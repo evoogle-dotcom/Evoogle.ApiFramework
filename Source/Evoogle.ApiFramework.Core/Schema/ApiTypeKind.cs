@@ -12,7 +12,7 @@ public enum ApiTypeKind
     Collection,
 
     /// <summary>Represents the API enumeration type.</summary>
-    Enumeration,
+    Enum,
 
     /// <summary>Represents the API object type.</summary>
     Object,

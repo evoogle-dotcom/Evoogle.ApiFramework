@@ -11,7 +11,7 @@ namespace Evoogle.ApiFramework.Schema;
 public class ApiEnumType : ApiNamedType
 {
     #region ApiType Properties
-    public override ApiTypeKind Kind => ApiTypeKind.Enumeration;
+    public override ApiTypeKind Kind => ApiTypeKind.Enum;
     #endregion
 
     #region ApiEnumType Properties
