@@ -3,6 +3,7 @@
 using System.Text.Json.Serialization;
 
 using Evoogle.Extension;
+using Evoogle.Json;
 
 namespace Evoogle.ApiFramework.Schema;
 
@@ -12,6 +13,7 @@ public abstract class ApiType(Type clrType) : ExtensibleBase
     #region ApiType Properties
     public abstract ApiTypeKind Kind { get; }
 
+    [JsonConverter(typeof(TypeJsonConverter))]
     public Type ClrType { get; } = clrType;
     #endregion
 }

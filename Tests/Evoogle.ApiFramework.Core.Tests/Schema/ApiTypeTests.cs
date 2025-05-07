@@ -192,6 +192,139 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 typeof(StopLight)
             )
         },
+
+        // ApiCollectionType
+        new JsonDeserializeTest
+        {
+            Name = "ApiCollectionType [List<String>]",
+            SourceJson = @"
+            {
+                ""Kind"": ""Collection"",
+                ""ApiItemType"": {
+                    ""Kind"": ""Scalar"",
+                    ""ApiName"": ""String"",
+                    ""ClrType"": ""System.String, System.Private.CoreLib""
+                },
+                ""ApiItemTypeModifiers"": ""Required"",
+                ""ClrType"": ""System.Collections.Generic.List\u00601[[System.String, System.Private.CoreLib]], System.Private.CoreLib""
+            }",
+            ExpectedApiType = new ApiCollectionType(new ApiScalarType("String", typeof(string)), ApiTypeModifiers.Required, typeof(List<string>))
+        },
+
+        new JsonDeserializeTest
+        {
+            Name = "ApiCollectionType [List<String?>]",
+            SourceJson = @"
+            {
+                ""Kind"": ""Collection"",
+                ""ApiItemType"": {
+                    ""Kind"": ""Scalar"",
+                    ""ApiName"": ""String"",
+                    ""ClrType"": ""System.String, System.Private.CoreLib""
+                },
+                ""ApiItemTypeModifiers"": ""None"",
+                ""ClrType"": ""System.Collections.Generic.List\u00601[[System.String, System.Private.CoreLib]], System.Private.CoreLib""
+            }",
+            ExpectedApiType = new ApiCollectionType(new ApiScalarType("String", typeof(string)), ApiTypeModifiers.None, typeof(List<string?>))
+        },
+
+        new JsonDeserializeTest
+        {
+            Name = "ApiCollectionType [List<StopLight>]",
+            SourceJson = @"
+            {
+                ""Kind"": ""Collection"",
+                ""ApiItemType"": {
+                    ""Kind"": ""Enum"",
+                    ""ApiName"": ""StopLight"",
+                    ""ApiEnumValues"": [
+                        {
+                            ""ApiName"": ""None"",
+                            ""ClrName"": ""None"",
+                            ""ClrOrdinal"": 0
+                        },
+                        {
+                            ""ApiName"": ""Green"",
+                            ""ClrName"": ""Green"",
+                            ""ClrOrdinal"": 1
+                        },
+                        {
+                            ""ApiName"": ""Yellow"",
+                            ""ClrName"": ""Yellow"",
+                            ""ClrOrdinal"": 2
+                        },
+                        {
+                            ""ApiName"": ""Red"",
+                            ""ClrName"": ""Red"",
+                            ""ClrOrdinal"": 3
+                        }
+                    ],
+                    ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiTypeTests\u002BStopLight, Evoogle.ApiFramework.Core.Tests""
+                },
+                ""ApiItemTypeModifiers"": ""Required"",
+                ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.Schema.ApiTypeTests\u002BStopLight, Evoogle.ApiFramework.Core.Tests]], System.Private.CoreLib""
+            }",
+            ExpectedApiType = new ApiCollectionType
+            (
+                new ApiEnumType
+                (
+                    "StopLight",
+                    [new ApiEnumValue("None", "None", 0), new ApiEnumValue("Green", "Green", 1), new ApiEnumValue("Yellow", "Yellow", 2), new ApiEnumValue("Red", "Red", 3)],
+                    typeof(StopLight)
+                ),
+                ApiTypeModifiers.Required,
+                typeof(List<StopLight>)
+            )
+        },
+
+        new JsonDeserializeTest
+        {
+            Name = "ApiCollectionType [List<StopLight?>]",
+            SourceJson = @"
+            {
+                ""Kind"": ""Collection"",
+                ""ApiItemType"": {
+                    ""Kind"": ""Enum"",
+                    ""ApiName"": ""StopLight"",
+                    ""ApiEnumValues"": [
+                        {
+                            ""ApiName"": ""None"",
+                            ""ClrName"": ""None"",
+                            ""ClrOrdinal"": 0
+                        },
+                        {
+                            ""ApiName"": ""Green"",
+                            ""ClrName"": ""Green"",
+                            ""ClrOrdinal"": 1
+                        },
+                        {
+                            ""ApiName"": ""Yellow"",
+                            ""ClrName"": ""Yellow"",
+                            ""ClrOrdinal"": 2
+                        },
+                        {
+                            ""ApiName"": ""Red"",
+                            ""ClrName"": ""Red"",
+                            ""ClrOrdinal"": 3
+                        }
+                    ],
+                    ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiTypeTests\u002BStopLight, Evoogle.ApiFramework.Core.Tests""
+                },
+                ""ApiItemTypeModifiers"": ""None"",
+                ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.Schema.ApiTypeTests\u002BStopLight, Evoogle.ApiFramework.Core.Tests]], System.Private.CoreLib""
+            }",
+            ExpectedApiType = new ApiCollectionType
+            (
+                new ApiEnumType
+                (
+                    "StopLight",
+                    [new ApiEnumValue("None", "None", 0), new ApiEnumValue("Green", "Green", 1), new ApiEnumValue("Yellow", "Yellow", 2), new ApiEnumValue("Red", "Red", 3)],
+                    typeof(StopLight)
+                ),
+                ApiTypeModifiers.None,
+                typeof(List<StopLight>)
+            )
+        },
     ];
 
     public static TheoryDataRow<IXUnitTest>[] JsonSerializeTheoryData =>
@@ -302,6 +435,139 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     }
                 ],
                 ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiTypeTests\u002BStopLight, Evoogle.ApiFramework.Core.Tests""
+            }"
+        },
+
+        // ApiCollectionType
+        new JsonSerializeTest
+        {
+            Name = "ApiCollectionType [List<String>]",
+            SourceApiType = new ApiCollectionType(new ApiScalarType("String", typeof(string)), ApiTypeModifiers.Required, typeof(List<string>)),
+            ExpectedJson = @"
+            {
+                ""Kind"": ""Collection"",
+                ""ApiItemType"": {
+                    ""Kind"": ""Scalar"",
+                    ""ApiName"": ""String"",
+                    ""ClrType"": ""System.String, System.Private.CoreLib""
+                },
+                ""ApiItemTypeModifiers"": ""Required"",
+                ""ClrType"": ""System.Collections.Generic.List\u00601[[System.String, System.Private.CoreLib]], System.Private.CoreLib""
+            }"
+        },
+
+        new JsonSerializeTest
+        {
+            Name = "ApiCollectionType [List<String?>]",
+            SourceApiType = new ApiCollectionType(new ApiScalarType("String", typeof(string)), ApiTypeModifiers.None, typeof(List<string?>)),
+            ExpectedJson = @"
+            {
+                ""Kind"": ""Collection"",
+                ""ApiItemType"": {
+                    ""Kind"": ""Scalar"",
+                    ""ApiName"": ""String"",
+                    ""ClrType"": ""System.String, System.Private.CoreLib""
+                },
+                ""ApiItemTypeModifiers"": ""None"",
+                ""ClrType"": ""System.Collections.Generic.List\u00601[[System.String, System.Private.CoreLib]], System.Private.CoreLib""
+            }"
+        },
+
+        new JsonSerializeTest
+        {
+            Name = "ApiCollectionType [List<StopLight>]",
+            SourceApiType = new ApiCollectionType
+            (
+                new ApiEnumType
+                (
+                    "StopLight",
+                    [new ApiEnumValue("None", "None", 0), new ApiEnumValue("Green", "Green", 1), new ApiEnumValue("Yellow", "Yellow", 2), new ApiEnumValue("Red", "Red", 3)],
+                    typeof(StopLight)
+                ),
+                ApiTypeModifiers.Required,
+                typeof(List<StopLight>)
+            ),
+            ExpectedJson = @"
+            {
+                ""Kind"": ""Collection"",
+                ""ApiItemType"": {
+                    ""Kind"": ""Enum"",
+                    ""ApiName"": ""StopLight"",
+                    ""ApiEnumValues"": [
+                        {
+                            ""ApiName"": ""None"",
+                            ""ClrName"": ""None"",
+                            ""ClrOrdinal"": 0
+                        },
+                        {
+                            ""ApiName"": ""Green"",
+                            ""ClrName"": ""Green"",
+                            ""ClrOrdinal"": 1
+                        },
+                        {
+                            ""ApiName"": ""Yellow"",
+                            ""ClrName"": ""Yellow"",
+                            ""ClrOrdinal"": 2
+                        },
+                        {
+                            ""ApiName"": ""Red"",
+                            ""ClrName"": ""Red"",
+                            ""ClrOrdinal"": 3
+                        }
+                    ],
+                    ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiTypeTests\u002BStopLight, Evoogle.ApiFramework.Core.Tests""
+                },
+                ""ApiItemTypeModifiers"": ""Required"",
+                ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.Schema.ApiTypeTests\u002BStopLight, Evoogle.ApiFramework.Core.Tests]], System.Private.CoreLib""
+            }"
+        },
+
+        new JsonSerializeTest
+        {
+            Name = "ApiCollectionType [List<StopLight?>]",
+            SourceApiType = new ApiCollectionType
+            (
+                new ApiEnumType
+                (
+                    "StopLight",
+                    [new ApiEnumValue("None", "None", 0), new ApiEnumValue("Green", "Green", 1), new ApiEnumValue("Yellow", "Yellow", 2), new ApiEnumValue("Red", "Red", 3)],
+                    typeof(StopLight)
+                ),
+                ApiTypeModifiers.None,
+                typeof(List<StopLight>)
+            ),
+            ExpectedJson = @"
+            {
+                ""Kind"": ""Collection"",
+                ""ApiItemType"": {
+                    ""Kind"": ""Enum"",
+                    ""ApiName"": ""StopLight"",
+                    ""ApiEnumValues"": [
+                        {
+                            ""ApiName"": ""None"",
+                            ""ClrName"": ""None"",
+                            ""ClrOrdinal"": 0
+                        },
+                        {
+                            ""ApiName"": ""Green"",
+                            ""ClrName"": ""Green"",
+                            ""ClrOrdinal"": 1
+                        },
+                        {
+                            ""ApiName"": ""Yellow"",
+                            ""ClrName"": ""Yellow"",
+                            ""ClrOrdinal"": 2
+                        },
+                        {
+                            ""ApiName"": ""Red"",
+                            ""ClrName"": ""Red"",
+                            ""ClrOrdinal"": 3
+                        }
+                    ],
+                    ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiTypeTests\u002BStopLight, Evoogle.ApiFramework.Core.Tests""
+                },
+                ""ApiItemTypeModifiers"": ""None"",
+                ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.Schema.ApiTypeTests\u002BStopLight, Evoogle.ApiFramework.Core.Tests]], System.Private.CoreLib""
             }"
         },
     ];
