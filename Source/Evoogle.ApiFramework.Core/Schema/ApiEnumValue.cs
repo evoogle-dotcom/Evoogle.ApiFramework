@@ -1,23 +1,14 @@
-﻿// Copyright (c) 2024 Evoogle.com
-// Licensed under the MIT License. See License.txt in the project root for license information.
+﻿// Copyright (c) 2024-2025 Evoogle.com
+// SPDX-License-Identifier: MIT
+//
+// This file is licensed under the MIT License.
+// See the LICENSE file in the project root for more information.
 namespace Evoogle.ApiFramework.Schema;
 
-public class ApiEnumValue(string apiName, string clrName, int clrOrdinal)
-{
-    #region ApiEnumValue Properties
-    public string ApiName { get; } = apiName;
-    public string ClrName { get; } = clrName;
-    public int ClrOrdinal { get; } = clrOrdinal;
-    #endregion
-
-    #region Object Methods
-    public override string ToString()
-    {
-        var apiName = this.ApiName.SafeToString();
-        var clrName = this.ClrName.SafeToString();
-        var clrOrdinal = this.ClrOrdinal.SafeToString();
-
-        return $"{nameof(ApiEnumValue)} {{{nameof(ApiName)}={apiName}, {nameof(ClrName)}={clrName}, {nameof(ClrOrdinal)}={clrOrdinal}}}";
-    }
-    #endregion
-}
+/// <summary>
+///     Represents a single enumeration value within an API enumeration type.
+/// </summary>
+/// <param name="ApiName">The API name of the enumeration value (typically used in API requests/responses).</param>
+/// <param name="ClrName">The CLR name of the enumeration value (corresponding to the C# enum name).</param>
+/// <param name="ClrOrdinal">The CLR ordinal (integer value) of the enumeration value.</param>
+public sealed record ApiEnumValue(string ApiName, string ClrName, int ClrOrdinal);

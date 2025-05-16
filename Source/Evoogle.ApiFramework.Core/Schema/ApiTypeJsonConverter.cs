@@ -1,5 +1,8 @@
-﻿// Copyright (c) 2024 Evoogle.com
-// Licensed under the MIT License. See License.txt in the project root for license information.
+﻿// Copyright (c) 2024-2025 Evoogle.com
+// SPDX-License-Identifier: MIT
+//
+// This file is licensed under the MIT License.
+// See the LICENSE file in the project root for more information.
 using System.Collections.Concurrent;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
@@ -115,6 +118,23 @@ public class ApiTypeJsonConverter : JsonConverter<ApiType>
         #endregion
     }
 
+    private class ApiObjectTypeReadData
+    {
+        #region Properties
+        public List<ApiPropertyReadData>? ApiProperties { get; set; }
+        #endregion
+    }
+
+    private class ApiPropertyReadData
+    {
+        #region Properties
+        public string? ApiName { get; set; }
+        public ApiType? ApiType { get; set; }
+        public ApiTypeModifiers? ApiTypeModifiers { get; set; }
+        public string? ClrName { get; set; }
+        #endregion
+    }
+
     private class ApiTypeReadData
     {
         #region Properties
@@ -130,6 +150,7 @@ public class ApiTypeJsonConverter : JsonConverter<ApiType>
         public ApiCollectionTypeReadData? ApiCollectionType { get; set; }
         public ApiEnumTypeReadData? ApiEnumType { get; set; }
         public ApiNamedTypeReadData? ApiNamedType { get; set; }
+        public ApiObjectTypeReadData? ApiObjectType { get; set; }
         public ApiTypeReadData? ApiType { get; set; }
         #endregion
     }
@@ -139,7 +160,7 @@ public class ApiTypeJsonConverter : JsonConverter<ApiType>
     private class ReadHandlers(JsonNamingPolicy policy)
     {
         #region Fields
-        public readonly Dictionary<string, ReadHandler> ApiEnumValuePropertyHandler = new()
+        public readonly Dictionary<string, ReadHandler> ApiEnumValuePropertyHandlers = new()
         {
             {
                 policy.ConvertName(nameof(ApiEnumValue.ApiName)),
@@ -163,6 +184,42 @@ public class ApiTypeJsonConverter : JsonConverter<ApiType>
                 {
                     var apiEnumValue = context.ReadData.ApiEnumType!.ApiEnumValues!.Last();
                     apiEnumValue.ClrOrdinal = reader.GetInt32();
+                }
+            },
+        };
+
+        public readonly Dictionary<string, ReadHandler> ApiPropertyPropertyHandlers = new()
+        {
+            {
+                policy.ConvertName(nameof(ApiProperty.ApiName)),
+                (ref Utf8JsonReader reader, ref ReadContext context) =>
+                {
+                    var apiProperty = context.ReadData.ApiObjectType!.ApiProperties!.Last();
+                    apiProperty.ApiName = reader.GetString();
+                }
+            },
+            {
+                policy.ConvertName(nameof(ApiProperty.ApiType)),
+                (ref Utf8JsonReader reader, ref ReadContext context) =>
+                {
+                    var apiProperty = context.ReadData.ApiObjectType!.ApiProperties!.Last();
+                    apiProperty.ApiType = JsonSerializer.Deserialize<ApiType>(ref reader, context.Options) ?? throw new JsonException($"Failed to deserialize {context.PropertyNames.ApiCollectionType.ApiItemType}.");
+                }
+            },
+            {
+                policy.ConvertName(nameof(ApiProperty.ApiTypeModifiers)),
+                (ref Utf8JsonReader reader, ref ReadContext context) =>
+                {
+                    var apiProperty = context.ReadData.ApiObjectType!.ApiProperties!.Last();
+                    apiProperty.ApiTypeModifiers = ApiTypeModifiersJsonConverter.Read(ref reader, typeof(ApiTypeModifiers), context.Options);
+                }
+            },
+            {
+                policy.ConvertName(nameof(ApiProperty.ClrName)),
+                (ref Utf8JsonReader reader, ref ReadContext context) =>
+                {
+                    var apiProperty = context.ReadData.ApiObjectType!.ApiProperties!.Last();
+                    apiProperty.ClrName = reader.GetString();
                 }
             },
         };
@@ -233,6 +290,17 @@ public class ApiTypeJsonConverter : JsonConverter<ApiType>
                     ReadJsonArray(ref reader, ref context, (x) => ReadApiEnumValueArrayItem);
                 }
             },
+
+            // ApiObjectType Property Handlers
+            {
+                policy.ConvertName(nameof(ApiObjectType.ApiProperties)),
+                (ref Utf8JsonReader reader, ref ReadContext context) =>
+                {
+                    context.ReadData.ApiObjectType ??= new ApiObjectTypeReadData();
+
+                    ReadJsonArray(ref reader, ref context, (x) => ReadApiPropertyArrayItem);
+                }
+            },
         };
         #endregion
 
@@ -242,7 +310,15 @@ public class ApiTypeJsonConverter : JsonConverter<ApiType>
             context.ReadData.ApiEnumType!.ApiEnumValues ??= [];
             context.ReadData.ApiEnumType!.ApiEnumValues.Add(new ApiEnumValueReadData());
 
-            ReadJsonObject(ref reader, ref context, (x) => x.ReadHandlers.ApiEnumValuePropertyHandler);
+            ReadJsonObject(ref reader, ref context, (x) => x.ReadHandlers.ApiEnumValuePropertyHandlers);
+        }
+
+        private static void ReadApiPropertyArrayItem(ref Utf8JsonReader reader, ref ReadContext context)
+        {
+            context.ReadData.ApiObjectType!.ApiProperties ??= [];
+            context.ReadData.ApiObjectType!.ApiProperties.Add(new ApiPropertyReadData());
+
+            ReadJsonObject(ref reader, ref context, (x) => x.ReadHandlers.ApiPropertyPropertyHandlers);
         }
         #endregion
     }
@@ -317,6 +393,24 @@ public class ApiTypeJsonConverter : JsonConverter<ApiType>
     }
     #endregion
 
+    #region Cache Implementation Methods
+    private static JsonNamingPolicy GetPropertyNamingPolicy(JsonSerializerOptions options)
+    {
+        var policy = options.PropertyNamingPolicy ?? NullJsonNamingPolicy;
+        return policy;
+    }
+
+    private static PropertyNames GetPropertyNames(JsonNamingPolicy policy)
+    {
+        return PropertyNamesCache.GetOrAdd(policy, policy => new PropertyNames(policy));
+    }
+
+    private static ReadHandlers GetReadHandlers(JsonNamingPolicy policy)
+    {
+        return ReadHandlersCache.GetOrAdd(policy, policy => new ReadHandlers(policy));
+    }
+    #endregion
+
     #region Factory Implementation Methods
     private static void AttachExtensions(ReadContext context, ApiType apiType)
     {
@@ -369,6 +463,27 @@ public class ApiTypeJsonConverter : JsonConverter<ApiType>
         return apiEnumValues;
     }
 
+    private static ApiObjectType CreateApiObjectType(ReadContext context, List<ValidationResult>? validationResults)
+    {
+        HandleValidationResults(validationResults);
+
+        var apiName = context.ReadData.ApiNamedType!.ApiName!;
+        var apiProperties = context.ReadData.ApiObjectType!.ApiProperties!.Select(x =>
+        {
+            var apiName = x.ApiName!;
+            var apiType = x.ApiType!;
+            var apiTypeModifiers = x.ApiTypeModifiers!.Value;
+            var clrName = x.ClrName!;
+
+            var apiProperty = new ApiProperty(apiName, apiType, apiTypeModifiers, clrName);
+            return apiProperty;
+        })
+        .ToList();
+        var clrType = context.ReadData.ApiType!.ClrType!;
+
+        return new ApiObjectType(apiName, apiProperties, clrType);
+    }
+
     private static ApiScalarType CreateApiScalarType(ReadContext context, List<ValidationResult>? validationResults)
     {
         HandleValidationResults(validationResults);
@@ -379,33 +494,20 @@ public class ApiTypeJsonConverter : JsonConverter<ApiType>
         return new ApiScalarType(apiName, clrType);
     }
 
-    private static void HandleValidationResults(List<ValidationResult>? validationResults)
+    private static void HandleValidationResults(IEnumerable<ValidationResult>? validationResults)
     {
         if (validationResults == null)
             return;
 
-        if (validationResults.Count == 0)
+        if (validationResults.Any() == false)
             return;
 
-        // TODO: Need to think through a strategy on how to capture all validation errors and return it as an exception.
-    }
-    #endregion
+        // Create a delimited string of all the failed validation result error messages.
+        var message = validationResults.Where(x => x != ValidationResult.Success && !string.IsNullOrWhiteSpace(x.ErrorMessage)).SafeToDelimitedString('\n');
+        if (string.IsNullOrWhiteSpace(message))
+            return;
 
-    #region Cache Implementation Methods
-    private static JsonNamingPolicy GetPropertyNamingPolicy(JsonSerializerOptions options)
-    {
-        var policy = options.PropertyNamingPolicy ?? NullJsonNamingPolicy;
-        return policy;
-    }
-
-    private static PropertyNames GetPropertyNames(JsonNamingPolicy policy)
-    {
-        return PropertyNamesCache.GetOrAdd(policy, policy => new PropertyNames(policy));
-    }
-
-    private static ReadHandlers GetReadHandlers(JsonNamingPolicy policy)
-    {
-        return ReadHandlersCache.GetOrAdd(policy, policy => new ReadHandlers(policy));
+        throw new JsonException(message);
     }
     #endregion
 
@@ -439,9 +541,19 @@ public class ApiTypeJsonConverter : JsonConverter<ApiType>
                 }
                 break;
 
+            case nameof(ApiTypeKind.Object):
+                {
+                    ValidateApiNamedTypeProperties(context, validationResults);
+                    ValidateApiObjectTypeProperties(context, validationResults);
+
+                    apiType = CreateApiObjectType(context, validationResults);
+                }
+                break;
+
             case nameof(ApiTypeKind.Scalar):
                 {
                     ValidateApiNamedTypeProperties(context, validationResults);
+
                     apiType = CreateApiScalarType(context, validationResults);
                 }
                 break;
@@ -565,6 +677,7 @@ public class ApiTypeJsonConverter : JsonConverter<ApiType>
     {
         ValidateApiEnumTypeProperties
         (
+            context,
             context.PropertyNames.ApiEnumType.ApiEnumValues, context.ReadData.ApiEnumType?.ApiEnumValues,
             validationResults
         );
@@ -572,6 +685,7 @@ public class ApiTypeJsonConverter : JsonConverter<ApiType>
 
     private static void ValidateApiEnumTypeProperties
     (
+        ReadContext context,
         string apiEnumValuesPropertyName, IEnumerable<ApiEnumValueReadData>? apiEnumValues,
         List<ValidationResult>? validationResults
     )
@@ -588,6 +702,126 @@ public class ApiTypeJsonConverter : JsonConverter<ApiType>
                 validationResults ??= [];
                 validationResults.Add(new ValidationResult($"Empty required property: {apiEnumValuesPropertyName}", [apiEnumValuesPropertyName]));
             }
+
+            foreach (var apiEnumValue in apiEnumValues)
+            {
+                ValidateApiEnumValueProperties
+                (
+                    context.PropertyNames.ApiEnumValue.ApiName, apiEnumValue.ApiName,
+                    context.PropertyNames.ApiEnumValue.ClrName, apiEnumValue.ClrName,
+                    context.PropertyNames.ApiEnumValue.ClrOrdinal, apiEnumValue.ClrOrdinal,
+                    validationResults
+                );
+            }
+        }
+    }
+
+    private static void ValidateApiEnumValueProperties
+    (
+        string apiNamePropertyName, string? apiName,
+        string clrNamePropertyName, string? clrName,
+        string clrOrdinalPropertyName, long? clrOrdinal,
+        List<ValidationResult>? validationResults
+    )
+    {
+        if (apiName == null)
+        {
+            validationResults ??= [];
+            validationResults.Add(new ValidationResult($"Missing required property: {apiNamePropertyName}", [apiNamePropertyName]));
+        }
+
+        if (clrName == null)
+        {
+            validationResults ??= [];
+            validationResults.Add(new ValidationResult($"Missing required property: {clrNamePropertyName}", [clrNamePropertyName]));
+        }
+
+        if (clrOrdinal == null)
+        {
+            validationResults ??= [];
+            validationResults.Add(new ValidationResult($"Missing required property: {clrOrdinalPropertyName}", [clrOrdinalPropertyName]));
+        }
+    }
+
+    private static void ValidateApiObjectTypeProperties
+    (
+        ReadContext context,
+        List<ValidationResult>? validationResults
+    )
+    {
+        ValidateApiObjectTypeProperties
+        (
+            context,
+            context.PropertyNames.ApiObjectType.ApiProperties, context.ReadData.ApiObjectType?.ApiProperties,
+            validationResults
+        );
+    }
+
+    private static void ValidateApiObjectTypeProperties
+    (
+        ReadContext context,
+        string apiPropertiesPropertyName, IEnumerable<ApiPropertyReadData>? apiProperties,
+        List<ValidationResult>? validationResults
+    )
+    {
+        if (apiProperties == null)
+        {
+            validationResults ??= [];
+            validationResults.Add(new ValidationResult($"Missing required property: {apiPropertiesPropertyName}", [apiPropertiesPropertyName]));
+        }
+        else
+        {
+            if (apiProperties.Any() == false)
+            {
+                validationResults ??= [];
+                validationResults.Add(new ValidationResult($"Empty required property: {apiPropertiesPropertyName}", [apiPropertiesPropertyName]));
+            }
+
+            foreach (var apiProperty in apiProperties)
+            {
+                ValidateApiPropertyProperties
+                (
+                    context.PropertyNames.ApiProperty.ApiName, apiProperty.ApiName,
+                    context.PropertyNames.ApiProperty.ApiType, apiProperty.ApiType,
+                    context.PropertyNames.ApiProperty.ApiTypeModifiers, apiProperty.ApiTypeModifiers,
+                    context.PropertyNames.ApiProperty.ClrName, apiProperty.ClrName,
+                    validationResults
+                );
+            }
+        }
+    }
+
+    private static void ValidateApiPropertyProperties
+    (
+        string apiNamePropertyName, string? apiName,
+        string apiTypePropertyName, ApiType? apiType,
+        string apiTypeModifiersPropertyName, ApiTypeModifiers? apiTypeModifiers,
+        string clrNamePropertyName, string? clrName,
+        List<ValidationResult>? validationResults
+    )
+    {
+        if (apiName == null)
+        {
+            validationResults ??= [];
+            validationResults.Add(new ValidationResult($"Missing required property: {apiNamePropertyName}", [apiNamePropertyName]));
+        }
+
+        if (apiType == null)
+        {
+            validationResults ??= [];
+            validationResults.Add(new ValidationResult($"Missing required property: {apiTypePropertyName}", [apiTypePropertyName]));
+        }
+
+        if (apiTypeModifiers == null)
+        {
+            validationResults ??= [];
+            validationResults.Add(new ValidationResult($"Missing required property: {apiTypeModifiersPropertyName}", [apiTypeModifiersPropertyName]));
+        }
+
+        if (clrName == null)
+        {
+            validationResults ??= [];
+            validationResults.Add(new ValidationResult($"Missing required property: {clrNamePropertyName}", [clrNamePropertyName]));
         }
     }
 
@@ -661,7 +895,6 @@ public class ApiTypeJsonConverter : JsonConverter<ApiType>
         ref WriteContext context
     )
     {
-        // Write concrete properties.
         WriteApiCollectionTypeApiItemType(writer, apiCollectionType, ref context);
         WriteApiCollectionTypeApiItemTypeModifiers(writer, apiCollectionType, ref context);
     }
@@ -705,7 +938,6 @@ public class ApiTypeJsonConverter : JsonConverter<ApiType>
         ref WriteContext context
     )
     {
-        // Write concrete properties.
         WriteApiEnumTypeApiEnumValues(writer, apiEnumType, ref context);
     }
 
@@ -791,7 +1023,6 @@ public class ApiTypeJsonConverter : JsonConverter<ApiType>
         ref WriteContext context
     )
     {
-        // Write concrete properties.
         WriteApiNamedTypeApiName(writer, apiNamedType, ref context);
     }
 
@@ -815,7 +1046,6 @@ public class ApiTypeJsonConverter : JsonConverter<ApiType>
         ref WriteContext context
     )
     {
-        // Write concrete properties.
         WriteApiObjectTypeApiProperties(writer, apiObjectType, ref context);
     }
 
@@ -848,11 +1078,14 @@ public class ApiTypeJsonConverter : JsonConverter<ApiType>
         ref WriteContext context
     )
     {
-        // Write concrete properties.
+        writer.WriteStartObject();
+
         WriteApiPropertyApiName(writer, apiProperty, ref context);
         WriteApiPropertyApiType(writer, apiProperty, ref context);
         WriteApiPropertyApiTypeModifiers(writer, apiProperty, ref context);
         WriteApiPropertyClrName(writer, apiProperty, ref context);
+
+        writer.WriteEndObject();
     }
 
     private static void WriteApiPropertyApiName
@@ -918,8 +1151,7 @@ public class ApiTypeJsonConverter : JsonConverter<ApiType>
         ref WriteContext context
     )
     {
-        // Write concrete properties.
-        // -- Note: No concrete ApiScalarType properties to write => NOOP.
+        // Note: No concrete ApiScalarType properties to write => NOOP.
     }
 
     // ApiType
@@ -930,7 +1162,6 @@ public class ApiTypeJsonConverter : JsonConverter<ApiType>
         ref WriteContext context
     )
     {
-        // Write Derived ApiType JSON Properties
         var kind = apiType.Kind;
         switch (kind)
         {
@@ -989,11 +1220,9 @@ public class ApiTypeJsonConverter : JsonConverter<ApiType>
         ref WriteContext context
     )
     {
-        // Write ApiType Epilog JSON Properties
         WriteApiTypeClrType(writer, apiType, ref context);
         WriteApiTypeExtensions(writer, apiType, ref context);
 
-        // Write JSON End of Object
         writer.WriteEndObject();
     }
 
@@ -1045,10 +1274,8 @@ public class ApiTypeJsonConverter : JsonConverter<ApiType>
         ref WriteContext context
     )
     {
-        // Write JSON Start of Object
         writer.WriteStartObject();
 
-        // Write ApiType Prolog JSON Properties
         WriteApiTypeKind(writer, apiType, ref context);
     }
     #endregion

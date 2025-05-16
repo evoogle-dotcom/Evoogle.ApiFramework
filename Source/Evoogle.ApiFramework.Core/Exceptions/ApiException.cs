@@ -1,5 +1,8 @@
-﻿// Copyright (c) 2024 Evoogle.com
-// Licensed under the MIT License. See License.txt in the project root for license information.
+﻿// Copyright (c) 2024-2025 Evoogle.com
+// SPDX-License-Identifier: MIT
+//
+// This file is licensed under the MIT License.
+// See the LICENSE file in the project root for more information.
 namespace Evoogle.ApiFramework.Exceptions;
 
 /// <summary>
@@ -16,8 +19,7 @@ public class ApiException : Exception
     { }
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="ApiException"/> class
-    ///     with a specified error message.
+    ///     Initializes a new instance of the <see cref="ApiException"/> class with a specified error message.
     /// </summary>
     /// <param name="message">The message that describes the error.</param>
     public ApiException(string message)
@@ -25,14 +27,11 @@ public class ApiException : Exception
     { }
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="ApiException"/> class
-    ///     with a specified error message and a reference to the inner exception
-    ///     that is the cause of this exception.
+    ///     Initializes a new instance of the <see cref="ApiException"/> class with a specified error message and a reference to the inner exception that is the cause of this exception.
     /// </summary>
     /// <param name="message">The message that describes the error.</param>
     /// <param name="innerException">
-    ///     The exception that is the cause of the current exception, or <c>null</c>
-    ///     if no inner exception is specified.
+    ///     The exception that is the cause of the current exception, or <c>null</c> if no inner exception is specified.
     /// </param>
     public ApiException(string message, Exception innerException)
         : base(message, innerException)

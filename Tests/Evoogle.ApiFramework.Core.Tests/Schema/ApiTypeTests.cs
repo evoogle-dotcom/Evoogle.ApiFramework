@@ -1,5 +1,8 @@
-// Copyright (c) 2024 Evoogle.com
-// Licensed under the MIT License. See License.txt in the project root for license information.
+// Copyright (c) 2024-2025 Evoogle.com
+// SPDX-License-Identifier: MIT
+//
+// This file is licensed under the MIT License.
+// See the LICENSE file in the project root for more information.
 using System.Text.Json;
 
 using Evoogle.XUnit;
@@ -74,6 +77,17 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
     #endregion
 
     #region Theory Data
+    public class ClassWithScalars(string requiredName, long requiredNumber, bool requiredPredicate)
+    {
+        public string RequiredName { get; set; } = requiredName;
+        public long RequiredNumber { get; set; } = requiredNumber;
+        public bool RequiredPredicate { get; set; } = requiredPredicate;
+
+        public string? OptionalName { get; set; }
+        public long? OptionalNumber { get; set; }
+        public bool? OptionalPredicate { get; set; }
+    }
+
     public enum StopLight
     {
         None,
@@ -156,7 +170,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
         // ApiEnumType
         new JsonDeserializeTest
         {
-            Name = "ApiEnumType [StopLight]",
+            Name = $"ApiEnumType [{nameof(StopLight)}]",
             SourceJson = @"
             {
                 ""Kind"": ""Enum"",
@@ -187,7 +201,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             }",
             ExpectedApiType = new ApiEnumType
             (
-                "StopLight",
+                nameof(StopLight),
                 [new ApiEnumValue("None", "None", 0), new ApiEnumValue("Green", "Green", 1), new ApiEnumValue("Yellow", "Yellow", 2), new ApiEnumValue("Red", "Red", 3)],
                 typeof(StopLight)
             )
@@ -230,7 +244,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
 
         new JsonDeserializeTest
         {
-            Name = "ApiCollectionType [List<StopLight>]",
+            Name = $"ApiCollectionType [List<{nameof(StopLight)}>]",
             SourceJson = @"
             {
                 ""Kind"": ""Collection"",
@@ -268,7 +282,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 new ApiEnumType
                 (
-                    "StopLight",
+                    nameof(StopLight),
                     [new ApiEnumValue("None", "None", 0), new ApiEnumValue("Green", "Green", 1), new ApiEnumValue("Yellow", "Yellow", 2), new ApiEnumValue("Red", "Red", 3)],
                     typeof(StopLight)
                 ),
@@ -279,7 +293,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
 
         new JsonDeserializeTest
         {
-            Name = "ApiCollectionType [List<StopLight?>]",
+            Name = $"ApiCollectionType [List<{nameof(StopLight)}?>]",
             SourceJson = @"
             {
                 ""Kind"": ""Collection"",
@@ -317,12 +331,135 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 new ApiEnumType
                 (
-                    "StopLight",
+                    nameof(StopLight),
                     [new ApiEnumValue("None", "None", 0), new ApiEnumValue("Green", "Green", 1), new ApiEnumValue("Yellow", "Yellow", 2), new ApiEnumValue("Red", "Red", 3)],
                     typeof(StopLight)
                 ),
                 ApiTypeModifiers.None,
                 typeof(List<StopLight>)
+            )
+        },
+
+        // ApiObjectType
+        new JsonDeserializeTest
+        {
+            Name = $"ApiObjectType [{nameof(ClassWithScalars)}]",
+            SourceJson = @"
+            {
+                ""Kind"": ""Object"",
+                ""ApiName"": ""ClassWithScalars"",
+                ""ApiProperties"": [
+                    {
+                        ""ApiName"": ""RequiredName"",
+                        ""ApiType"": {
+                            ""Kind"": ""Scalar"",
+                            ""ApiName"": ""String"",
+                            ""ClrType"": ""System.String, System.Private.CoreLib""
+                        },
+                        ""ApiTypeModifiers"": ""Required"",
+                        ""ClrName"": ""RequiredName""
+                    },
+                    {
+                        ""ApiName"": ""RequiredNumber"",
+                        ""ApiType"": {
+                            ""Kind"": ""Scalar"",
+                            ""ApiName"": ""Long"",
+                            ""ClrType"": ""System.Int64, System.Private.CoreLib""
+                        },
+                        ""ApiTypeModifiers"": ""Required"",
+                        ""ClrName"": ""RequiredNumber""
+                    },
+                    {
+                        ""ApiName"": ""RequiredPredicate"",
+                        ""ApiType"": {
+                            ""Kind"": ""Scalar"",
+                            ""ApiName"": ""Boolean"",
+                            ""ClrType"": ""System.Boolean, System.Private.CoreLib""
+                        },
+                        ""ApiTypeModifiers"": ""Required"",
+                        ""ClrName"": ""RequiredPredicate""
+                    },
+                    {
+                        ""ApiName"": ""OptionalName"",
+                        ""ApiType"": {
+                            ""Kind"": ""Scalar"",
+                            ""ApiName"": ""String"",
+                            ""ClrType"": ""System.String, System.Private.CoreLib""
+                        },
+                        ""ApiTypeModifiers"": ""None"",
+                        ""ClrName"": ""OptionalName""
+                    },
+                    {
+                        ""ApiName"": ""OptionalNumber"",
+                        ""ApiType"": {
+                            ""Kind"": ""Scalar"",
+                            ""ApiName"": ""Long"",
+                            ""ClrType"": ""System.Int64, System.Private.CoreLib""
+                        },
+                        ""ApiTypeModifiers"": ""None"",
+                        ""ClrName"": ""OptionalNumber""
+                    },
+                    {
+                        ""ApiName"": ""OptionalPredicate"",
+                        ""ApiType"": {
+                            ""Kind"": ""Scalar"",
+                            ""ApiName"": ""Boolean"",
+                            ""ClrType"": ""System.Boolean, System.Private.CoreLib""
+                        },
+                        ""ApiTypeModifiers"": ""None"",
+                        ""ClrName"": ""OptionalPredicate""
+                    }
+                ],
+                ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiTypeTests\u002BClassWithScalars, Evoogle.ApiFramework.Core.Tests""
+            }",
+            ExpectedApiType = new ApiObjectType
+            (
+                nameof(ClassWithScalars),
+                [
+                    new ApiProperty
+                    (
+                        nameof(ClassWithScalars.RequiredName),
+                        new ApiScalarType("String", typeof(string)),
+                        ApiTypeModifiers.Required,
+                        nameof(ClassWithScalars.RequiredName)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(ClassWithScalars.RequiredNumber),
+                        new ApiScalarType("Long", typeof(long)),
+                        ApiTypeModifiers.Required,
+                        nameof(ClassWithScalars.RequiredNumber)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(ClassWithScalars.RequiredPredicate),
+                        new ApiScalarType("Boolean", typeof(bool)),
+                        ApiTypeModifiers.Required,
+                        nameof(ClassWithScalars.RequiredPredicate)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(ClassWithScalars.OptionalName),
+                        new ApiScalarType("String", typeof(string)),
+                        ApiTypeModifiers.None,
+                        nameof(ClassWithScalars.OptionalName)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(ClassWithScalars.OptionalNumber),
+                        new ApiScalarType("Long", typeof(long)),
+                        ApiTypeModifiers.None,
+                        nameof(ClassWithScalars.OptionalNumber)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(ClassWithScalars.OptionalPredicate),
+                        new ApiScalarType("Boolean", typeof(bool)),
+                        ApiTypeModifiers.None,
+                        nameof(ClassWithScalars.OptionalPredicate)
+                    ),
+                ],
+                typeof(ClassWithScalars)
             )
         },
     ];
@@ -401,10 +538,10 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
         // ApiEnumType
         new JsonSerializeTest
         {
-            Name = "ApiEnumType [StopLight]",
+            Name = $"ApiEnumType [{nameof(StopLight)}]",
             SourceApiType = new ApiEnumType
             (
-                "StopLight",
+                nameof(StopLight),
                 [new ApiEnumValue("None", "None", 0), new ApiEnumValue("Green", "Green", 1), new ApiEnumValue("Yellow", "Yellow", 2), new ApiEnumValue("Red", "Red", 3)],
                 typeof(StopLight)
             ),
@@ -475,12 +612,12 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
 
         new JsonSerializeTest
         {
-            Name = "ApiCollectionType [List<StopLight>]",
+            Name = $"ApiCollectionType [List<{nameof(StopLight)}>]",
             SourceApiType = new ApiCollectionType
             (
                 new ApiEnumType
                 (
-                    "StopLight",
+                    nameof(StopLight),
                     [new ApiEnumValue("None", "None", 0), new ApiEnumValue("Green", "Green", 1), new ApiEnumValue("Yellow", "Yellow", 2), new ApiEnumValue("Red", "Red", 3)],
                     typeof(StopLight)
                 ),
@@ -524,12 +661,12 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
 
         new JsonSerializeTest
         {
-            Name = "ApiCollectionType [List<StopLight?>]",
+            Name = $"ApiCollectionType [List<{nameof(StopLight)}?>]",
             SourceApiType = new ApiCollectionType
             (
                 new ApiEnumType
                 (
-                    "StopLight",
+                    nameof(StopLight),
                     [new ApiEnumValue("None", "None", 0), new ApiEnumValue("Green", "Green", 1), new ApiEnumValue("Yellow", "Yellow", 2), new ApiEnumValue("Red", "Red", 3)],
                     typeof(StopLight)
                 ),
@@ -568,6 +705,129 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 },
                 ""ApiItemTypeModifiers"": ""None"",
                 ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.Schema.ApiTypeTests\u002BStopLight, Evoogle.ApiFramework.Core.Tests]], System.Private.CoreLib""
+            }"
+        },
+
+        // ApiObjectType
+        new JsonSerializeTest
+        {
+            Name = $"ApiObjectType [{nameof(ClassWithScalars)}]",
+            SourceApiType = new ApiObjectType
+            (
+                nameof(ClassWithScalars),
+                [
+                    new ApiProperty
+                    (
+                        nameof(ClassWithScalars.RequiredName),
+                        new ApiScalarType("String", typeof(string)),
+                        ApiTypeModifiers.Required,
+                        nameof(ClassWithScalars.RequiredName)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(ClassWithScalars.RequiredNumber),
+                        new ApiScalarType("Long", typeof(long)),
+                        ApiTypeModifiers.Required,
+                        nameof(ClassWithScalars.RequiredNumber)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(ClassWithScalars.RequiredPredicate),
+                        new ApiScalarType("Boolean", typeof(bool)),
+                        ApiTypeModifiers.Required,
+                        nameof(ClassWithScalars.RequiredPredicate)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(ClassWithScalars.OptionalName),
+                        new ApiScalarType("String", typeof(string)),
+                        ApiTypeModifiers.None,
+                        nameof(ClassWithScalars.OptionalName)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(ClassWithScalars.OptionalNumber),
+                        new ApiScalarType("Long", typeof(long)),
+                        ApiTypeModifiers.None,
+                        nameof(ClassWithScalars.OptionalNumber)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(ClassWithScalars.OptionalPredicate),
+                        new ApiScalarType("Boolean", typeof(bool)),
+                        ApiTypeModifiers.None,
+                        nameof(ClassWithScalars.OptionalPredicate)
+                    ),
+                ],
+                typeof(ClassWithScalars)
+            ),
+            ExpectedJson = @"
+            {
+                ""Kind"": ""Object"",
+                ""ApiName"": ""ClassWithScalars"",
+                ""ApiProperties"": [
+                    {
+                        ""ApiName"": ""RequiredName"",
+                        ""ApiType"": {
+                            ""Kind"": ""Scalar"",
+                            ""ApiName"": ""String"",
+                            ""ClrType"": ""System.String, System.Private.CoreLib""
+                        },
+                        ""ApiTypeModifiers"": ""Required"",
+                        ""ClrName"": ""RequiredName""
+                    },
+                    {
+                        ""ApiName"": ""RequiredNumber"",
+                        ""ApiType"": {
+                            ""Kind"": ""Scalar"",
+                            ""ApiName"": ""Long"",
+                            ""ClrType"": ""System.Int64, System.Private.CoreLib""
+                        },
+                        ""ApiTypeModifiers"": ""Required"",
+                        ""ClrName"": ""RequiredNumber""
+                    },
+                    {
+                        ""ApiName"": ""RequiredPredicate"",
+                        ""ApiType"": {
+                            ""Kind"": ""Scalar"",
+                            ""ApiName"": ""Boolean"",
+                            ""ClrType"": ""System.Boolean, System.Private.CoreLib""
+                        },
+                        ""ApiTypeModifiers"": ""Required"",
+                        ""ClrName"": ""RequiredPredicate""
+                    },
+                    {
+                        ""ApiName"": ""OptionalName"",
+                        ""ApiType"": {
+                            ""Kind"": ""Scalar"",
+                            ""ApiName"": ""String"",
+                            ""ClrType"": ""System.String, System.Private.CoreLib""
+                        },
+                        ""ApiTypeModifiers"": ""None"",
+                        ""ClrName"": ""OptionalName""
+                    },
+                    {
+                        ""ApiName"": ""OptionalNumber"",
+                        ""ApiType"": {
+                            ""Kind"": ""Scalar"",
+                            ""ApiName"": ""Long"",
+                            ""ClrType"": ""System.Int64, System.Private.CoreLib""
+                        },
+                        ""ApiTypeModifiers"": ""None"",
+                        ""ClrName"": ""OptionalNumber""
+                    },
+                    {
+                        ""ApiName"": ""OptionalPredicate"",
+                        ""ApiType"": {
+                            ""Kind"": ""Scalar"",
+                            ""ApiName"": ""Boolean"",
+                            ""ClrType"": ""System.Boolean, System.Private.CoreLib""
+                        },
+                        ""ApiTypeModifiers"": ""None"",
+                        ""ClrName"": ""OptionalPredicate""
+                    }
+                ],
+                ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiTypeTests\u002BClassWithScalars, Evoogle.ApiFramework.Core.Tests""
             }"
         },
     ];
