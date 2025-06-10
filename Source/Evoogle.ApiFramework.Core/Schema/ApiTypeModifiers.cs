@@ -12,7 +12,7 @@ namespace Evoogle.ApiFramework.Schema;
 public enum ApiTypeModifiers
 {
     #region Values    
-    /// <summary>Represents the API type has no modifiers.</summary>
+    /// <summary>Represents that the API type has no modifiers.</summary>
     None = 0,
 
     /// <summary>Represents the API instance (of API type) is required and will always be non-null.</summary>
