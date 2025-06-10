@@ -346,8 +346,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
                 // Fallback for unknown properties — safely skip and optionally log them
 
                 // Log the skipped property if a logger is available.
-                var skipped = reader.GetString();
-                context.Logger?.LogWarning("Skipping unknown JSON property: '{Skipped}'", skipped);
+                context.Logger?.LogWarning("Skipping unknown JSON property: '{Skipped}'", propertyName);
 
                 // Skip unknown JSON object properties.
                 reader.Skip();
