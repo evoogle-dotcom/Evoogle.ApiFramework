@@ -227,6 +227,19 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
 
         new JsonDeserializeTest
         {
+            Name = "ApiScalarType [Boolean] With Extra Property",
+            SourceJson = @"
+            {
+                ""Kind"": ""Scalar"",
+                ""ApiName"": ""Boolean"",
+                ""ClrType"": ""System.Boolean, System.Private.CoreLib"",
+                ""Unexpected"": ""IgnoreMe""
+            }",
+            ExpectedApiType = new ApiScalarType("Boolean", typeof(bool))
+        },
+
+        new JsonDeserializeTest
+        {
             Name = "ApiScalarType [ID]",
             SourceJson =  @"
             {
