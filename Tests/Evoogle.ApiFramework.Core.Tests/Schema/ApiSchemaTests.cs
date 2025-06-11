@@ -19,8 +19,16 @@ public class ApiSchemaTests
             new ApiCollectionType(new ApiScalarType("Boolean", typeof(bool)), ApiTypeModifiers.None, typeof(List<bool>))
         };
 
-        var schema = new ApiSchema(types);
+        var schema = new ApiSchema("Test", types);
         schema.ApiTypes.Should().ContainSingle(t => t is ApiScalarType);
+    }
+
+    [Fact]
+    public void NameProperty_ReturnsProvidedName()
+    {
+        var schema = new ApiSchema("MySchema", []);
+
+        schema.Name.Should().Be("MySchema");
     }
 
     [Fact]
@@ -31,7 +39,7 @@ public class ApiSchemaTests
             [new ApiProperty("Name", new ApiScalarType("String", typeof(string)), ApiTypeModifiers.Required, nameof(Person.Name))],
             typeof(Person));
 
-        var schema = new ApiSchema([personType]);
+        var schema = new ApiSchema("Test", [personType]);
 
         var found = schema.TryGetApiObjectType(nameof(Person), out var result);
 
