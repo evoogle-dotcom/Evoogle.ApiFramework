@@ -5,12 +5,14 @@
 // See the LICENSE file in the project root for more information.
 using Evoogle.ApiFramework.Exceptions;
 using Evoogle.Extension;
+using System.Text.Json.Serialization;
 
 namespace Evoogle.ApiFramework.Schema;
 
 /// <summary>
 ///     Represents a collection of <see cref="ApiNamedType"/> instances making up a schema.
 /// </summary>
+[JsonConverter(typeof(ApiSchemaJsonConverter))]
 public sealed class ApiSchema : ExtensibleBase
 {
     #region ApiSchema Fields
@@ -28,6 +30,9 @@ public sealed class ApiSchema : ExtensibleBase
     #endregion
 
     #region ApiSchema Properties
+    /// <summary>Gets the name of the schema.</summary>
+    public string Name { get; }
+
     /// <summary>Gets all API named types contained within this schema.</summary>
     public IReadOnlyCollection<ApiNamedType> ApiTypes { get; }
 
@@ -45,11 +50,14 @@ public sealed class ApiSchema : ExtensibleBase
     /// <summary>
     ///     Initializes a new instance of the <see cref="ApiSchema"/> class.
     /// </summary>
+    /// <param name="name">The schema name.</param>
     /// <param name="apiTypes">The collection of API types to include in the schema.</param>
-    /// <exception cref="ArgumentNullException">Thrown if <paramref name="apiTypes"/> is null.</exception>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="name"/> or <paramref name="apiTypes"/> is null.</exception>
     /// <exception cref="ApiSchemaException">Thrown if duplicate API or CLR identifiers are detected.</exception>
-    public ApiSchema(IEnumerable<ApiType> apiTypes)
+    public ApiSchema(string name, IEnumerable<ApiType> apiTypes)
     {
+        this.Name = name ?? throw new ArgumentNullException(nameof(name));
+
         var values = apiTypes.SafeToArray();
         var namedValues = values.OfType<ApiNamedType>().ToArray();
 
@@ -132,8 +140,9 @@ public sealed class ApiSchema : ExtensibleBase
     /// <inheritdoc/>
     public override string ToString()
     {
+        var name = this.Name.SafeToString();
         var count = this.ApiTypes.Count;
-        return $"{nameof(ApiSchema)} {{Count={count}}}";
+        return $"{nameof(ApiSchema)} {{Name={name}, Count={count}}}";
     }
     #endregion
 }
