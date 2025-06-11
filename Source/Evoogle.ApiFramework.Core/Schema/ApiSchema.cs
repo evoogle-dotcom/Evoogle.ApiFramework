@@ -41,9 +41,7 @@ public sealed class ApiSchema : ExtensibleBase
 
         this.ApiTypes = values;
 
-        this._apiNameLookup = values
-            .OfType<ApiNamedType>()
-            .ToDictionary(x => x.ApiName, StringComparer.OrdinalIgnoreCase);
+        this._apiNameLookup = values.OfType<ApiNamedType>().Cast<ApiType>().ToDictionary(x => ((ApiNamedType)x).ApiName, StringComparer.OrdinalIgnoreCase);
         this._clrNameLookup = values.ToDictionary(x => x.ClrType.Name, StringComparer.OrdinalIgnoreCase);
         this._clrTypeLookup = values.ToDictionary(x => x.ClrType);
     }
@@ -77,7 +75,9 @@ public sealed class ApiSchema : ExtensibleBase
     public bool TryGetByClrType(Type clrType, out ApiType? apiType)
         => this._clrTypeLookup.TryGetValue(clrType, out apiType);
 
-    private static void ValidateUnique<T>(IEnumerable<ApiType> values, Func<ApiType, T> keySelector, string propertyName)
+    private static void ValidateUnique<TApiType, TKey>(IEnumerable<TApiType> values, Func<TApiType, TKey> keySelector, string propertyName)
+        where TApiType : ApiType
+        where TKey : notnull
     {
         var duplicates = values
             .GroupBy(keySelector)
@@ -89,7 +89,7 @@ public sealed class ApiSchema : ExtensibleBase
             return;
 
         var duplicatesString = string.Join(",", duplicates);
-        var message = $"Unable to create {nameof(ApiSchema)} because duplicate {propertyName} values detected: {duplicatesString}"; 
+        var message = $"Unable to create {nameof(ApiSchema)} because duplicate {propertyName} values detected: {duplicatesString}";
         throw new ApiSchemaException(message);
     }
     #endregion
