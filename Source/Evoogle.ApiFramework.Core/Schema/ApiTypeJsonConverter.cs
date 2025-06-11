@@ -167,6 +167,9 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
     /// <returns>An <see cref="ApiType"/> instance.</returns>
     public override ApiType? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
+        if (reader.TokenType == JsonTokenType.Null)
+            return null;
+
         var propertyNamingPolicy = GetPropertyNamingPolicy(options);
         var propertyNames = GetPropertyNames(propertyNamingPolicy);
         var readHandlers = GetReadHandlers(propertyNamingPolicy, propertyNames);

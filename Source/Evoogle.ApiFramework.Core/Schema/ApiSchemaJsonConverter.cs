@@ -23,25 +23,31 @@ public class ApiSchemaJsonConverter : JsonConverter<ApiSchema>
     #region Types
     private readonly record struct PropertyNames
     {
+        #region Immutable Properties
         public required string Name { get; init; }
         public required string ApiScalarTypes { get; init; }
         public required string ApiEnumTypes { get; init; }
         public required string ApiObjectTypes { get; init; }
         public required string Extensions { get; init; }
+        #endregion
     }
+    #endregion
+
+    #region Read Types
     #endregion
 
     #region Fields
     private readonly ILogger<ApiSchemaJsonConverter>? _logger;
-    private static readonly TypeJsonConverter TypeJsonConverter = new();
-    private static readonly NullJsonNamingPolicy NullJsonNamingPolicy = new();
 
+    // Cache resolved property names per naming policy for performance and consistency
     private static readonly ConcurrentDictionary<JsonNamingPolicy, PropertyNames> PropertyNamesCache = new();
+
+    private static readonly NullJsonNamingPolicy NullJsonNamingPolicy = new();
     #endregion
 
     #region Constructors
     /// <summary>
-    ///     Parameterless constructor for attribute usage.
+    ///     Parameterless constructor for use via [JsonConverter(typeof(...))] attribute.
     /// </summary>
     public ApiSchemaJsonConverter()
         : this(null)
@@ -49,8 +55,9 @@ public class ApiSchemaJsonConverter : JsonConverter<ApiSchema>
     }
 
     /// <summary>
-    ///     Constructor allowing injection of a logger.
+    ///     Optional constructor with logger for use in DI contexts.
     /// </summary>
+    /// <param name="logger">The optional logger instance.</param>
     public ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger)
     {
         _logger = new MultiplexingLogger<ApiSchemaJsonConverter>(logger, MultiplexingLoggerMode.All);
@@ -58,20 +65,26 @@ public class ApiSchemaJsonConverter : JsonConverter<ApiSchema>
     #endregion
 
     #region JsonConverter
-    /// <inheritdoc />
+    /// <summary>
+    ///     Reads a JSON representation of an <see cref="ApiSchema"/> into a CLR object.
+    /// </summary>
+    /// <param name="reader">The JSON reader.</param>
+    /// <param name="typeToConvert">The target type (expected to be <see cref="ApiSchema"/>).</param>
+    /// <param name="options">The serializer options in effect.</param>
+    /// <returns>An <see cref="ApiSchema"/> instance.</returns>
     public override ApiSchema? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         if (reader.TokenType == JsonTokenType.Null)
             return null;
 
-        var policy = options.PropertyNamingPolicy ?? NullJsonNamingPolicy;
-        var names = GetPropertyNames(policy);
+        var propertyNamingPolicy = GetPropertyNamingPolicy(options);
+        var propertyNames = GetPropertyNames(propertyNamingPolicy);
 
-        string? name = null;
-        List<ApiScalarType>? scalarTypes = null;
-        List<ApiEnumType>? enumTypes = null;
-        List<ApiObjectType>? objectTypes = null;
-        Dictionary<string, object>? extensions = null;
+        var name = default(string);
+        var scalarTypes = default(List<ApiScalarType>);
+        var enumTypes = default(List<ApiEnumType>);
+        var objectTypes = default(List<ApiObjectType>);
+        var extensions = default(Dictionary<string, object>);
 
         if (reader.TokenType != JsonTokenType.StartObject)
             throw new JsonException("Expected start of an object.");
@@ -87,26 +100,23 @@ public class ApiSchemaJsonConverter : JsonConverter<ApiSchema>
             var propertyName = reader.GetString()!;
             reader.Read();
 
-            if (propertyName == names.Name)
+            if (propertyName == propertyNames.Name)
             {
-                name = reader.GetString();
+                name = ReadName(ref reader, options, propertyName);
             }
-            else if (propertyName == names.ApiScalarTypes)
+            else if (propertyName == propertyNames.ApiScalarTypes)
             {
-                scalarTypes = JsonSerializer.Deserialize<List<ApiScalarType>>(ref reader, options)
-                    ?? throw new JsonException($"Failed to deserialize {names.ApiScalarTypes}.");
+                scalarTypes = ReadApiScalarTypes(ref reader, options, propertyName);
             }
-            else if (propertyName == names.ApiEnumTypes)
+            else if (propertyName == propertyNames.ApiEnumTypes)
             {
-                enumTypes = JsonSerializer.Deserialize<List<ApiEnumType>>(ref reader, options)
-                    ?? throw new JsonException($"Failed to deserialize {names.ApiEnumTypes}.");
+                enumTypes = ReadApiEnumTypes(ref reader, options, propertyName);
             }
-            else if (propertyName == names.ApiObjectTypes)
+            else if (propertyName == propertyNames.ApiObjectTypes)
             {
-                objectTypes = JsonSerializer.Deserialize<List<ApiObjectType>>(ref reader, options)
-                    ?? throw new JsonException($"Failed to deserialize {names.ApiObjectTypes}.");
+                objectTypes = ReadApiObjectTypes(ref reader, options, propertyName);
             }
-            else if (propertyName == names.Extensions)
+            else if (propertyName == propertyNames.Extensions)
             {
                 extensions = ReadExtensions(ref reader, options);
             }
@@ -138,45 +148,50 @@ public class ApiSchemaJsonConverter : JsonConverter<ApiSchema>
         return schema;
     }
 
-    /// <inheritdoc />
-    public override void Write(Utf8JsonWriter writer, ApiSchema value, JsonSerializerOptions options)
+    /// <summary>
+    ///     Writes an <see cref="ApiSchema"/> instance into its JSON representation.
+    /// </summary>
+    /// <param name="writer">The JSON writer.</param>
+    /// <param name="apiSchema">The object to write.</param>
+    /// <param name="options">The serializer options in effect.</param>
+    public override void Write(Utf8JsonWriter writer, ApiSchema apiSchema, JsonSerializerOptions options)
     {
-        var policy = options.PropertyNamingPolicy ?? NullJsonNamingPolicy;
-        var names = GetPropertyNames(policy);
+        var propertyNamingPolicy = GetPropertyNamingPolicy(options);
+        var propertyNames = GetPropertyNames(propertyNamingPolicy);
 
         writer.WriteStartObject();
 
-        writer.WriteString(names.Name, value.Name);
+        writer.WriteString(propertyNames.Name, apiSchema.Name);
 
-        writer.WritePropertyName(names.ApiScalarTypes);
+        writer.WritePropertyName(propertyNames.ApiScalarTypes);
         writer.WriteStartArray();
-        foreach (var apiType in value.ApiScalarTypes)
+        foreach (var apiType in apiSchema.ApiScalarTypes)
         {
-            JsonSerializer.Serialize(writer, apiType, options);
+            JsonSerializer.Serialize<ApiType>(writer, apiType, options);
         }
         writer.WriteEndArray();
 
-        writer.WritePropertyName(names.ApiEnumTypes);
+        writer.WritePropertyName(propertyNames.ApiEnumTypes);
         writer.WriteStartArray();
-        foreach (var apiType in value.ApiEnumerationTypes)
+        foreach (var apiType in apiSchema.ApiEnumerationTypes)
         {
-            JsonSerializer.Serialize(writer, apiType, options);
+            JsonSerializer.Serialize<ApiType>(writer, apiType, options);
         }
         writer.WriteEndArray();
 
-        writer.WritePropertyName(names.ApiObjectTypes);
+        writer.WritePropertyName(propertyNames.ApiObjectTypes);
         writer.WriteStartArray();
-        foreach (var apiType in value.ApiObjectTypes)
+        foreach (var apiType in apiSchema.ApiObjectTypes)
         {
-            JsonSerializer.Serialize(writer, apiType, options);
+            JsonSerializer.Serialize<ApiType>(writer, apiType, options);
         }
         writer.WriteEndArray();
 
-        if (value.Extensions != null)
+        if (apiSchema.Extensions != null)
         {
-            writer.WritePropertyName(names.Extensions);
+            writer.WritePropertyName(propertyNames.Extensions);
             writer.WriteStartObject();
-            foreach (var (extensionType, extension) in value.Extensions)
+            foreach (var (extensionType, extension) in apiSchema.Extensions)
             {
                 var name = TypeJsonConverter.GetSerializeTypeName(extensionType);
                 writer.WritePropertyName(name);
@@ -189,17 +204,58 @@ public class ApiSchemaJsonConverter : JsonConverter<ApiSchema>
     }
     #endregion
 
-    #region Implementation
+    #region Cache Implementation Methods
+    private static JsonNamingPolicy GetPropertyNamingPolicy(JsonSerializerOptions options)
+    {
+        var policy = options.PropertyNamingPolicy ?? NullJsonNamingPolicy;
+        return policy;
+    }
+
     private static PropertyNames GetPropertyNames(JsonNamingPolicy policy)
     {
-        return PropertyNamesCache.GetOrAdd(policy, p => new PropertyNames
+        return PropertyNamesCache.GetOrAdd(policy, policy => new PropertyNames
         {
-            Name = p.ConvertName(nameof(ApiSchema.Name)),
-            ApiScalarTypes = p.ConvertName(nameof(ApiSchema.ApiScalarTypes)),
-            ApiEnumTypes = p.ConvertName(nameof(ApiSchema.ApiEnumerationTypes)),
-            ApiObjectTypes = p.ConvertName(nameof(ApiSchema.ApiObjectTypes)),
-            Extensions = p.ConvertName(nameof(ApiSchema.Extensions))
+            Name = policy.ConvertName(nameof(ApiSchema.Name)),
+            ApiScalarTypes = policy.ConvertName(nameof(ApiSchema.ApiScalarTypes)),
+            ApiEnumTypes = policy.ConvertName(nameof(ApiSchema.ApiEnumerationTypes)),
+            ApiObjectTypes = policy.ConvertName(nameof(ApiSchema.ApiObjectTypes)),
+            Extensions = policy.ConvertName(nameof(ApiSchema.Extensions))
         });
+    }
+    #endregion
+
+    #region Read Implementation Methods
+    private static string ReadName(ref Utf8JsonReader reader, JsonSerializerOptions options, string propertyName)
+    {
+        var name = reader.GetString();
+        return name ?? throw new JsonException("Expected a non-null name {propertyName}.");
+    }
+
+    private List<ApiScalarType> ReadApiScalarTypes(ref Utf8JsonReader reader, JsonSerializerOptions options, string propertyName)
+    {
+        var apiTypes = JsonSerializer.Deserialize<List<ApiType>>(ref reader, options)
+            ?? throw new JsonException($"Failed to deserialize {propertyName}.");
+
+        var scalarTypes = apiTypes.Cast<ApiScalarType>().ToList();
+        return scalarTypes;
+    }
+
+    private List<ApiEnumType> ReadApiEnumTypes(ref Utf8JsonReader reader, JsonSerializerOptions options, string propertyName)
+    {
+        var apiTypes = JsonSerializer.Deserialize<List<ApiType>>(ref reader, options)
+            ?? throw new JsonException($"Failed to deserialize {propertyName}.");
+
+        var enumTypes = apiTypes.Cast<ApiEnumType>().ToList();
+        return enumTypes;
+    }
+
+    private List<ApiObjectType> ReadApiObjectTypes(ref Utf8JsonReader reader, JsonSerializerOptions options, string propertyName)
+    {
+        var apiTypes = JsonSerializer.Deserialize<List<ApiType>>(ref reader, options)
+            ?? throw new JsonException($"Failed to deserialize {propertyName}.");
+
+        var objectTypes = apiTypes.Cast<ApiObjectType>().ToList();
+        return objectTypes;
     }
 
     private static Dictionary<string, object> ReadExtensions(ref Utf8JsonReader reader, JsonSerializerOptions options)
