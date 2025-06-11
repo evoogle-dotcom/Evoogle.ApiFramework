@@ -21,10 +21,11 @@ namespace Evoogle.ApiFramework.Schema;
 public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
 {
     #region Context Types
-    private abstract class Context(ILogger<ApiTypeJsonConverter>? logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames)
+    private abstract class Context(ILogger<ApiTypeJsonConverter>? logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames) : IJsonConverterLogger
     {
         #region Immutable Properties
         public ILogger<ApiTypeJsonConverter>? Logger { get; } = logger;
+        ILogger? IJsonConverterLogger.Logger => Logger;
         public JsonSerializerOptions Options { get; } = options;
         public JsonNamingPolicy PropertyNamingPolicy { get; } = propertyNamingPolicy;
         public PropertyNames PropertyNames { get; } = propertyNames;
@@ -133,8 +134,6 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
 
     // Cache read handlers per naming policy to avoid rebuilding on every call
     private static readonly ConcurrentDictionary<JsonNamingPolicy, ReadHandlers> ReadHandlersCache = new();
-
-    private static readonly NullJsonNamingPolicy NullJsonNamingPolicy = new();
     private static readonly TypeJsonConverter TypeJsonConverter = new();
     #endregion
 
@@ -177,7 +176,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
 
         context.Logger?.LogTrace("Deserializing {ApiType}", nameof(ApiType));
 
-        ReadJsonObject(ref reader, ref context, (context) => context.ReadHandlers.ApiTypePropertyHandlers);
+        JsonConverterHelpers.ReadJsonObject(ref reader, ref context, (context) => context.ReadHandlers.ApiTypePropertyHandlers);
 
         var kind = context.ReadData.ApiType?.Kind;
         var clrType = context.ReadData.ApiType?.ClrType;
@@ -213,8 +212,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
     #region Cache Implementation Methods
     private static JsonNamingPolicy GetPropertyNamingPolicy(JsonSerializerOptions options)
     {
-        var policy = options.PropertyNamingPolicy ?? NullJsonNamingPolicy;
-        return policy;
+        return JsonConverterHelpers.GetPropertyNamingPolicy(options);
     }
 
     private static PropertyNames GetPropertyNames(JsonNamingPolicy policy)

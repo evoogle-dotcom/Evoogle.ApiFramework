@@ -81,12 +81,10 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         #endregion
     }
 
-    private delegate void ReadHandler(ref Utf8JsonReader reader, ref ReadContext context);
-
     private class ReadHandlers(PropertyNames propertyNames)
     {
         #region ApiEnumValue Fields
-        public readonly Dictionary<string, ReadHandler> ApiEnumValuePropertyHandlers = new()
+        public readonly Dictionary<string, JsonConverterHelpers.JsonReadHandler<ReadContext>> ApiEnumValuePropertyHandlers = new()
         {
             { propertyNames.ApiEnumValue.ApiName, HandleApiEnumValueApiName },
             { propertyNames.ApiEnumValue.ClrName, HandleApiEnumValueClrName },
@@ -95,7 +93,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         #endregion
 
         #region ApiProperty Fields
-        public readonly Dictionary<string, ReadHandler> ApiPropertyPropertyHandlers = new()
+        public readonly Dictionary<string, JsonConverterHelpers.JsonReadHandler<ReadContext>> ApiPropertyPropertyHandlers = new()
         {
             { propertyNames.ApiProperty.ApiName, HandleApiPropertyApiName },
             { propertyNames.ApiProperty.ApiType, HandleApiPropertyApiType },
@@ -105,7 +103,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         #endregion
 
         #region ApiType Fields
-        public readonly Dictionary<string, ReadHandler> ApiTypePropertyHandlers = new()
+        public readonly Dictionary<string, JsonConverterHelpers.JsonReadHandler<ReadContext>> ApiTypePropertyHandlers = new()
         {
             // ApiType Property Handlers
             { propertyNames.ApiType.Kind, HandleApiTypeKind },
@@ -145,7 +143,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         private static void HandleApiEnumTypeApiEnumValues(ref Utf8JsonReader reader, ref ReadContext context)
         {
             context.ReadData.ApiEnumType ??= new ApiEnumTypeReadData();
-            ReadJsonArray(ref reader, ref context, (x) => HandleApiEnumTypeApiEnumValuesArrayItem);
+            JsonConverterHelpers.ReadJsonArray(ref reader, ref context, (x) => HandleApiEnumTypeApiEnumValuesArrayItem);
         }
 
         private static void HandleApiEnumTypeApiEnumValuesArrayItem(ref Utf8JsonReader reader, ref ReadContext context)
@@ -153,7 +151,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
             context.ReadData.ApiEnumType!.ApiEnumValues ??= [];
             context.ReadData.ApiEnumType!.ApiEnumValues.Add(new ApiEnumValueReadData());
 
-            ReadJsonObject(ref reader, ref context, (x) => x.ReadHandlers.ApiEnumValuePropertyHandlers);
+            JsonConverterHelpers.ReadJsonObject(ref reader, ref context, (x) => x.ReadHandlers.ApiEnumValuePropertyHandlers);
         }
         #endregion
 
@@ -192,7 +190,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         private static void HandleApiObjectTypeApiProperties(ref Utf8JsonReader reader, ref ReadContext context)
         {
             context.ReadData.ApiObjectType ??= new ApiObjectTypeReadData();
-            ReadJsonArray(ref reader, ref context, (x) => HandleApiObjectTypeApiPropertiesArrayItem);
+            JsonConverterHelpers.ReadJsonArray(ref reader, ref context, (x) => HandleApiObjectTypeApiPropertiesArrayItem);
         }
 
         private static void HandleApiObjectTypeApiPropertiesArrayItem(ref Utf8JsonReader reader, ref ReadContext context)
@@ -200,7 +198,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
             context.ReadData.ApiObjectType!.ApiProperties ??= [];
             context.ReadData.ApiObjectType!.ApiProperties.Add(new ApiPropertyReadData());
 
-            ReadJsonObject(ref reader, ref context, (x) => x.ReadHandlers.ApiPropertyPropertyHandlers);
+            JsonConverterHelpers.ReadJsonObject(ref reader, ref context, (x) => x.ReadHandlers.ApiPropertyPropertyHandlers);
         }
         #endregion
 
@@ -281,77 +279,6 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
             }
         }
         #endregion
-    }
-    #endregion
-
-    #region Read Implementation Methods
-    private static void ReadJsonArray
-    (
-        ref Utf8JsonReader reader,
-        ref ReadContext context,
-        Func<ReadContext, ReadHandler> arrayElementHandlerAccessor
-    )
-    {
-        // Validate the start of the JSON array.
-        if (reader.TokenType != JsonTokenType.StartArray)
-            throw new JsonException("Expected start of an array.");
-
-        // Iterate through the JSON array elements.
-        var handler = arrayElementHandlerAccessor(context);
-        while (reader.Read())
-        {
-            if (reader.TokenType == JsonTokenType.EndArray)
-                break;
-
-            // Execute the JSON array element handler to read the JSON array element.
-            handler(ref reader, ref context);
-        }
-    }
-
-    private static void ReadJsonObject
-    (
-        ref Utf8JsonReader reader,
-        ref ReadContext context,
-        Func<ReadContext, Dictionary<string, ReadHandler>> propertyHandlersAccessor
-    )
-    {
-        // Validate the start of the JSON object.
-        if (reader.TokenType != JsonTokenType.StartObject)
-            throw new JsonException("Expected start of an object.");
-
-        // Read the JSON object properties.
-        var handlers = propertyHandlersAccessor(context);
-        while (reader.Read())
-        {
-            if (reader.TokenType == JsonTokenType.EndObject)
-                break;
-
-            if (reader.TokenType != JsonTokenType.PropertyName)
-                throw new JsonException("Expected object property name.");
-
-            // Read the JSON property name.
-            var propertyName = reader.GetString()!;
-
-            // Move past the JSON property name.
-            reader.Read();
-
-            // Look up the JSON property value handler based on the JSON property name.
-            if (handlers.TryGetValue(propertyName, out var handler))
-            {
-                // Execute the JSON property value handler to read the JSON property value.
-                handler(ref reader, ref context);
-            }
-            else
-            {
-                // Fallback for unknown properties — safely skip and optionally log them
-
-                // Log the skipped property if a logger is available.
-                context.Logger?.LogWarning("Skipping unknown JSON property: '{Skipped}'", propertyName);
-
-                // Skip unknown JSON object properties.
-                reader.Skip();
-            }
-        }
     }
     #endregion
 }
