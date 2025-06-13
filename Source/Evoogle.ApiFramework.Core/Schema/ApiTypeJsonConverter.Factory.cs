@@ -7,7 +7,9 @@ using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
+using Evoogle.Extension;
 using Evoogle.Json;
+
 using Microsoft.Extensions.Logging;
 
 namespace Evoogle.ApiFramework.Schema;
@@ -15,7 +17,7 @@ namespace Evoogle.ApiFramework.Schema;
 public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
 {
     #region Factory Implementation Methods
-    private static ApiType? CreateApiType(in ReadContext context)
+    private static ApiType CreateApiType(in ReadContext context)
     {
         // Validate all required properties are non-null.
         var validationResults = default(List<ValidationResult>);
@@ -24,7 +26,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         var kindAsString = context.ReadData.ApiType!.Kind;
         if (Enum.TryParse<ApiTypeKind>(kindAsString, out var kind) == false)
         {
-            context.Logger?.LogError("Invalid Kind: '{Kind}'", kindAsString);
+            context.Logger.LogError("Invalid Kind: '{Kind}'", kindAsString);
 
             throw new JsonException($"Unable to parse '{kindAsString}' into an {nameof(ApiTypeKind)} enumeration.");
         }
@@ -69,7 +71,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
 
             default:
                 {
-                    context.Logger?.LogError("Unsupported Kind: '{Kind}'", kindAsString);
+                    context.Logger.LogError("Unsupported Kind: '{Kind}'", kindAsString);
 
                     throw new JsonException($"Unable to create a derived {nameof(ApiType)} because no factory method exists for {kind} enumeration.");
                 }
@@ -80,15 +82,15 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         return apiType;
     }
 
-    private static void AttachExtensions(in ReadContext context, ApiType apiType)
+    private static void AttachExtensions(in ReadContext context, ExtensibleBase extensibleBase)
     {
-        var extensions = context.ReadData.ApiType?.Extensions;
+        var extensions = context.ReadData.ExtensibleBase?.Extensions;
         if (extensions != null)
         {
             foreach (var (extensionTypeName, extension) in extensions)
             {
                 var extensionType = TypeJsonConverter.GetDeserializeType(extensionTypeName);
-                apiType.AttachExtension(extensionType, extension);
+                extensibleBase.AttachExtension(extensionType, extension);
             }
         }
     }
@@ -175,7 +177,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         if (string.IsNullOrWhiteSpace(validationErrorMessage))
             return;
 
-        context.Logger?.LogError("Validation failed for ApiTypeKind '{Kind}': {Message}", kind, validationErrorMessage);
+        context.Logger.LogError("Validation failed for ApiTypeKind '{Kind}': {Message}", kind, validationErrorMessage);
 
         throw new JsonException(validationErrorMessage);
     }

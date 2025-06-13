@@ -7,6 +7,8 @@ using System.Collections.Concurrent;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
+using Evoogle.ApiFramework.Schema.Internal;
+using Evoogle.Extension;
 using Evoogle.Json;
 using Evoogle.Logging;
 
@@ -21,18 +23,17 @@ namespace Evoogle.ApiFramework.Schema;
 public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
 {
     #region Context Types
-    private abstract class Context(ILogger<ApiTypeJsonConverter>? logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames) : IJsonConverterLogger
+    private abstract class Context(ILogger<ApiTypeJsonConverter> logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames) : IHasLogger<ApiTypeJsonConverter>
     {
         #region Immutable Properties
-        public ILogger<ApiTypeJsonConverter>? Logger { get; } = logger;
-        ILogger? IJsonConverterLogger.Logger => Logger;
+        public ILogger<ApiTypeJsonConverter> Logger { get; } = logger;
         public JsonSerializerOptions Options { get; } = options;
         public JsonNamingPolicy PropertyNamingPolicy { get; } = propertyNamingPolicy;
         public PropertyNames PropertyNames { get; } = propertyNames;
         #endregion
     }
 
-    private class ReadContext(ILogger<ApiTypeJsonConverter>? logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames, ReadHandlers readHandlers)
+    private class ReadContext(ILogger<ApiTypeJsonConverter> logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames, ReadHandlers readHandlers)
         : Context(logger, options, propertyNamingPolicy, propertyNames)
     {
         #region Immutable Properties
@@ -45,29 +46,13 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         #endregion
     }
 
-    private class WriteContext(ILogger<ApiTypeJsonConverter>? logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames)
+    private class WriteContext(ILogger<ApiTypeJsonConverter> logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames)
         : Context(logger, options, propertyNamingPolicy, propertyNames)
     {
     }
     #endregion
 
     #region Property Types
-    private readonly record struct ApiTypePropertyNames
-    {
-        #region Immutable Properties
-        public required string ClrType { get; init; }
-        public required string Extensions { get; init; }
-        public required string Kind { get; init; }
-        #endregion
-    }
-
-    private readonly record struct ApiNamedTypePropertyNames
-    {
-        #region Immutable Properties
-        public required string ApiName { get; init; }
-        #endregion
-    }
-
     private readonly record struct ApiCollectionTypePropertyNames
     {
         #region Immutable Properties
@@ -92,6 +77,12 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         #endregion
     }
 
+    private readonly record struct ApiNamedTypePropertyNames
+    {
+        #region Immutable Properties
+        public required string ApiName { get; init; }
+        #endregion
+    }
     private readonly record struct ApiObjectTypePropertyNames
     {
         #region Immutable Properties
@@ -109,32 +100,49 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         #endregion
     }
 
+    private readonly record struct ApiTypePropertyNames
+    {
+        #region Immutable Properties
+        public required string ClrType { get; init; }
+        public required string Kind { get; init; }
+        #endregion
+    }
+
+    private readonly record struct ExtensibleBasePropertyNames
+    {
+        #region Immutable Properties
+        public required string Extensions { get; init; }
+        #endregion
+    }
+
     private readonly record struct PropertyNames
     {
         #region Immutable Properties
-        public required ApiTypePropertyNames ApiType { get; init; }
-        public required ApiNamedTypePropertyNames ApiNamedType { get; init; }
         public required ApiCollectionTypePropertyNames ApiCollectionType { get; init; }
         public required ApiEnumTypePropertyNames ApiEnumType { get; init; }
         public required ApiEnumValuePropertyNames ApiEnumValue { get; init; }
+        public required ApiNamedTypePropertyNames ApiNamedType { get; init; }
         public required ApiObjectTypePropertyNames ApiObjectType { get; init; }
         public required ApiPropertyPropertyNames ApiProperty { get; init; }
+        public required ApiTypePropertyNames ApiType { get; init; }
+        public required ExtensibleBasePropertyNames ExtensibleBase { get; init; }
         #endregion
     }
     #endregion
 
     #region Fields
-    private readonly ILogger<ApiTypeJsonConverter>? _logger;
+    private readonly ILogger<ApiTypeJsonConverter> _logger;
 
     private static readonly EnumJsonConverter<ApiTypeKind> ApiTypeKindJsonConverter = new();
     private static readonly EnumJsonConverter<ApiTypeModifiers> ApiTypeModifiersJsonConverter = new();
+
+    private static readonly TypeJsonConverter TypeJsonConverter = new();
 
     // Cache resolved property names per naming policy for performance and consistency
     private static readonly ConcurrentDictionary<JsonNamingPolicy, PropertyNames> PropertyNamesCache = new();
 
     // Cache read handlers per naming policy to avoid rebuilding on every call
     private static readonly ConcurrentDictionary<JsonNamingPolicy, ReadHandlers> ReadHandlersCache = new();
-    private static readonly TypeJsonConverter TypeJsonConverter = new();
     #endregion
 
     #region Constructors
@@ -174,16 +182,17 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         var readHandlers = GetReadHandlers(propertyNamingPolicy, propertyNames);
         var context = new ReadContext(_logger, options, propertyNamingPolicy, propertyNames, readHandlers);
 
-        context.Logger?.LogTrace("Deserializing {ApiType}", nameof(ApiType));
+        context.Logger.LogTrace("Deserializing {ApiType}", nameof(ApiType));
 
-        JsonConverterHelpers.ReadJsonObject(ref reader, ref context, (context) => context.ReadHandlers.ApiTypePropertyHandlers);
+        ApiJsonConverterHelpers.ReadJsonObject<ApiTypeJsonConverter, ReadContext>(ref reader, ref context, (context) => context.ReadHandlers.ApiTypePropertyHandlers);
 
         var kind = context.ReadData.ApiType?.Kind;
         var clrType = context.ReadData.ApiType?.ClrType;
 
-        context.Logger?.LogDebug("Deserialized  {ApiType} of kind '{Kind}' with CLR type '{ClrType}'", nameof(ApiType), kind, clrType?.Name);
-
         var apiType = CreateApiType(context);
+
+        context.Logger.LogDebug("Deserialized  {ApiType}", apiType);
+
         return apiType;
     }
 
@@ -199,36 +208,26 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         var propertyNames = GetPropertyNames(propertyNamingPolicy);
         var context = new WriteContext(_logger, options, propertyNamingPolicy, propertyNames);
 
-        context.Logger?.LogTrace("Serializing {ApiType} of kind '{Kind}' with CLR type '{ClrType}'", nameof(ApiType), apiType.Kind, apiType.ClrType?.Name);
+        context.Logger.LogTrace("Serializing {ApiType}", apiType);
 
         WriteApiTypeProlog(writer, apiType, context);
         WriteApiTypeBody(writer, apiType, context);
         WriteApiTypeEpilog(writer, apiType, context);
 
-        context.Logger?.LogDebug("Serialized  {ApiType} of kind '{Kind}' with CLR type '{ClrType}'", nameof(ApiType), apiType.Kind, apiType.ClrType?.Name);
+        context.Logger.LogDebug("Serialized  {ApiType}", apiType);
     }
     #endregion
 
     #region Cache Implementation Methods
     private static JsonNamingPolicy GetPropertyNamingPolicy(JsonSerializerOptions options)
     {
-        return JsonConverterHelpers.GetPropertyNamingPolicy(options);
+        return ApiJsonConverterHelpers.GetPropertyNamingPolicy(options);
     }
 
     private static PropertyNames GetPropertyNames(JsonNamingPolicy policy)
     {
         return PropertyNamesCache.GetOrAdd(policy, policy => new PropertyNames
         {
-            ApiType = new ApiTypePropertyNames
-            {
-                ClrType = policy.ConvertName(nameof(ApiType.ClrType)),
-                Extensions = policy.ConvertName(nameof(ApiType.Extensions)),
-                Kind = policy.ConvertName(nameof(ApiType.Kind))
-            },
-            ApiNamedType = new ApiNamedTypePropertyNames
-            {
-                ApiName = policy.ConvertName(nameof(ApiNamedType.ApiName))
-            },
             ApiCollectionType = new ApiCollectionTypePropertyNames
             {
                 ApiItemType = policy.ConvertName(nameof(ApiCollectionType.ApiItemType)),
@@ -244,6 +243,10 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
                 ClrName = policy.ConvertName(nameof(ApiEnumValue.ClrName)),
                 ClrOrdinal = policy.ConvertName(nameof(ApiEnumValue.ClrOrdinal))
             },
+            ApiNamedType = new ApiNamedTypePropertyNames
+            {
+                ApiName = policy.ConvertName(nameof(ApiNamedType.ApiName))
+            },
             ApiObjectType = new ApiObjectTypePropertyNames
             {
                 ApiProperties = policy.ConvertName(nameof(ApiObjectType.ApiProperties))
@@ -254,6 +257,15 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
                 ApiType = policy.ConvertName(nameof(ApiProperty.ApiType)),
                 ApiTypeModifiers = policy.ConvertName(nameof(ApiProperty.ApiTypeModifiers)),
                 ClrName = policy.ConvertName(nameof(ApiProperty.ClrName))
+            },
+            ApiType = new ApiTypePropertyNames
+            {
+                ClrType = policy.ConvertName(nameof(ApiType.ClrType)),
+                Kind = policy.ConvertName(nameof(ApiType.Kind))
+            },
+            ExtensibleBase = new ExtensibleBasePropertyNames
+            {
+                Extensions = policy.ConvertName(nameof(ExtensibleBase.Extensions))
             }
         });
     }

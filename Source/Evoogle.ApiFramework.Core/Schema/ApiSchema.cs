@@ -37,8 +37,8 @@ public sealed class ApiSchema : ExtensibleBase
     /// <summary>Gets all API named types contained within this schema.</summary>
     public IReadOnlyCollection<ApiNamedType> ApiTypes { get; }
 
-    /// <summary>Gets all API enumeration types contained within this schema.</summary>
-    public IReadOnlyCollection<ApiEnumType> ApiEnumerationTypes { get; }
+    /// <summary>Gets all API enum types contained within this schema.</summary>
+    public IReadOnlyCollection<ApiEnumType> ApiEnumTypes { get; }
 
     /// <summary>Gets all API object types contained within this schema.</summary>
     public IReadOnlyCollection<ApiObjectType> ApiObjectTypes { get; }
@@ -60,63 +60,65 @@ public sealed class ApiSchema : ExtensibleBase
         this.Name = name ?? throw new ArgumentNullException(nameof(name));
 
         var values = apiTypes.SafeToArray();
-        var namedValues = values.OfType<ApiNamedType>().ToArray();
+        var namedValues = values
+            .OfType<ApiNamedType>()
+            .OrderBy(x => x.ApiName, StringComparer.OrdinalIgnoreCase)
+            .ToArray();
 
         ValidateUnique(namedValues, x => x.ApiName, nameof(ApiNamedType.ApiName));
-        ValidateUnique(namedValues, x => x.ClrType.Name, "ClrName");
         ValidateUnique(namedValues, x => x.ClrType, nameof(ApiType.ClrType));
 
         this.ApiTypes = namedValues;
-        this.ApiEnumerationTypes = namedValues.OfType<ApiEnumType>().ToArray();
+        this.ApiEnumTypes = namedValues.OfType<ApiEnumType>().ToArray();
         this.ApiObjectTypes = namedValues.OfType<ApiObjectType>().ToArray();
         this.ApiScalarTypes = namedValues.OfType<ApiScalarType>().ToArray();
 
-        this._apiNameLookup = namedValues.ToDictionary(x => x.ApiName, StringComparer.OrdinalIgnoreCase);
-        this._clrTypeLookup = namedValues.ToDictionary(x => x.ClrType);
+        _apiNameLookup = namedValues.ToDictionary(x => x.ApiName, StringComparer.OrdinalIgnoreCase);
+        _clrTypeLookup = namedValues.ToDictionary(x => x.ClrType);
 
-        this._enumApiNameLookup = this.ApiEnumerationTypes.ToDictionary(x => x.ApiName, StringComparer.OrdinalIgnoreCase);
-        this._enumClrTypeLookup = this.ApiEnumerationTypes.ToDictionary(x => x.ClrType);
+        _enumApiNameLookup = this.ApiEnumTypes.ToDictionary(x => x.ApiName, StringComparer.OrdinalIgnoreCase);
+        _enumClrTypeLookup = this.ApiEnumTypes.ToDictionary(x => x.ClrType);
 
-        this._objectApiNameLookup = this.ApiObjectTypes.ToDictionary(x => x.ApiName, StringComparer.OrdinalIgnoreCase);
-        this._objectClrTypeLookup = this.ApiObjectTypes.ToDictionary(x => x.ClrType);
+        _objectApiNameLookup = this.ApiObjectTypes.ToDictionary(x => x.ApiName, StringComparer.OrdinalIgnoreCase);
+        _objectClrTypeLookup = this.ApiObjectTypes.ToDictionary(x => x.ClrType);
 
-        this._scalarApiNameLookup = this.ApiScalarTypes.ToDictionary(x => x.ApiName, StringComparer.OrdinalIgnoreCase);
-        this._scalarClrTypeLookup = this.ApiScalarTypes.ToDictionary(x => x.ClrType);
+        _scalarApiNameLookup = this.ApiScalarTypes.ToDictionary(x => x.ApiName, StringComparer.OrdinalIgnoreCase);
+        _scalarClrTypeLookup = this.ApiScalarTypes.ToDictionary(x => x.ClrType);
     }
     #endregion
 
     #region ApiSchema Methods
     /// <summary>Attempts to retrieve an API named type by its API name.</summary>
     public bool TryGetApiType(string apiName, out ApiNamedType? apiNamedType)
-        => this._apiNameLookup.TryGetValue(apiName, out apiNamedType);
+        => _apiNameLookup.TryGetValue(apiName, out apiNamedType);
 
     /// <summary>Attempts to retrieve an API named type by its CLR type.</summary>
     public bool TryGetApiType(Type clrType, out ApiNamedType? apiNamedType)
-        => this._clrTypeLookup.TryGetValue(clrType, out apiNamedType);
+        => _clrTypeLookup.TryGetValue(clrType, out apiNamedType);
 
     /// <summary>Attempts to retrieve an API enumeration type by its API name.</summary>
-    public bool TryGetApiEnumerationType(string apiName, out ApiEnumType? apiEnumerationType)
-        => this._enumApiNameLookup.TryGetValue(apiName, out apiEnumerationType);
+    public bool TryGetApiEnumType(string apiName, out ApiEnumType? apiEnumType)
+        => _enumApiNameLookup.TryGetValue(apiName, out apiEnumType);
 
     /// <summary>Attempts to retrieve an API enumeration type by its CLR type.</summary>
-    public bool TryGetApiEnumerationType(Type clrType, out ApiEnumType? apiEnumerationType)
-        => this._enumClrTypeLookup.TryGetValue(clrType, out apiEnumerationType);
+    public bool TryGetApiEnumType(Type clrType, out ApiEnumType? apiEnumType)
+        => _enumClrTypeLookup.TryGetValue(clrType, out apiEnumType);
 
     /// <summary>Attempts to retrieve an API object type by its API name.</summary>
     public bool TryGetApiObjectType(string apiName, out ApiObjectType? apiObjectType)
-        => this._objectApiNameLookup.TryGetValue(apiName, out apiObjectType);
+        => _objectApiNameLookup.TryGetValue(apiName, out apiObjectType);
 
     /// <summary>Attempts to retrieve an API object type by its CLR type.</summary>
     public bool TryGetApiObjectType(Type clrType, out ApiObjectType? apiObjectType)
-        => this._objectClrTypeLookup.TryGetValue(clrType, out apiObjectType);
+        => _objectClrTypeLookup.TryGetValue(clrType, out apiObjectType);
 
     /// <summary>Attempts to retrieve an API scalar type by its API name.</summary>
     public bool TryGetApiScalarType(string apiName, out ApiScalarType? apiScalarType)
-        => this._scalarApiNameLookup.TryGetValue(apiName, out apiScalarType);
+        => _scalarApiNameLookup.TryGetValue(apiName, out apiScalarType);
 
     /// <summary>Attempts to retrieve an API scalar type by its CLR type.</summary>
     public bool TryGetApiScalarType(Type clrType, out ApiScalarType? apiScalarType)
-        => this._scalarClrTypeLookup.TryGetValue(clrType, out apiScalarType);
+        => _scalarClrTypeLookup.TryGetValue(clrType, out apiScalarType);
 
     private static void ValidateUnique<TApiType, TKey>(IEnumerable<TApiType> values, Func<TApiType, TKey> keySelector, string propertyName)
         where TApiType : ApiNamedType
@@ -142,8 +144,11 @@ public sealed class ApiSchema : ExtensibleBase
     public override string ToString()
     {
         var name = this.Name.SafeToString();
-        var count = this.ApiTypes.Count;
-        return $"{nameof(ApiSchema)} {{Name={name}, Count={count}}}";
+        var count = this.ApiTypes.Count.SafeToString();
+        var scalarCount = this.ApiScalarTypes.Count.SafeToString();
+        var enumCount = this.ApiEnumTypes.Count.SafeToString();
+        var objectCount = this.ApiObjectTypes.Count.SafeToString();
+        return $"{nameof(ApiSchema)} {{Name={name}, Count={count}, ScalarCount={scalarCount}, EnumCount={enumCount}, ObjectCount={objectCount}}}";
     }
     #endregion
 }

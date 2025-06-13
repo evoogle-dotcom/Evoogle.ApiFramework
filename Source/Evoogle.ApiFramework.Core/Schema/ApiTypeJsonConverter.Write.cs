@@ -6,7 +6,9 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
+using Evoogle.Extension;
 using Evoogle.Json;
+
 using Microsoft.Extensions.Logging;
 
 namespace Evoogle.ApiFramework.Schema;
@@ -358,41 +360,9 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
     )
     {
         WriteApiTypeClrType(writer, apiType, context);
-        WriteApiTypeExtensions(writer, apiType, context);
+        WriteExtensibleBaseExtensions(writer, apiType, context);
 
         writer.WriteEndObject();
-    }
-
-    private static void WriteApiTypeExtensions
-    (
-        Utf8JsonWriter writer,
-        ApiType apiType,
-        in WriteContext context
-    )
-    {
-        var extensions = apiType.Extensions;
-        if (extensions != null)
-        {
-            var extensionsPropertyName = context.PropertyNames.ApiType.Extensions;
-            writer.WritePropertyName(extensionsPropertyName);
-
-            writer.WriteStartObject();
-            foreach (var (extensionType, extension) in extensions)
-            {
-                // Note: Don't apply naming policy to extension type name as property name for round-trip compatibility.
-                var extensionTypeName = TypeJsonConverter.GetSerializeTypeName(extensionType);
-
-                context.Logger?.LogTrace("Serializing extension type: {ExtensionType}", extensionType.Name);
-
-                writer.WritePropertyName(extensionTypeName);
-
-                var options = context.Options;
-                JsonSerializer.Serialize(writer, extension, extensionType, options);
-
-                context.Logger?.LogDebug("Serialized  extension type: {ExtensionType}", extensionType.Name);
-            }
-            writer.WriteEndObject();
-        }
     }
 
     private static void WriteApiTypeKind
@@ -419,6 +389,39 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         writer.WriteStartObject();
 
         WriteApiTypeKind(writer, apiType, context);
+    }
+
+    // ExtensibleBase Methods
+    private static void WriteExtensibleBaseExtensions
+    (
+        Utf8JsonWriter writer,
+        ExtensibleBase extensibleBase,
+        in WriteContext context
+    )
+    {
+        var extensions = extensibleBase.Extensions;
+        if (extensions != null)
+        {
+            var extensionsPropertyName = context.PropertyNames.ExtensibleBase.Extensions;
+            writer.WritePropertyName(extensionsPropertyName);
+
+            writer.WriteStartObject();
+            foreach (var (extensionType, extension) in extensions)
+            {
+                // Note: Don't apply naming policy to extension type name as property name for round-trip compatibility.
+                var extensionTypeName = TypeJsonConverter.GetSerializeTypeName(extensionType);
+
+                context.Logger.LogTrace("Serializing extension type: {ExtensionType}", extensionType.Name);
+
+                writer.WritePropertyName(extensionTypeName);
+
+                var options = context.Options;
+                JsonSerializer.Serialize(writer, extension, extensionType, options);
+
+                context.Logger.LogDebug("Serialized  extension type: {ExtensionType}", extensionType.Name);
+            }
+            writer.WriteEndObject();
+        }
     }
     #endregion
 }

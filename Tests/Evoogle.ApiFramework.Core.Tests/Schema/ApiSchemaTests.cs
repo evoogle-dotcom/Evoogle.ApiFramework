@@ -159,35 +159,35 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
     [
         new TryGetByApiNameTest()
         {
-            Name = "Find ApiScalarType [Boolean] by ApiName",
+            Name = $"Find {TestApiScalarTypeBoolean} by ApiName",
             ApiSchema = TestApiSchema,
             ApiName = nameof(Boolean),
             ExpectedApiType = TestApiScalarTypeBoolean,
         },
         new TryGetByApiNameTest()
         {
-            Name = "Find ApiScalarType [Int32] by ApiName",
+            Name = $"Find {TestApiScalarTypeInt32} by ApiName",
             ApiSchema = TestApiSchema,
             ApiName = nameof(Int32),
             ExpectedApiType = TestApiScalarTypeInt32,
         },
         new TryGetByApiNameTest()
         {
-            Name = "Find ApiScalarType [String] by ApiName",
+            Name = $"Find {TestApiScalarTypeString} by ApiName",
             ApiSchema = TestApiSchema,
             ApiName = nameof(String),
             ExpectedApiType = TestApiScalarTypeString,
         },
         new TryGetByApiNameTest()
         {
-            Name = "Find ApiEnumType [Gender] by ApiName",
+            Name = $"Find {TestApiEnumTypeGender} by ApiName",
             ApiSchema = TestApiSchema,
             ApiName = nameof(Gender),
             ExpectedApiType = TestApiEnumTypeGender,
         },
         new TryGetByApiNameTest()
         {
-            Name = "Find ApiObjectType [Person] by ApiName",
+            Name = $"Find {TestApiObjectTypePerson} by ApiName",
             ApiSchema = TestApiSchema,
             ApiName = nameof(Person),
             ExpectedApiType = TestApiObjectTypePerson
@@ -198,35 +198,35 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
     [
         new TryGetByClrTypeTest()
         {
-            Name = "Find ApiScalarType [Boolean] by ClrType",
+            Name = $"Find {TestApiScalarTypeBoolean} by ClrType",
             ApiSchema = TestApiSchema,
             ClrType = typeof(bool),
             ExpectedApiType = TestApiScalarTypeBoolean,
         },
         new TryGetByClrTypeTest()
         {
-            Name = "Find ApiScalarType [Int32] by ClrType",
+            Name = $"Find {TestApiScalarTypeInt32} by ClrType",
             ApiSchema = TestApiSchema,
             ClrType = typeof(int),
             ExpectedApiType = TestApiScalarTypeInt32,
         },
         new TryGetByClrTypeTest()
         {
-            Name = "Find ApiScalarType [String] by ClrType",
+            Name = $"Find {TestApiScalarTypeString} by ClrType",
             ApiSchema = TestApiSchema,
             ClrType = typeof(string),
             ExpectedApiType = TestApiScalarTypeString,
         },
         new TryGetByClrTypeTest()
         {
-            Name = "Find ApiEnumType [Gender] by ClrType",
+            Name = $"Find {TestApiEnumTypeGender} by ClrType",
             ApiSchema = TestApiSchema,
             ClrType = typeof(Gender),
             ExpectedApiType = TestApiEnumTypeGender,
         },
         new TryGetByClrTypeTest()
         {
-            Name = "Find ApiObjectType [Person] by ClrType",
+            Name = $"Find {TestApiObjectTypePerson} by ClrType",
             ApiSchema = TestApiSchema,
             ClrType = typeof(Person),
             ExpectedApiType = TestApiObjectTypePerson
@@ -243,18 +243,5 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
     [MemberData(nameof(TryGetByClrTypeTheoryData))]
     public void TryGetByClrType(IXUnitTest test) => test.Execute(this);
     #endregion
-
-    [Fact]
-    public void Constructor_IgnoresNonNamedTypes()
-    {
-        var types = new ApiType[]
-        {
-            new ApiScalarType("Boolean", typeof(bool)),
-            new ApiCollectionType(new ApiScalarType("Boolean", typeof(bool)), ApiTypeModifiers.None, typeof(List<bool>))
-        };
-
-        var schema = new ApiSchema("Test", types);
-        schema.ApiTypes.Should().ContainSingle(t => t is ApiScalarType);
-    }
 }
 

@@ -55,9 +55,9 @@ public sealed class ApiEnumType : ApiNamedType
 
         this.ApiEnumValues = values;
 
-        this._apiNameLookup = values.ToDictionary(x => x.ApiName, StringComparer.OrdinalIgnoreCase);
-        this._clrNameLookup = values.ToDictionary(x => x.ClrName, StringComparer.OrdinalIgnoreCase);
-        this._clrOrdinalLookup = values.ToDictionary(x => x.ClrOrdinal);
+        _apiNameLookup = values.ToDictionary(x => x.ApiName, StringComparer.OrdinalIgnoreCase);
+        _clrNameLookup = values.ToDictionary(x => x.ClrName, StringComparer.OrdinalIgnoreCase);
+        _clrOrdinalLookup = values.ToDictionary(x => x.ClrOrdinal);
     }
     #endregion
 
@@ -69,7 +69,7 @@ public sealed class ApiEnumType : ApiNamedType
     /// <param name="value">When this method returns, contains the <see cref="ApiEnumValue"/> if found; otherwise, null.</param>
     /// <returns>True if the value is found; otherwise, false.</returns>
     public bool TryGetByApiName(string apiName, out ApiEnumValue? value)
-        => this._apiNameLookup.TryGetValue(apiName, out value);
+        => _apiNameLookup.TryGetValue(apiName, out value);
 
     /// <summary>
     ///     Attempts to retrieve an enum value by its CLR name.
@@ -78,7 +78,7 @@ public sealed class ApiEnumType : ApiNamedType
     /// <param name="value">When this method returns, contains the <see cref="ApiEnumValue"/> if found; otherwise, null.</param>
     /// <returns>True if the value is found; otherwise, false.</returns>
     public bool TryGetByClrName(string clrName, out ApiEnumValue? value)
-        => this._clrNameLookup.TryGetValue(clrName, out value);
+        => _clrNameLookup.TryGetValue(clrName, out value);
 
     /// <summary>
     ///     Attempts to retrieve an enum value by its CLR ordinal value.
@@ -87,7 +87,7 @@ public sealed class ApiEnumType : ApiNamedType
     /// <param name="value">When this method returns, contains the <see cref="ApiEnumValue"/> if found; otherwise, null.</param>
     /// <returns>True if the value is found; otherwise, false.</returns>
     public bool TryGetByClrOrdinal(int clrOrdinal, out ApiEnumValue? value)
-        => this._clrOrdinalLookup.TryGetValue(clrOrdinal, out value);
+        => _clrOrdinalLookup.TryGetValue(clrOrdinal, out value);
 
     private void ValidateUnique<T>(IEnumerable<ApiEnumValue> values, Func<ApiEnumValue, T> keySelector, string propertyName)
     {

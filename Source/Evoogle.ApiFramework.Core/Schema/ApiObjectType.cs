@@ -25,7 +25,7 @@ public sealed class ApiObjectType : ApiNamedType
     #region ApiObject Properties
     /// <summary>
     ///     Gets the collection of API properties defined on this object type.
-    /// </summary>    
+    /// </summary>
     public IReadOnlyCollection<ApiProperty> ApiProperties { get; }
     #endregion
 
@@ -37,7 +37,7 @@ public sealed class ApiObjectType : ApiNamedType
     /// <param name="apiProperties">The collection of API properties defined on this object type.</param>
     /// <param name="clrObjectType">The CLR type representing this API object.</param>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="apiProperties"/> is null.</exception>
-    /// <exception cref="ApiSchemaException">Thrown if duplicate API or CLR property names are detected.</exception>    
+    /// <exception cref="ApiSchemaException">Thrown if duplicate API or CLR property names are detected.</exception>
     public ApiObjectType(string apiName, IEnumerable<ApiProperty> apiProperties, Type clrObjectType)
         : base(apiName, clrObjectType)
     {
@@ -48,8 +48,8 @@ public sealed class ApiObjectType : ApiNamedType
 
         this.ApiProperties = values;
 
-        this._apiNameLookup = values.ToDictionary(x => x.ApiName, StringComparer.OrdinalIgnoreCase);
-        this._clrNameLookup = values.ToDictionary(x => x.ClrName, StringComparer.OrdinalIgnoreCase);
+        _apiNameLookup = values.ToDictionary(x => x.ApiName, StringComparer.OrdinalIgnoreCase);
+        _clrNameLookup = values.ToDictionary(x => x.ClrName, StringComparer.OrdinalIgnoreCase);
     }
     #endregion
 
@@ -62,7 +62,7 @@ public sealed class ApiObjectType : ApiNamedType
     /// <returns>True if the property was found; otherwise, false.</returns>
     public bool TryGetByApiName(string apiName, out ApiProperty? value)
     {
-        return this._apiNameLookup.TryGetValue(apiName, out value);
+        return _apiNameLookup.TryGetValue(apiName, out value);
     }
 
     /// <summary>
@@ -73,7 +73,7 @@ public sealed class ApiObjectType : ApiNamedType
     /// <returns>True if the property was found; otherwise, false.</returns>
     public bool TryGetByClrName(string clrName, out ApiProperty? value)
     {
-        return this._clrNameLookup.TryGetValue(clrName, out value);
+        return _clrNameLookup.TryGetValue(clrName, out value);
     }
     #endregion
 
