@@ -274,39 +274,8 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         private static void HandleExtensibleBaseExtensions(ref Utf8JsonReader reader, ref ReadContext context)
         {
             context.ReadData.ExtensibleBase ??= new ExtensibleBaseReadData();
-            context.ReadData.ExtensibleBase.Extensions ??= [];
-
-            // Validate the start of the JSON object.
-            if (reader.TokenType != JsonTokenType.StartObject)
-                throw new JsonException("Expected start of an object.");
-
-            // Read the JSON extension object properties.
-            while (reader.Read())
-            {
-                if (reader.TokenType == JsonTokenType.EndObject)
-                    break;
-
-                if (reader.TokenType != JsonTokenType.PropertyName)
-                    throw new JsonException("Expected object property name.");
-
-                // Note: We didn't apply naming policy to extension type name as property name for round-trip compatibility.
-                // Read the JSON property name (extension type name)
-                var extensionTypeName = reader.GetString()!;
-                var extensionType = Json.TypeJsonConverter.GetDeserializeType(extensionTypeName);
-
-                context.Logger.LogTrace("Deserializing extension type: {ExtensionType}", extensionType.Name);
-
-                // Move past the JSON property name (extension type name)
-                reader.Read();
-
-                // Read the extension object
-                var options = context.Options;
-                var extension = JsonSerializer.Deserialize(ref reader, extensionType, options) ?? throw new JsonException($"Failed to deserialize {context.PropertyNames.ExtensibleBase.Extensions}.");
-
-                context.Logger.LogDebug("Deserialized  extension type: {ExtensionType}", extensionType.Name);
-
-                context.ReadData.ExtensibleBase.Extensions.Add(extensionTypeName, extension);
-            }
+            context.ReadData.ExtensibleBase.Extensions =
+                ApiJsonConverterHelpers.ReadExtensions<ApiTypeJsonConverter>(ref reader, context.Options, context.Logger);
         }
         #endregion
     }

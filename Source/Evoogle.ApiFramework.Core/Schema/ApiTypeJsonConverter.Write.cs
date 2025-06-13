@@ -8,6 +8,7 @@ using System.Text.Json.Serialization;
 
 using Evoogle.Extension;
 using Evoogle.Json;
+using Evoogle.ApiFramework.Schema.Internal;
 
 using Microsoft.Extensions.Logging;
 
@@ -405,22 +406,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
             var extensionsPropertyName = context.PropertyNames.ExtensibleBase.Extensions;
             writer.WritePropertyName(extensionsPropertyName);
 
-            writer.WriteStartObject();
-            foreach (var (extensionType, extension) in extensions)
-            {
-                // Note: Don't apply naming policy to extension type name as property name for round-trip compatibility.
-                var extensionTypeName = TypeJsonConverter.GetSerializeTypeName(extensionType);
-
-                context.Logger.LogTrace("Serializing extension type: {ExtensionType}", extensionType.Name);
-
-                writer.WritePropertyName(extensionTypeName);
-
-                var options = context.Options;
-                JsonSerializer.Serialize(writer, extension, extensionType, options);
-
-                context.Logger.LogDebug("Serialized  extension type: {ExtensionType}", extensionType.Name);
-            }
-            writer.WriteEndObject();
+            ApiJsonConverterHelpers.WriteExtensions(writer, extensions, context.Options, context.Logger);
         }
     }
     #endregion

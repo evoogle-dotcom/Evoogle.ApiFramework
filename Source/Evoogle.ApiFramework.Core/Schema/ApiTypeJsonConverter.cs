@@ -108,13 +108,6 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         #endregion
     }
 
-    private readonly record struct ExtensibleBasePropertyNames
-    {
-        #region Immutable Properties
-        public required string Extensions { get; init; }
-        #endregion
-    }
-
     private readonly record struct PropertyNames
     {
         #region Immutable Properties

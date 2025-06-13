@@ -84,15 +84,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
 
     private static void AttachExtensions(in ReadContext context, ExtensibleBase extensibleBase)
     {
-        var extensions = context.ReadData.ExtensibleBase?.Extensions;
-        if (extensions != null)
-        {
-            foreach (var (extensionTypeName, extension) in extensions)
-            {
-                var extensionType = TypeJsonConverter.GetDeserializeType(extensionTypeName);
-                extensibleBase.AttachExtension(extensionType, extension);
-            }
-        }
+        ApiJsonConverterHelpers.AttachExtensions(extensibleBase, context.ReadData.ExtensibleBase?.Extensions);
     }
 
     private static ApiCollectionType CreateApiCollectionType(in ReadContext context, ApiTypeKind kind, List<ValidationResult>? validationResults)
