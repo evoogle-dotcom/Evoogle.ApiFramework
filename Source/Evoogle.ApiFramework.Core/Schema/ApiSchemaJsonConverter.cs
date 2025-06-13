@@ -63,13 +63,6 @@ public class ApiSchemaJsonConverter : JsonConverter<ApiSchema>
         #endregion
     }
 
-    private readonly record struct ExtensibleBasePropertyNames
-    {
-        #region Immutable Properties
-        public required string Extensions { get; init; }
-        #endregion
-    }
-
     private readonly record struct PropertyNames
     {
         #region Immutable Properties
@@ -167,39 +160,8 @@ public class ApiSchemaJsonConverter : JsonConverter<ApiSchema>
         private static void HandleExtensibleBaseExtensions(ref Utf8JsonReader reader, ref ReadContext context)
         {
             context.ReadData.ExtensibleBase ??= new ExtensibleBaseReadData();
-            context.ReadData.ExtensibleBase.Extensions ??= [];
-
-            // Validate the start of the JSON object.
-            if (reader.TokenType != JsonTokenType.StartObject)
-                throw new JsonException("Expected start of an object.");
-
-            // Read the JSON extension object properties.
-            while (reader.Read())
-            {
-                if (reader.TokenType == JsonTokenType.EndObject)
-                    break;
-
-                if (reader.TokenType != JsonTokenType.PropertyName)
-                    throw new JsonException("Expected object property name.");
-
-                // Note: We didn't apply naming policy to extension type name as property name for round-trip compatibility.
-                // Read the JSON property name (extension type name)
-                var extensionTypeName = reader.GetString()!;
-                var extensionType = Json.TypeJsonConverter.GetDeserializeType(extensionTypeName);
-
-                context.Logger.LogTrace("Deserializing extension type: {ExtensionType}", extensionType.Name);
-
-                // Move past the JSON property name (extension type name)
-                reader.Read();
-
-                // Read the extension object
-                var options = context.Options;
-                var extension = JsonSerializer.Deserialize(ref reader, extensionType, options) ?? throw new JsonException($"Failed to deserialize {context.PropertyNames.ExtensibleBase.Extensions}.");
-
-                context.Logger.LogDebug("Deserialized  extension type: {ExtensionType}", extensionType.Name);
-
-                context.ReadData.ExtensibleBase.Extensions.Add(extensionTypeName, extension);
-            }
+            context.ReadData.ExtensibleBase.Extensions =
+                ApiJsonConverterHelpers.ReadExtensions<ApiSchemaJsonConverter>(ref reader, context.Options, context.Logger);
         }
         #endregion
     }
@@ -346,15 +308,7 @@ public class ApiSchemaJsonConverter : JsonConverter<ApiSchema>
 
     private static void AttachExtensions(in ReadContext context, ExtensibleBase extensibleBase)
     {
-        var extensions = context.ReadData.ExtensibleBase?.Extensions;
-        if (extensions != null)
-        {
-            foreach (var (extensionTypeName, extension) in extensions)
-            {
-                var extensionType = TypeJsonConverter.GetDeserializeType(extensionTypeName);
-                extensibleBase.AttachExtension(extensionType, extension);
-            }
-        }
+        ApiJsonConverterHelpers.AttachExtensions(extensibleBase, context.ReadData.ExtensibleBase?.Extensions);
     }
     #endregion
 
@@ -493,22 +447,7 @@ public class ApiSchemaJsonConverter : JsonConverter<ApiSchema>
             var extensionsPropertyName = context.PropertyNames.ExtensibleBase.Extensions;
             writer.WritePropertyName(extensionsPropertyName);
 
-            writer.WriteStartObject();
-            foreach (var (extensionType, extension) in extensions)
-            {
-                // Note: Don't apply naming policy to extension type name as property name for round-trip compatibility.
-                var extensionTypeName = TypeJsonConverter.GetSerializeTypeName(extensionType);
-
-                context.Logger.LogTrace("Serializing extension type: {ExtensionType}", extensionType.Name);
-
-                writer.WritePropertyName(extensionTypeName);
-
-                var options = context.Options;
-                JsonSerializer.Serialize(writer, extension, extensionType, options);
-
-                context.Logger.LogDebug("Serialized  extension type: {ExtensionType}", extensionType.Name);
-            }
-            writer.WriteEndObject();
+            ApiJsonConverterHelpers.WriteExtensions(writer, extensions, context.Options, context.Logger);
         }
     }
     #endregion
