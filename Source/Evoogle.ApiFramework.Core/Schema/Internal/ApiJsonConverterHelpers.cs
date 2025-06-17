@@ -19,6 +19,17 @@ namespace Evoogle.ApiFramework.Schema.Internal;
 /// </summary>
 internal static class ApiJsonConverterHelpers
 {
+    #region Types
+    public delegate void ApiJsonReaderHandler<TContext>(ref Utf8JsonReader reader, ref TContext context);
+
+    public readonly record struct ExtensibleBasePropertyNames
+    {
+        #region Properties
+        public required string Extensions { get; init; }
+        #endregion
+    }
+    #endregion
+
     #region Read Methods
     public static void ReadJsonArray<T, TContext>
     (
@@ -74,13 +85,6 @@ internal static class ApiJsonConverterHelpers
                 reader.Skip();
             }
         }
-    }
-    #endregion
-
-    #region Utility Methods
-    public static JsonNamingPolicy GetPropertyNamingPolicy(JsonSerializerOptions options)
-    {
-        return options.PropertyNamingPolicy ?? new NullJsonNamingPolicy();
     }
     #endregion
 
@@ -148,16 +152,27 @@ internal static class ApiJsonConverterHelpers
         writer.WriteEndObject();
     }
 
-    public static void AttachExtensions(ExtensibleBase extensibleBase, Dictionary<string, object>? extensions)
+    public static void AttachExtensions
+    (
+        ExtensibleBase extensibleBase,
+        Dictionary<string, object>? extensions
+    )
     {
         if (extensions == null)
             return;
 
-        foreach (var (typeName, extension) in extensions)
+        foreach ((var typeName, var extension) in extensions)
         {
             var extensionType = TypeJsonConverter.GetDeserializeType(typeName);
             extensibleBase.AttachExtension(extensionType, extension);
         }
+    }
+    #endregion
+
+    #region Utility Methods
+    public static JsonNamingPolicy GetPropertyNamingPolicy(JsonSerializerOptions options)
+    {
+        return options.PropertyNamingPolicy ?? new NullJsonNamingPolicy();
     }
     #endregion
 }

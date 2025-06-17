@@ -7,12 +7,13 @@ using System.Collections.Concurrent;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.Extension;
 using Evoogle.Json;
 using Evoogle.Logging;
 
 using Microsoft.Extensions.Logging;
+
+using static Evoogle.ApiFramework.Schema.Internal.ApiJsonConverterHelpers;
 
 namespace Evoogle.ApiFramework.Schema;
 
@@ -160,8 +161,7 @@ public class ApiSchemaJsonConverter : JsonConverter<ApiSchema>
         private static void HandleExtensibleBaseExtensions(ref Utf8JsonReader reader, ref ReadContext context)
         {
             context.ReadData.ExtensibleBase ??= new ExtensibleBaseReadData();
-            context.ReadData.ExtensibleBase.Extensions =
-                ApiJsonConverterHelpers.ReadExtensions<ApiSchemaJsonConverter>(ref reader, context.Options, context.Logger);
+            context.ReadData.ExtensibleBase.Extensions = ReadExtensions(ref reader, context.Options, context.Logger);
         }
         #endregion
     }
@@ -216,7 +216,7 @@ public class ApiSchemaJsonConverter : JsonConverter<ApiSchema>
 
         context.Logger.LogTrace("Deserializing {ApiSchema}", nameof(ApiSchema));
 
-        ApiJsonConverterHelpers.ReadJsonObject<ApiSchemaJsonConverter, ReadContext>(ref reader, ref context, c => c.ReadHandlers.PropertyHandlers);
+        ReadJsonObject<ApiSchemaJsonConverter, ReadContext>(ref reader, ref context, c => c.ReadHandlers.PropertyHandlers);
 
         var apiSchema = CreateApiSchema(context);
 
@@ -248,11 +248,6 @@ public class ApiSchemaJsonConverter : JsonConverter<ApiSchema>
     #endregion
 
     #region Cache Implementation Methods
-    private static JsonNamingPolicy GetPropertyNamingPolicy(JsonSerializerOptions options)
-    {
-        return ApiJsonConverterHelpers.GetPropertyNamingPolicy(options);
-    }
-
     private static PropertyNames GetPropertyNames(JsonNamingPolicy policy)
     {
         return PropertyNamesCache.GetOrAdd(policy, policy => new PropertyNames
@@ -301,14 +296,10 @@ public class ApiSchemaJsonConverter : JsonConverter<ApiSchema>
 
         var apiSchema = new ApiSchema(name, apiTypes);
 
-        AttachExtensions(context, apiSchema);
+        var extensions = context.ReadData.ExtensibleBase?.Extensions;
+        AttachExtensions(apiSchema, extensions);
 
         return apiSchema;
-    }
-
-    private static void AttachExtensions(in ReadContext context, ExtensibleBase extensibleBase)
-    {
-        ApiJsonConverterHelpers.AttachExtensions(extensibleBase, context.ReadData.ExtensibleBase?.Extensions);
     }
     #endregion
 
@@ -447,7 +438,7 @@ public class ApiSchemaJsonConverter : JsonConverter<ApiSchema>
             var extensionsPropertyName = context.PropertyNames.ExtensibleBase.Extensions;
             writer.WritePropertyName(extensionsPropertyName);
 
-            ApiJsonConverterHelpers.WriteExtensions(writer, extensions, context.Options, context.Logger);
+            WriteExtensions(writer, extensions, context.Options, context.Logger);
         }
     }
     #endregion

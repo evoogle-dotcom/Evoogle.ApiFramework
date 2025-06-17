@@ -3,294 +3,122 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using System.Text.Json;
-
-using Evoogle.Extension;
 using Evoogle.XUnit;
 
-using FluentAssertions;
+using static Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests;
 
 namespace Evoogle.ApiFramework.Schema;
 
 public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
 {
-    #region Test Classes
-    public class JsonDeserializeTest : XUnitTest
-    {
-        #region User Supplied Properties
-        public string? SourceJson { get; set; }
-        public ApiType? ExpectedApiType { get; set; }
-        public bool? AddTestExtension1 { get; set; } = false;
-        public bool? AddTestExtension2 { get; set; } = false;
-        #endregion
-
-        #region Calculated Properties
-        private ApiType? ActualApiType { get; set; }
-        #endregion
-
-        #region XUnitTest Methods
-        protected override void Arrange()
-        {
-            if (this?.AddTestExtension1 == true)
-            {
-                // Attach test extension 1 to the ApiType if requested.
-                this.ExpectedApiType?.AttachExtension(new TestExtension1());
-            }
-
-            if (this?.AddTestExtension2 == true)
-            {
-                // Attach test extension 2 to the ApiType if requested.
-                this.ExpectedApiType?.AttachExtension(new TestExtension2());
-            }
-
-            this.WriteLine($"Source      JSON: {this.SourceJson.SafeToString().RemoveWhitespace()}");
-            this.WriteLine($"Expected ApiType: {this.ExpectedApiType.SafeToString()}");
-        }
-
-        protected override void Act()
-        {
-            this.ActualApiType = JsonSerializer.Deserialize<ApiType>(this.SourceJson!);
-            this.WriteLine($"Actual   ApiType: {this.ActualApiType.SafeToString()}");
-        }
-
-        protected override void Assert()
-        {
-            this.ActualApiType.Should().BeEquivalentTo(ExpectedApiType);
-        }
-        #endregion
-    }
-
-    public class JsonRoundtripTest : XUnitTest
-    {
-        #region User Supplied Properties
-        public ApiType? ExpectedApiType { get; set; }
-        public bool? AddTestExtension1 { get; set; } = false;
-        public bool? AddTestExtension2 { get; set; } = false;
-        #endregion
-
-        #region Calculated Properties
-        private ApiType? ActualApiType { get; set; }
-        #endregion
-
-        #region XUnitTest Methods
-        protected override void Arrange()
-        {
-            if (this?.AddTestExtension1 == true)
-            {
-                // Attach test extension 1 to the ApiType if requested.
-                this.ExpectedApiType?.AttachExtension(new TestExtension1());
-            }
-
-            if (this?.AddTestExtension2 == true)
-            {
-                // Attach test extension 2 to the ApiType if requested.
-                this.ExpectedApiType?.AttachExtension(new TestExtension2());
-            }
-
-            this.WriteLine($"Expected ApiType: {this.ExpectedApiType.SafeToString()}");
-        }
-
-        protected override void Act()
-        {
-            var json = JsonSerializer.Serialize(this.ExpectedApiType);
-            this.ActualApiType = JsonSerializer.Deserialize<ApiType>(json);
-            this.WriteLine($"Actual   ApiType: {this.ActualApiType.SafeToString()}");
-        }
-
-        protected override void Assert()
-        {
-            this.ActualApiType.Should().BeEquivalentTo(ExpectedApiType);
-        }
-        #endregion
-    }
-
-    public class JsonSerializeTest : XUnitTest
-    {
-        #region User Supplied Properties
-        public ApiType? SourceApiType { get; set; }
-        public string? ExpectedJson { get; set; }
-        public bool? AddTestExtension1 { get; set; } = false;
-        public bool? AddTestExtension2 { get; set; } = false;
-        #endregion
-
-        #region Calculated Properties
-        private string? ActualJson { get; set; }
-        #endregion
-
-        #region XUnitTest Methods
-        protected override void Arrange()
-        {
-            if (this?.AddTestExtension1 == true)
-            {
-                // Attach test extension 1 to the ApiType if requested.
-                this.SourceApiType?.AttachExtension(new TestExtension1());
-            }
-
-            if (this?.AddTestExtension2 == true)
-            {
-                // Attach test extension 2 to the ApiType if requested.
-                this.SourceApiType?.AttachExtension(new TestExtension2());
-            }
-
-            this.WriteLine($"Source ApiType: {this.SourceApiType.SafeToString()}");
-            this.WriteLine($"Expected  JSON: {this.ExpectedJson.SafeToString().RemoveWhitespace()}");
-        }
-
-        protected override void Act()
-        {
-            this.ActualJson = JsonSerializer.Serialize(this.SourceApiType);
-            this.WriteLine($"Actual    JSON: {this.ActualJson.SafeToString().RemoveWhitespace()}");
-        }
-
-        protected override void Assert()
-        {
-            var actualJsonMinusWhitespace = this.ActualJson.RemoveWhitespace();
-            var expectedJsonMinusWhitespace = this.ExpectedJson.RemoveWhitespace();
-
-            actualJsonMinusWhitespace.Should().Be(expectedJsonMinusWhitespace);
-        }
-        #endregion
-    }
-    #endregion
-
     #region Theory Data
-    public class ClassWithScalars(string requiredName, long requiredNumber, bool requiredPredicate)
-    {
-        public string RequiredName { get; set; } = requiredName;
-        public long RequiredNumber { get; set; } = requiredNumber;
-        public bool RequiredPredicate { get; set; } = requiredPredicate;
-
-        public string? OptionalName { get; set; }
-        public long? OptionalNumber { get; set; }
-        public bool? OptionalPredicate { get; set; }
-    }
-
-    public enum StopLight
-    {
-        None,
-        Green,
-        Yellow,
-        Red
-    }
-
-    public class TestExtension1
-    {
-        public string Description { get; set; } = "This is test extension 1.";
-    }
-
-    public class TestExtension2
-    {
-        public string Id { get; set; } = "2";
-        public string Name { get; set; } = "Test Extension 2.";
-    }
-
     public static TheoryDataRow<IXUnitTest>[] JsonDeserializeTheoryData =>
     [
         // Null
-        new JsonDeserializeTest
+        new JsonDeserializeTest<ApiType>
         {
             Name = "Null",
-            SourceJson = "null",
-            ExpectedApiType = null
+            Source = "null",
+            Expected = null
         },
 
         // ApiScalarType
-        new JsonDeserializeTest
+        new JsonDeserializeTest<ApiType>
         {
             Name = "ApiScalarType [Boolean]",
-            SourceJson = @"
+            Source = @"
             {
                 ""Kind"": ""Scalar"",
                 ""ApiName"": ""Boolean"",
                 ""ClrType"": ""System.Boolean, System.Private.CoreLib""
             }",
-            ExpectedApiType = new ApiScalarType("Boolean", typeof(bool))
+            Expected = new ApiScalarType("Boolean", typeof(bool))
         },
 
-        new JsonDeserializeTest
+        new JsonDeserializeTest<ApiType>
         {
             Name = "ApiScalarType [Boolean] With Extension 1",
-            SourceJson = @"
+            Source = @"
             {
                 ""Kind"": ""Scalar"",
                 ""ApiName"": ""Boolean"",
                 ""ClrType"": ""System.Boolean, System.Private.CoreLib"",
                 ""Extensions"": {
-                    ""Evoogle.ApiFramework.Schema.ApiTypeTests\u002BTestExtension1, Evoogle.ApiFramework.Core.Tests"": {
-                        ""Description"": ""This is test extension 1.""
+                    ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BTestExtension1, Evoogle.ApiFramework.Core.Tests"": {
+                        ""Description"": ""TestExtension1""
                     }
                 }
             }",
-            ExpectedApiType = new ApiScalarType("Boolean", typeof(bool)),
+            Expected = new ApiScalarType("Boolean", typeof(bool)),
             AddTestExtension1 = true
         },
 
-        new JsonDeserializeTest
+        new JsonDeserializeTest<ApiType>
         {
             Name = "ApiScalarType [Boolean] With Extra Property",
-            SourceJson = @"
+            Source = @"
             {
                 ""Kind"": ""Scalar"",
                 ""ApiName"": ""Boolean"",
                 ""ClrType"": ""System.Boolean, System.Private.CoreLib"",
                 ""Unexpected"": ""IgnoreMe""
             }",
-            ExpectedApiType = new ApiScalarType("Boolean", typeof(bool))
+            Expected = new ApiScalarType("Boolean", typeof(bool))
         },
 
-        new JsonDeserializeTest
+        new JsonDeserializeTest<ApiType>
         {
             Name = "ApiScalarType [ID]",
-            SourceJson =  @"
+            Source =  @"
             {
                 ""Kind"": ""Scalar"",
                 ""ApiName"": ""ID"",
                 ""ClrType"": ""System.String, System.Private.CoreLib""
             }",
-            ExpectedApiType = new ApiScalarType("ID", typeof(string))
+            Expected = new ApiScalarType("ID", typeof(string))
         },
 
-        new JsonDeserializeTest
+        new JsonDeserializeTest<ApiType>
         {
             Name = "ApiScalarType [Int]",
-            SourceJson = @"
+            Source = @"
             {
                 ""Kind"": ""Scalar"",
                 ""ApiName"": ""Int"",
                 ""ClrType"": ""System.Int32, System.Private.CoreLib""
             }",
-            ExpectedApiType = new ApiScalarType("Int", typeof(int))
+            Expected = new ApiScalarType("Int", typeof(int))
         },
 
-        new JsonDeserializeTest
+        new JsonDeserializeTest<ApiType>
         {
             Name = "ApiScalarType [Float]",
-            SourceJson = @"
+            Source = @"
             {
                 ""Kind"": ""Scalar"",
                 ""ApiName"": ""Float"",
                 ""ClrType"": ""System.Single, System.Private.CoreLib""
             }",
-            ExpectedApiType = new ApiScalarType("Float", typeof(float))
+            Expected = new ApiScalarType("Float", typeof(float))
         },
 
-        new JsonDeserializeTest
+        new JsonDeserializeTest<ApiType>
         {
             Name = "ApiScalarType [String]",
-            SourceJson = @"
+            Source = @"
             {
                 ""Kind"": ""Scalar"",
                 ""ApiName"": ""String"",
                 ""ClrType"": ""System.String, System.Private.CoreLib""
             }",
-            ExpectedApiType = new ApiScalarType("String", typeof(string))
+            Expected = new ApiScalarType("String", typeof(string))
         },
 
         // ApiEnumType
-        new JsonDeserializeTest
+        new JsonDeserializeTest<ApiType>
         {
             Name = $"ApiEnumType [{nameof(StopLight)}]",
-            SourceJson = @"
+            Source = @"
             {
                 ""Kind"": ""Enum"",
                 ""ApiName"": ""StopLight"",
@@ -316,9 +144,9 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                         ""ClrOrdinal"": 3
                     }
                 ],
-                ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiTypeTests\u002BStopLight, Evoogle.ApiFramework.Core.Tests""
+                ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BStopLight, Evoogle.ApiFramework.Core.Tests""
             }",
-            ExpectedApiType = new ApiEnumType
+            Expected = new ApiEnumType
             (
                 nameof(StopLight),
                 [new ApiEnumValue("None", "None", 0), new ApiEnumValue("Green", "Green", 1), new ApiEnumValue("Yellow", "Yellow", 2), new ApiEnumValue("Red", "Red", 3)],
@@ -326,10 +154,10 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             )
         },
 
-        new JsonDeserializeTest
+        new JsonDeserializeTest<ApiType>
         {
             Name = $"ApiEnumType [{nameof(StopLight)}] With Extension 2",
-            SourceJson = @"
+            Source = @"
             {
                 ""Kind"": ""Enum"",
                 ""ApiName"": ""StopLight"",
@@ -355,15 +183,15 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                         ""ClrOrdinal"": 3
                     }
                 ],
-                ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiTypeTests\u002BStopLight, Evoogle.ApiFramework.Core.Tests"",
+                ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BStopLight, Evoogle.ApiFramework.Core.Tests"",
                 ""Extensions"": {
-                    ""Evoogle.ApiFramework.Schema.ApiTypeTests\u002BTestExtension2, Evoogle.ApiFramework.Core.Tests"": {
+                    ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BTestExtension2, Evoogle.ApiFramework.Core.Tests"": {
                         ""Id"": ""2"",
-                        ""Name"": ""Test Extension 2.""
+                        ""Name"": ""TestExtension2""
                     }
                 }
             }",
-            ExpectedApiType = new ApiEnumType
+            Expected = new ApiEnumType
             (
                 nameof(StopLight),
                 [new ApiEnumValue("None", "None", 0), new ApiEnumValue("Green", "Green", 1), new ApiEnumValue("Yellow", "Yellow", 2), new ApiEnumValue("Red", "Red", 3)],
@@ -373,10 +201,10 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
         },
 
         // ApiCollectionType
-        new JsonDeserializeTest
+        new JsonDeserializeTest<ApiType>
         {
             Name = "ApiCollectionType [List<String>]",
-            SourceJson = @"
+            Source = @"
             {
                 ""Kind"": ""Collection"",
                 ""ApiItemType"": {
@@ -387,13 +215,13 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 ""ApiItemTypeModifiers"": ""Required"",
                 ""ClrType"": ""System.Collections.Generic.List\u00601[[System.String, System.Private.CoreLib]], System.Private.CoreLib""
             }",
-            ExpectedApiType = new ApiCollectionType(new ApiScalarType("String", typeof(string)), ApiTypeModifiers.Required, typeof(List<string>))
+            Expected = new ApiCollectionType(new ApiScalarType("String", typeof(string)), ApiTypeModifiers.Required, typeof(List<string>))
         },
 
-        new JsonDeserializeTest
+        new JsonDeserializeTest<ApiType>
         {
             Name = "ApiCollectionType [List<String?>]",
-            SourceJson = @"
+            Source = @"
             {
                 ""Kind"": ""Collection"",
                 ""ApiItemType"": {
@@ -404,13 +232,13 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 ""ApiItemTypeModifiers"": ""None"",
                 ""ClrType"": ""System.Collections.Generic.List\u00601[[System.String, System.Private.CoreLib]], System.Private.CoreLib""
             }",
-            ExpectedApiType = new ApiCollectionType(new ApiScalarType("String", typeof(string)), ApiTypeModifiers.None, typeof(List<string?>))
+            Expected     = new ApiCollectionType(new ApiScalarType("String", typeof(string)), ApiTypeModifiers.None, typeof(List<string?>))
         },
 
-        new JsonDeserializeTest
+        new JsonDeserializeTest<ApiType>
         {
             Name = $"ApiCollectionType [List<{nameof(StopLight)}>]",
-            SourceJson = @"
+            Source = @"
             {
                 ""Kind"": ""Collection"",
                 ""ApiItemType"": {
@@ -438,12 +266,12 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                             ""ClrOrdinal"": 3
                         }
                     ],
-                    ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiTypeTests\u002BStopLight, Evoogle.ApiFramework.Core.Tests""
+                    ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BStopLight, Evoogle.ApiFramework.Core.Tests""
                 },
                 ""ApiItemTypeModifiers"": ""Required"",
-                ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.Schema.ApiTypeTests\u002BStopLight, Evoogle.ApiFramework.Core.Tests]], System.Private.CoreLib""
+                ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BStopLight, Evoogle.ApiFramework.Core.Tests]], System.Private.CoreLib""
             }",
-            ExpectedApiType = new ApiCollectionType
+            Expected = new ApiCollectionType
             (
                 new ApiEnumType
                 (
@@ -456,10 +284,10 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             )
         },
 
-        new JsonDeserializeTest
+        new JsonDeserializeTest<ApiType>
         {
             Name = $"ApiCollectionType [List<{nameof(StopLight)}?>]",
-            SourceJson = @"
+            Source = @"
             {
                 ""Kind"": ""Collection"",
                 ""ApiItemType"": {
@@ -487,12 +315,12 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                             ""ClrOrdinal"": 3
                         }
                     ],
-                    ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiTypeTests\u002BStopLight, Evoogle.ApiFramework.Core.Tests""
+                    ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BStopLight, Evoogle.ApiFramework.Core.Tests""
                 },
                 ""ApiItemTypeModifiers"": ""None"",
-                ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.Schema.ApiTypeTests\u002BStopLight, Evoogle.ApiFramework.Core.Tests]], System.Private.CoreLib""
+                ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BStopLight, Evoogle.ApiFramework.Core.Tests]], System.Private.CoreLib""
             }",
-            ExpectedApiType = new ApiCollectionType
+            Expected = new ApiCollectionType
             (
                 new ApiEnumType
                 (
@@ -506,10 +334,10 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
         },
 
         // ApiObjectType
-        new JsonDeserializeTest
+        new JsonDeserializeTest<ApiType>
         {
             Name = $"ApiObjectType [{nameof(ClassWithScalars)}]",
-            SourceJson = @"
+            Source = @"
             {
                 ""Kind"": ""Object"",
                 ""ApiName"": ""ClassWithScalars"",
@@ -575,9 +403,9 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                         ""ClrName"": ""OptionalPredicate""
                     }
                 ],
-                ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiTypeTests\u002BClassWithScalars, Evoogle.ApiFramework.Core.Tests""
+                ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BClassWithScalars, Evoogle.ApiFramework.Core.Tests""
             }",
-            ExpectedApiType = new ApiObjectType
+            Expected = new ApiObjectType
             (
                 nameof(ClassWithScalars),
                 [
@@ -628,10 +456,10 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             )
         },
 
-        new JsonDeserializeTest
+        new JsonDeserializeTest<ApiType>
         {
             Name = $"ApiObjectType [{nameof(ClassWithScalars)}] With Extension 1 and Extension 2",
-            SourceJson = @"
+            Source = @"
             {
                 ""Kind"": ""Object"",
                 ""ApiName"": ""ClassWithScalars"",
@@ -697,18 +525,18 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                         ""ClrName"": ""OptionalPredicate""
                     }
                 ],
-                ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiTypeTests\u002BClassWithScalars, Evoogle.ApiFramework.Core.Tests"",
+                ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BClassWithScalars, Evoogle.ApiFramework.Core.Tests"",
                 ""Extensions"": {
-                    ""Evoogle.ApiFramework.Schema.ApiTypeTests\u002BTestExtension1, Evoogle.ApiFramework.Core.Tests"": {
-                        ""Description"": ""This is test extension 1.""
+                    ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BTestExtension1, Evoogle.ApiFramework.Core.Tests"": {
+                        ""Description"": ""TestExtension1""
                     },
-                    ""Evoogle.ApiFramework.Schema.ApiTypeTests\u002BTestExtension2, Evoogle.ApiFramework.Core.Tests"": {
+                    ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BTestExtension2, Evoogle.ApiFramework.Core.Tests"": {
                         ""Id"": ""2"",
-                        ""Name"": ""Test Extension 2.""
+                        ""Name"": ""TestExtension2""
                     }
                 }
             }",
-            ExpectedApiType = new ApiObjectType
+            Expected = new ApiObjectType
             (
                 nameof(ClassWithScalars),
                 [
@@ -765,55 +593,55 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
     public static TheoryDataRow<IXUnitTest>[] JsonRoundtripTheoryData =>
     [
         // Null
-        new JsonRoundtripTest
+        new JsonRoundtripTest<ApiType>
         {
             Name = "Null",
-            ExpectedApiType = null
+            Expected = null
         },
 
         // ApiScalarType
-        new JsonRoundtripTest
+        new JsonRoundtripTest<ApiType>
         {
             Name = "ApiScalarType [Boolean]",
-            ExpectedApiType = new ApiScalarType("Boolean", typeof(bool))
+            Expected = new ApiScalarType("Boolean", typeof(bool))
         },
 
-        new JsonRoundtripTest
+        new JsonRoundtripTest<ApiType>
         {
             Name = "ApiScalarType [Boolean] With Extension 1",
-            ExpectedApiType = new ApiScalarType("Boolean", typeof(bool)),
+            Expected = new ApiScalarType("Boolean", typeof(bool)),
             AddTestExtension1 = true
         },
 
-        new JsonRoundtripTest
+        new JsonRoundtripTest<ApiType>
         {
             Name = "ApiScalarType [ID]",
-            ExpectedApiType = new ApiScalarType("ID", typeof(string))
+            Expected = new ApiScalarType("ID", typeof(string))
         },
 
-        new JsonRoundtripTest
+        new JsonRoundtripTest<ApiType>
         {
             Name = "ApiScalarType [Int]",
-            ExpectedApiType = new ApiScalarType("Int", typeof(int))
+            Expected = new ApiScalarType("Int", typeof(int))
         },
 
-        new JsonRoundtripTest
+        new JsonRoundtripTest<ApiType>
         {
             Name = "ApiScalarType [Float]",
-            ExpectedApiType = new ApiScalarType("Float", typeof(float))
+            Expected = new ApiScalarType("Float", typeof(float))
         },
 
-        new JsonRoundtripTest
+        new JsonRoundtripTest<ApiType>
         {
             Name = "ApiScalarType [String]",
-            ExpectedApiType = new ApiScalarType("String", typeof(string))
+            Expected = new ApiScalarType("String", typeof(string))
         },
 
         // ApiEnumType
-        new JsonRoundtripTest
+        new JsonRoundtripTest<ApiType>
         {
             Name = $"ApiEnumType [{nameof(StopLight)}]",
-            ExpectedApiType = new ApiEnumType
+            Expected = new ApiEnumType
             (
                 nameof(StopLight),
                 [new ApiEnumValue("None", "None", 0), new ApiEnumValue("Green", "Green", 1), new ApiEnumValue("Yellow", "Yellow", 2), new ApiEnumValue("Red", "Red", 3)],
@@ -821,10 +649,10 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             )
         },
 
-        new JsonRoundtripTest
+        new JsonRoundtripTest<ApiType>
         {
             Name = $"ApiEnumType [{nameof(StopLight)}] With Extension 2",
-            ExpectedApiType = new ApiEnumType
+            Expected = new ApiEnumType
             (
                 nameof(StopLight),
                 [new ApiEnumValue("None", "None", 0), new ApiEnumValue("Green", "Green", 1), new ApiEnumValue("Yellow", "Yellow", 2), new ApiEnumValue("Red", "Red", 3)],
@@ -834,22 +662,22 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
         },
 
         // ApiCollectionType
-        new JsonRoundtripTest
+        new JsonRoundtripTest<ApiType>
         {
             Name = "ApiCollectionType [List<String>]",
-            ExpectedApiType = new ApiCollectionType(new ApiScalarType("String", typeof(string)), ApiTypeModifiers.Required, typeof(List<string>))
+            Expected = new ApiCollectionType(new ApiScalarType("String", typeof(string)), ApiTypeModifiers.Required, typeof(List<string>))
         },
 
-        new JsonRoundtripTest
+        new JsonRoundtripTest<ApiType>
         {
             Name = "ApiCollectionType [List<String?>]",
-            ExpectedApiType = new ApiCollectionType(new ApiScalarType("String", typeof(string)), ApiTypeModifiers.None, typeof(List<string?>))
+            Expected = new ApiCollectionType(new ApiScalarType("String", typeof(string)), ApiTypeModifiers.None, typeof(List<string?>))
         },
 
-        new JsonRoundtripTest
+        new JsonRoundtripTest<ApiType>
         {
             Name = $"ApiCollectionType [List<{nameof(StopLight)}>]",
-            ExpectedApiType = new ApiCollectionType
+            Expected = new ApiCollectionType
             (
                 new ApiEnumType
                 (
@@ -862,10 +690,10 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             )
         },
 
-        new JsonRoundtripTest
+        new JsonRoundtripTest<ApiType>
         {
             Name = $"ApiCollectionType [List<{nameof(StopLight)}?>]",
-            ExpectedApiType = new ApiCollectionType
+            Expected = new ApiCollectionType
             (
                 new ApiEnumType
                 (
@@ -879,10 +707,10 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
         },
 
         // ApiObjectType
-        new JsonRoundtripTest
+        new JsonRoundtripTest<ApiType>
         {
             Name = $"ApiObjectType [{nameof(ClassWithScalars)}]",
-            ExpectedApiType = new ApiObjectType
+            Expected = new ApiObjectType
             (
                 nameof(ClassWithScalars),
                 [
@@ -933,10 +761,10 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             )
         },
 
-        new JsonRoundtripTest
+        new JsonRoundtripTest<ApiType>
         {
             Name = $"ApiObjectType [{nameof(ClassWithScalars)}] With Extension 1 and Extension 2",
-            ExpectedApiType = new ApiObjectType
+            Expected = new ApiObjectType
             (
                 nameof(ClassWithScalars),
                 [
@@ -993,19 +821,19 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
     public static TheoryDataRow<IXUnitTest>[] JsonSerializeTheoryData =>
     [
         // Null
-        new JsonSerializeTest
+        new JsonSerializeTest<ApiType>
         {
             Name = "Null",
-            SourceApiType = null,
-            ExpectedJson = "null"
+            Source = null,
+            Expected = "null"
         },
 
         // ApiScalarType
-        new JsonSerializeTest
+        new JsonSerializeTest<ApiType>
         {
             Name = "ApiScalarType [Boolean]",
-            SourceApiType = new ApiScalarType("Boolean", typeof(bool)),
-            ExpectedJson = @"
+            Source = new ApiScalarType("Boolean", typeof(bool)),
+            Expected = @"
             {
                 ""Kind"": ""Scalar"",
                 ""ApiName"": ""Boolean"",
@@ -1013,29 +841,29 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             }"
         },
 
-        new JsonSerializeTest
+        new JsonSerializeTest<ApiType>
         {
             Name = "ApiScalarType [Boolean] With Extension 1",
-            SourceApiType = new ApiScalarType("Boolean", typeof(bool)),
-            ExpectedJson = @"
+            Source = new ApiScalarType("Boolean", typeof(bool)),
+            Expected = @"
             {
                 ""Kind"": ""Scalar"",
                 ""ApiName"": ""Boolean"",
                 ""ClrType"": ""System.Boolean, System.Private.CoreLib"",
                 ""Extensions"": {
-                    ""Evoogle.ApiFramework.Schema.ApiTypeTests\u002BTestExtension1, Evoogle.ApiFramework.Core.Tests"": {
-                        ""Description"": ""This is test extension 1.""
+                    ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BTestExtension1, Evoogle.ApiFramework.Core.Tests"": {
+                        ""Description"": ""TestExtension1""
                     }
                 }
             }",
             AddTestExtension1 = true
         },
 
-        new JsonSerializeTest
+        new JsonSerializeTest<ApiType>
         {
             Name = "ApiScalarType [ID]",
-            SourceApiType = new ApiScalarType("ID", typeof(string)),
-            ExpectedJson = @"
+            Source = new ApiScalarType("ID", typeof(string)),
+            Expected = @"
             {
                 ""Kind"": ""Scalar"",
                 ""ApiName"": ""ID"",
@@ -1043,11 +871,11 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             }"
         },
 
-        new JsonSerializeTest
+        new JsonSerializeTest<ApiType>
         {
             Name = "ApiScalarType [Int]",
-            SourceApiType = new ApiScalarType("Int", typeof(int)),
-            ExpectedJson = @"
+            Source = new ApiScalarType("Int", typeof(int)),
+            Expected = @"
             {
                 ""Kind"": ""Scalar"",
                 ""ApiName"": ""Int"",
@@ -1055,11 +883,11 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             }"
         },
 
-        new JsonSerializeTest
+        new JsonSerializeTest<ApiType>
         {
             Name = "ApiScalarType [Float]",
-            SourceApiType = new ApiScalarType("Float", typeof(float)),
-            ExpectedJson = @"
+            Source = new ApiScalarType("Float", typeof(float)),
+            Expected = @"
             {
                 ""Kind"": ""Scalar"",
                 ""ApiName"": ""Float"",
@@ -1067,11 +895,11 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             }"
         },
 
-        new JsonSerializeTest
+        new JsonSerializeTest<ApiType>
         {
             Name = "ApiScalarType [String]",
-            SourceApiType = new ApiScalarType("String", typeof(string)),
-            ExpectedJson = @"
+            Source = new ApiScalarType("String", typeof(string)),
+            Expected = @"
             {
                 ""Kind"": ""Scalar"",
                 ""ApiName"": ""String"",
@@ -1080,16 +908,16 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
         },
 
         // ApiEnumType
-        new JsonSerializeTest
+        new JsonSerializeTest<ApiType>
         {
             Name = $"ApiEnumType [{nameof(StopLight)}]",
-            SourceApiType = new ApiEnumType
+            Source = new ApiEnumType
             (
                 nameof(StopLight),
                 [new ApiEnumValue("None", "None", 0), new ApiEnumValue("Green", "Green", 1), new ApiEnumValue("Yellow", "Yellow", 2), new ApiEnumValue("Red", "Red", 3)],
                 typeof(StopLight)
             ),
-            ExpectedJson = @"
+            Expected = @"
             {
                 ""Kind"": ""Enum"",
                 ""ApiName"": ""StopLight"",
@@ -1115,20 +943,20 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                         ""ClrOrdinal"": 3
                     }
                 ],
-                ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiTypeTests\u002BStopLight, Evoogle.ApiFramework.Core.Tests""
+                ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BStopLight, Evoogle.ApiFramework.Core.Tests""
             }"
         },
 
-        new JsonSerializeTest
+        new JsonSerializeTest<ApiType>
         {
             Name = $"ApiEnumType [{nameof(StopLight)}] With Extension 2",
-            SourceApiType = new ApiEnumType
+            Source = new ApiEnumType
             (
                 nameof(StopLight),
                 [new ApiEnumValue("None", "None", 0), new ApiEnumValue("Green", "Green", 1), new ApiEnumValue("Yellow", "Yellow", 2), new ApiEnumValue("Red", "Red", 3)],
                 typeof(StopLight)
             ),
-            ExpectedJson = @"
+            Expected = @"
             {
                 ""Kind"": ""Enum"",
                 ""ApiName"": ""StopLight"",
@@ -1154,11 +982,11 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                         ""ClrOrdinal"": 3
                     }
                 ],
-                ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiTypeTests\u002BStopLight, Evoogle.ApiFramework.Core.Tests"",
+                ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BStopLight, Evoogle.ApiFramework.Core.Tests"",
                 ""Extensions"": {
-                    ""Evoogle.ApiFramework.Schema.ApiTypeTests\u002BTestExtension2, Evoogle.ApiFramework.Core.Tests"": {
+                    ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BTestExtension2, Evoogle.ApiFramework.Core.Tests"": {
                         ""Id"": ""2"",
-                        ""Name"": ""Test Extension 2.""
+                        ""Name"": ""TestExtension2""
                     }
                 }
             }",
@@ -1166,11 +994,11 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
         },
 
         // ApiCollectionType
-        new JsonSerializeTest
+        new JsonSerializeTest<ApiType>
         {
             Name = "ApiCollectionType [List<String>]",
-            SourceApiType = new ApiCollectionType(new ApiScalarType("String", typeof(string)), ApiTypeModifiers.Required, typeof(List<string>)),
-            ExpectedJson = @"
+            Source = new ApiCollectionType(new ApiScalarType("String", typeof(string)), ApiTypeModifiers.Required, typeof(List<string>)),
+            Expected = @"
             {
                 ""Kind"": ""Collection"",
                 ""ApiItemType"": {
@@ -1183,11 +1011,11 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             }"
         },
 
-        new JsonSerializeTest
+        new JsonSerializeTest<ApiType>
         {
             Name = "ApiCollectionType [List<String?>]",
-            SourceApiType = new ApiCollectionType(new ApiScalarType("String", typeof(string)), ApiTypeModifiers.None, typeof(List<string?>)),
-            ExpectedJson = @"
+            Source = new ApiCollectionType(new ApiScalarType("String", typeof(string)), ApiTypeModifiers.None, typeof(List<string?>)),
+            Expected = @"
             {
                 ""Kind"": ""Collection"",
                 ""ApiItemType"": {
@@ -1200,10 +1028,10 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             }"
         },
 
-        new JsonSerializeTest
+        new JsonSerializeTest<ApiType>
         {
             Name = $"ApiCollectionType [List<{nameof(StopLight)}>]",
-            SourceApiType = new ApiCollectionType
+            Source = new ApiCollectionType
             (
                 new ApiEnumType
                 (
@@ -1214,7 +1042,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 ApiTypeModifiers.Required,
                 typeof(List<StopLight>)
             ),
-            ExpectedJson = @"
+            Expected = @"
             {
                 ""Kind"": ""Collection"",
                 ""ApiItemType"": {
@@ -1242,17 +1070,17 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                             ""ClrOrdinal"": 3
                         }
                     ],
-                    ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiTypeTests\u002BStopLight, Evoogle.ApiFramework.Core.Tests""
+                    ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BStopLight, Evoogle.ApiFramework.Core.Tests""
                 },
                 ""ApiItemTypeModifiers"": ""Required"",
-                ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.Schema.ApiTypeTests\u002BStopLight, Evoogle.ApiFramework.Core.Tests]], System.Private.CoreLib""
+                ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BStopLight, Evoogle.ApiFramework.Core.Tests]], System.Private.CoreLib""
             }"
         },
 
-        new JsonSerializeTest
+        new JsonSerializeTest<ApiType>
         {
             Name = $"ApiCollectionType [List<{nameof(StopLight)}?>]",
-            SourceApiType = new ApiCollectionType
+            Source = new ApiCollectionType
             (
                 new ApiEnumType
                 (
@@ -1263,7 +1091,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 ApiTypeModifiers.None,
                 typeof(List<StopLight>)
             ),
-            ExpectedJson = @"
+            Expected = @"
             {
                 ""Kind"": ""Collection"",
                 ""ApiItemType"": {
@@ -1291,18 +1119,18 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                             ""ClrOrdinal"": 3
                         }
                     ],
-                    ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiTypeTests\u002BStopLight, Evoogle.ApiFramework.Core.Tests""
+                    ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BStopLight, Evoogle.ApiFramework.Core.Tests""
                 },
                 ""ApiItemTypeModifiers"": ""None"",
-                ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.Schema.ApiTypeTests\u002BStopLight, Evoogle.ApiFramework.Core.Tests]], System.Private.CoreLib""
+                ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BStopLight, Evoogle.ApiFramework.Core.Tests]], System.Private.CoreLib""
             }"
         },
 
         // ApiObjectType
-        new JsonSerializeTest
+        new JsonSerializeTest<ApiType>
         {
             Name = $"ApiObjectType [{nameof(ClassWithScalars)}]",
-            SourceApiType = new ApiObjectType
+            Source = new ApiObjectType
             (
                 nameof(ClassWithScalars),
                 [
@@ -1351,7 +1179,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 ],
                 typeof(ClassWithScalars)
             ),
-            ExpectedJson = @"
+            Expected = @"
             {
                 ""Kind"": ""Object"",
                 ""ApiName"": ""ClassWithScalars"",
@@ -1417,14 +1245,14 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                         ""ClrName"": ""OptionalPredicate""
                     }
                 ],
-                ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiTypeTests\u002BClassWithScalars, Evoogle.ApiFramework.Core.Tests""
+                ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BClassWithScalars, Evoogle.ApiFramework.Core.Tests""
             }"
         },
 
-        new JsonSerializeTest
+        new JsonSerializeTest<ApiType>
         {
             Name = $"ApiObjectType [{nameof(ClassWithScalars)}] With Extension 1 and Extension 2",
-            SourceApiType = new ApiObjectType
+            Source = new ApiObjectType
             (
                 nameof(ClassWithScalars),
                 [
@@ -1473,7 +1301,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 ],
                 typeof(ClassWithScalars)
             ),
-            ExpectedJson = @"
+            Expected = @"
             {
                 ""Kind"": ""Object"",
                 ""ApiName"": ""ClassWithScalars"",
@@ -1539,14 +1367,14 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                         ""ClrName"": ""OptionalPredicate""
                     }
                 ],
-                ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiTypeTests\u002BClassWithScalars, Evoogle.ApiFramework.Core.Tests"",
+                ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BClassWithScalars, Evoogle.ApiFramework.Core.Tests"",
                 ""Extensions"": {
-                    ""Evoogle.ApiFramework.Schema.ApiTypeTests\u002BTestExtension1, Evoogle.ApiFramework.Core.Tests"": {
-                        ""Description"": ""This is test extension 1.""
+                    ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BTestExtension1, Evoogle.ApiFramework.Core.Tests"": {
+                        ""Description"": ""TestExtension1""
                     },
-                    ""Evoogle.ApiFramework.Schema.ApiTypeTests\u002BTestExtension2, Evoogle.ApiFramework.Core.Tests"": {
+                    ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BTestExtension2, Evoogle.ApiFramework.Core.Tests"": {
                         ""Id"": ""2"",
-                        ""Name"": ""Test Extension 2.""
+                        ""Name"": ""TestExtension2""
                     }
                 }
             }",
@@ -1559,23 +1387,14 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
     #region Test Methods
     [Theory]
     [MemberData(nameof(JsonDeserializeTheoryData))]
-    public void JsonDeserialize(IXUnitTest test)
-    {
-        test.Execute(this);
-    }
+    public void JsonDeserialize(IXUnitTest test) => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(JsonRoundtripTheoryData))]
-    public void JsonRoundtrip(IXUnitTest test)
-    {
-        test.Execute(this);
-    }
+    public void JsonRoundtrip(IXUnitTest test) => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(JsonSerializeTheoryData))]
-    public void JsonSerialize(IXUnitTest test)
-    {
-        test.Execute(this);
-    }
+    public void JsonSerialize(IXUnitTest test) => test.Execute(this);
     #endregion
 }

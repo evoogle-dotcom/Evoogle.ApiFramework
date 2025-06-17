@@ -7,10 +7,9 @@ using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-using Evoogle.Extension;
-using Evoogle.Json;
-
 using Microsoft.Extensions.Logging;
+
+using static Evoogle.ApiFramework.Schema.Internal.ApiJsonConverterHelpers;
 
 namespace Evoogle.ApiFramework.Schema;
 
@@ -77,14 +76,10 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
                 }
         }
 
-        AttachExtensions(context, apiType);
+        var extensions = context.ReadData.ExtensibleBase?.Extensions;
+        AttachExtensions(apiType, extensions);
 
         return apiType;
-    }
-
-    private static void AttachExtensions(in ReadContext context, ExtensibleBase extensibleBase)
-    {
-        ApiJsonConverterHelpers.AttachExtensions(extensibleBase, context.ReadData.ExtensibleBase?.Extensions);
     }
 
     private static ApiCollectionType CreateApiCollectionType(in ReadContext context, ApiTypeKind kind, List<ValidationResult>? validationResults)

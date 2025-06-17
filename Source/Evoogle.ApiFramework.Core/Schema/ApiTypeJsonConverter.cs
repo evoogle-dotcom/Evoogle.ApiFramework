@@ -14,6 +14,8 @@ using Evoogle.Logging;
 
 using Microsoft.Extensions.Logging;
 
+using static Evoogle.ApiFramework.Schema.Internal.ApiJsonConverterHelpers;
+
 namespace Evoogle.ApiFramework.Schema;
 
 /// <summary>
@@ -177,7 +179,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
 
         context.Logger.LogTrace("Deserializing {ApiType}", nameof(ApiType));
 
-        ApiJsonConverterHelpers.ReadJsonObject<ApiTypeJsonConverter, ReadContext>(ref reader, ref context, (context) => context.ReadHandlers.ApiTypePropertyHandlers);
+        ReadJsonObject<ApiTypeJsonConverter, ReadContext>(ref reader, ref context, (context) => context.ReadHandlers.ApiTypePropertyHandlers);
 
         var kind = context.ReadData.ApiType?.Kind;
         var clrType = context.ReadData.ApiType?.ClrType;
@@ -212,11 +214,6 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
     #endregion
 
     #region Cache Implementation Methods
-    private static JsonNamingPolicy GetPropertyNamingPolicy(JsonSerializerOptions options)
-    {
-        return ApiJsonConverterHelpers.GetPropertyNamingPolicy(options);
-    }
-
     private static PropertyNames GetPropertyNames(JsonNamingPolicy policy)
     {
         return PropertyNamesCache.GetOrAdd(policy, policy => new PropertyNames

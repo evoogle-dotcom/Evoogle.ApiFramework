@@ -8,7 +8,7 @@ using System.Text.Json.Serialization;
 
 using Evoogle.ApiFramework.Schema.Internal;
 
-using Microsoft.Extensions.Logging;
+using static Evoogle.ApiFramework.Schema.Internal.ApiJsonConverterHelpers;
 
 namespace Evoogle.ApiFramework.Schema;
 
@@ -160,7 +160,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         {
             context.ReadData.ApiEnumType ??= new ApiEnumTypeReadData();
 
-            ApiJsonConverterHelpers.ReadJsonArray<ApiTypeJsonConverter, ReadContext>(ref reader, ref context, (x) => HandleApiEnumTypeApiEnumValuesArrayItem);
+            ReadJsonArray<ApiTypeJsonConverter, ReadContext>(ref reader, ref context, (x) => HandleApiEnumTypeApiEnumValuesArrayItem);
         }
 
         private static void HandleApiEnumTypeApiEnumValuesArrayItem(ref Utf8JsonReader reader, ref ReadContext context)
@@ -168,7 +168,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
             context.ReadData.ApiEnumType!.ApiEnumValues ??= [];
             context.ReadData.ApiEnumType!.ApiEnumValues.Add(new ApiEnumValueReadData());
 
-            ApiJsonConverterHelpers.ReadJsonObject<ApiTypeJsonConverter, ReadContext>(ref reader, ref context, (x) => x.ReadHandlers.ApiEnumValuePropertyHandlers);
+            ReadJsonObject<ApiTypeJsonConverter, ReadContext>(ref reader, ref context, (x) => x.ReadHandlers.ApiEnumValuePropertyHandlers);
         }
         #endregion
 
@@ -209,7 +209,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         {
             context.ReadData.ApiObjectType ??= new ApiObjectTypeReadData();
 
-            ApiJsonConverterHelpers.ReadJsonArray<ApiTypeJsonConverter, ReadContext>(ref reader, ref context, (x) => HandleApiObjectTypeApiPropertiesArrayItem);
+            ReadJsonArray<ApiTypeJsonConverter, ReadContext>(ref reader, ref context, (x) => HandleApiObjectTypeApiPropertiesArrayItem);
         }
 
         private static void HandleApiObjectTypeApiPropertiesArrayItem(ref Utf8JsonReader reader, ref ReadContext context)
@@ -217,7 +217,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
             context.ReadData.ApiObjectType!.ApiProperties ??= [];
             context.ReadData.ApiObjectType!.ApiProperties.Add(new ApiPropertyReadData());
 
-            ApiJsonConverterHelpers.ReadJsonObject<ApiTypeJsonConverter, ReadContext>(ref reader, ref context, (x) => x.ReadHandlers.ApiPropertyPropertyHandlers);
+            ReadJsonObject<ApiTypeJsonConverter, ReadContext>(ref reader, ref context, (x) => x.ReadHandlers.ApiPropertyPropertyHandlers);
         }
         #endregion
 
@@ -274,8 +274,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         private static void HandleExtensibleBaseExtensions(ref Utf8JsonReader reader, ref ReadContext context)
         {
             context.ReadData.ExtensibleBase ??= new ExtensibleBaseReadData();
-            context.ReadData.ExtensibleBase.Extensions =
-                ApiJsonConverterHelpers.ReadExtensions<ApiTypeJsonConverter>(ref reader, context.Options, context.Logger);
+            context.ReadData.ExtensibleBase.Extensions = ReadExtensions(ref reader, context.Options, context.Logger);
         }
         #endregion
     }
