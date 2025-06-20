@@ -3,6 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
 
 using Evoogle.Json;
@@ -173,6 +174,43 @@ internal static class ApiJsonConverterHelpers
     public static JsonNamingPolicy GetPropertyNamingPolicy(JsonSerializerOptions options)
     {
         return options.PropertyNamingPolicy ?? new NullJsonNamingPolicy();
+    }
+    #endregion
+
+    #region Validation Methods
+    public static void AddValidationError(ref List<ValidationResult>? results, string message, string memberName)
+    {
+        results ??= [];
+        results.Add(new ValidationResult(message, [memberName]));
+    }
+
+    public static void AddEmptyRequiredCollectionPropertyError(ref List<ValidationResult>? results, string propertyName)
+    {
+        AddValidationError(ref results, $"Empty required collection property: {propertyName}", propertyName);
+    }
+
+    public static void AddMissingRequiredPropertyError(ref List<ValidationResult>? results, string propertyName)
+    {
+        AddValidationError(ref results, $"Missing required property: {propertyName}", propertyName);
+    }
+
+    public static void ThrowIfInvalid<T, TReadContext>(in TReadContext context, string typeName, IEnumerable<ValidationResult>? validationResults)
+        where TReadContext : IHasLogger<T>
+    {
+        if (validationResults == null)
+            return;
+
+        if (validationResults.Any() == false)
+            return;
+
+        // Create a delimited string of all the failed validation result error messages.
+        var validationErrorMessage = validationResults.Where(x => x != ValidationResult.Success && !string.IsNullOrWhiteSpace(x.ErrorMessage)).SafeToDelimitedString('\n');
+        if (string.IsNullOrWhiteSpace(validationErrorMessage))
+            return;
+
+        context.Logger.LogError("Validation failed for '{TypeName}': {Message}", typeName, validationErrorMessage);
+
+        throw new JsonException(validationErrorMessage);
     }
     #endregion
 }

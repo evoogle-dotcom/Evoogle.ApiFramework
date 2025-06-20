@@ -209,13 +209,12 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 ""Kind"": ""Collection"",
                 ""ApiItemType"": {
                     ""Kind"": ""Scalar"",
-                    ""ApiName"": ""String"",
-                    ""ClrType"": ""System.String, System.Private.CoreLib""
+                    ""ApiName"": ""String""
                 },
                 ""ApiItemTypeModifiers"": ""Required"",
                 ""ClrType"": ""System.Collections.Generic.List\u00601[[System.String, System.Private.CoreLib]], System.Private.CoreLib""
             }",
-            Expected = new ApiCollectionType(new ApiScalarType("String", typeof(string)), ApiTypeModifiers.Required, typeof(List<string>))
+            Expected = new ApiCollectionType(new ApiTypeExpression(ApiTypeKind.Scalar, "String"), ApiTypeModifiers.Required, typeof(List<string>))
         },
 
         new JsonDeserializeTest<ApiType>
@@ -226,13 +225,12 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 ""Kind"": ""Collection"",
                 ""ApiItemType"": {
                     ""Kind"": ""Scalar"",
-                    ""ApiName"": ""String"",
-                    ""ClrType"": ""System.String, System.Private.CoreLib""
+                    ""ApiName"": ""String""
                 },
                 ""ApiItemTypeModifiers"": ""None"",
                 ""ClrType"": ""System.Collections.Generic.List\u00601[[System.String, System.Private.CoreLib]], System.Private.CoreLib""
             }",
-            Expected     = new ApiCollectionType(new ApiScalarType("String", typeof(string)), ApiTypeModifiers.None, typeof(List<string?>))
+            Expected = new ApiCollectionType(new ApiTypeExpression(ApiTypeKind.Scalar, "String"), ApiTypeModifiers.None, typeof(List<string?>))
         },
 
         new JsonDeserializeTest<ApiType>
@@ -243,45 +241,12 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 ""Kind"": ""Collection"",
                 ""ApiItemType"": {
                     ""Kind"": ""Enum"",
-                    ""ApiName"": ""StopLight"",
-                    ""ApiEnumValues"": [
-                        {
-                            ""ApiName"": ""None"",
-                            ""ClrName"": ""None"",
-                            ""ClrOrdinal"": 0
-                        },
-                        {
-                            ""ApiName"": ""Green"",
-                            ""ClrName"": ""Green"",
-                            ""ClrOrdinal"": 1
-                        },
-                        {
-                            ""ApiName"": ""Yellow"",
-                            ""ClrName"": ""Yellow"",
-                            ""ClrOrdinal"": 2
-                        },
-                        {
-                            ""ApiName"": ""Red"",
-                            ""ClrName"": ""Red"",
-                            ""ClrOrdinal"": 3
-                        }
-                    ],
-                    ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BStopLight, Evoogle.ApiFramework.Core.Tests""
+                    ""ApiName"": ""StopLight""
                 },
                 ""ApiItemTypeModifiers"": ""Required"",
                 ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BStopLight, Evoogle.ApiFramework.Core.Tests]], System.Private.CoreLib""
             }",
-            Expected = new ApiCollectionType
-            (
-                new ApiEnumType
-                (
-                    nameof(StopLight),
-                    [new ApiEnumValue("None", "None", 0), new ApiEnumValue("Green", "Green", 1), new ApiEnumValue("Yellow", "Yellow", 2), new ApiEnumValue("Red", "Red", 3)],
-                    typeof(StopLight)
-                ),
-                ApiTypeModifiers.Required,
-                typeof(List<StopLight>)
-            )
+            Expected = new ApiCollectionType(new ApiTypeExpression(ApiTypeKind.Enum, nameof(StopLight)), ApiTypeModifiers.Required, typeof(List<StopLight>))
         },
 
         new JsonDeserializeTest<ApiType>
@@ -292,45 +257,12 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 ""Kind"": ""Collection"",
                 ""ApiItemType"": {
                     ""Kind"": ""Enum"",
-                    ""ApiName"": ""StopLight"",
-                    ""ApiEnumValues"": [
-                        {
-                            ""ApiName"": ""None"",
-                            ""ClrName"": ""None"",
-                            ""ClrOrdinal"": 0
-                        },
-                        {
-                            ""ApiName"": ""Green"",
-                            ""ClrName"": ""Green"",
-                            ""ClrOrdinal"": 1
-                        },
-                        {
-                            ""ApiName"": ""Yellow"",
-                            ""ClrName"": ""Yellow"",
-                            ""ClrOrdinal"": 2
-                        },
-                        {
-                            ""ApiName"": ""Red"",
-                            ""ClrName"": ""Red"",
-                            ""ClrOrdinal"": 3
-                        }
-                    ],
-                    ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BStopLight, Evoogle.ApiFramework.Core.Tests""
+                    ""ApiName"": ""StopLight""
                 },
                 ""ApiItemTypeModifiers"": ""None"",
                 ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BStopLight, Evoogle.ApiFramework.Core.Tests]], System.Private.CoreLib""
             }",
-            Expected = new ApiCollectionType
-            (
-                new ApiEnumType
-                (
-                    nameof(StopLight),
-                    [new ApiEnumValue("None", "None", 0), new ApiEnumValue("Green", "Green", 1), new ApiEnumValue("Yellow", "Yellow", 2), new ApiEnumValue("Red", "Red", 3)],
-                    typeof(StopLight)
-                ),
-                ApiTypeModifiers.None,
-                typeof(List<StopLight>)
-            )
+            Expected = new ApiCollectionType(new ApiTypeExpression(ApiTypeKind.Enum, nameof(StopLight)), ApiTypeModifiers.None, typeof(List<StopLight>))
         },
 
         // ApiObjectType
@@ -346,8 +278,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                         ""ApiName"": ""RequiredName"",
                         ""ApiType"": {
                             ""Kind"": ""Scalar"",
-                            ""ApiName"": ""String"",
-                            ""ClrType"": ""System.String, System.Private.CoreLib""
+                            ""ApiName"": ""String""
                         },
                         ""ApiTypeModifiers"": ""Required"",
                         ""ClrName"": ""RequiredName""
@@ -356,8 +287,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                         ""ApiName"": ""RequiredNumber"",
                         ""ApiType"": {
                             ""Kind"": ""Scalar"",
-                            ""ApiName"": ""Long"",
-                            ""ClrType"": ""System.Int64, System.Private.CoreLib""
+                            ""ApiName"": ""Long""
                         },
                         ""ApiTypeModifiers"": ""Required"",
                         ""ClrName"": ""RequiredNumber""
@@ -366,8 +296,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                         ""ApiName"": ""RequiredPredicate"",
                         ""ApiType"": {
                             ""Kind"": ""Scalar"",
-                            ""ApiName"": ""Boolean"",
-                            ""ClrType"": ""System.Boolean, System.Private.CoreLib""
+                            ""ApiName"": ""Boolean""
                         },
                         ""ApiTypeModifiers"": ""Required"",
                         ""ClrName"": ""RequiredPredicate""
@@ -376,8 +305,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                         ""ApiName"": ""OptionalName"",
                         ""ApiType"": {
                             ""Kind"": ""Scalar"",
-                            ""ApiName"": ""String"",
-                            ""ClrType"": ""System.String, System.Private.CoreLib""
+                            ""ApiName"": ""String""
                         },
                         ""ApiTypeModifiers"": ""None"",
                         ""ClrName"": ""OptionalName""
@@ -386,8 +314,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                         ""ApiName"": ""OptionalNumber"",
                         ""ApiType"": {
                             ""Kind"": ""Scalar"",
-                            ""ApiName"": ""Long"",
-                            ""ClrType"": ""System.Int64, System.Private.CoreLib""
+                            ""ApiName"": ""Long""
                         },
                         ""ApiTypeModifiers"": ""None"",
                         ""ClrName"": ""OptionalNumber""
@@ -396,8 +323,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                         ""ApiName"": ""OptionalPredicate"",
                         ""ApiType"": {
                             ""Kind"": ""Scalar"",
-                            ""ApiName"": ""Boolean"",
-                            ""ClrType"": ""System.Boolean, System.Private.CoreLib""
+                            ""ApiName"": ""Boolean""
                         },
                         ""ApiTypeModifiers"": ""None"",
                         ""ClrName"": ""OptionalPredicate""
@@ -412,42 +338,42 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     new ApiProperty
                     (
                         nameof(ClassWithScalars.RequiredName),
-                        new ApiScalarType("String", typeof(string)),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "String"),
                         ApiTypeModifiers.Required,
                         nameof(ClassWithScalars.RequiredName)
                     ),
                     new ApiProperty
                     (
                         nameof(ClassWithScalars.RequiredNumber),
-                        new ApiScalarType("Long", typeof(long)),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "Long"),
                         ApiTypeModifiers.Required,
                         nameof(ClassWithScalars.RequiredNumber)
                     ),
                     new ApiProperty
                     (
                         nameof(ClassWithScalars.RequiredPredicate),
-                        new ApiScalarType("Boolean", typeof(bool)),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "Boolean"),
                         ApiTypeModifiers.Required,
                         nameof(ClassWithScalars.RequiredPredicate)
                     ),
                     new ApiProperty
                     (
                         nameof(ClassWithScalars.OptionalName),
-                        new ApiScalarType("String", typeof(string)),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "String"),
                         ApiTypeModifiers.None,
                         nameof(ClassWithScalars.OptionalName)
                     ),
                     new ApiProperty
                     (
                         nameof(ClassWithScalars.OptionalNumber),
-                        new ApiScalarType("Long", typeof(long)),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "Long"),
                         ApiTypeModifiers.None,
                         nameof(ClassWithScalars.OptionalNumber)
                     ),
                     new ApiProperty
                     (
                         nameof(ClassWithScalars.OptionalPredicate),
-                        new ApiScalarType("Boolean", typeof(bool)),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "Boolean"),
                         ApiTypeModifiers.None,
                         nameof(ClassWithScalars.OptionalPredicate)
                     ),
@@ -468,8 +394,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                         ""ApiName"": ""RequiredName"",
                         ""ApiType"": {
                             ""Kind"": ""Scalar"",
-                            ""ApiName"": ""String"",
-                            ""ClrType"": ""System.String, System.Private.CoreLib""
+                            ""ApiName"": ""String""
                         },
                         ""ApiTypeModifiers"": ""Required"",
                         ""ClrName"": ""RequiredName""
@@ -478,8 +403,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                         ""ApiName"": ""RequiredNumber"",
                         ""ApiType"": {
                             ""Kind"": ""Scalar"",
-                            ""ApiName"": ""Long"",
-                            ""ClrType"": ""System.Int64, System.Private.CoreLib""
+                            ""ApiName"": ""Long""
                         },
                         ""ApiTypeModifiers"": ""Required"",
                         ""ClrName"": ""RequiredNumber""
@@ -488,8 +412,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                         ""ApiName"": ""RequiredPredicate"",
                         ""ApiType"": {
                             ""Kind"": ""Scalar"",
-                            ""ApiName"": ""Boolean"",
-                            ""ClrType"": ""System.Boolean, System.Private.CoreLib""
+                            ""ApiName"": ""Boolean""
                         },
                         ""ApiTypeModifiers"": ""Required"",
                         ""ClrName"": ""RequiredPredicate""
@@ -498,8 +421,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                         ""ApiName"": ""OptionalName"",
                         ""ApiType"": {
                             ""Kind"": ""Scalar"",
-                            ""ApiName"": ""String"",
-                            ""ClrType"": ""System.String, System.Private.CoreLib""
+                            ""ApiName"": ""String""
                         },
                         ""ApiTypeModifiers"": ""None"",
                         ""ClrName"": ""OptionalName""
@@ -508,8 +430,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                         ""ApiName"": ""OptionalNumber"",
                         ""ApiType"": {
                             ""Kind"": ""Scalar"",
-                            ""ApiName"": ""Long"",
-                            ""ClrType"": ""System.Int64, System.Private.CoreLib""
+                            ""ApiName"": ""Long""
                         },
                         ""ApiTypeModifiers"": ""None"",
                         ""ClrName"": ""OptionalNumber""
@@ -518,8 +439,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                         ""ApiName"": ""OptionalPredicate"",
                         ""ApiType"": {
                             ""Kind"": ""Scalar"",
-                            ""ApiName"": ""Boolean"",
-                            ""ClrType"": ""System.Boolean, System.Private.CoreLib""
+                            ""ApiName"": ""Boolean""
                         },
                         ""ApiTypeModifiers"": ""None"",
                         ""ClrName"": ""OptionalPredicate""
@@ -543,42 +463,42 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     new ApiProperty
                     (
                         nameof(ClassWithScalars.RequiredName),
-                        new ApiScalarType("String", typeof(string)),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "String"),
                         ApiTypeModifiers.Required,
                         nameof(ClassWithScalars.RequiredName)
                     ),
                     new ApiProperty
                     (
                         nameof(ClassWithScalars.RequiredNumber),
-                        new ApiScalarType("Long", typeof(long)),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "Long"),
                         ApiTypeModifiers.Required,
                         nameof(ClassWithScalars.RequiredNumber)
                     ),
                     new ApiProperty
                     (
                         nameof(ClassWithScalars.RequiredPredicate),
-                        new ApiScalarType("Boolean", typeof(bool)),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "Boolean"),
                         ApiTypeModifiers.Required,
                         nameof(ClassWithScalars.RequiredPredicate)
                     ),
                     new ApiProperty
                     (
                         nameof(ClassWithScalars.OptionalName),
-                        new ApiScalarType("String", typeof(string)),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "String"),
                         ApiTypeModifiers.None,
                         nameof(ClassWithScalars.OptionalName)
                     ),
                     new ApiProperty
                     (
                         nameof(ClassWithScalars.OptionalNumber),
-                        new ApiScalarType("Long", typeof(long)),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "Long"),
                         ApiTypeModifiers.None,
                         nameof(ClassWithScalars.OptionalNumber)
                     ),
                     new ApiProperty
                     (
                         nameof(ClassWithScalars.OptionalPredicate),
-                        new ApiScalarType("Boolean", typeof(bool)),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "Boolean"),
                         ApiTypeModifiers.None,
                         nameof(ClassWithScalars.OptionalPredicate)
                     ),
@@ -665,13 +585,13 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
         new JsonRoundtripTest<ApiType>
         {
             Name = "ApiCollectionType [List<String>]",
-            Expected = new ApiCollectionType(new ApiScalarType("String", typeof(string)), ApiTypeModifiers.Required, typeof(List<string>))
+            Expected = new ApiCollectionType(new ApiTypeExpression(ApiTypeKind.Scalar,  "String"), ApiTypeModifiers.Required, typeof(List<string>))
         },
 
         new JsonRoundtripTest<ApiType>
         {
             Name = "ApiCollectionType [List<String?>]",
-            Expected = new ApiCollectionType(new ApiScalarType("String", typeof(string)), ApiTypeModifiers.None, typeof(List<string?>))
+            Expected = new ApiCollectionType(new ApiTypeExpression(ApiTypeKind.Scalar,  "String"), ApiTypeModifiers.None, typeof(List<string?>))
         },
 
         new JsonRoundtripTest<ApiType>
@@ -679,12 +599,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = $"ApiCollectionType [List<{nameof(StopLight)}>]",
             Expected = new ApiCollectionType
             (
-                new ApiEnumType
-                (
-                    nameof(StopLight),
-                    [new ApiEnumValue("None", "None", 0), new ApiEnumValue("Green", "Green", 1), new ApiEnumValue("Yellow", "Yellow", 2), new ApiEnumValue("Red", "Red", 3)],
-                    typeof(StopLight)
-                ),
+                new ApiTypeExpression(ApiTypeKind.Enum, nameof(StopLight)),
                 ApiTypeModifiers.Required,
                 typeof(List<StopLight>)
             )
@@ -695,12 +610,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = $"ApiCollectionType [List<{nameof(StopLight)}?>]",
             Expected = new ApiCollectionType
             (
-                new ApiEnumType
-                (
-                    nameof(StopLight),
-                    [new ApiEnumValue("None", "None", 0), new ApiEnumValue("Green", "Green", 1), new ApiEnumValue("Yellow", "Yellow", 2), new ApiEnumValue("Red", "Red", 3)],
-                    typeof(StopLight)
-                ),
+                new ApiTypeExpression(ApiTypeKind.Enum, nameof(StopLight)),
                 ApiTypeModifiers.None,
                 typeof(List<StopLight>)
             )
@@ -717,42 +627,42 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     new ApiProperty
                     (
                         nameof(ClassWithScalars.RequiredName),
-                        new ApiScalarType("String", typeof(string)),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "String"),
                         ApiTypeModifiers.Required,
                         nameof(ClassWithScalars.RequiredName)
                     ),
                     new ApiProperty
                     (
                         nameof(ClassWithScalars.RequiredNumber),
-                        new ApiScalarType("Long", typeof(long)),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "Long"),
                         ApiTypeModifiers.Required,
                         nameof(ClassWithScalars.RequiredNumber)
                     ),
                     new ApiProperty
                     (
                         nameof(ClassWithScalars.RequiredPredicate),
-                        new ApiScalarType("Boolean", typeof(bool)),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "Boolean"),
                         ApiTypeModifiers.Required,
                         nameof(ClassWithScalars.RequiredPredicate)
                     ),
                     new ApiProperty
                     (
                         nameof(ClassWithScalars.OptionalName),
-                        new ApiScalarType("String", typeof(string)),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "String"),
                         ApiTypeModifiers.None,
                         nameof(ClassWithScalars.OptionalName)
                     ),
                     new ApiProperty
                     (
                         nameof(ClassWithScalars.OptionalNumber),
-                        new ApiScalarType("Long", typeof(long)),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "Long"),
                         ApiTypeModifiers.None,
                         nameof(ClassWithScalars.OptionalNumber)
                     ),
                     new ApiProperty
                     (
                         nameof(ClassWithScalars.OptionalPredicate),
-                        new ApiScalarType("Boolean", typeof(bool)),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "Boolean"),
                         ApiTypeModifiers.None,
                         nameof(ClassWithScalars.OptionalPredicate)
                     ),
@@ -771,42 +681,42 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     new ApiProperty
                     (
                         nameof(ClassWithScalars.RequiredName),
-                        new ApiScalarType("String", typeof(string)),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "String"),
                         ApiTypeModifiers.Required,
                         nameof(ClassWithScalars.RequiredName)
                     ),
                     new ApiProperty
                     (
                         nameof(ClassWithScalars.RequiredNumber),
-                        new ApiScalarType("Long", typeof(long)),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "Long"),
                         ApiTypeModifiers.Required,
                         nameof(ClassWithScalars.RequiredNumber)
                     ),
                     new ApiProperty
                     (
                         nameof(ClassWithScalars.RequiredPredicate),
-                        new ApiScalarType("Boolean", typeof(bool)),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "Boolean"),
                         ApiTypeModifiers.Required,
                         nameof(ClassWithScalars.RequiredPredicate)
                     ),
                     new ApiProperty
                     (
                         nameof(ClassWithScalars.OptionalName),
-                        new ApiScalarType("String", typeof(string)),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "String"),
                         ApiTypeModifiers.None,
                         nameof(ClassWithScalars.OptionalName)
                     ),
                     new ApiProperty
                     (
                         nameof(ClassWithScalars.OptionalNumber),
-                        new ApiScalarType("Long", typeof(long)),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "Long"),
                         ApiTypeModifiers.None,
                         nameof(ClassWithScalars.OptionalNumber)
                     ),
                     new ApiProperty
                     (
                         nameof(ClassWithScalars.OptionalPredicate),
-                        new ApiScalarType("Boolean", typeof(bool)),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "Boolean"),
                         ApiTypeModifiers.None,
                         nameof(ClassWithScalars.OptionalPredicate)
                     ),
@@ -997,14 +907,13 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
         new JsonSerializeTest<ApiType>
         {
             Name = "ApiCollectionType [List<String>]",
-            Source = new ApiCollectionType(new ApiScalarType("String", typeof(string)), ApiTypeModifiers.Required, typeof(List<string>)),
+            Source = new ApiCollectionType(new ApiTypeExpression(ApiTypeKind.Scalar, "String"), ApiTypeModifiers.Required, typeof(List<string>)),
             Expected = @"
             {
                 ""Kind"": ""Collection"",
                 ""ApiItemType"": {
                     ""Kind"": ""Scalar"",
-                    ""ApiName"": ""String"",
-                    ""ClrType"": ""System.String, System.Private.CoreLib""
+                    ""ApiName"": ""String""
                 },
                 ""ApiItemTypeModifiers"": ""Required"",
                 ""ClrType"": ""System.Collections.Generic.List\u00601[[System.String, System.Private.CoreLib]], System.Private.CoreLib""
@@ -1014,14 +923,13 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
         new JsonSerializeTest<ApiType>
         {
             Name = "ApiCollectionType [List<String?>]",
-            Source = new ApiCollectionType(new ApiScalarType("String", typeof(string)), ApiTypeModifiers.None, typeof(List<string?>)),
+            Source = new ApiCollectionType(new ApiTypeExpression(ApiTypeKind.Scalar, "String"), ApiTypeModifiers.None, typeof(List<string?>)),
             Expected = @"
             {
                 ""Kind"": ""Collection"",
                 ""ApiItemType"": {
                     ""Kind"": ""Scalar"",
-                    ""ApiName"": ""String"",
-                    ""ClrType"": ""System.String, System.Private.CoreLib""
+                    ""ApiName"": ""String""
                 },
                 ""ApiItemTypeModifiers"": ""None"",
                 ""ClrType"": ""System.Collections.Generic.List\u00601[[System.String, System.Private.CoreLib]], System.Private.CoreLib""
@@ -1033,12 +941,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = $"ApiCollectionType [List<{nameof(StopLight)}>]",
             Source = new ApiCollectionType
             (
-                new ApiEnumType
-                (
-                    nameof(StopLight),
-                    [new ApiEnumValue("None", "None", 0), new ApiEnumValue("Green", "Green", 1), new ApiEnumValue("Yellow", "Yellow", 2), new ApiEnumValue("Red", "Red", 3)],
-                    typeof(StopLight)
-                ),
+                new ApiTypeExpression(ApiTypeKind.Enum, nameof(StopLight)),
                 ApiTypeModifiers.Required,
                 typeof(List<StopLight>)
             ),
@@ -1047,30 +950,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 ""Kind"": ""Collection"",
                 ""ApiItemType"": {
                     ""Kind"": ""Enum"",
-                    ""ApiName"": ""StopLight"",
-                    ""ApiEnumValues"": [
-                        {
-                            ""ApiName"": ""None"",
-                            ""ClrName"": ""None"",
-                            ""ClrOrdinal"": 0
-                        },
-                        {
-                            ""ApiName"": ""Green"",
-                            ""ClrName"": ""Green"",
-                            ""ClrOrdinal"": 1
-                        },
-                        {
-                            ""ApiName"": ""Yellow"",
-                            ""ClrName"": ""Yellow"",
-                            ""ClrOrdinal"": 2
-                        },
-                        {
-                            ""ApiName"": ""Red"",
-                            ""ClrName"": ""Red"",
-                            ""ClrOrdinal"": 3
-                        }
-                    ],
-                    ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BStopLight, Evoogle.ApiFramework.Core.Tests""
+                    ""ApiName"": ""StopLight""
                 },
                 ""ApiItemTypeModifiers"": ""Required"",
                 ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BStopLight, Evoogle.ApiFramework.Core.Tests]], System.Private.CoreLib""
@@ -1082,12 +962,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = $"ApiCollectionType [List<{nameof(StopLight)}?>]",
             Source = new ApiCollectionType
             (
-                new ApiEnumType
-                (
-                    nameof(StopLight),
-                    [new ApiEnumValue("None", "None", 0), new ApiEnumValue("Green", "Green", 1), new ApiEnumValue("Yellow", "Yellow", 2), new ApiEnumValue("Red", "Red", 3)],
-                    typeof(StopLight)
-                ),
+                new ApiTypeExpression(ApiTypeKind.Enum, nameof(StopLight)),
                 ApiTypeModifiers.None,
                 typeof(List<StopLight>)
             ),
@@ -1096,30 +971,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 ""Kind"": ""Collection"",
                 ""ApiItemType"": {
                     ""Kind"": ""Enum"",
-                    ""ApiName"": ""StopLight"",
-                    ""ApiEnumValues"": [
-                        {
-                            ""ApiName"": ""None"",
-                            ""ClrName"": ""None"",
-                            ""ClrOrdinal"": 0
-                        },
-                        {
-                            ""ApiName"": ""Green"",
-                            ""ClrName"": ""Green"",
-                            ""ClrOrdinal"": 1
-                        },
-                        {
-                            ""ApiName"": ""Yellow"",
-                            ""ClrName"": ""Yellow"",
-                            ""ClrOrdinal"": 2
-                        },
-                        {
-                            ""ApiName"": ""Red"",
-                            ""ClrName"": ""Red"",
-                            ""ClrOrdinal"": 3
-                        }
-                    ],
-                    ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BStopLight, Evoogle.ApiFramework.Core.Tests""
+                    ""ApiName"": ""StopLight""
                 },
                 ""ApiItemTypeModifiers"": ""None"",
                 ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BStopLight, Evoogle.ApiFramework.Core.Tests]], System.Private.CoreLib""
@@ -1137,42 +989,42 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     new ApiProperty
                     (
                         nameof(ClassWithScalars.RequiredName),
-                        new ApiScalarType("String", typeof(string)),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "String"),
                         ApiTypeModifiers.Required,
                         nameof(ClassWithScalars.RequiredName)
                     ),
                     new ApiProperty
                     (
                         nameof(ClassWithScalars.RequiredNumber),
-                        new ApiScalarType("Long", typeof(long)),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "Long"),
                         ApiTypeModifiers.Required,
                         nameof(ClassWithScalars.RequiredNumber)
                     ),
                     new ApiProperty
                     (
                         nameof(ClassWithScalars.RequiredPredicate),
-                        new ApiScalarType("Boolean", typeof(bool)),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "Boolean"),
                         ApiTypeModifiers.Required,
                         nameof(ClassWithScalars.RequiredPredicate)
                     ),
                     new ApiProperty
                     (
                         nameof(ClassWithScalars.OptionalName),
-                        new ApiScalarType("String", typeof(string)),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "String"),
                         ApiTypeModifiers.None,
                         nameof(ClassWithScalars.OptionalName)
                     ),
                     new ApiProperty
                     (
                         nameof(ClassWithScalars.OptionalNumber),
-                        new ApiScalarType("Long", typeof(long)),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "Long"),
                         ApiTypeModifiers.None,
                         nameof(ClassWithScalars.OptionalNumber)
                     ),
                     new ApiProperty
                     (
                         nameof(ClassWithScalars.OptionalPredicate),
-                        new ApiScalarType("Boolean", typeof(bool)),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "Boolean"),
                         ApiTypeModifiers.None,
                         nameof(ClassWithScalars.OptionalPredicate)
                     ),
@@ -1188,8 +1040,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                         ""ApiName"": ""RequiredName"",
                         ""ApiType"": {
                             ""Kind"": ""Scalar"",
-                            ""ApiName"": ""String"",
-                            ""ClrType"": ""System.String, System.Private.CoreLib""
+                            ""ApiName"": ""String""
                         },
                         ""ApiTypeModifiers"": ""Required"",
                         ""ClrName"": ""RequiredName""
@@ -1198,8 +1049,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                         ""ApiName"": ""RequiredNumber"",
                         ""ApiType"": {
                             ""Kind"": ""Scalar"",
-                            ""ApiName"": ""Long"",
-                            ""ClrType"": ""System.Int64, System.Private.CoreLib""
+                            ""ApiName"": ""Long""
                         },
                         ""ApiTypeModifiers"": ""Required"",
                         ""ClrName"": ""RequiredNumber""
@@ -1208,8 +1058,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                         ""ApiName"": ""RequiredPredicate"",
                         ""ApiType"": {
                             ""Kind"": ""Scalar"",
-                            ""ApiName"": ""Boolean"",
-                            ""ClrType"": ""System.Boolean, System.Private.CoreLib""
+                            ""ApiName"": ""Boolean""
                         },
                         ""ApiTypeModifiers"": ""Required"",
                         ""ClrName"": ""RequiredPredicate""
@@ -1218,8 +1067,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                         ""ApiName"": ""OptionalName"",
                         ""ApiType"": {
                             ""Kind"": ""Scalar"",
-                            ""ApiName"": ""String"",
-                            ""ClrType"": ""System.String, System.Private.CoreLib""
+                            ""ApiName"": ""String""
                         },
                         ""ApiTypeModifiers"": ""None"",
                         ""ClrName"": ""OptionalName""
@@ -1228,8 +1076,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                         ""ApiName"": ""OptionalNumber"",
                         ""ApiType"": {
                             ""Kind"": ""Scalar"",
-                            ""ApiName"": ""Long"",
-                            ""ClrType"": ""System.Int64, System.Private.CoreLib""
+                            ""ApiName"": ""Long""
                         },
                         ""ApiTypeModifiers"": ""None"",
                         ""ClrName"": ""OptionalNumber""
@@ -1238,8 +1085,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                         ""ApiName"": ""OptionalPredicate"",
                         ""ApiType"": {
                             ""Kind"": ""Scalar"",
-                            ""ApiName"": ""Boolean"",
-                            ""ClrType"": ""System.Boolean, System.Private.CoreLib""
+                            ""ApiName"": ""Boolean""
                         },
                         ""ApiTypeModifiers"": ""None"",
                         ""ClrName"": ""OptionalPredicate""
@@ -1259,42 +1105,42 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     new ApiProperty
                     (
                         nameof(ClassWithScalars.RequiredName),
-                        new ApiScalarType("String", typeof(string)),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "String"),
                         ApiTypeModifiers.Required,
                         nameof(ClassWithScalars.RequiredName)
                     ),
                     new ApiProperty
                     (
                         nameof(ClassWithScalars.RequiredNumber),
-                        new ApiScalarType("Long", typeof(long)),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "Long"),
                         ApiTypeModifiers.Required,
                         nameof(ClassWithScalars.RequiredNumber)
                     ),
                     new ApiProperty
                     (
                         nameof(ClassWithScalars.RequiredPredicate),
-                        new ApiScalarType("Boolean", typeof(bool)),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "Boolean"),
                         ApiTypeModifiers.Required,
                         nameof(ClassWithScalars.RequiredPredicate)
                     ),
                     new ApiProperty
                     (
                         nameof(ClassWithScalars.OptionalName),
-                        new ApiScalarType("String", typeof(string)),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "String"),
                         ApiTypeModifiers.None,
                         nameof(ClassWithScalars.OptionalName)
                     ),
                     new ApiProperty
                     (
                         nameof(ClassWithScalars.OptionalNumber),
-                        new ApiScalarType("Long", typeof(long)),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "Long"),
                         ApiTypeModifiers.None,
                         nameof(ClassWithScalars.OptionalNumber)
                     ),
                     new ApiProperty
                     (
                         nameof(ClassWithScalars.OptionalPredicate),
-                        new ApiScalarType("Boolean", typeof(bool)),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "Boolean"),
                         ApiTypeModifiers.None,
                         nameof(ClassWithScalars.OptionalPredicate)
                     ),
@@ -1310,8 +1156,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                         ""ApiName"": ""RequiredName"",
                         ""ApiType"": {
                             ""Kind"": ""Scalar"",
-                            ""ApiName"": ""String"",
-                            ""ClrType"": ""System.String, System.Private.CoreLib""
+                            ""ApiName"": ""String""
                         },
                         ""ApiTypeModifiers"": ""Required"",
                         ""ClrName"": ""RequiredName""
@@ -1320,8 +1165,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                         ""ApiName"": ""RequiredNumber"",
                         ""ApiType"": {
                             ""Kind"": ""Scalar"",
-                            ""ApiName"": ""Long"",
-                            ""ClrType"": ""System.Int64, System.Private.CoreLib""
+                            ""ApiName"": ""Long""
                         },
                         ""ApiTypeModifiers"": ""Required"",
                         ""ClrName"": ""RequiredNumber""
@@ -1330,8 +1174,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                         ""ApiName"": ""RequiredPredicate"",
                         ""ApiType"": {
                             ""Kind"": ""Scalar"",
-                            ""ApiName"": ""Boolean"",
-                            ""ClrType"": ""System.Boolean, System.Private.CoreLib""
+                            ""ApiName"": ""Boolean""
                         },
                         ""ApiTypeModifiers"": ""Required"",
                         ""ClrName"": ""RequiredPredicate""
@@ -1340,8 +1183,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                         ""ApiName"": ""OptionalName"",
                         ""ApiType"": {
                             ""Kind"": ""Scalar"",
-                            ""ApiName"": ""String"",
-                            ""ClrType"": ""System.String, System.Private.CoreLib""
+                            ""ApiName"": ""String""
                         },
                         ""ApiTypeModifiers"": ""None"",
                         ""ClrName"": ""OptionalName""
@@ -1350,8 +1192,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                         ""ApiName"": ""OptionalNumber"",
                         ""ApiType"": {
                             ""Kind"": ""Scalar"",
-                            ""ApiName"": ""Long"",
-                            ""ClrType"": ""System.Int64, System.Private.CoreLib""
+                            ""ApiName"": ""Long""
                         },
                         ""ApiTypeModifiers"": ""None"",
                         ""ClrName"": ""OptionalNumber""
@@ -1360,8 +1201,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                         ""ApiName"": ""OptionalPredicate"",
                         ""ApiType"": {
                             ""Kind"": ""Scalar"",
-                            ""ApiName"": ""Boolean"",
-                            ""ClrType"": ""System.Boolean, System.Private.CoreLib""
+                            ""ApiName"": ""Boolean""
                         },
                         ""ApiTypeModifiers"": ""None"",
                         ""ClrName"": ""OptionalPredicate""

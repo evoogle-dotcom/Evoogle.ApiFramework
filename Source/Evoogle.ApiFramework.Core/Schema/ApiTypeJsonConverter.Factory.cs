@@ -84,18 +84,19 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
 
     private static ApiCollectionType CreateApiCollectionType(in ReadContext context, ApiTypeKind kind, List<ValidationResult>? validationResults)
     {
-        ThrowIfInvalid(context, kind, validationResults);
+        ThrowIfInvalid<ApiTypeJsonConverter, ReadContext>(context, nameof(ApiCollectionType), validationResults);
 
-        var apiItemType = context.ReadData.ApiCollectionType!.ApiItemType!;
+        var logger = context.Logger;
+        var apiItemTypeExpression = CreateApiTypeExpression(logger, context.ReadData.ApiCollectionType!.ApiItemTypeExpression!);
         var apiItemTypeModifiers = context.ReadData.ApiCollectionType!.ApiItemTypeModifiers!.Value;
         var clrCollectionType = context.ReadData.ApiType!.ClrType!;
 
-        return new ApiCollectionType(apiItemType, apiItemTypeModifiers, clrCollectionType);
+        return new ApiCollectionType(apiItemTypeExpression, apiItemTypeModifiers, clrCollectionType);
     }
 
     private static ApiEnumType CreateApiEnumType(in ReadContext context, ApiTypeKind kind, List<ValidationResult>? validationResults)
     {
-        ThrowIfInvalid(context, kind, validationResults);
+        ThrowIfInvalid<ApiTypeJsonConverter, ReadContext>(context, nameof(ApiEnumType), validationResults);
 
         var apiName = context.ReadData.ApiNamedType!.ApiName!;
         var apiEnumValues = CreateApiEnumValues(context);
@@ -122,17 +123,18 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
 
     private static ApiObjectType CreateApiObjectType(in ReadContext context, ApiTypeKind kind, List<ValidationResult>? validationResults)
     {
-        ThrowIfInvalid(context, kind, validationResults);
+        ThrowIfInvalid<ApiTypeJsonConverter, ReadContext>(context, nameof(ApiObjectType), validationResults);
 
+        var logger = context.Logger;
         var apiName = context.ReadData.ApiNamedType!.ApiName!;
         var apiProperties = context.ReadData.ApiObjectType!.ApiProperties!.Select(x =>
         {
             var apiName = x.ApiName!;
-            var apiType = x.ApiType!;
+            var apiTypeExpression = CreateApiTypeExpression(logger, x.ApiTypeExpression!);
             var apiTypeModifiers = x.ApiTypeModifiers!.Value;
             var clrName = x.ClrName!;
 
-            var apiProperty = new ApiProperty(apiName, apiType, apiTypeModifiers, clrName);
+            var apiProperty = new ApiProperty(apiName, apiTypeExpression, apiTypeModifiers, clrName);
             return apiProperty;
         })
         .ToList();
@@ -143,7 +145,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
 
     private static ApiScalarType CreateApiScalarType(in ReadContext context, ApiTypeKind kind, List<ValidationResult>? validationResults)
     {
-        ThrowIfInvalid(context, kind, validationResults);
+        ThrowIfInvalid<ApiTypeJsonConverter, ReadContext>(context, nameof(ApiScalarType), validationResults);
 
         var apiName = context.ReadData.ApiNamedType!.ApiName!;
         var clrType = context.ReadData.ApiType!.ClrType!;
@@ -151,22 +153,31 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         return new ApiScalarType(apiName, clrType);
     }
 
-    private static void ThrowIfInvalid(in ReadContext context, ApiTypeKind kind, IEnumerable<ValidationResult>? validationResults)
+    private static ApiTypeExpression CreateApiTypeExpression(ILogger logger, ApiTypeExpressionReadData apiTypeExpressionReadData)
     {
-        if (validationResults == null)
-            return;
+        var apiInlineType = apiTypeExpressionReadData.ApiInlineType;
+        if (apiInlineType is not null)
+        {
+            return new ApiTypeExpression(apiInlineType);
+        }
 
-        if (validationResults.Any() == false)
-            return;
+        var kind = GetApiTypeKind(logger, apiTypeExpressionReadData.Kind);
+        var apiName = apiTypeExpressionReadData.ApiName!;
 
-        // Create a delimited string of all the failed validation result error messages.
-        var validationErrorMessage = validationResults.Where(x => x != ValidationResult.Success && !string.IsNullOrWhiteSpace(x.ErrorMessage)).SafeToDelimitedString('\n');
-        if (string.IsNullOrWhiteSpace(validationErrorMessage))
-            return;
+        return new ApiTypeExpression(kind, apiName);
+    }
 
-        context.Logger.LogError("Validation failed for ApiTypeKind '{Kind}': {Message}", kind, validationErrorMessage);
+    private static ApiTypeKind GetApiTypeKind(ILogger logger, string? value)
+    {
+        if (Enum.TryParse<ApiTypeKind>(value, out var kind) == false)
+        {
+            var kindAsString = value.SafeToString();
+            logger.LogError("Invalid Kind: '{Kind}'", kindAsString);
 
-        throw new JsonException(validationErrorMessage);
+            throw new JsonException($"Unable to parse '{kindAsString}' into an {nameof(ApiTypeKind)} enumeration.");
+        }
+
+        return kind;
     }
     #endregion
 }

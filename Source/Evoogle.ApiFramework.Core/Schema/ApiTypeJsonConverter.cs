@@ -58,7 +58,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
     private readonly record struct ApiCollectionTypePropertyNames
     {
         #region Immutable Properties
-        public required string ApiItemType { get; init; }
+        public required string ApiItemTypeExpression { get; init; }
         public required string ApiItemTypeModifiers { get; init; }
         #endregion
     }
@@ -96,7 +96,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
     {
         #region Immutable Properties
         public required string ApiName { get; init; }
-        public required string ApiType { get; init; }
+        public required string ApiTypeExpression { get; init; }
         public required string ApiTypeModifiers { get; init; }
         public required string ClrName { get; init; }
         #endregion
@@ -106,6 +106,15 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
     {
         #region Immutable Properties
         public required string ClrType { get; init; }
+        public required string Kind { get; init; }
+        #endregion
+    }
+
+    private readonly record struct ApiTypeExpressionPropertyNames
+    {
+        #region Immutable Properties
+        public required string ApiName { get; init; }
+        public required string ApiInlineType { get; init; }
         public required string Kind { get; init; }
         #endregion
     }
@@ -120,6 +129,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         public required ApiObjectTypePropertyNames ApiObjectType { get; init; }
         public required ApiPropertyPropertyNames ApiProperty { get; init; }
         public required ApiTypePropertyNames ApiType { get; init; }
+        public required ApiTypeExpressionPropertyNames ApiTypeExpression { get; init; }
         public required ExtensibleBasePropertyNames ExtensibleBase { get; init; }
         #endregion
     }
@@ -220,7 +230,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         {
             ApiCollectionType = new ApiCollectionTypePropertyNames
             {
-                ApiItemType = policy.ConvertName(nameof(ApiCollectionType.ApiItemType)),
+                ApiItemTypeExpression = policy.ConvertName(nameof(ApiCollectionType.ApiItemType)), // Mapping property name from ApiItemTypeExpression to ApiItemType by design
                 ApiItemTypeModifiers = policy.ConvertName(nameof(ApiCollectionType.ApiItemTypeModifiers))
             },
             ApiEnumType = new ApiEnumTypePropertyNames
@@ -244,7 +254,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
             ApiProperty = new ApiPropertyPropertyNames
             {
                 ApiName = policy.ConvertName(nameof(ApiProperty.ApiName)),
-                ApiType = policy.ConvertName(nameof(ApiProperty.ApiType)),
+                ApiTypeExpression = policy.ConvertName(nameof(ApiProperty.ApiType)), // Mapping property name from ApiTypeExpression to ApiType by design
                 ApiTypeModifiers = policy.ConvertName(nameof(ApiProperty.ApiTypeModifiers)),
                 ClrName = policy.ConvertName(nameof(ApiProperty.ClrName))
             },
@@ -252,6 +262,12 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
             {
                 ClrType = policy.ConvertName(nameof(ApiType.ClrType)),
                 Kind = policy.ConvertName(nameof(ApiType.Kind))
+            },
+            ApiTypeExpression = new ApiTypeExpressionPropertyNames
+            {
+                ApiName = policy.ConvertName(nameof(ApiTypeExpression.ApiName)),
+                ApiInlineType = policy.ConvertName(nameof(ApiTypeExpression.ApiInlineType)),
+                Kind = policy.ConvertName(nameof(ApiTypeExpression.Kind))
             },
             ExtensibleBase = new ExtensibleBasePropertyNames
             {

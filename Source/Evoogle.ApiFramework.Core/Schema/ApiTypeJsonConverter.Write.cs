@@ -24,22 +24,22 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         in WriteContext context
     )
     {
-        WriteApiCollectionTypeApiItemType(writer, apiCollectionType, context);
+        WriteApiCollectionTypeApiItemTypeExpression(writer, apiCollectionType, context);
         WriteApiCollectionTypeApiItemTypeModifiers(writer, apiCollectionType, context);
     }
 
-    private static void WriteApiCollectionTypeApiItemType
+    private static void WriteApiCollectionTypeApiItemTypeExpression
     (
         Utf8JsonWriter writer,
         ApiCollectionType apiCollectionType,
         in WriteContext context
     )
     {
-        var propertyName = context.PropertyNames.ApiCollectionType.ApiItemType;
-        var apiItemType = apiCollectionType.ApiItemType;
-        var options = context.Options;
+        var propertyName = context.PropertyNames.ApiCollectionType.ApiItemTypeExpression;
+        writer.WritePropertyName(propertyName);
 
-        writer.WritePropertyWithSerializer(propertyName, apiItemType, options);
+        var apiItemTypeExpression = apiCollectionType.ApiItemTypeExpression;
+        WriteApiTypeExpression(writer, apiItemTypeExpression, context);
     }
 
     private static void WriteApiCollectionTypeApiItemTypeModifiers
@@ -215,7 +215,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         writer.WriteStartObject();
 
         WriteApiPropertyApiName(writer, apiProperty, context);
-        WriteApiPropertyApiType(writer, apiProperty, context);
+        WriteApiPropertyApiTypeExpression(writer, apiProperty, context);
         WriteApiPropertyApiTypeModifiers(writer, apiProperty, context);
         WriteApiPropertyClrName(writer, apiProperty, context);
 
@@ -236,18 +236,18 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         writer.WritePropertyString(propertyName, value, options);
     }
 
-    private static void WriteApiPropertyApiType
+    private static void WriteApiPropertyApiTypeExpression
     (
         Utf8JsonWriter writer,
         ApiProperty apiProperty,
         in WriteContext context
     )
     {
-        var propertyName = context.PropertyNames.ApiProperty.ApiType;
-        var apiType = apiProperty.ApiType;
-        var options = context.Options;
+        var propertyName = context.PropertyNames.ApiProperty.ApiTypeExpression;
+        writer.WritePropertyName(propertyName);
 
-        writer.WritePropertyWithSerializer(propertyName, apiType, options);
+        var apiTypeExpression = apiProperty.ApiTypeExpression;
+        WriteApiTypeExpression(writer, apiTypeExpression, context);
     }
 
     private static void WriteApiPropertyApiTypeModifiers
@@ -389,6 +389,65 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         writer.WriteStartObject();
 
         WriteApiTypeKind(writer, apiType, context);
+    }
+
+    // ApiTypeExpression
+    private static void WriteApiTypeExpression
+    (
+        Utf8JsonWriter writer,
+        ApiTypeExpression apiTypeExpression,
+        in WriteContext context
+    )
+    {
+        writer.WriteStartObject();
+
+        WriteApiTypeExpressionKind(writer, apiTypeExpression, context);
+        WriteApiTypeExpressionApiName(writer, apiTypeExpression, context);
+        WriteApiTypeExpressionApiInlineType(writer, apiTypeExpression, context);
+
+        writer.WriteEndObject();
+    }
+
+    private static void WriteApiTypeExpressionKind
+    (
+        Utf8JsonWriter writer,
+        ApiTypeExpression apiTypeExpression,
+        in WriteContext context
+    )
+    {
+        var propertyName = context.PropertyNames.ApiTypeExpression.Kind;
+        var kind = apiTypeExpression.Kind;
+        var options = context.Options;
+
+        writer.WritePropertyWithConverter(propertyName, kind, options, ApiTypeKindJsonConverter);
+    }
+
+    private static void WriteApiTypeExpressionApiName
+    (
+        Utf8JsonWriter writer,
+        ApiTypeExpression apiTypeExpression,
+        in WriteContext context
+    )
+    {
+        var propertyName = context.PropertyNames.ApiTypeExpression.ApiName;
+        var value = apiTypeExpression.ApiName;
+        var options = context.Options;
+
+        writer.WritePropertyString(propertyName, value, options);
+    }
+
+    private static void WriteApiTypeExpressionApiInlineType
+    (
+        Utf8JsonWriter writer,
+        ApiTypeExpression apiTypeExpression,
+        in WriteContext context
+    )
+    {
+        var propertyName = context.PropertyNames.ApiTypeExpression.ApiInlineType;
+        var apiInlineType = apiTypeExpression.ApiInlineType;
+        var options = context.Options;
+
+        writer.WritePropertyWithSerializer(propertyName, apiInlineType, options);
     }
 
     // ExtensibleBase Methods

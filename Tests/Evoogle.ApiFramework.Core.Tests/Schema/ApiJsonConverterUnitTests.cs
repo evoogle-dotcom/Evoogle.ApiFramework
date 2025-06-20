@@ -4,7 +4,7 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using System.Text.Json;
-
+using System.Text.Json.Serialization;
 using Evoogle.Extension;
 using Evoogle.XUnit;
 
@@ -31,6 +31,14 @@ public static class ApiJsonConverterUnitTests
         public string Name { get; set; } = string.Empty;
         public int? Age { get; set; }
         public Gender? Gender { get; set; }
+        public List<string>? Hobbies { get; set; }
+    }
+
+    public class Company
+    {
+        public string Name { get; set; } = string.Empty;
+        public Person? Owner { get; set; }
+        public List<Person>? Employees { get; set; }
     }
 
     public enum StopLight
@@ -62,17 +70,24 @@ public static class ApiJsonConverterUnitTests
     public class JsonDeserializeTest<T> : XUnitTest
         where T : IExtensible
     {
+        #region Default Properties
+        private static JsonSerializerOptions DefaultJsonSerializerOptions { get; } = new()
+        {
+            WriteIndented = false,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+        };
+        #endregion
+
         #region User Supplied Properties
         public string? Source { get; set; }
         public T? Expected { get; set; }
         public bool? AddTestExtension1 { get; set; } = false;
         public bool? AddTestExtension2 { get; set; } = false;
+        public JsonSerializerOptions? JsonSerializerOptions { get; set; } = DefaultJsonSerializerOptions;
         #endregion
 
         #region Calculated Properties
         private T? Actual { get; set; }
-
-        private static string TypeName => typeof(T).Name;
         #endregion
 
         #region XUnitTest Methods
@@ -97,7 +112,7 @@ public static class ApiJsonConverterUnitTests
 
         protected override void Act()
         {
-            this.Actual = JsonSerializer.Deserialize<T>(this.Source!);
+            this.Actual = JsonSerializer.Deserialize<T>(this.Source!, JsonSerializerOptions);
             this.WriteLine($"Actual:   {this.Actual.SafeToString()}");
         }
 
@@ -111,16 +126,23 @@ public static class ApiJsonConverterUnitTests
     public class JsonRoundtripTest<T> : XUnitTest
         where T : IExtensible
     {
+        #region Default Properties
+        private static JsonSerializerOptions DefaultJsonSerializerOptions { get; } = new()
+        {
+            WriteIndented = false,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+        };
+        #endregion
+
         #region User Supplied Properties
         public T? Expected { get; set; }
         public bool? AddTestExtension1 { get; set; } = false;
         public bool? AddTestExtension2 { get; set; } = false;
+        public JsonSerializerOptions? JsonSerializerOptions { get; set; } = DefaultJsonSerializerOptions;
         #endregion
 
         #region Calculated Properties
         private T? Actual { get; set; }
-
-        private static string TypeName => typeof(T).Name;
         #endregion
 
         #region XUnitTest Methods
@@ -143,8 +165,8 @@ public static class ApiJsonConverterUnitTests
 
         protected override void Act()
         {
-            var json = JsonSerializer.Serialize(this.Expected);
-            this.Actual = JsonSerializer.Deserialize<T>(json);
+            var json = JsonSerializer.Serialize(this.Expected, JsonSerializerOptions);
+            this.Actual = JsonSerializer.Deserialize<T>(json, JsonSerializerOptions);
             this.WriteLine($"Actual:   {this.Actual.SafeToString()}");
         }
 
@@ -158,17 +180,24 @@ public static class ApiJsonConverterUnitTests
     public class JsonSerializeTest<T> : XUnitTest
         where T : IExtensible
     {
+        #region Default Properties
+        private static JsonSerializerOptions DefaultJsonSerializerOptions { get; } = new()
+        {
+            WriteIndented = false,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+        };
+        #endregion
+
         #region User Supplied Properties
         public T? Source { get; set; }
         public string? Expected { get; set; }
         public bool? AddTestExtension1 { get; set; } = false;
         public bool? AddTestExtension2 { get; set; } = false;
+        public JsonSerializerOptions? JsonSerializerOptions { get; set; } = DefaultJsonSerializerOptions;
         #endregion
 
         #region Calculated Properties
         private string? ActualJson { get; set; }
-
-        private static string TypeName => typeof(T).Name;
         #endregion
 
         #region XUnitTest Methods
@@ -193,7 +222,7 @@ public static class ApiJsonConverterUnitTests
 
         protected override void Act()
         {
-            this.ActualJson = JsonSerializer.Serialize(this.Source);
+            this.ActualJson = JsonSerializer.Serialize(this.Source, DefaultJsonSerializerOptions);
             this.WriteLine($"Actual:   {this.ActualJson.SafeToString().RemoveWhitespace()}");
         }
 

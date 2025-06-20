@@ -6,6 +6,8 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
+using static Evoogle.ApiFramework.Schema.Internal.ApiJsonConverterHelpers;
+
 namespace Evoogle.ApiFramework.Schema;
 
 public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
@@ -15,7 +17,8 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
     {
         ValidateApiCollectionTypeProperties
         (
-            context.PropertyNames.ApiCollectionType.ApiItemType, context.ReadData.ApiCollectionType?.ApiItemType,
+            context,
+            context.PropertyNames.ApiCollectionType.ApiItemTypeExpression, context.ReadData.ApiCollectionType?.ApiItemTypeExpression,
             context.PropertyNames.ApiCollectionType.ApiItemTypeModifiers, context.ReadData.ApiCollectionType?.ApiItemTypeModifiers,
             ref results
         );
@@ -23,14 +26,19 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
 
     private static void ValidateApiCollectionTypeProperties
     (
-        string apiItemTypePropertyName, ApiType? apiItemType,
+        in ReadContext context,
+        string apiItemTypeExpressionPropertyName, ApiTypeExpressionReadData? apiItemTypeExpression,
         string apiItemTypeModifiersPropertyName, ApiTypeModifiers? apiItemTypeModifiers,
         ref List<ValidationResult>? results
     )
     {
-        if (apiItemType == null)
+        if (apiItemTypeExpression == null)
         {
-            AddMissingRequiredPropertyError(ref results, apiItemTypePropertyName);
+            AddMissingRequiredPropertyError(ref results, apiItemTypeExpressionPropertyName);
+        }
+        else
+        {
+            ValidateApiTypeExpression(context, apiItemTypeExpression, ref results);
         }
 
         if (apiItemTypeModifiers == null)
@@ -68,16 +76,18 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
             {
                 AddEmptyRequiredCollectionPropertyError(ref results, apiEnumValuesPropertyName);
             }
-
-            for (int i = 0; i < apiEnumValues.Count; i++)
+            else
             {
-                var enumValue = apiEnumValues[i];
-                ValidateApiEnumValueProperties(
-                    $"{apiEnumValuesPropertyName}[{i}].{context.PropertyNames.ApiEnumValue.ApiName}", enumValue.ApiName,
-                    $"{apiEnumValuesPropertyName}[{i}].{context.PropertyNames.ApiEnumValue.ClrName}", enumValue.ClrName,
-                    $"{apiEnumValuesPropertyName}[{i}].{context.PropertyNames.ApiEnumValue.ClrOrdinal}", enumValue.ClrOrdinal,
-                    ref results
-                );
+                for (var i = 0; i < apiEnumValues.Count; ++i)
+                {
+                    var enumValue = apiEnumValues[i];
+                    ValidateApiEnumValueProperties(
+                        $"{apiEnumValuesPropertyName}[{i}].{context.PropertyNames.ApiEnumValue.ApiName}", enumValue.ApiName,
+                        $"{apiEnumValuesPropertyName}[{i}].{context.PropertyNames.ApiEnumValue.ClrName}", enumValue.ClrName,
+                        $"{apiEnumValuesPropertyName}[{i}].{context.PropertyNames.ApiEnumValue.ClrOrdinal}", enumValue.ClrOrdinal,
+                        ref results
+                    );
+                }
             }
         }
     }
@@ -158,26 +168,29 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
             {
                 AddEmptyRequiredCollectionPropertyError(ref results, apiPropertiesPropertyName);
             }
-
-
-            for (int i = 0; i < apiProperties.Count; i++)
+            else
             {
-                var apiProperty = apiProperties[i];
-                ValidateApiPropertyProperties(
-                    $"{apiPropertiesPropertyName}[{i}].{context.PropertyNames.ApiProperty.ApiName}", apiProperty.ApiName,
-                    $"{apiPropertiesPropertyName}[{i}].{context.PropertyNames.ApiProperty.ApiType}", apiProperty.ApiType,
-                    $"{apiPropertiesPropertyName}[{i}].{context.PropertyNames.ApiProperty.ApiTypeModifiers}", apiProperty.ApiTypeModifiers,
-                    $"{apiPropertiesPropertyName}[{i}].{context.PropertyNames.ApiProperty.ClrName}", apiProperty.ClrName,
-                    ref results
-                );
+                for (var i = 0; i < apiProperties.Count; ++i)
+                {
+                    var apiProperty = apiProperties[i];
+                    ValidateApiPropertyProperties(
+                        context,
+                        $"{apiPropertiesPropertyName}[{i}].{context.PropertyNames.ApiProperty.ApiName}", apiProperty.ApiName,
+                        $"{apiPropertiesPropertyName}[{i}].{context.PropertyNames.ApiProperty.ApiTypeExpression}", apiProperty.ApiTypeExpression,
+                        $"{apiPropertiesPropertyName}[{i}].{context.PropertyNames.ApiProperty.ApiTypeModifiers}", apiProperty.ApiTypeModifiers,
+                        $"{apiPropertiesPropertyName}[{i}].{context.PropertyNames.ApiProperty.ClrName}", apiProperty.ClrName,
+                        ref results
+                    );
+                }
             }
         }
     }
 
     private static void ValidateApiPropertyProperties
     (
+        in ReadContext context,
         string apiNamePropertyName, string? apiName,
-        string apiTypePropertyName, ApiType? apiType,
+        string apiTypeExpressionPropertyName, ApiTypeExpressionReadData? apiTypeExpression,
         string apiTypeModifiersPropertyName, ApiTypeModifiers? apiTypeModifiers,
         string clrNamePropertyName, string? clrName,
         ref List<ValidationResult>? results
@@ -188,9 +201,13 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
             AddMissingRequiredPropertyError(ref results, apiNamePropertyName);
         }
 
-        if (apiType == null)
+        if (apiTypeExpression == null)
         {
-            AddMissingRequiredPropertyError(ref results, apiTypePropertyName);
+            AddMissingRequiredPropertyError(ref results, apiTypeExpressionPropertyName);
+        }
+        else
+        {
+            ValidateApiTypeExpression(context, apiTypeExpression, ref results);
         }
 
         if (apiTypeModifiers == null)
@@ -239,21 +256,46 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
     }
     #endregion
 
-    #region Validation Helper Methods
-    private static void AddValidationError(ref List<ValidationResult>? results, string message, string memberName)
+    #region ApiTypeExpression Validation Methods
+    private static void ValidateApiTypeExpression
+    (
+        in ReadContext context,
+        ApiTypeExpressionReadData apiTypeExpression,
+        ref List<ValidationResult>? results
+    )
     {
-        results ??= [];
-        results.Add(new ValidationResult(message, [memberName]));
+        var apiInlineType = apiTypeExpression.ApiInlineType;
+        if (apiInlineType == null)
+        {
+            ValidateApiTypeExpressionReferenceProperties
+            (
+                context.PropertyNames.ApiTypeExpression.Kind, apiTypeExpression.Kind,
+                context.PropertyNames.ApiTypeExpression.ApiName, apiTypeExpression.ApiName,
+                ref results
+            );
+        }
     }
 
-    private static void AddEmptyRequiredCollectionPropertyError(ref List<ValidationResult>? results, string propertyName)
+    private static void ValidateApiTypeExpressionReferenceProperties
+    (
+        string kindPropertyName, string? kind,
+        string apiNamePropertyName, string? apiName,
+        ref List<ValidationResult>? results
+    )
     {
-        AddValidationError(ref results, $"Empty required collection property: {propertyName}", propertyName);
-    }
+        if (kind == null)
+        {
+            AddMissingRequiredPropertyError(ref results, kindPropertyName);
+        }
+        else if (Enum.TryParse<ApiTypeKind>(kind, out var apiTypeKind) == false)
+        {
+            AddValidationError(ref results, $"Invalid ApiTypeKind value: {kind}", kindPropertyName);
+        }
 
-    private static void AddMissingRequiredPropertyError(ref List<ValidationResult>? results, string propertyName)
-    {
-        AddValidationError(ref results, $"Missing required property: {propertyName}", propertyName);
+        if (apiName == null)
+        {
+            AddMissingRequiredPropertyError(ref results, apiNamePropertyName);
+        }
     }
     #endregion
 }

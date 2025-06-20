@@ -3,6 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 using Evoogle.ApiFramework.Exceptions;
@@ -55,26 +56,67 @@ public sealed class ApiSchema : ExtensibleBase
     /// <param name="apiTypes">The collection of API types to include in the schema.</param>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="name"/> or <paramref name="apiTypes"/> is null.</exception>
     /// <exception cref="ApiSchemaException">Thrown if duplicate API or CLR identifiers are detected.</exception>
-    public ApiSchema(string name, IEnumerable<ApiType> apiTypes)
+    public ApiSchema
+    (
+        string name,
+        IEnumerable<ApiType>? apiTypes
+    )
     {
         this.Name = name ?? throw new ArgumentNullException(nameof(name));
 
-        var values = apiTypes.SafeToArray();
-        var namedValues = values
+        var apiNamedTypes = apiTypes
+            .SafeCast<ApiType>()
             .OfType<ApiNamedType>()
             .OrderBy(x => x.ApiName, StringComparer.OrdinalIgnoreCase)
             .ToArray();
 
-        ValidateUnique(namedValues, x => x.ApiName, nameof(ApiNamedType.ApiName));
-        ValidateUnique(namedValues, x => x.ClrType, nameof(ApiType.ClrType));
+        ValidateUnique(apiNamedTypes, x => x.ApiName, nameof(ApiNamedType.ApiName));
+        ValidateUnique(apiNamedTypes, x => x.ClrType, nameof(ApiType.ClrType));
 
-        this.ApiTypes = namedValues;
-        this.ApiEnumTypes = namedValues.OfType<ApiEnumType>().ToArray();
-        this.ApiObjectTypes = namedValues.OfType<ApiObjectType>().ToArray();
-        this.ApiScalarTypes = namedValues.OfType<ApiScalarType>().ToArray();
+        this.ApiTypes = apiNamedTypes;
+        this.ApiScalarTypes = apiNamedTypes.OfType<ApiScalarType>().ToArray();
+        this.ApiEnumTypes = apiNamedTypes.OfType<ApiEnumType>().ToArray();
+        this.ApiObjectTypes = apiNamedTypes.OfType<ApiObjectType>().ToArray();
 
-        _apiNameLookup = namedValues.ToDictionary(x => x.ApiName, StringComparer.OrdinalIgnoreCase);
-        _clrTypeLookup = namedValues.ToDictionary(x => x.ClrType);
+        _apiNameLookup = apiNamedTypes.ToDictionary(x => x.ApiName, StringComparer.OrdinalIgnoreCase);
+        _clrTypeLookup = apiNamedTypes.ToDictionary(x => x.ClrType);
+
+        _scalarApiNameLookup = this.ApiScalarTypes.ToDictionary(x => x.ApiName, StringComparer.OrdinalIgnoreCase);
+        _scalarClrTypeLookup = this.ApiScalarTypes.ToDictionary(x => x.ClrType);
+
+        _enumApiNameLookup = this.ApiEnumTypes.ToDictionary(x => x.ApiName, StringComparer.OrdinalIgnoreCase);
+        _enumClrTypeLookup = this.ApiEnumTypes.ToDictionary(x => x.ClrType);
+
+        _objectApiNameLookup = this.ApiObjectTypes.ToDictionary(x => x.ApiName, StringComparer.OrdinalIgnoreCase);
+        _objectClrTypeLookup = this.ApiObjectTypes.ToDictionary(x => x.ClrType);
+    }
+
+    public ApiSchema
+    (
+        string name,
+        IEnumerable<ApiScalarType>? apiScalarTypes,
+        IEnumerable<ApiEnumType>? apiEnumTypes,
+        IEnumerable<ApiObjectType>? apiObjectTypes
+    )
+    {
+        this.Name = name ?? throw new ArgumentNullException(nameof(name));
+
+        var apiNamedTypes = apiScalarTypes.SafeCast<ApiNamedType>()
+            .Concat(apiEnumTypes.SafeCast<ApiNamedType>())
+            .Concat(apiObjectTypes.SafeCast<ApiNamedType>())
+            .OrderBy(x => x.ApiName, StringComparer.OrdinalIgnoreCase)
+            .ToArray();
+
+        ValidateUnique(apiNamedTypes, x => x.ApiName, nameof(ApiNamedType.ApiName));
+        ValidateUnique(apiNamedTypes, x => x.ClrType, nameof(ApiType.ClrType));
+
+        this.ApiTypes = apiNamedTypes;
+        this.ApiScalarTypes = apiScalarTypes.SafeCast<ApiScalarType>().OrderBy(x => x.ApiName, StringComparer.OrdinalIgnoreCase).ToArray();
+        this.ApiEnumTypes = apiEnumTypes.SafeCast<ApiEnumType>().OrderBy(x => x.ApiName, StringComparer.OrdinalIgnoreCase).ToArray();
+        this.ApiObjectTypes = apiObjectTypes.SafeCast<ApiObjectType>().OrderBy(x => x.ApiName, StringComparer.OrdinalIgnoreCase).ToArray();
+
+        _apiNameLookup = apiNamedTypes.ToDictionary(x => x.ApiName, StringComparer.OrdinalIgnoreCase);
+        _clrTypeLookup = apiNamedTypes.ToDictionary(x => x.ClrType);
 
         _enumApiNameLookup = this.ApiEnumTypes.ToDictionary(x => x.ApiName, StringComparer.OrdinalIgnoreCase);
         _enumClrTypeLookup = this.ApiEnumTypes.ToDictionary(x => x.ClrType);
@@ -88,6 +130,24 @@ public sealed class ApiSchema : ExtensibleBase
     #endregion
 
     #region ApiSchema Methods
+    /// <summary>
+    ///     Resolves all <see cref="ApiTypeExpression"/> instances within object and collection types in the schema.
+    ///     This ensures that every property and nested structure has its referenced or inline type linked.
+    /// </summary>
+    /// <exception cref="ApiSchemaException">
+    ///     Thrown if any named reference could not be resolved in the schema.
+    /// </exception>
+    public void ResolveAllReferences(ref List<ValidationResult>? results)
+    {
+        foreach (var apiObjectType in this.ApiObjectTypes)
+        {
+            foreach (var apiProperty in apiObjectType.ApiProperties)
+            {
+                apiProperty.Resolve(this, ref results);
+            }
+        }
+    }
+
     /// <summary>Attempts to retrieve an API named type by its API name.</summary>
     public bool TryGetApiType(string apiName, out ApiNamedType? apiNamedType)
         => _apiNameLookup.TryGetValue(apiName, out apiNamedType);

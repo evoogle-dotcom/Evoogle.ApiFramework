@@ -4,6 +4,7 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using System.Collections.Concurrent;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -275,27 +276,25 @@ public class ApiSchemaJsonConverter : JsonConverter<ApiSchema>
     #region Factory Implementation Methods
     private static ApiSchema CreateApiSchema(in ReadContext context)
     {
+        // Validate all required properties are non-null.
+        var validationResults = default(List<ValidationResult>);
+        ValidateApiSchemaProperties(context, ref validationResults);
+
+        // Create the ApiSchema instance using the read data.
         var name = context.ReadData.ApiSchema!.Name!;
+        var apiScalarTypes = context.ReadData.ApiSchema.ApiScalarTypes.SafeCast<ApiScalarType>();
+        var apiEnumTypes = context.ReadData.ApiSchema.ApiEnumTypes.SafeCast<ApiEnumType>();
+        var apiObjectTypes = context.ReadData.ApiSchema.ApiObjectTypes.SafeCast<ApiObjectType>();
 
-        var apiTypes = new List<ApiType>();
+        var apiSchema = new ApiSchema(name, apiScalarTypes, apiEnumTypes, apiObjectTypes);
 
-        if (context.ReadData.ApiSchema.ApiScalarTypes != null)
-        {
-            apiTypes.AddRange(context.ReadData.ApiSchema.ApiScalarTypes);
-        }
+        // Resolve all ApiTypeExpression instances (named or inline)
+        apiSchema.ResolveAllReferences(ref validationResults);
 
-        if (context.ReadData.ApiSchema.ApiEnumTypes != null)
-        {
-            apiTypes.AddRange(context.ReadData.ApiSchema.ApiEnumTypes);
-        }
+        // Throw if any ApiSchema validation errors were found.
+        ThrowIfInvalid<ApiSchemaJsonConverter, ReadContext>(context, nameof(ApiSchema), validationResults);
 
-        if (context.ReadData.ApiSchema.ApiObjectTypes != null)
-        {
-            apiTypes.AddRange(context.ReadData.ApiSchema.ApiObjectTypes);
-        }
-
-        var apiSchema = new ApiSchema(name, apiTypes);
-
+        // Attach the extensions if present.
         var extensions = context.ReadData.ExtensibleBase?.Extensions;
         AttachExtensions(apiSchema, extensions);
 
@@ -439,6 +438,35 @@ public class ApiSchemaJsonConverter : JsonConverter<ApiSchema>
             writer.WritePropertyName(extensionsPropertyName);
 
             WriteExtensions(writer, extensions, context.Options, context.Logger);
+        }
+    }
+    #endregion
+
+    #region Validation Implementation Methods
+    private static void ValidateApiSchemaProperties(in ReadContext context, ref List<ValidationResult>? results)
+    {
+        ValidateApiSchemaProperties
+        (
+            context.PropertyNames.ApiSchema.Name, context.ReadData.ApiSchema?.Name,
+            context.PropertyNames.ApiSchema.ApiScalarTypes, context.ReadData.ApiSchema?.ApiScalarTypes,
+            context.PropertyNames.ApiSchema.ApiEnumTypes, context.ReadData.ApiSchema?.ApiEnumTypes,
+            context.PropertyNames.ApiSchema.ApiObjectTypes, context.ReadData.ApiSchema?.ApiObjectTypes,
+            ref results
+        );
+    }
+
+    private static void ValidateApiSchemaProperties
+    (
+        string namePropertyName, string? name,
+        string apiScalarTypesPropertyName, IEnumerable<ApiScalarType>? apiScalarTypes,
+        string apiEnumTypesPropertyName, IEnumerable<ApiEnumType>? apiEnumTypes,
+        string apiObjectTypesPropertyName, IEnumerable<ApiObjectType>? apiObjectTypes,
+        ref List<ValidationResult>? results
+    )
+    {
+        if (name == null)
+        {
+            AddMissingRequiredPropertyError(ref results, namePropertyName);
         }
     }
     #endregion

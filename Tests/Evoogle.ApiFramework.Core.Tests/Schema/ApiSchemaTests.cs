@@ -110,6 +110,11 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
     public static readonly ApiScalarType TestApiScalarTypeString = new(nameof(String), typeof(string));
     public static readonly ApiScalarType TestApiScalarTypeUInt32 = new(nameof(UInt32), typeof(uint));
 
+    public static readonly ApiTypeExpression TestApiScalarTypeBooleanReference = new(ApiTypeKind.Scalar, nameof(Boolean));
+    public static readonly ApiTypeExpression TestApiScalarTypeInt32Reference = new(ApiTypeKind.Scalar, nameof(Int32));
+    public static readonly ApiTypeExpression TestApiScalarTypeStringReference = new(ApiTypeKind.Scalar, nameof(String));
+    public static readonly ApiTypeExpression TestApiScalarTypeUInt32Reference = new(ApiTypeKind.Scalar, nameof(UInt32));
+
     public static readonly ApiEnumType TestApiEnumTypeGender = new
     (
         nameof(Gender),
@@ -121,16 +126,39 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         typeof(Gender)
     );
 
+    public static readonly ApiTypeExpression TestApiEnumTypeGenderReference = new(ApiTypeKind.Enum, nameof(Gender));
+
+    public static readonly ApiTypeExpression TestApiCollectionTypeListOfString = new
+    (
+        new ApiCollectionType(TestApiScalarTypeStringReference, ApiTypeModifiers.None, typeof(List<string>))
+    );
+
     public static readonly ApiObjectType TestApiObjectTypePerson = new
     (
         nameof(Person),
         [
-            new ApiProperty(nameof(Person.Name), TestApiScalarTypeString, ApiTypeModifiers.Required, nameof(Person.Name)),
-            new ApiProperty(nameof(Person.Age), TestApiScalarTypeInt32, ApiTypeModifiers.None, nameof(Person.Age)),
-            new ApiProperty(nameof(Person.Gender), TestApiEnumTypeGender, ApiTypeModifiers.None, nameof(Person.Gender))
+            new ApiProperty(nameof(Person.Name), TestApiScalarTypeStringReference, ApiTypeModifiers.Required, nameof(Person.Name)),
+            new ApiProperty(nameof(Person.Age), TestApiScalarTypeInt32Reference, ApiTypeModifiers.None, nameof(Person.Age)),
+            new ApiProperty(nameof(Person.Gender), TestApiEnumTypeGenderReference, ApiTypeModifiers.None, nameof(Person.Gender)),
+            new ApiProperty(nameof(Person.Hobbies), new ApiTypeExpression(new ApiCollectionType(TestApiScalarTypeStringReference, ApiTypeModifiers.Required, typeof(List<string>))), ApiTypeModifiers.None, nameof(Person.Hobbies))
         ],
         typeof(Person)
     );
+
+    public static readonly ApiTypeExpression TestApiObjectTypePersonReference = new(ApiTypeKind.Object, nameof(Person));
+
+    public static readonly ApiObjectType TestApiObjectTypeCompany = new
+    (
+        nameof(Company),
+        [
+            new ApiProperty(nameof(Company.Name), TestApiScalarTypeStringReference, ApiTypeModifiers.Required, nameof(Company.Name)),
+            new ApiProperty(nameof(Company.Owner), TestApiObjectTypePersonReference, ApiTypeModifiers.None, nameof(Company.Owner)),
+            new ApiProperty(nameof(Company.Employees), new ApiTypeExpression(new ApiCollectionType(TestApiObjectTypePersonReference, ApiTypeModifiers.Required, typeof(List<Person>))), ApiTypeModifiers.None, nameof(Company.Employees))
+        ],
+        typeof(Company)
+    );
+
+    public static readonly ApiTypeExpression TestApiObjectTypeCompanyReference = new(ApiTypeKind.Object, nameof(Company));
 
     public static readonly ApiSchema TestApiSchema = new
     (
@@ -390,13 +418,13 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             AddTestExtension1 = true,
         },
 
-        // ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType
+        // ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)
         new JsonDeserializeTest<ApiSchema>
         {
-            Name = "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType",
+            Name = "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)",
             Source = @"
             {
-                ""Name"": ""ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType"",
+                ""Name"": ""ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)"",
                 ""ApiScalarTypes"": [
                     {
                         ""Kind"": ""Scalar"",
@@ -443,12 +471,11 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                         ""Kind"": ""Object"",
                         ""ApiName"": ""Person"",
                         ""ApiProperties"": [
-                            {
+                             {
                                 ""ApiName"": ""Name"",
                                 ""ApiType"": {
                                     ""Kind"": ""Scalar"",
-                                    ""ApiName"": ""String"",
-                                    ""ClrType"": ""System.String, System.Private.CoreLib""
+                                    ""ApiName"": ""String""
                                 },
                                 ""ApiTypeModifiers"": ""Required"",
                                 ""ClrName"": ""Name""
@@ -457,8 +484,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                                 ""ApiName"": ""Age"",
                                 ""ApiType"": {
                                     ""Kind"": ""Scalar"",
-                                    ""ApiName"": ""Int32"",
-                                    ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                                    ""ApiName"": ""Int32""
                                 },
                                 ""ApiTypeModifiers"": ""None"",
                                 ""ClrName"": ""Age""
@@ -467,28 +493,26 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                                 ""ApiName"": ""Gender"",
                                 ""ApiType"": {
                                     ""Kind"": ""Enum"",
-                                    ""ApiName"": ""Gender"",
-                                    ""ApiEnumValues"": [
-                                        {
-                                            ""ApiName"": ""Unspecified"",
-                                            ""ClrName"": ""Unspecified"",
-                                            ""ClrOrdinal"": 0
-                                        },
-                                        {
-                                            ""ApiName"": ""Male"",
-                                            ""ClrName"": ""Male"",
-                                            ""ClrOrdinal"": 1
-                                        },
-                                        {
-                                            ""ApiName"": ""Female"",
-                                            ""ClrName"": ""Female"",
-                                            ""ClrOrdinal"": 2
-                                        }
-                                    ],
-                                    ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BGender, Evoogle.ApiFramework.Core.Tests""
+                                    ""ApiName"": ""Gender""
                                 },
                                 ""ApiTypeModifiers"": ""None"",
                                 ""ClrName"": ""Gender""
+                            },
+                            {
+                                ""ApiName"": ""Hobbies"",
+                                ""ApiType"": {
+                                    ""ApiInlineType"": {
+                                        ""Kind"": ""Collection"",
+                                        ""ApiItemType"": {
+                                            ""Kind"": ""Scalar"",
+                                            ""ApiName"": ""String""
+                                        },
+                                        ""ApiItemTypeModifiers"": ""Required"",
+                                        ""ClrType"": ""System.Collections.Generic.List\u00601[[System.String,System.Private.CoreLib]], System.Private.CoreLib""
+                                    }
+                                },
+                                ""ApiTypeModifiers"": ""None"",
+                                ""ClrName"": ""Hobbies""
                             }
                         ],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BPerson, Evoogle.ApiFramework.Core.Tests""
@@ -497,7 +521,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             }",
             Expected = new ApiSchema
             (
-                "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType",
+                "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)",
                 [
                     TestApiScalarTypeBoolean,
                     TestApiScalarTypeInt32,
@@ -511,10 +535,10 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         // ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType And Extension 1 And Extension 2
         new JsonDeserializeTest<ApiSchema>
         {
-            Name = "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType And Extension 1 And Extension 2",
+            Name = "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person) And Extension 1 And Extension 2",
             Source = @"
             {
-                ""Name"": ""ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType And Extension 1 And Extension 2"",
+                ""Name"": ""ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person) And Extension 1 And Extension 2"",
                 ""ApiScalarTypes"": [
                     {
                         ""Kind"": ""Scalar"",
@@ -565,8 +589,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                                 ""ApiName"": ""Name"",
                                 ""ApiType"": {
                                     ""Kind"": ""Scalar"",
-                                    ""ApiName"": ""String"",
-                                    ""ClrType"": ""System.String, System.Private.CoreLib""
+                                    ""ApiName"": ""String""
                                 },
                                 ""ApiTypeModifiers"": ""Required"",
                                 ""ClrName"": ""Name""
@@ -575,8 +598,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                                 ""ApiName"": ""Age"",
                                 ""ApiType"": {
                                     ""Kind"": ""Scalar"",
-                                    ""ApiName"": ""Int32"",
-                                    ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                                    ""ApiName"": ""Int32""
                                 },
                                 ""ApiTypeModifiers"": ""None"",
                                 ""ClrName"": ""Age""
@@ -585,28 +607,26 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                                 ""ApiName"": ""Gender"",
                                 ""ApiType"": {
                                     ""Kind"": ""Enum"",
-                                    ""ApiName"": ""Gender"",
-                                    ""ApiEnumValues"": [
-                                        {
-                                            ""ApiName"": ""Unspecified"",
-                                            ""ClrName"": ""Unspecified"",
-                                            ""ClrOrdinal"": 0
-                                        },
-                                        {
-                                            ""ApiName"": ""Male"",
-                                            ""ClrName"": ""Male"",
-                                            ""ClrOrdinal"": 1
-                                        },
-                                        {
-                                            ""ApiName"": ""Female"",
-                                            ""ClrName"": ""Female"",
-                                            ""ClrOrdinal"": 2
-                                        }
-                                    ],
-                                    ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BGender, Evoogle.ApiFramework.Core.Tests""
+                                    ""ApiName"": ""Gender""
                                 },
                                 ""ApiTypeModifiers"": ""None"",
                                 ""ClrName"": ""Gender""
+                            },
+                            {
+                                ""ApiName"": ""Hobbies"",
+                                ""ApiType"": {
+                                    ""ApiInlineType"": {
+                                        ""Kind"": ""Collection"",
+                                        ""ApiItemType"": {
+                                            ""Kind"": ""Scalar"",
+                                            ""ApiName"": ""String""
+                                        },
+                                        ""ApiItemTypeModifiers"": ""Required"",
+                                        ""ClrType"": ""System.Collections.Generic.List\u00601[[System.String,System.Private.CoreLib]], System.Private.CoreLib""
+                                    }
+                                },
+                                ""ApiTypeModifiers"": ""None"",
+                                ""ClrName"": ""Hobbies""
                             }
                         ],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BPerson, Evoogle.ApiFramework.Core.Tests""
@@ -624,7 +644,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             }",
             Expected = new ApiSchema
             (
-                "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType And Extension 1 And Extension 2",
+                "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person) And Extension 1 And Extension 2",
                 [
                     TestApiScalarTypeBoolean,
                     TestApiScalarTypeInt32,
@@ -635,6 +655,162 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             ),
             AddTestExtension1 = true,
             AddTestExtension2 = true,
+        },
+
+        // ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 2 ApiObjectTypes (Person and Company)
+        new JsonDeserializeTest<ApiSchema>
+        {
+            Name = "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 2 ApiObjectTypes (Person and Company)",
+            Source = @"
+            {
+                ""Name"": ""ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 2 ApiObjectTypes (Person and Company)"",
+                ""ApiScalarTypes"": [
+                    {
+                        ""Kind"": ""Scalar"",
+                        ""ApiName"": ""Boolean"",
+                        ""ClrType"": ""System.Boolean, System.Private.CoreLib""
+                    },
+                    {
+                        ""Kind"": ""Scalar"",
+                        ""ApiName"": ""Int32"",
+                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                    },
+                    {
+                        ""Kind"": ""Scalar"",
+                        ""ApiName"": ""String"",
+                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                    }
+                ],
+                ""ApiEnumTypes"": [
+                    {
+                        ""Kind"": ""Enum"",
+                        ""ApiName"": ""Gender"",
+                        ""ApiEnumValues"": [
+                            {
+                                ""ApiName"": ""Unspecified"",
+                                ""ClrName"": ""Unspecified"",
+                                ""ClrOrdinal"": 0
+                            },
+                            {
+                                ""ApiName"": ""Male"",
+                                ""ClrName"": ""Male"",
+                                ""ClrOrdinal"": 1
+                            },
+                            {
+                                ""ApiName"": ""Female"",
+                                ""ClrName"": ""Female"",
+                                ""ClrOrdinal"": 2
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BGender, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ],
+                ""ApiObjectTypes"": [
+                    {
+                        ""Kind"": ""Object"",
+                        ""ApiName"": ""Company"",
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""Name"",
+                                ""ApiType"": {
+                                    ""Kind"": ""Scalar"",
+                                    ""ApiName"": ""String""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Name""
+                            },
+                            {
+                                ""ApiName"": ""Owner"",
+                                ""ApiType"": {
+                                    ""Kind"": ""Object"",
+                                    ""ApiName"": ""Person""
+                                },
+                                ""ApiTypeModifiers"": ""None"",
+                                ""ClrName"": ""Owner""
+                            },
+                            {
+                                ""ApiName"": ""Employees"",
+                                ""ApiType"": {
+                                    ""ApiInlineType"": {
+                                        ""Kind"": ""Collection"",
+                                        ""ApiItemType"": {
+                                            ""Kind"": ""Object"",
+                                            ""ApiName"": ""Person""
+                                        },
+                                        ""ApiItemTypeModifiers"": ""Required"",
+                                        ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BPerson, Evoogle.ApiFramework.Core.Tests]], System.Private.CoreLib""
+                                    }
+                                },
+                                ""ApiTypeModifiers"": ""None"",
+                                ""ClrName"": ""Employees""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BCompany, Evoogle.ApiFramework.Core.Tests""
+                    },
+                    {
+                        ""Kind"": ""Object"",
+                        ""ApiName"": ""Person"",
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""Name"",
+                                ""ApiType"": {
+                                    ""Kind"": ""Scalar"",
+                                    ""ApiName"": ""String""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Name""
+                            },
+                            {
+                                ""ApiName"": ""Age"",
+                                ""ApiType"": {
+                                    ""Kind"": ""Scalar"",
+                                    ""ApiName"": ""Int32""
+                                },
+                                ""ApiTypeModifiers"": ""None"",
+                                ""ClrName"": ""Age""
+                            },
+                            {
+                                ""ApiName"": ""Gender"",
+                                ""ApiType"": {
+                                    ""Kind"": ""Enum"",
+                                    ""ApiName"": ""Gender""
+                                },
+                                ""ApiTypeModifiers"": ""None"",
+                                ""ClrName"": ""Gender""
+                            },
+                            {
+                                ""ApiName"": ""Hobbies"",
+                                ""ApiType"": {
+                                    ""ApiInlineType"": {
+                                        ""Kind"": ""Collection"",
+                                        ""ApiItemType"": {
+                                            ""Kind"": ""Scalar"",
+                                            ""ApiName"": ""String""
+                                        },
+                                        ""ApiItemTypeModifiers"": ""Required"",
+                                        ""ClrType"": ""System.Collections.Generic.List\u00601[[System.String,System.Private.CoreLib]], System.Private.CoreLib""
+                                    }
+                                },
+                                ""ApiTypeModifiers"": ""None"",
+                                ""ClrName"": ""Hobbies""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BPerson, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ]
+            }",
+            Expected = new ApiSchema
+            (
+                "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 2 ApiObjectTypes (Person and Company)",
+                [
+                    TestApiScalarTypeBoolean,
+                    TestApiScalarTypeInt32,
+                    TestApiScalarTypeString,
+                    TestApiEnumTypeGender,
+                    TestApiObjectTypePerson,
+                    TestApiObjectTypeCompany
+                ]
+            )
         },
     ];
 
@@ -707,13 +883,13 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             AddTestExtension1 = true,
         },
 
-        // ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType
+        // ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)
         new JsonRoundtripTest<ApiSchema>
         {
-            Name = "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType",
+            Name = "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)",
             Expected = new ApiSchema
             (
-                "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType",
+                "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)",
                 [
                     TestApiScalarTypeBoolean,
                     TestApiScalarTypeInt32,
@@ -724,19 +900,39 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             ),
         },
 
-        // ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType And Extension 1 And Extension 2
+        // ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person) And Extension 1 And Extension 2
         new JsonRoundtripTest<ApiSchema>
         {
-            Name = "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType And Extension 1 And Extension 2",
+            Name = "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person) And Extension 1 And Extension 2",
             Expected = new ApiSchema
             (
-                "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType And Extension 1 And Extension 2",
+                "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person) And Extension 1 And Extension 2",
                 [
                     TestApiScalarTypeBoolean,
                     TestApiScalarTypeInt32,
                     TestApiScalarTypeString,
                     TestApiEnumTypeGender,
                     TestApiObjectTypePerson
+                ]
+            ),
+            AddTestExtension1 = true,
+            AddTestExtension2 = true,
+        },
+
+        // ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 2 ApiObjectTypes (Person and Company) And Extension 1 And Extension 2
+        new JsonRoundtripTest<ApiSchema>
+        {
+            Name = "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 2 ApiObjectTypes (Person and Company) And Extension 1 And Extension 2",
+            Expected = new ApiSchema
+            (
+                "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 2 ApiObjectTypes (Person and Company) And Extension 1 And Extension 2",
+                [
+                    TestApiScalarTypeBoolean,
+                    TestApiScalarTypeInt32,
+                    TestApiScalarTypeString,
+                    TestApiEnumTypeGender,
+                    TestApiObjectTypePerson,
+                    TestApiObjectTypeCompany
                 ]
             ),
             AddTestExtension1 = true,
@@ -990,13 +1186,13 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             AddTestExtension1 = true
         },
 
-        // ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType
+        // ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)
         new JsonSerializeTest<ApiSchema>
         {
-            Name = "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType",
+            Name = "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)",
             Source = new ApiSchema
             (
-                "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType",
+                "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)",
                 [
                     TestApiScalarTypeBoolean,
                     TestApiScalarTypeInt32,
@@ -1007,7 +1203,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             ),
             Expected = @"
             {
-                ""Name"": ""ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType"",
+                ""Name"": ""ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)"",
                 ""ApiScalarTypes"": [
                     {
                         ""Kind"": ""Scalar"",
@@ -1058,8 +1254,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                                 ""ApiName"": ""Name"",
                                 ""ApiType"": {
                                     ""Kind"": ""Scalar"",
-                                    ""ApiName"": ""String"",
-                                    ""ClrType"": ""System.String, System.Private.CoreLib""
+                                    ""ApiName"": ""String""
                                 },
                                 ""ApiTypeModifiers"": ""Required"",
                                 ""ClrName"": ""Name""
@@ -1068,8 +1263,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                                 ""ApiName"": ""Age"",
                                 ""ApiType"": {
                                     ""Kind"": ""Scalar"",
-                                    ""ApiName"": ""Int32"",
-                                    ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                                    ""ApiName"": ""Int32""
                                 },
                                 ""ApiTypeModifiers"": ""None"",
                                 ""ClrName"": ""Age""
@@ -1078,28 +1272,26 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                                 ""ApiName"": ""Gender"",
                                 ""ApiType"": {
                                     ""Kind"": ""Enum"",
-                                    ""ApiName"": ""Gender"",
-                                    ""ApiEnumValues"": [
-                                        {
-                                            ""ApiName"": ""Unspecified"",
-                                            ""ClrName"": ""Unspecified"",
-                                            ""ClrOrdinal"": 0
-                                        },
-                                        {
-                                            ""ApiName"": ""Male"",
-                                            ""ClrName"": ""Male"",
-                                            ""ClrOrdinal"": 1
-                                        },
-                                        {
-                                            ""ApiName"": ""Female"",
-                                            ""ClrName"": ""Female"",
-                                            ""ClrOrdinal"": 2
-                                        }
-                                    ],
-                                    ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BGender, Evoogle.ApiFramework.Core.Tests""
+                                    ""ApiName"": ""Gender""
                                 },
                                 ""ApiTypeModifiers"": ""None"",
                                 ""ClrName"": ""Gender""
+                            },
+                            {
+                                ""ApiName"": ""Hobbies"",
+                                ""ApiType"": {
+                                    ""ApiInlineType"": {
+                                        ""Kind"": ""Collection"",
+                                        ""ApiItemType"": {
+                                            ""Kind"": ""Scalar"",
+                                            ""ApiName"": ""String""
+                                        },
+                                        ""ApiItemTypeModifiers"": ""Required"",
+                                        ""ClrType"": ""System.Collections.Generic.List\u00601[[System.String,System.Private.CoreLib]], System.Private.CoreLib""
+                                    }
+                                },
+                                ""ApiTypeModifiers"": ""None"",
+                                ""ClrName"": ""Hobbies""
                             }
                         ],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BPerson, Evoogle.ApiFramework.Core.Tests""
@@ -1108,13 +1300,13 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             }"
         },
 
-        // ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType And Extension 1 And Extension 2
+        // ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person) And Extension 1 And Extension 2
         new JsonSerializeTest<ApiSchema>
         {
-            Name = "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType And Extension 1 And Extension 2",
+            Name = "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person) And Extension 1 And Extension 2",
             Source = new ApiSchema
             (
-                "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType And Extension 1 And Extension 2",
+                "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person) And Extension 1 And Extension 2",
                 [
                     TestApiScalarTypeBoolean,
                     TestApiScalarTypeInt32,
@@ -1125,7 +1317,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             ),
             Expected = @"
             {
-                ""Name"": ""ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType And Extension 1 And Extension 2"",
+                ""Name"": ""ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person) And Extension 1 And Extension 2"",
                 ""ApiScalarTypes"": [
                     {
                         ""Kind"": ""Scalar"",
@@ -1172,12 +1364,11 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                         ""Kind"": ""Object"",
                         ""ApiName"": ""Person"",
                         ""ApiProperties"": [
-                            {
+                             {
                                 ""ApiName"": ""Name"",
                                 ""ApiType"": {
                                     ""Kind"": ""Scalar"",
-                                    ""ApiName"": ""String"",
-                                    ""ClrType"": ""System.String, System.Private.CoreLib""
+                                    ""ApiName"": ""String""
                                 },
                                 ""ApiTypeModifiers"": ""Required"",
                                 ""ClrName"": ""Name""
@@ -1186,8 +1377,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                                 ""ApiName"": ""Age"",
                                 ""ApiType"": {
                                     ""Kind"": ""Scalar"",
-                                    ""ApiName"": ""Int32"",
-                                    ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                                    ""ApiName"": ""Int32""
                                 },
                                 ""ApiTypeModifiers"": ""None"",
                                 ""ClrName"": ""Age""
@@ -1196,28 +1386,26 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                                 ""ApiName"": ""Gender"",
                                 ""ApiType"": {
                                     ""Kind"": ""Enum"",
-                                    ""ApiName"": ""Gender"",
-                                    ""ApiEnumValues"": [
-                                        {
-                                            ""ApiName"": ""Unspecified"",
-                                            ""ClrName"": ""Unspecified"",
-                                            ""ClrOrdinal"": 0
-                                        },
-                                        {
-                                            ""ApiName"": ""Male"",
-                                            ""ClrName"": ""Male"",
-                                            ""ClrOrdinal"": 1
-                                        },
-                                        {
-                                            ""ApiName"": ""Female"",
-                                            ""ClrName"": ""Female"",
-                                            ""ClrOrdinal"": 2
-                                        }
-                                    ],
-                                    ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BGender, Evoogle.ApiFramework.Core.Tests""
+                                    ""ApiName"": ""Gender""
                                 },
                                 ""ApiTypeModifiers"": ""None"",
                                 ""ClrName"": ""Gender""
+                            },
+                            {
+                                ""ApiName"": ""Hobbies"",
+                                ""ApiType"": {
+                                    ""ApiInlineType"": {
+                                        ""Kind"": ""Collection"",
+                                        ""ApiItemType"": {
+                                            ""Kind"": ""Scalar"",
+                                            ""ApiName"": ""String""
+                                        },
+                                        ""ApiItemTypeModifiers"": ""Required"",
+                                        ""ClrType"": ""System.Collections.Generic.List\u00601[[System.String,System.Private.CoreLib]], System.Private.CoreLib""
+                                    }
+                                },
+                                ""ApiTypeModifiers"": ""None"",
+                                ""ClrName"": ""Hobbies""
                             }
                         ],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BPerson, Evoogle.ApiFramework.Core.Tests""
@@ -1235,6 +1423,162 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             }",
             AddTestExtension1 = true,
             AddTestExtension2 = true
+        },
+
+        // ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 2 ApiObjectTypes (Person and Company)
+        new JsonSerializeTest<ApiSchema>
+        {
+            Name = "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 2 ApiObjectTypes (Person and Company)",
+            Source = new ApiSchema
+            (
+                "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 2 ApiObjectTypes (Person and Company)",
+                [
+                    TestApiScalarTypeBoolean,
+                    TestApiScalarTypeInt32,
+                    TestApiScalarTypeString,
+                    TestApiEnumTypeGender,
+                    TestApiObjectTypePerson,
+                    TestApiObjectTypeCompany
+                ]
+            ),
+            Expected = @"
+            {
+                ""Name"": ""ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 2 ApiObjectTypes (Person and Company)"",
+                ""ApiScalarTypes"": [
+                    {
+                        ""Kind"": ""Scalar"",
+                        ""ApiName"": ""Boolean"",
+                        ""ClrType"": ""System.Boolean, System.Private.CoreLib""
+                    },
+                    {
+                        ""Kind"": ""Scalar"",
+                        ""ApiName"": ""Int32"",
+                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                    },
+                    {
+                        ""Kind"": ""Scalar"",
+                        ""ApiName"": ""String"",
+                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                    }
+                ],
+                ""ApiEnumTypes"": [
+                    {
+                        ""Kind"": ""Enum"",
+                        ""ApiName"": ""Gender"",
+                        ""ApiEnumValues"": [
+                            {
+                                ""ApiName"": ""Unspecified"",
+                                ""ClrName"": ""Unspecified"",
+                                ""ClrOrdinal"": 0
+                            },
+                            {
+                                ""ApiName"": ""Male"",
+                                ""ClrName"": ""Male"",
+                                ""ClrOrdinal"": 1
+                            },
+                            {
+                                ""ApiName"": ""Female"",
+                                ""ClrName"": ""Female"",
+                                ""ClrOrdinal"": 2
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BGender, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ],
+                ""ApiObjectTypes"": [
+                    {
+                        ""Kind"": ""Object"",
+                        ""ApiName"": ""Company"",
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""Name"",
+                                ""ApiType"": {
+                                    ""Kind"": ""Scalar"",
+                                    ""ApiName"": ""String""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Name""
+                            },
+                            {
+                                ""ApiName"": ""Owner"",
+                                ""ApiType"": {
+                                    ""Kind"": ""Object"",
+                                    ""ApiName"": ""Person""
+                                },
+                                ""ApiTypeModifiers"": ""None"",
+                                ""ClrName"": ""Owner""
+                            },
+                            {
+                                ""ApiName"": ""Employees"",
+                                ""ApiType"": {
+                                    ""ApiInlineType"": {
+                                        ""Kind"": ""Collection"",
+                                        ""ApiItemType"": {
+                                            ""Kind"": ""Object"",
+                                            ""ApiName"": ""Person""
+                                        },
+                                        ""ApiItemTypeModifiers"": ""Required"",
+                                        ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BPerson, Evoogle.ApiFramework.Core.Tests]], System.Private.CoreLib""
+                                    }
+                                },
+                                ""ApiTypeModifiers"": ""None"",
+                                ""ClrName"": ""Employees""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BCompany, Evoogle.ApiFramework.Core.Tests""
+                    },
+                    {
+                        ""Kind"": ""Object"",
+                        ""ApiName"": ""Person"",
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""Name"",
+                                ""ApiType"": {
+                                    ""Kind"": ""Scalar"",
+                                    ""ApiName"": ""String""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Name""
+                            },
+                            {
+                                ""ApiName"": ""Age"",
+                                ""ApiType"": {
+                                    ""Kind"": ""Scalar"",
+                                    ""ApiName"": ""Int32""
+                                },
+                                ""ApiTypeModifiers"": ""None"",
+                                ""ClrName"": ""Age""
+                            },
+                            {
+                                ""ApiName"": ""Gender"",
+                                ""ApiType"": {
+                                    ""Kind"": ""Enum"",
+                                    ""ApiName"": ""Gender""
+                                },
+                                ""ApiTypeModifiers"": ""None"",
+                                ""ClrName"": ""Gender""
+                            },
+                            {
+                                ""ApiName"": ""Hobbies"",
+                                ""ApiType"": {
+                                    ""ApiInlineType"": {
+                                        ""Kind"": ""Collection"",
+                                        ""ApiItemType"": {
+                                            ""Kind"": ""Scalar"",
+                                            ""ApiName"": ""String""
+                                        },
+                                        ""ApiItemTypeModifiers"": ""Required"",
+                                        ""ClrType"": ""System.Collections.Generic.List\u00601[[System.String,System.Private.CoreLib]], System.Private.CoreLib""
+                                    }
+                                },
+                                ""ApiTypeModifiers"": ""None"",
+                                ""ClrName"": ""Hobbies""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BPerson, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ]
+            }"
         },
     ];
 

@@ -3,6 +3,10 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.ComponentModel.DataAnnotations;
+
+using Evoogle.ApiFramework.Exceptions;
+
 namespace Evoogle.ApiFramework.Schema;
 
 /// <summary>
@@ -11,11 +15,11 @@ namespace Evoogle.ApiFramework.Schema;
 /// <remarks>
 ///     Initializes a new instance of the <see cref="ApiCollectionType"/> class.
 /// </remarks>
-/// <param name="apiItemType">The API type of the items in the collection.</param>
+/// <param name="apiItemTypeExpression">The API type expression of the items in the collection.</param>
 /// <param name="apiItemTypeModifiers">Modifiers applied to the item type (e.g., Required).</param>
 /// <param name="clrCollectionType">The CLR type representing the collection type (e.g., List&lt;T&gt;).</param>
-/// <exception cref="ArgumentNullException">Thrown if <paramref name="apiItemType"/> is null.</exception>
-public sealed class ApiCollectionType(ApiType apiItemType, ApiTypeModifiers apiItemTypeModifiers, Type clrCollectionType) : ApiType(clrCollectionType)
+/// <exception cref="ArgumentNullException">Thrown if <paramref name="apiItemTypeExpression"/> is null.</exception>
+public sealed class ApiCollectionType(ApiTypeExpression apiItemTypeExpression, ApiTypeModifiers apiItemTypeModifiers, Type clrCollectionType) : ApiType(clrCollectionType)
 {
     #region ApiType Properties
     /// <inheritdoc/>
@@ -23,22 +27,38 @@ public sealed class ApiCollectionType(ApiType apiItemType, ApiTypeModifiers apiI
     #endregion
 
     #region ApiObject Properties
-    /// <summary>Gets the API type of the items contained within the collection.</summary>
-    public ApiType ApiItemType { get; } = apiItemType ?? throw new ArgumentNullException(nameof(apiItemType));
+    /// <summary>
+    ///     Gets the API type expression to the API item type of this collection.
+    ///     May point to a named type or inline type (e.g., collection).
+    /// </summary>
+    public ApiTypeExpression ApiItemTypeExpression { get; } = apiItemTypeExpression ?? throw new ArgumentNullException(nameof(apiItemTypeExpression));
 
     /// <summary>Gets the modifiers applied to the item type within the collection (e.g., Required).</summary>
     public ApiTypeModifiers ApiItemTypeModifiers { get; } = apiItemTypeModifiers;
+
+    /// <summary>
+    ///     Gets the resolved API item type (named or inline) associated with this collection.
+    /// </summary>
+    public ApiType ApiItemType => ApiItemTypeExpression.ApiResolvedType ?? throw new ApiSchemaException($"{nameof(ApiItemTypeExpression)} has not been resolved yet.");
+    #endregion
+
+    #region ApiCollectionType Methods
+    /// <summary>
+    ///     Resolves the API named type (or inline type) from the provided schema.
+    /// </summary>
+    /// <param name="apiSchema">The API schema to resolve the type from.</param>
+    public void Resolve(ApiSchema apiSchema, ref List<ValidationResult>? results) => ApiItemTypeExpression.Resolve(apiSchema, ref results);
     #endregion
 
     #region Object Methods
     /// <inheritdoc/>
     public override string ToString()
     {
-        var apiItemType = this.ApiItemType.SafeToString();
+        var apiItemTypeExpression = this.ApiItemTypeExpression.SafeToString();
         var apiItemTypeModifiers = this.ApiItemTypeModifiers.SafeToString();
         var clrType = this.ClrType.SafeToString();
 
-        return $"{nameof(ApiCollectionType)} {{{nameof(ApiItemType)}={apiItemType}, {nameof(ApiItemTypeModifiers)}={apiItemTypeModifiers}}} [{clrType}]";
+        return $"{nameof(ApiCollectionType)} {{{nameof(ApiItemTypeExpression)}={apiItemTypeExpression}, {nameof(ApiItemTypeModifiers)}={apiItemTypeModifiers}}} [{clrType}]";
     }
     #endregion
 }
