@@ -184,18 +184,30 @@ internal static class ApiJsonConverterHelpers
         results.Add(new ValidationResult(message, [memberName]));
     }
 
-    public static void AddEmptyRequiredCollectionPropertyError(ref List<ValidationResult>? results, string propertyName)
+    public static void AddEmptyCollectionPropertyError(ref List<ValidationResult>? results, string propertyName)
     {
-        AddValidationError(ref results, $"Empty required collection property: {propertyName}", propertyName);
+        AddValidationError(ref results, $"Empty collection property: {propertyName}.", propertyName);
     }
 
-    public static void AddMissingRequiredPropertyError(ref List<ValidationResult>? results, string propertyName)
+    public static void AddInvalidPropertyError(ref List<ValidationResult>? results, string propertyName, string reason)
     {
-        AddValidationError(ref results, $"Missing required property: {propertyName}", propertyName);
+        AddValidationError(ref results, $"Invalid property: {propertyName}. Reason: {reason}", propertyName);
     }
 
-    public static void ThrowIfInvalid<T, TReadContext>(in TReadContext context, string typeName, IEnumerable<ValidationResult>? validationResults)
+    public static void AddMissingPropertyError(ref List<ValidationResult>? results, string propertyName)
+    {
+        AddValidationError(ref results, $"Missing property: {propertyName}.", propertyName);
+    }
+
+    public static void ThrowIfInvalid<T, TReadContext, TException>
+    (
+        in TReadContext context,
+        string typeName,
+        IEnumerable<ValidationResult>? validationResults,
+        Func<string, TException> exceptionFactory
+    )
         where TReadContext : IHasLogger<T>
+        where TException : Exception
     {
         if (validationResults == null)
             return;
@@ -210,7 +222,7 @@ internal static class ApiJsonConverterHelpers
 
         context.Logger.LogError("Validation failed for '{TypeName}': {Message}", typeName, validationErrorMessage);
 
-        throw new JsonException(validationErrorMessage);
+        throw exceptionFactory(validationErrorMessage);
     }
     #endregion
 }

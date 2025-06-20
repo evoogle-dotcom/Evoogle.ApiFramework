@@ -34,7 +34,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
     {
         if (apiItemTypeExpression == null)
         {
-            AddMissingRequiredPropertyError(ref results, apiItemTypeExpressionPropertyName);
+            AddMissingPropertyError(ref results, apiItemTypeExpressionPropertyName);
         }
         else
         {
@@ -43,7 +43,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
 
         if (apiItemTypeModifiers == null)
         {
-            AddMissingRequiredPropertyError(ref results, apiItemTypeModifiersPropertyName);
+            AddMissingPropertyError(ref results, apiItemTypeModifiersPropertyName);
         }
     }
     #endregion
@@ -68,13 +68,13 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
     {
         if (apiEnumValues == null)
         {
-            AddMissingRequiredPropertyError(ref results, apiEnumValuesPropertyName);
+            AddMissingPropertyError(ref results, apiEnumValuesPropertyName);
         }
         else
         {
             if (apiEnumValues.Any() == false)
             {
-                AddEmptyRequiredCollectionPropertyError(ref results, apiEnumValuesPropertyName);
+                AddEmptyCollectionPropertyError(ref results, apiEnumValuesPropertyName);
             }
             else
             {
@@ -102,17 +102,17 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
     {
         if (apiName == null)
         {
-            AddMissingRequiredPropertyError(ref results, apiNamePropertyName);
+            AddMissingPropertyError(ref results, apiNamePropertyName);
         }
 
         if (clrName == null)
         {
-            AddMissingRequiredPropertyError(ref results, clrNamePropertyName);
+            AddMissingPropertyError(ref results, clrNamePropertyName);
         }
 
         if (clrOrdinal == null)
         {
-            AddMissingRequiredPropertyError(ref results, clrOrdinalPropertyName);
+            AddMissingPropertyError(ref results, clrOrdinalPropertyName);
         }
     }
     #endregion
@@ -135,7 +135,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
     {
         if (apiName == null)
         {
-            AddMissingRequiredPropertyError(ref results, apiNamePropertyName);
+            AddMissingPropertyError(ref results, apiNamePropertyName);
         }
     }
     #endregion
@@ -160,13 +160,13 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
     {
         if (apiProperties == null)
         {
-            AddMissingRequiredPropertyError(ref results, apiPropertiesPropertyName);
+            AddMissingPropertyError(ref results, apiPropertiesPropertyName);
         }
         else
         {
             if (apiProperties.Any() == false)
             {
-                AddEmptyRequiredCollectionPropertyError(ref results, apiPropertiesPropertyName);
+                AddEmptyCollectionPropertyError(ref results, apiPropertiesPropertyName);
             }
             else
             {
@@ -198,12 +198,12 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
     {
         if (apiName == null)
         {
-            AddMissingRequiredPropertyError(ref results, apiNamePropertyName);
+            AddMissingPropertyError(ref results, apiNamePropertyName);
         }
 
         if (apiTypeExpression == null)
         {
-            AddMissingRequiredPropertyError(ref results, apiTypeExpressionPropertyName);
+            AddMissingPropertyError(ref results, apiTypeExpressionPropertyName);
         }
         else
         {
@@ -212,12 +212,12 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
 
         if (apiTypeModifiers == null)
         {
-            AddMissingRequiredPropertyError(ref results, apiTypeModifiersPropertyName);
+            AddMissingPropertyError(ref results, apiTypeModifiersPropertyName);
         }
 
         if (clrName == null)
         {
-            AddMissingRequiredPropertyError(ref results, clrNamePropertyName);
+            AddMissingPropertyError(ref results, clrNamePropertyName);
         }
     }
     #endregion
@@ -242,7 +242,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
     {
         if (kind == null)
         {
-            AddMissingRequiredPropertyError(ref results, kindPropertyName);
+            AddMissingPropertyError(ref results, kindPropertyName);
         }
         else if (Enum.TryParse<ApiTypeKind>(kind, out var apiTypeKind) == false)
         {
@@ -251,7 +251,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
 
         if (clrType == null)
         {
-            AddMissingRequiredPropertyError(ref results, clrTypePropertyName);
+            AddMissingPropertyError(ref results, clrTypePropertyName);
         }
     }
     #endregion
@@ -285,7 +285,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
     {
         if (kind == null)
         {
-            AddMissingRequiredPropertyError(ref results, kindPropertyName);
+            AddMissingPropertyError(ref results, kindPropertyName);
         }
         else if (Enum.TryParse<ApiTypeKind>(kind, out var apiTypeKind) == false)
         {
@@ -294,7 +294,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
 
         if (apiName == null)
         {
-            AddMissingRequiredPropertyError(ref results, apiNamePropertyName);
+            AddMissingPropertyError(ref results, apiNamePropertyName);
         }
     }
     #endregion

@@ -89,6 +89,16 @@ public sealed class ApiObjectType : ApiNamedType
     #endregion
 
     #region Validation Methods
+    /// <summary>
+    ///     Validates that the specified key selector produces unique values across all API properties.
+    /// </summary>
+    /// <typeparam name="T">The type of the key selected from each <see cref="ApiProperty"/>.</typeparam>
+    /// <param name="values">The collection of properties to check.</param>
+    /// <param name="keySelector">A function to extract the key to test for uniqueness.</param>
+    /// <param name="propertyName">The name of the property being validated (for error messages).</param>
+    /// <exception cref="ApiSchemaException">
+    ///     Thrown when duplicate key values are found for the specified property.
+    /// </exception>
     private void ValidateUnique<T>(IEnumerable<ApiProperty> values, Func<ApiProperty, T> keySelector, string propertyName)
     {
         var duplicates = values

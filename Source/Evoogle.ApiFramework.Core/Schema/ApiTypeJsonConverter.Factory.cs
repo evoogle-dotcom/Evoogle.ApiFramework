@@ -84,7 +84,13 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
 
     private static ApiCollectionType CreateApiCollectionType(in ReadContext context, ApiTypeKind kind, List<ValidationResult>? validationResults)
     {
-        ThrowIfInvalid<ApiTypeJsonConverter, ReadContext>(context, nameof(ApiCollectionType), validationResults);
+        ThrowIfInvalid<ApiTypeJsonConverter, ReadContext, JsonException>
+        (
+            context,
+            nameof(ApiCollectionType),
+            validationResults,
+            message => new JsonException(message)
+        );
 
         var logger = context.Logger;
         var apiItemTypeExpression = CreateApiTypeExpression(logger, context.ReadData.ApiCollectionType!.ApiItemTypeExpression!);
@@ -96,7 +102,13 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
 
     private static ApiEnumType CreateApiEnumType(in ReadContext context, ApiTypeKind kind, List<ValidationResult>? validationResults)
     {
-        ThrowIfInvalid<ApiTypeJsonConverter, ReadContext>(context, nameof(ApiEnumType), validationResults);
+        ThrowIfInvalid<ApiTypeJsonConverter, ReadContext, JsonException>
+        (
+            context,
+            nameof(ApiEnumType),
+            validationResults,
+            message => new JsonException(message)
+        );
 
         var apiName = context.ReadData.ApiNamedType!.ApiName!;
         var apiEnumValues = CreateApiEnumValues(context);
@@ -123,7 +135,13 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
 
     private static ApiObjectType CreateApiObjectType(in ReadContext context, ApiTypeKind kind, List<ValidationResult>? validationResults)
     {
-        ThrowIfInvalid<ApiTypeJsonConverter, ReadContext>(context, nameof(ApiObjectType), validationResults);
+        ThrowIfInvalid<ApiTypeJsonConverter, ReadContext, JsonException>
+        (
+            context,
+            nameof(ApiObjectType),
+            validationResults,
+            message => new JsonException(message)
+        );
 
         var logger = context.Logger;
         var apiName = context.ReadData.ApiNamedType!.ApiName!;
@@ -145,7 +163,13 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
 
     private static ApiScalarType CreateApiScalarType(in ReadContext context, ApiTypeKind kind, List<ValidationResult>? validationResults)
     {
-        ThrowIfInvalid<ApiTypeJsonConverter, ReadContext>(context, nameof(ApiScalarType), validationResults);
+        ThrowIfInvalid<ApiTypeJsonConverter, ReadContext, JsonException>
+        (
+            context,
+            nameof(ApiScalarType),
+            validationResults,
+            message => new JsonException(message)
+        );
 
         var apiName = context.ReadData.ApiNamedType!.ApiName!;
         var clrType = context.ReadData.ApiType!.ClrType!;

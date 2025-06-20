@@ -8,6 +8,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
+using Evoogle.ApiFramework.Exceptions;
 using Evoogle.Extension;
 using Evoogle.Json;
 using Evoogle.Logging;
@@ -25,6 +26,7 @@ namespace Evoogle.ApiFramework.Schema;
 public class ApiSchemaJsonConverter : JsonConverter<ApiSchema>
 {
     #region Context Types
+    // Note: This class is not thread-safe and is intended for per-call use.
     private abstract class Context(ILogger<ApiSchemaJsonConverter> logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames) : IHasLogger<ApiSchemaJsonConverter>
     {
         #region Immutable Properties
@@ -59,6 +61,7 @@ public class ApiSchemaJsonConverter : JsonConverter<ApiSchema>
     {
         #region Immutable Properties
         public required string Name { get; init; }
+        public required string Version { get; init; }
         public required string ApiScalarTypes { get; init; }
         public required string ApiEnumTypes { get; init; }
         public required string ApiObjectTypes { get; init; }
@@ -79,6 +82,7 @@ public class ApiSchemaJsonConverter : JsonConverter<ApiSchema>
     {
         #region Properties
         public string? Name { get; set; }
+        public string? Version { get; set; }
         public List<ApiScalarType>? ApiScalarTypes { get; set; }
         public List<ApiEnumType>? ApiEnumTypes { get; set; }
         public List<ApiObjectType>? ApiObjectTypes { get; set; }
@@ -107,6 +111,7 @@ public class ApiSchemaJsonConverter : JsonConverter<ApiSchema>
         {
             // ApiSchema Property Handlers
             { propertyNames.ApiSchema.Name, HandleApiSchemaName },
+            { propertyNames.ApiSchema.Version, HandleApiSchemaVersion },
             { propertyNames.ApiSchema.ApiScalarTypes, HandleApiSchemaApiScalarTypes },
             { propertyNames.ApiSchema.ApiEnumTypes, HandleApiSchemaApiEnumTypes },
             { propertyNames.ApiSchema.ApiObjectTypes, HandleApiObjectTypes },
@@ -122,6 +127,13 @@ public class ApiSchemaJsonConverter : JsonConverter<ApiSchema>
             context.ReadData.ApiSchema ??= new ApiSchemaReadData();
 
             context.ReadData.ApiSchema.Name = reader.GetString();
+        }
+
+        private static void HandleApiSchemaVersion(ref Utf8JsonReader reader, ref ReadContext context)
+        {
+            context.ReadData.ApiSchema ??= new ApiSchemaReadData();
+
+            context.ReadData.ApiSchema.Version = reader.GetString();
         }
 
         private static void HandleApiSchemaApiScalarTypes(ref Utf8JsonReader reader, ref ReadContext context)
@@ -256,6 +268,7 @@ public class ApiSchemaJsonConverter : JsonConverter<ApiSchema>
             ApiSchema = new ApiSchemaPropertyNames
             {
                 Name = policy.ConvertName(nameof(ApiSchema.Name)),
+                Version = policy.ConvertName(nameof(ApiSchema.Version)),
                 ApiScalarTypes = policy.ConvertName(nameof(ApiSchema.ApiScalarTypes)),
                 ApiEnumTypes = policy.ConvertName(nameof(ApiSchema.ApiEnumTypes)),
                 ApiObjectTypes = policy.ConvertName(nameof(ApiSchema.ApiObjectTypes))
@@ -276,23 +289,44 @@ public class ApiSchemaJsonConverter : JsonConverter<ApiSchema>
     #region Factory Implementation Methods
     private static ApiSchema CreateApiSchema(in ReadContext context)
     {
-        // Validate all required properties are non-null.
+        // Validate the JSON that was read during deserialization.
         var validationResults = default(List<ValidationResult>);
         ValidateApiSchemaProperties(context, ref validationResults);
 
+        // Throw if any JSON validation errors were found.
+        // This ensures the JSON structure is valid before proceeding with ApiSchema creation.
+        ThrowIfInvalid<ApiSchemaJsonConverter, ReadContext, JsonException>
+        (
+            context,
+            nameof(ApiSchema),
+            validationResults,
+            message => new JsonException(message)
+        );
+
         // Create the ApiSchema instance using the read data.
         var name = context.ReadData.ApiSchema!.Name!;
-        var apiScalarTypes = context.ReadData.ApiSchema.ApiScalarTypes.SafeCast<ApiScalarType>();
-        var apiEnumTypes = context.ReadData.ApiSchema.ApiEnumTypes.SafeCast<ApiEnumType>();
-        var apiObjectTypes = context.ReadData.ApiSchema.ApiObjectTypes.SafeCast<ApiObjectType>();
+        var version = context.ReadData.ApiSchema!.Version;
+        var apiScalarTypes = context.ReadData.ApiSchema!.ApiScalarTypes;
+        var apiEnumTypes = context.ReadData.ApiSchema!.ApiEnumTypes;
+        var apiObjectTypes = context.ReadData.ApiSchema!.ApiObjectTypes;
 
-        var apiSchema = new ApiSchema(name, apiScalarTypes, apiEnumTypes, apiObjectTypes);
+        var apiSchema = new ApiSchema(name, apiScalarTypes, apiEnumTypes, apiObjectTypes)
+        {
+            Version = version
+        };
 
         // Resolve all ApiTypeExpression instances (named or inline)
         apiSchema.ResolveAllReferences(ref validationResults);
 
-        // Throw if any ApiSchema validation errors were found.
-        ThrowIfInvalid<ApiSchemaJsonConverter, ReadContext>(context, nameof(ApiSchema), validationResults);
+        // Throw if any ApiTypeExpression validation errors were found during resolution.
+        // This ensures all ApiTypeExpressions are valid before finalizing the ApiSchema.
+        ThrowIfInvalid<ApiSchemaJsonConverter, ReadContext, ApiSchemaException>
+        (
+            context,
+            nameof(ApiSchema),
+            validationResults,
+            message => new ApiSchemaException(message)
+        );
 
         // Attach the extensions if present.
         var extensions = context.ReadData.ExtensibleBase?.Extensions;
@@ -311,29 +345,26 @@ public class ApiSchemaJsonConverter : JsonConverter<ApiSchema>
         in WriteContext context
     )
     {
-        WriteApiSchemaApiScalarTypes(writer, apiSchema, context);
-        WriteApiSchemaApiEnumTypes(writer, apiSchema, context);
-        WriteApiSchemaApiObjectTypes(writer, apiSchema, context);
+        WriteApiSchemaApiTypes(writer, context.PropertyNames.ApiSchema.ApiScalarTypes, apiSchema.ApiScalarTypes, context.Options);
+        WriteApiSchemaApiTypes(writer, context.PropertyNames.ApiSchema.ApiEnumTypes, apiSchema.ApiEnumTypes, context.Options);
+        WriteApiSchemaApiTypes(writer, context.PropertyNames.ApiSchema.ApiObjectTypes, apiSchema.ApiObjectTypes, context.Options);
     }
 
-    private static void WriteApiSchemaApiEnumTypes
+    private static void WriteApiSchemaApiTypes
     (
         Utf8JsonWriter writer,
-        ApiSchema apiSchema,
-        in WriteContext context
+        string propertyName,
+        IEnumerable<ApiType> apiTypes,
+        JsonSerializerOptions options
     )
     {
-        var propertyName = context.PropertyNames.ApiSchema.ApiEnumTypes;
-        var values = apiSchema.ApiEnumTypes;
-        var options = context.Options;
-
         writer.WritePropertyName(propertyName);
 
         writer.WriteStartArray();
 
-        foreach (var value in values)
+        foreach (var apiType in apiTypes)
         {
-            JsonSerializer.Serialize<ApiType>(writer, value, options);
+            JsonSerializer.Serialize(writer, apiType, options);
         }
 
         writer.WriteEndArray();
@@ -349,52 +380,6 @@ public class ApiSchemaJsonConverter : JsonConverter<ApiSchema>
         WriteExtensibleBaseExtensions(writer, apiSchema, context);
 
         writer.WriteEndObject();
-    }
-
-    private static void WriteApiSchemaApiObjectTypes
-    (
-        Utf8JsonWriter writer,
-        ApiSchema apiSchema,
-        in WriteContext context
-    )
-    {
-        var propertyName = context.PropertyNames.ApiSchema.ApiObjectTypes;
-        var values = apiSchema.ApiObjectTypes;
-        var options = context.Options;
-
-        writer.WritePropertyName(propertyName);
-
-        writer.WriteStartArray();
-
-        foreach (var value in values)
-        {
-            JsonSerializer.Serialize<ApiType>(writer, value, options);
-        }
-
-        writer.WriteEndArray();
-    }
-
-    private static void WriteApiSchemaApiScalarTypes
-    (
-        Utf8JsonWriter writer,
-        ApiSchema apiSchema,
-        in WriteContext context
-    )
-    {
-        var propertyName = context.PropertyNames.ApiSchema.ApiScalarTypes;
-        var values = apiSchema.ApiScalarTypes;
-        var options = context.Options;
-
-        writer.WritePropertyName(propertyName);
-
-        writer.WriteStartArray();
-
-        foreach (var value in values)
-        {
-            JsonSerializer.Serialize<ApiType>(writer, value, options);
-        }
-
-        writer.WriteEndArray();
     }
 
     private static void WriteApiSchemaName
@@ -421,6 +406,21 @@ public class ApiSchemaJsonConverter : JsonConverter<ApiSchema>
         writer.WriteStartObject();
 
         WriteApiSchemaName(writer, apiSchema, context);
+        WriteApiSchemaVersion(writer, apiSchema, context);
+    }
+
+    private static void WriteApiSchemaVersion
+    (
+        Utf8JsonWriter writer,
+        ApiSchema apiSchema,
+        in WriteContext context
+    )
+    {
+        var propertyName = context.PropertyNames.ApiSchema.Version;
+        var value = apiSchema.Version;
+        var options = context.Options;
+
+        writer.WritePropertyString(propertyName, value, options);
     }
 
     // ExtensibleBase Methods
@@ -448,9 +448,6 @@ public class ApiSchemaJsonConverter : JsonConverter<ApiSchema>
         ValidateApiSchemaProperties
         (
             context.PropertyNames.ApiSchema.Name, context.ReadData.ApiSchema?.Name,
-            context.PropertyNames.ApiSchema.ApiScalarTypes, context.ReadData.ApiSchema?.ApiScalarTypes,
-            context.PropertyNames.ApiSchema.ApiEnumTypes, context.ReadData.ApiSchema?.ApiEnumTypes,
-            context.PropertyNames.ApiSchema.ApiObjectTypes, context.ReadData.ApiSchema?.ApiObjectTypes,
             ref results
         );
     }
@@ -458,15 +455,16 @@ public class ApiSchemaJsonConverter : JsonConverter<ApiSchema>
     private static void ValidateApiSchemaProperties
     (
         string namePropertyName, string? name,
-        string apiScalarTypesPropertyName, IEnumerable<ApiScalarType>? apiScalarTypes,
-        string apiEnumTypesPropertyName, IEnumerable<ApiEnumType>? apiEnumTypes,
-        string apiObjectTypesPropertyName, IEnumerable<ApiObjectType>? apiObjectTypes,
         ref List<ValidationResult>? results
     )
     {
         if (name == null)
         {
-            AddMissingRequiredPropertyError(ref results, namePropertyName);
+            AddMissingPropertyError(ref results, namePropertyName);
+        }
+        else if (string.IsNullOrWhiteSpace(name))
+        {
+            AddInvalidPropertyError(ref results, namePropertyName, $"{namePropertyName} cannot be empty or whitespace.");
         }
     }
     #endregion

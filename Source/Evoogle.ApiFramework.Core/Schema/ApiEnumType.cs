@@ -88,7 +88,30 @@ public sealed class ApiEnumType : ApiNamedType
     /// <returns>True if the value is found; otherwise, false.</returns>
     public bool TryGetByClrOrdinal(int clrOrdinal, out ApiEnumValue? value)
         => _clrOrdinalLookup.TryGetValue(clrOrdinal, out value);
+    #endregion
 
+    #region Object Methods
+    /// <inheritdoc/>
+    public override string ToString()
+    {
+        var apiName = this.ApiName.SafeToString();
+        var clrType = this.ClrType.SafeToString();
+
+        return $"{nameof(ApiEnumType)} {{{nameof(ApiName)}={apiName}}} [{clrType}]";
+    }
+    #endregion
+
+    #region Validation Methods
+    /// <summary>
+    ///     Validates that the specified key selector produces unique values across all enum values.
+    /// </summary>
+    /// <typeparam name="T">The type of the key selected from each <see cref="ApiEnumValue"/>.</typeparam>
+    /// <param name="values">The collection of enum values to check.</param>
+    /// <param name="keySelector">A function to extract the key to test for uniqueness.</param>
+    /// <param name="propertyName">The name of the property being validated (for error messages).</param>
+    /// <exception cref="ApiSchemaException">
+    ///     Thrown when duplicate key values are found for the specified property.
+    /// </exception>
     private void ValidateUnique<T>(IEnumerable<ApiEnumValue> values, Func<ApiEnumValue, T> keySelector, string propertyName)
     {
         var duplicates = values
@@ -103,17 +126,6 @@ public sealed class ApiEnumType : ApiNamedType
         var duplicatesString = string.Join(",", duplicates);
         var message = $"Unable to create {this} because duplicate {propertyName} values detected: {duplicatesString}";
         throw new ApiSchemaException(message);
-    }
-    #endregion
-
-    #region Object Methods
-    /// <inheritdoc/>
-    public override string ToString()
-    {
-        var apiName = this.ApiName.SafeToString();
-        var clrType = this.ClrType.SafeToString();
-
-        return $"{nameof(ApiEnumType)} {{{nameof(ApiName)}={apiName}}} [{clrType}]";
     }
     #endregion
 }
