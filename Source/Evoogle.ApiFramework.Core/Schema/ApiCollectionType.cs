@@ -6,6 +6,7 @@
 using System.ComponentModel.DataAnnotations;
 
 using Evoogle.ApiFramework.Exceptions;
+using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema;
 

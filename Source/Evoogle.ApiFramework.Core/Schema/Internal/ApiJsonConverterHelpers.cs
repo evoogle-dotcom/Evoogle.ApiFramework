@@ -11,6 +11,7 @@ using Evoogle.Extension;
 using Evoogle.Logging;
 
 using Microsoft.Extensions.Logging;
+using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema.Internal;
 

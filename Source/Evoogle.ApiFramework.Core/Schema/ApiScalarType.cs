@@ -3,6 +3,8 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.Extensions;
+
 namespace Evoogle.ApiFramework.Schema;
 
 /// <summary>
@@ -17,7 +19,7 @@ namespace Evoogle.ApiFramework.Schema;
 public sealed class ApiScalarType(string apiName, Type clrScalarType) : ApiNamedType(apiName, clrScalarType)
 {
     #region ApiType Properties
-    /// <inheritdoc/>    
+    /// <inheritdoc/>
     public override ApiTypeKind Kind => ApiTypeKind.Scalar;
     #endregion
 
