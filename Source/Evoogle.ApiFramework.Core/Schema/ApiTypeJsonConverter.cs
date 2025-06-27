@@ -22,7 +22,11 @@ namespace Evoogle.ApiFramework.Schema;
 ///     A JSON converter for <see cref="ApiType"/> that handles serialization and deserialization logic.
 ///     This converter supports reading and writing various derived types of <see cref="ApiType"/> including scalar, enum, object, and collection types, as well as handling custom property naming policies and extensions.
 /// </summary>
-public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
+/// <remarks>
+///     Optional constructor with logger for use in DI contexts.
+/// </remarks>
+/// <param name="logger">The optional logger instance.</param>
+public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger) : JsonConverter<ApiType>
 {
     #region Context Types
     private abstract class Context(ILogger<ApiTypeJsonConverter> logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames) : IHasLogger<ApiTypeJsonConverter>
@@ -136,7 +140,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
     #endregion
 
     #region Fields
-    private readonly ILogger<ApiTypeJsonConverter> _logger;
+    private readonly ILogger<ApiTypeJsonConverter> _logger = new MultiplexingLogger<ApiTypeJsonConverter>(logger, MultiplexingLoggerMode.All);
 
     private static readonly EnumJsonConverter<ApiTypeKind> ApiTypeKindJsonConverter = new();
     private static readonly EnumJsonConverter<ApiTypeModifiers> ApiTypeModifiersJsonConverter = new();
@@ -157,15 +161,6 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
     public ApiTypeJsonConverter()
         : this(null)
     {
-    }
-
-    /// <summary>
-    ///     Optional constructor with logger for use in DI contexts.
-    /// </summary>
-    /// <param name="logger">The optional logger instance.</param>
-    public ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
-    {
-        _logger = new MultiplexingLogger<ApiTypeJsonConverter>(logger, MultiplexingLoggerMode.All);
     }
     #endregion
 

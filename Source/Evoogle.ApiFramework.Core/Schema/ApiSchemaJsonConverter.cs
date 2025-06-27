@@ -23,7 +23,11 @@ namespace Evoogle.ApiFramework.Schema;
 ///     JSON converter for <see cref="ApiSchema"/> which reads and writes schema objects.
 ///     Follows the same patterns used by <see cref="ApiTypeJsonConverter"/>.
 /// </summary>
-public class ApiSchemaJsonConverter : JsonConverter<ApiSchema>
+/// <remarks>
+///     Optional constructor with logger for use in DI contexts.
+/// </remarks>
+/// <param name="logger">The optional logger instance.</param>
+public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : JsonConverter<ApiSchema>
 {
     #region Context Types
     // Note: This class is not thread-safe and is intended for per-call use.
@@ -181,7 +185,7 @@ public class ApiSchemaJsonConverter : JsonConverter<ApiSchema>
     #endregion
 
     #region Fields
-    private readonly ILogger<ApiSchemaJsonConverter> _logger;
+    private readonly ILogger<ApiSchemaJsonConverter> _logger = new MultiplexingLogger<ApiSchemaJsonConverter>(logger, MultiplexingLoggerMode.All);
 
     // Cache resolved property names per naming policy for performance and consistency
     private static readonly ConcurrentDictionary<JsonNamingPolicy, PropertyNames> PropertyNamesCache = new();
@@ -197,15 +201,6 @@ public class ApiSchemaJsonConverter : JsonConverter<ApiSchema>
     public ApiSchemaJsonConverter()
         : this(null)
     {
-    }
-
-    /// <summary>
-    ///     Optional constructor with logger for use in DI contexts.
-    /// </summary>
-    /// <param name="logger">The optional logger instance.</param>
-    public ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger)
-    {
-        _logger = new MultiplexingLogger<ApiSchemaJsonConverter>(logger, MultiplexingLoggerMode.All);
     }
     #endregion
 
