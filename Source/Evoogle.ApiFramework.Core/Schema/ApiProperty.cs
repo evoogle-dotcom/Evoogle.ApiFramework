@@ -45,7 +45,7 @@ public sealed class ApiProperty(string apiName, ApiTypeExpression apiTypeExpress
     /// <summary>
     ///     Gets the resolved API type (named or inline) associated with this property.
     /// </summary>
-    public ApiType ApiType => ApiTypeExpression.ApiResolvedType ?? throw new ApiSchemaException($"{nameof(ApiTypeExpression)} has not been resolved yet.");
+    public ApiType ApiType => this.ApiTypeExpression.ApiResolvedType ?? throw new ApiSchemaException($"{nameof(this.ApiTypeExpression)} has not been resolved yet.");
     #endregion
 
     #region ApiProperty Methods
@@ -53,7 +53,7 @@ public sealed class ApiProperty(string apiName, ApiTypeExpression apiTypeExpress
     ///     Resolves the API named type (or inline type) from the provided schema.
     /// </summary>
     /// <param name="apiSchema">The API schema to resolve the type from.</param>
-    public void Resolve(ApiSchema apiSchema, ref List<ValidationResult>? results) => ApiTypeExpression.Resolve(apiSchema, ref results);
+    public void Resolve(ApiSchema apiSchema, ref List<ValidationResult>? results) => this.ApiTypeExpression.Resolve(apiSchema, ref results);
     #endregion
 
     #region Object Methods
@@ -65,7 +65,7 @@ public sealed class ApiProperty(string apiName, ApiTypeExpression apiTypeExpress
         var apiTypeModifiers = this.ApiTypeModifiers.SafeToString();
         var clrName = this.ClrName.SafeToString();
 
-        return $"{nameof(ApiProperty)} {{{nameof(ApiName)}={apiName}, {nameof(ApiTypeExpression)}={apiTypeExpression}, {nameof(ApiTypeModifiers)}={apiTypeModifiers}, {nameof(ClrName)}={clrName}}}";
+        return $"{nameof(ApiProperty)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ApiTypeExpression)}={apiTypeExpression}, {nameof(this.ApiTypeModifiers)}={apiTypeModifiers}, {nameof(this.ClrName)}={clrName}}}";
     }
     #endregion
 }

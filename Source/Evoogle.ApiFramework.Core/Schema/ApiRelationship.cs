@@ -22,7 +22,7 @@ public sealed class ApiRelationship(ApiRelationshipCardinality apiCardinality, A
         var apiCardinality = this.ApiCardinality.SafeToString();
         var apiPropertyName = this.ApiProperty.ApiName.SafeToString();
 
-        return $"{nameof(ApiRelationship)} {{{nameof(ApiCardinality)}={apiCardinality}, {nameof(ApiProperty)}={apiPropertyName}}}";
+        return $"{nameof(ApiRelationship)} {{{nameof(this.ApiCardinality)}={apiCardinality}, {nameof(this.ApiProperty)}={apiPropertyName}}}";
     }
     #endregion
 }

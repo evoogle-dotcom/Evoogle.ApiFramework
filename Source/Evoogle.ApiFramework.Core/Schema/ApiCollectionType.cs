@@ -40,7 +40,7 @@ public sealed class ApiCollectionType(ApiTypeExpression apiItemTypeExpression, A
     /// <summary>
     ///     Gets the resolved API item type (named or inline) associated with this collection.
     /// </summary>
-    public ApiType ApiItemType => ApiItemTypeExpression.ApiResolvedType ?? throw new ApiSchemaException($"{nameof(ApiItemTypeExpression)} has not been resolved yet.");
+    public ApiType ApiItemType => this.ApiItemTypeExpression.ApiResolvedType ?? throw new ApiSchemaException($"{nameof(this.ApiItemTypeExpression)} has not been resolved yet.");
     #endregion
 
     #region ApiCollectionType Methods
@@ -48,7 +48,7 @@ public sealed class ApiCollectionType(ApiTypeExpression apiItemTypeExpression, A
     ///     Resolves the API named type (or inline type) from the provided schema.
     /// </summary>
     /// <param name="apiSchema">The API schema to resolve the type from.</param>
-    public void Resolve(ApiSchema apiSchema, ref List<ValidationResult>? results) => ApiItemTypeExpression.Resolve(apiSchema, ref results);
+    public void Resolve(ApiSchema apiSchema, ref List<ValidationResult>? results) => this.ApiItemTypeExpression.Resolve(apiSchema, ref results);
     #endregion
 
     #region Object Methods
@@ -59,7 +59,7 @@ public sealed class ApiCollectionType(ApiTypeExpression apiItemTypeExpression, A
         var apiItemTypeModifiers = this.ApiItemTypeModifiers.SafeToString();
         var clrType = this.ClrType.SafeToString();
 
-        return $"{nameof(ApiCollectionType)} {{{nameof(ApiItemTypeExpression)}={apiItemTypeExpression}, {nameof(ApiItemTypeModifiers)}={apiItemTypeModifiers}}} [{clrType}]";
+        return $"{nameof(ApiCollectionType)} {{{nameof(this.ApiItemTypeExpression)}={apiItemTypeExpression}, {nameof(this.ApiItemTypeModifiers)}={apiItemTypeModifiers}}} [{clrType}]";
     }
     #endregion
 }

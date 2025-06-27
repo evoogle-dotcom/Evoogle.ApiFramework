@@ -98,7 +98,7 @@ public sealed class ApiEnumType : ApiNamedType
         var apiName = this.ApiName.SafeToString();
         var clrType = this.ClrType.SafeToString();
 
-        return $"{nameof(ApiEnumType)} {{{nameof(ApiName)}={apiName}}} [{clrType}]";
+        return $"{nameof(ApiEnumType)} {{{nameof(this.ApiName)}={apiName}}} [{clrType}]";
     }
     #endregion
 

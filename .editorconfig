@@ -1,59 +1,134 @@
 ﻿# EditorConfig is awesome: https://EditorConfig.org
 
 # top-most EditorConfig file
-root = true
+root = true  # Marks this as the root .editorconfig; stops searching parent dirs
 
 # Exclude generated directories
-[bin/**]
-generated_code = true
+[bin/**]  # Match all files under bin/ folder
+generated_code = true  # Treats matched files as generated code; often skipped by analyzers
 
-[obj/**]
-generated_code = true
+[obj/**]  # Match all files under obj/ folder
+generated_code = true  # Treats matched files as generated code; often skipped by analyzers
 
 [*]
-indent_style = space
-indent_size = 4
-end_of_line = crlf
-charset = utf-8-bom
-trim_trailing_whitespace = true
-insert_final_newline = true
+charset = utf-8-bom  # Use UTF-8 encoding with BOM (Byte Order Mark)
+end_of_line = crlf  # Use CRLF (Windows-style) line endings
+indent_size = 4  # Use 4 spaces per indentation level
+indent_style = space  # Use spaces instead of tabs for indentation
+insert_final_newline = true  # Ensure file ends with a newline
+trim_trailing_whitespace = true  # Remove any whitespace at the end of lines
 
-# JSON files
 [*.json,*.xml]
-indent_style = space
-indent_size = 4
+indent_size = 4  # Use 4 spaces per indentation level
+indent_style = space  # Use spaces instead of tabs for indentation
 
-# C# project/solution files
 [*.csproj,*.sln]
-indent_style = space
-indent_size = 4
+indent_size = 4  # Use 4 spaces per indentation level
+indent_style = space  # Use spaces instead of tabs for indentation
 
-# C# files
 [*.cs]
-charset = utf-8-bom
-indent_style = space
-indent_size = 4
-insert_final_newline = true
-trim_trailing_whitespace = true
-end_of_line = crlf
-dotnet_sort_system_directives_first = true
-dotnet_style_qualification_for_field = false:suggestion
-dotnet_style_qualification_for_property = false:suggestion
-dotnet_style_qualification_for_method = false:suggestion
-dotnet_style_qualification_for_event = false:suggestion
-csharp_new_line_before_open_brace = all
-csharp_indent_case_contents = true
-csharp_indent_switch_labels = true
-csharp_indent_labels = one_less_than_current
-csharp_preserve_single_line_statements = true
-csharp_style_var_for_built_in_types = true:suggestion
-csharp_style_var_when_type_is_apparent = true:suggestion
-csharp_style_var_elsewhere = false:suggestion
-csharp_prefer_braces = true:suggestion
-csharp_prefer_switch_expression = true:suggestion
-csharp_prefer_simple_using_statement = true:suggestion
-csharp_prefer_static_local_function = true:suggestion
-dotnet_diagnostic.IDE0055.severity = warning  # format document
+# File encoding and line formatting
+charset = utf-8-bom  # Use UTF-8 encoding with BOM (Byte Order Mark)
+end_of_line = crlf  # Use Windows-style line endings
+indent_size = 4  # Use 4 spaces per indentation level
+indent_style = space  # Use spaces instead of tabs
+insert_final_newline = true  # Ensure file ends with a newline
+trim_trailing_whitespace = true  # Remove trailing whitespace on save
 
-# File-scoped namespaces (C# 10+)
-csharp_style_namespace_declarations = file_scoped:suggestion
+# Bracing, indentation, and formatting rules
+csharp_indent_case_contents = true  # Indent contents inside switch 'case' blocks
+csharp_indent_labels = one_less_than_current  # Label indentation is one level less than current scope
+csharp_indent_switch_labels = true  # Indent case/default labels inside switch blocks
+csharp_new_line_before_open_brace = all  # Always place braces on a new line for all constructs
+csharp_preserve_single_line_statements = true  # Preserve single-line blocks like 'if (x) return y;'
+csharp_prefer_braces = when_multiline:suggestion  # Prefer braces for multiline statements
+csharp_prefer_simple_using_statement = true:suggestion  # Prefer C# 8+ simple using statements
+csharp_prefer_static_local_function = true:suggestion  # Mark local functions static when possible
+csharp_prefer_switch_expression = true:suggestion  # Prefer using switch expressions
+
+# Expression-bodied members
+csharp_style_expression_bodied_accessors = when_on_single_line:suggestion
+csharp_style_expression_bodied_constructors = when_on_single_line:suggestion
+csharp_style_expression_bodied_indexers = when_on_single_line:suggestion
+csharp_style_expression_bodied_lambdas = true:suggestion
+csharp_style_expression_bodied_local_functions = when_on_single_line:suggestion
+csharp_style_expression_bodied_methods = when_on_single_line:suggestion
+csharp_style_expression_bodied_operators = when_on_single_line:suggestion
+csharp_style_expression_bodied_properties = when_on_single_line:suggestion
+
+# Qualification preferences for clarity/control
+dotnet_style_qualification_for_event = true:suggestion  # Require 'this.' for events
+dotnet_style_qualification_for_field = false:suggestion  # Don't require 'this.' for fields
+dotnet_style_qualification_for_method = true:suggestion  # Require 'this.' for methods
+dotnet_style_qualification_for_property = true:suggestion  # Require 'this.' for properties
+
+# 'var' usage preferences
+csharp_style_var_for_built_in_types = true:suggestion  # Prefer 'var' for built-in types
+csharp_style_var_when_type_is_apparent = true:suggestion  # Prefer 'var' when type is obvious
+csharp_style_var_elsewhere = true:suggestion  # Prefer 'var' even when not obvious
+
+# Pattern matching preferences
+csharp_style_pattern_matching_over_as_with_null_check = true:suggestion  # Prefer 'is' pattern over 'as' and null check
+csharp_style_pattern_matching_over_is_with_cast_check = true:suggestion  # Prefer pattern matching over 'is + cast'
+csharp_style_prefer_pattern_matching = true:suggestion  # Prefer pattern matching when available
+
+# Null-check and conditional logic
+csharp_style_conditional_delegate_call = true:suggestion  # Use ?.Invoke() for delegates
+csharp_style_prefer_coalesce_expression = true:suggestion  # Use null-coalescing operator (??)
+csharp_style_prefer_conditional_expression_over_assignment = true:suggestion  # Use ternary in assignments
+csharp_style_prefer_conditional_expression_over_return = true:suggestion  # Use ternary in return statements
+csharp_style_prefer_null_check_over_type_check = true:suggestion  # Prefer null-check when possible
+
+# Object and collection initializers
+csharp_style_prefer_object_initializer = true:suggestion  # Prefer object initializers
+csharp_style_prefer_collection_initializer = true:suggestion  # Prefer collection initializers
+
+# Discards
+csharp_style_unused_value_assignment_preference = discard_variable:suggestion  # Use '_ = ' when discarding
+csharp_style_unused_value_expression_statement_preference = discard_variable:suggestion  # Use '_ = ' for discard expressions
+
+# Tuples and anonymous types
+csharp_style_prefer_inferred_tuple_names = true:suggestion  # Prefer inferred tuple names
+csharp_style_prefer_inferred_anonymous_type_member_names = true:suggestion  # Prefer inferred anonymous type member names
+
+# Default literal
+csharp_style_prefer_default_literal = true:suggestion  # Prefer 'default' instead of 'default(Type)'
+
+# Index and range operators
+csharp_style_prefer_index_operator = true:suggestion  # Prefer ^1 over array.Length - 1
+csharp_style_prefer_range_operator = true:suggestion  # Prefer x[1..^1] over slicing helpers
+
+# File-local types (C# 11+)
+csharp_style_prefer_file_local_type = true:suggestion  # Prefer file-local types for privacy
+
+# Primary constructors (C# 12+)
+csharp_style_prefer_primary_constructors = true:suggestion  # Prefer primary constructors when available
+
+# Namespaces
+csharp_style_namespace_declarations = file_scoped:suggestion  # Use file-scoped namespaces (C# 10+)
+
+# Formatting diagnostic severity
+dotnet_diagnostic.IDE0055.severity = warning  # Warn when formatting does not match .editorconfig
+
+# System using directive order
+dotnet_sort_system_directives_first = true  # Place 'using System.*' before other using directives
+
+# Naming rule: private fields must start with _ and use camelCase
+dotnet_naming_rule.private_fields_underscore.style = private_field_style
+dotnet_naming_rule.private_fields_underscore.symbols = private_fields
+dotnet_naming_rule.private_fields_underscore.severity = suggestion
+
+dotnet_naming_symbols.private_fields.applicable_kinds = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private
+dotnet_naming_symbols.private_fields.required_modifiers =
+
+dotnet_naming_style.private_field_style.required_prefix = _
+dotnet_naming_style.private_field_style.capitalization = camel_case
+
+# File header template
+file_header_template =
+// Copyright (c) 2024-2025 Evoogle.com
+// SPDX-License-Identifier: MIT
+//
+// This file is licensed under the MIT License.
+// See the LICENSE file in the project root for more information.

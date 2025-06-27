@@ -72,7 +72,7 @@ public sealed class ApiTypeExpression
         {
             var message = $"Cannot resolve API type expression '{this}' because it is missing required properties.";
             results ??= [];
-            results.Add(new ValidationResult(message, [nameof(ApiResolvedType)]));
+            results.Add(new ValidationResult(message, [nameof(this.ApiResolvedType)]));
             return;
         }
 
@@ -106,7 +106,7 @@ public sealed class ApiTypeExpression
             var message = $"Failed to resolve API type '{this.Kind}:{apiName}' from API schema.";
 
             results ??= [];
-            results.Add(new ValidationResult(message, [nameof(ApiResolvedType)]));
+            results.Add(new ValidationResult(message, [nameof(this.ApiResolvedType)]));
         }
     }
     #endregion

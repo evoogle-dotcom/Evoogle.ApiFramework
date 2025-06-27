@@ -30,7 +30,7 @@ public sealed class ApiScalarType(string apiName, Type clrScalarType) : ApiNamed
         var apiName = this.ApiName.SafeToString();
         var clrType = this.ClrType.SafeToString();
 
-        return $"{nameof(ApiScalarType)} {{{nameof(ApiName)}={apiName}}} [{clrType}]";
+        return $"{nameof(ApiScalarType)} {{{nameof(this.ApiName)}={apiName}}} [{clrType}]";
     }
     #endregion
 }

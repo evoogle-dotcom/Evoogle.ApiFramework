@@ -113,13 +113,13 @@ public static class ApiJsonConverterUnitTests
 
         protected override void Act()
         {
-            this.Actual = JsonSerializer.Deserialize<T>(this.Source!, JsonSerializerOptions);
+            this.Actual = JsonSerializer.Deserialize<T>(this.Source!, this.JsonSerializerOptions);
             this.WriteLine($"Actual:   {this.Actual.SafeToString()}");
         }
 
         protected override void Assert()
         {
-            this.Actual.Should().BeEquivalentTo(Expected);
+            this.Actual.Should().BeEquivalentTo(this.Expected);
         }
         #endregion
     }
@@ -166,14 +166,14 @@ public static class ApiJsonConverterUnitTests
 
         protected override void Act()
         {
-            var json = JsonSerializer.Serialize(this.Expected, JsonSerializerOptions);
-            this.Actual = JsonSerializer.Deserialize<T>(json, JsonSerializerOptions);
+            var json = JsonSerializer.Serialize(this.Expected, this.JsonSerializerOptions);
+            this.Actual = JsonSerializer.Deserialize<T>(json, this.JsonSerializerOptions);
             this.WriteLine($"Actual:   {this.Actual.SafeToString()}");
         }
 
         protected override void Assert()
         {
-            this.Actual.Should().BeEquivalentTo(Expected);
+            this.Actual.Should().BeEquivalentTo(this.Expected);
         }
         #endregion
     }
