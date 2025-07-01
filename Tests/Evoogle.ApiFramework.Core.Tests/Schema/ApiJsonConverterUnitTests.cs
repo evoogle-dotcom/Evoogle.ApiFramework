@@ -117,10 +117,7 @@ public static class ApiJsonConverterUnitTests
             this.WriteLine($"Actual:   {this.Actual.SafeToString()}");
         }
 
-        protected override void Assert()
-        {
-            this.Actual.Should().BeEquivalentTo(this.Expected);
-        }
+        protected override void Assert() => this.Actual.Should().BeEquivalentTo(this.Expected);
         #endregion
     }
 
@@ -171,10 +168,7 @@ public static class ApiJsonConverterUnitTests
             this.WriteLine($"Actual:   {this.Actual.SafeToString()}");
         }
 
-        protected override void Assert()
-        {
-            this.Actual.Should().BeEquivalentTo(this.Expected);
-        }
+        protected override void Assert() => this.Actual.Should().BeEquivalentTo(this.Expected);
         #endregion
     }
 

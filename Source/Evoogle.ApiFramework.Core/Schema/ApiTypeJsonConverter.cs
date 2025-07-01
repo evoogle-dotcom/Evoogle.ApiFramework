@@ -271,9 +271,6 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
         });
     }
 
-    private static ReadHandlers GetReadHandlers(JsonNamingPolicy policy, PropertyNames propertyNames)
-    {
-        return ReadHandlersCache.GetOrAdd(policy, policy => new ReadHandlers(propertyNames));
-    }
+    private static ReadHandlers GetReadHandlers(JsonNamingPolicy policy, PropertyNames propertyNames) => ReadHandlersCache.GetOrAdd(policy, policy => new ReadHandlers(propertyNames));
     #endregion
 }

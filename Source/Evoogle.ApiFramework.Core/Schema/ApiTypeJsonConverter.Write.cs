@@ -62,10 +62,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         Utf8JsonWriter writer,
         ApiEnumType apiEnumType,
         in WriteContext context
-    )
-    {
-        WriteApiEnumTypeApiEnumValues(writer, apiEnumType, context);
-    }
+    ) => WriteApiEnumTypeApiEnumValues(writer, apiEnumType, context);
 
     private static void WriteApiEnumTypeApiEnumValues
     (
@@ -153,10 +150,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         Utf8JsonWriter writer,
         ApiNamedType apiNamedType,
         in WriteContext context
-    )
-    {
-        WriteApiNamedTypeApiName(writer, apiNamedType, context);
-    }
+    ) => WriteApiNamedTypeApiName(writer, apiNamedType, context);
 
     private static void WriteApiNamedTypeApiName
     (
@@ -178,10 +172,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         Utf8JsonWriter writer,
         ApiObjectType apiObjectType,
         in WriteContext context
-    )
-    {
-        WriteApiObjectTypeApiProperties(writer, apiObjectType, context);
-    }
+    ) => WriteApiObjectTypeApiProperties(writer, apiObjectType, context);
 
     private static void WriteApiObjectTypeApiProperties
     (

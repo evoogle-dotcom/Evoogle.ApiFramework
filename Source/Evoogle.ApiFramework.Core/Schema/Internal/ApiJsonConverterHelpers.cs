@@ -170,10 +170,7 @@ internal static class ApiJsonConverterHelpers
     #endregion
 
     #region Utility Methods
-    public static JsonNamingPolicy GetPropertyNamingPolicy(JsonSerializerOptions options)
-    {
-        return options.PropertyNamingPolicy ?? new NullJsonNamingPolicy();
-    }
+    public static JsonNamingPolicy GetPropertyNamingPolicy(JsonSerializerOptions options) => options.PropertyNamingPolicy ?? new NullJsonNamingPolicy();
     #endregion
 
     #region Validation Methods
@@ -183,20 +180,11 @@ internal static class ApiJsonConverterHelpers
         results.Add(new ValidationResult(message, [memberName]));
     }
 
-    public static void AddEmptyCollectionPropertyError(ref List<ValidationResult>? results, string propertyName)
-    {
-        AddValidationError(ref results, $"Empty collection property: {propertyName}.", propertyName);
-    }
+    public static void AddEmptyCollectionPropertyError(ref List<ValidationResult>? results, string propertyName) => AddValidationError(ref results, $"Empty collection property: {propertyName}.", propertyName);
 
-    public static void AddInvalidPropertyError(ref List<ValidationResult>? results, string propertyName, string reason)
-    {
-        AddValidationError(ref results, $"Invalid property: {propertyName}. Reason: {reason}", propertyName);
-    }
+    public static void AddInvalidPropertyError(ref List<ValidationResult>? results, string propertyName, string reason) => AddValidationError(ref results, $"Invalid property: {propertyName}. Reason: {reason}", propertyName);
 
-    public static void AddMissingPropertyError(ref List<ValidationResult>? results, string propertyName)
-    {
-        AddValidationError(ref results, $"Missing property: {propertyName}.", propertyName);
-    }
+    public static void AddMissingPropertyError(ref List<ValidationResult>? results, string propertyName) => AddValidationError(ref results, $"Missing property: {propertyName}.", propertyName);
 
     public static void ThrowIfInvalid<T, TReadContext, TException>
     (

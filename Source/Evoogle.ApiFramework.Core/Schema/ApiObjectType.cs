@@ -61,10 +61,7 @@ public sealed class ApiObjectType : ApiNamedType
     /// <param name="apiName">The API name of the property to retrieve.</param>
     /// <param name="value">When this method returns, contains the <see cref="ApiProperty"/> if found; otherwise, null.</param>
     /// <returns>True if the property was found; otherwise, false.</returns>
-    public bool TryGetByApiName(string apiName, out ApiProperty? value)
-    {
-        return _apiNameLookup.TryGetValue(apiName, out value);
-    }
+    public bool TryGetByApiName(string apiName, out ApiProperty? value) => _apiNameLookup.TryGetValue(apiName, out value);
 
     /// <summary>
     ///     Attempts to retrieve an API property by its CLR property name.
@@ -72,10 +69,7 @@ public sealed class ApiObjectType : ApiNamedType
     /// <param name="clrName">The CLR name of the property to retrieve.</param>
     /// <param name="value">When this method returns, contains the <see cref="ApiProperty"/> if found; otherwise, null.</param>
     /// <returns>True if the property was found; otherwise, false.</returns>
-    public bool TryGetByClrName(string clrName, out ApiProperty? value)
-    {
-        return _clrNameLookup.TryGetValue(clrName, out value);
-    }
+    public bool TryGetByClrName(string clrName, out ApiProperty? value) => _clrNameLookup.TryGetValue(clrName, out value);
     #endregion
 
     #region Object Methods
