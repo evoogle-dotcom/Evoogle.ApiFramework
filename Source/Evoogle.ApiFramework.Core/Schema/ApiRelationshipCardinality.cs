@@ -11,10 +11,10 @@ namespace Evoogle.ApiFramework.Schema;
 public enum ApiRelationshipCardinality
 {
     #region Values
-    /// <summary>Represents a to-one relationship.</summary>
+    /// <summary>Represents a one-to-one relationship from the parent API object type to the related API object type.</summary>
     ToOne,
 
-    /// <summary>Represents a to-many relationship.</summary>
+    /// <summary>Represents a one-to-many relationship from the parent API object type to the related API object type.</summary>
     ToMany
     #endregion
 }

@@ -91,9 +91,9 @@ public sealed class ApiSchema : ExtensibleBase
 
         // Initialize the collections for API types, scalar types, enum types, and object types.
         this.ApiNamedTypes = apiNamedTypes;
-        this.ApiScalarTypes = apiScalarTypes.SafeCast<ApiScalarType>().OrderBy(x => x.ApiName, StringComparer.OrdinalIgnoreCase).ToArray();
-        this.ApiEnumTypes = apiEnumTypes.SafeCast<ApiEnumType>().OrderBy(x => x.ApiName, StringComparer.OrdinalIgnoreCase).ToArray();
-        this.ApiObjectTypes = apiObjectTypes.SafeCast<ApiObjectType>().OrderBy(x => x.ApiName, StringComparer.OrdinalIgnoreCase).ToArray();
+        this.ApiScalarTypes = apiScalarTypes.EmptyIfNull().OrderBy(x => x.ApiName, StringComparer.OrdinalIgnoreCase).ToArray();
+        this.ApiEnumTypes = apiEnumTypes.EmptyIfNull().OrderBy(x => x.ApiName, StringComparer.OrdinalIgnoreCase).ToArray();
+        this.ApiObjectTypes = apiObjectTypes.EmptyIfNull().OrderBy(x => x.ApiName, StringComparer.OrdinalIgnoreCase).ToArray();
 
         // Initialize the lookup dictionaries for fast access to API types by API name and CLR type.
         _apiNameLookup = new(StringComparer.OrdinalIgnoreCase);
@@ -141,15 +141,8 @@ public sealed class ApiSchema : ExtensibleBase
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="name"/> is null.</exception>
     /// <exception cref="ApiSchemaException">Thrown if duplicate API or CLR identifiers are detected.</exception>
     public ApiSchema(string name, IEnumerable<ApiNamedType>? apiNamedTypes)
-        : this
-        (
-            name,
-            apiNamedTypes?.OfType<ApiScalarType>(),
-            apiNamedTypes?.OfType<ApiEnumType>(),
-            apiNamedTypes?.OfType<ApiObjectType>()
-        )
-    {
-    }
+        : this(name, apiNamedTypes?.OfType<ApiScalarType>(), apiNamedTypes?.OfType<ApiEnumType>(), apiNamedTypes?.OfType<ApiObjectType>())
+    { }
     #endregion
 
     #region ApiSchema Methods
@@ -159,6 +152,7 @@ public sealed class ApiSchema : ExtensibleBase
     /// </summary>
     /// <exception cref="ApiSchemaException">
     ///     Thrown if any named reference could not be resolved in the schema.
+    ///     This can occur if the API property expression does not resolve to a valid API property.
     /// </exception>
     public void ResolveAllReferences(ref List<ValidationResult>? results)
     {
@@ -167,6 +161,26 @@ public sealed class ApiSchema : ExtensibleBase
             foreach (var apiProperty in apiObjectType.ApiProperties)
             {
                 apiProperty.Resolve(this, ref results);
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Resolves all API relationships within object types in the schema.
+    ///     This method ensures that each relationship is properly linked to its corresponding API property.
+    /// </summary>
+    /// <param name="results">Storage for any validation results encountered during resolution.</param>
+    /// <exception cref="ApiSchemaException">
+    ///     Thrown if any relationship could not be resolved in the schema.
+    ///     This can occur if the relationship's API property expression does not resolve to a valid API property.
+    /// </exception>
+    public void ResolveAllRelationships(ref List<ValidationResult>? results)
+    {
+        foreach (var apiObjectType in this.ApiObjectTypes)
+        {
+            foreach (var apiRelationship in apiObjectType.ApiRelationships)
+            {
+                apiRelationship.Resolve(apiObjectType, ref results);
             }
         }
     }

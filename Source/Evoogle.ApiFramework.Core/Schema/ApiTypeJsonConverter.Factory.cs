@@ -147,20 +147,56 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
 
         var logger = context.Logger;
         var apiName = context.ReadData.ApiNamedType!.ApiName!;
-        var apiProperties = context.ReadData.ApiObjectType!.ApiProperties!.Select(x =>
+        var apiProperties = context.ReadData.ApiObjectType!.ApiProperties.EmptyIfNull().Select(x =>
         {
-            var apiName = x.ApiName!;
-            var apiTypeExpression = CreateApiTypeExpression(logger, x.ApiTypeExpression!);
-            var apiTypeModifiers = x.ApiTypeModifiers!.Value;
-            var clrName = x.ClrName!;
-
-            var apiProperty = new ApiProperty(apiName, apiTypeExpression, apiTypeModifiers, clrName);
+            var apiProperty = CreateApiProperty(logger, x);
             return apiProperty;
         })
         .ToList();
+
+        var apiRelationships = context.ReadData.ApiObjectType!.ApiRelationships.EmptyIfNull().Select(x =>
+        {
+            var apiRelationship = CreateApiRelationship(logger, x);
+            return apiRelationship;
+        })
+        .ToList();
+
         var clrType = context.ReadData.ApiType!.ClrType!;
 
-        return new ApiObjectType(apiName, apiProperties, clrType);
+        return new ApiObjectType(apiName, apiProperties, apiRelationships, clrType);
+    }
+
+    private static ApiProperty CreateApiProperty(ILogger logger, ApiPropertyReadData apiPropertyReadData)
+    {
+        var apiName = apiPropertyReadData.ApiName!;
+        var apiTypeExpression = CreateApiTypeExpression(logger, apiPropertyReadData.ApiTypeExpression!);
+        var apiTypeModifiers = apiPropertyReadData.ApiTypeModifiers!.Value;
+        var clrName = apiPropertyReadData.ClrName!;
+
+        var apiProperty = new ApiProperty(apiName, apiTypeExpression, apiTypeModifiers, clrName);
+        return apiProperty;
+    }
+
+    private static ApiPropertyExpression CreateApiPropertyExpression(ILogger logger, ApiPropertyExpressionReadData apiPropertyExpressionReadData)
+    {
+        var apiInlinePropertyReadData = apiPropertyExpressionReadData.ApiInlineProperty;
+        if (apiInlinePropertyReadData is not null)
+        {
+            var apiProperty = CreateApiProperty(logger, apiInlinePropertyReadData);
+            return new ApiPropertyExpression(apiProperty);
+        }
+
+        var apiName = apiPropertyExpressionReadData.ApiName!;
+
+        return new ApiPropertyExpression(apiName);
+    }
+
+    private static ApiRelationship CreateApiRelationship(ILogger logger, ApiRelationshipReadData apiRelationshipReadData)
+    {
+        var apiPropertyExpression = CreateApiPropertyExpression(logger, apiRelationshipReadData.ApiPropertyExpression!);
+
+        var apiRelationship = new ApiRelationship(apiPropertyExpression);
+        return apiRelationship;
     }
 
     private static ApiScalarType CreateApiScalarType(in ReadContext context, ApiTypeKind kind, List<ValidationResult>? validationResults)

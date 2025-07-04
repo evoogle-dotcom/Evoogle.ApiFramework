@@ -310,8 +310,10 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
         // Resolve all ApiTypeExpression instances (named or inline)
         apiSchema.ResolveAllReferences(ref validationResults);
 
-        // Throw if any ApiTypeExpression validation errors were found during resolution.
-        // This ensures all ApiTypeExpressions are valid before finalizing the ApiSchema.
+        // Resolve all ApiPropertyExpression instances (named or inline)
+        apiSchema.ResolveAllRelationships(ref validationResults);
+
+        // Throw if any validation errors were found API schema creation.
         ThrowIfInvalid<ApiSchemaJsonConverter, ReadContext, ApiSchemaException>
         (
             context,
@@ -330,25 +332,14 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
 
     #region Write Implementation Methods
     // ApiSchema Methods
-    private static void WriteApiSchemaBody
-    (
-        Utf8JsonWriter writer,
-        ApiSchema apiSchema,
-        in WriteContext context
-    )
+    private static void WriteApiSchemaBody(Utf8JsonWriter writer, ApiSchema apiSchema, WriteContext context)
     {
         WriteApiSchemaApiTypes(writer, context.PropertyNames.ApiSchema.ApiScalarTypes, apiSchema.ApiScalarTypes, context.Options);
         WriteApiSchemaApiTypes(writer, context.PropertyNames.ApiSchema.ApiEnumTypes, apiSchema.ApiEnumTypes, context.Options);
         WriteApiSchemaApiTypes(writer, context.PropertyNames.ApiSchema.ApiObjectTypes, apiSchema.ApiObjectTypes, context.Options);
     }
 
-    private static void WriteApiSchemaApiTypes
-    (
-        Utf8JsonWriter writer,
-        string propertyName,
-        IEnumerable<ApiType> apiTypes,
-        JsonSerializerOptions options
-    )
+    private static void WriteApiSchemaApiTypes(Utf8JsonWriter writer, string propertyName, IEnumerable<ApiType> apiTypes, JsonSerializerOptions options)
     {
         writer.WritePropertyName(propertyName);
 
@@ -362,38 +353,23 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
         writer.WriteEndArray();
     }
 
-    private static void WriteApiSchemaEpilog
-    (
-        Utf8JsonWriter writer,
-        ApiSchema apiSchema,
-        in WriteContext context
-    )
+    private static void WriteApiSchemaEpilog(Utf8JsonWriter writer, ApiSchema apiSchema, WriteContext context)
     {
         WriteExtensibleBaseExtensions(writer, apiSchema, context);
 
         writer.WriteEndObject();
     }
 
-    private static void WriteApiSchemaName
-    (
-        Utf8JsonWriter writer,
-        ApiSchema apiSchema,
-        in WriteContext context
-    )
+    private static void WriteApiSchemaName(Utf8JsonWriter writer, ApiSchema apiSchema, WriteContext context)
     {
         var propertyName = context.PropertyNames.ApiSchema.Name;
         var value = apiSchema.Name;
         var options = context.Options;
 
-        writer.WritePropertyString(propertyName, value, options);
+        writer.WriteConditionalPropertyAsString(propertyName, value, options);
     }
 
-    private static void WriteApiSchemaProlog
-    (
-        Utf8JsonWriter writer,
-        ApiSchema apiSchema,
-        in WriteContext context
-    )
+    private static void WriteApiSchemaProlog(Utf8JsonWriter writer, ApiSchema apiSchema, WriteContext context)
     {
         writer.WriteStartObject();
 
@@ -401,27 +377,17 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
         WriteApiSchemaVersion(writer, apiSchema, context);
     }
 
-    private static void WriteApiSchemaVersion
-    (
-        Utf8JsonWriter writer,
-        ApiSchema apiSchema,
-        in WriteContext context
-    )
+    private static void WriteApiSchemaVersion(Utf8JsonWriter writer, ApiSchema apiSchema, WriteContext context)
     {
         var propertyName = context.PropertyNames.ApiSchema.Version;
         var value = apiSchema.Version;
         var options = context.Options;
 
-        writer.WritePropertyString(propertyName, value, options);
+        writer.WriteConditionalPropertyAsString(propertyName, value, options);
     }
 
     // ExtensibleBase Methods
-    private static void WriteExtensibleBaseExtensions
-    (
-        Utf8JsonWriter writer,
-        ExtensibleBase extensibleBase,
-        in WriteContext context
-    )
+    private static void WriteExtensibleBaseExtensions(Utf8JsonWriter writer, ExtensibleBase extensibleBase, WriteContext context)
     {
         var extensions = extensibleBase.Extensions;
         if (extensions != null)
@@ -444,11 +410,7 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
         );
     }
 
-    private static void ValidateApiSchemaProperties
-    (
-        string namePropertyName, string? name,
-        ref List<ValidationResult>? results
-    )
+    private static void ValidateApiSchemaProperties(string namePropertyName, string? name, ref List<ValidationResult>? results)
     {
         if (name == null)
         {

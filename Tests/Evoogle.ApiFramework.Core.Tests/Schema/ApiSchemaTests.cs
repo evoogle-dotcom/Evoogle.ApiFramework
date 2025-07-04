@@ -143,6 +143,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             new ApiProperty(nameof(Person.Gender), TestApiEnumTypeGenderReference, ApiTypeModifiers.None, nameof(Person.Gender)),
             new ApiProperty(nameof(Person.Hobbies), new ApiTypeExpression(new ApiCollectionType(TestApiScalarTypeStringReference, ApiTypeModifiers.Required, typeof(List<string>))), ApiTypeModifiers.None, nameof(Person.Hobbies))
         ],
+        [],
         typeof(Person)
     );
 
@@ -155,6 +156,10 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             new ApiProperty(nameof(Company.Name), TestApiScalarTypeStringReference, ApiTypeModifiers.Required, nameof(Company.Name)),
             new ApiProperty(nameof(Company.Owner), TestApiObjectTypePersonReference, ApiTypeModifiers.None, nameof(Company.Owner)),
             new ApiProperty(nameof(Company.Employees), new ApiTypeExpression(new ApiCollectionType(TestApiObjectTypePersonReference, ApiTypeModifiers.Required, typeof(List<Person>))), ApiTypeModifiers.None, nameof(Company.Employees))
+        ],
+        [
+            new ApiRelationship(new ApiPropertyExpression(nameof(Company.Employees))),
+            new ApiRelationship(new ApiPropertyExpression(nameof(Company.Owner)))
         ],
         typeof(Company)
     );
@@ -516,6 +521,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                                 ""ClrName"": ""Hobbies""
                             }
                         ],
+                        ""ApiRelationships"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BPerson, Evoogle.ApiFramework.Core.Tests""
                     }
                 ]
@@ -630,6 +636,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                                 ""ClrName"": ""Hobbies""
                             }
                         ],
+                        ""ApiRelationships"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BPerson, Evoogle.ApiFramework.Core.Tests""
                     }
                 ],
@@ -746,6 +753,18 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                                 ""ClrName"": ""Employees""
                             }
                         ],
+                        ""ApiRelationships"": [
+                            {
+                                ""ApiProperty"": {
+                                    ""ApiName"": ""Owner""
+                                }
+                            },
+                            {
+                                ""ApiProperty"": {
+                                    ""ApiName"": ""Employees""
+                                }
+                            }
+                        ],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BCompany, Evoogle.ApiFramework.Core.Tests""
                     },
                     {
@@ -796,6 +815,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                                 ""ClrName"": ""Hobbies""
                             }
                         ],
+                        ""ApiRelationships"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BPerson, Evoogle.ApiFramework.Core.Tests""
                     }
                 ]
@@ -808,8 +828,8 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     TestApiScalarTypeInt32,
                     TestApiScalarTypeString,
                     TestApiEnumTypeGender,
-                    TestApiObjectTypePerson,
-                    TestApiObjectTypeCompany
+                    TestApiObjectTypeCompany,
+                    TestApiObjectTypePerson
                 ]
             )
         },
@@ -1295,6 +1315,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                                 ""ClrName"": ""Hobbies""
                             }
                         ],
+                        ""ApiRelationships"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BPerson, Evoogle.ApiFramework.Core.Tests""
                     }
                 ]
@@ -1409,6 +1430,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                                 ""ClrName"": ""Hobbies""
                             }
                         ],
+                        ""ApiRelationships"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BPerson, Evoogle.ApiFramework.Core.Tests""
                     }
                 ],
@@ -1526,6 +1548,18 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                                 ""ClrName"": ""Employees""
                             }
                         ],
+                        ""ApiRelationships"": [
+                            {
+                                ""ApiProperty"": {
+                                    ""ApiName"": ""Owner""
+                                }
+                            },
+                            {
+                                ""ApiProperty"": {
+                                    ""ApiName"": ""Employees""
+                                }
+                            }
+                        ],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BCompany, Evoogle.ApiFramework.Core.Tests""
                     },
                     {
@@ -1576,6 +1610,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                                 ""ClrName"": ""Hobbies""
                             }
                         ],
+                        ""ApiRelationships"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BPerson, Evoogle.ApiFramework.Core.Tests""
                     }
                 ]

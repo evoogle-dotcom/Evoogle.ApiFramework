@@ -28,6 +28,11 @@ public sealed class ApiObjectType : ApiNamedType
     ///     Gets the collection of API properties defined on this object type.
     /// </summary>
     public IReadOnlyCollection<ApiProperty> ApiProperties { get; }
+
+    /// <summary>
+    ///     Gets the collection of API relationships defined on this object type.
+    /// </summary>
+    public IReadOnlyCollection<ApiRelationship> ApiRelationships { get; }
     #endregion
 
     #region Constructors
@@ -36,21 +41,22 @@ public sealed class ApiObjectType : ApiNamedType
     /// </summary>
     /// <param name="apiName">The API name of the object type.</param>
     /// <param name="apiProperties">The collection of API properties defined on this object type.</param>
+    /// <param name="apiRelationships">The collection of API relationships defined on this object type.</param>
     /// <param name="clrObjectType">The CLR type representing this API object.</param>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="apiProperties"/> is null.</exception>
     /// <exception cref="ApiSchemaException">Thrown if duplicate API or CLR property names are detected.</exception>
-    public ApiObjectType(string apiName, IEnumerable<ApiProperty> apiProperties, Type clrObjectType)
+    public ApiObjectType(string apiName, IEnumerable<ApiProperty> apiProperties, IEnumerable<ApiRelationship> apiRelationships, Type clrObjectType)
         : base(apiName, clrObjectType)
     {
-        var values = apiProperties.SafeToArray();
+        this.ApiProperties = apiProperties.SafeToArray();
 
-        this.ValidateUnique(values, x => x.ApiName, nameof(ApiProperty.ApiName));
-        this.ValidateUnique(values, x => x.ClrName, nameof(ApiProperty.ClrName));
+        this.ValidateUnique(this.ApiProperties, x => x.ApiName, nameof(ApiProperty.ApiName));
+        this.ValidateUnique(this.ApiProperties, x => x.ClrName, nameof(ApiProperty.ClrName));
 
-        this.ApiProperties = values;
+        _apiNameLookup = this.ApiProperties.ToDictionary(x => x.ApiName, StringComparer.OrdinalIgnoreCase);
+        _clrNameLookup = this.ApiProperties.ToDictionary(x => x.ClrName, StringComparer.OrdinalIgnoreCase);
 
-        _apiNameLookup = values.ToDictionary(x => x.ApiName, StringComparer.OrdinalIgnoreCase);
-        _clrNameLookup = values.ToDictionary(x => x.ClrName, StringComparer.OrdinalIgnoreCase);
+        this.ApiRelationships = apiRelationships.SafeToArray();
     }
     #endregion
 
@@ -61,7 +67,7 @@ public sealed class ApiObjectType : ApiNamedType
     /// <param name="apiName">The API name of the property to retrieve.</param>
     /// <param name="value">When this method returns, contains the <see cref="ApiProperty"/> if found; otherwise, null.</param>
     /// <returns>True if the property was found; otherwise, false.</returns>
-    public bool TryGetByApiName(string apiName, out ApiProperty? value) => _apiNameLookup.TryGetValue(apiName, out value);
+    public bool TryGetPropertyByApiName(string apiName, out ApiProperty? value) => _apiNameLookup.TryGetValue(apiName, out value);
 
     /// <summary>
     ///     Attempts to retrieve an API property by its CLR property name.
@@ -69,7 +75,7 @@ public sealed class ApiObjectType : ApiNamedType
     /// <param name="clrName">The CLR name of the property to retrieve.</param>
     /// <param name="value">When this method returns, contains the <see cref="ApiProperty"/> if found; otherwise, null.</param>
     /// <returns>True if the property was found; otherwise, false.</returns>
-    public bool TryGetByClrName(string clrName, out ApiProperty? value) => _clrNameLookup.TryGetValue(clrName, out value);
+    public bool TryGetPropertyByClrName(string clrName, out ApiProperty? value) => _clrNameLookup.TryGetValue(clrName, out value);
     #endregion
 
     #region Object Methods

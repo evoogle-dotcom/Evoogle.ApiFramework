@@ -5,10 +5,12 @@
 // See the LICENSE file in the project root for more information.
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
+
 using Evoogle.Extension;
 using Evoogle.Extensions;
 using Evoogle.Json;
 using Evoogle.Logging;
+
 using Microsoft.Extensions.Logging;
 
 namespace Evoogle.ApiFramework.Schema.Internal;
@@ -39,15 +41,35 @@ internal static class ApiJsonConverterHelpers
     )
         where TContext : IHasLogger<T>
     {
+        // Ensure we are at the start of an array.
+        // If not, throw an exception to indicate that we expected an array.
         if (reader.TokenType != JsonTokenType.StartArray)
             throw new JsonException("Expected start of an array.");
 
+        var index = -1;
         var handler = arrayElementHandlerAccessor(context);
         while (reader.Read())
         {
+            // Check for end of the array.
+            // If we reach the end, break out of the loop.
             if (reader.TokenType == JsonTokenType.EndArray)
                 break;
 
+            // Increment the index for each element read.
+            // This helps in tracking the position of the element in the array.
+            ++index;
+
+            // Handle null array elements.
+            // If we encounter a null element, log it and continue to the next element.
+            if (reader.TokenType == JsonTokenType.Null)
+            {
+                // Log the skipped null element and continue to the next element.
+                // This prevents null elements from causing issues in the deserialization process.
+                context.Logger.LogTrace("Skipping null JSON array element at index {Index}", index);
+                continue;
+            }
+
+            // Handle the current array element using the provided handler.
             handler(ref reader, ref context);
         }
     }
@@ -60,27 +82,52 @@ internal static class ApiJsonConverterHelpers
     )
         where TContext : IHasLogger<T>
     {
+        // Ensure we are at the start of an object.
+        // If not, throw an exception to indicate that we expected an object.
         if (reader.TokenType != JsonTokenType.StartObject)
             throw new JsonException("Expected start of an object.");
 
         var handlers = propertyHandlersAccessor(context);
         while (reader.Read())
         {
+            // Check for end of the object.
+            // If we reach the end, break out of the loop.
             if (reader.TokenType == JsonTokenType.EndObject)
                 break;
 
+            // If we are not at a property name, throw an exception.
+            // This ensures we are reading a valid JSON object.
             if (reader.TokenType != JsonTokenType.PropertyName)
                 throw new JsonException("Expected object property name.");
 
+            // Read the property name.
             var propertyName = reader.GetString()!;
-            reader.Read();
 
+            // Read the property value.
+            var readSuccess = reader.Read();
+            if (!readSuccess)
+                throw new JsonException($"Failed to read value for property '{propertyName}'.");
+
+            // Handle null property values.
+            if (reader.TokenType == JsonTokenType.Null)
+            {
+                // Log the skipped null property and continue to the next property.
+                // This prevents null properties from causing issues in the deserialization process.
+                context.Logger.LogTrace("Skipping null JSON property: '{Skipped}'", propertyName);
+                continue;
+            }
+
+            // Check if we have a handler for this property value.
+            // If not, skip it and log a warning.
             if (handlers.TryGetValue(propertyName, out var handler))
             {
+                // Handle the property value using the corresponding handler.
                 handler(ref reader, ref context);
             }
             else
             {
+                // Log a warning for the skipped property.
+                // This helps in identifying properties that are not handled by the deserialization logic.
                 context.Logger.LogWarning("Skipping unknown JSON property: '{Skipped}'", propertyName);
                 reader.Skip();
             }

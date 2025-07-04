@@ -91,7 +91,9 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
             }
         }
     }
+    #endregion
 
+    #region ApiEnumValue Validation Methods
     private static void ValidateApiEnumValueProperties
     (
         string apiNamePropertyName, string? apiName,
@@ -147,6 +149,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         (
             context,
             context.PropertyNames.ApiObjectType.ApiProperties, context.ReadData.ApiObjectType?.ApiProperties,
+            context.PropertyNames.ApiObjectType.ApiRelationships, context.ReadData.ApiObjectType?.ApiRelationships,
             ref results
         );
     }
@@ -155,6 +158,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
     (
         in ReadContext context,
         string apiPropertiesPropertyName, IReadOnlyList<ApiPropertyReadData>? apiProperties,
+        string apiRelationshipsPropertyName, IReadOnlyList<ApiRelationshipReadData>? apiRelationships,
         ref List<ValidationResult>? results
     )
     {
@@ -184,8 +188,23 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
                 }
             }
         }
-    }
 
+        if (apiRelationships?.Count > 0)
+        {
+            for (var i = 0; i < apiRelationships.Count; ++i)
+            {
+                var apiRelationship = apiRelationships[i];
+                ValidateApiRelationshipProperties(
+                    context,
+                    $"{apiRelationshipsPropertyName}[{i}].{context.PropertyNames.ApiRelationship.ApiPropertyExpression}", apiRelationship.ApiPropertyExpression,
+                    ref results
+                );
+            }
+        }
+    }
+    #endregion
+
+    #region ApiProperty Validation Methods
     private static void ValidateApiPropertyProperties
     (
         in ReadContext context,
@@ -218,6 +237,57 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         if (clrName == null)
         {
             AddMissingPropertyError(ref results, clrNamePropertyName);
+        }
+    }
+    #endregion
+
+    #region ApiPropertyExpression Validation Methods
+    private static void ValidateApiPropertyExpression
+    (
+        in ReadContext context,
+        ApiPropertyExpressionReadData apiPropertyExpression,
+        ref List<ValidationResult>? results
+    )
+    {
+        var apiInlineProperty = apiPropertyExpression.ApiInlineProperty;
+        if (apiInlineProperty == null)
+        {
+            ValidateApiPropertyExpressionProperties
+            (
+                context.PropertyNames.ApiPropertyExpression.ApiName, apiPropertyExpression.ApiName,
+                ref results
+            );
+        }
+    }
+
+    private static void ValidateApiPropertyExpressionProperties
+    (
+        string apiNamePropertyName, string? apiName,
+        ref List<ValidationResult>? results
+    )
+    {
+        if (apiName == null)
+        {
+            AddMissingPropertyError(ref results, apiNamePropertyName);
+        }
+    }
+    #endregion
+
+    #region ApiRelationship Validation Methods
+    private static void ValidateApiRelationshipProperties
+    (
+        in ReadContext context,
+        string apiPropertyExpressionPropertyName, ApiPropertyExpressionReadData? apiPropertyExpression,
+        ref List<ValidationResult>? results
+    )
+    {
+        if (apiPropertyExpression == null)
+        {
+            AddMissingPropertyError(ref results, apiPropertyExpressionPropertyName);
+        }
+        else
+        {
+            ValidateApiPropertyExpression(context, apiPropertyExpression, ref results);
         }
     }
     #endregion
@@ -267,7 +337,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         var apiInlineType = apiTypeExpression.ApiInlineType;
         if (apiInlineType == null)
         {
-            ValidateApiTypeExpressionReferenceProperties
+            ValidateApiTypeExpressionProperties
             (
                 context.PropertyNames.ApiTypeExpression.Kind, apiTypeExpression.Kind,
                 context.PropertyNames.ApiTypeExpression.ApiName, apiTypeExpression.ApiName,
@@ -276,7 +346,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         }
     }
 
-    private static void ValidateApiTypeExpressionReferenceProperties
+    private static void ValidateApiTypeExpressionProperties
     (
         string kindPropertyName, string? kind,
         string apiNamePropertyName, string? apiName,

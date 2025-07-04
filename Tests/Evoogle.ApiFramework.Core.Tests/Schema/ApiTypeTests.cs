@@ -329,6 +329,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                         ""ClrName"": ""OptionalPredicate""
                     }
                 ],
+                ""ApiRelationships"": [],
                 ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BClassWithScalars, Evoogle.ApiFramework.Core.Tests""
             }",
             Expected = new ApiObjectType
@@ -378,6 +379,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                         nameof(ClassWithScalars.OptionalPredicate)
                     ),
                 ],
+                [],
                 typeof(ClassWithScalars)
             )
         },
@@ -445,6 +447,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                         ""ClrName"": ""OptionalPredicate""
                     }
                 ],
+                ""ApiRelationships"": [],
                 ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BClassWithScalars, Evoogle.ApiFramework.Core.Tests"",
                 ""Extensions"": {
                     ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BTestExtension1, Evoogle.ApiFramework.Core.Tests"": {
@@ -503,10 +506,102 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                         nameof(ClassWithScalars.OptionalPredicate)
                     ),
                 ],
+                [],
                 typeof(ClassWithScalars)
             ),
             AddTestExtension1 = true,
             AddTestExtension2 = true
+        },
+
+        new JsonDeserializeTest<ApiType>
+        {
+            Name = $"ApiObjectType [{nameof(Company)}]",
+            Source = @"
+            {
+                ""Kind"": ""Object"",
+                ""ApiName"": ""Company"",
+                ""ApiProperties"": [
+                    {
+                        ""ApiName"": ""Name"",
+                        ""ApiType"": {
+                            ""Kind"": ""Scalar"",
+                            ""ApiName"": ""String""
+                        },
+                        ""ApiTypeModifiers"": ""Required"",
+                        ""ClrName"": ""Name""
+                    },
+                    {
+                        ""ApiName"": ""Owner"",
+                        ""ApiType"": {
+                            ""Kind"": ""Object"",
+                            ""ApiName"": ""Person""
+                        },
+                        ""ApiTypeModifiers"": ""None"",
+                        ""ClrName"": ""Owner""
+                    },
+                    {
+                        ""ApiName"": ""Employees"",
+                        ""ApiType"": {
+                            ""ApiInlineType"": {
+                                ""Kind"": ""Collection"",
+                                ""ApiItemType"": {
+                                    ""Kind"": ""Object"",
+                                    ""ApiName"": ""Person""
+                                },
+                                ""ApiItemTypeModifiers"": ""Required"",
+                                ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BPerson, Evoogle.ApiFramework.Core.Tests]], System.Private.CoreLib""
+                            }
+                        },
+                        ""ApiTypeModifiers"": ""None"",
+                        ""ClrName"": ""Employees""
+                    }
+                ],
+                ""ApiRelationships"": [
+                    {
+                        ""ApiProperty"": {
+                            ""ApiName"": ""Owner""
+                        }
+                    },
+                    {
+                        ""ApiProperty"": {
+                            ""ApiName"": ""Employees""
+                        }
+                    }
+                ],
+                ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BCompany, Evoogle.ApiFramework.Core.Tests""
+            }",
+            Expected = new ApiObjectType
+            (
+                nameof(Company),
+                [
+                    new ApiProperty
+                    (
+                        nameof(Company.Name),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "String"),
+                        ApiTypeModifiers.Required,
+                        nameof(Company.Name)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(Company.Owner),
+                        new ApiTypeExpression(ApiTypeKind.Object, nameof(Person)),
+                        ApiTypeModifiers.None,
+                        nameof(Company.Owner)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(Company.Employees),
+                        new ApiTypeExpression(new ApiCollectionType(new ApiTypeExpression(ApiTypeKind.Object, nameof(Person)), ApiTypeModifiers.Required, typeof(List<Person>))),
+                        ApiTypeModifiers.None,
+                        nameof(Company.Employees)
+                    ),
+                ],
+                [
+                    new ApiRelationship(new ApiPropertyExpression(nameof(Company.Owner))),
+                    new ApiRelationship(new ApiPropertyExpression(nameof(Company.Employees)))
+                ],
+                typeof(Company)
+            ),
         },
     ];
 
@@ -667,6 +762,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                         nameof(ClassWithScalars.OptionalPredicate)
                     ),
                 ],
+                [],
                 typeof(ClassWithScalars)
             )
         },
@@ -721,10 +817,48 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                         nameof(ClassWithScalars.OptionalPredicate)
                     ),
                 ],
+                [],
                 typeof(ClassWithScalars)
             ),
             AddTestExtension1 = true,
             AddTestExtension2 = true
+        },
+
+        new JsonRoundtripTest<ApiType>
+        {
+            Name = $"ApiObjectType [{nameof(Company)}]",
+            Expected = new ApiObjectType
+            (
+                nameof(Company),
+                [
+                    new ApiProperty
+                    (
+                        nameof(Company.Name),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "String"),
+                        ApiTypeModifiers.Required,
+                        nameof(Company.Name)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(Company.Owner),
+                        new ApiTypeExpression(ApiTypeKind.Object, nameof(Person)),
+                        ApiTypeModifiers.None,
+                        nameof(Company.Owner)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(Company.Employees),
+                        new ApiTypeExpression(new ApiCollectionType(new ApiTypeExpression(ApiTypeKind.Object, nameof(Person)), ApiTypeModifiers.Required, typeof(List<Person>))),
+                        ApiTypeModifiers.None,
+                        nameof(Company.Employees)
+                    ),
+                ],
+                [
+                    new ApiRelationship(new ApiPropertyExpression(nameof(Company.Owner))),
+                    new ApiRelationship(new ApiPropertyExpression(nameof(Company.Employees)))
+                ],
+                typeof(Company)
+            ),
         },
     ];
 
@@ -1029,6 +1163,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                         nameof(ClassWithScalars.OptionalPredicate)
                     ),
                 ],
+                [],
                 typeof(ClassWithScalars)
             ),
             Expected = @"
@@ -1091,6 +1226,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                         ""ClrName"": ""OptionalPredicate""
                     }
                 ],
+                ""ApiRelationships"": [],
                 ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BClassWithScalars, Evoogle.ApiFramework.Core.Tests""
             }"
         },
@@ -1145,6 +1281,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                         nameof(ClassWithScalars.OptionalPredicate)
                     ),
                 ],
+                [],
                 typeof(ClassWithScalars)
             ),
             Expected = @"
@@ -1207,6 +1344,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                         ""ClrName"": ""OptionalPredicate""
                     }
                 ],
+                ""ApiRelationships"": [],
                 ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BClassWithScalars, Evoogle.ApiFramework.Core.Tests"",
                 ""Extensions"": {
                     ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BTestExtension1, Evoogle.ApiFramework.Core.Tests"": {
@@ -1220,6 +1358,97 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             }",
             AddTestExtension1 = true,
             AddTestExtension2 = true
+        },
+
+        new JsonSerializeTest<ApiType>
+        {
+            Name = $"ApiObjectType [{nameof(Company)}]",
+            Source = new ApiObjectType
+            (
+                nameof(Company),
+                [
+                    new ApiProperty
+                    (
+                        nameof(Company.Name),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "String"),
+                        ApiTypeModifiers.Required,
+                        nameof(Company.Name)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(Company.Owner),
+                        new ApiTypeExpression(ApiTypeKind.Object, nameof(Person)),
+                        ApiTypeModifiers.None,
+                        nameof(Company.Owner)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(Company.Employees),
+                        new ApiTypeExpression(new ApiCollectionType(new ApiTypeExpression(ApiTypeKind.Object, nameof(Person)), ApiTypeModifiers.Required, typeof(List<Person>))),
+                        ApiTypeModifiers.None,
+                        nameof(Company.Employees)
+                    ),
+                ],
+                [
+                    new ApiRelationship(new ApiPropertyExpression(nameof(Company.Owner))),
+                    new ApiRelationship(new ApiPropertyExpression(nameof(Company.Employees)))
+                ],
+                typeof(Company)
+            ),
+            Expected = @"
+            {
+                ""Kind"": ""Object"",
+                ""ApiName"": ""Company"",
+                ""ApiProperties"": [
+                    {
+                        ""ApiName"": ""Name"",
+                        ""ApiType"": {
+                            ""Kind"": ""Scalar"",
+                            ""ApiName"": ""String""
+                        },
+                        ""ApiTypeModifiers"": ""Required"",
+                        ""ClrName"": ""Name""
+                    },
+                    {
+                        ""ApiName"": ""Owner"",
+                        ""ApiType"": {
+                            ""Kind"": ""Object"",
+                            ""ApiName"": ""Person""
+                        },
+                        ""ApiTypeModifiers"": ""None"",
+                        ""ClrName"": ""Owner""
+                    },
+                    {
+                        ""ApiName"": ""Employees"",
+                        ""ApiType"": {
+                            ""ApiInlineType"": {
+                                ""Kind"": ""Collection"",
+                                ""ApiItemType"": {
+                                    ""Kind"": ""Object"",
+                                    ""ApiName"": ""Person""
+                                },
+                                ""ApiItemTypeModifiers"": ""Required"",
+                                ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BPerson, Evoogle.ApiFramework.Core.Tests]], System.Private.CoreLib""
+                            }
+                        },
+                        ""ApiTypeModifiers"": ""None"",
+                        ""ClrName"": ""Employees""
+                    }
+                ],
+                ""ApiRelationships"": [
+                    {
+                        ""ApiProperty"": {
+                            ""ApiName"": ""Owner""
+                        }
+                    },
+                    {
+                        ""ApiProperty"": {
+                            ""ApiName"": ""Employees""
+                        }
+                    }
+                ],
+                ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BCompany, Evoogle.ApiFramework.Core.Tests""
+            }"
         },
     ];
     #endregion

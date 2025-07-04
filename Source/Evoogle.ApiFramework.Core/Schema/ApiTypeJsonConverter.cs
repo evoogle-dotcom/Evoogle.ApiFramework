@@ -92,6 +92,7 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
     {
         #region Immutable Properties
         public required string ApiProperties { get; init; }
+        public required string ApiRelationships { get; init; }
         #endregion
     }
 
@@ -102,6 +103,21 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
         public required string ApiTypeExpression { get; init; }
         public required string ApiTypeModifiers { get; init; }
         public required string ClrName { get; init; }
+        #endregion
+    }
+
+    private readonly record struct ApiPropertyExpressionPropertyNames
+    {
+        #region Immutable Properties
+        public required string ApiName { get; init; }
+        public required string ApiInlineProperty { get; init; }
+        #endregion
+    }
+
+    private readonly record struct ApiRelationshipPropertyNames
+    {
+        #region Immutable Properties
+        public required string ApiPropertyExpression { get; init; }
         #endregion
     }
 
@@ -131,6 +147,8 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
         public required ApiNamedTypePropertyNames ApiNamedType { get; init; }
         public required ApiObjectTypePropertyNames ApiObjectType { get; init; }
         public required ApiPropertyPropertyNames ApiProperty { get; init; }
+        public required ApiPropertyExpressionPropertyNames ApiPropertyExpression { get; init; }
+        public required ApiRelationshipPropertyNames ApiRelationship { get; init; }
         public required ApiTypePropertyNames ApiType { get; init; }
         public required ApiTypeExpressionPropertyNames ApiTypeExpression { get; init; }
         public required ExtensibleBasePropertyNames ExtensibleBase { get; init; }
@@ -243,7 +261,8 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
             },
             ApiObjectType = new ApiObjectTypePropertyNames
             {
-                ApiProperties = policy.ConvertName(nameof(ApiObjectType.ApiProperties))
+                ApiProperties = policy.ConvertName(nameof(ApiObjectType.ApiProperties)),
+                ApiRelationships = policy.ConvertName(nameof(ApiObjectType.ApiRelationships))
             },
             ApiProperty = new ApiPropertyPropertyNames
             {
@@ -251,6 +270,15 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
                 ApiTypeExpression = policy.ConvertName(nameof(ApiProperty.ApiType)), // Mapping property name from ApiTypeExpression to ApiType by design
                 ApiTypeModifiers = policy.ConvertName(nameof(ApiProperty.ApiTypeModifiers)),
                 ClrName = policy.ConvertName(nameof(ApiProperty.ClrName))
+            },
+            ApiPropertyExpression = new ApiPropertyExpressionPropertyNames
+            {
+                ApiName = policy.ConvertName(nameof(ApiPropertyExpression.ApiName)),
+                ApiInlineProperty = policy.ConvertName(nameof(ApiPropertyExpression.ApiInlineProperty)),
+            },
+            ApiRelationship = new ApiRelationshipPropertyNames
+            {
+                ApiPropertyExpression = policy.ConvertName(nameof(ApiRelationship.ApiProperty)) // Mapping property name from ApiPropertyExpression to ApiProperty by design
             },
             ApiType = new ApiTypePropertyNames
             {
