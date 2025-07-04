@@ -72,7 +72,7 @@ public sealed class ApiObjectType : ApiNamedType
     public bool TryGetPropertyByApiName(string apiName, out ApiProperty? value) => _propertyApiNameLookup.TryGetValue(apiName, out value);
 
     /// <summary>
-    ///     Attempts to retrieve an API property by its CLR property name.
+    ///     Attempts to retrieve an API property by its CLR name.
     /// </summary>
     /// <param name="clrName">The CLR name of the property to retrieve.</param>
     /// <param name="value">When this method returns, contains the <see cref="ApiProperty"/> if found; otherwise, null.</param>
