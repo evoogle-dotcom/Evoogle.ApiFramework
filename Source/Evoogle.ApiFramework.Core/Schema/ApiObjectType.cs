@@ -19,8 +19,8 @@ public sealed class ApiObjectType : ApiNamedType
     #endregion
 
     #region ApiObject Fields
-    private readonly Dictionary<string, ApiProperty> _apiNameLookup;
-    private readonly Dictionary<string, ApiProperty> _clrNameLookup;
+    private readonly Dictionary<string, ApiProperty> _propertyApiNameLookup;
+    private readonly Dictionary<string, ApiProperty> _propertyClrNameLookup;
     #endregion
 
     #region ApiObject Properties
@@ -53,8 +53,8 @@ public sealed class ApiObjectType : ApiNamedType
         this.ValidateUnique(this.ApiProperties, x => x.ApiName, nameof(ApiProperty.ApiName));
         this.ValidateUnique(this.ApiProperties, x => x.ClrName, nameof(ApiProperty.ClrName));
 
-        _apiNameLookup = this.ApiProperties.ToDictionary(x => x.ApiName, StringComparer.OrdinalIgnoreCase);
-        _clrNameLookup = this.ApiProperties.ToDictionary(x => x.ClrName, StringComparer.OrdinalIgnoreCase);
+        _propertyApiNameLookup = this.ApiProperties.ToDictionary(x => x.ApiName, StringComparer.OrdinalIgnoreCase);
+        _propertyClrNameLookup = this.ApiProperties.ToDictionary(x => x.ClrName, StringComparer.OrdinalIgnoreCase);
 
         this.ApiRelationships = apiRelationships.SafeToArray();
     }
@@ -67,7 +67,7 @@ public sealed class ApiObjectType : ApiNamedType
     /// <param name="apiName">The API name of the property to retrieve.</param>
     /// <param name="value">When this method returns, contains the <see cref="ApiProperty"/> if found; otherwise, null.</param>
     /// <returns>True if the property was found; otherwise, false.</returns>
-    public bool TryGetPropertyByApiName(string apiName, out ApiProperty? value) => _apiNameLookup.TryGetValue(apiName, out value);
+    public bool TryGetPropertyByApiName(string apiName, out ApiProperty? value) => _propertyApiNameLookup.TryGetValue(apiName, out value);
 
     /// <summary>
     ///     Attempts to retrieve an API property by its CLR property name.
@@ -75,7 +75,7 @@ public sealed class ApiObjectType : ApiNamedType
     /// <param name="clrName">The CLR name of the property to retrieve.</param>
     /// <param name="value">When this method returns, contains the <see cref="ApiProperty"/> if found; otherwise, null.</param>
     /// <returns>True if the property was found; otherwise, false.</returns>
-    public bool TryGetPropertyByClrName(string clrName, out ApiProperty? value) => _clrNameLookup.TryGetValue(clrName, out value);
+    public bool TryGetPropertyByClrName(string clrName, out ApiProperty? value) => _propertyClrNameLookup.TryGetValue(clrName, out value);
     #endregion
 
     #region Object Methods
