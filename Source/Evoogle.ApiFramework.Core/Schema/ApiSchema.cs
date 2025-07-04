@@ -7,6 +7,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 using Evoogle.ApiFramework.Exceptions;
+using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.Extension;
 using Evoogle.Extensions;
 
@@ -61,11 +62,9 @@ public sealed class ApiSchema : ExtensibleBase
     /// <param name="apiScalarTypes">The collection of scalar types to include in the schema.</param>
     /// <param name="apiEnumTypes">The collection of enum types to include in the schema.</param>
     /// <param name="apiObjectTypes">The collection of object types to include in the schema.</param>
-    /// <exception cref="ArgumentNullException">
-    ///     Thrown if <paramref name="name"/> is <c>null</c>.
-    /// </exception>
     /// <exception cref="ApiSchemaException">
-    ///     Thrown if duplicate API or CLR identifiers are detected across the provided types.
+    ///     Thrown if <paramref name="name"/> is <c>null</c>.
+    ///     Thrown if duplicate API name or CLR type identifiers are detected across the provided types.
     /// </exception>
     public ApiSchema
     (
@@ -75,22 +74,21 @@ public sealed class ApiSchema : ExtensibleBase
         IEnumerable<ApiObjectType>? apiObjectTypes
     )
     {
-        // Initialize the schema with the provided name and version.
-        this.Name = name ?? throw new ArgumentNullException(nameof(name), "Schema name cannot be null.");
+        // Initialize the schema with the provided name.
+        this.Name = name ?? throw new ApiSchemaException("Schema name cannot be null.");
 
         // Construct the API types from the provided collections.
-        var apiNamedTypes = apiScalarTypes.SafeCast<ApiNamedType>()
+        this.ApiNamedTypes = apiScalarTypes.SafeCast<ApiNamedType>()
             .Concat(apiEnumTypes.SafeCast<ApiNamedType>())
             .Concat(apiObjectTypes.SafeCast<ApiNamedType>())
             .OrderBy(x => x.ApiName, StringComparer.OrdinalIgnoreCase)
             .ToArray();
 
         // Validate that there are no duplicate API names or CLR types across all API named types.
-        ValidateUnique(apiNamedTypes, x => x.ApiName, nameof(ApiNamedType.ApiName));
-        ValidateUnique(apiNamedTypes, x => x.ClrType, nameof(ApiType.ClrType));
+        ApiSchemaHelpers.ValidateUnique<ApiSchema, ApiNamedType, string>(this.ApiNamedTypes, x => x.ApiName, nameof(ApiNamedType.ApiName));
+        ApiSchemaHelpers.ValidateUnique<ApiSchema, ApiNamedType, Type>(this.ApiNamedTypes, x => x.ClrType, nameof(ApiType.ClrType));
 
         // Initialize the collections for API types, scalar types, enum types, and object types.
-        this.ApiNamedTypes = apiNamedTypes;
         this.ApiScalarTypes = apiScalarTypes.EmptyIfNull().OrderBy(x => x.ApiName, StringComparer.OrdinalIgnoreCase).ToArray();
         this.ApiEnumTypes = apiEnumTypes.EmptyIfNull().OrderBy(x => x.ApiName, StringComparer.OrdinalIgnoreCase).ToArray();
         this.ApiObjectTypes = apiObjectTypes.EmptyIfNull().OrderBy(x => x.ApiName, StringComparer.OrdinalIgnoreCase).ToArray();
@@ -186,36 +184,28 @@ public sealed class ApiSchema : ExtensibleBase
     }
 
     /// <summary>Attempts to retrieve an API named type by its API name.</summary>
-    public bool TryGetApiType(string apiName, out ApiNamedType? apiNamedType)
-        => _apiNameLookup.TryGetValue(apiName, out apiNamedType);
+    public bool TryGetApiType(string apiName, out ApiNamedType? apiNamedType) => _apiNameLookup.TryGetValue(apiName, out apiNamedType);
 
     /// <summary>Attempts to retrieve an API named type by its CLR type.</summary>
-    public bool TryGetApiType(Type clrType, out ApiNamedType? apiNamedType)
-        => _clrTypeLookup.TryGetValue(clrType, out apiNamedType);
+    public bool TryGetApiType(Type clrType, out ApiNamedType? apiNamedType) => _clrTypeLookup.TryGetValue(clrType, out apiNamedType);
 
     /// <summary>Attempts to retrieve an API enumeration type by its API name.</summary>
-    public bool TryGetApiEnumType(string apiName, out ApiEnumType? apiEnumType)
-        => _enumApiNameLookup.TryGetValue(apiName, out apiEnumType);
+    public bool TryGetApiEnumType(string apiName, out ApiEnumType? apiEnumType) => _enumApiNameLookup.TryGetValue(apiName, out apiEnumType);
 
     /// <summary>Attempts to retrieve an API enumeration type by its CLR type.</summary>
-    public bool TryGetApiEnumType(Type clrType, out ApiEnumType? apiEnumType)
-        => _enumClrTypeLookup.TryGetValue(clrType, out apiEnumType);
+    public bool TryGetApiEnumType(Type clrType, out ApiEnumType? apiEnumType) => _enumClrTypeLookup.TryGetValue(clrType, out apiEnumType);
 
     /// <summary>Attempts to retrieve an API object type by its API name.</summary>
-    public bool TryGetApiObjectType(string apiName, out ApiObjectType? apiObjectType)
-        => _objectApiNameLookup.TryGetValue(apiName, out apiObjectType);
+    public bool TryGetApiObjectType(string apiName, out ApiObjectType? apiObjectType) => _objectApiNameLookup.TryGetValue(apiName, out apiObjectType);
 
     /// <summary>Attempts to retrieve an API object type by its CLR type.</summary>
-    public bool TryGetApiObjectType(Type clrType, out ApiObjectType? apiObjectType)
-        => _objectClrTypeLookup.TryGetValue(clrType, out apiObjectType);
+    public bool TryGetApiObjectType(Type clrType, out ApiObjectType? apiObjectType) => _objectClrTypeLookup.TryGetValue(clrType, out apiObjectType);
 
     /// <summary>Attempts to retrieve an API scalar type by its API name.</summary>
-    public bool TryGetApiScalarType(string apiName, out ApiScalarType? apiScalarType)
-        => _scalarApiNameLookup.TryGetValue(apiName, out apiScalarType);
+    public bool TryGetApiScalarType(string apiName, out ApiScalarType? apiScalarType) => _scalarApiNameLookup.TryGetValue(apiName, out apiScalarType);
 
     /// <summary>Attempts to retrieve an API scalar type by its CLR type.</summary>
-    public bool TryGetApiScalarType(Type clrType, out ApiScalarType? apiScalarType)
-        => _scalarClrTypeLookup.TryGetValue(clrType, out apiScalarType);
+    public bool TryGetApiScalarType(Type clrType, out ApiScalarType? apiScalarType) => _scalarClrTypeLookup.TryGetValue(clrType, out apiScalarType);
     #endregion
 
     #region Object Methods
@@ -228,37 +218,6 @@ public sealed class ApiSchema : ExtensibleBase
         var enumCount = this.ApiEnumTypes.Count.SafeToString();
         var objectCount = this.ApiObjectTypes.Count.SafeToString();
         return $"{nameof(ApiSchema)} {{Name={name}, Count={count}, ScalarCount={scalarCount}, EnumCount={enumCount}, ObjectCount={objectCount}}}";
-    }
-    #endregion
-
-    #region Validation Methods
-    /// <summary>
-    ///     Validates that a collection of named types contains unique values for a specified key.
-    /// </summary>
-    /// <typeparam name="TApiType">The type of API named type being validated.</typeparam>
-    /// <typeparam name="TKey">The type of the key to validate uniqueness for.</typeparam>
-    /// <param name="values">The collection of values to check.</param>
-    /// <param name="keySelector">Function to select the key from each value.</param>
-    /// <param name="propertyName">The name of the property being validated (used in exception message).</param>
-    /// <exception cref="ApiSchemaException">
-    ///     Thrown if any duplicate keys are found in the collection.
-    /// </exception>
-    private static void ValidateUnique<TApiType, TKey>(IEnumerable<TApiType> values, Func<TApiType, TKey> keySelector, string propertyName)
-        where TApiType : ApiNamedType
-        where TKey : notnull
-    {
-        var duplicates = values
-            .GroupBy(keySelector)
-            .Where(g => g.Count() > 1)
-            .Select(g => g.Key)
-            .ToList();
-
-        if (duplicates.Count == 0)
-            return;
-
-        var duplicatesString = string.Join(",", duplicates);
-        var message = $"Unable to create {nameof(ApiSchema)} because duplicate {propertyName} values detected: {duplicatesString}";
-        throw new ApiSchemaException(message);
     }
     #endregion
 }

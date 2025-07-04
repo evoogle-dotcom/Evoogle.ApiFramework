@@ -4,6 +4,7 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using Evoogle.ApiFramework.Exceptions;
+using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.Extensions;
 using Evoogle.Reflection;
 
@@ -48,47 +49,42 @@ public sealed class ApiEnumType : ApiNamedType
             throw new ApiSchemaException(message);
         }
 
-        var values = apiEnumValues.SafeToArray();
+        this.ApiEnumValues = apiEnumValues.SafeToArray();
 
-        this.ValidateUnique(values, x => x.ApiName, nameof(ApiEnumValue.ApiName));
-        this.ValidateUnique(values, x => x.ClrName, nameof(ApiEnumValue.ClrName));
-        this.ValidateUnique(values, x => x.ClrOrdinal, nameof(ApiEnumValue.ClrOrdinal));
+        ApiSchemaHelpers.ValidateUnique<ApiEnumType, ApiEnumValue, string>(this.ApiEnumValues, x => x.ApiName, nameof(ApiEnumValue.ApiName));
+        ApiSchemaHelpers.ValidateUnique<ApiEnumType, ApiEnumValue, string>(this.ApiEnumValues, x => x.ClrName, nameof(ApiEnumValue.ClrName));
+        ApiSchemaHelpers.ValidateUnique<ApiEnumType, ApiEnumValue, int>(this.ApiEnumValues, x => x.ClrOrdinal, nameof(ApiEnumValue.ClrOrdinal));
 
-        this.ApiEnumValues = values;
-
-        _apiNameLookup = values.ToDictionary(x => x.ApiName, StringComparer.OrdinalIgnoreCase);
-        _clrNameLookup = values.ToDictionary(x => x.ClrName, StringComparer.OrdinalIgnoreCase);
-        _clrOrdinalLookup = values.ToDictionary(x => x.ClrOrdinal);
+        _apiNameLookup = this.ApiEnumValues.ToDictionary(x => x.ApiName, StringComparer.OrdinalIgnoreCase);
+        _clrNameLookup = this.ApiEnumValues.ToDictionary(x => x.ClrName, StringComparer.OrdinalIgnoreCase);
+        _clrOrdinalLookup = this.ApiEnumValues.ToDictionary(x => x.ClrOrdinal);
     }
     #endregion
 
     #region ApiEnumType Methods
     /// <summary>
-    ///     Attempts to retrieve an enum value by its API name.
+    ///     Attempts to retrieve an API enum value by its API name.
     /// </summary>
     /// <param name="apiName">The API name of the enumeration value to retrieve.</param>
     /// <param name="value">When this method returns, contains the <see cref="ApiEnumValue"/> if found; otherwise, null.</param>
     /// <returns>True if the value is found; otherwise, false.</returns>
-    public bool TryGetByApiName(string apiName, out ApiEnumValue? value)
-        => _apiNameLookup.TryGetValue(apiName, out value);
+    public bool TryGetValueByApiName(string apiName, out ApiEnumValue? value) => _apiNameLookup.TryGetValue(apiName, out value);
 
     /// <summary>
-    ///     Attempts to retrieve an enum value by its CLR name.
+    ///     Attempts to retrieve an API enum value by its CLR name.
     /// </summary>
     /// <param name="clrName">The CLR name of the enumeration value to retrieve.</param>
     /// <param name="value">When this method returns, contains the <see cref="ApiEnumValue"/> if found; otherwise, null.</param>
     /// <returns>True if the value is found; otherwise, false.</returns>
-    public bool TryGetByClrName(string clrName, out ApiEnumValue? value)
-        => _clrNameLookup.TryGetValue(clrName, out value);
+    public bool TryGetValueByClrName(string clrName, out ApiEnumValue? value) => _clrNameLookup.TryGetValue(clrName, out value);
 
     /// <summary>
-    ///     Attempts to retrieve an enum value by its CLR ordinal value.
+    ///     Attempts to retrieve an API enum value by its CLR ordinal value.
     /// </summary>
     /// <param name="clrOrdinal">The CLR ordinal of the enumeration value to retrieve.</param>
     /// <param name="value">When this method returns, contains the <see cref="ApiEnumValue"/> if found; otherwise, null.</param>
     /// <returns>True if the value is found; otherwise, false.</returns>
-    public bool TryGetByClrOrdinal(int clrOrdinal, out ApiEnumValue? value)
-        => _clrOrdinalLookup.TryGetValue(clrOrdinal, out value);
+    public bool TryGetValueByClrOrdinal(int clrOrdinal, out ApiEnumValue? value) => _clrOrdinalLookup.TryGetValue(clrOrdinal, out value);
     #endregion
 
     #region Object Methods
@@ -99,34 +95,6 @@ public sealed class ApiEnumType : ApiNamedType
         var clrType = this.ClrType.SafeToString();
 
         return $"{nameof(ApiEnumType)} {{{nameof(this.ApiName)}={apiName}}} [{clrType}]";
-    }
-    #endregion
-
-    #region Validation Methods
-    /// <summary>
-    ///     Validates that the specified key selector produces unique values across all enum values.
-    /// </summary>
-    /// <typeparam name="T">The type of the key selected from each <see cref="ApiEnumValue"/>.</typeparam>
-    /// <param name="values">The collection of enum values to check.</param>
-    /// <param name="keySelector">A function to extract the key to test for uniqueness.</param>
-    /// <param name="propertyName">The name of the property being validated (for error messages).</param>
-    /// <exception cref="ApiSchemaException">
-    ///     Thrown when duplicate key values are found for the specified property.
-    /// </exception>
-    private void ValidateUnique<T>(IEnumerable<ApiEnumValue> values, Func<ApiEnumValue, T> keySelector, string propertyName)
-    {
-        var duplicates = values
-            .GroupBy(keySelector)
-            .Where(g => g.Count() > 1)
-            .Select(g => g.Key)
-            .ToList();
-
-        if (duplicates.Count == 0)
-            return;
-
-        var duplicatesString = string.Join(",", duplicates);
-        var message = $"Unable to create {this} because duplicate {propertyName} values detected: {duplicatesString}";
-        throw new ApiSchemaException(message);
     }
     #endregion
 }
