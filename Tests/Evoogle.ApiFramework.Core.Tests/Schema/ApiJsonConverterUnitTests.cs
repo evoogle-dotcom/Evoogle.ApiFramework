@@ -110,6 +110,7 @@ public static class ApiJsonConverterUnitTests
             this.WriteLine($"Source: {this.Source.SafeToString().RemoveWhitespace()}");
             this.WriteLine();
             this.WriteLine($"Expected: {this.Expected.SafeToString()}");
+            this.WriteLine();
         }
 
         protected override void Act()
@@ -214,6 +215,7 @@ public static class ApiJsonConverterUnitTests
             this.WriteLine($"Source: {this.Source.SafeToString()}");
             this.WriteLine();
             this.WriteLine($"Expected: {this.Expected.SafeToString().RemoveWhitespace()}");
+            this.WriteLine();
         }
 
         protected override void Act()

@@ -44,7 +44,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         var apiItemTypeModifiers = apiCollectionType.ApiItemTypeModifiers;
         var options = context.Options;
 
-        writer.WriteConditionalPropertyWithConverter(propertyName, apiItemTypeModifiers, options, ApiTypeModifiersJsonConverter);
+        writer.WriteConditionalPropertyWithConverter(propertyName, apiItemTypeModifiers, options, _apiTypeModifiersJsonConverter);
     }
 
     // ApiEnumType
@@ -226,7 +226,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         var apiTypeModifiers = apiProperty.ApiTypeModifiers;
         var options = context.Options;
 
-        writer.WriteConditionalPropertyWithConverter(propertyName, apiTypeModifiers, options, ApiTypeModifiersJsonConverter);
+        writer.WriteConditionalPropertyWithConverter(propertyName, apiTypeModifiers, options, _apiTypeModifiersJsonConverter);
     }
 
     private static void WriteApiPropertyClrName(Utf8JsonWriter writer, ApiProperty apiProperty, WriteContext context)
@@ -238,64 +238,40 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         writer.WriteConditionalPropertyAsString(propertyName, value, options);
     }
 
-    // ApiPropertyExpression
-    private static void WriteApiPropertyExpression(Utf8JsonWriter writer, ApiPropertyExpression apiPropertyExpression, WriteContext context)
-    {
-        writer.WriteStartObject();
-
-        WriteApiPropertyExpressionApiName(writer, apiPropertyExpression, context);
-        WriteApiPropertyExpressionApiInlineProperty(writer, apiPropertyExpression, context);
-
-        writer.WriteEndObject();
-    }
-
-    private static void WriteApiPropertyExpressionApiName(Utf8JsonWriter writer, ApiPropertyExpression apiPropertyExpression, WriteContext context)
-    {
-        var propertyName = context.PropertyNames.ApiPropertyExpression.ApiName;
-        var value = apiPropertyExpression.ApiName;
-        var options = context.Options;
-
-        writer.WriteConditionalPropertyAsString(propertyName, value, options);
-    }
-
-    private static void WriteApiPropertyExpressionApiInlineProperty(Utf8JsonWriter writer, ApiPropertyExpression apiPropertyExpression, WriteContext context)
-    {
-        var propertyName = context.PropertyNames.ApiPropertyExpression.ApiInlineProperty;
-        var apiInlineProperty = apiPropertyExpression.ApiInlineProperty;
-        var options = context.Options;
-
-        writer.WriteConditionalPropertyWithAction
-        (
-            propertyName,
-            apiInlineProperty,
-            options,
-            (x) => WriteApiProperty(writer, x, context)
-        );
-    }
-
     // ApiRelationship
     private static void WriteApiRelationship(Utf8JsonWriter writer, ApiRelationship apiRelationship, WriteContext context)
     {
         writer.WriteStartObject();
 
-        WriteApiRelationshipApiPropertyExpression(writer, apiRelationship, context);
+        WriteApiRelationshipApiName(writer, apiRelationship, context);
+        WriteApiRelationshipApiPropertyName(writer, apiRelationship, context);
 
         writer.WriteEndObject();
     }
 
-    private static void WriteApiRelationshipApiPropertyExpression(Utf8JsonWriter writer, ApiRelationship apiRelationship, WriteContext context)
+    private static void WriteApiRelationshipApiName(Utf8JsonWriter writer, ApiRelationship apiRelationship, WriteContext context)
     {
-        var propertyName = context.PropertyNames.ApiRelationship.ApiPropertyExpression;
-        var apiPropertyExpression = apiRelationship.ApiPropertyExpression;
+        var propertyName = context.PropertyNames.ApiRelationship.ApiName;
+        var value = apiRelationship.ApiName;
         var options = context.Options;
 
-        writer.WriteConditionalPropertyWithAction
-        (
-            propertyName,
-            apiPropertyExpression,
-            options,
-            (x) => WriteApiPropertyExpression(writer, x, context)
-        );
+        writer.WriteConditionalPropertyAsString(propertyName, value, options);
+    }
+
+    private static void WriteApiRelationshipApiPropertyName(Utf8JsonWriter writer, ApiRelationship apiRelationship, WriteContext context)
+    {
+        var apiName = apiRelationship.ApiName;
+        var apiPropertyName = apiRelationship.ApiPropertyName;
+        if (apiName.Equals(apiPropertyName))
+        {
+            // If the API name and property name are the same, we do not need to write the property name.
+            return;
+        }
+
+        var propertyName = context.PropertyNames.ApiRelationship.ApiPropertyName;
+        var options = context.Options;
+
+        writer.WriteConditionalPropertyAsString(propertyName, apiPropertyName, options);
     }
 
     // ApiScalarType
@@ -354,7 +330,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         var clrType = apiType.ClrType;
         var options = context.Options;
 
-        writer.WriteConditionalPropertyWithConverter(propertyName, clrType, options, TypeJsonConverter);
+        writer.WriteConditionalPropertyWithConverter(propertyName, clrType, options, _typeJsonConverter);
     }
 
     private static void WriteApiTypeEpilog(Utf8JsonWriter writer, ApiType apiType, WriteContext context)
@@ -371,7 +347,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         var kind = apiType.Kind;
         var options = context.Options;
 
-        writer.WriteConditionalPropertyWithConverter(propertyName, kind, options, ApiTypeKindJsonConverter);
+        writer.WriteConditionalPropertyWithConverter(propertyName, kind, options, _apiTypeKindJsonConverter);
     }
 
     private static void WriteApiTypeProlog(Utf8JsonWriter writer, ApiType apiType, WriteContext context)
@@ -399,7 +375,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         var kind = apiTypeExpression.Kind;
         var options = context.Options;
 
-        writer.WriteConditionalPropertyWithConverter(propertyName, kind, options, ApiTypeKindJsonConverter);
+        writer.WriteConditionalPropertyWithConverter(propertyName, kind, options, _apiTypeKindJsonConverter);
     }
 
     private static void WriteApiTypeExpressionApiName(Utf8JsonWriter writer, ApiTypeExpression apiTypeExpression, WriteContext context)

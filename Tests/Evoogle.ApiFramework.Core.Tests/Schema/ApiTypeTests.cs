@@ -558,14 +558,11 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 ],
                 ""ApiRelationships"": [
                     {
-                        ""ApiProperty"": {
-                            ""ApiName"": ""Owner""
-                        }
+                        ""ApiName"": ""OwnedBy"",
+                        ""ApiPropertyName"": ""Owner""
                     },
                     {
-                        ""ApiProperty"": {
-                            ""ApiName"": ""Employees""
-                        }
+                        ""ApiName"": ""Employees""
                     }
                 ],
                 ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BCompany, Evoogle.ApiFramework.Core.Tests""
@@ -597,8 +594,8 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     ),
                 ],
                 [
-                    new ApiRelationship(new ApiPropertyExpression(nameof(Company.Owner))),
-                    new ApiRelationship(new ApiPropertyExpression(nameof(Company.Employees)))
+                    new ApiRelationship("OwnedBy", nameof(Company.Owner)),
+                    new ApiRelationship(nameof(Company.Employees))
                 ],
                 typeof(Company)
             ),
@@ -854,8 +851,8 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     ),
                 ],
                 [
-                    new ApiRelationship(new ApiPropertyExpression(nameof(Company.Owner))),
-                    new ApiRelationship(new ApiPropertyExpression(nameof(Company.Employees)))
+                    new ApiRelationship("OwnedBy", nameof(Company.Owner)),
+                    new ApiRelationship(nameof(Company.Employees))
                 ],
                 typeof(Company)
             ),
@@ -1390,8 +1387,8 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     ),
                 ],
                 [
-                    new ApiRelationship(new ApiPropertyExpression(nameof(Company.Owner))),
-                    new ApiRelationship(new ApiPropertyExpression(nameof(Company.Employees)))
+                    new ApiRelationship("OwnedBy", nameof(Company.Owner)),
+                    new ApiRelationship(nameof(Company.Employees))
                 ],
                 typeof(Company)
             ),
@@ -1437,14 +1434,11 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 ],
                 ""ApiRelationships"": [
                     {
-                        ""ApiProperty"": {
-                            ""ApiName"": ""Owner""
-                        }
+                        ""ApiName"": ""OwnedBy"",
+                        ""ApiPropertyName"": ""Owner""
                     },
                     {
-                        ""ApiProperty"": {
-                            ""ApiName"": ""Employees""
-                        }
+                        ""ApiName"": ""Employees""
                     }
                 ],
                 ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BCompany, Evoogle.ApiFramework.Core.Tests""

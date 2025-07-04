@@ -158,8 +158,8 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             new ApiProperty(nameof(Company.Employees), new ApiTypeExpression(new ApiCollectionType(TestApiObjectTypePersonReference, ApiTypeModifiers.Required, typeof(List<Person>))), ApiTypeModifiers.None, nameof(Company.Employees))
         ],
         [
-            new ApiRelationship(new ApiPropertyExpression(nameof(Company.Employees))),
-            new ApiRelationship(new ApiPropertyExpression(nameof(Company.Owner)))
+            new ApiRelationship(nameof(Company.Owner)),
+            new ApiRelationship(nameof(Company.Employees))
         ],
         typeof(Company)
     );
@@ -755,14 +755,10 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                         ],
                         ""ApiRelationships"": [
                             {
-                                ""ApiProperty"": {
-                                    ""ApiName"": ""Owner""
-                                }
+                                ""ApiName"": ""Owner""
                             },
                             {
-                                ""ApiProperty"": {
-                                    ""ApiName"": ""Employees""
-                                }
+                                ""ApiName"": ""Employees""
                             }
                         ],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BCompany, Evoogle.ApiFramework.Core.Tests""
@@ -1550,14 +1546,10 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                         ],
                         ""ApiRelationships"": [
                             {
-                                ""ApiProperty"": {
-                                    ""ApiName"": ""Owner""
-                                }
+                                ""ApiName"": ""Owner""
                             },
                             {
-                                ""ApiProperty"": {
-                                    ""ApiName"": ""Employees""
-                                }
+                                ""ApiName"": ""Employees""
                             }
                         ],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BCompany, Evoogle.ApiFramework.Core.Tests""

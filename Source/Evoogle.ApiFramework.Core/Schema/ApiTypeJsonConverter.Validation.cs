@@ -162,30 +162,19 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         ref List<ValidationResult>? results
     )
     {
-        if (apiProperties == null)
+        if (apiProperties?.Count > 0)
         {
-            AddMissingPropertyError(ref results, apiPropertiesPropertyName);
-        }
-        else
-        {
-            if (apiProperties.Any() == false)
+            for (var i = 0; i < apiProperties.Count; ++i)
             {
-                AddEmptyCollectionPropertyError(ref results, apiPropertiesPropertyName);
-            }
-            else
-            {
-                for (var i = 0; i < apiProperties.Count; ++i)
-                {
-                    var apiProperty = apiProperties[i];
-                    ValidateApiPropertyProperties(
-                        context,
-                        $"{apiPropertiesPropertyName}[{i}].{context.PropertyNames.ApiProperty.ApiName}", apiProperty.ApiName,
-                        $"{apiPropertiesPropertyName}[{i}].{context.PropertyNames.ApiProperty.ApiTypeExpression}", apiProperty.ApiTypeExpression,
-                        $"{apiPropertiesPropertyName}[{i}].{context.PropertyNames.ApiProperty.ApiTypeModifiers}", apiProperty.ApiTypeModifiers,
-                        $"{apiPropertiesPropertyName}[{i}].{context.PropertyNames.ApiProperty.ClrName}", apiProperty.ClrName,
-                        ref results
-                    );
-                }
+                var apiProperty = apiProperties[i];
+                ValidateApiPropertyProperties(
+                    context,
+                    $"{apiPropertiesPropertyName}[{i}].{context.PropertyNames.ApiProperty.ApiName}", apiProperty.ApiName,
+                    $"{apiPropertiesPropertyName}[{i}].{context.PropertyNames.ApiProperty.ApiTypeExpression}", apiProperty.ApiTypeExpression,
+                    $"{apiPropertiesPropertyName}[{i}].{context.PropertyNames.ApiProperty.ApiTypeModifiers}", apiProperty.ApiTypeModifiers,
+                    $"{apiPropertiesPropertyName}[{i}].{context.PropertyNames.ApiProperty.ClrName}", apiProperty.ClrName,
+                    ref results
+                );
             }
         }
 
@@ -195,8 +184,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
             {
                 var apiRelationship = apiRelationships[i];
                 ValidateApiRelationshipProperties(
-                    context,
-                    $"{apiRelationshipsPropertyName}[{i}].{context.PropertyNames.ApiRelationship.ApiPropertyExpression}", apiRelationship.ApiPropertyExpression,
+                    $"{apiRelationshipsPropertyName}[{i}].{context.PropertyNames.ApiRelationship.ApiName}", apiRelationship.ApiName,
                     ref results
                 );
             }
@@ -241,26 +229,8 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
     }
     #endregion
 
-    #region ApiPropertyExpression Validation Methods
-    private static void ValidateApiPropertyExpression
-    (
-        in ReadContext context,
-        ApiPropertyExpressionReadData apiPropertyExpression,
-        ref List<ValidationResult>? results
-    )
-    {
-        var apiInlineProperty = apiPropertyExpression.ApiInlineProperty;
-        if (apiInlineProperty == null)
-        {
-            ValidateApiPropertyExpressionProperties
-            (
-                context.PropertyNames.ApiPropertyExpression.ApiName, apiPropertyExpression.ApiName,
-                ref results
-            );
-        }
-    }
-
-    private static void ValidateApiPropertyExpressionProperties
+    #region ApiRelationship Validation Methods
+    private static void ValidateApiRelationshipProperties
     (
         string apiNamePropertyName, string? apiName,
         ref List<ValidationResult>? results
@@ -269,25 +239,6 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         if (apiName == null)
         {
             AddMissingPropertyError(ref results, apiNamePropertyName);
-        }
-    }
-    #endregion
-
-    #region ApiRelationship Validation Methods
-    private static void ValidateApiRelationshipProperties
-    (
-        in ReadContext context,
-        string apiPropertyExpressionPropertyName, ApiPropertyExpressionReadData? apiPropertyExpression,
-        ref List<ValidationResult>? results
-    )
-    {
-        if (apiPropertyExpression == null)
-        {
-            AddMissingPropertyError(ref results, apiPropertyExpressionPropertyName);
-        }
-        else
-        {
-            ValidateApiPropertyExpression(context, apiPropertyExpression, ref results);
         }
     }
     #endregion
@@ -316,7 +267,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         }
         else if (Enum.TryParse<ApiTypeKind>(kind, out var apiTypeKind) == false)
         {
-            AddValidationError(ref results, $"Invalid ApiTypeKind value: {kind}", kindPropertyName);
+            AddValidationError(ref results, $"Invalid {nameof(ApiTypeKind)} value: {kind}", kindPropertyName);
         }
 
         if (clrType == null)
@@ -359,7 +310,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         }
         else if (Enum.TryParse<ApiTypeKind>(kind, out var apiTypeKind) == false)
         {
-            AddValidationError(ref results, $"Invalid ApiTypeKind value: {kind}", kindPropertyName);
+            AddValidationError(ref results, $"Invalid {nameof(ApiTypeKind)} value: {kind}", kindPropertyName);
         }
 
         if (apiName == null)

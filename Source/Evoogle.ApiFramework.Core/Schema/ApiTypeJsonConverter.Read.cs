@@ -62,18 +62,11 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         #endregion
     }
 
-    private class ApiPropertyExpressionReadData
-    {
-        #region Properties
-        public ApiPropertyReadData? ApiInlineProperty { get; set; }
-        public string? ApiName { get; set; }
-        #endregion
-    }
-
     private class ApiRelationshipReadData
     {
         #region Properties
-        public ApiPropertyExpressionReadData? ApiPropertyExpression { get; set; }
+        public string? ApiName { get; set; }
+        public string? ApiPropertyName { get; set; }
         #endregion
     }
 
@@ -110,7 +103,6 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         public ApiNamedTypeReadData? ApiNamedType { get; set; }
         public ApiObjectTypeReadData? ApiObjectType { get; set; }
         public ApiPropertyReadData? ApiProperty { get; set; }
-        public ApiPropertyExpressionReadData? ApiPropertyExpression { get; set; }
         public ApiRelationshipReadData? ApiRelationship { get; set; }
         public ApiTypeReadData? ApiType { get; set; }
         public ApiTypeExpressionReadData? ApiTypeExpression { get; set; }
@@ -139,18 +131,11 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         };
         #endregion
 
-        #region ApiPropertyExpression Fields
-        public readonly Dictionary<string, ApiJsonReaderHandler<ReadContext>> ApiPropertyExpressionHandlers = new()
-        {
-            { propertyNames.ApiPropertyExpression.ApiInlineProperty, HandleApiPropertyExpressionApiInlineProperty },
-            { propertyNames.ApiPropertyExpression.ApiName, HandleApiPropertyExpressionApiName },
-        };
-        #endregion
-
         #region ApiRelationship Fields
         public readonly Dictionary<string, ApiJsonReaderHandler<ReadContext>> ApiRelationshipPropertyHandlers = new()
         {
-            { propertyNames.ApiRelationship.ApiPropertyExpression, HandleApiRelationshipApiPropertyExpression },
+            { propertyNames.ApiRelationship.ApiName, HandleApiRelationshipApiName },
+            { propertyNames.ApiRelationship.ApiPropertyName, HandleApiRelationshipApiPropertyName },
         };
         #endregion
 
@@ -207,7 +192,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
 
             var options = context.Options;
             var typeToConvert = typeof(ApiTypeModifiers);
-            context.ReadData.ApiCollectionType.ApiItemTypeModifiers = ApiTypeModifiersJsonConverter.Read(ref reader, typeToConvert, options);
+            context.ReadData.ApiCollectionType.ApiItemTypeModifiers = _apiTypeModifiersJsonConverter.Read(ref reader, typeToConvert, options);
         }
         #endregion
 
@@ -321,7 +306,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
 
             var options = context.Options;
             var typeToConvert = typeof(ApiTypeModifiers);
-            context.ReadData.ApiProperty.ApiTypeModifiers = ApiTypeModifiersJsonConverter.Read(ref reader, typeToConvert, options);
+            context.ReadData.ApiProperty.ApiTypeModifiers = _apiTypeModifiersJsonConverter.Read(ref reader, typeToConvert, options);
         }
 
         private static void HandleApiPropertyApiTypeExpression(ref Utf8JsonReader reader, ref ReadContext context)
@@ -343,38 +328,19 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         }
         #endregion
 
-        #region ApiPropertyExpression Fields
-        private static void HandleApiPropertyExpressionApiInlineProperty(ref Utf8JsonReader reader, ref ReadContext context)
-        {
-            ReadJsonObject<ApiTypeJsonConverter, ReadContext>(ref reader, ref context, (x) => x.ReadHandlers.ApiPropertyPropertyHandlers);
-            if (context.ReadData.ApiProperty == null)
-                return;
-
-            context.ReadData.ApiPropertyExpression ??= new ApiPropertyExpressionReadData();
-            context.ReadData.ApiPropertyExpression.ApiInlineProperty = context.ReadData.ApiProperty;
-
-            // Clear the ApiProperty to avoid confusion in the next read operation
-            context.ReadData.ApiProperty = null;
-        }
-
-        private static void HandleApiPropertyExpressionApiName(ref Utf8JsonReader reader, ref ReadContext context)
-        {
-            context.ReadData.ApiPropertyExpression ??= new ApiPropertyExpressionReadData();
-
-            context.ReadData.ApiPropertyExpression.ApiName = reader.GetString();
-        }
-        #endregion
-
         #region ApiRelationship Methods
-        private static void HandleApiRelationshipApiPropertyExpression(ref Utf8JsonReader reader, ref ReadContext context)
+        private static void HandleApiRelationshipApiName(ref Utf8JsonReader reader, ref ReadContext context)
         {
-            ReadJsonObject<ApiTypeJsonConverter, ReadContext>(ref reader, ref context, (x) => x.ReadHandlers.ApiPropertyExpressionHandlers);
-
             context.ReadData.ApiRelationship ??= new ApiRelationshipReadData();
-            context.ReadData.ApiRelationship.ApiPropertyExpression = context.ReadData.ApiPropertyExpression;
 
-            // Clear the ApiPropertyExpression to avoid confusion in the next read operation
-            context.ReadData.ApiPropertyExpression = null;
+            context.ReadData.ApiRelationship.ApiName = reader.GetString();
+        }
+
+        private static void HandleApiRelationshipApiPropertyName(ref Utf8JsonReader reader, ref ReadContext context)
+        {
+            context.ReadData.ApiRelationship ??= new ApiRelationshipReadData();
+
+            context.ReadData.ApiRelationship.ApiPropertyName = reader.GetString();
         }
         #endregion
 
@@ -413,7 +379,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         {
             context.ReadData.ApiType ??= new ApiTypeReadData();
 
-            context.ReadData.ApiType.ClrType = TypeJsonConverter.Read(ref reader, typeof(Type), context.Options);
+            context.ReadData.ApiType.ClrType = _typeJsonConverter.Read(ref reader, typeof(Type), context.Options);
         }
         #endregion
 

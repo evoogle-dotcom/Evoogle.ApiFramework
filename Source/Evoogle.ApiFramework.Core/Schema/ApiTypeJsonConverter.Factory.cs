@@ -156,7 +156,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
 
         var apiRelationships = context.ReadData.ApiObjectType!.ApiRelationships.EmptyIfNull().Select(x =>
         {
-            var apiRelationship = CreateApiRelationship(logger, x);
+            var apiRelationship = CreateApiRelationship(x);
             return apiRelationship;
         })
         .ToList();
@@ -177,26 +177,12 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         return apiProperty;
     }
 
-    private static ApiPropertyExpression CreateApiPropertyExpression(ILogger logger, ApiPropertyExpressionReadData apiPropertyExpressionReadData)
+    private static ApiRelationship CreateApiRelationship(ApiRelationshipReadData apiRelationshipReadData)
     {
-        var apiInlinePropertyReadData = apiPropertyExpressionReadData.ApiInlineProperty;
-        if (apiInlinePropertyReadData is not null)
-        {
-            var apiProperty = CreateApiProperty(logger, apiInlinePropertyReadData);
-            return new ApiPropertyExpression(apiProperty);
-        }
+        var apiName = apiRelationshipReadData.ApiName!;
+        var apiPropertyName = apiRelationshipReadData.ApiPropertyName;
 
-        var apiName = apiPropertyExpressionReadData.ApiName!;
-
-        return new ApiPropertyExpression(apiName);
-    }
-
-    private static ApiRelationship CreateApiRelationship(ILogger logger, ApiRelationshipReadData apiRelationshipReadData)
-    {
-        var apiPropertyExpression = CreateApiPropertyExpression(logger, apiRelationshipReadData.ApiPropertyExpression!);
-
-        var apiRelationship = new ApiRelationship(apiPropertyExpression);
-        return apiRelationship;
+        return new ApiRelationship(apiName, apiPropertyName);
     }
 
     private static ApiScalarType CreateApiScalarType(in ReadContext context, ApiTypeKind kind, List<ValidationResult>? validationResults)

@@ -106,18 +106,11 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
         #endregion
     }
 
-    private readonly record struct ApiPropertyExpressionPropertyNames
-    {
-        #region Immutable Properties
-        public required string ApiName { get; init; }
-        public required string ApiInlineProperty { get; init; }
-        #endregion
-    }
-
     private readonly record struct ApiRelationshipPropertyNames
     {
         #region Immutable Properties
-        public required string ApiPropertyExpression { get; init; }
+        public required string ApiName { get; init; }
+        public required string ApiPropertyName { get; init; }
         #endregion
     }
 
@@ -147,7 +140,6 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
         public required ApiNamedTypePropertyNames ApiNamedType { get; init; }
         public required ApiObjectTypePropertyNames ApiObjectType { get; init; }
         public required ApiPropertyPropertyNames ApiProperty { get; init; }
-        public required ApiPropertyExpressionPropertyNames ApiPropertyExpression { get; init; }
         public required ApiRelationshipPropertyNames ApiRelationship { get; init; }
         public required ApiTypePropertyNames ApiType { get; init; }
         public required ApiTypeExpressionPropertyNames ApiTypeExpression { get; init; }
@@ -159,16 +151,16 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
     #region Fields
     private readonly ILogger<ApiTypeJsonConverter> _logger = new MultiplexingLogger<ApiTypeJsonConverter>(logger, MultiplexingLoggerMode.All);
 
-    private static readonly EnumJsonConverter<ApiTypeKind> ApiTypeKindJsonConverter = new();
-    private static readonly EnumJsonConverter<ApiTypeModifiers> ApiTypeModifiersJsonConverter = new();
+    private static readonly EnumJsonConverter<ApiTypeKind> _apiTypeKindJsonConverter = new();
+    private static readonly EnumJsonConverter<ApiTypeModifiers> _apiTypeModifiersJsonConverter = new();
 
-    private static readonly TypeJsonConverter TypeJsonConverter = new();
+    private static readonly TypeJsonConverter _typeJsonConverter = new();
 
     // Cache resolved property names per naming policy for performance and consistency
-    private static readonly ConcurrentDictionary<JsonNamingPolicy, PropertyNames> PropertyNamesCache = new();
+    private static readonly ConcurrentDictionary<JsonNamingPolicy, PropertyNames> _propertyNamesCache = new();
 
     // Cache read handlers per naming policy to avoid rebuilding on every call
-    private static readonly ConcurrentDictionary<JsonNamingPolicy, ReadHandlers> ReadHandlersCache = new();
+    private static readonly ConcurrentDictionary<JsonNamingPolicy, ReadHandlers> _readHandlersCache = new();
     #endregion
 
     #region Constructors
@@ -238,7 +230,7 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
     #region Cache Implementation Methods
     private static PropertyNames GetPropertyNames(JsonNamingPolicy policy)
     {
-        return PropertyNamesCache.GetOrAdd(policy, policy => new PropertyNames
+        return _propertyNamesCache.GetOrAdd(policy, policy => new PropertyNames
         {
             ApiCollectionType = new ApiCollectionTypePropertyNames
             {
@@ -271,14 +263,10 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
                 ApiTypeModifiers = policy.ConvertName(nameof(ApiProperty.ApiTypeModifiers)),
                 ClrName = policy.ConvertName(nameof(ApiProperty.ClrName))
             },
-            ApiPropertyExpression = new ApiPropertyExpressionPropertyNames
-            {
-                ApiName = policy.ConvertName(nameof(ApiPropertyExpression.ApiName)),
-                ApiInlineProperty = policy.ConvertName(nameof(ApiPropertyExpression.ApiInlineProperty)),
-            },
             ApiRelationship = new ApiRelationshipPropertyNames
             {
-                ApiPropertyExpression = policy.ConvertName(nameof(ApiRelationship.ApiProperty)) // Mapping property name from ApiPropertyExpression to ApiProperty by design
+                ApiName = policy.ConvertName(nameof(ApiRelationship.ApiName)),
+                ApiPropertyName = policy.ConvertName(nameof(ApiRelationship.ApiPropertyName))
             },
             ApiType = new ApiTypePropertyNames
             {
@@ -298,6 +286,6 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
         });
     }
 
-    private static ReadHandlers GetReadHandlers(JsonNamingPolicy policy, PropertyNames propertyNames) => ReadHandlersCache.GetOrAdd(policy, policy => new ReadHandlers(propertyNames));
+    private static ReadHandlers GetReadHandlers(JsonNamingPolicy policy, PropertyNames propertyNames) => _readHandlersCache.GetOrAdd(policy, policy => new ReadHandlers(propertyNames));
     #endregion
 }
