@@ -45,7 +45,7 @@ public sealed class ApiEnumType : ApiNamedType
     {
         if (!TypeReflection.IsEnum(clrEnumType))
         {
-            var message = $"Unable to create an {nameof(ApiEnumType)}, the CLR type [name={clrEnumType.Name}] is not a CLR enum type.";
+            var message = $"Unable to create {nameof(ApiEnumType)} because the CLR type [name={clrEnumType.Name}] is not a CLR enum type.";
             throw new ApiSchemaException(message);
         }
 

@@ -310,7 +310,7 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
         // Resolve all ApiTypeExpression instances (named or inline)
         apiSchema.ResolveAllReferences(ref validationResults);
 
-        // Resolve all ApiPropertyExpression instances (named or inline)
+        // Resolve all ApiRelationship instances
         apiSchema.ResolveAllRelationships(ref validationResults);
 
         // Throw if any validation errors were found API schema creation.
