@@ -12,9 +12,17 @@ using Evoogle.Extensions;
 namespace Evoogle.ApiFramework.Schema;
 
 /// <summary>
-///     Represents a named API relationship that optionally resolves to a specific <see cref="ApiProperty"/> defined on an <see cref="ApiObjectType"/>.
-///     Relationships abstract navigation and cardinality.
+///     Represents semantic metadata for a named relationship within an <see cref="ApiObjectType"/> that
+///     expresses object-to-object linkage and cardinality.
 /// </summary>
+/// <remarks>
+///     <para>
+///         <see cref="ApiRelationship"/> refers to a specific <see cref="ApiProperty"/> on the parent object
+///         and interprets it as a navigational link to another object type. Relationships capture
+///         semantic context (e.g., "customer → orders", "user → roles") that goes beyond the property's
+///         structural definition.
+///     </para>
+/// </remarks>
 public sealed class ApiRelationship(string apiName, string? apiPropertyName = null) : ExtensibleBase
 {
     #region Fields

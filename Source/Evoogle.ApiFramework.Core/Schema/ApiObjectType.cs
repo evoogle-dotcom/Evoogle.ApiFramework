@@ -10,8 +10,24 @@ using Evoogle.Extensions;
 namespace Evoogle.ApiFramework.Schema;
 
 /// <summary>
-///     Represents metadata of an API object that has API named properties that can be read/written from/to an API service.
+///     Represents metadata of an API object type that defines a set of named structural properties and semantic relationships
+///     for API input/output.
 /// </summary>
+/// <remarks>
+///     <para>
+///         <see cref="ApiObjectType"/> distinguishes between:
+///         <list type="bullet">
+///             <item>
+///                 <description><see cref="ApiProperty"/> — structural metadata describing individual named data members
+///                 (e.g., strings, numbers, collections) of the object.</description>
+///             </item>
+///             <item>
+///                 <description><see cref="ApiRelationship"/> — semantic metadata describing navigation or linkage from
+///                 one object type to another, based on one of its properties and expressing cardinality.</description>
+///             </item>
+///         </list>
+///     </para>
+/// </remarks>
 public sealed class ApiObjectType : ApiNamedType
 {
     #region ApiType Properties

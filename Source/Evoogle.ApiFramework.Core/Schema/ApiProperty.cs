@@ -12,8 +12,16 @@ using Evoogle.Extensions;
 namespace Evoogle.ApiFramework.Schema;
 
 /// <summary>
-///     Represents metadata of an API property belonging to an API object type.
+///     Represents structural metadata of an API property belonging to an <see cref="ApiObjectType"/>.
+///     Each property corresponds to a named data element in an API contract.
 /// </summary>
+/// <remarks>
+///     <para>
+///         <see cref="ApiProperty"/> captures type-level structure for fields such as primitives,
+///         objects, collections, and complex types. Properties may be referenced by one or more
+///         <see cref="ApiRelationship"/> instances to convey semantic meaning (e.g., parent-child, references).
+///     </para>
+/// </remarks>
 /// <remarks>
 ///     Initializes a new instance of the <see cref="ApiProperty"/> class.
 /// </remarks>
