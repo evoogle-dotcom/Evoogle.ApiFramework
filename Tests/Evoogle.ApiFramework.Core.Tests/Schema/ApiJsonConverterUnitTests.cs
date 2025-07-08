@@ -81,11 +81,11 @@ public static class ApiJsonConverterUnitTests
         #endregion
 
         #region User Supplied Properties
-        public string? Source { get; set; }
-        public T? Expected { get; set; }
-        public bool? AddTestExtension1 { get; set; } = false;
-        public bool? AddTestExtension2 { get; set; } = false;
-        public JsonSerializerOptions? JsonSerializerOptions { get; set; } = DefaultJsonSerializerOptions;
+        public string? Source { get; init; }
+        public T? Expected { get; init; }
+        public bool? AddTestExtension1 { get; init; } = false;
+        public bool? AddTestExtension2 { get; init; } = false;
+        public JsonSerializerOptions? JsonSerializerOptions { get; init; } = DefaultJsonSerializerOptions;
         #endregion
 
         #region Calculated Properties
@@ -135,10 +135,10 @@ public static class ApiJsonConverterUnitTests
         #endregion
 
         #region User Supplied Properties
-        public T? Expected { get; set; }
-        public bool? AddTestExtension1 { get; set; } = false;
-        public bool? AddTestExtension2 { get; set; } = false;
-        public JsonSerializerOptions? JsonSerializerOptions { get; set; } = DefaultJsonSerializerOptions;
+        public T? Expected { get; init; }
+        public bool? AddTestExtension1 { get; init; } = false;
+        public bool? AddTestExtension2 { get; init; } = false;
+        public JsonSerializerOptions? JsonSerializerOptions { get; init; } = DefaultJsonSerializerOptions;
         #endregion
 
         #region Calculated Properties
@@ -186,11 +186,11 @@ public static class ApiJsonConverterUnitTests
         #endregion
 
         #region User Supplied Properties
-        public T? Source { get; set; }
-        public string? Expected { get; set; }
-        public bool? AddTestExtension1 { get; set; } = false;
-        public bool? AddTestExtension2 { get; set; } = false;
-        public JsonSerializerOptions? JsonSerializerOptions { get; set; } = DefaultJsonSerializerOptions;
+        public T? Source { get; init; }
+        public string? Expected { get; init; }
+        public bool? AddTestExtension1 { get; init; } = false;
+        public bool? AddTestExtension2 { get; init; } = false;
+        public JsonSerializerOptions? JsonSerializerOptions { get; init; } = DefaultJsonSerializerOptions;
         #endregion
 
         #region Calculated Properties
