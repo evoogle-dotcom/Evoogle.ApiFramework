@@ -4,6 +4,7 @@
     <TargetFramework>net9.0</TargetFramework>
     <OutputType>Exe</OutputType>
     <ImplicitUsings>enable</ImplicitUsings>
+    <IsTestProject>true</IsTestProject>
     <Nullable>enable</Nullable>
     <RootNamespace>Evoogle.ApiFramework</RootNamespace>
   </PropertyGroup>
