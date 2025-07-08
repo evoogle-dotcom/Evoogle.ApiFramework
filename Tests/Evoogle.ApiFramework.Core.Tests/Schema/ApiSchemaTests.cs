@@ -18,9 +18,9 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
     private class TryGetByApiNameTest : XUnitTest
     {
         #region User Supplied Properties
-        public ApiSchema? ApiSchema { get; set; }
-        public string? ApiName { get; set; }
-        public ApiType? ExpectedApiType { get; set; }
+        public ApiSchema? ApiSchema { get; init; }
+        public string? ApiName { get; init; }
+        public ApiType? ExpectedApiType { get; init; }
         #endregion
 
         #region Calculated Properties
@@ -62,9 +62,9 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
     private class TryGetByClrTypeTest : XUnitTest
     {
         #region User Supplied Properties
-        public ApiSchema? ApiSchema { get; set; }
-        public Type? ClrType { get; set; }
-        public ApiType? ExpectedApiType { get; set; }
+        public ApiSchema? ApiSchema { get; init; }
+        public Type? ClrType { get; init; }
+        public ApiType? ExpectedApiType { get; init; }
         #endregion
 
         #region Calculated Properties
