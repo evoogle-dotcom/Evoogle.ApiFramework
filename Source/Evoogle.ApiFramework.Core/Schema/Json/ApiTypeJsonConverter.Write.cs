@@ -9,9 +9,9 @@ using System.Text.Json.Serialization;
 using Evoogle.Extension;
 using Evoogle.Json;
 
-using static Evoogle.ApiFramework.Schema.Internal.ApiJsonConverterHelpers;
+using static Evoogle.ApiFramework.Schema.Json.Internal.ApiJsonConverterHelpers;
 
-namespace Evoogle.ApiFramework.Schema;
+namespace Evoogle.ApiFramework.Schema.Json;
 
 public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
 {

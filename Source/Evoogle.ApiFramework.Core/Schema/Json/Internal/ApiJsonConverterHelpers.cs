@@ -13,7 +13,7 @@ using Evoogle.Logging;
 
 using Microsoft.Extensions.Logging;
 
-namespace Evoogle.ApiFramework.Schema.Internal;
+namespace Evoogle.ApiFramework.Schema.Json.Internal;
 
 /// <summary>
 ///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used directly from your code.

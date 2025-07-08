@@ -11,9 +11,9 @@ using Evoogle.Extensions;
 
 using Microsoft.Extensions.Logging;
 
-using static Evoogle.ApiFramework.Schema.Internal.ApiJsonConverterHelpers;
+using static Evoogle.ApiFramework.Schema.Json.Internal.ApiJsonConverterHelpers;
 
-namespace Evoogle.ApiFramework.Schema;
+namespace Evoogle.ApiFramework.Schema.Json;
 
 public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
 {

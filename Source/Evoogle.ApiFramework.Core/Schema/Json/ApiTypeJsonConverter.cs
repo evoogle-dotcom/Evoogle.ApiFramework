@@ -13,9 +13,9 @@ using Evoogle.Logging;
 
 using Microsoft.Extensions.Logging;
 
-using static Evoogle.ApiFramework.Schema.Internal.ApiJsonConverterHelpers;
+using static Evoogle.ApiFramework.Schema.Json.Internal.ApiJsonConverterHelpers;
 
-namespace Evoogle.ApiFramework.Schema;
+namespace Evoogle.ApiFramework.Schema.Json;
 
 /// <summary>
 ///     A JSON converter for <see cref="ApiType"/> that handles serialization and deserialization logic.

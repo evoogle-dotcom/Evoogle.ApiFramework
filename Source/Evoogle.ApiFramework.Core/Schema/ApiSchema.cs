@@ -8,6 +8,7 @@ using System.Text.Json.Serialization;
 
 using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Schema.Internal;
+using Evoogle.ApiFramework.Schema.Json;
 using Evoogle.Extension;
 using Evoogle.Extensions;
 

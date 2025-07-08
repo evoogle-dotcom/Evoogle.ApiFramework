@@ -15,9 +15,9 @@ using Evoogle.Logging;
 
 using Microsoft.Extensions.Logging;
 
-using static Evoogle.ApiFramework.Schema.Internal.ApiJsonConverterHelpers;
+using static Evoogle.ApiFramework.Schema.Json.Internal.ApiJsonConverterHelpers;
 
-namespace Evoogle.ApiFramework.Schema;
+namespace Evoogle.ApiFramework.Schema.Json;
 
 /// <summary>
 ///     JSON converter for <see cref="ApiSchema"/> which reads and writes schema objects.
