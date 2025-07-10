@@ -5,10 +5,9 @@
 // See the LICENSE file in the project root for more information.
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
-public sealed class ApiScalarTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
-    : ApiNamedTypeBuilder<ApiScalarTypeBuilder>(clrType, context)
+public interface IApiEnumTypeConfiguration
 {
-    #region Builder Methods
-    public ApiScalarType Build() => new(this.ApiName, this.ClrType);
+    #region Methods
+    void Configure(ApiEnumTypeBuilder builder);
     #endregion
 }

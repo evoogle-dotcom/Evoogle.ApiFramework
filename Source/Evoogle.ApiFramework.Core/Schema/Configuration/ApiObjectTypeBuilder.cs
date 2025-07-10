@@ -10,37 +10,22 @@ using System.Collections.Generic;
 
 using Evoogle.ApiFramework.Schema;
 
-public sealed class ApiObjectTypeBuilder : IApiNamedTypeBuilder
+public sealed class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
+    : ApiNamedTypeBuilder<ApiObjectTypeBuilder>(clrType, context)
 {
-    public string ApiName => _apiName;
-    public Type ClrType => _clrType ?? typeof(object);
+    #region Fields
+    private readonly List<ApiProperty> _properties = [];
+    private readonly List<ApiRelationship> _relationships = [];
+    #endregion
 
-    private readonly string _apiName;
-    private readonly ApiSchemaBuilderContext _context;
-    private readonly List<ApiProperty> _properties = new();
-    private readonly List<ApiRelationship> _relationships = new();
-    private Type? _clrType;
-
-    public ApiObjectTypeBuilder(string apiName, ApiSchemaBuilderContext context)
-    {
-        _apiName = apiName ?? throw new ArgumentNullException(nameof(apiName));
-        _context = context ?? throw new ArgumentNullException(nameof(context));
-    }
-
-    public ApiObjectTypeBuilder WithClrType(Type clrType)
-    {
-        _clrType = clrType ?? throw new ArgumentNullException(nameof(clrType));
-        return this;
-    }
-
+    #region Builder Methods
     public ApiObjectTypeBuilder AddProperty(string apiName, string clrName, Type clrType, Action<ApiTypeModifiersBuilder>? modifiers = null)
     {
-        if (string.IsNullOrWhiteSpace(apiName))
-            throw new ArgumentException("API property name cannot be null or whitespace.", nameof(apiName));
-        if (string.IsNullOrWhiteSpace(clrName))
-            throw new ArgumentException("CLR property name cannot be null or whitespace.", nameof(clrName));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
+        ArgumentException.ThrowIfNullOrWhiteSpace(clrName, nameof(clrName));
+        ArgumentNullException.ThrowIfNull(clrType, nameof(clrType));
 
-        var typeExpression = ApiTypeExpressionBuilder.FromClrType(clrType, _context);
+        var typeExpression = ApiTypeExpressionBuilder.FromClrType(clrType, this.Context);
 
         var modifierBuilder = new ApiTypeModifiersBuilder();
         modifiers?.Invoke(modifierBuilder);
@@ -53,8 +38,7 @@ public sealed class ApiObjectTypeBuilder : IApiNamedTypeBuilder
 
     public ApiObjectTypeBuilder AddRelationship(string apiName, string? apiPropertyName = null)
     {
-        if (string.IsNullOrWhiteSpace(apiName))
-            throw new ArgumentException("API relationship name cannot be null or whitespace.", nameof(apiName));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
 
         var relationship = new ApiRelationship(apiName, apiPropertyName);
         _relationships.Add(relationship);
@@ -64,13 +48,15 @@ public sealed class ApiObjectTypeBuilder : IApiNamedTypeBuilder
 
     public ApiObjectType Build()
     {
-        var objectType = new ApiObjectType(
-            apiName: _apiName,
+        var objectType = new ApiObjectType
+        (
+            apiName: this.ApiName,
             apiProperties: _properties,
             apiRelationships: _relationships,
-            clrObjectType: ClrType
+            clrObjectType: this.ClrType
         );
 
         return objectType;
     }
+    #endregion
 }

@@ -12,9 +12,9 @@ public sealed class ApiSchemaBuilder
 
     private readonly ApiSchemaBuilderContext _context = new();
 
-    private readonly Dictionary<string, ApiScalarTypeBuilder> _scalarBuilders = new(StringComparer.OrdinalIgnoreCase);
-    private readonly Dictionary<string, ApiEnumTypeBuilder> _enumBuilders = new(StringComparer.OrdinalIgnoreCase);
-    private readonly Dictionary<string, ApiObjectTypeBuilder> _objectTypeBuilders = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<Type, ApiScalarTypeBuilder> _scalarTypeBuilders = [];
+    private readonly Dictionary<Type, ApiEnumTypeBuilder> _enumTypeBuilders = [];
+    private readonly Dictionary<Type, ApiObjectTypeBuilder> _objectTypeBuilders = [];
 
     public ApiSchemaBuilder WithName(string name)
     {
@@ -28,48 +28,76 @@ public sealed class ApiSchemaBuilder
         return this;
     }
 
-    public ApiSchemaBuilder AddEnum(string apiName, Type clrType, Action<ApiEnumTypeBuilder>? configure = null)
+    public ApiSchemaBuilder AddEnum(Type clrType, Action<ApiEnumTypeBuilder> configure)
     {
-        if (!_enumBuilders.TryGetValue(apiName, out var builder))
-        {
-            builder = new ApiEnumTypeBuilder(apiName, clrType);
-            _enumBuilders[apiName] = builder;
-        }
+        ArgumentNullException.ThrowIfNull(clrType);
+        ArgumentNullException.ThrowIfNull(configure);
 
-        configure?.Invoke(builder);
-        _context.RegisterApiType(clrType, builder);
-        return this;
-    }
-
-    public ApiSchemaBuilder AddObject(string apiName, Action<ApiObjectTypeBuilder> configure)
-    {
-        if (!_objectTypeBuilders.TryGetValue(apiName, out var builder))
-        {
-            builder = new ApiObjectTypeBuilder(apiName, _context);
-            _objectTypeBuilders[apiName] = builder;
-        }
+        var builder = _context.GetOrAddEnumTypeBuilder(clrType);
 
         configure(builder);
         return this;
     }
 
-    public ApiSchemaBuilder AddScalar(string apiName, Type clrType, Action<ApiScalarTypeBuilder>? configure = null)
+    public ApiSchemaBuilder AddEnum(Type clrType, IApiEnumTypeConfiguration configuration)
     {
-        if (!_scalarBuilders.TryGetValue(apiName, out var builder))
-        {
-            builder = new ApiScalarTypeBuilder(apiName, clrType);
-            _scalarBuilders[apiName] = builder;
-        }
+        ArgumentNullException.ThrowIfNull(clrType);
+        ArgumentNullException.ThrowIfNull(configuration);
 
-        configure?.Invoke(builder);
-        _context.RegisterApiType(clrType, builder); // Register builder now, resolve later in Build()
+        var builder = _context.GetOrAddEnumTypeBuilder(clrType);
+
+        configuration.Configure(builder);
+        return this;
+    }
+
+    public ApiSchemaBuilder AddObject(Type clrType, Action<ApiObjectTypeBuilder> configure)
+    {
+        ArgumentNullException.ThrowIfNull(clrType);
+        ArgumentNullException.ThrowIfNull(configure);
+
+        var builder = _context.GetOrAddObjectTypeBuilder(clrType);
+
+        configure(builder);
+        return this;
+    }
+
+    public ApiSchemaBuilder AddObject(Type clrType, IApiObjectTypeConfiguration configuration)
+    {
+        ArgumentNullException.ThrowIfNull(clrType);
+        ArgumentNullException.ThrowIfNull(configuration);
+
+        var builder = _context.GetOrAddObjectTypeBuilder(clrType);
+
+        configuration.Configure(builder);
+        return this;
+    }
+
+    public ApiSchemaBuilder AddScalar(Type clrType, Action<ApiScalarTypeBuilder> configure)
+    {
+        ArgumentNullException.ThrowIfNull(clrType);
+        ArgumentNullException.ThrowIfNull(configure);
+
+        var builder = _context.GetOrAddScalarTypeBuilder(clrType);
+
+        configure(builder);
+        return this;
+    }
+
+    public ApiSchemaBuilder AddScalar(Type clrType, IApiScalarTypeConfiguration configuration)
+    {
+        ArgumentNullException.ThrowIfNull(clrType);
+        ArgumentNullException.ThrowIfNull(configuration);
+
+        var builder = _context.GetOrAddScalarTypeBuilder(clrType);
+
+        configuration.Configure(builder);
         return this;
     }
 
     public ApiSchema Build()
     {
-        var scalarTypes = _scalarBuilders.Values.Select(b => b.Build()).ToList();
-        var enumTypes = _enumBuilders.Values.Select(b => b.Build()).ToList();
+        var scalarTypes = _scalarTypeBuilders.Values.Select(b => b.Build()).ToList();
+        var enumTypes = _enumTypeBuilders.Values.Select(b => b.Build()).ToList();
         var objectTypes = _objectTypeBuilders.Values.Select(b => b.Build()).ToList();
 
         return new ApiSchema(_name, scalarTypes, enumTypes, objectTypes)
@@ -77,4 +105,46 @@ public sealed class ApiSchemaBuilder
             Version = _version
         };
     }
+
+    // private ApiEnumTypeBuilder GetOrAddEnumTypeBuilder(Type clrType)
+    // {
+    //     ArgumentNullException.ThrowIfNull(clrType);
+
+    //     if (!_enumTypeBuilders.TryGetValue(clrType, out var builder))
+    //     {
+    //         builder = new ApiEnumTypeBuilder(clrType, _context);
+    //         _enumTypeBuilders[clrType] = builder;
+    //         _context.RegisterApiType(clrType, builder);
+    //     }
+
+    //     return builder;
+    // }
+
+    // private ApiObjectTypeBuilder GetOrAddObjectTypeBuilder(Type clrType)
+    // {
+    //     ArgumentNullException.ThrowIfNull(clrType);
+
+    //     if (!_objectTypeBuilders.TryGetValue(clrType, out var builder))
+    //     {
+    //         builder = new ApiObjectTypeBuilder(clrType, _context);
+    //         _objectTypeBuilders[clrType] = builder;
+    //         _context.RegisterApiType(clrType, builder);
+    //     }
+
+    //     return builder;
+    // }
+
+    // private ApiScalarTypeBuilder GetOrAddScalarTypeBuilder(Type clrType)
+    // {
+    //     ArgumentNullException.ThrowIfNull(clrType);
+
+    //     if (!_scalarTypeBuilders.TryGetValue(clrType, out var builder))
+    //     {
+    //         builder = new ApiScalarTypeBuilder(clrType, _context);
+    //         _scalarTypeBuilders[clrType] = builder;
+    //         _context.RegisterApiType(clrType, builder);
+    //     }
+
+    //     return builder;
+    // }
 }

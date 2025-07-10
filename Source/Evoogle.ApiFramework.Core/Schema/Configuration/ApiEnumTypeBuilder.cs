@@ -5,21 +5,14 @@
 // See the LICENSE file in the project root for more information.
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
-public sealed class ApiEnumTypeBuilder : IApiNamedTypeBuilder
+public sealed class ApiEnumTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
+    : ApiNamedTypeBuilder<ApiEnumTypeBuilder>(clrType, context)
 {
-    public string ApiName { get; }
-    public Type ClrType { get; }
-    private readonly List<ApiEnumValue> _values = new();
+    #region Fields
+    private readonly List<ApiEnumValue> _values = [];
+    #endregion
 
-    public ApiEnumTypeBuilder(string apiName, Type clrEnumType)
-    {
-        ApiName = apiName ?? throw new ArgumentNullException(nameof(apiName));
-        ClrType = clrEnumType ?? throw new ArgumentNullException(nameof(clrEnumType));
-
-        if (!clrEnumType.IsEnum)
-            throw new ArgumentException("Provided CLR type must be an enum.", nameof(clrEnumType));
-    }
-
+    #region Builder Methods
     public ApiEnumTypeBuilder AddValue(string apiName, string clrName, int clrOrdinal)
     {
         _values.Add(new ApiEnumValue(apiName, clrName, clrOrdinal));
@@ -28,18 +21,19 @@ public sealed class ApiEnumTypeBuilder : IApiNamedTypeBuilder
 
     public ApiEnumType Build()
     {
-        var finalValues = _values.Any()
+        var finalValues = _values.Count != 0
             ? _values
-            : Enum.GetValues(ClrType)
+            : Enum.GetValues(this.ClrType)
                   .Cast<object>()
                   .Select(value =>
                   {
-                      var name = Enum.GetName(ClrType, value)!;
+                      var name = Enum.GetName(this.ClrType, value)!;
                       var ordinal = Convert.ToInt32(value);
                       return new ApiEnumValue(name, name, ordinal);
                   })
                   .ToList();
 
-        return new ApiEnumType(ApiName, finalValues, ClrType);
+        return new ApiEnumType(this.ApiName, finalValues, this.ClrType);
     }
+    #endregion
 }

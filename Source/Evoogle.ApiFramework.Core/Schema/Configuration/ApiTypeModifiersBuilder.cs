@@ -7,8 +7,11 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 
 public sealed class ApiTypeModifiersBuilder
 {
+    #region Fields
     private ApiTypeModifiers _modifiers = ApiTypeModifiers.None;
+    #endregion
 
+    #region Builder Methods
     public ApiTypeModifiersBuilder Required()
     {
         _modifiers |= ApiTypeModifiers.Required;
@@ -22,4 +25,5 @@ public sealed class ApiTypeModifiersBuilder
     }
 
     public ApiTypeModifiers Build() => _modifiers;
+    #endregion
 }

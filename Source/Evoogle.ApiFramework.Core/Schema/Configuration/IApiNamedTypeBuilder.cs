@@ -7,6 +7,8 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 
 public interface IApiNamedTypeBuilder
 {
+    #region Properties
     string ApiName { get; }
     Type ClrType { get; }
+    #endregion
 }
