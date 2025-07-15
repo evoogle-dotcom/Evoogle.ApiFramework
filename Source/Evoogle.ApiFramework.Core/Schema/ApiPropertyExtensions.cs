@@ -26,7 +26,7 @@ public static class ApiPropertyExtensions
     /// <param name="apiProperty">The <see cref="ApiProperty"/> instance.</param>
     /// <returns>
     ///     <c>true</c> if the <see cref="ApiProperty.ApiTypeModifiers"/> does not have the <see cref="ApiTypeModifiers.Required"/> flag set; otherwise, <c>false</c>.
-    /// </returns
+    /// </returns>
     public static bool IsOptional(this ApiProperty apiProperty) => !apiProperty.ApiTypeModifiers.HasFlag(ApiTypeModifiers.Required);
     #endregion
 }

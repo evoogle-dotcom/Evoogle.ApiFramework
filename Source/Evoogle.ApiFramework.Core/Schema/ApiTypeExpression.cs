@@ -6,6 +6,7 @@
 using System.ComponentModel.DataAnnotations;
 
 using Evoogle.ApiFramework.Exceptions;
+using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema;
@@ -39,12 +40,12 @@ public sealed class ApiTypeExpression
     public ApiType? ApiInlineType { get; }
 
     /// <summary>
-    ///     Gets the resolved <see cref="ApiType"/> this expression refers to, either inline or named.
+    ///     Gets the resolved <see cref="ApiType"/> this expression refers to, either inline or named reference.
     /// </summary>
     /// <exception cref="ApiSchemaException">
-    ///     Thrown if the expression has not been resolved yet using <see cref="Resolve"/>.
+    ///     Thrown if the expression has not been resolved yet.
     /// </exception>
-    public ApiType ApiResolvedType => _apiResolvedType ?? throw new ApiSchemaException($"{this} has not been resolved. Call '{nameof(Resolve)}' before accessing this property.");
+    public ApiType ApiType => this.ThrowIfNotInitialized(_apiResolvedType);
 
     /// <summary>
     ///     Gets a value indicating whether this is an inline type (i.e., <see cref="ApiInlineType"/> is not null).
@@ -55,98 +56,52 @@ public sealed class ApiTypeExpression
     ///     Gets a value indicating whether this is a reference to a named type (i.e., <see cref="ApiInlineType"/> is null).
     /// </summary>
     public bool IsReference => this.ApiInlineType is null;
+
+    /// <summary>
+    ///    Gets a value indicating whether this expression has been resolved to an API type.
+    /// </summary>
+    public bool IsResolved => _apiResolvedType is not null;
     #endregion
 
     #region Constructors
     /// <summary>
-    ///     Initializes a named type reference.
+    ///     Initializes a named reference to a declared API type within a schema.
     /// </summary>
-    /// <param name="kind">The kind of the named API type.</param>
-    /// <param name="apiName">The API name of the type.</param>    
+    /// <param name="kind">The expected kind of the referenced API type.</param>
+    /// <param name="apiName">The name of the API type to be resolved in the schema.</param>
     public ApiTypeExpression(ApiTypeKind kind, string apiName)
     {
-        ArgumentNullException.ThrowIfNull(apiName);
-
         this.Kind = kind;
         this.ApiName = apiName;
     }
 
     /// <summary>
-    ///     Initializes an inline type expression.
+    ///     Initializes an inline type expression (e.g., a collection declared in-place).
     /// </summary>
-    /// <param name="apiInlineType">The inline API type.</param>
-    public ApiTypeExpression(ApiType apiInlineType)
-    {
-        ArgumentNullException.ThrowIfNull(apiInlineType);
-
-        this.ApiInlineType = apiInlineType;
-    }
+    /// <param name="apiInlineType">The API type instance used directly by this expression.</param>
+    public ApiTypeExpression(ApiType apiInlineType) => this.ApiInlineType = apiInlineType;
     #endregion
 
     #region Methods
-    /// <summary>
-    ///     Resolves the API type expression to a concrete <see cref="ApiType"/> using the provided schema.
-    ///     Adds a <see cref="ValidationResult"/> to <paramref name="results"/> if resolution fails.
-    /// </summary>
-    /// <param name="apiSchema">The schema to resolve from.</param>
-    /// <param name="results">An optional list to which validation errors are appended.</param>    
-    public void Resolve(ApiSchema apiSchema, ref List<ValidationResult>? results)
+    internal void Initialize(ApiSchema apiSchema, string apiValidationPath, ref List<ValidationResult>? results)
     {
         ArgumentNullException.ThrowIfNull(apiSchema);
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiValidationPath);
 
-        // If this is an inline type, we can resolve it directly.
-        // Inline types are typically collections or other complex types defined directly in the API schema.
-        if (this.IsInline)
-        {
-            if (this.ApiInlineType is ApiCollectionType apiCollectionType)
-                apiCollectionType.Resolve(apiSchema, ref results); // recursive
+        _apiResolvedType = null;
 
-            _apiResolvedType = this.ApiInlineType;
+        // Try and resolve API type with inlined API type first if applicable
+        this.InitializeApiTypeByInline(apiSchema, ref results);
+
+        if (_apiResolvedType is not null)
             return;
-        }
 
-        // This is a named API type, we need to resolve it from the schema.
-        // If Kind or ApiName is null, we cannot resolve it.
-        if (this.Kind is null || this.ApiName is null)
-        {
-            var message = $"Cannot resolve {this} because it is missing required properties.";
-            results ??= [];
-            results.Add(new ValidationResult(message, [nameof(this.ApiResolvedType)]));
-            return;
-        }
+        // Try and resolve API type with referenced kind and API name
+        var tryToResolve = true;
 
-        // Resolve the named API type based on its kind.
-        // This will look up the type in the API schema based on its kind and name.
-        var kind = this.Kind.Value;
-        var apiName = this.ApiName!;
-        _apiResolvedType = kind switch
-        {
-            ApiTypeKind.Scalar => apiSchema.TryGetApiScalarType(apiName, out var apiScalarType)
-                ? apiScalarType
-                : null,
-
-            ApiTypeKind.Enum => apiSchema.TryGetApiEnumType(apiName, out var apiEnumType)
-                ? apiEnumType
-                : null,
-
-            ApiTypeKind.Object => apiSchema.TryGetApiObjectType(apiName, out var apiObjectType)
-                ? apiObjectType
-                : null,
-
-            ApiTypeKind.Collection => throw new ApiSchemaException($"Cannot resolve {nameof(ApiType)} '{kind.SafeToString()}:{apiName.SafeToString()}' because it is an {nameof(ApiCollectionType)}. Use inline feature instead."),
-
-            _ => null
-        };
-
-        // If we couldn't resolve the API type, we need to add a validation result.
-        // This will help identify issues in the API schema.
-        if (_apiResolvedType is null)
-        {
-            var message = $"Failed to resolve {nameof(ApiType)} '{kind.SafeToString()}:{apiName.SafeToString()}' from API schema.";
-
-            results ??= [];
-            results.Add(new ValidationResult(message, [nameof(this.ApiResolvedType)]));
-        }
+        this.InitializeKind(apiSchema, apiValidationPath, ref tryToResolve, ref results);
+        this.InitializeApiName(apiSchema, apiValidationPath, ref tryToResolve, ref results);
+        this.InitializeApiTypeByReference(apiSchema, apiValidationPath, tryToResolve, ref results);
     }
     #endregion
 
@@ -163,6 +118,90 @@ public sealed class ApiTypeExpression
         var kind = this.Kind.SafeToString();
         var apiName = this.ApiName.SafeToString();
         return $"{nameof(ApiTypeExpression)} {{{nameof(this.Kind)}={kind}, {nameof(this.ApiName)}={apiName}}}";
+    }
+    #endregion
+
+    #region Implementation Methods
+    private void InitializeKind(ApiSchema _, string apiValidationPath, ref bool tryToResolve, ref List<ValidationResult>? results)
+    {
+        if (this.Kind is null)
+        {
+            tryToResolve = false;
+
+            results ??= [];
+            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.Kind)} cannot be null.", [nameof(this.Kind)]));
+            return;
+        }
+
+        if (this.Kind == ApiTypeKind.Unknown)
+        {
+            tryToResolve = false;
+
+            results ??= [];
+            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.Kind)} cannot be equal to {ApiTypeKind.Unknown}.", [nameof(this.Kind)]));
+        }
+    }
+
+    private void InitializeApiName(ApiSchema _, string apiValidationPath, ref bool tryToResolve, ref List<ValidationResult>? results)
+    {
+        if (string.IsNullOrWhiteSpace(this.ApiName))
+        {
+            tryToResolve = false;
+
+            results ??= [];
+            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ApiName)} cannot be null or whitespace.", [nameof(this.ApiName)]));
+        }
+    }
+
+    private void InitializeApiTypeByInline(ApiSchema apiSchema, ref List<ValidationResult>? results)
+    {
+        if (this.ApiInlineType is not null)
+        {
+            if (this.ApiInlineType is ApiCollectionType collection)
+                collection.Initialize(apiSchema, ref results);
+
+            _apiResolvedType = this.ApiInlineType;
+        }
+    }
+
+    private void InitializeApiTypeByReference(ApiSchema apiSchema, string apiValidationPath, bool tryToResolve, ref List<ValidationResult>? results)
+    {
+        if (tryToResolve)
+        {
+            var kind = this.Kind!;
+            var apiName = this.ApiName!;
+
+            switch (kind)
+            {
+                case ApiTypeKind.Scalar:
+                    _apiResolvedType = apiSchema.TryGetApiScalarType(apiName, out var apiScalarType) ? apiScalarType : null;
+                    break;
+
+                case ApiTypeKind.Enum:
+                    _apiResolvedType = apiSchema.TryGetApiEnumType(apiName, out var apiEnumType) ? apiEnumType : null;
+                    break;
+
+                case ApiTypeKind.Object:
+                    _apiResolvedType = apiSchema.TryGetApiObjectType(apiName, out var apiObjectType) ? apiObjectType : null;
+                    break;
+
+                case ApiTypeKind.Collection:
+                    {
+                        results ??= [];
+                        results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.Kind)} is set to {nameof(ApiTypeKind.Collection)} which is invalid.", [nameof(this.Kind)]));
+                        break;
+                    }
+
+                default:
+                    break;
+            }
+        }
+
+        if (_apiResolvedType is null)
+        {
+            results ??= [];
+            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ApiType)} is unresolved for {nameof(this.Kind)}={this.Kind.SafeToString()} and {nameof(this.ApiName)}={this.ApiName.SafeToString()}.", [nameof(this.ApiType)]));
+        }
     }
     #endregion
 }

@@ -112,6 +112,10 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
 
     private class ReadHandlers(PropertyNames propertyNames)
     {
+        #region Constants
+        private static readonly Type _apiTypeModifiersType = typeof(ApiTypeModifiers);
+        #endregion
+
         #region ApiEnumValue Fields
         public readonly Dictionary<string, ApiJsonReaderHandler<ReadContext>> ApiEnumValuePropertyHandlers = new()
         {
@@ -191,8 +195,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
             context.ReadData.ApiCollectionType ??= new ApiCollectionTypeReadData();
 
             var options = context.Options;
-            var typeToConvert = typeof(ApiTypeModifiers);
-            context.ReadData.ApiCollectionType.ApiItemTypeModifiers = _apiTypeModifiersJsonConverter.Read(ref reader, typeToConvert, options);
+            context.ReadData.ApiCollectionType.ApiItemTypeModifiers = _apiTypeModifiersJsonConverter.Read(ref reader, _apiTypeModifiersType, options);
         }
         #endregion
 
@@ -305,8 +308,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
             context.ReadData.ApiProperty ??= new ApiPropertyReadData();
 
             var options = context.Options;
-            var typeToConvert = typeof(ApiTypeModifiers);
-            context.ReadData.ApiProperty.ApiTypeModifiers = _apiTypeModifiersJsonConverter.Read(ref reader, typeToConvert, options);
+            context.ReadData.ApiProperty.ApiTypeModifiers = _apiTypeModifiersJsonConverter.Read(ref reader, _apiTypeModifiersType, options);
         }
 
         private static void HandleApiPropertyApiTypeExpression(ref Utf8JsonReader reader, ref ReadContext context)

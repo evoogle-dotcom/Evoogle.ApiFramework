@@ -29,39 +29,38 @@ namespace Evoogle.ApiFramework.Schema;
 /// <param name="apiTypeExpression">The API type expression of the property.</param>
 /// <param name="apiTypeModifiers">Modifiers applied to the property (e.g., Required).</param>
 /// <param name="clrName">The CLR property name corresponding to this API property.</param>
-/// <exception cref="ArgumentNullException">
-///     Thrown if <paramref name="apiName"/>, <paramref name="apiTypeExpression"/>, or <paramref name="clrName"/> is null.
-/// </exception>
 public sealed class ApiProperty(string apiName, ApiTypeExpression apiTypeExpression, ApiTypeModifiers apiTypeModifiers, string clrName) : ExtensibleBase
 {
-    #region ApiProperty Properties
+    #region Properties
     /// <summary>Gets the API name of the property (used in API requests/responses).</summary>
-    public string ApiName { get; } = apiName ?? throw new ArgumentNullException(nameof(apiName));
+    public string ApiName { get; } = apiName;
 
-    /// <summary>
-    ///     Gets the API type expression to the API type of this property.
-    ///     May point to a named type or inline type (e.g., collection).
-    /// </summary>
-    public ApiTypeExpression ApiTypeExpression { get; } = apiTypeExpression ?? throw new ArgumentNullException(nameof(apiTypeExpression));
+    /// <summary>Gets the API type of the property.</summary>
+    public ApiType ApiType => this.ApiTypeExpression.ApiType;
 
     /// <summary>Gets the modifiers applied to this property (e.g., Required).</summary>
     public ApiTypeModifiers ApiTypeModifiers { get; } = apiTypeModifiers;
 
     /// <summary>Gets the CLR name of the property (matching the C# property name).</summary>
-    public string ClrName { get; } = clrName ?? throw new ArgumentNullException(nameof(clrName));
+    public string ClrName { get; } = clrName;
 
     /// <summary>
-    ///     Gets the resolved API type (named or inline) associated with this property.
+    ///     Gets the API type expression to the API type of this property.
+    ///     May point to a named type or inline type (e.g., collection).
     /// </summary>
-    public ApiType ApiType => this.ApiTypeExpression.ApiResolvedType ?? throw new ApiSchemaException($"{nameof(this.ApiTypeExpression)} has not been resolved yet.");
+    internal ApiTypeExpression ApiTypeExpression { get; } = apiTypeExpression;
     #endregion
 
     #region ApiProperty Methods
-    /// <summary>
-    ///     Resolves the API named type (or inline type) from the provided schema.
-    /// </summary>
-    /// <param name="apiSchema">The API schema to resolve the type from.</param>
-    public void Resolve(ApiSchema apiSchema, ref List<ValidationResult>? results) => this.ApiTypeExpression.Resolve(apiSchema, ref results);
+    internal void Initialize(ApiSchema apiSchema, string apiValidationPath, ref List<ValidationResult>? results)
+    {
+        ArgumentNullException.ThrowIfNull(apiSchema);
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiValidationPath);
+
+        this.InitializeApiName(apiSchema, apiValidationPath, ref results);
+        this.InitializeClrName(apiSchema, apiValidationPath, ref results);
+        this.InitializeApiTypeExpression(apiSchema, apiValidationPath, ref results);
+    }
     #endregion
 
     #region Object Methods
@@ -74,6 +73,39 @@ public sealed class ApiProperty(string apiName, ApiTypeExpression apiTypeExpress
         var clrName = this.ClrName.SafeToString();
 
         return $"{nameof(ApiProperty)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ApiTypeExpression)}={apiTypeExpression}, {nameof(this.ApiTypeModifiers)}={apiTypeModifiers}, {nameof(this.ClrName)}={clrName}}}";
+    }
+    #endregion
+
+    #region Implementation Methods
+    private void InitializeApiName(ApiSchema _, string apiValidationPath, ref List<ValidationResult>? results)
+    {
+        if (string.IsNullOrWhiteSpace(this.ApiName))
+        {
+            results ??= [];
+            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ApiName)} cannot be null or whitespace.", [nameof(this.ApiName)]));
+        }
+    }
+
+    private void InitializeApiTypeExpression(ApiSchema apiSchema, string apiParentValidationPath, ref List<ValidationResult>? results)
+    {
+        if (this.ApiTypeExpression is null)
+        {
+            results ??= [];
+            results.Add(new ValidationResult($"{apiParentValidationPath}.{nameof(this.ApiTypeExpression)} cannot be null.", [nameof(this.ApiTypeExpression)]));
+            return;
+        }
+
+        var apiChildValidationPath = $"{apiParentValidationPath}.{nameof(this.ApiTypeExpression)}";
+        this.ApiTypeExpression.Initialize(apiSchema, apiChildValidationPath, ref results);
+    }
+
+    private void InitializeClrName(ApiSchema _, string apiValidationPath, ref List<ValidationResult>? results)
+    {
+        if (string.IsNullOrWhiteSpace(this.ClrName))
+        {
+            results ??= [];
+            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ClrName)} cannot be null or whitespace.", [nameof(this.ClrName)]));
+        }
     }
     #endregion
 }

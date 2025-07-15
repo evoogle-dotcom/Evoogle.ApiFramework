@@ -14,10 +14,10 @@ namespace Evoogle.ApiFramework.Schema;
 public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
 {
     #region Test Types
-    public record struct ApiPropertyStub(string ApiName, ApiTypeKind ApiTypeExpressionKind, string ApiTypeExpressionApiName, ApiTypeModifiers ApiTypeModifiers, string ClrName);
+    public record struct ApiPropertyStub(string ApiName, ApiTypeKind ApiTypeExpressionKind, string ApiTypeExpressionApiName, ApiTypeModifiers ApiTypeModifiers, string ClrName, Type ApiTypeExpressionClrType);
     public record struct ApiRelationshipStub(string ApiName);
 
-    public class ConstructorThrowsTest : XUnitTest
+    public class InitializeThrowsTest : XUnitTest
     {
         #region User Supplied Properties
         public List<ApiPropertyStub>? ApiPropertyStubCollection { get; init; }
@@ -73,10 +73,27 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
         {
             try
             {
+                var apiScalarTypes = this.ApiPropertyStubCollection
+                    ?.Where(x => x.ApiTypeExpressionKind == ApiTypeKind.Scalar)
+                    ?.GroupBy(x => x.ApiTypeExpressionClrType)
+                    ?.Select(x => x.First())
+                    ?.Select(x => new ApiScalarType(x.ApiTypeExpressionApiName, x.ApiTypeExpressionClrType)).ToList() ?? [];
+
                 var apiObjectType = new ApiObjectType(nameof(Object), // Using 'Object' as a placeholder API name
                                                       this.ApiPropertyCollection ?? throw new ArgumentNullException(nameof(this.ApiPropertyCollection)),
                                                       this.ApiRelationshipCollection ?? throw new ArgumentNullException(nameof(this.ApiRelationshipCollection)),
                                                       typeof(object)); // Using 'object' as a placeholder CLR type
+
+                var apiSchema = new ApiSchema
+                (
+                    apiName: nameof(ApiSchema),
+                    apiScalarTypes: apiScalarTypes,
+                    apiEnumTypes: null,
+                    apiObjectTypes: [apiObjectType]
+                );
+                var result = apiSchema.Initialize();
+                result.ThrowIfInvalid();
+
             }
             catch (ApiSchemaException ex)
             {
@@ -154,10 +171,27 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 stub => new ApiRelationship(stub.ApiName)
             ).ToList() ?? [];
 
-            this.ApiObjectType = new ApiObjectType(nameof(Object), // Using 'Object' as a placeholder API name
-                                                   this.ApiPropertyCollection ?? throw new ArgumentNullException(nameof(this.ApiPropertyCollection)),
-                                                   this.ApiRelationshipCollection ?? throw new ArgumentNullException(nameof(this.ApiRelationshipCollection)),
-                                                   typeof(object)); // Using object as a placeholder CLR type
+            var apiScalarTypes = this.ApiPropertyStubCollection
+                ?.Where(x => x.ApiTypeExpressionKind == ApiTypeKind.Scalar)
+                ?.GroupBy(x => x.ApiTypeExpressionClrType)
+                ?.FirstOrDefault()
+                ?.Select(x => new ApiScalarType(x.ApiTypeExpressionApiName, x.ApiTypeExpressionClrType)).ToList() ?? [];
+
+            var apiObjectType = new ApiObjectType(nameof(Object), // Using 'Object' as a placeholder API name
+                                                  this.ApiPropertyCollection ?? throw new ArgumentNullException(nameof(this.ApiPropertyCollection)),
+                                                  this.ApiRelationshipCollection ?? throw new ArgumentNullException(nameof(this.ApiRelationshipCollection)),
+                                                  typeof(object)); // Using object as a placeholder CLR type
+            this.ApiObjectType = apiObjectType;
+
+            var apiSchema = new ApiSchema
+            (
+                apiName: nameof(ApiSchema),
+                apiScalarTypes: apiScalarTypes,
+                apiEnumTypes: null,
+                apiObjectTypes: [apiObjectType]
+            );
+            var result = apiSchema.Initialize();
+            result.ThrowIfInvalid();
 
             this.WriteLine($"TryGetMethod:  {this.TryGetMethod.SafeToString()}");
             this.WriteLine($"Input:         {this.Input.SafeToString()}");
@@ -192,52 +226,52 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
     #endregion
 
     #region Theory Data
-    public static TheoryDataRow<IXUnitTest>[] ConstructorThrowsTheoryData =>
+    public static TheoryDataRow<IXUnitTest>[] InitializeThrowsTheoryData =>
     [
         // Duplicate API property names
-        new ConstructorThrowsTest
+        new InitializeThrowsTest
         {
             Name = "Throws on duplicate API property names",
             ApiPropertyStubCollection =
             [
-                new("Id", ApiTypeKind.Scalar, nameof(Int32), ApiTypeModifiers.None, "Id"),
-                new("Name", ApiTypeKind.Scalar, nameof(String), ApiTypeModifiers.None, "Name1"),
-                new("Name", ApiTypeKind.Scalar, nameof(String), ApiTypeModifiers.None, "Name2") // Duplicate API Name
+                new("Id", ApiTypeKind.Scalar, nameof(Int32), ApiTypeModifiers.None, "Id", typeof(int)),
+                new("Name", ApiTypeKind.Scalar, nameof(String), ApiTypeModifiers.None, "Name1", typeof(string)),
+                new("Name", ApiTypeKind.Scalar, nameof(String), ApiTypeModifiers.None, "Name2", typeof(string)) // Duplicate API Name
             ],
             ApiRelationshipStubCollection = [],
-            ExpectedApiSchemaExceptionMessage = $"Unable to create {nameof(ApiObjectType)} because duplicate {nameof(ApiProperty)}.{nameof(ApiProperty.ApiName)} values detected: Name",
+            ExpectedApiSchemaExceptionMessage = $"{nameof(ApiSchema)} initialization failed:\nApiObjectType[\"System.Object\"][\"Object\"].ApiProperty unable to initialize because duplicate ApiName values detected: Name",
         },
 
         // Duplicate CLR property names
-        new ConstructorThrowsTest
+        new InitializeThrowsTest
         {
             Name = "Throws on duplicate CLR property names",
             ApiPropertyStubCollection =
             [
-                new("Id", ApiTypeKind.Scalar, nameof(Int32), ApiTypeModifiers.None, "Id"),
-                new("Name1", ApiTypeKind.Scalar, nameof(String), ApiTypeModifiers.None, "Name"),
-                new("Name2", ApiTypeKind.Scalar, nameof(String), ApiTypeModifiers.None, "Name") // Duplicate CLR Name
+                new("Id", ApiTypeKind.Scalar, nameof(Int32), ApiTypeModifiers.None, "Id", typeof(int)),
+                new("Name1", ApiTypeKind.Scalar, nameof(String), ApiTypeModifiers.None, "Name", typeof(string)),
+                new("Name2", ApiTypeKind.Scalar, nameof(String), ApiTypeModifiers.None, "Name", typeof(string)) // Duplicate CLR Name
             ],
             ApiRelationshipStubCollection = [],
-            ExpectedApiSchemaExceptionMessage = $"Unable to create {nameof(ApiObjectType)} because duplicate {nameof(ApiProperty)}.{nameof(ApiProperty.ClrName)} values detected: Name",
+            ExpectedApiSchemaExceptionMessage = $"{nameof(ApiSchema)} initialization failed:\nApiObjectType[\"System.Object\"][\"Object\"].ApiProperty unable to initialize because duplicate ClrName values detected: Name",
         },
 
         // Duplicate API relationship names
-        new ConstructorThrowsTest
+        new InitializeThrowsTest
         {
             Name = "Throws on duplicate API relationship names",
             ApiPropertyStubCollection =
             [
-                new("Id", ApiTypeKind.Scalar, nameof(Int32), ApiTypeModifiers.None, "Id"),
-                new("Name1", ApiTypeKind.Scalar, nameof(String), ApiTypeModifiers.None, "Name1"),
-                new("Name2", ApiTypeKind.Scalar, nameof(String), ApiTypeModifiers.None, "Name2")
+                new("Id", ApiTypeKind.Scalar, nameof(Int32), ApiTypeModifiers.None, "Id", typeof(int)),
+                new("Name1", ApiTypeKind.Scalar, nameof(String), ApiTypeModifiers.None, "Name1", typeof(string)),
+                new("Name2", ApiTypeKind.Scalar, nameof(String), ApiTypeModifiers.None, "Name2", typeof(string))
             ],
             ApiRelationshipStubCollection =
             [
-                new("RelatedObject"),
-                new("RelatedObject") // Duplicate API Name
+                new("Name2"),
+                new("Name2") // Duplicate API Name
             ],
-            ExpectedApiSchemaExceptionMessage = $"Unable to create {nameof(ApiObjectType)} because duplicate {nameof(ApiRelationship)}.{nameof(ApiRelationship.ApiName)} values detected: RelatedObject",
+            ExpectedApiSchemaExceptionMessage = $"{nameof(ApiSchema)} initialization failed:\nApiObjectType[\"System.Object\"][\"Object\"].ApiRelationship unable to initialize because duplicate ApiName values detected: Name2",
         },
     ];
 
@@ -249,7 +283,7 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = "TryGetPropertyByApiName works for known API property name and exact case",
             ApiPropertyStubCollection =
             [
-                new("id", ApiTypeKind.Scalar, nameof(Int32), ApiTypeModifiers.None, "Id"),
+                new("id", ApiTypeKind.Scalar, nameof(Int32), ApiTypeModifiers.None, "Id", typeof(int)),
             ],
             ApiRelationshipStubCollection = [],
             TryGetMethod = TryGetMethod.TryGetPropertyByApiName,
@@ -262,7 +296,7 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = "TryGetPropertyByApiName works for known API property name and case insensitivity",
             ApiPropertyStubCollection =
             [
-                new("id", ApiTypeKind.Scalar, nameof(Int32), ApiTypeModifiers.None, "Id"),
+                new("id", ApiTypeKind.Scalar, nameof(Int32), ApiTypeModifiers.None, "Id", typeof(int)),
             ],
             ApiRelationshipStubCollection = [],
             TryGetMethod = TryGetMethod.TryGetPropertyByApiName,
@@ -275,7 +309,7 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = "TryGetPropertyByApiName works for unknown API property name",
             ApiPropertyStubCollection =
             [
-                new("id", ApiTypeKind.Scalar, nameof(Int32), ApiTypeModifiers.None, "Id"),
+                new("id", ApiTypeKind.Scalar, nameof(Int32), ApiTypeModifiers.None, "Id", typeof(int)),
             ],
             ApiRelationshipStubCollection = [],
             TryGetMethod = TryGetMethod.TryGetPropertyByApiName,
@@ -289,7 +323,7 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = "TryGetPropertyByClrName works for known API property name and exact case",
             ApiPropertyStubCollection =
             [
-                new("id", ApiTypeKind.Scalar, nameof(Int32), ApiTypeModifiers.None, "Id"),
+                new("id", ApiTypeKind.Scalar, nameof(Int32), ApiTypeModifiers.None, "Id", typeof(int)),
             ],
             ApiRelationshipStubCollection = [],
             TryGetMethod = TryGetMethod.TryGetPropertyByClrName,
@@ -302,7 +336,7 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = "TryGetPropertyByClrName works for known API property name and case insensitivity",
             ApiPropertyStubCollection =
             [
-                new("id", ApiTypeKind.Scalar, nameof(Int32), ApiTypeModifiers.None, "Id"),
+                new("id", ApiTypeKind.Scalar, nameof(Int32), ApiTypeModifiers.None, "Id", typeof(int)),
             ],
             ApiRelationshipStubCollection = [],
             TryGetMethod = TryGetMethod.TryGetPropertyByClrName,
@@ -315,7 +349,7 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = "TryGetPropertyByClrName works for unknown API property name",
             ApiPropertyStubCollection =
             [
-                new("id", ApiTypeKind.Scalar, nameof(Int32), ApiTypeModifiers.None, "Id"),
+                new("id", ApiTypeKind.Scalar, nameof(Int32), ApiTypeModifiers.None, "Id", typeof(int)),
             ],
             ApiRelationshipStubCollection = [],
             TryGetMethod = TryGetMethod.TryGetPropertyByClrName,
@@ -327,7 +361,10 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
         new TryGetTest
         {
             Name = "TryGetRelationshipByApiName works for known API property name and exact case",
-            ApiPropertyStubCollection = [],
+            ApiPropertyStubCollection =
+            [
+                new("rel", ApiTypeKind.Scalar, nameof(String), ApiTypeModifiers.None, "Rel", typeof(string)),
+            ],
             ApiRelationshipStubCollection =
             [
                 new("rel")
@@ -340,7 +377,10 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
         new TryGetTest
         {
             Name = "TryGetRelationshipByApiName works for known API property name and case insensitivity",
-            ApiPropertyStubCollection = [],
+            ApiPropertyStubCollection =
+            [
+                new("rel", ApiTypeKind.Scalar, nameof(String), ApiTypeModifiers.None, "Rel", typeof(string)),
+            ],
             ApiRelationshipStubCollection =
             [
                 new("rel")
@@ -353,7 +393,10 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
         new TryGetTest
         {
             Name = "TryGetRelationshipByApiName works for unknown API property name",
-            ApiPropertyStubCollection = [],
+            ApiPropertyStubCollection =
+            [
+                new("rel", ApiTypeKind.Scalar, nameof(String), ApiTypeModifiers.None, "Rel", typeof(string)),
+            ],
             ApiRelationshipStubCollection =
             [
                 new("rel")
@@ -367,8 +410,8 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
 
     #region Test Methods
     [Theory]
-    [MemberData(nameof(ConstructorThrowsTheoryData))]
-    public void ConstructorThrows(IXUnitTest test) => test.Execute(this);
+    [MemberData(nameof(InitializeThrowsTheoryData))]
+    public void InitializeThrows(IXUnitTest test) => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(TryGetTheoryData))]

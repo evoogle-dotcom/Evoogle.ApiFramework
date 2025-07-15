@@ -6,7 +6,7 @@
 namespace Evoogle.ApiFramework.Schema;
 
 /// <summary>
-///     Represents optional modifiers about an API type.
+///     Represents modifiers that affect the behavior or constraints of an API type (e.g., required/optional).
 /// </summary>
 [Flags]
 public enum ApiTypeModifiers

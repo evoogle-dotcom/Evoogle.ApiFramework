@@ -3,6 +3,8 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.ComponentModel.DataAnnotations;
+
 using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema;
@@ -15,12 +17,18 @@ namespace Evoogle.ApiFramework.Schema;
 /// </remarks>
 /// <param name="apiName">The API name of the scalar type.</param>
 /// <param name="clrScalarType">The CLR type representing the scalar (e.g., typeof(string)).</param>
-/// <exception cref="ArgumentNullException">Thrown if <paramref name="apiName"/> or <paramref name="clrScalarType"/> is null.</exception>
 public sealed class ApiScalarType(string apiName, Type clrScalarType) : ApiNamedType(apiName, clrScalarType)
 {
     #region ApiType Properties
     /// <inheritdoc/>
     public override ApiTypeKind Kind => ApiTypeKind.Scalar;
+
+    /// <inheritdoc/>
+    protected override string ApiTypeName => nameof(ApiScalarType);
+    #endregion
+
+    #region ApiType Methods
+    internal override void Initialize(ApiSchema apiSchema, ref List<ValidationResult>? results) => base.Initialize(apiSchema, ref results);
     #endregion
 
     #region Object Methods
@@ -28,7 +36,7 @@ public sealed class ApiScalarType(string apiName, Type clrScalarType) : ApiNamed
     public override string ToString()
     {
         var apiName = this.ApiName.SafeToString();
-        var clrType = this.ClrType.SafeToString();
+        var clrType = this.ClrType.SafeToName();
 
         return $"{nameof(ApiScalarType)} {{{nameof(this.ApiName)}={apiName}}} [{clrType}]";
     }

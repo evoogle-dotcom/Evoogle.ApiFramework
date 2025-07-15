@@ -194,7 +194,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             Name = "ApiSchema With No ApiTypes",
             Source = @"
             {
-                ""Name"": ""ApiSchema With No ApiTypes"",
+                ""ApiName"": ""ApiSchema With No ApiTypes"",
                 ""ApiScalarTypes"": [],
                 ""ApiEnumTypes"": [],
                 ""ApiObjectTypes"": []
@@ -208,7 +208,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             Name = "ApiSchema With 1 ApiScalarType",
             Source = @"
             {
-                ""Name"": ""ApiSchema With 1 ApiScalarType"",
+                ""ApiName"": ""ApiSchema With 1 ApiScalarType"",
                 ""ApiScalarTypes"": [
                     {
                         ""Kind"": ""Scalar"",
@@ -228,7 +228,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             Name = "ApiSchema With 1 ApiScalarType And Extension 1",
             Source = @"
             {
-                ""Name"": ""ApiSchema With 1 ApiScalarType And Extension 1"",
+                ""ApiName"": ""ApiSchema With 1 ApiScalarType And Extension 1"",
                 ""ApiScalarTypes"": [
                     {
                         ""Kind"": ""Scalar"",
@@ -254,7 +254,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             Name = "ApiSchema With 2 ApiScalarTypes",
             Source = @"
             {
-                ""Name"": ""ApiSchema With 2 ApiScalarTypes"",
+                ""ApiName"": ""ApiSchema With 2 ApiScalarTypes"",
                 ""ApiScalarTypes"": [
                     {
                         ""Kind"": ""Scalar"",
@@ -279,7 +279,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             Name = "ApiSchema With 3 ApiScalarTypes",
             Source = @"
             {
-                ""Name"": ""ApiSchema With 3 ApiScalarTypes"",
+                ""ApiName"": ""ApiSchema With 3 ApiScalarTypes"",
                 ""ApiScalarTypes"": [
                     {
                         ""Kind"": ""Scalar"",
@@ -309,7 +309,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             Name = "ApiSchema With 3 ApiScalarTypes And Extension 1 And Extension 2",
             Source = @"
             {
-                ""Name"": ""ApiSchema With 3 ApiScalarTypes And Extension 1 And Extension 2"",
+                ""ApiName"": ""ApiSchema With 3 ApiScalarTypes And Extension 1 And Extension 2"",
                 ""ApiScalarTypes"": [
                     {
                         ""Kind"": ""Scalar"",
@@ -350,7 +350,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             Name = "ApiSchema With 1 ApiEnumType",
             Source = @"
             {
-                ""Name"": ""ApiSchema With 1 ApiEnumType"",
+                ""ApiName"": ""ApiSchema With 1 ApiEnumType"",
                 ""ApiScalarTypes"": [],
                 ""ApiEnumTypes"": [
                     {
@@ -387,7 +387,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             Name = "ApiSchema With 1 ApiEnumType And Extension 1",
             Source = @"
             {
-                ""Name"": ""ApiSchema With 1 ApiEnumType And Extension 1"",
+                ""ApiName"": ""ApiSchema With 1 ApiEnumType And Extension 1"",
                 ""ApiScalarTypes"": [],
                 ""ApiEnumTypes"": [
                     {
@@ -430,7 +430,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             Name = "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)",
             Source = @"
             {
-                ""Name"": ""ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)"",
+                ""ApiName"": ""ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)"",
                 ""ApiScalarTypes"": [
                     {
                         ""Kind"": ""Scalar"",
@@ -545,7 +545,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             Name = "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person) And Extension 1 And Extension 2",
             Source = @"
             {
-                ""Name"": ""ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person) And Extension 1 And Extension 2"",
+                ""ApiName"": ""ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person) And Extension 1 And Extension 2"",
                 ""ApiScalarTypes"": [
                     {
                         ""Kind"": ""Scalar"",
@@ -671,7 +671,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             Name = "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 2 ApiObjectTypes (Person and Company)",
             Source = @"
             {
-                ""Name"": ""ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 2 ApiObjectTypes (Person and Company)"",
+                ""ApiName"": ""ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 2 ApiObjectTypes (Person and Company)"",
                 ""ApiScalarTypes"": [
                     {
                         ""Kind"": ""Scalar"",
@@ -974,7 +974,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             Source = new ApiSchema("ApiSchema With No ApiTypes", []),
             Expected = @"
             {
-                ""Name"": ""ApiSchema With No ApiTypes"",
+                ""ApiName"": ""ApiSchema With No ApiTypes"",
                 ""ApiScalarTypes"": [],
                 ""ApiEnumTypes"": [],
                 ""ApiObjectTypes"": []
@@ -988,7 +988,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             Source = new ApiSchema("ApiSchema With 1 ApiScalarType", [TestApiScalarTypeBoolean]),
             Expected = @"
             {
-                ""Name"": ""ApiSchema With 1 ApiScalarType"",
+                ""ApiName"": ""ApiSchema With 1 ApiScalarType"",
                 ""ApiScalarTypes"": [
                     {
                         ""Kind"": ""Scalar"",
@@ -1008,7 +1008,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             Source = new ApiSchema("ApiSchema With 1 ApiScalarType And Extension 1", [TestApiScalarTypeBoolean]),
             Expected = @"
             {
-                ""Name"": ""ApiSchema With 1 ApiScalarType And Extension 1"",
+                ""ApiName"": ""ApiSchema With 1 ApiScalarType And Extension 1"",
                 ""ApiScalarTypes"": [
                     {
                         ""Kind"": ""Scalar"",
@@ -1034,7 +1034,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             Source = new ApiSchema("ApiSchema With 2 ApiScalarTypes", [TestApiScalarTypeBoolean, TestApiScalarTypeInt32]),
             Expected = @"
             {
-                ""Name"": ""ApiSchema With 2 ApiScalarTypes"",
+                ""ApiName"": ""ApiSchema With 2 ApiScalarTypes"",
                 ""ApiScalarTypes"": [
                     {
                         ""Kind"": ""Scalar"",
@@ -1059,7 +1059,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             Source = new ApiSchema("ApiSchema With 3 ApiScalarTypes", [TestApiScalarTypeBoolean, TestApiScalarTypeInt32, TestApiScalarTypeString]),
             Expected = @"
             {
-                ""Name"": ""ApiSchema With 3 ApiScalarTypes"",
+                ""ApiName"": ""ApiSchema With 3 ApiScalarTypes"",
                 ""ApiScalarTypes"": [
                     {
                         ""Kind"": ""Scalar"",
@@ -1089,7 +1089,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             Source = new ApiSchema("ApiSchema With 3 ApiScalarTypes And Extension 1 And Extension 2", [TestApiScalarTypeBoolean, TestApiScalarTypeInt32, TestApiScalarTypeString]),
             Expected = @"
             {
-                ""Name"": ""ApiSchema With 3 ApiScalarTypes And Extension 1 And Extension 2"",
+                ""ApiName"": ""ApiSchema With 3 ApiScalarTypes And Extension 1 And Extension 2"",
                 ""ApiScalarTypes"": [
                     {
                         ""Kind"": ""Scalar"",
@@ -1130,7 +1130,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             Source = new ApiSchema("ApiSchema With 1 ApiEnumType", [TestApiEnumTypeGender]),
             Expected = @"
             {
-                ""Name"": ""ApiSchema With 1 ApiEnumType"",
+                ""ApiName"": ""ApiSchema With 1 ApiEnumType"",
                 ""ApiScalarTypes"": [],
                 ""ApiEnumTypes"": [
                     {
@@ -1167,7 +1167,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             Source = new ApiSchema("ApiSchema With 1 ApiEnumType And Extension 1", [TestApiEnumTypeGender]),
             Expected = @"
             {
-                ""Name"": ""ApiSchema With 1 ApiEnumType And Extension 1"",
+                ""ApiName"": ""ApiSchema With 1 ApiEnumType And Extension 1"",
                 ""ApiScalarTypes"": [],
                 ""ApiEnumTypes"": [
                     {
@@ -1220,7 +1220,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             ),
             Expected = @"
             {
-                ""Name"": ""ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)"",
+                ""ApiName"": ""ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)"",
                 ""ApiScalarTypes"": [
                     {
                         ""Kind"": ""Scalar"",
@@ -1335,7 +1335,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             ),
             Expected = @"
             {
-                ""Name"": ""ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person) And Extension 1 And Extension 2"",
+                ""ApiName"": ""ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person) And Extension 1 And Extension 2"",
                 ""ApiScalarTypes"": [
                     {
                         ""Kind"": ""Scalar"",
@@ -1462,7 +1462,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             ),
             Expected = @"
             {
-                ""Name"": ""ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 2 ApiObjectTypes (Person and Company)"",
+                ""ApiName"": ""ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 2 ApiObjectTypes (Person and Company)"",
                 ""ApiScalarTypes"": [
                     {
                         ""Kind"": ""Scalar"",

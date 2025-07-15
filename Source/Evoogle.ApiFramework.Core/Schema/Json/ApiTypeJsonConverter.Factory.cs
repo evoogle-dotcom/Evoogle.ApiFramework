@@ -3,11 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using System.ComponentModel.DataAnnotations;
-using System.Text.Json;
 using System.Text.Json.Serialization;
-
-using Evoogle.Extensions;
 
 using Microsoft.Extensions.Logging;
 
@@ -17,212 +13,168 @@ namespace Evoogle.ApiFramework.Schema.Json;
 
 public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
 {
-    #region Factory Implementation Methods
-    private static ApiType CreateApiType(in ReadContext context)
+    #region Factory Methods
+    private static ApiType CreateApiType(ReadContext context)
     {
-        // Validate all required properties are non-null.
-        var validationResults = default(List<ValidationResult>);
-        ValidateApiTypeProperties(context, ref validationResults);
-
-        var kindAsString = context.ReadData.ApiType!.Kind;
-        if (Enum.TryParse<ApiTypeKind>(kindAsString, out var kind) == false)
-        {
-            context.Logger.LogError("Invalid Kind: '{Kind}'", kindAsString);
-
-            throw new JsonException($"Unable to parse '{kindAsString}' into an {nameof(ApiTypeKind)} enumeration.");
-        }
-
-        // Construct the appropriate ApiType based on its declared Kind, after applying kind-specific validation logic.
         var apiType = default(ApiType);
-        switch (kind)
+
+        var kindAsString = context.ReadData.ApiType?.Kind;
+
+        var kind = GetApiTypeKind(context, kindAsString);
+        if (kind is not null)
         {
-            case ApiTypeKind.Collection:
-                {
-                    ValidateApiCollectionTypeProperties(context, ref validationResults);
+            switch (kind)
+            {
+                case ApiTypeKind.Collection:
+                    apiType = CreateApiCollectionType(context);
+                    break;
 
-                    apiType = CreateApiCollectionType(context, kind, validationResults);
-                }
-                break;
+                case ApiTypeKind.Enum:
+                    apiType = CreateApiEnumType(context);
+                    break;
 
-            case ApiTypeKind.Enum:
-                {
-                    ValidateApiNamedTypeProperties(context, ref validationResults);
-                    ValidateApiEnumTypeProperties(context, ref validationResults);
+                case ApiTypeKind.Object:
+                    apiType = CreateApiObjectType(context);
+                    break;
 
-                    apiType = CreateApiEnumType(context, kind, validationResults);
-                }
-                break;
+                case ApiTypeKind.Scalar:
+                    apiType = CreateApiScalarType(context);
+                    break;
 
-            case ApiTypeKind.Object:
-                {
-                    ValidateApiNamedTypeProperties(context, ref validationResults);
-                    ValidateApiObjectTypeProperties(context, ref validationResults);
-
-                    apiType = CreateApiObjectType(context, kind, validationResults);
-                }
-                break;
-
-            case ApiTypeKind.Scalar:
-                {
-                    ValidateApiNamedTypeProperties(context, ref validationResults);
-
-                    apiType = CreateApiScalarType(context, kind, validationResults);
-                }
-                break;
-
-            default:
-                {
-                    context.Logger.LogError("Unsupported Kind: '{Kind}'", kindAsString);
-
-                    throw new JsonException($"Unable to create a derived {nameof(ApiType)} because no factory method exists for {kind} enumeration.");
-                }
+                default:
+                    context.Logger.LogError("Unsupported {Kind} enumeration value: '{KindValue}'", nameof(ApiTypeKind), kind);
+                    break;
+            }
         }
+
+        apiType ??= new ApiUnknownType();
 
         var extensions = context.ReadData.ExtensibleBase?.Extensions;
         AttachExtensions(apiType, extensions);
 
         return apiType;
     }
+    #endregion
 
-    private static ApiCollectionType CreateApiCollectionType(in ReadContext context, ApiTypeKind kind, List<ValidationResult>? validationResults)
+    #region ApiCollectionType Factory Methods
+    private static ApiCollectionType CreateApiCollectionType(ReadContext context)
     {
-        ThrowIfInvalid<ApiTypeJsonConverter, ReadContext, JsonException>
-        (
-            context,
-            nameof(ApiCollectionType),
-            validationResults,
-            message => new JsonException(message)
-        );
+        var apiItemTypeExpression = CreateApiTypeExpression(context, context.ReadData.ApiCollectionType?.ApiItemTypeExpression);
+        var apiItemTypeModifiers = context.ReadData.ApiCollectionType?.ApiItemTypeModifiers ?? ApiTypeModifiers.None;
+        var clrCollectionType = context.ReadData.ApiType?.ClrType;
 
-        var logger = context.Logger;
-        var apiItemTypeExpression = CreateApiTypeExpression(logger, context.ReadData.ApiCollectionType!.ApiItemTypeExpression!);
-        var apiItemTypeModifiers = context.ReadData.ApiCollectionType!.ApiItemTypeModifiers!.Value;
-        var clrCollectionType = context.ReadData.ApiType!.ClrType!;
-
-        return new ApiCollectionType(apiItemTypeExpression, apiItemTypeModifiers, clrCollectionType);
+        return new ApiCollectionType(apiItemTypeExpression, apiItemTypeModifiers, clrCollectionType!);
     }
+    #endregion
 
-    private static ApiEnumType CreateApiEnumType(in ReadContext context, ApiTypeKind kind, List<ValidationResult>? validationResults)
+    #region ApiEnumType Factory Methods
+    private static ApiEnumType CreateApiEnumType(ReadContext context)
     {
-        ThrowIfInvalid<ApiTypeJsonConverter, ReadContext, JsonException>
-        (
-            context,
-            nameof(ApiEnumType),
-            validationResults,
-            message => new JsonException(message)
-        );
-
-        var apiName = context.ReadData.ApiNamedType!.ApiName!;
+        var apiName = context.ReadData.ApiNamedType?.ApiName;
         var apiEnumValues = CreateApiEnumValues(context);
-        var clrType = context.ReadData.ApiType!.ClrType!;
+        var clrType = context.ReadData.ApiType?.ClrType;
 
-        return new ApiEnumType(apiName, apiEnumValues, clrType);
+        return new ApiEnumType(apiName!, apiEnumValues, clrType!);
     }
 
-    private static List<ApiEnumValue> CreateApiEnumValues(in ReadContext context)
+    private static ApiEnumValue[] CreateApiEnumValues(ReadContext context)
     {
-        var apiEnumValues = context.ReadData.ApiEnumType!.ApiEnumValues!.Select(x =>
-        {
-            var apiName = x.ApiName!;
-            var clrName = x.ClrName!;
-            var clrOrdinal = x.ClrOrdinal!.Value;
-
-            var apiEnumValue = new ApiEnumValue(apiName, clrName, clrOrdinal);
-            return apiEnumValue;
-        })
-        .ToList();
-
+        var apiEnumValues = context.ReadData.ApiEnumType?.ApiEnumValues?.Select(CreateApiEnumValue).ToArray() ?? [];
         return apiEnumValues;
     }
 
-    private static ApiObjectType CreateApiObjectType(in ReadContext context, ApiTypeKind kind, List<ValidationResult>? validationResults)
+    private static ApiEnumValue CreateApiEnumValue(ApiEnumValueReadData apiEnumValueReadData)
     {
-        ThrowIfInvalid<ApiTypeJsonConverter, ReadContext, JsonException>
-        (
-            context,
-            nameof(ApiObjectType),
-            validationResults,
-            message => new JsonException(message)
-        );
+        var apiName = apiEnumValueReadData.ApiName;
+        var clrName = apiEnumValueReadData.ClrName;
+        var clrOrdinal = apiEnumValueReadData.ClrOrdinal.GetValueOrDefault();
 
-        var logger = context.Logger;
-        var apiName = context.ReadData.ApiNamedType!.ApiName!;
-        var apiProperties = context.ReadData.ApiObjectType!.ApiProperties.EmptyIfNull().Select(x =>
-        {
-            var apiProperty = CreateApiProperty(logger, x);
-            return apiProperty;
-        })
-        .ToList();
+        return new ApiEnumValue(apiName!, clrName!, clrOrdinal);
+    }
+    #endregion
 
-        var apiRelationships = context.ReadData.ApiObjectType!.ApiRelationships.EmptyIfNull().Select(x =>
-        {
-            var apiRelationship = CreateApiRelationship(x);
-            return apiRelationship;
-        })
-        .ToList();
+    #region ApiObjectType Factory Methods
+    private static ApiObjectType CreateApiObjectType(ReadContext context)
+    {
+        var apiName = context.ReadData.ApiNamedType?.ApiName;
+        var apiProperties = CreateApiProperties(context);
+        var apiRelationships = CreateApiRelationships(context);
+        var clrType = context.ReadData.ApiType?.ClrType;
 
-        var clrType = context.ReadData.ApiType!.ClrType!;
-
-        return new ApiObjectType(apiName, apiProperties, apiRelationships, clrType);
+        return new ApiObjectType(apiName!, apiProperties, apiRelationships, clrType!);
     }
 
-    private static ApiProperty CreateApiProperty(ILogger logger, ApiPropertyReadData apiPropertyReadData)
+    private static ApiProperty[] CreateApiProperties(ReadContext context)
     {
-        var apiName = apiPropertyReadData.ApiName!;
-        var apiTypeExpression = CreateApiTypeExpression(logger, apiPropertyReadData.ApiTypeExpression!);
-        var apiTypeModifiers = apiPropertyReadData.ApiTypeModifiers!.Value;
-        var clrName = apiPropertyReadData.ClrName!;
+        var apiProperties = context.ReadData.ApiObjectType?.ApiProperties?.Select(x => CreateApiProperty(context, x)).ToArray() ?? [];
+        return apiProperties;
+    }
 
-        var apiProperty = new ApiProperty(apiName, apiTypeExpression, apiTypeModifiers, clrName);
+    private static ApiProperty CreateApiProperty(ReadContext context, ApiPropertyReadData apiPropertyReadData)
+    {
+        var apiName = apiPropertyReadData.ApiName;
+        var apiTypeExpression = CreateApiTypeExpression(context, apiPropertyReadData.ApiTypeExpression);
+        var apiTypeModifiers = apiPropertyReadData.ApiTypeModifiers ?? ApiTypeModifiers.None;
+        var clrName = apiPropertyReadData.ClrName;
+
+        var apiProperty = new ApiProperty(apiName!, apiTypeExpression, apiTypeModifiers, clrName!);
         return apiProperty;
+    }
+
+    private static ApiRelationship[] CreateApiRelationships(ReadContext context)
+    {
+        var apiRelationships = context.ReadData.ApiObjectType?.ApiRelationships?.Select(CreateApiRelationship).ToArray() ?? [];
+        return apiRelationships;
     }
 
     private static ApiRelationship CreateApiRelationship(ApiRelationshipReadData apiRelationshipReadData)
     {
-        var apiName = apiRelationshipReadData.ApiName!;
+        var apiName = apiRelationshipReadData.ApiName;
         var apiPropertyName = apiRelationshipReadData.ApiPropertyName;
 
-        return new ApiRelationship(apiName, apiPropertyName);
+        return new ApiRelationship(apiName!, apiPropertyName);
     }
+    #endregion
 
-    private static ApiScalarType CreateApiScalarType(in ReadContext context, ApiTypeKind kind, List<ValidationResult>? validationResults)
+    #region ApiScalarType Factory Methods
+    private static ApiScalarType CreateApiScalarType(ReadContext context)
     {
-        ThrowIfInvalid<ApiTypeJsonConverter, ReadContext, JsonException>
-        (
-            context,
-            nameof(ApiScalarType),
-            validationResults,
-            message => new JsonException(message)
-        );
+        var apiName = context.ReadData.ApiNamedType?.ApiName;
+        var clrType = context.ReadData.ApiType?.ClrType;
 
-        var apiName = context.ReadData.ApiNamedType!.ApiName!;
-        var clrType = context.ReadData.ApiType!.ClrType!;
-
-        return new ApiScalarType(apiName, clrType);
+        return new ApiScalarType(apiName!, clrType!);
     }
+    #endregion
 
-    private static ApiTypeExpression CreateApiTypeExpression(ILogger logger, ApiTypeExpressionReadData apiTypeExpressionReadData)
+    #region ApiTypeExpression Factory Methods
+    private static ApiTypeExpression CreateApiTypeExpression(ReadContext context, ApiTypeExpressionReadData? apiTypeExpressionReadData)
     {
-        var apiInlineType = apiTypeExpressionReadData.ApiInlineType;
+        var apiInlineType = apiTypeExpressionReadData?.ApiInlineType;
         if (apiInlineType is not null)
         {
             return new ApiTypeExpression(apiInlineType);
         }
 
-        var kind = GetApiTypeKind(logger, apiTypeExpressionReadData.Kind);
-        var apiName = apiTypeExpressionReadData.ApiName!;
+        var kind = GetApiTypeKind(context, apiTypeExpressionReadData?.Kind) ?? ApiTypeKind.Unknown;
+        var apiName = apiTypeExpressionReadData?.ApiName;
 
-        return new ApiTypeExpression(kind, apiName);
+        return new ApiTypeExpression(kind, apiName!);
     }
+    #endregion
 
-    private static ApiTypeKind GetApiTypeKind(ILogger logger, string? value)
+    #region Utility Methods
+    private static ApiTypeKind? GetApiTypeKind(ReadContext context, string? kindAsString)
     {
-        if (Enum.TryParse<ApiTypeKind>(value, out var kind) == false)
+        if (kindAsString is null)
         {
-            var kindAsString = value.SafeToString();
-            logger.LogError("Invalid Kind: '{Kind}'", kindAsString);
+            context.Logger.LogError("{Kind} enumeration string is null", nameof(ApiTypeKind));
+            return null;
+        }
 
-            throw new JsonException($"Unable to parse '{kindAsString}' into an {nameof(ApiTypeKind)} enumeration.");
+        if (Enum.TryParse<ApiTypeKind>(kindAsString, out var kind) == false)
+        {
+            context.Logger.LogError("Unable to parse {Kind} enumeration string: '{KindAsString}'", nameof(ApiTypeKind), kindAsString);
+            return null;
         }
 
         return kind;

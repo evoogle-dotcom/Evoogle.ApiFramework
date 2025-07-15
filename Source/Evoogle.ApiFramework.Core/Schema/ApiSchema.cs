@@ -6,7 +6,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.ApiFramework.Schema.Json;
 using Evoogle.Extension;
@@ -21,204 +20,248 @@ namespace Evoogle.ApiFramework.Schema;
 public sealed class ApiSchema : ExtensibleBase
 {
     #region ApiSchema Fields
-    private readonly Dictionary<string, ApiNamedType> _apiNameLookup;
-    private readonly Dictionary<Type, ApiNamedType> _clrTypeLookup;
+    private Dictionary<string, ApiNamedType>? _apiNamedTypeApiNameLookup = null;
+    private Dictionary<Type, ApiNamedType>? _apiNamedTypeClrTypeLookup = null;
 
-    private readonly Dictionary<string, ApiEnumType> _enumApiNameLookup;
-    private readonly Dictionary<Type, ApiEnumType> _enumClrTypeLookup;
+    private Dictionary<string, ApiEnumType>? _apiEnumTypeApiNameLookup = null;
+    private Dictionary<Type, ApiEnumType>? _apiEnumTypeClrTypeLookup = null;
 
-    private readonly Dictionary<string, ApiObjectType> _objectApiNameLookup;
-    private readonly Dictionary<Type, ApiObjectType> _objectClrTypeLookup;
+    private Dictionary<string, ApiObjectType>? _apiObjectTypeApiNameLookup = null;
+    private Dictionary<Type, ApiObjectType>? _apiObjectTypeClrTypeLookup = null;
 
-    private readonly Dictionary<string, ApiScalarType> _scalarApiNameLookup;
-    private readonly Dictionary<Type, ApiScalarType> _scalarClrTypeLookup;
+    private Dictionary<string, ApiScalarType>? _apiScalarTypeApiNameLookup = null;
+    private Dictionary<Type, ApiScalarType>? _apiScalarTypeClrTypeLookup = null;
     #endregion
 
     #region ApiSchema Properties
-    /// <summary>Gets the name of the schema.</summary>
-    public string Name { get; }
+    /// <summary>Gets the name of the API schema.</summary>
+    public string ApiName { get; }
 
-    /// <summary>Gets the optional version of the schema.</summary>
-    public string? Version { get; init; }
+    /// <summary>Gets the optional version of the API schema.</summary>
+    public string? ApiVersion { get; init; }
 
-    /// <summary>Gets all API named types contained within this schema.</summary>
-    public IReadOnlyCollection<ApiNamedType> ApiNamedTypes { get; }
+    /// <summary>Gets all API named types contained within this API schema.</summary>
+    public ApiNamedType[] ApiNamedTypes { get; }
 
-    /// <summary>Gets all API enum types contained within this schema.</summary>
-    public IReadOnlyCollection<ApiEnumType> ApiEnumTypes { get; }
+    /// <summary>Gets all API enum types contained within this API schema.</summary>
+    public ApiEnumType[] ApiEnumTypes { get; }
 
-    /// <summary>Gets all API object types contained within this schema.</summary>
-    public IReadOnlyCollection<ApiObjectType> ApiObjectTypes { get; }
+    /// <summary>Gets all API object types contained within this API schema.</summary>
+    public ApiObjectType[] ApiObjectTypes { get; }
 
-    /// <summary>Gets all API scalar types contained within this schema.</summary>
-    public IReadOnlyCollection<ApiScalarType> ApiScalarTypes { get; }
+    /// <summary>Gets all API scalar types contained within this API schema.</summary>
+    public ApiScalarType[] ApiScalarTypes { get; }
+
+    private Dictionary<string, ApiNamedType> ApiNamedTypeApiNameLookup => this.ThrowIfNotInitialized(_apiNamedTypeApiNameLookup);
+    private Dictionary<Type, ApiNamedType> ApiNamedTypeClrTypeLookup => this.ThrowIfNotInitialized(_apiNamedTypeClrTypeLookup);
+
+    private Dictionary<string, ApiEnumType> ApiEnumTypeApiNameLookup => this.ThrowIfNotInitialized(_apiEnumTypeApiNameLookup);
+    private Dictionary<Type, ApiEnumType> ApiEnumTypeClrTypeLookup => this.ThrowIfNotInitialized(_apiEnumTypeClrTypeLookup);
+
+    private Dictionary<string, ApiObjectType> ApiObjectTypeApiNameLookup => this.ThrowIfNotInitialized(_apiObjectTypeApiNameLookup);
+    private Dictionary<Type, ApiObjectType> ApiObjectTypeClrTypeLookup => this.ThrowIfNotInitialized(_apiObjectTypeClrTypeLookup);
+
+    private Dictionary<string, ApiScalarType> ApiScalarTypeApiNameLookup => this.ThrowIfNotInitialized(_apiScalarTypeApiNameLookup);
+    private Dictionary<Type, ApiScalarType> ApiScalarTypeClrTypeLookup => this.ThrowIfNotInitialized(_apiScalarTypeClrTypeLookup);
+
+    private string ValidationPath => $"{nameof(ApiSchema)}[\"{this.ApiName.SafeToString()}\"]";
     #endregion
 
     #region Constructors
     /// <summary>
     ///     Initializes a new instance of the <see cref="ApiSchema"/> class using separate collections for scalar, enum, and object types.
     /// </summary>
-    /// <param name="name">The name of the schema.</param>
-    /// <param name="version">The optional version of the schema.</param>
-    /// <param name="apiScalarTypes">The collection of scalar types to include in the schema.</param>
-    /// <param name="apiEnumTypes">The collection of enum types to include in the schema.</param>
-    /// <param name="apiObjectTypes">The collection of object types to include in the schema.</param>
-    /// <exception cref="ApiSchemaException">
-    ///     Thrown if <paramref name="name"/> is <c>null</c>.
-    ///     Thrown if duplicate API name or CLR type identifiers are detected across the provided types.
-    /// </exception>
+    /// <param name="apiName">The name of the API schema.</param>
+    /// <param name="apiVersion">The optional version of the API schema.</param>
+    /// <param name="apiScalarTypes">The collection of scalar types to include in the API schema.</param>
+    /// <param name="apiEnumTypes">The collection of enum types to include in the API schema.</param>
+    /// <param name="apiObjectTypes">The collection of object types to include in the API schema.</param>
     public ApiSchema
     (
-        string name,
+        string apiName,
         IEnumerable<ApiScalarType>? apiScalarTypes,
         IEnumerable<ApiEnumType>? apiEnumTypes,
         IEnumerable<ApiObjectType>? apiObjectTypes
     )
     {
-        // Initialize the schema with the provided name.
-        this.Name = name ?? throw new ApiSchemaException("Schema name cannot be null.");
-
-        // Construct the API types from the provided collections.
-        this.ApiNamedTypes = apiScalarTypes.SafeCast<ApiNamedType>()
-            .Concat(apiEnumTypes.SafeCast<ApiNamedType>())
-            .Concat(apiObjectTypes.SafeCast<ApiNamedType>())
-            .OrderBy(x => x.ApiName, StringComparer.OrdinalIgnoreCase)
-            .ToArray();
-
-        // Validate that there are no duplicate API names or CLR types across all API named types.
-        ApiSchemaHelpers.ValidateUnique<ApiSchema, ApiNamedType, string>(this.ApiNamedTypes, x => x.ApiName, nameof(ApiNamedType.ApiName));
-        ApiSchemaHelpers.ValidateUnique<ApiSchema, ApiNamedType, Type>(this.ApiNamedTypes, x => x.ClrType, nameof(ApiType.ClrType));
+        // Initialize the API name.
+        this.ApiName = apiName;
 
         // Initialize the collections for API types, scalar types, enum types, and object types.
-        this.ApiScalarTypes = apiScalarTypes.EmptyIfNull().OrderBy(x => x.ApiName, StringComparer.OrdinalIgnoreCase).ToArray();
-        this.ApiEnumTypes = apiEnumTypes.EmptyIfNull().OrderBy(x => x.ApiName, StringComparer.OrdinalIgnoreCase).ToArray();
-        this.ApiObjectTypes = apiObjectTypes.EmptyIfNull().OrderBy(x => x.ApiName, StringComparer.OrdinalIgnoreCase).ToArray();
+        this.ApiScalarTypes = [.. apiScalarTypes.EmptyIfNull().OrderBy(x => x.ApiName, StringComparer.OrdinalIgnoreCase)];
 
-        // Initialize the lookup dictionaries for fast access to API types by API name and CLR type.
-        _apiNameLookup = new(StringComparer.OrdinalIgnoreCase);
-        _clrTypeLookup = new();
-        foreach (var apiType in this.ApiNamedTypes)
-        {
-            _apiNameLookup[apiType.ApiName] = apiType;
-            _clrTypeLookup[apiType.ClrType] = apiType;
-        }
+        this.ApiEnumTypes = [.. apiEnumTypes.EmptyIfNull().OrderBy(x => x.ApiName, StringComparer.OrdinalIgnoreCase)];
 
-        // Initialize the lookup dictionaries for API scalar types by API name and CLR type.
-        _scalarApiNameLookup = new(StringComparer.OrdinalIgnoreCase);
-        _scalarClrTypeLookup = new();
-        foreach (var apiScalarType in this.ApiScalarTypes)
-        {
-            _scalarApiNameLookup[apiScalarType.ApiName] = apiScalarType;
-            _scalarClrTypeLookup[apiScalarType.ClrType] = apiScalarType;
-        }
+        this.ApiObjectTypes = [.. apiObjectTypes.EmptyIfNull().OrderBy(x => x.ApiName, StringComparer.OrdinalIgnoreCase)];
 
-        // Initialize the lookup dictionaries for API enum types by API name and CLR type.
-        _enumApiNameLookup = new(StringComparer.OrdinalIgnoreCase);
-        _enumClrTypeLookup = new();
-        foreach (var apiEnumType in this.ApiEnumTypes)
-        {
-            _enumApiNameLookup[apiEnumType.ApiName] = apiEnumType;
-            _enumClrTypeLookup[apiEnumType.ClrType] = apiEnumType;
-        }
-
-        // Initialize the lookup dictionaries for API object types by API name and CLR type.
-        _objectApiNameLookup = new(StringComparer.OrdinalIgnoreCase);
-        _objectClrTypeLookup = new();
-        foreach (var apiObjectType in this.ApiObjectTypes)
-        {
-            _objectApiNameLookup[apiObjectType.ApiName] = apiObjectType;
-            _objectClrTypeLookup[apiObjectType.ClrType] = apiObjectType;
-        }
+        // Initialize the collection of all API named types.
+        this.ApiNamedTypes = [.. this.ApiScalarTypes.SafeCast<ApiNamedType>().Concat(this.ApiEnumTypes.SafeCast<ApiNamedType>()).Concat(this.ApiObjectTypes.SafeCast<ApiNamedType>()).OrderBy(x => x.ApiName, StringComparer.OrdinalIgnoreCase)];
     }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ApiSchema"/> class from a collection of API named types.
     /// </summary>
-    /// <param name="name">The schema name.</param>
-    /// <param name="version">The optional version of the schema.</param>
-    /// <param name="apiNamedTypes">The collection of API named types to include in the schema.</param>
-    /// <exception cref="ArgumentNullException">Thrown if <paramref name="name"/> is null.</exception>
-    /// <exception cref="ApiSchemaException">Thrown if duplicate API or CLR identifiers are detected.</exception>
-    public ApiSchema(string name, IEnumerable<ApiNamedType>? apiNamedTypes)
-        : this(name, apiNamedTypes?.OfType<ApiScalarType>(), apiNamedTypes?.OfType<ApiEnumType>(), apiNamedTypes?.OfType<ApiObjectType>())
+    /// <param name="apiName">The name of the API schema.</param>
+    /// <param name="apiVersion">The optional version of the API schema.</param>
+    /// <param name="apiNamedTypes">The collection of API named types to include in the API schema.</param>
+    public ApiSchema(string apiName, IEnumerable<ApiNamedType>? apiNamedTypes)
+        : this(apiName, apiNamedTypes?.OfType<ApiScalarType>(), apiNamedTypes?.OfType<ApiEnumType>(), apiNamedTypes?.OfType<ApiObjectType>())
     { }
     #endregion
 
     #region ApiSchema Methods
-    /// <summary>
-    ///     Resolves all <see cref="ApiTypeExpression"/> instances within object and collection types in the schema.
-    ///     This ensures that every property and nested structure has its referenced or inline type linked.
-    /// </summary>
-    /// <exception cref="ApiSchemaException">
-    ///     Thrown if any named reference could not be resolved in the schema.
-    ///     This can occur if the API property expression does not resolve to a valid API property.
-    /// </exception>
-    public void ResolveAllReferences(ref List<ValidationResult>? results)
+    public ApiSchemaInitializeResult Initialize()
     {
-        foreach (var apiObjectType in this.ApiObjectTypes)
-        {
-            foreach (var apiProperty in apiObjectType.ApiProperties)
-            {
-                apiProperty.Resolve(this, ref results);
-            }
-        }
+        List<ValidationResult>? results = null;
+        this.Initialize(ref results);
+
+        return new ApiSchemaInitializeResult(results);
     }
 
-    /// <summary>
-    ///     Resolves all API relationships within object types in the schema.
-    ///     This method ensures that each relationship is properly linked to its corresponding API property.
-    /// </summary>
-    /// <param name="results">Storage for any validation results encountered during resolution.</param>
-    /// <exception cref="ApiSchemaException">
-    ///     Thrown if any relationship could not be resolved in the schema.
-    ///     This can occur if the relationship's API property expression does not resolve to a valid API property.
-    /// </exception>
-    public void ResolveAllRelationships(ref List<ValidationResult>? results)
+    public void Initialize(ref List<ValidationResult>? results)
     {
-        foreach (var apiObjectType in this.ApiObjectTypes)
-        {
-            foreach (var apiRelationship in apiObjectType.ApiRelationships)
-            {
-                apiRelationship.Resolve(apiObjectType, ref results);
-            }
-        }
+        this.InitializeApiName(ref results);
+
+        this.InitializeLookupDictionaries(ref results);
+
+        this.InitializeApiScalarTypes(ref results);
+        this.InitializeApiEnumTypes(ref results);
+        this.InitializeApiObjectTypes(ref results);
     }
 
     /// <summary>Attempts to retrieve an API named type by its API name.</summary>
-    public bool TryGetApiType(string apiName, out ApiNamedType? apiNamedType) => _apiNameLookup.TryGetValue(apiName, out apiNamedType);
+    public bool TryGetApiType(string apiName, out ApiNamedType? apiNamedType) => this.ApiNamedTypeApiNameLookup.TryGetValue(apiName, out apiNamedType);
 
     /// <summary>Attempts to retrieve an API named type by its CLR type.</summary>
-    public bool TryGetApiType(Type clrType, out ApiNamedType? apiNamedType) => _clrTypeLookup.TryGetValue(clrType, out apiNamedType);
+    public bool TryGetApiType(Type clrType, out ApiNamedType? apiNamedType) => this.ApiNamedTypeClrTypeLookup.TryGetValue(clrType, out apiNamedType);
 
     /// <summary>Attempts to retrieve an API enumeration type by its API name.</summary>
-    public bool TryGetApiEnumType(string apiName, out ApiEnumType? apiEnumType) => _enumApiNameLookup.TryGetValue(apiName, out apiEnumType);
+    public bool TryGetApiEnumType(string apiName, out ApiEnumType? apiEnumType) => this.ApiEnumTypeApiNameLookup.TryGetValue(apiName, out apiEnumType);
 
     /// <summary>Attempts to retrieve an API enumeration type by its CLR type.</summary>
-    public bool TryGetApiEnumType(Type clrType, out ApiEnumType? apiEnumType) => _enumClrTypeLookup.TryGetValue(clrType, out apiEnumType);
+    public bool TryGetApiEnumType(Type clrType, out ApiEnumType? apiEnumType) => this.ApiEnumTypeClrTypeLookup.TryGetValue(clrType, out apiEnumType);
 
     /// <summary>Attempts to retrieve an API object type by its API name.</summary>
-    public bool TryGetApiObjectType(string apiName, out ApiObjectType? apiObjectType) => _objectApiNameLookup.TryGetValue(apiName, out apiObjectType);
+    public bool TryGetApiObjectType(string apiName, out ApiObjectType? apiObjectType) => this.ApiObjectTypeApiNameLookup.TryGetValue(apiName, out apiObjectType);
 
     /// <summary>Attempts to retrieve an API object type by its CLR type.</summary>
-    public bool TryGetApiObjectType(Type clrType, out ApiObjectType? apiObjectType) => _objectClrTypeLookup.TryGetValue(clrType, out apiObjectType);
+    public bool TryGetApiObjectType(Type clrType, out ApiObjectType? apiObjectType) => this.ApiObjectTypeClrTypeLookup.TryGetValue(clrType, out apiObjectType);
 
     /// <summary>Attempts to retrieve an API scalar type by its API name.</summary>
-    public bool TryGetApiScalarType(string apiName, out ApiScalarType? apiScalarType) => _scalarApiNameLookup.TryGetValue(apiName, out apiScalarType);
+    public bool TryGetApiScalarType(string apiName, out ApiScalarType? apiScalarType) => this.ApiScalarTypeApiNameLookup.TryGetValue(apiName, out apiScalarType);
 
     /// <summary>Attempts to retrieve an API scalar type by its CLR type.</summary>
-    public bool TryGetApiScalarType(Type clrType, out ApiScalarType? apiScalarType) => _scalarClrTypeLookup.TryGetValue(clrType, out apiScalarType);
+    public bool TryGetApiScalarType(Type clrType, out ApiScalarType? apiScalarType) => this.ApiScalarTypeClrTypeLookup.TryGetValue(clrType, out apiScalarType);
     #endregion
 
     #region Object Methods
     /// <inheritdoc/>
     public override string ToString()
     {
-        var name = this.Name.SafeToString();
-        var count = this.ApiNamedTypes.Count.SafeToString();
-        var scalarCount = this.ApiScalarTypes.Count.SafeToString();
-        var enumCount = this.ApiEnumTypes.Count.SafeToString();
-        var objectCount = this.ApiObjectTypes.Count.SafeToString();
-        return $"{nameof(ApiSchema)} {{Name={name}, Count={count}, ScalarCount={scalarCount}, EnumCount={enumCount}, ObjectCount={objectCount}}}";
+        var apiName = this.ApiName.SafeToString();
+        var apiVersion = this.ApiVersion.SafeToString();
+        var apiNamedTypeCount = this.ApiNamedTypes.Length.SafeToString();
+        var apiScalarTypeCount = this.ApiScalarTypes.Length.SafeToString();
+        var apiEnumTypeCount = this.ApiEnumTypes.Length.SafeToString();
+        var apiObjectTypeCount = this.ApiObjectTypes.Length.SafeToString();
+        return $"{nameof(ApiSchema)} {{ApiName={apiName}, ApiVersion={apiVersion}, ApiNamedTypeCount={apiNamedTypeCount}, ApiScalarTypeCount={apiScalarTypeCount}, ApiEnumTypeCount={apiEnumTypeCount}, ApiObjectTypeCount={apiObjectTypeCount}}}";
+    }
+    #endregion
+
+    #region Implementation Methods
+    private void InitializeApiEnumTypes(ref List<ValidationResult>? results)
+    {
+        foreach (var apiEnumType in this.ApiEnumTypes)
+        {
+            apiEnumType.Initialize(this, ref results);
+        }
+    }
+
+    private void InitializeApiName(ref List<ValidationResult>? results)
+    {
+        if (string.IsNullOrWhiteSpace(this.ApiName))
+        {
+            results ??= [];
+            results.Add(new ValidationResult($"{nameof(ApiSchema)}.{nameof(this.ApiName)} cannot be null or whitespace.", [nameof(this.ApiName)]));
+        }
+    }
+
+    private void InitializeApiObjectTypes(ref List<ValidationResult>? results)
+    {
+        foreach (var apiObjectType in this.ApiObjectTypes)
+        {
+            apiObjectType.Initialize(this, ref results);
+        }
+    }
+
+    private void InitializeApiScalarTypes(ref List<ValidationResult>? results)
+    {
+        foreach (var apiScalarType in this.ApiScalarTypes)
+        {
+            apiScalarType.Initialize(this, ref results);
+        }
+    }
+
+    private void InitializeLookupDictionaries(ref List<ValidationResult>? results)
+    {
+        // Initialize the lookup dictionaries for lookup by API name and CLR type.
+        _apiNamedTypeApiNameLookup = null;
+        _apiNamedTypeClrTypeLookup = null;
+
+        _apiEnumTypeApiNameLookup = null;
+        _apiEnumTypeClrTypeLookup = null;
+
+        _apiObjectTypeApiNameLookup = null;
+        _apiObjectTypeClrTypeLookup = null;
+
+        _apiScalarTypeApiNameLookup = null;
+        _apiScalarTypeClrTypeLookup = null;
+
+        // Validate uniqueness of API names and CLR types across all API named types.
+        var anyApiEnumTypeApiNameDuplicates = ApiSchemaHelpers.ValidateUnique(this.ApiEnumTypes, x => x.ApiName, this.ValidationPath, nameof(ApiEnumType.ApiName), ref results);
+        var anyApiEnumTypeClrTypeDuplicates = ApiSchemaHelpers.ValidateUnique(this.ApiEnumTypes, x => x.ClrType, this.ValidationPath, nameof(ApiEnumType.ClrType), ref results);
+
+        var anyApiObjectTypeApiNameDuplicates = ApiSchemaHelpers.ValidateUnique(this.ApiObjectTypes, x => x.ApiName, this.ValidationPath, nameof(ApiObjectType.ApiName), ref results);
+        var anyApiObjectTypeClrTypeDuplicates = ApiSchemaHelpers.ValidateUnique(this.ApiObjectTypes, x => x.ClrType, this.ValidationPath, nameof(ApiObjectType.ClrType), ref results);
+
+        var anyApiScalarTypeApiNameDuplicates = ApiSchemaHelpers.ValidateUnique(this.ApiScalarTypes, x => x.ApiName, this.ValidationPath, nameof(ApiScalarType.ApiName), ref results);
+        var anyApiScalarTypeClrTypeDuplicates = ApiSchemaHelpers.ValidateUnique(this.ApiScalarTypes, x => x.ClrType, this.ValidationPath, nameof(ApiScalarType.ClrType), ref results);
+
+        // Initialize the lookup dictionaries for fast access to API types by API name and CLR type.
+        _apiNamedTypeApiNameLookup = new(StringComparer.OrdinalIgnoreCase);
+        _apiNamedTypeClrTypeLookup = [];
+        foreach (var apiNamedType in this.ApiNamedTypes)
+        {
+            _apiNamedTypeApiNameLookup[apiNamedType.ApiName] = apiNamedType;
+            _apiNamedTypeClrTypeLookup[apiNamedType.ClrType] = apiNamedType;
+        }
+
+        // Initialize the lookup dictionaries for API scalar types by API name and CLR type.
+        _apiScalarTypeApiNameLookup = new(StringComparer.OrdinalIgnoreCase);
+        _apiScalarTypeClrTypeLookup = new();
+        foreach (var apiScalarType in this.ApiScalarTypes)
+        {
+            _apiScalarTypeApiNameLookup[apiScalarType.ApiName] = apiScalarType;
+            _apiScalarTypeClrTypeLookup[apiScalarType.ClrType] = apiScalarType;
+        }
+
+        // Initialize the lookup dictionaries for API enum types by API name and CLR type.
+        _apiEnumTypeApiNameLookup = new(StringComparer.OrdinalIgnoreCase);
+        _apiEnumTypeClrTypeLookup = new();
+        foreach (var apiEnumType in this.ApiEnumTypes)
+        {
+            _apiEnumTypeApiNameLookup[apiEnumType.ApiName] = apiEnumType;
+            _apiEnumTypeClrTypeLookup[apiEnumType.ClrType] = apiEnumType;
+        }
+
+        // Initialize the lookup dictionaries for API object types by API name and CLR type.
+        _apiObjectTypeApiNameLookup = new(StringComparer.OrdinalIgnoreCase);
+        _apiObjectTypeClrTypeLookup = new();
+        foreach (var apiObjectType in this.ApiObjectTypes)
+        {
+            _apiObjectTypeApiNameLookup[apiObjectType.ApiName] = apiObjectType;
+            _apiObjectTypeClrTypeLookup[apiObjectType.ClrType] = apiObjectType;
+        }
     }
     #endregion
 }

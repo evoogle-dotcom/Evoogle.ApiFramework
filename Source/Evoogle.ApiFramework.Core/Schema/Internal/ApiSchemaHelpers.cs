@@ -3,6 +3,9 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.ComponentModel.DataAnnotations;
+using System.Runtime.CompilerServices;
+
 using Evoogle.ApiFramework.Exceptions;
 using Evoogle.Extensions;
 
@@ -15,20 +18,17 @@ namespace Evoogle.ApiFramework.Schema.Internal;
 internal static class ApiSchemaHelpers
 {
     #region Validation Methods
-    /// <summary>
-    ///     Validates that the specified key selector produces unique values for creating a new entity.
-    ///     This is used to ensure that the entity can be created without conflicts.
-    /// </summary>
-    /// <typeparam name="T">The type of entity.</typeparam>
-    /// <typeparam name="TPart">The type of the part within the entity.</typeparam>
-    /// <typeparam name="TPartKey">The type of the key selected from each part.</typeparam>
-    /// <param name="parts">The collection of entity parts to check.</param>
-    /// <param name="partKeySelector">A function to extract the key to test for uniqueness.</param>
-    /// <param name="partKeyPropertyName">The name of the property being validated (for error messages).</param>
-    /// <exception cref="ApiSchemaException">
-    ///     Thrown when duplicate key values are found for the specified entity.
-    /// </exception>
-    public static void ValidateUnique<T, TPart, TPartKey>(IEnumerable<TPart> parts, Func<TPart, TPartKey> partKeySelector, string partKeyPropertyName)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static T ThrowIfNotInitialized<T>(this object obj, T? value)
+    {
+        if (value is not null)
+            return value;
+
+        var typeName = obj.GetType().Name;
+        throw new ApiSchemaException($"{typeName} has not been initialized. Initialize the schema before accessing.");
+    }
+
+    public static bool ValidateUnique<TPart, TPartKey>(IEnumerable<TPart> parts, Func<TPart, TPartKey> partKeySelector, string validationPath, string partKeyPropertyName, ref List<ValidationResult>? results)
     {
         var duplicates = parts
             .GroupBy(partKeySelector)
@@ -37,13 +37,15 @@ internal static class ApiSchemaHelpers
             .ToList();
 
         if (duplicates.Count == 0)
-            return;
+            return false;
 
-        var duplicateKeysString = duplicates.SafeToDelimitedString(',');
-        var typeName = typeof(T).Name;
+        var duplicatesString = duplicates.SafeToDelimitedString(',');
         var partTypeName = typeof(TPart).Name;
-        var message = $"Unable to create {typeName} because duplicate {partTypeName}.{partKeyPropertyName} values detected: {duplicateKeysString}";
-        throw new ApiSchemaException(message);
+        var message = $"{validationPath}.{partTypeName} unable to initialize because duplicate {partKeyPropertyName} values detected: {duplicatesString}";
+
+        results ??= [];
+        results.Add(new ValidationResult(message));
+        return true;
     }
     #endregion
 }

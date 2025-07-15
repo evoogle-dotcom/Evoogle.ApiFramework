@@ -102,7 +102,7 @@ public sealed class ApiSchemaBuilder
 
         return new ApiSchema(_name, scalarTypes, enumTypes, objectTypes)
         {
-            Version = _version
+            ApiVersion = _version
         };
     }
 

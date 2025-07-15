@@ -22,7 +22,7 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
         Second
     }
 
-    public class ConstructorThrowsTest : XUnitTest
+    public class InitializeThrowsTest : XUnitTest
     {
         #region User Supplied Properties
         public List<ApiEnumValue>? ApiEnumValueCollection { get; init; }
@@ -53,9 +53,19 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
         {
             try
             {
-                var apiEnumType = new ApiEnumType(nameof(Enum), // Using 'Enum' as a placeholder API name
+                var apiEnumType = new ApiEnumType(nameof(SampleEnum), // Using 'SampleEnum' as a placeholder API name
                                                   this.ApiEnumValueCollection ?? throw new ArgumentNullException(nameof(this.ApiEnumValueCollection)),
                                                   this.ClrEnumType ?? throw new ArgumentNullException(nameof(this.ClrEnumType)));
+
+                var apiSchema = new ApiSchema
+                (
+                    apiName: nameof(ApiSchema),
+                    apiScalarTypes: null,
+                    apiEnumTypes: [apiEnumType],
+                    apiObjectTypes: null
+                );
+                var result = apiSchema.Initialize();
+                result.ThrowIfInvalid();
             }
             catch (ApiSchemaException ex)
             {
@@ -108,9 +118,20 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
             this.WriteLine($"API Enum Values: [{apiEnumValuesString}]");
             this.WriteLine();
 
-            this.ApiEnumType = new ApiEnumType(nameof(Enum), // Using 'Enum' as a placeholder API name
-                                               this.ApiEnumValueCollection ?? throw new ArgumentNullException(nameof(this.ApiEnumValueCollection)),
-                                               this.ClrEnumType ?? throw new ArgumentNullException(nameof(this.ClrEnumType)));
+            var apiEnumType = new ApiEnumType(nameof(SampleEnum), // Using 'SampleEnum' as a placeholder API name
+                                              this.ApiEnumValueCollection ?? throw new ArgumentNullException(nameof(this.ApiEnumValueCollection)),
+                                              this.ClrEnumType ?? throw new ArgumentNullException(nameof(this.ClrEnumType)));
+            this.ApiEnumType = apiEnumType;
+
+            var apiSchema = new ApiSchema
+            (
+                apiName: nameof(ApiSchema),
+                apiScalarTypes: null,
+                apiEnumTypes: [apiEnumType],
+                apiObjectTypes: null
+            );
+            var result = apiSchema.Initialize();
+            result.ThrowIfInvalid();
 
             this.WriteLine($"TryGetMethod:  {this.TryGetMethod.SafeToString()}");
             this.WriteLine($"Input:         {this.Input.SafeToString()}");
@@ -160,10 +181,10 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
     #endregion
 
     #region Theory Data
-    public static TheoryDataRow<IXUnitTest>[] ConstructorThrowsTheoryData =>
+    public static TheoryDataRow<IXUnitTest>[] InitializeThrowsTheoryData =>
     [
         // Duplicate API enum value names
-        new ConstructorThrowsTest
+        new InitializeThrowsTest
         {
             Name = "Throws on duplicate API enum value names",
             ApiEnumValueCollection =
@@ -173,11 +194,11 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 new("second", "Second2", 2), // Duplicate API Name
             ],
             ClrEnumType = typeof(SampleEnum),
-            ExpectedApiSchemaExceptionMessage = $"Unable to create {nameof(ApiEnumType)} because duplicate {nameof(ApiEnumValue)}.{nameof(ApiEnumValue.ApiName)} values detected: second",
+            ExpectedApiSchemaExceptionMessage = $"{nameof(ApiSchema)} initialization failed:\nApiEnumType[\"Evoogle.ApiFramework.Schema.ApiEnumTypeTests+SampleEnum\"][\"SampleEnum\"].ApiEnumValue unable to initialize because duplicate ApiName values detected: second",
         },
 
         // Duplicate CLR enum value names
-        new ConstructorThrowsTest
+        new InitializeThrowsTest
         {
             Name = "Throws on duplicate CLR enum value names",
             ApiEnumValueCollection =
@@ -187,11 +208,11 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 new("second2", "Second", 2), // Duplicate CLR Name
             ],
             ClrEnumType = typeof(SampleEnum),
-            ExpectedApiSchemaExceptionMessage = $"Unable to create {nameof(ApiEnumType)} because duplicate {nameof(ApiEnumValue)}.{nameof(ApiEnumValue.ClrName)} values detected: Second",
+            ExpectedApiSchemaExceptionMessage = $"{nameof(ApiSchema)} initialization failed:\nApiEnumType[\"Evoogle.ApiFramework.Schema.ApiEnumTypeTests+SampleEnum\"][\"SampleEnum\"].ApiEnumValue unable to initialize because duplicate ClrName values detected: Second",
         },
 
         // Duplicate CLR enum value ordinals
-        new ConstructorThrowsTest
+        new InitializeThrowsTest
         {
             Name = "Throws on duplicate CLR enum value ordinals",
             ApiEnumValueCollection =
@@ -201,11 +222,11 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 new("third", "Third", 1), // Duplicate CLR Ordinal
             ],
             ClrEnumType = typeof(SampleEnum),
-            ExpectedApiSchemaExceptionMessage = $"Unable to create {nameof(ApiEnumType)} because duplicate {nameof(ApiEnumValue)}.{nameof(ApiEnumValue.ClrOrdinal)} values detected: 1",
+            ExpectedApiSchemaExceptionMessage = $"{nameof(ApiSchema)} initialization failed:\nApiEnumType[\"Evoogle.ApiFramework.Schema.ApiEnumTypeTests+SampleEnum\"][\"SampleEnum\"].ApiEnumValue unable to initialize because duplicate ClrOrdinal values detected: 1",
         },
 
         // CLR type is not an enum
-        new ConstructorThrowsTest
+        new InitializeThrowsTest
         {
             Name = "Throws if CLR type is not an enum",
             ApiEnumValueCollection =
@@ -215,7 +236,7 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 new("third", "Third", 2),
             ],
             ClrEnumType = typeof(string), // Using a non-enum type
-            ExpectedApiSchemaExceptionMessage = $"Unable to create {nameof(ApiEnumType)} because the CLR type [name={typeof(string).Name}] is not a CLR enum type.",
+            ExpectedApiSchemaExceptionMessage = $"{nameof(ApiSchema)} initialization failed:\nApiEnumType[\"System.String\"][\"SampleEnum\"].ClrType must be a CLR enum type.",
         },
     ];
 
@@ -340,8 +361,8 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
 
     #region Test Methods
     [Theory]
-    [MemberData(nameof(ConstructorThrowsTheoryData))]
-    public void ConstructorThrows(IXUnitTest test) => test.Execute(this);
+    [MemberData(nameof(InitializeThrowsTheoryData))]
+    public void InitializeThrows(IXUnitTest test) => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(TryGetTheoryData))]

@@ -195,9 +195,6 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
 
         ReadJsonObject<ApiTypeJsonConverter, ReadContext>(ref reader, ref context, (context) => context.ReadHandlers.ApiTypePropertyHandlers);
 
-        var kind = context.ReadData.ApiType?.Kind;
-        var clrType = context.ReadData.ApiType?.ClrType;
-
         var apiType = CreateApiType(context);
 
         context.Logger.LogDebug("Deserialized  {ApiType}", apiType);

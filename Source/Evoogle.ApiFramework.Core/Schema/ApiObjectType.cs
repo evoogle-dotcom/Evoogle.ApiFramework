@@ -3,7 +3,8 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using Evoogle.ApiFramework.Exceptions;
+using System.ComponentModel.DataAnnotations;
+
 using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.Extensions;
 
@@ -17,64 +18,61 @@ namespace Evoogle.ApiFramework.Schema;
 ///     <para>
 ///         <see cref="ApiObjectType"/> distinguishes between:
 ///         <list type="bullet">
-///             <item>
-///                 <description><see cref="ApiProperty"/> — structural metadata describing individual named data members
-///                 (e.g., strings, numbers, collections) of the object.</description>
-///             </item>
-///             <item>
-///                 <description><see cref="ApiRelationship"/> — semantic metadata describing navigation or linkage from
-///                 one object type to another, based on one of its properties and expressing cardinality.</description>
-///             </item>
+///             <item><description><see cref="ApiProperty"/> — structural metadata describing individual named data members (e.g., strings, numbers, collections) of the object.</description></item>
+///             <item><description><see cref="ApiRelationship"/> — semantic metadata describing navigation or linkage from one object type to another, based on one of its properties and expressing cardinality.</description></item>
 ///         </list>
 ///     </para>
 /// </remarks>
-public sealed class ApiObjectType : ApiNamedType
+/// <remarks>
+///     Initializes a new instance of the <see cref="ApiObjectType"/> class.
+/// </remarks>
+/// <param name="apiName">The API name of the object type.</param>
+/// <param name="apiProperties">The collection of API properties defined on this object type.</param>
+/// <param name="apiRelationships">The collection of API relationships defined on this object type.</param>
+/// <param name="clrObjectType">The CLR type representing this API object.</param>
+public sealed class ApiObjectType(string apiName, IEnumerable<ApiProperty> apiProperties, IEnumerable<ApiRelationship> apiRelationships, Type clrObjectType) : ApiNamedType(apiName, clrObjectType)
 {
+    #region ApiObject Fields
+    private Dictionary<string, ApiProperty>? _propertyApiNameLookup = null;
+    private Dictionary<string, ApiProperty>? _propertyClrNameLookup = null;
+    private Dictionary<string, ApiRelationship>? _relationshipApiNameLookup = null;
+    #endregion
+
     #region ApiType Properties
     /// <inheritdoc/>
     public override ApiTypeKind Kind => ApiTypeKind.Object;
-    #endregion
 
-    #region ApiObject Fields
-    private readonly Dictionary<string, ApiProperty> _propertyApiNameLookup;
-    private readonly Dictionary<string, ApiProperty> _propertyClrNameLookup;
-    private readonly Dictionary<string, ApiRelationship> _relationshipApiNameLookup;
+    /// <inheritdoc/>
+    protected override string ApiTypeName => nameof(ApiObjectType);
     #endregion
 
     #region ApiObject Properties
     /// <summary>
     ///     Gets the collection of API properties defined on this object type.
     /// </summary>
-    public IReadOnlyCollection<ApiProperty> ApiProperties { get; }
+    public ApiProperty[] ApiProperties { get; } = apiProperties.SafeToArray();
 
     /// <summary>
     ///     Gets the collection of API relationships defined on this object type.
     /// </summary>
-    public IReadOnlyCollection<ApiRelationship> ApiRelationships { get; }
+    public ApiRelationship[] ApiRelationships { get; } = apiRelationships.SafeToArray();
+
+    private Dictionary<string, ApiProperty> PropertyApiNameLookup => this.ThrowIfNotInitialized(_propertyApiNameLookup);
+    private Dictionary<string, ApiProperty> PropertyClrNameLookup => this.ThrowIfNotInitialized(_propertyClrNameLookup);
+    private Dictionary<string, ApiRelationship> RelationshipApiNameLookup => this.ThrowIfNotInitialized(_relationshipApiNameLookup);
     #endregion
 
-    #region Constructors
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="ApiObjectType"/> class.
-    /// </summary>
-    /// <param name="apiName">The API name of the object type.</param>
-    /// <param name="apiProperties">The collection of API properties defined on this object type.</param>
-    /// <param name="apiRelationships">The collection of API relationships defined on this object type.</param>
-    /// <param name="clrObjectType">The CLR type representing this API object.</param>
-    /// <exception cref="ApiSchemaException">Thrown if duplicate API or CLR property names are detected.</exception>
-    public ApiObjectType(string apiName, IEnumerable<ApiProperty> apiProperties, IEnumerable<ApiRelationship> apiRelationships, Type clrObjectType)
-        : base(apiName, clrObjectType)
+    #region ApiType Methods
+    internal override void Initialize(ApiSchema apiSchema, ref List<ValidationResult>? results)
     {
-        this.ApiProperties = apiProperties.SafeToArray();
-        this.ApiRelationships = apiRelationships.SafeToArray();
+        ArgumentNullException.ThrowIfNull(apiSchema);
 
-        ApiSchemaHelpers.ValidateUnique<ApiObjectType, ApiProperty, string>(this.ApiProperties, x => x.ApiName, nameof(ApiProperty.ApiName));
-        ApiSchemaHelpers.ValidateUnique<ApiObjectType, ApiProperty, string>(this.ApiProperties, x => x.ClrName, nameof(ApiProperty.ClrName));
-        ApiSchemaHelpers.ValidateUnique<ApiObjectType, ApiRelationship, string>(this.ApiRelationships, x => x.ApiName, nameof(ApiRelationship.ApiName));
+        base.Initialize(apiSchema, ref results);
 
-        _propertyApiNameLookup = this.ApiProperties.ToDictionary(x => x.ApiName, StringComparer.OrdinalIgnoreCase);
-        _propertyClrNameLookup = this.ApiProperties.ToDictionary(x => x.ClrName, StringComparer.OrdinalIgnoreCase);
-        _relationshipApiNameLookup = this.ApiRelationships.ToDictionary(x => x.ApiName, StringComparer.OrdinalIgnoreCase);
+        this.InitializeLookupDictionaries(apiSchema, ref results);
+
+        this.InitializeApiProperties(apiSchema, ref results);
+        this.InitializeApiRelationships(apiSchema, ref results);
     }
     #endregion
 
@@ -85,7 +83,7 @@ public sealed class ApiObjectType : ApiNamedType
     /// <param name="apiName">The API name of the property to retrieve.</param>
     /// <param name="value">When this method returns, contains the <see cref="ApiProperty"/> if found; otherwise, null.</param>
     /// <returns>True if the property was found; otherwise, false.</returns>
-    public bool TryGetPropertyByApiName(string apiName, out ApiProperty? value) => _propertyApiNameLookup.TryGetValue(apiName, out value);
+    public bool TryGetPropertyByApiName(string apiName, out ApiProperty? value) => this.PropertyApiNameLookup.TryGetValue(apiName, out value);
 
     /// <summary>
     ///     Attempts to retrieve an API property by its CLR name.
@@ -93,7 +91,7 @@ public sealed class ApiObjectType : ApiNamedType
     /// <param name="clrName">The CLR name of the property to retrieve.</param>
     /// <param name="value">When this method returns, contains the <see cref="ApiProperty"/> if found; otherwise, null.</param>
     /// <returns>True if the property was found; otherwise, false.</returns>
-    public bool TryGetPropertyByClrName(string clrName, out ApiProperty? value) => _propertyClrNameLookup.TryGetValue(clrName, out value);
+    public bool TryGetPropertyByClrName(string clrName, out ApiProperty? value) => this.PropertyClrNameLookup.TryGetValue(clrName, out value);
 
     /// <summary>
     ///     Attempts to retrieve an API relationship by its API name.
@@ -101,7 +99,7 @@ public sealed class ApiObjectType : ApiNamedType
     /// <param name="apiName">The API name of the relationship to retrieve.</param>
     /// <param name="value">When this method returns, contains the <see cref="ApiRelationship"/> if found; otherwise, null.</param>
     /// <returns>True if the relationship was found; otherwise, false.</returns>
-    public bool TryGetRelationshipByApiName(string apiName, out ApiRelationship? value) => _relationshipApiNameLookup.TryGetValue(apiName, out value);
+    public bool TryGetRelationshipByApiName(string apiName, out ApiRelationship? value) => this.RelationshipApiNameLookup.TryGetValue(apiName, out value);
     #endregion
 
     #region Object Methods
@@ -112,6 +110,86 @@ public sealed class ApiObjectType : ApiNamedType
         var clrType = this.ClrType.SafeToString();
 
         return $"{nameof(ApiObjectType)} {{{nameof(this.ApiName)}={apiName}}} [{clrType}]";
+    }
+    #endregion
+
+    #region Implementation Methods
+    private void InitializeApiProperties(ApiSchema apiSchema, ref List<ValidationResult>? results)
+    {
+        if (this.ApiProperties is null)
+        {
+            results ??= [];
+            results.Add(new ValidationResult($"{this.ValidationPath}.{nameof(this.ApiProperties)} cannot be null.", [nameof(this.ApiProperties)]));
+            return;
+        }
+
+        var apiPropertiesCount = this.ApiProperties.Length;
+        for (var i = 0; i < apiPropertiesCount; ++i)
+        {
+            var apiValidationPath = $"{this.ValidationPath}.{nameof(this.ApiProperties)}[{i}]";
+
+            var apiProperty = this.ApiProperties[i];
+            if (apiProperty is null)
+            {
+                results ??= [];
+                results.Add(new ValidationResult($"{apiValidationPath} cannot be null.", [nameof(this.ApiProperties)]));
+                continue;
+            }
+
+            apiProperty.Initialize(apiSchema, apiValidationPath, ref results);
+        }
+    }
+
+    private void InitializeApiRelationships(ApiSchema apiSchema, ref List<ValidationResult>? results)
+    {
+        if (this.ApiRelationships is null)
+        {
+            results ??= [];
+            results.Add(new ValidationResult($"{this.ValidationPath}.{nameof(this.ApiRelationships)} cannot be null.", [nameof(this.ApiRelationships)]));
+            return;
+        }
+
+        var apiRelationshipsCount = this.ApiRelationships.Length;
+        for (var i = 0; i < apiRelationshipsCount; ++i)
+        {
+            var apiValidationPath = $"{this.ValidationPath}.{nameof(this.ApiRelationships)}[{i}]";
+
+            var apiRelationship = this.ApiRelationships[i];
+            if (apiRelationship is null)
+            {
+                results ??= [];
+                results.Add(new ValidationResult($"{apiValidationPath} cannot be null.", [nameof(this.ApiRelationships)]));
+                continue;
+            }
+
+            apiRelationship.Initialize(apiSchema, this, apiValidationPath, ref results);
+        }
+    }
+
+    private void InitializeLookupDictionaries(ApiSchema _, ref List<ValidationResult>? results)
+    {
+        _propertyApiNameLookup = null;
+        _propertyClrNameLookup = null;
+        _relationshipApiNameLookup = null;
+
+        var anyPropertyApiNameDuplicates = ApiSchemaHelpers.ValidateUnique(this.ApiProperties, x => x.ApiName, this.ValidationPath, nameof(ApiProperty.ApiName), ref results);
+        var anyPropertyClrNameDuplicates = ApiSchemaHelpers.ValidateUnique(this.ApiProperties, x => x.ClrName, this.ValidationPath, nameof(ApiProperty.ClrName), ref results);
+        var anyRelationshipApiNameDuplicates = ApiSchemaHelpers.ValidateUnique(this.ApiRelationships, x => x.ApiName, this.ValidationPath, nameof(ApiRelationship.ApiName), ref results);
+
+        if (!anyPropertyApiNameDuplicates)
+        {
+            _propertyApiNameLookup = this.ApiProperties.ToDictionary(x => x.ApiName, StringComparer.OrdinalIgnoreCase);
+        }
+
+        if (!anyPropertyClrNameDuplicates)
+        {
+            _propertyClrNameLookup = this.ApiProperties.ToDictionary(x => x.ClrName, StringComparer.OrdinalIgnoreCase);
+        }
+
+        if (!anyRelationshipApiNameDuplicates)
+        {
+            _relationshipApiNameLookup = this.ApiRelationships.ToDictionary(x => x.ApiName, StringComparer.OrdinalIgnoreCase);
+        }
     }
     #endregion
 }

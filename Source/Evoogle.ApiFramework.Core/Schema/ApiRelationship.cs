@@ -6,6 +6,7 @@
 using System.ComponentModel.DataAnnotations;
 
 using Evoogle.ApiFramework.Exceptions;
+using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.Extension;
 using Evoogle.Extensions;
 
@@ -26,19 +27,17 @@ namespace Evoogle.ApiFramework.Schema;
 public sealed class ApiRelationship(string apiName, string? apiPropertyName = null) : ExtensibleBase
 {
     #region Fields
-    private ApiProperty? _apiResolvedProperty = null;
-
     private readonly string? _apiPropertyName = apiPropertyName;
+
+    private ApiProperty? _apiResolvedProperty = null;
     #endregion
 
     #region Properties
     /// <summary>
     ///     Gets the API name of the relationship.
     /// </summary>
-    public string ApiName { get; } = apiName ?? throw new ArgumentNullException(nameof(apiName), $"{nameof(apiName)} cannot be null.");
-    #endregion
+    public string ApiName { get; } = apiName;
 
-    #region Computed Properties
     /// <summary>
     ///     Gets the API property name this relationship refers to.
     ///     If no property name is explicitly provided, defaults to <see cref="ApiName"/>.
@@ -47,12 +46,12 @@ public sealed class ApiRelationship(string apiName, string? apiPropertyName = nu
 
     /// <summary>
     ///     Gets the resolved <see cref="ApiProperty"/> backing this relationship.
-    ///     This property must be resolved first using <see cref="Resolve"/>.
+    ///     This property must be resolved first using <see cref="Initialize"/>.
     /// </summary>
     /// <exception cref="ApiSchemaException">
-    ///     Thrown if the property has not yet been resolved via <see cref="Resolve"/>.
+    ///     Thrown if the property has not yet been resolved via <see cref="Initialize"/>.
     /// </exception>
-    public ApiProperty ApiProperty => _apiResolvedProperty ?? throw new ApiSchemaException($"{nameof(ApiRelationship)} has not been resolved yet.");
+    public ApiProperty ApiProperty => this.ThrowIfNotInitialized(_apiResolvedProperty);
 
     /// <summary>
     ///     Gets the relationship cardinality (<see cref="ApiRelationshipCardinality.ToOne"/> or <see cref="ApiRelationshipCardinality.ToMany"/>) based on the <see cref="ApiProperty.ApiType"/> kind.
@@ -69,30 +68,14 @@ public sealed class ApiRelationship(string apiName, string? apiPropertyName = nu
     #endregion
 
     #region ApiRelationship Methods
-    /// <summary>
-    ///     Resolves the relationship by binding it to a property of the given <see cref="ApiObjectType"/>.
-    ///     Adds a <see cref="ValidationResult"/> to <paramref name="results"/> if the referenced property cannot be found.
-    /// </summary>
-    /// <param name="apiObjectType">The API object type containing the property.</param>
-    /// <param name="results">An optional list to which validation errors are appended.</param>    
-    public void Resolve(ApiObjectType apiObjectType, ref List<ValidationResult>? results)
+    internal void Initialize(ApiSchema apiSchema, ApiObjectType apiObjectType, string apiValidationPath, ref List<ValidationResult>? results)
     {
+        ArgumentNullException.ThrowIfNull(apiSchema);
         ArgumentNullException.ThrowIfNull(apiObjectType);
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiValidationPath);
 
-        // Lookup the API property by API name.
-        if (!apiObjectType.TryGetPropertyByApiName(this.ApiPropertyName, out var apiProperty))
-        {
-#pragma warning disable IDE0009 // Member access should be qualified.
-            var message = $"Failed to lookup {nameof(ApiProperty)} '{this.ApiPropertyName.SafeToString()}' from {apiObjectType.SafeToString()}.";
-#pragma warning restore IDE0009 // Member access should be qualified.
-
-            results ??= [];
-            results.Add(new ValidationResult(message, [nameof(this.ApiProperty)]));
-            return;
-        }
-
-        // If we found the property, we have resolved it.
-        _apiResolvedProperty = apiProperty;
+        this.InitializeApiName(apiSchema, apiValidationPath, ref results);
+        this.InitializeApiProperty(apiSchema, apiObjectType, apiValidationPath, ref results);
     }
     #endregion
 
@@ -107,6 +90,42 @@ public sealed class ApiRelationship(string apiName, string? apiPropertyName = nu
             return $"{nameof(ApiRelationship)} {{{nameof(this.ApiName)}={apiName}}}";
         else
             return $"{nameof(ApiRelationship)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ApiPropertyName)}={apiPropertyName}}}";
+    }
+    #endregion
+
+    #region Implementation Methods
+    private void InitializeApiName(ApiSchema _, string apiValidationPath, ref List<ValidationResult>? results)
+    {
+        if (string.IsNullOrWhiteSpace(this.ApiName))
+        {
+            results ??= [];
+            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ApiName)} cannot be null or whitespace.", [nameof(this.ApiName)]));
+        }
+    }
+
+    private void InitializeApiProperty(ApiSchema _, ApiObjectType apiObjectType, string apiValidationPath, ref List<ValidationResult>? results)
+    {
+        _apiResolvedProperty = null;
+
+        if (string.IsNullOrWhiteSpace(this.ApiPropertyName))
+        {
+            results ??= [];
+            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ApiPropertyName)} cannot be null or whitespace.", [nameof(this.ApiPropertyName)]));
+        }
+        else
+        {
+            // Resolve the related API property for the parent API object type.
+            if (apiObjectType.TryGetPropertyByApiName(this.ApiPropertyName, out var apiResolvedProperty))
+            {
+                _apiResolvedProperty = apiResolvedProperty;
+            }
+        }
+
+        if (_apiResolvedProperty is null)
+        {
+            results ??= [];
+            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ApiProperty)} unable to resolve {nameof(this.ApiProperty)}[\"{this.ApiPropertyName.SafeToString()}\"].", [nameof(this.ApiProperty)]));
+        }
     }
     #endregion
 }
