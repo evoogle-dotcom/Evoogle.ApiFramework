@@ -7,9 +7,18 @@ using Evoogle.Reflection;
 
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
+/// <summary>
+///     Factory helper for creating <see cref="ApiTypeExpression"/> instances from CLR types.
+/// </summary>
 public static class ApiTypeExpressionBuilder
 {
     #region Factory Methods
+    /// <summary>
+    ///     Creates an <see cref="ApiTypeExpression"/> that represents the given CLR type.
+    /// </summary>
+    /// <param name="clrType">The CLR type to translate.</param>
+    /// <param name="context">The builder context used to resolve registered types.</param>
+    /// <returns>An <see cref="ApiTypeExpression"/> describing the CLR type.</returns>
     public static ApiTypeExpression FromClrType(Type clrType, ApiSchemaBuilderContext context)
     {
         ArgumentNullException.ThrowIfNull(clrType);

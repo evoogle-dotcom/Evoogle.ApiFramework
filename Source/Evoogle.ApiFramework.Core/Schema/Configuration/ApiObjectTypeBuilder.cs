@@ -10,6 +10,11 @@ using System.Collections.Generic;
 
 using Evoogle.ApiFramework.Schema;
 
+/// <summary>
+///     Fluent builder used to configure an <see cref="ApiObjectType"/>.
+/// </summary>
+/// <param name="clrType">The CLR type represented by the API object type.</param>
+/// <param name="context">The shared builder context.</param>
 public sealed class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     : ApiNamedTypeBuilder<ApiObjectTypeBuilder>(clrType, context)
 {
@@ -19,6 +24,14 @@ public sealed class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext c
     #endregion
 
     #region Builder Methods
+    /// <summary>
+    ///     Adds an <see cref="ApiProperty"/> definition to the object type.
+    /// </summary>
+    /// <param name="apiName">The API property name.</param>
+    /// <param name="clrName">The CLR property name.</param>
+    /// <param name="clrType">The CLR type of the property.</param>
+    /// <param name="modifiers">Optional callback to configure type modifiers.</param>
+    /// <returns>The current builder instance.</returns>
     public ApiObjectTypeBuilder AddProperty(string apiName, string clrName, Type clrType, Action<ApiTypeModifiersBuilder>? modifiers = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
@@ -36,6 +49,12 @@ public sealed class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext c
         return this;
     }
 
+    /// <summary>
+    ///     Adds a relationship definition to the object type.
+    /// </summary>
+    /// <param name="apiName">The API name of the relationship.</param>
+    /// <param name="apiPropertyName">Optional API property name backing the relationship.</param>
+    /// <returns>The current builder instance.</returns>
     public ApiObjectTypeBuilder AddRelationship(string apiName, string? apiPropertyName = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
@@ -46,6 +65,10 @@ public sealed class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext c
         return this;
     }
 
+    /// <summary>
+    ///     Builds the <see cref="ApiObjectType"/> using the configured properties and relationships.
+    /// </summary>
+    /// <returns>The constructed <see cref="ApiObjectType"/>.</returns>
     public ApiObjectType Build()
     {
         var objectType = new ApiObjectType
