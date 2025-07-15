@@ -7,6 +7,9 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
+/// <summary>
+///     Internal context used by <see cref="ApiSchemaBuilder"/> for tracking registered type builders.
+/// </summary>
 public sealed class ApiSchemaBuilderContext
 {
     #region Fields
@@ -18,6 +21,11 @@ public sealed class ApiSchemaBuilderContext
     #endregion
 
     #region Methods
+    /// <summary>
+    ///     Retrieves an existing <see cref="ApiEnumTypeBuilder"/> for the specified CLR type or creates one.
+    /// </summary>
+    /// <param name="clrType">The CLR enum type.</param>
+    /// <returns>The corresponding <see cref="ApiEnumTypeBuilder"/>.</returns>
     public ApiEnumTypeBuilder GetOrAddEnumTypeBuilder(Type clrType)
     {
         ArgumentNullException.ThrowIfNull(clrType);
@@ -32,6 +40,11 @@ public sealed class ApiSchemaBuilderContext
         return builder;
     }
 
+    /// <summary>
+    ///     Retrieves an existing <see cref="ApiObjectTypeBuilder"/> for the specified CLR type or creates one.
+    /// </summary>
+    /// <param name="clrType">The CLR object type.</param>
+    /// <returns>The corresponding <see cref="ApiObjectTypeBuilder"/>.</returns>
     public ApiObjectTypeBuilder GetOrAddObjectTypeBuilder(Type clrType)
     {
         ArgumentNullException.ThrowIfNull(clrType);
@@ -46,6 +59,11 @@ public sealed class ApiSchemaBuilderContext
         return builder;
     }
 
+    /// <summary>
+    ///     Retrieves an existing <see cref="ApiScalarTypeBuilder"/> for the specified CLR type or creates one.
+    /// </summary>
+    /// <param name="clrType">The CLR scalar type.</param>
+    /// <returns>The corresponding <see cref="ApiScalarTypeBuilder"/>.</returns>
     public ApiScalarTypeBuilder GetOrAddScalarTypeBuilder(Type clrType)
     {
         ArgumentNullException.ThrowIfNull(clrType);
@@ -64,8 +82,19 @@ public sealed class ApiSchemaBuilderContext
 
 
 
+    /// <summary>
+    ///     Determines whether the specified CLR type has been registered.
+    /// </summary>
+    /// <param name="clrType">The CLR type to check.</param>
+    /// <returns><c>true</c> if the type is registered; otherwise <c>false</c>.</returns>
     public bool IsRegistered(Type clrType) => _namedTypeBuilders.ContainsKey(clrType);
 
+    /// <summary>
+    ///     Registers the builder for a CLR type. Throws if the type is already registered.
+    /// </summary>
+    /// <typeparam name="TBuilder">The builder type.</typeparam>
+    /// <param name="clrType">The CLR type.</param>
+    /// <param name="builder">The builder instance.</param>
     public void RegisterApiType<TBuilder>(Type clrType, TBuilder builder)
         where TBuilder : IApiNamedTypeBuilder
     {
@@ -78,6 +107,12 @@ public sealed class ApiSchemaBuilderContext
         _namedTypeBuilders[clrType] = builder!;
     }
 
+    /// <summary>
+    ///     Attempts to resolve the API name for a CLR type if it has been registered.
+    /// </summary>
+    /// <param name="clrType">The CLR type.</param>
+    /// <param name="apiName">When this method returns, contains the API name if found.</param>
+    /// <returns><c>true</c> if the type is registered; otherwise <c>false</c>.</returns>
     public bool TryGetApiName(Type clrType, out string? apiName)
     {
         if (!_namedTypeBuilders.TryGetValue(clrType, out var builder))
@@ -97,6 +132,12 @@ public sealed class ApiSchemaBuilderContext
         return apiName != null;
     }
 
+    /// <summary>
+    ///     Attempts to retrieve the registered builder for a CLR type.
+    /// </summary>
+    /// <param name="clrType">The CLR type.</param>
+    /// <param name="builder">When this method returns, contains the builder if found.</param>
+    /// <returns><c>true</c> if the builder exists; otherwise <c>false</c>.</returns>
     public bool TryGetBuilder(Type clrType, [NotNullWhen(true)] out IApiNamedTypeBuilder? builder) =>
         _namedTypeBuilders.TryGetValue(clrType, out builder);
     #endregion

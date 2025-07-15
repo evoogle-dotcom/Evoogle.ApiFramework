@@ -5,10 +5,19 @@
 // See the LICENSE file in the project root for more information.
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
+/// <summary>
+///     Fluent builder used to configure an <see cref="ApiScalarType"/>.
+/// </summary>
+/// <param name="clrType">The CLR scalar type.</param>
+/// <param name="context">The shared builder context.</param>
 public sealed class ApiScalarTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     : ApiNamedTypeBuilder<ApiScalarTypeBuilder>(clrType, context)
 {
     #region Builder Methods
+    /// <summary>
+    ///     Builds the <see cref="ApiScalarType"/> using the configured settings.
+    /// </summary>
+    /// <returns>The constructed <see cref="ApiScalarType"/>.</returns>
     public ApiScalarType Build() => new(this.ApiName, this.ClrType);
     #endregion
 }
