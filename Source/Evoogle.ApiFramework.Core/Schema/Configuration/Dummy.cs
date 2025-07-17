@@ -7,24 +7,27 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 
 public static class Dummy
 {
-    public record struct MailAddress(string Address)
+    public record struct EmailAddress(string Email)
     {
-        public static implicit operator MailAddress(string address) => new(address);
-        public static implicit operator string(MailAddress mailAddress) => mailAddress.Address;
+        public static implicit operator EmailAddress(string address) => new(address);
+        public static implicit operator string(EmailAddress emailAddress) => emailAddress.Email;
     }
 
     public class Customer
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
+        public EmailAddress? Email { get; set; }
         public List<Order> Orders { get; set; } = [];
     }
 
     public class Order
     {
-        public Guid OrderId { get; set; }
+        public Guid Id { get; set; }
         public OrderStatus Status { get; set; }
         public decimal Total { get; set; }
+        public Guid? CustomerId { get; set; }
+        public Customer? Customer { get; set; }
     }
 
     public enum OrderStatus
@@ -35,7 +38,7 @@ public static class Dummy
         Cancelled
     }
 
-    public class MailAddressConfiguration : IApiScalarTypeConfiguration
+    public class EmailAddressConfiguration : IApiScalarTypeConfiguration
     {
         public void Configure(ApiScalarTypeBuilder builder)
         {
@@ -74,24 +77,31 @@ public static class Dummy
         var schema = new ApiSchemaBuilder()
             .WithName("CustomerOrdersAPI")
             .WithVersion("v1")
-            .AddScalar(typeof(MailAddress), x => x
-                .WithApiName("Email"))
+            .AddScalar(typeof(EmailAddress), x => x
+                .WithApiName("EmailAddress"))
             .AddObject(typeof(Customer), x => x
                 .WithApiName("Customer")
-                .AddProperty("email", "Email", typeof(MailAddress), m => m.Required())
-                .AddRelationship("orders"))
+                .AddProperty("Id", "Id", typeof(Guid), m => m.Required())
+                .AddProperty("Name", "Name", typeof(string), m => m.Required())
+                .AddProperty("Email", "Email", typeof(EmailAddress), m => m.Nullable())
+                .AddProperty("Orders", "Orders", typeof(List<Order>), m => m.Required())
+                .AddRelationship("Orders"))
             .AddObject(typeof(Order), x => x
                 .WithApiName("Order")
-                .AddProperty("id", "Id", typeof(Guid))
-                .AddProperty("status", "Status", typeof(OrderStatus))
-                .AddProperty("total", "Total", typeof(decimal)))
+                .AddProperty("Id", "Id", typeof(Guid), m => m.Required())
+                .AddProperty("Status", "Status", typeof(OrderStatus), m => m.Required())
+                .AddProperty("Total", "Total", typeof(decimal), m => m.Required())
+                .AddProperty("CustomerId", "CustomerId", typeof(Guid?), m => m.Nullable())
+                .AddProperty("Customer", "Customer", typeof(Customer), m => m.Nullable())
+                .AddRelationship("Customer")
+                )
             .AddEnum(typeof(OrderStatus), x => x
                 .WithApiName("OrderStatus")
                 .AddValue("Pending", "Pending", 0)
                 .AddValue("Shipped", "Shipped", 1)
                 .AddValue("Delivered", "Delivered", 2)
                 .AddValue("Cancelled", "Cancelled", 3))
-            .AddScalar(typeof(MailAddress), new MailAddressConfiguration())
+            .AddScalar(typeof(EmailAddress), new EmailAddressConfiguration())
             .AddEnum(typeof(OrderStatus), new OrderStatusConfiguration())
             .AddObject(typeof(Order), new OrderConfiguration())
             .Build();

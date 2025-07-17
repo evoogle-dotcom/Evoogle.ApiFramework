@@ -78,10 +78,6 @@ public sealed class ApiSchemaBuilderContext
         return builder;
     }
 
-
-
-
-
     /// <summary>
     ///     Determines whether the specified CLR type has been registered.
     /// </summary>

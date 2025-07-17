@@ -34,16 +34,12 @@ public sealed class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext c
     /// <returns>The current builder instance.</returns>
     public ApiObjectTypeBuilder AddProperty(string apiName, string clrName, Type clrType, Action<ApiTypeModifiersBuilder>? modifiers = null)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
-        ArgumentException.ThrowIfNullOrWhiteSpace(clrName, nameof(clrName));
-        ArgumentNullException.ThrowIfNull(clrType, nameof(clrType));
-
-        var typeExpression = ApiTypeExpressionBuilder.FromClrType(clrType, this.Context);
+        var apiTypeExpression = ApiTypeExpressionBuilder.FromClrType(clrType, this.Context);
 
         var modifierBuilder = new ApiTypeModifiersBuilder();
         modifiers?.Invoke(modifierBuilder);
 
-        var property = new ApiProperty(apiName, typeExpression, modifierBuilder.Build(), clrName);
+        var property = new ApiProperty(apiName, apiTypeExpression, modifierBuilder.Build(), clrName);
         _properties.Add(property);
 
         return this;
@@ -57,8 +53,6 @@ public sealed class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext c
     /// <returns>The current builder instance.</returns>
     public ApiObjectTypeBuilder AddRelationship(string apiName, string? apiPropertyName = null)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
-
         var relationship = new ApiRelationship(apiName, apiPropertyName);
         _relationships.Add(relationship);
 

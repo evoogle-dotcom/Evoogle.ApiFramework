@@ -22,13 +22,12 @@ public abstract class ApiNamedTypeBuilder<TBuilder>(Type clrType, ApiSchemaBuild
     /// <summary>
     ///     Gets the API name configured for the type.
     /// </summary>
-    /// <exception cref="InvalidOperationException">Thrown if the API name has not been set.</exception>
-    public string ApiName => _apiName ?? throw new InvalidOperationException("API name has not been set.");
+    public string ApiName => _apiName!;
 
     /// <summary>
     ///     Gets the CLR type represented by this builder.
     /// </summary>
-    public Type ClrType { get; } = clrType ?? throw new ArgumentNullException(nameof(clrType));
+    public Type ClrType { get; } = clrType;
     #endregion
 
     #region Properties
@@ -46,7 +45,7 @@ public abstract class ApiNamedTypeBuilder<TBuilder>(Type clrType, ApiSchemaBuild
     /// <returns>The current builder instance.</returns>
     public TBuilder WithApiName(string apiName)
     {
-        _apiName = apiName ?? throw new ArgumentNullException(nameof(apiName));
+        _apiName = apiName;
         return (TBuilder)this;
     }
     #endregion

@@ -65,7 +65,6 @@ public static class ApiTypeExpressionBuilder
 
         throw new InvalidOperationException($"Cannot resolve API type for CLR type '{clrType.FullName}'. Is it registered with ApiSchemaBuilder?");
     }
-    #endregion
 
     private static bool IsKnownScalar(Type type, out ApiTypeKind kind, out string apiName)
     {
@@ -81,4 +80,5 @@ public static class ApiTypeExpressionBuilder
 
         return apiName != null;
     }
+    #endregion
 }

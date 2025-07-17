@@ -10,6 +10,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 /// </summary>
 public sealed class ApiSchemaBuilder
 {
+    #region 
     private string _name = "UnnamedSchema";
     private string? _version;
 
@@ -18,26 +19,32 @@ public sealed class ApiSchemaBuilder
     private readonly Dictionary<Type, ApiScalarTypeBuilder> _scalarTypeBuilders = [];
     private readonly Dictionary<Type, ApiEnumTypeBuilder> _enumTypeBuilders = [];
     private readonly Dictionary<Type, ApiObjectTypeBuilder> _objectTypeBuilders = [];
+    #endregion
 
+    #region Builder Methods
     /// <summary>
     ///     Sets the name of the schema being built.
     /// </summary>
-    /// <param name="name">The schema name.</param>
+    /// <param name="apiName">The schema name.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiSchemaBuilder WithName(string name)
+    public ApiSchemaBuilder WithName(string apiName)
     {
-        _name = name ?? throw new ArgumentNullException(nameof(name));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
+
+        _name = apiName;
         return this;
     }
 
     /// <summary>
     ///     Sets the optional version string for the schema.
     /// </summary>
-    /// <param name="version">The version identifier.</param>
+    /// <param name="apiVersion">The version identifier.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiSchemaBuilder WithVersion(string version)
+    public ApiSchemaBuilder WithVersion(string apiVersion)
     {
-        _version = version ?? throw new ArgumentNullException(nameof(version));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiVersion, nameof(apiVersion));
+
+        _version = apiVersion;
         return this;
     }
 
@@ -158,46 +165,5 @@ public sealed class ApiSchemaBuilder
             ApiVersion = _version
         };
     }
-
-    // private ApiEnumTypeBuilder GetOrAddEnumTypeBuilder(Type clrType)
-    // {
-    //     ArgumentNullException.ThrowIfNull(clrType);
-
-    //     if (!_enumTypeBuilders.TryGetValue(clrType, out var builder))
-    //     {
-    //         builder = new ApiEnumTypeBuilder(clrType, _context);
-    //         _enumTypeBuilders[clrType] = builder;
-    //         _context.RegisterApiType(clrType, builder);
-    //     }
-
-    //     return builder;
-    // }
-
-    // private ApiObjectTypeBuilder GetOrAddObjectTypeBuilder(Type clrType)
-    // {
-    //     ArgumentNullException.ThrowIfNull(clrType);
-
-    //     if (!_objectTypeBuilders.TryGetValue(clrType, out var builder))
-    //     {
-    //         builder = new ApiObjectTypeBuilder(clrType, _context);
-    //         _objectTypeBuilders[clrType] = builder;
-    //         _context.RegisterApiType(clrType, builder);
-    //     }
-
-    //     return builder;
-    // }
-
-    // private ApiScalarTypeBuilder GetOrAddScalarTypeBuilder(Type clrType)
-    // {
-    //     ArgumentNullException.ThrowIfNull(clrType);
-
-    //     if (!_scalarTypeBuilders.TryGetValue(clrType, out var builder))
-    //     {
-    //         builder = new ApiScalarTypeBuilder(clrType, _context);
-    //         _scalarTypeBuilders[clrType] = builder;
-    //         _context.RegisterApiType(clrType, builder);
-    //     }
-
-    //     return builder;
-    // }
+    #endregion
 }
