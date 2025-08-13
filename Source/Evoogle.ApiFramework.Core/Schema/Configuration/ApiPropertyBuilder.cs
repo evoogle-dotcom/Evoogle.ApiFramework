@@ -9,6 +9,11 @@ using Evoogle.Reflection;
 
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
+/// <summary>
+///     Builds <see cref="ApiProperty"/> definitions from CLR property metadata and optional modifiers.
+/// </summary>
+/// <param name="apiName">The API name of the property.</param>
+/// <param name="clrName">The CLR property name.</param>
 public class ApiPropertyBuilder(string apiName, string clrName) : ExtensionBuilder<ApiPropertyBuilder>
 {
     #region Fields
@@ -17,10 +22,18 @@ public class ApiPropertyBuilder(string apiName, string clrName) : ExtensionBuild
     #endregion
 
     #region Properties
+    /// <summary>
+    ///     Gets or sets a delegate that configures additional type modifiers for the property.
+    /// </summary>
     internal Action<ApiTypeModifiersBuilder>? Modifiers { get; set; }
     #endregion
 
     #region Methods
+    /// <summary>
+    ///     Builds an <see cref="ApiProperty"/> for the specified CLR object type.
+    /// </summary>
+    /// <param name="clrObjectType">The CLR type declaring the property.</param>
+    /// <returns>The constructed <see cref="ApiProperty"/> instance.</returns>
     internal ApiProperty Build(Type clrObjectType)
     {
         var apiPropertyName = _apiName;
@@ -58,6 +71,14 @@ public class ApiPropertyBuilder(string apiName, string clrName) : ExtensionBuild
         return this.CreateAndBuildExtensions(apiPropertyName, apiTypeExpression, apiTypeModifiers, clrPropertyName);
     }
 
+    /// <summary>
+    ///     Creates the <see cref="ApiProperty"/> instance and attaches any collected extensions.
+    /// </summary>
+    /// <param name="apiPropertyName">The API property name.</param>
+    /// <param name="apiTypeExpression">The property's type expression.</param>
+    /// <param name="apiTypeModifiers">Modifiers applied to the property.</param>
+    /// <param name="clrPropertyName">The CLR property name.</param>
+    /// <returns>The created <see cref="ApiProperty"/>.</returns>
     private ApiProperty CreateAndBuildExtensions(string apiPropertyName, ApiTypeExpression apiTypeExpression, ApiTypeModifiers apiTypeModifiers, string clrPropertyName)
     {
         var apiProperty = new ApiProperty(apiPropertyName, apiTypeExpression, apiTypeModifiers, clrPropertyName);

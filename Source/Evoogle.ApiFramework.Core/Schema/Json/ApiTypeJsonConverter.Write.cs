@@ -13,6 +13,9 @@ using static Evoogle.ApiFramework.Schema.Json.Internal.ApiJsonConverterHelpers;
 
 namespace Evoogle.ApiFramework.Schema.Json;
 
+/// <summary>
+///     Partial implementation of <see cref="ApiTypeJsonConverter"/> focused on writing JSON.
+/// </summary>
 public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
 {
     #region Write Implementation Methods

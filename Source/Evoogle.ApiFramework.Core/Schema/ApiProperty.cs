@@ -21,9 +21,6 @@ namespace Evoogle.ApiFramework.Schema;
 ///         <see cref="ApiRelationship"/> instances to convey semantic meaning (e.g., parent-child, references).
 ///     </para>
 /// </remarks>
-/// <remarks>
-///     Initializes a new instance of the <see cref="ApiProperty"/> class.
-/// </remarks>
 /// <param name="apiName">The API name of the property.</param>
 /// <param name="apiTypeExpression">The API type expression of the property.</param>
 /// <param name="apiTypeModifiers">Modifiers applied to the property (e.g., Required).</param>

@@ -5,6 +5,11 @@
 // See the LICENSE file in the project root for more information.
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
+/// <summary>
+///     Builds <see cref="ApiRelationship"/> instances that describe object-to-object navigation.
+/// </summary>
+/// <param name="apiName">The API name of the relationship.</param>
+/// <param name="apiPropertyName">The API property name this relationship points to, if any.</param>
 public class ApiRelationshipBuilder(string apiName, string? apiPropertyName) : ExtensionBuilder<ApiRelationshipBuilder>
 {
     #region Fields
@@ -13,6 +18,10 @@ public class ApiRelationshipBuilder(string apiName, string? apiPropertyName) : E
     #endregion
 
     #region Methods
+    /// <summary>
+    ///     Builds the <see cref="ApiRelationship"/> configured by this builder.
+    /// </summary>
+    /// <returns>A new <see cref="ApiRelationship"/> instance.</returns>
     internal ApiRelationship Build()
     {
         var apiPropertyName = _apiPropertyName;
