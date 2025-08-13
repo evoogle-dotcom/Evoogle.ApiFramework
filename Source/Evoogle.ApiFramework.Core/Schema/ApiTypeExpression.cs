@@ -8,13 +8,15 @@ using System.ComponentModel.DataAnnotations;
 using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.Extensions;
+using Evoogle.Reflection;
 
 namespace Evoogle.ApiFramework.Schema;
 
 /// <summary>
 ///     Represents a type reference in an API schema. This can either be:
-///     - A named reference to an API type (<see cref="Kind"/> and <see cref="ApiName"/> set), or
-///     - An inline type, such as a collection (<see cref="ApiInlineType"/> set).
+///     - An API inline type, such as a collection (<see cref="ApiInlineType"/> set).
+///     - An API named reference to an API type (<see cref="Kind"/> and <see cref="ApiName"/> set), or
+///     - A CLR type reference to an API type (<see cref="ClrType"/> set), or
 /// </summary>
 public sealed class ApiTypeExpression
 {
@@ -24,14 +26,19 @@ public sealed class ApiTypeExpression
 
     #region Properties
     /// <summary>
-    ///     Gets the kind of the referenced API type (only used for named references).
+    ///     Gets the kind of the referenced API type (only used for API named references).
     /// </summary>    
     public ApiTypeKind? Kind { get; }
 
     /// <summary>
-    ///     Gets the API name of the referenced type (only used for named references).
+    ///     Gets the API name of the referenced type (only used for API named references).
     /// </summary>
     public string? ApiName { get; }
+
+    /// <summary>
+    ///     Gets the CLR type of the referenced type (only used for CLR references).
+    /// </summary>
+    public Type? ClrType { get; }
 
     /// <summary>
     ///     Gets the inline type definition, if any.
@@ -53,9 +60,19 @@ public sealed class ApiTypeExpression
     public bool IsInline => this.ApiInlineType is not null;
 
     /// <summary>
-    ///     Gets a value indicating whether this is a reference to a named type (i.e., <see cref="ApiInlineType"/> is null).
+    ///     Gets a value indicating whether this is either an API named reference or a CLR type reference (i.e., <see cref="ApiInlineType"/> is null).
     /// </summary>
-    public bool IsReference => this.ApiInlineType is null;
+    public bool IsReference => this.IsApiNamedReference || this.IsClrTypeReference;
+
+    /// <summary>
+    ///     Gets a value indicating whether this is an API named reference (i.e., <see cref="ApiInlineType"/> is null).
+    /// </summary>
+    public bool IsApiNamedReference => this.ApiInlineType is null && this.Kind is not null && !string.IsNullOrWhiteSpace(this.ApiName);
+
+    /// <summary>
+    ///     Gets a value indicating whether this is a CLR reference (i.e., <see cref="ApiInlineType"/> is null).
+    /// </summary>
+    public bool IsClrTypeReference => this.ApiInlineType is null && this.ClrType is not null;
 
     /// <summary>
     ///    Gets a value indicating whether this expression has been resolved to an API type.
@@ -65,7 +82,13 @@ public sealed class ApiTypeExpression
 
     #region Constructors
     /// <summary>
-    ///     Initializes a named reference to a declared API type within a schema.
+    ///     Initializes an inline type expression (e.g., a collection declared in-place).
+    /// </summary>
+    /// <param name="apiInlineType">The API type instance used directly by this expression.</param>
+    public ApiTypeExpression(ApiType apiInlineType) => this.ApiInlineType = apiInlineType;
+
+    /// <summary>
+    ///     Initializes an API named reference to a declared API type within a schema.
     /// </summary>
     /// <param name="kind">The expected kind of the referenced API type.</param>
     /// <param name="apiName">The name of the API type to be resolved in the schema.</param>
@@ -76,10 +99,23 @@ public sealed class ApiTypeExpression
     }
 
     /// <summary>
-    ///     Initializes an inline type expression (e.g., a collection declared in-place).
+    ///     Initializes a CLR typed reference to a declared API type within a schema.
     /// </summary>
-    /// <param name="apiInlineType">The API type instance used directly by this expression.</param>
-    public ApiTypeExpression(ApiType apiInlineType) => this.ApiInlineType = apiInlineType;
+    /// <param name="clrType">The CLR type to be resolved in the schema.</param>
+    public ApiTypeExpression(Type clrType) => this.ClrType = TypeReflection.IsNullableType(clrType) ? Nullable.GetUnderlyingType(clrType) : clrType;
+
+    /// <summary>
+    ///     Initializes either an API named reference or a CLR typed reference to a declared API type within a schema.
+    /// </summary>
+    /// <param name="kind">The expected kind of the referenced API type.</param>
+    /// <param name="apiName">The name of the API type to be resolved in the schema.</param>
+    /// <param name="clrType">The CLR type to be resolved in the schema.</param>
+    public ApiTypeExpression(ApiTypeKind? kind, string? apiName, Type? clrType)
+    {
+        this.Kind = kind;
+        this.ApiName = apiName;
+        this.ClrType = clrType;
+    }
     #endregion
 
     #region Methods
@@ -96,12 +132,23 @@ public sealed class ApiTypeExpression
         if (_apiResolvedType is not null)
             return;
 
-        // Try and resolve API type with referenced kind and API name
-        var tryToResolve = true;
+        // Try and resolve API type with API named reference or CLR type reference if applicable
+        if (this.IsApiNamedReference)
+        {
+            this.InitializeApiTypeByApiNamedReference(apiSchema, apiValidationPath, ref results);
+        }
+        else if (this.IsClrTypeReference)
+        {
+            this.InitializeApiTypeByClrTypeReference(apiSchema, apiValidationPath, ref results);
+        }
 
-        this.InitializeKind(apiSchema, apiValidationPath, ref tryToResolve, ref results);
-        this.InitializeApiName(apiSchema, apiValidationPath, ref tryToResolve, ref results);
-        this.InitializeApiTypeByReference(apiSchema, apiValidationPath, tryToResolve, ref results);
+        if (_apiResolvedType is not null)
+            return;
+
+        // Unable to resolve API type with either an API named reference or a CLR type reference.
+        this.ValidateKind(apiSchema, apiValidationPath, ref results);
+        this.ValidateApiName(apiSchema, apiValidationPath, ref results);
+        this.ValidateClrType(apiSchema, apiValidationPath, ref results);
     }
     #endregion
 
@@ -117,39 +164,58 @@ public sealed class ApiTypeExpression
 
         var kind = this.Kind.SafeToString();
         var apiName = this.ApiName.SafeToString();
-        return $"{nameof(ApiTypeExpression)} {{{nameof(this.Kind)}={kind}, {nameof(this.ApiName)}={apiName}}}";
+        var clrType = this.ClrType.SafeToString();
+        return $"{nameof(ApiTypeExpression)} {{{nameof(this.Kind)}={kind}, {nameof(this.ApiName)}={apiName}, {nameof(this.ClrType)}={clrType}}}";
     }
     #endregion
 
     #region Implementation Methods
-    private void InitializeKind(ApiSchema _, string apiValidationPath, ref bool tryToResolve, ref List<ValidationResult>? results)
+    private void InitializeApiTypeByApiNamedReference(ApiSchema apiSchema, string apiValidationPath, ref List<ValidationResult>? results)
     {
-        if (this.Kind is null)
-        {
-            tryToResolve = false;
+        var kind = this.Kind!;
+        var apiName = this.ApiName!;
 
-            results ??= [];
-            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.Kind)} cannot be null.", [nameof(this.Kind)]));
-            return;
+        switch (kind)
+        {
+            case ApiTypeKind.Scalar:
+                _apiResolvedType = apiSchema.TryGetApiScalarType(apiName, out var apiScalarType) ? apiScalarType : null;
+                break;
+
+            case ApiTypeKind.Enum:
+                _apiResolvedType = apiSchema.TryGetApiEnumType(apiName, out var apiEnumType) ? apiEnumType : null;
+                break;
+
+            case ApiTypeKind.Object:
+                _apiResolvedType = apiSchema.TryGetApiObjectType(apiName, out var apiObjectType) ? apiObjectType : null;
+                break;
+
+            case ApiTypeKind.Collection:
+                {
+                    results ??= [];
+                    results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.Kind)} is set to {nameof(ApiTypeKind.Collection)} which is invalid.", [nameof(this.Kind)]));
+                    break;
+                }
+
+            default:
+                break;
         }
 
-        if (this.Kind == ApiTypeKind.Unknown)
+        if (_apiResolvedType is null)
         {
-            tryToResolve = false;
-
             results ??= [];
-            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.Kind)} cannot be equal to {ApiTypeKind.Unknown}.", [nameof(this.Kind)]));
+            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ApiType)} is unresolved for {nameof(this.Kind)}={this.Kind.SafeToString()} and {nameof(this.ApiName)}={this.ApiName.SafeToString()}.", [nameof(this.ApiType)]));
         }
     }
 
-    private void InitializeApiName(ApiSchema _, string apiValidationPath, ref bool tryToResolve, ref List<ValidationResult>? results)
+    private void InitializeApiTypeByClrTypeReference(ApiSchema apiSchema, string apiValidationPath, ref List<ValidationResult>? results)
     {
-        if (string.IsNullOrWhiteSpace(this.ApiName))
-        {
-            tryToResolve = false;
+        var clrType = this.ClrType!;
+        _apiResolvedType = apiSchema.TryGetApiType(clrType, out var apiType) ? apiType : null;
 
+        if (_apiResolvedType is null)
+        {
             results ??= [];
-            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ApiName)} cannot be null or whitespace.", [nameof(this.ApiName)]));
+            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ApiType)} is unresolved for {nameof(this.ClrType)}={this.ClrType.SafeToName()}.", [nameof(this.ApiType)]));
         }
     }
 
@@ -164,43 +230,38 @@ public sealed class ApiTypeExpression
         }
     }
 
-    private void InitializeApiTypeByReference(ApiSchema apiSchema, string apiValidationPath, bool tryToResolve, ref List<ValidationResult>? results)
+    private void ValidateApiName(ApiSchema _, string apiValidationPath, ref List<ValidationResult>? results)
     {
-        if (tryToResolve)
-        {
-            var kind = this.Kind!;
-            var apiName = this.ApiName!;
-
-            switch (kind)
-            {
-                case ApiTypeKind.Scalar:
-                    _apiResolvedType = apiSchema.TryGetApiScalarType(apiName, out var apiScalarType) ? apiScalarType : null;
-                    break;
-
-                case ApiTypeKind.Enum:
-                    _apiResolvedType = apiSchema.TryGetApiEnumType(apiName, out var apiEnumType) ? apiEnumType : null;
-                    break;
-
-                case ApiTypeKind.Object:
-                    _apiResolvedType = apiSchema.TryGetApiObjectType(apiName, out var apiObjectType) ? apiObjectType : null;
-                    break;
-
-                case ApiTypeKind.Collection:
-                    {
-                        results ??= [];
-                        results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.Kind)} is set to {nameof(ApiTypeKind.Collection)} which is invalid.", [nameof(this.Kind)]));
-                        break;
-                    }
-
-                default:
-                    break;
-            }
-        }
-
-        if (_apiResolvedType is null)
+        if (string.IsNullOrWhiteSpace(this.ApiName))
         {
             results ??= [];
-            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ApiType)} is unresolved for {nameof(this.Kind)}={this.Kind.SafeToString()} and {nameof(this.ApiName)}={this.ApiName.SafeToString()}.", [nameof(this.ApiType)]));
+            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ApiName)} cannot be null or whitespace.", [nameof(this.ApiName)]));
+        }
+    }
+
+    private void ValidateClrType(ApiSchema _, string apiValidationPath, ref List<ValidationResult>? results)
+    {
+        if (this.ClrType is null)
+        {
+            results ??= [];
+            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ClrType)} cannot be null.", [nameof(this.ClrType)]));
+            return;
+        }
+    }
+
+    private void ValidateKind(ApiSchema _, string apiValidationPath, ref List<ValidationResult>? results)
+    {
+        if (this.Kind is null)
+        {
+            results ??= [];
+            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.Kind)} cannot be null.", [nameof(this.Kind)]));
+            return;
+        }
+
+        if (this.Kind == ApiTypeKind.Unknown)
+        {
+            results ??= [];
+            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.Kind)} cannot be equal to {ApiTypeKind.Unknown}.", [nameof(this.Kind)]));
         }
     }
     #endregion

@@ -37,8 +37,7 @@ public sealed class ApiSchemaInitializeResult(IEnumerable<ValidationResult>? val
         if (this.Success)
             return;
 
-        var messages = this.ValidationResults?.Select(v => v.ErrorMessage).SafeToDelimitedString("\n");
-        throw new ApiSchemaException($"{nameof(ApiSchema)} initialization failed:\n{messages}");
+        throw new ApiSchemaValidationException($"{nameof(ApiSchema)} initialization failed.", this.ValidationResults!);
     }
     #endregion
 

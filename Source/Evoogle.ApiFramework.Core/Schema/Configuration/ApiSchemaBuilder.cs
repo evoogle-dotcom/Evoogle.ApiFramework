@@ -3,22 +3,20 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Microsoft.Extensions.Logging;
+
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
 /// <summary>
 ///     Provides a fluent API for programmatically constructing an <see cref="ApiSchema"/>.
 /// </summary>
-public sealed class ApiSchemaBuilder
+public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) : ExtensionBuilder<ApiSchemaBuilder>
 {
     #region 
-    private string _name = "UnnamedSchema";
-    private string? _version;
+    private string? _apiName;
+    private string? _apiVersion;
 
-    private readonly ApiSchemaBuilderContext _context = new();
-
-    private readonly Dictionary<Type, ApiScalarTypeBuilder> _scalarTypeBuilders = [];
-    private readonly Dictionary<Type, ApiEnumTypeBuilder> _enumTypeBuilders = [];
-    private readonly Dictionary<Type, ApiObjectTypeBuilder> _objectTypeBuilders = [];
+    private readonly ApiSchemaBuilderContext _context = new(logger);
     #endregion
 
     #region Builder Methods
@@ -31,7 +29,7 @@ public sealed class ApiSchemaBuilder
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
 
-        _name = apiName;
+        _apiName = apiName;
         return this;
     }
 
@@ -44,7 +42,7 @@ public sealed class ApiSchemaBuilder
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiVersion, nameof(apiVersion));
 
-        _version = apiVersion;
+        _apiVersion = apiVersion;
         return this;
     }
 
@@ -156,14 +154,32 @@ public sealed class ApiSchemaBuilder
     /// <returns>The built <see cref="ApiSchema"/>.</returns>
     public ApiSchema Build()
     {
-        var scalarTypes = _scalarTypeBuilders.Values.Select(b => b.Build()).ToList();
-        var enumTypes = _enumTypeBuilders.Values.Select(b => b.Build()).ToList();
-        var objectTypes = _objectTypeBuilders.Values.Select(b => b.Build()).ToList();
+        // Build ApiSchema instance from all the configured components.
+        var apiName = _apiName!;
 
-        return new ApiSchema(_name, scalarTypes, enumTypes, objectTypes)
+        var apiScalarTypes = _context.ApiScalarTypeBuilders.Select(b => b.Build());
+        var apiEnumTypes = _context.ApiEnumTypeBuilders.Select(b => b.Build());
+        var apiObjectTypes = _context.ApiObjectTypeBuilders.Select(b => b.Build());
+
+        var apiVersion = _apiVersion ?? "1.0"; // Default version if not set
+
+        var apiSchema = new ApiSchema(apiName, apiScalarTypes, apiEnumTypes, apiObjectTypes)
         {
-            ApiVersion = _version
+            ApiVersion = apiVersion
         };
+
+        // Add any extensions that were configured.
+        var extensions = this.BuildExtensions();
+        if (extensions != null)
+        {
+            apiSchema.Extensions = extensions;
+        }
+
+        // Initialize the ApiSchema instance.
+        var result = apiSchema.Initialize();
+        result.ThrowIfInvalid();
+
+        return apiSchema;
     }
     #endregion
 }

@@ -5,11 +5,6 @@
 // See the LICENSE file in the project root for more information.
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
-using System;
-using System.Collections.Generic;
-
-using Evoogle.ApiFramework.Schema;
-
 /// <summary>
 ///     Fluent builder used to configure an <see cref="ApiObjectType"/>.
 /// </summary>
@@ -19,8 +14,8 @@ public sealed class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext c
     : ApiNamedTypeBuilder<ApiObjectTypeBuilder>(clrType, context)
 {
     #region Fields
-    private readonly List<ApiProperty> _properties = [];
-    private readonly List<ApiRelationship> _relationships = [];
+    private readonly List<ApiPropertyBuilder> _apiPropertyBuilders = [];
+    private readonly List<ApiRelationshipBuilder> _apiRelationshipBuilders = [];
     #endregion
 
     #region Builder Methods
@@ -29,18 +24,19 @@ public sealed class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext c
     /// </summary>
     /// <param name="apiName">The API property name.</param>
     /// <param name="clrName">The CLR property name.</param>
-    /// <param name="clrType">The CLR type of the property.</param>
     /// <param name="modifiers">Optional callback to configure type modifiers.</param>
+    /// <param name="extensions">Optional callback to configure property extensions.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiObjectTypeBuilder AddProperty(string apiName, string clrName, Type clrType, Action<ApiTypeModifiersBuilder>? modifiers = null)
+    public ApiObjectTypeBuilder AddProperty(string apiName, string clrName, Action<ApiTypeModifiersBuilder>? modifiers = null, Action<ApiPropertyBuilder>? extensions = null)
     {
-        var apiTypeExpression = ApiTypeExpressionBuilder.FromClrType(clrType, this.Context);
+        var apiPropertyBuilder = new ApiPropertyBuilder(apiName, clrName)
+        {
+            Modifiers = modifiers
+        };
 
-        var modifierBuilder = new ApiTypeModifiersBuilder();
-        modifiers?.Invoke(modifierBuilder);
+        extensions?.Invoke(apiPropertyBuilder);
 
-        var property = new ApiProperty(apiName, apiTypeExpression, modifierBuilder.Build(), clrName);
-        _properties.Add(property);
+        _apiPropertyBuilders.Add(apiPropertyBuilder);
 
         return this;
     }
@@ -50,11 +46,15 @@ public sealed class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext c
     /// </summary>
     /// <param name="apiName">The API name of the relationship.</param>
     /// <param name="apiPropertyName">Optional API property name backing the relationship.</param>
+    /// <param name="extensions">Optional callback to configure relationship extensions.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiObjectTypeBuilder AddRelationship(string apiName, string? apiPropertyName = null)
+    public ApiObjectTypeBuilder AddRelationship(string apiName, string? apiPropertyName = null, Action<ApiRelationshipBuilder>? extensions = null)
     {
-        var relationship = new ApiRelationship(apiName, apiPropertyName);
-        _relationships.Add(relationship);
+        var apiRelationshipBuilder = new ApiRelationshipBuilder(apiName, apiPropertyName);
+
+        extensions?.Invoke(apiRelationshipBuilder);
+
+        _apiRelationshipBuilders.Add(apiRelationshipBuilder);
 
         return this;
     }
@@ -63,17 +63,32 @@ public sealed class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext c
     ///     Builds the <see cref="ApiObjectType"/> using the configured properties and relationships.
     /// </summary>
     /// <returns>The constructed <see cref="ApiObjectType"/>.</returns>
-    public ApiObjectType Build()
+    internal ApiObjectType Build()
     {
-        var objectType = new ApiObjectType
+        var apiName = this.ApiName;
+        var clrObjectType = this.ClrType;
+
+        var apiProperties = _apiPropertyBuilders
+            .Select(b => b.Build(clrObjectType));
+
+        var apiRelationships = _apiRelationshipBuilders
+            .Select(b => b.Build());
+
+        var apiObjectType = new ApiObjectType
         (
-            apiName: this.ApiName,
-            apiProperties: _properties,
-            apiRelationships: _relationships,
-            clrObjectType: this.ClrType
+            apiName: apiName,
+            apiProperties: apiProperties,
+            apiRelationships: apiRelationships,
+            clrObjectType: clrObjectType
         );
 
-        return objectType;
+        var extensions = this.BuildExtensions();
+        if (extensions != null)
+        {
+            apiObjectType.Extensions = extensions;
+        }
+
+        return apiObjectType;
     }
     #endregion
 }

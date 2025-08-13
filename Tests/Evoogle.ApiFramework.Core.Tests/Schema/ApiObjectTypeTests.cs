@@ -3,6 +3,8 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.ComponentModel.DataAnnotations;
+
 using Evoogle.ApiFramework.Exceptions;
 using Evoogle.Extensions;
 using Evoogle.XUnit;
@@ -23,6 +25,7 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
         public List<ApiPropertyStub>? ApiPropertyStubCollection { get; init; }
         public List<ApiRelationshipStub>? ApiRelationshipStubCollection { get; init; }
         public string? ExpectedApiSchemaExceptionMessage { get; init; }
+        public List<string>? ExpectedValidationResults { get; init; }
         #endregion
 
         #region Calculated Properties
@@ -30,6 +33,7 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
         private List<ApiRelationship>? ApiRelationshipCollection { get; set; }
         private bool? ActualApiSchemaExceptionThrown { get; set; }
         private string? ActualApiSchemaExceptionMessage { get; set; }
+        private List<string>? ActualValidationResults { get; set; }
         #endregion
 
         #region XUnitTest Methods
@@ -66,6 +70,13 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
             ).ToList() ?? [];
 
             this.WriteLine($"Expected Exception Message: {this.ExpectedApiSchemaExceptionMessage.SafeToString()}");
+            if (this.ExpectedValidationResults is not null)
+            {
+                foreach (var expectedValidationResult in this.ExpectedValidationResults)
+                {
+                    this.WriteLine($"Expected Validation Result: {expectedValidationResult.SafeToString()}");
+                }
+            }
             this.WriteLine();
         }
 
@@ -95,14 +106,28 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 result.ThrowIfInvalid();
 
             }
+            catch (ApiSchemaValidationException ex)
+            {
+                this.ActualApiSchemaExceptionThrown = true;
+                this.ActualApiSchemaExceptionMessage = ex.Message;
+                this.ActualValidationResults = [.. ex.ValidationResults.Where(x => x.ErrorMessage is not null).Select(x => x.ErrorMessage!)];
+            }
             catch (ApiSchemaException ex)
             {
                 this.ActualApiSchemaExceptionThrown = true;
                 this.ActualApiSchemaExceptionMessage = ex.Message;
+                this.ActualValidationResults = null;
             }
 
             this.WriteLine($"Actual Exception Thrown:  {this.ActualApiSchemaExceptionThrown.SafeToString()}");
             this.WriteLine($"Actual Exception Message: {this.ActualApiSchemaExceptionMessage.SafeToString()}");
+            if (this.ActualValidationResults is not null)
+            {
+                foreach (var actualValidationResult in this.ActualValidationResults)
+                {
+                    this.WriteLine($"Actual Validation Result: {actualValidationResult.SafeToString()}");
+                }
+            }
             this.WriteLine();
         }
 
@@ -110,6 +135,8 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
         {
             this.ActualApiSchemaExceptionThrown.Should().BeTrue();
             this.ActualApiSchemaExceptionMessage.Should().Be(this.ExpectedApiSchemaExceptionMessage);
+            this.ActualValidationResults.Should().NotBeNull();
+            this.ActualValidationResults.Should().BeEquivalentTo(this.ExpectedValidationResults);
         }
         #endregion
     }
@@ -239,7 +266,11 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 new("Name", ApiTypeKind.Scalar, nameof(String), ApiTypeModifiers.None, "Name2", typeof(string)) // Duplicate API Name
             ],
             ApiRelationshipStubCollection = [],
-            ExpectedApiSchemaExceptionMessage = $"{nameof(ApiSchema)} initialization failed:\nApiObjectType[\"System.Object\"][\"Object\"].ApiProperty unable to initialize because duplicate ApiName values detected: Name",
+            ExpectedApiSchemaExceptionMessage = $"{nameof(ApiSchema)} initialization failed.",
+            ExpectedValidationResults =
+            [
+                $"{nameof(ApiObjectType)}[\"System.Object\"][\"Object\"].{nameof(ApiProperty)} unable to initialize because duplicate {nameof(ApiProperty.ApiName)} values detected: Name"
+            ]
         },
 
         // Duplicate CLR property names
@@ -253,7 +284,11 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 new("Name2", ApiTypeKind.Scalar, nameof(String), ApiTypeModifiers.None, "Name", typeof(string)) // Duplicate CLR Name
             ],
             ApiRelationshipStubCollection = [],
-            ExpectedApiSchemaExceptionMessage = $"{nameof(ApiSchema)} initialization failed:\nApiObjectType[\"System.Object\"][\"Object\"].ApiProperty unable to initialize because duplicate ClrName values detected: Name",
+            ExpectedApiSchemaExceptionMessage = $"{nameof(ApiSchema)} initialization failed.",
+            ExpectedValidationResults =
+            [
+                $"{nameof(ApiObjectType)}[\"System.Object\"][\"Object\"].{nameof(ApiProperty)} unable to initialize because duplicate {nameof(ApiProperty.ClrName)} values detected: Name"
+            ]
         },
 
         // Duplicate API relationship names
@@ -271,7 +306,11 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 new("Name2"),
                 new("Name2") // Duplicate API Name
             ],
-            ExpectedApiSchemaExceptionMessage = $"{nameof(ApiSchema)} initialization failed:\nApiObjectType[\"System.Object\"][\"Object\"].ApiRelationship unable to initialize because duplicate ApiName values detected: Name2",
+            ExpectedApiSchemaExceptionMessage = $"{nameof(ApiSchema)} initialization failed.",
+            ExpectedValidationResults =
+            [
+                $"{nameof(ApiObjectType)}[\"System.Object\"][\"Object\"].{nameof(ApiRelationship)} unable to initialize because duplicate {nameof(ApiRelationship.ApiName)} values detected: Name2"
+            ]
         },
     ];
 

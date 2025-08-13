@@ -265,10 +265,10 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Expected = new ApiCollectionType(new ApiTypeExpression(ApiTypeKind.Enum, nameof(StopLight)), ApiTypeModifiers.None, typeof(List<StopLight>))
         },
 
-        // ApiObjectType
+        // ApiObjectType With API Named Typed Expressions
         new JsonDeserializeTest<ApiType>
         {
-            Name = $"ApiObjectType [{nameof(ClassWithScalars)}]",
+            Name = $"ApiObjectType [{nameof(ClassWithScalars)}] With API Named Typed Expressions",
             Source = @"
             {
                 ""Kind"": ""Object"",
@@ -386,7 +386,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
 
         new JsonDeserializeTest<ApiType>
         {
-            Name = $"ApiObjectType [{nameof(ClassWithScalars)}] With Extension 1 and Extension 2",
+            Name = $"ApiObjectType [{nameof(ClassWithScalars)}] With API Named Typed Expressions With Extension 1 and Extension 2",
             Source = @"
             {
                 ""Kind"": ""Object"",
@@ -515,7 +515,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
 
         new JsonDeserializeTest<ApiType>
         {
-            Name = $"ApiObjectType [{nameof(Company)}]",
+            Name = $"ApiObjectType [{nameof(Company)}] With API Named Typed Expressions",
             Source = @"
             {
                 ""Kind"": ""Object"",
@@ -547,6 +547,327 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                                 ""ApiItemType"": {
                                     ""Kind"": ""Object"",
                                     ""ApiName"": ""Person""
+                                },
+                                ""ApiItemTypeModifiers"": ""Required"",
+                                ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BPerson, Evoogle.ApiFramework.Core.Tests]], System.Private.CoreLib""
+                            }
+                        },
+                        ""ApiTypeModifiers"": ""None"",
+                        ""ClrName"": ""Employees""
+                    }
+                ],
+                ""ApiRelationships"": [
+                    {
+                        ""ApiName"": ""OwnedBy"",
+                        ""ApiPropertyName"": ""Owner""
+                    },
+                    {
+                        ""ApiName"": ""Employees""
+                    }
+                ],
+                ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BCompany, Evoogle.ApiFramework.Core.Tests""
+            }",
+            Expected = new ApiObjectType
+            (
+                nameof(Company),
+                [
+                    new ApiProperty
+                    (
+                        nameof(Company.Name),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "String"),
+                        ApiTypeModifiers.Required,
+                        nameof(Company.Name)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(Company.Owner),
+                        new ApiTypeExpression(ApiTypeKind.Object, nameof(Person)),
+                        ApiTypeModifiers.None,
+                        nameof(Company.Owner)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(Company.Employees),
+                        new ApiTypeExpression(new ApiCollectionType(new ApiTypeExpression(ApiTypeKind.Object, nameof(Person)), ApiTypeModifiers.Required, typeof(List<Person>))),
+                        ApiTypeModifiers.None,
+                        nameof(Company.Employees)
+                    ),
+                ],
+                [
+                    new ApiRelationship("OwnedBy", nameof(Company.Owner)),
+                    new ApiRelationship(nameof(Company.Employees))
+                ],
+                typeof(Company)
+            ),
+        },
+
+        // ApiObjectType With CLR Typed Expressions
+        new JsonDeserializeTest<ApiType>
+        {
+            Name = $"ApiObjectType [{nameof(ClassWithScalars)}] With CLR Typed Expressions",
+            Source = @"
+            {
+                ""Kind"": ""Object"",
+                ""ApiName"": ""ClassWithScalars"",
+                ""ApiProperties"": [
+                    {
+                        ""ApiName"": ""RequiredName"",
+                        ""ApiType"": {
+                            ""ClrType"": ""System.String,System.Private.CoreLib""
+                        },
+                        ""ApiTypeModifiers"": ""Required"",
+                        ""ClrName"": ""RequiredName""
+                    },
+                    {
+                        ""ApiName"": ""RequiredNumber"",
+                        ""ApiType"": {
+                            ""ClrType"": ""System.Int64,System.Private.CoreLib""
+                        },
+                        ""ApiTypeModifiers"": ""Required"",
+                        ""ClrName"": ""RequiredNumber""
+                    },
+                    {
+                        ""ApiName"": ""RequiredPredicate"",
+                        ""ApiType"": {
+                            ""ClrType"": ""System.Boolean,System.Private.CoreLib""
+                        },
+                        ""ApiTypeModifiers"": ""Required"",
+                        ""ClrName"": ""RequiredPredicate""
+                    },
+                    {
+                        ""ApiName"": ""OptionalName"",
+                        ""ApiType"": {
+                            ""ClrType"": ""System.String,System.Private.CoreLib""
+                        },
+                        ""ApiTypeModifiers"": ""None"",
+                        ""ClrName"": ""OptionalName""
+                    },
+                    {
+                        ""ApiName"": ""OptionalNumber"",
+                        ""ApiType"": {
+                            ""ClrType"": ""System.Int64,System.Private.CoreLib""
+                        },
+                        ""ApiTypeModifiers"": ""None"",
+                        ""ClrName"": ""OptionalNumber""
+                    },
+                    {
+                        ""ApiName"": ""OptionalPredicate"",
+                        ""ApiType"": {
+                            ""ClrType"": ""System.Boolean,System.Private.CoreLib""
+                        },
+                        ""ApiTypeModifiers"": ""None"",
+                        ""ClrName"": ""OptionalPredicate""
+                    }
+                ],
+                ""ApiRelationships"": [],
+                ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BClassWithScalars, Evoogle.ApiFramework.Core.Tests""
+            }",
+            Expected = new ApiObjectType
+            (
+                nameof(ClassWithScalars),
+                [
+                    new ApiProperty
+                    (
+                        nameof(ClassWithScalars.RequiredName),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "String"),
+                        ApiTypeModifiers.Required,
+                        nameof(ClassWithScalars.RequiredName)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(ClassWithScalars.RequiredNumber),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "Long"),
+                        ApiTypeModifiers.Required,
+                        nameof(ClassWithScalars.RequiredNumber)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(ClassWithScalars.RequiredPredicate),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "Boolean"),
+                        ApiTypeModifiers.Required,
+                        nameof(ClassWithScalars.RequiredPredicate)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(ClassWithScalars.OptionalName),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "String"),
+                        ApiTypeModifiers.None,
+                        nameof(ClassWithScalars.OptionalName)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(ClassWithScalars.OptionalNumber),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "Long"),
+                        ApiTypeModifiers.None,
+                        nameof(ClassWithScalars.OptionalNumber)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(ClassWithScalars.OptionalPredicate),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "Boolean"),
+                        ApiTypeModifiers.None,
+                        nameof(ClassWithScalars.OptionalPredicate)
+                    ),
+                ],
+                [],
+                typeof(ClassWithScalars)
+            )
+        },
+
+        new JsonDeserializeTest<ApiType>
+        {
+            Name = $"ApiObjectType [{nameof(ClassWithScalars)}] With CLR Typed Expressions With Extension 1 and Extension 2",
+            Source = @"
+            {
+                ""Kind"": ""Object"",
+                ""ApiName"": ""ClassWithScalars"",
+                ""ApiProperties"": [
+                    {
+                        ""ApiName"": ""RequiredName"",
+                        ""ApiType"": {
+                            ""ClrType"": ""System.String,System.Private.CoreLib""
+                        },
+                        ""ApiTypeModifiers"": ""Required"",
+                        ""ClrName"": ""RequiredName""
+                    },
+                    {
+                        ""ApiName"": ""RequiredNumber"",
+                        ""ApiType"": {
+                            ""ClrType"": ""System.Int64,System.Private.CoreLib""
+                        },
+                        ""ApiTypeModifiers"": ""Required"",
+                        ""ClrName"": ""RequiredNumber""
+                    },
+                    {
+                        ""ApiName"": ""RequiredPredicate"",
+                        ""ApiType"": {
+                            ""ClrType"": ""System.Boolean,System.Private.CoreLib""
+                        },
+                        ""ApiTypeModifiers"": ""Required"",
+                        ""ClrName"": ""RequiredPredicate""
+                    },
+                    {
+                        ""ApiName"": ""OptionalName"",
+                        ""ApiType"": {
+                            ""ClrType"": ""System.String,System.Private.CoreLib""
+                        },
+                        ""ApiTypeModifiers"": ""None"",
+                        ""ClrName"": ""OptionalName""
+                    },
+                    {
+                        ""ApiName"": ""OptionalNumber"",
+                        ""ApiType"": {
+                            ""ClrType"": ""System.Int64,System.Private.CoreLib""
+                        },
+                        ""ApiTypeModifiers"": ""None"",
+                        ""ClrName"": ""OptionalNumber""
+                    },
+                    {
+                        ""ApiName"": ""OptionalPredicate"",
+                        ""ApiType"": {
+                            ""ClrType"": ""System.Boolean,System.Private.CoreLib""
+                        },
+                        ""ApiTypeModifiers"": ""None"",
+                        ""ClrName"": ""OptionalPredicate""
+                    }
+                ],
+                ""ApiRelationships"": [],
+                ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BClassWithScalars, Evoogle.ApiFramework.Core.Tests"",
+                ""Extensions"": {
+                    ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BTestExtension1, Evoogle.ApiFramework.Core.Tests"": {
+                        ""Description"": ""TestExtension1""
+                    },
+                    ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BTestExtension2, Evoogle.ApiFramework.Core.Tests"": {
+                        ""Id"": ""2"",
+                        ""Name"": ""TestExtension2""
+                    }
+                }
+            }",
+            Expected = new ApiObjectType
+            (
+                nameof(ClassWithScalars),
+                [
+                    new ApiProperty
+                    (
+                        nameof(ClassWithScalars.RequiredName),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "String"),
+                        ApiTypeModifiers.Required,
+                        nameof(ClassWithScalars.RequiredName)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(ClassWithScalars.RequiredNumber),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "Long"),
+                        ApiTypeModifiers.Required,
+                        nameof(ClassWithScalars.RequiredNumber)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(ClassWithScalars.RequiredPredicate),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "Boolean"),
+                        ApiTypeModifiers.Required,
+                        nameof(ClassWithScalars.RequiredPredicate)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(ClassWithScalars.OptionalName),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "String"),
+                        ApiTypeModifiers.None,
+                        nameof(ClassWithScalars.OptionalName)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(ClassWithScalars.OptionalNumber),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "Long"),
+                        ApiTypeModifiers.None,
+                        nameof(ClassWithScalars.OptionalNumber)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(ClassWithScalars.OptionalPredicate),
+                        new ApiTypeExpression(ApiTypeKind.Scalar, "Boolean"),
+                        ApiTypeModifiers.None,
+                        nameof(ClassWithScalars.OptionalPredicate)
+                    ),
+                ],
+                [],
+                typeof(ClassWithScalars)
+            ),
+            AddTestExtension1 = true,
+            AddTestExtension2 = true
+        },
+
+        new JsonDeserializeTest<ApiType>
+        {
+            Name = $"ApiObjectType [{nameof(Company)}] With CLR Typed Expressions",
+            Source = @"
+            {
+                ""Kind"": ""Object"",
+                ""ApiName"": ""Company"",
+                ""ApiProperties"": [
+                    {
+                        ""ApiName"": ""Name"",
+                        ""ApiType"": {
+                            ""ClrType"": ""System.String,System.Private.CoreLib""
+                        },
+                        ""ApiTypeModifiers"": ""Required"",
+                        ""ClrName"": ""Name""
+                    },
+                    {
+                        ""ApiName"": ""Owner"",
+                        ""ApiType"": {
+                            ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BPerson,Evoogle.ApiFramework.Core.Tests""
+                        },
+                        ""ApiTypeModifiers"": ""None"",
+                        ""ClrName"": ""Owner""
+                    },
+                    {
+                        ""ApiName"": ""Employees"",
+                        ""ApiType"": {
+                            ""ApiInlineType"": {
+                                ""Kind"": ""Collection"",
+                                ""ApiItemType"": {
+                                    ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BPerson,Evoogle.ApiFramework.Core.Tests""
                                 },
                                 ""ApiItemTypeModifiers"": ""Required"",
                                 ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BPerson, Evoogle.ApiFramework.Core.Tests]], System.Private.CoreLib""
@@ -708,10 +1029,10 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             )
         },
 
-        // ApiObjectType
+        // ApiObjectType With API Named Typed Expressions
         new JsonRoundtripTest<ApiType>
         {
-            Name = $"ApiObjectType [{nameof(ClassWithScalars)}]",
+            Name = $"ApiObjectType [{nameof(ClassWithScalars)}] With API Named Typed Expressions",
             Expected = new ApiObjectType
             (
                 nameof(ClassWithScalars),
@@ -766,7 +1087,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
 
         new JsonRoundtripTest<ApiType>
         {
-            Name = $"ApiObjectType [{nameof(ClassWithScalars)}] With Extension 1 and Extension 2",
+            Name = $"ApiObjectType [{nameof(ClassWithScalars)}] With API Named Typed Expressions With Extension 1 and Extension 2",
             Expected = new ApiObjectType
             (
                 nameof(ClassWithScalars),
@@ -823,7 +1144,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
 
         new JsonRoundtripTest<ApiType>
         {
-            Name = $"ApiObjectType [{nameof(Company)}]",
+            Name = $"ApiObjectType [{nameof(Company)}] With API Named Typed Expressions",
             Expected = new ApiObjectType
             (
                 nameof(Company),
@@ -846,6 +1167,156 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         nameof(Company.Employees),
                         new ApiTypeExpression(new ApiCollectionType(new ApiTypeExpression(ApiTypeKind.Object, nameof(Person)), ApiTypeModifiers.Required, typeof(List<Person>))),
+                        ApiTypeModifiers.None,
+                        nameof(Company.Employees)
+                    ),
+                ],
+                [
+                    new ApiRelationship("OwnedBy", nameof(Company.Owner)),
+                    new ApiRelationship(nameof(Company.Employees))
+                ],
+                typeof(Company)
+            ),
+        },
+
+        // ApiObjectType With CLR Typed Expressions
+        new JsonRoundtripTest<ApiType>
+        {
+            Name = $"ApiObjectType [{nameof(ClassWithScalars)}] With CLR Typed Expressions",
+            Expected = new ApiObjectType
+            (
+                nameof(ClassWithScalars),
+                [
+                    new ApiProperty
+                    (
+                        nameof(ClassWithScalars.RequiredName),
+                        new ApiTypeExpression(typeof(string)),
+                        ApiTypeModifiers.Required,
+                        nameof(ClassWithScalars.RequiredName)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(ClassWithScalars.RequiredNumber),
+                        new ApiTypeExpression(typeof(long)),
+                        ApiTypeModifiers.Required,
+                        nameof(ClassWithScalars.RequiredNumber)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(ClassWithScalars.RequiredPredicate),
+                        new ApiTypeExpression(typeof(bool)),
+                        ApiTypeModifiers.Required,
+                        nameof(ClassWithScalars.RequiredPredicate)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(ClassWithScalars.OptionalName),
+                        new ApiTypeExpression(typeof(string)),
+                        ApiTypeModifiers.None,
+                        nameof(ClassWithScalars.OptionalName)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(ClassWithScalars.OptionalNumber),
+                        new ApiTypeExpression(typeof(long)),
+                        ApiTypeModifiers.None,
+                        nameof(ClassWithScalars.OptionalNumber)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(ClassWithScalars.OptionalPredicate),
+                        new ApiTypeExpression(typeof(bool)),
+                        ApiTypeModifiers.None,
+                        nameof(ClassWithScalars.OptionalPredicate)
+                    ),
+                ],
+                [],
+                typeof(ClassWithScalars)
+            )
+        },
+
+        new JsonRoundtripTest<ApiType>
+        {
+            Name = $"ApiObjectType [{nameof(ClassWithScalars)}] With CLR Typed Expressions With Extension 1 and Extension 2",
+            Expected = new ApiObjectType
+            (
+                nameof(ClassWithScalars),
+                [
+                    new ApiProperty
+                    (
+                        nameof(ClassWithScalars.RequiredName),
+                        new ApiTypeExpression(typeof(string)),
+                        ApiTypeModifiers.Required,
+                        nameof(ClassWithScalars.RequiredName)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(ClassWithScalars.RequiredNumber),
+                        new ApiTypeExpression(typeof(long)),
+                        ApiTypeModifiers.Required,
+                        nameof(ClassWithScalars.RequiredNumber)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(ClassWithScalars.RequiredPredicate),
+                        new ApiTypeExpression(typeof(bool)),
+                        ApiTypeModifiers.Required,
+                        nameof(ClassWithScalars.RequiredPredicate)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(ClassWithScalars.OptionalName),
+                        new ApiTypeExpression(typeof(string)),
+                        ApiTypeModifiers.None,
+                        nameof(ClassWithScalars.OptionalName)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(ClassWithScalars.OptionalNumber),
+                        new ApiTypeExpression(typeof(long)),
+                        ApiTypeModifiers.None,
+                        nameof(ClassWithScalars.OptionalNumber)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(ClassWithScalars.OptionalPredicate),
+                        new ApiTypeExpression(typeof(bool)),
+                        ApiTypeModifiers.None,
+                        nameof(ClassWithScalars.OptionalPredicate)
+                    ),
+                ],
+                [],
+                typeof(ClassWithScalars)
+            ),
+            AddTestExtension1 = true,
+            AddTestExtension2 = true
+        },
+
+        new JsonRoundtripTest<ApiType>
+        {
+            Name = $"ApiObjectType [{nameof(Company)}] With CLR Typed Expressions",
+            Expected = new ApiObjectType
+            (
+                nameof(Company),
+                [
+                    new ApiProperty
+                    (
+                        nameof(Company.Name),
+                        new ApiTypeExpression(typeof(string)),
+                        ApiTypeModifiers.Required,
+                        nameof(Company.Name)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(Company.Owner),
+                        new ApiTypeExpression(typeof(Person)),
+                        ApiTypeModifiers.None,
+                        nameof(Company.Owner)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(Company.Employees),
+                        new ApiTypeExpression(new ApiCollectionType(new ApiTypeExpression(typeof(Person)), ApiTypeModifiers.Required, typeof(List<Person>))),
                         ApiTypeModifiers.None,
                         nameof(Company.Employees)
                     ),
@@ -1109,10 +1580,10 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             }"
         },
 
-        // ApiObjectType
+        // ApiObjectType With API Named Typed Expressions
         new JsonSerializeTest<ApiType>
         {
-            Name = $"ApiObjectType [{nameof(ClassWithScalars)}]",
+            Name = $"ApiObjectType [{nameof(ClassWithScalars)}] With API Named Typed Expressions",
             Source = new ApiObjectType
             (
                 nameof(ClassWithScalars),
@@ -1230,7 +1701,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
 
         new JsonSerializeTest<ApiType>
         {
-            Name = $"ApiObjectType [{nameof(ClassWithScalars)}] With Extension 1 and Extension 2",
+            Name = $"ApiObjectType [{nameof(ClassWithScalars)}] With API Named Typed Expressions And With Extension 1 and Extension 2",
             Source = new ApiObjectType
             (
                 nameof(ClassWithScalars),
@@ -1359,7 +1830,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
 
         new JsonSerializeTest<ApiType>
         {
-            Name = $"ApiObjectType [{nameof(Company)}]",
+            Name = $"ApiObjectType [{nameof(Company)}] With API Named Typed Expressions",
             Source = new ApiObjectType
             (
                 nameof(Company),
@@ -1423,6 +1894,327 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                                 ""ApiItemType"": {
                                     ""Kind"": ""Object"",
                                     ""ApiName"": ""Person""
+                                },
+                                ""ApiItemTypeModifiers"": ""Required"",
+                                ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BPerson, Evoogle.ApiFramework.Core.Tests]], System.Private.CoreLib""
+                            }
+                        },
+                        ""ApiTypeModifiers"": ""None"",
+                        ""ClrName"": ""Employees""
+                    }
+                ],
+                ""ApiRelationships"": [
+                    {
+                        ""ApiName"": ""OwnedBy"",
+                        ""ApiPropertyName"": ""Owner""
+                    },
+                    {
+                        ""ApiName"": ""Employees""
+                    }
+                ],
+                ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BCompany, Evoogle.ApiFramework.Core.Tests""
+            }"
+        },
+
+        // ApiObjectType With CLR Typed Expressions
+        new JsonSerializeTest<ApiType>
+        {
+            Name = $"ApiObjectType [{nameof(ClassWithScalars)}] With CLR Typed Expressions",
+            Source = new ApiObjectType
+            (
+                nameof(ClassWithScalars),
+                [
+                    new ApiProperty
+                    (
+                        nameof(ClassWithScalars.RequiredName),
+                        new ApiTypeExpression(typeof(string)),
+                        ApiTypeModifiers.Required,
+                        nameof(ClassWithScalars.RequiredName)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(ClassWithScalars.RequiredNumber),
+                        new ApiTypeExpression(typeof(long)),
+                        ApiTypeModifiers.Required,
+                        nameof(ClassWithScalars.RequiredNumber)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(ClassWithScalars.RequiredPredicate),
+                        new ApiTypeExpression(typeof(bool)),
+                        ApiTypeModifiers.Required,
+                        nameof(ClassWithScalars.RequiredPredicate)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(ClassWithScalars.OptionalName),
+                        new ApiTypeExpression(typeof(string)),
+                        ApiTypeModifiers.None,
+                        nameof(ClassWithScalars.OptionalName)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(ClassWithScalars.OptionalNumber),
+                        new ApiTypeExpression(typeof(long?)),
+                        ApiTypeModifiers.None,
+                        nameof(ClassWithScalars.OptionalNumber)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(ClassWithScalars.OptionalPredicate),
+                        new ApiTypeExpression(typeof(bool?)),
+                        ApiTypeModifiers.None,
+                        nameof(ClassWithScalars.OptionalPredicate)
+                    ),
+                ],
+                [],
+                typeof(ClassWithScalars)
+            ),
+            Expected = @"
+            {
+                ""Kind"": ""Object"",
+                ""ApiName"": ""ClassWithScalars"",
+                ""ApiProperties"": [
+                    {
+                        ""ApiName"": ""RequiredName"",
+                        ""ApiType"": {
+                            ""ClrType"": ""System.String,System.Private.CoreLib""
+                        },
+                        ""ApiTypeModifiers"": ""Required"",
+                        ""ClrName"": ""RequiredName""
+                    },
+                    {
+                        ""ApiName"": ""RequiredNumber"",
+                        ""ApiType"": {
+                            ""ClrType"": ""System.Int64,System.Private.CoreLib""
+                        },
+                        ""ApiTypeModifiers"": ""Required"",
+                        ""ClrName"": ""RequiredNumber""
+                    },
+                    {
+                        ""ApiName"": ""RequiredPredicate"",
+                        ""ApiType"": {
+                            ""ClrType"": ""System.Boolean,System.Private.CoreLib""
+                        },
+                        ""ApiTypeModifiers"": ""Required"",
+                        ""ClrName"": ""RequiredPredicate""
+                    },
+                    {
+                        ""ApiName"": ""OptionalName"",
+                        ""ApiType"": {
+                            ""ClrType"": ""System.String,System.Private.CoreLib""
+                        },
+                        ""ApiTypeModifiers"": ""None"",
+                        ""ClrName"": ""OptionalName""
+                    },
+                    {
+                        ""ApiName"": ""OptionalNumber"",
+                        ""ApiType"": {
+                            ""ClrType"": ""System.Int64,System.Private.CoreLib""
+                        },
+                        ""ApiTypeModifiers"": ""None"",
+                        ""ClrName"": ""OptionalNumber""
+                    },
+                    {
+                        ""ApiName"": ""OptionalPredicate"",
+                        ""ApiType"": {
+                            ""ClrType"": ""System.Boolean,System.Private.CoreLib""
+                        },
+                        ""ApiTypeModifiers"": ""None"",
+                        ""ClrName"": ""OptionalPredicate""
+                    }
+                ],
+                ""ApiRelationships"": [],
+                ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BClassWithScalars, Evoogle.ApiFramework.Core.Tests""
+            }"
+        },
+
+        new JsonSerializeTest<ApiType>
+        {
+            Name = $"ApiObjectType [{nameof(ClassWithScalars)}] With CLR Typed Expressions And With Extension 1 and Extension 2",
+            Source = new ApiObjectType
+            (
+                nameof(ClassWithScalars),
+                [
+                    new ApiProperty
+                    (
+                        nameof(ClassWithScalars.RequiredName),
+                        new ApiTypeExpression(typeof(string)),
+                        ApiTypeModifiers.Required,
+                        nameof(ClassWithScalars.RequiredName)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(ClassWithScalars.RequiredNumber),
+                        new ApiTypeExpression(typeof(long)),
+                        ApiTypeModifiers.Required,
+                        nameof(ClassWithScalars.RequiredNumber)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(ClassWithScalars.RequiredPredicate),
+                        new ApiTypeExpression(typeof(bool)),
+                        ApiTypeModifiers.Required,
+                        nameof(ClassWithScalars.RequiredPredicate)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(ClassWithScalars.OptionalName),
+                        new ApiTypeExpression(typeof(string)),
+                        ApiTypeModifiers.None,
+                        nameof(ClassWithScalars.OptionalName)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(ClassWithScalars.OptionalNumber),
+                        new ApiTypeExpression(typeof(long?)),
+                        ApiTypeModifiers.None,
+                        nameof(ClassWithScalars.OptionalNumber)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(ClassWithScalars.OptionalPredicate),
+                        new ApiTypeExpression(typeof(bool?)),
+                        ApiTypeModifiers.None,
+                        nameof(ClassWithScalars.OptionalPredicate)
+                    ),
+                ],
+                [],
+                typeof(ClassWithScalars)
+            ),
+            Expected = @"
+            {
+                ""Kind"": ""Object"",
+                ""ApiName"": ""ClassWithScalars"",
+                ""ApiProperties"": [
+                    {
+                        ""ApiName"": ""RequiredName"",
+                        ""ApiType"": {
+                            ""ClrType"": ""System.String,System.Private.CoreLib""
+                        },
+                        ""ApiTypeModifiers"": ""Required"",
+                        ""ClrName"": ""RequiredName""
+                    },
+                    {
+                        ""ApiName"": ""RequiredNumber"",
+                        ""ApiType"": {
+                            ""ClrType"": ""System.Int64,System.Private.CoreLib""
+                        },
+                        ""ApiTypeModifiers"": ""Required"",
+                        ""ClrName"": ""RequiredNumber""
+                    },
+                    {
+                        ""ApiName"": ""RequiredPredicate"",
+                        ""ApiType"": {
+                            ""ClrType"": ""System.Boolean,System.Private.CoreLib""
+                        },
+                        ""ApiTypeModifiers"": ""Required"",
+                        ""ClrName"": ""RequiredPredicate""
+                    },
+                    {
+                        ""ApiName"": ""OptionalName"",
+                        ""ApiType"": {
+                            ""ClrType"": ""System.String,System.Private.CoreLib""
+                        },
+                        ""ApiTypeModifiers"": ""None"",
+                        ""ClrName"": ""OptionalName""
+                    },
+                    {
+                        ""ApiName"": ""OptionalNumber"",
+                        ""ApiType"": {
+                            ""ClrType"": ""System.Int64,System.Private.CoreLib""
+                        },
+                        ""ApiTypeModifiers"": ""None"",
+                        ""ClrName"": ""OptionalNumber""
+                    },
+                    {
+                        ""ApiName"": ""OptionalPredicate"",
+                        ""ApiType"": {
+                            ""ClrType"": ""System.Boolean,System.Private.CoreLib""
+                        },
+                        ""ApiTypeModifiers"": ""None"",
+                        ""ClrName"": ""OptionalPredicate""
+                    }
+                ],
+                ""ApiRelationships"": [],
+                ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BClassWithScalars, Evoogle.ApiFramework.Core.Tests"",
+                ""Extensions"": {
+                    ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BTestExtension1, Evoogle.ApiFramework.Core.Tests"": {
+                        ""Description"": ""TestExtension1""
+                    },
+                    ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BTestExtension2, Evoogle.ApiFramework.Core.Tests"": {
+                        ""Id"": ""2"",
+                        ""Name"": ""TestExtension2""
+                    }
+                }
+            }",
+            AddTestExtension1 = true,
+            AddTestExtension2 = true
+        },
+
+        new JsonSerializeTest<ApiType>
+        {
+            Name = $"ApiObjectType [{nameof(Company)}] With CLR Typed Expressions",
+            Source = new ApiObjectType
+            (
+                nameof(Company),
+                [
+                    new ApiProperty
+                    (
+                        nameof(Company.Name),
+                        new ApiTypeExpression(typeof(string)),
+                        ApiTypeModifiers.Required,
+                        nameof(Company.Name)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(Company.Owner),
+                        new ApiTypeExpression(typeof(Person)),
+                        ApiTypeModifiers.None,
+                        nameof(Company.Owner)
+                    ),
+                    new ApiProperty
+                    (
+                        nameof(Company.Employees),
+                        new ApiTypeExpression(new ApiCollectionType(new ApiTypeExpression(typeof(Person)), ApiTypeModifiers.Required, typeof(List<Person>))),
+                        ApiTypeModifiers.None,
+                        nameof(Company.Employees)
+                    ),
+                ],
+                [
+                    new ApiRelationship("OwnedBy", nameof(Company.Owner)),
+                    new ApiRelationship(nameof(Company.Employees))
+                ],
+                typeof(Company)
+            ),
+            Expected = @"
+            {
+                ""Kind"": ""Object"",
+                ""ApiName"": ""Company"",
+                ""ApiProperties"": [
+                    {
+                        ""ApiName"": ""Name"",
+                        ""ApiType"": {
+                            ""ClrType"": ""System.String,System.Private.CoreLib""
+                        },
+                        ""ApiTypeModifiers"": ""Required"",
+                        ""ClrName"": ""Name""
+                    },
+                    {
+                        ""ApiName"": ""Owner"",
+                        ""ApiType"": {
+                            ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BPerson,Evoogle.ApiFramework.Core.Tests""
+                        },
+                        ""ApiTypeModifiers"": ""None"",
+                        ""ClrName"": ""Owner""
+                    },
+                    {
+                        ""ApiName"": ""Employees"",
+                        ""ApiType"": {
+                            ""ApiInlineType"": {
+                                ""Kind"": ""Collection"",
+                                ""ApiItemType"": {
+                                    ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BPerson,Evoogle.ApiFramework.Core.Tests""
                                 },
                                 ""ApiItemTypeModifiers"": ""Required"",
                                 ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BPerson, Evoogle.ApiFramework.Core.Tests]], System.Private.CoreLib""

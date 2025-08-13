@@ -155,10 +155,11 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
             return new ApiTypeExpression(apiInlineType);
         }
 
-        var kind = GetApiTypeKind(context, apiTypeExpressionReadData?.Kind) ?? ApiTypeKind.Unknown;
+        var kind = GetApiTypeKind(context, apiTypeExpressionReadData?.Kind);
         var apiName = apiTypeExpressionReadData?.ApiName;
+        var clrType = apiTypeExpressionReadData?.ClrType;
 
-        return new ApiTypeExpression(kind, apiName!);
+        return new ApiTypeExpression(kind, apiName, clrType);
     }
     #endregion
 
@@ -167,7 +168,6 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
     {
         if (kindAsString is null)
         {
-            context.Logger.LogError("{Kind} enumeration string is null", nameof(ApiTypeKind));
             return null;
         }
 

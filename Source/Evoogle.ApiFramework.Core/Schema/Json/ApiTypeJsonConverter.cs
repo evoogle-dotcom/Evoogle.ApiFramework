@@ -31,7 +31,7 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
     private abstract class Context(ILogger<ApiTypeJsonConverter> logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames) : IHasLogger<ApiTypeJsonConverter>
     {
         #region Immutable Properties
-        public ILogger<ApiTypeJsonConverter> Logger { get; } = logger;
+        public ILogger<ApiTypeJsonConverter> Logger { get; } = new MultiplexingLogger<ApiTypeJsonConverter>(logger, MultiplexingLoggerMode.All);
         public JsonSerializerOptions Options { get; } = options;
         public JsonNamingPolicy PropertyNamingPolicy { get; } = propertyNamingPolicy;
         public PropertyNames PropertyNames { get; } = propertyNames;
@@ -127,6 +127,7 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
         #region Immutable Properties
         public required string ApiName { get; init; }
         public required string ApiInlineType { get; init; }
+        public required string ClrType { get; init; }
         public required string Kind { get; init; }
         #endregion
     }
@@ -274,6 +275,7 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
             {
                 ApiName = policy.ConvertName(nameof(ApiTypeExpression.ApiName)),
                 ApiInlineType = policy.ConvertName(nameof(ApiTypeExpression.ApiInlineType)),
+                ClrType = policy.ConvertName(nameof(ApiTypeExpression.ClrType)),
                 Kind = policy.ConvertName(nameof(ApiTypeExpression.Kind))
             },
             ExtensibleBase = new ExtensibleBasePropertyNames

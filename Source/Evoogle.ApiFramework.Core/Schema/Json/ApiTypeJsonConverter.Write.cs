@@ -365,6 +365,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         WriteApiTypeExpressionKind(writer, apiTypeExpression, context);
         WriteApiTypeExpressionApiName(writer, apiTypeExpression, context);
         WriteApiTypeExpressionApiInlineType(writer, apiTypeExpression, context);
+        WriteApiTypeExpressionClrType(writer, apiTypeExpression, context);
 
         writer.WriteEndObject();
     }
@@ -394,6 +395,15 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         var options = context.Options;
 
         writer.WriteConditionalPropertyWithSerializer(propertyName, apiInlineType, options);
+    }
+
+    private static void WriteApiTypeExpressionClrType(Utf8JsonWriter writer, ApiTypeExpression apiTypeExpression, WriteContext context)
+    {
+        var propertyName = context.PropertyNames.ApiTypeExpression.ClrType;
+        var clrType = apiTypeExpression.ClrType;
+        var options = context.Options;
+
+        writer.WriteConditionalPropertyWithConverter(propertyName, clrType, options, _typeJsonConverter);
     }
 
     // ExtensibleBase Methods

@@ -83,6 +83,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         #region Properties
         public ApiType? ApiInlineType { get; set; }
         public string? ApiName { get; set; }
+        public Type? ClrType { get; set; }
         public string? Kind { get; set; }
         #endregion
     }
@@ -148,6 +149,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         {
             { propertyNames.ApiTypeExpression.ApiInlineType, HandleApiTypeExpressionApiInlineType },
             { propertyNames.ApiTypeExpression.ApiName, HandleApiTypeExpressionApiName },
+            { propertyNames.ApiTypeExpression.ClrType, HandleApiTypeExpressionClrType },
             { propertyNames.ApiTypeExpression.Kind, HandleApiTypeExpressionKind },
         };
         #endregion
@@ -359,6 +361,13 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
             context.ReadData.ApiTypeExpression ??= new ApiTypeExpressionReadData();
 
             context.ReadData.ApiTypeExpression.ApiName = reader.GetString();
+        }
+
+        private static void HandleApiTypeExpressionClrType(ref Utf8JsonReader reader, ref ReadContext context)
+        {
+            context.ReadData.ApiTypeExpression ??= new ApiTypeExpressionReadData();
+
+            context.ReadData.ApiTypeExpression.ClrType = _typeJsonConverter.Read(ref reader, typeof(Type), context.Options);
         }
 
         private static void HandleApiTypeExpressionKind(ref Utf8JsonReader reader, ref ReadContext context)

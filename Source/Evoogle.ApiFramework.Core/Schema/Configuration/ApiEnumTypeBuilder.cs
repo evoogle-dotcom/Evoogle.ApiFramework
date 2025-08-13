@@ -35,21 +35,26 @@ public sealed class ApiEnumTypeBuilder(Type clrType, ApiSchemaBuilderContext con
     ///     Builds the <see cref="ApiEnumType"/> using the configured values.
     /// </summary>
     /// <returns>The constructed <see cref="ApiEnumType"/>.</returns>
-    public ApiEnumType Build()
+    internal ApiEnumType Build()
     {
-        var finalValues = _values.Count != 0
-            ? _values
-            : Enum.GetValues(this.ClrType)
-                  .Cast<object>()
-                  .Select(value =>
-                  {
-                      var name = Enum.GetName(this.ClrType, value)!;
-                      var ordinal = Convert.ToInt32(value);
-                      return new ApiEnumValue(name, name, ordinal);
-                  })
-                  .ToList();
+        var apiName = this.ApiName;
+        var apiEnumValues = _values;
+        var clrEnumType = this.ClrType;
 
-        return new ApiEnumType(this.ApiName, finalValues, this.ClrType);
+        var apiEnumType = new ApiEnumType
+        (
+            apiName: apiName,
+            apiEnumValues: apiEnumValues,
+            clrEnumType: clrEnumType
+        );
+
+        var extensions = this.BuildExtensions();
+        if (extensions != null)
+        {
+            apiEnumType.Extensions = extensions;
+        }
+
+        return apiEnumType;
     }
     #endregion
 }

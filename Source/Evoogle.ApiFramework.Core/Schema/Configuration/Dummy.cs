@@ -43,7 +43,8 @@ public static class Dummy
         public void Configure(ApiScalarTypeBuilder builder)
         {
             builder
-                .WithApiName("Email");
+                .WithName("Email")
+                .AddExtension(new VisibleMetadata { Visible = true });
         }
     }
 
@@ -52,11 +53,12 @@ public static class Dummy
         public void Configure(ApiEnumTypeBuilder builder)
         {
             builder
-                .WithApiName("OrderStatus")
+                .WithName("OrderStatus")
                 .AddValue("Pending", "Pending", 0)
                 .AddValue("Shipped", "Shipped", 1)
                 .AddValue("Delivered", "Delivered", 2)
-                .AddValue("Cancelled", "Cancelled", 3);
+                .AddValue("Cancelled", "Cancelled", 3)
+                .AddExtension(new VisibleMetadata { Visible = true });
         }
     }
 
@@ -65,11 +67,17 @@ public static class Dummy
         public void Configure(ApiObjectTypeBuilder builder)
         {
             builder
-                .WithApiName("Order")
-                .AddProperty("id", "Id", typeof(Guid))
-                .AddProperty("status", "Status", typeof(OrderStatus))
-                .AddProperty("total", "Total", typeof(decimal));
+                .WithName("Order")
+                .AddProperty("id", "Id")
+                .AddProperty("status", "Status")
+                .AddProperty("total", "Total")
+                .AddExtension(new VisibleMetadata { Visible = true });
         }
+    }
+
+    public class VisibleMetadata
+    {
+        public bool Visible { get; set; }
     }
 
     public static void DummyMethod()
@@ -78,25 +86,27 @@ public static class Dummy
             .WithName("CustomerOrdersAPI")
             .WithVersion("v1")
             .AddScalar(typeof(EmailAddress), x => x
-                .WithApiName("EmailAddress"))
+                .WithName("EmailAddress"))
+                .AddExtension(new VisibleMetadata { Visible = true })
             .AddObject(typeof(Customer), x => x
-                .WithApiName("Customer")
-                .AddProperty("Id", "Id", typeof(Guid), m => m.Required())
-                .AddProperty("Name", "Name", typeof(string), m => m.Required())
-                .AddProperty("Email", "Email", typeof(EmailAddress), m => m.Nullable())
-                .AddProperty("Orders", "Orders", typeof(List<Order>), m => m.Required())
+                .WithName("Customer")
+                .AddProperty("Id", "Id", m => m.Required())
+                .AddProperty("Name", "Name", m => m.Required(), p => p.AddExtension(new VisibleMetadata { Visible = true }))
+                .AddProperty("Email", "Email", m => m.Optional())
+                .AddProperty("Orders", "Orders", m => m.Required())
                 .AddRelationship("Orders"))
+                .AddExtension(new VisibleMetadata { Visible = true })
             .AddObject(typeof(Order), x => x
-                .WithApiName("Order")
-                .AddProperty("Id", "Id", typeof(Guid), m => m.Required())
-                .AddProperty("Status", "Status", typeof(OrderStatus), m => m.Required())
-                .AddProperty("Total", "Total", typeof(decimal), m => m.Required())
-                .AddProperty("CustomerId", "CustomerId", typeof(Guid?), m => m.Nullable())
-                .AddProperty("Customer", "Customer", typeof(Customer), m => m.Nullable())
-                .AddRelationship("Customer")
-                )
+                .WithName("Order")
+                .AddProperty("Id", "Id", m => m.Required())
+                .AddProperty("Status", "Status", m => m.Required())
+                .AddProperty("Total", "Total", m => m.Required())
+                .AddProperty("CustomerId", "CustomerId", m => m.Optional())
+                .AddProperty("Customer", "Customer", m => m.Optional())
+                .AddRelationship("Customer"))
             .AddEnum(typeof(OrderStatus), x => x
-                .WithApiName("OrderStatus")
+                .AddExtension(new VisibleMetadata { Visible = true })
+                .WithName("OrderStatus")
                 .AddValue("Pending", "Pending", 0)
                 .AddValue("Shipped", "Shipped", 1)
                 .AddValue("Delivered", "Delivered", 2)
@@ -104,6 +114,7 @@ public static class Dummy
             .AddScalar(typeof(EmailAddress), new EmailAddressConfiguration())
             .AddEnum(typeof(OrderStatus), new OrderStatusConfiguration())
             .AddObject(typeof(Order), new OrderConfiguration())
+            .AddExtension(new VisibleMetadata { Visible = true })
             .Build();
     }
 }

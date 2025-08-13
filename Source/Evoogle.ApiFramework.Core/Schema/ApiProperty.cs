@@ -5,7 +5,6 @@
 // See the LICENSE file in the project root for more information.
 using System.ComponentModel.DataAnnotations;
 
-using Evoogle.ApiFramework.Exceptions;
 using Evoogle.Extension;
 using Evoogle.Extensions;
 

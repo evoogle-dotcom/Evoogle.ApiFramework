@@ -11,28 +11,26 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 /// <typeparam name="TBuilder">The concrete builder type.</typeparam>
 /// <param name="clrType">The CLR type represented by the API named type.</param>
 /// <param name="context">The shared builder context.</param>
-public abstract class ApiNamedTypeBuilder<TBuilder>(Type clrType, ApiSchemaBuilderContext context) : IApiNamedTypeBuilder
+public abstract class ApiNamedTypeBuilder<TBuilder>(Type clrType, ApiSchemaBuilderContext context) : ExtensionBuilder<TBuilder>
     where TBuilder : ApiNamedTypeBuilder<TBuilder>
 {
     #region Fields
     private string? _apiName;
     #endregion
 
-    #region IApiNamedTypeBuilder Properties
+    #region Properties
     /// <summary>
     ///     Gets the API name configured for the type.
     /// </summary>
-    public string ApiName => _apiName!;
+    internal string ApiName => _apiName!;
 
     /// <summary>
     ///     Gets the CLR type represented by this builder.
     /// </summary>
-    public Type ClrType { get; } = clrType;
-    #endregion
+    internal Type ClrType { get; } = clrType;
 
-    #region Properties
     /// <summary>
-    ///     Gets the shared builder context for registering API types.
+    ///     Gets the shared builder context.
     /// </summary>
     protected ApiSchemaBuilderContext Context { get; } = context ?? throw new ArgumentNullException(nameof(context));
     #endregion
@@ -43,7 +41,7 @@ public abstract class ApiNamedTypeBuilder<TBuilder>(Type clrType, ApiSchemaBuild
     /// </summary>
     /// <param name="apiName">The API name to use.</param>
     /// <returns>The current builder instance.</returns>
-    public TBuilder WithApiName(string apiName)
+    public TBuilder WithName(string apiName)
     {
         _apiName = apiName;
         return (TBuilder)this;

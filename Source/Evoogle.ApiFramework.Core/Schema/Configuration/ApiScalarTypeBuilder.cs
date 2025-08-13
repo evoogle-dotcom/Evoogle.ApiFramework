@@ -18,6 +18,24 @@ public sealed class ApiScalarTypeBuilder(Type clrType, ApiSchemaBuilderContext c
     ///     Builds the <see cref="ApiScalarType"/> using the configured settings.
     /// </summary>
     /// <returns>The constructed <see cref="ApiScalarType"/>.</returns>
-    public ApiScalarType Build() => new(this.ApiName, this.ClrType);
+    internal ApiScalarType Build()
+    {
+        var apiName = this.ApiName;
+        var clrScalarType = this.ClrType;
+
+        var apiScalarType = new ApiScalarType
+        (
+            apiName: apiName,
+            clrScalarType: clrScalarType
+        );
+
+        var extensions = this.BuildExtensions();
+        if (extensions != null)
+        {
+            apiScalarType.Extensions = extensions;
+        }
+
+        return apiScalarType;
+    }
     #endregion
 }

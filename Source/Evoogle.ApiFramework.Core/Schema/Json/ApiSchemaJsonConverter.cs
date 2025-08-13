@@ -34,7 +34,7 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
     private abstract class Context(ILogger<ApiSchemaJsonConverter> logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames) : IHasLogger<ApiSchemaJsonConverter>
     {
         #region Immutable Properties
-        public ILogger<ApiSchemaJsonConverter> Logger { get; } = logger;
+        public ILogger<ApiSchemaJsonConverter> Logger { get; } = new MultiplexingLogger<ApiSchemaJsonConverter>(logger, MultiplexingLoggerMode.All);
         public JsonSerializerOptions Options { get; } = options;
         public JsonNamingPolicy PropertyNamingPolicy { get; } = propertyNamingPolicy;
         public PropertyNames PropertyNames { get; } = propertyNames;

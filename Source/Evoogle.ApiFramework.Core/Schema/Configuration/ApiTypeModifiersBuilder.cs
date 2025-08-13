@@ -8,10 +8,10 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 /// <summary>
 ///     Helper used to fluently configure <see cref="ApiTypeModifiers"/> flags.
 /// </summary>
-public sealed class ApiTypeModifiersBuilder
+public sealed class ApiTypeModifiersBuilder(ApiTypeModifiers modifiers = ApiTypeModifiers.None)
 {
     #region Fields
-    private ApiTypeModifiers _modifiers = ApiTypeModifiers.None;
+    private ApiTypeModifiers _modifiers = modifiers;
     #endregion
 
     #region Builder Methods
@@ -29,7 +29,7 @@ public sealed class ApiTypeModifiersBuilder
     ///     Marks the API type as optional.
     /// </summary>
     /// <returns>The current builder instance.</returns>
-    public ApiTypeModifiersBuilder Nullable()
+    public ApiTypeModifiersBuilder Optional()
     {
         _modifiers &= ~ApiTypeModifiers.Required;
         return this;
@@ -39,6 +39,6 @@ public sealed class ApiTypeModifiersBuilder
     ///     Builds the combined <see cref="ApiTypeModifiers"/> flags.
     /// </summary>
     /// <returns>The computed modifiers.</returns>
-    public ApiTypeModifiers Build() => _modifiers;
+    internal ApiTypeModifiers Build() => _modifiers;
     #endregion
 }

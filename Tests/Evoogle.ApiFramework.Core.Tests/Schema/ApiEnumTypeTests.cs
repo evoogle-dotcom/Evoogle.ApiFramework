@@ -28,24 +28,33 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
         public List<ApiEnumValue>? ApiEnumValueCollection { get; init; }
         public Type? ClrEnumType { get; init; }
         public string? ExpectedApiSchemaExceptionMessage { get; init; }
+        public List<string>? ExpectedValidationResults { get; init; }
         #endregion
 
         #region Calculated Properties
         private bool? ActualApiSchemaExceptionThrown { get; set; }
         private string? ActualApiSchemaExceptionMessage { get; set; }
+        private List<string>? ActualValidationResults { get; set; }
         #endregion
 
         #region XUnitTest Methods
         protected override void Arrange()
         {
             var apiEnumValuesString = this.ApiEnumValueCollection?
-                .Select(x => $"{{ApiName={x.ApiName},ClrName={x.ClrName},ClrOrdinal={x.ClrOrdinal}}}")
+                .Select(x => $"{{{nameof(ApiEnumValue.ApiName)}={x.ApiName},{nameof(ApiEnumValue.ClrName)}={x.ClrName},{nameof(ApiEnumValue.ClrOrdinal)}={x.ClrOrdinal}}}")
                 .SafeToDelimitedString(',') ?? "None";
 
             this.WriteLine($"API Enum Values: [{apiEnumValuesString}]");
             this.WriteLine();
 
             this.WriteLine($"Expected Exception Message: {this.ExpectedApiSchemaExceptionMessage.SafeToString()}");
+            if (this.ExpectedValidationResults is not null)
+            {
+                foreach (var expectedValidationResult in this.ExpectedValidationResults)
+                {
+                    this.WriteLine($"Expected Validation Result: {expectedValidationResult.SafeToString()}");
+                }
+            }
             this.WriteLine();
         }
 
@@ -67,14 +76,28 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 var result = apiSchema.Initialize();
                 result.ThrowIfInvalid();
             }
+            catch (ApiSchemaValidationException ex)
+            {
+                this.ActualApiSchemaExceptionThrown = true;
+                this.ActualApiSchemaExceptionMessage = ex.Message;
+                this.ActualValidationResults = [.. ex.ValidationResults.Where(x => x.ErrorMessage is not null).Select(x => x.ErrorMessage!)];
+            }
             catch (ApiSchemaException ex)
             {
                 this.ActualApiSchemaExceptionThrown = true;
                 this.ActualApiSchemaExceptionMessage = ex.Message;
+                this.ActualValidationResults = null;
             }
 
             this.WriteLine($"Actual Exception Thrown:  {this.ActualApiSchemaExceptionThrown.SafeToString()}");
             this.WriteLine($"Actual Exception Message: {this.ActualApiSchemaExceptionMessage.SafeToString()}");
+            if (this.ActualValidationResults is not null)
+            {
+                foreach (var actualValidationResult in this.ActualValidationResults)
+                {
+                    this.WriteLine($"Actual Validation Result: {actualValidationResult.SafeToString()}");
+                }
+            }
             this.WriteLine();
         }
 
@@ -82,6 +105,8 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
         {
             this.ActualApiSchemaExceptionThrown.Should().BeTrue();
             this.ActualApiSchemaExceptionMessage.Should().Be(this.ExpectedApiSchemaExceptionMessage);
+            this.ActualValidationResults.Should().NotBeNull();
+            this.ActualValidationResults.Should().BeEquivalentTo(this.ExpectedValidationResults);
         }
         #endregion
     }
@@ -112,7 +137,7 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
         protected override void Arrange()
         {
             var apiEnumValuesString = this.ApiEnumValueCollection?
-                .Select(x => $"{{ApiName={x.ApiName},ClrName={x.ClrName},ClrOrdinal={x.ClrOrdinal}}}")
+                .Select(x => $"{{{nameof(ApiEnumValue.ApiName)}={x.ApiName},{nameof(ApiEnumValue.ClrName)}={x.ClrName},{nameof(ApiEnumValue.ClrOrdinal)}={x.ClrOrdinal}}}")
                 .SafeToDelimitedString(',') ?? "None";
 
             this.WriteLine($"API Enum Values: [{apiEnumValuesString}]");
@@ -194,7 +219,11 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 new("second", "Second2", 2), // Duplicate API Name
             ],
             ClrEnumType = typeof(SampleEnum),
-            ExpectedApiSchemaExceptionMessage = $"{nameof(ApiSchema)} initialization failed:\nApiEnumType[\"Evoogle.ApiFramework.Schema.ApiEnumTypeTests+SampleEnum\"][\"SampleEnum\"].ApiEnumValue unable to initialize because duplicate ApiName values detected: second",
+            ExpectedApiSchemaExceptionMessage = $"{nameof(ApiSchema)} initialization failed.",
+            ExpectedValidationResults =
+            [
+                $"{nameof(ApiEnumType)}[\"Evoogle.ApiFramework.Schema.ApiEnumTypeTests+SampleEnum\"][\"SampleEnum\"].{nameof(ApiEnumValue)} unable to initialize because duplicate {nameof(ApiEnumValue.ApiName)} values detected: second"
+            ]
         },
 
         // Duplicate CLR enum value names
@@ -208,7 +237,11 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 new("second2", "Second", 2), // Duplicate CLR Name
             ],
             ClrEnumType = typeof(SampleEnum),
-            ExpectedApiSchemaExceptionMessage = $"{nameof(ApiSchema)} initialization failed:\nApiEnumType[\"Evoogle.ApiFramework.Schema.ApiEnumTypeTests+SampleEnum\"][\"SampleEnum\"].ApiEnumValue unable to initialize because duplicate ClrName values detected: Second",
+            ExpectedApiSchemaExceptionMessage = $"{nameof(ApiSchema)} initialization failed.",
+            ExpectedValidationResults =
+            [
+                $"{nameof(ApiEnumType)}[\"Evoogle.ApiFramework.Schema.ApiEnumTypeTests+SampleEnum\"][\"SampleEnum\"].{nameof(ApiEnumValue)} unable to initialize because duplicate {nameof(ApiEnumValue.ClrName)} values detected: Second"
+            ]
         },
 
         // Duplicate CLR enum value ordinals
@@ -222,7 +255,11 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 new("third", "Third", 1), // Duplicate CLR Ordinal
             ],
             ClrEnumType = typeof(SampleEnum),
-            ExpectedApiSchemaExceptionMessage = $"{nameof(ApiSchema)} initialization failed:\nApiEnumType[\"Evoogle.ApiFramework.Schema.ApiEnumTypeTests+SampleEnum\"][\"SampleEnum\"].ApiEnumValue unable to initialize because duplicate ClrOrdinal values detected: 1",
+            ExpectedApiSchemaExceptionMessage = $"{nameof(ApiSchema)} initialization failed.",
+            ExpectedValidationResults =
+            [
+                $"{nameof(ApiEnumType)}[\"Evoogle.ApiFramework.Schema.ApiEnumTypeTests+SampleEnum\"][\"SampleEnum\"].{nameof(ApiEnumValue)} unable to initialize because duplicate {nameof(ApiEnumValue.ClrOrdinal)} values detected: 1"
+            ]
         },
 
         // CLR type is not an enum
@@ -236,7 +273,11 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 new("third", "Third", 2),
             ],
             ClrEnumType = typeof(string), // Using a non-enum type
-            ExpectedApiSchemaExceptionMessage = $"{nameof(ApiSchema)} initialization failed:\nApiEnumType[\"System.String\"][\"SampleEnum\"].ClrType must be a CLR enum type.",
+            ExpectedApiSchemaExceptionMessage = $"{nameof(ApiSchema)} initialization failed.",
+            ExpectedValidationResults =
+            [
+                $"{nameof(ApiEnumType)}[\"System.String\"][\"SampleEnum\"].{nameof(ApiEnumType.ClrType)} must be a CLR enum type."
+            ]
         },
     ];
 
