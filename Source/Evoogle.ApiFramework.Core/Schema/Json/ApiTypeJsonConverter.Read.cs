@@ -10,6 +10,9 @@ using static Evoogle.ApiFramework.Schema.Json.Internal.ApiJsonConverterHelpers;
 
 namespace Evoogle.ApiFramework.Schema.Json;
 
+/// <summary>
+///     Partial implementation of <see cref="ApiTypeJsonConverter"/> that handles JSON reading.
+/// </summary>
 public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
 {
     #region Read Types
