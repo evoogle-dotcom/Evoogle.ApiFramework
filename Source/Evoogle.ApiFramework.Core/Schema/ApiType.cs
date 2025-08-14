@@ -35,6 +35,7 @@ public abstract class ApiType : ExtensibleBase
     #endregion
 
     #region ApiType Methods
-    internal virtual void Initialize(ApiSchema apiSchema, ref List<ValidationResult>? results) { }
+    internal virtual void Initialize(ApiSchema apiSchema, ref List<ValidationResult>? results)
+    { }
     #endregion
 }

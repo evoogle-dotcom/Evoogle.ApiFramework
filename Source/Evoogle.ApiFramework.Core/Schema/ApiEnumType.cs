@@ -126,7 +126,9 @@ public sealed class ApiEnumType(string apiName, IEnumerable<ApiEnumValue> apiEnu
     private void InitializeClrType(ApiSchema _, ref List<ValidationResult>? results)
     {
         if (this.ClrType is null)
+        {
             return;
+        }
 
         if (!TypeReflection.IsEnum(this.ClrType))
         {

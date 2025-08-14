@@ -1,7 +1,5 @@
-﻿# EditorConfig is awesome: https://EditorConfig.org
-
-# top-most EditorConfig file
-root = true  # Marks this as the root .editorconfig; stops searching parent dirs
+﻿# Root editorconfig
+root = true
 
 # Exclude generated directories
 [bin/**]  # Match all files under bin/ folder
@@ -10,125 +8,143 @@ generated_code = true  # Treats matched files as generated code; often skipped b
 [obj/**]  # Match all files under obj/ folder
 generated_code = true  # Treats matched files as generated code; often skipped by analyzers
 
+# =========================================================
+# Core formatting
+# =========================================================
+
 [*]
 charset = utf-8-bom  # Use UTF-8 encoding with BOM (Byte Order Mark)
 end_of_line = crlf  # Use CRLF (Windows-style) line endings
 indent_size = 4  # Use 4 spaces per indentation level
 indent_style = space  # Use spaces instead of tabs for indentation
 insert_final_newline = true  # Ensure file ends with a newline
+max_line_length = 100 # Maximum line length of 100 characters
+tab_width = 4 # Use 4 spaces per indentation level
 trim_trailing_whitespace = true  # Remove any whitespace at the end of lines
 
-[*.json,*.xml]
-indent_size = 4  # Use 4 spaces per indentation level
-indent_style = space  # Use spaces instead of tabs for indentation
+# Using directives: outside namespace; System first
+csharp_using_directive_placement = outside_namespace:error
+dotnet_sort_system_directives_first = true
 
-[*.csproj,*.sln]
-indent_size = 4  # Use 4 spaces per indentation level
-indent_style = space  # Use spaces instead of tabs for indentation
+# Namespace declarations: file-scoped
+csharp_style_namespace_declarations = file_scoped:error
 
-[*.cs]
-# File encoding and line formatting
-charset = utf-8-bom  # Use UTF-8 encoding with BOM (Byte Order Mark)
-end_of_line = crlf  # Use Windows-style line endings
-indent_size = 4  # Use 4 spaces per indentation level
-indent_style = space  # Use spaces instead of tabs
-insert_final_newline = true  # Ensure file ends with a newline
-trim_trailing_whitespace = true  # Remove trailing whitespace on save
+# Newline/brace rules
+csharp_new_line_before_open_brace = all
+csharp_new_line_before_else = true
+csharp_prefer_braces = true:error
 
-# Bracing, indentation, and formatting rules
-csharp_indent_case_contents = true  # Indent contents inside switch 'case' blocks
-csharp_indent_labels = one_less_than_current  # Label indentation is one level less than current scope
-csharp_indent_switch_labels = true  # Indent case/default labels inside switch blocks
-csharp_new_line_before_open_brace = all  # Always place braces on a new line for all constructs
-csharp_preserve_single_line_statements = true  # Preserve single-line blocks like 'if (x) return y;'
-csharp_prefer_braces = when_multiline:suggestion  # Prefer braces for multiline statements
-csharp_prefer_simple_using_statement = true:suggestion  # Prefer C# 8+ simple using statements
-csharp_prefer_static_local_function = true:suggestion  # Mark local functions static when possible
-csharp_prefer_switch_expression = true:suggestion  # Prefer using switch expressions
+# Braces should always be on their own line, even if the block is empty
+csharp_style_allow_embedded_statements_on_same_line = false
+
+# Allow blank lines between consecutive braces for clarity
+csharp_style_allow_blank_lines_between_consecutive_braces = true
+
+# Spacing
+csharp_space_after_keywords_in_control_flow_statements = true
+csharp_space_after_comma = true
+csharp_space_between_parentheses = false
+csharp_space_around_binary_operators = before_and_after
+
+# var usage
+csharp_style_var_when_type_is_apparent = true:error
+csharp_style_var_for_built_in_types = true:error
+csharp_style_var_elsewhere = true:error
 
 # Expression-bodied members
-csharp_style_expression_bodied_accessors = when_on_single_line:suggestion
-csharp_style_expression_bodied_constructors = when_on_single_line:suggestion
-csharp_style_expression_bodied_indexers = when_on_single_line:suggestion
-csharp_style_expression_bodied_lambdas = true:suggestion
-csharp_style_expression_bodied_local_functions = when_on_single_line:suggestion
-csharp_style_expression_bodied_methods = when_on_single_line:suggestion
-csharp_style_expression_bodied_operators = when_on_single_line:suggestion
-csharp_style_expression_bodied_properties = when_on_single_line:suggestion
+csharp_style_expression_bodied_properties = when_possible:error
+csharp_style_expression_bodied_methods = never:error
 
-# Qualification preferences for clarity/control
-dotnet_style_qualification_for_event = true:suggestion  # Require 'this.' for events
-dotnet_style_qualification_for_field = false:suggestion  # Don't require 'this.' for fields
-dotnet_style_qualification_for_method = true:suggestion  # Require 'this.' for methods
-dotnet_style_qualification_for_property = true:suggestion  # Require 'this.' for properties
+# Prefer readonly/const where applicable
+dotnet_style_readonly_field = true:error
+csharp_style_prefer_readonly_struct = true:error
+csharp_style_prefer_static_local_function = true:error
 
-# 'var' usage preferences
-csharp_style_var_for_built_in_types = true:suggestion  # Prefer 'var' for built-in types
-csharp_style_var_when_type_is_apparent = true:suggestion  # Prefer 'var' when type is obvious
-csharp_style_var_elsewhere = true:suggestion  # Prefer 'var' even when not obvious
+# Modifier order
+csharp_preferred_modifier_order = public,protected,internal,private,new,abstract,virtual,override,sealed,static,readonly,extern,unsafe,volatile,async:error
+dotnet_style_require_accessibility_modifiers = for_non_interface_members:error
 
-# Pattern matching preferences
-csharp_style_pattern_matching_over_as_with_null_check = true:suggestion  # Prefer 'is' pattern over 'as' and null check
-csharp_style_pattern_matching_over_is_with_cast_check = true:suggestion  # Prefer pattern matching over 'is + cast'
-csharp_style_prefer_pattern_matching = true:suggestion  # Prefer pattern matching when available
+# Pattern preferences
+csharp_style_deconstructed_variable_declaration = true:error
+csharp_style_pattern_local_over_anonymous_function = true:error
+csharp_style_prefer_switch_expression = true:error
 
-# Null-check and conditional logic
-csharp_style_conditional_delegate_call = true:suggestion  # Use ?.Invoke() for delegates
-csharp_style_prefer_coalesce_expression = true:suggestion  # Use null-coalescing operator (??)
-csharp_style_prefer_conditional_expression_over_assignment = true:suggestion  # Use ternary in assignments
-csharp_style_prefer_conditional_expression_over_return = true:suggestion  # Use ternary in return statements
-csharp_style_prefer_null_check_over_type_check = true:suggestion  # Prefer null-check when possible
+# =========================================================
+# Naming conventions
+# =========================================================
 
-# Object and collection initializers
-csharp_style_prefer_object_initializer = true:suggestion  # Prefer object initializers
-csharp_style_prefer_collection_initializer = true:suggestion  # Prefer collection initializers
+# ---------- Styles ----------
+dotnet_naming_style.pascal_case.capitalization = pascal_case
+dotnet_naming_style.pascal_case.required_prefix =
+dotnet_naming_style.camel_case.capitalization = camel_case
+dotnet_naming_style.camel_case.required_prefix =
+dotnet_naming_style.underscore_camel.capitalization = camel_case
+dotnet_naming_style.underscore_camel.required_prefix = _
+dotnet_naming_style.interface_pascal_with_i.capitalization = pascal_case
+dotnet_naming_style.interface_pascal_with_i.required_prefix = I
 
-# Discards
-csharp_style_unused_value_assignment_preference = discard_variable:suggestion  # Use '_ = ' when discarding
-csharp_style_unused_value_expression_statement_preference = discard_variable:suggestion  # Use '_ = ' for discard expressions
+# ---------- Symbols ----------
+dotnet_naming_symbols.public_api.applicable_kinds = namespace,class,struct,enum,delegate,interface,property,method,field,event
+dotnet_naming_symbols.public_api.applicable_accessibilities = public
+dotnet_naming_symbols.public_api.required_modifiers =
 
-# Tuples and anonymous types
-csharp_style_prefer_inferred_tuple_names = true:suggestion  # Prefer inferred tuple names
-csharp_style_prefer_inferred_anonymous_type_member_names = true:suggestion  # Prefer inferred anonymous type member names
+dotnet_naming_symbols.nonpublic_instance_fields.applicable_kinds = field
+dotnet_naming_symbols.nonpublic_instance_fields.applicable_accessibilities = private,protected,internal,protected_internal
+dotnet_naming_symbols.nonpublic_instance_fields.required_modifiers =
 
-# Default literal
-csharp_style_prefer_default_literal = true:suggestion  # Prefer 'default' instead of 'default(Type)'
+dotnet_naming_symbols.nonpublic_properties.applicable_kinds = property
+dotnet_naming_symbols.nonpublic_properties.applicable_accessibilities = private,protected,internal,protected_internal
+dotnet_naming_symbols.nonpublic_properties.required_modifiers =
 
-# Index and range operators
-csharp_style_prefer_index_operator = true:suggestion  # Prefer ^1 over array.Length - 1
-csharp_style_prefer_range_operator = true:suggestion  # Prefer x[1..^1] over slicing helpers
+dotnet_naming_symbols.interfaces.applicable_kinds = interface
+dotnet_naming_symbols.interfaces.applicable_accessibilities = *
+dotnet_naming_symbols.interfaces.required_modifiers =
 
-# File-local types (C# 11+)
-csharp_style_prefer_file_local_type = true:suggestion  # Prefer file-local types for privacy
+dotnet_naming_symbols.enums.applicable_kinds = enum
+dotnet_naming_symbols.enums.applicable_accessibilities = *
+dotnet_naming_symbols.enums.required_modifiers =
 
-# Primary constructors (C# 12+)
-csharp_style_prefer_primary_constructors = true:suggestion  # Prefer primary constructors when available
+dotnet_naming_symbols.enum_members.applicable_kinds = enum_member
+dotnet_naming_symbols.enum_members.applicable_accessibilities = *
+dotnet_naming_symbols.enum_members.required_modifiers =
 
-# Namespaces
-csharp_style_namespace_declarations = file_scoped:suggestion  # Use file-scoped namespaces (C# 10+)
+dotnet_naming_symbols.locals.applicable_kinds = local
+dotnet_naming_symbols.locals.applicable_accessibilities = *
+dotnet_naming_symbols.locals.required_modifiers =
 
-# Formatting diagnostic severity
-dotnet_diagnostic.IDE0055.severity = warning  # Warn when formatting does not match .editorconfig
+dotnet_naming_symbols.parameters.applicable_kinds = parameter
+dotnet_naming_symbols.parameters.applicable_accessibilities = *
+dotnet_naming_symbols.parameters.required_modifiers =
 
-# System using directive order
-dotnet_sort_system_directives_first = true  # Place 'using System.*' before other using directives
+# ---------- Rules ----------
+dotnet_naming_rule.public_api_pascal.symbols = public_api
+dotnet_naming_rule.public_api_pascal.style = pascal_case
+dotnet_naming_rule.public_api_pascal.severity = error
 
-# Naming rule: private fields must start with _ and use camelCase
-dotnet_naming_rule.private_fields_underscore.style = private_field_style
-dotnet_naming_rule.private_fields_underscore.symbols = private_fields
-dotnet_naming_rule.private_fields_underscore.severity = suggestion
+dotnet_naming_rule.interfaces_ipascal.symbols = interfaces
+dotnet_naming_rule.interfaces_ipascal.style = interface_pascal_with_i
+dotnet_naming_rule.interfaces_ipascal.severity = error
 
-dotnet_naming_symbols.private_fields.applicable_kinds = field
-dotnet_naming_symbols.private_fields.applicable_accessibilities = private
-dotnet_naming_symbols.private_fields.required_modifiers =
+dotnet_naming_rule.enums_pascal.symbols = enums
+dotnet_naming_rule.enums_pascal.style = pascal_case
+dotnet_naming_rule.enums_pascal.severity = error
 
-dotnet_naming_style.private_field_style.required_prefix = _
-dotnet_naming_style.private_field_style.capitalization = camel_case
+dotnet_naming_rule.enum_members_pascal.symbols = enum_members
+dotnet_naming_rule.enum_members_pascal.style = pascal_case
+dotnet_naming_rule.enum_members_pascal.severity = error
 
-# File header template
-file_header_template =
-// Copyright (c) 2024-2025 Evoogle.com
-// SPDX-License-Identifier: MIT
-//
-// This file is licensed under the MIT License.
-// See the LICENSE file in the project root for more information.
+dotnet_naming_rule.nonpublic_fields_underscore_camel.symbols = nonpublic_instance_fields
+dotnet_naming_rule.nonpublic_fields_underscore_camel.style = underscore_camel
+dotnet_naming_rule.nonpublic_fields_underscore_camel.severity = error
+
+dotnet_naming_rule.nonpublic_properties_pascal.symbols = nonpublic_properties
+dotnet_naming_rule.nonpublic_properties_pascal.style = pascal_case
+dotnet_naming_rule.nonpublic_properties_pascal.severity = error
+
+dotnet_naming_rule.locals_camel.symbols = locals
+dotnet_naming_rule.locals_camel.style = camel_case
+dotnet_naming_rule.locals_camel.severity = error
+
+dotnet_naming_rule.parameters_camel.symbols = parameters
+dotnet_naming_rule.parameters_camel.style = camel_case
+dotnet_naming_rule.parameters_camel.severity = error

@@ -122,7 +122,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
 
         #region ApiEnumValue Fields
         public readonly Dictionary<string, ApiJsonReaderHandler<ReadContext>> ApiEnumValuePropertyHandlers = new()
-        {
+    {
             { propertyNames.ApiEnumValue.ApiName, HandleApiEnumValueApiName },
             { propertyNames.ApiEnumValue.ClrName, HandleApiEnumValueClrName },
             { propertyNames.ApiEnumValue.ClrOrdinal, HandleApiEnumValueClrOrdinal },
@@ -131,7 +131,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
 
         #region ApiProperty Fields
         public readonly Dictionary<string, ApiJsonReaderHandler<ReadContext>> ApiPropertyPropertyHandlers = new()
-        {
+    {
             { propertyNames.ApiProperty.ApiName, HandleApiPropertyApiName },
             { propertyNames.ApiProperty.ApiTypeModifiers, HandleApiPropertyApiTypeModifiers },
             { propertyNames.ApiProperty.ApiTypeExpression, HandleApiPropertyApiTypeExpression },
@@ -141,7 +141,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
 
         #region ApiRelationship Fields
         public readonly Dictionary<string, ApiJsonReaderHandler<ReadContext>> ApiRelationshipPropertyHandlers = new()
-        {
+    {
             { propertyNames.ApiRelationship.ApiName, HandleApiRelationshipApiName },
             { propertyNames.ApiRelationship.ApiPropertyName, HandleApiRelationshipApiPropertyName },
         };
@@ -149,7 +149,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
 
         #region ApiTypeExpression Fields
         public readonly Dictionary<string, ApiJsonReaderHandler<ReadContext>> ApiTypeExpressionHandlers = new()
-        {
+    {
             { propertyNames.ApiTypeExpression.ApiInlineType, HandleApiTypeExpressionApiInlineType },
             { propertyNames.ApiTypeExpression.ApiName, HandleApiTypeExpressionApiName },
             { propertyNames.ApiTypeExpression.ClrType, HandleApiTypeExpressionClrType },
@@ -159,7 +159,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
 
         #region ApiType Fields
         public readonly Dictionary<string, ApiJsonReaderHandler<ReadContext>> ApiTypePropertyHandlers = new()
-        {
+    {
             // ApiCollectionType Property Handlers
             { propertyNames.ApiCollectionType.ApiItemTypeExpression, HandleApiCollectionTypeApiItemTypeExpression },
             { propertyNames.ApiCollectionType.ApiItemTypeModifiers, HandleApiCollectionTypeApiItemTypeModifiers },
@@ -217,7 +217,9 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         {
             ReadJsonObject<ApiTypeJsonConverter, ReadContext>(ref reader, ref context, (x) => x.ReadHandlers.ApiEnumValuePropertyHandlers);
             if (context.ReadData.ApiEnumValue == null)
+            {
                 return;
+            }
 
             context.ReadData.ApiEnumType!.ApiEnumValues!.Add(context.ReadData.ApiEnumValue);
 
@@ -271,7 +273,9 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         {
             ReadJsonObject<ApiTypeJsonConverter, ReadContext>(ref reader, ref context, (x) => x.ReadHandlers.ApiPropertyPropertyHandlers);
             if (context.ReadData.ApiProperty == null)
+            {
                 return;
+            }
 
             context.ReadData.ApiObjectType!.ApiProperties!.Add(context.ReadData.ApiProperty);
 
@@ -291,7 +295,9 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         {
             ReadJsonObject<ApiTypeJsonConverter, ReadContext>(ref reader, ref context, (x) => x.ReadHandlers.ApiRelationshipPropertyHandlers);
             if (context.ReadData.ApiRelationship == null)
+            {
                 return;
+            }
 
             context.ReadData.ApiObjectType!.ApiRelationships!.Add(context.ReadData.ApiRelationship);
 

@@ -44,7 +44,9 @@ internal static class ApiJsonConverterHelpers
         // Ensure we are at the start of an array.
         // If not, throw an exception to indicate that we expected an array.
         if (reader.TokenType != JsonTokenType.StartArray)
+        {
             throw new JsonException("Expected start of an array.");
+        }
 
         var index = -1;
         var handler = arrayElementHandlerAccessor(context);
@@ -53,7 +55,9 @@ internal static class ApiJsonConverterHelpers
             // Check for end of the array.
             // If we reach the end, break out of the loop.
             if (reader.TokenType == JsonTokenType.EndArray)
+            {
                 break;
+            }
 
             // Increment the index for each element read.
             // This helps in tracking the position of the element in the array.
@@ -85,7 +89,9 @@ internal static class ApiJsonConverterHelpers
         // Ensure we are at the start of an object.
         // If not, throw an exception to indicate that we expected an object.
         if (reader.TokenType != JsonTokenType.StartObject)
+        {
             throw new JsonException("Expected start of an object.");
+        }
 
         var handlers = propertyHandlersAccessor(context);
         while (reader.Read())
@@ -93,12 +99,16 @@ internal static class ApiJsonConverterHelpers
             // Check for end of the object.
             // If we reach the end, break out of the loop.
             if (reader.TokenType == JsonTokenType.EndObject)
+            {
                 break;
+            }
 
             // If we are not at a property name, throw an exception.
             // This ensures we are reading a valid JSON object.
             if (reader.TokenType != JsonTokenType.PropertyName)
+            {
                 throw new JsonException("Expected object property name.");
+            }
 
             // Read the property name.
             var propertyName = reader.GetString()!;
@@ -106,7 +116,9 @@ internal static class ApiJsonConverterHelpers
             // Read the property value.
             var readSuccess = reader.Read();
             if (!readSuccess)
+            {
                 throw new JsonException($"Failed to read value for property '{propertyName}'.");
+            }
 
             // Handle null property values.
             if (reader.TokenType == JsonTokenType.Null)
@@ -144,17 +156,23 @@ internal static class ApiJsonConverterHelpers
     )
     {
         if (reader.TokenType != JsonTokenType.StartObject)
+        {
             throw new JsonException("Expected start of an object.");
+        }
 
         var extensions = new Dictionary<string, object>();
 
         while (reader.Read())
         {
             if (reader.TokenType == JsonTokenType.EndObject)
+            {
                 break;
+            }
 
             if (reader.TokenType != JsonTokenType.PropertyName)
+            {
                 throw new JsonException("Expected object property name.");
+            }
 
             var typeName = reader.GetString()!;
             var extensionType = TypeJsonConverter.GetDeserializeType(typeName);
@@ -206,7 +224,9 @@ internal static class ApiJsonConverterHelpers
     )
     {
         if (extensions == null)
+        {
             return;
+        }
 
         foreach ((var typeName, var extension) in extensions)
         {
@@ -244,15 +264,21 @@ internal static class ApiJsonConverterHelpers
         where TException : Exception
     {
         if (validationResults == null)
+        {
             return;
+        }
 
         if (validationResults.Any() == false)
+        {
             return;
+        }
 
         // Create a delimited string of all the failed validation result error messages.
         var validationErrorMessage = validationResults.Where(x => x != ValidationResult.Success && !string.IsNullOrWhiteSpace(x.ErrorMessage)).SafeToDelimitedString('\n');
         if (string.IsNullOrWhiteSpace(validationErrorMessage))
+        {
             return;
+        }
 
         context.Logger.LogError("Validation failed for '{TypeName}': {Message}", typeName, validationErrorMessage);
 

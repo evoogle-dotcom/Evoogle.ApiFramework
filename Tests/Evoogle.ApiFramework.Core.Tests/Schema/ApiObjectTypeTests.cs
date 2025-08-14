@@ -229,7 +229,9 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
         protected override void Act()
         {
             if (this.TryGetMethod is null)
+            {
                 throw new InvalidOperationException($"{nameof(this.TryGetMethod)} is null.");
+            }
 
             this.ActualFound = this.TryGetMethod.Value switch
             {

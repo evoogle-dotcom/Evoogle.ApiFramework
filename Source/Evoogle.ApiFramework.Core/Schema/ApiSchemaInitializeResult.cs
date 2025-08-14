@@ -35,7 +35,9 @@ public sealed class ApiSchemaInitializeResult(IEnumerable<ValidationResult>? val
     public void ThrowIfInvalid()
     {
         if (this.Success)
+        {
             return;
+        }
 
         throw new ApiSchemaValidationException($"{nameof(ApiSchema)} initialization failed.", this.ValidationResults!);
     }

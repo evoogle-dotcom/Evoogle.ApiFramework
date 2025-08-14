@@ -24,7 +24,9 @@ public static class ApiObjectTypeExtensions
     public static ApiProperty GetPropertyByApiName(this ApiObjectType apiObjectType, string apiName)
     {
         if (apiObjectType.TryGetPropertyByApiName(apiName, out var apiProperty))
+        {
             return apiProperty!;
+        }
 
         throw new ApiSchemaException($"{nameof(ApiProperty)} with {nameof(ApiProperty.ApiName)} '{apiName}' was not found in {apiObjectType.SafeToString()}.");
     }
@@ -39,7 +41,9 @@ public static class ApiObjectTypeExtensions
     public static ApiProperty GetPropertyByClrName(this ApiObjectType apiObjectType, string clrName)
     {
         if (apiObjectType.TryGetPropertyByClrName(clrName, out var apiProperty))
+        {
             return apiProperty!;
+        }
 
         throw new ApiSchemaException($"{nameof(ApiProperty)} with {nameof(ApiProperty.ClrName)} '{clrName}' was not found in {apiObjectType.SafeToString()}.");
     }
@@ -54,7 +58,9 @@ public static class ApiObjectTypeExtensions
     public static ApiRelationship GetRelationshipByApiName(this ApiObjectType apiObjectType, string apiName)
     {
         if (apiObjectType.TryGetRelationshipByApiName(apiName, out var apiRelationship))
+        {
             return apiRelationship!;
+        }
 
         throw new ApiSchemaException($"{nameof(ApiRelationship)} with {nameof(ApiRelationship.ApiName)} '{apiName}' was not found in {apiObjectType.SafeToString()}.");
     }

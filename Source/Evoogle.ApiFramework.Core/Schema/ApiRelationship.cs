@@ -87,9 +87,13 @@ public sealed class ApiRelationship(string apiName, string? apiPropertyName = nu
         var apiPropertyName = this.ApiPropertyName.SafeToString();
 
         if (apiName.Equals(apiPropertyName, StringComparison.OrdinalIgnoreCase))
+        {
             return $"{nameof(ApiRelationship)} {{{nameof(this.ApiName)}={apiName}}}";
+        }
         else
+        {
             return $"{nameof(ApiRelationship)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ApiPropertyName)}={apiPropertyName}}}";
+        }
     }
     #endregion
 

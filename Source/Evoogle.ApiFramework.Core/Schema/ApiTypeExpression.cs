@@ -130,7 +130,9 @@ public sealed class ApiTypeExpression
         this.InitializeApiTypeByInline(apiSchema, ref results);
 
         if (_apiResolvedType is not null)
+        {
             return;
+        }
 
         // Try and resolve API type with API named reference or CLR type reference if applicable
         if (this.IsApiNamedReference)
@@ -143,7 +145,9 @@ public sealed class ApiTypeExpression
         }
 
         if (_apiResolvedType is not null)
+        {
             return;
+        }
 
         // Unable to resolve API type with either an API named reference or a CLR type reference.
         this.ValidateKind(apiSchema, apiValidationPath, ref results);
@@ -224,7 +228,9 @@ public sealed class ApiTypeExpression
         if (this.ApiInlineType is not null)
         {
             if (this.ApiInlineType is ApiCollectionType collection)
+            {
                 collection.Initialize(apiSchema, ref results);
+            }
 
             _apiResolvedType = this.ApiInlineType;
         }

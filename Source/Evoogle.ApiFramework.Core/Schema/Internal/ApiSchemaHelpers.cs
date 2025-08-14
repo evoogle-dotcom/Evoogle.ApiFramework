@@ -22,7 +22,9 @@ internal static class ApiSchemaHelpers
     public static T ThrowIfNotInitialized<T>(this object obj, T? value)
     {
         if (value is not null)
+        {
             return value;
+        }
 
         var typeName = obj.GetType().Name;
         throw new ApiSchemaException($"{typeName} has not been initialized. Initialize the {nameof(ApiSchema)} before accessing.");
@@ -37,7 +39,9 @@ internal static class ApiSchemaHelpers
             .ToList();
 
         if (duplicates.Count == 0)
+        {
             return false;
+        }
 
         var duplicatesString = duplicates.SafeToDelimitedString(',');
         var partTypeName = typeof(TPart).Name;

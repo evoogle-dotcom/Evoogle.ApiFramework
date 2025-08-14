@@ -12,7 +12,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 /// </summary>
 public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) : ExtensionBuilder<ApiSchemaBuilder>
 {
-    #region 
+    #region Fields
     private string? _apiName;
     private string? _apiVersion;
 

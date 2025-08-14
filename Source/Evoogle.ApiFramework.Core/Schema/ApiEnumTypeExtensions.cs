@@ -24,7 +24,9 @@ public static class ApiEnumTypeExtensions
     public static ApiEnumValue GetValueByApiName(this ApiEnumType apiEnumType, string apiName)
     {
         if (apiEnumType.TryGetValueByApiName(apiName, out var apiEnumValue))
+        {
             return apiEnumValue!;
+        }
 
         throw new ApiSchemaException($"{nameof(ApiEnumValue)} with {nameof(ApiEnumValue.ApiName)} '{apiName}' was not found in {apiEnumType.SafeToString()}.");
     }
@@ -39,7 +41,9 @@ public static class ApiEnumTypeExtensions
     public static ApiEnumValue GetValueByClrName(this ApiEnumType apiEnumType, string clrName)
     {
         if (apiEnumType.TryGetValueByClrName(clrName, out var apiEnumValue))
+        {
             return apiEnumValue!;
+        }
 
         throw new ApiSchemaException($"{nameof(ApiEnumValue)} with {nameof(ApiEnumValue.ClrName)} '{clrName}' was not found in {apiEnumType.SafeToString()}.");
     }
@@ -54,7 +58,9 @@ public static class ApiEnumTypeExtensions
     public static ApiEnumValue GetValueByClrOrdinal(this ApiEnumType apiEnumType, int clrOrdinal)
     {
         if (apiEnumType.TryGetValueByClrOrdinal(clrOrdinal, out var apiEnumValue))
+        {
             return apiEnumValue!;
+        }
 
         throw new ApiSchemaException($"{nameof(ApiEnumValue)} with {nameof(ApiEnumValue.ClrOrdinal)} '{clrOrdinal}' was not found in {apiEnumType.SafeToString()}.");
     }

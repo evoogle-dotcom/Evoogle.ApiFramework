@@ -24,7 +24,9 @@ public static class ApiSchemaExtensions
     public static ApiNamedType GetApiType(this ApiSchema apiSchema, string apiName)
     {
         if (apiSchema.TryGetApiType(apiName, out var result))
+        {
             return result!;
+        }
 
         throw new ApiSchemaException($"{nameof(ApiNamedType)} with {nameof(ApiNamedType.ApiName)} '{apiName}' was not found in {apiSchema.SafeToString()}.");
     }
@@ -39,7 +41,9 @@ public static class ApiSchemaExtensions
     public static ApiNamedType GetApiType(this ApiSchema apiSchema, Type clrType)
     {
         if (apiSchema.TryGetApiType(clrType, out var result))
+        {
             return result!;
+        }
 
         throw new ApiSchemaException($"{nameof(ApiNamedType)} with {nameof(ApiType.ClrType)} '{clrType.FullName}' was not found in {apiSchema.SafeToString()}.");
     }
@@ -54,7 +58,9 @@ public static class ApiSchemaExtensions
     public static ApiEnumType GetApiEnumType(this ApiSchema apiSchema, string apiName)
     {
         if (apiSchema.TryGetApiEnumType(apiName, out var result))
+        {
             return result!;
+        }
 
         throw new ApiSchemaException($"{nameof(ApiEnumType)} with {nameof(ApiNamedType.ApiName)} '{apiName}' was not found in {apiSchema.SafeToString()}.");
     }
@@ -69,7 +75,9 @@ public static class ApiSchemaExtensions
     public static ApiEnumType GetApiEnumType(this ApiSchema apiSchema, Type clrType)
     {
         if (apiSchema.TryGetApiEnumType(clrType, out var result))
+        {
             return result!;
+        }
 
         throw new ApiSchemaException($"{nameof(ApiEnumType)} with {nameof(ApiType.ClrType)} '{clrType.FullName}' was not found in {apiSchema.SafeToString()}.");
     }
@@ -84,7 +92,9 @@ public static class ApiSchemaExtensions
     public static ApiObjectType GetApiObjectType(this ApiSchema apiSchema, string apiName)
     {
         if (apiSchema.TryGetApiObjectType(apiName, out var result))
+        {
             return result!;
+        }
 
         throw new ApiSchemaException($"{nameof(ApiObjectType)} with {nameof(ApiNamedType.ApiName)} '{apiName}' was not found in {apiSchema.SafeToString()}.");
     }
@@ -99,7 +109,9 @@ public static class ApiSchemaExtensions
     public static ApiObjectType GetApiObjectType(this ApiSchema apiSchema, Type clrType)
     {
         if (apiSchema.TryGetApiObjectType(clrType, out var result))
+        {
             return result!;
+        }
 
         throw new ApiSchemaException($"{nameof(ApiObjectType)} with {nameof(ApiType.ClrType)} '{clrType.FullName}' was not found in {apiSchema.SafeToString()}.");
     }
@@ -114,7 +126,9 @@ public static class ApiSchemaExtensions
     public static ApiScalarType GetApiScalarType(this ApiSchema apiSchema, string apiName)
     {
         if (apiSchema.TryGetApiScalarType(apiName, out var result))
+        {
             return result!;
+        }
 
         throw new ApiSchemaException($"{nameof(ApiScalarType)} with {nameof(ApiNamedType.ApiName)} '{apiName}' was not found in {apiSchema.SafeToString()}.");
     }
@@ -129,7 +143,9 @@ public static class ApiSchemaExtensions
     public static ApiScalarType GetApiScalarType(this ApiSchema apiSchema, Type clrType)
     {
         if (apiSchema.TryGetApiScalarType(clrType, out var result))
+        {
             return result!;
+        }
 
         throw new ApiSchemaException($"{nameof(ApiScalarType)} with {nameof(ApiType.ClrType)} '{clrType.FullName}' was not found in {apiSchema.SafeToString()}.");
     }

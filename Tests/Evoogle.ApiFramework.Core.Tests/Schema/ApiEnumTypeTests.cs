@@ -167,7 +167,9 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
         protected override void Act()
         {
             if (this.TryGetMethod is null)
+            {
                 throw new InvalidOperationException($"{nameof(this.TryGetMethod)} is null.");
+            }
 
             var inputValue = this.Input;
             if (inputValue is JsonElement jsonElement)

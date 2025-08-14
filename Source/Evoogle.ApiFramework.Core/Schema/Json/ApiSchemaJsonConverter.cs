@@ -119,7 +119,7 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
     {
         #region ApiSchema Fields
         public readonly Dictionary<string, ApiJsonReaderHandler<ReadContext>> PropertyHandlers = new()
-        {
+    {
             // ApiSchema Property Handlers
             { propertyNames.ApiSchema.ApiName, HandleApiSchemaApiName },
             { propertyNames.ApiSchema.ApiVersion, HandleApiSchemaApiVersion },
@@ -222,7 +222,9 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
     public override ApiSchema? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
         if (reader.TokenType == JsonTokenType.Null)
+        {
             return null;
+        }
 
         var propertyNamingPolicy = GetPropertyNamingPolicy(options);
         var propertyNames = GetPropertyNames(propertyNamingPolicy);
