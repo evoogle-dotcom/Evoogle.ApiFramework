@@ -3,58 +3,120 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using Evoogle.ApiFramework.Schema;
-using Evoogle.ApiFramework.Schema.Configuration;
+using Evoogle.Extensions;
 using Evoogle.XUnit;
+
 using FluentAssertions;
 
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
-public class ApiPropertyBuilderTests(ITestOutputHelper output) : XUnitTests(output)
+public class ApiPropertyBuilderTests(ITestOutputHelper output) : ApiBuilderTests(output)
 {
-    private class Sample
-    {
-        public string Name { get; set; } = string.Empty;
-    }
-
-    private sealed class TestExtension
-    {
-        public bool Flag { get; set; }
-    }
-
+    #region Test Classes
     public class BuildTest : XUnitTest
     {
-        private ApiProperty? ApiProperty { get; set; }
+        #region User Supplied Properties
+        public string ApiName { get; init; } = null!;
+        public string ClrName { get; init; } = null!;
+        public ApiProperty ApiPropertyExpected { get; init; } = null!;
+        public bool? AddExtension { get; init; }
+        #endregion
+
+        #region Calculated Properties
+        private ApiProperty? ApiPropertyActual { get; set; }
+        #endregion
+
+        #region XUnitTest Methods
+        protected override void Arrange()
+        {
+            this.WriteLine($"ApiName: {this.ApiName.SafeToString()}");
+            this.WriteLine($"ClrName: {this.ClrName.SafeToString()}");
+            this.WriteLine($"AddExtension: {this.AddExtension.SafeToString()}");
+            this.WriteLine();
+            this.WriteLine($"Expected: {this.ApiPropertyExpected.SafeToString()}");
+        }
 
         protected override void Act()
         {
-            var builder = new ApiPropertyBuilder("name", nameof(Sample.Name));
-            builder.AddExtension(new TestExtension { Flag = true });
-            var build = typeof(ApiPropertyBuilder).GetMethod("Build", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!;
-            this.ApiProperty = (ApiProperty)build.Invoke(builder, [typeof(Sample)])!;
+            var builder = new ApiPropertyBuilder(this.ApiName, this.ClrName);
+            if (this.AddExtension == true)
+            {
+                builder.AddExtension(TestExtension.Instance());
+            }
+
+            this.ApiPropertyActual = builder.Build(typeof(TestClass));
+            this.WriteLine();
         }
 
         protected override void Assert()
         {
-            this.ApiProperty.Should().NotBeNull();
-            this.ApiProperty!.ApiName.Should().Be("name");
-            this.ApiProperty.ClrName.Should().Be(nameof(Sample.Name));
-            this.ApiProperty.ApiTypeModifiers.Should().Be(ApiTypeModifiers.Required);
-            this.ApiProperty.Extensions.Should().NotBeNull();
-            this.ApiProperty.Extensions!.ContainsKey(typeof(TestExtension)).Should().BeTrue();
+            this.ApiPropertyActual.Should().NotBeNull();
+            this.ApiPropertyActual.Should().BeEquivalentTo(this.ApiPropertyExpected);
         }
+        #endregion
     }
+    #endregion
+
+    #region Theory Data
+    private static ApiProperty RequiredNameProperty { get; } = new ApiProperty("name", new ApiTypeExpression(typeof(string)), ApiTypeModifiers.Required, nameof(TestClass.RequiredName));
+    private static ApiProperty RequiredNamePropertyWithExtension { get; } = new ApiProperty("name", new ApiTypeExpression(typeof(string)), ApiTypeModifiers.Required, nameof(TestClass.RequiredName))
+    {
+        Extensions = new OrderedDictionary<Type, object>
+        {
+            [typeof(TestExtension)] = TestExtension.Instance()
+        }
+    };
+
+    private static ApiProperty OptionalAgeProperty { get; } = new ApiProperty("age", new ApiTypeExpression(typeof(int)), ApiTypeModifiers.None, nameof(TestClass.OptionalAge));
+    private static ApiProperty OptionalAgePropertyWithExtension { get; } = new ApiProperty("age", new ApiTypeExpression(typeof(int)), ApiTypeModifiers.None, nameof(TestClass.OptionalAge))
+    {
+        Extensions = new OrderedDictionary<Type, object>
+        {
+            [typeof(TestExtension)] = TestExtension.Instance()
+        }
+    };
 
     public static TheoryDataRow<IXUnitTest>[] BuildTheoryData =>
     [
         new BuildTest
         {
-            Name = "Builds property for existing CLR property"
-        }
+            Name = $"Builds {RequiredNameProperty} without extension",
+            ApiName = RequiredNameProperty.ApiName,
+            ClrName = RequiredNameProperty.ClrName,
+            ApiPropertyExpected = RequiredNameProperty,
+            AddExtension = false,
+        },
+        new BuildTest
+        {
+            Name = $"Builds {RequiredNameProperty} with extension",
+            ApiName = RequiredNamePropertyWithExtension.ApiName,
+            ClrName = RequiredNamePropertyWithExtension.ClrName,
+            ApiPropertyExpected = RequiredNamePropertyWithExtension,
+            AddExtension = true,
+        },
+        new BuildTest
+        {
+            Name = $"Builds {OptionalAgeProperty} without extension",
+            ApiName = OptionalAgeProperty.ApiName,
+            ClrName = OptionalAgeProperty.ClrName,
+            ApiPropertyExpected = OptionalAgeProperty,
+            AddExtension = false,
+        },
+        new BuildTest
+        {
+            Name = $"Builds {OptionalAgeProperty} with extension",
+            ApiName = OptionalAgePropertyWithExtension.ApiName,
+            ClrName = OptionalAgePropertyWithExtension.ClrName,
+            ApiPropertyExpected = OptionalAgePropertyWithExtension,
+            AddExtension = true,
+        },
     ];
+    #endregion
 
+    #region Test Methods
     [Theory]
     [MemberData(nameof(BuildTheoryData))]
     public void Build(IXUnitTest test) => test.Execute(this);
+    #endregion
 }
 

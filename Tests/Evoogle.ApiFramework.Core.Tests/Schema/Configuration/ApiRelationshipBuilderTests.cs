@@ -3,9 +3,8 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using Evoogle.ApiFramework.Schema;
-using Evoogle.ApiFramework.Schema.Configuration;
 using Evoogle.XUnit;
+
 using FluentAssertions;
 
 namespace Evoogle.ApiFramework.Schema.Configuration;

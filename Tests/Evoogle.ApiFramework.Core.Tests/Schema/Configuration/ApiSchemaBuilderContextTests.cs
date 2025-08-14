@@ -3,13 +3,13 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using Evoogle.ApiFramework.Schema.Configuration;
 using Evoogle.XUnit;
+
 using FluentAssertions;
 
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
-public class ApiSchemaBuilderContextTests(ITestOutputHelper output) : XUnitTests(output)
+public class ApiSchemaBuilderContextTests(ITestOutputHelper output) : ApiBuilderTests(output)
 {
     public enum BuilderKind
     {
@@ -66,7 +66,7 @@ public class ApiSchemaBuilderContextTests(ITestOutputHelper output) : XUnitTests
         {
             Name = "Enum builder cached",
             Kind = BuilderKind.Enum,
-            ClrType = typeof(ApiEnumTypeBuilderTests.SampleEnum)
+            ClrType = typeof(TestEnum)
         },
         new GetOrAddTest
         {
