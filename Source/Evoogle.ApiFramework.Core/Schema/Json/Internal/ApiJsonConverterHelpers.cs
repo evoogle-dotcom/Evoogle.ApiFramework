@@ -217,6 +217,23 @@ internal static class ApiJsonConverterHelpers
         writer.WriteEndObject();
     }
 
+    public static void WriteExtensibleBaseExtensions<T>
+    (
+        Utf8JsonWriter writer,
+        ExtensibleBase extensibleBase,
+        string propertyName,
+        JsonSerializerOptions options,
+        ILogger<T> logger
+    )
+    {
+        var extensions = extensibleBase.Extensions;
+        if (extensions != null)
+        {
+            writer.WritePropertyName(propertyName);
+            WriteExtensions(writer, extensions, options, logger);
+        }
+    }
+
     public static void AttachExtensions
     (
         ExtensibleBase extensibleBase,

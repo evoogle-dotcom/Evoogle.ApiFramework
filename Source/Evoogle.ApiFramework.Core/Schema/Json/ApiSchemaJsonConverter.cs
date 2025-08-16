@@ -14,6 +14,7 @@ using Evoogle.Logging;
 using Microsoft.Extensions.Logging;
 
 using static Evoogle.ApiFramework.Schema.Json.Internal.ApiJsonConverterHelpers;
+using Evoogle.ApiFramework.Schema.Json.Internal;
 
 namespace Evoogle.ApiFramework.Schema.Json;
 
@@ -100,18 +101,10 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
         #endregion
     }
 
-    private class ExtensibleBaseReadData
-    {
-        #region Properties
-        public Dictionary<string, object>? Extensions { get; set; }
-        #endregion
-    }
-
-    private class ReadData
+    private class ReadData : ExtensibleReadData
     {
         #region Properties
         public ApiSchemaReadData? ApiSchema { get; set; }
-        public ExtensibleBaseReadData? ExtensibleBase { get; set; }
         #endregion
     }
 
@@ -128,7 +121,8 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
             { propertyNames.ApiSchema.ApiObjectTypes, HandleApiObjectTypes },
 
             // ExtensibleBase Property Handlers
-            { propertyNames.ExtensibleBase.Extensions, HandleExtensibleBaseExtensions },
+            { propertyNames.ExtensibleBase.Extensions, (ref Utf8JsonReader reader, ref ReadContext context) =>
+                context.ReadData.Extensions = ReadExtensions(ref reader, context.Options, context.Logger) },
         };
         #endregion
 
@@ -181,13 +175,6 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
         }
         #endregion
 
-        #region ExtensibleBase Methods
-        private static void HandleExtensibleBaseExtensions(ref Utf8JsonReader reader, ref ReadContext context)
-        {
-            context.ReadData.ExtensibleBase ??= new ExtensibleBaseReadData();
-            context.ReadData.ExtensibleBase.Extensions = ReadExtensions(ref reader, context.Options, context.Logger);
-        }
-        #endregion
     }
     #endregion
 
@@ -309,7 +296,7 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
         };
 
         // Attach the extensions if present.
-        var extensions = context.ReadData.ExtensibleBase?.Extensions;
+        var extensions = context.ReadData.Extensions;
         AttachExtensions(apiSchema, extensions);
 
         // Initialize the ApiSchema instance.
@@ -345,7 +332,7 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
 
     private static void WriteApiSchemaEpilog(Utf8JsonWriter writer, ApiSchema apiSchema, WriteContext context)
     {
-        WriteExtensibleBaseExtensions(writer, apiSchema, context);
+        WriteExtensibleBaseExtensions(writer, apiSchema, context.PropertyNames.ExtensibleBase.Extensions, context.Options, context.Logger);
 
         writer.WriteEndObject();
     }
@@ -377,16 +364,5 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
     }
 
     // ExtensibleBase Methods
-    private static void WriteExtensibleBaseExtensions(Utf8JsonWriter writer, ExtensibleBase extensibleBase, WriteContext context)
-    {
-        var extensions = extensibleBase.Extensions;
-        if (extensions != null)
-        {
-            var extensionsPropertyName = context.PropertyNames.ExtensibleBase.Extensions;
-            writer.WritePropertyName(extensionsPropertyName);
-
-            WriteExtensions(writer, extensions, context.Options, context.Logger);
-        }
-    }
     #endregion
 }
