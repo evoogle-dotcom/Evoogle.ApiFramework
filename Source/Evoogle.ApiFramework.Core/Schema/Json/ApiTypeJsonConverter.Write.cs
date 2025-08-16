@@ -10,6 +10,7 @@ using Evoogle.Extension;
 using Evoogle.Json;
 
 using static Evoogle.ApiFramework.Schema.Json.Internal.ApiJsonConverterHelpers;
+using Evoogle.ApiFramework.Schema.Json.Internal;
 
 namespace Evoogle.ApiFramework.Schema.Json;
 
@@ -203,7 +204,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
     private static void WriteApiTypeEpilog(Utf8JsonWriter writer, ApiType apiType, WriteContext context)
     {
         WriteApiTypeClrType(writer, apiType, context);
-        WriteExtensibleBaseExtensions(writer, apiType, context);
+        WriteExtensibleBaseExtensions(writer, apiType, context.PropertyNames.ExtensibleBase.Extensions, context.Options, context.Logger);
 
         writer.WriteEndObject();
     }
@@ -224,17 +225,5 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         WriteApiTypeKind(writer, apiType, context);
     }
 
-    // ExtensibleBase Methods
-    private static void WriteExtensibleBaseExtensions(Utf8JsonWriter writer, ExtensibleBase extensibleBase, WriteContext context)
-    {
-        var extensions = extensibleBase.Extensions;
-        if (extensions != null)
-        {
-            var extensionsPropertyName = context.PropertyNames.ExtensibleBase.Extensions;
-            writer.WritePropertyName(extensionsPropertyName);
-
-            WriteExtensions(writer, extensions, context.Options, context.Logger);
-        }
-    }
     #endregion
 }

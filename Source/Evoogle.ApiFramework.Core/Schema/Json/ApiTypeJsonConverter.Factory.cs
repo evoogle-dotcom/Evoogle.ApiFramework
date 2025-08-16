@@ -52,7 +52,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
 
         apiType ??= new ApiUnknownType();
 
-        var extensions = context.ReadData.ExtensibleBase?.Extensions;
+        var extensions = context.ReadData.Extensions;
         AttachExtensions(apiType, extensions);
 
         return apiType;
