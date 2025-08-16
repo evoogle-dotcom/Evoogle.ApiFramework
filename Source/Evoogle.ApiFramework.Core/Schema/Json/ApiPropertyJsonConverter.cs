@@ -250,7 +250,7 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
         WriteApiPropertyClrName(writer, apiProperty, context);
 
         WriteExtensibleBaseExtensions(writer, apiProperty, context.PropertyNames.ExtensibleBase.Extensions, context.Options, context.Logger);
-        
+
         writer.WriteEndObject();
     }
 
