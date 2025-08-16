@@ -19,7 +19,7 @@ public class ApiPropertyBuilderTests(ITestOutputHelper output) : ApiBuilderTests
         public string ApiName { get; init; } = null!;
         public string ClrName { get; init; } = null!;
         public ApiProperty ApiPropertyExpected { get; init; } = null!;
-        public bool? AddExtension { get; init; }
+        public bool AddExtension { get; init; }
         #endregion
 
         #region Calculated Properties
@@ -45,13 +45,19 @@ public class ApiPropertyBuilderTests(ITestOutputHelper output) : ApiBuilderTests
             }
 
             this.ApiPropertyActual = builder.Build(typeof(TestClass));
-            this.WriteLine();
+            this.WriteLine($"Actual:   {this.ApiPropertyActual.SafeToString()}");
         }
 
         protected override void Assert()
         {
             this.ApiPropertyActual.Should().NotBeNull();
-            this.ApiPropertyActual.Should().BeEquivalentTo(this.ApiPropertyExpected);
+
+            this.ApiPropertyActual.Should().BeEquivalentTo
+            (
+                this.ApiPropertyExpected,
+                opt => opt
+                    .Excluding(p => p.ApiType)
+            );
         }
         #endregion
     }

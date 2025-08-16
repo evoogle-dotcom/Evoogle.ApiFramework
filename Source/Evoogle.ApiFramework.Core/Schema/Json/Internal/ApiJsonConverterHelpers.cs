@@ -238,6 +238,22 @@ internal static class ApiJsonConverterHelpers
 
     #region Utility Methods
     public static JsonNamingPolicy GetPropertyNamingPolicy(JsonSerializerOptions options) => options.PropertyNamingPolicy ?? new NullJsonNamingPolicy();
+
+    public static ApiTypeKind? GetApiTypeKind(ILogger logger, string? kindAsString)
+    {
+        if (kindAsString is null)
+        {
+            return null;
+        }
+
+        if (Enum.TryParse<ApiTypeKind>(kindAsString, out var kind) == false)
+        {
+            logger.LogError("Unable to parse {Kind} enumeration string: '{KindAsString}'", nameof(ApiTypeKind), kindAsString);
+            return null;
+        }
+
+        return kind;
+    }
     #endregion
 
     #region Validation Methods

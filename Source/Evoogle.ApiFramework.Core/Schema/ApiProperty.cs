@@ -4,7 +4,9 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
+using Evoogle.ApiFramework.Schema.Json;
 using Evoogle.Extension;
 using Evoogle.Extensions;
 
@@ -25,6 +27,7 @@ namespace Evoogle.ApiFramework.Schema;
 /// <param name="apiTypeExpression">The API type expression of the property.</param>
 /// <param name="apiTypeModifiers">Modifiers applied to the property (e.g., Required).</param>
 /// <param name="clrName">The CLR property name corresponding to this API property.</param>
+[JsonConverter(typeof(ApiPropertyJsonConverter))]
 public sealed class ApiProperty(string apiName, ApiTypeExpression apiTypeExpression, ApiTypeModifiers apiTypeModifiers, string clrName) : ExtensibleBase
 {
     #region Properties
@@ -67,8 +70,9 @@ public sealed class ApiProperty(string apiName, ApiTypeExpression apiTypeExpress
         var apiTypeExpression = this.ApiTypeExpression.SafeToString();
         var apiTypeModifiers = this.ApiTypeModifiers.SafeToString();
         var clrName = this.ClrName.SafeToString();
+        var extensionCount = this.ExtensionCount.SafeToString();
 
-        return $"{nameof(ApiProperty)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ApiTypeExpression)}={apiTypeExpression}, {nameof(this.ApiTypeModifiers)}={apiTypeModifiers}, {nameof(this.ClrName)}={clrName}}}";
+        return $"{nameof(ApiProperty)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ApiTypeExpression)}={apiTypeExpression}, {nameof(this.ApiTypeModifiers)}={apiTypeModifiers}, {nameof(this.ClrName)}={clrName}, {nameof(ExtensionCount)}={extensionCount}}}";
     }
     #endregion
 

@@ -19,7 +19,7 @@ public class ApiScalarTypeBuilderTests(ITestOutputHelper output) : ApiBuilderTes
         public string ApiName { get; init; } = null!;
         public Type ClrType { get; init; } = null!;
         public ApiType ApiTypeExpected { get; init; } = null!;
-        public bool? AddExtension { get; init; }
+        public bool AddExtension { get; init; }
         #endregion
 
         #region Calculated Properties

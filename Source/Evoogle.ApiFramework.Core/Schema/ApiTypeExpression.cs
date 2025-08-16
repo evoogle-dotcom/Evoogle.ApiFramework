@@ -4,9 +4,11 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Schema.Internal;
+using Evoogle.ApiFramework.Schema.Json;
 using Evoogle.Extensions;
 using Evoogle.Reflection;
 
@@ -18,6 +20,7 @@ namespace Evoogle.ApiFramework.Schema;
 ///     - An API named reference to an API type (<see cref="Kind"/> and <see cref="ApiName"/> set), or
 ///     - A CLR type reference to an API type (<see cref="ClrType"/> set), or
 /// </summary>
+[JsonConverter(typeof(ApiTypeExpressionJsonConverter))]
 public sealed class ApiTypeExpression
 {
     #region Fields

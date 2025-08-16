@@ -4,17 +4,34 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
+
+using Evoogle.ApiFramework.Schema.Json;
+using Evoogle.Extension;
+using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema;
 
 /// <summary>
 ///     Represents a single enumeration value within an API enumeration type.
 /// </summary>
-/// <param name="ApiName">The API name of the enumeration value (typically used in API requests/responses).</param>
-/// <param name="ClrName">The CLR name of the enumeration value (corresponding to the C# enum name).</param>
-/// <param name="ClrOrdinal">The CLR ordinal (integer value) of the enumeration value.</param>
-public sealed record ApiEnumValue(string ApiName, string ClrName, int ClrOrdinal)
+/// <param name="apiName">The API name of the enumeration value (typically used in API requests/responses).</param>
+/// <param name="clrName">The CLR name of the enumeration value (corresponding to the C# enum name).</param>
+/// <param name="clrOrdinal">The CLR ordinal (integer value) of the enumeration value.</param>
+[JsonConverter(typeof(ApiEnumValueJsonConverter))]
+public sealed class ApiEnumValue(string apiName, string clrName, int clrOrdinal) : ExtensibleBase
 {
+    #region Properties
+    /// <summary>Gets the API name of the API enumeration value.</summary>
+    public string ApiName { get; } = apiName;
+
+    /// <summary>Gets the CLR name of the API enumeration value (matching the C# enum name).</summary>
+    public string ClrName { get; } = clrName;
+
+    /// <summary>Gets the CLR ordinal of the API enumeration value (matching the C# enum ordinal value).</summary>
+    public int ClrOrdinal { get; } = clrOrdinal;
+    #endregion
+
     #region ApiEnumValue Methods
     /// <summary>
     ///     Validates the <see cref="ApiEnumValue"/> by checking that required fields are not null or empty.
@@ -29,6 +46,19 @@ public sealed record ApiEnumValue(string ApiName, string ClrName, int ClrOrdinal
 
         this.InitializeApiName(apiSchema, apiValidationPath, ref results);
         this.InitializeClrName(apiSchema, apiValidationPath, ref results);
+    }
+    #endregion
+
+    #region Object Methods
+    /// <inheritdoc/>
+    public override string ToString()
+    {
+        var apiName = this.ApiName.SafeToString();
+        var clrName = this.ClrName.SafeToString();
+        var clrOrdinal = this.ClrOrdinal.SafeToString();
+        var extensionCount = this.ExtensionCount.SafeToString();
+
+        return $"{nameof(ApiEnumValue)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ClrName)}={clrName}, {nameof(this.ClrOrdinal)}={clrOrdinal}, {nameof(ExtensionCount)}={extensionCount}}}";
     }
     #endregion
 

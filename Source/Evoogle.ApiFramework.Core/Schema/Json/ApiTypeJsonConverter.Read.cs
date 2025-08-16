@@ -19,7 +19,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
     private class ApiCollectionTypeReadData
     {
         #region Properties
-        public ApiTypeExpressionReadData? ApiItemTypeExpression { get; set; }
+        public ApiTypeExpression? ApiItemTypeExpression { get; set; }
         public ApiTypeModifiers? ApiItemTypeModifiers { get; set; }
         #endregion
     }
@@ -27,16 +27,7 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
     private class ApiEnumTypeReadData
     {
         #region Properties
-        public List<ApiEnumValueReadData>? ApiEnumValues { get; set; }
-        #endregion
-    }
-
-    private class ApiEnumValueReadData
-    {
-        #region Properties
-        public string? ApiName { get; set; }
-        public string? ClrName { get; set; }
-        public int? ClrOrdinal { get; set; }
+        public List<ApiEnumValue>? ApiEnumValues { get; set; }
         #endregion
     }
 
@@ -50,42 +41,14 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
     private class ApiObjectTypeReadData
     {
         #region Properties
-        public List<ApiPropertyReadData>? ApiProperties { get; set; }
-        public List<ApiRelationshipReadData>? ApiRelationships { get; set; }
-        #endregion
-    }
-
-    private class ApiPropertyReadData
-    {
-        #region Properties
-        public string? ApiName { get; set; }
-        public ApiTypeExpressionReadData? ApiTypeExpression { get; set; }
-        public ApiTypeModifiers? ApiTypeModifiers { get; set; }
-        public string? ClrName { get; set; }
-        #endregion
-    }
-
-    private class ApiRelationshipReadData
-    {
-        #region Properties
-        public string? ApiName { get; set; }
-        public string? ApiPropertyName { get; set; }
+        public List<ApiProperty>? ApiProperties { get; set; }
+        public List<ApiRelationship>? ApiRelationships { get; set; }
         #endregion
     }
 
     private class ApiTypeReadData
     {
         #region Properties
-        public Type? ClrType { get; set; }
-        public string? Kind { get; set; }
-        #endregion
-    }
-
-    private class ApiTypeExpressionReadData
-    {
-        #region Properties
-        public ApiType? ApiInlineType { get; set; }
-        public string? ApiName { get; set; }
         public Type? ClrType { get; set; }
         public string? Kind { get; set; }
         #endregion
@@ -103,13 +66,9 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         #region Properties
         public ApiCollectionTypeReadData? ApiCollectionType { get; set; }
         public ApiEnumTypeReadData? ApiEnumType { get; set; }
-        public ApiEnumValueReadData? ApiEnumValue { get; set; }
         public ApiNamedTypeReadData? ApiNamedType { get; set; }
         public ApiObjectTypeReadData? ApiObjectType { get; set; }
-        public ApiPropertyReadData? ApiProperty { get; set; }
-        public ApiRelationshipReadData? ApiRelationship { get; set; }
         public ApiTypeReadData? ApiType { get; set; }
-        public ApiTypeExpressionReadData? ApiTypeExpression { get; set; }
         public ExtensibleBaseReadData? ExtensibleBase { get; set; }
         #endregion
     }
@@ -120,46 +79,9 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         private static readonly Type _apiTypeModifiersType = typeof(ApiTypeModifiers);
         #endregion
 
-        #region ApiEnumValue Fields
-        public readonly Dictionary<string, ApiJsonReaderHandler<ReadContext>> ApiEnumValuePropertyHandlers = new()
-    {
-            { propertyNames.ApiEnumValue.ApiName, HandleApiEnumValueApiName },
-            { propertyNames.ApiEnumValue.ClrName, HandleApiEnumValueClrName },
-            { propertyNames.ApiEnumValue.ClrOrdinal, HandleApiEnumValueClrOrdinal },
-        };
-        #endregion
-
-        #region ApiProperty Fields
-        public readonly Dictionary<string, ApiJsonReaderHandler<ReadContext>> ApiPropertyPropertyHandlers = new()
-    {
-            { propertyNames.ApiProperty.ApiName, HandleApiPropertyApiName },
-            { propertyNames.ApiProperty.ApiTypeModifiers, HandleApiPropertyApiTypeModifiers },
-            { propertyNames.ApiProperty.ApiTypeExpression, HandleApiPropertyApiTypeExpression },
-            { propertyNames.ApiProperty.ClrName, HandleApiPropertyClrName },
-        };
-        #endregion
-
-        #region ApiRelationship Fields
-        public readonly Dictionary<string, ApiJsonReaderHandler<ReadContext>> ApiRelationshipPropertyHandlers = new()
-    {
-            { propertyNames.ApiRelationship.ApiName, HandleApiRelationshipApiName },
-            { propertyNames.ApiRelationship.ApiPropertyName, HandleApiRelationshipApiPropertyName },
-        };
-        #endregion
-
-        #region ApiTypeExpression Fields
-        public readonly Dictionary<string, ApiJsonReaderHandler<ReadContext>> ApiTypeExpressionHandlers = new()
-    {
-            { propertyNames.ApiTypeExpression.ApiInlineType, HandleApiTypeExpressionApiInlineType },
-            { propertyNames.ApiTypeExpression.ApiName, HandleApiTypeExpressionApiName },
-            { propertyNames.ApiTypeExpression.ClrType, HandleApiTypeExpressionClrType },
-            { propertyNames.ApiTypeExpression.Kind, HandleApiTypeExpressionKind },
-        };
-        #endregion
-
         #region ApiType Fields
         public readonly Dictionary<string, ApiJsonReaderHandler<ReadContext>> ApiTypePropertyHandlers = new()
-    {
+        {
             // ApiCollectionType Property Handlers
             { propertyNames.ApiCollectionType.ApiItemTypeExpression, HandleApiCollectionTypeApiItemTypeExpression },
             { propertyNames.ApiCollectionType.ApiItemTypeModifiers, HandleApiCollectionTypeApiItemTypeModifiers },
@@ -186,13 +108,9 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         #region ApiCollectionType Methods
         private static void HandleApiCollectionTypeApiItemTypeExpression(ref Utf8JsonReader reader, ref ReadContext context)
         {
-            ReadJsonObject<ApiTypeJsonConverter, ReadContext>(ref reader, ref context, (x) => x.ReadHandlers.ApiTypeExpressionHandlers);
-
             context.ReadData.ApiCollectionType ??= new ApiCollectionTypeReadData();
-            context.ReadData.ApiCollectionType.ApiItemTypeExpression = context.ReadData.ApiTypeExpression;
 
-            // Clear the ApiTypeExpression to avoid confusion in the next read operation
-            context.ReadData.ApiTypeExpression = null;
+            context.ReadData.ApiCollectionType.ApiItemTypeExpression = JsonSerializer.Deserialize<ApiTypeExpression>(ref reader, context.Options);
         }
 
         private static void HandleApiCollectionTypeApiItemTypeModifiers(ref Utf8JsonReader reader, ref ReadContext context)
@@ -215,39 +133,13 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
 
         private static void HandleApiEnumTypeApiEnumValuesArrayItem(ref Utf8JsonReader reader, ref ReadContext context)
         {
-            ReadJsonObject<ApiTypeJsonConverter, ReadContext>(ref reader, ref context, (x) => x.ReadHandlers.ApiEnumValuePropertyHandlers);
-            if (context.ReadData.ApiEnumValue == null)
+            var apiEnumValue = JsonSerializer.Deserialize<ApiEnumValue>(ref reader, context.Options);
+            if (apiEnumValue == null)
             {
                 return;
             }
 
-            context.ReadData.ApiEnumType!.ApiEnumValues!.Add(context.ReadData.ApiEnumValue);
-
-            // Clear the ApiEnumValue to avoid confusion in the next read operation
-            context.ReadData.ApiEnumValue = null;
-        }
-        #endregion
-
-        #region ApiEnumValue Methods
-        private static void HandleApiEnumValueApiName(ref Utf8JsonReader reader, ref ReadContext context)
-        {
-            context.ReadData.ApiEnumValue ??= new ApiEnumValueReadData();
-
-            context.ReadData.ApiEnumValue.ApiName = reader.GetString();
-        }
-
-        private static void HandleApiEnumValueClrName(ref Utf8JsonReader reader, ref ReadContext context)
-        {
-            context.ReadData.ApiEnumValue ??= new ApiEnumValueReadData();
-
-            context.ReadData.ApiEnumValue.ClrName = reader.GetString();
-        }
-
-        private static void HandleApiEnumValueClrOrdinal(ref Utf8JsonReader reader, ref ReadContext context)
-        {
-            context.ReadData.ApiEnumValue ??= new ApiEnumValueReadData();
-
-            context.ReadData.ApiEnumValue.ClrOrdinal = reader.GetInt32();
+            context.ReadData.ApiEnumType!.ApiEnumValues!.Add(apiEnumValue);
         }
         #endregion
 
@@ -271,16 +163,13 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
 
         private static void HandleApiObjectTypeApiPropertiesArrayItem(ref Utf8JsonReader reader, ref ReadContext context)
         {
-            ReadJsonObject<ApiTypeJsonConverter, ReadContext>(ref reader, ref context, (x) => x.ReadHandlers.ApiPropertyPropertyHandlers);
-            if (context.ReadData.ApiProperty == null)
+            var apiProperty = JsonSerializer.Deserialize<ApiProperty>(ref reader, context.Options);
+            if (apiProperty == null)
             {
                 return;
             }
 
-            context.ReadData.ApiObjectType!.ApiProperties!.Add(context.ReadData.ApiProperty);
-
-            // Clear the ApiProperty to avoid confusion in the next read operation
-            context.ReadData.ApiProperty = null;
+            context.ReadData.ApiObjectType!.ApiProperties!.Add(apiProperty);
         }
 
         private static void HandleApiObjectTypeApiRelationships(ref Utf8JsonReader reader, ref ReadContext context)
@@ -293,97 +182,13 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
 
         private static void HandleApiObjectTypeApiRelationshipsArrayItem(ref Utf8JsonReader reader, ref ReadContext context)
         {
-            ReadJsonObject<ApiTypeJsonConverter, ReadContext>(ref reader, ref context, (x) => x.ReadHandlers.ApiRelationshipPropertyHandlers);
-            if (context.ReadData.ApiRelationship == null)
+            var apiRelationship = JsonSerializer.Deserialize<ApiRelationship>(ref reader, context.Options);
+            if (apiRelationship == null)
             {
                 return;
             }
 
-            context.ReadData.ApiObjectType!.ApiRelationships!.Add(context.ReadData.ApiRelationship);
-
-            // Clear the ApiRelationship to avoid confusion in the next read operation
-            context.ReadData.ApiRelationship = null;
-        }
-        #endregion
-
-        #region ApiProperty Methods
-        private static void HandleApiPropertyApiName(ref Utf8JsonReader reader, ref ReadContext context)
-        {
-            context.ReadData.ApiProperty ??= new ApiPropertyReadData();
-
-            context.ReadData.ApiProperty.ApiName = reader.GetString();
-        }
-
-        private static void HandleApiPropertyApiTypeModifiers(ref Utf8JsonReader reader, ref ReadContext context)
-        {
-            context.ReadData.ApiProperty ??= new ApiPropertyReadData();
-
-            var options = context.Options;
-            context.ReadData.ApiProperty.ApiTypeModifiers = _apiTypeModifiersJsonConverter.Read(ref reader, _apiTypeModifiersType, options);
-        }
-
-        private static void HandleApiPropertyApiTypeExpression(ref Utf8JsonReader reader, ref ReadContext context)
-        {
-            ReadJsonObject<ApiTypeJsonConverter, ReadContext>(ref reader, ref context, (x) => x.ReadHandlers.ApiTypeExpressionHandlers);
-
-            context.ReadData.ApiProperty ??= new ApiPropertyReadData();
-            context.ReadData.ApiProperty.ApiTypeExpression = context.ReadData.ApiTypeExpression;
-
-            // Clear the ApiTypeExpression to avoid confusion in the next read operation
-            context.ReadData.ApiTypeExpression = null;
-        }
-
-        private static void HandleApiPropertyClrName(ref Utf8JsonReader reader, ref ReadContext context)
-        {
-            context.ReadData.ApiProperty ??= new ApiPropertyReadData();
-
-            context.ReadData.ApiProperty.ClrName = reader.GetString();
-        }
-        #endregion
-
-        #region ApiRelationship Methods
-        private static void HandleApiRelationshipApiName(ref Utf8JsonReader reader, ref ReadContext context)
-        {
-            context.ReadData.ApiRelationship ??= new ApiRelationshipReadData();
-
-            context.ReadData.ApiRelationship.ApiName = reader.GetString();
-        }
-
-        private static void HandleApiRelationshipApiPropertyName(ref Utf8JsonReader reader, ref ReadContext context)
-        {
-            context.ReadData.ApiRelationship ??= new ApiRelationshipReadData();
-
-            context.ReadData.ApiRelationship.ApiPropertyName = reader.GetString();
-        }
-        #endregion
-
-        #region ApiTypeExpression Fields
-        private static void HandleApiTypeExpressionApiInlineType(ref Utf8JsonReader reader, ref ReadContext context)
-        {
-            context.ReadData.ApiTypeExpression ??= new ApiTypeExpressionReadData();
-
-            context.ReadData.ApiTypeExpression.ApiInlineType = JsonSerializer.Deserialize<ApiType>(ref reader, context.Options);
-        }
-
-        private static void HandleApiTypeExpressionApiName(ref Utf8JsonReader reader, ref ReadContext context)
-        {
-            context.ReadData.ApiTypeExpression ??= new ApiTypeExpressionReadData();
-
-            context.ReadData.ApiTypeExpression.ApiName = reader.GetString();
-        }
-
-        private static void HandleApiTypeExpressionClrType(ref Utf8JsonReader reader, ref ReadContext context)
-        {
-            context.ReadData.ApiTypeExpression ??= new ApiTypeExpressionReadData();
-
-            context.ReadData.ApiTypeExpression.ClrType = _typeJsonConverter.Read(ref reader, typeof(Type), context.Options);
-        }
-
-        private static void HandleApiTypeExpressionKind(ref Utf8JsonReader reader, ref ReadContext context)
-        {
-            context.ReadData.ApiTypeExpression ??= new ApiTypeExpressionReadData();
-
-            context.ReadData.ApiTypeExpression.Kind = reader.GetString();
+            context.ReadData.ApiObjectType!.ApiRelationships!.Add(apiRelationship);
         }
         #endregion
 

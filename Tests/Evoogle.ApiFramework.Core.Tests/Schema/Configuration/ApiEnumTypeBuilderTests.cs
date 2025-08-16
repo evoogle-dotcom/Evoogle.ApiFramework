@@ -20,7 +20,7 @@ public class ApiEnumTypeBuilderTests(ITestOutputHelper output) : ApiBuilderTests
         public Type ClrType { get; init; } = null!;
         public ApiType ApiTypeExpected { get; init; } = null!;
         public ApiEnumValue[] ApiEnumValues { get; init; } = null!;
-        public bool? AddExtension { get; init; }
+        public bool AddExtension { get; init; }
         #endregion
 
         #region Calculated Properties

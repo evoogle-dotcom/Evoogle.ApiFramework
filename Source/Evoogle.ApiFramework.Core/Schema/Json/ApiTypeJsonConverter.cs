@@ -73,15 +73,6 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
         #endregion
     }
 
-    private readonly record struct ApiEnumValuePropertyNames
-    {
-        #region Immutable Properties
-        public required string ApiName { get; init; }
-        public required string ClrName { get; init; }
-        public required string ClrOrdinal { get; init; }
-        #endregion
-    }
-
     private readonly record struct ApiNamedTypePropertyNames
     {
         #region Immutable Properties
@@ -96,37 +87,9 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
         #endregion
     }
 
-    private readonly record struct ApiPropertyPropertyNames
-    {
-        #region Immutable Properties
-        public required string ApiName { get; init; }
-        public required string ApiTypeExpression { get; init; }
-        public required string ApiTypeModifiers { get; init; }
-        public required string ClrName { get; init; }
-        #endregion
-    }
-
-    private readonly record struct ApiRelationshipPropertyNames
-    {
-        #region Immutable Properties
-        public required string ApiName { get; init; }
-        public required string ApiPropertyName { get; init; }
-        #endregion
-    }
-
     private readonly record struct ApiTypePropertyNames
     {
         #region Immutable Properties
-        public required string ClrType { get; init; }
-        public required string Kind { get; init; }
-        #endregion
-    }
-
-    private readonly record struct ApiTypeExpressionPropertyNames
-    {
-        #region Immutable Properties
-        public required string ApiName { get; init; }
-        public required string ApiInlineType { get; init; }
         public required string ClrType { get; init; }
         public required string Kind { get; init; }
         #endregion
@@ -137,13 +100,9 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
         #region Immutable Properties
         public required ApiCollectionTypePropertyNames ApiCollectionType { get; init; }
         public required ApiEnumTypePropertyNames ApiEnumType { get; init; }
-        public required ApiEnumValuePropertyNames ApiEnumValue { get; init; }
         public required ApiNamedTypePropertyNames ApiNamedType { get; init; }
         public required ApiObjectTypePropertyNames ApiObjectType { get; init; }
-        public required ApiPropertyPropertyNames ApiProperty { get; init; }
-        public required ApiRelationshipPropertyNames ApiRelationship { get; init; }
         public required ApiTypePropertyNames ApiType { get; init; }
-        public required ApiTypeExpressionPropertyNames ApiTypeExpression { get; init; }
         public required ExtensibleBasePropertyNames ExtensibleBase { get; init; }
         #endregion
     }
@@ -241,12 +200,6 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
             {
                 ApiEnumValues = policy.ConvertName(nameof(ApiEnumType.ApiEnumValues))
             },
-            ApiEnumValue = new ApiEnumValuePropertyNames
-            {
-                ApiName = policy.ConvertName(nameof(ApiEnumValue.ApiName)),
-                ClrName = policy.ConvertName(nameof(ApiEnumValue.ClrName)),
-                ClrOrdinal = policy.ConvertName(nameof(ApiEnumValue.ClrOrdinal))
-            },
             ApiNamedType = new ApiNamedTypePropertyNames
             {
                 ApiName = policy.ConvertName(nameof(ApiNamedType.ApiName))
@@ -256,29 +209,10 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
                 ApiProperties = policy.ConvertName(nameof(ApiObjectType.ApiProperties)),
                 ApiRelationships = policy.ConvertName(nameof(ApiObjectType.ApiRelationships))
             },
-            ApiProperty = new ApiPropertyPropertyNames
-            {
-                ApiName = policy.ConvertName(nameof(ApiProperty.ApiName)),
-                ApiTypeExpression = policy.ConvertName(nameof(ApiProperty.ApiType)), // Mapping property name from ApiTypeExpression to ApiType by design
-                ApiTypeModifiers = policy.ConvertName(nameof(ApiProperty.ApiTypeModifiers)),
-                ClrName = policy.ConvertName(nameof(ApiProperty.ClrName))
-            },
-            ApiRelationship = new ApiRelationshipPropertyNames
-            {
-                ApiName = policy.ConvertName(nameof(ApiRelationship.ApiName)),
-                ApiPropertyName = policy.ConvertName(nameof(ApiRelationship.ApiPropertyName))
-            },
             ApiType = new ApiTypePropertyNames
             {
                 ClrType = policy.ConvertName(nameof(ApiType.ClrType)),
                 Kind = policy.ConvertName(nameof(ApiType.Kind))
-            },
-            ApiTypeExpression = new ApiTypeExpressionPropertyNames
-            {
-                ApiName = policy.ConvertName(nameof(ApiTypeExpression.ApiName)),
-                ApiInlineType = policy.ConvertName(nameof(ApiTypeExpression.ApiInlineType)),
-                ClrType = policy.ConvertName(nameof(ApiTypeExpression.ClrType)),
-                Kind = policy.ConvertName(nameof(ApiTypeExpression.Kind))
             },
             ExtensibleBase = new ExtensibleBasePropertyNames
             {

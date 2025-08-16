@@ -119,7 +119,7 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
     {
         #region ApiSchema Fields
         public readonly Dictionary<string, ApiJsonReaderHandler<ReadContext>> PropertyHandlers = new()
-    {
+        {
             // ApiSchema Property Handlers
             { propertyNames.ApiSchema.ApiName, HandleApiSchemaApiName },
             { propertyNames.ApiSchema.ApiVersion, HandleApiSchemaApiVersion },
@@ -356,7 +356,7 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
         var value = apiSchema.ApiName;
         var options = context.Options;
 
-        writer.WriteConditionalPropertyAsString(propertyName, value, options);
+        writer.TryWritePropertyAsString(propertyName, value, options);
     }
 
     private static void WriteApiSchemaProlog(Utf8JsonWriter writer, ApiSchema apiSchema, WriteContext context)
@@ -373,7 +373,7 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
         var value = apiSchema.ApiVersion;
         var options = context.Options;
 
-        writer.WriteConditionalPropertyAsString(propertyName, value, options);
+        writer.TryWritePropertyAsString(propertyName, value, options);
     }
 
     // ExtensibleBase Methods

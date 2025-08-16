@@ -108,8 +108,9 @@ public sealed class ApiObjectType(string apiName, IEnumerable<ApiProperty> apiPr
     {
         var apiName = this.ApiName.SafeToString();
         var clrType = this.ClrType.SafeToString();
+        var extensionCount = this.ExtensionCount.SafeToString();
 
-        return $"{nameof(ApiObjectType)} {{{nameof(this.ApiName)}={apiName}}} [{clrType}]";
+        return $"{nameof(ApiObjectType)} {{{nameof(this.ApiName)}={apiName}, {nameof(ExtensionCount)}={extensionCount}}} [{clrType}]";
     }
     #endregion
 

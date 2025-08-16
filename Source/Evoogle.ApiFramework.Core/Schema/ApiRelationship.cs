@@ -4,9 +4,11 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Schema.Internal;
+using Evoogle.ApiFramework.Schema.Json;
 using Evoogle.Extension;
 using Evoogle.Extensions;
 
@@ -24,6 +26,7 @@ namespace Evoogle.ApiFramework.Schema;
 ///         structural definition.
 ///     </para>
 /// </remarks>
+[JsonConverter(typeof(ApiRelationshipJsonConverter))]
 public sealed class ApiRelationship(string apiName, string? apiPropertyName = null) : ExtensibleBase
 {
     #region Fields
@@ -85,14 +88,15 @@ public sealed class ApiRelationship(string apiName, string? apiPropertyName = nu
     {
         var apiName = this.ApiName.SafeToString();
         var apiPropertyName = this.ApiPropertyName.SafeToString();
+        var extensionCount = this.ExtensionCount.SafeToString();
 
         if (apiName.Equals(apiPropertyName, StringComparison.OrdinalIgnoreCase))
         {
-            return $"{nameof(ApiRelationship)} {{{nameof(this.ApiName)}={apiName}}}";
+            return $"{nameof(ApiRelationship)} {{{nameof(this.ApiName)}={apiName}, {nameof(ExtensionCount)}={extensionCount}}}";
         }
         else
         {
-            return $"{nameof(ApiRelationship)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ApiPropertyName)}={apiPropertyName}}}";
+            return $"{nameof(ApiRelationship)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ApiPropertyName)}={apiPropertyName}, {nameof(ExtensionCount)}={extensionCount}}}";
         }
     }
     #endregion

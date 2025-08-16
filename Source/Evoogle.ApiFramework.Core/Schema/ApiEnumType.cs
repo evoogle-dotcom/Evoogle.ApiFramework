@@ -91,8 +91,9 @@ public sealed class ApiEnumType(string apiName, IEnumerable<ApiEnumValue> apiEnu
     {
         var apiName = this.ApiName.SafeToString();
         var clrType = this.ClrType.SafeToString();
+        var extensionCount = this.ExtensionCount.SafeToString();
 
-        return $"{nameof(ApiEnumType)} {{{nameof(this.ApiName)}={apiName}}} [{clrType}]";
+        return $"{nameof(ApiEnumType)} {{{nameof(this.ApiName)}={apiName}, {nameof(ExtensionCount)}={extensionCount}}} [{clrType}]";
     }
     #endregion
 

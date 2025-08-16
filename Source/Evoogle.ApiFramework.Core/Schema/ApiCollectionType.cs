@@ -5,7 +5,6 @@
 // See the LICENSE file in the project root for more information.
 using System.ComponentModel.DataAnnotations;
 
-using Evoogle.ApiFramework.Exceptions;
 using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema;
@@ -67,8 +66,9 @@ public sealed class ApiCollectionType(ApiTypeExpression apiItemTypeExpression, A
         var apiItemTypeExpression = this.ApiItemTypeExpression.SafeToString();
         var apiItemTypeModifiers = this.ApiItemTypeModifiers.SafeToString();
         var clrType = this.ClrType.SafeToName();
+        var extensionCount = this.ExtensionCount.SafeToString();
 
-        return $"{nameof(ApiCollectionType)} {{{nameof(this.ApiItemTypeExpression)}={apiItemTypeExpression}, {nameof(this.ApiItemTypeModifiers)}={apiItemTypeModifiers}}} [{clrType}]";
+        return $"{nameof(ApiCollectionType)} {{{nameof(this.ApiItemTypeExpression)}={apiItemTypeExpression}, {nameof(this.ApiItemTypeModifiers)}={apiItemTypeModifiers}, {nameof(ExtensionCount)}={extensionCount}}} [{clrType}]";
     }
     #endregion
 
