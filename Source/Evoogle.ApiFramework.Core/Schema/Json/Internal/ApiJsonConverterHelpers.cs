@@ -30,6 +30,13 @@ internal static class ApiJsonConverterHelpers
         public required string Extensions { get; init; }
         #endregion
     }
+
+    public class ExtensibleReadData
+    {
+        #region Properties
+        public Dictionary<string, object>? Extensions { get; set; }
+        #endregion
+    }
     #endregion
 
     #region Read Methods
