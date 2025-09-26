@@ -9,6 +9,11 @@ using Microsoft.Extensions.Logging;
 
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
+/// <summary>
+///     Maintains shared state for <see cref="ApiSchemaBuilder"/> while schema components are being configured.
+///     The context caches builder instances and exposes a consolidated logger to provide consistent diagnostics.
+/// </summary>
+/// <param name="logger">The optional logger used to emit diagnostics during schema construction.</param>
 public sealed class ApiSchemaBuilderContext(ILogger<ApiSchemaBuilder>? logger = null)
 {
     #region Fields

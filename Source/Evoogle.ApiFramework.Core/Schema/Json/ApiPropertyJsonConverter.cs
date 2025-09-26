@@ -17,9 +17,16 @@ using static Evoogle.ApiFramework.Schema.Json.Internal.ApiJsonConverterHelpers;
 
 namespace Evoogle.ApiFramework.Schema.Json;
 
+/// <summary>
+///     Serializes and deserializes <see cref="ApiProperty"/> instances, including extension payloads and type expressions.
+/// </summary>
+/// <param name="logger">The optional logger used to emit diagnostics during JSON operations.</param>
 public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger) : JsonConverter<ApiProperty>
 {
     #region Context Types
+    /// <summary>
+    ///     Represents the immutable state shared by read and write operations for <see cref="ApiProperty"/> conversion.
+    /// </summary>
     private abstract class Context(ILogger<ApiPropertyJsonConverter> logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames) : IHasLogger<ApiPropertyJsonConverter>
     {
         #region Immutable Properties
@@ -30,6 +37,9 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
         #endregion
     }
 
+    /// <summary>
+    ///     Captures transient state while reading a property from JSON.
+    /// </summary>
     private class ReadContext(ILogger<ApiPropertyJsonConverter> logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames, ReadHandlers readHandlers)
         : Context(logger, options, propertyNamingPolicy, propertyNames)
     {
@@ -42,6 +52,9 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
         #endregion
     }
 
+    /// <summary>
+    ///     Provides contextual information required while writing a property to JSON.
+    /// </summary>
     private class WriteContext(ILogger<ApiPropertyJsonConverter> logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames)
         : Context(logger, options, propertyNamingPolicy, propertyNames)
     {
@@ -49,6 +62,9 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
     #endregion
 
     #region Property Types
+    /// <summary>
+    ///     Stores the resolved JSON property names for an <see cref="ApiProperty"/> under a given naming policy.
+    /// </summary>
     private readonly record struct ApiPropertyPropertyNames
     {
         #region Immutable Properties
@@ -59,6 +75,9 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
         #endregion
     }
 
+    /// <summary>
+    ///     Bundles the property name metadata used during serialization and deserialization.
+    /// </summary>
     private readonly record struct PropertyNames
     {
         #region Immutable Properties
@@ -69,6 +88,9 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
     #endregion
 
     #region Read Types
+    /// <summary>
+    ///     Temporary storage used while reading property members from JSON.
+    /// </summary>
     private class ApiPropertyReadData
     {
         #region Properties
@@ -79,6 +101,9 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
         #endregion
     }
 
+    /// <summary>
+    ///     Collects the data required to instantiate an <see cref="ApiProperty"/> during deserialization.
+    /// </summary>
     private class ReadData : ExtensibleReadData
     {
         #region Properties
@@ -86,6 +111,9 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
         #endregion
     }
 
+    /// <summary>
+    ///     Supplies JSON property handlers for mapping serialized values to a <see cref="ReadData"/> instance.
+    /// </summary>
     private class ReadHandlers(PropertyNames propertyNames)
     {
         #region Constants

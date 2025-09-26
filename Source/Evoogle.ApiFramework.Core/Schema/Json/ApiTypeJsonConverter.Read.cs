@@ -16,6 +16,9 @@ namespace Evoogle.ApiFramework.Schema.Json;
 public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
 {
     #region Read Types
+    /// <summary>
+    ///     Holds interim data for <see cref="ApiCollectionType"/> members encountered during deserialization.
+    /// </summary>
     private class ApiCollectionTypeReadData
     {
         #region Properties
@@ -24,6 +27,9 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         #endregion
     }
 
+    /// <summary>
+    ///     Holds interim data for <see cref="ApiEnumType"/> members encountered during deserialization.
+    /// </summary>
     private class ApiEnumTypeReadData
     {
         #region Properties
@@ -31,6 +37,9 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         #endregion
     }
 
+    /// <summary>
+    ///     Holds interim data for <see cref="ApiNamedType"/> members encountered during deserialization.
+    /// </summary>
     private class ApiNamedTypeReadData
     {
         #region Properties
@@ -38,6 +47,9 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         #endregion
     }
 
+    /// <summary>
+    ///     Holds interim data for <see cref="ApiObjectType"/> members encountered during deserialization.
+    /// </summary>
     private class ApiObjectTypeReadData
     {
         #region Properties
@@ -46,6 +58,9 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         #endregion
     }
 
+    /// <summary>
+    ///     Holds interim data for common <see cref="ApiType"/> members encountered during deserialization.
+    /// </summary>
     private class ApiTypeReadData
     {
         #region Properties
@@ -54,6 +69,9 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         #endregion
     }
 
+    /// <summary>
+    ///     Aggregates all temporary data required to create an <see cref="ApiType"/> instance from JSON.
+    /// </summary>
     private class ReadData : ExtensibleReadData
     {
         #region Properties
@@ -65,6 +83,9 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
         #endregion
     }
 
+    /// <summary>
+    ///     Provides JSON property handlers that map serialized data to <see cref="ReadData"/> during deserialization.
+    /// </summary>
     private class ReadHandlers(PropertyNames propertyNames)
     {
         #region Constants

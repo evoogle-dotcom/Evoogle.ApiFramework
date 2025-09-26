@@ -68,6 +68,9 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
     #endregion
 
     #region Property Types
+    /// <summary>
+    ///     Represents the JSON property names associated with an <see cref="ApiSchema"/> for a given naming policy.
+    /// </summary>
     private readonly record struct ApiSchemaPropertyNames
     {
         #region Immutable Properties
@@ -79,6 +82,9 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
         #endregion
     }
 
+    /// <summary>
+    ///     Aggregates all property name metadata used during schema serialization and deserialization.
+    /// </summary>
     private readonly record struct PropertyNames
     {
         #region Immutable Properties
@@ -89,6 +95,9 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
     #endregion
 
     #region Read Types
+    /// <summary>
+    ///     Temporary storage used while parsing an <see cref="ApiSchema"/> from JSON.
+    /// </summary>
     private class ApiSchemaReadData
     {
         #region Properties
@@ -100,6 +109,9 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
         #endregion
     }
 
+    /// <summary>
+    ///     Collects the complete data set required to instantiate an <see cref="ApiSchema"/> during deserialization.
+    /// </summary>
     private class ReadData : ExtensibleReadData
     {
         #region Properties
@@ -107,6 +119,9 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
         #endregion
     }
 
+    /// <summary>
+    ///     Provides property handlers that map JSON members to <see cref="ReadData"/> assignments.
+    /// </summary>
     private class ReadHandlers(PropertyNames propertyNames)
     {
         #region ApiSchema Fields

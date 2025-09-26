@@ -17,9 +17,17 @@ using static Evoogle.ApiFramework.Schema.Json.Internal.ApiJsonConverterHelpers;
 
 namespace Evoogle.ApiFramework.Schema.Json;
 
+/// <summary>
+///     Provides System.Text.Json serialization support for <see cref="ApiRelationship"/> instances, including
+///     extension payloads and schema-specific naming policies.
+/// </summary>
+/// <param name="logger">The optional logger used to emit diagnostics while reading or writing relationships.</param>
 public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>? logger) : JsonConverter<ApiRelationship>
 {
     #region Context Types
+    /// <summary>
+    ///     Represents the common state that is required while reading or writing an <see cref="ApiRelationship"/>.
+    /// </summary>
     private abstract class Context(ILogger<ApiRelationshipJsonConverter> logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames) : IHasLogger<ApiRelationshipJsonConverter>
     {
         #region Immutable Properties
@@ -30,6 +38,9 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
         #endregion
     }
 
+    /// <summary>
+    ///     Captures state that is accumulated while deserializing an <see cref="ApiRelationship"/> from JSON.
+    /// </summary>
     private class ReadContext(ILogger<ApiRelationshipJsonConverter> logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames, ReadHandlers readHandlers)
         : Context(logger, options, propertyNamingPolicy, propertyNames)
     {
@@ -42,6 +53,9 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
         #endregion
     }
 
+    /// <summary>
+    ///     Represents the contextual information required while serializing an <see cref="ApiRelationship"/> to JSON.
+    /// </summary>
     private class WriteContext(ILogger<ApiRelationshipJsonConverter> logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames)
         : Context(logger, options, propertyNamingPolicy, propertyNames)
     {
@@ -49,6 +63,9 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
     #endregion
 
     #region Property Types
+    /// <summary>
+    ///     Provides cached JSON property names for <see cref="ApiRelationship"/> members under a specific naming policy.
+    /// </summary>
     private readonly record struct ApiRelationshipPropertyNames
     {
         #region Immutable Properties
@@ -57,6 +74,9 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
         #endregion
     }
 
+    /// <summary>
+    ///     Aggregates the property name sets used while reading or writing relationships and extension data.
+    /// </summary>
     private readonly record struct PropertyNames
     {
         #region Immutable Properties
@@ -67,6 +87,9 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
     #endregion
 
     #region Read Types
+    /// <summary>
+    ///     Temporary storage used while reading the primitive relationship properties from JSON.
+    /// </summary>
     private class ApiRelationshipReadData
     {
         #region Properties
@@ -75,6 +98,9 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
         #endregion
     }
 
+    /// <summary>
+    ///     Collects all data encountered while deserializing a relationship, including extensions.
+    /// </summary>
     private class ReadData : ExtensibleReadData
     {
         #region Properties
@@ -82,6 +108,9 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
         #endregion
     }
 
+    /// <summary>
+    ///     Provides handlers that map JSON property names to strongly typed relationship data assignments.
+    /// </summary>
     private class ReadHandlers(PropertyNames propertyNames)
     {
         #region Constants

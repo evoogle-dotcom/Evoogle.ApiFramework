@@ -28,6 +28,9 @@ namespace Evoogle.ApiFramework.Schema.Json;
 public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger) : JsonConverter<ApiType>
 {
     #region Context Types
+    /// <summary>
+    ///     Encapsulates the immutable state required while reading or writing <see cref="ApiType"/> instances.
+    /// </summary>
     private abstract class Context(ILogger<ApiTypeJsonConverter> logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames) : IHasLogger<ApiTypeJsonConverter>
     {
         #region Immutable Properties
@@ -38,6 +41,9 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
         #endregion
     }
 
+    /// <summary>
+    ///     Captures intermediate state while deserializing a polymorphic <see cref="ApiType"/>.
+    /// </summary>
     private class ReadContext(ILogger<ApiTypeJsonConverter> logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames, ReadHandlers readHandlers)
         : Context(logger, options, propertyNamingPolicy, propertyNames)
     {
@@ -51,6 +57,9 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
         #endregion
     }
 
+    /// <summary>
+    ///     Provides converter state while serializing a concrete <see cref="ApiType"/> instance.
+    /// </summary>
     private class WriteContext(ILogger<ApiTypeJsonConverter> logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames)
         : Context(logger, options, propertyNamingPolicy, propertyNames)
     {
@@ -58,6 +67,9 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
     #endregion
 
     #region Property Types
+    /// <summary>
+    ///     Stores the JSON member names for <see cref="ApiCollectionType"/> properties under the active naming policy.
+    /// </summary>
     private readonly record struct ApiCollectionTypePropertyNames
     {
         #region Immutable Properties
@@ -66,6 +78,9 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
         #endregion
     }
 
+    /// <summary>
+    ///     Stores the JSON member names for <see cref="ApiEnumType"/> properties under the active naming policy.
+    /// </summary>
     private readonly record struct ApiEnumTypePropertyNames
     {
         #region Immutable Properties
@@ -73,12 +88,19 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
         #endregion
     }
 
+    /// <summary>
+    ///     Stores the JSON member names for <see cref="ApiNamedType"/> properties under the active naming policy.
+    /// </summary>
     private readonly record struct ApiNamedTypePropertyNames
     {
         #region Immutable Properties
         public required string ApiName { get; init; }
         #endregion
     }
+
+    /// <summary>
+    ///     Stores the JSON member names for <see cref="ApiObjectType"/> properties under the active naming policy.
+    /// </summary>
     private readonly record struct ApiObjectTypePropertyNames
     {
         #region Immutable Properties
@@ -87,6 +109,9 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
         #endregion
     }
 
+    /// <summary>
+    ///     Stores the JSON member names for base <see cref="ApiType"/> properties under the active naming policy.
+    /// </summary>
     private readonly record struct ApiTypePropertyNames
     {
         #region Immutable Properties
@@ -95,6 +120,9 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
         #endregion
     }
 
+    /// <summary>
+    ///     Aggregates all property name groups used by the converter for a given naming policy.
+    /// </summary>
     private readonly record struct PropertyNames
     {
         #region Immutable Properties

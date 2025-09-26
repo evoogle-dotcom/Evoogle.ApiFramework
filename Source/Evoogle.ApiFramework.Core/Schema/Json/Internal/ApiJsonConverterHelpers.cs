@@ -24,6 +24,9 @@ internal static class ApiJsonConverterHelpers
     #region Types
     public delegate void ApiJsonReaderHandler<TContext>(ref Utf8JsonReader reader, ref TContext context);
 
+    /// <summary>
+    ///     Represents the JSON property names required to materialize <see cref="ExtensibleBase"/> instances.
+    /// </summary>
     public readonly record struct ExtensibleBasePropertyNames
     {
         #region Properties
@@ -31,6 +34,9 @@ internal static class ApiJsonConverterHelpers
         #endregion
     }
 
+    /// <summary>
+    ///     Serves as a base type for read-data structures that need to capture extension payloads.
+    /// </summary>
     public class ExtensibleReadData
     {
         #region Properties
