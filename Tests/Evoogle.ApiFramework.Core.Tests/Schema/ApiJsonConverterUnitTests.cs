@@ -17,58 +17,6 @@ namespace Evoogle.ApiFramework.Schema;
 public static class ApiJsonConverterUnitTests
 {
     #region Test Classes
-    public class ClassWithScalars(string requiredName, long requiredNumber, bool requiredPredicate)
-    {
-        public string RequiredName { get; set; } = requiredName;
-        public long RequiredNumber { get; set; } = requiredNumber;
-        public bool RequiredPredicate { get; set; } = requiredPredicate;
-
-        public string? OptionalName { get; set; }
-        public long? OptionalNumber { get; set; }
-        public bool? OptionalPredicate { get; set; }
-    }
-
-    public class Person
-    {
-        public string Name { get; set; } = string.Empty;
-        public int? Age { get; set; }
-        public Gender? Gender { get; set; }
-        public List<string>? Hobbies { get; set; }
-    }
-
-    public class Company
-    {
-        public string Name { get; set; } = string.Empty;
-        public Person? Owner { get; set; }
-        public List<Person>? Employees { get; set; }
-    }
-
-    public enum StopLight
-    {
-        None,
-        Green,
-        Yellow,
-        Red
-    }
-
-    public enum Gender
-    {
-        Unspecified,
-        Male,
-        Female
-    }
-
-    public class TestExtension1
-    {
-        public string Description { get; set; } = nameof(TestExtension1);
-    }
-
-    public class TestExtension2
-    {
-        public string Id { get; set; } = "2";
-        public string Name { get; set; } = nameof(TestExtension2);
-    }
-
     public class JsonDeserializeTest<T> : XUnitTest
         where T : IExtensible
     {
@@ -83,8 +31,8 @@ public static class ApiJsonConverterUnitTests
         #region User Supplied Properties
         public string? Source { get; init; }
         public T? Expected { get; init; }
-        public bool? AddTestExtension1 { get; init; } = false;
-        public bool? AddTestExtension2 { get; init; } = false;
+        public Type? ExtensionType1 { get; init; }
+        public Type? ExtensionType2 { get; init; }
         public JsonSerializerOptions? JsonSerializerOptions { get; init; } = DefaultJsonSerializerOptions;
         #endregion
 
@@ -95,22 +43,24 @@ public static class ApiJsonConverterUnitTests
         #region XUnitTest Methods
         protected override void Arrange()
         {
-            if (this?.AddTestExtension1 == true)
-            {
-                // Attach test extension 1 if requested.
-                this.Expected?.AttachExtension(new TestExtension1());
-            }
-
-            if (this?.AddTestExtension2 == true)
-            {
-                // Attach test extension 2 if requested.
-                this.Expected?.AttachExtension(new TestExtension2());
-            }
-
             this.WriteLine($"Source: {this.Source.SafeToString().RemoveWhitespace()}");
             this.WriteLine();
             this.WriteLine($"Expected: {this.Expected.SafeToString()}");
             this.WriteLine();
+
+            if (this.ExtensionType1 != null)
+            {
+                // Attach test extension 1 if requested.
+                var extension1 = Activator.CreateInstance(this.ExtensionType1);
+                this.Expected?.AttachExtension(this.ExtensionType1, extension1!);
+            }
+
+            if (this.ExtensionType2 != null)
+            {
+                // Attach test extension 2 if requested.
+                var extension2 = Activator.CreateInstance(this.ExtensionType2);
+                this.Expected?.AttachExtension(this.ExtensionType2, extension2!);
+            }
         }
 
         protected override void Act()
@@ -136,8 +86,8 @@ public static class ApiJsonConverterUnitTests
 
         #region User Supplied Properties
         public T? Expected { get; init; }
-        public bool? AddTestExtension1 { get; init; } = false;
-        public bool? AddTestExtension2 { get; init; } = false;
+        public Type? AddTestExtension1 { get; init; }
+        public Type? AddTestExtension2 { get; init; }
         public JsonSerializerOptions? JsonSerializerOptions { get; init; } = DefaultJsonSerializerOptions;
         #endregion
 
@@ -148,19 +98,21 @@ public static class ApiJsonConverterUnitTests
         #region XUnitTest Methods
         protected override void Arrange()
         {
-            if (this?.AddTestExtension1 == true)
+            this.WriteLine($"Expected: {this.Expected.SafeToString()}");
+
+            if (this.AddTestExtension1 != null)
             {
                 // Attach test extension 1 if requested.
-                this.Expected?.AttachExtension(new TestExtension1());
+                var extension1 = Activator.CreateInstance(this.AddTestExtension1);
+                this.Expected?.AttachExtension(this.AddTestExtension1, extension1!);
             }
 
-            if (this?.AddTestExtension2 == true)
+            if (this.AddTestExtension2 != null)
             {
                 // Attach test extension 2 if requested.
-                this.Expected?.AttachExtension(new TestExtension2());
+                var extension2 = Activator.CreateInstance(this.AddTestExtension2);
+                this.Expected?.AttachExtension(this.AddTestExtension2, extension2!);
             }
-
-            this.WriteLine($"Expected: {this.Expected.SafeToString()}");
         }
 
         protected override void Act()
@@ -188,8 +140,8 @@ public static class ApiJsonConverterUnitTests
         #region User Supplied Properties
         public T? Source { get; init; }
         public string? Expected { get; init; }
-        public bool? AddTestExtension1 { get; init; } = false;
-        public bool? AddTestExtension2 { get; init; } = false;
+        public Type? AddTestExtension1 { get; init; }
+        public Type? AddTestExtension2 { get; init; }
         public JsonSerializerOptions? JsonSerializerOptions { get; init; } = DefaultJsonSerializerOptions;
         #endregion
 
@@ -200,22 +152,24 @@ public static class ApiJsonConverterUnitTests
         #region XUnitTest Methods
         protected override void Arrange()
         {
-            if (this?.AddTestExtension1 == true)
-            {
-                // Attach test extension 1 if requested.
-                this.Source?.AttachExtension(new TestExtension1());
-            }
-
-            if (this?.AddTestExtension2 == true)
-            {
-                // Attach test extension 2 if requested.
-                this.Source?.AttachExtension(new TestExtension2());
-            }
-
             this.WriteLine($"Source: {this.Source.SafeToString()}");
             this.WriteLine();
             this.WriteLine($"Expected: {this.Expected.SafeToString().RemoveWhitespace()}");
             this.WriteLine();
+
+            if (this.AddTestExtension1 != null)
+            {
+                // Attach test extension 1 if requested.
+                var extension1 = Activator.CreateInstance(this.AddTestExtension1);
+                this.Source?.AttachExtension(this.AddTestExtension1, extension1!);
+            }
+
+            if (this.AddTestExtension2 != null)
+            {
+                // Attach test extension 2 if requested.
+                var extension2 = Activator.CreateInstance(this.AddTestExtension2);
+                this.Source?.AttachExtension(this.AddTestExtension2, extension2!);
+            }
         }
 
         protected override void Act()

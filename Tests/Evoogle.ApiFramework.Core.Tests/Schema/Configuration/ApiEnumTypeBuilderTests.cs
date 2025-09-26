@@ -3,6 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Schema.TestData;
 using Evoogle.Extensions;
 using Evoogle.XUnit;
 
@@ -10,7 +11,7 @@ using FluentAssertions;
 
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
-public class ApiEnumTypeBuilderTests(ITestOutputHelper output) : ApiBuilderTests(output)
+public class ApiEnumTypeBuilderTests(ITestOutputHelper output) : XUnitTests(output)
 {
     #region Test Classes
     public class BuildTest : XUnitTest
@@ -18,9 +19,9 @@ public class ApiEnumTypeBuilderTests(ITestOutputHelper output) : ApiBuilderTests
         #region User Supplied Properties
         public string ApiName { get; init; } = null!;
         public Type ClrType { get; init; } = null!;
-        public ApiType ApiTypeExpected { get; init; } = null!;
         public ApiEnumValue[] ApiEnumValues { get; init; } = null!;
-        public bool AddExtension { get; init; }
+        public ApiType ApiTypeExpected { get; init; } = null!;
+        public Type? ApiExtensionType { get; init; }
         #endregion
 
         #region Calculated Properties
@@ -32,24 +33,26 @@ public class ApiEnumTypeBuilderTests(ITestOutputHelper output) : ApiBuilderTests
         {
             this.WriteLine($"ApiName: {this.ApiName.SafeToString()}");
             this.WriteLine($"ClrType: {this.ClrType.SafeToName()}");
-            this.WriteLine($"AddExtension: {this.AddExtension.SafeToString()}");
+            this.WriteLine($"ApiExtensionType: {this.ApiExtensionType.SafeToName()}");
             this.WriteLine();
             this.WriteLine($"Expected: {this.ApiTypeExpected.SafeToString()}");
         }
 
         protected override void Act()
         {
-            var context = new ApiSchemaBuilderContext(null);
+            var context = new ApiSchemaBuilderContext();
             var builder = new ApiEnumTypeBuilder(this.ClrType, context)
                 .WithName(this.ApiName);
+
             foreach (var apiEnumValue in this.ApiEnumValues)
             {
                 builder.AddValue(apiEnumValue.ApiName, apiEnumValue.ClrName, apiEnumValue.ClrOrdinal);
             }
 
-            if (this.AddExtension == true)
+            if (this.ApiExtensionType != null)
             {
-                builder.AddExtension(TestExtension.Instance());
+                var extension = Activator.CreateInstance(this.ApiExtensionType);
+                builder.AddExtension(this.ApiExtensionType, extension!);
             }
 
             this.ApiTypeActual = builder.Build();
@@ -59,7 +62,16 @@ public class ApiEnumTypeBuilderTests(ITestOutputHelper output) : ApiBuilderTests
         protected override void Assert()
         {
             this.ApiTypeActual.Should().NotBeNull();
-            this.ApiTypeActual.Should().BeEquivalentTo(this.ApiTypeExpected);
+
+            this.ApiTypeActual.Should().BeOfType<ApiEnumType>();
+            this.ApiTypeExpected.Should().BeOfType<ApiEnumType>();
+
+            this.ApiTypeActual.As<ApiEnumType>().Should().BeEquivalentTo
+            (
+                this.ApiTypeExpected.As<ApiEnumType>(),
+                opt => opt
+                    .WithStrictOrdering()
+            );
         }
         #endregion
     }
@@ -70,25 +82,31 @@ public class ApiEnumTypeBuilderTests(ITestOutputHelper output) : ApiBuilderTests
     (
         "enum",
         [
-            new ApiEnumValue("first", $"{nameof(TestEnum.First)}", (int)TestEnum.First),
-            new ApiEnumValue("second", $"{nameof(TestEnum.Second)}", (int)TestEnum.Second)
+            new ApiEnumValue($"{nameof(OrderStatus.Pending)}", $"{nameof(OrderStatus.Pending)}", (int)OrderStatus.Pending),
+            new ApiEnumValue($"{nameof(OrderStatus.Paid)}", $"{nameof(OrderStatus.Paid)}", (int)OrderStatus.Paid),
+            new ApiEnumValue($"{nameof(OrderStatus.Shipped)}", $"{nameof(OrderStatus.Shipped)}", (int)OrderStatus.Shipped),
+            new ApiEnumValue($"{nameof(OrderStatus.Cancelled)}", $"{nameof(OrderStatus.Cancelled)}", (int)OrderStatus.Cancelled),
+            new ApiEnumValue($"{nameof(OrderStatus.Returned)}", $"{nameof(OrderStatus.Returned)}", (int)OrderStatus.Returned)
         ],
-        typeof(TestEnum)
+        typeof(OrderStatus)
     );
 
     private static ApiEnumType EnumTypeWithExtension { get; } = new ApiEnumType
     (
         "enum",
         [
-            new ApiEnumValue("first", $"{nameof(TestEnum.First)}", (int)TestEnum.First),
-            new ApiEnumValue("second", $"{nameof(TestEnum.Second)}", (int)TestEnum.Second)
+            new ApiEnumValue($"{nameof(OrderStatus.Pending)}", $"{nameof(OrderStatus.Pending)}", (int)OrderStatus.Pending),
+            new ApiEnumValue($"{nameof(OrderStatus.Paid)}", $"{nameof(OrderStatus.Paid)}", (int)OrderStatus.Paid),
+            new ApiEnumValue($"{nameof(OrderStatus.Shipped)}", $"{nameof(OrderStatus.Shipped)}", (int)OrderStatus.Shipped),
+            new ApiEnumValue($"{nameof(OrderStatus.Cancelled)}", $"{nameof(OrderStatus.Cancelled)}", (int)OrderStatus.Cancelled),
+            new ApiEnumValue($"{nameof(OrderStatus.Returned)}", $"{nameof(OrderStatus.Returned)}", (int)OrderStatus.Returned)
         ],
-        typeof(TestEnum)
+        typeof(OrderStatus)
     )
     {
         Extensions = new OrderedDictionary<Type, object>
         {
-            [typeof(TestExtension)] = TestExtension.Instance()
+            [typeof(TestExtension)] = new TestExtension()
         }
     };
 
@@ -96,21 +114,20 @@ public class ApiEnumTypeBuilderTests(ITestOutputHelper output) : ApiBuilderTests
     [
         new BuildTest
         {
-            Name = $"Builds {EnumType} without extension",
+            Name = $"Builds {EnumType}",
             ApiName = EnumType.ApiName,
             ClrType = EnumType.ClrType,
             ApiEnumValues = [.. EnumType.ApiEnumValues],
             ApiTypeExpected = EnumType,
-            AddExtension = false,
         },
         new BuildTest
         {
-            Name = $"Builds {EnumType} with extension",
+            Name = $"Builds {EnumTypeWithExtension} with extension",
             ApiName = EnumTypeWithExtension.ApiName,
             ClrType = EnumTypeWithExtension.ClrType,
             ApiEnumValues = [.. EnumTypeWithExtension.ApiEnumValues],
             ApiTypeExpected = EnumTypeWithExtension,
-            AddExtension = true,
+            ApiExtensionType = typeof(TestExtension),
         },
     ];
     #endregion

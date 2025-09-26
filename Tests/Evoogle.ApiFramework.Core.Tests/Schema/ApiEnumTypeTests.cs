@@ -6,6 +6,7 @@
 using System.Text.Json;
 
 using Evoogle.ApiFramework.Exceptions;
+using Evoogle.ApiFramework.Schema.TestData;
 using Evoogle.Extensions;
 using Evoogle.XUnit;
 
@@ -16,12 +17,6 @@ namespace Evoogle.ApiFramework.Schema;
 public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
 {
     #region Test Types
-    public enum SampleEnum
-    {
-        First,
-        Second
-    }
-
     public class InitializeThrowsTest : XUnitTest
     {
         #region User Supplied Properties
@@ -62,7 +57,7 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
         {
             try
             {
-                var apiEnumType = new ApiEnumType(nameof(SampleEnum), // Using 'SampleEnum' as a placeholder API name
+                var apiEnumType = new ApiEnumType(nameof(Gender), // Using 'Gender' as a placeholder API name
                                                   this.ApiEnumValueCollection ?? throw new ArgumentNullException(nameof(this.ApiEnumValueCollection)),
                                                   this.ClrEnumType ?? throw new ArgumentNullException(nameof(this.ClrEnumType)));
 
@@ -143,7 +138,7 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
             this.WriteLine($"API Enum Values: [{apiEnumValuesString}]");
             this.WriteLine();
 
-            var apiEnumType = new ApiEnumType(nameof(SampleEnum), // Using 'SampleEnum' as a placeholder API name
+            var apiEnumType = new ApiEnumType(nameof(Gender), // Using 'Gender' as a placeholder API name
                                               this.ApiEnumValueCollection ?? throw new ArgumentNullException(nameof(this.ApiEnumValueCollection)),
                                               this.ClrEnumType ?? throw new ArgumentNullException(nameof(this.ClrEnumType)));
             this.ApiEnumType = apiEnumType;
@@ -216,15 +211,16 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = "Throws on duplicate API enum value names",
             ApiEnumValueCollection =
             [
-                new("first", "First", 0),
-                new("second", "Second1", 1),
-                new("second", "Second2", 2), // Duplicate API Name
+                new("unspecified", "Unspecified", 0),
+                new("male", "Male", 1),
+                new("female", "Female1", 2),
+                new("female", "Female2", 3), // Duplicate API Name
             ],
-            ClrEnumType = typeof(SampleEnum),
+            ClrEnumType = typeof(Gender),
             ExpectedApiSchemaExceptionMessage = $"{nameof(ApiSchema)} initialization failed.",
             ExpectedValidationResults =
             [
-                $"{nameof(ApiEnumType)}[\"Evoogle.ApiFramework.Schema.ApiEnumTypeTests+SampleEnum\"][\"SampleEnum\"].{nameof(ApiEnumValue)} unable to initialize because duplicate {nameof(ApiEnumValue.ApiName)} values detected: second"
+                $"{nameof(ApiEnumType)}[\"Evoogle.ApiFramework.Schema.TestData.Gender\"][\"Gender\"].{nameof(ApiEnumValue)} unable to initialize because duplicate {nameof(ApiEnumValue.ApiName)} values detected: female"
             ]
         },
 
@@ -234,15 +230,16 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = "Throws on duplicate CLR enum value names",
             ApiEnumValueCollection =
             [
-                new("first", "First", 0),
-                new("second1", "Second", 1),
-                new("second2", "Second", 2), // Duplicate CLR Name
+                new("unspecified", "Unspecified", 0),
+                new("male", "Male", 1),
+                new("female1", "Female", 2),
+                new("female2", "Female", 3), // Duplicate CLR Name
             ],
-            ClrEnumType = typeof(SampleEnum),
+            ClrEnumType = typeof(Gender),
             ExpectedApiSchemaExceptionMessage = $"{nameof(ApiSchema)} initialization failed.",
             ExpectedValidationResults =
             [
-                $"{nameof(ApiEnumType)}[\"Evoogle.ApiFramework.Schema.ApiEnumTypeTests+SampleEnum\"][\"SampleEnum\"].{nameof(ApiEnumValue)} unable to initialize because duplicate {nameof(ApiEnumValue.ClrName)} values detected: Second"
+                $"{nameof(ApiEnumType)}[\"Evoogle.ApiFramework.Schema.TestData.Gender\"][\"Gender\"].{nameof(ApiEnumValue)} unable to initialize because duplicate {nameof(ApiEnumValue.ClrName)} values detected: Female"
             ]
         },
 
@@ -252,15 +249,16 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = "Throws on duplicate CLR enum value ordinals",
             ApiEnumValueCollection =
             [
-                new("first", "First", 0),
-                new("second", "Second", 1),
-                new("third", "Third", 1), // Duplicate CLR Ordinal
+                new("unspecified", "Unspecified", 0),
+                new("male", "Male", 1),
+                new("female", "Female", 2),
+                new("alien", "Alien", 2), // Duplicate CLR Ordinal
             ],
-            ClrEnumType = typeof(SampleEnum),
+            ClrEnumType = typeof(Gender),
             ExpectedApiSchemaExceptionMessage = $"{nameof(ApiSchema)} initialization failed.",
             ExpectedValidationResults =
             [
-                $"{nameof(ApiEnumType)}[\"Evoogle.ApiFramework.Schema.ApiEnumTypeTests+SampleEnum\"][\"SampleEnum\"].{nameof(ApiEnumValue)} unable to initialize because duplicate {nameof(ApiEnumValue.ClrOrdinal)} values detected: 1"
+                $"{nameof(ApiEnumType)}[\"Evoogle.ApiFramework.Schema.TestData.Gender\"][\"Gender\"].{nameof(ApiEnumValue)} unable to initialize because duplicate {nameof(ApiEnumValue.ClrOrdinal)} values detected: 2"
             ]
         },
 
@@ -270,15 +268,15 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = "Throws if CLR type is not an enum",
             ApiEnumValueCollection =
             [
-                new("first", "First", 0),
-                new("second", "Second", 1),
-                new("third", "Third", 2),
+                new("unspecified", "Unspecified", 0),
+                new("male", "Male", 1),
+                new("female", "Female", 2)
             ],
             ClrEnumType = typeof(string), // Using a non-enum type
             ExpectedApiSchemaExceptionMessage = $"{nameof(ApiSchema)} initialization failed.",
             ExpectedValidationResults =
             [
-                $"{nameof(ApiEnumType)}[\"System.String\"][\"SampleEnum\"].{nameof(ApiEnumType.ClrType)} must be a CLR enum type."
+                $"{nameof(ApiEnumType)}[\"System.String\"][\"Gender\"].{nameof(ApiEnumType.ClrType)} must be a CLR enum type."
             ]
         },
     ];
@@ -291,12 +289,13 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = "TryGetValueByApiName works for known API enum value name and exact case",
             ApiEnumValueCollection =
             [
-                new("first", "First", 0),
-                new("second", "Second", 1),
+                new("unspecified", "Unspecified", 0),
+                new("male", "Male", 1),
+                new("female", "Female", 2),
             ],
-            ClrEnumType = typeof(SampleEnum),
+            ClrEnumType = typeof(Gender),
             TryGetMethod = TryGetMethod.TryGetValueByApiName,
-            Input = "first",
+            Input = "male",
             ExpectedFound = true
         },
 
@@ -305,12 +304,13 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = "TryGetValueByApiName works for known API enum value name and case insensitivity",
             ApiEnumValueCollection =
             [
-                new("first", "First", 0),
-                new("second", "Second", 1),
+                new("unspecified", "Unspecified", 0),
+                new("male", "Male", 1),
+                new("female", "Female", 2),
             ],
-            ClrEnumType = typeof(SampleEnum),
+            ClrEnumType = typeof(Gender),
             TryGetMethod = TryGetMethod.TryGetValueByApiName,
-            Input = "FIRST",
+            Input = "MALE",
             ExpectedFound = true
         },
 
@@ -319,12 +319,13 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = "TryGetValueByApiName works for unknown API enum value name",
             ApiEnumValueCollection =
             [
-                new("first", "First", 0),
-                new("second", "Second", 1),
+                new("unspecified", "Unspecified", 0),
+                new("male", "Male", 1),
+                new("female", "Female", 2),
             ],
-            ClrEnumType = typeof(SampleEnum),
+            ClrEnumType = typeof(Gender),
             TryGetMethod = TryGetMethod.TryGetValueByApiName,
-            Input = "third",
+            Input = "alien",
             ExpectedFound = false
         },
 
@@ -334,12 +335,13 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = "TryGetValueByClrName works for known CLR enum value name and exact case",
             ApiEnumValueCollection =
             [
-                new("first", "First", 0),
-                new("second", "Second", 1),
+                new("unspecified", "Unspecified", 0),
+                new("male", "Male", 1),
+                new("female", "Female", 2),
             ],
-            ClrEnumType = typeof(SampleEnum),
+            ClrEnumType = typeof(Gender),
             TryGetMethod = TryGetMethod.TryGetValueByClrName,
-            Input = "First",
+            Input = "Male",
             ExpectedFound = true
         },
 
@@ -348,12 +350,13 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = "TryGetValueByClrName works for known CLR enum value name and case insensitivity",
             ApiEnumValueCollection =
             [
-                new("first", "First", 0),
-                new("second", "Second", 1),
+                new("unspecified", "Unspecified", 0),
+                new("male", "Male", 1),
+                new("female", "Female", 2),
             ],
-            ClrEnumType = typeof(SampleEnum),
+            ClrEnumType = typeof(Gender),
             TryGetMethod = TryGetMethod.TryGetValueByClrName,
-            Input = "FIRST",
+            Input = "MALE",
             ExpectedFound = true
         },
 
@@ -362,12 +365,13 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = "TryGetValueByClrName works for unknown CLR enum value name",
             ApiEnumValueCollection =
             [
-                new("first", "First", 0),
-                new("second", "Second", 1),
+                new("unspecified", "Unspecified", 0),
+                new("male", "Male", 1),
+                new("female", "Female", 2),
             ],
-            ClrEnumType = typeof(SampleEnum),
+            ClrEnumType = typeof(Gender),
             TryGetMethod = TryGetMethod.TryGetValueByClrName,
-            Input = "Third",
+            Input = "Alien",
             ExpectedFound = false
         },
 
@@ -377,12 +381,13 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = "TryGetValueByClrOrdinal works for known CLR enum value ordinal",
             ApiEnumValueCollection =
             [
-                new("first", "First", 0),
-                new("second", "Second", 1),
+                new("unspecified", "Unspecified", 0),
+                new("male", "Male", 1),
+                new("female", "Female", 2),
             ],
-            ClrEnumType = typeof(SampleEnum),
+            ClrEnumType = typeof(Gender),
             TryGetMethod = TryGetMethod.TryGetValueByClrOrdinal,
-            Input = 0,
+            Input = 1,
             ExpectedFound = true
         },
 
@@ -391,12 +396,13 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = "TryGetValueByClrOrdinal works for unknown CLR enum value ordinal",
             ApiEnumValueCollection =
             [
-                new("first", "First", 0),
-                new("second", "Second", 1),
+                new("unspecified", "Unspecified", 0),
+                new("male", "Male", 1),
+                new("female", "Female", 2),
             ],
-            ClrEnumType = typeof(SampleEnum),
+            ClrEnumType = typeof(Gender),
             TryGetMethod = TryGetMethod.TryGetValueByClrOrdinal,
-            Input = 2,
+            Input = 3,
             ExpectedFound = false
         },
     ];

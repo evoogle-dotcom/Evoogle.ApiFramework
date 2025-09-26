@@ -122,6 +122,14 @@ public sealed class ApiTypeExpression
     #endregion
 
     #region Methods
+    public static ApiTypeExpression ClrRef<T>() => new(typeof(T));
+
+    public static ApiTypeExpression HashSetOf<T>(ApiTypeModifiers apiItemTypeModifiers)
+        => new(new ApiCollectionType(ClrRef<T>(), apiItemTypeModifiers, typeof(HashSet<T>)));
+
+    public static ApiTypeExpression ListOf<T>(ApiTypeModifiers apiItemTypeModifiers)
+        => new(new ApiCollectionType(ClrRef<T>(), apiItemTypeModifiers, typeof(List<T>)));
+
     internal void Initialize(ApiSchema apiSchema, string apiValidationPath, ref List<ValidationResult>? results)
     {
         ArgumentNullException.ThrowIfNull(apiSchema);
@@ -130,10 +138,9 @@ public sealed class ApiTypeExpression
         _apiResolvedType = null;
 
         // Try and resolve API type with inlined API type first if applicable
-        this.InitializeApiTypeByInline(apiSchema, ref results);
-
-        if (_apiResolvedType is not null)
+        if (this.IsInline)
         {
+            this.InitializeApiTypeByInline(apiSchema, ref results);
             return;
         }
 
@@ -141,21 +148,17 @@ public sealed class ApiTypeExpression
         if (this.IsApiNamedReference)
         {
             this.InitializeApiTypeByApiNamedReference(apiSchema, apiValidationPath, ref results);
+            return;
         }
         else if (this.IsClrTypeReference)
         {
             this.InitializeApiTypeByClrTypeReference(apiSchema, apiValidationPath, ref results);
-        }
-
-        if (_apiResolvedType is not null)
-        {
             return;
         }
 
         // Unable to resolve API type with either an API named reference or a CLR type reference.
-        this.ValidateKind(apiSchema, apiValidationPath, ref results);
-        this.ValidateApiName(apiSchema, apiValidationPath, ref results);
-        this.ValidateClrType(apiSchema, apiValidationPath, ref results);
+        results ??= [];
+        results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ApiType)} is unresolved because neither {nameof(this.ApiInlineType)}, nor a valid combination of {nameof(this.Kind)} and {nameof(this.ApiName)}, nor {nameof(this.ClrType)} is set.", [nameof(this.ApiType)]));
     }
     #endregion
 
@@ -228,15 +231,12 @@ public sealed class ApiTypeExpression
 
     private void InitializeApiTypeByInline(ApiSchema apiSchema, ref List<ValidationResult>? results)
     {
-        if (this.ApiInlineType is not null)
+        if (this.ApiInlineType is ApiCollectionType collection)
         {
-            if (this.ApiInlineType is ApiCollectionType collection)
-            {
-                collection.Initialize(apiSchema, ref results);
-            }
-
-            _apiResolvedType = this.ApiInlineType;
+            collection.Initialize(apiSchema, ref results);
         }
+
+        _apiResolvedType = this.ApiInlineType;
     }
 
     private void ValidateApiName(ApiSchema _, string apiValidationPath, ref List<ValidationResult>? results)

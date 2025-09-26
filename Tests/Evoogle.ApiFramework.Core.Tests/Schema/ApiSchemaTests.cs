@@ -3,6 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Schema.TestData;
 using Evoogle.Extensions;
 using Evoogle.XUnit;
 
@@ -239,13 +240,13 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 ""ApiEnumTypes"": [],
                 ""ApiObjectTypes"": [],
                 ""Extensions"": {
-                    ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BTestExtension1, Evoogle.ApiFramework.Core.Tests"": {
+                    ""Evoogle.ApiFramework.Schema.TestData.TestExtension1, Evoogle.ApiFramework.Core.Tests"": {
                         ""Description"": ""TestExtension1""
                     }
                 }
             }",
             Expected = new ApiSchema("ApiSchema With 1 ApiScalarType And Extension 1", [TestApiScalarTypeBoolean]),
-            AddTestExtension1 = true
+            ExtensionType1 = typeof(TestExtension1)
         },
 
         // ApiSchema With 2 ApiScalarTypes
@@ -330,18 +331,18 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 ""ApiEnumTypes"": [],
                 ""ApiObjectTypes"": [],
                 ""Extensions"": {
-                    ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BTestExtension1, Evoogle.ApiFramework.Core.Tests"": {
+                    ""Evoogle.ApiFramework.Schema.TestData.TestExtension1, Evoogle.ApiFramework.Core.Tests"": {
                         ""Description"": ""TestExtension1""
                     },
-                    ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BTestExtension2, Evoogle.ApiFramework.Core.Tests"": {
+                    ""Evoogle.ApiFramework.Schema.TestData.TestExtension2, Evoogle.ApiFramework.Core.Tests"": {
                         ""Id"": ""2"",
                         ""Name"": ""TestExtension2""
                     }
                 }
             }",
             Expected = new ApiSchema("ApiSchema With 3 ApiScalarTypes And Extension 1 And Extension 2", [TestApiScalarTypeBoolean, TestApiScalarTypeInt32, TestApiScalarTypeString]),
-            AddTestExtension1 = true,
-            AddTestExtension2 = true,
+            ExtensionType1 = typeof(TestExtension1),
+            ExtensionType2 = typeof(TestExtension2),
         },
 
         // ApiSchema With 1 ApiEnumType
@@ -373,7 +374,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                                 ""ClrOrdinal"": 2
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BGender, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
                     }
                 ],
                 ""ApiObjectTypes"": []
@@ -410,18 +411,18 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                                 ""ClrOrdinal"": 2
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BGender, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
                     }
                 ],
                 ""ApiObjectTypes"": [],
                 ""Extensions"": {
-                    ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BTestExtension1, Evoogle.ApiFramework.Core.Tests"": {
+                    ""Evoogle.ApiFramework.Schema.TestData.TestExtension1, Evoogle.ApiFramework.Core.Tests"": {
                         ""Description"": ""TestExtension1""
                     }
                 }
             }",
             Expected = new ApiSchema("ApiSchema With 1 ApiEnumType And Extension 1", [TestApiEnumTypeGender]),
-            AddTestExtension1 = true,
+            ExtensionType1 = typeof(TestExtension1),
         },
 
         // ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)
@@ -469,7 +470,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                                 ""ClrOrdinal"": 2
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BGender, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
                     }
                 ],
                 ""ApiObjectTypes"": [
@@ -522,7 +523,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                             }
                         ],
                         ""ApiRelationships"": [],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BPerson, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Person, Evoogle.ApiFramework.Core.Tests""
                     }
                 ]
             }",
@@ -584,7 +585,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                                 ""ClrOrdinal"": 2
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BGender, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
                     }
                 ],
                 ""ApiObjectTypes"": [
@@ -637,14 +638,14 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                             }
                         ],
                         ""ApiRelationships"": [],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BPerson, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Person, Evoogle.ApiFramework.Core.Tests""
                     }
                 ],
                 ""Extensions"": {
-                    ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BTestExtension1, Evoogle.ApiFramework.Core.Tests"": {
+                    ""Evoogle.ApiFramework.Schema.TestData.TestExtension1, Evoogle.ApiFramework.Core.Tests"": {
                         ""Description"": ""TestExtension1""
                     },
-                    ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BTestExtension2, Evoogle.ApiFramework.Core.Tests"": {
+                    ""Evoogle.ApiFramework.Schema.TestData.TestExtension2, Evoogle.ApiFramework.Core.Tests"": {
                         ""Id"": ""2"",
                         ""Name"": ""TestExtension2""
                     }
@@ -661,8 +662,8 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     TestApiObjectTypePerson
                 ]
             ),
-            AddTestExtension1 = true,
-            AddTestExtension2 = true,
+            ExtensionType1 = typeof(TestExtension1),
+            ExtensionType2 = typeof(TestExtension2),
         },
 
         // ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 2 ApiObjectTypes (Person and Company)
@@ -710,7 +711,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                                 ""ClrOrdinal"": 2
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BGender, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
                     }
                 ],
                 ""ApiObjectTypes"": [
@@ -746,7 +747,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                                             ""ApiName"": ""Person""
                                         },
                                         ""ApiItemTypeModifiers"": ""Required"",
-                                        ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BPerson, Evoogle.ApiFramework.Core.Tests]], System.Private.CoreLib""
+                                        ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.Schema.TestData.Person, Evoogle.ApiFramework.Core.Tests]], System.Private.CoreLib""
                                     }
                                 },
                                 ""ApiTypeModifiers"": ""None"",
@@ -761,7 +762,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                                 ""ApiName"": ""Employees""
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BCompany, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Company, Evoogle.ApiFramework.Core.Tests""
                     },
                     {
                         ""Kind"": ""Object"",
@@ -812,7 +813,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                             }
                         ],
                         ""ApiRelationships"": [],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BPerson, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Person, Evoogle.ApiFramework.Core.Tests""
                     }
                 ]
             }",
@@ -859,7 +860,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         {
             Name = "ApiSchema With 1 ApiScalarType And Extension 1",
             Expected = new ApiSchema("ApiSchema With 1 ApiScalarType And Extension 1", [TestApiScalarTypeBoolean]),
-            AddTestExtension1 = true
+            AddTestExtension1 = typeof(TestExtension1)
         },
 
         // ApiSchema With 2 ApiScalarTypes
@@ -881,8 +882,8 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         {
             Name = "ApiSchema With 3 ApiScalarTypes And Extension 1 And Extension 2",
             Expected = new ApiSchema("ApiSchema With 3 ApiScalarTypes And Extension 1 And Extension 2", [TestApiScalarTypeBoolean, TestApiScalarTypeInt32, TestApiScalarTypeString]),
-            AddTestExtension1 = true,
-            AddTestExtension2 = true,
+            AddTestExtension1 = typeof(TestExtension1),
+            AddTestExtension2 = typeof(TestExtension2),
         },
 
         // ApiSchema With 1 ApiEnumType
@@ -897,7 +898,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         {
             Name = "ApiSchema With 1 ApiEnumType And Extension 1",
             Expected = new ApiSchema("ApiSchema With 1 ApiEnumType And Extension 1", [TestApiEnumTypeGender]),
-            AddTestExtension1 = true,
+            AddTestExtension1 = typeof(TestExtension1),
         },
 
         // ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)
@@ -932,8 +933,8 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     TestApiObjectTypePerson
                 ]
             ),
-            AddTestExtension1 = true,
-            AddTestExtension2 = true,
+            AddTestExtension1 = typeof(TestExtension1),
+            AddTestExtension2 = typeof(TestExtension2),
         },
 
         // ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 2 ApiObjectTypes (Person and Company) And Extension 1 And Extension 2
@@ -952,8 +953,8 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     TestApiObjectTypeCompany
                 ]
             ),
-            AddTestExtension1 = true,
-            AddTestExtension2 = true,
+            AddTestExtension1 = typeof(TestExtension1),
+            AddTestExtension2 = typeof(TestExtension2),
         },
     ];
 
@@ -1019,12 +1020,12 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 ""ApiEnumTypes"": [],
                 ""ApiObjectTypes"": [],
                 ""Extensions"": {
-                    ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BTestExtension1, Evoogle.ApiFramework.Core.Tests"": {
+                    ""Evoogle.ApiFramework.Schema.TestData.TestExtension1, Evoogle.ApiFramework.Core.Tests"": {
                         ""Description"": ""TestExtension1""
                     }
                 }
             }",
-            AddTestExtension1 = true
+            AddTestExtension1 = typeof(TestExtension1)
         },
 
         // ApiSchema With 2 ApiScalarTypes
@@ -1110,17 +1111,17 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 ""ApiEnumTypes"": [],
                 ""ApiObjectTypes"": [],
                 ""Extensions"": {
-                    ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BTestExtension1, Evoogle.ApiFramework.Core.Tests"": {
+                    ""Evoogle.ApiFramework.Schema.TestData.TestExtension1, Evoogle.ApiFramework.Core.Tests"": {
                         ""Description"": ""TestExtension1""
                     },
-                    ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BTestExtension2, Evoogle.ApiFramework.Core.Tests"": {
+                    ""Evoogle.ApiFramework.Schema.TestData.TestExtension2, Evoogle.ApiFramework.Core.Tests"": {
                         ""Id"": ""2"",
                         ""Name"": ""TestExtension2""
                     }
                 }
             }",
-            AddTestExtension1 = true,
-            AddTestExtension2 = true
+            AddTestExtension1 = typeof(TestExtension1),
+            AddTestExtension2 = typeof(TestExtension2)
         },
 
         // ApiSchema With 1 ApiEnumType
@@ -1153,7 +1154,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                                 ""ClrOrdinal"": 2
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BGender, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
                     }
                 ],
                 ""ApiObjectTypes"": []
@@ -1190,17 +1191,17 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                                 ""ClrOrdinal"": 2
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BGender, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
                     }
                 ],
                 ""ApiObjectTypes"": [],
                 ""Extensions"": {
-                    ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BTestExtension1, Evoogle.ApiFramework.Core.Tests"": {
+                    ""Evoogle.ApiFramework.Schema.TestData.TestExtension1, Evoogle.ApiFramework.Core.Tests"": {
                         ""Description"": ""TestExtension1""
                     }
                 }
             }",
-            AddTestExtension1 = true
+            AddTestExtension1 = typeof(TestExtension1)
         },
 
         // ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)
@@ -1259,7 +1260,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                                 ""ClrOrdinal"": 2
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BGender, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
                     }
                 ],
                 ""ApiObjectTypes"": [
@@ -1312,7 +1313,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                             }
                         ],
                         ""ApiRelationships"": [],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BPerson, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Person, Evoogle.ApiFramework.Core.Tests""
                     }
                 ]
             }"
@@ -1374,7 +1375,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                                 ""ClrOrdinal"": 2
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BGender, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
                     }
                 ],
                 ""ApiObjectTypes"": [
@@ -1427,21 +1428,21 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                             }
                         ],
                         ""ApiRelationships"": [],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BPerson, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Person, Evoogle.ApiFramework.Core.Tests""
                     }
                 ],
                 ""Extensions"": {
-                    ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BTestExtension1, Evoogle.ApiFramework.Core.Tests"": {
+                    ""Evoogle.ApiFramework.Schema.TestData.TestExtension1, Evoogle.ApiFramework.Core.Tests"": {
                         ""Description"": ""TestExtension1""
                     },
-                    ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BTestExtension2, Evoogle.ApiFramework.Core.Tests"": {
+                    ""Evoogle.ApiFramework.Schema.TestData.TestExtension2, Evoogle.ApiFramework.Core.Tests"": {
                         ""Id"": ""2"",
                         ""Name"": ""TestExtension2""
                     }
                 }
             }",
-            AddTestExtension1 = true,
-            AddTestExtension2 = true
+            AddTestExtension1 = typeof(TestExtension1),
+            AddTestExtension2 = typeof(TestExtension2)
         },
 
         // ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 2 ApiObjectTypes (Person and Company)
@@ -1501,7 +1502,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                                 ""ClrOrdinal"": 2
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BGender, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
                     }
                 ],
                 ""ApiObjectTypes"": [
@@ -1537,7 +1538,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                                             ""ApiName"": ""Person""
                                         },
                                         ""ApiItemTypeModifiers"": ""Required"",
-                                        ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BPerson, Evoogle.ApiFramework.Core.Tests]], System.Private.CoreLib""
+                                        ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.Schema.TestData.Person, Evoogle.ApiFramework.Core.Tests]], System.Private.CoreLib""
                                     }
                                 },
                                 ""ApiTypeModifiers"": ""None"",
@@ -1552,7 +1553,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                                 ""ApiName"": ""Employees""
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BCompany, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Company, Evoogle.ApiFramework.Core.Tests""
                     },
                     {
                         ""Kind"": ""Object"",
@@ -1603,7 +1604,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                             }
                         ],
                         ""ApiRelationships"": [],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests\u002BPerson, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Person, Evoogle.ApiFramework.Core.Tests""
                     }
                 ]
             }"

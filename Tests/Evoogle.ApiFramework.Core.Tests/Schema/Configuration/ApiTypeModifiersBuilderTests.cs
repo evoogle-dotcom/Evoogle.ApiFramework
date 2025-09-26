@@ -13,18 +13,23 @@ public class ApiTypeModifiersBuilderTests(ITestOutputHelper output) : XUnitTests
 {
     public class BuildTest : XUnitTest
     {
+        #region User Supplied Properties
         public bool? UseRequired { get; init; }
         public bool? UseOptional { get; init; }
-        public ApiTypeModifiers? Expected { get; init; }
+        public ApiTypeModifiers Expected { get; init; }
+        #endregion
 
-        private ApiTypeModifiers? Actual { get; set; }
+        #region Calculated Properties
+        private ApiTypeModifiers Actual { get; set; }
+        #endregion
 
+        #region XUnitTest Methods
         protected override void Arrange()
         {
             this.WriteLine($"UseRequired: {this.UseRequired}");
             this.WriteLine($"UseOptional: {this.UseOptional}");
-            this.WriteLine($"Expected: {this.Expected}");
             this.WriteLine();
+            this.WriteLine($"Expected: {this.Expected}");
         }
 
         protected override void Act()
@@ -38,18 +43,18 @@ public class ApiTypeModifiersBuilderTests(ITestOutputHelper output) : XUnitTests
             {
                 builder.Optional();
             }
-            var build = typeof(ApiTypeModifiersBuilder).GetMethod("Build", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!;
-            this.Actual = (ApiTypeModifiers)build.Invoke(builder, null)!;
-            this.WriteLine($"Actual: {this.Actual}");
-            this.WriteLine();
+            this.Actual = builder.Build();
+            this.WriteLine($"Actual:   {this.Actual}");
         }
 
         protected override void Assert()
         {
             this.Actual.Should().Be(this.Expected);
         }
+        #endregion
     }
 
+    #region Theory Data
     public static TheoryDataRow<IXUnitTest>[] BuildTheoryData =>
     [
         new BuildTest
@@ -59,21 +64,24 @@ public class ApiTypeModifiersBuilderTests(ITestOutputHelper output) : XUnitTests
         },
         new BuildTest
         {
-            Name = "Required sets flag",
+            Name = "UseRequired sets flag",
             UseRequired = true,
             Expected = ApiTypeModifiers.Required
         },
         new BuildTest
         {
-            Name = "Optional clears flag",
+            Name = "UseOptional clears flag",
             UseRequired = true,
             UseOptional = true,
             Expected = ApiTypeModifiers.None
         }
     ];
+    #endregion
 
+    #region Test Methods
     [Theory]
     [MemberData(nameof(BuildTheoryData))]
     public void Build(IXUnitTest test) => test.Execute(this);
+    #endregion
 }
 

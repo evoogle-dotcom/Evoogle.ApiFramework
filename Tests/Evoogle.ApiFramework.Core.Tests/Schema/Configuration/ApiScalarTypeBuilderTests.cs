@@ -3,6 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Schema.TestData;
 using Evoogle.Extensions;
 using Evoogle.XUnit;
 
@@ -10,7 +11,7 @@ using FluentAssertions;
 
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
-public class ApiScalarTypeBuilderTests(ITestOutputHelper output) : ApiBuilderTests(output)
+public class ApiScalarTypeBuilderTests(ITestOutputHelper output) : XUnitTests(output)
 {
     #region Test Classes
     public class BuildTest : XUnitTest
@@ -19,7 +20,7 @@ public class ApiScalarTypeBuilderTests(ITestOutputHelper output) : ApiBuilderTes
         public string ApiName { get; init; } = null!;
         public Type ClrType { get; init; } = null!;
         public ApiType ApiTypeExpected { get; init; } = null!;
-        public bool AddExtension { get; init; }
+        public Type? ApiExtensionType { get; init; }
         #endregion
 
         #region Calculated Properties
@@ -31,20 +32,21 @@ public class ApiScalarTypeBuilderTests(ITestOutputHelper output) : ApiBuilderTes
         {
             this.WriteLine($"ApiName: {this.ApiName.SafeToString()}");
             this.WriteLine($"ClrType: {this.ClrType.SafeToName()}");
-            this.WriteLine($"AddExtension: {this.AddExtension.SafeToString()}");
+            this.WriteLine($"ApiExtensionType: {this.ApiExtensionType.SafeToName()}");
             this.WriteLine();
             this.WriteLine($"Expected: {this.ApiTypeExpected.SafeToString()}");
         }
 
         protected override void Act()
         {
-            var context = new ApiSchemaBuilderContext(null);
+            var context = new ApiSchemaBuilderContext();
             var builder = new ApiScalarTypeBuilder(this.ClrType, context)
                 .WithName(this.ApiName);
 
-            if (this.AddExtension == true)
+            if (this.ApiExtensionType != null)
             {
-                builder.AddExtension(TestExtension.Instance());
+                var extension = Activator.CreateInstance(this.ApiExtensionType);
+                builder.AddExtension(this.ApiExtensionType, extension!);
             }
 
             this.ApiTypeActual = builder.Build();
@@ -54,7 +56,11 @@ public class ApiScalarTypeBuilderTests(ITestOutputHelper output) : ApiBuilderTes
         protected override void Assert()
         {
             this.ApiTypeActual.Should().NotBeNull();
-            this.ApiTypeActual.Should().BeEquivalentTo(this.ApiTypeExpected);
+
+            this.ApiTypeActual.Should().BeOfType<ApiScalarType>();
+            this.ApiTypeExpected.Should().BeOfType<ApiScalarType>();
+
+            this.ApiTypeActual.As<ApiScalarType>().Should().BeEquivalentTo(this.ApiTypeExpected.As<ApiScalarType>());
         }
         #endregion
     }
@@ -66,7 +72,7 @@ public class ApiScalarTypeBuilderTests(ITestOutputHelper output) : ApiBuilderTes
     {
         Extensions = new OrderedDictionary<Type, object>
         {
-            [typeof(TestExtension)] = TestExtension.Instance()
+            [typeof(TestExtension)] = new TestExtension()
         }
     };
 
@@ -75,7 +81,7 @@ public class ApiScalarTypeBuilderTests(ITestOutputHelper output) : ApiBuilderTes
     {
         Extensions = new OrderedDictionary<Type, object>
         {
-            [typeof(TestExtension)] = TestExtension.Instance()
+            [typeof(TestExtension)] = new TestExtension()
         }
     };
 
@@ -83,35 +89,33 @@ public class ApiScalarTypeBuilderTests(ITestOutputHelper output) : ApiBuilderTes
     [
         new BuildTest
         {
-            Name = $"Builds {Int64Type} without extension",
+            Name = $"Build {Int64Type}",
             ApiName = Int64Type.ApiName,
             ClrType = Int64Type.ClrType,
             ApiTypeExpected = Int64Type,
-            AddExtension = false,
         },
         new BuildTest
         {
-            Name = $"Builds {StringType} without extension",
+            Name = $"Build {StringType}",
             ApiName = StringType.ApiName,
             ClrType = StringType.ClrType,
             ApiTypeExpected = StringType,
-            AddExtension = false,
         },
         new BuildTest
         {
-            Name = $"Builds {Int64TypeWithExtension} with extension",
+            Name = $"Build {Int64TypeWithExtension} with extension",
             ApiName = Int64TypeWithExtension.ApiName,
             ClrType = Int64TypeWithExtension.ClrType,
             ApiTypeExpected = Int64TypeWithExtension,
-            AddExtension = true,
+            ApiExtensionType = typeof(TestExtension),
         },
         new BuildTest
         {
-            Name = $"Builds {StringTypeWithExtension} with extension",
+            Name = $"Build {StringTypeWithExtension} with extension",
             ApiName = StringTypeWithExtension.ApiName,
             ClrType = StringTypeWithExtension.ClrType,
             ApiTypeExpected = StringTypeWithExtension,
-            AddExtension = true,
+            ApiExtensionType = typeof(TestExtension),
         },
     ];
     #endregion

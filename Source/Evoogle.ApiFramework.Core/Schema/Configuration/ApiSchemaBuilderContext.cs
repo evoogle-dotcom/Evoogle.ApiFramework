@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
-public sealed class ApiSchemaBuilderContext(ILogger<ApiSchemaBuilder>? logger)
+public sealed class ApiSchemaBuilderContext(ILogger<ApiSchemaBuilder>? logger = null)
 {
     #region Fields
     private readonly Dictionary<Type, ApiScalarTypeBuilder> _apiScalarTypeBuilders = [];

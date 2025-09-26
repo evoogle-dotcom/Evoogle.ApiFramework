@@ -69,7 +69,7 @@ public sealed class ApiSchema : ExtensibleBase
 
     #region Constructors
     /// <summary>
-    ///     Initializes a new instance of the <see cref="ApiSchema"/> class using separate collections for scalar, enum, and object types.
+    ///     Instantiates a new instance of the <see cref="ApiSchema"/> class using separate collections for scalar, enum, and object types.
     /// </summary>
     /// <param name="apiName">The name of the API schema.</param>
     /// <param name="apiVersion">The optional version of the API schema.</param>
@@ -99,7 +99,7 @@ public sealed class ApiSchema : ExtensibleBase
     }
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="ApiSchema"/> class from a collection of API named types.
+    ///     Instantiates a new instance of the <see cref="ApiSchema"/> class from a collection of API named types.
     /// </summary>
     /// <param name="apiName">The name of the API schema.</param>
     /// <param name="apiVersion">The optional version of the API schema.</param>
@@ -109,7 +109,63 @@ public sealed class ApiSchema : ExtensibleBase
     { }
     #endregion
 
-    #region ApiSchema Methods
+    #region Factory Methods
+    public static ApiSchema Create
+    (
+        string apiName,
+        IEnumerable<ApiNamedType>? apiNamedTypes,
+        string? apiVersion = null,
+        IEnumerable<object>? extensions = null
+    )
+    {
+        var apiSchema = new ApiSchema(apiName, apiNamedTypes)
+        {
+            ApiVersion = apiVersion
+        };
+
+        if (extensions is not null)
+        {
+            foreach (var extension in extensions)
+            {
+                var extensionType = extension.GetType();
+                apiSchema.AttachExtension(extensionType, extension);
+            }
+        }
+
+        apiSchema.Initialize();
+        return apiSchema;
+    }
+
+    public static ApiSchema Create
+    (
+        string apiName,
+        IEnumerable<ApiScalarType>? apiScalarTypes,
+        IEnumerable<ApiEnumType>? apiEnumTypes,
+        IEnumerable<ApiObjectType>? apiObjectTypes,
+        string? apiVersion = null,
+        IEnumerable<object>? extensions = null
+    )
+    {
+        var apiSchema = new ApiSchema(apiName, apiScalarTypes, apiEnumTypes, apiObjectTypes)
+        {
+            ApiVersion = apiVersion
+        };
+
+        if (extensions is not null)
+        {
+            foreach (var extension in extensions)
+            {
+                var extensionType = extension.GetType();
+                apiSchema.AttachExtension(extensionType, extension);
+            }
+        }
+
+        apiSchema.Initialize();
+        return apiSchema;
+    }
+    #endregion
+
+    #region Initialize Methods
     public ApiSchemaInitializeResult Initialize()
     {
         List<ValidationResult>? results = null;

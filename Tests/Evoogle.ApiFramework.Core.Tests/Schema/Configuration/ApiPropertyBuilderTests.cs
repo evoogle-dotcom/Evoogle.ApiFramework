@@ -3,6 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Schema.TestData;
 using Evoogle.Extensions;
 using Evoogle.XUnit;
 
@@ -10,16 +11,17 @@ using FluentAssertions;
 
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
-public class ApiPropertyBuilderTests(ITestOutputHelper output) : ApiBuilderTests(output)
+public class ApiPropertyBuilderTests(ITestOutputHelper output) : XUnitTests(output)
 {
     #region Test Classes
     public class BuildTest : XUnitTest
     {
         #region User Supplied Properties
+        public Type ClrObjectType { get; init; } = null!;
         public string ApiName { get; init; } = null!;
         public string ClrName { get; init; } = null!;
         public ApiProperty ApiPropertyExpected { get; init; } = null!;
-        public bool AddExtension { get; init; }
+        public Type? ApiExtensionType { get; init; }
         #endregion
 
         #region Calculated Properties
@@ -29,9 +31,10 @@ public class ApiPropertyBuilderTests(ITestOutputHelper output) : ApiBuilderTests
         #region XUnitTest Methods
         protected override void Arrange()
         {
+            this.WriteLine($"ClrObjectType: {this.ClrObjectType.SafeToName()}");
             this.WriteLine($"ApiName: {this.ApiName.SafeToString()}");
             this.WriteLine($"ClrName: {this.ClrName.SafeToString()}");
-            this.WriteLine($"AddExtension: {this.AddExtension.SafeToString()}");
+            this.WriteLine($"ApiExtensionType: {this.ApiExtensionType.SafeToName()}");
             this.WriteLine();
             this.WriteLine($"Expected: {this.ApiPropertyExpected.SafeToString()}");
         }
@@ -39,12 +42,13 @@ public class ApiPropertyBuilderTests(ITestOutputHelper output) : ApiBuilderTests
         protected override void Act()
         {
             var builder = new ApiPropertyBuilder(this.ApiName, this.ClrName);
-            if (this.AddExtension == true)
+            if (this.ApiExtensionType != null)
             {
-                builder.AddExtension(TestExtension.Instance());
+                var extension = Activator.CreateInstance(this.ApiExtensionType);
+                builder.AddExtension(this.ApiExtensionType, extension!);
             }
 
-            this.ApiPropertyActual = builder.Build(typeof(TestClass));
+            this.ApiPropertyActual = builder.Build(this.ClrObjectType);
             this.WriteLine($"Actual:   {this.ApiPropertyActual.SafeToString()}");
         }
 
@@ -64,21 +68,21 @@ public class ApiPropertyBuilderTests(ITestOutputHelper output) : ApiBuilderTests
     #endregion
 
     #region Theory Data
-    private static ApiProperty RequiredNameProperty { get; } = new ApiProperty("name", new ApiTypeExpression(typeof(string)), ApiTypeModifiers.Required, nameof(TestClass.RequiredName));
-    private static ApiProperty RequiredNamePropertyWithExtension { get; } = new ApiProperty("name", new ApiTypeExpression(typeof(string)), ApiTypeModifiers.Required, nameof(TestClass.RequiredName))
+    private static ApiProperty RequiredNameProperty { get; } = new ApiProperty(nameof(ScalarsOnly.RequiredName), ApiTypeExpression.ClrRef<string>(), ApiTypeModifiers.Required, nameof(ScalarsOnly.RequiredName));
+    private static ApiProperty RequiredNamePropertyWithExtension { get; } = new ApiProperty(nameof(ScalarsOnly.RequiredName), ApiTypeExpression.ClrRef<string>(), ApiTypeModifiers.Required, nameof(ScalarsOnly.RequiredName))
     {
         Extensions = new OrderedDictionary<Type, object>
         {
-            [typeof(TestExtension)] = TestExtension.Instance()
+            [typeof(TestExtension)] = new TestExtension()
         }
     };
 
-    private static ApiProperty OptionalAgeProperty { get; } = new ApiProperty("age", new ApiTypeExpression(typeof(int)), ApiTypeModifiers.None, nameof(TestClass.OptionalAge));
-    private static ApiProperty OptionalAgePropertyWithExtension { get; } = new ApiProperty("age", new ApiTypeExpression(typeof(int)), ApiTypeModifiers.None, nameof(TestClass.OptionalAge))
+    private static ApiProperty OptionalNumberProperty { get; } = new ApiProperty(nameof(ScalarsOnly.OptionalNumber), ApiTypeExpression.ClrRef<long>(), ApiTypeModifiers.None, nameof(ScalarsOnly.OptionalNumber));
+    private static ApiProperty OptionalNumberPropertyWithExtension { get; } = new ApiProperty(nameof(ScalarsOnly.OptionalNumber), ApiTypeExpression.ClrRef<long>(), ApiTypeModifiers.None, nameof(ScalarsOnly.OptionalNumber))
     {
         Extensions = new OrderedDictionary<Type, object>
         {
-            [typeof(TestExtension)] = TestExtension.Instance()
+            [typeof(TestExtension)] = new TestExtension()
         }
     };
 
@@ -86,35 +90,37 @@ public class ApiPropertyBuilderTests(ITestOutputHelper output) : ApiBuilderTests
     [
         new BuildTest
         {
-            Name = $"Builds {RequiredNameProperty} without extension",
+            Name = $"Builds {RequiredNameProperty}",
+            ClrObjectType = typeof(ScalarsOnly),
             ApiName = RequiredNameProperty.ApiName,
             ClrName = RequiredNameProperty.ClrName,
             ApiPropertyExpected = RequiredNameProperty,
-            AddExtension = false,
         },
         new BuildTest
         {
-            Name = $"Builds {RequiredNameProperty} with extension",
+            Name = $"Builds {RequiredNamePropertyWithExtension} with extension",
+            ClrObjectType = typeof(ScalarsOnly),
             ApiName = RequiredNamePropertyWithExtension.ApiName,
             ClrName = RequiredNamePropertyWithExtension.ClrName,
             ApiPropertyExpected = RequiredNamePropertyWithExtension,
-            AddExtension = true,
+            ApiExtensionType = typeof(TestExtension),
         },
         new BuildTest
         {
-            Name = $"Builds {OptionalAgeProperty} without extension",
-            ApiName = OptionalAgeProperty.ApiName,
-            ClrName = OptionalAgeProperty.ClrName,
-            ApiPropertyExpected = OptionalAgeProperty,
-            AddExtension = false,
+            Name = $"Builds {OptionalNumberProperty}",
+            ClrObjectType = typeof(ScalarsOnly),
+            ApiName = OptionalNumberProperty.ApiName,
+            ClrName = OptionalNumberProperty.ClrName,
+            ApiPropertyExpected = OptionalNumberProperty,
         },
         new BuildTest
         {
-            Name = $"Builds {OptionalAgeProperty} with extension",
-            ApiName = OptionalAgePropertyWithExtension.ApiName,
-            ClrName = OptionalAgePropertyWithExtension.ClrName,
-            ApiPropertyExpected = OptionalAgePropertyWithExtension,
-            AddExtension = true,
+            Name = $"Builds {OptionalNumberPropertyWithExtension} with extension",
+            ClrObjectType = typeof(ScalarsOnly),
+            ApiName = OptionalNumberPropertyWithExtension.ApiName,
+            ClrName = OptionalNumberPropertyWithExtension.ClrName,
+            ApiPropertyExpected = OptionalNumberPropertyWithExtension,
+            ApiExtensionType = typeof(TestExtension),
         },
     ];
     #endregion

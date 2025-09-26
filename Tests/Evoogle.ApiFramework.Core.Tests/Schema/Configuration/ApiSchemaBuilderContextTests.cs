@@ -3,14 +3,23 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Schema.TestData;
 using Evoogle.XUnit;
 
 using FluentAssertions;
 
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
-public class ApiSchemaBuilderContextTests(ITestOutputHelper output) : ApiBuilderTests(output)
+public class ApiSchemaBuilderContextTests(ITestOutputHelper output) : XUnitTests(output)
 {
+    #region Test Types
+    public class Parent
+    {
+        public string Name { get; set; } = string.Empty;
+        public List<Parent> Children { get; set; } = [];
+    }
+    #endregion
+
     public enum BuilderKind
     {
         Enum,
@@ -35,7 +44,7 @@ public class ApiSchemaBuilderContextTests(ITestOutputHelper output) : ApiBuilder
 
         protected override void Act()
         {
-            var context = new ApiSchemaBuilderContext(null);
+            var context = new ApiSchemaBuilderContext();
             var methodName = this.Kind switch
             {
                 BuilderKind.Enum => "GetOrAddEnumTypeBuilder",
@@ -66,13 +75,13 @@ public class ApiSchemaBuilderContextTests(ITestOutputHelper output) : ApiBuilder
         {
             Name = "Enum builder cached",
             Kind = BuilderKind.Enum,
-            ClrType = typeof(TestEnum)
+            ClrType = typeof(OrderStatus)
         },
         new GetOrAddTest
         {
             Name = "Object builder cached",
             Kind = BuilderKind.Object,
-            ClrType = typeof(ApiObjectTypeBuilderTests.Parent)
+            ClrType = typeof(Parent)
         }
     ];
 

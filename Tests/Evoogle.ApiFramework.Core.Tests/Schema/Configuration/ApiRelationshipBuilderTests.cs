@@ -3,6 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Schema.TestData;
 using Evoogle.Extensions;
 using Evoogle.XUnit;
 
@@ -10,7 +11,7 @@ using FluentAssertions;
 
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
-public class ApiRelationshipBuilderTests(ITestOutputHelper output) : ApiBuilderTests(output)
+public class ApiRelationshipBuilderTests(ITestOutputHelper output) : XUnitTests(output)
 {
     public class BuildTest : XUnitTest
     {
@@ -18,7 +19,7 @@ public class ApiRelationshipBuilderTests(ITestOutputHelper output) : ApiBuilderT
         public string ApiName { get; init; } = null!;
         public string? ApiPropertyName { get; init; }
         public ApiRelationship ApiRelationshipExpected { get; init; } = null!;
-        public bool AddExtension { get; init; }
+        public Type? ApiExtensionType { get; init; }
         #endregion
 
         #region Calculated Properties
@@ -29,7 +30,7 @@ public class ApiRelationshipBuilderTests(ITestOutputHelper output) : ApiBuilderT
         {
             this.WriteLine($"ApiName: {this.ApiName}");
             this.WriteLine($"ApiPropertyName: {this.ApiPropertyName}");
-            this.WriteLine($"AddExtension: {this.AddExtension.SafeToString()}");
+            this.WriteLine($"ApiExtensionType: {this.ApiExtensionType.SafeToName()}");
             this.WriteLine();
             this.WriteLine($"Expected: {this.ApiRelationshipExpected.SafeToString()}");
         }
@@ -37,9 +38,10 @@ public class ApiRelationshipBuilderTests(ITestOutputHelper output) : ApiBuilderT
         protected override void Act()
         {
             var builder = new ApiRelationshipBuilder(this.ApiName, this.ApiPropertyName);
-            if (this.AddExtension == true)
+            if (this.ApiExtensionType != null)
             {
-                builder.AddExtension(TestExtension.Instance());
+                var extension = Activator.CreateInstance(this.ApiExtensionType);
+                builder.AddExtension(this.ApiExtensionType, extension!);
             }
 
             this.ApiRelationshipActual = builder.Build();
@@ -66,7 +68,7 @@ public class ApiRelationshipBuilderTests(ITestOutputHelper output) : ApiBuilderT
     {
         Extensions = new OrderedDictionary<Type, object>
         {
-            [typeof(TestExtension)] = TestExtension.Instance()
+            [typeof(TestExtension)] = new TestExtension()
         }
     };
 
@@ -75,7 +77,7 @@ public class ApiRelationshipBuilderTests(ITestOutputHelper output) : ApiBuilderT
     {
         Extensions = new OrderedDictionary<Type, object>
         {
-            [typeof(TestExtension)] = TestExtension.Instance()
+            [typeof(TestExtension)] = new TestExtension()
         }
     };
 
@@ -83,11 +85,10 @@ public class ApiRelationshipBuilderTests(ITestOutputHelper output) : ApiBuilderT
     [
         new BuildTest
         {
-            Name = $"Builds {CustomerRelationship} without extension",
+            Name = $"Builds {CustomerRelationship}",
             ApiName = CustomerRelationship.ApiName,
             ApiPropertyName = CustomerRelationship.ApiPropertyName,
             ApiRelationshipExpected = CustomerRelationship,
-            AddExtension = false,
         },
         new BuildTest
         {
@@ -95,15 +96,14 @@ public class ApiRelationshipBuilderTests(ITestOutputHelper output) : ApiBuilderT
             ApiName = CustomerRelationshipWithExtension.ApiName,
             ApiPropertyName = CustomerRelationshipWithExtension.ApiPropertyName,
             ApiRelationshipExpected = CustomerRelationshipWithExtension,
-            AddExtension = true,
+            ApiExtensionType = typeof(TestExtension),
         },
         new BuildTest
         {
-            Name = $"Builds {OrdersRelationship} without extension",
+            Name = $"Builds {OrdersRelationship}",
             ApiName = OrdersRelationship.ApiName,
             ApiPropertyName = OrdersRelationship.ApiPropertyName,
             ApiRelationshipExpected = OrdersRelationship,
-            AddExtension = false,
         },
         new BuildTest
         {
@@ -111,7 +111,7 @@ public class ApiRelationshipBuilderTests(ITestOutputHelper output) : ApiBuilderT
             ApiName = OrdersRelationshipWithExtension.ApiName,
             ApiPropertyName = OrdersRelationshipWithExtension.ApiPropertyName,
             ApiRelationshipExpected = OrdersRelationshipWithExtension,
-            AddExtension = true,
+            ApiExtensionType = typeof(TestExtension),
         },
     ];
     #endregion
