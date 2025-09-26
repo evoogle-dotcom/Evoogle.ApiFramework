@@ -16,9 +16,16 @@ using static Evoogle.ApiFramework.Schema.Json.Internal.ApiJsonConverterHelpers;
 
 namespace Evoogle.ApiFramework.Schema.Json;
 
+/// <summary>
+///     Converts <see cref="ApiTypeExpression"/> instances to and from JSON, including inline types and references.
+/// </summary>
+/// <param name="logger">The optional logger that receives diagnostics for serialization operations.</param>
 public class ApiTypeExpressionJsonConverter(ILogger<ApiTypeExpressionJsonConverter>? logger) : JsonConverter<ApiTypeExpression>
 {
     #region Context Types
+    /// <summary>
+    ///     Encapsulates the immutable state needed while reading or writing type expressions.
+    /// </summary>
     private abstract class Context(ILogger<ApiTypeExpressionJsonConverter> logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames) : IHasLogger<ApiTypeExpressionJsonConverter>
     {
         #region Immutable Properties
@@ -29,6 +36,9 @@ public class ApiTypeExpressionJsonConverter(ILogger<ApiTypeExpressionJsonConvert
         #endregion
     }
 
+    /// <summary>
+    ///     Holds intermediate values while deserializing an <see cref="ApiTypeExpression"/> from JSON.
+    /// </summary>
     private class ReadContext(ILogger<ApiTypeExpressionJsonConverter> logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames, ReadHandlers readHandlers)
         : Context(logger, options, propertyNamingPolicy, propertyNames)
     {
@@ -41,6 +51,9 @@ public class ApiTypeExpressionJsonConverter(ILogger<ApiTypeExpressionJsonConvert
         #endregion
     }
 
+    /// <summary>
+    ///     Provides converter state while writing an <see cref="ApiTypeExpression"/> to JSON.
+    /// </summary>
     private class WriteContext(ILogger<ApiTypeExpressionJsonConverter> logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames)
         : Context(logger, options, propertyNamingPolicy, propertyNames)
     {
@@ -48,6 +61,9 @@ public class ApiTypeExpressionJsonConverter(ILogger<ApiTypeExpressionJsonConvert
     #endregion
 
     #region Property Types
+    /// <summary>
+    ///     Caches the JSON property names used to represent a type expression for the active naming policy.
+    /// </summary>
     private readonly record struct ApiTypeExpressionPropertyNames
     {
         #region Immutable Properties
@@ -58,6 +74,9 @@ public class ApiTypeExpressionJsonConverter(ILogger<ApiTypeExpressionJsonConvert
         #endregion
     }
 
+    /// <summary>
+    ///     Aggregates all property names used by the converter for a given naming policy.
+    /// </summary>
     private readonly record struct PropertyNames
     {
         #region Immutable Properties
@@ -67,6 +86,9 @@ public class ApiTypeExpressionJsonConverter(ILogger<ApiTypeExpressionJsonConvert
     #endregion
 
     #region Read Types
+    /// <summary>
+    ///     Temporary storage that holds parsed values prior to creating an <see cref="ApiTypeExpression"/>.
+    /// </summary>
     private class ApiTypeExpressionReadData
     {
         #region Properties
@@ -77,6 +99,9 @@ public class ApiTypeExpressionJsonConverter(ILogger<ApiTypeExpressionJsonConvert
         #endregion
     }
 
+    /// <summary>
+    ///     Captures the overall data read from JSON for a single type expression instance.
+    /// </summary>
     private class ReadData
     {
         #region Properties
@@ -84,6 +109,9 @@ public class ApiTypeExpressionJsonConverter(ILogger<ApiTypeExpressionJsonConvert
         #endregion
     }
 
+    /// <summary>
+    ///     Provides JSON property handlers that populate <see cref="ReadData"/> during deserialization.
+    /// </summary>
     private class ReadHandlers(PropertyNames propertyNames)
     {
         #region ApiTypeExpression Fields

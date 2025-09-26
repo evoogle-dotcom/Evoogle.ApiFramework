@@ -17,9 +17,16 @@ using static Evoogle.ApiFramework.Schema.Json.Internal.ApiJsonConverterHelpers;
 
 namespace Evoogle.ApiFramework.Schema.Json;
 
+/// <summary>
+///     Handles JSON serialization for <see cref="ApiEnumValue"/> instances, including support for extensions.
+/// </summary>
+/// <param name="logger">The optional logger that receives converter diagnostics.</param>
 public class ApiEnumValueJsonConverter(ILogger<ApiEnumValueJsonConverter>? logger) : JsonConverter<ApiEnumValue>
 {
     #region Context Types
+    /// <summary>
+    ///     Represents the shared state required by read and write operations while converting enum values.
+    /// </summary>
     private abstract class Context(ILogger<ApiEnumValueJsonConverter> logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames) : IHasLogger<ApiEnumValueJsonConverter>
     {
         #region Immutable Properties
@@ -30,6 +37,9 @@ public class ApiEnumValueJsonConverter(ILogger<ApiEnumValueJsonConverter>? logge
         #endregion
     }
 
+    /// <summary>
+    ///     Collects intermediate data while reading an <see cref="ApiEnumValue"/> from JSON.
+    /// </summary>
     private class ReadContext(ILogger<ApiEnumValueJsonConverter> logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames, ReadHandlers readHandlers)
         : Context(logger, options, propertyNamingPolicy, propertyNames)
     {
@@ -42,6 +52,9 @@ public class ApiEnumValueJsonConverter(ILogger<ApiEnumValueJsonConverter>? logge
         #endregion
     }
 
+    /// <summary>
+    ///     Supplies contextual information while writing an <see cref="ApiEnumValue"/> to JSON.
+    /// </summary>
     private class WriteContext(ILogger<ApiEnumValueJsonConverter> logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames)
         : Context(logger, options, propertyNamingPolicy, propertyNames)
     {
@@ -49,6 +62,9 @@ public class ApiEnumValueJsonConverter(ILogger<ApiEnumValueJsonConverter>? logge
     #endregion
 
     #region Property Types
+    /// <summary>
+    ///     Stores the resolved property names for enum value members under a given naming policy.
+    /// </summary>
     private readonly record struct ApiEnumValuePropertyNames
     {
         #region Immutable Properties
@@ -58,6 +74,9 @@ public class ApiEnumValueJsonConverter(ILogger<ApiEnumValueJsonConverter>? logge
         #endregion
     }
 
+    /// <summary>
+    ///     Combines property name metadata used by the converter while reading or writing values.
+    /// </summary>
     private readonly record struct PropertyNames
     {
         #region Immutable Properties
@@ -68,6 +87,9 @@ public class ApiEnumValueJsonConverter(ILogger<ApiEnumValueJsonConverter>? logge
     #endregion
 
     #region Read Types
+    /// <summary>
+    ///     Temporary storage used when deserializing individual enum value members.
+    /// </summary>
     private class ApiEnumValueReadData
     {
         #region Properties
@@ -77,6 +99,9 @@ public class ApiEnumValueJsonConverter(ILogger<ApiEnumValueJsonConverter>? logge
         #endregion
     }
 
+    /// <summary>
+    ///     Collects the fully parsed data required to construct an <see cref="ApiEnumValue"/>.
+    /// </summary>
     private class ReadData : ExtensibleReadData
     {
         #region Properties
@@ -84,6 +109,9 @@ public class ApiEnumValueJsonConverter(ILogger<ApiEnumValueJsonConverter>? logge
         #endregion
     }
 
+    /// <summary>
+    ///     Maps JSON property names to handlers that populate <see cref="ReadData"/> during deserialization.
+    /// </summary>
     private class ReadHandlers(PropertyNames propertyNames)
     {
         #region Constants
