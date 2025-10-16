@@ -222,7 +222,7 @@ public sealed class ApiSchema : ExtensibleBase
         var apiObjectTypeCount = this.ApiObjectTypes.Length.SafeToString();
         var extensionCount = this.ExtensionCount.SafeToString();
 
-        return $"{nameof(ApiSchema)} {{ApiName={apiName}, ApiVersion={apiVersion}, ApiNamedTypeCount={apiNamedTypeCount}, ApiScalarTypeCount={apiScalarTypeCount}, ApiEnumTypeCount={apiEnumTypeCount}, ApiObjectTypeCount={apiObjectTypeCount}, {nameof(ExtensionCount)}={extensionCount}}}";
+        return $"{nameof(ApiSchema)} {{ApiName={apiName}, ApiVersion={apiVersion}, ApiNamedTypeCount={apiNamedTypeCount}, ApiScalarTypeCount={apiScalarTypeCount}, ApiEnumTypeCount={apiEnumTypeCount}, ApiObjectTypeCount={apiObjectTypeCount}, {nameof(this.ExtensionCount)}={extensionCount}}}";
     }
     #endregion
 

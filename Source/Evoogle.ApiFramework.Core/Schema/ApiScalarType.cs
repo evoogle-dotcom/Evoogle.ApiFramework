@@ -39,7 +39,7 @@ public sealed class ApiScalarType(string apiName, Type clrScalarType) : ApiNamed
         var clrType = this.ClrType.SafeToName();
         var extensionCount = this.ExtensionCount.SafeToString();
 
-        return $"{nameof(ApiScalarType)} {{{nameof(this.ApiName)}={apiName}, {nameof(ExtensionCount)}={extensionCount}}} [{clrType}]";
+        return $"{nameof(ApiScalarType)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ExtensionCount)}={extensionCount}}} [{clrType}]";
     }
     #endregion
 }

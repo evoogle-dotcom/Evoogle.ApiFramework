@@ -58,7 +58,7 @@ public sealed class ApiEnumValue(string apiName, string clrName, int clrOrdinal)
         var clrOrdinal = this.ClrOrdinal.SafeToString();
         var extensionCount = this.ExtensionCount.SafeToString();
 
-        return $"{nameof(ApiEnumValue)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ClrName)}={clrName}, {nameof(this.ClrOrdinal)}={clrOrdinal}, {nameof(ExtensionCount)}={extensionCount}}}";
+        return $"{nameof(ApiEnumValue)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ClrName)}={clrName}, {nameof(this.ClrOrdinal)}={clrOrdinal}, {nameof(this.ExtensionCount)}={extensionCount}}}";
     }
     #endregion
 

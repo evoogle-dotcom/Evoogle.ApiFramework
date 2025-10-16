@@ -68,7 +68,7 @@ public sealed class ApiCollectionType(ApiTypeExpression apiItemTypeExpression, A
         var clrType = this.ClrType.SafeToName();
         var extensionCount = this.ExtensionCount.SafeToString();
 
-        return $"{nameof(ApiCollectionType)} {{{nameof(this.ApiItemTypeExpression)}={apiItemTypeExpression}, {nameof(this.ApiItemTypeModifiers)}={apiItemTypeModifiers}, {nameof(ExtensionCount)}={extensionCount}}} [{clrType}]";
+        return $"{nameof(ApiCollectionType)} {{{nameof(this.ApiItemTypeExpression)}={apiItemTypeExpression}, {nameof(this.ApiItemTypeModifiers)}={apiItemTypeModifiers}, {nameof(this.ExtensionCount)}={extensionCount}}} [{clrType}]";
     }
     #endregion
 

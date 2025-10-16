@@ -28,8 +28,8 @@ public sealed class ApiIdJsonConverter : JsonConverter<ApiId>
         }
 
         var kind = ApiIdKind.None;
-        string? valueText = null;
-        ApiIdPart[]? parts = null;
+        var valueText = default(string?);
+        var parts = default(ApiIdPart[]?);
 
         while (reader.Read())
         {
@@ -52,7 +52,14 @@ public sealed class ApiIdJsonConverter : JsonConverter<ApiId>
                 {
                     kind = ParseKind(reader.GetString());
                 }
-                else if (reader.TokenType == JsonTokenType.Number) { if (!reader.TryGetByte(out var b)) { throw new JsonException("Invalid kind numeric value."); } kind = (ApiIdKind)b; }
+                else if (reader.TokenType == JsonTokenType.Number)
+                {
+                    if (!reader.TryGetByte(out var b))
+                    {
+                        throw new JsonException("Invalid kind numeric value.");
+                    }
+                    kind = (ApiIdKind)b;
+                }
                 else
                 {
                     throw new JsonException("Invalid kind value type.");
@@ -67,7 +74,7 @@ public sealed class ApiIdJsonConverter : JsonConverter<ApiId>
                         throw new JsonException("Composite value must be an array of parts.");
                     }
 
-                    var list = new System.Collections.Generic.List<ApiIdPart>();
+                    var list = new List<ApiIdPart>();
                     while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
                     {
                         if (reader.TokenType != JsonTokenType.StartObject)
@@ -75,7 +82,8 @@ public sealed class ApiIdJsonConverter : JsonConverter<ApiId>
                             throw new JsonException("Composite part must be an object.");
                         }
 
-                        string? name = null; ApiId val = default;
+                        var name = default(string?);
+                        var val = default(ApiId);
                         while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
                         {
                             if (reader.TokenType != JsonTokenType.PropertyName)
@@ -86,14 +94,25 @@ public sealed class ApiIdJsonConverter : JsonConverter<ApiId>
                             var pn = reader.GetString();
                             reader.Read();
                             if (string.Equals(pn, "name", StringComparison.OrdinalIgnoreCase))
-                            { name = reader.TokenType == JsonTokenType.String ? reader.GetString() : throw new JsonException("Part.name must be a string."); }
+                            {
+                                name = reader.TokenType == JsonTokenType.String ? reader.GetString() : throw new JsonException("Part.name must be a string.");
+                            }
                             else if (string.Equals(pn, "value", StringComparison.OrdinalIgnoreCase))
-                            { val = Read(ref reader, typeof(ApiId), options); }
-                            else { reader.Skip(); }
+                            {
+                                val = this.Read(ref reader, typeof(ApiId), options);
+                                if (val.Kind == ApiIdKind.Composite)
+                                {
+                                    throw new JsonException("Nested composite parts are not allowed in ApiId.");
+                                }
+                            }
+                            else
+                            {
+                                reader.Skip();
+                            }
                         }
                         list.Add(new ApiIdPart(name, val));
                     }
-                    parts = list.ToArray();
+                    parts = [.. list];
                 }
                 else
                 {
@@ -107,7 +126,10 @@ public sealed class ApiIdJsonConverter : JsonConverter<ApiId>
                     };
                 }
             }
-            else { reader.Skip(); }
+            else
+            {
+                reader.Skip();
+            }
         }
 
         if (kind == ApiIdKind.None)
@@ -135,7 +157,11 @@ public sealed class ApiIdJsonConverter : JsonConverter<ApiId>
 
     public override void Write(Utf8JsonWriter writer, ApiId value, JsonSerializerOptions options)
     {
-        if (!value.HasValue) { writer.WriteNullValue(); return; }
+        if (!value.HasValue)
+        {
+            writer.WriteNullValue();
+            return;
+        }
 
         writer.WriteStartObject();
         writer.WriteString(_kindProp, value.Kind.ToString().ToLowerInvariant());
@@ -152,7 +178,7 @@ public sealed class ApiIdJsonConverter : JsonConverter<ApiId>
                 }
 
                 writer.WritePropertyName("value");
-                Write(writer, p.Value, options);
+                this.Write(writer, p.Value, options);
                 writer.WriteEndObject();
             }
             writer.WriteEndArray();

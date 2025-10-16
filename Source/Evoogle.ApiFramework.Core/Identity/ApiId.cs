@@ -48,6 +48,7 @@ public readonly struct ApiId : IEquatable<ApiId>, IComparable<ApiId>
     public bool IsUlid => this.Kind == ApiIdKind.Ulid;
     public bool IsCulture => this.Kind == ApiIdKind.Culture;
     public bool IsComposite => this.Kind == ApiIdKind.Composite;
+    public bool IsScalar => this.Kind != ApiIdKind.None && this.Kind != ApiIdKind.Composite;
 
     /// <summary>
     ///     True if this composite was built with all <see cref="ApiIdPart.Name"/> non-null.
@@ -101,7 +102,7 @@ public readonly struct ApiId : IEquatable<ApiId>, IComparable<ApiId>
     #endregion
 
     #region Constructors
-    private ApiId(ApiIdKind kind, in ApiIdValueUnion val, object? reference, string? original)
+    internal ApiId(ApiIdKind kind, in ApiIdValueUnion val, object? reference, string? original)
     {
         _val = val;
         _ref = reference;
@@ -118,6 +119,12 @@ public readonly struct ApiId : IEquatable<ApiId>, IComparable<ApiId>
         return new ApiId(ApiIdKind.Culture, default, value, value.Name);
     }
 
+    public static ApiId FromCulture(string name)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
+        return new ApiId(ApiIdKind.Culture, default, CultureInfo.GetCultureInfo(name), name);
+    }
+
     public static ApiId FromString(string value)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(value, nameof(value));
@@ -128,6 +135,20 @@ public readonly struct ApiId : IEquatable<ApiId>, IComparable<ApiId>
     public static ApiId FromInt64(long value) => new(ApiIdKind.Int64, ApiIdValueUnion.FromInt64(value), null, value.ToString(CultureInfo.InvariantCulture));
     public static ApiId FromGuid(Guid value) => new(ApiIdKind.Guid, ApiIdValueUnion.FromGuid(value), null, value.ToString("D"));
     public static ApiId FromUlid(Ulid value) => new(ApiIdKind.Ulid, ApiIdValueUnion.FromUlid(value), null, value.ToString());
+
+    public static ApiId Composite(IEnumerable<ApiId> orderedParts)
+    {
+        if (orderedParts is null || !orderedParts.Any())
+        {
+            return Empty;
+        }
+
+        var parts = orderedParts.Select(p => new ApiIdPart(null, p)).ToArray();
+
+        ValidateCompositeParts(parts);
+
+        return new ApiId(ApiIdKind.Composite, default, parts, CompositeString(parts));
+    }
 
     public static ApiId Composite(params ApiId[] orderedParts)
     {
@@ -142,7 +163,23 @@ public readonly struct ApiId : IEquatable<ApiId>, IComparable<ApiId>
             parts[i] = new ApiIdPart(null, orderedParts[i]);
         }
 
-        return new ApiId(ApiIdKind.Composite, default, parts, string.Join("|", parts));
+        ValidateCompositeParts(parts);
+
+        return new ApiId(ApiIdKind.Composite, default, parts, CompositeString(parts));
+    }
+
+    public static ApiId Composite(IEnumerable<ApiIdPart> namedParts)
+    {
+        if (namedParts is null || !namedParts.Any())
+        {
+            return Empty;
+        }
+
+        var clone = namedParts.Select(p => new ApiIdPart(p.Name, p.Value)).ToArray();
+
+        ValidateCompositeParts(clone);
+
+        return new ApiId(ApiIdKind.Composite, default, clone, CompositeString(clone));
     }
 
     public static ApiId Composite(params ApiIdPart[] namedParts)
@@ -154,17 +191,32 @@ public readonly struct ApiId : IEquatable<ApiId>, IComparable<ApiId>
 
         var clone = (ApiIdPart[])namedParts.Clone();
 
-        ValidateNoMixedNames(clone);
+        ValidateCompositeParts(clone);
 
-        return new ApiId(ApiIdKind.Composite, default, clone, string.Join("|", clone));
+        return new ApiId(ApiIdKind.Composite, default, clone, CompositeString(clone));
     }
 
-    private static void ValidateNoMixedNames(ApiIdPart[] parts)
+    public static string? CompositeString(IEnumerable<ApiIdPart>? parts)
+    {
+        if (parts is null || !parts.Any())
+        {
+            return null;
+        }
+
+        return string.Join("|", parts);
+    }       
+
+    private static void ValidateCompositeParts(ApiIdPart[] parts)
     {
         var anyNamed = false;
         var anyUnnamed = false;
         foreach (var p in parts)
         {
+            if (p.Value.Kind == ApiIdKind.Composite)
+            {
+                throw new InvalidOperationException($"Nested composite parts are not allowed in {nameof(ApiId)}.");
+            }
+
             if (p.Name is null)
             {
                 anyUnnamed = true;
@@ -176,19 +228,19 @@ public readonly struct ApiId : IEquatable<ApiId>, IComparable<ApiId>
 
             if (anyNamed && anyUnnamed)
             {
-                throw new ArgumentException($"Cannot mix named and unnamed parts in the same composite {nameof(ApiId)}.", nameof(parts));
+                throw new InvalidOperationException($"Cannot mix named and unnamed parts in the same composite {nameof(ApiId)}.");
             }
         }
     }
     #endregion
 
     #region AsOrThrow Methods
-    public string AsStringOrThrow() => this.Kind == ApiIdKind.String ? (string)_ref! : throw new InvalidOperationException($"Kind {Kind} is not a string.");
-    public int AsInt32OrThrow() => this.Kind == ApiIdKind.Int32 ? _val.Int32 : throw new InvalidOperationException($"Kind {Kind} is not an Int32.");
-    public long AsInt64OrThrow() => this.Kind == ApiIdKind.Int64 ? _val.Int64 : throw new InvalidOperationException($"Kind {Kind} is not an Int64.");
-    public Guid AsGuidOrThrow() => this.Kind == ApiIdKind.Guid ? _val.Guid : throw new InvalidOperationException($"Kind {Kind} is not a Guid.");
-    public Ulid AsUlidOrThrow() => this.Kind == ApiIdKind.Ulid ? _val.Ulid : throw new InvalidOperationException($"Kind {Kind} is not a Ulid.");
-    public CultureInfo AsCultureOrThrow() => this.Kind == ApiIdKind.Culture ? (CultureInfo)_ref! : throw new InvalidOperationException($"Kind {Kind} is not a Culture.");
+    public string AsStringOrThrow() => this.Kind == ApiIdKind.String ? (string)_ref! : throw new InvalidOperationException($"Kind {this.Kind} is not a string.");
+    public int AsInt32OrThrow() => this.Kind == ApiIdKind.Int32 ? _val.Int32 : throw new InvalidOperationException($"Kind {this.Kind} is not an Int32.");
+    public long AsInt64OrThrow() => this.Kind == ApiIdKind.Int64 ? _val.Int64 : throw new InvalidOperationException($"Kind {this.Kind} is not an Int64.");
+    public Guid AsGuidOrThrow() => this.Kind == ApiIdKind.Guid ? _val.Guid : throw new InvalidOperationException($"Kind {this.Kind} is not a Guid.");
+    public Ulid AsUlidOrThrow() => this.Kind == ApiIdKind.Ulid ? _val.Ulid : throw new InvalidOperationException($"Kind {this.Kind} is not a Ulid.");
+    public CultureInfo AsCultureOrThrow() => this.Kind == ApiIdKind.Culture ? (CultureInfo)_ref! : throw new InvalidOperationException($"Kind {this.Kind} is not a Culture.");
     #endregion
 
     #region TryGet Methods
@@ -222,64 +274,150 @@ public readonly struct ApiId : IEquatable<ApiId>, IComparable<ApiId>
     #region Parsing
     public static bool TryParse(ApiIdKind kind, string? text, out ApiId id)
     {
-        if (kind == ApiIdKind.Composite) { id = default; return false; }
-        if (string.IsNullOrWhiteSpace(text)) { id = default; return false; }
+        if (kind == ApiIdKind.Composite)
+        {
+            id = default;
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            id = default;
+            return false;
+        }
 
         switch (kind)
         {
-            case ApiIdKind.String: id = FromString(text); return true;
-            case ApiIdKind.Int32: if (int.TryParse(text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var i32)) { id = FromInt32(i32); return true; } break;
-            case ApiIdKind.Int64: if (long.TryParse(text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var i64)) { id = FromInt64(i64); return true; } break;
-            case ApiIdKind.Guid: if (Guid.TryParse(text, out var g)) { id = FromGuid(g); return true; } break;
-            case ApiIdKind.Ulid: if (Ulid.TryParse(text, out var u)) { id = FromUlid(u); return true; } break;
-            case ApiIdKind.Culture: try { id = FromCulture(CultureInfo.GetCultureInfo(text)); return true; } catch { } break;
+            case ApiIdKind.String: return TryParseString(text, out id);
+            case ApiIdKind.Int32: return TryParseInt32(text, out id);
+            case ApiIdKind.Int64: return TryParseInt64(text, out id);
+            case ApiIdKind.Guid: return TryParseGuid(text, out id);
+            case ApiIdKind.Ulid: return TryParseUlid(text, out id);
+            case ApiIdKind.Culture: return TryParseCulture(text, out id);
         }
-        id = default; return false;
+
+        id = default;
+        return false;
     }
 
     public static bool TryParse(string? text, out ApiId id)
     {
-        if (string.IsNullOrWhiteSpace(text)) { id = default; return false; }
-        if (Ulid.TryParse(text, out var u)) { id = FromUlid(u); return true; }
-        if (Guid.TryParse(text, out var g)) { id = FromGuid(g); return true; }
-        if (int.TryParse(text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var i32)) { id = FromInt32(i32); return true; }
-        if (long.TryParse(text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var i64)) { id = FromInt64(i64); return true; }
-        try { var c = CultureInfo.GetCultureInfo(text); id = FromCulture(c); return true; } catch { }
-        id = FromString(text); return true;
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            id = default;
+            return false;
+        }
+
+        if (TryParseInt32(text, out id)) { return true; }
+        if (TryParseInt64(text, out id)) { return true; }
+        if (TryParseGuid(text, out id)) { return true; }
+        if (TryParseUlid(text, out id)) { return true; }
+        if (TryParseCulture(text, out id)) { return true; }
+
+        id = FromString(text);
+        return true;
     }
 
-    public static ApiId Parse(ApiIdKind kind, string text)
-        => TryParse(kind, text, out var id) ? id : throw new FormatException($"Text '{text}' is not a valid {kind} id.");
-    public static ApiId Parse(string text)
-        => TryParse(text, out var id) ? id : throw new FormatException("Text is null/empty.");
+    public static ApiId Parse(ApiIdKind kind, string text) => TryParse(kind, text, out var id) ? id : throw new FormatException($"Text '{text}' is not a valid {kind} id.");
+
+    public static ApiId Parse(string text) => TryParse(text, out var id) ? id : throw new FormatException("Text is null/empty.");
+
+    private static bool TryParseCulture(string text, out ApiId id)
+    {
+        try
+        {
+            var c = CultureInfo.GetCultureInfo(text, predefinedOnly: true);
+            id = FromCulture(c);
+            return true;
+        }
+        catch
+        {
+            id = default;
+            return false;
+        }
+    }
+
+    private static bool TryParseGuid(string text, out ApiId id)
+    {
+        if (Guid.TryParse(text, out var g))
+        {
+            id = FromGuid(g);
+            return true;
+        }
+
+        id = default;
+        return false;
+    }
+
+    private static bool TryParseInt32(string text, out ApiId id)
+    {
+        if (int.TryParse(text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var i32))
+        {
+            id = FromInt32(i32);
+            return true;
+        }
+
+        id = default;
+        return false;
+    }
+
+    private static bool TryParseInt64(string text, out ApiId id)
+    {
+        if (long.TryParse(text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var i64))
+        {
+            id = FromInt64(i64);
+            return true;
+        }
+
+        id = default;
+        return false;
+    }
+
+    private static bool TryParseString(string text, out ApiId id)
+    {
+        id = FromString(text);
+        return true;
+    }
+
+    private static bool TryParseUlid(string text, out ApiId id)
+    {
+        if (Ulid.TryParse(text, out var u))
+        {
+            id = FromUlid(u);
+            return true;
+        }
+
+        id = default;
+        return false;
+    }
     #endregion
 
     #region Formatting
-    public override string? ToString()
-        => Kind switch
-        {
-            ApiIdKind.None => null,
-            ApiIdKind.String => (string?)_ref,
-            ApiIdKind.Int32 => _val.Int32.ToString(CultureInfo.InvariantCulture),
-            ApiIdKind.Int64 => _val.Int64.ToString(CultureInfo.InvariantCulture),
-            ApiIdKind.Guid => _val.Guid.ToString("D"),
-            ApiIdKind.Ulid => _val.Ulid.ToString(),
-            ApiIdKind.Culture => ((CultureInfo)_ref!).Name,
-            ApiIdKind.Composite => string.Join("|", (ApiIdPart[])_ref!),
-            _ => (string?)_ref
-        };
-    private string ToDebuggerDisplay() => HasValue ? $"{Kind}:{ToString()}" : "(empty)";
+    public override string? ToString() => this.Kind switch
+    {
+        ApiIdKind.None => null,
+        ApiIdKind.String => (string?)_ref,
+        ApiIdKind.Int32 => _val.Int32.ToString(CultureInfo.InvariantCulture),
+        ApiIdKind.Int64 => _val.Int64.ToString(CultureInfo.InvariantCulture),
+        ApiIdKind.Guid => _val.Guid.ToString("D"),
+        ApiIdKind.Ulid => _val.Ulid.ToString(),
+        ApiIdKind.Culture => ((CultureInfo)_ref!).Name,
+        ApiIdKind.Composite => CompositeString((ApiIdPart[])_ref!),
+        _ => (string?)_ref
+    };
+
+    private string ToDebuggerDisplay() => this.HasValue ? $"{this.Kind}:{this}" : "(empty)";
     #endregion
 
     #region Equality / Ordering
     public bool Equals(ApiId other)
     {
-        if (Kind != other.Kind)
+        if (this.Kind != other.Kind)
         {
             return false;
         }
 
-        return Kind switch
+        return this.Kind switch
         {
             ApiIdKind.None => true,
             ApiIdKind.String => string.Equals((string?)_ref, (string?)other._ref, StringComparison.Ordinal),
@@ -319,20 +457,20 @@ public readonly struct ApiId : IEquatable<ApiId>, IComparable<ApiId>
         return true;
     }
 
-    public override bool Equals(object? obj) => obj is ApiId other && Equals(other);
+    public override bool Equals(object? obj) => obj is ApiId other && this.Equals(other);
     public override int GetHashCode()
     {
-        return Kind switch
+        return this.Kind switch
         {
             ApiIdKind.None => 0,
-            ApiIdKind.String => HashCode.Combine((int)Kind, (string?)_ref),
-            ApiIdKind.Int32 => HashCode.Combine((int)Kind, _val.Int32),
-            ApiIdKind.Int64 => HashCode.Combine((int)Kind, _val.Int64),
-            ApiIdKind.Guid => HashCode.Combine((int)Kind, _val.Guid),
-            ApiIdKind.Ulid => HashCode.Combine((int)Kind, _val.Ulid),
-            ApiIdKind.Culture => HashCode.Combine((int)Kind, ((CultureInfo?)_ref)?.Name?.ToUpperInvariant()),
+            ApiIdKind.String => HashCode.Combine((int)this.Kind, (string?)_ref),
+            ApiIdKind.Int32 => HashCode.Combine((int)this.Kind, _val.Int32),
+            ApiIdKind.Int64 => HashCode.Combine((int)this.Kind, _val.Int64),
+            ApiIdKind.Guid => HashCode.Combine((int)this.Kind, _val.Guid),
+            ApiIdKind.Ulid => HashCode.Combine((int)this.Kind, _val.Ulid),
+            ApiIdKind.Culture => HashCode.Combine((int)this.Kind, ((CultureInfo?)_ref)?.Name?.ToUpperInvariant()),
             ApiIdKind.Composite => GetCompositeHash((ApiIdPart[])_ref!),
-            _ => (int)Kind
+            _ => (int)this.Kind
         };
     }
     private static int GetCompositeHash(ApiIdPart[] parts)
@@ -352,13 +490,13 @@ public readonly struct ApiId : IEquatable<ApiId>, IComparable<ApiId>
 
     public int CompareTo(ApiId other)
     {
-        var kindCmp = Kind.CompareTo(other.Kind);
+        var kindCmp = this.Kind.CompareTo(other.Kind);
         if (kindCmp != 0)
         {
             return kindCmp;
         }
 
-        return Kind switch
+        return this.Kind switch
         {
             ApiIdKind.None => 0,
             ApiIdKind.String => string.Compare((string?)_ref, (string?)other._ref, StringComparison.Ordinal),

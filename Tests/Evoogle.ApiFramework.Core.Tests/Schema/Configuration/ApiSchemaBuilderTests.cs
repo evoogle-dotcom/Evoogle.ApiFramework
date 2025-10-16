@@ -161,7 +161,7 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
 
         protected override void Assert()
         {
-            if (!ApiSchemaExceptionThrown.GetValueOrDefault())
+            if (!this.ApiSchemaExceptionThrown.GetValueOrDefault())
             {
                 this.ApiSchemaExceptionMessageActual.Should().BeNull();
                 this.ApiSchemaValidationResultsActual.Should().BeNull();

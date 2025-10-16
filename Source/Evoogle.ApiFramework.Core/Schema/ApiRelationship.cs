@@ -92,11 +92,11 @@ public sealed class ApiRelationship(string apiName, string? apiPropertyName = nu
 
         if (apiName.Equals(apiPropertyName, StringComparison.OrdinalIgnoreCase))
         {
-            return $"{nameof(ApiRelationship)} {{{nameof(this.ApiName)}={apiName}, {nameof(ExtensionCount)}={extensionCount}}}";
+            return $"{nameof(ApiRelationship)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ExtensionCount)}={extensionCount}}}";
         }
         else
         {
-            return $"{nameof(ApiRelationship)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ApiPropertyName)}={apiPropertyName}, {nameof(ExtensionCount)}={extensionCount}}}";
+            return $"{nameof(ApiRelationship)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ApiPropertyName)}={apiPropertyName}, {nameof(this.ExtensionCount)}={extensionCount}}}";
         }
     }
     #endregion

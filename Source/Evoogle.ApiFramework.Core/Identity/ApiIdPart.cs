@@ -8,21 +8,26 @@ using Evoogle.Extensions;
 namespace Evoogle.ApiFramework.Identity;
 
 /// <summary>
-///     Represents a part of an API identifier, consisting of an optional name and a value.
+///     Represents a part of an API composite identifier, consisting of an optional name and a value.
 /// </summary>
 /// <param name="name">The optional name associated with the API identifier part.</param>
 /// <param name="value">The value of the API identifier part.</param>
-public readonly struct ApiIdPart(string? name, ApiId value)
+public readonly record struct ApiIdPart(string? Name, ApiId Value)
 {
     #region Properties
-    /// <summary>Gets the optional name associated with the API identifier part.</summary>
-    public string? Name { get; } = name;
-
-    /// <summary>Gets the value of the API identifier part.</summary>
-    public ApiId Value { get; } = value;
-
     /// <summary>Indicates whether the API identifier part has a name.</summary>
     public bool IsNamed => this.Name is not null;
+    #endregion
+
+    #region Factory Methods
+    /// <summary>Creates an unnamed API identifier part with the specified value.</summary>
+    /// <param name="value">The value of the API identifier part.</param>
+    public static ApiIdPart CreateUnnamed(ApiId value) => new(null, value);
+
+    /// <summary>Creates a named API identifier part with the specified name and value.</summary>
+    /// <param name="name">The name associated with the API identifier part.</param>
+    /// <param name="value">The value of the API identifier part.</param>
+    public static ApiIdPart CreateNamed(string name, ApiId value) => new(name, value);
     #endregion
 
     #region Object Methods

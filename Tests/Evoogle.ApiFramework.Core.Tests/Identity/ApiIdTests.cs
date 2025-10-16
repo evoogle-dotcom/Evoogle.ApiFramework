@@ -5,18 +5,18 @@
 // See the LICENSE file in the project root for more information.
 using System.Globalization;
 
-using Evoogle.ApiFramework.Identity;
+using Evoogle.ApiFramework.Identity.Internal;
 using Evoogle.Extensions;
 using Evoogle.XUnit;
 
 using FluentAssertions;
 
-namespace Evoogle.ApiFramework.Identity.Tests;
+namespace Evoogle.ApiFramework.Identity;
 
 public class ApiIdTests(ITestOutputHelper output) : XUnitTests(output)
 {
     #region Test Classes
-    public enum ApiIdFactory
+    public enum ApiIdFromFactory
     {
         FromString,
         FromInt32,
@@ -26,118 +26,151 @@ public class ApiIdTests(ITestOutputHelper output) : XUnitTests(output)
         FromCulture
     }
 
-    public class ScalarApiIdTest : XUnitTest
+    public enum ApiIdCompositeFactory
+    {
+        Named,
+        Ordered
+    }
+
+    public class CompositeTest : XUnitTest
     {
         #region User Supplied Properties
-        public ApiIdFactory Factory { get; init; }
-        public string Value { get; init; } = null!;
-        public ApiIdKind ExpectedKind { get; init; }
-        public string? ExpectedString { get; init; }
-        public string? ExpectedOriginalString { get; init; }
+        public ApiIdCompositeFactory Factory { get; init; }
+        public ApiId[]? IdCollection { get; init; } = null;
+        public ApiIdPart[]? PartCollection { get; init; } = null;
         #endregion
 
         #region Calculated Properties
-        private ApiId Source { get; set; }
+        private ApiId ExpectedApiId { get; set; }
+        private ApiId ActualApiId { get; set; }
         #endregion
 
         #region XUnitTest Methods
         protected override void Arrange()
         {
-            this.Source = this.Factory switch
-            {
-                ApiIdFactory.FromString => ApiId.FromString(this.Value),
-                ApiIdFactory.FromInt32 => ApiId.FromInt32(int.Parse(this.Value, CultureInfo.InvariantCulture)),
-                ApiIdFactory.FromInt64 => ApiId.FromInt64(long.Parse(this.Value, CultureInfo.InvariantCulture)),
-                ApiIdFactory.FromGuid => ApiId.FromGuid(Guid.Parse(this.Value)),
-                ApiIdFactory.FromUlid => ApiId.FromUlid(Ulid.Parse(this.Value)),
-                ApiIdFactory.FromCulture => ApiId.FromCulture(CultureInfo.GetCultureInfo(this.Value)),
-                _ => throw new InvalidOperationException($"Unsupported factory {this.Factory}.")
-            };
-
-            this.WriteLine($"Source Kind: {this.Source.Kind}");
-            this.WriteLine($"Expected Kind: {this.ExpectedKind}");
-            this.WriteLine($"Factory: {this.Factory}");
-            this.WriteLine($"Value: {this.Value.SafeToString()}");
-            this.WriteLine($"Expected String: {this.ExpectedString.SafeToString()}");
-            this.WriteLine($"Expected Original: {this.ExpectedOriginalString.SafeToString()}");
+            this.WriteLine($"Factory:        {this.Factory}");
+            this.WriteLine($"IdCollection:   [{this.IdCollection.SafeToDelimitedString(',')}]");
+            this.WriteLine($"PartCollection: [{this.PartCollection.SafeToDelimitedString(',')}]");
             this.WriteLine();
+
+            this.ExpectedApiId = this.CreateExpectedApiId();
+
+            this.WriteLine($"Expected ApiId: {this.ExpectedApiId.SafeToString()}");
         }
 
         protected override void Act()
         {
-            this.WriteLine($"Actual Kind: {this.Source.Kind}");
-            this.WriteLine($"Actual HasValue: {this.Source.HasValue}");
-            this.WriteLine($"Actual ToString(): {this.Source.ToString().SafeToString()}");
-            this.WriteLine($"Actual Original: {this.Source.OriginalString.SafeToString()}");
-            this.WriteLine();
+            this.ActualApiId = this.CreateActualApiId();
+
+            this.WriteLine($"Actual ApiId:   {this.ActualApiId.SafeToString()}");
         }
 
         protected override void Assert()
         {
-            this.Source.HasValue.Should().BeTrue();
-            this.Source.Kind.Should().Be(this.ExpectedKind);
-            this.Source.IsString.Should().Be(this.ExpectedKind == ApiIdKind.String);
-            this.Source.IsInt32.Should().Be(this.ExpectedKind == ApiIdKind.Int32);
-            this.Source.IsInt64.Should().Be(this.ExpectedKind == ApiIdKind.Int64);
-            this.Source.IsGuid.Should().Be(this.ExpectedKind == ApiIdKind.Guid);
-            this.Source.IsUlid.Should().Be(this.ExpectedKind == ApiIdKind.Ulid);
-            this.Source.IsCulture.Should().Be(this.ExpectedKind == ApiIdKind.Culture);
-            this.Source.IsComposite.Should().BeFalse();
-            this.Source.PartCount.Should().Be(1);
-            this.Source.Parts.IsEmpty.Should().BeTrue();
-
-            if (this.ExpectedString is not null)
-            {
-                this.Source.ToString().Should().Be(this.ExpectedString);
-            }
-
-            if (this.ExpectedOriginalString is not null)
-            {
-                this.Source.OriginalString.Should().Be(this.ExpectedOriginalString);
-            }
-
-            switch (this.ExpectedKind)
-            {
-                case ApiIdKind.String:
-                    this.Source.AsStringOrThrow().Should().Be(this.Value);
-                    this.Source.TryGet(out string? s).Should().BeTrue();
-                    s.Should().Be(this.Value);
-                    break;
-                case ApiIdKind.Int32:
-                    var expectedInt32 = int.Parse(this.Value, CultureInfo.InvariantCulture);
-                    this.Source.AsInt32OrThrow().Should().Be(expectedInt32);
-                    this.Source.TryGet(out int i32).Should().BeTrue();
-                    i32.Should().Be(expectedInt32);
-                    break;
-                case ApiIdKind.Int64:
-                    var expectedInt64 = long.Parse(this.Value, CultureInfo.InvariantCulture);
-                    this.Source.AsInt64OrThrow().Should().Be(expectedInt64);
-                    this.Source.TryGet(out long i64).Should().BeTrue();
-                    i64.Should().Be(expectedInt64);
-                    break;
-                case ApiIdKind.Guid:
-                    var expectedGuid = Guid.Parse(this.Value);
-                    this.Source.AsGuidOrThrow().Should().Be(expectedGuid);
-                    this.Source.TryGet(out Guid guid).Should().BeTrue();
-                    guid.Should().Be(expectedGuid);
-                    break;
-                case ApiIdKind.Ulid:
-                    var expectedUlid = Ulid.Parse(this.Value);
-                    this.Source.AsUlidOrThrow().Should().Be(expectedUlid);
-                    this.Source.TryGet(out Ulid ulid).Should().BeTrue();
-                    ulid.Should().Be(expectedUlid);
-                    break;
-                case ApiIdKind.Culture:
-                    var expectedCulture = CultureInfo.GetCultureInfo(this.Value);
-                    this.Source.AsCultureOrThrow().Should().BeEquivalentTo(expectedCulture);
-                    this.Source.TryGet(out CultureInfo? culture).Should().BeTrue();
-                    culture.Should().NotBeNull();
-                    culture!.Name.Should().Be(expectedCulture.Name);
-                    break;
-                default:
-                    throw new InvalidOperationException($"Unsupported scalar kind: {this.ExpectedKind}");
-            }
+            this.ActualApiId.Should().BeEquivalentTo(this.ExpectedApiId);
         }
+        #endregion
+
+        #region Factory Methods
+        private ApiId CreateActualApiId()
+            => this.Factory switch
+            {
+                ApiIdCompositeFactory.Named => ApiId.Composite(this.PartCollection!),
+                ApiIdCompositeFactory.Ordered => ApiId.Composite(this.IdCollection!),
+                _ => throw new InvalidOperationException($"Unsupported factory {this.Factory}.")
+            };
+
+        private ApiId CreateExpectedApiId()
+        {
+            var partCollection = default(ApiIdPart[]?);
+            switch (this.Factory)
+            {
+                case ApiIdCompositeFactory.Named:
+                    {
+                        if (this.PartCollection is null || this.PartCollection.Length == 0)
+                        {
+                            return ApiId.Empty;
+                        }
+
+                        partCollection = this.PartCollection!;
+                        break;
+                    }
+
+                case ApiIdCompositeFactory.Ordered:
+                    {
+                        if (this.IdCollection is null || this.IdCollection.Length == 0)
+                        {
+                            return ApiId.Empty;
+                        }
+
+                        partCollection = [.. this.IdCollection.Select(id => new ApiIdPart(null, id))];
+                        break;
+                    }
+            }
+
+            if (partCollection is not null)
+            {
+                var apiId = new ApiId
+                (
+                    ApiIdKind.Composite,
+                    default,
+                    partCollection,
+                    ApiId.CompositeString(partCollection)
+                );
+                return apiId;
+            }
+
+            throw new InvalidOperationException($"Unsupported factory {this.Factory}.");
+        }
+        #endregion
+    }
+
+    public class FromScalarTest : XUnitTest
+    {
+        #region User Supplied Properties
+        public ApiIdFromFactory Factory { get; init; }
+        public string Value { get; init; } = null!;
+        public ApiId ExpectedApiId { get; init; }
+        #endregion
+
+        #region Calculated Properties
+        private ApiId ActualApiId { get; set; }
+        #endregion
+
+        #region XUnitTest Methods
+        protected override void Arrange()
+        {
+            this.WriteLine($"Factory: {this.Factory}");
+            this.WriteLine($"Value:   {this.Value.SafeToString()}");
+            this.WriteLine();
+            this.WriteLine($"Expected ApiId: {this.ExpectedApiId.SafeToString()}");
+        }
+
+        protected override void Act()
+        {
+            this.ActualApiId = this.CreateApiId();
+
+            this.WriteLine($"Actual ApiId:   {this.ActualApiId.SafeToString()}");
+        }
+
+        protected override void Assert()
+        {
+            this.ActualApiId.Should().BeEquivalentTo(this.ExpectedApiId);
+        }
+        #endregion
+
+        #region Factory Methods
+        private ApiId CreateApiId()
+            => this.Factory switch
+            {
+                ApiIdFromFactory.FromString => ApiId.FromString(this.Value),
+                ApiIdFromFactory.FromInt32 => ApiId.FromInt32(int.Parse(this.Value, CultureInfo.InvariantCulture)),
+                ApiIdFromFactory.FromInt64 => ApiId.FromInt64(long.Parse(this.Value, CultureInfo.InvariantCulture)),
+                ApiIdFromFactory.FromGuid => ApiId.FromGuid(Guid.Parse(this.Value)),
+                ApiIdFromFactory.FromUlid => ApiId.FromUlid(Ulid.Parse(this.Value)),
+                ApiIdFromFactory.FromCulture => ApiId.FromCulture(this.Value),
+                _ => throw new InvalidOperationException($"Unsupported factory {this.Factory}.")
+            };
         #endregion
     }
 
@@ -147,12 +180,12 @@ public class ApiIdTests(ITestOutputHelper output) : XUnitTests(output)
         public ApiIdKind Kind { get; init; }
         public string? Text { get; init; }
         public bool ExpectedResult { get; init; }
-        public string? ExpectedValue { get; init; }
+        public ApiId? ExpectedApiId { get; init; }
         #endregion
 
         #region Calculated Properties
         private bool ActualResult { get; set; }
-        private ApiId ActualValue { get; set; }
+        private ApiId? ActualApiId { get; set; }
         #endregion
 
         #region XUnitTest Methods
@@ -160,266 +193,181 @@ public class ApiIdTests(ITestOutputHelper output) : XUnitTests(output)
         {
             this.WriteLine($"Kind: {this.Kind}");
             this.WriteLine($"Text: {this.Text.SafeToString()}");
+            this.WriteLine();
             this.WriteLine($"Expected Result: {this.ExpectedResult}");
-            this.WriteLine($"Expected Value: {this.ExpectedValue.SafeToString()}");
+            this.WriteLine($"Expected ApiId:  {this.ExpectedApiId.SafeToString()}");
             this.WriteLine();
         }
 
         protected override void Act()
         {
             this.ActualResult = ApiId.TryParse(this.Kind, this.Text, out var value);
-            this.ActualValue = value;
+            this.ActualApiId = value;
             this.WriteLine($"Actual Result: {this.ActualResult}");
-            this.WriteLine($"Actual Value: {this.ActualValue.SafeToString()}");
-            this.WriteLine();
+            this.WriteLine($"Actual Value:  {this.ActualApiId.SafeToString()}");
         }
 
         protected override void Assert()
         {
-            this.ActualResult.Should().Be(this.ExpectedResult);
             if (this.ExpectedResult)
             {
-                this.ActualValue.Kind.Should().Be(this.Kind);
-                this.ActualValue.ToString().Should().Be(this.ExpectedValue);
-
-                switch (this.Kind)
-                {
-                    case ApiIdKind.String:
-                        this.ActualValue.AsStringOrThrow().Should().Be(this.ExpectedValue);
-                        break;
-                    case ApiIdKind.Int32:
-                        this.ActualValue.AsInt32OrThrow().Should().Be(int.Parse(this.ExpectedValue!, CultureInfo.InvariantCulture));
-                        break;
-                    case ApiIdKind.Int64:
-                        this.ActualValue.AsInt64OrThrow().Should().Be(long.Parse(this.ExpectedValue!, CultureInfo.InvariantCulture));
-                        break;
-                    case ApiIdKind.Guid:
-                        this.ActualValue.AsGuidOrThrow().Should().Be(Guid.Parse(this.ExpectedValue!));
-                        break;
-                    case ApiIdKind.Ulid:
-                        this.ActualValue.AsUlidOrThrow().Should().Be(Ulid.Parse(this.ExpectedValue!));
-                        break;
-                    case ApiIdKind.Culture:
-                        this.ActualValue.AsCultureOrThrow().Name.Should().Be(this.ExpectedValue);
-                        break;
-                }
+                this.ActualResult.Should().BeTrue();
+                this.ActualApiId.Should().NotBeNull();
+                this.ActualApiId.Should().BeEquivalentTo(this.ExpectedApiId);
             }
             else
             {
-                this.ActualValue.Should().Be(ApiId.Empty);
+                this.ActualResult.Should().BeFalse();
+                this.ActualApiId.Should().Be(ApiId.Empty);
             }
-        }
-        #endregion
-    }
-
-    public readonly record struct CompositePartData(ApiIdKind Kind, string Value, string? Name = null);
-
-    public class CompositeApiIdTest : XUnitTest
-    {
-        #region User Supplied Properties
-        public CompositePartData[] PartsData { get; init; } = Array.Empty<CompositePartData>();
-        public bool ExpectedIsNamed { get; init; }
-        public bool ExpectedIsOrdered { get; init; }
-        public string? LookupName { get; init; }
-        public bool ExpectedLookupResult { get; init; }
-        public ApiIdKind? ExpectedLookupKind { get; init; }
-        public string? ExpectedLookupValue { get; init; }
-        #endregion
-
-        #region Calculated Properties
-        private ApiId Source { get; set; }
-        private ApiIdPart[] ExpectedParts { get; set; } = Array.Empty<ApiIdPart>();
-        private bool? ActualLookupResult { get; set; }
-        private ApiId ActualLookupValue { get; set; }
-        #endregion
-
-        #region XUnitTest Methods
-        protected override void Arrange()
-        {
-            var parts = new ApiIdPart[this.PartsData.Length];
-            for (var i = 0; i < this.PartsData.Length; i++)
-            {
-                var partData = this.PartsData[i];
-                var partValue = CreateApiId(partData.Kind, partData.Value);
-                parts[i] = new ApiIdPart(partData.Name, partValue);
-                this.WriteLine($"Expected Part: {parts[i].SafeToString()}");
-            }
-
-            this.ExpectedParts = parts;
-            if (parts.Length > 0 && parts[0].Name is not null)
-            {
-                this.Source = ApiId.Composite(parts);
-            }
-            else
-            {
-                this.Source = ApiId.Composite(parts.Select(p => p.Value).ToArray());
-            }
-
-            this.WriteLine($"Expected IsNamed: {this.ExpectedIsNamed}");
-            this.WriteLine($"Expected IsOrdered: {this.ExpectedIsOrdered}");
-            if (this.LookupName is not null)
-            {
-                this.WriteLine($"Lookup Name: {this.LookupName}");
-                this.WriteLine($"Expected Lookup Result: {this.ExpectedLookupResult}");
-                this.WriteLine($"Expected Lookup Value: {this.ExpectedLookupValue.SafeToString()}");
-            }
-            this.WriteLine();
-        }
-
-        protected override void Act()
-        {
-            if (this.LookupName is not null)
-            {
-                this.ActualLookupResult = this.Source.TryGetPart(this.LookupName, out var value);
-                this.ActualLookupValue = value;
-                this.WriteLine($"Actual Lookup Result: {this.ActualLookupResult}");
-                this.WriteLine($"Actual Lookup Value: {this.ActualLookupValue.SafeToString()}");
-                this.WriteLine();
-            }
-        }
-
-        protected override void Assert()
-        {
-            this.Source.Kind.Should().Be(ApiIdKind.Composite);
-            this.Source.IsComposite.Should().BeTrue();
-            this.Source.IsNamedComposite.Should().Be(this.ExpectedIsNamed);
-            this.Source.IsOrderedComposite.Should().Be(this.ExpectedIsOrdered);
-            this.Source.PartCount.Should().Be(this.ExpectedParts.Length);
-
-            var parts = this.Source.Parts.ToArray();
-            parts.Should().HaveCount(this.ExpectedParts.Length);
-            for (var i = 0; i < parts.Length; i++)
-            {
-                parts[i].Name.Should().Be(this.ExpectedParts[i].Name);
-                parts[i].Value.Should().Be(this.ExpectedParts[i].Value);
-                this.Source[i].Should().Be(this.ExpectedParts[i].Value);
-            }
-
-            if (this.LookupName is not null)
-            {
-                this.ActualLookupResult.Should().NotBeNull();
-                this.ActualLookupResult.Should().Be(this.ExpectedLookupResult);
-                if (this.ExpectedLookupResult)
-                {
-                    this.ExpectedLookupKind.Should().NotBeNull();
-                    this.ActualLookupValue.Kind.Should().Be(this.ExpectedLookupKind);
-                    this.ActualLookupValue.ToString().Should().Be(this.ExpectedLookupValue);
-                }
-                else
-                {
-                    this.ActualLookupValue.Should().Be(ApiId.Empty);
-                }
-            }
-        }
-        #endregion
-
-        #region Helpers
-        private static ApiId CreateApiId(ApiIdKind kind, string value)
-            => kind switch
-            {
-                ApiIdKind.String => ApiId.FromString(value),
-                ApiIdKind.Int32 => ApiId.FromInt32(int.Parse(value, CultureInfo.InvariantCulture)),
-                ApiIdKind.Int64 => ApiId.FromInt64(long.Parse(value, CultureInfo.InvariantCulture)),
-                ApiIdKind.Guid => ApiId.FromGuid(Guid.Parse(value)),
-                ApiIdKind.Ulid => ApiId.FromUlid(Ulid.Parse(value)),
-                ApiIdKind.Culture => ApiId.FromCulture(CultureInfo.GetCultureInfo(value)),
-                _ => throw new InvalidOperationException($"Unsupported composite part kind: {kind}")
-            };
-        #endregion
-    }
-
-    public class EmptyApiIdTest : XUnitTest
-    {
-        #region Calculated Properties
-        private ApiId Source { get; set; }
-        #endregion
-
-        #region XUnitTest Methods
-        protected override void Arrange()
-        {
-            this.Source = ApiId.Empty;
-            this.WriteLine("Testing ApiId.Empty");
-            this.WriteLine();
-        }
-
-        protected override void Act()
-        {
-            this.WriteLine($"Kind: {this.Source.Kind}");
-            this.WriteLine($"HasValue: {this.Source.HasValue}");
-            this.WriteLine($"PartCount: {this.Source.PartCount}");
-            this.WriteLine($"ToString(): {this.Source.ToString().SafeToString()}");
-            this.WriteLine();
-        }
-
-        protected override void Assert()
-        {
-            this.Source.Kind.Should().Be(ApiIdKind.None);
-            this.Source.HasValue.Should().BeFalse();
-            this.Source.IsComposite.Should().BeFalse();
-            this.Source.PartCount.Should().Be(0);
-            this.Source.Parts.IsEmpty.Should().BeTrue();
-            this.Source.ToString().Should().BeNull();
         }
         #endregion
     }
     #endregion
 
     #region Theory Data
-    public static TheoryDataRow<IXUnitTest>[] ScalarTheoryData =>
+    private static Guid TestGuid { get; } = Guid.NewGuid();
+    private static string TestGuidString { get; } = TestGuid.ToString();
+
+    private static Ulid TestUlid { get; } = Ulid.NewUlid();
+    private static string TestUlidString { get; } = TestUlid.ToString();
+
+    public static TheoryDataRow<IXUnitTest>[] CompositeTheoryData =>
     [
-        new ScalarApiIdTest
+        // Named
+        new CompositeTest
         {
-            Name = "String scalar",
-            Factory = ApiIdFactory.FromString,
+            Name = "Named Composite from null parts",
+            Factory = ApiIdCompositeFactory.Named,
+            PartCollection = null
+        },
+        new CompositeTest
+        {
+            Name = "Named Composite from empty parts",
+            Factory = ApiIdCompositeFactory.Named,
+            PartCollection = []
+        },
+        new CompositeTest
+        {
+            Name = "Named Composite from Int32 and Int32 ApiIds",
+            Factory = ApiIdCompositeFactory.Named,
+            PartCollection =
+            [
+                ApiIdPart.CreateNamed("id-1", ApiId.FromInt32(42)),
+                ApiIdPart.CreateNamed("id-2", ApiId.FromInt32(24)),
+            ]
+        },
+        new CompositeTest
+        {
+            Name = "Named Composite from String and Culture ApiIds",
+            Factory = ApiIdCompositeFactory.Named,
+            PartCollection =
+            [
+                ApiIdPart.CreateNamed("id", ApiId.FromString("42")),
+                ApiIdPart.CreateNamed("locale", ApiId.FromCulture("en-us")),
+            ]
+        },
+        new CompositeTest
+        {
+            Name = "Named Composite from String and Int64 and Culture ApiIds",
+            Factory = ApiIdCompositeFactory.Named,
+            PartCollection =
+            [
+                ApiIdPart.CreateNamed("id-string", ApiId.FromString("42")),
+                ApiIdPart.CreateNamed("id-int64", ApiId.FromInt64(42)),
+                ApiIdPart.CreateNamed("locale", ApiId.FromCulture("en-us")),
+            ]
+        },
+
+        // Ordered
+        new CompositeTest
+        {
+            Name = "Ordered Composite from null parts",
+            Factory = ApiIdCompositeFactory.Ordered,
+            IdCollection = null
+        },
+        new CompositeTest
+        {
+            Name = "Ordered Composite from empty parts",
+            Factory = ApiIdCompositeFactory.Ordered,
+            IdCollection = []
+        },
+        new CompositeTest
+        {
+            Name = "Ordered Composite from Int32 and Int32 ApiIds",
+            Factory = ApiIdCompositeFactory.Ordered,
+            IdCollection =
+            [
+                ApiId.FromInt32(42),
+                ApiId.FromInt32(24),
+            ]
+        },
+        new CompositeTest
+        {
+            Name = "Ordered Composite from String and Culture ApiIds",
+            Factory = ApiIdCompositeFactory.Ordered,
+            IdCollection =
+            [
+                ApiId.FromString("42"),
+                ApiId.FromCulture("en-us"),
+            ]
+        },
+        new CompositeTest
+        {
+            Name = "Ordered Composite from String and Int64 and Culture ApiIds",
+            Factory = ApiIdCompositeFactory.Ordered,
+            IdCollection =
+            [
+                ApiId.FromString("42"),
+                ApiId.FromInt64(42),
+                ApiId.FromCulture("en-us"),
+            ]
+        },
+    ];
+
+    public static TheoryDataRow<IXUnitTest>[] FromScalarTheoryData =>
+    [
+        new FromScalarTest
+        {
+            Name = "FromString",
+            Factory = ApiIdFromFactory.FromString,
             Value = "alpha",
-            ExpectedKind = ApiIdKind.String,
-            ExpectedString = "alpha",
-            ExpectedOriginalString = "alpha"
+            ExpectedApiId = new ApiId(ApiIdKind.String, default, "alpha", "alpha")
         },
-        new ScalarApiIdTest
+        new FromScalarTest
         {
-            Name = "Int32 scalar",
-            Factory = ApiIdFactory.FromInt32,
+            Name = "FromInt32",
+            Factory = ApiIdFromFactory.FromInt32,
             Value = "42",
-            ExpectedKind = ApiIdKind.Int32,
-            ExpectedString = "42",
-            ExpectedOriginalString = "42"
+            ExpectedApiId = new ApiId(ApiIdKind.Int32, ApiIdValueUnion.FromInt32(42), null, "42")
         },
-        new ScalarApiIdTest
+        new FromScalarTest
         {
-            Name = "Int64 scalar",
-            Factory = ApiIdFactory.FromInt64,
+            Name = "FromInt64",
+            Factory = ApiIdFromFactory.FromInt64,
             Value = "8675309",
-            ExpectedKind = ApiIdKind.Int64,
-            ExpectedString = "8675309",
-            ExpectedOriginalString = "8675309"
+            ExpectedApiId = new ApiId(ApiIdKind.Int64, ApiIdValueUnion.FromInt64(8675309), null, "8675309")
         },
-        new ScalarApiIdTest
+        new FromScalarTest
         {
-            Name = "Guid scalar",
-            Factory = ApiIdFactory.FromGuid,
-            Value = "5bd5095b-2a77-4a63-8d13-20dce65d6cfe",
-            ExpectedKind = ApiIdKind.Guid,
-            ExpectedString = "5bd5095b-2a77-4a63-8d13-20dce65d6cfe",
-            ExpectedOriginalString = "5bd5095b-2a77-4a63-8d13-20dce65d6cfe"
+            Name = "FromGuid",
+            Factory = ApiIdFromFactory.FromGuid,
+            Value = TestGuidString,
+            ExpectedApiId = new ApiId(ApiIdKind.Guid, ApiIdValueUnion.FromGuid(TestGuid), null, TestGuidString)
         },
-        new ScalarApiIdTest
+        new FromScalarTest
         {
-            Name = "Ulid scalar",
-            Factory = ApiIdFactory.FromUlid,
-            Value = "01ARZ3NDEKTSV4RRFFQ69G5FAV",
-            ExpectedKind = ApiIdKind.Ulid,
-            ExpectedString = "01ARZ3NDEKTSV4RRFFQ69G5FAV",
-            ExpectedOriginalString = "01ARZ3NDEKTSV4RRFFQ69G5FAV"
+            Name = "FromUlid",
+            Factory = ApiIdFromFactory.FromUlid,
+            Value = TestUlidString,
+            ExpectedApiId = new ApiId(ApiIdKind.Ulid, ApiIdValueUnion.FromUlid(TestUlid), null, TestUlidString)
         },
-        new ScalarApiIdTest
+        new FromScalarTest
         {
-            Name = "Culture scalar",
-            Factory = ApiIdFactory.FromCulture,
-            Value = "en-US",
-            ExpectedKind = ApiIdKind.Culture,
-            ExpectedString = "en-US",
-            ExpectedOriginalString = "en-US"
+            Name = "FromCulture",
+            Factory = ApiIdFromFactory.FromCulture,
+            Value = "en-us",
+            ExpectedApiId = new ApiId(ApiIdKind.Culture, default, new CultureInfo("en-us"), "en-us")
         }
     ];
 
@@ -427,112 +375,138 @@ public class ApiIdTests(ITestOutputHelper output) : XUnitTests(output)
     [
         new TryParseTest
         {
-            Name = "TryParse string success",
+            Name = "String success",
             Kind = ApiIdKind.String,
             Text = "orders/123",
             ExpectedResult = true,
-            ExpectedValue = "orders/123"
+            ExpectedApiId = new ApiId(ApiIdKind.String, default, "orders/123", "orders/123")
         },
         new TryParseTest
         {
-            Name = "TryParse int32 success",
-            Kind = ApiIdKind.Int32,
-            Text = "123",
-            ExpectedResult = true,
-            ExpectedValue = "123"
-        },
-        new TryParseTest
-        {
-            Name = "TryParse culture success",
-            Kind = ApiIdKind.Culture,
-            Text = "fr-FR",
-            ExpectedResult = true,
-            ExpectedValue = "fr-FR"
-        },
-        new TryParseTest
-        {
-            Name = "TryParse composite fails",
-            Kind = ApiIdKind.Composite,
-            Text = "part",
+            Name = "String fails with null",
+            Kind = ApiIdKind.String,
+            Text = null,
             ExpectedResult = false,
-            ExpectedValue = null
+            ExpectedApiId = null
         },
         new TryParseTest
         {
-            Name = "TryParse invalid int32 fails",
-            Kind = ApiIdKind.Int32,
-            Text = "abc",
+            Name = "String fails with empty string",
+            Kind = ApiIdKind.String,
+            Text = "",
             ExpectedResult = false,
-            ExpectedValue = null
+            ExpectedApiId = null
         },
         new TryParseTest
         {
-            Name = "TryParse whitespace fails",
+            Name = "String fails with whitespace",
             Kind = ApiIdKind.String,
             Text = "  ",
             ExpectedResult = false,
-            ExpectedValue = null
-        }
-    ];
-
-    public static TheoryDataRow<IXUnitTest>[] CompositeTheoryData =>
-    [
-        new CompositeApiIdTest
-        {
-            Name = "Named composite",
-            PartsData =
-            [
-                new CompositePartData(ApiIdKind.String, "US", "country"),
-                new CompositePartData(ApiIdKind.Culture, "en-US", "language")
-            ],
-            ExpectedIsNamed = true,
-            ExpectedIsOrdered = false,
-            LookupName = "language",
-            ExpectedLookupResult = true,
-            ExpectedLookupKind = ApiIdKind.Culture,
-            ExpectedLookupValue = "en-US"
+            ExpectedApiId = null
         },
-        new CompositeApiIdTest
+        new TryParseTest
         {
-            Name = "Ordered composite",
-            PartsData =
-            [
-                new CompositePartData(ApiIdKind.Int32, "1"),
-                new CompositePartData(ApiIdKind.Int32, "2")
-            ],
-            ExpectedIsNamed = false,
-            ExpectedIsOrdered = true,
-            LookupName = "missing",
-            ExpectedLookupResult = false,
-            ExpectedLookupKind = null,
-            ExpectedLookupValue = null
-        }
-    ];
-
-    public static TheoryDataRow<IXUnitTest>[] EmptyTheoryData =>
-    [
-        new EmptyApiIdTest
+            Name = "Int32 success",
+            Kind = ApiIdKind.Int32,
+            Text = "42",
+            ExpectedResult = true,
+            ExpectedApiId = new ApiId(ApiIdKind.Int32, ApiIdValueUnion.FromInt32(42), null, "42")
+        },
+        new TryParseTest
         {
-            Name = "Empty instance"
-        }
+            Name = "Int32 fails with invalid text",
+            Kind = ApiIdKind.Int32,
+            Text = "abc",
+            ExpectedResult = false,
+            ExpectedApiId = null
+        },
+        new TryParseTest
+        {
+            Name = "Int64 success",
+            Kind = ApiIdKind.Int64,
+            Text = "42",
+            ExpectedResult = true,
+            ExpectedApiId = new ApiId(ApiIdKind.Int64, ApiIdValueUnion.FromInt64(42), null, "42")
+        },
+        new TryParseTest
+        {
+            Name = "Int64 fails with invalid text",
+            Kind = ApiIdKind.Int64,
+            Text = "xyz",
+            ExpectedResult = false,
+            ExpectedApiId = null
+        },
+        new TryParseTest
+        {
+            Name = "Guid success",
+            Kind = ApiIdKind.Guid,
+            Text = TestGuidString,
+            ExpectedResult = true,
+            ExpectedApiId = new ApiId(ApiIdKind.Guid, ApiIdValueUnion.FromGuid(TestGuid), null, TestGuidString)
+        },
+        new TryParseTest
+        {
+            Name = "Guid fails with invalid text",
+            Kind = ApiIdKind.Guid,
+            Text = "abc",
+            ExpectedResult = false,
+            ExpectedApiId = null
+        },
+        new TryParseTest
+        {
+            Name = "Ulid success",
+            Kind = ApiIdKind.Ulid,
+            Text = TestUlidString,
+            ExpectedResult = true,
+            ExpectedApiId = new ApiId(ApiIdKind.Ulid, ApiIdValueUnion.FromUlid(TestUlid), null, TestUlidString)
+        },
+        new TryParseTest
+        {
+            Name = "Ulid fails with invalid text",
+            Kind = ApiIdKind.Ulid,
+            Text = "abc",
+            ExpectedResult = false,
+            ExpectedApiId = null
+        },
+        new TryParseTest
+        {
+            Name = "Culture success",
+            Kind = ApiIdKind.Culture,
+            Text = "fr-FR",
+            ExpectedResult = true,
+            ExpectedApiId = new ApiId(ApiIdKind.Culture, default, new CultureInfo("fr-FR"), "fr-FR")
+        },
+        new TryParseTest
+        {
+            Name = "Culture fails with invalid text",
+            Kind = ApiIdKind.Culture,
+            Text = "abc",
+            ExpectedResult = false,
+            ExpectedApiId = null
+        },
+        new TryParseTest
+        {
+            Name = "Composite fails",
+            Kind = ApiIdKind.Composite,
+            Text = "part",
+            ExpectedResult = false,
+            ExpectedApiId = null
+        },
     ];
     #endregion
 
     #region Theory Methods
     [Theory]
-    [MemberData(nameof(ScalarTheoryData))]
-    public void Scalar_ids(IXUnitTest test) => test.Execute(this);
+    [MemberData(nameof(CompositeTheoryData))]
+    public void Composite(IXUnitTest test) => test.Execute(this);
+
+    [Theory]
+    [MemberData(nameof(FromScalarTheoryData))]
+    public void FromScalar(IXUnitTest test) => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(TryParseTheoryData))]
-    public void TryParse_ids(IXUnitTest test) => test.Execute(this);
-
-    [Theory]
-    [MemberData(nameof(CompositeTheoryData))]
-    public void Composite_ids(IXUnitTest test) => test.Execute(this);
-
-    [Theory]
-    [MemberData(nameof(EmptyTheoryData))]
-    public void Empty_id(IXUnitTest test) => test.Execute(this);
+    public void TryParse(IXUnitTest test) => test.Execute(this);
     #endregion
 }

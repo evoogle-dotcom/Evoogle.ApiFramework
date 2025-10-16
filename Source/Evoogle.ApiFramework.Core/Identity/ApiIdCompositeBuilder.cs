@@ -5,17 +5,34 @@
 // See the LICENSE file in the project root for more information.
 namespace Evoogle.ApiFramework.Identity;
 
-// === Builder (composite) ===
 public sealed class ApiIdCompositeBuilder
 {
-    private readonly List<ApiIdPart> _parts = new();
+    private readonly List<ApiIdPart> _parts = [];
     private bool _requireUniqueNames;
     private IComparer<string?> _nameComparer = StringComparer.Ordinal;
 
     public ApiIdCompositeBuilder EnforceUniqueNames(bool require = true, IComparer<string?>? comparer = null)
-    { _requireUniqueNames = require; if (comparer is not null) { _nameComparer = comparer; } return this; }
-    public ApiIdCompositeBuilder Add(ApiId value) { _parts.Add(new ApiIdPart(null, value)); return this; }
-    public ApiIdCompositeBuilder Add(string name, ApiId value) { _parts.Add(new ApiIdPart(name, value)); return this; }
+    {
+        _requireUniqueNames = require;
+        if (comparer is not null)
+        {
+            _nameComparer = comparer;
+        }
+        return this;
+    }
+
+    public ApiIdCompositeBuilder Add(ApiId value)
+    {
+        _parts.Add(new ApiIdPart(null, value));
+        return this;
+    }
+
+    public ApiIdCompositeBuilder Add(string name, ApiId value)
+    {
+        _parts.Add(new ApiIdPart(name, value));
+        return this;
+    }
+
     public ApiId Build()
     {
         if (_parts.Count == 0)
@@ -23,10 +40,16 @@ public sealed class ApiIdCompositeBuilder
             return ApiId.Empty;
         }
 
-        // Invariant: either all named or all unnamed parts (no mixing)
-        bool anyNamed = false, anyUnnamed = false;
+        // No mixing + no nested composites
+        var anyNamed = false;
+        var anyUnnamed = false;
         foreach (var p in _parts)
         {
+            if (p.Value.Kind == ApiIdKind.Composite)
+            {
+                throw new InvalidOperationException("Nested composite parts are not allowed in ApiId.");
+            }
+
             if (p.Name is null)
             {
                 anyUnnamed = true;
