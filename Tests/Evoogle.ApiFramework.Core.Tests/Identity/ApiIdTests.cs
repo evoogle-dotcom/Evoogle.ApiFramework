@@ -3,6 +3,8 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System;
+using System.Collections.Generic;
 using System.Globalization;
 
 using Evoogle.ApiFramework.Identity.Internal;
@@ -494,6 +496,42 @@ public class ApiIdTests(ITestOutputHelper output) : XUnitTests(output)
             ExpectedApiId = null
         },
     ];
+
+    public static IEnumerable<object[]> EqualityCases()
+    {
+        yield return new object[] { ApiId.Empty, ApiId.Empty, true };
+        yield return new object[] { ApiId.FromString("alpha"), ApiId.FromInt32(1), false };
+        yield return new object[] { ApiId.FromString("Alpha"), ApiId.FromString("alpha"), false };
+        yield return new object[] { ApiId.FromCulture("en-US"), ApiId.FromCulture("EN-us"), true };
+        yield return new object[] { ApiId.FromInt32(42), ApiId.FromInt32(42), true };
+        yield return new object[]
+        {
+            ApiId.Composite(ApiIdPart.CreateNamed("id", ApiId.FromInt32(1))),
+            ApiId.Composite(ApiIdPart.CreateNamed("id", ApiId.FromInt32(1))),
+            true
+        };
+        yield return new object[]
+        {
+            ApiId.Composite(ApiIdPart.CreateNamed("id", ApiId.FromInt32(1))),
+            ApiId.Composite(ApiIdPart.CreateNamed("other", ApiId.FromInt32(1))),
+            false
+        };
+    }
+
+    public static IEnumerable<object[]> ComparisonCases()
+    {
+        yield return new object[] { ApiId.Empty, ApiId.Empty, 0 };
+        yield return new object[] { ApiId.Empty, ApiId.FromString("alpha"), -1 };
+        yield return new object[] { ApiId.FromString("alpha"), ApiId.FromString("beta"), -1 };
+        yield return new object[] { ApiId.FromInt32(10), ApiId.FromInt32(2), 1 };
+        yield return new object[] { ApiId.FromCulture("en-US"), ApiId.FromCulture("EN-us"), 0 };
+        yield return new object[]
+        {
+            ApiId.Composite(ApiId.FromInt32(1), ApiId.FromInt32(2)),
+            ApiId.Composite(ApiId.FromInt32(1), ApiId.FromInt32(3)),
+            -1
+        };
+    }
     #endregion
 
     #region Theory Methods
@@ -508,5 +546,31 @@ public class ApiIdTests(ITestOutputHelper output) : XUnitTests(output)
     [Theory]
     [MemberData(nameof(TryParseTheoryData))]
     public void TryParse(IXUnitTest test) => test.Execute(this);
+
+    [Theory]
+    [MemberData(nameof(EqualityCases))]
+    public void Equality(ApiId left, ApiId right, bool expectedEqual)
+    {
+        left.Equals(right).Should().Be(expectedEqual, "Equals should match expectation");
+        right.Equals(left).Should().Be(expectedEqual, "Equals should be symmetric");
+        (left == right).Should().Be(expectedEqual, "operator == should match expectation");
+        (left != right).Should().Be(!expectedEqual, "operator != should match expectation");
+
+        if (expectedEqual)
+        {
+            left.GetHashCode().Should().Be(right.GetHashCode(), "equal values must produce identical hashes");
+        }
+    }
+
+    [Theory]
+    [MemberData(nameof(ComparisonCases))]
+    public void Comparison(ApiId left, ApiId right, int expectedSign)
+    {
+        var actualSign = Math.Sign(left.CompareTo(right));
+        actualSign.Should().Be(expectedSign, "CompareTo should return the expected ordering");
+
+        var reverseSign = Math.Sign(right.CompareTo(left));
+        reverseSign.Should().Be(-actualSign, "CompareTo should be antisymmetric");
+    }
     #endregion
 }
