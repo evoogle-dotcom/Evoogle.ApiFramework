@@ -16,7 +16,7 @@ public readonly record struct ApiIdPart(string? Name, ApiId Value)
 {
     #region Properties
     /// <summary>Indicates whether the API identifier part has a name.</summary>
-    public bool IsNamed => this.Name is not null;
+    public bool IsNamed => string.IsNullOrWhiteSpace(this.Name) is false;
     #endregion
 
     #region Factory Methods

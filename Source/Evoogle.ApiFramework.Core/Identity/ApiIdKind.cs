@@ -12,12 +12,12 @@ public enum ApiIdKind : byte
 {
     #region Values
     None,
-    String,
+    Composite,
+    Culture,
+    Guid,
     Int32,
     Int64,
-    Guid,
+    String,
     Ulid,
-    Culture,
-    Composite
     #endregion
 }

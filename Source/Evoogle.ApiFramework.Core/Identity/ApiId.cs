@@ -10,6 +10,7 @@ using System.Text.Json.Serialization;
 using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Identity.Internal;
 using Evoogle.ApiFramework.Identity.Json;
+using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Identity;
 
@@ -70,7 +71,7 @@ public readonly struct ApiId : IEquatable<ApiId>, IComparable<ApiId>
                 return false;
             }
 
-            return parts[0].Name is not null;
+            return string.IsNullOrWhiteSpace(parts[0].Name) is false;
         }
     }
 
@@ -93,7 +94,7 @@ public readonly struct ApiId : IEquatable<ApiId>, IComparable<ApiId>
                 return false;
             }
 
-            return parts[0].Name is null;
+            return string.IsNullOrWhiteSpace(parts[0].Name);
         }
     }
 
@@ -151,7 +152,7 @@ public readonly struct ApiId : IEquatable<ApiId>, IComparable<ApiId>
         return new ApiId(ApiIdKind.Composite, default, parts, CompositeString(parts));
     }
 
-    public static ApiId Composite(params ApiId[] orderedParts)
+    public static ApiId Composite(params ApiId[]? orderedParts)
     {
         if (orderedParts is null || orderedParts.Length == 0)
         {
@@ -169,7 +170,7 @@ public readonly struct ApiId : IEquatable<ApiId>, IComparable<ApiId>
         return new ApiId(ApiIdKind.Composite, default, parts, CompositeString(parts));
     }
 
-    public static ApiId Composite(IEnumerable<ApiIdPart> namedParts)
+    public static ApiId Composite(IEnumerable<ApiIdPart>? namedParts)
     {
         if (namedParts is null || !namedParts.Any())
         {
@@ -183,7 +184,7 @@ public readonly struct ApiId : IEquatable<ApiId>, IComparable<ApiId>
         return new ApiId(ApiIdKind.Composite, default, clone, CompositeString(clone));
     }
 
-    public static ApiId Composite(params ApiIdPart[] namedParts)
+    public static ApiId Composite(params ApiIdPart[]? namedParts)
     {
         if (namedParts is null || namedParts.Length == 0)
         {
@@ -209,6 +210,8 @@ public readonly struct ApiId : IEquatable<ApiId>, IComparable<ApiId>
 
     private static void ValidateCompositeParts(ApiIdPart[] parts)
     {
+        // No nested composites
+        // No mixing (named <-> unnamed)
         var anyNamed = false;
         var anyUnnamed = false;
         foreach (var p in parts)
@@ -218,7 +221,7 @@ public readonly struct ApiId : IEquatable<ApiId>, IComparable<ApiId>
                 throw new ApiIdentityException($"Nested composite parts are not allowed in {nameof(ApiId)}.");
             }
 
-            if (p.Name is null)
+            if (string.IsNullOrWhiteSpace(p.Name))
             {
                 anyUnnamed = true;
             }
@@ -230,6 +233,22 @@ public readonly struct ApiId : IEquatable<ApiId>, IComparable<ApiId>
             if (anyNamed && anyUnnamed)
             {
                 throw new ApiIdentityException($"Cannot mix named and unnamed parts in the same composite {nameof(ApiId)}.");
+            }
+        }
+
+        // At this point, the parts are all either named or unnamed.
+        // If named, ensure uniqueness.
+        if (anyNamed)
+        {
+            var duplicateNames = parts
+                .GroupBy(p => p.Name)
+                .Where(g => g.Count() > 1)
+                .Select(g => g.Key)
+                .ToList();
+
+            if (duplicateNames.Count > 0)
+            {
+                throw new ApiIdentityException($"Duplicate part names in composite {nameof(ApiId)}: [{duplicateNames.OrderBy(n => n).SafeToDelimitedString(',')}].");
             }
         }
     }
@@ -319,9 +338,9 @@ public readonly struct ApiId : IEquatable<ApiId>, IComparable<ApiId>
         return true;
     }
 
-    public static ApiId Parse(ApiIdKind kind, string text) => TryParse(kind, text, out var id) ? id : throw new FormatException($"Text '{text}' is not a valid {kind} id.");
+    public static ApiId Parse(ApiIdKind kind, string text) => TryParse(kind, text, out var id) ? id : throw new ApiIdentityException($"Text '{text}' is not a valid {kind} id.");
 
-    public static ApiId Parse(string text) => TryParse(text, out var id) ? id : throw new FormatException("Text is null/empty.");
+    public static ApiId Parse(string text) => TryParse(text, out var id) ? id : throw new ApiIdentityException("Text is null/empty.");
 
     private static bool TryParseCulture(string text, out ApiId id)
     {
