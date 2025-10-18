@@ -34,6 +34,45 @@ public class ApiIdTests(ITestOutputHelper output) : XUnitTests(output)
         Ordered
     }
 
+    public class ComparisonTest : XUnitTest
+    {
+        #region User Supplied Properties
+        public ApiId Left { get; init; }
+        public ApiId Right { get; init; }
+        public int ExpectedSign { get; init; }
+        #endregion
+
+        #region Calculated Properties
+        private int ActualLeftToRightCompareToMethod { get; set; }
+        private int ActualRightToLeftCompareToMethod { get; set; }
+        #endregion
+
+        #region XUnitTest Methods
+        protected override void Arrange()
+        {
+            this.WriteLine($"Left:  {this.Left.SafeToString()}");
+            this.WriteLine($"Right: {this.Right.SafeToString()}");
+            this.WriteLine();
+            this.WriteLine($"Expected Sign: {this.ExpectedSign}");
+        }
+
+        protected override void Act()
+        {
+            this.ActualLeftToRightCompareToMethod = this.Left.CompareTo(this.Right);
+            this.ActualRightToLeftCompareToMethod = this.Right.CompareTo(this.Left);
+
+            this.WriteLine($"Actual LeftToRight CompareTo Method: {this.ActualLeftToRightCompareToMethod}");
+            this.WriteLine($"Actual RightToLeft CompareTo Method: {this.ActualRightToLeftCompareToMethod}");
+        }
+
+        protected override void Assert()
+        {
+            this.ActualLeftToRightCompareToMethod.Should().Be(this.ExpectedSign, "CompareTo should return the expected ordering");
+            this.ActualRightToLeftCompareToMethod.Should().Be(-this.ExpectedSign, "CompareTo should be antisymmetric");
+        }
+        #endregion
+    }
+
     public class CompositeTest : XUnitTest
     {
         #region User Supplied Properties
@@ -123,6 +162,58 @@ public class ApiIdTests(ITestOutputHelper output) : XUnitTests(output)
             }
 
             throw new InvalidOperationException($"Unsupported factory {this.Factory}.");
+        }
+        #endregion
+    }
+
+    public class EqualityTest : XUnitTest
+    {
+        #region User Supplied Properties
+        public ApiId Left { get; init; }
+        public ApiId Right { get; init; }
+        public bool ExpectedEqual { get; init; }
+        #endregion
+
+        #region Calculated Properties
+        private bool ActualLeftToRightEqualsMethod { get; set; }
+        private bool ActualRightToLeftEqualsMethod { get; set; }
+        private bool ActualLeftToRightEqualsOperator { get; set; }
+        private bool ActualLeftToRightNotEqualsOperator { get; set; }
+        #endregion
+
+        #region XUnitTest Methods
+        protected override void Arrange()
+        {
+            this.WriteLine($"Left:  {this.Left.SafeToString()}");
+            this.WriteLine($"Right: {this.Right.SafeToString()}");
+            this.WriteLine();
+            this.WriteLine($"Expected Equal: {this.ExpectedEqual}");
+        }
+
+        protected override void Act()
+        {
+            this.ActualLeftToRightEqualsMethod = this.Left.Equals(this.Right);
+            this.ActualRightToLeftEqualsMethod = this.Right.Equals(this.Left);
+            this.ActualLeftToRightEqualsOperator = this.Left == this.Right;
+            this.ActualLeftToRightNotEqualsOperator = this.Left != this.Right;
+
+            this.WriteLine($"Actual LeftToRight Equals Method:      {this.ActualLeftToRightEqualsMethod}");
+            this.WriteLine($"Actual RightToLeft Equals Method:      {this.ActualRightToLeftEqualsMethod}");
+            this.WriteLine($"Actual LeftToRight Equals Operator:    {this.ActualLeftToRightEqualsOperator}");
+            this.WriteLine($"Actual LeftToRight NotEquals Operator: {this.ActualLeftToRightNotEqualsOperator}");
+        }
+
+        protected override void Assert()
+        {
+            this.ActualLeftToRightEqualsMethod.Should().Be(this.ExpectedEqual, "Equals should match expectation");
+            this.ActualRightToLeftEqualsMethod.Should().Be(this.ExpectedEqual, "Equals should be symmetric");
+            this.ActualLeftToRightEqualsOperator.Should().Be(this.ExpectedEqual, "operator == should match expectation");
+            this.ActualLeftToRightNotEqualsOperator.Should().Be(!this.ExpectedEqual, "operator != should match expectation");
+
+            if (this.ExpectedEqual)
+            {
+                this.Left.GetHashCode().Should().Be(this.Right.GetHashCode(), "equal values must produce identical hashes");
+            }
         }
         #endregion
     }
@@ -228,11 +319,185 @@ public class ApiIdTests(ITestOutputHelper output) : XUnitTests(output)
     #endregion
 
     #region Theory Data
+    private static ApiId TestStringAlphaApiId { get; } = ApiId.FromString("alpha");
+    private static ApiId TestStringALPHAApiId { get; } = ApiId.FromString("ALPHA");
+
+    private static ApiId TestStringBetaApiId { get; } = ApiId.FromString("beta");
+
+    private static ApiId TestInt24ApiId { get; } = ApiId.FromInt32(24);
+    private static ApiId TestInt42ApiId { get; } = ApiId.FromInt32(42);
+
+    private static ApiId TestLong24ApiId { get; } = ApiId.FromInt64(24);
+    private static ApiId TestLong42ApiId { get; } = ApiId.FromInt64(42);
+
+    private static ApiId TestCultureEnUsApiId { get; } = ApiId.FromCulture("en-us");
+    private static ApiId TestCultureFrFrApiId { get; } = ApiId.FromCulture("fr-fr");
+
+    private static ApiId TestCompositeInt24AndInt24ApiId { get; } = ApiId.Composite
+    (
+        ApiIdPart.CreateUnnamed(ApiId.FromInt32(24)),
+        ApiIdPart.CreateUnnamed(ApiId.FromInt32(24))
+    );
+
+    private static ApiId TestCompositeInt24AndInt42ApiId { get; } = ApiId.Composite
+    (
+        ApiIdPart.CreateUnnamed(ApiId.FromInt32(24)),
+        ApiIdPart.CreateUnnamed(ApiId.FromInt32(42))
+    );
+
+    private static ApiId TestCompositeInt24AndInt42AndInt48ApiId { get; } = ApiId.Composite
+    (
+        ApiIdPart.CreateUnnamed(ApiId.FromInt32(24)),
+        ApiIdPart.CreateUnnamed(ApiId.FromInt32(42)),
+        ApiIdPart.CreateUnnamed(ApiId.FromInt32(48))
+    );
+
+    private static ApiId TestCompositeAlphaInt24AndBetaInt24ApiId { get; } = ApiId.Composite
+    (
+        ApiIdPart.CreateNamed("alpha", ApiId.FromInt32(24)),
+        ApiIdPart.CreateNamed("beta", ApiId.FromInt32(24))
+    );
+
+    private static ApiId TestCompositeAlphaInt24AndBetaInt42ApiId { get; } = ApiId.Composite
+    (
+        ApiIdPart.CreateNamed("alpha", ApiId.FromInt32(24)),
+        ApiIdPart.CreateNamed("beta", ApiId.FromInt32(42))
+    );
+
+    private static ApiId TestCompositeAlphaInt24AndZetaInt42ApiId { get; } = ApiId.Composite
+    (
+        ApiIdPart.CreateNamed("alpha", ApiId.FromInt32(24)),
+        ApiIdPart.CreateNamed("zeta", ApiId.FromInt32(42))
+    );
+
     private static Guid TestGuid { get; } = Guid.NewGuid();
     private static string TestGuidString { get; } = TestGuid.ToString();
+    private static ApiId TestGuidApiId { get; } = ApiId.FromGuid(TestGuid);
 
     private static Ulid TestUlid { get; } = Ulid.NewUlid();
     private static string TestUlidString { get; } = TestUlid.ToString();
+    private static ApiId TestUlidApiId { get; } = ApiId.FromUlid(TestUlid);
+
+    public static TheoryDataRow<IXUnitTest>[] ComparisonTheoryData =>
+    [
+        // Scalars
+        new ComparisonTest
+        {
+            Name = $"{ApiId.Empty.ToDebuggerDisplay()} CompareTo {ApiId.Empty.ToDebuggerDisplay()} should be 0",
+            Left = ApiId.Empty,
+            Right = ApiId.Empty,
+            ExpectedSign = 0
+        },
+        new ComparisonTest
+        {
+            Name = $"{ApiId.Empty.ToDebuggerDisplay()} CompareTo {TestStringAlphaApiId.ToDebuggerDisplay()} should be -1",
+            Left = ApiId.Empty,
+            Right = TestStringAlphaApiId,
+            ExpectedSign = -1
+        },
+        new ComparisonTest
+        {
+            Name = $"{TestStringAlphaApiId.ToDebuggerDisplay()} CompareTo {TestStringAlphaApiId.ToDebuggerDisplay()} should be 0",
+            Left = TestStringAlphaApiId,
+            Right = TestStringAlphaApiId,
+            ExpectedSign = 0
+        },
+        new ComparisonTest
+        {
+            Name = $"{TestStringAlphaApiId.ToDebuggerDisplay()} CompareTo {TestStringALPHAApiId.ToDebuggerDisplay()} should be +1",
+            Left = TestStringAlphaApiId,
+            Right = TestStringALPHAApiId,
+            ExpectedSign = +1
+        },
+        new ComparisonTest
+        {
+            Name = $"{TestStringAlphaApiId.ToDebuggerDisplay()} CompareTo {TestStringBetaApiId.ToDebuggerDisplay()} should be -1",
+            Left = TestStringAlphaApiId,
+            Right = TestStringBetaApiId,
+            ExpectedSign = -1
+        },
+        new ComparisonTest
+        {
+            Name = $"{TestInt42ApiId.ToDebuggerDisplay()} CompareTo {TestInt42ApiId.ToDebuggerDisplay()} should be 0",
+            Left = TestInt42ApiId,
+            Right = TestInt42ApiId,
+            ExpectedSign = 0
+        },
+        new ComparisonTest
+        {
+            Name = $"{TestInt42ApiId.ToDebuggerDisplay()} CompareTo {TestInt24ApiId.ToDebuggerDisplay()} should be +1",
+            Left = TestInt42ApiId,
+            Right = TestInt24ApiId,
+            ExpectedSign = +1
+        },
+        new ComparisonTest
+        {
+            Name = $"{TestInt24ApiId.ToDebuggerDisplay()} CompareTo {TestInt42ApiId.ToDebuggerDisplay()} should be -1",
+            Left = TestInt24ApiId,
+            Right = TestInt42ApiId,
+            ExpectedSign = -1
+        },
+        new ComparisonTest
+        {
+            Name = $"{TestInt42ApiId.ToDebuggerDisplay()} CompareTo {TestLong42ApiId.ToDebuggerDisplay()} should be -1 based on kind ordinal comparison",
+            Left = TestInt42ApiId,
+            Right = TestLong42ApiId,
+            ExpectedSign = -1
+        },
+
+        // Ordered Composites (unnamed parts)
+        new ComparisonTest
+        {
+            Name = $"{TestCompositeInt24AndInt24ApiId.ToDebuggerDisplay()} CompareTo {TestCompositeInt24AndInt24ApiId.ToDebuggerDisplay()} should be 0",
+            Left = TestCompositeInt24AndInt24ApiId,
+            Right = TestCompositeInt24AndInt24ApiId,
+            ExpectedSign = 0
+        },
+        new ComparisonTest
+        {
+            Name = $"{TestCompositeInt24AndInt24ApiId.ToDebuggerDisplay()} CompareTo {TestCompositeInt24AndInt42ApiId.ToDebuggerDisplay()} should be -1 based on part values",
+            Left = TestCompositeInt24AndInt24ApiId,
+            Right = TestCompositeInt24AndInt42ApiId,
+            ExpectedSign = -1
+        },
+        new ComparisonTest
+        {
+            Name = $"{TestCompositeInt24AndInt42ApiId.ToDebuggerDisplay()} CompareTo {TestCompositeInt24AndInt24ApiId.ToDebuggerDisplay()} should be +1 based on part values",
+            Left = TestCompositeInt24AndInt42ApiId,
+            Right = TestCompositeInt24AndInt24ApiId,
+            ExpectedSign = +1
+        },
+        new ComparisonTest
+        {
+            Name = $"{TestCompositeInt24AndInt42ApiId.ToDebuggerDisplay()} CompareTo {TestCompositeInt24AndInt42AndInt48ApiId.ToDebuggerDisplay()} should be -1 based on part count",
+            Left = TestCompositeInt24AndInt42ApiId,
+            Right = TestCompositeInt24AndInt42AndInt48ApiId,
+            ExpectedSign = -1
+        },
+
+        // Named Composites (named parts)
+        new ComparisonTest
+        {
+            Name = $"{TestCompositeAlphaInt24AndBetaInt42ApiId.ToDebuggerDisplay()} CompareTo {TestCompositeAlphaInt24AndBetaInt42ApiId.ToDebuggerDisplay()} should be 0",
+            Left = TestCompositeAlphaInt24AndBetaInt42ApiId,
+            Right = TestCompositeAlphaInt24AndBetaInt42ApiId,
+            ExpectedSign = 0
+        },
+        new ComparisonTest
+        {
+            Name = $"{TestCompositeAlphaInt24AndBetaInt24ApiId.ToDebuggerDisplay()} CompareTo {TestCompositeAlphaInt24AndBetaInt42ApiId.ToDebuggerDisplay()} should be -1 based on part values",
+            Left = TestCompositeAlphaInt24AndBetaInt24ApiId,
+            Right = TestCompositeAlphaInt24AndBetaInt42ApiId,
+            ExpectedSign = -1
+        },
+        new ComparisonTest
+        {
+            Name = $"{TestCompositeAlphaInt24AndZetaInt42ApiId.ToDebuggerDisplay()} CompareTo {TestCompositeAlphaInt24AndBetaInt42ApiId.ToDebuggerDisplay()} should be +1 based on part names",
+            Left = TestCompositeAlphaInt24AndZetaInt42ApiId,
+            Right = TestCompositeAlphaInt24AndBetaInt42ApiId,
+            ExpectedSign = +1
+        },
+    ];
 
     public static TheoryDataRow<IXUnitTest>[] CompositeTheoryData =>
     [
@@ -324,6 +589,113 @@ public class ApiIdTests(ITestOutputHelper output) : XUnitTests(output)
                 ApiId.FromInt64(42),
                 ApiId.FromCulture("en-us"),
             ]
+        },
+    ];
+
+    public static TheoryDataRow<IXUnitTest>[] EqualityTheoryData =>
+    [
+        // Scalars
+        new EqualityTest
+        {
+            Name = $"{ApiId.Empty.ToDebuggerDisplay()} Equals {ApiId.Empty.ToDebuggerDisplay()} should be true",
+            Left = ApiId.Empty,
+            Right = ApiId.Empty,
+            ExpectedEqual = true
+        },
+        new EqualityTest
+        {
+            Name = $"{ApiId.Empty.ToDebuggerDisplay()} Equals {TestStringAlphaApiId.ToDebuggerDisplay()} should be false",
+            Left = ApiId.Empty,
+            Right = TestStringAlphaApiId,
+            ExpectedEqual = false
+        },
+        new EqualityTest
+        {
+            Name = $"{TestStringAlphaApiId.ToDebuggerDisplay()} Equals {TestStringAlphaApiId.ToDebuggerDisplay()} should be true",
+            Left = TestStringAlphaApiId,
+            Right = TestStringAlphaApiId,
+            ExpectedEqual = true
+        },
+        new EqualityTest
+        {
+            Name = $"{TestStringALPHAApiId.ToDebuggerDisplay()} Equals {TestStringAlphaApiId.ToDebuggerDisplay()} should be false",
+            Left = TestStringALPHAApiId,
+            Right = TestStringAlphaApiId,
+            ExpectedEqual = false
+        },
+        new EqualityTest
+        {
+            Name = $"{TestInt42ApiId.ToDebuggerDisplay()} Equals {TestInt42ApiId.ToDebuggerDisplay()} should be true",
+            Left = TestInt42ApiId,
+            Right = TestInt42ApiId,
+            ExpectedEqual = true
+        },
+        new EqualityTest
+        {
+            Name = $"{TestInt42ApiId.ToDebuggerDisplay()} Equals {TestInt24ApiId.ToDebuggerDisplay()} should be false",
+            Left = TestInt42ApiId,
+            Right = TestInt24ApiId,
+            ExpectedEqual = false
+        },
+        new EqualityTest
+        {
+            Name = $"{TestCultureEnUsApiId.ToDebuggerDisplay()} Equals {TestCultureEnUsApiId.ToDebuggerDisplay()} should be true",
+            Left = TestCultureEnUsApiId,
+            Right = TestCultureEnUsApiId,
+            ExpectedEqual = true
+        },
+        new EqualityTest
+        {
+            Name = $"{TestCultureEnUsApiId.ToDebuggerDisplay()} Equals {TestCultureFrFrApiId.ToDebuggerDisplay()} should be false",
+            Left = TestCultureEnUsApiId,
+            Right = TestCultureFrFrApiId,
+            ExpectedEqual = false
+        },
+
+        // Ordered Composites (unnamed parts)
+        new EqualityTest
+        {
+            Name = $"{TestCompositeInt24AndInt42ApiId.ToDebuggerDisplay()} Equals {TestCompositeInt24AndInt42ApiId.ToDebuggerDisplay()} should be true",
+            Left = TestCompositeInt24AndInt42ApiId,
+            Right = TestCompositeInt24AndInt42ApiId,
+            ExpectedEqual = true
+        },
+        new EqualityTest
+        {
+            Name = $"{TestCompositeInt24AndInt24ApiId.ToDebuggerDisplay()} Equals {TestCompositeInt24AndInt42ApiId.ToDebuggerDisplay()} should be false based on part values",
+            Left = TestCompositeInt24AndInt24ApiId,
+            Right = TestCompositeInt24AndInt42ApiId,
+            ExpectedEqual = false
+        },
+        new EqualityTest
+        {
+            Name = $"{TestCompositeInt24AndInt42ApiId.ToDebuggerDisplay()} Equals {TestCompositeInt24AndInt42AndInt48ApiId.ToDebuggerDisplay()} should be false based on part count",
+            Left = TestCompositeInt24AndInt42ApiId,
+            Right = TestCompositeInt24AndInt42AndInt48ApiId,
+            ExpectedEqual = false
+        },
+
+        // Named Composites (named parts)
+        new EqualityTest
+        {
+            Name = $"{TestCompositeAlphaInt24AndBetaInt42ApiId.ToDebuggerDisplay()} Equals {TestCompositeAlphaInt24AndBetaInt42ApiId.ToDebuggerDisplay()} should be true",
+            Left = TestCompositeAlphaInt24AndBetaInt42ApiId,
+            Right = TestCompositeAlphaInt24AndBetaInt42ApiId,
+            ExpectedEqual = true
+        },
+        new EqualityTest
+        {
+            Name = $"{TestCompositeAlphaInt24AndBetaInt42ApiId.ToDebuggerDisplay()} Equals {TestCompositeAlphaInt24AndZetaInt42ApiId.ToDebuggerDisplay()} should be false based on part names",
+            Left = TestCompositeAlphaInt24AndBetaInt42ApiId,
+            Right = TestCompositeAlphaInt24AndZetaInt42ApiId,
+            ExpectedEqual = false
+        },
+        new EqualityTest
+        {
+            Name = $"{TestCompositeAlphaInt24AndBetaInt24ApiId.ToDebuggerDisplay()} Equals {TestCompositeAlphaInt24AndZetaInt42ApiId.ToDebuggerDisplay()} should be false based on part values",
+            Left = TestCompositeAlphaInt24AndBetaInt24ApiId,
+            Right = TestCompositeAlphaInt24AndZetaInt42ApiId,
+            ExpectedEqual = false
         },
     ];
 
@@ -496,48 +868,20 @@ public class ApiIdTests(ITestOutputHelper output) : XUnitTests(output)
             ExpectedApiId = null
         },
     ];
-
-    public static IEnumerable<object[]> EqualityCases()
-    {
-        yield return new object[] { ApiId.Empty, ApiId.Empty, true };
-        yield return new object[] { ApiId.FromString("alpha"), ApiId.FromInt32(1), false };
-        yield return new object[] { ApiId.FromString("Alpha"), ApiId.FromString("alpha"), false };
-        yield return new object[] { ApiId.FromCulture("en-US"), ApiId.FromCulture("EN-us"), true };
-        yield return new object[] { ApiId.FromInt32(42), ApiId.FromInt32(42), true };
-        yield return new object[]
-        {
-            ApiId.Composite(ApiIdPart.CreateNamed("id", ApiId.FromInt32(1))),
-            ApiId.Composite(ApiIdPart.CreateNamed("id", ApiId.FromInt32(1))),
-            true
-        };
-        yield return new object[]
-        {
-            ApiId.Composite(ApiIdPart.CreateNamed("id", ApiId.FromInt32(1))),
-            ApiId.Composite(ApiIdPart.CreateNamed("other", ApiId.FromInt32(1))),
-            false
-        };
-    }
-
-    public static IEnumerable<object[]> ComparisonCases()
-    {
-        yield return new object[] { ApiId.Empty, ApiId.Empty, 0 };
-        yield return new object[] { ApiId.Empty, ApiId.FromString("alpha"), -1 };
-        yield return new object[] { ApiId.FromString("alpha"), ApiId.FromString("beta"), -1 };
-        yield return new object[] { ApiId.FromInt32(10), ApiId.FromInt32(2), 1 };
-        yield return new object[] { ApiId.FromCulture("en-US"), ApiId.FromCulture("EN-us"), 0 };
-        yield return new object[]
-        {
-            ApiId.Composite(ApiId.FromInt32(1), ApiId.FromInt32(2)),
-            ApiId.Composite(ApiId.FromInt32(1), ApiId.FromInt32(3)),
-            -1
-        };
-    }
     #endregion
 
     #region Theory Methods
     [Theory]
+    [MemberData(nameof(ComparisonTheoryData))]
+    public void Comparison(IXUnitTest test) => test.Execute(this);
+
+    [Theory]
     [MemberData(nameof(CompositeTheoryData))]
     public void Composite(IXUnitTest test) => test.Execute(this);
+
+    [Theory]
+    [MemberData(nameof(EqualityTheoryData))]
+    public void Equality(IXUnitTest test) => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(FromScalarTheoryData))]
@@ -546,31 +890,5 @@ public class ApiIdTests(ITestOutputHelper output) : XUnitTests(output)
     [Theory]
     [MemberData(nameof(TryParseTheoryData))]
     public void TryParse(IXUnitTest test) => test.Execute(this);
-
-    [Theory]
-    [MemberData(nameof(EqualityCases))]
-    public void Equality(ApiId left, ApiId right, bool expectedEqual)
-    {
-        left.Equals(right).Should().Be(expectedEqual, "Equals should match expectation");
-        right.Equals(left).Should().Be(expectedEqual, "Equals should be symmetric");
-        (left == right).Should().Be(expectedEqual, "operator == should match expectation");
-        (left != right).Should().Be(!expectedEqual, "operator != should match expectation");
-
-        if (expectedEqual)
-        {
-            left.GetHashCode().Should().Be(right.GetHashCode(), "equal values must produce identical hashes");
-        }
-    }
-
-    [Theory]
-    [MemberData(nameof(ComparisonCases))]
-    public void Comparison(ApiId left, ApiId right, int expectedSign)
-    {
-        var actualSign = Math.Sign(left.CompareTo(right));
-        actualSign.Should().Be(expectedSign, "CompareTo should return the expected ordering");
-
-        var reverseSign = Math.Sign(right.CompareTo(left));
-        reverseSign.Should().Be(-actualSign, "CompareTo should be antisymmetric");
-    }
     #endregion
 }

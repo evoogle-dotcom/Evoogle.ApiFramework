@@ -8,7 +8,7 @@ using System.ComponentModel.DataAnnotations;
 namespace Evoogle.ApiFramework.Exceptions;
 
 /// <summary>
-///     Represents an error that occurs when an <see cref="Evoogle.ApiFramework.Schema.ApiSchema"/> fails validation.
+///     Represents an error that occurs when an <see cref="ApiSchema"/> fails validation.
 /// </summary>
 /// <remarks>
 ///     The exception exposes the set of <see cref="ValidationResults"/> that describe the validation failures.

@@ -6,7 +6,7 @@
 namespace Evoogle.ApiFramework.Exceptions;
 
 /// <summary>
-///     Represents errors that occur due to API schema validation failures.
+///    Represents errors that occur during API schema processing.
 /// </summary>
 public class ApiSchemaException : ApiException
 {

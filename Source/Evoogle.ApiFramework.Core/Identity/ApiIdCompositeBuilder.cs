@@ -3,6 +3,8 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Exceptions;
+
 namespace Evoogle.ApiFramework.Identity;
 
 public sealed class ApiIdCompositeBuilder
@@ -47,7 +49,7 @@ public sealed class ApiIdCompositeBuilder
         {
             if (p.Value.Kind == ApiIdKind.Composite)
             {
-                throw new InvalidOperationException("Nested composite parts are not allowed in ApiId.");
+                throw new ApiIdentityException("Nested composite parts are not allowed in ApiId.");
             }
 
             if (p.Name is null)
@@ -61,7 +63,7 @@ public sealed class ApiIdCompositeBuilder
 
             if (anyNamed && anyUnnamed)
             {
-                throw new InvalidOperationException("Cannot mix named and unnamed parts in the same composite ApiId.");
+                throw new ApiIdentityException("Cannot mix named and unnamed parts in the same composite ApiId.");
             }
         }
 
@@ -77,7 +79,7 @@ public sealed class ApiIdCompositeBuilder
 
                 if (!set.Add(p.Name))
                 {
-                    throw new InvalidOperationException($"Duplicate composite part name '{p.Name}'.");
+                    throw new ApiIdentityException($"Duplicate composite part name '{p.Name}'.");
                 }
             }
         }

@@ -17,11 +17,17 @@ public sealed class ApiIdJsonConverter : JsonConverter<ApiId>
 
     public override ApiId Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
+        if (reader.TokenType == JsonTokenType.Null)
+        {
+            return ApiId.Empty;
+        }
+
         if (reader.TokenType == JsonTokenType.String)
         {
             var text = reader.GetString();
             return ApiId.TryParse(text, out var auto) ? auto : ApiId.Empty;
         }
+
         if (reader.TokenType != JsonTokenType.StartObject)
         {
             throw new JsonException("Expected object or string for ApiId.");

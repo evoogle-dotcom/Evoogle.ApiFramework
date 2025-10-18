@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Text.Json.Serialization;
 
+using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Identity.Internal;
 using Evoogle.ApiFramework.Identity.Json;
 
@@ -98,7 +99,7 @@ public readonly struct ApiId : IEquatable<ApiId>, IComparable<ApiId>
 
     public int PartCount => this.IsComposite ? ((ApiIdPart[])_ref!).Length : (this.HasValue ? 1 : 0);
     public ReadOnlySpan<ApiIdPart> Parts => this.IsComposite ? ((ApiIdPart[])_ref!).AsSpan() : ReadOnlySpan<ApiIdPart>.Empty;
-    public ApiId this[int index] => this.IsComposite ? ((ApiIdPart[])_ref!)[index].Value : throw new InvalidOperationException("Not composite.");
+    public ApiId this[int index] => this.IsComposite ? ((ApiIdPart[])_ref!)[index].Value : throw new ApiIdentityException("Not composite.");
     #endregion
 
     #region Constructors
@@ -214,7 +215,7 @@ public readonly struct ApiId : IEquatable<ApiId>, IComparable<ApiId>
         {
             if (p.Value.Kind == ApiIdKind.Composite)
             {
-                throw new InvalidOperationException($"Nested composite parts are not allowed in {nameof(ApiId)}.");
+                throw new ApiIdentityException($"Nested composite parts are not allowed in {nameof(ApiId)}.");
             }
 
             if (p.Name is null)
@@ -228,19 +229,19 @@ public readonly struct ApiId : IEquatable<ApiId>, IComparable<ApiId>
 
             if (anyNamed && anyUnnamed)
             {
-                throw new InvalidOperationException($"Cannot mix named and unnamed parts in the same composite {nameof(ApiId)}.");
+                throw new ApiIdentityException($"Cannot mix named and unnamed parts in the same composite {nameof(ApiId)}.");
             }
         }
     }
     #endregion
 
     #region AsOrThrow Methods
-    public string AsStringOrThrow() => this.Kind == ApiIdKind.String ? (string)_ref! : throw new InvalidOperationException($"Kind {this.Kind} is not a string.");
-    public int AsInt32OrThrow() => this.Kind == ApiIdKind.Int32 ? _val.Int32 : throw new InvalidOperationException($"Kind {this.Kind} is not an Int32.");
-    public long AsInt64OrThrow() => this.Kind == ApiIdKind.Int64 ? _val.Int64 : throw new InvalidOperationException($"Kind {this.Kind} is not an Int64.");
-    public Guid AsGuidOrThrow() => this.Kind == ApiIdKind.Guid ? _val.Guid : throw new InvalidOperationException($"Kind {this.Kind} is not a Guid.");
-    public Ulid AsUlidOrThrow() => this.Kind == ApiIdKind.Ulid ? _val.Ulid : throw new InvalidOperationException($"Kind {this.Kind} is not a Ulid.");
-    public CultureInfo AsCultureOrThrow() => this.Kind == ApiIdKind.Culture ? (CultureInfo)_ref! : throw new InvalidOperationException($"Kind {this.Kind} is not a Culture.");
+    public string AsStringOrThrow() => this.Kind == ApiIdKind.String ? (string)_ref! : throw new ApiIdentityException($"Kind {this.Kind} is not a string.");
+    public int AsInt32OrThrow() => this.Kind == ApiIdKind.Int32 ? _val.Int32 : throw new ApiIdentityException($"Kind {this.Kind} is not an Int32.");
+    public long AsInt64OrThrow() => this.Kind == ApiIdKind.Int64 ? _val.Int64 : throw new ApiIdentityException($"Kind {this.Kind} is not an Int64.");
+    public Guid AsGuidOrThrow() => this.Kind == ApiIdKind.Guid ? _val.Guid : throw new ApiIdentityException($"Kind {this.Kind} is not a Guid.");
+    public Ulid AsUlidOrThrow() => this.Kind == ApiIdKind.Ulid ? _val.Ulid : throw new ApiIdentityException($"Kind {this.Kind} is not a Ulid.");
+    public CultureInfo AsCultureOrThrow() => this.Kind == ApiIdKind.Culture ? (CultureInfo)_ref! : throw new ApiIdentityException($"Kind {this.Kind} is not a Culture.");
     #endregion
 
     #region TryGet Methods
@@ -406,7 +407,7 @@ public readonly struct ApiId : IEquatable<ApiId>, IComparable<ApiId>
         _ => (string?)_ref
     };
 
-    private string ToDebuggerDisplay() => this.HasValue ? $"{this.Kind}:{this}" : "(empty)";
+    internal string ToDebuggerDisplay() => this.HasValue ? $"{this.Kind}:{this}" : "(empty)";
     #endregion
 
     #region Equality / Ordering
@@ -499,12 +500,12 @@ public readonly struct ApiId : IEquatable<ApiId>, IComparable<ApiId>
         return this.Kind switch
         {
             ApiIdKind.None => 0,
-            ApiIdKind.String => string.Compare((string?)_ref, (string?)other._ref, StringComparison.Ordinal),
+            ApiIdKind.String => Math.Sign(string.Compare((string?)_ref, (string?)other._ref, StringComparison.Ordinal)),
             ApiIdKind.Int32 => _val.Int32.CompareTo(other._val.Int32),
             ApiIdKind.Int64 => _val.Int64.CompareTo(other._val.Int64),
             ApiIdKind.Guid => _val.Guid.CompareTo(other._val.Guid),
             ApiIdKind.Ulid => _val.Ulid.CompareTo(other._val.Ulid),
-            ApiIdKind.Culture => string.Compare(((CultureInfo)_ref!).Name, ((CultureInfo)other._ref!).Name, StringComparison.OrdinalIgnoreCase),
+            ApiIdKind.Culture => Math.Sign(string.Compare(((CultureInfo)_ref!).Name, ((CultureInfo)other._ref!).Name, StringComparison.OrdinalIgnoreCase)),
             ApiIdKind.Composite => CompareParts((ApiIdPart[])_ref!, (ApiIdPart[])other._ref!),
             _ => 0
         };
@@ -519,7 +520,7 @@ public readonly struct ApiId : IEquatable<ApiId>, IComparable<ApiId>
 
         for (var i = 0; i < a.Length; i++)
         {
-            var nameCmp = string.Compare(a[i].Name, b[i].Name, StringComparison.Ordinal);
+            var nameCmp = Math.Sign(string.Compare(a[i].Name, b[i].Name, StringComparison.Ordinal));
             if (nameCmp != 0)
             {
                 return nameCmp;
