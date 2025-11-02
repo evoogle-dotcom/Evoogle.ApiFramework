@@ -5,15 +5,11 @@
 // See the LICENSE file in the project root for more information.
 using System.Collections.Concurrent;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 using Evoogle.Extension;
 using Evoogle.Json;
-using Evoogle.Logging;
 
 using Microsoft.Extensions.Logging;
-
-using static Evoogle.ApiFramework.Schema.Json.Internal.ApiJsonConverterHelpers;
 
 namespace Evoogle.ApiFramework.Schema.Json;
 
@@ -25,16 +21,16 @@ namespace Evoogle.ApiFramework.Schema.Json;
 ///     Optional constructor with logger for use in DI contexts.
 /// </remarks>
 /// <param name="logger">The optional logger instance.</param>
-public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger) : JsonConverter<ApiType>
+public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger) : JsonConverterBase<ApiType>(logger)
 {
     #region Context Types
     /// <summary>
     ///     Encapsulates the immutable state required while reading or writing <see cref="ApiType"/> instances.
     /// </summary>
-    private abstract class Context(ILogger<ApiTypeJsonConverter> logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames) : IHasLogger<ApiTypeJsonConverter>
+    private abstract class Context(ILogger logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames) : IContext
     {
         #region Immutable Properties
-        public ILogger<ApiTypeJsonConverter> Logger { get; } = new MultiplexingLogger<ApiTypeJsonConverter>(logger, MultiplexingLoggerMode.All);
+        public ILogger Logger { get; } = logger;
         public JsonSerializerOptions Options { get; } = options;
         public JsonNamingPolicy PropertyNamingPolicy { get; } = propertyNamingPolicy;
         public PropertyNames PropertyNames { get; } = propertyNames;
@@ -44,15 +40,14 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
     /// <summary>
     ///     Captures intermediate state while deserializing a polymorphic <see cref="ApiType"/>.
     /// </summary>
-    private class ReadContext(ILogger<ApiTypeJsonConverter> logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames, ReadHandlers readHandlers)
-        : Context(logger, options, propertyNamingPolicy, propertyNames)
+    private class ReadContext(ILogger logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames, ReadHandlers readHandlers)
+        : Context(logger, options, propertyNamingPolicy, propertyNames), IReadContext
     {
         #region Immutable Properties
         public ReadHandlers ReadHandlers { get; } = readHandlers;
         #endregion
 
         #region Mutable Properties
-        // Scratchpad for temporarily holding parsed values before type instantiation
         public ReadData ReadData { get; } = new ReadData();
         #endregion
     }
@@ -60,8 +55,8 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
     /// <summary>
     ///     Provides converter state while serializing a concrete <see cref="ApiType"/> instance.
     /// </summary>
-    private class WriteContext(ILogger<ApiTypeJsonConverter> logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames)
-        : Context(logger, options, propertyNamingPolicy, propertyNames)
+    private class WriteContext(ILogger logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames)
+        : Context(logger, options, propertyNamingPolicy, propertyNames), IWriteContext
     {
     }
     #endregion
@@ -137,8 +132,6 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
     #endregion
 
     #region Fields
-    private readonly ILogger<ApiTypeJsonConverter> _logger = new MultiplexingLogger<ApiTypeJsonConverter>(logger, MultiplexingLoggerMode.All);
-
     private static readonly EnumJsonConverter<ApiTypeKind> _apiTypeKindJsonConverter = new();
     private static readonly EnumJsonConverter<ApiTypeModifiers> _apiTypeModifiersJsonConverter = new();
 
@@ -152,65 +145,45 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
     #endregion
 
     #region Constructors
-    /// <summary>
-    ///     Parameterless constructor for use via [JsonConverter(typeof(...))] attribute.
-    /// </summary>
+    /// <summary>Parameterless constructor for use via [JsonConverter(typeof(...))] attribute.</summary>
     public ApiTypeJsonConverter()
         : this(null)
     {
     }
     #endregion
 
-    #region JsonConverter<T> Methods
-    /// <summary>
-    ///     Reads a JSON representation of an <see cref="ApiType"/> into a CLR object.
-    /// </summary>
-    /// <param name="reader">The JSON reader.</param>
-    /// <param name="typeToConvert">The target type (expected to be <see cref="ApiType"/>).</param>
-    /// <param name="options">The serializer options in effect.</param>
-    /// <returns>An <see cref="ApiType"/> instance.</returns>
-    public override ApiType? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    #region JsonConverterBase<T> Methods
+    protected override IReadContext CreateReadContext(ILogger logger, JsonSerializerOptions options)
     {
-        if (reader.TokenType == JsonTokenType.Null)
-        {
-            return null;
-        }
-
-        var propertyNamingPolicy = GetPropertyNamingPolicy(options);
+        var propertyNamingPolicy = options.GetPropertyNamingPolicy();
         var propertyNames = GetPropertyNames(propertyNamingPolicy);
         var readHandlers = GetReadHandlers(propertyNamingPolicy, propertyNames);
-        var context = new ReadContext(_logger, options, propertyNamingPolicy, propertyNames, readHandlers);
+        var context = new ReadContext(logger, options, propertyNamingPolicy, propertyNames, readHandlers);
 
-        context.Logger.LogTrace("Deserializing {ApiType}", nameof(ApiType));
-
-        ReadJsonObject<ApiTypeJsonConverter, ReadContext>(ref reader, ref context, (context) => context.ReadHandlers.ApiTypePropertyHandlers);
-
-        var apiType = CreateApiType(context);
-
-        context.Logger.LogDebug("Deserialized  {ApiType}", apiType);
-
-        return apiType;
+        return context;
     }
 
-    /// <summary>
-    ///     Writes an <see cref="ApiType"/> instance into its JSON representation.
-    /// </summary>
-    /// <param name="writer">The JSON writer.</param>
-    /// <param name="apiType">The object to write.</param>
-    /// <param name="options">The serializer options in effect.</param>
-    public override void Write(Utf8JsonWriter writer, ApiType apiType, JsonSerializerOptions options)
+    protected override IWriteContext CreateWriteContext(ILogger logger, JsonSerializerOptions options)
     {
-        var propertyNamingPolicy = GetPropertyNamingPolicy(options);
+        var propertyNamingPolicy = options.GetPropertyNamingPolicy();
         var propertyNames = GetPropertyNames(propertyNamingPolicy);
-        var context = new WriteContext(_logger, options, propertyNamingPolicy, propertyNames);
+        var context = new WriteContext(logger, options, propertyNamingPolicy, propertyNames);
 
-        context.Logger.LogTrace("Serializing {ApiType}", apiType);
+        return context;
+    }
 
-        WriteApiTypeProlog(writer, apiType, context);
-        WriteApiTypeBody(writer, apiType, context);
-        WriteApiTypeEpilog(writer, apiType, context);
+    protected override void ReadCore(ref Utf8JsonReader reader, IReadContext context)
+    {
+        var readContext = (ReadContext)context;
+        ReadJsonObject(ref reader, readContext, (readContext) => readContext.ReadHandlers.ApiTypePropertyHandlers);
+    }
 
-        context.Logger.LogDebug("Serialized  {ApiType}", apiType);
+    protected override void WriteCore(Utf8JsonWriter writer, ApiType value, IWriteContext context)
+    {
+        var writeContext = (WriteContext)context;
+        WriteApiTypeProlog(writer, value, writeContext);
+        WriteApiTypeBody(writer, value, writeContext);
+        WriteApiTypeEpilog(writer, value, writeContext);
     }
     #endregion
 

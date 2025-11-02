@@ -5,15 +5,11 @@
 // See the LICENSE file in the project root for more information.
 using System.Collections.Concurrent;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 using Evoogle.Extension;
 using Evoogle.Json;
-using Evoogle.Logging;
 
 using Microsoft.Extensions.Logging;
-
-using static Evoogle.ApiFramework.Schema.Json.Internal.ApiJsonConverterHelpers;
 
 namespace Evoogle.ApiFramework.Schema.Json;
 
@@ -21,17 +17,17 @@ namespace Evoogle.ApiFramework.Schema.Json;
 ///     Provides System.Text.Json serialization support for <see cref="ApiRelationship"/> instances, including
 ///     extension payloads and schema-specific naming policies.
 /// </summary>
-/// <param name="logger">The optional logger used to emit diagnostics while reading or writing relationships.</param>
-public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>? logger) : JsonConverter<ApiRelationship>
+/// <param name="logger">The optional logger used to emit diagnostics during JSON operations.</param>
+public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>? logger) : JsonConverterBase<ApiRelationship>(logger)
 {
     #region Context Types
     /// <summary>
     ///     Represents the common state that is required while reading or writing an <see cref="ApiRelationship"/>.
     /// </summary>
-    private abstract class Context(ILogger<ApiRelationshipJsonConverter> logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames) : IHasLogger<ApiRelationshipJsonConverter>
+    private abstract class Context(ILogger logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames) : IContext
     {
         #region Immutable Properties
-        public ILogger<ApiRelationshipJsonConverter> Logger { get; } = new MultiplexingLogger<ApiRelationshipJsonConverter>(logger, MultiplexingLoggerMode.All);
+        public ILogger Logger { get; } = logger;
         public JsonSerializerOptions Options { get; } = options;
         public JsonNamingPolicy PropertyNamingPolicy { get; } = propertyNamingPolicy;
         public PropertyNames PropertyNames { get; } = propertyNames;
@@ -41,8 +37,8 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
     /// <summary>
     ///     Captures state that is accumulated while deserializing an <see cref="ApiRelationship"/> from JSON.
     /// </summary>
-    private class ReadContext(ILogger<ApiRelationshipJsonConverter> logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames, ReadHandlers readHandlers)
-        : Context(logger, options, propertyNamingPolicy, propertyNames)
+    private class ReadContext(ILogger logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames, ReadHandlers readHandlers)
+        : Context(logger, options, propertyNamingPolicy, propertyNames), IReadContext
     {
         #region Immutable Properties
         public ReadHandlers ReadHandlers { get; } = readHandlers;
@@ -56,8 +52,8 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
     /// <summary>
     ///     Represents the contextual information required while serializing an <see cref="ApiRelationship"/> to JSON.
     /// </summary>
-    private class WriteContext(ILogger<ApiRelationshipJsonConverter> logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames)
-        : Context(logger, options, propertyNamingPolicy, propertyNames)
+    private class WriteContext(ILogger logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames)
+        : Context(logger, options, propertyNamingPolicy, propertyNames), IWriteContext
     {
     }
     #endregion
@@ -113,30 +109,26 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
     /// </summary>
     private class ReadHandlers(PropertyNames propertyNames)
     {
-        #region Constants
-        private static readonly Type _apiTypeModifiersType = typeof(ApiTypeModifiers);
-        #endregion
-
         #region ApiRelationship Fields
-        public readonly Dictionary<string, ApiJsonReaderHandler<ReadContext>> ApiRelationshipPropertyHandlers = new()
+        public readonly Dictionary<string, JsonReaderHandler<ReadContext>> ApiRelationshipPropertyHandlers = new()
         {
             // ApiRelationship Property Handlers
             { propertyNames.ApiRelationship.ApiName, HandleApiRelationshipApiName },
             { propertyNames.ApiRelationship.ApiPropertyName, HandleApiRelationshipApiPropertyName },
 
             // ExtensibleBase Property Handlers
-            { propertyNames.ExtensibleBase.Extensions, (ref Utf8JsonReader reader, ref ReadContext context) =>
-                context.ReadData.Extensions = ReadExtensions(ref reader, context.Options, context.Logger) },
+            { propertyNames.ExtensibleBase.Extensions, (ref Utf8JsonReader reader, ReadContext context) =>
+                context.ReadData.Extensions = ReadJsonExtensionsObject(ref reader, context) },
         };
         #endregion
 
         #region ApiRelationship Methods
-        private static void HandleApiRelationshipApiName(ref Utf8JsonReader reader, ref ReadContext context)
+        private static void HandleApiRelationshipApiName(ref Utf8JsonReader reader, ReadContext context)
         {
             context.ReadData.ApiRelationship.ApiName = reader.GetString();
         }
 
-        private static void HandleApiRelationshipApiPropertyName(ref Utf8JsonReader reader, ref ReadContext context)
+        private static void HandleApiRelationshipApiPropertyName(ref Utf8JsonReader reader, ReadContext context)
         {
             context.ReadData.ApiRelationship.ApiPropertyName = reader.GetString();
         }
@@ -146,8 +138,6 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
     #endregion
 
     #region Fields
-    private readonly ILogger<ApiRelationshipJsonConverter> _logger = new MultiplexingLogger<ApiRelationshipJsonConverter>(logger, MultiplexingLoggerMode.All);
-
     private static readonly EnumJsonConverter<ApiTypeModifiers> _apiTypeModifiersJsonConverter = new();
 
     // Cache resolved property names per naming policy for performance and consistency
@@ -158,50 +148,56 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
     #endregion
 
     #region Constructors
-    /// <summary>
-    ///     Parameterless constructor for use via [JsonConverter(typeof(...))] attribute.
-    /// </summary>
+    /// <summary>Parameterless constructor for use via [JsonConverter(typeof(...))] attribute.</summary>
     public ApiRelationshipJsonConverter()
         : this(null)
     {
     }
     #endregion
 
-    #region JsonConverter<T> Methods
-    public override ApiRelationship? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    #region JsonConverterBase<T> Methods
+    protected override IReadContext CreateReadContext(ILogger logger, JsonSerializerOptions options)
     {
-        if (reader.TokenType == JsonTokenType.Null)
-        {
-            return null;
-        }
-
-        var propertyNamingPolicy = GetPropertyNamingPolicy(options);
+        var propertyNamingPolicy = options.GetPropertyNamingPolicy();
         var propertyNames = GetPropertyNames(propertyNamingPolicy);
         var readHandlers = GetReadHandlers(propertyNamingPolicy, propertyNames);
-        var context = new ReadContext(_logger, options, propertyNamingPolicy, propertyNames, readHandlers);
+        var context = new ReadContext(logger, options, propertyNamingPolicy, propertyNames, readHandlers);
 
-        context.Logger.LogTrace("Deserializing {ApiRelationship}", nameof(ApiRelationship));
+        return context;
+    }
 
-        ReadJsonObject<ApiRelationshipJsonConverter, ReadContext>(ref reader, ref context, (context) => context.ReadHandlers.ApiRelationshipPropertyHandlers);
+    protected override ApiRelationship? CreateValue(IReadContext context)
+    {
+        var readContext = (ReadContext)context;
 
-        var apiRelationship = CreateApiRelationship(context);
+        var apiRelationshipReadData = readContext.ReadData.ApiRelationship;
+        var apiRelationship = CreateApiRelationship(apiRelationshipReadData);
 
-        context.Logger.LogDebug("Deserialized  {ApiRelationship}", apiRelationship);
+        var extensions = readContext.ReadData.Extensions;
+        AttachExtensions(apiRelationship, extensions);
 
         return apiRelationship;
     }
 
-    public override void Write(Utf8JsonWriter writer, ApiRelationship apiRelationship, JsonSerializerOptions options)
+    protected override IWriteContext CreateWriteContext(ILogger logger, JsonSerializerOptions options)
     {
-        var propertyNamingPolicy = GetPropertyNamingPolicy(options);
+        var propertyNamingPolicy = options.GetPropertyNamingPolicy();
         var propertyNames = GetPropertyNames(propertyNamingPolicy);
-        var context = new WriteContext(_logger, options, propertyNamingPolicy, propertyNames);
+        var context = new WriteContext(logger, options, propertyNamingPolicy, propertyNames);
 
-        context.Logger.LogTrace("Serializing {ApiRelationship}", apiRelationship);
+        return context;
+    }
 
-        WriteApiRelationship(writer, apiRelationship, context);
+    protected override void ReadCore(ref Utf8JsonReader reader, IReadContext context)
+    {
+        var readContext = (ReadContext)context;
+        ReadJsonObject(ref reader, readContext, (readContext) => readContext.ReadHandlers.ApiRelationshipPropertyHandlers);
+    }
 
-        context.Logger.LogDebug("Serialized  {ApiRelationship}", apiRelationship);
+    protected override void WriteCore(Utf8JsonWriter writer, ApiRelationship value, IWriteContext context)
+    {
+        var writeContext = (WriteContext)context;
+        WriteApiRelationship(writer, value, writeContext);
     }
     #endregion
 
@@ -226,17 +222,6 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
     #endregion
 
     #region Factory Implementation Methods
-    private static ApiRelationship CreateApiRelationship(ReadContext context)
-    {
-        var apiRelationshipReadData = context.ReadData.ApiRelationship;
-        var apiRelationship = CreateApiRelationship(apiRelationshipReadData);
-
-        var extensions = context.ReadData.Extensions;
-        AttachExtensions(apiRelationship, extensions);
-
-        return apiRelationship;
-    }
-
     private static ApiRelationship CreateApiRelationship(ApiRelationshipReadData apiRelationshipReadData)
     {
         var apiName = apiRelationshipReadData.ApiName;
@@ -254,7 +239,7 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
         WriteApiRelationshipApiName(writer, apiRelationship, context);
         WriteApiRelationshipApiPropertyName(writer, apiRelationship, context);
 
-        WriteExtensibleBaseExtensions(writer, apiRelationship, context.PropertyNames.ExtensibleBase.Extensions, context.Options, context.Logger);
+        WriteExtensibleBaseExtensions(writer, context.PropertyNames.ExtensibleBase.Extensions, apiRelationship, context);
 
         writer.WriteEndObject();
     }
@@ -283,6 +268,5 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
 
         writer.TryWritePropertyAsString(propertyName, apiPropertyName, options);
     }
-
     #endregion
 }

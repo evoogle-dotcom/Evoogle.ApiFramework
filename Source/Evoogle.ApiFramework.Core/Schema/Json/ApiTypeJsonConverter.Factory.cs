@@ -3,7 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using System.Text.Json.Serialization;
+using Evoogle.Json;
 
 using Microsoft.Extensions.Logging;
 
@@ -14,45 +14,47 @@ namespace Evoogle.ApiFramework.Schema.Json;
 /// <summary>
 ///     Partial implementation of <see cref="ApiTypeJsonConverter"/> containing factory helpers.
 /// </summary>
-public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
+public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
 {
-    #region Factory Methods
-    private static ApiType CreateApiType(ReadContext context)
+    #region JsonConverterBase<T> Methods
+    protected override ApiType? CreateValue(IReadContext context)
     {
+        var readContext = (ReadContext)context;
+
         var apiType = default(ApiType);
 
-        var kindAsString = context.ReadData.ApiType?.Kind;
+        var kindAsString = readContext.ReadData.ApiType?.Kind;
 
-        var kind = GetApiTypeKind(context.Logger, kindAsString);
+        var kind = GetApiTypeKind(readContext.Logger, kindAsString);
         if (kind is not null)
         {
             switch (kind)
             {
                 case ApiTypeKind.Collection:
-                    apiType = CreateApiCollectionType(context);
+                    apiType = CreateApiCollectionType(readContext);
                     break;
 
                 case ApiTypeKind.Enum:
-                    apiType = CreateApiEnumType(context);
+                    apiType = CreateApiEnumType(readContext);
                     break;
 
                 case ApiTypeKind.Object:
-                    apiType = CreateApiObjectType(context);
+                    apiType = CreateApiObjectType(readContext);
                     break;
 
                 case ApiTypeKind.Scalar:
-                    apiType = CreateApiScalarType(context);
+                    apiType = CreateApiScalarType(readContext);
                     break;
 
                 default:
-                    context.Logger.LogError("Unsupported {Kind} enumeration value: '{KindValue}'", nameof(ApiTypeKind), kind);
+                    readContext.Logger.LogError("Unsupported {Kind} enumeration value: '{KindValue}'", nameof(ApiTypeKind), kind);
                     break;
             }
         }
 
         apiType ??= new ApiUnknownType();
 
-        var extensions = context.ReadData.Extensions;
+        var extensions = readContext.ReadData.Extensions;
         AttachExtensions(apiType, extensions);
 
         return apiType;

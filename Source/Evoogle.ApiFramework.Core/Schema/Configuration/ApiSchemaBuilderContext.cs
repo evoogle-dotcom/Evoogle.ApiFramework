@@ -14,7 +14,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 ///     The context caches builder instances and exposes a consolidated logger to provide consistent diagnostics.
 /// </summary>
 /// <param name="logger">The optional logger used to emit diagnostics during schema construction.</param>
-public sealed class ApiSchemaBuilderContext(ILogger<ApiSchemaBuilder>? logger = null)
+public sealed class ApiSchemaBuilderContext(ILogger? logger = null)
 {
     #region Fields
     private readonly Dictionary<Type, ApiScalarTypeBuilder> _apiScalarTypeBuilders = [];
@@ -27,7 +27,7 @@ public sealed class ApiSchemaBuilderContext(ILogger<ApiSchemaBuilder>? logger = 
     internal IEnumerable<ApiEnumTypeBuilder> ApiEnumTypeBuilders => _apiEnumTypeBuilders.Values;
     internal IEnumerable<ApiObjectTypeBuilder> ApiObjectTypeBuilders => _apiObjectTypeBuilders.Values;
 
-    internal ILogger<ApiSchemaBuilder> Logger { get; } = new MultiplexingLogger<ApiSchemaBuilder>(logger, MultiplexingLoggerMode.All);
+    internal ILogger Logger { get; } = new MultiplexingLogger(logger, MultiplexingLoggerMode.All);
     #endregion
 
     #region Methods

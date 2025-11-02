@@ -5,32 +5,28 @@
 // See the LICENSE file in the project root for more information.
 using System.Collections.Concurrent;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 using Evoogle.Extension;
 using Evoogle.Json;
-using Evoogle.Logging;
 
 using Microsoft.Extensions.Logging;
-
-using static Evoogle.ApiFramework.Schema.Json.Internal.ApiJsonConverterHelpers;
 
 namespace Evoogle.ApiFramework.Schema.Json;
 
 /// <summary>
 ///     Handles JSON serialization for <see cref="ApiEnumValue"/> instances, including support for extensions.
 /// </summary>
-/// <param name="logger">The optional logger that receives converter diagnostics.</param>
-public class ApiEnumValueJsonConverter(ILogger<ApiEnumValueJsonConverter>? logger) : JsonConverter<ApiEnumValue>
+/// <param name="logger">The optional logger used to emit diagnostics during JSON operations.</param>
+public class ApiEnumValueJsonConverter(ILogger<ApiEnumValueJsonConverter>? logger) : JsonConverterBase<ApiEnumValue>(logger)
 {
     #region Context Types
     /// <summary>
-    ///     Represents the shared state required by read and write operations while converting enum values.
+    ///     Represents the shared state required by read and write operations while converting <see cref="ApiEnumValue"/> objects.
     /// </summary>
-    private abstract class Context(ILogger<ApiEnumValueJsonConverter> logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames) : IHasLogger<ApiEnumValueJsonConverter>
+    private abstract class Context(ILogger logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames) : IContext
     {
         #region Immutable Properties
-        public ILogger<ApiEnumValueJsonConverter> Logger { get; } = new MultiplexingLogger<ApiEnumValueJsonConverter>(logger, MultiplexingLoggerMode.All);
+        public ILogger Logger { get; } = logger;
         public JsonSerializerOptions Options { get; } = options;
         public JsonNamingPolicy PropertyNamingPolicy { get; } = propertyNamingPolicy;
         public PropertyNames PropertyNames { get; } = propertyNames;
@@ -40,8 +36,8 @@ public class ApiEnumValueJsonConverter(ILogger<ApiEnumValueJsonConverter>? logge
     /// <summary>
     ///     Collects intermediate data while reading an <see cref="ApiEnumValue"/> from JSON.
     /// </summary>
-    private class ReadContext(ILogger<ApiEnumValueJsonConverter> logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames, ReadHandlers readHandlers)
-        : Context(logger, options, propertyNamingPolicy, propertyNames)
+    private class ReadContext(ILogger logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames, ReadHandlers readHandlers)
+        : Context(logger, options, propertyNamingPolicy, propertyNames), IReadContext
     {
         #region Immutable Properties
         public ReadHandlers ReadHandlers { get; } = readHandlers;
@@ -55,8 +51,8 @@ public class ApiEnumValueJsonConverter(ILogger<ApiEnumValueJsonConverter>? logge
     /// <summary>
     ///     Supplies contextual information while writing an <see cref="ApiEnumValue"/> to JSON.
     /// </summary>
-    private class WriteContext(ILogger<ApiEnumValueJsonConverter> logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames)
-        : Context(logger, options, propertyNamingPolicy, propertyNames)
+    private class WriteContext(ILogger logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames)
+        : Context(logger, options, propertyNamingPolicy, propertyNames), IWriteContext
     {
     }
     #endregion
@@ -114,12 +110,8 @@ public class ApiEnumValueJsonConverter(ILogger<ApiEnumValueJsonConverter>? logge
     /// </summary>
     private class ReadHandlers(PropertyNames propertyNames)
     {
-        #region Constants
-        private static readonly Type _apiTypeModifiersType = typeof(ApiTypeModifiers);
-        #endregion
-
         #region ApiEnumValue Fields
-        public readonly Dictionary<string, ApiJsonReaderHandler<ReadContext>> ApiEnumValuePropertyHandlers = new()
+        public readonly Dictionary<string, JsonReaderHandler<ReadContext>> ApiEnumValuePropertyHandlers = new()
         {
             // ApiEnumValue Property Handlers
             { propertyNames.ApiEnumValue.ApiName, HandleApiEnumValueApiName },
@@ -127,36 +119,31 @@ public class ApiEnumValueJsonConverter(ILogger<ApiEnumValueJsonConverter>? logge
             { propertyNames.ApiEnumValue.ClrOrdinal, HandleApiEnumValueClrOrdinal },
 
             // ExtensibleBase Property Handlers
-            { propertyNames.ExtensibleBase.Extensions, (ref Utf8JsonReader reader, ref ReadContext context) =>
-                context.ReadData.Extensions = ReadExtensions(ref reader, context.Options, context.Logger) },
+            { propertyNames.ExtensibleBase.Extensions, (ref Utf8JsonReader reader, ReadContext context) =>
+                context.ReadData.Extensions = ReadJsonExtensionsObject(ref reader, context) },
         };
         #endregion
 
         #region ApiEnumValue Methods
-        private static void HandleApiEnumValueApiName(ref Utf8JsonReader reader, ref ReadContext context)
+        private static void HandleApiEnumValueApiName(ref Utf8JsonReader reader, ReadContext context)
         {
             context.ReadData.ApiEnumValue.ApiName = reader.GetString();
         }
 
-        private static void HandleApiEnumValueClrName(ref Utf8JsonReader reader, ref ReadContext context)
+        private static void HandleApiEnumValueClrName(ref Utf8JsonReader reader, ReadContext context)
         {
             context.ReadData.ApiEnumValue.ClrName = reader.GetString();
         }
 
-        private static void HandleApiEnumValueClrOrdinal(ref Utf8JsonReader reader, ref ReadContext context)
+        private static void HandleApiEnumValueClrOrdinal(ref Utf8JsonReader reader, ReadContext context)
         {
             context.ReadData.ApiEnumValue.ClrOrdinal = reader.GetInt32();
         }
         #endregion
-
     }
     #endregion
 
     #region Fields
-    private readonly ILogger<ApiEnumValueJsonConverter> _logger = new MultiplexingLogger<ApiEnumValueJsonConverter>(logger, MultiplexingLoggerMode.All);
-
-    private static readonly EnumJsonConverter<ApiTypeModifiers> _apiTypeModifiersJsonConverter = new();
-
     // Cache resolved property names per naming policy for performance and consistency
     private static readonly ConcurrentDictionary<JsonNamingPolicy, PropertyNames> _propertyNamesCache = new();
 
@@ -165,50 +152,56 @@ public class ApiEnumValueJsonConverter(ILogger<ApiEnumValueJsonConverter>? logge
     #endregion
 
     #region Constructors
-    /// <summary>
-    ///     Parameterless constructor for use via [JsonConverter(typeof(...))] attribute.
-    /// </summary>
+    /// <summary>Parameterless constructor for use via [JsonConverter(typeof(...))] attribute.</summary>
     public ApiEnumValueJsonConverter()
         : this(null)
     {
     }
     #endregion
 
-    #region JsonConverter<T> Methods
-    public override ApiEnumValue? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    #region JsonConverterBase<T> Methods
+    protected override IReadContext CreateReadContext(ILogger logger, JsonSerializerOptions options)
     {
-        if (reader.TokenType == JsonTokenType.Null)
-        {
-            return null;
-        }
-
-        var propertyNamingPolicy = GetPropertyNamingPolicy(options);
+        var propertyNamingPolicy = options.GetPropertyNamingPolicy();
         var propertyNames = GetPropertyNames(propertyNamingPolicy);
         var readHandlers = GetReadHandlers(propertyNamingPolicy, propertyNames);
-        var context = new ReadContext(_logger, options, propertyNamingPolicy, propertyNames, readHandlers);
+        var context = new ReadContext(logger, options, propertyNamingPolicy, propertyNames, readHandlers);
 
-        context.Logger.LogTrace("Deserializing {ApiEnumValue}", nameof(ApiEnumValue));
+        return context;
+    }
 
-        ReadJsonObject<ApiEnumValueJsonConverter, ReadContext>(ref reader, ref context, (context) => context.ReadHandlers.ApiEnumValuePropertyHandlers);
+    protected override ApiEnumValue? CreateValue(IReadContext context)
+    {
+        var readContext = (ReadContext)context;
 
-        var apiEnumValue = CreateApiEnumValue(context);
+        var apiEnumValueReadData = readContext.ReadData.ApiEnumValue;
+        var apiEnumValue = CreateApiEnumValue(apiEnumValueReadData);
 
-        context.Logger.LogDebug("Deserialized  {ApiEnumValue}", apiEnumValue);
+        var extensions = readContext.ReadData.Extensions;
+        AttachExtensions(apiEnumValue, extensions);
 
         return apiEnumValue;
     }
 
-    public override void Write(Utf8JsonWriter writer, ApiEnumValue apiEnumValue, JsonSerializerOptions options)
+    protected override IWriteContext CreateWriteContext(ILogger logger, JsonSerializerOptions options)
     {
-        var propertyNamingPolicy = GetPropertyNamingPolicy(options);
+        var propertyNamingPolicy = options.GetPropertyNamingPolicy();
         var propertyNames = GetPropertyNames(propertyNamingPolicy);
-        var context = new WriteContext(_logger, options, propertyNamingPolicy, propertyNames);
+        var context = new WriteContext(logger, options, propertyNamingPolicy, propertyNames);
 
-        context.Logger.LogTrace("Serializing {ApiEnumValue}", apiEnumValue);
+        return context;
+    }
 
-        WriteApiEnumValue(writer, apiEnumValue, context);
+    protected override void ReadCore(ref Utf8JsonReader reader, IReadContext context)
+    {
+        var readContext = (ReadContext)context;
+        ReadJsonObject(ref reader, readContext, (readContext) => readContext.ReadHandlers.ApiEnumValuePropertyHandlers);
+    }
 
-        context.Logger.LogDebug("Serialized  {ApiEnumValue}", apiEnumValue);
+    protected override void WriteCore(Utf8JsonWriter writer, ApiEnumValue value, IWriteContext context)
+    {
+        var writeContext = (WriteContext)context;
+        WriteApiEnumValue(writer, value, writeContext);
     }
     #endregion
 
@@ -234,17 +227,6 @@ public class ApiEnumValueJsonConverter(ILogger<ApiEnumValueJsonConverter>? logge
     #endregion
 
     #region Factory Implementation Methods
-    private static ApiEnumValue CreateApiEnumValue(ReadContext context)
-    {
-        var apiEnumValueReadData = context.ReadData.ApiEnumValue;
-        var apiEnumValue = CreateApiEnumValue(apiEnumValueReadData);
-
-        var extensions = context.ReadData.Extensions;
-        AttachExtensions(apiEnumValue, extensions);
-
-        return apiEnumValue;
-    }
-
     private static ApiEnumValue CreateApiEnumValue(ApiEnumValueReadData apiEnumValueReadData)
     {
         var apiName = apiEnumValueReadData.ApiName;
@@ -264,7 +246,7 @@ public class ApiEnumValueJsonConverter(ILogger<ApiEnumValueJsonConverter>? logge
         WriteApiEnumValueClrName(writer, apiEnumValue, context);
         WriteApiEnumValueClrOrdinal(writer, apiEnumValue, context);
 
-        WriteExtensibleBaseExtensions(writer, apiEnumValue, context.PropertyNames.ExtensibleBase.Extensions, context.Options, context.Logger);
+        WriteExtensibleBaseExtensions(writer, context.PropertyNames.ExtensibleBase.Extensions, apiEnumValue, context);
 
         writer.WriteEndObject();
     }
@@ -295,6 +277,5 @@ public class ApiEnumValueJsonConverter(ILogger<ApiEnumValueJsonConverter>? logge
 
         writer.TryWritePropertyAsNumber(propertyName, value, options);
     }
-
     #endregion
 }

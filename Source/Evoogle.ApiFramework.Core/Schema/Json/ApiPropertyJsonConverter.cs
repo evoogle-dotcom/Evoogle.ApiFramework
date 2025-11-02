@@ -5,15 +5,11 @@
 // See the LICENSE file in the project root for more information.
 using System.Collections.Concurrent;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 using Evoogle.Extension;
 using Evoogle.Json;
-using Evoogle.Logging;
 
 using Microsoft.Extensions.Logging;
-
-using static Evoogle.ApiFramework.Schema.Json.Internal.ApiJsonConverterHelpers;
 
 namespace Evoogle.ApiFramework.Schema.Json;
 
@@ -21,16 +17,16 @@ namespace Evoogle.ApiFramework.Schema.Json;
 ///     Serializes and deserializes <see cref="ApiProperty"/> instances, including extension payloads and type expressions.
 /// </summary>
 /// <param name="logger">The optional logger used to emit diagnostics during JSON operations.</param>
-public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger) : JsonConverter<ApiProperty>
+public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger) : JsonConverterBase<ApiProperty>(logger)
 {
     #region Context Types
     /// <summary>
     ///     Represents the immutable state shared by read and write operations for <see cref="ApiProperty"/> conversion.
     /// </summary>
-    private abstract class Context(ILogger<ApiPropertyJsonConverter> logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames) : IHasLogger<ApiPropertyJsonConverter>
+    private abstract class Context(ILogger logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames) : IContext
     {
         #region Immutable Properties
-        public ILogger<ApiPropertyJsonConverter> Logger { get; } = new MultiplexingLogger<ApiPropertyJsonConverter>(logger, MultiplexingLoggerMode.All);
+        public ILogger Logger { get; } = logger;
         public JsonSerializerOptions Options { get; } = options;
         public JsonNamingPolicy PropertyNamingPolicy { get; } = propertyNamingPolicy;
         public PropertyNames PropertyNames { get; } = propertyNames;
@@ -40,8 +36,8 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
     /// <summary>
     ///     Captures transient state while reading a property from JSON.
     /// </summary>
-    private class ReadContext(ILogger<ApiPropertyJsonConverter> logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames, ReadHandlers readHandlers)
-        : Context(logger, options, propertyNamingPolicy, propertyNames)
+    private class ReadContext(ILogger logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames, ReadHandlers readHandlers)
+        : Context(logger, options, propertyNamingPolicy, propertyNames), IReadContext
     {
         #region Immutable Properties
         public ReadHandlers ReadHandlers { get; } = readHandlers;
@@ -55,8 +51,8 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
     /// <summary>
     ///     Provides contextual information required while writing a property to JSON.
     /// </summary>
-    private class WriteContext(ILogger<ApiPropertyJsonConverter> logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames)
-        : Context(logger, options, propertyNamingPolicy, propertyNames)
+    private class WriteContext(ILogger logger, JsonSerializerOptions options, JsonNamingPolicy propertyNamingPolicy, PropertyNames propertyNames)
+        : Context(logger, options, propertyNamingPolicy, propertyNames), IWriteContext
     {
     }
     #endregion
@@ -121,7 +117,7 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
         #endregion
 
         #region ApiProperty Fields
-        public readonly Dictionary<string, ApiJsonReaderHandler<ReadContext>> ApiPropertyPropertyHandlers = new()
+        public readonly Dictionary<string, JsonReaderHandler<ReadContext>> ApiPropertyPropertyHandlers = new()
         {
             // ApiProperty Property Handlers
             { propertyNames.ApiProperty.ApiName, HandleApiPropertyApiName },
@@ -130,40 +126,37 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
             { propertyNames.ApiProperty.ClrName, HandleApiPropertyClrName },
 
             // ExtensibleBase Property Handlers
-            { propertyNames.ExtensibleBase.Extensions, (ref Utf8JsonReader reader, ref ReadContext context) =>
-                context.ReadData.Extensions = ReadExtensions(ref reader, context.Options, context.Logger) },
+            { propertyNames.ExtensibleBase.Extensions, (ref Utf8JsonReader reader, ReadContext context) =>
+                context.ReadData.Extensions = ReadJsonExtensionsObject(ref reader, context) },
         };
         #endregion
 
         #region ApiProperty Methods
-        private static void HandleApiPropertyApiName(ref Utf8JsonReader reader, ref ReadContext context)
+        private static void HandleApiPropertyApiName(ref Utf8JsonReader reader, ReadContext context)
         {
             context.ReadData.ApiProperty.ApiName = reader.GetString();
         }
 
-        private static void HandleApiPropertyApiTypeModifiers(ref Utf8JsonReader reader, ref ReadContext context)
+        private static void HandleApiPropertyApiTypeModifiers(ref Utf8JsonReader reader, ReadContext context)
         {
             var options = context.Options;
             context.ReadData.ApiProperty.ApiTypeModifiers = _apiTypeModifiersJsonConverter.Read(ref reader, _apiTypeModifiersType, options);
         }
 
-        private static void HandleApiPropertyApiTypeExpression(ref Utf8JsonReader reader, ref ReadContext context)
+        private static void HandleApiPropertyApiTypeExpression(ref Utf8JsonReader reader, ReadContext context)
         {
             context.ReadData.ApiProperty.ApiTypeExpression = JsonSerializer.Deserialize<ApiTypeExpression>(ref reader, context.Options);
         }
 
-        private static void HandleApiPropertyClrName(ref Utf8JsonReader reader, ref ReadContext context)
+        private static void HandleApiPropertyClrName(ref Utf8JsonReader reader, ReadContext context)
         {
             context.ReadData.ApiProperty.ClrName = reader.GetString();
         }
         #endregion
-
     }
     #endregion
 
     #region Fields
-    private readonly ILogger<ApiPropertyJsonConverter> _logger = new MultiplexingLogger<ApiPropertyJsonConverter>(logger, MultiplexingLoggerMode.All);
-
     private static readonly EnumJsonConverter<ApiTypeModifiers> _apiTypeModifiersJsonConverter = new();
 
     // Cache resolved property names per naming policy for performance and consistency
@@ -174,50 +167,56 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
     #endregion
 
     #region Constructors
-    /// <summary>
-    ///     Parameterless constructor for use via [JsonConverter(typeof(...))] attribute.
-    /// </summary>
+    /// <summary>Parameterless constructor for use via [JsonConverter(typeof(...))] attribute.</summary>
     public ApiPropertyJsonConverter()
         : this(null)
     {
     }
     #endregion
 
-    #region JsonConverter<T> Methods
-    public override ApiProperty? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    #region JsonConverterBase<T> Methods
+    protected override IReadContext CreateReadContext(ILogger logger, JsonSerializerOptions options)
     {
-        if (reader.TokenType == JsonTokenType.Null)
-        {
-            return null;
-        }
-
-        var propertyNamingPolicy = GetPropertyNamingPolicy(options);
+        var propertyNamingPolicy = options.GetPropertyNamingPolicy();
         var propertyNames = GetPropertyNames(propertyNamingPolicy);
         var readHandlers = GetReadHandlers(propertyNamingPolicy, propertyNames);
-        var context = new ReadContext(_logger, options, propertyNamingPolicy, propertyNames, readHandlers);
+        var context = new ReadContext(logger, options, propertyNamingPolicy, propertyNames, readHandlers);
 
-        context.Logger.LogTrace("Deserializing {ApiProperty}", nameof(ApiProperty));
+        return context;
+    }
 
-        ReadJsonObject<ApiPropertyJsonConverter, ReadContext>(ref reader, ref context, (context) => context.ReadHandlers.ApiPropertyPropertyHandlers);
+    protected override ApiProperty? CreateValue(IReadContext context)
+    {
+        var readContext = (ReadContext)context;
 
-        var apiProperty = CreateApiProperty(context);
+        var apiPropertyReadData = readContext.ReadData.ApiProperty;
+        var apiProperty = CreateApiProperty(apiPropertyReadData);
 
-        context.Logger.LogDebug("Deserialized  {ApiProperty}", apiProperty);
+        var extensions = readContext.ReadData.Extensions;
+        AttachExtensions(apiProperty, extensions);
 
         return apiProperty;
     }
 
-    public override void Write(Utf8JsonWriter writer, ApiProperty apiProperty, JsonSerializerOptions options)
+    protected override IWriteContext CreateWriteContext(ILogger logger, JsonSerializerOptions options)
     {
-        var propertyNamingPolicy = GetPropertyNamingPolicy(options);
+        var propertyNamingPolicy = options.GetPropertyNamingPolicy();
         var propertyNames = GetPropertyNames(propertyNamingPolicy);
-        var context = new WriteContext(_logger, options, propertyNamingPolicy, propertyNames);
+        var context = new WriteContext(logger, options, propertyNamingPolicy, propertyNames);
 
-        context.Logger.LogTrace("Serializing {ApiProperty}", apiProperty);
+        return context;
+    }
 
-        WriteApiProperty(writer, apiProperty, context);
+    protected override void ReadCore(ref Utf8JsonReader reader, IReadContext context)
+    {
+        var readContext = (ReadContext)context;
+        ReadJsonObject(ref reader, readContext, (readContext) => readContext.ReadHandlers.ApiPropertyPropertyHandlers);
+    }
 
-        context.Logger.LogDebug("Serialized  {ApiProperty}", apiProperty);
+    protected override void WriteCore(Utf8JsonWriter writer, ApiProperty value, IWriteContext context)
+    {
+        var writeContext = (WriteContext)context;
+        WriteApiProperty(writer, value, writeContext);
     }
     #endregion
 
@@ -244,17 +243,6 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
     #endregion
 
     #region Factory Implementation Methods
-    private static ApiProperty CreateApiProperty(ReadContext context)
-    {
-        var apiPropertyReadData = context.ReadData.ApiProperty;
-        var apiProperty = CreateApiProperty(apiPropertyReadData);
-
-        var extensions = context.ReadData.Extensions;
-        AttachExtensions(apiProperty, extensions);
-
-        return apiProperty;
-    }
-
     private static ApiProperty CreateApiProperty(ApiPropertyReadData apiPropertyReadData)
     {
         var apiName = apiPropertyReadData.ApiName;
@@ -277,7 +265,7 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
         WriteApiPropertyApiTypeModifiers(writer, apiProperty, context);
         WriteApiPropertyClrName(writer, apiProperty, context);
 
-        WriteExtensibleBaseExtensions(writer, apiProperty, context.PropertyNames.ExtensibleBase.Extensions, context.Options, context.Logger);
+        WriteExtensibleBaseExtensions(writer, context.PropertyNames.ExtensibleBase.Extensions, apiProperty, context);
 
         writer.WriteEndObject();
     }
@@ -317,6 +305,5 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
 
         writer.TryWritePropertyAsString(propertyName, value, options);
     }
-
     #endregion
 }

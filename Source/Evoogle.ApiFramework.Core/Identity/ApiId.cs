@@ -16,9 +16,13 @@ namespace Evoogle.ApiFramework.Identity;
 
 /// <summary>
 ///     ApiId is a compact, tagged-discriminated union for identifiers.
+///     ApiId is immutable and thread-safe.
 ///     Scalars are allocation-free; composites allocate an array of parts.
 ///     Uses a safe value-type union for primitives and a single reference slot for reference arms.
 /// </summary>
+/// <remarks>
+///     TODO: Use coercion library in core framework for conversions between coercible types (e.g., string to CultureInfo, Int32 to Int64).
+/// </remarks>
 [DebuggerDisplay("{ToDebuggerDisplay(),nq}")]
 [JsonConverter(typeof(ApiIdJsonConverter))]
 public readonly struct ApiId : IEquatable<ApiId>, IComparable<ApiId>
@@ -124,7 +128,7 @@ public readonly struct ApiId : IEquatable<ApiId>, IComparable<ApiId>
     public static ApiId FromCulture(string name)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
-        return new ApiId(ApiIdKind.Culture, default, CultureInfo.GetCultureInfo(name), name);
+        return new ApiId(ApiIdKind.Culture, default, CultureInfo.GetCultureInfo(name, predefinedOnly: true), name);
     }
 
     public static ApiId FromString(string value)
@@ -513,7 +517,7 @@ public readonly struct ApiId : IEquatable<ApiId>, IComparable<ApiId>
         var kindCmp = this.Kind.CompareTo(other.Kind);
         if (kindCmp != 0)
         {
-            return kindCmp;
+            return Math.Sign(kindCmp);
         }
 
         return this.Kind switch

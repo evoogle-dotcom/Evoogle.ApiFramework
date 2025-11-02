@@ -335,39 +335,39 @@ public class ApiIdTests(ITestOutputHelper output) : XUnitTests(output)
 
     private static ApiId TestCompositeInt24AndInt24ApiId { get; } = ApiId.Composite
     (
-        ApiIdPart.CreateUnnamed(ApiId.FromInt32(24)),
-        ApiIdPart.CreateUnnamed(ApiId.FromInt32(24))
+        ApiIdPart.Create(ApiId.FromInt32(24)),
+        ApiIdPart.Create(ApiId.FromInt32(24))
     );
 
     private static ApiId TestCompositeInt24AndInt42ApiId { get; } = ApiId.Composite
     (
-        ApiIdPart.CreateUnnamed(ApiId.FromInt32(24)),
-        ApiIdPart.CreateUnnamed(ApiId.FromInt32(42))
+        ApiIdPart.Create(ApiId.FromInt32(24)),
+        ApiIdPart.Create(ApiId.FromInt32(42))
     );
 
     private static ApiId TestCompositeInt24AndInt42AndInt48ApiId { get; } = ApiId.Composite
     (
-        ApiIdPart.CreateUnnamed(ApiId.FromInt32(24)),
-        ApiIdPart.CreateUnnamed(ApiId.FromInt32(42)),
-        ApiIdPart.CreateUnnamed(ApiId.FromInt32(48))
+        ApiIdPart.Create(ApiId.FromInt32(24)),
+        ApiIdPart.Create(ApiId.FromInt32(42)),
+        ApiIdPart.Create(ApiId.FromInt32(48))
     );
 
     private static ApiId TestCompositeAlphaInt24AndBetaInt24ApiId { get; } = ApiId.Composite
     (
-        ApiIdPart.CreateNamed("alpha", ApiId.FromInt32(24)),
-        ApiIdPart.CreateNamed("beta", ApiId.FromInt32(24))
+        ApiIdPart.Create("alpha", ApiId.FromInt32(24)),
+        ApiIdPart.Create("beta", ApiId.FromInt32(24))
     );
 
     private static ApiId TestCompositeAlphaInt24AndBetaInt42ApiId { get; } = ApiId.Composite
     (
-        ApiIdPart.CreateNamed("alpha", ApiId.FromInt32(24)),
-        ApiIdPart.CreateNamed("beta", ApiId.FromInt32(42))
+        ApiIdPart.Create("alpha", ApiId.FromInt32(24)),
+        ApiIdPart.Create("beta", ApiId.FromInt32(42))
     );
 
     private static ApiId TestCompositeAlphaInt24AndZetaInt42ApiId { get; } = ApiId.Composite
     (
-        ApiIdPart.CreateNamed("alpha", ApiId.FromInt32(24)),
-        ApiIdPart.CreateNamed("zeta", ApiId.FromInt32(42))
+        ApiIdPart.Create("alpha", ApiId.FromInt32(24)),
+        ApiIdPart.Create("zeta", ApiId.FromInt32(42))
     );
 
     private static Guid TestGuid { get; } = Guid.NewGuid();
@@ -520,8 +520,8 @@ public class ApiIdTests(ITestOutputHelper output) : XUnitTests(output)
             Factory = ApiIdCompositeFactory.Named,
             PartCollection =
             [
-                ApiIdPart.CreateNamed("id-1", ApiId.FromInt32(42)),
-                ApiIdPart.CreateNamed("id-2", ApiId.FromInt32(24)),
+                ApiIdPart.Create("id-1", ApiId.FromInt32(42)),
+                ApiIdPart.Create("id-2", ApiId.FromInt32(24)),
             ]
         },
         new CompositeTest
@@ -530,8 +530,8 @@ public class ApiIdTests(ITestOutputHelper output) : XUnitTests(output)
             Factory = ApiIdCompositeFactory.Named,
             PartCollection =
             [
-                ApiIdPart.CreateNamed("id", ApiId.FromString("42")),
-                ApiIdPart.CreateNamed("locale", ApiId.FromCulture("en-us")),
+                ApiIdPart.Create("id", ApiId.FromString("42")),
+                ApiIdPart.Create("locale", ApiId.FromCulture("en-us")),
             ]
         },
         new CompositeTest
@@ -540,9 +540,9 @@ public class ApiIdTests(ITestOutputHelper output) : XUnitTests(output)
             Factory = ApiIdCompositeFactory.Named,
             PartCollection =
             [
-                ApiIdPart.CreateNamed("id-string", ApiId.FromString("42")),
-                ApiIdPart.CreateNamed("id-int64", ApiId.FromInt64(42)),
-                ApiIdPart.CreateNamed("locale", ApiId.FromCulture("en-us")),
+                ApiIdPart.Create("id-string", ApiId.FromString("42")),
+                ApiIdPart.Create("id-int64", ApiId.FromInt64(42)),
+                ApiIdPart.Create("locale", ApiId.FromCulture("en-us")),
             ]
         },
 

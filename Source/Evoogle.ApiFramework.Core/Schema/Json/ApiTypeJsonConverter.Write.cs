@@ -4,18 +4,15 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 using Evoogle.Json;
-
-using static Evoogle.ApiFramework.Schema.Json.Internal.ApiJsonConverterHelpers;
 
 namespace Evoogle.ApiFramework.Schema.Json;
 
 /// <summary>
 ///     Partial implementation of <see cref="ApiTypeJsonConverter"/> focused on writing JSON.
 /// </summary>
-public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
+public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
 {
     #region Write Implementation Methods
     // ApiCollectionType
@@ -202,7 +199,8 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
     private static void WriteApiTypeEpilog(Utf8JsonWriter writer, ApiType apiType, WriteContext context)
     {
         WriteApiTypeClrType(writer, apiType, context);
-        WriteExtensibleBaseExtensions(writer, apiType, context.PropertyNames.ExtensibleBase.Extensions, context.Options, context.Logger);
+
+        WriteExtensibleBaseExtensions(writer, context.PropertyNames.ExtensibleBase.Extensions, apiType, context);
 
         writer.WriteEndObject();
     }
@@ -222,6 +220,5 @@ public partial class ApiTypeJsonConverter : JsonConverter<ApiType>
 
         WriteApiTypeKind(writer, apiType, context);
     }
-
     #endregion
 }
