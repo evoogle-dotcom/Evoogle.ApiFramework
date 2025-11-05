@@ -9,7 +9,7 @@ using Evoogle.XUnit;
 
 using FluentAssertions;
 
-using static Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests;
+using static Evoogle.XUnit.JsonUnitTests;
 
 namespace Evoogle.ApiFramework.Schema;
 
@@ -860,7 +860,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         {
             Name = "ApiSchema With 1 ApiScalarType And Extension 1",
             Expected = new ApiSchema("ApiSchema With 1 ApiScalarType And Extension 1", [TestApiScalarTypeBoolean]),
-            AddTestExtension1 = typeof(TestExtension1)
+            ExtensionType1 = typeof(TestExtension1)
         },
 
         // ApiSchema With 2 ApiScalarTypes
@@ -882,8 +882,8 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         {
             Name = "ApiSchema With 3 ApiScalarTypes And Extension 1 And Extension 2",
             Expected = new ApiSchema("ApiSchema With 3 ApiScalarTypes And Extension 1 And Extension 2", [TestApiScalarTypeBoolean, TestApiScalarTypeInt32, TestApiScalarTypeString]),
-            AddTestExtension1 = typeof(TestExtension1),
-            AddTestExtension2 = typeof(TestExtension2),
+            ExtensionType1 = typeof(TestExtension1),
+            ExtensionType2 = typeof(TestExtension2),
         },
 
         // ApiSchema With 1 ApiEnumType
@@ -898,7 +898,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         {
             Name = "ApiSchema With 1 ApiEnumType And Extension 1",
             Expected = new ApiSchema("ApiSchema With 1 ApiEnumType And Extension 1", [TestApiEnumTypeGender]),
-            AddTestExtension1 = typeof(TestExtension1),
+            ExtensionType1 = typeof(TestExtension1),
         },
 
         // ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)
@@ -933,8 +933,8 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     TestApiObjectTypePerson
                 ]
             ),
-            AddTestExtension1 = typeof(TestExtension1),
-            AddTestExtension2 = typeof(TestExtension2),
+            ExtensionType1 = typeof(TestExtension1),
+            ExtensionType2 = typeof(TestExtension2),
         },
 
         // ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 2 ApiObjectTypes (Person and Company) And Extension 1 And Extension 2
@@ -953,8 +953,8 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     TestApiObjectTypeCompany
                 ]
             ),
-            AddTestExtension1 = typeof(TestExtension1),
-            AddTestExtension2 = typeof(TestExtension2),
+            ExtensionType1 = typeof(TestExtension1),
+            ExtensionType2 = typeof(TestExtension2),
         },
     ];
 
@@ -1025,7 +1025,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     }
                 }
             }",
-            AddTestExtension1 = typeof(TestExtension1)
+            ExtensionType1 = typeof(TestExtension1)
         },
 
         // ApiSchema With 2 ApiScalarTypes
@@ -1120,8 +1120,8 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     }
                 }
             }",
-            AddTestExtension1 = typeof(TestExtension1),
-            AddTestExtension2 = typeof(TestExtension2)
+            ExtensionType1 = typeof(TestExtension1),
+            ExtensionType2 = typeof(TestExtension2)
         },
 
         // ApiSchema With 1 ApiEnumType
@@ -1201,7 +1201,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     }
                 }
             }",
-            AddTestExtension1 = typeof(TestExtension1)
+            ExtensionType1 = typeof(TestExtension1)
         },
 
         // ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)
@@ -1441,8 +1441,8 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     }
                 }
             }",
-            AddTestExtension1 = typeof(TestExtension1),
-            AddTestExtension2 = typeof(TestExtension2)
+            ExtensionType1 = typeof(TestExtension1),
+            ExtensionType2 = typeof(TestExtension2)
         },
 
         // ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 2 ApiObjectTypes (Person and Company)

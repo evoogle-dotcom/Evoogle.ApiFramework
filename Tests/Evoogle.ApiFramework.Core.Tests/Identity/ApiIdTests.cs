@@ -12,6 +12,7 @@ using Evoogle.Extensions;
 using Evoogle.XUnit;
 
 using FluentAssertions;
+using static Evoogle.XUnit.JsonUnitTests;
 
 namespace Evoogle.ApiFramework.Identity;
 
@@ -745,6 +746,319 @@ public class ApiIdTests(ITestOutputHelper output) : XUnitTests(output)
         }
     ];
 
+    public static TheoryDataRow<IXUnitTest>[] JsonDeserializeTheoryData =>
+    [
+        // Empty
+        new JsonDeserializeTest<ApiId>
+        {
+            Name = $"None: {ApiId.Empty.ToDebuggerDisplay()}",
+            Source = "null",
+            Expected = ApiId.Empty
+        },
+
+        // Scalars
+
+        // .. String
+        new JsonDeserializeTest<ApiId>
+        {
+            Name = $"Scalar: {TestStringAlphaApiId.ToDebuggerDisplay()}",
+            Source = @"{""Kind"":""String"",""Value"":""alpha""}",
+            Expected = TestStringAlphaApiId
+        },
+        new JsonDeserializeTest<ApiId>
+        {
+            Name = $"Scalar: {TestStringALPHAApiId.ToDebuggerDisplay()}",
+            Source = @"{""Kind"":""String"",""Value"":""ALPHA""}",
+            Expected = TestStringALPHAApiId
+        },
+
+        // .. Int32
+        new JsonDeserializeTest<ApiId>
+        {
+            Name = $"Scalar: {TestInt42ApiId.ToDebuggerDisplay()}",
+            Source = @"{""Kind"":""Int32"",""Value"":""42""}",
+            Expected = TestInt42ApiId
+        },
+
+        // .. Int64
+        new JsonDeserializeTest<ApiId>
+        {
+            Name = $"Scalar: {TestLong24ApiId.ToDebuggerDisplay()}",
+            Source = @"{""Kind"":""Int64"",""Value"":""24""}",
+            Expected = TestLong24ApiId
+        },
+
+        // .. Guid
+        new JsonDeserializeTest<ApiId>
+        {
+            Name = $"Scalar: {TestGuidApiId.ToDebuggerDisplay()}",
+            Source = @"{""Kind"":""Guid"",""Value"":""" + TestGuidString + @"""}",
+            Expected = TestGuidApiId
+        },
+
+        // .. Ulid
+        new JsonDeserializeTest<ApiId>
+        {
+            Name = $"Scalar: {TestUlidApiId.ToDebuggerDisplay()}",
+            Source = @"{""Kind"":""Ulid"",""Value"":""" +  TestUlidString + @"""}",
+            Expected = TestUlidApiId
+        },
+
+        // .. Culture
+        new JsonDeserializeTest<ApiId>
+        {
+            Name = $"Scalar: {TestCultureEnUsApiId.ToDebuggerDisplay()}",
+            Source = @"{""Kind"":""Culture"",""Value"":""en-US""}",
+            Expected = TestCultureEnUsApiId
+        },
+        new JsonDeserializeTest<ApiId>
+        {
+            Name = $"Scalar: {TestCultureFrFrApiId.ToDebuggerDisplay()}",
+            Source = @"{""Kind"":""Culture"",""Value"":""fr-FR""}",
+            Expected = TestCultureFrFrApiId
+        },
+
+        // Composites
+
+        // .. Ordered (unnamed parts)
+        new JsonDeserializeTest<ApiId>
+        {
+            Name = $"Composite: {TestCompositeInt24AndInt24ApiId.ToDebuggerDisplay()}",
+            Source = @"{""Kind"":""Composite"",""Value"":[{""Kind"":""Int32"",""Value"":""24""},{""Kind"":""Int32"",""Value"":""24""}]}",
+            Expected = TestCompositeInt24AndInt24ApiId
+        },
+        new JsonDeserializeTest<ApiId>
+        {
+            Name = $"Composite: {TestCompositeInt24AndInt42ApiId.ToDebuggerDisplay()}",
+            Source = @"{""Kind"":""Composite"",""Value"":[{""Kind"":""Int32"",""Value"":""24""},{""Kind"":""Int32"",""Value"":""42""}]}",
+            Expected = TestCompositeInt24AndInt42ApiId
+        },
+
+        // .. Named (named parts)
+        new JsonDeserializeTest<ApiId>
+        {
+            Name = $"Composite: {TestCompositeAlphaInt24AndBetaInt24ApiId.ToDebuggerDisplay()}",
+            Source = @"{""Kind"":""Composite"",""Value"":[{""Name"":""alpha"",""Kind"":""Int32"",""Value"":""24""},{""Name"":""beta"",""Kind"":""Int32"",""Value"":""24""}]}",
+            Expected = TestCompositeAlphaInt24AndBetaInt24ApiId
+        },
+        new JsonDeserializeTest<ApiId>
+        {
+            Name = $"Composite: {TestCompositeAlphaInt24AndBetaInt42ApiId.ToDebuggerDisplay()}",
+            Source = @"{""Kind"":""Composite"",""Value"":[{""Name"":""alpha"",""Kind"":""Int32"",""Value"":""24""},{""Name"":""beta"",""Kind"":""Int32"",""Value"":""42""}]}",
+            Expected = TestCompositeAlphaInt24AndBetaInt42ApiId
+        },
+        new JsonDeserializeTest<ApiId>
+        {
+            Name = $"Composite: {TestCompositeAlphaInt24AndZetaInt42ApiId.ToDebuggerDisplay()}",
+            Source = @"{""Kind"":""Composite"",""Value"":[{""Name"":""alpha"",""Kind"":""Int32"",""Value"":""24""},{""Name"":""zeta"",""Kind"":""Int32"",""Value"":""42""}]}",
+            Expected = TestCompositeAlphaInt24AndZetaInt42ApiId
+        },
+    ];
+
+    public static TheoryDataRow<IXUnitTest>[] JsonRoundtripTheoryData =>
+    [
+        // Empty
+        new JsonRoundtripTest<ApiId>
+        {
+            Name = $"None: {ApiId.Empty.ToDebuggerDisplay()}",
+            Expected = ApiId.Empty
+        },
+
+        // Scalars
+
+        // .. String
+        new JsonRoundtripTest<ApiId>
+        {
+            Name = $"Scalar: {TestStringAlphaApiId.ToDebuggerDisplay()}",
+            Expected = TestStringAlphaApiId
+        },
+        new JsonRoundtripTest<ApiId>
+        {
+            Name = $"Scalar: {TestStringALPHAApiId.ToDebuggerDisplay()}",
+            Expected = TestStringALPHAApiId
+        },
+
+        // .. Int32
+        new JsonRoundtripTest<ApiId>
+        {
+            Name = $"Scalar: {TestInt42ApiId.ToDebuggerDisplay()}",
+            Expected = TestInt42ApiId
+        },
+
+        // .. Int64
+        new JsonRoundtripTest<ApiId>
+        {
+            Name = $"Scalar: {TestLong24ApiId.ToDebuggerDisplay()}",
+            Expected = TestLong24ApiId
+        },
+
+        // .. Guid
+        new JsonRoundtripTest<ApiId>
+        {
+            Name = $"Scalar: {TestGuidApiId.ToDebuggerDisplay()}",
+            Expected = TestGuidApiId
+        },
+
+        // .. Ulid
+        new JsonRoundtripTest<ApiId>
+        {
+            Name = $"Scalar: {TestUlidApiId.ToDebuggerDisplay()}",
+            Expected = TestUlidApiId
+        },
+
+        // .. Culture
+        new JsonRoundtripTest<ApiId>
+        {
+            Name = $"Scalar: {TestCultureEnUsApiId.ToDebuggerDisplay()}",
+            Expected = TestCultureEnUsApiId
+        },
+        new JsonRoundtripTest<ApiId>
+        {
+            Name = $"Scalar: {TestCultureFrFrApiId.ToDebuggerDisplay()}",
+            Expected = TestCultureFrFrApiId
+        },
+
+        // Composites
+
+        // .. Ordered (unnamed parts)
+        new JsonRoundtripTest<ApiId>
+        {
+            Name = $"Composite: {TestCompositeInt24AndInt24ApiId.ToDebuggerDisplay()}",
+            Expected = TestCompositeInt24AndInt24ApiId
+        },
+        new JsonRoundtripTest<ApiId>
+        {
+            Name = $"Composite: {TestCompositeInt24AndInt42ApiId.ToDebuggerDisplay()}",
+            Expected = TestCompositeInt24AndInt42ApiId
+        },
+
+        // .. Named (named parts)
+        new JsonRoundtripTest<ApiId>
+        {
+            Name = $"Composite: {TestCompositeAlphaInt24AndBetaInt24ApiId.ToDebuggerDisplay()}",
+            Expected = TestCompositeAlphaInt24AndBetaInt24ApiId
+        },
+        new JsonRoundtripTest<ApiId>
+        {
+            Name = $"Composite: {TestCompositeAlphaInt24AndBetaInt42ApiId.ToDebuggerDisplay()}",
+            Expected = TestCompositeAlphaInt24AndBetaInt42ApiId
+        },
+        new JsonRoundtripTest<ApiId>
+        {
+            Name = $"Composite: {TestCompositeAlphaInt24AndZetaInt42ApiId.ToDebuggerDisplay()}",
+            Expected = TestCompositeAlphaInt24AndZetaInt42ApiId
+        },
+    ];
+
+    public static TheoryDataRow<IXUnitTest>[] JsonSerializeTheoryData =>
+    [
+        // Empty
+        new JsonSerializeTest<ApiId>
+        {
+            Name = $"None: {ApiId.Empty.ToDebuggerDisplay()}",
+            Source = ApiId.Empty,
+            Expected = "null"
+        },
+
+        // Scalars
+
+        // .. String
+        new JsonSerializeTest<ApiId>
+        {
+            Name = $"Scalar: {TestStringAlphaApiId.ToDebuggerDisplay()}",
+            Source = TestStringAlphaApiId,
+            Expected = @"{""Kind"":""String"",""Value"":""alpha""}"
+        },
+        new JsonSerializeTest<ApiId>
+        {
+            Name = $"Scalar: {TestStringALPHAApiId.ToDebuggerDisplay()}",
+            Source = TestStringALPHAApiId,
+            Expected = @"{""Kind"":""String"",""Value"":""ALPHA""}"
+        },
+
+        // .. Int32
+        new JsonSerializeTest<ApiId>
+        {
+            Name = $"Scalar: {TestInt42ApiId.ToDebuggerDisplay()}",
+            Source = TestInt42ApiId,
+            Expected = @"{""Kind"":""Int32"",""Value"":""42""}"
+        },
+
+        // .. Int64
+        new JsonSerializeTest<ApiId>
+        {
+            Name = $"Scalar: {TestLong24ApiId.ToDebuggerDisplay()}",
+            Source = TestLong24ApiId,
+            Expected = @"{""Kind"":""Int64"",""Value"":""24""}"
+        },
+
+        // .. Guid
+        new JsonSerializeTest<ApiId>
+        {
+            Name = $"Scalar: {TestGuidApiId.ToDebuggerDisplay()}",
+            Source = TestGuidApiId,
+            Expected = @"{""Kind"":""Guid"",""Value"":""" + TestGuidString + @"""}"
+        },
+
+        // .. Ulid
+        new JsonSerializeTest<ApiId>
+        {
+            Name = $"Scalar: {TestUlidApiId.ToDebuggerDisplay()}",
+            Source = TestUlidApiId,
+            Expected = @"{""Kind"":""Ulid"",""Value"":""" +  TestUlidString + @"""}"
+        },
+
+        // .. Culture
+        new JsonSerializeTest<ApiId>
+        {
+            Name = $"Scalar: {TestCultureEnUsApiId.ToDebuggerDisplay()}",
+            Source = TestCultureEnUsApiId,
+            Expected = @"{""Kind"":""Culture"",""Value"":""en-US""}"
+        },
+        new JsonSerializeTest<ApiId>
+        {
+            Name = $"Scalar: {TestCultureFrFrApiId.ToDebuggerDisplay()}",
+            Source = TestCultureFrFrApiId,
+            Expected = @"{""Kind"":""Culture"",""Value"":""fr-FR""}"
+        },
+
+        // Composites
+
+        // .. Ordered (unnamed parts)
+        new JsonSerializeTest<ApiId>
+        {
+            Name = $"Composite: {TestCompositeInt24AndInt24ApiId.ToDebuggerDisplay()}",
+            Source = TestCompositeInt24AndInt24ApiId,
+            Expected = @"{""Kind"":""Composite"",""Value"":[{""Kind"":""Int32"",""Value"":""24""},{""Kind"":""Int32"",""Value"":""24""}]}"
+        },
+        new JsonSerializeTest<ApiId>
+        {
+            Name = $"Composite: {TestCompositeInt24AndInt42ApiId.ToDebuggerDisplay()}",
+            Source = TestCompositeInt24AndInt42ApiId,
+            Expected = @"{""Kind"":""Composite"",""Value"":[{""Kind"":""Int32"",""Value"":""24""},{""Kind"":""Int32"",""Value"":""42""}]}"
+        },
+
+        // .. Named (named parts)
+        new JsonSerializeTest<ApiId>
+        {
+            Name = $"Composite: {TestCompositeAlphaInt24AndBetaInt24ApiId.ToDebuggerDisplay()}",
+            Source = TestCompositeAlphaInt24AndBetaInt24ApiId,
+            Expected = @"{""Kind"":""Composite"",""Value"":[{""Name"":""alpha"",""Kind"":""Int32"",""Value"":""24""},{""Name"":""beta"",""Kind"":""Int32"",""Value"":""24""}]}"
+        },
+        new JsonSerializeTest<ApiId>
+        {
+            Name = $"Composite: {TestCompositeAlphaInt24AndBetaInt42ApiId.ToDebuggerDisplay()}",
+            Source = TestCompositeAlphaInt24AndBetaInt42ApiId,
+            Expected = @"{""Kind"":""Composite"",""Value"":[{""Name"":""alpha"",""Kind"":""Int32"",""Value"":""24""},{""Name"":""beta"",""Kind"":""Int32"",""Value"":""42""}]}"
+        },
+        new JsonSerializeTest<ApiId>
+        {
+            Name = $"Composite: {TestCompositeAlphaInt24AndZetaInt42ApiId.ToDebuggerDisplay()}",
+            Source = TestCompositeAlphaInt24AndZetaInt42ApiId,
+            Expected = @"{""Kind"":""Composite"",""Value"":[{""Name"":""alpha"",""Kind"":""Int32"",""Value"":""24""},{""Name"":""zeta"",""Kind"":""Int32"",""Value"":""42""}]}"
+        },
+    ];
+
     public static TheoryDataRow<IXUnitTest>[] TryParseTheoryData =>
     [
         new TryParseTest
@@ -886,6 +1200,18 @@ public class ApiIdTests(ITestOutputHelper output) : XUnitTests(output)
     [Theory]
     [MemberData(nameof(FromScalarTheoryData))]
     public void FromScalar(IXUnitTest test) => test.Execute(this);
+
+    [Theory]
+    [MemberData(nameof(JsonDeserializeTheoryData))]
+    public void JsonDeserialize(IXUnitTest test) => test.Execute(this);
+
+    [Theory]
+    [MemberData(nameof(JsonRoundtripTheoryData))]
+    public void JsonRoundtrip(IXUnitTest test) => test.Execute(this);
+
+    [Theory]
+    [MemberData(nameof(JsonSerializeTheoryData))]
+    public void JsonSerialize(IXUnitTest test) => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(TryParseTheoryData))]

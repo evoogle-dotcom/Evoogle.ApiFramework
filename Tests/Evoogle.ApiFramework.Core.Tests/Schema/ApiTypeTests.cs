@@ -6,7 +6,7 @@
 using Evoogle.ApiFramework.Schema.TestData;
 using Evoogle.XUnit;
 
-using static Evoogle.ApiFramework.Schema.ApiJsonConverterUnitTests;
+using static Evoogle.XUnit.JsonUnitTests;
 
 namespace Evoogle.ApiFramework.Schema;
 
@@ -944,7 +944,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
         {
             Name = "ApiScalarType [Boolean] With Extension 1",
             Expected = new ApiScalarType("Boolean", typeof(bool)),
-            AddTestExtension1 = typeof(TestExtension1)
+            ExtensionType1 = typeof(TestExtension1)
         },
 
         new JsonRoundtripTest<ApiType>
@@ -992,7 +992,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 [new ApiEnumValue("None", "None", 0), new ApiEnumValue("Green", "Green", 1), new ApiEnumValue("Yellow", "Yellow", 2), new ApiEnumValue("Red", "Red", 3)],
                 typeof(StopLight)
             ),
-            AddTestExtension2 = typeof(TestExtension2)
+            ExtensionType2 = typeof(TestExtension2)
         },
 
         // ApiCollectionType
@@ -1139,8 +1139,8 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 [],
                 typeof(ScalarsOnly)
             ),
-            AddTestExtension1 = typeof(TestExtension1),
-            AddTestExtension2 = typeof(TestExtension2)
+            ExtensionType1 = typeof(TestExtension1),
+            ExtensionType2 = typeof(TestExtension2)
         },
 
         new JsonRoundtripTest<ApiType>
@@ -1289,8 +1289,8 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 [],
                 typeof(ScalarsOnly)
             ),
-            AddTestExtension1 = typeof(TestExtension1),
-            AddTestExtension2 = typeof(TestExtension2)
+            ExtensionType1 = typeof(TestExtension1),
+            ExtensionType2 = typeof(TestExtension2)
         },
 
         new JsonRoundtripTest<ApiType>
@@ -1369,7 +1369,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     }
                 }
             }",
-            AddTestExtension1 = typeof(TestExtension1)
+            ExtensionType1 = typeof(TestExtension1)
         },
 
         new JsonSerializeTest<ApiType>
@@ -1503,7 +1503,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     }
                 }
             }",
-            AddTestExtension2 = typeof(TestExtension2)
+            ExtensionType2 = typeof(TestExtension2)
         },
 
         // ApiCollectionType
@@ -1825,8 +1825,8 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     }
                 }
             }",
-            AddTestExtension1 = typeof(TestExtension1),
-            AddTestExtension2 = typeof(TestExtension2)
+            ExtensionType1 = typeof(TestExtension1),
+            ExtensionType2 = typeof(TestExtension2)
         },
 
         new JsonSerializeTest<ApiType>
@@ -2149,8 +2149,8 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     }
                 }
             }",
-            AddTestExtension1 = typeof(TestExtension1),
-            AddTestExtension2 = typeof(TestExtension2)
+            ExtensionType1 = typeof(TestExtension1),
+            ExtensionType2 = typeof(TestExtension2)
         },
 
         new JsonSerializeTest<ApiType>
