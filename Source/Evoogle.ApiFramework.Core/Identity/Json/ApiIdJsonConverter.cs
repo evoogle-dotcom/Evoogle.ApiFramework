@@ -3,7 +3,6 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using System.Globalization;
 using System.Text.Json;
 
 using Evoogle.Json;
@@ -12,34 +11,73 @@ using Microsoft.Extensions.Logging;
 
 namespace Evoogle.ApiFramework.Identity.Json;
 
+/// <summary>
+///     JSON converter for <see cref="ApiId"/> values that supports both scalar and composite
+///     representations for read and write using System.Text.Json.
+/// </summary>
+/// <remarks>
+///     This converter integrates with the Evoogle JSON infrastructure and writes/reads an object with
+///     two properties: a <c>kind</c> enum and a <c>value</c> that is either a string (scalar) or an array
+///     of parts (composite). Null values are written as JSON <c>null</c>.
+/// </remarks>
+/// <remarks>
+///     Initializes a new instance of the <see cref="ApiIdJsonConverter"/> class.
+/// </remarks>
+/// <param name="logger">The logger used for diagnostics (optional).</param>
 public sealed class ApiIdJsonConverter(ILogger<ApiIdJsonConverter>? logger) : JsonConverterBase<ApiId>(logger)
 {
     #region Property Types
+    /// <summary>
+    ///     Provides the JSON property names used when serializing and deserializing an <see cref="ApiId"/>.
+    ///     Names are pre-computed using the configured <see cref="JsonNamingPolicy"/>.
+    /// </summary>
     private readonly record struct ApiIdPropertyNames
     {
         #region Immutable Properties
+        /// <summary>Gets the JSON property name used for the <see cref="ApiId.Kind"/> value.</summary>
         public required string Kind { get; init; }
+
+        /// <summary>Gets the JSON property name used for the <see cref="ApiId.Value"/> value or the composite parts.</summary>
         public required string Value { get; init; }
         #endregion
     }
 
+    /// <summary>
+    ///     Provides the JSON property names used for a composite <see cref="ApiId"/> part.
+    /// </summary>
     private readonly record struct ApiIdPartPropertyNames
     {
         #region Immutable Properties
+        /// <summary>Gets the JSON property name used for the <see cref="ApiIdPart.Name"/> value.</summary>
         public required string Name { get; init; }
+
+        /// <summary>Gets the JSON property name used for the part <see cref="ApiId.Kind"/> value.</summary>
         public required string Kind { get; init; }
+
+        /// <summary>Gets the JSON property name used for the part <see cref="ApiId.Value"/> value.</summary>
         public required string Value { get; init; }
         #endregion
     }
 
+    /// <summary>
+    ///     Groups the property name collections used during serialization and deserialization for both the root <see cref="ApiId"/> and its composite parts.
+    /// </summary>
     private readonly record struct PropertyNames
     {
         #region Immutable Properties
+        /// <summary>Gets the property names used for the root <see cref="ApiId"/> object.</summary>
         public required ApiIdPropertyNames ApiId { get; init; }
+
+        /// <summary>Gets the property names used for an <see cref="ApiIdPart"/> entry in a composite <see cref="ApiId"/>.</summary>
         public required ApiIdPartPropertyNames ApiIdPart { get; init; }
         #endregion
 
         #region Factory Methods
+        /// <summary>
+        ///     Creates a <see cref="PropertyNames"/> instance using the provided <paramref name="policy"/> to convert CLR member names to JSON property names.
+        /// </summary>
+        /// <param name="policy">The naming policy to apply when generating property names.</param>
+        /// <returns>A new <see cref="PropertyNames"/> populated with converted names.</returns>
         public static PropertyNames Create(JsonNamingPolicy policy)
             => new()
             {
@@ -60,37 +98,66 @@ public sealed class ApiIdJsonConverter(ILogger<ApiIdJsonConverter>? logger) : Js
     #endregion
 
     #region Read Types
+    /// <summary>
+    ///     Accumulates the state required to construct an <see cref="ApiId"/> during deserialization.
+    /// </summary>
     private class ApiIdReadData
     {
         #region Properties
-        public string? Kind { get; set; }
+        /// <summary>Gets or sets the parsed <see cref="ApiIdKind"/> (required).</summary>
+        public ApiIdKind? Kind { get; set; }
+
+        /// <summary>Gets or sets the scalar value for non-composite ids.</summary>
         public string? ScalarValue { get; set; }
-        public List<ApiIdPartReadData>? CompositeParts { get; set; }
+
+        /// <summary>Gets or sets the current index when iterating composite parts.</summary>
+        public long CompositePartsIndex { get; set; }
+
+        /// <summary>Gets or sets the collection of composite parts as they are read.</summary>
+        public List<ApiIdPartReadData?>? CompositeParts { get; set; }
         #endregion
     }
 
+    /// <summary>
+    ///     Accumulates the state for a single <see cref="ApiIdPart"/> during composite deserialization.
+    /// </summary>
     private class ApiIdPartReadData
     {
         #region Properties
+        /// <summary>Gets or sets the optional part name.</summary>
         public string? Name { get; set; }
-        public string? Kind { get; set; }
+
+        /// <summary>Gets or sets the part <see cref="ApiIdKind"/> (required).</summary>
+        public ApiIdKind? Kind { get; set; }
+
+        /// <summary>Gets or sets the raw scalar string value for the part (required).</summary>
         public string? ScalarValue { get; set; }
         #endregion
     }
 
+    /// <summary>
+    ///     Root container for all read-time state while materializing an <see cref="ApiId"/>.
+    /// </summary>
     private class ReadData
     {
         #region Properties
-        public ApiId? Foo { get; set; }
-
+        /// <summary>Gets or sets the current <see cref="ApiIdReadData"/>.</summary>
         public ApiIdReadData? ApiId { get; set; }
+
+        /// <summary>Gets or sets the current <see cref="ApiIdPartReadData"/> being populated.</summary>
+        public ApiIdPartReadData? ApiIdPart { get; set; }
         #endregion
     }
 
+    /// <summary>
+    ///     Provides handler tables and callback methods for reading JSON tokens into <see cref="ReadData"/>.
+    /// </summary>
+    /// <param name="propertyNames">The property name dictionary for the current naming policy.</param>
     private class ReadHandlers(PropertyNames propertyNames)
     {
         #region ApiId Fields
-        public readonly Dictionary<string, JsonReaderHandler<DefaultReadContext<PropertyNames, ReadData, ReadHandlers>>> PropertyHandlers = new()
+        /// <summary>Gets the map of JSON property names to handlers for the root <see cref="ApiId"/> object.</summary>
+        public readonly Dictionary<string, JsonReaderHandler<DefaultReadContext<PropertyNames, ReadData, ReadHandlers>>> ApiIdPropertyHandlers = new()
         {
             // ApiId Property Handlers
             { propertyNames.ApiId.Kind, HandleApiIdKind },
@@ -98,14 +165,77 @@ public sealed class ApiIdJsonConverter(ILogger<ApiIdJsonConverter>? logger) : Js
         };
         #endregion
 
+        #region ApiIdPart Fields
+        /// <summary>Gets the map of JSON property names to handlers for an <see cref="ApiIdPart"/> object.</summary>
+        public readonly Dictionary<string, JsonReaderHandler<DefaultReadContext<PropertyNames, ReadData, ReadHandlers>>> ApiIdPartPropertyHandlers = new()
+        {
+            // ApiIdPart Property Handlers
+            { propertyNames.ApiIdPart.Name, HandleApiIdPartName },
+            { propertyNames.ApiIdPart.Kind, HandleApiIdPartKind },
+            { propertyNames.ApiIdPart.Value, HandleApiIdPartValue },
+        };
+        #endregion
+
+        #region ApiIdPart Methods
+        /// <summary>
+        ///     Reads the <c>Name</c> property of an <see cref="ApiIdPart"/>.
+        /// </summary>
+        /// <param name="reader">The JSON reader positioned at the value token.</param>
+        /// <param name="context">The read context to populate.</param>
+        private static void HandleApiIdPartName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        {
+            context.ReadData.ApiIdPart ??= new ApiIdPartReadData();
+
+            context.ReadData.ApiIdPart.Name = reader.GetString();
+        }
+
+        /// <summary>
+        ///     Reads the <c>Kind</c> property of an <see cref="ApiIdPart"/>.
+        /// </summary>
+        /// <param name="reader">The JSON reader positioned at the value token.</param>
+        /// <param name="context">The read context to populate.</param>
+        private static void HandleApiIdPartKind(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        {
+            context.ReadData.ApiIdPart ??= new ApiIdPartReadData();
+
+            var options = context.Options;
+            context.ReadData.ApiIdPart.Kind = _apiIdKindJsonConverter.Read(ref reader, typeof(ApiIdKind), options);
+        }
+
+        /// <summary>
+        ///     Reads the <c>Value</c> property of an <see cref="ApiIdPart"/>.
+        /// </summary>
+        /// <param name="reader">The JSON reader positioned at the value token.</param>
+        /// <param name="context">The read context to populate.</param>
+        private static void HandleApiIdPartValue(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        {
+            context.ReadData.ApiIdPart ??= new ApiIdPartReadData();
+
+            context.ReadData.ApiIdPart.ScalarValue = reader.GetString();
+        }
+        #endregion
+
         #region ApiId Methods
+        /// <summary>
+        ///     Reads the <c>Kind</c> property of an <see cref="ApiId"/>.
+        /// </summary>
+        /// <param name="reader">The JSON reader positioned at the value token.</param>
+        /// <param name="context">The read context to populate.</param>
         private static void HandleApiIdKind(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiId ??= new ApiIdReadData();
 
-            context.ReadData.ApiId.Kind = reader.GetString();
+            var options = context.Options;
+            context.ReadData.ApiId.Kind = _apiIdKindJsonConverter.Read(ref reader, typeof(ApiIdKind), options);
         }
 
+        /// <summary>
+        ///     Reads the <c>Value</c> property of an <see cref="ApiId"/>, which may be a string (scalar) or an array (composite).
+        ///     Populates <see cref="ApiIdReadData.ScalarValue"/> or <see cref="ApiIdReadData.CompositeParts"/> accordingly.
+        /// </summary>
+        /// <param name="reader">The JSON reader positioned at the value token.</param>
+        /// <param name="context">The read context to populate.</param>
+        /// <exception cref="JsonException">Thrown when the token type is not a string or array.</exception>
         private static void HandleApiIdValue(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiId ??= new ApiIdReadData();
@@ -118,21 +248,36 @@ public sealed class ApiIdJsonConverter(ILogger<ApiIdJsonConverter>? logger) : Js
             }
             else if (reader.TokenType == JsonTokenType.StartArray)
             {
-                var options = context.Options;
-                var propertyName = context.PropertyNames.ApiId.Value;
+                context.ReadData.ApiId.CompositeParts = [];
 
-                throw new NotImplementedException();
+                ReadJsonArray(ref reader, context, (x) => HandleApiIdPartArrayItem);
             }
             else
             {
-                throw new JsonException("Invalid token type for ApiId value.");
+                var propertyName = context.PropertyNames.ApiId.Value;
+                throw new JsonException($"Invalid token type for {propertyName} : {reader.TokenType}.");
             }
+        }
+
+        /// <summary>
+        ///     Reads a single array item for the composite <c>value</c> and appends the populated <see cref="ApiIdPartReadData"/> to <see cref="ApiIdReadData.CompositeParts"/>.
+        /// </summary>
+        /// <param name="reader">The JSON reader positioned at the start of an object.</param>
+        /// <param name="context">The read context to populate.</param>
+        private static void HandleApiIdPartArrayItem(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        {
+            context.ReadData.ApiIdPart = null;
+            ReadJsonObject(ref reader, context, context.ReadHandlers.ApiIdPartPropertyHandlers);
+            var apiIdPartReadData = context.ReadData.ApiIdPart;
+
+            context.ReadData.ApiId!.CompositeParts!.Add(apiIdPartReadData);
         }
         #endregion
     }
     #endregion
 
     #region Fields
+    /// <summary>Cached enum converter used to read and write <see cref="ApiIdKind"/> values with current options.</summary>
     private static readonly EnumJsonConverter<ApiIdKind> _apiIdKindJsonConverter = new();
     #endregion
 
@@ -145,6 +290,7 @@ public sealed class ApiIdJsonConverter(ILogger<ApiIdJsonConverter>? logger) : Js
     #endregion
 
     #region JsonConverterBase<T> Methods
+    /// <inheritdoc/>
     protected override IReadContext CreateReadContext(ILogger logger, JsonSerializerOptions options)
         => CreateDefaultReadContext<PropertyNames, ReadData, ReadHandlers>
             (
@@ -154,6 +300,7 @@ public sealed class ApiIdJsonConverter(ILogger<ApiIdJsonConverter>? logger) : Js
                 buildReadHandlers: names => new ReadHandlers(names)
             );
 
+    /// <inheritdoc/>
     protected override IWriteContext CreateWriteContext(ILogger logger, JsonSerializerOptions options)
         => CreateDefaultWriteContext
             (
@@ -162,204 +309,101 @@ public sealed class ApiIdJsonConverter(ILogger<ApiIdJsonConverter>? logger) : Js
                 buildPropertyNames: PropertyNames.Create
             );
 
+    /// <inheritdoc/>
     protected override ApiId CreateValue(IReadContext context)
     {
         var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
+        var propertyNames = readContext.PropertyNames;
         var readData = readContext.ReadData;
-        return readData.Foo ?? throw new InvalidOperationException("ApiId value was not set during reading.");
-    }
 
-    private static ApiIdKind ParseKind(string? s)
-    {
-        if (string.IsNullOrWhiteSpace(s))
+        // Determine ApiId kind
+        var nullableKind = readData.ApiId?.Kind;
+        if (nullableKind is null)
         {
-            return ApiIdKind.None;
+            var kindPropertyName = propertyNames.ApiId.Kind;
+            throw new JsonException($"Missing required property: {kindPropertyName}.");
+        }
+        var kind = nullableKind.Value;
+
+        // Handle Empty ApiId
+        if (kind is ApiIdKind.None)
+        {
+            // Return Empty ApiId
+            return ApiId.Empty;
         }
 
-        s = s.Trim();
-        if (Enum.TryParse<ApiIdKind>(s, true, out var k))
+        // Handle Scalar ApiId
+        if (kind is not ApiIdKind.Composite)
         {
-            return k;
+            var scalarValueAsString = readData.ApiId?.ScalarValue;
+            if (!ApiId.TryParse(kind, scalarValueAsString, out var scalarApiId))
+            {
+                var valuePropertyName = propertyNames.ApiId.Value;
+                throw new JsonException($"Value '{scalarValueAsString}' is not a valid {kind} for property: {valuePropertyName}.");
+            }
+
+            // Create and return scalar ApiId
+            return scalarApiId;
         }
 
-        return s.ToLowerInvariant() switch
+        // Handle Composite ApiId
+        var compositePartsReadData = readData.ApiId?.CompositeParts;
+        if (compositePartsReadData is null || compositePartsReadData.Count == 0)
         {
-            "str" or "string" => ApiIdKind.String,
-            "i32" or "int" or "int32" => ApiIdKind.Int32,
-            "i64" or "long" or "int64" => ApiIdKind.Int64,
-            "guid" or "uuid" => ApiIdKind.Guid,
-            "ulid" => ApiIdKind.Ulid,
-            "culture" or "cultureinfo" or "locale" => ApiIdKind.Culture,
-            "composite" or "cmp" => ApiIdKind.Composite,
-            _ => ApiIdKind.None
-        };
+            var valuePropertyName = propertyNames.ApiId.Value;
+            throw new JsonException($"Composite ApiId requires non-empty array property: {valuePropertyName}.");
+        }
+
+        var compositePartsCount = compositePartsReadData.Count;
+        var compositeParts = new List<ApiIdPart>(compositePartsCount);
+        for (var index = 0; index < compositePartsCount; index++)
+        {
+            var partReadData = compositePartsReadData[index];
+            if (partReadData is null)
+            {
+                var valuePropertyName = propertyNames.ApiId.Value;
+                throw new JsonException($"Null composite ApiId part at index {index} in property: {valuePropertyName}.");
+            }
+
+            // Get part name (not required)
+            var partName = partReadData.Name;
+
+            // Get and validate part kind (required)
+            var partNullableKind = partReadData.Kind;
+            if (partNullableKind is null)
+            {
+                var propertyName = propertyNames.ApiIdPart.Kind;
+                throw new JsonException($"Missing required property: {propertyName} for composite part at index {index}.");
+            }
+            var partKind = partNullableKind.Value;
+
+            // Get and validate part value (required)
+            var partScalarValueAsString = partReadData.ScalarValue;
+            if (!ApiId.TryParse(partKind, partScalarValueAsString, out var partApiId))
+            {
+                var propertyName = propertyNames.ApiIdPart.Value;
+                throw new JsonException($"Value '{partScalarValueAsString}' is not a valid {partKind} for property: {propertyName} of composite part at index {index}.");
+            }
+
+            // Create and add composite part to collection
+            var apiIdPart = new ApiIdPart(partName, partApiId);
+            compositeParts.Add(apiIdPart);
+        }
+
+        // Create and return composite ApiId
+        return ApiId.Composite(compositeParts);
     }
 
+    /// <inheritdoc/>
     protected override void ReadCore(ref Utf8JsonReader reader, IReadContext context)
     {
         var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
-        var readData = readContext.ReadData;
-        var propertyNames = readContext.PropertyNames;
-        var kindPropertyName = propertyNames.ApiId.Kind;
-        var valuePropertyName = propertyNames.ApiId.Value;
-        var options = readContext.Options;
-
-        if (reader.TokenType == JsonTokenType.Null)
-        {
-            readData.Foo = ApiId.Empty;
-            return;
-        }
-
-        if (reader.TokenType == JsonTokenType.String)
-        {
-            var text = reader.GetString();
-            readData.Foo = ApiId.TryParse(text, out var auto) ? auto : ApiId.Empty;
-            return;
-        }
-
-        if (reader.TokenType != JsonTokenType.StartObject)
-        {
-            throw new JsonException("Expected object or string for ApiId.");
-        }
-
-        var kind = ApiIdKind.None;
-        var valueText = default(string?);
-        var parts = default(ApiIdPart[]?);
-
-        while (reader.Read())
-        {
-            if (reader.TokenType == JsonTokenType.EndObject)
-            {
-                break;
-            }
-
-            if (reader.TokenType != JsonTokenType.PropertyName)
-            {
-                throw new JsonException("Invalid token in ApiId object.");
-            }
-
-            var propName = reader.GetString();
-            reader.Read();
-
-            if (string.Equals(propName, kindPropertyName, StringComparison.OrdinalIgnoreCase))
-            {
-                if (reader.TokenType == JsonTokenType.String)
-                {
-                    kind = ParseKind(reader.GetString());
-                }
-                else if (reader.TokenType == JsonTokenType.Number)
-                {
-                    if (!reader.TryGetByte(out var b))
-                    {
-                        throw new JsonException("Invalid kind numeric value.");
-                    }
-                    kind = (ApiIdKind)b;
-                }
-                else
-                {
-                    throw new JsonException("Invalid kind value type.");
-                }
-            }
-            else if (string.Equals(propName, valuePropertyName, StringComparison.OrdinalIgnoreCase))
-            {
-                if (kind == ApiIdKind.Composite)
-                {
-                    if (reader.TokenType != JsonTokenType.StartArray)
-                    {
-                        throw new JsonException("Composite value must be an array of parts.");
-                    }
-
-                    var list = new List<ApiIdPart>();
-                    while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
-                    {
-                        if (reader.TokenType != JsonTokenType.StartObject)
-                        {
-                            throw new JsonException("Composite part must be an object.");
-                        }
-
-                        var name = default(string?);
-                        var val = default(ApiId);
-                        while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
-                        {
-                            if (reader.TokenType != JsonTokenType.PropertyName)
-                            {
-                                throw new JsonException("Invalid part token.");
-                            }
-
-                            var pn = reader.GetString();
-                            reader.Read();
-                            if (string.Equals(pn, "name", StringComparison.OrdinalIgnoreCase))
-                            {
-                                name = reader.TokenType == JsonTokenType.String ? reader.GetString() : throw new JsonException("Part.name must be a string.");
-                            }
-                            else if (string.Equals(pn, "value", StringComparison.OrdinalIgnoreCase))
-                            {
-                                val = this.Read(ref reader, typeof(ApiId), options);
-                                if (val.Kind == ApiIdKind.Composite)
-                                {
-                                    throw new JsonException("Nested composite parts are not allowed in ApiId.");
-                                }
-                            }
-                            else
-                            {
-                                reader.Skip();
-                            }
-                        }
-                        list.Add(new ApiIdPart(name, val));
-                    }
-                    parts = [.. list];
-                }
-                else
-                {
-                    valueText = reader.TokenType switch
-                    {
-                        JsonTokenType.String => reader.GetString(),
-                        JsonTokenType.Number => reader.GetDouble().ToString(CultureInfo.InvariantCulture),
-                        JsonTokenType.True => bool.TrueString,
-                        JsonTokenType.False => bool.FalseString,
-                        _ => throw new JsonException("Unsupported value token for ApiId.")
-                    };
-                }
-            }
-            else
-            {
-                reader.Skip();
-            }
-        }
-
-        if (kind == ApiIdKind.None)
-        {
-            throw new JsonException("ApiId.kind is required.");
-        }
-
-        if (kind == ApiIdKind.Composite)
-        {
-            if (parts is null || parts.Length == 0)
-            {
-                throw new JsonException("Composite value array required.");
-            }
-
-            readData.Foo = ApiId.Composite(parts);
-            return;
-        }
-
-        if (!ApiId.TryParse(kind, valueText, out var id))
-        {
-            throw new JsonException($"Value '{valueText}' is not a valid {kind}.");
-        }
-
-        readData.Foo = id;
-        return;
-    }
-
-    protected void ReadCoreWorkingVersion(ref Utf8JsonReader reader, IReadContext context)
-    {
-        var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
-        var handlers = readContext.ReadHandlers.PropertyHandlers;
+        var handlers = readContext.ReadHandlers.ApiIdPropertyHandlers;
 
         ReadJsonObject(ref reader, readContext, handlers);
     }
 
+    /// <inheritdoc/>
     protected override void WriteCore(Utf8JsonWriter writer, ApiId apiId, IWriteContext context)
     {
         if (!apiId.HasValue)
@@ -386,6 +430,12 @@ public sealed class ApiIdJsonConverter(ILogger<ApiIdJsonConverter>? logger) : Js
     #endregion
 
     #region Write Implementation Methods
+    /// <summary>
+    ///     Writes the <c>Kind</c> property for an <see cref="ApiId"/> using the enum converter.
+    /// </summary>
+    /// <param name="writer">The JSON writer.</param>
+    /// <param name="apiId">The value being serialized.</param>
+    /// <param name="context">The write context with naming/options.</param>
     private static void WriteApiIdKind(Utf8JsonWriter writer, ApiId apiId, DefaultWriteContext<PropertyNames> context)
     {
         var propertyName = context.PropertyNames.ApiId.Kind;
@@ -395,6 +445,12 @@ public sealed class ApiIdJsonConverter(ILogger<ApiIdJsonConverter>? logger) : Js
         writer.TryWritePropertyWithConverter(propertyName, value, options, _apiIdKindJsonConverter);
     }
 
+    /// <summary>
+    ///     Writes the <c>Value</c> property for a composite <see cref="ApiId"/> as an array of objects, including each part's name, kind, and value.
+    /// </summary>
+    /// <param name="writer">The JSON writer.</param>
+    /// <param name="apiId">The composite identifier to serialize.</param>
+    /// <param name="context">The write context with naming/options.</param>
     private static void WriteApiIdCompositeValue(Utf8JsonWriter writer, ApiId apiId, DefaultWriteContext<PropertyNames> context)
     {
         var propertyName = context.PropertyNames.ApiId.Value;
@@ -427,6 +483,12 @@ public sealed class ApiIdJsonConverter(ILogger<ApiIdJsonConverter>? logger) : Js
         );
     }
 
+    /// <summary>
+    ///     Writes the <c>Kind</c> property for a single composite part.
+    /// </summary>
+    /// <param name="writer">The JSON writer.</param>
+    /// <param name="apiIdPart">The part being serialized.</param>
+    /// <param name="context">The write context with naming/options.</param>
     private static void WriteApiIdPartKind(Utf8JsonWriter writer, ApiIdPart apiIdPart, DefaultWriteContext<PropertyNames> context)
     {
         var propertyName = context.PropertyNames.ApiIdPart.Kind;
@@ -436,6 +498,12 @@ public sealed class ApiIdJsonConverter(ILogger<ApiIdJsonConverter>? logger) : Js
         writer.TryWritePropertyWithConverter(propertyName, value, options, _apiIdKindJsonConverter);
     }
 
+    /// <summary>
+    ///     Writes the <c>Name</c> property for a single composite part.
+    /// </summary>
+    /// <param name="writer">The JSON writer.</param>
+    /// <param name="apiIdPart">The part being serialized.</param>
+    /// <param name="context">The write context with naming/options.</param>
     private static void WriteApiIdPartName(Utf8JsonWriter writer, ApiIdPart apiIdPart, DefaultWriteContext<PropertyNames> context)
     {
         var propertyName = context.PropertyNames.ApiIdPart.Name;
@@ -445,6 +513,12 @@ public sealed class ApiIdJsonConverter(ILogger<ApiIdJsonConverter>? logger) : Js
         writer.TryWritePropertyAsString(propertyName, value, options);
     }
 
+    /// <summary>
+    ///     Writes the <c>Value</c> property for a single composite part as a string.
+    /// </summary>
+    /// <param name="writer">The JSON writer.</param>
+    /// <param name="apiIdPart">The part being serialized.</param>
+    /// <param name="context">The write context with naming/options.</param>
     private static void WriteApiIdPartValue(Utf8JsonWriter writer, ApiIdPart apiIdPart, DefaultWriteContext<PropertyNames> context)
     {
         var propertyName = context.PropertyNames.ApiIdPart.Value;
@@ -454,6 +528,12 @@ public sealed class ApiIdJsonConverter(ILogger<ApiIdJsonConverter>? logger) : Js
         writer.TryWritePropertyAsString(propertyName, value, options);
     }
 
+    /// <summary>
+    ///     Writes the <c>Value</c> property for a scalar <see cref="ApiId"/> as a string.
+    /// </summary>
+    /// <param name="writer">The JSON writer.</param>
+    /// <param name="apiId">The scalar identifier to serialize.</param>
+    /// <param name="context">The write context with naming/options.</param>
     private static void WriteApiIdScalarValue(Utf8JsonWriter writer, ApiId apiId, DefaultWriteContext<PropertyNames> context)
     {
         var propertyName = context.PropertyNames.ApiId.Value;
@@ -464,221 +544,3 @@ public sealed class ApiIdJsonConverter(ILogger<ApiIdJsonConverter>? logger) : Js
     }
     #endregion
 }
-
-
-
-
-
-// === JSON converters ===
-// public sealed class ApiIdJsonConverter : JsonConverter<ApiId>
-// {
-//     private const string _kindProp = "kind";
-//     private const string _valueProp = "value";
-
-//     public override ApiId Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-//     {
-//         if (reader.TokenType == JsonTokenType.Null)
-//         {
-//             return ApiId.Empty;
-//         }
-
-//         if (reader.TokenType == JsonTokenType.String)
-//         {
-//             var text = reader.GetString();
-//             return ApiId.TryParse(text, out var auto) ? auto : ApiId.Empty;
-//         }
-
-//         if (reader.TokenType != JsonTokenType.StartObject)
-//         {
-//             throw new JsonException("Expected object or string for ApiId.");
-//         }
-
-//         var kind = ApiIdKind.None;
-//         var valueText = default(string?);
-//         var parts = default(ApiIdPart[]?);
-
-//         while (reader.Read())
-//         {
-//             if (reader.TokenType == JsonTokenType.EndObject)
-//             {
-//                 break;
-//             }
-
-//             if (reader.TokenType != JsonTokenType.PropertyName)
-//             {
-//                 throw new JsonException("Invalid token in ApiId object.");
-//             }
-
-//             var propName = reader.GetString();
-//             reader.Read();
-
-//             if (string.Equals(propName, _kindProp, StringComparison.OrdinalIgnoreCase))
-//             {
-//                 if (reader.TokenType == JsonTokenType.String)
-//                 {
-//                     kind = ParseKind(reader.GetString());
-//                 }
-//                 else if (reader.TokenType == JsonTokenType.Number)
-//                 {
-//                     if (!reader.TryGetByte(out var b))
-//                     {
-//                         throw new JsonException("Invalid kind numeric value.");
-//                     }
-//                     kind = (ApiIdKind)b;
-//                 }
-//                 else
-//                 {
-//                     throw new JsonException("Invalid kind value type.");
-//                 }
-//             }
-//             else if (string.Equals(propName, _valueProp, StringComparison.OrdinalIgnoreCase))
-//             {
-//                 if (kind == ApiIdKind.Composite)
-//                 {
-//                     if (reader.TokenType != JsonTokenType.StartArray)
-//                     {
-//                         throw new JsonException("Composite value must be an array of parts.");
-//                     }
-
-//                     var list = new List<ApiIdPart>();
-//                     while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
-//                     {
-//                         if (reader.TokenType != JsonTokenType.StartObject)
-//                         {
-//                             throw new JsonException("Composite part must be an object.");
-//                         }
-
-//                         var name = default(string?);
-//                         var val = default(ApiId);
-//                         while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
-//                         {
-//                             if (reader.TokenType != JsonTokenType.PropertyName)
-//                             {
-//                                 throw new JsonException("Invalid part token.");
-//                             }
-
-//                             var pn = reader.GetString();
-//                             reader.Read();
-//                             if (string.Equals(pn, "name", StringComparison.OrdinalIgnoreCase))
-//                             {
-//                                 name = reader.TokenType == JsonTokenType.String ? reader.GetString() : throw new JsonException("Part.name must be a string.");
-//                             }
-//                             else if (string.Equals(pn, "value", StringComparison.OrdinalIgnoreCase))
-//                             {
-//                                 val = this.Read(ref reader, typeof(ApiId), options);
-//                                 if (val.Kind == ApiIdKind.Composite)
-//                                 {
-//                                     throw new JsonException("Nested composite parts are not allowed in ApiId.");
-//                                 }
-//                             }
-//                             else
-//                             {
-//                                 reader.Skip();
-//                             }
-//                         }
-//                         list.Add(new ApiIdPart(name, val));
-//                     }
-//                     parts = [.. list];
-//                 }
-//                 else
-//                 {
-//                     valueText = reader.TokenType switch
-//                     {
-//                         JsonTokenType.String => reader.GetString(),
-//                         JsonTokenType.Number => reader.GetDouble().ToString(CultureInfo.InvariantCulture),
-//                         JsonTokenType.True => bool.TrueString,
-//                         JsonTokenType.False => bool.FalseString,
-//                         _ => throw new JsonException("Unsupported value token for ApiId.")
-//                     };
-//                 }
-//             }
-//             else
-//             {
-//                 reader.Skip();
-//             }
-//         }
-
-//         if (kind == ApiIdKind.None)
-//         {
-//             throw new JsonException("ApiId.kind is required.");
-//         }
-
-//         if (kind == ApiIdKind.Composite)
-//         {
-//             if (parts is null || parts.Length == 0)
-//             {
-//                 throw new JsonException("Composite value array required.");
-//             }
-
-//             return ApiId.Composite(parts);
-//         }
-
-//         if (!ApiId.TryParse(kind, valueText, out var id))
-//         {
-//             throw new JsonException($"Value '{valueText}' is not a valid {kind}.");
-//         }
-
-//         return id;
-//     }
-
-//     public override void Write(Utf8JsonWriter writer, ApiId value, JsonSerializerOptions options)
-//     {
-//         if (!value.HasValue)
-//         {
-//             writer.WriteNullValue();
-//             return;
-//         }
-
-//         writer.WriteStartObject();
-//         writer.WriteString(_kindProp, value.Kind.ToString().ToLowerInvariant());
-//         if (value.IsComposite)
-//         {
-//             writer.WritePropertyName(_valueProp);
-//             writer.WriteStartArray();
-//             foreach (var p in value.Parts)
-//             {
-//                 writer.WriteStartObject();
-//                 if (p.Name is not null)
-//                 {
-//                     writer.WriteString("name", p.Name);
-//                 }
-
-//                 writer.WritePropertyName("value");
-//                 this.Write(writer, p.Value, options);
-//                 writer.WriteEndObject();
-//             }
-//             writer.WriteEndArray();
-//         }
-//         else
-//         {
-//             writer.WriteString(_valueProp, value.ToString());
-//         }
-//         writer.WriteEndObject();
-//     }
-
-//     private static ApiIdKind ParseKind(string? s)
-//     {
-//         if (string.IsNullOrWhiteSpace(s))
-//         {
-//             return ApiIdKind.None;
-//         }
-
-//         s = s.Trim();
-//         if (Enum.TryParse<ApiIdKind>(s, true, out var k))
-//         {
-//             return k;
-//         }
-
-//         return s.ToLowerInvariant() switch
-//         {
-//             "str" or "string" => ApiIdKind.String,
-//             "i32" or "int" or "int32" => ApiIdKind.Int32,
-//             "i64" or "long" or "int64" => ApiIdKind.Int64,
-//             "guid" or "uuid" => ApiIdKind.Guid,
-//             "ulid" => ApiIdKind.Ulid,
-//             "culture" or "cultureinfo" or "locale" => ApiIdKind.Culture,
-//             "composite" or "cmp" => ApiIdKind.Composite,
-//             _ => ApiIdKind.None
-//         };
-//     }
-// }

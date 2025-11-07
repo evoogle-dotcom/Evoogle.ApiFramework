@@ -3,8 +3,6 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using System;
-using System.Collections.Generic;
 using System.Globalization;
 
 using Evoogle.ApiFramework.Identity.Internal;
@@ -12,6 +10,7 @@ using Evoogle.Extensions;
 using Evoogle.XUnit;
 
 using FluentAssertions;
+
 using static Evoogle.XUnit.JsonUnitTests;
 
 namespace Evoogle.ApiFramework.Identity;

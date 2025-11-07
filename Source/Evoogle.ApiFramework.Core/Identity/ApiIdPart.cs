@@ -22,11 +22,13 @@ public readonly record struct ApiIdPart(string? Name, ApiId Value)
     #region Factory Methods
     /// <summary>Creates an unnamed API identifier part with the specified value.</summary>
     /// <param name="value">The value of the API identifier part.</param>
+    /// <returns>A new <see cref="ApiIdPart"/> whose <see cref="Name"/> is null and whose <see cref="Value"/> equals <paramref name="value"/>.</returns>
     public static ApiIdPart Create(ApiId value) => new(null, value);
 
     /// <summary>Creates a named API identifier part with the specified name and value.</summary>
     /// <param name="name">The name associated with the API identifier part.</param>
     /// <param name="value">The value of the API identifier part.</param>
+    /// <returns>A new <see cref="ApiIdPart"/> whose <see cref="Name"/> equals <paramref name="name"/> and whose <see cref="Value"/> equals <paramref name="value"/>.</returns>
     public static ApiIdPart Create(string name, ApiId value) => new(name, value);
     #endregion
 
