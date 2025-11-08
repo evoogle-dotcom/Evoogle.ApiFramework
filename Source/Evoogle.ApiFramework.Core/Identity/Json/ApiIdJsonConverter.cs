@@ -572,11 +572,7 @@ public sealed class ApiIdJsonConverter(ILogger<ApiIdJsonConverter>? logger) : Js
                 {
                     WriteJsonObject(writer, () =>
                     {
-                        if (part.Name is not null) // skip if unnamed
-                        {
-                            WriteApiIdPartName(writer, part, context);
-                        }
-
+                        WriteApiIdPartName(writer, part, context);
                         WriteApiIdPartKind(writer, part, context);
                         WriteApiIdPartValue(writer, part, context);
                     });
