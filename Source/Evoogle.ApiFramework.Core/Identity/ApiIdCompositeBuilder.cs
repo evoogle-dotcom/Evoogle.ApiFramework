@@ -40,8 +40,13 @@ public sealed class ApiIdCompositeBuilder
     /// <returns>The current <see cref="ApiIdCompositeBuilder"/> for fluent chaining.</returns>
     public ApiIdCompositeBuilder Add(string name, ApiId value)
     {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException("Name must be non-empty for a named part.", nameof(name));
+        }
+
         _parts ??= [];
-        _parts.Add(new ApiIdPart(name, value));
+        _parts.Add(new ApiIdPart(name.Trim(), value));
         return this;
     }
 

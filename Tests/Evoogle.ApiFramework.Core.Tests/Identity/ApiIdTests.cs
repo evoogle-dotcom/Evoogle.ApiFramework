@@ -156,7 +156,7 @@ public class ApiIdTests(ITestOutputHelper output) : XUnitTests(output)
                     ApiIdKind.Composite,
                     default,
                     partCollection,
-                    ApiId.CompositeString(partCollection)
+                    ApiId.ToDebugString(partCollection)
                 );
                 return apiId;
             }

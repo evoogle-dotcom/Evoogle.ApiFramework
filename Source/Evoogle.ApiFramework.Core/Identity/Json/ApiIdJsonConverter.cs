@@ -110,9 +110,6 @@ public sealed class ApiIdJsonConverter(ILogger<ApiIdJsonConverter>? logger) : Js
         /// <summary>Gets or sets the scalar value for non-composite ids.</summary>
         public string? ScalarValue { get; set; }
 
-        /// <summary>Gets or sets the current index when iterating composite parts.</summary>
-        public long CompositePartsIndex { get; set; }
-
         /// <summary>Gets or sets the collection of composite parts as they are read.</summary>
         public List<ApiIdPartReadData?>? CompositeParts { get; set; }
         #endregion
@@ -249,8 +246,7 @@ public sealed class ApiIdJsonConverter(ILogger<ApiIdJsonConverter>? logger) : Js
             else if (reader.TokenType == JsonTokenType.StartArray)
             {
                 context.ReadData.ApiId.CompositeParts = [];
-
-                ReadJsonArray(ref reader, context, (x) => HandleApiIdPartArrayItem);
+                ReadJsonArray(ref reader, context, static _ => HandleApiIdPartArrayItem); // direct method group, no capture
             }
             else
             {
@@ -454,7 +450,7 @@ public sealed class ApiIdJsonConverter(ILogger<ApiIdJsonConverter>? logger) : Js
     private static void WriteApiIdCompositeValue(Utf8JsonWriter writer, ApiId apiId, DefaultWriteContext<PropertyNames> context)
     {
         var propertyName = context.PropertyNames.ApiId.Value;
-        var parts = apiId.Parts.ToArray();
+        var parts = apiId.PartsAsSpan.ToArray();
         var options = context.Options;
 
         writer.TryWritePropertyWithAction
@@ -462,22 +458,22 @@ public sealed class ApiIdJsonConverter(ILogger<ApiIdJsonConverter>? logger) : Js
             propertyName,
             parts,
             options,
-            collection => WriteJsonArray
+            span => WriteJsonArray
             (
                 writer,
-                collection,
-                item =>
+                span,
+                part =>
                 {
-                    WriteJsonObject
-                    (
-                        writer,
-                        () =>
+                    WriteJsonObject(writer, () =>
+                    {
+                        if (part.Name is not null) // skip if unnamed
                         {
-                            WriteApiIdPartName(writer, item, context);
-                            WriteApiIdPartKind(writer, item, context);
-                            WriteApiIdPartValue(writer, item, context);
+                            WriteApiIdPartName(writer, part, context);
                         }
-                    );
+
+                        WriteApiIdPartKind(writer, part, context);
+                        WriteApiIdPartValue(writer, part, context);
+                    });
                 }
             )
         );
