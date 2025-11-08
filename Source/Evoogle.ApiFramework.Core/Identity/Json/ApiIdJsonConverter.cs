@@ -556,7 +556,7 @@ public sealed class ApiIdJsonConverter(ILogger<ApiIdJsonConverter>? logger) : Js
     private static void WriteApiIdCompositeValue(Utf8JsonWriter writer, ApiId apiId, DefaultWriteContext<PropertyNames> context)
     {
         var propertyName = context.PropertyNames.ApiId.Value;
-        var parts = apiId.PartsAsSpan.ToArray();
+        var parts = apiId.PartsAsSpan;
         var options = context.Options;
 
         writer.TryWritePropertyWithAction
