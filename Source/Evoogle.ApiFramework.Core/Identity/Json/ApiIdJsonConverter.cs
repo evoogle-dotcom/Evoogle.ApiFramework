@@ -3,6 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Globalization;
 using System.Text.Json;
 
 using Evoogle.Json;
@@ -173,6 +174,89 @@ public sealed class ApiIdJsonConverter(ILogger<ApiIdJsonConverter>? logger) : Js
         };
         #endregion
 
+        #region ApiId Methods
+        /// <summary>
+        ///     Reads the <c>Kind</c> property of an <see cref="ApiId"/>.
+        /// </summary>
+        /// <param name="reader">The JSON reader positioned at the value token.</param>
+        /// <param name="context">The read context to populate.</param>
+        private static void HandleApiIdKind(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        {
+            context.ReadData.ApiId ??= new ApiIdReadData();
+
+            var options = context.Options;
+            context.ReadData.ApiId.Kind = _apiIdKindJsonConverter.Read(ref reader, typeof(ApiIdKind), options);
+        }
+
+        /// <summary>
+        ///     Reads the <c>Value</c> property of an <see cref="ApiId"/>, which may be a string (scalar) or an array (composite).
+        ///     Populates <see cref="ApiIdReadData.ScalarValue"/> or <see cref="ApiIdReadData.CompositeParts"/> accordingly.
+        /// </summary>
+        /// <param name="reader">The JSON reader positioned at the value token.</param>
+        /// <param name="context">The read context to populate.</param>
+        /// <exception cref="JsonException">Thrown when the token type is not a string or array.</exception>
+        private static void HandleApiIdValue(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        {
+            context.ReadData.ApiId ??= new ApiIdReadData();
+
+            var propertyName = context.PropertyNames.ApiId.Value;
+            var knownKind = context.ReadData.ApiId.Kind;
+            var hasKnownKind = knownKind is not null;
+
+            // If Kind is known, enforce token expectations upfront and normalize values more precisely.
+            if (hasKnownKind)
+            {
+                var kind = knownKind!.Value;
+
+                if (kind == ApiIdKind.Composite)
+                {
+                    if (reader.TokenType != JsonTokenType.StartArray)
+                    {
+                        throw new JsonException($"Invalid token type for {propertyName} with kind {kind}: {reader.TokenType}. Expected StartArray.");
+                    }
+
+                    context.ReadData.ApiId.CompositeParts = [];
+                    ReadJsonArray(ref reader, context, static _ => HandleApiIdPartArrayItem);
+                    return;
+                }
+
+                // Scalar kinds must not be arrays
+                if (reader.TokenType == JsonTokenType.StartArray)
+                {
+                    throw new JsonException($"Invalid token type for {propertyName} with kind {kind}: {reader.TokenType}. Scalars cannot be arrays.");
+                }
+
+                context.ReadData.ApiId.ScalarValue = ReadScalarValueKnownKind(ref reader, kind, propertyName);
+                return;
+            }
+
+            // Fallback when Kind is not yet known: accept string/number as scalar or array as composite
+            if (reader.TokenType == JsonTokenType.StartArray)
+            {
+                context.ReadData.ApiId.CompositeParts = [];
+                ReadJsonArray(ref reader, context, static _ => HandleApiIdPartArrayItem); // direct method group, no capture
+            }
+            else
+            {
+                context.ReadData.ApiId.ScalarValue = ReadScalarValueUnknownKind(ref reader, propertyName);
+            }
+        }
+
+        /// <summary>
+        ///     Reads a single array item for the composite <c>value</c> and appends the populated <see cref="ApiIdPartReadData"/> to <see cref="ApiIdReadData.CompositeParts"/>.
+        /// </summary>
+        /// <param name="reader">The JSON reader positioned at the start of an object.</param>
+        /// <param name="context">The read context to populate.</param>
+        private static void HandleApiIdPartArrayItem(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        {
+            context.ReadData.ApiIdPart = null;
+            ReadJsonObject(ref reader, context, context.ReadHandlers.ApiIdPartPropertyHandlers);
+            var apiIdPartReadData = context.ReadData.ApiIdPart;
+
+            context.ReadData.ApiId!.CompositeParts!.Add(apiIdPartReadData);
+        }
+        #endregion
+
         #region ApiIdPart Methods
         /// <summary>
         ///     Reads the <c>Name</c> property of an <see cref="ApiIdPart"/>.
@@ -207,66 +291,88 @@ public sealed class ApiIdJsonConverter(ILogger<ApiIdJsonConverter>? logger) : Js
         private static void HandleApiIdPartValue(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiIdPart ??= new ApiIdPartReadData();
+            var propertyName = context.PropertyNames.ApiIdPart.Value;
+            var knownKind = context.ReadData.ApiIdPart.Kind;
+            if (knownKind is not null)
+            {
+                context.ReadData.ApiIdPart.ScalarValue = ReadScalarValueKnownKind(ref reader, knownKind.Value, propertyName);
+                return;
+            }
 
-            context.ReadData.ApiIdPart.ScalarValue = reader.GetString();
+            context.ReadData.ApiIdPart.ScalarValue = ReadScalarValueUnknownKind(ref reader, propertyName);
         }
         #endregion
 
-        #region ApiId Methods
+        #region Helper Methods
         /// <summary>
-        ///     Reads the <c>Kind</c> property of an <see cref="ApiId"/>.
+        ///     Reads a scalar JSON token and normalizes it to an invariant string when the ApiIdKind is known.
+        ///     Enforces token expectations (e.g. forbids numeric for Guid/Ulid/Culture) and range checks for integers.
         /// </summary>
-        /// <param name="reader">The JSON reader positioned at the value token.</param>
-        /// <param name="context">The read context to populate.</param>
-        private static void HandleApiIdKind(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static string ReadScalarValueKnownKind(ref Utf8JsonReader reader, ApiIdKind kind, string propertyName)
         {
-            context.ReadData.ApiId ??= new ApiIdReadData();
-
-            var options = context.Options;
-            context.ReadData.ApiId.Kind = _apiIdKindJsonConverter.Read(ref reader, typeof(ApiIdKind), options);
-        }
-
-        /// <summary>
-        ///     Reads the <c>Value</c> property of an <see cref="ApiId"/>, which may be a string (scalar) or an array (composite).
-        ///     Populates <see cref="ApiIdReadData.ScalarValue"/> or <see cref="ApiIdReadData.CompositeParts"/> accordingly.
-        /// </summary>
-        /// <param name="reader">The JSON reader positioned at the value token.</param>
-        /// <param name="context">The read context to populate.</param>
-        /// <exception cref="JsonException">Thrown when the token type is not a string or array.</exception>
-        private static void HandleApiIdValue(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
-        {
-            context.ReadData.ApiId ??= new ApiIdReadData();
-
-            // If the value is a string we have a scalar ApiId
-            // If the value is an array we have a composite ApiId
             if (reader.TokenType == JsonTokenType.String)
             {
-                context.ReadData.ApiId.ScalarValue = reader.GetString();
+                return reader.GetString()!;
             }
-            else if (reader.TokenType == JsonTokenType.StartArray)
+
+            if (reader.TokenType == JsonTokenType.Number)
             {
-                context.ReadData.ApiId.CompositeParts = [];
-                ReadJsonArray(ref reader, context, static _ => HandleApiIdPartArrayItem); // direct method group, no capture
+                switch (kind)
+                {
+                    case ApiIdKind.Int32:
+                        if (!reader.TryGetInt64(out var i64For32))
+                        {
+                            throw new JsonException($"Numeric value for {propertyName} could not be read as integer.");
+                        }
+                        if (i64For32 < int.MinValue || i64For32 > int.MaxValue)
+                        {
+                            throw new JsonException($"Numeric value for {propertyName} is out of range for Int32: {i64For32}.");
+                        }
+                        return ((int)i64For32).ToString(CultureInfo.InvariantCulture);
+
+                    case ApiIdKind.Int64:
+                        if (!reader.TryGetInt64(out var i64))
+                        {
+                            throw new JsonException($"Numeric value for {propertyName} could not be read as Int64.");
+                        }
+                        return i64.ToString(CultureInfo.InvariantCulture);
+
+                    case ApiIdKind.String:
+                        if (!reader.TryGetInt64(out var nAsText))
+                        {
+                            throw new JsonException($"Numeric value for {propertyName} could not be read as integer for String kind.");
+                        }
+                        return nAsText.ToString(CultureInfo.InvariantCulture);
+
+                    default:
+                        throw new JsonException($"Invalid numeric token for {propertyName} with kind {kind}. Expected string.");
+                }
             }
-            else
-            {
-                var propertyName = context.PropertyNames.ApiId.Value;
-                throw new JsonException($"Invalid token type for {propertyName} : {reader.TokenType}.");
-            }
+
+            throw new JsonException($"Invalid token type for {propertyName} with kind {kind}: {reader.TokenType}.");
         }
 
         /// <summary>
-        ///     Reads a single array item for the composite <c>value</c> and appends the populated <see cref="ApiIdPartReadData"/> to <see cref="ApiIdReadData.CompositeParts"/>.
+        ///     Reads a scalar JSON token and normalizes it to an invariant string when the ApiIdKind is not yet known.
+        ///     Accepts string or integer number tokens only.
         /// </summary>
-        /// <param name="reader">The JSON reader positioned at the start of an object.</param>
-        /// <param name="context">The read context to populate.</param>
-        private static void HandleApiIdPartArrayItem(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static string ReadScalarValueUnknownKind(ref Utf8JsonReader reader, string propertyName)
         {
-            context.ReadData.ApiIdPart = null;
-            ReadJsonObject(ref reader, context, context.ReadHandlers.ApiIdPartPropertyHandlers);
-            var apiIdPartReadData = context.ReadData.ApiIdPart;
+            if (reader.TokenType == JsonTokenType.String)
+            {
+                return reader.GetString()!;
+            }
 
-            context.ReadData.ApiId!.CompositeParts!.Add(apiIdPartReadData);
+            if (reader.TokenType == JsonTokenType.Number)
+            {
+                if (!reader.TryGetInt64(out var n))
+                {
+                    throw new JsonException($"Numeric value for {propertyName} is not an integer.");
+                }
+                return n.ToString(CultureInfo.InvariantCulture);
+            }
+
+            throw new JsonException($"Invalid token type for {propertyName} : {reader.TokenType}.");
         }
         #endregion
     }
