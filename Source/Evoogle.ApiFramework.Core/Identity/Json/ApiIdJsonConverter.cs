@@ -620,10 +620,8 @@ public sealed class ApiIdJsonConverter(ILogger<ApiIdJsonConverter>? logger) : Js
     private static void WriteApiIdPartValue(Utf8JsonWriter writer, ApiIdPart apiIdPart, DefaultWriteContext<PropertyNames> context)
     {
         var propertyName = context.PropertyNames.ApiIdPart.Value;
-        var value = apiIdPart.Value.ToString();
         var options = context.Options;
-
-        writer.TryWritePropertyAsString(propertyName, value, options);
+        WriteApiIdScalarOrPartValueCore(writer, propertyName, apiIdPart.Value, options);
     }
 
     /// <summary>
@@ -635,10 +633,39 @@ public sealed class ApiIdJsonConverter(ILogger<ApiIdJsonConverter>? logger) : Js
     private static void WriteApiIdScalarValue(Utf8JsonWriter writer, ApiId apiId, DefaultWriteContext<PropertyNames> context)
     {
         var propertyName = context.PropertyNames.ApiId.Value;
-        var value = apiId.ToString();
         var options = context.Options;
+        WriteApiIdScalarOrPartValueCore(writer, propertyName, apiId, options);
+    }
 
-        writer.TryWritePropertyAsString(propertyName, value, options);
+    /// <summary>
+    ///     Writes the <c>Value</c> property for any scalar <see cref="ApiId"/> (root or part) choosing a JSON number for Int32 / Int64 kinds and a JSON string for all others.
+    ///     This central helper keeps numeric handling logic DRY for <see cref="WriteApiIdPartValue"/> and <see cref="WriteApiIdScalarValue"/>.
+    /// </summary>
+    /// <param name="writer">The JSON writer.</param>
+    /// <param name="propertyName">The JSON property name to write.</param>
+    /// <param name="apiId">The identifier whose value is being written.</param>
+    /// <param name="options">Serializer options used by existing extension helpers (for consistency).</param>
+    private static void WriteApiIdScalarOrPartValueCore(Utf8JsonWriter writer, string propertyName, ApiId apiId, JsonSerializerOptions options)
+    {
+        // Fast-path numeric kinds: write as JSON number instead of string.
+        switch (apiId.Kind)
+        {
+            case ApiIdKind.Int32:
+                {
+                    var i32 = apiId.AsInt32OrThrow();
+                    writer.TryWritePropertyAsNumber(propertyName, i32, options);
+                    return;
+                }
+            case ApiIdKind.Int64:
+                {
+                    var i64 = apiId.AsInt64OrThrow();
+                    writer.TryWritePropertyAsNumber(propertyName, i64, options);
+                    return;
+                }
+        }
+
+        // All other kinds (or fallback): write as string using existing extension for consistency
+        writer.TryWritePropertyAsString(propertyName, apiId.ToString(), options);
     }
     #endregion
 }

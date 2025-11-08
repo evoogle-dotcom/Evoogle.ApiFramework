@@ -774,16 +774,30 @@ public class ApiIdTests(ITestOutputHelper output) : XUnitTests(output)
         // .. Int32
         new JsonDeserializeTest<ApiId>
         {
-            Name = $"Scalar: {TestInt42ApiId.ToDebuggerDisplay()}",
+            Name = $"Scalar: {TestInt42ApiId.ToDebuggerDisplay()} with JSON string value",
             Source = @"{""Kind"":""Int32"",""Value"":""42""}",
+            Expected = TestInt42ApiId
+        },
+
+        new JsonDeserializeTest<ApiId>
+        {
+            Name = $"Scalar: {TestInt42ApiId.ToDebuggerDisplay()} with JSON numeric value",
+            Source = @"{""Kind"":""Int32"",""Value"":42}",
             Expected = TestInt42ApiId
         },
 
         // .. Int64
         new JsonDeserializeTest<ApiId>
         {
-            Name = $"Scalar: {TestLong24ApiId.ToDebuggerDisplay()}",
+            Name = $"Scalar: {TestLong24ApiId.ToDebuggerDisplay()} with JSON string value",
             Source = @"{""Kind"":""Int64"",""Value"":""24""}",
+            Expected = TestLong24ApiId
+        },
+
+        new JsonDeserializeTest<ApiId>
+        {
+            Name = $"Scalar: {TestLong24ApiId.ToDebuggerDisplay()} with JSON numeric value",
+            Source = @"{""Kind"":""Int64"",""Value"":24}",
             Expected = TestLong24ApiId
         },
 
@@ -822,34 +836,66 @@ public class ApiIdTests(ITestOutputHelper output) : XUnitTests(output)
         // .. Ordered (unnamed parts)
         new JsonDeserializeTest<ApiId>
         {
-            Name = $"Composite: {TestCompositeInt24AndInt24ApiId.ToDebuggerDisplay()}",
+            Name = $"Composite: {TestCompositeInt24AndInt24ApiId.ToDebuggerDisplay()} with JSON string values",
             Source = @"{""Kind"":""Composite"",""Value"":[{""Kind"":""Int32"",""Value"":""24""},{""Kind"":""Int32"",""Value"":""24""}]}",
             Expected = TestCompositeInt24AndInt24ApiId
         },
         new JsonDeserializeTest<ApiId>
         {
-            Name = $"Composite: {TestCompositeInt24AndInt42ApiId.ToDebuggerDisplay()}",
+            Name = $"Composite: {TestCompositeInt24AndInt42ApiId.ToDebuggerDisplay()} with JSON string values",
             Source = @"{""Kind"":""Composite"",""Value"":[{""Kind"":""Int32"",""Value"":""24""},{""Kind"":""Int32"",""Value"":""42""}]}",
+            Expected = TestCompositeInt24AndInt42ApiId
+        },
+
+        new JsonDeserializeTest<ApiId>
+        {
+            Name = $"Composite: {TestCompositeInt24AndInt24ApiId.ToDebuggerDisplay()} with JSON numeric values",
+            Source = @"{""Kind"":""Composite"",""Value"":[{""Kind"":""Int32"",""Value"":24},{""Kind"":""Int32"",""Value"":24}]}",
+            Expected = TestCompositeInt24AndInt24ApiId
+        },
+        new JsonDeserializeTest<ApiId>
+        {
+            Name = $"Composite: {TestCompositeInt24AndInt42ApiId.ToDebuggerDisplay()} with JSON numeric values",
+            Source = @"{""Kind"":""Composite"",""Value"":[{""Kind"":""Int32"",""Value"":24},{""Kind"":""Int32"",""Value"":42}]}",
             Expected = TestCompositeInt24AndInt42ApiId
         },
 
         // .. Named (named parts)
         new JsonDeserializeTest<ApiId>
         {
-            Name = $"Composite: {TestCompositeAlphaInt24AndBetaInt24ApiId.ToDebuggerDisplay()}",
+            Name = $"Composite: {TestCompositeAlphaInt24AndBetaInt24ApiId.ToDebuggerDisplay()} with JSON string values",
             Source = @"{""Kind"":""Composite"",""Value"":[{""Name"":""alpha"",""Kind"":""Int32"",""Value"":""24""},{""Name"":""beta"",""Kind"":""Int32"",""Value"":""24""}]}",
             Expected = TestCompositeAlphaInt24AndBetaInt24ApiId
         },
         new JsonDeserializeTest<ApiId>
         {
-            Name = $"Composite: {TestCompositeAlphaInt24AndBetaInt42ApiId.ToDebuggerDisplay()}",
+            Name = $"Composite: {TestCompositeAlphaInt24AndBetaInt42ApiId.ToDebuggerDisplay()} with JSON string values",
             Source = @"{""Kind"":""Composite"",""Value"":[{""Name"":""alpha"",""Kind"":""Int32"",""Value"":""24""},{""Name"":""beta"",""Kind"":""Int32"",""Value"":""42""}]}",
             Expected = TestCompositeAlphaInt24AndBetaInt42ApiId
         },
         new JsonDeserializeTest<ApiId>
         {
-            Name = $"Composite: {TestCompositeAlphaInt24AndZetaInt42ApiId.ToDebuggerDisplay()}",
+            Name = $"Composite: {TestCompositeAlphaInt24AndZetaInt42ApiId.ToDebuggerDisplay()} with JSON string values",
             Source = @"{""Kind"":""Composite"",""Value"":[{""Name"":""alpha"",""Kind"":""Int32"",""Value"":""24""},{""Name"":""zeta"",""Kind"":""Int32"",""Value"":""42""}]}",
+            Expected = TestCompositeAlphaInt24AndZetaInt42ApiId
+        },
+
+        new JsonDeserializeTest<ApiId>
+        {
+            Name = $"Composite: {TestCompositeAlphaInt24AndBetaInt24ApiId.ToDebuggerDisplay()} with JSON numeric values",
+            Source = @"{""Kind"":""Composite"",""Value"":[{""Name"":""alpha"",""Kind"":""Int32"",""Value"":24},{""Name"":""beta"",""Kind"":""Int32"",""Value"":24}]}",
+            Expected = TestCompositeAlphaInt24AndBetaInt24ApiId
+        },
+        new JsonDeserializeTest<ApiId>
+        {
+            Name = $"Composite: {TestCompositeAlphaInt24AndBetaInt42ApiId.ToDebuggerDisplay()} with JSON numeric values",
+            Source = @"{""Kind"":""Composite"",""Value"":[{""Name"":""alpha"",""Kind"":""Int32"",""Value"":24},{""Name"":""beta"",""Kind"":""Int32"",""Value"":42}]}",
+            Expected = TestCompositeAlphaInt24AndBetaInt42ApiId
+        },
+        new JsonDeserializeTest<ApiId>
+        {
+            Name = $"Composite: {TestCompositeAlphaInt24AndZetaInt42ApiId.ToDebuggerDisplay()} with JSON numeric values",
+            Source = @"{""Kind"":""Composite"",""Value"":[{""Name"":""alpha"",""Kind"":""Int32"",""Value"":24},{""Name"":""zeta"",""Kind"":""Int32"",""Value"":42}]}",
             Expected = TestCompositeAlphaInt24AndZetaInt42ApiId
         },
     ];
@@ -980,7 +1026,7 @@ public class ApiIdTests(ITestOutputHelper output) : XUnitTests(output)
         {
             Name = $"Scalar: {TestInt42ApiId.ToDebuggerDisplay()}",
             Source = TestInt42ApiId,
-            Expected = @"{""Kind"":""Int32"",""Value"":""42""}"
+            Expected = @"{""Kind"":""Int32"",""Value"":42}"
         },
 
         // .. Int64
@@ -988,7 +1034,7 @@ public class ApiIdTests(ITestOutputHelper output) : XUnitTests(output)
         {
             Name = $"Scalar: {TestLong24ApiId.ToDebuggerDisplay()}",
             Source = TestLong24ApiId,
-            Expected = @"{""Kind"":""Int64"",""Value"":""24""}"
+            Expected = @"{""Kind"":""Int64"",""Value"":24}"
         },
 
         // .. Guid
@@ -1028,13 +1074,13 @@ public class ApiIdTests(ITestOutputHelper output) : XUnitTests(output)
         {
             Name = $"Composite: {TestCompositeInt24AndInt24ApiId.ToDebuggerDisplay()}",
             Source = TestCompositeInt24AndInt24ApiId,
-            Expected = @"{""Kind"":""Composite"",""Value"":[{""Kind"":""Int32"",""Value"":""24""},{""Kind"":""Int32"",""Value"":""24""}]}"
+            Expected = @"{""Kind"":""Composite"",""Value"":[{""Kind"":""Int32"",""Value"":24},{""Kind"":""Int32"",""Value"":24}]}"
         },
         new JsonSerializeTest<ApiId>
         {
             Name = $"Composite: {TestCompositeInt24AndInt42ApiId.ToDebuggerDisplay()}",
             Source = TestCompositeInt24AndInt42ApiId,
-            Expected = @"{""Kind"":""Composite"",""Value"":[{""Kind"":""Int32"",""Value"":""24""},{""Kind"":""Int32"",""Value"":""42""}]}"
+            Expected = @"{""Kind"":""Composite"",""Value"":[{""Kind"":""Int32"",""Value"":24},{""Kind"":""Int32"",""Value"":42}]}"
         },
 
         // .. Named (named parts)
@@ -1042,19 +1088,19 @@ public class ApiIdTests(ITestOutputHelper output) : XUnitTests(output)
         {
             Name = $"Composite: {TestCompositeAlphaInt24AndBetaInt24ApiId.ToDebuggerDisplay()}",
             Source = TestCompositeAlphaInt24AndBetaInt24ApiId,
-            Expected = @"{""Kind"":""Composite"",""Value"":[{""Name"":""alpha"",""Kind"":""Int32"",""Value"":""24""},{""Name"":""beta"",""Kind"":""Int32"",""Value"":""24""}]}"
+            Expected = @"{""Kind"":""Composite"",""Value"":[{""Name"":""alpha"",""Kind"":""Int32"",""Value"":24},{""Name"":""beta"",""Kind"":""Int32"",""Value"":24}]}"
         },
         new JsonSerializeTest<ApiId>
         {
             Name = $"Composite: {TestCompositeAlphaInt24AndBetaInt42ApiId.ToDebuggerDisplay()}",
             Source = TestCompositeAlphaInt24AndBetaInt42ApiId,
-            Expected = @"{""Kind"":""Composite"",""Value"":[{""Name"":""alpha"",""Kind"":""Int32"",""Value"":""24""},{""Name"":""beta"",""Kind"":""Int32"",""Value"":""42""}]}"
+            Expected = @"{""Kind"":""Composite"",""Value"":[{""Name"":""alpha"",""Kind"":""Int32"",""Value"":24},{""Name"":""beta"",""Kind"":""Int32"",""Value"":42}]}"
         },
         new JsonSerializeTest<ApiId>
         {
             Name = $"Composite: {TestCompositeAlphaInt24AndZetaInt42ApiId.ToDebuggerDisplay()}",
             Source = TestCompositeAlphaInt24AndZetaInt42ApiId,
-            Expected = @"{""Kind"":""Composite"",""Value"":[{""Name"":""alpha"",""Kind"":""Int32"",""Value"":""24""},{""Name"":""zeta"",""Kind"":""Int32"",""Value"":""42""}]}"
+            Expected = @"{""Kind"":""Composite"",""Value"":[{""Name"":""alpha"",""Kind"":""Int32"",""Value"":24},{""Name"":""zeta"",""Kind"":""Int32"",""Value"":42}]}"
         },
     ];
 
