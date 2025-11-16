@@ -93,7 +93,7 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
                                                       this.ApiRelationshipCollection ?? throw new ArgumentNullException(nameof(this.ApiRelationshipCollection)),
                                                       typeof(object)); // Using 'object' as a placeholder CLR type
 
-                var apiSchema = new ApiSchema
+                var apiSchema = ApiSchema.Create
                 (
                     apiName: nameof(ApiSchema),
                     apiScalarTypes: apiScalarTypes,
@@ -208,7 +208,7 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
                                                   typeof(object)); // Using object as a placeholder CLR type
             this.ApiObjectType = apiObjectType;
 
-            var apiSchema = new ApiSchema
+            var apiSchema = ApiSchema.Create
             (
                 apiName: nameof(ApiSchema),
                 apiScalarTypes: apiScalarTypes,

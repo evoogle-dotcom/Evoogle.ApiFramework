@@ -370,12 +370,12 @@ public class ApiIdTests(ITestOutputHelper output) : XUnitTests(output)
         ApiIdPart.Create("zeta", ApiId.FromInt32(42))
     );
 
-    private static Guid TestGuid { get; } = Guid.NewGuid();
-    private static string TestGuidString { get; } = TestGuid.ToString();
+    public const string TestGuidString = "86d5d1a9-ec14-4730-8d9a-41812e5a117a";
+    public static Guid TestGuid { get; } = Guid.Parse(TestGuidString);
     private static ApiId TestGuidApiId { get; } = ApiId.FromGuid(TestGuid);
 
-    private static Ulid TestUlid { get; } = Ulid.NewUlid();
-    private static string TestUlidString { get; } = TestUlid.ToString();
+    public const string TestUlidString = "46TQ8TKV0M8WR8V6J1G4Q5M4BT";
+    public static Ulid TestUlid { get; } = Ulid.Parse(TestUlidString);
     private static ApiId TestUlidApiId { get; } = ApiId.FromUlid(TestUlid);
 
     public static TheoryDataRow<IXUnitTest>[] ComparisonTheoryData =>

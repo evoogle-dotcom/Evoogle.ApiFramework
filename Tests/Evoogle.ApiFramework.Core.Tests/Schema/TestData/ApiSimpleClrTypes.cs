@@ -3,6 +3,8 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Text.Json.Serialization;
+
 namespace Evoogle.ApiFramework.Schema.TestData;
 
 #region Enums
@@ -27,15 +29,29 @@ public sealed class Empty()
 {
 }
 
-public sealed class ScalarsOnly(string requiredName, long requiredNumber, bool requiredPredicate)
+public sealed class ScalarsOnly
 {
-    public string RequiredName { get; set; } = requiredName;
-    public long RequiredNumber { get; set; } = requiredNumber;
-    public bool RequiredPredicate { get; set; } = requiredPredicate;
+    public string RequiredName { get; set; }
+    public long RequiredNumber { get; set; }
+    public bool RequiredPredicate { get; set; }
 
     public string? OptionalName { get; set; }
     public long? OptionalNumber { get; set; }
     public bool? OptionalPredicate { get; set; }
+
+    public ScalarsOnly()
+    {
+        this.RequiredName = string.Empty;
+        this.RequiredNumber = default;
+        this.RequiredPredicate = default;
+    }
+
+    public ScalarsOnly(string requiredName, long requiredNumber, bool requiredPredicate)
+    {
+        this.RequiredName = requiredName;
+        this.RequiredNumber = requiredNumber;
+        this.RequiredPredicate = requiredPredicate;
+    }
 }
 
 public sealed class Person

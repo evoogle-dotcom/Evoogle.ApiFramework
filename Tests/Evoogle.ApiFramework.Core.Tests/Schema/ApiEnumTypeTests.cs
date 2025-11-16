@@ -61,7 +61,7 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
                                                   this.ApiEnumValueCollection ?? throw new ArgumentNullException(nameof(this.ApiEnumValueCollection)),
                                                   this.ClrEnumType ?? throw new ArgumentNullException(nameof(this.ClrEnumType)));
 
-                var apiSchema = new ApiSchema
+                var apiSchema = ApiSchema.Create
                 (
                     apiName: nameof(ApiSchema),
                     apiScalarTypes: null,
@@ -143,7 +143,7 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
                                               this.ClrEnumType ?? throw new ArgumentNullException(nameof(this.ClrEnumType)));
             this.ApiEnumType = apiEnumType;
 
-            var apiSchema = new ApiSchema
+            var apiSchema = ApiSchema.Create
             (
                 apiName: nameof(ApiSchema),
                 apiScalarTypes: null,
@@ -166,26 +166,11 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 throw new InvalidOperationException($"{nameof(this.TryGetMethod)} is null.");
             }
 
-            var inputValue = this.Input;
-            if (inputValue is JsonElement jsonElement)
-            {
-                switch (this.TryGetMethod.Value)
-                {
-                    case ApiEnumTypeTests.TryGetMethod.TryGetValueByApiName:
-                    case ApiEnumTypeTests.TryGetMethod.TryGetValueByClrName:
-                        inputValue = jsonElement.GetString();
-                        break;
-                    case ApiEnumTypeTests.TryGetMethod.TryGetValueByClrOrdinal:
-                        inputValue = jsonElement.GetInt32();
-                        break;
-                }
-            }
-
             this.ActualFound = this.TryGetMethod.Value switch
             {
-                ApiEnumTypeTests.TryGetMethod.TryGetValueByApiName => this.ApiEnumType!.TryGetValueByApiName((string)inputValue!, out _),
-                ApiEnumTypeTests.TryGetMethod.TryGetValueByClrName => this.ApiEnumType!.TryGetValueByClrName((string)inputValue!, out _),
-                ApiEnumTypeTests.TryGetMethod.TryGetValueByClrOrdinal => (bool?)this.ApiEnumType!.TryGetValueByClrOrdinal((int)inputValue!, out _),
+                ApiEnumTypeTests.TryGetMethod.TryGetValueByApiName => this.ApiEnumType!.TryGetValueByApiName((string)this.Input!, out _),
+                ApiEnumTypeTests.TryGetMethod.TryGetValueByClrName => this.ApiEnumType!.TryGetValueByClrName((string)this.Input!, out _),
+                ApiEnumTypeTests.TryGetMethod.TryGetValueByClrOrdinal => (bool?)this.ApiEnumType!.TryGetValueByClrOrdinal((int)this.Input!, out _),
                 _ => throw new InvalidOperationException($"Unknown {nameof(this.TryGetMethod)}: {this.TryGetMethod}"),
             };
 

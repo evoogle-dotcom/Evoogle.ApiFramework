@@ -167,7 +167,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
 
     public static readonly ApiTypeExpression TestApiObjectTypeCompanyReference = new(ApiTypeKind.Object, nameof(Company));
 
-    public static readonly ApiSchema TestApiSchema = new
+    public static readonly ApiSchema TestApiSchema = ApiSchema.Create
     (
         nameof(TestApiSchema),
         [
@@ -200,7 +200,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 ""ApiEnumTypes"": [],
                 ""ApiObjectTypes"": []
             }",
-            Expected = new ApiSchema("ApiSchema With No ApiTypes", []),
+            Expected = ApiSchema.Create("ApiSchema With No ApiTypes", []),
         },
 
         // ApiSchema With 1 ApiScalarType
@@ -220,7 +220,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 ""ApiEnumTypes"": [],
                 ""ApiObjectTypes"": []
             }",
-            Expected = new ApiSchema("ApiSchema With 1 ApiScalarType", [TestApiScalarTypeBoolean]),
+            Expected = ApiSchema.Create("ApiSchema With 1 ApiScalarType", [TestApiScalarTypeBoolean]),
         },
 
         // ApiSchema With 1 ApiScalarType And Extension 1
@@ -245,7 +245,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     }
                 }
             }",
-            Expected = new ApiSchema("ApiSchema With 1 ApiScalarType And Extension 1", [TestApiScalarTypeBoolean]),
+            Expected = ApiSchema.Create("ApiSchema With 1 ApiScalarType And Extension 1", [TestApiScalarTypeBoolean]),
             ExtensionType1 = typeof(TestExtension1)
         },
 
@@ -271,7 +271,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 ""ApiEnumTypes"": [],
                 ""ApiObjectTypes"": []
             }",
-            Expected = new ApiSchema("ApiSchema With 2 ApiScalarTypes", [TestApiScalarTypeBoolean, TestApiScalarTypeInt32]),
+            Expected = ApiSchema.Create("ApiSchema With 2 ApiScalarTypes", [TestApiScalarTypeBoolean, TestApiScalarTypeInt32]),
         },
 
         // ApiSchema With 3 ApiScalarTypes
@@ -301,7 +301,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 ""ApiEnumTypes"": [],
                 ""ApiObjectTypes"": []
             }",
-            Expected = new ApiSchema("ApiSchema With 3 ApiScalarTypes", [TestApiScalarTypeBoolean, TestApiScalarTypeInt32, TestApiScalarTypeString]),
+            Expected = ApiSchema.Create("ApiSchema With 3 ApiScalarTypes", [TestApiScalarTypeBoolean, TestApiScalarTypeInt32, TestApiScalarTypeString]),
         },
 
         // ApiSchema With 3 ApiScalarTypes And Extension 1 And Extension 2
@@ -340,7 +340,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     }
                 }
             }",
-            Expected = new ApiSchema("ApiSchema With 3 ApiScalarTypes And Extension 1 And Extension 2", [TestApiScalarTypeBoolean, TestApiScalarTypeInt32, TestApiScalarTypeString]),
+            Expected = ApiSchema.Create("ApiSchema With 3 ApiScalarTypes And Extension 1 And Extension 2", [TestApiScalarTypeBoolean, TestApiScalarTypeInt32, TestApiScalarTypeString]),
             ExtensionType1 = typeof(TestExtension1),
             ExtensionType2 = typeof(TestExtension2),
         },
@@ -379,7 +379,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 ],
                 ""ApiObjectTypes"": []
             }",
-            Expected = new ApiSchema("ApiSchema With 1 ApiEnumType", [TestApiEnumTypeGender]),
+            Expected = ApiSchema.Create("ApiSchema With 1 ApiEnumType", [TestApiEnumTypeGender]),
         },
 
         // ApiSchema With 1 ApiEnumType And Extension 1
@@ -421,7 +421,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     }
                 }
             }",
-            Expected = new ApiSchema("ApiSchema With 1 ApiEnumType And Extension 1", [TestApiEnumTypeGender]),
+            Expected = ApiSchema.Create("ApiSchema With 1 ApiEnumType And Extension 1", [TestApiEnumTypeGender]),
             ExtensionType1 = typeof(TestExtension1),
         },
 
@@ -527,7 +527,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     }
                 ]
             }",
-            Expected = new ApiSchema
+            Expected = ApiSchema.Create
             (
                 "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)",
                 [
@@ -651,7 +651,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     }
                 }
             }",
-            Expected = new ApiSchema
+            Expected = ApiSchema.Create
             (
                 "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person) And Extension 1 And Extension 2",
                 [
@@ -817,7 +817,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     }
                 ]
             }",
-            Expected = new ApiSchema
+            Expected = ApiSchema.Create
             (
                 "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 2 ApiObjectTypes (Person and Company)",
                 [
@@ -845,21 +845,21 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         new JsonRoundtripTest<ApiSchema>
         {
             Name = "ApiSchema With No ApiTypes",
-            Expected = new ApiSchema("ApiSchema With No ApiTypes", []),
+            Expected = ApiSchema.Create("ApiSchema With No ApiTypes", []),
         },
 
         // ApiSchema With 1 ApiScalarType
         new JsonRoundtripTest<ApiSchema>
         {
             Name = "ApiSchema With 1 ApiScalarType",
-            Expected = new ApiSchema("ApiSchema With 1 ApiScalarType", [TestApiScalarTypeBoolean]),
+            Expected = ApiSchema.Create("ApiSchema With 1 ApiScalarType", [TestApiScalarTypeBoolean]),
         },
 
         // ApiSchema With 1 ApiScalarType And Extension 1
         new JsonRoundtripTest<ApiSchema>
         {
             Name = "ApiSchema With 1 ApiScalarType And Extension 1",
-            Expected = new ApiSchema("ApiSchema With 1 ApiScalarType And Extension 1", [TestApiScalarTypeBoolean]),
+            Expected = ApiSchema.Create("ApiSchema With 1 ApiScalarType And Extension 1", [TestApiScalarTypeBoolean]),
             ExtensionType1 = typeof(TestExtension1)
         },
 
@@ -867,21 +867,21 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         new JsonRoundtripTest<ApiSchema>
         {
             Name = "ApiSchema With 2 ApiScalarTypes",
-            Expected = new ApiSchema("ApiSchema With 2 ApiScalarTypes", [TestApiScalarTypeBoolean, TestApiScalarTypeInt32]),
+            Expected = ApiSchema.Create("ApiSchema With 2 ApiScalarTypes", [TestApiScalarTypeBoolean, TestApiScalarTypeInt32]),
         },
 
         // ApiSchema With 3 ApiScalarTypes
         new JsonRoundtripTest<ApiSchema>
         {
             Name = "ApiSchema With 3 ApiScalarTypes",
-            Expected = new ApiSchema("ApiSchema With 3 ApiScalarTypes", [TestApiScalarTypeBoolean, TestApiScalarTypeInt32, TestApiScalarTypeString]),
+            Expected = ApiSchema.Create("ApiSchema With 3 ApiScalarTypes", [TestApiScalarTypeBoolean, TestApiScalarTypeInt32, TestApiScalarTypeString]),
         },
 
         // ApiSchema With 3 ApiScalarTypes And Extension 1 And Extension 2
         new JsonRoundtripTest<ApiSchema>
         {
             Name = "ApiSchema With 3 ApiScalarTypes And Extension 1 And Extension 2",
-            Expected = new ApiSchema("ApiSchema With 3 ApiScalarTypes And Extension 1 And Extension 2", [TestApiScalarTypeBoolean, TestApiScalarTypeInt32, TestApiScalarTypeString]),
+            Expected = ApiSchema.Create("ApiSchema With 3 ApiScalarTypes And Extension 1 And Extension 2", [TestApiScalarTypeBoolean, TestApiScalarTypeInt32, TestApiScalarTypeString]),
             ExtensionType1 = typeof(TestExtension1),
             ExtensionType2 = typeof(TestExtension2),
         },
@@ -890,14 +890,14 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         new JsonRoundtripTest<ApiSchema>
         {
             Name = "ApiSchema With 1 ApiEnumType",
-            Expected = new ApiSchema("ApiSchema With 1 ApiEnumType", [TestApiEnumTypeGender]),
+            Expected = ApiSchema.Create("ApiSchema With 1 ApiEnumType", [TestApiEnumTypeGender]),
         },
 
         // ApiSchema With 1 ApiEnumType And Extension 1
         new JsonRoundtripTest<ApiSchema>
         {
             Name = "ApiSchema With 1 ApiEnumType And Extension 1",
-            Expected = new ApiSchema("ApiSchema With 1 ApiEnumType And Extension 1", [TestApiEnumTypeGender]),
+            Expected = ApiSchema.Create("ApiSchema With 1 ApiEnumType And Extension 1", [TestApiEnumTypeGender]),
             ExtensionType1 = typeof(TestExtension1),
         },
 
@@ -905,7 +905,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         new JsonRoundtripTest<ApiSchema>
         {
             Name = "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)",
-            Expected = new ApiSchema
+            Expected = ApiSchema.Create
             (
                 "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)",
                 [
@@ -922,7 +922,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         new JsonRoundtripTest<ApiSchema>
         {
             Name = "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person) And Extension 1 And Extension 2",
-            Expected = new ApiSchema
+            Expected = ApiSchema.Create
             (
                 "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person) And Extension 1 And Extension 2",
                 [
@@ -941,7 +941,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         new JsonRoundtripTest<ApiSchema>
         {
             Name = "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 2 ApiObjectTypes (Person and Company) And Extension 1 And Extension 2",
-            Expected = new ApiSchema
+            Expected = ApiSchema.Create
             (
                 "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 2 ApiObjectTypes (Person and Company) And Extension 1 And Extension 2",
                 [
@@ -972,7 +972,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         new JsonSerializeTest<ApiSchema>
         {
             Name = "ApiSchema With No ApiTypes",
-            Source = new ApiSchema("ApiSchema With No ApiTypes", []),
+            Source = ApiSchema.Create("ApiSchema With No ApiTypes", []),
             Expected = @"
             {
                 ""ApiName"": ""ApiSchema With No ApiTypes"",
@@ -986,7 +986,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         new JsonSerializeTest<ApiSchema>
         {
             Name = "ApiSchema With 1 ApiScalarType",
-            Source = new ApiSchema("ApiSchema With 1 ApiScalarType", [TestApiScalarTypeBoolean]),
+            Source = ApiSchema.Create("ApiSchema With 1 ApiScalarType", [TestApiScalarTypeBoolean]),
             Expected = @"
             {
                 ""ApiName"": ""ApiSchema With 1 ApiScalarType"",
@@ -1006,7 +1006,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         new JsonSerializeTest<ApiSchema>
         {
             Name = "ApiSchema With 1 ApiScalarType And Extension 1",
-            Source = new ApiSchema("ApiSchema With 1 ApiScalarType And Extension 1", [TestApiScalarTypeBoolean]),
+            Source = ApiSchema.Create("ApiSchema With 1 ApiScalarType And Extension 1", [TestApiScalarTypeBoolean]),
             Expected = @"
             {
                 ""ApiName"": ""ApiSchema With 1 ApiScalarType And Extension 1"",
@@ -1032,7 +1032,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         new JsonSerializeTest<ApiSchema>
         {
             Name = "ApiSchema With 2 ApiScalarTypes",
-            Source = new ApiSchema("ApiSchema With 2 ApiScalarTypes", [TestApiScalarTypeBoolean, TestApiScalarTypeInt32]),
+            Source = ApiSchema.Create("ApiSchema With 2 ApiScalarTypes", [TestApiScalarTypeBoolean, TestApiScalarTypeInt32]),
             Expected = @"
             {
                 ""ApiName"": ""ApiSchema With 2 ApiScalarTypes"",
@@ -1057,7 +1057,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         new JsonSerializeTest<ApiSchema>
         {
             Name = "ApiSchema With 3 ApiScalarTypes",
-            Source = new ApiSchema("ApiSchema With 3 ApiScalarTypes", [TestApiScalarTypeBoolean, TestApiScalarTypeInt32, TestApiScalarTypeString]),
+            Source = ApiSchema.Create("ApiSchema With 3 ApiScalarTypes", [TestApiScalarTypeBoolean, TestApiScalarTypeInt32, TestApiScalarTypeString]),
             Expected = @"
             {
                 ""ApiName"": ""ApiSchema With 3 ApiScalarTypes"",
@@ -1087,7 +1087,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         new JsonSerializeTest<ApiSchema>
         {
             Name = "ApiSchema With 3 ApiScalarTypes And Extension 1 And Extension 2",
-            Source = new ApiSchema("ApiSchema With 3 ApiScalarTypes And Extension 1 And Extension 2", [TestApiScalarTypeBoolean, TestApiScalarTypeInt32, TestApiScalarTypeString]),
+            Source = ApiSchema.Create("ApiSchema With 3 ApiScalarTypes And Extension 1 And Extension 2", [TestApiScalarTypeBoolean, TestApiScalarTypeInt32, TestApiScalarTypeString]),
             Expected = @"
             {
                 ""ApiName"": ""ApiSchema With 3 ApiScalarTypes And Extension 1 And Extension 2"",
@@ -1128,7 +1128,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         new JsonSerializeTest<ApiSchema>
         {
             Name = "ApiSchema With 1 ApiEnumType",
-            Source = new ApiSchema("ApiSchema With 1 ApiEnumType", [TestApiEnumTypeGender]),
+            Source = ApiSchema.Create("ApiSchema With 1 ApiEnumType", [TestApiEnumTypeGender]),
             Expected = @"
             {
                 ""ApiName"": ""ApiSchema With 1 ApiEnumType"",
@@ -1165,7 +1165,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         new JsonSerializeTest<ApiSchema>
         {
             Name = "ApiSchema With 1 ApiEnumType And Extension 1",
-            Source = new ApiSchema("ApiSchema With 1 ApiEnumType And Extension 1", [TestApiEnumTypeGender]),
+            Source = ApiSchema.Create("ApiSchema With 1 ApiEnumType And Extension 1", [TestApiEnumTypeGender]),
             Expected = @"
             {
                 ""ApiName"": ""ApiSchema With 1 ApiEnumType And Extension 1"",
@@ -1208,8 +1208,9 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         new JsonSerializeTest<ApiSchema>
         {
             Name = "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)",
-            Source = new ApiSchema
+            Source = ApiSchema.Create
             (
+            
                 "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)",
                 [
                     TestApiScalarTypeBoolean,
@@ -1323,7 +1324,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         new JsonSerializeTest<ApiSchema>
         {
             Name = "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person) And Extension 1 And Extension 2",
-            Source = new ApiSchema
+            Source = ApiSchema.Create
             (
                 "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person) And Extension 1 And Extension 2",
                 [
@@ -1449,7 +1450,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         new JsonSerializeTest<ApiSchema>
         {
             Name = "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 2 ApiObjectTypes (Person and Company)",
-            Source = new ApiSchema
+            Source = ApiSchema.Create
             (
                 "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 2 ApiObjectTypes (Person and Company)",
                 [

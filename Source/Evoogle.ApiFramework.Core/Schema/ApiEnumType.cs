@@ -52,9 +52,9 @@ public sealed class ApiEnumType(string apiName, IEnumerable<ApiEnumValue> apiEnu
 
         base.Initialize(apiSchema, ref results);
 
-        this.InitializeLookupDictionaries(apiSchema, ref results);
+        this.InitializeLookupDictionaries(ref results);
 
-        this.InitializeClrType(apiSchema, ref results);
+        this.InitializeClrType(ref results);
         this.InitializeApiEnumValues(apiSchema, ref results);
     }
     #endregion
@@ -124,7 +124,7 @@ public sealed class ApiEnumType(string apiName, IEnumerable<ApiEnumValue> apiEnu
         }
     }
 
-    private void InitializeClrType(ApiSchema _, ref List<ValidationResult>? results)
+    private void InitializeClrType(ref List<ValidationResult>? results)
     {
         if (this.ClrType is null)
         {
@@ -138,7 +138,7 @@ public sealed class ApiEnumType(string apiName, IEnumerable<ApiEnumValue> apiEnu
         }
     }
 
-    private void InitializeLookupDictionaries(ApiSchema _, ref List<ValidationResult>? results)
+    private void InitializeLookupDictionaries(ref List<ValidationResult>? results)
     {
         _apiNameLookup = null;
         _clrNameLookup = null;

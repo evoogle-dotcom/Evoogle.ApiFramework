@@ -238,40 +238,5 @@ public sealed class ApiTypeExpression
 
         _apiResolvedType = this.ApiInlineType;
     }
-
-    private void ValidateApiName(ApiSchema _, string apiValidationPath, ref List<ValidationResult>? results)
-    {
-        if (string.IsNullOrWhiteSpace(this.ApiName))
-        {
-            results ??= [];
-            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ApiName)} cannot be null or whitespace.", [nameof(this.ApiName)]));
-        }
-    }
-
-    private void ValidateClrType(ApiSchema _, string apiValidationPath, ref List<ValidationResult>? results)
-    {
-        if (this.ClrType is null)
-        {
-            results ??= [];
-            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ClrType)} cannot be null.", [nameof(this.ClrType)]));
-            return;
-        }
-    }
-
-    private void ValidateKind(ApiSchema _, string apiValidationPath, ref List<ValidationResult>? results)
-    {
-        if (this.Kind is null)
-        {
-            results ??= [];
-            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.Kind)} cannot be null.", [nameof(this.Kind)]));
-            return;
-        }
-
-        if (this.Kind == ApiTypeKind.Unknown)
-        {
-            results ??= [];
-            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.Kind)} cannot be equal to {ApiTypeKind.Unknown}.", [nameof(this.Kind)]));
-        }
-    }
     #endregion
 }

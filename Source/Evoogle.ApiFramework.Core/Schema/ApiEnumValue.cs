@@ -44,8 +44,8 @@ public sealed class ApiEnumValue(string apiName, string clrName, int clrOrdinal)
         ArgumentNullException.ThrowIfNull(apiSchema);
         ArgumentException.ThrowIfNullOrWhiteSpace(apiValidationPath);
 
-        this.InitializeApiName(apiSchema, apiValidationPath, ref results);
-        this.InitializeClrName(apiSchema, apiValidationPath, ref results);
+        this.InitializeApiName(apiValidationPath, ref results);
+        this.InitializeClrName(apiValidationPath, ref results);
     }
     #endregion
 
@@ -63,7 +63,7 @@ public sealed class ApiEnumValue(string apiName, string clrName, int clrOrdinal)
     #endregion
 
     #region Implementation Methods
-    private void InitializeApiName(ApiSchema _, string apiValidationPath, ref List<ValidationResult>? results)
+    private void InitializeApiName(string apiValidationPath, ref List<ValidationResult>? results)
     {
         if (string.IsNullOrWhiteSpace(this.ApiName))
         {
@@ -72,7 +72,7 @@ public sealed class ApiEnumValue(string apiName, string clrName, int clrOrdinal)
         }
     }
 
-    private void InitializeClrName(ApiSchema _, string apiValidationPath, ref List<ValidationResult>? results)
+    private void InitializeClrName(string apiValidationPath, ref List<ValidationResult>? results)
     {
         if (string.IsNullOrWhiteSpace(this.ClrName))
         {

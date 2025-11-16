@@ -296,7 +296,7 @@ public sealed class ApiSchema : ExtensibleBase
 
         // Initialize the lookup dictionaries for API scalar types by API name and CLR type.
         _apiScalarTypeApiNameLookup = new(StringComparer.OrdinalIgnoreCase);
-        _apiScalarTypeClrTypeLookup = new();
+        _apiScalarTypeClrTypeLookup = [];
         foreach (var apiScalarType in this.ApiScalarTypes)
         {
             _apiScalarTypeApiNameLookup[apiScalarType.ApiName] = apiScalarType;
@@ -305,7 +305,7 @@ public sealed class ApiSchema : ExtensibleBase
 
         // Initialize the lookup dictionaries for API enum types by API name and CLR type.
         _apiEnumTypeApiNameLookup = new(StringComparer.OrdinalIgnoreCase);
-        _apiEnumTypeClrTypeLookup = new();
+        _apiEnumTypeClrTypeLookup = [];
         foreach (var apiEnumType in this.ApiEnumTypes)
         {
             _apiEnumTypeApiNameLookup[apiEnumType.ApiName] = apiEnumType;
@@ -314,7 +314,7 @@ public sealed class ApiSchema : ExtensibleBase
 
         // Initialize the lookup dictionaries for API object types by API name and CLR type.
         _apiObjectTypeApiNameLookup = new(StringComparer.OrdinalIgnoreCase);
-        _apiObjectTypeClrTypeLookup = new();
+        _apiObjectTypeClrTypeLookup = [];
         foreach (var apiObjectType in this.ApiObjectTypes)
         {
             _apiObjectTypeApiNameLookup[apiObjectType.ApiName] = apiObjectType;

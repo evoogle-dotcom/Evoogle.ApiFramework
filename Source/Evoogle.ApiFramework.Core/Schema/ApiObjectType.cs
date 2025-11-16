@@ -30,12 +30,19 @@ namespace Evoogle.ApiFramework.Schema;
 /// <param name="apiProperties">The collection of API properties defined on this object type.</param>
 /// <param name="apiRelationships">The collection of API relationships defined on this object type.</param>
 /// <param name="clrObjectType">The CLR type representing this API object.</param>
-public sealed class ApiObjectType(string apiName, IEnumerable<ApiProperty> apiProperties, IEnumerable<ApiRelationship> apiRelationships, Type clrObjectType) : ApiNamedType(apiName, clrObjectType)
+public sealed partial class ApiObjectType
+(
+    string apiName,
+    IEnumerable<ApiProperty> apiProperties,
+    IEnumerable<ApiRelationship> apiRelationships,
+    Type clrObjectType,
+    ApiIdentitySet? apiIdentitySet = null
+) : ApiNamedType(apiName, clrObjectType)
 {
-    #region ApiObject Fields
-    private Dictionary<string, ApiProperty>? _propertyApiNameLookup = null;
-    private Dictionary<string, ApiProperty>? _propertyClrNameLookup = null;
-    private Dictionary<string, ApiRelationship>? _relationshipApiNameLookup = null;
+    #region ApiObjectType Fields
+    private Dictionary<string, ApiProperty>? _apiPropertyApiNameLookup = null;
+    private Dictionary<string, ApiProperty>? _apiPropertyClrNameLookup = null;
+    private Dictionary<string, ApiRelationship>? _apiRelationshipApiNameLookup = null;
     #endregion
 
     #region ApiType Properties
@@ -57,9 +64,24 @@ public sealed class ApiObjectType(string apiName, IEnumerable<ApiProperty> apiPr
     /// </summary>
     public ApiRelationship[] ApiRelationships { get; } = apiRelationships.SafeToArray();
 
-    private Dictionary<string, ApiProperty> PropertyApiNameLookup => this.ThrowIfNotInitialized(_propertyApiNameLookup);
-    private Dictionary<string, ApiProperty> PropertyClrNameLookup => this.ThrowIfNotInitialized(_propertyClrNameLookup);
-    private Dictionary<string, ApiRelationship> RelationshipApiNameLookup => this.ThrowIfNotInitialized(_relationshipApiNameLookup);
+    /// <summary>
+    ///     Gets the collection of API identities defined on this object type.
+    /// </summary>
+    public ApiIdentitySet? ApiIdentitySet => apiIdentitySet;
+
+    /// <summary>
+    ///     Gets the primary API identity for this object type, if available.
+    /// </summary>
+    public ApiIdentity? ApiPrimaryIdentity => this.ApiIdentitySet?.ApiPrimaryIdentity;
+
+    /// <summary>
+    ///     Indicates whether this object type has any API identities defined.
+    /// </summary>
+    public bool HasIdentity => this.ApiIdentitySet is not null;
+
+    private Dictionary<string, ApiProperty> ApiPropertyApiNameLookup => this.ThrowIfNotInitialized(_apiPropertyApiNameLookup);
+    private Dictionary<string, ApiProperty> ApiPropertyClrNameLookup => this.ThrowIfNotInitialized(_apiPropertyClrNameLookup);
+    private Dictionary<string, ApiRelationship> ApiRelationshipApiNameLookup => this.ThrowIfNotInitialized(_apiRelationshipApiNameLookup);
     #endregion
 
     #region ApiType Methods
@@ -69,21 +91,38 @@ public sealed class ApiObjectType(string apiName, IEnumerable<ApiProperty> apiPr
 
         base.Initialize(apiSchema, ref results);
 
-        this.InitializeLookupDictionaries(apiSchema, ref results);
+        this.InitializeLookupDictionaries(ref results);
 
         this.InitializeApiProperties(apiSchema, ref results);
         this.InitializeApiRelationships(apiSchema, ref results);
+        this.InitializeApiIdentitySet(apiSchema, ref results);
     }
     #endregion
 
     #region ApiObjectType Methods
+    /// <summary>
+    ///     Attempts to retrieve an API identity by its API name.
+    /// </summary>
+    /// <param name="name">The name of the identity to retrieve.</param>
+    /// <param name="apiIdentity">When this method returns, contains the <see cref="ApiIdentity"/> if found; otherwise, null.</param>
+    /// <returns>True if the identity was found; otherwise, false.</returns>
+    public bool TryGetIdentityByApiName(string apiName, out ApiIdentity? apiIdentity)
+    {
+        if (!this.HasIdentity)
+        {
+            apiIdentity = null;
+            return false;
+        }
+        return this.ApiIdentitySet!.TryGetIdentityByApiName(apiName, out apiIdentity);
+    }
+
     /// <summary>
     ///     Attempts to retrieve an API property by its API name.
     /// </summary>
     /// <param name="apiName">The API name of the property to retrieve.</param>
     /// <param name="value">When this method returns, contains the <see cref="ApiProperty"/> if found; otherwise, null.</param>
     /// <returns>True if the property was found; otherwise, false.</returns>
-    public bool TryGetPropertyByApiName(string apiName, out ApiProperty? value) => this.PropertyApiNameLookup.TryGetValue(apiName, out value);
+    public bool TryGetPropertyByApiName(string apiName, out ApiProperty? value) => this.ApiPropertyApiNameLookup.TryGetValue(apiName, out value);
 
     /// <summary>
     ///     Attempts to retrieve an API property by its CLR name.
@@ -91,7 +130,7 @@ public sealed class ApiObjectType(string apiName, IEnumerable<ApiProperty> apiPr
     /// <param name="clrName">The CLR name of the property to retrieve.</param>
     /// <param name="value">When this method returns, contains the <see cref="ApiProperty"/> if found; otherwise, null.</param>
     /// <returns>True if the property was found; otherwise, false.</returns>
-    public bool TryGetPropertyByClrName(string clrName, out ApiProperty? value) => this.PropertyClrNameLookup.TryGetValue(clrName, out value);
+    public bool TryGetPropertyByClrName(string clrName, out ApiProperty? value) => this.ApiPropertyClrNameLookup.TryGetValue(clrName, out value);
 
     /// <summary>
     ///     Attempts to retrieve an API relationship by its API name.
@@ -99,7 +138,7 @@ public sealed class ApiObjectType(string apiName, IEnumerable<ApiProperty> apiPr
     /// <param name="apiName">The API name of the relationship to retrieve.</param>
     /// <param name="value">When this method returns, contains the <see cref="ApiRelationship"/> if found; otherwise, null.</param>
     /// <returns>True if the relationship was found; otherwise, false.</returns>
-    public bool TryGetRelationshipByApiName(string apiName, out ApiRelationship? value) => this.RelationshipApiNameLookup.TryGetValue(apiName, out value);
+    public bool TryGetRelationshipByApiName(string apiName, out ApiRelationship? value) => this.ApiRelationshipApiNameLookup.TryGetValue(apiName, out value);
     #endregion
 
     #region Object Methods
@@ -115,6 +154,17 @@ public sealed class ApiObjectType(string apiName, IEnumerable<ApiProperty> apiPr
     #endregion
 
     #region Implementation Methods
+    private void InitializeApiIdentitySet(ApiSchema apiSchema, ref List<ValidationResult>? results)
+    {
+        if (this.ApiIdentitySet is null)
+        {
+            return; // optional (no identity for this object type)
+        }
+
+        var apiValidationPath = $"{this.ValidationPath}.Identities";
+        this.ApiIdentitySet.Initialize(apiSchema, this, apiValidationPath, ref results);
+    }
+
     private void InitializeApiProperties(ApiSchema apiSchema, ref List<ValidationResult>? results)
     {
         if (this.ApiProperties is null)
@@ -167,11 +217,11 @@ public sealed class ApiObjectType(string apiName, IEnumerable<ApiProperty> apiPr
         }
     }
 
-    private void InitializeLookupDictionaries(ApiSchema _, ref List<ValidationResult>? results)
+    private void InitializeLookupDictionaries(ref List<ValidationResult>? results)
     {
-        _propertyApiNameLookup = null;
-        _propertyClrNameLookup = null;
-        _relationshipApiNameLookup = null;
+        _apiPropertyApiNameLookup = null;
+        _apiPropertyClrNameLookup = null;
+        _apiRelationshipApiNameLookup = null;
 
         var anyPropertyApiNameDuplicates = ApiSchemaHelpers.ValidateUnique(this.ApiProperties, x => x.ApiName, this.ValidationPath, nameof(ApiProperty.ApiName), ref results);
         var anyPropertyClrNameDuplicates = ApiSchemaHelpers.ValidateUnique(this.ApiProperties, x => x.ClrName, this.ValidationPath, nameof(ApiProperty.ClrName), ref results);
@@ -179,17 +229,17 @@ public sealed class ApiObjectType(string apiName, IEnumerable<ApiProperty> apiPr
 
         if (!anyPropertyApiNameDuplicates)
         {
-            _propertyApiNameLookup = this.ApiProperties.ToDictionary(x => x.ApiName, StringComparer.OrdinalIgnoreCase);
+            _apiPropertyApiNameLookup = this.ApiProperties.ToDictionary(x => x.ApiName, StringComparer.OrdinalIgnoreCase);
         }
 
         if (!anyPropertyClrNameDuplicates)
         {
-            _propertyClrNameLookup = this.ApiProperties.ToDictionary(x => x.ClrName, StringComparer.OrdinalIgnoreCase);
+            _apiPropertyClrNameLookup = this.ApiProperties.ToDictionary(x => x.ClrName, StringComparer.OrdinalIgnoreCase);
         }
 
         if (!anyRelationshipApiNameDuplicates)
         {
-            _relationshipApiNameLookup = this.ApiRelationships.ToDictionary(x => x.ApiName, StringComparer.OrdinalIgnoreCase);
+            _apiRelationshipApiNameLookup = this.ApiRelationships.ToDictionary(x => x.ApiName, StringComparer.OrdinalIgnoreCase);
         }
     }
     #endregion

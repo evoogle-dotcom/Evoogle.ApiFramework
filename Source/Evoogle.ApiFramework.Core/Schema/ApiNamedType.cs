@@ -43,8 +43,8 @@ public abstract class ApiNamedType(string apiName, Type clrType) : ApiType()
     {
         ArgumentNullException.ThrowIfNull(apiSchema);
 
-        this.InitializeApiName(apiSchema, ref results);
-        this.InitializeClrType(apiSchema, ref results);
+        this.InitializeApiName(ref results);
+        this.InitializeClrType(ref results);
     }
     #endregion
 
@@ -52,9 +52,8 @@ public abstract class ApiNamedType(string apiName, Type clrType) : ApiType()
     /// <summary>
     /// Validates that the <see cref="ApiName"/> is not null or whitespace.
     /// </summary>
-    /// <param name="_">The current <see cref="ApiSchema"/> instance (unused).</param>
     /// <param name="results">Validation results collection to populate.</param>
-    private void InitializeApiName(ApiSchema _, ref List<ValidationResult>? results)
+    private void InitializeApiName(ref List<ValidationResult>? results)
     {
         if (string.IsNullOrWhiteSpace(this.ApiName))
         {
@@ -66,9 +65,8 @@ public abstract class ApiNamedType(string apiName, Type clrType) : ApiType()
     /// <summary>
     /// Validates that the <see cref="ClrType"/> is not null.
     /// </summary>
-    /// <param name="_">The current <see cref="ApiSchema"/> instance (unused).</param>
     /// <param name="results">Validation results collection to populate.</param>
-    private void InitializeClrType(ApiSchema _, ref List<ValidationResult>? results)
+    private void InitializeClrType(ref List<ValidationResult>? results)
     {
         if (this.ClrType is null)
         {

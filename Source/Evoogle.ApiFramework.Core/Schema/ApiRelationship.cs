@@ -77,8 +77,8 @@ public sealed class ApiRelationship(string apiName, string? apiPropertyName = nu
         ArgumentNullException.ThrowIfNull(apiObjectType);
         ArgumentException.ThrowIfNullOrWhiteSpace(apiValidationPath);
 
-        this.InitializeApiName(apiSchema, apiValidationPath, ref results);
-        this.InitializeApiProperty(apiSchema, apiObjectType, apiValidationPath, ref results);
+        this.InitializeApiName(apiValidationPath, ref results);
+        this.InitializeApiProperty(apiObjectType, apiValidationPath, ref results);
     }
     #endregion
 
@@ -102,7 +102,7 @@ public sealed class ApiRelationship(string apiName, string? apiPropertyName = nu
     #endregion
 
     #region Implementation Methods
-    private void InitializeApiName(ApiSchema _, string apiValidationPath, ref List<ValidationResult>? results)
+    private void InitializeApiName(string apiValidationPath, ref List<ValidationResult>? results)
     {
         if (string.IsNullOrWhiteSpace(this.ApiName))
         {
@@ -111,7 +111,7 @@ public sealed class ApiRelationship(string apiName, string? apiPropertyName = nu
         }
     }
 
-    private void InitializeApiProperty(ApiSchema _, ApiObjectType apiObjectType, string apiValidationPath, ref List<ValidationResult>? results)
+    private void InitializeApiProperty(ApiObjectType apiObjectType, string apiValidationPath, ref List<ValidationResult>? results)
     {
         _apiResolvedProperty = null;
 
