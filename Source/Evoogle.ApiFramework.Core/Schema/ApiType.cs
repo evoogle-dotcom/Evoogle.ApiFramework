@@ -31,11 +31,16 @@ public abstract class ApiType : ExtensibleBase
     protected abstract string ApiTypeName { get; }
 
     /// <summary>Gets the validation path for the API type, used for error messages and validation results.</summary>
-    protected abstract string ValidationPath { get; }
+    // protected abstract string ValidationPath { get; }
     #endregion
 
     #region ApiType Methods
-    internal virtual void Initialize(ApiSchema apiSchema, ref List<ValidationResult>? results)
-    { }
+    /// <summary>
+    ///     Gets the validation path for the API type, used for error messages and validation results.
+    /// </summary>
+    /// <returns>The validation path as a string.</returns>
+    protected abstract string GetValidationPath();
+
+    internal abstract void Initialize(ApiSchema apiSchema, ref List<ValidationResult>? results);
     #endregion
 }

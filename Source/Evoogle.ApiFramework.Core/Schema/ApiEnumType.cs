@@ -100,27 +100,33 @@ public sealed class ApiEnumType(string apiName, IEnumerable<ApiEnumValue> apiEnu
     #region Implementation Methods
     private void InitializeApiEnumValues(ApiSchema apiSchema, ref List<ValidationResult>? results)
     {
+        var apiValidationPath = this.GetValidationPath();
+
         if (this.ApiEnumValues is null)
         {
             results ??= [];
-            results.Add(new ValidationResult($"{this.ValidationPath}.{nameof(this.ApiEnumValues)} cannot be null.", [nameof(this.ApiEnumValues)]));
+            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ApiEnumValues)} cannot be null.", [nameof(this.ApiEnumValues)]));
             return;
         }
 
         var apiEnumValuesCount = this.ApiEnumValues.Length;
         for (var i = 0; i < apiEnumValuesCount; ++i)
         {
-            var apiValidationPath = $"{this.ValidationPath}.{nameof(this.ApiEnumValues)}[{i}]";
-
             var apiEnumValue = this.ApiEnumValues[i];
             if (apiEnumValue is null)
             {
                 results ??= [];
-                results.Add(new ValidationResult($"{apiValidationPath} cannot be null.", [nameof(this.ApiEnumValues)]));
+                results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ApiEnumValues)}[{i}] cannot be null.", [nameof(this.ApiEnumValues)]));
                 continue;
             }
 
-            apiEnumValue.Initialize(apiSchema, apiValidationPath, ref results);
+            var apiEnumValueValidationPath = apiEnumValue.GetValidationPath(parentPath: apiValidationPath);
+            apiEnumValue.Initialize
+            (
+                apiSchema,
+                apiEnumValueValidationPath,
+                ref results
+            );
         }
     }
 
@@ -134,7 +140,7 @@ public sealed class ApiEnumType(string apiName, IEnumerable<ApiEnumValue> apiEnu
         if (!TypeReflection.IsEnum(this.ClrType))
         {
             results ??= [];
-            results.Add(new ValidationResult($"{this.ValidationPath}.{nameof(this.ClrType)} must be a CLR enum type.", [nameof(this.ClrType)]));
+            results.Add(new ValidationResult($"{this.GetValidationPath()}.{nameof(this.ClrType)} must be a CLR enum type.", [nameof(this.ClrType)]));
         }
     }
 
@@ -144,9 +150,9 @@ public sealed class ApiEnumType(string apiName, IEnumerable<ApiEnumValue> apiEnu
         _clrNameLookup = null;
         _clrOrdinalLookup = null;
 
-        var anyApiNameDuplicates = ApiSchemaHelpers.ValidateUnique(this.ApiEnumValues, x => x.ApiName, this.ValidationPath, nameof(ApiEnumValue.ApiName), ref results);
-        var anyClrNameDuplicates = ApiSchemaHelpers.ValidateUnique(this.ApiEnumValues, x => x.ClrName, this.ValidationPath, nameof(ApiEnumValue.ClrName), ref results);
-        var anyClrOrdinalDuplicates = ApiSchemaHelpers.ValidateUnique(this.ApiEnumValues, x => x.ClrOrdinal, this.ValidationPath, nameof(ApiEnumValue.ClrOrdinal), ref results);
+        var anyApiNameDuplicates = ApiSchemaHelpers.ValidateUnique(this.ApiEnumValues, x => x.ApiName, this.GetValidationPath(), nameof(ApiEnumValue.ApiName), ref results);
+        var anyClrNameDuplicates = ApiSchemaHelpers.ValidateUnique(this.ApiEnumValues, x => x.ClrName, this.GetValidationPath(), nameof(ApiEnumValue.ClrName), ref results);
+        var anyClrOrdinalDuplicates = ApiSchemaHelpers.ValidateUnique(this.ApiEnumValues, x => x.ClrOrdinal, this.GetValidationPath(), nameof(ApiEnumValue.ClrOrdinal), ref results);
 
         if (!anyApiNameDuplicates)
         {

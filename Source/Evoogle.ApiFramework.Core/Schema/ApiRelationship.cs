@@ -71,6 +71,8 @@ public sealed class ApiRelationship(string apiName, string? apiPropertyName = nu
     #endregion
 
     #region ApiRelationship Methods
+    internal string GetValidationPath(string parentPath) => $"{parentPath.SafeToString()}.{nameof(ApiRelationship)}[\"{this.ApiName.SafeToString()}\"]";
+
     internal void Initialize(ApiSchema apiSchema, ApiObjectType apiObjectType, string apiValidationPath, ref List<ValidationResult>? results)
     {
         ArgumentNullException.ThrowIfNull(apiSchema);

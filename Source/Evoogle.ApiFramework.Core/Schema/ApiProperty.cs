@@ -9,6 +9,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.Json.Serialization;
 
+using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Schema.Json;
 using Evoogle.Extension;
 using Evoogle.Extensions;
@@ -27,12 +28,10 @@ namespace Evoogle.ApiFramework.Schema;
 ///         <see cref="ApiRelationship"/> instances to convey semantic meaning (e.g., parent-child, references).
 ///     </para>
 ///     <para>
-///         Getter and setter accessors are compiled on-demand as lambda expressions and cached per
-///         target CLR type using thread-safe <see cref="ConcurrentDictionary{TKey, TValue}"/> instances. This
-///         avoids repeated reflection and keeps hot paths allocation-friendly. For reference types, the
-///         compiled delegates operate on the runtime type when the declared type is not sealed to honor
-///         derived members. For value types (struct targets), a dedicated by-ref setter is provided to
-///         ensure mutations affect the original instance.
+///         For optimal performance, getter and setter accessors are compiled once during initialization
+///         as lambda expressions using the owning <see cref="ApiObjectType"/>'s CLR type. The compiled
+///         delegates are stored directly on each <see cref="ApiProperty"/> instance and provide near-native
+///         performance (~10-20x faster than reflection) for property/field access operations.
 ///     </para>
 ///     <para>
 ///         The non-generic Try* methods accept <see cref="object"/> and will box value types by design. Prefer
@@ -47,32 +46,38 @@ namespace Evoogle.ApiFramework.Schema;
 public sealed class ApiProperty(string apiName, ApiTypeExpression apiTypeExpression, ApiTypeModifiers apiTypeModifiers, string clrName) : ExtensibleBase
 {
     #region Types
-    private delegate void ByRefAction<TTarget, in TValue>(ref TTarget target, TValue value);
+    private delegate void ByRefAction<TObject, in TValue>(ref TObject clrObject, TValue? clrValue);
 
-    private readonly record struct CacheKey(Type TargetType, string MemberName);
+    private readonly record struct ClrCacheKey(Type ClrObjectType, string ClrMemberName);
 
-    private readonly record struct GetterCacheValue<TObject, TValue>(bool Found, Func<TObject, TValue>? Getter);
+    private readonly record struct ClrGetterCacheValue<TObject, TValue>(Func<TObject, TValue?>? ClrGetter);
 
-    private readonly record struct SetterCacheValue<TObject, TValue>(bool Found, Action<TObject, TValue>? Setter);
+    private readonly record struct ClrSetterCacheValue<TObject, TValue>(Action<TObject, TValue?>? ClrSetter);
 
-    private readonly record struct SetterRefCacheValue<TObject, TValue>(bool Found, ByRefAction<TObject, TValue>? Setter)
+    private readonly record struct ClrSetterByRefCacheValue<TObject, TValue>(ByRefAction<TObject, TValue?>? ClrSetterByRef)
         where TObject : struct;
 
-    private static class GetterCache<TObject, TValue>
+    private static class ClrGetterCache<TObject, TValue>
     {
-        public static readonly ConcurrentDictionary<CacheKey, GetterCacheValue<TObject, TValue>> Cache = new();
+        public static readonly ConcurrentDictionary<ClrCacheKey, ClrGetterCacheValue<TObject, TValue>> Cache = new();
     }
 
-    private static class SetterCache<TObject, TValue>
+    private static class ClrSetterCache<TObject, TValue>
     {
-        public static readonly ConcurrentDictionary<CacheKey, SetterCacheValue<TObject, TValue>> Cache = new();
+        public static readonly ConcurrentDictionary<ClrCacheKey, ClrSetterCacheValue<TObject, TValue>> Cache = new();
     }
 
-    private static class SetterRefCache<TObject, TValue>
+    private static class ClrSetterByRefCache<TObject, TValue>
         where TObject : struct
     {
-        public static readonly ConcurrentDictionary<CacheKey, SetterRefCacheValue<TObject, TValue>> Cache = new();
+        public static readonly ConcurrentDictionary<ClrCacheKey, ClrSetterByRefCacheValue<TObject, TValue>> Cache = new();
     }
+    #endregion
+
+    #region Fields
+    private Func<object, object?>? _clrGetter;
+
+    private Action<object, object?>? _clrSetter;
     #endregion
 
     #region Properties
@@ -97,53 +102,254 @@ public sealed class ApiProperty(string apiName, ApiTypeExpression apiTypeExpress
 
     #region ApiProperty Methods
     /// <summary>
+    ///     Gets the value of this property from the specified object.
+    /// </summary>
+    /// <param name="clrObject">The object instance to get the property value from.</param>
+    /// <returns>The property value.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="clrObject"/> is null.</exception>
+    /// <exception cref="ApiSchemaException">Thrown when the property has no compiled getter or the getter fails to execute.</exception>
+    /// <remarks>
+    ///     This method uses a pre-compiled lambda expression for optimal performance.
+    ///     The return value will be boxed if the property type is a value type.
+    /// </remarks>
+    public object? GetValue(object clrObject)
+    {
+        ArgumentNullException.ThrowIfNull(clrObject, nameof(clrObject));
+
+        if (_clrGetter is null)
+        {
+            var errorMessage =
+                $"Cannot get value for property '{this.ClrName}': no compiled getter available. " +
+                $"This may indicate the property does not exist on the target type, is write-only, or the schema was not initialized properly.";
+            throw new ApiSchemaException(errorMessage);
+        }
+
+        try
+        {
+            return _clrGetter(clrObject);
+        }
+        catch (Exception ex)
+        {
+            var errorMessage = $"Failed to get value for property '{this.ClrName}' from object of type '{clrObject.GetType().SafeToName()}': {ex.Message}";
+            throw new ApiSchemaException(errorMessage, ex);
+        }
+    }
+
+    /// <summary>
+    ///     Gets the value of this property from the specified object with type safety.
+    /// </summary>
+    /// <typeparam name="TObject">The type of the object containing the property.</typeparam>
+    /// <typeparam name="TValue">The expected return type of the property value.</typeparam>
+    /// <param name="clrObject">The object instance to get the property value from.</param>
+    /// <returns>The property value typed as <typeparamref name="TValue"/>.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="clrObject"/> is null.</exception>
+    /// <exception cref="ApiSchemaException">Thrown when the typed getter cannot be compiled or the getter fails to execute.</exception>
+    /// <remarks>
+    ///     <para>
+    ///         This method compiles and caches a typed lambda expression per unique combination of
+    ///         <typeparamref name="TObject"/> and <typeparamref name="TValue"/>. The compiled delegate
+    ///         is cached for subsequent calls, providing near-native performance.
+    ///     </para>
+    ///     <para>
+    ///         Prefer this generic overload over the non-generic version when the types are known
+    ///         at compile time to avoid boxing overhead for value types.
+    ///     </para>
+    /// </remarks>
+    public TValue? GetValue<TObject, TValue>(TObject clrObject)
+        where TObject : notnull
+    {
+        ArgumentNullException.ThrowIfNull(clrObject, nameof(clrObject));
+
+        var clrObjectType = typeof(TObject);
+        var clrCacheKey = new ClrCacheKey(clrObjectType, this.ClrName);
+        var clrCacheValue = ClrGetterCache<TObject, TValue>.Cache.GetOrAdd(clrCacheKey, static k => BuildGenericClrGetter<TObject, TValue>(k.ClrObjectType, k.ClrMemberName));
+        var clrGetter = clrCacheValue.ClrGetter;
+
+        if (clrGetter is null)
+        {
+            var errorMessage =
+                $"Cannot get value for property '{this.ClrName}' on type '{typeof(TObject).SafeToName()}': " +
+                $"failed to compile typed getter for return type '{typeof(TValue).SafeToName()}'. " +
+                $"Verify the property exists, is readable, and the return type is compatible.";
+            throw new ApiSchemaException(errorMessage);
+        }
+
+        try
+        {
+            return clrGetter(clrObject);
+        }
+        catch (Exception ex)
+        {
+            var errorMessage = $"Failed to get value for property '{this.ClrName}' from object of type '{typeof(TObject).SafeToName()}': {ex.Message}";
+            throw new ApiSchemaException(errorMessage, ex);
+        }
+    }
+
+    /// <summary>
+    ///     Sets the value of this property on the specified object.
+    /// </summary>
+    /// <param name="clrObject">The object instance to set the property value on.</param>
+    /// <param name="clrValue">The value to assign to the property.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="clrObject"/> is null.</exception>
+    /// <exception cref="ApiSchemaException">Thrown when the property has no compiled setter, is read-only, or the setter fails to execute.</exception>
+    /// <remarks>
+    ///     This method uses a pre-compiled lambda expression for optimal performance.
+    ///     For struct targets passed by value, this method will modify a copy. Use the generic
+    ///     <see cref="SetValueByRef{TObject, TValue}(ref TObject, TValue)"/> method for struct mutation.
+    /// </remarks>
+    public void SetValue(object clrObject, object? clrValue)
+    {
+        ArgumentNullException.ThrowIfNull(clrObject, nameof(clrObject));
+
+        if (_clrSetter is null)
+        {
+            var errorMessage =
+                $"Cannot set value for property '{this.ClrName}': no compiled setter available. " +
+                $"This property may be read-only, write-only (getter missing), not exist on the target type, or the schema was not initialized properly.";
+            throw new ApiSchemaException(errorMessage);
+        }
+
+        try
+        {
+            _clrSetter(clrObject, clrValue);
+        }
+        catch (Exception ex)
+        {
+            var valueTypeName = clrValue?.GetType().SafeToName() ?? "null";
+            var errorMessage =
+                $"Failed to set value for property '{this.ClrName}' on object of type '{clrObject.GetType().SafeToName()}' " +
+                $"with value of type '{valueTypeName}': {ex.Message}";
+            throw new ApiSchemaException(errorMessage, ex);
+        }
+    }
+
+    /// <summary>
+    ///     Sets the value of this property on the specified object with type safety.
+    /// </summary>
+    /// <typeparam name="TObject">The type of the object containing the property.</typeparam>
+    /// <typeparam name="TValue">The type of the value to assign.</typeparam>
+    /// <param name="clrObject">The object instance to set the property value on.</param>
+    /// <param name="clrValue">The value to assign to the property.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="clrObject"/> is null.</exception>
+    /// <exception cref="ApiSchemaException">Thrown when the typed setter cannot be compiled, the property is read-only, or the setter fails to execute.</exception>
+    /// <remarks>
+    ///     <para>
+    ///         This method compiles and caches a typed lambda expression per unique combination of
+    ///         <typeparamref name="TObject"/> and <typeparamref name="TValue"/>. The compiled delegate
+    ///         is cached for subsequent calls, providing near-native performance.
+    ///     </para>
+    ///     <para>
+    ///         For struct targets passed by value, this method will modify a copy. Use
+    ///         <see cref="SetValueByRef{TObject, TValue}(ref TObject, TValue)"/> for struct mutation.
+    ///     </para>
+    /// </remarks>
+    public void SetValue<TObject, TValue>(TObject clrObject, TValue? clrValue)
+        where TObject : notnull
+    {
+        ArgumentNullException.ThrowIfNull(clrObject, nameof(clrObject));
+
+        var clrObjectType = typeof(TObject);
+        var clrCacheKey = new ClrCacheKey(clrObjectType, this.ClrName);
+        var clrCacheValue = ClrSetterCache<TObject, TValue>.Cache.GetOrAdd(clrCacheKey, static k => BuildGenericClrSetter<TObject, TValue>(k.ClrObjectType, k.ClrMemberName));
+        var clrSetter = clrCacheValue.ClrSetter;
+
+        if (clrSetter is null)
+        {
+            var errorMessage =
+                $"Cannot set value for property '{this.ClrName}' on type '{typeof(TObject).SafeToName()}': " +
+                $"failed to compile typed setter for value type '{typeof(TValue).SafeToName()}'. " +
+                $"Verify the property exists, is writable, and the value type is compatible.";
+            throw new ApiSchemaException(errorMessage);
+        }
+
+        try
+        {
+            clrSetter(clrObject, clrValue);
+        }
+        catch (Exception ex)
+        {
+            var valueTypeName = clrValue?.GetType().SafeToName() ?? "null";
+            var errorMessage =
+                $"Failed to set value for property '{this.ClrName}' on object of type '{typeof(TObject).SafeToName()}' " +
+                $"with value of type '{valueTypeName}': {ex.Message}";
+            throw new ApiSchemaException(errorMessage, ex);
+        }
+    }
+
+    /// <summary>
+    ///     Sets the value of this property on the specified struct by reference, ensuring mutations affect the original instance.
+    /// </summary>
+    /// <typeparam name="TObject">The struct type of the object containing the property.</typeparam>
+    /// <typeparam name="TValue">The type of the value to assign.</typeparam>
+    /// <param name="clrObject">The struct instance passed by reference to set the property value on.</param>
+    /// <param name="clrValue">The value to assign to the property.</param>
+    /// <exception cref="ApiSchemaException">Thrown when the by-ref setter cannot be compiled, the property is read-only, or the setter fails to execute.</exception>
+    /// <remarks>
+    ///     <para>
+    ///         This method compiles and caches a by-reference lambda expression for struct mutation.
+    ///         Unlike <see cref="SetValue{TObject, TValue}(TObject, TValue)"/>, this method ensures
+    ///         the original struct instance is modified rather than a copy.
+    ///     </para>
+    ///     <para>
+    ///         Use this method when you need to mutate struct properties in place, such as when
+    ///         working with struct collections or ref locals.
+    ///     </para>
+    /// </remarks>
+    public void SetValueByRef<TObject, TValue>(ref TObject clrObject, TValue? clrValue)
+        where TObject : struct
+    {
+        var clrObjectType = typeof(TObject);
+        var clrCacheKey = new ClrCacheKey(clrObjectType, this.ClrName);
+        var clrCacheValue = ClrSetterByRefCache<TObject, TValue>.Cache.GetOrAdd(clrCacheKey, static k => BuildGenericClrSetterByRef<TObject, TValue>(k.ClrObjectType, k.ClrMemberName));
+        var clrSetterByRef = clrCacheValue.ClrSetterByRef;
+
+        if (clrSetterByRef is null)
+        {
+            var errorMessage =
+                $"Cannot set value for property '{this.ClrName}' on struct type '{typeof(TObject).SafeToName()}': " +
+                $"failed to compile by-ref setter for value type '{typeof(TValue).SafeToName()}'. " +
+                $"Verify the property exists on the struct, is writable (not readonly/init-only), and the value type is compatible.";
+            throw new ApiSchemaException(errorMessage);
+        }
+
+        try
+        {
+            clrSetterByRef(ref clrObject, clrValue);
+        }
+        catch (Exception ex)
+        {
+            var valueTypeName = clrValue?.GetType().SafeToName() ?? "null";
+            var errorMessage =
+                $"Failed to set value for property '{this.ClrName}' on struct of type '{typeof(TObject).SafeToName()}' " +
+                $"with value of type '{valueTypeName}': {ex.Message}";
+            throw new ApiSchemaException(errorMessage, ex);
+        }
+    }
+
+    /// <summary>
     ///     Attempts to read the CLR member value identified by <see cref="ClrName"/> from the specified <paramref name="clrObject"/>.
     ///     This non-generic overload returns the value as <see cref="object"/>, which will box value types.
     /// </summary>
     /// <param name="clrObject">The object instance containing the member.</param>
-    /// <param name="clrValue">When this method returns, contains the member value if found; otherwise the default.</param>
+    /// <param name="clrValue">When this method returns, contains the member value if successful; otherwise, the default value.</param>
     /// <returns><c>true</c> if the value was retrieved successfully; otherwise, <c>false</c>.</returns>
-    public bool TryGetValue(object clrObject, out object? clrValue)
+    /// <remarks>
+    ///     <para>
+    ///         This method never throws exceptions. It returns <c>false</c> if:
+    ///         <list type="bullet">
+    ///             <item><description>The <paramref name="clrObject"/> is null</description></item>
+    ///             <item><description>The property has no compiled getter</description></item>
+    ///             <item><description>An exception occurs during property access</description></item>
+    ///         </list>
+    ///     </para>
+    ///     <para>
+    ///         Prefer this method over <see cref="GetValue(object)"/> when failure is expected
+    ///         or performance is critical, as it avoids exception overhead.
+    ///     </para>
+    /// </remarks>
+    public bool TryGetValue(object? clrObject, out object? clrValue)
     {
-        if (clrObject is null)
-        {
-            clrValue = default;
-            return false;
-        }
-
-        var ok = this.TryGetValue<object, object?>(clrObject, out var result);
-        clrValue = result;
-        return ok;
-    }
-
-    /// <summary>
-    ///     Attempts to read the CLR member value identified by <see cref="ClrName"/> from the specified <paramref name="clrObject"/> without unnecessary boxing when possible.
-    ///     Compiles and caches a typed <see cref="Func{T, TResult}"/> delegate per target type.
-    /// </summary>
-    /// <typeparam name="TObject">The static type of the target instance.</typeparam>
-    /// <typeparam name="TValue">The desired return type for the member value.</typeparam>
-    /// <param name="clrObject">The object instance containing the member.</param>
-    /// <param name="clrValue">When this method returns, contains the member value if found; otherwise the default.</param>
-    /// <returns><c>true</c> if the value was retrieved successfully; otherwise, <c>false</c>.</returns>
-    public bool TryGetValue<TObject, TValue>(TObject clrObject, out TValue? clrValue)
-    {
-        if (clrObject is null)
-        {
-            clrValue = default;
-            return false;
-        }
-
-        // Use runtime type for non-sealed reference types to respect derived members
-        var targetType = typeof(TObject);
-        if (!targetType.IsValueType && !targetType.IsSealed)
-        {
-            targetType = clrObject.GetType();
-        }
-
-        var key = new CacheKey(targetType, this.ClrName);
-        var cacheValue = GetterCache<TObject, TValue>.Cache.GetOrAdd(key, static k => BuildTypedGetter<TObject, TValue>(k.TargetType, k.MemberName));
-
-        if (!cacheValue.Found || cacheValue.Getter is null)
+        if (clrObject is null || _clrGetter is null)
         {
             clrValue = default;
             return false;
@@ -151,7 +357,68 @@ public sealed class ApiProperty(string apiName, ApiTypeExpression apiTypeExpress
 
         try
         {
-            clrValue = cacheValue.Getter(clrObject);
+            clrValue = _clrGetter(clrObject);
+            return true;
+        }
+        catch
+        {
+            clrValue = default;
+            return false;
+        }
+    }
+
+    /// <summary>
+    ///     Attempts to read the CLR member value identified by <see cref="ClrName"/> from the specified <paramref name="clrObject"/>
+    ///     with type safety and minimal boxing overhead.
+    /// </summary>
+    /// <typeparam name="TObject">The static type of the target instance.</typeparam>
+    /// <typeparam name="TValue">The desired return type for the member value.</typeparam>
+    /// <param name="clrObject">The object instance containing the member.</param>
+    /// <param name="clrValue">When this method returns, contains the member value if successful; otherwise, the default value.</param>
+    /// <returns><c>true</c> if the value was retrieved successfully; otherwise, <c>false</c>.</returns>
+    /// <remarks>
+    ///     <para>
+    ///         This method compiles and caches a typed lambda expression per unique combination of
+    ///         <typeparamref name="TObject"/> and <typeparamref name="TValue"/>. Subsequent calls with
+    ///         the same type parameters reuse the cached delegate for optimal performance.
+    ///     </para>
+    ///     <para>
+    ///         This method never throws exceptions. It returns <c>false</c> if:
+    ///         <list type="bullet">
+    ///             <item><description>The <paramref name="clrObject"/> is null</description></item>
+    ///             <item><description>The typed getter cannot be compiled</description></item>
+    ///             <item><description>An exception occurs during property access</description></item>
+    ///         </list>
+    ///     </para>
+    ///     <para>
+    ///         Prefer this generic overload over the non-generic version when types are known at
+    ///         compile time to avoid boxing value types.
+    ///     </para>
+    /// </remarks>
+    public bool TryGetValue<TObject, TValue>(TObject? clrObject, out TValue? clrValue)
+    {
+        if (clrObject is null)
+        {
+            clrValue = default;
+            return false;
+        }
+
+        var clrObjectType = typeof(TObject);
+        var clrMemberName = this.ClrName;
+
+        var clrCacheKey = new ClrCacheKey(clrObjectType, clrMemberName);
+        var clrCacheValue = ClrGetterCache<TObject, TValue>.Cache.GetOrAdd(clrCacheKey, static k => BuildGenericClrGetter<TObject, TValue>(k.ClrObjectType, k.ClrMemberName));
+        var clrGetter = clrCacheValue.ClrGetter;
+
+        if (clrGetter is null)
+        {
+            clrValue = default;
+            return false;
+        }
+
+        try
+        {
+            clrValue = clrGetter(clrObject);
             return true;
         }
         catch
@@ -164,56 +431,100 @@ public sealed class ApiProperty(string apiName, ApiTypeExpression apiTypeExpress
     /// <summary>
     ///     Attempts to set the CLR member identified by <see cref="ClrName"/> on the specified <paramref name="clrObject"/> to <paramref name="clrValue"/>.
     ///     This non-generic overload accepts <see cref="object"/> parameters and will box value types by design.
-    ///     For struct targets, this method sets a copy and will not mutate the caller's instance.
     /// </summary>
     /// <param name="clrObject">The object instance containing the member to set.</param>
     /// <param name="clrValue">The value to assign to the member.</param>
     /// <returns><c>true</c> if the assignment succeeded; otherwise, <c>false</c>.</returns>
-    public bool TrySetValue(object clrObject, object? clrValue)
+    /// <remarks>
+    ///     <para>
+    ///         This method never throws exceptions. It returns <c>false</c> if:
+    ///         <list type="bullet">
+    ///             <item><description>The <paramref name="clrObject"/> is null</description></item>
+    ///             <item><description>The property has no compiled setter or is read-only</description></item>
+    ///             <item><description>An exception occurs during property assignment</description></item>
+    ///         </list>
+    ///     </para>
+    ///     <para>
+    ///         For struct targets passed by value, this method modifies a copy. Use
+    ///         <see cref="TrySetValueByRef{TObject, TValue}(ref TObject, TValue)"/> for struct mutation.
+    ///     </para>
+    ///     <para>
+    ///         Prefer this method over <see cref="SetValue(object, object)"/> when failure is expected
+    ///         or performance is critical, as it avoids exception overhead.
+    ///     </para>
+    /// </remarks>
+    public bool TrySetValue(object? clrObject, object? clrValue)
     {
-        if (clrObject is null)
+        if (clrObject is null || _clrSetter is null)
         {
             return false;
         }
 
-        return this.TrySetValue<object, object?>(clrObject, clrValue);
+        try
+        {
+            _clrSetter(clrObject, clrValue);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     /// <summary>
-    ///     Attempts to set the CLR member identified by <see cref="ClrName"/> on the specified <paramref name="clrObject"/> to <paramref name="clrValue"/> using a compiled setter.
-    ///     For struct targets passed by value, this assigns to a copy and will not mutate the caller.
-    ///     Use <see cref="TrySetValueRef{TObject, TValue}(ref TObject, TValue)"/> for structs when mutation is required.
+    ///     Attempts to set the CLR member identified by <see cref="ClrName"/> on the specified <paramref name="clrObject"/>
+    ///     to <paramref name="clrValue"/> with type safety and minimal boxing overhead.
     /// </summary>
     /// <typeparam name="TObject">The static type of the target instance.</typeparam>
     /// <typeparam name="TValue">The type of the value to assign.</typeparam>
     /// <param name="clrObject">The object instance containing the member to set.</param>
     /// <param name="clrValue">The value to assign to the member.</param>
     /// <returns><c>true</c> if the assignment succeeded; otherwise, <c>false</c>.</returns>
-    public bool TrySetValue<TObject, TValue>(TObject clrObject, TValue clrValue)
+    /// <remarks>
+    ///     <para>
+    ///         This method compiles and caches a typed lambda expression per unique combination of
+    ///         <typeparamref name="TObject"/> and <typeparamref name="TValue"/>. Subsequent calls with
+    ///         the same type parameters reuse the cached delegate for optimal performance.
+    ///     </para>
+    ///     <para>
+    ///         This method never throws exceptions. It returns <c>false</c> if:
+    ///         <list type="bullet">
+    ///             <item><description>The <paramref name="clrObject"/> is null</description></item>
+    ///             <item><description>The typed setter cannot be compiled or the property is read-only</description></item>
+    ///             <item><description>An exception occurs during property assignment</description></item>
+    ///         </list>
+    ///     </para>
+    ///     <para>
+    ///         For struct targets passed by value, this method modifies a copy. Use
+    ///         <see cref="TrySetValueByRef{TObject, TValue}(ref TObject, TValue)"/> for struct mutation.
+    ///     </para>
+    ///     <para>
+    ///         Prefer this generic overload over the non-generic version when types are known at
+    ///         compile time to avoid boxing value types.
+    ///     </para>
+    /// </remarks>
+    public bool TrySetValue<TObject, TValue>(TObject? clrObject, TValue? clrValue)
     {
         if (clrObject is null)
         {
             return false;
         }
 
-        // Use runtime type for non-sealed reference types
-        var targetType = typeof(TObject);
-        if (!targetType.IsValueType && !targetType.IsSealed)
-        {
-            targetType = clrObject.GetType();
-        }
+        var clrObjectType = typeof(TObject);
+        var clrMemberName = this.ClrName;
 
-        var key = new CacheKey(targetType, this.ClrName);
-        var cacheValue = SetterCache<TObject, TValue>.Cache.GetOrAdd(key, static k => BuildTypedSetter<TObject, TValue>(k.TargetType, k.MemberName));
+        var clrCacheKey = new ClrCacheKey(clrObjectType, clrMemberName);
+        var clrCacheValue = ClrSetterCache<TObject, TValue>.Cache.GetOrAdd(clrCacheKey, static k => BuildGenericClrSetter<TObject, TValue>(k.ClrObjectType, k.ClrMemberName));
+        var clrSetter = clrCacheValue.ClrSetter;
 
-        if (!cacheValue.Found || cacheValue.Setter is null)
+        if (clrSetter is null)
         {
             return false;
         }
 
         try
         {
-            cacheValue.Setter(clrObject, clrValue);
+            clrSetter(clrObject, clrValue);
             return true;
         }
         catch
@@ -223,30 +534,50 @@ public sealed class ApiProperty(string apiName, ApiTypeExpression apiTypeExpress
     }
 
     /// <summary>
-    ///     Attempts to set the CLR member identified by <see cref="ClrName"/> on the specified struct <paramref name="clrObject"/> by reference so that mutations affect the original instance.
-    ///     This overload compiles and caches a by-ref setter delegate.
+    ///     Attempts to set the CLR member identified by <see cref="ClrName"/> on the specified struct <paramref name="clrObject"/>
+    ///     by reference, ensuring mutations affect the original instance.
     /// </summary>
     /// <typeparam name="TObject">The struct type of the target instance.</typeparam>
     /// <typeparam name="TValue">The type of the value to assign.</typeparam>
     /// <param name="clrObject">The struct instance passed by reference whose member will be set.</param>
     /// <param name="clrValue">The value to assign to the member.</param>
     /// <returns><c>true</c> if the assignment succeeded; otherwise, <c>false</c>.</returns>
-    public bool TrySetValueRef<TObject, TValue>(ref TObject clrObject, TValue clrValue)
+    /// <remarks>
+    ///     <para>
+    ///         This method compiles and caches a by-reference lambda expression for struct mutation.
+    ///         Unlike <see cref="TrySetValue{TObject, TValue}(TObject, TValue)"/>, this method ensures
+    ///         the original struct instance is modified rather than a copy.
+    ///     </para>
+    ///     <para>
+    ///         This method never throws exceptions. It returns <c>false</c> if:
+    ///         <list type="bullet">
+    ///             <item><description>The by-ref setter cannot be compiled or the property is read-only</description></item>
+    ///             <item><description>An exception occurs during property assignment</description></item>
+    ///         </list>
+    ///     </para>
+    ///     <para>
+    ///         Use this method when you need to mutate struct properties in place, such as when
+    ///         working with struct collections or ref locals.
+    ///     </para>
+    /// </remarks>
+    public bool TrySetValueByRef<TObject, TValue>(ref TObject clrObject, TValue? clrValue)
         where TObject : struct
     {
-        var targetType = typeof(TObject); // for structs, compile-time type is exact
+        var clrObjectType = typeof(TObject);
+        var clrMemberName = this.ClrName;
 
-        var key = new CacheKey(targetType, this.ClrName);
-        var cacheValue = SetterRefCache<TObject, TValue>.Cache.GetOrAdd(key, static k => BuildTypedSetterByRef<TObject, TValue>(k.TargetType, k.MemberName));
+        var clrCacheKey = new ClrCacheKey(clrObjectType, clrMemberName);
+        var clrCacheValue = ClrSetterByRefCache<TObject, TValue>.Cache.GetOrAdd(clrCacheKey, static k => BuildGenericClrSetterByRef<TObject, TValue>(k.ClrObjectType, k.ClrMemberName));
+        var clrSetterByRef = clrCacheValue.ClrSetterByRef;
 
-        if (!cacheValue.Found || cacheValue.Setter is null)
+        if (clrSetterByRef is null)
         {
             return false;
         }
 
         try
         {
-            cacheValue.Setter(ref clrObject, clrValue);
+            clrSetterByRef(ref clrObject, clrValue);
             return true;
         }
         catch
@@ -255,14 +586,18 @@ public sealed class ApiProperty(string apiName, ApiTypeExpression apiTypeExpress
         }
     }
 
-    internal void Initialize(ApiSchema apiSchema, string apiValidationPath, ref List<ValidationResult>? results)
+    internal string GetValidationPath(string parentPath) => $"{parentPath.SafeToString()}.{nameof(ApiProperty)}[\"{this.ApiName.SafeToString()}\"]";
+
+    internal void Initialize(ApiSchema apiSchema, ApiObjectType apiObjectType, string apiValidationPath, ref List<ValidationResult>? results)
     {
         ArgumentNullException.ThrowIfNull(apiSchema);
+        ArgumentNullException.ThrowIfNull(apiObjectType);
         ArgumentException.ThrowIfNullOrWhiteSpace(apiValidationPath);
 
         this.InitializeApiName(apiValidationPath, ref results);
-        this.InitializeClrName(apiValidationPath, ref results);
         this.InitializeApiTypeExpression(apiSchema, apiValidationPath, ref results);
+        this.InitializeClrName(apiValidationPath, ref results);
+        this.InitializeClrGetterAndSetter(apiObjectType, apiValidationPath, ref results);
     }
     #endregion
 
@@ -303,6 +638,87 @@ public sealed class ApiProperty(string apiName, ApiTypeExpression apiTypeExpress
         this.ApiTypeExpression.Initialize(apiSchema, apiChildValidationPath, ref results);
     }
 
+    private void InitializeClrGetterAndSetter(ApiObjectType apiObjectType, string apiValidationPath, ref List<ValidationResult>? results)
+    {
+        var clrObjectType = apiObjectType.ClrType;
+        var clrMemberName = this.ClrName;
+
+        try
+        {
+            // Prefer property, then field
+            var clrPropertyInfo = TypeReflection.GetProperty(clrObjectType, clrMemberName, BindingFlags.Public | BindingFlags.Instance);
+            if (clrPropertyInfo is not null)
+            {
+                // Exclude indexers
+                if (clrPropertyInfo.GetIndexParameters().Length > 0)
+                {
+                    results ??= [];
+                    results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ClrName)} refers to an indexer property, which is not supported.", [nameof(this.ClrName)]));
+                    return;
+                }
+
+                // Build compiled property getter and setter
+                try
+                {
+                    _clrGetter = BuildNonGenericClrPropertyGetter(clrObjectType, clrPropertyInfo);
+                }
+                catch (Exception ex)
+                {
+                    results ??= [];
+                    results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ClrName)} failed to compile lambda property getter: {ex.Message}", [nameof(this.ClrName)]));
+                }
+
+                try
+                {
+                    _clrSetter = BuildNonGenericClrPropertySetter(clrObjectType, clrPropertyInfo);
+                }
+                catch (Exception ex)
+                {
+                    results ??= [];
+                    results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ClrName)} failed to compile lambda property setter: {ex.Message}", [nameof(this.ClrName)]));
+                }
+
+                return; // Found valid property
+            }
+
+            var clrFieldInfo = TypeReflection.GetField(clrObjectType, clrMemberName, BindingFlags.Public | BindingFlags.Instance);
+            if (clrFieldInfo is not null)
+            {
+                // Build compiled field getter and setter
+                try
+                {
+                    _clrGetter = BuildNonGenericClrFieldGetter(clrObjectType, clrFieldInfo);
+                }
+                catch (Exception ex)
+                {
+                    results ??= [];
+                    results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ClrName)} failed to compile lambda field getter: {ex.Message}", [nameof(this.ClrName)]));
+                }
+
+                try
+                {
+                    _clrSetter = BuildNonGenericClrFieldSetter(clrObjectType, clrFieldInfo);
+                }
+                catch (Exception ex)
+                {
+                    results ??= [];
+                    results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ClrName)} failed to compile lambda field setter: {ex.Message}", [nameof(this.ClrName)]));
+                }
+
+                return; // Found valid field
+            }
+
+            // Member not found
+            results ??= [];
+            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ClrName)} '{clrMemberName}' could not be found on {nameof(ApiObjectType.ClrType)} '{clrObjectType.SafeToName()}'.", [nameof(this.ClrName)]));
+        }
+        catch (Exception ex)
+        {
+            results ??= [];
+            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ClrName)} failed to compile lambda getter or setter accessor: {ex.Message}", [nameof(this.ClrName)]));
+        }
+    }
+
     private void InitializeClrName(string apiValidationPath, ref List<ValidationResult>? results)
     {
         if (string.IsNullOrWhiteSpace(this.ClrName))
@@ -313,149 +729,221 @@ public sealed class ApiProperty(string apiName, ApiTypeExpression apiTypeExpress
     }
     #endregion
 
-    #region Cache Methods
-    private static GetterCacheValue<TObject, TValue> BuildTypedGetter<TObject, TValue>(Type targetType, string memberName)
+    #region Non-Generic Accessor Methods
+    private static Func<object, object?>? BuildNonGenericClrPropertyGetter(Type objectType, PropertyInfo propertyInfo)
     {
-        if (!TryResolveMember(targetType, memberName, forWrite: false, out var memberInfo, out var memberType))
+        // Build property getter if readable: (object obj) => ((OwningType)obj).PropertyName
+        if (!propertyInfo.CanRead)
         {
-            return new GetterCacheValue<TObject, TValue>(false, null);
+            return null;
         }
 
-        var objExpression = Expression.Parameter(typeof(TObject), "obj");
-        var targetExpression = MakeTargetExpression<TObject>(objExpression, targetType);
+        var parameterExpression = Expression.Parameter(typeof(object), "obj");
+        var objectExpression = Expression.Convert(parameterExpression, objectType);
+        var propertyAccessExpression = Expression.Property(objectExpression, propertyInfo);
+        var bodyExpression = Expression.Convert(propertyAccessExpression, typeof(object));
 
-        var valueExpression = memberInfo switch
-        {
-            PropertyInfo pi => Expression.Property(targetExpression, pi),
-            FieldInfo fi => Expression.Field(targetExpression, fi),
-            _ => null
-        };
-
-        if (valueExpression is null)
-        {
-            return new GetterCacheValue<TObject, TValue>(false, null);
-        }
-
-        if (!TryConvertExpression(valueExpression, typeof(TValue), out var bodyExpression))
-        {
-            return new GetterCacheValue<TObject, TValue>(false, null);
-        }
-
-        var lambdaExpression = Expression.Lambda<Func<TObject, TValue>>(bodyExpression, objExpression);
+        var lambdaExpression = Expression.Lambda<Func<object, object?>>(bodyExpression, parameterExpression);
         var lambda = lambdaExpression.Compile();
-
-        return new GetterCacheValue<TObject, TValue>(true, lambda);
+        return lambda;
     }
 
-    private static SetterCacheValue<TObject, TValue> BuildTypedSetter<TObject, TValue>(Type targetType, string memberName)
+    private static Action<object, object?>? BuildNonGenericClrPropertySetter(Type objectType, PropertyInfo propertyInfo)
     {
-        if (!TryResolveMember(targetType, memberName, forWrite: true, out var memberInfo, out var memberType))
+        // Build property setter if writable: (object obj, object value) => ((OwningType)obj).PropertyName = (PropertyType)value
+        if (!propertyInfo.CanWrite)
         {
-            return new SetterCacheValue<TObject, TValue>(false, null);
+            return null;
         }
 
-        var objExpression = Expression.Parameter(typeof(TObject), "obj");
-        var targetExpression = MakeTargetExpression<TObject>(objExpression, targetType);
+        var parameterExpression1 = Expression.Parameter(typeof(object), "obj");
+        var parameterExpression2 = Expression.Parameter(typeof(object), "value");
+        var objectExpression = Expression.Convert(parameterExpression1, objectType);
+        var propertyAccessExpression = Expression.Property(objectExpression, propertyInfo);
+        var rhsExpression = Expression.Convert(parameterExpression2, propertyInfo.PropertyType);
+        var bodyExpression = Expression.Assign(propertyAccessExpression, rhsExpression);
 
-        var valueExpression = Expression.Parameter(typeof(TValue), "value");
+        var lambdaExpression = Expression.Lambda<Action<object, object?>>(bodyExpression, parameterExpression1, parameterExpression2);
+        var lambda = lambdaExpression.Compile();
+        return lambda;
+    }
+
+    private static Func<object, object?>? BuildNonGenericClrFieldGetter(Type objectType, FieldInfo fieldInfo)
+    {
+        // Build field getter: (object obj) => ((OwningType)obj).FieldName
+        var parameterExpression = Expression.Parameter(typeof(object), "obj");
+        var objectExpression = Expression.Convert(parameterExpression, objectType);
+        var fieldAccessExpression = Expression.Field(objectExpression, fieldInfo);
+        var bodyExpression = Expression.Convert(fieldAccessExpression, typeof(object));
+
+        var lambdaExpression = Expression.Lambda<Func<object, object?>>(bodyExpression, parameterExpression);
+        var lambda = lambdaExpression.Compile();
+        return lambda;
+    }
+
+    private static Action<object, object?>? BuildNonGenericClrFieldSetter(Type objectType, FieldInfo fieldInfo)
+    {
+        // Build field setter if writable: (object obj, object value) => ((OwningType)obj).FieldName = (FieldType)value
+        if (fieldInfo.IsInitOnly)
+        {
+            return null;
+        }
+
+        var parameterExpression1 = Expression.Parameter(typeof(object), "obj");
+        var parameterExpression2 = Expression.Parameter(typeof(object), "value");
+        var objectExpression = Expression.Convert(parameterExpression1, objectType);
+        var fieldAccessExpression = Expression.Field(objectExpression, fieldInfo);
+        var rhsExpression = Expression.Convert(parameterExpression2, fieldInfo.FieldType);
+        var bodyExpression = Expression.Assign(fieldAccessExpression, rhsExpression);
+
+        var lambdaExpression = Expression.Lambda<Action<object, object?>>(bodyExpression, parameterExpression1, parameterExpression2);
+        var lambda = lambdaExpression.Compile();
+        return lambda;
+    }
+    #endregion
+
+    #region Generic Accessor Methods
+    private static ClrGetterCacheValue<TObject, TValue> BuildGenericClrGetter<TObject, TValue>(Type objectType, string memberName)
+    {
+        if (!TryResolveMember(objectType, memberName, forWrite: false, out var memberInfo, out var memberType))
+        {
+            return new ClrGetterCacheValue<TObject, TValue>(null);
+        }
+
+        var parameterExpression = Expression.Parameter(typeof(TObject), "obj");
+        var objectExpression = MakeObjectExpression<TObject>(parameterExpression, objectType);
 
         var memberAccessExpression = memberInfo switch
         {
-            PropertyInfo pi => Expression.Property(targetExpression, pi),
-            FieldInfo fi => Expression.Field(targetExpression, fi),
+            PropertyInfo pi => Expression.Property(objectExpression, pi),
+            FieldInfo fi => Expression.Field(objectExpression, fi),
             _ => null
         };
 
         if (memberAccessExpression is null)
         {
-            return new SetterCacheValue<TObject, TValue>(false, null);
+            return new ClrGetterCacheValue<TObject, TValue>(null);
         }
 
-        if (!TryConvertExpression(valueExpression, memberType, out var rhsExpression))
+        if (!TryConvertExpression(memberAccessExpression, typeof(TValue), out var bodyExpression))
         {
-            return new SetterCacheValue<TObject, TValue>(false, null);
+            return new ClrGetterCacheValue<TObject, TValue>(null);
         }
 
-        var assignExpression = Expression.Assign(memberAccessExpression, rhsExpression);
-        var lambdaExpression = Expression.Lambda<Action<TObject, TValue>>(assignExpression, objExpression, valueExpression);
+        var lambdaExpression = Expression.Lambda<Func<TObject, TValue?>>(bodyExpression, parameterExpression);
         var lambda = lambdaExpression.Compile();
 
-        return new SetterCacheValue<TObject, TValue>(true, lambda);
+        return new ClrGetterCacheValue<TObject, TValue>(lambda);
     }
 
-    private static SetterRefCacheValue<TObject, TValue> BuildTypedSetterByRef<TObject, TValue>(Type targetType, string memberName)
+    private static ClrSetterCacheValue<TObject, TValue> BuildGenericClrSetter<TObject, TValue>(Type objectType, string memberName)
+    {
+        if (!TryResolveMember(objectType, memberName, forWrite: true, out var memberInfo, out var memberType))
+        {
+            return new ClrSetterCacheValue<TObject, TValue>(null);
+        }
+
+        var parameterExpression1 = Expression.Parameter(typeof(TObject), "obj");
+        var objectExpression = MakeObjectExpression<TObject>(parameterExpression1, objectType);
+
+        var parameterExpression2 = Expression.Parameter(typeof(TValue), "value");
+
+        var memberAccessExpression = memberInfo switch
+        {
+            PropertyInfo pi => Expression.Property(objectExpression, pi),
+            FieldInfo fi => Expression.Field(objectExpression, fi),
+            _ => null
+        };
+
+        if (memberAccessExpression is null)
+        {
+            return new ClrSetterCacheValue<TObject, TValue>(null);
+        }
+
+        if (!TryConvertExpression(parameterExpression2, memberType, out var rhsExpression))
+        {
+            return new ClrSetterCacheValue<TObject, TValue>(null);
+        }
+
+        var bodyExpression = Expression.Assign(memberAccessExpression, rhsExpression);
+        var lambdaExpression = Expression.Lambda<Action<TObject, TValue?>>(bodyExpression, parameterExpression1, parameterExpression2);
+        var lambda = lambdaExpression.Compile();
+
+        return new ClrSetterCacheValue<TObject, TValue>(lambda);
+    }
+
+    private static ClrSetterByRefCacheValue<TObject, TValue> BuildGenericClrSetterByRef<TObject, TValue>(Type objectType, string memberName)
         where TObject : struct
     {
-        // targetType must be exactly typeof(TObject) for structs
-        if (targetType != typeof(TObject))
+        // objectType must be exactly typeof(TObject) for structs
+        if (objectType != typeof(TObject))
         {
-            return new SetterRefCacheValue<TObject, TValue>(false, null);
+            return new ClrSetterByRefCacheValue<TObject, TValue>(null);
         }
 
-        if (!TryResolveMember(targetType, memberName, forWrite: true, out var memberInfo, out var memberType))
+        if (!TryResolveMember(objectType, memberName, forWrite: true, out var memberInfo, out var memberType))
         {
-            return new SetterRefCacheValue<TObject, TValue>(false, null);
+            return new ClrSetterByRefCacheValue<TObject, TValue>(null);
         }
 
-        var objExpression = Expression.Parameter(typeof(TObject).MakeByRefType(), "obj");
-        var valueExpression = Expression.Parameter(typeof(TValue), "value");
+        var parameterExpression1 = Expression.Parameter(typeof(TObject).MakeByRefType(), "obj");
+        var parameterExpression2 = Expression.Parameter(typeof(TValue), "value");
 
         var memberAccessExpression = memberInfo switch
         {
-            PropertyInfo pi => Expression.Property(objExpression, pi),
-            FieldInfo fi => Expression.Field(objExpression, fi),
+            PropertyInfo pi => Expression.Property(parameterExpression1, pi),
+            FieldInfo fi => Expression.Field(parameterExpression1, fi),
             _ => null
         };
 
         if (memberAccessExpression is null)
         {
-            return new SetterRefCacheValue<TObject, TValue>(false, null);
+            return new ClrSetterByRefCacheValue<TObject, TValue>(null);
         }
 
-        if (!TryConvertExpression(valueExpression, memberType, out var rhsExpression))
+        if (!TryConvertExpression(parameterExpression2, memberType, out var rhsExpression))
         {
-            return new SetterRefCacheValue<TObject, TValue>(false, null);
+            return new ClrSetterByRefCacheValue<TObject, TValue>(null);
         }
 
-        var assignExpression = Expression.Assign(memberAccessExpression, rhsExpression);
-        var lambdaExpression = Expression.Lambda<ByRefAction<TObject, TValue>>(assignExpression, objExpression, valueExpression);
+        var bodyExpression = Expression.Assign(memberAccessExpression, rhsExpression);
+        var lambdaExpression = Expression.Lambda<ByRefAction<TObject, TValue?>>(bodyExpression, parameterExpression1, parameterExpression2);
         var lambda = lambdaExpression.Compile();
 
-        return new SetterRefCacheValue<TObject, TValue>(true, lambda);
+        return new ClrSetterByRefCacheValue<TObject, TValue>(lambda);
     }
 
-    private static Expression MakeTargetExpression<TObject>(ParameterExpression objParam, Type targetType)
+    private static Expression MakeObjectExpression<TObject>(ParameterExpression parameterExpression, Type objectType)
     {
-        return targetType == typeof(TObject)
-            ? objParam
-            : Expression.Convert(objParam, targetType);
+        return objectType == typeof(TObject)
+            ? parameterExpression
+            : Expression.Convert(parameterExpression, objectType);
     }
 
-    private static bool TryConvertExpression(Expression source, Type destinationType, out Expression converted)
+    private static bool TryConvertExpression(Expression sourceExpression, Type destinationType, out Expression convertedExpression)
     {
-        if (destinationType.IsAssignableFrom(source.Type))
+        if (destinationType.IsAssignableFrom(sourceExpression.Type))
         {
-            converted = source;
+            convertedExpression = sourceExpression;
             return true;
         }
 
         try
         {
-            converted = Expression.Convert(source, destinationType);
+            convertedExpression = Expression.Convert(sourceExpression, destinationType);
             return true;
         }
         catch
         {
-            converted = default!;
+            convertedExpression = default!;
             return false;
         }
     }
 
-    // Shared helpers to DRY member resolution and expression conversions
-    private static bool TryResolveMember(Type targetType, string memberName, bool forWrite, out MemberInfo memberInfo, out Type memberType)
+    private static bool TryResolveMember(Type objectType, string memberName, bool forWrite, out MemberInfo memberInfo, out Type memberType)
     {
         // Prefer property, then field (case-insensitive)
-        var propertyInfo = TypeReflection.GetProperty(targetType, memberName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+        var propertyInfo = TypeReflection.GetProperty(objectType, memberName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
 
         if (propertyInfo is not null)
         {
@@ -480,7 +968,7 @@ public sealed class ApiProperty(string apiName, ApiTypeExpression apiTypeExpress
             return true;
         }
 
-        var fieldInfo = TypeReflection.GetField(targetType, memberName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+        var fieldInfo = TypeReflection.GetField(objectType, memberName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
         if (fieldInfo is not null)
         {
             // For write operations, exclude init-only fields

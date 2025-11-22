@@ -3,8 +3,6 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using System.Text.Json;
-
 using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Schema.TestData;
 using Evoogle.Extensions;
@@ -205,7 +203,7 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
             ExpectedApiSchemaExceptionMessage = $"{nameof(ApiSchema)} initialization failed.",
             ExpectedValidationResults =
             [
-                $"{nameof(ApiEnumType)}[\"Evoogle.ApiFramework.Schema.TestData.Gender\"][\"Gender\"].{nameof(ApiEnumValue)} unable to initialize because duplicate {nameof(ApiEnumValue.ApiName)} values detected: female"
+                $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"] unable to initialize because duplicate {nameof(ApiEnumValue)}.{nameof(ApiEnumValue.ApiName)} values detected: 'female'"
             ]
         },
 
@@ -224,7 +222,7 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
             ExpectedApiSchemaExceptionMessage = $"{nameof(ApiSchema)} initialization failed.",
             ExpectedValidationResults =
             [
-                $"{nameof(ApiEnumType)}[\"Evoogle.ApiFramework.Schema.TestData.Gender\"][\"Gender\"].{nameof(ApiEnumValue)} unable to initialize because duplicate {nameof(ApiEnumValue.ClrName)} values detected: Female"
+                $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"] unable to initialize because duplicate {nameof(ApiEnumValue)}.{nameof(ApiEnumValue.ClrName)} values detected: 'Female'"
             ]
         },
 
@@ -243,7 +241,7 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
             ExpectedApiSchemaExceptionMessage = $"{nameof(ApiSchema)} initialization failed.",
             ExpectedValidationResults =
             [
-                $"{nameof(ApiEnumType)}[\"Evoogle.ApiFramework.Schema.TestData.Gender\"][\"Gender\"].{nameof(ApiEnumValue)} unable to initialize because duplicate {nameof(ApiEnumValue.ClrOrdinal)} values detected: 2"
+                $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"] unable to initialize because duplicate {nameof(ApiEnumValue)}.{nameof(ApiEnumValue.ClrOrdinal)} values detected: '2'"
             ]
         },
 
@@ -261,7 +259,7 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
             ExpectedApiSchemaExceptionMessage = $"{nameof(ApiSchema)} initialization failed.",
             ExpectedValidationResults =
             [
-                $"{nameof(ApiEnumType)}[\"System.String\"][\"Gender\"].{nameof(ApiEnumType.ClrType)} must be a CLR enum type."
+                $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"].{nameof(ApiEnumType.ClrType)} must be a CLR enum type."
             ]
         },
     ];

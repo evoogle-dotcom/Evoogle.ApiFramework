@@ -13,45 +13,63 @@ namespace Evoogle.ApiFramework.Schema;
 
 public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 {
-    #region Local Test Types
-    // Public struct required so it can be used as a generic type argument in public test classes
-    public struct TestPoint
-    {
-        public int X; // field
-        public int Y { get; set; } // property
-    }
-    #endregion
-
-    #region TryGet Tests
-    public class TryGetGenericTest<TObject, TValue> : XUnitTest
+    #region Base Tests
+    public abstract class TryTestBase : XUnitTest
     {
         #region User Supplied Properties
-        public TObject ClrObject { get; init; } = default!;
-        public string ClrName { get; init; } = default!;
-        public bool ExpectedSuccess { get; init; }
-        public TValue? ExpectedClrValue { get; init; } = default!;
+        public required ApiTestSchemaKind ApiSchemaKind { get; init; }
+        public required string ApiObjectTypeName { get; init; }
+        public required string ApiPropertyName { get; init; }
+        public required bool ExpectedSuccess { get; init; }
         #endregion
 
         #region Calculated Properties
-        private ApiProperty ApiProperty { get; set; } = default!;
-        private bool ActualSuccess { get; set; }
+        protected ApiSchema ApiSchema { get; set; } = default!;
+        protected ApiObjectType ApiObjectType { get; set; } = default!;
+        protected ApiProperty ApiProperty { get; set; } = default!;
+        protected bool ActualSuccess { get; set; }
+        #endregion
+
+        #region XUnitTest Methods
+        protected override void Arrange()
+        {
+            var apiSchema = ApiTestSchemaFactory.BuildTestSchema(this.ApiSchemaKind);
+            this.ApiSchema = apiSchema;
+
+            var apiObjectType = this.ApiSchema.GetObjectTypeByApiName(this.ApiObjectTypeName);
+            this.ApiObjectType = apiObjectType;
+
+            var apiProperty = apiObjectType.GetPropertyByApiName(this.ApiPropertyName);
+            this.ApiProperty = apiProperty;
+        }
+        #endregion
+    }
+    #endregion
+
+    #region TryGet Tests (Generic and Non-Generic)
+    public class TryGetGenericTest<TObject, TValue> : TryTestBase
+    {
+        #region User Supplied Properties
+        public TObject? ClrObject { get; init; }
+        public TValue? ExpectedClrValue { get; init; }
+        #endregion
+
+        #region Calculated Properties
         private TValue? ActualClrValue { get; set; }
         #endregion
 
         #region XUnitTest Methods
         protected override void Arrange()
         {
-            var apiName = this.ClrName;
-            var apiTypeExpression = ApiTypeExpression.ClrRef<TValue>();
-            var clrName = this.ClrName;
+            base.Arrange();
 
-            this.ApiProperty = new ApiProperty
-            (
-                apiName,
-                apiTypeExpression,
-                ApiTypeModifiers.None, // Need to address modifiers in near future
-                clrName
-            );
+            this.WriteLine($"ApiSchema:     {this.ApiSchema.ApiName.SafeToString()}");
+            this.WriteLine($"ApiObjectType: {this.ApiObjectTypeName.SafeToString()}");
+            this.WriteLine($"ApiProperty:   {this.ApiPropertyName.SafeToString()}");
+            this.WriteLine($"ClrObject:     {this.ClrObject.SafeToString()}");
+            this.WriteLine();
+            this.WriteLine($"ExpectedSuccess:  {this.ExpectedSuccess.SafeToString()}");
+            this.WriteLine($"ExpectedClrValue: {this.ExpectedClrValue.SafeToString()}");
         }
 
         protected override void Act()
@@ -75,36 +93,29 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
         #endregion
     }
 
-    public class TryGetNonGenericTest : XUnitTest
+    public class TryGetNonGenericTest : TryTestBase
     {
         #region User Supplied Properties
-        public object ClrObject { get; init; } = default!;
-        public string ClrName { get; init; } = default!;
-        public Type ClrValueType { get; init; } = default!;
-        public bool ExpectedSuccess { get; init; }
-        public object? ExpectedClrValue { get; init; } = default!;
+        public object? ClrObject { get; init; }
+        public object? ExpectedClrValue { get; init; }
         #endregion
 
         #region Calculated Properties
-        private ApiProperty ApiProperty { get; set; } = default!;
-        private bool ActualSuccess { get; set; }
         private object? ActualClrValue { get; set; }
         #endregion
 
         #region XUnitTest Methods
         protected override void Arrange()
         {
-            var apiName = this.ClrName;
-            var apiTypeExpression = new ApiTypeExpression(this.ClrValueType);
-            var clrName = this.ClrName;
+            base.Arrange();
 
-            this.ApiProperty = new ApiProperty
-            (
-                apiName,
-                apiTypeExpression,
-                ApiTypeModifiers.None, // Need to address modifiers in near future
-                clrName
-            );
+            this.WriteLine($"ApiSchema:     {this.ApiSchema.ApiName.SafeToString()}");
+            this.WriteLine($"ApiObjectType: {this.ApiObjectTypeName.SafeToString()}");
+            this.WriteLine($"ApiProperty:   {this.ApiPropertyName.SafeToString()}");
+            this.WriteLine($"ClrObject:     {this.ClrObject.SafeToString()}");
+            this.WriteLine();
+            this.WriteLine($"ExpectedSuccess:  {this.ExpectedSuccess.SafeToString()}");
+            this.WriteLine($"ExpectedClrValue: {this.ExpectedClrValue.SafeToString()}");
         }
 
         protected override void Act()
@@ -127,245 +138,263 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
         }
         #endregion
     }
-
-
-
-
-    public class TryGetGenericTestOld<TObject, TValue> : XUnitTest
-    {
-        #region User Supplied Properties
-        public string? ClrName { get; init; }
-        public TObject Target { get; init; } = default!;
-        public bool? ExpectedFound { get; init; }
-        public TValue? ExpectedValue { get; init; } = default!;
-        #endregion
-
-        #region Calculated Properties
-        private ApiProperty? ApiProperty { get; set; }
-        private bool? ActualFound { get; set; }
-        private TValue? ActualValue { get; set; }
-        #endregion
-
-        #region XUnitTest Methods
-        protected override void Arrange()
-        {
-            this.ClrName.Should().NotBeNullOrWhiteSpace();
-            this.Target.Should().NotBeNull();
-
-            var targetType = this.Target!.GetType();
-            var clrType = targetType.GetProperty(this!.ClrName!)?.PropertyType
-                        ?? targetType.GetField(this!.ClrName!)?.FieldType
-                        ?? typeof(object);
-
-            this.ApiProperty = new ApiProperty(this!.ClrName!, new ApiTypeExpression(clrType), ApiTypeModifiers.None, this.ClrName!);
-        }
-
-        protected override void Act()
-        {
-            this.ActualFound = this.ApiProperty!.TryGetValue<TObject, TValue>(this.Target!, out var value);
-            this.ActualValue = value;
-        }
-
-        protected override void Assert()
-        {
-            this.ActualFound.Should().Be(this!.ExpectedFound);
-            if (this.ExpectedFound == true)
-            {
-                this.ActualValue.Should().Be(this!.ExpectedValue);
-            }
-        }
-        #endregion
-    }
     #endregion
 
     #region TrySet Tests
-    public class TrySetObjectTest : XUnitTest
+    public class TrySetGenericTest<TObject, TValue> : TryTestBase
     {
         #region User Supplied Properties
-        public string? ClrName { get; init; }
-        public object? Target { get; init; }
-        public object? InputValue { get; init; }
-        public bool? ExpectedSuccess { get; init; }
-        public object? ExpectedValue { get; init; }
+        public TObject? ClrObject { get; init; }
+        public TValue? ClrValue { get; init; }
         #endregion
 
         #region Calculated Properties
-        private ApiProperty? ApiProperty { get; set; }
-        private bool? ActualSuccess { get; set; }
-        private object? ActualValue { get; set; }
+        private bool ActualTrySetSuccess { get; set; }
+        private bool ActualTryGetSuccess { get; set; }
+        private TValue? ActualTryGetClrValue { get; set; }
         #endregion
 
         #region XUnitTest Methods
         protected override void Arrange()
         {
-            this.ClrName.Should().NotBeNullOrWhiteSpace();
-            this.Target.Should().NotBeNull();
+            base.Arrange();
 
-            var targetType = this.Target!.GetType();
-            var clrType = targetType.GetProperty(this!.ClrName!)?.PropertyType
-                        ?? targetType.GetField(this!.ClrName!)?.FieldType
-                        ?? typeof(object);
-
-            this.ApiProperty = new ApiProperty(this!.ClrName!, new ApiTypeExpression(clrType), ApiTypeModifiers.None, this.ClrName!);
+            this.WriteLine($"ApiSchema:     {this.ApiSchema.ApiName.SafeToString()}");
+            this.WriteLine($"ApiObjectType: {this.ApiObjectTypeName.SafeToString()}");
+            this.WriteLine($"ApiProperty:   {this.ApiPropertyName.SafeToString()}");
+            this.WriteLine($"ClrObject:     {this.ClrObject.SafeToString()}");
+            this.WriteLine($"ClrValue:      {this.ClrValue.SafeToString()}");
+            this.WriteLine();
+            this.WriteLine($"ExpectedSuccess:  {this.ExpectedSuccess.SafeToString()}");
         }
 
         protected override void Act()
         {
-            this.ActualSuccess = this.ApiProperty!.TrySetValue(this!.Target!, this!.InputValue);
-            // Read back via reflection to verify mutation
-            this.ActualValue = this.Target!.GetType().GetProperty(this!.ClrName!)?.GetValue(this.Target!)
-                             ?? this.Target!.GetType().GetField(this!.ClrName!)?.GetValue(this.Target!);
+            this.ActualTrySetSuccess = this.ApiProperty!.TrySetValue(this.ClrObject, this.ClrValue);
+            if (this.ActualTrySetSuccess)
+            {
+                // Read back via TryGet to verify mutation
+                this.ActualTryGetSuccess = this.ApiProperty!.TryGetValue<TObject, TValue>(this.ClrObject, out var clrValue);
+                this.ActualTryGetClrValue = clrValue;
+            }
         }
 
         protected override void Assert()
         {
-            this.ActualSuccess.Should().Be(this!.ExpectedSuccess);
-            if (this.ExpectedSuccess == true)
+            this.ActualTrySetSuccess.Should().Be(this.ExpectedSuccess);
+            if (this.ExpectedSuccess)
             {
-                this.ActualValue.Should().Be(this!.ExpectedValue);
+                this.ActualTryGetSuccess.Should().BeTrue("TryGetValue should succeed after TrySetValue");
+                this.ActualTryGetClrValue.Should().BeEquivalentTo(this.ClrValue);
             }
         }
         #endregion
     }
 
-    public class TrySetGenericTest<TObject, TValue> : XUnitTest
+    public class TrySetNonGenericTest : TryTestBase
     {
         #region User Supplied Properties
-        public string? ClrName { get; init; }
-        public TObject Target { get; init; } = default!;
-        public TValue InputValue { get; init; } = default!;
-        public bool? ExpectedSuccess { get; init; }
-        public object? ExpectedValue { get; init; }
+        public object? ClrObject { get; init; }
+        public object? ClrValue { get; init; }
         #endregion
 
         #region Calculated Properties
-        private ApiProperty? ApiProperty { get; set; }
-        private bool? ActualSuccess { get; set; }
-        private object? ActualValue { get; set; }
+        private bool ActualTrySetSuccess { get; set; }
+        private bool ActualTryGetSuccess { get; set; }
+        private object? ActualTryGetClrValue { get; set; }
         #endregion
 
         #region XUnitTest Methods
         protected override void Arrange()
         {
-            this.ClrName.Should().NotBeNullOrWhiteSpace();
-            this.Target.Should().NotBeNull();
+            base.Arrange();
 
-            var targetType = this.Target!.GetType();
-            var clrType = targetType.GetProperty(this!.ClrName!)?.PropertyType
-                        ?? targetType.GetField(this!.ClrName!)?.FieldType
-                        ?? typeof(object);
-
-            this.ApiProperty = new ApiProperty(this!.ClrName!, new ApiTypeExpression(clrType), ApiTypeModifiers.None, this.ClrName!);
+            this.WriteLine($"ApiSchema:     {this.ApiSchema.ApiName.SafeToString()}");
+            this.WriteLine($"ApiObjectType: {this.ApiObjectTypeName.SafeToString()}");
+            this.WriteLine($"ApiProperty:   {this.ApiPropertyName.SafeToString()}");
+            this.WriteLine($"ClrObject:     {this.ClrObject.SafeToString()}");
+            this.WriteLine($"ClrValue:      {this.ClrValue.SafeToString()}");
+            this.WriteLine();
+            this.WriteLine($"ExpectedSuccess:  {this.ExpectedSuccess.SafeToString()}");
         }
 
         protected override void Act()
         {
-            this.ActualSuccess = this.ApiProperty!.TrySetValue<TObject, TValue>(this.Target!, this.InputValue);
-            // Read back via reflection
-            var boxed = (object)this.Target!;
-            this.ActualValue = boxed.GetType().GetProperty(this!.ClrName!)?.GetValue(boxed)
-                             ?? boxed.GetType().GetField(this!.ClrName!)?.GetValue(boxed);
+            this.ActualTrySetSuccess = this.ApiProperty!.TrySetValue(this.ClrObject, this.ClrValue);
+            if (this.ActualTrySetSuccess)
+            {
+                // Read back via TryGet to verify mutation
+                this.ActualTryGetSuccess = this.ApiProperty!.TryGetValue(this.ClrObject, out var clrValue);
+                this.ActualTryGetClrValue = clrValue;
+            }
         }
 
         protected override void Assert()
         {
-            this.ActualSuccess.Should().Be(this!.ExpectedSuccess);
-            if (this.ExpectedSuccess == true)
+            this.ActualTrySetSuccess.Should().Be(this.ExpectedSuccess);
+            if (this.ExpectedSuccess)
             {
-                this.ActualValue.Should().Be(this!.ExpectedValue);
+                this.ActualTryGetSuccess.Should().BeTrue("TryGetValue should succeed after TrySetValue");
+                this.ActualTryGetClrValue.Should().BeEquivalentTo(this.ClrValue);
             }
         }
         #endregion
     }
 
-    public class TrySetByRefStructTest<TValue> : XUnitTest
-    {
-        #region User Supplied Properties
-        public string? ClrName { get; init; }
-        public TestPoint Target { get; init; }
-        public TValue InputValue { get; init; } = default!;
-        public int ExpectedX { get; init; }
-        public int ExpectedY { get; init; }
-        #endregion
+    // public class TrySetByRefStructTest<TValue> : XUnitTest
+    // {
+    //     #region User Supplied Properties
+    //     public string? ClrName { get; init; }
+    //     public TestPoint Target { get; init; }
+    //     public TValue InputValue { get; init; } = default!;
+    //     public int ExpectedX { get; init; }
+    //     public int ExpectedY { get; init; }
+    //     #endregion
 
-        #region Calculated Properties
-        private ApiProperty? ApiProperty { get; set; }
-        private bool? ActualSuccess { get; set; }
-        private TestPoint ActualPoint { get; set; }
-        #endregion
+    //     #region Calculated Properties
+    //     private ApiProperty? ApiProperty { get; set; }
+    //     private bool? ActualSuccess { get; set; }
+    //     private TestPoint ActualPoint { get; set; }
+    //     #endregion
 
-        #region XUnitTest Methods
-        protected override void Arrange()
-        {
-            this.ClrName.Should().NotBeNullOrWhiteSpace();
-            var memberType = typeof(TestPoint).GetProperty(this!.ClrName!)?.PropertyType
-                           ?? typeof(TestPoint).GetField(this!.ClrName!)?.FieldType
-                           ?? typeof(object);
+    //     #region XUnitTest Methods
+    //     protected override void Arrange()
+    //     {
+    //         this.ClrName.Should().NotBeNullOrWhiteSpace();
+    //         var memberType = typeof(TestPoint).GetProperty(this!.ClrName!)?.PropertyType
+    //                        ?? typeof(TestPoint).GetField(this!.ClrName!)?.FieldType
+    //                        ?? typeof(object);
 
-            this.ApiProperty = new ApiProperty(this!.ClrName!, new ApiTypeExpression(memberType), ApiTypeModifiers.None, this.ClrName!);
-        }
+    //         this.ApiProperty = new ApiProperty(this!.ClrName!, new ApiTypeExpression(memberType), ApiTypeModifiers.None, this.ClrName!);
+    //     }
 
-        protected override void Act()
-        {
-            var p = this.Target; // local copy
-            this.ActualSuccess = this.ApiProperty!.TrySetValueRef<TestPoint, TValue>(ref p, this.InputValue);
-            this.ActualPoint = p;
-        }
+    //     protected override void Act()
+    //     {
+    //         var p = this.Target; // local copy
+    //         this.ActualSuccess = this.ApiProperty!.TrySetValueRef<TestPoint, TValue>(ref p, this.InputValue);
+    //         this.ActualPoint = p;
+    //     }
 
-        protected override void Assert()
-        {
-            this.ActualSuccess.Should().BeTrue();
-            this.ActualPoint.X.Should().Be(this.ExpectedX);
-            this.ActualPoint.Y.Should().Be(this.ExpectedY);
-        }
-        #endregion
-    }
+    //     protected override void Assert()
+    //     {
+    //         this.ActualSuccess.Should().BeTrue();
+    //         this.ActualPoint.X.Should().Be(this.ExpectedX);
+    //         this.ActualPoint.Y.Should().Be(this.ExpectedY);
+    //     }
+    //     #endregion
+    // }
     #endregion
 
     #region Theory Data
+    public static ApiSchema TestSchema { get; } = ApiTestSchemaFactory.BuildSimpleSchema();
+
     public static TheoryDataRow<IXUnitTest>[] TryGetGenericTheoryData =>
     [
         new TryGetGenericTest<ScalarsOnly, string>
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredName)} TryGetValue<TObject,TValue> returns string value for known non-null reference property",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredName)} TryGetValue<TObject,TValue> returns failure for null object",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiObjectTypeName = nameof(ScalarsOnly),
+            ApiPropertyName = nameof(ScalarsOnly.RequiredName),
+            ClrObject = null,
+            ExpectedSuccess = false
+        },
+
+        new TryGetGenericTest<ScalarsOnly, string>
+        {
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredName)} TryGetValue<TObject,TValue> returns success for required string property",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiObjectTypeName = nameof(ScalarsOnly),
+            ApiPropertyName = nameof(ScalarsOnly.RequiredName),
             ClrObject = new ScalarsOnly("Alice", 123, true),
-            ClrName = nameof(ScalarsOnly.RequiredName),
             ExpectedSuccess = true,
             ExpectedClrValue = "Alice"
         },
 
         new TryGetGenericTest<ScalarsOnly, long>
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredNumber)} TryGetValue<TObject,TValue> returns long value for known value property",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredNumber)} TryGetValue<TObject,TValue> returns success for required long property",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiObjectTypeName = nameof(ScalarsOnly),
+            ApiPropertyName = nameof(ScalarsOnly.RequiredNumber),
             ClrObject = new ScalarsOnly("Alice", 123, true),
-            ClrName = nameof(ScalarsOnly.RequiredNumber),
             ExpectedSuccess = true,
             ExpectedClrValue = 123
         },
 
         new TryGetGenericTest<ScalarsOnly, bool>
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredPredicate)} TryGetValue<TObject,TValue> returns bool value for known value property",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredPredicate)} TryGetValue<TObject,TValue> returns success for required bool property",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiObjectTypeName = nameof(ScalarsOnly),
+            ApiPropertyName = nameof(ScalarsOnly.RequiredPredicate),
             ClrObject = new ScalarsOnly("Alice", 123, true),
-            ClrName = nameof(ScalarsOnly.RequiredPredicate),
             ExpectedSuccess = true,
             ExpectedClrValue = true
         },
 
         new TryGetGenericTest<ScalarsOnly, string?>
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalName)} TryGetValue<TObject,TValue> returns string value for known nullable reference property",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalName)} TryGetValue<TObject,TValue> returns success for optional string property for non-null value",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiObjectTypeName = nameof(ScalarsOnly),
+            ApiPropertyName = nameof(ScalarsOnly.OptionalName),
             ClrObject = new ScalarsOnly("Alice", 123, true) { OptionalName = "Bob" },
-            ClrName = nameof(ScalarsOnly.OptionalName),
             ExpectedSuccess = true,
             ExpectedClrValue = "Bob"
         },
 
         new TryGetGenericTest<ScalarsOnly, string?>
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalName)} TryGetValue<TObject,TValue> returns null for known nullable reference property",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalName)} TryGetValue<TObject,TValue> returns success for optional string property for null value",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiObjectTypeName = nameof(ScalarsOnly),
+            ApiPropertyName = nameof(ScalarsOnly.OptionalName),
             ClrObject = new ScalarsOnly("Alice", 123, true) { OptionalName = null },
-            ClrName = nameof(ScalarsOnly.OptionalName),
+            ExpectedSuccess = true,
+            ExpectedClrValue = null
+        },
+
+        new TryGetGenericTest<ScalarsOnly, long?>
+        {
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalNumber)} TryGetValue<TObject,TValue> returns success for optional long property for non-null value",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiObjectTypeName = nameof(ScalarsOnly),
+            ApiPropertyName = nameof(ScalarsOnly.OptionalNumber),
+            ClrObject = new ScalarsOnly("Alice", 123, true) { OptionalNumber = 42 },
+            ExpectedSuccess = true,
+            ExpectedClrValue = 42
+        },
+
+        new TryGetGenericTest<ScalarsOnly, long?>
+        {
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalNumber)} TryGetValue<TObject,TValue> returns success for optional long property for null value",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiObjectTypeName = nameof(ScalarsOnly),
+            ApiPropertyName = nameof(ScalarsOnly.OptionalNumber),
+            ClrObject = new ScalarsOnly("Alice", 123, true) { OptionalNumber = null },
+            ExpectedSuccess = true,
+            ExpectedClrValue = null
+        },
+
+        new TryGetGenericTest<ScalarsOnly, bool?>
+        {
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalPredicate)} TryGetValue<TObject,TValue> returns success for optional bool property for non-null value",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiObjectTypeName = nameof(ScalarsOnly),
+            ApiPropertyName = nameof(ScalarsOnly.OptionalPredicate),
+            ClrObject = new ScalarsOnly("Alice", 123, true) { OptionalPredicate = false },
+            ExpectedSuccess = true,
+            ExpectedClrValue = false
+        },
+
+        new TryGetGenericTest<ScalarsOnly, bool?>
+        {
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalPredicate)} TryGetValue<TObject,TValue> returns success for optional bool property for null value",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiObjectTypeName = nameof(ScalarsOnly),
+            ApiPropertyName = nameof(ScalarsOnly.OptionalPredicate),
+            ClrObject = new ScalarsOnly("Alice", 123, true) { OptionalPredicate = null },
             ExpectedSuccess = true,
             ExpectedClrValue = null
         },
@@ -375,105 +404,244 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
     [
         new TryGetNonGenericTest
         {
-            Name = $"{nameof(Person)}:{nameof(Person.Name)} TryGetValue(object, out object) returns value for known property",
-            ClrObject = new Person { Name = "Bob" },
-            ClrName = nameof(Person.Name),
-            ClrValueType = typeof(string),
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredName)} TryGetValue returns failure for null object",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiObjectTypeName = nameof(ScalarsOnly),
+            ApiPropertyName = nameof(ScalarsOnly.RequiredName),
+            ClrObject = null,
+            ExpectedSuccess = false
+        },
+
+        new TryGetNonGenericTest
+        {
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredName)} TryGetValue returns success for required string property",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiObjectTypeName = nameof(ScalarsOnly),
+            ApiPropertyName = nameof(ScalarsOnly.RequiredName),
+            ClrObject = new ScalarsOnly("Alice", 123, true),
+            ExpectedSuccess = true,
+            ExpectedClrValue = "Alice"
+        },
+
+        new TryGetNonGenericTest
+        {
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredNumber)} TryGetValue returns success for required long property",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiObjectTypeName = nameof(ScalarsOnly),
+            ApiPropertyName = nameof(ScalarsOnly.RequiredNumber),
+            ClrObject = new ScalarsOnly("Alice", 123, true),
+            ExpectedSuccess = true,
+            ExpectedClrValue = 123
+        },
+
+        new TryGetNonGenericTest
+        {
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredPredicate)} TryGetValue returns success for required bool property",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiObjectTypeName = nameof(ScalarsOnly),
+            ApiPropertyName = nameof(ScalarsOnly.RequiredPredicate),
+            ClrObject = new ScalarsOnly("Alice", 123, true),
+            ExpectedSuccess = true,
+            ExpectedClrValue = true
+        },
+
+        new TryGetNonGenericTest
+        {
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalName)} TryGetValue returns success for optional string property for non-null value",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiObjectTypeName = nameof(ScalarsOnly),
+            ApiPropertyName = nameof(ScalarsOnly.OptionalName),
+            ClrObject = new ScalarsOnly("Alice", 123, true) { OptionalName = "Bob" },
             ExpectedSuccess = true,
             ExpectedClrValue = "Bob"
         },
 
-        // object-based getter: unknown property
-        // new TryGetObjectTestOld
-        // {
-        //     Name = "TryGetValue(object, out object) returns false for unknown property",
-        //     ClrName = "DoesNotExist",
-        //     Target = new Person { Name = "Bob" },
-        //     ExpectedFound = false,
-        //     ExpectedValue = null
-        // },
+        new TryGetNonGenericTest
+        {
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalName)} TryGetValue returns success for optional string property for null value",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiObjectTypeName = nameof(ScalarsOnly),
+            ApiPropertyName = nameof(ScalarsOnly.OptionalName),
+            ClrObject = new ScalarsOnly("Alice", 123, true) { OptionalName = null },
+            ExpectedSuccess = true,
+            ExpectedClrValue = null
+        },
+
+        new TryGetNonGenericTest
+        {
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalNumber)} TryGetValue returns success for optional long property for non-null value",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiObjectTypeName = nameof(ScalarsOnly),
+            ApiPropertyName = nameof(ScalarsOnly.OptionalNumber),
+            ClrObject = new ScalarsOnly("Alice", 123, true) { OptionalNumber = 42 },
+            ExpectedSuccess = true,
+            ExpectedClrValue = 42
+        },
+
+        new TryGetNonGenericTest
+        {
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalNumber)} TryGetValue returns success for optional long property for null value",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiObjectTypeName = nameof(ScalarsOnly),
+            ApiPropertyName = nameof(ScalarsOnly.OptionalNumber),
+            ClrObject = new ScalarsOnly("Alice", 123, true) { OptionalNumber = null },
+            ExpectedSuccess = true,
+            ExpectedClrValue = null
+        },
+
+        new TryGetNonGenericTest
+        {
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalPredicate)} TryGetValue returns success for optional bool property for non-null value",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiObjectTypeName = nameof(ScalarsOnly),
+            ApiPropertyName = nameof(ScalarsOnly.OptionalPredicate),
+            ClrObject = new ScalarsOnly("Alice", 123, true) { OptionalPredicate = false },
+            ExpectedSuccess = true,
+            ExpectedClrValue = false
+        },
+
+        new TryGetNonGenericTest
+        {
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalPredicate)} TryGetValue returns success for optional bool property for null value",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiObjectTypeName = nameof(ScalarsOnly),
+            ApiPropertyName = nameof(ScalarsOnly.OptionalPredicate),
+            ClrObject = new ScalarsOnly("Alice", 123, true) { OptionalPredicate = null },
+            ExpectedSuccess = true,
+            ExpectedClrValue = null
+        },
     ];
 
-    public static TheoryDataRow<IXUnitTest>[] TrySetTheoryData =>
+    public static TheoryDataRow<IXUnitTest>[] TrySetGenericTheoryData =>
     [
-        // object-based setter on reference type
-        new TrySetObjectTest
+        new TrySetGenericTest<ScalarsOnly, string>
         {
-            Name = "TrySetValue(object, object?) sets reference type property",
-            ClrName = nameof(Person.Name),
-            Target = new Person { Name = "Old" },
-            InputValue = "New",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredName)} TrySetValue<TObject,TValue> returns success for required string property for non-null value",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiObjectTypeName = nameof(ScalarsOnly),
+            ApiPropertyName = nameof(ScalarsOnly.RequiredName),
+            ClrObject = new ScalarsOnly("Alice", 123, true),
+            ClrValue = "Bob",
             ExpectedSuccess = true,
-            ExpectedValue = "New"
         },
 
-        // generic setter on reference type
-        new TrySetGenericTest<Person, string>
+        new TrySetGenericTest<ScalarsOnly, string>
         {
-            Name = "TrySetValue<TObject,TValue> sets reference type property",
-            ClrName = nameof(Person.Name),
-            Target = new Person { Name = "Old" },
-            InputValue = "New",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredName)} TrySetValue<TObject,TValue> returns success for required string property for null value",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiObjectTypeName = nameof(ScalarsOnly),
+            ApiPropertyName = nameof(ScalarsOnly.RequiredName),
+            ClrObject = new ScalarsOnly("Alice", 123, true),
+            ClrValue = null,
             ExpectedSuccess = true,
-            ExpectedValue = "New"
-        },
-
-        // generic setter on reference type, numeric
-        new TrySetGenericTest<ScalarsOnly, long>
-        {
-            Name = "TrySetValue<TObject,TValue> sets numeric property",
-            ClrName = nameof(ScalarsOnly.RequiredNumber),
-            Target = new ScalarsOnly("n", 1, true),
-            InputValue = 42L,
-            ExpectedSuccess = true,
-            ExpectedValue = 42L
-        },
-
-        // non-ref setter on struct target does not mutate caller (field)
-        new TrySetGenericTest<TestPoint, int>
-        {
-            Name = "TrySetValue<TObject,TValue> on struct target assigns copy (field)",
-            ClrName = nameof(TestPoint.X),
-            Target = new TestPoint { X = 1, Y = 2 },
-            InputValue = 10,
-            ExpectedSuccess = true,
-            // Reading back from boxed Target reflects original value (no mutation)
-            ExpectedValue = 1
-        },
-
-        // non-ref setter on struct target does not mutate caller (property)
-        new TrySetGenericTest<TestPoint, int>
-        {
-            Name = "TrySetValue<TObject,TValue> on struct target assigns copy (property)",
-            ClrName = nameof(TestPoint.Y),
-            Target = new TestPoint { X = 1, Y = 2 },
-            InputValue = 20,
-            ExpectedSuccess = true,
-            ExpectedValue = 2
-        },
-
-        // ref setter on struct target mutates caller (field)
-        new TrySetByRefStructTest<int>
-        {
-            Name = "TrySetValueRef mutates struct target (field)",
-            ClrName = nameof(TestPoint.X),
-            Target = new TestPoint { X = 1, Y = 2 },
-            InputValue = 10,
-            ExpectedX = 10,
-            ExpectedY = 2
-        },
-
-        // ref setter on struct target mutates caller (property)
-        new TrySetByRefStructTest<int>
-        {
-            Name = "TrySetValueRef mutates struct target (property)",
-            ClrName = nameof(TestPoint.Y),
-            Target = new TestPoint { X = 1, Y = 2 },
-            InputValue = 20,
-            ExpectedX = 1,
-            ExpectedY = 20
         },
     ];
+
+    public static TheoryDataRow<IXUnitTest>[] TrySetNonGenericTheoryData =>
+    [
+        new TrySetNonGenericTest
+        {
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredName)} TrySetValue<TObject,TValue> returns success for required string property for non-null value",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiObjectTypeName = nameof(ScalarsOnly),
+            ApiPropertyName = nameof(ScalarsOnly.RequiredName),
+            ClrObject = new ScalarsOnly("Alice", 123, true),
+            ClrValue = "Bob",
+            ExpectedSuccess = true,
+        },
+
+        new TrySetNonGenericTest
+        {
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredName)} TrySetValue<TObject,TValue> returns success for required string property for null value",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiObjectTypeName = nameof(ScalarsOnly),
+            ApiPropertyName = nameof(ScalarsOnly.RequiredName),
+            ClrObject = new ScalarsOnly("Alice", 123, true),
+            ClrValue = null,
+            ExpectedSuccess = true,
+        },
+    ];
+
+    // public static TheoryDataRow<IXUnitTest>[] TrySetTheoryData =>
+    // [
+    //     // object-based setter on reference type
+    //     new TrySetObjectTest
+    //     {
+    //         Name = "TrySetValue(object, object?) sets reference type property",
+    //         ClrName = nameof(Person.Name),
+    //         Target = new Person { Name = "Old" },
+    //         InputValue = "New",
+    //         ExpectedSuccess = true,
+    //         ExpectedValue = "New"
+    //     },
+
+    //     // generic setter on reference type
+    //     new TrySetGenericTest<Person, string>
+    //     {
+    //         Name = "TrySetValue<TObject,TValue> sets reference type property",
+    //         ClrName = nameof(Person.Name),
+    //         Target = new Person { Name = "Old" },
+    //         InputValue = "New",
+    //         ExpectedSuccess = true,
+    //         ExpectedValue = "New"
+    //     },
+
+    //     // generic setter on reference type, numeric
+    //     new TrySetGenericTest<ScalarsOnly, long>
+    //     {
+    //         Name = "TrySetValue<TObject,TValue> sets numeric property",
+    //         ClrName = nameof(ScalarsOnly.RequiredNumber),
+    //         Target = new ScalarsOnly("n", 1, true),
+    //         InputValue = 42L,
+    //         ExpectedSuccess = true,
+    //         ExpectedValue = 42L
+    //     },
+
+    //     // non-ref setter on struct target does not mutate caller (field)
+    //     new TrySetGenericTest<TestPoint, int>
+    //     {
+    //         Name = "TrySetValue<TObject,TValue> on struct target assigns copy (field)",
+    //         ClrName = nameof(TestPoint.X),
+    //         Target = new TestPoint { X = 1, Y = 2 },
+    //         InputValue = 10,
+    //         ExpectedSuccess = true,
+    //         // Reading back from boxed Target reflects original value (no mutation)
+    //         ExpectedValue = 1
+    //     },
+
+    //     // non-ref setter on struct target does not mutate caller (property)
+    //     new TrySetGenericTest<TestPoint, int>
+    //     {
+    //         Name = "TrySetValue<TObject,TValue> on struct target assigns copy (property)",
+    //         ClrName = nameof(TestPoint.Y),
+    //         Target = new TestPoint { X = 1, Y = 2 },
+    //         InputValue = 20,
+    //         ExpectedSuccess = true,
+    //         ExpectedValue = 2
+    //     },
+
+    //     // ref setter on struct target mutates caller (field)
+    //     new TrySetByRefStructTest<int>
+    //     {
+    //         Name = "TrySetValueRef mutates struct target (field)",
+    //         ClrName = nameof(TestPoint.X),
+    //         Target = new TestPoint { X = 1, Y = 2 },
+    //         InputValue = 10,
+    //         ExpectedX = 10,
+    //         ExpectedY = 2
+    //     },
+
+    //     // ref setter on struct target mutates caller (property)
+    //     new TrySetByRefStructTest<int>
+    //     {
+    //         Name = "TrySetValueRef mutates struct target (property)",
+    //         ClrName = nameof(TestPoint.Y),
+    //         Target = new TestPoint { X = 1, Y = 2 },
+    //         InputValue = 20,
+    //         ExpectedX = 1,
+    //         ExpectedY = 20
+    //     },
+    // ];
     #endregion
 
     #region Test Methods
@@ -485,8 +653,12 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
     [MemberData(nameof(TryGetNonGenericTheoryData))]
     public void TryGetNonGeneric(IXUnitTest test) => test.Execute(this);
 
-    // [Theory]
-    // [MemberData(nameof(TrySetTheoryData))]
-    // public void TrySet(IXUnitTest test) => test.Execute(this);
+    [Theory]
+    [MemberData(nameof(TrySetGenericTheoryData))]
+    public void TrySetGeneric(IXUnitTest test) => test.Execute(this);
+
+    [Theory]
+    [MemberData(nameof(TrySetNonGenericTheoryData))]
+    public void TrySetNonGeneric(IXUnitTest test) => test.Execute(this);
     #endregion
 }

@@ -33,6 +33,8 @@ public sealed class ApiEnumValue(string apiName, string clrName, int clrOrdinal)
     #endregion
 
     #region ApiEnumValue Methods
+    internal string GetValidationPath(string parentPath) => $"{parentPath.SafeToString()}.{nameof(ApiEnumValue)}[\"{this.ApiName.SafeToString()}\"]";
+
     /// <summary>
     ///     Validates the <see cref="ApiEnumValue"/> by checking that required fields are not null or empty.
     /// </summary>

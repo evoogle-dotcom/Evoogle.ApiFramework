@@ -3,8 +3,6 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using System.Text.Json.Serialization;
-
 namespace Evoogle.ApiFramework.Schema.TestData;
 
 #region Enums
@@ -29,15 +27,21 @@ public sealed class Empty()
 {
 }
 
+public struct Point
+{
+    public int X; // field
+    public int Y { get; set; } // property
+}
+
 public sealed class ScalarsOnly
 {
     public string RequiredName { get; set; }
     public long RequiredNumber { get; set; }
     public bool RequiredPredicate { get; set; }
 
-    public string? OptionalName { get; set; }
-    public long? OptionalNumber { get; set; }
-    public bool? OptionalPredicate { get; set; }
+    public string? OptionalName;
+    public long? OptionalNumber;
+    public bool? OptionalPredicate;
 
     public ScalarsOnly()
     {
@@ -67,21 +71,5 @@ public sealed class Company
     public string Name { get; set; } = string.Empty;
     public Person? Owner { get; set; }
     public List<Person>? Employees { get; set; }
-}
-
-public class TestExtension
-{
-    public bool Flag { get; set; } = true;
-}
-
-public class TestExtension1
-{
-    public string Description { get; set; } = nameof(TestExtension1);
-}
-
-public class TestExtension2
-{
-    public string Id { get; set; } = "2";
-    public string Name { get; set; } = nameof(TestExtension2);
 }
 #endregion

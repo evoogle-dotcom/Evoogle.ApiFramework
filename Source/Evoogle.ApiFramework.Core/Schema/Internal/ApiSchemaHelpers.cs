@@ -26,8 +26,8 @@ internal static class ApiSchemaHelpers
             return value;
         }
 
-        var typeName = obj.GetType().Name;
-        throw new ApiSchemaException($"{typeName} has not been initialized. Initialize the {nameof(ApiSchema)} before accessing.");
+        var objectType = obj.GetType();
+        throw new ApiSchemaException($"{objectType.SafeToName()} has not been initialized. Initialize the {nameof(ApiSchema)} before accessing.");
     }
 
     public static bool ValidateUnique<TPart, TPartKey>(IEnumerable<TPart> parts, Func<TPart, TPartKey> partKeySelector, string validationPath, string partKeyPropertyName, ref List<ValidationResult>? results)
@@ -44,8 +44,8 @@ internal static class ApiSchemaHelpers
         }
 
         var duplicatesString = duplicates.SafeToDelimitedString(',');
-        var partTypeName = typeof(TPart).Name;
-        var message = $"{validationPath}.{partTypeName} unable to initialize because duplicate {partKeyPropertyName} values detected: {duplicatesString}";
+        var partTypeName = typeof(TPart).SafeToName();
+        var message = $"{validationPath} unable to initialize because duplicate {partTypeName}.{partKeyPropertyName} values detected: '{duplicatesString}'";
 
         results ??= [];
         results.Add(new ValidationResult(message, [partKeyPropertyName]));

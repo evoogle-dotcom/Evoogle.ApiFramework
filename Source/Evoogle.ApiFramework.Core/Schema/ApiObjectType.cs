@@ -161,59 +161,73 @@ public sealed partial class ApiObjectType
             return; // optional (no identity for this object type)
         }
 
-        var apiValidationPath = $"{this.ValidationPath}.Identities";
+        var apiValidationPath = $"{this.GetValidationPath()}.{nameof(this.ApiIdentitySet)}";
         this.ApiIdentitySet.Initialize(apiSchema, this, apiValidationPath, ref results);
     }
 
     private void InitializeApiProperties(ApiSchema apiSchema, ref List<ValidationResult>? results)
     {
+        var apiValidationPath = this.GetValidationPath();
+
         if (this.ApiProperties is null)
         {
             results ??= [];
-            results.Add(new ValidationResult($"{this.ValidationPath}.{nameof(this.ApiProperties)} cannot be null.", [nameof(this.ApiProperties)]));
+            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ApiProperties)} cannot be null.", [nameof(this.ApiProperties)]));
             return;
         }
 
         var apiPropertiesCount = this.ApiProperties.Length;
         for (var i = 0; i < apiPropertiesCount; ++i)
         {
-            var apiValidationPath = $"{this.ValidationPath}.{nameof(this.ApiProperties)}[{i}]";
-
             var apiProperty = this.ApiProperties[i];
             if (apiProperty is null)
             {
                 results ??= [];
-                results.Add(new ValidationResult($"{apiValidationPath} cannot be null.", [nameof(this.ApiProperties)]));
+                results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ApiProperties)}[{i}] cannot be null.", [nameof(this.ApiProperties)]));
                 continue;
             }
 
-            apiProperty.Initialize(apiSchema, apiValidationPath, ref results);
+            var apiPropertyValidationPath = apiProperty.GetValidationPath(parentPath: apiValidationPath);
+            apiProperty.Initialize
+            (
+                apiSchema,
+                this,
+                apiPropertyValidationPath,
+                ref results
+            );
         }
     }
 
     private void InitializeApiRelationships(ApiSchema apiSchema, ref List<ValidationResult>? results)
     {
+        var apiValidationPath = this.GetValidationPath();
+
         if (this.ApiRelationships is null)
         {
             results ??= [];
-            results.Add(new ValidationResult($"{this.ValidationPath}.{nameof(this.ApiRelationships)} cannot be null.", [nameof(this.ApiRelationships)]));
+            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ApiRelationships)} cannot be null.", [nameof(this.ApiRelationships)]));
             return;
         }
 
         var apiRelationshipsCount = this.ApiRelationships.Length;
         for (var i = 0; i < apiRelationshipsCount; ++i)
         {
-            var apiValidationPath = $"{this.ValidationPath}.{nameof(this.ApiRelationships)}[{i}]";
-
             var apiRelationship = this.ApiRelationships[i];
             if (apiRelationship is null)
             {
                 results ??= [];
-                results.Add(new ValidationResult($"{apiValidationPath} cannot be null.", [nameof(this.ApiRelationships)]));
+                results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ApiRelationships)}[{i}] cannot be null.", [nameof(this.ApiRelationships)]));
                 continue;
             }
 
-            apiRelationship.Initialize(apiSchema, this, apiValidationPath, ref results);
+            var apiRelationshipValidationPath = apiRelationship.GetValidationPath(parentPath: apiValidationPath);
+            apiRelationship.Initialize
+            (
+                apiSchema,
+                this,
+                apiRelationshipValidationPath,
+                ref results
+            );
         }
     }
 
@@ -223,9 +237,9 @@ public sealed partial class ApiObjectType
         _apiPropertyClrNameLookup = null;
         _apiRelationshipApiNameLookup = null;
 
-        var anyPropertyApiNameDuplicates = ApiSchemaHelpers.ValidateUnique(this.ApiProperties, x => x.ApiName, this.ValidationPath, nameof(ApiProperty.ApiName), ref results);
-        var anyPropertyClrNameDuplicates = ApiSchemaHelpers.ValidateUnique(this.ApiProperties, x => x.ClrName, this.ValidationPath, nameof(ApiProperty.ClrName), ref results);
-        var anyRelationshipApiNameDuplicates = ApiSchemaHelpers.ValidateUnique(this.ApiRelationships, x => x.ApiName, this.ValidationPath, nameof(ApiRelationship.ApiName), ref results);
+        var anyPropertyApiNameDuplicates = ApiSchemaHelpers.ValidateUnique(this.ApiProperties, x => x.ApiName, this.GetValidationPath(), nameof(ApiProperty.ApiName), ref results);
+        var anyPropertyClrNameDuplicates = ApiSchemaHelpers.ValidateUnique(this.ApiProperties, x => x.ClrName, this.GetValidationPath(), nameof(ApiProperty.ClrName), ref results);
+        var anyRelationshipApiNameDuplicates = ApiSchemaHelpers.ValidateUnique(this.ApiRelationships, x => x.ApiName, this.GetValidationPath(), nameof(ApiRelationship.ApiName), ref results);
 
         if (!anyPropertyApiNameDuplicates)
         {

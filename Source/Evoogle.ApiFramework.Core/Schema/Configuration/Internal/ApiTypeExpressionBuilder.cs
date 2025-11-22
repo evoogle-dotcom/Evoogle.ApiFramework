@@ -14,14 +14,14 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Internal;
 internal static class ApiTypeExpressionBuilder
 {
     #region Factory Methods
-    public static ApiTypeExpression Build(PropertyNullableInfo clrPropertyNullabilityInfo)
+    public static ApiTypeExpression Build(MemberNullableInfo clrPropertyNullabilityInfo)
     {
         if (clrPropertyNullabilityInfo.IsCollection)
         {
             return BuildInlineCollection(clrPropertyNullabilityInfo.CollectionChain);
         }
 
-        return BuildClrTypeReference(clrPropertyNullabilityInfo.PropertyType);
+        return BuildClrTypeReference(clrPropertyNullabilityInfo.MemberType);
     }
 
     public static ApiTypeExpression Build() => new(new ApiUnknownType());
@@ -30,7 +30,7 @@ internal static class ApiTypeExpressionBuilder
     #region Implementation Methods
     private static ApiTypeExpression BuildClrTypeReference(Type clrType) => new(clrType);
 
-    private static ApiTypeExpression BuildInlineCollection(IReadOnlyList<PropertyNullableInfo.CollectionInfo> clrCollectionChain)
+    private static ApiTypeExpression BuildInlineCollection(IReadOnlyList<MemberNullableInfo.CollectionInfo> clrCollectionChain)
     {
         // Build the API type expression for the innermost (last) layer
         var clrCollectionChainCount = clrCollectionChain.Count;

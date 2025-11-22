@@ -3,14 +3,15 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Reflection;
+
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
-using Evoogle.Extensions;
 using Evoogle.Reflection;
 
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
 /// <summary>
-///     Builds <see cref="ApiProperty"/> definitions from CLR property metadata and optional modifiers.
+///     Builds <see cref="ApiProperty"/> definitions from CLR property/field metadata and optional modifiers.
 /// </summary>
 /// <param name="apiName">The API name of the property.</param>
 /// <param name="clrName">The CLR property name.</param>
@@ -32,56 +33,69 @@ public class ApiPropertyBuilder(string apiName, string clrName) : ExtensionBuild
     /// <summary>
     ///     Builds an <see cref="ApiProperty"/> for the specified CLR object type.
     /// </summary>
-    /// <param name="clrObjectType">The CLR type declaring the property.</param>
+    /// <param name="clrObjectType">The CLR type declaring the property/field.</param>
     /// <returns>The constructed <see cref="ApiProperty"/> instance.</returns>
     internal ApiProperty Build(Type clrObjectType)
     {
-        var apiPropertyName = _apiName;
-        var clrPropertyName = _clrName;
-        var clrObjectTypeName = clrObjectType.SafeToName();
-
-        var clrPropertyInfo = TypeReflection.GetProperty(clrObjectType, clrPropertyName);
-        if (clrPropertyInfo == null)
+        var clrPropertyInfo = TypeReflection.GetProperty(clrObjectType, _clrName);
+        if (clrPropertyInfo != null)
         {
-            var apiUnknownTypeExpression = ApiTypeExpressionBuilder.Build();
-
-            var apiUnknownTypeModifiers = ApiTypeModifiers.None;
-            if (this.Modifiers != null)
-            {
-                var modifierBuilder = new ApiTypeModifiersBuilder(apiUnknownTypeModifiers);
-                this.Modifiers.Invoke(modifierBuilder);
-                apiUnknownTypeModifiers = modifierBuilder.Build();
-            }
-
-            return this.CreateAndBuildExtensions(apiPropertyName, apiUnknownTypeExpression, apiUnknownTypeModifiers, clrPropertyName);
+            return this.BuildFromPropertyInfo(clrPropertyInfo);
         }
 
-        var clrPropertyNullabilityInfo = PropertyReflection.GetNullabilityInfo(clrPropertyInfo);
-
-        var apiTypeExpression = ApiTypeExpressionBuilder.Build(clrPropertyNullabilityInfo);
-
-        var apiTypeModifiers = clrPropertyNullabilityInfo.IsNullable ? ApiTypeModifiers.None : ApiTypeModifiers.Required;
-        if (this.Modifiers != null)
+        var clrFieldInfo = TypeReflection.GetField(clrObjectType, _clrName);
+        if (clrFieldInfo != null)
         {
-            var modifierBuilder = new ApiTypeModifiersBuilder(apiTypeModifiers);
-            this.Modifiers.Invoke(modifierBuilder);
-            apiTypeModifiers = modifierBuilder.Build();
+            return this.BuildFromFieldInfo(clrFieldInfo);
         }
 
-        return this.CreateAndBuildExtensions(apiPropertyName, apiTypeExpression, apiTypeModifiers, clrPropertyName);
+        return this.BuildUnknownProperty();
     }
 
-    /// <summary>
-    ///     Creates the <see cref="ApiProperty"/> instance and attaches any collected extensions.
-    /// </summary>
-    /// <param name="apiPropertyName">The API property name.</param>
-    /// <param name="apiTypeExpression">The property's type expression.</param>
-    /// <param name="apiTypeModifiers">Modifiers applied to the property.</param>
-    /// <param name="clrPropertyName">The CLR property name.</param>
-    /// <returns>The created <see cref="ApiProperty"/>.</returns>
-    private ApiProperty CreateAndBuildExtensions(string apiPropertyName, ApiTypeExpression apiTypeExpression, ApiTypeModifiers apiTypeModifiers, string clrPropertyName)
+    private ApiProperty BuildFromPropertyInfo(PropertyInfo clrPropertyInfo)
     {
-        var apiProperty = new ApiProperty(apiPropertyName, apiTypeExpression, apiTypeModifiers, clrPropertyName);
+        var clrPropertyNullabilityInfo = PropertyReflection.GetNullabilityInfo(clrPropertyInfo);
+        return this.BuildFromNullabilityInfo(clrPropertyNullabilityInfo);
+    }
+
+    private ApiProperty BuildFromFieldInfo(FieldInfo clrFieldInfo)
+    {
+        var clrFieldNullabilityInfo = FieldReflection.GetNullabilityInfo(clrFieldInfo);
+        return this.BuildFromNullabilityInfo(clrFieldNullabilityInfo);
+    }
+
+    private ApiTypeModifiers BuildModifiers(ApiTypeModifiers apiInitialTypeModifiers)
+    {
+        if (this.Modifiers == null)
+        {
+            return apiInitialTypeModifiers;
+        }
+
+        var modifierBuilder = new ApiTypeModifiersBuilder(apiInitialTypeModifiers);
+        this.Modifiers.Invoke(modifierBuilder);
+        return modifierBuilder.Build();
+    }
+
+    private ApiProperty BuildFromNullabilityInfo(MemberNullableInfo clrNullabilityInfo)
+    {
+        var apiTypeExpression = ApiTypeExpressionBuilder.Build(clrNullabilityInfo);
+        var apiInitialTypeModifiers = clrNullabilityInfo.IsNullable ? ApiTypeModifiers.None : ApiTypeModifiers.Required;
+        var apiTypeModifiers = this.BuildModifiers(apiInitialTypeModifiers);
+
+        return this.CreateAndBuildExtensions(_apiName, apiTypeExpression, apiTypeModifiers, _clrName);
+    }
+
+    private ApiProperty BuildUnknownProperty()
+    {
+        var apiTypeExpression = ApiTypeExpressionBuilder.Build();
+        var apiTypeModifiers = this.BuildModifiers(ApiTypeModifiers.None);
+
+        return this.CreateAndBuildExtensions(_apiName, apiTypeExpression, apiTypeModifiers, _clrName);
+    }
+
+    private ApiProperty CreateAndBuildExtensions(string apiName, ApiTypeExpression apiTypeExpression, ApiTypeModifiers apiTypeModifiers, string clrName)
+    {
+        var apiProperty = new ApiProperty(apiName, apiTypeExpression, apiTypeModifiers, clrName);
 
         var extensions = this.BuildExtensions();
         if (extensions != null)

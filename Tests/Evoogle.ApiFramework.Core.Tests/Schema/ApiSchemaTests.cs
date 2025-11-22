@@ -45,7 +45,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
 
         protected override void Act()
         {
-            this.ActualResult = this.ApiSchema!.TryGetApiType(this.ApiName!, out var apiType);
+            this.ActualResult = this.ApiSchema!.TryGetTypeByApiName(this.ApiName!, out var apiType);
             this.ActualApiType = apiType;
 
             this.WriteLine($"Actual Result:    {this.ActualResult.SafeToString()}");
@@ -90,7 +90,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
 
         protected override void Act()
         {
-            this.ActualResult = this.ApiSchema!.TryGetApiType(this.ClrType!, out var apiType);
+            this.ActualResult = this.ApiSchema!.TryGetTypeByClrType(this.ClrType!, out var apiType);
             this.ActualApiType = apiType;
 
             this.WriteLine($"Actual   Result:  {this.ActualResult.SafeToString()}");

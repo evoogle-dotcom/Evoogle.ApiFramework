@@ -29,9 +29,6 @@ public sealed class ApiCollectionType(ApiTypeExpression apiItemTypeExpression, A
 
     /// <inheritdoc/>
     protected override string ApiTypeName => nameof(ApiCollectionType);
-
-    /// <inheritdoc />
-    protected override string ValidationPath => $"{this.ApiTypeName}[\"{this.ClrType.SafeToString()}\"]";
     #endregion
 
     #region ApiCollectionType Properties
@@ -43,14 +40,13 @@ public sealed class ApiCollectionType(ApiTypeExpression apiItemTypeExpression, A
     /// <summary>Gets the modifiers applied to the item type within the collection (e.g., Required).</summary>
     public ApiTypeModifiers ApiItemTypeModifiers { get; } = apiItemTypeModifiers;
 
-    /// <summary>
-    ///     Gets the API type expression to the API item type of this collection.
-    ///     May point to a named type or inline type (e.g., collection).
-    /// </summary>
     internal ApiTypeExpression ApiItemTypeExpression { get; } = apiItemTypeExpression;
     #endregion
 
     #region ApiType Methods
+    /// <inheritdoc />
+    protected override string GetValidationPath() => $"{this.ApiTypeName.SafeToString()}";
+
     internal override void Initialize(ApiSchema apiSchema, ref List<ValidationResult>? results)
     {
         ArgumentNullException.ThrowIfNull(apiSchema);
@@ -78,11 +74,11 @@ public sealed class ApiCollectionType(ApiTypeExpression apiItemTypeExpression, A
         if (this.ApiItemTypeExpression is null)
         {
             results ??= [];
-            results.Add(new ValidationResult($"{this.ValidationPath}.{nameof(this.ApiItemTypeExpression)} cannot be null.", [nameof(this.ApiItemTypeExpression)]));
+            results.Add(new ValidationResult($"{this.GetValidationPath()}.{nameof(this.ApiItemTypeExpression)} cannot be null.", [nameof(this.ApiItemTypeExpression)]));
             return;
         }
 
-        var apiChildValidationPath = $"{this.ValidationPath}.{nameof(this.ApiItemTypeExpression)}";
+        var apiChildValidationPath = $"{this.GetValidationPath()}.{nameof(this.ApiItemTypeExpression)}";
         this.ApiItemTypeExpression.Initialize(apiSchema, apiChildValidationPath, ref results);
     }
     #endregion

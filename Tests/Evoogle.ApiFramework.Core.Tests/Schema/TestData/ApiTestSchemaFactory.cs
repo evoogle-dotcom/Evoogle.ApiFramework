@@ -3,7 +3,6 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-
 using static Evoogle.ApiFramework.Schema.TestData.ApiTestSchemaUtils;
 
 namespace Evoogle.ApiFramework.Schema.TestData;
@@ -11,9 +10,19 @@ namespace Evoogle.ApiFramework.Schema.TestData;
 /// <summary>
 ///     Produces a compact but expressive ApiSchema suitable for most unit tests.
 /// </summary>
-public static class TestSchemaFactory
+public static class ApiTestSchemaFactory
 {
     #region Methods
+    public static ApiSchema BuildTestSchema(ApiTestSchemaKind kind)
+    {
+        return kind switch
+        {
+            ApiTestSchemaKind.Simple => BuildSimpleSchema(),
+            ApiTestSchemaKind.Commerce => BuildCommerceSchema(),
+            _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null)
+        };
+    }
+
     /// <summary>
     ///     Builds the reusable “Commerce” schema:
     ///     Scalars, Enums, Value Objects, Entities, Relationships, Polymorphism, Recursion, and M2M.
@@ -228,6 +237,79 @@ public static class TestSchemaFactory
         var result = schema.Initialize();
         result.ThrowIfInvalid();
 
+        return schema;
+    }
+
+    /// <summary>
+    ///    Builds the reusable “Simple” schema: Scalars, Enums, and Object Types.
+    /// </summary>
+    public static ApiSchema BuildSimpleSchema(string name = "Simple")
+    {
+        // 1) Scalars
+        var scalars = new List<ApiScalarType>
+        {
+            S("String",  typeof(string)),
+            S("Int32",   typeof(int)),
+            S("Int64",   typeof(long)),
+            S("Boolean", typeof(bool))
+        };
+
+        // 2) Enums
+        var enums = new List<ApiEnumType>
+        {
+            E("Gender", typeof(Gender), [EV("Unspecified", 0), EV("Male", 1), EV("Female", 2)]),
+            E("StopLight", typeof(StopLight), [EV("None", 0), EV("Green", 1), EV("Yellow", 2), EV("Red", 3)])
+        };
+
+        // 3) Object Types
+        var empty = O("Empty", typeof(Empty), []);
+
+        var scalarsOnly = O("ScalarsOnly", typeof(ScalarsOnly),
+        [
+            P("RequiredName",   TE.ClrRef<string>(),    required: true),
+            P("RequiredNumber", TE.ClrRef<long>(),      required: true),
+            P("RequiredPredicate", TE.ClrRef<bool>(),   required: true),
+            P("OptionalName",   TE.ClrRef<string>(),    required: false),
+            P("OptionalNumber", TE.ClrRef<long>(),      required: false),
+            P("OptionalPredicate", TE.ClrRef<bool>(),   required: false)
+        ]);
+
+        var person = O("Person", typeof(Person),
+        [
+            P("Name",     TE.ClrRef<string>(),              required: true),
+            P("Age",      TE.ClrRef<int>(),                 required: false),
+            P("Gender",   TE.ClrRef<Gender>(),              required: false),
+            P("Hobbies",  TE.ListOf<string>(required:true), required: false)
+        ]);
+        var company = O("Company", typeof(Company),
+        [
+            P("Name",      TE.ClrRef<string>(),              required: true),
+            P("Owner",     TE.ClrRef<Person>(),              required: false),
+            P("Employees", TE.ListOf<Person>(required:true), required: false)
+        ],
+        [
+            R("Company_Owner", "Owner"),
+            R("Company_Employees", "Employees")
+        ]);
+
+        // 4) Objects list
+        var objects = new List<ApiObjectType>
+        {
+            empty,
+            scalarsOnly,
+            person,
+            company
+        };
+
+        // 5) Assemble schema
+        var schema = new ApiSchema(
+            apiName: name,
+            apiScalarTypes: scalars,
+            apiEnumTypes: enums,
+            apiObjectTypes: objects
+        );
+        var result = schema.Initialize();
+        result.ThrowIfInvalid();
         return schema;
     }
     #endregion

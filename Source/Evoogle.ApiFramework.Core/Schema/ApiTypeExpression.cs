@@ -188,15 +188,15 @@ public sealed class ApiTypeExpression
         switch (kind)
         {
             case ApiTypeKind.Scalar:
-                _apiResolvedType = apiSchema.TryGetApiScalarType(apiName, out var apiScalarType) ? apiScalarType : null;
+                _apiResolvedType = apiSchema.TryGetScalarTypeByApiName(apiName, out var apiScalarType) ? apiScalarType : null;
                 break;
 
             case ApiTypeKind.Enum:
-                _apiResolvedType = apiSchema.TryGetApiEnumType(apiName, out var apiEnumType) ? apiEnumType : null;
+                _apiResolvedType = apiSchema.TryGetEnumTypeByApiName(apiName, out var apiEnumType) ? apiEnumType : null;
                 break;
 
             case ApiTypeKind.Object:
-                _apiResolvedType = apiSchema.TryGetApiObjectType(apiName, out var apiObjectType) ? apiObjectType : null;
+                _apiResolvedType = apiSchema.TryGetObjectTypeByApiName(apiName, out var apiObjectType) ? apiObjectType : null;
                 break;
 
             case ApiTypeKind.Collection:
@@ -220,7 +220,7 @@ public sealed class ApiTypeExpression
     private void InitializeApiTypeByClrTypeReference(ApiSchema apiSchema, string apiValidationPath, ref List<ValidationResult>? results)
     {
         var clrType = this.ClrType!;
-        _apiResolvedType = apiSchema.TryGetApiType(clrType, out var apiType) ? apiType : null;
+        _apiResolvedType = apiSchema.TryGetTypeByClrType(clrType, out var apiType) ? apiType : null;
 
         if (_apiResolvedType is null)
         {

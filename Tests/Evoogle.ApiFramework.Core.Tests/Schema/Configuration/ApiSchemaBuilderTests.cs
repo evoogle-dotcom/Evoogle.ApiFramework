@@ -451,8 +451,8 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
             ApiSchemaExceptionMessageExpected = "ApiSchema initialization failed.",
             ApiSchemaValidationResultsExpected =
             [
-                @"ApiObjectType[""Evoogle.ApiFramework.Schema.TestData.ScalarsOnly""][""ScalarsOnly""].ApiProperties[0].ApiTypeExpression.ApiType is unresolved for ClrType=String.",
-                @"ApiObjectType[""Evoogle.ApiFramework.Schema.TestData.ScalarsOnly""][""ScalarsOnly""].ApiProperties[3].ApiTypeExpression.ApiType is unresolved for ClrType=String.",
+                @"ApiObjectType[""ScalarsOnly""].ApiProperty[""RequiredName""].ApiTypeExpression.ApiType is unresolved for ClrType=String.",
+                @"ApiObjectType[""ScalarsOnly""].ApiProperty[""OptionalName""].ApiTypeExpression.ApiType is unresolved for ClrType=String.",
             ],
         },
         new BuildTest
@@ -492,9 +492,9 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
             ApiSchemaExceptionMessageExpected = "ApiSchema initialization failed.",
             ApiSchemaValidationResultsExpected =
             [
-                @"ApiObjectType[""Evoogle.ApiFramework.Schema.TestData.Person""][""Person""].ApiProperties[0].ApiTypeExpression.ApiType is unresolved for ClrType=String.",
-                @"ApiObjectType[""Evoogle.ApiFramework.Schema.TestData.Person""][""Person""].ApiProperties[2].ApiTypeExpression.ApiType is unresolved for ClrType=Gender.",
-                @"ApiCollectionType[""System.Collections.Generic.List`1[System.String]""].ApiItemTypeExpression.ApiType is unresolved for ClrType=String.",
+                @"ApiObjectType[""Person""].ApiProperty[""Name""].ApiTypeExpression.ApiType is unresolved for ClrType=String.",
+                @"ApiObjectType[""Person""].ApiProperty[""Gender""].ApiTypeExpression.ApiType is unresolved for ClrType=Gender.",
+                @"ApiCollectionType.ApiItemTypeExpression.ApiType is unresolved for ClrType=String.",
             ],
         },
         new BuildTest
@@ -535,8 +535,8 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
             ApiSchemaExceptionMessageExpected = "ApiSchema initialization failed.",
             ApiSchemaValidationResultsExpected =
             [
-                @"ApiObjectType[""Evoogle.ApiFramework.Schema.TestData.Company""][""Company""].ApiProperties[1].ApiTypeExpression.ApiType is unresolved for ClrType=Person.",
-                @"ApiCollectionType[""System.Collections.Generic.List`1[Evoogle.ApiFramework.Schema.TestData.Person]""].ApiItemTypeExpression.ApiType is unresolved for ClrType=Person.",
+                @"ApiObjectType[""Company""].ApiProperty[""Owner""].ApiTypeExpression.ApiType is unresolved for ClrType=Person.",
+                @"ApiCollectionType.ApiItemTypeExpression.ApiType is unresolved for ClrType=Person.",
             ],
         },
         new BuildTest
@@ -561,8 +561,8 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
             ApiSchemaExceptionMessageExpected = "ApiSchema initialization failed.",
             ApiSchemaValidationResultsExpected =
             [
-                @"ApiObjectType[""Evoogle.ApiFramework.Schema.TestData.Company""][""Company""].ApiRelationships[0].ApiProperty unable to resolve ApiProperty[""OwnerMissing""].",
-                @"ApiObjectType[""Evoogle.ApiFramework.Schema.TestData.Company""][""Company""].ApiRelationships[1].ApiProperty unable to resolve ApiProperty[""EmployeesMissing""].",
+                @"ApiObjectType[""Company""].ApiRelationship[""Owner""].ApiProperty unable to resolve ApiProperty[""OwnerMissing""].",
+                @"ApiObjectType[""Company""].ApiRelationship[""Employees""].ApiProperty unable to resolve ApiProperty[""EmployeesMissing""].",
             ],
         },
     ];

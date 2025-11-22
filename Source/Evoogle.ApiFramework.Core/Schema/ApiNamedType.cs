@@ -22,9 +22,6 @@ public abstract class ApiNamedType(string apiName, Type clrType) : ApiType()
     #region ApiType Properties
     /// <inheritdoc />
     public override Type ClrType { get; } = clrType;
-
-    /// <inheritdoc />
-    protected override string ValidationPath => $"{this.ApiTypeName}[\"{this.ClrType.SafeToString()}\"][\"{this.ApiName.SafeToString()}\"]";
     #endregion
 
     #region ApiNamedType Properties
@@ -33,12 +30,9 @@ public abstract class ApiNamedType(string apiName, Type clrType) : ApiType()
     #endregion
 
     #region ApiType Methods
-    /// <summary>
-    ///     Performs validation and initialization of the <see cref="ApiNamedType"/> within the specified <see cref="ApiSchema"/>.
-    /// </summary>
-    /// <param name="apiSchema">The API schema the type is part of.</param>
-    /// <param name="results">Optional validation results to populate with any issues.</param>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="apiSchema"/> is null.</exception>
+    /// <inheritdoc />
+    protected override string GetValidationPath() => $"{this.ApiTypeName.SafeToString()}[\"{this.ApiName.SafeToString()}\"]";
+
     internal override void Initialize(ApiSchema apiSchema, ref List<ValidationResult>? results)
     {
         ArgumentNullException.ThrowIfNull(apiSchema);
@@ -49,29 +43,21 @@ public abstract class ApiNamedType(string apiName, Type clrType) : ApiType()
     #endregion
 
     #region Implementation Methods
-    /// <summary>
-    /// Validates that the <see cref="ApiName"/> is not null or whitespace.
-    /// </summary>
-    /// <param name="results">Validation results collection to populate.</param>
     private void InitializeApiName(ref List<ValidationResult>? results)
     {
         if (string.IsNullOrWhiteSpace(this.ApiName))
         {
             results ??= [];
-            results.Add(new ValidationResult($"{this.ValidationPath}.{nameof(this.ApiName)} cannot be null or whitespace.", [nameof(this.ApiName)]));
+            results.Add(new ValidationResult($"{this.GetValidationPath()}.{nameof(this.ApiName)} cannot be null or whitespace.", [nameof(this.ApiName)]));
         }
     }
 
-    /// <summary>
-    /// Validates that the <see cref="ClrType"/> is not null.
-    /// </summary>
-    /// <param name="results">Validation results collection to populate.</param>
     private void InitializeClrType(ref List<ValidationResult>? results)
     {
         if (this.ClrType is null)
         {
             results ??= [];
-            results.Add(new ValidationResult($"{this.ValidationPath}.{nameof(this.ClrType)} cannot be null.", [nameof(this.ClrType)]));
+            results.Add(new ValidationResult($"{this.GetValidationPath()}.{nameof(this.ClrType)} cannot be null.", [nameof(this.ClrType)]));
         }
     }
     #endregion
