@@ -30,6 +30,8 @@ namespace Evoogle.ApiFramework.Schema;
 public sealed class ApiRelationship(string apiName, string? apiPropertyName = null) : ExtensibleBase
 {
     #region Fields
+    private ApiSchemaContext? _apiSchemaContext = null;
+
     private readonly string? _apiPropertyName = apiPropertyName;
 
     private ApiProperty? _apiResolvedProperty = null;
@@ -68,16 +70,22 @@ public sealed class ApiRelationship(string apiName, string? apiPropertyName = nu
         ApiTypeKind.Collection => ApiRelationshipCardinality.ToMany,
         _ => throw new ApiSchemaException($"Unsupported {nameof(ApiTypeKind)}: {this.ApiProperty.ApiType.Kind.SafeToString()} for {this}. Only Object and Collection types are supported.")
     };
+
+    /// <summary>Gets the schema context for this relationship.</summary>
+    internal ApiSchemaContext Context => this.ThrowIfNotInitialized(_apiSchemaContext);
     #endregion
 
     #region ApiRelationship Methods
     internal string GetValidationPath(string parentPath) => $"{parentPath.SafeToString()}.{nameof(ApiRelationship)}[\"{this.ApiName.SafeToString()}\"]";
 
-    internal void Initialize(ApiSchema apiSchema, ApiObjectType apiObjectType, string apiValidationPath, ref List<ValidationResult>? results)
+    internal void Initialize(ApiSchema apiSchema, ApiSchemaContext apiSchemaContext, ApiObjectType apiObjectType, string apiValidationPath, ref List<ValidationResult>? results)
     {
         ArgumentNullException.ThrowIfNull(apiSchema);
+        ArgumentNullException.ThrowIfNull(apiSchemaContext);
         ArgumentNullException.ThrowIfNull(apiObjectType);
         ArgumentException.ThrowIfNullOrWhiteSpace(apiValidationPath);
+
+        _apiSchemaContext = apiSchemaContext;
 
         this.InitializeApiName(apiValidationPath, ref results);
         this.InitializeApiProperty(apiObjectType, apiValidationPath, ref results);

@@ -40,6 +40,8 @@ public sealed partial class ApiObjectType
 ) : ApiNamedType(apiName, clrObjectType)
 {
     #region ApiObjectType Fields
+    private ApiSchemaContext? _apiSchemaContext = null;
+
     private Dictionary<string, ApiProperty>? _apiPropertyApiNameLookup = null;
     private Dictionary<string, ApiProperty>? _apiPropertyClrNameLookup = null;
     private Dictionary<string, ApiRelationship>? _apiRelationshipApiNameLookup = null;
@@ -79,23 +81,29 @@ public sealed partial class ApiObjectType
     /// </summary>
     public bool HasIdentity => this.ApiIdentitySet is not null;
 
+    /// <summary>Gets the schema context for this object type.</summary>
+    internal ApiSchemaContext Context => this.ThrowIfNotInitialized(_apiSchemaContext);
+
     private Dictionary<string, ApiProperty> ApiPropertyApiNameLookup => this.ThrowIfNotInitialized(_apiPropertyApiNameLookup);
     private Dictionary<string, ApiProperty> ApiPropertyClrNameLookup => this.ThrowIfNotInitialized(_apiPropertyClrNameLookup);
     private Dictionary<string, ApiRelationship> ApiRelationshipApiNameLookup => this.ThrowIfNotInitialized(_apiRelationshipApiNameLookup);
     #endregion
 
     #region ApiType Methods
-    internal override void Initialize(ApiSchema apiSchema, ref List<ValidationResult>? results)
+    internal override void Initialize(ApiSchema apiSchema, ApiSchemaContext apiSchemaContext, ref List<ValidationResult>? results)
     {
         ArgumentNullException.ThrowIfNull(apiSchema);
+        ArgumentNullException.ThrowIfNull(apiSchemaContext);
 
-        base.Initialize(apiSchema, ref results);
+        _apiSchemaContext = apiSchemaContext;
+
+        base.Initialize(apiSchema, apiSchemaContext, ref results);
 
         this.InitializeLookupDictionaries(ref results);
 
-        this.InitializeApiProperties(apiSchema, ref results);
-        this.InitializeApiRelationships(apiSchema, ref results);
-        this.InitializeApiIdentitySet(apiSchema, ref results);
+        this.InitializeApiProperties(apiSchema, apiSchemaContext, ref results);
+        this.InitializeApiRelationships(apiSchema, apiSchemaContext, ref results);
+        this.InitializeApiIdentitySet(apiSchema, apiSchemaContext, ref results);
     }
     #endregion
 
@@ -154,7 +162,7 @@ public sealed partial class ApiObjectType
     #endregion
 
     #region Implementation Methods
-    private void InitializeApiIdentitySet(ApiSchema apiSchema, ref List<ValidationResult>? results)
+    private void InitializeApiIdentitySet(ApiSchema apiSchema, ApiSchemaContext apiSchemaContext, ref List<ValidationResult>? results)
     {
         if (this.ApiIdentitySet is null)
         {
@@ -162,10 +170,10 @@ public sealed partial class ApiObjectType
         }
 
         var apiValidationPath = $"{this.GetValidationPath()}.{nameof(this.ApiIdentitySet)}";
-        this.ApiIdentitySet.Initialize(apiSchema, this, apiValidationPath, ref results);
+        this.ApiIdentitySet.Initialize(apiSchema, apiSchemaContext, this, apiValidationPath, ref results);
     }
 
-    private void InitializeApiProperties(ApiSchema apiSchema, ref List<ValidationResult>? results)
+    private void InitializeApiProperties(ApiSchema apiSchema, ApiSchemaContext apiSchemaContext, ref List<ValidationResult>? results)
     {
         var apiValidationPath = this.GetValidationPath();
 
@@ -191,6 +199,7 @@ public sealed partial class ApiObjectType
             apiProperty.Initialize
             (
                 apiSchema,
+                apiSchemaContext,
                 this,
                 apiPropertyValidationPath,
                 ref results
@@ -198,7 +207,7 @@ public sealed partial class ApiObjectType
         }
     }
 
-    private void InitializeApiRelationships(ApiSchema apiSchema, ref List<ValidationResult>? results)
+    private void InitializeApiRelationships(ApiSchema apiSchema, ApiSchemaContext apiSchemaContext, ref List<ValidationResult>? results)
     {
         var apiValidationPath = this.GetValidationPath();
 
@@ -224,6 +233,7 @@ public sealed partial class ApiObjectType
             apiRelationship.Initialize
             (
                 apiSchema,
+                apiSchemaContext,
                 this,
                 apiRelationshipValidationPath,
                 ref results

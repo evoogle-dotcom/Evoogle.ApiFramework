@@ -6,6 +6,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
+using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.ApiFramework.Schema.Json;
 using Evoogle.Extension;
 using Evoogle.Extensions;
@@ -21,6 +22,10 @@ namespace Evoogle.ApiFramework.Schema;
 [JsonConverter(typeof(ApiEnumValueJsonConverter))]
 public sealed class ApiEnumValue(string apiName, string clrName, int clrOrdinal) : ExtensibleBase
 {
+    #region Fields
+    private ApiSchemaContext? _apiSchemaContext = null;
+    #endregion
+
     #region Properties
     /// <summary>Gets the API name of the API enumeration value.</summary>
     public string ApiName { get; } = apiName;
@@ -30,6 +35,9 @@ public sealed class ApiEnumValue(string apiName, string clrName, int clrOrdinal)
 
     /// <summary>Gets the CLR ordinal of the API enumeration value (matching the C# enum ordinal value).</summary>
     public int ClrOrdinal { get; } = clrOrdinal;
+
+    /// <summary>Gets the schema context for this enum value.</summary>
+    internal ApiSchemaContext Context => this.ThrowIfNotInitialized(_apiSchemaContext);
     #endregion
 
     #region ApiEnumValue Methods
@@ -39,12 +47,16 @@ public sealed class ApiEnumValue(string apiName, string clrName, int clrOrdinal)
     ///     Validates the <see cref="ApiEnumValue"/> by checking that required fields are not null or empty.
     /// </summary>
     /// <param name="apiSchema">The current API schema.</param>
+    /// <param name="apiSchemaContext">The API schema context.</param>
     /// <param name="apiValidationPath">The string path used to report validation context.</param>
     /// <param name="results">Validation results list to append to if validation fails.</param>
-    internal void Initialize(ApiSchema apiSchema, string apiValidationPath, ref List<ValidationResult>? results)
+    internal void Initialize(ApiSchema apiSchema, ApiSchemaContext apiSchemaContext, string apiValidationPath, ref List<ValidationResult>? results)
     {
         ArgumentNullException.ThrowIfNull(apiSchema);
+        ArgumentNullException.ThrowIfNull(apiSchemaContext);
         ArgumentException.ThrowIfNullOrWhiteSpace(apiValidationPath);
+
+        _apiSchemaContext = apiSchemaContext;
 
         this.InitializeApiName(apiValidationPath, ref results);
         this.InitializeClrName(apiValidationPath, ref results);

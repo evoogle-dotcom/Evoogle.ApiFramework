@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -13,23 +13,33 @@ namespace Evoogle.ApiFramework.Schema;
 
 public sealed class ApiIdentity(string apiName, IEnumerable<ApiIdentityPart> apiIdentityParts) : ExtensibleBase
 {
+    #region Fields
+    private ApiSchemaContext? _apiSchemaContext = null;
+    #endregion
+
     #region Properties
     public string ApiName { get; } = apiName;
 
     public ApiIdentityPart[] ApiIdentityParts { get; } = apiIdentityParts.SafeToArray();
 
     public bool IsComposite => this.ApiIdentityParts.Length > 1;
+
+    /// <summary>Gets the schema context for this identity.</summary>
+    internal ApiSchemaContext Context => this.ThrowIfNotInitialized(_apiSchemaContext);
     #endregion
 
     #region ApiIdentity Methods
-    internal void Initialize(ApiSchema apiSchema, ApiObjectType apiObjectType, string apiValidationPath, ref List<ValidationResult>? results)
+    internal void Initialize(ApiSchema apiSchema, ApiSchemaContext apiSchemaContext, ApiObjectType apiObjectType, string apiValidationPath, ref List<ValidationResult>? results)
     {
         ArgumentNullException.ThrowIfNull(apiSchema);
+        ArgumentNullException.ThrowIfNull(apiSchemaContext);
         ArgumentNullException.ThrowIfNull(apiObjectType);
         ArgumentException.ThrowIfNullOrWhiteSpace(apiValidationPath);
 
+        _apiSchemaContext = apiSchemaContext;
+
         this.InitializeApiName(apiValidationPath, ref results);
-        this.InitializeApiIdentityParts(apiSchema, apiObjectType, apiValidationPath, ref results);
+        this.InitializeApiIdentityParts(apiSchema, apiSchemaContext, apiObjectType, apiValidationPath, ref results);
     }
     #endregion
 
@@ -62,6 +72,7 @@ public sealed class ApiIdentity(string apiName, IEnumerable<ApiIdentityPart> api
     private void InitializeApiIdentityParts
     (
         ApiSchema apiSchema,
+        ApiSchemaContext apiSchemaContext,
         ApiObjectType apiObjectType,
         string apiValidationPath,
         ref List<ValidationResult>? results
@@ -109,7 +120,7 @@ public sealed class ApiIdentity(string apiName, IEnumerable<ApiIdentityPart> api
                 continue;
             }
 
-            apiIdentityPart.Initialize(apiSchema, apiObjectType, apiValidationPath, ref results);
+            apiIdentityPart.Initialize(apiSchema, apiSchemaContext, apiObjectType, apiValidationPath, ref results);
         }
     }
     #endregion

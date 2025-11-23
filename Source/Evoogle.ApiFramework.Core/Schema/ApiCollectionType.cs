@@ -55,9 +55,10 @@ public sealed class ApiCollectionType(ApiTypeExpression apiItemTypeExpression, A
     /// <inheritdoc />
     protected override string GetValidationPath() => $"{this.ApiTypeName.SafeToString()}";
 
-    internal override void Initialize(ApiSchema apiSchema, ref List<ValidationResult>? results)
+    internal override void Initialize(ApiSchema apiSchema, ApiSchemaContext apiSchemaContext, ref List<ValidationResult>? results)
     {
         ArgumentNullException.ThrowIfNull(apiSchema);
+        ArgumentNullException.ThrowIfNull(apiSchemaContext);
 
         this.InitializeApiItemTypeExpression(apiSchema, ref results);
     }

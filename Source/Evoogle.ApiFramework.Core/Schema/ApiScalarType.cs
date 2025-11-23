@@ -28,7 +28,7 @@ public sealed class ApiScalarType(string apiName, Type clrScalarType) : ApiNamed
     #endregion
 
     #region ApiType Methods
-    internal override void Initialize(ApiSchema apiSchema, ref List<ValidationResult>? results) => base.Initialize(apiSchema, ref results);
+    internal override void Initialize(ApiSchema apiSchema, ApiSchemaContext apiSchemaContext, ref List<ValidationResult>? results) => base.Initialize(apiSchema, apiSchemaContext, ref results);
     #endregion
 
     #region Object Methods

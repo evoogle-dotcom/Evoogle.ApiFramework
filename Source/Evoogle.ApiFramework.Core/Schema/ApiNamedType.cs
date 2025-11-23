@@ -33,9 +33,10 @@ public abstract class ApiNamedType(string apiName, Type clrType) : ApiType()
     /// <inheritdoc />
     protected override string GetValidationPath() => $"{this.ApiTypeName.SafeToString()}[\"{this.ApiName.SafeToString()}\"]";
 
-    internal override void Initialize(ApiSchema apiSchema, ref List<ValidationResult>? results)
+    internal override void Initialize(ApiSchema apiSchema, ApiSchemaContext apiSchemaContext, ref List<ValidationResult>? results)
     {
         ArgumentNullException.ThrowIfNull(apiSchema);
+        ArgumentNullException.ThrowIfNull(apiSchemaContext);
 
         this.InitializeApiName(ref results);
         this.InitializeClrType(ref results);

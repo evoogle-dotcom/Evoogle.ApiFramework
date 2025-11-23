@@ -41,6 +41,6 @@ public abstract class ApiType : ExtensibleBase
     /// <returns>The validation path as a string.</returns>
     protected abstract string GetValidationPath();
 
-    internal abstract void Initialize(ApiSchema apiSchema, ref List<ValidationResult>? results);
+    internal abstract void Initialize(ApiSchema apiSchema, ApiSchemaContext apiSchemaContext, ref List<ValidationResult>? results);
     #endregion
 }

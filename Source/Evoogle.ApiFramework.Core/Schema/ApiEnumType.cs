@@ -23,6 +23,8 @@ namespace Evoogle.ApiFramework.Schema;
 public sealed class ApiEnumType(string apiName, IEnumerable<ApiEnumValue> apiEnumValues, Type clrEnumType) : ApiNamedType(apiName, clrEnumType)
 {
     #region ApiEnumType Fields
+    private ApiSchemaContext? _apiSchemaContext = null;
+
     private Dictionary<string, ApiEnumValue>? _apiNameLookup = null;
     private Dictionary<string, ApiEnumValue>? _clrNameLookup = null;
     private Dictionary<int, ApiEnumValue>? _clrOrdinalLookup = null;
@@ -40,22 +42,28 @@ public sealed class ApiEnumType(string apiName, IEnumerable<ApiEnumValue> apiEnu
     /// <summary>Gets the collection of enumeration values defined for this API enum type.</summary>
     public ApiEnumValue[] ApiEnumValues { get; } = apiEnumValues.SafeToArray();
 
+    /// <summary>Gets the schema context for this enum type.</summary>
+    internal ApiSchemaContext Context => this.ThrowIfNotInitialized(_apiSchemaContext);
+
     private Dictionary<string, ApiEnumValue> ApiNameLookup => this.ThrowIfNotInitialized(_apiNameLookup);
     private Dictionary<string, ApiEnumValue> ClrNameLookup => this.ThrowIfNotInitialized(_clrNameLookup);
     private Dictionary<int, ApiEnumValue> ClrOrdinalLookup => this.ThrowIfNotInitialized(_clrOrdinalLookup);
     #endregion
 
     #region ApiType Methods
-    internal override void Initialize(ApiSchema apiSchema, ref List<ValidationResult>? results)
+    internal override void Initialize(ApiSchema apiSchema, ApiSchemaContext apiSchemaContext, ref List<ValidationResult>? results)
     {
         ArgumentNullException.ThrowIfNull(apiSchema);
+        ArgumentNullException.ThrowIfNull(apiSchemaContext);
 
-        base.Initialize(apiSchema, ref results);
+        _apiSchemaContext = apiSchemaContext;
+
+        base.Initialize(apiSchema, apiSchemaContext, ref results);
 
         this.InitializeLookupDictionaries(ref results);
 
         this.InitializeClrType(ref results);
-        this.InitializeApiEnumValues(apiSchema, ref results);
+        this.InitializeApiEnumValues(apiSchema, apiSchemaContext, ref results);
     }
     #endregion
 
@@ -98,7 +106,7 @@ public sealed class ApiEnumType(string apiName, IEnumerable<ApiEnumValue> apiEnu
     #endregion
 
     #region Implementation Methods
-    private void InitializeApiEnumValues(ApiSchema apiSchema, ref List<ValidationResult>? results)
+    private void InitializeApiEnumValues(ApiSchema apiSchema, ApiSchemaContext apiSchemaContext, ref List<ValidationResult>? results)
     {
         var apiValidationPath = this.GetValidationPath();
 
@@ -124,6 +132,7 @@ public sealed class ApiEnumType(string apiName, IEnumerable<ApiEnumValue> apiEnu
             apiEnumValue.Initialize
             (
                 apiSchema,
+                apiSchemaContext,
                 apiEnumValueValidationPath,
                 ref results
             );

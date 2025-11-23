@@ -20,6 +20,8 @@ namespace Evoogle.ApiFramework.Schema;
 public sealed class ApiSchema : ExtensibleBase
 {
     #region ApiSchema Fields
+    private ApiSchemaContext? _apiSchemaContext = null;
+
     private Dictionary<string, ApiNamedType>? _apiNamedTypeApiNameLookup = null;
     private Dictionary<Type, ApiNamedType>? _apiNamedTypeClrTypeLookup = null;
 
@@ -39,6 +41,9 @@ public sealed class ApiSchema : ExtensibleBase
 
     /// <summary>Gets the optional version of the API schema.</summary>
     public string? ApiVersion { get; init; }
+
+    /// <summary>Gets the runtime context for this API schema. Available after initialization.</summary>
+    public ApiSchemaContext Context => this.ThrowIfNotInitialized(_apiSchemaContext);
 
     /// <summary>Gets all API named types contained within this API schema.</summary>
     public ApiNamedType[] ApiNamedTypes { get; }
@@ -115,7 +120,8 @@ public sealed class ApiSchema : ExtensibleBase
         string apiName,
         IEnumerable<ApiNamedType>? apiNamedTypes,
         string? apiVersion = null,
-        IEnumerable<object>? extensions = null
+        IEnumerable<object>? extensions = null,
+        ApiSchemaContext? apiSchemaContext = null
     )
     {
         var apiSchema = new ApiSchema(apiName, apiNamedTypes)
@@ -132,7 +138,7 @@ public sealed class ApiSchema : ExtensibleBase
             }
         }
 
-        var result = apiSchema.Initialize();
+        var result = apiSchema.Initialize(apiSchemaContext);
         result.ThrowIfInvalid();
 
         return apiSchema;
@@ -145,7 +151,8 @@ public sealed class ApiSchema : ExtensibleBase
         IEnumerable<ApiEnumType>? apiEnumTypes,
         IEnumerable<ApiObjectType>? apiObjectTypes,
         string? apiVersion = null,
-        IEnumerable<object>? extensions = null
+        IEnumerable<object>? extensions = null,
+        ApiSchemaContext? apiSchemaContext = null
     )
     {
         var apiSchema = new ApiSchema(apiName, apiScalarTypes, apiEnumTypes, apiObjectTypes)
@@ -161,8 +168,7 @@ public sealed class ApiSchema : ExtensibleBase
                 apiSchema.AttachExtension(extensionType, extension);
             }
         }
-
-        var result = apiSchema.Initialize();
+        var result = apiSchema.Initialize(apiSchemaContext);
         result.ThrowIfInvalid();
 
         return apiSchema;
@@ -170,16 +176,19 @@ public sealed class ApiSchema : ExtensibleBase
     #endregion
 
     #region Initialize Methods
-    public ApiSchemaInitializeResult Initialize()
+    public ApiSchemaInitializeResult Initialize(ApiSchemaContext? apiSchemaContext = null)
     {
         List<ValidationResult>? results = null;
-        this.Initialize(ref results);
+        this.Initialize(apiSchemaContext, ref results);
 
         return new ApiSchemaInitializeResult(results);
     }
 
-    public void Initialize(ref List<ValidationResult>? results)
+    public void Initialize(ApiSchemaContext? apiSchemaContext, ref List<ValidationResult>? results)
     {
+        // Set context (use provided or default)
+        _apiSchemaContext = apiSchemaContext ?? ApiSchemaContext.Default;
+
         this.InitializeApiName(ref results);
 
         this.InitializeLookupDictionaries(ref results);
@@ -235,7 +244,7 @@ public sealed class ApiSchema : ExtensibleBase
     {
         foreach (var apiEnumType in this.ApiEnumTypes)
         {
-            apiEnumType.Initialize(this, ref results);
+            apiEnumType.Initialize(this, this.Context, ref results);
         }
     }
 
@@ -252,7 +261,7 @@ public sealed class ApiSchema : ExtensibleBase
     {
         foreach (var apiObjectType in this.ApiObjectTypes)
         {
-            apiObjectType.Initialize(this, ref results);
+            apiObjectType.Initialize(this, this.Context, ref results);
         }
     }
 
@@ -260,7 +269,7 @@ public sealed class ApiSchema : ExtensibleBase
     {
         foreach (var apiScalarType in this.ApiScalarTypes)
         {
-            apiScalarType.Initialize(this, ref results);
+            apiScalarType.Initialize(this, this.Context, ref results);
         }
     }
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -18,6 +18,8 @@ public sealed class ApiIdentitySet
 ) : ExtensibleBase
 {
     #region Fields
+    private ApiSchemaContext? _apiSchemaContext = null;
+
     private Dictionary<string, ApiIdentity>? _apiIdentityApiNameLookup = null;
 
     private ApiIdentity? _apiResolvedPrimaryIdentity = null;
@@ -30,21 +32,27 @@ public sealed class ApiIdentitySet
 
     public ApiIdentity ApiPrimaryIdentity => this.ThrowIfNotInitialized(_apiResolvedPrimaryIdentity);
 
+    /// <summary>Gets the schema context for this identity set.</summary>
+    internal ApiSchemaContext Context => this.ThrowIfNotInitialized(_apiSchemaContext);
+
     private Dictionary<string, ApiIdentity> ApiIdentityApiNameLookup => this.ThrowIfNotInitialized(_apiIdentityApiNameLookup);
     #endregion
 
     #region ApiIdentitySet Methods
     public bool TryGetIdentityByApiName(string apiName, out ApiIdentity? apiIdentity) => this.ApiIdentityApiNameLookup.TryGetValue(apiName, out apiIdentity);
 
-    internal void Initialize(ApiSchema apiSchema, ApiObjectType apiObjectType, string apiValidationPath, ref List<ValidationResult>? results)
+    internal void Initialize(ApiSchema apiSchema, ApiSchemaContext apiSchemaContext, ApiObjectType apiObjectType, string apiValidationPath, ref List<ValidationResult>? results)
     {
         ArgumentNullException.ThrowIfNull(apiSchema);
+        ArgumentNullException.ThrowIfNull(apiSchemaContext);
         ArgumentNullException.ThrowIfNull(apiObjectType);
         ArgumentException.ThrowIfNullOrWhiteSpace(apiValidationPath);
 
+        _apiSchemaContext = apiSchemaContext;
+
         this.InitializeLookupDictionaries(apiValidationPath, ref results);
 
-        this.InitializeApiIdentities(apiSchema, apiObjectType, apiValidationPath, ref results);
+        this.InitializeApiIdentities(apiSchema, apiSchemaContext, apiObjectType, apiValidationPath, ref results);
         this.InitializeApiPrimaryIdentity(apiValidationPath, ref results);
     }
 
@@ -59,7 +67,7 @@ public sealed class ApiIdentitySet
         }
     }
 
-    private void InitializeApiIdentities(ApiSchema apiSchema, ApiObjectType apiObjectType, string apiValidationPath, ref List<ValidationResult>? results)
+    private void InitializeApiIdentities(ApiSchema apiSchema, ApiSchemaContext apiSchemaContext, ApiObjectType apiObjectType, string apiValidationPath, ref List<ValidationResult>? results)
     {
         // Must not be null
         if (this.ApiIdentities is null)
@@ -91,7 +99,7 @@ public sealed class ApiIdentitySet
                 continue;
             }
 
-            apiIdentity.Initialize(apiSchema, apiObjectType, apiValidationPath, ref results);
+            apiIdentity.Initialize(apiSchema, apiSchemaContext, apiObjectType, apiValidationPath, ref results);
         }
     }
 

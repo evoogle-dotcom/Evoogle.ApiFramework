@@ -10,6 +10,7 @@ using System.Reflection;
 using System.Text.Json.Serialization;
 
 using Evoogle.ApiFramework.Exceptions;
+using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.ApiFramework.Schema.Json;
 using Evoogle.Extension;
 using Evoogle.Extensions;
@@ -75,6 +76,8 @@ public sealed class ApiProperty(string apiName, ApiTypeExpression apiTypeExpress
     #endregion
 
     #region Fields
+    private ApiSchemaContext? _apiSchemaContext = null;
+
     private Func<object, object?>? _clrGetter;
 
     private Action<object, object?>? _clrSetter;
@@ -98,6 +101,9 @@ public sealed class ApiProperty(string apiName, ApiTypeExpression apiTypeExpress
     ///     May point to a named type or inline type (e.g., collection).
     /// </summary>
     internal ApiTypeExpression ApiTypeExpression { get; } = apiTypeExpression;
+
+    /// <summary>Gets the schema context for this property.</summary>
+    internal ApiSchemaContext Context => this.ThrowIfNotInitialized(_apiSchemaContext);
     #endregion
 
     #region Computed Properties
@@ -641,11 +647,14 @@ public sealed class ApiProperty(string apiName, ApiTypeExpression apiTypeExpress
 
     internal string GetValidationPath(string parentPath) => $"{parentPath.SafeToString()}.{nameof(ApiProperty)}[\"{this.ApiName.SafeToString()}\"]";
 
-    internal void Initialize(ApiSchema apiSchema, ApiObjectType apiObjectType, string apiValidationPath, ref List<ValidationResult>? results)
+    internal void Initialize(ApiSchema apiSchema, ApiSchemaContext apiSchemaContext, ApiObjectType apiObjectType, string apiValidationPath, ref List<ValidationResult>? results)
     {
         ArgumentNullException.ThrowIfNull(apiSchema);
+        ArgumentNullException.ThrowIfNull(apiSchemaContext);
         ArgumentNullException.ThrowIfNull(apiObjectType);
         ArgumentException.ThrowIfNullOrWhiteSpace(apiValidationPath);
+
+        _apiSchemaContext = apiSchemaContext;
 
         this.InitializeApiName(apiValidationPath, ref results);
         this.InitializeApiTypeExpression(apiSchema, apiValidationPath, ref results);

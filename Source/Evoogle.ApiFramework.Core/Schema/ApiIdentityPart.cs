@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -14,6 +14,8 @@ namespace Evoogle.ApiFramework.Schema;
 public sealed class ApiIdentityPart(string apiPropertyName, ApiIdentityCoercion? coercion = null, bool emitAsOrdered = false) : ExtensibleBase
 {
     #region Fields
+    private ApiSchemaContext? _apiSchemaContext = null;
+
     private ApiProperty? _apiResolvedProperty = null;
     #endregion
 
@@ -23,14 +25,20 @@ public sealed class ApiIdentityPart(string apiPropertyName, ApiIdentityCoercion?
     public bool EmitAsOrdered { get; } = emitAsOrdered;
 
     public ApiProperty ApiProperty => this.ThrowIfNotInitialized(_apiResolvedProperty);
+
+    /// <summary>Gets the schema context for this identity part.</summary>
+    internal ApiSchemaContext Context => this.ThrowIfNotInitialized(_apiSchemaContext);
     #endregion
 
     #region ApiIdentityPart Methods
-    internal void Initialize(ApiSchema apiSchema, ApiObjectType apiObjectType, string apiValidationPath, ref List<ValidationResult>? results)
+    internal void Initialize(ApiSchema apiSchema, ApiSchemaContext apiSchemaContext, ApiObjectType apiObjectType, string apiValidationPath, ref List<ValidationResult>? results)
     {
         ArgumentNullException.ThrowIfNull(apiSchema);
+        ArgumentNullException.ThrowIfNull(apiSchemaContext);
         ArgumentNullException.ThrowIfNull(apiObjectType);
         ArgumentException.ThrowIfNullOrWhiteSpace(apiValidationPath);
+
+        _apiSchemaContext = apiSchemaContext;
 
         this.InitializeApiPropertyName(apiValidationPath, ref results);
         this.InitializeApiProperty(apiObjectType, apiValidationPath, ref results);

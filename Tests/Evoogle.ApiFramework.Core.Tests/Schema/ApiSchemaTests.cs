@@ -1210,7 +1210,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             Name = "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)",
             Source = ApiSchema.Create
             (
-            
+
                 "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)",
                 [
                     TestApiScalarTypeBoolean,

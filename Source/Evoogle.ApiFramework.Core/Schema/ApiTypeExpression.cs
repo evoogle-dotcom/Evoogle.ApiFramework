@@ -233,7 +233,7 @@ public sealed class ApiTypeExpression
     {
         if (this.ApiInlineType is ApiCollectionType collection)
         {
-            collection.Initialize(apiSchema, ref results);
+            collection.Initialize(apiSchema, apiSchema.Context, ref results);
         }
 
         _apiResolvedType = this.ApiInlineType;
