@@ -43,6 +43,14 @@ public sealed class ApiCollectionType(ApiTypeExpression apiItemTypeExpression, A
     internal ApiTypeExpression ApiItemTypeExpression { get; } = apiItemTypeExpression;
     #endregion
 
+    #region ApiCollectionType Computed Properties
+    /// <summary>Gets a value indicating whether this item type is optional (not required).</summary>
+    public bool IsItemOptional => !this.ApiItemTypeModifiers.HasFlag(ApiTypeModifiers.Required);
+
+    /// <summary>Gets a value indicating whether this item type is required.</summary>
+    public bool IsItemRequired => this.ApiItemTypeModifiers.HasFlag(ApiTypeModifiers.Required);
+    #endregion
+
     #region ApiType Methods
     /// <inheritdoc />
     protected override string GetValidationPath() => $"{this.ApiTypeName.SafeToString()}";

@@ -20,34 +20,61 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
         public required ApiTestSchemaKind ApiSchemaKind { get; init; }
         public required string ApiObjectTypeName { get; init; }
         public required string ApiPropertyName { get; init; }
-        public required bool ExpectedSuccess { get; init; }
         #endregion
 
         #region Calculated Properties
-        protected ApiSchema ApiSchema { get; set; } = default!;
-        protected ApiObjectType ApiObjectType { get; set; } = default!;
-        protected ApiProperty ApiProperty { get; set; } = default!;
-        protected bool ActualSuccess { get; set; }
+        protected ApiSchema? ApiSchema { get; set; }
+        protected ApiObjectType? ApiObjectType { get; set; }
+        protected ApiProperty? ApiProperty { get; set; }
         #endregion
 
         #region XUnitTest Methods
         protected override void Arrange()
         {
             var apiSchema = ApiTestSchemaFactory.BuildTestSchema(this.ApiSchemaKind);
-            this.ApiSchema = apiSchema;
+            this.ApiSchema = apiSchema ?? throw new InvalidOperationException($"{nameof(Schema.ApiSchema)} creation failed.");
 
             var apiObjectType = this.ApiSchema.GetObjectTypeByApiName(this.ApiObjectTypeName);
-            this.ApiObjectType = apiObjectType;
+            this.ApiObjectType = apiObjectType ?? throw new InvalidOperationException($"{nameof(Schema.ApiObjectType)} '{this.ApiObjectTypeName}' not found in ApiSchema.");
 
             var apiProperty = apiObjectType.GetPropertyByApiName(this.ApiPropertyName);
-            this.ApiProperty = apiProperty;
+            this.ApiProperty = apiProperty ?? throw new InvalidOperationException($"{nameof(Schema.ApiProperty)} '{this.ApiPropertyName}' not found in ApiObjectType '{this.ApiObjectTypeName}'.");
+
+            this.WriteLine($"ApiSchema:     {this.ApiSchema.ApiName.SafeToString()}");
+            this.WriteLine($"ApiObjectType: {this.ApiObjectType.ApiName.SafeToString()}");
+            this.WriteLine($"ApiProperty:   {this.ApiProperty.ApiName.SafeToString()}");
+            this.WriteLine();
         }
+        #endregion
+    }
+
+
+    public abstract class TryGetTestBase : TryTestBase
+    {
+        #region User Supplied Properties
+        public required bool ExpectedSuccess { get; init; }
+        #endregion
+
+        #region Calculated Properties
+        protected bool? ActualSuccess { get; set; }
+        #endregion
+    }
+
+    public abstract class TrySetTestBase : TryTestBase
+    {
+        #region User Supplied Properties
+        public required bool ExpectedTrySetSuccess { get; set; }
+        #endregion
+
+        #region Calculated Properties
+        protected bool? ActualTrySetSuccess { get; set; }
+        protected bool? ActualTryGetSuccess { get; set; }
         #endregion
     }
     #endregion
 
     #region TryGet Tests (Generic and Non-Generic)
-    public class TryGetGenericTest<TObject, TValue> : TryTestBase
+    public class TryGetGenericTest<TObject, TValue> : TryGetTestBase
     {
         #region User Supplied Properties
         public TObject? ClrObject { get; init; }
@@ -63,10 +90,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
         {
             base.Arrange();
 
-            this.WriteLine($"ApiSchema:     {this.ApiSchema.ApiName.SafeToString()}");
-            this.WriteLine($"ApiObjectType: {this.ApiObjectTypeName.SafeToString()}");
-            this.WriteLine($"ApiProperty:   {this.ApiPropertyName.SafeToString()}");
-            this.WriteLine($"ClrObject:     {this.ClrObject.SafeToString()}");
+            this.WriteLine($"ClrObject: {this.ClrObject.SafeToString()}");
             this.WriteLine();
             this.WriteLine($"ExpectedSuccess:  {this.ExpectedSuccess.SafeToString()}");
             this.WriteLine($"ExpectedClrValue: {this.ExpectedClrValue.SafeToString()}");
@@ -74,8 +98,12 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         protected override void Act()
         {
-            this.ActualSuccess = this.ApiProperty.TryGetValue<TObject, TValue>(this.ClrObject, out var clrValue);
+            this.ActualSuccess = this.ApiProperty!.TryGetValue<TObject, TValue>(this.ClrObject, out var clrValue);
             this.ActualClrValue = clrValue;
+
+            this.WriteLine();
+            this.WriteLine($"ActualSuccess:  {this.ActualSuccess.SafeToString()}");
+            this.WriteLine($"ActualClrValue: {this.ActualClrValue.SafeToString()}");
         }
 
         protected override void Assert()
@@ -93,7 +121,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
         #endregion
     }
 
-    public class TryGetNonGenericTest : TryTestBase
+    public class TryGetNonGenericTest : TryGetTestBase
     {
         #region User Supplied Properties
         public object? ClrObject { get; init; }
@@ -109,10 +137,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
         {
             base.Arrange();
 
-            this.WriteLine($"ApiSchema:     {this.ApiSchema.ApiName.SafeToString()}");
-            this.WriteLine($"ApiObjectType: {this.ApiObjectTypeName.SafeToString()}");
-            this.WriteLine($"ApiProperty:   {this.ApiPropertyName.SafeToString()}");
-            this.WriteLine($"ClrObject:     {this.ClrObject.SafeToString()}");
+            this.WriteLine($"ClrObject: {this.ClrObject.SafeToString()}");
             this.WriteLine();
             this.WriteLine($"ExpectedSuccess:  {this.ExpectedSuccess.SafeToString()}");
             this.WriteLine($"ExpectedClrValue: {this.ExpectedClrValue.SafeToString()}");
@@ -120,8 +145,12 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         protected override void Act()
         {
-            this.ActualSuccess = this.ApiProperty.TryGetValue(this.ClrObject, out var clrValue);
+            this.ActualSuccess = this.ApiProperty!.TryGetValue(this.ClrObject, out var clrValue);
             this.ActualClrValue = clrValue;
+
+            this.WriteLine();
+            this.WriteLine($"ActualSuccess:  {this.ActualSuccess.SafeToString()}");
+            this.WriteLine($"ActualClrValue: {this.ActualClrValue.SafeToString()}");
         }
 
         protected override void Assert()
@@ -141,7 +170,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
     #endregion
 
     #region TrySet Tests
-    public class TrySetGenericTest<TObject, TValue> : TryTestBase
+    public class TrySetGenericTest<TObject, TValue> : TrySetTestBase
     {
         #region User Supplied Properties
         public TObject? ClrObject { get; init; }
@@ -149,8 +178,6 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
         #endregion
 
         #region Calculated Properties
-        private bool ActualTrySetSuccess { get; set; }
-        private bool ActualTryGetSuccess { get; set; }
         private TValue? ActualTryGetClrValue { get; set; }
         #endregion
 
@@ -159,30 +186,32 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
         {
             base.Arrange();
 
-            this.WriteLine($"ApiSchema:     {this.ApiSchema.ApiName.SafeToString()}");
-            this.WriteLine($"ApiObjectType: {this.ApiObjectTypeName.SafeToString()}");
-            this.WriteLine($"ApiProperty:   {this.ApiPropertyName.SafeToString()}");
-            this.WriteLine($"ClrObject:     {this.ClrObject.SafeToString()}");
-            this.WriteLine($"ClrValue:      {this.ClrValue.SafeToString()}");
+            this.WriteLine($"ClrObject: {this.ClrObject.SafeToString()}");
+            this.WriteLine($"ClrValue:  {this.ClrValue.SafeToString()}");
             this.WriteLine();
-            this.WriteLine($"ExpectedSuccess:  {this.ExpectedSuccess.SafeToString()}");
+            this.WriteLine($"ExpectedTrySetSuccess: {this.ExpectedTrySetSuccess.SafeToString()}");
         }
 
         protected override void Act()
         {
             this.ActualTrySetSuccess = this.ApiProperty!.TrySetValue(this.ClrObject, this.ClrValue);
-            if (this.ActualTrySetSuccess)
+            if (this.ActualTrySetSuccess.Value)
             {
                 // Read back via TryGet to verify mutation
                 this.ActualTryGetSuccess = this.ApiProperty!.TryGetValue<TObject, TValue>(this.ClrObject, out var clrValue);
                 this.ActualTryGetClrValue = clrValue;
             }
+
+            this.WriteLine();
+            this.WriteLine($"ActualTrySetSuccess:  {this.ActualTrySetSuccess.SafeToString()}");
+            this.WriteLine($"ActualTryGetSuccess:  {this.ActualTryGetSuccess.SafeToString()}");
+            this.WriteLine($"ActualTryGetClrValue: {this.ActualTryGetClrValue.SafeToString()}");
         }
 
         protected override void Assert()
         {
-            this.ActualTrySetSuccess.Should().Be(this.ExpectedSuccess);
-            if (this.ExpectedSuccess)
+            this.ActualTrySetSuccess.Should().Be(this.ExpectedTrySetSuccess);
+            if (this.ExpectedTrySetSuccess)
             {
                 this.ActualTryGetSuccess.Should().BeTrue("TryGetValue should succeed after TrySetValue");
                 this.ActualTryGetClrValue.Should().BeEquivalentTo(this.ClrValue);
@@ -191,7 +220,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
         #endregion
     }
 
-    public class TrySetNonGenericTest : TryTestBase
+    public class TrySetNonGenericTest : TrySetTestBase
     {
         #region User Supplied Properties
         public object? ClrObject { get; init; }
@@ -199,8 +228,6 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
         #endregion
 
         #region Calculated Properties
-        private bool ActualTrySetSuccess { get; set; }
-        private bool ActualTryGetSuccess { get; set; }
         private object? ActualTryGetClrValue { get; set; }
         #endregion
 
@@ -209,30 +236,32 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
         {
             base.Arrange();
 
-            this.WriteLine($"ApiSchema:     {this.ApiSchema.ApiName.SafeToString()}");
-            this.WriteLine($"ApiObjectType: {this.ApiObjectTypeName.SafeToString()}");
-            this.WriteLine($"ApiProperty:   {this.ApiPropertyName.SafeToString()}");
-            this.WriteLine($"ClrObject:     {this.ClrObject.SafeToString()}");
-            this.WriteLine($"ClrValue:      {this.ClrValue.SafeToString()}");
+            this.WriteLine($"ClrObject: {this.ClrObject.SafeToString()}");
+            this.WriteLine($"ClrValue:  {this.ClrValue.SafeToString()}");
             this.WriteLine();
-            this.WriteLine($"ExpectedSuccess:  {this.ExpectedSuccess.SafeToString()}");
+            this.WriteLine($"ExpectedTrySetSuccess: {this.ExpectedTrySetSuccess.SafeToString()}");
         }
 
         protected override void Act()
         {
             this.ActualTrySetSuccess = this.ApiProperty!.TrySetValue(this.ClrObject, this.ClrValue);
-            if (this.ActualTrySetSuccess)
+            if (this.ActualTrySetSuccess.Value)
             {
                 // Read back via TryGet to verify mutation
                 this.ActualTryGetSuccess = this.ApiProperty!.TryGetValue(this.ClrObject, out var clrValue);
                 this.ActualTryGetClrValue = clrValue;
             }
+
+            this.WriteLine();
+            this.WriteLine($"ActualTrySetSuccess:  {this.ActualTrySetSuccess.SafeToString()}");
+            this.WriteLine($"ActualTryGetSuccess:  {this.ActualTryGetSuccess.SafeToString()}");
+            this.WriteLine($"ActualTryGetClrValue: {this.ActualTryGetClrValue.SafeToString()}");
         }
 
         protected override void Assert()
         {
-            this.ActualTrySetSuccess.Should().Be(this.ExpectedSuccess);
-            if (this.ExpectedSuccess)
+            this.ActualTrySetSuccess.Should().Be(this.ExpectedTrySetSuccess);
+            if (this.ExpectedTrySetSuccess)
             {
                 this.ActualTryGetSuccess.Should().BeTrue("TryGetValue should succeed after TrySetValue");
                 this.ActualTryGetClrValue.Should().BeEquivalentTo(this.ClrValue);
@@ -286,8 +315,6 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
     #endregion
 
     #region Theory Data
-    public static ApiSchema TestSchema { get; } = ApiTestSchemaFactory.BuildSimpleSchema();
-
     public static TheoryDataRow<IXUnitTest>[] TryGetGenericTheoryData =>
     [
         new TryGetGenericTest<ScalarsOnly, string>
@@ -522,7 +549,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
             ApiPropertyName = nameof(ScalarsOnly.RequiredName),
             ClrObject = new ScalarsOnly("Alice", 123, true),
             ClrValue = "Bob",
-            ExpectedSuccess = true,
+            ExpectedTrySetSuccess = true,
         },
 
         new TrySetGenericTest<ScalarsOnly, string>
@@ -533,7 +560,95 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
             ApiPropertyName = nameof(ScalarsOnly.RequiredName),
             ClrObject = new ScalarsOnly("Alice", 123, true),
             ClrValue = null,
-            ExpectedSuccess = true,
+            ExpectedTrySetSuccess = true,
+        },
+
+        new TrySetGenericTest<ScalarsOnly, long>
+        {
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredNumber)} TrySetValue<TObject,TValue> returns success for required long property",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiObjectTypeName = nameof(ScalarsOnly),
+            ApiPropertyName = nameof(ScalarsOnly.RequiredNumber),
+            ClrObject = new ScalarsOnly("Alice", 123, true),
+            ClrValue = 42,
+            ExpectedTrySetSuccess = true
+        },
+
+        new TrySetGenericTest<ScalarsOnly, bool>
+        {
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredPredicate)} TrySetValue<TObject,TValue> returns success for required bool property",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiObjectTypeName = nameof(ScalarsOnly),
+            ApiPropertyName = nameof(ScalarsOnly.RequiredPredicate),
+            ClrObject = new ScalarsOnly("Alice", 123, true),
+            ClrValue = false,
+            ExpectedTrySetSuccess = true
+        },
+
+        new TrySetGenericTest<ScalarsOnly, string?>
+        {
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalName)} TrySetValue<TObject,TValue> returns success for optional string property for non-null value",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiObjectTypeName = nameof(ScalarsOnly),
+            ApiPropertyName = nameof(ScalarsOnly.OptionalName),
+            ClrObject = new ScalarsOnly("Alice", 123, true) { OptionalName = "Bob" },
+            ClrValue = "Charlie",
+            ExpectedTrySetSuccess = true
+        },
+
+        new TrySetGenericTest<ScalarsOnly, string?>
+        {
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalName)} TrySetValue<TObject,TValue> returns success for optional string property for null value",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiObjectTypeName = nameof(ScalarsOnly),
+            ApiPropertyName = nameof(ScalarsOnly.OptionalName),
+            ClrObject = new ScalarsOnly("Alice", 123, true) { OptionalName = "Bob" },
+            ClrValue = null,
+            ExpectedTrySetSuccess = true
+        },
+
+        new TrySetGenericTest<ScalarsOnly, long?>
+        {
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalNumber)} TrySetValue<TObject,TValue> returns success for optional long property for non-null value",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiObjectTypeName = nameof(ScalarsOnly),
+            ApiPropertyName = nameof(ScalarsOnly.OptionalNumber),
+            ClrObject = new ScalarsOnly("Alice", 123, true) { OptionalNumber = 42 },
+            ClrValue = 100,
+            ExpectedTrySetSuccess = true
+        },
+
+        new TrySetGenericTest<ScalarsOnly, long?>
+        {
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalNumber)} TrySetValue<TObject,TValue> returns success for optional long property for null value",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiObjectTypeName = nameof(ScalarsOnly),
+            ApiPropertyName = nameof(ScalarsOnly.OptionalNumber),
+            ClrObject = new ScalarsOnly("Alice", 123, true) { OptionalNumber = 42 },
+            ClrValue = null,
+            ExpectedTrySetSuccess = true
+        },
+
+        new TrySetGenericTest<ScalarsOnly, bool?>
+        {
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalPredicate)} TrySetValue<TObject,TValue> returns success for optional bool property for non-null value",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiObjectTypeName = nameof(ScalarsOnly),
+            ApiPropertyName = nameof(ScalarsOnly.OptionalPredicate),
+            ClrObject = new ScalarsOnly("Alice", 123, true) { OptionalPredicate = false },
+            ClrValue = true,
+            ExpectedTrySetSuccess = true
+        },
+
+        new TrySetGenericTest<ScalarsOnly, bool?>
+        {
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalPredicate)} TrySetValue<TObject,TValue> returns success for optional bool property for null value",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiObjectTypeName = nameof(ScalarsOnly),
+            ApiPropertyName = nameof(ScalarsOnly.OptionalPredicate),
+            ClrObject = new ScalarsOnly("Alice", 123, true) { OptionalPredicate = false },
+            ClrValue = null,
+            ExpectedTrySetSuccess = true
         },
     ];
 
@@ -547,7 +662,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
             ApiPropertyName = nameof(ScalarsOnly.RequiredName),
             ClrObject = new ScalarsOnly("Alice", 123, true),
             ClrValue = "Bob",
-            ExpectedSuccess = true,
+            ExpectedTrySetSuccess = true,
         },
 
         new TrySetNonGenericTest
@@ -558,7 +673,95 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
             ApiPropertyName = nameof(ScalarsOnly.RequiredName),
             ClrObject = new ScalarsOnly("Alice", 123, true),
             ClrValue = null,
-            ExpectedSuccess = true,
+            ExpectedTrySetSuccess = true,
+        },
+
+        new TrySetNonGenericTest
+        {
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredNumber)} TrySetValue returns success for required long property",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiObjectTypeName = nameof(ScalarsOnly),
+            ApiPropertyName = nameof(ScalarsOnly.RequiredNumber),
+            ClrObject = new ScalarsOnly("Alice", 123, true),
+            ClrValue = 42,
+            ExpectedTrySetSuccess = true
+        },
+
+        new TrySetNonGenericTest
+        {
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredPredicate)} TrySetValue returns success for required bool property",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiObjectTypeName = nameof(ScalarsOnly),
+            ApiPropertyName = nameof(ScalarsOnly.RequiredPredicate),
+            ClrObject = new ScalarsOnly("Alice", 123, true),
+            ClrValue = false,
+            ExpectedTrySetSuccess = true
+        },
+
+        new TrySetNonGenericTest
+        {
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalName)} TrySetValue returns success for optional string property for non-null value",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiObjectTypeName = nameof(ScalarsOnly),
+            ApiPropertyName = nameof(ScalarsOnly.OptionalName),
+            ClrObject = new ScalarsOnly("Alice", 123, true) { OptionalName = "Bob" },
+            ClrValue = "Charlie",
+            ExpectedTrySetSuccess = true
+        },
+
+        new TrySetNonGenericTest
+        {
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalName)} TrySetValue returns success for optional string property for null value",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiObjectTypeName = nameof(ScalarsOnly),
+            ApiPropertyName = nameof(ScalarsOnly.OptionalName),
+            ClrObject = new ScalarsOnly("Alice", 123, true) { OptionalName = "Bob" },
+            ClrValue = null,
+            ExpectedTrySetSuccess = true
+        },
+
+        new TrySetNonGenericTest
+        {
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalNumber)} TrySetValue returns success for optional long property for non-null value",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiObjectTypeName = nameof(ScalarsOnly),
+            ApiPropertyName = nameof(ScalarsOnly.OptionalNumber),
+            ClrObject = new ScalarsOnly("Alice", 123, true) { OptionalNumber = 42 },
+            ClrValue = 100,
+            ExpectedTrySetSuccess = true
+        },
+
+        new TrySetNonGenericTest
+        {
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalNumber)} TrySetValue returns success for optional long property for null value",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiObjectTypeName = nameof(ScalarsOnly),
+            ApiPropertyName = nameof(ScalarsOnly.OptionalNumber),
+            ClrObject = new ScalarsOnly("Alice", 123, true) { OptionalNumber = 42 },
+            ClrValue = null,
+            ExpectedTrySetSuccess = true
+        },
+
+        new TrySetNonGenericTest
+        {
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalPredicate)} TrySetValue returns success for optional bool property for non-null value",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiObjectTypeName = nameof(ScalarsOnly),
+            ApiPropertyName = nameof(ScalarsOnly.OptionalPredicate),
+            ClrObject = new ScalarsOnly("Alice", 123, true) { OptionalPredicate = false },
+            ClrValue = true,
+            ExpectedTrySetSuccess = true
+        },
+
+        new TrySetNonGenericTest
+        {
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalPredicate)} TrySetValue returns success for optional bool property for null value",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiObjectTypeName = nameof(ScalarsOnly),
+            ApiPropertyName = nameof(ScalarsOnly.OptionalPredicate),
+            ClrObject = new ScalarsOnly("Alice", 123, true) { OptionalPredicate = false },
+            ClrValue = null,
+            ExpectedTrySetSuccess = true
         },
     ];
 

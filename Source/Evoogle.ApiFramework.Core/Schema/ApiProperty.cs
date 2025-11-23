@@ -100,6 +100,14 @@ public sealed class ApiProperty(string apiName, ApiTypeExpression apiTypeExpress
     internal ApiTypeExpression ApiTypeExpression { get; } = apiTypeExpression;
     #endregion
 
+    #region Computed Properties
+    /// <summary>Gets a value indicating whether this property is optional (not required).</summary>
+    public bool IsOptional => !this.ApiTypeModifiers.HasFlag(ApiTypeModifiers.Required);
+
+    /// <summary>Gets a value indicating whether this property is required.</summary>
+    public bool IsRequired => this.ApiTypeModifiers.HasFlag(ApiTypeModifiers.Required);
+    #endregion
+
     #region ApiProperty Methods
     /// <summary>
     ///     Gets the value of this property from the specified object.
@@ -584,6 +592,51 @@ public sealed class ApiProperty(string apiName, ApiTypeExpression apiTypeExpress
         {
             return false;
         }
+    }
+
+    /// <summary>
+    ///     Validates the specified CLR value against this property's constraints with type safety.
+    /// </summary>
+    /// <param name="apiValidationPath">The validation path used for error reporting.</param>
+    /// <param name="clrValue">The CLR value to validate.</param>
+    /// <returns>A <see cref="ValidationResult"/> if validation fails; otherwise, <c>null</c>.</returns>
+    /// <remarks>
+    ///     This method validates whether a value can be assigned to this property based on the <see cref="ApiTypeModifiers"/>.
+    ///     Currently validates that required properties receive non-null values.
+    /// </remarks>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="apiValidationPath"/> is null or whitespace.</exception>
+    public ValidationResult? ValidateValue(string apiValidationPath, object? clrValue)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiValidationPath);
+
+        if (clrValue is null && this.IsRequired)
+        {
+            return new ValidationResult($"{apiValidationPath}' is required and cannot be set to null.", [this.ApiName]);
+        }
+        return null;
+    }
+
+    /// <summary>
+    ///     Validates the specified CLR value against this property's constraints with type safety.
+    /// </summary>
+    /// <typeparam name="TValue">The type of the CLR value to validate.</typeparam>
+    /// <param name="apiValidationPath">The validation path used for error reporting.</param>
+    /// <param name="clrValue">The CLR value to validate.</param>
+    /// <returns>A <see cref="ValidationResult"/> if validation fails; otherwise, <c>null</c>.</returns>
+    /// <remarks>
+    ///     This method validates whether a value can be assigned to this property based on the <see cref="ApiTypeModifiers"/>.
+    ///     Currently validates that required properties receive non-null values.
+    /// </remarks>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="apiValidationPath"/> is null or whitespace.</exception>
+    public ValidationResult? ValidateValue<TValue>(string apiValidationPath, TValue? clrValue)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiValidationPath);
+
+        if (clrValue is null && this.IsRequired)
+        {
+            return new ValidationResult($"{apiValidationPath}' is required and cannot be set to null.", [this.ApiName]);
+        }
+        return null;
     }
 
     internal string GetValidationPath(string parentPath) => $"{parentPath.SafeToString()}.{nameof(ApiProperty)}[\"{this.ApiName.SafeToString()}\"]";
