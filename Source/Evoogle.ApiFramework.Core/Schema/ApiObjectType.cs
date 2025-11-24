@@ -82,7 +82,7 @@ public sealed partial class ApiObjectType
     public bool HasIdentity => this.ApiIdentitySet is not null;
 
     /// <summary>Gets the schema context for this object type.</summary>
-    internal ApiSchemaContext Context => this.ThrowIfNotInitialized(_apiSchemaContext);
+    internal ApiSchemaContext ApiSchemaContext => this.ThrowIfNotInitialized(_apiSchemaContext);
 
     private Dictionary<string, ApiProperty> ApiPropertyApiNameLookup => this.ThrowIfNotInitialized(_apiPropertyApiNameLookup);
     private Dictionary<string, ApiProperty> ApiPropertyClrNameLookup => this.ThrowIfNotInitialized(_apiPropertyClrNameLookup);

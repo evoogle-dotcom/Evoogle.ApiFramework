@@ -37,7 +37,7 @@ public sealed class ApiEnumValue(string apiName, string clrName, int clrOrdinal)
     public int ClrOrdinal { get; } = clrOrdinal;
 
     /// <summary>Gets the schema context for this enum value.</summary>
-    internal ApiSchemaContext Context => this.ThrowIfNotInitialized(_apiSchemaContext);
+    internal ApiSchemaContext ApiSchemaContext => this.ThrowIfNotInitialized(_apiSchemaContext);
     #endregion
 
     #region ApiEnumValue Methods

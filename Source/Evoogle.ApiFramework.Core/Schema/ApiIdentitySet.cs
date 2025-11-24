@@ -33,7 +33,7 @@ public sealed class ApiIdentitySet
     public ApiIdentity ApiPrimaryIdentity => this.ThrowIfNotInitialized(_apiResolvedPrimaryIdentity);
 
     /// <summary>Gets the schema context for this identity set.</summary>
-    internal ApiSchemaContext Context => this.ThrowIfNotInitialized(_apiSchemaContext);
+    internal ApiSchemaContext ApiSchemaContext => this.ThrowIfNotInitialized(_apiSchemaContext);
 
     private Dictionary<string, ApiIdentity> ApiIdentityApiNameLookup => this.ThrowIfNotInitialized(_apiIdentityApiNameLookup);
     #endregion

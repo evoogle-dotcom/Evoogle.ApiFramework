@@ -27,7 +27,7 @@ public sealed class ApiIdentityPart(string apiPropertyName, ApiIdentityCoercion?
     public ApiProperty ApiProperty => this.ThrowIfNotInitialized(_apiResolvedProperty);
 
     /// <summary>Gets the schema context for this identity part.</summary>
-    internal ApiSchemaContext Context => this.ThrowIfNotInitialized(_apiSchemaContext);
+    internal ApiSchemaContext ApiSchemaContext => this.ThrowIfNotInitialized(_apiSchemaContext);
     #endregion
 
     #region ApiIdentityPart Methods

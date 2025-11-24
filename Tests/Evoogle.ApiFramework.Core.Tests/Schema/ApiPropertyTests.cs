@@ -315,7 +315,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
     #endregion
 
     #region Theory Data
-    public static TheoryDataRow<IXUnitTest>[] TryGetGenericTheoryData =>
+    public static TheoryDataRow<IXUnitTest>[] TryGetGenericTheoryData() =>
     [
         new TryGetGenericTest<ScalarsOnly, string>
         {
@@ -427,7 +427,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
         },
     ];
 
-    public static TheoryDataRow<IXUnitTest>[] TryGetNonGenericTheoryData =>
+    public static TheoryDataRow<IXUnitTest>[] TryGetNonGenericTheoryData() =>
     [
         new TryGetNonGenericTest
         {
@@ -539,7 +539,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
         },
     ];
 
-    public static TheoryDataRow<IXUnitTest>[] TrySetGenericTheoryData =>
+    public static TheoryDataRow<IXUnitTest>[] TrySetGenericTheoryData() =>
     [
         new TrySetGenericTest<ScalarsOnly, string>
         {
@@ -652,11 +652,11 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
         },
     ];
 
-    public static TheoryDataRow<IXUnitTest>[] TrySetNonGenericTheoryData =>
+    public static TheoryDataRow<IXUnitTest>[] TrySetNonGenericTheoryData() =>
     [
         new TrySetNonGenericTest
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredName)} TrySetValue<TObject,TValue> returns success for required string property for non-null value",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredName)} TrySetValue returns success for required string property for non-null value",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.RequiredName),
@@ -667,7 +667,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TrySetNonGenericTest
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredName)} TrySetValue<TObject,TValue> returns success for required string property for null value",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredName)} TrySetValue returns success for required string property for null value",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.RequiredName),
@@ -764,87 +764,6 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
             ExpectedTrySetSuccess = true
         },
     ];
-
-    // public static TheoryDataRow<IXUnitTest>[] TrySetTheoryData =>
-    // [
-    //     // object-based setter on reference type
-    //     new TrySetObjectTest
-    //     {
-    //         Name = "TrySetValue(object, object?) sets reference type property",
-    //         ClrName = nameof(Person.Name),
-    //         Target = new Person { Name = "Old" },
-    //         InputValue = "New",
-    //         ExpectedSuccess = true,
-    //         ExpectedValue = "New"
-    //     },
-
-    //     // generic setter on reference type
-    //     new TrySetGenericTest<Person, string>
-    //     {
-    //         Name = "TrySetValue<TObject,TValue> sets reference type property",
-    //         ClrName = nameof(Person.Name),
-    //         Target = new Person { Name = "Old" },
-    //         InputValue = "New",
-    //         ExpectedSuccess = true,
-    //         ExpectedValue = "New"
-    //     },
-
-    //     // generic setter on reference type, numeric
-    //     new TrySetGenericTest<ScalarsOnly, long>
-    //     {
-    //         Name = "TrySetValue<TObject,TValue> sets numeric property",
-    //         ClrName = nameof(ScalarsOnly.RequiredNumber),
-    //         Target = new ScalarsOnly("n", 1, true),
-    //         InputValue = 42L,
-    //         ExpectedSuccess = true,
-    //         ExpectedValue = 42L
-    //     },
-
-    //     // non-ref setter on struct target does not mutate caller (field)
-    //     new TrySetGenericTest<TestPoint, int>
-    //     {
-    //         Name = "TrySetValue<TObject,TValue> on struct target assigns copy (field)",
-    //         ClrName = nameof(TestPoint.X),
-    //         Target = new TestPoint { X = 1, Y = 2 },
-    //         InputValue = 10,
-    //         ExpectedSuccess = true,
-    //         // Reading back from boxed Target reflects original value (no mutation)
-    //         ExpectedValue = 1
-    //     },
-
-    //     // non-ref setter on struct target does not mutate caller (property)
-    //     new TrySetGenericTest<TestPoint, int>
-    //     {
-    //         Name = "TrySetValue<TObject,TValue> on struct target assigns copy (property)",
-    //         ClrName = nameof(TestPoint.Y),
-    //         Target = new TestPoint { X = 1, Y = 2 },
-    //         InputValue = 20,
-    //         ExpectedSuccess = true,
-    //         ExpectedValue = 2
-    //     },
-
-    //     // ref setter on struct target mutates caller (field)
-    //     new TrySetByRefStructTest<int>
-    //     {
-    //         Name = "TrySetValueRef mutates struct target (field)",
-    //         ClrName = nameof(TestPoint.X),
-    //         Target = new TestPoint { X = 1, Y = 2 },
-    //         InputValue = 10,
-    //         ExpectedX = 10,
-    //         ExpectedY = 2
-    //     },
-
-    //     // ref setter on struct target mutates caller (property)
-    //     new TrySetByRefStructTest<int>
-    //     {
-    //         Name = "TrySetValueRef mutates struct target (property)",
-    //         ClrName = nameof(TestPoint.Y),
-    //         Target = new TestPoint { X = 1, Y = 2 },
-    //         InputValue = 20,
-    //         ExpectedX = 1,
-    //         ExpectedY = 20
-    //     },
-    // ];
     #endregion
 
     #region Test Methods

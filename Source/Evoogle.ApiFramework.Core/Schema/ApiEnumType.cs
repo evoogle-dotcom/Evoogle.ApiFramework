@@ -43,7 +43,7 @@ public sealed class ApiEnumType(string apiName, IEnumerable<ApiEnumValue> apiEnu
     public ApiEnumValue[] ApiEnumValues { get; } = apiEnumValues.SafeToArray();
 
     /// <summary>Gets the schema context for this enum type.</summary>
-    internal ApiSchemaContext Context => this.ThrowIfNotInitialized(_apiSchemaContext);
+    internal ApiSchemaContext ApiSchemaContext => this.ThrowIfNotInitialized(_apiSchemaContext);
 
     private Dictionary<string, ApiEnumValue> ApiNameLookup => this.ThrowIfNotInitialized(_apiNameLookup);
     private Dictionary<string, ApiEnumValue> ClrNameLookup => this.ThrowIfNotInitialized(_clrNameLookup);

@@ -72,7 +72,7 @@ public sealed class ApiRelationship(string apiName, string? apiPropertyName = nu
     };
 
     /// <summary>Gets the schema context for this relationship.</summary>
-    internal ApiSchemaContext Context => this.ThrowIfNotInitialized(_apiSchemaContext);
+    internal ApiSchemaContext ApiSchemaContext => this.ThrowIfNotInitialized(_apiSchemaContext);
     #endregion
 
     #region ApiRelationship Methods

@@ -25,7 +25,7 @@ public sealed class ApiIdentity(string apiName, IEnumerable<ApiIdentityPart> api
     public bool IsComposite => this.ApiIdentityParts.Length > 1;
 
     /// <summary>Gets the schema context for this identity.</summary>
-    internal ApiSchemaContext Context => this.ThrowIfNotInitialized(_apiSchemaContext);
+    internal ApiSchemaContext ApiSchemaContext => this.ThrowIfNotInitialized(_apiSchemaContext);
     #endregion
 
     #region ApiIdentity Methods
