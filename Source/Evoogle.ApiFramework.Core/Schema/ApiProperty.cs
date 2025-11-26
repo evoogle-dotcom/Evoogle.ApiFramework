@@ -1243,8 +1243,8 @@ public sealed class ApiProperty(string apiName, ApiTypeExpression apiTypeExpress
 
     private static bool TryResolveMember(Type objectType, string memberName, bool forWrite, out MemberInfo memberInfo, out Type memberType)
     {
-        // Prefer property, then field (case-insensitive)
-        var propertyInfo = TypeReflection.GetProperty(objectType, memberName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+        // Prefer property, then field
+        var propertyInfo = TypeReflection.GetProperty(objectType, memberName, BindingFlags.Public | BindingFlags.Instance);
 
         if (propertyInfo is not null)
         {
@@ -1269,7 +1269,7 @@ public sealed class ApiProperty(string apiName, ApiTypeExpression apiTypeExpress
             return true;
         }
 
-        var fieldInfo = TypeReflection.GetField(objectType, memberName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+        var fieldInfo = TypeReflection.GetField(objectType, memberName, BindingFlags.Public | BindingFlags.Instance);
         if (fieldInfo is not null)
         {
             // For write operations, exclude init-only fields
