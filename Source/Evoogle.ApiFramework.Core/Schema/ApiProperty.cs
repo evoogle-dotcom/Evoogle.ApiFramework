@@ -74,6 +74,8 @@ public sealed class ApiProperty(string apiName, ApiTypeExpression apiTypeExpress
     {
         public static readonly ConcurrentDictionary<ClrCacheKey, ClrSetterByRefCacheValue<TObject, TValue>> Cache = new();
     }
+
+    private readonly record struct CoerceMethodCacheKey(Type ClrInputType, Type ClrOutputType);
     #endregion
 
     #region Fields
@@ -82,6 +84,24 @@ public sealed class ApiProperty(string apiName, ApiTypeExpression apiTypeExpress
     private Func<object, ApiSchemaContext, object?>? _clrGetter;
 
     private Action<object, ApiSchemaContext, object?>? _clrSetter;
+
+    private static readonly ConcurrentDictionary<CoerceMethodCacheKey, MethodInfo> _coerceMethodCache = new();
+
+    private static readonly MethodInfo? _genericCoerceMethodDefinition = TypeReflection.GetGenericMethodDefinition
+    (
+        type: typeof(TypeCoercion),
+        methodName: nameof(TypeCoercion.Coerce),
+        bindingFlags: BindingFlags.Public | BindingFlags.Instance,
+        parameterCount: 2
+    );
+
+    private static readonly MethodInfo? _nonGenericCoerceMethod = TypeReflection.GetMethod
+    (
+        type: typeof(TypeCoercion),
+        methodName: nameof(TypeCoercion.Coerce),
+        bindingFlags: BindingFlags.Public | BindingFlags.Instance,
+        parameterTypes: [typeof(object), typeof(Type), typeof(TypeCoercionContext)]
+    );
     #endregion
 
     #region Properties
@@ -105,6 +125,12 @@ public sealed class ApiProperty(string apiName, ApiTypeExpression apiTypeExpress
 
     /// <summary>Gets the schema context for this property.</summary>
     internal ApiSchemaContext ApiSchemaContext => this.ThrowIfNotInitialized(_apiSchemaContext);
+
+    private static MethodInfo GenericCoerceMethodDefinition => _genericCoerceMethodDefinition
+        ?? throw new InvalidOperationException($"Failed to locate generic method definition for {nameof(TypeCoercion)}.{nameof(TypeCoercion.Coerce)}.");
+
+    private static MethodInfo NonGenericCoerceMethod => _nonGenericCoerceMethod
+        ?? throw new InvalidOperationException($"Failed to locate non-generic method for {nameof(TypeCoercion)}.{nameof(TypeCoercion.Coerce)}.");
     #endregion
 
     #region Computed Properties
@@ -618,7 +644,7 @@ public sealed class ApiProperty(string apiName, ApiTypeExpression apiTypeExpress
 
         if (clrValue is null && this.IsRequired)
         {
-            return new ValidationResult($"{apiValidationPath}' is required and cannot be set to null.", [this.ApiName]);
+            return new ValidationResult($"'{apiValidationPath}' is required and cannot be set to null.", [this.ApiName]);
         }
         return null;
     }
@@ -641,7 +667,7 @@ public sealed class ApiProperty(string apiName, ApiTypeExpression apiTypeExpress
 
         if (clrValue is null && this.IsRequired)
         {
-            return new ValidationResult($"{apiValidationPath}' is required and cannot be set to null.", [this.ApiName]);
+            return new ValidationResult($"'{apiValidationPath}' is required and cannot be set to null.", [this.ApiName]);
         }
         return null;
     }
@@ -795,55 +821,29 @@ public sealed class ApiProperty(string apiName, ApiTypeExpression apiTypeExpress
     #region Non-Generic Accessor Methods
     private static Func<object, ApiSchemaContext, object?>? BuildNonGenericClrPropertyGetter(Type objectType, PropertyInfo propertyInfo)
     {
-        // Build property getter if readable: (object obj, ApiSchemaContext context) => context.TypeCoercion.Coerce<PropertyType, object>(((OwningType)obj).PropertyName, context.TypeCoercionContext)
+        // Build property getter if readable: (object obj, ApiSchemaContext context) => ((OwningType)obj).PropertyName
+        // All types are assignable to object, so direct conversion is sufficient
         if (!propertyInfo.CanRead)
         {
             return null;
         }
 
-        var objectParameter = Expression.Parameter(typeof(object), "obj");
-        var contextParameter = Expression.Parameter(typeof(ApiSchemaContext), "context");
-        var objectExpression = Expression.Convert(objectParameter, objectType);
-        var propertyAccessExpression = Expression.Property(objectExpression, propertyInfo);
+        var objectParameterExpression = Expression.Parameter(typeof(object), "obj");
+        var contextParameterExpression = Expression.Parameter(typeof(ApiSchemaContext), "context");
+        var castObjectExpression = Expression.Convert(objectParameterExpression, objectType);
+        var propertyAccessExpression = Expression.Property(castObjectExpression, propertyInfo);
 
-        // If property type is already object, just return it directly
-        if (propertyInfo.PropertyType == typeof(object))
+        // Direct path: All types are assignable to object (reference types upcast, value types box)
+        // Direct conversion is always sufficient - no TypeCoercion needed
+        var valueAsObjectExpression = (Expression)propertyAccessExpression;
+        if (propertyInfo.PropertyType != typeof(object))
         {
-            var lambdaExpression = Expression.Lambda<Func<object, ApiSchemaContext, object?>>(propertyAccessExpression, objectParameter, contextParameter);
-            var lambda = lambdaExpression.Compile();
-            return lambda;
+            valueAsObjectExpression = Expression.Convert(propertyAccessExpression, typeof(object));
         }
 
-        // Otherwise, use TypeCoercion to coerce to object
-        var typeCoercionProperty = Expression.Property(contextParameter, nameof(ApiSchemaContext.TypeCoercion));
-        var typeCoercionContextProperty = Expression.Property(contextParameter, nameof(ApiSchemaContext.TypeCoercionContext));
-        var outputTypeConstant = Expression.Constant(typeof(object), typeof(Type));
-
-        // Convert property value to object for the Coerce call
-        var propertyAsObjectExpression = Expression.Convert(propertyAccessExpression, typeof(object));
-
-        var coerceMethod = typeof(TypeCoercion).GetMethod(
-            nameof(TypeCoercion.Coerce),
-            BindingFlags.Public | BindingFlags.Instance,
-            null,
-            [typeof(object), typeof(Type), typeof(TypeCoercionContext)],
-            null);
-
-        if (coerceMethod is null)
-        {
-            return null;
-        }
-
-        var coerceCallExpression = Expression.Call(
-            typeCoercionProperty,
-            coerceMethod,
-            propertyAsObjectExpression,
-            outputTypeConstant,
-            typeCoercionContextProperty);
-
-        var coerceLambdaExpression = Expression.Lambda<Func<object, ApiSchemaContext, object?>>(coerceCallExpression, objectParameter, contextParameter);
-        var coerceLambda = coerceLambdaExpression.Compile();
-        return coerceLambda;
+        var directGetterLambdaExpression = Expression.Lambda<Func<object, ApiSchemaContext, object?>>(valueAsObjectExpression, objectParameterExpression, contextParameterExpression);
+        var directGetterDelegate = directGetterLambdaExpression.Compile();
+        return directGetterDelegate;
     }
 
     private static Action<object, ApiSchemaContext, object?>? BuildNonGenericClrPropertySetter(Type objectType, PropertyInfo propertyInfo)
@@ -854,100 +854,63 @@ public sealed class ApiProperty(string apiName, ApiTypeExpression apiTypeExpress
             return null;
         }
 
-        var objectParameter = Expression.Parameter(typeof(object), "obj");
-        var contextParameter = Expression.Parameter(typeof(ApiSchemaContext), "context");
-        var valueParameter = Expression.Parameter(typeof(object), "value");
-        var objectExpression = Expression.Convert(objectParameter, objectType);
-        var propertyAccessExpression = Expression.Property(objectExpression, propertyInfo);
+        var objectParameterExpression = Expression.Parameter(typeof(object), "obj");
+        var contextParameterExpression = Expression.Parameter(typeof(ApiSchemaContext), "context");
+        var valueParameterExpression = Expression.Parameter(typeof(object), "value");
+        var castObjectExpression = Expression.Convert(objectParameterExpression, objectType);
+        var propertyAccessExpression = Expression.Property(castObjectExpression, propertyInfo);
 
-        // If property type is already object, just assign directly
+        // Direct path: If property type is assignable from object (only if property type IS object)
         if (propertyInfo.PropertyType == typeof(object))
         {
-            var bodyExpression = Expression.Assign(propertyAccessExpression, valueParameter);
-            var lambdaExpression = Expression.Lambda<Action<object, ApiSchemaContext, object?>>(bodyExpression, objectParameter, contextParameter, valueParameter);
-            var lambda = lambdaExpression.Compile();
-            return lambda;
+            var directAssignExpression = Expression.Assign(propertyAccessExpression, valueParameterExpression);
+            var directSetterLambdaExpression = Expression.Lambda<Action<object, ApiSchemaContext, object?>>(directAssignExpression, objectParameterExpression, contextParameterExpression, valueParameterExpression);
+            var directSetterDelegate = directSetterLambdaExpression.Compile();
+            return directSetterDelegate;
         }
 
-        // Otherwise, use TypeCoercion to coerce from object to property type
-        var typeCoercionProperty = Expression.Property(contextParameter, nameof(ApiSchemaContext.TypeCoercion));
-        var typeCoercionContextProperty = Expression.Property(contextParameter, nameof(ApiSchemaContext.TypeCoercionContext));
-        var outputTypeConstant = Expression.Constant(propertyInfo.PropertyType, typeof(Type));
+        // Coercion path: Use TypeCoercion to convert object → specific type
+        // This handles unboxing, downcasting, and custom conversions
+        var typeCoercionPropertyExpression = Expression.Property(contextParameterExpression, nameof(ApiSchemaContext.TypeCoercion));
+        var typeCoercionContextPropertyExpression = Expression.Property(contextParameterExpression, nameof(ApiSchemaContext.TypeCoercionContext));
+        var targetPropertyTypeConstantExpression = Expression.Constant(propertyInfo.PropertyType, typeof(Type));
 
-        var coerceMethod = typeof(TypeCoercion).GetMethod(
-            nameof(TypeCoercion.Coerce),
-            BindingFlags.Public | BindingFlags.Instance,
-            null,
-            [typeof(object), typeof(Type), typeof(TypeCoercionContext)],
-            null);
-
-        if (coerceMethod is null)
-        {
-            return null;
-        }
-
-        var coerceCallExpression = Expression.Call(
-            typeCoercionProperty,
-            coerceMethod,
-            valueParameter,
-            outputTypeConstant,
-            typeCoercionContextProperty);
+        var coerceMethodCallExpression = Expression.Call(
+            typeCoercionPropertyExpression,
+            NonGenericCoerceMethod,
+            valueParameterExpression,
+            targetPropertyTypeConstantExpression,
+            typeCoercionContextPropertyExpression);
 
         // Convert coerce result back to property type
-        var coerceResultExpression = Expression.Convert(coerceCallExpression, propertyInfo.PropertyType);
+        var coercedValueExpression = Expression.Convert(coerceMethodCallExpression, propertyInfo.PropertyType);
 
-        var assignExpression = Expression.Assign(propertyAccessExpression, coerceResultExpression);
-        var coerceLambdaExpression = Expression.Lambda<Action<object, ApiSchemaContext, object?>>(assignExpression, objectParameter, contextParameter, valueParameter);
-        var coerceLambda = coerceLambdaExpression.Compile();
-        return coerceLambda;
+        var coerceAssignExpression = Expression.Assign(propertyAccessExpression, coercedValueExpression);
+        var coerceSetterLambdaExpression = Expression.Lambda<Action<object, ApiSchemaContext, object?>>(coerceAssignExpression, objectParameterExpression, contextParameterExpression, valueParameterExpression);
+        var coerceSetterDelegate = coerceSetterLambdaExpression.Compile();
+        return coerceSetterDelegate;
     }
 
     private static Func<object, ApiSchemaContext, object?>? BuildNonGenericClrFieldGetter(Type objectType, FieldInfo fieldInfo)
     {
-        // Build field getter: (object obj, ApiSchemaContext context) => context.TypeCoercion.Coerce<FieldType, object>(((OwningType)obj).FieldName, context.TypeCoercionContext)
-        var objectParameter = Expression.Parameter(typeof(object), "obj");
-        var contextParameter = Expression.Parameter(typeof(ApiSchemaContext), "context");
-        var objectExpression = Expression.Convert(objectParameter, objectType);
-        var fieldAccessExpression = Expression.Field(objectExpression, fieldInfo);
+        // Build field getter: (object obj, ApiSchemaContext context) => ((OwningType)obj).FieldName
+        // All types are assignable to object, so direct conversion is sufficient
+        var objectParameterExpression = Expression.Parameter(typeof(object), "obj");
+        var contextParameterExpression = Expression.Parameter(typeof(ApiSchemaContext), "context");
+        var castObjectExpression = Expression.Convert(objectParameterExpression, objectType);
+        var fieldAccessExpression = Expression.Field(castObjectExpression, fieldInfo);
 
-        // If field type is already object, just return it directly
-        if (fieldInfo.FieldType == typeof(object))
+        // Direct path: All types are assignable to object (reference types upcast, value types box)
+        // Direct conversion is always sufficient - no TypeCoercion needed
+        var valueAsObjectExpression = (Expression)fieldAccessExpression;
+        if (fieldInfo.FieldType != typeof(object))
         {
-            var lambdaExpression = Expression.Lambda<Func<object, ApiSchemaContext, object?>>(fieldAccessExpression, objectParameter, contextParameter);
-            var lambda = lambdaExpression.Compile();
-            return lambda;
+            valueAsObjectExpression = Expression.Convert(fieldAccessExpression, typeof(object));
         }
 
-        // Otherwise, use TypeCoercion to coerce to object
-        var typeCoercionProperty = Expression.Property(contextParameter, nameof(ApiSchemaContext.TypeCoercion));
-        var typeCoercionContextProperty = Expression.Property(contextParameter, nameof(ApiSchemaContext.TypeCoercionContext));
-        var outputTypeConstant = Expression.Constant(typeof(object), typeof(Type));
-
-        // Convert field value to object for the Coerce call
-        var fieldAsObjectExpression = Expression.Convert(fieldAccessExpression, typeof(object));
-
-        var coerceMethod = typeof(TypeCoercion).GetMethod(
-            nameof(TypeCoercion.Coerce),
-            BindingFlags.Public | BindingFlags.Instance,
-            null,
-            [typeof(object), typeof(Type), typeof(TypeCoercionContext)],
-            null);
-
-        if (coerceMethod is null)
-        {
-            return null;
-        }
-
-        var coerceCallExpression = Expression.Call(
-            typeCoercionProperty,
-            coerceMethod,
-            fieldAsObjectExpression,
-            outputTypeConstant,
-            typeCoercionContextProperty);
-
-        var coerceLambdaExpression = Expression.Lambda<Func<object, ApiSchemaContext, object?>>(coerceCallExpression, objectParameter, contextParameter);
-        var coerceLambda = coerceLambdaExpression.Compile();
-        return coerceLambda;
+        var directGetterLambdaExpression = Expression.Lambda<Func<object, ApiSchemaContext, object?>>(valueAsObjectExpression, objectParameterExpression, contextParameterExpression);
+        var directGetterDelegate = directGetterLambdaExpression.Compile();
+        return directGetterDelegate;
     }
 
     private static Action<object, ApiSchemaContext, object?>? BuildNonGenericClrFieldSetter(Type objectType, FieldInfo fieldInfo)
@@ -958,52 +921,41 @@ public sealed class ApiProperty(string apiName, ApiTypeExpression apiTypeExpress
             return null;
         }
 
-        var objectParameter = Expression.Parameter(typeof(object), "obj");
-        var contextParameter = Expression.Parameter(typeof(ApiSchemaContext), "context");
-        var valueParameter = Expression.Parameter(typeof(object), "value");
-        var objectExpression = Expression.Convert(objectParameter, objectType);
-        var fieldAccessExpression = Expression.Field(objectExpression, fieldInfo);
+        var objectParameterExpression = Expression.Parameter(typeof(object), "obj");
+        var contextParameterExpression = Expression.Parameter(typeof(ApiSchemaContext), "context");
+        var valueParameterExpression = Expression.Parameter(typeof(object), "value");
+        var castObjectExpression = Expression.Convert(objectParameterExpression, objectType);
+        var fieldAccessExpression = Expression.Field(castObjectExpression, fieldInfo);
 
-        // If field type is already object, just assign directly
+        // Direct path: If field type is assignable from object (only if field type IS object)
         if (fieldInfo.FieldType == typeof(object))
         {
-            var bodyExpression = Expression.Assign(fieldAccessExpression, valueParameter);
-            var lambdaExpression = Expression.Lambda<Action<object, ApiSchemaContext, object?>>(bodyExpression, objectParameter, contextParameter, valueParameter);
-            var lambda = lambdaExpression.Compile();
-            return lambda;
+            var directAssignExpression = Expression.Assign(fieldAccessExpression, valueParameterExpression);
+            var directSetterLambdaExpression = Expression.Lambda<Action<object, ApiSchemaContext, object?>>(directAssignExpression, objectParameterExpression, contextParameterExpression, valueParameterExpression);
+            var directSetterDelegate = directSetterLambdaExpression.Compile();
+            return directSetterDelegate;
         }
 
-        // Otherwise, use TypeCoercion to coerce from object to field type
-        var typeCoercionProperty = Expression.Property(contextParameter, nameof(ApiSchemaContext.TypeCoercion));
-        var typeCoercionContextProperty = Expression.Property(contextParameter, nameof(ApiSchemaContext.TypeCoercionContext));
-        var outputTypeConstant = Expression.Constant(fieldInfo.FieldType, typeof(Type));
+        // Coercion path: Use TypeCoercion to convert object → specific type
+        // This handles unboxing, downcasting, and custom conversions
+        var typeCoercionPropertyExpression = Expression.Property(contextParameterExpression, nameof(ApiSchemaContext.TypeCoercion));
+        var typeCoercionContextPropertyExpression = Expression.Property(contextParameterExpression, nameof(ApiSchemaContext.TypeCoercionContext));
+        var targetFieldTypeConstantExpression = Expression.Constant(fieldInfo.FieldType, typeof(Type));
 
-        var coerceMethod = typeof(TypeCoercion).GetMethod(
-            nameof(TypeCoercion.Coerce),
-            BindingFlags.Public | BindingFlags.Instance,
-            null,
-            [typeof(object), typeof(Type), typeof(TypeCoercionContext)],
-            null);
-
-        if (coerceMethod is null)
-        {
-            return null;
-        }
-
-        var coerceCallExpression = Expression.Call(
-            typeCoercionProperty,
-            coerceMethod,
-            valueParameter,
-            outputTypeConstant,
-            typeCoercionContextProperty);
+        var coerceMethodCallExpression = Expression.Call(
+            typeCoercionPropertyExpression,
+            NonGenericCoerceMethod,
+            valueParameterExpression,
+            targetFieldTypeConstantExpression,
+            typeCoercionContextPropertyExpression);
 
         // Convert coerce result back to field type
-        var coerceResultExpression = Expression.Convert(coerceCallExpression, fieldInfo.FieldType);
+        var coercedValueExpression = Expression.Convert(coerceMethodCallExpression, fieldInfo.FieldType);
 
-        var assignExpression = Expression.Assign(fieldAccessExpression, coerceResultExpression);
-        var coerceLambdaExpression = Expression.Lambda<Action<object, ApiSchemaContext, object?>>(assignExpression, objectParameter, contextParameter, valueParameter);
-        var coerceLambda = coerceLambdaExpression.Compile();
-        return coerceLambda;
+        var coerceAssignExpression = Expression.Assign(fieldAccessExpression, coercedValueExpression);
+        var coerceSetterLambdaExpression = Expression.Lambda<Action<object, ApiSchemaContext, object?>>(coerceAssignExpression, objectParameterExpression, contextParameterExpression, valueParameterExpression);
+        var coerceSetterDelegate = coerceSetterLambdaExpression.Compile();
+        return coerceSetterDelegate;
     }
     #endregion
 
@@ -1016,15 +968,15 @@ public sealed class ApiProperty(string apiName, ApiTypeExpression apiTypeExpress
         }
 
         // Parameters: (TObject obj, ApiSchemaContext context)
-        var objectParameter = Expression.Parameter(typeof(TObject), "obj");
-        var contextParameter = Expression.Parameter(typeof(ApiSchemaContext), "context");
+        var objectParameterExpression = Expression.Parameter(typeof(TObject), "obj");
+        var contextParameterExpression = Expression.Parameter(typeof(ApiSchemaContext), "context");
 
-        var objectExpression = MakeObjectExpression<TObject>(objectParameter, objectType);
+        var castObjectExpression = MakeObjectExpression<TObject>(objectParameterExpression, objectType);
 
         var memberAccessExpression = memberInfo switch
         {
-            PropertyInfo pi => Expression.Property(objectExpression, pi),
-            FieldInfo fi => Expression.Field(objectExpression, fi),
+            PropertyInfo pi => Expression.Property(castObjectExpression, pi),
+            FieldInfo fi => Expression.Field(castObjectExpression, fi),
             _ => null
         };
 
@@ -1036,39 +988,35 @@ public sealed class ApiProperty(string apiName, ApiTypeExpression apiTypeExpress
         // If the member type is already assignable to TValue, just use it directly
         if (typeof(TValue).IsAssignableFrom(memberType))
         {
-            Expression bodyExpression = memberAccessExpression;
+            Expression convertedMemberValueExpression = memberAccessExpression;
             if (memberAccessExpression.Type != typeof(TValue))
             {
-                bodyExpression = Expression.Convert(memberAccessExpression, typeof(TValue));
+                convertedMemberValueExpression = Expression.Convert(memberAccessExpression, typeof(TValue));
             }
 
-            var lambdaExpression = Expression.Lambda<Func<TObject, ApiSchemaContext, TValue?>>(bodyExpression, objectParameter, contextParameter);
-            var lambda = lambdaExpression.Compile();
-            return new ClrGetterCacheValue<TObject, TValue>(lambda);
+            var directGetterLambdaExpression = Expression.Lambda<Func<TObject, ApiSchemaContext, TValue?>>(convertedMemberValueExpression, objectParameterExpression, contextParameterExpression);
+            var directGetterDelegate = directGetterLambdaExpression.Compile();
+            return new ClrGetterCacheValue<TObject, TValue>(directGetterDelegate);
         }
 
         // Otherwise, we need to use TypeCoercion to coerce the value
         // context.TypeCoercion.Coerce<memberType, TValue>(memberValue, context.TypeCoercionContext)
-        var typeCoercionProperty = Expression.Property(contextParameter, nameof(ApiSchemaContext.TypeCoercion));
-        var typeCoercionContextProperty = Expression.Property(contextParameter, nameof(ApiSchemaContext.TypeCoercionContext));
+        var typeCoercionPropertyExpression = Expression.Property(contextParameterExpression, nameof(ApiSchemaContext.TypeCoercion));
+        var typeCoercionContextPropertyExpression = Expression.Property(contextParameterExpression, nameof(ApiSchemaContext.TypeCoercionContext));
 
-        var coerceMethod = typeof(TypeCoercion).GetMethods(BindingFlags.Public | BindingFlags.Instance)
-            .FirstOrDefault(m => m.Name == nameof(TypeCoercion.Coerce) && m.IsGenericMethodDefinition && m.GetGenericArguments().Length == 2)
-            ?.MakeGenericMethod(memberType, typeof(TValue)); if (coerceMethod is null)
-        {
-            return new ClrGetterCacheValue<TObject, TValue>(null);
-        }
+        // Use generic Coerce<,> overload for type-safe coercion with compile-time types
+        var genericCoerceMethod = MakeGenericCoerceMethod(memberType, typeof(TValue));
 
-        var coerceCallExpression = Expression.Call(
-            typeCoercionProperty,
-            coerceMethod,
+        var coerceMethodCallExpression = Expression.Call(
+            typeCoercionPropertyExpression,
+            genericCoerceMethod,
             memberAccessExpression,
-            typeCoercionContextProperty);
+            typeCoercionContextPropertyExpression);
 
-        var coerceLambdaExpression = Expression.Lambda<Func<TObject, ApiSchemaContext, TValue?>>(coerceCallExpression, objectParameter, contextParameter);
-        var coerceLambda = coerceLambdaExpression.Compile();
+        var coerceGetterLambdaExpression = Expression.Lambda<Func<TObject, ApiSchemaContext, TValue?>>(coerceMethodCallExpression, objectParameterExpression, contextParameterExpression);
+        var coerceGetterDelegate = coerceGetterLambdaExpression.Compile();
 
-        return new ClrGetterCacheValue<TObject, TValue>(coerceLambda);
+        return new ClrGetterCacheValue<TObject, TValue>(coerceGetterDelegate);
     }
 
     private static ClrSetterCacheValue<TObject, TValue> BuildGenericClrSetter<TObject, TValue>(Type objectType, string memberName)
@@ -1079,16 +1027,16 @@ public sealed class ApiProperty(string apiName, ApiTypeExpression apiTypeExpress
         }
 
         // Parameters: (TObject obj, ApiSchemaContext context, TValue value)
-        var objectParameter = Expression.Parameter(typeof(TObject), "obj");
-        var contextParameter = Expression.Parameter(typeof(ApiSchemaContext), "context");
-        var valueParameter = Expression.Parameter(typeof(TValue), "value");
+        var objectParameterExpression = Expression.Parameter(typeof(TObject), "obj");
+        var contextParameterExpression = Expression.Parameter(typeof(ApiSchemaContext), "context");
+        var valueParameterExpression = Expression.Parameter(typeof(TValue), "value");
 
-        var objectExpression = MakeObjectExpression<TObject>(objectParameter, objectType);
+        var castObjectExpression = MakeObjectExpression<TObject>(objectParameterExpression, objectType);
 
         var memberAccessExpression = memberInfo switch
         {
-            PropertyInfo pi => Expression.Property(objectExpression, pi),
-            FieldInfo fi => Expression.Field(objectExpression, fi),
+            PropertyInfo pi => Expression.Property(castObjectExpression, pi),
+            FieldInfo fi => Expression.Field(castObjectExpression, fi),
             _ => null
         };
 
@@ -1100,44 +1048,38 @@ public sealed class ApiProperty(string apiName, ApiTypeExpression apiTypeExpress
         // If TValue is already assignable to the member type, just use it directly
         if (memberType.IsAssignableFrom(typeof(TValue)))
         {
-            Expression rhsExpression = valueParameter;
-            if (valueParameter.Type != memberType)
+            Expression convertedValueExpression = valueParameterExpression;
+            if (valueParameterExpression.Type != memberType)
             {
-                rhsExpression = Expression.Convert(valueParameter, memberType);
+                convertedValueExpression = Expression.Convert(valueParameterExpression, memberType);
             }
 
-            var bodyExpression = Expression.Assign(memberAccessExpression, rhsExpression);
-            var lambdaExpression = Expression.Lambda<Action<TObject, ApiSchemaContext, TValue?>>(bodyExpression, objectParameter, contextParameter, valueParameter);
-            var lambda = lambdaExpression.Compile();
-            return new ClrSetterCacheValue<TObject, TValue>(lambda);
+            var directAssignExpression = Expression.Assign(memberAccessExpression, convertedValueExpression);
+            var directSetterLambdaExpression = Expression.Lambda<Action<TObject, ApiSchemaContext, TValue?>>(directAssignExpression, objectParameterExpression, contextParameterExpression, valueParameterExpression);
+            var directSetterDelegate = directSetterLambdaExpression.Compile();
+            return new ClrSetterCacheValue<TObject, TValue>(directSetterDelegate);
         }
 
         // Otherwise, we need to use TypeCoercion to coerce the value
-        // var coercedValue = context.TypeCoercion.Coerce<TValue, memberType>(value, context.TypeCoercionContext);
+        // var coercedValue = context.TypeCoercion.Coerce<TValue, MemberType>(value, context.TypeCoercionContext);
         // member = coercedValue;
-        var typeCoercionProperty = Expression.Property(contextParameter, nameof(ApiSchemaContext.TypeCoercion));
-        var typeCoercionContextProperty = Expression.Property(contextParameter, nameof(ApiSchemaContext.TypeCoercionContext));
+        var typeCoercionPropertyExpression = Expression.Property(contextParameterExpression, nameof(ApiSchemaContext.TypeCoercion));
+        var typeCoercionContextPropertyExpression = Expression.Property(contextParameterExpression, nameof(ApiSchemaContext.TypeCoercionContext));
 
-        var coerceMethod = typeof(TypeCoercion).GetMethods(BindingFlags.Public | BindingFlags.Instance)
-            .FirstOrDefault(m => m.Name == nameof(TypeCoercion.Coerce) && m.IsGenericMethodDefinition && m.GetGenericArguments().Length == 2)
-            ?.MakeGenericMethod(typeof(TValue), memberType);
+        // Use generic Coerce<,> overload for type-safe coercion with compile-time types
+        var genericCoerceMethod = MakeGenericCoerceMethod(typeof(TValue), memberType);
 
-        if (coerceMethod is null)
-        {
-            return new ClrSetterCacheValue<TObject, TValue>(null);
-        }
+        var coerceMethodCallExpression = Expression.Call(
+            typeCoercionPropertyExpression,
+            genericCoerceMethod,
+            valueParameterExpression,
+            typeCoercionContextPropertyExpression);
 
-        var coerceCallExpression = Expression.Call(
-            typeCoercionProperty,
-            coerceMethod,
-            valueParameter,
-            typeCoercionContextProperty);
+        var coerceAssignExpression = Expression.Assign(memberAccessExpression, coerceMethodCallExpression);
+        var coerceSetterLambdaExpression = Expression.Lambda<Action<TObject, ApiSchemaContext, TValue?>>(coerceAssignExpression, objectParameterExpression, contextParameterExpression, valueParameterExpression);
+        var coerceSetterDelegate = coerceSetterLambdaExpression.Compile();
 
-        var assignExpression = Expression.Assign(memberAccessExpression, coerceCallExpression);
-        var coerceLambdaExpression = Expression.Lambda<Action<TObject, ApiSchemaContext, TValue?>>(assignExpression, objectParameter, contextParameter, valueParameter);
-        var coerceLambda = coerceLambdaExpression.Compile();
-
-        return new ClrSetterCacheValue<TObject, TValue>(coerceLambda);
+        return new ClrSetterCacheValue<TObject, TValue>(coerceSetterDelegate);
     }
 
     private static ClrSetterByRefCacheValue<TObject, TValue> BuildGenericClrSetterByRef<TObject, TValue>(Type objectType, string memberName)
@@ -1155,14 +1097,14 @@ public sealed class ApiProperty(string apiName, ApiTypeExpression apiTypeExpress
         }
 
         // Parameters: (ref TObject obj, ApiSchemaContext context, TValue value)
-        var objectParameter = Expression.Parameter(typeof(TObject).MakeByRefType(), "obj");
-        var contextParameter = Expression.Parameter(typeof(ApiSchemaContext), "context");
-        var valueParameter = Expression.Parameter(typeof(TValue), "value");
+        var objectByRefParameterExpression = Expression.Parameter(typeof(TObject).MakeByRefType(), "obj");
+        var contextParameterExpression = Expression.Parameter(typeof(ApiSchemaContext), "context");
+        var valueParameterExpression = Expression.Parameter(typeof(TValue), "value");
 
         var memberAccessExpression = memberInfo switch
         {
-            PropertyInfo pi => Expression.Property(objectParameter, pi),
-            FieldInfo fi => Expression.Field(objectParameter, fi),
+            PropertyInfo pi => Expression.Property(objectByRefParameterExpression, pi),
+            FieldInfo fi => Expression.Field(objectByRefParameterExpression, fi),
             _ => null
         };
 
@@ -1174,44 +1116,44 @@ public sealed class ApiProperty(string apiName, ApiTypeExpression apiTypeExpress
         // If TValue is already assignable to the member type, just use it directly
         if (memberType.IsAssignableFrom(typeof(TValue)))
         {
-            Expression rhsExpression = valueParameter;
-            if (valueParameter.Type != memberType)
+            Expression convertedValueExpression = valueParameterExpression;
+            if (valueParameterExpression.Type != memberType)
             {
-                rhsExpression = Expression.Convert(valueParameter, memberType);
+                convertedValueExpression = Expression.Convert(valueParameterExpression, memberType);
             }
 
-            var bodyExpression = Expression.Assign(memberAccessExpression, rhsExpression);
-            var lambdaExpression = Expression.Lambda<ByRefAction<TObject, TValue?>>(bodyExpression, objectParameter, contextParameter, valueParameter);
-            var lambda = lambdaExpression.Compile();
-            return new ClrSetterByRefCacheValue<TObject, TValue>(lambda);
+            var directAssignExpression = Expression.Assign(memberAccessExpression, convertedValueExpression);
+            var directSetterLambdaExpression = Expression.Lambda<ByRefAction<TObject, TValue?>>(directAssignExpression, objectByRefParameterExpression, contextParameterExpression, valueParameterExpression);
+            var directSetterDelegate = directSetterLambdaExpression.Compile();
+            return new ClrSetterByRefCacheValue<TObject, TValue>(directSetterDelegate);
         }
 
         // Otherwise, we need to use TypeCoercion to coerce the value
         // var coercedValue = context.TypeCoercion.Coerce<TValue, memberType>(value, context.TypeCoercionContext);
         // member = coercedValue;
-        var typeCoercionProperty = Expression.Property(contextParameter, nameof(ApiSchemaContext.TypeCoercion));
-        var typeCoercionContextProperty = Expression.Property(contextParameter, nameof(ApiSchemaContext.TypeCoercionContext));
+        var typeCoercionPropertyExpression = Expression.Property(contextParameterExpression, nameof(ApiSchemaContext.TypeCoercion));
+        var typeCoercionContextPropertyExpression = Expression.Property(contextParameterExpression, nameof(ApiSchemaContext.TypeCoercionContext));
 
-        var coerceMethod = typeof(TypeCoercion).GetMethods(BindingFlags.Public | BindingFlags.Instance)
-            .FirstOrDefault(m => m.Name == nameof(TypeCoercion.Coerce) && m.IsGenericMethodDefinition && m.GetGenericArguments().Length == 2)
-            ?.MakeGenericMethod(typeof(TValue), memberType);
+        // Use generic Coerce<,> overload for type-safe coercion with compile-time types
+        var genericCoerceMethod = MakeGenericCoerceMethod(typeof(TValue), memberType);
 
-        if (coerceMethod is null)
-        {
-            return new ClrSetterByRefCacheValue<TObject, TValue>(null);
-        }
+        var coerceMethodCallExpression = Expression.Call(
+            typeCoercionPropertyExpression,
+            genericCoerceMethod,
+            valueParameterExpression,
+            typeCoercionContextPropertyExpression);
 
-        var coerceCallExpression = Expression.Call(
-            typeCoercionProperty,
-            coerceMethod,
-            valueParameter,
-            typeCoercionContextProperty);
+        var coerceAssignExpression = Expression.Assign(memberAccessExpression, coerceMethodCallExpression);
+        var coerceSetterLambdaExpression = Expression.Lambda<ByRefAction<TObject, TValue?>>(coerceAssignExpression, objectByRefParameterExpression, contextParameterExpression, valueParameterExpression);
+        var coerceSetterDelegate = coerceSetterLambdaExpression.Compile();
 
-        var assignExpression = Expression.Assign(memberAccessExpression, coerceCallExpression);
-        var coerceLambdaExpression = Expression.Lambda<ByRefAction<TObject, TValue?>>(assignExpression, objectParameter, contextParameter, valueParameter);
-        var coerceLambda = coerceLambdaExpression.Compile();
+        return new ClrSetterByRefCacheValue<TObject, TValue>(coerceSetterDelegate);
+    }
 
-        return new ClrSetterByRefCacheValue<TObject, TValue>(coerceLambda);
+    private static MethodInfo MakeGenericCoerceMethod(Type inputType, Type outputType)
+    {
+        var key = new CoerceMethodCacheKey(inputType, outputType);
+        return _coerceMethodCache.GetOrAdd(key, k => GenericCoerceMethodDefinition.MakeGenericMethod(k.ClrInputType, k.ClrOutputType));
     }
 
     private static Expression MakeObjectExpression<TObject>(ParameterExpression parameterExpression, Type objectType)
@@ -1221,31 +1163,10 @@ public sealed class ApiProperty(string apiName, ApiTypeExpression apiTypeExpress
             : Expression.Convert(parameterExpression, objectType);
     }
 
-    private static bool TryConvertExpression(Expression sourceExpression, Type destinationType, out Expression convertedExpression)
-    {
-        if (destinationType.IsAssignableFrom(sourceExpression.Type))
-        {
-            convertedExpression = sourceExpression;
-            return true;
-        }
-
-        try
-        {
-            convertedExpression = Expression.Convert(sourceExpression, destinationType);
-            return true;
-        }
-        catch
-        {
-            convertedExpression = default!;
-            return false;
-        }
-    }
-
     private static bool TryResolveMember(Type objectType, string memberName, bool forWrite, out MemberInfo memberInfo, out Type memberType)
     {
         // Prefer property, then field
         var propertyInfo = TypeReflection.GetProperty(objectType, memberName, BindingFlags.Public | BindingFlags.Instance);
-
         if (propertyInfo is not null)
         {
             // Exclude indexers
