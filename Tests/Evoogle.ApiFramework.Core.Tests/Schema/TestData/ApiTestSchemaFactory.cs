@@ -257,21 +257,28 @@ public static class ApiTestSchemaFactory
         // 2) Enums
         var enums = new List<ApiEnumType>
         {
-            E("Gender", typeof(Gender), [EV("Unspecified", 0), EV("Male", 1), EV("Female", 2)]),
-            E("StopLight", typeof(StopLight), [EV("None", 0), EV("Green", 1), EV("Yellow", 2), EV("Red", 3)])
+            E("Gender",     typeof(Gender),     [EV("Unspecified", 0),  EV("Male", 1),  EV("Female", 2)]),
+            E("StopLight",  typeof(StopLight),  [EV("None", 0),         EV("Green", 1), EV("Yellow", 2), EV("Red", 3)])
         };
 
         // 3) Object Types
         var empty = O("Empty", typeof(Empty), []);
 
+        var point = O("Point", typeof(Point),
+        [
+            P("X",      TE.ClrRef<long>(),      required: true),
+            P("Y",      TE.ClrRef<long>(),      required: true),
+            P("Note",   TE.ClrRef<string>(),    required: false)
+        ]);
+
         var scalarsOnly = O("ScalarsOnly", typeof(ScalarsOnly),
         [
-            P("RequiredName",   TE.ClrRef<string>(),    required: true),
-            P("RequiredNumber", TE.ClrRef<long>(),      required: true),
-            P("RequiredPredicate", TE.ClrRef<bool>(),   required: true),
-            P("OptionalName",   TE.ClrRef<string>(),    required: false),
-            P("OptionalNumber", TE.ClrRef<long>(),      required: false),
-            P("OptionalPredicate", TE.ClrRef<bool>(),   required: false)
+            P("RequiredName",       TE.ClrRef<string>(),    required: true),
+            P("RequiredNumber",     TE.ClrRef<long>(),      required: true),
+            P("RequiredPredicate",  TE.ClrRef<bool>(),      required: true),
+            P("OptionalName",       TE.ClrRef<string>(),    required: false),
+            P("OptionalNumber",     TE.ClrRef<long>(),      required: false),
+            P("OptionalPredicate",  TE.ClrRef<bool>(),      required: false)
         ]);
 
         var person = O("Person", typeof(Person),
@@ -288,14 +295,15 @@ public static class ApiTestSchemaFactory
             P("Employees", TE.ListOf<Person>(required:true), required: false)
         ],
         [
-            R("Company_Owner", "Owner"),
-            R("Company_Employees", "Employees")
+            R("Company_Owner",      "Owner"),
+            R("Company_Employees",  "Employees")
         ]);
 
         // 4) Objects list
         var objects = new List<ApiObjectType>
         {
             empty,
+            point,
             scalarsOnly,
             person,
             company

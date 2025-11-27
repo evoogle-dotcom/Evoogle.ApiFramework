@@ -6,7 +6,6 @@
 using System.Linq.Expressions;
 using System.Reflection;
 
-using Evoogle.Coercion;
 using Evoogle.Reflection;
 
 namespace Evoogle.ApiFramework.Schema;
@@ -208,7 +207,7 @@ public sealed partial class ApiProperty
             }
 
             var directAssignExpression = Expression.Assign(memberAccessExpression, convertedValueExpression);
-            var directSetterLambdaExpression = Expression.Lambda<ByRefAction<TObject, TValue?>>(directAssignExpression, objectByRefParameterExpression, contextParameterExpression, valueParameterExpression);
+            var directSetterLambdaExpression = Expression.Lambda<ClrByRefAction<TObject, TValue?>>(directAssignExpression, objectByRefParameterExpression, contextParameterExpression, valueParameterExpression);
             var directSetterDelegate = directSetterLambdaExpression.Compile();
             return new ClrSetterByRefCacheValue<TObject, TValue>(directSetterDelegate);
         }
@@ -229,7 +228,7 @@ public sealed partial class ApiProperty
             typeCoercionContextPropertyExpression);
 
         var coerceAssignExpression = Expression.Assign(memberAccessExpression, coerceMethodCallExpression);
-        var coerceSetterLambdaExpression = Expression.Lambda<ByRefAction<TObject, TValue?>>(coerceAssignExpression, objectByRefParameterExpression, contextParameterExpression, valueParameterExpression);
+        var coerceSetterLambdaExpression = Expression.Lambda<ClrByRefAction<TObject, TValue?>>(coerceAssignExpression, objectByRefParameterExpression, contextParameterExpression, valueParameterExpression);
         var coerceSetterDelegate = coerceSetterLambdaExpression.Compile();
 
         return new ClrSetterByRefCacheValue<TObject, TValue>(coerceSetterDelegate);

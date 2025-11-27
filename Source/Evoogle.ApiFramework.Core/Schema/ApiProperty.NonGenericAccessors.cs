@@ -6,8 +6,6 @@
 using System.Linq.Expressions;
 using System.Reflection;
 
-using Evoogle.Coercion;
-
 namespace Evoogle.ApiFramework.Schema;
 
 /// <summary>
