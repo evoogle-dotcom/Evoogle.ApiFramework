@@ -18,14 +18,26 @@ public sealed partial class ApiProperty
     ///     Gets the value of this property from the specified object.
     /// </summary>
     /// <param name="clrObject">The object instance to get the property value from.</param>
-    /// <returns>The property value.</returns>
+    /// <param name="clrValueType">
+    ///     The optional desired output type for coercion. If <c>null</c> (the default), no coercion is performed
+    ///     and the value is returned directly as <see cref="object"/>. If specified, the retrieved value is
+    ///     coerced to the specified type using <see cref="ApiSchemaContext.TypeCoercion"/>.
+    /// </param>
+    /// <returns>The property value, optionally coerced to <paramref name="clrValueType"/> if specified.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="clrObject"/> is null.</exception>
     /// <exception cref="ApiSchemaException">Thrown when the property has no compiled getter or the getter fails to execute.</exception>
     /// <remarks>
-    ///     This method uses a pre-compiled lambda expression for optimal performance.
-    ///     The return value will be boxed if the property type is a value type.
+    ///     <para>
+    ///         This method uses a pre-compiled lambda expression for optimal performance.
+    ///         The return value will be boxed if the property type is a value type.
+    ///     </para>
+    ///     <para>
+    ///         When <paramref name="clrValueType"/> is specified, the retrieved value is coerced using the
+    ///         schema's <see cref="TypeCoercion"/> instance. This handles type conversions
+    ///         such as unboxing, downcasting, enum conversions, and custom coercion definitions.
+    ///     </para>
     /// </remarks>
-    public object? GetValue(object clrObject)
+    public object? GetValue(object clrObject, Type? clrValueType = null)
     {
         ArgumentNullException.ThrowIfNull(clrObject, nameof(clrObject));
 
@@ -39,7 +51,17 @@ public sealed partial class ApiProperty
 
         try
         {
-            return _clrGetter(clrObject, this.ApiSchemaContext);
+            var clrValue = _clrGetter(clrObject, this.ApiSchemaContext);
+
+            // If no desired output type specified, return the value directly (no coercion)
+            if (clrValueType is null)
+            {
+                return clrValue;
+            }
+
+            // Coerce the value to the desired output type
+            var clrCoercedValue = this.ApiSchemaContext.TypeCoercion.Coerce(clrValue, clrValueType, this.ApiSchemaContext.TypeCoercionContext);
+            return clrCoercedValue;
         }
         catch (Exception ex)
         {
@@ -249,7 +271,12 @@ public sealed partial class ApiProperty
     /// </summary>
     /// <param name="clrObject">The object instance containing the member.</param>
     /// <param name="clrValue">When this method returns, contains the member value if successful; otherwise, the default value.</param>
-    /// <returns><c>true</c> if the value was retrieved successfully; otherwise, <c>false</c>.</returns>
+    /// <param name="clrValueType">
+    ///     The optional desired output type for coercion. If <c>null</c> (the default), no coercion is performed
+    ///     and the value is returned directly as <see cref="object"/>. If specified, the retrieved value is
+    ///     coerced to the specified type using <see cref="ApiSchemaContext.TypeCoercion"/>.
+    /// </param>
+    /// <returns><c>true</c> if the value was retrieved (and optionally coerced) successfully; otherwise, <c>false</c>.</returns>
     /// <remarks>
     ///     <para>
     ///         This method never throws exceptions. It returns <c>false</c> if:
@@ -257,14 +284,20 @@ public sealed partial class ApiProperty
     ///             <item><description>The <paramref name="clrObject"/> is null</description></item>
     ///             <item><description>The property has no compiled getter</description></item>
     ///             <item><description>An exception occurs during property access</description></item>
+    ///             <item><description>Coercion to <paramref name="clrValueType"/> fails (when specified)</description></item>
     ///         </list>
     ///     </para>
     ///     <para>
-    ///         Prefer this method over <see cref="GetValue(object)"/> when failure is expected
+    ///         Prefer this method over <see cref="GetValue(object, Type?)"/> when failure is expected
     ///         or performance is critical, as it avoids exception overhead.
     ///     </para>
+    ///     <para>
+    ///         When <paramref name="clrValueType"/> is specified, the retrieved value is coerced using the
+    ///         schema's <see cref="TypeCoercion"/> instance. This handles type conversions
+    ///         such as unboxing, downcasting, enum conversions, and custom coercion definitions.
+    ///     </para>
     /// </remarks>
-    public bool TryGetValue(object? clrObject, out object? clrValue)
+    public bool TryGetValue(object? clrObject, out object? clrValue, Type? clrValueType = null)
     {
         if (clrObject is null || _clrGetter is null)
         {
@@ -274,7 +307,17 @@ public sealed partial class ApiProperty
 
         try
         {
-            clrValue = _clrGetter(clrObject, this.ApiSchemaContext);
+            var clrRawValue = _clrGetter(clrObject, this.ApiSchemaContext);
+
+            // If no desired output type specified, return the value directly (no coercion)
+            if (clrValueType is null)
+            {
+                clrValue = clrRawValue;
+                return true;
+            }
+
+            // Coerce the value to the desired output type
+            clrValue = this.ApiSchemaContext.TypeCoercion.Coerce(clrRawValue, clrValueType, this.ApiSchemaContext.TypeCoercionContext);
             return true;
         }
         catch

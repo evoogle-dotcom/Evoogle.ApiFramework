@@ -123,6 +123,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
     {
         #region User Supplied Properties
         public object? ClrObject { get; init; }
+        public Type? ClrValueType { get; init; }
         public object? ExpectedClrValue { get; init; }
         #endregion
 
@@ -135,7 +136,8 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
         {
             base.Arrange();
 
-            this.WriteLine($"ClrObject: {this.ClrObject.SafeToString()}");
+            this.WriteLine($"ClrObject:    {this.ClrObject.SafeToString()}");
+            this.WriteLine($"ClrValueType: {this.ClrValueType.SafeToName()}");
             this.WriteLine();
             this.WriteLine($"ExpectedSuccess:  {this.ExpectedSuccess.SafeToString()}");
             this.WriteLine($"ExpectedClrValue: {this.ExpectedClrValue.SafeToString()}");
@@ -143,7 +145,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         protected override void Act()
         {
-            this.ActualSuccess = this.ApiProperty!.TryGetValue(this.ClrObject, out var clrValue);
+            this.ActualSuccess = this.ApiProperty!.TryGetValue(this.ClrObject, out var clrValue, this.ClrValueType);
             this.ActualClrValue = clrValue;
 
             this.WriteLine();
@@ -630,6 +632,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.RequiredNumber),
             ClrObject = new ScalarsOnly("Alice", 123, true),
+            ClrValueType = typeof(string),
             ExpectedSuccess = true,
             ExpectedClrValue = "123"
         },
@@ -641,6 +644,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.RequiredPredicate),
             ClrObject = new ScalarsOnly("Alice", 123, true),
+            ClrValueType = typeof(string),
             ExpectedSuccess = true,
             ExpectedClrValue = "true"
         },
@@ -653,6 +657,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.OptionalNumber),
             ClrObject = new ScalarsOnly("Alice", 123, true) { OptionalNumber = 42 },
+            ClrValueType = typeof(string),
             ExpectedSuccess = true,
             ExpectedClrValue = "42"
         },
@@ -664,6 +669,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.OptionalNumber),
             ClrObject = new ScalarsOnly("Alice", 123, true) { OptionalNumber = null },
+            ClrValueType = typeof(string),
             ExpectedSuccess = true,
             ExpectedClrValue = null
         },
@@ -675,6 +681,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.OptionalPredicate),
             ClrObject = new ScalarsOnly("Alice", 123, true) { OptionalPredicate = false },
+            ClrValueType = typeof(string),
             ExpectedSuccess = true,
             ExpectedClrValue = "false"
         },
@@ -686,6 +693,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.OptionalPredicate),
             ClrObject = new ScalarsOnly("Alice", 123, true) { OptionalPredicate = null },
+            ClrValueType = typeof(string),
             ExpectedSuccess = true,
             ExpectedClrValue = null
         },
