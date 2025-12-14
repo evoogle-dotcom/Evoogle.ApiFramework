@@ -84,7 +84,7 @@ public sealed class ApiIdentityPart(string apiPropertyName, ApiIdentityCoercion?
             var path = $"{this.ApiPath}.{nameof(this.ApiProperty)}";
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_IDENTITY_PART_UNRESOLVED_PROPERTY;
-            var description = $"{nameof(this.ApiProperty)} unable to resolve {nameof(this.ApiProperty)}[\"{this.ApiPropertyName.SafeToString()}\"]";
+            var description = $"{nameof(this.ApiProperty)} is unresolved for {nameof(this.ApiPropertyName)}='{this.ApiPropertyName.SafeToString()}'";
             var remediation = $"Ensure that {nameof(this.ApiPropertyName)} refers to a valid property on the parent {nameof(ApiObjectType)}";
 
             context.AddIssue(path, severity, code, description, remediation);

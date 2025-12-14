@@ -68,7 +68,7 @@ public sealed class ApiIdentity(string apiName, IEnumerable<ApiIdentityPart> api
             var path = $"{this.ApiPath}.{nameof(this.ApiIdentityParts)}";
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_IDENTITY_NULL_OR_EMPTY_IDENTITY_PARTS;
-            var description = $"{nameof(this.ApiIdentityParts)} is either null or empty";
+            var description = $"{nameof(this.ApiIdentityParts)} cannot be null or empty";
             var remediation = $"Provide at least one {nameof(ApiIdentityPart)}";
 
             context.AddIssue(path, severity, code, description, remediation);

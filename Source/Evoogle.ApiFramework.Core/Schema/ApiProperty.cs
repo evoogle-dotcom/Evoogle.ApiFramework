@@ -188,8 +188,8 @@ public sealed partial class ApiProperty(string apiName, ApiTypeExpression apiTyp
             var path = $"{this.ApiPath}.{nameof(this.ApiType)}";
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_PROPERTY_NULL_TYPE;
-            var description = $"{nameof(this.ApiType)} is null for {nameof(ApiProperty)}";
-            var remediation = $"Ensure that {nameof(this.ApiType)} is specified for {nameof(ApiProperty)}";
+            var description = $"{nameof(this.ApiType)} cannot be null";
+            var remediation = $"Ensure that {nameof(this.ApiType)} is specified";
 
             context.AddIssue(path, severity, code, description, remediation);
             return;
@@ -215,8 +215,8 @@ public sealed partial class ApiProperty(string apiName, ApiTypeExpression apiTyp
             var path = $"{this.ApiPath}.{nameof(this.ClrName)}";
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_PROPERTY_INVALID_CLR_FIELD_GETTER;
-            var description = $"Failed to compile lambda field getter: {ex.Message}";
-            var remediation = $"Ensure CLR Object '{clrObjectType.SafeToName()}' has a valid '{clrMemberName}' field getter";
+            var description = $"Failed to compile field getter for '{clrMemberName}': {ex.Message}";
+            var remediation = $"Ensure field '{clrMemberName}' on {nameof(ApiObjectType)}.{nameof(ApiObjectType.ClrType)} '{clrObjectType.SafeToName()}' is accessible";
 
             context.AddIssue(path, severity, code, description, remediation);
         }
@@ -230,8 +230,8 @@ public sealed partial class ApiProperty(string apiName, ApiTypeExpression apiTyp
             var path = $"{this.ApiPath}.{nameof(this.ClrName)}";
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_PROPERTY_INVALID_CLR_FIELD_SETTER;
-            var description = $"Failed to compile lambda field setter: {ex.Message}";
-            var remediation = $"Ensure CLR Object '{clrObjectType.SafeToName()}' has a valid '{clrMemberName}' field setter";
+            var description = $"Failed to compile field setter for '{clrMemberName}': {ex.Message}";
+            var remediation = $"Ensure field '{clrMemberName}' on {nameof(ApiObjectType)}.{nameof(ApiObjectType.ClrType)} '{clrObjectType.SafeToName()}' is accessible and writable";
 
             context.AddIssue(path, severity, code, description, remediation);
         }
@@ -251,7 +251,7 @@ public sealed partial class ApiProperty(string apiName, ApiTypeExpression apiTyp
             var path = $"{this.ApiPath}.{nameof(this.ClrName)}";
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_PROPERTY_INVALID_CLR_PROPERTY_GETTER;
-            var description = $"Refers to an indexer property, which is not supported.";
+            var description = $"Property '{clrMemberName}' is an indexer, which is not supported";
 
             context.AddIssue(path, severity, code, description, remediation: null);
             return;
@@ -267,8 +267,8 @@ public sealed partial class ApiProperty(string apiName, ApiTypeExpression apiTyp
             var path = $"{this.ApiPath}.{nameof(this.ClrName)}";
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_PROPERTY_INVALID_CLR_PROPERTY_GETTER;
-            var description = $"Failed to compile lambda property getter: {ex.Message}";
-            var remediation = $"Ensure CLR Object '{clrObjectType.SafeToName()}' has a valid '{clrMemberName}' property getter";
+            var description = $"Failed to compile property getter for '{clrMemberName}': {ex.Message}";
+            var remediation = $"Ensure property '{clrMemberName}' on {nameof(ApiObjectType)}.{nameof(ApiObjectType.ClrType)} '{clrObjectType.SafeToName()}' is accessible";
 
             context.AddIssue(path, severity, code, description, remediation);
         }
@@ -282,8 +282,8 @@ public sealed partial class ApiProperty(string apiName, ApiTypeExpression apiTyp
             var path = $"{this.ApiPath}.{nameof(this.ClrName)}";
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_PROPERTY_INVALID_CLR_PROPERTY_SETTER;
-            var description = $"Failed to compile lambda property setter: {ex.Message}";
-            var remediation = $"Ensure CLR Object '{clrObjectType.SafeToName()}' has a valid '{clrMemberName}' property setter";
+            var description = $"Failed to compile property setter for '{clrMemberName}': {ex.Message}";
+            var remediation = $"Ensure property '{clrMemberName}' on {nameof(ApiObjectType)}.{nameof(ApiObjectType.ClrType)} '{clrObjectType.SafeToName()}' is accessible and writable";
 
             context.AddIssue(path, severity, code, description, remediation);
         }
@@ -316,8 +316,8 @@ public sealed partial class ApiProperty(string apiName, ApiTypeExpression apiTyp
             var path = $"{this.ApiPath}.{nameof(this.ClrName)}";
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_PROPERTY_MISSING_CLR_MEMBER;
-            var description = $"'{clrMemberName}' could not be found on {nameof(ApiObjectType.ClrType)} '{clrObjectType.SafeToName()}'";
-            var remediation = $"Ensure that '{clrMemberName}' exists as a public property or field on '{clrObjectType.SafeToName()}'";
+            var description = $"Member '{clrMemberName}' could not be found on {nameof(ApiObjectType)}.{nameof(ApiObjectType.ClrType)} '{clrObjectType.SafeToName()}'";
+            var remediation = $"Ensure that '{clrMemberName}' exists as a public property or field on {nameof(ApiObjectType)}.{nameof(ApiObjectType.ClrType)} '{clrObjectType.SafeToName()}'";
 
             context.AddIssue(path, severity, code, description, remediation);
         }
@@ -326,8 +326,8 @@ public sealed partial class ApiProperty(string apiName, ApiTypeExpression apiTyp
             var path = $"{this.ApiPath}.{nameof(this.ClrName)}";
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_PROPERTY_INVALID_CLR_MEMBER;
-            var description = $"Failed to compile lambda getter or setter accessor: {ex.Message}";
-            var remediation = $"Ensure that '{clrMemberName}' exists as a public property or field on '{clrObjectType.SafeToName()}'";
+            var description = $"Failed to compile getter or setter accessor for '{clrMemberName}': {ex.Message}";
+            var remediation = $"Ensure that '{clrMemberName}' exists as a public property or field on {nameof(ApiObjectType)}.{nameof(ApiObjectType.ClrType)} '{clrObjectType.SafeToName()}'";
 
             context.AddIssue(path, severity, code, description, remediation);
         }

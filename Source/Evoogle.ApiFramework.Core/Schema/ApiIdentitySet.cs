@@ -74,7 +74,7 @@ public sealed class ApiIdentitySet(IEnumerable<ApiIdentity> apiIdentities, strin
             var path = $"{this.ApiPath}.{nameof(this.ApiIdentities)}";
             var severity = ApiInitializationSeverity.Warning;
             var code = ApiInitializationCode.API_IDENTITY_SET_NULL_OR_EMPTY_IDENTITIES;
-            var description = $"{nameof(this.ApiIdentities)} is either null or empty";
+            var description = $"{nameof(this.ApiIdentities)} cannot be null or empty";
 
             context.AddIssue(path, severity, code, description, remediation: null);
             return;
@@ -117,8 +117,8 @@ public sealed class ApiIdentitySet(IEnumerable<ApiIdentity> apiIdentities, strin
             var path = $"{this.ApiPath}.{nameof(this.ApiPrimaryIdentity)}";
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_IDENTITY_SET_UNRESOLVED_PRIMARY_IDENTITY;
-            var description = $"{nameof(this.ApiPrimaryIdentity)} is unresolved for {nameof(this.ApiPrimaryIdentityName)}={this.ApiPrimaryIdentityName.SafeToString()}";
-            var remediation = $"Ensure that an {nameof(this.ApiPrimaryIdentity)} is declared in the {nameof(this.ApiIdentities)} for {nameof(this.ApiPrimaryIdentityName)}={this.ApiPrimaryIdentityName.SafeToString()}";
+            var description = $"{nameof(this.ApiPrimaryIdentity)} is unresolved for {nameof(this.ApiPrimaryIdentityName)}='{this.ApiPrimaryIdentityName.SafeToString()}'";
+            var remediation = $"Ensure that an {nameof(ApiIdentity)} is declared in {nameof(this.ApiIdentities)} for {nameof(this.ApiPrimaryIdentityName)}='{this.ApiPrimaryIdentityName.SafeToString()}'";
 
             context.AddIssue(path, severity, code, description, remediation);
         }

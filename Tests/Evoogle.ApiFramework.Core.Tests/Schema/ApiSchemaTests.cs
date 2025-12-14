@@ -372,7 +372,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_ENUM_TYPE_INVALID_CLR_TYPE,
                     description: $"{nameof(ApiEnumType.ClrType)} 'String' must be a CLR Enum",
-                    remediation: $"Change the {nameof(ApiEnumType.ClrType)} to be a valid CLR Enum"
+                    remediation: $"Set {nameof(ApiEnumType.ClrType)} to a CLR Enum type"
                 ),
             ]
         },
@@ -402,7 +402,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     path: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"].{nameof(ApiEnumType.ApiEnumValues)}",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_ENUM_TYPE_NULL_OR_EMPTY_ENUM_VALUES,
-                    description: $"{nameof(ApiEnumType.ApiEnumValues)} is either null or empty",
+                    description: $"{nameof(ApiEnumType.ApiEnumValues)} cannot be null or empty",
                     remediation: $"Define at least one {nameof(ApiEnumValue)}"
                 ),
             ]
@@ -434,7 +434,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     path: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"].{nameof(ApiEnumType.ApiEnumValues)}",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_ENUM_TYPE_NULL_OR_EMPTY_ENUM_VALUES,
-                    description: $"{nameof(ApiEnumType.ApiEnumValues)} is either null or empty",
+                    description: $"{nameof(ApiEnumType.ApiEnumValues)} cannot be null or empty",
                     remediation: $"Define at least one {nameof(ApiEnumValue)}"
                 ),
             ]

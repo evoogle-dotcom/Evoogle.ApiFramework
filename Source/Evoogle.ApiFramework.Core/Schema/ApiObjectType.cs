@@ -172,7 +172,7 @@ public sealed partial class ApiObjectType
             var path = $"{this.ApiPath}.{nameof(this.ApiProperties)}";
             var severity = ApiInitializationSeverity.Warning;
             var code = ApiInitializationCode.API_OBJECT_TYPE_NULL_OR_EMPTY_PROPERTIES;
-            var description = $"{nameof(this.ApiProperties)} is either null or empty";
+            var description = $"{nameof(this.ApiProperties)} cannot be null or empty";
 
             context.AddIssue(path, severity, code, description, remediation: null);
             return;

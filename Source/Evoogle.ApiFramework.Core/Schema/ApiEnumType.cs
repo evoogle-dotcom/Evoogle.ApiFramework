@@ -104,7 +104,7 @@ public sealed class ApiEnumType(string apiName, IEnumerable<ApiEnumValue> apiEnu
             var path = $"{this.ApiPath}.{nameof(this.ApiEnumValues)}";
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_ENUM_TYPE_NULL_OR_EMPTY_ENUM_VALUES;
-            var description = $"{nameof(this.ApiEnumValues)} is either null or empty";
+            var description = $"{nameof(this.ApiEnumValues)} cannot be null or empty";
             var remediation = $"Define at least one {nameof(ApiEnumValue)}";
 
             context.AddIssue(path, severity, code, description, remediation);
@@ -135,7 +135,7 @@ public sealed class ApiEnumType(string apiName, IEnumerable<ApiEnumValue> apiEnu
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_ENUM_TYPE_INVALID_CLR_TYPE;
             var description = $"{nameof(this.ClrType)} '{this.ClrType.SafeToName()}' must be a CLR Enum";
-            var remediation = $"Change the {nameof(this.ClrType)} to be a valid CLR Enum";
+            var remediation = $"Set {nameof(this.ClrType)} to a CLR Enum type";
 
             context.AddIssue(path, severity, code, description, remediation);
         }
