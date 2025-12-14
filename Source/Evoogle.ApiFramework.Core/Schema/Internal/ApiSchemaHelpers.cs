@@ -130,7 +130,7 @@ internal static class ApiSchemaHelpers
 
         var severity = ApiInitializationSeverity.Error;
         var description = $"Duplicate {partTypeName}.{partKeyPropertyName} values: '{duplicatesString}'";
-        var remediation = $"Ensure each {partTypeName} has a unique {partKeyPropertyName} value";
+        var remediation = $"Verify that each {partTypeName} has a unique {partKeyPropertyName} value";
 
         context.AddIssue(path, severity, code, description, remediation);
     }

@@ -166,8 +166,8 @@ public sealed class ApiTypeExpression
             var path = $"{context.ApiParentPath.SafeToString()}.{parentUnresolvedName}";
             var severity = ApiInitializationSeverity.Error;
             var code = parentUnresolvedCode;
-            var description = $"{parentUnresolvedName} is unresolved because none of the following are set: {nameof(this.ApiInlineType)}, a valid combination of {nameof(this.Kind)} and {nameof(this.ApiName)}, or {nameof(this.ClrType)}";
-            var remediation = $"Set either {nameof(this.ApiInlineType)}, a valid combination of {nameof(this.Kind)} and {nameof(this.ApiName)}, or {nameof(this.ClrType)}";
+            var description = $"{parentUnresolvedName} could not be resolved because none of the following are set: {nameof(this.ApiInlineType)}, a valid combination of {nameof(this.Kind)} and {nameof(this.ApiName)}, or {nameof(this.ClrType)}";
+            var remediation = $"Specify either {nameof(this.ApiInlineType)}, a valid combination of {nameof(this.Kind)} and {nameof(this.ApiName)}, or {nameof(this.ClrType)}";
 
             context.AddIssue(path, severity, code, description, remediation);
         }
@@ -231,8 +231,8 @@ public sealed class ApiTypeExpression
                     var path = $"{context.ApiParentPath.SafeToString()}.{parentUnresolvedName}";
                     var severity = ApiInitializationSeverity.Error;
                     var code = parentUnresolvedCode;
-                    var description = $"{parentUnresolvedName} cannot be resolved for {nameof(this.Kind)}={this.Kind.SafeToString()} and {nameof(this.ApiName)}={this.ApiName.SafeToString()} because {nameof(ApiTypeKind.Collection)} types must be defined inline";
-                    var remediation = $"Define {nameof(ApiTypeKind.Collection)} types inline using {nameof(this.ApiInlineType)} instead of {nameof(this.Kind)} and {nameof(this.ApiName)}";
+                    var description = $"{parentUnresolvedName} could not be resolved for {nameof(this.Kind)}={this.Kind.SafeToString()} and {nameof(this.ApiName)}={this.ApiName.SafeToString()} because {nameof(ApiTypeKind.Collection)} types must be defined inline";
+                    var remediation = $"Define the {nameof(ApiTypeKind.Collection)} type inline using {nameof(this.ApiInlineType)} instead of specifying {nameof(this.Kind)} and {nameof(this.ApiName)}";
 
                     context.AddIssue(path, severity, code, description, remediation);
                     return;
@@ -247,8 +247,8 @@ public sealed class ApiTypeExpression
             var path = $"{context.ApiParentPath.SafeToString()}.{parentUnresolvedName}";
             var severity = ApiInitializationSeverity.Error;
             var code = parentUnresolvedCode;
-            var description = $"{parentUnresolvedName} is unresolved for {nameof(this.Kind)}='{this.Kind.SafeToString()}' and {nameof(this.ApiName)}='{this.ApiName.SafeToString()}'";
-            var remediation = $"Ensure that a type is declared in the schema for {nameof(this.Kind)}='{this.Kind.SafeToString()}' and {nameof(this.ApiName)}='{this.ApiName.SafeToString()}'";
+            var description = $"{parentUnresolvedName} could not be resolved for {nameof(this.Kind)}='{this.Kind.SafeToString()}' and {nameof(this.ApiName)}='{this.ApiName.SafeToString()}'";
+            var remediation = $"Verify that a type is declared in the schema for {nameof(this.Kind)}='{this.Kind.SafeToString()}' and {nameof(this.ApiName)}='{this.ApiName.SafeToString()}'";
 
             context.AddIssue(path, severity, code, description, remediation);
         }
@@ -270,8 +270,8 @@ public sealed class ApiTypeExpression
             var path = $"{context.ApiParentPath.SafeToString()}.{parentUnresolvedName}";
             var severity = ApiInitializationSeverity.Error;
             var code = parentUnresolvedCode;
-            var description = $"{parentUnresolvedName} is unresolved for {nameof(this.ClrType)}='{this.ClrType.SafeToName()}'";
-            var remediation = $"Ensure that a type is declared in the schema for {nameof(this.ClrType)}='{this.ClrType.SafeToName()}'";
+            var description = $"{parentUnresolvedName} could not be resolved for {nameof(this.ClrType)}='{this.ClrType.SafeToName()}'";
+            var remediation = $"Verify that a type is declared in the schema for {nameof(this.ClrType)}='{this.ClrType.SafeToName()}'";
             context.AddIssue(path, severity, code, description, remediation);
         }
     }

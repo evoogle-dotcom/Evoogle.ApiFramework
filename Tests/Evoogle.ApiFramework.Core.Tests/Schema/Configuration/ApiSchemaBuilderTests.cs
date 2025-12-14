@@ -447,16 +447,16 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
                     path: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"{nameof(ScalarsOnly.RequiredName)}\"].{nameof(ApiProperty.ApiType)}",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_PROPERTY_UNRESOLVED_TYPE,
-                    description: $"{nameof(ApiProperty.ApiType)} is unresolved for {nameof(ApiTypeExpression.ClrType)}='{nameof(String)}'",
-                    remediation: $"Ensure that a type is declared in the schema for {nameof(ApiTypeExpression.ClrType)}='{nameof(String)}'"
+                    description: $"{nameof(ApiProperty.ApiType)} could not be resolved for {nameof(ApiTypeExpression.ClrType)}='{nameof(String)}'",
+                    remediation: $"Verify that a type is declared in the schema for {nameof(ApiTypeExpression.ClrType)}='{nameof(String)}'"
                 ),
                 new ApiInitializationIssue
                 (
                     path: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"{nameof(ScalarsOnly.OptionalName)}\"].{nameof(ApiProperty.ApiType)}",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_PROPERTY_UNRESOLVED_TYPE,
-                    description: $"{nameof(ApiProperty.ApiType)} is unresolved for {nameof(ApiTypeExpression.ClrType)}='{nameof(String)}'",
-                    remediation: $"Ensure that a type is declared in the schema for {nameof(ApiTypeExpression.ClrType)}='{nameof(String)}'"
+                    description: $"{nameof(ApiProperty.ApiType)} could not be resolved for {nameof(ApiTypeExpression.ClrType)}='{nameof(String)}'",
+                    remediation: $"Verify that a type is declared in the schema for {nameof(ApiTypeExpression.ClrType)}='{nameof(String)}'"
                 ),
             ]
         },
@@ -502,24 +502,24 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
                     path: $"{nameof(ApiObjectType)}[\"{nameof(Person)}\"].{nameof(ApiProperty)}[\"{nameof(Person.Name)}\"].{nameof(ApiProperty.ApiType)}",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_PROPERTY_UNRESOLVED_TYPE,
-                    description: $"{nameof(ApiProperty.ApiType)} is unresolved for {nameof(ApiTypeExpression.ClrType)}='{nameof(String)}'",
-                    remediation: $"Ensure that a type is declared in the schema for {nameof(ApiTypeExpression.ClrType)}='{nameof(String)}'"
+                    description: $"{nameof(ApiProperty.ApiType)} could not be resolved for {nameof(ApiTypeExpression.ClrType)}='{nameof(String)}'",
+                    remediation: $"Verify that a type is declared in the schema for {nameof(ApiTypeExpression.ClrType)}='{nameof(String)}'"
                 ),
                 new ApiInitializationIssue
                 (
                     path: $"{nameof(ApiObjectType)}[\"{nameof(Person)}\"].{nameof(ApiProperty)}[\"{nameof(Person.Gender)}\"].{nameof(ApiProperty.ApiType)}",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_PROPERTY_UNRESOLVED_TYPE,
-                    description: $"{nameof(ApiProperty.ApiType)} is unresolved for {nameof(ApiTypeExpression.ClrType)}='{nameof(Gender)}'",
-                    remediation: $"Ensure that a type is declared in the schema for {nameof(ApiTypeExpression.ClrType)}='{nameof(Gender)}'"
+                    description: $"{nameof(ApiProperty.ApiType)} could not be resolved for {nameof(ApiTypeExpression.ClrType)}='{nameof(Gender)}'",
+                    remediation: $"Verify that a type is declared in the schema for {nameof(ApiTypeExpression.ClrType)}='{nameof(Gender)}'"
                 ),
                 new ApiInitializationIssue
                 (
                     path: $"{nameof(ApiObjectType)}[\"{nameof(Person)}\"].{nameof(ApiProperty)}[\"{nameof(Person.Hobbies)}\"].{nameof(ApiCollectionType)}.{nameof(ApiCollectionType.ApiItemType)}",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_COLLECTION_TYPE_UNRESOLVED_ITEM_TYPE,
-                    description: $"{nameof(ApiCollectionType.ApiItemType)} is unresolved for {nameof(ApiTypeExpression.ClrType)}='{nameof(String)}'",
-                    remediation: $"Ensure that a type is declared in the schema for {nameof(ApiTypeExpression.ClrType)}='{nameof(String)}'"
+                    description: $"{nameof(ApiCollectionType.ApiItemType)} could not be resolved for {nameof(ApiTypeExpression.ClrType)}='{nameof(String)}'",
+                    remediation: $"Verify that a type is declared in the schema for {nameof(ApiTypeExpression.ClrType)}='{nameof(String)}'"
                 ),
             ]
         },
@@ -566,16 +566,16 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
                     path: $"{nameof(ApiObjectType)}[\"{nameof(Company)}\"].{nameof(ApiProperty)}[\"{nameof(Company.Owner)}\"].{nameof(ApiProperty.ApiType)}",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_PROPERTY_UNRESOLVED_TYPE,
-                    description: $"{nameof(ApiProperty.ApiType)} is unresolved for {nameof(ApiTypeExpression.ClrType)}='{nameof(Person)}'",
-                    remediation: $"Ensure that a type is declared in the schema for {nameof(ApiTypeExpression.ClrType)}='{nameof(Person)}'"
+                    description: $"{nameof(ApiProperty.ApiType)} could not be resolved for {nameof(ApiTypeExpression.ClrType)}='{nameof(Person)}'",
+                    remediation: $"Verify that a type is declared in the schema for {nameof(ApiTypeExpression.ClrType)}='{nameof(Person)}'"
                 ),
                 new ApiInitializationIssue
                 (
                     path: $"{nameof(ApiObjectType)}[\"{nameof(Company)}\"].{nameof(ApiProperty)}[\"{nameof(Company.Employees)}\"].{nameof(ApiCollectionType)}.{nameof(ApiCollectionType.ApiItemType)}",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_COLLECTION_TYPE_UNRESOLVED_ITEM_TYPE,
-                    description: $"{nameof(ApiCollectionType.ApiItemType)} is unresolved for {nameof(ApiTypeExpression.ClrType)}='{nameof(Person)}'",
-                    remediation: $"Ensure that a type is declared in the schema for {nameof(ApiTypeExpression.ClrType)}='{nameof(Person)}'"
+                    description: $"{nameof(ApiCollectionType.ApiItemType)} could not be resolved for {nameof(ApiTypeExpression.ClrType)}='{nameof(Person)}'",
+                    remediation: $"Verify that a type is declared in the schema for {nameof(ApiTypeExpression.ClrType)}='{nameof(Person)}'"
                 ),
             ]
         },
@@ -606,16 +606,16 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
                     path: $"{nameof(ApiObjectType)}[\"{nameof(Company)}\"].{nameof(ApiRelationship)}[\"{nameof(Company.Owner)}\"].{nameof(ApiRelationship.ApiProperty)}",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_RELATIONSHIP_UNRESOLVED_PROPERTY,
-                    description: $"{nameof(ApiRelationship.ApiProperty)} is unresolved for {nameof(ApiRelationship.ApiPropertyName)}='OwnerMissing' on parent {nameof(ApiObjectType)}='{nameof(Company)}'",
-                    remediation: $"Ensure that {nameof(ApiRelationship.ApiPropertyName)} refers to a valid property on parent {nameof(ApiObjectType)}='{nameof(Company)}'"
+                    description: $"{nameof(ApiRelationship.ApiProperty)} could not be resolved for {nameof(ApiRelationship.ApiPropertyName)}='OwnerMissing' on parent {nameof(ApiObjectType)}='{nameof(Company)}'",
+                    remediation: $"Verify that {nameof(ApiRelationship.ApiPropertyName)} refers to a valid property on parent {nameof(ApiObjectType)}='{nameof(Company)}'"
                 ),
                 new ApiInitializationIssue
                 (
                     path: $"{nameof(ApiObjectType)}[\"{nameof(Company)}\"].{nameof(ApiRelationship)}[\"{nameof(Company.Employees)}\"].{nameof(ApiRelationship.ApiProperty)}",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_RELATIONSHIP_UNRESOLVED_PROPERTY,
-                    description: $"{nameof(ApiRelationship.ApiProperty)} is unresolved for {nameof(ApiRelationship.ApiPropertyName)}='EmployeesMissing' on parent {nameof(ApiObjectType)}='{nameof(Company)}'",
-                    remediation: $"Ensure that {nameof(ApiRelationship.ApiPropertyName)} refers to a valid property on parent {nameof(ApiObjectType)}='{nameof(Company)}'"
+                    description: $"{nameof(ApiRelationship.ApiProperty)} could not be resolved for {nameof(ApiRelationship.ApiPropertyName)}='EmployeesMissing' on parent {nameof(ApiObjectType)}='{nameof(Company)}'",
+                    remediation: $"Verify that {nameof(ApiRelationship.ApiPropertyName)} refers to a valid property on parent {nameof(ApiObjectType)}='{nameof(Company)}'"
                 ),
             ]
         },

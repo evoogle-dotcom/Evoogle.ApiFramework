@@ -112,8 +112,8 @@ public sealed class ApiRelationship(string apiName, string? apiPropertyName = nu
             var path = $"{this.ApiPath}.{nameof(this.ApiName)}";
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_RELATIONSHIP_INVALID_API_NAME;
-            var description = $"{nameof(this.ApiName)} cannot be null, empty, or whitespace";
-            var remediation = $"Provide a valid {nameof(this.ApiName)}";
+            var description = $"{nameof(this.ApiName)} must not be null, empty, or whitespace";
+            var remediation = $"Specify a valid {nameof(this.ApiName)} value";
 
             context.AddIssue(path, severity, code, description, remediation);
         }
@@ -140,8 +140,8 @@ public sealed class ApiRelationship(string apiName, string? apiPropertyName = nu
             var path = $"{this.ApiPath}.{nameof(this.ApiProperty)}";
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_RELATIONSHIP_UNRESOLVED_PROPERTY;
-            var description = $"{nameof(this.ApiProperty)} is unresolved for {nameof(this.ApiPropertyName)}='{this.ApiPropertyName.SafeToString()}' on parent {nameof(ApiObjectType)}='{apiObjectTypeName}'";
-            var remediation = $"Ensure that {nameof(this.ApiPropertyName)} refers to a valid property on parent {nameof(ApiObjectType)}='{apiObjectTypeName}'";
+            var description = $"{nameof(this.ApiProperty)} could not be resolved for {nameof(this.ApiPropertyName)}='{this.ApiPropertyName.SafeToString()}' on parent {nameof(ApiObjectType)}='{apiObjectTypeName}'";
+            var remediation = $"Verify that {nameof(this.ApiPropertyName)} refers to a valid property on parent {nameof(ApiObjectType)}='{apiObjectTypeName}'";
 
             context.AddIssue(path, severity, code, description, remediation);
         }

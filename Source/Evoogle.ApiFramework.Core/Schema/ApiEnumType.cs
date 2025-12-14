@@ -104,7 +104,7 @@ public sealed class ApiEnumType(string apiName, IEnumerable<ApiEnumValue> apiEnu
             var path = $"{this.ApiPath}.{nameof(this.ApiEnumValues)}";
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_ENUM_TYPE_NULL_OR_EMPTY_ENUM_VALUES;
-            var description = $"{nameof(this.ApiEnumValues)} cannot be null or empty";
+            var description = $"{nameof(this.ApiEnumValues)} must not be null or empty";
             var remediation = $"Define at least one {nameof(ApiEnumValue)}";
 
             context.AddIssue(path, severity, code, description, remediation);

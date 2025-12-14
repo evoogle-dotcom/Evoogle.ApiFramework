@@ -52,8 +52,8 @@ public abstract class ApiNamedType(string apiName, Type clrType) : ApiType()
             var path = $"{this.ApiPath}.{nameof(this.ApiName)}";
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_NAMED_TYPE_INVALID_API_NAME;
-            var description = $"{nameof(this.ApiName)} cannot be null, empty, or whitespace";
-            var remediation = $"Provide a valid {nameof(this.ApiName)}";
+            var description = $"{nameof(this.ApiName)} must not be null, empty, or whitespace";
+            var remediation = $"Specify a valid {nameof(this.ApiName)} value";
 
             context.AddIssue(path, severity, code, description, remediation);
         }
@@ -66,8 +66,8 @@ public abstract class ApiNamedType(string apiName, Type clrType) : ApiType()
             var path = $"{this.ApiPath}.{nameof(this.ClrType)}";
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_NAMED_TYPE_NULL_CLR_TYPE;
-            var description = $"{nameof(this.ClrType)} cannot be null";
-            var remediation = $"Provide a valid {nameof(this.ClrType)}";
+            var description = $"{nameof(this.ClrType)} must not be null";
+            var remediation = $"Specify a valid {nameof(this.ClrType)}";
 
             context.AddIssue(path, severity, code, description, remediation);
         }
