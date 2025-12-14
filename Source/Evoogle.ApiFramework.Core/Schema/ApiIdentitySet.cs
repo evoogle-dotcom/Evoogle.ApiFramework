@@ -8,6 +8,15 @@ using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema;
 
+/// <summary>
+///     Represents a collection of identities for an <see cref="ApiObjectType"/>, including a primary identity.
+/// </summary>
+/// <remarks>
+///     An object type can have multiple identities (e.g., primary key, alternate keys),
+///     with one designated as the primary identity.
+/// </remarks>
+/// <param name="apiIdentities">The collection of identities for the object type.</param>
+/// <param name="apiPrimaryIdentityName">The name of the primary identity within the collection.</param>
 public sealed class ApiIdentitySet(IEnumerable<ApiIdentity> apiIdentities, string apiPrimaryIdentityName) : ApiSchemaElement
 {
     #region Fields
@@ -17,10 +26,22 @@ public sealed class ApiIdentitySet(IEnumerable<ApiIdentity> apiIdentities, strin
     #endregion
 
     #region Properties
+    /// <summary>
+    ///     Gets all identities defined for the object type.
+    /// </summary>
     public ApiIdentity[] ApiIdentities { get; } = [.. apiIdentities.EmptyIfNull().Where(x => x is not null).OrderBy(x => x.ApiName, StringComparer.OrdinalIgnoreCase)];
 
+    /// <summary>
+    ///     Gets the name of the primary identity.
+    /// </summary>
     public string ApiPrimaryIdentityName => apiPrimaryIdentityName;
 
+    /// <summary>
+    ///     Gets the primary identity for the object type.
+    /// </summary>
+    /// <remarks>
+    ///     This property is available after initialization.
+    /// </remarks>
     public ApiIdentity ApiPrimaryIdentity => this.ThrowIfNotInitialized(_apiResolvedPrimaryIdentity);
 
     private Dictionary<string, ApiIdentity> ApiIdentityApiNameLookup => this.ThrowIfNotInitialized(_apiIdentityApiNameLookup);
@@ -46,6 +67,12 @@ public sealed class ApiIdentitySet(IEnumerable<ApiIdentity> apiIdentities, strin
     #endregion
 
     #region ApiIdentitySet Methods
+    /// <summary>
+    ///     Attempts to retrieve an identity by its API name.
+    /// </summary>
+    /// <param name="apiName">The name of the identity to retrieve.</param>
+    /// <param name="apiIdentity">When this method returns, contains the identity if found; otherwise, <c>null</c>.</param>
+    /// <returns><c>true</c> if the identity was found; otherwise, <c>false</c>.</returns>
     public bool TryGetIdentityByApiName(string apiName, out ApiIdentity? apiIdentity) => this.ApiIdentityApiNameLookup.TryGetValue(apiName, out apiIdentity);
     #endregion
 

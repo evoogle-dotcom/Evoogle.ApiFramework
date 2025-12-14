@@ -7,6 +7,14 @@ using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema;
 
+/// <summary>
+///     Represents an issue encountered during API schema initialization.
+/// </summary>
+/// <param name="path">The path to the schema element where the issue occurred.</param>
+/// <param name="severity">The severity level of the issue.</param>
+/// <param name="code">The specific error or warning code identifying the issue.</param>
+/// <param name="description">A human-readable description of the issue.</param>
+/// <param name="remediation">Optional guidance on how to resolve the issue.</param>
 public sealed class ApiInitializationIssue
 (
     string path,
@@ -17,18 +25,37 @@ public sealed class ApiInitializationIssue
 )
 {
     #region Properties
+    /// <summary>
+    ///     Gets the path to the schema element where the issue occurred.
+    /// </summary>
     public string Path { get; } = path;
 
+    /// <summary>
+    ///     Gets the severity level of the issue.
+    /// </summary>
     public ApiInitializationSeverity Severity { get; } = severity;
 
+    /// <summary>
+    ///     Gets the specific error or warning code identifying the issue.
+    /// </summary>
     public ApiInitializationCode Code { get; } = code;
 
+    /// <summary>
+    ///     Gets a human-readable description of the issue.
+    /// </summary>
     public string Description { get; } = description;
 
+    /// <summary>
+    ///     Gets optional guidance on how to resolve the issue.
+    /// </summary>
     public string? Remediation { get; } = remediation;
     #endregion
 
     #region Methods
+    /// <summary>
+    ///     Converts the issue to a formatted message string.
+    /// </summary>
+    /// <returns>A formatted string containing the issue's path, severity, code, description, and optional remediation.</returns>
     public string ToMessage()
     {
         var core = $"{this.Path}: {this.Severity} | {this.Code} - {this.Description}.";

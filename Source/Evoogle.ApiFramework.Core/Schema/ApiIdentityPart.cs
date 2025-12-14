@@ -8,6 +8,16 @@ using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema;
 
+/// <summary>
+///     Represents a single property part within an <see cref="ApiIdentity"/>.
+/// </summary>
+/// <remarks>
+///     Each part references a property of the parent <see cref="ApiObjectType"/> and can optionally specify
+///     coercion rules and ordering behavior for identity serialization.
+/// </remarks>
+/// <param name="apiPropertyName">The name of the property that is part of the identity.</param>
+/// <param name="coercion">Optional coercion rules for converting the property value to an identity component.</param>
+/// <param name="emitAsOrdered">Indicates whether this part should be emitted as an ordered (positional) component rather than named.</param>
 public sealed class ApiIdentityPart(string apiPropertyName, ApiIdentityCoercion? coercion = null, bool emitAsOrdered = false) : ApiSchemaElement
 {
     #region Fields
@@ -15,10 +25,27 @@ public sealed class ApiIdentityPart(string apiPropertyName, ApiIdentityCoercion?
     #endregion
 
     #region Properties
+    /// <summary>
+    ///     Gets the name of the property that is part of this identity.
+    /// </summary>
     public string ApiPropertyName { get; } = apiPropertyName;
+
+    /// <summary>
+    ///     Gets the optional coercion rules for converting the property value to an identity component.
+    /// </summary>
     public ApiIdentityCoercion? Coercion { get; } = coercion;
+
+    /// <summary>
+    ///     Gets a value indicating whether this part should be emitted as an ordered (positional) component.
+    /// </summary>
     public bool EmitAsOrdered { get; } = emitAsOrdered;
 
+    /// <summary>
+    ///     Gets the resolved property referenced by this identity part.
+    /// </summary>
+    /// <remarks>
+    ///     This property is available after initialization.
+    /// </remarks>
     public ApiProperty ApiProperty => this.ThrowIfNotInitialized(_apiResolvedProperty);
     #endregion
 

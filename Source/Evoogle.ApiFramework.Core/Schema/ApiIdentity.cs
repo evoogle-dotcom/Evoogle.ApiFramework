@@ -8,13 +8,31 @@ using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema;
 
+/// <summary>
+///     Represents a unique identity for an <see cref="ApiObjectType"/> consisting of one or more property parts.
+/// </summary>
+/// <remarks>
+///     An identity can be simple (single property) or composite (multiple properties).
+///     All parts must be either ordered (positional) or named, but not mixed.
+/// </remarks>
+/// <param name="apiName">The name of the identity.</param>
+/// <param name="apiIdentityParts">The collection of property parts that make up this identity.</param>
 public sealed class ApiIdentity(string apiName, IEnumerable<ApiIdentityPart> apiIdentityParts) : ApiSchemaElement
 {
     #region Properties
+    /// <summary>
+    ///     Gets the API name of the identity.
+    /// </summary>
     public string ApiName { get; } = apiName;
 
+    /// <summary>
+    ///     Gets the collection of property parts that constitute this identity.
+    /// </summary>
     public ApiIdentityPart[] ApiIdentityParts { get; } = [.. apiIdentityParts.EmptyIfNull().Where(x => x is not null).OrderBy(x => x.ApiPropertyName, StringComparer.OrdinalIgnoreCase)];
 
+    /// <summary>
+    ///     Gets a value indicating whether this identity is composite (has two or more parts).
+    /// </summary>
     public bool IsComposite => this.ApiIdentityParts.Length >= 2;
     #endregion
 

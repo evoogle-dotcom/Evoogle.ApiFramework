@@ -8,29 +8,52 @@ using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema;
 
+/// <summary>
+///     Represents the result of API schema initialization, including any issues encountered.
+/// </summary>
+/// <param name="issues">Optional collection of issues encountered during initialization.</param>
 public sealed class ApiInitializationResult(IEnumerable<ApiInitializationIssue>? issues = null)
 {
     #region Fields
+    /// <summary>
+    ///     Represents a successful initialization result with no issues.
+    /// </summary>
     public static readonly ApiInitializationResult Success = new();
     #endregion
 
     #region Properties
+    /// <summary>
+    ///     Gets a value indicating whether the initialization was successful (no errors).
+    /// </summary>
     public bool IsValid => !this.Issues?.Any(x => x.Severity == ApiInitializationSeverity.Error) ?? true;
 
+    /// <summary>
+    ///     Gets the collection of error-level issues, or <c>null</c> if no issues were encountered.
+    /// </summary>
     public ApiInitializationIssue[]? Errors { get; } = issues is not null
         ? [.. issues.Where(x => x.Severity == ApiInitializationSeverity.Error)]
         : null;
 
+    /// <summary>
+    ///     Gets the collection of warning-level issues, or <c>null</c> if no issues were encountered.
+    /// </summary>
     public ApiInitializationIssue[]? Warnings { get; } = issues is not null
         ? [.. issues.Where(x => x.Severity == ApiInitializationSeverity.Warning)]
         : null;
 
+    /// <summary>
+    ///     Gets all issues (errors and warnings), or <c>null</c> if no issues were encountered.
+    /// </summary>
     public ApiInitializationIssue[]? Issues { get; } = issues is not null
         ? [.. issues]
         : null;
     #endregion
 
     #region Methods
+    /// <summary>
+    ///     Throws an <see cref="ApiSchemaInitializationException"/> if the initialization result contains errors.
+    /// </summary>
+    /// <exception cref="ApiSchemaInitializationException">The initialization result contains one or more errors.</exception>
     public void ThrowIfInvalid()
     {
         if (this.IsValid)
