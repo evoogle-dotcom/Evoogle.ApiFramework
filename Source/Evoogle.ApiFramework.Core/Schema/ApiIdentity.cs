@@ -34,6 +34,24 @@ public sealed class ApiIdentity(string apiName, IEnumerable<ApiIdentityPart> api
     ///     Gets a value indicating whether this identity is composite (has two or more parts).
     /// </summary>
     public bool IsComposite => this.ApiIdentityParts.Length >= 2;
+
+    /// <summary>
+    ///     Gets the type detection strategy for converting property values to <see cref="Identity.ApiId"/> scalars.
+    ///     Initialized from the parent <see cref="ApiSchema.DefaultApiIdTypeDetectionStrategy"/> during initialization.
+    /// </summary>
+    public IApiIdTypeDetectionStrategy TypeDetectionStrategy { get; private set; } = null!;
+
+    /// <summary>
+    ///     Gets the null handling behavior for this identity.
+    ///     Initialized from the parent <see cref="ApiSchema.DefaultIdentityNullHandling"/> during initialization.
+    /// </summary>
+    public ApiIdentityNullHandling NullHandling { get; private set; }
+
+    /// <summary>
+    ///     Gets the runtime context for the API schema containing this identity.
+    ///     Available after initialization.
+    /// </summary>
+    public new ApiSchemaContext ApiSchemaContext => base.ApiSchemaContext;
     #endregion
 
     #region ApiSchemaElement Methods
@@ -47,6 +65,10 @@ public sealed class ApiIdentity(string apiName, IEnumerable<ApiIdentityPart> api
         ArgumentNullException.ThrowIfNull(context);
 
         base.Initialize(context);
+
+        // Initialize strategy and null handling from schema defaults
+        this.TypeDetectionStrategy = context.ApiSchema.DefaultApiIdTypeDetectionStrategy;
+        this.NullHandling = context.ApiSchema.DefaultIdentityNullHandling;
 
         this.InitializeApiName(context);
         this.InitializeApiIdentityParts(context);

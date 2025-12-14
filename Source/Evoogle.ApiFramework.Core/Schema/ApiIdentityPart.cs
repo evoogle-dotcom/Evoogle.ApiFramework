@@ -12,13 +12,13 @@ namespace Evoogle.ApiFramework.Schema;
 ///     Represents a single property part within an <see cref="ApiIdentity"/>.
 /// </summary>
 /// <remarks>
-///     Each part references a property of the parent <see cref="ApiObjectType"/> and can optionally specify
-///     coercion rules and ordering behavior for identity serialization.
+///     Each part references a property of the parent <see cref="ApiObjectType"/> and specifies
+///     ordering behavior for identity serialization. Type coercion is handled automatically via
+///     <see cref="ApiProperty"/> and the configured <see cref="IApiIdTypeDetectionStrategy"/>.
 /// </remarks>
 /// <param name="apiPropertyName">The name of the property that is part of the identity.</param>
-/// <param name="coercion">Optional coercion rules for converting the property value to an identity component.</param>
 /// <param name="emitAsOrdered">Indicates whether this part should be emitted as an ordered (positional) component rather than named.</param>
-public sealed class ApiIdentityPart(string apiPropertyName, ApiIdentityCoercion? coercion = null, bool emitAsOrdered = false) : ApiSchemaElement
+public sealed class ApiIdentityPart(string apiPropertyName, bool emitAsOrdered = false) : ApiSchemaElement
 {
     #region Fields
     private ApiProperty? _apiResolvedProperty = null;
@@ -29,11 +29,6 @@ public sealed class ApiIdentityPart(string apiPropertyName, ApiIdentityCoercion?
     ///     Gets the name of the property that is part of this identity.
     /// </summary>
     public string ApiPropertyName { get; } = apiPropertyName;
-
-    /// <summary>
-    ///     Gets the optional coercion rules for converting the property value to an identity component.
-    /// </summary>
-    public ApiIdentityCoercion? Coercion { get; } = coercion;
 
     /// <summary>
     ///     Gets a value indicating whether this part should be emitted as an ordered (positional) component.
@@ -115,31 +110,7 @@ public sealed class ApiIdentityPart(string apiPropertyName, ApiIdentityCoercion?
             var remediation = $"Verify that {nameof(this.ApiPropertyName)} refers to a valid property on the parent {nameof(ApiObjectType)}";
 
             context.AddIssue(path, severity, code, description, remediation);
-            return;
         }
-
-        // TODO: What to do here? Have to comment out for now.
-        // Basic coercion compatibility
-        // if (this.Coercion?.TargetKind is ApiIdentityTargetKind tk && !IsCoercible(_apiResolvedProperty, tk))
-        // {
-        //     results ??= [];
-        //     results.Add(new ValidationResult($"{apiValidationPath} property '{this.ApiPropertyName}' not coercible to {tk}.", [nameof(this.ApiPropertyName)]));
-        // }
-    }
-
-    private static bool IsCoercible(ApiProperty apiProperty, ApiIdentityTargetKind target)
-    {
-        var clrPropertyType = apiProperty.ApiType.ClrType;
-        return target switch
-        {
-            ApiIdentityTargetKind.String => clrPropertyType == typeof(string),
-            ApiIdentityTargetKind.Int32 => clrPropertyType == typeof(int),
-            ApiIdentityTargetKind.Int64 => clrPropertyType == typeof(long) || clrPropertyType == typeof(int),
-            ApiIdentityTargetKind.Guid => clrPropertyType == typeof(Guid),
-            ApiIdentityTargetKind.Ulid => clrPropertyType == typeof(Ulid),
-            ApiIdentityTargetKind.Culture => clrPropertyType == typeof(System.Globalization.CultureInfo) || clrPropertyType == typeof(string),
-            _ => false
-        };
     }
     #endregion
 }

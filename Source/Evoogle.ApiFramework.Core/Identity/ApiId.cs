@@ -21,9 +21,6 @@ namespace Evoogle.ApiFramework.Identity;
 ///     Scalars are allocation-free; composites allocate an array of parts.
 ///     Uses a safe value-type union for primitives and a single reference slot for reference arms.
 /// </summary>
-/// <remarks>
-///     TODO: Use coercion library in core framework for conversions between coercible types (e.g., string to CultureInfo, Int32 to Int64).
-/// </remarks>
 [DebuggerDisplay("{ToDebuggerDisplay(),nq}")]
 [JsonConverter(typeof(ApiIdJsonConverter))]
 public readonly struct ApiId

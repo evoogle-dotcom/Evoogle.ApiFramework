@@ -3,6 +3,9 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Globalization;
+
+using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Identity;
 
 namespace Evoogle.ApiFramework.Schema;
@@ -61,114 +64,193 @@ public sealed partial class ApiObjectType
             _ => ApiId.Composite(parts)
         };
 
-    private static ApiId CoerceRawToApiId(ApiIdentityPart part, object? raw)
+    private static ApiId MaterializeApiIdFromProperty(ApiProperty property, object? rawValue, ApiIdentity identity, object clrInstance, ApiSchemaContext schemaContext)
     {
-        if (part.Coercion?.Converter is not null)
+        // Detect the target type using the configured strategy
+        var targetType = identity.TypeDetectionStrategy.DetectTargetType(property);
+
+        // Use the schema's TypeCoercion to convert the raw value to the target type
+        object? coercedValue;
+        try
         {
-            return part.Coercion.Converter(raw);
+            coercedValue = schemaContext.TypeCoercion.Coerce(rawValue, targetType, schemaContext.TypeCoercionContext);
+        }
+        catch (Exception ex)
+        {
+            throw new ApiIdentityException(
+                $"Failed to coerce property '{property.ApiName}' value to type '{targetType.Name}' for identity '{identity.ApiName}' on type '{clrInstance.GetType().Name}'.",
+                ex);
         }
 
-        if (raw is null)
+        // Handle null values according to the identity's null handling configuration
+        if (coercedValue is null)
         {
+            if (identity.NullHandling == ApiIdentityNullHandling.ThrowException)
+            {
+                throw new ApiIdentityException(
+                    $"Property '{property.ApiName}' has a null value for identity '{identity.ApiName}' on type '{clrInstance.GetType().Name}'. Null values are not allowed with {nameof(ApiIdentityNullHandling.ThrowException)} configured.");
+            }
+
             return ApiId.Empty;
         }
 
-        if (raw is ApiId pre)
+        // Convert the typed value to ApiId
+        return ConvertToApiId(coercedValue, targetType, property, identity, clrInstance);
+    }
+
+    private static ApiId ConvertToApiId(object value, Type targetType, ApiProperty property, ApiIdentity identity, object clrInstance)
+    {
+        // Handle ApiId passthrough
+        if (value is ApiId apiId)
         {
-            return pre;
+            return apiId;
         }
 
-        var target = part.Coercion?.TargetKind;
-        if (raw is string s && target.HasValue)
+        // Convert based on the target type
+        try
         {
-            return target.Value switch
+            if (targetType == typeof(int))
             {
-                ApiIdentityTargetKind.Int32 => ApiId.TryParse(ApiIdKind.Int32, s, out var i32) ? i32 : ApiId.FromString(s),
-                ApiIdentityTargetKind.Int64 => ApiId.TryParse(ApiIdKind.Int64, s, out var i64) ? i64 : ApiId.FromString(s),
-                ApiIdentityTargetKind.Guid => ApiId.TryParse(ApiIdKind.Guid, s, out var g) ? g : ApiId.FromString(s),
-                ApiIdentityTargetKind.Ulid => ApiId.TryParse(ApiIdKind.Ulid, s, out var u) ? u : ApiId.FromString(s),
-                ApiIdentityTargetKind.Culture => ApiId.TryParse(ApiIdKind.Culture, s, out var c) ? c : ApiId.FromString(s),
-                _ => ApiId.Parse(s)
-            };
-        }
+                return ApiId.FromInt32((int)value);
+            }
 
-        return raw switch
+            if (targetType == typeof(long))
+            {
+                return ApiId.FromInt64((long)value);
+            }
+
+            if (targetType == typeof(Guid))
+            {
+                return ApiId.FromGuid((Guid)value);
+            }
+
+            if (targetType == typeof(Ulid))
+            {
+                return ApiId.FromUlid((Ulid)value);
+            }
+
+            if (targetType == typeof(CultureInfo))
+            {
+                return ApiId.FromCulture((CultureInfo)value);
+            }
+
+            if (targetType == typeof(string))
+            {
+                return ApiId.FromString((string)value);
+            }
+
+            // Fallback: convert to string
+            return ApiId.FromString(value.ToString() ?? string.Empty);
+        }
+        catch (Exception ex)
         {
-            int i32 => ApiId.FromInt32(i32),
-            long i64 => ApiId.FromInt64(i64),
-            Guid g => ApiId.FromGuid(g),
-            Ulid u => ApiId.FromUlid(u),
-            System.Globalization.CultureInfo c => ApiId.FromCulture(c),
-            string str => ApiId.Parse(str),
-            _ => ApiId.FromString(raw?.ToString() ?? string.Empty)
-        };
+            throw new ApiIdentityException(
+                $"Failed to convert property '{property.ApiName}' value of type '{value.GetType().Name}' to ApiId for identity '{identity.ApiName}' on type '{clrInstance.GetType().Name}'.",
+                ex);
+        }
     }
 
     private static bool BuildIdentityFromInstance(ApiIdentity identity, object clrInstance, out ApiId id)
     {
         id = default;
-        // Disallow mixed named/ordered parts (already validated); just in case:
-        var anyOrdered = identity.ApiIdentityParts.Any(p => p.EmitAsOrdered);
-        var anyNamed = identity.ApiIdentityParts.Any(p => !p.EmitAsOrdered);
-        if (anyOrdered && anyNamed)
+
+        try
         {
+            // Disallow mixed named/ordered parts (already validated during initialization)
+            var anyOrdered = identity.ApiIdentityParts.Any(p => p.EmitAsOrdered);
+            var anyNamed = identity.ApiIdentityParts.Any(p => !p.EmitAsOrdered);
+            if (anyOrdered && anyNamed)
+            {
+                return false;
+            }
+
+            var parts = new List<ApiIdPart>(identity.ApiIdentityParts.Length);
+            foreach (var part in identity.ApiIdentityParts)
+            {
+                // Get the property value using compiled accessors
+                if (!part.ApiProperty.TryGetValue(clrInstance, out var rawValue))
+                {
+                    return false;
+                }
+
+                // Materialize the ApiId using TypeCoercion
+                var partId = MaterializeApiIdFromProperty(part.ApiProperty, rawValue, identity, clrInstance, identity.ApiSchemaContext);
+
+                // Only allow Empty if null handling is ReturnEmpty
+                if (!partId.HasValue && identity.NullHandling != ApiIdentityNullHandling.ReturnEmpty)
+                {
+                    return false;
+                }
+
+                parts.Add(part.EmitAsOrdered
+                    ? ApiIdPart.Create(partId)
+                    : ApiIdPart.Create(part.ApiProperty.ApiName, partId));
+            }
+
+            id = FinalizeComposite(parts);
+            return id.HasValue;
+        }
+        catch (ApiIdentityException)
+        {
+            // Re-throw identity exceptions as-is
+            throw;
+        }
+        catch (Exception)
+        {
+            // Swallow other exceptions and return false for try pattern
             return false;
         }
-
-        var parts = new List<ApiIdPart>(identity.ApiIdentityParts.Length);
-        foreach (var part in identity.ApiIdentityParts)
-        {
-            // Assumes ApiProperty can fetch CLR value; if not available, adapt to your accessor layer.
-            if (!part.ApiProperty.TryGetValue(clrInstance, out var raw))
-            {
-                return false;
-            }
-
-            var pid = CoerceRawToApiId(part, raw);
-            if (!pid.HasValue)
-            {
-                return false;
-            }
-
-            parts.Add(part.EmitAsOrdered
-                ? ApiIdPart.Create(pid)
-                : ApiIdPart.Create(part.ApiProperty.ApiName, pid));
-        }
-
-        id = FinalizeComposite(parts);
-        return id.HasValue;
     }
 
     private static bool BuildIdentityFromValues(ApiIdentity identity, IReadOnlyDictionary<string, object?> values, out ApiId id)
     {
         id = default;
-        var anyOrdered = identity.ApiIdentityParts.Any(p => p.EmitAsOrdered);
-        var anyNamed = identity.ApiIdentityParts.Any(p => !p.EmitAsOrdered);
-        if (anyOrdered && anyNamed)
+
+        try
         {
+            var anyOrdered = identity.ApiIdentityParts.Any(p => p.EmitAsOrdered);
+            var anyNamed = identity.ApiIdentityParts.Any(p => !p.EmitAsOrdered);
+            if (anyOrdered && anyNamed)
+            {
+                return false;
+            }
+
+            var parts = new List<ApiIdPart>(identity.ApiIdentityParts.Length);
+            foreach (var part in identity.ApiIdentityParts)
+            {
+                if (!values.TryGetValue(part.ApiPropertyName, out var rawValue))
+                {
+                    return false;
+                }
+
+                // Materialize the ApiId using TypeCoercion (same path as instance-based)
+                // Use a dummy object for error reporting since we don't have the actual instance
+                var dummyInstance = new { DictionaryValues = true };
+                var partId = MaterializeApiIdFromProperty(part.ApiProperty, rawValue, identity, dummyInstance, identity.ApiSchemaContext);
+
+                // Only allow Empty if null handling is ReturnEmpty
+                if (!partId.HasValue && identity.NullHandling != ApiIdentityNullHandling.ReturnEmpty)
+                {
+                    return false;
+                }
+
+                parts.Add(part.EmitAsOrdered
+                    ? ApiIdPart.Create(partId)
+                    : ApiIdPart.Create(part.ApiPropertyName, partId));
+            }
+
+            id = FinalizeComposite(parts);
+            return id.HasValue;
+        }
+        catch (ApiIdentityException)
+        {
+            // Re-throw identity exceptions as-is
+            throw;
+        }
+        catch (Exception)
+        {
+            // Swallow other exceptions and return false for try pattern
             return false;
         }
-
-        var parts = new List<ApiIdPart>(identity.ApiIdentityParts.Length);
-        foreach (var part in identity.ApiIdentityParts)
-        {
-            if (!values.TryGetValue(part.ApiPropertyName, out var raw))
-            {
-                return false;
-            }
-
-            var pid = CoerceRawToApiId(part, raw);
-            if (!pid.HasValue)
-            {
-                return false;
-            }
-
-            parts.Add(part.EmitAsOrdered
-                ? ApiIdPart.Create(pid)
-                : ApiIdPart.Create(part.ApiPropertyName, pid));
-        }
-
-        id = FinalizeComposite(parts);
-        return id.HasValue;
     }
 }

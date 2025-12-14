@@ -61,6 +61,12 @@ public sealed class ApiSchema : ExtensibleBase
     /// <summary>Gets all API scalar types contained within this API schema.</summary>
     public ApiScalarType[] ApiScalarTypes { get; }
 
+    /// <summary>Gets the default type detection strategy for identity building.</summary>
+    public IApiIdTypeDetectionStrategy DefaultApiIdTypeDetectionStrategy { get; init; } = null!;
+
+    /// <summary>Gets the default null handling behavior for identity building. Defaults to <see cref="ApiIdentityNullHandling.ReturnEmpty"/>.</summary>
+    public ApiIdentityNullHandling DefaultIdentityNullHandling { get; init; } = ApiIdentityNullHandling.ReturnEmpty;
+
     private Dictionary<string, ApiNamedType> ApiNamedTypeApiNameLookup => this.ThrowIfNotInitialized(_apiNamedTypeApiNameLookup);
     private Dictionary<Type, ApiNamedType> ApiNamedTypeClrTypeLookup => this.ThrowIfNotInitialized(_apiNamedTypeClrTypeLookup);
 
@@ -93,6 +99,9 @@ public sealed class ApiSchema : ExtensibleBase
     {
         // Initialize the API name.
         this.ApiName = apiName;
+
+        // Initialize default identity configuration
+        this.DefaultApiIdTypeDetectionStrategy = Schema.DefaultApiIdTypeDetectionStrategy.Instance;
 
         // Initialize the collections for API types, scalar types, enum types, and object types.
         this.ApiScalarTypes = [.. apiScalarTypes.EmptyIfNull().Where(x => x is not null).OrderBy(x => x.ApiName, StringComparer.OrdinalIgnoreCase)];
