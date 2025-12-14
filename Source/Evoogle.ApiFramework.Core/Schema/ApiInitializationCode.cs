@@ -126,11 +126,6 @@ public enum ApiInitializationCode
     ///     The named type's API name is null, empty, or whitespace.
     /// </summary>
     API_NAMED_TYPE_INVALID_API_NAME,
-
-    /// <summary>
-    ///     The named type's CLR type is null.
-    /// </summary>
-    API_NAMED_TYPE_NULL_CLR_TYPE,
     #endregion
 
     #region ApiObjectType Initialization Codes
@@ -264,5 +259,12 @@ public enum ApiInitializationCode
     ///     The schema's API name is null, empty, or whitespace.
     /// </summary>
     API_SCHEMA_INVALID_NAME,
+    #endregion
+
+    #region ApiType Initialization Codes
+    /// <summary>
+    ///     The type's CLR type is null.
+    /// </summary>
+    API_TYPE_NULL_CLR_TYPE,
     #endregion
 }

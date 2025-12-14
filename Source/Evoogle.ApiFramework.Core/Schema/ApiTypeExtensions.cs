@@ -11,9 +11,6 @@ namespace Evoogle.ApiFramework.Schema;
 public static class ApiTypeExtensions
 {
     #region Extension Methods
-    /// <summary>Gets a value indicating whether this API type is unknown.</summary>
-    public static bool IsUnknownType(this ApiType apiType) => apiType.Kind == ApiTypeKind.Unknown;
-
     /// <summary>Gets a value indicating whether this API type is an enumeration type.</summary>
     public static bool IsEnumType(this ApiType apiType) => apiType.Kind == ApiTypeKind.Enum;
 

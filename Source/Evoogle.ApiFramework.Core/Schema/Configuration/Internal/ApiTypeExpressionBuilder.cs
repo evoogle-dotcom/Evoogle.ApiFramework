@@ -23,8 +23,6 @@ internal static class ApiTypeExpressionBuilder
 
         return BuildClrTypeReference(clrPropertyNullabilityInfo.MemberType);
     }
-
-    public static ApiTypeExpression Build() => new(new ApiUnknownType());
     #endregion
 
     #region Implementation Methods

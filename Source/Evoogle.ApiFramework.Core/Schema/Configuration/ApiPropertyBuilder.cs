@@ -87,10 +87,9 @@ public class ApiPropertyBuilder(string apiName, string clrName) : ExtensionBuild
 
     private ApiProperty BuildUnknownProperty()
     {
-        var apiTypeExpression = ApiTypeExpressionBuilder.Build();
         var apiTypeModifiers = this.BuildModifiers(ApiTypeModifiers.None);
 
-        return this.CreateAndBuildExtensions(_apiName, apiTypeExpression, apiTypeModifiers, _clrName);
+        return this.CreateAndBuildExtensions(_apiName, default!, apiTypeModifiers, _clrName);
     }
 
     private ApiProperty CreateAndBuildExtensions(string apiName, ApiTypeExpression apiTypeExpression, ApiTypeModifiers apiTypeModifiers, string clrName)

@@ -322,7 +322,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 (
                     path: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"].{nameof(ApiEnumType.ClrType)}",
                     severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.API_NAMED_TYPE_NULL_CLR_TYPE,
+                    code: ApiInitializationCode.API_TYPE_NULL_CLR_TYPE,
                     description: $"{nameof(ApiEnumType.ClrType)} must not be null",
                     remediation: $"Specify a valid {nameof(ApiEnumType.ClrType)}"
                 ),

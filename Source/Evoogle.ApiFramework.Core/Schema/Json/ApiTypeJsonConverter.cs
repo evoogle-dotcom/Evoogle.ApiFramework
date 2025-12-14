@@ -191,7 +191,10 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
             }
         }
 
-        apiType ??= new ApiUnknownType();
+        if (apiType is null)
+        {
+            return null;
+        }
 
         var extensions = readContext.ReadData.Extensions;
         AttachExtensions(apiType, extensions);

@@ -17,14 +17,11 @@ namespace Evoogle.ApiFramework.Schema;
 /// <param name="apiItemTypeExpression">The API type expression of the items in the collection.</param>
 /// <param name="apiItemTypeModifiers">Modifiers applied to the item type (e.g., Required).</param>
 /// <param name="clrCollectionType">The CLR type representing the collection type (e.g., List&lt;T&gt;).</param>
-public sealed class ApiCollectionType(ApiTypeExpression apiItemTypeExpression, ApiTypeModifiers apiItemTypeModifiers, Type clrCollectionType) : ApiType()
+public sealed class ApiCollectionType(ApiTypeExpression apiItemTypeExpression, ApiTypeModifiers apiItemTypeModifiers, Type clrCollectionType) : ApiType(clrCollectionType)
 {
     #region ApiType Properties
     /// <inheritdoc />
     public override ApiTypeKind Kind => ApiTypeKind.Collection;
-
-    /// <inheritdoc />
-    public override Type ClrType { get; } = clrCollectionType;
 
     /// <inheritdoc/>
     protected override string ApiTypeName => nameof(ApiCollectionType);

@@ -15,13 +15,8 @@ namespace Evoogle.ApiFramework.Schema;
 /// </remarks>
 /// <param name="apiName">The unique API name of the type.</param>
 /// <param name="clrType">The underlying CLR type this API type maps to.</param>
-public abstract class ApiNamedType(string apiName, Type clrType) : ApiType()
+public abstract class ApiNamedType(string apiName, Type clrType) : ApiType(clrType)
 {
-    #region ApiType Properties
-    /// <inheritdoc />
-    public override Type ClrType { get; } = clrType;
-    #endregion
-
     #region ApiNamedType Properties
     /// <summary>Gets the API name of the API type.</summary>
     public string ApiName { get; } = apiName;
@@ -40,7 +35,6 @@ public abstract class ApiNamedType(string apiName, Type clrType) : ApiType()
         base.Initialize(context);
 
         this.InitializeApiName(context);
-        this.InitializeClrType(context);
     }
     #endregion
 
@@ -54,20 +48,6 @@ public abstract class ApiNamedType(string apiName, Type clrType) : ApiType()
             var code = ApiInitializationCode.API_NAMED_TYPE_INVALID_API_NAME;
             var description = $"{nameof(this.ApiName)} must not be null, empty, or whitespace";
             var remediation = $"Specify a valid {nameof(this.ApiName)} value";
-
-            context.AddIssue(path, severity, code, description, remediation);
-        }
-    }
-
-    private void InitializeClrType(ApiInitializationContext context)
-    {
-        if (this.ClrType is null)
-        {
-            var path = $"{this.ApiPath}.{nameof(this.ClrType)}";
-            var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.API_NAMED_TYPE_NULL_CLR_TYPE;
-            var description = $"{nameof(this.ClrType)} must not be null";
-            var remediation = $"Specify a valid {nameof(this.ClrType)}";
 
             context.AddIssue(path, severity, code, description, remediation);
         }

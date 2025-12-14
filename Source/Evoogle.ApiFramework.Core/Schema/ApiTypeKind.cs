@@ -11,9 +11,6 @@ namespace Evoogle.ApiFramework.Schema;
 public enum ApiTypeKind
 {
     #region Values
-    /// <summary>Represents an unknown API type.</summary>
-    Unknown,
-
     /// <summary>Represents the API collection type.</summary>
     Collection,
 
