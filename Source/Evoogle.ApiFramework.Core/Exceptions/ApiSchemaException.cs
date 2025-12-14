@@ -3,6 +3,8 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Schema;
+
 namespace Evoogle.ApiFramework.Exceptions;
 
 /// <summary>
@@ -15,7 +17,7 @@ public class ApiSchemaException : ApiException
     ///     Initializes a new instance of the <see cref="ApiSchemaException"/> class with a default schema error message.
     /// </summary>    
     public ApiSchemaException()
-        : base("An API schema error occurred.")
+        : base($"An {nameof(ApiSchema)} error occurred.")
     { }
 
     /// <summary>

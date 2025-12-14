@@ -26,19 +26,20 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
         // ApiScalarType
         new JsonDeserializeTest<ApiType>
         {
-            Name = "ApiScalarType [Boolean]",
+            Name = $"{nameof(ApiScalarType)} [Boolean]",
             Source = @"
             {
                 ""Kind"": ""Scalar"",
                 ""ApiName"": ""Boolean"",
                 ""ClrType"": ""System.Boolean, System.Private.CoreLib""
             }",
-            Expected = new ApiScalarType("Boolean", typeof(bool))
+            Expected = new ApiScalarType("Boolean", typeof(bool)),
+            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
         },
 
         new JsonDeserializeTest<ApiType>
         {
-            Name = "ApiScalarType [Boolean] With Extension 1",
+            Name = $"{nameof(ApiScalarType)} [Boolean] With Extension 1",
             Source = @"
             {
                 ""Kind"": ""Scalar"",
@@ -51,12 +52,13 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 }
             }",
             Expected = new ApiScalarType("Boolean", typeof(bool)),
-            ExtensionType1 = typeof(TestExtension1)
+            ExtensionType1 = typeof(TestExtension1),
+            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
         },
 
         new JsonDeserializeTest<ApiType>
         {
-            Name = "ApiScalarType [Boolean] With Extra Property",
+            Name = $"{nameof(ApiScalarType)} [Boolean] With Extra Property",
             Source = @"
             {
                 ""Kind"": ""Scalar"",
@@ -64,61 +66,66 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 ""ClrType"": ""System.Boolean, System.Private.CoreLib"",
                 ""Unexpected"": ""IgnoreMe""
             }",
-            Expected = new ApiScalarType("Boolean", typeof(bool))
+            Expected = new ApiScalarType("Boolean", typeof(bool)),
+            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
         },
 
         new JsonDeserializeTest<ApiType>
         {
-            Name = "ApiScalarType [ID]",
+            Name = $"{nameof(ApiScalarType)} [ID]",
             Source =  @"
             {
                 ""Kind"": ""Scalar"",
                 ""ApiName"": ""ID"",
                 ""ClrType"": ""System.String, System.Private.CoreLib""
             }",
-            Expected = new ApiScalarType("ID", typeof(string))
+            Expected = new ApiScalarType("ID", typeof(string)),
+            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
         },
 
         new JsonDeserializeTest<ApiType>
         {
-            Name = "ApiScalarType [Int]",
+            Name = $"{nameof(ApiScalarType)} [Int]",
             Source = @"
             {
                 ""Kind"": ""Scalar"",
                 ""ApiName"": ""Int"",
                 ""ClrType"": ""System.Int32, System.Private.CoreLib""
             }",
-            Expected = new ApiScalarType("Int", typeof(int))
+            Expected = new ApiScalarType("Int", typeof(int)),
+            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
         },
 
         new JsonDeserializeTest<ApiType>
         {
-            Name = "ApiScalarType [Float]",
+            Name = $"{nameof(ApiScalarType)} [Float]",
             Source = @"
             {
                 ""Kind"": ""Scalar"",
                 ""ApiName"": ""Float"",
                 ""ClrType"": ""System.Single, System.Private.CoreLib""
             }",
-            Expected = new ApiScalarType("Float", typeof(float))
+            Expected = new ApiScalarType("Float", typeof(float)),
+            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
         },
 
         new JsonDeserializeTest<ApiType>
         {
-            Name = "ApiScalarType [String]",
+            Name = $"{nameof(ApiScalarType)} [String]",
             Source = @"
             {
                 ""Kind"": ""Scalar"",
                 ""ApiName"": ""String"",
                 ""ClrType"": ""System.String, System.Private.CoreLib""
             }",
-            Expected = new ApiScalarType("String", typeof(string))
+            Expected = new ApiScalarType("String", typeof(string)),
+            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
         },
 
         // ApiEnumType
         new JsonDeserializeTest<ApiType>
         {
-            Name = $"ApiEnumType [{nameof(StopLight)}]",
+            Name = $"{nameof(ApiEnumType)} [{nameof(StopLight)}]",
             Source = @"
             {
                 ""Kind"": ""Enum"",
@@ -152,12 +159,13 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 nameof(StopLight),
                 [new ApiEnumValue("None", "None", 0), new ApiEnumValue("Green", "Green", 1), new ApiEnumValue("Yellow", "Yellow", 2), new ApiEnumValue("Red", "Red", 3)],
                 typeof(StopLight)
-            )
+            ),
+            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
         },
 
         new JsonDeserializeTest<ApiType>
         {
-            Name = $"ApiEnumType [{nameof(StopLight)}] With Extension 2",
+            Name = $"{nameof(ApiEnumType)} [{nameof(StopLight)}] With Extension 2",
             Source = @"
             {
                 ""Kind"": ""Enum"",
@@ -198,13 +206,14 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 [new ApiEnumValue("None", "None", 0), new ApiEnumValue("Green", "Green", 1), new ApiEnumValue("Yellow", "Yellow", 2), new ApiEnumValue("Red", "Red", 3)],
                 typeof(StopLight)
             ),
-            ExtensionType2 = typeof(TestExtension2)
+            ExtensionType2 = typeof(TestExtension2),
+            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
         },
 
         // ApiCollectionType
         new JsonDeserializeTest<ApiType>
         {
-            Name = "ApiCollectionType [List<String>]",
+            Name = $"{nameof(ApiCollectionType)} [List<{nameof(String)}>]",
             Source = @"
             {
                 ""Kind"": ""Collection"",
@@ -215,12 +224,13 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 ""ApiItemTypeModifiers"": ""Required"",
                 ""ClrType"": ""System.Collections.Generic.List\u00601[[System.String, System.Private.CoreLib]], System.Private.CoreLib""
             }",
-            Expected = new ApiCollectionType(new ApiTypeExpression(ApiTypeKind.Scalar, "String"), ApiTypeModifiers.Required, typeof(List<string>))
+            Expected = new ApiCollectionType(new ApiTypeExpression(ApiTypeKind.Scalar, "String"), ApiTypeModifiers.Required, typeof(List<string>)),
+            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
         },
 
         new JsonDeserializeTest<ApiType>
         {
-            Name = "ApiCollectionType [List<String?>]",
+            Name = $"{nameof(ApiCollectionType)} [List<{nameof(String)}?>]",
             Source = @"
             {
                 ""Kind"": ""Collection"",
@@ -231,12 +241,13 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 ""ApiItemTypeModifiers"": ""None"",
                 ""ClrType"": ""System.Collections.Generic.List\u00601[[System.String, System.Private.CoreLib]], System.Private.CoreLib""
             }",
-            Expected = new ApiCollectionType(new ApiTypeExpression(ApiTypeKind.Scalar, "String"), ApiTypeModifiers.None, typeof(List<string?>))
+            Expected = new ApiCollectionType(new ApiTypeExpression(ApiTypeKind.Scalar, "String"), ApiTypeModifiers.None, typeof(List<string?>)),
+            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
         },
 
         new JsonDeserializeTest<ApiType>
         {
-            Name = $"ApiCollectionType [List<{nameof(StopLight)}>]",
+            Name = $"{nameof(ApiCollectionType)} [List<{nameof(StopLight)}>]",
             Source = @"
             {
                 ""Kind"": ""Collection"",
@@ -247,12 +258,13 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 ""ApiItemTypeModifiers"": ""Required"",
                 ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.Schema.TestData.StopLight, Evoogle.ApiFramework.Core.Tests]], System.Private.CoreLib""
             }",
-            Expected = new ApiCollectionType(new ApiTypeExpression(ApiTypeKind.Enum, nameof(StopLight)), ApiTypeModifiers.Required, typeof(List<StopLight>))
+            Expected = new ApiCollectionType(new ApiTypeExpression(ApiTypeKind.Enum, nameof(StopLight)), ApiTypeModifiers.Required, typeof(List<StopLight>)),
+            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
         },
 
         new JsonDeserializeTest<ApiType>
         {
-            Name = $"ApiCollectionType [List<{nameof(StopLight)}?>]",
+            Name = $"{nameof(ApiCollectionType)} [List<{nameof(StopLight)}?>]",
             Source = @"
             {
                 ""Kind"": ""Collection"",
@@ -263,13 +275,14 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 ""ApiItemTypeModifiers"": ""None"",
                 ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.Schema.TestData.StopLight, Evoogle.ApiFramework.Core.Tests]], System.Private.CoreLib""
             }",
-            Expected = new ApiCollectionType(new ApiTypeExpression(ApiTypeKind.Enum, nameof(StopLight)), ApiTypeModifiers.None, typeof(List<StopLight>))
+            Expected = new ApiCollectionType(new ApiTypeExpression(ApiTypeKind.Enum, nameof(StopLight)), ApiTypeModifiers.None, typeof(List<StopLight>)),
+            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
         },
 
         // ApiObjectType With API Named Typed Expressions
         new JsonDeserializeTest<ApiType>
         {
-            Name = $"ApiObjectType [{nameof(ScalarsOnly)}] With API Named Typed Expressions",
+            Name = $"{nameof(ApiObjectType)} [{nameof(ScalarsOnly)}] With API Named Typed Expressions",
             Source = @"
             {
                 ""Kind"": ""Object"",
@@ -382,12 +395,13 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 ],
                 [],
                 typeof(ScalarsOnly)
-            )
+            ),
+            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
         },
 
         new JsonDeserializeTest<ApiType>
         {
-            Name = $"ApiObjectType [{nameof(ScalarsOnly)}] With API Named Typed Expressions With Extension 1 and Extension 2",
+            Name = $"{nameof(ApiObjectType)} [{nameof(ScalarsOnly)}] With API Named Typed Expressions With Extension 1 and Extension 2",
             Source = @"
             {
                 ""Kind"": ""Object"",
@@ -511,12 +525,13 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 typeof(ScalarsOnly)
             ),
             ExtensionType1 = typeof(TestExtension1),
-            ExtensionType2 = typeof(TestExtension2)
+            ExtensionType2 = typeof(TestExtension2),
+            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
         },
 
         new JsonDeserializeTest<ApiType>
         {
-            Name = $"ApiObjectType [{nameof(Company)}] With API Named Typed Expressions",
+            Name = $"{nameof(ApiObjectType)} [{nameof(Company)}] With API Named Typed Expressions",
             Source = @"
             {
                 ""Kind"": ""Object"",
@@ -600,12 +615,13 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 ],
                 typeof(Company)
             ),
+            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
         },
 
         // ApiObjectType With CLR Typed Expressions
         new JsonDeserializeTest<ApiType>
         {
-            Name = $"ApiObjectType [{nameof(ScalarsOnly)}] With CLR Typed Expressions",
+            Name = $"{nameof(ApiObjectType)} [{nameof(ScalarsOnly)}] With CLR Typed Expressions",
             Source = @"
             {
                 ""Kind"": ""Object"",
@@ -712,12 +728,13 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 ],
                 [],
                 typeof(ScalarsOnly)
-            )
+            ),
+            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
         },
 
         new JsonDeserializeTest<ApiType>
         {
-            Name = $"ApiObjectType [{nameof(ScalarsOnly)}] With CLR Typed Expressions With Extension 1 and Extension 2",
+            Name = $"{nameof(ApiObjectType)} [{nameof(ScalarsOnly)}] With CLR Typed Expressions With Extension 1 and Extension 2",
             Source = @"
             {
                 ""Kind"": ""Object"",
@@ -835,12 +852,13 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 typeof(ScalarsOnly)
             ),
             ExtensionType1 = typeof(TestExtension1),
-            ExtensionType2 = typeof(TestExtension2)
+            ExtensionType2 = typeof(TestExtension2),
+            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
         },
 
         new JsonDeserializeTest<ApiType>
         {
-            Name = $"ApiObjectType [{nameof(Company)}] With CLR Typed Expressions",
+            Name = $"{nameof(ApiObjectType)} [{nameof(Company)}] With CLR Typed Expressions",
             Source = @"
             {
                 ""Kind"": ""Object"",
@@ -921,6 +939,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 ],
                 typeof(Company)
             ),
+            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
         },
     ];
 
@@ -936,104 +955,116 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
         // ApiScalarType
         new JsonRoundtripTest<ApiType>
         {
-            Name = "ApiScalarType [Boolean]",
-            Expected = new ApiScalarType("Boolean", typeof(bool))
-        },
-
-        new JsonRoundtripTest<ApiType>
-        {
-            Name = "ApiScalarType [Boolean] With Extension 1",
+            Name = $"{nameof(ApiScalarType)} [Boolean]",
             Expected = new ApiScalarType("Boolean", typeof(bool)),
-            ExtensionType1 = typeof(TestExtension1)
+            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
         },
 
         new JsonRoundtripTest<ApiType>
         {
-            Name = "ApiScalarType [ID]",
-            Expected = new ApiScalarType("ID", typeof(string))
+            Name = $"{nameof(ApiScalarType)} [Boolean] With Extension 1",
+            Expected = new ApiScalarType("Boolean", typeof(bool)),
+            ExtensionType1 = typeof(TestExtension1),
+            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
         },
 
         new JsonRoundtripTest<ApiType>
         {
-            Name = "ApiScalarType [Int]",
-            Expected = new ApiScalarType("Int", typeof(int))
+            Name = $"{nameof(ApiScalarType)} [ID]",
+            Expected = new ApiScalarType("ID", typeof(string)),
+            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
         },
 
         new JsonRoundtripTest<ApiType>
         {
-            Name = "ApiScalarType [Float]",
-            Expected = new ApiScalarType("Float", typeof(float))
+            Name = $"{nameof(ApiScalarType)} [Int]",
+            Expected = new ApiScalarType("Int", typeof(int)),
+            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
         },
 
         new JsonRoundtripTest<ApiType>
         {
-            Name = "ApiScalarType [String]",
-            Expected = new ApiScalarType("String", typeof(string))
+            Name = $"{nameof(ApiScalarType)} [Float]",
+            Expected = new ApiScalarType("Float", typeof(float)),
+            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
+        },
+
+        new JsonRoundtripTest<ApiType>
+        {
+            Name = $"{nameof(ApiScalarType)} [String]",
+            Expected = new ApiScalarType("String", typeof(string)),
+            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
         },
 
         // ApiEnumType
         new JsonRoundtripTest<ApiType>
         {
-            Name = $"ApiEnumType [{nameof(StopLight)}]",
-            Expected = new ApiEnumType
-            (
-                nameof(StopLight),
-                [new ApiEnumValue("None", "None", 0), new ApiEnumValue("Green", "Green", 1), new ApiEnumValue("Yellow", "Yellow", 2), new ApiEnumValue("Red", "Red", 3)],
-                typeof(StopLight)
-            )
-        },
-
-        new JsonRoundtripTest<ApiType>
-        {
-            Name = $"ApiEnumType [{nameof(StopLight)}] With Extension 2",
+            Name = $"{nameof(ApiEnumType)} [{nameof(StopLight)}]",
             Expected = new ApiEnumType
             (
                 nameof(StopLight),
                 [new ApiEnumValue("None", "None", 0), new ApiEnumValue("Green", "Green", 1), new ApiEnumValue("Yellow", "Yellow", 2), new ApiEnumValue("Red", "Red", 3)],
                 typeof(StopLight)
             ),
-            ExtensionType2 = typeof(TestExtension2)
+            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
+        },
+
+        new JsonRoundtripTest<ApiType>
+        {
+            Name = $"{nameof(ApiEnumType)} [{nameof(StopLight)}] With Extension 2",
+            Expected = new ApiEnumType
+            (
+                nameof(StopLight),
+                [new ApiEnumValue("None", "None", 0), new ApiEnumValue("Green", "Green", 1), new ApiEnumValue("Yellow", "Yellow", 2), new ApiEnumValue("Red", "Red", 3)],
+                typeof(StopLight)
+            ),
+            ExtensionType2 = typeof(TestExtension2),
+            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
         },
 
         // ApiCollectionType
         new JsonRoundtripTest<ApiType>
         {
-            Name = "ApiCollectionType [List<String>]",
-            Expected = new ApiCollectionType(new ApiTypeExpression(ApiTypeKind.Scalar,  "String"), ApiTypeModifiers.Required, typeof(List<string>))
+            Name = $"{nameof(ApiCollectionType)} [List<{nameof(StopLight)}>]",
+            Expected = new ApiCollectionType(new ApiTypeExpression(ApiTypeKind.Scalar,  "String"), ApiTypeModifiers.Required, typeof(List<string>)),
+            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
         },
 
         new JsonRoundtripTest<ApiType>
         {
-            Name = "ApiCollectionType [List<String?>]",
-            Expected = new ApiCollectionType(new ApiTypeExpression(ApiTypeKind.Scalar,  "String"), ApiTypeModifiers.None, typeof(List<string?>))
+            Name = $"{nameof(ApiCollectionType)} [List<{nameof(StopLight)}?>]",
+            Expected = new ApiCollectionType(new ApiTypeExpression(ApiTypeKind.Scalar,  "String"), ApiTypeModifiers.None, typeof(List<string?>)),
+            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
         },
 
         new JsonRoundtripTest<ApiType>
         {
-            Name = $"ApiCollectionType [List<{nameof(StopLight)}>]",
+            Name = $"{nameof(ApiCollectionType)} [List<{nameof(StopLight)}>]",
             Expected = new ApiCollectionType
             (
                 new ApiTypeExpression(ApiTypeKind.Enum, nameof(StopLight)),
                 ApiTypeModifiers.Required,
                 typeof(List<StopLight>)
-            )
+            ),
+            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
         },
 
         new JsonRoundtripTest<ApiType>
         {
-            Name = $"ApiCollectionType [List<{nameof(StopLight)}?>]",
+            Name = $"{nameof(ApiCollectionType)} [List<{nameof(StopLight)}?>]",
             Expected = new ApiCollectionType
             (
                 new ApiTypeExpression(ApiTypeKind.Enum, nameof(StopLight)),
                 ApiTypeModifiers.None,
                 typeof(List<StopLight>)
-            )
+            ),
+            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
         },
 
         // ApiObjectType With API Named Typed Expressions
         new JsonRoundtripTest<ApiType>
         {
-            Name = $"ApiObjectType [{nameof(ScalarsOnly)}] With API Named Typed Expressions",
+            Name = $"{nameof(ApiObjectType)} [{nameof(ScalarsOnly)}] With API Named Typed Expressions",
             Expected = new ApiObjectType
             (
                 nameof(ScalarsOnly),
@@ -1083,12 +1114,13 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 ],
                 [],
                 typeof(ScalarsOnly)
-            )
+            ),
+            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
         },
 
         new JsonRoundtripTest<ApiType>
         {
-            Name = $"ApiObjectType [{nameof(ScalarsOnly)}] With API Named Typed Expressions With Extension 1 and Extension 2",
+            Name = $"{nameof(ApiObjectType)} [{nameof(ScalarsOnly)}] With API Named Typed Expressions With Extension 1 and Extension 2",
             Expected = new ApiObjectType
             (
                 nameof(ScalarsOnly),
@@ -1140,12 +1172,13 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 typeof(ScalarsOnly)
             ),
             ExtensionType1 = typeof(TestExtension1),
-            ExtensionType2 = typeof(TestExtension2)
+            ExtensionType2 = typeof(TestExtension2),
+            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
         },
 
         new JsonRoundtripTest<ApiType>
         {
-            Name = $"ApiObjectType [{nameof(Company)}] With API Named Typed Expressions",
+            Name = $"{nameof(ApiObjectType)} [{nameof(Company)}] With API Named Typed Expressions",
             Expected = new ApiObjectType
             (
                 nameof(Company),
@@ -1178,12 +1211,13 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 ],
                 typeof(Company)
             ),
+            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
         },
 
         // ApiObjectType With CLR Typed Expressions
         new JsonRoundtripTest<ApiType>
         {
-            Name = $"ApiObjectType [{nameof(ScalarsOnly)}] With CLR Typed Expressions",
+            Name = $"{nameof(ApiObjectType)} [{nameof(ScalarsOnly)}] With CLR Typed Expressions",
             Expected = new ApiObjectType
             (
                 nameof(ScalarsOnly),
@@ -1233,12 +1267,13 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 ],
                 [],
                 typeof(ScalarsOnly)
-            )
+            ),
+            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
         },
 
         new JsonRoundtripTest<ApiType>
         {
-            Name = $"ApiObjectType [{nameof(ScalarsOnly)}] With CLR Typed Expressions With Extension 1 and Extension 2",
+            Name = $"{nameof(ApiObjectType)} [{nameof(ScalarsOnly)}] With CLR Typed Expressions With Extension 1 and Extension 2",
             Expected = new ApiObjectType
             (
                 nameof(ScalarsOnly),
@@ -1290,12 +1325,13 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 typeof(ScalarsOnly)
             ),
             ExtensionType1 = typeof(TestExtension1),
-            ExtensionType2 = typeof(TestExtension2)
+            ExtensionType2 = typeof(TestExtension2),
+            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
         },
 
         new JsonRoundtripTest<ApiType>
         {
-            Name = $"ApiObjectType [{nameof(Company)}] With CLR Typed Expressions",
+            Name = $"{nameof(ApiObjectType)} [{nameof(Company)}] With CLR Typed Expressions",
             Expected = new ApiObjectType
             (
                 nameof(Company),
@@ -1328,6 +1364,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 ],
                 typeof(Company)
             ),
+            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
         },
     ];
 
@@ -1344,7 +1381,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
         // ApiScalarType
         new JsonSerializeTest<ApiType>
         {
-            Name = "ApiScalarType [Boolean]",
+            Name = $"{nameof(ApiScalarType)} [Boolean]",
             Source = new ApiScalarType("Boolean", typeof(bool)),
             Expected = @"
             {
@@ -1356,7 +1393,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
 
         new JsonSerializeTest<ApiType>
         {
-            Name = "ApiScalarType [Boolean] With Extension 1",
+            Name = $"{nameof(ApiScalarType)} [Boolean] With Extension 1",
             Source = new ApiScalarType("Boolean", typeof(bool)),
             Expected = @"
             {
@@ -1374,7 +1411,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
 
         new JsonSerializeTest<ApiType>
         {
-            Name = "ApiScalarType [ID]",
+            Name = $"{nameof(ApiScalarType)} [ID]",
             Source = new ApiScalarType("ID", typeof(string)),
             Expected = @"
             {
@@ -1386,7 +1423,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
 
         new JsonSerializeTest<ApiType>
         {
-            Name = "ApiScalarType [Int]",
+            Name = $"{nameof(ApiScalarType)} [Int]",
             Source = new ApiScalarType("Int", typeof(int)),
             Expected = @"
             {
@@ -1398,7 +1435,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
 
         new JsonSerializeTest<ApiType>
         {
-            Name = "ApiScalarType [Float]",
+            Name = $"{nameof(ApiScalarType)} [Float]",
             Source = new ApiScalarType("Float", typeof(float)),
             Expected = @"
             {
@@ -1410,7 +1447,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
 
         new JsonSerializeTest<ApiType>
         {
-            Name = "ApiScalarType [String]",
+            Name = $"{nameof(ApiScalarType)} [String]",
             Source = new ApiScalarType("String", typeof(string)),
             Expected = @"
             {
@@ -1423,7 +1460,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
         // ApiEnumType
         new JsonSerializeTest<ApiType>
         {
-            Name = $"ApiEnumType [{nameof(StopLight)}]",
+            Name = $"{nameof(ApiEnumType)} [{nameof(StopLight)}]",
             Source = new ApiEnumType
             (
                 nameof(StopLight),
@@ -1462,7 +1499,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
 
         new JsonSerializeTest<ApiType>
         {
-            Name = $"ApiEnumType [{nameof(StopLight)}] With Extension 2",
+            Name = $"{nameof(ApiEnumType)} [{nameof(StopLight)}] With Extension 2",
             Source = new ApiEnumType
             (
                 nameof(StopLight),
@@ -1509,7 +1546,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
         // ApiCollectionType
         new JsonSerializeTest<ApiType>
         {
-            Name = "ApiCollectionType [List<String>]",
+            Name = $"{nameof(ApiCollectionType)} [List<String>]",
             Source = new ApiCollectionType(new ApiTypeExpression(ApiTypeKind.Scalar, "String"), ApiTypeModifiers.Required, typeof(List<string>)),
             Expected = @"
             {
@@ -1525,7 +1562,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
 
         new JsonSerializeTest<ApiType>
         {
-            Name = "ApiCollectionType [List<String?>]",
+            Name = $"{nameof(ApiCollectionType)} [List<String?>]",
             Source = new ApiCollectionType(new ApiTypeExpression(ApiTypeKind.Scalar, "String"), ApiTypeModifiers.None, typeof(List<string?>)),
             Expected = @"
             {
@@ -1541,7 +1578,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
 
         new JsonSerializeTest<ApiType>
         {
-            Name = $"ApiCollectionType [List<{nameof(StopLight)}>]",
+            Name = $"{nameof(ApiCollectionType)} [List<{nameof(StopLight)}>]",
             Source = new ApiCollectionType
             (
                 new ApiTypeExpression(ApiTypeKind.Enum, nameof(StopLight)),
@@ -1562,7 +1599,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
 
         new JsonSerializeTest<ApiType>
         {
-            Name = $"ApiCollectionType [List<{nameof(StopLight)}?>]",
+            Name = $"{nameof(ApiCollectionType)} [List<{nameof(StopLight)}?>]",
             Source = new ApiCollectionType
             (
                 new ApiTypeExpression(ApiTypeKind.Enum, nameof(StopLight)),
@@ -1584,7 +1621,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
         // ApiObjectType With API Named Typed Expressions
         new JsonSerializeTest<ApiType>
         {
-            Name = $"ApiObjectType [{nameof(ScalarsOnly)}] With API Named Typed Expressions",
+            Name = $"{nameof(ApiObjectType)} [{nameof(ScalarsOnly)}] With API Named Typed Expressions",
             Source = new ApiObjectType
             (
                 nameof(ScalarsOnly),
@@ -1702,7 +1739,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
 
         new JsonSerializeTest<ApiType>
         {
-            Name = $"ApiObjectType [{nameof(ScalarsOnly)}] With API Named Typed Expressions And With Extension 1 and Extension 2",
+            Name = $"{nameof(ApiObjectType)} [{nameof(ScalarsOnly)}] With API Named Typed Expressions And With Extension 1 and Extension 2",
             Source = new ApiObjectType
             (
                 nameof(ScalarsOnly),
@@ -1831,7 +1868,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
 
         new JsonSerializeTest<ApiType>
         {
-            Name = $"ApiObjectType [{nameof(Company)}] With API Named Typed Expressions",
+            Name = $"{nameof(ApiObjectType)} [{nameof(Company)}] With API Named Typed Expressions",
             Source = new ApiObjectType
             (
                 nameof(Company),
@@ -1920,7 +1957,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
         // ApiObjectType With CLR Typed Expressions
         new JsonSerializeTest<ApiType>
         {
-            Name = $"ApiObjectType [{nameof(ScalarsOnly)}] With CLR Typed Expressions",
+            Name = $"{nameof(ApiObjectType)} [{nameof(ScalarsOnly)}] With CLR Typed Expressions",
             Source = new ApiObjectType
             (
                 nameof(ScalarsOnly),
@@ -2032,7 +2069,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
 
         new JsonSerializeTest<ApiType>
         {
-            Name = $"ApiObjectType [{nameof(ScalarsOnly)}] With CLR Typed Expressions And With Extension 1 and Extension 2",
+            Name = $"{nameof(ApiObjectType)} [{nameof(ScalarsOnly)}] With CLR Typed Expressions And With Extension 1 and Extension 2",
             Source = new ApiObjectType
             (
                 nameof(ScalarsOnly),
@@ -2155,7 +2192,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
 
         new JsonSerializeTest<ApiType>
         {
-            Name = $"ApiObjectType [{nameof(Company)}] With CLR Typed Expressions",
+            Name = $"{nameof(ApiObjectType)} [{nameof(Company)}] With CLR Typed Expressions",
             Source = new ApiObjectType
             (
                 nameof(Company),

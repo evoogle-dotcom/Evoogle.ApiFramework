@@ -3,9 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using System.ComponentModel.DataAnnotations;
-
-using Evoogle.Extensions;
+using Evoogle.ApiFramework.Schema.Internal;
 
 namespace Evoogle.ApiFramework.Schema;
 
@@ -29,36 +27,49 @@ public abstract class ApiNamedType(string apiName, Type clrType) : ApiType()
     public string ApiName { get; } = apiName;
     #endregion
 
-    #region ApiType Methods
+    #region ApiSchemaElement Methods
     /// <inheritdoc />
-    protected override string GetValidationPath() => $"{this.ApiTypeName.SafeToString()}[\"{this.ApiName.SafeToString()}\"]";
+    protected override string BuildPath(string? apiParentPath)
+        => ApiSchemaHelpers.BuildPath(apiParentPath, apiChildPath: this.ApiTypeName, apiApiName: this.ApiName);
 
-    internal override void Initialize(ApiSchema apiSchema, ApiSchemaContext apiSchemaContext, ref List<ValidationResult>? results)
+    /// <inheritdoc />
+    internal override void Initialize(ApiInitializationContext context)
     {
-        ArgumentNullException.ThrowIfNull(apiSchema);
-        ArgumentNullException.ThrowIfNull(apiSchemaContext);
+        ArgumentNullException.ThrowIfNull(context);
 
-        this.InitializeApiName(ref results);
-        this.InitializeClrType(ref results);
+        base.Initialize(context);
+
+        this.InitializeApiName(context);
+        this.InitializeClrType(context);
     }
     #endregion
 
     #region Implementation Methods
-    private void InitializeApiName(ref List<ValidationResult>? results)
+    private void InitializeApiName(ApiInitializationContext context)
     {
         if (string.IsNullOrWhiteSpace(this.ApiName))
         {
-            results ??= [];
-            results.Add(new ValidationResult($"{this.GetValidationPath()}.{nameof(this.ApiName)} cannot be null or whitespace.", [nameof(this.ApiName)]));
+            var path = $"{this.ApiPath}.{nameof(this.ApiName)}";
+            var severity = ApiInitializationSeverity.Error;
+            var code = ApiInitializationCode.API_NAMED_TYPE_INVALID_API_NAME;
+            var description = $"{nameof(this.ApiName)} cannot be null, empty, or whitespace";
+            var remediation = $"Provide a valid {nameof(this.ApiName)}";
+
+            context.AddIssue(path, severity, code, description, remediation);
         }
     }
 
-    private void InitializeClrType(ref List<ValidationResult>? results)
+    private void InitializeClrType(ApiInitializationContext context)
     {
         if (this.ClrType is null)
         {
-            results ??= [];
-            results.Add(new ValidationResult($"{this.GetValidationPath()}.{nameof(this.ClrType)} cannot be null.", [nameof(this.ClrType)]));
+            var path = $"{this.ApiPath}.{nameof(this.ClrType)}";
+            var severity = ApiInitializationSeverity.Error;
+            var code = ApiInitializationCode.API_NAMED_TYPE_NULL_CLR_TYPE;
+            var description = $"{nameof(this.ClrType)} cannot be null";
+            var remediation = $"Provide a valid {nameof(this.ClrType)}";
+
+            context.AddIssue(path, severity, code, description, remediation);
         }
     }
     #endregion

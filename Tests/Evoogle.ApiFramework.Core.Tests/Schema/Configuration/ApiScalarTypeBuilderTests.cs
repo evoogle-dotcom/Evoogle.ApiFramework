@@ -60,7 +60,13 @@ public class ApiScalarTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
             this.ApiTypeActual.Should().BeOfType<ApiScalarType>();
             this.ApiTypeExpected.Should().BeOfType<ApiScalarType>();
 
-            this.ApiTypeActual.As<ApiScalarType>().Should().BeEquivalentTo(this.ApiTypeExpected.As<ApiScalarType>());
+            this.ApiTypeActual.As<ApiScalarType>().Should().BeEquivalentTo
+            (
+                this.ApiTypeExpected.As<ApiScalarType>(),
+                opt => opt
+                    .Excluding(info => info.Path.Contains(nameof(ApiSchemaElement.ApiPath)))
+                    .WithStrictOrdering()
+            );
         }
         #endregion
     }

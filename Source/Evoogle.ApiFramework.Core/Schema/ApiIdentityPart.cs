@@ -3,19 +3,14 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using System.ComponentModel.DataAnnotations;
-
 using Evoogle.ApiFramework.Schema.Internal;
-using Evoogle.Extension;
 using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema;
 
-public sealed class ApiIdentityPart(string apiPropertyName, ApiIdentityCoercion? coercion = null, bool emitAsOrdered = false) : ExtensibleBase
+public sealed class ApiIdentityPart(string apiPropertyName, ApiIdentityCoercion? coercion = null, bool emitAsOrdered = false) : ApiSchemaElement
 {
     #region Fields
-    private ApiSchemaContext? _apiSchemaContext = null;
-
     private ApiProperty? _apiResolvedProperty = null;
     #endregion
 
@@ -25,23 +20,22 @@ public sealed class ApiIdentityPart(string apiPropertyName, ApiIdentityCoercion?
     public bool EmitAsOrdered { get; } = emitAsOrdered;
 
     public ApiProperty ApiProperty => this.ThrowIfNotInitialized(_apiResolvedProperty);
-
-    /// <summary>Gets the schema context for this identity part.</summary>
-    internal ApiSchemaContext ApiSchemaContext => this.ThrowIfNotInitialized(_apiSchemaContext);
     #endregion
 
-    #region ApiIdentityPart Methods
-    internal void Initialize(ApiSchema apiSchema, ApiSchemaContext apiSchemaContext, ApiObjectType apiObjectType, string apiValidationPath, ref List<ValidationResult>? results)
+    #region ApiSchemaElement Methods
+    /// <inheritdoc />
+    protected override string BuildPath(string? apiParentPath)
+        => ApiSchemaHelpers.BuildPath(apiParentPath, apiChildPath: nameof(ApiIdentityPart), apiApiName: this.ApiPropertyName);
+
+    /// <inheritdoc />
+    internal override void Initialize(ApiInitializationContext context)
     {
-        ArgumentNullException.ThrowIfNull(apiSchema);
-        ArgumentNullException.ThrowIfNull(apiSchemaContext);
-        ArgumentNullException.ThrowIfNull(apiObjectType);
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiValidationPath);
+        ArgumentNullException.ThrowIfNull(context);
 
-        _apiSchemaContext = apiSchemaContext;
+        base.Initialize(context);
 
-        this.InitializeApiPropertyName(apiValidationPath, ref results);
-        this.InitializeApiProperty(apiObjectType, apiValidationPath, ref results);
+        this.InitializeApiPropertyName(context);
+        this.InitializeApiProperty(context);
     }
     #endregion
 
@@ -57,39 +51,53 @@ public sealed class ApiIdentityPart(string apiPropertyName, ApiIdentityCoercion?
     #endregion
 
     #region Implementation Methods
-    private void InitializeApiPropertyName(string apiValidationPath, ref List<ValidationResult>? results)
+    private void InitializeApiPropertyName(ApiInitializationContext context)
     {
         if (string.IsNullOrWhiteSpace(this.ApiPropertyName))
         {
-            results ??= [];
-            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ApiPropertyName)} cannot be null or whitespace.", [nameof(this.ApiPropertyName)]));
-            return;
+            var path = $"{this.ApiPath}.{nameof(this.ApiPropertyName)}";
+            var severity = ApiInitializationSeverity.Error;
+            var code = ApiInitializationCode.API_IDENTITY_PART_INVALID_API_PROPERTY_NAME;
+            var description = $"{nameof(this.ApiPropertyName)} cannot be null, empty, or whitespace";
+            var remediation = $"Provide a valid {nameof(this.ApiPropertyName)}";
+
+            context.AddIssue(path, severity, code, description, remediation);
         }
     }
 
-    private void InitializeApiProperty(ApiObjectType apiObjectType, string apiValidationPath, ref List<ValidationResult>? results)
+    private void InitializeApiProperty(ApiInitializationContext context)
     {
         _apiResolvedProperty = null;
 
-        // Resolve the related API property for the parent API object type.
-        if (apiObjectType.TryGetPropertyByApiName(this.ApiPropertyName, out var apiResolvedProperty))
+        if (!string.IsNullOrWhiteSpace(this.ApiPropertyName))
         {
-            _apiResolvedProperty = apiResolvedProperty;
+            // Resolve the related API property for the parent API object type.
+            var apiParentObjectType = context.ApiParentObjectType;
+            if (apiParentObjectType.TryGetPropertyByApiName(this.ApiPropertyName, out var apiResolvedProperty))
+            {
+                _apiResolvedProperty = apiResolvedProperty;
+            }
         }
 
         if (_apiResolvedProperty is null)
         {
-            results ??= [];
-            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ApiProperty)} unable to resolve {nameof(this.ApiProperty)}[\"{this.ApiPropertyName.SafeToString()}\"].", [nameof(this.ApiProperty)]));
+            var path = $"{this.ApiPath}.{nameof(this.ApiProperty)}";
+            var severity = ApiInitializationSeverity.Error;
+            var code = ApiInitializationCode.API_IDENTITY_PART_UNRESOLVED_PROPERTY;
+            var description = $"{nameof(this.ApiProperty)} unable to resolve {nameof(this.ApiProperty)}[\"{this.ApiPropertyName.SafeToString()}\"]";
+            var remediation = $"Ensure that {nameof(this.ApiPropertyName)} refers to a valid property on the parent {nameof(ApiObjectType)}";
+
+            context.AddIssue(path, severity, code, description, remediation);
             return;
         }
 
+        // TODO: What to do here? Have to comment out for now.
         // Basic coercion compatibility
-        if (this.Coercion?.TargetKind is ApiIdentityTargetKind tk && !IsCoercible(_apiResolvedProperty, tk))
-        {
-            results ??= [];
-            results.Add(new ValidationResult($"{apiValidationPath} property '{this.ApiPropertyName}' not coercible to {tk}.", [nameof(this.ApiPropertyName)]));
-        }
+        // if (this.Coercion?.TargetKind is ApiIdentityTargetKind tk && !IsCoercible(_apiResolvedProperty, tk))
+        // {
+        //     results ??= [];
+        //     results.Add(new ValidationResult($"{apiValidationPath} property '{this.ApiPropertyName}' not coercible to {tk}.", [nameof(this.ApiPropertyName)]));
+        // }
     }
 
     private static bool IsCoercible(ApiProperty apiProperty, ApiIdentityTargetKind target)

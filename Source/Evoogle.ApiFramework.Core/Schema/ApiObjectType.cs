@@ -3,8 +3,6 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using System.ComponentModel.DataAnnotations;
-
 using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.Extensions;
 
@@ -40,8 +38,6 @@ public sealed partial class ApiObjectType
 ) : ApiNamedType(apiName, clrObjectType)
 {
     #region ApiObjectType Fields
-    private ApiSchemaContext? _apiSchemaContext = null;
-
     private Dictionary<string, ApiProperty>? _apiPropertyApiNameLookup = null;
     private Dictionary<string, ApiProperty>? _apiPropertyClrNameLookup = null;
     private Dictionary<string, ApiRelationship>? _apiRelationshipApiNameLookup = null;
@@ -59,12 +55,12 @@ public sealed partial class ApiObjectType
     /// <summary>
     ///     Gets the collection of API properties defined on this object type.
     /// </summary>
-    public ApiProperty[] ApiProperties { get; } = apiProperties.SafeToArray();
+    public ApiProperty[] ApiProperties { get; } = [.. apiProperties.EmptyIfNull().Where(x => x is not null)];
 
     /// <summary>
     ///     Gets the collection of API relationships defined on this object type.
     /// </summary>
-    public ApiRelationship[] ApiRelationships { get; } = apiRelationships.SafeToArray();
+    public ApiRelationship[] ApiRelationships { get; } = [.. apiRelationships.EmptyIfNull().Where(x => x is not null)];
 
     /// <summary>
     ///     Gets the collection of API identities defined on this object type.
@@ -81,29 +77,24 @@ public sealed partial class ApiObjectType
     /// </summary>
     public bool HasIdentity => this.ApiIdentitySet is not null;
 
-    /// <summary>Gets the schema context for this object type.</summary>
-    internal ApiSchemaContext ApiSchemaContext => this.ThrowIfNotInitialized(_apiSchemaContext);
-
     private Dictionary<string, ApiProperty> ApiPropertyApiNameLookup => this.ThrowIfNotInitialized(_apiPropertyApiNameLookup);
     private Dictionary<string, ApiProperty> ApiPropertyClrNameLookup => this.ThrowIfNotInitialized(_apiPropertyClrNameLookup);
     private Dictionary<string, ApiRelationship> ApiRelationshipApiNameLookup => this.ThrowIfNotInitialized(_apiRelationshipApiNameLookup);
     #endregion
 
-    #region ApiType Methods
-    internal override void Initialize(ApiSchema apiSchema, ApiSchemaContext apiSchemaContext, ref List<ValidationResult>? results)
+    #region ApiSchemaElement Methods
+    /// <inheritdoc />
+    internal override void Initialize(ApiInitializationContext context)
     {
-        ArgumentNullException.ThrowIfNull(apiSchema);
-        ArgumentNullException.ThrowIfNull(apiSchemaContext);
+        ArgumentNullException.ThrowIfNull(context);
 
-        _apiSchemaContext = apiSchemaContext;
+        base.Initialize(context);
 
-        base.Initialize(apiSchema, apiSchemaContext, ref results);
+        this.InitializeLookupDictionaries(context);
 
-        this.InitializeLookupDictionaries(ref results);
-
-        this.InitializeApiProperties(apiSchema, apiSchemaContext, ref results);
-        this.InitializeApiRelationships(apiSchema, apiSchemaContext, ref results);
-        this.InitializeApiIdentitySet(apiSchema, apiSchemaContext, ref results);
+        this.InitializeApiProperties(context);
+        this.InitializeApiRelationships(context);
+        this.InitializeApiIdentitySet(context);
     }
     #endregion
 
@@ -162,25 +153,28 @@ public sealed partial class ApiObjectType
     #endregion
 
     #region Implementation Methods
-    private void InitializeApiIdentitySet(ApiSchema apiSchema, ApiSchemaContext apiSchemaContext, ref List<ValidationResult>? results)
+    private void InitializeApiIdentitySet(ApiInitializationContext context)
     {
         if (this.ApiIdentitySet is null)
         {
-            return; // optional (no identity for this object type)
+            // No identity set defined; this is acceptable as identity sets are optional.
+            return;
         }
 
-        var apiValidationPath = $"{this.GetValidationPath()}.{nameof(this.ApiIdentitySet)}";
-        this.ApiIdentitySet.Initialize(apiSchema, apiSchemaContext, this, apiValidationPath, ref results);
+        var childContext = context.WithParentObjectType(this);
+        this.ApiIdentitySet.Initialize(childContext);
     }
 
-    private void InitializeApiProperties(ApiSchema apiSchema, ApiSchemaContext apiSchemaContext, ref List<ValidationResult>? results)
+    private void InitializeApiProperties(ApiInitializationContext context)
     {
-        var apiValidationPath = this.GetValidationPath();
-
-        if (this.ApiProperties is null)
+        if (this.ApiProperties is null || this.ApiProperties.Length == 0)
         {
-            results ??= [];
-            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ApiProperties)} cannot be null.", [nameof(this.ApiProperties)]));
+            var path = $"{this.ApiPath}.{nameof(this.ApiProperties)}";
+            var severity = ApiInitializationSeverity.Warning;
+            var code = ApiInitializationCode.API_OBJECT_TYPE_NULL_OR_EMPTY_PROPERTIES;
+            var description = $"{nameof(this.ApiProperties)} is either null or empty";
+
+            context.AddIssue(path, severity, code, description, remediation: null);
             return;
         }
 
@@ -188,33 +182,17 @@ public sealed partial class ApiObjectType
         for (var i = 0; i < apiPropertiesCount; ++i)
         {
             var apiProperty = this.ApiProperties[i];
-            if (apiProperty is null)
-            {
-                results ??= [];
-                results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ApiProperties)}[{i}] cannot be null.", [nameof(this.ApiProperties)]));
-                continue;
-            }
 
-            var apiPropertyValidationPath = apiProperty.GetValidationPath(parentPath: apiValidationPath);
-            apiProperty.Initialize
-            (
-                apiSchema,
-                apiSchemaContext,
-                this,
-                apiPropertyValidationPath,
-                ref results
-            );
+            var childContext = context.WithParentObjectType(this);
+            apiProperty.Initialize(childContext);
         }
     }
 
-    private void InitializeApiRelationships(ApiSchema apiSchema, ApiSchemaContext apiSchemaContext, ref List<ValidationResult>? results)
+    private void InitializeApiRelationships(ApiInitializationContext context)
     {
-        var apiValidationPath = this.GetValidationPath();
-
-        if (this.ApiRelationships is null)
+        if (this.ApiRelationships is null || this.ApiRelationships.Length == 0)
         {
-            results ??= [];
-            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ApiRelationships)} cannot be null.", [nameof(this.ApiRelationships)]));
+            // No relationships defined; this is acceptable as relationships are optional.
             return;
         }
 
@@ -222,49 +200,56 @@ public sealed partial class ApiObjectType
         for (var i = 0; i < apiRelationshipsCount; ++i)
         {
             var apiRelationship = this.ApiRelationships[i];
-            if (apiRelationship is null)
-            {
-                results ??= [];
-                results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ApiRelationships)}[{i}] cannot be null.", [nameof(this.ApiRelationships)]));
-                continue;
-            }
 
-            var apiRelationshipValidationPath = apiRelationship.GetValidationPath(parentPath: apiValidationPath);
-            apiRelationship.Initialize
-            (
-                apiSchema,
-                apiSchemaContext,
-                this,
-                apiRelationshipValidationPath,
-                ref results
-            );
+            var childContext = context.WithParentObjectType(this);
+            apiRelationship.Initialize(childContext);
         }
     }
 
-    private void InitializeLookupDictionaries(ref List<ValidationResult>? results)
+    private void InitializeLookupDictionaries(ApiInitializationContext context)
     {
+        // Initialize lookup dictionaries for lookup of:
+        // - Property by API name and CLR name
+        // - Relationship by API name
         _apiPropertyApiNameLookup = null;
         _apiPropertyClrNameLookup = null;
         _apiRelationshipApiNameLookup = null;
 
-        var anyPropertyApiNameDuplicates = ApiSchemaHelpers.ValidateUnique(this.ApiProperties, x => x.ApiName, this.GetValidationPath(), nameof(ApiProperty.ApiName), ref results);
-        var anyPropertyClrNameDuplicates = ApiSchemaHelpers.ValidateUnique(this.ApiProperties, x => x.ClrName, this.GetValidationPath(), nameof(ApiProperty.ClrName), ref results);
-        var anyRelationshipApiNameDuplicates = ApiSchemaHelpers.ValidateUnique(this.ApiRelationships, x => x.ApiName, this.GetValidationPath(), nameof(ApiRelationship.ApiName), ref results);
+        ApiSchemaHelpers.InitializeLookupDictionary
+        (
+            parts: this.ApiProperties,
+            partKeySelector: x => x.ApiName,
+            partKeyFilter: x => !string.IsNullOrWhiteSpace(x),
+            partKeyPropertyName: nameof(ApiProperty.ApiName),
+            path: $"{this.ApiPath}.{nameof(this.ApiProperties)}",
+            code: ApiInitializationCode.API_OBJECT_TYPE_DUPLICATE_PROPERTY_API_NAME,
+            context: context,
+            lookupDictionary: out _apiPropertyApiNameLookup
+        );
 
-        if (!anyPropertyApiNameDuplicates)
-        {
-            _apiPropertyApiNameLookup = this.ApiProperties.ToDictionary(x => x.ApiName, StringComparer.OrdinalIgnoreCase);
-        }
+        ApiSchemaHelpers.InitializeLookupDictionary
+        (
+            parts: this.ApiProperties,
+            partKeySelector: x => x.ClrName,
+            partKeyFilter: x => !string.IsNullOrWhiteSpace(x),
+            partKeyPropertyName: nameof(ApiProperty.ClrName),
+            path: $"{this.ApiPath}.{nameof(this.ApiProperties)}",
+            code: ApiInitializationCode.API_OBJECT_TYPE_DUPLICATE_PROPERTY_CLR_NAME,
+            context: context,
+            lookupDictionary: out _apiPropertyClrNameLookup
+        );
 
-        if (!anyPropertyClrNameDuplicates)
-        {
-            _apiPropertyClrNameLookup = this.ApiProperties.ToDictionary(x => x.ClrName, StringComparer.OrdinalIgnoreCase);
-        }
-
-        if (!anyRelationshipApiNameDuplicates)
-        {
-            _apiRelationshipApiNameLookup = this.ApiRelationships.ToDictionary(x => x.ApiName, StringComparer.OrdinalIgnoreCase);
-        }
+        ApiSchemaHelpers.InitializeLookupDictionary
+        (
+            parts: this.ApiRelationships,
+            partKeySelector: x => x.ApiName,
+            partKeyFilter: x => !string.IsNullOrWhiteSpace(x),
+            partKeyPropertyName: nameof(ApiRelationship.ApiName),
+            path: $"{this.ApiPath}.{nameof(this.ApiRelationships)}",
+            code: ApiInitializationCode.API_OBJECT_TYPE_DUPLICATE_RELATIONSHIP_API_NAME,
+            context: context,
+            lookupDictionary: out _apiRelationshipApiNameLookup
+        );
     }
     #endregion
 }

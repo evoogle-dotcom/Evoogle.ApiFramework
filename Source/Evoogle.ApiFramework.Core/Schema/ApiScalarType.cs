@@ -3,8 +3,6 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using System.ComponentModel.DataAnnotations;
-
 using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema;
@@ -25,10 +23,6 @@ public sealed class ApiScalarType(string apiName, Type clrScalarType) : ApiNamed
 
     /// <inheritdoc/>
     protected override string ApiTypeName => nameof(ApiScalarType);
-    #endregion
-
-    #region ApiType Methods
-    internal override void Initialize(ApiSchema apiSchema, ApiSchemaContext apiSchemaContext, ref List<ValidationResult>? results) => base.Initialize(apiSchema, apiSchemaContext, ref results);
     #endregion
 
     #region Object Methods

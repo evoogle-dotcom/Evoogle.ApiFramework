@@ -3,7 +3,6 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Schema.TestData;
 using Evoogle.Extensions;
 using Evoogle.XUnit;
@@ -15,96 +14,7 @@ namespace Evoogle.ApiFramework.Schema;
 public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
 {
     #region Test Types
-    public class InitializeThrowsTest : XUnitTest
-    {
-        #region User Supplied Properties
-        public List<ApiEnumValue>? ApiEnumValueCollection { get; init; }
-        public Type? ClrEnumType { get; init; }
-        public string? ExpectedApiSchemaExceptionMessage { get; init; }
-        public List<string>? ExpectedValidationResults { get; init; }
-        #endregion
-
-        #region Calculated Properties
-        private bool? ActualApiSchemaExceptionThrown { get; set; }
-        private string? ActualApiSchemaExceptionMessage { get; set; }
-        private List<string>? ActualValidationResults { get; set; }
-        #endregion
-
-        #region XUnitTest Methods
-        protected override void Arrange()
-        {
-            var apiEnumValuesString = this.ApiEnumValueCollection?
-                .Select(x => $"{{{nameof(ApiEnumValue.ApiName)}={x.ApiName},{nameof(ApiEnumValue.ClrName)}={x.ClrName},{nameof(ApiEnumValue.ClrOrdinal)}={x.ClrOrdinal}}}")
-                .SafeToDelimitedString(',') ?? "None";
-
-            this.WriteLine($"API Enum Values: [{apiEnumValuesString}]");
-            this.WriteLine();
-
-            this.WriteLine($"Expected Exception Message: {this.ExpectedApiSchemaExceptionMessage.SafeToString()}");
-            if (this.ExpectedValidationResults is not null)
-            {
-                foreach (var expectedValidationResult in this.ExpectedValidationResults)
-                {
-                    this.WriteLine($"Expected Validation Result: {expectedValidationResult.SafeToString()}");
-                }
-            }
-            this.WriteLine();
-        }
-
-        protected override void Act()
-        {
-            try
-            {
-                var apiEnumType = new ApiEnumType(nameof(Gender), // Using 'Gender' as a placeholder API name
-                                                  this.ApiEnumValueCollection ?? throw new ArgumentNullException(nameof(this.ApiEnumValueCollection)),
-                                                  this.ClrEnumType ?? throw new ArgumentNullException(nameof(this.ClrEnumType)));
-
-                var apiSchema = ApiSchema.Create
-                (
-                    apiName: nameof(ApiSchema),
-                    apiScalarTypes: null,
-                    apiEnumTypes: [apiEnumType],
-                    apiObjectTypes: null
-                );
-                var result = apiSchema.Initialize();
-                result.ThrowIfInvalid();
-            }
-            catch (ApiSchemaValidationException ex)
-            {
-                this.ActualApiSchemaExceptionThrown = true;
-                this.ActualApiSchemaExceptionMessage = ex.Message;
-                this.ActualValidationResults = [.. ex.ValidationResults.Where(x => x.ErrorMessage is not null).Select(x => x.ErrorMessage!)];
-            }
-            catch (ApiSchemaException ex)
-            {
-                this.ActualApiSchemaExceptionThrown = true;
-                this.ActualApiSchemaExceptionMessage = ex.Message;
-                this.ActualValidationResults = null;
-            }
-
-            this.WriteLine($"Actual Exception Thrown:  {this.ActualApiSchemaExceptionThrown.SafeToString()}");
-            this.WriteLine($"Actual Exception Message: {this.ActualApiSchemaExceptionMessage.SafeToString()}");
-            if (this.ActualValidationResults is not null)
-            {
-                foreach (var actualValidationResult in this.ActualValidationResults)
-                {
-                    this.WriteLine($"Actual Validation Result: {actualValidationResult.SafeToString()}");
-                }
-            }
-            this.WriteLine();
-        }
-
-        protected override void Assert()
-        {
-            this.ActualApiSchemaExceptionThrown.Should().BeTrue();
-            this.ActualApiSchemaExceptionMessage.Should().Be(this.ExpectedApiSchemaExceptionMessage);
-            this.ActualValidationResults.Should().NotBeNull();
-            this.ActualValidationResults.Should().BeEquivalentTo(this.ExpectedValidationResults);
-        }
-        #endregion
-    }
-
-    public enum TryGetMethod
+    public enum TryGetMethodKind
     {
         TryGetValueByApiName,
         TryGetValueByClrName,
@@ -114,288 +24,149 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
     public class TryGetTest : XUnitTest
     {
         #region User Supplied Properties
-        public List<ApiEnumValue>? ApiEnumValueCollection { get; init; }
-        public Type? ClrEnumType { get; init; }
-        public TryGetMethod? TryGetMethod { get; init; }
-        public object? Input { get; init; }
-        public bool? ExpectedFound { get; init; }
+        public required ApiTestSchemaKind ApiSchemaKind { get; init; }
+        public required string ApiEnumTypeName { get; init; }
+        public required TryGetMethodKind TryGetMethod { get; init; }
+        public required object SearchKey { get; init; }
+        public required bool ExpectedResult { get; init; }
         #endregion
 
         #region Calculated Properties
+        protected ApiSchema? ApiSchema { get; set; }
         private ApiEnumType? ApiEnumType { get; set; }
-        private bool? ActualFound { get; set; }
+        private bool? ActualResult { get; set; }
         #endregion
 
         #region XUnitTest Methods
         protected override void Arrange()
         {
-            var apiEnumValuesString = this.ApiEnumValueCollection?
-                .Select(x => $"{{{nameof(ApiEnumValue.ApiName)}={x.ApiName},{nameof(ApiEnumValue.ClrName)}={x.ClrName},{nameof(ApiEnumValue.ClrOrdinal)}={x.ClrOrdinal}}}")
-                .SafeToDelimitedString(',') ?? "None";
+            var apiSchema = ApiTestSchemaFactory.BuildTestSchema(this.ApiSchemaKind);
+            this.ApiSchema = apiSchema ?? throw new InvalidOperationException($"{nameof(Schema.ApiSchema)} creation failed.");
 
-            this.WriteLine($"API Enum Values: [{apiEnumValuesString}]");
+            var apiEnumType = this.ApiSchema.GetEnumTypeByApiName(this.ApiEnumTypeName);
+            this.ApiEnumType = apiEnumType ?? throw new InvalidOperationException($"{nameof(Schema.ApiEnumType)} '{this.ApiEnumTypeName}' not found in ApiSchema.");
+
+            this.WriteLine($"ApiSchema:      {this.ApiSchema.ApiName.SafeToString()}");
+            this.WriteLine($"ApiEnumType:    {this.ApiEnumType.ApiName.SafeToString()}");
             this.WriteLine();
-
-            var apiEnumType = new ApiEnumType(nameof(Gender), // Using 'Gender' as a placeholder API name
-                                              this.ApiEnumValueCollection ?? throw new ArgumentNullException(nameof(this.ApiEnumValueCollection)),
-                                              this.ClrEnumType ?? throw new ArgumentNullException(nameof(this.ClrEnumType)));
-            this.ApiEnumType = apiEnumType;
-
-            var apiSchema = ApiSchema.Create
-            (
-                apiName: nameof(ApiSchema),
-                apiScalarTypes: null,
-                apiEnumTypes: [apiEnumType],
-                apiObjectTypes: null
-            );
-            var result = apiSchema.Initialize();
-            result.ThrowIfInvalid();
-
-            this.WriteLine($"TryGetMethod:  {this.TryGetMethod.SafeToString()}");
-            this.WriteLine($"Input:         {this.Input.SafeToString()}");
-            this.WriteLine($"ExpectedFound: {this.ExpectedFound.SafeToString()}");
+            this.WriteLine($"TryGetMethod:   {this.TryGetMethod.SafeToString()}");
+            this.WriteLine($"SearchKey:      {this.SearchKey.SafeToString()}");
+            this.WriteLine($"ExpectedResult: {this.ExpectedResult.SafeToString()}");
             this.WriteLine();
         }
 
         protected override void Act()
         {
-            if (this.TryGetMethod is null)
+            this.ActualResult = this.TryGetMethod switch
             {
-                throw new InvalidOperationException($"{nameof(this.TryGetMethod)} is null.");
-            }
-
-            this.ActualFound = this.TryGetMethod.Value switch
-            {
-                ApiEnumTypeTests.TryGetMethod.TryGetValueByApiName => this.ApiEnumType!.TryGetValueByApiName((string)this.Input!, out _),
-                ApiEnumTypeTests.TryGetMethod.TryGetValueByClrName => this.ApiEnumType!.TryGetValueByClrName((string)this.Input!, out _),
-                ApiEnumTypeTests.TryGetMethod.TryGetValueByClrOrdinal => (bool?)this.ApiEnumType!.TryGetValueByClrOrdinal((int)this.Input!, out _),
+                TryGetMethodKind.TryGetValueByApiName => this.ApiEnumType!.TryGetValueByApiName((string)this.SearchKey!, out _),
+                TryGetMethodKind.TryGetValueByClrName => this.ApiEnumType!.TryGetValueByClrName((string)this.SearchKey!, out _),
+                TryGetMethodKind.TryGetValueByClrOrdinal => this.ApiEnumType!.TryGetValueByClrOrdinal((int)this.SearchKey!, out _),
                 _ => throw new InvalidOperationException($"Unknown {nameof(this.TryGetMethod)}: {this.TryGetMethod}"),
             };
 
-            this.WriteLine($"ActualFound: {this.ActualFound.SafeToString()}");
+            this.WriteLine($"ActualResult: {this.ActualResult.SafeToString()}");
             this.WriteLine();
         }
 
         protected override void Assert()
         {
-            this.ActualFound.Should().NotBeNull();
-            this.ActualFound.Should().Be(this.ExpectedFound);
+            this.ActualResult.Should().NotBeNull();
+            this.ActualResult.Should().Be(this.ExpectedResult);
         }
         #endregion
     }
     #endregion
 
     #region Theory Data
-    public static TheoryDataRow<IXUnitTest>[] InitializeThrowsTheoryData =>
-    [
-        // Duplicate API enum value names
-        new InitializeThrowsTest
-        {
-            Name = "Throws on duplicate API enum value names",
-            ApiEnumValueCollection =
-            [
-                new("unspecified", "Unspecified", 0),
-                new("male", "Male", 1),
-                new("female", "Female1", 2),
-                new("female", "Female2", 3), // Duplicate API Name
-            ],
-            ClrEnumType = typeof(Gender),
-            ExpectedApiSchemaExceptionMessage = $"{nameof(ApiSchema)} initialization failed.",
-            ExpectedValidationResults =
-            [
-                $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"] unable to initialize because duplicate {nameof(ApiEnumValue)}.{nameof(ApiEnumValue.ApiName)} values detected: 'female'"
-            ]
-        },
-
-        // Duplicate CLR enum value names
-        new InitializeThrowsTest
-        {
-            Name = "Throws on duplicate CLR enum value names",
-            ApiEnumValueCollection =
-            [
-                new("unspecified", "Unspecified", 0),
-                new("male", "Male", 1),
-                new("female1", "Female", 2),
-                new("female2", "Female", 3), // Duplicate CLR Name
-            ],
-            ClrEnumType = typeof(Gender),
-            ExpectedApiSchemaExceptionMessage = $"{nameof(ApiSchema)} initialization failed.",
-            ExpectedValidationResults =
-            [
-                $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"] unable to initialize because duplicate {nameof(ApiEnumValue)}.{nameof(ApiEnumValue.ClrName)} values detected: 'Female'"
-            ]
-        },
-
-        // Duplicate CLR enum value ordinals
-        new InitializeThrowsTest
-        {
-            Name = "Throws on duplicate CLR enum value ordinals",
-            ApiEnumValueCollection =
-            [
-                new("unspecified", "Unspecified", 0),
-                new("male", "Male", 1),
-                new("female", "Female", 2),
-                new("alien", "Alien", 2), // Duplicate CLR Ordinal
-            ],
-            ClrEnumType = typeof(Gender),
-            ExpectedApiSchemaExceptionMessage = $"{nameof(ApiSchema)} initialization failed.",
-            ExpectedValidationResults =
-            [
-                $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"] unable to initialize because duplicate {nameof(ApiEnumValue)}.{nameof(ApiEnumValue.ClrOrdinal)} values detected: '2'"
-            ]
-        },
-
-        // CLR type is not an enum
-        new InitializeThrowsTest
-        {
-            Name = "Throws if CLR type is not an enum",
-            ApiEnumValueCollection =
-            [
-                new("unspecified", "Unspecified", 0),
-                new("male", "Male", 1),
-                new("female", "Female", 2)
-            ],
-            ClrEnumType = typeof(string), // Using a non-enum type
-            ExpectedApiSchemaExceptionMessage = $"{nameof(ApiSchema)} initialization failed.",
-            ExpectedValidationResults =
-            [
-                $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"].{nameof(ApiEnumType.ClrType)} must be a CLR enum type."
-            ]
-        },
-    ];
-
     public static TheoryDataRow<IXUnitTest>[] TryGetTheoryData =>
     [
         // TryGetValueByApiName
         new TryGetTest
         {
-            Name = "TryGetValueByApiName works for known API enum value name and exact case",
-            ApiEnumValueCollection =
-            [
-                new("unspecified", "Unspecified", 0),
-                new("male", "Male", 1),
-                new("female", "Female", 2),
-            ],
-            ClrEnumType = typeof(Gender),
-            TryGetMethod = TryGetMethod.TryGetValueByApiName,
-            Input = "male",
-            ExpectedFound = true
+            Name = $"{nameof(ApiEnumType.TryGetValueByApiName)} returns true when {nameof(ApiEnumValue)} exists with exact case match",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiEnumTypeName = nameof(Gender),
+            TryGetMethod = TryGetMethodKind.TryGetValueByApiName,
+            SearchKey = "Male",
+            ExpectedResult = true
         },
 
         new TryGetTest
         {
-            Name = "TryGetValueByApiName works for known API enum value name and case insensitivity",
-            ApiEnumValueCollection =
-            [
-                new("unspecified", "Unspecified", 0),
-                new("male", "Male", 1),
-                new("female", "Female", 2),
-            ],
-            ClrEnumType = typeof(Gender),
-            TryGetMethod = TryGetMethod.TryGetValueByApiName,
-            Input = "MALE",
-            ExpectedFound = true
+            Name = $"{nameof(ApiEnumType.TryGetValueByApiName)} returns false when {nameof(ApiEnumValue)} exists but with case-insensitive search",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiEnumTypeName = nameof(Gender),
+            TryGetMethod = TryGetMethodKind.TryGetValueByApiName,
+            SearchKey = "MALE",
+            ExpectedResult = false
         },
 
         new TryGetTest
         {
-            Name = "TryGetValueByApiName works for unknown API enum value name",
-            ApiEnumValueCollection =
-            [
-                new("unspecified", "Unspecified", 0),
-                new("male", "Male", 1),
-                new("female", "Female", 2),
-            ],
-            ClrEnumType = typeof(Gender),
-            TryGetMethod = TryGetMethod.TryGetValueByApiName,
-            Input = "alien",
-            ExpectedFound = false
+            Name = $"{nameof(ApiEnumType.TryGetValueByApiName)} returns false when {nameof(ApiEnumValue)} does not exist",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiEnumTypeName = nameof(Gender),
+            TryGetMethod = TryGetMethodKind.TryGetValueByApiName,
+            SearchKey = "alien",
+            ExpectedResult = false
         },
 
         // TryGetValueByClrName
         new TryGetTest
         {
-            Name = "TryGetValueByClrName works for known CLR enum value name and exact case",
-            ApiEnumValueCollection =
-            [
-                new("unspecified", "Unspecified", 0),
-                new("male", "Male", 1),
-                new("female", "Female", 2),
-            ],
-            ClrEnumType = typeof(Gender),
-            TryGetMethod = TryGetMethod.TryGetValueByClrName,
-            Input = "Male",
-            ExpectedFound = true
+            Name = $"{nameof(ApiEnumType.TryGetValueByClrName)} returns true when {nameof(ApiEnumValue)} exists with exact case match",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiEnumTypeName = nameof(Gender),
+            TryGetMethod = TryGetMethodKind.TryGetValueByClrName,
+            SearchKey = "Male",
+            ExpectedResult = true
         },
 
         new TryGetTest
         {
-            Name = "TryGetValueByClrName works for known CLR enum value name and case insensitivity",
-            ApiEnumValueCollection =
-            [
-                new("unspecified", "Unspecified", 0),
-                new("male", "Male", 1),
-                new("female", "Female", 2),
-            ],
-            ClrEnumType = typeof(Gender),
-            TryGetMethod = TryGetMethod.TryGetValueByClrName,
-            Input = "MALE",
-            ExpectedFound = true
+            Name = $"{nameof(ApiEnumType.TryGetValueByClrName)} returns false when {nameof(ApiEnumValue)} exists but with case-insensitive search",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiEnumTypeName = nameof(Gender),
+            TryGetMethod = TryGetMethodKind.TryGetValueByClrName,
+            SearchKey = "MALE",
+            ExpectedResult = false
         },
 
         new TryGetTest
         {
-            Name = "TryGetValueByClrName works for unknown CLR enum value name",
-            ApiEnumValueCollection =
-            [
-                new("unspecified", "Unspecified", 0),
-                new("male", "Male", 1),
-                new("female", "Female", 2),
-            ],
-            ClrEnumType = typeof(Gender),
-            TryGetMethod = TryGetMethod.TryGetValueByClrName,
-            Input = "Alien",
-            ExpectedFound = false
+            Name = $"{nameof(ApiEnumType.TryGetValueByClrName)} returns false when {nameof(ApiEnumValue)} does not exist",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiEnumTypeName = nameof(Gender),
+            TryGetMethod = TryGetMethodKind.TryGetValueByClrName,
+            SearchKey = "Alien",
+            ExpectedResult = false
         },
 
         // TryGetValueByClrOrdinal
         new TryGetTest
         {
-            Name = "TryGetValueByClrOrdinal works for known CLR enum value ordinal",
-            ApiEnumValueCollection =
-            [
-                new("unspecified", "Unspecified", 0),
-                new("male", "Male", 1),
-                new("female", "Female", 2),
-            ],
-            ClrEnumType = typeof(Gender),
-            TryGetMethod = TryGetMethod.TryGetValueByClrOrdinal,
-            Input = 1,
-            ExpectedFound = true
+            Name = $"{nameof(ApiEnumType.TryGetValueByClrOrdinal)} returns true when {nameof(ApiEnumValue)} exists for given ordinal",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiEnumTypeName = nameof(Gender),
+            TryGetMethod = TryGetMethodKind.TryGetValueByClrOrdinal,
+            SearchKey = 1,
+            ExpectedResult = true
         },
 
         new TryGetTest
         {
-            Name = "TryGetValueByClrOrdinal works for unknown CLR enum value ordinal",
-            ApiEnumValueCollection =
-            [
-                new("unspecified", "Unspecified", 0),
-                new("male", "Male", 1),
-                new("female", "Female", 2),
-            ],
-            ClrEnumType = typeof(Gender),
-            TryGetMethod = TryGetMethod.TryGetValueByClrOrdinal,
-            Input = 3,
-            ExpectedFound = false
+            Name = $"{nameof(ApiEnumType.TryGetValueByClrOrdinal)} returns false when {nameof(ApiEnumValue)} does not exist for given ordinal",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiEnumTypeName = nameof(Gender),
+            TryGetMethod = TryGetMethodKind.TryGetValueByClrOrdinal,
+            SearchKey = 3,
+            ExpectedResult = false
         },
     ];
     #endregion
 
     #region Test Methods
-    [Theory]
-    [MemberData(nameof(InitializeThrowsTheoryData))]
-    public void InitializeThrows(IXUnitTest test) => test.Execute(this);
-
     [Theory]
     [MemberData(nameof(TryGetTheoryData))]
     public void TryGet(IXUnitTest test) => test.Execute(this);

@@ -3,10 +3,8 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using System.ComponentModel.DataAnnotations;
-
 using Evoogle.ApiFramework.Exceptions;
-using Evoogle.Extensions;
+using Evoogle.ApiFramework.Schema.Internal;
 
 namespace Evoogle.ApiFramework.Schema;
 
@@ -16,6 +14,7 @@ namespace Evoogle.ApiFramework.Schema;
 /// </summary>
 /// <remarks>
 ///     I am thinking of renaming this class to "ApiNullType" in the future.
+///     Actually, it might be better to avoid using this class altogether and instead use nullable references to ApiType where needed.
 /// </remarks>
 [Obsolete("Consider using nullable ApiType references instead of ApiUnknownType.")]
 public sealed class ApiUnknownType() : ApiType()
@@ -37,13 +36,17 @@ public sealed class ApiUnknownType() : ApiType()
     protected override string ApiTypeName => nameof(ApiUnknownType);
     #endregion
 
-    #region ApiType Methods
+    #region ApiSchemaElement Methods
     /// <inheritdoc />
-    protected override string GetValidationPath() => $"{this.ApiTypeName.SafeToString()}";
+    protected override string BuildPath(string? apiParentPath)
+        => ApiSchemaHelpers.BuildPath(apiParentPath, apiChildPath: this.ApiTypeName, apiApiName: null);
 
-    internal override void Initialize(ApiSchema apiSchema, ApiSchemaContext apiSchemaContext, ref List<ValidationResult>? results)
+    /// <inheritdoc />
+    internal override void Initialize(ApiInitializationContext context)
     {
-        // No initialization needed for unknown type.
+        ArgumentNullException.ThrowIfNull(context);
+
+        base.Initialize(context);
     }
     #endregion
 

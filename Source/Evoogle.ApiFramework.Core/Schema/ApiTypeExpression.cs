@@ -3,7 +3,6 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 using Evoogle.ApiFramework.Exceptions;
@@ -121,7 +120,61 @@ public sealed class ApiTypeExpression
     }
     #endregion
 
-    #region Methods
+    #region ApiTypeExpression Methods
+    internal void InitializeForCollection(ApiInitializationContext context)
+    {
+        this.Initialize(context, ApiInitializationCode.API_COLLECTION_TYPE_UNRESOLVED_ITEM_TYPE, nameof(ApiCollectionType.ApiItemType));
+    }
+
+    internal void InitializeForProperty(ApiInitializationContext context)
+    {
+        this.Initialize(context, ApiInitializationCode.API_PROPERTY_UNRESOLVED_TYPE, nameof(ApiProperty.ApiType));
+    }
+
+    private void Initialize
+    (
+        ApiInitializationContext context,
+        ApiInitializationCode parentUnresolvedCode,
+        string parentUnresolvedName
+    )
+    {
+        ArgumentNullException.ThrowIfNull(context);
+
+        _apiResolvedType = null;
+
+        // Try and resolve API type:
+        // - Inline API type
+        // - API named reference
+        // - CLR type reference
+        if (this.IsInline)
+        {
+            this.InitializeApiTypeByInline(context);
+            return;
+        }
+        else if (this.IsApiNamedReference)
+        {
+            this.InitializeApiTypeByApiNamedReference(context, parentUnresolvedCode, parentUnresolvedName);
+            return;
+        }
+        else if (this.IsClrTypeReference)
+        {
+            this.InitializeApiTypeByClrTypeReference(context, parentUnresolvedCode, parentUnresolvedName);
+            return;
+        }
+        else
+        {
+            var path = $"{context.ApiParentPath.SafeToString()}.{parentUnresolvedName}";
+            var severity = ApiInitializationSeverity.Error;
+            var code = parentUnresolvedCode;
+            var description = $"{parentUnresolvedName} is unresolved because neither {nameof(this.ApiInlineType)}, nor a valid combination of {nameof(this.Kind)} and {nameof(this.ApiName)}, nor {nameof(this.ClrType)} is set";
+            var remediation = $"Set either {nameof(this.ApiInlineType)}, or a valid combination of {nameof(this.Kind)} and {nameof(this.ApiName)}, or {nameof(this.ClrType)}";
+
+            context.AddIssue(path, severity, code, description, remediation);
+        }
+    }
+    #endregion
+
+    #region Factory Methods
     public static ApiTypeExpression ClrRef<T>() => new(typeof(T));
 
     public static ApiTypeExpression HashSetOf<T>(ApiTypeModifiers apiItemTypeModifiers)
@@ -129,37 +182,6 @@ public sealed class ApiTypeExpression
 
     public static ApiTypeExpression ListOf<T>(ApiTypeModifiers apiItemTypeModifiers)
         => new(new ApiCollectionType(ClrRef<T>(), apiItemTypeModifiers, typeof(List<T>)));
-
-    internal void Initialize(ApiSchema apiSchema, string apiValidationPath, ref List<ValidationResult>? results)
-    {
-        ArgumentNullException.ThrowIfNull(apiSchema);
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiValidationPath);
-
-        _apiResolvedType = null;
-
-        // Try and resolve API type with inlined API type first if applicable
-        if (this.IsInline)
-        {
-            this.InitializeApiTypeByInline(apiSchema, ref results);
-            return;
-        }
-
-        // Try and resolve API type with API named reference or CLR type reference if applicable
-        if (this.IsApiNamedReference)
-        {
-            this.InitializeApiTypeByApiNamedReference(apiSchema, apiValidationPath, ref results);
-            return;
-        }
-        else if (this.IsClrTypeReference)
-        {
-            this.InitializeApiTypeByClrTypeReference(apiSchema, apiValidationPath, ref results);
-            return;
-        }
-
-        // Unable to resolve API type with either an API named reference or a CLR type reference.
-        results ??= [];
-        results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ApiType)} is unresolved because neither {nameof(this.ApiInlineType)}, nor a valid combination of {nameof(this.Kind)} and {nameof(this.ApiName)}, nor {nameof(this.ClrType)} is set.", [nameof(this.ApiType)]));
-    }
     #endregion
 
     #region Object Methods
@@ -180,7 +202,12 @@ public sealed class ApiTypeExpression
     #endregion
 
     #region Implementation Methods
-    private void InitializeApiTypeByApiNamedReference(ApiSchema apiSchema, string apiValidationPath, ref List<ValidationResult>? results)
+    private void InitializeApiTypeByApiNamedReference
+    (
+        ApiInitializationContext context,
+        ApiInitializationCode parentUnresolvedCode,
+        string parentUnresolvedName
+    )
     {
         var kind = this.Kind!;
         var apiName = this.ApiName!;
@@ -188,22 +215,27 @@ public sealed class ApiTypeExpression
         switch (kind)
         {
             case ApiTypeKind.Scalar:
-                _apiResolvedType = apiSchema.TryGetScalarTypeByApiName(apiName, out var apiScalarType) ? apiScalarType : null;
+                _apiResolvedType = context.ApiSchema.TryGetScalarTypeByApiName(apiName, out var apiScalarType) ? apiScalarType : null;
                 break;
 
             case ApiTypeKind.Enum:
-                _apiResolvedType = apiSchema.TryGetEnumTypeByApiName(apiName, out var apiEnumType) ? apiEnumType : null;
+                _apiResolvedType = context.ApiSchema.TryGetEnumTypeByApiName(apiName, out var apiEnumType) ? apiEnumType : null;
                 break;
 
             case ApiTypeKind.Object:
-                _apiResolvedType = apiSchema.TryGetObjectTypeByApiName(apiName, out var apiObjectType) ? apiObjectType : null;
+                _apiResolvedType = context.ApiSchema.TryGetObjectTypeByApiName(apiName, out var apiObjectType) ? apiObjectType : null;
                 break;
 
             case ApiTypeKind.Collection:
                 {
-                    results ??= [];
-                    results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.Kind)} is set to {nameof(ApiTypeKind.Collection)} which is invalid.", [nameof(this.Kind)]));
-                    break;
+                    var path = $"{context.ApiParentPath.SafeToString()}.{parentUnresolvedName}";
+                    var severity = ApiInitializationSeverity.Error;
+                    var code = parentUnresolvedCode;
+                    var description = $"{parentUnresolvedName} cannot be resolved for {nameof(this.Kind)}={this.Kind.SafeToString()} and {nameof(this.ApiName)}={this.ApiName.SafeToString()} because collections must be defined inline.";
+                    var remediation = $"Define collections inline using {nameof(this.ApiInlineType)} instead of using {nameof(this.Kind)}={this.Kind.SafeToString()} and {nameof(this.ApiName)}={this.ApiName.SafeToString()}.";
+
+                    context.AddIssue(path, severity, code, description, remediation);
+                    return;
                 }
 
             default:
@@ -212,31 +244,46 @@ public sealed class ApiTypeExpression
 
         if (_apiResolvedType is null)
         {
-            results ??= [];
-            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ApiType)} is unresolved for {nameof(this.Kind)}={this.Kind.SafeToString()} and {nameof(this.ApiName)}={this.ApiName.SafeToString()}.", [nameof(this.ApiType)]));
+            var path = $"{context.ApiParentPath.SafeToString()}.{parentUnresolvedName}";
+            var severity = ApiInitializationSeverity.Error;
+            var code = parentUnresolvedCode;
+            var description = $"{parentUnresolvedName} is unresolved for {nameof(this.Kind)}={this.Kind.SafeToString()} and {nameof(this.ApiName)}={this.ApiName.SafeToString()}";
+            var remediation = $"Ensure that an {parentUnresolvedName} is declared in the schema for {nameof(this.Kind)}={this.Kind.SafeToString()} and {nameof(this.ApiName)}={this.ApiName.SafeToString()}";
+
+            context.AddIssue(path, severity, code, description, remediation);
         }
     }
 
-    private void InitializeApiTypeByClrTypeReference(ApiSchema apiSchema, string apiValidationPath, ref List<ValidationResult>? results)
+    private void InitializeApiTypeByClrTypeReference
+    (
+        ApiInitializationContext context,
+        ApiInitializationCode parentUnresolvedCode,
+        string parentUnresolvedName
+    )
     {
         var clrType = this.ClrType!;
-        _apiResolvedType = apiSchema.TryGetTypeByClrType(clrType, out var apiType) ? apiType : null;
+
+        _apiResolvedType = context.ApiSchema.TryGetTypeByClrType(clrType, out var apiType) ? apiType : null;
 
         if (_apiResolvedType is null)
         {
-            results ??= [];
-            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ApiType)} is unresolved for {nameof(this.ClrType)}={this.ClrType.SafeToName()}.", [nameof(this.ApiType)]));
+            var path = $"{context.ApiParentPath.SafeToString()}.{parentUnresolvedName}";
+            var severity = ApiInitializationSeverity.Error;
+            var code = parentUnresolvedCode;
+            var description = $"{parentUnresolvedName} is unresolved for {nameof(this.ClrType)}={this.ClrType.SafeToName()}";
+            var remediation = $"Ensure that an {parentUnresolvedName} is declared in the schema for {nameof(this.ClrType)}={this.ClrType.SafeToName()}";
+            context.AddIssue(path, severity, code, description, remediation);
         }
     }
 
-    private void InitializeApiTypeByInline(ApiSchema apiSchema, ref List<ValidationResult>? results)
+    private void InitializeApiTypeByInline(ApiInitializationContext context)
     {
+        _apiResolvedType = this.ApiInlineType;
+
         if (this.ApiInlineType is ApiCollectionType collection)
         {
-            collection.Initialize(apiSchema, apiSchema.Context, ref results);
+            collection.Initialize(context);
         }
-
-        _apiResolvedType = this.ApiInlineType;
     }
     #endregion
 }

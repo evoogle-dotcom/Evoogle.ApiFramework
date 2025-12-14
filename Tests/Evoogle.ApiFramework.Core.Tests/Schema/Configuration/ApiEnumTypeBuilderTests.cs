@@ -70,6 +70,7 @@ public class ApiEnumTypeBuilderTests(ITestOutputHelper output) : XUnitTests(outp
             (
                 this.ApiTypeExpected.As<ApiEnumType>(),
                 opt => opt
+                    .Excluding(info => info.Path.Contains(nameof(ApiSchemaElement.ApiPath)))
                     .WithStrictOrdering()
             );
         }

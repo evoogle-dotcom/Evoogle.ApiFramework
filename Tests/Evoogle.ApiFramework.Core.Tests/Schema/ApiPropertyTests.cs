@@ -329,12 +329,12 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
     #endregion
 
     #region Theory Data
-    public static TheoryDataRow<IXUnitTest>[] TryGetGenericTheoryData() =>
+    public static TheoryDataRow<IXUnitTest>[] TryGetGenericTheoryData =>
     [
         // Required Properties
         new TryGetGenericTest<ScalarsOnly, string>
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredName)} TryGetValue<TObject,TValue> returns failure for null object",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredName)} {nameof(ApiProperty.TryGetValue)}<TObject,TValue> returns failure for null object",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.RequiredName),
@@ -344,7 +344,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TryGetGenericTest<ScalarsOnly, string>
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredName)} TryGetValue<TObject,TValue> returns success for required string property",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredName)} {nameof(ApiProperty.TryGetValue)}<TObject,TValue> returns success for required string property",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.RequiredName),
@@ -355,7 +355,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TryGetGenericTest<ScalarsOnly, long>
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredNumber)} TryGetValue<TObject,TValue> returns success for required long property",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredNumber)} {nameof(ApiProperty.TryGetValue)}<TObject,TValue> returns success for required long property",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.RequiredNumber),
@@ -366,7 +366,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TryGetGenericTest<ScalarsOnly, bool>
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredPredicate)} TryGetValue<TObject,TValue> returns success for required bool property",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredPredicate)} {nameof(ApiProperty.TryGetValue)}<TObject,TValue> returns success for required bool property",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.RequiredPredicate),
@@ -378,7 +378,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
         // Optional Fields
         new TryGetGenericTest<ScalarsOnly, string?>
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalName)} TryGetValue<TObject,TValue> returns success for optional string field for non-null value",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalName)} {nameof(ApiProperty.TryGetValue)}<TObject,TValue> returns success for optional string field for non-null value",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.OptionalName),
@@ -389,7 +389,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TryGetGenericTest<ScalarsOnly, string?>
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalName)} TryGetValue<TObject,TValue> returns success for optional string field for null value",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalName)} {nameof(ApiProperty.TryGetValue)}<TObject,TValue> returns success for optional string field for null value",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.OptionalName),
@@ -400,7 +400,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TryGetGenericTest<ScalarsOnly, long?>
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalNumber)} TryGetValue<TObject,TValue> returns success for optional long field for non-null value",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalNumber)} {nameof(ApiProperty.TryGetValue)}<TObject,TValue> returns success for optional long field for non-null value",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.OptionalNumber),
@@ -411,7 +411,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TryGetGenericTest<ScalarsOnly, long?>
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalNumber)} TryGetValue<TObject,TValue> returns success for optional long field for null value",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalNumber)} {nameof(ApiProperty.TryGetValue)}<TObject,TValue> returns success for optional long field for null value",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.OptionalNumber),
@@ -422,7 +422,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TryGetGenericTest<ScalarsOnly, bool?>
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalPredicate)} TryGetValue<TObject,TValue> returns success for optional bool field for non-null value",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalPredicate)} {nameof(ApiProperty.TryGetValue)}<TObject,TValue> returns success for optional bool field for non-null value",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.OptionalPredicate),
@@ -433,7 +433,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TryGetGenericTest<ScalarsOnly, bool?>
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalPredicate)} TryGetValue<TObject,TValue> returns success for optional bool field for null value",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalPredicate)} {nameof(ApiProperty.TryGetValue)}<TObject,TValue> returns success for optional bool field for null value",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.OptionalPredicate),
@@ -445,7 +445,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
         // Required Properties With Coercion
         new TryGetGenericTest<ScalarsOnly, string>
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredNumber)} TryGetValue<TObject,TValue> returns success for required long property with coercion to string",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredNumber)} {nameof(ApiProperty.TryGetValue)}<TObject,TValue> returns success for required long property with coercion to string",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.RequiredNumber),
@@ -456,7 +456,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TryGetGenericTest<ScalarsOnly, string>
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredPredicate)} TryGetValue<TObject,TValue> returns success for required bool property with coercion to string",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredPredicate)} {nameof(ApiProperty.TryGetValue)}<TObject,TValue> returns success for required bool property with coercion to string",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.RequiredPredicate),
@@ -468,7 +468,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
         // Optional Fields With Coercion
         new TryGetGenericTest<ScalarsOnly, string?>
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalNumber)} TryGetValue<TObject,TValue> returns success for optional long field for non-null value with coercion to string",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalNumber)} {nameof(ApiProperty.TryGetValue)}<TObject,TValue> returns success for optional long field for non-null value with coercion to string",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.OptionalNumber),
@@ -479,7 +479,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TryGetGenericTest<ScalarsOnly, string?>
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalNumber)} TryGetValue<TObject,TValue> returns success for optional long field for null value with coercion to string",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalNumber)} {nameof(ApiProperty.TryGetValue)}<TObject,TValue> returns success for optional long field for null value with coercion to string",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.OptionalNumber),
@@ -490,7 +490,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TryGetGenericTest<ScalarsOnly, string?>
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalPredicate)} TryGetValue<TObject,TValue> returns success for optional bool field for non-null value with coercion to string",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalPredicate)} {nameof(ApiProperty.TryGetValue)}<TObject,TValue> returns success for optional bool field for non-null value with coercion to string",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.OptionalPredicate),
@@ -501,7 +501,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TryGetGenericTest<ScalarsOnly, string?>
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalPredicate)} TryGetValue<TObject,TValue> returns success for optional bool field for null value with coercion to string",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalPredicate)} {nameof(ApiProperty.TryGetValue)}<TObject,TValue> returns success for optional bool field for null value with coercion to string",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.OptionalPredicate),
@@ -511,12 +511,12 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
         },
     ];
 
-    public static TheoryDataRow<IXUnitTest>[] TryGetNonGenericTheoryData() =>
+    public static TheoryDataRow<IXUnitTest>[] TryGetNonGenericTheoryData =>
     [
         // Required Properties
         new TryGetNonGenericTest
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredName)} TryGetValue returns failure for null object",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredName)} {nameof(ApiProperty.TryGetValue)} returns failure for null object",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.RequiredName),
@@ -526,7 +526,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TryGetNonGenericTest
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredName)} TryGetValue returns success for required string property",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredName)} {nameof(ApiProperty.TryGetValue)} returns success for required string property",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.RequiredName),
@@ -537,7 +537,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TryGetNonGenericTest
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredNumber)} TryGetValue returns success for required long property",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredNumber)} {nameof(ApiProperty.TryGetValue)} returns success for required long property",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.RequiredNumber),
@@ -548,7 +548,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TryGetNonGenericTest
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredPredicate)} TryGetValue returns success for required bool property",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredPredicate)} {nameof(ApiProperty.TryGetValue)} returns success for required bool property",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.RequiredPredicate),
@@ -560,7 +560,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
         // Optional Fields
         new TryGetNonGenericTest
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalName)} TryGetValue returns success for optional string field for non-null value",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalName)} {nameof(ApiProperty.TryGetValue)} returns success for optional string field for non-null value",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.OptionalName),
@@ -571,7 +571,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TryGetNonGenericTest
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalName)} TryGetValue returns success for optional string field for null value",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalName)} {nameof(ApiProperty.TryGetValue)} returns success for optional string field for null value",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.OptionalName),
@@ -582,7 +582,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TryGetNonGenericTest
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalNumber)} TryGetValue returns success for optional long field for non-null value",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalNumber)} {nameof(ApiProperty.TryGetValue)} returns success for optional long field for non-null value",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.OptionalNumber),
@@ -593,7 +593,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TryGetNonGenericTest
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalNumber)} TryGetValue returns success for optional long field for null value",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalNumber)} {nameof(ApiProperty.TryGetValue)} returns success for optional long field for null value",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.OptionalNumber),
@@ -604,7 +604,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TryGetNonGenericTest
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalPredicate)} TryGetValue returns success for optional bool field for non-null value",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalPredicate)} {nameof(ApiProperty.TryGetValue)} returns success for optional bool field for non-null value",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.OptionalPredicate),
@@ -615,7 +615,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TryGetNonGenericTest
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalPredicate)} TryGetValue returns success for optional bool field for null value",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalPredicate)} {nameof(ApiProperty.TryGetValue)} returns success for optional bool field for null value",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.OptionalPredicate),
@@ -627,7 +627,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
         // Required Properties With Coercion
         new TryGetNonGenericTest
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredNumber)} TryGetValue returns success for required long property with coercion to string",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredNumber)} {nameof(ApiProperty.TryGetValue)} returns success for required long property with coercion to string",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.RequiredNumber),
@@ -639,7 +639,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TryGetNonGenericTest
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredPredicate)} TryGetValue returns success for required bool property with coercion to string",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredPredicate)} {nameof(ApiProperty.TryGetValue)} returns success for required bool property with coercion to string",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.RequiredPredicate),
@@ -652,7 +652,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
         // Optional Fields With Coercion
         new TryGetNonGenericTest
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalNumber)} TryGetValue returns success for optional long field for non-null value with coercion to string",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalNumber)} {nameof(ApiProperty.TryGetValue)} returns success for optional long field for non-null value with coercion to string",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.OptionalNumber),
@@ -664,7 +664,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TryGetNonGenericTest
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalNumber)} TryGetValue returns success for optional long field for null value with coercion to string",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalNumber)} {nameof(ApiProperty.TryGetValue)} returns success for optional long field for null value with coercion to string",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.OptionalNumber),
@@ -676,7 +676,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TryGetNonGenericTest
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalPredicate)} TryGetValue returns success for optional bool field for non-null value with coercion to string",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalPredicate)} {nameof(ApiProperty.TryGetValue)} returns success for optional bool field for non-null value with coercion to string",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.OptionalPredicate),
@@ -688,7 +688,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TryGetNonGenericTest
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalPredicate)} TryGetValue returns success for optional bool field for null value with coercion to string",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalPredicate)} {nameof(ApiProperty.TryGetValue)} returns success for optional bool field for null value with coercion to string",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.OptionalPredicate),
@@ -699,12 +699,12 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
         },
     ];
 
-    public static TheoryDataRow<IXUnitTest>[] TrySetGenericTheoryData() =>
+    public static TheoryDataRow<IXUnitTest>[] TrySetGenericTheoryData =>
     [
         // Required Properties
         new TrySetGenericTest<ScalarsOnly, string>
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredName)} TrySetValue<TObject,TValue> returns success for required string property for non-null value",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredName)} {nameof(ApiProperty.TrySetValue)}<TObject,TValue> returns success for required string property for non-null value",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.RequiredName),
@@ -716,7 +716,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TrySetGenericTest<ScalarsOnly, string>
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredName)} TrySetValue<TObject,TValue> returns success for required string property for null value",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredName)} {nameof(ApiProperty.TrySetValue)}<TObject,TValue> returns success for required string property for null value",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.RequiredName),
@@ -728,7 +728,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TrySetGenericTest<ScalarsOnly, long>
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredNumber)} TrySetValue<TObject,TValue> returns success for required long property",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredNumber)} {nameof(ApiProperty.TrySetValue)}<TObject,TValue> returns success for required long property",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.RequiredNumber),
@@ -740,7 +740,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TrySetGenericTest<ScalarsOnly, bool>
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredPredicate)} TrySetValue<TObject,TValue> returns success for required bool property",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredPredicate)} {nameof(ApiProperty.TrySetValue)}<TObject,TValue> returns success for required bool property",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.RequiredPredicate),
@@ -753,7 +753,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
         // Optional Fields
         new TrySetGenericTest<ScalarsOnly, string?>
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalName)} TrySetValue<TObject,TValue> returns success for optional string field for non-null value",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalName)} {nameof(ApiProperty.TrySetValue)}<TObject,TValue> returns success for optional string field for non-null value",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.OptionalName),
@@ -765,7 +765,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TrySetGenericTest<ScalarsOnly, string?>
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalName)} TrySetValue<TObject,TValue> returns success for optional string field for null value",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalName)} {nameof(ApiProperty.TrySetValue)}<TObject,TValue> returns success for optional string field for null value",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.OptionalName),
@@ -777,7 +777,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TrySetGenericTest<ScalarsOnly, long?>
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalNumber)} TrySetValue<TObject,TValue> returns success for optional long field for non-null value",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalNumber)} {nameof(ApiProperty.TrySetValue)}<TObject,TValue> returns success for optional long field for non-null value",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.OptionalNumber),
@@ -789,7 +789,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TrySetGenericTest<ScalarsOnly, long?>
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalNumber)} TrySetValue<TObject,TValue> returns success for optional long field for null value",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalNumber)} {nameof(ApiProperty.TrySetValue)}<TObject,TValue> returns success for optional long field for null value",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.OptionalNumber),
@@ -801,7 +801,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TrySetGenericTest<ScalarsOnly, bool?>
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalPredicate)} TrySetValue<TObject,TValue> returns success for optional bool field for non-null value",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalPredicate)} {nameof(ApiProperty.TrySetValue)}<TObject,TValue> returns success for optional bool field for non-null value",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.OptionalPredicate),
@@ -813,7 +813,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TrySetGenericTest<ScalarsOnly, bool?>
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalPredicate)} TrySetValue<TObject,TValue> returns success for optional bool field for null value",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalPredicate)} {nameof(ApiProperty.TrySetValue)}<TObject,TValue> returns success for optional bool field for null value",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.OptionalPredicate),
@@ -826,7 +826,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
         // Required Properties With Coercion
         new TrySetGenericTest<ScalarsOnly, long>
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredName)} TrySetValue<TObject,TValue> returns success for required string property for non-null value with coercion from long",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredName)} {nameof(ApiProperty.TrySetValue)}<TObject,TValue> returns success for required string property for non-null value with coercion from long",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.RequiredName),
@@ -838,7 +838,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TrySetGenericTest<ScalarsOnly, long?>
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredName)} TrySetValue<TObject,TValue> returns success for required string property for null value with coercion from nullable long",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredName)} {nameof(ApiProperty.TrySetValue)}<TObject,TValue> returns success for required string property for null value with coercion from nullable long",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.RequiredName),
@@ -850,7 +850,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TrySetGenericTest<ScalarsOnly, string>
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredNumber)} TrySetValue<TObject,TValue> returns success for required long property with coercion from string",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredNumber)} {nameof(ApiProperty.TrySetValue)}<TObject,TValue> returns success for required long property with coercion from string",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.RequiredNumber),
@@ -862,7 +862,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TrySetGenericTest<ScalarsOnly, string>
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredPredicate)} TrySetValue<TObject,TValue> returns success for required bool property with coercion from string",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredPredicate)} {nameof(ApiProperty.TrySetValue)}<TObject,TValue> returns success for required bool property with coercion from string",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.RequiredPredicate),
@@ -875,7 +875,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
         // Optional Fields With Coercion
         new TrySetGenericTest<ScalarsOnly, Ulid?>
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalName)} TrySetValue<TObject,TValue> returns success for optional string field for non-null value with coercion from nullable Ulid",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalName)} {nameof(ApiProperty.TrySetValue)}<TObject,TValue> returns success for optional string field for non-null value with coercion from nullable Ulid",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.OptionalName),
@@ -887,7 +887,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TrySetGenericTest<ScalarsOnly, Ulid?>
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalName)} TrySetValue<TObject,TValue> returns success for optional string field for null value with coercion from nullable Ulid",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalName)} {nameof(ApiProperty.TrySetValue)}<TObject,TValue> returns success for optional string field for null value with coercion from nullable Ulid",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.OptionalName),
@@ -899,7 +899,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TrySetGenericTest<ScalarsOnly, string?>
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalNumber)} TrySetValue<TObject,TValue> returns success for optional long field for non-null value with coercion from string",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalNumber)} {nameof(ApiProperty.TrySetValue)}<TObject,TValue> returns success for optional long field for non-null value with coercion from string",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.OptionalNumber),
@@ -911,7 +911,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TrySetGenericTest<ScalarsOnly, string?>
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalNumber)} TrySetValue<TObject,TValue> returns success for optional long field for null value with coercion from string",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalNumber)} {nameof(ApiProperty.TrySetValue)}<TObject,TValue> returns success for optional long field for null value with coercion from string",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.OptionalNumber),
@@ -923,7 +923,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TrySetGenericTest<ScalarsOnly, string?>
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalPredicate)} TrySetValue<TObject,TValue> returns success for optional bool field for non-null value with coercion from string",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalPredicate)} {nameof(ApiProperty.TrySetValue)}<TObject,TValue> returns success for optional bool field for non-null value with coercion from string",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.OptionalPredicate),
@@ -935,7 +935,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TrySetGenericTest<ScalarsOnly, string?>
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalPredicate)} TrySetValue<TObject,TValue> returns success for optional bool field for null value with coercion from string",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalPredicate)} {nameof(ApiProperty.TrySetValue)}<TObject,TValue> returns success for optional bool field for null value with coercion from string",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.OptionalPredicate),
@@ -946,12 +946,12 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
         },
     ];
 
-    public static TheoryDataRow<IXUnitTest>[] TrySetByRefGenericTheoryData() =>
+    public static TheoryDataRow<IXUnitTest>[] TrySetByRefGenericTheoryData =>
     [
         // Required Fields
         new TrySetByRefGenericTest<Point, long>
         {
-            Name = $"{nameof(Point)}:{nameof(Point.X)} TrySetValueByRef<TObject,TValue> returns success for required long field",
+            Name = $"{nameof(Point)}:{nameof(Point.X)} {nameof(ApiProperty.TrySetValueByRef)}<TObject,TValue> returns success for required long field",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(Point),
             ApiPropertyName = nameof(Point.X),
@@ -964,7 +964,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
         // Required Fields With Coercion
         new TrySetByRefGenericTest<Point, string>
         {
-            Name = $"{nameof(Point)}:{nameof(Point.X)} TrySetValueByRef<TObject,TValue> returns success for required long field with coercion from string",
+            Name = $"{nameof(Point)}:{nameof(Point.X)} {nameof(ApiProperty.TrySetValueByRef)}<TObject,TValue> returns success for required long field with coercion from string",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(Point),
             ApiPropertyName = nameof(Point.X),
@@ -977,7 +977,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
         // Required Properties
         new TrySetByRefGenericTest<Point, long>
         {
-            Name = $"{nameof(Point)}:{nameof(Point.Y)} TrySetValueByRef<TObject,TValue> returns success for required long property",
+            Name = $"{nameof(Point)}:{nameof(Point.Y)} {nameof(ApiProperty.TrySetValueByRef)}<TObject,TValue> returns success for required long property",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(Point),
             ApiPropertyName = nameof(Point.Y),
@@ -990,7 +990,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
         // Required Properties With Coercion
         new TrySetByRefGenericTest<Point, string>
         {
-            Name = $"{nameof(Point)}:{nameof(Point.Y)} TrySetValueByRef<TObject,TValue> returns success for required long property with coercion from string",
+            Name = $"{nameof(Point)}:{nameof(Point.Y)} {nameof(ApiProperty.TrySetValueByRef)}<TObject,TValue> returns success for required long property with coercion from string",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(Point),
             ApiPropertyName = nameof(Point.Y),
@@ -1003,7 +1003,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
         // Optional Properties
         new TrySetByRefGenericTest<Point, string?>
         {
-            Name = $"{nameof(Point)}:{nameof(Point.Note)} TrySetValueByRef<TObject,TValue> returns success for optional string field for non-null value",
+            Name = $"{nameof(Point)}:{nameof(Point.Note)} {nameof(ApiProperty.TrySetValueByRef)}<TObject,TValue> returns success for optional string field for non-null value",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(Point),
             ApiPropertyName = nameof(Point.Note),
@@ -1015,7 +1015,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TrySetByRefGenericTest<Point, string?>
         {
-            Name = $"{nameof(Point)}:{nameof(Point.Note)} TrySetValueByRef<TObject,TValue> returns success for optional string field for null value",
+            Name = $"{nameof(Point)}:{nameof(Point.Note)} {nameof(ApiProperty.TrySetValueByRef)}<TObject,TValue> returns success for optional string field for null value",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(Point),
             ApiPropertyName = nameof(Point.Note),
@@ -1028,7 +1028,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
         // Optional Properties With Coercion
         new TrySetByRefGenericTest<Point, Guid?>
         {
-            Name = $"{nameof(Point)}:{nameof(Point.Note)} TrySetValueByRef<TObject,TValue> returns success for optional string field for non-null value with coercion from nullable Guid",
+            Name = $"{nameof(Point)}:{nameof(Point.Note)} {nameof(ApiProperty.TrySetValueByRef)}<TObject,TValue> returns success for optional string field for non-null value with coercion from nullable Guid",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(Point),
             ApiPropertyName = nameof(Point.Note),
@@ -1040,7 +1040,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TrySetByRefGenericTest<Point, Guid?>
         {
-            Name = $"{nameof(Point)}:{nameof(Point.Note)} TrySetValueByRef<TObject,TValue> returns success for optional string field for null value with coercion from nullable Guid",
+            Name = $"{nameof(Point)}:{nameof(Point.Note)} {nameof(ApiProperty.TrySetValueByRef)}<TObject,TValue> returns success for optional string field for null value with coercion from nullable Guid",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(Point),
             ApiPropertyName = nameof(Point.Note),
@@ -1051,12 +1051,12 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
         },
     ];
 
-    public static TheoryDataRow<IXUnitTest>[] TrySetNonGenericTheoryData() =>
+    public static TheoryDataRow<IXUnitTest>[] TrySetNonGenericTheoryData =>
     [
         // Required Properties
         new TrySetNonGenericTest
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredName)} TrySetValue returns success for required string property for non-null value",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredName)} {nameof(ApiProperty.TrySetValue)} returns success for required string property for non-null value",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.RequiredName),
@@ -1068,7 +1068,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TrySetNonGenericTest
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredName)} TrySetValue returns success for required string property for null value",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredName)} {nameof(ApiProperty.TrySetValue)} returns success for required string property for null value",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.RequiredName),
@@ -1080,7 +1080,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TrySetNonGenericTest
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredNumber)} TrySetValue returns success for required long property",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredNumber)} {nameof(ApiProperty.TrySetValue)} returns success for required long property",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.RequiredNumber),
@@ -1092,7 +1092,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TrySetNonGenericTest
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredPredicate)} TrySetValue returns success for required bool property",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredPredicate)} {nameof(ApiProperty.TrySetValue)} returns success for required bool property",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.RequiredPredicate),
@@ -1105,7 +1105,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
         // Optional Fields
         new TrySetNonGenericTest
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalName)} TrySetValue returns success for optional string field for non-null value",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalName)} {nameof(ApiProperty.TrySetValue)} returns success for optional string field for non-null value",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.OptionalName),
@@ -1117,7 +1117,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TrySetNonGenericTest
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalName)} TrySetValue returns success for optional string field for null value",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalName)} {nameof(ApiProperty.TrySetValue)} returns success for optional string field for null value",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.OptionalName),
@@ -1129,7 +1129,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TrySetNonGenericTest
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalNumber)} TrySetValue returns success for optional long field for non-null value",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalNumber)} {nameof(ApiProperty.TrySetValue)} returns success for optional long field for non-null value",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.OptionalNumber),
@@ -1141,7 +1141,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TrySetNonGenericTest
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalNumber)} TrySetValue returns success for optional long field for null value",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalNumber)} {nameof(ApiProperty.TrySetValue)} returns success for optional long field for null value",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.OptionalNumber),
@@ -1153,7 +1153,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TrySetNonGenericTest
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalPredicate)} TrySetValue returns success for optional bool field for non-null value",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalPredicate)} {nameof(ApiProperty.TrySetValue)} returns success for optional bool field for non-null value",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.OptionalPredicate),
@@ -1165,7 +1165,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TrySetNonGenericTest
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalPredicate)} TrySetValue returns success for optional bool field for null value",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalPredicate)} {nameof(ApiProperty.TrySetValue)} returns success for optional bool field for null value",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.OptionalPredicate),
@@ -1178,7 +1178,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
         // Required Properties With Coercion
         new TrySetNonGenericTest
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredNumber)} TrySetValue returns success for required long property with coercion from string",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredNumber)} {nameof(ApiProperty.TrySetValue)} returns success for required long property with coercion from string",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.RequiredNumber),
@@ -1190,7 +1190,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TrySetNonGenericTest
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredPredicate)} TrySetValue returns success for required bool property with coercion from string",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.RequiredPredicate)} {nameof(ApiProperty.TrySetValue)} returns success for required bool property with coercion from string",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.RequiredPredicate),
@@ -1203,7 +1203,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
         // Optional Fields With Coercion
         new TrySetNonGenericTest
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalNumber)} TrySetValue returns success for optional long field for non-null value with coercion from string",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalNumber)} {nameof(ApiProperty.TrySetValue)} returns success for optional long field for non-null value with coercion from string",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.OptionalNumber),
@@ -1215,7 +1215,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TrySetNonGenericTest
         {
-            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalPredicate)} TrySetValue returns success for optional bool field for non-null value with coercion from string",
+            Name = $"{nameof(ScalarsOnly)}:{nameof(ScalarsOnly.OptionalPredicate)} {nameof(ApiProperty.TrySetValue)} returns success for optional bool field for non-null value with coercion from string",
             ApiSchemaKind = ApiTestSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiPropertyName = nameof(ScalarsOnly.OptionalPredicate),

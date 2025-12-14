@@ -3,11 +3,9 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 using Evoogle.ApiFramework.Schema.Json;
-using Evoogle.Extension;
 
 namespace Evoogle.ApiFramework.Schema;
 
@@ -18,7 +16,7 @@ namespace Evoogle.ApiFramework.Schema;
 ///     Initializes a new instance of the <see cref="ApiType"/> class.
 /// </remarks>
 [JsonConverter(typeof(ApiTypeJsonConverter))]
-public abstract class ApiType : ExtensibleBase
+public abstract class ApiType : ApiSchemaElement
 {
     #region ApiType Properties
     /// <summary>Gets the kind of API type represented by this instance.</summary>    
@@ -29,18 +27,15 @@ public abstract class ApiType : ExtensibleBase
 
     /// <summary>Gets runtime API type name of the API type.</summary>
     protected abstract string ApiTypeName { get; }
-
-    /// <summary>Gets the validation path for the API type, used for error messages and validation results.</summary>
-    // protected abstract string ValidationPath { get; }
     #endregion
 
-    #region ApiType Methods
-    /// <summary>
-    ///     Gets the validation path for the API type, used for error messages and validation results.
-    /// </summary>
-    /// <returns>The validation path as a string.</returns>
-    protected abstract string GetValidationPath();
+    #region ApiSchemaElement Methods
+    /// <inheritdoc />
+    internal override void Initialize(ApiInitializationContext context)
+    {
+        ArgumentNullException.ThrowIfNull(context);
 
-    internal abstract void Initialize(ApiSchema apiSchema, ApiSchemaContext apiSchemaContext, ref List<ValidationResult>? results);
+        base.Initialize(context);
+    }
     #endregion
 }

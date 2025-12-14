@@ -3,8 +3,8 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using System.ComponentModel.DataAnnotations;
 using System.Runtime.CompilerServices;
+using System.Text;
 
 using Evoogle.ApiFramework.Exceptions;
 using Evoogle.Extensions;
@@ -18,6 +18,74 @@ namespace Evoogle.ApiFramework.Schema.Internal;
 internal static class ApiSchemaHelpers
 {
     #region Validation Methods
+    public static string BuildPath(string? apiParentPath, string apiChildPath, string? apiApiName)
+    {
+        var hasParent = !string.IsNullOrWhiteSpace(apiParentPath);
+        var hasName = !string.IsNullOrWhiteSpace(apiApiName);
+
+        if (!hasParent && !hasName)
+        {
+            return apiChildPath;
+        }
+
+        var capacity = (hasParent ? apiParentPath!.Length + 1 : 0)
+            + apiChildPath.Length
+            + (hasName ? apiApiName!.Length + 4 : 0);
+
+        var sb = new StringBuilder(capacity);
+
+        if (hasParent)
+        {
+            sb.Append(apiParentPath);
+            sb.Append('.');
+        }
+
+        sb.Append(apiChildPath);
+
+        if (hasName)
+        {
+            sb.Append("[\"");
+            sb.Append(apiApiName);
+            sb.Append("\"]");
+        }
+
+        return sb.ToString();
+    }
+
+    public static void InitializeLookupDictionary<TPart, TPartKey>
+    (
+        IEnumerable<TPart> parts,
+        Func<TPart, TPartKey> partKeySelector,
+        Func<TPartKey, bool>? partKeyFilter,
+        string partKeyPropertyName,
+        string path,
+        ApiInitializationCode code,
+        ApiInitializationContext context,
+        out Dictionary<TPartKey, TPart>? lookupDictionary
+    )
+        where TPartKey : notnull
+    {
+        partKeyFilter ??= (_ => true);
+
+        lookupDictionary = parts
+            .Where(p => p is not null)
+            .GroupBy(partKeySelector)
+            .Where(g => partKeyFilter(g.Key))
+            .Where(g => g.Count() == 1)
+            .ToDictionary(g => g.Key, g => g.Single());
+
+        ValidateUnique
+        (
+            parts: parts,
+            partKeySelector: partKeySelector,
+            partKeyFilter: partKeyFilter,
+            partKeyPropertyName: partKeyPropertyName,
+            path: path,
+            code: code,
+            context: context
+        );
+    }
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T ThrowIfNotInitialized<T>(this object obj, T? value)
     {
@@ -30,26 +98,41 @@ internal static class ApiSchemaHelpers
         throw new ApiSchemaException($"{objectType.SafeToName()} has not been initialized. Initialize the {nameof(ApiSchema)} before accessing.");
     }
 
-    public static bool ValidateUnique<TPart, TPartKey>(IEnumerable<TPart> parts, Func<TPart, TPartKey> partKeySelector, string validationPath, string partKeyPropertyName, ref List<ValidationResult>? results)
+    public static void ValidateUnique<TPart, TPartKey>
+    (
+        IEnumerable<TPart> parts,
+        Func<TPart, TPartKey> partKeySelector,
+        Func<TPartKey, bool>? partKeyFilter,
+        string partKeyPropertyName,
+        string path,
+        ApiInitializationCode code,
+        ApiInitializationContext context
+    )
+        where TPartKey : notnull
     {
+        partKeyFilter ??= (_ => true);
+
         var duplicates = parts
+            .Where(p => p is not null)
             .GroupBy(partKeySelector)
+            .Where(g => partKeyFilter(g.Key))
             .Where(g => g.Count() > 1)
             .Select(g => g.Key)
             .ToList();
 
         if (duplicates.Count == 0)
         {
-            return false;
+            return;
         }
 
         var duplicatesString = duplicates.SafeToDelimitedString(',');
         var partTypeName = typeof(TPart).SafeToName();
-        var message = $"{validationPath} unable to initialize because duplicate {partTypeName}.{partKeyPropertyName} values detected: '{duplicatesString}'";
 
-        results ??= [];
-        results.Add(new ValidationResult(message, [partKeyPropertyName]));
-        return true;
+        var severity = ApiInitializationSeverity.Error;
+        var description = $"Duplicate {partTypeName}.{partKeyPropertyName} values: '{duplicatesString}'";
+        var remediation = $"Ensure each {partTypeName} has a unique {partKeyPropertyName} value";
+
+        context.AddIssue(path, severity, code, description, remediation);
     }
     #endregion
 }

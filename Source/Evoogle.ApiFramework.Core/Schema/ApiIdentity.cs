@@ -3,43 +3,35 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using System.ComponentModel.DataAnnotations;
-
 using Evoogle.ApiFramework.Schema.Internal;
-using Evoogle.Extension;
 using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema;
 
-public sealed class ApiIdentity(string apiName, IEnumerable<ApiIdentityPart> apiIdentityParts) : ExtensibleBase
+public sealed class ApiIdentity(string apiName, IEnumerable<ApiIdentityPart> apiIdentityParts) : ApiSchemaElement
 {
-    #region Fields
-    private ApiSchemaContext? _apiSchemaContext = null;
-    #endregion
-
     #region Properties
     public string ApiName { get; } = apiName;
 
-    public ApiIdentityPart[] ApiIdentityParts { get; } = apiIdentityParts.SafeToArray();
+    public ApiIdentityPart[] ApiIdentityParts { get; } = [.. apiIdentityParts.EmptyIfNull().Where(x => x is not null).OrderBy(x => x.ApiPropertyName, StringComparer.OrdinalIgnoreCase)];
 
-    public bool IsComposite => this.ApiIdentityParts.Length > 1;
-
-    /// <summary>Gets the schema context for this identity.</summary>
-    internal ApiSchemaContext ApiSchemaContext => this.ThrowIfNotInitialized(_apiSchemaContext);
+    public bool IsComposite => this.ApiIdentityParts.Length >= 2;
     #endregion
 
-    #region ApiIdentity Methods
-    internal void Initialize(ApiSchema apiSchema, ApiSchemaContext apiSchemaContext, ApiObjectType apiObjectType, string apiValidationPath, ref List<ValidationResult>? results)
+    #region ApiSchemaElement Methods
+    /// <inheritdoc />
+    protected override string BuildPath(string? apiParentPath)
+        => ApiSchemaHelpers.BuildPath(apiParentPath, apiChildPath: nameof(ApiIdentity), apiApiName: this.ApiName);
+
+    /// <inheritdoc />
+    internal override void Initialize(ApiInitializationContext context)
     {
-        ArgumentNullException.ThrowIfNull(apiSchema);
-        ArgumentNullException.ThrowIfNull(apiSchemaContext);
-        ArgumentNullException.ThrowIfNull(apiObjectType);
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiValidationPath);
+        ArgumentNullException.ThrowIfNull(context);
 
-        _apiSchemaContext = apiSchemaContext;
+        base.Initialize(context);
 
-        this.InitializeApiName(apiValidationPath, ref results);
-        this.InitializeApiIdentityParts(apiSchema, apiSchemaContext, apiObjectType, apiValidationPath, ref results);
+        this.InitializeApiName(context);
+        this.InitializeApiIdentityParts(context);
     }
     #endregion
 
@@ -55,72 +47,68 @@ public sealed class ApiIdentity(string apiName, IEnumerable<ApiIdentityPart> api
     #endregion
 
     #region Implementation Methods
-    private void InitializeApiName
-    (
-        string apiValidationPath,
-        ref List<ValidationResult>? results
-    )
+    private void InitializeApiName(ApiInitializationContext context)
     {
         if (string.IsNullOrWhiteSpace(this.ApiName))
         {
-            results ??= [];
-            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ApiName)} cannot be null or whitespace.", [nameof(this.ApiName)]));
-            return;
+            var path = $"{this.ApiPath}.{nameof(this.ApiName)}";
+            var severity = ApiInitializationSeverity.Error;
+            var code = ApiInitializationCode.API_IDENTITY_INVALID_API_NAME;
+            var description = $"{nameof(this.ApiName)} cannot be null, empty, or whitespace";
+            var remediation = $"Provide a valid {nameof(this.ApiName)}";
+
+            context.AddIssue(path, severity, code, description, remediation);
         }
     }
 
-    private void InitializeApiIdentityParts
-    (
-        ApiSchema apiSchema,
-        ApiSchemaContext apiSchemaContext,
-        ApiObjectType apiObjectType,
-        string apiValidationPath,
-        ref List<ValidationResult>? results
-    )
+    private void InitializeApiIdentityParts(ApiInitializationContext context)
     {
-        // Parts collection cannot be null or empty
-        if (this.ApiIdentityParts is null)
+        if (this.ApiIdentityParts is null || this.ApiIdentityParts.Length == 0)
         {
-            results ??= [];
-            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ApiIdentityParts)} cannot be null.", [nameof(this.ApiIdentityParts)]));
-            return;
-        }
+            var path = $"{this.ApiPath}.{nameof(this.ApiIdentityParts)}";
+            var severity = ApiInitializationSeverity.Error;
+            var code = ApiInitializationCode.API_IDENTITY_NULL_OR_EMPTY_IDENTITY_PARTS;
+            var description = $"{nameof(this.ApiIdentityParts)} is either null or empty";
+            var remediation = $"Provide at least one {nameof(ApiIdentityPart)}";
 
-        // Must have at least one part
-        var apiIdentityPartsCount = this.ApiIdentityParts.Length;
-        if (apiIdentityPartsCount == 0)
-        {
-            results ??= [];
-            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ApiIdentityParts)} must contain at least one part.", [nameof(this.ApiIdentityParts)]));
+            context.AddIssue(path, severity, code, description, remediation);
             return;
         }
 
         // No duplicate part property names
-        ApiSchemaHelpers.ValidateUnique(this.ApiIdentityParts, x => x.ApiPropertyName, apiValidationPath, nameof(ApiIdentityPart.ApiPropertyName), ref results);
+        ApiSchemaHelpers.ValidateUnique
+        (
+            parts: this.ApiIdentityParts,
+            partKeySelector: x => x.ApiPropertyName,
+            partKeyFilter: x => !string.IsNullOrWhiteSpace(x),
+            partKeyPropertyName: nameof(ApiIdentityPart.ApiPropertyName),
+            path: $"{this.ApiPath}.{nameof(this.ApiIdentityParts)}",
+            code: ApiInitializationCode.API_IDENTITY_DUPLICATE_PART_API_PROPERTY_NAME,
+            context: context
+        );
 
         // Do not mix ordered and named parts
         var anyOrdered = this.ApiIdentityParts.Any(p => p.EmitAsOrdered);
         var anyNamed = this.ApiIdentityParts.Any(p => !p.EmitAsOrdered);
         if (anyOrdered && anyNamed)
         {
-            results ??= [];
-            results.Add(new ValidationResult($"{apiValidationPath} cannot mix ordered and named parts.", [nameof(this.ApiIdentityParts)]));
+            var path = $"{this.ApiPath}.{nameof(this.ApiIdentityParts)}";
+            var severity = ApiInitializationSeverity.Error;
+            var code = ApiInitializationCode.API_IDENTITY_MIXED_ORDERED_AND_NAMED_IDENTITY_PARTS;
+            var description = $"Cannot mix ordered parts with named parts in the same {nameof(ApiIdentity)}";
+            var remediation = $"Either use all ordered parts or all named parts in the {nameof(ApiIdentity)}";
+
+            context.AddIssue(path, severity, code, description, remediation);
+            return;
         }
 
-        // Initialize each part
+        var apiIdentityPartsCount = this.ApiIdentityParts.Length;
         for (var i = 0; i < apiIdentityPartsCount; ++i)
         {
-            apiValidationPath = $"{apiValidationPath}.{nameof(this.ApiIdentityParts)}[{i}]";
-
             var apiIdentityPart = this.ApiIdentityParts[i];
-            if (apiIdentityPart is null)
-            {
-                results ??= [];
-                results.Add(new ValidationResult($"{apiValidationPath} cannot be null.", [nameof(this.ApiIdentityParts)]));
-                continue;
-            }
 
-            apiIdentityPart.Initialize(apiSchema, apiSchemaContext, apiObjectType, apiValidationPath, ref results);
+            var childContext = context.WithParentSchemaElement(this);
+            apiIdentityPart.Initialize(childContext);
         }
     }
     #endregion

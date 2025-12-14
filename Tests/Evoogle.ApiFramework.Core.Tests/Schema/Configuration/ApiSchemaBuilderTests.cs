@@ -25,41 +25,42 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
         public ApiType[]? ApiObjectTypes { get; init; }
         public Type? ApiExtensionType { get; init; }
 
-        public ApiSchema? ApiSchemaExpected { get; init; } = null!;
-        public string? ApiSchemaExceptionMessageExpected { get; init; }
-        public List<string>? ApiSchemaValidationResultsExpected { get; init; }
+        public ApiSchema? Expected { get; init; } = null!;
+        public string? ExpectedExceptionMessage { get; init; }
+        public List<ApiInitializationIssue>? ExpectedIssues { get; init; }
         #endregion
 
         #region Calculated Properties
-        private ApiSchema? ApiSchemaActual { get; set; }
-        private bool? ApiSchemaExceptionThrown { get; set; }
-        private string? ApiSchemaExceptionMessageActual { get; set; }
-        private List<string>? ApiSchemaValidationResultsActual { get; set; }
+        private ApiSchema? Actual { get; set; }
+        private bool? ActualExceptionThrown { get; set; }
+        private string? ActualExceptionMessage { get; set; }
+        private List<ApiInitializationIssue>? ActualIssues { get; set; }
         #endregion
 
         #region XUnitTest Methods
         protected override void Arrange()
         {
-            this.WriteLine($"ApiName: {this.ApiName.SafeToString()}");
-            this.WriteLine($"ApiVersion: {this.ApiVersion.SafeToString()}");
+            this.WriteLine($"ApiName:          {this.ApiName.SafeToString()}");
+            this.WriteLine($"ApiVersion:       {this.ApiVersion.SafeToString()}");
             this.WriteLine($"ApiExtensionType: {this.ApiExtensionType.SafeToName()}");
             this.WriteLine();
 
-            if (this.ApiSchemaExpected is not null)
+            if (this.Expected is not null)
             {
-                this.WriteLine($"Expected: {this.ApiSchemaExpected.SafeToString()}");
+                this.WriteLine($"Expected: {this.Expected.SafeToString()}");
             }
 
-            if (this.ApiSchemaExceptionMessageExpected is not null)
+            if (this.ExpectedExceptionMessage is not null)
             {
-                this.WriteLine($"Expected Exception Message: {this.ApiSchemaExceptionMessageExpected.SafeToString()}");
+                this.WriteLine($"Expected Exception Message: {this.ExpectedExceptionMessage.SafeToString()}");
             }
 
-            if (this.ApiSchemaValidationResultsExpected is not null)
+            if (this.ExpectedIssues is not null)
             {
-                foreach (var apiSchemaValidationResult in this.ApiSchemaValidationResultsExpected)
+                this.WriteLine();
+                foreach (var expectedIssue in this.ExpectedIssues)
                 {
-                    this.WriteLine($"Expected Validation Result: {apiSchemaValidationResult.SafeToString()}");
+                    this.WriteLine($"Expected Issue: {expectedIssue.SafeToString()}");
                 }
             }
             this.WriteLine();
@@ -132,57 +133,47 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
 
             try
             {
-                this.ApiSchemaActual = builder.Build();
-                this.WriteLine($"Actual:   {this.ApiSchemaActual.SafeToString()}");
+                this.Actual = builder.Build();
+                this.WriteLine($"Actual:   {this.Actual.SafeToString()}");
             }
-            catch (ApiSchemaValidationException ex)
+            catch (ApiSchemaInitializationException ex)
             {
-                this.ApiSchemaExceptionThrown = true;
-                this.ApiSchemaExceptionMessageActual = ex.Message;
-                this.ApiSchemaValidationResultsActual = [.. ex.ValidationResults.Where(x => x.ErrorMessage is not null).Select(x => x.ErrorMessage!)];
+                this.ActualExceptionThrown = true;
+                this.ActualExceptionMessage = ex.Message;
+                this.ActualIssues = [.. ex.Issues];
 
-                this.WriteLine($"Actual Exception Message: {this.ApiSchemaExceptionMessageActual.SafeToString()}");
-
-                foreach (var apiSchemaValidationResult in this.ApiSchemaValidationResultsActual)
+                this.WriteLine($"Actual Exception Thrown:  {this.ActualExceptionThrown.SafeToString()}");
+                this.WriteLine($"Actual Exception Message: {this.ActualExceptionMessage.SafeToString()}");
+                this.WriteLine();
+                foreach (var actualIssue in this.ActualIssues)
                 {
-                    this.WriteLine($"Actual Validation Result: {apiSchemaValidationResult.SafeToString()}");
+                    this.WriteLine($"Actual Issue: {actualIssue.SafeToString()}");
                 }
-
-            }
-            catch (ApiSchemaException ex)
-            {
-                this.ApiSchemaExceptionThrown = true;
-                this.ApiSchemaExceptionMessageActual = ex.Message;
-                this.ApiSchemaValidationResultsActual = null;
-
-                this.WriteLine($"Actual Exception Message: {this.ApiSchemaExceptionMessageActual.SafeToString()}");
             }
         }
 
         protected override void Assert()
         {
-            if (!this.ApiSchemaExceptionThrown.GetValueOrDefault())
+            if (this.ActualExceptionThrown.GetValueOrDefault() == false)
             {
-                this.ApiSchemaExceptionMessageActual.Should().BeNull();
-                this.ApiSchemaValidationResultsActual.Should().BeNull();
+                this.ActualExceptionMessage.Should().BeNull();
+                this.ActualIssues.Should().BeNull();
 
-                this.ApiSchemaActual.Should().NotBeNull();
-                this.ApiSchemaActual.Should().BeEquivalentTo
+                this.Actual.Should().NotBeNull();
+                this.Actual.Should().BeEquivalentTo
                 (
-                    this.ApiSchemaExpected,
+                    this.Expected,
                     opt => opt
                         .WithStrictOrdering()
                 );
             }
             else
             {
-                this.ApiSchemaActual.Should().BeNull();
+                this.Actual.Should().BeNull();
 
-                this.ApiSchemaExceptionMessageActual.Should().NotBeNull();
-                this.ApiSchemaExceptionMessageActual.Should().Be(this.ApiSchemaExceptionMessageExpected);
-
-                this.ApiSchemaValidationResultsActual.Should().NotBeNull();
-                this.ApiSchemaValidationResultsActual.Should().BeEquivalentTo(this.ApiSchemaValidationResultsExpected);
+                this.ActualExceptionMessage.Should().Be(this.ExpectedExceptionMessage);
+                this.ActualIssues.Should().NotBeNull();
+                this.ActualIssues.Should().BeEquivalentTo(this.ExpectedIssues);
             }
         }
         #endregion
@@ -374,14 +365,14 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
             Name = $"Build {ApiEmptySchema}",
             ApiName = nameof(ApiEmptySchema),
             ApiVersion = "1.0",
-            ApiSchemaExpected = ApiEmptySchema,
+            Expected = ApiEmptySchema,
         },
         new BuildTest
         {
             Name = $"Build {ApiEmptySchemaWithExtension}",
             ApiName = nameof(ApiEmptySchemaWithExtension),
             ApiVersion = "1.0",
-            ApiSchemaExpected = ApiEmptySchemaWithExtension,
+            Expected = ApiEmptySchemaWithExtension,
             ApiExtensionType = typeof(TestExtension),
         },
         new BuildTest
@@ -397,7 +388,7 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
             ],
             ApiEnumTypes = [],
             ApiObjectTypes = [],
-            ApiSchemaExpected = ApiScalarsOnlySchema,
+            Expected = ApiScalarsOnlySchema,
         },
         new BuildTest
         {
@@ -412,7 +403,7 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
             ],
             ApiEnumTypes = [],
             ApiObjectTypes = [],
-            ApiSchemaExpected = ApiScalarsOnlySchemaWithExtension,
+            Expected = ApiScalarsOnlySchemaWithExtension,
             ApiExtensionType = typeof(TestExtension),
         },
         new BuildTest
@@ -431,7 +422,7 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
             [
                 ApiScalarsOnlyObjectType,
             ],
-            ApiSchemaExpected = ApiScalarsOnlyObjectTypeSchema,
+            Expected = ApiScalarsOnlyObjectTypeSchema,
         },
         new BuildTest
         {
@@ -448,12 +439,26 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
             [
                 ApiScalarsOnlyObjectType,
             ],
-            ApiSchemaExceptionMessageExpected = "ApiSchema initialization failed.",
-            ApiSchemaValidationResultsExpected =
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=2, Errors=2, Warnings=0.",
+            ExpectedIssues =
             [
-                @"ApiObjectType[""ScalarsOnly""].ApiProperty[""RequiredName""].ApiTypeExpression.ApiType is unresolved for ClrType=String.",
-                @"ApiObjectType[""ScalarsOnly""].ApiProperty[""OptionalName""].ApiTypeExpression.ApiType is unresolved for ClrType=String.",
-            ],
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"{nameof(ScalarsOnly.RequiredName)}\"].{nameof(ApiProperty.ApiType)}",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_PROPERTY_UNRESOLVED_TYPE,
+                    description: $"{nameof(ApiProperty.ApiType)} is unresolved for {nameof(ApiTypeExpression.ClrType)}={nameof(String)}",
+                    remediation: $"Ensure that an {nameof(ApiProperty.ApiType)} is declared in the schema for {nameof(ApiTypeExpression.ClrType)}={nameof(String)}"
+                ),
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"{nameof(ScalarsOnly.OptionalName)}\"].{nameof(ApiProperty.ApiType)}",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_PROPERTY_UNRESOLVED_TYPE,
+                    description: $"{nameof(ApiProperty.ApiType)} is unresolved for {nameof(ApiTypeExpression.ClrType)}={nameof(String)}",
+                    remediation: $"Ensure that an {nameof(ApiProperty.ApiType)} is declared in the schema for {nameof(ApiTypeExpression.ClrType)}={nameof(String)}"
+                ),
+            ]
         },
         new BuildTest
         {
@@ -473,7 +478,7 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
             [
                 ApiPersonObjectType,
             ],
-            ApiSchemaExpected = ApiPersonObjectTypeSchema,
+            Expected = ApiPersonObjectTypeSchema,
         },
         new BuildTest
         {
@@ -489,13 +494,34 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
             [
                 ApiPersonObjectType,
             ],
-            ApiSchemaExceptionMessageExpected = "ApiSchema initialization failed.",
-            ApiSchemaValidationResultsExpected =
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=3, Errors=3, Warnings=0.",
+            ExpectedIssues =
             [
-                @"ApiObjectType[""Person""].ApiProperty[""Name""].ApiTypeExpression.ApiType is unresolved for ClrType=String.",
-                @"ApiObjectType[""Person""].ApiProperty[""Gender""].ApiTypeExpression.ApiType is unresolved for ClrType=Gender.",
-                @"ApiCollectionType.ApiItemTypeExpression.ApiType is unresolved for ClrType=String.",
-            ],
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiObjectType)}[\"{nameof(Person)}\"].{nameof(ApiProperty)}[\"{nameof(Person.Name)}\"].{nameof(ApiProperty.ApiType)}",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_PROPERTY_UNRESOLVED_TYPE,
+                    description: $"{nameof(ApiProperty.ApiType)} is unresolved for {nameof(ApiTypeExpression.ClrType)}={nameof(String)}",
+                    remediation: $"Ensure that an {nameof(ApiProperty.ApiType)} is declared in the schema for {nameof(ApiTypeExpression.ClrType)}={nameof(String)}"
+                ),
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiObjectType)}[\"{nameof(Person)}\"].{nameof(ApiProperty)}[\"{nameof(Person.Gender)}\"].{nameof(ApiProperty.ApiType)}",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_PROPERTY_UNRESOLVED_TYPE,
+                    description: $"{nameof(ApiProperty.ApiType)} is unresolved for {nameof(ApiTypeExpression.ClrType)}={nameof(Gender)}",
+                    remediation: $"Ensure that an {nameof(ApiProperty.ApiType)} is declared in the schema for {nameof(ApiTypeExpression.ClrType)}={nameof(Gender)}"
+                ),
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiObjectType)}[\"{nameof(Person)}\"].{nameof(ApiProperty)}[\"{nameof(Person.Hobbies)}\"].{nameof(ApiCollectionType)}.{nameof(ApiCollectionType.ApiItemType)}",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_COLLECTION_TYPE_UNRESOLVED_ITEM_TYPE,
+                    description: $"{nameof(ApiCollectionType.ApiItemType)} is unresolved for {nameof(ApiTypeExpression.ClrType)}={nameof(String)}",
+                    remediation: $"Ensure that an {nameof(ApiCollectionType.ApiItemType)} is declared in the schema for {nameof(ApiTypeExpression.ClrType)}={nameof(String)}"
+                ),
+            ]
         },
         new BuildTest
         {
@@ -516,7 +542,7 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
                 ApiCompanyObjectType,
                 ApiPersonObjectType,
             ],
-            ApiSchemaExpected = ApiCompanyObjectTypeSchema,
+            Expected = ApiCompanyObjectTypeSchema,
         },
         new BuildTest
         {
@@ -532,12 +558,26 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
             [
                 ApiCompanyObjectType
             ],
-            ApiSchemaExceptionMessageExpected = "ApiSchema initialization failed.",
-            ApiSchemaValidationResultsExpected =
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=2, Errors=2, Warnings=0.",
+            ExpectedIssues =
             [
-                @"ApiObjectType[""Company""].ApiProperty[""Owner""].ApiTypeExpression.ApiType is unresolved for ClrType=Person.",
-                @"ApiCollectionType.ApiItemTypeExpression.ApiType is unresolved for ClrType=Person.",
-            ],
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiObjectType)}[\"{nameof(Company)}\"].{nameof(ApiProperty)}[\"{nameof(Company.Owner)}\"].{nameof(ApiProperty.ApiType)}",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_PROPERTY_UNRESOLVED_TYPE,
+                    description: $"{nameof(ApiProperty.ApiType)} is unresolved for {nameof(ApiTypeExpression.ClrType)}={nameof(Person)}",
+                    remediation: $"Ensure that an {nameof(ApiProperty.ApiType)} is declared in the schema for {nameof(ApiTypeExpression.ClrType)}={nameof(Person)}"
+                ),
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiObjectType)}[\"{nameof(Company)}\"].{nameof(ApiProperty)}[\"{nameof(Company.Employees)}\"].{nameof(ApiCollectionType)}.{nameof(ApiCollectionType.ApiItemType)}",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_COLLECTION_TYPE_UNRESOLVED_ITEM_TYPE,
+                    description: $"{nameof(ApiCollectionType.ApiItemType)} is unresolved for {nameof(ApiTypeExpression.ClrType)}={nameof(Person)}",
+                    remediation: $"Ensure that an {nameof(ApiCollectionType.ApiItemType)} is declared in the schema for {nameof(ApiTypeExpression.ClrType)}={nameof(Person)}"
+                ),
+            ]
         },
         new BuildTest
         {
@@ -558,12 +598,26 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
                 ApiCompanyObjectTypeWithMissingRelatedProperties,
                 ApiPersonObjectType,
             ],
-            ApiSchemaExceptionMessageExpected = "ApiSchema initialization failed.",
-            ApiSchemaValidationResultsExpected =
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=2, Errors=2, Warnings=0.",
+            ExpectedIssues =
             [
-                @"ApiObjectType[""Company""].ApiRelationship[""Owner""].ApiProperty unable to resolve ApiProperty[""OwnerMissing""].",
-                @"ApiObjectType[""Company""].ApiRelationship[""Employees""].ApiProperty unable to resolve ApiProperty[""EmployeesMissing""].",
-            ],
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiObjectType)}[\"{nameof(Company)}\"].{nameof(ApiRelationship)}[\"{nameof(Company.Owner)}\"].{nameof(ApiRelationship.ApiProperty)}",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_RELATIONSHIP_UNRESOLVED_PROPERTY,
+                    description: $"{nameof(ApiRelationship.ApiProperty)} unable to resolve {nameof(ApiRelationship.ApiPropertyName)}=\"OwnerMissing\" on parent {nameof(ApiObjectType)}[\"{nameof(Company)}\"]",
+                    remediation: $"Ensure that {nameof(ApiRelationship.ApiPropertyName)} refers to a valid property on the parent {nameof(ApiObjectType)}[\"{nameof(Company)}\"]"
+                ),
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiObjectType)}[\"{nameof(Company)}\"].{nameof(ApiRelationship)}[\"{nameof(Company.Employees)}\"].{nameof(ApiRelationship.ApiProperty)}",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_RELATIONSHIP_UNRESOLVED_PROPERTY,
+                    description: $"{nameof(ApiRelationship.ApiProperty)} unable to resolve {nameof(ApiRelationship.ApiPropertyName)}=\"EmployeesMissing\" on parent {nameof(ApiObjectType)}[\"{nameof(Company)}\"]",
+                    remediation: $"Ensure that {nameof(ApiRelationship.ApiPropertyName)} refers to a valid property on the parent {nameof(ApiObjectType)}[\"{nameof(Company)}\"]"
+                ),
+            ]
         },
     ];
     #endregion

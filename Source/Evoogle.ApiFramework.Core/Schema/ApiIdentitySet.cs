@@ -3,127 +3,124 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using System.ComponentModel.DataAnnotations;
-
 using Evoogle.ApiFramework.Schema.Internal;
-using Evoogle.Extension;
 using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema;
 
-public sealed class ApiIdentitySet
-(
-    IEnumerable<ApiIdentity> apiIdentities,
-    string apiPrimaryIdentityName
-) : ExtensibleBase
+public sealed class ApiIdentitySet(IEnumerable<ApiIdentity> apiIdentities, string apiPrimaryIdentityName) : ApiSchemaElement
 {
     #region Fields
-    private ApiSchemaContext? _apiSchemaContext = null;
-
     private Dictionary<string, ApiIdentity>? _apiIdentityApiNameLookup = null;
 
     private ApiIdentity? _apiResolvedPrimaryIdentity = null;
     #endregion
 
     #region Properties
-    public ApiIdentity[] ApiIdentities { get; } = apiIdentities.SafeToArray();
+    public ApiIdentity[] ApiIdentities { get; } = [.. apiIdentities.EmptyIfNull().Where(x => x is not null).OrderBy(x => x.ApiName, StringComparer.OrdinalIgnoreCase)];
 
     public string ApiPrimaryIdentityName => apiPrimaryIdentityName;
 
     public ApiIdentity ApiPrimaryIdentity => this.ThrowIfNotInitialized(_apiResolvedPrimaryIdentity);
 
-    /// <summary>Gets the schema context for this identity set.</summary>
-    internal ApiSchemaContext ApiSchemaContext => this.ThrowIfNotInitialized(_apiSchemaContext);
-
     private Dictionary<string, ApiIdentity> ApiIdentityApiNameLookup => this.ThrowIfNotInitialized(_apiIdentityApiNameLookup);
+    #endregion
+
+    #region ApiSchemaElement Methods
+    /// <inheritdoc />
+    protected override string BuildPath(string? apiParentPath)
+        => ApiSchemaHelpers.BuildPath(apiParentPath, apiChildPath: nameof(ApiIdentitySet), apiApiName: null);
+
+    /// <inheritdoc />
+    internal override void Initialize(ApiInitializationContext context)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+
+        base.Initialize(context);
+
+        this.InitializeLookupDictionaries(context);
+
+        this.InitializeApiIdentities(context);
+        this.InitializeApiPrimaryIdentity(context);
+    }
     #endregion
 
     #region ApiIdentitySet Methods
     public bool TryGetIdentityByApiName(string apiName, out ApiIdentity? apiIdentity) => this.ApiIdentityApiNameLookup.TryGetValue(apiName, out apiIdentity);
+    #endregion
 
-    internal void Initialize(ApiSchema apiSchema, ApiSchemaContext apiSchemaContext, ApiObjectType apiObjectType, string apiValidationPath, ref List<ValidationResult>? results)
-    {
-        ArgumentNullException.ThrowIfNull(apiSchema);
-        ArgumentNullException.ThrowIfNull(apiSchemaContext);
-        ArgumentNullException.ThrowIfNull(apiObjectType);
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiValidationPath);
-
-        _apiSchemaContext = apiSchemaContext;
-
-        this.InitializeLookupDictionaries(apiValidationPath, ref results);
-
-        this.InitializeApiIdentities(apiSchema, apiSchemaContext, apiObjectType, apiValidationPath, ref results);
-        this.InitializeApiPrimaryIdentity(apiValidationPath, ref results);
-    }
-
-    private void InitializeLookupDictionaries(string apiValidationPath, ref List<ValidationResult>? results)
+    #region Implementation Methods
+    private void InitializeLookupDictionaries(ApiInitializationContext context)
     {
         _apiIdentityApiNameLookup = null;
 
-        var anyIdentityApiNameDuplicates = ApiSchemaHelpers.ValidateUnique(this.ApiIdentities, x => x.ApiName, apiValidationPath, nameof(ApiIdentity.ApiName), ref results);
-        if (!anyIdentityApiNameDuplicates)
-        {
-            _apiIdentityApiNameLookup = this.ApiIdentities.ToDictionary(x => x.ApiName, StringComparer.OrdinalIgnoreCase);
-        }
+        ApiSchemaHelpers.InitializeLookupDictionary
+        (
+            parts: this.ApiIdentities,
+            partKeySelector: x => x.ApiName,
+            partKeyFilter: x => !string.IsNullOrWhiteSpace(x),
+            partKeyPropertyName: nameof(ApiIdentity.ApiName),
+            path: $"{this.ApiPath}.{nameof(this.ApiIdentities)}",
+            code: ApiInitializationCode.API_IDENTITY_SET_DUPLICATE_IDENTITY_API_NAME,
+            context: context,
+            lookupDictionary: out _apiIdentityApiNameLookup
+        );
     }
 
-    private void InitializeApiIdentities(ApiSchema apiSchema, ApiSchemaContext apiSchemaContext, ApiObjectType apiObjectType, string apiValidationPath, ref List<ValidationResult>? results)
+    private void InitializeApiIdentities(ApiInitializationContext context)
     {
-        // Must not be null
-        if (this.ApiIdentities is null)
+        if (this.ApiIdentities is null || this.ApiIdentities.Length == 0)
         {
-            results ??= [];
-            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ApiIdentities)} cannot be null.", [nameof(this.ApiIdentities)]));
-            return;
-        }
+            var path = $"{this.ApiPath}.{nameof(this.ApiIdentities)}";
+            var severity = ApiInitializationSeverity.Warning;
+            var code = ApiInitializationCode.API_IDENTITY_SET_NULL_OR_EMPTY_IDENTITIES;
+            var description = $"{nameof(this.ApiIdentities)} is either null or empty";
 
-        // Must have at least one identity
-        var apiIdentitiesCount = this.ApiIdentities.Length;
-        if (apiIdentitiesCount == 0)
-        {
-            results ??= [];
-            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ApiIdentities)} must contain at least one identity.", [nameof(this.ApiIdentities)]));
+            context.AddIssue(path, severity, code, description, remediation: null);
             return;
         }
 
         // Initialize each identity
+        var apiIdentitiesCount = this.ApiIdentities.Length;
         for (var i = 0; i < apiIdentitiesCount; ++i)
         {
-            apiValidationPath = $"{apiValidationPath}.{nameof(this.ApiIdentities)}[{i}]";
-
             var apiIdentity = this.ApiIdentities[i];
-            if (apiIdentity is null)
-            {
-                results ??= [];
-                results.Add(new ValidationResult($"{apiValidationPath} cannot be null.", [nameof(this.ApiIdentities)]));
-                continue;
-            }
 
-            apiIdentity.Initialize(apiSchema, apiSchemaContext, apiObjectType, apiValidationPath, ref results);
+            var childContext = context.WithParentSchemaElement(this);
+            apiIdentity.Initialize(childContext);
         }
     }
 
-    private void InitializeApiPrimaryIdentity(string apiValidationPath, ref List<ValidationResult>? results)
+    private void InitializeApiPrimaryIdentity(ApiInitializationContext context)
     {
         _apiResolvedPrimaryIdentity = null;
 
         if (string.IsNullOrWhiteSpace(this.ApiPrimaryIdentityName))
         {
-            results ??= [];
-            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ApiPrimaryIdentityName)} cannot be null or whitespace.", [nameof(this.ApiPrimaryIdentityName)]));
+            var path = $"{this.ApiPath}.{nameof(this.ApiPrimaryIdentityName)}";
+            var severity = ApiInitializationSeverity.Error;
+            var code = ApiInitializationCode.API_IDENTITY_SET_INVALID_PRIMARY_IDENTITY_API_NAME;
+            var description = $"{nameof(this.ApiPrimaryIdentityName)} cannot be null, empty, or whitespace";
+            var remediation = $"Provide a valid {nameof(this.ApiPrimaryIdentityName)}";
+
+            context.AddIssue(path, severity, code, description, remediation);
+            return;
         }
-        else
+
+        if (this.ApiIdentityApiNameLookup.TryGetValue(this.ApiPrimaryIdentityName, out var apiResolvedPrimaryIdentity))
         {
-            if (this.ApiIdentityApiNameLookup.TryGetValue(this.ApiPrimaryIdentityName, out var apiResolvedPrimaryIdentity))
-            {
-                _apiResolvedPrimaryIdentity = apiResolvedPrimaryIdentity;
-            }
+            _apiResolvedPrimaryIdentity = apiResolvedPrimaryIdentity;
         }
 
         if (_apiResolvedPrimaryIdentity is null)
         {
-            results ??= [];
-            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ApiPrimaryIdentityName)} unable to resolve {nameof(this.ApiPrimaryIdentityName)}[\"{this.ApiPrimaryIdentityName.SafeToString()}\"].", [nameof(this.ApiPrimaryIdentityName)]));
+            var path = $"{this.ApiPath}.{nameof(this.ApiPrimaryIdentity)}";
+            var severity = ApiInitializationSeverity.Error;
+            var code = ApiInitializationCode.API_IDENTITY_SET_UNRESOLVED_PRIMARY_IDENTITY;
+            var description = $"{nameof(this.ApiPrimaryIdentity)} is unresolved for {nameof(this.ApiPrimaryIdentityName)}={this.ApiPrimaryIdentityName.SafeToString()}";
+            var remediation = $"Ensure that an {nameof(this.ApiPrimaryIdentity)} is declared in the {nameof(this.ApiIdentities)} for {nameof(this.ApiPrimaryIdentityName)}={this.ApiPrimaryIdentityName.SafeToString()}";
+
+            context.AddIssue(path, severity, code, description, remediation);
         }
     }
     #endregion

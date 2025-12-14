@@ -11,7 +11,6 @@ using System.Text.Json.Serialization;
 using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.ApiFramework.Schema.Json;
 using Evoogle.Coercion;
-using Evoogle.Extension;
 using Evoogle.Extensions;
 using Evoogle.Reflection;
 
@@ -43,7 +42,7 @@ namespace Evoogle.ApiFramework.Schema;
 /// <param name="apiTypeModifiers">Modifiers applied to the property (e.g., Required).</param>
 /// <param name="clrName">The CLR property name corresponding to this API property.</param>
 [JsonConverter(typeof(ApiPropertyJsonConverter))]
-public sealed partial class ApiProperty(string apiName, ApiTypeExpression apiTypeExpression, ApiTypeModifiers apiTypeModifiers, string clrName) : ExtensibleBase
+public sealed partial class ApiProperty(string apiName, ApiTypeExpression apiTypeExpression, ApiTypeModifiers apiTypeModifiers, string clrName) : ApiSchemaElement
 {
     #region Types
     private delegate void ClrByRefAction<TObject, in TValue>(ref TObject clrObject, ApiSchemaContext apiSchemaContext, TValue? clrValue);
@@ -77,8 +76,6 @@ public sealed partial class ApiProperty(string apiName, ApiTypeExpression apiTyp
     #endregion
 
     #region Fields
-    private ApiSchemaContext? _apiSchemaContext = null;
-
     private Func<object, ApiSchemaContext, object?>? _clrGetter;
 
     private Action<object, ApiSchemaContext, object?>? _clrSetter;
@@ -121,9 +118,6 @@ public sealed partial class ApiProperty(string apiName, ApiTypeExpression apiTyp
     /// </summary>
     internal ApiTypeExpression ApiTypeExpression { get; } = apiTypeExpression;
 
-    /// <summary>Gets the schema context for this property.</summary>
-    internal ApiSchemaContext ApiSchemaContext => this.ThrowIfNotInitialized(_apiSchemaContext);
-
     /// <summary>Gets the cached generic method definition for TypeCoercion.Coerce&lt;TInput, TOutput&gt;.</summary>
     private static MethodInfo GenericCoerceMethodDefinition => _genericCoerceMethodDefinition
         ?? throw new InvalidOperationException($"Failed to locate generic method definition for {nameof(TypeCoercion)}.{nameof(TypeCoercion.Coerce)}.");
@@ -155,79 +149,149 @@ public sealed partial class ApiProperty(string apiName, ApiTypeExpression apiTyp
     }
     #endregion
 
-    #region Initialization Methods
-    /// <summary>
-    ///     Gets the validation path for this property, used for error reporting during validation.
-    /// </summary>
-    /// <param name="parentPath">The parent validation path.</param>
-    /// <returns>A formatted validation path string.</returns>
-    internal string GetValidationPath(string parentPath) => $"{parentPath.SafeToString()}.{nameof(ApiProperty)}[\"{this.ApiName.SafeToString()}\"]";
+    #region ApiSchemaElement Methods
+    /// <inheritdoc />
+    protected override string BuildPath(string? apiParentPath)
+        => ApiSchemaHelpers.BuildPath(apiParentPath, apiChildPath: nameof(ApiProperty), apiApiName: this.ApiName);
 
-    /// <summary>
-    ///     Initializes this property within the context of an API schema.
-    /// </summary>
-    /// <param name="apiSchema">The parent API schema.</param>
-    /// <param name="apiSchemaContext">The schema context containing shared resources.</param>
-    /// <param name="apiObjectType">The object type that owns this property.</param>
-    /// <param name="apiValidationPath">The validation path for error reporting.</param>
-    /// <param name="results">Collection to accumulate validation errors.</param>
-    internal void Initialize(ApiSchema apiSchema, ApiSchemaContext apiSchemaContext, ApiObjectType apiObjectType, string apiValidationPath, ref List<ValidationResult>? results)
+    /// <inheritdoc />
+    internal override void Initialize(ApiInitializationContext context)
     {
-        ArgumentNullException.ThrowIfNull(apiSchema);
-        ArgumentNullException.ThrowIfNull(apiSchemaContext);
-        ArgumentNullException.ThrowIfNull(apiObjectType);
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiValidationPath);
+        ArgumentNullException.ThrowIfNull(context);
 
-        _apiSchemaContext = apiSchemaContext;
+        base.Initialize(context);
 
-        this.InitializeApiName(apiValidationPath, ref results);
-        this.InitializeApiTypeExpression(apiSchema, apiValidationPath, ref results);
-        this.InitializeClrName(apiValidationPath, ref results);
-        this.InitializeClrGetterAndSetter(apiObjectType, apiValidationPath, ref results);
+        this.InitializeApiName(context);
+        this.InitializeApiTypeExpression(context);
+        this.InitializeClrName(context);
+        this.InitializeClrGetterAndSetter(context);
     }
 
-    /// <summary>
-    ///     Validates that the API name is not null or whitespace.
-    /// </summary>
-    /// <param name="apiValidationPath">The validation path for error reporting.</param>
-    /// <param name="results">Collection to accumulate validation errors.</param>
-    private void InitializeApiName(string apiValidationPath, ref List<ValidationResult>? results)
+    private void InitializeApiName(ApiInitializationContext context)
     {
         if (string.IsNullOrWhiteSpace(this.ApiName))
         {
-            results ??= [];
-            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ApiName)} cannot be null or whitespace.", [nameof(this.ApiName)]));
+            var path = $"{this.ApiPath}.{nameof(this.ApiName)}";
+            var severity = ApiInitializationSeverity.Error;
+            var code = ApiInitializationCode.API_PROPERTY_INVALID_API_NAME;
+            var description = $"{nameof(this.ApiName)} cannot be null, empty, or whitespace";
+            var remediation = $"Provide a valid {nameof(this.ApiName)}";
+
+            context.AddIssue(path, severity, code, description, remediation);
         }
     }
 
-    /// <summary>
-    ///     Validates and initializes the API type expression for this property.
-    /// </summary>
-    /// <param name="apiSchema">The parent API schema.</param>
-    /// <param name="apiParentValidationPath">The parent validation path for error reporting.</param>
-    /// <param name="results">Collection to accumulate validation errors.</param>
-    private void InitializeApiTypeExpression(ApiSchema apiSchema, string apiParentValidationPath, ref List<ValidationResult>? results)
+    private void InitializeApiTypeExpression(ApiInitializationContext context)
     {
         if (this.ApiTypeExpression is null)
         {
-            results ??= [];
-            results.Add(new ValidationResult($"{apiParentValidationPath}.{nameof(this.ApiTypeExpression)} cannot be null.", [nameof(this.ApiTypeExpression)]));
+            var path = $"{this.ApiPath}.{nameof(this.ApiType)}";
+            var severity = ApiInitializationSeverity.Error;
+            var code = ApiInitializationCode.API_PROPERTY_NULL_TYPE;
+            var description = $"{nameof(this.ApiType)} is null for {nameof(ApiProperty)}";
+            var remediation = $"Ensure that {nameof(this.ApiType)} is specified for {nameof(ApiProperty)}";
+
+            context.AddIssue(path, severity, code, description, remediation);
             return;
         }
 
-        var apiChildValidationPath = $"{apiParentValidationPath}.{nameof(this.ApiTypeExpression)}";
-        this.ApiTypeExpression.Initialize(apiSchema, apiChildValidationPath, ref results);
+        var childContext = context.WithParentSchemaElement(this);
+        this.ApiTypeExpression.InitializeForProperty(childContext);
     }
 
-    /// <summary>
-    ///     Initializes and compiles the CLR getter and setter delegates for this property.
-    ///     Attempts to resolve the property or field on the CLR type and builds optimized lambda expressions.
-    /// </summary>
-    /// <param name="apiObjectType">The object type that owns this property.</param>
-    /// <param name="apiValidationPath">The validation path for error reporting.</param>
-    /// <param name="results">Collection to accumulate validation errors.</param>
-    private void InitializeClrGetterAndSetter(ApiObjectType apiObjectType, string apiValidationPath, ref List<ValidationResult>? results)
+    private void InitializeClrFieldGetterAndSetter(ApiInitializationContext context, FieldInfo clrFieldInfo)
     {
+        var apiObjectType = context.ApiParentObjectType;
+        var clrObjectType = apiObjectType.ClrType;
+        var clrMemberName = this.ClrName;
+
+        // Build compiled field getter and setter
+        try
+        {
+            _clrGetter = BuildNonGenericClrFieldGetter(clrObjectType, clrFieldInfo);
+        }
+        catch (Exception ex)
+        {
+            var path = $"{this.ApiPath}.{nameof(this.ClrName)}";
+            var severity = ApiInitializationSeverity.Error;
+            var code = ApiInitializationCode.API_PROPERTY_INVALID_CLR_FIELD_GETTER;
+            var description = $"Failed to compile lambda field getter: {ex.Message}";
+            var remediation = $"Ensure CLR Object '{clrObjectType.SafeToName()}' has a valid '{clrMemberName}' field getter";
+
+            context.AddIssue(path, severity, code, description, remediation);
+        }
+
+        try
+        {
+            _clrSetter = BuildNonGenericClrFieldSetter(clrObjectType, clrFieldInfo);
+        }
+        catch (Exception ex)
+        {
+            var path = $"{this.ApiPath}.{nameof(this.ClrName)}";
+            var severity = ApiInitializationSeverity.Error;
+            var code = ApiInitializationCode.API_PROPERTY_INVALID_CLR_FIELD_SETTER;
+            var description = $"Failed to compile lambda field setter: {ex.Message}";
+            var remediation = $"Ensure CLR Object '{clrObjectType.SafeToName()}' has a valid '{clrMemberName}' field setter";
+
+            context.AddIssue(path, severity, code, description, remediation);
+        }
+
+        return; // Found valid field
+    }
+
+    private void InitializeClrPropertyGetterAndSetter(ApiInitializationContext context, PropertyInfo clrPropertyInfo)
+    {
+        var apiObjectType = context.ApiParentObjectType;
+        var clrObjectType = apiObjectType.ClrType;
+        var clrMemberName = this.ClrName;
+
+        // Exclude indexers
+        if (clrPropertyInfo.GetIndexParameters().Length > 0)
+        {
+            var path = $"{this.ApiPath}.{nameof(this.ClrName)}";
+            var severity = ApiInitializationSeverity.Error;
+            var code = ApiInitializationCode.API_PROPERTY_INVALID_CLR_PROPERTY_GETTER;
+            var description = $"Refers to an indexer property, which is not supported.";
+
+            context.AddIssue(path, severity, code, description, remediation: null);
+            return;
+        }
+
+        // Build compiled property getter and setter
+        try
+        {
+            _clrGetter = BuildNonGenericClrPropertyGetter(clrObjectType, clrPropertyInfo);
+        }
+        catch (Exception ex)
+        {
+            var path = $"{this.ApiPath}.{nameof(this.ClrName)}";
+            var severity = ApiInitializationSeverity.Error;
+            var code = ApiInitializationCode.API_PROPERTY_INVALID_CLR_PROPERTY_GETTER;
+            var description = $"Failed to compile lambda property getter: {ex.Message}";
+            var remediation = $"Ensure CLR Object '{clrObjectType.SafeToName()}' has a valid '{clrMemberName}' property getter";
+
+            context.AddIssue(path, severity, code, description, remediation);
+        }
+
+        try
+        {
+            _clrSetter = BuildNonGenericClrPropertySetter(clrObjectType, clrPropertyInfo);
+        }
+        catch (Exception ex)
+        {
+            var path = $"{this.ApiPath}.{nameof(this.ClrName)}";
+            var severity = ApiInitializationSeverity.Error;
+            var code = ApiInitializationCode.API_PROPERTY_INVALID_CLR_PROPERTY_SETTER;
+            var description = $"Failed to compile lambda property setter: {ex.Message}";
+            var remediation = $"Ensure CLR Object '{clrObjectType.SafeToName()}' has a valid '{clrMemberName}' property setter";
+
+            context.AddIssue(path, severity, code, description, remediation);
+        }
+    }
+
+    private void InitializeClrGetterAndSetter(ApiInitializationContext context)
+    {
+        var apiObjectType = context.ApiParentObjectType;
         var clrObjectType = apiObjectType.ClrType;
         var clrMemberName = this.ClrName;
 
@@ -237,87 +301,49 @@ public sealed partial class ApiProperty(string apiName, ApiTypeExpression apiTyp
             var clrPropertyInfo = TypeReflection.GetProperty(clrObjectType, clrMemberName, BindingFlags.Public | BindingFlags.Instance);
             if (clrPropertyInfo is not null)
             {
-                // Exclude indexers
-                if (clrPropertyInfo.GetIndexParameters().Length > 0)
-                {
-                    results ??= [];
-                    results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ClrName)} refers to an indexer property, which is not supported.", [nameof(this.ClrName)]));
-                    return;
-                }
-
-                // Build compiled property getter and setter
-                try
-                {
-                    _clrGetter = BuildNonGenericClrPropertyGetter(clrObjectType, clrPropertyInfo);
-                }
-                catch (Exception ex)
-                {
-                    results ??= [];
-                    results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ClrName)} failed to compile lambda property getter: {ex.Message}", [nameof(this.ClrName)]));
-                }
-
-                try
-                {
-                    _clrSetter = BuildNonGenericClrPropertySetter(clrObjectType, clrPropertyInfo);
-                }
-                catch (Exception ex)
-                {
-                    results ??= [];
-                    results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ClrName)} failed to compile lambda property setter: {ex.Message}", [nameof(this.ClrName)]));
-                }
-
+                this.InitializeClrPropertyGetterAndSetter(context, clrPropertyInfo);
                 return; // Found valid property
             }
 
             var clrFieldInfo = TypeReflection.GetField(clrObjectType, clrMemberName, BindingFlags.Public | BindingFlags.Instance);
             if (clrFieldInfo is not null)
             {
-                // Build compiled field getter and setter
-                try
-                {
-                    _clrGetter = BuildNonGenericClrFieldGetter(clrObjectType, clrFieldInfo);
-                }
-                catch (Exception ex)
-                {
-                    results ??= [];
-                    results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ClrName)} failed to compile lambda field getter: {ex.Message}", [nameof(this.ClrName)]));
-                }
-
-                try
-                {
-                    _clrSetter = BuildNonGenericClrFieldSetter(clrObjectType, clrFieldInfo);
-                }
-                catch (Exception ex)
-                {
-                    results ??= [];
-                    results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ClrName)} failed to compile lambda field setter: {ex.Message}", [nameof(this.ClrName)]));
-                }
-
+                this.InitializeClrFieldGetterAndSetter(context, clrFieldInfo);
                 return; // Found valid field
             }
 
             // Member not found
-            results ??= [];
-            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ClrName)} '{clrMemberName}' could not be found on {nameof(ApiObjectType.ClrType)} '{clrObjectType.SafeToName()}'.", [nameof(this.ClrName)]));
+            var path = $"{this.ApiPath}.{nameof(this.ClrName)}";
+            var severity = ApiInitializationSeverity.Error;
+            var code = ApiInitializationCode.API_PROPERTY_MISSING_CLR_MEMBER;
+            var description = $"'{clrMemberName}' could not be found on {nameof(ApiObjectType.ClrType)} '{clrObjectType.SafeToName()}'";
+            var remediation = $"Ensure that '{clrMemberName}' exists as a public property or field on '{clrObjectType.SafeToName()}'";
+
+            context.AddIssue(path, severity, code, description, remediation);
         }
         catch (Exception ex)
         {
-            results ??= [];
-            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ClrName)} failed to compile lambda getter or setter accessor: {ex.Message}", [nameof(this.ClrName)]));
+            var path = $"{this.ApiPath}.{nameof(this.ClrName)}";
+            var severity = ApiInitializationSeverity.Error;
+            var code = ApiInitializationCode.API_PROPERTY_INVALID_CLR_MEMBER;
+            var description = $"Failed to compile lambda getter or setter accessor: {ex.Message}";
+            var remediation = $"Ensure that '{clrMemberName}' exists as a public property or field on '{clrObjectType.SafeToName()}'";
+
+            context.AddIssue(path, severity, code, description, remediation);
         }
     }
 
-    /// <summary>
-    ///     Validates that the CLR name is not null or whitespace.
-    /// </summary>
-    /// <param name="apiValidationPath">The validation path for error reporting.</param>
-    /// <param name="results">Collection to accumulate validation errors.</param>
-    private void InitializeClrName(string apiValidationPath, ref List<ValidationResult>? results)
+    private void InitializeClrName(ApiInitializationContext context)
     {
         if (string.IsNullOrWhiteSpace(this.ClrName))
         {
-            results ??= [];
-            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ClrName)} cannot be null or whitespace.", [nameof(this.ClrName)]));
+            var path = $"{this.ApiPath}.{nameof(this.ClrName)}";
+            var severity = ApiInitializationSeverity.Error;
+            var code = ApiInitializationCode.API_PROPERTY_INVALID_CLR_NAME;
+            var description = $"{nameof(this.ClrName)} cannot be null, empty, or whitespace";
+            var remediation = $"Provide a valid {nameof(this.ClrName)}";
+
+            context.AddIssue(path, severity, code, description, remediation);
         }
     }
     #endregion

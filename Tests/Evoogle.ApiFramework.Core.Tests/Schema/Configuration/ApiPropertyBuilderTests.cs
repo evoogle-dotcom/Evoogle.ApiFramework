@@ -60,7 +60,9 @@ public class ApiPropertyBuilderTests(ITestOutputHelper output) : XUnitTests(outp
             (
                 this.ApiPropertyExpected,
                 opt => opt
+                    .Excluding(info => info.Path.Contains(nameof(ApiSchemaElement.ApiPath)))
                     .Excluding(p => p.ApiType)
+                    .WithStrictOrdering()
             );
         }
         #endregion

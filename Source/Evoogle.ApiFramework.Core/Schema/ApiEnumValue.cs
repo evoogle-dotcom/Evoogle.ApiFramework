@@ -3,12 +3,10 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.ApiFramework.Schema.Json;
-using Evoogle.Extension;
 using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema;
@@ -20,12 +18,8 @@ namespace Evoogle.ApiFramework.Schema;
 /// <param name="clrName">The CLR name of the enumeration value (corresponding to the C# enum name).</param>
 /// <param name="clrOrdinal">The CLR ordinal (integer value) of the enumeration value.</param>
 [JsonConverter(typeof(ApiEnumValueJsonConverter))]
-public sealed class ApiEnumValue(string apiName, string clrName, int clrOrdinal) : ExtensibleBase
+public sealed class ApiEnumValue(string apiName, string clrName, int clrOrdinal) : ApiSchemaElement
 {
-    #region Fields
-    private ApiSchemaContext? _apiSchemaContext = null;
-    #endregion
-
     #region Properties
     /// <summary>Gets the API name of the API enumeration value.</summary>
     public string ApiName { get; } = apiName;
@@ -35,31 +29,22 @@ public sealed class ApiEnumValue(string apiName, string clrName, int clrOrdinal)
 
     /// <summary>Gets the CLR ordinal of the API enumeration value (matching the C# enum ordinal value).</summary>
     public int ClrOrdinal { get; } = clrOrdinal;
-
-    /// <summary>Gets the schema context for this enum value.</summary>
-    internal ApiSchemaContext ApiSchemaContext => this.ThrowIfNotInitialized(_apiSchemaContext);
     #endregion
 
-    #region ApiEnumValue Methods
-    internal string GetValidationPath(string parentPath) => $"{parentPath.SafeToString()}.{nameof(ApiEnumValue)}[\"{this.ApiName.SafeToString()}\"]";
+    #region ApiSchemaElement Methods
+    /// <inheritdoc />
+    protected override string BuildPath(string? apiParentPath)
+        => ApiSchemaHelpers.BuildPath(apiParentPath, apiChildPath: nameof(ApiEnumValue), apiApiName: this.ApiName);
 
-    /// <summary>
-    ///     Validates the <see cref="ApiEnumValue"/> by checking that required fields are not null or empty.
-    /// </summary>
-    /// <param name="apiSchema">The current API schema.</param>
-    /// <param name="apiSchemaContext">The API schema context.</param>
-    /// <param name="apiValidationPath">The string path used to report validation context.</param>
-    /// <param name="results">Validation results list to append to if validation fails.</param>
-    internal void Initialize(ApiSchema apiSchema, ApiSchemaContext apiSchemaContext, string apiValidationPath, ref List<ValidationResult>? results)
+    /// <inheritdoc />
+    internal override void Initialize(ApiInitializationContext context)
     {
-        ArgumentNullException.ThrowIfNull(apiSchema);
-        ArgumentNullException.ThrowIfNull(apiSchemaContext);
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiValidationPath);
+        ArgumentNullException.ThrowIfNull(context);
 
-        _apiSchemaContext = apiSchemaContext;
+        base.Initialize(context);
 
-        this.InitializeApiName(apiValidationPath, ref results);
-        this.InitializeClrName(apiValidationPath, ref results);
+        this.InitializeApiName(context);
+        this.InitializeClrName(context);
     }
     #endregion
 
@@ -77,21 +62,31 @@ public sealed class ApiEnumValue(string apiName, string clrName, int clrOrdinal)
     #endregion
 
     #region Implementation Methods
-    private void InitializeApiName(string apiValidationPath, ref List<ValidationResult>? results)
+    private void InitializeApiName(ApiInitializationContext context)
     {
         if (string.IsNullOrWhiteSpace(this.ApiName))
         {
-            results ??= [];
-            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ApiName)} cannot be null or whitespace.", [nameof(this.ApiName)]));
+            var path = $"{this.ApiPath}.{nameof(this.ApiName)}";
+            var severity = ApiInitializationSeverity.Error;
+            var code = ApiInitializationCode.API_ENUM_VALUE_INVALID_API_NAME;
+            var description = $"{nameof(this.ApiName)} cannot be null, empty, or whitespace";
+            var remediation = $"Provide a valid {nameof(this.ApiName)}";
+
+            context.AddIssue(path, severity, code, description, remediation);
         }
     }
 
-    private void InitializeClrName(string apiValidationPath, ref List<ValidationResult>? results)
+    private void InitializeClrName(ApiInitializationContext context)
     {
         if (string.IsNullOrWhiteSpace(this.ClrName))
         {
-            results ??= [];
-            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ClrName)} cannot be null or whitespace.", [nameof(this.ClrName)]));
+            var path = $"{this.ApiPath}.{nameof(this.ClrName)}";
+            var severity = ApiInitializationSeverity.Error;
+            var code = ApiInitializationCode.API_ENUM_VALUE_INVALID_CLR_NAME;
+            var description = $"{nameof(this.ClrName)} cannot be null, empty, or whitespace";
+            var remediation = $"Provide a valid {nameof(this.ClrName)}";
+
+            context.AddIssue(path, severity, code, description, remediation);
         }
     }
     #endregion

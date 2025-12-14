@@ -3,13 +3,11 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.ApiFramework.Schema.Json;
-using Evoogle.Extension;
 using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema;
@@ -27,11 +25,9 @@ namespace Evoogle.ApiFramework.Schema;
 ///     </para>
 /// </remarks>
 [JsonConverter(typeof(ApiRelationshipJsonConverter))]
-public sealed class ApiRelationship(string apiName, string? apiPropertyName = null) : ExtensibleBase
+public sealed class ApiRelationship(string apiName, string? apiPropertyName = null) : ApiSchemaElement
 {
     #region Fields
-    private ApiSchemaContext? _apiSchemaContext = null;
-
     private readonly string? _apiPropertyName = apiPropertyName;
 
     private ApiProperty? _apiResolvedProperty = null;
@@ -70,25 +66,22 @@ public sealed class ApiRelationship(string apiName, string? apiPropertyName = nu
         ApiTypeKind.Collection => ApiRelationshipCardinality.ToMany,
         _ => throw new ApiSchemaException($"Unsupported {nameof(ApiTypeKind)}: {this.ApiProperty.ApiType.Kind.SafeToString()} for {this}. Only Object and Collection types are supported.")
     };
-
-    /// <summary>Gets the schema context for this relationship.</summary>
-    internal ApiSchemaContext ApiSchemaContext => this.ThrowIfNotInitialized(_apiSchemaContext);
     #endregion
 
-    #region ApiRelationship Methods
-    internal string GetValidationPath(string parentPath) => $"{parentPath.SafeToString()}.{nameof(ApiRelationship)}[\"{this.ApiName.SafeToString()}\"]";
+    #region ApiSchemaElement Methods
+    /// <inheritdoc />
+    protected override string BuildPath(string? apiParentPath)
+        => ApiSchemaHelpers.BuildPath(apiParentPath, apiChildPath: nameof(ApiRelationship), apiApiName: this.ApiName);
 
-    internal void Initialize(ApiSchema apiSchema, ApiSchemaContext apiSchemaContext, ApiObjectType apiObjectType, string apiValidationPath, ref List<ValidationResult>? results)
+    /// <inheritdoc />
+    internal override void Initialize(ApiInitializationContext context)
     {
-        ArgumentNullException.ThrowIfNull(apiSchema);
-        ArgumentNullException.ThrowIfNull(apiSchemaContext);
-        ArgumentNullException.ThrowIfNull(apiObjectType);
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiValidationPath);
+        ArgumentNullException.ThrowIfNull(context);
 
-        _apiSchemaContext = apiSchemaContext;
+        base.Initialize(context);
 
-        this.InitializeApiName(apiValidationPath, ref results);
-        this.InitializeApiProperty(apiObjectType, apiValidationPath, ref results);
+        this.InitializeApiName(context);
+        this.InitializeApiProperty(context);
     }
     #endregion
 
@@ -112,28 +105,29 @@ public sealed class ApiRelationship(string apiName, string? apiPropertyName = nu
     #endregion
 
     #region Implementation Methods
-    private void InitializeApiName(string apiValidationPath, ref List<ValidationResult>? results)
+    private void InitializeApiName(ApiInitializationContext context)
     {
         if (string.IsNullOrWhiteSpace(this.ApiName))
         {
-            results ??= [];
-            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ApiName)} cannot be null or whitespace.", [nameof(this.ApiName)]));
+            var path = $"{this.ApiPath}.{nameof(this.ApiName)}";
+            var severity = ApiInitializationSeverity.Error;
+            var code = ApiInitializationCode.API_RELATIONSHIP_INVALID_API_NAME;
+            var description = $"{nameof(this.ApiName)} cannot be null, empty, or whitespace";
+            var remediation = $"Provide a valid {nameof(this.ApiName)}";
+
+            context.AddIssue(path, severity, code, description, remediation);
         }
     }
 
-    private void InitializeApiProperty(ApiObjectType apiObjectType, string apiValidationPath, ref List<ValidationResult>? results)
+    private void InitializeApiProperty(ApiInitializationContext context)
     {
         _apiResolvedProperty = null;
 
-        if (string.IsNullOrWhiteSpace(this.ApiPropertyName))
-        {
-            results ??= [];
-            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ApiPropertyName)} cannot be null or whitespace.", [nameof(this.ApiPropertyName)]));
-        }
-        else
+        if (!string.IsNullOrWhiteSpace(this.ApiPropertyName))
         {
             // Resolve the related API property for the parent API object type.
-            if (apiObjectType.TryGetPropertyByApiName(this.ApiPropertyName, out var apiResolvedProperty))
+            var apiParentObjectType = context.ApiParentObjectType;
+            if (apiParentObjectType.TryGetPropertyByApiName(this.ApiPropertyName, out var apiResolvedProperty))
             {
                 _apiResolvedProperty = apiResolvedProperty;
             }
@@ -141,8 +135,15 @@ public sealed class ApiRelationship(string apiName, string? apiPropertyName = nu
 
         if (_apiResolvedProperty is null)
         {
-            results ??= [];
-            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ApiProperty)} unable to resolve {nameof(this.ApiProperty)}[\"{this.ApiPropertyName.SafeToString()}\"].", [nameof(this.ApiProperty)]));
+            var apiObjectTypeName = context.ApiParentObjectType.ApiName.SafeToString();
+
+            var path = $"{this.ApiPath}.{nameof(this.ApiProperty)}";
+            var severity = ApiInitializationSeverity.Error;
+            var code = ApiInitializationCode.API_RELATIONSHIP_UNRESOLVED_PROPERTY;
+            var description = $"{nameof(this.ApiProperty)} unable to resolve {nameof(this.ApiPropertyName)}=\"{this.ApiPropertyName.SafeToString()}\" on parent {nameof(ApiObjectType)}[\"{apiObjectTypeName}\"]";
+            var remediation = $"Ensure that {nameof(this.ApiPropertyName)} refers to a valid property on the parent {nameof(ApiObjectType)}[\"{apiObjectTypeName}\"]";
+
+            context.AddIssue(path, severity, code, description, remediation);
         }
     }
     #endregion

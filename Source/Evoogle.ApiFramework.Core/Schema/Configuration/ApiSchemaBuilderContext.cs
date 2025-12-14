@@ -27,7 +27,7 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null)
     internal IEnumerable<ApiEnumTypeBuilder> ApiEnumTypeBuilders => _apiEnumTypeBuilders.Values;
     internal IEnumerable<ApiObjectTypeBuilder> ApiObjectTypeBuilders => _apiObjectTypeBuilders.Values;
 
-    internal ILogger Logger { get; } = new MultiplexingLogger(logger, MultiplexingLoggerMode.All);
+    internal ILogger Logger { get; } = new MultiplexingLogger(logger, MultiplexingLoggerMode.None);
     #endregion
 
     #region Methods

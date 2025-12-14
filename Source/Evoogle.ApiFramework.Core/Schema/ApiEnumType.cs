@@ -3,8 +3,6 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using System.ComponentModel.DataAnnotations;
-
 using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.Extensions;
 using Evoogle.Reflection;
@@ -23,8 +21,6 @@ namespace Evoogle.ApiFramework.Schema;
 public sealed class ApiEnumType(string apiName, IEnumerable<ApiEnumValue> apiEnumValues, Type clrEnumType) : ApiNamedType(apiName, clrEnumType)
 {
     #region ApiEnumType Fields
-    private ApiSchemaContext? _apiSchemaContext = null;
-
     private Dictionary<string, ApiEnumValue>? _apiNameLookup = null;
     private Dictionary<string, ApiEnumValue>? _clrNameLookup = null;
     private Dictionary<int, ApiEnumValue>? _clrOrdinalLookup = null;
@@ -40,30 +36,25 @@ public sealed class ApiEnumType(string apiName, IEnumerable<ApiEnumValue> apiEnu
 
     #region ApiEnumType Properties
     /// <summary>Gets the collection of enumeration values defined for this API enum type.</summary>
-    public ApiEnumValue[] ApiEnumValues { get; } = apiEnumValues.SafeToArray();
-
-    /// <summary>Gets the schema context for this enum type.</summary>
-    internal ApiSchemaContext ApiSchemaContext => this.ThrowIfNotInitialized(_apiSchemaContext);
+    public ApiEnumValue[] ApiEnumValues { get; } = [.. apiEnumValues.EmptyIfNull().Where(x => x is not null).OrderBy(x => x.ClrOrdinal)];
 
     private Dictionary<string, ApiEnumValue> ApiNameLookup => this.ThrowIfNotInitialized(_apiNameLookup);
     private Dictionary<string, ApiEnumValue> ClrNameLookup => this.ThrowIfNotInitialized(_clrNameLookup);
     private Dictionary<int, ApiEnumValue> ClrOrdinalLookup => this.ThrowIfNotInitialized(_clrOrdinalLookup);
     #endregion
 
-    #region ApiType Methods
-    internal override void Initialize(ApiSchema apiSchema, ApiSchemaContext apiSchemaContext, ref List<ValidationResult>? results)
+    #region ApiSchemaElement Methods
+    /// <inheritdoc />
+    internal override void Initialize(ApiInitializationContext context)
     {
-        ArgumentNullException.ThrowIfNull(apiSchema);
-        ArgumentNullException.ThrowIfNull(apiSchemaContext);
+        ArgumentNullException.ThrowIfNull(context);
 
-        _apiSchemaContext = apiSchemaContext;
+        base.Initialize(context);
 
-        base.Initialize(apiSchema, apiSchemaContext, ref results);
+        this.InitializeLookupDictionaries(context);
 
-        this.InitializeLookupDictionaries(ref results);
-
-        this.InitializeClrType(ref results);
-        this.InitializeApiEnumValues(apiSchema, apiSchemaContext, ref results);
+        this.InitializeClrType(context);
+        this.InitializeApiEnumValues(context);
     }
     #endregion
 
@@ -106,14 +97,17 @@ public sealed class ApiEnumType(string apiName, IEnumerable<ApiEnumValue> apiEnu
     #endregion
 
     #region Implementation Methods
-    private void InitializeApiEnumValues(ApiSchema apiSchema, ApiSchemaContext apiSchemaContext, ref List<ValidationResult>? results)
+    private void InitializeApiEnumValues(ApiInitializationContext context)
     {
-        var apiValidationPath = this.GetValidationPath();
-
-        if (this.ApiEnumValues is null)
+        if (this.ApiEnumValues is null || this.ApiEnumValues.Length == 0)
         {
-            results ??= [];
-            results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ApiEnumValues)} cannot be null.", [nameof(this.ApiEnumValues)]));
+            var path = $"{this.ApiPath}.{nameof(this.ApiEnumValues)}";
+            var severity = ApiInitializationSeverity.Error;
+            var code = ApiInitializationCode.API_ENUM_TYPE_NULL_OR_EMPTY_ENUM_VALUES;
+            var description = $"{nameof(this.ApiEnumValues)} is either null or empty";
+            var remediation = $"Define at least one {nameof(ApiEnumValue)}";
+
+            context.AddIssue(path, severity, code, description, remediation);
             return;
         }
 
@@ -121,26 +115,15 @@ public sealed class ApiEnumType(string apiName, IEnumerable<ApiEnumValue> apiEnu
         for (var i = 0; i < apiEnumValuesCount; ++i)
         {
             var apiEnumValue = this.ApiEnumValues[i];
-            if (apiEnumValue is null)
-            {
-                results ??= [];
-                results.Add(new ValidationResult($"{apiValidationPath}.{nameof(this.ApiEnumValues)}[{i}] cannot be null.", [nameof(this.ApiEnumValues)]));
-                continue;
-            }
 
-            var apiEnumValueValidationPath = apiEnumValue.GetValidationPath(parentPath: apiValidationPath);
-            apiEnumValue.Initialize
-            (
-                apiSchema,
-                apiSchemaContext,
-                apiEnumValueValidationPath,
-                ref results
-            );
+            var childContext = context.WithParentSchemaElement(this);
+            apiEnumValue.Initialize(childContext);
         }
     }
 
-    private void InitializeClrType(ref List<ValidationResult>? results)
+    private void InitializeClrType(ApiInitializationContext context)
     {
+        // If ClrType is null, the base ApiNamedType.Initialize will have already reported the issue.
         if (this.ClrType is null)
         {
             return;
@@ -148,35 +131,58 @@ public sealed class ApiEnumType(string apiName, IEnumerable<ApiEnumValue> apiEnu
 
         if (!TypeReflection.IsEnum(this.ClrType))
         {
-            results ??= [];
-            results.Add(new ValidationResult($"{this.GetValidationPath()}.{nameof(this.ClrType)} must be a CLR enum type.", [nameof(this.ClrType)]));
+            var path = $"{this.ApiPath}.{nameof(this.ClrType)}";
+            var severity = ApiInitializationSeverity.Error;
+            var code = ApiInitializationCode.API_ENUM_TYPE_INVALID_CLR_TYPE;
+            var description = $"{nameof(this.ClrType)} '{this.ClrType.SafeToName()}' must be a CLR Enum";
+            var remediation = $"Change the {nameof(this.ClrType)} to be a valid CLR Enum";
+
+            context.AddIssue(path, severity, code, description, remediation);
         }
     }
 
-    private void InitializeLookupDictionaries(ref List<ValidationResult>? results)
+    private void InitializeLookupDictionaries(ApiInitializationContext context)
     {
+        // Initialize lookup dictionaries for lookup by API name, CLR name, and CLR ordinal.
         _apiNameLookup = null;
         _clrNameLookup = null;
         _clrOrdinalLookup = null;
 
-        var anyApiNameDuplicates = ApiSchemaHelpers.ValidateUnique(this.ApiEnumValues, x => x.ApiName, this.GetValidationPath(), nameof(ApiEnumValue.ApiName), ref results);
-        var anyClrNameDuplicates = ApiSchemaHelpers.ValidateUnique(this.ApiEnumValues, x => x.ClrName, this.GetValidationPath(), nameof(ApiEnumValue.ClrName), ref results);
-        var anyClrOrdinalDuplicates = ApiSchemaHelpers.ValidateUnique(this.ApiEnumValues, x => x.ClrOrdinal, this.GetValidationPath(), nameof(ApiEnumValue.ClrOrdinal), ref results);
+        ApiSchemaHelpers.InitializeLookupDictionary
+        (
+            parts: this.ApiEnumValues,
+            partKeySelector: x => x.ApiName,
+            partKeyFilter: x => !string.IsNullOrWhiteSpace(x),
+            partKeyPropertyName: nameof(ApiEnumValue.ApiName),
+            path: $"{this.ApiPath}.{nameof(this.ApiEnumValues)}",
+            code: ApiInitializationCode.API_ENUM_TYPE_DUPLICATE_ENUM_VALUE_API_NAME,
+            context: context,
+            lookupDictionary: out _apiNameLookup
+        );
 
-        if (!anyApiNameDuplicates)
-        {
-            _apiNameLookup = this.ApiEnumValues.ToDictionary(x => x.ApiName, StringComparer.OrdinalIgnoreCase);
-        }
+        ApiSchemaHelpers.InitializeLookupDictionary
+        (
+            parts: this.ApiEnumValues,
+            partKeySelector: x => x.ClrName,
+            partKeyFilter: x => !string.IsNullOrWhiteSpace(x),
+            partKeyPropertyName: nameof(ApiEnumValue.ClrName),
+            path: $"{this.ApiPath}.{nameof(this.ApiEnumValues)}",
+            code: ApiInitializationCode.API_ENUM_TYPE_DUPLICATE_ENUM_VALUE_CLR_NAME,
+            context: context,
+            lookupDictionary: out _clrNameLookup
+        );
 
-        if (!anyClrNameDuplicates)
-        {
-            _clrNameLookup = this.ApiEnumValues.ToDictionary(x => x.ClrName, StringComparer.OrdinalIgnoreCase);
-        }
-
-        if (!anyClrOrdinalDuplicates)
-        {
-            _clrOrdinalLookup = this.ApiEnumValues.ToDictionary(x => x.ClrOrdinal);
-        }
+        ApiSchemaHelpers.InitializeLookupDictionary
+        (
+            parts: this.ApiEnumValues,
+            partKeySelector: x => x.ClrOrdinal,
+            partKeyFilter: null,
+            partKeyPropertyName: nameof(ApiEnumValue.ClrOrdinal),
+            path: $"{this.ApiPath}.{nameof(this.ApiEnumValues)}",
+            code: ApiInitializationCode.API_ENUM_TYPE_DUPLICATE_ENUM_VALUE_CLR_ORDINAL,
+            context: context,
+            lookupDictionary: out _clrOrdinalLookup
+        );
     }
     #endregion
 }

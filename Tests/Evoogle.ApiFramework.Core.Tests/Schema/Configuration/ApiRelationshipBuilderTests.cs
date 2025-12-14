@@ -56,8 +56,10 @@ public class ApiRelationshipBuilderTests(ITestOutputHelper output) : XUnitTests(
             (
                 this.ApiRelationshipExpected,
                 opt => opt
-                    .Excluding(p => p.ApiProperty)
-                    .Excluding(p => p.ApiCardinality)
+                    .Excluding(info => info.Path.Contains(nameof(ApiSchemaElement.ApiPath)))
+                    .Excluding(r => r.ApiProperty)
+                    .Excluding(r => r.ApiCardinality)
+                    .WithStrictOrdering()
             );
         }
     }

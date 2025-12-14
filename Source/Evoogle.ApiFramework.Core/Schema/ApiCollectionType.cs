@@ -3,8 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using System.ComponentModel.DataAnnotations;
-
+using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema;
@@ -53,14 +52,17 @@ public sealed class ApiCollectionType(ApiTypeExpression apiItemTypeExpression, A
 
     #region ApiType Methods
     /// <inheritdoc />
-    protected override string GetValidationPath() => $"{this.ApiTypeName.SafeToString()}";
+    protected override string BuildPath(string? apiParentPath)
+        => ApiSchemaHelpers.BuildPath(apiParentPath, apiChildPath: this.ApiTypeName, apiApiName: null);
 
-    internal override void Initialize(ApiSchema apiSchema, ApiSchemaContext apiSchemaContext, ref List<ValidationResult>? results)
+    /// <inheritdoc />
+    internal override void Initialize(ApiInitializationContext context)
     {
-        ArgumentNullException.ThrowIfNull(apiSchema);
-        ArgumentNullException.ThrowIfNull(apiSchemaContext);
+        ArgumentNullException.ThrowIfNull(context);
 
-        this.InitializeApiItemTypeExpression(apiSchema, ref results);
+        base.Initialize(context);
+
+        this.InitializeApiItemTypeExpression(context);
     }
     #endregion
 
@@ -78,17 +80,22 @@ public sealed class ApiCollectionType(ApiTypeExpression apiItemTypeExpression, A
     #endregion
 
     #region Implementation Methods
-    private void InitializeApiItemTypeExpression(ApiSchema apiSchema, ref List<ValidationResult>? results)
+    private void InitializeApiItemTypeExpression(ApiInitializationContext context)
     {
         if (this.ApiItemTypeExpression is null)
         {
-            results ??= [];
-            results.Add(new ValidationResult($"{this.GetValidationPath()}.{nameof(this.ApiItemTypeExpression)} cannot be null.", [nameof(this.ApiItemTypeExpression)]));
+            var path = $"{this.ApiPath}.{nameof(this.ApiItemType)}";
+            var severity = ApiInitializationSeverity.Error;
+            var code = ApiInitializationCode.API_COLLECTION_TYPE_NULL_ITEM_TYPE;
+            var description = $"{nameof(this.ApiItemType)} is null for {nameof(ApiCollectionType)}";
+            var remediation = $"Ensure that {nameof(this.ApiItemType)} is specified for {nameof(ApiCollectionType)}";
+
+            context.AddIssue(path, severity, code, description, remediation);
             return;
         }
 
-        var apiChildValidationPath = $"{this.GetValidationPath()}.{nameof(this.ApiItemTypeExpression)}";
-        this.ApiItemTypeExpression.Initialize(apiSchema, apiChildValidationPath, ref results);
+        var childContext = context.WithParentSchemaElement(this);
+        this.ApiItemTypeExpression.InitializeForCollection(childContext);
     }
     #endregion
 }

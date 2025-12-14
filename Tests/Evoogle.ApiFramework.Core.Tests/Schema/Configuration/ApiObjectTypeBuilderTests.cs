@@ -76,10 +76,11 @@ public class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
             (
                 this.ApiTypeExpected.As<ApiObjectType>(),
                 opt => opt
+                    .Excluding(info => info.Path.Contains(nameof(ApiSchemaElement.ApiPath)))
+                    .Excluding(info => info.DeclaringType == typeof(ApiProperty) && info.Name == nameof(ApiProperty.ApiType))
+                    .Excluding(info => info.DeclaringType == typeof(ApiRelationship) && info.Name == nameof(ApiRelationship.ApiProperty))
+                    .Excluding(info => info.DeclaringType == typeof(ApiRelationship) && info.Name == nameof(ApiRelationship.ApiCardinality))
                     .WithStrictOrdering()
-                    .Excluding(p => p.DeclaringType == typeof(ApiProperty) && p.Name == nameof(ApiProperty.ApiType))
-                    .Excluding(p => p.DeclaringType == typeof(ApiRelationship) && p.Name == nameof(ApiRelationship.ApiProperty))
-                    .Excluding(p => p.DeclaringType == typeof(ApiRelationship) && p.Name == nameof(ApiRelationship.ApiCardinality))
             );
         }
         #endregion

@@ -32,20 +32,18 @@ public static class ApiTestSchemaFactory
         // 1) Scalars
         var scalars = new List<ApiScalarType>
         {
-            S("Ulid",           typeof(Ulid)),
-            S("Guid",           typeof(Guid)),
-            S("String",         typeof(string)),
-            S("Int32",          typeof(int)),
-            S("Int64",          typeof(long)),
-            S("Decimal",        typeof(decimal)),
-            S("Double",         typeof(double)),
-            S("Boolean",        typeof(bool)),
-            S("DateOnly",       typeof(DateOnly)),
-            S("TimeOnly",       typeof(TimeOnly)),
-            S("DateTimeOffset", typeof(DateTimeOffset)),
-            S("Uri",            typeof(Uri)),
-            S("Email",          typeof(string)),
-            S("Bytes",          typeof(byte[]))
+            S(nameof(Ulid),           typeof(Ulid)),
+            S(nameof(Guid),           typeof(Guid)),
+            S(nameof(String),         typeof(string)),
+            S(nameof(Int32),          typeof(int)),
+            S(nameof(Int64),          typeof(long)),
+            S(nameof(Decimal),        typeof(decimal)),
+            S(nameof(Double),         typeof(double)),
+            S(nameof(Boolean),        typeof(bool)),
+            S(nameof(DateOnly),       typeof(DateOnly)),
+            S(nameof(TimeOnly),       typeof(TimeOnly)),
+            S(nameof(DateTimeOffset), typeof(DateTimeOffset)),
+            S(nameof(Uri),            typeof(Uri))
         };
 
         // 2) Enums

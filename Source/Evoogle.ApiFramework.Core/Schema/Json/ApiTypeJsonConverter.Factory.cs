@@ -27,7 +27,7 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
     private static ApiEnumType CreateApiEnumType(DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
     {
         var apiName = context.ReadData.ApiNamedType?.ApiName;
-        var apiEnumValues = context.ReadData.ApiEnumType?.ApiEnumValues; ;
+        var apiEnumValues = context.ReadData.ApiEnumType?.ApiEnumValues;
         var clrType = context.ReadData.ApiType?.ClrType;
 
         return new ApiEnumType(apiName!, apiEnumValues!, clrType!);

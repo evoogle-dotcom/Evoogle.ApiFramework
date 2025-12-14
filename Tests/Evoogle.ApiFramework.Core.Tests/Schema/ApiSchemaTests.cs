@@ -3,6 +3,9 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Text.Json;
+
+using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Schema.TestData;
 using Evoogle.Extensions;
 using Evoogle.XUnit;
@@ -16,91 +19,149 @@ namespace Evoogle.ApiFramework.Schema;
 public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
 {
     #region Test Classes
-    private class TryGetByApiNameTest : XUnitTest
+    public class InitializeThrowsTest : JsonConverterTestBase<ApiSchema>
     {
         #region User Supplied Properties
-        public ApiSchema? ApiSchema { get; init; }
-        public string? ApiName { get; init; }
-        public ApiType? ExpectedApiType { get; init; }
+        public required string Source { get; init; }
+        public required string ExpectedExceptionMessage { get; init; }
+        public required List<ApiInitializationIssue> ExpectedIssues { get; init; }
         #endregion
 
         #region Calculated Properties
-        private bool ExpectedResult { get; set; }
-        private bool ActualResult { get; set; }
-        private ApiType? ActualApiType { get; set; }
+        private bool? ActualExceptionThrown { get; set; }
+        private string? ActualExceptionMessage { get; set; }
+        private List<ApiInitializationIssue>? ActualIssues { get; set; }
         #endregion
 
         #region XUnitTest Methods
         protected override void Arrange()
         {
-            this.WriteLine($"ApiName: {this.ApiName.SafeToString()}");
+            this.WriteLine($"Source:   {this.Source.SafeToString().RemoveWhitespace()}");
             this.WriteLine();
 
-            this.ExpectedResult = this.ExpectedApiType != null;
+            this.WriteLine($"Expected Exception Message: {this.ExpectedExceptionMessage.SafeToString()}");
+            this.WriteLine();
+            foreach (var expectedIssue in this.ExpectedIssues)
+            {
+                this.WriteLine($"Expected Issue: {expectedIssue.SafeToString()}");
+            }
+            this.WriteLine();
+        }
+        #endregion
 
-            this.WriteLine($"Expected Result:  {this.ExpectedResult.SafeToString()}");
-            this.WriteLine($"Expected ApiType: {this.ExpectedApiType.SafeToString()}");
+        protected override void Act()
+        {
+            try
+            {
+                JsonSerializer.Deserialize<ApiSchema>(this.Source, this.JsonSerializerOptions);
+            }
+            catch (ApiSchemaInitializationException ex)
+            {
+                this.ActualExceptionThrown = true;
+                this.ActualExceptionMessage = ex.Message;
+                this.ActualIssues = [.. ex.Issues];
+            }
+
+            this.WriteLine($"Actual Exception Thrown:  {this.ActualExceptionThrown.SafeToString()}");
+            this.WriteLine($"Actual Exception Message: {this.ActualExceptionMessage.SafeToString()}");
+            this.WriteLine();
+            if (this.ActualIssues is not null)
+            {
+                foreach (var actualIssue in this.ActualIssues)
+                {
+                    this.WriteLine($"Actual Issue: {actualIssue.SafeToString()}");
+                }
+            }
+            this.WriteLine();
+        }
+
+        protected override void Assert()
+        {
+            this.ActualExceptionThrown.Should().BeTrue();
+            this.ActualExceptionMessage.Should().Be(this.ExpectedExceptionMessage);
+            this.ActualIssues.Should().NotBeNull();
+            this.ActualIssues.Should().BeEquivalentTo(this.ExpectedIssues);
+        }
+    }
+
+    public class TryGetByApiNameTest : XUnitTest
+    {
+        #region User Supplied Properties
+        public required ApiTestSchemaKind ApiSchemaKind { get; init; }
+        public required string SearchKey { get; init; }
+        public required bool ExpectedResult { get; init; }
+        #endregion
+
+        #region Calculated Properties
+        private ApiSchema? ApiSchema { get; set; }
+        private bool? ActualResult { get; set; }
+        #endregion
+
+        #region XUnitTest Methods
+        protected override void Arrange()
+        {
+            var apiSchema = ApiTestSchemaFactory.BuildTestSchema(this.ApiSchemaKind);
+            this.ApiSchema = apiSchema ?? throw new InvalidOperationException($"{nameof(Schema.ApiSchema)} creation failed.");
+
+            this.WriteLine($"ApiSchema:      {this.ApiSchema.ApiName.SafeToString()}");
+            this.WriteLine($"SearchKey:      {this.SearchKey.SafeToString()}");
+            this.WriteLine($"ExpectedResult: {this.ExpectedResult.SafeToString()}");
             this.WriteLine();
         }
 
         protected override void Act()
         {
-            this.ActualResult = this.ApiSchema!.TryGetTypeByApiName(this.ApiName!, out var apiType);
-            this.ActualApiType = apiType;
+            this.ActualResult = this.ApiSchema!.TryGetTypeByApiName(this.SearchKey, out _);
 
-            this.WriteLine($"Actual Result:    {this.ActualResult.SafeToString()}");
-            this.WriteLine($"Actual ApiType:   {this.ActualApiType.SafeToString()}");
+            this.WriteLine($"ActualResult: {this.ActualResult.SafeToString()}");
+            this.WriteLine();
         }
 
         protected override void Assert()
         {
+            this.ActualResult.Should().NotBeNull();
             this.ActualResult.Should().Be(this.ExpectedResult);
-            this.ActualApiType.Should().BeEquivalentTo(this.ExpectedApiType);
         }
         #endregion
     }
 
-    private class TryGetByClrTypeTest : XUnitTest
+    public class TryGetByClrTypeTest : XUnitTest
     {
         #region User Supplied Properties
-        public ApiSchema? ApiSchema { get; init; }
-        public Type? ClrType { get; init; }
-        public ApiType? ExpectedApiType { get; init; }
+        public required ApiTestSchemaKind ApiSchemaKind { get; init; }
+        public required Type SearchKey { get; init; }
+        public required bool ExpectedResult { get; init; }
         #endregion
 
         #region Calculated Properties
-        private bool ExpectedResult { get; set; }
-        private bool ActualResult { get; set; }
-        private ApiType? ActualApiType { get; set; }
+        private ApiSchema? ApiSchema { get; set; }
+        private bool? ActualResult { get; set; }
         #endregion
 
         #region XUnitTest Methods
         protected override void Arrange()
         {
-            var clrTypeName = this.ClrType!.Name;
-            this.WriteLine($"ClrType: {clrTypeName.SafeToString()}");
-            this.WriteLine();
+            var apiSchema = ApiTestSchemaFactory.BuildTestSchema(this.ApiSchemaKind);
+            this.ApiSchema = apiSchema ?? throw new InvalidOperationException($"{nameof(Schema.ApiSchema)} creation failed.");
 
-            this.ExpectedResult = this.ExpectedApiType != null;
-
-            this.WriteLine($"Expected Result:  {this.ExpectedResult.SafeToString()}");
-            this.WriteLine($"Expected ApiType: {this.ExpectedApiType.SafeToString()}");
+            this.WriteLine($"ApiSchema:      {this.ApiSchema.ApiName.SafeToString()}");
+            this.WriteLine($"SearchKey:      {this.SearchKey.SafeToString()}");
+            this.WriteLine($"ExpectedResult: {this.ExpectedResult.SafeToString()}");
             this.WriteLine();
         }
 
         protected override void Act()
         {
-            this.ActualResult = this.ApiSchema!.TryGetTypeByClrType(this.ClrType!, out var apiType);
-            this.ActualApiType = apiType;
+            this.ActualResult = this.ApiSchema!.TryGetTypeByClrType(this.SearchKey, out _);
 
-            this.WriteLine($"Actual   Result:  {this.ActualResult.SafeToString()}");
-            this.WriteLine($"Actual   ApiType: {this.ActualApiType.SafeToString()}");
+            this.WriteLine($"ActualResult: {this.ActualResult.SafeToString()}");
+            this.WriteLine();
         }
 
         protected override void Assert()
         {
+            this.ActualResult.Should().NotBeNull();
             this.ActualResult.Should().Be(this.ExpectedResult);
-            this.ActualApiType.Should().BeEquivalentTo(this.ExpectedApiType);
         }
         #endregion
     }
@@ -167,17 +228,367 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
 
     public static readonly ApiTypeExpression TestApiObjectTypeCompanyReference = new(ApiTypeKind.Object, nameof(Company));
 
-    public static readonly ApiSchema TestApiSchema = ApiSchema.Create
-    (
-        nameof(TestApiSchema),
-        [
-            TestApiScalarTypeBoolean,
-            TestApiScalarTypeInt32,
-            TestApiScalarTypeString,
-            TestApiEnumTypeGender,
-            TestApiObjectTypePerson
-        ]
-    );
+    public class TestUnknownType
+    {
+    }
+
+    public static TheoryDataRow<IXUnitTest>[] InitializeThrowsTheoryData =>
+    [
+        // ApiEnumType throws if ApiName is invalid
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiEnumType)} Throws If {nameof(ApiEnumType.ApiName)} Is Invalid",
+            Source = @"
+            {
+                ""ApiName"": ""ApiSchema With 1 ApiEnumType"",
+                ""ApiScalarTypes"": [],
+                ""ApiEnumTypes"": [
+                    {
+                        ""Kind"": ""Enum"",
+                        ""ApiName"": """",
+                        ""ApiEnumValues"": [
+                            {
+                                ""ApiName"": ""Unspecified"",
+                                ""ClrName"": ""Unspecified"",
+                                ""ClrOrdinal"": 0
+                            },
+                            {
+                                ""ApiName"": ""Male"",
+                                ""ClrName"": ""Male"",
+                                ""ClrOrdinal"": 1
+                            },
+                            {
+                                ""ApiName"": ""Female"",
+                                ""ClrName"": ""Female"",
+                                ""ClrOrdinal"": 2
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ],
+                ""ApiObjectTypes"": []
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiEnumType)}.{nameof(ApiEnumType.ApiName)}",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_NAMED_TYPE_INVALID_API_NAME,
+                    description: $"{nameof(ApiEnumType.ApiName)} cannot be null, empty, or whitespace",
+                    remediation: $"Provide a valid {nameof(ApiEnumType.ApiName)}"
+                ),
+            ]
+        },
+
+        // ApiEnumType throws if ClrType is null
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiEnumType)} Throws If {nameof(ApiEnumType.ClrType)} Is Null",
+            Source = @"
+            {
+                ""ApiName"": ""ApiSchema With 1 ApiEnumType"",
+                ""ApiScalarTypes"": [],
+                ""ApiEnumTypes"": [
+                    {
+                        ""Kind"": ""Enum"",
+                        ""ApiName"": ""Gender"",
+                        ""ApiEnumValues"": [
+                            {
+                                ""ApiName"": ""Unspecified"",
+                                ""ClrName"": ""Unspecified"",
+                                ""ClrOrdinal"": 0
+                            },
+                            {
+                                ""ApiName"": ""Male"",
+                                ""ClrName"": ""Male"",
+                                ""ClrOrdinal"": 1
+                            },
+                            {
+                                ""ApiName"": ""Female"",
+                                ""ClrName"": ""Female"",
+                                ""ClrOrdinal"": 2
+                            }
+                        ]
+                    }
+                ],
+                ""ApiObjectTypes"": []
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"].{nameof(ApiEnumType.ClrType)}",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_NAMED_TYPE_NULL_CLR_TYPE,
+                    description: $"{nameof(ApiEnumType.ClrType)} cannot be null",
+                    remediation: $"Provide a valid {nameof(ApiEnumType.ClrType)}"
+                ),
+            ]
+        },
+
+        // ApiEnumType throws if ClrType is not a CLR Enum
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiEnumType)} Throws If {nameof(ApiEnumType.ClrType)} Is Not a CLR Enum",
+            Source = @"
+            {
+                ""ApiName"": ""ApiSchema With 1 ApiEnumType"",
+                ""ApiScalarTypes"": [],
+                ""ApiEnumTypes"": [
+                    {
+                        ""Kind"": ""Enum"",
+                        ""ApiName"": ""Gender"",
+                        ""ApiEnumValues"": [
+                            {
+                                ""ApiName"": ""Unspecified"",
+                                ""ClrName"": ""Unspecified"",
+                                ""ClrOrdinal"": 0
+                            },
+                            {
+                                ""ApiName"": ""Male"",
+                                ""ClrName"": ""Male"",
+                                ""ClrOrdinal"": 1
+                            },
+                            {
+                                ""ApiName"": ""Female"",
+                                ""ClrName"": ""Female"",
+                                ""ClrOrdinal"": 2
+                            }
+                        ],
+                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                    }
+                ],
+                ""ApiObjectTypes"": []
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"].{nameof(ApiEnumType.ClrType)}",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_ENUM_TYPE_INVALID_CLR_TYPE,
+                    description: $"{nameof(ApiEnumType.ClrType)} 'String' must be a CLR Enum",
+                    remediation: $"Change the {nameof(ApiEnumType.ClrType)} to be a valid CLR Enum"
+                ),
+            ]
+        },
+
+        // ApiEnumType throws if ApiEnumValues is null
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiEnumType)} Throws If {nameof(ApiEnumType.ApiEnumValues)} Is Null",
+            Source = @"
+            {
+                ""ApiName"": ""ApiSchema With 1 ApiEnumType"",
+                ""ApiScalarTypes"": [],
+                ""ApiEnumTypes"": [
+                    {
+                        ""Kind"": ""Enum"",
+                        ""ApiName"": ""Gender"",
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ],
+                ""ApiObjectTypes"": []
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"].{nameof(ApiEnumType.ApiEnumValues)}",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_ENUM_TYPE_NULL_OR_EMPTY_ENUM_VALUES,
+                    description: $"{nameof(ApiEnumType.ApiEnumValues)} is either null or empty",
+                    remediation: $"Define at least one {nameof(ApiEnumValue)}"
+                ),
+            ]
+        },
+
+        // ApiEnumType throws if ApiEnumValues is emtpy
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiEnumType)} Throws If {nameof(ApiEnumType.ApiEnumValues)} Is Empty",
+            Source = @"
+            {
+                ""ApiName"": ""ApiSchema With 1 ApiEnumType"",
+                ""ApiScalarTypes"": [],
+                ""ApiEnumTypes"": [
+                    {
+                        ""Kind"": ""Enum"",
+                        ""ApiName"": ""Gender"",
+                        ""ApiEnumValues"": [],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ],
+                ""ApiObjectTypes"": []
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"].{nameof(ApiEnumType.ApiEnumValues)}",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_ENUM_TYPE_NULL_OR_EMPTY_ENUM_VALUES,
+                    description: $"{nameof(ApiEnumType.ApiEnumValues)} is either null or empty",
+                    remediation: $"Define at least one {nameof(ApiEnumValue)}"
+                ),
+            ]
+        },
+
+        // ApiEnumType throws if ApiEnumValues has duplicate ApiName values
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiEnumType)} Throws If {nameof(ApiEnumType.ApiEnumValues)} Has Duplicate {nameof(ApiEnumValue.ApiName)} Values",
+            Source = @"
+            {
+                ""ApiName"": ""ApiSchema With 1 ApiEnumType"",
+                ""ApiScalarTypes"": [],
+                ""ApiEnumTypes"": [
+                    {
+                        ""Kind"": ""Enum"",
+                        ""ApiName"": ""Gender"",
+                        ""ApiEnumValues"": [
+                            {
+                                ""ApiName"": ""Unspecified"",
+                                ""ClrName"": ""Unspecified"",
+                                ""ClrOrdinal"": 0
+                            },
+                            {
+                                ""ApiName"": ""Female"",
+                                ""ClrName"": ""Male"",
+                                ""ClrOrdinal"": 1
+                            },
+                            {
+                                ""ApiName"": ""Female"",
+                                ""ClrName"": ""Female"",
+                                ""ClrOrdinal"": 2
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ],
+                ""ApiObjectTypes"": []
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"].{nameof(ApiEnumType.ApiEnumValues)}",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_ENUM_TYPE_DUPLICATE_ENUM_VALUE_API_NAME,
+                    description: $"Duplicate {nameof(ApiEnumValue)}.{nameof(ApiEnumValue.ApiName)} values: 'Female'",
+                    remediation: $"Ensure each {nameof(ApiEnumValue)} has a unique {nameof(ApiEnumValue.ApiName)} value"
+                ),
+            ]
+        },
+
+        // ApiEnumType throws if ApiEnumValues has duplicate ClrName values
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiEnumType)} Throws If {nameof(ApiEnumType.ApiEnumValues)} Has Duplicate {nameof(ApiEnumValue.ClrName)} Values",
+            Source = @"
+            {
+                ""ApiName"": ""ApiSchema With 1 ApiEnumType"",
+                ""ApiScalarTypes"": [],
+                ""ApiEnumTypes"": [
+                    {
+                        ""Kind"": ""Enum"",
+                        ""ApiName"": ""Gender"",
+                        ""ApiEnumValues"": [
+                            {
+                                ""ApiName"": ""Unspecified"",
+                                ""ClrName"": ""Unspecified"",
+                                ""ClrOrdinal"": 0
+                            },
+                            {
+                                ""ApiName"": ""Male"",
+                                ""ClrName"": ""Female"",
+                                ""ClrOrdinal"": 1
+                            },
+                            {
+                                ""ApiName"": ""Female"",
+                                ""ClrName"": ""Female"",
+                                ""ClrOrdinal"": 2
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ],
+                ""ApiObjectTypes"": []
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"].{nameof(ApiEnumType.ApiEnumValues)}",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_ENUM_TYPE_DUPLICATE_ENUM_VALUE_CLR_NAME,
+                    description: $"Duplicate {nameof(ApiEnumValue)}.{nameof(ApiEnumValue.ClrName)} values: 'Female'",
+                    remediation: $"Ensure each {nameof(ApiEnumValue)} has a unique {nameof(ApiEnumValue.ClrName)} value"
+                ),
+            ]
+        },
+
+        // ApiEnumType throws if ApiEnumValues has duplicate ClrOrdinal values
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiEnumType)} Throws If {nameof(ApiEnumType.ApiEnumValues)} Has Duplicate {nameof(ApiEnumValue.ClrOrdinal)} Values",
+            Source = @"
+            {
+                ""ApiName"": ""ApiSchema With 1 ApiEnumType"",
+                ""ApiScalarTypes"": [],
+                ""ApiEnumTypes"": [
+                    {
+                        ""Kind"": ""Enum"",
+                        ""ApiName"": ""Gender"",
+                        ""ApiEnumValues"": [
+                            {
+                                ""ApiName"": ""Unspecified"",
+                                ""ClrName"": ""Unspecified"",
+                                ""ClrOrdinal"": 0
+                            },
+                            {
+                                ""ApiName"": ""Male"",
+                                ""ClrName"": ""Male"",
+                                ""ClrOrdinal"": 1
+                            },
+                            {
+                                ""ApiName"": ""Female"",
+                                ""ClrName"": ""Female"",
+                                ""ClrOrdinal"": 2
+                            },
+                            {
+                                ""ApiName"": ""Alien"",
+                                ""ClrName"": ""Alien"",
+                                ""ClrOrdinal"": 2
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ],
+                ""ApiObjectTypes"": []
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"].{nameof(ApiEnumType.ApiEnumValues)}",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_ENUM_TYPE_DUPLICATE_ENUM_VALUE_CLR_ORDINAL,
+                    description: $"Duplicate {nameof(ApiEnumValue)}.{nameof(ApiEnumValue.ClrOrdinal)} values: '2'",
+                    remediation: $"Ensure each {nameof(ApiEnumValue)} has a unique {nameof(ApiEnumValue.ClrOrdinal)} value"
+                ),
+            ]
+        },
+    ];
 
     public static TheoryDataRow<IXUnitTest>[] JsonDeserializeTheoryData =>
     [
@@ -192,7 +603,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         // ApiSchema With No ApiTypes
         new JsonDeserializeTest<ApiSchema>
         {
-            Name = "ApiSchema With No ApiTypes",
+            Name = $"{nameof(ApiSchema)} With No ApiTypes",
             Source = @"
             {
                 ""ApiName"": ""ApiSchema With No ApiTypes"",
@@ -206,7 +617,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         // ApiSchema With 1 ApiScalarType
         new JsonDeserializeTest<ApiSchema>
         {
-            Name = "ApiSchema With 1 ApiScalarType",
+            Name = $"{nameof(ApiSchema)} With 1 ApiScalarType",
             Source = @"
             {
                 ""ApiName"": ""ApiSchema With 1 ApiScalarType"",
@@ -226,7 +637,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         // ApiSchema With 1 ApiScalarType And Extension 1
         new JsonDeserializeTest<ApiSchema>
         {
-            Name = "ApiSchema With 1 ApiScalarType And Extension 1",
+            Name = $"{nameof(ApiSchema)} With 1 ApiScalarType And Extension 1",
             Source = @"
             {
                 ""ApiName"": ""ApiSchema With 1 ApiScalarType And Extension 1"",
@@ -252,7 +663,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         // ApiSchema With 2 ApiScalarTypes
         new JsonDeserializeTest<ApiSchema>
         {
-            Name = "ApiSchema With 2 ApiScalarTypes",
+            Name = $"{nameof(ApiSchema)} With 2 ApiScalarTypes",
             Source = @"
             {
                 ""ApiName"": ""ApiSchema With 2 ApiScalarTypes"",
@@ -277,7 +688,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         // ApiSchema With 3 ApiScalarTypes
         new JsonDeserializeTest<ApiSchema>
         {
-            Name = "ApiSchema With 3 ApiScalarTypes",
+            Name = $"{nameof(ApiSchema)} With 3 ApiScalarTypes",
             Source = @"
             {
                 ""ApiName"": ""ApiSchema With 3 ApiScalarTypes"",
@@ -307,7 +718,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         // ApiSchema With 3 ApiScalarTypes And Extension 1 And Extension 2
         new JsonDeserializeTest<ApiSchema>
         {
-            Name = "ApiSchema With 3 ApiScalarTypes And Extension 1 And Extension 2",
+            Name = $"{nameof(ApiSchema)} With 3 ApiScalarTypes And Extension 1 And Extension 2",
             Source = @"
             {
                 ""ApiName"": ""ApiSchema With 3 ApiScalarTypes And Extension 1 And Extension 2"",
@@ -348,7 +759,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         // ApiSchema With 1 ApiEnumType
         new JsonDeserializeTest<ApiSchema>
         {
-            Name = "ApiSchema With 1 ApiEnumType",
+            Name = $"{nameof(ApiSchema)} With 1 ApiEnumType",
             Source = @"
             {
                 ""ApiName"": ""ApiSchema With 1 ApiEnumType"",
@@ -385,7 +796,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         // ApiSchema With 1 ApiEnumType And Extension 1
         new JsonDeserializeTest<ApiSchema>
         {
-            Name = "ApiSchema With 1 ApiEnumType And Extension 1",
+            Name = $"{nameof(ApiSchema)} With 1 ApiEnumType And Extension 1",
             Source = @"
             {
                 ""ApiName"": ""ApiSchema With 1 ApiEnumType And Extension 1"",
@@ -428,7 +839,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         // ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)
         new JsonDeserializeTest<ApiSchema>
         {
-            Name = "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)",
+            Name = $"{nameof(ApiSchema)} With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)",
             Source = @"
             {
                 ""ApiName"": ""ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)"",
@@ -543,7 +954,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         // ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType And Extension 1 And Extension 2
         new JsonDeserializeTest<ApiSchema>
         {
-            Name = "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person) And Extension 1 And Extension 2",
+            Name = $"{nameof(ApiSchema)} With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person) And Extension 1 And Extension 2",
             Source = @"
             {
                 ""ApiName"": ""ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person) And Extension 1 And Extension 2"",
@@ -669,7 +1080,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         // ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 2 ApiObjectTypes (Person and Company)
         new JsonDeserializeTest<ApiSchema>
         {
-            Name = "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 2 ApiObjectTypes (Person and Company)",
+            Name = $"{nameof(ApiSchema)} With 3 ApiScalarTypes and 1 ApiEnumType and 2 ApiObjectTypes (Person and Company)",
             Source = @"
             {
                 ""ApiName"": ""ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 2 ApiObjectTypes (Person and Company)"",
@@ -844,21 +1255,21 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         // ApiSchema With No ApiTypes
         new JsonRoundtripTest<ApiSchema>
         {
-            Name = "ApiSchema With No ApiTypes",
+            Name = $"{nameof(ApiSchema)} With No ApiTypes",
             Expected = ApiSchema.Create("ApiSchema With No ApiTypes", []),
         },
 
         // ApiSchema With 1 ApiScalarType
         new JsonRoundtripTest<ApiSchema>
         {
-            Name = "ApiSchema With 1 ApiScalarType",
+            Name = $"{nameof(ApiSchema)} With 1 ApiScalarType",
             Expected = ApiSchema.Create("ApiSchema With 1 ApiScalarType", [TestApiScalarTypeBoolean]),
         },
 
         // ApiSchema With 1 ApiScalarType And Extension 1
         new JsonRoundtripTest<ApiSchema>
         {
-            Name = "ApiSchema With 1 ApiScalarType And Extension 1",
+            Name = $"{nameof(ApiSchema)} With 1 ApiScalarType And Extension 1",
             Expected = ApiSchema.Create("ApiSchema With 1 ApiScalarType And Extension 1", [TestApiScalarTypeBoolean]),
             ExtensionType1 = typeof(TestExtension1)
         },
@@ -866,21 +1277,21 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         // ApiSchema With 2 ApiScalarTypes
         new JsonRoundtripTest<ApiSchema>
         {
-            Name = "ApiSchema With 2 ApiScalarTypes",
+            Name = $"{nameof(ApiSchema)} With 2 ApiScalarTypes",
             Expected = ApiSchema.Create("ApiSchema With 2 ApiScalarTypes", [TestApiScalarTypeBoolean, TestApiScalarTypeInt32]),
         },
 
         // ApiSchema With 3 ApiScalarTypes
         new JsonRoundtripTest<ApiSchema>
         {
-            Name = "ApiSchema With 3 ApiScalarTypes",
+            Name = $"{nameof(ApiSchema)} With 3 ApiScalarTypes",
             Expected = ApiSchema.Create("ApiSchema With 3 ApiScalarTypes", [TestApiScalarTypeBoolean, TestApiScalarTypeInt32, TestApiScalarTypeString]),
         },
 
         // ApiSchema With 3 ApiScalarTypes And Extension 1 And Extension 2
         new JsonRoundtripTest<ApiSchema>
         {
-            Name = "ApiSchema With 3 ApiScalarTypes And Extension 1 And Extension 2",
+            Name = $"{nameof(ApiSchema)} With 3 ApiScalarTypes And Extension 1 And Extension 2",
             Expected = ApiSchema.Create("ApiSchema With 3 ApiScalarTypes And Extension 1 And Extension 2", [TestApiScalarTypeBoolean, TestApiScalarTypeInt32, TestApiScalarTypeString]),
             ExtensionType1 = typeof(TestExtension1),
             ExtensionType2 = typeof(TestExtension2),
@@ -889,14 +1300,14 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         // ApiSchema With 1 ApiEnumType
         new JsonRoundtripTest<ApiSchema>
         {
-            Name = "ApiSchema With 1 ApiEnumType",
+            Name = $"{nameof(ApiSchema)} With 1 ApiEnumType",
             Expected = ApiSchema.Create("ApiSchema With 1 ApiEnumType", [TestApiEnumTypeGender]),
         },
 
         // ApiSchema With 1 ApiEnumType And Extension 1
         new JsonRoundtripTest<ApiSchema>
         {
-            Name = "ApiSchema With 1 ApiEnumType And Extension 1",
+            Name = $"{nameof(ApiSchema)} With 1 ApiEnumType And Extension 1",
             Expected = ApiSchema.Create("ApiSchema With 1 ApiEnumType And Extension 1", [TestApiEnumTypeGender]),
             ExtensionType1 = typeof(TestExtension1),
         },
@@ -904,7 +1315,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         // ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)
         new JsonRoundtripTest<ApiSchema>
         {
-            Name = "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)",
+            Name = $"{nameof(ApiSchema)} With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)",
             Expected = ApiSchema.Create
             (
                 "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)",
@@ -921,7 +1332,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         // ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person) And Extension 1 And Extension 2
         new JsonRoundtripTest<ApiSchema>
         {
-            Name = "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person) And Extension 1 And Extension 2",
+            Name = $"{nameof(ApiSchema)} With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person) And Extension 1 And Extension 2",
             Expected = ApiSchema.Create
             (
                 "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person) And Extension 1 And Extension 2",
@@ -940,7 +1351,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         // ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 2 ApiObjectTypes (Person and Company) And Extension 1 And Extension 2
         new JsonRoundtripTest<ApiSchema>
         {
-            Name = "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 2 ApiObjectTypes (Person and Company) And Extension 1 And Extension 2",
+            Name = $"{nameof(ApiSchema)} With 3 ApiScalarTypes and 1 ApiEnumType and 2 ApiObjectTypes (Person and Company) And Extension 1 And Extension 2",
             Expected = ApiSchema.Create
             (
                 "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 2 ApiObjectTypes (Person and Company) And Extension 1 And Extension 2",
@@ -971,7 +1382,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         // ApiSchema With No ApiTypes
         new JsonSerializeTest<ApiSchema>
         {
-            Name = "ApiSchema With No ApiTypes",
+            Name = $"{nameof(ApiSchema)} With No ApiTypes",
             Source = ApiSchema.Create("ApiSchema With No ApiTypes", []),
             Expected = @"
             {
@@ -985,7 +1396,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         // ApiSchema With 1 ApiScalarType
         new JsonSerializeTest<ApiSchema>
         {
-            Name = "ApiSchema With 1 ApiScalarType",
+            Name = $"{nameof(ApiSchema)} With 1 ApiScalarType",
             Source = ApiSchema.Create("ApiSchema With 1 ApiScalarType", [TestApiScalarTypeBoolean]),
             Expected = @"
             {
@@ -1005,7 +1416,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         // ApiSchema With 1 ApiScalarType And Extension 1
         new JsonSerializeTest<ApiSchema>
         {
-            Name = "ApiSchema With 1 ApiScalarType And Extension 1",
+            Name = $"{nameof(ApiSchema)} With 1 ApiScalarType And Extension 1",
             Source = ApiSchema.Create("ApiSchema With 1 ApiScalarType And Extension 1", [TestApiScalarTypeBoolean]),
             Expected = @"
             {
@@ -1031,7 +1442,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         // ApiSchema With 2 ApiScalarTypes
         new JsonSerializeTest<ApiSchema>
         {
-            Name = "ApiSchema With 2 ApiScalarTypes",
+            Name = $"{nameof(ApiSchema)} With 2 ApiScalarTypes",
             Source = ApiSchema.Create("ApiSchema With 2 ApiScalarTypes", [TestApiScalarTypeBoolean, TestApiScalarTypeInt32]),
             Expected = @"
             {
@@ -1056,7 +1467,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         // ApiSchema With 3 ApiScalarTypes
         new JsonSerializeTest<ApiSchema>
         {
-            Name = "ApiSchema With 3 ApiScalarTypes",
+            Name = $"{nameof(ApiSchema)} With 3 ApiScalarTypes",
             Source = ApiSchema.Create("ApiSchema With 3 ApiScalarTypes", [TestApiScalarTypeBoolean, TestApiScalarTypeInt32, TestApiScalarTypeString]),
             Expected = @"
             {
@@ -1086,7 +1497,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         // ApiSchema With 3 ApiScalarTypes And Extension 1 And Extension 2
         new JsonSerializeTest<ApiSchema>
         {
-            Name = "ApiSchema With 3 ApiScalarTypes And Extension 1 And Extension 2",
+            Name = $"{nameof(ApiSchema)} With 3 ApiScalarTypes And Extension 1 And Extension 2",
             Source = ApiSchema.Create("ApiSchema With 3 ApiScalarTypes And Extension 1 And Extension 2", [TestApiScalarTypeBoolean, TestApiScalarTypeInt32, TestApiScalarTypeString]),
             Expected = @"
             {
@@ -1127,7 +1538,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         // ApiSchema With 1 ApiEnumType
         new JsonSerializeTest<ApiSchema>
         {
-            Name = "ApiSchema With 1 ApiEnumType",
+            Name = $"{nameof(ApiSchema)} With 1 ApiEnumType",
             Source = ApiSchema.Create("ApiSchema With 1 ApiEnumType", [TestApiEnumTypeGender]),
             Expected = @"
             {
@@ -1164,7 +1575,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         // ApiSchema With 1 ApiEnumType And Extension 1
         new JsonSerializeTest<ApiSchema>
         {
-            Name = "ApiSchema With 1 ApiEnumType And Extension 1",
+            Name = $"{nameof(ApiSchema)} With 1 ApiEnumType And Extension 1",
             Source = ApiSchema.Create("ApiSchema With 1 ApiEnumType And Extension 1", [TestApiEnumTypeGender]),
             Expected = @"
             {
@@ -1207,7 +1618,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         // ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)
         new JsonSerializeTest<ApiSchema>
         {
-            Name = "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)",
+            Name = $"{nameof(ApiSchema)} With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)",
             Source = ApiSchema.Create
             (
 
@@ -1323,7 +1734,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         // ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person) And Extension 1 And Extension 2
         new JsonSerializeTest<ApiSchema>
         {
-            Name = "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person) And Extension 1 And Extension 2",
+            Name = $"{nameof(ApiSchema)} With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person) And Extension 1 And Extension 2",
             Source = ApiSchema.Create
             (
                 "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person) And Extension 1 And Extension 2",
@@ -1449,7 +1860,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         // ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 2 ApiObjectTypes (Person and Company)
         new JsonSerializeTest<ApiSchema>
         {
-            Name = "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 2 ApiObjectTypes (Person and Company)",
+            Name = $"{nameof(ApiSchema)} With 3 ApiScalarTypes and 1 ApiEnumType and 2 ApiObjectTypes (Person and Company)",
             Source = ApiSchema.Create
             (
                 "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 2 ApiObjectTypes (Person and Company)",
@@ -1614,98 +2025,104 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
 
     public static TheoryDataRow<IXUnitTest>[] TryGetByApiNameTheoryData =>
     [
-        new TryGetByApiNameTest()
+        new TryGetByApiNameTest
         {
-            Name = $"Find {TestApiScalarTypeBoolean} by ApiName, Expect ApiType Exists",
-            ApiSchema = TestApiSchema,
-            ApiName = nameof(Boolean),
-            ExpectedApiType = TestApiScalarTypeBoolean,
+            Name = $"{nameof(ApiSchema.TryGetTypeByApiName)} returns false when {nameof(ApiNamedType)} does not exist in schema",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            SearchKey = "UnknownType",
+            ExpectedResult = false
         },
-        new TryGetByApiNameTest()
+
+        new TryGetByApiNameTest
         {
-            Name = $"Find {TestApiScalarTypeInt32} by ApiName, Expect ApiType Exists",
-            ApiSchema = TestApiSchema,
-            ApiName = nameof(Int32),
-            ExpectedApiType = TestApiScalarTypeInt32,
+            Name = $"{nameof(ApiSchema.TryGetTypeByApiName)} returns true for {nameof(ApiEnumType)} with exact case match",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            SearchKey = "Gender",
+            ExpectedResult = true
         },
-        new TryGetByApiNameTest()
+
+        new TryGetByApiNameTest
         {
-            Name = $"Find {TestApiScalarTypeString} by ApiName, Expect ApiType Exists",
-            ApiSchema = TestApiSchema,
-            ApiName = nameof(String),
-            ExpectedApiType = TestApiScalarTypeString,
+            Name = $"{nameof(ApiSchema.TryGetTypeByApiName)} returns false for {nameof(ApiEnumType)} with case-insensitive search (uppercase)",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            SearchKey = "GENDER",
+            ExpectedResult = false
         },
-        new TryGetByApiNameTest()
+
+        new TryGetByApiNameTest
         {
-            Name = $"Find {TestApiEnumTypeGender} by ApiName, Expect ApiType Exists",
-            ApiSchema = TestApiSchema,
-            ApiName = nameof(Gender),
-            ExpectedApiType = TestApiEnumTypeGender,
+            Name = $"{nameof(ApiSchema.TryGetTypeByApiName)} returns true for {nameof(ApiObjectType)} with exact case match",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            SearchKey = "ScalarsOnly",
+            ExpectedResult = true
         },
-        new TryGetByApiNameTest()
+
+        new TryGetByApiNameTest
         {
-            Name = $"Find {TestApiObjectTypePerson} by ApiName, Expect ApiType Exists",
-            ApiSchema = TestApiSchema,
-            ApiName = nameof(Person),
-            ExpectedApiType = TestApiObjectTypePerson
+            Name = $"{nameof(ApiSchema.TryGetTypeByApiName)} returns false for {nameof(ApiObjectType)} with case-insensitive search (lowercase)",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            SearchKey = "scalarsonly",
+            ExpectedResult = false
         },
-        new TryGetByApiNameTest()
+
+        new TryGetByApiNameTest
         {
-            Name = $"Find {TestApiScalarTypeUInt32} by ApiName, Expect ApiType Does Not Exist",
-            ApiSchema = TestApiSchema,
-            ApiName = nameof(UInt32),
-            ExpectedApiType = null,
+            Name = $"{nameof(ApiSchema.TryGetTypeByApiName)} returns true for {nameof(ApiScalarType)} with exact case match",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            SearchKey = "Boolean",
+            ExpectedResult = true
+        },
+
+        new TryGetByApiNameTest
+        {
+            Name = $"{nameof(ApiSchema.TryGetTypeByApiName)} returns false for {nameof(ApiScalarType)} with case-insensitive search (uppercase)",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            SearchKey = "BOOLEAN",
+            ExpectedResult = false
         },
     ];
 
     public static TheoryDataRow<IXUnitTest>[] TryGetByClrTypeTheoryData =>
     [
-        new TryGetByClrTypeTest()
+        new TryGetByClrTypeTest
         {
-            Name = $"Find {TestApiScalarTypeBoolean} by ClrType, Expect ApiType Exists",
-            ApiSchema = TestApiSchema,
-            ClrType = typeof(bool),
-            ExpectedApiType = TestApiScalarTypeBoolean,
+            Name = $"{nameof(ApiSchema.TryGetTypeByClrType)} returns false when {nameof(ApiType)} is not registered in schema",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            SearchKey = typeof(TestUnknownType),
+            ExpectedResult = false
         },
-        new TryGetByClrTypeTest()
+
+        new TryGetByClrTypeTest
         {
-            Name = $"Find {TestApiScalarTypeInt32} by ClrType, Expect ApiType Exists",
-            ApiSchema = TestApiSchema,
-            ClrType = typeof(int),
-            ExpectedApiType = TestApiScalarTypeInt32,
+            Name = $"{nameof(ApiSchema.TryGetTypeByClrType)} returns true for registered {nameof(ApiEnumType)} CLR type",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            SearchKey = typeof(Gender),
+            ExpectedResult = true
         },
-        new TryGetByClrTypeTest()
+
+        new TryGetByClrTypeTest
         {
-            Name = $"Find {TestApiScalarTypeString} by ClrType, Expect ApiType Exists",
-            ApiSchema = TestApiSchema,
-            ClrType = typeof(string),
-            ExpectedApiType = TestApiScalarTypeString,
+            Name = $"{nameof(ApiSchema.TryGetTypeByClrType)} returns true for registered {nameof(ApiObjectType)} CLR type",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            SearchKey = typeof(ScalarsOnly),
+            ExpectedResult = true
         },
-        new TryGetByClrTypeTest()
+
+        new TryGetByClrTypeTest
         {
-            Name = $"Find {TestApiEnumTypeGender} by ClrType, Expect ApiType Exists",
-            ApiSchema = TestApiSchema,
-            ClrType = typeof(Gender),
-            ExpectedApiType = TestApiEnumTypeGender,
-        },
-        new TryGetByClrTypeTest()
-        {
-            Name = $"Find {TestApiObjectTypePerson} by ClrType, Expect ApiType Exists",
-            ApiSchema = TestApiSchema,
-            ClrType = typeof(Person),
-            ExpectedApiType = TestApiObjectTypePerson
-        },
-        new TryGetByClrTypeTest()
-        {
-            Name = $"Find {TestApiScalarTypeUInt32} by ClrType, Expect ApiType Does Not Exist",
-            ApiSchema = TestApiSchema,
-            ClrType = typeof(uint),
-            ExpectedApiType = null,
+            Name = $"{nameof(ApiSchema.TryGetTypeByClrType)} returns true for registered {nameof(ApiScalarType)} CLR type",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            SearchKey = typeof(bool),
+            ExpectedResult = true
         },
     ];
     #endregion
 
     #region Test Methods
+    [Theory]
+    [MemberData(nameof(InitializeThrowsTheoryData))]
+    public void InitializeThrows(IXUnitTest test) => test.Execute(this);
+
     [Theory]
     [MemberData(nameof(JsonDeserializeTheoryData))]
     public void JsonDeserialize(IXUnitTest test) => test.Execute(this);
@@ -1727,4 +2144,3 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
     public void TryGetByClrType(IXUnitTest test) => test.Execute(this);
     #endregion
 }
-
