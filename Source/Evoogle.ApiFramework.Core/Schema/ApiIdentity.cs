@@ -54,8 +54,8 @@ public sealed class ApiIdentity(string apiName, IEnumerable<ApiIdentityPart> api
             var path = $"{this.ApiPath}.{nameof(this.ApiName)}";
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_IDENTITY_INVALID_API_NAME;
-            var description = $"{nameof(this.ApiName)} cannot be null, empty, or whitespace";
-            var remediation = $"Provide a valid {nameof(this.ApiName)}";
+            var description = $"{nameof(this.ApiName)} must not be null, empty, or whitespace";
+            var remediation = $"Specify a valid {nameof(this.ApiName)} value";
 
             context.AddIssue(path, severity, code, description, remediation);
         }
@@ -67,9 +67,9 @@ public sealed class ApiIdentity(string apiName, IEnumerable<ApiIdentityPart> api
         {
             var path = $"{this.ApiPath}.{nameof(this.ApiIdentityParts)}";
             var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.API_IDENTITY_NULL_OR_EMPTY_IDENTITY_PARTS;
-            var description = $"{nameof(this.ApiIdentityParts)} cannot be null or empty";
-            var remediation = $"Provide at least one {nameof(ApiIdentityPart)}";
+            var code = ApiInitializationCode.API_IDENTITY_NULL_OR_EMPTY_PARTS;
+            var description = $"{nameof(this.ApiIdentityParts)} must not be null or empty";
+            var remediation = $"Specify at least one {nameof(ApiIdentityPart)}";
 
             context.AddIssue(path, severity, code, description, remediation);
             return;
@@ -94,9 +94,9 @@ public sealed class ApiIdentity(string apiName, IEnumerable<ApiIdentityPart> api
         {
             var path = $"{this.ApiPath}.{nameof(this.ApiIdentityParts)}";
             var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.API_IDENTITY_MIXED_ORDERED_AND_NAMED_IDENTITY_PARTS;
+            var code = ApiInitializationCode.API_IDENTITY_MIXED_ORDERED_AND_NAMED_PARTS;
             var description = $"Cannot mix ordered parts with named parts in the same {nameof(ApiIdentity)}";
-            var remediation = $"Either use all ordered parts or all named parts in the {nameof(ApiIdentity)}";
+            var remediation = $"Use either all ordered parts or all named parts in the {nameof(ApiIdentity)}";
 
             context.AddIssue(path, severity, code, description, remediation);
             return;

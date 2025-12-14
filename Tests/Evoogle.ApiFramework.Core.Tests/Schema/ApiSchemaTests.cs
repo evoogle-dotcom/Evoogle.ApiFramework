@@ -401,7 +401,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 (
                     path: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"].{nameof(ApiEnumType.ApiEnumValues)}",
                     severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.API_ENUM_TYPE_NULL_OR_EMPTY_ENUM_VALUES,
+                    code: ApiInitializationCode.API_ENUM_TYPE_NULL_OR_EMPTY_VALUES,
                     description: $"{nameof(ApiEnumType.ApiEnumValues)} must not be null or empty",
                     remediation: $"Define at least one {nameof(ApiEnumValue)}"
                 ),
@@ -433,7 +433,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 (
                     path: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"].{nameof(ApiEnumType.ApiEnumValues)}",
                     severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.API_ENUM_TYPE_NULL_OR_EMPTY_ENUM_VALUES,
+                    code: ApiInitializationCode.API_ENUM_TYPE_NULL_OR_EMPTY_VALUES,
                     description: $"{nameof(ApiEnumType.ApiEnumValues)} must not be null or empty",
                     remediation: $"Define at least one {nameof(ApiEnumValue)}"
                 ),
@@ -481,7 +481,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 (
                     path: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"].{nameof(ApiEnumType.ApiEnumValues)}",
                     severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.API_ENUM_TYPE_DUPLICATE_ENUM_VALUE_API_NAME,
+                    code: ApiInitializationCode.API_ENUM_TYPE_DUPLICATE_VALUE_API_NAME,
                     description: $"Duplicate {nameof(ApiEnumValue)}.{nameof(ApiEnumValue.ApiName)} values: 'Female'",
                     remediation: $"Verify that each {nameof(ApiEnumValue)} has a unique {nameof(ApiEnumValue.ApiName)} value"
                 ),
@@ -529,7 +529,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 (
                     path: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"].{nameof(ApiEnumType.ApiEnumValues)}",
                     severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.API_ENUM_TYPE_DUPLICATE_ENUM_VALUE_CLR_NAME,
+                    code: ApiInitializationCode.API_ENUM_TYPE_DUPLICATE_VALUE_CLR_NAME,
                     description: $"Duplicate {nameof(ApiEnumValue)}.{nameof(ApiEnumValue.ClrName)} values: 'Female'",
                     remediation: $"Verify that each {nameof(ApiEnumValue)} has a unique {nameof(ApiEnumValue.ClrName)} value"
                 ),
@@ -582,7 +582,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 (
                     path: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"].{nameof(ApiEnumType.ApiEnumValues)}",
                     severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.API_ENUM_TYPE_DUPLICATE_ENUM_VALUE_CLR_ORDINAL,
+                    code: ApiInitializationCode.API_ENUM_TYPE_DUPLICATE_VALUE_CLR_ORDINAL,
                     description: $"Duplicate {nameof(ApiEnumValue)}.{nameof(ApiEnumValue.ClrOrdinal)} values: '2'",
                     remediation: $"Verify that each {nameof(ApiEnumValue)} has a unique {nameof(ApiEnumValue.ClrOrdinal)} value"
                 ),

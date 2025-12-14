@@ -58,8 +58,8 @@ public sealed class ApiIdentityPart(string apiPropertyName, ApiIdentityCoercion?
             var path = $"{this.ApiPath}.{nameof(this.ApiPropertyName)}";
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_IDENTITY_PART_INVALID_API_PROPERTY_NAME;
-            var description = $"{nameof(this.ApiPropertyName)} cannot be null, empty, or whitespace";
-            var remediation = $"Provide a valid {nameof(this.ApiPropertyName)}";
+            var description = $"{nameof(this.ApiPropertyName)} must not be null, empty, or whitespace";
+            var remediation = $"Specify a valid {nameof(this.ApiPropertyName)} value";
 
             context.AddIssue(path, severity, code, description, remediation);
         }
@@ -84,8 +84,8 @@ public sealed class ApiIdentityPart(string apiPropertyName, ApiIdentityCoercion?
             var path = $"{this.ApiPath}.{nameof(this.ApiProperty)}";
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_IDENTITY_PART_UNRESOLVED_PROPERTY;
-            var description = $"{nameof(this.ApiProperty)} is unresolved for {nameof(this.ApiPropertyName)}='{this.ApiPropertyName.SafeToString()}'";
-            var remediation = $"Ensure that {nameof(this.ApiPropertyName)} refers to a valid property on the parent {nameof(ApiObjectType)}";
+            var description = $"{nameof(this.ApiProperty)} could not be resolved for {nameof(this.ApiPropertyName)}='{this.ApiPropertyName.SafeToString()}'";
+            var remediation = $"Verify that {nameof(this.ApiPropertyName)} refers to a valid property on the parent {nameof(ApiObjectType)}";
 
             context.AddIssue(path, severity, code, description, remediation);
             return;

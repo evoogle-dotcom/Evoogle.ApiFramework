@@ -214,7 +214,7 @@ public sealed partial class ApiProperty(string apiName, ApiTypeExpression apiTyp
         {
             var path = $"{this.ApiPath}.{nameof(this.ClrName)}";
             var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.API_PROPERTY_INVALID_CLR_FIELD_GETTER;
+            var code = ApiInitializationCode.API_PROPERTY_INVALID_FIELD_GETTER;
             var description = $"Failed to compile field getter for '{clrMemberName}': {ex.Message}";
             var remediation = $"Verify that field '{clrMemberName}' on {nameof(ApiObjectType)}.{nameof(ApiObjectType.ClrType)} '{clrObjectType.SafeToName()}' is accessible";
 
@@ -229,7 +229,7 @@ public sealed partial class ApiProperty(string apiName, ApiTypeExpression apiTyp
         {
             var path = $"{this.ApiPath}.{nameof(this.ClrName)}";
             var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.API_PROPERTY_INVALID_CLR_FIELD_SETTER;
+            var code = ApiInitializationCode.API_PROPERTY_INVALID_FIELD_SETTER;
             var description = $"Failed to compile field setter for '{clrMemberName}': {ex.Message}";
             var remediation = $"Verify that field '{clrMemberName}' on {nameof(ApiObjectType)}.{nameof(ApiObjectType.ClrType)} '{clrObjectType.SafeToName()}' is accessible and writable";
 
@@ -250,7 +250,7 @@ public sealed partial class ApiProperty(string apiName, ApiTypeExpression apiTyp
         {
             var path = $"{this.ApiPath}.{nameof(this.ClrName)}";
             var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.API_PROPERTY_INVALID_CLR_PROPERTY_GETTER;
+            var code = ApiInitializationCode.API_PROPERTY_INVALID_PROPERTY_GETTER;
             var description = $"Property '{clrMemberName}' is an indexer, which is not supported";
 
             context.AddIssue(path, severity, code, description, remediation: null);
@@ -266,7 +266,7 @@ public sealed partial class ApiProperty(string apiName, ApiTypeExpression apiTyp
         {
             var path = $"{this.ApiPath}.{nameof(this.ClrName)}";
             var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.API_PROPERTY_INVALID_CLR_PROPERTY_GETTER;
+            var code = ApiInitializationCode.API_PROPERTY_INVALID_PROPERTY_GETTER;
             var description = $"Failed to compile property getter for '{clrMemberName}': {ex.Message}";
             var remediation = $"Verify that property '{clrMemberName}' on {nameof(ApiObjectType)}.{nameof(ApiObjectType.ClrType)} '{clrObjectType.SafeToName()}' is accessible";
 
@@ -281,7 +281,7 @@ public sealed partial class ApiProperty(string apiName, ApiTypeExpression apiTyp
         {
             var path = $"{this.ApiPath}.{nameof(this.ClrName)}";
             var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.API_PROPERTY_INVALID_CLR_PROPERTY_SETTER;
+            var code = ApiInitializationCode.API_PROPERTY_INVALID_PROPERTY_SETTER;
             var description = $"Failed to compile property setter for '{clrMemberName}': {ex.Message}";
             var remediation = $"Verify that property '{clrMemberName}' on {nameof(ApiObjectType)}.{nameof(ApiObjectType.ClrType)} '{clrObjectType.SafeToName()}' is accessible and writable";
 

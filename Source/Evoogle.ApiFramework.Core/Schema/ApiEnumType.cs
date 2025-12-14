@@ -103,7 +103,7 @@ public sealed class ApiEnumType(string apiName, IEnumerable<ApiEnumValue> apiEnu
         {
             var path = $"{this.ApiPath}.{nameof(this.ApiEnumValues)}";
             var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.API_ENUM_TYPE_NULL_OR_EMPTY_ENUM_VALUES;
+            var code = ApiInitializationCode.API_ENUM_TYPE_NULL_OR_EMPTY_VALUES;
             var description = $"{nameof(this.ApiEnumValues)} must not be null or empty";
             var remediation = $"Define at least one {nameof(ApiEnumValue)}";
 
@@ -155,7 +155,7 @@ public sealed class ApiEnumType(string apiName, IEnumerable<ApiEnumValue> apiEnu
             partKeyFilter: x => !string.IsNullOrWhiteSpace(x),
             partKeyPropertyName: nameof(ApiEnumValue.ApiName),
             path: $"{this.ApiPath}.{nameof(this.ApiEnumValues)}",
-            code: ApiInitializationCode.API_ENUM_TYPE_DUPLICATE_ENUM_VALUE_API_NAME,
+            code: ApiInitializationCode.API_ENUM_TYPE_DUPLICATE_VALUE_API_NAME,
             context: context,
             lookupDictionary: out _apiNameLookup
         );
@@ -167,7 +167,7 @@ public sealed class ApiEnumType(string apiName, IEnumerable<ApiEnumValue> apiEnu
             partKeyFilter: x => !string.IsNullOrWhiteSpace(x),
             partKeyPropertyName: nameof(ApiEnumValue.ClrName),
             path: $"{this.ApiPath}.{nameof(this.ApiEnumValues)}",
-            code: ApiInitializationCode.API_ENUM_TYPE_DUPLICATE_ENUM_VALUE_CLR_NAME,
+            code: ApiInitializationCode.API_ENUM_TYPE_DUPLICATE_VALUE_CLR_NAME,
             context: context,
             lookupDictionary: out _clrNameLookup
         );
@@ -179,7 +179,7 @@ public sealed class ApiEnumType(string apiName, IEnumerable<ApiEnumValue> apiEnu
             partKeyFilter: null,
             partKeyPropertyName: nameof(ApiEnumValue.ClrOrdinal),
             path: $"{this.ApiPath}.{nameof(this.ApiEnumValues)}",
-            code: ApiInitializationCode.API_ENUM_TYPE_DUPLICATE_ENUM_VALUE_CLR_ORDINAL,
+            code: ApiInitializationCode.API_ENUM_TYPE_DUPLICATE_VALUE_CLR_ORDINAL,
             context: context,
             lookupDictionary: out _clrOrdinalLookup
         );

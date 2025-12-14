@@ -261,7 +261,7 @@ public sealed class ApiSchema : ExtensibleBase
         {
             var path = $"{this.ApiPath}.{nameof(this.ApiName)}";
             var severity = ApiInitializationSeverity.Warning;
-            var code = ApiInitializationCode.API_SCHEMA_INVALID_API_NAME;
+            var code = ApiInitializationCode.API_SCHEMA_INVALID_NAME;
             var description = $"{nameof(this.ApiName)} must not be null, empty, or whitespace";
             var remediation = $"Specify a valid {nameof(this.ApiName)} value";
 

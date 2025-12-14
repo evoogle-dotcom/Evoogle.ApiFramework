@@ -69,8 +69,8 @@ public sealed class ApiEnumValue(string apiName, string clrName, int clrOrdinal)
             var path = $"{this.ApiPath}.{nameof(this.ApiName)}";
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_ENUM_VALUE_INVALID_API_NAME;
-            var description = $"{nameof(this.ApiName)} cannot be null, empty, or whitespace";
-            var remediation = $"Provide a valid {nameof(this.ApiName)}";
+            var description = $"{nameof(this.ApiName)} must not be null, empty, or whitespace";
+            var remediation = $"Specify a valid {nameof(this.ApiName)} value";
 
             context.AddIssue(path, severity, code, description, remediation);
         }
@@ -83,8 +83,8 @@ public sealed class ApiEnumValue(string apiName, string clrName, int clrOrdinal)
             var path = $"{this.ApiPath}.{nameof(this.ClrName)}";
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_ENUM_VALUE_INVALID_CLR_NAME;
-            var description = $"{nameof(this.ClrName)} cannot be null, empty, or whitespace";
-            var remediation = $"Provide a valid {nameof(this.ClrName)}";
+            var description = $"{nameof(this.ClrName)} must not be null, empty, or whitespace";
+            var remediation = $"Specify a valid {nameof(this.ClrName)} value";
 
             context.AddIssue(path, severity, code, description, remediation);
         }
