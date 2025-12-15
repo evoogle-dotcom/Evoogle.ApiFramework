@@ -77,6 +77,8 @@ public sealed partial class ApiObjectType
     /// </summary>
     public bool HasIdentity => this.ApiIdentitySet is not null;
 
+    public ApiObjectTypeOptions ApiObjectTypeOptions { get; init; } = new ApiObjectTypeOptions();
+
     private Dictionary<string, ApiProperty> ApiPropertyApiNameLookup => this.ThrowIfNotInitialized(_apiPropertyApiNameLookup);
     private Dictionary<string, ApiProperty> ApiPropertyClrNameLookup => this.ThrowIfNotInitialized(_apiPropertyClrNameLookup);
     private Dictionary<string, ApiRelationship> ApiRelationshipApiNameLookup => this.ThrowIfNotInitialized(_apiRelationshipApiNameLookup);

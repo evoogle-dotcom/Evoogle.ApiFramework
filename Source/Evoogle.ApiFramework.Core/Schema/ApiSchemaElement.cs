@@ -38,7 +38,7 @@ public abstract class ApiSchemaElement : ExtensibleBase
     /// <remarks>
     ///     This property is available after the element has been initialized.
     /// </remarks>
-    protected ApiSchemaContext ApiSchemaContext => this.ThrowIfNotInitialized(_apiSchemaContext);
+    protected internal ApiSchemaContext ApiSchemaContext => this.ThrowIfNotInitialized(_apiSchemaContext);
     #endregion
 
     #region Methods

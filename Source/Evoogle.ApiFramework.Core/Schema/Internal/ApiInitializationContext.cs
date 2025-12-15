@@ -3,9 +3,13 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-namespace Evoogle.ApiFramework.Schema;
+namespace Evoogle.ApiFramework.Schema.Internal;
 
-public class ApiInitializationContext
+/// <summary>
+///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used directly from your code.
+///     This API may change or be removed in future releases.
+/// </summary>
+internal class ApiInitializationContext
 {
     #region Fields
     private readonly string? _apiParentPath;

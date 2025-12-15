@@ -26,7 +26,7 @@ public sealed partial class ApiObjectType
             return false;
         }
 
-        return BuildIdentityFromInstance(identity, clrInstance, out id);
+        return this.BuildIdentityFromInstance(identity, clrInstance, out id);
     }
 
     public bool TryBuildIdentity(IReadOnlyDictionary<string, object?> values, out ApiId id, string? apiIdentityName = null)
@@ -43,7 +43,7 @@ public sealed partial class ApiObjectType
             return false;
         }
 
-        return BuildIdentityFromValues(identity, values, out id);
+        return this.BuildIdentityFromValues(identity, values, out id);
     }
 
     private ApiIdentity? ResolveIdentityForBuild(string? apiIdentityName)
@@ -64,7 +64,7 @@ public sealed partial class ApiObjectType
             _ => ApiId.Composite(parts)
         };
 
-    private static ApiId MaterializeApiIdFromProperty(ApiProperty property, object? rawValue, ApiIdentity identity, object clrInstance, ApiSchemaContext schemaContext)
+    private ApiId MaterializeApiIdFromProperty(ApiProperty property, object? rawValue, ApiIdentity identity, object clrInstance, ApiSchemaContext schemaContext)
     {
         // Detect the target type using the configured strategy
         var targetType = identity.TypeDetectionStrategy.DetectTargetType(property);
@@ -85,7 +85,8 @@ public sealed partial class ApiObjectType
         // Handle null values according to the identity's null handling configuration
         if (coercedValue is null)
         {
-            if (identity.NullHandling == ApiIdentityNullHandling.ThrowException)
+            var nullHandling = this.ApiObjectTypeOptions.GetIdentityNullHandling(this);
+            if (nullHandling == ApiIdentityNullHandling.ThrowException)
             {
                 throw new ApiIdentityException(
                     $"Property '{property.ApiName}' has a null value for identity '{identity.ApiName}' on type '{clrInstance.GetType().Name}'. Null values are not allowed with {nameof(ApiIdentityNullHandling.ThrowException)} configured.");
@@ -150,7 +151,7 @@ public sealed partial class ApiObjectType
         }
     }
 
-    private static bool BuildIdentityFromInstance(ApiIdentity identity, object clrInstance, out ApiId id)
+    private bool BuildIdentityFromInstance(ApiIdentity identity, object clrInstance, out ApiId id)
     {
         id = default;
 
@@ -174,10 +175,11 @@ public sealed partial class ApiObjectType
                 }
 
                 // Materialize the ApiId using TypeCoercion
-                var partId = MaterializeApiIdFromProperty(part.ApiProperty, rawValue, identity, clrInstance, identity.ApiSchemaContext);
+                var partId = this.MaterializeApiIdFromProperty(part.ApiProperty, rawValue, identity, clrInstance, identity.ApiSchemaContext);
 
                 // Only allow Empty if null handling is ReturnEmpty
-                if (!partId.HasValue && identity.NullHandling != ApiIdentityNullHandling.ReturnEmpty)
+                var nullHandling = this.ApiObjectTypeOptions.GetIdentityNullHandling(this);
+                if (!partId.HasValue && nullHandling != ApiIdentityNullHandling.ReturnEmpty)
                 {
                     return false;
                 }
@@ -202,7 +204,7 @@ public sealed partial class ApiObjectType
         }
     }
 
-    private static bool BuildIdentityFromValues(ApiIdentity identity, IReadOnlyDictionary<string, object?> values, out ApiId id)
+    private bool BuildIdentityFromValues(ApiIdentity identity, IReadOnlyDictionary<string, object?> values, out ApiId id)
     {
         id = default;
 
@@ -226,10 +228,11 @@ public sealed partial class ApiObjectType
                 // Materialize the ApiId using TypeCoercion (same path as instance-based)
                 // Use a dummy object for error reporting since we don't have the actual instance
                 var dummyInstance = new { DictionaryValues = true };
-                var partId = MaterializeApiIdFromProperty(part.ApiProperty, rawValue, identity, dummyInstance, identity.ApiSchemaContext);
+                var partId = this.MaterializeApiIdFromProperty(part.ApiProperty, rawValue, identity, dummyInstance, identity.ApiSchemaContext);
 
                 // Only allow Empty if null handling is ReturnEmpty
-                if (!partId.HasValue && identity.NullHandling != ApiIdentityNullHandling.ReturnEmpty)
+                var nullHandling = this.ApiObjectTypeOptions.GetIdentityNullHandling(this);
+                if (!partId.HasValue && nullHandling != ApiIdentityNullHandling.ReturnEmpty)
                 {
                     return false;
                 }

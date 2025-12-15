@@ -10,23 +10,24 @@ using Microsoft.Extensions.Logging;
 namespace Evoogle.ApiFramework.Schema;
 
 /// <summary>
-///     Provides runtime context and services for all API schema operations.
+///     Provides runtime context and services for all API schema elements.
 /// </summary>
 /// <remarks>
 ///     This context is established once during schema initialization and provides
 ///     shared services like type coercion, logging, and configuration to all schema elements.
 /// </remarks>
-public sealed class ApiSchemaContext
+public sealed class ApiSchemaContext()
 {
-    #region Fields
-    private static readonly ApiSchemaContext _default = new();
-    #endregion
-
     #region Properties
     /// <summary>
-    ///     Gets the default <see cref="ApiSchemaContext"/> with standard configuration.
+    ///     Gets the root API schema that owns this context.
     /// </summary>
-    public static ApiSchemaContext Default => _default;
+    public required ApiSchema ApiSchema { get; init; }
+
+    /// <summary>
+    ///     Gets the root API schema options.
+    /// </summary>
+    public ApiSchemaOptions ApiSchemaOptions => this.ApiSchema.ApiSchemaOptions;
 
     /// <summary>
     ///     Gets the type coercion service for converting between types.
