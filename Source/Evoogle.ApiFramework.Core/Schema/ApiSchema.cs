@@ -50,6 +50,7 @@ public sealed class ApiSchema : ExtensibleBase
     public string ApiPath => this.ThrowIfNotInitialized(_apiPath);
 
     /// <summary>Gets the runtime context for this API schema. Available after initialization.</summary>
+    [JsonIgnore]
     public ApiSchemaContext ApiSchemaContext => this.ThrowIfNotInitialized(_apiSchemaContext);
 
     /// <summary>Gets all API named types contained within this API schema.</summary>

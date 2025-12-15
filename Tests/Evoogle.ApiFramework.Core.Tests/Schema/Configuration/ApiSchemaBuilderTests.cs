@@ -165,6 +165,7 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
                     this.Expected,
                     opt => opt
                         .WithStrictOrdering()
+                        .Excluding(info => info.Path == $"{nameof(ApiSchemaContext)}" || info.Path == $"{nameof(ApiSchemaContext)}.{nameof(ApiSchemaContext.ApiSchema)}")
                 );
             }
             else

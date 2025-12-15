@@ -20,7 +20,7 @@ public record class ApiObjectTypeOptions
     #region Methods
     internal ApiIdentityNullHandling GetIdentityNullHandling(ApiObjectType parent)
     {
-        return this.ApiIdentityNullHandling ?? parent.ApiSchemaContext.ApiSchema.ApiSchemaOptions.ApiIdentityNullHandling;
+        return this.ApiIdentityNullHandling ?? parent.ApiSchemaContext.ApiSchemaOptions.ApiIdentityNullHandling;
     }
     #endregion
 }
