@@ -67,9 +67,6 @@ public sealed class ApiSchema : ExtensibleBase
     /// <summary>Gets the default type detection strategy for identity building.</summary>
     public IApiIdTypeDetectionStrategy DefaultApiIdTypeDetectionStrategy { get; init; } = null!;
 
-    /// <summary>Gets the default null handling behavior for identity building. Defaults to <see cref="ApiIdentityNullHandling.ReturnEmpty"/>.</summary>
-    // public ApiIdentityNullHandling DefaultIdentityNullHandling { get; init; } = ApiIdentityNullHandling.ReturnEmpty;
-
     private Dictionary<string, ApiNamedType> ApiNamedTypeApiNameLookup => this.ThrowIfNotInitialized(_apiNamedTypeApiNameLookup);
     private Dictionary<Type, ApiNamedType> ApiNamedTypeClrTypeLookup => this.ThrowIfNotInitialized(_apiNamedTypeClrTypeLookup);
 

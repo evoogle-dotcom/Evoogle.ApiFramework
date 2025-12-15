@@ -36,12 +36,6 @@ public sealed class ApiIdentity(string apiName, IEnumerable<ApiIdentityPart> api
     public bool IsComposite => this.ApiIdentityParts.Length >= 2;
 
     /// <summary>
-    ///     Gets the runtime context for the API schema containing this identity.
-    ///     Available after initialization.
-    /// </summary>
-    public new ApiSchemaContext ApiSchemaContext => base.ApiSchemaContext;
-
-    /// <summary>
     ///     Gets the type detection strategy for converting property values to <see cref="Identity.ApiId"/> scalars.
     ///     Initialized from the parent <see cref="ApiSchema.DefaultApiIdTypeDetectionStrategy"/> during initialization.
     /// </summary>
