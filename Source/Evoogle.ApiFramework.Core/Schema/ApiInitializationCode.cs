@@ -119,6 +119,11 @@ public enum ApiInitializationCode
     ///     The identity part's property reference could not be resolved to a defined property.
     /// </summary>
     API_IDENTITY_PART_UNRESOLVED_PROPERTY,
+
+    /// <summary>
+    ///     The target CLR type specified for an <see cref="ApiIdentityPart"/> is not compatible with <see cref="ApiId"/>.
+    /// </summary>
+    API_IDENTITY_PART_INVALID_TARGET_TYPE,
     #endregion
 
     #region ApiNamedType Initialization Codes

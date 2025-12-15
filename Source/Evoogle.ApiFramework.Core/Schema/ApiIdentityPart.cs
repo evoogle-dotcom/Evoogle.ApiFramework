@@ -3,6 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Identity;
 using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.Extensions;
 
@@ -14,14 +15,16 @@ namespace Evoogle.ApiFramework.Schema;
 /// <remarks>
 ///     Each part references a property of the parent <see cref="ApiObjectType"/> and specifies
 ///     ordering behavior for identity serialization. Type coercion is handled automatically via
-///     <see cref="ApiProperty"/> and the configured <see cref="IApiIdTypeDetectionStrategy"/>.
+///     <see cref="ApiProperty"/> and resolved at initialization time.
 /// </remarks>
 /// <param name="apiPropertyName">The name of the property that is part of the identity.</param>
 /// <param name="emitAsOrdered">Indicates whether this part should be emitted as an ordered (positional) component rather than named.</param>
-public sealed class ApiIdentityPart(string apiPropertyName, bool emitAsOrdered = false) : ApiSchemaElement
+/// <param name="targetClrType">Optional CLR type to use for <see cref="Identity.ApiId"/> conversion. If null, the type is detected automatically.</param>
+public sealed class ApiIdentityPart(string apiPropertyName, bool emitAsOrdered = false, Type? targetClrType = null) : ApiSchemaElement
 {
     #region Fields
     private ApiProperty? _apiResolvedProperty = null;
+    private Type? _resolvedTargetType = null;
     #endregion
 
     #region Properties
@@ -36,12 +39,29 @@ public sealed class ApiIdentityPart(string apiPropertyName, bool emitAsOrdered =
     public bool EmitAsOrdered { get; } = emitAsOrdered;
 
     /// <summary>
+    ///     Gets the optional CLR type override for <see cref="Identity.ApiId"/> conversion.
+    /// </summary>
+    /// <remarks>
+    ///     If null, the type is detected automatically based on the property's CLR type.
+    /// </remarks>
+    public Type? TargetClrType { get; } = targetClrType;
+
+    /// <summary>
     ///     Gets the resolved property referenced by this identity part.
     /// </summary>
     /// <remarks>
     ///     This property is available after initialization.
     /// </remarks>
     public ApiProperty ApiProperty => this.ThrowIfNotInitialized(_apiResolvedProperty);
+
+    /// <summary>
+    ///     Gets the resolved target CLR type for <see cref="Identity.ApiId"/> conversion.
+    /// </summary>
+    /// <remarks>
+    ///     This is either the <see cref="TargetClrType"/> override or automatically detected from
+    ///     the <see cref="ApiProperty"/>'s CLR type during initialization.
+    /// </remarks>
+    public Type ResolvedTargetType => this.ThrowIfNotInitialized(_resolvedTargetType);
     #endregion
 
     #region ApiSchemaElement Methods
@@ -58,6 +78,7 @@ public sealed class ApiIdentityPart(string apiPropertyName, bool emitAsOrdered =
 
         this.InitializeApiPropertyName(context);
         this.InitializeApiProperty(context);
+        this.InitializeResolvedTargetType(context);
     }
     #endregion
 
@@ -111,6 +132,35 @@ public sealed class ApiIdentityPart(string apiPropertyName, bool emitAsOrdered =
 
             context.AddIssue(path, severity, code, description, remediation);
         }
+    }
+
+    private void InitializeResolvedTargetType(ApiInitializationContext context)
+    {
+        _resolvedTargetType = null;
+
+        // If the resolved property is null, we can't determine the target type
+        if (_apiResolvedProperty is null)
+        {
+            return;
+        }
+
+        // Use the override if provided, otherwise detect from property type
+        var targetType = this.TargetClrType ?? ApiSchemaHelpers.DetectApiIdTargetType(_apiResolvedProperty.ApiType.ClrType);
+
+        // Validate that the target type is ApiId-compatible
+        if (!ApiId.IsCompatibleScalarType(targetType))
+        {
+            var path = $"{this.ApiPath}.{nameof(this.ResolvedTargetType)}";
+            var severity = ApiInitializationSeverity.Error;
+            var code = ApiInitializationCode.API_IDENTITY_PART_INVALID_TARGET_TYPE;
+            var description = $"Target type '{targetType.SafeToName()}' is not compatible with {nameof(Identity.ApiId)}";
+            var remediation = $"Use one of the supported types: int, long, Guid, Ulid, CultureInfo, or string";
+
+            context.AddIssue(path, severity, code, description, remediation);
+            return;
+        }
+
+        _resolvedTargetType = targetType;
     }
     #endregion
 }

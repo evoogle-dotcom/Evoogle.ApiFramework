@@ -3,6 +3,8 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Text.Json.Serialization;
+
 using Evoogle.Coercion;
 
 using Microsoft.Extensions.Logging;
@@ -22,6 +24,7 @@ public sealed class ApiSchemaContext()
     /// <summary>
     ///     Gets the root API schema that owns this context.
     /// </summary>
+    [JsonIgnore]
     public required ApiSchema ApiSchema { get; init; }
 
     /// <summary>

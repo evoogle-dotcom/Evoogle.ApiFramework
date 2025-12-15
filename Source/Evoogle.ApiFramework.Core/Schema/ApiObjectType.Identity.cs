@@ -64,10 +64,10 @@ public sealed partial class ApiObjectType
             _ => ApiId.Composite(parts)
         };
 
-    private ApiId MaterializeApiIdFromProperty(ApiProperty property, object? rawValue, ApiIdentity identity, object clrInstance, ApiSchemaContext schemaContext)
+    private ApiId MaterializeApiIdFromProperty(ApiIdentityPart part, object? rawValue, ApiIdentity identity, object clrInstance, ApiSchemaContext schemaContext)
     {
-        // Detect the target type using the configured strategy
-        var targetType = identity.TypeDetectionStrategy.DetectTargetType(property);
+        // Use the pre-resolved target type from the identity part
+        var targetType = part.ResolvedTargetType;
 
         // Use the schema's TypeCoercion to convert the raw value to the target type
         object? coercedValue;
@@ -78,7 +78,7 @@ public sealed partial class ApiObjectType
         catch (Exception ex)
         {
             throw new ApiIdentityException(
-                $"Failed to coerce property '{property.ApiName}' value to type '{targetType.Name}' for identity '{identity.ApiName}' on type '{clrInstance.GetType().Name}'.",
+                $"Failed to coerce property '{part.ApiProperty.ApiName}' value to type '{targetType.Name}' for identity '{identity.ApiName}' on type '{clrInstance.GetType().Name}'.",
                 ex);
         }
 
@@ -89,14 +89,14 @@ public sealed partial class ApiObjectType
             if (nullHandling == ApiIdentityNullHandling.ThrowException)
             {
                 throw new ApiIdentityException(
-                    $"Property '{property.ApiName}' has a null value for identity '{identity.ApiName}' on type '{clrInstance.GetType().Name}'. Null values are not allowed with {nameof(ApiIdentityNullHandling.ThrowException)} configured.");
+                    $"Property '{part.ApiProperty.ApiName}' has a null value for identity '{identity.ApiName}' on type '{clrInstance.GetType().Name}'. Null values are not allowed with {nameof(ApiIdentityNullHandling.ThrowException)} configured.");
             }
 
             return ApiId.Empty;
         }
 
         // Convert the typed value to ApiId
-        return ConvertToApiId(coercedValue, targetType, property, identity, clrInstance);
+        return ConvertToApiId(coercedValue, targetType, part.ApiProperty, identity, clrInstance);
     }
 
     private static ApiId ConvertToApiId(object value, Type targetType, ApiProperty property, ApiIdentity identity, object clrInstance)
@@ -174,8 +174,8 @@ public sealed partial class ApiObjectType
                     return false;
                 }
 
-                // Materialize the ApiId using TypeCoercion
-                var partId = this.MaterializeApiIdFromProperty(part.ApiProperty, rawValue, identity, clrInstance, identity.ApiSchemaContext);
+                // Materialize the ApiId using TypeCoercion and pre-resolved target type
+                var partId = this.MaterializeApiIdFromProperty(part, rawValue, identity, clrInstance, identity.ApiSchemaContext);
 
                 // Only allow Empty if null handling is ReturnEmpty
                 var nullHandling = this.ApiObjectTypeOptions.GetIdentityNullHandling(this);
@@ -225,10 +225,10 @@ public sealed partial class ApiObjectType
                     return false;
                 }
 
-                // Materialize the ApiId using TypeCoercion (same path as instance-based)
+                // Materialize the ApiId using TypeCoercion and pre-resolved target type
                 // Use a dummy object for error reporting since we don't have the actual instance
                 var dummyInstance = new { DictionaryValues = true };
-                var partId = this.MaterializeApiIdFromProperty(part.ApiProperty, rawValue, identity, dummyInstance, identity.ApiSchemaContext);
+                var partId = this.MaterializeApiIdFromProperty(part, rawValue, identity, dummyInstance, identity.ApiSchemaContext);
 
                 // Only allow Empty if null handling is ReturnEmpty
                 var nullHandling = this.ApiObjectTypeOptions.GetIdentityNullHandling(this);

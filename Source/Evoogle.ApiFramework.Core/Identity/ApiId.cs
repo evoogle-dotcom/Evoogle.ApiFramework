@@ -377,6 +377,25 @@ public readonly struct ApiId
     }
     #endregion
 
+    #region Utility Methods
+    /// <summary>
+    ///    Determines whether the specified <see cref="Type"/> is a compatible scalar type for <see cref="ApiId"/>.
+    /// </summary>
+    /// <param name="type">The type to check.</param>
+    /// <returns>True if the type is a compatible scalar type; otherwise, false.</returns>
+    public static bool IsCompatibleScalarType(Type type)
+    {
+        ArgumentNullException.ThrowIfNull(type, nameof(type));
+
+        return type == typeof(string)
+            || type == typeof(int)
+            || type == typeof(long)
+            || type == typeof(Guid)
+            || type == typeof(Ulid)
+            || type == typeof(CultureInfo);
+    }
+    #endregion
+
     #region AsOrThrow Methods
     /// <summary>Gets the string value or throws if the kind is not <see cref="ApiIdKind.String"/>.</summary>
     /// <returns>The string value.</returns>
@@ -940,7 +959,7 @@ public readonly struct ApiId
     public readonly ApiId this[string name] => this.TryGetPart(name, out var v) ? v : throw new KeyNotFoundException($"Part name '{name}' not found in composite ApiId.");
     #endregion
 
-    #region Equality / Ordering Operators
+    #region Equality/Ordering Operators
     /// <summary>Equality operator that compares two <see cref="ApiId"/> instances using <see cref="Equals(ApiId)"/>.</summary>
     /// <param name="left">Left operand.</param>
     /// <param name="right">Right operand.</param>
@@ -978,7 +997,7 @@ public readonly struct ApiId
     public static bool operator >=(ApiId left, ApiId right) => left.CompareTo(right) >= 0;
     #endregion
 
-    #region Conversions
+    #region Conversion Operators
     /// <summary>Implicit conversion from <see cref="string"/> to <see cref="ApiId"/>.</summary>
     public static implicit operator ApiId(string value) => FromString(value);
 

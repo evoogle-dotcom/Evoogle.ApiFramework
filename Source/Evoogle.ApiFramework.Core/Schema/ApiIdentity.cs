@@ -34,12 +34,6 @@ public sealed class ApiIdentity(string apiName, IEnumerable<ApiIdentityPart> api
     ///     Gets a value indicating whether this identity is composite (has two or more parts).
     /// </summary>
     public bool IsComposite => this.ApiIdentityParts.Length >= 2;
-
-    /// <summary>
-    ///     Gets the type detection strategy for converting property values to <see cref="Identity.ApiId"/> scalars.
-    ///     Initialized from the parent <see cref="ApiSchema.DefaultApiIdTypeDetectionStrategy"/> during initialization.
-    /// </summary>
-    public IApiIdTypeDetectionStrategy TypeDetectionStrategy { get; private set; } = null!;
     #endregion
 
     #region ApiSchemaElement Methods
@@ -53,8 +47,6 @@ public sealed class ApiIdentity(string apiName, IEnumerable<ApiIdentityPart> api
         ArgumentNullException.ThrowIfNull(context);
 
         base.Initialize(context);
-
-        this.InitializeTypeDetectionStrategy(context);
 
         this.InitializeApiName(context);
         this.InitializeApiIdentityParts(context);
@@ -73,12 +65,6 @@ public sealed class ApiIdentity(string apiName, IEnumerable<ApiIdentityPart> api
     #endregion
 
     #region Implementation Methods
-    private void InitializeTypeDetectionStrategy(ApiInitializationContext context)
-    {
-        // Currently using schema default; placeholder for future per-identity configuration
-        this.TypeDetectionStrategy = context.ApiSchema.DefaultApiIdTypeDetectionStrategy;
-    }
-
     private void InitializeApiName(ApiInitializationContext context)
     {
         if (string.IsNullOrWhiteSpace(this.ApiName))
