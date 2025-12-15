@@ -3,8 +3,6 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using System.Text.Json.Serialization;
-
 using Evoogle.Coercion;
 
 using Microsoft.Extensions.Logging;
@@ -18,19 +16,13 @@ namespace Evoogle.ApiFramework.Schema;
 ///     This context is established once during schema initialization and provides
 ///     shared services like type coercion, logging, and configuration to all schema elements.
 /// </remarks>
-public sealed class ApiSchemaContext()
+public sealed class ApiSchemaContext
 {
     #region Properties
     /// <summary>
     ///     Gets the root API schema that owns this context.
     /// </summary>
-    [JsonIgnore]
     public required ApiSchema ApiSchema { get; init; }
-
-    /// <summary>
-    ///     Gets the root API schema options.
-    /// </summary>
-    public ApiSchemaOptions ApiSchemaOptions => this.ApiSchema.ApiSchemaOptions;
 
     /// <summary>
     ///     Gets the type coercion service for converting between types.
