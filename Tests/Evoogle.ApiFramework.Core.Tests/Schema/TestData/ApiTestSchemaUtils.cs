@@ -29,10 +29,17 @@ public static class ApiTestSchemaUtils
             Extensions = extensions
         };
 
-    public static ApiObjectType O(string name, Type clr, IEnumerable<ApiProperty> properties, IEnumerable<ApiRelationship>? relationships = null, OrderedDictionary<Type, object>? extensions = null)
+    public static ApiObjectType O(string name, Type clr, IEnumerable<ApiProperty> properties, IEnumerable<ApiRelationship>? relationships = null, ApiObjectTypeOptions? options = null, OrderedDictionary<Type, object>? extensions = null)
         => new(name, properties, relationships ?? [], clr)
         {
+            ApiOptions = options ?? ApiObjectTypeOptions.Default,
             Extensions = extensions
+        };
+
+    public static ApiObjectTypeOptions OO(ApiIdentityNullHandling identityNullHandling)
+        => new()
+        {
+            ApiIdentityNullHandling = identityNullHandling
         };
 
     public static ApiProperty P(string name, ApiTypeExpression expression, bool required, OrderedDictionary<Type, object>? extensions = null)

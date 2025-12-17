@@ -85,7 +85,7 @@ public sealed partial class ApiObjectType
         // Handle null values according to the identity's null handling configuration
         if (coercedValue is null)
         {
-            var nullHandling = this.ApiObjectTypeOptions.GetIdentityNullHandling(this);
+            var nullHandling = this.ApiOptions.GetIdentityNullHandling(this);
             if (nullHandling == ApiIdentityNullHandling.ThrowException)
             {
                 throw new ApiIdentityException(
@@ -178,7 +178,7 @@ public sealed partial class ApiObjectType
                 var partId = this.MaterializeApiIdFromProperty(part, rawValue, identity, clrInstance, identity.ApiSchemaContext);
 
                 // Only allow Empty if null handling is ReturnEmpty
-                var nullHandling = this.ApiObjectTypeOptions.GetIdentityNullHandling(this);
+                var nullHandling = this.ApiOptions.GetIdentityNullHandling(this);
                 if (!partId.HasValue && nullHandling != ApiIdentityNullHandling.ReturnEmpty)
                 {
                     return false;
@@ -231,7 +231,7 @@ public sealed partial class ApiObjectType
                 var partId = this.MaterializeApiIdFromProperty(part, rawValue, identity, dummyInstance, identity.ApiSchemaContext);
 
                 // Only allow Empty if null handling is ReturnEmpty
-                var nullHandling = this.ApiObjectTypeOptions.GetIdentityNullHandling(this);
+                var nullHandling = this.ApiOptions.GetIdentityNullHandling(this);
                 if (!partId.HasValue && nullHandling != ApiIdentityNullHandling.ReturnEmpty)
                 {
                     return false;

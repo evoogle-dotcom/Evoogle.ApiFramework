@@ -72,12 +72,12 @@ public sealed partial class ApiObjectType
     /// </summary>
     public ApiIdentity? ApiPrimaryIdentity => this.ApiIdentitySet?.ApiPrimaryIdentity;
 
+    public ApiObjectTypeOptions ApiOptions { get; init; } = ApiObjectTypeOptions.Default;
+
     /// <summary>
     ///     Indicates whether this object type has any API identities defined.
     /// </summary>
     public bool HasIdentity => this.ApiIdentitySet is not null;
-
-    public ApiObjectTypeOptions ApiObjectTypeOptions { get; init; } = new ApiObjectTypeOptions();
 
     private Dictionary<string, ApiProperty> ApiPropertyApiNameLookup => this.ThrowIfNotInitialized(_apiPropertyApiNameLookup);
     private Dictionary<string, ApiProperty> ApiPropertyClrNameLookup => this.ThrowIfNotInitialized(_apiPropertyClrNameLookup);
@@ -148,9 +148,10 @@ public sealed partial class ApiObjectType
     {
         var apiName = this.ApiName.SafeToString();
         var clrType = this.ClrType.SafeToString();
+        var apiOptions = this.ApiOptions.SafeToString();
         var extensionCount = this.ExtensionCount.SafeToString();
 
-        return $"{nameof(ApiObjectType)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ExtensionCount)}={extensionCount}}} [{clrType}]";
+        return $"{nameof(ApiObjectType)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ApiOptions)}={apiOptions}, {nameof(this.ExtensionCount)}={extensionCount}}} [{clrType}]";
     }
     #endregion
 

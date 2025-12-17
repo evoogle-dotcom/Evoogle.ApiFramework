@@ -31,7 +31,7 @@ public sealed class ApiSchemaContext
     ///     Gets the API schema options used for configuring schema behavior.
     /// </summary>
     [JsonIgnore]
-    public ApiSchemaOptions ApiSchemaOptions => this.ApiSchema.ApiSchemaOptions;
+    public ApiSchemaOptions ApiSchemaOptions => this.ApiSchema.ApiOptions;
 
     /// <summary>
     ///     Gets the type coercion service for converting between types.

@@ -16,6 +16,7 @@ public sealed class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext c
     #region Fields
     private readonly List<ApiPropertyBuilder> _apiPropertyBuilders = [];
     private readonly List<ApiRelationshipBuilder> _apiRelationshipBuilders = [];
+    private Action<ApiObjectTypeOptionsBuilder>? _apiOptionsConfiguration = null;
     #endregion
 
     #region Builder Methods
@@ -60,11 +61,23 @@ public sealed class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext c
     }
 
     /// <summary>
+    ///     Configures options for this object type.
+    /// </summary>
+    /// <param name="configure">Callback to configure the object type options.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiObjectTypeBuilder WithOptions(Action<ApiObjectTypeOptionsBuilder> configure)
+    {
+        _apiOptionsConfiguration = configure;
+        return this;
+    }
+
+    /// <summary>
     ///     Builds the <see cref="ApiObjectType"/> using the configured properties and relationships.
     /// </summary>
     /// <returns>The constructed <see cref="ApiObjectType"/>.</returns>
     internal ApiObjectType Build()
     {
+        // Build ApiObjectType instance from all the configured components.
         var apiName = this.ApiName;
         var clrObjectType = this.ClrType;
 
@@ -74,14 +87,20 @@ public sealed class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext c
         var apiRelationships = _apiRelationshipBuilders
             .Select(b => b.Build());
 
+        var apiOptions = this.BuildOptions();
+
         var apiObjectType = new ApiObjectType
         (
-            apiName: apiName,
-            apiProperties: apiProperties,
-            apiRelationships: apiRelationships,
-            clrObjectType: clrObjectType
-        );
+            apiName,
+            apiProperties,
+            apiRelationships,
+            clrObjectType
+        )
+        {
+            ApiOptions = apiOptions
+        };
 
+        // Add any extensions that were configured.
         var extensions = this.BuildExtensions();
         if (extensions != null)
         {
@@ -89,6 +108,20 @@ public sealed class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext c
         }
 
         return apiObjectType;
+    }
+    #endregion
+
+    #region Implementation Methods
+    private ApiObjectTypeOptions BuildOptions()
+    {
+        if (_apiOptionsConfiguration == null)
+        {
+            return ApiObjectTypeOptions.Default;
+        }
+
+        var apiOptionsBuilder = new ApiObjectTypeOptionsBuilder();
+        _apiOptionsConfiguration.Invoke(apiOptionsBuilder);
+        return apiOptionsBuilder.Build();
     }
     #endregion
 }

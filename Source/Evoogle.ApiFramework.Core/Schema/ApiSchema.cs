@@ -44,7 +44,7 @@ public sealed class ApiSchema : ExtensibleBase
     public string? ApiVersion { get; init; }
 
     /// <summary>Gets the options used to configure this API schema.</summary>
-    public ApiSchemaOptions ApiSchemaOptions { get; init; }
+    public ApiSchemaOptions ApiOptions { get; init; }
 
     /// <summary>Gets the API path for this schema. Available after initialization.</summary>
     public string ApiPath => this.ThrowIfNotInitialized(_apiPath);
@@ -100,7 +100,7 @@ public sealed class ApiSchema : ExtensibleBase
         this.ApiName = apiName;
 
         // Initialize the API schema options.
-        this.ApiSchemaOptions = apiSchemaOptions ?? ApiSchemaOptions.Default;
+        this.ApiOptions = apiSchemaOptions ?? ApiSchemaOptions.Default;
 
         // Initialize the collections for API types, scalar types, enum types, and object types.
         this.ApiScalarTypes = [.. apiScalarTypes.EmptyIfNull().Where(x => x is not null).OrderBy(x => x.ApiName, StringComparer.OrdinalIgnoreCase)];

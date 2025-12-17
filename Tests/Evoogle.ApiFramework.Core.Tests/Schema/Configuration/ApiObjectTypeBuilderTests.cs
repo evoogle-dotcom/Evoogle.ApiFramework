@@ -17,48 +17,83 @@ public class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
     public class BuildTest : XUnitTest
     {
         #region User Supplied Properties
-        public string ApiName { get; init; } = null!;
-        public Type ClrType { get; init; } = null!;
-        public ApiProperty[] ApiProperties { get; init; } = null!;
-        public ApiRelationship[] ApiRelationships { get; init; } = null!;
-        public ApiType ApiTypeExpected { get; init; } = null!;
-        public Type? ApiExtensionType { get; init; }
+        public required ApiTestSchemaKind ApiSchemaKind { get; init; }
+        public required string ApiObjectTypeName { get; init; }
+        public Type? ApiExtensionType1 { get; init; }
+        public Type? ApiExtensionType2 { get; init; }
         #endregion
 
         #region Calculated Properties
+        private ApiType? ApiTypeExpected { get; set; }
         private ApiType? ApiTypeActual { get; set; }
         #endregion
 
         #region XUnitTest Methods
         protected override void Arrange()
         {
-            this.WriteLine($"ApiName: {this.ApiName.SafeToString()}");
-            this.WriteLine($"ClrType: {this.ClrType.SafeToName()}");
-            this.WriteLine($"ApiExtensionType: {this.ApiExtensionType.SafeToName()}");
+            var apiSchema = ApiTestSchemaFactory.BuildTestSchema(this.ApiSchemaKind) ?? throw new InvalidOperationException($"{nameof(ApiSchema)} creation failed.");
+            var apiType = apiSchema.GetObjectTypeByApiName(this.ApiObjectTypeName) as ApiType ?? throw new InvalidOperationException($"{nameof(ApiObjectType)} '{this.ApiObjectTypeName}' not found in ApiSchema.");
+
+            var apiTypeExpected = (ApiObjectType)apiType.DeepCopy()!; // Needs to be ApiType here to allow deep copy by JSON serialization/deserialization to work properly
+
+            if (this.ApiExtensionType1 != null)
+            {
+                var extensionInstance = Activator.CreateInstance(this.ApiExtensionType1);
+                apiTypeExpected.Extensions ??= [];
+                apiTypeExpected.Extensions[this.ApiExtensionType1] = extensionInstance!;
+            }
+
+            if (this.ApiExtensionType2 != null)
+            {
+                var extensionInstance = Activator.CreateInstance(this.ApiExtensionType2);
+                apiTypeExpected.Extensions ??= [];
+                apiTypeExpected.Extensions[this.ApiExtensionType2] = extensionInstance!;
+            }
+
+            this.ApiTypeExpected = apiTypeExpected;
+
+            this.WriteLine($"ApiSchema:      {apiSchema.ApiName.SafeToString()}");
+            this.WriteLine($"ApiObjectType:  {apiTypeExpected.ApiName.SafeToString()}");
             this.WriteLine();
             this.WriteLine($"Expected: {this.ApiTypeExpected.SafeToString()}");
         }
 
         protected override void Act()
         {
-            var context = new ApiSchemaBuilderContext();
-            var builder = new ApiObjectTypeBuilder(this.ClrType, context)
-                .WithName(this.ApiName);
+            var apiObjectType = (ApiObjectType)this.ApiTypeExpected!;
 
-            foreach (var apiProperty in this.ApiProperties ?? [])
+            var apiName = apiObjectType.ApiName;
+            var clrType = apiObjectType.ClrType;
+
+            var context = new ApiSchemaBuilderContext();
+            var builder = new ApiObjectTypeBuilder(clrType, context)
+                .WithName(apiName);
+
+            var apiProperties = apiObjectType.ApiProperties;
+            foreach (var apiProperty in apiProperties ?? [])
             {
                 builder.AddProperty(apiProperty.ApiName, apiProperty.ClrName);
             }
 
-            foreach (var apiRelationship in this.ApiRelationships ?? [])
+            var apiRelationships = apiObjectType.ApiRelationships;
+            foreach (var apiRelationship in apiRelationships ?? [])
             {
                 builder.AddRelationship(apiRelationship.ApiName, apiRelationship.ApiPropertyName);
             }
 
-            if (this.ApiExtensionType != null)
+            var apiOptions = apiObjectType.ApiOptions;
+            builder.WithOptions(optionsBuilder =>
             {
-                var extension = Activator.CreateInstance(this.ApiExtensionType);
-                builder.AddExtension(this.ApiExtensionType, extension!);
+                if (apiOptions.ApiIdentityNullHandling.HasValue)
+                {
+                    optionsBuilder.WithIdentityNullHandling(apiOptions.ApiIdentityNullHandling.Value);
+                }
+            });
+
+            var extensions = apiObjectType.Extensions;
+            foreach (var extension in extensions ?? [])
+            {
+                builder.AddExtension(extension.Key, extension.Value);
             }
 
             this.ApiTypeActual = builder.Build();
@@ -88,145 +123,63 @@ public class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
     #endregion
 
     #region Theory Data
-    private static ApiObjectType EmptyObjectType { get; } = new ApiObjectType(nameof(Empty), [], [], typeof(Empty));
-    private static ApiObjectType EmptyObjectTypeWithExtension { get; } = new ApiObjectType(nameof(Empty), [], [], typeof(Empty))
-    {
-        Extensions = new OrderedDictionary<Type, object>
-        {
-            [typeof(TestExtension)] = new TestExtension()
-        }
-    };
-
-    private static ApiObjectType ScalarsOnlyObjectType { get; } = new ApiObjectType
-    (
-        nameof(ScalarsOnly),
-        [
-            new ApiProperty(nameof(ScalarsOnly.RequiredName), ApiTypeExpression.ClrRef<string>(), ApiTypeModifiers.Required, nameof(ScalarsOnly.RequiredName)),
-            new ApiProperty(nameof(ScalarsOnly.RequiredNumber), ApiTypeExpression.ClrRef<long>(), ApiTypeModifiers.Required, nameof(ScalarsOnly.RequiredNumber)),
-            new ApiProperty(nameof(ScalarsOnly.RequiredPredicate), ApiTypeExpression.ClrRef<bool>(), ApiTypeModifiers.Required, nameof(ScalarsOnly.RequiredPredicate)),
-            new ApiProperty(nameof(ScalarsOnly.OptionalName), ApiTypeExpression.ClrRef<string>(), ApiTypeModifiers.None, nameof(ScalarsOnly.OptionalName)),
-            new ApiProperty(nameof(ScalarsOnly.OptionalNumber), ApiTypeExpression.ClrRef<long>(), ApiTypeModifiers.None, nameof(ScalarsOnly.OptionalNumber)),
-            new ApiProperty(nameof(ScalarsOnly.OptionalPredicate), ApiTypeExpression.ClrRef<bool>(), ApiTypeModifiers.None, nameof(ScalarsOnly.OptionalPredicate)),
-        ],
-        [],
-        typeof(ScalarsOnly)
-    );
-
-    private static ApiObjectType ScalarsOnlyObjectTypeWithExtension { get; } = new ApiObjectType
-    (
-        nameof(ScalarsOnly),
-        [
-            new ApiProperty(nameof(ScalarsOnly.RequiredName), ApiTypeExpression.ClrRef<string>(), ApiTypeModifiers.Required, nameof(ScalarsOnly.RequiredName)),
-            new ApiProperty(nameof(ScalarsOnly.RequiredNumber), ApiTypeExpression.ClrRef<long>(), ApiTypeModifiers.Required, nameof(ScalarsOnly.RequiredNumber)),
-            new ApiProperty(nameof(ScalarsOnly.RequiredPredicate), ApiTypeExpression.ClrRef<bool>(), ApiTypeModifiers.Required, nameof(ScalarsOnly.RequiredPredicate)),
-            new ApiProperty(nameof(ScalarsOnly.OptionalName), ApiTypeExpression.ClrRef<string>(), ApiTypeModifiers.None, nameof(ScalarsOnly.OptionalName)),
-            new ApiProperty(nameof(ScalarsOnly.OptionalNumber), ApiTypeExpression.ClrRef<long>(), ApiTypeModifiers.None, nameof(ScalarsOnly.OptionalNumber)),
-            new ApiProperty(nameof(ScalarsOnly.OptionalPredicate), ApiTypeExpression.ClrRef<bool>(), ApiTypeModifiers.None, nameof(ScalarsOnly.OptionalPredicate)),
-        ],
-        [],
-        typeof(ScalarsOnly)
-    )
-    {
-        Extensions = new OrderedDictionary<Type, object>
-        {
-            [typeof(TestExtension)] = new TestExtension()
-        }
-    };
-
-    private static ApiObjectType CompanyObjectType { get; } = new ApiObjectType
-    (
-        nameof(Company),
-        [
-            new ApiProperty(nameof(Company.Name), ApiTypeExpression.ClrRef<string>(), ApiTypeModifiers.Required, nameof(Company.Name)),
-            new ApiProperty(nameof(Company.Owner), ApiTypeExpression.ClrRef<Person>(), ApiTypeModifiers.None, nameof(Company.Owner)),
-            new ApiProperty(nameof(Company.Employees), ApiTypeExpression.ListOf<Person>(ApiTypeModifiers.Required), ApiTypeModifiers.None, nameof(Company.Employees)),
-        ],
-        [
-            new ApiRelationship(nameof(Company.Owner)),
-            new ApiRelationship(nameof(Company.Employees)),
-        ],
-        typeof(Company)
-    );
-
-    private static ApiObjectType CompanyObjectTypeWithExtension { get; } = new ApiObjectType
-    (
-        nameof(Company),
-        [
-            new ApiProperty(nameof(Company.Name), ApiTypeExpression.ClrRef<string>(), ApiTypeModifiers.Required, nameof(Company.Name)),
-            new ApiProperty(nameof(Company.Owner), ApiTypeExpression.ClrRef<Person>(), ApiTypeModifiers.None, nameof(Company.Owner)),
-            new ApiProperty(nameof(Company.Employees), ApiTypeExpression.ListOf<Person>(ApiTypeModifiers.Required), ApiTypeModifiers.None, nameof(Company.Employees)),
-        ],
-        [
-            new ApiRelationship(nameof(Company.Owner)),
-            new ApiRelationship(nameof(Company.Employees)),
-        ],
-        typeof(Company)
-    )
-    {
-        Extensions = new OrderedDictionary<Type, object>
-        {
-            [typeof(TestExtension)] = new TestExtension()
-        }
-    };
-
     public static TheoryDataRow<IXUnitTest>[] BuildTheoryData =>
     [
         new BuildTest
         {
-            Name = $"Builds {EmptyObjectType}",
-            ApiName = nameof(Empty),
-            ClrType = typeof(Empty),
-            ApiProperties = [.. EmptyObjectType.ApiProperties],
-            ApiRelationships = [.. EmptyObjectType.ApiRelationships],
-            ApiTypeExpected = EmptyObjectType,
+            Name = $"Builds {nameof(Empty)} from {ApiTestSchemaKind.Simple} API schema",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiObjectTypeName = nameof(Empty),
         },
         new BuildTest
         {
-            Name = $"Builds {EmptyObjectTypeWithExtension} with extension",
-            ApiName = nameof(Empty),
-            ClrType = typeof(Empty),
-            ApiProperties = [.. EmptyObjectTypeWithExtension.ApiProperties],
-            ApiRelationships = [.. EmptyObjectTypeWithExtension.ApiRelationships],
-            ApiTypeExpected = EmptyObjectTypeWithExtension,
-            ApiExtensionType = typeof(TestExtension),
+            Name = $"Builds {nameof(Empty)} with GraphQl extension from {ApiTestSchemaKind.Simple} API schema",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiObjectTypeName = nameof(Empty),
+            ApiExtensionType1 = typeof(GraphQlExtension),
+        },
+
+        new BuildTest
+        {
+            Name = $"Builds {nameof(ScalarsOnly)} from {ApiTestSchemaKind.Simple} API schema",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiObjectTypeName = nameof(ScalarsOnly),
         },
         new BuildTest
         {
-            Name = $"Builds {ScalarsOnlyObjectType}",
-            ApiName = nameof(ScalarsOnly),
-            ClrType = typeof(ScalarsOnly),
-            ApiProperties = [.. ScalarsOnlyObjectType.ApiProperties],
-            ApiRelationships = [.. ScalarsOnlyObjectType.ApiRelationships],
-            ApiTypeExpected = ScalarsOnlyObjectType,
+            Name = $"Builds {nameof(ScalarsOnly)} with GraphQl extension from {ApiTestSchemaKind.Simple} API schema",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiObjectTypeName = nameof(ScalarsOnly),
+            ApiExtensionType1 = typeof(GraphQlExtension),
         },
         new BuildTest
         {
-            Name = $"Builds {ScalarsOnlyObjectTypeWithExtension} with extension",
-            ApiName = nameof(ScalarsOnly),
-            ClrType = typeof(ScalarsOnly),
-            ApiProperties = [.. ScalarsOnlyObjectTypeWithExtension.ApiProperties],
-            ApiRelationships = [.. ScalarsOnlyObjectTypeWithExtension.ApiRelationships],
-            ApiTypeExpected = ScalarsOnlyObjectTypeWithExtension,
-            ApiExtensionType = typeof(TestExtension),
+            Name = $"Builds {nameof(ScalarsOnly)} with JsonApi extension from {ApiTestSchemaKind.Simple} API schema",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiObjectTypeName = nameof(ScalarsOnly),
+            ApiExtensionType1 = typeof(JsonApiExtension),
         },
         new BuildTest
         {
-            Name = $"Builds {CompanyObjectType}",
-            ApiName = nameof(Company),
-            ClrType = typeof(Company),
-            ApiProperties = [.. CompanyObjectType.ApiProperties],
-            ApiRelationships = [.. CompanyObjectType.ApiRelationships],
-            ApiTypeExpected = CompanyObjectType,
+            Name = $"Builds {nameof(ScalarsOnly)} with GraphQl and JsonApi extensions from {ApiTestSchemaKind.Simple} API schema",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiObjectTypeName = nameof(ScalarsOnly),
+            ApiExtensionType1 = typeof(GraphQlExtension),
+            ApiExtensionType2 = typeof(JsonApiExtension),
+        },
+
+        new BuildTest
+        {
+            Name = $"Builds {nameof(Company)} from {ApiTestSchemaKind.Simple} API schema",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiObjectTypeName = nameof(Company),
         },
         new BuildTest
         {
-            Name = $"Builds {CompanyObjectTypeWithExtension} with extension",
-            ApiName = nameof(Company),
-            ClrType = typeof(Company),
-            ApiProperties = [.. CompanyObjectTypeWithExtension.ApiProperties],
-            ApiRelationships = [.. CompanyObjectTypeWithExtension.ApiRelationships],
-            ApiTypeExpected = CompanyObjectTypeWithExtension,
-            ApiExtensionType = typeof(TestExtension),
+            Name = $"Builds {nameof(Company)} with GraphQl extension from {ApiTestSchemaKind.Simple} API schema",
+            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiObjectTypeName = nameof(Company),
+            ApiExtensionType1 = typeof(GraphQlExtension),
         },
     ];
     #endregion

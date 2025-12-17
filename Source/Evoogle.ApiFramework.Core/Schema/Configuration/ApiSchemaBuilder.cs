@@ -15,6 +15,7 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     #region Fields
     private string? _apiName;
     private string? _apiVersion;
+    private Action<ApiSchemaOptionsBuilder>? _apiOptionsConfiguration = null;
 
     private readonly ApiSchemaBuilderContext _context = new(logger);
     #endregion
@@ -43,6 +44,17 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
         ArgumentException.ThrowIfNullOrWhiteSpace(apiVersion, nameof(apiVersion));
 
         _apiVersion = apiVersion;
+        return this;
+    }
+
+    /// <summary>
+    ///     Configures options for this schema.
+    /// </summary>
+    /// <param name="configure">Callback to configure the schema options.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiSchemaBuilder WithOptions(Action<ApiSchemaOptionsBuilder> configure)
+    {
+        _apiOptionsConfiguration = configure;
         return this;
     }
 
@@ -163,9 +175,18 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
 
         var apiVersion = _apiVersion ?? "1.0"; // Default version if not set
 
-        var apiSchema = new ApiSchema(apiName, apiScalarTypes, apiEnumTypes, apiObjectTypes)
+        var apiOptions = this.BuildOptions();
+
+        var apiSchema = new ApiSchema
+        (
+            apiName,
+            apiScalarTypes,
+            apiEnumTypes,
+            apiObjectTypes
+        )
         {
-            ApiVersion = apiVersion
+            ApiVersion = apiVersion,
+            ApiOptions = apiOptions
         };
 
         // Add any extensions that were configured.
@@ -180,6 +201,20 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
         result.ThrowIfInvalid();
 
         return apiSchema;
+    }
+    #endregion
+
+    #region Implementation Methods
+    private ApiSchemaOptions BuildOptions()
+    {
+        if (_apiOptionsConfiguration == null)
+        {
+            return ApiSchemaOptions.Default;
+        }
+
+        var apiOptionsBuilder = new ApiSchemaOptionsBuilder();
+        _apiOptionsConfiguration.Invoke(apiOptionsBuilder);
+        return apiOptionsBuilder.Build();
     }
     #endregion
 }

@@ -12,13 +12,23 @@ namespace Evoogle.ApiFramework.Schema.TestData;
 /// </summary>
 public static class ApiTestSchemaFactory
 {
+    #region Fields
+    private static readonly Lazy<ApiSchema> _commerceSchema = new(() => BuildCommerceSchema());
+    private static readonly Lazy<ApiSchema> _simpleSchema = new(() => BuildSimpleSchema());
+    #endregion
+
+    #region Properties
+    public static ApiSchema CommerceSchema => _commerceSchema.Value;
+    public static ApiSchema SimpleSchema => _simpleSchema.Value;
+    #endregion
+
     #region Methods
     public static ApiSchema BuildTestSchema(ApiTestSchemaKind kind)
     {
         return kind switch
         {
-            ApiTestSchemaKind.Simple => BuildSimpleSchema(),
-            ApiTestSchemaKind.Commerce => BuildCommerceSchema(),
+            ApiTestSchemaKind.Simple => SimpleSchema,
+            ApiTestSchemaKind.Commerce => CommerceSchema,
             _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null)
         };
     }
@@ -32,80 +42,107 @@ public static class ApiTestSchemaFactory
         // 1) Scalars
         var scalars = new List<ApiScalarType>
         {
-            S(nameof(Ulid),           typeof(Ulid)),
-            S(nameof(Guid),           typeof(Guid)),
-            S(nameof(String),         typeof(string)),
-            S(nameof(Int32),          typeof(int)),
-            S(nameof(Int64),          typeof(long)),
-            S(nameof(Decimal),        typeof(decimal)),
-            S(nameof(Double),         typeof(double)),
-            S(nameof(Boolean),        typeof(bool)),
-            S(nameof(DateOnly),       typeof(DateOnly)),
-            S(nameof(TimeOnly),       typeof(TimeOnly)),
-            S(nameof(DateTimeOffset), typeof(DateTimeOffset)),
-            S(nameof(Uri),            typeof(Uri))
+            S(name: nameof(Ulid),           clr: typeof(Ulid)),
+            S(name: nameof(Guid),           clr: typeof(Guid)),
+            S(name: nameof(String),         clr: typeof(string)),
+            S(name: nameof(Int32),          clr: typeof(int)),
+            S(name: nameof(Int64),          clr: typeof(long)),
+            S(name: nameof(Decimal),        clr: typeof(decimal)),
+            S(name: nameof(Double),         clr: typeof(double)),
+            S(name: nameof(Boolean),        clr: typeof(bool)),
+            S(name: nameof(DateOnly),       clr: typeof(DateOnly)),
+            S(name: nameof(TimeOnly),       clr: typeof(TimeOnly)),
+            S(name: nameof(DateTimeOffset), clr: typeof(DateTimeOffset)),
+            S(name: nameof(Uri),            clr: typeof(Uri))
         };
 
         // 2) Enums
         var enums = new List<ApiEnumType>
         {
-            E("OrderStatus",   typeof(OrderStatus),   [EV("Pending", 0), EV("Paid", 1), EV("Shipped", 2), EV("Cancelled", 3), EV("Returned", 4)]),
-            E("PaymentMethod", typeof(PaymentMethod), [EV("Card", 0), EV("Cash", 1), EV("Wire", 2), EV("Crypto", 3)]),
-            E("UserRole",      typeof(UserRole),      [EV("None", 0), EV("Reader", 1), EV("Editor", 2), EV("Admin", 3)]),
-            E("CountryCode",   typeof(CountryCode),   [EV("US", 0), EV("CA", 1), EV("GB", 2)])
+            E(name: nameof(OrderStatus), clr: typeof(OrderStatus), values:
+            [
+                EV(name: nameof(OrderStatus.Pending),   ordinal: 0),
+                EV(name: nameof(OrderStatus.Paid),      ordinal: 1),
+                EV(name: nameof(OrderStatus.Shipped),   ordinal: 2),
+                EV(name: nameof(OrderStatus.Cancelled), ordinal: 3),
+                EV(name: nameof(OrderStatus.Returned),  ordinal: 4)
+            ]),
+
+            E(name: nameof(PaymentMethod), clr: typeof(PaymentMethod), values:
+            [
+                EV(name: nameof(PaymentMethod.Card),   ordinal: 0),
+                EV(name: nameof(PaymentMethod.Cash),   ordinal: 1),
+                EV(name: nameof(PaymentMethod.Wire),   ordinal: 2),
+                EV(name: nameof(PaymentMethod.Crypto), ordinal: 3)
+            ]),
+
+            E(name: nameof(UserRole), clr: typeof(UserRole), values:
+            [
+                EV(name: nameof(UserRole.None),   ordinal: 0),
+                EV(name: nameof(UserRole.Reader), ordinal: 1),
+                EV(name: nameof(UserRole.Editor), ordinal: 2),
+                EV(name: nameof(UserRole.Admin),  ordinal: 3)
+            ]),
+
+            E(name: nameof(CountryCode), clr: typeof(CountryCode), values:
+            [
+                EV(name: nameof(CountryCode.US), ordinal: 0),
+                EV(name: nameof(CountryCode.CA), ordinal: 1),
+                EV(name: nameof(CountryCode.GB), ordinal: 2)
+            ])
         };
 
         // 3) Value Objects (objects w/o relationships)
-        var money = O("Money", typeof(Money),
+        var money = O(name: nameof(Money), clr: typeof(Money), properties:
         [
-            P("Amount",    TE.ClrRef<decimal>(),    required: true),
-            P("Currency",  TE.ClrRef<string>(),     required: true)
+            P(name: nameof(Money.Amount),   expression: TE.ClrRef<decimal>(), required: true),
+            P(name: nameof(Money.Currency), expression: TE.ClrRef<string>(),  required: true)
         ]);
 
-        var quantity = O("Quantity", typeof(Quantity),
+        var quantity = O(name: nameof(Quantity), clr: typeof(Quantity), properties:
         [
-            P("Value",     TE.ClrRef<decimal>(),    required: true),
-            P("Unit",      TE.ClrRef<string>(),     required: true)
+            P(name: nameof(Quantity.Value), expression: TE.ClrRef<decimal>(), required: true),
+            P(name: nameof(Quantity.Unit),  expression: TE.ClrRef<string>(),  required: true)
         ]);
 
-        var emailAddress = O("EmailAddress", typeof(EmailAddress),
+        var emailAddress = O(name: nameof(EmailAddress), clr: typeof(EmailAddress), properties:
         [
-            P("Value",     TE.ClrRef<string>(), required: true)
+            P(name: nameof(EmailAddress.Value), expression: TE.ClrRef<string>(), required: true)
         ]);
 
-        var address = O("Address", typeof(Address),
+        var address = O(name: nameof(Address), clr: typeof(Address), properties:
         [
-            P("Line1",     TE.ClrRef<string>(),         required: true),
-            P("Line2",     TE.ClrRef<string>(),         required: false),
-            P("City",      TE.ClrRef<string>(),         required: true),
-            P("State",     TE.ClrRef<string>(),         required: true),
-            P("Postal",    TE.ClrRef<string>(),         required: true),
-            P("Country",   TE.ClrRef<CountryCode>(),    required: true)
+            P(name: nameof(Address.Line1),   expression: TE.ClrRef<string>(),      required: true),
+            P(name: nameof(Address.Line2),   expression: TE.ClrRef<string>(),      required: false),
+            P(name: nameof(Address.City),    expression: TE.ClrRef<string>(),      required: true),
+            P(name: nameof(Address.State),   expression: TE.ClrRef<string>(),      required: true),
+            P(name: nameof(Address.Postal),  expression: TE.ClrRef<string>(),      required: true),
+            P(name: nameof(Address.Country), expression: TE.ClrRef<CountryCode>(), required: true)
         ]);
 
         // 4) Entity/Object Types (with relationships)
         // Category (self-referential)
-        var category = O("Category", typeof(Category),
+        var category = O(name: nameof(Category), clr: typeof(Category), properties:
         [
-            P("Id",        TE.ClrRef<Ulid>(),                   required: true),
-            P("Name",      TE.ClrRef<string>(),                 required: true),
-            P("Parent",    TE.ClrRef<Category>(),               required: false),
-            P("Children",  TE.ListOf<Category>(required: true), required: true)
-        ],
+            P(name: nameof(Category.Id),        expression: TE.ClrRef<Ulid>(),                   required: true),
+            P(name: nameof(Category.Name),      expression: TE.ClrRef<string>(),                 required: true),
+            P(name: nameof(Category.Parent),    expression: TE.ClrRef<Category>(),               required: false),
+            P(name: nameof(Category.Children),  expression: TE.ListOf<Category>(required: true), required: true)
+        ], relationships:
         [
-            R("Category_Children", "Children"),
-            R("Category_Children", "Parent")
+            R(name: "Category_Children", propertyName: nameof(Category.Children)),
+            R(name: "Category_Children", propertyName: nameof(Category.Parent))
         ]);
 
         // Tag (M2M with ProductBase)
-        var tag = O("Tag", typeof(Tag),
+        var tag = O(name: nameof(Tag), clr: typeof(Tag), properties:
         [
-            P("Id",        TE.ClrRef<Ulid>(),                       required: true),
-            P("Name",      TE.ClrRef<string>(),                     required: true),
-            P("Products",  TE.ListOf<ProductBase>(required:true),   required: true)
-        ],
+            P(name: nameof(Tag.Id),        expression: TE.ClrRef<Ulid>(),                      required: true),
+            P(name: nameof(Tag.Name),      expression: TE.ClrRef<string>(),                    required: true),
+            P(name: nameof(Tag.Products),  expression: TE.ListOf<ProductBase>(required: true), required: true)
+        ], relationships:
         [
-            R("Product_Tags", "Products")
+            R(name: "Product_Tags", propertyName: "Products")
         ]);
 
         // // Abstract ProductBase + two derived types (polymorphism)
@@ -118,101 +155,101 @@ public static class ApiTestSchemaFactory
         // ],
         // extensions: Ext(new() { ["discriminator"] = "kind" })); // Example: your framework’s discriminator key
 
-        var physicalProduct = O("PhysicalProduct", typeof(PhysicalProduct),
+        var physicalProduct = O(name: nameof(PhysicalProduct), clr: typeof(PhysicalProduct), properties:
         [
-            P("Id",        TE.ClrRef<Ulid>(),               required: true),
-            P("Sku",       TE.ClrRef<string>(),             required: true),
-            P("Name",      TE.ClrRef<string>(),             required: true),
-            P("Price",     TE.ClrRef<Money>(),              required: true),
-            P("Tags",      TE.ListOf<Tag>(required:true),   required: false),
-            P("Category",  TE.ClrRef<Category>(),           required: false),
-            P("Weight",    TE.ClrRef<decimal>(),            required: true),
-            P("Size",      TE.ClrRef<Quantity>(),           required: false),
-        ],
+            P(name: nameof(PhysicalProduct.Id),        expression: TE.ClrRef<Ulid>(),              required: true),
+            P(name: nameof(PhysicalProduct.Sku),       expression: TE.ClrRef<string>(),            required: true),
+            P(name: nameof(PhysicalProduct.Name),      expression: TE.ClrRef<string>(),            required: true),
+            P(name: nameof(PhysicalProduct.Price),     expression: TE.ClrRef<Money>(),             required: true),
+            P(name: nameof(PhysicalProduct.Tags),      expression: TE.ListOf<Tag>(required: true), required: false),
+            P(name: nameof(PhysicalProduct.Category),  expression: TE.ClrRef<Category>(),          required: false),
+            P(name: nameof(PhysicalProduct.Weight),    expression: TE.ClrRef<decimal>(),           required: true),
+            P(name: nameof(PhysicalProduct.Size),      expression: TE.ClrRef<Quantity>(),          required: false),
+        ], relationships:
         [
-            R("Product_Tags", "Tags")
+            R(name: "Product_Tags", propertyName: nameof(PhysicalProduct.Tags))
         ]);
 
-        var digitalProduct = O("DigitalProduct", typeof(DigitalProduct),
+        var digitalProduct = O(name: nameof(DigitalProduct), clr: typeof(DigitalProduct), properties:
         [
-            P("Id",             TE.ClrRef<Ulid>(),              required: true),
-            P("Sku",            TE.ClrRef<string>(),            required: true),
-            P("Name",           TE.ClrRef<string>(),            required: true),
-            P("Price",          TE.ClrRef<Money>(),             required: true),
-            P("Tags",           TE.ListOf<Tag>(required:true),  required: false),
-            P("Category",       TE.ClrRef<Category>(),          required: false),
-            P("DownloadUrl",    TE.ClrRef<Uri>(),               required: false),
-            P("Bytes",          TE.ClrRef<long>(),              required: false),
-        ],
+            P(name: nameof(DigitalProduct.Id),             expression: TE.ClrRef<Ulid>(),              required: true),
+            P(name: nameof(DigitalProduct.Sku),            expression: TE.ClrRef<string>(),            required: true),
+            P(name: nameof(DigitalProduct.Name),           expression: TE.ClrRef<string>(),            required: true),
+            P(name: nameof(DigitalProduct.Price),          expression: TE.ClrRef<Money>(),             required: true),
+            P(name: nameof(DigitalProduct.Tags),           expression: TE.ListOf<Tag>(required: true), required: false),
+            P(name: nameof(DigitalProduct.Category),       expression: TE.ClrRef<Category>(),          required: false),
+            P(name: nameof(DigitalProduct.DownloadUrl),    expression: TE.ClrRef<Uri>(),               required: false),
+            P(name: nameof(DigitalProduct.Bytes),          expression: TE.ClrRef<long>(),              required: false),
+        ], relationships:
         [
-            R("Product_Tags", "Tags")
+            R(name: "Product_Tags", propertyName: nameof(DigitalProduct.Tags))
         ]);
 
         // OrderLine
-        var orderLine = O("OrderLine", typeof(OrderLine),
+        var orderLine = O(name: nameof(OrderLine), clr: typeof(OrderLine), properties:
         [
-            P("Id",        TE.ClrRef<Ulid>(),           required: true),
-            P("Product",   TE.ClrRef<ProductBase>(),    required: true),
-            P("Qty",       TE.ClrRef<Quantity>(),       required: true),
-            P("UnitPrice", TE.ClrRef<Money>(),          required: true),
-            P("LineTotal", TE.ClrRef<Money>(),          required: true)
+            P(name: nameof(OrderLine.Id),        expression: TE.ClrRef<Ulid>(),        required: true),
+            P(name: nameof(OrderLine.Product),   expression: TE.ClrRef<ProductBase>(), required: true),
+            P(name: nameof(OrderLine.Qty),       expression: TE.ClrRef<Quantity>(),    required: true),
+            P(name: nameof(OrderLine.UnitPrice), expression: TE.ClrRef<Money>(),       required: true),
+            P(name: nameof(OrderLine.LineTotal), expression: TE.ClrRef<Money>(),       required: true)
         ]);
 
         // Payment
-        var payment = O("Payment", typeof(Payment),
+        var payment = O(name: nameof(Payment), clr: typeof(Payment), properties:
         [
-            P("Id",         TE.ClrRef<Ulid>(),              required: true),
-            P("Method",     TE.ClrRef<PaymentMethod>(),     required: true),
-            P("Amount",     TE.ClrRef<Money>(),             required: true),
-            P("CapturedAt", TE.ClrRef<DateTimeOffset>(),    required: false),
+            P(name: nameof(Payment.Id),         expression: TE.ClrRef<Ulid>(),           required: true),
+            P(name: nameof(Payment.Method),     expression: TE.ClrRef<PaymentMethod>(),  required: true),
+            P(name: nameof(Payment.Amount),     expression: TE.ClrRef<Money>(),          required: true),
+            P(name: nameof(Payment.CapturedAt), expression: TE.ClrRef<DateTimeOffset>(), required: false),
             // Dictionary<string,string>
-            //P("Metadata",  TE.DictOf(TE.ClrRef<string>(), TE.ClrRef<string>(), valueNullable:true), required: true)
+            //P(name: "Metadata",  expression: TE.DictOf(TE.ClrRef<string>(), TE.ClrRef<string>(), valueNullable: true), required: true)
         ]);
 
         // Order
-        var order = O("Order", typeof(Order),
+        var order = O(name: nameof(Order), clr: typeof(Order), properties:
         [
-            P("Id",        TE.ClrRef<Ulid>(),                   required: true),
-            P("Customer",  TE.ClrRef<Customer>(),               required: true),
-            P("PlacedAt",  TE.ClrRef<DateTimeOffset>(),         required: true),
-            P("Status",    TE.ClrRef<OrderStatus>(),            required: true),
-            P("Lines",     TE.ListOf<OrderLine>(required:true), required: true),
-            P("Payment",   TE.ClrRef<Payment>(),                required: false),
-            P("Total",     TE.ClrRef<Money>(),                  required: true)
-        ],
+            P(name: nameof(Order.Id),        expression: TE.ClrRef<Ulid>(),                    required: true),
+            P(name: nameof(Order.Customer),  expression: TE.ClrRef<Customer>(),                required: true),
+            P(name: nameof(Order.PlacedAt),  expression: TE.ClrRef<DateTimeOffset>(),          required: true),
+            P(name: nameof(Order.Status),    expression: TE.ClrRef<OrderStatus>(),             required: true),
+            P(name: nameof(Order.Lines),     expression: TE.ListOf<OrderLine>(required: true), required: true),
+            P(name: nameof(Order.Payment),   expression: TE.ClrRef<Payment>(),                 required: false),
+            P(name: nameof(Order.Total),     expression: TE.ClrRef<Money>(),                   required: true)
+        ], relationships:
         [
-            R("Customer_Orders", "Customer"),
-            R("Order_Payment", "Payment")
+            R(name: "Customer_Orders", propertyName: nameof(Order.Customer)),
+            R(name: "Order_Payment", propertyName: nameof(Order.Payment))
         ]);
 
         // Customer (has collections, nested value objects)
-        var customer = O("Customer", typeof(Customer),
+        var customer = O(name: nameof(Customer), clr: typeof(Customer), properties:
         [
-            P("Id",             TE.ClrRef<Ulid>(),                  required: true),
-            P("Name",           TE.ClrRef<string>(),                required: true),
-            P("Email",          TE.ClrRef<EmailAddress>(),          required: true),
-            P("PrimaryAddress", TE.ClrRef<Address>(),               required: true),
-            P("Addresses",      TE.ListOf<Address>(required:true),  required: true),
-            P("Orders",         TE.ListOf<Order>(required:true),    required: true)
-        ],
+            P(name: nameof(Customer.Id),             expression: TE.ClrRef<Ulid>(),                  required: true),
+            P(name: nameof(Customer.Name),           expression: TE.ClrRef<string>(),                required: true),
+            P(name: nameof(Customer.Email),          expression: TE.ClrRef<EmailAddress>(),          required: true),
+            P(name: nameof(Customer.PrimaryAddress), expression: TE.ClrRef<Address>(),               required: true),
+            P(name: nameof(Customer.Addresses),      expression: TE.ListOf<Address>(required: true), required: true),
+            P(name: nameof(Customer.Orders),         expression: TE.ListOf<Order>(required: true),   required: true)
+        ], relationships:
         [
-            R("Customer_Orders", "Orders")
+            R(name: "Customer_Orders", propertyName: nameof(Customer.Orders))
         ]);
 
         // 5) Relationships (optional if you encode via properties; include here when you want explicit cardinality tests)
         var relationships = new List<ApiRelationship>
         {
             // Customer 1–many Orders
-            R("Customer_Orders", "Orders"),
+            R(name: "Customer_Orders", propertyName: nameof(Customer.Orders)),
 
             // Order optional 1–1 Payment
-            R("Order_Payment", "Payment"),
+            R(name: "Order_Payment", propertyName: nameof(Order.Payment)),
 
             // ProductBase many–many Tag
-            R("Product_Tags", "Tags"),
+            R(name: "Product_Tags", propertyName: nameof(ProductBase.Tags)),
 
             // Category self-reference
-            R("Category_Children", "Children"),
+            R(name: "Category_Children", propertyName: nameof(Category.Children)),
         };
 
         // 6) Objects list (include value objects + entities + abstract base + derived)
@@ -246,55 +283,67 @@ public static class ApiTestSchemaFactory
         // 1) Scalars
         var scalars = new List<ApiScalarType>
         {
-            S("String",  typeof(string)),
-            S("Int32",   typeof(int)),
-            S("Int64",   typeof(long)),
-            S("Boolean", typeof(bool))
+            S(name: nameof(String),  clr: typeof(string)),
+            S(name: nameof(Int32),   clr: typeof(int)),
+            S(name: nameof(Int64),   clr: typeof(long)),
+            S(name: nameof(Boolean), clr: typeof(bool))
         };
 
         // 2) Enums
         var enums = new List<ApiEnumType>
         {
-            E("Gender",     typeof(Gender),     [EV("Unspecified", 0),  EV("Male", 1),  EV("Female", 2)]),
-            E("StopLight",  typeof(StopLight),  [EV("None", 0),         EV("Green", 1), EV("Yellow", 2), EV("Red", 3)])
+            E(name: nameof(Gender), clr: typeof(Gender), values:
+            [
+                EV(name: nameof(Gender.Unspecified), ordinal: 0),
+                EV(name: nameof(Gender.Male),        ordinal: 1),
+                EV(name: nameof(Gender.Female),      ordinal: 2)
+            ]),
+
+            E(name: nameof(StopLight), clr: typeof(StopLight), values:
+            [
+                EV(name: nameof(StopLight.None),   ordinal: 0),
+                EV(name: nameof(StopLight.Green),  ordinal: 1),
+                EV(name: nameof(StopLight.Yellow), ordinal: 2),
+                EV(name: nameof(StopLight.Red),    ordinal: 3)
+            ])
         };
 
         // 3) Object Types
-        var empty = O("Empty", typeof(Empty), []);
+        var empty = O(name: nameof(Empty), clr: typeof(Empty), options: OO(ApiIdentityNullHandling.ThrowException), properties: []);
 
-        var point = O("Point", typeof(Point),
+        var point = O(name: nameof(Point), clr: typeof(Point), options: OO(ApiIdentityNullHandling.ThrowException), properties:
         [
-            P("X",      TE.ClrRef<long>(),      required: true),
-            P("Y",      TE.ClrRef<long>(),      required: true),
-            P("Note",   TE.ClrRef<string>(),    required: false)
+            P(name: nameof(Point.X),    expression: TE.ClrRef<long>(),   required: true),
+            P(name: nameof(Point.Y),    expression: TE.ClrRef<long>(),   required: true),
+            P(name: nameof(Point.Note), expression: TE.ClrRef<string>(), required: false)
         ]);
 
-        var scalarsOnly = O("ScalarsOnly", typeof(ScalarsOnly),
+        var scalarsOnly = O(name: nameof(ScalarsOnly), clr: typeof(ScalarsOnly), options: OO(ApiIdentityNullHandling.ThrowException), properties:
         [
-            P("RequiredName",       TE.ClrRef<string>(),    required: true),
-            P("RequiredNumber",     TE.ClrRef<long>(),      required: true),
-            P("RequiredPredicate",  TE.ClrRef<bool>(),      required: true),
-            P("OptionalName",       TE.ClrRef<string>(),    required: false),
-            P("OptionalNumber",     TE.ClrRef<long>(),      required: false),
-            P("OptionalPredicate",  TE.ClrRef<bool>(),      required: false)
+            P(name: nameof(ScalarsOnly.RequiredName),      expression: TE.ClrRef<string>(), required: true),
+            P(name: nameof(ScalarsOnly.RequiredNumber),    expression: TE.ClrRef<long>(),   required: true),
+            P(name: nameof(ScalarsOnly.RequiredPredicate), expression: TE.ClrRef<bool>(),   required: true),
+            P(name: nameof(ScalarsOnly.OptionalName),      expression: TE.ClrRef<string>(), required: false),
+            P(name: nameof(ScalarsOnly.OptionalNumber),    expression: TE.ClrRef<long>(),   required: false),
+            P(name: nameof(ScalarsOnly.OptionalPredicate), expression: TE.ClrRef<bool>(),   required: false)
         ]);
 
-        var person = O("Person", typeof(Person),
+        var person = O(name: nameof(Person), clr: typeof(Person), options: OO(ApiIdentityNullHandling.ThrowException), properties:
         [
-            P("Name",     TE.ClrRef<string>(),              required: true),
-            P("Age",      TE.ClrRef<int>(),                 required: false),
-            P("Gender",   TE.ClrRef<Gender>(),              required: false),
-            P("Hobbies",  TE.ListOf<string>(required:true), required: false)
+            P(name: nameof(Person.Name),    expression: TE.ClrRef<string>(),               required: true),
+            P(name: nameof(Person.Age),     expression: TE.ClrRef<int>(),                  required: false),
+            P(name: nameof(Person.Gender),  expression: TE.ClrRef<Gender>(),               required: false),
+            P(name: nameof(Person.Hobbies), expression: TE.ListOf<string>(required: true), required: false)
         ]);
-        var company = O("Company", typeof(Company),
+        var company = O(name: nameof(Company), clr: typeof(Company), options: OO(ApiIdentityNullHandling.ThrowException), properties:
         [
-            P("Name",      TE.ClrRef<string>(),              required: true),
-            P("Owner",     TE.ClrRef<Person>(),              required: false),
-            P("Employees", TE.ListOf<Person>(required:true), required: false)
-        ],
+            P(name: nameof(Company.Name),      expression: TE.ClrRef<string>(),               required: true),
+            P(name: nameof(Company.Owner),     expression: TE.ClrRef<Person>(),               required: false),
+            P(name: nameof(Company.Employees), expression: TE.ListOf<Person>(required: true), required: false)
+        ], relationships:
         [
-            R("Company_Owner",      "Owner"),
-            R("Company_Employees",  "Employees")
+            R(name: "Company_Owner",      propertyName: nameof(Company.Owner)),
+            R(name: "Company_Employees",  propertyName: nameof(Company.Employees))
         ]);
 
         // 4) Objects list

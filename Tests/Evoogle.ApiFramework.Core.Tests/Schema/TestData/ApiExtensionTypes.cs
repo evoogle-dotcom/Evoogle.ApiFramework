@@ -6,6 +6,21 @@
 namespace Evoogle.ApiFramework.Schema.TestData;
 
 #region Extension Types
+public class GraphQlExtension
+{
+    public int Count { get; set; } = 42;
+}
+
+public class JsonApiExtension
+{
+    public string Info { get; set; } = "See specification at http://jsonapi.org";
+}
+
+public class ProtobufExtension
+{
+    public int Edition { get; set; } = 2024;
+}
+
 public class TestExtension
 {
     public bool Flag { get; set; } = true;
