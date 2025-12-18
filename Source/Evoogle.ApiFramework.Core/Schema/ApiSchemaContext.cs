@@ -3,8 +3,6 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using System.Text.Json.Serialization;
-
 using Evoogle.Coercion;
 
 using Microsoft.Extensions.Logging;
@@ -24,13 +22,11 @@ public sealed class ApiSchemaContext
     /// <summary>
     ///     Gets the API schema associated with this context.
     /// </summary>
-    [JsonIgnore]
     public required ApiSchema ApiSchema { get; init; }
 
     /// <summary>
     ///     Gets the API schema options used for configuring schema behavior.
     /// </summary>
-    [JsonIgnore]
     public ApiSchemaOptions ApiSchemaOptions => this.ApiSchema.ApiOptions;
 
     /// <summary>

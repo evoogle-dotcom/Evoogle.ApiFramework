@@ -3,8 +3,6 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using System.Text.Json.Serialization;
-
 using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.Extension;
 
@@ -40,7 +38,6 @@ public abstract class ApiSchemaElement : ExtensibleBase
     /// <remarks>
     ///     This property is available after the element has been initialized.
     /// </remarks>
-    [JsonIgnore]
     protected internal ApiSchemaContext ApiSchemaContext => this.ThrowIfNotInitialized(_apiSchemaContext);
     #endregion
 
