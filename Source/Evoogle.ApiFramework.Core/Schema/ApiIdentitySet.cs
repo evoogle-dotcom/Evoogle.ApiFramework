@@ -17,7 +17,11 @@ namespace Evoogle.ApiFramework.Schema;
 /// </remarks>
 /// <param name="apiIdentities">The collection of identities for the object type.</param>
 /// <param name="apiPrimaryIdentityName">The name of the primary identity within the collection.</param>
-public sealed class ApiIdentitySet(IEnumerable<ApiIdentity> apiIdentities, string apiPrimaryIdentityName) : ApiSchemaElement
+public sealed class ApiIdentitySet
+(
+    IEnumerable<ApiIdentity> apiIdentities,
+    string apiPrimaryIdentityName
+) : ApiSchemaElement
 {
     #region Fields
     private Dictionary<string, ApiIdentity>? _apiIdentityApiNameLookup = null;

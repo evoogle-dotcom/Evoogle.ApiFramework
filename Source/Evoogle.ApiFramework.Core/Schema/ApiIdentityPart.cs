@@ -20,7 +20,12 @@ namespace Evoogle.ApiFramework.Schema;
 /// <param name="apiPropertyName">The name of the property that is part of the identity.</param>
 /// <param name="emitAsOrdered">Indicates whether this part should be emitted as an ordered (positional) component rather than named.</param>
 /// <param name="targetClrType">Optional CLR type to use for <see cref="ApiId"/> conversion. If null, the type is detected automatically.</param>
-public sealed class ApiIdentityPart(string apiPropertyName, bool emitAsOrdered = false, Type? targetClrType = null) : ApiSchemaElement
+public sealed class ApiIdentityPart
+(
+    string apiPropertyName,
+    bool emitAsOrdered = false,
+    Type? targetClrType = null
+) : ApiSchemaElement
 {
     #region Fields
     private ApiProperty? _apiResolvedProperty = null;

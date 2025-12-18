@@ -42,7 +42,13 @@ namespace Evoogle.ApiFramework.Schema;
 /// <param name="apiTypeModifiers">Modifiers applied to the property (e.g., Required).</param>
 /// <param name="clrName">The CLR property name corresponding to this API property.</param>
 [JsonConverter(typeof(ApiPropertyJsonConverter))]
-public sealed partial class ApiProperty(string apiName, ApiTypeExpression apiTypeExpression, ApiTypeModifiers apiTypeModifiers, string clrName) : ApiSchemaElement
+public sealed partial class ApiProperty
+(
+    string apiName,
+    ApiTypeExpression apiTypeExpression,
+    ApiTypeModifiers apiTypeModifiers,
+    string clrName
+) : ApiSchemaElement
 {
     #region Types
     private delegate void ClrByRefAction<TObject, in TValue>(ref TObject clrObject, ApiSchemaContext apiSchemaContext, TValue? clrValue);

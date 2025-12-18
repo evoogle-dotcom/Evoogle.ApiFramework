@@ -18,7 +18,12 @@ namespace Evoogle.ApiFramework.Schema;
 /// <param name="clrName">The CLR name of the enumeration value (corresponding to the C# enum name).</param>
 /// <param name="clrOrdinal">The CLR ordinal (integer value) of the enumeration value.</param>
 [JsonConverter(typeof(ApiEnumValueJsonConverter))]
-public sealed class ApiEnumValue(string apiName, string clrName, int clrOrdinal) : ApiSchemaElement
+public sealed class ApiEnumValue
+(
+    string apiName,
+    string clrName,
+    int clrOrdinal
+) : ApiSchemaElement
 {
     #region Properties
     /// <summary>Gets the API name of the API enumeration value.</summary>

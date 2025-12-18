@@ -60,12 +60,7 @@ public sealed class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext c
         return this;
     }
 
-    /// <summary>
-    ///     Configures options for this object type.
-    /// </summary>
-    /// <param name="configure">Callback to configure the object type options.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiObjectTypeBuilder WithOptions(Action<ApiObjectTypeOptionsBuilder> configure)
+    public ApiObjectTypeBuilder WithOptions(Action<ApiObjectTypeOptionsBuilder>? configure = null)
     {
         _apiOptionsConfiguration = configure;
         return this;
@@ -94,11 +89,10 @@ public sealed class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext c
             apiName,
             apiProperties,
             apiRelationships,
+            apiIdentitySet: null,
+            apiOptions,
             clrObjectType
-        )
-        {
-            ApiOptions = apiOptions
-        };
+        );
 
         // Add any extensions that were configured.
         var extensions = this.BuildExtensions();
@@ -112,11 +106,11 @@ public sealed class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext c
     #endregion
 
     #region Implementation Methods
-    private ApiObjectTypeOptions BuildOptions()
+    private ApiObjectTypeOptions? BuildOptions()
     {
         if (_apiOptionsConfiguration == null)
         {
-            return ApiObjectTypeOptions.Default;
+            return null;
         }
 
         var apiOptionsBuilder = new ApiObjectTypeOptionsBuilder();

@@ -18,7 +18,12 @@ namespace Evoogle.ApiFramework.Schema;
 /// <param name="apiName">The API name of the enumeration type.</param>
 /// <param name="apiEnumValues">The collection of enumeration values associated with this type.</param>
 /// <param name="clrEnumType">The CLR type that defines the enumeration.</param>
-public sealed class ApiEnumType(string apiName, IEnumerable<ApiEnumValue> apiEnumValues, Type clrEnumType) : ApiNamedType(apiName, clrEnumType)
+public sealed class ApiEnumType
+(
+    string apiName,
+    IEnumerable<ApiEnumValue> apiEnumValues,
+    Type clrEnumType
+) : ApiNamedType(apiName, clrEnumType)
 {
     #region ApiEnumType Fields
     private Dictionary<string, ApiEnumValue>? _apiNameLookup = null;

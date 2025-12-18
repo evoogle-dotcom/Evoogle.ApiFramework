@@ -14,6 +14,6 @@ public record class ApiSchemaOptions
     #region Properties
     public static ApiSchemaOptions Default => _default;
 
-    public ApiIdentityNullHandling ApiIdentityNullHandling { get; set; } = ApiIdentityNullHandling.ReturnEmpty;
+    public ApiIdentityNullHandling ApiIdentityNullHandling { get; init; } = ApiIdentityNullHandling.ReturnEmpty;
     #endregion
 }

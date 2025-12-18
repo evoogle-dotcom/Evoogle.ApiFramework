@@ -30,9 +30,8 @@ public static class ApiTestSchemaUtils
         };
 
     public static ApiObjectType O(string name, Type clr, IEnumerable<ApiProperty> properties, IEnumerable<ApiRelationship>? relationships = null, ApiObjectTypeOptions? options = null, OrderedDictionary<Type, object>? extensions = null)
-        => new(name, properties, relationships ?? [], clr)
+        => new(name, properties, relationships ?? [], apiIdentitySet: null, options, clr)
         {
-            ApiOptions = options ?? ApiObjectTypeOptions.Default,
             Extensions = extensions
         };
 

@@ -54,6 +54,7 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
         #region Properties
         public List<ApiProperty>? ApiProperties { get; set; }
         public List<ApiRelationship>? ApiRelationships { get; set; }
+        public ApiObjectTypeOptions? ApiOptions { get; set; }
         #endregion
     }
 
@@ -107,6 +108,7 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
             // ApiObjectType Property Handlers
             { propertyNames.ApiObjectType.ApiProperties, HandleApiObjectTypeApiProperties },
             { propertyNames.ApiObjectType.ApiRelationships, HandleApiObjectTypeApiRelationships },
+            { propertyNames.ApiObjectType.ApiOptions, HandleApiObjectTypeApiOptions },
 
             // ApiType Property Handlers
             { propertyNames.ApiType.Kind, HandleApiTypeKind },
@@ -201,6 +203,13 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
             }
 
             context.ReadData.ApiObjectType!.ApiRelationships!.Add(apiRelationship);
+        }
+
+        private static void HandleApiObjectTypeApiOptions(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        {
+            context.ReadData.ApiObjectType ??= new ApiObjectTypeReadData();
+
+            context.ReadData.ApiObjectType.ApiOptions = JsonSerializer.Deserialize<ApiObjectTypeOptions>(ref reader, context.Options);
         }
         #endregion
 

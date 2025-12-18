@@ -19,7 +19,7 @@ namespace Evoogle.ApiFramework.Schema;
 public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
 {
     #region Fields
-    private static readonly List<string> _excludeApiSchemaContextMembers = [$"{nameof(ApiSchemaContext)}", $"{nameof(ApiSchemaContext)}.{nameof(ApiSchemaContext.ApiSchema)}"];
+    private static readonly List<string> _excludeMembers = [$"{nameof(ApiSchemaContext)}", $"{nameof(ApiSchemaContext)}.{nameof(ApiSchemaContext.ApiSchema)}"];
     #endregion
 
     #region Test Classes
@@ -27,7 +27,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
     {
         public ApiSchemaJsonDeserializeTest()
         {
-            this.ExcludeMembers = _excludeApiSchemaContextMembers;
+            this.ExcludeMembers = _excludeMembers;
         }
     }
 
@@ -35,7 +35,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
     {
         public ApiSchemaJsonRoundtripTest()
         {
-            this.ExcludeMembers = _excludeApiSchemaContextMembers;
+            this.ExcludeMembers = _excludeMembers;
         }
     }
 
@@ -188,65 +188,78 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
     #endregion
 
     #region Theory Data
-    public static readonly ApiScalarType TestApiScalarTypeBoolean = new(nameof(Boolean), typeof(bool));
-    public static readonly ApiScalarType TestApiScalarTypeInt32 = new(nameof(Int32), typeof(int));
-    public static readonly ApiScalarType TestApiScalarTypeString = new(nameof(String), typeof(string));
-    public static readonly ApiScalarType TestApiScalarTypeUInt32 = new(nameof(UInt32), typeof(uint));
+    public static readonly ApiScalarType TestApiScalarTypeBoolean = new(apiName: nameof(Boolean), clrScalarType: typeof(bool));
+    public static readonly ApiScalarType TestApiScalarTypeInt32 = new(apiName: nameof(Int32), clrScalarType: typeof(int));
+    public static readonly ApiScalarType TestApiScalarTypeString = new(apiName: nameof(String), clrScalarType: typeof(string));
+    public static readonly ApiScalarType TestApiScalarTypeUInt32 = new(apiName: nameof(UInt32), clrScalarType: typeof(uint));
 
-    public static readonly ApiTypeExpression TestApiScalarTypeBooleanReference = new(ApiTypeKind.Scalar, nameof(Boolean));
-    public static readonly ApiTypeExpression TestApiScalarTypeInt32Reference = new(ApiTypeKind.Scalar, nameof(Int32));
-    public static readonly ApiTypeExpression TestApiScalarTypeStringReference = new(ApiTypeKind.Scalar, nameof(String));
-    public static readonly ApiTypeExpression TestApiScalarTypeUInt32Reference = new(ApiTypeKind.Scalar, nameof(UInt32));
+    public static readonly ApiTypeExpression TestApiScalarTypeBooleanReference = new(kind: ApiTypeKind.Scalar, apiName: nameof(Boolean));
+    public static readonly ApiTypeExpression TestApiScalarTypeInt32Reference = new(kind: ApiTypeKind.Scalar, apiName: nameof(Int32));
+    public static readonly ApiTypeExpression TestApiScalarTypeStringReference = new(kind: ApiTypeKind.Scalar, apiName: nameof(String));
+    public static readonly ApiTypeExpression TestApiScalarTypeUInt32Reference = new(kind: ApiTypeKind.Scalar, apiName: nameof(UInt32));
 
     public static readonly ApiEnumType TestApiEnumTypeGender = new
     (
-        nameof(Gender),
+        apiName: nameof(Gender),
+        apiEnumValues:
         [
-            new ApiEnumValue(nameof(Gender.Unspecified), nameof(Gender.Unspecified), (int)Gender.Unspecified),
-            new ApiEnumValue(nameof(Gender.Male), nameof(Gender.Male), (int)Gender.Male),
-            new ApiEnumValue(nameof(Gender.Female), nameof(Gender.Female), (int)Gender.Female)
+            new ApiEnumValue(apiName: nameof(Gender.Unspecified), clrName: nameof(Gender.Unspecified), clrOrdinal: (int)Gender.Unspecified),
+            new ApiEnumValue(apiName: nameof(Gender.Male), clrName: nameof(Gender.Male), clrOrdinal: (int)Gender.Male),
+            new ApiEnumValue(apiName: nameof(Gender.Female), clrName: nameof(Gender.Female), clrOrdinal: (int)Gender.Female)
         ],
-        typeof(Gender)
+        clrEnumType: typeof(Gender)
     );
 
-    public static readonly ApiTypeExpression TestApiEnumTypeGenderReference = new(ApiTypeKind.Enum, nameof(Gender));
+    public static readonly ApiTypeExpression TestApiEnumTypeGenderReference = new(kind: ApiTypeKind.Enum, apiName: nameof(Gender));
 
     public static readonly ApiTypeExpression TestApiCollectionTypeListOfString = new
     (
-        new ApiCollectionType(TestApiScalarTypeStringReference, ApiTypeModifiers.None, typeof(List<string>))
+        apiInlineType: new ApiCollectionType
+        (
+            apiItemTypeExpression: TestApiScalarTypeStringReference,
+            apiItemTypeModifiers: ApiTypeModifiers.None,
+            clrCollectionType: typeof(List<string>)
+        )
     );
 
     public static readonly ApiObjectType TestApiObjectTypePerson = new
     (
-        nameof(Person),
+        apiName: nameof(Person),
+        apiProperties:
         [
             new ApiProperty(nameof(Person.Name), TestApiScalarTypeStringReference, ApiTypeModifiers.Required, nameof(Person.Name)),
             new ApiProperty(nameof(Person.Age), TestApiScalarTypeInt32Reference, ApiTypeModifiers.None, nameof(Person.Age)),
             new ApiProperty(nameof(Person.Gender), TestApiEnumTypeGenderReference, ApiTypeModifiers.None, nameof(Person.Gender)),
             new ApiProperty(nameof(Person.Hobbies), new ApiTypeExpression(new ApiCollectionType(TestApiScalarTypeStringReference, ApiTypeModifiers.Required, typeof(List<string>))), ApiTypeModifiers.None, nameof(Person.Hobbies))
         ],
-        [],
-        typeof(Person)
+        apiRelationships: [],
+        apiIdentitySet: null,
+        apiOptions: null,
+        clrObjectType: typeof(Person)
     );
 
-    public static readonly ApiTypeExpression TestApiObjectTypePersonReference = new(ApiTypeKind.Object, nameof(Person));
+    public static readonly ApiTypeExpression TestApiObjectTypePersonReference = new(kind: ApiTypeKind.Object, apiName: nameof(Person));
 
     public static readonly ApiObjectType TestApiObjectTypeCompany = new
     (
-        nameof(Company),
+        apiName: nameof(Company),
+        apiProperties:
         [
             new ApiProperty(nameof(Company.Name), TestApiScalarTypeStringReference, ApiTypeModifiers.Required, nameof(Company.Name)),
             new ApiProperty(nameof(Company.Owner), TestApiObjectTypePersonReference, ApiTypeModifiers.None, nameof(Company.Owner)),
             new ApiProperty(nameof(Company.Employees), new ApiTypeExpression(new ApiCollectionType(TestApiObjectTypePersonReference, ApiTypeModifiers.Required, typeof(List<Person>))), ApiTypeModifiers.None, nameof(Company.Employees))
         ],
+        apiRelationships:
         [
             new ApiRelationship(nameof(Company.Owner)),
             new ApiRelationship(nameof(Company.Employees))
         ],
-        typeof(Company)
+        apiIdentitySet: null,
+        apiOptions: null,
+        clrObjectType: typeof(Company)
     );
 
-    public static readonly ApiTypeExpression TestApiObjectTypeCompanyReference = new(ApiTypeKind.Object, nameof(Company));
+    public static readonly ApiTypeExpression TestApiObjectTypeCompanyReference = new(kind: ApiTypeKind.Object, apiName: nameof(Company));
 
     public class TestUnknownType
     {

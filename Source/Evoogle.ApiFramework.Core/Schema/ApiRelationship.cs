@@ -25,7 +25,11 @@ namespace Evoogle.ApiFramework.Schema;
 ///     </para>
 /// </remarks>
 [JsonConverter(typeof(ApiRelationshipJsonConverter))]
-public sealed class ApiRelationship(string apiName, string? apiPropertyName = null) : ApiSchemaElement
+public sealed class ApiRelationship
+(
+    string apiName,
+    string? apiPropertyName = null
+) : ApiSchemaElement
 {
     #region Fields
     private readonly string? _apiPropertyName = apiPropertyName;

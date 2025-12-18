@@ -82,13 +82,16 @@ public class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
             }
 
             var apiOptions = apiObjectType.ApiOptions;
-            builder.WithOptions(optionsBuilder =>
+            if (apiOptions is not null)
             {
-                if (apiOptions.ApiIdentityNullHandling.HasValue)
+                builder.WithOptions(optionsBuilder =>
                 {
-                    optionsBuilder.WithIdentityNullHandling(apiOptions.ApiIdentityNullHandling.Value);
-                }
-            });
+                    if (apiOptions.ApiIdentityNullHandling.HasValue)
+                    {
+                        optionsBuilder.WithIdentityNullHandling(apiOptions.ApiIdentityNullHandling.Value);
+                    }
+                });
+            }
 
             var extensions = apiObjectType.Extensions;
             foreach (var extension in extensions ?? [])

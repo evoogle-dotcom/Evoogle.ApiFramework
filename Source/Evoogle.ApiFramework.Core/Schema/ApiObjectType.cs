@@ -32,9 +32,10 @@ public sealed partial class ApiObjectType
 (
     string apiName,
     IEnumerable<ApiProperty> apiProperties,
-    IEnumerable<ApiRelationship> apiRelationships,
-    Type clrObjectType,
-    ApiIdentitySet? apiIdentitySet = null
+    IEnumerable<ApiRelationship>? apiRelationships,
+    ApiIdentitySet? apiIdentitySet,
+    ApiObjectTypeOptions? apiOptions,
+    Type clrObjectType
 ) : ApiNamedType(apiName, clrObjectType)
 {
     #region ApiObjectType Fields
@@ -72,7 +73,7 @@ public sealed partial class ApiObjectType
     /// </summary>
     public ApiIdentity? ApiPrimaryIdentity => this.ApiIdentitySet?.ApiPrimaryIdentity;
 
-    public ApiObjectTypeOptions ApiOptions { get; init; } = ApiObjectTypeOptions.Default;
+    public ApiObjectTypeOptions? ApiOptions => apiOptions;
 
     /// <summary>
     ///     Indicates whether this object type has any API identities defined.
@@ -147,9 +148,9 @@ public sealed partial class ApiObjectType
     public override string ToString()
     {
         var apiName = this.ApiName.SafeToString();
-        var clrType = this.ClrType.SafeToString();
         var apiOptions = this.ApiOptions.SafeToString();
         var extensionCount = this.ExtensionCount.SafeToString();
+        var clrType = this.ClrType.SafeToString();
 
         return $"{nameof(ApiObjectType)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ApiOptions)}={apiOptions}, {nameof(this.ExtensionCount)}={extensionCount}}} [{clrType}]";
     }

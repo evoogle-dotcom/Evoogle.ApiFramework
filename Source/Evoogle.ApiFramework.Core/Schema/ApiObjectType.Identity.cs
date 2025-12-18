@@ -12,6 +12,7 @@ namespace Evoogle.ApiFramework.Schema;
 
 public sealed partial class ApiObjectType
 {
+    #region Identity Methods
     public bool TryBuildIdentity(object clrInstance, out ApiId id, string? apiIdentityName = null)
     {
         id = default;
@@ -45,58 +46,113 @@ public sealed partial class ApiObjectType
 
         return this.BuildIdentityFromValues(identity, values, out id);
     }
+    #endregion
 
-    private ApiIdentity? ResolveIdentityForBuild(string? apiIdentityName)
+    #region Implementation Methods
+    private bool BuildIdentityFromInstance(ApiIdentity identity, object clrInstance, out ApiId id)
     {
-        if (!string.IsNullOrWhiteSpace(apiIdentityName))
-        {
-            return this.TryGetIdentityByApiName(apiIdentityName, out var id) ? id : null;
-        }
+        id = default;
 
-        return this.ApiIdentitySet!.ApiPrimaryIdentity;
-    }
-
-    private static ApiId FinalizeComposite(List<ApiIdPart> parts)
-        => parts.Count switch
-        {
-            0 => ApiId.Empty,
-            1 => parts[0].Value,
-            _ => ApiId.Composite(parts)
-        };
-
-    private ApiId MaterializeApiIdFromProperty(ApiIdentityPart part, object? rawValue, ApiIdentity identity, object clrInstance, ApiSchemaContext schemaContext)
-    {
-        // Use the pre-resolved target type from the identity part
-        var targetType = part.ResolvedTargetType;
-
-        // Use the schema's TypeCoercion to convert the raw value to the target type
-        object? coercedValue;
         try
         {
-            coercedValue = schemaContext.TypeCoercion.Coerce(rawValue, targetType, schemaContext.TypeCoercionContext);
-        }
-        catch (Exception ex)
-        {
-            throw new ApiIdentityException(
-                $"Failed to coerce property '{part.ApiProperty.ApiName}' value to type '{targetType.Name}' for identity '{identity.ApiName}' on type '{clrInstance.GetType().Name}'.",
-                ex);
-        }
-
-        // Handle null values according to the identity's null handling configuration
-        if (coercedValue is null)
-        {
-            var nullHandling = this.ApiOptions.GetIdentityNullHandling(this);
-            if (nullHandling == ApiIdentityNullHandling.ThrowException)
+            // Disallow mixed named/ordered parts (already validated during initialization)
+            var anyOrdered = identity.ApiIdentityParts.Any(p => p.EmitAsOrdered);
+            var anyNamed = identity.ApiIdentityParts.Any(p => !p.EmitAsOrdered);
+            if (anyOrdered && anyNamed)
             {
-                throw new ApiIdentityException(
-                    $"Property '{part.ApiProperty.ApiName}' has a null value for identity '{identity.ApiName}' on type '{clrInstance.GetType().Name}'. Null values are not allowed with {nameof(ApiIdentityNullHandling.ThrowException)} configured.");
+                return false;
             }
 
-            return ApiId.Empty;
-        }
+            var parts = new List<ApiIdPart>(identity.ApiIdentityParts.Length);
+            foreach (var part in identity.ApiIdentityParts)
+            {
+                // Get the property value using compiled accessors
+                if (!part.ApiProperty.TryGetValue(clrInstance, out var rawValue))
+                {
+                    return false;
+                }
 
-        // Convert the typed value to ApiId
-        return ConvertToApiId(coercedValue, targetType, part.ApiProperty, identity, clrInstance);
+                // Materialize the ApiId using TypeCoercion and pre-resolved target type
+                var partId = this.MaterializeApiIdFromProperty(part, rawValue, identity, clrInstance, identity.ApiSchemaContext);
+
+                // Only allow Empty if null handling is ReturnEmpty
+                var nullHandling = this.GetIdentityNullHandling();
+                if (!partId.HasValue && nullHandling != ApiIdentityNullHandling.ReturnEmpty)
+                {
+                    return false;
+                }
+
+                parts.Add(part.EmitAsOrdered
+                    ? ApiIdPart.Create(partId)
+                    : ApiIdPart.Create(part.ApiProperty.ApiName, partId));
+            }
+
+            id = FinalizeComposite(parts);
+            return id.HasValue;
+        }
+        catch (ApiIdentityException)
+        {
+            // Re-throw identity exceptions as-is
+            throw;
+        }
+        catch (Exception)
+        {
+            // Swallow other exceptions and return false for try pattern
+            return false;
+        }
+    }
+
+    private bool BuildIdentityFromValues(ApiIdentity identity, IReadOnlyDictionary<string, object?> values, out ApiId id)
+    {
+        id = default;
+
+        try
+        {
+            var anyOrdered = identity.ApiIdentityParts.Any(p => p.EmitAsOrdered);
+            var anyNamed = identity.ApiIdentityParts.Any(p => !p.EmitAsOrdered);
+            if (anyOrdered && anyNamed)
+            {
+                return false;
+            }
+
+            var parts = new List<ApiIdPart>(identity.ApiIdentityParts.Length);
+            foreach (var part in identity.ApiIdentityParts)
+            {
+                if (!values.TryGetValue(part.ApiPropertyName, out var rawValue))
+                {
+                    return false;
+                }
+
+                // Materialize the ApiId using TypeCoercion and pre-resolved target type
+                // Use a dummy object for error reporting since we don't have the actual instance
+                var dummyInstance = new { DictionaryValues = true };
+                var partId = this.MaterializeApiIdFromProperty(part, rawValue, identity, dummyInstance, identity.ApiSchemaContext);
+
+                // Only allow Empty if null handling is ReturnEmpty
+                var nullHandling = this.GetIdentityNullHandling();
+                if (!partId.HasValue && nullHandling != ApiIdentityNullHandling.ReturnEmpty)
+                {
+                    return false;
+                }
+
+                parts.Add(part.EmitAsOrdered
+                    ? ApiIdPart.Create(partId)
+                    : ApiIdPart.Create(part.ApiPropertyName, partId));
+            }
+
+            id = FinalizeComposite(parts);
+            return id.HasValue;
+        }
+        catch (ApiIdentityException)
+        {
+            // Re-throw identity exceptions as-is
+            throw;
+        }
+        catch (Exception)
+        {
+            // Swallow other exceptions and return false for try pattern
+            return false;
+        }
     }
 
     private static ApiId ConvertToApiId(object value, Type targetType, ApiProperty property, ApiIdentity identity, object clrInstance)
@@ -151,109 +207,60 @@ public sealed partial class ApiObjectType
         }
     }
 
-    private bool BuildIdentityFromInstance(ApiIdentity identity, object clrInstance, out ApiId id)
-    {
-        id = default;
+    private static ApiId FinalizeComposite(List<ApiIdPart> parts)
+        => parts.Count switch
+        {
+            0 => ApiId.Empty,
+            1 => parts[0].Value,
+            _ => ApiId.Composite(parts)
+        };
 
+    private ApiIdentityNullHandling GetIdentityNullHandling()
+        => this.ApiOptions?.ApiIdentityNullHandling ?? this.ApiSchemaContext.ApiSchemaOptions.ApiIdentityNullHandling;
+
+    private ApiId MaterializeApiIdFromProperty(ApiIdentityPart part, object? rawValue, ApiIdentity identity, object clrInstance, ApiSchemaContext schemaContext)
+    {
+        // Use the pre-resolved target type from the identity part
+        var targetType = part.ResolvedTargetType;
+
+        // Use the schema's TypeCoercion to convert the raw value to the target type
+        object? coercedValue;
         try
         {
-            // Disallow mixed named/ordered parts (already validated during initialization)
-            var anyOrdered = identity.ApiIdentityParts.Any(p => p.EmitAsOrdered);
-            var anyNamed = identity.ApiIdentityParts.Any(p => !p.EmitAsOrdered);
-            if (anyOrdered && anyNamed)
+            coercedValue = schemaContext.TypeCoercion.Coerce(rawValue, targetType, schemaContext.TypeCoercionContext);
+        }
+        catch (Exception ex)
+        {
+            throw new ApiIdentityException(
+                $"Failed to coerce property '{part.ApiProperty.ApiName}' value to type '{targetType.Name}' for identity '{identity.ApiName}' on type '{clrInstance.GetType().Name}'.",
+                ex);
+        }
+
+        // Handle null values according to the identity's null handling configuration
+        if (coercedValue is null)
+        {
+            var nullHandling = this.GetIdentityNullHandling();
+            if (nullHandling == ApiIdentityNullHandling.ThrowException)
             {
-                return false;
+                throw new ApiIdentityException(
+                    $"Property '{part.ApiProperty.ApiName}' has a null value for identity '{identity.ApiName}' on type '{clrInstance.GetType().Name}'. Null values are not allowed with {nameof(ApiIdentityNullHandling.ThrowException)} configured.");
             }
 
-            var parts = new List<ApiIdPart>(identity.ApiIdentityParts.Length);
-            foreach (var part in identity.ApiIdentityParts)
-            {
-                // Get the property value using compiled accessors
-                if (!part.ApiProperty.TryGetValue(clrInstance, out var rawValue))
-                {
-                    return false;
-                }
-
-                // Materialize the ApiId using TypeCoercion and pre-resolved target type
-                var partId = this.MaterializeApiIdFromProperty(part, rawValue, identity, clrInstance, identity.ApiSchemaContext);
-
-                // Only allow Empty if null handling is ReturnEmpty
-                var nullHandling = this.ApiOptions.GetIdentityNullHandling(this);
-                if (!partId.HasValue && nullHandling != ApiIdentityNullHandling.ReturnEmpty)
-                {
-                    return false;
-                }
-
-                parts.Add(part.EmitAsOrdered
-                    ? ApiIdPart.Create(partId)
-                    : ApiIdPart.Create(part.ApiProperty.ApiName, partId));
-            }
-
-            id = FinalizeComposite(parts);
-            return id.HasValue;
+            return ApiId.Empty;
         }
-        catch (ApiIdentityException)
-        {
-            // Re-throw identity exceptions as-is
-            throw;
-        }
-        catch (Exception)
-        {
-            // Swallow other exceptions and return false for try pattern
-            return false;
-        }
+
+        // Convert the typed value to ApiId
+        return ConvertToApiId(coercedValue, targetType, part.ApiProperty, identity, clrInstance);
     }
 
-    private bool BuildIdentityFromValues(ApiIdentity identity, IReadOnlyDictionary<string, object?> values, out ApiId id)
+    private ApiIdentity? ResolveIdentityForBuild(string? apiIdentityName)
     {
-        id = default;
-
-        try
+        if (!string.IsNullOrWhiteSpace(apiIdentityName))
         {
-            var anyOrdered = identity.ApiIdentityParts.Any(p => p.EmitAsOrdered);
-            var anyNamed = identity.ApiIdentityParts.Any(p => !p.EmitAsOrdered);
-            if (anyOrdered && anyNamed)
-            {
-                return false;
-            }
-
-            var parts = new List<ApiIdPart>(identity.ApiIdentityParts.Length);
-            foreach (var part in identity.ApiIdentityParts)
-            {
-                if (!values.TryGetValue(part.ApiPropertyName, out var rawValue))
-                {
-                    return false;
-                }
-
-                // Materialize the ApiId using TypeCoercion and pre-resolved target type
-                // Use a dummy object for error reporting since we don't have the actual instance
-                var dummyInstance = new { DictionaryValues = true };
-                var partId = this.MaterializeApiIdFromProperty(part, rawValue, identity, dummyInstance, identity.ApiSchemaContext);
-
-                // Only allow Empty if null handling is ReturnEmpty
-                var nullHandling = this.ApiOptions.GetIdentityNullHandling(this);
-                if (!partId.HasValue && nullHandling != ApiIdentityNullHandling.ReturnEmpty)
-                {
-                    return false;
-                }
-
-                parts.Add(part.EmitAsOrdered
-                    ? ApiIdPart.Create(partId)
-                    : ApiIdPart.Create(part.ApiPropertyName, partId));
-            }
-
-            id = FinalizeComposite(parts);
-            return id.HasValue;
+            return this.TryGetIdentityByApiName(apiIdentityName, out var id) ? id : null;
         }
-        catch (ApiIdentityException)
-        {
-            // Re-throw identity exceptions as-is
-            throw;
-        }
-        catch (Exception)
-        {
-            // Swallow other exceptions and return false for try pattern
-            return false;
-        }
+
+        return this.ApiIdentitySet!.ApiPrimaryIdentity;
     }
+    #endregion
 }

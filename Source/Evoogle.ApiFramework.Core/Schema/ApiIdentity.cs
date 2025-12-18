@@ -17,7 +17,11 @@ namespace Evoogle.ApiFramework.Schema;
 /// </remarks>
 /// <param name="apiName">The name of the identity.</param>
 /// <param name="apiIdentityParts">The collection of property parts that make up this identity.</param>
-public sealed class ApiIdentity(string apiName, IEnumerable<ApiIdentityPart> apiIdentityParts) : ApiSchemaElement
+public sealed class ApiIdentity
+(
+    string apiName,
+    IEnumerable<ApiIdentityPart> apiIdentityParts
+) : ApiSchemaElement
 {
     #region Properties
     /// <summary>

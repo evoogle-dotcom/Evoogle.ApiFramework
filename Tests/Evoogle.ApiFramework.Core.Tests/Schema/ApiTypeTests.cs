@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -12,11 +12,33 @@ namespace Evoogle.ApiFramework.Schema;
 
 public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
 {
+    #region Fields
+    private static readonly List<string> _excludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"];
+    #endregion
+
+    #region Test Classes
+    public class ApiTypeJsonDeserializeTest : JsonDeserializeTest<ApiType>
+    {
+        public ApiTypeJsonDeserializeTest()
+        {
+            this.ExcludeMembers = _excludeMembers;
+        }
+    }
+
+    public class ApiTypeJsonRoundtripTest : JsonRoundtripTest<ApiType>
+    {
+        public ApiTypeJsonRoundtripTest()
+        {
+            this.ExcludeMembers = _excludeMembers;
+        }
+    }
+    #endregion
+
     #region Theory Data
     public static TheoryDataRow<IXUnitTest>[] JsonDeserializeTheoryData =>
     [
         // Null
-        new JsonDeserializeTest<ApiType>
+        new ApiTypeJsonDeserializeTest
         {
             Name = "Null",
             Source = "null",
@@ -24,7 +46,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
         },
 
         // ApiScalarType
-        new JsonDeserializeTest<ApiType>
+        new ApiTypeJsonDeserializeTest
         {
             Name = $"{nameof(ApiScalarType)} [Boolean]",
             Source = @"
@@ -33,11 +55,10 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 ""ApiName"": ""Boolean"",
                 ""ClrType"": ""System.Boolean, System.Private.CoreLib""
             }",
-            Expected = new ApiScalarType("Boolean", typeof(bool)),
-            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
+            Expected = new ApiScalarType(apiName: "Boolean", clrScalarType: typeof(bool))
         },
 
-        new JsonDeserializeTest<ApiType>
+        new ApiTypeJsonDeserializeTest
         {
             Name = $"{nameof(ApiScalarType)} [Boolean] With Extension 1",
             Source = @"
@@ -51,12 +72,11 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     }
                 }
             }",
-            Expected = new ApiScalarType("Boolean", typeof(bool)),
-            ExtensionType1 = typeof(TestExtension1),
-            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
+            Expected = new ApiScalarType(apiName: "Boolean", clrScalarType: typeof(bool)),
+            ExtensionType1 = typeof(TestExtension1)
         },
 
-        new JsonDeserializeTest<ApiType>
+        new ApiTypeJsonDeserializeTest
         {
             Name = $"{nameof(ApiScalarType)} [Boolean] With Extra Property",
             Source = @"
@@ -66,11 +86,10 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 ""ClrType"": ""System.Boolean, System.Private.CoreLib"",
                 ""Unexpected"": ""IgnoreMe""
             }",
-            Expected = new ApiScalarType("Boolean", typeof(bool)),
-            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
+            Expected = new ApiScalarType(apiName: "Boolean", clrScalarType: typeof(bool))
         },
 
-        new JsonDeserializeTest<ApiType>
+        new ApiTypeJsonDeserializeTest
         {
             Name = $"{nameof(ApiScalarType)} [ID]",
             Source =  @"
@@ -79,11 +98,10 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 ""ApiName"": ""ID"",
                 ""ClrType"": ""System.String, System.Private.CoreLib""
             }",
-            Expected = new ApiScalarType("ID", typeof(string)),
-            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
+            Expected = new ApiScalarType(apiName: "ID", clrScalarType: typeof(string))
         },
 
-        new JsonDeserializeTest<ApiType>
+        new ApiTypeJsonDeserializeTest
         {
             Name = $"{nameof(ApiScalarType)} [Int]",
             Source = @"
@@ -92,11 +110,10 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 ""ApiName"": ""Int"",
                 ""ClrType"": ""System.Int32, System.Private.CoreLib""
             }",
-            Expected = new ApiScalarType("Int", typeof(int)),
-            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
+            Expected = new ApiScalarType(apiName: "Int", clrScalarType: typeof(int))
         },
 
-        new JsonDeserializeTest<ApiType>
+        new ApiTypeJsonDeserializeTest
         {
             Name = $"{nameof(ApiScalarType)} [Float]",
             Source = @"
@@ -105,11 +122,10 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 ""ApiName"": ""Float"",
                 ""ClrType"": ""System.Single, System.Private.CoreLib""
             }",
-            Expected = new ApiScalarType("Float", typeof(float)),
-            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
+            Expected = new ApiScalarType(apiName: "Float", clrScalarType: typeof(float))
         },
 
-        new JsonDeserializeTest<ApiType>
+        new ApiTypeJsonDeserializeTest
         {
             Name = $"{nameof(ApiScalarType)} [String]",
             Source = @"
@@ -118,12 +134,11 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 ""ApiName"": ""String"",
                 ""ClrType"": ""System.String, System.Private.CoreLib""
             }",
-            Expected = new ApiScalarType("String", typeof(string)),
-            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
+            Expected = new ApiScalarType(apiName: "String", clrScalarType: typeof(string))
         },
 
         // ApiEnumType
-        new JsonDeserializeTest<ApiType>
+        new ApiTypeJsonDeserializeTest
         {
             Name = $"{nameof(ApiEnumType)} [{nameof(StopLight)}]",
             Source = @"
@@ -156,14 +171,19 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             }",
             Expected = new ApiEnumType
             (
-                nameof(StopLight),
-                [new ApiEnumValue("None", "None", 0), new ApiEnumValue("Green", "Green", 1), new ApiEnumValue("Yellow", "Yellow", 2), new ApiEnumValue("Red", "Red", 3)],
-                typeof(StopLight)
-            ),
-            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
+                apiName: nameof(StopLight),
+                apiEnumValues:
+                [
+                    new ApiEnumValue(apiName: "None", clrName: "None", clrOrdinal: 0),
+                    new ApiEnumValue(apiName: "Green", clrName: "Green", clrOrdinal: 1),
+                    new ApiEnumValue(apiName: "Yellow", clrName: "Yellow", clrOrdinal: 2),
+                    new ApiEnumValue(apiName: "Red", clrName: "Red", clrOrdinal: 3)
+                ],
+                clrEnumType: typeof(StopLight)
+            )
         },
 
-        new JsonDeserializeTest<ApiType>
+        new ApiTypeJsonDeserializeTest
         {
             Name = $"{nameof(ApiEnumType)} [{nameof(StopLight)}] With Extension 2",
             Source = @"
@@ -202,16 +222,21 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             }",
             Expected = new ApiEnumType
             (
-                nameof(StopLight),
-                [new ApiEnumValue("None", "None", 0), new ApiEnumValue("Green", "Green", 1), new ApiEnumValue("Yellow", "Yellow", 2), new ApiEnumValue("Red", "Red", 3)],
-                typeof(StopLight)
+                apiName: nameof(StopLight),
+                apiEnumValues:
+                [
+                    new ApiEnumValue(apiName: "None", clrName: "None", clrOrdinal: 0),
+                    new ApiEnumValue(apiName: "Green", clrName: "Green", clrOrdinal: 1),
+                    new ApiEnumValue(apiName: "Yellow", clrName: "Yellow", clrOrdinal: 2),
+                    new ApiEnumValue(apiName: "Red", clrName: "Red", clrOrdinal: 3)
+                ],
+                clrEnumType: typeof(StopLight)
             ),
-            ExtensionType2 = typeof(TestExtension2),
-            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
+            ExtensionType2 = typeof(TestExtension2)
         },
 
         // ApiCollectionType
-        new JsonDeserializeTest<ApiType>
+        new ApiTypeJsonDeserializeTest
         {
             Name = $"{nameof(ApiCollectionType)} [List<{nameof(String)}>]",
             Source = @"
@@ -224,11 +249,15 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 ""ApiItemTypeModifiers"": ""Required"",
                 ""ClrType"": ""System.Collections.Generic.List\u00601[[System.String, System.Private.CoreLib]], System.Private.CoreLib""
             }",
-            Expected = new ApiCollectionType(new ApiTypeExpression(ApiTypeKind.Scalar, "String"), ApiTypeModifiers.Required, typeof(List<string>)),
-            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
+            Expected = new ApiCollectionType
+            (
+                apiItemTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "String"),
+                apiItemTypeModifiers: ApiTypeModifiers.Required,
+                clrCollectionType: typeof(List<string>)
+            )
         },
 
-        new JsonDeserializeTest<ApiType>
+        new ApiTypeJsonDeserializeTest
         {
             Name = $"{nameof(ApiCollectionType)} [List<{nameof(String)}?>]",
             Source = @"
@@ -241,11 +270,15 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 ""ApiItemTypeModifiers"": ""None"",
                 ""ClrType"": ""System.Collections.Generic.List\u00601[[System.String, System.Private.CoreLib]], System.Private.CoreLib""
             }",
-            Expected = new ApiCollectionType(new ApiTypeExpression(ApiTypeKind.Scalar, "String"), ApiTypeModifiers.None, typeof(List<string?>)),
-            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
+            Expected = new ApiCollectionType
+            (
+                apiItemTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "String"),
+                apiItemTypeModifiers: ApiTypeModifiers.None,
+                clrCollectionType: typeof(List<string?>)
+            )
         },
 
-        new JsonDeserializeTest<ApiType>
+        new ApiTypeJsonDeserializeTest
         {
             Name = $"{nameof(ApiCollectionType)} [List<{nameof(StopLight)}>]",
             Source = @"
@@ -258,11 +291,15 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 ""ApiItemTypeModifiers"": ""Required"",
                 ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.Schema.TestData.StopLight, Evoogle.ApiFramework.Core.Tests]], System.Private.CoreLib""
             }",
-            Expected = new ApiCollectionType(new ApiTypeExpression(ApiTypeKind.Enum, nameof(StopLight)), ApiTypeModifiers.Required, typeof(List<StopLight>)),
-            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
+            Expected = new ApiCollectionType
+            (
+                apiItemTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Enum, apiName: nameof(StopLight)),
+                apiItemTypeModifiers: ApiTypeModifiers.Required,
+                clrCollectionType: typeof(List<StopLight>)
+            )
         },
 
-        new JsonDeserializeTest<ApiType>
+        new ApiTypeJsonDeserializeTest
         {
             Name = $"{nameof(ApiCollectionType)} [List<{nameof(StopLight)}?>]",
             Source = @"
@@ -275,12 +312,16 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 ""ApiItemTypeModifiers"": ""None"",
                 ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.Schema.TestData.StopLight, Evoogle.ApiFramework.Core.Tests]], System.Private.CoreLib""
             }",
-            Expected = new ApiCollectionType(new ApiTypeExpression(ApiTypeKind.Enum, nameof(StopLight)), ApiTypeModifiers.None, typeof(List<StopLight>)),
-            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
+            Expected = new ApiCollectionType
+            (
+                apiItemTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Enum, apiName: nameof(StopLight)),
+                apiItemTypeModifiers: ApiTypeModifiers.None,
+                clrCollectionType: typeof(List<StopLight>)
+            )
         },
 
         // ApiObjectType With API Named Typed Expressions
-        new JsonDeserializeTest<ApiType>
+        new ApiTypeJsonDeserializeTest
         {
             Name = $"{nameof(ApiObjectType)} [{nameof(ScalarsOnly)}] With API Named Typed Expressions",
             Source = @"
@@ -348,58 +389,187 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             }",
             Expected = new ApiObjectType
             (
-                nameof(ScalarsOnly),
+                apiName: nameof(ScalarsOnly),
+                apiProperties:
                 [
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.RequiredName),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "String"),
-                        ApiTypeModifiers.Required,
-                        nameof(ScalarsOnly.RequiredName)
+                        apiName: nameof(ScalarsOnly.RequiredName),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "String"),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(ScalarsOnly.RequiredName)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.RequiredNumber),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "Long"),
-                        ApiTypeModifiers.Required,
-                        nameof(ScalarsOnly.RequiredNumber)
+                        apiName: nameof(ScalarsOnly.RequiredNumber),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "Long"),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(ScalarsOnly.RequiredNumber)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.RequiredPredicate),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "Boolean"),
-                        ApiTypeModifiers.Required,
-                        nameof(ScalarsOnly.RequiredPredicate)
+                        apiName: nameof(ScalarsOnly.RequiredPredicate),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "Boolean"),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(ScalarsOnly.RequiredPredicate)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.OptionalName),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "String"),
-                        ApiTypeModifiers.None,
-                        nameof(ScalarsOnly.OptionalName)
+                        apiName: nameof(ScalarsOnly.OptionalName),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "String"),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(ScalarsOnly.OptionalName)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.OptionalNumber),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "Long"),
-                        ApiTypeModifiers.None,
-                        nameof(ScalarsOnly.OptionalNumber)
+                        apiName: nameof(ScalarsOnly.OptionalNumber),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "Long"),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(ScalarsOnly.OptionalNumber)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.OptionalPredicate),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "Boolean"),
-                        ApiTypeModifiers.None,
-                        nameof(ScalarsOnly.OptionalPredicate)
+                        apiName: nameof(ScalarsOnly.OptionalPredicate),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "Boolean"),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(ScalarsOnly.OptionalPredicate)
                     ),
                 ],
-                [],
-                typeof(ScalarsOnly)
-            ),
-            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
+                apiRelationships:[],
+                apiIdentitySet: null,
+                apiOptions: null,
+                clrObjectType: typeof(ScalarsOnly)
+            )
         },
 
-        new JsonDeserializeTest<ApiType>
+        new ApiTypeJsonDeserializeTest
+        {
+            Name = $"{nameof(ApiObjectType)} [{nameof(ScalarsOnly)}] With API Named Typed Expressions And With API Options",
+            Source = @"
+            {
+                ""Kind"": ""Object"",
+                ""ApiName"": ""ScalarsOnly"",
+                ""ApiProperties"": [
+                    {
+                        ""ApiName"": ""RequiredName"",
+                        ""ApiType"": {
+                            ""Kind"": ""Scalar"",
+                            ""ApiName"": ""String""
+                        },
+                        ""ApiTypeModifiers"": ""Required"",
+                        ""ClrName"": ""RequiredName""
+                    },
+                    {
+                        ""ApiName"": ""RequiredNumber"",
+                        ""ApiType"": {
+                            ""Kind"": ""Scalar"",
+                            ""ApiName"": ""Long""
+                        },
+                        ""ApiTypeModifiers"": ""Required"",
+                        ""ClrName"": ""RequiredNumber""
+                    },
+                    {
+                        ""ApiName"": ""RequiredPredicate"",
+                        ""ApiType"": {
+                            ""Kind"": ""Scalar"",
+                            ""ApiName"": ""Boolean""
+                        },
+                        ""ApiTypeModifiers"": ""Required"",
+                        ""ClrName"": ""RequiredPredicate""
+                    },
+                    {
+                        ""ApiName"": ""OptionalName"",
+                        ""ApiType"": {
+                            ""Kind"": ""Scalar"",
+                            ""ApiName"": ""String""
+                        },
+                        ""ApiTypeModifiers"": ""None"",
+                        ""ClrName"": ""OptionalName""
+                    },
+                    {
+                        ""ApiName"": ""OptionalNumber"",
+                        ""ApiType"": {
+                            ""Kind"": ""Scalar"",
+                            ""ApiName"": ""Long""
+                        },
+                        ""ApiTypeModifiers"": ""None"",
+                        ""ClrName"": ""OptionalNumber""
+                    },
+                    {
+                        ""ApiName"": ""OptionalPredicate"",
+                        ""ApiType"": {
+                            ""Kind"": ""Scalar"",
+                            ""ApiName"": ""Boolean""
+                        },
+                        ""ApiTypeModifiers"": ""None"",
+                        ""ClrName"": ""OptionalPredicate""
+                    }
+                ],
+                ""ApiRelationships"": [],
+                ""ApiOptions"": {
+                    ""ApiIdentityNullHandling"": ""ThrowException""
+                },
+                ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.ScalarsOnly, Evoogle.ApiFramework.Core.Tests""
+            }",
+            Expected = new ApiObjectType
+            (
+                apiName: nameof(ScalarsOnly),
+                apiProperties:
+                [
+                    new ApiProperty
+                    (
+                        apiName: nameof(ScalarsOnly.RequiredName),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "String"),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(ScalarsOnly.RequiredName)
+                    ),
+                    new ApiProperty
+                    (
+                        apiName: nameof(ScalarsOnly.RequiredNumber),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "Long"),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(ScalarsOnly.RequiredNumber)
+                    ),
+                    new ApiProperty
+                    (
+                        apiName: nameof(ScalarsOnly.RequiredPredicate),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "Boolean"),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(ScalarsOnly.RequiredPredicate)
+                    ),
+                    new ApiProperty
+                    (
+                        apiName: nameof(ScalarsOnly.OptionalName),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "String"),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(ScalarsOnly.OptionalName)
+                    ),
+                    new ApiProperty
+                    (
+                        apiName: nameof(ScalarsOnly.OptionalNumber),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "Long"),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(ScalarsOnly.OptionalNumber)
+                    ),
+                    new ApiProperty
+                    (
+                        apiName: nameof(ScalarsOnly.OptionalPredicate),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "Boolean"),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(ScalarsOnly.OptionalPredicate)
+                    ),
+                ],
+                apiRelationships:[],
+                apiIdentitySet: null,
+                apiOptions: new ApiObjectTypeOptions
+                {
+                    ApiIdentityNullHandling = ApiIdentityNullHandling.ThrowException
+                },
+                clrObjectType: typeof(ScalarsOnly)
+            )
+        },
+
+        new ApiTypeJsonDeserializeTest
         {
             Name = $"{nameof(ApiObjectType)} [{nameof(ScalarsOnly)}] With API Named Typed Expressions With Extension 1 and Extension 2",
             Source = @"
@@ -476,60 +646,62 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             }",
             Expected = new ApiObjectType
             (
-                nameof(ScalarsOnly),
+                apiName: nameof(ScalarsOnly),
+                apiProperties:
                 [
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.RequiredName),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "String"),
-                        ApiTypeModifiers.Required,
-                        nameof(ScalarsOnly.RequiredName)
+                        apiName: nameof(ScalarsOnly.RequiredName),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "String"),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(ScalarsOnly.RequiredName)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.RequiredNumber),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "Long"),
-                        ApiTypeModifiers.Required,
-                        nameof(ScalarsOnly.RequiredNumber)
+                        apiName: nameof(ScalarsOnly.RequiredNumber),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "Long"),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(ScalarsOnly.RequiredNumber)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.RequiredPredicate),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "Boolean"),
-                        ApiTypeModifiers.Required,
-                        nameof(ScalarsOnly.RequiredPredicate)
+                        apiName: nameof(ScalarsOnly.RequiredPredicate),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "Boolean"),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(ScalarsOnly.RequiredPredicate)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.OptionalName),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "String"),
-                        ApiTypeModifiers.None,
-                        nameof(ScalarsOnly.OptionalName)
+                        apiName: nameof(ScalarsOnly.OptionalName),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "String"),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(ScalarsOnly.OptionalName)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.OptionalNumber),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "Long"),
-                        ApiTypeModifiers.None,
-                        nameof(ScalarsOnly.OptionalNumber)
+                        apiName: nameof(ScalarsOnly.OptionalNumber),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "Long"),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(ScalarsOnly.OptionalNumber)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.OptionalPredicate),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "Boolean"),
-                        ApiTypeModifiers.None,
-                        nameof(ScalarsOnly.OptionalPredicate)
+                        apiName: nameof(ScalarsOnly.OptionalPredicate),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "Boolean"),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(ScalarsOnly.OptionalPredicate)
                     ),
                 ],
-                [],
-                typeof(ScalarsOnly)
+                apiRelationships: [],
+                apiIdentitySet: null,
+                apiOptions: null,
+                clrObjectType: typeof(ScalarsOnly)
             ),
             ExtensionType1 = typeof(TestExtension1),
-            ExtensionType2 = typeof(TestExtension2),
-            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
+            ExtensionType2 = typeof(TestExtension2)
         },
 
-        new JsonDeserializeTest<ApiType>
+        new ApiTypeJsonDeserializeTest
         {
             Name = $"{nameof(ApiObjectType)} [{nameof(Company)}] With API Named Typed Expressions",
             Source = @"
@@ -585,41 +757,52 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             }",
             Expected = new ApiObjectType
             (
-                nameof(Company),
+                apiName: nameof(Company),
+                apiProperties:
                 [
                     new ApiProperty
                     (
-                        nameof(Company.Name),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "String"),
-                        ApiTypeModifiers.Required,
-                        nameof(Company.Name)
+                        apiName: nameof(Company.Name),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "String"),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(Company.Name)
                     ),
                     new ApiProperty
                     (
-                        nameof(Company.Owner),
-                        new ApiTypeExpression(ApiTypeKind.Object, nameof(Person)),
-                        ApiTypeModifiers.None,
-                        nameof(Company.Owner)
+                        apiName: nameof(Company.Owner),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Object, apiName: nameof(Person)),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(Company.Owner)
                     ),
                     new ApiProperty
                     (
-                        nameof(Company.Employees),
-                        new ApiTypeExpression(new ApiCollectionType(new ApiTypeExpression(ApiTypeKind.Object, nameof(Person)), ApiTypeModifiers.Required, typeof(List<Person>))),
-                        ApiTypeModifiers.None,
-                        nameof(Company.Employees)
+                        apiName: nameof(Company.Employees),
+                        apiTypeExpression: new ApiTypeExpression
+                        (
+                            apiInlineType: new ApiCollectionType
+                            (
+                                apiItemTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Object, apiName: nameof(Person)),
+                                apiItemTypeModifiers: ApiTypeModifiers.Required,
+                                clrCollectionType: typeof(List<Person>)
+                            )
+                        ),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(Company.Employees)
                     ),
                 ],
+                apiRelationships:
                 [
-                    new ApiRelationship("OwnedBy", nameof(Company.Owner)),
-                    new ApiRelationship(nameof(Company.Employees))
+                    new ApiRelationship(apiName: "OwnedBy", apiPropertyName: nameof(Company.Owner)),
+                    new ApiRelationship(apiName: nameof(Company.Employees))
                 ],
-                typeof(Company)
-            ),
-            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
+                apiIdentitySet: null,
+                apiOptions: null,
+                clrObjectType: typeof(Company)
+            )
         },
 
         // ApiObjectType With CLR Typed Expressions
-        new JsonDeserializeTest<ApiType>
+        new ApiTypeJsonDeserializeTest
         {
             Name = $"{nameof(ApiObjectType)} [{nameof(ScalarsOnly)}] With CLR Typed Expressions",
             Source = @"
@@ -681,58 +864,60 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             }",
             Expected = new ApiObjectType
             (
-                nameof(ScalarsOnly),
+                apiName: nameof(ScalarsOnly),
+                apiProperties:
                 [
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.RequiredName),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "String"),
-                        ApiTypeModifiers.Required,
-                        nameof(ScalarsOnly.RequiredName)
+                        apiName: nameof(ScalarsOnly.RequiredName),
+                        apiTypeExpression: new ApiTypeExpression(clrType: typeof(string)),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(ScalarsOnly.RequiredName)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.RequiredNumber),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "Long"),
-                        ApiTypeModifiers.Required,
-                        nameof(ScalarsOnly.RequiredNumber)
+                        apiName: nameof(ScalarsOnly.RequiredNumber),
+                        apiTypeExpression: new ApiTypeExpression(clrType: typeof(long)),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(ScalarsOnly.RequiredNumber)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.RequiredPredicate),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "Boolean"),
-                        ApiTypeModifiers.Required,
-                        nameof(ScalarsOnly.RequiredPredicate)
+                        apiName: nameof(ScalarsOnly.RequiredPredicate),
+                        apiTypeExpression: new ApiTypeExpression(clrType: typeof(bool)),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(ScalarsOnly.RequiredPredicate)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.OptionalName),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "String"),
-                        ApiTypeModifiers.None,
-                        nameof(ScalarsOnly.OptionalName)
+                        apiName: nameof(ScalarsOnly.OptionalName),
+                        apiTypeExpression: new ApiTypeExpression(clrType: typeof(string)),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(ScalarsOnly.OptionalName)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.OptionalNumber),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "Long"),
-                        ApiTypeModifiers.None,
-                        nameof(ScalarsOnly.OptionalNumber)
+                        apiName: nameof(ScalarsOnly.OptionalNumber),
+                        apiTypeExpression: new ApiTypeExpression(clrType: typeof(long)),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(ScalarsOnly.OptionalNumber)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.OptionalPredicate),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "Boolean"),
-                        ApiTypeModifiers.None,
-                        nameof(ScalarsOnly.OptionalPredicate)
+                        apiName: nameof(ScalarsOnly.OptionalPredicate),
+                        apiTypeExpression: new ApiTypeExpression(clrType: typeof(bool)),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(ScalarsOnly.OptionalPredicate)
                     ),
                 ],
-                [],
-                typeof(ScalarsOnly)
-            ),
-            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
+                apiRelationships:[],
+                apiIdentitySet: null,
+                apiOptions: null,
+                clrObjectType: typeof(ScalarsOnly)
+            )
         },
 
-        new JsonDeserializeTest<ApiType>
+        new ApiTypeJsonDeserializeTest
         {
             Name = $"{nameof(ApiObjectType)} [{nameof(ScalarsOnly)}] With CLR Typed Expressions With Extension 1 and Extension 2",
             Source = @"
@@ -803,60 +988,62 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             }",
             Expected = new ApiObjectType
             (
-                nameof(ScalarsOnly),
+                apiName: nameof(ScalarsOnly),
+                apiProperties:
                 [
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.RequiredName),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "String"),
-                        ApiTypeModifiers.Required,
-                        nameof(ScalarsOnly.RequiredName)
+                        apiName: nameof(ScalarsOnly.RequiredName),
+                        apiTypeExpression: new ApiTypeExpression(clrType: typeof(string)),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(ScalarsOnly.RequiredName)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.RequiredNumber),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "Long"),
-                        ApiTypeModifiers.Required,
-                        nameof(ScalarsOnly.RequiredNumber)
+                        apiName: nameof(ScalarsOnly.RequiredNumber),
+                        apiTypeExpression: new ApiTypeExpression(clrType: typeof(long)),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(ScalarsOnly.RequiredNumber)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.RequiredPredicate),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "Boolean"),
-                        ApiTypeModifiers.Required,
-                        nameof(ScalarsOnly.RequiredPredicate)
+                        apiName: nameof(ScalarsOnly.RequiredPredicate),
+                        apiTypeExpression: new ApiTypeExpression(clrType: typeof(bool)),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(ScalarsOnly.RequiredPredicate)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.OptionalName),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "String"),
-                        ApiTypeModifiers.None,
-                        nameof(ScalarsOnly.OptionalName)
+                        apiName: nameof(ScalarsOnly.OptionalName),
+                        apiTypeExpression: new ApiTypeExpression(clrType: typeof(string)),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(ScalarsOnly.OptionalName)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.OptionalNumber),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "Long"),
-                        ApiTypeModifiers.None,
-                        nameof(ScalarsOnly.OptionalNumber)
+                        apiName: nameof(ScalarsOnly.OptionalNumber),
+                        apiTypeExpression: new ApiTypeExpression(clrType: typeof(long)),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(ScalarsOnly.OptionalNumber)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.OptionalPredicate),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "Boolean"),
-                        ApiTypeModifiers.None,
-                        nameof(ScalarsOnly.OptionalPredicate)
+                        apiName: nameof(ScalarsOnly.OptionalPredicate),
+                        apiTypeExpression: new ApiTypeExpression(clrType: typeof(bool)),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(ScalarsOnly.OptionalPredicate)
                     ),
                 ],
-                [],
-                typeof(ScalarsOnly)
+                apiRelationships: [],
+                apiIdentitySet: null,
+                apiOptions: null,
+                clrObjectType: typeof(ScalarsOnly)
             ),
             ExtensionType1 = typeof(TestExtension1),
-            ExtensionType2 = typeof(TestExtension2),
-            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
+            ExtensionType2 = typeof(TestExtension2)
         },
 
-        new JsonDeserializeTest<ApiType>
+        new ApiTypeJsonDeserializeTest
         {
             Name = $"{nameof(ApiObjectType)} [{nameof(Company)}] With CLR Typed Expressions",
             Source = @"
@@ -909,462 +1096,574 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             }",
             Expected = new ApiObjectType
             (
-                nameof(Company),
+                apiName: nameof(Company),
+                apiProperties:
                 [
                     new ApiProperty
                     (
-                        nameof(Company.Name),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "String"),
-                        ApiTypeModifiers.Required,
-                        nameof(Company.Name)
+                        apiName: nameof(Company.Name),
+                        apiTypeExpression: new ApiTypeExpression(clrType: typeof(string)),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(Company.Name)
                     ),
                     new ApiProperty
                     (
-                        nameof(Company.Owner),
-                        new ApiTypeExpression(ApiTypeKind.Object, nameof(Person)),
-                        ApiTypeModifiers.None,
-                        nameof(Company.Owner)
+                        apiName: nameof(Company.Owner),
+                        apiTypeExpression: new ApiTypeExpression(clrType: typeof(Person)),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(Company.Owner)
                     ),
                     new ApiProperty
                     (
-                        nameof(Company.Employees),
-                        new ApiTypeExpression(new ApiCollectionType(new ApiTypeExpression(ApiTypeKind.Object, nameof(Person)), ApiTypeModifiers.Required, typeof(List<Person>))),
-                        ApiTypeModifiers.None,
-                        nameof(Company.Employees)
+                        apiName: nameof(Company.Employees),
+                        apiTypeExpression: new ApiTypeExpression
+                        (
+                            apiInlineType: new ApiCollectionType
+                            (
+                                apiItemTypeExpression: new ApiTypeExpression(clrType: typeof(Person)),
+                                apiItemTypeModifiers: ApiTypeModifiers.Required,
+                                clrCollectionType: typeof(List<Person>)
+                            )
+                        ),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(Company.Employees)
                     ),
                 ],
+                apiRelationships:
                 [
-                    new ApiRelationship("OwnedBy", nameof(Company.Owner)),
-                    new ApiRelationship(nameof(Company.Employees))
+                    new ApiRelationship(apiName: "OwnedBy", apiPropertyName: nameof(Company.Owner)),
+                    new ApiRelationship(apiName: nameof(Company.Employees))
                 ],
-                typeof(Company)
-            ),
-            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
+                apiIdentitySet: null,
+                apiOptions: null,
+                clrObjectType: typeof(Company)
+            )
         },
     ];
 
     public static TheoryDataRow<IXUnitTest>[] JsonRoundtripTheoryData =>
     [
         // Null
-        new JsonRoundtripTest<ApiType>
+        new ApiTypeJsonRoundtripTest
         {
             Name = "Null",
             Expected = null
         },
 
         // ApiScalarType
-        new JsonRoundtripTest<ApiType>
+        new ApiTypeJsonRoundtripTest
         {
             Name = $"{nameof(ApiScalarType)} [Boolean]",
-            Expected = new ApiScalarType("Boolean", typeof(bool)),
-            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
+            Expected = new ApiScalarType(apiName: "Boolean", clrScalarType: typeof(bool))
         },
 
-        new JsonRoundtripTest<ApiType>
+        new ApiTypeJsonRoundtripTest
         {
             Name = $"{nameof(ApiScalarType)} [Boolean] With Extension 1",
-            Expected = new ApiScalarType("Boolean", typeof(bool)),
-            ExtensionType1 = typeof(TestExtension1),
-            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
+            Expected = new ApiScalarType(apiName: "Boolean", clrScalarType: typeof(bool)),
+            ExtensionType1 = typeof(TestExtension1)
         },
 
-        new JsonRoundtripTest<ApiType>
+        new ApiTypeJsonRoundtripTest
         {
             Name = $"{nameof(ApiScalarType)} [ID]",
-            Expected = new ApiScalarType("ID", typeof(string)),
-            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
+            Expected = new ApiScalarType(apiName: "ID", clrScalarType: typeof(string))
         },
 
-        new JsonRoundtripTest<ApiType>
+        new ApiTypeJsonRoundtripTest
         {
             Name = $"{nameof(ApiScalarType)} [Int]",
-            Expected = new ApiScalarType("Int", typeof(int)),
-            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
+            Expected = new ApiScalarType(apiName: "Int", clrScalarType: typeof(int))
         },
 
-        new JsonRoundtripTest<ApiType>
+        new ApiTypeJsonRoundtripTest
         {
             Name = $"{nameof(ApiScalarType)} [Float]",
-            Expected = new ApiScalarType("Float", typeof(float)),
-            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
+            Expected = new ApiScalarType(apiName: "Float", clrScalarType: typeof(float))
         },
 
-        new JsonRoundtripTest<ApiType>
+        new ApiTypeJsonRoundtripTest
         {
             Name = $"{nameof(ApiScalarType)} [String]",
-            Expected = new ApiScalarType("String", typeof(string)),
-            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
+            Expected = new ApiScalarType(apiName: "String", clrScalarType: typeof(string))
         },
 
         // ApiEnumType
-        new JsonRoundtripTest<ApiType>
+        new ApiTypeJsonRoundtripTest
         {
             Name = $"{nameof(ApiEnumType)} [{nameof(StopLight)}]",
             Expected = new ApiEnumType
             (
-                nameof(StopLight),
-                [new ApiEnumValue("None", "None", 0), new ApiEnumValue("Green", "Green", 1), new ApiEnumValue("Yellow", "Yellow", 2), new ApiEnumValue("Red", "Red", 3)],
-                typeof(StopLight)
-            ),
-            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
+                apiName: nameof(StopLight),
+                apiEnumValues:
+                [
+                    new ApiEnumValue(apiName: "None", clrName: "None", clrOrdinal: 0),
+                    new ApiEnumValue(apiName: "Green", clrName: "Green", clrOrdinal: 1),
+                    new ApiEnumValue(apiName: "Yellow", clrName: "Yellow", clrOrdinal: 2),
+                    new ApiEnumValue(apiName: "Red", clrName: "Red", clrOrdinal: 3)
+                ],
+                clrEnumType: typeof(StopLight)
+            )
         },
 
-        new JsonRoundtripTest<ApiType>
+        new ApiTypeJsonRoundtripTest
         {
             Name = $"{nameof(ApiEnumType)} [{nameof(StopLight)}] With Extension 2",
             Expected = new ApiEnumType
             (
-                nameof(StopLight),
-                [new ApiEnumValue("None", "None", 0), new ApiEnumValue("Green", "Green", 1), new ApiEnumValue("Yellow", "Yellow", 2), new ApiEnumValue("Red", "Red", 3)],
-                typeof(StopLight)
+                apiName: nameof(StopLight),
+                apiEnumValues:
+                [
+                    new ApiEnumValue(apiName: "None", clrName: "None", clrOrdinal: 0),
+                    new ApiEnumValue(apiName: "Green", clrName: "Green", clrOrdinal: 1),
+                    new ApiEnumValue(apiName: "Yellow", clrName: "Yellow", clrOrdinal: 2),
+                    new ApiEnumValue(apiName: "Red", clrName: "Red", clrOrdinal: 3)
+                ],
+                clrEnumType: typeof(StopLight)
             ),
-            ExtensionType2 = typeof(TestExtension2),
-            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
+            ExtensionType2 = typeof(TestExtension2)
         },
 
         // ApiCollectionType
-        new JsonRoundtripTest<ApiType>
-        {
-            Name = $"{nameof(ApiCollectionType)} [List<{nameof(StopLight)}>]",
-            Expected = new ApiCollectionType(new ApiTypeExpression(ApiTypeKind.Scalar,  "String"), ApiTypeModifiers.Required, typeof(List<string>)),
-            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
-        },
-
-        new JsonRoundtripTest<ApiType>
-        {
-            Name = $"{nameof(ApiCollectionType)} [List<{nameof(StopLight)}?>]",
-            Expected = new ApiCollectionType(new ApiTypeExpression(ApiTypeKind.Scalar,  "String"), ApiTypeModifiers.None, typeof(List<string?>)),
-            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
-        },
-
-        new JsonRoundtripTest<ApiType>
+        new ApiTypeJsonRoundtripTest
         {
             Name = $"{nameof(ApiCollectionType)} [List<{nameof(StopLight)}>]",
             Expected = new ApiCollectionType
             (
-                new ApiTypeExpression(ApiTypeKind.Enum, nameof(StopLight)),
-                ApiTypeModifiers.Required,
-                typeof(List<StopLight>)
-            ),
-            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
+                apiItemTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "String"),
+                apiItemTypeModifiers: ApiTypeModifiers.Required,
+                clrCollectionType: typeof(List<string>)
+            )
         },
 
-        new JsonRoundtripTest<ApiType>
+        new ApiTypeJsonRoundtripTest
         {
             Name = $"{nameof(ApiCollectionType)} [List<{nameof(StopLight)}?>]",
             Expected = new ApiCollectionType
             (
-                new ApiTypeExpression(ApiTypeKind.Enum, nameof(StopLight)),
-                ApiTypeModifiers.None,
-                typeof(List<StopLight>)
-            ),
-            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
+                apiItemTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "String"),
+                apiItemTypeModifiers: ApiTypeModifiers.None,
+                clrCollectionType: typeof(List<string?>)
+            )
+        },
+
+        new ApiTypeJsonRoundtripTest
+        {
+            Name = $"{nameof(ApiCollectionType)} [List<{nameof(StopLight)}>]",
+            Expected = new ApiCollectionType
+            (
+                apiItemTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Enum, apiName: nameof(StopLight)),
+                apiItemTypeModifiers: ApiTypeModifiers.Required,
+                clrCollectionType: typeof(List<StopLight>)
+            )
+        },
+
+        new ApiTypeJsonRoundtripTest
+        {
+            Name = $"{nameof(ApiCollectionType)} [List<{nameof(StopLight)}?>]",
+            Expected = new ApiCollectionType
+            (
+                apiItemTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Enum, apiName: nameof(StopLight)),
+                apiItemTypeModifiers: ApiTypeModifiers.None,
+                clrCollectionType: typeof(List<StopLight>)
+            )
         },
 
         // ApiObjectType With API Named Typed Expressions
-        new JsonRoundtripTest<ApiType>
+        new ApiTypeJsonRoundtripTest
         {
             Name = $"{nameof(ApiObjectType)} [{nameof(ScalarsOnly)}] With API Named Typed Expressions",
             Expected = new ApiObjectType
             (
-                nameof(ScalarsOnly),
+                apiName: nameof(ScalarsOnly),
+                apiProperties:
                 [
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.RequiredName),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "String"),
-                        ApiTypeModifiers.Required,
-                        nameof(ScalarsOnly.RequiredName)
+                        apiName: nameof(ScalarsOnly.RequiredName),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "String"),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(ScalarsOnly.RequiredName)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.RequiredNumber),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "Long"),
-                        ApiTypeModifiers.Required,
-                        nameof(ScalarsOnly.RequiredNumber)
+                        apiName: nameof(ScalarsOnly.RequiredNumber),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "Long"),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(ScalarsOnly.RequiredNumber)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.RequiredPredicate),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "Boolean"),
-                        ApiTypeModifiers.Required,
-                        nameof(ScalarsOnly.RequiredPredicate)
+                        apiName: nameof(ScalarsOnly.RequiredPredicate),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "Boolean"),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(ScalarsOnly.RequiredPredicate)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.OptionalName),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "String"),
-                        ApiTypeModifiers.None,
-                        nameof(ScalarsOnly.OptionalName)
+                        apiName: nameof(ScalarsOnly.OptionalName),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "String"),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(ScalarsOnly.OptionalName)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.OptionalNumber),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "Long"),
-                        ApiTypeModifiers.None,
-                        nameof(ScalarsOnly.OptionalNumber)
+                        apiName: nameof(ScalarsOnly.OptionalNumber),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "Long"),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(ScalarsOnly.OptionalNumber)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.OptionalPredicate),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "Boolean"),
-                        ApiTypeModifiers.None,
-                        nameof(ScalarsOnly.OptionalPredicate)
+                        apiName: nameof(ScalarsOnly.OptionalPredicate),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "Boolean"),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(ScalarsOnly.OptionalPredicate)
                     ),
                 ],
-                [],
-                typeof(ScalarsOnly)
-            ),
-            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
+                apiRelationships:[],
+                apiIdentitySet: null,
+                apiOptions: null,
+                clrObjectType: typeof(ScalarsOnly)
+            )
         },
 
-        new JsonRoundtripTest<ApiType>
+        new ApiTypeJsonRoundtripTest
+        {
+            Name = $"{nameof(ApiObjectType)} [{nameof(ScalarsOnly)}] With API Named Typed Expressions And With API Options",
+            Expected = new ApiObjectType
+            (
+                apiName: nameof(ScalarsOnly),
+                apiProperties:
+                [
+                    new ApiProperty
+                    (
+                        apiName: nameof(ScalarsOnly.RequiredName),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "String"),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(ScalarsOnly.RequiredName)
+                    ),
+                    new ApiProperty
+                    (
+                        apiName: nameof(ScalarsOnly.RequiredNumber),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "Long"),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(ScalarsOnly.RequiredNumber)
+                    ),
+                    new ApiProperty
+                    (
+                        apiName: nameof(ScalarsOnly.RequiredPredicate),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "Boolean"),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(ScalarsOnly.RequiredPredicate)
+                    ),
+                    new ApiProperty
+                    (
+                        apiName: nameof(ScalarsOnly.OptionalName),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "String"),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(ScalarsOnly.OptionalName)
+                    ),
+                    new ApiProperty
+                    (
+                        apiName: nameof(ScalarsOnly.OptionalNumber),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "Long"),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(ScalarsOnly.OptionalNumber)
+                    ),
+                    new ApiProperty
+                    (
+                        apiName: nameof(ScalarsOnly.OptionalPredicate),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "Boolean"),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(ScalarsOnly.OptionalPredicate)
+                    ),
+                ],
+                apiRelationships:[],
+                apiIdentitySet: null,
+                apiOptions: new ApiObjectTypeOptions
+                {
+                    ApiIdentityNullHandling = ApiIdentityNullHandling.ThrowException
+                },
+                clrObjectType: typeof(ScalarsOnly)
+            )
+        },
+
+        new ApiTypeJsonRoundtripTest
         {
             Name = $"{nameof(ApiObjectType)} [{nameof(ScalarsOnly)}] With API Named Typed Expressions With Extension 1 and Extension 2",
             Expected = new ApiObjectType
             (
-                nameof(ScalarsOnly),
+                apiName: nameof(ScalarsOnly),
+                apiProperties:
                 [
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.RequiredName),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "String"),
-                        ApiTypeModifiers.Required,
-                        nameof(ScalarsOnly.RequiredName)
+                        apiName: nameof(ScalarsOnly.RequiredName),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "String"),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(ScalarsOnly.RequiredName)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.RequiredNumber),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "Long"),
-                        ApiTypeModifiers.Required,
-                        nameof(ScalarsOnly.RequiredNumber)
+                        apiName: nameof(ScalarsOnly.RequiredNumber),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "Long"),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(ScalarsOnly.RequiredNumber)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.RequiredPredicate),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "Boolean"),
-                        ApiTypeModifiers.Required,
-                        nameof(ScalarsOnly.RequiredPredicate)
+                        apiName: nameof(ScalarsOnly.RequiredPredicate),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "Boolean"),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(ScalarsOnly.RequiredPredicate)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.OptionalName),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "String"),
-                        ApiTypeModifiers.None,
-                        nameof(ScalarsOnly.OptionalName)
+                        apiName: nameof(ScalarsOnly.OptionalName),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "String"),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(ScalarsOnly.OptionalName)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.OptionalNumber),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "Long"),
-                        ApiTypeModifiers.None,
-                        nameof(ScalarsOnly.OptionalNumber)
+                        apiName: nameof(ScalarsOnly.OptionalNumber),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "Long"),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(ScalarsOnly.OptionalNumber)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.OptionalPredicate),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "Boolean"),
-                        ApiTypeModifiers.None,
-                        nameof(ScalarsOnly.OptionalPredicate)
+                        apiName: nameof(ScalarsOnly.OptionalPredicate),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "Boolean"),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(ScalarsOnly.OptionalPredicate)
                     ),
                 ],
-                [],
-                typeof(ScalarsOnly)
+                apiRelationships: [],
+                apiIdentitySet: null,
+                apiOptions: null,
+                clrObjectType: typeof(ScalarsOnly)
             ),
             ExtensionType1 = typeof(TestExtension1),
-            ExtensionType2 = typeof(TestExtension2),
-            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
+            ExtensionType2 = typeof(TestExtension2)
         },
 
-        new JsonRoundtripTest<ApiType>
+        new ApiTypeJsonRoundtripTest
         {
             Name = $"{nameof(ApiObjectType)} [{nameof(Company)}] With API Named Typed Expressions",
             Expected = new ApiObjectType
             (
-                nameof(Company),
+                apiName: nameof(Company),
+                apiProperties:
                 [
                     new ApiProperty
                     (
-                        nameof(Company.Name),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "String"),
-                        ApiTypeModifiers.Required,
-                        nameof(Company.Name)
+                        apiName: nameof(Company.Name),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "String"),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(Company.Name)
                     ),
                     new ApiProperty
                     (
-                        nameof(Company.Owner),
-                        new ApiTypeExpression(ApiTypeKind.Object, nameof(Person)),
-                        ApiTypeModifiers.None,
-                        nameof(Company.Owner)
+                        apiName: nameof(Company.Owner),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Object, apiName: nameof(Person)),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(Company.Owner)
                     ),
                     new ApiProperty
                     (
-                        nameof(Company.Employees),
-                        new ApiTypeExpression(new ApiCollectionType(new ApiTypeExpression(ApiTypeKind.Object, nameof(Person)), ApiTypeModifiers.Required, typeof(List<Person>))),
-                        ApiTypeModifiers.None,
-                        nameof(Company.Employees)
+                        apiName: nameof(Company.Employees),
+                        apiTypeExpression: new ApiTypeExpression
+                        (
+                            apiInlineType: new ApiCollectionType
+                            (
+                                apiItemTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Object, apiName: nameof(Person)),
+                                apiItemTypeModifiers: ApiTypeModifiers.Required,
+                                clrCollectionType: typeof(List<Person>)
+                            )
+                        ),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(Company.Employees)
                     ),
                 ],
+                apiRelationships:
                 [
-                    new ApiRelationship("OwnedBy", nameof(Company.Owner)),
-                    new ApiRelationship(nameof(Company.Employees))
+                    new ApiRelationship(apiName: "OwnedBy", apiPropertyName: nameof(Company.Owner)),
+                    new ApiRelationship(apiName: nameof(Company.Employees))
                 ],
-                typeof(Company)
-            ),
-            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
+                apiIdentitySet: null,
+                apiOptions: null,
+                clrObjectType: typeof(Company)
+            )
         },
 
         // ApiObjectType With CLR Typed Expressions
-        new JsonRoundtripTest<ApiType>
+        new ApiTypeJsonRoundtripTest
         {
             Name = $"{nameof(ApiObjectType)} [{nameof(ScalarsOnly)}] With CLR Typed Expressions",
             Expected = new ApiObjectType
             (
-                nameof(ScalarsOnly),
+                apiName: nameof(ScalarsOnly),
+                apiProperties:
                 [
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.RequiredName),
-                        new ApiTypeExpression(typeof(string)),
-                        ApiTypeModifiers.Required,
-                        nameof(ScalarsOnly.RequiredName)
+                        apiName: nameof(ScalarsOnly.RequiredName),
+                        apiTypeExpression: new ApiTypeExpression(clrType: typeof(string)),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(ScalarsOnly.RequiredName)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.RequiredNumber),
-                        new ApiTypeExpression(typeof(long)),
-                        ApiTypeModifiers.Required,
-                        nameof(ScalarsOnly.RequiredNumber)
+                        apiName: nameof(ScalarsOnly.RequiredNumber),
+                        apiTypeExpression: new ApiTypeExpression(clrType: typeof(long)),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(ScalarsOnly.RequiredNumber)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.RequiredPredicate),
-                        new ApiTypeExpression(typeof(bool)),
-                        ApiTypeModifiers.Required,
-                        nameof(ScalarsOnly.RequiredPredicate)
+                        apiName: nameof(ScalarsOnly.RequiredPredicate),
+                        apiTypeExpression: new ApiTypeExpression(clrType: typeof(bool)),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(ScalarsOnly.RequiredPredicate)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.OptionalName),
-                        new ApiTypeExpression(typeof(string)),
-                        ApiTypeModifiers.None,
-                        nameof(ScalarsOnly.OptionalName)
+                        apiName: nameof(ScalarsOnly.OptionalName),
+                        apiTypeExpression: new ApiTypeExpression(clrType: typeof(string)),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(ScalarsOnly.OptionalName)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.OptionalNumber),
-                        new ApiTypeExpression(typeof(long)),
-                        ApiTypeModifiers.None,
-                        nameof(ScalarsOnly.OptionalNumber)
+                        apiName: nameof(ScalarsOnly.OptionalNumber),
+                        apiTypeExpression: new ApiTypeExpression(clrType: typeof(long)),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(ScalarsOnly.OptionalNumber)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.OptionalPredicate),
-                        new ApiTypeExpression(typeof(bool)),
-                        ApiTypeModifiers.None,
-                        nameof(ScalarsOnly.OptionalPredicate)
+                        apiName: nameof(ScalarsOnly.OptionalPredicate),
+                        apiTypeExpression: new ApiTypeExpression(clrType: typeof(bool)),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(ScalarsOnly.OptionalPredicate)
                     ),
                 ],
-                [],
-                typeof(ScalarsOnly)
-            ),
-            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
+                apiRelationships:[],
+                apiIdentitySet: null,
+                apiOptions: null,
+                clrObjectType: typeof(ScalarsOnly)
+            )
         },
 
-        new JsonRoundtripTest<ApiType>
+        new ApiTypeJsonRoundtripTest
         {
             Name = $"{nameof(ApiObjectType)} [{nameof(ScalarsOnly)}] With CLR Typed Expressions With Extension 1 and Extension 2",
             Expected = new ApiObjectType
             (
-                nameof(ScalarsOnly),
+                apiName: nameof(ScalarsOnly),
+                apiProperties:
                 [
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.RequiredName),
-                        new ApiTypeExpression(typeof(string)),
-                        ApiTypeModifiers.Required,
-                        nameof(ScalarsOnly.RequiredName)
+                        apiName: nameof(ScalarsOnly.RequiredName),
+                        apiTypeExpression: new ApiTypeExpression(clrType: typeof(string)),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(ScalarsOnly.RequiredName)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.RequiredNumber),
-                        new ApiTypeExpression(typeof(long)),
-                        ApiTypeModifiers.Required,
-                        nameof(ScalarsOnly.RequiredNumber)
+                        apiName: nameof(ScalarsOnly.RequiredNumber),
+                        apiTypeExpression: new ApiTypeExpression(clrType: typeof(long)),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(ScalarsOnly.RequiredNumber)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.RequiredPredicate),
-                        new ApiTypeExpression(typeof(bool)),
-                        ApiTypeModifiers.Required,
-                        nameof(ScalarsOnly.RequiredPredicate)
+                        apiName: nameof(ScalarsOnly.RequiredPredicate),
+                        apiTypeExpression: new ApiTypeExpression(clrType: typeof(bool)),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(ScalarsOnly.RequiredPredicate)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.OptionalName),
-                        new ApiTypeExpression(typeof(string)),
-                        ApiTypeModifiers.None,
-                        nameof(ScalarsOnly.OptionalName)
+                        apiName: nameof(ScalarsOnly.OptionalName),
+                        apiTypeExpression: new ApiTypeExpression(clrType: typeof(string)),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(ScalarsOnly.OptionalName)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.OptionalNumber),
-                        new ApiTypeExpression(typeof(long)),
-                        ApiTypeModifiers.None,
-                        nameof(ScalarsOnly.OptionalNumber)
+                        apiName: nameof(ScalarsOnly.OptionalNumber),
+                        apiTypeExpression: new ApiTypeExpression(clrType: typeof(long)),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(ScalarsOnly.OptionalNumber)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.OptionalPredicate),
-                        new ApiTypeExpression(typeof(bool)),
-                        ApiTypeModifiers.None,
-                        nameof(ScalarsOnly.OptionalPredicate)
+                        apiName: nameof(ScalarsOnly.OptionalPredicate),
+                        apiTypeExpression: new ApiTypeExpression(clrType: typeof(bool)),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(ScalarsOnly.OptionalPredicate)
                     ),
                 ],
-                [],
-                typeof(ScalarsOnly)
+                apiRelationships: [],
+                apiIdentitySet: null,
+                apiOptions: null,
+                clrObjectType: typeof(ScalarsOnly)
             ),
             ExtensionType1 = typeof(TestExtension1),
-            ExtensionType2 = typeof(TestExtension2),
-            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
+            ExtensionType2 = typeof(TestExtension2)
         },
 
-        new JsonRoundtripTest<ApiType>
+        new ApiTypeJsonRoundtripTest
         {
             Name = $"{nameof(ApiObjectType)} [{nameof(Company)}] With CLR Typed Expressions",
             Expected = new ApiObjectType
             (
-                nameof(Company),
+                apiName: nameof(Company),
+                apiProperties:
                 [
                     new ApiProperty
                     (
-                        nameof(Company.Name),
-                        new ApiTypeExpression(typeof(string)),
-                        ApiTypeModifiers.Required,
-                        nameof(Company.Name)
+                        apiName: nameof(Company.Name),
+                        apiTypeExpression: new ApiTypeExpression(clrType: typeof(string)),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(Company.Name)
                     ),
                     new ApiProperty
                     (
-                        nameof(Company.Owner),
-                        new ApiTypeExpression(typeof(Person)),
-                        ApiTypeModifiers.None,
-                        nameof(Company.Owner)
+                        apiName: nameof(Company.Owner),
+                        apiTypeExpression: new ApiTypeExpression(clrType: typeof(Person)),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(Company.Owner)
                     ),
                     new ApiProperty
                     (
-                        nameof(Company.Employees),
-                        new ApiTypeExpression(new ApiCollectionType(new ApiTypeExpression(typeof(Person)), ApiTypeModifiers.Required, typeof(List<Person>))),
-                        ApiTypeModifiers.None,
-                        nameof(Company.Employees)
+                        apiName: nameof(Company.Employees),
+                        apiTypeExpression: new ApiTypeExpression
+                        (
+                            new ApiCollectionType
+                            (
+                                apiItemTypeExpression: new ApiTypeExpression(clrType: typeof(Person)),
+                                apiItemTypeModifiers: ApiTypeModifiers.Required,
+                                clrCollectionType: typeof(List<Person>)
+                            )
+                        ),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(Company.Employees)
                     ),
                 ],
+                apiRelationships:
                 [
-                    new ApiRelationship("OwnedBy", nameof(Company.Owner)),
-                    new ApiRelationship(nameof(Company.Employees))
+                    new ApiRelationship(apiName: "OwnedBy", apiPropertyName: nameof(Company.Owner)),
+                    new ApiRelationship(apiName: nameof(Company.Employees))
                 ],
-                typeof(Company)
-            ),
-            ExcludeMembers = [$"{nameof(ApiSchemaElement.ApiPath)}"]
+                apiIdentitySet: null,
+                apiOptions: null,
+                clrObjectType: typeof(Company)
+            )
         },
     ];
 
@@ -1382,7 +1681,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
         new JsonSerializeTest<ApiType>
         {
             Name = $"{nameof(ApiScalarType)} [Boolean]",
-            Source = new ApiScalarType("Boolean", typeof(bool)),
+            Source = new ApiScalarType(apiName: "Boolean", clrScalarType: typeof(bool)),
             Expected = @"
             {
                 ""Kind"": ""Scalar"",
@@ -1394,7 +1693,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
         new JsonSerializeTest<ApiType>
         {
             Name = $"{nameof(ApiScalarType)} [Boolean] With Extension 1",
-            Source = new ApiScalarType("Boolean", typeof(bool)),
+            Source = new ApiScalarType(apiName: "Boolean", clrScalarType: typeof(bool)),
             Expected = @"
             {
                 ""Kind"": ""Scalar"",
@@ -1412,7 +1711,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
         new JsonSerializeTest<ApiType>
         {
             Name = $"{nameof(ApiScalarType)} [ID]",
-            Source = new ApiScalarType("ID", typeof(string)),
+            Source = new ApiScalarType(apiName: "ID", clrScalarType: typeof(string)),
             Expected = @"
             {
                 ""Kind"": ""Scalar"",
@@ -1424,7 +1723,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
         new JsonSerializeTest<ApiType>
         {
             Name = $"{nameof(ApiScalarType)} [Int]",
-            Source = new ApiScalarType("Int", typeof(int)),
+            Source = new ApiScalarType(apiName: "Int", clrScalarType: typeof(int)),
             Expected = @"
             {
                 ""Kind"": ""Scalar"",
@@ -1436,7 +1735,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
         new JsonSerializeTest<ApiType>
         {
             Name = $"{nameof(ApiScalarType)} [Float]",
-            Source = new ApiScalarType("Float", typeof(float)),
+            Source = new ApiScalarType(apiName: "Float", clrScalarType: typeof(float)),
             Expected = @"
             {
                 ""Kind"": ""Scalar"",
@@ -1448,7 +1747,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
         new JsonSerializeTest<ApiType>
         {
             Name = $"{nameof(ApiScalarType)} [String]",
-            Source = new ApiScalarType("String", typeof(string)),
+            Source = new ApiScalarType(apiName: "String", clrScalarType: typeof(string)),
             Expected = @"
             {
                 ""Kind"": ""Scalar"",
@@ -1463,9 +1762,15 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = $"{nameof(ApiEnumType)} [{nameof(StopLight)}]",
             Source = new ApiEnumType
             (
-                nameof(StopLight),
-                [new ApiEnumValue("None", "None", 0), new ApiEnumValue("Green", "Green", 1), new ApiEnumValue("Yellow", "Yellow", 2), new ApiEnumValue("Red", "Red", 3)],
-                typeof(StopLight)
+                apiName: nameof(StopLight),
+                apiEnumValues:
+                [
+                    new ApiEnumValue(apiName: "None", clrName: "None", clrOrdinal: 0),
+                    new ApiEnumValue(apiName: "Green", clrName: "Green", clrOrdinal: 1),
+                    new ApiEnumValue(apiName: "Yellow", clrName: "Yellow", clrOrdinal: 2),
+                    new ApiEnumValue(apiName: "Red", clrName: "Red", clrOrdinal: 3)
+                ],
+                clrEnumType: typeof(StopLight)
             ),
             Expected = @"
             {
@@ -1502,9 +1807,15 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = $"{nameof(ApiEnumType)} [{nameof(StopLight)}] With Extension 2",
             Source = new ApiEnumType
             (
-                nameof(StopLight),
-                [new ApiEnumValue("None", "None", 0), new ApiEnumValue("Green", "Green", 1), new ApiEnumValue("Yellow", "Yellow", 2), new ApiEnumValue("Red", "Red", 3)],
-                typeof(StopLight)
+                apiName: nameof(StopLight),
+                apiEnumValues:
+                [
+                    new ApiEnumValue(apiName: "None", clrName: "None", clrOrdinal: 0),
+                    new ApiEnumValue(apiName: "Green", clrName: "Green", clrOrdinal: 1),
+                    new ApiEnumValue(apiName: "Yellow", clrName: "Yellow", clrOrdinal: 2),
+                    new ApiEnumValue(apiName: "Red", clrName: "Red", clrOrdinal: 3)
+                ],
+                clrEnumType: typeof(StopLight)
             ),
             Expected = @"
             {
@@ -1547,7 +1858,12 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
         new JsonSerializeTest<ApiType>
         {
             Name = $"{nameof(ApiCollectionType)} [List<String>]",
-            Source = new ApiCollectionType(new ApiTypeExpression(ApiTypeKind.Scalar, "String"), ApiTypeModifiers.Required, typeof(List<string>)),
+            Source = new ApiCollectionType
+            (
+                apiItemTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "String"),
+                apiItemTypeModifiers: ApiTypeModifiers.Required,
+                clrCollectionType: typeof(List<string>)
+            ),
             Expected = @"
             {
                 ""Kind"": ""Collection"",
@@ -1563,7 +1879,12 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
         new JsonSerializeTest<ApiType>
         {
             Name = $"{nameof(ApiCollectionType)} [List<String?>]",
-            Source = new ApiCollectionType(new ApiTypeExpression(ApiTypeKind.Scalar, "String"), ApiTypeModifiers.None, typeof(List<string?>)),
+            Source = new ApiCollectionType
+            (
+                apiItemTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "String"),
+                apiItemTypeModifiers: ApiTypeModifiers.None,
+                clrCollectionType: typeof(List<string?>)
+            ),
             Expected = @"
             {
                 ""Kind"": ""Collection"",
@@ -1581,9 +1902,9 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = $"{nameof(ApiCollectionType)} [List<{nameof(StopLight)}>]",
             Source = new ApiCollectionType
             (
-                new ApiTypeExpression(ApiTypeKind.Enum, nameof(StopLight)),
-                ApiTypeModifiers.Required,
-                typeof(List<StopLight>)
+                apiItemTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Enum, apiName: nameof(StopLight)),
+                apiItemTypeModifiers: ApiTypeModifiers.Required,
+                clrCollectionType: typeof(List<StopLight>)
             ),
             Expected = @"
             {
@@ -1602,9 +1923,9 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = $"{nameof(ApiCollectionType)} [List<{nameof(StopLight)}?>]",
             Source = new ApiCollectionType
             (
-                new ApiTypeExpression(ApiTypeKind.Enum, nameof(StopLight)),
-                ApiTypeModifiers.None,
-                typeof(List<StopLight>)
+                apiItemTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Enum, apiName: nameof(StopLight)),
+                apiItemTypeModifiers: ApiTypeModifiers.None,
+                clrCollectionType: typeof(List<StopLight>)
             ),
             Expected = @"
             {
@@ -1624,53 +1945,56 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = $"{nameof(ApiObjectType)} [{nameof(ScalarsOnly)}] With API Named Typed Expressions",
             Source = new ApiObjectType
             (
-                nameof(ScalarsOnly),
+                apiName: nameof(ScalarsOnly),
+                apiProperties:
                 [
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.RequiredName),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "String"),
-                        ApiTypeModifiers.Required,
-                        nameof(ScalarsOnly.RequiredName)
+                        apiName: nameof(ScalarsOnly.RequiredName),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "String"),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(ScalarsOnly.RequiredName)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.RequiredNumber),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "Long"),
-                        ApiTypeModifiers.Required,
-                        nameof(ScalarsOnly.RequiredNumber)
+                        apiName: nameof(ScalarsOnly.RequiredNumber),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "Long"),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(ScalarsOnly.RequiredNumber)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.RequiredPredicate),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "Boolean"),
-                        ApiTypeModifiers.Required,
-                        nameof(ScalarsOnly.RequiredPredicate)
+                        apiName: nameof(ScalarsOnly.RequiredPredicate),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "Boolean"),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(ScalarsOnly.RequiredPredicate)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.OptionalName),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "String"),
-                        ApiTypeModifiers.None,
-                        nameof(ScalarsOnly.OptionalName)
+                        apiName: nameof(ScalarsOnly.OptionalName),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "String"),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(ScalarsOnly.OptionalName)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.OptionalNumber),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "Long"),
-                        ApiTypeModifiers.None,
-                        nameof(ScalarsOnly.OptionalNumber)
+                        apiName: nameof(ScalarsOnly.OptionalNumber),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "Long"),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(ScalarsOnly.OptionalNumber)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.OptionalPredicate),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "Boolean"),
-                        ApiTypeModifiers.None,
-                        nameof(ScalarsOnly.OptionalPredicate)
+                        apiName: nameof(ScalarsOnly.OptionalPredicate),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "Boolean"),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(ScalarsOnly.OptionalPredicate)
                     ),
                 ],
-                [],
-                typeof(ScalarsOnly)
+                apiRelationships:[],
+                apiIdentitySet: null,
+                apiOptions: null,
+                clrObjectType: typeof(ScalarsOnly)
             ),
             Expected = @"
             {
@@ -1739,56 +2063,186 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
 
         new JsonSerializeTest<ApiType>
         {
-            Name = $"{nameof(ApiObjectType)} [{nameof(ScalarsOnly)}] With API Named Typed Expressions And With Extension 1 and Extension 2",
+            Name = $"{nameof(ApiObjectType)} [{nameof(ScalarsOnly)}] With API Named Typed Expressions And With API Options",
             Source = new ApiObjectType
             (
-                nameof(ScalarsOnly),
+                apiName: nameof(ScalarsOnly),
+                apiProperties:
                 [
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.RequiredName),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "String"),
-                        ApiTypeModifiers.Required,
-                        nameof(ScalarsOnly.RequiredName)
+                        apiName: nameof(ScalarsOnly.RequiredName),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "String"),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(ScalarsOnly.RequiredName)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.RequiredNumber),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "Long"),
-                        ApiTypeModifiers.Required,
-                        nameof(ScalarsOnly.RequiredNumber)
+                        apiName: nameof(ScalarsOnly.RequiredNumber),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "Long"),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(ScalarsOnly.RequiredNumber)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.RequiredPredicate),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "Boolean"),
-                        ApiTypeModifiers.Required,
-                        nameof(ScalarsOnly.RequiredPredicate)
+                        apiName: nameof(ScalarsOnly.RequiredPredicate),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "Boolean"),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(ScalarsOnly.RequiredPredicate)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.OptionalName),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "String"),
-                        ApiTypeModifiers.None,
-                        nameof(ScalarsOnly.OptionalName)
+                        apiName: nameof(ScalarsOnly.OptionalName),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "String"),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(ScalarsOnly.OptionalName)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.OptionalNumber),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "Long"),
-                        ApiTypeModifiers.None,
-                        nameof(ScalarsOnly.OptionalNumber)
+                        apiName: nameof(ScalarsOnly.OptionalNumber),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "Long"),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(ScalarsOnly.OptionalNumber)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.OptionalPredicate),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "Boolean"),
-                        ApiTypeModifiers.None,
-                        nameof(ScalarsOnly.OptionalPredicate)
+                        apiName: nameof(ScalarsOnly.OptionalPredicate),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "Boolean"),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(ScalarsOnly.OptionalPredicate)
                     ),
                 ],
-                [],
-                typeof(ScalarsOnly)
+                apiRelationships:[],
+                apiIdentitySet: null,
+                apiOptions: new ApiObjectTypeOptions
+                {
+                    ApiIdentityNullHandling = ApiIdentityNullHandling.ThrowException
+                },
+                clrObjectType: typeof(ScalarsOnly)
+            ),
+            Expected = @"
+            {
+                ""Kind"": ""Object"",
+                ""ApiName"": ""ScalarsOnly"",
+                ""ApiProperties"": [
+                    {
+                        ""ApiName"": ""RequiredName"",
+                        ""ApiType"": {
+                            ""Kind"": ""Scalar"",
+                            ""ApiName"": ""String""
+                        },
+                        ""ApiTypeModifiers"": ""Required"",
+                        ""ClrName"": ""RequiredName""
+                    },
+                    {
+                        ""ApiName"": ""RequiredNumber"",
+                        ""ApiType"": {
+                            ""Kind"": ""Scalar"",
+                            ""ApiName"": ""Long""
+                        },
+                        ""ApiTypeModifiers"": ""Required"",
+                        ""ClrName"": ""RequiredNumber""
+                    },
+                    {
+                        ""ApiName"": ""RequiredPredicate"",
+                        ""ApiType"": {
+                            ""Kind"": ""Scalar"",
+                            ""ApiName"": ""Boolean""
+                        },
+                        ""ApiTypeModifiers"": ""Required"",
+                        ""ClrName"": ""RequiredPredicate""
+                    },
+                    {
+                        ""ApiName"": ""OptionalName"",
+                        ""ApiType"": {
+                            ""Kind"": ""Scalar"",
+                            ""ApiName"": ""String""
+                        },
+                        ""ApiTypeModifiers"": ""None"",
+                        ""ClrName"": ""OptionalName""
+                    },
+                    {
+                        ""ApiName"": ""OptionalNumber"",
+                        ""ApiType"": {
+                            ""Kind"": ""Scalar"",
+                            ""ApiName"": ""Long""
+                        },
+                        ""ApiTypeModifiers"": ""None"",
+                        ""ClrName"": ""OptionalNumber""
+                    },
+                    {
+                        ""ApiName"": ""OptionalPredicate"",
+                        ""ApiType"": {
+                            ""Kind"": ""Scalar"",
+                            ""ApiName"": ""Boolean""
+                        },
+                        ""ApiTypeModifiers"": ""None"",
+                        ""ClrName"": ""OptionalPredicate""
+                    }
+                ],
+                ""ApiRelationships"": [],
+                ""ApiOptions"": {
+                    ""ApiIdentityNullHandling"": ""ThrowException""
+                },
+                ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.ScalarsOnly, Evoogle.ApiFramework.Core.Tests""
+            }"
+        },
+
+        new JsonSerializeTest<ApiType>
+        {
+            Name = $"{nameof(ApiObjectType)} [{nameof(ScalarsOnly)}] With API Named Typed Expressions And With Extension 1 and Extension 2",
+            Source = new ApiObjectType
+            (
+                apiName: nameof(ScalarsOnly),
+                apiProperties:
+                [
+                    new ApiProperty
+                    (
+                        apiName: nameof(ScalarsOnly.RequiredName),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "String"),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(ScalarsOnly.RequiredName)
+                    ),
+                    new ApiProperty
+                    (
+                        apiName: nameof(ScalarsOnly.RequiredNumber),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "Long"),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(ScalarsOnly.RequiredNumber)
+                    ),
+                    new ApiProperty
+                    (
+                        apiName: nameof(ScalarsOnly.RequiredPredicate),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "Boolean"),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(ScalarsOnly.RequiredPredicate)
+                    ),
+                    new ApiProperty
+                    (
+                        apiName: nameof(ScalarsOnly.OptionalName),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "String"),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(ScalarsOnly.OptionalName)
+                    ),
+                    new ApiProperty
+                    (
+                        apiName: nameof(ScalarsOnly.OptionalNumber),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "Long"),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(ScalarsOnly.OptionalNumber)
+                    ),
+                    new ApiProperty
+                    (
+                        apiName: nameof(ScalarsOnly.OptionalPredicate),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "Boolean"),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(ScalarsOnly.OptionalPredicate)
+                    ),
+                ],
+                apiRelationships: [],
+                apiIdentitySet: null,
+                apiOptions: null,
+                clrObjectType: typeof(ScalarsOnly)
             ),
             Expected = @"
             {
@@ -1871,35 +2325,47 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = $"{nameof(ApiObjectType)} [{nameof(Company)}] With API Named Typed Expressions",
             Source = new ApiObjectType
             (
-                nameof(Company),
+                apiName: nameof(Company),
+                apiProperties:
                 [
                     new ApiProperty
                     (
-                        nameof(Company.Name),
-                        new ApiTypeExpression(ApiTypeKind.Scalar, "String"),
-                        ApiTypeModifiers.Required,
-                        nameof(Company.Name)
+                        apiName: nameof(Company.Name),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "String"),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(Company.Name)
                     ),
                     new ApiProperty
                     (
-                        nameof(Company.Owner),
-                        new ApiTypeExpression(ApiTypeKind.Object, nameof(Person)),
-                        ApiTypeModifiers.None,
-                        nameof(Company.Owner)
+                        apiName: nameof(Company.Owner),
+                        apiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Object, apiName: nameof(Person)),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(Company.Owner)
                     ),
                     new ApiProperty
                     (
-                        nameof(Company.Employees),
-                        new ApiTypeExpression(new ApiCollectionType(new ApiTypeExpression(ApiTypeKind.Object, nameof(Person)), ApiTypeModifiers.Required, typeof(List<Person>))),
-                        ApiTypeModifiers.None,
-                        nameof(Company.Employees)
+                        apiName: nameof(Company.Employees),
+                        apiTypeExpression: new ApiTypeExpression
+                        (
+                            apiInlineType: new ApiCollectionType
+                            (
+                                apiItemTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Object, apiName: nameof(Person)),
+                                apiItemTypeModifiers: ApiTypeModifiers.Required,
+                                clrCollectionType: typeof(List<Person>)
+                            )
+                        ),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(Company.Employees)
                     ),
                 ],
+                apiRelationships:
                 [
-                    new ApiRelationship("OwnedBy", nameof(Company.Owner)),
-                    new ApiRelationship(nameof(Company.Employees))
+                    new ApiRelationship(apiName: "OwnedBy", apiPropertyName: nameof(Company.Owner)),
+                    new ApiRelationship(apiName: nameof(Company.Employees))
                 ],
-                typeof(Company)
+                apiIdentitySet: null,
+                apiOptions: null,
+                clrObjectType: typeof(Company)
             ),
             Expected = @"
             {
@@ -1960,53 +2426,56 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = $"{nameof(ApiObjectType)} [{nameof(ScalarsOnly)}] With CLR Typed Expressions",
             Source = new ApiObjectType
             (
-                nameof(ScalarsOnly),
+                apiName: nameof(ScalarsOnly),
+                apiProperties:
                 [
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.RequiredName),
-                        new ApiTypeExpression(typeof(string)),
-                        ApiTypeModifiers.Required,
-                        nameof(ScalarsOnly.RequiredName)
+                        apiName: nameof(ScalarsOnly.RequiredName),
+                        apiTypeExpression: new ApiTypeExpression(clrType: typeof(string)),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(ScalarsOnly.RequiredName)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.RequiredNumber),
-                        new ApiTypeExpression(typeof(long)),
-                        ApiTypeModifiers.Required,
-                        nameof(ScalarsOnly.RequiredNumber)
+                        apiName: nameof(ScalarsOnly.RequiredNumber),
+                        apiTypeExpression: new ApiTypeExpression(clrType: typeof(long)),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(ScalarsOnly.RequiredNumber)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.RequiredPredicate),
-                        new ApiTypeExpression(typeof(bool)),
-                        ApiTypeModifiers.Required,
-                        nameof(ScalarsOnly.RequiredPredicate)
+                        apiName: nameof(ScalarsOnly.RequiredPredicate),
+                        apiTypeExpression: new ApiTypeExpression(clrType: typeof(bool)),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(ScalarsOnly.RequiredPredicate)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.OptionalName),
-                        new ApiTypeExpression(typeof(string)),
-                        ApiTypeModifiers.None,
-                        nameof(ScalarsOnly.OptionalName)
+                        apiName: nameof(ScalarsOnly.OptionalName),
+                        apiTypeExpression: new ApiTypeExpression(clrType: typeof(string)),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(ScalarsOnly.OptionalName)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.OptionalNumber),
-                        new ApiTypeExpression(typeof(long?)),
-                        ApiTypeModifiers.None,
-                        nameof(ScalarsOnly.OptionalNumber)
+                        apiName: nameof(ScalarsOnly.OptionalNumber),
+                        apiTypeExpression: new ApiTypeExpression(clrType: typeof(long)),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(ScalarsOnly.OptionalNumber)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.OptionalPredicate),
-                        new ApiTypeExpression(typeof(bool?)),
-                        ApiTypeModifiers.None,
-                        nameof(ScalarsOnly.OptionalPredicate)
+                        apiName: nameof(ScalarsOnly.OptionalPredicate),
+                        apiTypeExpression: new ApiTypeExpression(clrType: typeof(bool)),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(ScalarsOnly.OptionalPredicate)
                     ),
                 ],
-                [],
-                typeof(ScalarsOnly)
+                apiRelationships:[],
+                apiIdentitySet: null,
+                apiOptions: null,
+                clrObjectType: typeof(ScalarsOnly)
             ),
             Expected = @"
             {
@@ -2072,53 +2541,56 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = $"{nameof(ApiObjectType)} [{nameof(ScalarsOnly)}] With CLR Typed Expressions And With Extension 1 and Extension 2",
             Source = new ApiObjectType
             (
-                nameof(ScalarsOnly),
+                apiName: nameof(ScalarsOnly),
+                apiProperties:
                 [
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.RequiredName),
-                        new ApiTypeExpression(typeof(string)),
-                        ApiTypeModifiers.Required,
-                        nameof(ScalarsOnly.RequiredName)
+                        apiName: nameof(ScalarsOnly.RequiredName),
+                        apiTypeExpression: new ApiTypeExpression(clrType: typeof(string)),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(ScalarsOnly.RequiredName)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.RequiredNumber),
-                        new ApiTypeExpression(typeof(long)),
-                        ApiTypeModifiers.Required,
-                        nameof(ScalarsOnly.RequiredNumber)
+                        apiName: nameof(ScalarsOnly.RequiredNumber),
+                        apiTypeExpression: new ApiTypeExpression(clrType: typeof(long)),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(ScalarsOnly.RequiredNumber)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.RequiredPredicate),
-                        new ApiTypeExpression(typeof(bool)),
-                        ApiTypeModifiers.Required,
-                        nameof(ScalarsOnly.RequiredPredicate)
+                        apiName: nameof(ScalarsOnly.RequiredPredicate),
+                        apiTypeExpression: new ApiTypeExpression(clrType: typeof(bool)),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(ScalarsOnly.RequiredPredicate)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.OptionalName),
-                        new ApiTypeExpression(typeof(string)),
-                        ApiTypeModifiers.None,
-                        nameof(ScalarsOnly.OptionalName)
+                        apiName: nameof(ScalarsOnly.OptionalName),
+                        apiTypeExpression: new ApiTypeExpression(clrType: typeof(string)),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(ScalarsOnly.OptionalName)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.OptionalNumber),
-                        new ApiTypeExpression(typeof(long?)),
-                        ApiTypeModifiers.None,
-                        nameof(ScalarsOnly.OptionalNumber)
+                        apiName: nameof(ScalarsOnly.OptionalNumber),
+                        apiTypeExpression: new ApiTypeExpression(clrType: typeof(long)),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(ScalarsOnly.OptionalNumber)
                     ),
                     new ApiProperty
                     (
-                        nameof(ScalarsOnly.OptionalPredicate),
-                        new ApiTypeExpression(typeof(bool?)),
-                        ApiTypeModifiers.None,
-                        nameof(ScalarsOnly.OptionalPredicate)
+                        apiName: nameof(ScalarsOnly.OptionalPredicate),
+                        apiTypeExpression: new ApiTypeExpression(clrType: typeof(bool)),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(ScalarsOnly.OptionalPredicate)
                     ),
                 ],
-                [],
-                typeof(ScalarsOnly)
+                apiRelationships: [],
+                apiIdentitySet: null,
+                apiOptions: null,
+                clrObjectType: typeof(ScalarsOnly)
             ),
             Expected = @"
             {
@@ -2195,35 +2667,47 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = $"{nameof(ApiObjectType)} [{nameof(Company)}] With CLR Typed Expressions",
             Source = new ApiObjectType
             (
-                nameof(Company),
+                apiName: nameof(Company),
+                apiProperties:
                 [
                     new ApiProperty
                     (
-                        nameof(Company.Name),
-                        new ApiTypeExpression(typeof(string)),
-                        ApiTypeModifiers.Required,
-                        nameof(Company.Name)
+                        apiName: nameof(Company.Name),
+                        apiTypeExpression: new ApiTypeExpression(clrType: typeof(string)),
+                        apiTypeModifiers: ApiTypeModifiers.Required,
+                        clrName: nameof(Company.Name)
                     ),
                     new ApiProperty
                     (
-                        nameof(Company.Owner),
-                        new ApiTypeExpression(typeof(Person)),
-                        ApiTypeModifiers.None,
-                        nameof(Company.Owner)
+                        apiName: nameof(Company.Owner),
+                        apiTypeExpression: new ApiTypeExpression(clrType: typeof(Person)),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(Company.Owner)
                     ),
                     new ApiProperty
                     (
-                        nameof(Company.Employees),
-                        new ApiTypeExpression(new ApiCollectionType(new ApiTypeExpression(typeof(Person)), ApiTypeModifiers.Required, typeof(List<Person>))),
-                        ApiTypeModifiers.None,
-                        nameof(Company.Employees)
+                        apiName: nameof(Company.Employees),
+                        apiTypeExpression: new ApiTypeExpression
+                        (
+                            apiInlineType: new ApiCollectionType
+                            (
+                                apiItemTypeExpression: new ApiTypeExpression(clrType: typeof(Person)),
+                                apiItemTypeModifiers: ApiTypeModifiers.Required,
+                                clrCollectionType: typeof(List<Person>)
+                            )
+                        ),
+                        apiTypeModifiers: ApiTypeModifiers.None,
+                        clrName: nameof(Company.Employees)
                     ),
                 ],
+                apiRelationships:
                 [
-                    new ApiRelationship("OwnedBy", nameof(Company.Owner)),
-                    new ApiRelationship(nameof(Company.Employees))
+                    new ApiRelationship(apiName: "OwnedBy", apiPropertyName: nameof(Company.Owner)),
+                    new ApiRelationship(apiName: nameof(Company.Employees))
                 ],
-                typeof(Company)
+                apiIdentitySet: null,
+                apiOptions: null,
+                clrObjectType: typeof(Company)
             ),
             Expected = @"
             {

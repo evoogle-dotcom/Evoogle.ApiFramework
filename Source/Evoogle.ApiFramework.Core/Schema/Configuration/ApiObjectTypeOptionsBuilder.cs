@@ -11,7 +11,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 public sealed class ApiObjectTypeOptionsBuilder()
 {
     #region Fields
-    private ApiIdentityNullHandling? _apiIdentityNullHandling = ApiObjectTypeOptions.Default.ApiIdentityNullHandling;
+    private ApiIdentityNullHandling? _apiIdentityNullHandling = null;
     #endregion
 
     #region Builder Methods
@@ -20,7 +20,7 @@ public sealed class ApiObjectTypeOptionsBuilder()
     /// </summary>
     /// <param name="handling">The optional null handling strategy to use.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiObjectTypeOptionsBuilder WithIdentityNullHandling(ApiIdentityNullHandling? handling)
+    public ApiObjectTypeOptionsBuilder WithIdentityNullHandling(ApiIdentityNullHandling? handling = null)
     {
         _apiIdentityNullHandling = handling;
         return this;

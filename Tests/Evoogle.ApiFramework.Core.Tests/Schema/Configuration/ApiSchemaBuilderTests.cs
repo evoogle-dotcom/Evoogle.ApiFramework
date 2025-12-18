@@ -182,78 +182,93 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
     #endregion
 
     #region Theory Data
-    private static ApiType ApiBooleanScalarType { get; } = new ApiScalarType(nameof(Boolean), typeof(bool));
-    private static ApiType ApiInt32ScalarType { get; } = new ApiScalarType(nameof(Int32), typeof(int));
-    private static ApiType ApiInt64ScalarType { get; } = new ApiScalarType(nameof(Int64), typeof(long));
-    private static ApiType ApiStringScalarType { get; } = new ApiScalarType(nameof(String), typeof(string));
+    private static ApiType ApiBooleanScalarType { get; } = new ApiScalarType(apiName: nameof(Boolean), clrScalarType: typeof(bool));
+    private static ApiType ApiInt32ScalarType { get; } = new ApiScalarType(apiName: nameof(Int32), clrScalarType: typeof(int));
+    private static ApiType ApiInt64ScalarType { get; } = new ApiScalarType(apiName: nameof(Int64), clrScalarType: typeof(long));
+    private static ApiType ApiStringScalarType { get; } = new ApiScalarType(apiName: nameof(String), clrScalarType: typeof(string));
 
     private static ApiType ApiGenderEnumType { get; } = new ApiEnumType
     (
-        nameof(Gender),
+        apiName: nameof(Gender),
+        apiEnumValues:
         [
-            new (nameof(Gender.Unspecified), nameof(Gender.Unspecified), (int)Gender.Unspecified),
-            new (nameof(Gender.Male), nameof(Gender.Male), (int)Gender.Male),
-            new (nameof(Gender.Female), nameof(Gender.Female), (int)Gender.Female),
+            new (apiName: nameof(Gender.Unspecified), clrName: nameof(Gender.Unspecified), clrOrdinal: (int)Gender.Unspecified),
+            new (apiName: nameof(Gender.Male), clrName: nameof(Gender.Male), clrOrdinal: (int)Gender.Male),
+            new (apiName: nameof(Gender.Female), clrName: nameof(Gender.Female), clrOrdinal: (int)Gender.Female),
         ],
-        typeof(Gender)
+        clrEnumType: typeof(Gender)
     );
 
     private static ApiType ApiScalarsOnlyObjectType { get; } = new ApiObjectType
     (
-        nameof(ScalarsOnly),
+        apiName: nameof(ScalarsOnly),
+        apiProperties:
         [
-            new (nameof(ScalarsOnly.RequiredName), ApiTypeExpression.ClrRef<string>(), ApiTypeModifiers.Required, nameof(ScalarsOnly.RequiredName)),
-            new (nameof(ScalarsOnly.RequiredNumber), ApiTypeExpression.ClrRef<long>(), ApiTypeModifiers.Required, nameof(ScalarsOnly.RequiredNumber)),
-            new (nameof(ScalarsOnly.RequiredPredicate), ApiTypeExpression.ClrRef<bool>(), ApiTypeModifiers.Required, nameof(ScalarsOnly.RequiredPredicate)),
-            new (nameof(ScalarsOnly.OptionalName), ApiTypeExpression.ClrRef<string>(), ApiTypeModifiers.None, nameof(ScalarsOnly.OptionalName)),
-            new (nameof(ScalarsOnly.OptionalNumber), ApiTypeExpression.ClrRef<long>(), ApiTypeModifiers.None, nameof(ScalarsOnly.OptionalNumber)),
-            new (nameof(ScalarsOnly.OptionalPredicate), ApiTypeExpression.ClrRef<bool>(), ApiTypeModifiers.None, nameof(ScalarsOnly.OptionalPredicate)),
+            new (apiName: nameof(ScalarsOnly.RequiredName), apiTypeExpression: ApiTypeExpression.ClrRef<string>(), apiTypeModifiers: ApiTypeModifiers.Required, clrName: nameof(ScalarsOnly.RequiredName)),
+            new (apiName: nameof(ScalarsOnly.RequiredNumber), apiTypeExpression: ApiTypeExpression.ClrRef<long>(), apiTypeModifiers: ApiTypeModifiers.Required, clrName: nameof(ScalarsOnly.RequiredNumber)),
+            new (apiName: nameof(ScalarsOnly.RequiredPredicate), apiTypeExpression: ApiTypeExpression.ClrRef<bool>(), apiTypeModifiers: ApiTypeModifiers.Required, clrName: nameof(ScalarsOnly.RequiredPredicate)),
+            new (apiName: nameof(ScalarsOnly.OptionalName), apiTypeExpression: ApiTypeExpression.ClrRef<string>(), apiTypeModifiers: ApiTypeModifiers.None, clrName: nameof(ScalarsOnly.OptionalName)),
+            new (apiName: nameof(ScalarsOnly.OptionalNumber), apiTypeExpression: ApiTypeExpression.ClrRef<long>(), apiTypeModifiers: ApiTypeModifiers.None, clrName: nameof(ScalarsOnly.OptionalNumber)),
+            new (apiName: nameof(ScalarsOnly.OptionalPredicate), apiTypeExpression: ApiTypeExpression.ClrRef<bool>(), apiTypeModifiers: ApiTypeModifiers.None, clrName: nameof(ScalarsOnly.OptionalPredicate)),
         ],
-        [],
-        typeof(ScalarsOnly)
+        apiRelationships: null,
+        apiIdentitySet: null,
+        apiOptions: null,
+        clrObjectType: typeof(ScalarsOnly)
     );
 
     private static ApiType ApiPersonObjectType { get; } = new ApiObjectType
     (
-        nameof(Person),
+        apiName: nameof(Person),
+        apiProperties:
         [
-            new (nameof(Person.Name), ApiTypeExpression.ClrRef<string>(), ApiTypeModifiers.Required, nameof(Person.Name)),
-            new (nameof(Person.Age), ApiTypeExpression.ClrRef<int>(), ApiTypeModifiers.None, nameof(Person.Age)),
-            new (nameof(Person.Gender), ApiTypeExpression.ClrRef<Gender>(), ApiTypeModifiers.None, nameof(Person.Gender)),
-            new (nameof(Person.Hobbies), ApiTypeExpression.ListOf<string>(ApiTypeModifiers.Required), ApiTypeModifiers.None, nameof(Person.Hobbies)),
+            new (apiName: nameof(Person.Name), apiTypeExpression: ApiTypeExpression.ClrRef<string>(), apiTypeModifiers: ApiTypeModifiers.Required, clrName: nameof(Person.Name)),
+            new (apiName: nameof(Person.Age), apiTypeExpression: ApiTypeExpression.ClrRef<int>(), apiTypeModifiers: ApiTypeModifiers.None, clrName: nameof(Person.Age)),
+            new (apiName: nameof(Person.Gender), apiTypeExpression: ApiTypeExpression.ClrRef<Gender>(), apiTypeModifiers: ApiTypeModifiers.None, clrName: nameof(Person.Gender)),
+            new (apiName: nameof(Person.Hobbies), apiTypeExpression: ApiTypeExpression.ListOf<string>(apiItemTypeModifiers: ApiTypeModifiers.Required), apiTypeModifiers: ApiTypeModifiers.None, clrName: nameof(Person.Hobbies)),
         ],
-        [],
-        typeof(Person)
+        apiRelationships: null,
+        apiIdentitySet: null,
+        apiOptions: null,
+        clrObjectType: typeof(Person)
     );
 
     private static ApiType ApiCompanyObjectType { get; } = new ApiObjectType
     (
-        nameof(Company),
+        apiName: nameof(Company),
+        apiProperties:
         [
-            new (nameof(Company.Name), ApiTypeExpression.ClrRef<string>(), ApiTypeModifiers.Required, nameof(Company.Name)),
-            new (nameof(Company.Owner), ApiTypeExpression.ClrRef<Person>(), ApiTypeModifiers.None, nameof(Company.Owner)),
-            new (nameof(Company.Employees), ApiTypeExpression.ListOf<Person>(ApiTypeModifiers.Required), ApiTypeModifiers.None, nameof(Company.Employees)),
+            new (apiName: nameof(Company.Name), apiTypeExpression: ApiTypeExpression.ClrRef<string>(), apiTypeModifiers: ApiTypeModifiers.Required, clrName: nameof(Company.Name)),
+            new (apiName: nameof(Company.Owner), apiTypeExpression: ApiTypeExpression.ClrRef<Person>(), apiTypeModifiers: ApiTypeModifiers.None, clrName: nameof(Company.Owner)),
+            new (apiName: nameof(Company.Employees), apiTypeExpression: ApiTypeExpression.ListOf<Person>(apiItemTypeModifiers: ApiTypeModifiers.Required), apiTypeModifiers: ApiTypeModifiers.None, clrName: nameof(Company.Employees)),
         ],
+        apiRelationships:
         [
-            new (nameof(Company.Owner)),
-            new (nameof(Company.Employees)),
+            new (apiName: nameof(Company.Owner)),
+            new (apiName: nameof(Company.Employees)),
         ],
-        typeof(Company)
+        apiIdentitySet: null,
+        apiOptions: null,
+        clrObjectType: typeof(Company)
     );
 
     private static ApiType ApiCompanyObjectTypeWithMissingRelatedProperties { get; } = new ApiObjectType
     (
-        nameof(Company),
+        apiName: nameof(Company),
+        apiProperties:
         [
-            new (nameof(Company.Name), ApiTypeExpression.ClrRef<string>(), ApiTypeModifiers.Required, nameof(Company.Name)),
-            new (nameof(Company.Owner), ApiTypeExpression.ClrRef<Person>(), ApiTypeModifiers.None, nameof(Company.Owner)),
-            new (nameof(Company.Employees), ApiTypeExpression.ListOf<Person>(ApiTypeModifiers.Required), ApiTypeModifiers.None, nameof(Company.Employees)),
+            new (apiName: nameof(Company.Name), apiTypeExpression: ApiTypeExpression.ClrRef<string>(), apiTypeModifiers: ApiTypeModifiers.Required, clrName: nameof(Company.Name)),
+            new (apiName: nameof(Company.Owner), apiTypeExpression: ApiTypeExpression.ClrRef<Person>(), apiTypeModifiers: ApiTypeModifiers.None, clrName: nameof(Company.Owner)),
+            new (apiName: nameof(Company.Employees), apiTypeExpression: ApiTypeExpression.ListOf<Person>(apiItemTypeModifiers: ApiTypeModifiers.Required), apiTypeModifiers: ApiTypeModifiers.None, clrName: nameof(Company.Employees)),
         ],
+        apiRelationships:
         [
-            new (nameof(Company.Owner), nameof(Company.Owner) + "Missing"),
-            new (nameof(Company.Employees), nameof(Company.Employees) + "Missing"),
+            new (apiName: nameof(Company.Owner), apiPropertyName: nameof(Company.Owner) + "Missing"),
+            new (apiName: nameof(Company.Employees), apiPropertyName: nameof(Company.Employees) + "Missing"),
         ],
-        typeof(Company)
+        apiIdentitySet: null,
+        apiOptions: null,
+        clrObjectType: typeof(Company)
     );
 
     private static ApiSchema ApiEmptySchema { get; } = ApiSchema.Create

@@ -3,27 +3,18 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Text.Json.Serialization;
+
+using Evoogle.ApiFramework.Schema.Json;
 using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema;
 
+[JsonConverter(typeof(ApiObjectTypeOptionsJsonConverter))]
 public record class ApiObjectTypeOptions
 {
-    #region Fields
-    private static readonly ApiObjectTypeOptions _default = new();
-    #endregion
-
     #region Properties
-    public static ApiObjectTypeOptions Default => _default;
-
-    public ApiIdentityNullHandling? ApiIdentityNullHandling { get; set; }
-    #endregion
-
-    #region Methods
-    internal ApiIdentityNullHandling GetIdentityNullHandling(ApiObjectType parent)
-    {
-        return this.ApiIdentityNullHandling ?? parent.ApiSchemaContext.ApiSchemaOptions.ApiIdentityNullHandling;
-    }
+    public ApiIdentityNullHandling? ApiIdentityNullHandling { get; init; }
     #endregion
 
     #region Object Methods

@@ -19,7 +19,14 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
         var apiItemTypeModifiers = context.ReadData.ApiCollectionType?.ApiItemTypeModifiers ?? ApiTypeModifiers.None;
         var clrCollectionType = context.ReadData.ApiType?.ClrType;
 
-        return new ApiCollectionType(apiItemTypeExpression!, apiItemTypeModifiers, clrCollectionType!);
+        var apiCollectionType = new ApiCollectionType
+        (
+            apiItemTypeExpression!,
+            apiItemTypeModifiers,
+            clrCollectionType!
+        );
+
+        return apiCollectionType;
     }
     #endregion
 
@@ -30,7 +37,14 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
         var apiEnumValues = context.ReadData.ApiEnumType?.ApiEnumValues;
         var clrType = context.ReadData.ApiType?.ClrType;
 
-        return new ApiEnumType(apiName!, apiEnumValues!, clrType!);
+        var apiEnumType = new ApiEnumType
+        (
+            apiName!,
+            apiEnumValues!,
+            clrType!
+        );
+
+        return apiEnumType;
     }
     #endregion
 
@@ -40,9 +54,20 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
         var apiName = context.ReadData.ApiNamedType?.ApiName;
         var apiProperties = context.ReadData.ApiObjectType?.ApiProperties;
         var apiRelationships = context.ReadData.ApiObjectType?.ApiRelationships;
+        var apiOptions = context.ReadData.ApiObjectType?.ApiOptions;
         var clrType = context.ReadData.ApiType?.ClrType;
 
-        return new ApiObjectType(apiName!, apiProperties!, apiRelationships!, clrType!);
+        var apiObjectType = new ApiObjectType
+        (
+            apiName!,
+            apiProperties!,
+            apiRelationships!,
+            apiIdentitySet: null,
+            apiOptions,
+            clrType!
+        );
+
+        return apiObjectType;
     }
     #endregion
 
@@ -52,7 +77,13 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
         var apiName = context.ReadData.ApiNamedType?.ApiName;
         var clrType = context.ReadData.ApiType?.ClrType;
 
-        return new ApiScalarType(apiName!, clrType!);
+        var apiScalarType = new ApiScalarType
+        (
+            apiName!,
+            clrType!
+        );
+
+        return apiScalarType;
     }
     #endregion
 }

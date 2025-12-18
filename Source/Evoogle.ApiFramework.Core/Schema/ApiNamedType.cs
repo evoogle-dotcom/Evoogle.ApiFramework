@@ -15,7 +15,11 @@ namespace Evoogle.ApiFramework.Schema;
 /// </remarks>
 /// <param name="apiName">The unique API name of the type.</param>
 /// <param name="clrType">The underlying CLR type this API type maps to.</param>
-public abstract class ApiNamedType(string apiName, Type clrType) : ApiType(clrType)
+public abstract class ApiNamedType
+(
+    string apiName,
+    Type clrType
+) : ApiType(clrType)
 {
     #region ApiNamedType Properties
     /// <summary>Gets the API name of the API type.</summary>
