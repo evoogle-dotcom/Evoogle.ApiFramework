@@ -13,7 +13,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 
 public class ApiRelationshipBuilderTests(ITestOutputHelper output) : XUnitTests(output)
 {
-    public class BuildTest : XUnitTest
+    private class BuildTest : XUnitTest
     {
         #region User Supplied Properties
         public string ApiName { get; init; } = null!;

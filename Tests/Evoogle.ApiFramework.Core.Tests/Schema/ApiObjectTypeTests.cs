@@ -16,14 +16,14 @@ namespace Evoogle.ApiFramework.Schema;
 public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
 {
     #region Test Types
-    public enum TryGetMethod
+    private enum TryGetMethod
     {
         TryGetPropertyByApiName,
         TryGetPropertyByClrName,
         TryGetRelationshipByApiName
     }
 
-    public class TryGetTest : XUnitTest
+    private class TryGetTest : XUnitTest
     {
         #region User Supplied Properties
         public required ApiSchemaKind ApiSchemaKind { get; init; }

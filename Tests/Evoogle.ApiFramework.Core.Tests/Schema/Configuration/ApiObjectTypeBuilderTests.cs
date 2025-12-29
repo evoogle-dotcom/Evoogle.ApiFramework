@@ -16,7 +16,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 public class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnitTests(output)
 {
     #region Test Classes
-    public class BuildTest : XUnitTest
+    private class BuildTest : XUnitTest
     {
         #region User Supplied Properties
         public required ApiSchemaKind ApiSchemaKind { get; init; }

@@ -16,7 +16,7 @@ namespace Evoogle.ApiFramework.Schema;
 public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
 {
     #region Base Tests
-    public abstract class TryTestBase : XUnitTest
+    private abstract class TryTestBase : XUnitTest
     {
         #region User Supplied Properties
         public required ApiSchemaKind ApiSchemaKind { get; init; }
@@ -50,7 +50,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
         #endregion
     }
 
-    public abstract class TryGetTestBase : TryTestBase
+    private abstract class TryGetTestBase : TryTestBase
     {
         #region User Supplied Properties
         public required bool ExpectedSuccess { get; init; }
@@ -61,7 +61,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
         #endregion
     }
 
-    public abstract class TrySetTestBase : TryTestBase
+    private abstract class TrySetTestBase : TryTestBase
     {
         #region User Supplied Properties
         public required bool ExpectedTrySetSuccess { get; set; }
@@ -74,7 +74,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
     #endregion
 
     #region TryGet Tests (Generic and Non-Generic)
-    public class TryGetGenericTest<TObject, TValue> : TryGetTestBase
+    private class TryGetGenericTest<TObject, TValue> : TryGetTestBase
     {
         #region User Supplied Properties
         public TObject? ClrObject { get; init; }
@@ -121,7 +121,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
         #endregion
     }
 
-    public class TryGetNonGenericTest : TryGetTestBase
+    private class TryGetNonGenericTest : TryGetTestBase
     {
         #region User Supplied Properties
         public object? ClrObject { get; init; }
@@ -172,7 +172,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
     #endregion
 
     #region TrySet Tests
-    public class TrySetGenericTest<TObject, TValue> : TrySetTestBase
+    private class TrySetGenericTest<TObject, TValue> : TrySetTestBase
     {
         #region User Supplied Properties
         public TObject? ClrObject { get; init; }
@@ -221,7 +221,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
         #endregion
     }
 
-    public class TrySetByRefGenericTest<TObject, TValue> : TrySetTestBase
+    private class TrySetByRefGenericTest<TObject, TValue> : TrySetTestBase
         where TObject : struct
     {
         #region User Supplied Properties
@@ -272,7 +272,7 @@ public class ApiPropertyTests(ITestOutputHelper output) : XUnitTests(output)
         #endregion
     }
 
-    public class TrySetNonGenericTest : TrySetTestBase
+    private class TrySetNonGenericTest : TrySetTestBase
     {
         #region User Supplied Properties
         public object? ClrObject { get; init; }

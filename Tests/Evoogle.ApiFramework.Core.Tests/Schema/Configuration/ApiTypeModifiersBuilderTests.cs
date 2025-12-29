@@ -11,7 +11,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 
 public class ApiTypeModifiersBuilderTests(ITestOutputHelper output) : XUnitTests(output)
 {
-    public class BuildTest : XUnitTest
+    private class BuildTest : XUnitTest
     {
         #region User Supplied Properties
         public bool? UseRequired { get; init; }

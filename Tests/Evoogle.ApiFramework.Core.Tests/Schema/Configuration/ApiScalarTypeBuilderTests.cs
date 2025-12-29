@@ -14,7 +14,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 public class ApiScalarTypeBuilderTests(ITestOutputHelper output) : XUnitTests(output)
 {
     #region Test Classes
-    public class BuildTest : XUnitTest
+    private class BuildTest : XUnitTest
     {
         #region User Supplied Properties
         public string ApiName { get; init; } = null!;

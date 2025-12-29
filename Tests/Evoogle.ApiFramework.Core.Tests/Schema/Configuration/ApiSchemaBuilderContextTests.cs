@@ -14,7 +14,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 public class ApiSchemaBuilderContextTests(ITestOutputHelper output) : XUnitTests(output)
 {
     #region Test Classes
-    public class GetOrAddTest : XUnitTest
+    private class GetOrAddTest : XUnitTest
     {
         #region User Supplied Properties
         public string MethodName { get; init; } = null!;
