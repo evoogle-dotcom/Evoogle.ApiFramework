@@ -139,6 +139,7 @@ public static class Dummy
         var schema = new ApiSchemaBuilder()
             .WithName("CustomerOrdersAPI")
             .WithVersion("v1")
+            .WithDefaultOptions()
             .WithOptions(o => o
                 .WithIdentityNullHandling(ApiIdentityNullHandling.ReturnEmpty))
             .AddScalar(typeof(EmailAddress), x => x
@@ -156,6 +157,7 @@ public static class Dummy
                 .AddExtension(new VisibleMetadata { Visible = true })
             .AddObject(typeof(Order), x => x
                 .WithName("Order")
+                .WithDefaultOptions()
                 .AddProperty("Id", "Id", m => m.Required())
                 .AddProperty("Status", "Status", m => m.Required())
                 .AddProperty("Total", "Total", m => m.Required())

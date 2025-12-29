@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Evoogle.ApiFramework.Schema.Json;
 
-public class ApiObjectTypeOptionsJsonConverter(ILogger<ApiObjectTypeOptionsJsonConverter>? logger) : JsonConverterBase<ApiObjectTypeOptions>(logger)
+public class ApiSchemaOptionsJsonConverter(ILogger<ApiSchemaOptionsJsonConverter>? logger) : JsonConverterBase<ApiSchemaOptions>(logger)
 {
     #region Property Types
     private readonly record struct PropertyNames
@@ -24,7 +24,7 @@ public class ApiObjectTypeOptionsJsonConverter(ILogger<ApiObjectTypeOptionsJsonC
         public static PropertyNames Create(JsonNamingPolicy policy)
             => new()
             {
-                ApiIdentityNullHandling = policy.ConvertName(nameof(ApiObjectTypeOptions.ApiIdentityNullHandling)),
+                ApiIdentityNullHandling = policy.ConvertName(nameof(ApiSchemaOptions.ApiIdentityNullHandling)),
             };
         #endregion
     }
@@ -67,7 +67,7 @@ public class ApiObjectTypeOptionsJsonConverter(ILogger<ApiObjectTypeOptionsJsonC
 
     #region Constructors
     /// <summary>Parameterless constructor for use via [JsonConverter(typeof(...))] attribute.</summary>
-    public ApiObjectTypeOptionsJsonConverter()
+    public ApiSchemaOptionsJsonConverter()
         : this(null)
     {
     }
@@ -91,19 +91,19 @@ public class ApiObjectTypeOptionsJsonConverter(ILogger<ApiObjectTypeOptionsJsonC
                 buildPropertyNames: PropertyNames.Create
             );
 
-    protected override ApiObjectTypeOptions? CreateValue(IReadContext context)
+    protected override ApiSchemaOptions? CreateValue(IReadContext context)
     {
         var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
         var readData = readContext.ReadData;
 
-        var apiIdentityNullHandling = readData.ApiIdentityNullHandling;
+        var apiIdentityNullHandling = readData.ApiIdentityNullHandling ?? ApiSchemaOptions.Default.ApiIdentityNullHandling;
 
-        var apiObjectTypeOptions = new ApiObjectTypeOptions()
+        var apiSchemaOptions = new ApiSchemaOptions()
         {
             ApiIdentityNullHandling = apiIdentityNullHandling,
         };
 
-        return apiObjectTypeOptions;
+        return apiSchemaOptions;
     }
 
     protected override void ReadCore(ref Utf8JsonReader reader, IReadContext context)
@@ -114,7 +114,7 @@ public class ApiObjectTypeOptionsJsonConverter(ILogger<ApiObjectTypeOptionsJsonC
         ReadJsonObject(ref reader, readContext, handlers);
     }
 
-    protected override void WriteCore(Utf8JsonWriter writer, ApiObjectTypeOptions value, IWriteContext context)
+    protected override void WriteCore(Utf8JsonWriter writer, ApiSchemaOptions value, IWriteContext context)
     {
         var writeContext = (DefaultWriteContext<PropertyNames>)context;
 
@@ -126,10 +126,10 @@ public class ApiObjectTypeOptionsJsonConverter(ILogger<ApiObjectTypeOptionsJsonC
     #endregion
 
     #region Write Implementation Methods
-    private static void WriteApiIdentityNullHandling(Utf8JsonWriter writer, ApiObjectTypeOptions apiObjectTypeOptions, DefaultWriteContext<PropertyNames> context)
+    private static void WriteApiIdentityNullHandling(Utf8JsonWriter writer, ApiSchemaOptions apiSchemaOptions, DefaultWriteContext<PropertyNames> context)
     {
         var propertyName = context.PropertyNames.ApiIdentityNullHandling;
-        var apiIdentityNullHandling = apiObjectTypeOptions.ApiIdentityNullHandling;
+        var apiIdentityNullHandling = apiSchemaOptions.ApiIdentityNullHandling;
         var options = context.Options;
 
         writer.TryWritePropertyWithConverter(propertyName, apiIdentityNullHandling, options, _apiIdentityNullHandlingJsonConverter);

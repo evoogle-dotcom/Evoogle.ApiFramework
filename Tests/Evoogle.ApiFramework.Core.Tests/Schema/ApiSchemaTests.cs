@@ -3,6 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 
 using Evoogle.ApiFramework.Exceptions;
@@ -12,34 +13,23 @@ using Evoogle.XUnit;
 
 using FluentAssertions;
 
-using static Evoogle.XUnit.JsonUnitTests;
+using static Evoogle.ApiFramework.Schema.TestData.ApiSchemaFactory;
+using static Evoogle.XUnit.Tests.JsonUnitTests;
 
 namespace Evoogle.ApiFramework.Schema;
 
 public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
 {
     #region Fields
-    private static readonly List<string> _excludeMembers = [$"{nameof(ApiSchemaContext)}", $"{nameof(ApiSchemaContext)}.{nameof(ApiSchemaContext.ApiSchema)}"];
+    private static readonly List<string> _excludeMembers =
+    [
+        $"{nameof(ApiSchemaContext)}",
+        $"{nameof(ApiSchemaContext)}.{nameof(ApiSchemaContext.ApiSchema)}"
+    ];
     #endregion
 
-    #region Test Classes
-    public class ApiSchemaJsonDeserializeTest : JsonDeserializeTest<ApiSchema>
-    {
-        public ApiSchemaJsonDeserializeTest()
-        {
-            this.ExcludeMembers = _excludeMembers;
-        }
-    }
-
-    public class ApiSchemaJsonRoundtripTest : JsonRoundtripTest<ApiSchema>
-    {
-        public ApiSchemaJsonRoundtripTest()
-        {
-            this.ExcludeMembers = _excludeMembers;
-        }
-    }
-
-    public class InitializeThrowsTest : JsonConverterTestBase<ApiSchema>
+    #region Test Types
+    private class InitializeThrowsTest : JsonConverterTestBase<ApiSchema>
     {
         #region User Supplied Properties
         public required string Source { get; init; }
@@ -104,10 +94,45 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         }
     }
 
-    public class TryGetByApiNameTest : XUnitTest
+    private class JsonDeserializeTest : JsonDeserializeTest<ApiSchema, ApiSchemaDescriptor>
+    {
+        #region Constructors
+        [SetsRequiredMembers]
+        public JsonDeserializeTest()
+        {
+            this.ExpectedFactoryExpression = (arg) => BuildTestApiSchema(arg);
+            this.ExcludeMembers = _excludeMembers;
+        }
+        #endregion
+    }
+
+    private class JsonRoundtripTest : JsonRoundtripTest<ApiSchema, ApiSchemaDescriptor>
+    {
+        #region Constructors
+        [SetsRequiredMembers]
+        public JsonRoundtripTest()
+        {
+            this.ExpectedFactoryExpression = (arg) => BuildTestApiSchema(arg);
+            this.ExcludeMembers = _excludeMembers;
+        }
+        #endregion
+    }
+
+    private class JsonSerializeTest : JsonSerializeTest<ApiSchema, ApiSchemaDescriptor>
+    {
+        #region Constructors
+        [SetsRequiredMembers]
+        public JsonSerializeTest()
+        {
+            this.SourceFactoryExpression = (arg) => BuildTestApiSchema(arg);
+        }
+        #endregion
+    }
+
+    private class TryGetByApiNameTest : XUnitTest
     {
         #region User Supplied Properties
-        public required ApiTestSchemaKind ApiSchemaKind { get; init; }
+        public required ApiSchemaKind ApiSchemaKind { get; init; }
         public required string SearchKey { get; init; }
         public required bool ExpectedResult { get; init; }
         #endregion
@@ -120,7 +145,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         #region XUnitTest Methods
         protected override void Arrange()
         {
-            var apiSchema = ApiTestSchemaFactory.BuildTestSchema(this.ApiSchemaKind);
+            var apiSchema = BuildTestApiSchema(this.ApiSchemaKind);
             this.ApiSchema = apiSchema ?? throw new InvalidOperationException($"{nameof(Schema.ApiSchema)} creation failed.");
 
             this.WriteLine($"ApiSchema:      {this.ApiSchema.ApiName.SafeToString()}");
@@ -145,10 +170,10 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         #endregion
     }
 
-    public class TryGetByClrTypeTest : XUnitTest
+    private class TryGetByClrTypeTest : XUnitTest
     {
         #region User Supplied Properties
-        public required ApiTestSchemaKind ApiSchemaKind { get; init; }
+        public required ApiSchemaKind ApiSchemaKind { get; init; }
         public required Type SearchKey { get; init; }
         public required bool ExpectedResult { get; init; }
         #endregion
@@ -161,7 +186,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         #region XUnitTest Methods
         protected override void Arrange()
         {
-            var apiSchema = ApiTestSchemaFactory.BuildTestSchema(this.ApiSchemaKind);
+            var apiSchema = BuildTestApiSchema(this.ApiSchemaKind);
             this.ApiSchema = apiSchema ?? throw new InvalidOperationException($"{nameof(Schema.ApiSchema)} creation failed.");
 
             this.WriteLine($"ApiSchema:      {this.ApiSchema.ApiName.SafeToString()}");
@@ -188,83 +213,6 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
     #endregion
 
     #region Theory Data
-    public static readonly ApiScalarType TestApiScalarTypeBoolean = new(apiName: nameof(Boolean), clrScalarType: typeof(bool));
-    public static readonly ApiScalarType TestApiScalarTypeInt32 = new(apiName: nameof(Int32), clrScalarType: typeof(int));
-    public static readonly ApiScalarType TestApiScalarTypeString = new(apiName: nameof(String), clrScalarType: typeof(string));
-    public static readonly ApiScalarType TestApiScalarTypeUInt32 = new(apiName: nameof(UInt32), clrScalarType: typeof(uint));
-
-    public static readonly ApiTypeExpression TestApiScalarTypeBooleanReference = new(kind: ApiTypeKind.Scalar, apiName: nameof(Boolean));
-    public static readonly ApiTypeExpression TestApiScalarTypeInt32Reference = new(kind: ApiTypeKind.Scalar, apiName: nameof(Int32));
-    public static readonly ApiTypeExpression TestApiScalarTypeStringReference = new(kind: ApiTypeKind.Scalar, apiName: nameof(String));
-    public static readonly ApiTypeExpression TestApiScalarTypeUInt32Reference = new(kind: ApiTypeKind.Scalar, apiName: nameof(UInt32));
-
-    public static readonly ApiEnumType TestApiEnumTypeGender = new
-    (
-        apiName: nameof(Gender),
-        apiEnumValues:
-        [
-            new ApiEnumValue(apiName: nameof(Gender.Unspecified), clrName: nameof(Gender.Unspecified), clrOrdinal: (int)Gender.Unspecified),
-            new ApiEnumValue(apiName: nameof(Gender.Male), clrName: nameof(Gender.Male), clrOrdinal: (int)Gender.Male),
-            new ApiEnumValue(apiName: nameof(Gender.Female), clrName: nameof(Gender.Female), clrOrdinal: (int)Gender.Female)
-        ],
-        clrEnumType: typeof(Gender)
-    );
-
-    public static readonly ApiTypeExpression TestApiEnumTypeGenderReference = new(kind: ApiTypeKind.Enum, apiName: nameof(Gender));
-
-    public static readonly ApiTypeExpression TestApiCollectionTypeListOfString = new
-    (
-        apiInlineType: new ApiCollectionType
-        (
-            apiItemTypeExpression: TestApiScalarTypeStringReference,
-            apiItemTypeModifiers: ApiTypeModifiers.None,
-            clrCollectionType: typeof(List<string>)
-        )
-    );
-
-    public static readonly ApiObjectType TestApiObjectTypePerson = new
-    (
-        apiName: nameof(Person),
-        apiProperties:
-        [
-            new ApiProperty(nameof(Person.Name), TestApiScalarTypeStringReference, ApiTypeModifiers.Required, nameof(Person.Name)),
-            new ApiProperty(nameof(Person.Age), TestApiScalarTypeInt32Reference, ApiTypeModifiers.None, nameof(Person.Age)),
-            new ApiProperty(nameof(Person.Gender), TestApiEnumTypeGenderReference, ApiTypeModifiers.None, nameof(Person.Gender)),
-            new ApiProperty(nameof(Person.Hobbies), new ApiTypeExpression(new ApiCollectionType(TestApiScalarTypeStringReference, ApiTypeModifiers.Required, typeof(List<string>))), ApiTypeModifiers.None, nameof(Person.Hobbies))
-        ],
-        apiRelationships: [],
-        apiIdentitySet: null,
-        apiOptions: null,
-        clrObjectType: typeof(Person)
-    );
-
-    public static readonly ApiTypeExpression TestApiObjectTypePersonReference = new(kind: ApiTypeKind.Object, apiName: nameof(Person));
-
-    public static readonly ApiObjectType TestApiObjectTypeCompany = new
-    (
-        apiName: nameof(Company),
-        apiProperties:
-        [
-            new ApiProperty(nameof(Company.Name), TestApiScalarTypeStringReference, ApiTypeModifiers.Required, nameof(Company.Name)),
-            new ApiProperty(nameof(Company.Owner), TestApiObjectTypePersonReference, ApiTypeModifiers.None, nameof(Company.Owner)),
-            new ApiProperty(nameof(Company.Employees), new ApiTypeExpression(new ApiCollectionType(TestApiObjectTypePersonReference, ApiTypeModifiers.Required, typeof(List<Person>))), ApiTypeModifiers.None, nameof(Company.Employees))
-        ],
-        apiRelationships:
-        [
-            new ApiRelationship(nameof(Company.Owner)),
-            new ApiRelationship(nameof(Company.Employees))
-        ],
-        apiIdentitySet: null,
-        apiOptions: null,
-        clrObjectType: typeof(Company)
-    );
-
-    public static readonly ApiTypeExpression TestApiObjectTypeCompanyReference = new(kind: ApiTypeKind.Object, apiName: nameof(Company));
-
-    public class TestUnknownType
-    {
-    }
-
     public static TheoryDataRow<IXUnitTest>[] InitializeThrowsTheoryData =>
     [
         // ApiEnumType throws if ApiName is invalid
@@ -273,7 +221,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             Name = $"{nameof(ApiEnumType)} Throws If {nameof(ApiEnumType.ApiName)} Is Invalid",
             Source = @"
             {
-                ""ApiName"": ""ApiSchema With 1 ApiEnumType"",
+                ""ApiName"": ""ApiEnumType Throws If ApiName Is Invalid"",
                 ""ApiScalarTypes"": [],
                 ""ApiEnumTypes"": [
                     {
@@ -321,7 +269,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             Name = $"{nameof(ApiEnumType)} Throws If {nameof(ApiEnumType.ClrType)} Is Null",
             Source = @"
             {
-                ""ApiName"": ""ApiSchema With 1 ApiEnumType"",
+                ""ApiName"": ""ApiEnumType Throws If ClrType Is Null"",
                 ""ApiScalarTypes"": [],
                 ""ApiEnumTypes"": [
                     {
@@ -368,7 +316,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             Name = $"{nameof(ApiEnumType)} Throws If {nameof(ApiEnumType.ClrType)} Is Not a CLR Enum",
             Source = @"
             {
-                ""ApiName"": ""ApiSchema With 1 ApiEnumType"",
+                ""ApiName"": ""ApiEnumType Throws If ClrType Is Not a CLR Enum"",
                 ""ApiScalarTypes"": [],
                 ""ApiEnumTypes"": [
                     {
@@ -416,7 +364,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             Name = $"{nameof(ApiEnumType)} Throws If {nameof(ApiEnumType.ApiEnumValues)} Is Null",
             Source = @"
             {
-                ""ApiName"": ""ApiSchema With 1 ApiEnumType"",
+                ""ApiName"": ""ApiEnumType Throws If ApiEnumValues Is Null"",
                 ""ApiScalarTypes"": [],
                 ""ApiEnumTypes"": [
                     {
@@ -447,7 +395,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             Name = $"{nameof(ApiEnumType)} Throws If {nameof(ApiEnumType.ApiEnumValues)} Is Empty",
             Source = @"
             {
-                ""ApiName"": ""ApiSchema With 1 ApiEnumType"",
+                ""ApiName"": ""ApiEnumType Throws If ApiEnumValues Is Empty"",
                 ""ApiScalarTypes"": [],
                 ""ApiEnumTypes"": [
                     {
@@ -479,7 +427,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             Name = $"{nameof(ApiEnumType)} Throws If {nameof(ApiEnumType.ApiEnumValues)} Has Duplicate {nameof(ApiEnumValue.ApiName)} Values",
             Source = @"
             {
-                ""ApiName"": ""ApiSchema With 1 ApiEnumType"",
+                ""ApiName"": ""ApiEnumType Throws If ApiEnumValues Has Duplicate ApiName Values"",
                 ""ApiScalarTypes"": [],
                 ""ApiEnumTypes"": [
                     {
@@ -527,7 +475,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             Name = $"{nameof(ApiEnumType)} Throws If {nameof(ApiEnumType.ApiEnumValues)} Has Duplicate {nameof(ApiEnumValue.ClrName)} Values",
             Source = @"
             {
-                ""ApiName"": ""ApiSchema With 1 ApiEnumType"",
+                ""ApiName"": ""ApiEnumType Throws If ApiEnumValues Has Duplicate ClrName Values"",
                 ""ApiScalarTypes"": [],
                 ""ApiEnumTypes"": [
                     {
@@ -575,7 +523,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             Name = $"{nameof(ApiEnumType)} Throws If {nameof(ApiEnumType.ApiEnumValues)} Has Duplicate {nameof(ApiEnumValue.ClrOrdinal)} Values",
             Source = @"
             {
-                ""ApiName"": ""ApiSchema With 1 ApiEnumType"",
+                ""ApiName"": ""ApiEnumType Throws If ApiEnumValues Has Duplicate ClrOrdinal Values"",
                 ""ApiScalarTypes"": [],
                 ""ApiEnumTypes"": [
                     {
@@ -626,34 +574,75 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
     public static TheoryDataRow<IXUnitTest>[] JsonDeserializeTheoryData =>
     [
         // Null
-        new ApiSchemaJsonDeserializeTest
+        new JsonDeserializeTest
         {
             Name = "Null",
-            Source = "null",
-            Expected = null
+            SourceJson = "null",
+            ExpectedFactoryArgument = null
         },
 
-        // ApiSchema With No ApiTypes
-        new ApiSchemaJsonDeserializeTest
+        // ApiSchema With 0 ApiType
+        new JsonDeserializeTest
         {
-            Name = $"{nameof(ApiSchema)} With No ApiTypes",
-            Source = @"
+            Name = $"{nameof(ApiSchema)} With 0 {nameof(ApiType)}",
+            SourceJson = @"
             {
-                ""ApiName"": ""ApiSchema With No ApiTypes"",
+                ""ApiName"": ""ApiSchema With 0 ApiType"",
+                ""ApiVersion"": ""0.1.0"",
+                ""ApiOptions"": {
+                    ""ApiIdentityNullHandling"": ""ReturnEmpty""
+                },
                 ""ApiScalarTypes"": [],
                 ""ApiEnumTypes"": [],
                 ""ApiObjectTypes"": []
             }",
-            Expected = ApiSchema.Create("ApiSchema With No ApiTypes", []),
+            ExpectedFactoryArgument = new ApiSchemaDescriptor
+            (
+                ApiSchema: new ApiSchemaConfig
+                (
+                    ApiName: $"{nameof(ApiSchema)} With 0 {nameof(ApiType)}"
+                )
+            )
+        },
+
+        new JsonDeserializeTest
+        {
+            Name = $"{nameof(ApiSchema)} With 0 {nameof(ApiType)} And {nameof(ApiSchemaOptions)}",
+            SourceJson = @"
+            {
+                ""ApiName"": ""ApiSchema With 0 ApiType And ApiSchemaOptions"",
+                ""ApiVersion"": ""0.1.0"",
+                ""ApiOptions"": {
+                    ""ApiIdentityNullHandling"": ""ThrowException""
+                },
+                ""ApiScalarTypes"": [],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": []
+            }",
+            ExpectedFactoryArgument = new ApiSchemaDescriptor
+            (
+                ApiSchema: new ApiSchemaConfig
+                (
+                    ApiName: $"{nameof(ApiSchema)} With 0 {nameof(ApiType)} And {nameof(ApiSchemaOptions)}",
+                    ApiOptions: new ApiSchemaOptionsConfig
+                    (
+                        ApiIdentityNullHandling: ApiIdentityNullHandling.ThrowException
+                    )
+                )
+            )
         },
 
         // ApiSchema With 1 ApiScalarType
-        new ApiSchemaJsonDeserializeTest
+        new JsonDeserializeTest
         {
-            Name = $"{nameof(ApiSchema)} With 1 ApiScalarType",
-            Source = @"
+            Name = $"{nameof(ApiSchema)} With 1 {nameof(ApiScalarType)}",
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiSchema With 1 ApiScalarType"",
+                ""ApiVersion"": ""0.1.0"",
+                ""ApiOptions"": {
+                    ""ApiIdentityNullHandling"": ""ReturnEmpty""
+                },
                 ""ApiScalarTypes"": [
                     {
                         ""Kind"": ""Scalar"",
@@ -664,16 +653,90 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 ""ApiEnumTypes"": [],
                 ""ApiObjectTypes"": []
             }",
-            Expected = ApiSchema.Create("ApiSchema With 1 ApiScalarType", [TestApiScalarTypeBoolean]),
+            ExpectedFactoryArgument = new ApiSchemaDescriptor
+            (
+                ApiSchema: new ApiSchemaConfig
+                (
+                    ApiName: $"{nameof(ApiSchema)} With 1 {nameof(ApiScalarType)}"
+                ),
+                ApiNamedTypes:
+                [
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(bool)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Boolean)
+                        )
+                    )
+                ]
+            )
         },
 
-        // ApiSchema With 1 ApiScalarType And Extension 1
-        new ApiSchemaJsonDeserializeTest
+        // ApiSchema With 1 ApiScalarType And ApiSchemaOptions
+        new JsonDeserializeTest
         {
-            Name = $"{nameof(ApiSchema)} With 1 ApiScalarType And Extension 1",
-            Source = @"
+            Name = $"{nameof(ApiSchema)} With 1 {nameof(ApiScalarType)} And {nameof(ApiSchemaOptions)}",
+            SourceJson = @"
             {
-                ""ApiName"": ""ApiSchema With 1 ApiScalarType And Extension 1"",
+                ""ApiName"": ""ApiSchema With 1 ApiScalarType And ApiSchemaOptions"",
+                ""ApiVersion"": ""0.1.0"",
+                ""ApiOptions"": {
+                    ""ApiIdentityNullHandling"": ""ThrowException""
+                },
+                ""ApiScalarTypes"": [
+                    {
+                        ""Kind"": ""Scalar"",
+                        ""ApiName"": ""Boolean"",
+                        ""ClrType"": ""System.Boolean, System.Private.CoreLib""
+                    }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": []
+            }",
+            ExpectedFactoryArgument = new ApiSchemaDescriptor
+            (
+                ApiSchema: new ApiSchemaConfig
+                (
+                    ApiName: $"{nameof(ApiSchema)} With 1 {nameof(ApiScalarType)} And {nameof(ApiSchemaOptions)}",
+                    ApiOptions: new ApiSchemaOptionsConfig
+                    (
+                        ApiIdentityNullHandling: ApiIdentityNullHandling.ThrowException
+                    )
+                ),
+                ApiNamedTypes:
+                [
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(bool)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Boolean)
+                        )
+                    )
+                ]
+            )
+        },
+
+        // ApiSchema With 1 ApiScalarType And GraphQlExtension
+        new JsonDeserializeTest
+        {
+            Name = $"{nameof(ApiSchema)} With 1 {nameof(ApiScalarType)} And {nameof(GraphQlExtension)}",
+            SourceJson = @"
+            {
+                ""ApiName"": ""ApiSchema With 1 ApiScalarType And GraphQlExtension"",
+                ""ApiVersion"": ""0.1.0"",
+                ""ApiOptions"": {
+                    ""ApiIdentityNullHandling"": ""ReturnEmpty""
+                },
                 ""ApiScalarTypes"": [
                     {
                         ""Kind"": ""Scalar"",
@@ -684,22 +747,47 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 ""ApiEnumTypes"": [],
                 ""ApiObjectTypes"": [],
                 ""Extensions"": {
-                    ""Evoogle.ApiFramework.Schema.TestData.TestExtension1, Evoogle.ApiFramework.Core.Tests"": {
-                        ""Description"": ""TestExtension1""
+                    ""Evoogle.ApiFramework.Schema.TestData.GraphQlExtension, Evoogle.ApiFramework.Core.Tests"": {
+                        ""Count"": 42
                     }
                 }
             }",
-            Expected = ApiSchema.Create("ApiSchema With 1 ApiScalarType And Extension 1", [TestApiScalarTypeBoolean]),
-            ExtensionType1 = typeof(TestExtension1)
+            ExpectedFactoryArgument = new ApiSchemaDescriptor
+            (
+                ApiSchema: new ApiSchemaConfig
+                (
+                    ApiName: $"{nameof(ApiSchema)} With 1 {nameof(ApiScalarType)} And {nameof(GraphQlExtension)}",
+                    ExtensionTypes: [ typeof(GraphQlExtension) ]
+                ),
+                ApiNamedTypes:
+                [
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(bool)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Boolean)
+                        )
+                    )
+                ]
+            )
         },
 
-        // ApiSchema With 2 ApiScalarTypes
-        new ApiSchemaJsonDeserializeTest
+        // ApiSchema With 2 ApiScalarType
+        new JsonDeserializeTest
         {
-            Name = $"{nameof(ApiSchema)} With 2 ApiScalarTypes",
-            Source = @"
+            Name = $"{nameof(ApiSchema)} With 2 {nameof(ApiScalarType)}",
+            SourceJson = @"
             {
-                ""ApiName"": ""ApiSchema With 2 ApiScalarTypes"",
+                ""ApiName"": ""ApiSchema With 2 ApiScalarType"",
+                ""ApiVersion"": ""0.1.0"",
+                ""ApiOptions"": {
+                    ""ApiIdentityNullHandling"": ""ReturnEmpty""
+                },
                 ""ApiScalarTypes"": [
                     {
                         ""Kind"": ""Scalar"",
@@ -715,16 +803,53 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 ""ApiEnumTypes"": [],
                 ""ApiObjectTypes"": []
             }",
-            Expected = ApiSchema.Create("ApiSchema With 2 ApiScalarTypes", [TestApiScalarTypeBoolean, TestApiScalarTypeInt32]),
+            ExpectedFactoryArgument = new ApiSchemaDescriptor
+            (
+                ApiSchema: new ApiSchemaConfig
+                (
+                    ApiName: $"{nameof(ApiSchema)} With 2 {nameof(ApiScalarType)}"
+                ),
+                ApiNamedTypes:
+                [
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(bool)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Boolean)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(int)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Int32)
+                        )
+                    ),
+                ]
+            )
         },
 
-        // ApiSchema With 3 ApiScalarTypes
-        new ApiSchemaJsonDeserializeTest
+        // ApiSchema With 3 ApiScalarType
+        new JsonDeserializeTest
         {
-            Name = $"{nameof(ApiSchema)} With 3 ApiScalarTypes",
-            Source = @"
+            Name = $"{nameof(ApiSchema)} With 3 {nameof(ApiScalarType)}",
+            SourceJson = @"
             {
-                ""ApiName"": ""ApiSchema With 3 ApiScalarTypes"",
+                ""ApiName"": ""ApiSchema With 3 ApiScalarType"",
+                ""ApiVersion"": ""0.1.0"",
+                ""ApiOptions"": {
+                    ""ApiIdentityNullHandling"": ""ReturnEmpty""
+                },
                 ""ApiScalarTypes"": [
                     {
                         ""Kind"": ""Scalar"",
@@ -745,16 +870,65 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 ""ApiEnumTypes"": [],
                 ""ApiObjectTypes"": []
             }",
-            Expected = ApiSchema.Create("ApiSchema With 3 ApiScalarTypes", [TestApiScalarTypeBoolean, TestApiScalarTypeInt32, TestApiScalarTypeString]),
+            ExpectedFactoryArgument = new ApiSchemaDescriptor
+            (
+                ApiSchema: new ApiSchemaConfig
+                (
+                    ApiName: $"{nameof(ApiSchema)} With 3 {nameof(ApiScalarType)}"
+                ),
+                ApiNamedTypes:
+                [
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(bool)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Boolean)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(int)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Int32)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(string)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(String)
+                        )
+                    ),
+                ]
+            )
         },
 
-        // ApiSchema With 3 ApiScalarTypes And Extension 1 And Extension 2
-        new ApiSchemaJsonDeserializeTest
+        // ApiSchema With 3 ApiScalarType And GraphQlExtension And JsonApiExtension
+        new JsonDeserializeTest
         {
-            Name = $"{nameof(ApiSchema)} With 3 ApiScalarTypes And Extension 1 And Extension 2",
-            Source = @"
+            Name = $"{nameof(ApiSchema)} With 3 {nameof(ApiScalarType)} And {nameof(GraphQlExtension)} And {nameof(JsonApiExtension)}",
+            SourceJson = @"
             {
-                ""ApiName"": ""ApiSchema With 3 ApiScalarTypes And Extension 1 And Extension 2"",
+                ""ApiName"": ""ApiSchema With 3 ApiScalarType And GraphQlExtension And JsonApiExtension"",
+                ""ApiVersion"": ""0.1.0"",
+                ""ApiOptions"": {
+                    ""ApiIdentityNullHandling"": ""ReturnEmpty""
+                },
                 ""ApiScalarTypes"": [
                     {
                         ""Kind"": ""Scalar"",
@@ -775,27 +949,74 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 ""ApiEnumTypes"": [],
                 ""ApiObjectTypes"": [],
                 ""Extensions"": {
-                    ""Evoogle.ApiFramework.Schema.TestData.TestExtension1, Evoogle.ApiFramework.Core.Tests"": {
-                        ""Description"": ""TestExtension1""
+                    ""Evoogle.ApiFramework.Schema.TestData.GraphQlExtension, Evoogle.ApiFramework.Core.Tests"": {
+                        ""Count"": 42
                     },
-                    ""Evoogle.ApiFramework.Schema.TestData.TestExtension2, Evoogle.ApiFramework.Core.Tests"": {
-                        ""Id"": ""2"",
-                        ""Name"": ""TestExtension2""
+                    ""Evoogle.ApiFramework.Schema.TestData.JsonApiExtension, Evoogle.ApiFramework.Core.Tests"": {
+                        ""Website"": ""http://jsonapi.org""
                     }
                 }
             }",
-            Expected = ApiSchema.Create("ApiSchema With 3 ApiScalarTypes And Extension 1 And Extension 2", [TestApiScalarTypeBoolean, TestApiScalarTypeInt32, TestApiScalarTypeString]),
-            ExtensionType1 = typeof(TestExtension1),
-            ExtensionType2 = typeof(TestExtension2),
+            ExpectedFactoryArgument = new ApiSchemaDescriptor
+            (
+                ApiSchema: new ApiSchemaConfig
+                (
+                    ApiName: $"{nameof(ApiSchema)} With 3 {nameof(ApiScalarType)} And {nameof(GraphQlExtension)} And {nameof(JsonApiExtension)}",
+                    ExtensionTypes: [ typeof(GraphQlExtension), typeof(JsonApiExtension) ]
+                ),
+                ApiNamedTypes:
+                [
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(bool)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Boolean)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(int)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Int32)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(string)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(String)
+                        )
+                    ),
+                ]
+            )
         },
 
         // ApiSchema With 1 ApiEnumType
-        new ApiSchemaJsonDeserializeTest
+        new JsonDeserializeTest
         {
-            Name = $"{nameof(ApiSchema)} With 1 ApiEnumType",
-            Source = @"
+            Name = $"{nameof(ApiSchema)} With 1 {nameof(ApiEnumType)}",
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiSchema With 1 ApiEnumType"",
+                ""ApiVersion"": ""0.1.0"",
+                ""ApiOptions"": {
+                    ""ApiIdentityNullHandling"": ""ReturnEmpty""
+                },
                 ""ApiScalarTypes"": [],
                 ""ApiEnumTypes"": [
                     {
@@ -823,16 +1044,41 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 ],
                 ""ApiObjectTypes"": []
             }",
-            Expected = ApiSchema.Create("ApiSchema With 1 ApiEnumType", [TestApiEnumTypeGender]),
+            ExpectedFactoryArgument = new ApiSchemaDescriptor
+            (
+                ApiSchema: new ApiSchemaConfig
+                (
+                    ApiName: $"{nameof(ApiSchema)} With 1 {nameof(ApiEnumType)}"
+                ),
+                ApiNamedTypes:
+                [
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Enum,
+                            ClrType: typeof(Gender)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Gender)
+                        )
+                    )
+                ]
+            )
         },
 
-        // ApiSchema With 1 ApiEnumType And Extension 1
-        new ApiSchemaJsonDeserializeTest
+        // ApiSchema With 1 ApiEnumType And ProtobufExtension
+        new JsonDeserializeTest
         {
-            Name = $"{nameof(ApiSchema)} With 1 ApiEnumType And Extension 1",
-            Source = @"
+            Name = $"{nameof(ApiSchema)} With 1 {nameof(ApiEnumType)} And {nameof(ProtobufExtension)}",
+            SourceJson = @"
             {
-                ""ApiName"": ""ApiSchema With 1 ApiEnumType And Extension 1"",
+                ""ApiName"": ""ApiSchema With 1 ApiEnumType And ProtobufExtension"",
+                ""ApiVersion"": ""0.1.0"",
+                ""ApiOptions"": {
+                    ""ApiIdentityNullHandling"": ""ReturnEmpty""
+                },
                 ""ApiScalarTypes"": [],
                 ""ApiEnumTypes"": [
                     {
@@ -860,22 +1106,47 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 ],
                 ""ApiObjectTypes"": [],
                 ""Extensions"": {
-                    ""Evoogle.ApiFramework.Schema.TestData.TestExtension1, Evoogle.ApiFramework.Core.Tests"": {
-                        ""Description"": ""TestExtension1""
+                    ""Evoogle.ApiFramework.Schema.TestData.ProtobufExtension, Evoogle.ApiFramework.Core.Tests"": {
+                        ""Edition"": 2024
                     }
                 }
             }",
-            Expected = ApiSchema.Create("ApiSchema With 1 ApiEnumType And Extension 1", [TestApiEnumTypeGender]),
-            ExtensionType1 = typeof(TestExtension1),
+            ExpectedFactoryArgument = new ApiSchemaDescriptor
+            (
+                ApiSchema: new ApiSchemaConfig
+                (
+                    ApiName: $"{nameof(ApiSchema)} With 1 {nameof(ApiEnumType)} And {nameof(ProtobufExtension)}",
+                    ExtensionTypes: [ typeof(ProtobufExtension) ]
+                ),
+                ApiNamedTypes:
+                [
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Enum,
+                            ClrType: typeof(Gender)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Gender)
+                        )
+                    )
+                ]
+            )
         },
 
-        // ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)
-        new ApiSchemaJsonDeserializeTest
+        // ApiSchema With 3 ApiScalarType And 1 ApiEnumType And 1 ApiObjectType (Person)
+        new JsonDeserializeTest
         {
-            Name = $"{nameof(ApiSchema)} With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)",
-            Source = @"
+            Name = $"{nameof(ApiSchema)} With 3 {nameof(ApiScalarType)} And 1 {nameof(ApiEnumType)} And 1 {nameof(ApiObjectType)} (Person)",
+            SourceJson = @"
             {
-                ""ApiName"": ""ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)"",
+                ""ApiName"": ""ApiSchema With 3 ApiScalarType And 1 ApiEnumType And 1 ApiObjectType (Person)"",
+                ""ApiVersion"": ""0.1.0"",
+                ""ApiOptions"": {
+                    ""ApiIdentityNullHandling"": ""ReturnEmpty""
+                },
                 ""ApiScalarTypes"": [
                     {
                         ""Kind"": ""Scalar"",
@@ -922,7 +1193,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                         ""Kind"": ""Object"",
                         ""ApiName"": ""Person"",
                         ""ApiProperties"": [
-                             {
+                            {
                                 ""ApiName"": ""Name"",
                                 ""ApiType"": {
                                     ""Kind"": ""Scalar"",
@@ -971,26 +1242,131 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     }
                 ]
             }",
-            Expected = ApiSchema.Create
+            ExpectedFactoryArgument = new ApiSchemaDescriptor
             (
-                "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)",
+                ApiSchema: new ApiSchemaConfig
+                (
+                    ApiName: $"{nameof(ApiSchema)} With 3 {nameof(ApiScalarType)} And 1 {nameof(ApiEnumType)} And 1 {nameof(ApiObjectType)} (Person)"
+                ),
+                ApiNamedTypes:
                 [
-                    TestApiScalarTypeBoolean,
-                    TestApiScalarTypeInt32,
-                    TestApiScalarTypeString,
-                    TestApiEnumTypeGender,
-                    TestApiObjectTypePerson
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(bool)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Boolean)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(int)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Int32)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(string)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(String)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Enum,
+                            ClrType: typeof(Gender)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Gender)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Object,
+                            ClrType: typeof(Person)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Person)
+                        ),
+                        ApiObjectType: new ApiObjectTypeConfig
+                        (
+                            ApiProperties:
+                            [
+                                new ApiPropertyConfig
+                                (
+                                    ApiName: nameof(Person.Name),
+                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                    ApiTypeModifiers: ApiTypeModifiers.Required,
+                                    ClrName: nameof(Person.Name)
+                                ),
+                                new ApiPropertyConfig
+                                (
+                                    ApiName: nameof(Person.Age),
+                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                    ApiTypeModifiers: ApiTypeModifiers.None,
+                                    ClrName: nameof(Person.Age)
+                                ),
+                                new ApiPropertyConfig
+                                (
+                                    ApiName: nameof(Person.Gender),
+                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Enum, apiName: nameof(Gender)),
+                                    ApiTypeModifiers: ApiTypeModifiers.None,
+                                    ClrName: nameof(Person.Gender)
+                                ),
+                                new ApiPropertyConfig
+                                (
+                                    ApiName: nameof(Person.Hobbies),
+                                    ApiTypeExpression: new ApiTypeExpression
+                                    (
+                                        apiInlineType: new ApiCollectionType
+                                        (
+                                            apiItemTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                            apiItemTypeModifiers: ApiTypeModifiers.Required,
+                                            clrCollectionType: typeof(List<string>)
+                                        )
+                                    ),
+                                    ApiTypeModifiers: ApiTypeModifiers.None,
+                                    ClrName: nameof(Person.Hobbies)
+                                ),
+                            ]
+                        )
+                    ),
                 ]
-            ),
+            )
         },
 
-        // ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType And Extension 1 And Extension 2
-        new ApiSchemaJsonDeserializeTest
+        // ApiSchema With 3 ApiScalarType And 1 ApiEnumType And 1 ApiObjectType (Person) And GraphQlExtension And JsonApiExtension
+        new JsonDeserializeTest
         {
-            Name = $"{nameof(ApiSchema)} With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person) And Extension 1 And Extension 2",
-            Source = @"
+            Name = $"{nameof(ApiSchema)} With 3 {nameof(ApiScalarType)} And 1 {nameof(ApiEnumType)} And 1 {nameof(ApiObjectType)} (Person) And {nameof(GraphQlExtension)} And {nameof(JsonApiExtension)}",
+            SourceJson = @"
             {
-                ""ApiName"": ""ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person) And Extension 1 And Extension 2"",
+                ""ApiName"": ""ApiSchema With 3 ApiScalarType And 1 ApiEnumType And 1 ApiObjectType (Person) And GraphQlExtension And JsonApiExtension"",
+                ""ApiVersion"": ""0.1.0"",
+                ""ApiOptions"": {
+                    ""ApiIdentityNullHandling"": ""ReturnEmpty""
+                },
                 ""ApiScalarTypes"": [
                     {
                         ""Kind"": ""Scalar"",
@@ -1086,37 +1462,140 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     }
                 ],
                 ""Extensions"": {
-                    ""Evoogle.ApiFramework.Schema.TestData.TestExtension1, Evoogle.ApiFramework.Core.Tests"": {
-                        ""Description"": ""TestExtension1""
+                    ""Evoogle.ApiFramework.Schema.TestData.GraphQlExtension, Evoogle.ApiFramework.Core.Tests"": {
+                        ""Count"": 42
                     },
-                    ""Evoogle.ApiFramework.Schema.TestData.TestExtension2, Evoogle.ApiFramework.Core.Tests"": {
-                        ""Id"": ""2"",
-                        ""Name"": ""TestExtension2""
+                    ""Evoogle.ApiFramework.Schema.TestData.JsonApiExtension, Evoogle.ApiFramework.Core.Tests"": {
+                        ""Website"": ""http://jsonapi.org""
                     }
                 }
             }",
-            Expected = ApiSchema.Create
+            ExpectedFactoryArgument = new ApiSchemaDescriptor
             (
-                "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person) And Extension 1 And Extension 2",
+                ApiSchema: new ApiSchemaConfig
+                (
+                    ApiName: $"{nameof(ApiSchema)} With 3 {nameof(ApiScalarType)} And 1 {nameof(ApiEnumType)} And 1 {nameof(ApiObjectType)} (Person) And {nameof(GraphQlExtension)} And {nameof(JsonApiExtension)}",
+                    ExtensionTypes: [ typeof(GraphQlExtension), typeof(JsonApiExtension) ]
+                ),
+                ApiNamedTypes:
                 [
-                    TestApiScalarTypeBoolean,
-                    TestApiScalarTypeInt32,
-                    TestApiScalarTypeString,
-                    TestApiEnumTypeGender,
-                    TestApiObjectTypePerson
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(bool)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Boolean)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(int)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Int32)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(string)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(String)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Enum,
+                            ClrType: typeof(Gender)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Gender)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Object,
+                            ClrType: typeof(Person)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Person)
+                        ),
+                        ApiObjectType: new ApiObjectTypeConfig
+                        (
+                            ApiProperties:
+                            [
+                                new ApiPropertyConfig
+                                (
+                                    ApiName: nameof(Person.Name),
+                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                    ApiTypeModifiers: ApiTypeModifiers.Required,
+                                    ClrName: nameof(Person.Name)
+                                ),
+                                new ApiPropertyConfig
+                                (
+                                    ApiName: nameof(Person.Age),
+                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                    ApiTypeModifiers: ApiTypeModifiers.None,
+                                    ClrName: nameof(Person.Age)
+                                ),
+                                new ApiPropertyConfig
+                                (
+                                    ApiName: nameof(Person.Gender),
+                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Enum, apiName: nameof(Gender)),
+                                    ApiTypeModifiers: ApiTypeModifiers.None,
+                                    ClrName: nameof(Person.Gender)
+                                ),
+                                new ApiPropertyConfig
+                                (
+                                    ApiName: nameof(Person.Hobbies),
+                                    ApiTypeExpression: new ApiTypeExpression
+                                    (
+                                        apiInlineType: new ApiCollectionType
+                                        (
+                                            apiItemTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                            apiItemTypeModifiers: ApiTypeModifiers.Required,
+                                            clrCollectionType: typeof(List<string>)
+                                        )
+                                    ),
+                                    ApiTypeModifiers: ApiTypeModifiers.None,
+                                    ClrName: nameof(Person.Hobbies)
+                                ),
+                            ]
+                        )
+                    ),
                 ]
-            ),
-            ExtensionType1 = typeof(TestExtension1),
-            ExtensionType2 = typeof(TestExtension2),
+            )
         },
 
-        // ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 2 ApiObjectTypes (Person and Company)
-        new ApiSchemaJsonDeserializeTest
+        // ApiSchema With 3 ApiScalarTypes And 1 ApiEnumType And 2 ApiObjectTypes (Company And Person)
+        new JsonDeserializeTest
         {
-            Name = $"{nameof(ApiSchema)} With 3 ApiScalarTypes and 1 ApiEnumType and 2 ApiObjectTypes (Person and Company)",
-            Source = @"
+            Name = $"{nameof(ApiSchema)} With 3 {nameof(ApiScalarType)} And 1 {nameof(ApiEnumType)} And 2 {nameof(ApiObjectType)} (Company And Person)",
+            SourceJson = @"
             {
-                ""ApiName"": ""ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 2 ApiObjectTypes (Person and Company)"",
+                ""ApiName"": ""ApiSchema With 3 ApiScalarType And 1 ApiEnumType And 2 ApiObjectType (Company And Person)"",
+                ""ApiVersion"": ""0.1.0"",
+                ""ApiOptions"": {
+                    ""ApiIdentityNullHandling"": ""ReturnEmpty""
+                },
                 ""ApiScalarTypes"": [
                     {
                         ""Kind"": ""Scalar"",
@@ -1191,7 +1670,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                                             ""ApiName"": ""Person""
                                         },
                                         ""ApiItemTypeModifiers"": ""Required"",
-                                        ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.Schema.TestData.Person, Evoogle.ApiFramework.Core.Tests]], System.Private.CoreLib""
+                                        ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.Schema.TestData.Person,Evoogle.ApiFramework.Core.Tests]], System.Private.CoreLib""
                                     }
                                 },
                                 ""ApiTypeModifiers"": ""None"",
@@ -1200,10 +1679,12 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                         ],
                         ""ApiRelationships"": [
                             {
-                                ""ApiName"": ""Owner""
+                                ""ApiName"": ""Company_Owner"",
+                                ""ApiPropertyName"": ""Owner""
                             },
                             {
-                                ""ApiName"": ""Employees""
+                                ""ApiName"": ""Company_Employees"",
+                                ""ApiPropertyName"": ""Employees""
                             }
                         ],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Company, Evoogle.ApiFramework.Core.Tests""
@@ -1261,16 +1742,168 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     }
                 ]
             }",
-            Expected = ApiSchema.Create
+            ExpectedFactoryArgument = new ApiSchemaDescriptor
             (
-                "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 2 ApiObjectTypes (Person and Company)",
+                ApiSchema: new ApiSchemaConfig
+                (
+                    ApiName: $"{nameof(ApiSchema)} With 3 {nameof(ApiScalarType)} And 1 {nameof(ApiEnumType)} And 2 {nameof(ApiObjectType)} (Company And Person)"
+                ),
+                ApiNamedTypes:
                 [
-                    TestApiScalarTypeBoolean,
-                    TestApiScalarTypeInt32,
-                    TestApiScalarTypeString,
-                    TestApiEnumTypeGender,
-                    TestApiObjectTypeCompany,
-                    TestApiObjectTypePerson
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(bool)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Boolean)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(int)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Int32)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(string)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(String)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Enum,
+                            ClrType: typeof(Gender)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Gender)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Object,
+                            ClrType: typeof(Company)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Company)
+                        ),
+                        ApiObjectType: new ApiObjectTypeConfig
+                        (
+                            ApiProperties:
+                            [
+                                new ApiPropertyConfig
+                                (
+                                    ApiName: nameof(Company.Name),
+                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                    ApiTypeModifiers: ApiTypeModifiers.Required,
+                                    ClrName: nameof(Company.Name)
+                                ),
+                                new ApiPropertyConfig
+                                (
+                                    ApiName: nameof(Company.Owner),
+                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Object, apiName: nameof(Person)),
+                                    ApiTypeModifiers: ApiTypeModifiers.None,
+                                    ClrName: nameof(Company.Owner)
+                                ),
+                                new ApiPropertyConfig
+                                (
+                                    ApiName: nameof(Company.Employees),
+                                    ApiTypeExpression: new ApiTypeExpression
+                                    (
+                                        apiInlineType: new ApiCollectionType
+                                        (
+                                            apiItemTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Object, apiName: nameof(Person)),
+                                            apiItemTypeModifiers: ApiTypeModifiers.Required,
+                                            clrCollectionType: typeof(List<Person>)
+                                        )
+                                    ),
+                                    ApiTypeModifiers: ApiTypeModifiers.None,
+                                    ClrName: nameof(Company.Employees)
+                                ),
+                            ],
+                            ApiRelationships:
+                            [
+                                new ApiRelationshipConfig(ApiName: "Company_Owner", ApiPropertyName: nameof(Company.Owner)),
+                                new ApiRelationshipConfig(ApiName: "Company_Employees", ApiPropertyName: nameof(Company.Employees))
+                            ]
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Object,
+                            ClrType: typeof(Person)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Person)
+                        ),
+                        ApiObjectType: new ApiObjectTypeConfig
+                        (
+                            ApiProperties:
+                            [
+                                new ApiPropertyConfig
+                                (
+                                    ApiName: nameof(Person.Name),
+                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                    ApiTypeModifiers: ApiTypeModifiers.Required,
+                                    ClrName: nameof(Person.Name)
+                                ),
+                                new ApiPropertyConfig
+                                (
+                                    ApiName: nameof(Person.Age),
+                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                    ApiTypeModifiers: ApiTypeModifiers.None,
+                                    ClrName: nameof(Person.Age)
+                                ),
+                                new ApiPropertyConfig
+                                (
+                                    ApiName: nameof(Person.Gender),
+                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Enum, apiName: nameof(Gender)),
+                                    ApiTypeModifiers: ApiTypeModifiers.None,
+                                    ClrName: nameof(Person.Gender)
+                                ),
+                                new ApiPropertyConfig
+                                (
+                                    ApiName: nameof(Person.Hobbies),
+                                    ApiTypeExpression: new ApiTypeExpression
+                                    (
+                                        apiInlineType: new ApiCollectionType
+                                        (
+                                            apiItemTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                            apiItemTypeModifiers: ApiTypeModifiers.Required,
+                                            clrCollectionType: typeof(List<string>)
+                                        )
+                                    ),
+                                    ApiTypeModifiers: ApiTypeModifiers.None,
+                                    ClrName: nameof(Person.Hobbies)
+                                ),
+                            ]
+                        )
+                    ),
                 ]
             )
         },
@@ -1279,147 +1912,795 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
     public static TheoryDataRow<IXUnitTest>[] JsonRoundtripTheoryData =>
     [
         // Null
-        new ApiSchemaJsonRoundtripTest
+        new JsonRoundtripTest
         {
             Name = "Null",
-            Expected = null
+            ExpectedFactoryArgument = null
         },
 
-        // ApiSchema With No ApiTypes
-        new ApiSchemaJsonRoundtripTest
+        // ApiSchema With 0 ApiType
+        new JsonRoundtripTest
         {
-            Name = $"{nameof(ApiSchema)} With No ApiTypes",
-            Expected = ApiSchema.Create("ApiSchema With No ApiTypes", []),
+            Name = $"{nameof(ApiSchema)} With 0 {nameof(ApiType)}",
+            ExpectedFactoryArgument = new ApiSchemaDescriptor
+            (
+                ApiSchema: new ApiSchemaConfig
+                (
+                    ApiName: $"{nameof(ApiSchema)} With 0 {nameof(ApiType)}"
+                )
+            )
+        },
+
+        new JsonRoundtripTest
+        {
+            Name = $"{nameof(ApiSchema)} With 0 {nameof(ApiType)} And {nameof(ApiSchemaOptions)}",
+            ExpectedFactoryArgument = new ApiSchemaDescriptor
+            (
+                ApiSchema: new ApiSchemaConfig
+                (
+                    ApiName: $"{nameof(ApiSchema)} With 0 {nameof(ApiType)} And {nameof(ApiSchemaOptions)}",
+                    ApiOptions: new ApiSchemaOptionsConfig
+                    (
+                        ApiIdentityNullHandling: ApiIdentityNullHandling.ThrowException
+                    )
+                )
+            )
         },
 
         // ApiSchema With 1 ApiScalarType
-        new ApiSchemaJsonRoundtripTest
+        new JsonRoundtripTest
         {
-            Name = $"{nameof(ApiSchema)} With 1 ApiScalarType",
-            Expected = ApiSchema.Create("ApiSchema With 1 ApiScalarType", [TestApiScalarTypeBoolean]),
+            Name = $"{nameof(ApiSchema)} With 1 {nameof(ApiScalarType)}",
+            ExpectedFactoryArgument = new ApiSchemaDescriptor
+            (
+                ApiSchema: new ApiSchemaConfig
+                (
+                    ApiName: $"{nameof(ApiSchema)} With 1 {nameof(ApiScalarType)}"
+                ),
+                ApiNamedTypes:
+                [
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(bool)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Boolean)
+                        )
+                    )
+                ]
+            )
         },
 
-        // ApiSchema With 1 ApiScalarType And Extension 1
-        new ApiSchemaJsonRoundtripTest
+        // ApiSchema With 1 ApiScalarType And ApiSchemaOptions
+        new JsonRoundtripTest
         {
-            Name = $"{nameof(ApiSchema)} With 1 ApiScalarType And Extension 1",
-            Expected = ApiSchema.Create("ApiSchema With 1 ApiScalarType And Extension 1", [TestApiScalarTypeBoolean]),
-            ExtensionType1 = typeof(TestExtension1)
+            Name = $"{nameof(ApiSchema)} With 1 {nameof(ApiScalarType)} And {nameof(ApiSchemaOptions)}",
+            ExpectedFactoryArgument = new ApiSchemaDescriptor
+            (
+                ApiSchema: new ApiSchemaConfig
+                (
+                    ApiName: $"{nameof(ApiSchema)} With 1 {nameof(ApiScalarType)} And {nameof(ApiSchemaOptions)}",
+                    ApiOptions: new ApiSchemaOptionsConfig
+                    (
+                        ApiIdentityNullHandling: ApiIdentityNullHandling.ThrowException
+                    )
+                ),
+                ApiNamedTypes:
+                [
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(bool)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Boolean)
+                        )
+                    )
+                ]
+            )
         },
 
-        // ApiSchema With 2 ApiScalarTypes
-        new ApiSchemaJsonRoundtripTest
+        // ApiSchema With 1 ApiScalarType And GraphQlExtension
+        new JsonRoundtripTest
         {
-            Name = $"{nameof(ApiSchema)} With 2 ApiScalarTypes",
-            Expected = ApiSchema.Create("ApiSchema With 2 ApiScalarTypes", [TestApiScalarTypeBoolean, TestApiScalarTypeInt32]),
+            Name = $"{nameof(ApiSchema)} With 1 {nameof(ApiScalarType)} And {nameof(GraphQlExtension)}",
+            ExpectedFactoryArgument = new ApiSchemaDescriptor
+            (
+                ApiSchema: new ApiSchemaConfig
+                (
+                    ApiName: $"{nameof(ApiSchema)} With 1 {nameof(ApiScalarType)} And {nameof(GraphQlExtension)}",
+                    ExtensionTypes: [ typeof(GraphQlExtension) ]
+                ),
+                ApiNamedTypes:
+                [
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(bool)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Boolean)
+                        )
+                    )
+                ]
+            )
         },
 
-        // ApiSchema With 3 ApiScalarTypes
-        new ApiSchemaJsonRoundtripTest
+        // ApiSchema With 2 ApiScalarType
+        new JsonRoundtripTest
         {
-            Name = $"{nameof(ApiSchema)} With 3 ApiScalarTypes",
-            Expected = ApiSchema.Create("ApiSchema With 3 ApiScalarTypes", [TestApiScalarTypeBoolean, TestApiScalarTypeInt32, TestApiScalarTypeString]),
+            Name = $"{nameof(ApiSchema)} With 2 {nameof(ApiScalarType)}",
+            ExpectedFactoryArgument = new ApiSchemaDescriptor
+            (
+                ApiSchema: new ApiSchemaConfig
+                (
+                    ApiName: $"{nameof(ApiSchema)} With 2 {nameof(ApiScalarType)}"
+                ),
+                ApiNamedTypes:
+                [
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(bool)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Boolean)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(int)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Int32)
+                        )
+                    ),
+                ]
+            )
         },
 
-        // ApiSchema With 3 ApiScalarTypes And Extension 1 And Extension 2
-        new ApiSchemaJsonRoundtripTest
+        // ApiSchema With 3 ApiScalarType
+        new JsonRoundtripTest
         {
-            Name = $"{nameof(ApiSchema)} With 3 ApiScalarTypes And Extension 1 And Extension 2",
-            Expected = ApiSchema.Create("ApiSchema With 3 ApiScalarTypes And Extension 1 And Extension 2", [TestApiScalarTypeBoolean, TestApiScalarTypeInt32, TestApiScalarTypeString]),
-            ExtensionType1 = typeof(TestExtension1),
-            ExtensionType2 = typeof(TestExtension2),
+            Name = $"{nameof(ApiSchema)} With 3 {nameof(ApiScalarType)}",
+            ExpectedFactoryArgument = new ApiSchemaDescriptor
+            (
+                ApiSchema: new ApiSchemaConfig
+                (
+                    ApiName: $"{nameof(ApiSchema)} With 3 {nameof(ApiScalarType)}"
+                ),
+                ApiNamedTypes:
+                [
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(bool)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Boolean)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(int)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Int32)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(string)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(String)
+                        )
+                    ),
+                ]
+            )
+        },
+
+        // ApiSchema With 3 ApiScalarType And GraphQlExtension And JsonApiExtension
+        new JsonRoundtripTest
+        {
+            Name = $"{nameof(ApiSchema)} With 3 {nameof(ApiScalarType)} And {nameof(GraphQlExtension)} And {nameof(JsonApiExtension)}",
+            ExpectedFactoryArgument = new ApiSchemaDescriptor
+            (
+                ApiSchema: new ApiSchemaConfig
+                (
+                    ApiName: $"{nameof(ApiSchema)} With 3 {nameof(ApiScalarType)} And {nameof(GraphQlExtension)} And {nameof(JsonApiExtension)}",
+                    ExtensionTypes: [ typeof(GraphQlExtension), typeof(JsonApiExtension) ]
+                ),
+                ApiNamedTypes:
+                [
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(bool)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Boolean)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(int)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Int32)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(string)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(String)
+                        )
+                    ),
+                ]
+            )
         },
 
         // ApiSchema With 1 ApiEnumType
-        new ApiSchemaJsonRoundtripTest
+        new JsonRoundtripTest
         {
-            Name = $"{nameof(ApiSchema)} With 1 ApiEnumType",
-            Expected = ApiSchema.Create("ApiSchema With 1 ApiEnumType", [TestApiEnumTypeGender]),
-        },
-
-        // ApiSchema With 1 ApiEnumType And Extension 1
-        new ApiSchemaJsonRoundtripTest
-        {
-            Name = $"{nameof(ApiSchema)} With 1 ApiEnumType And Extension 1",
-            Expected = ApiSchema.Create("ApiSchema With 1 ApiEnumType And Extension 1", [TestApiEnumTypeGender]),
-            ExtensionType1 = typeof(TestExtension1),
-        },
-
-        // ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)
-        new ApiSchemaJsonRoundtripTest
-        {
-            Name = $"{nameof(ApiSchema)} With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)",
-            Expected = ApiSchema.Create
+            Name = $"{nameof(ApiSchema)} With 1 {nameof(ApiEnumType)}",
+            ExpectedFactoryArgument = new ApiSchemaDescriptor
             (
-                "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)",
+                ApiSchema: new ApiSchemaConfig
+                (
+                    ApiName: $"{nameof(ApiSchema)} With 1 {nameof(ApiEnumType)}"
+                ),
+                ApiNamedTypes:
                 [
-                    TestApiScalarTypeBoolean,
-                    TestApiScalarTypeInt32,
-                    TestApiScalarTypeString,
-                    TestApiEnumTypeGender,
-                    TestApiObjectTypePerson
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Enum,
+                            ClrType: typeof(Gender)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Gender)
+                        )
+                    )
                 ]
-            ),
+            )
         },
 
-        // ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person) And Extension 1 And Extension 2
-        new ApiSchemaJsonRoundtripTest
+        // ApiSchema With 1 ApiEnumType And ProtobufExtension
+        new JsonRoundtripTest
         {
-            Name = $"{nameof(ApiSchema)} With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person) And Extension 1 And Extension 2",
-            Expected = ApiSchema.Create
+            Name = $"{nameof(ApiSchema)} With 1 {nameof(ApiEnumType)} And {nameof(ProtobufExtension)}",
+            ExpectedFactoryArgument = new ApiSchemaDescriptor
             (
-                "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person) And Extension 1 And Extension 2",
+                ApiSchema: new ApiSchemaConfig
+                (
+                    ApiName: $"{nameof(ApiSchema)} With 1 {nameof(ApiEnumType)} And {nameof(ProtobufExtension)}",
+                    ExtensionTypes: [ typeof(ProtobufExtension) ]
+                ),
+                ApiNamedTypes:
                 [
-                    TestApiScalarTypeBoolean,
-                    TestApiScalarTypeInt32,
-                    TestApiScalarTypeString,
-                    TestApiEnumTypeGender,
-                    TestApiObjectTypePerson
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Enum,
+                            ClrType: typeof(Gender)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Gender)
+                        )
+                    )
                 ]
-            ),
-            ExtensionType1 = typeof(TestExtension1),
-            ExtensionType2 = typeof(TestExtension2),
+            )
         },
 
-        // ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 2 ApiObjectTypes (Person and Company) And Extension 1 And Extension 2
-        new ApiSchemaJsonRoundtripTest
+        // ApiSchema With 3 ApiScalarType And 1 ApiEnumType And 1 ApiObjectType (Person)
+        new JsonRoundtripTest
         {
-            Name = $"{nameof(ApiSchema)} With 3 ApiScalarTypes and 1 ApiEnumType and 2 ApiObjectTypes (Person and Company) And Extension 1 And Extension 2",
-            Expected = ApiSchema.Create
+            Name = $"{nameof(ApiSchema)} With 3 {nameof(ApiScalarType)} And 1 {nameof(ApiEnumType)} And 1 {nameof(ApiObjectType)} (Person)",
+            ExpectedFactoryArgument = new ApiSchemaDescriptor
             (
-                "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 2 ApiObjectTypes (Person and Company) And Extension 1 And Extension 2",
+                ApiSchema: new ApiSchemaConfig
+                (
+                    ApiName: $"{nameof(ApiSchema)} With 3 {nameof(ApiScalarType)} And 1 {nameof(ApiEnumType)} And 1 {nameof(ApiObjectType)} (Person)"
+                ),
+                ApiNamedTypes:
                 [
-                    TestApiScalarTypeBoolean,
-                    TestApiScalarTypeInt32,
-                    TestApiScalarTypeString,
-                    TestApiEnumTypeGender,
-                    TestApiObjectTypePerson,
-                    TestApiObjectTypeCompany
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(bool)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Boolean)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(int)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Int32)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(string)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(String)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Enum,
+                            ClrType: typeof(Gender)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Gender)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Object,
+                            ClrType: typeof(Person)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Person)
+                        ),
+                        ApiObjectType: new ApiObjectTypeConfig
+                        (
+                            ApiProperties:
+                            [
+                                new ApiPropertyConfig
+                                (
+                                    ApiName: nameof(Person.Name),
+                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                    ApiTypeModifiers: ApiTypeModifiers.Required,
+                                    ClrName: nameof(Person.Name)
+                                ),
+                                new ApiPropertyConfig
+                                (
+                                    ApiName: nameof(Person.Age),
+                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                    ApiTypeModifiers: ApiTypeModifiers.None,
+                                    ClrName: nameof(Person.Age)
+                                ),
+                                new ApiPropertyConfig
+                                (
+                                    ApiName: nameof(Person.Gender),
+                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Enum, apiName: nameof(Gender)),
+                                    ApiTypeModifiers: ApiTypeModifiers.None,
+                                    ClrName: nameof(Person.Gender)
+                                ),
+                                new ApiPropertyConfig
+                                (
+                                    ApiName: nameof(Person.Hobbies),
+                                    ApiTypeExpression: new ApiTypeExpression
+                                    (
+                                        apiInlineType: new ApiCollectionType
+                                        (
+                                            apiItemTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                            apiItemTypeModifiers: ApiTypeModifiers.Required,
+                                            clrCollectionType: typeof(List<string>)
+                                        )
+                                    ),
+                                    ApiTypeModifiers: ApiTypeModifiers.None,
+                                    ClrName: nameof(Person.Hobbies)
+                                ),
+                            ]
+                        )
+                    ),
                 ]
-            ),
-            ExtensionType1 = typeof(TestExtension1),
-            ExtensionType2 = typeof(TestExtension2),
+            )
+        },
+
+        // ApiSchema With 3 ApiScalarType And 1 ApiEnumType And 1 ApiObjectType (Person) And GraphQlExtension And JsonApiExtension
+        new JsonRoundtripTest
+        {
+            Name = $"{nameof(ApiSchema)} With 3 {nameof(ApiScalarType)} And 1 {nameof(ApiEnumType)} And 1 {nameof(ApiObjectType)} (Person) And {nameof(GraphQlExtension)} And {nameof(JsonApiExtension)}",
+            ExpectedFactoryArgument = new ApiSchemaDescriptor
+            (
+                ApiSchema: new ApiSchemaConfig
+                (
+                    ApiName: $"{nameof(ApiSchema)} With 3 {nameof(ApiScalarType)} And 1 {nameof(ApiEnumType)} And 1 {nameof(ApiObjectType)} (Person) And {nameof(GraphQlExtension)} And {nameof(JsonApiExtension)}",
+                    ExtensionTypes: [ typeof(GraphQlExtension), typeof(JsonApiExtension) ]
+                ),
+                ApiNamedTypes:
+                [
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(bool)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Boolean)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(int)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Int32)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(string)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(String)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Enum,
+                            ClrType: typeof(Gender)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Gender)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Object,
+                            ClrType: typeof(Person)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Person)
+                        ),
+                        ApiObjectType: new ApiObjectTypeConfig
+                        (
+                            ApiProperties:
+                            [
+                                new ApiPropertyConfig
+                                (
+                                    ApiName: nameof(Person.Name),
+                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                    ApiTypeModifiers: ApiTypeModifiers.Required,
+                                    ClrName: nameof(Person.Name)
+                                ),
+                                new ApiPropertyConfig
+                                (
+                                    ApiName: nameof(Person.Age),
+                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                    ApiTypeModifiers: ApiTypeModifiers.None,
+                                    ClrName: nameof(Person.Age)
+                                ),
+                                new ApiPropertyConfig
+                                (
+                                    ApiName: nameof(Person.Gender),
+                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Enum, apiName: nameof(Gender)),
+                                    ApiTypeModifiers: ApiTypeModifiers.None,
+                                    ClrName: nameof(Person.Gender)
+                                ),
+                                new ApiPropertyConfig
+                                (
+                                    ApiName: nameof(Person.Hobbies),
+                                    ApiTypeExpression: new ApiTypeExpression
+                                    (
+                                        apiInlineType: new ApiCollectionType
+                                        (
+                                            apiItemTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                            apiItemTypeModifiers: ApiTypeModifiers.Required,
+                                            clrCollectionType: typeof(List<string>)
+                                        )
+                                    ),
+                                    ApiTypeModifiers: ApiTypeModifiers.None,
+                                    ClrName: nameof(Person.Hobbies)
+                                ),
+                            ]
+                        )
+                    ),
+                ]
+            )
+        },
+
+        // ApiSchema With 3 ApiScalarTypes And 1 ApiEnumType And 2 ApiObjectTypes (Company And Person)
+        new JsonRoundtripTest
+        {
+            Name = $"{nameof(ApiSchema)} With 3 {nameof(ApiScalarType)} And 1 {nameof(ApiEnumType)} And 2 {nameof(ApiObjectType)} (Company And Person)",
+            ExpectedFactoryArgument = new ApiSchemaDescriptor
+            (
+                ApiSchema: new ApiSchemaConfig
+                (
+                    ApiName: $"{nameof(ApiSchema)} With 3 {nameof(ApiScalarType)} And 1 {nameof(ApiEnumType)} And 2 {nameof(ApiObjectType)} (Company And Person)"
+                ),
+                ApiNamedTypes:
+                [
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(bool)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Boolean)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(int)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Int32)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(string)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(String)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Enum,
+                            ClrType: typeof(Gender)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Gender)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Object,
+                            ClrType: typeof(Company)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Company)
+                        ),
+                        ApiObjectType: new ApiObjectTypeConfig
+                        (
+                            ApiProperties:
+                            [
+                                new ApiPropertyConfig
+                                (
+                                    ApiName: nameof(Company.Name),
+                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                    ApiTypeModifiers: ApiTypeModifiers.Required,
+                                    ClrName: nameof(Company.Name)
+                                ),
+                                new ApiPropertyConfig
+                                (
+                                    ApiName: nameof(Company.Owner),
+                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Object, apiName: nameof(Person)),
+                                    ApiTypeModifiers: ApiTypeModifiers.None,
+                                    ClrName: nameof(Company.Owner)
+                                ),
+                                new ApiPropertyConfig
+                                (
+                                    ApiName: nameof(Company.Employees),
+                                    ApiTypeExpression: new ApiTypeExpression
+                                    (
+                                        apiInlineType: new ApiCollectionType
+                                        (
+                                            apiItemTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Object, apiName: nameof(Person)),
+                                            apiItemTypeModifiers: ApiTypeModifiers.Required,
+                                            clrCollectionType: typeof(List<Person>)
+                                        )
+                                    ),
+                                    ApiTypeModifiers: ApiTypeModifiers.None,
+                                    ClrName: nameof(Company.Employees)
+                                ),
+                            ],
+                            ApiRelationships:
+                            [
+                                new ApiRelationshipConfig(ApiName: "Company_Owner", ApiPropertyName: nameof(Company.Owner)),
+                                new ApiRelationshipConfig(ApiName: "Company_Employees", ApiPropertyName: nameof(Company.Employees))
+                            ]
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Object,
+                            ClrType: typeof(Person)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Person)
+                        ),
+                        ApiObjectType: new ApiObjectTypeConfig
+                        (
+                            ApiProperties:
+                            [
+                                new ApiPropertyConfig
+                                (
+                                    ApiName: nameof(Person.Name),
+                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                    ApiTypeModifiers: ApiTypeModifiers.Required,
+                                    ClrName: nameof(Person.Name)
+                                ),
+                                new ApiPropertyConfig
+                                (
+                                    ApiName: nameof(Person.Age),
+                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                    ApiTypeModifiers: ApiTypeModifiers.None,
+                                    ClrName: nameof(Person.Age)
+                                ),
+                                new ApiPropertyConfig
+                                (
+                                    ApiName: nameof(Person.Gender),
+                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Enum, apiName: nameof(Gender)),
+                                    ApiTypeModifiers: ApiTypeModifiers.None,
+                                    ClrName: nameof(Person.Gender)
+                                ),
+                                new ApiPropertyConfig
+                                (
+                                    ApiName: nameof(Person.Hobbies),
+                                    ApiTypeExpression: new ApiTypeExpression
+                                    (
+                                        apiInlineType: new ApiCollectionType
+                                        (
+                                            apiItemTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                            apiItemTypeModifiers: ApiTypeModifiers.Required,
+                                            clrCollectionType: typeof(List<string>)
+                                        )
+                                    ),
+                                    ApiTypeModifiers: ApiTypeModifiers.None,
+                                    ClrName: nameof(Person.Hobbies)
+                                ),
+                            ]
+                        )
+                    ),
+                ]
+            )
         },
     ];
 
     public static TheoryDataRow<IXUnitTest>[] JsonSerializeTheoryData =>
     [
         // Null
-        new JsonSerializeTest<ApiSchema>
+        new JsonSerializeTest
         {
             Name = "Null",
-            Source = null,
-            Expected = "null"
+            SourceFactoryArgument = null,
+            ExpectedJson = "null"
         },
 
-        // ApiSchema With No ApiTypes
-        new JsonSerializeTest<ApiSchema>
+        // ApiSchema With 0 ApiType
+        new JsonSerializeTest
         {
-            Name = $"{nameof(ApiSchema)} With No ApiTypes",
-            Source = ApiSchema.Create("ApiSchema With No ApiTypes", []),
-            Expected = @"
+            Name = $"{nameof(ApiSchema)} With 0 {nameof(ApiType)}",
+            SourceFactoryArgument = new ApiSchemaDescriptor
+            (
+                ApiSchema: new ApiSchemaConfig
+                (
+                    ApiName: $"{nameof(ApiSchema)} With 0 {nameof(ApiType)}"
+                )
+            ),
+            ExpectedJson = @"
             {
-                ""ApiName"": ""ApiSchema With No ApiTypes"",
+                ""ApiName"": ""ApiSchema With 0 ApiType"",
+                ""ApiVersion"": ""0.1.0"",
+                ""ApiOptions"": {
+                    ""ApiIdentityNullHandling"": ""ReturnEmpty""
+                },
+                ""ApiScalarTypes"": [],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": []
+            }"
+        },
+
+        new JsonSerializeTest
+        {
+            Name = $"{nameof(ApiSchema)} With 0 {nameof(ApiType)} And {nameof(ApiSchemaOptions)}",
+            SourceFactoryArgument = new ApiSchemaDescriptor
+            (
+                ApiSchema: new ApiSchemaConfig
+                (
+                    ApiName: $"{nameof(ApiSchema)} With 0 {nameof(ApiType)} And {nameof(ApiSchemaOptions)}",
+                    ApiOptions: new ApiSchemaOptionsConfig
+                    (
+                        ApiIdentityNullHandling: ApiIdentityNullHandling.ThrowException
+                    )
+                )
+            ),
+            ExpectedJson = @"
+            {
+                ""ApiName"": ""ApiSchema With 0 ApiType And ApiSchemaOptions"",
+                ""ApiVersion"": ""0.1.0"",
+                ""ApiOptions"": {
+                    ""ApiIdentityNullHandling"": ""ThrowException""
+                },
                 ""ApiScalarTypes"": [],
                 ""ApiEnumTypes"": [],
                 ""ApiObjectTypes"": []
@@ -1427,13 +2708,38 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         },
 
         // ApiSchema With 1 ApiScalarType
-        new JsonSerializeTest<ApiSchema>
+        new JsonSerializeTest
         {
-            Name = $"{nameof(ApiSchema)} With 1 ApiScalarType",
-            Source = ApiSchema.Create("ApiSchema With 1 ApiScalarType", [TestApiScalarTypeBoolean]),
-            Expected = @"
+            Name = $"{nameof(ApiSchema)} With 1 {nameof(ApiScalarType)}",
+            SourceFactoryArgument = new ApiSchemaDescriptor
+            (
+                ApiSchema: new ApiSchemaConfig
+                (
+                    ApiName: $"{nameof(ApiSchema)} With 1 {nameof(ApiScalarType)}"
+                ),
+                ApiNamedTypes:
+                [
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(bool)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Boolean)
+                        )
+                    )
+                ]
+            ),
+            ExpectedJson = @"
             {
                 ""ApiName"": ""ApiSchema With 1 ApiScalarType"",
+                ""ApiVersion"": ""0.1.0"",
+                ""ApiOptions"": {
+                    ""ApiIdentityNullHandling"": ""ReturnEmpty""
+                },
                 ""ApiScalarTypes"": [
                     {
                         ""Kind"": ""Scalar"",
@@ -1446,14 +2752,89 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             }"
         },
 
-        // ApiSchema With 1 ApiScalarType And Extension 1
-        new JsonSerializeTest<ApiSchema>
+        // ApiSchema With 1 ApiScalarType And ApiSchemaOptions
+        new JsonSerializeTest
         {
-            Name = $"{nameof(ApiSchema)} With 1 ApiScalarType And Extension 1",
-            Source = ApiSchema.Create("ApiSchema With 1 ApiScalarType And Extension 1", [TestApiScalarTypeBoolean]),
-            Expected = @"
+            Name = $"{nameof(ApiSchema)} With 1 {nameof(ApiScalarType)} And {nameof(ApiSchemaOptions)}",
+            SourceFactoryArgument = new ApiSchemaDescriptor
+            (
+                ApiSchema: new ApiSchemaConfig
+                (
+                    ApiName: $"{nameof(ApiSchema)} With 1 {nameof(ApiScalarType)} And {nameof(ApiSchemaOptions)}",
+                    ApiOptions: new ApiSchemaOptionsConfig
+                    (
+                        ApiIdentityNullHandling: ApiIdentityNullHandling.ThrowException
+                    )
+                ),
+                ApiNamedTypes:
+                [
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(bool)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Boolean)
+                        )
+                    )
+                ]
+            ),
+            ExpectedJson = @"
             {
-                ""ApiName"": ""ApiSchema With 1 ApiScalarType And Extension 1"",
+                ""ApiName"": ""ApiSchema With 1 ApiScalarType And ApiSchemaOptions"",
+                ""ApiVersion"": ""0.1.0"",
+                ""ApiOptions"": {
+                    ""ApiIdentityNullHandling"": ""ThrowException""
+                },
+                ""ApiScalarTypes"": [
+                    {
+                        ""Kind"": ""Scalar"",
+                        ""ApiName"": ""Boolean"",
+                        ""ClrType"": ""System.Boolean, System.Private.CoreLib""
+                    }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": []
+            }"
+        },
+
+        // ApiSchema With 1 ApiScalarType And GraphQlExtension
+        new JsonSerializeTest
+        {
+            Name = $"{nameof(ApiSchema)} With 1 {nameof(ApiScalarType)} And {nameof(GraphQlExtension)}",
+            SourceFactoryArgument = new ApiSchemaDescriptor
+            (
+                ApiSchema: new ApiSchemaConfig
+                (
+                    ApiName: $"{nameof(ApiSchema)} With 1 {nameof(ApiScalarType)} And {nameof(GraphQlExtension)}",
+                    ExtensionTypes: [ typeof(GraphQlExtension) ]
+                ),
+                ApiNamedTypes:
+                [
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(bool)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Boolean)
+                        )
+                    )
+                ]
+            ),
+            ExpectedJson = @"
+            {
+                ""ApiName"": ""ApiSchema With 1 ApiScalarType And GraphQlExtension"",
+                ""ApiVersion"": ""0.1.0"",
+                ""ApiOptions"": {
+                    ""ApiIdentityNullHandling"": ""ReturnEmpty""
+                },
                 ""ApiScalarTypes"": [
                     {
                         ""Kind"": ""Scalar"",
@@ -1464,22 +2845,58 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 ""ApiEnumTypes"": [],
                 ""ApiObjectTypes"": [],
                 ""Extensions"": {
-                    ""Evoogle.ApiFramework.Schema.TestData.TestExtension1, Evoogle.ApiFramework.Core.Tests"": {
-                        ""Description"": ""TestExtension1""
+                    ""Evoogle.ApiFramework.Schema.TestData.GraphQlExtension, Evoogle.ApiFramework.Core.Tests"": {
+                        ""Count"": 42
                     }
                 }
-            }",
-            ExtensionType1 = typeof(TestExtension1)
+            }"
         },
 
-        // ApiSchema With 2 ApiScalarTypes
-        new JsonSerializeTest<ApiSchema>
+        // ApiSchema With 2 ApiScalarType
+        new JsonSerializeTest
         {
-            Name = $"{nameof(ApiSchema)} With 2 ApiScalarTypes",
-            Source = ApiSchema.Create("ApiSchema With 2 ApiScalarTypes", [TestApiScalarTypeBoolean, TestApiScalarTypeInt32]),
-            Expected = @"
+            Name = $"{nameof(ApiSchema)} With 2 {nameof(ApiScalarType)}",
+            SourceFactoryArgument = new ApiSchemaDescriptor
+            (
+                ApiSchema: new ApiSchemaConfig
+                (
+                    ApiName: $"{nameof(ApiSchema)} With 2 {nameof(ApiScalarType)}"
+                ),
+                ApiNamedTypes:
+                [
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(bool)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Boolean)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(int)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Int32)
+                        )
+                    ),
+                ]
+            ),
+            ExpectedJson = @"
             {
-                ""ApiName"": ""ApiSchema With 2 ApiScalarTypes"",
+                ""ApiName"": ""ApiSchema With 2 ApiScalarType"",
+                ""ApiVersion"": ""0.1.0"",
+                ""ApiOptions"": {
+                    ""ApiIdentityNullHandling"": ""ReturnEmpty""
+                },
                 ""ApiScalarTypes"": [
                     {
                         ""Kind"": ""Scalar"",
@@ -1497,14 +2914,63 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             }"
         },
 
-        // ApiSchema With 3 ApiScalarTypes
-        new JsonSerializeTest<ApiSchema>
+        // ApiSchema With 3 ApiScalarType
+        new JsonSerializeTest
         {
-            Name = $"{nameof(ApiSchema)} With 3 ApiScalarTypes",
-            Source = ApiSchema.Create("ApiSchema With 3 ApiScalarTypes", [TestApiScalarTypeBoolean, TestApiScalarTypeInt32, TestApiScalarTypeString]),
-            Expected = @"
+            Name = $"{nameof(ApiSchema)} With 3 {nameof(ApiScalarType)}",
+            SourceFactoryArgument = new ApiSchemaDescriptor
+            (
+                ApiSchema: new ApiSchemaConfig
+                (
+                    ApiName: $"{nameof(ApiSchema)} With 3 {nameof(ApiScalarType)}"
+                ),
+                ApiNamedTypes:
+                [
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(bool)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Boolean)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(int)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Int32)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(string)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(String)
+                        )
+                    ),
+                ]
+            ),
+            ExpectedJson = @"
             {
-                ""ApiName"": ""ApiSchema With 3 ApiScalarTypes"",
+                ""ApiName"": ""ApiSchema With 3 ApiScalarType"",
+                ""ApiVersion"": ""0.1.0"",
+                ""ApiOptions"": {
+                    ""ApiIdentityNullHandling"": ""ReturnEmpty""
+                },
                 ""ApiScalarTypes"": [
                     {
                         ""Kind"": ""Scalar"",
@@ -1527,14 +2993,64 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             }"
         },
 
-        // ApiSchema With 3 ApiScalarTypes And Extension 1 And Extension 2
-        new JsonSerializeTest<ApiSchema>
+        // ApiSchema With 3 ApiScalarType And GraphQlExtension And JsonApiExtension
+        new JsonSerializeTest
         {
-            Name = $"{nameof(ApiSchema)} With 3 ApiScalarTypes And Extension 1 And Extension 2",
-            Source = ApiSchema.Create("ApiSchema With 3 ApiScalarTypes And Extension 1 And Extension 2", [TestApiScalarTypeBoolean, TestApiScalarTypeInt32, TestApiScalarTypeString]),
-            Expected = @"
+            Name = $"{nameof(ApiSchema)} With 3 {nameof(ApiScalarType)} And {nameof(GraphQlExtension)} And {nameof(JsonApiExtension)}",
+            SourceFactoryArgument = new ApiSchemaDescriptor
+            (
+                ApiSchema: new ApiSchemaConfig
+                (
+                    ApiName: $"{nameof(ApiSchema)} With 3 {nameof(ApiScalarType)} And {nameof(GraphQlExtension)} And {nameof(JsonApiExtension)}",
+                    ExtensionTypes: [ typeof(GraphQlExtension), typeof(JsonApiExtension) ]
+                ),
+                ApiNamedTypes:
+                [
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(bool)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Boolean)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(int)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Int32)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(string)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(String)
+                        )
+                    ),
+                ]
+            ),
+            ExpectedJson = @"
             {
-                ""ApiName"": ""ApiSchema With 3 ApiScalarTypes And Extension 1 And Extension 2"",
+                ""ApiName"": ""ApiSchema With 3 ApiScalarType And GraphQlExtension And JsonApiExtension"",
+                ""ApiVersion"": ""0.1.0"",
+                ""ApiOptions"": {
+                    ""ApiIdentityNullHandling"": ""ReturnEmpty""
+                },
                 ""ApiScalarTypes"": [
                     {
                         ""Kind"": ""Scalar"",
@@ -1555,27 +3071,49 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 ""ApiEnumTypes"": [],
                 ""ApiObjectTypes"": [],
                 ""Extensions"": {
-                    ""Evoogle.ApiFramework.Schema.TestData.TestExtension1, Evoogle.ApiFramework.Core.Tests"": {
-                        ""Description"": ""TestExtension1""
+                    ""Evoogle.ApiFramework.Schema.TestData.GraphQlExtension, Evoogle.ApiFramework.Core.Tests"": {
+                        ""Count"": 42
                     },
-                    ""Evoogle.ApiFramework.Schema.TestData.TestExtension2, Evoogle.ApiFramework.Core.Tests"": {
-                        ""Id"": ""2"",
-                        ""Name"": ""TestExtension2""
+                    ""Evoogle.ApiFramework.Schema.TestData.JsonApiExtension, Evoogle.ApiFramework.Core.Tests"": {
+                        ""Website"": ""http://jsonapi.org""
                     }
                 }
-            }",
-            ExtensionType1 = typeof(TestExtension1),
-            ExtensionType2 = typeof(TestExtension2)
+            }"
         },
 
         // ApiSchema With 1 ApiEnumType
-        new JsonSerializeTest<ApiSchema>
+        new JsonSerializeTest
         {
-            Name = $"{nameof(ApiSchema)} With 1 ApiEnumType",
-            Source = ApiSchema.Create("ApiSchema With 1 ApiEnumType", [TestApiEnumTypeGender]),
-            Expected = @"
+            Name = $"{nameof(ApiSchema)} With 1 {nameof(ApiEnumType)}",
+            SourceFactoryArgument = new ApiSchemaDescriptor
+            (
+                ApiSchema: new ApiSchemaConfig
+                (
+                    ApiName: $"{nameof(ApiSchema)} With 1 {nameof(ApiEnumType)}"
+                ),
+                ApiNamedTypes:
+                [
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Enum,
+                            ClrType: typeof(Gender)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Gender)
+                        )
+                    )
+                ]
+            ),
+            ExpectedJson = @"
             {
                 ""ApiName"": ""ApiSchema With 1 ApiEnumType"",
+                ""ApiVersion"": ""0.1.0"",
+                ""ApiOptions"": {
+                    ""ApiIdentityNullHandling"": ""ReturnEmpty""
+                },
                 ""ApiScalarTypes"": [],
                 ""ApiEnumTypes"": [
                     {
@@ -1605,14 +3143,40 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             }"
         },
 
-        // ApiSchema With 1 ApiEnumType And Extension 1
-        new JsonSerializeTest<ApiSchema>
+        // ApiSchema With 1 ApiEnumType And ProtobufExtension
+        new JsonSerializeTest
         {
-            Name = $"{nameof(ApiSchema)} With 1 ApiEnumType And Extension 1",
-            Source = ApiSchema.Create("ApiSchema With 1 ApiEnumType And Extension 1", [TestApiEnumTypeGender]),
-            Expected = @"
+            Name = $"{nameof(ApiSchema)} With 1 {nameof(ApiEnumType)} And {nameof(ProtobufExtension)}",
+            SourceFactoryArgument = new ApiSchemaDescriptor
+            (
+                ApiSchema: new ApiSchemaConfig
+                (
+                    ApiName: $"{nameof(ApiSchema)} With 1 {nameof(ApiEnumType)} And {nameof(ProtobufExtension)}",
+                    ExtensionTypes: [ typeof(ProtobufExtension) ]
+                ),
+                ApiNamedTypes:
+                [
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Enum,
+                            ClrType: typeof(Gender)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Gender)
+                        )
+                    )
+                ]
+            ),
+            ExpectedJson = @"
             {
-                ""ApiName"": ""ApiSchema With 1 ApiEnumType And Extension 1"",
+                ""ApiName"": ""ApiSchema With 1 ApiEnumType And ProtobufExtension"",
+                ""ApiVersion"": ""0.1.0"",
+                ""ApiOptions"": {
+                    ""ApiIdentityNullHandling"": ""ReturnEmpty""
+                },
                 ""ApiScalarTypes"": [],
                 ""ApiEnumTypes"": [
                     {
@@ -1640,33 +3204,136 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 ],
                 ""ApiObjectTypes"": [],
                 ""Extensions"": {
-                    ""Evoogle.ApiFramework.Schema.TestData.TestExtension1, Evoogle.ApiFramework.Core.Tests"": {
-                        ""Description"": ""TestExtension1""
+                    ""Evoogle.ApiFramework.Schema.TestData.ProtobufExtension, Evoogle.ApiFramework.Core.Tests"": {
+                        ""Edition"": 2024
                     }
                 }
-            }",
-            ExtensionType1 = typeof(TestExtension1)
+            }"
         },
 
-        // ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)
-        new JsonSerializeTest<ApiSchema>
+        // ApiSchema With 3 ApiScalarType And 1 ApiEnumType And 1 ApiObjectType (Person)
+        new JsonSerializeTest
         {
-            Name = $"{nameof(ApiSchema)} With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)",
-            Source = ApiSchema.Create
+            Name = $"{nameof(ApiSchema)} With 3 {nameof(ApiScalarType)} And 1 {nameof(ApiEnumType)} And 1 {nameof(ApiObjectType)} (Person)",
+            SourceFactoryArgument = new ApiSchemaDescriptor
             (
-
-                "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)",
+                ApiSchema: new ApiSchemaConfig
+                (
+                    ApiName: $"{nameof(ApiSchema)} With 3 {nameof(ApiScalarType)} And 1 {nameof(ApiEnumType)} And 1 {nameof(ApiObjectType)} (Person)"
+                ),
+                ApiNamedTypes:
                 [
-                    TestApiScalarTypeBoolean,
-                    TestApiScalarTypeInt32,
-                    TestApiScalarTypeString,
-                    TestApiEnumTypeGender,
-                    TestApiObjectTypePerson
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(bool)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Boolean)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(int)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Int32)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(string)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(String)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Enum,
+                            ClrType: typeof(Gender)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Gender)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Object,
+                            ClrType: typeof(Person)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Person)
+                        ),
+                        ApiObjectType: new ApiObjectTypeConfig
+                        (
+                            ApiProperties:
+                            [
+                                new ApiPropertyConfig
+                                (
+                                    ApiName: nameof(Person.Name),
+                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                    ApiTypeModifiers: ApiTypeModifiers.Required,
+                                    ClrName: nameof(Person.Name)
+                                ),
+                                new ApiPropertyConfig
+                                (
+                                    ApiName: nameof(Person.Age),
+                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                    ApiTypeModifiers: ApiTypeModifiers.None,
+                                    ClrName: nameof(Person.Age)
+                                ),
+                                new ApiPropertyConfig
+                                (
+                                    ApiName: nameof(Person.Gender),
+                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Enum, apiName: nameof(Gender)),
+                                    ApiTypeModifiers: ApiTypeModifiers.None,
+                                    ClrName: nameof(Person.Gender)
+                                ),
+                                new ApiPropertyConfig
+                                (
+                                    ApiName: nameof(Person.Hobbies),
+                                    ApiTypeExpression: new ApiTypeExpression
+                                    (
+                                        apiInlineType: new ApiCollectionType
+                                        (
+                                            apiItemTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                            apiItemTypeModifiers: ApiTypeModifiers.Required,
+                                            clrCollectionType: typeof(List<string>)
+                                        )
+                                    ),
+                                    ApiTypeModifiers: ApiTypeModifiers.None,
+                                    ClrName: nameof(Person.Hobbies)
+                                ),
+                            ]
+                        )
+                    ),
                 ]
             ),
-            Expected = @"
+            ExpectedJson = @"
             {
-                ""ApiName"": ""ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person)"",
+                ""ApiName"": ""ApiSchema With 3 ApiScalarType And 1 ApiEnumType And 1 ApiObjectType (Person)"",
+                ""ApiVersion"": ""0.1.0"",
+                ""ApiOptions"": {
+                    ""ApiIdentityNullHandling"": ""ReturnEmpty""
+                },
                 ""ApiScalarTypes"": [
                     {
                         ""Kind"": ""Scalar"",
@@ -1764,24 +3431,130 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
             }"
         },
 
-        // ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person) And Extension 1 And Extension 2
-        new JsonSerializeTest<ApiSchema>
+        // ApiSchema With 3 ApiScalarType And 1 ApiEnumType And 1 ApiObjectType (Person) And GraphQlExtension And JsonApiExtension
+        new JsonSerializeTest
         {
-            Name = $"{nameof(ApiSchema)} With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person) And Extension 1 And Extension 2",
-            Source = ApiSchema.Create
+            Name = $"{nameof(ApiSchema)} With 3 {nameof(ApiScalarType)} And 1 {nameof(ApiEnumType)} And 1 {nameof(ApiObjectType)} (Person) And {nameof(GraphQlExtension)} And {nameof(JsonApiExtension)}",
+            SourceFactoryArgument = new ApiSchemaDescriptor
             (
-                "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person) And Extension 1 And Extension 2",
+                ApiSchema: new ApiSchemaConfig
+                (
+                    ApiName: $"{nameof(ApiSchema)} With 3 {nameof(ApiScalarType)} And 1 {nameof(ApiEnumType)} And 1 {nameof(ApiObjectType)} (Person) And {nameof(GraphQlExtension)} And {nameof(JsonApiExtension)}",
+                    ExtensionTypes: [ typeof(GraphQlExtension), typeof(JsonApiExtension) ]
+                ),
+                ApiNamedTypes:
                 [
-                    TestApiScalarTypeBoolean,
-                    TestApiScalarTypeInt32,
-                    TestApiScalarTypeString,
-                    TestApiEnumTypeGender,
-                    TestApiObjectTypePerson
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(bool)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Boolean)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(int)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Int32)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(string)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(String)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Enum,
+                            ClrType: typeof(Gender)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Gender)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Object,
+                            ClrType: typeof(Person)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Person)
+                        ),
+                        ApiObjectType: new ApiObjectTypeConfig
+                        (
+                            ApiProperties:
+                            [
+                                new ApiPropertyConfig
+                                (
+                                    ApiName: nameof(Person.Name),
+                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                    ApiTypeModifiers: ApiTypeModifiers.Required,
+                                    ClrName: nameof(Person.Name)
+                                ),
+                                new ApiPropertyConfig
+                                (
+                                    ApiName: nameof(Person.Age),
+                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                    ApiTypeModifiers: ApiTypeModifiers.None,
+                                    ClrName: nameof(Person.Age)
+                                ),
+                                new ApiPropertyConfig
+                                (
+                                    ApiName: nameof(Person.Gender),
+                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Enum, apiName: nameof(Gender)),
+                                    ApiTypeModifiers: ApiTypeModifiers.None,
+                                    ClrName: nameof(Person.Gender)
+                                ),
+                                new ApiPropertyConfig
+                                (
+                                    ApiName: nameof(Person.Hobbies),
+                                    ApiTypeExpression: new ApiTypeExpression
+                                    (
+                                        apiInlineType: new ApiCollectionType
+                                        (
+                                            apiItemTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                            apiItemTypeModifiers: ApiTypeModifiers.Required,
+                                            clrCollectionType: typeof(List<string>)
+                                        )
+                                    ),
+                                    ApiTypeModifiers: ApiTypeModifiers.None,
+                                    ClrName: nameof(Person.Hobbies)
+                                ),
+                            ]
+                        )
+                    ),
                 ]
             ),
-            Expected = @"
+            ExpectedJson = @"
             {
-                ""ApiName"": ""ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 1 ApiObjectType (Person) And Extension 1 And Extension 2"",
+                ""ApiName"": ""ApiSchema With 3 ApiScalarType And 1 ApiEnumType And 1 ApiObjectType (Person) And GraphQlExtension And JsonApiExtension"",
+                ""ApiVersion"": ""0.1.0"",
+                ""ApiOptions"": {
+                    ""ApiIdentityNullHandling"": ""ReturnEmpty""
+                },
                 ""ApiScalarTypes"": [
                     {
                         ""Kind"": ""Scalar"",
@@ -1828,7 +3601,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                         ""Kind"": ""Object"",
                         ""ApiName"": ""Person"",
                         ""ApiProperties"": [
-                             {
+                            {
                                 ""ApiName"": ""Name"",
                                 ""ApiType"": {
                                     ""Kind"": ""Scalar"",
@@ -1877,38 +3650,191 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     }
                 ],
                 ""Extensions"": {
-                    ""Evoogle.ApiFramework.Schema.TestData.TestExtension1, Evoogle.ApiFramework.Core.Tests"": {
-                        ""Description"": ""TestExtension1""
+                    ""Evoogle.ApiFramework.Schema.TestData.GraphQlExtension, Evoogle.ApiFramework.Core.Tests"": {
+                        ""Count"": 42
                     },
-                    ""Evoogle.ApiFramework.Schema.TestData.TestExtension2, Evoogle.ApiFramework.Core.Tests"": {
-                        ""Id"": ""2"",
-                        ""Name"": ""TestExtension2""
+                    ""Evoogle.ApiFramework.Schema.TestData.JsonApiExtension, Evoogle.ApiFramework.Core.Tests"": {
+                        ""Website"": ""http://jsonapi.org""
                     }
                 }
-            }",
-            ExtensionType1 = typeof(TestExtension1),
-            ExtensionType2 = typeof(TestExtension2)
+            }"
         },
 
-        // ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 2 ApiObjectTypes (Person and Company)
-        new JsonSerializeTest<ApiSchema>
+        // ApiSchema With 3 ApiScalarTypes And 1 ApiEnumType And 2 ApiObjectTypes (Company And Person)
+        new JsonSerializeTest
         {
-            Name = $"{nameof(ApiSchema)} With 3 ApiScalarTypes and 1 ApiEnumType and 2 ApiObjectTypes (Person and Company)",
-            Source = ApiSchema.Create
+            Name = $"{nameof(ApiSchema)} With 3 {nameof(ApiScalarType)} And 1 {nameof(ApiEnumType)} And 2 {nameof(ApiObjectType)} (Company And Person)",
+            SourceFactoryArgument = new ApiSchemaDescriptor
             (
-                "ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 2 ApiObjectTypes (Person and Company)",
+                ApiSchema: new ApiSchemaConfig
+                (
+                    ApiName: $"{nameof(ApiSchema)} With 3 {nameof(ApiScalarType)} And 1 {nameof(ApiEnumType)} And 2 {nameof(ApiObjectType)} (Company And Person)"
+                ),
+                ApiNamedTypes:
                 [
-                    TestApiScalarTypeBoolean,
-                    TestApiScalarTypeInt32,
-                    TestApiScalarTypeString,
-                    TestApiEnumTypeGender,
-                    TestApiObjectTypePerson,
-                    TestApiObjectTypeCompany
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(bool)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Boolean)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(int)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Int32)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Scalar,
+                            ClrType: typeof(string)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(String)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Enum,
+                            ClrType: typeof(Gender)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Gender)
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Object,
+                            ClrType: typeof(Company)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Company)
+                        ),
+                        ApiObjectType: new ApiObjectTypeConfig
+                        (
+                            ApiProperties:
+                            [
+                                new ApiPropertyConfig
+                                (
+                                    ApiName: nameof(Company.Name),
+                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                    ApiTypeModifiers: ApiTypeModifiers.Required,
+                                    ClrName: nameof(Company.Name)
+                                ),
+                                new ApiPropertyConfig
+                                (
+                                    ApiName: nameof(Company.Owner),
+                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Object, apiName: nameof(Person)),
+                                    ApiTypeModifiers: ApiTypeModifiers.None,
+                                    ClrName: nameof(Company.Owner)
+                                ),
+                                new ApiPropertyConfig
+                                (
+                                    ApiName: nameof(Company.Employees),
+                                    ApiTypeExpression: new ApiTypeExpression
+                                    (
+                                        apiInlineType: new ApiCollectionType
+                                        (
+                                            apiItemTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Object, apiName: nameof(Person)),
+                                            apiItemTypeModifiers: ApiTypeModifiers.Required,
+                                            clrCollectionType: typeof(List<Person>)
+                                        )
+                                    ),
+                                    ApiTypeModifiers: ApiTypeModifiers.None,
+                                    ClrName: nameof(Company.Employees)
+                                ),
+                            ],
+                            ApiRelationships:
+                            [
+                                new ApiRelationshipConfig(ApiName: "Company_Owner", ApiPropertyName: nameof(Company.Owner)),
+                                new ApiRelationshipConfig(ApiName: "Company_Employees", ApiPropertyName: nameof(Company.Employees))
+                            ]
+                        )
+                    ),
+                    new ApiTypeDescriptor
+                    (
+                        ApiType: new ApiTypeConfig
+                        (
+                            Kind: ApiTypeKind.Object,
+                            ClrType: typeof(Person)
+                        ),
+                        ApiNamedType: new ApiNamedTypeConfig
+                        (
+                            ApiName: nameof(Person)
+                        ),
+                        ApiObjectType: new ApiObjectTypeConfig
+                        (
+                            ApiProperties:
+                            [
+                                new ApiPropertyConfig
+                                (
+                                    ApiName: nameof(Person.Name),
+                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                    ApiTypeModifiers: ApiTypeModifiers.Required,
+                                    ClrName: nameof(Person.Name)
+                                ),
+                                new ApiPropertyConfig
+                                (
+                                    ApiName: nameof(Person.Age),
+                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                    ApiTypeModifiers: ApiTypeModifiers.None,
+                                    ClrName: nameof(Person.Age)
+                                ),
+                                new ApiPropertyConfig
+                                (
+                                    ApiName: nameof(Person.Gender),
+                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Enum, apiName: nameof(Gender)),
+                                    ApiTypeModifiers: ApiTypeModifiers.None,
+                                    ClrName: nameof(Person.Gender)
+                                ),
+                                new ApiPropertyConfig
+                                (
+                                    ApiName: nameof(Person.Hobbies),
+                                    ApiTypeExpression: new ApiTypeExpression
+                                    (
+                                        apiInlineType: new ApiCollectionType
+                                        (
+                                            apiItemTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                            apiItemTypeModifiers: ApiTypeModifiers.Required,
+                                            clrCollectionType: typeof(List<string>)
+                                        )
+                                    ),
+                                    ApiTypeModifiers: ApiTypeModifiers.None,
+                                    ClrName: nameof(Person.Hobbies)
+                                ),
+                            ]
+                        )
+                    ),
                 ]
             ),
-            Expected = @"
+            ExpectedJson = @"
             {
-                ""ApiName"": ""ApiSchema With 3 ApiScalarTypes and 1 ApiEnumType and 2 ApiObjectTypes (Person and Company)"",
+                ""ApiName"": ""ApiSchema With 3 ApiScalarType And 1 ApiEnumType And 2 ApiObjectType (Company And Person)"",
+                ""ApiVersion"": ""0.1.0"",
+                ""ApiOptions"": {
+                    ""ApiIdentityNullHandling"": ""ReturnEmpty""
+                },
                 ""ApiScalarTypes"": [
                     {
                         ""Kind"": ""Scalar"",
@@ -1983,7 +3909,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                                             ""ApiName"": ""Person""
                                         },
                                         ""ApiItemTypeModifiers"": ""Required"",
-                                        ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.Schema.TestData.Person, Evoogle.ApiFramework.Core.Tests]], System.Private.CoreLib""
+                                        ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.Schema.TestData.Person,Evoogle.ApiFramework.Core.Tests]], System.Private.CoreLib""
                                     }
                                 },
                                 ""ApiTypeModifiers"": ""None"",
@@ -1992,10 +3918,12 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                         ],
                         ""ApiRelationships"": [
                             {
-                                ""ApiName"": ""Owner""
+                                ""ApiName"": ""Company_Owner"",
+                                ""ApiPropertyName"": ""Owner""
                             },
                             {
-                                ""ApiName"": ""Employees""
+                                ""ApiName"": ""Company_Employees"",
+                                ""ApiPropertyName"": ""Employees""
                             }
                         ],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Company, Evoogle.ApiFramework.Core.Tests""
@@ -2061,7 +3989,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         new TryGetByApiNameTest
         {
             Name = $"{nameof(ApiSchema.TryGetTypeByApiName)} returns false when {nameof(ApiNamedType)} does not exist in schema",
-            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiSchemaKind = ApiSchemaKind.Simple,
             SearchKey = "UnknownType",
             ExpectedResult = false
         },
@@ -2069,7 +3997,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         new TryGetByApiNameTest
         {
             Name = $"{nameof(ApiSchema.TryGetTypeByApiName)} returns true for {nameof(ApiEnumType)} with exact case match",
-            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiSchemaKind = ApiSchemaKind.Simple,
             SearchKey = "Gender",
             ExpectedResult = true
         },
@@ -2077,7 +4005,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         new TryGetByApiNameTest
         {
             Name = $"{nameof(ApiSchema.TryGetTypeByApiName)} returns false for {nameof(ApiEnumType)} with case-insensitive search (uppercase)",
-            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiSchemaKind = ApiSchemaKind.Simple,
             SearchKey = "GENDER",
             ExpectedResult = false
         },
@@ -2085,7 +4013,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         new TryGetByApiNameTest
         {
             Name = $"{nameof(ApiSchema.TryGetTypeByApiName)} returns true for {nameof(ApiObjectType)} with exact case match",
-            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiSchemaKind = ApiSchemaKind.Simple,
             SearchKey = "ScalarsOnly",
             ExpectedResult = true
         },
@@ -2093,7 +4021,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         new TryGetByApiNameTest
         {
             Name = $"{nameof(ApiSchema.TryGetTypeByApiName)} returns false for {nameof(ApiObjectType)} with case-insensitive search (lowercase)",
-            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiSchemaKind = ApiSchemaKind.Simple,
             SearchKey = "scalarsonly",
             ExpectedResult = false
         },
@@ -2101,7 +4029,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         new TryGetByApiNameTest
         {
             Name = $"{nameof(ApiSchema.TryGetTypeByApiName)} returns true for {nameof(ApiScalarType)} with exact case match",
-            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiSchemaKind = ApiSchemaKind.Simple,
             SearchKey = "Boolean",
             ExpectedResult = true
         },
@@ -2109,7 +4037,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         new TryGetByApiNameTest
         {
             Name = $"{nameof(ApiSchema.TryGetTypeByApiName)} returns false for {nameof(ApiScalarType)} with case-insensitive search (uppercase)",
-            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiSchemaKind = ApiSchemaKind.Simple,
             SearchKey = "BOOLEAN",
             ExpectedResult = false
         },
@@ -2120,15 +4048,15 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         new TryGetByClrTypeTest
         {
             Name = $"{nameof(ApiSchema.TryGetTypeByClrType)} returns false when {nameof(ApiType)} is not registered in schema",
-            ApiSchemaKind = ApiTestSchemaKind.Simple,
-            SearchKey = typeof(TestUnknownType),
+            ApiSchemaKind = ApiSchemaKind.Simple,
+            SearchKey = typeof(Order),
             ExpectedResult = false
         },
 
         new TryGetByClrTypeTest
         {
             Name = $"{nameof(ApiSchema.TryGetTypeByClrType)} returns true for registered {nameof(ApiEnumType)} CLR type",
-            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiSchemaKind = ApiSchemaKind.Simple,
             SearchKey = typeof(Gender),
             ExpectedResult = true
         },
@@ -2136,7 +4064,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         new TryGetByClrTypeTest
         {
             Name = $"{nameof(ApiSchema.TryGetTypeByClrType)} returns true for registered {nameof(ApiObjectType)} CLR type",
-            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiSchemaKind = ApiSchemaKind.Simple,
             SearchKey = typeof(ScalarsOnly),
             ExpectedResult = true
         },
@@ -2144,7 +4072,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
         new TryGetByClrTypeTest
         {
             Name = $"{nameof(ApiSchema.TryGetTypeByClrType)} returns true for registered {nameof(ApiScalarType)} CLR type",
-            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiSchemaKind = ApiSchemaKind.Simple,
             SearchKey = typeof(bool),
             ExpectedResult = true
         },

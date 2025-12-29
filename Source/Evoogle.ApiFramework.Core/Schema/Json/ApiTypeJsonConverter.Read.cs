@@ -52,9 +52,9 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
     private class ApiObjectTypeReadData
     {
         #region Properties
+        public ApiObjectTypeOptions? ApiOptions { get; set; }
         public List<ApiProperty>? ApiProperties { get; set; }
         public List<ApiRelationship>? ApiRelationships { get; set; }
-        public ApiObjectTypeOptions? ApiOptions { get; set; }
         #endregion
     }
 
@@ -106,9 +106,9 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
             { propertyNames.ApiNamedType.ApiName, HandleApiNamedTypeApiName },
 
             // ApiObjectType Property Handlers
+            { propertyNames.ApiObjectType.ApiOptions, HandleApiObjectTypeApiOptions },
             { propertyNames.ApiObjectType.ApiProperties, HandleApiObjectTypeApiProperties },
             { propertyNames.ApiObjectType.ApiRelationships, HandleApiObjectTypeApiRelationships },
-            { propertyNames.ApiObjectType.ApiOptions, HandleApiObjectTypeApiOptions },
 
             // ApiType Property Handlers
             { propertyNames.ApiType.Kind, HandleApiTypeKind },
@@ -167,6 +167,13 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
         #endregion
 
         #region ApiObjectType Methods
+        private static void HandleApiObjectTypeApiOptions(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        {
+            context.ReadData.ApiObjectType ??= new ApiObjectTypeReadData();
+
+            context.ReadData.ApiObjectType.ApiOptions = JsonSerializer.Deserialize<ApiObjectTypeOptions>(ref reader, context.Options);
+        }
+
         private static void HandleApiObjectTypeApiProperties(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiObjectType ??= new ApiObjectTypeReadData();
@@ -203,13 +210,6 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
             }
 
             context.ReadData.ApiObjectType!.ApiRelationships!.Add(apiRelationship);
-        }
-
-        private static void HandleApiObjectTypeApiOptions(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
-        {
-            context.ReadData.ApiObjectType ??= new ApiObjectTypeReadData();
-
-            context.ReadData.ApiObjectType.ApiOptions = JsonSerializer.Deserialize<ApiObjectTypeOptions>(ref reader, context.Options);
         }
         #endregion
 

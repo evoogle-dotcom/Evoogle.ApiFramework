@@ -13,7 +13,7 @@ public class GraphQlExtension
 
 public class JsonApiExtension
 {
-    public string Info { get; set; } = "See specification at http://jsonapi.org";
+    public string Website { get; set; } = "http://jsonapi.org";
 }
 
 public class ProtobufExtension

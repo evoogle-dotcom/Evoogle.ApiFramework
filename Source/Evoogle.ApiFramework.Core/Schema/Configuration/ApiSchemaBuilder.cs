@@ -47,14 +47,15 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
         return this;
     }
 
-    /// <summary>
-    ///     Configures options for this schema.
-    /// </summary>
-    /// <param name="configure">Callback to configure the schema options.</param>
-    /// <returns>The current builder instance.</returns>
     public ApiSchemaBuilder WithOptions(Action<ApiSchemaOptionsBuilder> configure)
     {
         _apiOptionsConfiguration = configure;
+        return this;
+    }
+
+    public ApiSchemaBuilder WithDefaultOptions()
+    {
+        _apiOptionsConfiguration = null;
         return this;
     }
 
@@ -168,26 +169,22 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     {
         // Build ApiSchema instance from all the configured components.
         var apiName = _apiName!;
+        var apiVersion = _apiVersion;
+        var apiOptions = this.BuildOptions();
 
         var apiScalarTypes = _context.ApiScalarTypeBuilders.Select(b => b.Build());
         var apiEnumTypes = _context.ApiEnumTypeBuilders.Select(b => b.Build());
         var apiObjectTypes = _context.ApiObjectTypeBuilders.Select(b => b.Build());
 
-        var apiVersion = _apiVersion ?? "1.0"; // Default version if not set
-
-        var apiOptions = this.BuildOptions();
-
         var apiSchema = new ApiSchema
         (
             apiName,
+            apiVersion,
+            apiOptions,
             apiScalarTypes,
             apiEnumTypes,
             apiObjectTypes
-        )
-        {
-            ApiVersion = apiVersion,
-            ApiOptions = apiOptions
-        };
+        );
 
         // Add any extensions that were configured.
         var extensions = this.BuildExtensions();
@@ -205,11 +202,11 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     #endregion
 
     #region Implementation Methods
-    private ApiSchemaOptions BuildOptions()
+    private ApiSchemaOptions? BuildOptions()
     {
         if (_apiOptionsConfiguration == null)
         {
-            return ApiSchemaOptions.Default;
+            return null;
         }
 
         var apiOptionsBuilder = new ApiSchemaOptionsBuilder();

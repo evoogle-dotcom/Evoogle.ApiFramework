@@ -60,10 +60,10 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
         var apiObjectType = new ApiObjectType
         (
             apiName!,
-            apiProperties!,
-            apiRelationships!,
             apiIdentitySet: null,
             apiOptions,
+            apiProperties!,
+            apiRelationships!,
             clrType!
         );
 

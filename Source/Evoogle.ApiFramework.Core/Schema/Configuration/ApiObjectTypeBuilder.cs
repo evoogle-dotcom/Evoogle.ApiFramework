@@ -60,7 +60,13 @@ public sealed class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext c
         return this;
     }
 
-    public ApiObjectTypeBuilder WithOptions(Action<ApiObjectTypeOptionsBuilder>? configure = null)
+    public ApiObjectTypeBuilder WithDefaultOptions()
+    {
+        _apiOptionsConfiguration = null;
+        return this;
+    }
+
+    public ApiObjectTypeBuilder WithOptions(Action<ApiObjectTypeOptionsBuilder> configure)
     {
         _apiOptionsConfiguration = configure;
         return this;
@@ -76,21 +82,21 @@ public sealed class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext c
         var apiName = this.ApiName;
         var clrObjectType = this.ClrType;
 
+        var apiOptions = this.BuildOptions();
+
         var apiProperties = _apiPropertyBuilders
             .Select(b => b.Build(clrObjectType));
 
         var apiRelationships = _apiRelationshipBuilders
             .Select(b => b.Build());
 
-        var apiOptions = this.BuildOptions();
-
         var apiObjectType = new ApiObjectType
         (
             apiName,
-            apiProperties,
-            apiRelationships,
             apiIdentitySet: null,
             apiOptions,
+            apiProperties,
+            apiRelationships,
             clrObjectType
         );
 

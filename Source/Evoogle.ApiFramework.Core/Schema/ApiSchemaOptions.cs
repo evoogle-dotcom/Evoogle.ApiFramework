@@ -3,8 +3,13 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Text.Json.Serialization;
+
+using Evoogle.ApiFramework.Schema.Json;
+
 namespace Evoogle.ApiFramework.Schema;
 
+[JsonConverter(typeof(ApiSchemaOptionsJsonConverter))]
 public record class ApiSchemaOptions
 {
     #region Fields

@@ -3,6 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 using Evoogle.ApiFramework.Identity.Internal;
@@ -11,14 +12,14 @@ using Evoogle.XUnit;
 
 using FluentAssertions;
 
-using static Evoogle.XUnit.JsonUnitTests;
+using static Evoogle.XUnit.Tests.JsonUnitTests;
 
 namespace Evoogle.ApiFramework.Identity;
 
 public class ApiIdTests(ITestOutputHelper output) : XUnitTests(output)
 {
-    #region Test Classes
-    public enum ApiIdFromFactory
+    #region Test Types
+    private enum ApiIdFromFactory
     {
         FromString,
         FromInt32,
@@ -28,13 +29,37 @@ public class ApiIdTests(ITestOutputHelper output) : XUnitTests(output)
         FromCulture
     }
 
-    public enum ApiIdCompositeFactory
+    private enum ApiIdCompositeFactory
     {
         Named,
         Ordered
     }
 
-    public class ComparisonTest : XUnitTest
+    private record ApiIdDescriptor
+    (
+        ApiIdScalarConfig? ScalarConfig = null,
+        ApiIdCompositePartConfig[]? CompositePartsConfig = null
+    );
+
+    private record ApiIdScalarConfig
+    (
+        ApiIdKind Kind,
+
+        string? CultureValue = null,
+        Guid? GuidValue = null,
+        int? Int32Value = null,
+        long? Int64Value = null,
+        string? StringValue = null,
+        Ulid? UlidValue = null
+    );
+
+    private record ApiIdCompositePartConfig
+    (
+        ApiIdScalarConfig ScalarConfig,
+        string? Name = null
+    );
+
+    private class ComparisonTest : XUnitTest
     {
         #region User Supplied Properties
         public ApiId Left { get; init; }
@@ -73,7 +98,7 @@ public class ApiIdTests(ITestOutputHelper output) : XUnitTests(output)
         #endregion
     }
 
-    public class CompositeTest : XUnitTest
+    private class CompositeTest : XUnitTest
     {
         #region User Supplied Properties
         public ApiIdCompositeFactory Factory { get; init; }
@@ -166,7 +191,7 @@ public class ApiIdTests(ITestOutputHelper output) : XUnitTests(output)
         #endregion
     }
 
-    public class EqualityTest : XUnitTest
+    private class EqualityTest : XUnitTest
     {
         #region User Supplied Properties
         public ApiId Left { get; init; }
@@ -218,7 +243,7 @@ public class ApiIdTests(ITestOutputHelper output) : XUnitTests(output)
         #endregion
     }
 
-    public class FromScalarTest : XUnitTest
+    private class FromScalarTest : XUnitTest
     {
         #region User Supplied Properties
         public ApiIdFromFactory Factory { get; init; }
@@ -267,7 +292,40 @@ public class ApiIdTests(ITestOutputHelper output) : XUnitTests(output)
         #endregion
     }
 
-    public class TryParseTest : XUnitTest
+    private class JsonDeserializeTest : JsonDeserializeTest<ApiId, ApiIdDescriptor>
+    {
+        #region Constructors
+        [SetsRequiredMembers]
+        public JsonDeserializeTest()
+        {
+            this.ExpectedFactoryExpression = (arg) => BuildApiId(arg);
+        }
+        #endregion
+    }
+
+    private class JsonRoundtripTest : JsonRoundtripTest<ApiId, ApiIdDescriptor>
+    {
+        #region Constructors
+        [SetsRequiredMembers]
+        public JsonRoundtripTest()
+        {
+            this.ExpectedFactoryExpression = (arg) => BuildApiId(arg);
+        }
+        #endregion
+    }
+
+    private class JsonSerializeTest : JsonSerializeTest<ApiId, ApiIdDescriptor>
+    {
+        #region Constructors
+        [SetsRequiredMembers]
+        public JsonSerializeTest()
+        {
+            this.SourceFactoryExpression = (arg) => BuildApiId(arg);
+        }
+        #endregion
+    }
+
+    private class TryParseTest : XUnitTest
     {
         #region User Supplied Properties
         public ApiIdKind Kind { get; init; }
@@ -748,359 +806,826 @@ public class ApiIdTests(ITestOutputHelper output) : XUnitTests(output)
     public static TheoryDataRow<IXUnitTest>[] JsonDeserializeTheoryData =>
     [
         // Empty
-        new JsonDeserializeTest<ApiId>
+        new JsonDeserializeTest
         {
-            Name = $"None: {ApiId.Empty.ToDebuggerDisplay()}",
-            Source = "null",
-            Expected = ApiId.Empty
+            Name = "None",
+            SourceJson = "null",
+            ExpectedFactoryArgument = new ApiIdDescriptor
+            (
+                ScalarConfig: new ApiIdScalarConfig
+                (
+                    Kind: ApiIdKind.None
+                )
+            )
         },
 
         // Scalars
 
         // .. String
-        new JsonDeserializeTest<ApiId>
+        new JsonDeserializeTest
         {
-            Name = $"Scalar: {TestStringAlphaApiId.ToDebuggerDisplay()}",
-            Source = @"{""Kind"":""String"",""Value"":""alpha""}",
-            Expected = TestStringAlphaApiId
+            Name = $"Scalar: {nameof(ApiIdKind.String)}:alpha",
+            SourceJson = @"{""Kind"":""String"",""Value"":""alpha""}",
+            ExpectedFactoryArgument = new ApiIdDescriptor
+            (
+                ScalarConfig: new ApiIdScalarConfig
+                (
+                    Kind: ApiIdKind.String,
+                    StringValue: "alpha"
+                )
+            )
         },
-        new JsonDeserializeTest<ApiId>
+
+        new JsonDeserializeTest
         {
-            Name = $"Scalar: {TestStringALPHAApiId.ToDebuggerDisplay()}",
-            Source = @"{""Kind"":""String"",""Value"":""ALPHA""}",
-            Expected = TestStringALPHAApiId
+            Name = $"Scalar: {nameof(ApiIdKind.String)}:ALPHA",
+            SourceJson = @"{""Kind"":""String"",""Value"":""ALPHA""}",
+            ExpectedFactoryArgument = new ApiIdDescriptor
+            (
+                ScalarConfig: new ApiIdScalarConfig
+                (
+                    Kind: ApiIdKind.String,
+                    StringValue: "ALPHA"
+                )
+            )
         },
 
         // .. Int32
-        new JsonDeserializeTest<ApiId>
+        new JsonDeserializeTest
         {
-            Name = $"Scalar: {TestInt42ApiId.ToDebuggerDisplay()} with JSON string value",
-            Source = @"{""Kind"":""Int32"",""Value"":""42""}",
-            Expected = TestInt42ApiId
-        },
-
-        new JsonDeserializeTest<ApiId>
-        {
-            Name = $"Scalar: {TestInt42ApiId.ToDebuggerDisplay()} with JSON numeric value",
-            Source = @"{""Kind"":""Int32"",""Value"":42}",
-            Expected = TestInt42ApiId
+            Name = $"Scalar: {nameof(ApiIdKind.Int32)}:42",
+            SourceJson = @"{""Kind"":""Int32"",""Value"":42}",
+            ExpectedFactoryArgument = new ApiIdDescriptor
+            (
+                ScalarConfig: new ApiIdScalarConfig
+                (
+                    Kind: ApiIdKind.Int32,
+                    Int32Value: 42
+                )
+            )
         },
 
         // .. Int64
-        new JsonDeserializeTest<ApiId>
+        new JsonDeserializeTest
         {
-            Name = $"Scalar: {TestLong24ApiId.ToDebuggerDisplay()} with JSON string value",
-            Source = @"{""Kind"":""Int64"",""Value"":""24""}",
-            Expected = TestLong24ApiId
-        },
-
-        new JsonDeserializeTest<ApiId>
-        {
-            Name = $"Scalar: {TestLong24ApiId.ToDebuggerDisplay()} with JSON numeric value",
-            Source = @"{""Kind"":""Int64"",""Value"":24}",
-            Expected = TestLong24ApiId
+            Name = $"Scalar: {nameof(ApiIdKind.Int64)}:24",
+            SourceJson = @"{""Kind"":""Int64"",""Value"":24}",
+            ExpectedFactoryArgument = new ApiIdDescriptor
+            (
+                ScalarConfig: new ApiIdScalarConfig
+                (
+                    Kind: ApiIdKind.Int64,
+                    Int64Value: 24
+                )
+            )
         },
 
         // .. Guid
-        new JsonDeserializeTest<ApiId>
+        new JsonDeserializeTest
         {
-            Name = $"Scalar: {TestGuidApiId.ToDebuggerDisplay()}",
-            Source = @"{""Kind"":""Guid"",""Value"":""" + TestGuidString + @"""}",
-            Expected = TestGuidApiId
+            Name = $"Scalar: {nameof(ApiIdKind.Guid)}:{TestGuid}",
+            SourceJson = @"{""Kind"":""Guid"",""Value"":""" + TestGuid + @"""}",
+            ExpectedFactoryArgument = new ApiIdDescriptor
+            (
+                ScalarConfig: new ApiIdScalarConfig
+                (
+                    Kind: ApiIdKind.Guid,
+                    GuidValue: TestGuid
+                )
+            )
         },
 
         // .. Ulid
-        new JsonDeserializeTest<ApiId>
+        new JsonDeserializeTest
         {
-            Name = $"Scalar: {TestUlidApiId.ToDebuggerDisplay()}",
-            Source = @"{""Kind"":""Ulid"",""Value"":""" +  TestUlidString + @"""}",
-            Expected = TestUlidApiId
+            Name = $"Scalar: {nameof(ApiIdKind.Ulid)}:{TestUlid}",
+            SourceJson = @"{""Kind"":""Ulid"",""Value"":""" + TestUlid + @"""}",
+            ExpectedFactoryArgument = new ApiIdDescriptor
+            (
+                ScalarConfig: new ApiIdScalarConfig
+                (
+                    Kind: ApiIdKind.Ulid,
+                    UlidValue: TestUlid
+                )
+            )
         },
 
         // .. Culture
-        new JsonDeserializeTest<ApiId>
+        new JsonDeserializeTest
         {
-            Name = $"Scalar: {TestCultureEnUsApiId.ToDebuggerDisplay()}",
-            Source = @"{""Kind"":""Culture"",""Value"":""en-US""}",
-            Expected = TestCultureEnUsApiId
+            Name = $"Scalar: {nameof(ApiIdKind.Culture)}:en-US",
+            SourceJson = @"{""Kind"":""Culture"",""Value"":""en-US""}",
+            ExpectedFactoryArgument = new ApiIdDescriptor
+            (
+                ScalarConfig: new ApiIdScalarConfig
+                (
+                    Kind: ApiIdKind.Culture,
+                    CultureValue: "en-US"
+                )
+            )
         },
-        new JsonDeserializeTest<ApiId>
+
+        new JsonDeserializeTest
         {
-            Name = $"Scalar: {TestCultureFrFrApiId.ToDebuggerDisplay()}",
-            Source = @"{""Kind"":""Culture"",""Value"":""fr-FR""}",
-            Expected = TestCultureFrFrApiId
+            Name = $"Scalar: {nameof(ApiIdKind.Culture)}:fr-FR",
+            SourceJson = @"{""Kind"":""Culture"",""Value"":""fr-FR""}",
+            ExpectedFactoryArgument = new ApiIdDescriptor
+            (
+                ScalarConfig: new ApiIdScalarConfig
+                (
+                    Kind: ApiIdKind.Culture,
+                    CultureValue: "fr-FR"
+                )
+            )
         },
 
         // Composites
 
         // .. Ordered (unnamed parts)
-        new JsonDeserializeTest<ApiId>
+        new JsonDeserializeTest
         {
-            Name = $"Composite: {TestCompositeInt24AndInt24ApiId.ToDebuggerDisplay()} with JSON string values",
-            Source = @"{""Kind"":""Composite"",""Value"":[{""Kind"":""Int32"",""Value"":""24""},{""Kind"":""Int32"",""Value"":""24""}]}",
-            Expected = TestCompositeInt24AndInt24ApiId
-        },
-        new JsonDeserializeTest<ApiId>
-        {
-            Name = $"Composite: {TestCompositeInt24AndInt42ApiId.ToDebuggerDisplay()} with JSON string values",
-            Source = @"{""Kind"":""Composite"",""Value"":[{""Kind"":""Int32"",""Value"":""24""},{""Kind"":""Int32"",""Value"":""42""}]}",
-            Expected = TestCompositeInt24AndInt42ApiId
+            Name = $"Composite: Composite:24|24",
+            SourceJson = @"{""Kind"":""Composite"",""Value"":[{""Kind"":""Int32"",""Value"":24},{""Kind"":""Int32"",""Value"":24}]}",
+            ExpectedFactoryArgument = new ApiIdDescriptor
+            (
+                CompositePartsConfig: [
+                    new ApiIdCompositePartConfig
+                    (
+                        ScalarConfig: new ApiIdScalarConfig
+                        (
+                            Kind: ApiIdKind.Int32,
+                            Int32Value: 24
+                        )
+                    ),
+                    new ApiIdCompositePartConfig
+                    (
+                        ScalarConfig: new ApiIdScalarConfig
+                        (
+                            Kind: ApiIdKind.Int32,
+                            Int32Value: 24
+                        )
+                    )
+                ]
+            )
         },
 
-        new JsonDeserializeTest<ApiId>
+        new JsonDeserializeTest
         {
-            Name = $"Composite: {TestCompositeInt24AndInt24ApiId.ToDebuggerDisplay()} with JSON numeric values",
-            Source = @"{""Kind"":""Composite"",""Value"":[{""Kind"":""Int32"",""Value"":24},{""Kind"":""Int32"",""Value"":24}]}",
-            Expected = TestCompositeInt24AndInt24ApiId
-        },
-        new JsonDeserializeTest<ApiId>
-        {
-            Name = $"Composite: {TestCompositeInt24AndInt42ApiId.ToDebuggerDisplay()} with JSON numeric values",
-            Source = @"{""Kind"":""Composite"",""Value"":[{""Kind"":""Int32"",""Value"":24},{""Kind"":""Int32"",""Value"":42}]}",
-            Expected = TestCompositeInt24AndInt42ApiId
+            Name = $"Composite: Composite:24|42",
+            SourceJson = @"{""Kind"":""Composite"",""Value"":[{""Kind"":""Int32"",""Value"":24},{""Kind"":""Int32"",""Value"":42}]}",
+            ExpectedFactoryArgument = new ApiIdDescriptor
+            (
+                CompositePartsConfig: [
+                    new ApiIdCompositePartConfig
+                    (
+                        ScalarConfig: new ApiIdScalarConfig
+                        (
+                            Kind: ApiIdKind.Int32,
+                            Int32Value: 24
+                        )
+                    ),
+                    new ApiIdCompositePartConfig
+                    (
+                        ScalarConfig: new ApiIdScalarConfig
+                        (
+                            Kind: ApiIdKind.Int32,
+                            Int32Value: 42
+                        )
+                    )
+                ]
+            )
         },
 
         // .. Named (named parts)
-        new JsonDeserializeTest<ApiId>
+        new JsonDeserializeTest
         {
-            Name = $"Composite: {TestCompositeAlphaInt24AndBetaInt24ApiId.ToDebuggerDisplay()} with JSON string values",
-            Source = @"{""Kind"":""Composite"",""Value"":[{""Name"":""alpha"",""Kind"":""Int32"",""Value"":""24""},{""Name"":""beta"",""Kind"":""Int32"",""Value"":""24""}]}",
-            Expected = TestCompositeAlphaInt24AndBetaInt24ApiId
+            Name = $"Composite: Composite:alpha=24|beta=24",
+            SourceJson = @"{""Kind"":""Composite"",""Value"":[{""Name"":""alpha"",""Kind"":""Int32"",""Value"":24},{""Name"":""beta"",""Kind"":""Int32"",""Value"":24}]}",
+            ExpectedFactoryArgument = new ApiIdDescriptor
+            (
+                CompositePartsConfig: [
+                    new ApiIdCompositePartConfig
+                    (
+                        Name: "alpha",
+                        ScalarConfig: new ApiIdScalarConfig
+                        (
+                            Kind: ApiIdKind.Int32,
+                            Int32Value: 24
+                        )
+                    ),
+                    new ApiIdCompositePartConfig
+                    (
+                        Name: "beta",
+                        ScalarConfig: new ApiIdScalarConfig
+                        (
+                            Kind: ApiIdKind.Int32,
+                            Int32Value: 24
+                        )
+                    )
+                ]
+            )
         },
-        new JsonDeserializeTest<ApiId>
+        new JsonDeserializeTest
         {
-            Name = $"Composite: {TestCompositeAlphaInt24AndBetaInt42ApiId.ToDebuggerDisplay()} with JSON string values",
-            Source = @"{""Kind"":""Composite"",""Value"":[{""Name"":""alpha"",""Kind"":""Int32"",""Value"":""24""},{""Name"":""beta"",""Kind"":""Int32"",""Value"":""42""}]}",
-            Expected = TestCompositeAlphaInt24AndBetaInt42ApiId
+            Name = $"Composite: Composite:alpha=24|beta=42",
+            SourceJson = @"{""Kind"":""Composite"",""Value"":[{""Name"":""alpha"",""Kind"":""Int32"",""Value"":24},{""Name"":""beta"",""Kind"":""Int32"",""Value"":42}]}",
+            ExpectedFactoryArgument = new ApiIdDescriptor
+            (
+                CompositePartsConfig: [
+                    new ApiIdCompositePartConfig
+                    (
+                        Name: "alpha",
+                        ScalarConfig: new ApiIdScalarConfig
+                        (
+                            Kind: ApiIdKind.Int32,
+                            Int32Value: 24
+                        )
+                    ),
+                    new ApiIdCompositePartConfig
+                    (
+                        Name: "beta",
+                        ScalarConfig: new ApiIdScalarConfig
+                        (
+                            Kind: ApiIdKind.Int32,
+                            Int32Value: 42
+                        )
+                    )
+                ]
+            )
         },
-        new JsonDeserializeTest<ApiId>
+        new JsonDeserializeTest
         {
-            Name = $"Composite: {TestCompositeAlphaInt24AndZetaInt42ApiId.ToDebuggerDisplay()} with JSON string values",
-            Source = @"{""Kind"":""Composite"",""Value"":[{""Name"":""alpha"",""Kind"":""Int32"",""Value"":""24""},{""Name"":""zeta"",""Kind"":""Int32"",""Value"":""42""}]}",
-            Expected = TestCompositeAlphaInt24AndZetaInt42ApiId
-        },
-
-        new JsonDeserializeTest<ApiId>
-        {
-            Name = $"Composite: {TestCompositeAlphaInt24AndBetaInt24ApiId.ToDebuggerDisplay()} with JSON numeric values",
-            Source = @"{""Kind"":""Composite"",""Value"":[{""Name"":""alpha"",""Kind"":""Int32"",""Value"":24},{""Name"":""beta"",""Kind"":""Int32"",""Value"":24}]}",
-            Expected = TestCompositeAlphaInt24AndBetaInt24ApiId
-        },
-        new JsonDeserializeTest<ApiId>
-        {
-            Name = $"Composite: {TestCompositeAlphaInt24AndBetaInt42ApiId.ToDebuggerDisplay()} with JSON numeric values",
-            Source = @"{""Kind"":""Composite"",""Value"":[{""Name"":""alpha"",""Kind"":""Int32"",""Value"":24},{""Name"":""beta"",""Kind"":""Int32"",""Value"":42}]}",
-            Expected = TestCompositeAlphaInt24AndBetaInt42ApiId
-        },
-        new JsonDeserializeTest<ApiId>
-        {
-            Name = $"Composite: {TestCompositeAlphaInt24AndZetaInt42ApiId.ToDebuggerDisplay()} with JSON numeric values",
-            Source = @"{""Kind"":""Composite"",""Value"":[{""Name"":""alpha"",""Kind"":""Int32"",""Value"":24},{""Name"":""zeta"",""Kind"":""Int32"",""Value"":42}]}",
-            Expected = TestCompositeAlphaInt24AndZetaInt42ApiId
+            Name = $"Composite: Composite:alpha=24|zeta=42",
+            SourceJson = @"{""Kind"":""Composite"",""Value"":[{""Name"":""alpha"",""Kind"":""Int32"",""Value"":24},{""Name"":""zeta"",""Kind"":""Int32"",""Value"":42}]}",
+            ExpectedFactoryArgument = new ApiIdDescriptor
+            (
+                CompositePartsConfig: [
+                    new ApiIdCompositePartConfig
+                    (
+                        Name: "alpha",
+                        ScalarConfig: new ApiIdScalarConfig
+                        (
+                            Kind: ApiIdKind.Int32,
+                            Int32Value: 24
+                        )
+                    ),
+                    new ApiIdCompositePartConfig
+                    (
+                        Name: "zeta",
+                        ScalarConfig: new ApiIdScalarConfig
+                        (
+                            Kind: ApiIdKind.Int32,
+                            Int32Value: 42
+                        )
+                    )
+                ]
+            )
         },
     ];
 
     public static TheoryDataRow<IXUnitTest>[] JsonRoundtripTheoryData =>
     [
         // Empty
-        new JsonRoundtripTest<ApiId>
+        new JsonRoundtripTest
         {
-            Name = $"None: {ApiId.Empty.ToDebuggerDisplay()}",
-            Expected = ApiId.Empty
+            Name = "None",
+            ExpectedFactoryArgument = new ApiIdDescriptor
+            (
+                ScalarConfig: new ApiIdScalarConfig
+                (
+                    Kind: ApiIdKind.None
+                )
+            )
         },
 
         // Scalars
 
         // .. String
-        new JsonRoundtripTest<ApiId>
+        new JsonRoundtripTest
         {
-            Name = $"Scalar: {TestStringAlphaApiId.ToDebuggerDisplay()}",
-            Expected = TestStringAlphaApiId
+            Name = $"Scalar: {nameof(ApiIdKind.String)}:alpha",
+            ExpectedFactoryArgument = new ApiIdDescriptor
+            (
+                ScalarConfig: new ApiIdScalarConfig
+                (
+                    Kind: ApiIdKind.String,
+                    StringValue: "alpha"
+                )
+            )
         },
-        new JsonRoundtripTest<ApiId>
+
+        new JsonRoundtripTest
         {
-            Name = $"Scalar: {TestStringALPHAApiId.ToDebuggerDisplay()}",
-            Expected = TestStringALPHAApiId
+            Name = $"Scalar: {nameof(ApiIdKind.String)}:ALPHA",
+            ExpectedFactoryArgument = new ApiIdDescriptor
+            (
+                ScalarConfig: new ApiIdScalarConfig
+                (
+                    Kind: ApiIdKind.String,
+                    StringValue: "ALPHA"
+                )
+            )
         },
 
         // .. Int32
-        new JsonRoundtripTest<ApiId>
+        new JsonRoundtripTest
         {
-            Name = $"Scalar: {TestInt42ApiId.ToDebuggerDisplay()}",
-            Expected = TestInt42ApiId
+            Name = $"Scalar: {nameof(ApiIdKind.Int32)}:42",
+            ExpectedFactoryArgument = new ApiIdDescriptor
+            (
+                ScalarConfig: new ApiIdScalarConfig
+                (
+                    Kind: ApiIdKind.Int32,
+                    Int32Value: 42
+                )
+            )
         },
 
         // .. Int64
-        new JsonRoundtripTest<ApiId>
+        new JsonRoundtripTest
         {
-            Name = $"Scalar: {TestLong24ApiId.ToDebuggerDisplay()}",
-            Expected = TestLong24ApiId
+            Name = $"Scalar: {nameof(ApiIdKind.Int64)}:24",
+            ExpectedFactoryArgument = new ApiIdDescriptor
+            (
+                ScalarConfig: new ApiIdScalarConfig
+                (
+                    Kind: ApiIdKind.Int64,
+                    Int64Value: 24
+                )
+            )
         },
 
         // .. Guid
-        new JsonRoundtripTest<ApiId>
+        new JsonRoundtripTest
         {
-            Name = $"Scalar: {TestGuidApiId.ToDebuggerDisplay()}",
-            Expected = TestGuidApiId
+            Name = $"Scalar: {nameof(ApiIdKind.Guid)}:{TestGuid}",
+            ExpectedFactoryArgument = new ApiIdDescriptor
+            (
+                ScalarConfig: new ApiIdScalarConfig
+                (
+                    Kind: ApiIdKind.Guid,
+                    GuidValue: TestGuid
+                )
+            )
         },
 
         // .. Ulid
-        new JsonRoundtripTest<ApiId>
+        new JsonRoundtripTest
         {
-            Name = $"Scalar: {TestUlidApiId.ToDebuggerDisplay()}",
-            Expected = TestUlidApiId
+            Name = $"Scalar: {nameof(ApiIdKind.Ulid)}:{TestUlid}",
+            ExpectedFactoryArgument = new ApiIdDescriptor
+            (
+                ScalarConfig: new ApiIdScalarConfig
+                (
+                    Kind: ApiIdKind.Ulid,
+                    UlidValue: TestUlid
+                )
+            )
         },
 
         // .. Culture
-        new JsonRoundtripTest<ApiId>
+        new JsonRoundtripTest
         {
-            Name = $"Scalar: {TestCultureEnUsApiId.ToDebuggerDisplay()}",
-            Expected = TestCultureEnUsApiId
+            Name = $"Scalar: {nameof(ApiIdKind.Culture)}:en-US",
+            ExpectedFactoryArgument = new ApiIdDescriptor
+            (
+                ScalarConfig: new ApiIdScalarConfig
+                (
+                    Kind: ApiIdKind.Culture,
+                    CultureValue: "en-US"
+                )
+            )
         },
-        new JsonRoundtripTest<ApiId>
+
+        new JsonRoundtripTest
         {
-            Name = $"Scalar: {TestCultureFrFrApiId.ToDebuggerDisplay()}",
-            Expected = TestCultureFrFrApiId
+            Name = $"Scalar: {nameof(ApiIdKind.Culture)}:fr-FR",
+            ExpectedFactoryArgument = new ApiIdDescriptor
+            (
+                ScalarConfig: new ApiIdScalarConfig
+                (
+                    Kind: ApiIdKind.Culture,
+                    CultureValue: "fr-FR"
+                )
+            )
         },
 
         // Composites
 
         // .. Ordered (unnamed parts)
-        new JsonRoundtripTest<ApiId>
+        new JsonRoundtripTest
         {
-            Name = $"Composite: {TestCompositeInt24AndInt24ApiId.ToDebuggerDisplay()}",
-            Expected = TestCompositeInt24AndInt24ApiId
+            Name = $"Composite: Composite:24|24",
+            ExpectedFactoryArgument = new ApiIdDescriptor
+            (
+                CompositePartsConfig: [
+                    new ApiIdCompositePartConfig
+                    (
+                        ScalarConfig: new ApiIdScalarConfig
+                        (
+                            Kind: ApiIdKind.Int32,
+                            Int32Value: 24
+                        )
+                    ),
+                    new ApiIdCompositePartConfig
+                    (
+                        ScalarConfig: new ApiIdScalarConfig
+                        (
+                            Kind: ApiIdKind.Int32,
+                            Int32Value: 24
+                        )
+                    )
+                ]
+            )
         },
-        new JsonRoundtripTest<ApiId>
+
+        new JsonRoundtripTest
         {
-            Name = $"Composite: {TestCompositeInt24AndInt42ApiId.ToDebuggerDisplay()}",
-            Expected = TestCompositeInt24AndInt42ApiId
+            Name = $"Composite: Composite:24|42",
+            ExpectedFactoryArgument = new ApiIdDescriptor
+            (
+                CompositePartsConfig: [
+                    new ApiIdCompositePartConfig
+                    (
+                        ScalarConfig: new ApiIdScalarConfig
+                        (
+                            Kind: ApiIdKind.Int32,
+                            Int32Value: 24
+                        )
+                    ),
+                    new ApiIdCompositePartConfig
+                    (
+                        ScalarConfig: new ApiIdScalarConfig
+                        (
+                            Kind: ApiIdKind.Int32,
+                            Int32Value: 42
+                        )
+                    )
+                ]
+            )
         },
 
         // .. Named (named parts)
-        new JsonRoundtripTest<ApiId>
+        new JsonRoundtripTest
         {
-            Name = $"Composite: {TestCompositeAlphaInt24AndBetaInt24ApiId.ToDebuggerDisplay()}",
-            Expected = TestCompositeAlphaInt24AndBetaInt24ApiId
+            Name = $"Composite: Composite:alpha=24|beta=24",
+            ExpectedFactoryArgument = new ApiIdDescriptor
+            (
+                CompositePartsConfig: [
+                    new ApiIdCompositePartConfig
+                    (
+                        Name: "alpha",
+                        ScalarConfig: new ApiIdScalarConfig
+                        (
+                            Kind: ApiIdKind.Int32,
+                            Int32Value: 24
+                        )
+                    ),
+                    new ApiIdCompositePartConfig
+                    (
+                        Name: "beta",
+                        ScalarConfig: new ApiIdScalarConfig
+                        (
+                            Kind: ApiIdKind.Int32,
+                            Int32Value: 24
+                        )
+                    )
+                ]
+            )
         },
-        new JsonRoundtripTest<ApiId>
+        new JsonRoundtripTest
         {
-            Name = $"Composite: {TestCompositeAlphaInt24AndBetaInt42ApiId.ToDebuggerDisplay()}",
-            Expected = TestCompositeAlphaInt24AndBetaInt42ApiId
+            Name = $"Composite: Composite:alpha=24|beta=42",
+            ExpectedFactoryArgument = new ApiIdDescriptor
+            (
+                CompositePartsConfig: [
+                    new ApiIdCompositePartConfig
+                    (
+                        Name: "alpha",
+                        ScalarConfig: new ApiIdScalarConfig
+                        (
+                            Kind: ApiIdKind.Int32,
+                            Int32Value: 24
+                        )
+                    ),
+                    new ApiIdCompositePartConfig
+                    (
+                        Name: "beta",
+                        ScalarConfig: new ApiIdScalarConfig
+                        (
+                            Kind: ApiIdKind.Int32,
+                            Int32Value: 42
+                        )
+                    )
+                ]
+            )
         },
-        new JsonRoundtripTest<ApiId>
+        new JsonRoundtripTest
         {
-            Name = $"Composite: {TestCompositeAlphaInt24AndZetaInt42ApiId.ToDebuggerDisplay()}",
-            Expected = TestCompositeAlphaInt24AndZetaInt42ApiId
+            Name = $"Composite: Composite:alpha=24|zeta=42",
+            ExpectedFactoryArgument = new ApiIdDescriptor
+            (
+                CompositePartsConfig: [
+                    new ApiIdCompositePartConfig
+                    (
+                        Name: "alpha",
+                        ScalarConfig: new ApiIdScalarConfig
+                        (
+                            Kind: ApiIdKind.Int32,
+                            Int32Value: 24
+                        )
+                    ),
+                    new ApiIdCompositePartConfig
+                    (
+                        Name: "zeta",
+                        ScalarConfig: new ApiIdScalarConfig
+                        (
+                            Kind: ApiIdKind.Int32,
+                            Int32Value: 42
+                        )
+                    )
+                ]
+            )
         },
     ];
 
     public static TheoryDataRow<IXUnitTest>[] JsonSerializeTheoryData =>
     [
         // Empty
-        new JsonSerializeTest<ApiId>
+        new JsonSerializeTest
         {
-            Name = $"None: {ApiId.Empty.ToDebuggerDisplay()}",
-            Source = ApiId.Empty,
-            Expected = "null"
+            Name = "None",
+            SourceFactoryArgument = new ApiIdDescriptor
+            (
+                ScalarConfig: new ApiIdScalarConfig
+                (
+                    Kind: ApiIdKind.None
+                )
+            ),
+            ExpectedJson = "null"
         },
 
         // Scalars
 
         // .. String
-        new JsonSerializeTest<ApiId>
+        new JsonSerializeTest
         {
-            Name = $"Scalar: {TestStringAlphaApiId.ToDebuggerDisplay()}",
-            Source = TestStringAlphaApiId,
-            Expected = @"{""Kind"":""String"",""Value"":""alpha""}"
+            Name = $"Scalar: {nameof(ApiIdKind.String)}:alpha",
+            SourceFactoryArgument = new ApiIdDescriptor
+            (
+                ScalarConfig: new ApiIdScalarConfig
+                (
+                    Kind: ApiIdKind.String,
+                    StringValue: "alpha"
+                )
+            ),
+            ExpectedJson = @"{""Kind"":""String"",""Value"":""alpha""}"
         },
-        new JsonSerializeTest<ApiId>
+
+        new JsonSerializeTest
         {
-            Name = $"Scalar: {TestStringALPHAApiId.ToDebuggerDisplay()}",
-            Source = TestStringALPHAApiId,
-            Expected = @"{""Kind"":""String"",""Value"":""ALPHA""}"
+            Name = $"Scalar: {nameof(ApiIdKind.String)}:ALPHA",
+            SourceFactoryArgument = new ApiIdDescriptor
+            (
+                ScalarConfig: new ApiIdScalarConfig
+                (
+                    Kind: ApiIdKind.String,
+                    StringValue: "ALPHA"
+                )
+            ),
+            ExpectedJson = @"{""Kind"":""String"",""Value"":""ALPHA""}"
         },
 
         // .. Int32
-        new JsonSerializeTest<ApiId>
+        new JsonSerializeTest
         {
-            Name = $"Scalar: {TestInt42ApiId.ToDebuggerDisplay()}",
-            Source = TestInt42ApiId,
-            Expected = @"{""Kind"":""Int32"",""Value"":42}"
+            Name = $"Scalar: {nameof(ApiIdKind.Int32)}:42",
+            SourceFactoryArgument = new ApiIdDescriptor
+            (
+                ScalarConfig: new ApiIdScalarConfig
+                (
+                    Kind: ApiIdKind.Int32,
+                    Int32Value: 42
+                )
+            ),
+            ExpectedJson = @"{""Kind"":""Int32"",""Value"":42}"
         },
 
         // .. Int64
-        new JsonSerializeTest<ApiId>
+        new JsonSerializeTest
         {
-            Name = $"Scalar: {TestLong24ApiId.ToDebuggerDisplay()}",
-            Source = TestLong24ApiId,
-            Expected = @"{""Kind"":""Int64"",""Value"":24}"
+            Name = $"Scalar: {nameof(ApiIdKind.Int64)}:24",
+            SourceFactoryArgument = new ApiIdDescriptor
+            (
+                ScalarConfig: new ApiIdScalarConfig
+                (
+                    Kind: ApiIdKind.Int64,
+                    Int64Value: 24
+                )
+            ),
+            ExpectedJson = @"{""Kind"":""Int64"",""Value"":24}"
         },
 
         // .. Guid
-        new JsonSerializeTest<ApiId>
+        new JsonSerializeTest
         {
-            Name = $"Scalar: {TestGuidApiId.ToDebuggerDisplay()}",
-            Source = TestGuidApiId,
-            Expected = @"{""Kind"":""Guid"",""Value"":""" + TestGuidString + @"""}"
+            Name = $"Scalar: {nameof(ApiIdKind.Guid)}:{TestGuid}",
+            SourceFactoryArgument = new ApiIdDescriptor
+            (
+                ScalarConfig: new ApiIdScalarConfig
+                (
+                    Kind: ApiIdKind.Guid,
+                    GuidValue: TestGuid
+                )
+            ),
+            ExpectedJson = @"{""Kind"":""Guid"",""Value"":""" + TestGuid + @"""}"
         },
 
         // .. Ulid
-        new JsonSerializeTest<ApiId>
+        new JsonSerializeTest
         {
-            Name = $"Scalar: {TestUlidApiId.ToDebuggerDisplay()}",
-            Source = TestUlidApiId,
-            Expected = @"{""Kind"":""Ulid"",""Value"":""" +  TestUlidString + @"""}"
+            Name = $"Scalar: {nameof(ApiIdKind.Ulid)}:{TestUlid}",
+            SourceFactoryArgument = new ApiIdDescriptor
+            (
+                ScalarConfig: new ApiIdScalarConfig
+                (
+                    Kind: ApiIdKind.Ulid,
+                    UlidValue: TestUlid
+                )
+            ),
+            ExpectedJson = @"{""Kind"":""Ulid"",""Value"":""" + TestUlid + @"""}"
         },
 
         // .. Culture
-        new JsonSerializeTest<ApiId>
+        new JsonSerializeTest
         {
-            Name = $"Scalar: {TestCultureEnUsApiId.ToDebuggerDisplay()}",
-            Source = TestCultureEnUsApiId,
-            Expected = @"{""Kind"":""Culture"",""Value"":""en-US""}"
+            Name = $"Scalar: {nameof(ApiIdKind.Culture)}:en-US",
+            SourceFactoryArgument = new ApiIdDescriptor
+            (
+                ScalarConfig: new ApiIdScalarConfig
+                (
+                    Kind: ApiIdKind.Culture,
+                    CultureValue: "en-US"
+                )
+            ),
+            ExpectedJson = @"{""Kind"":""Culture"",""Value"":""en-US""}"
         },
-        new JsonSerializeTest<ApiId>
+
+        new JsonSerializeTest
         {
-            Name = $"Scalar: {TestCultureFrFrApiId.ToDebuggerDisplay()}",
-            Source = TestCultureFrFrApiId,
-            Expected = @"{""Kind"":""Culture"",""Value"":""fr-FR""}"
+            Name = $"Scalar: {nameof(ApiIdKind.Culture)}:fr-FR",
+            SourceFactoryArgument = new ApiIdDescriptor
+            (
+                ScalarConfig: new ApiIdScalarConfig
+                (
+                    Kind: ApiIdKind.Culture,
+                    CultureValue: "fr-FR"
+                )
+            ),
+            ExpectedJson = @"{""Kind"":""Culture"",""Value"":""fr-FR""}"
         },
 
         // Composites
 
         // .. Ordered (unnamed parts)
-        new JsonSerializeTest<ApiId>
+        new JsonSerializeTest
         {
-            Name = $"Composite: {TestCompositeInt24AndInt24ApiId.ToDebuggerDisplay()}",
-            Source = TestCompositeInt24AndInt24ApiId,
-            Expected = @"{""Kind"":""Composite"",""Value"":[{""Kind"":""Int32"",""Value"":24},{""Kind"":""Int32"",""Value"":24}]}"
+            Name = $"Composite: Composite:24|24",
+            SourceFactoryArgument = new ApiIdDescriptor
+            (
+                CompositePartsConfig: [
+                    new ApiIdCompositePartConfig
+                    (
+                        ScalarConfig: new ApiIdScalarConfig
+                        (
+                            Kind: ApiIdKind.Int32,
+                            Int32Value: 24
+                        )
+                    ),
+                    new ApiIdCompositePartConfig
+                    (
+                        ScalarConfig: new ApiIdScalarConfig
+                        (
+                            Kind: ApiIdKind.Int32,
+                            Int32Value: 24
+                        )
+                    )
+                ]
+            ),
+            ExpectedJson = @"{""Kind"":""Composite"",""Value"":[{""Kind"":""Int32"",""Value"":24},{""Kind"":""Int32"",""Value"":24}]}"
         },
-        new JsonSerializeTest<ApiId>
+
+        new JsonSerializeTest
         {
-            Name = $"Composite: {TestCompositeInt24AndInt42ApiId.ToDebuggerDisplay()}",
-            Source = TestCompositeInt24AndInt42ApiId,
-            Expected = @"{""Kind"":""Composite"",""Value"":[{""Kind"":""Int32"",""Value"":24},{""Kind"":""Int32"",""Value"":42}]}"
+            Name = $"Composite: Composite:24|42",
+            SourceFactoryArgument = new ApiIdDescriptor
+            (
+                CompositePartsConfig: [
+                    new ApiIdCompositePartConfig
+                    (
+                        ScalarConfig: new ApiIdScalarConfig
+                        (
+                            Kind: ApiIdKind.Int32,
+                            Int32Value: 24
+                        )
+                    ),
+                    new ApiIdCompositePartConfig
+                    (
+                        ScalarConfig: new ApiIdScalarConfig
+                        (
+                            Kind: ApiIdKind.Int32,
+                            Int32Value: 42
+                        )
+                    )
+                ]
+            ),
+            ExpectedJson = @"{""Kind"":""Composite"",""Value"":[{""Kind"":""Int32"",""Value"":24},{""Kind"":""Int32"",""Value"":42}]}"
         },
 
         // .. Named (named parts)
-        new JsonSerializeTest<ApiId>
+        new JsonSerializeTest
         {
-            Name = $"Composite: {TestCompositeAlphaInt24AndBetaInt24ApiId.ToDebuggerDisplay()}",
-            Source = TestCompositeAlphaInt24AndBetaInt24ApiId,
-            Expected = @"{""Kind"":""Composite"",""Value"":[{""Name"":""alpha"",""Kind"":""Int32"",""Value"":24},{""Name"":""beta"",""Kind"":""Int32"",""Value"":24}]}"
+            Name = $"Composite: Composite:alpha=24|beta=24",
+            SourceFactoryArgument = new ApiIdDescriptor
+            (
+                CompositePartsConfig: [
+                    new ApiIdCompositePartConfig
+                    (
+                        Name: "alpha",
+                        ScalarConfig: new ApiIdScalarConfig
+                        (
+                            Kind: ApiIdKind.Int32,
+                            Int32Value: 24
+                        )
+                    ),
+                    new ApiIdCompositePartConfig
+                    (
+                        Name: "beta",
+                        ScalarConfig: new ApiIdScalarConfig
+                        (
+                            Kind: ApiIdKind.Int32,
+                            Int32Value: 24
+                        )
+                    )
+                ]
+            ),
+            ExpectedJson = @"{""Kind"":""Composite"",""Value"":[{""Name"":""alpha"",""Kind"":""Int32"",""Value"":24},{""Name"":""beta"",""Kind"":""Int32"",""Value"":24}]}"
         },
-        new JsonSerializeTest<ApiId>
+        new JsonSerializeTest
         {
-            Name = $"Composite: {TestCompositeAlphaInt24AndBetaInt42ApiId.ToDebuggerDisplay()}",
-            Source = TestCompositeAlphaInt24AndBetaInt42ApiId,
-            Expected = @"{""Kind"":""Composite"",""Value"":[{""Name"":""alpha"",""Kind"":""Int32"",""Value"":24},{""Name"":""beta"",""Kind"":""Int32"",""Value"":42}]}"
+            Name = $"Composite: Composite:alpha=24|beta=42",
+            SourceFactoryArgument = new ApiIdDescriptor
+            (
+                CompositePartsConfig: [
+                    new ApiIdCompositePartConfig
+                    (
+                        Name: "alpha",
+                        ScalarConfig: new ApiIdScalarConfig
+                        (
+                            Kind: ApiIdKind.Int32,
+                            Int32Value: 24
+                        )
+                    ),
+                    new ApiIdCompositePartConfig
+                    (
+                        Name: "beta",
+                        ScalarConfig: new ApiIdScalarConfig
+                        (
+                            Kind: ApiIdKind.Int32,
+                            Int32Value: 42
+                        )
+                    )
+                ]
+            ),
+            ExpectedJson = @"{""Kind"":""Composite"",""Value"":[{""Name"":""alpha"",""Kind"":""Int32"",""Value"":24},{""Name"":""beta"",""Kind"":""Int32"",""Value"":42}]}"
         },
-        new JsonSerializeTest<ApiId>
+        new JsonSerializeTest
         {
-            Name = $"Composite: {TestCompositeAlphaInt24AndZetaInt42ApiId.ToDebuggerDisplay()}",
-            Source = TestCompositeAlphaInt24AndZetaInt42ApiId,
-            Expected = @"{""Kind"":""Composite"",""Value"":[{""Name"":""alpha"",""Kind"":""Int32"",""Value"":24},{""Name"":""zeta"",""Kind"":""Int32"",""Value"":42}]}"
+            Name = $"Composite: Composite:alpha=24|zeta=42",
+            SourceFactoryArgument = new ApiIdDescriptor
+            (
+                CompositePartsConfig: [
+                    new ApiIdCompositePartConfig
+                    (
+                        Name: "alpha",
+                        ScalarConfig: new ApiIdScalarConfig
+                        (
+                            Kind: ApiIdKind.Int32,
+                            Int32Value: 24
+                        )
+                    ),
+                    new ApiIdCompositePartConfig
+                    (
+                        Name: "zeta",
+                        ScalarConfig: new ApiIdScalarConfig
+                        (
+                            Kind: ApiIdKind.Int32,
+                            Int32Value: 42
+                        )
+                    )
+                ]
+            ),
+            ExpectedJson = @"{""Kind"":""Composite"",""Value"":[{""Name"":""alpha"",""Kind"":""Int32"",""Value"":24},{""Name"":""zeta"",""Kind"":""Int32"",""Value"":42}]}"
         },
     ];
 
@@ -1261,5 +1786,38 @@ public class ApiIdTests(ITestOutputHelper output) : XUnitTests(output)
     [Theory]
     [MemberData(nameof(TryParseTheoryData))]
     public void TryParse(IXUnitTest test) => test.Execute(this);
+    #endregion
+
+    #region Helper Methods
+    private static ApiId BuildApiId(ApiIdDescriptor? descriptor)
+    {
+        if (descriptor != null && descriptor.ScalarConfig != null)
+        {
+            var scalarConfig = descriptor.ScalarConfig;
+            return scalarConfig.Kind switch
+            {
+                ApiIdKind.None => ApiId.Empty,
+                ApiIdKind.Culture when scalarConfig.CultureValue != null => ApiId.FromCulture(scalarConfig.CultureValue),
+                ApiIdKind.Guid when scalarConfig.GuidValue != null => ApiId.FromGuid(scalarConfig.GuidValue.Value),
+                ApiIdKind.Int32 when scalarConfig.Int32Value != null => ApiId.FromInt32(scalarConfig.Int32Value.Value),
+                ApiIdKind.Int64 when scalarConfig.Int64Value != null => ApiId.FromInt64(scalarConfig.Int64Value.Value),
+                ApiIdKind.String when scalarConfig.StringValue != null => ApiId.FromString(scalarConfig.StringValue),
+                ApiIdKind.Ulid when scalarConfig.UlidValue != null => ApiId.FromUlid(scalarConfig.UlidValue.Value),
+                _ => throw new InvalidOperationException($"Invalid {nameof(ApiIdDescriptor)}: {nameof(ApiIdDescriptor.ScalarConfig)} is missing required value.")
+            };
+        }
+        else if (descriptor != null && descriptor.CompositePartsConfig != null && descriptor.CompositePartsConfig.Length > 0)
+        {
+            var parts = descriptor.CompositePartsConfig.Select(partConfig =>
+            {
+                var partApiId = BuildApiId(new ApiIdDescriptor(partConfig.ScalarConfig, null));
+                return ApiIdPart.Create(partConfig.Name, partApiId);
+            }).ToArray();
+
+            return ApiId.Composite(parts);
+        }
+
+        return ApiId.Empty;
+    }
     #endregion
 }

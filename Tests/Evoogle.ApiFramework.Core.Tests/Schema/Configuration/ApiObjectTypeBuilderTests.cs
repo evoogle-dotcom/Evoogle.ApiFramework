@@ -9,6 +9,8 @@ using Evoogle.XUnit;
 
 using FluentAssertions;
 
+using static Evoogle.ApiFramework.Schema.TestData.ApiSchemaFactory;
+
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
 public class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnitTests(output)
@@ -17,7 +19,7 @@ public class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
     public class BuildTest : XUnitTest
     {
         #region User Supplied Properties
-        public required ApiTestSchemaKind ApiSchemaKind { get; init; }
+        public required ApiSchemaKind ApiSchemaKind { get; init; }
         public required string ApiObjectTypeName { get; init; }
         public Type? ApiExtensionType1 { get; init; }
         public Type? ApiExtensionType2 { get; init; }
@@ -31,7 +33,7 @@ public class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
         #region XUnitTest Methods
         protected override void Arrange()
         {
-            var apiSchema = ApiTestSchemaFactory.BuildTestSchema(this.ApiSchemaKind) ?? throw new InvalidOperationException($"{nameof(ApiSchema)} creation failed.");
+            var apiSchema = BuildTestApiSchema(this.ApiSchemaKind) ?? throw new InvalidOperationException($"{nameof(ApiSchema)} creation failed.");
             var apiType = apiSchema.GetObjectTypeByApiName(this.ApiObjectTypeName) as ApiType ?? throw new InvalidOperationException($"{nameof(ApiObjectType)} '{this.ApiObjectTypeName}' not found in ApiSchema.");
 
             var apiTypeExpected = (ApiObjectType)apiType.DeepCopy()!; // Needs to be ApiType here to allow deep copy by JSON serialization/deserialization to work properly
@@ -130,42 +132,42 @@ public class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
     [
         new BuildTest
         {
-            Name = $"Builds {nameof(Empty)} from {ApiTestSchemaKind.Simple} API schema",
-            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            Name = $"Builds {nameof(Empty)} from {ApiSchemaKind.Simple} API schema",
+            ApiSchemaKind = ApiSchemaKind.Simple,
             ApiObjectTypeName = nameof(Empty),
         },
         new BuildTest
         {
-            Name = $"Builds {nameof(Empty)} with GraphQl extension from {ApiTestSchemaKind.Simple} API schema",
-            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            Name = $"Builds {nameof(Empty)} with GraphQl extension from {ApiSchemaKind.Simple} API schema",
+            ApiSchemaKind = ApiSchemaKind.Simple,
             ApiObjectTypeName = nameof(Empty),
             ApiExtensionType1 = typeof(GraphQlExtension),
         },
 
         new BuildTest
         {
-            Name = $"Builds {nameof(ScalarsOnly)} from {ApiTestSchemaKind.Simple} API schema",
-            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            Name = $"Builds {nameof(ScalarsOnly)} from {ApiSchemaKind.Simple} API schema",
+            ApiSchemaKind = ApiSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
         },
         new BuildTest
         {
-            Name = $"Builds {nameof(ScalarsOnly)} with GraphQl extension from {ApiTestSchemaKind.Simple} API schema",
-            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            Name = $"Builds {nameof(ScalarsOnly)} with GraphQl extension from {ApiSchemaKind.Simple} API schema",
+            ApiSchemaKind = ApiSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiExtensionType1 = typeof(GraphQlExtension),
         },
         new BuildTest
         {
-            Name = $"Builds {nameof(ScalarsOnly)} with JsonApi extension from {ApiTestSchemaKind.Simple} API schema",
-            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            Name = $"Builds {nameof(ScalarsOnly)} with JsonApi extension from {ApiSchemaKind.Simple} API schema",
+            ApiSchemaKind = ApiSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiExtensionType1 = typeof(JsonApiExtension),
         },
         new BuildTest
         {
-            Name = $"Builds {nameof(ScalarsOnly)} with GraphQl and JsonApi extensions from {ApiTestSchemaKind.Simple} API schema",
-            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            Name = $"Builds {nameof(ScalarsOnly)} with GraphQl and JsonApi extensions from {ApiSchemaKind.Simple} API schema",
+            ApiSchemaKind = ApiSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiExtensionType1 = typeof(GraphQlExtension),
             ApiExtensionType2 = typeof(JsonApiExtension),
@@ -173,14 +175,14 @@ public class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
 
         new BuildTest
         {
-            Name = $"Builds {nameof(Company)} from {ApiTestSchemaKind.Simple} API schema",
-            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            Name = $"Builds {nameof(Company)} from {ApiSchemaKind.Simple} API schema",
+            ApiSchemaKind = ApiSchemaKind.Simple,
             ApiObjectTypeName = nameof(Company),
         },
         new BuildTest
         {
-            Name = $"Builds {nameof(Company)} with GraphQl extension from {ApiTestSchemaKind.Simple} API schema",
-            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            Name = $"Builds {nameof(Company)} with GraphQl extension from {ApiSchemaKind.Simple} API schema",
+            ApiSchemaKind = ApiSchemaKind.Simple,
             ApiObjectTypeName = nameof(Company),
             ApiExtensionType1 = typeof(GraphQlExtension),
         },

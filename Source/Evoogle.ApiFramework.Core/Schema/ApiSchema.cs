@@ -40,11 +40,11 @@ public sealed class ApiSchema : ExtensibleBase
     /// <summary>Gets the name of the API schema.</summary>
     public string ApiName { get; }
 
-    /// <summary>Gets the optional version of the API schema.</summary>
-    public string? ApiVersion { get; init; }
+    /// <summary>Gets the version of the API schema.</summary>
+    public string ApiVersion { get; }
 
     /// <summary>Gets the options used to configure this API schema.</summary>
-    public ApiSchemaOptions ApiOptions { get; init; }
+    public ApiSchemaOptions ApiOptions { get; }
 
     /// <summary>Gets the API path for this schema. Available after initialization.</summary>
     public string ApiPath => this.ThrowIfNotInitialized(_apiPath);
@@ -82,24 +82,30 @@ public sealed class ApiSchema : ExtensibleBase
     ///     Instantiates a new instance of the <see cref="ApiSchema"/> class using separate collections for scalar, enum, and object types.
     /// </summary>
     /// <param name="apiName">The name of the API schema.</param>
+    /// <param name="apiVersion">The optional version of the API schema. Will default to "1.0" if not provided.</param>
+    /// <param name="apiOptions">The options used to configure this API schema. If null, the default options are used.</param>
     /// <param name="apiScalarTypes">The collection of scalar types to include in the API schema.</param>
     /// <param name="apiEnumTypes">The collection of enum types to include in the API schema.</param>
     /// <param name="apiObjectTypes">The collection of object types to include in the API schema.</param>
-    /// <param name="apiSchemaOptions">The options used to configure this API schema. If null, the default options are used.</param>
     public ApiSchema
     (
         string apiName,
+        string? apiVersion,
+        ApiSchemaOptions? apiOptions,
         IEnumerable<ApiScalarType>? apiScalarTypes,
         IEnumerable<ApiEnumType>? apiEnumTypes,
-        IEnumerable<ApiObjectType>? apiObjectTypes,
-        ApiSchemaOptions? apiSchemaOptions = null
+        IEnumerable<ApiObjectType>? apiObjectTypes
     )
     {
         // Initialize the API name.
         this.ApiName = apiName;
 
+        // Initialize the API version.
+        // Default to standard semantic versioning for initial development version.
+        this.ApiVersion = apiVersion ?? "0.1.0";
+
         // Initialize the API schema options.
-        this.ApiOptions = apiSchemaOptions ?? ApiSchemaOptions.Default;
+        this.ApiOptions = apiOptions ?? ApiSchemaOptions.Default;
 
         // Initialize the collections for API types, scalar types, enum types, and object types.
         this.ApiScalarTypes = [.. apiScalarTypes.EmptyIfNull().Where(x => x is not null).OrderBy(x => x.ApiName, StringComparer.OrdinalIgnoreCase)];
@@ -116,16 +122,17 @@ public sealed class ApiSchema : ExtensibleBase
     ///     Instantiates a new instance of the <see cref="ApiSchema"/> class from a collection of API named types.
     /// </summary>
     /// <param name="apiName">The name of the API schema.</param>
-    /// <param name="apiVersion">The optional version of the API schema.</param>
+    /// <param name="apiVersion">The optional version of the API schema. Will default to "1.0" if not provided.</param>
+    /// <param name="apiOptions">The options used to configure this API schema. If null, the default options are used.</param>
     /// <param name="apiNamedTypes">The collection of API named types to include in the API schema.</param>
-    /// <param name="apiSchemaOptions">The options used to configure this API schema. If null, the default options are used.</param>
     public ApiSchema
     (
         string apiName,
-        IEnumerable<ApiNamedType>? apiNamedTypes,
-        ApiSchemaOptions? apiSchemaOptions = null
+        string? apiVersion,
+        ApiSchemaOptions? apiOptions,
+        IEnumerable<ApiNamedType>? apiNamedTypes
     )
-        : this(apiName, apiNamedTypes?.OfType<ApiScalarType>(), apiNamedTypes?.OfType<ApiEnumType>(), apiNamedTypes?.OfType<ApiObjectType>(), apiSchemaOptions)
+        : this(apiName, apiVersion, apiOptions, apiNamedTypes?.OfType<ApiScalarType>(), apiNamedTypes?.OfType<ApiEnumType>(), apiNamedTypes?.OfType<ApiObjectType>())
     { }
     #endregion
 
@@ -190,21 +197,17 @@ public sealed class ApiSchema : ExtensibleBase
         string apiName,
         IEnumerable<ApiNamedType>? apiNamedTypes,
         string? apiVersion = null,
-        ApiSchemaOptions? apiSchemaOptions = null,
-        IEnumerable<object>? extensions = null
+        ApiSchemaOptions? apiOptions = null,
+        IEnumerable<(Type ExtensionType, object ExtensionInstance)>? extensionTypeAndInstances = null
     )
     {
-        var apiSchema = new ApiSchema(apiName, apiNamedTypes, apiSchemaOptions)
-        {
-            ApiVersion = apiVersion
-        };
+        var apiSchema = new ApiSchema(apiName, apiVersion, apiOptions, apiNamedTypes);
 
-        if (extensions is not null)
+        if (extensionTypeAndInstances is not null)
         {
-            foreach (var extension in extensions)
+            foreach (var (extensionType, extensionInstance) in extensionTypeAndInstances)
             {
-                var extensionType = extension.GetType();
-                apiSchema.AttachExtension(extensionType, extension);
+                apiSchema.AttachExtension(extensionType, extensionInstance);
             }
         }
 
@@ -221,23 +224,20 @@ public sealed class ApiSchema : ExtensibleBase
         IEnumerable<ApiEnumType>? apiEnumTypes,
         IEnumerable<ApiObjectType>? apiObjectTypes,
         string? apiVersion = null,
-        ApiSchemaOptions? apiSchemaOptions = null,
-        IEnumerable<object>? extensions = null
+        ApiSchemaOptions? apiOptions = null,
+        IEnumerable<(Type ExtensionType, object ExtensionInstance)>? extensionTypeAndInstances = null
     )
     {
-        var apiSchema = new ApiSchema(apiName, apiScalarTypes, apiEnumTypes, apiObjectTypes, apiSchemaOptions)
-        {
-            ApiVersion = apiVersion
-        };
+        var apiSchema = new ApiSchema(apiName, apiVersion, apiOptions, apiScalarTypes, apiEnumTypes, apiObjectTypes);
 
-        if (extensions is not null)
+        if (extensionTypeAndInstances is not null)
         {
-            foreach (var extension in extensions)
+            foreach (var (extensionType, extensionInstance) in extensionTypeAndInstances)
             {
-                var extensionType = extension.GetType();
-                apiSchema.AttachExtension(extensionType, extension);
+                apiSchema.AttachExtension(extensionType, extensionInstance);
             }
         }
+
         var result = apiSchema.Initialize();
         result.ThrowIfInvalid();
 
@@ -251,13 +251,14 @@ public sealed class ApiSchema : ExtensibleBase
     {
         var apiName = this.ApiName.SafeToString();
         var apiVersion = this.ApiVersion.SafeToString();
+        var apiOptions = this.ApiOptions.SafeToString();
         var apiNamedTypeCount = this.ApiNamedTypes.Length.SafeToString();
         var apiScalarTypeCount = this.ApiScalarTypes.Length.SafeToString();
         var apiEnumTypeCount = this.ApiEnumTypes.Length.SafeToString();
         var apiObjectTypeCount = this.ApiObjectTypes.Length.SafeToString();
         var extensionCount = this.ExtensionCount.SafeToString();
 
-        return $"{nameof(ApiSchema)} {{ApiName={apiName}, ApiVersion={apiVersion}, ApiNamedTypeCount={apiNamedTypeCount}, ApiScalarTypeCount={apiScalarTypeCount}, ApiEnumTypeCount={apiEnumTypeCount}, ApiObjectTypeCount={apiObjectTypeCount}, {nameof(this.ExtensionCount)}={extensionCount}}}";
+        return $"{nameof(ApiSchema)} {{ApiName={apiName}, ApiVersion={apiVersion}, {nameof(this.ApiOptions)}={apiOptions}, ApiNamedTypeCount={apiNamedTypeCount}, ApiScalarTypeCount={apiScalarTypeCount}, ApiEnumTypeCount={apiEnumTypeCount}, ApiObjectTypeCount={apiObjectTypeCount}, {nameof(this.ExtensionCount)}={extensionCount}}}";
     }
     #endregion
 

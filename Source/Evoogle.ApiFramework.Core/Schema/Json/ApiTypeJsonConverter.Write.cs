@@ -73,9 +73,9 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
     // ApiObjectType
     private static void WriteApiObjectType(Utf8JsonWriter writer, ApiObjectType apiObjectType, DefaultWriteContext<PropertyNames> context)
     {
+        WriteApiObjectTypeApiOptions(writer, apiObjectType, context);
         WriteApiObjectTypeApiProperties(writer, apiObjectType, context);
         WriteApiObjectTypeApiRelationships(writer, apiObjectType, context);
-        WriteApiObjectTypeApiOptions(writer, apiObjectType, context);
     }
 
     private static void WriteApiObjectTypeApiProperties(Utf8JsonWriter writer, ApiObjectType apiObjectType, DefaultWriteContext<PropertyNames> context)

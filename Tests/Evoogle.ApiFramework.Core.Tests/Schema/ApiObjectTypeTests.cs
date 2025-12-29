@@ -9,6 +9,8 @@ using Evoogle.XUnit;
 
 using FluentAssertions;
 
+using static Evoogle.ApiFramework.Schema.TestData.ApiSchemaFactory;
+
 namespace Evoogle.ApiFramework.Schema;
 
 public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
@@ -24,7 +26,7 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
     public class TryGetTest : XUnitTest
     {
         #region User Supplied Properties
-        public required ApiTestSchemaKind ApiSchemaKind { get; init; }
+        public required ApiSchemaKind ApiSchemaKind { get; init; }
         public required string ApiObjectTypeName { get; init; }
         public required TryGetMethod TryGetMethod { get; init; }
         public required string SearchKey { get; init; }
@@ -40,7 +42,7 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
         #region XUnitTest Methods
         protected override void Arrange()
         {
-            var apiSchema = ApiTestSchemaFactory.BuildTestSchema(this.ApiSchemaKind);
+            var apiSchema = BuildTestApiSchema(this.ApiSchemaKind);
             this.ApiSchema = apiSchema ?? throw new InvalidOperationException($"{nameof(Schema.ApiSchema)} creation failed.");
 
             var apiObjectType = this.ApiSchema.GetObjectTypeByApiName(this.ApiObjectTypeName);
@@ -84,7 +86,7 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
         new TryGetTest
         {
             Name = $"{nameof(ApiObjectType.TryGetPropertyByApiName)} returns true when {nameof(ApiProperty)} exists with exact case match",
-            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiSchemaKind = ApiSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             TryGetMethod = TryGetMethod.TryGetPropertyByApiName,
             SearchKey = "RequiredName",
@@ -94,7 +96,7 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
         new TryGetTest
         {
             Name = $"{nameof(ApiObjectType.TryGetPropertyByApiName)} returns true when {nameof(ApiProperty)} exists but with case-insensitive search",
-            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiSchemaKind = ApiSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             TryGetMethod = TryGetMethod.TryGetPropertyByApiName,
             SearchKey = "requiredname",
@@ -104,7 +106,7 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
         new TryGetTest
         {
             Name = $"{nameof(ApiObjectType.TryGetPropertyByApiName)} returns false when {nameof(ApiProperty)} does not exist",
-            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiSchemaKind = ApiSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             TryGetMethod = TryGetMethod.TryGetPropertyByApiName,
             SearchKey = "Unknown_Property",
@@ -115,7 +117,7 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
         new TryGetTest
         {
             Name = $"{nameof(ApiObjectType.TryGetPropertyByClrName)} returns true when {nameof(ApiProperty)} exists with exact case match",
-            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiSchemaKind = ApiSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             TryGetMethod = TryGetMethod.TryGetPropertyByClrName,
             SearchKey = "OptionalName",
@@ -125,7 +127,7 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
         new TryGetTest
         {
             Name = $"{nameof(ApiObjectType.TryGetPropertyByClrName)} returns true when {nameof(ApiProperty)} exists but with case-insensitive search",
-            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiSchemaKind = ApiSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             TryGetMethod = TryGetMethod.TryGetPropertyByClrName,
             SearchKey = "OPTIONALNAME",
@@ -135,7 +137,7 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
         new TryGetTest
         {
             Name = $"{nameof(ApiObjectType.TryGetPropertyByClrName)} returns false when {nameof(ApiProperty)} does not exist",
-            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiSchemaKind = ApiSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             TryGetMethod = TryGetMethod.TryGetPropertyByClrName,
             SearchKey = "Unknown_Property",
@@ -146,7 +148,7 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
         new TryGetTest
         {
             Name = $"{nameof(ApiObjectType.TryGetRelationshipByApiName)} returns true when {nameof(ApiRelationship)} exists with exact case match",
-            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiSchemaKind = ApiSchemaKind.Simple,
             ApiObjectTypeName = nameof(Company),
             TryGetMethod = TryGetMethod.TryGetRelationshipByApiName,
             SearchKey = "Company_Owner",
@@ -156,7 +158,7 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
         new TryGetTest
         {
             Name = $"{nameof(ApiObjectType.TryGetRelationshipByApiName)} returns true when {nameof(ApiRelationship)} exists but with case-insensitive search",
-            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiSchemaKind = ApiSchemaKind.Simple,
             ApiObjectTypeName = nameof(Company),
             TryGetMethod = TryGetMethod.TryGetRelationshipByApiName,
             SearchKey = "COMPANY_OWNER",
@@ -166,7 +168,7 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
         new TryGetTest
         {
             Name = $"{nameof(ApiObjectType.TryGetRelationshipByApiName)} returns false when {nameof(ApiRelationship)} does not exist",
-            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiSchemaKind = ApiSchemaKind.Simple,
             ApiObjectTypeName = nameof(Company),
             TryGetMethod = TryGetMethod.TryGetRelationshipByApiName,
             SearchKey = "Unknown_Relationship",

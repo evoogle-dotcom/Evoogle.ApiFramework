@@ -31,10 +31,10 @@ namespace Evoogle.ApiFramework.Schema;
 public sealed partial class ApiObjectType
 (
     string apiName,
-    IEnumerable<ApiProperty> apiProperties,
-    IEnumerable<ApiRelationship>? apiRelationships,
     ApiIdentitySet? apiIdentitySet,
     ApiObjectTypeOptions? apiOptions,
+    IEnumerable<ApiProperty>? apiProperties,
+    IEnumerable<ApiRelationship>? apiRelationships,
     Type clrObjectType
 ) : ApiNamedType(apiName, clrObjectType)
 {
@@ -54,16 +54,6 @@ public sealed partial class ApiObjectType
 
     #region ApiObject Properties
     /// <summary>
-    ///     Gets the collection of API properties defined on this object type.
-    /// </summary>
-    public ApiProperty[] ApiProperties { get; } = [.. apiProperties.EmptyIfNull().Where(x => x is not null)];
-
-    /// <summary>
-    ///     Gets the collection of API relationships defined on this object type.
-    /// </summary>
-    public ApiRelationship[] ApiRelationships { get; } = [.. apiRelationships.EmptyIfNull().Where(x => x is not null)];
-
-    /// <summary>
     ///     Gets the collection of API identities defined on this object type.
     /// </summary>
     public ApiIdentitySet? ApiIdentitySet => apiIdentitySet;
@@ -74,6 +64,16 @@ public sealed partial class ApiObjectType
     public ApiIdentity? ApiPrimaryIdentity => this.ApiIdentitySet?.ApiPrimaryIdentity;
 
     public ApiObjectTypeOptions? ApiOptions => apiOptions;
+
+    /// <summary>
+    ///     Gets the collection of API properties defined on this object type.
+    /// </summary>
+    public ApiProperty[] ApiProperties { get; } = [.. apiProperties.EmptyIfNull().Where(x => x is not null)];
+
+    /// <summary>
+    ///     Gets the collection of API relationships defined on this object type.
+    /// </summary>
+    public ApiRelationship[] ApiRelationships { get; } = [.. apiRelationships.EmptyIfNull().Where(x => x is not null)];
 
     /// <summary>
     ///     Indicates whether this object type has any API identities defined.

@@ -287,7 +287,7 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
         apiEnumTypes: [],
         apiObjectTypes: [],
         apiVersion: "1.0",
-        extensions: [new TestExtension()]
+        extensionTypeAndInstances: [(typeof(TestExtension), new TestExtension())]
     );
 
     private static ApiSchema ApiScalarsOnlySchema { get; } = ApiSchema.Create
@@ -316,7 +316,7 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
         apiEnumTypes: [],
         apiObjectTypes: [],
         apiVersion: "1.0",
-        extensions: [new TestExtension()]
+        extensionTypeAndInstances: [(typeof(TestExtension), new TestExtension())]
     );
 
     private static ApiSchema ApiScalarsOnlyObjectTypeSchema { get; } = ApiSchema.Create

@@ -9,6 +9,8 @@ using Evoogle.XUnit;
 
 using FluentAssertions;
 
+using static Evoogle.ApiFramework.Schema.TestData.ApiSchemaFactory;
+
 namespace Evoogle.ApiFramework.Schema;
 
 public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
@@ -24,7 +26,7 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
     public class TryGetTest : XUnitTest
     {
         #region User Supplied Properties
-        public required ApiTestSchemaKind ApiSchemaKind { get; init; }
+        public required ApiSchemaKind ApiSchemaKind { get; init; }
         public required string ApiEnumTypeName { get; init; }
         public required TryGetMethodKind TryGetMethod { get; init; }
         public required object SearchKey { get; init; }
@@ -40,7 +42,7 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
         #region XUnitTest Methods
         protected override void Arrange()
         {
-            var apiSchema = ApiTestSchemaFactory.BuildTestSchema(this.ApiSchemaKind);
+            var apiSchema = BuildTestApiSchema(this.ApiSchemaKind);
             this.ApiSchema = apiSchema ?? throw new InvalidOperationException($"{nameof(Schema.ApiSchema)} creation failed.");
 
             var apiEnumType = this.ApiSchema.GetEnumTypeByApiName(this.ApiEnumTypeName);
@@ -85,7 +87,7 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
         new TryGetTest
         {
             Name = $"{nameof(ApiEnumType.TryGetValueByApiName)} returns true when {nameof(ApiEnumValue)} exists with exact case match",
-            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiSchemaKind = ApiSchemaKind.Simple,
             ApiEnumTypeName = nameof(Gender),
             TryGetMethod = TryGetMethodKind.TryGetValueByApiName,
             SearchKey = "Male",
@@ -95,7 +97,7 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
         new TryGetTest
         {
             Name = $"{nameof(ApiEnumType.TryGetValueByApiName)} returns false when {nameof(ApiEnumValue)} exists but with case-insensitive search",
-            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiSchemaKind = ApiSchemaKind.Simple,
             ApiEnumTypeName = nameof(Gender),
             TryGetMethod = TryGetMethodKind.TryGetValueByApiName,
             SearchKey = "MALE",
@@ -105,7 +107,7 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
         new TryGetTest
         {
             Name = $"{nameof(ApiEnumType.TryGetValueByApiName)} returns false when {nameof(ApiEnumValue)} does not exist",
-            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiSchemaKind = ApiSchemaKind.Simple,
             ApiEnumTypeName = nameof(Gender),
             TryGetMethod = TryGetMethodKind.TryGetValueByApiName,
             SearchKey = "alien",
@@ -116,7 +118,7 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
         new TryGetTest
         {
             Name = $"{nameof(ApiEnumType.TryGetValueByClrName)} returns true when {nameof(ApiEnumValue)} exists with exact case match",
-            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiSchemaKind = ApiSchemaKind.Simple,
             ApiEnumTypeName = nameof(Gender),
             TryGetMethod = TryGetMethodKind.TryGetValueByClrName,
             SearchKey = "Male",
@@ -126,7 +128,7 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
         new TryGetTest
         {
             Name = $"{nameof(ApiEnumType.TryGetValueByClrName)} returns false when {nameof(ApiEnumValue)} exists but with case-insensitive search",
-            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiSchemaKind = ApiSchemaKind.Simple,
             ApiEnumTypeName = nameof(Gender),
             TryGetMethod = TryGetMethodKind.TryGetValueByClrName,
             SearchKey = "MALE",
@@ -136,7 +138,7 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
         new TryGetTest
         {
             Name = $"{nameof(ApiEnumType.TryGetValueByClrName)} returns false when {nameof(ApiEnumValue)} does not exist",
-            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiSchemaKind = ApiSchemaKind.Simple,
             ApiEnumTypeName = nameof(Gender),
             TryGetMethod = TryGetMethodKind.TryGetValueByClrName,
             SearchKey = "Alien",
@@ -147,7 +149,7 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
         new TryGetTest
         {
             Name = $"{nameof(ApiEnumType.TryGetValueByClrOrdinal)} returns true when {nameof(ApiEnumValue)} exists for given ordinal",
-            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiSchemaKind = ApiSchemaKind.Simple,
             ApiEnumTypeName = nameof(Gender),
             TryGetMethod = TryGetMethodKind.TryGetValueByClrOrdinal,
             SearchKey = 1,
@@ -157,7 +159,7 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
         new TryGetTest
         {
             Name = $"{nameof(ApiEnumType.TryGetValueByClrOrdinal)} returns false when {nameof(ApiEnumValue)} does not exist for given ordinal",
-            ApiSchemaKind = ApiTestSchemaKind.Simple,
+            ApiSchemaKind = ApiSchemaKind.Simple,
             ApiEnumTypeName = nameof(Gender),
             TryGetMethod = TryGetMethodKind.TryGetValueByClrOrdinal,
             SearchKey = 3,

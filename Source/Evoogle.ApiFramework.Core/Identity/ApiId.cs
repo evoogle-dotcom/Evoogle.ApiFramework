@@ -217,47 +217,47 @@ public readonly struct ApiId
     /// <summary>
     ///     Creates a composite identifier from an ordered sequence of part identifiers. Parts are treated as unnamed.
     /// </summary>
-    /// <param name="orderedParts">The ordered part identifiers.</param>
-    /// <returns>The composite identifier or <see cref="Empty"/> if <paramref name="orderedParts"/> is null or empty.</returns>
-    public static ApiId Composite(IEnumerable<ApiId> orderedParts)
+    /// <param name="partIdCollection">The ordered part identifiers.</param>
+    /// <returns>The composite identifier or <see cref="Empty"/> if <paramref name="partIdCollection"/> is null or empty.</returns>
+    public static ApiId Composite(IEnumerable<ApiId> partIdCollection)
     {
-        if (orderedParts is null)
+        if (partIdCollection is null)
         {
             return Empty;
         }
 
-        var parts = orderedParts as ApiId[] ?? [.. orderedParts];
-        if (parts.Length == 0)
+        var partIdArray = partIdCollection as ApiId[] ?? [.. partIdCollection];
+        if (partIdArray.Length == 0)
         {
             return Empty;
         }
 
-        var named = new ApiIdPart[parts.Length];
-        for (var i = 0; i < parts.Length; i++)
+        var parts = new ApiIdPart[partIdArray.Length];
+        for (var i = 0; i < partIdArray.Length; i++)
         {
-            named[i] = new ApiIdPart(null, parts[i]);
+            parts[i] = new ApiIdPart(null, partIdArray[i]);
         }
 
-        ValidateCompositeParts(named);
-        return new ApiId(ApiIdKind.Composite, default, named, ToDebugString(named));
+        ValidateCompositeParts(parts);
+        return new ApiId(ApiIdKind.Composite, default, parts, ToDebugString(parts));
     }
 
     /// <summary>
     ///     Creates a composite identifier from ordered unnamed part identifiers (params overload).
     /// </summary>
-    /// <param name="orderedParts">The ordered part identifiers.</param>
+    /// <param name="partIdArray">The ordered part identifiers.</param>
     /// <returns>The composite identifier or <see cref="Empty"/>.</returns>
-    public static ApiId Composite(params ApiId[]? orderedParts)
+    public static ApiId Composite(params ApiId[]? partIdArray)
     {
-        if (orderedParts is null || orderedParts.Length == 0)
+        if (partIdArray is null || partIdArray.Length == 0)
         {
             return Empty;
         }
 
-        var parts = new ApiIdPart[orderedParts.Length];
-        for (var i = 0; i < orderedParts.Length; i++)
+        var parts = new ApiIdPart[partIdArray.Length];
+        for (var i = 0; i < partIdArray.Length; i++)
         {
-            parts[i] = new ApiIdPart(null, orderedParts[i]);
+            parts[i] = new ApiIdPart(null, partIdArray[i]);
         }
 
         ValidateCompositeParts(parts);
@@ -266,18 +266,18 @@ public readonly struct ApiId
     }
 
     /// <summary>
-    ///     Creates a composite identifier from named part structures.
+    ///     Creates a composite identifier from part structures.
     /// </summary>
-    /// <param name="namedParts">The sequence of named parts.</param>
+    /// <param name="parts">The sequence of parts.</param>
     /// <returns>The composite identifier or <see cref="Empty"/>.</returns>
-    public static ApiId Composite(IEnumerable<ApiIdPart>? namedParts)
+    public static ApiId Composite(IEnumerable<ApiIdPart>? parts)
     {
-        if (namedParts is null || !namedParts.Any())
+        if (parts is null || !parts.Any())
         {
             return Empty;
         }
 
-        var clone = namedParts.Select(p => new ApiIdPart(p.Name, p.Value)).ToArray();
+        var clone = parts.Select(p => new ApiIdPart(p.Name, p.Value)).ToArray();
 
         ValidateCompositeParts(clone);
 
@@ -285,18 +285,18 @@ public readonly struct ApiId
     }
 
     /// <summary>
-    ///     Creates a composite identifier from named parts (params overload).
+    ///     Creates a composite identifier from parts (params overload).
     /// </summary>
-    /// <param name="namedParts">The named parts.</param>
+    /// <param name="partArray">The sequence of parts.</param>
     /// <returns>The composite identifier or <see cref="Empty"/>.</returns>
-    public static ApiId Composite(params ApiIdPart[]? namedParts)
+    public static ApiId Composite(params ApiIdPart[]? partArray)
     {
-        if (namedParts is null || namedParts.Length == 0)
+        if (partArray is null || partArray.Length == 0)
         {
             return Empty;
         }
 
-        var clone = (ApiIdPart[])namedParts.Clone();
+        var clone = (ApiIdPart[])partArray.Clone();
 
         ValidateCompositeParts(clone);
 

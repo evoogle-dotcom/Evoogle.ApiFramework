@@ -5,7 +5,7 @@
 // See the LICENSE file in the project root for more information.
 namespace Evoogle.ApiFramework.Schema.TestData;
 
-public enum ApiTestSchemaKind
+public enum ApiSchemaKind
 {
     Simple,
     Commerce
