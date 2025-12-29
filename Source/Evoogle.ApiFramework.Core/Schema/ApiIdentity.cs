@@ -109,21 +109,6 @@ public sealed class ApiIdentity
             context: context
         );
 
-        // Do not mix ordered and named parts
-        var anyOrdered = this.ApiIdentityParts.Any(p => p.EmitAsOrdered);
-        var anyNamed = this.ApiIdentityParts.Any(p => !p.EmitAsOrdered);
-        if (anyOrdered && anyNamed)
-        {
-            var path = $"{this.ApiPath}.{nameof(this.ApiIdentityParts)}";
-            var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.API_IDENTITY_MIXED_ORDERED_AND_NAMED_PARTS;
-            var description = $"Cannot mix ordered parts with named parts in the same {nameof(ApiIdentity)}";
-            var remediation = $"Use either all ordered parts or all named parts in the {nameof(ApiIdentity)}";
-
-            context.AddIssue(path, severity, code, description, remediation);
-            return;
-        }
-
         var apiIdentityPartsCount = this.ApiIdentityParts.Length;
         for (var i = 0; i < apiIdentityPartsCount; ++i)
         {

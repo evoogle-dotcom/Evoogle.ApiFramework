@@ -13,17 +13,14 @@ namespace Evoogle.ApiFramework.Schema;
 ///     Represents a single property part within an <see cref="ApiIdentity"/>.
 /// </summary>
 /// <remarks>
-///     Each part references a property of the parent <see cref="ApiObjectType"/> and specifies
-///     ordering behavior for identity serialization. Type coercion is handled automatically via
-///     <see cref="ApiProperty"/> and resolved at initialization time.
+///     Each part references a property of the parent <see cref="ApiObjectType"/>.
+///     Type coercion is handled automatically via <see cref="ApiProperty"/> and resolved at initialization time.
 /// </remarks>
 /// <param name="apiPropertyName">The name of the property that is part of the identity.</param>
-/// <param name="emitAsOrdered">Indicates whether this part should be emitted as an ordered (positional) component rather than named.</param>
 /// <param name="targetClrType">Optional CLR type to use for <see cref="ApiId"/> conversion. If null, the type is detected automatically.</param>
 public sealed class ApiIdentityPart
 (
     string apiPropertyName,
-    bool emitAsOrdered = false,
     Type? targetClrType = null
 ) : ApiSchemaElement
 {
@@ -37,11 +34,6 @@ public sealed class ApiIdentityPart
     ///     Gets the name of the property that is part of this identity.
     /// </summary>
     public string ApiPropertyName { get; } = apiPropertyName;
-
-    /// <summary>
-    ///     Gets a value indicating whether this part should be emitted as an ordered (positional) component.
-    /// </summary>
-    public bool EmitAsOrdered { get; } = emitAsOrdered;
 
     /// <summary>
     ///     Gets the optional CLR type override for <see cref="Identity.ApiId"/> conversion.
