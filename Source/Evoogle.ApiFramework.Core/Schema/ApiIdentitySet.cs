@@ -22,7 +22,7 @@ namespace Evoogle.ApiFramework.Schema;
 public sealed class ApiIdentitySet
 (
     IEnumerable<ApiIdentity> apiIdentities,
-    string apiPrimaryIdentityName
+    string? apiPrimaryIdentityName = null
 ) : ApiSchemaElement
 {
     #region Fields
@@ -40,7 +40,7 @@ public sealed class ApiIdentitySet
     /// <summary>
     ///     Gets the name of the primary identity.
     /// </summary>
-    public string ApiPrimaryIdentityName => apiPrimaryIdentityName;
+    public string ApiPrimaryIdentityName { get; } = apiPrimaryIdentityName ?? apiIdentities.EmptyIfNull().FirstOrDefault()?.ApiName ?? string.Empty;
 
     /// <summary>
     ///     Gets the primary identity for the object type.

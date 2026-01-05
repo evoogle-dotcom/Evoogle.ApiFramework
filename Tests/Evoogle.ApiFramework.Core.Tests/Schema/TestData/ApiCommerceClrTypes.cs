@@ -181,7 +181,8 @@ public sealed class Order
 
 public sealed class OrderLine
 {
-    public Ulid Id { get; init; }
+    public Ulid OrderId { get; init; }
+    public int LineNumber { get; init; }
     public ProductBase Product { get; init; } = default!;
     public Quantity Qty { get; init; } = new(1, "ea");
     public Money UnitPrice { get; init; } = new(0, "USD");
@@ -189,13 +190,14 @@ public sealed class OrderLine
 
     public override string ToString()
     {
-        var id = this.Id.SafeToString();
+        var orderId = this.OrderId.SafeToString();
+        var lineNumber = this.LineNumber.SafeToString();
         var product = this.Product.SafeToString();
         var qty = this.Qty.SafeToString();
         var unitPrice = this.UnitPrice.SafeToString();
         var lineTotal = this.LineTotal.SafeToString();
 
-        return $"{nameof(OrderLine)} {{{nameof(this.Id)}={id}, {nameof(this.Product)}={product}, {nameof(this.Qty)}={qty}, {nameof(this.UnitPrice)}={unitPrice}, {nameof(this.LineTotal)}={lineTotal}}}";
+        return $"{nameof(OrderLine)} {{{nameof(this.OrderId)}={orderId}, {nameof(this.LineNumber)}={lineNumber}, {nameof(this.Product)}={product}, {nameof(this.Qty)}={qty}, {nameof(this.UnitPrice)}={unitPrice}, {nameof(this.LineTotal)}={lineTotal}}}";
     }
 }
 

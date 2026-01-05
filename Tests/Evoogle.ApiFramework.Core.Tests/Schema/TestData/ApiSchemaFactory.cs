@@ -237,8 +237,14 @@ public static class ApiSchemaFactory
             Extensions = extensions
         };
 
-    private static ApiObjectType O(string name, Type clr, IEnumerable<ApiProperty> properties, IEnumerable<ApiRelationship>? relationships = null, ApiObjectTypeOptions? options = null, OrderedDictionary<Type, object>? extensions = null)
-        => new(name, apiIdentitySet: null, options, properties, relationships ?? [], clr)
+    private static ApiIdentitySet IS(string primaryIdentityName, IEnumerable<ApiIdentity> identities)
+        => new(identities, primaryIdentityName);
+
+    private static ApiIdentity I(string name, IEnumerable<string> propertyNames)
+        => new(name, propertyNames.Select(pn => new ApiIdentityPart(pn)));
+
+    private static ApiObjectType O(string name, Type clr, IEnumerable<ApiProperty> properties, IEnumerable<ApiIdentity>? identities = null, IEnumerable<ApiRelationship>? relationships = null, ApiObjectTypeOptions? options = null, OrderedDictionary<Type, object>? extensions = null)
+        => new(name, identities != null ? new ApiIdentitySet(identities) : null, options, properties, relationships ?? [], clr)
         {
             Extensions = extensions
         };
@@ -360,6 +366,29 @@ public static class ApiSchemaFactory
         ]);
 
         // 4) Entity/Object Types (with relationships)
+
+        // Customer Object Types
+
+        // Customer (has collections, nested value objects)
+        var customer = O(name: nameof(Customer), clr: typeof(Customer), properties:
+        [
+            P(name: nameof(Customer.Id),             expression: TE.ClrRef<Ulid>(),                  required: true),
+            P(name: nameof(Customer.Name),           expression: TE.ClrRef<string>(),                required: true),
+            P(name: nameof(Customer.Email),          expression: TE.ClrRef<EmailAddress>(),          required: true),
+            P(name: nameof(Customer.PrimaryAddress), expression: TE.ClrRef<Address>(),               required: true),
+            P(name: nameof(Customer.Addresses),      expression: TE.ListOf<Address>(required: true), required: true),
+            P(name: nameof(Customer.Orders),         expression: TE.ListOf<Order>(required: true),   required: true)
+        ], identities:
+        [
+            I("PK_Customer", [nameof(Customer.Id)]),
+            I("AK_Customer_Email", [nameof(Customer.Email)])
+        ], relationships:
+        [
+            R(name: "Customer_Orders", propertyName: nameof(Customer.Orders))
+        ]);
+
+        // Product Object Types
+
         // Category (self-referential)
         var category = O(name: nameof(Category), clr: typeof(Category), properties:
         [
@@ -367,10 +396,14 @@ public static class ApiSchemaFactory
             P(name: nameof(Category.Name),      expression: TE.ClrRef<string>(),                 required: true),
             P(name: nameof(Category.Parent),    expression: TE.ClrRef<Category>(),               required: false),
             P(name: nameof(Category.Children),  expression: TE.ListOf<Category>(required: true), required: true)
+        ], identities:
+        [
+            I("PK_Category", [nameof(Category.Id)]),
+            I("AK_Category_Name", [nameof(Category.Name)])
         ], relationships:
         [
             R(name: "Category_Children", propertyName: nameof(Category.Children)),
-            R(name: "Category_Children", propertyName: nameof(Category.Parent))
+            R(name: "Category_Parent", propertyName: nameof(Category.Parent))
         ]);
 
         // Tag (M2M with ProductBase)
@@ -379,6 +412,10 @@ public static class ApiSchemaFactory
             P(name: nameof(Tag.Id),        expression: TE.ClrRef<Ulid>(),                      required: true),
             P(name: nameof(Tag.Name),      expression: TE.ClrRef<string>(),                    required: true),
             P(name: nameof(Tag.Products),  expression: TE.ListOf<ProductBase>(required: true), required: true)
+        ], identities:
+        [
+            I("PK_Tag", [nameof(Tag.Id)]),
+            I("AK_Tag_Name", [nameof(Tag.Name)])
         ], relationships:
         [
             R(name: "Product_Tags", propertyName: "Products")
@@ -394,21 +431,6 @@ public static class ApiSchemaFactory
         // ],
         // extensions: Ext(new() { ["discriminator"] = "kind" })); // Example: your framework’s discriminator key
 
-        var physicalProduct = O(name: nameof(PhysicalProduct), clr: typeof(PhysicalProduct), properties:
-        [
-            P(name: nameof(PhysicalProduct.Id),        expression: TE.ClrRef<Ulid>(),              required: true),
-            P(name: nameof(PhysicalProduct.Sku),       expression: TE.ClrRef<string>(),            required: true),
-            P(name: nameof(PhysicalProduct.Name),      expression: TE.ClrRef<string>(),            required: true),
-            P(name: nameof(PhysicalProduct.Price),     expression: TE.ClrRef<Money>(),             required: true),
-            P(name: nameof(PhysicalProduct.Tags),      expression: TE.ListOf<Tag>(required: true), required: false),
-            P(name: nameof(PhysicalProduct.Category),  expression: TE.ClrRef<Category>(),          required: false),
-            P(name: nameof(PhysicalProduct.Weight),    expression: TE.ClrRef<decimal>(),           required: true),
-            P(name: nameof(PhysicalProduct.Size),      expression: TE.ClrRef<Quantity>(),          required: false),
-        ], relationships:
-        [
-            R(name: "Product_Tags", propertyName: nameof(PhysicalProduct.Tags))
-        ]);
-
         var digitalProduct = O(name: nameof(DigitalProduct), clr: typeof(DigitalProduct), properties:
         [
             P(name: nameof(DigitalProduct.Id),             expression: TE.ClrRef<Ulid>(),              required: true),
@@ -419,31 +441,35 @@ public static class ApiSchemaFactory
             P(name: nameof(DigitalProduct.Category),       expression: TE.ClrRef<Category>(),          required: false),
             P(name: nameof(DigitalProduct.DownloadUrl),    expression: TE.ClrRef<Uri>(),               required: false),
             P(name: nameof(DigitalProduct.Bytes),          expression: TE.ClrRef<long>(),              required: false),
+        ], identities:
+        [
+            I("PK_DigitalProduct", [nameof(DigitalProduct.Id)]),
+            I("AK_DigitalProduct_Sku", [nameof(DigitalProduct.Sku)])
         ], relationships:
         [
             R(name: "Product_Tags", propertyName: nameof(DigitalProduct.Tags))
         ]);
 
-        // OrderLine
-        var orderLine = O(name: nameof(OrderLine), clr: typeof(OrderLine), properties:
+        var physicalProduct = O(name: nameof(PhysicalProduct), clr: typeof(PhysicalProduct), properties:
         [
-            P(name: nameof(OrderLine.Id),        expression: TE.ClrRef<Ulid>(),        required: true),
-            P(name: nameof(OrderLine.Product),   expression: TE.ClrRef<ProductBase>(), required: true),
-            P(name: nameof(OrderLine.Qty),       expression: TE.ClrRef<Quantity>(),    required: true),
-            P(name: nameof(OrderLine.UnitPrice), expression: TE.ClrRef<Money>(),       required: true),
-            P(name: nameof(OrderLine.LineTotal), expression: TE.ClrRef<Money>(),       required: true)
+            P(name: nameof(PhysicalProduct.Id),        expression: TE.ClrRef<Ulid>(),              required: true),
+            P(name: nameof(PhysicalProduct.Sku),       expression: TE.ClrRef<string>(),            required: true),
+            P(name: nameof(PhysicalProduct.Name),      expression: TE.ClrRef<string>(),            required: true),
+            P(name: nameof(PhysicalProduct.Price),     expression: TE.ClrRef<Money>(),             required: true),
+            P(name: nameof(PhysicalProduct.Tags),      expression: TE.ListOf<Tag>(required: true), required: false),
+            P(name: nameof(PhysicalProduct.Category),  expression: TE.ClrRef<Category>(),          required: false),
+            P(name: nameof(PhysicalProduct.Weight),    expression: TE.ClrRef<decimal>(),           required: true),
+            P(name: nameof(PhysicalProduct.Size),      expression: TE.ClrRef<Quantity>(),          required: false),
+        ], identities:
+        [
+            I("PK_PhysicalProduct", [nameof(PhysicalProduct.Id)]),
+            I("AK_PhysicalProduct_Sku", [nameof(PhysicalProduct.Sku)])
+        ], relationships:
+        [
+            R(name: "Product_Tags", propertyName: nameof(PhysicalProduct.Tags))
         ]);
 
-        // Payment
-        var payment = O(name: nameof(Payment), clr: typeof(Payment), properties:
-        [
-            P(name: nameof(Payment.Id),         expression: TE.ClrRef<Ulid>(),           required: true),
-            P(name: nameof(Payment.Method),     expression: TE.ClrRef<PaymentMethod>(),  required: true),
-            P(name: nameof(Payment.Amount),     expression: TE.ClrRef<Money>(),          required: true),
-            P(name: nameof(Payment.CapturedAt), expression: TE.ClrRef<DateTimeOffset>(), required: false),
-            // Dictionary<string,string>
-            //P(name: "Metadata",  expression: TE.DictOf(TE.ClrRef<string>(), TE.ClrRef<string>(), valueNullable: true), required: true)
-        ]);
+        // Order/Payment Object Types
 
         // Order
         var order = O(name: nameof(Order), clr: typeof(Order), properties:
@@ -455,24 +481,41 @@ public static class ApiSchemaFactory
             P(name: nameof(Order.Lines),     expression: TE.ListOf<OrderLine>(required: true), required: true),
             P(name: nameof(Order.Payment),   expression: TE.ClrRef<Payment>(),                 required: false),
             P(name: nameof(Order.Total),     expression: TE.ClrRef<Money>(),                   required: true)
+        ], identities:
+        [
+            I("PK_Order", [nameof(Order.Id)])
         ], relationships:
         [
             R(name: "Customer_Orders", propertyName: nameof(Order.Customer)),
             R(name: "Order_Payment", propertyName: nameof(Order.Payment))
         ]);
 
-        // Customer (has collections, nested value objects)
-        var customer = O(name: nameof(Customer), clr: typeof(Customer), properties:
+        // OrderLine
+        var orderLine = O(name: nameof(OrderLine), clr: typeof(OrderLine), properties:
         [
-            P(name: nameof(Customer.Id),             expression: TE.ClrRef<Ulid>(),                  required: true),
-            P(name: nameof(Customer.Name),           expression: TE.ClrRef<string>(),                required: true),
-            P(name: nameof(Customer.Email),          expression: TE.ClrRef<EmailAddress>(),          required: true),
-            P(name: nameof(Customer.PrimaryAddress), expression: TE.ClrRef<Address>(),               required: true),
-            P(name: nameof(Customer.Addresses),      expression: TE.ListOf<Address>(required: true), required: true),
-            P(name: nameof(Customer.Orders),         expression: TE.ListOf<Order>(required: true),   required: true)
-        ], relationships:
+            P(name: nameof(OrderLine.OrderId),      expression: TE.ClrRef<Ulid>(),        required: true),
+            P(name: nameof(OrderLine.LineNumber),   expression: TE.ClrRef<int>(),         required: true),
+            P(name: nameof(OrderLine.Product),      expression: TE.ClrRef<ProductBase>(), required: true),
+            P(name: nameof(OrderLine.Qty),          expression: TE.ClrRef<Quantity>(),    required: true),
+            P(name: nameof(OrderLine.UnitPrice),    expression: TE.ClrRef<Money>(),       required: true),
+            P(name: nameof(OrderLine.LineTotal),    expression: TE.ClrRef<Money>(),       required: true)
+        ], identities:
         [
-            R(name: "Customer_Orders", propertyName: nameof(Customer.Orders))
+            I("PK_OrderLine", [nameof(OrderLine.OrderId), nameof(OrderLine.LineNumber)])
+        ]);
+
+        // Payment
+        var payment = O(name: nameof(Payment), clr: typeof(Payment), properties:
+        [
+            P(name: nameof(Payment.Id),         expression: TE.ClrRef<Ulid>(),           required: true),
+            P(name: nameof(Payment.Method),     expression: TE.ClrRef<PaymentMethod>(),  required: true),
+            P(name: nameof(Payment.Amount),     expression: TE.ClrRef<Money>(),          required: true),
+            P(name: nameof(Payment.CapturedAt), expression: TE.ClrRef<DateTimeOffset>(), required: false),
+            // Dictionary<string,string>
+            //P(name: "Metadata",  expression: TE.DictOf(TE.ClrRef<string>(), TE.ClrRef<string>(), valueNullable: true), required: true)
+        ], identities:
+        [
+            I("PK_Payment", [nameof(Payment.Id)])
         ]);
 
         // 5) Relationships (optional if you encode via properties; include here when you want explicit cardinality tests)
@@ -495,9 +538,9 @@ public static class ApiSchemaFactory
         var objects = new List<ApiObjectType>
         {
             money, quantity, emailAddress, address,
-            category, tag,
-            physicalProduct, digitalProduct,
-            orderLine, payment, order, customer
+            customer,
+            category, physicalProduct, digitalProduct, tag,
+            order, orderLine, payment
         };
 
         // 7) Assemble schema
