@@ -6,6 +6,8 @@
 using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.Extension;
 
+using Microsoft.Extensions.Logging;
+
 namespace Evoogle.ApiFramework.Schema;
 
 /// <summary>
@@ -39,6 +41,14 @@ public abstract class ApiSchemaElement : ExtensibleBase
     ///     This property is available after the element has been initialized.
     /// </remarks>
     protected internal ApiSchemaContext ApiSchemaContext => this.ThrowIfNotInitialized(_apiSchemaContext);
+
+    /// <summary>
+    ///     Gets the logger for this schema element.
+    /// </summary>
+    /// <remarks>
+    ///     Returns the shared logger from the schema context, categorized under <see cref="ApiSchema"/>.
+    /// </remarks>
+    protected ILogger Logger => this.ApiSchemaContext.Logger;
     #endregion
 
     #region Methods

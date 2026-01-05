@@ -4,6 +4,7 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using Evoogle.Coercion;
+using Evoogle.Logging;
 
 using Microsoft.Extensions.Logging;
 
@@ -43,6 +44,20 @@ public sealed class ApiSchemaContext
     ///     Gets the optional logger factory for diagnostic logging during schema operations.
     /// </summary>
     public ILoggerFactory? LoggerFactory { get; init; }
+
+    /// <summary>
+    ///     Gets the multiplexing logger mode for diagnostic output.
+    /// </summary>
+    public MultiplexingLoggerMode LoggerMode { get; init; } = MultiplexingLoggerMode.All;
+
+    /// <summary>
+    ///     Gets the multiplexing logger for schema operations.
+    /// </summary>
+    /// <remarks>
+    ///     This logger always returns a non-null instance and can output to multiple targets
+    ///     based on the configured <see cref="LoggerMode"/>.
+    /// </remarks>
+    public ILogger Logger { get; private set; } = default!;
     #endregion
 
     #region Methods
@@ -50,5 +65,17 @@ public sealed class ApiSchemaContext
     ///     Creates a logger for the specified type.
     /// </summary>
     internal ILogger<T>? CreateLogger<T>() => this.LoggerFactory?.CreateLogger<T>();
+
+    /// <summary>
+    ///     Initializes the logger for this context.
+    /// </summary>
+    /// <remarks>
+    ///     This method is called internally during schema initialization.
+    /// </remarks>
+    internal void InitializeLogger()
+    {
+        var innerLogger = this.LoggerFactory?.CreateLogger<ApiSchema>();
+        this.Logger = new MultiplexingLogger(innerLogger, this.LoggerMode);
+    }
     #endregion
 }

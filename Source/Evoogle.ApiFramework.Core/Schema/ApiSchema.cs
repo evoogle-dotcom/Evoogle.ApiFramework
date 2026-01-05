@@ -10,6 +10,7 @@ using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.ApiFramework.Schema.Json;
 using Evoogle.Extension;
 using Evoogle.Extensions;
+using Microsoft.Extensions.Logging;
 
 namespace Evoogle.ApiFramework.Schema;
 
@@ -76,6 +77,14 @@ public sealed class ApiSchema : ExtensibleBase
 
     private Dictionary<string, ApiScalarType> ApiScalarTypeApiNameLookup => this.ThrowIfNotInitialized(_apiScalarTypeApiNameLookup);
     private Dictionary<Type, ApiScalarType> ApiScalarTypeClrTypeLookup => this.ThrowIfNotInitialized(_apiScalarTypeClrTypeLookup);
+
+    /// <summary>
+    ///     Gets the logger for this API schema.
+    /// </summary>
+    /// <remarks>
+    ///     Returns the shared logger from the API schema context, categorized under <see cref="ApiSchema"/>.
+    /// </remarks>
+    private ILogger Logger => this.ApiSchemaContext.Logger;
     #endregion
 
     #region Constructors
@@ -145,6 +154,8 @@ public sealed class ApiSchema : ExtensibleBase
         {
             ApiSchema = this
         };
+
+        _apiSchemaContext.InitializeLogger();
 
         // Set path
         _apiPath = this.BuildPath();

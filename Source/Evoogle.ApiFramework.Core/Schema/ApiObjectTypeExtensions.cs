@@ -3,8 +3,6 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using System.Diagnostics.CodeAnalysis;
-
 using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Identity;
 using Evoogle.Extensions;

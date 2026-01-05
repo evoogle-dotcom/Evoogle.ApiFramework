@@ -3,11 +3,12 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Identity;
+
+using Microsoft.Extensions.Logging;
 
 namespace Evoogle.ApiFramework.Schema;
 
@@ -192,7 +193,7 @@ public sealed partial class ApiObjectType
         }
 
         // Convert the typed value to ApiId
-        return ConvertToApiId(coercedValue, targetType, part.ApiProperty.ApiName, identity.ApiName, clrInstance.GetType().Name);
+        return this.ConvertToApiId(coercedValue, targetType, part.ApiProperty.ApiName, identity.ApiName, clrInstance.GetType().Name);
     }
 
     private ApiId MaterializeApiIdFromPropertyValue(ApiIdentityPart part, object? rawValue, ApiIdentity identity, ApiSchemaContext schemaContext)
@@ -227,10 +228,10 @@ public sealed partial class ApiObjectType
         }
 
         // Convert the typed value to ApiId
-        return ConvertToApiId(coercedValue, targetType, part.ApiPropertyName, identity.ApiName, "values dictionary");
+        return this.ConvertToApiId(coercedValue, targetType, part.ApiPropertyName, identity.ApiName, "values dictionary");
     }
 
-    private static ApiId ConvertToApiId(object value, Type targetType, string propertyName, string identityName, string contextDescription)
+    private ApiId ConvertToApiId(object value, Type targetType, string propertyName, string identityName, string contextDescription)
     {
         // Handle ApiId passthrough
         if (value is ApiId apiId)
@@ -276,6 +277,7 @@ public sealed partial class ApiObjectType
         }
         catch (Exception ex)
         {
+            this.Logger.LogWarning(ex, "Identity coercion failed for {Property}", propertyName);
             throw new ApiIdentityException(
                 $"Failed to convert property '{propertyName}' value of type '{value.GetType().Name}' to ApiId for identity '{identityName}' on {contextDescription}.",
                 ex);
