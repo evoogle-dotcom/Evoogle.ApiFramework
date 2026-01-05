@@ -422,7 +422,7 @@ public readonly struct ApiId
     /// <summary>Attempts to get the string value if kind is <see cref="ApiIdKind.String"/>.</summary>
     /// <param name="value">The output value or null.</param>
     /// <returns>True if successful.</returns>
-    public readonly bool TryGet(out string? value) { value = this.Kind == ApiIdKind.String ? (string?)_ref : null; return this.Kind == ApiIdKind.String; }
+    public readonly bool TryGet([NotNullWhen(true)] out string? value) { value = this.Kind == ApiIdKind.String ? (string?)_ref : null; return this.Kind == ApiIdKind.String; }
 
     /// <summary>Attempts to get the Int32 value if kind is <see cref="ApiIdKind.Int32"/>.</summary>
     public readonly bool TryGet(out int value) { value = _val.Int32; return this.Kind == ApiIdKind.Int32; }
@@ -437,7 +437,7 @@ public readonly struct ApiId
     public readonly bool TryGet(out Ulid value) { value = _val.Ulid; return this.Kind == ApiIdKind.Ulid; }
 
     /// <summary>Attempts to get the culture value if kind is <see cref="ApiIdKind.Culture"/>.</summary>
-    public readonly bool TryGet(out CultureInfo? value) { value = this.Kind == ApiIdKind.Culture ? (CultureInfo?)_ref : null; return this.Kind == ApiIdKind.Culture; }
+    public readonly bool TryGet([NotNullWhen(true)] out CultureInfo? value) { value = this.Kind == ApiIdKind.Culture ? (CultureInfo?)_ref : null; return this.Kind == ApiIdKind.Culture; }
 
     /// <summary>
     ///     Attempts to retrieve a part identifier by <paramref name="name"/> from a named composite.

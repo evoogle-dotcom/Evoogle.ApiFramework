@@ -109,13 +109,28 @@ public sealed class ApiIdentity
             context: context
         );
 
-        var apiIdentityPartsCount = this.ApiIdentityParts.Length;
-        for (var i = 0; i < apiIdentityPartsCount; ++i)
-        {
-            var apiIdentityPart = this.ApiIdentityParts[i];
+        // Track the current identity in the traversal path to detect circular references
+        var identityPath = this.ApiPath;
+        var wasAdded = context.IdentityTraversalPath.Add(identityPath);
 
-            var childContext = context.WithParentSchemaElement(this);
-            apiIdentityPart.Initialize(childContext);
+        try
+        {
+            var apiIdentityPartsCount = this.ApiIdentityParts.Length;
+            for (var i = 0; i < apiIdentityPartsCount; ++i)
+            {
+                var apiIdentityPart = this.ApiIdentityParts[i];
+
+                var childContext = context.WithParentSchemaElement(this);
+                apiIdentityPart.Initialize(childContext);
+            }
+        }
+        finally
+        {
+            // Remove from traversal path after initialization
+            if (wasAdded)
+            {
+                context.IdentityTraversalPath.Remove(identityPath);
+            }
         }
     }
     #endregion

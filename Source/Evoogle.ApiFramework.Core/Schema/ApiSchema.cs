@@ -3,6 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 using Evoogle.ApiFramework.Schema.Internal;
@@ -164,28 +165,28 @@ public sealed class ApiSchema : ExtensibleBase
     }
 
     /// <summary>Attempts to retrieve an API named type by its API name.</summary>
-    public bool TryGetTypeByApiName(string apiName, out ApiNamedType? apiNamedType) => this.ApiNamedTypeApiNameLookup.TryGetValue(apiName, out apiNamedType);
+    public bool TryGetTypeByApiName(string apiName, [NotNullWhen(true)] out ApiNamedType? apiNamedType) => this.ApiNamedTypeApiNameLookup.TryGetValue(apiName, out apiNamedType);
 
     /// <summary>Attempts to retrieve an API named type by its CLR type.</summary>
-    public bool TryGetTypeByClrType(Type clrType, out ApiNamedType? apiNamedType) => this.ApiNamedTypeClrTypeLookup.TryGetValue(clrType, out apiNamedType);
+    public bool TryGetTypeByClrType(Type clrType, [NotNullWhen(true)] out ApiNamedType? apiNamedType) => this.ApiNamedTypeClrTypeLookup.TryGetValue(clrType, out apiNamedType);
 
     /// <summary>Attempts to retrieve an API enumeration type by its API name.</summary>
-    public bool TryGetEnumTypeByApiName(string apiName, out ApiEnumType? apiEnumType) => this.ApiEnumTypeApiNameLookup.TryGetValue(apiName, out apiEnumType);
+    public bool TryGetEnumTypeByApiName(string apiName, [NotNullWhen(true)] out ApiEnumType? apiEnumType) => this.ApiEnumTypeApiNameLookup.TryGetValue(apiName, out apiEnumType);
 
     /// <summary>Attempts to retrieve an API enumeration type by its CLR type.</summary>
-    public bool TryGetEnumTypeByClrType(Type clrType, out ApiEnumType? apiEnumType) => this.ApiEnumTypeClrTypeLookup.TryGetValue(clrType, out apiEnumType);
+    public bool TryGetEnumTypeByClrType(Type clrType, [NotNullWhen(true)] out ApiEnumType? apiEnumType) => this.ApiEnumTypeClrTypeLookup.TryGetValue(clrType, out apiEnumType);
 
     /// <summary>Attempts to retrieve an API object type by its API name.</summary>
-    public bool TryGetObjectTypeByApiName(string apiName, out ApiObjectType? apiObjectType) => this.ApiObjectTypeApiNameLookup.TryGetValue(apiName, out apiObjectType);
+    public bool TryGetObjectTypeByApiName(string apiName, [NotNullWhen(true)] out ApiObjectType? apiObjectType) => this.ApiObjectTypeApiNameLookup.TryGetValue(apiName, out apiObjectType);
 
     /// <summary>Attempts to retrieve an API object type by its CLR type.</summary>
-    public bool TryGetObjectTypeByClrType(Type clrType, out ApiObjectType? apiObjectType) => this.ApiObjectTypeClrTypeLookup.TryGetValue(clrType, out apiObjectType);
+    public bool TryGetObjectTypeByClrType(Type clrType, [NotNullWhen(true)] out ApiObjectType? apiObjectType) => this.ApiObjectTypeClrTypeLookup.TryGetValue(clrType, out apiObjectType);
 
     /// <summary>Attempts to retrieve an API scalar type by its API name.</summary>
-    public bool TryGetScalarTypeByApiName(string apiName, out ApiScalarType? apiScalarType) => this.ApiScalarTypeApiNameLookup.TryGetValue(apiName, out apiScalarType);
+    public bool TryGetScalarTypeByApiName(string apiName, [NotNullWhen(true)] out ApiScalarType? apiScalarType) => this.ApiScalarTypeApiNameLookup.TryGetValue(apiName, out apiScalarType);
 
     /// <summary>Attempts to retrieve an API scalar type by its CLR type.</summary>
-    public bool TryGetScalarTypeByClrType(Type clrType, out ApiScalarType? apiScalarType) => this.ApiScalarTypeClrTypeLookup.TryGetValue(clrType, out apiScalarType);
+    public bool TryGetScalarTypeByClrType(Type clrType, [NotNullWhen(true)] out ApiScalarType? apiScalarType) => this.ApiScalarTypeClrTypeLookup.TryGetValue(clrType, out apiScalarType);
 
     private string BuildPath()
         => ApiSchemaHelpers.BuildPath(null, apiChildPath: nameof(ApiSchema), apiApiName: this.ApiName);

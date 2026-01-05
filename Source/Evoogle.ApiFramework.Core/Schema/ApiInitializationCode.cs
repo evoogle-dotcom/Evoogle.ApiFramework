@@ -124,6 +124,11 @@ public enum ApiInitializationCode
     ///     The target CLR type specified for an <see cref="ApiIdentityPart"/> is not compatible with <see cref="ApiId"/>.
     /// </summary>
     API_IDENTITY_PART_INVALID_TARGET_TYPE,
+
+    /// <summary>
+    ///     An identity part references a property whose type has an identity that creates a circular dependency.
+    /// </summary>
+    API_IDENTITY_PART_CIRCULAR_REFERENCE,
     #endregion
 
     #region ApiNamedType Initialization Codes

@@ -3,6 +3,8 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Diagnostics.CodeAnalysis;
+
 using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.Extensions;
 
@@ -108,7 +110,7 @@ public sealed partial class ApiObjectType
     /// <param name="name">The name of the identity to retrieve.</param>
     /// <param name="apiIdentity">When this method returns, contains the <see cref="ApiIdentity"/> if found; otherwise, null.</param>
     /// <returns>True if the identity was found; otherwise, false.</returns>
-    public bool TryGetIdentityByApiName(string apiName, out ApiIdentity? apiIdentity)
+    public bool TryGetIdentityByApiName(string apiName, [NotNullWhen(true)] out ApiIdentity? apiIdentity)
     {
         if (!this.HasIdentity)
         {
@@ -124,7 +126,7 @@ public sealed partial class ApiObjectType
     /// <param name="apiName">The API name of the property to retrieve.</param>
     /// <param name="value">When this method returns, contains the <see cref="ApiProperty"/> if found; otherwise, null.</param>
     /// <returns>True if the property was found; otherwise, false.</returns>
-    public bool TryGetPropertyByApiName(string apiName, out ApiProperty? value) => this.ApiPropertyApiNameLookup.TryGetValue(apiName, out value);
+    public bool TryGetPropertyByApiName(string apiName, [NotNullWhen(true)] out ApiProperty? value) => this.ApiPropertyApiNameLookup.TryGetValue(apiName, out value);
 
     /// <summary>
     ///     Attempts to retrieve an API property by its CLR name.
@@ -132,7 +134,7 @@ public sealed partial class ApiObjectType
     /// <param name="clrName">The CLR name of the property to retrieve.</param>
     /// <param name="value">When this method returns, contains the <see cref="ApiProperty"/> if found; otherwise, null.</param>
     /// <returns>True if the property was found; otherwise, false.</returns>
-    public bool TryGetPropertyByClrName(string clrName, out ApiProperty? value) => this.ApiPropertyClrNameLookup.TryGetValue(clrName, out value);
+    public bool TryGetPropertyByClrName(string clrName, [NotNullWhen(true)] out ApiProperty? value) => this.ApiPropertyClrNameLookup.TryGetValue(clrName, out value);
 
     /// <summary>
     ///     Attempts to retrieve an API relationship by its API name.
@@ -140,7 +142,7 @@ public sealed partial class ApiObjectType
     /// <param name="apiName">The API name of the relationship to retrieve.</param>
     /// <param name="value">When this method returns, contains the <see cref="ApiRelationship"/> if found; otherwise, null.</param>
     /// <returns>True if the relationship was found; otherwise, false.</returns>
-    public bool TryGetRelationshipByApiName(string apiName, out ApiRelationship? value) => this.ApiRelationshipApiNameLookup.TryGetValue(apiName, out value);
+    public bool TryGetRelationshipByApiName(string apiName, [NotNullWhen(true)] out ApiRelationship? value) => this.ApiRelationshipApiNameLookup.TryGetValue(apiName, out value);
     #endregion
 
     #region Object Methods

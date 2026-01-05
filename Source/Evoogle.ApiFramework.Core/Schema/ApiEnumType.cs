@@ -3,6 +3,8 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Diagnostics.CodeAnalysis;
+
 using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.Extensions;
 using Evoogle.Reflection;
@@ -70,7 +72,7 @@ public sealed class ApiEnumType
     /// <param name="apiName">The API name of the enumeration value to retrieve.</param>
     /// <param name="value">When this method returns, contains the <see cref="ApiEnumValue"/> if found; otherwise, null.</param>
     /// <returns>True if the value is found; otherwise, false.</returns>
-    public bool TryGetValueByApiName(string apiName, out ApiEnumValue? value) => this.ApiNameLookup.TryGetValue(apiName, out value);
+    public bool TryGetValueByApiName(string apiName, [NotNullWhen(true)] out ApiEnumValue? value) => this.ApiNameLookup.TryGetValue(apiName, out value);
 
     /// <summary>
     ///     Attempts to retrieve an API enum value by its CLR name.
@@ -78,7 +80,7 @@ public sealed class ApiEnumType
     /// <param name="clrName">The CLR name of the enumeration value to retrieve.</param>
     /// <param name="value">When this method returns, contains the <see cref="ApiEnumValue"/> if found; otherwise, null.</param>
     /// <returns>True if the value is found; otherwise, false.</returns>
-    public bool TryGetValueByClrName(string clrName, out ApiEnumValue? value) => this.ClrNameLookup.TryGetValue(clrName, out value);
+    public bool TryGetValueByClrName(string clrName, [NotNullWhen(true)] out ApiEnumValue? value) => this.ClrNameLookup.TryGetValue(clrName, out value);
 
     /// <summary>
     ///     Attempts to retrieve an API enum value by its CLR ordinal value.
@@ -86,7 +88,7 @@ public sealed class ApiEnumType
     /// <param name="clrOrdinal">The CLR ordinal of the enumeration value to retrieve.</param>
     /// <param name="value">When this method returns, contains the <see cref="ApiEnumValue"/> if found; otherwise, null.</param>
     /// <returns>True if the value is found; otherwise, false.</returns>
-    public bool TryGetValueByClrOrdinal(int clrOrdinal, out ApiEnumValue? value) => this.ClrOrdinalLookup.TryGetValue(clrOrdinal, out value);
+    public bool TryGetValueByClrOrdinal(int clrOrdinal, [NotNullWhen(true)] out ApiEnumValue? value) => this.ClrOrdinalLookup.TryGetValue(clrOrdinal, out value);
     #endregion
 
     #region Object Methods

@@ -3,6 +3,8 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Diagnostics.CodeAnalysis;
+
 using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.Extensions;
 
@@ -77,7 +79,7 @@ public sealed class ApiIdentitySet
     /// <param name="apiName">The name of the identity to retrieve.</param>
     /// <param name="apiIdentity">When this method returns, contains the identity if found; otherwise, <c>null</c>.</param>
     /// <returns><c>true</c> if the identity was found; otherwise, <c>false</c>.</returns>
-    public bool TryGetIdentityByApiName(string apiName, out ApiIdentity? apiIdentity) => this.ApiIdentityApiNameLookup.TryGetValue(apiName, out apiIdentity);
+    public bool TryGetIdentityByApiName(string apiName, [NotNullWhen(true)] out ApiIdentity? apiIdentity) => this.ApiIdentityApiNameLookup.TryGetValue(apiName, out apiIdentity);
     #endregion
 
     #region Implementation Methods

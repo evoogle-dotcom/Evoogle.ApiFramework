@@ -116,6 +116,24 @@ public sealed class ApiIdentityPart
             if (apiParentObjectType.TryGetPropertyByApiName(this.ApiPropertyName, out var apiResolvedProperty))
             {
                 _apiResolvedProperty = apiResolvedProperty;
+
+                // Check for circular identity references
+                // ApiPath is guaranteed to be set during initialization before identity resolution
+                if (_apiResolvedProperty.ApiType is ApiObjectType referencedObjectType && referencedObjectType.HasIdentity)
+                {
+                    var referencedTypePath = referencedObjectType.ApiPath;
+                    if (context.IdentityTraversalPath.Contains(referencedTypePath))
+                    {
+                        var path = $"{this.ApiPath}.{nameof(this.ApiProperty)}";
+                        var severity = ApiInitializationSeverity.Error;
+                        var code = ApiInitializationCode.API_IDENTITY_PART_CIRCULAR_REFERENCE;
+                        var description = $"Circular identity reference detected: property '{this.ApiPropertyName}' references type '{referencedObjectType.ApiName}' which has an identity that depends on the current type";
+                        var remediation = "Remove the circular dependency by restructuring the identity definitions or using a non-identity property";
+
+                        context.AddIssue(path, severity, code, description, remediation);
+                        _apiResolvedProperty = null; // Clear to prevent further issues
+                    }
+                }
             }
         }
 

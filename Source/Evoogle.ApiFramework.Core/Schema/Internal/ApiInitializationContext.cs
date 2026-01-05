@@ -15,6 +15,7 @@ internal class ApiInitializationContext
     private readonly string? _apiParentPath;
     private readonly ApiObjectType? _apiParentObjectType;
     private readonly List<ApiInitializationIssue> _issues; // shared, non-null
+    private readonly HashSet<string> _identityTraversalPath; // shared, tracks identity resolution path for cycle detection
     #endregion
 
     #region Properties
@@ -25,6 +26,8 @@ internal class ApiInitializationContext
     public ApiObjectType ApiParentObjectType => _apiParentObjectType ?? throw new InvalidOperationException($"No parent {nameof(ApiObjectType)} in this context.");
 
     public IEnumerable<ApiInitializationIssue> Issues => _issues;
+
+    internal HashSet<string> IdentityTraversalPath => _identityTraversalPath;
     #endregion
 
     #region Constructor
@@ -33,17 +36,20 @@ internal class ApiInitializationContext
         ApiSchema apiSchema,
         string? apiParentPath,
         ApiObjectType? apiParentObjectType,
-        List<ApiInitializationIssue> issues
+        List<ApiInitializationIssue> issues,
+        HashSet<string> identityTraversalPath
     )
     {
         ArgumentNullException.ThrowIfNull(apiSchema);
         ArgumentNullException.ThrowIfNull(issues);
+        ArgumentNullException.ThrowIfNull(identityTraversalPath);
 
         _apiParentPath = apiParentPath;
         _apiParentObjectType = apiParentObjectType;
 
         this.ApiSchema = apiSchema;
         _issues = issues; // keep shared reference
+        _identityTraversalPath = identityTraversalPath; // keep shared reference
     }
     #endregion
 
@@ -68,7 +74,8 @@ internal class ApiInitializationContext
             apiSchema: apiSchema,
             apiParentPath: null,
             apiParentObjectType: null,
-            issues: [] // always non-null shared list
+            issues: [], // always non-null shared list
+            identityTraversalPath: [] // always non-null shared set
         );
     }
 
@@ -81,7 +88,8 @@ internal class ApiInitializationContext
             this.ApiSchema,
             apiParentPath,
             apiParentObjectType,
-            _issues // share the same list
+            _issues, // share the same list
+            _identityTraversalPath // share the same set
         );
     }
 
@@ -94,7 +102,8 @@ internal class ApiInitializationContext
             this.ApiSchema,
             apiParentPath,
             _apiParentObjectType,
-            _issues // share the same list
+            _issues, // share the same list
+            _identityTraversalPath // share the same set
         );
     }
     #endregion

@@ -3,6 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -270,7 +271,7 @@ public sealed partial class ApiProperty
     /// <param name="memberInfo">The resolved member info, or default if not found.</param>
     /// <param name="memberType">The type of the resolved member, or default if not found.</param>
     /// <returns>True if the member was successfully resolved; otherwise false.</returns>
-    private static bool TryResolveMember(Type objectType, string memberName, bool forWrite, out MemberInfo memberInfo, out Type memberType)
+    private static bool TryResolveMember(Type objectType, string memberName, bool forWrite, [NotNullWhen(true)] out MemberInfo memberInfo, [NotNullWhen(true)] out Type memberType)
     {
         // Prefer property, then field
         var propertyInfo = TypeReflection.GetProperty(objectType, memberName, BindingFlags.Public | BindingFlags.Instance);
