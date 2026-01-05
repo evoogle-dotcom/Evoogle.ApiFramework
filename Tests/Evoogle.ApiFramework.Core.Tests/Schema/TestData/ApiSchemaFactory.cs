@@ -101,10 +101,7 @@ public static class ApiSchemaFactory
         {
             ApiSchemaKind.Simple => SimpleApiSchema,
             ApiSchemaKind.Commerce => CommerceApiSchema,
-            ApiSchemaKind.CompositeIdentity => BuildCompositeIdentityApiSchema(),
-            ApiSchemaKind.CompositeIdentityNullable => BuildCompositeIdentityNullableApiSchema(),
-            ApiSchemaKind.CompositeIdentityStrict => BuildCompositeIdentityStrictApiSchema(),
-            ApiSchemaKind.AlternateIdentity => BuildAlternateIdentityApiSchema(),
+            ApiSchemaKind.Identity => BuildIdentityApiSchema(),
             _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null)
         };
     }
@@ -662,139 +659,87 @@ public static class ApiSchemaFactory
     }
 
     /// <summary>
-    ///    Builds a test schema with composite identity (int + string + Guid).
+    ///    Builds a consolidated test schema for identity testing.
+    ///    Supports composite identities, nullable handling (both ReturnEmpty and ThrowException),
+    ///    and alternate identities for comprehensive identity testing.
     /// </summary>
-    private static ApiSchema BuildCompositeIdentityApiSchema(string name = "CompositeIdentity")
+    private static ApiSchema BuildIdentityApiSchema(string name = "Identity")
     {
-        // Scalars
         var scalars = new List<ApiScalarType>
         {
+            S(name: nameof(Guid),   clr: typeof(Guid)),
             S(name: nameof(String), clr: typeof(string)),
-            S(name: nameof(Int32), clr: typeof(int)),
-            S(name: nameof(Guid), clr: typeof(Guid))
+            S(name: nameof(Int32),  clr: typeof(int))
         };
 
-        // ProductInventory object type with composite identity
-        var productInventory = O(name: nameof(ProductInventory), clr: typeof(ProductInventory), options: OO(ApiIdentityNullHandling.ReturnEmpty), properties:
-        [
-            P(name: nameof(ProductInventory.WarehouseId), expression: TE.ClrRef<int>(), required: true),
-            P(name: nameof(ProductInventory.ProductCode), expression: TE.ClrRef<string>(), required: true),
-            P(name: nameof(ProductInventory.BatchId), expression: TE.ClrRef<Guid>(), required: true),
-            P(name: nameof(ProductInventory.Quantity), expression: TE.ClrRef<int>(), required: true)
-        ], identities:
-        [
-            I("PK_ProductInventory", [nameof(ProductInventory.WarehouseId), nameof(ProductInventory.ProductCode), nameof(ProductInventory.BatchId)])
-        ]);
-
-        var objects = new List<ApiObjectType> { productInventory };
-
-        var schema = ApiSchema.Create
-        (
-            apiName: name,
-            apiVersion: null,
-            apiOptions: null,
-            apiScalarTypes: scalars,
-            apiEnumTypes: [],
-            apiObjectTypes: objects
+        // ProductInventory: Composite identity (int + string + Guid)
+        var productInventory = O(
+            name: nameof(ProductInventory),
+            clr: typeof(ProductInventory),
+            identities:
+            [
+                I(name: "PK_ProductInventory", propertyNames: [nameof(ProductInventory.WarehouseId), nameof(ProductInventory.ProductCode), nameof(ProductInventory.BatchId)])
+            ],
+            properties:
+            [
+                P(name: nameof(ProductInventory.WarehouseId),  expression: TE.ClrRef<int>(),    required: true),
+                P(name: nameof(ProductInventory.ProductCode),  expression: TE.ClrRef<string>(), required: true),
+                P(name: nameof(ProductInventory.BatchId),      expression: TE.ClrRef<Guid>(),   required: true),
+                P(name: nameof(ProductInventory.Quantity),     expression: TE.ClrRef<int>(),    required: true)
+            ]
         );
 
-        return schema;
-    }
-
-    /// <summary>
-    ///    Builds a test schema with composite identity and nullable parts (ReturnEmpty handling).
-    /// </summary>
-    private static ApiSchema BuildCompositeIdentityNullableApiSchema(string name = "CompositeIdentityNullable")
-    {
-        var scalars = new List<ApiScalarType>
-        {
-            S(name: nameof(String), clr: typeof(string)),
-            S(name: nameof(Int32), clr: typeof(int))
-        };
-
-        var compositeNullable = O(name: nameof(CompositeNullable), clr: typeof(CompositeNullable), options: OO(ApiIdentityNullHandling.ReturnEmpty), properties:
-        [
-            P(name: nameof(CompositeNullable.Part1), expression: TE.ClrRef<int>(), required: false),
-            P(name: nameof(CompositeNullable.Part2), expression: TE.ClrRef<string>(), required: false)
-        ], identities:
-        [
-            I("PK_CompositeNullable", [nameof(CompositeNullable.Part1), nameof(CompositeNullable.Part2)])
-        ]);
-
-        var objects = new List<ApiObjectType> { compositeNullable };
-
-        var schema = ApiSchema.Create
-        (
-            apiName: name,
-            apiVersion: null,
-            apiOptions: null,
-            apiScalarTypes: scalars,
-            apiEnumTypes: [],
-            apiObjectTypes: objects
+        // CompositeNullable: Composite identity with nullable parts (ReturnEmpty)
+        var compositeNullable = O(
+            name: nameof(CompositeNullable),
+            clr: typeof(CompositeNullable),
+            options: OO(ApiIdentityNullHandling.ReturnEmpty),
+            identities:
+            [
+                I(name: "PK_CompositeNullable", propertyNames: [nameof(CompositeNullable.Part1), nameof(CompositeNullable.Part2)])
+            ],
+            properties:
+            [
+                P(name: nameof(CompositeNullable.Part1), expression: TE.ClrRef<int>(),    required: true),
+                P(name: nameof(CompositeNullable.Part2), expression: TE.ClrRef<string>(), required: false)
+            ]
         );
 
-        return schema;
-    }
-
-    /// <summary>
-    ///    Builds a test schema with composite identity and nullable parts (ThrowException handling).
-    /// </summary>
-    private static ApiSchema BuildCompositeIdentityStrictApiSchema(string name = "CompositeIdentityStrict")
-    {
-        var scalars = new List<ApiScalarType>
-        {
-            S(name: nameof(String), clr: typeof(string)),
-            S(name: nameof(Int32), clr: typeof(int))
-        };
-
-        var compositeStrict = O(name: nameof(CompositeStrict), clr: typeof(CompositeStrict), options: OO(ApiIdentityNullHandling.ThrowException), properties:
-        [
-            P(name: nameof(CompositeStrict.Part1), expression: TE.ClrRef<int>(), required: false),
-            P(name: nameof(CompositeStrict.Part2), expression: TE.ClrRef<string>(), required: false)
-        ], identities:
-        [
-            I("PK_CompositeStrict", [nameof(CompositeStrict.Part1), nameof(CompositeStrict.Part2)])
-        ]);
-
-        var objects = new List<ApiObjectType> { compositeStrict };
-
-        var schema = ApiSchema.Create
-        (
-            apiName: name,
-            apiVersion: null,
-            apiOptions: null,
-            apiScalarTypes: scalars,
-            apiEnumTypes: [],
-            apiObjectTypes: objects
+        // CompositeStrict: Composite identity with nullable parts (ThrowException)
+        var compositeStrict = O(
+            name: nameof(CompositeStrict),
+            clr: typeof(CompositeStrict),
+            options: OO(ApiIdentityNullHandling.ThrowException),
+            identities:
+            [
+                I(name: "PK_CompositeStrict", propertyNames: [nameof(CompositeStrict.Part1), nameof(CompositeStrict.Part2)])
+            ],
+            properties:
+            [
+                P(name: nameof(CompositeStrict.Part1), expression: TE.ClrRef<int>(),    required: true),
+                P(name: nameof(CompositeStrict.Part2), expression: TE.ClrRef<string>(), required: false)
+            ]
         );
 
-        return schema;
-    }
+        // User: Primary + alternate identities
+        var user = O(
+            name: nameof(User),
+            clr: typeof(User),
+            identities:
+            [
+                I(name: "PK_User",        propertyNames: [nameof(User.UserId)]),
+                I(name: "AK_User_Email",  propertyNames: [nameof(User.Email)]),
+                I(name: "AK_User_Username", propertyNames: [nameof(User.Username)])
+            ],
+            properties:
+            [
+                P(name: nameof(User.UserId),   expression: TE.ClrRef<int>(),    required: true),
+                P(name: nameof(User.Email),    expression: TE.ClrRef<string>(), required: true),
+                P(name: nameof(User.Username), expression: TE.ClrRef<string>(), required: true)
+            ]
+        );
 
-    /// <summary>
-    ///    Builds a test schema with multiple identities (primary + alternates).
-    /// </summary>
-    private static ApiSchema BuildAlternateIdentityApiSchema(string name = "AlternateIdentity")
-    {
-        var scalars = new List<ApiScalarType>
-        {
-            S(name: nameof(String), clr: typeof(string)),
-            S(name: nameof(Int32), clr: typeof(int))
-        };
-
-        var user = O(name: nameof(User), clr: typeof(User), options: OO(ApiIdentityNullHandling.ThrowException), properties:
-        [
-            P(name: nameof(User.UserId), expression: TE.ClrRef<int>(), required: true),
-            P(name: nameof(User.Username), expression: TE.ClrRef<string>(), required: true),
-            P(name: nameof(User.Email), expression: TE.ClrRef<string>(), required: true)
-        ], identities:
-        [
-            I("PK_User", [nameof(User.UserId)]),
-            I("AK_User_Username", [nameof(User.Username)]),
-            I("AK_User_Email", [nameof(User.Email)])
-        ]);
-
-        var objects = new List<ApiObjectType> { user };
+        var objects = new List<ApiObjectType> { productInventory, compositeNullable, compositeStrict, user };
 
         var schema = ApiSchema.Create
         (

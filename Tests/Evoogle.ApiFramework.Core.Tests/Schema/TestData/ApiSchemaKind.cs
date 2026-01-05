@@ -9,8 +9,5 @@ public enum ApiSchemaKind
 {
     Simple,
     Commerce,
-    CompositeIdentity,
-    CompositeIdentityNullable,
-    CompositeIdentityStrict,
-    AlternateIdentity
+    Identity
 }

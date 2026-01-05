@@ -46,12 +46,12 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
             var apiObjectType = this.ApiSchema.GetObjectTypeByApiName(this.ApiObjectTypeName);
             this.ApiObjectType = apiObjectType ?? throw new InvalidOperationException($"{nameof(Schema.ApiObjectType)} '{this.ApiObjectTypeName}' not found in ApiSchema.");
 
-            this.WriteLine($"ApiSchema:        {this.ApiSchema.ApiName.SafeToString()}");
-            this.WriteLine($"ApiObjectType:    {this.ApiObjectTypeName.SafeToString()}");
-            this.WriteLine($"ApiIdentityName:  {this.ApiIdentityName.SafeToString() ?? "<primary>"}");
-            this.WriteLine($"ClrInstance:      {this.ClrInstance.SafeToString()}");
-            this.WriteLine($"ShouldSucceed:    {this.ShouldSucceed}");
-            this.WriteLine($"ExpectedId:       {this.ExpectedId.SafeToString()}");
+            this.WriteLine($"ApiSchema:         {this.ApiSchema.ApiName.SafeToString()}");
+            this.WriteLine($"ApiObjectType:     {this.ApiObjectTypeName.SafeToString()}");
+            this.WriteLine($"ApiIdentityName:   {this.ApiIdentityName.SafeToString() ?? "<primary>"}");
+            this.WriteLine($"ClrInstance:       {this.ClrInstance.SafeToString()}");
+            this.WriteLine($"ShouldSucceed:     {this.ShouldSucceed}");
+            this.WriteLine($"ExpectedId:        {this.ExpectedId.SafeToString()}");
             this.WriteLine($"ExpectedException: {this.ExpectedException?.Name.SafeToString() ?? "<none>"}");
             this.WriteLine();
         }
@@ -371,7 +371,7 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
         new BuildIdentityTest
         {
             Name = "BuildIdentity succeeds with composite identity (int + string + Guid)",
-            ApiSchemaKind = ApiSchemaKind.CompositeIdentity,
+            ApiSchemaKind = ApiSchemaKind.Identity,
             ApiObjectTypeName = nameof(ProductInventory),
             ClrInstance = new ProductInventory
             {
@@ -393,7 +393,7 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
         new BuildIdentityTest
         {
             Name = "BuildIdentity succeeds with composite identity containing null part (ReturnEmpty)",
-            ApiSchemaKind = ApiSchemaKind.CompositeIdentityNullable,
+            ApiSchemaKind = ApiSchemaKind.Identity,
             ApiObjectTypeName = nameof(CompositeNullable),
             ClrInstance = new CompositeNullable { Part1 = 100, Part2 = null },
             ApiIdentityName = null,
@@ -408,7 +408,7 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
         new BuildIdentityTest
         {
             Name = "BuildIdentity throws with composite identity containing null part (ThrowException)",
-            ApiSchemaKind = ApiSchemaKind.CompositeIdentityStrict,
+            ApiSchemaKind = ApiSchemaKind.Identity,
             ApiObjectTypeName = nameof(CompositeStrict),
             ClrInstance = new CompositeStrict { Part1 = 200, Part2 = null },
             ApiIdentityName = null,
@@ -421,7 +421,7 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
         new BuildIdentityTest
         {
             Name = "BuildIdentity succeeds with alternate identity",
-            ApiSchemaKind = ApiSchemaKind.AlternateIdentity,
+            ApiSchemaKind = ApiSchemaKind.Identity,
             ApiObjectTypeName = nameof(User),
             ClrInstance = new User { UserId = 999, Email = "user@example.com", Username = "johndoe" },
             ApiIdentityName = "AK_User_Email",
@@ -433,7 +433,7 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
         new BuildIdentityTest
         {
             Name = "BuildIdentity succeeds with primary identity when alternates exist",
-            ApiSchemaKind = ApiSchemaKind.AlternateIdentity,
+            ApiSchemaKind = ApiSchemaKind.Identity,
             ApiObjectTypeName = nameof(User),
             ClrInstance = new User { UserId = 999, Email = "user@example.com", Username = "johndoe" },
             ApiIdentityName = null,
@@ -505,7 +505,7 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
         new BuildIdentityFromValuesTest
         {
             Name = "BuildIdentity from values succeeds with composite identity",
-            ApiSchemaKind = ApiSchemaKind.CompositeIdentity,
+            ApiSchemaKind = ApiSchemaKind.Identity,
             ApiObjectTypeName = nameof(ProductInventory),
             PropertyValues = new Dictionary<string, object?>
             {
@@ -538,7 +538,7 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
         new BuildIdentityFromValuesTest
         {
             Name = "BuildIdentity from values throws when property missing",
-            ApiSchemaKind = ApiSchemaKind.CompositeIdentity,
+            ApiSchemaKind = ApiSchemaKind.Identity,
             ApiObjectTypeName = nameof(ProductInventory),
             PropertyValues = new Dictionary<string, object?> { ["WarehouseId"] = 123 },
             ApiIdentityName = null,
@@ -578,7 +578,7 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
         new TryBuildIdentityTest
         {
             Name = "TryBuildIdentity returns true with composite identity",
-            ApiSchemaKind = ApiSchemaKind.CompositeIdentity,
+            ApiSchemaKind = ApiSchemaKind.Identity,
             ApiObjectTypeName = nameof(ProductInventory),
             ClrInstance = new ProductInventory
             {
@@ -653,7 +653,7 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
         new TryBuildIdentityFromValuesTest
         {
             Name = "TryBuildIdentity from values returns true with composite identity",
-            ApiSchemaKind = ApiSchemaKind.CompositeIdentity,
+            ApiSchemaKind = ApiSchemaKind.Identity,
             ApiObjectTypeName = nameof(ProductInventory),
             PropertyValues = new Dictionary<string, object?>
             {
@@ -684,7 +684,7 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
         new TryBuildIdentityFromValuesTest
         {
             Name = "TryBuildIdentity from values returns true with alternate identity",
-            ApiSchemaKind = ApiSchemaKind.AlternateIdentity,
+            ApiSchemaKind = ApiSchemaKind.Identity,
             ApiObjectTypeName = nameof(User),
             PropertyValues = new Dictionary<string, object?> { ["Email"] = "user@example.com" },
             ApiIdentityName = "AK_User_Email",
@@ -729,7 +729,7 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
         new TryBuildIdentityFromValuesTest
         {
             Name = "TryBuildIdentity from values returns false when property missing",
-            ApiSchemaKind = ApiSchemaKind.CompositeIdentity,
+            ApiSchemaKind = ApiSchemaKind.Identity,
             ApiObjectTypeName = nameof(ProductInventory),
             PropertyValues = new Dictionary<string, object?> { ["WarehouseId"] = 123 },
             ApiIdentityName = null,
