@@ -13,7 +13,6 @@ namespace Evoogle.ApiFramework.Schema;
 public sealed partial class ApiObjectType
 {
     #region Public Identity Methods
-
     /// <summary>
     ///     Attempts to build an identity from a CLR instance without throwing exceptions.
     /// </summary>
@@ -29,9 +28,27 @@ public sealed partial class ApiObjectType
     {
         id = default;
 
+        // Validate inputs without throwing
+        if (clrInstance is null)
+        {
+            return false;
+        }
+
+        if (!this.HasIdentity)
+        {
+            return false;
+        }
+
+        var identity = this.ResolveIdentityForBuild(apiIdentityName);
+        if (identity is null)
+        {
+            return false;
+        }
+
+        // Core implementation - catch any exceptions from deeper layers
         try
         {
-            id = this.BuildIdentity(clrInstance, apiIdentityName);
+            id = this.BuildIdentityFromInstance(identity, clrInstance);
             return id.HasValue;
         }
         catch
@@ -55,9 +72,27 @@ public sealed partial class ApiObjectType
     {
         id = default;
 
+        // Validate inputs without throwing
+        if (values is null)
+        {
+            return false;
+        }
+
+        if (!this.HasIdentity)
+        {
+            return false;
+        }
+
+        var identity = this.ResolveIdentityForBuild(apiIdentityName);
+        if (identity is null)
+        {
+            return false;
+        }
+
+        // Core implementation - catch any exceptions from deeper layers
         try
         {
-            id = this.BuildIdentity(values, apiIdentityName);
+            id = this.BuildIdentityFromValues(identity, values);
             return id.HasValue;
         }
         catch
@@ -65,94 +100,19 @@ public sealed partial class ApiObjectType
             return false;
         }
     }
-
-    /// <summary>
-    ///     Attempts to build the primary identity from a CLR instance without throwing exceptions.
-    /// </summary>
-    /// <param name="clrInstance">The CLR instance to build the identity from.</param>
-    /// <param name="id">When this method returns, contains the built identity if successful; otherwise, <see cref="ApiId.Empty"/>.</param>
-    /// <returns><c>true</c> if the identity was built successfully; otherwise, <c>false</c>.</returns>
-    /// <remarks>
-    ///     This is a convenience method equivalent to calling <see cref="TryBuildIdentity(object, out ApiId, string?)"/> 
-    ///     with <c>apiIdentityName</c> set to <c>null</c>.
-    /// </remarks>
-    public bool TryBuildPrimaryIdentity(object clrInstance, out ApiId id)
-        => this.TryBuildIdentity(clrInstance, out id, apiIdentityName: null);
-
-    /// <summary>
-    ///     Builds an identity from a CLR instance.
-    /// </summary>
-    /// <param name="clrInstance">The CLR instance to build the identity from.</param>
-    /// <param name="apiIdentityName">Optional identity name. If null, uses the primary identity.</param>
-    /// <returns>The built identity.</returns>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="clrInstance"/> is null.</exception>
-    /// <exception cref="InvalidOperationException">Thrown when the object type has no identity configured or the specified identity name is not found.</exception>
-    /// <exception cref="ApiIdentityException">Thrown when type coercion fails or null handling requires throwing.</exception>
-    public ApiId BuildIdentity(object clrInstance, string? apiIdentityName = null)
-    {
-        ArgumentNullException.ThrowIfNull(clrInstance);
-
-        if (!this.HasIdentity)
-        {
-            throw new InvalidOperationException($"ApiObjectType '{this.ApiName}' has no identity configured.");
-        }
-
-        var identity = this.ResolveIdentityForBuild(apiIdentityName);
-        if (identity is null)
-        {
-            var identityRef = string.IsNullOrWhiteSpace(apiIdentityName) ? "primary identity" : $"identity '{apiIdentityName}'";
-            throw new InvalidOperationException($"ApiObjectType '{this.ApiName}' does not have {identityRef}.");
-        }
-
-        return this.BuildIdentityFromInstance(identity, clrInstance);
-    }
-
-    /// <summary>
-    ///     Builds an identity from a dictionary of property values.
-    /// </summary>
-    /// <param name="values">The dictionary of property names to values.</param>
-    /// <param name="apiIdentityName">Optional identity name. If null, uses the primary identity.</param>
-    /// <returns>The built identity.</returns>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="values"/> is null.</exception>
-    /// <exception cref="InvalidOperationException">Thrown when the object type has no identity configured or the specified identity name is not found.</exception>
-    /// <exception cref="ApiIdentityException">Thrown when type coercion fails, required properties are missing, or null handling requires throwing.</exception>
-    public ApiId BuildIdentity(IReadOnlyDictionary<string, object?> values, string? apiIdentityName = null)
-    {
-        ArgumentNullException.ThrowIfNull(values);
-
-        if (!this.HasIdentity)
-        {
-            throw new InvalidOperationException($"ApiObjectType '{this.ApiName}' has no identity configured.");
-        }
-
-        var identity = this.ResolveIdentityForBuild(apiIdentityName);
-        if (identity is null)
-        {
-            var identityRef = string.IsNullOrWhiteSpace(apiIdentityName) ? "primary identity" : $"identity '{apiIdentityName}'";
-            throw new InvalidOperationException($"ApiObjectType '{this.ApiName}' does not have {identityRef}.");
-        }
-
-        return this.BuildIdentityFromValues(identity, values);
-    }
-
-    /// <summary>
-    ///     Builds the primary identity from a CLR instance.
-    /// </summary>
-    /// <param name="clrInstance">The CLR instance to build the identity from.</param>
-    /// <returns>The built primary identity.</returns>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="clrInstance"/> is null.</exception>
-    /// <exception cref="InvalidOperationException">Thrown when the object type has no primary identity configured.</exception>
-    /// <exception cref="ApiIdentityException">Thrown when type coercion fails or null handling requires throwing.</exception>
-    /// <remarks>
-    ///     This is a convenience method equivalent to calling <see cref="BuildIdentity(object, string?)"/> 
-    ///     with <c>apiIdentityName</c> set to <c>null</c>.
-    /// </remarks>
-    public ApiId BuildPrimaryIdentity(object clrInstance)
-        => this.BuildIdentity(clrInstance, apiIdentityName: null);
-
     #endregion
 
     #region Implementation Methods
+    internal ApiIdentity? ResolveIdentityForBuild(string? apiIdentityName)
+    {
+        if (!string.IsNullOrWhiteSpace(apiIdentityName))
+        {
+            return this.TryGetIdentityByApiName(apiIdentityName, out var id) ? id : null;
+        }
+
+        return this.ApiIdentitySet!.ApiPrimaryIdentity;
+    }
+
     private ApiId BuildIdentityFromInstance(ApiIdentity identity, object clrInstance)
     {
         var parts = new List<ApiIdPart>(identity.ApiIdentityParts.Length);
@@ -331,15 +291,5 @@ public sealed partial class ApiObjectType
 
     private ApiIdentityNullHandling GetIdentityNullHandling()
         => this.ApiOptions?.ApiIdentityNullHandling ?? this.ApiSchemaContext.ApiSchemaOptions.ApiIdentityNullHandling;
-
-    private ApiIdentity? ResolveIdentityForBuild(string? apiIdentityName)
-    {
-        if (!string.IsNullOrWhiteSpace(apiIdentityName))
-        {
-            return this.TryGetIdentityByApiName(apiIdentityName, out var id) ? id : null;
-        }
-
-        return this.ApiIdentitySet!.ApiPrimaryIdentity;
-    }
     #endregion
 }
