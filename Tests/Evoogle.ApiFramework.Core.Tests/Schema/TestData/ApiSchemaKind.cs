@@ -8,5 +8,9 @@ namespace Evoogle.ApiFramework.Schema.TestData;
 public enum ApiSchemaKind
 {
     Simple,
-    Commerce
+    Commerce,
+    CompositeIdentity,
+    CompositeIdentityNullable,
+    CompositeIdentityStrict,
+    AlternateIdentity
 }

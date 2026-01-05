@@ -88,6 +88,7 @@ public sealed class ScalarsOnly
 
 public sealed class Person
 {
+    public int Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public int? Age { get; set; }
     public Gender? Gender { get; set; }
@@ -95,12 +96,13 @@ public sealed class Person
 
     public override string ToString()
     {
+        var id = this.Id.SafeToString();
         var name = this.Name.SafeToString();
         var age = this.Age.SafeToString();
         var gender = this.Gender.SafeToString();
         var hobbies = this.Hobbies.SafeToString();
 
-        return $"{nameof(Person)} {{{nameof(this.Name)}={name}, {nameof(this.Age)}={age}, {nameof(this.Gender)}={gender}, {nameof(this.Hobbies)}={hobbies}}}";
+        return $"{nameof(Person)} {{{nameof(this.Id)}={id}, {nameof(this.Name)}={name}, {nameof(this.Age)}={age}, {nameof(this.Gender)}={gender}, {nameof(this.Hobbies)}={hobbies}}}";
     }
 }
 
