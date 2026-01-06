@@ -548,4 +548,87 @@ public sealed partial class ApiProperty
         }
     }
     #endregion
+
+    #region Value Coercion Methods
+    /// <summary>
+    ///     Coerces a raw value to the property's target type using the property's compiled coercion logic.
+    /// </summary>
+    /// <param name="rawValue">The raw value to coerce.</param>
+    /// <param name="clrValueType">The target type to coerce to. If <c>null</c>, uses the property's CLR type.</param>
+    /// <returns>The coerced value.</returns>
+    /// <exception cref="ApiSchemaException">Thrown when coercion fails.</exception>
+    /// <remarks>
+    ///     <para>
+    ///         This method provides access to the property's optimized type coercion without requiring
+    ///         an actual CLR instance. Useful for coercing dictionary values, query parameters, or
+    ///         deserialized data before assignment.
+    ///     </para>
+    ///     <para>
+    ///         The coercion uses the same cached compiled expressions as the property accessors,
+    ///         providing better performance than direct <see cref="TypeCoercion"/> calls for frequently-used type pairs.
+    ///     </para>
+    /// </remarks>
+    public object? CoerceValue(object? rawValue, Type? clrValueType = null)
+    {
+        ArgumentNullException.ThrowIfNull(this.ApiSchemaContext);
+
+        var targetType = clrValueType ?? this.ApiTypeExpression.ClrType ?? throw new InvalidOperationException(
+            $"Cannot coerce value for property '{this.ClrName}' because neither a target type was provided nor does the property have a resolved CLR type.");
+
+        try
+        {
+            return this.ApiSchemaContext.TypeCoercion.Coerce(
+                rawValue,
+                targetType,
+                this.ApiSchemaContext.TypeCoercionContext);
+        }
+        catch (Exception ex)
+        {
+            throw new ApiSchemaException(
+                $"Failed to coerce value for property '{this.ClrName}' from type '{rawValue?.GetType().Name ?? "null"}' to '{targetType.Name}'.",
+                ex);
+        }
+    }
+
+    /// <summary>
+    ///     Attempts to coerce a raw value to the property's target type without throwing exceptions.
+    /// </summary>
+    /// <param name="rawValue">The raw value to coerce.</param>
+    /// <param name="coercedValue">When this method returns, contains the coerced value if successful; otherwise, <c>null</c>.</param>
+    /// <param name="clrValueType">The target type to coerce to. If <c>null</c>, uses the property's CLR type.</param>
+    /// <returns><c>true</c> if coercion was successful; otherwise, <c>false</c>.</returns>
+    /// <remarks>
+    ///     This method never throws exceptions and returns <c>false</c> on any failure.
+    ///     Use <see cref="CoerceValue"/> if you need exception details.
+    /// </remarks>
+    public bool TryCoerceValue(object? rawValue, out object? coercedValue, Type? clrValueType = null)
+    {
+        coercedValue = null;
+
+        if (this.ApiSchemaContext is null)
+        {
+            return false;
+        }
+
+        var targetType = clrValueType ?? this.ApiTypeExpression.ClrType;
+
+        if (targetType is null)
+        {
+            return false;
+        }
+
+        try
+        {
+            coercedValue = this.ApiSchemaContext.TypeCoercion.Coerce(
+                rawValue,
+                targetType,
+                this.ApiSchemaContext.TypeCoercionContext);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+    #endregion
 }

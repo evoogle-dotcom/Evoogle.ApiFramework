@@ -273,15 +273,8 @@ public sealed partial class ApiObjectType
 
         foreach (var part in identity.ApiIdentityParts)
         {
-            // Get the property value using compiled accessors
-            if (!part.ApiProperty.TryGetValue(clrInstance, out var rawValue))
-            {
-                throw new ApiIdentityException(
-                    $"Failed to read property '{part.ApiProperty.ApiName}' from type '{clrInstance.GetType().Name}' for identity '{identity.ApiName}'.");
-            }
-
-            // Materialize the ApiId using TypeCoercion and pre-resolved target type
-            var partId = this.MaterializeApiIdFromProperty(part, rawValue, identity, clrInstance, identity.ApiSchemaContext);
+            // ApiProperty handles property access AND coercion in one optimized call
+            var partId = this.MaterializeApiIdFromProperty(part, identity, clrInstance, identity.ApiSchemaContext);
 
             // Always create named parts (serialization layer decides ordered vs named formatting)
             parts.Add(ApiIdPart.Create(part.ApiProperty.ApiName, partId));
@@ -313,27 +306,20 @@ public sealed partial class ApiObjectType
         return FinalizeComposite(parts);
     }
 
-    private ApiId MaterializeApiIdFromProperty(ApiIdentityPart part, object? rawValue, ApiIdentity identity, object clrInstance, ApiSchemaContext schemaContext)
+    private ApiId MaterializeApiIdFromProperty(ApiIdentityPart part, ApiIdentity identity, object clrInstance, ApiSchemaContext schemaContext)
     {
         // Use the pre-resolved target type from the identity part
         var targetType = part.ResolvedTargetType;
 
-        this.Logger.LogTrace("Coercing property '{PropertyName}' from type '{SourceType}' to '{TargetType}' for identity '{IdentityName}'",
-            part.ApiProperty.ApiName, rawValue?.GetType().Name ?? "null", targetType.Name, identity.ApiName);
+        this.Logger.LogTrace("Reading and coercing property '{PropertyName}' to '{TargetType}' for identity '{IdentityName}'",
+            part.ApiProperty.ApiName, targetType.Name, identity.ApiName);
 
-        // Use the schema's TypeCoercion to convert the raw value to the target type
-        object? coercedValue;
-        try
+        // Let ApiProperty handle property access AND type coercion in one optimized call
+        // This leverages ApiProperty's compiled accessors and coercion caching
+        if (!part.ApiProperty.TryGetValue(clrInstance, out var coercedValue, targetType))
         {
-            coercedValue = schemaContext.TypeCoercion.Coerce(rawValue, targetType, schemaContext.TypeCoercionContext);
-        }
-        catch (Exception ex)
-        {
-            this.Logger.LogWarning(ex, "Type coercion failed for property '{PropertyName}' from '{SourceType}' to '{TargetType}'",
-                part.ApiProperty.ApiName, rawValue?.GetType().Name ?? "null", targetType.Name);
             throw new ApiIdentityException(
-                $"Failed to coerce property '{part.ApiProperty.ApiName}' value to type '{targetType.Name}' for identity '{identity.ApiName}' on type '{clrInstance.GetType().Name}'.",
-                ex);
+                $"Failed to read and coerce property '{part.ApiProperty.ApiName}' to type '{targetType.Name}' for identity '{identity.ApiName}' on type '{clrInstance.GetType().Name}'.");
         }
 
         // Handle null values according to the configured null handling
@@ -352,7 +338,7 @@ public sealed partial class ApiObjectType
             return ApiId.Empty;
         }
 
-        // Convert the typed value to ApiId
+        // Convert the already-coerced value to ApiId
         return this.ConvertToApiId(coercedValue, targetType, part.ApiProperty.ApiName, identity.ApiName, clrInstance.GetType().Name);
     }
 
@@ -364,19 +350,13 @@ public sealed partial class ApiObjectType
         this.Logger.LogTrace("Coercing property '{PropertyName}' from values dictionary (type '{SourceType}') to '{TargetType}' for identity '{IdentityName}'",
             part.ApiPropertyName, rawValue?.GetType().Name ?? "null", targetType.Name, identity.ApiName);
 
-        // Use the schema's TypeCoercion to convert the raw value to the target type
-        object? coercedValue;
-        try
+        // Use ApiProperty's coercion for consistency and potential performance benefits
+        if (!part.ApiProperty.TryCoerceValue(rawValue, out var coercedValue, targetType))
         {
-            coercedValue = schemaContext.TypeCoercion.Coerce(rawValue, targetType, schemaContext.TypeCoercionContext);
-        }
-        catch (Exception ex)
-        {
-            this.Logger.LogWarning(ex, "Type coercion failed for property '{PropertyName}' from values dictionary ('{SourceType}' to '{TargetType}')",
+            this.Logger.LogWarning("Type coercion failed for property '{PropertyName}' from values dictionary ('{SourceType}' to '{TargetType}')",
                 part.ApiPropertyName, rawValue?.GetType().Name ?? "null", targetType.Name);
             throw new ApiIdentityException(
-                $"Failed to coerce property '{part.ApiPropertyName}' value to type '{targetType.Name}' for identity '{identity.ApiName}' from values dictionary.",
-                ex);
+                $"Failed to coerce property '{part.ApiPropertyName}' value to type '{targetType.Name}' for identity '{identity.ApiName}' from values dictionary.");
         }
 
         // Handle null values according to the configured null handling
