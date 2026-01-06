@@ -225,7 +225,7 @@ public static class ApiObjectTypeExtensions
             return apiIdentity!;
         }
 
-        var availableIdentitiesByApiName = string.Join(',', apiObjectType.ApiIdentitySet?.ApiIdentities.OrderBy(i => i.ApiName).Select(i => i.ApiName) ?? Array.Empty<string>());
+        var availableIdentitiesByApiName = string.Join(',', apiObjectType.ApiIdentitySet?.ApiIdentities.OrderBy(i => i.ApiName).Select(i => i.ApiName) ?? []);
         var errorMessage =
             $"{nameof(ApiIdentity)} with {nameof(ApiIdentity.ApiName)} '{apiName.SafeToString()}' not found in {apiObjectType.SafeToString()}. " +
             $"Available {nameof(ApiIdentity)} by {nameof(ApiIdentity.ApiName)} are: {availableIdentitiesByApiName}.";
@@ -321,7 +321,7 @@ public static class ApiObjectTypeExtensions
     /// <param name="apiObjectType">The API object type to build identities for.</param>
     /// <param name="instances">The collection of CLR instances to build identities for.</param>
     /// <param name="apiIdentityName">Optional identity name. If null, uses the primary identity.</param>
-    /// <returns>A read-only list of tuples containing each instance, its built identity, and success indicator.</returns>
+    /// <returns>A read-only list of <see cref="ApiIdentityBuildResult"/> containing the result for each instance.</returns>
     /// <remarks>
     ///     <para>This method provides fault-tolerant batch processing:</para>
     ///     <list type="bullet">
@@ -335,7 +335,7 @@ public static class ApiObjectTypeExtensions
     ///     <para><c>var failures = results.Where(r => !r.Success).Select(r => r.Instance);</c></para>
     ///     <para><c>var successes = results.Where(r => r.Success);</c></para>
     /// </remarks>
-    public static IReadOnlyList<(object Instance, ApiId Id, bool Success)> TryBuildIdentities(this ApiObjectType apiObjectType, IEnumerable<object?> instances, string? apiIdentityName = null)
+    public static IReadOnlyList<ApiIdentityBuildResult> TryBuildIdentities(this ApiObjectType apiObjectType, IEnumerable<object?> instances, string? apiIdentityName = null)
     {
         ArgumentNullException.ThrowIfNull(apiObjectType);
         return apiObjectType.TryBuildIdentities(instances, apiIdentityName);

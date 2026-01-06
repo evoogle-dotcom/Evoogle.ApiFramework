@@ -328,7 +328,7 @@ public sealed partial class ApiObjectType
     /// </summary>
     /// <param name="instances">The collection of CLR instances to build identities for.</param>
     /// <param name="apiIdentityName">Optional identity name. If null, uses the primary identity.</param>
-    /// <returns>A read-only list of tuples containing each instance, its built identity, and success indicator.</returns>
+    /// <returns>A read-only list of <see cref="ApiIdentityBuildResult"/> containing the result for each instance.</returns>
     /// <remarks>
     ///     <para>This method never throws exceptions. Failed identity builds are indicated in the result tuple.</para>
     ///     <para>Null instances are skipped and not included in the results.</para>
@@ -345,18 +345,18 @@ public sealed partial class ApiObjectType
     ///         <item><description>Data import - process as much as possible despite errors</description></item>
     ///     </list>
     /// </remarks>
-    public IReadOnlyList<(object Instance, ApiId Id, bool Success)> TryBuildIdentities(IEnumerable<object?> instances, string? apiIdentityName = null)
+    public IReadOnlyList<ApiIdentityBuildResult> TryBuildIdentities(IEnumerable<object?> instances, string? apiIdentityName = null)
     {
         if (instances is null)
         {
             this.Logger.LogDebug("TryBuildIdentities: instances collection is null");
-            return Array.Empty<(object, ApiId, bool)>();
+            return [];
         }
 
         if (!this.HasIdentity)
         {
             this.Logger.LogDebug("TryBuildIdentities: type '{TypeName}' has no identity configured", this.ApiName);
-            return Array.Empty<(object, ApiId, bool)>();
+            return [];
         }
 
         var identity = this.ResolveIdentityForBuild(apiIdentityName);
@@ -364,13 +364,13 @@ public sealed partial class ApiObjectType
         {
             var identityRef = string.IsNullOrWhiteSpace(apiIdentityName) ? "primary identity" : $"identity '{apiIdentityName}'";
             this.Logger.LogDebug("TryBuildIdentities: type '{TypeName}' does not have {IdentityRef}", this.ApiName, identityRef);
-            return Array.Empty<(object, ApiId, bool)>();
+            return [];
         }
 
         this.Logger.LogTrace("Building identities for batch (fault-tolerant) using identity '{IdentityName}' on type '{TypeName}'",
             identity.ApiName, this.ApiName);
 
-        var results = new List<(object Instance, ApiId Id, bool Success)>();
+        var results = new List<ApiIdentityBuildResult>();
         var successCount = 0;
         var failureCount = 0;
 
@@ -384,12 +384,12 @@ public sealed partial class ApiObjectType
 
             if (this.TryBuildIdentity(instance, out var id, apiIdentityName))
             {
-                results.Add((instance, id, true));
+                results.Add(new ApiIdentityBuildResult { Instance = instance, Id = id, Success = true });
                 successCount++;
             }
             else
             {
-                results.Add((instance, ApiId.Empty, false));
+                results.Add(new ApiIdentityBuildResult { Instance = instance, Id = ApiId.Empty, Success = false });
                 failureCount++;
             }
         }

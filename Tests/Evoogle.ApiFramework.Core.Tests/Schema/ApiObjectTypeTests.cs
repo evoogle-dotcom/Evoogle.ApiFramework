@@ -304,7 +304,7 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
         #region Calculated Properties
         private ApiSchema? ApiSchema { get; set; }
         private ApiObjectType? ApiObjectType { get; set; }
-        private IReadOnlyList<(object Instance, ApiId Id, bool Success)>? ActualResults { get; set; }
+        private IReadOnlyList<ApiIdentityBuildResult>? ActualResults { get; set; }
         #endregion
 
         #region XUnitTest Methods
@@ -369,15 +369,15 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
             this.ActualResults.Count.Should().Be(expectedResultCount, "null instances should be skipped");
 
             // Verify all successful results have non-empty IDs
-            foreach (var (instance, id, success) in this.ActualResults.Where(r => r.Success))
+            foreach (var result in this.ActualResults.Where(r => r.Success))
             {
-                id.HasValue.Should().BeTrue("successful results should have valid IDs");
+                result.Id.HasValue.Should().BeTrue("successful results should have valid IDs");
             }
 
             // Verify all failed results have empty IDs
-            foreach (var (instance, id, success) in this.ActualResults.Where(r => !r.Success))
+            foreach (var result in this.ActualResults.Where(r => !r.Success))
             {
-                id.Should().Be(ApiId.Empty, "failed results should have empty IDs");
+                result.Id.Should().Be(ApiId.Empty, "failed results should have empty IDs");
             }
         }
         #endregion
@@ -999,7 +999,7 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = "TryBuildIdentities returns empty results with empty collection",
             ApiSchemaKind = ApiSchemaKind.Simple,
             ApiObjectTypeName = nameof(Person),
-            Instances = Array.Empty<object>(),
+            Instances = [],
             ApiIdentityName = null,
             ExpectedSuccessCount = 0,
             ExpectedFailureCount = 0,
@@ -1156,7 +1156,7 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = "TryBuildIdentityMap succeeds with empty collection",
             ApiSchemaKind = ApiSchemaKind.Simple,
             ApiObjectTypeName = nameof(Person),
-            Instances = Array.Empty<object>(),
+            Instances = [],
             ApiIdentityName = null,
             ExpectedResult = true,
             ExpectedMapSize = 0
