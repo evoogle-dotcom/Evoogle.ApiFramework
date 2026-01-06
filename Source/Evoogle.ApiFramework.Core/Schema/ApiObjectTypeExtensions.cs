@@ -16,12 +16,12 @@ public static class ApiObjectTypeExtensions
 {
     #region Extension Methods
     /// <summary>
-    ///     Builds an identity from a CLR instance.
+    ///     Gets an identity from a CLR instance.
     /// </summary>
-    /// <param name="apiObjectType">The API object type to build the identity for.</param>
-    /// <param name="clrInstance">The CLR instance to build the identity from.</param>
+    /// <param name="apiObjectType">The API object type to get the identity for.</param>
+    /// <param name="clrInstance">The CLR instance to get the identity from.</param>
     /// <param name="apiIdentityName">Optional identity name. If null, uses the primary identity.</param>
-    /// <returns>The built identity.</returns>
+    /// <returns>The identity.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="clrInstance"/> is null.</exception>
     /// <exception cref="InvalidOperationException">Thrown when the object type has no identity configured or the specified identity name is not found.</exception>
     /// <exception cref="ApiIdentityException">Thrown when type coercion fails or null handling requires throwing.</exception>
@@ -34,16 +34,16 @@ public static class ApiObjectTypeExtensions
     ///     </list>
     ///     <para><b>Method Selection Guide:</b></para>
     ///     <list type="bullet">
-    ///         <item><description>Use <c>BuildIdentity</c> when failures indicate programming errors and you need detailed exceptions</description></item>
-    ///         <item><description>Use <see cref="ApiObjectType.TryBuildIdentity(object, out ApiId, string?)"/> for expected failures or validation scenarios</description></item>
+    ///         <item><description>Use <c>GetIdentity</c> when failures indicate programming errors and you need detailed exceptions</description></item>
+    ///         <item><description>Use <see cref="ApiObjectType.TryGetIdentity(object, out ApiId, string?)"/> for expected failures or validation scenarios</description></item>
     ///         <item><description>Use <see cref="ApiObjectType.MatchesIdentity"/> to compare without allocating an ApiId</description></item>
     ///     </list>
     /// </remarks>
-    public static ApiId BuildIdentity(this ApiObjectType apiObjectType, object clrInstance, string? apiIdentityName = null)
+    public static ApiId GetIdentity(this ApiObjectType apiObjectType, object clrInstance, string? apiIdentityName = null)
     {
         ArgumentNullException.ThrowIfNull(clrInstance);
 
-        if (!apiObjectType.TryBuildIdentity(clrInstance, out var id, apiIdentityName))
+        if (!apiObjectType.TryGetIdentity(clrInstance, out var id, apiIdentityName))
         {
             // Provide detailed diagnostics for the throwing version
             if (!apiObjectType.HasIdentity)
@@ -66,12 +66,12 @@ public static class ApiObjectTypeExtensions
     }
 
     /// <summary>
-    ///     Builds an identity from a dictionary of property values.
+    ///     Gets an identity from a dictionary of property values.
     /// </summary>
-    /// <param name="apiObjectType">The API object type to build the identity for.</param>
+    /// <param name="apiObjectType">The API object type to get the identity for.</param>
     /// <param name="values">The dictionary of property names to values.</param>
     /// <param name="apiIdentityName">Optional identity name. If null, uses the primary identity.</param>
-    /// <returns>The built identity.</returns>
+    /// <returns>The identity.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="values"/> is null.</exception>
     /// <exception cref="InvalidOperationException">Thrown when the object type has no identity configured or the specified identity name is not found.</exception>
     /// <exception cref="ApiIdentityException">Thrown when type coercion fails, required properties are missing, or null handling requires throwing.</exception>
@@ -90,11 +90,11 @@ public static class ApiObjectTypeExtensions
     ///         <item><description>Consider this method for batch operations to avoid repeated reflection on source objects</description></item>
     ///     </list>
     /// </remarks>
-    public static ApiId BuildIdentity(this ApiObjectType apiObjectType, IReadOnlyDictionary<string, object?> values, string? apiIdentityName = null)
+    public static ApiId GetIdentity(this ApiObjectType apiObjectType, IReadOnlyDictionary<string, object?> values, string? apiIdentityName = null)
     {
         ArgumentNullException.ThrowIfNull(values);
 
-        if (!apiObjectType.TryBuildIdentity(values, out var id, apiIdentityName))
+        if (!apiObjectType.TryGetIdentity(values, out var id, apiIdentityName))
         {
             if (!apiObjectType.HasIdentity)
             {
@@ -113,96 +113,6 @@ public static class ApiObjectTypeExtensions
 
         return id;
     }
-
-    /// <summary>
-    ///     Builds a dictionary mapping instances to their identities.
-    /// </summary>
-    /// <param name="apiObjectType">The API object type to build identities for.</param>
-    /// <param name="instances">The collection of CLR instances to build identities for.</param>
-    /// <param name="apiIdentityName">Optional identity name. If null, uses the primary identity.</param>
-    /// <returns>A read-only dictionary mapping each instance to its built identity.</returns>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="apiObjectType"/> or <paramref name="instances"/> is null.</exception>
-    /// <exception cref="InvalidOperationException">Thrown when the object type has no identity configured or the specified identity name is not found.</exception>
-    /// <exception cref="ApiIdentityException">Thrown when identity building fails for any instance.</exception>
-    /// <remarks>
-    ///     <para><b>Common Use Cases:</b></para>
-    ///     <list type="bullet">
-    ///         <item><description><b>Change Tracking:</b> Map entities to original identities for comparison</description></item>
-    ///         <item><description><b>Duplicate Detection:</b> Find multiple instances with the same identity</description></item>
-    ///         <item><description><b>Batch Updates:</b> Correlate instances with database records by identity</description></item>
-    ///     </list>
-    ///     <para>Example: <c>var map = objectType.BuildIdentityMap(entities); var duplicates = map.GroupBy(x => x.Value).Where(g => g.Count() > 1);</c></para>
-    /// </remarks>
-    public static IReadOnlyDictionary<object, ApiId> BuildIdentityMap(this ApiObjectType apiObjectType, IEnumerable<object?> instances, string? apiIdentityName = null)
-    {
-        ArgumentNullException.ThrowIfNull(apiObjectType);
-        ArgumentNullException.ThrowIfNull(instances);
-
-        if (!apiObjectType.TryBuildIdentityMap(instances, out var identityMap, apiIdentityName))
-        {
-            var identityRef = string.IsNullOrWhiteSpace(apiIdentityName) ? "primary identity" : $"identity '{apiIdentityName}'";
-            throw new ApiIdentityException($"Failed to build identity map using {identityRef} for type '{apiObjectType.ApiName}'.");
-        }
-
-        return identityMap;
-    }
-
-    /// <summary>
-    ///     Builds identities for a collection of instances.
-    /// </summary>
-    /// <param name="apiObjectType">The API object type to build identities for.</param>
-    /// <param name="instances">The collection of CLR instances to build identities for.</param>
-    /// <param name="apiIdentityName">Optional identity name. If null, uses the primary identity.</param>
-    /// <returns>A read-only list of built identities in the same order as the input instances.</returns>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="apiObjectType"/> or <paramref name="instances"/> is null.</exception>
-    /// <exception cref="InvalidOperationException">Thrown when the object type has no identity configured or the specified identity name is not found.</exception>
-    /// <exception cref="ApiIdentityException">Thrown when identity building fails for any instance.</exception>
-    /// <remarks>
-    ///     <para><b>Batch Processing Benefits:</b></para>
-    ///     <list type="bullet">
-    ///         <item><description>Identity resolution happens once for all instances (reduced overhead)</description></item>
-    ///         <item><description>Better error context with batch logging</description></item>
-    ///         <item><description>Pre-allocated result collection when count is known</description></item>
-    ///     </list>
-    ///     <para>This method throws on the first failure. For fault-tolerant processing, use <see cref="TryBuildIdentities"/>.</para>
-    ///     <para><b>Use Cases:</b></para>
-    ///     <list type="bullet">
-    ///         <item><description>Bulk entity loading from database with identity extraction</description></item>
-    ///         <item><description>Batch API responses requiring identity lists</description></item>
-    ///         <item><description>Cache warming with multiple entities</description></item>
-    ///     </list>
-    /// </remarks>
-    public static IReadOnlyList<ApiId> BuildIdentities(this ApiObjectType apiObjectType, IEnumerable<object?> instances, string? apiIdentityName = null)
-    {
-        ArgumentNullException.ThrowIfNull(apiObjectType);
-        ArgumentNullException.ThrowIfNull(instances);
-
-        var results = apiObjectType.TryBuildIdentities(instances, apiIdentityName);
-        var failures = results.Where(r => !r.Success).ToList();
-
-        if (failures.Count > 0)
-        {
-            throw new ApiIdentityException($"Failed to build identities for {failures.Count} of {results.Count} instances.");
-        }
-
-        return results.Select(r => r.Id).ToList();
-    }
-
-    /// <summary>
-    ///     Builds the primary identity from a CLR instance.
-    /// </summary>
-    /// <param name="apiObjectType">The API object type to build the identity for.</param>
-    /// <param name="clrInstance">The CLR instance to build the identity from.</param>
-    /// <returns>The built primary identity.</returns>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="clrInstance"/> is null.</exception>
-    /// <exception cref="InvalidOperationException">Thrown when the object type has no primary identity configured.</exception>
-    /// <exception cref="ApiIdentityException">Thrown when type coercion fails or null handling requires throwing.</exception>
-    /// <remarks>
-    ///     This is a convenience method equivalent to calling <see cref="BuildIdentity(object, string?)"/> 
-    ///     with <c>apiIdentityName</c> set to <c>null</c>.
-    /// </remarks>
-    public static ApiId BuildPrimaryIdentity(this ApiObjectType apiObjectType, object clrInstance)
-        => apiObjectType.BuildIdentity(clrInstance, apiIdentityName: null);
 
     /// <summary>
     ///     Gets an <see cref="ApiIdentity"/> by its API name.
@@ -231,6 +141,96 @@ public static class ApiObjectTypeExtensions
             $"Available {nameof(ApiIdentity)} by {nameof(ApiIdentity.ApiName)} are: {availableIdentitiesByApiName}.";
         throw new ApiSchemaException(errorMessage);
     }
+
+    /// <summary>
+    ///     Gets a dictionary mapping instances to their identities.
+    /// </summary>
+    /// <param name="apiObjectType">The API object type to get identities for.</param>
+    /// <param name="instances">The collection of CLR instances to build identities for.</param>
+    /// <param name="apiIdentityName">Optional identity name. If null, uses the primary identity.</param>
+    /// <returns>A read-only dictionary mapping each instance to its built identity.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="apiObjectType"/> or <paramref name="instances"/> is null.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when the object type has no identity configured or the specified identity name is not found.</exception>
+    /// <exception cref="ApiIdentityException">Thrown when identity building fails for any instance.</exception>
+    /// <remarks>
+    ///     <para><b>Common Use Cases:</b></para>
+    ///     <list type="bullet">
+    ///         <item><description><b>Change Tracking:</b> Map entities to original identities for comparison</description></item>
+    ///         <item><description><b>Duplicate Detection:</b> Find multiple instances with the same identity</description></item>
+    ///         <item><description><b>Batch Updates:</b> Correlate instances with database records by identity</description></item>
+    ///     </list>
+    ///     <para>Example: <c>var map = objectType.GetIdentityMap(entities); var duplicates = map.GroupBy(x => x.Value).Where(g => g.Count() > 1);</c></para>
+    /// </remarks>
+    public static IReadOnlyDictionary<object, ApiId> GetIdentityMap(this ApiObjectType apiObjectType, IEnumerable<object?> instances, string? apiIdentityName = null)
+    {
+        ArgumentNullException.ThrowIfNull(apiObjectType);
+        ArgumentNullException.ThrowIfNull(instances);
+
+        if (!apiObjectType.TryGetIdentityMap(instances, out var identityMap, apiIdentityName))
+        {
+            var identityRef = string.IsNullOrWhiteSpace(apiIdentityName) ? "primary identity" : $"identity '{apiIdentityName}'";
+            throw new ApiIdentityException($"Failed to build identity map using {identityRef} for type '{apiObjectType.ApiName}'.");
+        }
+
+        return identityMap;
+    }
+
+    /// <summary>
+    ///     Gets identities for a collection of instances.
+    /// </summary>
+    /// <param name="apiObjectType">The API object type to get identities for.</param>
+    /// <param name="instances">The collection of CLR instances to get identities for.</param>
+    /// <param name="apiIdentityName">Optional identity name. If null, uses the primary identity.</param>
+    /// <returns>A read-only list of identities in the same order as the input instances.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="apiObjectType"/> or <paramref name="instances"/> is null.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when the object type has no identity configured or the specified identity name is not found.</exception>
+    /// <exception cref="ApiIdentityException">Thrown when identity building fails for any instance.</exception>
+    /// <remarks>
+    ///     <para><b>Batch Processing Benefits:</b></para>
+    ///     <list type="bullet">
+    ///         <item><description>Identity resolution happens once for all instances (reduced overhead)</description></item>
+    ///         <item><description>Better error context with batch logging</description></item>
+    ///         <item><description>Pre-allocated result collection when count is known</description></item>
+    ///     </list>
+    ///     <para>This method throws on the first failure. For fault-tolerant processing, use <see cref="TryGetIdentities"/>.</para>
+    ///     <para><b>Use Cases:</b></para>
+    ///     <list type="bullet">
+    ///         <item><description>Bulk entity loading from database with identity extraction</description></item>
+    ///         <item><description>Batch API responses requiring identity lists</description></item>
+    ///         <item><description>Cache warming with multiple entities</description></item>
+    ///     </list>
+    /// </remarks>
+    public static IReadOnlyList<ApiId> GetIdentities(this ApiObjectType apiObjectType, IEnumerable<object?> instances, string? apiIdentityName = null)
+    {
+        ArgumentNullException.ThrowIfNull(apiObjectType);
+        ArgumentNullException.ThrowIfNull(instances);
+
+        var results = apiObjectType.TryGetIdentities(instances, apiIdentityName);
+        var failures = results.Where(r => !r.Success).ToList();
+
+        if (failures.Count > 0)
+        {
+            throw new ApiIdentityException($"Failed to build identities for {failures.Count} of {results.Count} instances.");
+        }
+
+        return results.Select(r => r.Id).ToList();
+    }
+
+    /// <summary>
+    ///     Gets the primary identity from a CLR instance.
+    /// </summary>
+    /// <param name="apiObjectType">The API object type to get the identity for.</param>
+    /// <param name="clrInstance">The CLR instance to get the identity from.</param>
+    /// <returns>The primary identity.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="clrInstance"/> is null.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when the object type has no primary identity configured.</exception>
+    /// <exception cref="ApiIdentityException">Thrown when type coercion fails or null handling requires throwing.</exception>
+    /// <remarks>
+    ///     This is a convenience method equivalent to calling <see cref="GetIdentity(ApiObjectType, object, string?)"/> 
+    ///     with <c>apiIdentityName</c> set to <c>null</c>.
+    /// </remarks>
+    public static ApiId GetPrimaryIdentity(this ApiObjectType apiObjectType, object clrInstance)
+        => apiObjectType.GetIdentity(clrInstance, apiIdentityName: null);
 
     /// <summary>
     ///     Gets an <see cref="ApiProperty"/> by its API name.
@@ -316,10 +316,10 @@ public static class ApiObjectTypeExtensions
     }
 
     /// <summary>
-    ///     Attempts to build identities for a collection of instances without throwing exceptions.
+    ///     Attempts to get identities for a collection of instances without throwing exceptions.
     /// </summary>
-    /// <param name="apiObjectType">The API object type to build identities for.</param>
-    /// <param name="instances">The collection of CLR instances to build identities for.</param>
+    /// <param name="apiObjectType">The API object type to get identities for.</param>
+    /// <param name="instances">The collection of CLR instances to get identities for.</param>
     /// <param name="apiIdentityName">Optional identity name. If null, uses the primary identity.</param>
     /// <returns>A read-only list of <see cref="ApiIdentityBuildResult"/> containing the result for each instance.</returns>
     /// <remarks>
@@ -335,24 +335,24 @@ public static class ApiObjectTypeExtensions
     ///     <para><c>var failures = results.Where(r => !r.Success).Select(r => r.Instance);</c></para>
     ///     <para><c>var successes = results.Where(r => r.Success);</c></para>
     /// </remarks>
-    public static IReadOnlyList<ApiIdentityBuildResult> TryBuildIdentities(this ApiObjectType apiObjectType, IEnumerable<object?> instances, string? apiIdentityName = null)
+    public static IReadOnlyList<ApiIdentityBuildResult> TryGetIdentities(this ApiObjectType apiObjectType, IEnumerable<object?> instances, string? apiIdentityName = null)
     {
         ArgumentNullException.ThrowIfNull(apiObjectType);
-        return apiObjectType.TryBuildIdentities(instances, apiIdentityName);
+        return apiObjectType.TryGetIdentities(instances, apiIdentityName);
     }
 
     /// <summary>
-    ///     Attempts to build the primary identity from a CLR instance without throwing exceptions.
+    ///     Attempts to get the primary identity from a CLR instance without throwing exceptions.
     /// </summary>
-    /// <param name="apiObjectType">The API object type to build the identity for.</param>
-    /// <param name="clrInstance">The CLR instance to build the identity from.</param>
-    /// <param name="id">When this method returns, contains the built identity if successful; otherwise, <see cref="ApiId.Empty"/>.</param>
-    /// <returns><c>true</c> if the identity was built successfully; otherwise, <c>false</c>.</returns>
+    /// <param name="apiObjectType">The API object type to get the identity for.</param>
+    /// <param name="clrInstance">The CLR instance to get the identity from.</param>
+    /// <param name="id">When this method returns, contains the identity if successful; otherwise, <see cref="ApiId.Empty"/>.</param>
+    /// <returns><c>true</c> if the identity was retrieved successfully; otherwise, <c>false</c>.</returns>
     /// <remarks>
-    ///     This is a convenience method equivalent to calling <see cref="TryBuildIdentity(object, out ApiId, string?)"/> 
+    ///     This is a convenience method equivalent to calling <see cref="ApiObjectType.TryGetIdentity(object, out ApiId, string?)"/> 
     ///     with <c>apiIdentityName</c> set to <c>null</c>.
     /// </remarks>
-    public static bool TryBuildPrimaryIdentity(this ApiObjectType apiObjectType, object clrInstance, out ApiId id)
-        => apiObjectType.TryBuildIdentity(clrInstance, out id, apiIdentityName: null);
+    public static bool TryGetPrimaryIdentity(this ApiObjectType apiObjectType, object clrInstance, out ApiId id)
+        => apiObjectType.TryGetIdentity(clrInstance, out id, apiIdentityName: null);
     #endregion
 }

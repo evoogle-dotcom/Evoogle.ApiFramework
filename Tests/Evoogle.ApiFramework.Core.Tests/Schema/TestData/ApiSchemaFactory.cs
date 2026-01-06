@@ -86,11 +86,13 @@ public static class ApiSchemaFactory
 
     #region Fields
     private static readonly Lazy<ApiSchema> _commerceApiSchema = new(() => BuildCommerceApiSchema());
+    private static readonly Lazy<ApiSchema> _identityApiSchema = new(() => BuildIdentityApiSchema());
     private static readonly Lazy<ApiSchema> _simpleApiSchema = new(() => BuildSimpleApiSchema());
     #endregion
 
     #region Properties
     public static ApiSchema CommerceApiSchema => _commerceApiSchema.Value;
+    public static ApiSchema IdentityApiSchema => _identityApiSchema.Value;
     public static ApiSchema SimpleApiSchema => _simpleApiSchema.Value;
     #endregion
 
@@ -101,7 +103,7 @@ public static class ApiSchemaFactory
         {
             ApiSchemaKind.Simple => SimpleApiSchema,
             ApiSchemaKind.Commerce => CommerceApiSchema,
-            ApiSchemaKind.Identity => BuildIdentityApiSchema(),
+            ApiSchemaKind.Identity => IdentityApiSchema,
             _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null)
         };
     }

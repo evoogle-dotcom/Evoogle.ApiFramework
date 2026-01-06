@@ -47,13 +47,13 @@ public sealed partial class ApiObjectType
             return true;
         }
 
-        if (!this.TryBuildIdentity(instance1, out var id1, apiIdentityName))
+        if (!this.TryGetIdentity(instance1, out var id1, apiIdentityName))
         {
             this.Logger.LogTrace("IdentitiesEqual: failed to build identity for instance1");
             return false;
         }
 
-        if (!this.TryBuildIdentity(instance2, out var id2, apiIdentityName))
+        if (!this.TryGetIdentity(instance2, out var id2, apiIdentityName))
         {
             this.Logger.LogTrace("IdentitiesEqual: failed to build identity for instance2");
             return false;
@@ -74,7 +74,7 @@ public sealed partial class ApiObjectType
     /// <remarks>
     ///     <para>This is a convenience method that builds the identity and compares it.</para>
     ///     <para>Returns <c>false</c> if identity building fails or if the object type has no identity.</para>
-    ///     <para><b>Performance:</b> Same as <see cref="TryBuildIdentity(object, out ApiId, string?)"/> plus equality check (~5-10ns)</para>
+    ///     <para><b>Performance:</b> Same as <see cref="TryGetIdentity(object, out ApiId, string?)"/> plus equality check (~5-10ns)</para>
     /// </remarks>
     public bool MatchesIdentity(object clrInstance, ApiId id, string? apiIdentityName = null)
     {
@@ -84,7 +84,7 @@ public sealed partial class ApiObjectType
             return false;
         }
 
-        if (!this.TryBuildIdentity(clrInstance, out var instanceId, apiIdentityName))
+        if (!this.TryGetIdentity(clrInstance, out var instanceId, apiIdentityName))
         {
             this.Logger.LogTrace("MatchesIdentity: failed to build identity for instance");
             return false;
@@ -97,15 +97,15 @@ public sealed partial class ApiObjectType
     }
 
     /// <summary>
-    ///     Attempts to build an identity from a CLR instance without throwing exceptions.
+    ///     Attempts to get an identity from a CLR instance without throwing exceptions.
     /// </summary>
-    /// <param name="clrInstance">The CLR instance to build the identity from.</param>
-    /// <param name="id">When this method returns, contains the built identity if successful; otherwise, <see cref="ApiId.Empty"/>.</param>
+    /// <param name="clrInstance">The CLR instance to get the identity from.</param>
+    /// <param name="id">When this method returns, contains the identity if successful; otherwise, <see cref="ApiId.Empty"/>.</param>
     /// <param name="apiIdentityName">Optional identity name. If null, uses the primary identity.</param>
-    /// <returns><c>true</c> if the identity was built successfully; otherwise, <c>false</c>.</returns>
+    /// <returns><c>true</c> if the identity was retrieved successfully; otherwise, <c>false</c>.</returns>
     /// <remarks>
     ///     <para>This method never throws exceptions and returns <c>false</c> on any failure.</para>
-    ///     <para>Use <see cref="BuildIdentity(object, string?)"/> if you need exception details.</para>
+    ///     <para>Use <see cref="GetIdentity(object, string?)"/> if you need exception details.</para>
     ///     <para><b>Performance Characteristics:</b></para>
     ///     <list type="bullet">
     ///         <item><description><b>Property Access:</b> Uses compiled accessors (reflection-free after initialization) for O(1) property reads</description></item>
@@ -116,25 +116,25 @@ public sealed partial class ApiObjectType
     ///     </list>
     ///     <para><b>When to Use:</b></para>
     ///     <list type="bullet">
-    ///         <item><description>Use <c>TryBuildIdentity</c> when failures are expected and should be handled gracefully</description></item>
-    ///         <item><description>Use <c>BuildIdentity</c> when failures indicate bugs and you need detailed exception information</description></item>
+    ///         <item><description>Use <c>TryGetIdentity</c> when failures are expected and should be handled gracefully</description></item>
+    ///         <item><description>Use <c>GetIdentity</c> when failures indicate bugs and you need detailed exception information</description></item>
     ///         <item><description>Consider caching results if calling repeatedly for the same instance</description></item>
     ///     </list>
     /// </remarks>
-    public bool TryBuildIdentity(object clrInstance, out ApiId id, string? apiIdentityName = null)
+    public bool TryGetIdentity(object clrInstance, out ApiId id, string? apiIdentityName = null)
     {
         id = default;
 
         // Validate inputs without throwing
         if (clrInstance is null)
         {
-            this.Logger.LogDebug("TryBuildIdentity failed: clrInstance is null for type '{TypeName}'", this.ApiName);
+            this.Logger.LogDebug("TryGetIdentity failed: clrInstance is null for type '{TypeName}'", this.ApiName);
             return false;
         }
 
         if (!this.HasIdentity)
         {
-            this.Logger.LogDebug("TryBuildIdentity failed: type '{TypeName}' has no identity configured", this.ApiName);
+            this.Logger.LogDebug("TryGetIdentity failed: type '{TypeName}' has no identity configured", this.ApiName);
             return false;
         }
 
@@ -142,7 +142,7 @@ public sealed partial class ApiObjectType
         if (identity is null)
         {
             var identityRef = string.IsNullOrWhiteSpace(apiIdentityName) ? "primary identity" : $"identity '{apiIdentityName}'";
-            this.Logger.LogDebug("TryBuildIdentity failed: type '{TypeName}' does not have {IdentityRef}", this.ApiName, identityRef);
+            this.Logger.LogDebug("TryGetIdentity failed: type '{TypeName}' does not have {IdentityRef}", this.ApiName, identityRef);
             return false;
         }
 
@@ -152,7 +152,7 @@ public sealed partial class ApiObjectType
         // Core implementation - catch any exceptions from deeper layers
         try
         {
-            id = this.BuildIdentityFromInstance(identity, clrInstance);
+            id = this.GetIdentityFromInstance(identity, clrInstance);
             var success = id.HasValue;
 
             if (success)
@@ -162,7 +162,7 @@ public sealed partial class ApiObjectType
             }
             else
             {
-                this.Logger.LogDebug("TryBuildIdentity returned empty identity for type '{TypeName}' identity '{IdentityName}' (likely null handling)",
+                this.Logger.LogDebug("TryGetIdentity returned empty identity for type '{TypeName}' identity '{IdentityName}' (likely null handling)",
                     this.ApiName, identity.ApiName);
             }
 
@@ -170,22 +170,22 @@ public sealed partial class ApiObjectType
         }
         catch (Exception ex)
         {
-            this.Logger.LogDebug(ex, "TryBuildIdentity failed with exception for type '{TypeName}' identity '{IdentityName}'",
+            this.Logger.LogDebug(ex, "TryGetIdentity failed with exception for type '{TypeName}' identity '{IdentityName}'",
                 this.ApiName, identity.ApiName);
             return false;
         }
     }
 
     /// <summary>
-    ///     Attempts to build an identity from a dictionary of property values without throwing exceptions.
+    ///     Attempts to get an identity from a dictionary of property values without throwing exceptions.
     /// </summary>
     /// <param name="values">The dictionary of property names to values.</param>
-    /// <param name="id">When this method returns, contains the built identity if successful; otherwise, <see cref="ApiId.Empty"/>.</param>
+    /// <param name="id">When this method returns, contains the identity if successful; otherwise, <see cref="ApiId.Empty"/>.</param>
     /// <param name="apiIdentityName">Optional identity name. If null, uses the primary identity.</param>
-    /// <returns><c>true</c> if the identity was built successfully; otherwise, <c>false</c>.</returns>
+    /// <returns><c>true</c> if the identity was retrieved successfully; otherwise, <c>false</c>.</returns>
     /// <remarks>
     ///     <para>This method never throws exceptions and returns <c>false</c> on any failure.</para>
-    ///     <para>Use <see cref="BuildIdentity(IReadOnlyDictionary{string, object?}, string?)"/> if you need exception details.</para>
+    ///     <para>Use <see cref="GetIdentity(IReadOnlyDictionary{string, object?}, string?)"/> if you need exception details.</para>
     ///     <para><b>Performance Characteristics:</b></para>
     ///     <list type="bullet">
     ///         <item><description><b>Dictionary Lookup:</b> O(1) lookups per identity part (typically 1-3 lookups)</description></item>
@@ -200,20 +200,20 @@ public sealed partial class ApiObjectType
     ///         <item><description>Batch operations where property values are pre-extracted</description></item>
     ///     </list>
     /// </remarks>
-    public bool TryBuildIdentity(IReadOnlyDictionary<string, object?> values, out ApiId id, string? apiIdentityName = null)
+    public bool TryGetIdentity(IReadOnlyDictionary<string, object?> values, out ApiId id, string? apiIdentityName = null)
     {
         id = default;
 
         // Validate inputs without throwing
         if (values is null)
         {
-            this.Logger.LogDebug("TryBuildIdentity failed: values dictionary is null for type '{TypeName}'", this.ApiName);
+            this.Logger.LogDebug("TryGetIdentity failed: values dictionary is null for type '{TypeName}'", this.ApiName);
             return false;
         }
 
         if (!this.HasIdentity)
         {
-            this.Logger.LogDebug("TryBuildIdentity failed: type '{TypeName}' has no identity configured", this.ApiName);
+            this.Logger.LogDebug("TryGetIdentity failed: type '{TypeName}' has no identity configured", this.ApiName);
             return false;
         }
 
@@ -221,17 +221,17 @@ public sealed partial class ApiObjectType
         if (identity is null)
         {
             var identityRef = string.IsNullOrWhiteSpace(apiIdentityName) ? "primary identity" : $"identity '{apiIdentityName}'";
-            this.Logger.LogDebug("TryBuildIdentity failed: type '{TypeName}' does not have {IdentityRef}", this.ApiName, identityRef);
+            this.Logger.LogDebug("TryGetIdentity failed: type '{TypeName}' does not have {IdentityRef}", this.ApiName, identityRef);
             return false;
         }
 
-        this.Logger.LogTrace("Building identity '{IdentityName}' from values dictionary for type '{TypeName}' with {PartCount} parts",
+        this.Logger.LogTrace("Getting identity '{IdentityName}' from values dictionary for type '{TypeName}' with {PartCount} parts",
             identity.ApiName, this.ApiName, identity.ApiIdentityParts.Length);
 
         // Core implementation - catch any exceptions from deeper layers
         try
         {
-            id = this.BuildIdentityFromValues(identity, values);
+            id = this.GetIdentityFromValues(identity, values);
             var success = id.HasValue;
 
             if (success)
@@ -241,7 +241,7 @@ public sealed partial class ApiObjectType
             }
             else
             {
-                this.Logger.LogDebug("TryBuildIdentity returned empty identity from values for type '{TypeName}' identity '{IdentityName}' (likely null handling)",
+                this.Logger.LogDebug("TryGetIdentity returned empty identity from values for type '{TypeName}' identity '{IdentityName}' (likely null handling)",
                     this.ApiName, identity.ApiName);
             }
 
@@ -249,16 +249,16 @@ public sealed partial class ApiObjectType
         }
         catch (Exception ex)
         {
-            this.Logger.LogDebug(ex, "TryBuildIdentity failed with exception from values for type '{TypeName}' identity '{IdentityName}'",
+            this.Logger.LogDebug(ex, "TryGetIdentity failed with exception from values for type '{TypeName}' identity '{IdentityName}'",
                 this.ApiName, identity.ApiName);
             return false;
         }
     }
 
     /// <summary>
-    ///     Attempts to build a dictionary mapping instances to their identities without throwing exceptions.
+    ///     Attempts to get a dictionary mapping instances to their identities without throwing exceptions.
     /// </summary>
-    /// <param name="instances">The collection of CLR instances to build identities for.</param>
+    /// <param name="instances">The collection of CLR instances to get identities for.</param>
     /// <param name="identityMap">When this method returns, contains the dictionary mapping instances to identities if successful; otherwise, an empty dictionary.</param>
     /// <param name="apiIdentityName">Optional identity name. If null, uses the primary identity.</param>
     /// <returns><c>true</c> if all identities were built successfully; otherwise, <c>false</c>.</returns>
@@ -272,19 +272,19 @@ public sealed partial class ApiObjectType
     ///         <item><description><b>Fail-Fast:</b> Stops on first failure for consistency</description></item>
     ///     </list>
     /// </remarks>
-    public bool TryBuildIdentityMap(IEnumerable<object?> instances, out IReadOnlyDictionary<object, ApiId> identityMap, string? apiIdentityName = null)
+    public bool TryGetIdentityMap(IEnumerable<object?> instances, out IReadOnlyDictionary<object, ApiId> identityMap, string? apiIdentityName = null)
     {
         identityMap = new Dictionary<object, ApiId>();
 
         if (instances is null)
         {
-            this.Logger.LogDebug("TryBuildIdentityMap: instances collection is null");
+            this.Logger.LogDebug("TryGetIdentityMap: instances collection is null");
             return false;
         }
 
         if (!this.HasIdentity)
         {
-            this.Logger.LogDebug("TryBuildIdentityMap: type '{TypeName}' has no identity configured", this.ApiName);
+            this.Logger.LogDebug("TryGetIdentityMap: type '{TypeName}' has no identity configured", this.ApiName);
             return false;
         }
 
@@ -292,11 +292,11 @@ public sealed partial class ApiObjectType
         if (identity is null)
         {
             var identityRef = string.IsNullOrWhiteSpace(apiIdentityName) ? "primary identity" : $"identity '{apiIdentityName}'";
-            this.Logger.LogDebug("TryBuildIdentityMap: type '{TypeName}' does not have {IdentityRef}", this.ApiName, identityRef);
+            this.Logger.LogDebug("TryGetIdentityMap: type '{TypeName}' does not have {IdentityRef}", this.ApiName, identityRef);
             return false;
         }
 
-        this.Logger.LogTrace("Building identity map for batch using identity '{IdentityName}' on type '{TypeName}'",
+        this.Logger.LogTrace("Getting identity map for batch using identity '{IdentityName}' on type '{TypeName}'",
             identity.ApiName, this.ApiName);
 
         var results = new Dictionary<object, ApiId>();
@@ -305,13 +305,13 @@ public sealed partial class ApiObjectType
         {
             if (instance is null)
             {
-                this.Logger.LogDebug("TryBuildIdentityMap: null instance in collection");
+                this.Logger.LogDebug("TryGetIdentityMap: encountered null instance, failing fast");
                 return false;
             }
 
-            if (!this.TryBuildIdentity(instance, out var id, apiIdentityName))
+            if (!this.TryGetIdentity(instance, out var id, apiIdentityName))
             {
-                this.Logger.LogDebug("TryBuildIdentityMap: failed to build identity for instance");
+                this.Logger.LogDebug("TryGetIdentityMap: failed to get identity for instance, failing fast");
                 return false;
             }
 
@@ -319,14 +319,14 @@ public sealed partial class ApiObjectType
         }
 
         identityMap = results;
-        this.Logger.LogDebug("TryBuildIdentityMap completed successfully with {Count} entries for type '{TypeName}'", results.Count, this.ApiName);
+        this.Logger.LogDebug("TryGetIdentityMap completed successfully with {Count} entries for type '{TypeName}'", results.Count, this.ApiName);
         return true;
     }
 
     /// <summary>
-    ///     Attempts to build identities for a collection of instances without throwing exceptions.
+    ///     Attempts to get identities for a collection of instances without throwing exceptions.
     /// </summary>
-    /// <param name="instances">The collection of CLR instances to build identities for.</param>
+    /// <param name="instances">The collection of CLR instances to get identities for.</param>
     /// <param name="apiIdentityName">Optional identity name. If null, uses the primary identity.</param>
     /// <returns>A read-only list of <see cref="ApiIdentityBuildResult"/> containing the result for each instance.</returns>
     /// <remarks>
@@ -345,17 +345,17 @@ public sealed partial class ApiObjectType
     ///         <item><description>Data import - process as much as possible despite errors</description></item>
     ///     </list>
     /// </remarks>
-    public IReadOnlyList<ApiIdentityBuildResult> TryBuildIdentities(IEnumerable<object?> instances, string? apiIdentityName = null)
+    public IReadOnlyList<ApiIdentityBuildResult> TryGetIdentities(IEnumerable<object?> instances, string? apiIdentityName = null)
     {
         if (instances is null)
         {
-            this.Logger.LogDebug("TryBuildIdentities: instances collection is null");
+            this.Logger.LogDebug("TryGetIdentities: instances collection is null");
             return [];
         }
 
         if (!this.HasIdentity)
         {
-            this.Logger.LogDebug("TryBuildIdentities: type '{TypeName}' has no identity configured", this.ApiName);
+            this.Logger.LogDebug("TryGetIdentities: type '{TypeName}' has no identity configured", this.ApiName);
             return [];
         }
 
@@ -363,11 +363,11 @@ public sealed partial class ApiObjectType
         if (identity is null)
         {
             var identityRef = string.IsNullOrWhiteSpace(apiIdentityName) ? "primary identity" : $"identity '{apiIdentityName}'";
-            this.Logger.LogDebug("TryBuildIdentities: type '{TypeName}' does not have {IdentityRef}", this.ApiName, identityRef);
+            this.Logger.LogDebug("TryGetIdentities: type '{TypeName}' does not have {IdentityRef}", this.ApiName, identityRef);
             return [];
         }
 
-        this.Logger.LogTrace("Building identities for batch (fault-tolerant) using identity '{IdentityName}' on type '{TypeName}'",
+        this.Logger.LogTrace("Getting identities for batch (fault-tolerant) using identity '{IdentityName}' on type '{TypeName}'",
             identity.ApiName, this.ApiName);
 
         var results = new List<ApiIdentityBuildResult>();
@@ -378,11 +378,11 @@ public sealed partial class ApiObjectType
         {
             if (instance is null)
             {
-                this.Logger.LogTrace("TryBuildIdentities: skipping null instance");
+                this.Logger.LogTrace("TryGetIdentities: skipping null instance");
                 continue;
             }
 
-            if (this.TryBuildIdentity(instance, out var id, apiIdentityName))
+            if (this.TryGetIdentity(instance, out var id, apiIdentityName))
             {
                 results.Add(new ApiIdentityBuildResult { Instance = instance, Id = id, Success = true });
                 successCount++;
@@ -394,7 +394,7 @@ public sealed partial class ApiObjectType
             }
         }
 
-        this.Logger.LogDebug("TryBuildIdentities completed: {SuccessCount} succeeded, {FailureCount} failed for type '{TypeName}'",
+        this.Logger.LogDebug("TryGetIdentities completed: {SuccessCount} succeeded, {FailureCount} failed for type '{TypeName}'",
             successCount, failureCount, this.ApiName);
 
         return results;
@@ -402,7 +402,7 @@ public sealed partial class ApiObjectType
     #endregion
 
     #region Implementation Methods
-    private ApiId BuildIdentityFromInstance(ApiIdentity identity, object clrInstance)
+    private ApiId GetIdentityFromInstance(ApiIdentity identity, object clrInstance)
     {
         var parts = new List<ApiIdPart>(identity.ApiIdentityParts.Length);
 
@@ -418,7 +418,7 @@ public sealed partial class ApiObjectType
         return FinalizeComposite(parts);
     }
 
-    private ApiId BuildIdentityFromValues(ApiIdentity identity, IReadOnlyDictionary<string, object?> values)
+    private ApiId GetIdentityFromValues(ApiIdentity identity, IReadOnlyDictionary<string, object?> values)
     {
         var parts = new List<ApiIdPart>(identity.ApiIdentityParts.Length);
 
