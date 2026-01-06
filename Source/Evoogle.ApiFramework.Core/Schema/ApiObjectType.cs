@@ -145,6 +145,129 @@ public sealed partial class ApiObjectType
     public bool TryGetRelationshipByApiName(string apiName, [NotNullWhen(true)] out ApiRelationship? value) => this.ApiRelationshipApiNameLookup.TryGetValue(apiName, out value);
     #endregion
 
+    #region ApiObjectType Identity Methods
+    /// <summary>
+    ///     Gets the API names of all properties that constitute a specific identity.
+    /// </summary>
+    /// <param name="apiIdentityName">Optional identity name. If null, uses the primary identity.</param>
+    /// <returns>A read-only list of property API names, or an empty list if the identity is not found.</returns>
+    /// <remarks>
+    ///     <para><b>Use Cases:</b></para>
+    ///     <list type="bullet">
+    ///         <item><description>UI form generation - Mark identity fields as required</description></item>
+    ///         <item><description>Query building - Generate WHERE clauses based on identity properties</description></item>
+    ///         <item><description>Validation - Auto-generate validation rules for identity fields</description></item>
+    ///         <item><description>Serialization - Optimize identity property handling</description></item>
+    ///     </list>
+    /// </remarks>
+    public string[] GetIdentityApiPropertyNames(string? apiIdentityName = null)
+    {
+        if (!this.HasIdentity)
+        {
+            return [];
+        }
+
+        var identity = this.ResolveIdentityForBuild(apiIdentityName);
+        if (identity is null)
+        {
+            return [];
+        }
+
+        return [.. identity.ApiIdentityParts.Select(part => part.ApiPropertyName)];
+    }
+
+    /// <summary>
+    ///     Gets the target CLR type for a specific identity part property.
+    /// </summary>
+    /// <param name="apiPropertyName">The API name of the property.</param>
+    /// <param name="apiIdentityName">Optional identity name. If null, uses the primary identity.</param>
+    /// <returns>The target type for the identity part, or null if the property is not part of the identity.</returns>
+    /// <remarks>
+    ///     This returns the resolved target type that the property value will be coerced to when building the identity.
+    /// </remarks>
+    public Type? GetIdentityPartClrType(string apiPropertyName, string? apiIdentityName = null)
+    {
+        if (!this.HasIdentity || string.IsNullOrWhiteSpace(apiPropertyName))
+        {
+            return null;
+        }
+
+        var identity = this.ResolveIdentityForBuild(apiIdentityName);
+        if (identity is null)
+        {
+            return null;
+        }
+
+        var part = identity.ApiIdentityParts
+            .FirstOrDefault(p => string.Equals(p.ApiPropertyName, apiPropertyName, StringComparison.OrdinalIgnoreCase));
+
+        return part?.ResolvedTargetType;
+    }
+
+    /// <summary>
+    ///     Checks if a property is part of any identity on this object type.
+    /// </summary>
+    /// <param name="apiPropertyName">The API name of the property to check.</param>
+    /// <returns><c>true</c> if the property is part of at least one identity; otherwise, <c>false</c>.</returns>
+    /// <remarks>
+    ///     <para><b>Use Cases:</b></para>
+    ///     <list type="bullet">
+    ///         <item><description>Validation - Mark identity properties as required in forms</description></item>
+    ///         <item><description>Security - Prevent modification of identity properties</description></item>
+    ///         <item><description>Change tracking - Detect identity changes that require special handling</description></item>
+    ///     </list>
+    /// </remarks>
+    public bool IsIdentityProperty(string apiPropertyName)
+    {
+        if (!this.HasIdentity || string.IsNullOrWhiteSpace(apiPropertyName))
+        {
+            return false;
+        }
+
+        return this.ApiIdentitySet!.ApiIdentities
+            .Any(identity => identity.ApiIdentityParts
+                .Any(part => string.Equals(part.ApiPropertyName, apiPropertyName, StringComparison.OrdinalIgnoreCase)));
+    }
+
+    /// <summary>
+    ///     Gets the API names of all identities defined on this object type.
+    /// </summary>
+    /// <returns>A read-only list of identity API names, or an empty list if no identities are defined.</returns>
+    /// <remarks>
+    ///     <para>The returned list includes both the primary identity and any alternate identities.</para>
+    ///     <para><b>Use Cases:</b></para>
+    ///     <list type="bullet">
+    ///         <item><description>Runtime discovery - Allow users to choose which identity to use</description></item>
+    ///         <item><description>API documentation - Generate documentation for available identity schemes</description></item>
+    ///         <item><description>Query optimization - Select most efficient identity for lookup operations</description></item>
+    ///     </list>
+    /// </remarks>
+    public string[] GetIdentityApiNames()
+    {
+        if (!this.HasIdentity)
+        {
+            return [];
+        }
+
+        return [.. this.ApiIdentitySet!.ApiIdentities.Select(identity => identity.ApiName)];
+    }
+
+    /// <summary>
+    ///     Checks if this object type has a specific identity by API name.
+    /// </summary>
+    /// <param name="apiIdentityName">The API name of the identity to check for.</param>
+    /// <returns><c>true</c> if the identity exists; otherwise, <c>false</c>.</returns>
+    public bool HasIdentityByApiName(string apiIdentityName)
+    {
+        if (!this.HasIdentity || string.IsNullOrWhiteSpace(apiIdentityName))
+        {
+            return false;
+        }
+
+        return this.ApiIdentitySet!.TryGetIdentityByApiName(apiIdentityName, out _);
+    }
+    #endregion
+
     #region Object Methods
     /// <inheritdoc/>
     public override string ToString()
@@ -169,6 +292,9 @@ public sealed partial class ApiObjectType
 
         var childContext = context.WithParentObjectType(this);
         this.ApiIdentitySet.Initialize(childContext);
+
+        // Perform additional validation after identity set initialization
+        this.ValidateIdentityConfiguration(context);
     }
 
     private void InitializeApiProperties(ApiInitializationContext context)
@@ -256,6 +382,74 @@ public sealed partial class ApiObjectType
             context: context,
             lookupDictionary: out _apiRelationshipApiNameLookup
         );
+    }
+
+    private void ValidateIdentityConfiguration(ApiInitializationContext context)
+    {
+        if (this.ApiIdentitySet is null || this.ApiIdentitySet.ApiIdentities.Length <= 1)
+        {
+            // No validation needed for single or no identities
+            return;
+        }
+
+        // Check for ambiguous identities (same property sets)
+        var identities = this.ApiIdentitySet.ApiIdentities;
+        for (var i = 0; i < identities.Length; i++)
+        {
+            for (var j = i + 1; j < identities.Length; j++)
+            {
+                var identity1 = identities[i];
+                var identity2 = identities[j];
+
+                var props1 = identity1.ApiIdentityParts
+                    .Select(p => p.ApiPropertyName)
+                    .OrderBy(n => n, StringComparer.OrdinalIgnoreCase)
+                    .ToArray();
+
+                var props2 = identity2.ApiIdentityParts
+                    .Select(p => p.ApiPropertyName)
+                    .OrderBy(n => n, StringComparer.OrdinalIgnoreCase)
+                    .ToArray();
+
+                if (props1.SequenceEqual(props2, StringComparer.OrdinalIgnoreCase))
+                {
+                    var path = $"{this.ApiPath}.{nameof(this.ApiIdentitySet)}";
+                    var severity = ApiInitializationSeverity.Warning;
+                    var code = ApiInitializationCode.API_IDENTITY_VALIDATION_AMBIGUOUS_IDENTITIES;
+                    var description = $"Identities '{identity1.ApiName}' and '{identity2.ApiName}' use the same property set [{string.Join(", ", props1)}], which may cause ambiguity";
+                    var remediation = "Consider using different property combinations for each identity, or remove one of the duplicate identities";
+
+                    context.AddIssue(path, severity, code, description, remediation);
+                }
+            }
+        }
+
+        // Check for performance concerns in identity properties
+        foreach (var identity in identities)
+        {
+            foreach (var part in identity.ApiIdentityParts)
+            {
+                if (part.ApiProperty is null)
+                {
+                    continue;
+                }
+
+                var propertyType = part.ApiProperty.ApiType.ClrType;
+                var targetType = part.ResolvedTargetType;
+
+                // Warn about string parsing to complex types (potentially expensive)
+                if (propertyType == typeof(string) && targetType != typeof(string))
+                {
+                    var path = $"{identity.ApiPath}.{nameof(identity.ApiIdentityParts)}[{part.ApiPropertyName}]";
+                    var severity = ApiInitializationSeverity.Warning;
+                    var code = ApiInitializationCode.API_IDENTITY_VALIDATION_PERFORMANCE_CONCERN;
+                    var description = $"Identity part '{part.ApiPropertyName}' requires type coercion from string to {targetType.Name}, which may impact performance";
+                    var remediation = $"Consider using {targetType.Name} as the property type directly, or be aware of the parsing overhead";
+
+                    context.AddIssue(path, severity, code, description, remediation);
+                }
+            }
+        }
     }
     #endregion
 }

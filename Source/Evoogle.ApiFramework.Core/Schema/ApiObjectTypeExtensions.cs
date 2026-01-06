@@ -131,6 +131,34 @@ public static class ApiObjectTypeExtensions
         => apiObjectType.BuildIdentity(clrInstance, apiIdentityName: null);
 
     /// <summary>
+    ///     Gets an <see cref="ApiIdentity"/> by its API name.
+    /// </summary>
+    /// <param name="apiObjectType">The API object type to search.</param>
+    /// <param name="apiName">The API name of the identity to retrieve.</param>
+    /// <returns>The <see cref="ApiIdentity"/> with the specified API name.</returns
+    /// <exception cref="ApiSchemaException">
+    ///     Thrown if no identity with the specified API name exists in the object type.
+    ///     The exception message includes a list of all available identity API names.
+    /// </exception>
+    /// <remarks>
+    ///     This method performs a case-sensitive search for the identity by its API name.
+    ///     Use <see cref="ApiObjectType.TryGetIdentityByApiName"/> if you prefer non-throwing behavior.
+    /// </remarks>
+    public static ApiIdentity GetIdentityByApiName(this ApiObjectType apiObjectType, string apiName)
+    {
+        if (apiObjectType.TryGetIdentityByApiName(apiName, out var apiIdentity))
+        {
+            return apiIdentity!;
+        }
+
+        var availableIdentitiesByApiName = string.Join(',', apiObjectType.ApiIdentitySet?.ApiIdentities.OrderBy(i => i.ApiName).Select(i => i.ApiName) ?? Array.Empty<string>());
+        var errorMessage =
+            $"{nameof(ApiIdentity)} with {nameof(ApiIdentity.ApiName)} '{apiName.SafeToString()}' not found in {apiObjectType.SafeToString()}. " +
+            $"Available {nameof(ApiIdentity)} by {nameof(ApiIdentity.ApiName)} are: {availableIdentitiesByApiName}.";
+        throw new ApiSchemaException(errorMessage);
+    }
+
+    /// <summary>
     ///     Gets an <see cref="ApiProperty"/> by its API name.
     /// </summary>
     /// <param name="apiObjectType">The API object type to search.</param>

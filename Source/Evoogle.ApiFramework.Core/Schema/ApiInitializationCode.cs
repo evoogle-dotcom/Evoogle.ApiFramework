@@ -129,6 +129,16 @@ public enum ApiInitializationCode
     ///     An identity part references a property whose type has an identity that creates a circular dependency.
     /// </summary>
     API_IDENTITY_PART_CIRCULAR_REFERENCE,
+
+    /// <summary>
+    ///     Two or more identities share the exact same set of properties, which may cause ambiguity.
+    /// </summary>
+    API_IDENTITY_VALIDATION_AMBIGUOUS_IDENTITIES,
+
+    /// <summary>
+    ///     An identity part uses a property type that may have performance implications for identity operations.
+    /// </summary>
+    API_IDENTITY_VALIDATION_PERFORMANCE_CONCERN,
     #endregion
 
     #region ApiNamedType Initialization Codes
