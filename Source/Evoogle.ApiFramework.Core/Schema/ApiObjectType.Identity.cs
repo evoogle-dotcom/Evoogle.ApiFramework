@@ -14,7 +14,88 @@ namespace Evoogle.ApiFramework.Schema;
 
 public sealed partial class ApiObjectType
 {
-    #region Public Identity Methods
+    #region Identity Methods
+    /// <summary>
+    ///     Checks if two instances have equal identities.
+    /// </summary>
+    /// <param name="instance1">The first CLR instance.</param>
+    /// <param name="instance2">The second CLR instance.</param>
+    /// <param name="apiIdentityName">Optional identity name. If null, uses the primary identity.</param>
+    /// <returns><c>true</c> if both instances have the same identity; otherwise, <c>false</c>.</returns>
+    /// <remarks>
+    ///     <para>Returns <c>false</c> if either instance is null or if identity building fails for either instance.</para>
+    ///     <para><b>Performance:</b> Builds two identities and compares them - roughly 2x the cost of single identity build</para>
+    ///     <para><b>Use Cases:</b></para>
+    ///     <list type="bullet">
+    ///         <item><description>Detecting duplicate entities in collections</description></item>
+    ///         <item><description>Change detection (comparing old vs new entity state)</description></item>
+    ///         <item><description>Verifying entity equality without full property comparison</description></item>
+    ///     </list>
+    /// </remarks>
+    public bool IdentitiesEqual(object instance1, object instance2, string? apiIdentityName = null)
+    {
+        if (instance1 is null || instance2 is null)
+        {
+            this.Logger.LogTrace("IdentitiesEqual: one or both instances are null");
+            return false;
+        }
+
+        // Optimization: if they're the same reference, they have the same identity
+        if (ReferenceEquals(instance1, instance2))
+        {
+            this.Logger.LogTrace("IdentitiesEqual: same reference, identities are equal");
+            return true;
+        }
+
+        if (!this.TryBuildIdentity(instance1, out var id1, apiIdentityName))
+        {
+            this.Logger.LogTrace("IdentitiesEqual: failed to build identity for instance1");
+            return false;
+        }
+
+        if (!this.TryBuildIdentity(instance2, out var id2, apiIdentityName))
+        {
+            this.Logger.LogTrace("IdentitiesEqual: failed to build identity for instance2");
+            return false;
+        }
+
+        var equal = id1.Equals(id2);
+        this.Logger.LogTrace("IdentitiesEqual result: {Equal} (id1: {Id1}, id2: {Id2})", equal, id1, id2);
+        return equal;
+    }
+
+    /// <summary>
+    ///     Checks if an instance's identity matches a given <see cref="ApiId"/>.
+    /// </summary>
+    /// <param name="clrInstance">The CLR instance to check.</param>
+    /// <param name="id">The identity to compare against.</param>
+    /// <param name="apiIdentityName">Optional identity name. If null, uses the primary identity.</param>
+    /// <returns><c>true</c> if the instance's identity matches the given id; otherwise, <c>false</c>.</returns>
+    /// <remarks>
+    ///     <para>This is a convenience method that builds the identity and compares it.</para>
+    ///     <para>Returns <c>false</c> if identity building fails or if the object type has no identity.</para>
+    ///     <para><b>Performance:</b> Same as <see cref="TryBuildIdentity(object, out ApiId, string?)"/> plus equality check (~5-10ns)</para>
+    /// </remarks>
+    public bool MatchesIdentity(object clrInstance, ApiId id, string? apiIdentityName = null)
+    {
+        if (clrInstance is null || !id.HasValue)
+        {
+            this.Logger.LogTrace("MatchesIdentity: clrInstance or id is null/empty");
+            return false;
+        }
+
+        if (!this.TryBuildIdentity(clrInstance, out var instanceId, apiIdentityName))
+        {
+            this.Logger.LogTrace("MatchesIdentity: failed to build identity for instance");
+            return false;
+        }
+
+        var matches = instanceId.Equals(id);
+        this.Logger.LogTrace("MatchesIdentity result: {Matches} (instance: {InstanceId}, expected: {ExpectedId})",
+            matches, instanceId, id);
+        return matches;
+    }
+
     /// <summary>
     ///     Attempts to build an identity from a CLR instance without throwing exceptions.
     /// </summary>
@@ -175,98 +256,152 @@ public sealed partial class ApiObjectType
     }
 
     /// <summary>
-    ///     Checks if an instance's identity matches a given <see cref="ApiId"/>.
+    ///     Attempts to build a dictionary mapping instances to their identities without throwing exceptions.
     /// </summary>
-    /// <param name="clrInstance">The CLR instance to check.</param>
-    /// <param name="id">The identity to compare against.</param>
+    /// <param name="instances">The collection of CLR instances to build identities for.</param>
+    /// <param name="identityMap">When this method returns, contains the dictionary mapping instances to identities if successful; otherwise, an empty dictionary.</param>
     /// <param name="apiIdentityName">Optional identity name. If null, uses the primary identity.</param>
-    /// <returns><c>true</c> if the instance's identity matches the given id; otherwise, <c>false</c>.</returns>
+    /// <returns><c>true</c> if all identities were built successfully; otherwise, <c>false</c>.</returns>
     /// <remarks>
-    ///     <para>This is a convenience method that builds the identity and compares it.</para>
-    ///     <para>Returns <c>false</c> if identity building fails or if the object type has no identity.</para>
-    ///     <para><b>Performance:</b> Same as <see cref="TryBuildIdentity(object, out ApiId, string?)"/> plus equality check (~5-10ns)</para>
+    ///     <para>This method never throws exceptions and returns <c>false</c> on any failure.</para>
+    ///     <para>The <paramref name="identityMap"/> will contain partial results up to the first failure.</para>
+    ///     <para><b>Performance Characteristics:</b></para>
+    ///     <list type="bullet">
+    ///         <item><description><b>Dictionary Overhead:</b> Additional O(n) memory for reference mapping</description></item>
+    ///         <item><description><b>Lookup Performance:</b> O(1) identity lookup by instance reference</description></item>
+    ///         <item><description><b>Fail-Fast:</b> Stops on first failure for consistency</description></item>
+    ///     </list>
     /// </remarks>
-    public bool MatchesIdentity(object clrInstance, ApiId id, string? apiIdentityName = null)
+    public bool TryBuildIdentityMap(IEnumerable<object?> instances, out IReadOnlyDictionary<object, ApiId> identityMap, string? apiIdentityName = null)
     {
-        if (clrInstance is null || !id.HasValue)
+        identityMap = new Dictionary<object, ApiId>();
+
+        if (instances is null)
         {
-            this.Logger.LogTrace("MatchesIdentity: clrInstance or id is null/empty");
+            this.Logger.LogDebug("TryBuildIdentityMap: instances collection is null");
             return false;
         }
 
-        if (!this.TryBuildIdentity(clrInstance, out var instanceId, apiIdentityName))
+        if (!this.HasIdentity)
         {
-            this.Logger.LogTrace("MatchesIdentity: failed to build identity for instance");
+            this.Logger.LogDebug("TryBuildIdentityMap: type '{TypeName}' has no identity configured", this.ApiName);
             return false;
         }
 
-        var matches = instanceId.Equals(id);
-        this.Logger.LogTrace("MatchesIdentity result: {Matches} (instance: {InstanceId}, expected: {ExpectedId})",
-            matches, instanceId, id);
-        return matches;
+        var identity = this.ResolveIdentityForBuild(apiIdentityName);
+        if (identity is null)
+        {
+            var identityRef = string.IsNullOrWhiteSpace(apiIdentityName) ? "primary identity" : $"identity '{apiIdentityName}'";
+            this.Logger.LogDebug("TryBuildIdentityMap: type '{TypeName}' does not have {IdentityRef}", this.ApiName, identityRef);
+            return false;
+        }
+
+        this.Logger.LogTrace("Building identity map for batch using identity '{IdentityName}' on type '{TypeName}'",
+            identity.ApiName, this.ApiName);
+
+        var results = new Dictionary<object, ApiId>();
+
+        foreach (var instance in instances)
+        {
+            if (instance is null)
+            {
+                this.Logger.LogDebug("TryBuildIdentityMap: null instance in collection");
+                return false;
+            }
+
+            if (!this.TryBuildIdentity(instance, out var id, apiIdentityName))
+            {
+                this.Logger.LogDebug("TryBuildIdentityMap: failed to build identity for instance");
+                return false;
+            }
+
+            results[instance] = id;
+        }
+
+        identityMap = results;
+        this.Logger.LogDebug("TryBuildIdentityMap completed successfully with {Count} entries for type '{TypeName}'", results.Count, this.ApiName);
+        return true;
     }
 
     /// <summary>
-    ///     Checks if two instances have equal identities.
+    ///     Attempts to build identities for a collection of instances without throwing exceptions.
     /// </summary>
-    /// <param name="instance1">The first CLR instance.</param>
-    /// <param name="instance2">The second CLR instance.</param>
+    /// <param name="instances">The collection of CLR instances to build identities for.</param>
     /// <param name="apiIdentityName">Optional identity name. If null, uses the primary identity.</param>
-    /// <returns><c>true</c> if both instances have the same identity; otherwise, <c>false</c>.</returns>
+    /// <returns>A read-only list of tuples containing each instance, its built identity, and success indicator.</returns>
     /// <remarks>
-    ///     <para>Returns <c>false</c> if either instance is null or if identity building fails for either instance.</para>
-    ///     <para><b>Performance:</b> Builds two identities and compares them - roughly 2x the cost of single identity build</para>
+    ///     <para>This method never throws exceptions. Failed identity builds are indicated in the result tuple.</para>
+    ///     <para>Null instances are skipped and not included in the results.</para>
+    ///     <para><b>Performance Characteristics:</b></para>
+    ///     <list type="bullet">
+    ///         <item><description><b>Identity Resolution:</b> Resolved once for all instances (O(1) vs O(n))</description></item>
+    ///         <item><description><b>Fault Tolerance:</b> Continues processing all instances even if some fail</description></item>
+    ///         <item><description><b>Result Pairing:</b> Returns instance-identity pairs with success flag for correlation</description></item>
+    ///     </list>
     ///     <para><b>Use Cases:</b></para>
     ///     <list type="bullet">
-    ///         <item><description>Detecting duplicate entities in collections</description></item>
-    ///         <item><description>Change detection (comparing old vs new entity state)</description></item>
-    ///         <item><description>Verifying entity equality without full property comparison</description></item>
+    ///         <item><description>Validation - identify which instances have invalid identities</description></item>
+    ///         <item><description>Partial processing - continue with valid identities, log failures</description></item>
+    ///         <item><description>Data import - process as much as possible despite errors</description></item>
     ///     </list>
     /// </remarks>
-    public bool IdentitiesEqual(object instance1, object instance2, string? apiIdentityName = null)
+    public IReadOnlyList<(object Instance, ApiId Id, bool Success)> TryBuildIdentities(IEnumerable<object?> instances, string? apiIdentityName = null)
     {
-        if (instance1 is null || instance2 is null)
+        if (instances is null)
         {
-            this.Logger.LogTrace("IdentitiesEqual: one or both instances are null");
-            return false;
+            this.Logger.LogDebug("TryBuildIdentities: instances collection is null");
+            return Array.Empty<(object, ApiId, bool)>();
         }
 
-        // Optimization: if they're the same reference, they have the same identity
-        if (ReferenceEquals(instance1, instance2))
+        if (!this.HasIdentity)
         {
-            this.Logger.LogTrace("IdentitiesEqual: same reference, identities are equal");
-            return true;
+            this.Logger.LogDebug("TryBuildIdentities: type '{TypeName}' has no identity configured", this.ApiName);
+            return Array.Empty<(object, ApiId, bool)>();
         }
 
-        if (!this.TryBuildIdentity(instance1, out var id1, apiIdentityName))
+        var identity = this.ResolveIdentityForBuild(apiIdentityName);
+        if (identity is null)
         {
-            this.Logger.LogTrace("IdentitiesEqual: failed to build identity for instance1");
-            return false;
+            var identityRef = string.IsNullOrWhiteSpace(apiIdentityName) ? "primary identity" : $"identity '{apiIdentityName}'";
+            this.Logger.LogDebug("TryBuildIdentities: type '{TypeName}' does not have {IdentityRef}", this.ApiName, identityRef);
+            return Array.Empty<(object, ApiId, bool)>();
         }
 
-        if (!this.TryBuildIdentity(instance2, out var id2, apiIdentityName))
+        this.Logger.LogTrace("Building identities for batch (fault-tolerant) using identity '{IdentityName}' on type '{TypeName}'",
+            identity.ApiName, this.ApiName);
+
+        var results = new List<(object Instance, ApiId Id, bool Success)>();
+        var successCount = 0;
+        var failureCount = 0;
+
+        foreach (var instance in instances)
         {
-            this.Logger.LogTrace("IdentitiesEqual: failed to build identity for instance2");
-            return false;
+            if (instance is null)
+            {
+                this.Logger.LogTrace("TryBuildIdentities: skipping null instance");
+                continue;
+            }
+
+            if (this.TryBuildIdentity(instance, out var id, apiIdentityName))
+            {
+                results.Add((instance, id, true));
+                successCount++;
+            }
+            else
+            {
+                results.Add((instance, ApiId.Empty, false));
+                failureCount++;
+            }
         }
 
-        var equal = id1.Equals(id2);
-        this.Logger.LogTrace("IdentitiesEqual result: {Equal} (id1: {Id1}, id2: {Id2})", equal, id1, id2);
-        return equal;
+        this.Logger.LogDebug("TryBuildIdentities completed: {SuccessCount} succeeded, {FailureCount} failed for type '{TypeName}'",
+            successCount, failureCount, this.ApiName);
+
+        return results;
     }
     #endregion
 
     #region Implementation Methods
-    internal ApiIdentity? ResolveIdentityForBuild(string? apiIdentityName)
-    {
-        if (!string.IsNullOrWhiteSpace(apiIdentityName))
-        {
-            return this.TryGetIdentityByApiName(apiIdentityName, out var id) ? id : null;
-        }
-
-        return this.ApiIdentitySet!.ApiPrimaryIdentity;
-    }
-
     private ApiId BuildIdentityFromInstance(ApiIdentity identity, object clrInstance)
     {
         var parts = new List<ApiIdPart>(identity.ApiIdentityParts.Length);
@@ -305,6 +440,70 @@ public sealed partial class ApiObjectType
 
         return FinalizeComposite(parts);
     }
+
+    private ApiId ConvertToApiId(object value, Type targetType, string propertyName, string identityName, string contextDescription)
+    {
+        // Handle ApiId passthrough
+        if (value is ApiId apiId)
+        {
+            return apiId;
+        }
+
+        // Convert based on the target type
+        try
+        {
+            if (targetType == typeof(int))
+            {
+                return ApiId.FromInt32((int)value);
+            }
+
+            if (targetType == typeof(long))
+            {
+                return ApiId.FromInt64((long)value);
+            }
+
+            if (targetType == typeof(Guid))
+            {
+                return ApiId.FromGuid((Guid)value);
+            }
+
+            if (targetType == typeof(Ulid))
+            {
+                return ApiId.FromUlid((Ulid)value);
+            }
+
+            if (targetType == typeof(CultureInfo))
+            {
+                return ApiId.FromCulture((CultureInfo)value);
+            }
+
+            if (targetType == typeof(string))
+            {
+                return ApiId.FromString((string)value);
+            }
+
+            // Fallback: convert to string
+            return ApiId.FromString(value.ToString() ?? string.Empty);
+        }
+        catch (Exception ex)
+        {
+            this.Logger.LogWarning(ex, "Identity coercion failed for {Property}", propertyName);
+            throw new ApiIdentityException(
+                $"Failed to convert property '{propertyName}' value of type '{value.GetType().Name}' to ApiId for identity '{identityName}' on {contextDescription}.",
+                ex);
+        }
+    }
+
+    private static ApiId FinalizeComposite(List<ApiIdPart> parts)
+        => parts.Count switch
+        {
+            0 => ApiId.Empty,
+            1 => parts[0].Value,
+            _ => ApiId.Composite(parts)
+        };
+
+    private ApiIdentityNullHandling GetIdentityNullHandling()
+        => this.ApiOptions?.ApiIdentityNullHandling ?? this.ApiSchemaContext.ApiSchemaOptions.ApiIdentityNullHandling;
 
     private ApiId MaterializeApiIdFromProperty(ApiIdentityPart part, ApiIdentity identity, object clrInstance, ApiSchemaContext schemaContext)
     {
@@ -379,68 +578,14 @@ public sealed partial class ApiObjectType
         return this.ConvertToApiId(coercedValue, targetType, part.ApiPropertyName, identity.ApiName, "values dictionary");
     }
 
-    private ApiId ConvertToApiId(object value, Type targetType, string propertyName, string identityName, string contextDescription)
+    internal ApiIdentity? ResolveIdentityForBuild(string? apiIdentityName)
     {
-        // Handle ApiId passthrough
-        if (value is ApiId apiId)
+        if (!string.IsNullOrWhiteSpace(apiIdentityName))
         {
-            return apiId;
+            return this.TryGetIdentityByApiName(apiIdentityName, out var id) ? id : null;
         }
 
-        // Convert based on the target type
-        try
-        {
-            if (targetType == typeof(int))
-            {
-                return ApiId.FromInt32((int)value);
-            }
-
-            if (targetType == typeof(long))
-            {
-                return ApiId.FromInt64((long)value);
-            }
-
-            if (targetType == typeof(Guid))
-            {
-                return ApiId.FromGuid((Guid)value);
-            }
-
-            if (targetType == typeof(Ulid))
-            {
-                return ApiId.FromUlid((Ulid)value);
-            }
-
-            if (targetType == typeof(CultureInfo))
-            {
-                return ApiId.FromCulture((CultureInfo)value);
-            }
-
-            if (targetType == typeof(string))
-            {
-                return ApiId.FromString((string)value);
-            }
-
-            // Fallback: convert to string
-            return ApiId.FromString(value.ToString() ?? string.Empty);
-        }
-        catch (Exception ex)
-        {
-            this.Logger.LogWarning(ex, "Identity coercion failed for {Property}", propertyName);
-            throw new ApiIdentityException(
-                $"Failed to convert property '{propertyName}' value of type '{value.GetType().Name}' to ApiId for identity '{identityName}' on {contextDescription}.",
-                ex);
-        }
+        return this.ApiIdentitySet!.ApiPrimaryIdentity;
     }
-
-    private static ApiId FinalizeComposite(List<ApiIdPart> parts)
-        => parts.Count switch
-        {
-            0 => ApiId.Empty,
-            1 => parts[0].Value,
-            _ => ApiId.Composite(parts)
-        };
-
-    private ApiIdentityNullHandling GetIdentityNullHandling()
-        => this.ApiOptions?.ApiIdentityNullHandling ?? this.ApiSchemaContext.ApiSchemaOptions.ApiIdentityNullHandling;
     #endregion
 }

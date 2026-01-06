@@ -115,6 +115,80 @@ public static class ApiObjectTypeExtensions
     }
 
     /// <summary>
+    ///     Builds a dictionary mapping instances to their identities.
+    /// </summary>
+    /// <param name="apiObjectType">The API object type to build identities for.</param>
+    /// <param name="instances">The collection of CLR instances to build identities for.</param>
+    /// <param name="apiIdentityName">Optional identity name. If null, uses the primary identity.</param>
+    /// <returns>A read-only dictionary mapping each instance to its built identity.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="apiObjectType"/> or <paramref name="instances"/> is null.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when the object type has no identity configured or the specified identity name is not found.</exception>
+    /// <exception cref="ApiIdentityException">Thrown when identity building fails for any instance.</exception>
+    /// <remarks>
+    ///     <para><b>Common Use Cases:</b></para>
+    ///     <list type="bullet">
+    ///         <item><description><b>Change Tracking:</b> Map entities to original identities for comparison</description></item>
+    ///         <item><description><b>Duplicate Detection:</b> Find multiple instances with the same identity</description></item>
+    ///         <item><description><b>Batch Updates:</b> Correlate instances with database records by identity</description></item>
+    ///     </list>
+    ///     <para>Example: <c>var map = objectType.BuildIdentityMap(entities); var duplicates = map.GroupBy(x => x.Value).Where(g => g.Count() > 1);</c></para>
+    /// </remarks>
+    public static IReadOnlyDictionary<object, ApiId> BuildIdentityMap(this ApiObjectType apiObjectType, IEnumerable<object?> instances, string? apiIdentityName = null)
+    {
+        ArgumentNullException.ThrowIfNull(apiObjectType);
+        ArgumentNullException.ThrowIfNull(instances);
+
+        if (!apiObjectType.TryBuildIdentityMap(instances, out var identityMap, apiIdentityName))
+        {
+            var identityRef = string.IsNullOrWhiteSpace(apiIdentityName) ? "primary identity" : $"identity '{apiIdentityName}'";
+            throw new ApiIdentityException($"Failed to build identity map using {identityRef} for type '{apiObjectType.ApiName}'.");
+        }
+
+        return identityMap;
+    }
+
+    /// <summary>
+    ///     Builds identities for a collection of instances.
+    /// </summary>
+    /// <param name="apiObjectType">The API object type to build identities for.</param>
+    /// <param name="instances">The collection of CLR instances to build identities for.</param>
+    /// <param name="apiIdentityName">Optional identity name. If null, uses the primary identity.</param>
+    /// <returns>A read-only list of built identities in the same order as the input instances.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="apiObjectType"/> or <paramref name="instances"/> is null.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when the object type has no identity configured or the specified identity name is not found.</exception>
+    /// <exception cref="ApiIdentityException">Thrown when identity building fails for any instance.</exception>
+    /// <remarks>
+    ///     <para><b>Batch Processing Benefits:</b></para>
+    ///     <list type="bullet">
+    ///         <item><description>Identity resolution happens once for all instances (reduced overhead)</description></item>
+    ///         <item><description>Better error context with batch logging</description></item>
+    ///         <item><description>Pre-allocated result collection when count is known</description></item>
+    ///     </list>
+    ///     <para>This method throws on the first failure. For fault-tolerant processing, use <see cref="TryBuildIdentities"/>.</para>
+    ///     <para><b>Use Cases:</b></para>
+    ///     <list type="bullet">
+    ///         <item><description>Bulk entity loading from database with identity extraction</description></item>
+    ///         <item><description>Batch API responses requiring identity lists</description></item>
+    ///         <item><description>Cache warming with multiple entities</description></item>
+    ///     </list>
+    /// </remarks>
+    public static IReadOnlyList<ApiId> BuildIdentities(this ApiObjectType apiObjectType, IEnumerable<object?> instances, string? apiIdentityName = null)
+    {
+        ArgumentNullException.ThrowIfNull(apiObjectType);
+        ArgumentNullException.ThrowIfNull(instances);
+
+        var results = apiObjectType.TryBuildIdentities(instances, apiIdentityName);
+        var failures = results.Where(r => !r.Success).ToList();
+
+        if (failures.Count > 0)
+        {
+            throw new ApiIdentityException($"Failed to build identities for {failures.Count} of {results.Count} instances.");
+        }
+
+        return results.Select(r => r.Id).ToList();
+    }
+
+    /// <summary>
     ///     Builds the primary identity from a CLR instance.
     /// </summary>
     /// <param name="apiObjectType">The API object type to build the identity for.</param>
@@ -239,6 +313,32 @@ public static class ApiObjectTypeExtensions
         var errorMessage = $"{nameof(ApiRelationship)} with {nameof(ApiRelationship.ApiName)} '{apiName.SafeToString()}' not found in {apiObjectType.SafeToString()}. " +
             $"Available {nameof(ApiRelationship)} by {nameof(ApiRelationship.ApiName)} are: {availableRelationshipsByApiName}.";
         throw new ApiSchemaException(errorMessage);
+    }
+
+    /// <summary>
+    ///     Attempts to build identities for a collection of instances without throwing exceptions.
+    /// </summary>
+    /// <param name="apiObjectType">The API object type to build identities for.</param>
+    /// <param name="instances">The collection of CLR instances to build identities for.</param>
+    /// <param name="apiIdentityName">Optional identity name. If null, uses the primary identity.</param>
+    /// <returns>A read-only list of tuples containing each instance, its built identity, and success indicator.</returns>
+    /// <remarks>
+    ///     <para>This method provides fault-tolerant batch processing:</para>
+    ///     <list type="bullet">
+    ///         <item><description>Never throws exceptions - returns empty list or partial results</description></item>
+    ///         <item><description>Null instances are skipped</description></item>
+    ///         <item><description>Failed builds are indicated with <c>Success = false</c> and <c>Id = ApiId.Empty</c></description></item>
+    ///         <item><description>Returns instance-identity-success tuples for easy correlation</description></item>
+    ///     </list>
+    ///     <para><b>Validation Example:</b></para>
+    ///     <para><c>var results = objectType.TryBuildIdentities(entities);</c></para>
+    ///     <para><c>var failures = results.Where(r => !r.Success).Select(r => r.Instance);</c></para>
+    ///     <para><c>var successes = results.Where(r => r.Success);</c></para>
+    /// </remarks>
+    public static IReadOnlyList<(object Instance, ApiId Id, bool Success)> TryBuildIdentities(this ApiObjectType apiObjectType, IEnumerable<object?> instances, string? apiIdentityName = null)
+    {
+        ArgumentNullException.ThrowIfNull(apiObjectType);
+        return apiObjectType.TryBuildIdentities(instances, apiIdentityName);
     }
 
     /// <summary>
