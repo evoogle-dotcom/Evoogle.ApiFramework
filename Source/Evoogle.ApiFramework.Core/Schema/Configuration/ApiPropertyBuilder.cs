@@ -55,13 +55,13 @@ public class ApiPropertyBuilder(string apiName, string clrName) : ExtensionBuild
     private ApiProperty BuildFromPropertyInfo(PropertyInfo clrPropertyInfo)
     {
         var clrPropertyNullabilityInfo = PropertyReflection.GetNullabilityInfo(clrPropertyInfo);
-        return this.BuildFromNullabilityInfo(clrPropertyNullabilityInfo);
+        return this.BuildFromNullabilityInfo(clrPropertyNullabilityInfo, ClrMemberKind.Property);
     }
 
     private ApiProperty BuildFromFieldInfo(FieldInfo clrFieldInfo)
     {
         var clrFieldNullabilityInfo = FieldReflection.GetNullabilityInfo(clrFieldInfo);
-        return this.BuildFromNullabilityInfo(clrFieldNullabilityInfo);
+        return this.BuildFromNullabilityInfo(clrFieldNullabilityInfo, ClrMemberKind.Field);
     }
 
     private ApiTypeModifiers BuildModifiers(ApiTypeModifiers apiInitialTypeModifiers)
@@ -76,25 +76,25 @@ public class ApiPropertyBuilder(string apiName, string clrName) : ExtensionBuild
         return modifierBuilder.Build();
     }
 
-    private ApiProperty BuildFromNullabilityInfo(MemberNullableInfo clrNullabilityInfo)
+    private ApiProperty BuildFromNullabilityInfo(MemberNullableInfo clrNullabilityInfo, ClrMemberKind clrMemberKind)
     {
         var apiTypeExpression = ApiTypeExpressionBuilder.Build(clrNullabilityInfo);
         var apiInitialTypeModifiers = clrNullabilityInfo.IsNullable ? ApiTypeModifiers.None : ApiTypeModifiers.Required;
         var apiTypeModifiers = this.BuildModifiers(apiInitialTypeModifiers);
 
-        return this.CreateAndBuildExtensions(_apiName, apiTypeExpression, apiTypeModifiers, _clrName);
+        return this.CreateAndBuildExtensions(_apiName, apiTypeExpression, apiTypeModifiers, _clrName, clrMemberKind);
     }
 
     private ApiProperty BuildUnknownProperty()
     {
         var apiTypeModifiers = this.BuildModifiers(ApiTypeModifiers.None);
 
-        return this.CreateAndBuildExtensions(_apiName, default!, apiTypeModifiers, _clrName);
+        return this.CreateAndBuildExtensions(_apiName, default!, apiTypeModifiers, _clrName, ClrMemberKind.Unknown);
     }
 
-    private ApiProperty CreateAndBuildExtensions(string apiName, ApiTypeExpression apiTypeExpression, ApiTypeModifiers apiTypeModifiers, string clrName)
+    private ApiProperty CreateAndBuildExtensions(string apiName, ApiTypeExpression apiTypeExpression, ApiTypeModifiers apiTypeModifiers, string clrName, ClrMemberKind clrMemberKind)
     {
-        var apiProperty = new ApiProperty(apiName, apiTypeExpression, apiTypeModifiers, clrName);
+        var apiProperty = new ApiProperty(apiName, apiTypeExpression, apiTypeModifiers, clrName, clrMemberKind);
 
         var extensions = this.BuildExtensions();
         if (extensions != null)

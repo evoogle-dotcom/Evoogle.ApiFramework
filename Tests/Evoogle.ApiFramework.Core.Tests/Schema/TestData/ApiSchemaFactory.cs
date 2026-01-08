@@ -74,7 +74,8 @@ public static class ApiSchemaFactory
         string ApiName,
         ApiTypeExpression ApiTypeExpression,
         ApiTypeModifiers ApiTypeModifiers,
-        string ClrName
+        string ClrName,
+        ClrMemberKind ClrMemberKind
     );
 
     public record ApiRelationshipConfig
@@ -258,8 +259,8 @@ public static class ApiSchemaFactory
             ApiIdentityNullHandling = identityNullHandling
         };
 
-    private static ApiProperty P(string name, ApiTypeExpression expression, bool required, OrderedDictionary<Type, object>? extensions = null)
-        => new(name, expression, required ? ApiTypeModifiers.Required : ApiTypeModifiers.None, name)
+    private static ApiProperty P(string name, ApiTypeExpression expression, bool required, ClrMemberKind clrMemberKind = ClrMemberKind.Property, OrderedDictionary<Type, object>? extensions = null)
+        => new(name, expression, required ? ApiTypeModifiers.Required : ApiTypeModifiers.None, name, clrMemberKind)
         {
             Extensions = extensions
         };
@@ -820,7 +821,8 @@ public static class ApiSchemaFactory
                         apiName: x.ApiName,
                         apiTypeExpression: x.ApiTypeExpression,
                         apiTypeModifiers: x.ApiTypeModifiers,
-                        clrName: x.ClrName
+                        clrName: x.ClrName,
+                        clrMemberKind: x.ClrMemberKind
                     );
                     return apiProperty;
                 });

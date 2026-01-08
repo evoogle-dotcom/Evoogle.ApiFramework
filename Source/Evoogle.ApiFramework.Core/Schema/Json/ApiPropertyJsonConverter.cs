@@ -28,6 +28,7 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
         public required string ApiTypeExpression { get; init; }
         public required string ApiTypeModifiers { get; init; }
         public required string ClrName { get; init; }
+        public required string ClrMemberKind { get; init; }
         #endregion
     }
 
@@ -51,6 +52,7 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
                     ApiTypeExpression = policy.ConvertName(nameof(Schema.ApiProperty.ApiType)), // Mapping property name from ApiTypeExpression to ApiType by design
                     ApiTypeModifiers = policy.ConvertName(nameof(Schema.ApiProperty.ApiTypeModifiers)),
                     ClrName = policy.ConvertName(nameof(Schema.ApiProperty.ClrName)),
+                    ClrMemberKind = policy.ConvertName(nameof(Schema.ApiProperty.ClrMemberKind)),
                 },
                 ExtensibleBase = GetExtensiblePropertyNames(policy),
             };
@@ -69,6 +71,7 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
         public ApiTypeExpression? ApiTypeExpression { get; set; }
         public ApiTypeModifiers? ApiTypeModifiers { get; set; }
         public string? ClrName { get; set; }
+        public ClrMemberKind? ClrMemberKind { get; set; }
         #endregion
     }
 
@@ -89,6 +92,7 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
     {
         #region Constants
         private static readonly Type _apiTypeModifiersType = typeof(ApiTypeModifiers);
+        private static readonly Type _clrMemberKindType = typeof(ClrMemberKind);
         #endregion
 
         #region ApiProperty Fields
@@ -99,6 +103,7 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
             { propertyNames.ApiProperty.ApiTypeModifiers, HandleApiPropertyApiTypeModifiers },
             { propertyNames.ApiProperty.ApiTypeExpression, HandleApiPropertyApiTypeExpression },
             { propertyNames.ApiProperty.ClrName, HandleApiPropertyClrName },
+            { propertyNames.ApiProperty.ClrMemberKind, HandleApiPropertyClrMemberKind },
 
             // ExtensibleBase Property Handlers
             { propertyNames.ExtensibleBase.Extensions, CreateExtensionsHandler<PropertyNames, ReadData, ReadHandlers>() },
@@ -126,12 +131,19 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
         {
             context.ReadData.ApiProperty.ClrName = reader.GetString();
         }
+
+        private static void HandleApiPropertyClrMemberKind(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        {
+            var options = context.Options;
+            context.ReadData.ApiProperty.ClrMemberKind = _clrMemberKindJsonConverter.Read(ref reader, _clrMemberKindType, options);
+        }
         #endregion
     }
     #endregion
 
     #region Fields
     private static readonly EnumJsonConverter<ApiTypeModifiers> _apiTypeModifiersJsonConverter = new();
+    private static readonly EnumJsonConverter<ClrMemberKind> _clrMemberKindJsonConverter = new();
     #endregion
 
     #region Constructors
@@ -169,8 +181,9 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
         var apiTypeExpression = readData.ApiTypeExpression;
         var apiTypeModifiers = readData.ApiTypeModifiers ?? ApiTypeModifiers.None;
         var clrName = readData.ClrName;
+        var clrMemberKind = readData.ClrMemberKind ?? ClrMemberKind.Unknown;
 
-        var apiProperty = new ApiProperty(apiName!, apiTypeExpression!, apiTypeModifiers, clrName!);
+        var apiProperty = new ApiProperty(apiName!, apiTypeExpression!, apiTypeModifiers, clrName!, clrMemberKind);
 
         var extensions = readContext.ReadData.Extensions;
         AttachExtensions(apiProperty, extensions);
@@ -196,6 +209,7 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
             WriteApiPropertyApiTypeExpression(writer, value, writeContext);
             WriteApiPropertyApiTypeModifiers(writer, value, writeContext);
             WriteApiPropertyClrName(writer, value, writeContext);
+            WriteApiPropertyClrMemberKind(writer, value, writeContext);
 
             WriteExtensibleBaseExtensions(writer, writeContext.PropertyNames.ExtensibleBase.Extensions, value, writeContext);
         });
@@ -237,6 +251,15 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
         var options = context.Options;
 
         writer.TryWritePropertyAsString(propertyName, value, options);
+    }
+
+    private static void WriteApiPropertyClrMemberKind(Utf8JsonWriter writer, ApiProperty apiProperty, DefaultWriteContext<PropertyNames> context)
+    {
+        var propertyName = context.PropertyNames.ApiProperty.ClrMemberKind;
+        var clrMemberKind = apiProperty.ClrMemberKind;
+        var options = context.Options;
+
+        writer.TryWritePropertyWithConverter(propertyName, clrMemberKind, options, _clrMemberKindJsonConverter);
     }
     #endregion
 }

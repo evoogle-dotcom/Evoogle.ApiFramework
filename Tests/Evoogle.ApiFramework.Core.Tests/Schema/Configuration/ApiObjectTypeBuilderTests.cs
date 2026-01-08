@@ -118,6 +118,7 @@ public class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
                 opt => opt
                     .Excluding(info => info.Path.Contains(nameof(ApiSchemaElement.ApiPath)))
                     .Excluding(info => info.DeclaringType == typeof(ApiProperty) && info.Name == nameof(ApiProperty.ApiType))
+                    .Excluding(info => info.DeclaringType == typeof(ApiProperty) && info.Name == nameof(ApiProperty.ClrMemberKind))
                     .Excluding(info => info.DeclaringType == typeof(ApiRelationship) && info.Name == nameof(ApiRelationship.ApiProperty))
                     .Excluding(info => info.DeclaringType == typeof(ApiRelationship) && info.Name == nameof(ApiRelationship.ApiCardinality))
                     .WithStrictOrdering()

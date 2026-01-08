@@ -70,8 +70,8 @@ public class ApiPropertyBuilderTests(ITestOutputHelper output) : XUnitTests(outp
     #endregion
 
     #region Theory Data
-    private static ApiProperty RequiredNameProperty { get; } = new ApiProperty(nameof(ScalarsOnly.RequiredName), ApiTypeExpression.ClrRef<string>(), ApiTypeModifiers.Required, nameof(ScalarsOnly.RequiredName));
-    private static ApiProperty RequiredNamePropertyWithExtension { get; } = new ApiProperty(nameof(ScalarsOnly.RequiredName), ApiTypeExpression.ClrRef<string>(), ApiTypeModifiers.Required, nameof(ScalarsOnly.RequiredName))
+    private static ApiProperty RequiredNameProperty { get; } = new ApiProperty(nameof(ScalarsOnly.RequiredName), ApiTypeExpression.ClrRef<string>(), ApiTypeModifiers.Required, nameof(ScalarsOnly.RequiredName), ClrMemberKind.Property);
+    private static ApiProperty RequiredNamePropertyWithExtension { get; } = new ApiProperty(nameof(ScalarsOnly.RequiredName), ApiTypeExpression.ClrRef<string>(), ApiTypeModifiers.Required, nameof(ScalarsOnly.RequiredName), ClrMemberKind.Property)
     {
         Extensions = new OrderedDictionary<Type, object>
         {
@@ -79,8 +79,8 @@ public class ApiPropertyBuilderTests(ITestOutputHelper output) : XUnitTests(outp
         }
     };
 
-    private static ApiProperty OptionalNumberProperty { get; } = new ApiProperty(nameof(ScalarsOnly.OptionalNumber), ApiTypeExpression.ClrRef<long>(), ApiTypeModifiers.None, nameof(ScalarsOnly.OptionalNumber));
-    private static ApiProperty OptionalNumberPropertyWithExtension { get; } = new ApiProperty(nameof(ScalarsOnly.OptionalNumber), ApiTypeExpression.ClrRef<long>(), ApiTypeModifiers.None, nameof(ScalarsOnly.OptionalNumber))
+    private static ApiProperty OptionalNumberProperty { get; } = new ApiProperty(nameof(ScalarsOnly.OptionalNumber), ApiTypeExpression.ClrRef<long>(), ApiTypeModifiers.None, nameof(ScalarsOnly.OptionalNumber), ClrMemberKind.Field);
+    private static ApiProperty OptionalNumberPropertyWithExtension { get; } = new ApiProperty(nameof(ScalarsOnly.OptionalNumber), ApiTypeExpression.ClrRef<long>(), ApiTypeModifiers.None, nameof(ScalarsOnly.OptionalNumber), ClrMemberKind.Field)
     {
         Extensions = new OrderedDictionary<Type, object>
         {

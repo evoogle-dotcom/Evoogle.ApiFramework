@@ -204,12 +204,12 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
         apiName: nameof(ScalarsOnly),
         apiProperties:
         [
-            new (apiName: nameof(ScalarsOnly.RequiredName), apiTypeExpression: ApiTypeExpression.ClrRef<string>(), apiTypeModifiers: ApiTypeModifiers.Required, clrName: nameof(ScalarsOnly.RequiredName)),
-            new (apiName: nameof(ScalarsOnly.RequiredNumber), apiTypeExpression: ApiTypeExpression.ClrRef<long>(), apiTypeModifiers: ApiTypeModifiers.Required, clrName: nameof(ScalarsOnly.RequiredNumber)),
-            new (apiName: nameof(ScalarsOnly.RequiredPredicate), apiTypeExpression: ApiTypeExpression.ClrRef<bool>(), apiTypeModifiers: ApiTypeModifiers.Required, clrName: nameof(ScalarsOnly.RequiredPredicate)),
-            new (apiName: nameof(ScalarsOnly.OptionalName), apiTypeExpression: ApiTypeExpression.ClrRef<string>(), apiTypeModifiers: ApiTypeModifiers.None, clrName: nameof(ScalarsOnly.OptionalName)),
-            new (apiName: nameof(ScalarsOnly.OptionalNumber), apiTypeExpression: ApiTypeExpression.ClrRef<long>(), apiTypeModifiers: ApiTypeModifiers.None, clrName: nameof(ScalarsOnly.OptionalNumber)),
-            new (apiName: nameof(ScalarsOnly.OptionalPredicate), apiTypeExpression: ApiTypeExpression.ClrRef<bool>(), apiTypeModifiers: ApiTypeModifiers.None, clrName: nameof(ScalarsOnly.OptionalPredicate)),
+            new (apiName: nameof(ScalarsOnly.RequiredName), apiTypeExpression: ApiTypeExpression.ClrRef<string>(), apiTypeModifiers: ApiTypeModifiers.Required, clrName: nameof(ScalarsOnly.RequiredName), clrMemberKind: ClrMemberKind.Property),
+            new (apiName: nameof(ScalarsOnly.RequiredNumber), apiTypeExpression: ApiTypeExpression.ClrRef<long>(), apiTypeModifiers: ApiTypeModifiers.Required, clrName: nameof(ScalarsOnly.RequiredNumber), clrMemberKind: ClrMemberKind.Property),
+            new (apiName: nameof(ScalarsOnly.RequiredPredicate), apiTypeExpression: ApiTypeExpression.ClrRef<bool>(), apiTypeModifiers: ApiTypeModifiers.Required, clrName: nameof(ScalarsOnly.RequiredPredicate), clrMemberKind: ClrMemberKind.Property),
+            new (apiName: nameof(ScalarsOnly.OptionalName), apiTypeExpression: ApiTypeExpression.ClrRef<string>(), apiTypeModifiers: ApiTypeModifiers.None, clrName: nameof(ScalarsOnly.OptionalName), clrMemberKind: ClrMemberKind.Field),
+            new (apiName: nameof(ScalarsOnly.OptionalNumber), apiTypeExpression: ApiTypeExpression.ClrRef<long>(), apiTypeModifiers: ApiTypeModifiers.None, clrName: nameof(ScalarsOnly.OptionalNumber), clrMemberKind: ClrMemberKind.Field),
+            new (apiName: nameof(ScalarsOnly.OptionalPredicate), apiTypeExpression: ApiTypeExpression.ClrRef<bool>(), apiTypeModifiers: ApiTypeModifiers.None, clrName: nameof(ScalarsOnly.OptionalPredicate), clrMemberKind: ClrMemberKind.Field),
         ],
         apiRelationships: null,
         apiIdentitySet: null,
@@ -222,10 +222,10 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
         apiName: nameof(Person),
         apiProperties:
         [
-            new (apiName: nameof(Person.Name), apiTypeExpression: ApiTypeExpression.ClrRef<string>(), apiTypeModifiers: ApiTypeModifiers.Required, clrName: nameof(Person.Name)),
-            new (apiName: nameof(Person.Age), apiTypeExpression: ApiTypeExpression.ClrRef<int>(), apiTypeModifiers: ApiTypeModifiers.None, clrName: nameof(Person.Age)),
-            new (apiName: nameof(Person.Gender), apiTypeExpression: ApiTypeExpression.ClrRef<Gender>(), apiTypeModifiers: ApiTypeModifiers.None, clrName: nameof(Person.Gender)),
-            new (apiName: nameof(Person.Hobbies), apiTypeExpression: ApiTypeExpression.ListOf<string>(apiItemTypeModifiers: ApiTypeModifiers.Required), apiTypeModifiers: ApiTypeModifiers.None, clrName: nameof(Person.Hobbies)),
+            new (apiName: nameof(Person.Name), apiTypeExpression: ApiTypeExpression.ClrRef<string>(), apiTypeModifiers: ApiTypeModifiers.Required, clrName: nameof(Person.Name), clrMemberKind: ClrMemberKind.Property),
+            new (apiName: nameof(Person.Age), apiTypeExpression: ApiTypeExpression.ClrRef<int>(), apiTypeModifiers: ApiTypeModifiers.None, clrName: nameof(Person.Age), clrMemberKind: ClrMemberKind.Property),
+            new (apiName: nameof(Person.Gender), apiTypeExpression: ApiTypeExpression.ClrRef<Gender>(), apiTypeModifiers: ApiTypeModifiers.None, clrName: nameof(Person.Gender), clrMemberKind: ClrMemberKind.Property),
+            new (apiName: nameof(Person.Hobbies), apiTypeExpression: ApiTypeExpression.ListOf<string>(apiItemTypeModifiers: ApiTypeModifiers.Required), apiTypeModifiers: ApiTypeModifiers.None, clrName: nameof(Person.Hobbies), clrMemberKind: ClrMemberKind.Property),
         ],
         apiRelationships: null,
         apiIdentitySet: null,
@@ -238,9 +238,9 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
         apiName: nameof(Company),
         apiProperties:
         [
-            new (apiName: nameof(Company.Name), apiTypeExpression: ApiTypeExpression.ClrRef<string>(), apiTypeModifiers: ApiTypeModifiers.Required, clrName: nameof(Company.Name)),
-            new (apiName: nameof(Company.Owner), apiTypeExpression: ApiTypeExpression.ClrRef<Person>(), apiTypeModifiers: ApiTypeModifiers.None, clrName: nameof(Company.Owner)),
-            new (apiName: nameof(Company.Employees), apiTypeExpression: ApiTypeExpression.ListOf<Person>(apiItemTypeModifiers: ApiTypeModifiers.Required), apiTypeModifiers: ApiTypeModifiers.None, clrName: nameof(Company.Employees)),
+            new (apiName: nameof(Company.Name), apiTypeExpression: ApiTypeExpression.ClrRef<string>(), apiTypeModifiers: ApiTypeModifiers.Required, clrName: nameof(Company.Name), clrMemberKind: ClrMemberKind.Property),
+            new (apiName: nameof(Company.Owner), apiTypeExpression: ApiTypeExpression.ClrRef<Person>(), apiTypeModifiers: ApiTypeModifiers.None, clrName: nameof(Company.Owner), clrMemberKind: ClrMemberKind.Property),
+            new (apiName: nameof(Company.Employees), apiTypeExpression: ApiTypeExpression.ListOf<Person>(apiItemTypeModifiers: ApiTypeModifiers.Required), apiTypeModifiers: ApiTypeModifiers.None, clrName: nameof(Company.Employees), clrMemberKind: ClrMemberKind.Property),
         ],
         apiRelationships:
         [
@@ -257,9 +257,9 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
         apiName: nameof(Company),
         apiProperties:
         [
-            new (apiName: nameof(Company.Name), apiTypeExpression: ApiTypeExpression.ClrRef<string>(), apiTypeModifiers: ApiTypeModifiers.Required, clrName: nameof(Company.Name)),
-            new (apiName: nameof(Company.Owner), apiTypeExpression: ApiTypeExpression.ClrRef<Person>(), apiTypeModifiers: ApiTypeModifiers.None, clrName: nameof(Company.Owner)),
-            new (apiName: nameof(Company.Employees), apiTypeExpression: ApiTypeExpression.ListOf<Person>(apiItemTypeModifiers: ApiTypeModifiers.Required), apiTypeModifiers: ApiTypeModifiers.None, clrName: nameof(Company.Employees)),
+            new (apiName: nameof(Company.Name), apiTypeExpression: ApiTypeExpression.ClrRef<string>(), apiTypeModifiers: ApiTypeModifiers.Required, clrName: nameof(Company.Name), clrMemberKind: ClrMemberKind.Property),
+            new (apiName: nameof(Company.Owner), apiTypeExpression: ApiTypeExpression.ClrRef<Person>(), apiTypeModifiers: ApiTypeModifiers.None, clrName: nameof(Company.Owner), clrMemberKind: ClrMemberKind.Property),
+            new (apiName: nameof(Company.Employees), apiTypeExpression: ApiTypeExpression.ListOf<Person>(apiItemTypeModifiers: ApiTypeModifiers.Required), apiTypeModifiers: ApiTypeModifiers.None, clrName: nameof(Company.Employees), clrMemberKind: ClrMemberKind.Property),
         ],
         apiRelationships:
         [

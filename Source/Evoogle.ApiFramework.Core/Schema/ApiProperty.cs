@@ -41,13 +41,15 @@ namespace Evoogle.ApiFramework.Schema;
 /// <param name="apiTypeExpression">The API type expression of the property.</param>
 /// <param name="apiTypeModifiers">Modifiers applied to the property (e.g., Required).</param>
 /// <param name="clrName">The CLR property name corresponding to this API property.</param>
+/// <param name="clrMemberKind">The kind of CLR member (property or field) this API property represents.</param>
 [JsonConverter(typeof(ApiPropertyJsonConverter))]
 public sealed partial class ApiProperty
 (
     string apiName,
     ApiTypeExpression apiTypeExpression,
     ApiTypeModifiers apiTypeModifiers,
-    string clrName
+    string clrName,
+    ClrMemberKind clrMemberKind
 ) : ApiSchemaElement
 {
     #region Types
@@ -118,6 +120,9 @@ public sealed partial class ApiProperty
     /// <summary>Gets the CLR name of the property (matching the C# property name).</summary>
     public string ClrName { get; } = clrName;
 
+    /// <summary>Gets the kind of CLR member (property or field) this API property represents.</summary>
+    public ClrMemberKind ClrMemberKind { get; } = clrMemberKind;
+
     /// <summary>
     ///     Gets the API type expression to the API type of this property.
     ///     May point to a named type or inline type (e.g., collection).
@@ -149,9 +154,10 @@ public sealed partial class ApiProperty
         var apiTypeExpression = this.ApiTypeExpression.SafeToString();
         var apiTypeModifiers = this.ApiTypeModifiers.SafeToString();
         var clrName = this.ClrName.SafeToString();
+        var clrMemberKind = this.ClrMemberKind.SafeToString();
         var extensionCount = this.ExtensionCount.SafeToString();
 
-        return $"{nameof(ApiProperty)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ApiTypeExpression)}={apiTypeExpression}, {nameof(this.ApiTypeModifiers)}={apiTypeModifiers}, {nameof(this.ClrName)}={clrName}, {nameof(this.ExtensionCount)}={extensionCount}}}";
+        return $"{nameof(ApiProperty)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ApiTypeExpression)}={apiTypeExpression}, {nameof(this.ApiTypeModifiers)}={apiTypeModifiers}, {nameof(this.ClrName)}={clrName}, {nameof(this.ClrMemberKind)}={clrMemberKind}, {nameof(this.ExtensionCount)}={extensionCount}}}";
     }
     #endregion
 
