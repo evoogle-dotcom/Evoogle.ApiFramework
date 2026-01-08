@@ -12,15 +12,15 @@ public static class ApiTypeExtensions
 {
     #region Extension Methods
     /// <summary>Gets a value indicating whether this API type is an enumeration type.</summary>
-    public static bool IsEnumType(this ApiType apiType) => apiType.Kind == ApiTypeKind.Enum;
+    public static bool IsEnumType(this ApiType apiType) => apiType.ApiKind == ApiTypeKind.Enum;
 
     /// <summary>Gets a value indicating whether this API type is a scalar type.</summary>
-    public static bool IsScalarType(this ApiType apiType) => apiType.Kind == ApiTypeKind.Scalar;
+    public static bool IsScalarType(this ApiType apiType) => apiType.ApiKind == ApiTypeKind.Scalar;
 
     /// <summary>Gets a value indicating whether this API type is an object type.</summary>
-    public static bool IsObjectType(this ApiType apiType) => apiType.Kind == ApiTypeKind.Object;
+    public static bool IsObjectType(this ApiType apiType) => apiType.ApiKind == ApiTypeKind.Object;
 
     /// <summary>Gets a value indicating whether this API type is a collection type.</summary>
-    public static bool IsCollectionType(this ApiType apiType) => apiType.Kind == ApiTypeKind.Collection;
+    public static bool IsCollectionType(this ApiType apiType) => apiType.ApiKind == ApiTypeKind.Collection;
     #endregion
 }

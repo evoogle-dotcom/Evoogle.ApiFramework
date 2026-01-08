@@ -19,7 +19,7 @@ public sealed class ApiScalarType(string apiName, Type clrScalarType) : ApiNamed
 {
     #region ApiType Properties
     /// <inheritdoc/>
-    public override ApiTypeKind Kind => ApiTypeKind.Scalar;
+    public override ApiTypeKind ApiKind => ApiTypeKind.Scalar;
 
     /// <inheritdoc/>
     protected override string ApiTypeName => nameof(ApiScalarType);

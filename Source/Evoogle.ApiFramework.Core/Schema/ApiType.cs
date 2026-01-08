@@ -22,7 +22,7 @@ public abstract class ApiType(Type clrType) : ApiSchemaElement
 {
     #region ApiType Properties
     /// <summary>Gets the kind of API type represented by this instance.</summary>    
-    public abstract ApiTypeKind Kind { get; }
+    public abstract ApiTypeKind ApiKind { get; }
 
     /// <summary>Gets runtime API type name of the API type.</summary>
     protected abstract string ApiTypeName { get; }

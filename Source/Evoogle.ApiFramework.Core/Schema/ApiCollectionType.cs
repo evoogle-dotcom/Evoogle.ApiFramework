@@ -26,7 +26,7 @@ public sealed class ApiCollectionType
 {
     #region ApiType Properties
     /// <inheritdoc />
-    public override ApiTypeKind Kind => ApiTypeKind.Collection;
+    public override ApiTypeKind ApiKind => ApiTypeKind.Collection;
 
     /// <inheritdoc/>
     protected override string ApiTypeName => nameof(ApiCollectionType);

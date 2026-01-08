@@ -48,7 +48,7 @@ public sealed partial class ApiObjectType
 
     #region ApiType Properties
     /// <inheritdoc/>
-    public override ApiTypeKind Kind => ApiTypeKind.Object;
+    public override ApiTypeKind ApiKind => ApiTypeKind.Object;
 
     /// <inheritdoc/>
     protected override string ApiTypeName => nameof(ApiObjectType);

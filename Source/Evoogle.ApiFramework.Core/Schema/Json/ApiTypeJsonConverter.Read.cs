@@ -65,7 +65,7 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
     {
         #region Properties
         public Type? ClrType { get; set; }
-        public string? Kind { get; set; }
+        public string? ApiKind { get; set; }
         #endregion
     }
 
@@ -111,7 +111,7 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
             { propertyNames.ApiObjectType.ApiRelationships, HandleApiObjectTypeApiRelationships },
 
             // ApiType Property Handlers
-            { propertyNames.ApiType.Kind, HandleApiTypeKind },
+            { propertyNames.ApiType.ApiKind, HandleApiTypeKind },
             { propertyNames.ApiType.ClrType, HandleApiTypeClrType },
 
             // ExtensibleBase Property Handlers
@@ -218,7 +218,7 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
         {
             context.ReadData.ApiType ??= new ApiTypeReadData();
 
-            context.ReadData.ApiType.Kind = reader.GetString();
+            context.ReadData.ApiType.ApiKind = reader.GetString();
         }
 
         private static void HandleApiTypeClrType(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)

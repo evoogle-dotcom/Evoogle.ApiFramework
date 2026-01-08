@@ -64,11 +64,11 @@ public sealed class ApiRelationship
     /// <exception cref="ApiSchemaException">
     ///     Thrown if the property type is not an object or collection.
     /// </exception>
-    public ApiRelationshipCardinality ApiCardinality => this.ApiProperty.ApiType.Kind switch
+    public ApiRelationshipCardinality ApiCardinality => this.ApiProperty.ApiType.ApiKind switch
     {
         ApiTypeKind.Object => ApiRelationshipCardinality.ToOne,
         ApiTypeKind.Collection => ApiRelationshipCardinality.ToMany,
-        _ => throw new ApiSchemaException($"Unsupported {nameof(ApiTypeKind)}: {this.ApiProperty.ApiType.Kind.SafeToString()} for {this}. Only Object and Collection types are supported.")
+        _ => throw new ApiSchemaException($"Unsupported {nameof(ApiTypeKind)}: {this.ApiProperty.ApiType.ApiKind.SafeToString()} for {this}. Only Object and Collection types are supported.")
     };
     #endregion
 

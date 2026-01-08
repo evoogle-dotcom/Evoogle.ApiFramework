@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -41,7 +41,7 @@ public static class ApiSchemaFactory
 
     public record ApiTypeConfig
     (
-        ApiTypeKind Kind,
+        ApiTypeKind ApiKind,
         Type ClrType,
         List<Type>? ExtensionTypes = null
     );
@@ -163,7 +163,7 @@ public static class ApiSchemaFactory
         }
 
         var apiTypeConfig = descriptor.ApiType;
-        var kind = apiTypeConfig.Kind;
+        var kind = apiTypeConfig.ApiKind;
 
         var apiType = default(ApiType?);
         switch (kind)

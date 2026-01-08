@@ -16,7 +16,7 @@ namespace Evoogle.ApiFramework.Schema;
 /// <summary>
 ///     Represents a type reference in an API schema. This can either be:
 ///     - An API inline type, such as a collection (<see cref="ApiInlineType"/> set).
-///     - An API named reference to an API type (<see cref="Kind"/> and <see cref="ApiName"/> set), or
+///     - An API named reference to an API type (<see cref="ApiKind"/> and <see cref="ApiName"/> set), or
 ///     - A CLR type reference to an API type (<see cref="ClrType"/> set), or
 /// </summary>
 [JsonConverter(typeof(ApiTypeExpressionJsonConverter))]
@@ -30,7 +30,7 @@ public sealed class ApiTypeExpression
     /// <summary>
     ///     Gets the kind of the referenced API type (only used for API named references).
     /// </summary>    
-    public ApiTypeKind? Kind { get; }
+    public ApiTypeKind? ApiKind { get; }
 
     /// <summary>
     ///     Gets the API name of the referenced type (only used for API named references).
@@ -69,7 +69,7 @@ public sealed class ApiTypeExpression
     /// <summary>
     ///     Gets a value indicating whether this is an API named reference (i.e., <see cref="ApiInlineType"/> is null).
     /// </summary>
-    public bool IsApiNamedReference => this.ApiInlineType is null && this.Kind is not null && !string.IsNullOrWhiteSpace(this.ApiName);
+    public bool IsApiNamedReference => this.ApiInlineType is null && this.ApiKind is not null && !string.IsNullOrWhiteSpace(this.ApiName);
 
     /// <summary>
     ///     Gets a value indicating whether this is a CLR reference (i.e., <see cref="ApiInlineType"/> is null).
@@ -96,7 +96,7 @@ public sealed class ApiTypeExpression
     /// <param name="apiName">The name of the API type to be resolved in the schema.</param>
     public ApiTypeExpression(ApiTypeKind kind, string apiName)
     {
-        this.Kind = kind;
+        this.ApiKind = kind;
         this.ApiName = apiName;
     }
 
@@ -114,7 +114,7 @@ public sealed class ApiTypeExpression
     /// <param name="clrType">The CLR type to be resolved in the schema.</param>
     public ApiTypeExpression(ApiTypeKind? kind, string? apiName, Type? clrType)
     {
-        this.Kind = kind;
+        this.ApiKind = kind;
         this.ApiName = apiName;
         this.ClrType = clrType;
     }
@@ -166,8 +166,8 @@ public sealed class ApiTypeExpression
             var path = $"{context.ApiParentPath.SafeToString()}.{parentUnresolvedName}";
             var severity = ApiInitializationSeverity.Error;
             var code = parentUnresolvedCode;
-            var description = $"{parentUnresolvedName} could not be resolved because none of the following are set: {nameof(this.ApiInlineType)}, a valid combination of {nameof(this.Kind)} and {nameof(this.ApiName)}, or {nameof(this.ClrType)}";
-            var remediation = $"Specify either {nameof(this.ApiInlineType)}, a valid combination of {nameof(this.Kind)} and {nameof(this.ApiName)}, or {nameof(this.ClrType)}";
+            var description = $"{parentUnresolvedName} could not be resolved because none of the following are set: {nameof(this.ApiInlineType)}, a valid combination of {nameof(this.ApiKind)} and {nameof(this.ApiName)}, or {nameof(this.ClrType)}";
+            var remediation = $"Specify either {nameof(this.ApiInlineType)}, a valid combination of {nameof(this.ApiKind)} and {nameof(this.ApiName)}, or {nameof(this.ClrType)}";
 
             context.AddIssue(path, severity, code, description, remediation);
         }
@@ -194,10 +194,10 @@ public sealed class ApiTypeExpression
             return $"{nameof(ApiTypeExpression)} {{ApiInlineType={apiInlineType}}}";
         }
 
-        var kind = this.Kind.SafeToString();
+        var kind = this.ApiKind.SafeToString();
         var apiName = this.ApiName.SafeToString();
         var clrType = this.ClrType.SafeToString();
-        return $"{nameof(ApiTypeExpression)} {{{nameof(this.Kind)}={kind}, {nameof(this.ApiName)}={apiName}, {nameof(this.ClrType)}={clrType}}}";
+        return $"{nameof(ApiTypeExpression)} {{{nameof(this.ApiKind)}={kind}, {nameof(this.ApiName)}={apiName}, {nameof(this.ClrType)}={clrType}}}";
     }
     #endregion
 
@@ -209,7 +209,7 @@ public sealed class ApiTypeExpression
         string parentUnresolvedName
     )
     {
-        var kind = this.Kind!;
+        var kind = this.ApiKind!;
         var apiName = this.ApiName!;
 
         switch (kind)
@@ -231,8 +231,8 @@ public sealed class ApiTypeExpression
                     var path = $"{context.ApiParentPath.SafeToString()}.{parentUnresolvedName}";
                     var severity = ApiInitializationSeverity.Error;
                     var code = parentUnresolvedCode;
-                    var description = $"{parentUnresolvedName} could not be resolved for {nameof(this.Kind)}={this.Kind.SafeToString()} and {nameof(this.ApiName)}={this.ApiName.SafeToString()} because {nameof(ApiTypeKind.Collection)} types must be defined inline";
-                    var remediation = $"Define the {nameof(ApiTypeKind.Collection)} type inline using {nameof(this.ApiInlineType)} instead of specifying {nameof(this.Kind)} and {nameof(this.ApiName)}";
+                    var description = $"{parentUnresolvedName} could not be resolved for {nameof(this.ApiKind)}={this.ApiKind.SafeToString()} and {nameof(this.ApiName)}={this.ApiName.SafeToString()} because {nameof(ApiTypeKind.Collection)} types must be defined inline";
+                    var remediation = $"Define the {nameof(ApiTypeKind.Collection)} type inline using {nameof(this.ApiInlineType)} instead of specifying {nameof(this.ApiKind)} and {nameof(this.ApiName)}";
 
                     context.AddIssue(path, severity, code, description, remediation);
                     return;
@@ -247,8 +247,8 @@ public sealed class ApiTypeExpression
             var path = $"{context.ApiParentPath.SafeToString()}.{parentUnresolvedName}";
             var severity = ApiInitializationSeverity.Error;
             var code = parentUnresolvedCode;
-            var description = $"{parentUnresolvedName} could not be resolved for {nameof(this.Kind)}='{this.Kind.SafeToString()}' and {nameof(this.ApiName)}='{this.ApiName.SafeToString()}'";
-            var remediation = $"Verify that a type is declared in the schema for {nameof(this.Kind)}='{this.Kind.SafeToString()}' and {nameof(this.ApiName)}='{this.ApiName.SafeToString()}'";
+            var description = $"{parentUnresolvedName} could not be resolved for {nameof(this.ApiKind)}='{this.ApiKind.SafeToString()}' and {nameof(this.ApiName)}='{this.ApiName.SafeToString()}'";
+            var remediation = $"Verify that a type is declared in the schema for {nameof(this.ApiKind)}='{this.ApiKind.SafeToString()}' and {nameof(this.ApiName)}='{this.ApiName.SafeToString()}'";
 
             context.AddIssue(path, severity, code, description, remediation);
         }

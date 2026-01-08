@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -225,7 +225,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 ""ApiScalarTypes"": [],
                 ""ApiEnumTypes"": [
                     {
-                        ""Kind"": ""Enum"",
+                        ""ApiKind"": ""Enum"",
                         ""ApiName"": """",
                         ""ApiEnumValues"": [
                             {
@@ -273,7 +273,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 ""ApiScalarTypes"": [],
                 ""ApiEnumTypes"": [
                     {
-                        ""Kind"": ""Enum"",
+                        ""ApiKind"": ""Enum"",
                         ""ApiName"": ""Gender"",
                         ""ApiEnumValues"": [
                             {
@@ -320,7 +320,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 ""ApiScalarTypes"": [],
                 ""ApiEnumTypes"": [
                     {
-                        ""Kind"": ""Enum"",
+                        ""ApiKind"": ""Enum"",
                         ""ApiName"": ""Gender"",
                         ""ApiEnumValues"": [
                             {
@@ -368,7 +368,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 ""ApiScalarTypes"": [],
                 ""ApiEnumTypes"": [
                     {
-                        ""Kind"": ""Enum"",
+                        ""ApiKind"": ""Enum"",
                         ""ApiName"": ""Gender"",
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
                     }
@@ -399,7 +399,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 ""ApiScalarTypes"": [],
                 ""ApiEnumTypes"": [
                     {
-                        ""Kind"": ""Enum"",
+                        ""ApiKind"": ""Enum"",
                         ""ApiName"": ""Gender"",
                         ""ApiEnumValues"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
@@ -431,7 +431,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 ""ApiScalarTypes"": [],
                 ""ApiEnumTypes"": [
                     {
-                        ""Kind"": ""Enum"",
+                        ""ApiKind"": ""Enum"",
                         ""ApiName"": ""Gender"",
                         ""ApiEnumValues"": [
                             {
@@ -479,7 +479,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 ""ApiScalarTypes"": [],
                 ""ApiEnumTypes"": [
                     {
-                        ""Kind"": ""Enum"",
+                        ""ApiKind"": ""Enum"",
                         ""ApiName"": ""Gender"",
                         ""ApiEnumValues"": [
                             {
@@ -527,7 +527,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 ""ApiScalarTypes"": [],
                 ""ApiEnumTypes"": [
                     {
-                        ""Kind"": ""Enum"",
+                        ""ApiKind"": ""Enum"",
                         ""ApiName"": ""Gender"",
                         ""ApiEnumValues"": [
                             {
@@ -645,7 +645,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 },
                 ""ApiScalarTypes"": [
                     {
-                        ""Kind"": ""Scalar"",
+                        ""ApiKind"": ""Scalar"",
                         ""ApiName"": ""Boolean"",
                         ""ClrType"": ""System.Boolean, System.Private.CoreLib""
                     }
@@ -665,7 +665,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(bool)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -690,7 +690,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 },
                 ""ApiScalarTypes"": [
                     {
-                        ""Kind"": ""Scalar"",
+                        ""ApiKind"": ""Scalar"",
                         ""ApiName"": ""Boolean"",
                         ""ClrType"": ""System.Boolean, System.Private.CoreLib""
                     }
@@ -714,7 +714,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(bool)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -739,7 +739,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 },
                 ""ApiScalarTypes"": [
                     {
-                        ""Kind"": ""Scalar"",
+                        ""ApiKind"": ""Scalar"",
                         ""ApiName"": ""Boolean"",
                         ""ClrType"": ""System.Boolean, System.Private.CoreLib""
                     }
@@ -765,7 +765,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(bool)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -790,12 +790,12 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 },
                 ""ApiScalarTypes"": [
                     {
-                        ""Kind"": ""Scalar"",
+                        ""ApiKind"": ""Scalar"",
                         ""ApiName"": ""Boolean"",
                         ""ClrType"": ""System.Boolean, System.Private.CoreLib""
                     },
                     {
-                        ""Kind"": ""Scalar"",
+                        ""ApiKind"": ""Scalar"",
                         ""ApiName"": ""Int32"",
                         ""ClrType"": ""System.Int32, System.Private.CoreLib""
                     }
@@ -815,7 +815,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(bool)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -827,7 +827,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(int)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -852,17 +852,17 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 },
                 ""ApiScalarTypes"": [
                     {
-                        ""Kind"": ""Scalar"",
+                        ""ApiKind"": ""Scalar"",
                         ""ApiName"": ""Boolean"",
                         ""ClrType"": ""System.Boolean, System.Private.CoreLib""
                     },
                     {
-                        ""Kind"": ""Scalar"",
+                        ""ApiKind"": ""Scalar"",
                         ""ApiName"": ""Int32"",
                         ""ClrType"": ""System.Int32, System.Private.CoreLib""
                     },
                     {
-                        ""Kind"": ""Scalar"",
+                        ""ApiKind"": ""Scalar"",
                         ""ApiName"": ""String"",
                         ""ClrType"": ""System.String, System.Private.CoreLib""
                     }
@@ -882,7 +882,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(bool)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -894,7 +894,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(int)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -906,7 +906,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(string)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -931,17 +931,17 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 },
                 ""ApiScalarTypes"": [
                     {
-                        ""Kind"": ""Scalar"",
+                        ""ApiKind"": ""Scalar"",
                         ""ApiName"": ""Boolean"",
                         ""ClrType"": ""System.Boolean, System.Private.CoreLib""
                     },
                     {
-                        ""Kind"": ""Scalar"",
+                        ""ApiKind"": ""Scalar"",
                         ""ApiName"": ""Int32"",
                         ""ClrType"": ""System.Int32, System.Private.CoreLib""
                     },
                     {
-                        ""Kind"": ""Scalar"",
+                        ""ApiKind"": ""Scalar"",
                         ""ApiName"": ""String"",
                         ""ClrType"": ""System.String, System.Private.CoreLib""
                     }
@@ -970,7 +970,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(bool)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -982,7 +982,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(int)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -994,7 +994,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(string)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -1020,7 +1020,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 ""ApiScalarTypes"": [],
                 ""ApiEnumTypes"": [
                     {
-                        ""Kind"": ""Enum"",
+                        ""ApiKind"": ""Enum"",
                         ""ApiName"": ""Gender"",
                         ""ApiEnumValues"": [
                             {
@@ -1056,7 +1056,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Enum,
+                            ApiKind: ApiTypeKind.Enum,
                             ClrType: typeof(Gender)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -1082,7 +1082,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 ""ApiScalarTypes"": [],
                 ""ApiEnumTypes"": [
                     {
-                        ""Kind"": ""Enum"",
+                        ""ApiKind"": ""Enum"",
                         ""ApiName"": ""Gender"",
                         ""ApiEnumValues"": [
                             {
@@ -1124,7 +1124,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Enum,
+                            ApiKind: ApiTypeKind.Enum,
                             ClrType: typeof(Gender)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -1149,24 +1149,24 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 },
                 ""ApiScalarTypes"": [
                     {
-                        ""Kind"": ""Scalar"",
+                        ""ApiKind"": ""Scalar"",
                         ""ApiName"": ""Boolean"",
                         ""ClrType"": ""System.Boolean, System.Private.CoreLib""
                     },
                     {
-                        ""Kind"": ""Scalar"",
+                        ""ApiKind"": ""Scalar"",
                         ""ApiName"": ""Int32"",
                         ""ClrType"": ""System.Int32, System.Private.CoreLib""
                     },
                     {
-                        ""Kind"": ""Scalar"",
+                        ""ApiKind"": ""Scalar"",
                         ""ApiName"": ""String"",
                         ""ClrType"": ""System.String, System.Private.CoreLib""
                     }
                 ],
                 ""ApiEnumTypes"": [
                     {
-                        ""Kind"": ""Enum"",
+                        ""ApiKind"": ""Enum"",
                         ""ApiName"": ""Gender"",
                         ""ApiEnumValues"": [
                             {
@@ -1190,13 +1190,13 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 ],
                 ""ApiObjectTypes"": [
                     {
-                        ""Kind"": ""Object"",
+                        ""ApiKind"": ""Object"",
                         ""ApiName"": ""Person"",
                         ""ApiProperties"": [
                             {
                                 ""ApiName"": ""Name"",
                                 ""ApiType"": {
-                                    ""Kind"": ""Scalar"",
+                                    ""ApiKind"": ""Scalar"",
                                     ""ApiName"": ""String""
                                 },
                                 ""ApiTypeModifiers"": ""Required"",
@@ -1206,7 +1206,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                             {
                                 ""ApiName"": ""Age"",
                                 ""ApiType"": {
-                                    ""Kind"": ""Scalar"",
+                                    ""ApiKind"": ""Scalar"",
                                     ""ApiName"": ""Int32""
                                 },
                                 ""ApiTypeModifiers"": ""None"",
@@ -1216,7 +1216,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                             {
                                 ""ApiName"": ""Gender"",
                                 ""ApiType"": {
-                                    ""Kind"": ""Enum"",
+                                    ""ApiKind"": ""Enum"",
                                     ""ApiName"": ""Gender""
                                 },
                                 ""ApiTypeModifiers"": ""None"",
@@ -1227,9 +1227,9 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                                 ""ApiName"": ""Hobbies"",
                                 ""ApiType"": {
                                     ""ApiInlineType"": {
-                                        ""Kind"": ""Collection"",
+                                        ""ApiKind"": ""Collection"",
                                         ""ApiItemType"": {
-                                            ""Kind"": ""Scalar"",
+                                            ""ApiKind"": ""Scalar"",
                                             ""ApiName"": ""String""
                                         },
                                         ""ApiItemTypeModifiers"": ""Required"",
@@ -1258,7 +1258,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(bool)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -1270,7 +1270,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(int)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -1282,7 +1282,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(string)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -1294,7 +1294,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Enum,
+                            ApiKind: ApiTypeKind.Enum,
                             ClrType: typeof(Gender)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -1306,7 +1306,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Object,
+                            ApiKind: ApiTypeKind.Object,
                             ClrType: typeof(Person)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -1377,24 +1377,24 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 },
                 ""ApiScalarTypes"": [
                     {
-                        ""Kind"": ""Scalar"",
+                        ""ApiKind"": ""Scalar"",
                         ""ApiName"": ""Boolean"",
                         ""ClrType"": ""System.Boolean, System.Private.CoreLib""
                     },
                     {
-                        ""Kind"": ""Scalar"",
+                        ""ApiKind"": ""Scalar"",
                         ""ApiName"": ""Int32"",
                         ""ClrType"": ""System.Int32, System.Private.CoreLib""
                     },
                     {
-                        ""Kind"": ""Scalar"",
+                        ""ApiKind"": ""Scalar"",
                         ""ApiName"": ""String"",
                         ""ClrType"": ""System.String, System.Private.CoreLib""
                     }
                 ],
                 ""ApiEnumTypes"": [
                     {
-                        ""Kind"": ""Enum"",
+                        ""ApiKind"": ""Enum"",
                         ""ApiName"": ""Gender"",
                         ""ApiEnumValues"": [
                             {
@@ -1418,13 +1418,13 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 ],
                 ""ApiObjectTypes"": [
                     {
-                        ""Kind"": ""Object"",
+                        ""ApiKind"": ""Object"",
                         ""ApiName"": ""Person"",
                         ""ApiProperties"": [
                             {
                                 ""ApiName"": ""Name"",
                                 ""ApiType"": {
-                                    ""Kind"": ""Scalar"",
+                                    ""ApiKind"": ""Scalar"",
                                     ""ApiName"": ""String""
                                 },
                                 ""ApiTypeModifiers"": ""Required"",
@@ -1434,7 +1434,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                             {
                                 ""ApiName"": ""Age"",
                                 ""ApiType"": {
-                                    ""Kind"": ""Scalar"",
+                                    ""ApiKind"": ""Scalar"",
                                     ""ApiName"": ""Int32""
                                 },
                                 ""ApiTypeModifiers"": ""None"",
@@ -1444,7 +1444,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                             {
                                 ""ApiName"": ""Gender"",
                                 ""ApiType"": {
-                                    ""Kind"": ""Enum"",
+                                    ""ApiKind"": ""Enum"",
                                     ""ApiName"": ""Gender""
                                 },
                                 ""ApiTypeModifiers"": ""None"",
@@ -1455,9 +1455,9 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                                 ""ApiName"": ""Hobbies"",
                                 ""ApiType"": {
                                     ""ApiInlineType"": {
-                                        ""Kind"": ""Collection"",
+                                        ""ApiKind"": ""Collection"",
                                         ""ApiItemType"": {
-                                            ""Kind"": ""Scalar"",
+                                            ""ApiKind"": ""Scalar"",
                                             ""ApiName"": ""String""
                                         },
                                         ""ApiItemTypeModifiers"": ""Required"",
@@ -1495,7 +1495,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(bool)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -1507,7 +1507,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(int)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -1519,7 +1519,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(string)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -1531,7 +1531,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Enum,
+                            ApiKind: ApiTypeKind.Enum,
                             ClrType: typeof(Gender)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -1543,7 +1543,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Object,
+                            ApiKind: ApiTypeKind.Object,
                             ClrType: typeof(Person)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -1614,24 +1614,24 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 },
                 ""ApiScalarTypes"": [
                     {
-                        ""Kind"": ""Scalar"",
+                        ""ApiKind"": ""Scalar"",
                         ""ApiName"": ""Boolean"",
                         ""ClrType"": ""System.Boolean, System.Private.CoreLib""
                     },
                     {
-                        ""Kind"": ""Scalar"",
+                        ""ApiKind"": ""Scalar"",
                         ""ApiName"": ""Int32"",
                         ""ClrType"": ""System.Int32, System.Private.CoreLib""
                     },
                     {
-                        ""Kind"": ""Scalar"",
+                        ""ApiKind"": ""Scalar"",
                         ""ApiName"": ""String"",
                         ""ClrType"": ""System.String, System.Private.CoreLib""
                     }
                 ],
                 ""ApiEnumTypes"": [
                     {
-                        ""Kind"": ""Enum"",
+                        ""ApiKind"": ""Enum"",
                         ""ApiName"": ""Gender"",
                         ""ApiEnumValues"": [
                             {
@@ -1655,13 +1655,13 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 ],
                 ""ApiObjectTypes"": [
                     {
-                        ""Kind"": ""Object"",
+                        ""ApiKind"": ""Object"",
                         ""ApiName"": ""Company"",
                         ""ApiProperties"": [
                             {
                                 ""ApiName"": ""Name"",
                                 ""ApiType"": {
-                                    ""Kind"": ""Scalar"",
+                                    ""ApiKind"": ""Scalar"",
                                     ""ApiName"": ""String""
                                 },
                                 ""ApiTypeModifiers"": ""Required"",
@@ -1671,7 +1671,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                             {
                                 ""ApiName"": ""Owner"",
                                 ""ApiType"": {
-                                    ""Kind"": ""Object"",
+                                    ""ApiKind"": ""Object"",
                                     ""ApiName"": ""Person""
                                 },
                                 ""ApiTypeModifiers"": ""None"",
@@ -1682,9 +1682,9 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                                 ""ApiName"": ""Employees"",
                                 ""ApiType"": {
                                     ""ApiInlineType"": {
-                                        ""Kind"": ""Collection"",
+                                        ""ApiKind"": ""Collection"",
                                         ""ApiItemType"": {
-                                            ""Kind"": ""Object"",
+                                            ""ApiKind"": ""Object"",
                                             ""ApiName"": ""Person""
                                         },
                                         ""ApiItemTypeModifiers"": ""Required"",
@@ -1709,13 +1709,13 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Company, Evoogle.ApiFramework.Core.Tests""
                     },
                     {
-                        ""Kind"": ""Object"",
+                        ""ApiKind"": ""Object"",
                         ""ApiName"": ""Person"",
                         ""ApiProperties"": [
                             {
                                 ""ApiName"": ""Name"",
                                 ""ApiType"": {
-                                    ""Kind"": ""Scalar"",
+                                    ""ApiKind"": ""Scalar"",
                                     ""ApiName"": ""String""
                                 },
                                 ""ApiTypeModifiers"": ""Required"",
@@ -1725,7 +1725,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                             {
                                 ""ApiName"": ""Age"",
                                 ""ApiType"": {
-                                    ""Kind"": ""Scalar"",
+                                    ""ApiKind"": ""Scalar"",
                                     ""ApiName"": ""Int32""
                                 },
                                 ""ApiTypeModifiers"": ""None"",
@@ -1735,7 +1735,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                             {
                                 ""ApiName"": ""Gender"",
                                 ""ApiType"": {
-                                    ""Kind"": ""Enum"",
+                                    ""ApiKind"": ""Enum"",
                                     ""ApiName"": ""Gender""
                                 },
                                 ""ApiTypeModifiers"": ""None"",
@@ -1746,9 +1746,9 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                                 ""ApiName"": ""Hobbies"",
                                 ""ApiType"": {
                                     ""ApiInlineType"": {
-                                        ""Kind"": ""Collection"",
+                                        ""ApiKind"": ""Collection"",
                                         ""ApiItemType"": {
-                                            ""Kind"": ""Scalar"",
+                                            ""ApiKind"": ""Scalar"",
                                             ""ApiName"": ""String""
                                         },
                                         ""ApiItemTypeModifiers"": ""Required"",
@@ -1777,7 +1777,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(bool)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -1789,7 +1789,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(int)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -1801,7 +1801,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(string)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -1813,7 +1813,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Enum,
+                            ApiKind: ApiTypeKind.Enum,
                             ClrType: typeof(Gender)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -1825,7 +1825,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Object,
+                            ApiKind: ApiTypeKind.Object,
                             ClrType: typeof(Company)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -1880,7 +1880,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Object,
+                            ApiKind: ApiTypeKind.Object,
                             ClrType: typeof(Person)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -1993,7 +1993,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(bool)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -2025,7 +2025,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(bool)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -2054,7 +2054,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(bool)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -2082,7 +2082,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(bool)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -2094,7 +2094,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(int)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -2122,7 +2122,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(bool)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -2134,7 +2134,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(int)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -2146,7 +2146,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(string)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -2175,7 +2175,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(bool)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -2187,7 +2187,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(int)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -2199,7 +2199,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(string)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -2227,7 +2227,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Enum,
+                            ApiKind: ApiTypeKind.Enum,
                             ClrType: typeof(Gender)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -2256,7 +2256,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Enum,
+                            ApiKind: ApiTypeKind.Enum,
                             ClrType: typeof(Gender)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -2284,7 +2284,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(bool)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -2296,7 +2296,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(int)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -2308,7 +2308,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(string)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -2320,7 +2320,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Enum,
+                            ApiKind: ApiTypeKind.Enum,
                             ClrType: typeof(Gender)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -2332,7 +2332,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Object,
+                            ApiKind: ApiTypeKind.Object,
                             ClrType: typeof(Person)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -2407,7 +2407,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(bool)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -2419,7 +2419,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(int)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -2431,7 +2431,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(string)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -2443,7 +2443,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Enum,
+                            ApiKind: ApiTypeKind.Enum,
                             ClrType: typeof(Gender)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -2455,7 +2455,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Object,
+                            ApiKind: ApiTypeKind.Object,
                             ClrType: typeof(Person)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -2529,7 +2529,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(bool)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -2541,7 +2541,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(int)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -2553,7 +2553,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(string)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -2565,7 +2565,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Enum,
+                            ApiKind: ApiTypeKind.Enum,
                             ClrType: typeof(Gender)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -2577,7 +2577,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Object,
+                            ApiKind: ApiTypeKind.Object,
                             ClrType: typeof(Company)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -2632,7 +2632,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Object,
+                            ApiKind: ApiTypeKind.Object,
                             ClrType: typeof(Person)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -2768,7 +2768,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(bool)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -2787,7 +2787,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 },
                 ""ApiScalarTypes"": [
                     {
-                        ""Kind"": ""Scalar"",
+                        ""ApiKind"": ""Scalar"",
                         ""ApiName"": ""Boolean"",
                         ""ClrType"": ""System.Boolean, System.Private.CoreLib""
                     }
@@ -2817,7 +2817,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(bool)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -2836,7 +2836,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 },
                 ""ApiScalarTypes"": [
                     {
-                        ""Kind"": ""Scalar"",
+                        ""ApiKind"": ""Scalar"",
                         ""ApiName"": ""Boolean"",
                         ""ClrType"": ""System.Boolean, System.Private.CoreLib""
                     }
@@ -2863,7 +2863,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(bool)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -2882,7 +2882,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 },
                 ""ApiScalarTypes"": [
                     {
-                        ""Kind"": ""Scalar"",
+                        ""ApiKind"": ""Scalar"",
                         ""ApiName"": ""Boolean"",
                         ""ClrType"": ""System.Boolean, System.Private.CoreLib""
                     }
@@ -2913,7 +2913,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(bool)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -2925,7 +2925,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(int)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -2944,12 +2944,12 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 },
                 ""ApiScalarTypes"": [
                     {
-                        ""Kind"": ""Scalar"",
+                        ""ApiKind"": ""Scalar"",
                         ""ApiName"": ""Boolean"",
                         ""ClrType"": ""System.Boolean, System.Private.CoreLib""
                     },
                     {
-                        ""Kind"": ""Scalar"",
+                        ""ApiKind"": ""Scalar"",
                         ""ApiName"": ""Int32"",
                         ""ClrType"": ""System.Int32, System.Private.CoreLib""
                     }
@@ -2975,7 +2975,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(bool)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -2987,7 +2987,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(int)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -2999,7 +2999,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(string)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -3018,17 +3018,17 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 },
                 ""ApiScalarTypes"": [
                     {
-                        ""Kind"": ""Scalar"",
+                        ""ApiKind"": ""Scalar"",
                         ""ApiName"": ""Boolean"",
                         ""ClrType"": ""System.Boolean, System.Private.CoreLib""
                     },
                     {
-                        ""Kind"": ""Scalar"",
+                        ""ApiKind"": ""Scalar"",
                         ""ApiName"": ""Int32"",
                         ""ClrType"": ""System.Int32, System.Private.CoreLib""
                     },
                     {
-                        ""Kind"": ""Scalar"",
+                        ""ApiKind"": ""Scalar"",
                         ""ApiName"": ""String"",
                         ""ClrType"": ""System.String, System.Private.CoreLib""
                     }
@@ -3055,7 +3055,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(bool)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -3067,7 +3067,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(int)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -3079,7 +3079,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(string)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -3098,17 +3098,17 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 },
                 ""ApiScalarTypes"": [
                     {
-                        ""Kind"": ""Scalar"",
+                        ""ApiKind"": ""Scalar"",
                         ""ApiName"": ""Boolean"",
                         ""ClrType"": ""System.Boolean, System.Private.CoreLib""
                     },
                     {
-                        ""Kind"": ""Scalar"",
+                        ""ApiKind"": ""Scalar"",
                         ""ApiName"": ""Int32"",
                         ""ClrType"": ""System.Int32, System.Private.CoreLib""
                     },
                     {
-                        ""Kind"": ""Scalar"",
+                        ""ApiKind"": ""Scalar"",
                         ""ApiName"": ""String"",
                         ""ClrType"": ""System.String, System.Private.CoreLib""
                     }
@@ -3142,7 +3142,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Enum,
+                            ApiKind: ApiTypeKind.Enum,
                             ClrType: typeof(Gender)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -3162,7 +3162,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 ""ApiScalarTypes"": [],
                 ""ApiEnumTypes"": [
                     {
-                        ""Kind"": ""Enum"",
+                        ""ApiKind"": ""Enum"",
                         ""ApiName"": ""Gender"",
                         ""ApiEnumValues"": [
                             {
@@ -3205,7 +3205,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Enum,
+                            ApiKind: ApiTypeKind.Enum,
                             ClrType: typeof(Gender)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -3225,7 +3225,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 ""ApiScalarTypes"": [],
                 ""ApiEnumTypes"": [
                     {
-                        ""Kind"": ""Enum"",
+                        ""ApiKind"": ""Enum"",
                         ""ApiName"": ""Gender"",
                         ""ApiEnumValues"": [
                             {
@@ -3272,7 +3272,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(bool)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -3284,7 +3284,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(int)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -3296,7 +3296,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(string)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -3308,7 +3308,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Enum,
+                            ApiKind: ApiTypeKind.Enum,
                             ClrType: typeof(Gender)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -3320,7 +3320,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Object,
+                            ApiKind: ApiTypeKind.Object,
                             ClrType: typeof(Person)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -3385,24 +3385,24 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 },
                 ""ApiScalarTypes"": [
                     {
-                        ""Kind"": ""Scalar"",
+                        ""ApiKind"": ""Scalar"",
                         ""ApiName"": ""Boolean"",
                         ""ClrType"": ""System.Boolean, System.Private.CoreLib""
                     },
                     {
-                        ""Kind"": ""Scalar"",
+                        ""ApiKind"": ""Scalar"",
                         ""ApiName"": ""Int32"",
                         ""ClrType"": ""System.Int32, System.Private.CoreLib""
                     },
                     {
-                        ""Kind"": ""Scalar"",
+                        ""ApiKind"": ""Scalar"",
                         ""ApiName"": ""String"",
                         ""ClrType"": ""System.String, System.Private.CoreLib""
                     }
                 ],
                 ""ApiEnumTypes"": [
                     {
-                        ""Kind"": ""Enum"",
+                        ""ApiKind"": ""Enum"",
                         ""ApiName"": ""Gender"",
                         ""ApiEnumValues"": [
                             {
@@ -3426,13 +3426,13 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 ],
                 ""ApiObjectTypes"": [
                     {
-                        ""Kind"": ""Object"",
+                        ""ApiKind"": ""Object"",
                         ""ApiName"": ""Person"",
                         ""ApiProperties"": [
                             {
                                 ""ApiName"": ""Name"",
                                 ""ApiType"": {
-                                    ""Kind"": ""Scalar"",
+                                    ""ApiKind"": ""Scalar"",
                                     ""ApiName"": ""String""
                                 },
                                 ""ApiTypeModifiers"": ""Required"",
@@ -3442,7 +3442,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                             {
                                 ""ApiName"": ""Age"",
                                 ""ApiType"": {
-                                    ""Kind"": ""Scalar"",
+                                    ""ApiKind"": ""Scalar"",
                                     ""ApiName"": ""Int32""
                                 },
                                 ""ApiTypeModifiers"": ""None"",
@@ -3452,7 +3452,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                             {
                                 ""ApiName"": ""Gender"",
                                 ""ApiType"": {
-                                    ""Kind"": ""Enum"",
+                                    ""ApiKind"": ""Enum"",
                                     ""ApiName"": ""Gender""
                                 },
                                 ""ApiTypeModifiers"": ""None"",
@@ -3463,9 +3463,9 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                                 ""ApiName"": ""Hobbies"",
                                 ""ApiType"": {
                                     ""ApiInlineType"": {
-                                        ""Kind"": ""Collection"",
+                                        ""ApiKind"": ""Collection"",
                                         ""ApiItemType"": {
-                                            ""Kind"": ""Scalar"",
+                                            ""ApiKind"": ""Scalar"",
                                             ""ApiName"": ""String""
                                         },
                                         ""ApiItemTypeModifiers"": ""Required"",
@@ -3501,7 +3501,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(bool)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -3513,7 +3513,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(int)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -3525,7 +3525,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(string)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -3537,7 +3537,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Enum,
+                            ApiKind: ApiTypeKind.Enum,
                             ClrType: typeof(Gender)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -3549,7 +3549,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Object,
+                            ApiKind: ApiTypeKind.Object,
                             ClrType: typeof(Person)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -3614,24 +3614,24 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 },
                 ""ApiScalarTypes"": [
                     {
-                        ""Kind"": ""Scalar"",
+                        ""ApiKind"": ""Scalar"",
                         ""ApiName"": ""Boolean"",
                         ""ClrType"": ""System.Boolean, System.Private.CoreLib""
                     },
                     {
-                        ""Kind"": ""Scalar"",
+                        ""ApiKind"": ""Scalar"",
                         ""ApiName"": ""Int32"",
                         ""ClrType"": ""System.Int32, System.Private.CoreLib""
                     },
                     {
-                        ""Kind"": ""Scalar"",
+                        ""ApiKind"": ""Scalar"",
                         ""ApiName"": ""String"",
                         ""ClrType"": ""System.String, System.Private.CoreLib""
                     }
                 ],
                 ""ApiEnumTypes"": [
                     {
-                        ""Kind"": ""Enum"",
+                        ""ApiKind"": ""Enum"",
                         ""ApiName"": ""Gender"",
                         ""ApiEnumValues"": [
                             {
@@ -3655,13 +3655,13 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 ],
                 ""ApiObjectTypes"": [
                     {
-                        ""Kind"": ""Object"",
+                        ""ApiKind"": ""Object"",
                         ""ApiName"": ""Person"",
                         ""ApiProperties"": [
                             {
                                 ""ApiName"": ""Name"",
                                 ""ApiType"": {
-                                    ""Kind"": ""Scalar"",
+                                    ""ApiKind"": ""Scalar"",
                                     ""ApiName"": ""String""
                                 },
                                 ""ApiTypeModifiers"": ""Required"",
@@ -3671,7 +3671,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                             {
                                 ""ApiName"": ""Age"",
                                 ""ApiType"": {
-                                    ""Kind"": ""Scalar"",
+                                    ""ApiKind"": ""Scalar"",
                                     ""ApiName"": ""Int32""
                                 },
                                 ""ApiTypeModifiers"": ""None"",
@@ -3681,7 +3681,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                             {
                                 ""ApiName"": ""Gender"",
                                 ""ApiType"": {
-                                    ""Kind"": ""Enum"",
+                                    ""ApiKind"": ""Enum"",
                                     ""ApiName"": ""Gender""
                                 },
                                 ""ApiTypeModifiers"": ""None"",
@@ -3692,9 +3692,9 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                                 ""ApiName"": ""Hobbies"",
                                 ""ApiType"": {
                                     ""ApiInlineType"": {
-                                        ""Kind"": ""Collection"",
+                                        ""ApiKind"": ""Collection"",
                                         ""ApiItemType"": {
-                                            ""Kind"": ""Scalar"",
+                                            ""ApiKind"": ""Scalar"",
                                             ""ApiName"": ""String""
                                         },
                                         ""ApiItemTypeModifiers"": ""Required"",
@@ -3737,7 +3737,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(bool)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -3749,7 +3749,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(int)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -3761,7 +3761,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Scalar,
+                            ApiKind: ApiTypeKind.Scalar,
                             ClrType: typeof(string)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -3773,7 +3773,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Enum,
+                            ApiKind: ApiTypeKind.Enum,
                             ClrType: typeof(Gender)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -3785,7 +3785,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Object,
+                            ApiKind: ApiTypeKind.Object,
                             ClrType: typeof(Company)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -3840,7 +3840,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                     (
                         ApiType: new ApiTypeConfig
                         (
-                            Kind: ApiTypeKind.Object,
+                            ApiKind: ApiTypeKind.Object,
                             ClrType: typeof(Person)
                         ),
                         ApiNamedType: new ApiNamedTypeConfig
@@ -3905,24 +3905,24 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 },
                 ""ApiScalarTypes"": [
                     {
-                        ""Kind"": ""Scalar"",
+                        ""ApiKind"": ""Scalar"",
                         ""ApiName"": ""Boolean"",
                         ""ClrType"": ""System.Boolean, System.Private.CoreLib""
                     },
                     {
-                        ""Kind"": ""Scalar"",
+                        ""ApiKind"": ""Scalar"",
                         ""ApiName"": ""Int32"",
                         ""ClrType"": ""System.Int32, System.Private.CoreLib""
                     },
                     {
-                        ""Kind"": ""Scalar"",
+                        ""ApiKind"": ""Scalar"",
                         ""ApiName"": ""String"",
                         ""ClrType"": ""System.String, System.Private.CoreLib""
                     }
                 ],
                 ""ApiEnumTypes"": [
                     {
-                        ""Kind"": ""Enum"",
+                        ""ApiKind"": ""Enum"",
                         ""ApiName"": ""Gender"",
                         ""ApiEnumValues"": [
                             {
@@ -3946,13 +3946,13 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                 ],
                 ""ApiObjectTypes"": [
                     {
-                        ""Kind"": ""Object"",
+                        ""ApiKind"": ""Object"",
                         ""ApiName"": ""Company"",
                         ""ApiProperties"": [
                             {
                                 ""ApiName"": ""Name"",
                                 ""ApiType"": {
-                                    ""Kind"": ""Scalar"",
+                                    ""ApiKind"": ""Scalar"",
                                     ""ApiName"": ""String""
                                 },
                                 ""ApiTypeModifiers"": ""Required"",
@@ -3962,7 +3962,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                             {
                                 ""ApiName"": ""Owner"",
                                 ""ApiType"": {
-                                    ""Kind"": ""Object"",
+                                    ""ApiKind"": ""Object"",
                                     ""ApiName"": ""Person""
                                 },
                                 ""ApiTypeModifiers"": ""None"",
@@ -3973,9 +3973,9 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                                 ""ApiName"": ""Employees"",
                                 ""ApiType"": {
                                     ""ApiInlineType"": {
-                                        ""Kind"": ""Collection"",
+                                        ""ApiKind"": ""Collection"",
                                         ""ApiItemType"": {
-                                            ""Kind"": ""Object"",
+                                            ""ApiKind"": ""Object"",
                                             ""ApiName"": ""Person""
                                         },
                                         ""ApiItemTypeModifiers"": ""Required"",
@@ -4000,13 +4000,13 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Company, Evoogle.ApiFramework.Core.Tests""
                     },
                     {
-                        ""Kind"": ""Object"",
+                        ""ApiKind"": ""Object"",
                         ""ApiName"": ""Person"",
                         ""ApiProperties"": [
                             {
                                 ""ApiName"": ""Name"",
                                 ""ApiType"": {
-                                    ""Kind"": ""Scalar"",
+                                    ""ApiKind"": ""Scalar"",
                                     ""ApiName"": ""String""
                                 },
                                 ""ApiTypeModifiers"": ""Required"",
@@ -4016,7 +4016,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                             {
                                 ""ApiName"": ""Age"",
                                 ""ApiType"": {
-                                    ""Kind"": ""Scalar"",
+                                    ""ApiKind"": ""Scalar"",
                                     ""ApiName"": ""Int32""
                                 },
                                 ""ApiTypeModifiers"": ""None"",
@@ -4026,7 +4026,7 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                             {
                                 ""ApiName"": ""Gender"",
                                 ""ApiType"": {
-                                    ""Kind"": ""Enum"",
+                                    ""ApiKind"": ""Enum"",
                                     ""ApiName"": ""Gender""
                                 },
                                 ""ApiTypeModifiers"": ""None"",
@@ -4037,9 +4037,9 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                                 ""ApiName"": ""Hobbies"",
                                 ""ApiType"": {
                                     ""ApiInlineType"": {
-                                        ""Kind"": ""Collection"",
+                                        ""ApiKind"": ""Collection"",
                                         ""ApiItemType"": {
-                                            ""Kind"": ""Scalar"",
+                                            ""ApiKind"": ""Scalar"",
                                             ""ApiName"": ""String""
                                         },
                                         ""ApiItemTypeModifiers"": ""Required"",

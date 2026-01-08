@@ -73,7 +73,7 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
     {
         #region Immutable Properties
         public required string ClrType { get; init; }
-        public required string Kind { get; init; }
+        public required string ApiKind { get; init; }
         #endregion
     }
 
@@ -117,7 +117,7 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
                 ApiType = new ApiTypePropertyNames
                 {
                     ClrType = policy.ConvertName(nameof(Schema.ApiType.ClrType)),
-                    Kind = policy.ConvertName(nameof(Schema.ApiType.Kind))
+                    ApiKind = policy.ConvertName(nameof(Schema.ApiType.ApiKind))
                 },
                 ExtensibleBase = GetExtensiblePropertyNames(policy),
             };
@@ -164,7 +164,7 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
 
         var apiType = default(ApiType);
 
-        var kindAsString = readContext.ReadData.ApiType?.Kind;
+        var kindAsString = readContext.ReadData.ApiType?.ApiKind;
         var kind = ApiJsonConverterHelpers.GetApiTypeKind(context.Logger, kindAsString);
 
         if (kind is not null)
@@ -222,7 +222,7 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
             WriteApiTypeKind(writer, value, writeContext);
 
             // Body
-            var kind = value.Kind;
+            var kind = value.ApiKind;
             switch (kind)
             {
                 case ApiTypeKind.Collection:

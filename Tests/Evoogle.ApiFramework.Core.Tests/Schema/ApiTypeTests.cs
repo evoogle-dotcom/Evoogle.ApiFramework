@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -76,7 +76,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = $"{nameof(ApiScalarType)} [Boolean]",
             SourceJson = @"
             {
-                ""Kind"": ""Scalar"",
+                ""ApiKind"": ""Scalar"",
                 ""ApiName"": ""Boolean"",
                 ""ClrType"": ""System.Boolean, System.Private.CoreLib""
             }",
@@ -84,7 +84,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Scalar,
+                    ApiKind: ApiTypeKind.Scalar,
                     ClrType: typeof(bool)
                 ),
                 ApiNamedType: new ApiNamedTypeConfig
@@ -99,7 +99,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = $"{nameof(ApiScalarType)} [{nameof(Boolean)}] With {nameof(GraphQlExtension)}",
             SourceJson = @"
             {
-                ""Kind"": ""Scalar"",
+                ""ApiKind"": ""Scalar"",
                 ""ApiName"": ""Boolean"",
                 ""ClrType"": ""System.Boolean, System.Private.CoreLib"",
                 ""Extensions"": {
@@ -112,7 +112,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Scalar,
+                    ApiKind: ApiTypeKind.Scalar,
                     ClrType: typeof(bool),
                     ExtensionTypes: [ typeof(GraphQlExtension) ]
                 ),
@@ -128,7 +128,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = $"{nameof(ApiScalarType)} [{nameof(Int32)}]",
             SourceJson = @"
             {
-                ""Kind"": ""Scalar"",
+                ""ApiKind"": ""Scalar"",
                 ""ApiName"": ""Int32"",
                 ""ClrType"": ""System.Int32, System.Private.CoreLib""
             }",
@@ -136,7 +136,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Scalar,
+                    ApiKind: ApiTypeKind.Scalar,
                     ClrType: typeof(int)
                 ),
                 ApiNamedType: new ApiNamedTypeConfig
@@ -151,7 +151,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = $"{nameof(ApiScalarType)} [{nameof(Single)}]",
             SourceJson = @"
             {
-                ""Kind"": ""Scalar"",
+                ""ApiKind"": ""Scalar"",
                 ""ApiName"": ""Single"",
                 ""ClrType"": ""System.Single, System.Private.CoreLib""
             }",
@@ -159,7 +159,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Scalar,
+                    ApiKind: ApiTypeKind.Scalar,
                     ClrType: typeof(float)
                 ),
                 ApiNamedType: new ApiNamedTypeConfig
@@ -174,7 +174,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = $"{nameof(ApiScalarType)} [{nameof(String)}]",
             SourceJson = @"
             {
-                ""Kind"": ""Scalar"",
+                ""ApiKind"": ""Scalar"",
                 ""ApiName"": ""String"",
                 ""ClrType"": ""System.String, System.Private.CoreLib""
             }",
@@ -182,7 +182,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Scalar,
+                    ApiKind: ApiTypeKind.Scalar,
                     ClrType: typeof(string)
                 ),
                 ApiNamedType: new ApiNamedTypeConfig
@@ -198,7 +198,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = $"{nameof(ApiEnumType)} [{nameof(StopLight)}]",
             SourceJson = @"
             {
-                ""Kind"": ""Enum"",
+                ""ApiKind"": ""Enum"",
                 ""ApiName"": ""StopLight"",
                 ""ApiEnumValues"": [
                     {
@@ -228,7 +228,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Enum,
+                    ApiKind: ApiTypeKind.Enum,
                     ClrType: typeof(StopLight)
                 ),
                 ApiNamedType: new ApiNamedTypeConfig
@@ -243,7 +243,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = $"{nameof(ApiEnumType)} [{nameof(StopLight)}] With {nameof(JsonApiExtension)}",
             SourceJson = @"
             {
-                ""Kind"": ""Enum"",
+                ""ApiKind"": ""Enum"",
                 ""ApiName"": ""StopLight"",
                 ""ApiEnumValues"": [
                     {
@@ -278,7 +278,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Enum,
+                    ApiKind: ApiTypeKind.Enum,
                     ClrType: typeof(StopLight),
                     ExtensionTypes: [ typeof(JsonApiExtension) ]
                 ),
@@ -295,9 +295,9 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = $"{nameof(ApiCollectionType)} [List<{nameof(String)}>]",
             SourceJson = @"
             {
-                ""Kind"": ""Collection"",
+                ""ApiKind"": ""Collection"",
                 ""ApiItemType"": {
-                    ""Kind"": ""Scalar"",
+                    ""ApiKind"": ""Scalar"",
                     ""ApiName"": ""String""
                 },
                 ""ApiItemTypeModifiers"": ""Required"",
@@ -307,7 +307,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Collection,
+                    ApiKind: ApiTypeKind.Collection,
                     ClrType: typeof(List<string>)
                 ),
                 ApiCollectionType: new ApiCollectionTypeConfig
@@ -323,9 +323,9 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = $"{nameof(ApiCollectionType)} [List<{nameof(String)}?>]",
             SourceJson = @"
             {
-                ""Kind"": ""Collection"",
+                ""ApiKind"": ""Collection"",
                 ""ApiItemType"": {
-                    ""Kind"": ""Scalar"",
+                    ""ApiKind"": ""Scalar"",
                     ""ApiName"": ""String""
                 },
                 ""ApiItemTypeModifiers"": ""None"",
@@ -335,7 +335,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Collection,
+                    ApiKind: ApiTypeKind.Collection,
                     ClrType: typeof(List<string?>)
                 ),
                 ApiCollectionType: new ApiCollectionTypeConfig
@@ -351,9 +351,9 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = $"{nameof(ApiCollectionType)} [List<{nameof(StopLight)}>]",
             SourceJson = @"
             {
-                ""Kind"": ""Collection"",
+                ""ApiKind"": ""Collection"",
                 ""ApiItemType"": {
-                    ""Kind"": ""Enum"",
+                    ""ApiKind"": ""Enum"",
                     ""ApiName"": ""StopLight""
                 },
                 ""ApiItemTypeModifiers"": ""Required"",
@@ -363,7 +363,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Collection,
+                    ApiKind: ApiTypeKind.Collection,
                     ClrType: typeof(List<StopLight>)
                 ),
                 ApiCollectionType: new ApiCollectionTypeConfig
@@ -379,9 +379,9 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = $"{nameof(ApiCollectionType)} [List<{nameof(StopLight)}?>]",
             SourceJson = @"
             {
-                ""Kind"": ""Collection"",
+                ""ApiKind"": ""Collection"",
                 ""ApiItemType"": {
-                    ""Kind"": ""Enum"",
+                    ""ApiKind"": ""Enum"",
                     ""ApiName"": ""StopLight""
                 },
                 ""ApiItemTypeModifiers"": ""None"",
@@ -391,7 +391,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Collection,
+                    ApiKind: ApiTypeKind.Collection,
                     ClrType: typeof(List<StopLight?>)
                 ),
                 ApiCollectionType: new ApiCollectionTypeConfig
@@ -408,13 +408,13 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = $"{nameof(ApiObjectType)} [{nameof(ScalarsOnly)}] With API Named Typed Expressions",
             SourceJson = @"
             {
-                ""Kind"": ""Object"",
+                ""ApiKind"": ""Object"",
                 ""ApiName"": ""ScalarsOnly"",
                 ""ApiProperties"": [
                     {
                         ""ApiName"": ""RequiredName"",
                         ""ApiType"": {
-                            ""Kind"": ""Scalar"",
+                            ""ApiKind"": ""Scalar"",
                             ""ApiName"": ""String""
                         },
                         ""ApiTypeModifiers"": ""Required"",
@@ -424,7 +424,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     {
                         ""ApiName"": ""RequiredNumber"",
                         ""ApiType"": {
-                            ""Kind"": ""Scalar"",
+                            ""ApiKind"": ""Scalar"",
                             ""ApiName"": ""Int64""
                         },
                         ""ApiTypeModifiers"": ""Required"",
@@ -434,7 +434,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     {
                         ""ApiName"": ""RequiredPredicate"",
                         ""ApiType"": {
-                            ""Kind"": ""Scalar"",
+                            ""ApiKind"": ""Scalar"",
                             ""ApiName"": ""Boolean""
                         },
                         ""ApiTypeModifiers"": ""Required"",
@@ -444,7 +444,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     {
                         ""ApiName"": ""OptionalName"",
                         ""ApiType"": {
-                            ""Kind"": ""Scalar"",
+                            ""ApiKind"": ""Scalar"",
                             ""ApiName"": ""String""
                         },
                         ""ApiTypeModifiers"": ""None"",
@@ -454,7 +454,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     {
                         ""ApiName"": ""OptionalNumber"",
                         ""ApiType"": {
-                            ""Kind"": ""Scalar"",
+                            ""ApiKind"": ""Scalar"",
                             ""ApiName"": ""Int64""
                         },
                         ""ApiTypeModifiers"": ""None"",
@@ -464,7 +464,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     {
                         ""ApiName"": ""OptionalPredicate"",
                         ""ApiType"": {
-                            ""Kind"": ""Scalar"",
+                            ""ApiKind"": ""Scalar"",
                             ""ApiName"": ""Boolean""
                         },
                         ""ApiTypeModifiers"": ""None"",
@@ -479,7 +479,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Object,
+                    ApiKind: ApiTypeKind.Object,
                     ClrType: typeof(ScalarsOnly)
                 ),
                 ApiNamedType: new ApiNamedTypeConfig
@@ -548,7 +548,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = $"{nameof(ApiObjectType)} [{nameof(ScalarsOnly)}] With API Named Typed Expressions And API Options",
             SourceJson = @"
             {
-                ""Kind"": ""Object"",
+                ""ApiKind"": ""Object"",
                 ""ApiName"": ""ScalarsOnly"",
                 ""ApiOptions"": {
                     ""ApiIdentityNullHandling"": ""ThrowException""
@@ -557,7 +557,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     {
                         ""ApiName"": ""RequiredName"",
                         ""ApiType"": {
-                            ""Kind"": ""Scalar"",
+                            ""ApiKind"": ""Scalar"",
                             ""ApiName"": ""String""
                         },
                         ""ApiTypeModifiers"": ""Required"",
@@ -567,7 +567,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     {
                         ""ApiName"": ""RequiredNumber"",
                         ""ApiType"": {
-                            ""Kind"": ""Scalar"",
+                            ""ApiKind"": ""Scalar"",
                             ""ApiName"": ""Int64""
                         },
                         ""ApiTypeModifiers"": ""Required"",
@@ -577,7 +577,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     {
                         ""ApiName"": ""RequiredPredicate"",
                         ""ApiType"": {
-                            ""Kind"": ""Scalar"",
+                            ""ApiKind"": ""Scalar"",
                             ""ApiName"": ""Boolean""
                         },
                         ""ApiTypeModifiers"": ""Required"",
@@ -587,7 +587,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     {
                         ""ApiName"": ""OptionalName"",
                         ""ApiType"": {
-                            ""Kind"": ""Scalar"",
+                            ""ApiKind"": ""Scalar"",
                             ""ApiName"": ""String""
                         },
                         ""ApiTypeModifiers"": ""None"",
@@ -597,7 +597,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     {
                         ""ApiName"": ""OptionalNumber"",
                         ""ApiType"": {
-                            ""Kind"": ""Scalar"",
+                            ""ApiKind"": ""Scalar"",
                             ""ApiName"": ""Int64""
                         },
                         ""ApiTypeModifiers"": ""None"",
@@ -607,7 +607,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     {
                         ""ApiName"": ""OptionalPredicate"",
                         ""ApiType"": {
-                            ""Kind"": ""Scalar"",
+                            ""ApiKind"": ""Scalar"",
                             ""ApiName"": ""Boolean""
                         },
                         ""ApiTypeModifiers"": ""None"",
@@ -622,7 +622,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Object,
+                    ApiKind: ApiTypeKind.Object,
                     ClrType: typeof(ScalarsOnly)
                 ),
                 ApiNamedType: new ApiNamedTypeConfig
@@ -695,13 +695,13 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = $"{nameof(ApiObjectType)} [{nameof(ScalarsOnly)}] With API Named Typed Expressions And {nameof(GraphQlExtension)} And {nameof(JsonApiExtension)}",
             SourceJson = @"
             {
-                ""Kind"": ""Object"",
+                ""ApiKind"": ""Object"",
                 ""ApiName"": ""ScalarsOnly"",
                 ""ApiProperties"": [
                     {
                         ""ApiName"": ""RequiredName"",
                         ""ApiType"": {
-                            ""Kind"": ""Scalar"",
+                            ""ApiKind"": ""Scalar"",
                             ""ApiName"": ""String""
                         },
                         ""ApiTypeModifiers"": ""Required"",
@@ -711,7 +711,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     {
                         ""ApiName"": ""RequiredNumber"",
                         ""ApiType"": {
-                            ""Kind"": ""Scalar"",
+                            ""ApiKind"": ""Scalar"",
                             ""ApiName"": ""Int64""
                         },
                         ""ApiTypeModifiers"": ""Required"",
@@ -721,7 +721,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     {
                         ""ApiName"": ""RequiredPredicate"",
                         ""ApiType"": {
-                            ""Kind"": ""Scalar"",
+                            ""ApiKind"": ""Scalar"",
                             ""ApiName"": ""Boolean""
                         },
                         ""ApiTypeModifiers"": ""Required"",
@@ -731,7 +731,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     {
                         ""ApiName"": ""OptionalName"",
                         ""ApiType"": {
-                            ""Kind"": ""Scalar"",
+                            ""ApiKind"": ""Scalar"",
                             ""ApiName"": ""String""
                         },
                         ""ApiTypeModifiers"": ""None"",
@@ -741,7 +741,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     {
                         ""ApiName"": ""OptionalNumber"",
                         ""ApiType"": {
-                            ""Kind"": ""Scalar"",
+                            ""ApiKind"": ""Scalar"",
                             ""ApiName"": ""Int64""
                         },
                         ""ApiTypeModifiers"": ""None"",
@@ -751,7 +751,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     {
                         ""ApiName"": ""OptionalPredicate"",
                         ""ApiType"": {
-                            ""Kind"": ""Scalar"",
+                            ""ApiKind"": ""Scalar"",
                             ""ApiName"": ""Boolean""
                         },
                         ""ApiTypeModifiers"": ""None"",
@@ -774,7 +774,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Object,
+                    ApiKind: ApiTypeKind.Object,
                     ClrType: typeof(ScalarsOnly),
                     ExtensionTypes: [ typeof(GraphQlExtension), typeof(JsonApiExtension) ]
                 ),
@@ -844,13 +844,13 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = $"{nameof(ApiObjectType)} [{nameof(Company)}] With API Named Typed Expressions",
             SourceJson = @"
             {
-                ""Kind"": ""Object"",
+                ""ApiKind"": ""Object"",
                 ""ApiName"": ""Company"",
                 ""ApiProperties"": [
                     {
                         ""ApiName"": ""Name"",
                         ""ApiType"": {
-                            ""Kind"": ""Scalar"",
+                            ""ApiKind"": ""Scalar"",
                             ""ApiName"": ""String""
                         },
                         ""ApiTypeModifiers"": ""Required"",
@@ -860,7 +860,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     {
                         ""ApiName"": ""Owner"",
                         ""ApiType"": {
-                            ""Kind"": ""Object"",
+                            ""ApiKind"": ""Object"",
                             ""ApiName"": ""Person""
                         },
                         ""ApiTypeModifiers"": ""None"",
@@ -871,9 +871,9 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                         ""ApiName"": ""Employees"",
                         ""ApiType"": {
                             ""ApiInlineType"": {
-                                ""Kind"": ""Collection"",
+                                ""ApiKind"": ""Collection"",
                                 ""ApiItemType"": {
-                                    ""Kind"": ""Object"",
+                                    ""ApiKind"": ""Object"",
                                     ""ApiName"": ""Person""
                                 },
                                 ""ApiItemTypeModifiers"": ""Required"",
@@ -900,7 +900,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Object,
+                    ApiKind: ApiTypeKind.Object,
                     ClrType: typeof(Company)
                 ),
                 ApiNamedType: new ApiNamedTypeConfig
@@ -959,7 +959,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = $"{nameof(ApiObjectType)} [{nameof(ScalarsOnly)}] With CLR Typed Expressions",
             SourceJson = @"
             {
-                ""Kind"": ""Object"",
+                ""ApiKind"": ""Object"",
                 ""ApiName"": ""ScalarsOnly"",
                 ""ApiProperties"": [
                     {
@@ -1024,7 +1024,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Object,
+                    ApiKind: ApiTypeKind.Object,
                     ClrType: typeof(ScalarsOnly)
                 ),
                 ApiNamedType: new ApiNamedTypeConfig
@@ -1093,7 +1093,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = $"{nameof(ApiObjectType)} [{nameof(ScalarsOnly)}] With CLR Typed Expressions And API Options",
             SourceJson = @"
             {
-                ""Kind"": ""Object"",
+                ""ApiKind"": ""Object"",
                 ""ApiName"": ""ScalarsOnly"",
                 ""ApiOptions"": {
                     ""ApiIdentityNullHandling"": ""ThrowException""
@@ -1161,7 +1161,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Object,
+                    ApiKind: ApiTypeKind.Object,
                     ClrType: typeof(ScalarsOnly)
                 ),
                 ApiNamedType: new ApiNamedTypeConfig
@@ -1234,7 +1234,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = $"{nameof(ApiObjectType)} [{nameof(ScalarsOnly)}] With CLR Typed Expressions And {nameof(GraphQlExtension)} And {nameof(JsonApiExtension)}",
             SourceJson = @"
             {
-                ""Kind"": ""Object"",
+                ""ApiKind"": ""Object"",
                 ""ApiName"": ""ScalarsOnly"",
                 ""ApiProperties"": [
                     {
@@ -1307,7 +1307,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Object,
+                    ApiKind: ApiTypeKind.Object,
                     ClrType: typeof(ScalarsOnly),
                     ExtensionTypes: [ typeof(GraphQlExtension), typeof(JsonApiExtension) ]
                 ),
@@ -1377,7 +1377,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             Name = $"{nameof(ApiObjectType)} [{nameof(Company)}] With CLR Typed Expressions",
             SourceJson = @"
             {
-                ""Kind"": ""Object"",
+                ""ApiKind"": ""Object"",
                 ""ApiName"": ""Company"",
                 ""ApiProperties"": [
                     {
@@ -1402,7 +1402,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                         ""ApiName"": ""Employees"",
                         ""ApiType"": {
                             ""ApiInlineType"": {
-                                ""Kind"": ""Collection"",
+                                ""ApiKind"": ""Collection"",
                                 ""ApiItemType"": {
                                     ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Person,Evoogle.ApiFramework.Core.Tests""
                                 },
@@ -1430,7 +1430,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Object,
+                    ApiKind: ApiTypeKind.Object,
                     ClrType: typeof(Company)
                 ),
                 ApiNamedType: new ApiNamedTypeConfig
@@ -1501,7 +1501,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Scalar,
+                    ApiKind: ApiTypeKind.Scalar,
                     ClrType: typeof(bool)
                 ),
                 ApiNamedType: new ApiNamedTypeConfig
@@ -1518,7 +1518,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Scalar,
+                    ApiKind: ApiTypeKind.Scalar,
                     ClrType: typeof(bool),
                     ExtensionTypes: [ typeof(GraphQlExtension) ]
                 ),
@@ -1536,7 +1536,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Scalar,
+                    ApiKind: ApiTypeKind.Scalar,
                     ClrType: typeof(int)
                 ),
                 ApiNamedType: new ApiNamedTypeConfig
@@ -1553,7 +1553,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Scalar,
+                    ApiKind: ApiTypeKind.Scalar,
                     ClrType: typeof(float)
                 ),
                 ApiNamedType: new ApiNamedTypeConfig
@@ -1570,7 +1570,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Scalar,
+                    ApiKind: ApiTypeKind.Scalar,
                     ClrType: typeof(string)
                 ),
                 ApiNamedType: new ApiNamedTypeConfig
@@ -1588,7 +1588,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Enum,
+                    ApiKind: ApiTypeKind.Enum,
                     ClrType: typeof(StopLight)
                 ),
                 ApiNamedType: new ApiNamedTypeConfig
@@ -1605,7 +1605,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Enum,
+                    ApiKind: ApiTypeKind.Enum,
                     ClrType: typeof(StopLight),
                     ExtensionTypes: [ typeof(JsonApiExtension) ]
                 ),
@@ -1624,7 +1624,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Collection,
+                    ApiKind: ApiTypeKind.Collection,
                     ClrType: typeof(List<string>)
                 ),
                 ApiCollectionType: new ApiCollectionTypeConfig
@@ -1642,7 +1642,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Collection,
+                    ApiKind: ApiTypeKind.Collection,
                     ClrType: typeof(List<string?>)
                 ),
                 ApiCollectionType: new ApiCollectionTypeConfig
@@ -1660,7 +1660,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Collection,
+                    ApiKind: ApiTypeKind.Collection,
                     ClrType: typeof(List<StopLight>)
                 ),
                 ApiCollectionType: new ApiCollectionTypeConfig
@@ -1678,7 +1678,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Collection,
+                    ApiKind: ApiTypeKind.Collection,
                     ClrType: typeof(List<StopLight?>)
                 ),
                 ApiCollectionType: new ApiCollectionTypeConfig
@@ -1697,7 +1697,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Object,
+                    ApiKind: ApiTypeKind.Object,
                     ClrType: typeof(ScalarsOnly)
                 ),
                 ApiNamedType: new ApiNamedTypeConfig
@@ -1768,7 +1768,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Object,
+                    ApiKind: ApiTypeKind.Object,
                     ClrType: typeof(ScalarsOnly)
                 ),
                 ApiNamedType: new ApiNamedTypeConfig
@@ -1843,7 +1843,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Object,
+                    ApiKind: ApiTypeKind.Object,
                     ClrType: typeof(ScalarsOnly),
                     ExtensionTypes: [ typeof(GraphQlExtension), typeof(JsonApiExtension) ]
                 ),
@@ -1915,7 +1915,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Object,
+                    ApiKind: ApiTypeKind.Object,
                     ClrType: typeof(Company)
                 ),
                 ApiNamedType: new ApiNamedTypeConfig
@@ -1976,7 +1976,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Object,
+                    ApiKind: ApiTypeKind.Object,
                     ClrType: typeof(ScalarsOnly)
                 ),
                 ApiNamedType: new ApiNamedTypeConfig
@@ -2047,7 +2047,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Object,
+                    ApiKind: ApiTypeKind.Object,
                     ClrType: typeof(ScalarsOnly)
                 ),
                 ApiNamedType: new ApiNamedTypeConfig
@@ -2122,7 +2122,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Object,
+                    ApiKind: ApiTypeKind.Object,
                     ClrType: typeof(ScalarsOnly),
                     ExtensionTypes: [ typeof(GraphQlExtension), typeof(JsonApiExtension) ]
                 ),
@@ -2194,7 +2194,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Object,
+                    ApiKind: ApiTypeKind.Object,
                     ClrType: typeof(Company)
                 ),
                 ApiNamedType: new ApiNamedTypeConfig
@@ -2266,7 +2266,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Scalar,
+                    ApiKind: ApiTypeKind.Scalar,
                     ClrType: typeof(bool)
                 ),
                 ApiNamedType: new ApiNamedTypeConfig
@@ -2276,7 +2276,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             ),
             ExpectedJson = @"
             {
-                ""Kind"": ""Scalar"",
+                ""ApiKind"": ""Scalar"",
                 ""ApiName"": ""Boolean"",
                 ""ClrType"": ""System.Boolean, System.Private.CoreLib""
             }"
@@ -2289,7 +2289,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Scalar,
+                    ApiKind: ApiTypeKind.Scalar,
                     ClrType: typeof(bool),
                     ExtensionTypes: [ typeof(GraphQlExtension) ]
                 ),
@@ -2300,7 +2300,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             ),
             ExpectedJson = @"
             {
-                ""Kind"": ""Scalar"",
+                ""ApiKind"": ""Scalar"",
                 ""ApiName"": ""Boolean"",
                 ""ClrType"": ""System.Boolean, System.Private.CoreLib"",
                 ""Extensions"": {
@@ -2318,7 +2318,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Scalar,
+                    ApiKind: ApiTypeKind.Scalar,
                     ClrType: typeof(int)
                 ),
                 ApiNamedType: new ApiNamedTypeConfig
@@ -2328,7 +2328,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             ),
             ExpectedJson = @"
             {
-                ""Kind"": ""Scalar"",
+                ""ApiKind"": ""Scalar"",
                 ""ApiName"": ""Int32"",
                 ""ClrType"": ""System.Int32, System.Private.CoreLib""
             }"
@@ -2341,7 +2341,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Scalar,
+                    ApiKind: ApiTypeKind.Scalar,
                     ClrType: typeof(float)
                 ),
                 ApiNamedType: new ApiNamedTypeConfig
@@ -2351,7 +2351,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             ),
             ExpectedJson = @"
             {
-                ""Kind"": ""Scalar"",
+                ""ApiKind"": ""Scalar"",
                 ""ApiName"": ""Single"",
                 ""ClrType"": ""System.Single, System.Private.CoreLib""
             }"
@@ -2364,7 +2364,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Scalar,
+                    ApiKind: ApiTypeKind.Scalar,
                     ClrType: typeof(string)
                 ),
                 ApiNamedType: new ApiNamedTypeConfig
@@ -2374,7 +2374,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             ),
             ExpectedJson = @"
             {
-                ""Kind"": ""Scalar"",
+                ""ApiKind"": ""Scalar"",
                 ""ApiName"": ""String"",
                 ""ClrType"": ""System.String, System.Private.CoreLib""
             }"
@@ -2388,7 +2388,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Enum,
+                    ApiKind: ApiTypeKind.Enum,
                     ClrType: typeof(StopLight)
                 ),
                 ApiNamedType: new ApiNamedTypeConfig
@@ -2398,7 +2398,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             ),
             ExpectedJson = @"
             {
-                ""Kind"": ""Enum"",
+                ""ApiKind"": ""Enum"",
                 ""ApiName"": ""StopLight"",
                 ""ApiEnumValues"": [
                     {
@@ -2433,7 +2433,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Enum,
+                    ApiKind: ApiTypeKind.Enum,
                     ClrType: typeof(StopLight),
                     ExtensionTypes: [ typeof(JsonApiExtension) ]
                 ),
@@ -2444,7 +2444,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             ),
             ExpectedJson = @"
             {
-                ""Kind"": ""Enum"",
+                ""ApiKind"": ""Enum"",
                 ""ApiName"": ""StopLight"",
                 ""ApiEnumValues"": [
                     {
@@ -2485,7 +2485,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Collection,
+                    ApiKind: ApiTypeKind.Collection,
                     ClrType: typeof(List<string>)
                 ),
                 ApiCollectionType: new ApiCollectionTypeConfig
@@ -2496,9 +2496,9 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             ),
             ExpectedJson = @"
             {
-                ""Kind"": ""Collection"",
+                ""ApiKind"": ""Collection"",
                 ""ApiItemType"": {
-                    ""Kind"": ""Scalar"",
+                    ""ApiKind"": ""Scalar"",
                     ""ApiName"": ""String""
                 },
                 ""ApiItemTypeModifiers"": ""Required"",
@@ -2513,7 +2513,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Collection,
+                    ApiKind: ApiTypeKind.Collection,
                     ClrType: typeof(List<string?>)
                 ),
                 ApiCollectionType: new ApiCollectionTypeConfig
@@ -2524,9 +2524,9 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             ),
             ExpectedJson = @"
             {
-                ""Kind"": ""Collection"",
+                ""ApiKind"": ""Collection"",
                 ""ApiItemType"": {
-                    ""Kind"": ""Scalar"",
+                    ""ApiKind"": ""Scalar"",
                     ""ApiName"": ""String""
                 },
                 ""ApiItemTypeModifiers"": ""None"",
@@ -2541,7 +2541,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Collection,
+                    ApiKind: ApiTypeKind.Collection,
                     ClrType: typeof(List<StopLight>)
                 ),
                 ApiCollectionType: new ApiCollectionTypeConfig
@@ -2552,9 +2552,9 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             ),
             ExpectedJson = @"
             {
-                ""Kind"": ""Collection"",
+                ""ApiKind"": ""Collection"",
                 ""ApiItemType"": {
-                    ""Kind"": ""Enum"",
+                    ""ApiKind"": ""Enum"",
                     ""ApiName"": ""StopLight""
                 },
                 ""ApiItemTypeModifiers"": ""Required"",
@@ -2569,7 +2569,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Collection,
+                    ApiKind: ApiTypeKind.Collection,
                     ClrType: typeof(List<StopLight?>)
                 ),
                 ApiCollectionType: new ApiCollectionTypeConfig
@@ -2580,9 +2580,9 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             ),
             ExpectedJson = @"
             {
-                ""Kind"": ""Collection"",
+                ""ApiKind"": ""Collection"",
                 ""ApiItemType"": {
-                    ""Kind"": ""Enum"",
+                    ""ApiKind"": ""Enum"",
                     ""ApiName"": ""StopLight""
                 },
                 ""ApiItemTypeModifiers"": ""None"",
@@ -2598,7 +2598,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Object,
+                    ApiKind: ApiTypeKind.Object,
                     ClrType: typeof(ScalarsOnly)
                 ),
                 ApiNamedType: new ApiNamedTypeConfig
@@ -2662,13 +2662,13 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             ),
             ExpectedJson = @"
             {
-                ""Kind"": ""Object"",
+                ""ApiKind"": ""Object"",
                 ""ApiName"": ""ScalarsOnly"",
                 ""ApiProperties"": [
                     {
                         ""ApiName"": ""RequiredName"",
                         ""ApiType"": {
-                            ""Kind"": ""Scalar"",
+                            ""ApiKind"": ""Scalar"",
                             ""ApiName"": ""String""
                         },
                         ""ApiTypeModifiers"": ""Required"",
@@ -2678,7 +2678,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     {
                         ""ApiName"": ""RequiredNumber"",
                         ""ApiType"": {
-                            ""Kind"": ""Scalar"",
+                            ""ApiKind"": ""Scalar"",
                             ""ApiName"": ""Int64""
                         },
                         ""ApiTypeModifiers"": ""Required"",
@@ -2688,7 +2688,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     {
                         ""ApiName"": ""RequiredPredicate"",
                         ""ApiType"": {
-                            ""Kind"": ""Scalar"",
+                            ""ApiKind"": ""Scalar"",
                             ""ApiName"": ""Boolean""
                         },
                         ""ApiTypeModifiers"": ""Required"",
@@ -2698,7 +2698,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     {
                         ""ApiName"": ""OptionalName"",
                         ""ApiType"": {
-                            ""Kind"": ""Scalar"",
+                            ""ApiKind"": ""Scalar"",
                             ""ApiName"": ""String""
                         },
                         ""ApiTypeModifiers"": ""None"",
@@ -2708,7 +2708,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     {
                         ""ApiName"": ""OptionalNumber"",
                         ""ApiType"": {
-                            ""Kind"": ""Scalar"",
+                            ""ApiKind"": ""Scalar"",
                             ""ApiName"": ""Int64""
                         },
                         ""ApiTypeModifiers"": ""None"",
@@ -2718,7 +2718,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     {
                         ""ApiName"": ""OptionalPredicate"",
                         ""ApiType"": {
-                            ""Kind"": ""Scalar"",
+                            ""ApiKind"": ""Scalar"",
                             ""ApiName"": ""Boolean""
                         },
                         ""ApiTypeModifiers"": ""None"",
@@ -2738,7 +2738,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Object,
+                    ApiKind: ApiTypeKind.Object,
                     ClrType: typeof(ScalarsOnly)
                 ),
                 ApiNamedType: new ApiNamedTypeConfig
@@ -2806,7 +2806,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             ),
             ExpectedJson = @"
             {
-                ""Kind"": ""Object"",
+                ""ApiKind"": ""Object"",
                 ""ApiName"": ""ScalarsOnly"",
                 ""ApiOptions"": {
                     ""ApiIdentityNullHandling"": ""ThrowException""
@@ -2815,7 +2815,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     {
                         ""ApiName"": ""RequiredName"",
                         ""ApiType"": {
-                            ""Kind"": ""Scalar"",
+                            ""ApiKind"": ""Scalar"",
                             ""ApiName"": ""String""
                         },
                         ""ApiTypeModifiers"": ""Required"",
@@ -2825,7 +2825,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     {
                         ""ApiName"": ""RequiredNumber"",
                         ""ApiType"": {
-                            ""Kind"": ""Scalar"",
+                            ""ApiKind"": ""Scalar"",
                             ""ApiName"": ""Int64""
                         },
                         ""ApiTypeModifiers"": ""Required"",
@@ -2835,7 +2835,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     {
                         ""ApiName"": ""RequiredPredicate"",
                         ""ApiType"": {
-                            ""Kind"": ""Scalar"",
+                            ""ApiKind"": ""Scalar"",
                             ""ApiName"": ""Boolean""
                         },
                         ""ApiTypeModifiers"": ""Required"",
@@ -2845,7 +2845,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     {
                         ""ApiName"": ""OptionalName"",
                         ""ApiType"": {
-                            ""Kind"": ""Scalar"",
+                            ""ApiKind"": ""Scalar"",
                             ""ApiName"": ""String""
                         },
                         ""ApiTypeModifiers"": ""None"",
@@ -2855,7 +2855,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     {
                         ""ApiName"": ""OptionalNumber"",
                         ""ApiType"": {
-                            ""Kind"": ""Scalar"",
+                            ""ApiKind"": ""Scalar"",
                             ""ApiName"": ""Int64""
                         },
                         ""ApiTypeModifiers"": ""None"",
@@ -2865,7 +2865,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     {
                         ""ApiName"": ""OptionalPredicate"",
                         ""ApiType"": {
-                            ""Kind"": ""Scalar"",
+                            ""ApiKind"": ""Scalar"",
                             ""ApiName"": ""Boolean""
                         },
                         ""ApiTypeModifiers"": ""None"",
@@ -2885,7 +2885,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Object,
+                    ApiKind: ApiTypeKind.Object,
                     ClrType: typeof(ScalarsOnly),
                     ExtensionTypes: [ typeof(GraphQlExtension), typeof(JsonApiExtension) ]
                 ),
@@ -2950,13 +2950,13 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             ),
             ExpectedJson = @"
             {
-                ""Kind"": ""Object"",
+                ""ApiKind"": ""Object"",
                 ""ApiName"": ""ScalarsOnly"",
                 ""ApiProperties"": [
                     {
                         ""ApiName"": ""RequiredName"",
                         ""ApiType"": {
-                            ""Kind"": ""Scalar"",
+                            ""ApiKind"": ""Scalar"",
                             ""ApiName"": ""String""
                         },
                         ""ApiTypeModifiers"": ""Required"",
@@ -2966,7 +2966,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     {
                         ""ApiName"": ""RequiredNumber"",
                         ""ApiType"": {
-                            ""Kind"": ""Scalar"",
+                            ""ApiKind"": ""Scalar"",
                             ""ApiName"": ""Int64""
                         },
                         ""ApiTypeModifiers"": ""Required"",
@@ -2976,7 +2976,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     {
                         ""ApiName"": ""RequiredPredicate"",
                         ""ApiType"": {
-                            ""Kind"": ""Scalar"",
+                            ""ApiKind"": ""Scalar"",
                             ""ApiName"": ""Boolean""
                         },
                         ""ApiTypeModifiers"": ""Required"",
@@ -2986,7 +2986,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     {
                         ""ApiName"": ""OptionalName"",
                         ""ApiType"": {
-                            ""Kind"": ""Scalar"",
+                            ""ApiKind"": ""Scalar"",
                             ""ApiName"": ""String""
                         },
                         ""ApiTypeModifiers"": ""None"",
@@ -2996,7 +2996,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     {
                         ""ApiName"": ""OptionalNumber"",
                         ""ApiType"": {
-                            ""Kind"": ""Scalar"",
+                            ""ApiKind"": ""Scalar"",
                             ""ApiName"": ""Int64""
                         },
                         ""ApiTypeModifiers"": ""None"",
@@ -3006,7 +3006,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     {
                         ""ApiName"": ""OptionalPredicate"",
                         ""ApiType"": {
-                            ""Kind"": ""Scalar"",
+                            ""ApiKind"": ""Scalar"",
                             ""ApiName"": ""Boolean""
                         },
                         ""ApiTypeModifiers"": ""None"",
@@ -3034,7 +3034,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Object,
+                    ApiKind: ApiTypeKind.Object,
                     ClrType: typeof(Company)
                 ),
                 ApiNamedType: new ApiNamedTypeConfig
@@ -3087,13 +3087,13 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             ),
             ExpectedJson = @"
             {
-                ""Kind"": ""Object"",
+                ""ApiKind"": ""Object"",
                 ""ApiName"": ""Company"",
                 ""ApiProperties"": [
                     {
                         ""ApiName"": ""Name"",
                         ""ApiType"": {
-                            ""Kind"": ""Scalar"",
+                            ""ApiKind"": ""Scalar"",
                             ""ApiName"": ""String""
                         },
                         ""ApiTypeModifiers"": ""Required"",
@@ -3103,7 +3103,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                     {
                         ""ApiName"": ""Owner"",
                         ""ApiType"": {
-                            ""Kind"": ""Object"",
+                            ""ApiKind"": ""Object"",
                             ""ApiName"": ""Person""
                         },
                         ""ApiTypeModifiers"": ""None"",
@@ -3114,9 +3114,9 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                         ""ApiName"": ""Employees"",
                         ""ApiType"": {
                             ""ApiInlineType"": {
-                                ""Kind"": ""Collection"",
+                                ""ApiKind"": ""Collection"",
                                 ""ApiItemType"": {
-                                    ""Kind"": ""Object"",
+                                    ""ApiKind"": ""Object"",
                                     ""ApiName"": ""Person""
                                 },
                                 ""ApiItemTypeModifiers"": ""Required"",
@@ -3149,7 +3149,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Object,
+                    ApiKind: ApiTypeKind.Object,
                     ClrType: typeof(ScalarsOnly)
                 ),
                 ApiNamedType: new ApiNamedTypeConfig
@@ -3213,7 +3213,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             ),
             ExpectedJson = @"
             {
-                ""Kind"": ""Object"",
+                ""ApiKind"": ""Object"",
                 ""ApiName"": ""ScalarsOnly"",
                 ""ApiProperties"": [
                     {
@@ -3283,7 +3283,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Object,
+                    ApiKind: ApiTypeKind.Object,
                     ClrType: typeof(ScalarsOnly)
                 ),
                 ApiNamedType: new ApiNamedTypeConfig
@@ -3351,7 +3351,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             ),
             ExpectedJson = @"
             {
-                ""Kind"": ""Object"",
+                ""ApiKind"": ""Object"",
                 ""ApiName"": ""ScalarsOnly"",
                 ""ApiOptions"": {
                     ""ApiIdentityNullHandling"": ""ThrowException""
@@ -3424,7 +3424,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Object,
+                    ApiKind: ApiTypeKind.Object,
                     ClrType: typeof(ScalarsOnly),
                     ExtensionTypes: [ typeof(GraphQlExtension), typeof(JsonApiExtension) ]
                 ),
@@ -3489,7 +3489,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             ),
             ExpectedJson = @"
             {
-                ""Kind"": ""Object"",
+                ""ApiKind"": ""Object"",
                 ""ApiName"": ""ScalarsOnly"",
                 ""ApiProperties"": [
                     {
@@ -3567,7 +3567,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             (
                 ApiType: new ApiTypeConfig
                 (
-                    Kind: ApiTypeKind.Object,
+                    ApiKind: ApiTypeKind.Object,
                     ClrType: typeof(Company)
                 ),
                 ApiNamedType: new ApiNamedTypeConfig
@@ -3620,7 +3620,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             ),
             ExpectedJson = @"
             {
-                ""Kind"": ""Object"",
+                ""ApiKind"": ""Object"",
                 ""ApiName"": ""Company"",
                 ""ApiProperties"": [
                     {
@@ -3645,7 +3645,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                         ""ApiName"": ""Employees"",
                         ""ApiType"": {
                             ""ApiInlineType"": {
-                                ""Kind"": ""Collection"",
+                                ""ApiKind"": ""Collection"",
                                 ""ApiItemType"": {
                                     ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Person,Evoogle.ApiFramework.Core.Tests""
                                 },

@@ -35,7 +35,7 @@ public sealed class ApiEnumType
 
     #region ApiType Properties
     /// <inheritdoc/>
-    public override ApiTypeKind Kind => ApiTypeKind.Enum;
+    public override ApiTypeKind ApiKind => ApiTypeKind.Enum;
 
     /// <inheritdoc/>
     protected override string ApiTypeName => nameof(ApiEnumType);
