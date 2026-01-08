@@ -123,17 +123,11 @@ public sealed partial class ApiProperty
     /// <summary>Gets the kind of CLR member (property or field) this API property represents.</summary>
     public ClrMemberKind ClrMemberKind { get; } = clrMemberKind;
 
-    /// <summary>
-    ///     Gets the API type expression to the API type of this property.
-    ///     May point to a named type or inline type (e.g., collection).
-    /// </summary>
     internal ApiTypeExpression ApiTypeExpression { get; } = apiTypeExpression;
 
-    /// <summary>Gets the cached generic method definition for TypeCoercion.Coerce&lt;TInput, TOutput&gt;.</summary>
     private static MethodInfo GenericCoerceMethodDefinition => _genericCoerceMethodDefinition
         ?? throw new InvalidOperationException($"Failed to locate generic method definition for {nameof(TypeCoercion)}.{nameof(TypeCoercion.Coerce)}.");
 
-    /// <summary>Gets the cached non-generic method for TypeCoercion.Coerce(object, Type, TypeCoercionContext).</summary>
     private static MethodInfo NonGenericCoerceMethod => _nonGenericCoerceMethod
         ?? throw new InvalidOperationException($"Failed to locate non-generic method for {nameof(TypeCoercion)}.{nameof(TypeCoercion.Coerce)}.");
     #endregion
