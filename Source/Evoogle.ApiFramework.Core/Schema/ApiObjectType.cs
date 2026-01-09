@@ -27,15 +27,16 @@ namespace Evoogle.ApiFramework.Schema;
 ///     Initializes a new instance of the <see cref="ApiObjectType"/> class.
 /// </remarks>
 /// <param name="apiName">The API name of the object type.</param>
+/// <param name="apiOptions">The configuration options for the object type.</param>
+/// <param name="apiIdentities">The collection of API identities defined for this object type.</param>
 /// <param name="apiProperties">The collection of API properties defined on this object type.</param>
 /// <param name="apiRelationships">The collection of API relationships defined on this object type.</param>
 /// <param name="clrObjectType">The CLR type representing this API object.</param>
 public sealed partial class ApiObjectType
 (
     string apiName,
-    IEnumerable<ApiIdentity>? apiIdentities,
-    string? apiPrimaryIdentityName,
     ApiObjectTypeOptions? apiOptions,
+    IEnumerable<ApiIdentity>? apiIdentities,
     IEnumerable<ApiProperty>? apiProperties,
     IEnumerable<ApiRelationship>? apiRelationships,
     Type clrObjectType
@@ -46,8 +47,6 @@ public sealed partial class ApiObjectType
     private Dictionary<string, ApiProperty>? _apiPropertyApiNameLookup = null;
     private Dictionary<string, ApiProperty>? _apiPropertyClrNameLookup = null;
     private Dictionary<string, ApiRelationship>? _apiRelationshipApiNameLookup = null;
-
-    private ApiIdentity? _apiResolvedPrimaryIdentity = null;
     #endregion
 
     #region ApiType Properties
@@ -65,18 +64,17 @@ public sealed partial class ApiObjectType
     public ApiIdentity[] ApiIdentities { get; } = [.. apiIdentities.EmptyIfNull().Where(x => x is not null)];
 
     /// <summary>
-    ///     Gets the name of the primary identity.
-    /// </summary>
-    public string ApiPrimaryIdentityName { get; } = apiPrimaryIdentityName ?? apiIdentities.EmptyIfNull().FirstOrDefault()?.ApiName ?? string.Empty;
-
-    /// <summary>
     ///     Gets the primary API identity for this object type, if available.
     /// </summary>
     /// <remarks>
-    ///     This property is available after initialization. Returns null if no primary identity is configured.
+    ///     By convention, the first identity in <see cref="ApiIdentities"/> is the primary identity.
+    ///     Returns null if no identities are configured.
     /// </remarks>
-    public ApiIdentity? ApiPrimaryIdentity => _apiResolvedPrimaryIdentity;
+    public ApiIdentity? ApiPrimaryIdentity => this.ApiIdentities.Length > 0 ? this.ApiIdentities[0] : null;
 
+    /// <summary>
+    ///     Gets the configuration options for the object type.
+    /// </summary>
     public ApiObjectTypeOptions? ApiOptions => apiOptions;
 
     /// <summary>
@@ -291,7 +289,6 @@ public sealed partial class ApiObjectType
     {
         // Initialize identity lookup dictionary
         _apiIdentityApiNameLookup = null;
-        _apiResolvedPrimaryIdentity = null;
 
         if (this.ApiIdentities.Length == 0)
         {
@@ -322,50 +319,8 @@ public sealed partial class ApiObjectType
             apiIdentity.Initialize(childContext);
         }
 
-        // Initialize and resolve primary identity
-        this.InitializeApiPrimaryIdentity(context);
-
         // Perform additional validation after identities initialization
         this.ValidateIdentityConfiguration(context);
-    }
-
-    private void InitializeApiPrimaryIdentity(ApiInitializationContext context)
-    {
-        _apiResolvedPrimaryIdentity = null;
-
-        if (this.ApiIdentities.Length == 0)
-        {
-            // No identities, nothing to resolve
-            return;
-        }
-
-        if (string.IsNullOrWhiteSpace(this.ApiPrimaryIdentityName))
-        {
-            var path = $"{this.ApiPath}.{nameof(this.ApiPrimaryIdentityName)}";
-            var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.API_OBJECT_TYPE_INVALID_PRIMARY_IDENTITY_API_NAME;
-            var description = $"{nameof(this.ApiPrimaryIdentityName)} must not be null, empty, or whitespace";
-            var remediation = $"Specify a valid {nameof(this.ApiPrimaryIdentityName)} value";
-
-            context.AddIssue(path, severity, code, description, remediation);
-            return;
-        }
-
-        if (this.ApiIdentityApiNameLookup.TryGetValue(this.ApiPrimaryIdentityName, out var apiResolvedPrimaryIdentity))
-        {
-            _apiResolvedPrimaryIdentity = apiResolvedPrimaryIdentity;
-        }
-
-        if (_apiResolvedPrimaryIdentity is null)
-        {
-            var path = $"{this.ApiPath}.{nameof(this.ApiPrimaryIdentity)}";
-            var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.API_OBJECT_TYPE_UNRESOLVED_PRIMARY_IDENTITY;
-            var description = $"{nameof(this.ApiPrimaryIdentity)} could not be resolved for {nameof(this.ApiPrimaryIdentityName)}='{this.ApiPrimaryIdentityName.SafeToString()}'";
-            var remediation = $"Verify that an {nameof(ApiIdentity)} is declared in {nameof(this.ApiIdentities)} for {nameof(this.ApiPrimaryIdentityName)}='{this.ApiPrimaryIdentityName.SafeToString()}'";
-
-            context.AddIssue(path, severity, code, description, remediation);
-        }
     }
 
     private void InitializeApiProperties(ApiInitializationContext context)

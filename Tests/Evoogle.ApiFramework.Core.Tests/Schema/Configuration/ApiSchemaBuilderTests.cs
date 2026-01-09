@@ -213,7 +213,6 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
         ],
         apiRelationships: null,
         apiIdentities: null,
-        apiPrimaryIdentityName: null,
         apiOptions: null,
         clrObjectType: typeof(ScalarsOnly)
     );
@@ -230,7 +229,6 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
         ],
         apiRelationships: null,
         apiIdentities: null,
-        apiPrimaryIdentityName: null,
         apiOptions: null,
         clrObjectType: typeof(Person)
     );
@@ -250,7 +248,6 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
             new (apiName: nameof(Company.Employees)),
         ],
         apiIdentities: null,
-        apiPrimaryIdentityName: null,
         apiOptions: null,
         clrObjectType: typeof(Company)
     );
@@ -270,7 +267,6 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
             new (apiName: nameof(Company.Employees), apiPropertyName: nameof(Company.Employees) + "Missing"),
         ],
         apiIdentities: null,
-        apiPrimaryIdentityName: null,
         apiOptions: null,
         clrObjectType: typeof(Company)
     );

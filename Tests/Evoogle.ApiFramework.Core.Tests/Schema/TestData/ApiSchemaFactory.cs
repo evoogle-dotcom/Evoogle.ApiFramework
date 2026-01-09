@@ -244,8 +244,8 @@ public static class ApiSchemaFactory
     private static ApiIdentity I(string name, IEnumerable<string> propertyNames)
         => new(name, propertyNames.Select(pn => new ApiIdentityPart(pn)));
 
-    private static ApiObjectType O(string name, Type clr, IEnumerable<ApiProperty> properties, IEnumerable<ApiIdentity>? identities = null, string? primaryIdentityName = null, IEnumerable<ApiRelationship>? relationships = null, ApiObjectTypeOptions? options = null, OrderedDictionary<Type, object>? extensions = null)
-        => new(name, identities, primaryIdentityName, options, properties, relationships ?? [], clr)
+    private static ApiObjectType O(string name, Type clr, IEnumerable<ApiProperty> properties, IEnumerable<ApiIdentity>? identities = null, IEnumerable<ApiRelationship>? relationships = null, ApiObjectTypeOptions? options = null, OrderedDictionary<Type, object>? extensions = null)
+        => new(name, options, identities, properties, relationships ?? [], clr)
         {
             Extensions = extensions
         };
@@ -838,9 +838,8 @@ public static class ApiSchemaFactory
         var apiObjectType = (ApiType)new ApiObjectType
         (
             apiName,
-            apiIdentities: null,
-            apiPrimaryIdentityName: null,
             apiOptions,
+            apiIdentities: null,
             apiProperties,
             apiRelationships: apiRelationships,
             clrObjectType

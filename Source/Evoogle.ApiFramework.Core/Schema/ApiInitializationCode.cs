@@ -148,19 +148,9 @@ public enum ApiInitializationCode
     API_OBJECT_TYPE_DUPLICATE_RELATIONSHIP_API_NAME,
 
     /// <summary>
-    ///     The primary identity API name is null, empty, or whitespace.
-    /// </summary>
-    API_OBJECT_TYPE_INVALID_PRIMARY_IDENTITY_API_NAME,
-
-    /// <summary>
     ///     The object type has no properties defined.
     /// </summary>
     API_OBJECT_TYPE_NULL_OR_EMPTY_PROPERTIES,
-
-    /// <summary>
-    ///     The primary identity reference could not be resolved to a defined identity.
-    /// </summary>
-    API_OBJECT_TYPE_UNRESOLVED_PRIMARY_IDENTITY,
     #endregion
 
     #region ApiProperty Initialization Codes
