@@ -33,7 +33,8 @@ namespace Evoogle.ApiFramework.Schema;
 public sealed partial class ApiObjectType
 (
     string apiName,
-    ApiIdentitySet? apiIdentitySet,
+    IEnumerable<ApiIdentity>? apiIdentities,
+    string? apiPrimaryIdentityName,
     ApiObjectTypeOptions? apiOptions,
     IEnumerable<ApiProperty>? apiProperties,
     IEnumerable<ApiRelationship>? apiRelationships,
@@ -41,9 +42,12 @@ public sealed partial class ApiObjectType
 ) : ApiNamedType(apiName, clrObjectType)
 {
     #region ApiObjectType Fields
+    private Dictionary<string, ApiIdentity>? _apiIdentityApiNameLookup = null;
     private Dictionary<string, ApiProperty>? _apiPropertyApiNameLookup = null;
     private Dictionary<string, ApiProperty>? _apiPropertyClrNameLookup = null;
     private Dictionary<string, ApiRelationship>? _apiRelationshipApiNameLookup = null;
+
+    private ApiIdentity? _apiResolvedPrimaryIdentity = null;
     #endregion
 
     #region ApiType Properties
@@ -56,14 +60,22 @@ public sealed partial class ApiObjectType
 
     #region ApiObject Properties
     /// <summary>
-    ///     Gets the collection of API identities defined on this object type.
+    ///     Gets all identities defined for the object type.
     /// </summary>
-    public ApiIdentitySet? ApiIdentitySet => apiIdentitySet;
+    public ApiIdentity[] ApiIdentities { get; } = [.. apiIdentities.EmptyIfNull().Where(x => x is not null)];
+
+    /// <summary>
+    ///     Gets the name of the primary identity.
+    /// </summary>
+    public string ApiPrimaryIdentityName { get; } = apiPrimaryIdentityName ?? apiIdentities.EmptyIfNull().FirstOrDefault()?.ApiName ?? string.Empty;
 
     /// <summary>
     ///     Gets the primary API identity for this object type, if available.
     /// </summary>
-    public ApiIdentity? ApiPrimaryIdentity => this.ApiIdentitySet?.ApiPrimaryIdentity;
+    /// <remarks>
+    ///     This property is available after initialization. Returns null if no primary identity is configured.
+    /// </remarks>
+    public ApiIdentity? ApiPrimaryIdentity => _apiResolvedPrimaryIdentity;
 
     public ApiObjectTypeOptions? ApiOptions => apiOptions;
 
@@ -80,8 +92,9 @@ public sealed partial class ApiObjectType
     /// <summary>
     ///     Indicates whether this object type has any API identities defined.
     /// </summary>
-    public bool HasIdentity => this.ApiIdentitySet is not null;
+    public bool HasIdentity => this.ApiIdentities.Length > 0;
 
+    private Dictionary<string, ApiIdentity> ApiIdentityApiNameLookup => this.ThrowIfNotInitialized(_apiIdentityApiNameLookup);
     private Dictionary<string, ApiProperty> ApiPropertyApiNameLookup => this.ThrowIfNotInitialized(_apiPropertyApiNameLookup);
     private Dictionary<string, ApiProperty> ApiPropertyClrNameLookup => this.ThrowIfNotInitialized(_apiPropertyClrNameLookup);
     private Dictionary<string, ApiRelationship> ApiRelationshipApiNameLookup => this.ThrowIfNotInitialized(_apiRelationshipApiNameLookup);
@@ -99,7 +112,7 @@ public sealed partial class ApiObjectType
 
         this.InitializeApiProperties(context);
         this.InitializeApiRelationships(context);
-        this.InitializeApiIdentitySet(context);
+        this.InitializeApiIdentities(context);
     }
     #endregion
 
@@ -107,18 +120,10 @@ public sealed partial class ApiObjectType
     /// <summary>
     ///     Attempts to retrieve an API identity by its API name.
     /// </summary>
-    /// <param name="name">The name of the identity to retrieve.</param>
+    /// <param name="apiName">The name of the identity to retrieve.</param>
     /// <param name="apiIdentity">When this method returns, contains the <see cref="ApiIdentity"/> if found; otherwise, null.</param>
     /// <returns>True if the identity was found; otherwise, false.</returns>
-    public bool TryGetIdentityByApiName(string apiName, [NotNullWhen(true)] out ApiIdentity? apiIdentity)
-    {
-        if (!this.HasIdentity)
-        {
-            apiIdentity = null;
-            return false;
-        }
-        return this.ApiIdentitySet!.TryGetIdentityByApiName(apiName, out apiIdentity);
-    }
+    public bool TryGetIdentityByApiName(string apiName, [NotNullWhen(true)] out ApiIdentity? apiIdentity) => this.ApiIdentityApiNameLookup.TryGetValue(apiName, out apiIdentity);
 
     /// <summary>
     ///     Attempts to retrieve an API property by its API name.
@@ -224,7 +229,7 @@ public sealed partial class ApiObjectType
             return false;
         }
 
-        return this.ApiIdentitySet!.ApiIdentities
+        return this.ApiIdentities
             .Any(identity => identity.ApiIdentityParts
                 .Any(part => string.Equals(part.ApiPropertyName, apiPropertyName, StringComparison.OrdinalIgnoreCase)));
     }
@@ -249,7 +254,7 @@ public sealed partial class ApiObjectType
             return [];
         }
 
-        return [.. this.ApiIdentitySet!.ApiIdentities.Select(identity => identity.ApiName)];
+        return [.. this.ApiIdentities.Select(identity => identity.ApiName)];
     }
 
     /// <summary>
@@ -264,7 +269,7 @@ public sealed partial class ApiObjectType
             return false;
         }
 
-        return this.ApiIdentitySet!.TryGetIdentityByApiName(apiIdentityName, out _);
+        return this.TryGetIdentityByApiName(apiIdentityName, out _);
     }
     #endregion
 
@@ -282,19 +287,85 @@ public sealed partial class ApiObjectType
     #endregion
 
     #region Implementation Methods
-    private void InitializeApiIdentitySet(ApiInitializationContext context)
+    private void InitializeApiIdentities(ApiInitializationContext context)
     {
-        if (this.ApiIdentitySet is null)
+        // Initialize identity lookup dictionary
+        _apiIdentityApiNameLookup = null;
+        _apiResolvedPrimaryIdentity = null;
+
+        if (this.ApiIdentities.Length == 0)
         {
-            // No identity set defined; this is acceptable as identity sets are optional.
+            // No identities defined; this is acceptable as identities are optional.
             return;
         }
 
-        var childContext = context.WithParentObjectType(this);
-        this.ApiIdentitySet.Initialize(childContext);
+        // Initialize identity lookup dictionary
+        ApiSchemaHelpers.InitializeLookupDictionary
+        (
+            parts: this.ApiIdentities,
+            partKeySelector: x => x.ApiName,
+            partKeyFilter: x => !string.IsNullOrWhiteSpace(x),
+            partKeyPropertyName: nameof(ApiIdentity.ApiName),
+            path: $"{this.ApiPath}.{nameof(this.ApiIdentities)}",
+            code: ApiInitializationCode.API_OBJECT_TYPE_DUPLICATE_IDENTITY_API_NAME,
+            context: context,
+            lookupDictionary: out _apiIdentityApiNameLookup
+        );
 
-        // Perform additional validation after identity set initialization
+        // Initialize each identity
+        var apiIdentitiesCount = this.ApiIdentities.Length;
+        for (var i = 0; i < apiIdentitiesCount; ++i)
+        {
+            var apiIdentity = this.ApiIdentities[i];
+
+            var childContext = context.WithParentObjectType(this);
+            apiIdentity.Initialize(childContext);
+        }
+
+        // Initialize and resolve primary identity
+        this.InitializeApiPrimaryIdentity(context);
+
+        // Perform additional validation after identities initialization
         this.ValidateIdentityConfiguration(context);
+    }
+
+    private void InitializeApiPrimaryIdentity(ApiInitializationContext context)
+    {
+        _apiResolvedPrimaryIdentity = null;
+
+        if (this.ApiIdentities.Length == 0)
+        {
+            // No identities, nothing to resolve
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(this.ApiPrimaryIdentityName))
+        {
+            var path = $"{this.ApiPath}.{nameof(this.ApiPrimaryIdentityName)}";
+            var severity = ApiInitializationSeverity.Error;
+            var code = ApiInitializationCode.API_OBJECT_TYPE_INVALID_PRIMARY_IDENTITY_API_NAME;
+            var description = $"{nameof(this.ApiPrimaryIdentityName)} must not be null, empty, or whitespace";
+            var remediation = $"Specify a valid {nameof(this.ApiPrimaryIdentityName)} value";
+
+            context.AddIssue(path, severity, code, description, remediation);
+            return;
+        }
+
+        if (this.ApiIdentityApiNameLookup.TryGetValue(this.ApiPrimaryIdentityName, out var apiResolvedPrimaryIdentity))
+        {
+            _apiResolvedPrimaryIdentity = apiResolvedPrimaryIdentity;
+        }
+
+        if (_apiResolvedPrimaryIdentity is null)
+        {
+            var path = $"{this.ApiPath}.{nameof(this.ApiPrimaryIdentity)}";
+            var severity = ApiInitializationSeverity.Error;
+            var code = ApiInitializationCode.API_OBJECT_TYPE_UNRESOLVED_PRIMARY_IDENTITY;
+            var description = $"{nameof(this.ApiPrimaryIdentity)} could not be resolved for {nameof(this.ApiPrimaryIdentityName)}='{this.ApiPrimaryIdentityName.SafeToString()}'";
+            var remediation = $"Verify that an {nameof(ApiIdentity)} is declared in {nameof(this.ApiIdentities)} for {nameof(this.ApiPrimaryIdentityName)}='{this.ApiPrimaryIdentityName.SafeToString()}'";
+
+            context.AddIssue(path, severity, code, description, remediation);
+        }
     }
 
     private void InitializeApiProperties(ApiInitializationContext context)
@@ -386,14 +457,14 @@ public sealed partial class ApiObjectType
 
     private void ValidateIdentityConfiguration(ApiInitializationContext context)
     {
-        if (this.ApiIdentitySet is null || this.ApiIdentitySet.ApiIdentities.Length <= 1)
+        if (this.ApiIdentities.Length <= 1)
         {
             // No validation needed for single or no identities
             return;
         }
 
         // Check for ambiguous identities (same property sets)
-        var identities = this.ApiIdentitySet.ApiIdentities;
+        var identities = this.ApiIdentities;
         for (var i = 0; i < identities.Length; i++)
         {
             for (var j = i + 1; j < identities.Length; j++)
@@ -413,7 +484,7 @@ public sealed partial class ApiObjectType
 
                 if (props1.SequenceEqual(props2, StringComparer.OrdinalIgnoreCase))
                 {
-                    var path = $"{this.ApiPath}.{nameof(this.ApiIdentitySet)}";
+                    var path = $"{this.ApiPath}.{nameof(this.ApiIdentities)}";
                     var severity = ApiInitializationSeverity.Warning;
                     var code = ApiInitializationCode.API_IDENTITY_VALIDATION_AMBIGUOUS_IDENTITIES;
                     var description = $"Identities '{identity1.ApiName}' and '{identity2.ApiName}' use the same property set [{string.Join(", ", props1)}], which may cause ambiguity";

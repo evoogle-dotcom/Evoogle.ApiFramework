@@ -93,7 +93,8 @@ public sealed class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext c
         var apiObjectType = new ApiObjectType
         (
             apiName,
-            apiIdentitySet: null,
+            apiIdentities: null,
+            apiPrimaryIdentityName: null,
             apiOptions,
             apiProperties,
             apiRelationships,

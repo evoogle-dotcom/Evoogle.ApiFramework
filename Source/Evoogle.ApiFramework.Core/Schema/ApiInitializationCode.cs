@@ -65,28 +65,6 @@ public enum ApiInitializationCode
     API_ENUM_VALUE_INVALID_CLR_NAME,
     #endregion
 
-    #region ApiIdentitySet Initialization Codes
-    /// <summary>
-    ///     Multiple identities have the same API name.
-    /// </summary>
-    API_IDENTITY_SET_DUPLICATE_API_NAME,
-
-    /// <summary>
-    ///     The primary identity API name is null, empty, or whitespace.
-    /// </summary>
-    API_IDENTITY_SET_INVALID_PRIMARY_API_NAME,
-
-    /// <summary>
-    ///     The identity set has no identities defined.
-    /// </summary>
-    API_IDENTITY_SET_NULL_OR_EMPTY_IDENTITIES,
-
-    /// <summary>
-    ///     The primary identity reference could not be resolved to a defined identity.
-    /// </summary>
-    API_IDENTITY_SET_UNRESOLVED_PRIMARY,
-    #endregion
-
     #region ApiIdentity Initialization Codes
     /// <summary>
     ///     Multiple identity parts reference the same property API name.
@@ -150,6 +128,11 @@ public enum ApiInitializationCode
 
     #region ApiObjectType Initialization Codes
     /// <summary>
+    ///     Multiple identities have the same API name.
+    /// </summary>
+    API_OBJECT_TYPE_DUPLICATE_IDENTITY_API_NAME,
+
+    /// <summary>
     ///     Multiple properties have the same API name.
     /// </summary>
     API_OBJECT_TYPE_DUPLICATE_PROPERTY_API_NAME,
@@ -165,9 +148,19 @@ public enum ApiInitializationCode
     API_OBJECT_TYPE_DUPLICATE_RELATIONSHIP_API_NAME,
 
     /// <summary>
+    ///     The primary identity API name is null, empty, or whitespace.
+    /// </summary>
+    API_OBJECT_TYPE_INVALID_PRIMARY_IDENTITY_API_NAME,
+
+    /// <summary>
     ///     The object type has no properties defined.
     /// </summary>
     API_OBJECT_TYPE_NULL_OR_EMPTY_PROPERTIES,
+
+    /// <summary>
+    ///     The primary identity reference could not be resolved to a defined identity.
+    /// </summary>
+    API_OBJECT_TYPE_UNRESOLVED_PRIMARY_IDENTITY,
     #endregion
 
     #region ApiProperty Initialization Codes

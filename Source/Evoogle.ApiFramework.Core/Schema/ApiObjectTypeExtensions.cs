@@ -135,7 +135,7 @@ public static class ApiObjectTypeExtensions
             return apiIdentity!;
         }
 
-        var availableIdentitiesByApiName = string.Join(',', apiObjectType.ApiIdentitySet?.ApiIdentities.OrderBy(i => i.ApiName).Select(i => i.ApiName) ?? []);
+        var availableIdentitiesByApiName = string.Join(',', apiObjectType.ApiIdentities.OrderBy(i => i.ApiName).Select(i => i.ApiName));
         var errorMessage =
             $"{nameof(ApiIdentity)} with {nameof(ApiIdentity.ApiName)} '{apiName.SafeToString()}' not found in {apiObjectType.SafeToString()}. " +
             $"Available {nameof(ApiIdentity)} by {nameof(ApiIdentity.ApiName)} are: {availableIdentitiesByApiName}.";

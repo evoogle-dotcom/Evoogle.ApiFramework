@@ -32,7 +32,7 @@ public sealed class ApiIdentity
     /// <summary>
     ///     Gets the collection of property parts that constitute this identity.
     /// </summary>
-    public ApiIdentityPart[] ApiIdentityParts { get; } = [.. apiIdentityParts.EmptyIfNull().Where(x => x is not null).OrderBy(x => x.ApiPropertyName, StringComparer.OrdinalIgnoreCase)];
+    public ApiIdentityPart[] ApiIdentityParts { get; } = [.. apiIdentityParts.EmptyIfNull().Where(x => x is not null)];
 
     /// <summary>
     ///     Gets a value indicating whether this identity is composite (has two or more parts).

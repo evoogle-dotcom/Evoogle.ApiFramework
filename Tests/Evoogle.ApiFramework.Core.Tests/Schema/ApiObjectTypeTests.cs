@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -541,9 +541,9 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
             ApiIdentityName = null,
             ShouldSucceed = true,
             ExpectedId = ApiId.Composite(
-                new ApiIdPart("BatchId", ApiId.FromGuid(Guid.Parse("12345678-1234-1234-1234-123456789abc"))),
+                new ApiIdPart("WarehouseId", ApiId.FromInt32(123)),
                 new ApiIdPart("ProductCode", ApiId.FromString("PROD-456")),
-                new ApiIdPart("WarehouseId", ApiId.FromInt32(123))
+                new ApiIdPart("BatchId", ApiId.FromGuid(Guid.Parse("12345678-1234-1234-1234-123456789abc")))
             )
         },
 
@@ -674,9 +674,9 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
             ApiIdentityName = null,
             ShouldSucceed = true,
             ExpectedId = ApiId.Composite(
-                new ApiIdPart("BatchId", ApiId.FromGuid(Guid.Parse("12345678-1234-1234-1234-123456789abc"))),
+                new ApiIdPart("WarehouseId", ApiId.FromInt32(123)),
                 new ApiIdPart("ProductCode", ApiId.FromString("PROD-456")),
-                new ApiIdPart("WarehouseId", ApiId.FromInt32(123))
+                new ApiIdPart("BatchId", ApiId.FromGuid(Guid.Parse("12345678-1234-1234-1234-123456789abc")))
             )
         },
 
@@ -843,9 +843,9 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
             ApiIdentityName = null,
             ExpectedResult = true,
             ExpectedId = ApiId.Composite(
-                new ApiIdPart("BatchId", ApiId.FromGuid(Guid.Parse("12345678-1234-1234-1234-123456789abc"))),
+                new ApiIdPart("WarehouseId", ApiId.FromInt32(123)),
                 new ApiIdPart("ProductCode", ApiId.FromString("PROD-456")),
-                new ApiIdPart("WarehouseId", ApiId.FromInt32(123))
+                new ApiIdPart("BatchId", ApiId.FromGuid(Guid.Parse("12345678-1234-1234-1234-123456789abc")))
             )
         },
 
@@ -918,9 +918,9 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
             ApiIdentityName = null,
             ExpectedResult = true,
             ExpectedId = ApiId.Composite(
-                new ApiIdPart("BatchId", ApiId.FromGuid(Guid.Parse("12345678-1234-1234-1234-123456789abc"))),
+                new ApiIdPart("WarehouseId", ApiId.FromInt32(123)),
                 new ApiIdPart("ProductCode", ApiId.FromString("PROD-456")),
-                new ApiIdPart("WarehouseId", ApiId.FromInt32(123))
+                new ApiIdPart("BatchId", ApiId.FromGuid(Guid.Parse("12345678-1234-1234-1234-123456789abc")))
             )
         },
 

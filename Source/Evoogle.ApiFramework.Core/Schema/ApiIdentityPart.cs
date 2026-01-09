@@ -36,7 +36,7 @@ public sealed class ApiIdentityPart
     public string ApiPropertyName { get; } = apiPropertyName;
 
     /// <summary>
-    ///     Gets the optional CLR type override for <see cref="Identity.ApiId"/> conversion.
+    ///     Gets the optional CLR type override for <see cref="ApiId"/> conversion.
     /// </summary>
     /// <remarks>
     ///     If null, the type is detected automatically based on the property's CLR type.
@@ -52,7 +52,7 @@ public sealed class ApiIdentityPart
     public ApiProperty ApiProperty => this.ThrowIfNotInitialized(_apiResolvedProperty);
 
     /// <summary>
-    ///     Gets the resolved target CLR type for <see cref="Identity.ApiId"/> conversion.
+    ///     Gets the resolved target CLR type for <see cref="ApiId"/> conversion.
     /// </summary>
     /// <remarks>
     ///     This is either the <see cref="TargetClrType"/> override or automatically detected from

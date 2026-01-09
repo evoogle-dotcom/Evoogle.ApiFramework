@@ -585,7 +585,7 @@ public sealed partial class ApiObjectType
             return this.TryGetIdentityByApiName(apiIdentityName, out var id) ? id : null;
         }
 
-        return this.ApiIdentitySet!.ApiPrimaryIdentity;
+        return this.ApiPrimaryIdentity;
     }
     #endregion
 }

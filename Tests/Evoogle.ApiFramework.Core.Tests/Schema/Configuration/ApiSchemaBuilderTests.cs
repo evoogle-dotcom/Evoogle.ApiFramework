@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -212,7 +212,8 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
             new (apiName: nameof(ScalarsOnly.OptionalPredicate), apiTypeExpression: ApiTypeExpression.ClrRef<bool>(), apiTypeModifiers: ApiTypeModifiers.None, clrName: nameof(ScalarsOnly.OptionalPredicate), clrMemberKind: ClrMemberKind.Field),
         ],
         apiRelationships: null,
-        apiIdentitySet: null,
+        apiIdentities: null,
+        apiPrimaryIdentityName: null,
         apiOptions: null,
         clrObjectType: typeof(ScalarsOnly)
     );
@@ -228,7 +229,8 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
             new (apiName: nameof(Person.Hobbies), apiTypeExpression: ApiTypeExpression.ListOf<string>(apiItemTypeModifiers: ApiTypeModifiers.Required), apiTypeModifiers: ApiTypeModifiers.None, clrName: nameof(Person.Hobbies), clrMemberKind: ClrMemberKind.Property),
         ],
         apiRelationships: null,
-        apiIdentitySet: null,
+        apiIdentities: null,
+        apiPrimaryIdentityName: null,
         apiOptions: null,
         clrObjectType: typeof(Person)
     );
@@ -247,7 +249,8 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
             new (apiName: nameof(Company.Owner)),
             new (apiName: nameof(Company.Employees)),
         ],
-        apiIdentitySet: null,
+        apiIdentities: null,
+        apiPrimaryIdentityName: null,
         apiOptions: null,
         clrObjectType: typeof(Company)
     );
@@ -266,7 +269,8 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
             new (apiName: nameof(Company.Owner), apiPropertyName: nameof(Company.Owner) + "Missing"),
             new (apiName: nameof(Company.Employees), apiPropertyName: nameof(Company.Employees) + "Missing"),
         ],
-        apiIdentitySet: null,
+        apiIdentities: null,
+        apiPrimaryIdentityName: null,
         apiOptions: null,
         clrObjectType: typeof(Company)
     );
