@@ -3,8 +3,11 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Text.Json.Serialization;
+
 using Evoogle.ApiFramework.Identity;
 using Evoogle.ApiFramework.Schema.Internal;
+using Evoogle.ApiFramework.Schema.Json;
 using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema;
@@ -18,6 +21,7 @@ namespace Evoogle.ApiFramework.Schema;
 /// </remarks>
 /// <param name="apiPropertyName">The name of the property that is part of the identity.</param>
 /// <param name="targetClrType">Optional CLR type to use for <see cref="ApiId"/> conversion. If null, the type is detected automatically.</param>
+[JsonConverter(typeof(ApiIdentityPartJsonConverter))]
 public sealed class ApiIdentityPart
 (
     string apiPropertyName,

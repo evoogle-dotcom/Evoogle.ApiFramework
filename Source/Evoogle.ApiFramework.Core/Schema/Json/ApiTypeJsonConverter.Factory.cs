@@ -52,6 +52,7 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
     private static ApiObjectType CreateApiObjectType(DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
     {
         var apiName = context.ReadData.ApiNamedType?.ApiName;
+        var apiIdentities = context.ReadData.ApiObjectType?.ApiIdentities;
         var apiProperties = context.ReadData.ApiObjectType?.ApiProperties;
         var apiRelationships = context.ReadData.ApiObjectType?.ApiRelationships;
         var apiOptions = context.ReadData.ApiObjectType?.ApiOptions;
@@ -61,9 +62,9 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
         (
             apiName!,
             apiOptions,
-            apiIdentities: null,
-            apiProperties!,
-            apiRelationships!,
+            apiIdentities,
+            apiProperties,
+            apiRelationships,
             clrType!
         );
 

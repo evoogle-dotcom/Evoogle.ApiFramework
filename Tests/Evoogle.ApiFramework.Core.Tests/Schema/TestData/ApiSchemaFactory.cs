@@ -60,6 +60,7 @@ public static class ApiSchemaFactory
     public record ApiObjectTypeConfig
     (
         ApiObjectTypeOptionsConfig? ApiOptions = null,
+        List<ApiIdentityConfig>? ApiIdentities = null,
         List<ApiPropertyConfig>? ApiProperties = null,
         List<ApiRelationshipConfig>? ApiRelationships = null
     );
@@ -67,6 +68,18 @@ public static class ApiSchemaFactory
     public record ApiObjectTypeOptionsConfig
     (
         ApiIdentityNullHandling? ApiIdentityNullHandling = null
+    );
+
+    public record ApiIdentityConfig
+    (
+        string ApiName,
+        List<ApiIdentityPartConfig> ApiIdentityParts
+    );
+
+    public record ApiIdentityPartConfig
+    (
+        string ApiPropertyName,
+        Type? TargetClrType = null
     );
 
     public record ApiPropertyConfig
@@ -569,7 +582,8 @@ public static class ApiSchemaFactory
             S(name: nameof(String),  clr: typeof(string)),
             S(name: nameof(Int32),   clr: typeof(int)),
             S(name: nameof(Int64),   clr: typeof(long)),
-            S(name: nameof(Boolean), clr: typeof(bool))
+            S(name: nameof(Boolean), clr: typeof(bool)),
+            S(name: nameof(Ulid),    clr: typeof(Ulid))
         };
 
         // 2) Enums
@@ -611,20 +625,27 @@ public static class ApiSchemaFactory
             P(name: nameof(ScalarsOnly.OptionalPredicate), expression: TE.ClrRef<bool>(),   required: false)
         ]);
 
-        var person = O(name: nameof(Person), clr: typeof(Person), options: OO(ApiIdentityNullHandling.ThrowException), properties:
+        var person = O(name: nameof(Person), clr: typeof(Person), options: OO(ApiIdentityNullHandling.ThrowException), identities:
         [
-            P(name: nameof(Person.Id),      expression: TE.ClrRef<int>(),                  required: true),
-            P(name: nameof(Person.Name),    expression: TE.ClrRef<string>(),               required: true),
-            P(name: nameof(Person.Age),     expression: TE.ClrRef<int>(),                  required: false),
-            P(name: nameof(Person.Gender),  expression: TE.ClrRef<Gender>(),               required: false),
-            P(name: nameof(Person.Hobbies), expression: TE.ListOf<string>(required: true), required: false)
-        ], identities:
+            I("PK_Person_Id", [nameof(Person.Id)]),
+            I("AK_Person_Name", [nameof(Person.Name)])
+        ], properties:
         [
-            I("PrimaryIdentity", [nameof(Person.Id)])
+            P(name: nameof(Person.Id),        expression: TE.ClrRef<int>(),                  required: true),
+            P(name: nameof(Person.Name),      expression: TE.ClrRef<string>(),               required: true),
+            P(name: nameof(Person.Age),       expression: TE.ClrRef<int>(),                  required: false),
+            P(name: nameof(Person.Gender),    expression: TE.ClrRef<Gender>(),               required: false),
+            P(name: nameof(Person.Hobbies),   expression: TE.ListOf<string>(required: true), required: false),
+            P(name: nameof(Person.CompanyId), expression: TE.ClrRef<Ulid>(),                 required: false),
         ]);
 
-        var company = O(name: nameof(Company), clr: typeof(Company), options: OO(ApiIdentityNullHandling.ThrowException), properties:
+        var company = O(name: nameof(Company), clr: typeof(Company), options: OO(ApiIdentityNullHandling.ThrowException), identities:
         [
+            I("PK_Company_Id", [nameof(Company.Id)]),
+            I("AK_Company_Name", [nameof(Company.Name)])
+        ], properties:
+        [
+            P(name: nameof(Company.Id),        expression: TE.ClrRef<Ulid>(),                 required: true),
             P(name: nameof(Company.Name),      expression: TE.ClrRef<string>(),               required: true),
             P(name: nameof(Company.Owner),     expression: TE.ClrRef<Person>(),               required: false),
             P(name: nameof(Company.Employees), expression: TE.ListOf<Person>(required: true), required: false)
@@ -810,6 +831,17 @@ public static class ApiSchemaFactory
 
         var apiOptions = BuildApiObjectTypeOptions(apiObjectTypeConfig);
 
+        var apiIdentities = apiObjectTypeConfig.ApiIdentities?
+                .Select(x =>
+                {
+                    var apiIdentity = new ApiIdentity
+                    (
+                        apiName: x.ApiName,
+                        apiIdentityParts: x.ApiIdentityParts.Select(part => new ApiIdentityPart(part.ApiPropertyName, part.TargetClrType))
+                    );
+                    return apiIdentity;
+                });
+
         var apiProperties = apiObjectTypeConfig.ApiProperties?
                 .Select(x =>
                 {
@@ -839,9 +871,9 @@ public static class ApiSchemaFactory
         (
             apiName,
             apiOptions,
-            apiIdentities: null,
+            apiIdentities,
             apiProperties,
-            apiRelationships: apiRelationships,
+            apiRelationships,
             clrObjectType
         );
         return apiObjectType;

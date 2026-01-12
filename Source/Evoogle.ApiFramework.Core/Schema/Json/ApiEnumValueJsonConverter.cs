@@ -75,7 +75,7 @@ public class ApiEnumValueJsonConverter(ILogger<ApiEnumValueJsonConverter>? logge
     private class ReadData : ExtensibleReadData
     {
         #region Properties
-        public ApiEnumValueReadData ApiEnumValue { get; } = new();
+        public ApiEnumValueReadData? ApiEnumValue { get; set; }
         #endregion
     }
 
@@ -100,16 +100,22 @@ public class ApiEnumValueJsonConverter(ILogger<ApiEnumValueJsonConverter>? logge
         #region ApiEnumValue Methods
         private static void HandleApiEnumValueApiName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
+            context.ReadData.ApiEnumValue ??= new ApiEnumValueReadData();
+
             context.ReadData.ApiEnumValue.ApiName = reader.GetString();
         }
 
         private static void HandleApiEnumValueClrName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
+            context.ReadData.ApiEnumValue ??= new ApiEnumValueReadData();
+
             context.ReadData.ApiEnumValue.ClrName = reader.GetString();
         }
 
         private static void HandleApiEnumValueClrOrdinal(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
+            context.ReadData.ApiEnumValue ??= new ApiEnumValueReadData();
+
             context.ReadData.ApiEnumValue.ClrOrdinal = reader.GetInt32();
         }
         #endregion
@@ -147,9 +153,9 @@ public class ApiEnumValueJsonConverter(ILogger<ApiEnumValueJsonConverter>? logge
         var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
         var readData = readContext.ReadData.ApiEnumValue;
 
-        var apiName = readData.ApiName;
-        var clrName = readData.ClrName;
-        var clrOrdinal = readData.ClrOrdinal.GetValueOrDefault();
+        var apiName = readData?.ApiName;
+        var clrName = readData?.ClrName;
+        var clrOrdinal = readData?.ClrOrdinal.GetValueOrDefault() ?? 0;
 
         var apiEnumValue = new ApiEnumValue(apiName!, clrName!, clrOrdinal);
 

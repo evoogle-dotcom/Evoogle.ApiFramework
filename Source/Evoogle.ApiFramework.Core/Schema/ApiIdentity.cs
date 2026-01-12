@@ -3,7 +3,10 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Text.Json.Serialization;
+
 using Evoogle.ApiFramework.Schema.Internal;
+using Evoogle.ApiFramework.Schema.Json;
 using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema;
@@ -17,6 +20,7 @@ namespace Evoogle.ApiFramework.Schema;
 /// </remarks>
 /// <param name="apiName">The name of the identity.</param>
 /// <param name="apiIdentityParts">The collection of property parts that make up this identity.</param>
+[JsonConverter(typeof(ApiIdentityJsonConverter))]
 public sealed class ApiIdentity
 (
     string apiName,

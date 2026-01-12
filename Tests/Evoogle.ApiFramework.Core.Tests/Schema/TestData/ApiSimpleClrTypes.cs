@@ -93,6 +93,7 @@ public sealed class Person
     public int? Age { get; set; }
     public Gender? Gender { get; set; }
     public List<string>? Hobbies { get; set; }
+    public Ulid? CompanyId { get; set; }
 
     public override string ToString()
     {
@@ -101,24 +102,27 @@ public sealed class Person
         var age = this.Age.SafeToString();
         var gender = this.Gender.SafeToString();
         var hobbies = this.Hobbies.SafeToString();
+        var companyId = this.CompanyId.SafeToString();
 
-        return $"{nameof(Person)} {{{nameof(this.Id)}={id}, {nameof(this.Name)}={name}, {nameof(this.Age)}={age}, {nameof(this.Gender)}={gender}, {nameof(this.Hobbies)}={hobbies}}}";
+        return $"{nameof(Person)} {{{nameof(this.Id)}={id}, {nameof(this.Name)}={name}, {nameof(this.Age)}={age}, {nameof(this.Gender)}={gender}, {nameof(this.Hobbies)}={hobbies}, {nameof(this.CompanyId)}={companyId}}}";
     }
 }
 
 public sealed class Company
 {
+    public Ulid Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public Person? Owner { get; set; }
     public List<Person>? Employees { get; set; }
 
     public override string ToString()
     {
+        var id = this.Id.SafeToString();
         var name = this.Name.SafeToString();
         var owner = this.Owner.SafeToString();
         var employees = this.Employees.SafeToString();
 
-        return $"{nameof(Company)} {{{nameof(this.Name)}={name}, {nameof(this.Owner)}={owner}, {nameof(this.Employees)}={employees}}}";
+        return $"{nameof(Company)} {{{nameof(this.Id)}={id}, {nameof(this.Name)}={name}, {nameof(this.Owner)}={owner}, {nameof(this.Employees)}={employees}}}";
     }
 }
 #endregion

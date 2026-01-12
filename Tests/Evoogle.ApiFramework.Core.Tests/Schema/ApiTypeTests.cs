@@ -410,6 +410,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             {
                 ""ApiKind"": ""Object"",
                 ""ApiName"": ""ScalarsOnly"",
+                ""ApiIdentities"": [],
                 ""ApiProperties"": [
                     {
                         ""ApiName"": ""RequiredName"",
@@ -553,6 +554,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 ""ApiOptions"": {
                     ""ApiIdentityNullHandling"": ""ThrowException""
                 },
+                ""ApiIdentities"": [],
                 ""ApiProperties"": [
                     {
                         ""ApiName"": ""RequiredName"",
@@ -697,6 +699,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             {
                 ""ApiKind"": ""Object"",
                 ""ApiName"": ""ScalarsOnly"",
+                ""ApiIdentities"": [],
                 ""ApiProperties"": [
                     {
                         ""ApiName"": ""RequiredName"",
@@ -846,7 +849,35 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             {
                 ""ApiKind"": ""Object"",
                 ""ApiName"": ""Company"",
+                ""ApiIdentities"": [
+                    {
+                        ""ApiName"": ""PK_Company_Id"",
+                        ""ApiIdentityParts"": [
+                            {
+                                ""ApiPropertyName"": ""Id""
+                            }
+                        ]
+                    },
+                    {
+                        ""ApiName"": ""AK_Company_Name"",
+                        ""ApiIdentityParts"": [
+                            {
+                                ""ApiPropertyName"": ""Name""
+                            }
+                        ]
+                    }
+                ],
                 ""ApiProperties"": [
+                    {
+                        ""ApiName"": ""Id"",
+                        ""ApiType"": {
+                            ""ApiKind"": ""Scalar"",
+                            ""ApiName"": ""Ulid""
+                        },
+                        ""ApiTypeModifiers"": ""Required"",
+                        ""ClrName"": ""Id"",
+                        ""ClrMemberKind"": ""Property""
+                    },
                     {
                         ""ApiName"": ""Name"",
                         ""ApiType"": {
@@ -909,8 +940,41 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 ),
                 ApiObjectType: new ApiObjectTypeConfig
                 (
+                    ApiIdentities:
+                    [
+                        new ApiIdentityConfig
+                        (
+                            ApiName: "PK_Company_Id",
+                            ApiIdentityParts:
+                            [
+                                new ApiIdentityPartConfig
+                                (
+                                    ApiPropertyName: nameof(Company.Id)
+                                )
+                            ]
+                        ),
+                        new ApiIdentityConfig
+                        (
+                            ApiName: "AK_Company_Name",
+                            ApiIdentityParts:
+                            [
+                                new ApiIdentityPartConfig
+                                (
+                                    ApiPropertyName: nameof(Company.Name)
+                                )
+                            ]
+                        )
+                    ],
                     ApiProperties:
                     [
+                        new ApiPropertyConfig
+                        (
+                            ApiName: nameof(Company.Id),
+                            ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Ulid)),
+                            ApiTypeModifiers: ApiTypeModifiers.Required,
+                            ClrName: nameof(Company.Id),
+                            ClrMemberKind: ClrMemberKind.Property
+                        ),
                         new ApiPropertyConfig
                         (
                             ApiName: nameof(Company.Name),
@@ -961,6 +1025,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             {
                 ""ApiKind"": ""Object"",
                 ""ApiName"": ""ScalarsOnly"",
+                ""ApiIdentities"": [],
                 ""ApiProperties"": [
                     {
                         ""ApiName"": ""RequiredName"",
@@ -1098,6 +1163,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 ""ApiOptions"": {
                     ""ApiIdentityNullHandling"": ""ThrowException""
                 },
+                ""ApiIdentities"": [],
                 ""ApiProperties"": [
                     {
                         ""ApiName"": ""RequiredName"",
@@ -1236,6 +1302,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             {
                 ""ApiKind"": ""Object"",
                 ""ApiName"": ""ScalarsOnly"",
+                ""ApiIdentities"": [],
                 ""ApiProperties"": [
                     {
                         ""ApiName"": ""RequiredName"",
@@ -1379,7 +1446,34 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             {
                 ""ApiKind"": ""Object"",
                 ""ApiName"": ""Company"",
+                ""ApiIdentities"": [
+                    {
+                        ""ApiName"": ""PK_Company_Id"",
+                        ""ApiIdentityParts"": [
+                            {
+                                ""ApiPropertyName"": ""Id""
+                            }
+                        ]
+                    },
+                    {
+                        ""ApiName"": ""AK_Company_Name"",
+                        ""ApiIdentityParts"": [
+                            {
+                                ""ApiPropertyName"": ""Name""
+                            }
+                        ]
+                    }
+                ],
                 ""ApiProperties"": [
+                    {
+                        ""ApiName"": ""Id"",
+                        ""ApiType"": {
+                            ""ClrType"": ""System.Ulid,Ulid""
+                        },
+                        ""ApiTypeModifiers"": ""Required"",
+                        ""ClrName"": ""Id"",
+                        ""ClrMemberKind"": ""Property""
+                    },
                     {
                         ""ApiName"": ""Name"",
                         ""ApiType"": {
@@ -1439,8 +1533,41 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 ),
                 ApiObjectType: new ApiObjectTypeConfig
                 (
+                    ApiIdentities:
+                    [
+                        new ApiIdentityConfig
+                        (
+                            ApiName: "PK_Company_Id",
+                            ApiIdentityParts:
+                            [
+                                new ApiIdentityPartConfig
+                                (
+                                    ApiPropertyName: nameof(Company.Id)
+                                )
+                            ]
+                        ),
+                        new ApiIdentityConfig
+                        (
+                            ApiName: "AK_Company_Name",
+                            ApiIdentityParts:
+                            [
+                                new ApiIdentityPartConfig
+                                (
+                                    ApiPropertyName: nameof(Company.Name)
+                                )
+                            ]
+                        )
+                    ],
                     ApiProperties:
                     [
+                        new ApiPropertyConfig
+                        (
+                            ApiName: nameof(Company.Id),
+                            ApiTypeExpression: new ApiTypeExpression(clrType: typeof(Ulid)),
+                            ApiTypeModifiers: ApiTypeModifiers.Required,
+                            ClrName: nameof(Company.Id),
+                            ClrMemberKind: ClrMemberKind.Property
+                        ),
                         new ApiPropertyConfig
                         (
                             ApiName: nameof(Company.Name),
@@ -1924,8 +2051,41 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 ),
                 ApiObjectType: new ApiObjectTypeConfig
                 (
+                    ApiIdentities:
+                    [
+                        new ApiIdentityConfig
+                        (
+                            ApiName: "PK_Company_Id",
+                            ApiIdentityParts:
+                            [
+                                new ApiIdentityPartConfig
+                                (
+                                    ApiPropertyName: nameof(Company.Id)
+                                )
+                            ]
+                        ),
+                        new ApiIdentityConfig
+                        (
+                            ApiName: "AK_Company_Name",
+                            ApiIdentityParts:
+                            [
+                                new ApiIdentityPartConfig
+                                (
+                                    ApiPropertyName: nameof(Company.Name)
+                                )
+                            ]
+                        )
+                    ],
                     ApiProperties:
                     [
+                        new ApiPropertyConfig
+                        (
+                            ApiName: nameof(Company.Id),
+                            ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Ulid)),
+                            ApiTypeModifiers: ApiTypeModifiers.Required,
+                            ClrName: nameof(Company.Id),
+                            ClrMemberKind: ClrMemberKind.Property
+                        ),
                         new ApiPropertyConfig
                         (
                             ApiName: nameof(Company.Name),
@@ -2203,8 +2363,41 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 ),
                 ApiObjectType: new ApiObjectTypeConfig
                 (
+                    ApiIdentities:
+                    [
+                        new ApiIdentityConfig
+                        (
+                            ApiName: "PK_Company_Id",
+                            ApiIdentityParts:
+                            [
+                                new ApiIdentityPartConfig
+                                (
+                                    ApiPropertyName: nameof(Company.Id)
+                                )
+                            ]
+                        ),
+                        new ApiIdentityConfig
+                        (
+                            ApiName: "AK_Company_Name",
+                            ApiIdentityParts:
+                            [
+                                new ApiIdentityPartConfig
+                                (
+                                    ApiPropertyName: nameof(Company.Name)
+                                )
+                            ]
+                        )
+                    ],
                     ApiProperties:
                     [
+                        new ApiPropertyConfig
+                        (
+                            ApiName: nameof(Company.Id),
+                            ApiTypeExpression: new ApiTypeExpression(clrType: typeof(Ulid)),
+                            ApiTypeModifiers: ApiTypeModifiers.Required,
+                            ClrName: nameof(Company.Id),
+                            ClrMemberKind: ClrMemberKind.Property
+                        ),
                         new ApiPropertyConfig
                         (
                             ApiName: nameof(Company.Name),
@@ -2664,6 +2857,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             {
                 ""ApiKind"": ""Object"",
                 ""ApiName"": ""ScalarsOnly"",
+                ""ApiIdentities"": [],
                 ""ApiProperties"": [
                     {
                         ""ApiName"": ""RequiredName"",
@@ -2811,6 +3005,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 ""ApiOptions"": {
                     ""ApiIdentityNullHandling"": ""ThrowException""
                 },
+                ""ApiIdentities"": [],
                 ""ApiProperties"": [
                     {
                         ""ApiName"": ""RequiredName"",
@@ -2952,6 +3147,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             {
                 ""ApiKind"": ""Object"",
                 ""ApiName"": ""ScalarsOnly"",
+                ""ApiIdentities"": [],
                 ""ApiProperties"": [
                     {
                         ""ApiName"": ""RequiredName"",
@@ -3043,8 +3239,41 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 ),
                 ApiObjectType: new ApiObjectTypeConfig
                 (
+                    ApiIdentities:
+                    [
+                        new ApiIdentityConfig
+                        (
+                            ApiName: "PK_Company_Id",
+                            ApiIdentityParts:
+                            [
+                                new ApiIdentityPartConfig
+                                (
+                                    ApiPropertyName: nameof(Company.Id)
+                                )
+                            ]
+                        ),
+                        new ApiIdentityConfig
+                        (
+                            ApiName: "AK_Company_Name",
+                            ApiIdentityParts:
+                            [
+                                new ApiIdentityPartConfig
+                                (
+                                    ApiPropertyName: nameof(Company.Name)
+                                )
+                            ]
+                        )
+                    ],
                     ApiProperties:
                     [
+                        new ApiPropertyConfig
+                        (
+                            ApiName: nameof(Company.Id),
+                            ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Ulid)),
+                            ApiTypeModifiers: ApiTypeModifiers.Required,
+                            ClrName: nameof(Company.Id),
+                            ClrMemberKind: ClrMemberKind.Property
+                        ),
                         new ApiPropertyConfig
                         (
                             ApiName: nameof(Company.Name),
@@ -3089,7 +3318,35 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             {
                 ""ApiKind"": ""Object"",
                 ""ApiName"": ""Company"",
+                ""ApiIdentities"": [
+                    {
+                        ""ApiName"": ""PK_Company_Id"",
+                        ""ApiIdentityParts"": [
+                            {
+                                ""ApiPropertyName"": ""Id""
+                            }
+                        ]
+                    },
+                    {
+                        ""ApiName"": ""AK_Company_Name"",
+                        ""ApiIdentityParts"": [
+                            {
+                                ""ApiPropertyName"": ""Name""
+                            }
+                        ]
+                    }
+                ],
                 ""ApiProperties"": [
+                    {
+                        ""ApiName"": ""Id"",
+                        ""ApiType"": {
+                            ""ApiKind"": ""Scalar"",
+                            ""ApiName"": ""Ulid""
+                        },
+                        ""ApiTypeModifiers"": ""Required"",
+                        ""ClrName"": ""Id"",
+                        ""ClrMemberKind"": ""Property""
+                    },
                     {
                         ""ApiName"": ""Name"",
                         ""ApiType"": {
@@ -3215,6 +3472,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             {
                 ""ApiKind"": ""Object"",
                 ""ApiName"": ""ScalarsOnly"",
+                ""ApiIdentities"": [],
                 ""ApiProperties"": [
                     {
                         ""ApiName"": ""RequiredName"",
@@ -3356,6 +3614,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 ""ApiOptions"": {
                     ""ApiIdentityNullHandling"": ""ThrowException""
                 },
+                ""ApiIdentities"": [],
                 ""ApiProperties"": [
                     {
                         ""ApiName"": ""RequiredName"",
@@ -3491,6 +3750,7 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             {
                 ""ApiKind"": ""Object"",
                 ""ApiName"": ""ScalarsOnly"",
+                ""ApiIdentities"": [],
                 ""ApiProperties"": [
                     {
                         ""ApiName"": ""RequiredName"",
@@ -3576,8 +3836,41 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 ),
                 ApiObjectType: new ApiObjectTypeConfig
                 (
+                    ApiIdentities:
+                    [
+                        new ApiIdentityConfig
+                        (
+                            ApiName: "PK_Company_Id",
+                            ApiIdentityParts:
+                            [
+                                new ApiIdentityPartConfig
+                                (
+                                    ApiPropertyName: nameof(Company.Id)
+                                )
+                            ]
+                        ),
+                        new ApiIdentityConfig
+                        (
+                            ApiName: "AK_Company_Name",
+                            ApiIdentityParts:
+                            [
+                                new ApiIdentityPartConfig
+                                (
+                                    ApiPropertyName: nameof(Company.Name)
+                                )
+                            ]
+                        )
+                    ],
                     ApiProperties:
                     [
+                        new ApiPropertyConfig
+                        (
+                            ApiName: nameof(Company.Id),
+                            ApiTypeExpression: new ApiTypeExpression(clrType: typeof(Ulid)),
+                            ApiTypeModifiers: ApiTypeModifiers.Required,
+                            ClrName: nameof(Company.Id),
+                            ClrMemberKind: ClrMemberKind.Property
+                        ),
                         new ApiPropertyConfig
                         (
                             ApiName: nameof(Company.Name),
@@ -3622,7 +3915,34 @@ public class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
             {
                 ""ApiKind"": ""Object"",
                 ""ApiName"": ""Company"",
+                ""ApiIdentities"": [
+                    {
+                        ""ApiName"": ""PK_Company_Id"",
+                        ""ApiIdentityParts"": [
+                            {
+                                ""ApiPropertyName"": ""Id""
+                            }
+                        ]
+                    },
+                    {
+                        ""ApiName"": ""AK_Company_Name"",
+                        ""ApiIdentityParts"": [
+                            {
+                                ""ApiPropertyName"": ""Name""
+                            }
+                        ]
+                    }
+                ],
                 ""ApiProperties"": [
+                    {
+                        ""ApiName"": ""Id"",
+                        ""ApiType"": {
+                            ""ClrType"": ""System.Ulid,Ulid""
+                        },
+                        ""ApiTypeModifiers"": ""Required"",
+                        ""ClrName"": ""Id"",
+                        ""ClrMemberKind"": ""Property""
+                    },
                     {
                         ""ApiName"": ""Name"",
                         ""ApiType"": {
