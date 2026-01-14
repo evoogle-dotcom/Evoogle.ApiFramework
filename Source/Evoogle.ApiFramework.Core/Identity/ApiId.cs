@@ -3,6 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Collections.Frozen;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -42,6 +43,21 @@ public readonly struct ApiId
     //  - _ref: single reference slot for reference arms (string, CultureInfo, ApiIdPart[])
     private readonly ApiIdValueUnion _val;
     private readonly object? _ref;
+
+    /// <summary>
+    ///     The set of scalar CLR types that are compatible with <see cref="ApiId"/>.
+    /// </summary>
+    private static readonly FrozenSet<Type> _scalarTypes = FrozenSet.ToFrozenSet
+    (
+        [
+            typeof(string),
+            typeof(int),
+            typeof(long),
+            typeof(Guid),
+            typeof(Ulid),
+            typeof(CultureInfo)
+        ]
+    );
     #endregion
 
     #region Properties
@@ -167,53 +183,6 @@ public readonly struct ApiId
     #endregion
 
     #region Factory Methods
-    /// <summary>Creates a culture identifier from a <see cref="CultureInfo"/> instance.</summary>
-    /// <param name="value">The culture value.</param>
-    /// <returns>A new culture <see cref="ApiId"/>.</returns>
-    public static ApiId FromCulture(CultureInfo value)
-    {
-        ArgumentNullException.ThrowIfNull(value, nameof(value));
-        return new ApiId(ApiIdKind.Culture, default, value, value.Name);
-    }
-
-    /// <summary>Creates a culture identifier from a culture name string.</summary>
-    /// <param name="name">The culture name.</param>
-    /// <returns>A new culture <see cref="ApiId"/>.</returns>
-    public static ApiId FromCulture(string name)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
-        return new ApiId(ApiIdKind.Culture, default, CultureInfo.GetCultureInfo(name, predefinedOnly: true), name);
-    }
-
-    /// <summary>Creates a string identifier.</summary>
-    /// <param name="value">The string value.</param>
-    /// <returns>A new string <see cref="ApiId"/>.</returns>
-    public static ApiId FromString(string value)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(value, nameof(value));
-        return new ApiId(ApiIdKind.String, default, value, value);
-    }
-
-    /// <summary>Creates an Int32 identifier.</summary>
-    /// <param name="value">The <see cref="int"/> value.</param>
-    /// <returns>A new Int32 <see cref="ApiId"/>.</returns>
-    public static ApiId FromInt32(int value) => new(ApiIdKind.Int32, ApiIdValueUnion.FromInt32(value), null, value.ToString(CultureInfo.InvariantCulture));
-
-    /// <summary>Creates an Int64 identifier.</summary>
-    /// <param name="value">The <see cref="long"/> value.</param>
-    /// <returns>A new Int64 <see cref="ApiId"/>.</returns>
-    public static ApiId FromInt64(long value) => new(ApiIdKind.Int64, ApiIdValueUnion.FromInt64(value), null, value.ToString(CultureInfo.InvariantCulture));
-
-    /// <summary>Creates a Guid identifier.</summary>
-    /// <param name="value">The <see cref="Guid"/> value.</param>
-    /// <returns>A new Guid <see cref="ApiId"/>.</returns>
-    public static ApiId FromGuid(Guid value) => new(ApiIdKind.Guid, ApiIdValueUnion.FromGuid(value), null, value.ToString("D"));
-
-    /// <summary>Creates a Ulid identifier.</summary>
-    /// <param name="value">The <see cref="Ulid"/> value.</param>
-    /// <returns>A new Ulid <see cref="ApiId"/>.</returns>
-    public static ApiId FromUlid(Ulid value) => new(ApiIdKind.Ulid, ApiIdValueUnion.FromUlid(value), null, value.ToString());
-
     /// <summary>
     ///     Creates a composite identifier from an ordered sequence of part identifiers. Parts are treated as unnamed.
     /// </summary>
@@ -303,27 +272,117 @@ public readonly struct ApiId
         return new ApiId(ApiIdKind.Composite, default, clone, ToDebugString(clone));
     }
 
-    /// <summary>
-    ///     Gets a string representation of composite <paramref name="parts"/> using '|' delimiters.
-    /// </summary>
-    /// <param name="parts">The composite parts.</param>
-    /// <returns>The delimited string or null if <paramref name="parts"/> is null/empty.</returns>
-    public static string? ToDebugString(IEnumerable<ApiIdPart>? parts)
+    /// <summary>Creates a culture identifier from a <see cref="CultureInfo"/> instance.</summary>
+    /// <param name="value">The culture value.</param>
+    /// <returns>A new culture <see cref="ApiId"/>.</returns>
+    public static ApiId FromCulture(CultureInfo value)
     {
-        if (parts is null)
-        {
-            return null;
-        }
-
-        var arr = parts as ApiIdPart[] ?? [.. parts];
-        if (arr.Length == 0)
-        {
-            return null;
-        }
-
-        // Build once; for purely diagnostic use, string.Join is fine
-        return string.Join("|", arr.Select(p => p.ToString()));
+        ArgumentNullException.ThrowIfNull(value, nameof(value));
+        return new ApiId(ApiIdKind.Culture, default, value, value.Name);
     }
+
+    /// <summary>Creates a culture identifier from a culture name string.</summary>
+    /// <param name="name">The culture name.</param>
+    /// <returns>A new culture <see cref="ApiId"/>.</returns>
+    public static ApiId FromCulture(string name)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
+        return new ApiId(ApiIdKind.Culture, default, CultureInfo.GetCultureInfo(name, predefinedOnly: true), name);
+    }
+
+    /// <summary>Creates a string identifier.</summary>
+    /// <param name="value">The string value.</param>
+    /// <returns>A new string <see cref="ApiId"/>.</returns>
+    public static ApiId FromString(string value)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(value, nameof(value));
+        return new ApiId(ApiIdKind.String, default, value, value);
+    }
+
+    /// <summary>Creates an Int32 identifier.</summary>
+    /// <param name="value">The <see cref="int"/> value.</param>
+    /// <returns>A new Int32 <see cref="ApiId"/>.</returns>
+    public static ApiId FromInt32(int value) => new(ApiIdKind.Int32, ApiIdValueUnion.FromInt32(value), null, value.ToString(CultureInfo.InvariantCulture));
+
+    /// <summary>Creates an Int64 identifier.</summary>
+    /// <param name="value">The <see cref="long"/> value.</param>
+    /// <returns>A new Int64 <see cref="ApiId"/>.</returns>
+    public static ApiId FromInt64(long value) => new(ApiIdKind.Int64, ApiIdValueUnion.FromInt64(value), null, value.ToString(CultureInfo.InvariantCulture));
+
+    /// <summary>Creates a Guid identifier.</summary>
+    /// <param name="value">The <see cref="Guid"/> value.</param>
+    /// <returns>A new Guid <see cref="ApiId"/>.</returns>
+    public static ApiId FromGuid(Guid value) => new(ApiIdKind.Guid, ApiIdValueUnion.FromGuid(value), null, value.ToString("D"));
+
+    /// <summary>
+    ///     Converts the specified <paramref name="value"/> into an <see cref="ApiId"/>.
+    /// </summary>
+    /// <param name="value">The value to convert.</param>
+    /// <param name="valueType">Optional type hint for the value. If null, uses <paramref name="value"/>.GetType().</param>
+    /// <returns>The resulting <see cref="ApiId"/>.</returns>
+    /// <remarks>
+    ///     Supports conversion from <see cref="string"/>, <see cref="int"/>, <see cref="long"/>, <see cref="Guid"/>, <see cref="Ulid"/>, and <see cref="CultureInfo"/>.
+    ///     If the <paramref name="value"/> is already an <see cref="ApiId"/>, it is returned as-is.
+    ///     For other types, converts to string.
+    /// </remarks>
+    public static ApiId FromObject(object value, Type? valueType = null)
+    {
+        ArgumentNullException.ThrowIfNull(value, nameof(value));
+
+        // Handle ApiId passthrough
+        if (value is ApiId apiId)
+        {
+            return apiId;
+        }
+
+        // Determine the effective type
+        var effectiveType = valueType ?? value.GetType();
+
+        // Convert based on the effective type
+        if (effectiveType == typeof(int))
+        {
+            return FromInt32((int)value);
+        }
+
+        if (effectiveType == typeof(long))
+        {
+            return FromInt64((long)value);
+        }
+
+        if (effectiveType == typeof(Guid))
+        {
+            return FromGuid((Guid)value);
+        }
+
+        if (effectiveType == typeof(Ulid))
+        {
+            return FromUlid((Ulid)value);
+        }
+
+        if (effectiveType == typeof(CultureInfo))
+        {
+            return FromCulture((CultureInfo)value);
+        }
+
+        if (effectiveType == typeof(string))
+        {
+            return FromString((string)value);
+        }
+
+        // Fallback: convert to string
+        var stringValue = value.ToString();
+        if (string.IsNullOrWhiteSpace(stringValue))
+        {
+            throw new ArgumentException("Value converted to null or empty string.", nameof(value));
+        }
+
+        return FromString(stringValue);
+    }
+
+    /// <summary>Creates a Ulid identifier.</summary>
+    /// <param name="value">The <see cref="Ulid"/> value.</param>
+    /// <returns>A new Ulid <see cref="ApiId"/>.</returns>
+    public static ApiId FromUlid(Ulid value) => new(ApiIdKind.Ulid, ApiIdValueUnion.FromUlid(value), null, value.ToString());
 
     /// <summary>
     ///     Validates the supplied composite <paramref name="parts"/> ensuring no nested composites,
@@ -379,6 +438,34 @@ public readonly struct ApiId
 
     #region Utility Methods
     /// <summary>
+    ///     Gets the compatible scalar CLR types for <see cref="ApiId"/> conversion.
+    /// </summary>
+    /// <returns>The compatible scalar CLR types for <see cref="ApiId"/> conversion.</returns>
+    public static Type[] GetCompatibleScalarTypes()
+    {
+        return [.. _scalarTypes];
+    }
+
+    /// <summary>
+    ///   Gets the compatible scalar CLR type for <see cref="ApiId"/> conversion.
+    /// </summary>
+    /// <param name="type">The CLR type to check.</param>
+    /// <returns>The compatible scalar CLR type for <see cref="ApiId"/> conversion.</returns>
+    public static Type GetCompatibleScalarType(Type type)
+    {
+        ArgumentNullException.ThrowIfNull(type, nameof(type));
+
+        // If already compatible, return as-is
+        if (IsCompatibleScalarType(type))
+        {
+            return type;
+        }
+
+        // Default fallback to string for all other types
+        return typeof(string);
+    }
+
+    /// <summary>
     ///    Determines whether the specified <see cref="Type"/> is a compatible scalar type for <see cref="ApiId"/>.
     /// </summary>
     /// <param name="type">The type to check.</param>
@@ -387,12 +474,29 @@ public readonly struct ApiId
     {
         ArgumentNullException.ThrowIfNull(type, nameof(type));
 
-        return type == typeof(string)
-            || type == typeof(int)
-            || type == typeof(long)
-            || type == typeof(Guid)
-            || type == typeof(Ulid)
-            || type == typeof(CultureInfo);
+        return _scalarTypes.Contains(type);
+    }
+
+    /// <summary>
+    ///     Gets a string representation of composite <paramref name="parts"/> using '|' delimiters.
+    /// </summary>
+    /// <param name="parts">The composite parts.</param>
+    /// <returns>The delimited string or null if <paramref name="parts"/> is null/empty.</returns>
+    public static string? ToDebugString(IEnumerable<ApiIdPart>? parts)
+    {
+        if (parts is null)
+        {
+            return null;
+        }
+
+        var arr = parts as ApiIdPart[] ?? [.. parts];
+        if (arr.Length == 0)
+        {
+            return null;
+        }
+
+        // Build once; for purely diagnostic use, string.Join is fine
+        return string.Join("|", arr.Select(p => p.ToString()));
     }
     #endregion
 

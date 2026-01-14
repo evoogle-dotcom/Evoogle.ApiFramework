@@ -29,6 +29,9 @@ public abstract class ApiType(Type clrType) : ApiSchemaElement
 
     /// <summary>Gets the CLR type associated with the API type.</summary>
     public Type ClrType { get; } = clrType;
+
+    /// <summary>Gets the name of the CLR type associated with the API type.</summary>
+    public string ClrTypeName => this.ClrType.Name;
     #endregion
 
     #region ApiSchemaElement Methods

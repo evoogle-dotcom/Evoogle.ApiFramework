@@ -24,12 +24,12 @@ public sealed partial class ApiProperty
     /// </summary>
     /// <typeparam name="TObject">The type of the object containing the member.</typeparam>
     /// <typeparam name="TValue">The expected return type of the member value.</typeparam>
-    /// <param name="objectType">The actual CLR type (may differ from TObject for inheritance scenarios).</param>
-    /// <param name="memberName">The name of the property or field to access.</param>
+    /// <param name="clrObjectType">The actual CLR type (may differ from TObject for inheritance scenarios).</param>
+    /// <param name="clrMemberName">The name of the property or field to access.</param>
     /// <returns>A cache value containing the compiled getter delegate, or null if the member cannot be accessed.</returns>
-    private static ClrGetterCacheValue<TObject, TValue> BuildGenericClrGetter<TObject, TValue>(Type objectType, string memberName)
+    private static ClrGetterCacheValue<TObject, TValue> BuildGenericClrGetter<TObject, TValue>(Type clrObjectType, string clrMemberName)
     {
-        if (!TryResolveMember(objectType, memberName, forWrite: false, out var memberInfo, out var memberType))
+        if (!TryResolveMember(clrObjectType, clrMemberName, forWrite: false, out var clrMemberInfo, out var clrMemberType))
         {
             return new ClrGetterCacheValue<TObject, TValue>(null);
         }
@@ -38,9 +38,9 @@ public sealed partial class ApiProperty
         var objectParameterExpression = Expression.Parameter(typeof(TObject), "obj");
         var contextParameterExpression = Expression.Parameter(typeof(ApiSchemaContext), "context");
 
-        var castObjectExpression = MakeObjectExpression<TObject>(objectParameterExpression, objectType);
+        var castObjectExpression = MakeObjectExpression<TObject>(objectParameterExpression, clrObjectType);
 
-        var memberAccessExpression = memberInfo switch
+        var memberAccessExpression = clrMemberInfo switch
         {
             PropertyInfo pi => Expression.Property(castObjectExpression, pi),
             FieldInfo fi => Expression.Field(castObjectExpression, fi),
@@ -53,7 +53,7 @@ public sealed partial class ApiProperty
         }
 
         // If the member type is already assignable to TValue, just use it directly
-        if (typeof(TValue).IsAssignableFrom(memberType))
+        if (typeof(TValue).IsAssignableFrom(clrMemberType))
         {
             Expression convertedMemberValueExpression = memberAccessExpression;
             if (memberAccessExpression.Type != typeof(TValue))
@@ -72,7 +72,7 @@ public sealed partial class ApiProperty
         var typeCoercionContextPropertyExpression = Expression.Property(contextParameterExpression, nameof(ApiSchemaContext.TypeCoercionContext));
 
         // Use generic Coerce<,> overload for type-safe coercion with compile-time types
-        var genericCoerceMethod = MakeGenericCoerceMethod(memberType, typeof(TValue));
+        var genericCoerceMethod = MakeGenericCoerceMethod(clrMemberType, typeof(TValue));
 
         var coerceMethodCallExpression = Expression.Call(
             typeCoercionPropertyExpression,
@@ -92,12 +92,12 @@ public sealed partial class ApiProperty
     /// </summary>
     /// <typeparam name="TObject">The type of the object containing the member.</typeparam>
     /// <typeparam name="TValue">The type of the value to assign.</typeparam>
-    /// <param name="objectType">The actual CLR type (may differ from TObject for inheritance scenarios).</param>
-    /// <param name="memberName">The name of the property or field to modify.</param>
+    /// <param name="clrObjectType">The actual CLR type (may differ from TObject for inheritance scenarios).</param>
+    /// <param name="clrMemberName">The name of the property or field to modify.</param>
     /// <returns>A cache value containing the compiled setter delegate, or null if the member cannot be modified.</returns>
-    private static ClrSetterCacheValue<TObject, TValue> BuildGenericClrSetter<TObject, TValue>(Type objectType, string memberName)
+    private static ClrSetterCacheValue<TObject, TValue> BuildGenericClrSetter<TObject, TValue>(Type clrObjectType, string clrMemberName)
     {
-        if (!TryResolveMember(objectType, memberName, forWrite: true, out var memberInfo, out var memberType))
+        if (!TryResolveMember(clrObjectType, clrMemberName, forWrite: true, out var clrMemberInfo, out var clrMemberType))
         {
             return new ClrSetterCacheValue<TObject, TValue>(null);
         }
@@ -107,9 +107,9 @@ public sealed partial class ApiProperty
         var contextParameterExpression = Expression.Parameter(typeof(ApiSchemaContext), "context");
         var valueParameterExpression = Expression.Parameter(typeof(TValue), "value");
 
-        var castObjectExpression = MakeObjectExpression<TObject>(objectParameterExpression, objectType);
+        var castObjectExpression = MakeObjectExpression<TObject>(objectParameterExpression, clrObjectType);
 
-        var memberAccessExpression = memberInfo switch
+        var memberAccessExpression = clrMemberInfo switch
         {
             PropertyInfo pi => Expression.Property(castObjectExpression, pi),
             FieldInfo fi => Expression.Field(castObjectExpression, fi),
@@ -122,12 +122,12 @@ public sealed partial class ApiProperty
         }
 
         // If TValue is already assignable to the member type, just use it directly
-        if (memberType.IsAssignableFrom(typeof(TValue)))
+        if (clrMemberType.IsAssignableFrom(typeof(TValue)))
         {
             Expression convertedValueExpression = valueParameterExpression;
-            if (valueParameterExpression.Type != memberType)
+            if (valueParameterExpression.Type != clrMemberType)
             {
-                convertedValueExpression = Expression.Convert(valueParameterExpression, memberType);
+                convertedValueExpression = Expression.Convert(valueParameterExpression, clrMemberType);
             }
 
             var directAssignExpression = Expression.Assign(memberAccessExpression, convertedValueExpression);
@@ -143,7 +143,7 @@ public sealed partial class ApiProperty
         var typeCoercionContextPropertyExpression = Expression.Property(contextParameterExpression, nameof(ApiSchemaContext.TypeCoercionContext));
 
         // Use generic Coerce<,> overload for type-safe coercion with compile-time types
-        var genericCoerceMethod = MakeGenericCoerceMethod(typeof(TValue), memberType);
+        var genericCoerceMethod = MakeGenericCoerceMethod(typeof(TValue), clrMemberType);
 
         var coerceMethodCallExpression = Expression.Call(
             typeCoercionPropertyExpression,
@@ -164,19 +164,19 @@ public sealed partial class ApiProperty
     /// </summary>
     /// <typeparam name="TObject">The struct type containing the member.</typeparam>
     /// <typeparam name="TValue">The type of the value to assign.</typeparam>
-    /// <param name="objectType">The CLR type (must exactly match typeof(TObject) for structs).</param>
-    /// <param name="memberName">The name of the property or field to modify.</param>
+    /// <param name="clrObjectType">The CLR type (must exactly match typeof(TObject) for structs).</param>
+    /// <param name="clrMemberName">The name of the property or field to modify.</param>
     /// <returns>A cache value containing the compiled by-ref setter delegate, or null if the member cannot be modified.</returns>
-    private static ClrSetterByRefCacheValue<TObject, TValue> BuildGenericClrSetterByRef<TObject, TValue>(Type objectType, string memberName)
+    private static ClrSetterByRefCacheValue<TObject, TValue> BuildGenericClrSetterByRef<TObject, TValue>(Type clrObjectType, string clrMemberName)
         where TObject : struct
     {
-        // objectType must be exactly typeof(TObject) for structs
-        if (objectType != typeof(TObject))
+        // clrObjectType must be exactly typeof(TObject) for structs
+        if (clrObjectType != typeof(TObject))
         {
             return new ClrSetterByRefCacheValue<TObject, TValue>(null);
         }
 
-        if (!TryResolveMember(objectType, memberName, forWrite: true, out var memberInfo, out var memberType))
+        if (!TryResolveMember(clrObjectType, clrMemberName, forWrite: true, out var clrMemberInfo, out var clrMemberType))
         {
             return new ClrSetterByRefCacheValue<TObject, TValue>(null);
         }
@@ -186,7 +186,7 @@ public sealed partial class ApiProperty
         var contextParameterExpression = Expression.Parameter(typeof(ApiSchemaContext), "context");
         var valueParameterExpression = Expression.Parameter(typeof(TValue), "value");
 
-        var memberAccessExpression = memberInfo switch
+        var memberAccessExpression = clrMemberInfo switch
         {
             PropertyInfo pi => Expression.Property(objectByRefParameterExpression, pi),
             FieldInfo fi => Expression.Field(objectByRefParameterExpression, fi),
@@ -199,12 +199,12 @@ public sealed partial class ApiProperty
         }
 
         // If TValue is already assignable to the member type, just use it directly
-        if (memberType.IsAssignableFrom(typeof(TValue)))
+        if (clrMemberType.IsAssignableFrom(typeof(TValue)))
         {
             Expression convertedValueExpression = valueParameterExpression;
-            if (valueParameterExpression.Type != memberType)
+            if (valueParameterExpression.Type != clrMemberType)
             {
-                convertedValueExpression = Expression.Convert(valueParameterExpression, memberType);
+                convertedValueExpression = Expression.Convert(valueParameterExpression, clrMemberType);
             }
 
             var directAssignExpression = Expression.Assign(memberAccessExpression, convertedValueExpression);
@@ -220,7 +220,7 @@ public sealed partial class ApiProperty
         var typeCoercionContextPropertyExpression = Expression.Property(contextParameterExpression, nameof(ApiSchemaContext.TypeCoercionContext));
 
         // Use generic Coerce<,> overload for type-safe coercion with compile-time types
-        var genericCoerceMethod = MakeGenericCoerceMethod(typeof(TValue), memberType);
+        var genericCoerceMethod = MakeGenericCoerceMethod(typeof(TValue), clrMemberType);
 
         var coerceMethodCallExpression = Expression.Call(
             typeCoercionPropertyExpression,
@@ -238,12 +238,12 @@ public sealed partial class ApiProperty
     /// <summary>
     ///     Creates and caches a generic MethodInfo for TypeCoercion.Coerce&lt;TInput, TOutput&gt;.
     /// </summary>
-    /// <param name="inputType">The input type for coercion.</param>
-    /// <param name="outputType">The output type for coercion.</param>
+    /// <param name="clrInputType">The input type for coercion.</param>
+    /// <param name="clrOutputType">The output type for coercion.</param>
     /// <returns>A MethodInfo for the generic coercion method.</returns>
-    private static MethodInfo MakeGenericCoerceMethod(Type inputType, Type outputType)
+    private static MethodInfo MakeGenericCoerceMethod(Type clrInputType, Type clrOutputType)
     {
-        var key = new CoerceMethodCacheKey(inputType, outputType);
+        var key = new CoerceMethodCacheKey(clrInputType, clrOutputType);
         return _coerceMethodCache.GetOrAdd(key, k => GenericCoerceMethodDefinition.MakeGenericMethod(k.ClrInputType, k.ClrOutputType));
     }
 
@@ -252,70 +252,70 @@ public sealed partial class ApiProperty
     /// </summary>
     /// <typeparam name="TObject">The compile-time type of the parameter.</typeparam>
     /// <param name="parameterExpression">The parameter expression to potentially cast.</param>
-    /// <param name="objectType">The runtime type needed.</param>
+    /// <param name="clrObjectType">The runtime type needed.</param>
     /// <returns>Either the original parameter or a cast expression.</returns>
-    private static Expression MakeObjectExpression<TObject>(ParameterExpression parameterExpression, Type objectType)
+    private static Expression MakeObjectExpression<TObject>(ParameterExpression parameterExpression, Type clrObjectType)
     {
-        return objectType == typeof(TObject)
+        return clrObjectType == typeof(TObject)
             ? parameterExpression
-            : Expression.Convert(parameterExpression, objectType);
+            : Expression.Convert(parameterExpression, clrObjectType);
     }
 
     /// <summary>
     ///     Attempts to resolve a property or field by name on the specified type.
     ///     Prefers properties over fields and validates accessibility based on the operation type.
     /// </summary>
-    /// <param name="objectType">The CLR type to search for the member.</param>
-    /// <param name="memberName">The name of the property or field.</param>
+    /// <param name="clrObjectType">The CLR type to search for the member.</param>
+    /// <param name="clrMemberName">The name of the property or field.</param>
     /// <param name="forWrite">True if the member will be written to; false for read-only access.</param>
-    /// <param name="memberInfo">The resolved member info, or default if not found.</param>
-    /// <param name="memberType">The type of the resolved member, or default if not found.</param>
+    /// <param name="clrMemberInfo">The resolved member info, or default if not found.</param>
+    /// <param name="clrMemberType">The type of the resolved member, or default if not found.</param>
     /// <returns>True if the member was successfully resolved; otherwise false.</returns>
-    private static bool TryResolveMember(Type objectType, string memberName, bool forWrite, [NotNullWhen(true)] out MemberInfo memberInfo, [NotNullWhen(true)] out Type memberType)
+    private static bool TryResolveMember(Type clrObjectType, string clrMemberName, bool forWrite, [NotNullWhen(true)] out MemberInfo clrMemberInfo, [NotNullWhen(true)] out Type clrMemberType)
     {
         // Prefer property, then field
-        var propertyInfo = TypeReflection.GetProperty(objectType, memberName, BindingFlags.Public | BindingFlags.Instance);
-        if (propertyInfo is not null)
+        var clrPropertyInfo = TypeReflection.GetProperty(clrObjectType, clrMemberName, BindingFlags.Public | BindingFlags.Instance);
+        if (clrPropertyInfo is not null)
         {
             // Exclude indexers
-            if (propertyInfo.GetIndexParameters().Length > 0)
+            if (clrPropertyInfo.GetIndexParameters().Length > 0)
             {
-                memberInfo = default!;
-                memberType = default!;
+                clrMemberInfo = default!;
+                clrMemberType = default!;
                 return false;
             }
 
             // For write operations, require CanWrite
-            if (forWrite && !propertyInfo.CanWrite)
+            if (forWrite && !clrPropertyInfo.CanWrite)
             {
-                memberInfo = default!;
-                memberType = default!;
+                clrMemberInfo = default!;
+                clrMemberType = default!;
                 return false;
             }
 
-            memberInfo = propertyInfo;
-            memberType = propertyInfo.PropertyType;
+            clrMemberInfo = clrPropertyInfo;
+            clrMemberType = clrPropertyInfo.PropertyType;
             return true;
         }
 
-        var fieldInfo = TypeReflection.GetField(objectType, memberName, BindingFlags.Public | BindingFlags.Instance);
-        if (fieldInfo is not null)
+        var clrFieldInfo = TypeReflection.GetField(clrObjectType, clrMemberName, BindingFlags.Public | BindingFlags.Instance);
+        if (clrFieldInfo is not null)
         {
             // For write operations, exclude init-only fields
-            if (forWrite && fieldInfo.IsInitOnly)
+            if (forWrite && clrFieldInfo.IsInitOnly)
             {
-                memberInfo = default!;
-                memberType = default!;
+                clrMemberInfo = default!;
+                clrMemberType = default!;
                 return false;
             }
 
-            memberInfo = fieldInfo;
-            memberType = fieldInfo.FieldType;
+            clrMemberInfo = clrFieldInfo;
+            clrMemberType = clrFieldInfo.FieldType;
             return true;
         }
 
-        memberInfo = default!;
-        memberType = default!;
+        clrMemberInfo = default!;
+        clrMemberType = default!;
         return false;
     }
     #endregion

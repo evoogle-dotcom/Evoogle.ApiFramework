@@ -31,6 +31,17 @@ public class ApiPropertyBuilder(string apiName, string clrName) : ExtensionBuild
 
     #region Methods
     /// <summary>
+    ///     Configures type modifiers for the property.
+    /// </summary>
+    /// <param name="configure">Callback to configure type modifiers.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiPropertyBuilder WithModifiers(Action<ApiTypeModifiersBuilder> configure)
+    {
+        this.Modifiers = configure;
+        return this;
+    }
+
+    /// <summary>
     ///     Builds an <see cref="ApiProperty"/> for the specified CLR object type.
     /// </summary>
     /// <param name="clrObjectType">The CLR type declaring the property/field.</param>

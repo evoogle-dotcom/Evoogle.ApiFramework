@@ -250,7 +250,6 @@ public class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(output)
             var apiSchema = BuildTestApiSchema(this.ApiSchemaKind);
             this.ApiSchema = apiSchema ?? throw new InvalidOperationException($"{nameof(Schema.ApiSchema)} creation failed.");
 
-            // FIX: Changed from this.ApiIdentityName to this.ApiObjectTypeName
             var apiObjectType = this.ApiSchema.GetObjectTypeByApiName(this.ApiObjectTypeName);
             this.ApiObjectType = apiObjectType ?? throw new InvalidOperationException($"{nameof(Schema.ApiObjectType)} '{this.ApiObjectTypeName}' not found in ApiSchema.");
 

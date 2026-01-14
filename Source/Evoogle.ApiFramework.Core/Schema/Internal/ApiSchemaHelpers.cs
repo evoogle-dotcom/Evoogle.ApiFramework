@@ -3,6 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -52,48 +53,48 @@ internal static class ApiSchemaHelpers
         return sb.ToString();
     }
 
-    /// <summary>
-    ///     Detects the target CLR type for converting a property value to an <see cref="Identity.ApiId"/> scalar.
-    /// </summary>
-    /// <param name="clrType">The CLR type of the property.</param>
-    /// <returns>
-    ///     The target CLR type for type coercion. Common types include <see cref="int"/>, <see cref="long"/>,
-    ///     <see cref="Guid"/>, <see cref="Ulid"/>, <see cref="System.Globalization.CultureInfo"/>,
-    ///     or <see cref="string"/> as a fallback.
-    /// </returns>
-    public static Type DetectApiIdTargetType(Type clrType)
-    {
-        ArgumentNullException.ThrowIfNull(clrType);
+    // /// <summary>
+    // ///     Detects the target CLR type for converting a property value to an <see cref="Identity.ApiId"/> scalar.
+    // /// </summary>
+    // /// <param name="clrType">The CLR type of the property.</param>
+    // /// <returns>
+    // ///     The target CLR type for type coercion. Common types include <see cref="int"/>, <see cref="long"/>,
+    // ///     <see cref="Guid"/>, <see cref="Ulid"/>, <see cref="CultureInfo"/>,
+    // ///     or <see cref="string"/> as a fallback.
+    // /// </returns>
+    // public static Type DetectApiIdScalarClrType(Type clrType)
+    // {
+    //     ArgumentNullException.ThrowIfNull(clrType);
 
-        // Map common CLR types to ApiId-compatible scalar types
-        if (clrType == typeof(int))
-        {
-            return typeof(int);
-        }
+    //     // Map common CLR types to ApiId-compatible scalar types
+    //     if (clrType == typeof(int))
+    //     {
+    //         return typeof(int);
+    //     }
 
-        if (clrType == typeof(long))
-        {
-            return typeof(long);
-        }
+    //     if (clrType == typeof(long))
+    //     {
+    //         return typeof(long);
+    //     }
 
-        if (clrType == typeof(Guid))
-        {
-            return typeof(Guid);
-        }
+    //     if (clrType == typeof(Guid))
+    //     {
+    //         return typeof(Guid);
+    //     }
 
-        if (clrType == typeof(Ulid))
-        {
-            return typeof(Ulid);
-        }
+    //     if (clrType == typeof(Ulid))
+    //     {
+    //         return typeof(Ulid);
+    //     }
 
-        if (clrType == typeof(System.Globalization.CultureInfo))
-        {
-            return typeof(System.Globalization.CultureInfo);
-        }
+    //     if (clrType == typeof(CultureInfo))
+    //     {
+    //         return typeof(CultureInfo);
+    //     }
 
-        // Default fallback to string for all other types
-        return typeof(string);
-    }
+    //     // Default fallback to string for all other types
+    //     return typeof(string);
+    // }
 
     public static void InitializeLookupDictionary<TPart, TPartKey>
     (

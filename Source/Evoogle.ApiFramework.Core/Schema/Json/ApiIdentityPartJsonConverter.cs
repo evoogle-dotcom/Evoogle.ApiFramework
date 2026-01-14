@@ -25,7 +25,7 @@ public class ApiIdentityPartJsonConverter(ILogger<ApiIdentityPartJsonConverter>?
     {
         #region Immutable Properties
         public required string ApiPropertyName { get; init; }
-        public required string TargetClrType { get; init; }
+        public required string ClrConfiguredIdType { get; init; }
         #endregion
     }
 
@@ -46,7 +46,7 @@ public class ApiIdentityPartJsonConverter(ILogger<ApiIdentityPartJsonConverter>?
                 ApiIdentityPart = new ApiIdentityPartPropertyNames
                 {
                     ApiPropertyName = policy.ConvertName(nameof(Schema.ApiIdentityPart.ApiPropertyName)),
-                    TargetClrType = policy.ConvertName(nameof(Schema.ApiIdentityPart.TargetClrType)),
+                    ClrConfiguredIdType = policy.ConvertName(nameof(Schema.ApiIdentityPart.ClrConfiguredIdType)),
                 },
                 ExtensibleBase = GetExtensiblePropertyNames(policy),
             };
@@ -62,7 +62,7 @@ public class ApiIdentityPartJsonConverter(ILogger<ApiIdentityPartJsonConverter>?
     {
         #region Properties
         public string? ApiPropertyName { get; set; }
-        public Type? TargetClrType { get; set; }
+        public Type? ClrConfiguredIdType { get; set; }
         #endregion
     }
 
@@ -86,7 +86,7 @@ public class ApiIdentityPartJsonConverter(ILogger<ApiIdentityPartJsonConverter>?
         {
             // ApiIdentityPart Property Handlers
             { propertyNames.ApiIdentityPart.ApiPropertyName, HandleApiIdentityPartApiPropertyName },
-            { propertyNames.ApiIdentityPart.TargetClrType, HandleApiIdentityPartTargetClrType },
+            { propertyNames.ApiIdentityPart.ClrConfiguredIdType, HandleApiIdentityPartClrConfiguredIdType },
 
             // ExtensibleBase Property Handlers
             { propertyNames.ExtensibleBase.Extensions, CreateExtensionsHandler<PropertyNames, ReadData, ReadHandlers>() },
@@ -101,11 +101,11 @@ public class ApiIdentityPartJsonConverter(ILogger<ApiIdentityPartJsonConverter>?
             context.ReadData.ApiIdentityPart.ApiPropertyName = reader.GetString();
         }
 
-        private static void HandleApiIdentityPartTargetClrType(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiIdentityPartClrConfiguredIdType(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiIdentityPart ??= new ApiIdentityPartReadData();
 
-            context.ReadData.ApiIdentityPart.TargetClrType = _typeJsonConverter.Read(ref reader, typeof(Type), context.Options);
+            context.ReadData.ApiIdentityPart.ClrConfiguredIdType = _typeJsonConverter.Read(ref reader, typeof(Type), context.Options);
         }
         #endregion
     }
@@ -147,9 +147,9 @@ public class ApiIdentityPartJsonConverter(ILogger<ApiIdentityPartJsonConverter>?
         var readData = readContext.ReadData.ApiIdentityPart;
 
         var apiPropertyName = readData?.ApiPropertyName;
-        var targetClrType = readData?.TargetClrType;
+        var clrConfiguredIdType = readData?.ClrConfiguredIdType;
 
-        var apiIdentityPart = new ApiIdentityPart(apiPropertyName!, targetClrType);
+        var apiIdentityPart = new ApiIdentityPart(apiPropertyName!, clrConfiguredIdType);
 
         var extensions = readContext.ReadData.Extensions;
         AttachExtensions(apiIdentityPart, extensions);
@@ -172,7 +172,7 @@ public class ApiIdentityPartJsonConverter(ILogger<ApiIdentityPartJsonConverter>?
         WriteJsonObject(writer, () =>
         {
             WriteApiIdentityPartApiPropertyName(writer, value, writeContext);
-            WriteApiIdentityPartTargetClrType(writer, value, writeContext);
+            WriteApiIdentityPartClrConfiguredIdType(writer, value, writeContext);
 
             WriteExtensibleBaseExtensions(writer, writeContext.PropertyNames.ExtensibleBase.Extensions, value, writeContext);
         });
@@ -189,10 +189,10 @@ public class ApiIdentityPartJsonConverter(ILogger<ApiIdentityPartJsonConverter>?
         writer.TryWritePropertyAsString(propertyName, value, options);
     }
 
-    private static void WriteApiIdentityPartTargetClrType(Utf8JsonWriter writer, ApiIdentityPart apiIdentityPart, DefaultWriteContext<PropertyNames> context)
+    private static void WriteApiIdentityPartClrConfiguredIdType(Utf8JsonWriter writer, ApiIdentityPart apiIdentityPart, DefaultWriteContext<PropertyNames> context)
     {
-        var propertyName = context.PropertyNames.ApiIdentityPart.TargetClrType;
-        var value = apiIdentityPart.TargetClrType;
+        var propertyName = context.PropertyNames.ApiIdentityPart.ClrConfiguredIdType;
+        var value = apiIdentityPart.ClrConfiguredIdType;
         var options = context.Options;
 
         writer.TryWritePropertyWithConverter(propertyName, value, options, _typeJsonConverter);

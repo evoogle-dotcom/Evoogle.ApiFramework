@@ -106,17 +106,25 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
                     x.WithName(apiName);
                     foreach (var apiProperty in apiObjectType.ApiProperties)
                     {
-                        x.AddProperty(apiProperty.ApiName, apiProperty.ClrName, y =>
-                        {
-                            if (apiProperty.IsRequired())
-                            {
-                                y.Required();
-                            }
-                            else
-                            {
-                                y.Optional();
-                            }
-                        });
+                        x.AddProperty
+                        (
+                            apiProperty.ApiName,
+                            apiProperty.ClrName,
+                            y => y.WithModifiers
+                            (
+                                z =>
+                                {
+                                    if (apiProperty.IsRequired())
+                                    {
+                                        z.Required();
+                                    }
+                                    else
+                                    {
+                                        z.Optional();
+                                    }
+                                }
+                            )
+                        );
                     }
                     foreach (var apiRelationship in apiObjectType.ApiRelationships)
                     {

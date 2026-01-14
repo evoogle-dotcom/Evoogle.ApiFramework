@@ -79,7 +79,7 @@ public static class ApiSchemaFactory
     public record ApiIdentityPartConfig
     (
         string ApiPropertyName,
-        Type? TargetClrType = null
+        Type? ClrConfiguredIdType = null
     );
 
     public record ApiPropertyConfig
@@ -620,9 +620,9 @@ public static class ApiSchemaFactory
             P(name: nameof(ScalarsOnly.RequiredName),      expression: TE.ClrRef<string>(), required: true),
             P(name: nameof(ScalarsOnly.RequiredNumber),    expression: TE.ClrRef<long>(),   required: true),
             P(name: nameof(ScalarsOnly.RequiredPredicate), expression: TE.ClrRef<bool>(),   required: true),
-            P(name: nameof(ScalarsOnly.OptionalName),      expression: TE.ClrRef<string>(), required: false),
-            P(name: nameof(ScalarsOnly.OptionalNumber),    expression: TE.ClrRef<long>(),   required: false),
-            P(name: nameof(ScalarsOnly.OptionalPredicate), expression: TE.ClrRef<bool>(),   required: false)
+            P(name: nameof(ScalarsOnly.OptionalName),      expression: TE.ClrRef<string>(), required: false, ClrMemberKind.Field),
+            P(name: nameof(ScalarsOnly.OptionalNumber),    expression: TE.ClrRef<long>(),   required: false, ClrMemberKind.Field),
+            P(name: nameof(ScalarsOnly.OptionalPredicate), expression: TE.ClrRef<bool>(),   required: false, ClrMemberKind.Field)
         ]);
 
         var person = O(name: nameof(Person), clr: typeof(Person), options: OO(ApiIdentityNullHandling.ThrowException), identities:
@@ -837,7 +837,7 @@ public static class ApiSchemaFactory
                     var apiIdentity = new ApiIdentity
                     (
                         apiName: x.ApiName,
-                        apiIdentityParts: x.ApiIdentityParts.Select(part => new ApiIdentityPart(part.ApiPropertyName, part.TargetClrType))
+                        apiIdentityParts: x.ApiIdentityParts.Select(part => new ApiIdentityPart(part.ApiPropertyName, part.ClrConfiguredIdType))
                     );
                     return apiIdentity;
                 });

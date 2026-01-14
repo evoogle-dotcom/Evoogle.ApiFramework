@@ -89,34 +89,24 @@ public enum ApiInitializationCode
 
     #region ApiIdentityPart Initialization Codes
     /// <summary>
-    ///     The identity part's property API name is null, empty, or whitespace.
-    /// </summary>
-    API_IDENTITY_PART_INVALID_API_PROPERTY_NAME,
-
-    /// <summary>
-    ///     The identity part's property reference could not be resolved to a defined property.
-    /// </summary>
-    API_IDENTITY_PART_UNRESOLVED_PROPERTY,
-
-    /// <summary>
-    ///     The target CLR type specified for an <see cref="ApiIdentityPart"/> is not compatible with <see cref="ApiId"/>.
-    /// </summary>
-    API_IDENTITY_PART_INVALID_TARGET_TYPE,
-
-    /// <summary>
     ///     An identity part references a property whose type has an identity that creates a circular dependency.
     /// </summary>
     API_IDENTITY_PART_CIRCULAR_REFERENCE,
 
     /// <summary>
-    ///     Two or more identities share the exact same set of properties, which may cause ambiguity.
+    ///     The identity part's property API name is null, empty, or whitespace.
     /// </summary>
-    API_IDENTITY_VALIDATION_AMBIGUOUS_IDENTITIES,
+    API_IDENTITY_PART_INVALID_API_PROPERTY_NAME,
 
     /// <summary>
-    ///     An identity part uses a property type that may have performance implications for identity operations.
+    ///     The scalar CLR type specified for an <see cref="ApiIdentityPart"/> is not compatible with <see cref="ApiId"/>.
     /// </summary>
-    API_IDENTITY_VALIDATION_PERFORMANCE_CONCERN,
+    API_IDENTITY_PART_INVALID_SCALAR_TYPE,
+
+    /// <summary>
+    ///     The identity part's property reference could not be resolved to a defined property.
+    /// </summary>
+    API_IDENTITY_PART_UNRESOLVED_PROPERTY,
     #endregion
 
     #region ApiNamedType Initialization Codes
@@ -127,6 +117,11 @@ public enum ApiInitializationCode
     #endregion
 
     #region ApiObjectType Initialization Codes
+    /// <summary>
+    ///     Multiple identities may be ambiguous due to using the same property set.
+    /// </summary>
+    API_OBJECT_TYPE_AMBIGUOUS_IDENTITIES,
+
     /// <summary>
     ///     Multiple identities have the same API name.
     /// </summary>
@@ -146,6 +141,11 @@ public enum ApiInitializationCode
     ///     Multiple relationships have the same API name.
     /// </summary>
     API_OBJECT_TYPE_DUPLICATE_RELATIONSHIP_API_NAME,
+
+    /// <summary>
+    ///     An identity part uses a property type that may have performance implications for identity operations.
+    /// </summary>
+    API_OBJECT_TYPE_IDENTITY_PERFORMANCE_CONCERN,
 
     /// <summary>
     ///     The object type has no properties defined.

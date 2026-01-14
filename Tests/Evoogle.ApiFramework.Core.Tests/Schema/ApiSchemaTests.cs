@@ -1820,7 +1820,8 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                                 ""ApiName"": ""PK_Company_Id"",
                                 ""ApiIdentityParts"": [
                                     {
-                                        ""ApiPropertyName"": ""Id""
+                                        ""ApiPropertyName"": ""Id"",
+					                    ""ClrConfiguredIdType"": ""System.String,System.Private.CoreLib""
                                     }
                                 ]
                             },
@@ -2067,7 +2068,8 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                                     [
                                         new ApiIdentityPartConfig
                                         (
-                                            ApiPropertyName: nameof(Company.Id)
+                                            ApiPropertyName: nameof(Company.Id),
+                                            ClrConfiguredIdType: typeof(string)
                                         )
                                     ]
                                 ),
@@ -2975,7 +2977,8 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                                     [
                                         new ApiIdentityPartConfig
                                         (
-                                            ApiPropertyName: nameof(Company.Id)
+                                            ApiPropertyName: nameof(Company.Id),
+                                            ClrConfiguredIdType: typeof(string)
                                         )
                                     ]
                                 ),
@@ -4415,7 +4418,8 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                                     [
                                         new ApiIdentityPartConfig
                                         (
-                                            ApiPropertyName: nameof(Company.Id)
+                                            ApiPropertyName: nameof(Company.Id),
+                                            ClrConfiguredIdType: typeof(string)
                                         )
                                     ]
                                 ),
@@ -4639,7 +4643,8 @@ public class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
                                 ""ApiName"": ""PK_Company_Id"",
                                 ""ApiIdentityParts"": [
                                     {
-                                        ""ApiPropertyName"": ""Id""
+                                        ""ApiPropertyName"": ""Id"",
+					                    ""ClrConfiguredIdType"": ""System.String,System.Private.CoreLib""
                                     }
                                 ]
                             },

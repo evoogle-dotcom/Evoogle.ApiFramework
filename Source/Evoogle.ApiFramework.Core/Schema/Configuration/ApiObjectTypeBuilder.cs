@@ -14,6 +14,7 @@ public sealed class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext c
     : ApiNamedTypeBuilder<ApiObjectTypeBuilder>(clrType, context)
 {
     #region Fields
+    private readonly List<ApiIdentityBuilder> _apiIdentityBuilders = [];
     private readonly List<ApiPropertyBuilder> _apiPropertyBuilders = [];
     private readonly List<ApiRelationshipBuilder> _apiRelationshipBuilders = [];
     private Action<ApiObjectTypeOptionsBuilder>? _apiOptionsConfiguration = null;
@@ -21,21 +22,37 @@ public sealed class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext c
 
     #region Builder Methods
     /// <summary>
+    ///     Adds an <see cref="ApiIdentity"/> definition to the object type.
+    /// </summary>
+    /// <remarks>
+    ///     The first identity added is the primary identity by convention unless specified otherwise.
+    /// </remarks>
+    /// <param name="apiName">The API name of the identity.</param>
+    /// <param name="configure">Callback to configure the added identity.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiObjectTypeBuilder AddIdentity(string apiName, Action<ApiIdentityBuilder> configure)
+    {
+        var apiIdentityBuilder = new ApiIdentityBuilder(apiName);
+
+        configure.Invoke(apiIdentityBuilder);
+
+        _apiIdentityBuilders.Add(apiIdentityBuilder);
+
+        return this;
+    }
+
+    /// <summary>
     ///     Adds an <see cref="ApiProperty"/> definition to the object type.
     /// </summary>
     /// <param name="apiName">The API property name.</param>
     /// <param name="clrName">The CLR property name.</param>
-    /// <param name="modifiers">Optional callback to configure type modifiers.</param>
-    /// <param name="extensions">Optional callback to configure property extensions.</param>
+    /// <param name="configure">Optional callback to configure the added property.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiObjectTypeBuilder AddProperty(string apiName, string clrName, Action<ApiTypeModifiersBuilder>? modifiers = null, Action<ApiPropertyBuilder>? extensions = null)
+    public ApiObjectTypeBuilder AddProperty(string apiName, string clrName, Action<ApiPropertyBuilder>? configure = null)
     {
-        var apiPropertyBuilder = new ApiPropertyBuilder(apiName, clrName)
-        {
-            Modifiers = modifiers
-        };
+        var apiPropertyBuilder = new ApiPropertyBuilder(apiName, clrName);
 
-        extensions?.Invoke(apiPropertyBuilder);
+        configure?.Invoke(apiPropertyBuilder);
 
         _apiPropertyBuilders.Add(apiPropertyBuilder);
 
@@ -43,17 +60,17 @@ public sealed class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext c
     }
 
     /// <summary>
-    ///     Adds a relationship definition to the object type.
+    ///     Adds an <see cref="ApiRelationship"/> definition to the object type.
     /// </summary>
     /// <param name="apiName">The API name of the relationship.</param>
     /// <param name="apiPropertyName">Optional API property name backing the relationship.</param>
-    /// <param name="extensions">Optional callback to configure relationship extensions.</param>
+    /// <param name="configure">Optional callback to configure the added relationship.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiObjectTypeBuilder AddRelationship(string apiName, string? apiPropertyName = null, Action<ApiRelationshipBuilder>? extensions = null)
+    public ApiObjectTypeBuilder AddRelationship(string apiName, string? apiPropertyName = null, Action<ApiRelationshipBuilder>? configure = null)
     {
         var apiRelationshipBuilder = new ApiRelationshipBuilder(apiName, apiPropertyName);
 
-        extensions?.Invoke(apiRelationshipBuilder);
+        configure?.Invoke(apiRelationshipBuilder);
 
         _apiRelationshipBuilders.Add(apiRelationshipBuilder);
 
@@ -84,6 +101,9 @@ public sealed class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext c
 
         var apiOptions = this.BuildOptions();
 
+        var apiIdentities = _apiIdentityBuilders
+            .Select(b => b.Build());
+
         var apiProperties = _apiPropertyBuilders
             .Select(b => b.Build(clrObjectType));
 
@@ -94,7 +114,7 @@ public sealed class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext c
         (
             apiName,
             apiOptions,
-            apiIdentities: null,
+            apiIdentities,
             apiProperties,
             apiRelationships,
             clrObjectType

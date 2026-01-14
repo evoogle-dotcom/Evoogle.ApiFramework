@@ -20,17 +20,17 @@ namespace Evoogle.ApiFramework.Schema;
 ///     Type coercion is handled automatically via <see cref="ApiProperty"/> and resolved at initialization time.
 /// </remarks>
 /// <param name="apiPropertyName">The name of the property that is part of the identity.</param>
-/// <param name="targetClrType">Optional CLR type to use for <see cref="ApiId"/> conversion. If null, the type is detected automatically.</param>
+/// <param name="clrConfiguredIdType">Optional user configured CLR type for the identity part. If not provided, the type is inferred from the resolved property.</param>
 [JsonConverter(typeof(ApiIdentityPartJsonConverter))]
 public sealed class ApiIdentityPart
 (
     string apiPropertyName,
-    Type? targetClrType = null
+    Type? clrConfiguredIdType = null
 ) : ApiSchemaElement
 {
     #region Fields
     private ApiProperty? _apiResolvedProperty = null;
-    private Type? _resolvedTargetType = null;
+    private Type? _clrResolvedIdType = null;
     #endregion
 
     #region Properties
@@ -38,14 +38,6 @@ public sealed class ApiIdentityPart
     ///     Gets the name of the property that is part of this identity.
     /// </summary>
     public string ApiPropertyName { get; } = apiPropertyName;
-
-    /// <summary>
-    ///     Gets the optional CLR type override for <see cref="ApiId"/> conversion.
-    /// </summary>
-    /// <remarks>
-    ///     If null, the type is detected automatically based on the property's CLR type.
-    /// </remarks>
-    public Type? TargetClrType { get; } = targetClrType;
 
     /// <summary>
     ///     Gets the resolved property referenced by this identity part.
@@ -56,13 +48,20 @@ public sealed class ApiIdentityPart
     public ApiProperty ApiProperty => this.ThrowIfNotInitialized(_apiResolvedProperty);
 
     /// <summary>
-    ///     Gets the resolved target CLR type for <see cref="ApiId"/> conversion.
+    ///     Gets the user configured CLR type for the identity part.
     /// </summary>
     /// <remarks>
-    ///     This is either the <see cref="TargetClrType"/> override or automatically detected from
-    ///     the <see cref="ApiProperty"/>'s CLR type during initialization.
+    ///     This property is optional. If not provided, the type is inferred from the resolved property.
     /// </remarks>
-    public Type ResolvedTargetType => this.ThrowIfNotInitialized(_resolvedTargetType);
+    public Type? ClrConfiguredIdType { get; } = clrConfiguredIdType;
+
+    /// <summary>
+    ///     Gets the resolved CLR type of the identity part.
+    /// </summary>
+    /// <remarks>
+    ///    This property is available after initialization.
+    /// </remarks>
+    public Type ClrIdType => this.ThrowIfNotInitialized(_clrResolvedIdType);
     #endregion
 
     #region ApiSchemaElement Methods
@@ -79,7 +78,7 @@ public sealed class ApiIdentityPart
 
         this.InitializeApiPropertyName(context);
         this.InitializeApiProperty(context);
-        this.InitializeResolvedTargetType(context);
+        this.InitializeClrIdType(context);
     }
     #endregion
 
@@ -88,9 +87,10 @@ public sealed class ApiIdentityPart
     public override string ToString()
     {
         var apiPropertyName = this.ApiPropertyName.SafeToString();
+        var clrIdTypeHint = this.ClrConfiguredIdType.SafeToName();
         var extensionCount = this.ExtensionCount.SafeToString();
 
-        return $"{nameof(ApiIdentityPart)} {{{nameof(this.ApiPropertyName)}={apiPropertyName}, {nameof(this.ExtensionCount)}={extensionCount}}}";
+        return $"{nameof(ApiIdentityPart)} {{{nameof(this.ApiPropertyName)}={apiPropertyName}, {nameof(this.ClrConfiguredIdType)}={clrIdTypeHint}, {nameof(this.ExtensionCount)}={extensionCount}}}";
     }
     #endregion
 
@@ -153,33 +153,36 @@ public sealed class ApiIdentityPart
         }
     }
 
-    private void InitializeResolvedTargetType(ApiInitializationContext context)
+    private void InitializeClrIdType(ApiInitializationContext context)
     {
-        _resolvedTargetType = null;
+        _clrResolvedIdType = null;
 
-        // If the resolved property is null, we can't determine the target type
-        if (_apiResolvedProperty is null)
+        // Use the configured type if provided
+        if (this.ClrConfiguredIdType is not null)
         {
-            return;
+            // Validate that the configured type is ApiId compatible
+            if (!ApiId.IsCompatibleScalarType(this.ClrConfiguredIdType))
+            {
+                var path = $"{this.ApiPath}.{nameof(this.ClrIdType)}";
+                var severity = ApiInitializationSeverity.Error;
+                var code = ApiInitializationCode.API_IDENTITY_PART_INVALID_SCALAR_TYPE;
+                var description = $"Scalar type '{this.ClrConfiguredIdType.SafeToName()}' is not compatible with {nameof(ApiId)}";
+                var scalarTypeNames = string.Join(",", ApiId.GetCompatibleScalarTypes().Select(t => t.SafeToName()));
+                var remediation = $"Use one of the supported scalar types: {scalarTypeNames}";
+                context.AddIssue(path, severity, code, description, remediation);
+                return;
+            }
+
+            _clrResolvedIdType = this.ClrConfiguredIdType;
         }
-
-        // Use the override if provided, otherwise detect from property type
-        var targetType = this.TargetClrType ?? ApiSchemaHelpers.DetectApiIdTargetType(_apiResolvedProperty.ApiType.ClrType);
-
-        // Validate that the target type is ApiId-compatible
-        if (!ApiId.IsCompatibleScalarType(targetType))
+        // Otherwise, detect from resolved property
+        else if (_apiResolvedProperty is not null)
         {
-            var path = $"{this.ApiPath}.{nameof(this.ResolvedTargetType)}";
-            var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.API_IDENTITY_PART_INVALID_TARGET_TYPE;
-            var description = $"Target type '{targetType.SafeToName()}' is not compatible with {nameof(Identity.ApiId)}";
-            var remediation = $"Use one of the supported types: int, long, Guid, Ulid, CultureInfo, or string";
+            var clrResolvedPropertyType = _apiResolvedProperty.ApiType.ClrType;
 
-            context.AddIssue(path, severity, code, description, remediation);
-            return;
+            // The ApiId.GetCompatibleScalarType method always returns a valid type
+            _clrResolvedIdType = ApiId.GetCompatibleScalarType(clrResolvedPropertyType);
         }
-
-        _resolvedTargetType = targetType;
     }
     #endregion
 }

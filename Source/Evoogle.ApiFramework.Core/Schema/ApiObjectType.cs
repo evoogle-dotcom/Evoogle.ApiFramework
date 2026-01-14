@@ -180,13 +180,13 @@ public sealed partial class ApiObjectType
     }
 
     /// <summary>
-    ///     Gets the target CLR type for a specific identity part property.
+    ///     Gets the scalar CLR type for a specific identity part property.
     /// </summary>
     /// <param name="apiPropertyName">The API name of the property.</param>
     /// <param name="apiIdentityName">Optional identity name. If null, uses the primary identity.</param>
-    /// <returns>The target type for the identity part, or null if the property is not part of the identity.</returns>
+    /// <returns>The scalar target type for the identity part, or null if the property is not part of the identity.</returns>
     /// <remarks>
-    ///     This returns the resolved target type that the property value will be coerced to when building the identity.
+    ///     This returns the resolved scalar target type that the property value will be coerced to when building the identity.
     /// </remarks>
     public Type? GetIdentityPartClrType(string apiPropertyName, string? apiIdentityName = null)
     {
@@ -204,7 +204,7 @@ public sealed partial class ApiObjectType
         var part = identity.ApiIdentityParts
             .FirstOrDefault(p => string.Equals(p.ApiPropertyName, apiPropertyName, StringComparison.OrdinalIgnoreCase));
 
-        return part?.ResolvedTargetType;
+        return part?.ClrIdType;
     }
 
     /// <summary>
@@ -441,7 +441,7 @@ public sealed partial class ApiObjectType
                 {
                     var path = $"{this.ApiPath}.{nameof(this.ApiIdentities)}";
                     var severity = ApiInitializationSeverity.Warning;
-                    var code = ApiInitializationCode.API_IDENTITY_VALIDATION_AMBIGUOUS_IDENTITIES;
+                    var code = ApiInitializationCode.API_OBJECT_TYPE_AMBIGUOUS_IDENTITIES;
                     var description = $"Identities '{identity1.ApiName}' and '{identity2.ApiName}' use the same property set [{string.Join(", ", props1)}], which may cause ambiguity";
                     var remediation = "Consider using different property combinations for each identity, or remove one of the duplicate identities";
 
@@ -461,16 +461,16 @@ public sealed partial class ApiObjectType
                 }
 
                 var propertyType = part.ApiProperty.ApiType.ClrType;
-                var targetType = part.ResolvedTargetType;
+                var idType = part.ClrIdType;
 
                 // Warn about string parsing to complex types (potentially expensive)
-                if (propertyType == typeof(string) && targetType != typeof(string))
+                if (propertyType == typeof(string) && idType != typeof(string))
                 {
                     var path = $"{identity.ApiPath}.{nameof(identity.ApiIdentityParts)}[{part.ApiPropertyName}]";
                     var severity = ApiInitializationSeverity.Warning;
-                    var code = ApiInitializationCode.API_IDENTITY_VALIDATION_PERFORMANCE_CONCERN;
-                    var description = $"Identity part '{part.ApiPropertyName}' requires type coercion from string to {targetType.Name}, which may impact performance";
-                    var remediation = $"Consider using {targetType.Name} as the property type directly, or be aware of the parsing overhead";
+                    var code = ApiInitializationCode.API_OBJECT_TYPE_IDENTITY_PERFORMANCE_CONCERN;
+                    var description = $"Identity part '{part.ApiPropertyName}' requires type coercion between string and {idType.Name}, which may impact performance";
+                    var remediation = $"Consider using {idType.Name} as the property type directly, or be aware of the parsing overhead";
 
                     context.AddIssue(path, severity, code, description, remediation);
                 }

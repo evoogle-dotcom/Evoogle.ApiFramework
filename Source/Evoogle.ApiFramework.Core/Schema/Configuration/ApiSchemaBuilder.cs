@@ -63,7 +63,7 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     ///     Adds an enumeration type to the schema using an inline configuration action.
     /// </summary>
     /// <param name="clrType">The CLR enum type.</param>
-    /// <param name="configure">Action used to configure the enum builder.</param>
+    /// <param name="configure">Callback to configure the added enumeration type.</param>
     /// <returns>The current builder instance.</returns>
     public ApiSchemaBuilder AddEnum(Type clrType, Action<ApiEnumTypeBuilder> configure)
     {
@@ -97,7 +97,7 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     ///     Adds an object type to the schema using an inline configuration action.
     /// </summary>
     /// <param name="clrType">The CLR object type.</param>
-    /// <param name="configure">Action used to configure the object builder.</param>
+    /// <param name="configure">Callback to configure the added object type.</param>
     /// <returns>The current builder instance.</returns>
     public ApiSchemaBuilder AddObject(Type clrType, Action<ApiObjectTypeBuilder> configure)
     {
@@ -131,7 +131,7 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     ///     Adds a scalar type to the schema using an inline configuration action.
     /// </summary>
     /// <param name="clrType">The CLR scalar type.</param>
-    /// <param name="configure">Action used to configure the scalar builder.</param>
+    /// <param name="configure">Callback to configure the added scalar type.</param>
     /// <returns>The current builder instance.</returns>
     public ApiSchemaBuilder AddScalar(Type clrType, Action<ApiScalarTypeBuilder> configure)
     {

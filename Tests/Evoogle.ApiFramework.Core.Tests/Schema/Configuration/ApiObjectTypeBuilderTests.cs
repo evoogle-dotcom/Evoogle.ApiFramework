@@ -71,6 +71,18 @@ public class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
             var builder = new ApiObjectTypeBuilder(clrType, context)
                 .WithName(apiName);
 
+            var apiIdentities = apiObjectType.ApiIdentities;
+            foreach (var apiIdentity in apiIdentities ?? [])
+            {
+                builder.AddIdentity(apiIdentity.ApiName, identityBuilder =>
+                {
+                    foreach (var apiIdentityPart in apiIdentity.ApiIdentityParts)
+                    {
+                        identityBuilder.AddPart(apiIdentityPart.ApiPropertyName, apiIdentityPart.ClrConfiguredIdType);
+                    }
+                });
+            }
+
             var apiProperties = apiObjectType.ApiProperties;
             foreach (var apiProperty in apiProperties ?? [])
             {
@@ -117,8 +129,9 @@ public class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
                 this.ApiTypeExpected.As<ApiObjectType>(),
                 opt => opt
                     .Excluding(info => info.Path.Contains(nameof(ApiSchemaElement.ApiPath)))
+                    .Excluding(info => info.DeclaringType == typeof(ApiIdentityPart) && info.Name == nameof(ApiIdentityPart.ApiProperty))
+                    .Excluding(info => info.DeclaringType == typeof(ApiIdentityPart) && info.Name == nameof(ApiIdentityPart.ClrIdType))
                     .Excluding(info => info.DeclaringType == typeof(ApiProperty) && info.Name == nameof(ApiProperty.ApiType))
-                    .Excluding(info => info.DeclaringType == typeof(ApiProperty) && info.Name == nameof(ApiProperty.ClrMemberKind))
                     .Excluding(info => info.DeclaringType == typeof(ApiRelationship) && info.Name == nameof(ApiRelationship.ApiProperty))
                     .Excluding(info => info.DeclaringType == typeof(ApiRelationship) && info.Name == nameof(ApiRelationship.ApiCardinality))
                     .WithStrictOrdering()

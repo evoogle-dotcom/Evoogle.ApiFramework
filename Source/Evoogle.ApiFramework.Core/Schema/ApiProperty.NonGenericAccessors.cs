@@ -19,27 +19,27 @@ public sealed partial class ApiProperty
     ///     Builds a compiled non-generic property getter that returns values as <see cref="object"/>.
     ///     Uses direct conversion without TypeCoercion since all types are assignable to object.
     /// </summary>
-    /// <param name="objectType">The CLR type that owns the property.</param>
-    /// <param name="propertyInfo">The property metadata.</param>
+    /// <param name="clrObjectType">The CLR type that owns the property.</param>
+    /// <param name="clrPropertyInfo">The property metadata.</param>
     /// <returns>A compiled getter delegate, or null if the property is not readable.</returns>
-    private static Func<object, ApiSchemaContext, object?>? BuildNonGenericClrPropertyGetter(Type objectType, PropertyInfo propertyInfo)
+    private static Func<object, ApiSchemaContext, object?>? BuildNonGenericClrPropertyGetter(Type clrObjectType, PropertyInfo clrPropertyInfo)
     {
         // Build property getter if readable: (object obj, ApiSchemaContext context) => ((OwningType)obj).PropertyName
         // All types are assignable to object, so direct conversion is sufficient
-        if (!propertyInfo.CanRead)
+        if (!clrPropertyInfo.CanRead)
         {
             return null;
         }
 
         var objectParameterExpression = Expression.Parameter(typeof(object), "obj");
         var contextParameterExpression = Expression.Parameter(typeof(ApiSchemaContext), "context");
-        var castObjectExpression = Expression.Convert(objectParameterExpression, objectType);
-        var propertyAccessExpression = Expression.Property(castObjectExpression, propertyInfo);
+        var castObjectExpression = Expression.Convert(objectParameterExpression, clrObjectType);
+        var propertyAccessExpression = Expression.Property(castObjectExpression, clrPropertyInfo);
 
         // Direct path: All types are assignable to object (reference types upcast, value types box)
         // Direct conversion is always sufficient - no TypeCoercion needed
         var valueAsObjectExpression = (Expression)propertyAccessExpression;
-        if (propertyInfo.PropertyType != typeof(object))
+        if (clrPropertyInfo.PropertyType != typeof(object))
         {
             valueAsObjectExpression = Expression.Convert(propertyAccessExpression, typeof(object));
         }
@@ -53,13 +53,13 @@ public sealed partial class ApiProperty
     ///     Builds a compiled non-generic property setter that accepts values as <see cref="object"/>.
     ///     Uses TypeCoercion to convert object to the target property type (handles unboxing, downcasting, etc.).
     /// </summary>
-    /// <param name="objectType">The CLR type that owns the property.</param>
-    /// <param name="propertyInfo">The property metadata.</param>
+    /// <param name="clrObjectType">The CLR type that owns the property.</param>
+    /// <param name="clrPropertyInfo">The property metadata.</param>
     /// <returns>A compiled setter delegate, or null if the property is not writable.</returns>
-    private static Action<object, ApiSchemaContext, object?>? BuildNonGenericClrPropertySetter(Type objectType, PropertyInfo propertyInfo)
+    private static Action<object, ApiSchemaContext, object?>? BuildNonGenericClrPropertySetter(Type clrObjectType, PropertyInfo clrPropertyInfo)
     {
         // Build property setter if writable: (object obj, ApiSchemaContext context, object value) => ((OwningType)obj).PropertyName = context.TypeCoercion.Coerce<object, PropertyType>(value, context.TypeCoercionContext)
-        if (!propertyInfo.CanWrite)
+        if (!clrPropertyInfo.CanWrite)
         {
             return null;
         }
@@ -67,11 +67,11 @@ public sealed partial class ApiProperty
         var objectParameterExpression = Expression.Parameter(typeof(object), "obj");
         var contextParameterExpression = Expression.Parameter(typeof(ApiSchemaContext), "context");
         var valueParameterExpression = Expression.Parameter(typeof(object), "value");
-        var castObjectExpression = Expression.Convert(objectParameterExpression, objectType);
-        var propertyAccessExpression = Expression.Property(castObjectExpression, propertyInfo);
+        var castObjectExpression = Expression.Convert(objectParameterExpression, clrObjectType);
+        var propertyAccessExpression = Expression.Property(castObjectExpression, clrPropertyInfo);
 
         // Direct path: If property type is assignable from object (only if property type IS object)
-        if (propertyInfo.PropertyType == typeof(object))
+        if (clrPropertyInfo.PropertyType == typeof(object))
         {
             var directAssignExpression = Expression.Assign(propertyAccessExpression, valueParameterExpression);
             var directSetterLambdaExpression = Expression.Lambda<Action<object, ApiSchemaContext, object?>>(directAssignExpression, objectParameterExpression, contextParameterExpression, valueParameterExpression);
@@ -83,7 +83,7 @@ public sealed partial class ApiProperty
         // This handles unboxing, downcasting, and custom conversions
         var typeCoercionPropertyExpression = Expression.Property(contextParameterExpression, nameof(ApiSchemaContext.TypeCoercion));
         var typeCoercionContextPropertyExpression = Expression.Property(contextParameterExpression, nameof(ApiSchemaContext.TypeCoercionContext));
-        var targetPropertyTypeConstantExpression = Expression.Constant(propertyInfo.PropertyType, typeof(Type));
+        var targetPropertyTypeConstantExpression = Expression.Constant(clrPropertyInfo.PropertyType, typeof(Type));
 
         var coerceMethodCallExpression = Expression.Call(
             typeCoercionPropertyExpression,
@@ -93,7 +93,7 @@ public sealed partial class ApiProperty
             typeCoercionContextPropertyExpression);
 
         // Convert coerce result back to property type
-        var coercedValueExpression = Expression.Convert(coerceMethodCallExpression, propertyInfo.PropertyType);
+        var coercedValueExpression = Expression.Convert(coerceMethodCallExpression, clrPropertyInfo.PropertyType);
 
         var coerceAssignExpression = Expression.Assign(propertyAccessExpression, coercedValueExpression);
         var coerceSetterLambdaExpression = Expression.Lambda<Action<object, ApiSchemaContext, object?>>(coerceAssignExpression, objectParameterExpression, contextParameterExpression, valueParameterExpression);
@@ -105,22 +105,22 @@ public sealed partial class ApiProperty
     ///     Builds a compiled non-generic field getter that returns values as <see cref="object"/>.
     ///     Uses direct conversion without TypeCoercion since all types are assignable to object.
     /// </summary>
-    /// <param name="objectType">The CLR type that owns the field.</param>
-    /// <param name="fieldInfo">The field metadata.</param>
+    /// <param name="clrObjectType">The CLR type that owns the field.</param>
+    /// <param name="clrFieldInfo">The field metadata.</param>
     /// <returns>A compiled getter delegate.</returns>
-    private static Func<object, ApiSchemaContext, object?>? BuildNonGenericClrFieldGetter(Type objectType, FieldInfo fieldInfo)
+    private static Func<object, ApiSchemaContext, object?>? BuildNonGenericClrFieldGetter(Type clrObjectType, FieldInfo clrFieldInfo)
     {
         // Build field getter: (object obj, ApiSchemaContext context) => ((OwningType)obj).FieldName
         // All types are assignable to object, so direct conversion is sufficient
         var objectParameterExpression = Expression.Parameter(typeof(object), "obj");
         var contextParameterExpression = Expression.Parameter(typeof(ApiSchemaContext), "context");
-        var castObjectExpression = Expression.Convert(objectParameterExpression, objectType);
-        var fieldAccessExpression = Expression.Field(castObjectExpression, fieldInfo);
+        var castObjectExpression = Expression.Convert(objectParameterExpression, clrObjectType);
+        var fieldAccessExpression = Expression.Field(castObjectExpression, clrFieldInfo);
 
         // Direct path: All types are assignable to object (reference types upcast, value types box)
         // Direct conversion is always sufficient - no TypeCoercion needed
         var valueAsObjectExpression = (Expression)fieldAccessExpression;
-        if (fieldInfo.FieldType != typeof(object))
+        if (clrFieldInfo.FieldType != typeof(object))
         {
             valueAsObjectExpression = Expression.Convert(fieldAccessExpression, typeof(object));
         }
@@ -134,13 +134,13 @@ public sealed partial class ApiProperty
     ///     Builds a compiled non-generic field setter that accepts values as <see cref="object"/>.
     ///     Uses TypeCoercion to convert object to the target field type (handles unboxing, downcasting, etc.).
     /// </summary>
-    /// <param name="objectType">The CLR type that owns the field.</param>
-    /// <param name="fieldInfo">The field metadata.</param>
+    /// <param name="clrObjectType">The CLR type that owns the field.</param>
+    /// <param name="clrFieldInfo">The field metadata.</param>
     /// <returns>A compiled setter delegate, or null if the field is init-only.</returns>
-    private static Action<object, ApiSchemaContext, object?>? BuildNonGenericClrFieldSetter(Type objectType, FieldInfo fieldInfo)
+    private static Action<object, ApiSchemaContext, object?>? BuildNonGenericClrFieldSetter(Type clrObjectType, FieldInfo clrFieldInfo)
     {
         // Build field setter if writable: (object obj, ApiSchemaContext context, object value) => ((OwningType)obj).FieldName = context.TypeCoercion.Coerce<object, FieldType>(value, context.TypeCoercionContext)
-        if (fieldInfo.IsInitOnly)
+        if (clrFieldInfo.IsInitOnly)
         {
             return null;
         }
@@ -148,11 +148,11 @@ public sealed partial class ApiProperty
         var objectParameterExpression = Expression.Parameter(typeof(object), "obj");
         var contextParameterExpression = Expression.Parameter(typeof(ApiSchemaContext), "context");
         var valueParameterExpression = Expression.Parameter(typeof(object), "value");
-        var castObjectExpression = Expression.Convert(objectParameterExpression, objectType);
-        var fieldAccessExpression = Expression.Field(castObjectExpression, fieldInfo);
+        var castObjectExpression = Expression.Convert(objectParameterExpression, clrObjectType);
+        var fieldAccessExpression = Expression.Field(castObjectExpression, clrFieldInfo);
 
         // Direct path: If field type is assignable from object (only if field type IS object)
-        if (fieldInfo.FieldType == typeof(object))
+        if (clrFieldInfo.FieldType == typeof(object))
         {
             var directAssignExpression = Expression.Assign(fieldAccessExpression, valueParameterExpression);
             var directSetterLambdaExpression = Expression.Lambda<Action<object, ApiSchemaContext, object?>>(directAssignExpression, objectParameterExpression, contextParameterExpression, valueParameterExpression);
@@ -164,7 +164,7 @@ public sealed partial class ApiProperty
         // This handles unboxing, downcasting, and custom conversions
         var typeCoercionPropertyExpression = Expression.Property(contextParameterExpression, nameof(ApiSchemaContext.TypeCoercion));
         var typeCoercionContextPropertyExpression = Expression.Property(contextParameterExpression, nameof(ApiSchemaContext.TypeCoercionContext));
-        var targetFieldTypeConstantExpression = Expression.Constant(fieldInfo.FieldType, typeof(Type));
+        var targetFieldTypeConstantExpression = Expression.Constant(clrFieldInfo.FieldType, typeof(Type));
 
         var coerceMethodCallExpression = Expression.Call(
             typeCoercionPropertyExpression,
@@ -174,7 +174,7 @@ public sealed partial class ApiProperty
             typeCoercionContextPropertyExpression);
 
         // Convert coerce result back to field type
-        var coercedValueExpression = Expression.Convert(coerceMethodCallExpression, fieldInfo.FieldType);
+        var coercedValueExpression = Expression.Convert(coerceMethodCallExpression, clrFieldInfo.FieldType);
 
         var coerceAssignExpression = Expression.Assign(fieldAccessExpression, coercedValueExpression);
         var coerceSetterLambdaExpression = Expression.Lambda<Action<object, ApiSchemaContext, object?>>(coerceAssignExpression, objectParameterExpression, contextParameterExpression, valueParameterExpression);

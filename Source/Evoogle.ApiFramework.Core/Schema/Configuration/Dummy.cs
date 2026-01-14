@@ -62,6 +62,15 @@ public static class Dummy
         public Customer? Customer { get; set; }
     }
 
+    public class OrderItem
+    {
+        public Guid OrderId { get; set; }
+        public long LineItemNumber { get; set; }
+        public string ProductName { get; set; } = string.Empty;
+        public int Quantity { get; set; }
+        public decimal UnitPrice { get; set; }
+    }
+
     /// <summary>
     ///     Defines the states that an order can be in for the sample schema configuration.
     /// </summary>
@@ -149,21 +158,34 @@ public static class Dummy
                 .WithName("Customer")
                 .WithOptions(o => o
                     .WithIdentityNullHandling(ApiIdentityNullHandling.ThrowException))
-                .AddProperty("Id", "Id", m => m.Required())
-                .AddProperty("Name", "Name", m => m.Required(), p => p.AddExtension(new VisibleMetadata { Visible = true }))
-                .AddProperty("Email", "Email", m => m.Optional())
-                .AddProperty("Orders", "Orders", m => m.Required())
+                .AddIdentity("PrimaryKey", identity => identity
+                    .AddPart("Id"))
+                .AddProperty("Id", "Id", p => p.WithModifiers(m => m.Required()))
+                .AddProperty("Name", "Name", p => p.WithModifiers(m => m.Required()).AddExtension(new VisibleMetadata { Visible = true }))
+                .AddProperty("Email", "Email", p => p.WithModifiers(m => m.Optional()))
+                .AddProperty("Orders", "Orders", p => p.WithModifiers(m => m.Required()))
                 .AddRelationship("Orders"))
                 .AddExtension(new VisibleMetadata { Visible = true })
             .AddObject(typeof(Order), x => x
                 .WithName("Order")
                 .WithDefaultOptions()
-                .AddProperty("Id", "Id", m => m.Required())
-                .AddProperty("Status", "Status", m => m.Required())
-                .AddProperty("Total", "Total", m => m.Required())
-                .AddProperty("CustomerId", "CustomerId", m => m.Optional())
-                .AddProperty("Customer", "Customer", m => m.Optional())
+                .AddProperty("Id", "Id", p => p.WithModifiers(m => m.Required()))
+                .AddProperty("Status", "Status", p => p.WithModifiers(m => m.Required()))
+                .AddProperty("Total", "Total", p => p.WithModifiers(m => m.Required()))
+                .AddProperty("CustomerId", "CustomerId", p => p.WithModifiers(m => m.Optional()))
+                .AddProperty("Customer", "Customer", p => p.WithModifiers(m => m.Optional()))
                 .AddRelationship("Customer"))
+            .AddObject(typeof(OrderItem), x => x
+                .WithName("OrderItem")
+                .WithDefaultOptions()
+                .AddIdentity("PrimaryKey", identity => identity
+                    .AddPart("OrderId")
+                    .AddPart("LineItemNumber"))
+                .AddProperty("OrderId", "OrderId", p => p.WithModifiers(m => m.Required()))
+                .AddProperty("LineItemNumber", "LineItemNumber", p => p.WithModifiers(m => m.Required()))
+                .AddProperty("ProductName", "ProductName", p => p.WithModifiers(m => m.Required()))
+                .AddProperty("Quantity", "Quantity", p => p.WithModifiers(m => m.Required()))
+                .AddProperty("UnitPrice", "UnitPrice", p => p.WithModifiers(m => m.Required())))
             .AddEnum(typeof(OrderStatus), x => x
                 .AddExtension(new VisibleMetadata { Visible = true })
                 .WithName("OrderStatus")
