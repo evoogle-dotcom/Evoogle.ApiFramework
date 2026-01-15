@@ -11,6 +11,7 @@ using Evoogle.Extensions;
 using Evoogle.XUnit;
 
 using FluentAssertions;
+
 using static Evoogle.XUnit.Tests.JsonUnitTests;
 
 namespace Evoogle.ApiFramework.Schema;

@@ -835,7 +835,6 @@ public partial class ApiIdTests
             ExpectedJson = @"{""Kind"":""Composite"",""Value"":[{""Name"":""alpha"",""Kind"":""Int32"",""Value"":24},{""Name"":""zeta"",""Kind"":""Int32"",""Value"":42}]}"
         },
     ];
-
     #endregion
 
     #region Test Methods
