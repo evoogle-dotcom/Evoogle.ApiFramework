@@ -2,25 +2,30 @@
 root = true
 
 # Exclude generated directories
-[bin/**]  # Match all files under bin/ folder
-generated_code = true  # Treats matched files as generated code; often skipped by analyzers
+[bin/**]
+generated_code = true
 
-[obj/**]  # Match all files under obj/ folder
-generated_code = true  # Treats matched files as generated code; often skipped by analyzers
+[obj/**]
+generated_code = true
 
 # =========================================================
 # Core formatting
 # =========================================================
 
 [*]
-charset = utf-8-bom  # Use UTF-8 encoding with BOM (Byte Order Mark)
-end_of_line = crlf  # Use CRLF (Windows-style) line endings
-indent_size = 4  # Use 4 spaces per indentation level
-indent_style = space  # Use spaces instead of tabs for indentation
-insert_final_newline = true  # Ensure file ends with a newline
-max_line_length = 100 # Maximum line length of 100 characters
-tab_width = 4 # Use 4 spaces per indentation level
-trim_trailing_whitespace = true  # Remove any whitespace at the end of lines
+# Use UTF-8 encoding with BOM (Byte Order Mark)
+charset = utf-8-bom
+
+# Use CRLF (Windows-style) line endings
+end_of_line = crlf
+
+# Indentation and spacing
+indent_size = 4
+indent_style = space
+insert_final_newline = true
+max_line_length = 100
+tab_width = 4
+trim_trailing_whitespace = true
 
 # Using directives: outside namespace; System first
 csharp_using_directive_placement = outside_namespace:error
