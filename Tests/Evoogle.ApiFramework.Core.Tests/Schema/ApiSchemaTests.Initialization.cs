@@ -96,6 +96,10 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
     #region Theory Data
     public static TheoryDataRow<IXUnitTest>[] InitializeThrowsTheoryData =>
     [
+        //
+        // ApiEnumType Initialization Tests
+        //
+
         // ApiEnumType throws if ApiName is invalid
         new InitializeThrowsTest
         {
@@ -447,6 +451,171 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
                     code: ApiInitializationCode.API_ENUM_TYPE_DUPLICATE_VALUE_CLR_ORDINAL,
                     description: $"Duplicate {nameof(ApiEnumValue)}.{nameof(ApiEnumValue.ClrOrdinal)} values: '2'",
                     remediation: $"Verify that each {nameof(ApiEnumValue)} has a unique {nameof(ApiEnumValue.ClrOrdinal)} value"
+                ),
+            ]
+        },
+
+        //
+        // ApiEnumValue Initialization Tests
+        //
+
+        // ApiEnumValue throws if ApiName is invalid
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiEnumValue)} Throws If {nameof(ApiEnumValue.ApiName)} Is Invalid",
+            Source = @"
+            {
+                ""ApiName"": ""ApiEnumValue Throws If ApiName Is Invalid"",
+                ""ApiScalarTypes"": [],
+                ""ApiEnumTypes"": [
+                    {
+                        ""ApiKind"": ""Enum"",
+                        ""ApiName"": ""Gender"",
+                        ""ApiEnumValues"": [
+                            {
+                                ""ApiName"": ""Unspecified"",
+                                ""ClrName"": ""Unspecified"",
+                                ""ClrOrdinal"": 0
+                            },
+                            {
+                                ""ApiName"": """",
+                                ""ClrName"": ""Male"",
+                                ""ClrOrdinal"": 1
+                            },
+                            {
+                                ""ApiName"": ""Female"",
+                                ""ClrName"": ""Female"",
+                                ""ClrOrdinal"": 2
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ],
+                ""ApiObjectTypes"": []
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"].{nameof(ApiEnumValue)}.{nameof(ApiEnumValue.ApiName)}",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_ENUM_VALUE_INVALID_API_NAME,
+                    description: $"{nameof(ApiEnumValue.ApiName)} must not be null, empty, or whitespace",
+                    remediation: $"Specify a valid {nameof(ApiEnumValue.ApiName)} value"
+                ),
+            ]
+        },
+
+        // ApiEnumValue throws if ClrName is invalid
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiEnumValue)} Throws If {nameof(ApiEnumValue.ClrName)} Is Invalid",
+            Source = @"
+            {
+                ""ApiName"": ""ApiEnumValue Throws If ClrName Is Invalid"",
+                ""ApiScalarTypes"": [],
+                ""ApiEnumTypes"": [
+                    {
+                        ""ApiKind"": ""Enum"",
+                        ""ApiName"": ""Gender"",
+                        ""ApiEnumValues"": [
+                            {
+                                ""ApiName"": ""Unspecified"",
+                                ""ClrName"": ""Unspecified"",
+                                ""ClrOrdinal"": 0
+                            },
+                            {
+                                ""ApiName"": ""Male"",
+                                ""ClrName"": """",
+                                ""ClrOrdinal"": 1
+                            },
+                            {
+                                ""ApiName"": ""Female"",
+                                ""ClrName"": ""Female"",
+                                ""ClrOrdinal"": 2
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ],
+                ""ApiObjectTypes"": []
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"].{nameof(ApiEnumValue)}[\"Male\"].{nameof(ApiEnumValue.ClrName)}",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_ENUM_VALUE_INVALID_CLR_NAME,
+                    description: $"{nameof(ApiEnumValue.ClrName)} must not be null, empty, or whitespace",
+                    remediation: $"Specify a valid {nameof(ApiEnumValue.ClrName)} value"
+                ),
+            ]
+        },
+
+        //
+        // ApiScalarType Initialization Tests
+        //
+
+        // ApiScalarType throws if ApiName is invalid
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiScalarType)} Throws If {nameof(ApiScalarType.ApiName)} Is Invalid",
+            Source = @"
+            {
+                ""ApiName"": ""ApiScalarType Throws If ApiName Is Invalid"",
+                ""ApiScalarTypes"": [
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": """",
+                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                    }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": []
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiScalarType)}.{nameof(ApiScalarType.ApiName)}",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_NAMED_TYPE_INVALID_API_NAME,
+                    description: $"{nameof(ApiScalarType.ApiName)} must not be null, empty, or whitespace",
+                    remediation: $"Specify a valid {nameof(ApiScalarType.ApiName)} value"
+                ),
+            ]
+        },
+
+        // ApiScalarType throws if ClrType is null
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiScalarType)} Throws If {nameof(ApiScalarType.ClrType)} Is Null",
+            Source = @"
+            {
+                ""ApiName"": ""ApiScalarType Throws If ClrType Is Null"",
+                ""ApiScalarTypes"": [
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""String""
+                    }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": []
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiScalarType)}[\"String\"].{nameof(ApiScalarType.ClrType)}",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_TYPE_NULL_CLR_TYPE,
+                    description: $"{nameof(ApiScalarType.ClrType)} must not be null",
+                    remediation: $"Specify a valid {nameof(ApiScalarType.ClrType)}"
                 ),
             ]
         },
