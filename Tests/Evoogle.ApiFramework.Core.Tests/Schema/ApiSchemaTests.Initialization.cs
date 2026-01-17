@@ -619,6 +619,319 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
                 ),
             ]
         },
+
+        //
+        // ApiProperty Initialization Tests
+        //
+
+        // ApiProperty throws if ApiName is invalid
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiProperty)} Throws If {nameof(ApiProperty.ApiName)} Is Invalid",
+            Source = @"
+            {
+                ""ApiName"": ""ApiProperty Throws If ApiName Is Invalid"",
+                ""ApiScalarTypes"": [
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""String"",
+                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                    }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""ScalarsOnly"",
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": """",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""String""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""RequiredName"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.ScalarsOnly, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}.{nameof(ApiProperty.ApiName)}",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_PROPERTY_INVALID_API_NAME,
+                    description: $"{nameof(ApiProperty.ApiName)} must not be null, empty, or whitespace",
+                    remediation: $"Specify a valid {nameof(ApiProperty.ApiName)} value"
+                ),
+            ]
+        },
+
+        // ApiProperty throws if ClrName is invalid
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiProperty)} Throws If {nameof(ApiProperty.ClrName)} Is Invalid",
+            Source = @"
+            {
+                ""ApiName"": ""ApiProperty Throws If ClrName Is Invalid"",
+                ""ApiScalarTypes"": [
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""String"",
+                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                    }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""ScalarsOnly"",
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""RequiredName"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""String""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": """",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.ScalarsOnly, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"RequiredName\"].{nameof(ApiProperty.ClrName)}",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_PROPERTY_INVALID_CLR_NAME,
+                    description: $"{nameof(ApiProperty.ClrName)} must not be null, empty, or whitespace",
+                    remediation: $"Specify a valid {nameof(ApiProperty.ClrName)} value"
+                ),
+            ]
+        },
+
+        // ApiProperty throws if ClrMember is missing
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiProperty)} Throws If CLR Member Is Missing",
+            Source = @"
+            {
+                ""ApiName"": ""ApiProperty Throws If CLR Member Is Missing"",
+                ""ApiScalarTypes"": [
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""String"",
+                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                    }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""ScalarsOnly"",
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""NonExistent"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""String""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""NonExistentProperty"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.ScalarsOnly, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"NonExistent\"].{nameof(ApiProperty.ClrName)}",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_PROPERTY_MISSING_CLR_MEMBER,
+                    description: $"CLR member 'NonExistentProperty' was not found on CLR type '{nameof(ScalarsOnly)}'",
+                    remediation: $"Add a public CLR property or field named 'NonExistentProperty' to CLR type '{nameof(ScalarsOnly)}'"
+                ),
+            ]
+        },
+
+        // ApiProperty throws if Type is null
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiProperty)} Throws If {nameof(ApiProperty.ApiType)} Type Is Null",
+            Source = @"
+            {
+                ""ApiName"": ""ApiProperty Throws If Type Is Null"",
+                ""ApiScalarTypes"": [],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""ScalarsOnly"",
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""RequiredName"",
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""RequiredName"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.ScalarsOnly, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"RequiredName\"].{nameof(ApiProperty.ApiType)}",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_PROPERTY_NULL_TYPE,
+                    description: $"{nameof(ApiProperty.ApiType)} must not be null",
+                    remediation: $"Specify a valid {nameof(ApiProperty.ApiType)}"
+                ),
+            ]
+        },
+
+        // ApiProperty throws if Type is unresolved
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiProperty)} Throws If {nameof(ApiProperty.ApiType)} Is Unresolved Because Api Named Reference Type Does Not Exist",
+            Source = @"
+            {
+                ""ApiName"": ""ApiProperty Throws If Type Is Unresolved Because Api Named Reference Type Does Not Exist"",
+                ""ApiScalarTypes"": [],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""ScalarsOnly"",
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""RequiredName"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""String""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""RequiredName"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.ScalarsOnly, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"RequiredName\"].{nameof(ApiProperty.ApiType)}",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_PROPERTY_UNRESOLVED_TYPE,
+                    description: $"{nameof(ApiProperty.ApiType)} could not be resolved for {nameof(ApiTypeExpression.ApiKind)}='Scalar' and {nameof(ApiTypeExpression.ApiName)}='String'",
+                    remediation: $"Verify that a type is declared in the schema for {nameof(ApiTypeExpression.ApiKind)}='Scalar' and {nameof(ApiTypeExpression.ApiName)}='String'"
+                ),
+            ]
+        },
+
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiProperty)} Throws If {nameof(ApiProperty.ApiType)} Is Unresolved Because CLR Reference Type Does Not Exist",
+            Source = @"
+            {
+                ""ApiName"": ""ApiProperty Throws If Type Is Unresolved Because CLR Reference Type Does Not Exist"",
+                ""ApiScalarTypes"": [],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""ScalarsOnly"",
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""RequiredName"",
+                                ""ApiType"": {
+                                    ""ClrType"": ""System.String, System.Private.CoreLib""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""RequiredName"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.ScalarsOnly, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"RequiredName\"].{nameof(ApiProperty.ApiType)}",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_PROPERTY_UNRESOLVED_TYPE,
+                    description: $"{nameof(ApiProperty.ApiType)} could not be resolved for {nameof(ApiTypeExpression.ClrType)}='{typeof(string).SafeToName()}'",
+                    remediation: $"Verify that a type is declared in the schema for {nameof(ApiTypeExpression.ClrType)}='{typeof(string).SafeToName()}'"
+                ),
+            ]
+        },
+
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiProperty)} Throws If {nameof(ApiProperty.ApiType)} Is Unresolved Because Type Reference Is Invalid",
+            Source = @"
+            {
+                ""ApiName"": ""ApiProperty Throws If Type Is Unresolved Because Type Reference Is Invalid"",
+                ""ApiScalarTypes"": [],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""ScalarsOnly"",
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""RequiredName"",
+                                ""ApiType"": {},
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""RequiredName"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.ScalarsOnly, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"RequiredName\"].{nameof(ApiProperty.ApiType)}",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_PROPERTY_UNRESOLVED_TYPE,
+                    description: $"{nameof(ApiProperty.ApiType)} could not be resolved because none of the following are set: {nameof(ApiTypeExpression.ApiInlineType)}, a valid combination of {nameof(ApiTypeExpression.ApiKind)} and {nameof(ApiTypeExpression.ApiName)}, or {nameof(ApiTypeExpression.ClrType)}",
+                    remediation: $"Specify either {nameof(ApiTypeExpression.ApiInlineType)}, a valid combination of {nameof(ApiTypeExpression.ApiKind)} and {nameof(ApiTypeExpression.ApiName)}, or {nameof(ApiTypeExpression.ClrType)}"
+                ),
+            ]
+        },
     ];
     #endregion
 

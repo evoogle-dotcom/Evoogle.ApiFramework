@@ -301,7 +301,7 @@ public sealed partial class ApiObjectType
         (
             parts: this.ApiIdentities,
             partKeySelector: x => x.ApiName,
-            partKeyFilter: x => !string.IsNullOrWhiteSpace(x),
+            partKeyFilter: x => ApiSchemaHelpers.IsNameValid(x),
             partKeyPropertyName: nameof(ApiIdentity.ApiName),
             path: $"{this.ApiPath}.{nameof(this.ApiIdentities)}",
             code: ApiInitializationCode.API_OBJECT_TYPE_DUPLICATE_IDENTITY_API_NAME,
@@ -377,7 +377,7 @@ public sealed partial class ApiObjectType
         (
             parts: this.ApiProperties,
             partKeySelector: x => x.ApiName,
-            partKeyFilter: x => !string.IsNullOrWhiteSpace(x),
+            partKeyFilter: x => ApiSchemaHelpers.IsNameValid(x),
             partKeyPropertyName: nameof(ApiProperty.ApiName),
             path: $"{this.ApiPath}.{nameof(this.ApiProperties)}",
             code: ApiInitializationCode.API_OBJECT_TYPE_DUPLICATE_PROPERTY_API_NAME,
@@ -389,7 +389,7 @@ public sealed partial class ApiObjectType
         (
             parts: this.ApiProperties,
             partKeySelector: x => x.ClrName,
-            partKeyFilter: x => !string.IsNullOrWhiteSpace(x),
+            partKeyFilter: x => ApiSchemaHelpers.IsNameValid(x),
             partKeyPropertyName: nameof(ApiProperty.ClrName),
             path: $"{this.ApiPath}.{nameof(this.ApiProperties)}",
             code: ApiInitializationCode.API_OBJECT_TYPE_DUPLICATE_PROPERTY_CLR_NAME,
@@ -401,7 +401,7 @@ public sealed partial class ApiObjectType
         (
             parts: this.ApiRelationships,
             partKeySelector: x => x.ApiName,
-            partKeyFilter: x => !string.IsNullOrWhiteSpace(x),
+            partKeyFilter: x => ApiSchemaHelpers.IsNameValid(x),
             partKeyPropertyName: nameof(ApiRelationship.ApiName),
             path: $"{this.ApiPath}.{nameof(this.ApiRelationships)}",
             code: ApiInitializationCode.API_OBJECT_TYPE_DUPLICATE_RELATIONSHIP_API_NAME,

@@ -287,7 +287,8 @@ public sealed class ApiSchema : ExtensibleBase
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        if (string.IsNullOrWhiteSpace(this.ApiName))
+        var isApiNameInvalid = ApiSchemaHelpers.IsNameInvalid(this.ApiName);
+        if (isApiNameInvalid)
         {
             var path = $"{this.ApiPath}.{nameof(this.ApiName)}";
             var severity = ApiInitializationSeverity.Warning;
@@ -334,7 +335,7 @@ public sealed class ApiSchema : ExtensibleBase
         (
             parts: this.ApiNamedTypes,
             partKeySelector: x => x.ApiName,
-            partKeyFilter: x => !string.IsNullOrWhiteSpace(x),
+            partKeyFilter: x => ApiSchemaHelpers.IsNameValid(x),
             partKeyPropertyName: nameof(ApiNamedType.ApiName),
             path: $"{this.ApiPath}.{nameof(this.ApiNamedTypes)}",
             code: ApiInitializationCode.API_SCHEMA_DUPLICATE_NAMED_TYPE_API_NAME,
@@ -358,7 +359,7 @@ public sealed class ApiSchema : ExtensibleBase
         (
             parts: this.ApiEnumTypes,
             partKeySelector: x => x.ApiName,
-            partKeyFilter: x => !string.IsNullOrWhiteSpace(x),
+            partKeyFilter: x => ApiSchemaHelpers.IsNameValid(x),
             partKeyPropertyName: nameof(ApiEnumType.ApiName),
             path: $"{this.ApiPath}.{nameof(this.ApiEnumTypes)}",
             code: ApiInitializationCode.API_SCHEMA_DUPLICATE_ENUM_TYPE_API_NAME,
@@ -382,7 +383,7 @@ public sealed class ApiSchema : ExtensibleBase
         (
             parts: this.ApiObjectTypes,
             partKeySelector: x => x.ApiName,
-            partKeyFilter: x => !string.IsNullOrWhiteSpace(x),
+            partKeyFilter: x => ApiSchemaHelpers.IsNameValid(x),
             partKeyPropertyName: nameof(ApiObjectType.ApiName),
             path: $"{this.ApiPath}.{nameof(this.ApiObjectTypes)}",
             code: ApiInitializationCode.API_SCHEMA_DUPLICATE_OBJECT_TYPE_API_NAME,
@@ -406,7 +407,7 @@ public sealed class ApiSchema : ExtensibleBase
         (
             parts: this.ApiScalarTypes,
             partKeySelector: x => x.ApiName,
-            partKeyFilter: x => !string.IsNullOrWhiteSpace(x),
+            partKeyFilter: x => ApiSchemaHelpers.IsNameValid(x),
             partKeyPropertyName: nameof(ApiScalarType.ApiName),
             path: $"{this.ApiPath}.{nameof(this.ApiScalarTypes)}",
             code: ApiInitializationCode.API_SCHEMA_DUPLICATE_SCALAR_TYPE_API_NAME,

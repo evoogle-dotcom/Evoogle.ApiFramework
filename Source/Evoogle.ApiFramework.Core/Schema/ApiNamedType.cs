@@ -45,7 +45,8 @@ public abstract class ApiNamedType
     #region Implementation Methods
     private void InitializeApiName(ApiInitializationContext context)
     {
-        if (string.IsNullOrWhiteSpace(this.ApiName))
+        var isApiNameInvalid = ApiSchemaHelpers.IsNameInvalid(this.ApiName);
+        if (isApiNameInvalid)
         {
             var path = $"{this.ApiPath}.{nameof(this.ApiName)}";
             var severity = ApiInitializationSeverity.Error;

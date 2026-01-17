@@ -111,7 +111,8 @@ public sealed class ApiRelationship
     #region Implementation Methods
     private void InitializeApiName(ApiInitializationContext context)
     {
-        if (string.IsNullOrWhiteSpace(this.ApiName))
+        var isApiNameInvalid = ApiSchemaHelpers.IsNameInvalid(this.ApiName);
+        if (isApiNameInvalid)
         {
             var path = $"{this.ApiPath}.{nameof(this.ApiName)}";
             var severity = ApiInitializationSeverity.Error;
@@ -127,7 +128,8 @@ public sealed class ApiRelationship
     {
         _apiResolvedProperty = null;
 
-        if (!string.IsNullOrWhiteSpace(this.ApiPropertyName))
+        var isApiPropertyNameValid = ApiSchemaHelpers.IsNameValid(this.ApiPropertyName);
+        if (isApiPropertyNameValid)
         {
             // Resolve the related API property for the parent API object type.
             var apiParentObjectType = context.ApiParentObjectType;

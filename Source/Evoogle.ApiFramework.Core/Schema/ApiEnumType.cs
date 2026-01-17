@@ -159,7 +159,7 @@ public sealed class ApiEnumType
         (
             parts: this.ApiEnumValues,
             partKeySelector: x => x.ApiName,
-            partKeyFilter: x => !string.IsNullOrWhiteSpace(x),
+            partKeyFilter: x => ApiSchemaHelpers.IsNameValid(x),
             partKeyPropertyName: nameof(ApiEnumValue.ApiName),
             path: $"{this.ApiPath}.{nameof(this.ApiEnumValues)}",
             code: ApiInitializationCode.API_ENUM_TYPE_DUPLICATE_VALUE_API_NAME,
@@ -171,7 +171,7 @@ public sealed class ApiEnumType
         (
             parts: this.ApiEnumValues,
             partKeySelector: x => x.ClrName,
-            partKeyFilter: x => !string.IsNullOrWhiteSpace(x),
+            partKeyFilter: x => ApiSchemaHelpers.IsNameValid(x),
             partKeyPropertyName: nameof(ApiEnumValue.ClrName),
             path: $"{this.ApiPath}.{nameof(this.ApiEnumValues)}",
             code: ApiInitializationCode.API_ENUM_TYPE_DUPLICATE_VALUE_CLR_NAME,

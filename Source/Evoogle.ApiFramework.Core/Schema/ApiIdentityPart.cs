@@ -97,7 +97,8 @@ public sealed class ApiIdentityPart
     #region Implementation Methods
     private void InitializeApiPropertyName(ApiInitializationContext context)
     {
-        if (string.IsNullOrWhiteSpace(this.ApiPropertyName))
+        var isApiPropertyNameInvalid = ApiSchemaHelpers.IsNameInvalid(this.ApiPropertyName);
+        if (isApiPropertyNameInvalid)
         {
             var path = $"{this.ApiPath}.{nameof(this.ApiPropertyName)}";
             var severity = ApiInitializationSeverity.Error;

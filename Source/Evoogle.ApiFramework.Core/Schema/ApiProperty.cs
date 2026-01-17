@@ -175,7 +175,8 @@ public sealed partial class ApiProperty
 
     private void InitializeApiName(ApiInitializationContext context)
     {
-        if (string.IsNullOrWhiteSpace(this.ApiName))
+        var isApiNameInvalid = ApiSchemaHelpers.IsNameInvalid(this.ApiName);
+        if (isApiNameInvalid)
         {
             var path = $"{this.ApiPath}.{nameof(this.ApiName)}";
             var severity = ApiInitializationSeverity.Error;
@@ -297,6 +298,13 @@ public sealed partial class ApiProperty
 
     private void InitializeClrGetterAndSetter(ApiInitializationContext context)
     {
+        var isClrNameInvalid = ApiSchemaHelpers.IsNameInvalid(this.ClrName);
+        if (isClrNameInvalid)
+        {
+            // If CLR name is invalid, skip further processing
+            return;
+        }
+
         var apiObjectType = context.ApiParentObjectType;
         var clrObjectType = apiObjectType.ClrType;
         var clrMemberName = this.ClrName;
@@ -322,8 +330,8 @@ public sealed partial class ApiProperty
             var path = $"{this.ApiPath}.{nameof(this.ClrName)}";
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_PROPERTY_MISSING_CLR_MEMBER;
-            var description = $"Member '{clrMemberName}' was not found on {nameof(ApiObjectType)}.{nameof(ApiObjectType.ClrType)} '{clrObjectType.SafeToName()}'";
-            var remediation = $"Add a public property or field named '{clrMemberName}' to {nameof(ApiObjectType)}.{nameof(ApiObjectType.ClrType)} '{clrObjectType.SafeToName()}'";
+            var description = $"CLR member '{clrMemberName}' was not found on CLR type '{clrObjectType.SafeToName()}'";
+            var remediation = $"Add a public CLR property or field named '{clrMemberName}' to CLR type '{clrObjectType.SafeToName()}'";
 
             context.AddIssue(path, severity, code, description, remediation);
         }
@@ -341,7 +349,8 @@ public sealed partial class ApiProperty
 
     private void InitializeClrName(ApiInitializationContext context)
     {
-        if (string.IsNullOrWhiteSpace(this.ClrName))
+        var isClrNameInvalid = ApiSchemaHelpers.IsNameInvalid(this.ClrName);
+        if (isClrNameInvalid)
         {
             var path = $"{this.ApiPath}.{nameof(this.ClrName)}";
             var severity = ApiInitializationSeverity.Error;
