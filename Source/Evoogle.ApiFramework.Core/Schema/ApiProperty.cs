@@ -221,8 +221,8 @@ public sealed partial class ApiProperty
             var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_PROPERTY_INVALID_FIELD_GETTER;
-            var description = $"Failed to compile field getter for '{clrMemberName}': {ex.Message}";
-            var remediation = $"Verify that field '{clrMemberName}' on {nameof(ApiObjectType)}.{nameof(ApiObjectType.ClrType)} '{clrObjectType.SafeToName()}' is accessible";
+            var description = $"Failed to compile field getter for '{clrMemberName}': {ex.Message.TrimEnd('.')}";
+            var remediation = $"Verify that field '{clrMemberName}' is readable and can be used in expression trees";
 
             context.AddIssue(path, severity, code, description, remediation);
         }
@@ -236,9 +236,8 @@ public sealed partial class ApiProperty
             var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_PROPERTY_INVALID_FIELD_SETTER;
-            var description = $"Failed to compile field setter for '{clrMemberName}': {ex.Message}";
-            var remediation = $"Verify that field '{clrMemberName}' on {nameof(ApiObjectType)}.{nameof(ApiObjectType.ClrType)} '{clrObjectType.SafeToName()}' is accessible and writable";
-
+            var description = $"Failed to compile field setter for '{clrMemberName}': {ex.Message.TrimEnd('.')}";
+            var remediation = $"Verify that field '{clrMemberName}' is writable and can be used in expression trees";
             context.AddIssue(path, severity, code, description, remediation);
         }
     }
@@ -271,8 +270,8 @@ public sealed partial class ApiProperty
             var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_PROPERTY_INVALID_PROPERTY_GETTER;
-            var description = $"Failed to compile property getter for '{clrMemberName}': {ex.Message}";
-            var remediation = $"Verify that property '{clrMemberName}' on {nameof(ApiObjectType)}.{nameof(ApiObjectType.ClrType)} '{clrObjectType.SafeToName()}' is accessible";
+            var description = $"Failed to compile property getter for '{clrMemberName}': {ex.Message.TrimEnd('.')}";
+            var remediation = $"Verify that property '{clrMemberName}' is readable and can be used in expression trees";
 
             context.AddIssue(path, severity, code, description, remediation);
         }
@@ -286,8 +285,8 @@ public sealed partial class ApiProperty
             var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_PROPERTY_INVALID_PROPERTY_SETTER;
-            var description = $"Failed to compile property setter for '{clrMemberName}': {ex.Message}";
-            var remediation = $"Verify that property '{clrMemberName}' on {nameof(ApiObjectType)}.{nameof(ApiObjectType.ClrType)} '{clrObjectType.SafeToName()}' is accessible and writable";
+            var description = $"Failed to compile property setter for '{clrMemberName}': {ex.Message.TrimEnd('.')}";
+            var remediation = $"Verify that property '{clrMemberName}' is writable and can be used in expression trees";
 
             context.AddIssue(path, severity, code, description, remediation);
         }
@@ -349,7 +348,7 @@ public sealed partial class ApiProperty
             var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_PROPERTY_INVALID_CLR_MEMBER;
-            var description = $"Failed to compile getter or setter accessor for '{clrMemberName}': {ex.Message}";
+            var description = $"Failed to compile getter or setter accessor for '{clrMemberName}': {ex.Message.TrimEnd('.')}";
             var remediation = $"Verify that '{clrMemberName}' exists as a public property or field on {nameof(ApiObjectType)}.{nameof(ApiObjectType.ClrType)} '{clrObjectType.SafeToName()}'";
 
             context.AddIssue(path, severity, code, description, remediation);

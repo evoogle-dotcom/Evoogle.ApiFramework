@@ -29,11 +29,20 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
     #region Test Types
     public ref struct TypesWithRefStructMembers
     {
-        // This will trigger API_PROPERTY_INVALID_FIELD_GETTER/SETTER
+        // This will trigger API_PROPERTY_INVALID_CLR_MEMBER
         public Span<byte> SpanField;
 
-        // This will trigger API_PROPERTY_INVALID_PROPERTY_GETTER/SETTER
+        // This will trigger API_PROPERTY_INVALID_CLR_MEMBER
         public Span<byte> SpanProperty { get; set; }
+    }
+
+    public unsafe class TypesWithPointerMembers
+    {
+        // This will trigger API_PROPERTY_INVALID_FIELD_GETTER/SETTER
+        public byte* PointerField;
+
+        // This will trigger API_PROPERTY_INVALID_PROPERTY_GETTER/SETTER
+        public byte* PointerProperty { get; set; }
     }
 
     private class InitializeThrowsTest : JsonConverterTestBase<ApiSchema>
@@ -1019,6 +1028,89 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
                     code: ApiInitializationCode.API_PROPERTY_UNRESOLVED_TYPE,
                     description: $"{nameof(ApiProperty.ApiType)} could not be resolved because none of the following are set: {nameof(ApiTypeExpression.ApiInlineType)}, a valid combination of {nameof(ApiTypeExpression.ApiKind)} and {nameof(ApiTypeExpression.ApiName)}, or {nameof(ApiTypeExpression.ClrType)}",
                     remediation: $"Specify either {nameof(ApiTypeExpression.ApiInlineType)}, a valid combination of {nameof(ApiTypeExpression.ApiKind)} and {nameof(ApiTypeExpression.ApiName)}, or {nameof(ApiTypeExpression.ClrType)}"
+                ),
+            ]
+        },
+
+        // ApiProperty throws if unable to get or set field/property value
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiProperty)} Throws If Unable To Get Or Set Field/Property Value",
+            Source = @"
+            {
+                ""ApiName"": ""ApiProperty Throws If Unable To Get Or Set Field/Property Value"",
+                ""ApiScalarTypes"": [
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""Byte"",
+                        ""ClrType"": ""System.Byte, System.Private.CoreLib""
+                    }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""TypesWithPointerMembers"",
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""PointerField"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""Byte""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""PointerField"",
+                                ""ClrMemberKind"": ""Field""
+                            },
+                            {
+                                ""ApiName"": ""PointerProperty"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""Byte""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""PointerProperty"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests\u002BTypesWithPointerMembers, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=4, Errors=4, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiObjectType)}[\"{nameof(TypesWithPointerMembers)}\"].{nameof(ApiProperty)}[\"PointerField\"]",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_PROPERTY_INVALID_FIELD_GETTER,
+                    description: $"Failed to compile field getter for '{nameof(TypesWithPointerMembers.PointerField)}': No coercion operator is defined between types 'System.Byte*' and 'System.Object'",
+                    remediation: $"Verify that field '{nameof(TypesWithPointerMembers.PointerField)}' is readable and can be used in expression trees"
+                ),
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiObjectType)}[\"{nameof(TypesWithPointerMembers)}\"].{nameof(ApiProperty)}[\"PointerField\"]",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_PROPERTY_INVALID_FIELD_SETTER,
+                    description: $"Failed to compile field setter for '{nameof(TypesWithPointerMembers.PointerField)}': Type must not be a pointer type (Parameter 'type')",
+                    remediation: $"Verify that field '{nameof(TypesWithPointerMembers.PointerField)}' is writable and can be used in expression trees"
+                ),
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiObjectType)}[\"{nameof(TypesWithPointerMembers)}\"].{nameof(ApiProperty)}[\"PointerProperty\"]",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_PROPERTY_INVALID_PROPERTY_GETTER,
+                    description: $"Failed to compile property getter for '{nameof(TypesWithPointerMembers.PointerProperty)}': No coercion operator is defined between types 'System.Byte*' and 'System.Object'",
+                    remediation: $"Verify that property '{nameof(TypesWithPointerMembers.PointerProperty)}' is readable and can be used in expression trees"
+                ),
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiObjectType)}[\"{nameof(TypesWithPointerMembers)}\"].{nameof(ApiProperty)}[\"PointerProperty\"]",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_PROPERTY_INVALID_PROPERTY_SETTER,
+                    description: $"Failed to compile property setter for '{nameof(TypesWithPointerMembers.PointerProperty)}': Type must not be a pointer type (Parameter 'type')",
+                    remediation: $"Verify that property '{nameof(TypesWithPointerMembers.PointerProperty)}' is writable and can be used in expression trees"
                 ),
             ]
         },
