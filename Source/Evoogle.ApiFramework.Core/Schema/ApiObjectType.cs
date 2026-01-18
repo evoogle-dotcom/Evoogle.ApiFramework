@@ -330,7 +330,7 @@ public sealed partial class ApiObjectType
             var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Warning;
             var code = ApiInitializationCode.API_OBJECT_TYPE_NULL_OR_EMPTY_PROPERTIES;
-            var description = $"{nameof(this.ApiProperties)} must not be null or empty";
+            var description = $"{nameof(this.ApiProperties)} is null or empty";
 
             context.AddIssue(path, severity, code, description, remediation: null);
             return;
@@ -444,33 +444,6 @@ public sealed partial class ApiObjectType
                     var code = ApiInitializationCode.API_OBJECT_TYPE_AMBIGUOUS_IDENTITIES;
                     var description = $"Identities '{identity1.ApiName}' and '{identity2.ApiName}' use the same property set [{string.Join(", ", props1)}], which may cause ambiguity";
                     var remediation = "Consider using different property combinations for each identity, or remove one of the duplicate identities";
-
-                    context.AddIssue(path, severity, code, description, remediation);
-                }
-            }
-        }
-
-        // Check for performance concerns in identity properties
-        foreach (var identity in identities)
-        {
-            foreach (var part in identity.ApiIdentityParts)
-            {
-                if (part.ApiProperty is null)
-                {
-                    continue;
-                }
-
-                var propertyType = part.ApiProperty.ApiType.ClrType;
-                var idType = part.ClrIdType;
-
-                // Warn about string parsing to complex types (potentially expensive)
-                if (propertyType == typeof(string) && idType != typeof(string))
-                {
-                    var path = $"{identity.ApiPath}.{nameof(identity.ApiIdentityParts)}[{part.ApiPropertyName}]";
-                    var severity = ApiInitializationSeverity.Warning;
-                    var code = ApiInitializationCode.API_OBJECT_TYPE_IDENTITY_PERFORMANCE_CONCERN;
-                    var description = $"Identity part '{part.ApiPropertyName}' requires type coercion between string and {idType.Name}, which may impact performance";
-                    var remediation = $"Consider using {idType.Name} as the property type directly, or be aware of the parsing overhead";
 
                     context.AddIssue(path, severity, code, description, remediation);
                 }

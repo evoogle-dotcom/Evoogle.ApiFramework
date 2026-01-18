@@ -104,7 +104,7 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
                 builder = builder.AddObject(clrType, x =>
                 {
                     x.WithName(apiName);
-                    foreach (var apiProperty in apiObjectType.ApiProperties)
+                    foreach (var apiProperty in apiObjectType.ApiProperties.SafeCast<ApiProperty>())
                     {
                         x.AddProperty
                         (
@@ -126,7 +126,7 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
                             )
                         );
                     }
-                    foreach (var apiRelationship in apiObjectType.ApiRelationships)
+                    foreach (var apiRelationship in apiObjectType.ApiRelationships.SafeCast<ApiRelationship>())
                     {
                         x.AddRelationship(apiRelationship.ApiName, apiRelationship.ApiPropertyName);
                     }
@@ -468,7 +468,7 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"{nameof(ScalarsOnly.RequiredName)}\"].{nameof(ApiProperty.ApiType)}",
+                    path: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"{nameof(ScalarsOnly.RequiredName)}\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_PROPERTY_UNRESOLVED_TYPE,
                     description: $"{nameof(ApiProperty.ApiType)} could not be resolved for {nameof(ApiTypeExpression.ClrType)}='{nameof(String)}'",
@@ -476,7 +476,7 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
                 ),
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"{nameof(ScalarsOnly.OptionalName)}\"].{nameof(ApiProperty.ApiType)}",
+                    path: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"{nameof(ScalarsOnly.OptionalName)}\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_PROPERTY_UNRESOLVED_TYPE,
                     description: $"{nameof(ApiProperty.ApiType)} could not be resolved for {nameof(ApiTypeExpression.ClrType)}='{nameof(String)}'",
@@ -523,7 +523,7 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"{nameof(Person)}\"].{nameof(ApiProperty)}[\"{nameof(Person.Name)}\"].{nameof(ApiProperty.ApiType)}",
+                    path: $"{nameof(ApiObjectType)}[\"{nameof(Person)}\"].{nameof(ApiProperty)}[\"{nameof(Person.Name)}\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_PROPERTY_UNRESOLVED_TYPE,
                     description: $"{nameof(ApiProperty.ApiType)} could not be resolved for {nameof(ApiTypeExpression.ClrType)}='{nameof(String)}'",
@@ -531,7 +531,7 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
                 ),
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"{nameof(Person)}\"].{nameof(ApiProperty)}[\"{nameof(Person.Gender)}\"].{nameof(ApiProperty.ApiType)}",
+                    path: $"{nameof(ApiObjectType)}[\"{nameof(Person)}\"].{nameof(ApiProperty)}[\"{nameof(Person.Gender)}\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_PROPERTY_UNRESOLVED_TYPE,
                     description: $"{nameof(ApiProperty.ApiType)} could not be resolved for {nameof(ApiTypeExpression.ClrType)}='{nameof(Gender)}'",
@@ -539,7 +539,7 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
                 ),
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"{nameof(Person)}\"].{nameof(ApiProperty)}[\"{nameof(Person.Hobbies)}\"].{nameof(ApiCollectionType)}.{nameof(ApiCollectionType.ApiItemType)}",
+                    path: $"{nameof(ApiObjectType)}[\"{nameof(Person)}\"].{nameof(ApiProperty)}[\"{nameof(Person.Hobbies)}\"].{nameof(ApiCollectionType)}",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_COLLECTION_TYPE_UNRESOLVED_ITEM_TYPE,
                     description: $"{nameof(ApiCollectionType.ApiItemType)} could not be resolved for {nameof(ApiTypeExpression.ClrType)}='{nameof(String)}'",
@@ -587,7 +587,7 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"{nameof(Company)}\"].{nameof(ApiProperty)}[\"{nameof(Company.Owner)}\"].{nameof(ApiProperty.ApiType)}",
+                    path: $"{nameof(ApiObjectType)}[\"{nameof(Company)}\"].{nameof(ApiProperty)}[\"{nameof(Company.Owner)}\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_PROPERTY_UNRESOLVED_TYPE,
                     description: $"{nameof(ApiProperty.ApiType)} could not be resolved for {nameof(ApiTypeExpression.ClrType)}='{nameof(Person)}'",
@@ -595,7 +595,7 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
                 ),
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"{nameof(Company)}\"].{nameof(ApiProperty)}[\"{nameof(Company.Employees)}\"].{nameof(ApiCollectionType)}.{nameof(ApiCollectionType.ApiItemType)}",
+                    path: $"{nameof(ApiObjectType)}[\"{nameof(Company)}\"].{nameof(ApiProperty)}[\"{nameof(Company.Employees)}\"].{nameof(ApiCollectionType)}",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_COLLECTION_TYPE_UNRESOLVED_ITEM_TYPE,
                     description: $"{nameof(ApiCollectionType.ApiItemType)} could not be resolved for {nameof(ApiTypeExpression.ClrType)}='{nameof(Person)}'",
@@ -627,7 +627,7 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"{nameof(Company)}\"].{nameof(ApiRelationship)}[\"{nameof(Company.Owner)}\"].{nameof(ApiRelationship.ApiProperty)}",
+                    path: $"{nameof(ApiObjectType)}[\"{nameof(Company)}\"].{nameof(ApiRelationship)}[\"{nameof(Company.Owner)}\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_RELATIONSHIP_UNRESOLVED_PROPERTY,
                     description: $"{nameof(ApiRelationship.ApiProperty)} could not be resolved for {nameof(ApiRelationship.ApiPropertyName)}='OwnerMissing' on parent {nameof(ApiObjectType)}='{nameof(Company)}'",
@@ -635,7 +635,7 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
                 ),
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"{nameof(Company)}\"].{nameof(ApiRelationship)}[\"{nameof(Company.Employees)}\"].{nameof(ApiRelationship.ApiProperty)}",
+                    path: $"{nameof(ApiObjectType)}[\"{nameof(Company)}\"].{nameof(ApiRelationship)}[\"{nameof(Company.Employees)}\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_RELATIONSHIP_UNRESOLVED_PROPERTY,
                     description: $"{nameof(ApiRelationship.ApiProperty)} could not be resolved for {nameof(ApiRelationship.ApiPropertyName)}='EmployeesMissing' on parent {nameof(ApiObjectType)}='{nameof(Company)}'",

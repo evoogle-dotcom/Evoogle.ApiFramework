@@ -3,6 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Net.Sockets;
 using System.Text.Json.Serialization;
 
 using Evoogle.ApiFramework.Identity;
@@ -170,19 +171,29 @@ public sealed class ApiIdentityPart
                 var description = $"Scalar type '{this.ClrConfiguredIdType.SafeToName()}' is not compatible with {nameof(ApiId)}";
                 var scalarTypeNames = string.Join(",", ApiId.GetCompatibleScalarTypes().Select(t => t.SafeToName()));
                 var remediation = $"Use one of the supported scalar types: {scalarTypeNames}";
+
                 context.AddIssue(path, severity, code, description, remediation);
-                return;
             }
 
             _clrResolvedIdType = this.ClrConfiguredIdType;
         }
-        // Otherwise, detect from resolved property
-        else if (_apiResolvedProperty is not null)
+
+        if (_apiResolvedProperty is not null)
         {
             var clrResolvedPropertyType = _apiResolvedProperty.ApiType.ClrType;
 
-            // The ApiId.GetCompatibleScalarType method always returns a valid type
-            _clrResolvedIdType = ApiId.GetCompatibleScalarType(clrResolvedPropertyType);
+            _clrResolvedIdType ??= ApiId.GetCompatibleScalarType(clrResolvedPropertyType);
+
+            if (clrResolvedPropertyType == typeof(string) && _clrResolvedIdType != typeof(string))
+            {
+                var path = this.ApiPath;
+                var severity = ApiInitializationSeverity.Warning;
+                var code = ApiInitializationCode.API_IDENTITY_PART_PERFORMANCE_CONCERN;
+                var description = $"Identity part '{this.ApiPropertyName}' requires type coercion between {nameof(String)} and {_clrResolvedIdType.SafeToName()}, which may impact performance";
+                var remediation = $"Consider using {_clrResolvedIdType.SafeToName()} as the property type directly, or be aware of the parsing overhead";
+
+                context.AddIssue(path, severity, code, description, remediation);
+            }
         }
     }
     #endregion

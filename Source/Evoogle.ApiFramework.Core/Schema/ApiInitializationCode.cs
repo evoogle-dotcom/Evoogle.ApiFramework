@@ -104,6 +104,11 @@ public enum ApiInitializationCode
     API_IDENTITY_PART_INVALID_SCALAR_TYPE,
 
     /// <summary>
+    ///     An identity part uses a property CLR type that may have performance implications for identity operations.
+    /// </summary>
+    API_IDENTITY_PART_PERFORMANCE_CONCERN,
+
+    /// <summary>
     ///     The identity part's property reference could not be resolved to a defined property.
     /// </summary>
     API_IDENTITY_PART_UNRESOLVED_PROPERTY,
@@ -141,11 +146,6 @@ public enum ApiInitializationCode
     ///     Multiple relationships have the same API name.
     /// </summary>
     API_OBJECT_TYPE_DUPLICATE_RELATIONSHIP_API_NAME,
-
-    /// <summary>
-    ///     An identity part uses a property type that may have performance implications for identity operations.
-    /// </summary>
-    API_OBJECT_TYPE_IDENTITY_PERFORMANCE_CONCERN,
 
     /// <summary>
     ///     The object type has no properties defined.

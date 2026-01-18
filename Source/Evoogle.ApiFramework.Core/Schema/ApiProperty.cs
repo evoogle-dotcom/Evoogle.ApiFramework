@@ -294,16 +294,21 @@ public sealed partial class ApiProperty
 
     private void InitializeClrGetterAndSetter(ApiInitializationContext context)
     {
-        var isClrNameInvalid = ApiSchemaHelpers.IsNameInvalid(this.ClrName);
-        if (isClrNameInvalid)
-        {
-            // If CLR name is invalid, skip further processing
-            return;
-        }
-
         var apiObjectType = context.ApiParentObjectType;
         var clrObjectType = apiObjectType.ClrType;
         var clrMemberName = this.ClrName;
+
+        if (clrObjectType is null)
+        {
+            // If the parent CLR object type is null, skip further processing
+            return;
+        }
+
+        if (ApiSchemaHelpers.IsNameInvalid(clrMemberName))
+        {
+            // If the CLR member name is invalid, skip further processing
+            return;
+        }
 
         try
         {
