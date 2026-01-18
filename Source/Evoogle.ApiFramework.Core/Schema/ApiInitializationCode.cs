@@ -165,7 +165,7 @@ public enum ApiInitializationCode
     API_PROPERTY_INVALID_CLR_NAME,
 
     /// <summary>
-    ///     The property's CLR member is not a field or property.
+    ///     The property's CLR member is not a valid field or property.
     /// </summary>
     API_PROPERTY_INVALID_CLR_MEMBER,
 

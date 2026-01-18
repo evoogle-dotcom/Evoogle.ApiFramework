@@ -48,7 +48,7 @@ public abstract class ApiNamedType
         var isApiNameInvalid = ApiSchemaHelpers.IsNameInvalid(this.ApiName);
         if (isApiNameInvalid)
         {
-            var path = $"{this.ApiPath}.{nameof(this.ApiName)}";
+            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_NAMED_TYPE_INVALID_API_NAME;
             var description = $"{nameof(this.ApiName)} must not be null, empty, or whitespace";

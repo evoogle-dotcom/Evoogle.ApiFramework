@@ -290,7 +290,7 @@ public sealed class ApiSchema : ExtensibleBase
         var isApiNameInvalid = ApiSchemaHelpers.IsNameInvalid(this.ApiName);
         if (isApiNameInvalid)
         {
-            var path = $"{this.ApiPath}.{nameof(this.ApiName)}";
+            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Warning;
             var code = ApiInitializationCode.API_SCHEMA_INVALID_NAME;
             var description = $"{nameof(this.ApiName)} must not be null, empty, or whitespace";
@@ -337,7 +337,7 @@ public sealed class ApiSchema : ExtensibleBase
             partKeySelector: x => x.ApiName,
             partKeyFilter: x => ApiSchemaHelpers.IsNameValid(x),
             partKeyPropertyName: nameof(ApiNamedType.ApiName),
-            path: $"{this.ApiPath}.{nameof(this.ApiNamedTypes)}",
+            path: this.ApiPath,
             code: ApiInitializationCode.API_SCHEMA_DUPLICATE_NAMED_TYPE_API_NAME,
             context: context,
             lookupDictionary: out _apiNamedTypeApiNameLookup
@@ -349,7 +349,7 @@ public sealed class ApiSchema : ExtensibleBase
             partKeySelector: x => x.ClrType,
             partKeyFilter: x => x is not null,
             partKeyPropertyName: nameof(ApiNamedType.ClrType),
-            path: $"{this.ApiPath}.{nameof(this.ApiNamedTypes)}",
+            path: this.ApiPath,
             code: ApiInitializationCode.API_SCHEMA_DUPLICATE_NAMED_TYPE_CLR_TYPE,
             context: context,
             lookupDictionary: out _apiNamedTypeClrTypeLookup
@@ -361,7 +361,7 @@ public sealed class ApiSchema : ExtensibleBase
             partKeySelector: x => x.ApiName,
             partKeyFilter: x => ApiSchemaHelpers.IsNameValid(x),
             partKeyPropertyName: nameof(ApiEnumType.ApiName),
-            path: $"{this.ApiPath}.{nameof(this.ApiEnumTypes)}",
+            path: this.ApiPath,
             code: ApiInitializationCode.API_SCHEMA_DUPLICATE_ENUM_TYPE_API_NAME,
             context: context,
             lookupDictionary: out _apiEnumTypeApiNameLookup
@@ -373,7 +373,7 @@ public sealed class ApiSchema : ExtensibleBase
             partKeySelector: x => x.ClrType,
             partKeyFilter: x => x is not null,
             partKeyPropertyName: nameof(ApiEnumType.ClrType),
-            path: $"{this.ApiPath}.{nameof(this.ApiEnumTypes)}",
+            path: this.ApiPath,
             code: ApiInitializationCode.API_SCHEMA_DUPLICATE_ENUM_TYPE_CLR_TYPE,
             context: context,
             lookupDictionary: out _apiEnumTypeClrTypeLookup
@@ -385,7 +385,7 @@ public sealed class ApiSchema : ExtensibleBase
             partKeySelector: x => x.ApiName,
             partKeyFilter: x => ApiSchemaHelpers.IsNameValid(x),
             partKeyPropertyName: nameof(ApiObjectType.ApiName),
-            path: $"{this.ApiPath}.{nameof(this.ApiObjectTypes)}",
+            path: this.ApiPath,
             code: ApiInitializationCode.API_SCHEMA_DUPLICATE_OBJECT_TYPE_API_NAME,
             context: context,
             lookupDictionary: out _apiObjectTypeApiNameLookup
@@ -397,7 +397,7 @@ public sealed class ApiSchema : ExtensibleBase
             partKeySelector: x => x.ClrType,
             partKeyFilter: x => x is not null,
             partKeyPropertyName: nameof(ApiObjectType.ClrType),
-            path: $"{this.ApiPath}.{nameof(this.ApiObjectTypes)}",
+            path: this.ApiPath,
             code: ApiInitializationCode.API_SCHEMA_DUPLICATE_OBJECT_TYPE_CLR_TYPE,
             context: context,
             lookupDictionary: out _apiObjectTypeClrTypeLookup
@@ -409,7 +409,7 @@ public sealed class ApiSchema : ExtensibleBase
             partKeySelector: x => x.ApiName,
             partKeyFilter: x => ApiSchemaHelpers.IsNameValid(x),
             partKeyPropertyName: nameof(ApiScalarType.ApiName),
-            path: $"{this.ApiPath}.{nameof(this.ApiScalarTypes)}",
+            path: this.ApiPath,
             code: ApiInitializationCode.API_SCHEMA_DUPLICATE_SCALAR_TYPE_API_NAME,
             context: context,
             lookupDictionary: out _apiScalarTypeApiNameLookup
@@ -421,7 +421,7 @@ public sealed class ApiSchema : ExtensibleBase
             partKeySelector: x => x.ClrType,
             partKeyFilter: x => x is not null,
             partKeyPropertyName: nameof(ApiScalarType.ClrType),
-            path: $"{this.ApiPath}.{nameof(this.ApiScalarTypes)}",
+            path: this.ApiPath,
             code: ApiInitializationCode.API_SCHEMA_DUPLICATE_SCALAR_TYPE_CLR_TYPE,
             context: context,
             lookupDictionary: out _apiScalarTypeClrTypeLookup

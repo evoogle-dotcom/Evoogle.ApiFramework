@@ -4,7 +4,6 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using System.Collections.Concurrent;
-using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 using System.Text.Json.Serialization;
 
@@ -178,7 +177,7 @@ public sealed partial class ApiProperty
         var isApiNameInvalid = ApiSchemaHelpers.IsNameInvalid(this.ApiName);
         if (isApiNameInvalid)
         {
-            var path = $"{this.ApiPath}.{nameof(this.ApiName)}";
+            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_PROPERTY_INVALID_API_NAME;
             var description = $"{nameof(this.ApiName)} must not be null, empty, or whitespace";
@@ -192,7 +191,7 @@ public sealed partial class ApiProperty
     {
         if (this.ApiTypeExpression is null)
         {
-            var path = $"{this.ApiPath}.{nameof(this.ApiType)}";
+            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_PROPERTY_NULL_TYPE;
             var description = $"{nameof(this.ApiType)} must not be null";
@@ -219,7 +218,7 @@ public sealed partial class ApiProperty
         }
         catch (Exception ex)
         {
-            var path = $"{this.ApiPath}.{nameof(this.ClrName)}";
+            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_PROPERTY_INVALID_FIELD_GETTER;
             var description = $"Failed to compile field getter for '{clrMemberName}': {ex.Message}";
@@ -234,7 +233,7 @@ public sealed partial class ApiProperty
         }
         catch (Exception ex)
         {
-            var path = $"{this.ApiPath}.{nameof(this.ClrName)}";
+            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_PROPERTY_INVALID_FIELD_SETTER;
             var description = $"Failed to compile field setter for '{clrMemberName}': {ex.Message}";
@@ -242,8 +241,6 @@ public sealed partial class ApiProperty
 
             context.AddIssue(path, severity, code, description, remediation);
         }
-
-        return; // Found valid field
     }
 
     private void InitializeClrPropertyGetterAndSetter(ApiInitializationContext context, PropertyInfo clrPropertyInfo)
@@ -255,7 +252,7 @@ public sealed partial class ApiProperty
         // Exclude indexers
         if (clrPropertyInfo.GetIndexParameters().Length > 0)
         {
-            var path = $"{this.ApiPath}.{nameof(this.ClrName)}";
+            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_PROPERTY_INVALID_PROPERTY_GETTER;
             var description = $"Property '{clrMemberName}' is an indexer, which is not supported";
@@ -271,7 +268,7 @@ public sealed partial class ApiProperty
         }
         catch (Exception ex)
         {
-            var path = $"{this.ApiPath}.{nameof(this.ClrName)}";
+            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_PROPERTY_INVALID_PROPERTY_GETTER;
             var description = $"Failed to compile property getter for '{clrMemberName}': {ex.Message}";
@@ -286,7 +283,7 @@ public sealed partial class ApiProperty
         }
         catch (Exception ex)
         {
-            var path = $"{this.ApiPath}.{nameof(this.ClrName)}";
+            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_PROPERTY_INVALID_PROPERTY_SETTER;
             var description = $"Failed to compile property setter for '{clrMemberName}': {ex.Message}";
@@ -315,6 +312,12 @@ public sealed partial class ApiProperty
             var clrPropertyInfo = TypeReflection.GetProperty(clrObjectType, clrMemberName, BindingFlags.Public | BindingFlags.Instance);
             if (clrPropertyInfo is not null)
             {
+                if (!this.ValidateClrMemberType(context, clrPropertyInfo.PropertyType, clrMemberName))
+                {
+                    // Fail fast on invalid member type
+                    return;
+                }
+
                 this.InitializeClrPropertyGetterAndSetter(context, clrPropertyInfo);
                 return; // Found valid property
             }
@@ -322,12 +325,18 @@ public sealed partial class ApiProperty
             var clrFieldInfo = TypeReflection.GetField(clrObjectType, clrMemberName, BindingFlags.Public | BindingFlags.Instance);
             if (clrFieldInfo is not null)
             {
+                if (!this.ValidateClrMemberType(context, clrFieldInfo.FieldType, clrMemberName))
+                {
+                    // Fail fast on invalid member type
+                    return;
+                }
+
                 this.InitializeClrFieldGetterAndSetter(context, clrFieldInfo);
                 return; // Found valid field
             }
 
             // Member not found
-            var path = $"{this.ApiPath}.{nameof(this.ClrName)}";
+            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_PROPERTY_MISSING_CLR_MEMBER;
             var description = $"CLR member '{clrMemberName}' was not found on CLR type '{clrObjectType.SafeToName()}'";
@@ -337,7 +346,7 @@ public sealed partial class ApiProperty
         }
         catch (Exception ex)
         {
-            var path = $"{this.ApiPath}.{nameof(this.ClrName)}";
+            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_PROPERTY_INVALID_CLR_MEMBER;
             var description = $"Failed to compile getter or setter accessor for '{clrMemberName}': {ex.Message}";
@@ -352,7 +361,7 @@ public sealed partial class ApiProperty
         var isClrNameInvalid = ApiSchemaHelpers.IsNameInvalid(this.ClrName);
         if (isClrNameInvalid)
         {
-            var path = $"{this.ApiPath}.{nameof(this.ClrName)}";
+            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_PROPERTY_INVALID_CLR_NAME;
             var description = $"{nameof(this.ClrName)} must not be null, empty, or whitespace";
@@ -364,49 +373,22 @@ public sealed partial class ApiProperty
     #endregion
 
     #region Validation Methods
-    /// <summary>
-    ///     Validates the specified CLR value against this property's constraints with type safety.
-    /// </summary>
-    /// <param name="apiValidationPath">The validation path used for error reporting.</param>
-    /// <param name="clrValue">The CLR value to validate.</param>
-    /// <returns>A <see cref="ValidationResult"/> if validation fails; otherwise, <c>null</c>.</returns>
-    /// <remarks>
-    ///     This method validates whether a value can be assigned to this property based on the <see cref="ApiTypeModifiers"/>.
-    ///     Currently validates that required properties receive non-null values.
-    /// </remarks>
-    /// <exception cref="ArgumentException">Thrown when <paramref name="apiValidationPath"/> is null or whitespace.</exception>
-    public ValidationResult? ValidateValue(string apiValidationPath, object? clrValue)
+    private bool ValidateClrMemberType(ApiInitializationContext context, Type memberType, string memberName)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiValidationPath);
-
-        if (clrValue is null && this.IsRequired)
+        // Check if the type is a ref struct (cannot be boxed/unboxed)
+        if (memberType.IsByRefLike)
         {
-            return new ValidationResult($"'{apiValidationPath}' is required and cannot be set to null.", [this.ApiName]);
-        }
-        return null;
-    }
+            var path = this.ApiPath;
+            var severity = ApiInitializationSeverity.Error;
+            var code = ApiInitializationCode.API_PROPERTY_INVALID_CLR_MEMBER;
+            var description = $"CLR member '{memberName}' has type '{memberType.SafeToName()}' which is a ref struct. Ref structs cannot be boxed to object and are not supported for API properties.";
+            var remediation = $"Change the type of CLR member '{memberName}' to a non-ref struct type.";
 
-    /// <summary>
-    ///     Validates the specified CLR value against this property's constraints with type safety.
-    /// </summary>
-    /// <typeparam name="TValue">The type of the CLR value to validate.</typeparam>
-    /// <param name="apiValidationPath">The validation path used for error reporting.</param>
-    /// <param name="clrValue">The CLR value to validate.</param>
-    /// <returns>A <see cref="ValidationResult"/> if validation fails; otherwise, <c>null</c>.</returns>
-    /// <remarks>
-    ///     This method validates whether a value can be assigned to this property based on the <see cref="ApiTypeModifiers"/>.
-    ///     Currently validates that required properties receive non-null values.
-    /// </remarks>
-    /// <exception cref="ArgumentException">Thrown when <paramref name="apiValidationPath"/> is null or whitespace.</exception>
-    public ValidationResult? ValidateValue<TValue>(string apiValidationPath, TValue? clrValue)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiValidationPath);
-
-        if (clrValue is null && this.IsRequired)
-        {
-            return new ValidationResult($"'{apiValidationPath}' is required and cannot be set to null.", [this.ApiName]);
+            context.AddIssue(path, severity, code, description, remediation);
+            return false;
         }
-        return null;
+
+        return true;
     }
     #endregion
 }

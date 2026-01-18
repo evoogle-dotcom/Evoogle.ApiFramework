@@ -27,6 +27,15 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
     #endregion
 
     #region Test Types
+    public ref struct TypesWithRefStructMembers
+    {
+        // This will trigger API_PROPERTY_INVALID_FIELD_GETTER/SETTER
+        public Span<byte> SpanField;
+
+        // This will trigger API_PROPERTY_INVALID_PROPERTY_GETTER/SETTER
+        public Span<byte> SpanProperty { get; set; }
+    }
+
     private class InitializeThrowsTest : JsonConverterTestBase<ApiSchema>
     {
         #region User Supplied Properties
@@ -139,7 +148,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiEnumType)}.{nameof(ApiEnumType.ApiName)}",
+                    path: $"{nameof(ApiEnumType)}",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_NAMED_TYPE_INVALID_API_NAME,
                     description: $"{nameof(ApiEnumType.ApiName)} must not be null, empty, or whitespace",
@@ -186,7 +195,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"].{nameof(ApiEnumType.ClrType)}",
+                    path: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_TYPE_NULL_CLR_TYPE,
                     description: $"{nameof(ApiEnumType.ClrType)} must not be null",
@@ -234,7 +243,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"].{nameof(ApiEnumType.ClrType)}",
+                    path: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_ENUM_TYPE_INVALID_CLR_TYPE,
                     description: $"{nameof(ApiEnumType.ClrType)} 'String' must be a CLR Enum",
@@ -265,7 +274,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"].{nameof(ApiEnumType.ApiEnumValues)}",
+                    path: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_ENUM_TYPE_NULL_OR_EMPTY_VALUES,
                     description: $"{nameof(ApiEnumType.ApiEnumValues)} must not be null or empty",
@@ -297,7 +306,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"].{nameof(ApiEnumType.ApiEnumValues)}",
+                    path: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_ENUM_TYPE_NULL_OR_EMPTY_VALUES,
                     description: $"{nameof(ApiEnumType.ApiEnumValues)} must not be null or empty",
@@ -345,7 +354,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"].{nameof(ApiEnumType.ApiEnumValues)}",
+                    path: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_ENUM_TYPE_DUPLICATE_VALUE_API_NAME,
                     description: $"Duplicate {nameof(ApiEnumValue)}.{nameof(ApiEnumValue.ApiName)} values: 'Female'",
@@ -393,7 +402,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"].{nameof(ApiEnumType.ApiEnumValues)}",
+                    path: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_ENUM_TYPE_DUPLICATE_VALUE_CLR_NAME,
                     description: $"Duplicate {nameof(ApiEnumValue)}.{nameof(ApiEnumValue.ClrName)} values: 'Female'",
@@ -446,7 +455,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"].{nameof(ApiEnumType.ApiEnumValues)}",
+                    path: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_ENUM_TYPE_DUPLICATE_VALUE_CLR_ORDINAL,
                     description: $"Duplicate {nameof(ApiEnumValue)}.{nameof(ApiEnumValue.ClrOrdinal)} values: '2'",
@@ -498,7 +507,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"].{nameof(ApiEnumValue)}.{nameof(ApiEnumValue.ApiName)}",
+                    path: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"].{nameof(ApiEnumValue)}",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_ENUM_VALUE_INVALID_API_NAME,
                     description: $"{nameof(ApiEnumValue.ApiName)} must not be null, empty, or whitespace",
@@ -546,7 +555,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"].{nameof(ApiEnumValue)}[\"Male\"].{nameof(ApiEnumValue.ClrName)}",
+                    path: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"].{nameof(ApiEnumValue)}[\"{nameof(Gender.Male)}\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_ENUM_VALUE_INVALID_CLR_NAME,
                     description: $"{nameof(ApiEnumValue.ClrName)} must not be null, empty, or whitespace",
@@ -581,7 +590,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiScalarType)}.{nameof(ApiScalarType.ApiName)}",
+                    path: $"{nameof(ApiScalarType)}",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_NAMED_TYPE_INVALID_API_NAME,
                     description: $"{nameof(ApiScalarType.ApiName)} must not be null, empty, or whitespace",
@@ -611,7 +620,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiScalarType)}[\"String\"].{nameof(ApiScalarType.ClrType)}",
+                    path: $"{nameof(ApiScalarType)}[\"String\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_TYPE_NULL_CLR_TYPE,
                     description: $"{nameof(ApiScalarType.ClrType)} must not be null",
@@ -664,7 +673,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}.{nameof(ApiProperty.ApiName)}",
+                    path: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_PROPERTY_INVALID_API_NAME,
                     description: $"{nameof(ApiProperty.ApiName)} must not be null, empty, or whitespace",
@@ -713,7 +722,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"RequiredName\"].{nameof(ApiProperty.ClrName)}",
+                    path: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"RequiredName\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_PROPERTY_INVALID_CLR_NAME,
                     description: $"{nameof(ApiProperty.ClrName)} must not be null, empty, or whitespace",
@@ -762,7 +771,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"NonExistent\"].{nameof(ApiProperty.ClrName)}",
+                    path: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"NonExistent\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_PROPERTY_MISSING_CLR_MEMBER,
                     description: $"CLR member 'NonExistentProperty' was not found on CLR type '{nameof(ScalarsOnly)}'",
@@ -801,11 +810,92 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"RequiredName\"].{nameof(ApiProperty.ApiType)}",
+                    path: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"RequiredName\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_PROPERTY_NULL_TYPE,
                     description: $"{nameof(ApiProperty.ApiType)} must not be null",
                     remediation: $"Specify a valid {nameof(ApiProperty.ApiType)}"
+                ),
+            ]
+        },
+
+        // ApiProperty throws if Type is an invalid CLR member
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiProperty)} Throws If Type Is An Invalid CLR Member",
+            Source = @"
+            {
+                ""ApiName"": ""ApiProperty Throws If Type Is An Invalid CLR Member"",
+                ""ApiScalarTypes"": [
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""Byte"",
+                        ""ClrType"": ""System.Byte, System.Private.CoreLib""
+                    }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""TypesWithRefStructMembers"",
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""SpanField"",
+                                ""ApiType"": {
+                                    ""ApiInlineType"": {
+                                        ""ApiKind"": ""Collection"",
+                                        ""ApiItemType"": {
+                                            ""ApiKind"": ""Scalar"",
+                                            ""ApiName"": ""Byte""
+                                        },
+                                        ""ApiItemTypeModifiers"": ""Required"",
+                                        ""ClrType"": ""System.Span\u00601[[System.Byte, System.Private.CoreLib]], System.Private.CoreLib""
+                                    }
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""SpanField"",
+                                ""ClrMemberKind"": ""Field""
+                            },
+                            {
+                                ""ApiName"": ""SpanProperty"",
+                                ""ApiType"": {
+                                    ""ApiInlineType"": {
+                                        ""ApiKind"": ""Collection"",
+                                        ""ApiItemType"": {
+                                            ""ApiKind"": ""Scalar"",
+                                            ""ApiName"": ""Byte""
+                                        },
+                                        ""ApiItemTypeModifiers"": ""Required"",
+                                        ""ClrType"": ""System.Span\u00601[[System.Byte, System.Private.CoreLib]], System.Private.CoreLib""
+                                    }
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""SpanProperty"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests\u002BTypesWithRefStructMembers, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=2, Errors=2, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiObjectType)}[\"{nameof(TypesWithRefStructMembers)}\"].{nameof(ApiProperty)}[\"SpanField\"]",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_PROPERTY_INVALID_CLR_MEMBER,
+                    description: $"CLR member '{nameof(TypesWithRefStructMembers.SpanField)}' has type '{typeof(Span<byte>).SafeToName()}' which is a ref struct. Ref structs cannot be boxed to object and are not supported for API properties.",
+                    remediation: $"Change the type of CLR member '{nameof(TypesWithRefStructMembers.SpanField)}' to a non-ref struct type."
+                ),
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiObjectType)}[\"{nameof(TypesWithRefStructMembers)}\"].{nameof(ApiProperty)}[\"SpanProperty\"]",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_PROPERTY_INVALID_CLR_MEMBER,
+                    description: $"CLR member '{nameof(TypesWithRefStructMembers.SpanProperty)}' has type '{typeof(Span<byte>).SafeToName()}' which is a ref struct. Ref structs cannot be boxed to object and are not supported for API properties.",
+                    remediation: $"Change the type of CLR member '{nameof(TypesWithRefStructMembers.SpanProperty)}' to a non-ref struct type."
                 ),
             ]
         },
@@ -844,7 +934,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"RequiredName\"].{nameof(ApiProperty.ApiType)}",
+                    path: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"RequiredName\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_PROPERTY_UNRESOLVED_TYPE,
                     description: $"{nameof(ApiProperty.ApiType)} could not be resolved for {nameof(ApiTypeExpression.ApiKind)}='Scalar' and {nameof(ApiTypeExpression.ApiName)}='String'",
@@ -885,7 +975,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"RequiredName\"].{nameof(ApiProperty.ApiType)}",
+                    path: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"RequiredName\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_PROPERTY_UNRESOLVED_TYPE,
                     description: $"{nameof(ApiProperty.ApiType)} could not be resolved for {nameof(ApiTypeExpression.ClrType)}='{typeof(string).SafeToName()}'",
@@ -924,7 +1014,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"RequiredName\"].{nameof(ApiProperty.ApiType)}",
+                    path: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"RequiredName\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_PROPERTY_UNRESOLVED_TYPE,
                     description: $"{nameof(ApiProperty.ApiType)} could not be resolved because none of the following are set: {nameof(ApiTypeExpression.ApiInlineType)}, a valid combination of {nameof(ApiTypeExpression.ApiKind)} and {nameof(ApiTypeExpression.ApiName)}, or {nameof(ApiTypeExpression.ClrType)}",

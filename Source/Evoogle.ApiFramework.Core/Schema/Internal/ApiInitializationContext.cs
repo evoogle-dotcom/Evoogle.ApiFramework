@@ -54,6 +54,11 @@ internal class ApiInitializationContext
     #endregion
 
     #region Methods
+    // public void AddIssue(ApiInitializationIssue issue)
+    // {
+    //     _issues.Add(issue);
+    // }
+
     public void AddIssue
     (
         string path,

@@ -21,7 +21,7 @@ namespace Evoogle.ApiFramework.Schema;
 public abstract class ApiType(Type clrType) : ApiSchemaElement
 {
     #region ApiType Properties
-    /// <summary>Gets the kind of API type represented by this instance.</summary>    
+    /// <summary>Gets the kind of API type represented by this instance.</summary>
     public abstract ApiTypeKind ApiKind { get; }
 
     /// <summary>Gets runtime API type name of the API type.</summary>
@@ -51,7 +51,7 @@ public abstract class ApiType(Type clrType) : ApiSchemaElement
     {
         if (this.ClrType is null)
         {
-            var path = $"{this.ApiPath}.{nameof(this.ClrType)}";
+            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_TYPE_NULL_CLR_TYPE;
             var description = $"{nameof(this.ClrType)} must not be null";

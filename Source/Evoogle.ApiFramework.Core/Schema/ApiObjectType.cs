@@ -303,7 +303,7 @@ public sealed partial class ApiObjectType
             partKeySelector: x => x.ApiName,
             partKeyFilter: x => ApiSchemaHelpers.IsNameValid(x),
             partKeyPropertyName: nameof(ApiIdentity.ApiName),
-            path: $"{this.ApiPath}.{nameof(this.ApiIdentities)}",
+            path: this.ApiPath,
             code: ApiInitializationCode.API_OBJECT_TYPE_DUPLICATE_IDENTITY_API_NAME,
             context: context,
             lookupDictionary: out _apiIdentityApiNameLookup
@@ -327,7 +327,7 @@ public sealed partial class ApiObjectType
     {
         if (this.ApiProperties is null || this.ApiProperties.Length == 0)
         {
-            var path = $"{this.ApiPath}.{nameof(this.ApiProperties)}";
+            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Warning;
             var code = ApiInitializationCode.API_OBJECT_TYPE_NULL_OR_EMPTY_PROPERTIES;
             var description = $"{nameof(this.ApiProperties)} must not be null or empty";
@@ -379,7 +379,7 @@ public sealed partial class ApiObjectType
             partKeySelector: x => x.ApiName,
             partKeyFilter: x => ApiSchemaHelpers.IsNameValid(x),
             partKeyPropertyName: nameof(ApiProperty.ApiName),
-            path: $"{this.ApiPath}.{nameof(this.ApiProperties)}",
+            path: this.ApiPath,
             code: ApiInitializationCode.API_OBJECT_TYPE_DUPLICATE_PROPERTY_API_NAME,
             context: context,
             lookupDictionary: out _apiPropertyApiNameLookup
@@ -391,7 +391,7 @@ public sealed partial class ApiObjectType
             partKeySelector: x => x.ClrName,
             partKeyFilter: x => ApiSchemaHelpers.IsNameValid(x),
             partKeyPropertyName: nameof(ApiProperty.ClrName),
-            path: $"{this.ApiPath}.{nameof(this.ApiProperties)}",
+            path: this.ApiPath,
             code: ApiInitializationCode.API_OBJECT_TYPE_DUPLICATE_PROPERTY_CLR_NAME,
             context: context,
             lookupDictionary: out _apiPropertyClrNameLookup
@@ -403,7 +403,7 @@ public sealed partial class ApiObjectType
             partKeySelector: x => x.ApiName,
             partKeyFilter: x => ApiSchemaHelpers.IsNameValid(x),
             partKeyPropertyName: nameof(ApiRelationship.ApiName),
-            path: $"{this.ApiPath}.{nameof(this.ApiRelationships)}",
+            path: this.ApiPath,
             code: ApiInitializationCode.API_OBJECT_TYPE_DUPLICATE_RELATIONSHIP_API_NAME,
             context: context,
             lookupDictionary: out _apiRelationshipApiNameLookup
@@ -439,7 +439,7 @@ public sealed partial class ApiObjectType
 
                 if (props1.SequenceEqual(props2, StringComparer.OrdinalIgnoreCase))
                 {
-                    var path = $"{this.ApiPath}.{nameof(this.ApiIdentities)}";
+                    var path = this.ApiPath;
                     var severity = ApiInitializationSeverity.Warning;
                     var code = ApiInitializationCode.API_OBJECT_TYPE_AMBIGUOUS_IDENTITIES;
                     var description = $"Identities '{identity1.ApiName}' and '{identity2.ApiName}' use the same property set [{string.Join(", ", props1)}], which may cause ambiguity";

@@ -86,7 +86,7 @@ public sealed class ApiCollectionType
     {
         if (this.ApiItemTypeExpression is null)
         {
-            var path = $"{this.ApiPath}.{nameof(this.ApiItemType)}";
+            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_COLLECTION_TYPE_NULL_ITEM_TYPE;
             var description = $"{nameof(this.ApiItemType)} must not be null";

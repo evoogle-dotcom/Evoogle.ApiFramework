@@ -114,7 +114,7 @@ public sealed class ApiRelationship
         var isApiNameInvalid = ApiSchemaHelpers.IsNameInvalid(this.ApiName);
         if (isApiNameInvalid)
         {
-            var path = $"{this.ApiPath}.{nameof(this.ApiName)}";
+            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_RELATIONSHIP_INVALID_NAME;
             var description = $"{nameof(this.ApiName)} must not be null, empty, or whitespace";
@@ -143,7 +143,7 @@ public sealed class ApiRelationship
         {
             var apiObjectTypeName = context.ApiParentObjectType.ApiName.SafeToString();
 
-            var path = $"{this.ApiPath}.{nameof(this.ApiProperty)}";
+            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_RELATIONSHIP_UNRESOLVED_PROPERTY;
             var description = $"{nameof(this.ApiProperty)} could not be resolved for {nameof(this.ApiPropertyName)}='{this.ApiPropertyName.SafeToString()}' on parent {nameof(ApiObjectType)}='{apiObjectTypeName}'";

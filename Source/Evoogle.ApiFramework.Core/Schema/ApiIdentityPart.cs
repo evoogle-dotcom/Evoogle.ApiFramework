@@ -100,7 +100,7 @@ public sealed class ApiIdentityPart
         var isApiPropertyNameInvalid = ApiSchemaHelpers.IsNameInvalid(this.ApiPropertyName);
         if (isApiPropertyNameInvalid)
         {
-            var path = $"{this.ApiPath}.{nameof(this.ApiPropertyName)}";
+            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_IDENTITY_PART_INVALID_API_PROPERTY_NAME;
             var description = $"{nameof(this.ApiPropertyName)} must not be null, empty, or whitespace";
@@ -129,7 +129,7 @@ public sealed class ApiIdentityPart
                     var referencedTypePath = referencedObjectType.ApiPath;
                     if (context.IdentityTraversalPath.Contains(referencedTypePath))
                     {
-                        var path = $"{this.ApiPath}.{nameof(this.ApiProperty)}";
+                        var path = this.ApiPath;
                         var severity = ApiInitializationSeverity.Error;
                         var code = ApiInitializationCode.API_IDENTITY_PART_CIRCULAR_REFERENCE;
                         var description = $"Circular identity reference detected: property '{this.ApiPropertyName}' references type '{referencedObjectType.ApiName}' which has an identity that depends on the current type";
@@ -144,7 +144,7 @@ public sealed class ApiIdentityPart
 
         if (_apiResolvedProperty is null)
         {
-            var path = $"{this.ApiPath}.{nameof(this.ApiProperty)}";
+            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_IDENTITY_PART_UNRESOLVED_PROPERTY;
             var description = $"{nameof(this.ApiProperty)} could not be resolved for {nameof(this.ApiPropertyName)}='{this.ApiPropertyName.SafeToString()}'";
@@ -164,7 +164,7 @@ public sealed class ApiIdentityPart
             // Validate that the configured type is ApiId compatible
             if (!ApiId.IsCompatibleScalarType(this.ClrConfiguredIdType))
             {
-                var path = $"{this.ApiPath}.{nameof(this.ClrIdType)}";
+                var path = this.ApiPath;
                 var severity = ApiInitializationSeverity.Error;
                 var code = ApiInitializationCode.API_IDENTITY_PART_INVALID_SCALAR_TYPE;
                 var description = $"Scalar type '{this.ClrConfiguredIdType.SafeToName()}' is not compatible with {nameof(ApiId)}";

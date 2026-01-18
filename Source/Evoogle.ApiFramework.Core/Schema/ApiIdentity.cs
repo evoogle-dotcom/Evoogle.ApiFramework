@@ -78,7 +78,7 @@ public sealed class ApiIdentity
         var isApiNameInvalid = ApiSchemaHelpers.IsNameInvalid(this.ApiName);
         if (isApiNameInvalid)
         {
-            var path = $"{this.ApiPath}.{nameof(this.ApiName)}";
+            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_IDENTITY_INVALID_API_NAME;
             var description = $"{nameof(this.ApiName)} must not be null, empty, or whitespace";
@@ -92,7 +92,7 @@ public sealed class ApiIdentity
     {
         if (this.ApiIdentityParts is null || this.ApiIdentityParts.Length == 0)
         {
-            var path = $"{this.ApiPath}.{nameof(this.ApiIdentityParts)}";
+            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_IDENTITY_NULL_OR_EMPTY_PARTS;
             var description = $"{nameof(this.ApiIdentityParts)} must not be null or empty";
@@ -109,7 +109,7 @@ public sealed class ApiIdentity
             partKeySelector: x => x.ApiPropertyName,
             partKeyFilter: x => !string.IsNullOrWhiteSpace(x),
             partKeyPropertyName: nameof(ApiIdentityPart.ApiPropertyName),
-            path: $"{this.ApiPath}.{nameof(this.ApiIdentityParts)}",
+            path: this.ApiPath,
             code: ApiInitializationCode.API_IDENTITY_DUPLICATE_PART_API_PROPERTY_NAME,
             context: context
         );

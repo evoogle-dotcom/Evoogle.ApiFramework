@@ -72,7 +72,7 @@ public sealed class ApiEnumValue
         var isApiNameInvalid = ApiSchemaHelpers.IsNameInvalid(this.ApiName);
         if (isApiNameInvalid)
         {
-            var path = $"{this.ApiPath}.{nameof(this.ApiName)}";
+            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_ENUM_VALUE_INVALID_API_NAME;
             var description = $"{nameof(this.ApiName)} must not be null, empty, or whitespace";
@@ -87,7 +87,7 @@ public sealed class ApiEnumValue
         var isClrNameInvalid = ApiSchemaHelpers.IsNameInvalid(this.ClrName);
         if (isClrNameInvalid)
         {
-            var path = $"{this.ApiPath}.{nameof(this.ClrName)}";
+            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_ENUM_VALUE_INVALID_CLR_NAME;
             var description = $"{nameof(this.ClrName)} must not be null, empty, or whitespace";
