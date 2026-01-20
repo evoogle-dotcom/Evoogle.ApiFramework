@@ -7,6 +7,7 @@ using System.Collections.Frozen;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Text;
 using System.Text.Json.Serialization;
 
 using Evoogle.ApiFramework.Exceptions;
@@ -58,6 +59,11 @@ public readonly struct ApiId
             typeof(CultureInfo)
         ]
     );
+
+    /// <summary>
+    ///    Cached hash code for immutability/equality.
+    /// </summary>
+    private readonly int _hashCode;
     #endregion
 
     #region Properties
@@ -179,6 +185,13 @@ public readonly struct ApiId
 
         this.Kind = kind;
         this.OriginalString = original;
+
+        // Pre-compute hash code for composites
+        _hashCode = kind switch
+        {
+            ApiIdKind.Composite => GetCompositeHash((ApiIdPart[])reference!),
+            _ => 0  // Computed lazily for scalars
+        };
     }
     #endregion
 
@@ -195,20 +208,40 @@ public readonly struct ApiId
             return Empty;
         }
 
-        var partIdArray = partIdCollection as ApiId[] ?? [.. partIdCollection];
-        if (partIdArray.Length == 0)
+        // Try fast path for common collection types
+        if (partIdCollection is ICollection<ApiId> collection)
+        {
+            if (collection.Count == 0)
+            {
+                return Empty;
+            }
+
+            var parts = new ApiIdPart[collection.Count];
+            var index = 0;
+            foreach (var id in collection)
+            {
+                parts[index++] = new ApiIdPart(null, id);
+            }
+
+            ValidateCompositeParts(parts);
+            return new ApiId(ApiIdKind.Composite, default, parts, ToDebugString(parts));
+        }
+
+        // Slow path: materialize to list
+        var list = new List<ApiIdPart>();
+        foreach (var id in partIdCollection)
+        {
+            list.Add(new ApiIdPart(null, id));
+        }
+
+        if (list.Count == 0)
         {
             return Empty;
         }
 
-        var parts = new ApiIdPart[partIdArray.Length];
-        for (var i = 0; i < partIdArray.Length; i++)
-        {
-            parts[i] = new ApiIdPart(null, partIdArray[i]);
-        }
-
-        ValidateCompositeParts(parts);
-        return new ApiId(ApiIdKind.Composite, default, parts, ToDebugString(parts));
+        var partsArray = list.ToArray();
+        ValidateCompositeParts(partsArray);
+        return new ApiId(ApiIdKind.Composite, default, partsArray, ToDebugString(partsArray));
     }
 
     /// <summary>
@@ -265,11 +298,9 @@ public readonly struct ApiId
             return Empty;
         }
 
-        var clone = (ApiIdPart[])partArray.Clone();
-
-        ValidateCompositeParts(clone);
-
-        return new ApiId(ApiIdKind.Composite, default, clone, ToDebugString(clone));
+        // params array is compiler-generated, safe to use directly
+        ValidateCompositeParts(partArray);
+        return new ApiId(ApiIdKind.Composite, default, partArray, ToDebugString(partArray));
     }
 
     /// <summary>Creates a culture identifier from a <see cref="CultureInfo"/> instance.</summary>
@@ -398,6 +429,7 @@ public readonly struct ApiId
         var anyUnnamed = false;
         foreach (var p in parts)
         {
+            // Reject nested composites
             if (p.Value.Kind == ApiIdKind.Composite)
             {
                 throw new ApiIdentityException($"Nested composite parts are not allowed in {nameof(ApiId)}.");
@@ -412,6 +444,7 @@ public readonly struct ApiId
                 anyNamed = true;
             }
 
+            // Reject mixing of named/unnamed parts
             if (anyNamed && anyUnnamed)
             {
                 throw new ApiIdentityException($"Cannot mix named and unnamed parts in the same composite {nameof(ApiId)}.");
@@ -430,6 +463,7 @@ public readonly struct ApiId
 
             if (duplicateNames.Count > 0)
             {
+                // Reject duplicate names
                 throw new ApiIdentityException($"Duplicate part names in composite {nameof(ApiId)}: [{duplicateNames.OrderBy(n => n).SafeToDelimitedString(',')}].");
             }
         }
@@ -495,8 +529,32 @@ public readonly struct ApiId
             return null;
         }
 
-        // Build once; for purely diagnostic use, string.Join is fine
-        return string.Join("|", arr.Select(p => p.ToString()));
+        // Fast path: single part
+        if (arr.Length == 1)
+        {
+            return arr[0].ToString();
+        }
+
+        // Use string.Create for zero-allocation formatting (advanced)
+        // OR simpler: pre-calculate size and use StringBuilder
+        var sb = new StringBuilder();
+        for (var i = 0; i < arr.Length; i++)
+        {
+            if (i > 0)
+            {
+                sb.Append('|');
+            }
+
+            var part = arr[i];
+            if (part.Name is not null)
+            {
+                sb.Append(part.Name);
+                sb.Append('=');
+            }
+            sb.Append(part.Value.ToString());
+        }
+
+        return sb.ToString();
     }
     #endregion
 
@@ -905,7 +963,7 @@ public readonly struct ApiId
             ApiIdKind.Guid => _val.Guid == other._val.Guid,
             ApiIdKind.Ulid => _val.Ulid == other._val.Ulid,
             ApiIdKind.Culture => string.Equals(((CultureInfo)_ref!).Name, ((CultureInfo)other._ref!).Name, StringComparison.OrdinalIgnoreCase),
-            ApiIdKind.Composite => PartsEqual((ApiIdPart[])_ref!, (ApiIdPart[])other._ref!),
+            ApiIdKind.Composite => ReferenceEquals(_ref, other._ref) || PartsEqual((ApiIdPart[])_ref!, (ApiIdPart[])other._ref!),
             _ => false
         };
     }
@@ -945,6 +1003,13 @@ public readonly struct ApiId
     /// <summary>Returns a hash code for this identifier.</summary>
     public override readonly int GetHashCode()
     {
+        // Composite: Use cached hash code from constructor
+        if (this.Kind == ApiIdKind.Composite)
+        {
+            return _hashCode;
+        }
+
+        // Scalars: Compute inline
         return this.Kind switch
         {
             ApiIdKind.None => 0,
@@ -954,7 +1019,6 @@ public readonly struct ApiId
             ApiIdKind.Guid => HashCode.Combine((int)this.Kind, _val.Guid),
             ApiIdKind.Ulid => HashCode.Combine((int)this.Kind, _val.Ulid),
             ApiIdKind.Culture => HashCode.Combine((int)this.Kind, ((CultureInfo?)_ref)?.Name?.ToUpperInvariant()),
-            ApiIdKind.Composite => GetCompositeHash((ApiIdPart[])_ref!),
             _ => (int)this.Kind
         };
     }
