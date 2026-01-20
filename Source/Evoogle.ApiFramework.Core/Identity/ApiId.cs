@@ -18,11 +18,95 @@ using Evoogle.Extensions;
 namespace Evoogle.ApiFramework.Identity;
 
 /// <summary>
-///     ApiId is a compact, tagged-discriminated union for identifiers.
-///     ApiId is immutable and thread-safe.
-///     Scalars are allocation-free; composites allocate an array of parts.
-///     Uses a safe value-type union for primitives and a single reference slot for reference arms.
+///     Represents a runtime identity value as a compact, immutable discriminated union optimized for performance-critical operations.
 /// </summary>
+/// <remarks>
+///     <para>
+///         <see cref="ApiId"/> is the low-level runtime representation of object identities in the API framework.
+///         It is designed for efficiency in hot-path operations such as dictionary lookups, cache keys, equality comparisons,
+///         and hash-based operations.
+///     </para>
+///     <para>
+///         <strong>Architecture:</strong>
+///         <see cref="ApiId"/> serves as the performance layer in the identity system:
+///         <list type="bullet">
+///             <item><strong>Schema Layer:</strong> <see cref="Schema.ApiIdentity"/> defines what constitutes an identity (build-time).</item>
+///             <item><strong>Semantic Layer:</strong> <see cref="ApiIdentityValue"/> preserves object graph structure for navigation and diagnostics.</item>
+///             <item><strong>Runtime Layer:</strong> <see cref="ApiId"/> provides flat, efficient identity values for operations.</item>
+///         </list>
+///     </para>
+///     <para>
+///         <strong>Design Principles:</strong>
+///         <list type="bullet">
+///             <item><strong>Performance-Focused:</strong> Value-type struct with zero-allocation storage for primitives via explicit-layout union.</item>
+///             <item><strong>Immutable:</strong> All instances are immutable and thread-safe.</item>
+///             <item><strong>Flat Structure:</strong> Composite identities contain only scalar parts; nested composites are not allowed.</item>
+///             <item><strong>Semantically Neutral:</strong> Contains no schema information; purely a runtime value representation.</item>
+///             <item><strong>Type-Safe:</strong> Discriminated union with compile-time type safety via <see cref="ApiIdKind"/>.</item>
+///         </list>
+///     </para>
+///     <para>
+///         <strong>Storage Optimization:</strong>
+///         Uses a tagged union with two fields:
+///         <list type="bullet">
+///             <item><see cref="ApiIdValueUnion"/>: Explicit-layout union overlaying <see cref="int"/>, <see cref="long"/>,
+///                   <see cref="Guid"/>, and <see cref="Ulid"/> in the same memory location (no boxing).</item>
+///             <item>Reference field: Single slot for <see cref="string"/>, <see cref="CultureInfo"/>, and <see cref="ApiIdPart"/> arrays.</item>
+///             <item>Cached hash code: Pre-computed for composite identities to optimize dictionary operations.</item>
+///         </list>
+///     </para>
+///     <para>
+///         <strong>Relationship with ApiIdentityValue:</strong>
+///         <see cref="ApiIdentityValue"/> extracts structured identity values from objects and can flatten them to <see cref="ApiId"/>
+///         via <see cref="ApiIdentityValue.ToApiId(bool)"/>. The client controls whether parts are named (semantic, readable) or
+///         unnamed (compact, performance-oriented):
+///         <code>
+///         // Semantic layer: preserves structure
+///         ApiIdentityValue structuredId = orderIdentity.Extract(order);
+///         int customerId = structuredId.GetScalarValue&lt;int&gt;("Customer.Id");
+///
+///         // Runtime layer: flatten for operations
+///         ApiId namedId = structuredId.ToApiId(useNamedParts: true);    // "Customer.Id=42|OrderNumber=1001"
+///         ApiId unnamedId = structuredId.ToApiId(useNamedParts: false); // "42|1001"
+///
+///         // Use in performance-critical operations
+///         cache[unnamedId] = order;
+///         if (existingOrders.ContainsKey(unnamedId)) { ... }
+///         </code>
+///     </para>
+///     <para>
+///         <strong>Composite Identities:</strong>
+///         Composite identities are flat collections of scalar parts that can be either:
+///         <list type="bullet">
+///             <item><strong>Named:</strong> Each part has a semantic name (e.g., "CustomerId=42|OrderNumber=1001").</item>
+///             <item><strong>Unnamed/Positional:</strong> Parts are ordered without names (e.g., "42|1001").</item>
+///         </list>
+///         All parts in a composite must be consistently named or unnamed (no mixing). Nested composites are explicitly forbidden
+///         to maintain performance characteristics and simplicity.
+///     </para>
+/// </remarks>
+/// <example>
+///     <code>
+///     // Scalar identities (allocation-free)
+///     ApiId intId = ApiId.FromInt32(42);
+///     ApiId guidId = ApiId.FromGuid(Guid.NewGuid());
+///     ApiId stringId = ApiId.FromString("user-123");
+///
+///     // Composite identities
+///     var orderId = ApiId.Composite(
+///         ApiIdPart.Create("CustomerId", ApiId.FromInt32(42)),
+///         ApiIdPart.Create("OrderNumber", ApiId.FromInt32(1001))
+///     );
+///
+///     // Dictionary usage (primary use case)
+///     var cache = new Dictionary&lt;ApiId, Order&gt;();
+///     cache[orderId] = order;
+///
+///     // Equality and comparison
+///     if (cache.ContainsKey(orderId)) { ... }
+///     var sorted = orders.OrderBy(o =&gt; o.Id).ToList();
+///     </code>
+/// </example>
 [DebuggerDisplay("{ToDebuggerDisplay(),nq}")]
 [JsonConverter(typeof(ApiIdJsonConverter))]
 public readonly struct ApiId
@@ -35,19 +119,40 @@ public readonly struct ApiId
 {
     #region Fields
     /// <summary>
-    ///     Represents the empty identifier (no value). Equivalent to default(<see cref="ApiId"/>).
+    ///     Represents an empty identifier with no value.
     /// </summary>
+    /// <remarks>
+    ///     Equivalent to <c>default(<see cref="ApiId"/>)</c>. Used to represent the absence of an identity value.
+    ///     Has <see cref="Kind"/> equal to <see cref="ApiIdKind.None"/>.
+    /// </remarks>
     public static readonly ApiId Empty = default;
 
-    // Union layout:
-    //  - _val: explicit-layout union for value-type arms (int, long, Guid, Ulid)
-    //  - _ref: single reference slot for reference arms (string, CultureInfo, ApiIdPart[])
+    /// <summary>
+    ///     Explicit-layout value union storing primitive types without boxing.
+    /// </summary>
+    /// <remarks>
+    ///     Overlays <see cref="int"/>, <see cref="long"/>, <see cref="Guid"/>, and <see cref="Ulid"/> in the same
+    ///     memory location, enabling zero-allocation storage of scalar identifiers.
+    /// </remarks>
     private readonly ApiIdValueUnion _val;
+
+    /// <summary>
+    ///     Reference slot for reference-type arms and composite arrays.
+    /// </summary>
+    /// <remarks>
+    ///     Stores <see cref="string"/>, <see cref="CultureInfo"/>, or <see cref="ApiIdPart"/>[] for composite identities.
+    ///     Null for scalar value-type identifiers.
+    /// </remarks>
     private readonly object? _ref;
 
     /// <summary>
-    ///     The set of scalar CLR types that are compatible with <see cref="ApiId"/>.
+    ///     Frozen set of CLR types supported as scalar identity values.
     /// </summary>
+    /// <remarks>
+    ///     Used by <see cref="IsScalarType(Type)"/> to validate type compatibility before creating <see cref="ApiId"/> instances.
+    ///     Supports: <see cref="string"/>, <see cref="int"/>, <see cref="long"/>, <see cref="Guid"/>,
+    ///     <see cref="Ulid"/>, and <see cref="CultureInfo"/>.
+    /// </remarks>
     private static readonly FrozenSet<Type> _scalarTypes = FrozenSet.ToFrozenSet
     (
         [
@@ -61,55 +166,127 @@ public readonly struct ApiId
     );
 
     /// <summary>
-    ///    Cached hash code for immutability/equality.
+    ///     Pre-computed hash code for composite identities.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Cached during construction to optimize dictionary and hash-based collection operations,
+    ///         which are primary use cases for <see cref="ApiId"/>.
+    ///     </para>
+    ///     <para>
+    ///         For scalar identities, the hash code is computed on-demand in <see cref="GetHashCode"/>.
+    ///         Only composite identities benefit from pre-computation due to their array traversal cost.
+    ///     </para>
+    /// </remarks>
     private readonly int _hashCode;
     #endregion
 
     #region Properties
     /// <summary>
-    ///     Gets the discriminated <see cref="ApiIdKind"/> for this identifier instance.
+    ///     Gets the discriminated union kind for this identifier.
     /// </summary>
+    /// <value>
+    ///     An <see cref="ApiIdKind"/> value indicating the runtime type of this identity (e.g., <see cref="ApiIdKind.Int32"/>,
+    ///     <see cref="ApiIdKind.Guid"/>, <see cref="ApiIdKind.Composite"/>).
+    /// </value>
+    /// <remarks>
+    ///     Used for type-safe access to the underlying value via pattern matching, type checking, and conversion methods.
+    /// </remarks>
     public ApiIdKind Kind { get; }
 
-    /// <summary>Optional original text (diagnostics/round-tripping only; not used for equality).</summary>
+    /// <summary>
+    ///     Gets the original string representation used to create this identifier, if applicable.
+    /// </summary>
+    /// <value>
+    ///     The original string from parsing or factory methods, or <see langword="null"/> if not tracked.
+    /// </value>
+    /// <remarks>
+    ///     <para>
+    ///         This property is for diagnostics and round-tripping only. It is <strong>not used for equality or hashing</strong>.
+    ///         Two <see cref="ApiId"/> instances with different <see cref="OriginalString"/> values but identical runtime values
+    ///         are considered equal.
+    ///     </para>
+    ///     <para>
+    ///         Example: <c>ApiId.FromString("  42  ")</c> and <c>ApiId.FromString("42")</c> are equal if both represent
+    ///         the same string value after normalization, even if <see cref="OriginalString"/> differs.
+    ///     </para>
+    /// </remarks>
     public string? OriginalString { get; }
     #endregion
 
     #region Computed Properties
     /// <summary>
-    ///     Gets a value indicating whether this identifier represents a non-empty value.
+    ///     Gets whether this identifier has a value (is not empty).
     /// </summary>
+    /// <value>
+    ///     <see langword="true"/> if <see cref="Kind"/> is not <see cref="ApiIdKind.None"/>; otherwise, <see langword="false"/>.
+    /// </value>
+    /// <remarks>
+    ///     Use this property to check for the presence of an identity value before accessing its components.
+    ///     Equivalent to <c>!Equals(<see cref="Empty"/>)</c>.
+    /// </remarks>
     public readonly bool HasValue => this.Kind != ApiIdKind.None;
 
-    /// <summary>True if this identifier is a <see cref="string"/> value.</summary>
+    /// <summary>Gets whether this identifier is a <see cref="string"/> value.</summary>
+    /// <value><see langword="true"/> if <see cref="Kind"/> is <see cref="ApiIdKind.String"/>; otherwise, <see langword="false"/>.</value>
     public readonly bool IsString => this.Kind == ApiIdKind.String;
 
-    /// <summary>True if this identifier is an <see cref="int"/> value.</summary>
+    /// <summary>Gets whether this identifier is an <see cref="int"/> value.</summary>
+    /// <value><see langword="true"/> if <see cref="Kind"/> is <see cref="ApiIdKind.Int32"/>; otherwise, <see langword="false"/>.</value>
     public readonly bool IsInt32 => this.Kind == ApiIdKind.Int32;
 
-    /// <summary>True if this identifier is a <see cref="long"/> value.</summary>
+    /// <summary>Gets whether this identifier is a <see cref="long"/> value.</summary>
+    /// <value><see langword="true"/> if <see cref="Kind"/> is <see cref="ApiIdKind.Int64"/>; otherwise, <see langword="false"/>.</value>
     public readonly bool IsInt64 => this.Kind == ApiIdKind.Int64;
 
-    /// <summary>True if this identifier is a <see cref="Guid"/> value.</summary>
+    /// <summary>Gets whether this identifier is a <see cref="Guid"/> value.</summary>
+    /// <value><see langword="true"/> if <see cref="Kind"/> is <see cref="ApiIdKind.Guid"/>; otherwise, <see langword="false"/>.</value>
     public readonly bool IsGuid => this.Kind == ApiIdKind.Guid;
 
-    /// <summary>True if this identifier is a <see cref="Ulid"/> value.</summary>
+    /// <summary>Gets whether this identifier is a <see cref="Ulid"/> value.</summary>
+    /// <value><see langword="true"/> if <see cref="Kind"/> is <see cref="ApiIdKind.Ulid"/>; otherwise, <see langword="false"/>.</value>
     public readonly bool IsUlid => this.Kind == ApiIdKind.Ulid;
 
-    /// <summary>True if this identifier is a <see cref="CultureInfo"/> value.</summary>
+    /// <summary>Gets whether this identifier is a <see cref="CultureInfo"/> value.</summary>
+    /// <value><see langword="true"/> if <see cref="Kind"/> is <see cref="ApiIdKind.Culture"/>; otherwise, <see langword="false"/>.</value>
     public readonly bool IsCulture => this.Kind == ApiIdKind.Culture;
 
-    /// <summary>True if this identifier is a composite value made up of parts.</summary>
+    /// <summary>Gets whether this identifier is a composite (multi-part) value.</summary>
+    /// <value><see langword="true"/> if <see cref="Kind"/> is <see cref="ApiIdKind.Composite"/>; otherwise, <see langword="false"/>.</value>
+    /// <remarks>
+    ///     Composite identities contain an array of <see cref="ApiIdPart"/> elements, all of which must be scalar values.
+    ///     Use <see cref="PartsAsSpan"/>, <see cref="PartsAsEnumerable"/>, or indexers to access individual parts.
+    /// </remarks>
     public readonly bool IsComposite => this.Kind == ApiIdKind.Composite;
 
-    /// <summary>True if this identifier is a scalar (non-composite, non-empty) value.</summary>
+    /// <summary>Gets whether this identifier is a scalar (single-value, non-composite) value.</summary>
+    /// <value>
+    ///     <see langword="true"/> if <see cref="Kind"/> is any scalar type (<see cref="ApiIdKind.String"/>, <see cref="ApiIdKind.Int32"/>,
+    ///     <see cref="ApiIdKind.Int64"/>, <see cref="ApiIdKind.Guid"/>, <see cref="ApiIdKind.Ulid"/>, <see cref="ApiIdKind.Culture"/>);
+    ///     otherwise, <see langword="false"/>.
+    /// </value>
+    /// <remarks>
+    ///     Returns <see langword="false"/> for both <see cref="ApiIdKind.None"/> and <see cref="ApiIdKind.Composite"/>.
+    ///     Scalar identifiers can be stored without allocation (for value types) or as a single reference (for <see cref="string"/>
+    ///     and <see cref="CultureInfo"/>).
+    /// </remarks>
     public readonly bool IsScalar => this.Kind != ApiIdKind.None && this.Kind != ApiIdKind.Composite;
 
     /// <summary>
-    ///     True if this composite was built with all <see cref="ApiIdPart.Name"/> non-null.
-    ///     Invariants guarantee there is no mixing; for non-composites returns false.
+    ///     Gets whether this is a named composite (all parts have non-null names).
     /// </summary>
+    /// <value>
+    ///     <see langword="true"/> if this is a composite where all parts have names; otherwise, <see langword="false"/>.
+    /// </value>
+    /// <remarks>
+    ///     <para>
+    ///         Named composites provide semantic meaning to each part (e.g., "CustomerId=42|OrderNumber=1001").
+    ///         The framework enforces that all parts in a composite must be consistently named or unnamed; mixing is not allowed.
+    ///     </para>
+    ///     <para>
+    ///         Returns <see langword="false"/> for non-composite identities and empty composites.
+    ///     </para>
+    /// </remarks>
     public readonly bool IsNamedComposite
     {
         get
@@ -130,9 +307,21 @@ public readonly struct ApiId
     }
 
     /// <summary>
-    ///     True if this composite was built with all <see cref="ApiIdPart.Name"/> null (positional/ordered).
-    ///     Invariants guarantee there is no mixing; for non-composites returns false.
+    ///     Gets whether this is an ordered composite (all parts are unnamed/positional).
     /// </summary>
+    /// <value>
+    ///     <see langword="true"/> if this is a composite where all parts lack names; otherwise, <see langword="false"/>.
+    /// </value>
+    /// <remarks>
+    ///     <para>
+    ///         Ordered/positional composites rely on part sequence rather than names (e.g., "42|1001").
+    ///         This format is more compact and efficient for performance-critical scenarios where semantic names are unnecessary.
+    ///     </para>
+    ///     <para>
+    ///         The framework enforces that all parts in a composite must be consistently named or unnamed; mixing is not allowed.
+    ///         Returns <see langword="false"/> for non-composite identities and empty composites.
+    ///     </para>
+    /// </remarks>
     public readonly bool IsOrderedComposite
     {
         get
@@ -153,19 +342,38 @@ public readonly struct ApiId
     }
 
     /// <summary>
-    ///     Gets the number of parts in this composite identifier, or zero if not composite.
+    ///     Gets the number of parts in this composite identifier.
     /// </summary>
+    /// <value>
+    ///     The number of <see cref="ApiIdPart"/> elements if this is a composite; otherwise, 0.
+    /// </value>
+    /// <remarks>
+    ///     For non-composite identifiers (scalars and <see cref="Empty"/>), this property returns 0.
+    /// </remarks>
     public readonly int PartCount => this.IsComposite ? ((ApiIdPart[])_ref!).Length : 0;
 
     /// <summary>
-    ///     Gets a span of the composite parts, or an empty span if not composite.
+    ///     Gets the parts of this composite identifier as a read-only span.
     /// </summary>
+    /// <value>
+    ///     A <see cref="ReadOnlySpan{T}"/> of <see cref="ApiIdPart"/> if this is a composite; otherwise, an empty span.
+    /// </value>
+    /// <remarks>
+    ///     Provides zero-allocation access to composite parts. Prefer this over <see cref="PartsAsEnumerable"/>
+    ///     for performance-sensitive code.
+    /// </remarks>
     public readonly ReadOnlySpan<ApiIdPart> PartsAsSpan =>
         this.IsComposite ? ((ApiIdPart[])_ref!).AsSpan() : ReadOnlySpan<ApiIdPart>.Empty;
 
     /// <summary>
-    ///     Gets an enumerable of the composite parts, or an empty enumerable if not composite.
+    ///     Gets the parts of this composite identifier as an enumerable sequence.
     /// </summary>
+    /// <value>
+    ///     An <see cref="IEnumerable{T}"/> of <see cref="ApiIdPart"/> if this is a composite; otherwise, an empty sequence.
+    /// </value>
+    /// <remarks>
+    ///     Use <see cref="PartsAsSpan"/> instead when possible for better performance (zero allocation).
+    /// </remarks>
     public readonly IEnumerable<ApiIdPart> PartsAsEnumerable =>
         this.IsComposite ? (ApiIdPart[])_ref! : Enumerable.Empty<ApiIdPart>();
     #endregion

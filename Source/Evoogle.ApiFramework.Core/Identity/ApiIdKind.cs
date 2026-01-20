@@ -6,37 +6,92 @@
 namespace Evoogle.ApiFramework.Identity;
 
 /// <summary>
-///     Specifies the kinds of identifiers that can be used in the API framework.
+///     Defines the discriminated union kinds for <see cref="ApiId"/> values.
 /// </summary>
 /// <remarks>
-///     The <see cref="ApiIdKind"/> enum distinguishes scalar identifier representations (e.g., <see cref="int"/>, <see cref="Guid"/>, <see cref="string"/>)
-///     from the <see cref="Composite"/> kind which models ordered or named collections of component identifiers.
+///     <para>
+///         <see cref="ApiIdKind"/> serves as the type tag for the <see cref="ApiId"/> discriminated union,
+///         distinguishing between scalar representations (e.g., <see cref="Int32"/>, <see cref="Guid"/>, <see cref="String"/>)
+///         and the <see cref="Composite"/> kind which contains multiple component parts.
+///     </para>
+///     <para>
+///         The enum is used throughout the API framework for type-safe operations, serialization, and runtime type checking.
+///     </para>
 /// </remarks>
 public enum ApiIdKind : byte
 {
     #region Values
-    /// <summary>No value present (empty identifier).</summary>
+    /// <summary>
+    ///     Represents an empty identifier with no value.
+    /// </summary>
+    /// <remarks>
+    ///     Equivalent to <c>default(<see cref="ApiId"/>)</c> or <see cref="ApiId.Empty"/>.
+    ///     Used to indicate the absence of an identifier value.
+    /// </remarks>
     None,
 
-    /// <summary>A composite identifier composed of one or more component <see cref="ApiId"/> values.</summary>
+    /// <summary>
+    ///     Represents a composite identifier composed of multiple scalar <see cref="ApiId"/> parts.
+    /// </summary>
+    /// <remarks>
+    ///     Composite identifiers can be either named (e.g., "CustomerId=42|OrderNumber=1001") or
+    ///     ordered/positional (e.g., "42|1001"). All parts within a composite must be scalar values;
+    ///     nested composites are not allowed.
+    /// </remarks>
     Composite,
 
-    /// <summary>A <see cref="System.Globalization.CultureInfo"/> identifier (by culture name).</summary>
+    /// <summary>
+    ///     Represents a <see cref="System.Globalization.CultureInfo"/> identifier stored by culture name.
+    /// </summary>
+    /// <remarks>
+    ///     Culture identifiers are compared case-insensitively and stored by their
+    ///     <see cref="System.Globalization.CultureInfo.Name"/> property.
+    /// </remarks>
     Culture,
 
-    /// <summary>A <see cref="System.Guid"/> identifier.</summary>
+    /// <summary>
+    ///     Represents a <see cref="System.Guid"/> (Globally Unique Identifier) value.
+    /// </summary>
+    /// <remarks>
+    ///     Stored in the value union without allocation. Provides globally unique identification
+    ///     suitable for distributed systems.
+    /// </remarks>
     Guid,
 
-    /// <summary>An <see cref="int"/> identifier.</summary>
+    /// <summary>
+    ///     Represents a 32-bit signed integer (<see cref="int"/>) identifier.
+    /// </summary>
+    /// <remarks>
+    ///     Stored in the value union without boxing. Suitable for database primary keys and
+    ///     sequential identifiers.
+    /// </remarks>
     Int32,
 
-    /// <summary>An <see cref="long"/> identifier.</summary>
+    /// <summary>
+    ///     Represents a 64-bit signed integer (<see cref="long"/>) identifier.
+    /// </summary>
+    /// <remarks>
+    ///     Stored in the value union without boxing. Suitable for high-volume systems requiring
+    ///     large identifier spaces.
+    /// </remarks>
     Int64,
 
-    /// <summary>A <see cref="string"/> identifier.</summary>
+    /// <summary>
+    ///     Represents a <see cref="string"/> identifier.
+    /// </summary>
+    /// <remarks>
+    ///     String identifiers use ordinal (case-sensitive) comparison for equality and ordering.
+    ///     Null strings are treated as <see cref="None"/>.
+    /// </remarks>
     String,
 
-    /// <summary>A <see cref="Ulid"/> identifier.</summary>
+    /// <summary>
+    ///     Represents a <see cref="Ulid"/> (Universally Unique Lexicographically Sortable Identifier) value.
+    /// </summary>
+    /// <remarks>
+    ///     Stored in the value union without allocation. Provides time-ordered unique identification
+    ///     with better database indexing properties than <see cref="Guid"/>.
+    /// </remarks>
     Ulid,
     #endregion
 }

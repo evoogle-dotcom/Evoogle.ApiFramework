@@ -8,16 +8,37 @@ using System.Runtime.InteropServices;
 namespace Evoogle.ApiFramework.Identity.Internal;
 
 /// <summary>
-///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used directly from your code.
-///     This API may change or be removed in future releases.
+///     Explicit-layout union for storing value-type arms of <see cref="ApiId"/> without boxing.
 /// </summary>
+/// <remarks>
+///     <para>
+///         <strong>Infrastructure Component:</strong> This type is an internal implementation detail of <see cref="ApiId"/>
+///         and is not intended for direct use in application code. It may change or be removed in future releases.
+///     </para>
+///     <para>
+///         Uses <see cref="StructLayout"/> with <see cref="LayoutKind.Explicit"/> to overlay all value-type fields
+///         in the same memory location, enabling zero-allocation storage of primitives within <see cref="ApiId"/>.
+///     </para>
+///     <para>
+///         Supports: <see cref="int"/>, <see cref="long"/>, <see cref="Guid"/>, and <see cref="Ulid"/>.
+///         Reference types (<see cref="string"/>, <see cref="System.Globalization.CultureInfo"/>, composite arrays)
+///         are stored separately in <see cref="ApiId"/>'s reference field.
+///     </para>
+/// </remarks>
 [StructLayout(LayoutKind.Explicit)]
 internal readonly struct ApiIdValueUnion
 {
     #region Fields
+    /// <summary>32-bit signed integer value, overlaid at offset 0.</summary>
     [FieldOffset(0)] public readonly int Int32;
+
+    /// <summary>64-bit signed integer value, overlaid at offset 0.</summary>
     [FieldOffset(0)] public readonly long Int64;
+
+    /// <summary><see cref="System.Guid"/> value (16 bytes), overlaid at offset 0.</summary>
     [FieldOffset(0)] public readonly Guid Guid;
+
+    /// <summary><see cref="System.Ulid"/> value (16 bytes), overlaid at offset 0.</summary>
     [FieldOffset(0)] public readonly Ulid Ulid;
     #endregion
 

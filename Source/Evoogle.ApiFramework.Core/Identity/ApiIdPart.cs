@@ -8,27 +8,69 @@ using Evoogle.Extensions;
 namespace Evoogle.ApiFramework.Identity;
 
 /// <summary>
-///     Represents a part of an API composite identifier, consisting of an optional name and a value.
+///     Represents a single component within a composite <see cref="ApiId"/>.
+///     Each part consists of an optional name (for named composites) and an <see cref="ApiId"/> value.
 /// </summary>
-/// <param name="name">The optional name associated with the API identifier part.</param>
-/// <param name="value">The value of the API identifier part.</param>
+/// <remarks>
+///     <para>
+///         <see cref="ApiIdPart"/> is used to build composite identifiers through <see cref="ApiId.Composite(ApiIdPart[])"/>.
+///         Parts can be either named (e.g., "CustomerId=42") or unnamed/positional (e.g., "42").
+///     </para>
+///     <para>
+///         Invariants enforced by <see cref="ApiId"/>:
+///         <list type="bullet">
+///             <item>All parts in a composite must be either named or unnamed (no mixing).</item>
+///             <item>Part values must be scalar (no nested composites).</item>
+///             <item>Named parts must have unique names within the same composite.</item>
+///         </list>
+///     </para>
+/// </remarks>
+/// <param name="name">The optional name for this part. Non-null/non-whitespace for named composites, null for ordered composites.</param>
+/// <param name="value">The <see cref="ApiId"/> value for this part. Must be a scalar (non-composite) identifier.</param>
 public readonly record struct ApiIdPart(string? Name, ApiId Value)
 {
     #region Properties
-    /// <summary>Indicates whether the API identifier part has a name.</summary>
-    public bool IsNamed => string.IsNullOrWhiteSpace(this.Name) is false;
+    /// <summary>
+    ///     Gets whether this part is named (has a non-null, non-whitespace <see cref="Name"/>).
+    /// </summary>
+    /// <value>
+    ///     <see langword="true"/> if <see cref="Name"/> is non-null and contains at least one non-whitespace character;
+    ///     otherwise <see langword="false"/>.
+    /// </value>
+    public bool IsNamed => !string.IsNullOrWhiteSpace(this.Name);
     #endregion
 
     #region Factory Methods
-    /// <summary>Creates an unnamed API identifier part with the specified value.</summary>
-    /// <param name="value">The value of the API identifier part.</param>
-    /// <returns>A new <see cref="ApiIdPart"/> whose <see cref="Name"/> is null and whose <see cref="Value"/> equals <paramref name="value"/>.</returns>
+    /// <summary>
+    ///     Creates an unnamed (positional) identifier part.
+    /// </summary>
+    /// <param name="value">The scalar identifier value for this part.</param>
+    /// <returns>
+    ///     A new <see cref="ApiIdPart"/> with <see cref="Name"/> set to <see langword="null"/> and
+    ///     <see cref="Value"/> set to <paramref name="value"/>.
+    /// </returns>
+    /// <remarks>
+    ///     Use this factory method when building ordered/positional composite identifiers where
+    ///     part order matters and names are not needed.
+    /// </remarks>
     public static ApiIdPart Create(ApiId value) => new(null, value);
 
-    /// <summary>Creates a named API identifier part with the specified name and value.</summary>
-    /// <param name="name">The optional name associated with the API identifier part.</param>
-    /// <param name="value">The value of the API identifier part.</param>
-    /// <returns>A new <see cref="ApiIdPart"/> whose <see cref="Name"/> equals <paramref name="name"/> and whose <see cref="Value"/> equals <paramref name="value"/>.</returns>
+    /// <summary>
+    ///     Creates a named identifier part with the specified name and value.
+    /// </summary>
+    /// <param name="name">
+    ///     The name for this part. Can be <see langword="null"/> for unnamed parts,
+    ///     but typically should be non-null/non-whitespace for named composites.
+    /// </param>
+    /// <param name="value">The scalar identifier value for this part.</param>
+    /// <returns>
+    ///     A new <see cref="ApiIdPart"/> with <see cref="Name"/> set to <paramref name="name"/> and
+    ///     <see cref="Value"/> set to <paramref name="value"/>.
+    /// </returns>
+    /// <remarks>
+    ///     Use this factory method when building named composite identifiers where each part
+    ///     has semantic meaning indicated by its name (e.g., "CustomerId", "OrderNumber").
+    /// </remarks>
     public static ApiIdPart Create(string? name, ApiId value) => new(name, value);
     #endregion
 
