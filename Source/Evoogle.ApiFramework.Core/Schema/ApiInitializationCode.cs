@@ -77,11 +77,6 @@ public enum ApiInitializationCode
     API_IDENTITY_INVALID_API_NAME,
 
     /// <summary>
-    ///     The identity contains both ordered and named parts, which is not allowed.
-    /// </summary>
-    API_IDENTITY_MIXED_ORDERED_AND_NAMED_PARTS,
-
-    /// <summary>
     ///     The identity has no parts defined.
     /// </summary>
     API_IDENTITY_NULL_OR_EMPTY_PARTS,

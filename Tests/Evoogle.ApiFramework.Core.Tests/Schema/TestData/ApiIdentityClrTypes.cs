@@ -6,7 +6,7 @@
 namespace Evoogle.ApiFramework.Schema.TestData;
 
 /// <summary>
-/// Test type with composite identity (int + string + Guid) for identity testing.
+///     Test type with composite identity (int + string + Guid) for identity testing.
 /// </summary>
 public class ProductInventory
 {
@@ -17,7 +17,7 @@ public class ProductInventory
 }
 
 /// <summary>
-/// Test type with composite identity allowing nulls (ReturnEmpty) for identity testing.
+///     Test type with composite identity allowing nulls (ReturnEmpty) for identity testing.
 /// </summary>
 public class CompositeNullable
 {
@@ -26,7 +26,7 @@ public class CompositeNullable
 }
 
 /// <summary>
-/// Test type with composite identity that throws on nulls (ThrowException) for identity testing.
+///     Test type with composite identity that throws on nulls (ThrowException) for identity testing.
 /// </summary>
 public class CompositeStrict
 {
@@ -35,7 +35,7 @@ public class CompositeStrict
 }
 
 /// <summary>
-/// Test type with primary and alternate identities for identity testing.
+///     Test type with primary and alternate identities for identity testing.
 /// </summary>
 public class User
 {

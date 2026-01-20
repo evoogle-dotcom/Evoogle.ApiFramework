@@ -114,9 +114,10 @@ public sealed class ApiIdentity
             context: context
         );
 
-        // Track the current identity in the traversal path to detect circular references
-        var identityPath = this.ApiPath;
-        var wasAdded = context.IdentityTraversalPath.Add(identityPath);
+        // Track the current object type in the traversal path to detect circular references.
+        // ApiIdentityPart checks referencedObjectType.ApiPath, so we must store object-type paths here.
+        var objectTypePath = context.ApiParentObjectType.ApiPath;
+        var wasAdded = context.IdentityTraversalPath.Add(objectTypePath);
 
         try
         {
@@ -134,7 +135,7 @@ public sealed class ApiIdentity
             // Remove from traversal path after initialization
             if (wasAdded)
             {
-                context.IdentityTraversalPath.Remove(identityPath);
+                context.IdentityTraversalPath.Remove(objectTypePath);
             }
         }
     }

@@ -115,30 +115,39 @@ public sealed class ApiIdentityPart
     {
         _apiResolvedProperty = null;
 
-        if (!string.IsNullOrWhiteSpace(this.ApiPropertyName))
+        var isApiPropertyNameInvalid = ApiSchemaHelpers.IsNameInvalid(this.ApiPropertyName);
+        if (isApiPropertyNameInvalid)
         {
-            // Resolve the related API property for the parent API object type.
-            var apiParentObjectType = context.ApiParentObjectType;
-            if (apiParentObjectType.TryGetPropertyByApiName(this.ApiPropertyName, out var apiResolvedProperty))
+            // If the ApiPropertyName is invalid, skip further processing
+            return;
+        }
+
+        // Resolve the related API property for the parent API object type.
+        var apiParentObjectType = context.ApiParentObjectType;
+        if (apiParentObjectType.TryGetPropertyByApiName(this.ApiPropertyName, out var apiResolvedProperty))
+        {
+            _apiResolvedProperty = apiResolvedProperty;
+
+            // Check for circular identity references
+            if (_apiResolvedProperty.ApiType is ApiObjectType referencedObjectType && referencedObjectType.HasIdentity)
             {
-                _apiResolvedProperty = apiResolvedProperty;
+                // Direct self reference, e.g. Node identity includes Node.Self
+                var isDirectSelfReference = ReferenceEquals(referencedObjectType, apiParentObjectType);
 
-                // Check for circular identity references
-                // ApiPath is guaranteed to be set during initialization before identity resolution
-                if (_apiResolvedProperty.ApiType is ApiObjectType referencedObjectType && referencedObjectType.HasIdentity)
+                // Indirect reference, e.g. Beta identity references Alpha and Alpha identity references Beta
+                var isIndirectCircularReference = !isDirectSelfReference
+                    && IdentityDependsOn(referencedObjectType, apiParentObjectType);
+
+                if (isDirectSelfReference || isIndirectCircularReference)
                 {
-                    var referencedTypePath = referencedObjectType.ApiPath;
-                    if (context.IdentityTraversalPath.Contains(referencedTypePath))
-                    {
-                        var path = this.ApiPath;
-                        var severity = ApiInitializationSeverity.Error;
-                        var code = ApiInitializationCode.API_IDENTITY_PART_CIRCULAR_REFERENCE;
-                        var description = $"Circular identity reference detected: property '{this.ApiPropertyName}' references type '{referencedObjectType.ApiName}' which has an identity that depends on the current type";
-                        var remediation = "Remove the circular dependency by restructuring the identity definitions or using a non-identity property";
+                    var path = this.ApiPath;
+                    var severity = ApiInitializationSeverity.Error;
+                    var code = ApiInitializationCode.API_IDENTITY_PART_CIRCULAR_REFERENCE;
+                    var description = $"Circular identity reference detected: property '{this.ApiPropertyName}' references type '{referencedObjectType.ApiName}' which has an identity that depends on the current type";
+                    var remediation = "Remove the circular dependency by restructuring the identity definitions or using a non-identity property";
 
-                        context.AddIssue(path, severity, code, description, remediation);
-                        _apiResolvedProperty = null; // Clear to prevent further issues
-                    }
+                    context.AddIssue(path, severity, code, description, remediation);
+                    _apiResolvedProperty = null; // Clear to prevent further issues
                 }
             }
         }
@@ -155,6 +164,58 @@ public sealed class ApiIdentityPart
         }
     }
 
+    private static bool IdentityDependsOn(ApiObjectType apiObjectType, ApiObjectType targetObjectType)
+    {
+        var visited = new HashSet<ApiObjectType>(ReferenceEqualityComparer.Instance);
+        var stack = new Stack<ApiObjectType>();
+
+        visited.Add(apiObjectType);
+        stack.Push(apiObjectType);
+
+        while (stack.Count > 0)
+        {
+            var current = stack.Pop();
+
+            foreach (var identity in current.ApiIdentities)
+            {
+                foreach (var part in identity.ApiIdentityParts)
+                {
+                    ApiProperty? partProperty = null;
+                    try
+                    {
+                        partProperty = part.ApiProperty;
+                    }
+                    catch
+                    {
+                        // Best-effort: referenced types may not be initialized yet during schema initialization.
+                    }
+
+                    if (partProperty?.ApiType is not ApiObjectType referenced)
+                    {
+                        continue;
+                    }
+
+                    if (ReferenceEquals(referenced, targetObjectType))
+                    {
+                        return true;
+                    }
+
+                    if (!referenced.HasIdentity)
+                    {
+                        continue;
+                    }
+
+                    if (visited.Add(referenced))
+                    {
+                        stack.Push(referenced);
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
     private void InitializeClrIdType(ApiInitializationContext context)
     {
         _clrResolvedIdType = null;
@@ -169,7 +230,7 @@ public sealed class ApiIdentityPart
                 var severity = ApiInitializationSeverity.Error;
                 var code = ApiInitializationCode.API_IDENTITY_PART_INVALID_SCALAR_TYPE;
                 var description = $"Scalar type '{this.ClrConfiguredIdType.SafeToName()}' is not compatible with {nameof(ApiId)}";
-                var scalarTypeNames = string.Join(",", ApiId.GetCompatibleScalarTypes().Select(t => t.SafeToName()));
+                var scalarTypeNames = string.Join(",", ApiId.GetCompatibleScalarTypes().Select(t => t.SafeToName()).OrderBy(n => n, StringComparer.Ordinal));
                 var remediation = $"Use one of the supported scalar types: {scalarTypeNames}";
 
                 context.AddIssue(path, severity, code, description, remediation);

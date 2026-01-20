@@ -298,13 +298,15 @@ public sealed partial class ApiProperty
         var clrObjectType = apiObjectType.ClrType;
         var clrMemberName = this.ClrName;
 
-        if (clrObjectType is null)
+        var isClrObjectTypeNull = clrObjectType is null;
+        if (isClrObjectTypeNull)
         {
             // If the parent CLR object type is null, skip further processing
             return;
         }
 
-        if (ApiSchemaHelpers.IsNameInvalid(clrMemberName))
+        var isClrMemberNameInvalid = ApiSchemaHelpers.IsNameInvalid(clrMemberName);
+        if (isClrMemberNameInvalid)
         {
             // If the CLR member name is invalid, skip further processing
             return;
@@ -313,7 +315,7 @@ public sealed partial class ApiProperty
         try
         {
             // Prefer property, then field
-            var clrPropertyInfo = TypeReflection.GetProperty(clrObjectType, clrMemberName, BindingFlags.Public | BindingFlags.Instance);
+            var clrPropertyInfo = TypeReflection.GetProperty(clrObjectType!, clrMemberName, BindingFlags.Public | BindingFlags.Instance);
             if (clrPropertyInfo is not null)
             {
                 if (!this.ValidateClrMemberType(context, clrPropertyInfo.PropertyType, clrMemberName))
@@ -326,7 +328,7 @@ public sealed partial class ApiProperty
                 return; // Found valid property
             }
 
-            var clrFieldInfo = TypeReflection.GetField(clrObjectType, clrMemberName, BindingFlags.Public | BindingFlags.Instance);
+            var clrFieldInfo = TypeReflection.GetField(clrObjectType!, clrMemberName, BindingFlags.Public | BindingFlags.Instance);
             if (clrFieldInfo is not null)
             {
                 if (!this.ValidateClrMemberType(context, clrFieldInfo.FieldType, clrMemberName))
