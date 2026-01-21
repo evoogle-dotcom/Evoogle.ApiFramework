@@ -31,7 +31,7 @@ namespace Evoogle.ApiFramework.Identity;
 ///         <see cref="ApiId"/> serves as the performance layer in the identity system:
 ///         <list type="bullet">
 ///             <item><strong>Schema Layer:</strong> <see cref="Schema.ApiIdentity"/> defines what constitutes an identity (build-time).</item>
-///             <item><strong>Semantic Layer:</strong> <see cref="ApiIdentityValue"/> preserves object graph structure for navigation and diagnostics.</item>
+///             <item><strong>Semantic Layer:</strong> <see cref="ApiIdentitySnapshot"/> preserves object graph structure for navigation and diagnostics.</item>
 ///             <item><strong>Runtime Layer:</strong> <see cref="ApiId"/> provides flat, efficient identity values for operations.</item>
 ///         </list>
 ///     </para>
@@ -56,18 +56,18 @@ namespace Evoogle.ApiFramework.Identity;
 ///         </list>
 ///     </para>
 ///     <para>
-///         <strong>Relationship with ApiIdentityValue:</strong>
-///         <see cref="ApiIdentityValue"/> extracts structured identity values from objects and can flatten them to <see cref="ApiId"/>
-///         via <see cref="ApiIdentityValue.ToApiId(bool)"/>. The client controls whether parts are named (semantic, readable) or
+///         <strong>Relationship with ApiIdentitySnapshot:</strong>
+///         <see cref="ApiIdentitySnapshot"/> extracts structured identity snapshots from objects and can flatten them to <see cref="ApiId"/>
+///         via <see cref="ApiIdentitySnapshot.ToApiId(bool)"/>. The client controls whether parts are named (semantic, readable) or
 ///         unnamed (compact, performance-oriented):
 ///         <code>
 ///         // Semantic layer: preserves structure
-///         ApiIdentityValue structuredId = orderIdentity.Extract(order);
-///         int customerId = structuredId.GetScalarValue&lt;int&gt;("Customer.Id");
+///         ApiIdentitySnapshot snapshot = orderIdentity.Extract(order);
+///         int customerId = snapshot.GetScalarValue&lt;int&gt;("Customer.Id");
 ///
 ///         // Runtime layer: flatten for operations
-///         ApiId namedId = structuredId.ToApiId(useNamedParts: true);    // "Customer.Id=42|OrderNumber=1001"
-///         ApiId unnamedId = structuredId.ToApiId(useNamedParts: false); // "42|1001"
+///         ApiId namedId = snapshot.ToApiId(useNamedParts: true);    // "Customer.Id=42|OrderNumber=1001"
+///         ApiId unnamedId = snapshot.ToApiId(useNamedParts: false); // "42|1001"
 ///
 ///         // Use in performance-critical operations
 ///         cache[unnamedId] = order;

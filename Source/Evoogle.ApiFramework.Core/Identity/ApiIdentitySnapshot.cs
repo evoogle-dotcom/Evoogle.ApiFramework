@@ -3,11 +3,6 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-// Copyright (c) 2024-2025 Evoogle.com
-// SPDX-License-Identifier: MIT
-//
-// This file is licensed under the MIT License.
-// See the LICENSE file in the project root for more information.
 using System.Collections.Frozen;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
@@ -17,23 +12,105 @@ using Evoogle.ApiFramework.Exceptions;
 namespace Evoogle.ApiFramework.Identity;
 
 /// <summary>
-///     Represents the structured resolution of an object's identity.
-///     Preserves semantic relationships and nested structure for navigation, introspection, and validation.
+///     Represents a captured snapshot of an object's identity structure.
+///     Preserves semantic relationships and nested hierarchy for navigation, introspection, and validation.
 /// </summary>
 /// <remarks>
 ///     <para>
-///         <see cref="ApiIdentityValue"/> is the bridge between identity schema and runtime value (<see cref="ApiId"/>).
+///         <see cref="ApiIdentitySnapshot"/> is the bridge between identity schema and runtime value (<see cref="ApiId"/>).
 ///         It maintains the nested object graph during resolution, enabling path-based navigation and diagnostics
 ///         before flattening to <see cref="ApiId"/> for performance-critical operations.
 ///     </para>
 ///     <para>
+///         <strong>Architecture:</strong>
+///         <see cref="ApiIdentitySnapshot"/> serves as the semantic layer in the identity system:
+///     </para>
+///     <list type="bullet">
+///         <item>
+///             <strong>Schema Layer:</strong> <see cref="Schema.ApiIdentity"/> defines what constitutes an identity (build-time).
+///         </item>
+///         <item>
+///             <strong>Semantic Layer:</strong> <see cref="ApiIdentitySnapshot"/> captures the resolved identity structure
+///             with full path context, enabling navigation and introspection (extraction/resolution time).
+///         </item>
+///         <item>
+///             <strong>Runtime Layer:</strong> <see cref="ApiId"/> provides a flat, performance-optimized representation
+///             for dictionary keys, caching, and equality operations (hot-path runtime).
+///         </item>
+///     </list>
+///     <para>
+///         <strong>Key Features:</strong>
+///     </para>
+///     <list type="bullet">
+///         <item><strong>Structured Navigation:</strong> Access nested parts via indexer or dot-notation paths.</item>
+///         <item><strong>Type Preservation:</strong> Stores <see cref="ApiId"/> values directly—no boxing or string conversions.</item>
+///         <item><strong>Dual Flattening:</strong> Convert to named (semantic) or unnamed (compact) <see cref="ApiId"/> formats.</item>
+///         <item><strong>Resolution Tracking:</strong> Detect unresolved (null) nested identities before use.</item>
+///         <item><strong>Immutable:</strong> Thread-safe and cacheable.</item>
+///     </list>
+///     <para>
 ///         This type is immutable and thread-safe.
 ///     </para>
 /// </remarks>
-public sealed class ApiIdentityValue
+/// <example>
+/// <para><strong>Example 1: Extract and Navigate Identity Snapshot</strong></para>
+/// <code>
+/// var order = new Order
+/// {
+///     Customer = new Customer { Country = new Country { Id = 1 }, CustomerId = 42 },
+///     OrderNumber = 1001L
+/// };
+///
+/// // Extract structured snapshot
+/// ApiIdentitySnapshot snapshot = orderIdentity.Extract(order);
+///
+/// // Navigate semantically
+/// int customerId = snapshot.GetScalarValue&lt;int&gt;("Customer.CustomerId");
+/// var customerSnapshot = snapshot["Customer"];
+///
+/// // Check resolution status
+/// if (!snapshot.IsFullyResolved)
+/// {
+///     var missing = snapshot.GetUnresolvedParts();
+///     throw new ApiIdentityException($"Unresolved: {string.Join(", ", missing)}");
+/// }
+/// </code>
+///
+/// <para><strong>Example 2: Flatten to ApiId (Client-Controlled Naming)</strong></para>
+/// <code>
+/// var snapshot = orderIdentity.Extract(order);
+///
+/// // Named (semantic) - for logging/debugging
+/// ApiId namedId = snapshot.ToApiId(useNamedParts: true);
+/// logger.LogInfo("Processing order {OrderId}", namedId);
+/// // Output: "Customer.Country.Id=1|Customer.CustomerId=42|OrderNumber=1001"
+///
+/// // Unnamed (compact) - for cache keys
+/// ApiId compactId = snapshot.ToApiId(useNamedParts: false);
+/// cache[compactId] = order;
+/// // Key: "1|42|1001"
+/// </code>
+///
+/// <para><strong>Example 3: Manual Construction</strong></para>
+/// <code>
+/// // Scalar snapshot
+/// var productSnapshot = ApiIdentitySnapshot.Scalar("ProductId", 99);
+///
+/// // Composite snapshot
+/// var orderSnapshot = ApiIdentitySnapshot.Composite(
+///     "Order",
+///     new Dictionary&lt;string, object?&gt;
+///     {
+///         ["Customer"] = customerSnapshot,
+///         ["OrderNumber"] = 1001L
+///     }
+/// );
+/// </code>
+/// </example>
+public sealed class ApiIdentitySnapshot
 {
     #region Fields
-    private readonly FrozenDictionary<string, ApiIdentityValue?> _nestedParts;
+    private readonly FrozenDictionary<string, ApiIdentitySnapshot?> _nestedParts;
     private readonly FrozenDictionary<string, ApiId> _scalarParts;
     private ApiId? _cachedNamedApiId;
     private ApiId? _cachedUnnamedApiId;
@@ -41,12 +118,12 @@ public sealed class ApiIdentityValue
 
     #region Constructors
     /// <summary>
-    ///     Initializes a new instance of <see cref="ApiIdentityValue"/>.
+    ///     Initializes a new instance of <see cref="ApiIdentitySnapshot"/>.
     /// </summary>
     /// <param name="name">The name of this identity part.</param>
     /// <param name="parts">The resolved parts (name -> value mappings).</param>
     /// <param name="parentPath">Optional parent path for nested values.</param>
-    public ApiIdentityValue(
+    public ApiIdentitySnapshot(
         string name,
         IReadOnlyDictionary<string, object?> parts,
         string? parentPath = null)
@@ -60,12 +137,12 @@ public sealed class ApiIdentityValue
             : $"{parentPath}.{name}";
 
         // Separate nested identities from scalar values
-        var nestedParts = new Dictionary<string, ApiIdentityValue?>();
+        var nestedParts = new Dictionary<string, ApiIdentitySnapshot?>();
         var scalarParts = new Dictionary<string, ApiId>();
 
         foreach (var kvp in parts)
         {
-            if (kvp.Value is ApiIdentityValue nested)
+            if (kvp.Value is ApiIdentitySnapshot nested)
             {
                 nestedParts[kvp.Key] = nested;
             }
@@ -88,7 +165,7 @@ public sealed class ApiIdentityValue
     /// <summary>
     ///     Internal constructor for wrapping a single scalar ApiId.
     /// </summary>
-    private ApiIdentityValue(string name, ApiId scalarValue, string? parentPath)
+    private ApiIdentitySnapshot(string name, ApiId scalarValue, string? parentPath)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
 
@@ -97,7 +174,7 @@ public sealed class ApiIdentityValue
             ? name
             : $"{parentPath}.{name}";
 
-        _nestedParts = FrozenDictionary<string, ApiIdentityValue?>.Empty;
+        _nestedParts = FrozenDictionary<string, ApiIdentitySnapshot?>.Empty;
         _scalarParts = new Dictionary<string, ApiId> { ["Value"] = scalarValue }
             .ToFrozenDictionary();
     }
@@ -107,28 +184,45 @@ public sealed class ApiIdentityValue
     /// <summary>
     ///     Gets the name of this identity part.
     /// </summary>
+    /// <value>
+    ///     The name of this snapshot node (e.g., "Customer", "Order", "Id").
+    /// </value>
     public string Name { get; }
 
     /// <summary>
-    ///     Gets the full path to this identity value in the object graph.
+    ///     Gets the full path to this identity snapshot in the object graph.
     /// </summary>
+    /// <value>
+    ///     The dot-separated path from the root identity to this node.
+    /// </value>
     /// <example>"Order.Customer.Id"</example>
     public string Path { get; }
 
     /// <summary>
-    ///     Gets whether this identity value is a leaf (scalar) node.
+    ///     Gets whether this identity snapshot is a leaf (scalar) node.
     /// </summary>
+    /// <value>
+    ///     <see langword="true"/> if this snapshot contains a single scalar value;
+    ///     otherwise, <see langword="false"/> (composite or empty).
+    /// </value>
     public bool IsScalar => _nestedParts.Count == 0 && _scalarParts.Count == 1 && _scalarParts.ContainsKey("Value");
 
     /// <summary>
     ///     Gets whether this identity is a composite (has multiple parts).
     /// </summary>
+    /// <value>
+    ///     <see langword="true"/> if this snapshot has more than one part (nested or scalar);
+    ///     otherwise, <see langword="false"/>.
+    /// </value>
     public bool IsComposite => _nestedParts.Count + _scalarParts.Count > 1;
 
     /// <summary>
     ///     Gets the scalar ApiId value if this is a leaf node.
     /// </summary>
-    /// <exception cref="ApiIdentityException">Thrown if this is not a scalar value.</exception>
+    /// <value>
+    ///     The <see cref="ApiId"/> stored in this scalar snapshot.
+    /// </value>
+    /// <exception cref="ApiIdentityException">Thrown if this is not a scalar snapshot.</exception>
     public ApiId ScalarValue
     {
         get
@@ -136,8 +230,8 @@ public sealed class ApiIdentityValue
             if (!this.IsScalar)
             {
                 throw new ApiIdentityException(
-                    $"Cannot access ScalarValue on composite identity value at path '{this.Path}'. " +
-                    $"This identity has {this.PartCount} parts: [{string.Join(", ", this.PartNames)}]."
+                    $"Cannot access ScalarValue on composite identity snapshot at path '{this.Path}'. " +
+                    $"This snapshot has {this.PartCount} parts: [{string.Join(", ", this.PartNames)}]."
                 );
             }
             return _scalarParts["Value"];
@@ -145,8 +239,16 @@ public sealed class ApiIdentityValue
     }
 
     /// <summary>
-    ///     Gets whether all identity parts were successfully resolved (no null nested values).
+    ///     Gets whether all identity parts were successfully resolved (no null nested snapshots).
     /// </summary>
+    /// <value>
+    ///     <see langword="true"/> if all nested parts are non-null and fully resolved;
+    ///     otherwise, <see langword="false"/>.
+    /// </value>
+    /// <remarks>
+    ///     Use this property to validate the snapshot before flattening to <see cref="ApiId"/>
+    ///     or performing operations that require complete identity data.
+    /// </remarks>
     public bool IsFullyResolved
     {
         get
@@ -171,13 +273,19 @@ public sealed class ApiIdentityValue
     }
 
     /// <summary>
-    ///     Gets the names of all parts in this identity value.
+    ///     Gets the names of all parts in this identity snapshot.
     /// </summary>
+    /// <value>
+    ///     An enumerable of part names (both nested and scalar).
+    /// </value>
     public IEnumerable<string> PartNames => _nestedParts.Keys.Concat(_scalarParts.Keys);
 
     /// <summary>
     ///     Gets the count of parts (nested + scalar).
     /// </summary>
+    /// <value>
+    ///     The total number of parts (nested snapshots + scalar values) in this snapshot.
+    /// </value>
     public int PartCount => _nestedParts.Count + _scalarParts.Count;
     #endregion
 
@@ -186,10 +294,10 @@ public sealed class ApiIdentityValue
     ///     Gets a part by name. Supports nested path navigation using dot notation.
     /// </summary>
     /// <param name="pathOrName">Part name or dot-separated path (e.g., "Customer" or "Customer.Id").</param>
-    /// <returns>The identity value at the specified path.</returns>
+    /// <returns>The identity snapshot at the specified path.</returns>
     /// <exception cref="KeyNotFoundException">Thrown if the path is not found.</exception>
     /// <exception cref="ApiIdentityException">Thrown if accessing an unresolved (null) part.</exception>
-    public ApiIdentityValue this[string pathOrName]
+    public ApiIdentitySnapshot this[string pathOrName]
     {
         get
         {
@@ -215,8 +323,8 @@ public sealed class ApiIdentityValue
 
                 if (_scalarParts.TryGetValue(pathOrName, out var scalarApiId))
                 {
-                    // Wrap ApiId in ApiIdentityValue for consistent API
-                    return new ApiIdentityValue(pathOrName, scalarApiId, this.Path);
+                    // Wrap ApiId in ApiIdentitySnapshot for consistent API
+                    return new ApiIdentitySnapshot(pathOrName, scalarApiId, this.Path);
                 }
 
                 throw new KeyNotFoundException(
@@ -238,56 +346,60 @@ public sealed class ApiIdentityValue
 
     #region Factory Methods
     /// <summary>
-    ///     Creates a scalar identity value from an ApiId.
+    ///     Creates a scalar identity snapshot from an ApiId.
     /// </summary>
     /// <param name="name">The name of this identity part.</param>
     /// <param name="value">The scalar ApiId value.</param>
     /// <param name="parentPath">Optional parent path.</param>
-    public static ApiIdentityValue Scalar(string name, ApiId value, string? parentPath = null)
+    /// <returns>A new scalar <see cref="ApiIdentitySnapshot"/>.</returns>
+    public static ApiIdentitySnapshot Scalar(string name, ApiId value, string? parentPath = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
 
-        return new ApiIdentityValue(name, value, parentPath);
+        return new ApiIdentitySnapshot(name, value, parentPath);
     }
 
     /// <summary>
-    ///     Creates a scalar identity value from a CLR object (converted to ApiId).
+    ///     Creates a scalar identity snapshot from a CLR object (converted to ApiId).
     /// </summary>
     /// <param name="name">The name of this identity part.</param>
     /// <param name="value">The scalar value (int, long, Guid, string, etc.).</param>
     /// <param name="parentPath">Optional parent path.</param>
-    public static ApiIdentityValue Scalar(string name, object? value, string? parentPath = null)
+    /// <returns>A new scalar <see cref="ApiIdentitySnapshot"/>.</returns>
+    public static ApiIdentitySnapshot Scalar(string name, object? value, string? parentPath = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
 
         var apiId = ApiId.FromObject(value);
-        return new ApiIdentityValue(name, apiId, parentPath);
+        return new ApiIdentitySnapshot(name, apiId, parentPath);
     }
 
     /// <summary>
-    ///     Creates a composite identity value from parts.
+    ///     Creates a composite identity snapshot from parts.
     /// </summary>
     /// <param name="name">The name of this identity.</param>
     /// <param name="parts">The resolved parts.</param>
     /// <param name="parentPath">Optional parent path.</param>
-    public static ApiIdentityValue Composite(
+    /// <returns>A new composite <see cref="ApiIdentitySnapshot"/>.</returns>
+    public static ApiIdentitySnapshot Composite(
         string name,
         IReadOnlyDictionary<string, object?> parts,
         string? parentPath = null)
     {
-        return new ApiIdentityValue(name, parts, parentPath);
+        return new ApiIdentitySnapshot(name, parts, parentPath);
     }
 
     /// <summary>
-    ///     Creates an empty/unresolved identity value.
+    ///     Creates an empty/unresolved identity snapshot.
     /// </summary>
     /// <param name="name">The name of this identity.</param>
     /// <param name="parentPath">Optional parent path.</param>
-    public static ApiIdentityValue Empty(string name, string? parentPath = null)
+    /// <returns>An empty <see cref="ApiIdentitySnapshot"/>.</returns>
+    public static ApiIdentitySnapshot Empty(string name, string? parentPath = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
 
-        return new ApiIdentityValue(
+        return new ApiIdentitySnapshot(
             name,
             new Dictionary<string, object?>(),
             parentPath
@@ -300,22 +412,22 @@ public sealed class ApiIdentityValue
     ///     Attempts to get a part by name.
     /// </summary>
     /// <param name="name">The part name.</param>
-    /// <param name="value">The identity value if found and resolved.</param>
+    /// <param name="snapshot">The identity snapshot if found and resolved.</param>
     /// <returns>True if the part exists and is resolved; otherwise false.</returns>
-    public bool TryGetPart(string name, [NotNullWhen(true)] out ApiIdentityValue? value)
+    public bool TryGetPart(string name, [NotNullWhen(true)] out ApiIdentitySnapshot? snapshot)
     {
-        if (_nestedParts.TryGetValue(name, out value))
+        if (_nestedParts.TryGetValue(name, out snapshot))
         {
-            return value is not null;
+            return snapshot is not null;
         }
 
         if (_scalarParts.TryGetValue(name, out var scalarApiId))
         {
-            value = new ApiIdentityValue(name, scalarApiId, this.Path);
+            snapshot = new ApiIdentitySnapshot(name, scalarApiId, this.Path);
             return true;
         }
 
-        value = null;
+        snapshot = null;
         return false;
     }
 
@@ -332,7 +444,7 @@ public sealed class ApiIdentityValue
         if (!part.IsScalar)
         {
             throw new ApiIdentityException(
-                $"Identity part at '{pathOrName}' (full path: '{part.Path}') is not a scalar value. " +
+                $"Identity part at '{pathOrName}' (full path: '{part.Path}') is not a scalar snapshot. " +
                 $"It has {part.PartCount} parts: [{string.Join(", ", part.PartNames)}]."
             );
         }
@@ -386,6 +498,7 @@ public sealed class ApiIdentityValue
     /// <summary>
     ///     Gets the paths of all unresolved (null) nested identity parts.
     /// </summary>
+    /// <returns>An enumerable of paths to unresolved parts.</returns>
     public IEnumerable<string> GetUnresolvedParts()
     {
         foreach (var kvp in _nestedParts)
@@ -405,7 +518,7 @@ public sealed class ApiIdentityValue
     }
 
     /// <summary>
-    ///     Flattens this structured identity value to an <see cref="ApiId"/> for runtime operations.
+    ///     Flattens this structured identity snapshot to an <see cref="ApiId"/> for runtime operations.
     ///     The result is cached per naming mode.
     /// </summary>
     /// <param name="useNamedParts">
@@ -414,6 +527,21 @@ public sealed class ApiIdentityValue
     /// </param>
     /// <returns>A flat <see cref="ApiId"/> suitable for runtime operations.</returns>
     /// <exception cref="ApiIdentityException">Thrown if any nested parts are unresolved (null).</exception>
+    /// <remarks>
+    ///     <para>
+    ///         <strong>Named Parts (useNamedParts: true):</strong>
+    ///         Produces a self-documenting <see cref="ApiId"/> with part names included.
+    ///         Best for logging, debugging, and scenarios where semantic meaning is important.
+    ///     </para>
+    ///     <para>
+    ///         <strong>Unnamed Parts (useNamedParts: false):</strong>
+    ///         Produces a compact positional <see cref="ApiId"/> without part names.
+    ///         Best for cache keys, database storage, and performance-critical scenarios.
+    ///     </para>
+    ///     <para>
+    ///         Both modes are cached independently to avoid redundant computation.
+    ///     </para>
+    /// </remarks>
     public ApiId ToApiId(bool useNamedParts = true)
     {
         // Check cache based on naming mode
@@ -466,6 +594,7 @@ public sealed class ApiIdentityValue
     /// <summary>
     ///     Returns a debug-friendly string representation showing the nested structure.
     /// </summary>
+    /// <returns>A hierarchical string representation of this snapshot.</returns>
     public string ToDebugString()
     {
         var sb = new StringBuilder();
@@ -481,23 +610,23 @@ public sealed class ApiIdentityValue
 
     #region Implementation Methods
     private static void FlattenRecursive(
-        ApiIdentityValue value,
+        ApiIdentitySnapshot snapshot,
         string? prefix,
         List<ApiIdPart> output,
         bool useNamedParts)
     {
-        if (value.IsScalar)
+        if (snapshot.IsScalar)
         {
             // Leaf node: add scalar part (ApiId is already the right type!)
             var partName = useNamedParts ? prefix : null;
-            var apiId = value.ScalarValue;
+            var apiId = snapshot.ScalarValue;
 
             output.Add(ApiIdPart.Create(partName, apiId));
             return;
         }
 
         // Composite: recurse into parts
-        foreach (var kvp in value._nestedParts)
+        foreach (var kvp in snapshot._nestedParts)
         {
             var partName = kvp.Key;
             var fullName = useNamedParts
@@ -512,13 +641,13 @@ public sealed class ApiIdentityValue
             {
                 var unresolvedPath = string.IsNullOrWhiteSpace(prefix) ? partName : $"{prefix}.{partName}";
                 throw new ApiIdentityException(
-                    $"Cannot flatten identity with unresolved nested part at '{unresolvedPath}'. " +
+                    $"Cannot flatten identity snapshot with unresolved nested part at '{unresolvedPath}'. " +
                     $"Check IsFullyResolved or use TryGetPart() before flattening."
                 );
             }
         }
 
-        foreach (var kvp in value._scalarParts)
+        foreach (var kvp in snapshot._scalarParts)
         {
             var partName = kvp.Key;
             var fullName = useNamedParts
@@ -574,7 +703,7 @@ public sealed class ApiIdentityValue
         }
 
         sb.Append(indentStr);
-        sb.Append("}");
+        sb.Append('}');
     }
     #endregion
 }
