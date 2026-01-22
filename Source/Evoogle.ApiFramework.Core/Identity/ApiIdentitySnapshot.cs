@@ -154,7 +154,8 @@ public sealed class ApiIdentitySnapshot
             else
             {
                 // Convert object to ApiId (preserves original type)
-                scalarParts[kvp.Key] = ApiId.FromObject(kvp.Value);
+                var value = kvp.Value;
+                scalarParts[kvp.Key] = value != null ? ApiId.FromObject(value) : ApiId.Empty;
             }
         }
 
@@ -366,7 +367,7 @@ public sealed class ApiIdentitySnapshot
     /// <param name="value">The scalar value (int, long, Guid, string, etc.).</param>
     /// <param name="parentPath">Optional parent path.</param>
     /// <returns>A new scalar <see cref="ApiIdentitySnapshot"/>.</returns>
-    public static ApiIdentitySnapshot Scalar(string name, object? value, string? parentPath = null)
+    public static ApiIdentitySnapshot Scalar(string name, object value, string? parentPath = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
 
