@@ -4,8 +4,7 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using System.Diagnostics.CodeAnalysis;
-
-using Evoogle.ApiFramework.Schema.TestData;
+using Evoogle.ApiFramework.TestData;
 using Evoogle.XUnit;
 
 using static Evoogle.ApiFramework.Schema.TestData.ApiSchemaFactory;
@@ -207,7 +206,7 @@ public partial class ApiSchemaTests
                 ""ApiEnumTypes"": [],
                 ""ApiObjectTypes"": [],
                 ""Extensions"": {
-                    ""Evoogle.ApiFramework.Schema.TestData.GraphQlExtension, Evoogle.ApiFramework.Core.Tests"": {
+                    ""Evoogle.ApiFramework.TestData.GraphQlExtension, Evoogle.ApiFramework.Core.Tests"": {
                         ""Count"": 42
                     }
                 }
@@ -409,10 +408,10 @@ public partial class ApiSchemaTests
                 ""ApiEnumTypes"": [],
                 ""ApiObjectTypes"": [],
                 ""Extensions"": {
-                    ""Evoogle.ApiFramework.Schema.TestData.GraphQlExtension, Evoogle.ApiFramework.Core.Tests"": {
+                    ""Evoogle.ApiFramework.TestData.GraphQlExtension, Evoogle.ApiFramework.Core.Tests"": {
                         ""Count"": 42
                     },
-                    ""Evoogle.ApiFramework.Schema.TestData.JsonApiExtension, Evoogle.ApiFramework.Core.Tests"": {
+                    ""Evoogle.ApiFramework.TestData.JsonApiExtension, Evoogle.ApiFramework.Core.Tests"": {
                         ""Website"": ""http://jsonapi.org""
                     }
                 }
@@ -499,7 +498,7 @@ public partial class ApiSchemaTests
                                 ""ClrOrdinal"": 2
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
                     }
                 ],
                 ""ApiObjectTypes"": []
@@ -561,12 +560,12 @@ public partial class ApiSchemaTests
                                 ""ClrOrdinal"": 2
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
                     }
                 ],
                 ""ApiObjectTypes"": [],
                 ""Extensions"": {
-                    ""Evoogle.ApiFramework.Schema.TestData.ProtobufExtension, Evoogle.ApiFramework.Core.Tests"": {
+                    ""Evoogle.ApiFramework.TestData.ProtobufExtension, Evoogle.ApiFramework.Core.Tests"": {
                         ""Edition"": 2024
                     }
                 }
@@ -645,7 +644,7 @@ public partial class ApiSchemaTests
                                 ""ClrOrdinal"": 2
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
                     }
                 ],
                 ""ApiObjectTypes"": [
@@ -740,7 +739,7 @@ public partial class ApiSchemaTests
                             }
                         ],
                         ""ApiRelationships"": [],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Person, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.Person, Evoogle.ApiFramework.Core.Tests""
                     }
                 ]
             }",
@@ -952,7 +951,7 @@ public partial class ApiSchemaTests
                                 ""ClrOrdinal"": 2
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
                     }
                 ],
                 ""ApiObjectTypes"": [
@@ -1047,14 +1046,14 @@ public partial class ApiSchemaTests
                             }
                         ],
                         ""ApiRelationships"": [],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Person, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.Person, Evoogle.ApiFramework.Core.Tests""
                     }
                 ],
                 ""Extensions"": {
-                    ""Evoogle.ApiFramework.Schema.TestData.GraphQlExtension, Evoogle.ApiFramework.Core.Tests"": {
+                    ""Evoogle.ApiFramework.TestData.GraphQlExtension, Evoogle.ApiFramework.Core.Tests"": {
                         ""Count"": 42
                     },
-                    ""Evoogle.ApiFramework.Schema.TestData.JsonApiExtension, Evoogle.ApiFramework.Core.Tests"": {
+                    ""Evoogle.ApiFramework.TestData.JsonApiExtension, Evoogle.ApiFramework.Core.Tests"": {
                         ""Website"": ""http://jsonapi.org""
                     }
                 }
@@ -1268,7 +1267,7 @@ public partial class ApiSchemaTests
                                 ""ClrOrdinal"": 2
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
                     }
                 ],
                 ""ApiObjectTypes"": [
@@ -1335,7 +1334,7 @@ public partial class ApiSchemaTests
                                             ""ApiName"": ""Person""
                                         },
                                         ""ApiItemTypeModifiers"": ""Required"",
-                                        ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.Schema.TestData.Person,Evoogle.ApiFramework.Core.Tests]], System.Private.CoreLib""
+                                        ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.TestData.Person,Evoogle.ApiFramework.Core.Tests]], System.Private.CoreLib""
                                     }
                                 },
                                 ""ApiTypeModifiers"": ""None"",
@@ -1353,7 +1352,7 @@ public partial class ApiSchemaTests
                                 ""ApiPropertyName"": ""Employees""
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Company, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.Company, Evoogle.ApiFramework.Core.Tests""
                     },
                     {
                         ""ApiKind"": ""Object"",
@@ -1446,7 +1445,7 @@ public partial class ApiSchemaTests
                             }
                         ],
                         ""ApiRelationships"": [],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Person, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.Person, Evoogle.ApiFramework.Core.Tests""
                     }
                 ]
             }",

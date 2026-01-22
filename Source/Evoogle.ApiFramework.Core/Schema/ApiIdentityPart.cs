@@ -3,7 +3,6 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using System.Net.Sockets;
 using System.Text.Json.Serialization;
 
 using Evoogle.ApiFramework.Identity;

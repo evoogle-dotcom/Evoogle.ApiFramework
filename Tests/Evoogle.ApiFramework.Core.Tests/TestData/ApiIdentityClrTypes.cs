@@ -3,7 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-namespace Evoogle.ApiFramework.Schema.TestData;
+namespace Evoogle.ApiFramework.TestData;
 
 /// <summary>
 ///     Test type with composite identity (int + string + Guid) for identity testing.

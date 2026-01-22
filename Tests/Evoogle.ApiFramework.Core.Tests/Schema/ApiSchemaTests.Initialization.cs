@@ -7,7 +7,7 @@ using System.Text.Json;
 
 using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Identity;
-using Evoogle.ApiFramework.Schema.TestData;
+using Evoogle.ApiFramework.TestData;
 using Evoogle.Extensions;
 using Evoogle.XUnit;
 
@@ -180,7 +180,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
                                 ""ClrOrdinal"": 2
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
                     }
                 ],
                 ""ApiObjectTypes"": []
@@ -306,7 +306,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
                     {
                         ""ApiKind"": ""Enum"",
                         ""ApiName"": ""Gender"",
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
                     }
                 ],
                 ""ApiObjectTypes"": []
@@ -338,7 +338,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
                         ""ApiKind"": ""Enum"",
                         ""ApiName"": ""Gender"",
                         ""ApiEnumValues"": [],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
                     }
                 ],
                 ""ApiObjectTypes"": []
@@ -386,7 +386,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
                                 ""ClrOrdinal"": 2
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
                     }
                 ],
                 ""ApiObjectTypes"": []
@@ -434,7 +434,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
                                 ""ClrOrdinal"": 2
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
                     }
                 ],
                 ""ApiObjectTypes"": []
@@ -487,7 +487,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
                                 ""ClrOrdinal"": 2
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
                     }
                 ],
                 ""ApiObjectTypes"": []
@@ -539,7 +539,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
                                 ""ClrOrdinal"": 2
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
                     }
                 ],
                 ""ApiObjectTypes"": []
@@ -587,7 +587,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
                                 ""ClrOrdinal"": 2
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
                     }
                 ],
                 ""ApiObjectTypes"": []
@@ -706,7 +706,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.ScalarsOnly, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Core.Tests""
                     }
                 ]
             }",
@@ -755,7 +755,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.ScalarsOnly, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Core.Tests""
                     }
                 ]
             }",
@@ -804,7 +804,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.ScalarsOnly, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Core.Tests""
                     }
                 ]
             }",
@@ -843,7 +843,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.ScalarsOnly, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Core.Tests""
                     }
                 ]
             }",
@@ -967,7 +967,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.ScalarsOnly, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Core.Tests""
                     }
                 ]
             }",
@@ -1008,7 +1008,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.ScalarsOnly, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Core.Tests""
                     }
                 ]
             }",
@@ -1047,7 +1047,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.ScalarsOnly, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Core.Tests""
                     }
                 ]
             }",
@@ -1493,7 +1493,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.ProductInventory, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.ProductInventory, Evoogle.ApiFramework.Core.Tests""
                     }
                 ]
             }",
@@ -1548,7 +1548,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.ProductInventory, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.ProductInventory, Evoogle.ApiFramework.Core.Tests""
                     }
                 ]
             }",
@@ -1610,7 +1610,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.ProductInventory, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.ProductInventory, Evoogle.ApiFramework.Core.Tests""
                     }
                 ]
             }",
@@ -1673,7 +1673,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.ProductInventory, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.ProductInventory, Evoogle.ApiFramework.Core.Tests""
                     }
                 ]
             }",
@@ -1732,7 +1732,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.ProductInventory, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.ProductInventory, Evoogle.ApiFramework.Core.Tests""
                     }
                 ]
             }",
@@ -1792,7 +1792,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.ProductInventory, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.ProductInventory, Evoogle.ApiFramework.Core.Tests""
                     }
                 ]
             }",
@@ -1852,7 +1852,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.ProductInventory, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.ProductInventory, Evoogle.ApiFramework.Core.Tests""
                     }
                 ]
             }",

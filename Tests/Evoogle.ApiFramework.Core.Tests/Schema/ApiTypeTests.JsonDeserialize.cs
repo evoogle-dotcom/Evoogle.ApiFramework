@@ -4,8 +4,7 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using System.Diagnostics.CodeAnalysis;
-
-using Evoogle.ApiFramework.Schema.TestData;
+using Evoogle.ApiFramework.TestData;
 using Evoogle.XUnit;
 
 using static Evoogle.ApiFramework.Schema.TestData.ApiSchemaFactory;
@@ -73,7 +72,7 @@ public partial class ApiTypeTests
                 ""ApiName"": ""Boolean"",
                 ""ClrType"": ""System.Boolean, System.Private.CoreLib"",
                 ""Extensions"": {
-                    ""Evoogle.ApiFramework.Schema.TestData.GraphQlExtension, Evoogle.ApiFramework.Core.Tests"": {
+                    ""Evoogle.ApiFramework.TestData.GraphQlExtension, Evoogle.ApiFramework.Core.Tests"": {
                         ""Count"": 42
                     }
                 }
@@ -192,7 +191,7 @@ public partial class ApiTypeTests
                         ""ClrOrdinal"": 3
                     }
                 ],
-                ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.StopLight, Evoogle.ApiFramework.Core.Tests""
+                ""ClrType"": ""Evoogle.ApiFramework.TestData.StopLight, Evoogle.ApiFramework.Core.Tests""
             }",
             ExpectedFactoryArgument = new ApiTypeDescriptor
             (
@@ -237,9 +236,9 @@ public partial class ApiTypeTests
                         ""ClrOrdinal"": 3
                     }
                 ],
-                ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.StopLight, Evoogle.ApiFramework.Core.Tests"",
+                ""ClrType"": ""Evoogle.ApiFramework.TestData.StopLight, Evoogle.ApiFramework.Core.Tests"",
                 ""Extensions"": {
-                    ""Evoogle.ApiFramework.Schema.TestData.JsonApiExtension, Evoogle.ApiFramework.Core.Tests"": {
+                    ""Evoogle.ApiFramework.TestData.JsonApiExtension, Evoogle.ApiFramework.Core.Tests"": {
                         ""Website"": ""http://jsonapi.org""
                     }
                 }
@@ -327,7 +326,7 @@ public partial class ApiTypeTests
                     ""ApiName"": ""StopLight""
                 },
                 ""ApiItemTypeModifiers"": ""Required"",
-                ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.Schema.TestData.StopLight, Evoogle.ApiFramework.Core.Tests]], System.Private.CoreLib""
+                ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.TestData.StopLight, Evoogle.ApiFramework.Core.Tests]], System.Private.CoreLib""
             }",
             ExpectedFactoryArgument = new ApiTypeDescriptor
             (
@@ -355,7 +354,7 @@ public partial class ApiTypeTests
                     ""ApiName"": ""StopLight""
                 },
                 ""ApiItemTypeModifiers"": ""None"",
-                ""ClrType"": ""System.Collections.Generic.List\u00601[[System.Nullable\u00601[[Evoogle.ApiFramework.Schema.TestData.StopLight,Evoogle.ApiFramework.Core.Tests]],System.Private.CoreLib]],System.Private.CoreLib""
+                ""ClrType"": ""System.Collections.Generic.List\u00601[[System.Nullable\u00601[[Evoogle.ApiFramework.TestData.StopLight,Evoogle.ApiFramework.Core.Tests]],System.Private.CoreLib]],System.Private.CoreLib""
             }",
             ExpectedFactoryArgument = new ApiTypeDescriptor
             (
@@ -444,7 +443,7 @@ public partial class ApiTypeTests
                     }
                 ],
                 ""ApiRelationships"": [],
-                ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.ScalarsOnly, Evoogle.ApiFramework.Core.Tests""
+                ""ClrType"": ""Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Core.Tests""
             }",
             ExpectedFactoryArgument = new ApiTypeDescriptor
             (
@@ -588,7 +587,7 @@ public partial class ApiTypeTests
                     }
                 ],
                 ""ApiRelationships"": [],
-                ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.ScalarsOnly, Evoogle.ApiFramework.Core.Tests""
+                ""ClrType"": ""Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Core.Tests""
             }",
             ExpectedFactoryArgument = new ApiTypeDescriptor
             (
@@ -733,12 +732,12 @@ public partial class ApiTypeTests
                     }
                 ],
                 ""ApiRelationships"": [],
-                ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.ScalarsOnly, Evoogle.ApiFramework.Core.Tests"",
+                ""ClrType"": ""Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Core.Tests"",
                 ""Extensions"": {
-                    ""Evoogle.ApiFramework.Schema.TestData.GraphQlExtension, Evoogle.ApiFramework.Core.Tests"": {
+                    ""Evoogle.ApiFramework.TestData.GraphQlExtension, Evoogle.ApiFramework.Core.Tests"": {
                         ""Count"": 42
                     },
-                    ""Evoogle.ApiFramework.Schema.TestData.JsonApiExtension, Evoogle.ApiFramework.Core.Tests"": {
+                    ""Evoogle.ApiFramework.TestData.JsonApiExtension, Evoogle.ApiFramework.Core.Tests"": {
                         ""Website"": ""http://jsonapi.org""
                     }
                 }
@@ -878,7 +877,7 @@ public partial class ApiTypeTests
                                     ""ApiName"": ""Person""
                                 },
                                 ""ApiItemTypeModifiers"": ""Required"",
-                                ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.Schema.TestData.Person, Evoogle.ApiFramework.Core.Tests]], System.Private.CoreLib""
+                                ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.TestData.Person, Evoogle.ApiFramework.Core.Tests]], System.Private.CoreLib""
                             }
                         },
                         ""ApiTypeModifiers"": ""None"",
@@ -895,7 +894,7 @@ public partial class ApiTypeTests
                         ""ApiName"": ""Employees""
                     }
                 ],
-                ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Company, Evoogle.ApiFramework.Core.Tests""
+                ""ClrType"": ""Evoogle.ApiFramework.TestData.Company, Evoogle.ApiFramework.Core.Tests""
             }",
             ExpectedFactoryArgument = new ApiTypeDescriptor
             (
@@ -1053,7 +1052,7 @@ public partial class ApiTypeTests
                     }
                 ],
                 ""ApiRelationships"": [],
-                ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.ScalarsOnly, Evoogle.ApiFramework.Core.Tests""
+                ""ClrType"": ""Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Core.Tests""
             }",
             ExpectedFactoryArgument = new ApiTypeDescriptor
             (
@@ -1191,7 +1190,7 @@ public partial class ApiTypeTests
                     }
                 ],
                 ""ApiRelationships"": [],
-                ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.ScalarsOnly, Evoogle.ApiFramework.Core.Tests""
+                ""ClrType"": ""Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Core.Tests""
             }",
             ExpectedFactoryArgument = new ApiTypeDescriptor
             (
@@ -1330,12 +1329,12 @@ public partial class ApiTypeTests
                     }
                 ],
                 ""ApiRelationships"": [],
-                ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.ScalarsOnly, Evoogle.ApiFramework.Core.Tests"",
+                ""ClrType"": ""Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Core.Tests"",
                 ""Extensions"": {
-                    ""Evoogle.ApiFramework.Schema.TestData.GraphQlExtension, Evoogle.ApiFramework.Core.Tests"": {
+                    ""Evoogle.ApiFramework.TestData.GraphQlExtension, Evoogle.ApiFramework.Core.Tests"": {
                         ""Count"": 42
                     },
-                    ""Evoogle.ApiFramework.Schema.TestData.JsonApiExtension, Evoogle.ApiFramework.Core.Tests"": {
+                    ""Evoogle.ApiFramework.TestData.JsonApiExtension, Evoogle.ApiFramework.Core.Tests"": {
                         ""Website"": ""http://jsonapi.org""
                     }
                 }
@@ -1457,7 +1456,7 @@ public partial class ApiTypeTests
                     {
                         ""ApiName"": ""Owner"",
                         ""ApiType"": {
-                            ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Person,Evoogle.ApiFramework.Core.Tests""
+                            ""ClrType"": ""Evoogle.ApiFramework.TestData.Person,Evoogle.ApiFramework.Core.Tests""
                         },
                         ""ApiTypeModifiers"": ""None"",
                         ""ClrName"": ""Owner"",
@@ -1469,10 +1468,10 @@ public partial class ApiTypeTests
                             ""ApiInlineType"": {
                                 ""ApiKind"": ""Collection"",
                                 ""ApiItemType"": {
-                                    ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Person,Evoogle.ApiFramework.Core.Tests""
+                                    ""ClrType"": ""Evoogle.ApiFramework.TestData.Person,Evoogle.ApiFramework.Core.Tests""
                                 },
                                 ""ApiItemTypeModifiers"": ""Required"",
-                                ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.Schema.TestData.Person, Evoogle.ApiFramework.Core.Tests]], System.Private.CoreLib""
+                                ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.TestData.Person, Evoogle.ApiFramework.Core.Tests]], System.Private.CoreLib""
                             }
                         },
                         ""ApiTypeModifiers"": ""None"",
@@ -1489,7 +1488,7 @@ public partial class ApiTypeTests
                         ""ApiName"": ""Employees""
                     }
                 ],
-                ""ClrType"": ""Evoogle.ApiFramework.Schema.TestData.Company, Evoogle.ApiFramework.Core.Tests""
+                ""ClrType"": ""Evoogle.ApiFramework.TestData.Company, Evoogle.ApiFramework.Core.Tests""
             }",
             ExpectedFactoryArgument = new ApiTypeDescriptor
             (

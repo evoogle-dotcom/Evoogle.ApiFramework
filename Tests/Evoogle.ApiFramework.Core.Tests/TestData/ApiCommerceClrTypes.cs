@@ -5,7 +5,7 @@
 // See the LICENSE file in the project root for more information.
 using Evoogle.Extensions;
 
-namespace Evoogle.ApiFramework.Schema.TestData;
+namespace Evoogle.ApiFramework.TestData;
 
 #region Enums
 public enum OrderStatus { Pending, Paid, Shipped, Cancelled, Returned }
