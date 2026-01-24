@@ -12,6 +12,27 @@ using Evoogle.ApiFramework.Exceptions;
 namespace Evoogle.ApiFramework.Identity;
 
 /// <summary>
+///     Specifies how to handle unresolved scalar parts when flattening an identity snapshot.
+/// </summary>
+public enum UnresolvedScalarBehavior
+{
+    /// <summary>
+    ///     Throw an <see cref="ApiIdentityException"/> when encountering an unresolved scalar.
+    /// </summary>
+    Throw,
+
+    /// <summary>
+    ///     Use <see cref="ApiId.Empty"/> for unresolved scalars.
+    /// </summary>
+    UseEmpty,
+
+    /// <summary>
+    ///     Omit unresolved scalars from the flattened result.
+    /// </summary>
+    Omit
+}
+
+/// <summary>
 ///     Represents a captured snapshot of an object's identity structure.
 ///     Preserves semantic relationships and nested hierarchy for navigation, introspection, and validation.
 /// </summary>
@@ -99,10 +120,10 @@ namespace Evoogle.ApiFramework.Identity;
 /// // Composite snapshot
 /// var orderSnapshot = ApiIdentitySnapshot.Composite(
 ///     "Order",
-///     new Dictionary&lt;string, object?&gt;
+///     new Dictionary&lt;string, ApiIdentityPart&gt;
 ///     {
-///         ["Customer"] = customerSnapshot,
-///         ["OrderNumber"] = 1001L
+///         ["Customer"] = ApiIdentityPart.Nested(customerSnapshot),
+///         ["OrderNumber"] = ApiIdentityPart.Scalar(ApiId.FromInt64(1001L))
 ///     }
 /// );
 /// </code>
@@ -112,6 +133,7 @@ public sealed class ApiIdentitySnapshot
     #region Fields
     private readonly FrozenDictionary<string, ApiIdentitySnapshot?> _nestedParts;
     private readonly FrozenDictionary<string, ApiId> _scalarParts;
+    private readonly FrozenSet<string> _unresolvedScalarParts;
     private ApiId? _cachedNamedApiId;
     private ApiId? _cachedUnnamedApiId;
     #endregion
@@ -121,11 +143,30 @@ public sealed class ApiIdentitySnapshot
     ///     Initializes a new instance of <see cref="ApiIdentitySnapshot"/>.
     /// </summary>
     /// <param name="name">The name of this identity part.</param>
-    /// <param name="parts">The resolved parts (name -> value mappings).</param>
+    /// <param name="parts">The resolved parts (name -> ApiIdentityPart mappings).</param>
     /// <param name="parentPath">Optional parent path for nested values.</param>
+    /// <remarks>
+    ///     <para>
+    ///         <strong>Part Value Handling:</strong>
+    ///     </para>
+    ///     <list type="bullet">
+    ///         <item>
+    ///             <strong>Scalar parts:</strong> <see cref="ApiIdentityPart.Scalar"/> values are stored directly
+    ///             in the scalar parts dictionary for efficient access.
+    ///         </item>
+    ///         <item>
+    ///             <strong>Nested parts:</strong> <see cref="ApiIdentityPart.Nested"/> values are stored in the
+    ///             nested parts dictionary, preserving the hierarchy.
+    ///         </item>
+    ///         <item>
+    ///             <strong>Unresolved nested parts:</strong> <see cref="ApiIdentityPart.UnresolvedNested"/> values
+    ///             are stored as null in the nested parts dictionary and tracked separately.
+    ///         </item>
+    ///     </list>
+    /// </remarks>
     public ApiIdentitySnapshot(
         string name,
-        IReadOnlyDictionary<string, object?> parts,
+        IReadOnlyDictionary<string, ApiIdentityPart> parts,
         string? parentPath = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
@@ -139,28 +180,54 @@ public sealed class ApiIdentitySnapshot
         // Separate nested identities from scalar values
         var nestedParts = new Dictionary<string, ApiIdentitySnapshot?>();
         var scalarParts = new Dictionary<string, ApiId>();
+        var unresolvedScalarParts = new HashSet<string>();
 
         foreach (var kvp in parts)
         {
-            if (kvp.Value is ApiIdentitySnapshot nested)
+            var partName = kvp.Key;
+            var part = kvp.Value;
+
+            switch (part.Kind)
             {
-                nestedParts[kvp.Key] = nested;
-            }
-            else if (kvp.Value is ApiId apiId)
-            {
-                // Already an ApiId - store directly (zero allocation)
-                scalarParts[kvp.Key] = apiId;
-            }
-            else
-            {
-                // Convert object to ApiId (preserves original type)
-                var value = kvp.Value;
-                scalarParts[kvp.Key] = value != null ? ApiId.FromObject(value) : ApiId.Empty;
+                case ApiIdentityPartKind.Scalar:
+                    if (!part.ScalarValue.HasValue)
+                    {
+                        throw new ArgumentException(
+                            $"Part '{partName}' is marked as Scalar but has no ScalarValue. " +
+                            "This indicates a programming error - use ApiIdentityPart.Scalar() factory method.",
+                            nameof(parts)
+                        );
+                    }
+                    scalarParts[partName] = part.ScalarValue.Value;
+                    break;
+
+                case ApiIdentityPartKind.Nested:
+                    if (part.NestedSnapshot == null)
+                    {
+                        throw new ArgumentException(
+                            $"Part '{partName}' is marked as Nested but has null NestedSnapshot. " +
+                            "Use ApiIdentityPart.UnresolvedNested() for unresolved nested identities.",
+                            nameof(parts)
+                        );
+                    }
+                    nestedParts[partName] = part.NestedSnapshot;
+                    break;
+
+                case ApiIdentityPartKind.UnresolvedNested:
+                    nestedParts[partName] = null;
+                    break;
+
+                default:
+                    throw new ArgumentException(
+                        $"Unknown ApiIdentityPart.PartKind: {part.Kind}",
+                        nameof(parts)
+                    );
             }
         }
 
         _nestedParts = nestedParts.ToFrozenDictionary();
         _scalarParts = scalarParts.ToFrozenDictionary();
+        _unresolvedScalarParts = unresolvedScalarParts.ToFrozenSet();
     }
 
     /// <summary>
@@ -178,6 +245,7 @@ public sealed class ApiIdentitySnapshot
         _nestedParts = FrozenDictionary<string, ApiIdentitySnapshot?>.Empty;
         _scalarParts = new Dictionary<string, ApiId> { ["Value"] = scalarValue }
             .ToFrozenDictionary();
+        _unresolvedScalarParts = FrozenSet<string>.Empty;
     }
     #endregion
 
@@ -247,8 +315,28 @@ public sealed class ApiIdentitySnapshot
     ///     otherwise, <see langword="false"/>.
     /// </value>
     /// <remarks>
-    ///     Use this property to validate the snapshot before flattening to <see cref="ApiId"/>
-    ///     or performing operations that require complete identity data.
+    ///     <para>
+    ///         <strong>What is "Resolution"?</strong>
+    ///     </para>
+    ///     <para>
+    ///         Resolution refers to whether all nested object references in the identity have been successfully
+    ///         navigated and extracted. During identity extraction (<c>ApiIdentity.Extract(obj)</c>), the system
+    ///         walks through the object graph following navigation properties. If any navigation property returns
+    ///         <see langword="null"/>, that part becomes "unresolved" because its nested values cannot be accessed.
+    ///     </para>
+    ///     <para>
+    ///         <strong>Fully Resolved:</strong> All navigation properties exist and their values were extracted.
+    ///         The snapshot contains complete identity data and can be safely flattened to <see cref="ApiId"/>.
+    ///     </para>
+    ///     <para>
+    ///         <strong>Partially Resolved:</strong> One or more navigation properties were <see langword="null"/>,
+    ///         leaving gaps in the identity data. Attempting to flatten will throw <see cref="ApiIdentityException"/>.
+    ///     </para>
+    ///     <para>
+    ///         Use this property to validate the snapshot before operations that require complete identity data,
+    ///         such as flattening to <see cref="ApiId"/> or storing in a database. For partially resolved snapshots,
+    ///         use <see cref="GetUnresolvedParts"/> to identify which parts are missing.
+    ///     </para>
     /// </remarks>
     public bool IsFullyResolved
     {
@@ -379,12 +467,12 @@ public sealed class ApiIdentitySnapshot
     ///     Creates a composite identity snapshot from parts.
     /// </summary>
     /// <param name="name">The name of this identity.</param>
-    /// <param name="parts">The resolved parts.</param>
+    /// <param name="parts">The resolved parts as ApiIdentityPart mappings.</param>
     /// <param name="parentPath">Optional parent path.</param>
     /// <returns>A new composite <see cref="ApiIdentitySnapshot"/>.</returns>
     public static ApiIdentitySnapshot Composite(
         string name,
-        IReadOnlyDictionary<string, object?> parts,
+        IReadOnlyDictionary<string, ApiIdentityPart> parts,
         string? parentPath = null)
     {
         return new ApiIdentitySnapshot(name, parts, parentPath);
@@ -402,7 +490,7 @@ public sealed class ApiIdentitySnapshot
 
         return new ApiIdentitySnapshot(
             name,
-            new Dictionary<string, object?>(),
+            new Dictionary<string, ApiIdentityPart>(),
             parentPath
         );
     }
@@ -499,7 +587,49 @@ public sealed class ApiIdentitySnapshot
     /// <summary>
     ///     Gets the paths of all unresolved (null) nested identity parts.
     /// </summary>
-    /// <returns>An enumerable of paths to unresolved parts.</returns>
+    /// <returns>
+    ///     An enumerable of dot-separated paths identifying which nested parts are <see langword="null"/>.
+    ///     Empty if the snapshot is fully resolved.
+    /// </returns>
+    /// <remarks>
+    ///     <para>
+    ///         An "unresolved part" occurs when a navigation property in the object graph was <see langword="null"/>
+    ///         during identity extraction, preventing the extraction of that object's identity values.
+    ///     </para>
+    ///     <para>
+    ///         <strong>Common Scenarios:</strong>
+    ///     </para>
+    ///     <list type="bullet">
+    ///         <item>
+    ///             <strong>Lazy Loading:</strong> Related entities not yet loaded from database.
+    ///             Example: <c>order.Customer == null</c> when Customer wasn't eager-loaded.
+    ///         </item>
+    ///         <item>
+    ///             <strong>Optional Data:</strong> Client didn't provide optional nested objects in API request.
+    ///             Example: Order submitted without shipment address.
+    ///         </item>
+    ///         <item>
+    ///             <strong>Partial Construction:</strong> Object being built incrementally and not all parts set yet.
+    ///         </item>
+    ///     </list>
+    ///     <para>
+    ///         Use this method to generate helpful error messages or to determine which related data needs to be loaded
+    ///         before the identity can be used.
+    ///     </para>
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// var snapshot = orderIdentity.Extract(order);
+    /// if (!snapshot.IsFullyResolved)
+    /// {
+    ///     var missing = snapshot.GetUnresolvedParts().ToArray();
+    ///     // Returns: ["Order.Customer", "Order.Shipment.Address"]
+    ///     throw new InvalidOperationException(
+    ///         $"Cannot process order: missing {string.Join(", ", missing)}"
+    ///     );
+    /// }
+    /// </code>
+    /// </example>
     public IEnumerable<string> GetUnresolvedParts()
     {
         foreach (var kvp in _nestedParts)
@@ -526,9 +656,23 @@ public sealed class ApiIdentitySnapshot
     ///     If true, flattens to named <see cref="ApiIdPart"/>s with path-based names (e.g., "Customer.Id=42").
     ///     If false, flattens to unnamed <see cref="ApiIdPart"/>s (e.g., "42|1001").
     /// </param>
+    /// <param name="unresolvedBehavior">
+    ///     Specifies how to handle unresolved scalar parts. Default is <see cref="UnresolvedScalarBehavior.Throw"/>.
+    /// </param>
     /// <returns>A flat <see cref="ApiId"/> suitable for runtime operations.</returns>
-    /// <exception cref="ApiIdentityException">Thrown if any nested parts are unresolved (null).</exception>
+    /// <exception cref="ApiIdentityException">
+    ///     Thrown if any nested parts are unresolved (<see langword="null"/>) and <paramref name="unresolvedBehavior"/>
+    ///     is <see cref="UnresolvedScalarBehavior.Throw"/>. Check <see cref="IsFullyResolved"/>
+    ///     before calling this method, or use <see cref="GetUnresolvedParts"/> to identify missing parts.
+    /// </exception>
     /// <remarks>
+    ///     <para>
+    ///         <strong>Resolution Requirement:</strong>
+    ///         By default, this method requires a fully resolved snapshot. If any nested navigation properties were
+    ///         <see langword="null"/> during extraction, flattening will fail because the complete identity cannot be constructed.
+    ///         Use <see cref="IsFullyResolved"/> to validate before calling, or specify an alternative
+    ///         <paramref name="unresolvedBehavior"/> to handle unresolved parts.
+    ///     </para>
     ///     <para>
     ///         <strong>Named Parts (useNamedParts: true):</strong>
     ///         Produces a self-documenting <see cref="ApiId"/> with part names included.
@@ -543,26 +687,29 @@ public sealed class ApiIdentitySnapshot
     ///         Both modes are cached independently to avoid redundant computation.
     ///     </para>
     /// </remarks>
-    public ApiId ToApiId(bool useNamedParts = true)
+    public ApiId ToApiId(bool useNamedParts = true, UnresolvedScalarBehavior unresolvedBehavior = UnresolvedScalarBehavior.Throw)
     {
-        // Check cache based on naming mode
-        if (useNamedParts)
+        // Check cache based on naming mode (only for default behavior)
+        if (unresolvedBehavior == UnresolvedScalarBehavior.Throw)
         {
-            if (_cachedNamedApiId.HasValue)
+            if (useNamedParts)
             {
-                return _cachedNamedApiId.Value;
+                if (_cachedNamedApiId.HasValue)
+                {
+                    return _cachedNamedApiId.Value;
+                }
             }
-        }
-        else
-        {
-            if (_cachedUnnamedApiId.HasValue)
+            else
             {
-                return _cachedUnnamedApiId.Value;
+                if (_cachedUnnamedApiId.HasValue)
+                {
+                    return _cachedUnnamedApiId.Value;
+                }
             }
         }
 
         var flatParts = new List<ApiIdPart>();
-        FlattenRecursive(this, prefix: null, flatParts, useNamedParts);
+        FlattenRecursive(this, prefix: null, flatParts, useNamedParts, unresolvedBehavior);
 
         ApiId result;
         if (flatParts.Count == 0)
@@ -579,14 +726,17 @@ public sealed class ApiIdentitySnapshot
             result = ApiId.Composite([.. flatParts]);
         }
 
-        // Cache result
-        if (useNamedParts)
+        // Cache result (only for default behavior)
+        if (unresolvedBehavior == UnresolvedScalarBehavior.Throw)
         {
-            _cachedNamedApiId = result;
-        }
-        else
-        {
-            _cachedUnnamedApiId = result;
+            if (useNamedParts)
+            {
+                _cachedNamedApiId = result;
+            }
+            else
+            {
+                _cachedUnnamedApiId = result;
+            }
         }
 
         return result;
@@ -614,7 +764,8 @@ public sealed class ApiIdentitySnapshot
         ApiIdentitySnapshot snapshot,
         string? prefix,
         List<ApiIdPart> output,
-        bool useNamedParts)
+        bool useNamedParts,
+        UnresolvedScalarBehavior unresolvedBehavior)
     {
         if (snapshot.IsScalar)
         {
@@ -636,15 +787,36 @@ public sealed class ApiIdentitySnapshot
 
             if (kvp.Value is not null)
             {
-                FlattenRecursive(kvp.Value, fullName, output, useNamedParts);
+                FlattenRecursive(kvp.Value, fullName, output, useNamedParts, unresolvedBehavior);
             }
             else
             {
+                // Handle unresolved nested part based on behavior
                 var unresolvedPath = string.IsNullOrWhiteSpace(prefix) ? partName : $"{prefix}.{partName}";
-                throw new ApiIdentityException(
-                    $"Cannot flatten identity snapshot with unresolved nested part at '{unresolvedPath}'. " +
-                    $"Check IsFullyResolved or use TryGetPart() before flattening."
-                );
+
+                switch (unresolvedBehavior)
+                {
+                    case UnresolvedScalarBehavior.Throw:
+                        throw new ApiIdentityException(
+                            $"Cannot flatten identity snapshot with unresolved nested part at '{unresolvedPath}'. " +
+                            $"Check IsFullyResolved or use TryGetPart() before flattening."
+                        );
+
+                    case UnresolvedScalarBehavior.UseEmpty:
+                        output.Add(ApiIdPart.Create(fullName, ApiId.Empty));
+                        break;
+
+                    case UnresolvedScalarBehavior.Omit:
+                        // Skip this part
+                        break;
+
+                    default:
+                        throw new ArgumentOutOfRangeException(
+                            nameof(unresolvedBehavior),
+                            unresolvedBehavior,
+                            "Unknown UnresolvedScalarBehavior value"
+                        );
+                }
             }
         }
 
@@ -708,4 +880,3 @@ public sealed class ApiIdentitySnapshot
     }
     #endregion
 }
-

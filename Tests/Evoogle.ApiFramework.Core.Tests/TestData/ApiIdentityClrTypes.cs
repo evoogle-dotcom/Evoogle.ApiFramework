@@ -43,3 +43,52 @@ public class User
     public string Email { get; set; } = string.Empty;
     public string Username { get; set; } = string.Empty;
 }
+
+/// <summary>
+///     Test type with simple scalar identity for snapshot testing.
+/// </summary>
+public class Product
+{
+    public int ProductId { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public decimal Price { get; set; }
+}
+
+/// <summary>
+///     Test type with nested composite identity for snapshot navigation testing.
+/// </summary>
+public class OrderSnapshot
+{
+    public CustomerSnapshot? Customer { get; set; }
+    public long OrderNumber { get; set; }
+    public DateTime OrderDate { get; set; }
+}
+
+/// <summary>
+///     Test type with nested identity for snapshot testing.
+/// </summary>
+public class CustomerSnapshot
+{
+    public int CustomerId { get; set; }
+    public CountrySnapshot? Country { get; set; }
+    public string Name { get; set; } = string.Empty;
+}
+
+/// <summary>
+///     Test type for nested navigation in snapshot testing.
+/// </summary>
+public class CountrySnapshot
+{
+    public int Id { get; set; }
+    public string Code { get; set; } = string.Empty;
+}
+
+/// <summary>
+///     Test type with mixed scalar types for snapshot flattening tests.
+/// </summary>
+public class Invoice
+{
+    public Guid InvoiceId { get; set; }
+    public string InvoiceNumber { get; set; } = string.Empty;
+    public DateTime IssuedDate { get; set; }
+}
