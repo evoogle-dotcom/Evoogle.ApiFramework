@@ -10,27 +10,42 @@ namespace Evoogle.ApiFramework.Identity;
 public partial class ApiIdentitySnapshotTests(ITestOutputHelper output) : XUnitTests(output)
 {
     #region Helper Methods
+    private static ApiIdentityPartEntry ScalarEntry(string name, ApiId value) =>
+        new(name, ApiIdentityPart.Scalar(value), Array.Empty<ApiIdentityPartEntry>());
+
+    private static ApiIdentityPartEntry NestedEntry(string name, ApiIdentitySnapshot snapshot, IReadOnlyList<ApiIdentityPartEntry> nestedBlueprint) =>
+        new(name, ApiIdentityPart.Nested(snapshot), nestedBlueprint);
+
+    private static ApiIdentityPartEntry UnresolvedNestedEntry(string name, IReadOnlyList<ApiIdentityPartEntry> nestedBlueprint) =>
+        new(name, ApiIdentityPart.UnresolvedNested(), nestedBlueprint);
+
     /// <summary>
     ///     Creates a sample nested order snapshot for testing navigation and flattening.
     /// </summary>
     private static ApiIdentitySnapshot CreateOrderSnapshot()
     {
-        // CountrySnapshot (nested 2 levels deep)
-        var countrySnapshot = ApiIdentitySnapshot.Scalar("Country", ApiId.FromInt32(1), "Customer");
-
-        // CustomerSnapshot (nested 1 level deep)
-        var customerSnapshot = ApiIdentitySnapshot.Composite("Customer", new Dictionary<string, ApiIdentityPart>
+        var countryBlueprint = new[]
         {
-            ["Country"] = ApiIdentityPart.Nested(countrySnapshot),
-            ["CustomerId"] = ApiIdentityPart.Scalar(ApiId.FromInt32(42))
-        }, "Order");
+            ScalarEntry("Id", ApiId.FromInt32(1))
+        };
 
-        // OrderSnapshot (root)
-        return ApiIdentitySnapshot.Composite("Order", new Dictionary<string, ApiIdentityPart>
+        var countrySnapshot = ApiIdentitySnapshot.Composite("Country", countryBlueprint, "Order.Customer");
+
+        var customerBlueprint = new[]
         {
-            ["Customer"] = ApiIdentityPart.Nested(customerSnapshot),
-            ["OrderNumber"] = ApiIdentityPart.Scalar(ApiId.FromInt64(1001L))
-        });
+            NestedEntry("Country", countrySnapshot, countryBlueprint),
+            ScalarEntry("CustomerId", ApiId.FromInt32(42))
+        };
+
+        var customerSnapshot = ApiIdentitySnapshot.Composite("Customer", customerBlueprint, "Order");
+
+        var orderBlueprint = new[]
+        {
+            NestedEntry("Customer", customerSnapshot, customerBlueprint),
+            ScalarEntry("OrderNumber", ApiId.FromInt64(1001L))
+        };
+
+        return ApiIdentitySnapshot.Composite("Order", orderBlueprint);
     }
 
     /// <summary>
@@ -38,15 +53,28 @@ public partial class ApiIdentitySnapshotTests(ITestOutputHelper output) : XUnitT
     /// </summary>
     private static ApiIdentitySnapshot CreateUnresolvedSnapshot()
     {
-        // Include a non-null ApiIdentitySnapshot to trigger the heuristic
-        var product = ApiIdentitySnapshot.Scalar("Product", ApiId.FromInt32(99), "Order");
-
-        return ApiIdentitySnapshot.Composite("Order", new Dictionary<string, ApiIdentityPart>
+        var productBlueprint = new[]
         {
-            ["Customer"] = ApiIdentityPart.UnresolvedNested(),  // Explicit null nested snapshot
-            ["Product"] = ApiIdentityPart.Nested(product),  // Non-null snapshot to enable null heuristic
-            ["OrderNumber"] = ApiIdentityPart.Scalar(ApiId.FromInt64(1001L))
-        });
+            ScalarEntry("ProductId", ApiId.FromInt32(99))
+        };
+
+        var product = ApiIdentitySnapshot.Composite("Product", productBlueprint, "Order");
+
+        // Explicit unresolved nested snapshot for Customer.
+        // Provide the nested blueprint so UseEmpty can flatten deterministically.
+        var customerBlueprint = new[]
+        {
+            ScalarEntry("CustomerId", ApiId.Empty)
+        };
+
+        var orderBlueprint = new[]
+        {
+            UnresolvedNestedEntry("Customer", customerBlueprint),
+            NestedEntry("Product", product, productBlueprint),
+            ScalarEntry("OrderNumber", ApiId.FromInt64(1001L))
+        };
+
+        return ApiIdentitySnapshot.Composite("Order", orderBlueprint);
     }
 
     /// <summary>
@@ -54,25 +82,29 @@ public partial class ApiIdentitySnapshotTests(ITestOutputHelper output) : XUnitT
     /// </summary>
     private static ApiIdentitySnapshot CreateDeeplyNestedSnapshot()
     {
-        var level3 = ApiIdentitySnapshot.Scalar("Level3", ApiId.FromString("deep"), "Root.Level1.Level2");
-
-        var level2 = ApiIdentitySnapshot.Composite("Level2", new Dictionary<string, ApiIdentityPart>
+        var level2Blueprint = new[]
         {
-            ["Level3"] = ApiIdentityPart.Nested(level3),
-            ["Id"] = ApiIdentityPart.Scalar(ApiId.FromInt32(100))
-        }, "Root.Level1");
+            ScalarEntry("Level3", ApiId.FromString("deep")),
+            ScalarEntry("Id", ApiId.FromInt32(100))
+        };
 
-        var level1 = ApiIdentitySnapshot.Composite("Level1", new Dictionary<string, ApiIdentityPart>
-        {
-            ["Level2"] = ApiIdentityPart.Nested(level2),
-            ["Name"] = ApiIdentityPart.Scalar(ApiId.FromString("test"))
-        }, "Root");
+        var level2 = ApiIdentitySnapshot.Composite("Level2", level2Blueprint, "Root.Level1");
 
-        return ApiIdentitySnapshot.Composite("Root", new Dictionary<string, ApiIdentityPart>
+        var level1Blueprint = new[]
         {
-            ["Level1"] = ApiIdentityPart.Nested(level1),
-            ["RootId"] = ApiIdentityPart.Scalar(ApiId.FromGuid(Guid.Parse("12345678-1234-1234-1234-123456789abc")))
-        });
+            NestedEntry("Level2", level2, level2Blueprint),
+            ScalarEntry("Name", ApiId.FromString("test"))
+        };
+
+        var level1 = ApiIdentitySnapshot.Composite("Level1", level1Blueprint, "Root");
+
+        var rootBlueprint = new[]
+        {
+            NestedEntry("Level1", level1, level1Blueprint),
+            ScalarEntry("RootId", ApiId.FromGuid(Guid.Parse("12345678-1234-1234-1234-123456789abc")))
+        };
+
+        return ApiIdentitySnapshot.Composite("Root", rootBlueprint);
     }
     #endregion
 }

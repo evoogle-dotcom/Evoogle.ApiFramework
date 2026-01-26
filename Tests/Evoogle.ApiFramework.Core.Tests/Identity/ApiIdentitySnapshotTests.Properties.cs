@@ -211,11 +211,13 @@ public partial class ApiIdentitySnapshotTests
         new PropertyTest
         {
             Name = "Composite snapshot has correct properties",
-            Snapshot = ApiIdentitySnapshot.Composite("Order", new Dictionary<string, ApiIdentityPart>
-            {
-                ["CustomerId"] = ApiIdentityPart.Scalar(ApiId.FromInt32(42)),
-                ["OrderNumber"] = ApiIdentityPart.Scalar(ApiId.FromInt64(1001L))
-            }),
+            Snapshot = ApiIdentitySnapshot.Composite(
+                "Order",
+                [
+                    ScalarEntry("CustomerId", ApiId.FromInt32(42)),
+                    ScalarEntry("OrderNumber", ApiId.FromInt64(1001L))
+                ]
+            ),
             ExpectedIsScalar = false,
             ExpectedIsComposite = true,
             ExpectedIsFullyResolved = true,
@@ -313,11 +315,13 @@ public partial class ApiIdentitySnapshotTests
         new GetScalarValueTest
         {
             Name = "GetScalarValue with direct part name succeeds",
-            Snapshot = ApiIdentitySnapshot.Composite("Product", new Dictionary<string, ApiIdentityPart>
-            {
-                ["ProductId"] = ApiIdentityPart.Scalar(ApiId.FromInt32(99)),
-                ["Name"] = ApiIdentityPart.Scalar(ApiId.FromString("Widget"))
-            }),
+            Snapshot = ApiIdentitySnapshot.Composite(
+                "Product",
+                [
+                    ScalarEntry("ProductId", ApiId.FromInt32(99)),
+                    ScalarEntry("Name", ApiId.FromString("Widget"))
+                ]
+            ),
             PathOrName = "ProductId",
             TargetType = typeof(int),
             ExpectedValue = 99
@@ -334,7 +338,7 @@ public partial class ApiIdentitySnapshotTests
         {
             Name = "GetScalarValue with deep nested path succeeds",
             Snapshot = CreateOrderSnapshot(),
-            PathOrName = "Customer.Country",
+            PathOrName = "Customer.Country.Id",
             TargetType = typeof(int),
             ExpectedValue = 1
         },
@@ -370,11 +374,13 @@ public partial class ApiIdentitySnapshotTests
         new GetScalarApiIdTest
         {
             Name = "GetScalarApiId with direct part name succeeds",
-            Snapshot = ApiIdentitySnapshot.Composite("Order", new Dictionary<string, ApiIdentityPart>
-            {
-                ["OrderNumber"] = ApiIdentityPart.Scalar(ApiId.FromInt64(1001L)),
-                ["CustomerId"] = ApiIdentityPart.Scalar(ApiId.FromInt32(42))
-            }),
+            Snapshot = ApiIdentitySnapshot.Composite(
+                "Order",
+                [
+                    ScalarEntry("OrderNumber", ApiId.FromInt64(1001L)),
+                    ScalarEntry("CustomerId", ApiId.FromInt32(42))
+                ]
+            ),
             PathOrName = "OrderNumber",
             ExpectedApiId = ApiId.FromInt64(1001L)
         },
@@ -412,32 +418,69 @@ public partial class ApiIdentitySnapshotTests
         new GetUnresolvedPartsTest
         {
             Name = "Snapshot with multiple unresolved parts returns all paths",
-            Snapshot = ApiIdentitySnapshot.Composite("Invoice", new Dictionary<string, ApiIdentityPart>
-            {
-                ["Customer"] = ApiIdentityPart.UnresolvedNested(),  // Explicit null
-                ["Order"] = ApiIdentityPart.UnresolvedNested(),  // Explicit null
-                ["Product"] = ApiIdentityPart.Nested(ApiIdentitySnapshot.Scalar("Product", ApiId.FromInt32(99), "Invoice")),  // Non-null to enable heuristic
-                ["InvoiceNumber"] = ApiIdentityPart.Scalar(ApiId.FromInt64(1001L))
-            }),
+            Snapshot = ApiIdentitySnapshot.Composite(
+                "Invoice",
+                [
+                    UnresolvedNestedEntry("Customer", [ ScalarEntry("CustomerId", ApiId.Empty) ]),
+                    UnresolvedNestedEntry("Order", [ ScalarEntry("OrderNumber", ApiId.Empty) ]),
+                    NestedEntry(
+                        "Product",
+                        ApiIdentitySnapshot.Scalar("Product", ApiId.FromInt32(99), "Invoice"),
+                        Array.Empty<ApiIdentityPartEntry>()
+                    ),
+                    ScalarEntry("InvoiceNumber", ApiId.FromInt64(1001L))
+                ]
+            ),
             ExpectedUnresolvedPaths = ["Invoice.Customer", "Invoice.Order"]
         },
         new GetUnresolvedPartsTest
         {
             Name = "Nested snapshot with deep unresolved parts returns all paths",
-            Snapshot = ApiIdentitySnapshot.Composite("Root", new Dictionary<string, ApiIdentityPart>
-            {
-                ["Level1"] = ApiIdentityPart.Nested(ApiIdentitySnapshot.Composite("Level1", new Dictionary<string, ApiIdentityPart>
-                {
-                    ["Level2A"] = ApiIdentityPart.UnresolvedNested(),  // Explicit null
-                    ["Level2B"] = ApiIdentityPart.Nested(ApiIdentitySnapshot.Composite("Level2B", new Dictionary<string, ApiIdentityPart>
-                    {
-                        ["Level3"] = ApiIdentityPart.UnresolvedNested(),  // Explicit null
-                        ["Anchor"] = ApiIdentityPart.Nested(ApiIdentitySnapshot.Scalar("Anchor", ApiId.FromInt32(1), "Root.Level1.Level2B")),  // Non-null to enable heuristic
-                        ["Value"] = ApiIdentityPart.Scalar(ApiId.FromInt32(42))
-                    }, "Root.Level1"))
-                }, "Root")),
-                ["RootValue"] = ApiIdentityPart.Scalar(ApiId.FromInt32(1))
-            }),
+            Snapshot =
+                ApiIdentitySnapshot.Composite(
+                    "Root",
+                    [
+                        NestedEntry(
+                            "Level1",
+                            ApiIdentitySnapshot.Composite(
+                                "Level1",
+                                [
+                                    UnresolvedNestedEntry("Level2A", [ ScalarEntry("Value", ApiId.Empty) ]),
+                                    NestedEntry(
+                                        "Level2B",
+                                        ApiIdentitySnapshot.Composite(
+                                            "Level2B",
+                                            [
+                                                UnresolvedNestedEntry("Level3", [ ScalarEntry("Value", ApiId.Empty) ]),
+                                                ScalarEntry("Anchor", ApiId.FromInt32(1)),
+                                                ScalarEntry("Value", ApiId.FromInt32(42))
+                                            ],
+                                            "Root.Level1"
+                                        ),
+                                        [
+                                            UnresolvedNestedEntry("Level3", [ ScalarEntry("Value", ApiId.Empty) ]),
+                                            ScalarEntry("Anchor", ApiId.Empty),
+                                            ScalarEntry("Value", ApiId.Empty)
+                                        ]
+                                    )
+                                ],
+                                "Root"
+                            ),
+                            [
+                                UnresolvedNestedEntry("Level2A", [ ScalarEntry("Value", ApiId.Empty) ]),
+                                UnresolvedNestedEntry(
+                                    "Level2B",
+                                    [
+                                        UnresolvedNestedEntry("Level3", [ ScalarEntry("Value", ApiId.Empty) ]),
+                                        ScalarEntry("Anchor", ApiId.Empty),
+                                        ScalarEntry("Value", ApiId.Empty)
+                                    ]
+                                )
+                            ]
+                        ),
+                        ScalarEntry("RootValue", ApiId.FromInt32(1))
+                    ]
+                ),
             ExpectedUnresolvedPaths = ["Root.Level1.Level2A", "Root.Level1.Level2B.Level3"]
         },
         new GetUnresolvedPartsTest

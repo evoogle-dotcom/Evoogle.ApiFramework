@@ -18,7 +18,7 @@ public partial class ApiIdentitySnapshotTests
     {
         #region User Supplied Properties
         public string? ConstructorName { get; init; }
-        public IReadOnlyDictionary<string, ApiIdentityPart>? Parts { get; init; }
+        public IReadOnlyList<ApiIdentityPartEntry>? PartsBlueprint { get; init; }
         public string? ParentPath { get; init; }
         public bool ExpectException { get; init; }
         public Type? ExpectedExceptionType { get; init; }
@@ -38,7 +38,7 @@ public partial class ApiIdentitySnapshotTests
         {
             try
             {
-                this.ActualSnapshot = new ApiIdentitySnapshot(this.ConstructorName!, this.Parts!, this.ParentPath);
+                this.ActualSnapshot = new ApiIdentitySnapshot(this.ConstructorName!, this.PartsBlueprint!, this.ParentPath);
             }
             catch (Exception ex)
             {
@@ -123,7 +123,7 @@ public partial class ApiIdentitySnapshotTests
         {
             Name = "Constructor with null name throws ArgumentNullException",
             ConstructorName = null,
-            Parts = new Dictionary<string, ApiIdentityPart>(),
+            PartsBlueprint = Array.Empty<ApiIdentityPartEntry>(),
             ExpectException = true,
             ExpectedExceptionType = typeof(ArgumentNullException)
         },
@@ -131,7 +131,7 @@ public partial class ApiIdentitySnapshotTests
         {
             Name = "Constructor with empty name throws ArgumentException",
             ConstructorName = "",
-            Parts = new Dictionary<string, ApiIdentityPart>(),
+            PartsBlueprint = Array.Empty<ApiIdentityPartEntry>(),
             ExpectException = true,
             ExpectedExceptionType = typeof(ArgumentException)
         },
@@ -139,7 +139,7 @@ public partial class ApiIdentitySnapshotTests
         {
             Name = "Constructor with whitespace name throws ArgumentException",
             ConstructorName = "  ",
-            Parts = new Dictionary<string, ApiIdentityPart>(),
+            PartsBlueprint = Array.Empty<ApiIdentityPartEntry>(),
             ExpectException = true,
             ExpectedExceptionType = typeof(ArgumentException)
         },
@@ -147,7 +147,7 @@ public partial class ApiIdentitySnapshotTests
         {
             Name = "Constructor with null parts throws ArgumentNullException",
             ConstructorName = "Product",
-            Parts = null,
+            PartsBlueprint = null,
             ExpectException = true,
             ExpectedExceptionType = typeof(ArgumentNullException)
         },
@@ -155,7 +155,7 @@ public partial class ApiIdentitySnapshotTests
         {
             Name = "Constructor with empty parts creates empty snapshot",
             ConstructorName = "Empty",
-            Parts = new Dictionary<string, ApiIdentityPart>(),
+            PartsBlueprint = Array.Empty<ApiIdentityPartEntry>(),
             ExpectedPartCount = 0,
             ExpectedIsScalar = false,
             ExpectedIsComposite = false,
@@ -165,7 +165,9 @@ public partial class ApiIdentitySnapshotTests
         {
             Name = "Constructor with single scalar ApiId creates scalar snapshot",
             ConstructorName = "Product",
-            Parts = new Dictionary<string, ApiIdentityPart> { ["Value"] = ApiIdentityPart.Scalar(ApiId.FromInt32(42)) },
+            PartsBlueprint = [
+                new ApiIdentityPartEntry("Value", ApiIdentityPart.Scalar(ApiId.FromInt32(42)), Array.Empty<ApiIdentityPartEntry>())
+            ],
             ExpectedPartCount = 1,
             ExpectedIsScalar = true,
             ExpectedIsComposite = false,
@@ -175,11 +177,10 @@ public partial class ApiIdentitySnapshotTests
         {
             Name = "Constructor with multiple scalars creates composite",
             ConstructorName = "Customer",
-            Parts = new Dictionary<string, ApiIdentityPart>
-            {
-                ["CustomerId"] = ApiIdentityPart.Scalar(ApiId.FromInt32(100)),
-                ["CountryId"] = ApiIdentityPart.Scalar(ApiId.FromInt32(1))
-            },
+            PartsBlueprint = [
+                new ApiIdentityPartEntry("CustomerId", ApiIdentityPart.Scalar(ApiId.FromInt32(100)), Array.Empty<ApiIdentityPartEntry>()),
+                new ApiIdentityPartEntry("CountryId", ApiIdentityPart.Scalar(ApiId.FromInt32(1)), Array.Empty<ApiIdentityPartEntry>())
+            ],
             ExpectedPartCount = 2,
             ExpectedIsScalar = false,
             ExpectedIsComposite = true,
@@ -189,11 +190,14 @@ public partial class ApiIdentitySnapshotTests
         {
             Name = "Constructor with nested snapshot creates composite",
             ConstructorName = "Order",
-            Parts = new Dictionary<string, ApiIdentityPart>
-            {
-                ["Customer"] = ApiIdentityPart.Nested(ApiIdentitySnapshot.Scalar("Customer", ApiId.FromInt32(42))),
-                ["OrderNumber"] = ApiIdentityPart.Scalar(ApiId.FromInt64(1001L))
-            },
+            PartsBlueprint = [
+                new ApiIdentityPartEntry(
+                    "Customer",
+                    ApiIdentityPart.Nested(ApiIdentitySnapshot.Scalar("Customer", ApiId.FromInt32(42))),
+                    Array.Empty<ApiIdentityPartEntry>()
+                ),
+                new ApiIdentityPartEntry("OrderNumber", ApiIdentityPart.Scalar(ApiId.FromInt64(1001L)), Array.Empty<ApiIdentityPartEntry>())
+            ],
             ExpectedPartCount = 2,
             ExpectedIsScalar = false,
             ExpectedIsComposite = true,
@@ -203,7 +207,9 @@ public partial class ApiIdentitySnapshotTests
         {
             Name = "Constructor with parentPath creates correct path",
             ConstructorName = "CustomerId",
-            Parts = new Dictionary<string, ApiIdentityPart> { ["Value"] = ApiIdentityPart.Scalar(ApiId.FromInt32(42)) },
+            PartsBlueprint = [
+                new ApiIdentityPartEntry("Value", ApiIdentityPart.Scalar(ApiId.FromInt32(42)), Array.Empty<ApiIdentityPartEntry>())
+            ],
             ParentPath = "Order.Customer",
             ExpectedPartCount = 1,
             ExpectedIsScalar = true,
@@ -214,7 +220,9 @@ public partial class ApiIdentitySnapshotTests
         {
             Name = "Constructor converts object to ApiId",
             ConstructorName = "Product",
-            Parts = new Dictionary<string, ApiIdentityPart> { ["ProductId"] = ApiIdentityPart.Scalar(ApiId.FromInt32(42)) },
+            PartsBlueprint = [
+                new ApiIdentityPartEntry("ProductId", ApiIdentityPart.Scalar(ApiId.FromInt32(42)), Array.Empty<ApiIdentityPartEntry>())
+            ],
             ExpectedPartCount = 1,
             ExpectedIsScalar = false,
             ExpectedIsComposite = false,
@@ -224,12 +232,17 @@ public partial class ApiIdentitySnapshotTests
         {
             Name = "Constructor accepts null nested snapshot",
             ConstructorName = "Order",
-            Parts = new Dictionary<string, ApiIdentityPart>
-            {
-                ["Customer"] = ApiIdentityPart.UnresolvedNested(),  // Explicit null nested snapshot
-                ["Product"] = ApiIdentityPart.Nested(ApiIdentitySnapshot.Scalar("Product", ApiId.FromInt32(99), "Order")),  // Non-null to enable heuristic
-                ["OrderNumber"] = ApiIdentityPart.Scalar(ApiId.FromInt64(1001L))
-            },
+            PartsBlueprint = [
+                new ApiIdentityPartEntry("Customer", ApiIdentityPart.UnresolvedNested(), [
+                    new ApiIdentityPartEntry("CustomerId", new ApiIdentityPart { Kind = ApiIdentityPartKind.Scalar }, Array.Empty<ApiIdentityPartEntry>())
+                ]),
+                new ApiIdentityPartEntry(
+                    "Product",
+                    ApiIdentityPart.Nested(ApiIdentitySnapshot.Scalar("Product", ApiId.FromInt32(99), "Order")),
+                    Array.Empty<ApiIdentityPartEntry>()
+                ),
+                new ApiIdentityPartEntry("OrderNumber", ApiIdentityPart.Scalar(ApiId.FromInt64(1001L)), Array.Empty<ApiIdentityPartEntry>())
+            ],
             ExpectedPartCount = 3,  // Customer (null) + Product + OrderNumber
             ExpectedIsScalar = false,
             ExpectedIsComposite = true,
@@ -237,16 +250,16 @@ public partial class ApiIdentitySnapshotTests
         },
     ];
 
-    private static Dictionary<string, ApiIdentityPart> OrderParts { get; } = new()
-    {
-        ["CustomerId"] = ApiIdentityPart.Scalar(ApiId.FromInt32(42)),
-        ["OrderNumber"] = ApiIdentityPart.Scalar(ApiId.FromInt64(1001L))
-    };
+    private static ApiIdentityPartEntry[] OrderPartsBlueprint { get; } =
+    [
+        new ApiIdentityPartEntry("CustomerId", ApiIdentityPart.Scalar(ApiId.FromInt32(42)), Array.Empty<ApiIdentityPartEntry>()),
+        new ApiIdentityPartEntry("OrderNumber", ApiIdentityPart.Scalar(ApiId.FromInt64(1001L)), Array.Empty<ApiIdentityPartEntry>())
+    ];
 
-    private static Dictionary<string, ApiIdentityPart> CustomerParts { get; } = new()
-    {
-        ["CustomerId"] = ApiIdentityPart.Scalar(ApiId.FromInt32(42))
-    };
+    private static ApiIdentityPartEntry[] CustomerPartsBlueprint { get; } =
+    [
+        new ApiIdentityPartEntry("CustomerId", ApiIdentityPart.Scalar(ApiId.FromInt32(42)), Array.Empty<ApiIdentityPartEntry>())
+    ];
 
     public static TheoryDataRow<IXUnitTest>[] FactoryMethodTheoryData =>
     [
@@ -322,7 +335,7 @@ public partial class ApiIdentitySnapshotTests
             FactoryExpression = () => ApiIdentitySnapshot.Composite
             (
                 "Order",
-                new Dictionary<string, ApiIdentityPart>(OrderParts),
+                OrderPartsBlueprint,
                 null
             ),
             ExpectedName = "Order",
@@ -337,7 +350,7 @@ public partial class ApiIdentitySnapshotTests
             FactoryExpression = () => ApiIdentitySnapshot.Composite
             (
                 "Customer",
-                new Dictionary<string, ApiIdentityPart>(CustomerParts),
+                CustomerPartsBlueprint,
                 "Order"),
             ExpectedName = "Customer",
             ExpectedIsScalar = false,

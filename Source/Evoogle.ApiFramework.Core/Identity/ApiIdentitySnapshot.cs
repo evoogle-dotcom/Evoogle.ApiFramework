@@ -4,6 +4,7 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using System.Collections.Frozen;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
@@ -12,24 +13,21 @@ using Evoogle.ApiFramework.Exceptions;
 namespace Evoogle.ApiFramework.Identity;
 
 /// <summary>
-///     Specifies how to handle unresolved scalar parts when flattening an identity snapshot.
+///     Specifies how to handle unresolved parts when flattening an identity snapshot.
 /// </summary>
-public enum UnresolvedScalarBehavior
+public enum UnresolvedPartBehavior
 {
     /// <summary>
-    ///     Throw an <see cref="ApiIdentityException"/> when encountering an unresolved scalar.
+    ///     Throw an <see cref="ApiIdentityException"/> when encountering an unresolved part.
     /// </summary>
     Throw,
 
     /// <summary>
-    ///     Use <see cref="ApiId.Empty"/> for unresolved scalars.
+    ///     Use <see cref="ApiId.Empty"/> for unresolved scalar parts.
+    ///     For unresolved nested parts, continue flattening using <see cref="ApiId.Empty"/> for all descendant scalar
+    ///     leaves according to the schema-provided blueprint.
     /// </summary>
-    UseEmpty,
-
-    /// <summary>
-    ///     Omit unresolved scalars from the flattened result.
-    /// </summary>
-    Omit
+    UseEmpty
 }
 
 /// <summary>
@@ -120,22 +118,26 @@ public enum UnresolvedScalarBehavior
 /// // Composite snapshot
 /// var orderSnapshot = ApiIdentitySnapshot.Composite(
 ///     "Order",
-///     new Dictionary&lt;string, ApiIdentityPart&gt;
+///     new ApiIdentityPartEntry[]
 ///     {
-///         ["Customer"] = ApiIdentityPart.Nested(customerSnapshot),
-///         ["OrderNumber"] = ApiIdentityPart.Scalar(ApiId.FromInt64(1001L))
+///         new("Customer", ApiIdentityPart.Nested(customerSnapshot), nestedBlueprint: Array.Empty&lt;ApiIdentityPartEntry&gt;()),
+///         new("OrderNumber", ApiIdentityPart.Scalar(ApiId.FromInt64(1001L)), nestedBlueprint: Array.Empty&lt;ApiIdentityPartEntry&gt;())
 ///     }
 /// );
 /// </code>
 /// </example>
+[DebuggerDisplay("{ToDebuggerDisplay(),nq}")]
 public sealed class ApiIdentitySnapshot
 {
     #region Fields
     private readonly FrozenDictionary<string, ApiIdentitySnapshot?> _nestedParts;
     private readonly FrozenDictionary<string, ApiId> _scalarParts;
     private readonly FrozenSet<string> _unresolvedScalarParts;
-    private ApiId? _cachedNamedApiId;
-    private ApiId? _cachedUnnamedApiId;
+    private readonly ApiIdentityPartEntry[] _partsBlueprint;
+
+    // Thread-safe caches (boxed ApiId). Cached only for unresolvedBehavior == Throw.
+    private object? _cachedNamedApiIdBox;
+    private object? _cachedUnnamedApiIdBox;
     #endregion
 
     #region Constructors
@@ -143,7 +145,7 @@ public sealed class ApiIdentitySnapshot
     ///     Initializes a new instance of <see cref="ApiIdentitySnapshot"/>.
     /// </summary>
     /// <param name="name">The name of this identity part.</param>
-    /// <param name="parts">The resolved parts (name -> ApiIdentityPart mappings).</param>
+    /// <param name="partsBlueprint">The ordered parts blueprint (interleaved nested/scalar exactly as desired).</param>
     /// <param name="parentPath">Optional parent path for nested values.</param>
     /// <remarks>
     ///     <para>
@@ -166,68 +168,99 @@ public sealed class ApiIdentitySnapshot
     /// </remarks>
     public ApiIdentitySnapshot(
         string name,
-        IReadOnlyDictionary<string, ApiIdentityPart> parts,
+        IReadOnlyList<ApiIdentityPartEntry> partsBlueprint,
         string? parentPath = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name);
-        ArgumentNullException.ThrowIfNull(parts);
+        ArgumentNullException.ThrowIfNull(partsBlueprint);
 
         this.Name = name;
         this.Path = string.IsNullOrWhiteSpace(parentPath)
             ? name
             : $"{parentPath}.{name}";
 
-        // Separate nested identities from scalar values
-        var nestedParts = new Dictionary<string, ApiIdentitySnapshot?>();
-        var scalarParts = new Dictionary<string, ApiId>();
-        var unresolvedScalarParts = new HashSet<string>();
+        _partsBlueprint = partsBlueprint.Count == 0
+            ? []
+            : [.. partsBlueprint];
 
-        foreach (var kvp in parts)
+        // Separate nested identities from scalar values, preserving blueprint ordering separately.
+        var nestedParts = new Dictionary<string, ApiIdentitySnapshot?>(StringComparer.Ordinal);
+        var scalarParts = new Dictionary<string, ApiId>(StringComparer.Ordinal);
+        var unresolvedScalarParts = new HashSet<string>(StringComparer.Ordinal);
+        var seen = new HashSet<string>(StringComparer.Ordinal);
+
+        foreach (var entry in _partsBlueprint)
         {
-            var partName = kvp.Key;
-            var part = kvp.Value;
+            if (string.IsNullOrWhiteSpace(entry.Name))
+            {
+                throw new ApiIdentityException(
+                    $"Identity snapshot '{this.Path}' contains a part with null/empty name in the blueprint."
+                );
+            }
+
+            if (!seen.Add(entry.Name))
+            {
+                throw new ApiIdentityException(
+                    $"Identity snapshot '{this.Path}' contains duplicate part name '{entry.Name}'. " +
+                    "Part names must be unique within a snapshot node."
+                );
+            }
+
+            var part = entry.Part;
 
             switch (part.Kind)
             {
                 case ApiIdentityPartKind.Scalar:
                     if (!part.ScalarValue.HasValue)
                     {
-                        throw new ArgumentException(
-                            $"Part '{partName}' is marked as Scalar but has no ScalarValue. " +
-                            "This indicates a programming error - use ApiIdentityPart.Scalar() factory method.",
-                            nameof(parts)
-                        );
+                        // Allow unresolved scalar to support deterministic flattening.
+                        unresolvedScalarParts.Add(entry.Name);
+                        scalarParts[entry.Name] = ApiId.Empty;
+                        break;
                     }
-                    scalarParts[partName] = part.ScalarValue.Value;
+
+                    scalarParts[entry.Name] = part.ScalarValue.Value;
                     break;
 
                 case ApiIdentityPartKind.Nested:
                     if (part.NestedSnapshot == null)
                     {
-                        throw new ArgumentException(
-                            $"Part '{partName}' is marked as Nested but has null NestedSnapshot. " +
-                            "Use ApiIdentityPart.UnresolvedNested() for unresolved nested identities.",
-                            nameof(parts)
+                        throw new ApiIdentityException(
+                            $"Part '{entry.Name}' is marked as Nested but has null NestedSnapshot. " +
+                            "Use ApiIdentityPart.UnresolvedNested() for unresolved nested identities."
                         );
                     }
-                    nestedParts[partName] = part.NestedSnapshot;
+                    if (entry.NestedBlueprint is null)
+                    {
+                        throw new ApiIdentityException(
+                            $"Nested part '{entry.Name}' at '{this.Path}' must define a NestedBlueprint " +
+                            "so unresolved nested parts can be flattened deterministically."
+                        );
+                    }
+                    nestedParts[entry.Name] = part.NestedSnapshot;
                     break;
 
                 case ApiIdentityPartKind.UnresolvedNested:
-                    nestedParts[partName] = null;
+                    if (entry.NestedBlueprint is null)
+                    {
+                        throw new ApiIdentityException(
+                            $"Unresolved nested part '{entry.Name}' at '{this.Path}' must define a NestedBlueprint " +
+                            "so it can be flattened deterministically."
+                        );
+                    }
+                    nestedParts[entry.Name] = null;
                     break;
 
                 default:
-                    throw new ArgumentException(
-                        $"Unknown ApiIdentityPart.PartKind: {part.Kind}",
-                        nameof(parts)
+                    throw new ApiIdentityException(
+                        $"Unknown ApiIdentityPart.Kind: {part.Kind}"
                     );
             }
         }
 
-        _nestedParts = nestedParts.ToFrozenDictionary();
-        _scalarParts = scalarParts.ToFrozenDictionary();
-        _unresolvedScalarParts = unresolvedScalarParts.ToFrozenSet();
+        _nestedParts = nestedParts.ToFrozenDictionary(StringComparer.Ordinal);
+        _scalarParts = scalarParts.ToFrozenDictionary(StringComparer.Ordinal);
+        _unresolvedScalarParts = unresolvedScalarParts.ToFrozenSet(StringComparer.Ordinal);
     }
 
     /// <summary>
@@ -243,9 +276,10 @@ public sealed class ApiIdentitySnapshot
             : $"{parentPath}.{name}";
 
         _nestedParts = FrozenDictionary<string, ApiIdentitySnapshot?>.Empty;
-        _scalarParts = new Dictionary<string, ApiId> { ["Value"] = scalarValue }
-            .ToFrozenDictionary();
+        _scalarParts = new Dictionary<string, ApiId>(StringComparer.Ordinal) { ["Value"] = scalarValue }
+            .ToFrozenDictionary(StringComparer.Ordinal);
         _unresolvedScalarParts = FrozenSet<string>.Empty;
+        _partsBlueprint = [];
     }
     #endregion
 
@@ -342,6 +376,11 @@ public sealed class ApiIdentitySnapshot
     {
         get
         {
+            if (_unresolvedScalarParts.Count > 0)
+            {
+                return false;
+            }
+
             // Check all nested parts are not null
             if (_nestedParts.Any(kvp => kvp.Value is null))
             {
@@ -367,7 +406,10 @@ public sealed class ApiIdentitySnapshot
     /// <value>
     ///     An enumerable of part names (both nested and scalar).
     /// </value>
-    public IEnumerable<string> PartNames => _nestedParts.Keys.Concat(_scalarParts.Keys);
+    public IEnumerable<string> PartNames =>
+        this.IsScalar
+            ? _scalarParts.Keys
+            : _partsBlueprint.Select(p => p.Name);
 
     /// <summary>
     ///     Gets the count of parts (nested + scalar).
@@ -412,6 +454,13 @@ public sealed class ApiIdentitySnapshot
 
                 if (_scalarParts.TryGetValue(pathOrName, out var scalarApiId))
                 {
+                    if (_unresolvedScalarParts.Contains(pathOrName))
+                    {
+                        throw new ApiIdentityException(
+                            $"Identity scalar part '{pathOrName}' at path '{this.Path}' is unresolved. " +
+                            $"Use TryGetPart() or check IsFullyResolved before accessing."
+                        );
+                    }
                     // Wrap ApiId in ApiIdentitySnapshot for consistent API
                     return new ApiIdentitySnapshot(pathOrName, scalarApiId, this.Path);
                 }
@@ -472,10 +521,10 @@ public sealed class ApiIdentitySnapshot
     /// <returns>A new composite <see cref="ApiIdentitySnapshot"/>.</returns>
     public static ApiIdentitySnapshot Composite(
         string name,
-        IReadOnlyDictionary<string, ApiIdentityPart> parts,
+        IReadOnlyList<ApiIdentityPartEntry> partsBlueprint,
         string? parentPath = null)
     {
-        return new ApiIdentitySnapshot(name, parts, parentPath);
+        return new ApiIdentitySnapshot(name, partsBlueprint, parentPath);
     }
 
     /// <summary>
@@ -490,7 +539,7 @@ public sealed class ApiIdentitySnapshot
 
         return new ApiIdentitySnapshot(
             name,
-            new Dictionary<string, ApiIdentityPart>(),
+            Array.Empty<ApiIdentityPartEntry>(),
             parentPath
         );
     }
@@ -512,6 +561,11 @@ public sealed class ApiIdentitySnapshot
 
         if (_scalarParts.TryGetValue(name, out var scalarApiId))
         {
+            if (_unresolvedScalarParts.Contains(name))
+            {
+                snapshot = null;
+                return false;
+            }
             snapshot = new ApiIdentitySnapshot(name, scalarApiId, this.Path);
             return true;
         }
@@ -632,17 +686,38 @@ public sealed class ApiIdentitySnapshot
     /// </example>
     public IEnumerable<string> GetUnresolvedParts()
     {
-        foreach (var kvp in _nestedParts)
+        if (this.IsScalar)
         {
-            if (kvp.Value is null)
+            yield break;
+        }
+
+        foreach (var entry in _partsBlueprint)
+        {
+            if (entry.Part.Kind == ApiIdentityPartKind.Scalar)
             {
-                yield return $"{this.Path}.{kvp.Key}";
-            }
-            else
-            {
-                foreach (var unresolved in kvp.Value.GetUnresolvedParts())
+                if (_unresolvedScalarParts.Contains(entry.Name))
                 {
-                    yield return unresolved;
+                    yield return $"{this.Path}.{entry.Name}";
+                }
+
+                continue;
+            }
+
+            if (entry.Part.Kind is ApiIdentityPartKind.Nested or ApiIdentityPartKind.UnresolvedNested)
+            {
+                if (_nestedParts.TryGetValue(entry.Name, out var nested))
+                {
+                    if (nested is null)
+                    {
+                        yield return $"{this.Path}.{entry.Name}";
+                    }
+                    else
+                    {
+                        foreach (var unresolved in nested.GetUnresolvedParts())
+                        {
+                            yield return unresolved;
+                        }
+                    }
                 }
             }
         }
@@ -657,12 +732,12 @@ public sealed class ApiIdentitySnapshot
     ///     If false, flattens to unnamed <see cref="ApiIdPart"/>s (e.g., "42|1001").
     /// </param>
     /// <param name="unresolvedBehavior">
-    ///     Specifies how to handle unresolved scalar parts. Default is <see cref="UnresolvedScalarBehavior.Throw"/>.
+    ///     Specifies how to handle unresolved parts. Default is <see cref="UnresolvedPartBehavior.Throw"/>.
     /// </param>
     /// <returns>A flat <see cref="ApiId"/> suitable for runtime operations.</returns>
     /// <exception cref="ApiIdentityException">
-    ///     Thrown if any nested parts are unresolved (<see langword="null"/>) and <paramref name="unresolvedBehavior"/>
-    ///     is <see cref="UnresolvedScalarBehavior.Throw"/>. Check <see cref="IsFullyResolved"/>
+    ///     Thrown if any parts are unresolved and <paramref name="unresolvedBehavior"/>
+    ///     is <see cref="UnresolvedPartBehavior.Throw"/>. Check <see cref="IsFullyResolved"/>
     ///     before calling this method, or use <see cref="GetUnresolvedParts"/> to identify missing parts.
     /// </exception>
     /// <remarks>
@@ -687,29 +762,26 @@ public sealed class ApiIdentitySnapshot
     ///         Both modes are cached independently to avoid redundant computation.
     ///     </para>
     /// </remarks>
-    public ApiId ToApiId(bool useNamedParts = true, UnresolvedScalarBehavior unresolvedBehavior = UnresolvedScalarBehavior.Throw)
+    public ApiId ToApiId(bool useNamedParts = true, UnresolvedPartBehavior unresolvedBehavior = UnresolvedPartBehavior.Throw)
     {
-        // Check cache based on naming mode (only for default behavior)
-        if (unresolvedBehavior == UnresolvedScalarBehavior.Throw)
+        // Thread-safe cache lookup (only for default behavior)
+        if (unresolvedBehavior == UnresolvedPartBehavior.Throw)
         {
-            if (useNamedParts)
+            var cachedBox = useNamedParts
+                ? Volatile.Read(ref _cachedNamedApiIdBox)
+                : Volatile.Read(ref _cachedUnnamedApiIdBox);
+
+            if (cachedBox is ApiId cached)
             {
-                if (_cachedNamedApiId.HasValue)
-                {
-                    return _cachedNamedApiId.Value;
-                }
-            }
-            else
-            {
-                if (_cachedUnnamedApiId.HasValue)
-                {
-                    return _cachedUnnamedApiId.Value;
-                }
+                return cached;
             }
         }
 
         var flatParts = new List<ApiIdPart>();
-        FlattenRecursive(this, prefix: null, flatParts, useNamedParts, unresolvedBehavior);
+
+        // Root scalar naming: in named mode, the root scalar should use snapshot.Name.
+        var initialPrefix = (useNamedParts && this.IsScalar) ? this.Name : null;
+        FlattenRecursive(this, prefix: initialPrefix, flatParts, useNamedParts, unresolvedBehavior);
 
         ApiId result;
         if (flatParts.Count == 0)
@@ -726,27 +798,25 @@ public sealed class ApiIdentitySnapshot
             result = ApiId.Composite([.. flatParts]);
         }
 
-        // Cache result (only for default behavior)
-        if (unresolvedBehavior == UnresolvedScalarBehavior.Throw)
+        // Thread-safe cache store (only for default behavior)
+        if (unresolvedBehavior == UnresolvedPartBehavior.Throw)
         {
             if (useNamedParts)
             {
-                _cachedNamedApiId = result;
+                Interlocked.CompareExchange(ref _cachedNamedApiIdBox, result, null);
             }
             else
             {
-                _cachedUnnamedApiId = result;
+                Interlocked.CompareExchange(ref _cachedUnnamedApiIdBox, result, null);
             }
         }
 
         return result;
     }
 
-    /// <summary>
-    ///     Returns a debug-friendly string representation showing the nested structure.
-    /// </summary>
+    /// <summary>Returns a debugger-friendly display string.</summary>
     /// <returns>A hierarchical string representation of this snapshot.</returns>
-    public string ToDebugString()
+    internal string ToDebuggerDisplay()
     {
         var sb = new StringBuilder();
         this.AppendDebugString(sb, indent: 0);
@@ -756,7 +826,7 @@ public sealed class ApiIdentitySnapshot
 
     #region Object Methods
     /// <inheritdoc />
-    public override string ToString() => this.ToDebugString();
+    public override string ToString() => this.ToDebuggerDisplay();
     #endregion
 
     #region Implementation Methods
@@ -765,70 +835,115 @@ public sealed class ApiIdentitySnapshot
         string? prefix,
         List<ApiIdPart> output,
         bool useNamedParts,
-        UnresolvedScalarBehavior unresolvedBehavior)
+        UnresolvedPartBehavior unresolvedBehavior)
     {
         if (snapshot.IsScalar)
         {
             // Leaf node: add scalar part (ApiId is already the right type!)
-            var partName = useNamedParts ? prefix : null;
+            var partName = useNamedParts ? (prefix ?? snapshot.Name) : null;
             var apiId = snapshot.ScalarValue;
 
             output.Add(ApiIdPart.Create(partName, apiId));
             return;
         }
 
-        // Composite: recurse into parts
-        foreach (var kvp in snapshot._nestedParts)
+        // Composite: recurse into parts in schema-provided blueprint order.
+        foreach (var entry in snapshot._partsBlueprint)
         {
-            var partName = kvp.Key;
             var fullName = useNamedParts
-                ? (string.IsNullOrWhiteSpace(prefix) ? partName : $"{prefix}.{partName}")
+                ? (string.IsNullOrWhiteSpace(prefix) ? entry.Name : $"{prefix}.{entry.Name}")
                 : null;
 
-            if (kvp.Value is not null)
+            switch (entry.Part.Kind)
             {
-                FlattenRecursive(kvp.Value, fullName, output, useNamedParts, unresolvedBehavior);
-            }
-            else
-            {
-                // Handle unresolved nested part based on behavior
-                var unresolvedPath = string.IsNullOrWhiteSpace(prefix) ? partName : $"{prefix}.{partName}";
+                case ApiIdentityPartKind.Scalar:
+                    if (snapshot._unresolvedScalarParts.Contains(entry.Name))
+                    {
+                        if (unresolvedBehavior == UnresolvedPartBehavior.Throw)
+                        {
+                            throw new ApiIdentityException(
+                                $"Cannot flatten identity snapshot with unresolved scalar part at '{snapshot.Path}.{entry.Name}'. " +
+                                $"Check IsFullyResolved or use GetUnresolvedParts() before flattening."
+                            );
+                        }
 
-                switch (unresolvedBehavior)
-                {
-                    case UnresolvedScalarBehavior.Throw:
-                        throw new ApiIdentityException(
-                            $"Cannot flatten identity snapshot with unresolved nested part at '{unresolvedPath}'. " +
-                            $"Check IsFullyResolved or use TryGetPart() before flattening."
-                        );
-
-                    case UnresolvedScalarBehavior.UseEmpty:
                         output.Add(ApiIdPart.Create(fullName, ApiId.Empty));
                         break;
+                    }
 
-                    case UnresolvedScalarBehavior.Omit:
-                        // Skip this part
-                        break;
-
-                    default:
-                        throw new ArgumentOutOfRangeException(
-                            nameof(unresolvedBehavior),
-                            unresolvedBehavior,
-                            "Unknown UnresolvedScalarBehavior value"
+                    if (!snapshot._scalarParts.TryGetValue(entry.Name, out var apiId))
+                    {
+                        throw new ApiIdentityException(
+                            $"Blueprint/reference mismatch: scalar part '{entry.Name}' not found in snapshot '{snapshot.Path}'."
                         );
-                }
+                    }
+
+                    output.Add(ApiIdPart.Create(fullName, apiId));
+                    break;
+
+                case ApiIdentityPartKind.Nested:
+                case ApiIdentityPartKind.UnresolvedNested:
+                    if (!snapshot._nestedParts.TryGetValue(entry.Name, out var nested))
+                    {
+                        throw new ApiIdentityException(
+                            $"Blueprint/reference mismatch: nested part '{entry.Name}' not found in snapshot '{snapshot.Path}'."
+                        );
+                    }
+
+                    if (nested is not null)
+                    {
+                        FlattenRecursive(nested, fullName, output, useNamedParts, unresolvedBehavior);
+                        break;
+                    }
+
+                    if (unresolvedBehavior == UnresolvedPartBehavior.Throw)
+                    {
+                        throw new ApiIdentityException(
+                            $"Cannot flatten identity snapshot with unresolved nested part at '{snapshot.Path}.{entry.Name}'. " +
+                            $"Check IsFullyResolved or use GetUnresolvedParts() before flattening."
+                        );
+                    }
+
+                    // UseEmpty: emit ApiId.Empty for all descendant scalar leaves according to the blueprint.
+                    FlattenBlueprintAsEmpty(entry.NestedBlueprint, fullName, output, useNamedParts);
+                    break;
+
+                default:
+                    throw new ApiIdentityException(
+                        $"Unknown ApiIdentityPart.Kind '{entry.Part.Kind}' while flattening '{snapshot.Path}.{entry.Name}'."
+                    );
             }
         }
+    }
 
-        foreach (var kvp in snapshot._scalarParts)
+    private static void FlattenBlueprintAsEmpty(
+        IReadOnlyList<ApiIdentityPartEntry> blueprint,
+        string? prefix,
+        List<ApiIdPart> output,
+        bool useNamedParts)
+    {
+        foreach (var entry in blueprint)
         {
-            var partName = kvp.Key;
             var fullName = useNamedParts
-                ? (string.IsNullOrWhiteSpace(prefix) ? partName : $"{prefix}.{partName}")
+                ? (string.IsNullOrWhiteSpace(prefix) ? entry.Name : $"{prefix}.{entry.Name}")
                 : null;
 
-            var apiId = kvp.Value;
-            output.Add(ApiIdPart.Create(fullName, apiId));
+            switch (entry.Part.Kind)
+            {
+                case ApiIdentityPartKind.Scalar:
+                    output.Add(ApiIdPart.Create(fullName, ApiId.Empty));
+                    break;
+
+                case ApiIdentityPartKind.Nested:
+                case ApiIdentityPartKind.UnresolvedNested:
+                    FlattenBlueprintAsEmpty(entry.NestedBlueprint, fullName, output, useNamedParts);
+                    break;
+
+                default:
+                    throw new ApiIdentityException(
+                        $"Unknown ApiIdentityPart.Kind '{entry.Part.Kind}' while flattening empty subtree."
+                    );
+            }
         }
     }
 
@@ -848,31 +963,43 @@ public sealed class ApiIdentitySnapshot
 
         sb.AppendLine(" {");
 
-        foreach (var kvp in _nestedParts)
+        foreach (var entry in _partsBlueprint)
         {
             sb.Append(indentStr);
             sb.Append("  ");
-            sb.Append(kvp.Key);
+            sb.Append(entry.Name);
             sb.Append(" = ");
 
-            if (kvp.Value is null)
+            switch (entry.Part.Kind)
             {
-                sb.AppendLine("null (unresolved)");
-            }
-            else
-            {
-                sb.AppendLine();
-                kvp.Value.AppendDebugString(sb, indent + 2);
-            }
-        }
+                case ApiIdentityPartKind.Scalar:
+                    if (_unresolvedScalarParts.Contains(entry.Name))
+                    {
+                        sb.AppendLine("null (unresolved scalar)");
+                    }
+                    else
+                    {
+                        sb.AppendLine(_scalarParts[entry.Name].ToString());
+                    }
+                    break;
 
-        foreach (var kvp in _scalarParts)
-        {
-            sb.Append(indentStr);
-            sb.Append("  ");
-            sb.Append(kvp.Key);
-            sb.Append(" = ");
-            sb.AppendLine(kvp.Value.ToString());
+                case ApiIdentityPartKind.Nested:
+                case ApiIdentityPartKind.UnresolvedNested:
+                    if (_nestedParts.TryGetValue(entry.Name, out var nested) && nested is not null)
+                    {
+                        sb.AppendLine();
+                        nested.AppendDebugString(sb, indent + 2);
+                    }
+                    else
+                    {
+                        sb.AppendLine("null (unresolved)");
+                    }
+                    break;
+
+                default:
+                    sb.AppendLine($"<unknown kind: {entry.Part.Kind}>");
+                    break;
+            }
         }
 
         sb.Append(indentStr);

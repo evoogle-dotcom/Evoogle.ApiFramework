@@ -20,6 +20,7 @@ public partial class ApiIdentitySnapshotTests
         #region User Supplied Properties
         public ApiIdentitySnapshot Snapshot { get; init; } = null!;
         public bool UseNamedParts { get; init; }
+        public UnresolvedPartBehavior UnresolvedBehavior { get; init; } = UnresolvedPartBehavior.Throw;
         public bool ExpectException { get; init; }
         public Type? ExpectedExceptionType { get; init; }
         public ApiId? ExpectedApiId { get; init; }
@@ -48,7 +49,7 @@ public partial class ApiIdentitySnapshotTests
         {
             try
             {
-                this.ActualApiId = this.Snapshot.ToApiId(this.UseNamedParts);
+                this.ActualApiId = this.Snapshot.ToApiId(this.UseNamedParts, this.UnresolvedBehavior);
             }
             catch (Exception ex)
             {
@@ -165,9 +166,10 @@ public partial class ApiIdentitySnapshotTests
             Name = "Scalar snapshot flattens to scalar ApiId",
             Snapshot = ApiIdentitySnapshot.Scalar("ProductId", 42),
             UseNamedParts = true,
-            ExpectedApiId = ApiId.FromInt32(42),
-            ExpectedIsComposite = false,
-            ExpectedPartCount = 0
+            ExpectedIsComposite = true,
+            ExpectedIsNamedComposite = true,
+            ExpectedPartCount = 1,
+            CustomAssertionExpression = id => id.PartCount == 1
         },
         new ToApiIdTest
         {
@@ -181,11 +183,11 @@ public partial class ApiIdentitySnapshotTests
         new ToApiIdTest
         {
             Name = "Simple composite flattens with named parts",
-            Snapshot = ApiIdentitySnapshot.Composite("Order", new Dictionary<string, ApiIdentityPart>
-            {
-                ["CustomerId"] = ApiIdentityPart.Scalar(ApiId.FromInt32(42)),
-                ["OrderNumber"] = ApiIdentityPart.Scalar(ApiId.FromInt64(1001L))
-            }),
+            Snapshot = ApiIdentitySnapshot.Composite("Order",
+            [
+                ScalarEntry("CustomerId", ApiId.FromInt32(42)),
+                ScalarEntry("OrderNumber", ApiId.FromInt64(1001L))
+            ]),
             UseNamedParts = true,
             ExpectedIsComposite = true,
             ExpectedIsNamedComposite = true,
@@ -194,11 +196,11 @@ public partial class ApiIdentitySnapshotTests
         new ToApiIdTest
         {
             Name = "Simple composite flattens with unnamed parts",
-            Snapshot = ApiIdentitySnapshot.Composite("Order", new Dictionary<string, ApiIdentityPart>
-            {
-                ["CustomerId"] = ApiIdentityPart.Scalar(ApiId.FromInt32(42)),
-                ["OrderNumber"] = ApiIdentityPart.Scalar(ApiId.FromInt64(1001L))
-            }),
+            Snapshot = ApiIdentitySnapshot.Composite("Order",
+            [
+                ScalarEntry("CustomerId", ApiId.FromInt32(42)),
+                ScalarEntry("OrderNumber", ApiId.FromInt64(1001L))
+            ]),
             UseNamedParts = false,
             ExpectedIsComposite = true,
             ExpectedIsNamedComposite = false,
@@ -234,10 +236,10 @@ public partial class ApiIdentitySnapshotTests
         new ToApiIdTest
         {
             Name = "Single unnamed part returns as scalar ApiId",
-            Snapshot = ApiIdentitySnapshot.Composite("Product", new Dictionary<string, ApiIdentityPart>
-            {
-                ["ProductId"] = ApiIdentityPart.Scalar(ApiId.FromInt32(99))
-            }),
+            Snapshot = ApiIdentitySnapshot.Composite("Product",
+            [
+                ScalarEntry("ProductId", ApiId.FromInt32(99))
+            ]),
             UseNamedParts = false,
             ExpectedApiId = ApiId.FromInt32(99),
             ExpectedIsComposite = false,
@@ -253,17 +255,114 @@ public partial class ApiIdentitySnapshotTests
         },
         new ToApiIdTest
         {
+            Name = "UseEmpty flattens unresolved nested part deterministically",
+            Snapshot = ApiIdentitySnapshot.Composite(
+                "Order",
+                [
+                    UnresolvedNestedEntry(
+                        "Customer",
+                        [
+                            NestedEntry(
+                                "Country",
+                                ApiIdentitySnapshot.Empty("Country", "Order.Customer"),
+                                [ ScalarEntry("Id", ApiId.Empty) ]
+                            ),
+                            ScalarEntry("CustomerId", ApiId.Empty)
+                        ]
+                    ),
+                    ScalarEntry("OrderNumber", ApiId.FromInt64(1001L))
+                ]
+            ),
+            UseNamedParts = true,
+            UnresolvedBehavior = UnresolvedPartBehavior.UseEmpty,
+            ExpectedIsComposite = true,
+            ExpectedIsNamedComposite = true,
+            ExpectedPartCount = 3,
+            CustomAssertionExpression = id => id.PartCount == 3
+        },
+        new ToApiIdTest
+        {
             Name = "Mixed scalar types flatten correctly with named parts",
-            Snapshot = ApiIdentitySnapshot.Composite("Invoice", new Dictionary<string, ApiIdentityPart>
-            {
-                ["InvoiceId"] = ApiIdentityPart.Scalar(ApiId.FromGuid(Guid.Parse("12345678-1234-1234-1234-123456789abc"))),
-                ["InvoiceNumber"] = ApiIdentityPart.Scalar(ApiId.FromString("INV-2024-001")),
-                ["Amount"] = ApiIdentityPart.Scalar(ApiId.FromInt32(100))
-            }),
+            Snapshot = ApiIdentitySnapshot.Composite("Invoice",
+            [
+                ScalarEntry("InvoiceId", ApiId.FromGuid(Guid.Parse("12345678-1234-1234-1234-123456789abc"))),
+                ScalarEntry("InvoiceNumber", ApiId.FromString("INV-2024-001")),
+                ScalarEntry("Amount", ApiId.FromInt32(100))
+            ]),
             UseNamedParts = true,
             ExpectedIsComposite = true,
             ExpectedIsNamedComposite = true,
             ExpectedPartCount = 3
+        },
+        new ToApiIdTest
+        {
+            Name = "Named ToString preserves exact blueprint order",
+            Snapshot =
+                ApiIdentitySnapshot.Composite(
+                    "Root",
+                    new ApiIdentityPartEntry[]
+                    {
+                        ScalarEntry("First", ApiId.FromInt32(1)),
+                        NestedEntry(
+                            "Inner",
+                            ApiIdentitySnapshot.Composite(
+                                "Inner",
+                                new ApiIdentityPartEntry[]
+                                {
+                                    ScalarEntry("X", ApiId.FromInt32(2)),
+                                    ScalarEntry("Y", ApiId.FromInt32(3))
+                                },
+                                "Root"
+                            ),
+                            new ApiIdentityPartEntry[]
+                            {
+                                ScalarEntry("X", ApiId.FromInt32(2)),
+                                ScalarEntry("Y", ApiId.FromInt32(3))
+                            }
+                        ),
+                        ScalarEntry("Last", ApiId.FromInt32(4))
+                    }
+                ),
+            UseNamedParts = true,
+            ExpectedIsComposite = true,
+            ExpectedIsNamedComposite = true,
+            ExpectedPartCount = 4,
+            CustomAssertionExpression = id => id.ToString() == "First=1|Inner.X=2|Inner.Y=3|Last=4"
+        },
+        new ToApiIdTest
+        {
+            Name = "Unnamed ToString preserves exact blueprint order",
+            Snapshot =
+                ApiIdentitySnapshot.Composite(
+                    "Root",
+                    new ApiIdentityPartEntry[]
+                    {
+                        ScalarEntry("First", ApiId.FromInt32(1)),
+                        NestedEntry(
+                            "Inner",
+                            ApiIdentitySnapshot.Composite(
+                                "Inner",
+                                new ApiIdentityPartEntry[]
+                                {
+                                    ScalarEntry("X", ApiId.FromInt32(2)),
+                                    ScalarEntry("Y", ApiId.FromInt32(3))
+                                },
+                                "Root"
+                            ),
+                            new ApiIdentityPartEntry[]
+                            {
+                                ScalarEntry("X", ApiId.FromInt32(2)),
+                                ScalarEntry("Y", ApiId.FromInt32(3))
+                            }
+                        ),
+                        ScalarEntry("Last", ApiId.FromInt32(4))
+                    }
+                ),
+            UseNamedParts = false,
+            ExpectedIsComposite = true,
+            ExpectedIsNamedComposite = false,
+            ExpectedPartCount = 4,
+            CustomAssertionExpression = id => id.ToString() == "1|2|3|4"
         },
     ];
 
@@ -305,11 +404,11 @@ public partial class ApiIdentitySnapshotTests
         new DualCachingTest
         {
             Name = "Simple composite has independent caches",
-            Snapshot = ApiIdentitySnapshot.Composite("Product", new Dictionary<string, ApiIdentityPart>
-            {
-                ["Id"] = ApiIdentityPart.Scalar(ApiId.FromInt32(42)),
-                ["Name"] = ApiIdentityPart.Scalar(ApiId.FromString("Widget"))
-            })
+            Snapshot = ApiIdentitySnapshot.Composite("Product",
+            [
+                ScalarEntry("Id", ApiId.FromInt32(42)),
+                ScalarEntry("Name", ApiId.FromString("Widget"))
+            ])
         },
     ];
     #endregion

@@ -165,20 +165,22 @@ public partial class ApiIdentitySnapshotTests
         {
             Name = "Indexer with deep dot notation navigates multiple levels",
             Snapshot = CreateOrderSnapshot(),
-            PathOrName = "Customer.Country",
-            ExpectedName = "Country",
-            ExpectedPath = "Customer.Country",
+            PathOrName = "Customer.Country.Id",
+            ExpectedName = "Id",
+            ExpectedPath = "Order.Customer.Country.Id",
             ExpectedIsScalar = true,
             ExpectedScalarValue = ApiId.FromInt32(1)
         },
         new IndexerTest
         {
             Name = "Indexer wraps scalar ApiId in snapshot for consistent API",
-            Snapshot = ApiIdentitySnapshot.Composite("Product", new Dictionary<string, ApiIdentityPart>
-            {
-                ["ProductId"] = ApiIdentityPart.Scalar(ApiId.FromInt32(99)),
-                ["Name"] = ApiIdentityPart.Scalar(ApiId.FromString("Widget"))
-            }),
+            Snapshot = ApiIdentitySnapshot.Composite(
+                "Product",
+                [
+                    ScalarEntry("ProductId", ApiId.FromInt32(99)),
+                    ScalarEntry("Name", ApiId.FromString("Widget"))
+                ]
+            ),
             PathOrName = "ProductId",
             ExpectedName = "ProductId",
             ExpectedPath = "Product.ProductId",
@@ -255,11 +257,13 @@ public partial class ApiIdentitySnapshotTests
         new TryGetPartTest
         {
             Name = "TryGetPart wraps scalar ApiId in snapshot",
-            Snapshot = ApiIdentitySnapshot.Composite("Invoice", new Dictionary<string, ApiIdentityPart>
-            {
-                ["InvoiceId"] = ApiIdentityPart.Scalar(ApiId.FromGuid(Guid.Parse("12345678-1234-1234-1234-123456789abc"))),
-                ["Amount"] = ApiIdentityPart.Scalar(ApiId.FromInt32(100))
-            }),
+            Snapshot = ApiIdentitySnapshot.Composite(
+                "Invoice",
+                [
+                    ScalarEntry("InvoiceId", ApiId.FromGuid(Guid.Parse("12345678-1234-1234-1234-123456789abc"))),
+                    ScalarEntry("Amount", ApiId.FromInt32(100))
+                ]
+            ),
             PartName = "InvoiceId",
             ExpectedResult = true,
             ExpectedName = "InvoiceId",

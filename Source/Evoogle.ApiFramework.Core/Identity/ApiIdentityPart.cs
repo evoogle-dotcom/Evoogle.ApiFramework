@@ -6,6 +6,37 @@
 namespace Evoogle.ApiFramework.Identity;
 
 /// <summary>
+///     Represents an ordered blueprint entry for an identity snapshot part.
+///     The order of entries determines both snapshot stringification and ApiId flattening.
+/// </summary>
+public readonly record struct ApiIdentityPartEntry(
+    string Name,
+    ApiIdentityPart Part,
+    IReadOnlyList<ApiIdentityPartEntry> NestedBlueprint
+);
+
+/// <summary>
+///     Specifies the kind of identity part.
+/// </summary>
+public enum ApiIdentityPartKind
+{
+    /// <summary>
+    ///     A scalar identity value (ApiId).
+    /// </summary>
+    Scalar,
+
+    /// <summary>
+    ///     A nested identity snapshot (ApiIdentitySnapshot).
+    /// </summary>
+    Nested,
+
+    /// <summary>
+    ///     An unresolved nested identity snapshot (ApiIdentitySnapshot).
+    /// </summary>
+    UnresolvedNested
+}
+
+/// <summary>
 ///     Represents a single part within an identity snapshot, which can be a scalar value,
 ///     a nested snapshot, or an unresolved nested identity.
 /// </summary>
