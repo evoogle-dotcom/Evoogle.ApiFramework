@@ -7,8 +7,10 @@ using System.Collections.Frozen;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
+using System.Text.Json.Serialization;
 
 using Evoogle.ApiFramework.Exceptions;
+using Evoogle.ApiFramework.Identity.Json;
 
 namespace Evoogle.ApiFramework.Identity;
 
@@ -127,6 +129,7 @@ public enum UnresolvedPartBehavior
 /// </code>
 /// </example>
 [DebuggerDisplay("{ToDebuggerDisplay(),nq}")]
+[JsonConverter(typeof(ApiIdentitySnapshotJsonConverter))]
 public sealed class ApiIdentitySnapshot
 {
     #region Fields
@@ -1005,5 +1008,7 @@ public sealed class ApiIdentitySnapshot
         sb.Append(indentStr);
         sb.Append('}');
     }
+
+    internal IReadOnlyList<ApiIdentityPartEntry> GetPartsBlueprintUnsafe() => _partsBlueprint;
     #endregion
 }
