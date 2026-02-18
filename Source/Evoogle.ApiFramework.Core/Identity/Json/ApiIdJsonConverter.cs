@@ -215,7 +215,7 @@ public sealed class ApiIdJsonConverter(ILogger<ApiIdJsonConverter>? logger) : Js
                         throw new JsonException($"Invalid token type for {propertyName} with kind {kind}: {reader.TokenType}. Expected StartArray.");
                     }
 
-                    context.ReadData.ApiId.CompositeParts = [];
+                    context.ReadData.ApiId.CompositeParts ??= [];
                     ReadJsonArray(ref reader, context, static _ => HandleApiIdPartArrayItem);
                     return;
                 }
@@ -233,7 +233,7 @@ public sealed class ApiIdJsonConverter(ILogger<ApiIdJsonConverter>? logger) : Js
             // Fallback when Kind is not yet known: accept string/number as scalar or array as composite
             if (reader.TokenType == JsonTokenType.StartArray)
             {
-                context.ReadData.ApiId.CompositeParts = [];
+                context.ReadData.ApiId.CompositeParts ??= [];
                 ReadJsonArray(ref reader, context, static _ => HandleApiIdPartArrayItem); // direct method group, no capture
             }
             else
@@ -427,14 +427,13 @@ public sealed class ApiIdJsonConverter(ILogger<ApiIdJsonConverter>? logger) : Js
         }
         var kind = nullableKind.Value;
 
-        // Handle Empty ApiId
-        if (kind is ApiIdKind.None)
+        // Handle Empty
+        if (kind is ApiIdKind.Empty)
         {
-            // Return Empty ApiId
             return ApiId.Empty;
         }
 
-        // Handle Scalar ApiId
+        // Handle Scalar
         if (kind is not ApiIdKind.Composite)
         {
             var scalarValueAsString = readData.ApiId?.ScalarValue;
@@ -448,7 +447,7 @@ public sealed class ApiIdJsonConverter(ILogger<ApiIdJsonConverter>? logger) : Js
             return scalarApiId;
         }
 
-        // Handle Composite ApiId
+        // Handle Composite
         var compositePartsReadData = readData.ApiId?.CompositeParts;
         if (compositePartsReadData is null || compositePartsReadData.Count == 0)
         {
@@ -564,17 +563,17 @@ public sealed class ApiIdJsonConverter(ILogger<ApiIdJsonConverter>? logger) : Js
             propertyName,
             parts,
             options,
-            span => WriteJsonArray
+            collection => WriteJsonArray
             (
                 writer,
-                span,
-                part =>
+                collection,
+                item =>
                 {
                     WriteJsonObject(writer, () =>
                     {
-                        WriteApiIdPartName(writer, part, context);
-                        WriteApiIdPartKind(writer, part, context);
-                        WriteApiIdPartValue(writer, part, context);
+                        WriteApiIdPartName(writer, item, context);
+                        WriteApiIdPartKind(writer, item, context);
+                        WriteApiIdPartValue(writer, item, context);
                     });
                 }
             )

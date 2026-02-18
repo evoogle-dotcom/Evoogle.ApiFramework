@@ -142,7 +142,7 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
         private static void HandleApiEnumTypeApiEnumValues(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiEnumType ??= new ApiEnumTypeReadData();
-            context.ReadData.ApiEnumType.ApiEnumValues = [];
+            context.ReadData.ApiEnumType.ApiEnumValues ??= [];
 
             ReadJsonArray(ref reader, context, (x) => HandleApiEnumTypeApiEnumValuesArrayItem);
         }
@@ -179,7 +179,7 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
         private static void HandleApiObjectTypeApiIdentities(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiObjectType ??= new ApiObjectTypeReadData();
-            context.ReadData.ApiObjectType.ApiIdentities = [];
+            context.ReadData.ApiObjectType.ApiIdentities ??= [];
 
             ReadJsonArray(ref reader, context, (x) => HandleApiObjectTypeApiIdentitiesArrayItem);
         }
@@ -198,7 +198,7 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
         private static void HandleApiObjectTypeApiProperties(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiObjectType ??= new ApiObjectTypeReadData();
-            context.ReadData.ApiObjectType.ApiProperties = [];
+            context.ReadData.ApiObjectType.ApiProperties ??= [];
 
             ReadJsonArray(ref reader, context, (x) => HandleApiObjectTypeApiPropertiesArrayItem);
         }
@@ -217,7 +217,7 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
         private static void HandleApiObjectTypeApiRelationships(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiObjectType ??= new ApiObjectTypeReadData();
-            context.ReadData.ApiObjectType.ApiRelationships = [];
+            context.ReadData.ApiObjectType.ApiRelationships ??= [];
 
             ReadJsonArray(ref reader, context, (x) => HandleApiObjectTypeApiRelationshipsArrayItem);
         }

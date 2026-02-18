@@ -3,126 +3,846 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using System.Text.Json;
-
 using Evoogle.XUnit;
-
-using FluentAssertions;
-using Xunit.Sdk;
 
 namespace Evoogle.ApiFramework.Identity;
 
 public partial class ApiIdentitySnapshotTests
 {
-    #region Test Types
-    private class JsonRoundTripTest : XUnitTest
-    {
-        #region User Supplied Properties
-        public required ApiIdentitySnapshot Snapshot { get; init; }
-        public bool ExpectResolvedRoundTrip { get; init; } = true;
-        #endregion
-
-        #region Calculated Properties
-        private string? ActualJson { get; set; }
-        private ApiIdentitySnapshot? ActualSnapshot { get; set; }
-        private Exception? ActualException { get; set; }
-        #endregion
-
-        #region XUnitTest Methods
-        protected override void Act()
-        {
-            try
-            {
-                this.ActualJson = JsonSerializer.Serialize(this.Snapshot);
-                this.ActualSnapshot = JsonSerializer.Deserialize<ApiIdentitySnapshot>(this.ActualJson);
-            }
-            catch (Exception ex)
-            {
-                this.ActualException = ex;
-            }
-        }
-
-        protected override void Assert()
-        {
-            if (this.ActualException is not null)
-            {
-                var json = this.ActualJson ?? "<null>";
-                throw new XunitException($"JSON round-trip failed with: {this.ActualException.GetType().Name}: {this.ActualException.Message}\nJSON:\n{json}");
-            }
-
-            this.ActualSnapshot.Should().NotBeNull();
-
-            var roundTripped = this.ActualSnapshot!;
-
-            roundTripped.Name.Should().Be(this.Snapshot.Name);
-            roundTripped.Path.Should().Be(this.Snapshot.Path);
-            roundTripped.IsScalar.Should().Be(this.Snapshot.IsScalar);
-            roundTripped.IsComposite.Should().Be(this.Snapshot.IsComposite);
-            roundTripped.PartCount.Should().Be(this.Snapshot.PartCount);
-            roundTripped.IsFullyResolved.Should().Be(this.Snapshot.IsFullyResolved);
-            roundTripped.PartNames.Should().Equal(this.Snapshot.PartNames);
-
-            // Structural equivalence: compare deterministic flattening and unresolved parts.
-            roundTripped.GetUnresolvedParts().Should().BeEquivalentTo(this.Snapshot.GetUnresolvedParts());
-
-            var expectedNamed = this.Snapshot.ToApiId(useNamedParts: true, unresolvedBehavior: UnresolvedPartBehavior.UseEmpty);
-            var expectedUnnamed = this.Snapshot.ToApiId(useNamedParts: false, unresolvedBehavior: UnresolvedPartBehavior.UseEmpty);
-
-            var actualNamed = roundTripped.ToApiId(useNamedParts: true, unresolvedBehavior: UnresolvedPartBehavior.UseEmpty);
-            var actualUnnamed = roundTripped.ToApiId(useNamedParts: false, unresolvedBehavior: UnresolvedPartBehavior.UseEmpty);
-
-            actualNamed.Should().Be(expectedNamed);
-            actualUnnamed.Should().Be(expectedUnnamed);
-
-            if (this.ExpectResolvedRoundTrip)
-            {
-                // When fully resolved, Throw-mode should round-trip too.
-                var expectedThrowNamed = this.Snapshot.ToApiId(useNamedParts: true, unresolvedBehavior: UnresolvedPartBehavior.Throw);
-                var expectedThrowUnnamed = this.Snapshot.ToApiId(useNamedParts: false, unresolvedBehavior: UnresolvedPartBehavior.Throw);
-
-                roundTripped.ToApiId(useNamedParts: true, unresolvedBehavior: UnresolvedPartBehavior.Throw).Should().Be(expectedThrowNamed);
-                roundTripped.ToApiId(useNamedParts: false, unresolvedBehavior: UnresolvedPartBehavior.Throw).Should().Be(expectedThrowUnnamed);
-            }
-        }
-        #endregion
-    }
-    #endregion
-
     #region Theory Data
-    public static TheoryDataRow<IXUnitTest>[] JsonRoundTripTheoryData =>
+    public static TheoryDataRow<IXUnitTest>[] JsonDeserializeTheoryData =>
     [
-        new JsonRoundTripTest
+        new JsonDeserializeTest
         {
-            Name = "Scalar snapshot round-trips",
-            Snapshot = ApiIdentitySnapshot.Scalar("ProductId", 42),
+            Name = "Scalar snapshot with empty value",
+            SourceJson = @"{""Kind"":""Scalar"",""ScalarValue"":null}",
+            ExpectedFactoryArgument = new ApiIdentitySnapshotConfig
+            {
+                Kind = ApiIdentitySnapshotKind.Scalar,
+                ScalarValue = ApiId.Empty
+            }
         },
-        new JsonRoundTripTest
+
+        new JsonDeserializeTest
         {
-            Name = "Empty snapshot round-trips",
-            Snapshot = ApiIdentitySnapshot.Empty("Empty"),
+            Name = "Scalar snapshot with integer value",
+            SourceJson = @"{""Kind"":""Scalar"",""ScalarValue"":{""Kind"":""Int32"",""Value"":42}}",
+            ExpectedFactoryArgument = new ApiIdentitySnapshotConfig
+            {
+                Kind = ApiIdentitySnapshotKind.Scalar,
+                ScalarValue = ApiId.FromInt32(42)
+            }
         },
-        new JsonRoundTripTest
+
+        new JsonDeserializeTest
         {
-            Name = "Composite resolved snapshot round-trips",
-            Snapshot = CreateOrderSnapshot(),
+            Name = "Composite snapshot with empty parts",
+            SourceJson = @"{""Kind"":""Composite"",""NestedParts"":[]}",
+            ExpectedFactoryArgument = new ApiIdentitySnapshotConfig
+            {
+                Kind = ApiIdentitySnapshotKind.Composite,
+                NestedParts = []
+            }
         },
-        new JsonRoundTripTest
+
+        new JsonDeserializeTest
         {
-            Name = "Composite unresolved snapshot round-trips",
-            Snapshot = CreateUnresolvedSnapshot(),
-            ExpectResolvedRoundTrip = false
+            Name = "Composite snapshot with scalar part",
+            SourceJson = @"{""Kind"":""Composite"",""NestedParts"":[{""Name"":""Id"",""Snapshot"":{""Kind"":""Scalar"",""Path"":""Id"",""ScalarValue"":{""Kind"":""Int32"",""Value"":42}}}]}",
+            ExpectedFactoryArgument = new ApiIdentitySnapshotConfig
+            {
+                Kind = ApiIdentitySnapshotKind.Composite,
+                NestedParts =
+                [
+                    new ApiIdentityPartConfig
+                    (
+                        Name: "Id",
+                        Snapshot: new ApiIdentitySnapshotConfig
+                        {
+                            Kind = ApiIdentitySnapshotKind.Scalar,
+                            ScalarValue = ApiId.FromInt32(42)
+                        },
+                        Structure: null
+                    )
+                ]
+            }
         },
-        new JsonRoundTripTest
+
+        new JsonDeserializeTest
         {
-            Name = "Deeply nested snapshot round-trips",
-            Snapshot = CreateDeeplyNestedSnapshot(),
+            Name = "Composite snapshot with resolved nested identity parts",
+            SourceJson = @"{""Kind"":""Composite"",""NestedParts"":[{""Name"":""Customer"",""Snapshot"":{""Kind"":""Composite"",""Path"":""Customer"",""NestedParts"":[{""Name"":""Country"",""Snapshot"":{""Kind"":""Composite"",""Path"":""Customer.Country"",""NestedParts"":[{""Name"":""Id"",""Snapshot"":{""Kind"":""Scalar"",""Path"":""Customer.Country.Id"",""ScalarValue"":{""Kind"":""Int32"",""Value"":1}}}]}},{""Name"":""CustomerId"",""Snapshot"":{""Kind"":""Scalar"",""Path"":""Customer.CustomerId"",""ScalarValue"":{""Kind"":""Int32"",""Value"":42}}}]}},{""Name"":""OrderNumber"",""Snapshot"":{""Kind"":""Scalar"",""Path"":""OrderNumber"",""ScalarValue"":{""Kind"":""Int64"",""Value"":1001}}}]}",
+            ExpectedFactoryArgument = new ApiIdentitySnapshotConfig
+            {
+                Kind = ApiIdentitySnapshotKind.Composite,
+                NestedParts =
+                [
+                    new ApiIdentityPartConfig
+                    (
+                        Name: "Customer",
+                        Snapshot: new ApiIdentitySnapshotConfig
+                        {
+                            Kind = ApiIdentitySnapshotKind.Composite,
+                            NestedParts =
+                            [
+                                new ApiIdentityPartConfig
+                                (
+                                    Name: "Country",
+                                    Snapshot: new ApiIdentitySnapshotConfig
+                                    {
+                                        Kind = ApiIdentitySnapshotKind.Composite,
+                                        NestedParts =
+                                        [
+                                            new ApiIdentityPartConfig
+                                            (
+                                                Name: "Id",
+                                                Snapshot: new ApiIdentitySnapshotConfig
+                                                {
+                                                    Kind = ApiIdentitySnapshotKind.Scalar,
+                                                    ScalarValue = ApiId.FromInt32(1)
+                                                },
+                                                Structure: null
+                                            )
+                                        ]
+                                    },
+                                    Structure: null
+                                ),
+                                new ApiIdentityPartConfig
+                                (
+                                    Name: "CustomerId",
+                                    Snapshot: new ApiIdentitySnapshotConfig
+                                    {
+                                        Kind = ApiIdentitySnapshotKind.Scalar,
+                                        ScalarValue = ApiId.FromInt32(42)
+                                    },
+                                    Structure: null
+                                )
+                            ]
+                        },
+                        Structure: null
+                    ),
+                    new ApiIdentityPartConfig
+                    (
+                        Name: "OrderNumber",
+                        Snapshot: new ApiIdentitySnapshotConfig
+                        {
+                            Kind = ApiIdentitySnapshotKind.Scalar,
+                            ScalarValue = ApiId.FromInt64(1001)
+                        },
+                        Structure: null
+                    )
+                ]
+            }
+        },
+
+        new JsonDeserializeTest
+        {
+            Name = "Composite snapshot with unresolved nested identity parts",
+            SourceJson = @"{""Kind"":""Composite"",""NestedParts"":[{""Name"":""Customer"",""Structure"":[{""Name"":""Country"",""Structure"":[{""Name"":""Id""}]},{""Name"":""CustomerId""}]},{""Name"":""OrderNumber"",""Snapshot"":{""Kind"":""Scalar"",""Path"":""OrderNumber"",""ScalarValue"":{""Kind"":""Int64"",""Value"":1001}}}]}",
+            ExpectedFactoryArgument = new ApiIdentitySnapshotConfig
+            {
+                Kind = ApiIdentitySnapshotKind.Composite,
+                NestedParts =
+                [
+                    new ApiIdentityPartConfig
+                    (
+                        Name: "Customer",
+                        Snapshot: null,
+                        Structure:
+                        [
+                            new ApiIdentityPartConfig
+                            (
+                                Name: "Country",
+                                Snapshot: null,
+                                Structure:
+                                [
+                                    new ApiIdentityPartConfig
+                                    (
+                                        Name: "Id",
+                                        Snapshot: null,
+                                        Structure: null
+                                    )
+                                ]
+                            ),
+                            new ApiIdentityPartConfig
+                            (
+                                Name: "CustomerId",
+                                Snapshot: null,
+                                Structure: null
+                            )
+                        ]
+                    ),
+                    new ApiIdentityPartConfig
+                    (
+                        Name: "OrderNumber",
+                        Snapshot: new ApiIdentitySnapshotConfig
+                        {
+                            Kind = ApiIdentitySnapshotKind.Scalar,
+                            ScalarValue = ApiId.FromInt64(1001)
+                        },
+                        Structure: null
+                    )
+                ]
+            }
+        },
+
+        new JsonDeserializeTest
+        {
+            Name = "Composite snapshot with deeply nested parts",
+            SourceJson = @"{""Kind"":""Composite"",""NestedParts"":[{""Name"":""Level1"",""Snapshot"":{""Kind"":""Composite"",""Path"":""Level1"",""NestedParts"":[{""Name"":""Level2"",""Snapshot"":{""Kind"":""Composite"",""Path"":""Level1.Level2"",""NestedParts"":[{""Name"":""Level3"",""Snapshot"":{""Kind"":""Composite"",""Path"":""Level1.Level2.Level3"",""NestedParts"":[{""Name"":""Level4"",""Snapshot"":{""Kind"":""Scalar"",""Path"":""Level1.Level2.Level3.Level4"",""ScalarValue"":{""Kind"":""String"",""Value"":""deep""}}},{""Name"":""SequenceNumber"",""Snapshot"":{""Kind"":""Scalar"",""Path"":""Level1.Level2.Level3.SequenceNumber"",""ScalarValue"":{""Kind"":""Int32"",""Value"":42}}}]}},{""Name"":""Id"",""Snapshot"":{""Kind"":""Scalar"",""Path"":""Level1.Level2.Id"",""ScalarValue"":{""Kind"":""Int32"",""Value"":100}}}]}},{""Name"":""Name"",""Snapshot"":{""Kind"":""Scalar"",""Path"":""Level1.Name"",""ScalarValue"":{""Kind"":""String"",""Value"":""test""}}}]}},{""Name"":""RootId"",""Snapshot"":{""Kind"":""Scalar"",""Path"":""RootId"",""ScalarValue"":{""Kind"":""Guid"",""Value"":""12345678-1234-1234-1234-123456789abc""}}}]}",
+            ExpectedFactoryArgument = new ApiIdentitySnapshotConfig
+            {
+                Kind = ApiIdentitySnapshotKind.Composite,
+                NestedParts =
+                [
+                    new ApiIdentityPartConfig
+                    (
+                        Name: "Level1",
+                        Snapshot: new ApiIdentitySnapshotConfig
+                        {
+                            Kind = ApiIdentitySnapshotKind.Composite,
+                            NestedParts =
+                            [
+                                new ApiIdentityPartConfig
+                                (
+                                    Name: "Level2",
+                                    Snapshot: new ApiIdentitySnapshotConfig
+                                    {
+                                        Kind = ApiIdentitySnapshotKind.Composite,
+                                        NestedParts =
+                                        [
+                                            new ApiIdentityPartConfig
+                                            (
+                                                Name: "Level3",
+                                                Snapshot: new ApiIdentitySnapshotConfig
+                                                {
+                                                    Kind = ApiIdentitySnapshotKind.Composite,
+                                                    NestedParts =
+                                                    [
+                                                        new ApiIdentityPartConfig
+                                                        (
+                                                            Name: "Level4",
+                                                            Snapshot: new ApiIdentitySnapshotConfig
+                                                            {
+                                                                Kind = ApiIdentitySnapshotKind.Scalar,
+                                                                ScalarValue = ApiId.FromString("deep")
+                                                            },
+                                                            Structure: null
+                                                        ),
+                                                        new ApiIdentityPartConfig
+                                                        (
+                                                            Name: "SequenceNumber",
+                                                            Snapshot: new ApiIdentitySnapshotConfig
+                                                            {
+                                                                Kind = ApiIdentitySnapshotKind.Scalar,
+                                                                ScalarValue = ApiId.FromInt32(42)
+                                                            },
+                                                            Structure: null
+                                                        )
+                                                    ]
+                                                },
+                                                Structure: null
+                                            ),
+                                            new ApiIdentityPartConfig
+                                            (
+                                                Name: "Id",
+                                                Snapshot: new ApiIdentitySnapshotConfig
+                                                {
+                                                    Kind = ApiIdentitySnapshotKind.Scalar,
+                                                    ScalarValue = ApiId.FromInt32(100)
+                                                },
+                                                Structure: null
+                                            )
+                                        ]
+                                    },
+                                    Structure: null
+                                ),
+                                new ApiIdentityPartConfig
+                                (
+                                    Name: "Name",
+                                    Snapshot: new ApiIdentitySnapshotConfig
+                                    {
+                                        Kind = ApiIdentitySnapshotKind.Scalar,
+                                        ScalarValue = ApiId.FromString("test")
+                                    },
+                                    Structure: null
+                                )
+                            ]
+                        },
+                        Structure: null
+                    ),
+                    new ApiIdentityPartConfig
+                    (
+                        Name: "RootId",
+                        Snapshot: new ApiIdentitySnapshotConfig
+                        {
+                            Kind = ApiIdentitySnapshotKind.Scalar,
+                            ScalarValue = ApiId.FromGuid(Guid.Parse("12345678-1234-1234-1234-123456789abc"))
+                        },
+                        Structure: null
+                    )
+                ]
+            },
+        }
+    ];
+
+    public static TheoryDataRow<IXUnitTest>[] JsonRoundtripTheoryData =>
+    [
+        new JsonRoundtripTest
+        {
+            Name = "Scalar snapshot with empty value",
+            ExpectedFactoryArgument = new ApiIdentitySnapshotConfig
+            {
+                Kind = ApiIdentitySnapshotKind.Scalar,
+                ScalarValue = ApiId.Empty
+            }
+        },
+
+        new JsonRoundtripTest
+        {
+            Name = "Scalar snapshot with integer value",
+            ExpectedFactoryArgument = new ApiIdentitySnapshotConfig
+            {
+                Kind = ApiIdentitySnapshotKind.Scalar,
+                ScalarValue = ApiId.FromInt32(42)
+            }
+        },
+
+        new JsonRoundtripTest
+        {
+            Name = "Composite snapshot with empty parts",
+            ExpectedFactoryArgument = new ApiIdentitySnapshotConfig
+            {
+                Kind = ApiIdentitySnapshotKind.Composite,
+                NestedParts = []
+            }
+        },
+
+        new JsonRoundtripTest
+        {
+            Name = "Composite snapshot with scalar part",
+            ExpectedFactoryArgument = new ApiIdentitySnapshotConfig
+            {
+                Kind = ApiIdentitySnapshotKind.Composite,
+                NestedParts =
+                [
+                    new ApiIdentityPartConfig
+                    (
+                        Name: "Id",
+                        Snapshot: new ApiIdentitySnapshotConfig
+                        {
+                            Kind = ApiIdentitySnapshotKind.Scalar,
+                            ScalarValue = ApiId.FromInt32(42)
+                        },
+                        Structure: null
+                    )
+                ]
+            },
+        },
+
+        new JsonRoundtripTest
+        {
+            Name = "Composite snapshot with resolved nested identity parts",
+            ExpectedFactoryArgument = new ApiIdentitySnapshotConfig
+            {
+                Kind = ApiIdentitySnapshotKind.Composite,
+                NestedParts =
+                [
+                    new ApiIdentityPartConfig
+                    (
+                        Name: "Customer",
+                        Snapshot: new ApiIdentitySnapshotConfig
+                        {
+                            Kind = ApiIdentitySnapshotKind.Composite,
+                            NestedParts =
+                            [
+                                new ApiIdentityPartConfig
+                                (
+                                    Name: "Country",
+                                    Snapshot: new ApiIdentitySnapshotConfig
+                                    {
+                                        Kind = ApiIdentitySnapshotKind.Composite,
+                                        NestedParts =
+                                        [
+                                            new ApiIdentityPartConfig
+                                            (
+                                                Name: "Id",
+                                                Snapshot: new ApiIdentitySnapshotConfig
+                                                {
+                                                    Kind = ApiIdentitySnapshotKind.Scalar,
+                                                    ScalarValue = ApiId.FromInt32(1)
+                                                },
+                                                Structure: null
+                                            )
+                                        ]
+                                    },
+                                    Structure: null
+                                ),
+                                new ApiIdentityPartConfig
+                                (
+                                    Name: "CustomerId",
+                                    Snapshot: new ApiIdentitySnapshotConfig
+                                    {
+                                        Kind = ApiIdentitySnapshotKind.Scalar,
+                                        ScalarValue = ApiId.FromInt32(42)
+                                    },
+                                    Structure: null
+                                )
+                            ]
+                        },
+                        Structure: null
+                    ),
+                    new ApiIdentityPartConfig
+                    (
+                        Name: "OrderNumber",
+                        Snapshot: new ApiIdentitySnapshotConfig
+                        {
+                            Kind = ApiIdentitySnapshotKind.Scalar,
+                            ScalarValue = ApiId.FromInt64(1001)
+                        },
+                        Structure: null
+                    )
+                ]
+            },
+        },
+
+        new JsonRoundtripTest
+        {
+            Name = "Composite snapshot with unresolved nested identity parts",
+            ExpectedFactoryArgument = new ApiIdentitySnapshotConfig
+            {
+                Kind = ApiIdentitySnapshotKind.Composite,
+                NestedParts =
+                [
+                    new ApiIdentityPartConfig
+                    (
+                        Name: "Customer",
+                        Snapshot: null,
+                        Structure:
+                        [
+                            new ApiIdentityPartConfig
+                            (
+                                Name: "Country",
+                                Snapshot: null,
+                                Structure:
+                                [
+                                    new ApiIdentityPartConfig
+                                    (
+                                        Name: "Id",
+                                        Snapshot: null,
+                                        Structure: null
+                                    )
+                                ]
+                            ),
+                            new ApiIdentityPartConfig
+                            (
+                                Name: "CustomerId",
+                                Snapshot: null,
+                                Structure: null
+                            )
+                        ]
+                    ),
+                    new ApiIdentityPartConfig
+                    (
+                        Name: "OrderNumber",
+                        Snapshot: new ApiIdentitySnapshotConfig
+                        {
+                            Kind = ApiIdentitySnapshotKind.Scalar,
+                            ScalarValue = ApiId.FromInt64(1001)
+                        },
+                        Structure: null
+                    )
+                ]
+            },
+        },
+
+        new JsonRoundtripTest
+        {
+            Name = "Composite snapshot with deeply nested parts",
+            ExpectedFactoryArgument = new ApiIdentitySnapshotConfig
+            {
+                Kind = ApiIdentitySnapshotKind.Composite,
+                NestedParts =
+                [
+                    new ApiIdentityPartConfig
+                    (
+                        Name: "Level1",
+                        Snapshot: new ApiIdentitySnapshotConfig
+                        {
+                            Kind = ApiIdentitySnapshotKind.Composite,
+                            NestedParts =
+                            [
+                                new ApiIdentityPartConfig
+                                (
+                                    Name: "Level2",
+                                    Snapshot: new ApiIdentitySnapshotConfig
+                                    {
+                                        Kind = ApiIdentitySnapshotKind.Composite,
+                                        NestedParts =
+                                        [
+                                            new ApiIdentityPartConfig
+                                            (
+                                                Name: "Level3",
+                                                Snapshot: new ApiIdentitySnapshotConfig
+                                                {
+                                                    Kind = ApiIdentitySnapshotKind.Composite,
+                                                    NestedParts =
+                                                    [
+                                                        new ApiIdentityPartConfig
+                                                        (
+                                                            Name: "Level4",
+                                                            Snapshot: new ApiIdentitySnapshotConfig
+                                                            {
+                                                                Kind = ApiIdentitySnapshotKind.Scalar,
+                                                                ScalarValue = ApiId.FromString("deep")
+                                                            },
+                                                            Structure: null
+                                                        ),
+                                                        new ApiIdentityPartConfig
+                                                        (
+                                                            Name: "SequenceNumber",
+                                                            Snapshot: new ApiIdentitySnapshotConfig
+                                                            {
+                                                                Kind = ApiIdentitySnapshotKind.Scalar,
+                                                                ScalarValue = ApiId.FromInt32(42)
+                                                            },
+                                                            Structure: null
+                                                        )
+                                                    ]
+                                                },
+                                                Structure: null
+                                            ),
+                                            new ApiIdentityPartConfig
+                                            (
+                                                Name: "Id",
+                                                Snapshot: new ApiIdentitySnapshotConfig
+                                                {
+                                                    Kind = ApiIdentitySnapshotKind.Scalar,
+                                                    ScalarValue = ApiId.FromInt32(100)
+                                                },
+                                                Structure: null
+                                            )
+                                        ]
+                                    },
+                                    Structure: null
+                                ),
+                                new ApiIdentityPartConfig
+                                (
+                                    Name: "Name",
+                                    Snapshot: new ApiIdentitySnapshotConfig
+                                    {
+                                        Kind = ApiIdentitySnapshotKind.Scalar,
+                                        ScalarValue = ApiId.FromString("test")
+                                    },
+                                    Structure: null
+                                )
+                            ]
+                        },
+                        Structure: null
+                    ),
+                    new ApiIdentityPartConfig
+                    (
+                        Name: "RootId",
+                        Snapshot: new ApiIdentitySnapshotConfig
+                        {
+                            Kind = ApiIdentitySnapshotKind.Scalar,
+                            ScalarValue = ApiId.FromGuid(Guid.Parse("12345678-1234-1234-1234-123456789abc"))
+                        },
+                        Structure: null
+                    )
+                ]
+            },
+        },
+    ];
+
+    public static TheoryDataRow<IXUnitTest>[] JsonSerializeTheoryData =>
+    [
+        new JsonSerializeTest
+        {
+            Name = "Scalar snapshot with empty value",
+            SourceFactoryArgument = new ApiIdentitySnapshotConfig
+            {
+                Kind = ApiIdentitySnapshotKind.Scalar,
+                ScalarValue = ApiId.Empty
+            },
+            ExpectedJson = @"{""Kind"":""Scalar"",""ScalarValue"":null}"
+        },
+
+        new JsonSerializeTest
+        {
+            Name = "Scalar snapshot with integer value",
+            SourceFactoryArgument = new ApiIdentitySnapshotConfig
+            {
+                Kind = ApiIdentitySnapshotKind.Scalar,
+                ScalarValue = ApiId.FromInt32(42)
+            },
+            ExpectedJson = @"{""Kind"":""Scalar"",""ScalarValue"":{""Kind"":""Int32"",""Value"":42}}"
+        },
+
+        new JsonSerializeTest
+        {
+            Name = "Composite snapshot with empty parts",
+            SourceFactoryArgument = new ApiIdentitySnapshotConfig
+            {
+                Kind = ApiIdentitySnapshotKind.Composite,
+                NestedParts = []
+            },
+            ExpectedJson = @"{""Kind"":""Composite"",""NestedParts"":[]}"
+        },
+
+        new JsonSerializeTest
+        {
+            Name = "Composite snapshot with scalar part",
+            SourceFactoryArgument = new ApiIdentitySnapshotConfig
+            {
+                Kind = ApiIdentitySnapshotKind.Composite,
+                NestedParts =
+                [
+                    new ApiIdentityPartConfig
+                    (
+                        Name: "Id",
+                        Snapshot: new ApiIdentitySnapshotConfig
+                        {
+                            Kind = ApiIdentitySnapshotKind.Scalar,
+                            ScalarValue = ApiId.FromInt32(42)
+                        },
+                        Structure: null
+                    )
+                ]
+            },
+            ExpectedJson = @"{""Kind"":""Composite"",""NestedParts"":[{""Name"":""Id"",""Snapshot"":{""Kind"":""Scalar"",""Path"":""Id"",""ScalarValue"":{""Kind"":""Int32"",""Value"":42}}}]}"
+        },
+
+        new JsonSerializeTest
+        {
+            Name = "Composite snapshot with resolved nested identity parts",
+            SourceFactoryArgument = new ApiIdentitySnapshotConfig
+            {
+                Kind = ApiIdentitySnapshotKind.Composite,
+                NestedParts =
+                [
+                    new ApiIdentityPartConfig
+                    (
+                        Name: "Customer",
+                        Snapshot: new ApiIdentitySnapshotConfig
+                        {
+                            Kind = ApiIdentitySnapshotKind.Composite,
+                            NestedParts =
+                            [
+                                new ApiIdentityPartConfig
+                                (
+                                    Name: "Country",
+                                    Snapshot: new ApiIdentitySnapshotConfig
+                                    {
+                                        Kind = ApiIdentitySnapshotKind.Composite,
+                                        NestedParts =
+                                        [
+                                            new ApiIdentityPartConfig
+                                            (
+                                                Name: "Id",
+                                                Snapshot: new ApiIdentitySnapshotConfig
+                                                {
+                                                    Kind = ApiIdentitySnapshotKind.Scalar,
+                                                    ScalarValue = ApiId.FromInt32(1)
+                                                },
+                                                Structure: null
+                                            )
+                                        ]
+                                    },
+                                    Structure: null
+                                ),
+                                new ApiIdentityPartConfig
+                                (
+                                    Name: "CustomerId",
+                                    Snapshot: new ApiIdentitySnapshotConfig
+                                    {
+                                        Kind = ApiIdentitySnapshotKind.Scalar,
+                                        ScalarValue = ApiId.FromInt32(42)
+                                    },
+                                    Structure: null
+                                )
+                            ]
+                        },
+                        Structure: null
+                    ),
+                    new ApiIdentityPartConfig
+                    (
+                        Name: "OrderNumber",
+                        Snapshot: new ApiIdentitySnapshotConfig
+                        {
+                            Kind = ApiIdentitySnapshotKind.Scalar,
+                            ScalarValue = ApiId.FromInt64(1001)
+                        },
+                        Structure: null
+                    )
+                ]
+            },
+            ExpectedJson = @"{""Kind"":""Composite"",""NestedParts"":[{""Name"":""Customer"",""Snapshot"":{""Kind"":""Composite"",""Path"":""Customer"",""NestedParts"":[{""Name"":""Country"",""Snapshot"":{""Kind"":""Composite"",""Path"":""Customer.Country"",""NestedParts"":[{""Name"":""Id"",""Snapshot"":{""Kind"":""Scalar"",""Path"":""Customer.Country.Id"",""ScalarValue"":{""Kind"":""Int32"",""Value"":1}}}]}},{""Name"":""CustomerId"",""Snapshot"":{""Kind"":""Scalar"",""Path"":""Customer.CustomerId"",""ScalarValue"":{""Kind"":""Int32"",""Value"":42}}}]}},{""Name"":""OrderNumber"",""Snapshot"":{""Kind"":""Scalar"",""Path"":""OrderNumber"",""ScalarValue"":{""Kind"":""Int64"",""Value"":1001}}}]}"
+        },
+
+        new JsonSerializeTest
+        {
+            Name = "Composite snapshot with unresolved nested identity parts",
+            SourceFactoryArgument = new ApiIdentitySnapshotConfig
+            {
+                Kind = ApiIdentitySnapshotKind.Composite,
+                NestedParts =
+                [
+                    new ApiIdentityPartConfig
+                    (
+                        Name: "Customer",
+                        Snapshot: null,
+                        Structure:
+                        [
+                            new ApiIdentityPartConfig
+                            (
+                                Name: "Country",
+                                Snapshot: null,
+                                Structure:
+                                [
+                                    new ApiIdentityPartConfig
+                                    (
+                                        Name: "Id",
+                                        Snapshot: null,
+                                        Structure: null
+                                    )
+                                ]
+                            ),
+                            new ApiIdentityPartConfig
+                            (
+                                Name: "CustomerId",
+                                Snapshot: null,
+                                Structure: null
+                            )
+                        ]
+                    ),
+                    new ApiIdentityPartConfig
+                    (
+                        Name: "OrderNumber",
+                        Snapshot: new ApiIdentitySnapshotConfig
+                        {
+                            Kind = ApiIdentitySnapshotKind.Scalar,
+                            ScalarValue = ApiId.FromInt64(1001)
+                        },
+                        Structure: null
+                    )
+                ]
+            },
+            ExpectedJson = @"{""Kind"":""Composite"",""NestedParts"":[{""Name"":""Customer"",""Structure"":[{""Name"":""Country"",""Structure"":[{""Name"":""Id""}]},{""Name"":""CustomerId""}]},{""Name"":""OrderNumber"",""Snapshot"":{""Kind"":""Scalar"",""Path"":""OrderNumber"",""ScalarValue"":{""Kind"":""Int64"",""Value"":1001}}}]}"
+        },
+
+        new JsonSerializeTest
+        {
+            Name = "Composite snapshot with deeply nested parts",
+            SourceFactoryArgument = new ApiIdentitySnapshotConfig
+            {
+                Kind = ApiIdentitySnapshotKind.Composite,
+                NestedParts =
+                [
+                    new ApiIdentityPartConfig
+                    (
+                        Name: "Level1",
+                        Snapshot: new ApiIdentitySnapshotConfig
+                        {
+                            Kind = ApiIdentitySnapshotKind.Composite,
+                            NestedParts =
+                            [
+                                new ApiIdentityPartConfig
+                                (
+                                    Name: "Level2",
+                                    Snapshot: new ApiIdentitySnapshotConfig
+                                    {
+                                        Kind = ApiIdentitySnapshotKind.Composite,
+                                        NestedParts =
+                                        [
+                                            new ApiIdentityPartConfig
+                                            (
+                                                Name: "Level3",
+                                                Snapshot: new ApiIdentitySnapshotConfig
+                                                {
+                                                    Kind = ApiIdentitySnapshotKind.Composite,
+                                                    NestedParts =
+                                                    [
+                                                        new ApiIdentityPartConfig
+                                                        (
+                                                            Name: "Level4",
+                                                            Snapshot: new ApiIdentitySnapshotConfig
+                                                            {
+                                                                Kind = ApiIdentitySnapshotKind.Scalar,
+                                                                ScalarValue = ApiId.FromString("deep")
+                                                            },
+                                                            Structure: null
+                                                        ),
+                                                        new ApiIdentityPartConfig
+                                                        (
+                                                            Name: "SequenceNumber",
+                                                            Snapshot: new ApiIdentitySnapshotConfig
+                                                            {
+                                                                Kind = ApiIdentitySnapshotKind.Scalar,
+                                                                ScalarValue = ApiId.FromInt32(42)
+                                                            },
+                                                            Structure: null
+                                                        )
+                                                    ]
+                                                },
+                                                Structure: null
+                                            ),
+                                            new ApiIdentityPartConfig
+                                            (
+                                                Name: "Id",
+                                                Snapshot: new ApiIdentitySnapshotConfig
+                                                {
+                                                    Kind = ApiIdentitySnapshotKind.Scalar,
+                                                    ScalarValue = ApiId.FromInt32(100)
+                                                },
+                                                Structure: null
+                                            )
+                                        ]
+                                    },
+                                    Structure: null
+                                ),
+                                new ApiIdentityPartConfig
+                                (
+                                    Name: "Name",
+                                    Snapshot: new ApiIdentitySnapshotConfig
+                                    {
+                                        Kind = ApiIdentitySnapshotKind.Scalar,
+                                        ScalarValue = ApiId.FromString("test")
+                                    },
+                                    Structure: null
+                                )
+                            ]
+                        },
+                        Structure: null
+                    ),
+                    new ApiIdentityPartConfig
+                    (
+                        Name: "RootId",
+                        Snapshot: new ApiIdentitySnapshotConfig
+                        {
+                            Kind = ApiIdentitySnapshotKind.Scalar,
+                            ScalarValue = ApiId.FromGuid(Guid.Parse("12345678-1234-1234-1234-123456789abc"))
+                        },
+                        Structure: null
+                    )
+                ]
+            },
+            ExpectedJson = @"{""Kind"":""Composite"",""NestedParts"":[{""Name"":""Level1"",""Snapshot"":{""Kind"":""Composite"",""Path"":""Level1"",""NestedParts"":[{""Name"":""Level2"",""Snapshot"":{""Kind"":""Composite"",""Path"":""Level1.Level2"",""NestedParts"":[{""Name"":""Level3"",""Snapshot"":{""Kind"":""Composite"",""Path"":""Level1.Level2.Level3"",""NestedParts"":[{""Name"":""Level4"",""Snapshot"":{""Kind"":""Scalar"",""Path"":""Level1.Level2.Level3.Level4"",""ScalarValue"":{""Kind"":""String"",""Value"":""deep""}}},{""Name"":""SequenceNumber"",""Snapshot"":{""Kind"":""Scalar"",""Path"":""Level1.Level2.Level3.SequenceNumber"",""ScalarValue"":{""Kind"":""Int32"",""Value"":42}}}]}},{""Name"":""Id"",""Snapshot"":{""Kind"":""Scalar"",""Path"":""Level1.Level2.Id"",""ScalarValue"":{""Kind"":""Int32"",""Value"":100}}}]}},{""Name"":""Name"",""Snapshot"":{""Kind"":""Scalar"",""Path"":""Level1.Name"",""ScalarValue"":{""Kind"":""String"",""Value"":""test""}}}]}},{""Name"":""RootId"",""Snapshot"":{""Kind"":""Scalar"",""Path"":""RootId"",""ScalarValue"":{""Kind"":""Guid"",""Value"":""12345678-1234-1234-1234-123456789abc""}}}]}"
         },
     ];
     #endregion
 
     #region Test Methods
     [Theory]
-    [MemberData(nameof(JsonRoundTripTheoryData))]
-    public void JsonRoundTrip(IXUnitTest test) => test.Execute(this);
+    [MemberData(nameof(JsonDeserializeTheoryData))]
+    public void JsonDeserialize(IXUnitTest test) => test.Execute(this);
+
+    [Theory]
+    [MemberData(nameof(JsonRoundtripTheoryData))]
+    public void JsonRoundtrip(IXUnitTest test) => test.Execute(this);
+
+    [Theory]
+    [MemberData(nameof(JsonSerializeTheoryData))]
+    public void JsonSerialize(IXUnitTest test) => test.Execute(this);
     #endregion
 }

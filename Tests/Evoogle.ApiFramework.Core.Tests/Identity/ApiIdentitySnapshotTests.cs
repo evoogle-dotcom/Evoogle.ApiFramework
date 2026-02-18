@@ -3,108 +3,328 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Diagnostics.CodeAnalysis;
+
 using Evoogle.XUnit;
+
+using static Evoogle.XUnit.Tests.JsonUnitTests;
 
 namespace Evoogle.ApiFramework.Identity;
 
 public partial class ApiIdentitySnapshotTests(ITestOutputHelper output) : XUnitTests(output)
 {
-    #region Helper Methods
-    private static ApiIdentityPartEntry ScalarEntry(string name, ApiId value) =>
-        new(name, ApiIdentityPart.Scalar(value), Array.Empty<ApiIdentityPartEntry>());
-
-    private static ApiIdentityPartEntry NestedEntry(string name, ApiIdentitySnapshot snapshot, IReadOnlyList<ApiIdentityPartEntry> nestedBlueprint) =>
-        new(name, ApiIdentityPart.Nested(snapshot), nestedBlueprint);
-
-    private static ApiIdentityPartEntry UnresolvedNestedEntry(string name, IReadOnlyList<ApiIdentityPartEntry> nestedBlueprint) =>
-        new(name, ApiIdentityPart.UnresolvedNested(), nestedBlueprint);
-
-    /// <summary>
-    ///     Creates a sample nested order snapshot for testing navigation and flattening.
-    /// </summary>
-    private static ApiIdentitySnapshot CreateOrderSnapshot()
+    #region Test Types
+    private record ApiIdentitySnapshotConfig
     {
-        var countryBlueprint = new[]
-        {
-            ScalarEntry("Id", ApiId.FromInt32(1))
-        };
-
-        var countrySnapshot = ApiIdentitySnapshot.Composite("Country", countryBlueprint, "Order.Customer");
-
-        var customerBlueprint = new[]
-        {
-            NestedEntry("Country", countrySnapshot, countryBlueprint),
-            ScalarEntry("CustomerId", ApiId.FromInt32(42))
-        };
-
-        var customerSnapshot = ApiIdentitySnapshot.Composite("Customer", customerBlueprint, "Order");
-
-        var orderBlueprint = new[]
-        {
-            NestedEntry("Customer", customerSnapshot, customerBlueprint),
-            ScalarEntry("OrderNumber", ApiId.FromInt64(1001L))
-        };
-
-        return ApiIdentitySnapshot.Composite("Order", orderBlueprint);
+        public required ApiIdentitySnapshotKind Kind { get; init; }
+        public ApiId? ScalarValue { get; init; }
+        public List<ApiIdentityPartConfig>? NestedParts { get; init; }
     }
 
-    /// <summary>
-    ///     Creates a snapshot with unresolved (null) nested parts.
-    /// </summary>
-    private static ApiIdentitySnapshot CreateUnresolvedSnapshot()
+    private record ApiIdentityPartConfig
+    (
+        string Name,
+        ApiIdentitySnapshotConfig? Snapshot,
+        List<ApiIdentityPartConfig>? Structure
+    );
+
+    private class JsonDeserializeTest : JsonDeserializeTest<ApiIdentitySnapshot, ApiIdentitySnapshotConfig>
     {
-        var productBlueprint = new[]
+        #region Constructors
+        [SetsRequiredMembers]
+        public JsonDeserializeTest()
         {
-            ScalarEntry("ProductId", ApiId.FromInt32(99))
-        };
-
-        var product = ApiIdentitySnapshot.Composite("Product", productBlueprint, "Order");
-
-        // Explicit unresolved nested snapshot for Customer.
-        // Provide the nested blueprint so UseEmpty can flatten deterministically.
-        var customerBlueprint = new[]
-        {
-            ScalarEntry("CustomerId", ApiId.Empty)
-        };
-
-        var orderBlueprint = new[]
-        {
-            UnresolvedNestedEntry("Customer", customerBlueprint),
-            NestedEntry("Product", product, productBlueprint),
-            ScalarEntry("OrderNumber", ApiId.FromInt64(1001L))
-        };
-
-        return ApiIdentitySnapshot.Composite("Order", orderBlueprint);
+            this.ExpectedFactoryExpression = (arg) => CreateSnapshot(arg!);
+        }
+        #endregion
     }
 
-    /// <summary>
-    ///     Creates a deeply nested snapshot for complex navigation tests.
-    /// </summary>
-    private static ApiIdentitySnapshot CreateDeeplyNestedSnapshot()
+    private class JsonRoundtripTest : JsonRoundtripTest<ApiIdentitySnapshot, ApiIdentitySnapshotConfig>
     {
-        var level2Blueprint = new[]
+        #region Constructors
+        [SetsRequiredMembers]
+        public JsonRoundtripTest()
         {
-            ScalarEntry("Level3", ApiId.FromString("deep")),
-            ScalarEntry("Id", ApiId.FromInt32(100))
-        };
-
-        var level2 = ApiIdentitySnapshot.Composite("Level2", level2Blueprint, "Root.Level1");
-
-        var level1Blueprint = new[]
-        {
-            NestedEntry("Level2", level2, level2Blueprint),
-            ScalarEntry("Name", ApiId.FromString("test"))
-        };
-
-        var level1 = ApiIdentitySnapshot.Composite("Level1", level1Blueprint, "Root");
-
-        var rootBlueprint = new[]
-        {
-            NestedEntry("Level1", level1, level1Blueprint),
-            ScalarEntry("RootId", ApiId.FromGuid(Guid.Parse("12345678-1234-1234-1234-123456789abc")))
-        };
-
-        return ApiIdentitySnapshot.Composite("Root", rootBlueprint);
+            this.ExpectedFactoryExpression = (arg) => CreateSnapshot(arg!);
+        }
+        #endregion
     }
+
+    private class JsonSerializeTest : JsonSerializeTest<ApiIdentitySnapshot, ApiIdentitySnapshotConfig>
+    {
+        #region Constructors
+        [SetsRequiredMembers]
+        public JsonSerializeTest()
+        {
+            this.SourceFactoryExpression = (arg) => CreateSnapshot(arg!);
+        }
+        #endregion
+    }
+    #endregion
+
+    #region Test Factories
+    private static ApiIdentitySnapshot CreateSnapshot(ApiIdentitySnapshotConfig config)
+    {
+        switch (config.Kind)
+        {
+            case ApiIdentitySnapshotKind.Scalar:
+                if (config.ScalarValue is null)
+                {
+                    throw new ArgumentException("ScalarValue must be provided for scalar snapshot.");
+                }
+
+                var scalarValue = config.ScalarValue.Value;
+                return ApiIdentitySnapshot.Scalar(scalarValue);
+
+            case ApiIdentitySnapshotKind.Composite:
+                var parts = config.NestedParts?.ConvertAll(CreatePartFromConfig).ToArray() ?? [];
+                return ApiIdentitySnapshot.Composite(parts);
+
+            default:
+                throw new ArgumentOutOfRangeException(nameof(config), config.Kind, $"Invalid {config.Kind} value.");
+        }
+    }
+
+    private static ApiIdentityPart CreatePartFromConfig(ApiIdentityPartConfig config)
+    {
+        var snapshot = config.Snapshot is not null
+            ? CreateSnapshot(config.Snapshot)
+            : null;
+
+        var structure = config.Structure is not null && config.Structure.Count > 0
+            ? config.Structure.ConvertAll(CreatePartFromConfig)
+            : null;
+
+        return new ApiIdentityPart(config.Name, snapshot, structure);
+    }
+    #endregion
+
+    #region Test Data
+    // Scalar snapshots
+    protected static ApiIdentitySnapshot ScalarSnapshot { get; } = ApiIdentitySnapshot.Scalar(ApiId.FromInt32(42));
+
+    // Composite snapshots with various configurations
+    protected static ApiIdentitySnapshot CompositeSnapshotEmpty { get; } = ApiIdentitySnapshot.Composite();
+
+    protected static ApiIdentitySnapshot CompositeSnapshotWithResolvedScalarPart { get; } = ApiIdentitySnapshot.Composite
+    (
+        new ApiIdentityPart
+        (
+            Name: "Id",
+            Snapshot: ApiIdentitySnapshot.Scalar(ApiId.FromInt32(42))
+        )
+    );
+
+    protected static ApiId CompositeSnapshotWithResolvedScalarPartToNamedCompositeApiId { get; } = ApiId.Composite(ApiIdPart.Create("Id", ApiId.FromInt32(42)));
+    protected static ApiId CompositeSnapshotWithResolvedScalarPartToUnnamedCompositeApiId { get; } = ApiId.Composite(ApiIdPart.Create(ApiId.FromInt32(42)));
+
+    protected static ApiIdentitySnapshot CompositeSnapshotWithUnresolvedScalarPart { get; } = ApiIdentitySnapshot.Composite
+    (
+        new ApiIdentityPart
+        (
+            Name: "Id",
+            Snapshot: null
+        )
+    );
+
+    protected static ApiId CompositeSnapshotWithUnresolvedScalarPartToNamedCompositeApiId { get; } = ApiId.Composite(ApiIdPart.Create("Id", ApiId.Empty));
+    protected static ApiId CompositeSnapshotWithUnresolvedScalarPartToUnnamedCompositeApiId { get; } = ApiId.Composite(ApiIdPart.Create(ApiId.Empty));
+
+    protected static ApiIdentitySnapshot CompositeSnapshotWithResolvedNestedIdentityParts { get; } = ApiIdentitySnapshot.Composite
+    (
+        new ApiIdentityPart
+        (
+            Name: "Customer",
+            Snapshot: ApiIdentitySnapshot.Composite
+            (
+                new ApiIdentityPart
+                (
+                    Name: "Country",
+                    Snapshot: ApiIdentitySnapshot.Composite
+                    (
+                        new ApiIdentityPart
+                        (
+                            Name: "Id",
+                            Snapshot: ApiIdentitySnapshot.Scalar(ApiId.FromInt32(1))
+                        )
+                    )
+                ),
+                new ApiIdentityPart
+                (
+                    Name: "CustomerId",
+                    Snapshot: ApiIdentitySnapshot.Scalar(ApiId.FromInt32(42))
+                )
+            )
+        ),
+        new ApiIdentityPart
+        (
+            Name: "OrderNumber",
+            Snapshot: ApiIdentitySnapshot.Scalar(ApiId.FromInt32(1001))
+        )
+    );
+
+    protected static ApiId CompositeSnapshotWithResolvedNestedIdentityPartsToNamedCompositeApiId { get; } = ApiId.Composite
+    (
+        ApiIdPart.Create("Customer.Country.Id", ApiId.FromInt32(1)),
+        ApiIdPart.Create("Customer.CustomerId", ApiId.FromInt32(42)),
+        ApiIdPart.Create("OrderNumber", ApiId.FromInt32(1001))
+    );
+
+    protected static ApiId CompositeSnapshotWithResolvedNestedIdentityPartsToUnnamedCompositeApiId { get; } = ApiId.Composite
+    (
+        ApiIdPart.Create(ApiId.FromInt32(1)),
+        ApiIdPart.Create(ApiId.FromInt32(42)),
+        ApiIdPart.Create(ApiId.FromInt32(1001))
+    );
+
+    protected static ApiIdentitySnapshot CompositeSnapshotWithUnresolvedNestedIdentityParts { get; } = ApiIdentitySnapshot.Composite
+    (
+        new ApiIdentityPart
+        (
+            Name: "Customer",
+            Snapshot: ApiIdentitySnapshot.Composite
+            (
+                new ApiIdentityPart
+                (
+                    Name: "Country",
+                    Snapshot: null,
+                    Structure:
+                    [
+                        new ApiIdentityPart
+                        (
+                            Name: "Id",
+                            Snapshot: null
+                        )
+                    ]
+                ),
+                new ApiIdentityPart
+                (
+                    Name: "CustomerId",
+                    Snapshot: null
+                )
+            )
+        ),
+        new ApiIdentityPart
+        (
+            Name: "OrderNumber",
+            Snapshot: null
+        )
+    );
+
+    protected static ApiId CompositeSnapshotWithUnresolvedNestedIdentityPartsToNamedCompositeApiId { get; } = ApiId.Composite
+    (
+        ApiIdPart.Create("Customer.Country.Id", ApiId.Empty),
+        ApiIdPart.Create("Customer.CustomerId", ApiId.Empty),
+        ApiIdPart.Create("OrderNumber", ApiId.Empty)
+    );
+
+    protected static ApiId CompositeSnapshotWithUnresolvedNestedIdentityPartsToUnnamedCompositeApiId { get; } = ApiId.Composite
+    (
+        ApiIdPart.Create(ApiId.Empty),
+        ApiIdPart.Create(ApiId.Empty),
+        ApiIdPart.Create(ApiId.Empty)
+    );
+
+    protected static ApiIdentitySnapshot CompositeSnapshotWithPartialUnresolvedNestedIdentityParts { get; } = ApiIdentitySnapshot.Composite
+    (
+        new ApiIdentityPart
+        (
+            Name: "Customer",
+            Snapshot: ApiIdentitySnapshot.Composite
+            (
+                new ApiIdentityPart
+                (
+                    Name: "Country",
+                    Snapshot: null,
+                    Structure:
+                    [
+                        new ApiIdentityPart
+                        (
+                            Name: "Id",
+                            Snapshot: null
+                        )
+                    ]
+                ),
+                new ApiIdentityPart
+                (
+                    Name: "CustomerId",
+                    Snapshot: ApiIdentitySnapshot.Scalar(ApiId.FromInt32(42))
+                )
+            )
+        ),
+        new ApiIdentityPart
+        (
+            Name: "OrderNumber",
+            Snapshot: ApiIdentitySnapshot.Scalar(ApiId.FromInt32(1001))
+        )
+    );
+
+    protected static ApiId CompositeSnapshotWithPartialUnresolvedNestedIdentityPartsToNamedCompositeApiId { get; } = ApiId.Composite
+    (
+        ApiIdPart.Create("Customer.Country.Id", ApiId.Empty),
+        ApiIdPart.Create("Customer.CustomerId", ApiId.FromInt32(42)),
+        ApiIdPart.Create("OrderNumber", ApiId.FromInt32(1001))
+    );
+
+    protected static ApiId CompositeSnapshotWithPartialUnresolvedNestedIdentityPartsToUnnamedCompositeApiId { get; } = ApiId.Composite
+    (
+        ApiIdPart.Create(ApiId.Empty),
+        ApiIdPart.Create(ApiId.FromInt32(42)),
+        ApiIdPart.Create(ApiId.FromInt32(1001))
+    );
+
+    protected static ApiIdentitySnapshot CompositeSnapshotWithResolvedDeeplyNestedIdentityParts { get; } = ApiIdentitySnapshot.Composite
+    (
+        new ApiIdentityPart
+        (
+            Name: "Level1",
+            Snapshot: ApiIdentitySnapshot.Composite
+            (
+                new ApiIdentityPart
+                (
+                    Name: "Level2",
+                    Snapshot: ApiIdentitySnapshot.Composite
+                    (
+                        new ApiIdentityPart
+                        (
+                            Name: "Level3",
+                            Snapshot: ApiIdentitySnapshot.Composite
+                            (
+                                new ApiIdentityPart
+                                (
+                                    Name: "Level4",
+                                    Snapshot: ApiIdentitySnapshot.Scalar(ApiId.FromString("DeepValue"))
+                                ),
+                                new ApiIdentityPart
+                                (
+                                    Name: "SequenceNumber",
+                                    Snapshot: ApiIdentitySnapshot.Scalar(ApiId.FromInt32(42))
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        ),
+        new ApiIdentityPart
+        (
+            Name: "RootId",
+            Snapshot: ApiIdentitySnapshot.Scalar(ApiId.FromGuid(Guid.Parse("12345678-1234-1234-1234-123456789abc")))
+        )
+    );
+
+    protected static ApiId CompositeSnapshotWithResolvedDeeplyNestedIdentityPartsToNamedCompositeApiId { get; } = ApiId.Composite
+    (
+        ApiIdPart.Create("Level1.Level2.Level3.Level4", ApiId.FromString("DeepValue")),
+        ApiIdPart.Create("Level1.Level2.Level3.SequenceNumber", ApiId.FromInt32(42)),
+        ApiIdPart.Create("RootId", ApiId.FromGuid(Guid.Parse("12345678-1234-1234-1234-123456789abc")))
+    );
+
+    protected static ApiId CompositeSnapshotWithResolvedDeeplyNestedIdentityPartsToUnnamedCompositeApiId { get; } = ApiId.Composite
+    (
+        ApiIdPart.Create(ApiId.FromString("DeepValue")),
+        ApiIdPart.Create(ApiId.FromInt32(42)),
+        ApiIdPart.Create(ApiId.FromGuid(Guid.Parse("12345678-1234-1234-1234-123456789abc")))
+    );
     #endregion
 }

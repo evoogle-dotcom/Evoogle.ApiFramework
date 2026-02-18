@@ -239,8 +239,8 @@ public partial class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(o
         #region Calculated Properties
         private ApiSchema? ApiSchema { get; set; }
         private ApiObjectType? ApiObjectType { get; set; }
-        private bool ActualResult { get; set; }
-        private ApiId ActualId { get; set; }
+        private bool? ActualResult { get; set; }
+        private ApiId? ActualId { get; set; }
         #endregion
 
         #region XUnitTest Methods
@@ -301,8 +301,8 @@ public partial class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(o
         #region Calculated Properties
         private ApiSchema? ApiSchema { get; set; }
         private ApiObjectType? ApiObjectType { get; set; }
-        private bool ActualResult { get; set; }
-        private ApiId ActualId { get; set; }
+        private bool? ActualResult { get; set; }
+        private ApiId? ActualId { get; set; }
         #endregion
 
         #region XUnitTest Methods
@@ -457,7 +457,7 @@ public partial class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(o
         #region Calculated Properties
         private ApiSchema? ApiSchema { get; set; }
         private ApiObjectType? ApiObjectType { get; set; }
-        private bool ActualResult { get; set; }
+        private bool? ActualResult { get; set; }
         private IReadOnlyDictionary<object, ApiId>? ActualMap { get; set; }
         #endregion
 

@@ -28,7 +28,7 @@ public enum ApiIdKind : byte
     ///     Equivalent to <c>default(<see cref="ApiId"/>)</c> or <see cref="ApiId.Empty"/>.
     ///     Used to indicate the absence of an identifier value.
     /// </remarks>
-    None,
+    Empty,
 
     /// <summary>
     ///     Represents a composite identifier composed of multiple scalar <see cref="ApiId"/> parts.
@@ -81,7 +81,7 @@ public enum ApiIdKind : byte
     /// </summary>
     /// <remarks>
     ///     String identifiers use ordinal (case-sensitive) comparison for equality and ordering.
-    ///     Null strings are treated as <see cref="None"/>.
+    ///     Null strings are treated as <see cref="Empty"/>.
     /// </remarks>
     String,
 

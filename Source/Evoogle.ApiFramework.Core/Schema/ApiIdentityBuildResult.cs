@@ -17,7 +17,7 @@ namespace Evoogle.ApiFramework.Schema;
 ///     var results = objectType.TryBuildIdentities(instances);
 ///     var successes = results.Where(r => r.Success);
 ///     var failures = results.Where(r => !r.Success);
-///     
+///
 ///     foreach (var result in results)
 ///     {
 ///         if (result.Success)

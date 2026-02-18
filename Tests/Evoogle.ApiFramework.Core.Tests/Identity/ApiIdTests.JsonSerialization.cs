@@ -15,13 +15,13 @@ public partial class ApiIdTests
         // Empty
         new JsonDeserializeTest
         {
-            Name = "None",
+            Name = "Empty",
             SourceJson = "null",
             ExpectedFactoryArgument = new ApiIdDescriptor
             (
                 ScalarConfig: new ApiIdScalarConfig
                 (
-                    Kind: ApiIdKind.None
+                    Kind: ApiIdKind.Empty
                 )
             )
         },
@@ -295,12 +295,12 @@ public partial class ApiIdTests
         // Empty
         new JsonRoundtripTest
         {
-            Name = "None",
+            Name = "Empty",
             ExpectedFactoryArgument = new ApiIdDescriptor
             (
                 ScalarConfig: new ApiIdScalarConfig
                 (
-                    Kind: ApiIdKind.None
+                    Kind: ApiIdKind.Empty
                 )
             )
         },
@@ -561,12 +561,12 @@ public partial class ApiIdTests
         // Empty
         new JsonSerializeTest
         {
-            Name = "None",
+            Name = "Empty",
             SourceFactoryArgument = new ApiIdDescriptor
             (
                 ScalarConfig: new ApiIdScalarConfig
                 (
-                    Kind: ApiIdKind.None
+                    Kind: ApiIdKind.Empty
                 )
             ),
             ExpectedJson = "null"

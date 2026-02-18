@@ -3,97 +3,48 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Text.Json.Serialization;
+
+using Evoogle.ApiFramework.Identity.Json;
+
 namespace Evoogle.ApiFramework.Identity;
 
 /// <summary>
-///     Represents an ordered blueprint entry for an identity snapshot part.
-///     The order of entries determines both snapshot stringification and ApiId flattening.
+///     Represents a named part of a composite identity snapshot.
 /// </summary>
-public readonly record struct ApiIdentityPartEntry(
-    string Name,
-    ApiIdentityPart Part,
-    IReadOnlyList<ApiIdentityPartEntry> NestedBlueprint
-);
-
-/// <summary>
-///     Specifies the kind of identity part.
-/// </summary>
-public enum ApiIdentityPartKind
-{
-    /// <summary>
-    ///     A scalar identity value (ApiId).
-    /// </summary>
-    Scalar,
-
-    /// <summary>
-    ///     A nested identity snapshot (ApiIdentitySnapshot).
-    /// </summary>
-    Nested,
-
-    /// <summary>
-    ///     An unresolved nested identity snapshot (ApiIdentitySnapshot).
-    /// </summary>
-    UnresolvedNested
-}
-
-/// <summary>
-///     Represents a single part within an identity snapshot, which can be a scalar value,
-///     a nested snapshot, or an unresolved nested identity.
-/// </summary>
+/// <param name="Name">
+///     The name of this identity part (property name for nested objects).
+/// </param>
+/// <param name="Snapshot">
+///     The nested identity snapshot, or null if the part is unresolved.
+/// </param>
+/// <param name="Structure">
+///     The structural definition of this part's children.
+///     Used to emit correct ApiId structure when Snapshot is null and UnresolvedPartBehavior is UseEmpty.
+///     Null for scalar leaf parts.
+/// </param>
+[JsonConverter(typeof(ApiIdentityPartJsonConverter))]
 public readonly record struct ApiIdentityPart
+(
+    string Name,
+    ApiIdentitySnapshot? Snapshot,
+    IReadOnlyList<ApiIdentityPart>? Structure = null
+)
 {
-    private ApiIdentityPart(ApiIdentityPartKind kind, ApiId? scalarValue, ApiIdentitySnapshot? nestedSnapshot)
-    {
-        this.Kind = kind;
-        this.ScalarValue = scalarValue;
-        this.NestedSnapshot = nestedSnapshot;
-    }
+    #region Properties
+    /// <summary>
+    ///     Gets whether this part is resolved (has a non-null snapshot).
+    /// </summary>
+    public bool IsResolved => this.Snapshot is not null;
 
     /// <summary>
-    ///     Gets the kind of this identity part.
+    ///     Gets whether this part is unresolved (has a null snapshot).
     /// </summary>
-    public ApiIdentityPartKind Kind { get; init; }
+    public bool IsUnresolved => this.Snapshot is null;
 
     /// <summary>
-    ///     Gets the scalar value if this is a scalar part; otherwise null.
+    ///     Gets whether this part has structural definition information.
     /// </summary>
-    public ApiId? ScalarValue { get; init; }
-
-    /// <summary>
-    ///     Gets the nested snapshot if this is a nested part; otherwise null.
-    /// </summary>
-    public ApiIdentitySnapshot? NestedSnapshot { get; init; }
-
-    /// <summary>
-    ///     Creates a scalar identity part from an ApiId.
-    /// </summary>
-    /// <param name="scalarValue">The scalar ApiId value.</param>
-    /// <returns>A scalar identity part.</returns>
-    public static ApiIdentityPart Scalar(ApiId scalarValue) =>
-        new(ApiIdentityPartKind.Scalar, scalarValue, null);
-
-    /// <summary>
-    ///     Creates a nested identity part from a snapshot.
-    /// </summary>
-    /// <param name="nestedSnapshot">The nested identity snapshot.</param>
-    /// <returns>A nested identity part.</returns>
-    public static ApiIdentityPart Nested(ApiIdentitySnapshot nestedSnapshot)
-    {
-        ArgumentNullException.ThrowIfNull(nestedSnapshot);
-        return new(ApiIdentityPartKind.Nested, null, nestedSnapshot);
-    }
-
-    /// <summary>
-    ///     Creates an unresolved nested identity part.
-    /// </summary>
-    /// <returns>An unresolved nested identity part.</returns>
-    public static ApiIdentityPart UnresolvedNested() =>
-        new(ApiIdentityPartKind.UnresolvedNested, null, null);
-
-    /// <summary>
-    ///     Creates an empty scalar identity part.
-    /// </summary>
-    /// <returns>An empty scalar identity part.</returns>
-    public static ApiIdentityPart EmptyScalar() =>
-        new(ApiIdentityPartKind.Scalar, ApiId.Empty, null);
+    public bool HasStructure => this.Structure is not null && this.Structure.Count > 0;
+    #endregion
 }

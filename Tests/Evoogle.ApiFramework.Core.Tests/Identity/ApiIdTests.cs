@@ -180,7 +180,7 @@ public partial class ApiIdTests(ITestOutputHelper output) : XUnitTests(output)
                     ApiIdKind.Composite,
                     default,
                     partCollection,
-                    ApiId.ToDebugString(partCollection)
+                    ApiId.ToCompositeString(partCollection)
                 );
                 return apiId;
             }
@@ -334,7 +334,7 @@ public partial class ApiIdTests(ITestOutputHelper output) : XUnitTests(output)
         #endregion
 
         #region Calculated Properties
-        private bool ActualResult { get; set; }
+        private bool? ActualResult { get; set; }
         private ApiId? ActualApiId { get; set; }
         #endregion
 
@@ -434,8 +434,6 @@ public partial class ApiIdTests(ITestOutputHelper output) : XUnitTests(output)
     public const string TestUlidString = "46TQ8TKV0M8WR8V6J1G4Q5M4BT";
     public static Ulid TestUlid { get; } = Ulid.Parse(TestUlidString);
     private static ApiId TestUlidApiId { get; } = ApiId.FromUlid(TestUlid);
-
-
     #endregion
 
     #region Helper Methods
@@ -446,7 +444,7 @@ public partial class ApiIdTests(ITestOutputHelper output) : XUnitTests(output)
             var scalarConfig = descriptor.ScalarConfig;
             return scalarConfig.Kind switch
             {
-                ApiIdKind.None => ApiId.Empty,
+                ApiIdKind.Empty => ApiId.Empty,
                 ApiIdKind.Culture when scalarConfig.CultureValue != null => ApiId.FromCulture(scalarConfig.CultureValue),
                 ApiIdKind.Guid when scalarConfig.GuidValue != null => ApiId.FromGuid(scalarConfig.GuidValue.Value),
                 ApiIdKind.Int32 when scalarConfig.Int32Value != null => ApiId.FromInt32(scalarConfig.Int32Value.Value),

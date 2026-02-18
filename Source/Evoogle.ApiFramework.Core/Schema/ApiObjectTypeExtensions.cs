@@ -226,7 +226,7 @@ public static class ApiObjectTypeExtensions
     /// <exception cref="InvalidOperationException">Thrown when the object type has no primary identity configured.</exception>
     /// <exception cref="ApiIdentityException">Thrown when type coercion fails or null handling requires throwing.</exception>
     /// <remarks>
-    ///     This is a convenience method equivalent to calling <see cref="GetIdentity(ApiObjectType, object, string?)"/> 
+    ///     This is a convenience method equivalent to calling <see cref="GetIdentity(ApiObjectType, object, string?)"/>
     ///     with <c>apiIdentityName</c> set to <c>null</c>.
     /// </remarks>
     public static ApiId GetPrimaryIdentity(this ApiObjectType apiObjectType, object clrInstance)
@@ -327,7 +327,7 @@ public static class ApiObjectTypeExtensions
     ///     <list type="bullet">
     ///         <item><description>Never throws exceptions - returns empty list or partial results</description></item>
     ///         <item><description>Null instances are skipped</description></item>
-    ///         <item><description>Failed builds are indicated with <c>Success = false</c> and <c>Id = ApiId.Empty</c></description></item>
+    ///         <item><description>Failed builds are indicated with <c>Success = false</c> and <c>Id = ApiId.None</c></description></item>
     ///         <item><description>Returns instance-identity-success tuples for easy correlation</description></item>
     ///     </list>
     ///     <para><b>Validation Example:</b></para>
@@ -349,7 +349,7 @@ public static class ApiObjectTypeExtensions
     /// <param name="id">When this method returns, contains the identity if successful; otherwise, <see cref="ApiId.Empty"/>.</param>
     /// <returns><c>true</c> if the identity was retrieved successfully; otherwise, <c>false</c>.</returns>
     /// <remarks>
-    ///     This is a convenience method equivalent to calling <see cref="ApiObjectType.TryGetIdentity(object, out ApiId, string?)"/> 
+    ///     This is a convenience method equivalent to calling <see cref="ApiObjectType.TryGetIdentity(object, out ApiId, string?)"/>
     ///     with <c>apiIdentityName</c> set to <c>null</c>.
     /// </remarks>
     public static bool TryGetPrimaryIdentity(this ApiObjectType apiObjectType, object clrInstance, out ApiId id)
