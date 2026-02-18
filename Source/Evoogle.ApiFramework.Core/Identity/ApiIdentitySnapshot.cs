@@ -63,9 +63,13 @@ public sealed record ApiIdentitySnapshot
     #endregion
 
     #region Fields
-    // Thread-safe caches (boxed ApiId). Cached only for unresolvedBehavior == Throw.
-    private object? _cachedNamedApiIdBox;
-    private object? _cachedUnnamedApiIdBox;
+    // Thread-safe caches (no boxing). Cached only for unresolvedBehavior == Throw.
+    // State: 0 = empty, 1 = writing, 2 = ready
+    private int _cachedNamedApiIdState;
+    private int _cachedUnnamedApiIdState;
+
+    private ApiId _cachedNamedApiId;
+    private ApiId _cachedUnnamedApiId;
     #endregion
 
     #region Properties
@@ -391,13 +395,19 @@ public sealed record ApiIdentitySnapshot
         // Thread-safe cache lookup (only for default behavior)
         if (unresolvedBehavior == ApiUnresolvedIdentityPartBehavior.Throw)
         {
-            var cachedBox = useNamedParts
-                ? Volatile.Read(ref _cachedNamedApiIdBox)
-                : Volatile.Read(ref _cachedUnnamedApiIdBox);
-
-            if (cachedBox is ApiId cached)
+            if (useNamedParts)
             {
-                return cached;
+                if (Volatile.Read(ref _cachedNamedApiIdState) == 2)
+                {
+                    return _cachedNamedApiId;
+                }
+            }
+            else
+            {
+                if (Volatile.Read(ref _cachedUnnamedApiIdState) == 2)
+                {
+                    return _cachedUnnamedApiId;
+                }
             }
         }
 
@@ -408,15 +418,36 @@ public sealed record ApiIdentitySnapshot
         {
             if (useNamedParts)
             {
-                Interlocked.CompareExchange(ref _cachedNamedApiIdBox, apiId, null);
+                TryPublishCache(apiId, ref _cachedNamedApiId, ref _cachedNamedApiIdState);
             }
             else
             {
-                Interlocked.CompareExchange(ref _cachedUnnamedApiIdBox, apiId, null);
+                TryPublishCache(apiId, ref _cachedUnnamedApiId, ref _cachedUnnamedApiIdState);
             }
         }
 
         return apiId;
+    }
+
+    private static void TryPublishCache(ApiId value, ref ApiId cache, ref int state)
+    {
+        // Fast path: already published.
+        if (Volatile.Read(ref state) == 2)
+        {
+            return;
+        }
+
+        // Become the single publisher.
+        if (Interlocked.CompareExchange(ref state, 1, 0) != 0)
+        {
+            // Someone else is publishing or it's already published.
+            return;
+        }
+
+        cache = value;
+
+        // Publish: make the value visible before state becomes 'ready'.
+        Volatile.Write(ref state, 2);
     }
 
     /// <summary>
