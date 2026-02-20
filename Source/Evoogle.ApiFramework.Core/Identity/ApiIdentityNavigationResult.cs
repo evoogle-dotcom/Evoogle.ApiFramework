@@ -204,7 +204,7 @@ public class ApiIdentityNavigationResult
     /// <exception cref="KeyNotFoundException">If the part was not found.</exception>
     public void ThrowIfFailed()
     {
-        if (this.IsSuccess || this.IsSynthetic)
+        if (this.IsSuccess)
         {
             return;
         }

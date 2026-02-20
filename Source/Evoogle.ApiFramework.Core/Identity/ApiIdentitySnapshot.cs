@@ -294,82 +294,21 @@ public sealed record ApiIdentitySnapshot
 
     #region Methods
     /// <summary>
-    ///     Gets the scalar ApiId value. Throws if not scalar.
-    /// </summary>
-    /// <returns>The scalar ApiId value.</returns>
-    /// <exception cref="ApiIdentityException">If this is not a scalar snapshot.</exception>
-    public ApiId GetScalarValue()
-    {
-        if (this.Kind != ApiIdentitySnapshotKind.Scalar)
-        {
-            throw new ApiIdentityException($"Cannot get scalar value from composite snapshot at path '{this.Path}'.");
-        }
-
-        return this.ScalarValue!.Value;
-    }
-
-    /// <summary>
-    ///     Gets the scalar value converted to type T.
-    /// </summary>
-    /// <typeparam name="T">The target type (must be a value type supported by ApiId).</typeparam>
-    /// <returns>The scalar value as type T.</returns>
-    /// <exception cref="ApiIdentityException">If this is not a scalar snapshot.</exception>
-    public T GetScalarValue<T>() where T : struct
-    {
-        var apiId = this.GetScalarValue();
-
-        // Use ApiId's built-in conversion logic
-        if (typeof(T) == typeof(int) && apiId.TryGet(out int intVal))
-        {
-            return (T)(object)intVal;
-        }
-        if (typeof(T) == typeof(long) && apiId.TryGet(out long longVal))
-        {
-            return (T)(object)longVal;
-        }
-        if (typeof(T) == typeof(Guid) && apiId.TryGet(out Guid guidVal))
-        {
-            return (T)(object)guidVal;
-        }
-        if (typeof(T) == typeof(Ulid) && apiId.TryGet(out Ulid ulidVal))
-        {
-            return (T)(object)ulidVal;
-        }
-
-        throw new ApiIdentityException($"Cannot convert ApiId of kind {apiId.Kind} to type {typeof(T).Name}.");
-    }
-
-    /// <summary>
     ///     Gets all unresolved nestedPart paths in this snapshot tree.
     /// </summary>
     /// <returns>A read-only list of dot-separated paths to unresolved parts.</returns>
-    public IReadOnlyList<string> GetUnresolvedParts()
+    public string[] GetUnresolvedParts()
     {
-        var unresolved = new List<string>();
-        CollectUnresolvedParts(this, unresolved);
-        return unresolved;
-    }
-
-    /// <summary>
-    ///     Navigates to a nested part by dot-separated path.
-    /// </summary>
-    /// <param name="path">
-    ///     A dot-separated path (e.g., "Customer.Country.Id").
-    ///     Single-segment paths like "Customer" navigate one level deep.
-    /// </param>
-    /// <returns>The nested identity snapshot.</returns>
-    /// <exception cref="ArgumentException">If the path is invalid or contains empty segments.</exception>
-    /// <exception cref="ApiIdentityException">If attempting to navigate into a scalar snapshot or the part is unresolved without structure.</exception>
-    /// <exception cref="KeyNotFoundException">If the specified part is not found.</exception>
-    public ApiIdentitySnapshot Navigate(string path)
-    {
-        var result = this.TryNavigate(path);
-        if (!result)
+        // Fast path: nothing to collect
+        if (this.Kind == ApiIdentitySnapshotKind.Scalar || this.NestedParts is null || this.NestedParts.Length == 0)
         {
-            result.ThrowIfFailed();
+            return [];
         }
 
-        return result.Snapshot!;
+        var unresolved = new List<string>(capacity: this.NestedParts.Length);
+        CollectUnresolvedParts(this, unresolved);
+
+        return unresolved.Count == 0 ? [] : [.. unresolved];
     }
 
     /// <summary>
@@ -429,30 +368,7 @@ public sealed record ApiIdentitySnapshot
         return apiId;
     }
 
-    private static void TryPublishCache(ApiId value, ref ApiId cache, ref int state)
-    {
-        // Fast path: already published.
-        if (Volatile.Read(ref state) == 2)
-        {
-            return;
-        }
-
-        // Become the single publisher.
-        if (Interlocked.CompareExchange(ref state, 1, 0) != 0)
-        {
-            // Someone else is publishing or it's already published.
-            return;
-        }
-
-        cache = value;
-
-        // Publish: make the value visible before state becomes 'ready'.
-        Volatile.Write(ref state, 2);
-    }
-
-    /// <summary>
-    ///     Returns a string representation of this snapshot.
-    /// </summary>
+    /// <inheritdoc/>
     public override string ToString()
     {
         try
@@ -468,6 +384,37 @@ public sealed record ApiIdentitySnapshot
     }
 
     /// <summary>
+    ///     Attempts to get the scalar <see cref="ApiId"/> value at the specified dot-separated path.
+    /// </summary>
+    /// <param name="path">A dot-separated path (e.g., "Customer.Country.Id").</param>
+    /// <param name="value">
+    ///     The scalar <see cref="ApiId"/> value if the snapshot at <paramref name="path"/> is scalar;
+    ///     otherwise <see cref="ApiId.Empty"/>.
+    /// </param>
+    /// <returns>
+    ///     <see langword="true"/> if navigation succeeded and the target snapshot is scalar; otherwise <see langword="false"/>.
+    /// </returns>
+    public (bool Success, ApiIdentityNavigationResult NavigationResult) TryGetScalarValue(string path, out ApiId value)
+    {
+        var navigationResult = this.TryNavigate(path);
+        if (!navigationResult)
+        {
+            value = ApiId.Empty;
+            return (false, navigationResult);
+        }
+
+        var snapshot = navigationResult.Snapshot!;
+        if (snapshot.Kind == ApiIdentitySnapshotKind.Scalar)
+        {
+            value = snapshot.ScalarValue!.Value;
+            return (true, navigationResult);
+        }
+
+        value = ApiId.Empty;
+        return (false, navigationResult);
+    }
+
+    /// <summary>
     ///     Attempts to navigate to a nested part by dot-separated path without throwing exceptions.
     /// </summary>
     /// <param name="path">
@@ -479,7 +426,7 @@ public sealed record ApiIdentitySnapshot
     {
         if (string.IsNullOrWhiteSpace(path))
         {
-            return ApiIdentityNavigationResult.InvalidSegment(path ?? string.Empty, path ?? string.Empty);
+            return ApiIdentityNavigationResult.InvalidSegment(string.Empty, string.Empty);
         }
 
         if (this.Kind == ApiIdentitySnapshotKind.Scalar)
@@ -573,11 +520,39 @@ public sealed record ApiIdentitySnapshot
 
             if (nestedPart.Snapshot is null)
             {
-                output.Add(partPath);
+                // If structure is available, recurse into it to find leaf-level unresolved paths
+                if (nestedPart.Structure is not null && nestedPart.Structure.Count > 0)
+                {
+                    CollectUnresolvedPartsFromStructure(nestedPart.Structure, partPath, output);
+                }
+                else
+                {
+                    // No structure info - the part itself is the unresolved leaf
+                    output.Add(partPath);
+                }
             }
             else
             {
                 CollectUnresolvedParts(nestedPart.Snapshot, output);
+            }
+        }
+    }
+
+    private static void CollectUnresolvedPartsFromStructure(IReadOnlyList<ApiIdentityPart> structure, string currentPath, List<string> output)
+    {
+        foreach (var structurePart in structure)
+        {
+            var partPath = $"{currentPath}.{structurePart.Name}";
+
+            if (structurePart.Structure is not null && structurePart.Structure.Count > 0)
+            {
+                // Composite structure node - recurse deeper
+                CollectUnresolvedPartsFromStructure(structurePart.Structure, partPath, output);
+            }
+            else
+            {
+                // Leaf scalar in structure - this is the actual unresolved path
+                output.Add(partPath);
             }
         }
     }
@@ -716,6 +691,27 @@ public sealed record ApiIdentitySnapshot
         FlattenRecursive(this, flatParts, useNamedParts, unresolvedBehavior);
 
         return ApiId.Composite(flatParts);
+    }
+
+    private static void TryPublishCache(ApiId value, ref ApiId cache, ref int state)
+    {
+        // Fast path: already published.
+        if (Volatile.Read(ref state) == 2)
+        {
+            return;
+        }
+
+        // Become the single publisher.
+        if (Interlocked.CompareExchange(ref state, 1, 0) != 0)
+        {
+            // Someone else is publishing or it's already published.
+            return;
+        }
+
+        cache = value;
+
+        // Publish: make the value visible before state becomes 'ready'.
+        Volatile.Write(ref state, 2);
     }
     #endregion
 
