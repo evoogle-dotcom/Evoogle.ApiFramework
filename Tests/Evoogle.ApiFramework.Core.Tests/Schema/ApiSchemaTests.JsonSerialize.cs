@@ -671,9 +671,9 @@ public partial class ApiSchemaTests
                                 new ApiIdentityConfig
                                 (
                                     ApiName: "PK_Person_Id",
-                                    ApiIdentityParts:
+                                    ApiIdentitySources:
                                     [
-                                        new ApiIdentityPartConfig
+                                        new ApiIdentitySourceConfig
                                         (
                                             ApiPropertyName: nameof(Person.Id)
                                         )
@@ -682,9 +682,9 @@ public partial class ApiSchemaTests
                                 new ApiIdentityConfig
                                 (
                                     ApiName: "AK_Person_Name",
-                                    ApiIdentityParts:
+                                    ApiIdentitySources:
                                     [
-                                        new ApiIdentityPartConfig
+                                        new ApiIdentitySourceConfig
                                         (
                                             ApiPropertyName: nameof(Person.Name)
                                         )
@@ -979,9 +979,9 @@ public partial class ApiSchemaTests
                                 new ApiIdentityConfig
                                 (
                                     ApiName: "PK_Person_Id",
-                                    ApiIdentityParts:
+                                    ApiIdentitySources:
                                     [
-                                        new ApiIdentityPartConfig
+                                        new ApiIdentitySourceConfig
                                         (
                                             ApiPropertyName: nameof(Person.Id)
                                         )
@@ -990,9 +990,9 @@ public partial class ApiSchemaTests
                                 new ApiIdentityConfig
                                 (
                                     ApiName: "AK_Person_Name",
-                                    ApiIdentityParts:
+                                    ApiIdentitySources:
                                     [
-                                        new ApiIdentityPartConfig
+                                        new ApiIdentitySourceConfig
                                         (
                                             ApiPropertyName: nameof(Person.Name)
                                         )
@@ -1294,21 +1294,21 @@ public partial class ApiSchemaTests
                                 new ApiIdentityConfig
                                 (
                                     ApiName: "PK_Company_Id",
-                                    ApiIdentityParts:
+                                    ApiIdentitySources:
                                     [
-                                        new ApiIdentityPartConfig
+                                        new ApiIdentitySourceConfig
                                         (
                                             ApiPropertyName: nameof(Company.Id),
-                                            ClrConfiguredIdType: typeof(string)
+                                            ClrScalarType: typeof(string)
                                         )
                                     ]
                                 ),
                                 new ApiIdentityConfig
                                 (
                                     ApiName: "AK_Company_Name",
-                                    ApiIdentityParts:
+                                    ApiIdentitySources:
                                     [
-                                        new ApiIdentityPartConfig
+                                        new ApiIdentitySourceConfig
                                         (
                                             ApiPropertyName: nameof(Company.Name)
                                         )
@@ -1383,9 +1383,9 @@ public partial class ApiSchemaTests
                                 new ApiIdentityConfig
                                 (
                                     ApiName: "PK_Person_Id",
-                                    ApiIdentityParts:
+                                    ApiIdentitySources:
                                     [
-                                        new ApiIdentityPartConfig
+                                        new ApiIdentitySourceConfig
                                         (
                                             ApiPropertyName: nameof(Person.Id)
                                         )
@@ -1394,9 +1394,9 @@ public partial class ApiSchemaTests
                                 new ApiIdentityConfig
                                 (
                                     ApiName: "AK_Person_Name",
-                                    ApiIdentityParts:
+                                    ApiIdentitySources:
                                     [
-                                        new ApiIdentityPartConfig
+                                        new ApiIdentitySourceConfig
                                         (
                                             ApiPropertyName: nameof(Person.Name)
                                         )
@@ -1524,7 +1524,7 @@ public partial class ApiSchemaTests
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiPropertyName"": ""Id"",
-					                    ""ClrConfiguredIdType"": ""System.String,System.Private.CoreLib""
+					                    ""ClrScalarType"": ""System.String,System.Private.CoreLib""
                                     }
                                 ]
                             },

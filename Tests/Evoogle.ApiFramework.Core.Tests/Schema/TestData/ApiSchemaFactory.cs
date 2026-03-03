@@ -75,13 +75,13 @@ public static class ApiSchemaFactory
     public record ApiIdentityConfig
     (
         string ApiName,
-        List<ApiIdentityPartConfig> ApiIdentityParts
+        List<ApiIdentitySourceConfig> ApiIdentitySources
     );
 
-    public record ApiIdentityPartConfig
+    public record ApiIdentitySourceConfig
     (
         string ApiPropertyName,
-        Type? ClrConfiguredIdType = null
+        Type? ClrScalarType = null
     );
 
     public record ApiPropertyConfig
@@ -257,7 +257,7 @@ public static class ApiSchemaFactory
         };
 
     private static ApiIdentity I(string name, IEnumerable<string> propertyNames)
-        => new(name, propertyNames.Select(pn => new ApiIdentityPart(pn)));
+        => new(name, propertyNames.Select(sn => new ApiIdentitySource(sn)));
 
     private static ApiObjectType O(string name, Type clr, IEnumerable<ApiProperty> properties, IEnumerable<ApiIdentity>? identities = null, IEnumerable<ApiRelationship>? relationships = null, ApiObjectTypeOptions? options = null, OrderedDictionary<Type, object>? extensions = null)
         => new(name, options, identities, properties, relationships ?? [], clr)
@@ -839,7 +839,7 @@ public static class ApiSchemaFactory
                     var apiIdentity = new ApiIdentity
                     (
                         apiName: x.ApiName,
-                        apiIdentityParts: x.ApiIdentityParts.Select(part => new ApiIdentityPart(part.ApiPropertyName, part.ClrConfiguredIdType))
+                        apiIdentitySources: x.ApiIdentitySources.Select(part => new ApiIdentitySource(part.ApiPropertyName, part.ClrScalarType))
                     );
                     return apiIdentity;
                 });

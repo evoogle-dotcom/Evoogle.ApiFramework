@@ -24,12 +24,24 @@ public static class Dummy
     }
 
     /// <summary>
+    ///     Represents a country domain model that is used by the sample schema builder extensions.
+    /// </summary>
+    public class Country
+    {
+        /// <summary>Gets or sets the ISO country code.</summary>
+        public string Code { get; set; } = "us";
+    }
+
+    /// <summary>
     ///     Represents a customer domain model that is used by the sample schema builder extensions.
     /// </summary>
     public class Customer
     {
         /// <summary>Gets or sets the unique customer identifier.</summary>
         public Guid Id { get; set; }
+
+        /// <summary>Gets or sets the customer's country.</summary>
+        public Country Country { get; set; } = new Country();
 
         /// <summary>Gets or sets the customer's display name.</summary>
         public string Name { get; set; } = string.Empty;
@@ -154,12 +166,19 @@ public static class Dummy
             .AddScalar(typeof(EmailAddress), x => x
                 .WithName("EmailAddress"))
                 .AddExtension(new VisibleMetadata { Visible = true })
+            .AddObject(typeof(Country), x => x
+                .WithName("Country")
+                .AddIdentity("PrimaryKey", identity => identity
+                    .AddScalar("Code")))
             .AddObject(typeof(Customer), x => x
                 .WithName("Customer")
                 .WithOptions(o => o
                     .WithIdentityNullHandling(ApiIdentityNullHandling.ThrowException))
                 .AddIdentity("PrimaryKey", identity => identity
-                    .AddPart("Id"))
+                    .AddScalar("Id"))
+                .AddIdentity("AlternateKey", identity => identity
+                    .AddNested("Country")
+                    .AddScalar("Name"))
                 .AddProperty("Id", "Id", p => p.WithModifiers(m => m.Required()))
                 .AddProperty("Name", "Name", p => p.WithModifiers(m => m.Required()).AddExtension(new VisibleMetadata { Visible = true }))
                 .AddProperty("Email", "Email", p => p.WithModifiers(m => m.Optional()))
@@ -179,8 +198,8 @@ public static class Dummy
                 .WithName("OrderItem")
                 .WithDefaultOptions()
                 .AddIdentity("PrimaryKey", identity => identity
-                    .AddPart("OrderId")
-                    .AddPart("LineItemNumber"))
+                    .AddScalar("OrderId", x => x.AddExtension(new VisibleMetadata { Visible = true }))
+                    .AddScalar("LineItemNumber", typeof(long)))
                 .AddProperty("OrderId", "OrderId", p => p.WithModifiers(m => m.Required()))
                 .AddProperty("LineItemNumber", "LineItemNumber", p => p.WithModifiers(m => m.Required()))
                 .AddProperty("ProductName", "ProductName", p => p.WithModifiers(m => m.Required()))

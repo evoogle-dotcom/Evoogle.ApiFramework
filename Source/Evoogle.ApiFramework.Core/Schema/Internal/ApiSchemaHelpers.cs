@@ -98,10 +98,24 @@ internal static class ApiSchemaHelpers
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static T ThrowIfNotInitialized<T>(this object obj, T? value)
+        where T : class
     {
         if (value is not null)
         {
             return value;
+        }
+
+        var objectType = obj.GetType();
+        throw new ApiSchemaException($"{objectType.SafeToName()} has not been initialized. Initialize the {nameof(ApiSchema)} before accessing.");
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static T ThrowIfNotInitialized<T>(this object obj, T? value)
+        where T : struct
+    {
+        if (value.HasValue)
+        {
+            return value.Value;
         }
 
         var objectType = obj.GetType();

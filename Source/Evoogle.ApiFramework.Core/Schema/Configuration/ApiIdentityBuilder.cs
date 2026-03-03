@@ -16,40 +16,55 @@ public class ApiIdentityBuilder(string apiName) : ExtensionBuilder<ApiIdentityBu
 {
     #region Fields
     private readonly string _apiName = apiName;
-    private readonly List<ApiIdentityPartBuilder> _apiIdentityPartBuilders = [];
+    private readonly List<ApiIdentitySourceBuilder> _apiIdentitySourceBuilders = [];
     #endregion
 
     #region Builder Methods
-    /// <summary>
-    ///     Adds an identity part (property) to this identity.
-    /// </summary>
-    /// <param name="apiPropertyName">The API property name that is part of the identity.</param>
-    /// <param name="clrConfiguredIdType">Optional user configured CLR type for the identity part. If not provided, the type is inferred from the resolved property.</param>
-    /// <param name="configure">Optional callback to configure the added identity part.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiIdentityBuilder AddPart(string apiPropertyName, Type? clrConfiguredIdType = null, Action<ApiIdentityPartBuilder>? configure = null)
+    public ApiIdentityBuilder AddSource(string apiPropertyName, Type? clrScalarType = null, string? apiNestedName = null, Action<ApiIdentitySourceBuilder>? configure = null)
     {
-        var apiIdentityPartBuilder = new ApiIdentityPartBuilder(apiPropertyName, clrConfiguredIdType);
+        var apiIdentitySourceBuilder = new ApiIdentitySourceBuilder(apiPropertyName, clrScalarType, apiNestedName);
 
-        configure?.Invoke(apiIdentityPartBuilder);
+        configure?.Invoke(apiIdentitySourceBuilder);
 
-        _apiIdentityPartBuilders.Add(apiIdentityPartBuilder);
+        _apiIdentitySourceBuilders.Add(apiIdentitySourceBuilder);
 
         return this;
     }
-    #endregion
 
-    #region Methods
+    public ApiIdentityBuilder AddScalar(string apiPropertyName, Action<ApiIdentitySourceBuilder>? configure = null)
+    {
+        this.AddSource(apiPropertyName, null, null, configure);
+        return this;
+    }
+
+    public ApiIdentityBuilder AddScalar(string apiPropertyName, Type clrScalarType, Action<ApiIdentitySourceBuilder>? configure = null)
+    {
+        this.AddSource(apiPropertyName, clrScalarType, null, configure);
+        return this;
+    }
+
+    public ApiIdentityBuilder AddNested(string apiPropertyName, Action<ApiIdentitySourceBuilder>? configure = null)
+    {
+        this.AddSource(apiPropertyName, null, null, configure);
+        return this;
+    }
+
+    public ApiIdentityBuilder AddNested(string apiPropertyName, string apiNestedName, Action<ApiIdentitySourceBuilder>? configure = null)
+    {
+        this.AddSource(apiPropertyName, null, apiNestedName, configure);
+        return this;
+    }
+
     /// <summary>
     ///     Builds the <see cref="ApiIdentity"/> configured by this builder.
     /// </summary>
     /// <returns>A new <see cref="ApiIdentity"/> instance.</returns>
     internal ApiIdentity Build()
     {
-        var apiIdentityParts = _apiIdentityPartBuilders
+        var apiIdentitySources = _apiIdentitySourceBuilders
             .Select(b => b.Build());
 
-        var apiIdentity = new ApiIdentity(_apiName, apiIdentityParts);
+        var apiIdentity = new ApiIdentity(_apiName, apiIdentitySources);
 
         var extensions = this.BuildExtensions();
         if (extensions != null)

@@ -140,6 +140,15 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
     }
 
     // ApiType
+    private static void WriteApiTypeApiKind(Utf8JsonWriter writer, ApiType apiType, DefaultWriteContext<PropertyNames> context)
+    {
+        var propertyName = context.PropertyNames.ApiType.ApiKind;
+        var kind = apiType.ApiKind;
+        var options = context.Options;
+
+        writer.TryWritePropertyWithConverter(propertyName, kind, options, _apiTypeKindJsonConverter);
+    }
+
     private static void WriteApiTypeClrType(Utf8JsonWriter writer, ApiType apiType, DefaultWriteContext<PropertyNames> context)
     {
         var propertyName = context.PropertyNames.ApiType.ClrType;
@@ -147,15 +156,6 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
         var options = context.Options;
 
         writer.TryWritePropertyWithConverter(propertyName, clrType, options, _typeJsonConverter);
-    }
-
-    private static void WriteApiTypeKind(Utf8JsonWriter writer, ApiType apiType, DefaultWriteContext<PropertyNames> context)
-    {
-        var propertyName = context.PropertyNames.ApiType.ApiKind;
-        var kind = apiType.ApiKind;
-        var options = context.Options;
-
-        writer.TryWritePropertyWithConverter(propertyName, kind, options, _apiTypeKindJsonConverter);
     }
     #endregion
 }

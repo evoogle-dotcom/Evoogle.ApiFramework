@@ -166,12 +166,10 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
 
         var apiType = default(ApiType);
 
-        var kindAsString = readContext.ReadData.ApiType?.ApiKind;
-        var kind = ApiJsonConverterHelpers.GetApiTypeKind(context.Logger, kindAsString);
-
-        if (kind is not null)
+        var apiKind = readContext.ReadData.ApiType?.ApiKind;
+        if (apiKind is not null)
         {
-            switch (kind)
+            switch (apiKind)
             {
                 case ApiTypeKind.Collection:
                     apiType = CreateApiCollectionType(readContext);
@@ -190,9 +188,13 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
                     break;
 
                 default:
-                    readContext.Logger.LogError("Unsupported {Kind} enumeration value: '{KindValue}'", nameof(ApiTypeKind), kind);
+                    readContext.Logger.LogError("Unsupported {Kind} enumeration value: '{KindValue}'", nameof(ApiTypeKind), apiKind);
                     break;
             }
+        }
+        else
+        {
+            readContext.Logger.LogError("Missing {Kind} enumeration value", nameof(ApiType.ApiKind));
         }
 
         if (apiType is null)
@@ -221,11 +223,11 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
         WriteJsonObject(writer, () =>
         {
             // Prolog
-            WriteApiTypeKind(writer, value, writeContext);
+            WriteApiTypeApiKind(writer, value, writeContext);
 
             // Body
-            var kind = value.ApiKind;
-            switch (kind)
+            var apiKind = value.ApiKind;
+            switch (apiKind)
             {
                 case ApiTypeKind.Collection:
                     {
@@ -260,7 +262,7 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
 
                 default:
                     {
-                        throw new JsonException($"Unsupported Kind: {kind}");
+                        throw new JsonException($"Unsupported Kind: {apiKind}");
                     }
             }
 

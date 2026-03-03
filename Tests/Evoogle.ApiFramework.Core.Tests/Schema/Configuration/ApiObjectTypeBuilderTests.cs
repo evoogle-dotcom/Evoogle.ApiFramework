@@ -55,8 +55,8 @@ public class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
 
             this.ApiTypeExpected = apiTypeExpected;
 
-            this.WriteLine($"ApiSchema:      {apiSchema.ApiName.SafeToString()}");
-            this.WriteLine($"ApiObjectType:  {apiTypeExpected.ApiName.SafeToString()}");
+            this.WriteLine($"ApiSchema:     {apiSchema.ApiName.SafeToString()}");
+            this.WriteLine($"ApiObjectType: {apiTypeExpected.ApiName.SafeToString()}");
             this.WriteLine();
             this.WriteLine($"Expected: {this.ApiTypeExpected.SafeToString()}");
         }
@@ -77,9 +77,9 @@ public class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
             {
                 builder.AddIdentity(apiIdentity.ApiName, identityBuilder =>
                 {
-                    foreach (var apiIdentityPart in apiIdentity.ApiIdentityParts)
+                    foreach (var apiIdentitySource in apiIdentity.ApiIdentitySources)
                     {
-                        identityBuilder.AddPart(apiIdentityPart.ApiPropertyName, apiIdentityPart.ClrConfiguredIdType);
+                        identityBuilder.AddSource(apiIdentitySource.ApiPropertyName, apiIdentitySource.ClrScalarType);
                     }
                 });
             }
@@ -130,8 +130,8 @@ public class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
                 this.ApiTypeExpected.As<ApiObjectType>(),
                 opt => opt
                     .Excluding(info => info.Path.Contains(nameof(ApiSchemaElement.ApiPath)))
-                    .Excluding(info => info.DeclaringType == typeof(ApiIdentityPart) && info.Name == nameof(ApiIdentityPart.ApiProperty))
-                    .Excluding(info => info.DeclaringType == typeof(ApiIdentityPart) && info.Name == nameof(ApiIdentityPart.ClrIdType))
+                    // .Excluding(info => info.DeclaringType == typeof(ApiIdentitySource) && info.Name == nameof(ApiIdentitySource.ApiPropertyName))
+                    // .Excluding(info => info.DeclaringType == typeof(ApiIdentitySource) && info.Name == nameof(ApiIdentitySource.ClrScalarType))
                     .Excluding(info => info.DeclaringType == typeof(ApiProperty) && info.Name == nameof(ApiProperty.ApiType))
                     .Excluding(info => info.DeclaringType == typeof(ApiRelationship) && info.Name == nameof(ApiRelationship.ApiProperty))
                     .Excluding(info => info.DeclaringType == typeof(ApiRelationship) && info.Name == nameof(ApiRelationship.ApiCardinality))

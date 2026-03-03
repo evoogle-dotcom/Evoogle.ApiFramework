@@ -67,9 +67,9 @@ public enum ApiInitializationCode
 
     #region ApiIdentity Initialization Codes
     /// <summary>
-    ///     Multiple identity parts reference the same property API name.
+    ///    Multiple identities reference the same property API name in their sources, which may cause ambiguity.
     /// </summary>
-    API_IDENTITY_DUPLICATE_PART_API_PROPERTY_NAME,
+    API_IDENTITY_DUPLICATE_SOURCE_API_PROPERTY_NAME,
 
     /// <summary>
     ///     The identity's API name is null, empty, or whitespace.
@@ -77,36 +77,61 @@ public enum ApiInitializationCode
     API_IDENTITY_INVALID_API_NAME,
 
     /// <summary>
-    ///     The identity has no parts defined.
+    ///     Multiple identity sources reference the same property API name.
     /// </summary>
-    API_IDENTITY_NULL_OR_EMPTY_PARTS,
+    API_IDENTITY_NULL_OR_EMPTY_SOURCES,
     #endregion
 
-    #region ApiIdentityPart Initialization Codes
+    #region ApiIdentitySource Initialization Codes
     /// <summary>
-    ///     An identity part references a property whose type has an identity that creates a circular dependency.
+    ///     An identity source references a property whose type has an identity that creates a circular dependency.
     /// </summary>
-    API_IDENTITY_PART_CIRCULAR_REFERENCE,
+    API_IDENTITY_SOURCE_CIRCULAR_REFERENCE,
 
     /// <summary>
-    ///     The identity part's property API name is null, empty, or whitespace.
+    ///    An identity source references a property whose type has an identity, but the source is being ignored because it is nested within another identity.
     /// </summary>
-    API_IDENTITY_PART_INVALID_API_PROPERTY_NAME,
+    API_IDENTITY_SOURCE_CLR_TYPE_IGNORED_FOR_NESTED,
 
     /// <summary>
-    ///     The scalar CLR type specified for an <see cref="ApiIdentityPart"/> is not compatible with <see cref="ApiId"/>.
+    ///     The identity source's property API name is null, empty, or whitespace.
     /// </summary>
-    API_IDENTITY_PART_INVALID_SCALAR_TYPE,
+    API_IDENTITY_SOURCE_INVALID_API_PROPERTY_NAME,
 
     /// <summary>
-    ///     An identity part uses a property CLR type that may have performance implications for identity operations.
+    ///     The scalar CLR type specified for an <see cref="ApiIdentitySource"/> is not compatible with <see cref="ApiId"/>.
     /// </summary>
-    API_IDENTITY_PART_PERFORMANCE_CONCERN,
+    API_IDENTITY_SOURCE_INVALID_SCALAR_TYPE,
 
     /// <summary>
-    ///     The identity part's property reference could not be resolved to a defined property.
+    ///    An identity source references a property whose type has an identity, but the source is being ignored because it would create a circular reference through another identity.
     /// </summary>
-    API_IDENTITY_PART_UNRESOLVED_PROPERTY,
+    API_IDENTITY_SOURCE_NO_PRIMARY_IDENTITY,
+
+    /// <summary>
+    ///     An identity source uses a property CLR type that may have performance implications for identity operations.
+    /// </summary>
+    API_IDENTITY_SOURCE_PERFORMANCE_CONCERN,
+
+    /// <summary>
+    ///     An identity source references a property whose type has an identity, but the source is being ignored because it is a scalar type that cannot be used for identity resolution.
+    /// </summary>
+    API_IDENTITY_SOURCE_REFERENCED_IDENTITY_IGNORED_FOR_SCALAR,
+
+    /// <summary>
+    ///    The identity source's kind could not be resolved or inferred based on the resolved property because the property's type is not a scalar type or an object type with an identity.
+    /// </summary>
+    API_IDENTITY_SOURCE_UNRESOLVED_KIND,
+
+    /// <summary>
+    ///     The identity source's property reference could not be resolved to a defined property.
+    /// </summary>
+    API_IDENTITY_SOURCE_UNRESOLVED_PROPERTY,
+
+    /// <summary>
+    ///    An identity source references a property whose type has an identity, but the source is being ignored because it would create a circular reference.
+    /// </summary>
+    API_IDENTITY_SOURCE_UNRESOLVED_REFERENCED_IDENTITY,
     #endregion
 
     #region ApiNamedType Initialization Codes

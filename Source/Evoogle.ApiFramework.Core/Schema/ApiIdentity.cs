@@ -12,19 +12,21 @@ using Evoogle.Extensions;
 namespace Evoogle.ApiFramework.Schema;
 
 /// <summary>
-///     Represents a unique identity for an <see cref="ApiObjectType"/> consisting of one or more property parts.
+///     Represents a unique identity for an <see cref="ApiObjectType"/> consisting of one or more <see cref="ApiIdentitySource"/> entries.
 /// </summary>
 /// <remarks>
-///     An identity can be simple (single property) or composite (multiple properties).
-///     All parts must be either ordered (positional) or named, but not mixed.
+///     <para>
+///         An identity can be simple (single source) or composite (multiple sources).
+///         Each source may be scalar (resolving directly to a value) or nested (delegating to a referenced object type's identity).
+///     </para>
 /// </remarks>
 /// <param name="apiName">The name of the identity.</param>
-/// <param name="apiIdentityParts">The collection of property parts that make up this identity.</param>
+/// <param name="apiIdentitySources">The collection of sources that make up this identity.</param>
 [JsonConverter(typeof(ApiIdentityJsonConverter))]
 public sealed class ApiIdentity
 (
     string apiName,
-    IEnumerable<ApiIdentityPart> apiIdentityParts
+    IEnumerable<ApiIdentitySource> apiIdentitySources
 ) : ApiSchemaElement
 {
     #region Properties
@@ -34,14 +36,14 @@ public sealed class ApiIdentity
     public string ApiName { get; } = apiName;
 
     /// <summary>
-    ///     Gets the collection of property parts that constitute this identity.
+    ///     Gets the collection of sources that constitute this identity.
     /// </summary>
-    public ApiIdentityPart[] ApiIdentityParts { get; } = [.. apiIdentityParts.EmptyIfNull().Where(x => x is not null)];
+    public ApiIdentitySource[] ApiIdentitySources { get; } = [.. apiIdentitySources.EmptyIfNull().Where(x => x is not null)];
 
     /// <summary>
-    ///     Gets a value indicating whether this identity is composite (has two or more parts).
+    ///     Gets a value indicating whether this identity is composite (has two or more sources).
     /// </summary>
-    public bool IsComposite => this.ApiIdentityParts.Length >= 2;
+    public bool IsComposite => this.ApiIdentitySources.Length >= 2;
     #endregion
 
     #region ApiSchemaElement Methods
@@ -57,7 +59,7 @@ public sealed class ApiIdentity
         base.Initialize(context);
 
         this.InitializeApiName(context);
-        this.InitializeApiIdentityParts(context);
+        this.InitializeApiIdentitySources(context);
     }
     #endregion
 
@@ -66,9 +68,10 @@ public sealed class ApiIdentity
     public override string ToString()
     {
         var apiName = this.ApiName.SafeToString();
+        var sourceCount = this.ApiIdentitySources.Length.SafeToString();
         var extensionCount = this.ExtensionCount.SafeToString();
 
-        return $"{nameof(ApiIdentity)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ExtensionCount)}={extensionCount}}}";
+        return $"{nameof(ApiIdentity)} {{{nameof(this.ApiName)}={apiName}, SourceCount={sourceCount}, {nameof(this.ExtensionCount)}={extensionCount}}}";
     }
     #endregion
 
@@ -88,56 +91,31 @@ public sealed class ApiIdentity
         }
     }
 
-    private void InitializeApiIdentityParts(ApiInitializationContext context)
+    private void InitializeApiIdentitySources(ApiInitializationContext context)
     {
-        if (this.ApiIdentityParts is null || this.ApiIdentityParts.Length == 0)
+        if (this.ApiIdentitySources is null || this.ApiIdentitySources.Length == 0)
         {
             var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.API_IDENTITY_NULL_OR_EMPTY_PARTS;
-            var description = $"{nameof(this.ApiIdentityParts)} must not be null or empty";
-            var remediation = $"Specify at least one {nameof(ApiIdentityPart)}";
+            var code = ApiInitializationCode.API_IDENTITY_NULL_OR_EMPTY_SOURCES;
+            var description = $"{nameof(this.ApiIdentitySources)} must not be null or empty";
+            var remediation = $"Specify at least one {nameof(ApiIdentitySource)}";
 
             context.AddIssue(path, severity, code, description, remediation);
             return;
         }
 
-        // No duplicate part property names
+        // No duplicate source property names
         ApiSchemaHelpers.ValidateUnique
         (
-            parts: this.ApiIdentityParts,
+            parts: this.ApiIdentitySources,
             partKeySelector: x => x.ApiPropertyName,
             partKeyFilter: x => !string.IsNullOrWhiteSpace(x),
-            partKeyPropertyName: nameof(ApiIdentityPart.ApiPropertyName),
+            partKeyPropertyName: nameof(ApiIdentitySource.ApiPropertyName),
             path: this.ApiPath,
-            code: ApiInitializationCode.API_IDENTITY_DUPLICATE_PART_API_PROPERTY_NAME,
+            code: ApiInitializationCode.API_IDENTITY_DUPLICATE_SOURCE_API_PROPERTY_NAME,
             context: context
         );
-
-        // Track the current object type in the traversal path to detect circular references.
-        // ApiIdentityPart checks referencedObjectType.ApiPath, so we must store object-type paths here.
-        var objectTypePath = context.ApiParentObjectType.ApiPath;
-        var wasAdded = context.IdentityTraversalPath.Add(objectTypePath);
-
-        try
-        {
-            var apiIdentityPartsCount = this.ApiIdentityParts.Length;
-            for (var i = 0; i < apiIdentityPartsCount; ++i)
-            {
-                var apiIdentityPart = this.ApiIdentityParts[i];
-
-                var childContext = context.WithParentSchemaElement(this);
-                apiIdentityPart.Initialize(childContext);
-            }
-        }
-        finally
-        {
-            // Remove from traversal path after initialization
-            if (wasAdded)
-            {
-                context.IdentityTraversalPath.Remove(objectTypePath);
-            }
-        }
     }
     #endregion
 }

@@ -176,35 +176,7 @@ public sealed partial class ApiObjectType
             return [];
         }
 
-        return [.. identity.ApiIdentityParts.Select(part => part.ApiPropertyName)];
-    }
-
-    /// <summary>
-    ///     Gets the scalar CLR type for a specific identity part property.
-    /// </summary>
-    /// <param name="apiPropertyName">The API name of the property.</param>
-    /// <param name="apiIdentityName">Optional identity name. If null, uses the primary identity.</param>
-    /// <returns>The scalar target type for the identity part, or null if the property is not part of the identity.</returns>
-    /// <remarks>
-    ///     This returns the resolved scalar target type that the property value will be coerced to when building the identity.
-    /// </remarks>
-    public Type? GetIdentityPartClrType(string apiPropertyName, string? apiIdentityName = null)
-    {
-        if (!this.HasIdentity || string.IsNullOrWhiteSpace(apiPropertyName))
-        {
-            return null;
-        }
-
-        var identity = this.ResolveIdentityForBuild(apiIdentityName);
-        if (identity is null)
-        {
-            return null;
-        }
-
-        var part = identity.ApiIdentityParts
-            .FirstOrDefault(p => string.Equals(p.ApiPropertyName, apiPropertyName, StringComparison.OrdinalIgnoreCase));
-
-        return part?.ClrIdType;
+        return [.. identity.ApiIdentitySources.Select(part => part.ApiPropertyName)];
     }
 
     /// <summary>
@@ -228,7 +200,7 @@ public sealed partial class ApiObjectType
         }
 
         return this.ApiIdentities
-            .Any(identity => identity.ApiIdentityParts
+            .Any(identity => identity.ApiIdentitySources
                 .Any(part => string.Equals(part.ApiPropertyName, apiPropertyName, StringComparison.OrdinalIgnoreCase)));
     }
 
@@ -427,12 +399,12 @@ public sealed partial class ApiObjectType
                 var identity1 = identities[i];
                 var identity2 = identities[j];
 
-                var props1 = identity1.ApiIdentityParts
+                var props1 = identity1.ApiIdentitySources
                     .Select(p => p.ApiPropertyName)
                     .OrderBy(n => n, StringComparer.OrdinalIgnoreCase)
                     .ToArray();
 
-                var props2 = identity2.ApiIdentityParts
+                var props2 = identity2.ApiIdentitySources
                     .Select(p => p.ApiPropertyName)
                     .OrderBy(n => n, StringComparer.OrdinalIgnoreCase)
                     .ToArray();

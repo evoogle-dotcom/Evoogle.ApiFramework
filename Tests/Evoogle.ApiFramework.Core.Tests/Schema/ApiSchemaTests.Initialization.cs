@@ -1324,7 +1324,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
                         ""ApiIdentities"": [
                             {
                                 ""ApiName"": ""Primary"",
-                                ""ApiIdentityParts"": [
+                                ""ApiIdentitySources"": [
                                     {
                                         ""ApiPropertyName"": ""Id""
                                     }
@@ -1332,7 +1332,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
                             },
                             {
                                 ""ApiName"": ""Primary"",
-                                ""ApiIdentityParts"": [
+                                ""ApiIdentitySources"": [
                                     {
                                         ""ApiPropertyName"": ""Code""
                                     }
@@ -1397,7 +1397,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
                         ""ApiIdentities"": [
                             {
                                 ""ApiName"": ""ById"",
-                                ""ApiIdentityParts"": [
+                                ""ApiIdentitySources"": [
                                     {
                                         ""ApiPropertyName"": ""Id""
                                     }
@@ -1405,7 +1405,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
                             },
                             {
                                 ""ApiName"": ""Primary"",
-                                ""ApiIdentityParts"": [
+                                ""ApiIdentitySources"": [
                                     {
                                         ""ApiPropertyName"": ""Id""
                                     }
@@ -1474,7 +1474,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
                         ""ApiIdentities"": [
                             {
                                 ""ApiName"": """",
-                                ""ApiIdentityParts"": [
+                                ""ApiIdentitySources"": [
                                     {
                                         ""ApiPropertyName"": ""WarehouseId""
                                     }
@@ -1511,13 +1511,13 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
             ]
         },
 
-        // ApiIdentity throws if ApiIdentityParts is empty
+        // ApiIdentity throws if ApiIdentitySources is empty
         new InitializeThrowsTest
         {
-            Name = $"{nameof(ApiIdentity)} Throws If {nameof(ApiIdentity.ApiIdentityParts)} Is Empty",
+            Name = $"{nameof(ApiIdentity)} Throws If {nameof(ApiIdentity.ApiIdentitySources)} Is Empty",
             Source = @"
             {
-                ""ApiName"": ""ApiIdentity Throws If ApiIdentityParts Is Empty"",
+                ""ApiName"": ""ApiIdentity Throws If ApiIdentitySources Is Empty"",
                 ""ApiScalarTypes"": [
                     {
                         ""ApiKind"": ""Scalar"",
@@ -1533,7 +1533,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
                         ""ApiIdentities"": [
                             {
                                 ""ApiName"": ""Primary"",
-                                ""ApiIdentityParts"": []
+                                ""ApiIdentitySources"": []
                             }
                         ],
                         ""ApiProperties"": [
@@ -1559,20 +1559,20 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
                 (
                     path: $"{nameof(ApiObjectType)}[\"TestObject\"].{nameof(ApiIdentity)}[\"Primary\"]",
                     severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.API_IDENTITY_NULL_OR_EMPTY_PARTS,
-                    description: $"{nameof(ApiIdentity.ApiIdentityParts)} must not be null or empty",
-                    remediation: $"Specify at least one {nameof(ApiIdentityPart)}"
+                    code: ApiInitializationCode.API_IDENTITY_NULL_OR_EMPTY_SOURCES,
+                    description: $"{nameof(ApiIdentity.ApiIdentitySources)} must not be null or empty",
+                    remediation: $"Specify at least one {nameof(ApiIdentitySource)}"
                 ),
             ]
         },
 
-        // ApiIdentity throws if ApiIdentityParts has duplicate ApiPropertyName values
+        // ApiIdentity throws if ApiIdentitySources has duplicate ApiPropertyName values
         new InitializeThrowsTest
         {
-            Name = $"{nameof(ApiIdentity)} Throws If {nameof(ApiIdentity.ApiIdentityParts)} Has Duplicate {nameof(ApiIdentityPart.ApiPropertyName)} Values",
+            Name = $"{nameof(ApiIdentity)} Throws If {nameof(ApiIdentity.ApiIdentitySources)} Has Duplicate {nameof(ApiIdentitySource.ApiPropertyName)} Values",
             Source = @"
             {
-                ""ApiName"": ""ApiIdentity Throws If ApiIdentityParts Has Duplicate ApiPropertyName Values"",
+                ""ApiName"": ""ApiIdentity Throws If ApiIdentitySources Has Duplicate ApiPropertyName Values"",
                 ""ApiScalarTypes"": [
                     {
                         ""ApiKind"": ""Scalar"",
@@ -1588,7 +1588,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
                         ""ApiIdentities"": [
                             {
                                 ""ApiName"": ""Primary"",
-                                ""ApiIdentityParts"": [
+                                ""ApiIdentitySources"": [
                                     {
                                         ""ApiPropertyName"": ""WarehouseId""
                                     },
@@ -1621,24 +1621,24 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
                 (
                     path: $"{nameof(ApiObjectType)}[\"TestObject\"].{nameof(ApiIdentity)}[\"Primary\"]",
                     severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.API_IDENTITY_DUPLICATE_PART_API_PROPERTY_NAME,
-                    description: $"Duplicate {nameof(ApiIdentityPart)}.{nameof(ApiIdentityPart.ApiPropertyName)} values: 'WarehouseId'",
-                    remediation: $"Verify that each {nameof(ApiIdentityPart)} has a unique {nameof(ApiIdentityPart.ApiPropertyName)} value"
+                    code: ApiInitializationCode.API_IDENTITY_DUPLICATE_SOURCE_API_PROPERTY_NAME,
+                    description: $"Duplicate {nameof(ApiIdentitySource)}.{nameof(ApiIdentitySource.ApiPropertyName)} values: 'WarehouseId'",
+                    remediation: $"Verify that each {nameof(ApiIdentitySource)} has a unique {nameof(ApiIdentitySource.ApiPropertyName)} value"
                 ),
             ]
         },
 
         //
-        // ApiIdentityPart Initialization Tests
+        // ApiIdentitySource Initialization Tests
         //
 
-        // ApiIdentityPart throws if ApiPropertyName is invalid
+        // ApiIdentitySource throws if ApiPropertyName is invalid
         new InitializeThrowsTest
         {
-            Name = $"{nameof(ApiIdentityPart)} Throws If {nameof(ApiIdentityPart.ApiPropertyName)} Is Invalid",
+            Name = $"{nameof(ApiIdentitySource)} Throws If {nameof(ApiIdentitySource.ApiPropertyName)} Is Invalid",
             Source = @"
             {
-                ""ApiName"": ""ApiIdentityPart Throws If ApiPropertyName Is Invalid"",
+                ""ApiName"": ""ApiIdentitySource Throws If ApiPropertyName Is Invalid"",
                 ""ApiScalarTypes"": [
                     {
                         ""ApiKind"": ""Scalar"",
@@ -1654,7 +1654,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
                         ""ApiIdentities"": [
                             {
                                 ""ApiName"": ""Primary"",
-                                ""ApiIdentityParts"": [
+                                ""ApiIdentitySources"": [
                                     {
                                         ""ApiPropertyName"": """"
                                     }
@@ -1682,22 +1682,22 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"TestObject\"].{nameof(ApiIdentity)}[\"Primary\"].{nameof(ApiIdentityPart)}",
+                    path: $"{nameof(ApiObjectType)}[\"TestObject\"].{nameof(ApiIdentity)}[\"Primary\"].{nameof(ApiIdentitySource)}",
                     severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.API_IDENTITY_PART_INVALID_API_PROPERTY_NAME,
-                    description: $"{nameof(ApiIdentityPart.ApiPropertyName)} must not be null, empty, or whitespace",
-                    remediation: $"Specify a valid {nameof(ApiIdentityPart.ApiPropertyName)} value"
+                    code: ApiInitializationCode.API_IDENTITY_SOURCE_INVALID_API_PROPERTY_NAME,
+                    description: $"{nameof(ApiIdentitySource.ApiPropertyName)} must not be null, empty, or whitespace",
+                    remediation: $"Specify a valid {nameof(ApiIdentitySource.ApiPropertyName)} value"
                 ),
             ]
         },
 
-        // ApiIdentityPart throws if ApiPropertyName is unresolved
+        // ApiIdentitySource throws if ApiPropertyName is unresolved
         new InitializeThrowsTest
         {
-            Name = $"{nameof(ApiIdentityPart)} Throws If {nameof(ApiIdentityPart.ApiPropertyName)} Is Unresolved",
+            Name = $"{nameof(ApiIdentitySource)} Throws If {nameof(ApiIdentitySource.ApiPropertyName)} Is Unresolved",
             Source = @"
             {
-                ""ApiName"": ""ApiIdentityPart Throws If ApiPropertyName Is Unresolved"",
+                ""ApiName"": ""ApiIdentitySource Throws If ApiPropertyName Is Unresolved"",
                 ""ApiScalarTypes"": [
                     {
                         ""ApiKind"": ""Scalar"",
@@ -1713,7 +1713,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
                         ""ApiIdentities"": [
                             {
                                 ""ApiName"": ""Primary"",
-                                ""ApiIdentityParts"": [
+                                ""ApiIdentitySources"": [
                                     {
                                         ""ApiPropertyName"": ""DoesNotExist""
                                     }
@@ -1741,22 +1741,22 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"TestObject\"].{nameof(ApiIdentity)}[\"Primary\"].{nameof(ApiIdentityPart)}[\"DoesNotExist\"]",
+                    path: $"{nameof(ApiObjectType)}[\"TestObject\"].{nameof(ApiIdentity)}[\"Primary\"].{nameof(ApiIdentitySource)}[\"DoesNotExist\"]",
                     severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.API_IDENTITY_PART_UNRESOLVED_PROPERTY,
-                    description: $"{nameof(ApiIdentityPart.ApiProperty)} could not be resolved for {nameof(ApiIdentityPart.ApiPropertyName)}='DoesNotExist'",
-                    remediation: $"Verify that {nameof(ApiIdentityPart.ApiPropertyName)} refers to a valid property on the parent {nameof(ApiObjectType)}"
+                    code: ApiInitializationCode.API_IDENTITY_SOURCE_UNRESOLVED_PROPERTY,
+                    description: $"{nameof(ApiIdentitySource.ApiProperty)} could not be resolved for {nameof(ApiIdentitySource.ApiPropertyName)}='DoesNotExist'",
+                    remediation: $"Verify that {nameof(ApiIdentitySource.ApiPropertyName)} refers to a valid property on the parent {nameof(ApiObjectType)}"
                 ),
             ]
         },
 
-        // ApiIdentityPart throws if ClrConfiguredIdType is not ApiId compatible
+        // ApiIdentitySource throws if ClrScalarType is not ApiId compatible
         new InitializeThrowsTest
         {
-            Name = $"{nameof(ApiIdentityPart)} Throws If {nameof(ApiIdentityPart.ClrConfiguredIdType)} Is Invalid",
+            Name = $"{nameof(ApiIdentitySource)} Throws If {nameof(ApiIdentitySource.ClrScalarType)} Is Invalid",
             Source = @"
             {
-                ""ApiName"": ""ApiIdentityPart Throws If ClrConfiguredIdType Is Invalid"",
+                ""ApiName"": ""ApiIdentitySource Throws If ClrScalarType Is Invalid"",
                 ""ApiScalarTypes"": [
                     {
                         ""ApiKind"": ""Scalar"",
@@ -1772,10 +1772,10 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
                         ""ApiIdentities"": [
                             {
                                 ""ApiName"": ""Primary"",
-                                ""ApiIdentityParts"": [
+                                ""ApiIdentitySources"": [
                                     {
                                         ""ApiPropertyName"": ""WarehouseId"",
-                                        ""ClrConfiguredIdType"": ""System.Net.Sockets.Socket, System.Net.Sockets""
+                                        ""ClrScalarType"": ""System.Net.Sockets.Socket, System.Net.Sockets""
                                     }
                                 ]
                             }
@@ -1801,22 +1801,22 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"TestObject\"].{nameof(ApiIdentity)}[\"Primary\"].{nameof(ApiIdentityPart)}[\"WarehouseId\"]",
+                    path: $"{nameof(ApiObjectType)}[\"TestObject\"].{nameof(ApiIdentity)}[\"Primary\"].{nameof(ApiIdentitySource)}[\"WarehouseId\"]",
                     severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.API_IDENTITY_PART_INVALID_SCALAR_TYPE,
+                    code: ApiInitializationCode.API_IDENTITY_SOURCE_INVALID_SCALAR_TYPE,
                     description: $"Scalar type 'Socket' is not compatible with {nameof(ApiId)}",
                     remediation: $"Use one of the supported scalar types: {string.Join(",", ApiId.GetCompatibleScalarTypes().Select(t => t.SafeToName()).OrderBy(n => n, StringComparer.Ordinal))}"
                 ),
             ]
         },
 
-        // ApiIdentityPart warns if identity part requires string parsing for a non-string scalar type
+        // ApiIdentitySource warns if identity source requires string parsing for a non-string scalar type
         new InitializeThrowsTest
         {
-            Name = $"{nameof(ApiIdentityPart)} Warns If {nameof(String)} Requires Coercion",
+            Name = $"{nameof(ApiIdentitySource)} Warns If {nameof(String)} Requires Coercion",
             Source = @"
             {
-                ""ApiName"": ""ApiIdentityPart Warns If String Requires Coercion"",
+                ""ApiName"": ""ApiIdentitySource Warns If String Requires Coercion"",
                 ""ApiScalarTypes"": [
                     {
                         ""ApiKind"": ""Scalar"",
@@ -1832,10 +1832,10 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
                         ""ApiIdentities"": [
                             {
                                 ""ApiName"": """",
-                                ""ApiIdentityParts"": [
+                                ""ApiIdentitySources"": [
                                     {
                                         ""ApiPropertyName"": ""ProductCode"",
-                                        ""ClrConfiguredIdType"": ""System.Guid, System.Private.CoreLib""
+                                        ""ClrScalarType"": ""System.Guid, System.Private.CoreLib""
                                     }
                                 ]
                             }
@@ -1869,22 +1869,22 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
                 ),
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"TestObject\"].{nameof(ApiIdentity)}.{nameof(ApiIdentityPart)}[\"ProductCode\"]",
+                    path: $"{nameof(ApiObjectType)}[\"TestObject\"].{nameof(ApiIdentity)}.{nameof(ApiIdentitySource)}[\"ProductCode\"]",
                     severity: ApiInitializationSeverity.Warning,
-                    code: ApiInitializationCode.API_IDENTITY_PART_PERFORMANCE_CONCERN,
-                    description: $"Identity part 'ProductCode' requires type coercion between {nameof(String)} and Guid, which may impact performance",
+                    code: ApiInitializationCode.API_IDENTITY_SOURCE_PERFORMANCE_CONCERN,
+                    description: $"Identity source 'ProductCode' requires type coercion between {nameof(String)} and Guid, which may impact performance",
                     remediation: "Consider using Guid as the property type directly, or be aware of the parsing overhead"
                 ),
             ]
         },
 
-        // ApiIdentityPart throws if identity part references a type that creates a circular dependency
+        // ApiIdentitySource throws if identity source references a type that creates a circular dependency
         new InitializeThrowsTest
         {
-            Name = $"{nameof(ApiIdentityPart)} Throws If Identity Reference Is Circular",
+            Name = $"{nameof(ApiIdentitySource)} Throws If Identity Reference Is Circular",
             Source = @"
             {
-                ""ApiName"": ""ApiIdentityPart Throws If Identity Reference Is Circular"",
+                ""ApiName"": ""ApiIdentitySource Throws If Identity Reference Is Circular"",
                 ""ApiScalarTypes"": [],
                 ""ApiEnumTypes"": [],
                 ""ApiObjectTypes"": [
@@ -1894,7 +1894,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
                         ""ApiIdentities"": [
                             {
                                 ""ApiName"": ""Primary"",
-                                ""ApiIdentityParts"": [
+                                ""ApiIdentitySources"": [
                                     {
                                         ""ApiPropertyName"": ""Self""
                                     }
@@ -1922,30 +1922,30 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"Node\"].{nameof(ApiIdentity)}[\"Primary\"].{nameof(ApiIdentityPart)}[\"Self\"]",
+                    path: $"{nameof(ApiObjectType)}[\"Node\"].{nameof(ApiIdentity)}[\"Primary\"].{nameof(ApiIdentitySource)}[\"Self\"]",
                     severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.API_IDENTITY_PART_CIRCULAR_REFERENCE,
+                    code: ApiInitializationCode.API_IDENTITY_SOURCE_CIRCULAR_REFERENCE,
                     description: "Circular identity reference detected: property 'Self' references type 'Node' which has an identity that depends on the current type",
                     remediation: "Remove the circular dependency by restructuring the identity definitions or using a non-identity property"
                 ),
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"Node\"].{nameof(ApiIdentity)}[\"Primary\"].{nameof(ApiIdentityPart)}[\"Self\"]",
+                    path: $"{nameof(ApiObjectType)}[\"Node\"].{nameof(ApiIdentity)}[\"Primary\"].{nameof(ApiIdentitySource)}[\"Self\"]",
                     severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.API_IDENTITY_PART_UNRESOLVED_PROPERTY,
-                    description: $"{nameof(ApiIdentityPart.ApiProperty)} could not be resolved for {nameof(ApiIdentityPart.ApiPropertyName)}='Self'",
-                    remediation: $"Verify that {nameof(ApiIdentityPart.ApiPropertyName)} refers to a valid property on the parent {nameof(ApiObjectType)}"
+                    code: ApiInitializationCode.API_IDENTITY_SOURCE_UNRESOLVED_PROPERTY,
+                    description: $"{nameof(ApiIdentitySource.ApiProperty)} could not be resolved for {nameof(ApiIdentitySource.ApiPropertyName)}='Self'",
+                    remediation: $"Verify that {nameof(ApiIdentitySource.ApiPropertyName)} refers to a valid property on the parent {nameof(ApiObjectType)}"
                 ),
             ]
         },
 
-        // ApiIdentityPart throws if two object types reference each other in their identities
+        // ApiIdentitySource throws if two object types reference each other in their identities
         new InitializeThrowsTest
         {
-            Name = $"{nameof(ApiIdentityPart)} Throws If Two Identity References Are Circular",
+            Name = $"{nameof(ApiIdentitySource)} Throws If Two Identity References Are Circular",
             Source = @"
             {
-                ""ApiName"": ""ApiIdentityPart Throws If Two Identity References Are Circular"",
+                ""ApiName"": ""ApiIdentitySource Throws If Two Identity References Are Circular"",
                 ""ApiScalarTypes"": [],
                 ""ApiEnumTypes"": [],
                 ""ApiObjectTypes"": [
@@ -1955,7 +1955,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
                         ""ApiIdentities"": [
                             {
                                 ""ApiName"": ""Primary"",
-                                ""ApiIdentityParts"": [
+                                ""ApiIdentitySources"": [
                                     {
                                         ""ApiPropertyName"": ""Beta""
                                     }
@@ -1982,7 +1982,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
                         ""ApiIdentities"": [
                             {
                                 ""ApiName"": ""Primary"",
-                                ""ApiIdentityParts"": [
+                                ""ApiIdentitySources"": [
                                     {
                                         ""ApiPropertyName"": ""Alpha""
                                     }
@@ -2010,19 +2010,19 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"Beta\"].{nameof(ApiIdentity)}[\"Primary\"].{nameof(ApiIdentityPart)}[\"Alpha\"]",
+                    path: $"{nameof(ApiObjectType)}[\"Beta\"].{nameof(ApiIdentity)}[\"Primary\"].{nameof(ApiIdentitySource)}[\"Alpha\"]",
                     severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.API_IDENTITY_PART_CIRCULAR_REFERENCE,
+                    code: ApiInitializationCode.API_IDENTITY_SOURCE_CIRCULAR_REFERENCE,
                     description: "Circular identity reference detected: property 'Alpha' references type 'Alpha' which has an identity that depends on the current type",
                     remediation: "Remove the circular dependency by restructuring the identity definitions or using a non-identity property"
                 ),
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"Beta\"].{nameof(ApiIdentity)}[\"Primary\"].{nameof(ApiIdentityPart)}[\"Alpha\"]",
+                    path: $"{nameof(ApiObjectType)}[\"Beta\"].{nameof(ApiIdentity)}[\"Primary\"].{nameof(ApiIdentitySource)}[\"Alpha\"]",
                     severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.API_IDENTITY_PART_UNRESOLVED_PROPERTY,
-                    description: $"{nameof(ApiIdentityPart.ApiProperty)} could not be resolved for {nameof(ApiIdentityPart.ApiPropertyName)}='Alpha'",
-                    remediation: $"Verify that {nameof(ApiIdentityPart.ApiPropertyName)} refers to a valid property on the parent {nameof(ApiObjectType)}"
+                    code: ApiInitializationCode.API_IDENTITY_SOURCE_UNRESOLVED_PROPERTY,
+                    description: $"{nameof(ApiIdentitySource.ApiProperty)} could not be resolved for {nameof(ApiIdentitySource.ApiPropertyName)}='Alpha'",
+                    remediation: $"Verify that {nameof(ApiIdentitySource.ApiPropertyName)} refers to a valid property on the parent {nameof(ApiObjectType)}"
                 ),
             ]
         },

@@ -66,7 +66,7 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
     {
         #region Properties
         public Type? ClrType { get; set; }
-        public string? ApiKind { get; set; }
+        public ApiTypeKind? ApiKind { get; set; }
         #endregion
     }
 
@@ -113,7 +113,7 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
             { propertyNames.ApiObjectType.ApiRelationships, HandleApiObjectTypeApiRelationships },
 
             // ApiType Property Handlers
-            { propertyNames.ApiType.ApiKind, HandleApiTypeKind },
+            { propertyNames.ApiType.ApiKind, HandleApiTypeApiKind },
             { propertyNames.ApiType.ClrType, HandleApiTypeClrType },
 
             // ExtensibleBase Property Handlers
@@ -235,11 +235,12 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
         #endregion
 
         #region ApiType Methods
-        private static void HandleApiTypeKind(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiTypeApiKind(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiType ??= new ApiTypeReadData();
 
-            context.ReadData.ApiType.ApiKind = reader.GetString();
+            var options = context.Options;
+            context.ReadData.ApiType.ApiKind = _apiTypeKindJsonConverter.Read(ref reader, typeof(ApiTypeKind), options);
         }
 
         private static void HandleApiTypeClrType(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)

@@ -25,10 +25,10 @@ public class ApiTypeExpressionJsonConverter(ILogger<ApiTypeExpressionJsonConvert
     private readonly record struct ApiTypeExpressionPropertyNames
     {
         #region Immutable Properties
-        public required string ApiName { get; init; }
         public required string ApiInlineType { get; init; }
-        public required string ClrType { get; init; }
         public required string ApiKind { get; init; }
+        public required string ApiName { get; init; }
+        public required string ClrType { get; init; }
         #endregion
     }
 
@@ -47,10 +47,10 @@ public class ApiTypeExpressionJsonConverter(ILogger<ApiTypeExpressionJsonConvert
             {
                 ApiTypeExpression = new ApiTypeExpressionPropertyNames
                 {
-                    ApiName = policy.ConvertName(nameof(Schema.ApiTypeExpression.ApiName)),
                     ApiInlineType = policy.ConvertName(nameof(Schema.ApiTypeExpression.ApiInlineType)),
+                    ApiKind = policy.ConvertName(nameof(Schema.ApiTypeExpression.ApiKind)),
+                    ApiName = policy.ConvertName(nameof(Schema.ApiTypeExpression.ApiName)),
                     ClrType = policy.ConvertName(nameof(Schema.ApiTypeExpression.ClrType)),
-                    ApiKind = policy.ConvertName(nameof(Schema.ApiTypeExpression.ApiKind))
                 }
             };
         #endregion
@@ -65,9 +65,9 @@ public class ApiTypeExpressionJsonConverter(ILogger<ApiTypeExpressionJsonConvert
     {
         #region Properties
         public ApiType? ApiInlineType { get; set; }
+        public ApiTypeKind? ApiKind { get; set; }
         public string? ApiName { get; set; }
         public Type? ClrType { get; set; }
-        public string? ApiKind { get; set; }
         #endregion
     }
 
@@ -90,9 +90,9 @@ public class ApiTypeExpressionJsonConverter(ILogger<ApiTypeExpressionJsonConvert
         public readonly Dictionary<string, JsonReaderHandler<DefaultReadContext<PropertyNames, ReadData, ReadHandlers>>> PropertyHandlers = new()
         {
             { propertyNames.ApiTypeExpression.ApiInlineType, HandleApiTypeExpressionApiInlineType },
+            { propertyNames.ApiTypeExpression.ApiKind, HandleApiTypeExpressionApiKind },
             { propertyNames.ApiTypeExpression.ApiName, HandleApiTypeExpressionApiName },
             { propertyNames.ApiTypeExpression.ClrType, HandleApiTypeExpressionClrType },
-            { propertyNames.ApiTypeExpression.ApiKind, HandleApiTypeExpressionKind },
         };
         #endregion
 
@@ -102,6 +102,14 @@ public class ApiTypeExpressionJsonConverter(ILogger<ApiTypeExpressionJsonConvert
             context.ReadData.ApiTypeExpression ??= new ApiTypeExpressionReadData();
 
             context.ReadData.ApiTypeExpression.ApiInlineType = JsonSerializer.Deserialize<ApiType>(ref reader, context.Options);
+        }
+
+        private static void HandleApiTypeExpressionApiKind(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        {
+            context.ReadData.ApiTypeExpression ??= new ApiTypeExpressionReadData();
+
+            var options = context.Options;
+            context.ReadData.ApiTypeExpression.ApiKind = _apiTypeKindJsonConverter.Read(ref reader, typeof(ApiTypeKind), options);
         }
 
         private static void HandleApiTypeExpressionApiName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
@@ -116,13 +124,6 @@ public class ApiTypeExpressionJsonConverter(ILogger<ApiTypeExpressionJsonConvert
             context.ReadData.ApiTypeExpression ??= new ApiTypeExpressionReadData();
 
             context.ReadData.ApiTypeExpression.ClrType = _typeJsonConverter.Read(ref reader, typeof(Type), context.Options);
-        }
-
-        private static void HandleApiTypeExpressionKind(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
-        {
-            context.ReadData.ApiTypeExpression ??= new ApiTypeExpressionReadData();
-
-            context.ReadData.ApiTypeExpression.ApiKind = reader.GetString();
         }
         #endregion
     }
@@ -171,11 +172,11 @@ public class ApiTypeExpressionJsonConverter(ILogger<ApiTypeExpressionJsonConvert
             return new ApiTypeExpression(apiInlineType);
         }
 
-        var kind = ApiJsonConverterHelpers.GetApiTypeKind(context.Logger, readData?.ApiKind);
+        var apiKind = readData?.ApiKind;
         var apiName = readData?.ApiName;
         var clrType = readData?.ClrType;
 
-        return new ApiTypeExpression(kind, apiName, clrType);
+        return new ApiTypeExpression(apiKind, apiName, clrType);
     }
 
     protected override void ReadCore(ref Utf8JsonReader reader, IReadContext context)
@@ -192,7 +193,7 @@ public class ApiTypeExpressionJsonConverter(ILogger<ApiTypeExpressionJsonConvert
 
         WriteJsonObject(writer, () =>
         {
-            WriteApiTypeExpressionKind(writer, value, writeContext);
+            WriteApiTypeExpressionApiKind(writer, value, writeContext);
             WriteApiTypeExpressionApiName(writer, value, writeContext);
             WriteApiTypeExpressionApiInlineType(writer, value, writeContext);
             WriteApiTypeExpressionClrType(writer, value, writeContext);
@@ -201,7 +202,7 @@ public class ApiTypeExpressionJsonConverter(ILogger<ApiTypeExpressionJsonConvert
     #endregion
 
     #region Write Implementation Methods
-    private static void WriteApiTypeExpressionKind(Utf8JsonWriter writer, ApiTypeExpression apiTypeExpression, DefaultWriteContext<PropertyNames> context)
+    private static void WriteApiTypeExpressionApiKind(Utf8JsonWriter writer, ApiTypeExpression apiTypeExpression, DefaultWriteContext<PropertyNames> context)
     {
         var propertyName = context.PropertyNames.ApiTypeExpression.ApiKind;
         var kind = apiTypeExpression.ApiKind;

@@ -474,9 +474,9 @@ public partial class ApiTypeTests
                         new ApiIdentityConfig
                         (
                             ApiName: "PK_Company_Id",
-                            ApiIdentityParts:
+                            ApiIdentitySources:
                             [
-                                new ApiIdentityPartConfig
+                                new ApiIdentitySourceConfig
                                 (
                                     ApiPropertyName: nameof(Company.Id)
                                 )
@@ -485,9 +485,9 @@ public partial class ApiTypeTests
                         new ApiIdentityConfig
                         (
                             ApiName: "AK_Company_Name",
-                            ApiIdentityParts:
+                            ApiIdentitySources:
                             [
-                                new ApiIdentityPartConfig
+                                new ApiIdentitySourceConfig
                                 (
                                     ApiPropertyName: nameof(Company.Name)
                                 )
@@ -786,21 +786,21 @@ public partial class ApiTypeTests
                         new ApiIdentityConfig
                         (
                             ApiName: "PK_Company_Id",
-                            ApiIdentityParts:
+                            ApiIdentitySources:
                             [
-                                new ApiIdentityPartConfig
+                                new ApiIdentitySourceConfig
                                 (
                                     ApiPropertyName: nameof(Company.Id),
-                                    ClrConfiguredIdType: typeof(string)
+                                    ClrScalarType: typeof(string)
                                 )
                             ]
                         ),
                         new ApiIdentityConfig
                         (
                             ApiName: "AK_Company_Name",
-                            ApiIdentityParts:
+                            ApiIdentitySources:
                             [
-                                new ApiIdentityPartConfig
+                                new ApiIdentitySourceConfig
                                 (
                                     ApiPropertyName: nameof(Company.Name)
                                 )
