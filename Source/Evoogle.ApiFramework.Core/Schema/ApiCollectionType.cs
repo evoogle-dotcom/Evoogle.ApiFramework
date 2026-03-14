@@ -24,12 +24,14 @@ public sealed class ApiCollectionType
     Type clrCollectionType
 ) : ApiType(clrCollectionType)
 {
+    #region ApiSchemaElement Properties
+    /// <inheritdoc/>
+    protected override string ApiElementName => nameof(ApiCollectionType);
+    #endregion
+
     #region ApiType Properties
     /// <inheritdoc />
     public override ApiTypeKind ApiKind => ApiTypeKind.Collection;
-
-    /// <inheritdoc/>
-    protected override string ApiTypeName => nameof(ApiCollectionType);
     #endregion
 
     #region ApiCollectionType Properties
@@ -52,22 +54,6 @@ public sealed class ApiCollectionType
     public bool IsItemRequired => this.ApiItemTypeModifiers.HasFlag(ApiTypeModifiers.Required);
     #endregion
 
-    #region ApiType Methods
-    /// <inheritdoc />
-    protected override string BuildPath(string? apiParentPath)
-        => ApiSchemaHelpers.BuildPath(apiParentPath, apiChildPath: this.ApiTypeName, apiApiName: null);
-
-    /// <inheritdoc />
-    internal override void Initialize(ApiInitializationContext context)
-    {
-        ArgumentNullException.ThrowIfNull(context);
-
-        base.Initialize(context);
-
-        this.InitializeApiItemTypeExpression(context);
-    }
-    #endregion
-
     #region Object Methods
     /// <inheritdoc/>
     public override string ToString()
@@ -78,6 +64,22 @@ public sealed class ApiCollectionType
         var extensionCount = this.ExtensionCount.SafeToString();
 
         return $"{nameof(ApiCollectionType)} {{{nameof(this.ApiItemTypeExpression)}={apiItemTypeExpression}, {nameof(this.ApiItemTypeModifiers)}={apiItemTypeModifiers}, {nameof(this.ExtensionCount)}={extensionCount}}} [{clrType}]";
+    }
+    #endregion
+
+    #region ApiSchemaElement Methods
+    /// <inheritdoc />
+    protected override string BuildPath(string? apiPreviousPath)
+        => ApiSchemaHelpers.BuildPath(basePath: apiPreviousPath, segment: this.ApiElementName, segmentName: null);
+
+    /// <inheritdoc />
+    internal override void Initialize(ApiInitializationContext context)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+
+        base.Initialize(context);
+
+        this.InitializeApiItemTypeExpression(context);
     }
     #endregion
 
@@ -96,7 +98,7 @@ public sealed class ApiCollectionType
             return;
         }
 
-        var childContext = context.WithParentSchemaElement(this);
+        var childContext = context.WithDeclaringSchemaElement(this);
         this.ApiItemTypeExpression.InitializeForCollection(childContext);
     }
     #endregion

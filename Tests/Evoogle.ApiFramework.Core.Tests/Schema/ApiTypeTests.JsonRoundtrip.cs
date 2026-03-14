@@ -3,31 +3,15 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using System.Diagnostics.CodeAnalysis;
 using Evoogle.ApiFramework.TestData;
 using Evoogle.XUnit;
 
 using static Evoogle.ApiFramework.Schema.TestData.ApiSchemaFactory;
-using static Evoogle.XUnit.Tests.JsonUnitTests;
 
 namespace Evoogle.ApiFramework.Schema;
 
 public partial class ApiTypeTests
 {
-    #region Test Types
-    private class JsonRoundtripTest : JsonRoundtripTest<ApiType, ApiTypeDescriptor>
-    {
-        #region Constructors
-        [SetsRequiredMembers]
-        public JsonRoundtripTest()
-        {
-            this.ExpectedFactoryExpression = (arg) => BuildTestApiType(arg);
-            this.ExcludeMembers = _excludeMembers;
-        }
-        #endregion
-    }
-    #endregion
-
     #region Theory Data
     public static TheoryDataRow<IXUnitTest>[] JsonRoundtripTheoryData =>
     [
@@ -474,21 +458,24 @@ public partial class ApiTypeTests
                         new ApiIdentityConfig
                         (
                             ApiName: "PK_Company_Id",
-                            ApiIdentitySources:
+                            ApiIdentityParts:
                             [
-                                new ApiIdentitySourceConfig
+                                new ApiIdentityPartConfig
                                 (
-                                    ApiPropertyName: nameof(Company.Id)
+                                    ApiKind: ApiIdentityPartKind.Scalar,
+                                    ApiPropertyName: nameof(Company.Id),
+                                    ClrScalarTypeHint: typeof(string)
                                 )
                             ]
                         ),
                         new ApiIdentityConfig
                         (
                             ApiName: "AK_Company_Name",
-                            ApiIdentitySources:
+                            ApiIdentityParts:
                             [
-                                new ApiIdentitySourceConfig
+                                new ApiIdentityPartConfig
                                 (
+                                    ApiKind: ApiIdentityPartKind.Scalar,
                                     ApiPropertyName: nameof(Company.Name)
                                 )
                             ]
@@ -786,22 +773,24 @@ public partial class ApiTypeTests
                         new ApiIdentityConfig
                         (
                             ApiName: "PK_Company_Id",
-                            ApiIdentitySources:
+                            ApiIdentityParts:
                             [
-                                new ApiIdentitySourceConfig
+                                new ApiIdentityPartConfig
                                 (
+                                    ApiKind: ApiIdentityPartKind.Scalar,
                                     ApiPropertyName: nameof(Company.Id),
-                                    ClrScalarType: typeof(string)
+                                    ClrScalarTypeHint: typeof(string)
                                 )
                             ]
                         ),
                         new ApiIdentityConfig
                         (
                             ApiName: "AK_Company_Name",
-                            ApiIdentitySources:
+                            ApiIdentityParts:
                             [
-                                new ApiIdentitySourceConfig
+                                new ApiIdentityPartConfig
                                 (
+                                    ApiKind: ApiIdentityPartKind.Scalar,
                                     ApiPropertyName: nameof(Company.Name)
                                 )
                             ]
@@ -853,7 +842,7 @@ public partial class ApiTypeTests
                     ApiRelationships:
                     [
                         new ApiRelationshipConfig(ApiName: "OwnedBy", ApiPropertyName: nameof(Company.Owner)),
-                        new ApiRelationshipConfig(ApiName: nameof(Company.Employees), ApiPropertyName: nameof(Company.Employees))
+                        new ApiRelationshipConfig(ApiName: nameof(Company.Employees))
                     ]
                 )
             )

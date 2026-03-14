@@ -75,13 +75,15 @@ public static class ApiSchemaFactory
     public record ApiIdentityConfig
     (
         string ApiName,
-        List<ApiIdentitySourceConfig> ApiIdentitySources
+        List<ApiIdentityPartConfig> ApiIdentityParts
     );
 
-    public record ApiIdentitySourceConfig
+    public record ApiIdentityPartConfig
     (
-        string ApiPropertyName,
-        Type? ClrScalarType = null
+        ApiIdentityPartKind ApiKind,
+        string? ApiPropertyName = null,
+        string? ApiIdentityName = null,
+        Type? ClrScalarTypeHint = null
     );
 
     public record ApiPropertyConfig
@@ -256,8 +258,19 @@ public static class ApiSchemaFactory
             Extensions = extensions
         };
 
-    private static ApiIdentity I(string name, IEnumerable<string> propertyNames)
-        => new(name, propertyNames.Select(sn => new ApiIdentitySource(sn)));
+    private static ApiIdentity I(string name, IEnumerable<ApiIdentityPart> parts)
+        => new(name, parts);
+
+#pragma warning disable CA1859 // Use concrete types when possible for improved performance
+    private static ApiIdentityPart IPS(string propertyName, Type? type = null)
+        => new ApiScalarIdentityPart(propertyName, type);
+
+    private static ApiIdentityPart IPN(string propertyName, string? identityName = null)
+        => new ApiNestedIdentityPart(propertyName, identityName);
+
+    private static ApiIdentityPart IPP(string? identityName = null)
+        => new ApiParentIdentityPart(identityName);
+#pragma warning restore CA1859 // Use concrete types when possible for improved performance
 
     private static ApiObjectType O(string name, Type clr, IEnumerable<ApiProperty> properties, IEnumerable<ApiIdentity>? identities = null, IEnumerable<ApiRelationship>? relationships = null, ApiObjectTypeOptions? options = null, OrderedDictionary<Type, object>? extensions = null)
         => new(name, options, identities, properties, relationships ?? [], clr)
@@ -396,8 +409,8 @@ public static class ApiSchemaFactory
             P(name: nameof(Customer.Orders),         expression: TE.ListOf<Order>(required: true),   required: true)
         ], identities:
         [
-            I("PK_Customer", [nameof(Customer.Id)]),
-            I("AK_Customer_Email", [nameof(Customer.Email)])
+            I("PK_Customer", [IPS(nameof(Customer.Id))]),
+            I("AK_Customer_Email", [IPS(nameof(Customer.Email))])
         ], relationships:
         [
             R(name: "Customer_Orders", propertyName: nameof(Customer.Orders))
@@ -414,8 +427,8 @@ public static class ApiSchemaFactory
             P(name: nameof(Category.Children),  expression: TE.ListOf<Category>(required: true), required: true)
         ], identities:
         [
-            I("PK_Category", [nameof(Category.Id)]),
-            I("AK_Category_Name", [nameof(Category.Name)])
+            I("PK_Category", [IPS(nameof(Category.Id))]),
+            I("AK_Category_Name", [IPS(nameof(Category.Name))])
         ], relationships:
         [
             R(name: "Category_Children", propertyName: nameof(Category.Children)),
@@ -430,8 +443,8 @@ public static class ApiSchemaFactory
             P(name: nameof(Tag.Products),  expression: TE.ListOf<ProductBase>(required: true), required: true)
         ], identities:
         [
-            I("PK_Tag", [nameof(Tag.Id)]),
-            I("AK_Tag_Name", [nameof(Tag.Name)])
+            I("PK_Tag", [IPS(nameof(Tag.Id))]),
+            I("AK_Tag_Name", [IPS(nameof(Tag.Name))])
         ], relationships:
         [
             R(name: "Product_Tags", propertyName: "Products")
@@ -459,8 +472,8 @@ public static class ApiSchemaFactory
             P(name: nameof(DigitalProduct.Bytes),          expression: TE.ClrRef<long>(),              required: false),
         ], identities:
         [
-            I("PK_DigitalProduct", [nameof(DigitalProduct.Id)]),
-            I("AK_DigitalProduct_Sku", [nameof(DigitalProduct.Sku)])
+            I("PK_DigitalProduct", [IPS(nameof(DigitalProduct.Id))]),
+            I("AK_DigitalProduct_Sku", [IPS(nameof(DigitalProduct.Sku))])
         ], relationships:
         [
             R(name: "Product_Tags", propertyName: nameof(DigitalProduct.Tags))
@@ -478,8 +491,8 @@ public static class ApiSchemaFactory
             P(name: nameof(PhysicalProduct.Size),      expression: TE.ClrRef<Quantity>(),          required: false),
         ], identities:
         [
-            I("PK_PhysicalProduct", [nameof(PhysicalProduct.Id)]),
-            I("AK_PhysicalProduct_Sku", [nameof(PhysicalProduct.Sku)])
+            I("PK_PhysicalProduct", [IPS(nameof(PhysicalProduct.Id))]),
+            I("AK_PhysicalProduct_Sku", [IPS(nameof(PhysicalProduct.Sku))])
         ], relationships:
         [
             R(name: "Product_Tags", propertyName: nameof(PhysicalProduct.Tags))
@@ -499,7 +512,7 @@ public static class ApiSchemaFactory
             P(name: nameof(Order.Total),     expression: TE.ClrRef<Money>(),                   required: true)
         ], identities:
         [
-            I("PK_Order", [nameof(Order.Id)])
+            I("PK_Order", [IPS(nameof(Order.Id))])
         ], relationships:
         [
             R(name: "Customer_Orders", propertyName: nameof(Order.Customer)),
@@ -517,7 +530,7 @@ public static class ApiSchemaFactory
             P(name: nameof(OrderLine.LineTotal),    expression: TE.ClrRef<Money>(),       required: true)
         ], identities:
         [
-            I("PK_OrderLine", [nameof(OrderLine.OrderId), nameof(OrderLine.LineNumber)])
+            I("PK_OrderLine", [IPS(nameof(OrderLine.OrderId)), IPS(nameof(OrderLine.LineNumber))])
         ]);
 
         // Payment
@@ -531,7 +544,7 @@ public static class ApiSchemaFactory
             //P(name: "Metadata",  expression: TE.DictOf(TE.ClrRef<string>(), TE.ClrRef<string>(), valueNullable: true), required: true)
         ], identities:
         [
-            I("PK_Payment", [nameof(Payment.Id)])
+            I("PK_Payment", [IPS(nameof(Payment.Id))])
         ]);
 
         // 5) Relationships (optional if you encode via properties; include here when you want explicit cardinality tests)
@@ -629,8 +642,8 @@ public static class ApiSchemaFactory
 
         var person = O(name: nameof(Person), clr: typeof(Person), options: OO(ApiIdentityNullHandling.ThrowException), identities:
         [
-            I("PK_Person_Id", [nameof(Person.Id)]),
-            I("AK_Person_Name", [nameof(Person.Name)])
+            I("PK_Person_Id", [IPS(nameof(Person.Id))]),
+            I("AK_Person_Name", [IPS(nameof(Person.Name))])
         ], properties:
         [
             P(name: nameof(Person.Id),        expression: TE.ClrRef<int>(),                  required: true),
@@ -643,8 +656,8 @@ public static class ApiSchemaFactory
 
         var company = O(name: nameof(Company), clr: typeof(Company), options: OO(ApiIdentityNullHandling.ThrowException), identities:
         [
-            I("PK_Company_Id", [nameof(Company.Id)]),
-            I("AK_Company_Name", [nameof(Company.Name)])
+            I("PK_Company_Id", [IPS(nameof(Company.Id))]),
+            I("AK_Company_Name", [IPS(nameof(Company.Name))])
         ], properties:
         [
             P(name: nameof(Company.Id),        expression: TE.ClrRef<Ulid>(),                 required: true),
@@ -695,74 +708,122 @@ public static class ApiSchemaFactory
             S(name: nameof(Int32),  clr: typeof(int))
         };
 
-        // ProductInventory: Composite identity (int + string + Guid)
-        var productInventory = O(
-            name: nameof(ProductInventory),
-            clr: typeof(ProductInventory),
+        // IdentityScalar: Single scalar identity
+        var identityScalar = O(
+            name: nameof(IdentityScalar),
+            clr: typeof(IdentityScalar),
             identities:
             [
-                I(name: "PK_ProductInventory", propertyNames: [nameof(ProductInventory.WarehouseId), nameof(ProductInventory.ProductCode), nameof(ProductInventory.BatchId)])
+                I(name: "PK_IdentityScalar", parts: [IPS(nameof(IdentityScalar.Id))]),
+                I(name: "AK_IdentityScalar_Name", parts: [IPS(nameof(IdentityScalar.Name))])
             ],
             properties:
             [
-                P(name: nameof(ProductInventory.WarehouseId),  expression: TE.ClrRef<int>(),    required: true),
-                P(name: nameof(ProductInventory.ProductCode),  expression: TE.ClrRef<string>(), required: true),
-                P(name: nameof(ProductInventory.BatchId),      expression: TE.ClrRef<Guid>(),   required: true),
-                P(name: nameof(ProductInventory.Quantity),     expression: TE.ClrRef<int>(),    required: true)
+                P(name: nameof(IdentityScalar.Id), expression: TE.ClrRef<int>(), required: true),
+                P(name: nameof(IdentityScalar.Name), expression: TE.ClrRef<string>(), required: true)
             ]
         );
 
-        // CompositeNullable: Composite identity with nullable parts (ReturnEmpty)
-        var compositeNullable = O(
-            name: nameof(CompositeNullable),
-            clr: typeof(CompositeNullable),
-            options: OO(ApiIdentityNullHandling.ReturnEmpty),
+        // IdentityTwoScalarPartComposite: Composite identity (int + string)
+        var identityTwoScalarPartComposite = O(
+            name: nameof(IdentityTwoScalarPartComposite),
+            clr: typeof(IdentityTwoScalarPartComposite),
             identities:
             [
-                I(name: "PK_CompositeNullable", propertyNames: [nameof(CompositeNullable.Part1), nameof(CompositeNullable.Part2)])
+                I(name: "PK_IdentityTwoScalarPartComposite", parts: [IPS(nameof(IdentityTwoScalarPartComposite.Part1)), IPS(nameof(IdentityTwoScalarPartComposite.Part2))])
             ],
             properties:
             [
-                P(name: nameof(CompositeNullable.Part1), expression: TE.ClrRef<int>(),    required: true),
-                P(name: nameof(CompositeNullable.Part2), expression: TE.ClrRef<string>(), required: false)
+                P(name: nameof(IdentityTwoScalarPartComposite.Part1), expression: TE.ClrRef<int>(), required: true),
+                P(name: nameof(IdentityTwoScalarPartComposite.Part2), expression: TE.ClrRef<string>(), required: false)
             ]
         );
 
-        // CompositeStrict: Composite identity with nullable parts (ThrowException)
-        var compositeStrict = O(
-            name: nameof(CompositeStrict),
-            clr: typeof(CompositeStrict),
-            options: OO(ApiIdentityNullHandling.ThrowException),
+        // IdentityThreeScalarPartComposite: Composite identity (int + string + int)
+        var identityThreeScalarPartComposite = O(
+            name: nameof(IdentityThreeScalarPartComposite),
+            clr: typeof(IdentityThreeScalarPartComposite),
             identities:
             [
-                I(name: "PK_CompositeStrict", propertyNames: [nameof(CompositeStrict.Part1), nameof(CompositeStrict.Part2)])
+                I(name: "PK_IdentityThreeScalarPartComposite", parts: [IPS(nameof(IdentityThreeScalarPartComposite.Part1)), IPS(nameof(IdentityThreeScalarPartComposite.Part2)), IPS(nameof(IdentityThreeScalarPartComposite.Part3))])
             ],
             properties:
             [
-                P(name: nameof(CompositeStrict.Part1), expression: TE.ClrRef<int>(),    required: true),
-                P(name: nameof(CompositeStrict.Part2), expression: TE.ClrRef<string>(), required: false)
+                P(name: nameof(IdentityThreeScalarPartComposite.Part1), expression: TE.ClrRef<int>(), required: true),
+                P(name: nameof(IdentityThreeScalarPartComposite.Part2), expression: TE.ClrRef<string>(), required: false),
+                P(name: nameof(IdentityThreeScalarPartComposite.Part3), expression: TE.ClrRef<int>(), required: true)
             ]
         );
 
-        // User: Primary + alternate identities
-        var user = O(
-            name: nameof(User),
-            clr: typeof(User),
+        // IdentityNestedPart: Nested part for identity testing
+        var identityNestedPart = O(
+            name: nameof(IdentityNestedPart),
+            clr: typeof(IdentityNestedPart),
             identities:
             [
-                I(name: "PK_User",        propertyNames: [nameof(User.UserId)]),
-                I(name: "AK_User_Email",  propertyNames: [nameof(User.Email)]),
-                I(name: "AK_User_Username", propertyNames: [nameof(User.Username)])
+                I(name: "PK_IdentityNestedPart", parts: [IPS(nameof(IdentityNestedPart.Id))])
             ],
             properties:
             [
-                P(name: nameof(User.UserId),   expression: TE.ClrRef<int>(),    required: true),
-                P(name: nameof(User.Email),    expression: TE.ClrRef<string>(), required: true),
-                P(name: nameof(User.Username), expression: TE.ClrRef<string>(), required: true)
+                P(name: nameof(IdentityNestedPart.Id), expression: TE.ClrRef<int>(), required: true),
+                P(name: nameof(IdentityNestedPart.Code), expression: TE.ClrRef<string>(), required: true)
             ]
         );
 
-        var objects = new List<ApiObjectType> { productInventory, compositeNullable, compositeStrict, user };
+        // IdentityNestedComposite: Composite identity with nested part
+        var identityNestedComposite = O(
+            name: nameof(IdentityNestedComposite),
+            clr: typeof(IdentityNestedComposite),
+            identities:
+            [
+                I(name: "PK_IdentityNestedComposite", parts: [IPN(nameof(IdentityNestedComposite.NestedPart)), IPS(nameof(IdentityNestedComposite.Name))])
+            ],
+            properties:
+            [
+                P(name: nameof(IdentityNestedComposite.NestedPart), expression: TE.ClrRef<IdentityNestedPart>(), required: true),
+                P(name: nameof(IdentityNestedComposite.Name), expression: TE.ClrRef<string>(), required: true)
+            ]
+        );
+
+        // IdentityParent: Parent identity reference for testing parent identity handling
+        var identityParent = O(
+            name: nameof(IdentityParent),
+            clr: typeof(IdentityParent),
+            identities:
+            [
+                I(name: "PK_IdentityParent", parts: [IPS(nameof(IdentityParent.Id))])
+            ],
+            properties:
+            [
+                P(name: nameof(IdentityParent.Id), expression: TE.ClrRef<int>(), required: true)
+            ]
+        );
+
+        // IdentityChildComposite: Composite identity with parent reference
+        var identityChildComposite = O(
+            name: nameof(IdentityChildComposite),
+            clr: typeof(IdentityChildComposite),
+            identities:
+            [
+                I(name: "PK_IdentityChildComposite", parts: [IPP(), IPS(nameof(IdentityChildComposite.ChildId))])
+            ],
+            properties:
+            [
+                P(name: nameof(IdentityChildComposite.ChildId), expression: TE.ClrRef<int>(), required: true),
+                P(name: nameof(IdentityChildComposite.ChildName), expression: TE.ClrRef<string>(), required: true)
+            ]
+        );
+
+        var objects = new List<ApiObjectType>
+        {
+            identityScalar,
+            identityTwoScalarPartComposite,
+            identityThreeScalarPartComposite,
+            identityNestedPart,
+            identityNestedComposite,
+            identityParent,
+            identityChildComposite
+        };
 
         var schema = ApiSchema.Create
         (
@@ -839,7 +900,18 @@ public static class ApiSchemaFactory
                     var apiIdentity = new ApiIdentity
                     (
                         apiName: x.ApiName,
-                        apiIdentitySources: x.ApiIdentitySources.Select(part => new ApiIdentitySource(part.ApiPropertyName, part.ClrScalarType))
+                        apiIdentityParts: x.ApiIdentityParts.Select(part =>
+                        {
+                            var apiKind = part.ApiKind;
+                            ApiIdentityPart apiIdentityPart = apiKind switch
+                            {
+                                ApiIdentityPartKind.Scalar => new ApiScalarIdentityPart(part.ApiPropertyName!, part.ClrScalarTypeHint),
+                                ApiIdentityPartKind.Nested => new ApiNestedIdentityPart(part.ApiPropertyName!, part.ApiIdentityName),
+                                ApiIdentityPartKind.Parent => new ApiParentIdentityPart(part.ApiIdentityName),
+                                _ => throw new InvalidOperationException($"Unsupported ApiIdentityPartKind: {apiKind}"),
+                            };
+                            return apiIdentityPart;
+                        })
                     );
                     return apiIdentity;
                 });

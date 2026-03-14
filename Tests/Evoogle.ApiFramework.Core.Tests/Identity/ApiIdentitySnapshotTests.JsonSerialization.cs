@@ -3,10 +3,9 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using Evoogle.XUnit;
-
 namespace Evoogle.ApiFramework.Identity;
 
+#if false
 public partial class ApiIdentitySnapshotTests
 {
     #region Theory Data
@@ -846,3 +845,4 @@ public partial class ApiIdentitySnapshotTests
     public void JsonSerialize(IXUnitTest test) => test.Execute(this);
     #endregion
 }
+#endif

@@ -146,6 +146,23 @@ public sealed class ApiSchema : ExtensibleBase
     { }
     #endregion
 
+    #region Object Methods
+    /// <inheritdoc/>
+    public override string ToString()
+    {
+        var apiName = this.ApiName.SafeToString();
+        var apiVersion = this.ApiVersion.SafeToString();
+        var apiOptions = this.ApiOptions.SafeToString();
+        var apiNamedTypeCount = this.ApiNamedTypes.Length.SafeToString();
+        var apiScalarTypeCount = this.ApiScalarTypes.Length.SafeToString();
+        var apiEnumTypeCount = this.ApiEnumTypes.Length.SafeToString();
+        var apiObjectTypeCount = this.ApiObjectTypes.Length.SafeToString();
+        var extensionCount = this.ExtensionCount.SafeToString();
+
+        return $"{nameof(ApiSchema)} {{ApiName={apiName}, ApiVersion={apiVersion}, {nameof(this.ApiOptions)}={apiOptions}, ApiNamedTypeCount={apiNamedTypeCount}, ApiScalarTypeCount={apiScalarTypeCount}, ApiEnumTypeCount={apiEnumTypeCount}, ApiObjectTypeCount={apiObjectTypeCount}, {nameof(this.ExtensionCount)}={extensionCount}}}";
+    }
+    #endregion
+
     #region ApiSchema Methods
     public ApiInitializationResult Initialize()
     {
@@ -200,7 +217,7 @@ public sealed class ApiSchema : ExtensibleBase
     public bool TryGetScalarTypeByClrType(Type clrType, [NotNullWhen(true)] out ApiScalarType? apiScalarType) => this.ApiScalarTypeClrTypeLookup.TryGetValue(clrType, out apiScalarType);
 
     private string BuildPath()
-        => ApiSchemaHelpers.BuildPath(null, apiChildPath: nameof(ApiSchema), apiApiName: this.ApiName);
+        => ApiSchemaHelpers.BuildPath(null, segment: nameof(ApiSchema), segmentName: this.ApiName);
     #endregion
 
     #region Factory Methods
@@ -254,23 +271,6 @@ public sealed class ApiSchema : ExtensibleBase
         result.ThrowIfInvalid();
 
         return apiSchema;
-    }
-    #endregion
-
-    #region Object Methods
-    /// <inheritdoc/>
-    public override string ToString()
-    {
-        var apiName = this.ApiName.SafeToString();
-        var apiVersion = this.ApiVersion.SafeToString();
-        var apiOptions = this.ApiOptions.SafeToString();
-        var apiNamedTypeCount = this.ApiNamedTypes.Length.SafeToString();
-        var apiScalarTypeCount = this.ApiScalarTypes.Length.SafeToString();
-        var apiEnumTypeCount = this.ApiEnumTypes.Length.SafeToString();
-        var apiObjectTypeCount = this.ApiObjectTypes.Length.SafeToString();
-        var extensionCount = this.ExtensionCount.SafeToString();
-
-        return $"{nameof(ApiSchema)} {{ApiName={apiName}, ApiVersion={apiVersion}, {nameof(this.ApiOptions)}={apiOptions}, ApiNamedTypeCount={apiNamedTypeCount}, ApiScalarTypeCount={apiScalarTypeCount}, ApiEnumTypeCount={apiEnumTypeCount}, ApiObjectTypeCount={apiObjectTypeCount}, {nameof(this.ExtensionCount)}={extensionCount}}}";
     }
     #endregion
 

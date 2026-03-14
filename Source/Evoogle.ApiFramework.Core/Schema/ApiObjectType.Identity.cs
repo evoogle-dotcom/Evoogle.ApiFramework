@@ -3,11 +3,6 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using Evoogle.ApiFramework.Exceptions;
-using Evoogle.ApiFramework.Identity;
-using Evoogle.Extensions;
-using Microsoft.Extensions.Logging;
-
 namespace Evoogle.ApiFramework.Schema;
 
 public sealed partial class ApiObjectType
@@ -420,44 +415,44 @@ public sealed partial class ApiObjectType
     ///         configured <see cref="ApiIdentityNullHandling"/> policy.
     ///     </para>
     /// </remarks>
-    public bool TryGetIdentitySnapshot(object clrInstance, out ApiIdentitySnapshot? snapshot, string? apiIdentityName = null)
-    {
-        snapshot = default;
+    // public bool TryGetIdentitySnapshot(object clrInstance, out ApiIdentitySnapshot? snapshot, string? apiIdentityName = null)
+    // {
+    //     snapshot = default;
 
-        if (clrInstance is null)
-        {
-            this.Logger.LogDebug("TryGetIdentitySnapshot failed: clrInstance is null for type '{TypeName}'", this.ApiName);
-            return false;
-        }
+    //     if (clrInstance is null)
+    //     {
+    //         this.Logger.LogDebug("TryGetIdentitySnapshot failed: clrInstance is null for type '{TypeName}'", this.ApiName);
+    //         return false;
+    //     }
 
-        if (!this.HasIdentity)
-        {
-            this.Logger.LogDebug("TryGetIdentitySnapshot failed: type '{TypeName}' has no identity configured", this.ApiName);
-            return false;
-        }
+    //     if (!this.HasIdentity)
+    //     {
+    //         this.Logger.LogDebug("TryGetIdentitySnapshot failed: type '{TypeName}' has no identity configured", this.ApiName);
+    //         return false;
+    //     }
 
-        var apiIdentity = this.ResolveIdentityForBuild(apiIdentityName);
-        if (apiIdentity is null)
-        {
-            var identityRef = string.IsNullOrWhiteSpace(apiIdentityName) ? "primary identity" : $"identity '{apiIdentityName}'";
-            this.Logger.LogDebug("TryGetIdentitySnapshot failed: type '{TypeName}' does not have {IdentityRef}", this.ApiName, identityRef);
-            return false;
-        }
+    //     var apiIdentity = this.ResolveIdentityForBuild(apiIdentityName);
+    //     if (apiIdentity is null)
+    //     {
+    //         var identityRef = string.IsNullOrWhiteSpace(apiIdentityName) ? "primary identity" : $"identity '{apiIdentityName}'";
+    //         this.Logger.LogDebug("TryGetIdentitySnapshot failed: type '{TypeName}' does not have {IdentityRef}", this.ApiName, identityRef);
+    //         return false;
+    //     }
 
-        this.Logger.LogTrace("Building identity snapshot '{IdentityName}' for type '{TypeName}' with {SourceCount} sources", apiIdentity.ApiName, this.ApiName, apiIdentity.ApiIdentitySources.Length);
+    //     this.Logger.LogTrace("Building identity snapshot '{IdentityName}' for type '{TypeName}' with {SourceCount} sources", apiIdentity.ApiName, this.ApiName, apiIdentity.ApiIdentitySources.Length);
 
-        try
-        {
-            snapshot = this.GetIdentitySnapshotFromInstance(apiIdentity, clrInstance, parentPath: null);
-            this.Logger.LogTrace("Successfully built identity snapshot '{IdentityName}' for type '{TypeName}': {Snapshot}", apiIdentity.ApiName, this.ApiName, snapshot);
-            return true;
-        }
-        catch (Exception ex)
-        {
-            this.Logger.LogDebug(ex, "TryGetIdentitySnapshot failed with exception for type '{TypeName}' identity '{IdentityName}'", this.ApiName, apiIdentity.ApiName);
-            return false;
-        }
-    }
+    //     try
+    //     {
+    //         snapshot = this.GetIdentitySnapshotFromInstance(apiIdentity, clrInstance, parentPath: null);
+    //         this.Logger.LogTrace("Successfully built identity snapshot '{IdentityName}' for type '{TypeName}': {Snapshot}", apiIdentity.ApiName, this.ApiName, snapshot);
+    //         return true;
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         this.Logger.LogDebug(ex, "TryGetIdentitySnapshot failed with exception for type '{TypeName}' identity '{IdentityName}'", this.ApiName, apiIdentity.ApiName);
+    //         return false;
+    //     }
+    // }
 
     /// <summary>
     ///     Attempts to build an <see cref="ApiIdentitySnapshot"/> from a dictionary of property values without throwing exceptions.
@@ -490,44 +485,44 @@ public sealed partial class ApiObjectType
     ///         <item><description>Integration with external systems that provide structured identity data</description></item>
     ///     </list>
     /// </remarks>
-    public bool TryGetIdentitySnapshot(IReadOnlyDictionary<string, object?> values, out ApiIdentitySnapshot? snapshot, string? apiIdentityName = null)
-    {
-        snapshot = default;
+    // public bool TryGetIdentitySnapshot(IReadOnlyDictionary<string, object?> values, out ApiIdentitySnapshot? snapshot, string? apiIdentityName = null)
+    // {
+    //     snapshot = default;
 
-        if (values is null)
-        {
-            this.Logger.LogDebug("TryGetIdentitySnapshot failed: values dictionary is null for type '{TypeName}'", this.ApiName);
-            return false;
-        }
+    //     if (values is null)
+    //     {
+    //         this.Logger.LogDebug("TryGetIdentitySnapshot failed: values dictionary is null for type '{TypeName}'", this.ApiName);
+    //         return false;
+    //     }
 
-        if (!this.HasIdentity)
-        {
-            this.Logger.LogDebug("TryGetIdentitySnapshot failed: type '{TypeName}' has no identity configured", this.ApiName);
-            return false;
-        }
+    //     if (!this.HasIdentity)
+    //     {
+    //         this.Logger.LogDebug("TryGetIdentitySnapshot failed: type '{TypeName}' has no identity configured", this.ApiName);
+    //         return false;
+    //     }
 
-        var apiIdentity = this.ResolveIdentityForBuild(apiIdentityName);
-        if (apiIdentity is null)
-        {
-            var identityRef = string.IsNullOrWhiteSpace(apiIdentityName) ? "primary identity" : $"identity '{apiIdentityName}'";
-            this.Logger.LogDebug("TryGetIdentitySnapshot failed: type '{TypeName}' does not have {IdentityRef}", this.ApiName, identityRef);
-            return false;
-        }
+    //     var apiIdentity = this.ResolveIdentityForBuild(apiIdentityName);
+    //     if (apiIdentity is null)
+    //     {
+    //         var identityRef = string.IsNullOrWhiteSpace(apiIdentityName) ? "primary identity" : $"identity '{apiIdentityName}'";
+    //         this.Logger.LogDebug("TryGetIdentitySnapshot failed: type '{TypeName}' does not have {IdentityRef}", this.ApiName, identityRef);
+    //         return false;
+    //     }
 
-        this.Logger.LogTrace("Building identity snapshot '{IdentityName}' from values dictionary for type '{TypeName}' with {SourceCount} sources", apiIdentity.ApiName, this.ApiName, apiIdentity.ApiIdentitySources.Length);
+    //     this.Logger.LogTrace("Building identity snapshot '{IdentityName}' from values dictionary for type '{TypeName}' with {SourceCount} sources", apiIdentity.ApiName, this.ApiName, apiIdentity.ApiIdentitySources.Length);
 
-        try
-        {
-            snapshot = this.GetIdentitySnapshotFromValues(apiIdentity, values, parentPath: null);
-            this.Logger.LogTrace("Successfully built identity snapshot '{IdentityName}' from values for type '{TypeName}': {Snapshot}", apiIdentity.ApiName, this.ApiName, snapshot);
-            return true;
-        }
-        catch (Exception ex)
-        {
-            this.Logger.LogDebug(ex, "TryGetIdentitySnapshot failed with exception from values for type '{TypeName}' identity '{IdentityName}'", this.ApiName, apiIdentity.ApiName);
-            return false;
-        }
-    }
+    //     try
+    //     {
+    //         snapshot = this.GetIdentitySnapshotFromValues(apiIdentity, values, parentPath: null);
+    //         this.Logger.LogTrace("Successfully built identity snapshot '{IdentityName}' from values for type '{TypeName}': {Snapshot}", apiIdentity.ApiName, this.ApiName, snapshot);
+    //         return true;
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         this.Logger.LogDebug(ex, "TryGetIdentitySnapshot failed with exception from values for type '{TypeName}' identity '{IdentityName}'", this.ApiName, apiIdentity.ApiName);
+    //         return false;
+    //     }
+    // }
     #endregion
 
     #region Implementation Methods
@@ -578,18 +573,18 @@ public sealed partial class ApiObjectType
     //     return FinalizeComposite(apiParts);
     // }
 
-    private ApiId ConvertToApiId(object value, Type valueType, string propertyName, string identityName, string contextDescription)
-    {
-        try
-        {
-            return ApiId.FromObject(value, valueType);
-        }
-        catch (Exception ex)
-        {
-            this.Logger.LogWarning(ex, "Identity coercion failed for {Property}", propertyName);
-            throw new ApiIdentityException($"Failed to convert property '{propertyName}' value of type '{value.GetType().Name}' to ApiId for identity '{identityName}' on {contextDescription}.", ex);
-        }
-    }
+    // private ApiId ConvertToApiId(object value, Type valueType, string propertyName, string identityName, string contextDescription)
+    // {
+    //     try
+    //     {
+    //         return ApiId.FromObject(value, valueType);
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         this.Logger.LogWarning(ex, "Identity coercion failed for {Property}", propertyName);
+    //         throw new ApiIdentityException($"Failed to convert property '{propertyName}' value of type '{value.GetType().Name}' to ApiId for identity '{identityName}' on {contextDescription}.", ex);
+    //     }
+    // }
 
     // private static ApiId FinalizeComposite(List<ApiIdPart> apiParts)
     //     => apiParts.Count switch
@@ -599,235 +594,235 @@ public sealed partial class ApiObjectType
     //         _ => ApiId.Composite(apiParts)
     //     };
 
-    private ApiIdentityNullHandling GetIdentityNullHandling()
-        => this.ApiOptions?.ApiIdentityNullHandling ?? this.ApiSchemaContext.ApiSchemaOptions.ApiIdentityNullHandling;
+    // private ApiIdentityNullHandling GetIdentityNullHandling()
+    //     => this.ApiOptions?.ApiIdentityNullHandling ?? this.ApiSchemaContext.ApiSchemaOptions.ApiIdentityNullHandling;
 
-    private ApiId MaterializeApiIdFromProperty(ApiIdentitySource apiIdentitySource, ApiIdentity apiIdentity, object clrInstance)
-    {
-        // Only valid for scalar sources — ClrScalarType is null for nested sources
-        var apiPropertyName = apiIdentitySource.ApiProperty.ApiName;
-        var apiIdentityName = apiIdentity.ApiName;
-        var clrScalarType = apiIdentitySource.ClrScalarType
-            ?? throw new ApiIdentityException($"Identity source '{apiPropertyName}' on identity '{apiIdentityName}' does not have a resolved scalar type. Ensure the source is a scalar kind before calling this method.");
-        var clrScalarTypeName = clrScalarType.Name;
+    // private ApiId MaterializeApiIdFromProperty(ApiIdentitySource apiIdentitySource, ApiIdentity apiIdentity, object clrInstance)
+    // {
+    //     // Only valid for scalar sources — ClrScalarType is null for nested sources
+    //     var apiPropertyName = apiIdentitySource.ApiProperty.ApiName;
+    //     var apiIdentityName = apiIdentity.ApiName;
+    //     var clrScalarType = apiIdentitySource.ClrScalarType
+    //         ?? throw new ApiIdentityException($"Identity source '{apiPropertyName}' on identity '{apiIdentityName}' does not have a resolved scalar type. Ensure the source is a scalar kind before calling this method.");
+    //     var clrScalarTypeName = clrScalarType.Name;
 
-        this.Logger.LogTrace("Reading and coercing property '{PropertyName}' to '{ScalarType}' for identity '{IdentityName}'", apiPropertyName, clrScalarTypeName, apiIdentityName);
+    //     this.Logger.LogTrace("Reading and coercing property '{PropertyName}' to '{ScalarType}' for identity '{IdentityName}'", apiPropertyName, clrScalarTypeName, apiIdentityName);
 
-        // Let ApiProperty handle property access AND type coercion in one optimized call
-        // This leverages ApiProperty's compiled accessors and coercion caching
-        if (!apiIdentitySource.ApiProperty.TryGetValue(clrInstance, out var coercedValue, clrScalarType))
-        {
-            throw new ApiIdentityException($"Failed to read and coerce property '{apiPropertyName}' to type '{clrScalarTypeName}' for identity '{apiIdentityName}' on type '{this.ClrTypeName}'.");
-        }
+    //     // Let ApiProperty handle property access AND type coercion in one optimized call
+    //     // This leverages ApiProperty's compiled accessors and coercion caching
+    //     if (!apiIdentitySource.ApiProperty.TryGetValue(clrInstance, out var coercedValue, clrScalarType))
+    //     {
+    //         throw new ApiIdentityException($"Failed to read and coerce property '{apiPropertyName}' to type '{clrScalarTypeName}' for identity '{apiIdentityName}' on type '{this.ClrTypeName}'.");
+    //     }
 
-        // Handle null values according to the configured null handling
-        if (coercedValue is null)
-        {
-            var nullHandling = this.GetIdentityNullHandling();
-            this.Logger.LogDebug("Property '{PropertyName}' has null value for identity '{IdentityName}', null handling: {NullHandling}", apiPropertyName, apiIdentityName, nullHandling);
+    //     // Handle null values according to the configured null handling
+    //     if (coercedValue is null)
+    //     {
+    //         var nullHandling = this.GetIdentityNullHandling();
+    //         this.Logger.LogDebug("Property '{PropertyName}' has null value for identity '{IdentityName}', null handling: {NullHandling}", apiPropertyName, apiIdentityName, nullHandling);
 
-            if (nullHandling == ApiIdentityNullHandling.ThrowException)
-            {
-                throw new ApiIdentityException($"Property '{apiPropertyName}' has a null value for identity '{apiIdentityName}' on type '{this.ClrTypeName}'. Null values are not allowed with {nameof(ApiIdentityNullHandling.ThrowException)} configured.");
-            }
+    //         if (nullHandling == ApiIdentityNullHandling.ThrowException)
+    //         {
+    //             throw new ApiIdentityException($"Property '{apiPropertyName}' has a null value for identity '{apiIdentityName}' on type '{this.ClrTypeName}'. Null values are not allowed with {nameof(ApiIdentityNullHandling.ThrowException)} configured.");
+    //         }
 
-            return ApiId.Empty;
-        }
+    //         return ApiId.Empty;
+    //     }
 
-        // Convert the already-coerced value to ApiId
-        return this.ConvertToApiId(coercedValue, clrScalarType, apiPropertyName, apiIdentityName, this.ClrTypeName);
-    }
+    //     // Convert the already-coerced value to ApiId
+    //     return this.ConvertToApiId(coercedValue, clrScalarType, apiPropertyName, apiIdentityName, this.ClrTypeName);
+    // }
 
-    private ApiId MaterializeApiIdFromPropertyValue(ApiIdentitySource apiIdentitySource, object? rawValue, ApiIdentity apiIdentity)
-    {
-        // Only valid for scalar sources — ClrScalarType is null for nested sources
-        var apiPropertyName = apiIdentitySource.ApiProperty.ApiName;
-        var apiIdentityName = apiIdentity.ApiName;
-        var clrScalarType = apiIdentitySource.ClrScalarType
-            ?? throw new ApiIdentityException($"Identity source '{apiPropertyName}' on identity '{apiIdentityName}' does not have a resolved scalar type. Ensure the source is a scalar kind before calling this method.");
-        var clrScalarTypeName = clrScalarType.Name;
+    // private ApiId MaterializeApiIdFromPropertyValue(ApiIdentitySource apiIdentitySource, object? rawValue, ApiIdentity apiIdentity)
+    // {
+    //     // Only valid for scalar sources — ClrScalarType is null for nested sources
+    //     var apiPropertyName = apiIdentitySource.ApiProperty.ApiName;
+    //     var apiIdentityName = apiIdentity.ApiName;
+    //     var clrScalarType = apiIdentitySource.ClrScalarType
+    //         ?? throw new ApiIdentityException($"Identity source '{apiPropertyName}' on identity '{apiIdentityName}' does not have a resolved scalar type. Ensure the source is a scalar kind before calling this method.");
+    //     var clrScalarTypeName = clrScalarType.Name;
 
-        this.Logger.LogTrace("Coercing property '{PropertyName}' from values dictionary ('{SourceType}' to '{TargetType}') for identity '{IdentityName}'",
-            apiPropertyName, rawValue?.GetType().SafeToName(), clrScalarTypeName, apiIdentityName);
+    //     this.Logger.LogTrace("Coercing property '{PropertyName}' from values dictionary ('{SourceType}' to '{TargetType}') for identity '{IdentityName}'",
+    //         apiPropertyName, rawValue?.GetType().SafeToName(), clrScalarTypeName, apiIdentityName);
 
-        // Use ApiProperty's coercion for consistency and potential performance benefits
-        if (!apiIdentitySource.ApiProperty.TryCoerceValue(rawValue, out var coercedValue, clrScalarType))
-        {
-            throw new ApiIdentityException($"Failed to coerce property '{apiPropertyName}' value to type '{clrScalarTypeName}' for identity '{apiIdentityName}' from values dictionary.");
-        }
+    //     // Use ApiProperty's coercion for consistency and potential performance benefits
+    //     if (!apiIdentitySource.ApiProperty.TryCoerceValue(rawValue, out var coercedValue, clrScalarType))
+    //     {
+    //         throw new ApiIdentityException($"Failed to coerce property '{apiPropertyName}' value to type '{clrScalarTypeName}' for identity '{apiIdentityName}' from values dictionary.");
+    //     }
 
-        // Handle null values according to the configured null handling
-        if (coercedValue is null)
-        {
-            var nullHandling = this.GetIdentityNullHandling();
-            this.Logger.LogDebug("Property '{PropertyName}' from values has null value for identity '{IdentityName}', null handling: {NullHandling}", apiPropertyName, apiIdentityName, nullHandling);
+    //     // Handle null values according to the configured null handling
+    //     if (coercedValue is null)
+    //     {
+    //         var nullHandling = this.GetIdentityNullHandling();
+    //         this.Logger.LogDebug("Property '{PropertyName}' from values has null value for identity '{IdentityName}', null handling: {NullHandling}", apiPropertyName, apiIdentityName, nullHandling);
 
-            if (nullHandling == ApiIdentityNullHandling.ThrowException)
-            {
-                throw new ApiIdentityException($"Property '{apiPropertyName}' has a null value for identity '{apiIdentityName}' from values dictionary. Null values are not allowed with {nameof(ApiIdentityNullHandling.ThrowException)} configured.");
-            }
+    //         if (nullHandling == ApiIdentityNullHandling.ThrowException)
+    //         {
+    //             throw new ApiIdentityException($"Property '{apiPropertyName}' has a null value for identity '{apiIdentityName}' from values dictionary. Null values are not allowed with {nameof(ApiIdentityNullHandling.ThrowException)} configured.");
+    //         }
 
-            return ApiId.Empty;
-        }
+    //         return ApiId.Empty;
+    //     }
 
-        // Convert the typed value to ApiId
-        return this.ConvertToApiId(coercedValue, clrScalarType, apiPropertyName, apiIdentityName, "values dictionary");
-    }
+    //     // Convert the typed value to ApiId
+    //     return this.ConvertToApiId(coercedValue, clrScalarType, apiPropertyName, apiIdentityName, "values dictionary");
+    // }
 
-    internal ApiIdentity? ResolveIdentityForBuild(string? apiIdentityName)
-    {
-        if (!string.IsNullOrWhiteSpace(apiIdentityName))
-        {
-            return this.TryGetIdentityByApiName(apiIdentityName, out var apiIdentity) ? apiIdentity : null;
-        }
+    // internal ApiIdentity? ResolveIdentityForBuild(string? apiIdentityName)
+    // {
+    //     if (!string.IsNullOrWhiteSpace(apiIdentityName))
+    //     {
+    //         return this.TryGetIdentityByApiName(apiIdentityName, out var apiIdentity) ? apiIdentity : null;
+    //     }
 
-        return this.ApiPrimaryIdentity;
-    }
+    //     return this.ApiPrimaryIdentity;
+    // }
 
-    private ApiIdentitySnapshot GetIdentitySnapshotFromInstance(ApiIdentity apiIdentity, object clrInstance, string? parentPath)
-    {
-        var sources = apiIdentity.ApiIdentitySources;
+    // private ApiIdentitySnapshot GetIdentitySnapshotFromInstance(ApiIdentity apiIdentity, object clrInstance, string? parentPath)
+    // {
+    //     var sources = apiIdentity.ApiIdentitySources;
 
-        // Fast path: single scalar source produces a scalar snapshot directly,
-        // mirroring FinalizeComposite which unwraps single-part ApiId to a scalar value.
-        if (sources.Length == 1 && sources[0].ApiKind == ApiIdentitySourceKind.Scalar)
-        {
-            var apiId = this.MaterializeApiIdFromProperty(sources[0], apiIdentity, clrInstance);
-            return ApiIdentitySnapshot.Scalar(parentPath, apiId);
-        }
+    //     // Fast path: single scalar source produces a scalar snapshot directly,
+    //     // mirroring FinalizeComposite which unwraps single-part ApiId to a scalar value.
+    //     if (sources.Length == 1 && sources[0].ApiKind == ApiIdentitySourceKind.Scalar)
+    //     {
+    //         var apiId = this.MaterializeApiIdFromProperty(sources[0], apiIdentity, clrInstance);
+    //         return ApiIdentitySnapshot.Scalar(parentPath, apiId);
+    //     }
 
-        var parts = new List<ApiIdentityPart>(sources.Length);
+    //     var parts = new List<ApiIdentityPart>(sources.Length);
 
-        foreach (var source in sources)
-        {
-            var partName = source.ApiProperty.ApiName;
-            var childPath = BuildChildPath(parentPath, partName);
+    //     foreach (var source in sources)
+    //     {
+    //         var partName = source.ApiProperty.ApiName;
+    //         var childPath = BuildChildPath(parentPath, partName);
 
-            if (source.ApiKind == ApiIdentitySourceKind.Scalar)
-            {
-                var apiId = this.MaterializeApiIdFromProperty(source, apiIdentity, clrInstance);
-                parts.Add(new ApiIdentityPart(partName, ApiIdentitySnapshot.Scalar(childPath, apiId)));
-            }
-            else
-            {
-                // Nested source: read the nested CLR object and recursively resolve its identity
-                var nestedObjectType = (ApiObjectType)source.ApiProperty.ApiType;
-                var nestedIdentity = source.ApiNestedIdentity!;
+    //         if (source.ApiKind == ApiIdentitySourceKind.Scalar)
+    //         {
+    //             var apiId = this.MaterializeApiIdFromProperty(source, apiIdentity, clrInstance);
+    //             parts.Add(new ApiIdentityPart(partName, ApiIdentitySnapshot.Scalar(childPath, apiId)));
+    //         }
+    //         else
+    //         {
+    //             // Nested source: read the nested CLR object and recursively resolve its identity
+    //             var nestedObjectType = (ApiObjectType)source.ApiProperty.ApiType;
+    //             var nestedIdentity = source.ApiNestedIdentity!;
 
-                source.ApiProperty.TryGetValue(clrInstance, out var nestedObject);
+    //             source.ApiProperty.TryGetValue(clrInstance, out var nestedObject);
 
-                if (nestedObject is null)
-                {
-                    var nullHandling = this.GetIdentityNullHandling();
+    //             if (nestedObject is null)
+    //             {
+    //                 var nullHandling = this.GetIdentityNullHandling();
 
-                    this.Logger.LogDebug("Nested property '{PartName}' is null for identity '{IdentityName}' on type '{TypeName}', null handling: {NullHandling}", partName, apiIdentity.ApiName, this.ApiName, nullHandling);
+    //                 this.Logger.LogDebug("Nested property '{PartName}' is null for identity '{IdentityName}' on type '{TypeName}', null handling: {NullHandling}", partName, apiIdentity.ApiName, this.ApiName, nullHandling);
 
-                    if (nullHandling == ApiIdentityNullHandling.ThrowException)
-                    {
-                        throw new ApiIdentityException
-                        (
-                            $"Nested property '{partName}' has a null value for identity '{apiIdentity.ApiName}' on type '{this.ClrTypeName}'. " +
-                            $"Null values are not allowed with {nameof(ApiIdentityNullHandling.ThrowException)} configured."
-                        );
-                    }
+    //                 if (nullHandling == ApiIdentityNullHandling.ThrowException)
+    //                 {
+    //                     throw new ApiIdentityException
+    //                     (
+    //                         $"Nested property '{partName}' has a null value for identity '{apiIdentity.ApiName}' on type '{this.ClrTypeName}'. " +
+    //                         $"Null values are not allowed with {nameof(ApiIdentityNullHandling.ThrowException)} configured."
+    //                     );
+    //                 }
 
-                    // Unresolved part
-                    // Build the structure metadata for the nested identity so that the snapshot can represent the expected shape of the unresolved part.
-                    var structure = BuildIdentityStructure(nestedIdentity);
-                    parts.Add(new ApiIdentityPart(partName, null, structure));
-                }
-                else
-                {
-                    var nestedSnapshot = nestedObjectType.GetIdentitySnapshotFromInstance(nestedIdentity, nestedObject, childPath);
-                    parts.Add(new ApiIdentityPart(partName, nestedSnapshot));
-                }
-            }
-        }
+    //                 // Unresolved part
+    //                 // Build the structure metadata for the nested identity so that the snapshot can represent the expected shape of the unresolved part.
+    //                 var structure = BuildIdentityStructure(nestedIdentity);
+    //                 parts.Add(new ApiIdentityPart(partName, null, structure));
+    //             }
+    //             else
+    //             {
+    //                 var nestedSnapshot = nestedObjectType.GetIdentitySnapshotFromInstance(nestedIdentity, nestedObject, childPath);
+    //                 parts.Add(new ApiIdentityPart(partName, nestedSnapshot));
+    //             }
+    //         }
+    //     }
 
-        return ApiIdentitySnapshot.Composite(parentPath, parts);
-    }
+    //     return ApiIdentitySnapshot.Composite(parentPath, parts);
+    // }
 
-    private ApiIdentitySnapshot GetIdentitySnapshotFromValues(ApiIdentity apiIdentity, IReadOnlyDictionary<string, object?> values, string? parentPath)
-    {
-        var sources = apiIdentity.ApiIdentitySources;
+    // private ApiIdentitySnapshot GetIdentitySnapshotFromValues(ApiIdentity apiIdentity, IReadOnlyDictionary<string, object?> values, string? parentPath)
+    // {
+    //     var sources = apiIdentity.ApiIdentitySources;
 
-        // Fast path: single scalar source produces a scalar snapshot directly,
-        // mirroring FinalizeComposite which unwraps single-part ApiId to a scalar value.
-        if (sources.Length == 1 && sources[0].ApiKind == ApiIdentitySourceKind.Scalar)
-        {
-            var source = sources[0];
-            var partName = source.ApiProperty.ApiName;
+    //     // Fast path: single scalar source produces a scalar snapshot directly,
+    //     // mirroring FinalizeComposite which unwraps single-part ApiId to a scalar value.
+    //     if (sources.Length == 1 && sources[0].ApiKind == ApiIdentitySourceKind.Scalar)
+    //     {
+    //         var source = sources[0];
+    //         var partName = source.ApiProperty.ApiName;
 
-            if (!values.TryGetValue(partName, out var rawScalarValue))
-            {
-                throw new ApiIdentityException($"Property '{partName}' not found in values dictionary for identity '{apiIdentity.ApiName}' on type '{this.ApiName}'.");
-            }
+    //         if (!values.TryGetValue(partName, out var rawScalarValue))
+    //         {
+    //             throw new ApiIdentityException($"Property '{partName}' not found in values dictionary for identity '{apiIdentity.ApiName}' on type '{this.ApiName}'.");
+    //         }
 
-            var apiId = this.MaterializeApiIdFromPropertyValue(source, rawScalarValue, apiIdentity);
-            return ApiIdentitySnapshot.Scalar(parentPath, apiId);
-        }
+    //         var apiId = this.MaterializeApiIdFromPropertyValue(source, rawScalarValue, apiIdentity);
+    //         return ApiIdentitySnapshot.Scalar(parentPath, apiId);
+    //     }
 
-        var parts = new List<ApiIdentityPart>(sources.Length);
+    //     var parts = new List<ApiIdentityPart>(sources.Length);
 
-        foreach (var source in sources)
-        {
-            var partName = source.ApiProperty.ApiName;
-            var childPath = BuildChildPath(parentPath, partName);
+    //     foreach (var source in sources)
+    //     {
+    //         var partName = source.ApiProperty.ApiName;
+    //         var childPath = BuildChildPath(parentPath, partName);
 
-            if (!values.TryGetValue(partName, out var rawValue))
-            {
-                throw new ApiIdentityException($"Property '{partName}' not found in values dictionary for identity '{apiIdentity.ApiName}' on type '{this.ApiName}'.");
-            }
+    //         if (!values.TryGetValue(partName, out var rawValue))
+    //         {
+    //             throw new ApiIdentityException($"Property '{partName}' not found in values dictionary for identity '{apiIdentity.ApiName}' on type '{this.ApiName}'.");
+    //         }
 
-            if (source.ApiKind == ApiIdentitySourceKind.Scalar)
-            {
-                var apiId = this.MaterializeApiIdFromPropertyValue(source, rawValue, apiIdentity);
-                parts.Add(new ApiIdentityPart(partName, ApiIdentitySnapshot.Scalar(childPath, apiId)));
-            }
-            else
-            {
-                // Nested source: expect a nested dictionary or null
-                var nestedObjectType = (ApiObjectType)source.ApiProperty.ApiType;
-                var nestedIdentity = source.ApiNestedIdentity!;
+    //         if (source.ApiKind == ApiIdentitySourceKind.Scalar)
+    //         {
+    //             var apiId = this.MaterializeApiIdFromPropertyValue(source, rawValue, apiIdentity);
+    //             parts.Add(new ApiIdentityPart(partName, ApiIdentitySnapshot.Scalar(childPath, apiId)));
+    //         }
+    //         else
+    //         {
+    //             // Nested source: expect a nested dictionary or null
+    //             var nestedObjectType = (ApiObjectType)source.ApiProperty.ApiType;
+    //             var nestedIdentity = source.ApiNestedIdentity!;
 
-                if (rawValue is null)
-                {
-                    var nullHandling = this.GetIdentityNullHandling();
+    //             if (rawValue is null)
+    //             {
+    //                 var nullHandling = this.GetIdentityNullHandling();
 
-                    this.Logger.LogDebug("Nested property '{PartName}' is null in values dictionary for identity '{IdentityName}' on type '{TypeName}', null handling: {NullHandling}", partName, apiIdentity.ApiName, this.ApiName, nullHandling);
+    //                 this.Logger.LogDebug("Nested property '{PartName}' is null in values dictionary for identity '{IdentityName}' on type '{TypeName}', null handling: {NullHandling}", partName, apiIdentity.ApiName, this.ApiName, nullHandling);
 
-                    if (nullHandling == ApiIdentityNullHandling.ThrowException)
-                    {
-                        throw new ApiIdentityException
-                        (
-                            $"Nested property '{partName}' has a null value for identity '{apiIdentity.ApiName}' from values dictionary. " +
-                            $"Null values are not allowed with {nameof(ApiIdentityNullHandling.ThrowException)} configured."
-                        );
-                    }
+    //                 if (nullHandling == ApiIdentityNullHandling.ThrowException)
+    //                 {
+    //                     throw new ApiIdentityException
+    //                     (
+    //                         $"Nested property '{partName}' has a null value for identity '{apiIdentity.ApiName}' from values dictionary. " +
+    //                         $"Null values are not allowed with {nameof(ApiIdentityNullHandling.ThrowException)} configured."
+    //                     );
+    //                 }
 
-                    // Unresolved part
-                    // Build the structure metadata for the nested identity so that the snapshot can represent the expected shape of the unresolved part.
-                    var structure = BuildIdentityStructure(nestedIdentity);
-                    parts.Add(new ApiIdentityPart(partName, null, structure));
-                }
-                else if (rawValue is IReadOnlyDictionary<string, object?> nestedValues)
-                {
-                    var nestedSnapshot = nestedObjectType.GetIdentitySnapshotFromValues(nestedIdentity, nestedValues, childPath);
-                    parts.Add(new ApiIdentityPart(partName, nestedSnapshot));
-                }
-                else
-                {
-                    throw new ApiIdentityException
-                    (
-                        $"Nested property '{partName}' for identity '{apiIdentity.ApiName}' expected an {nameof(IReadOnlyDictionary<string, object?>)} " +
-                        $"but received '{rawValue.GetType().Name}'. Nested identity sources require a dictionary of property values."
-                    );
-                }
-            }
-        }
+    //                 // Unresolved part
+    //                 // Build the structure metadata for the nested identity so that the snapshot can represent the expected shape of the unresolved part.
+    //                 var structure = BuildIdentityStructure(nestedIdentity);
+    //                 parts.Add(new ApiIdentityPart(partName, null, structure));
+    //             }
+    //             else if (rawValue is IReadOnlyDictionary<string, object?> nestedValues)
+    //             {
+    //                 var nestedSnapshot = nestedObjectType.GetIdentitySnapshotFromValues(nestedIdentity, nestedValues, childPath);
+    //                 parts.Add(new ApiIdentityPart(partName, nestedSnapshot));
+    //             }
+    //             else
+    //             {
+    //                 throw new ApiIdentityException
+    //                 (
+    //                     $"Nested property '{partName}' for identity '{apiIdentity.ApiName}' expected an {nameof(IReadOnlyDictionary<string, object?>)} " +
+    //                     $"but received '{rawValue.GetType().Name}'. Nested identity sources require a dictionary of property values."
+    //                 );
+    //             }
+    //         }
+    //     }
 
-        return ApiIdentitySnapshot.Composite(parentPath, parts);
-    }
+    //     return ApiIdentitySnapshot.Composite(parentPath, parts);
+    // }
 
     /// <summary>
     ///     Builds a structural skeleton of <see cref="ApiIdentityPart"/> entries for the given identity.
@@ -835,43 +830,43 @@ public sealed partial class ApiObjectType
     ///     nested parts so that <see cref="ApiIdentitySnapshot.ToApiId"/> can emit the correct number of
     ///     empty slots under <see cref="ApiUnresolvedIdentityPartBehavior.UseEmpty"/>.
     /// </summary>
-    private static ApiIdentityPart[]? BuildIdentityStructure(ApiIdentity apiIdentity)
-    {
-        var sources = apiIdentity.ApiIdentitySources;
+    // private static ApiIdentityPart[]? BuildIdentityStructure(ApiIdentity apiIdentity)
+    // {
+    //     var sources = apiIdentity.ApiIdentitySources;
 
-        if (sources.Length == 0)
-        {
-            return null;
-        }
+    //     if (sources.Length == 0)
+    //     {
+    //         return null;
+    //     }
 
-        // A single scalar source maps to a scalar snapshot (no composite wrapper), so no structure needed
-        if (sources.Length == 1 && sources[0].ApiKind == ApiIdentitySourceKind.Scalar)
-        {
-            return null;
-        }
+    //     // A single scalar source maps to a scalar snapshot (no composite wrapper), so no structure needed
+    //     if (sources.Length == 1 && sources[0].ApiKind == ApiIdentitySourceKind.Scalar)
+    //     {
+    //         return null;
+    //     }
 
-        var structure = new ApiIdentityPart[sources.Length];
+    //     var structure = new ApiIdentityPart[sources.Length];
 
-        for (var i = 0; i < sources.Length; i++)
-        {
-            var source = sources[i];
-            var partName = source.ApiProperty.ApiName;
+    //     for (var i = 0; i < sources.Length; i++)
+    //     {
+    //         var source = sources[i];
+    //         var partName = source.ApiProperty.ApiName;
 
-            if (source.ApiKind == ApiIdentitySourceKind.Scalar)
-            {
-                structure[i] = new ApiIdentityPart(partName, null);
-            }
-            else
-            {
-                // Recursively build the nested structure skeleton
-                var nestedStructure = BuildIdentityStructure(source.ApiNestedIdentity!);
-                structure[i] = new ApiIdentityPart(partName, null, nestedStructure);
-            }
-        }
+    //         if (source.ApiKind == ApiIdentitySourceKind.Scalar)
+    //         {
+    //             structure[i] = new ApiIdentityPart(partName, null);
+    //         }
+    //         else
+    //         {
+    //             // Recursively build the nested structure skeleton
+    //             var nestedStructure = BuildIdentityStructure(source.ApiNestedIdentity!);
+    //             structure[i] = new ApiIdentityPart(partName, null, nestedStructure);
+    //         }
+    //     }
 
-        return structure;
-    }
+    //     return structure;
+    // }
 
-    private static string BuildChildPath(string? parentPath, string segment) => string.IsNullOrEmpty(parentPath) ? segment : $"{parentPath}.{segment}";
+    // private static string BuildChildPath(string? parentPath, string segment) => string.IsNullOrEmpty(parentPath) ? segment : $"{parentPath}.{segment}";
     #endregion
 }

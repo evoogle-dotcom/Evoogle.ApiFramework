@@ -3,14 +3,9 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using System.Text.Json;
-
-using Evoogle.Json;
-
-using Microsoft.Extensions.Logging;
-
 namespace Evoogle.ApiFramework.Identity.Json;
 
+#if false
 public sealed class ApiIdentityPartJsonConverter(ILogger<ApiIdentityPartJsonConverter>? logger)
     : JsonConverterBase<ApiIdentityPart>(logger)
 {
@@ -198,3 +193,4 @@ public sealed class ApiIdentityPartJsonConverter(ILogger<ApiIdentityPartJsonConv
     }
     #endregion
 }
+#endif

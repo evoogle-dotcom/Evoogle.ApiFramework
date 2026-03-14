@@ -17,12 +17,14 @@ namespace Evoogle.ApiFramework.Schema;
 /// <param name="clrScalarType">The CLR type representing the scalar (e.g., typeof(string)).</param>
 public sealed class ApiScalarType(string apiName, Type clrScalarType) : ApiNamedType(apiName, clrScalarType)
 {
+    #region ApiSchemaElement Properties
+    /// <inheritdoc/>
+    protected override string ApiElementName => nameof(ApiScalarType);
+    #endregion
+
     #region ApiType Properties
     /// <inheritdoc/>
     public override ApiTypeKind ApiKind => ApiTypeKind.Scalar;
-
-    /// <inheritdoc/>
-    protected override string ApiTypeName => nameof(ApiScalarType);
     #endregion
 
     #region Object Methods

@@ -3,6 +3,9 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Diagnostics.CodeAnalysis;
+
+using Evoogle.ApiFramework.Schema.TestData;
 using Evoogle.ApiFramework.TestData;
 using Evoogle.Extensions;
 using Evoogle.XUnit;
@@ -14,21 +17,23 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 public class ApiIdentityBuilderTests(ITestOutputHelper output) : XUnitTests(output)
 {
     #region Test Classes
-    private class ApiIdentitySourceConfig(string apiPropertyName, string? apiNestedName = null, Type? clrScalarType = null, Type? apiExtensionType = null)
+    private class ApiIdentityPartConfig(ApiIdentityPartKind apiKind, string? apiPropertyName = null, string? apiIdentityName = null, Type? clrScalarTypeHint = null, Type? extensionType = null)
     {
-        public string ApiPropertyName { get; } = apiPropertyName;
-        public string? ApiNestedName { get; } = apiNestedName;
-        public Type? ClrScalarType { get; } = clrScalarType;
-        public Type? ApiExtensionType { get; } = apiExtensionType;
+        public ApiIdentityPartKind ApiKind { get; } = apiKind;
+        public string? ApiPropertyName { get; } = apiPropertyName;
+        public string? ApiIdentityName { get; } = apiIdentityName;
+        public Type? ClrScalarTypeHint { get; } = clrScalarTypeHint;
+        public Type? ExtensionType { get; } = extensionType;
 
         public override string ToString()
         {
+            var apiKind = this.ApiKind.SafeToString();
             var apiPropertyName = this.ApiPropertyName.SafeToString();
-            var apiNestedName = this.ApiNestedName.SafeToString();
-            var clrScalarType = this.ClrScalarType.SafeToName();
-            var apiExtensionType = this.ApiExtensionType.SafeToName();
+            var apiIdentityName = this.ApiIdentityName.SafeToString();
+            var clrScalarTypeHint = this.ClrScalarTypeHint.SafeToName();
+            var extensionType = this.ExtensionType.SafeToName();
 
-            return $"{nameof(ApiIdentitySourceConfig)} {{{nameof(this.ApiPropertyName)}={apiPropertyName}, {nameof(this.ApiNestedName)}={apiNestedName}, {nameof(this.ClrScalarType)}={clrScalarType}, {nameof(this.ApiExtensionType)}={apiExtensionType}}}";
+            return $"{nameof(ApiIdentityPartConfig)} {{{nameof(this.ApiKind)}={apiKind}, {nameof(this.ApiPropertyName)}={apiPropertyName}, {nameof(this.ApiIdentityName)}={apiIdentityName}, {nameof(this.ClrScalarTypeHint)}={clrScalarTypeHint}, {nameof(this.ExtensionType)}={extensionType}}}";
         }
     }
 
@@ -36,21 +41,30 @@ public class ApiIdentityBuilderTests(ITestOutputHelper output) : XUnitTests(outp
     {
         #region User Supplied Properties
         public required string ApiName { get; init; } = null!;
-        public required ApiIdentitySourceConfig[] ApiIdentitySources { get; init; } = null!;
+        public required ApiIdentityPartConfig[] ApiIdentityParts { get; init; } = null!;
         public required ApiIdentity ApiIdentityExpected { get; init; } = null!;
-        public Type? ApiExtensionType { get; init; }
+        public Type? ExtensionType { get; init; }
         #endregion
 
         #region Calculated Properties
         private ApiIdentity? ApiIdentityActual { get; set; }
         #endregion
 
+        #region Constructors
+        [SetsRequiredMembers]
+        public BuildTest()
+        {
+            this.Name = nameof(BuildTest);
+            this.ExcludeMembers = ApiSchemaExcludeMembers.Standard;
+        }
+        #endregion
+
         #region XUnitTest Methods
         protected override void Arrange()
         {
-            this.WriteLine($"ApiName:            {this.ApiName.SafeToString()}");
-            this.WriteLine($"ApiIdentitySources: {string.Join(",", this.ApiIdentitySources.Select(p => p.ToString()))}");
-            this.WriteLine($"ApiExtensionType:   {this.ApiExtensionType.SafeToName()}");
+            this.WriteLine($"ApiName:          {this.ApiName.SafeToString()}");
+            this.WriteLine($"ApiIdentityParts: {string.Join(",", this.ApiIdentityParts.Select(p => p.ToString()))}");
+            this.WriteLine($"ExtensionType:    {this.ExtensionType.SafeToName()}");
             this.WriteLine();
             this.WriteLine($"Expected: {this.ApiIdentityExpected.SafeToString()}");
         }
@@ -59,32 +73,34 @@ public class ApiIdentityBuilderTests(ITestOutputHelper output) : XUnitTests(outp
         {
             var builder = new ApiIdentityBuilder(this.ApiName);
 
-            foreach (var source in this.ApiIdentitySources)
+            foreach (var part in this.ApiIdentityParts)
             {
-                var apiPropertyName = source.ApiPropertyName;
-                var clrScalarType = source.ClrScalarType;
-                var apiNestedName = source.ApiNestedName;
-                var apiExtensionType = source.ApiExtensionType;
+                var apiKind = part.ApiKind;
+                var apiPropertyName = part.ApiPropertyName;
+                var apiIdentityName = part.ApiIdentityName;
+                var clrScalarTypeHint = part.ClrScalarTypeHint;
+                var extensionType = part.ExtensionType;
 
-                builder.AddSource
+                builder.AddPart
                 (
+                    apiKind,
                     apiPropertyName,
-                    clrScalarType,
-                    apiNestedName,
-                    apiExtensionType != null
+                    apiIdentityName,
+                    clrScalarTypeHint,
+                    extensionType != null
                         ? extensions =>
                         {
-                            var extension = Activator.CreateInstance(apiExtensionType);
-                            extensions.AddExtension(apiExtensionType, extension!);
+                            var extension = Activator.CreateInstance(extensionType);
+                            extensions.AddExtension(extensionType, extension!);
                         }
                 : null
                 );
             }
 
-            if (this.ApiExtensionType != null)
+            if (this.ExtensionType != null)
             {
-                var extension = Activator.CreateInstance(this.ApiExtensionType);
-                builder.AddExtension(this.ApiExtensionType, extension!);
+                var extension = Activator.CreateInstance(this.ExtensionType);
+                builder.AddExtension(this.ExtensionType, extension!);
             }
 
             this.ApiIdentityActual = builder.Build();
@@ -94,16 +110,7 @@ public class ApiIdentityBuilderTests(ITestOutputHelper output) : XUnitTests(outp
         protected override void Assert()
         {
             this.ApiIdentityActual.Should().NotBeNull();
-
-            this.ApiIdentityActual.Should().BeEquivalentTo
-            (
-                this.ApiIdentityExpected,
-                opt => opt
-                    .Excluding(info => info.Path.Contains(nameof(ApiSchemaElement.ApiPath)))
-                    // .Excluding(info => info.DeclaringType == typeof(ApiIdentitySource) && info.Name == nameof(ApiIdentitySource.ApiPropertyName))
-                    // .Excluding(info => info.DeclaringType == typeof(ApiIdentitySource) && info.Name == nameof(ApiIdentitySource.ClrScalarType))
-                    .WithStrictOrdering()
-            );
+            this.AssertBeEquivalentTo(this.ApiIdentityActual, this.ApiIdentityExpected);
         }
         #endregion
     }
@@ -114,38 +121,38 @@ public class ApiIdentityBuilderTests(ITestOutputHelper output) : XUnitTests(outp
     [
         new BuildTest
         {
-            Name = "Builds Simple Identity With 1 Source",
+            Name = "Builds Simple Identity With 1 Part",
             ApiName = "PrimaryKey",
-            ApiIdentitySources = [new ApiIdentitySourceConfig("Id")],
+            ApiIdentityParts = [new ApiIdentityPartConfig(apiKind: ApiIdentityPartKind.Scalar, apiPropertyName: "Id")],
             ApiIdentityExpected = new ApiIdentity
             (
                 apiName: "PrimaryKey",
-                apiIdentitySources: [new ApiIdentitySource("Id")]
+                apiIdentityParts: [new ApiScalarIdentityPart("Id")]
             )
         },
         new BuildTest
         {
-            Name = "Builds Simple Identity With 1 Source And CLR Scalar Type",
+            Name = "Builds Simple Identity With 1 Part And CLR Scalar Type",
             ApiName = "PrimaryKey",
-            ApiIdentitySources = [new ApiIdentitySourceConfig("Id", null, typeof(Guid))],
+            ApiIdentityParts = [new ApiIdentityPartConfig(apiKind: ApiIdentityPartKind.Scalar, apiPropertyName: "Id", clrScalarTypeHint: typeof(Guid))],
             ApiIdentityExpected = new ApiIdentity
             (
                 apiName: "PrimaryKey",
-                apiIdentitySources: [new ApiIdentitySource("Id", typeof(Guid))]
+                apiIdentityParts: [new ApiScalarIdentityPart("Id", typeof(Guid))]
             )
         },
         new BuildTest
         {
-            Name = "Builds Simple Identity With 1 Source And CLR Scalar Type And Extensions",
+            Name = "Builds Simple Identity With 1 Part And CLR Scalar Type And Extensions",
             ApiName = "PrimaryKey",
-            ApiIdentitySources = [new ApiIdentitySourceConfig("Id", null, typeof(Guid), typeof(GraphQlExtension))],
-            ApiExtensionType = typeof(JsonApiExtension),
+            ApiIdentityParts = [new ApiIdentityPartConfig(apiKind: ApiIdentityPartKind.Scalar, apiPropertyName: "Id", clrScalarTypeHint: typeof(Guid), extensionType: typeof(GraphQlExtension))],
+            ExtensionType = typeof(JsonApiExtension),
             ApiIdentityExpected = new ApiIdentity
             (
                 apiName: "PrimaryKey",
-                apiIdentitySources:
+                apiIdentityParts:
                 [
-                    new ApiIdentitySource("Id", typeof(Guid))
+                    new ApiScalarIdentityPart("Id", typeof(Guid))
                     {
                         Extensions = new OrderedDictionary<Type, object>
                         {
@@ -164,45 +171,45 @@ public class ApiIdentityBuilderTests(ITestOutputHelper output) : XUnitTests(outp
 
         new BuildTest
         {
-            Name = "Builds Composite Identity With 2 Sources",
+            Name = "Builds Composite Identity With 2 Parts",
             ApiName = "CompositeKey",
-            ApiIdentitySources = [new ApiIdentitySourceConfig("TenantId"), new ApiIdentitySourceConfig("UserId")],
+            ApiIdentityParts = [new ApiIdentityPartConfig(apiKind: ApiIdentityPartKind.Scalar, apiPropertyName: "TenantId"), new ApiIdentityPartConfig(apiKind: ApiIdentityPartKind.Scalar, apiPropertyName: "UserId")],
             ApiIdentityExpected = new ApiIdentity
             (
                 apiName: "CompositeKey",
-                apiIdentitySources: [new ApiIdentitySource("TenantId"), new ApiIdentitySource("UserId")]
+                apiIdentityParts: [new ApiScalarIdentityPart("TenantId"), new ApiScalarIdentityPart("UserId")]
             )
         },
         new BuildTest
         {
-            Name = "Builds Composite Identity With 2 Sources And CLR Scalar Types",
+            Name = "Builds Composite Identity With 2 Parts And CLR Scalar Types",
             ApiName = "CompositeKey",
-            ApiIdentitySources = [new ApiIdentitySourceConfig("TenantId", null, typeof(Ulid)), new ApiIdentitySourceConfig("UserId", null, typeof(int))],
+            ApiIdentityParts = [new ApiIdentityPartConfig(apiKind: ApiIdentityPartKind.Scalar, apiPropertyName: "TenantId", clrScalarTypeHint: typeof(Ulid)), new ApiIdentityPartConfig(apiKind: ApiIdentityPartKind.Scalar, apiPropertyName: "UserId", clrScalarTypeHint: typeof(int))],
             ApiIdentityExpected = new ApiIdentity
             (
                 apiName: "CompositeKey",
-                apiIdentitySources: [new ApiIdentitySource("TenantId", typeof(Ulid)), new ApiIdentitySource("UserId", typeof(int))]
+                apiIdentityParts: [new ApiScalarIdentityPart("TenantId", typeof(Ulid)), new ApiScalarIdentityPart("UserId", typeof(int))]
             )
         },
         new BuildTest
         {
-            Name = "Builds Composite Identity With 2 Sources And CLR Scalar Types And Extensions",
+            Name = "Builds Composite Identity With 2 Parts And CLR Scalar Types And Extensions",
             ApiName = "CompositeKey",
-            ApiIdentitySources = [new ApiIdentitySourceConfig("TenantId", null, typeof(Ulid), typeof(GraphQlExtension)), new ApiIdentitySourceConfig("UserId", null, typeof(int), typeof(GraphQlExtension))],
-            ApiExtensionType = typeof(JsonApiExtension),
+            ApiIdentityParts = [new ApiIdentityPartConfig(apiKind: ApiIdentityPartKind.Scalar, apiPropertyName: "TenantId", clrScalarTypeHint: typeof(Ulid), extensionType: typeof(GraphQlExtension)), new ApiIdentityPartConfig(apiKind: ApiIdentityPartKind.Scalar, apiPropertyName: "UserId", clrScalarTypeHint: typeof(int), extensionType: typeof(GraphQlExtension))],
+            ExtensionType = typeof(JsonApiExtension),
             ApiIdentityExpected = new ApiIdentity
             (
                 apiName: "CompositeKey",
-                apiIdentitySources:
+                apiIdentityParts:
                 [
-                    new ApiIdentitySource("TenantId", typeof(Ulid))
+                    new ApiScalarIdentityPart("TenantId", typeof(Ulid))
                     {
                         Extensions = new OrderedDictionary<Type, object>
                         {
                             [typeof(GraphQlExtension)] = new GraphQlExtension()
                         }
                     },
-                    new ApiIdentitySource("UserId", typeof(int))
+                    new ApiScalarIdentityPart("UserId", typeof(int))
                     {
                         Extensions = new OrderedDictionary<Type, object>
                         {
@@ -221,52 +228,52 @@ public class ApiIdentityBuilderTests(ITestOutputHelper output) : XUnitTests(outp
 
         new BuildTest
         {
-            Name = "Builds Composite Identity With 3 Sources",
+            Name = "Builds Composite Identity With 3 Parts",
             ApiName = "CompositeKey",
-            ApiIdentitySources = [new ApiIdentitySourceConfig("CompanyId"), new ApiIdentitySourceConfig("OrderId"), new ApiIdentitySourceConfig("ItemId")],
+            ApiIdentityParts = [new ApiIdentityPartConfig(apiKind: ApiIdentityPartKind.Scalar, apiPropertyName: "CompanyId"), new ApiIdentityPartConfig(apiKind: ApiIdentityPartKind.Scalar, apiPropertyName: "OrderId"), new ApiIdentityPartConfig(apiKind: ApiIdentityPartKind.Scalar, apiPropertyName: "ItemId")],
             ApiIdentityExpected = new ApiIdentity
             (
                 apiName: "CompositeKey",
-                apiIdentitySources: [new ApiIdentitySource("CompanyId"), new ApiIdentitySource("OrderId"), new ApiIdentitySource("ItemId")]
+                apiIdentityParts: [new ApiScalarIdentityPart("CompanyId"), new ApiScalarIdentityPart("OrderId"), new ApiScalarIdentityPart("ItemId")]
             )
         },
         new BuildTest
         {
-            Name = "Builds Composite Identity With 3 Sources And CLR Scalar Types",
+            Name = "Builds Composite Identity With 3 Parts And CLR Scalar Types",
             ApiName = "CompositeKey",
-            ApiIdentitySources = [new ApiIdentitySourceConfig("CompanyId", null, typeof(Ulid)), new ApiIdentitySourceConfig("OrderId", null, typeof(int)), new ApiIdentitySourceConfig("ItemId", null, typeof(string))],
+            ApiIdentityParts = [new ApiIdentityPartConfig(apiKind: ApiIdentityPartKind.Scalar, apiPropertyName: "CompanyId", clrScalarTypeHint: typeof(Ulid)), new ApiIdentityPartConfig(apiKind: ApiIdentityPartKind.Scalar, apiPropertyName: "OrderId", clrScalarTypeHint: typeof(int)), new ApiIdentityPartConfig(apiKind: ApiIdentityPartKind.Scalar, apiPropertyName: "ItemId", clrScalarTypeHint: typeof(string))],
             ApiIdentityExpected = new ApiIdentity
             (
                 apiName: "CompositeKey",
-                apiIdentitySources: [new ApiIdentitySource("CompanyId", typeof(Ulid)), new ApiIdentitySource("OrderId", typeof(int)), new ApiIdentitySource("ItemId", typeof(string))]
+                apiIdentityParts: [new ApiScalarIdentityPart("CompanyId", typeof(Ulid)), new ApiScalarIdentityPart("OrderId", typeof(int)), new ApiScalarIdentityPart("ItemId", typeof(string))]
             )
         },
         new BuildTest
         {
-            Name = "Builds Composite Identity With 3 Sources And CLR Scalar Types And Extensions",
+            Name = "Builds Composite Identity With 3 Parts And CLR Scalar Types And Extensions",
             ApiName = "CompositeKey",
-            ApiIdentitySources = [new ApiIdentitySourceConfig("CompanyId", null, typeof(Ulid), typeof(GraphQlExtension)), new ApiIdentitySourceConfig("OrderId", null, typeof(int), typeof(GraphQlExtension)), new ApiIdentitySourceConfig("ItemId", null, typeof(string), typeof(GraphQlExtension))],
-            ApiExtensionType = typeof(JsonApiExtension),
+            ApiIdentityParts = [new ApiIdentityPartConfig(apiKind: ApiIdentityPartKind.Scalar, apiPropertyName: "CompanyId", clrScalarTypeHint: typeof(Ulid), extensionType: typeof(GraphQlExtension)), new ApiIdentityPartConfig(apiKind: ApiIdentityPartKind.Scalar, apiPropertyName: "OrderId", clrScalarTypeHint: typeof(int), extensionType: typeof(GraphQlExtension)), new ApiIdentityPartConfig(apiKind: ApiIdentityPartKind.Scalar, apiPropertyName: "ItemId", clrScalarTypeHint: typeof(string), extensionType: typeof(GraphQlExtension))],
+            ExtensionType = typeof(JsonApiExtension),
             ApiIdentityExpected = new ApiIdentity
             (
                 apiName: "CompositeKey",
-                apiIdentitySources:
+                apiIdentityParts:
                 [
-                    new ApiIdentitySource("CompanyId", typeof(Ulid))
+                    new ApiScalarIdentityPart("CompanyId", typeof(Ulid))
                     {
                         Extensions = new OrderedDictionary<Type, object>
                         {
                             [typeof(GraphQlExtension)] = new GraphQlExtension()
                         }
                     },
-                    new ApiIdentitySource("OrderId", typeof(int))
+                    new ApiScalarIdentityPart("OrderId", typeof(int))
                     {
                         Extensions = new OrderedDictionary<Type, object>
                         {
                             [typeof(GraphQlExtension)] = new GraphQlExtension()
                         }
                     },
-                    new ApiIdentitySource("ItemId", typeof(string))
+                    new ApiScalarIdentityPart("ItemId", typeof(string))
                     {
                         Extensions = new OrderedDictionary<Type, object>
                         {

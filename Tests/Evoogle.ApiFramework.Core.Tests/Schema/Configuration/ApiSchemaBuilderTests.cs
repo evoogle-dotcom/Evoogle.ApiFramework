@@ -3,7 +3,10 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Diagnostics.CodeAnalysis;
+
 using Evoogle.ApiFramework.Exceptions;
+using Evoogle.ApiFramework.Schema.TestData;
 using Evoogle.ApiFramework.TestData;
 using Evoogle.Extensions;
 using Evoogle.XUnit;
@@ -35,6 +38,15 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
         private bool? ActualExceptionThrown { get; set; }
         private string? ActualExceptionMessage { get; set; }
         private List<ApiInitializationIssue>? ActualIssues { get; set; }
+        #endregion
+
+        #region Constructors
+        [SetsRequiredMembers]
+        public BuildTest()
+        {
+            this.Name = nameof(BuildTest);
+            this.ExcludeMembers = ApiSchemaExcludeMembers.SchemaInitialized;
+        }
         #endregion
 
         #region XUnitTest Methods
@@ -167,14 +179,7 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
                 this.ActualExceptionMessage.Should().BeNull();
                 this.ActualIssues.Should().BeNull();
 
-                this.Actual.Should().NotBeNull();
-                this.Actual.Should().BeEquivalentTo
-                (
-                    this.Expected,
-                    opt => opt
-                        .WithStrictOrdering()
-                        .Excluding(info => info.Path == $"{nameof(ApiSchemaContext)}" || info.Path == $"{nameof(ApiSchemaContext)}.{nameof(ApiSchemaContext.ApiSchema)}")
-                );
+                this.AssertBeEquivalentTo(this.Actual, this.Expected);
             }
             else
             {

@@ -31,13 +31,18 @@ public sealed class ApiRelationship
     string? apiPropertyName = null
 ) : ApiSchemaElement
 {
-    #region Fields
+    #region ApiRelationship Fields
     private readonly string? _apiPropertyName = apiPropertyName;
 
     private ApiProperty? _apiResolvedProperty = null;
     #endregion
 
-    #region Properties
+    #region ApiSchemaElement Properties
+    /// <inheritdoc/>
+    protected override string ApiElementName => nameof(ApiRelationship);
+    #endregion
+
+    #region ApiRelationship Properties
     /// <summary>
     ///     Gets the API name of the relationship.
     /// </summary>
@@ -72,23 +77,6 @@ public sealed class ApiRelationship
     };
     #endregion
 
-    #region ApiSchemaElement Methods
-    /// <inheritdoc />
-    protected override string BuildPath(string? apiParentPath)
-        => ApiSchemaHelpers.BuildPath(apiParentPath, apiChildPath: nameof(ApiRelationship), apiApiName: this.ApiName);
-
-    /// <inheritdoc />
-    internal override void Initialize(ApiInitializationContext context)
-    {
-        ArgumentNullException.ThrowIfNull(context);
-
-        base.Initialize(context);
-
-        this.InitializeApiName(context);
-        this.InitializeApiProperty(context);
-    }
-    #endregion
-
     #region Object Methods
     /// <inheritdoc />
     public override string ToString()
@@ -105,6 +93,23 @@ public sealed class ApiRelationship
         {
             return $"{nameof(ApiRelationship)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ApiPropertyName)}={apiPropertyName}, {nameof(this.ExtensionCount)}={extensionCount}}}";
         }
+    }
+    #endregion
+
+    #region ApiSchemaElement Methods
+    /// <inheritdoc />
+    protected override string BuildPath(string? apiPreviousPath)
+        => ApiSchemaHelpers.BuildPath(basePath: apiPreviousPath, segment: nameof(ApiRelationship), segmentName: this.ApiName);
+
+    /// <inheritdoc />
+    internal override void Initialize(ApiInitializationContext context)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+
+        base.Initialize(context);
+
+        this.InitializeApiName(context);
+        this.InitializeApiProperty(context);
     }
     #endregion
 
@@ -132,7 +137,7 @@ public sealed class ApiRelationship
         if (isApiPropertyNameValid)
         {
             // Resolve the related API property for the parent API object type.
-            var apiParentObjectType = context.ApiParentObjectType;
+            var apiParentObjectType = context.ApiDeclaringObjectType;
             if (apiParentObjectType.TryGetPropertyByApiName(this.ApiPropertyName, out var apiResolvedProperty))
             {
                 _apiResolvedProperty = apiResolvedProperty;
@@ -141,7 +146,7 @@ public sealed class ApiRelationship
 
         if (_apiResolvedProperty is null)
         {
-            var apiObjectTypeName = context.ApiParentObjectType.ApiName.SafeToString();
+            var apiObjectTypeName = context.ApiDeclaringObjectType.ApiName.SafeToString();
 
             var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;

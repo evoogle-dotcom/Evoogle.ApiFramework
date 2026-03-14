@@ -25,7 +25,12 @@ public sealed class ApiEnumValue
     int clrOrdinal
 ) : ApiSchemaElement
 {
-    #region Properties
+    #region ApiSchemaElement Properties
+    /// <inheritdoc/>
+    protected override string ApiElementName => nameof(ApiEnumValue);
+    #endregion
+
+    #region ApiEnumValue Properties
     /// <summary>Gets the API name of the API enumeration value.</summary>
     public string ApiName { get; } = apiName;
 
@@ -34,23 +39,6 @@ public sealed class ApiEnumValue
 
     /// <summary>Gets the CLR ordinal of the API enumeration value (matching the C# enum ordinal value).</summary>
     public int ClrOrdinal { get; } = clrOrdinal;
-    #endregion
-
-    #region ApiSchemaElement Methods
-    /// <inheritdoc />
-    protected override string BuildPath(string? apiParentPath)
-        => ApiSchemaHelpers.BuildPath(apiParentPath, apiChildPath: nameof(ApiEnumValue), apiApiName: this.ApiName);
-
-    /// <inheritdoc />
-    internal override void Initialize(ApiInitializationContext context)
-    {
-        ArgumentNullException.ThrowIfNull(context);
-
-        base.Initialize(context);
-
-        this.InitializeApiName(context);
-        this.InitializeClrName(context);
-    }
     #endregion
 
     #region Object Methods
@@ -63,6 +51,23 @@ public sealed class ApiEnumValue
         var extensionCount = this.ExtensionCount.SafeToString();
 
         return $"{nameof(ApiEnumValue)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ClrName)}={clrName}, {nameof(this.ClrOrdinal)}={clrOrdinal}, {nameof(this.ExtensionCount)}={extensionCount}}}";
+    }
+    #endregion
+
+    #region ApiSchemaElement Methods
+    /// <inheritdoc />
+    protected override string BuildPath(string? apiPreviousPath)
+        => ApiSchemaHelpers.BuildPath(basePath: apiPreviousPath, segment: nameof(ApiEnumValue), segmentName: this.ApiName);
+
+    /// <inheritdoc />
+    internal override void Initialize(ApiInitializationContext context)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+
+        base.Initialize(context);
+
+        this.InitializeApiName(context);
+        this.InitializeClrName(context);
     }
     #endregion
 

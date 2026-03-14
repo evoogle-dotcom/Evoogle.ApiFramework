@@ -97,7 +97,7 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TryGetTest
         {
-            Name = $"{nameof(ApiEnumType.TryGetValueByApiName)} returns false when {nameof(ApiEnumValue)} exists but with case-insensitive search",
+            Name = $"{nameof(ApiEnumType.TryGetValueByApiName)} returns false when {nameof(ApiEnumValue)} exists but case mismatch",
             ApiSchemaKind = ApiSchemaKind.Simple,
             ApiEnumTypeName = nameof(Gender),
             TryGetMethod = TryGetMethodKind.TryGetValueByApiName,
@@ -128,7 +128,7 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
 
         new TryGetTest
         {
-            Name = $"{nameof(ApiEnumType.TryGetValueByClrName)} returns false when {nameof(ApiEnumValue)} exists but with case-insensitive search",
+            Name = $"{nameof(ApiEnumType.TryGetValueByClrName)} returns false when {nameof(ApiEnumValue)} exists but case mismatch",
             ApiSchemaKind = ApiSchemaKind.Simple,
             ApiEnumTypeName = nameof(Gender),
             TryGetMethod = TryGetMethodKind.TryGetValueByClrName,

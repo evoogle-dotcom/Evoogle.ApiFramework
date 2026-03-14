@@ -6,7 +6,7 @@
 using System.Collections.Concurrent;
 using System.Reflection;
 using System.Text.Json.Serialization;
-
+using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.ApiFramework.Schema.Json;
 using Evoogle.Coercion;
@@ -51,7 +51,7 @@ public sealed partial class ApiProperty
     ClrMemberKind clrMemberKind
 ) : ApiSchemaElement
 {
-    #region Types
+    #region ApiProperty Types
     private delegate void ClrByRefAction<TObject, in TValue>(ref TObject clrObject, ApiSchemaContext apiSchemaContext, TValue? clrValue);
 
     private readonly record struct ClrCacheKey(Type ClrObjectType, string ClrMemberName);
@@ -82,7 +82,7 @@ public sealed partial class ApiProperty
     private readonly record struct CoerceMethodCacheKey(Type ClrInputType, Type ClrOutputType);
     #endregion
 
-    #region Fields
+    #region ApiProperty Fields
     private Func<object, ApiSchemaContext, object?>? _clrGetter;
 
     private Action<object, ApiSchemaContext, object?>? _clrSetter;
@@ -106,7 +106,12 @@ public sealed partial class ApiProperty
     );
     #endregion
 
-    #region Properties
+    #region ApiSchemaElement Properties
+    /// <inheritdoc/>
+    protected override string ApiElementName => nameof(ApiProperty);
+    #endregion
+
+    #region ApiProperty Properties
     /// <summary>Gets the API name of the property (used in API requests/responses).</summary>
     public string ApiName { get; } = apiName;
 
@@ -125,13 +130,13 @@ public sealed partial class ApiProperty
     internal ApiTypeExpression ApiTypeExpression { get; } = apiTypeExpression;
 
     private static MethodInfo GenericCoerceMethodDefinition => _genericCoerceMethodDefinition
-        ?? throw new InvalidOperationException($"Failed to locate generic method definition for {nameof(TypeCoercion)}.{nameof(TypeCoercion.Coerce)}.");
+        ?? throw new ApiSchemaException($"Failed to locate generic method definition for {nameof(TypeCoercion)}.{nameof(TypeCoercion.Coerce)}.");
 
     private static MethodInfo NonGenericCoerceMethod => _nonGenericCoerceMethod
-        ?? throw new InvalidOperationException($"Failed to locate non-generic method for {nameof(TypeCoercion)}.{nameof(TypeCoercion.Coerce)}.");
+        ?? throw new ApiSchemaException($"Failed to locate non-generic method for {nameof(TypeCoercion)}.{nameof(TypeCoercion.Coerce)}.");
     #endregion
 
-    #region Computed Properties
+    #region ApiProperty Computed Properties
     /// <summary>Gets a value indicating whether this property is optional (not required).</summary>
     public bool IsOptional => !this.ApiTypeModifiers.HasFlag(ApiTypeModifiers.Required);
 
@@ -156,8 +161,8 @@ public sealed partial class ApiProperty
 
     #region ApiSchemaElement Methods
     /// <inheritdoc />
-    protected override string BuildPath(string? apiParentPath)
-        => ApiSchemaHelpers.BuildPath(apiParentPath, apiChildPath: nameof(ApiProperty), apiApiName: this.ApiName);
+    protected override string BuildPath(string? apiPreviousPath)
+        => ApiSchemaHelpers.BuildPath(basePath: apiPreviousPath, segment: nameof(ApiProperty), segmentName: this.ApiName);
 
     /// <inheritdoc />
     internal override void Initialize(ApiInitializationContext context)
@@ -201,13 +206,13 @@ public sealed partial class ApiProperty
             return;
         }
 
-        var childContext = context.WithParentSchemaElement(this);
+        var childContext = context.WithDeclaringSchemaElement(this);
         this.ApiTypeExpression.InitializeForProperty(childContext);
     }
 
     private void InitializeClrFieldGetterAndSetter(ApiInitializationContext context, FieldInfo clrFieldInfo)
     {
-        var apiObjectType = context.ApiParentObjectType;
+        var apiObjectType = context.ApiDeclaringObjectType;
         var clrObjectType = apiObjectType.ClrType;
         var clrMemberName = this.ClrName;
 
@@ -244,7 +249,7 @@ public sealed partial class ApiProperty
 
     private void InitializeClrPropertyGetterAndSetter(ApiInitializationContext context, PropertyInfo clrPropertyInfo)
     {
-        var apiObjectType = context.ApiParentObjectType;
+        var apiObjectType = context.ApiDeclaringObjectType;
         var clrObjectType = apiObjectType.ClrType;
         var clrMemberName = this.ClrName;
 
@@ -294,7 +299,7 @@ public sealed partial class ApiProperty
 
     private void InitializeClrGetterAndSetter(ApiInitializationContext context)
     {
-        var apiObjectType = context.ApiParentObjectType;
+        var apiObjectType = context.ApiDeclaringObjectType;
         var clrObjectType = apiObjectType.ClrType;
         var clrMemberName = this.ClrName;
 

@@ -297,6 +297,7 @@ public partial class ApiIdTests(ITestOutputHelper output) : XUnitTests(output)
         [SetsRequiredMembers]
         public JsonDeserializeTest()
         {
+            this.Name = nameof(JsonDeserializeTest);
             this.ExpectedFactoryExpression = (arg) => BuildApiId(arg);
         }
         #endregion
@@ -308,6 +309,7 @@ public partial class ApiIdTests(ITestOutputHelper output) : XUnitTests(output)
         [SetsRequiredMembers]
         public JsonRoundtripTest()
         {
+            this.Name = nameof(JsonRoundtripTest);
             this.ExpectedFactoryExpression = (arg) => BuildApiId(arg);
         }
         #endregion
@@ -319,6 +321,7 @@ public partial class ApiIdTests(ITestOutputHelper output) : XUnitTests(output)
         [SetsRequiredMembers]
         public JsonSerializeTest()
         {
+            this.Name = nameof(JsonSerializeTest);
             this.SourceFactoryExpression = (arg) => BuildApiId(arg);
         }
         #endregion

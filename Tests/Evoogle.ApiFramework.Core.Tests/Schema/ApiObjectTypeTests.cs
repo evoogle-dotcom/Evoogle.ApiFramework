@@ -3,7 +3,6 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using Evoogle.ApiFramework.Identity;
 using Evoogle.ApiFramework.Schema.TestData;
 using Evoogle.Extensions;
 using Evoogle.XUnit;
@@ -165,6 +164,7 @@ public partial class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(o
 
     private enum TryGetMethod
     {
+        TryGetIdentityByApiName,
         TryGetPropertyByApiName,
         TryGetPropertyByClrName,
         TryGetRelationshipByApiName
@@ -207,6 +207,7 @@ public partial class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(o
         {
             this.ActualResult = this.TryGetMethod switch
             {
+                TryGetMethod.TryGetIdentityByApiName => this.ApiObjectType!.TryGetIdentityByApiName(this.SearchKey!, out _),
                 TryGetMethod.TryGetPropertyByApiName => this.ApiObjectType!.TryGetPropertyByApiName(this.SearchKey!, out _),
                 TryGetMethod.TryGetPropertyByClrName => this.ApiObjectType!.TryGetPropertyByClrName(this.SearchKey!, out _),
                 TryGetMethod.TryGetRelationshipByApiName => this.ApiObjectType!.TryGetRelationshipByApiName(this.SearchKey!, out _),

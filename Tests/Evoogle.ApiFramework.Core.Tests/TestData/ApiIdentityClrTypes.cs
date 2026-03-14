@@ -6,89 +6,65 @@
 namespace Evoogle.ApiFramework.TestData;
 
 /// <summary>
+///     Test type with single scalar identity for identity testing.
+///     Has both primary and alternate identity for Id and Name respectively.
+/// </summary>
+public class IdentityScalar
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+}
+
+/// <summary>
+///     Test type with composite identity (int + string) for identity testing.
+/// </summary>
+public class IdentityTwoScalarPartComposite
+{
+    public int Part1 { get; set; }
+    public string? Part2 { get; set; }
+}
+
+/// <summary>
 ///     Test type with composite identity (int + string + Guid) for identity testing.
 /// </summary>
-public class ProductInventory
-{
-    public int WarehouseId { get; set; }
-    public string ProductCode { get; set; } = string.Empty;
-    public Guid BatchId { get; set; }
-    public int Quantity { get; set; }
-}
-
-/// <summary>
-///     Test type with composite identity allowing nulls (ReturnEmpty) for identity testing.
-/// </summary>
-public class CompositeNullable
+public class IdentityThreeScalarPartComposite
 {
     public int Part1 { get; set; }
     public string? Part2 { get; set; }
+    public Guid Part3 { get; set; }
 }
 
 /// <summary>
-///     Test type with composite identity that throws on nulls (ThrowException) for identity testing.
+///     Test type to be used as a nested part for identity testing.
 /// </summary>
-public class CompositeStrict
-{
-    public int Part1 { get; set; }
-    public string? Part2 { get; set; }
-}
-
-/// <summary>
-///     Test type with primary and alternate identities for identity testing.
-/// </summary>
-public class User
-{
-    public int UserId { get; set; }
-    public string Email { get; set; } = string.Empty;
-    public string Username { get; set; } = string.Empty;
-}
-
-/// <summary>
-///     Test type with simple scalar identity for snapshot testing.
-/// </summary>
-public class Product
-{
-    public int ProductId { get; set; }
-    public string Name { get; set; } = string.Empty;
-    public decimal Price { get; set; }
-}
-
-/// <summary>
-///     Test type with nested composite identity for snapshot navigation testing.
-/// </summary>
-public class OrderSnapshot
-{
-    public CustomerSnapshot? Customer { get; set; }
-    public long OrderNumber { get; set; }
-    public DateTime OrderDate { get; set; }
-}
-
-/// <summary>
-///     Test type with nested identity for snapshot testing.
-/// </summary>
-public class CustomerSnapshot
-{
-    public int CustomerId { get; set; }
-    public CountrySnapshot? Country { get; set; }
-    public string Name { get; set; } = string.Empty;
-}
-
-/// <summary>
-///     Test type for nested navigation in snapshot testing.
-/// </summary>
-public class CountrySnapshot
+public class IdentityNestedPart
 {
     public int Id { get; set; }
     public string Code { get; set; } = string.Empty;
 }
 
 /// <summary>
-///     Test type with mixed scalar types for snapshot flattening tests.
+///     Test type with composite identity that includes a nested part for identity testing.
 /// </summary>
-public class Invoice
+public class IdentityNestedComposite
 {
-    public Guid InvoiceId { get; set; }
-    public string InvoiceNumber { get; set; } = string.Empty;
-    public DateTime IssuedDate { get; set; }
+    public IdentityNestedPart NestedPart { get; set; } = null!;
+    public string Name { get; set; } = string.Empty;
+}
+
+/// <summary>
+///     Test type to be used as a parent for a child type with composite identity for identity testing.
+/// </summary>
+public class IdentityParent
+{
+    public int Id { get; set; }
+}
+
+/// <summary>
+///     Test type with composite identity that includes a parent identity and scalar identity composite for identity testing.
+/// </summary>
+public class IdentityChildComposite
+{
+    public int ChildId { get; set; }
+    public string ChildName { get; set; } = string.Empty;
 }

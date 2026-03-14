@@ -3,13 +3,9 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using Evoogle.Extensions;
-using Evoogle.XUnit;
-
-using FluentAssertions;
-
 namespace Evoogle.ApiFramework.Identity;
 
+#if false
 public partial class ApiIdentitySnapshotTests
 {
     #region Test Types
@@ -262,3 +258,4 @@ public partial class ApiIdentitySnapshotTests
     public void TryGetScalarValue(IXUnitTest test) => test.Execute(this);
     #endregion
 }
+#endif

@@ -3,30 +3,14 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using System.Text.Json;
-
-using Evoogle.ApiFramework.Exceptions;
-using Evoogle.ApiFramework.Identity;
 using Evoogle.ApiFramework.TestData;
 using Evoogle.Extensions;
 using Evoogle.XUnit;
 
-using FluentAssertions;
-
-using static Evoogle.XUnit.Tests.JsonUnitTests;
-
 namespace Evoogle.ApiFramework.Schema;
 
-public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
+public partial class ApiSchemaTests
 {
-    #region Fields
-    private static readonly List<string> _excludeMembers =
-    [
-        $"{nameof(ApiSchemaContext)}",
-        $"{nameof(ApiSchemaContext)}.{nameof(ApiSchemaContext.ApiSchema)}"
-    ];
-    #endregion
-
     #region Test Types
     public ref struct TypesWithRefStructMembers
     {
@@ -77,71 +61,6 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
         public int Id { get; set; }
         public int Code { get; set; }
     }
-
-    private class InitializeThrowsTest : JsonConverterTestBase<ApiSchema>
-    {
-        #region User Supplied Properties
-        public required string Source { get; init; }
-        public required string ExpectedExceptionMessage { get; init; }
-        public required List<ApiInitializationIssue> ExpectedIssues { get; init; }
-        #endregion
-
-        #region Calculated Properties
-        private bool? ActualExceptionThrown { get; set; }
-        private string? ActualExceptionMessage { get; set; }
-        private List<ApiInitializationIssue>? ActualIssues { get; set; }
-        #endregion
-
-        #region XUnitTest Methods
-        protected override void Arrange()
-        {
-            this.WriteLine($"Source:   {this.Source.SafeToString().RemoveWhitespace()}");
-            this.WriteLine();
-
-            this.WriteLine($"Expected Exception Message: {this.ExpectedExceptionMessage.SafeToString()}");
-            this.WriteLine();
-            foreach (var expectedIssue in this.ExpectedIssues)
-            {
-                this.WriteLine($"Expected Issue: {expectedIssue.SafeToString()}");
-            }
-            this.WriteLine();
-        }
-        #endregion
-
-        protected override void Act()
-        {
-            try
-            {
-                JsonSerializer.Deserialize<ApiSchema>(this.Source, this.JsonSerializerOptions);
-            }
-            catch (ApiSchemaInitializationException ex)
-            {
-                this.ActualExceptionThrown = true;
-                this.ActualExceptionMessage = ex.Message;
-                this.ActualIssues = [.. ex.Issues];
-            }
-
-            this.WriteLine($"Actual Exception Thrown:  {this.ActualExceptionThrown.SafeToString()}");
-            this.WriteLine($"Actual Exception Message: {this.ActualExceptionMessage.SafeToString()}");
-            this.WriteLine();
-            if (this.ActualIssues is not null)
-            {
-                foreach (var actualIssue in this.ActualIssues)
-                {
-                    this.WriteLine($"Actual Issue: {actualIssue.SafeToString()}");
-                }
-            }
-            this.WriteLine();
-        }
-
-        protected override void Assert()
-        {
-            this.ActualExceptionThrown.Should().BeTrue();
-            this.ActualExceptionMessage.Should().Be(this.ExpectedExceptionMessage);
-            this.ActualIssues.Should().NotBeNull();
-            this.ActualIssues.Should().BeEquivalentTo(this.ExpectedIssues);
-        }
-    }
     #endregion
 
     #region Theory Data
@@ -155,7 +74,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiEnumType)} Throws If {nameof(ApiEnumType.ApiName)} Is Invalid",
-            Source = @"
+            Part = @"
             {
                 ""ApiName"": ""ApiEnumType Throws If ApiName Is Invalid"",
                 ""ApiScalarTypes"": [],
@@ -203,7 +122,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiEnumType)} Throws If {nameof(ApiEnumType.ClrType)} Is Null",
-            Source = @"
+            Part = @"
             {
                 ""ApiName"": ""ApiEnumType Throws If ClrType Is Null"",
                 ""ApiScalarTypes"": [],
@@ -250,7 +169,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiEnumType)} Throws If {nameof(ApiEnumType.ClrType)} Is Not a CLR Enum",
-            Source = @"
+            Part = @"
             {
                 ""ApiName"": ""ApiEnumType Throws If ClrType Is Not a CLR Enum"",
                 ""ApiScalarTypes"": [],
@@ -298,7 +217,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiEnumType)} Throws If {nameof(ApiEnumType.ApiEnumValues)} Is Null",
-            Source = @"
+            Part = @"
             {
                 ""ApiName"": ""ApiEnumType Throws If ApiEnumValues Is Null"",
                 ""ApiScalarTypes"": [],
@@ -329,7 +248,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiEnumType)} Throws If {nameof(ApiEnumType.ApiEnumValues)} Is Empty",
-            Source = @"
+            Part = @"
             {
                 ""ApiName"": ""ApiEnumType Throws If ApiEnumValues Is Empty"",
                 ""ApiScalarTypes"": [],
@@ -361,7 +280,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiEnumType)} Throws If {nameof(ApiEnumType.ApiEnumValues)} Has Duplicate {nameof(ApiEnumValue.ApiName)} Values",
-            Source = @"
+            Part = @"
             {
                 ""ApiName"": ""ApiEnumType Throws If ApiEnumValues Has Duplicate ApiName Values"",
                 ""ApiScalarTypes"": [],
@@ -409,7 +328,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiEnumType)} Throws If {nameof(ApiEnumType.ApiEnumValues)} Has Duplicate {nameof(ApiEnumValue.ClrName)} Values",
-            Source = @"
+            Part = @"
             {
                 ""ApiName"": ""ApiEnumType Throws If ApiEnumValues Has Duplicate ClrName Values"",
                 ""ApiScalarTypes"": [],
@@ -457,7 +376,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiEnumType)} Throws If {nameof(ApiEnumType.ApiEnumValues)} Has Duplicate {nameof(ApiEnumValue.ClrOrdinal)} Values",
-            Source = @"
+            Part = @"
             {
                 ""ApiName"": ""ApiEnumType Throws If ApiEnumValues Has Duplicate ClrOrdinal Values"",
                 ""ApiScalarTypes"": [],
@@ -514,7 +433,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiEnumValue)} Throws If {nameof(ApiEnumValue.ApiName)} Is Invalid",
-            Source = @"
+            Part = @"
             {
                 ""ApiName"": ""ApiEnumValue Throws If ApiName Is Invalid"",
                 ""ApiScalarTypes"": [],
@@ -562,7 +481,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiEnumValue)} Throws If {nameof(ApiEnumValue.ClrName)} Is Invalid",
-            Source = @"
+            Part = @"
             {
                 ""ApiName"": ""ApiEnumValue Throws If ClrName Is Invalid"",
                 ""ApiScalarTypes"": [],
@@ -614,7 +533,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiScalarType)} Throws If {nameof(ApiScalarType.ApiName)} Is Invalid",
-            Source = @"
+            Part = @"
             {
                 ""ApiName"": ""ApiScalarType Throws If ApiName Is Invalid"",
                 ""ApiScalarTypes"": [
@@ -645,7 +564,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiScalarType)} Throws If {nameof(ApiScalarType.ClrType)} Is Null",
-            Source = @"
+            Part = @"
             {
                 ""ApiName"": ""ApiScalarType Throws If ClrType Is Null"",
                 ""ApiScalarTypes"": [
@@ -679,7 +598,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiProperty)} Throws If {nameof(ApiProperty.ApiName)} Is Invalid",
-            Source = @"
+            Part = @"
             {
                 ""ApiName"": ""ApiProperty Throws If ApiName Is Invalid"",
                 ""ApiScalarTypes"": [
@@ -728,7 +647,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiProperty)} Throws If {nameof(ApiProperty.ClrName)} Is Invalid",
-            Source = @"
+            Part = @"
             {
                 ""ApiName"": ""ApiProperty Throws If ClrName Is Invalid"",
                 ""ApiScalarTypes"": [
@@ -777,7 +696,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiProperty)} Throws If CLR Member Is Missing",
-            Source = @"
+            Part = @"
             {
                 ""ApiName"": ""ApiProperty Throws If CLR Member Is Missing"",
                 ""ApiScalarTypes"": [
@@ -826,7 +745,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiProperty)} Throws If {nameof(ApiProperty.ApiType)} Type Is Null",
-            Source = @"
+            Part = @"
             {
                 ""ApiName"": ""ApiProperty Throws If Type Is Null"",
                 ""ApiScalarTypes"": [],
@@ -865,7 +784,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiProperty)} Throws If Type Is An Invalid CLR Member",
-            Source = @"
+            Part = @"
             {
                 ""ApiName"": ""ApiProperty Throws If Type Is An Invalid CLR Member"",
                 ""ApiScalarTypes"": [
@@ -946,7 +865,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiProperty)} Throws If {nameof(ApiProperty.ApiType)} Is Unresolved Because Api Named Reference Type Does Not Exist",
-            Source = @"
+            Part = @"
             {
                 ""ApiName"": ""ApiProperty Throws If Type Is Unresolved Because Api Named Reference Type Does Not Exist"",
                 ""ApiScalarTypes"": [],
@@ -988,7 +907,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiProperty)} Throws If {nameof(ApiProperty.ApiType)} Is Unresolved Because CLR Reference Type Does Not Exist",
-            Source = @"
+            Part = @"
             {
                 ""ApiName"": ""ApiProperty Throws If Type Is Unresolved Because CLR Reference Type Does Not Exist"",
                 ""ApiScalarTypes"": [],
@@ -1029,7 +948,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiProperty)} Throws If {nameof(ApiProperty.ApiType)} Is Unresolved Because Type Reference Is Invalid",
-            Source = @"
+            Part = @"
             {
                 ""ApiName"": ""ApiProperty Throws If Type Is Unresolved Because Type Reference Is Invalid"",
                 ""ApiScalarTypes"": [],
@@ -1069,7 +988,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiProperty)} Throws If Unable To Get Or Set Field/Property Value",
-            Source = @"
+            Part = @"
             {
                 ""ApiName"": ""ApiProperty Throws If Unable To Get Or Set Field/Property Value"",
                 ""ApiScalarTypes"": [
@@ -1156,7 +1075,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiObjectType)} Throws If ApiProperties Is Null Or Empty",
-            Source = @"
+            Part = @"
             {
                 ""ApiName"": ""ApiObjectType Throws If ApiProperties Is Null Or Empty"",
                 ""ApiScalarTypes"": [],
@@ -1196,7 +1115,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiObjectType)} Throws If ApiProperties Has Duplicate ApiName",
-            Source = @"
+            Part = @"
             {
                 ""ApiName"": ""ApiObjectType Throws If ApiProperties Has Duplicate ApiName"",
                 ""ApiScalarTypes"": [
@@ -1251,7 +1170,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiObjectType)} Throws If ApiProperties Has Duplicate ClrName",
-            Source = @"
+            Part = @"
             {
                 ""ApiName"": ""ApiObjectType Throws If ApiProperties Has Duplicate ClrName"",
                 ""ApiScalarTypes"": [
@@ -1306,7 +1225,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiObjectType)} Throws If ApiIdentities Has Duplicate ApiName",
-            Source = @"
+            Part = @"
             {
                 ""ApiName"": ""ApiObjectType Throws If ApiIdentities Has Duplicate ApiName"",
                 ""ApiScalarTypes"": [
@@ -1324,16 +1243,18 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
                         ""ApiIdentities"": [
                             {
                                 ""ApiName"": ""Primary"",
-                                ""ApiIdentitySources"": [
+                                ""ApiIdentityParts"": [
                                     {
+                                        ""ApiKind"": ""Scalar"",
                                         ""ApiPropertyName"": ""Id""
                                     }
                                 ]
                             },
                             {
                                 ""ApiName"": ""Primary"",
-                                ""ApiIdentitySources"": [
+                                ""ApiIdentityParts"": [
                                     {
+                                        ""ApiKind"": ""Scalar"",
                                         ""ApiPropertyName"": ""Code""
                                     }
                                 ]
@@ -1375,38 +1296,40 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
             ]
         },
 
-        // ApiObjectType throws if ApiIdentities has duplicate ApiPropertyName sets
+        //
+        // ApiIdentity Initialization Tests
+        //
+
+        // ApiIdentity throws if ApiName is invalid
         new InitializeThrowsTest
         {
-            Name = $"{nameof(ApiObjectType)} Throws If ApiIdentities Has Duplicate ApiPropertyName Sets",
-            Source = @"
+            Name = $"{nameof(ApiIdentity)} Throws If {nameof(ApiIdentity.ApiName)} Is Invalid",
+            Part = @"
             {
-                ""ApiName"": ""ApiObjectType Throws If ApiIdentities Has Duplicate ApiPropertyName Sets"",
+                ""ApiName"": ""ApiIdentity Throws If ApiName Is Invalid"",
                 ""ApiScalarTypes"": [
                     {
                         ""ApiKind"": ""Scalar"",
                         ""ApiName"": ""Int32"",
                         ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                    },
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""String"",
+                        ""ClrType"": ""System.String, System.Private.CoreLib""
                     }
                 ],
                 ""ApiEnumTypes"": [],
                 ""ApiObjectTypes"": [
                     {
                         ""ApiKind"": ""Object"",
-                        ""ApiName"": ""TestObject"",
+                        ""ApiName"": ""IdentityScalar"",
                         ""ApiIdentities"": [
                             {
-                                ""ApiName"": ""ById"",
-                                ""ApiIdentitySources"": [
+                                ""ApiName"": """",
+                                ""ApiIdentityParts"": [
                                     {
-                                        ""ApiPropertyName"": ""Id""
-                                    }
-                                ]
-                            },
-                            {
-                                ""ApiName"": ""Primary"",
-                                ""ApiIdentitySources"": [
-                                    {
+                                        ""ApiKind"": ""Scalar"",
                                         ""ApiPropertyName"": ""Id""
                                     }
                                 ]
@@ -1419,81 +1342,22 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
                                     ""ApiKind"": ""Scalar"",
                                     ""ApiName"": ""Int32""
                                 },
-                                ""ClrName"": ""Id""
-                            }
-                        ],
-                        ""ClrType"": null
-                    }
-                ]
-            }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=2, Errors=1, Warnings=1.",
-            ExpectedIssues =
-            [
-                new ApiInitializationIssue
-                (
-                    path: $"{nameof(ApiObjectType)}[\"TestObject\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.API_TYPE_NULL_CLR_TYPE,
-                    remediation: "Specify a valid ClrType",
-                    description: $"{nameof(ApiObjectType.ClrType)} must not be null"
-                ),
-                new ApiInitializationIssue
-                (
-                    path: $"{nameof(ApiObjectType)}[\"TestObject\"]",
-                    severity: ApiInitializationSeverity.Warning,
-                    code: ApiInitializationCode.API_OBJECT_TYPE_AMBIGUOUS_IDENTITIES,
-                    description: "Identities 'ById' and 'Primary' use the same property set [Id], which may cause ambiguity",
-                    remediation: "Consider using different property combinations for each identity, or remove one of the duplicate identities"
-                ),
-            ]
-        },
-
-        //
-        // ApiIdentity Initialization Tests
-        //
-
-        // ApiIdentity throws if ApiName is invalid
-        new InitializeThrowsTest
-        {
-            Name = $"{nameof(ApiIdentity)} Throws If {nameof(ApiIdentity.ApiName)} Is Invalid",
-            Source = @"
-            {
-                ""ApiName"": ""ApiIdentity Throws If ApiName Is Invalid"",
-                ""ApiScalarTypes"": [
-                    {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""Int32"",
-                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
-                    }
-                ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
-                    {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""TestObject"",
-                        ""ApiIdentities"": [
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Id"",
+                                ""ClrMemberKind"": ""Property""
+                            },
                             {
-                                ""ApiName"": """",
-                                ""ApiIdentitySources"": [
-                                    {
-                                        ""ApiPropertyName"": ""WarehouseId""
-                                    }
-                                ]
-                            }
-                        ],
-                        ""ApiProperties"": [
-                            {
-                                ""ApiName"": ""WarehouseId"",
+                                ""ApiName"": ""Name"",
                                 ""ApiType"": {
                                     ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Int32""
+                                    ""ApiName"": ""String""
                                 },
                                 ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""WarehouseId"",
+                                ""ClrName"": ""Name"",
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.ProductInventory, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityScalar, Evoogle.ApiFramework.Core.Tests""
                     }
                 ]
             }",
@@ -1502,7 +1366,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"TestObject\"].{nameof(ApiIdentity)}",
+                    path: $"{nameof(ApiObjectType)}[\"IdentityScalar\"].{nameof(ApiIdentity)}",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_IDENTITY_INVALID_API_NAME,
                     description: $"{nameof(ApiIdentity.ApiName)} must not be null, empty, or whitespace",
@@ -1511,313 +1375,19 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
             ]
         },
 
-        // ApiIdentity throws if ApiIdentitySources is empty
+        // ApiIdentity throws if ApiIdentityParts is empty
         new InitializeThrowsTest
         {
-            Name = $"{nameof(ApiIdentity)} Throws If {nameof(ApiIdentity.ApiIdentitySources)} Is Empty",
-            Source = @"
+            Name = $"{nameof(ApiIdentity)} Throws If {nameof(ApiIdentity.ApiIdentityParts)} Is Empty",
+            Part = @"
             {
-                ""ApiName"": ""ApiIdentity Throws If ApiIdentitySources Is Empty"",
+                ""ApiName"": ""ApiIdentity Throws If ApiIdentityParts Is Empty"",
                 ""ApiScalarTypes"": [
                     {
                         ""ApiKind"": ""Scalar"",
                         ""ApiName"": ""Int32"",
                         ""ClrType"": ""System.Int32, System.Private.CoreLib""
-                    }
-                ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
-                    {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""TestObject"",
-                        ""ApiIdentities"": [
-                            {
-                                ""ApiName"": ""Primary"",
-                                ""ApiIdentitySources"": []
-                            }
-                        ],
-                        ""ApiProperties"": [
-                            {
-                                ""ApiName"": ""WarehouseId"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Int32""
-                                },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""WarehouseId"",
-                                ""ClrMemberKind"": ""Property""
-                            }
-                        ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.ProductInventory, Evoogle.ApiFramework.Core.Tests""
-                    }
-                ]
-            }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
-            ExpectedIssues =
-            [
-                new ApiInitializationIssue
-                (
-                    path: $"{nameof(ApiObjectType)}[\"TestObject\"].{nameof(ApiIdentity)}[\"Primary\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.API_IDENTITY_NULL_OR_EMPTY_SOURCES,
-                    description: $"{nameof(ApiIdentity.ApiIdentitySources)} must not be null or empty",
-                    remediation: $"Specify at least one {nameof(ApiIdentitySource)}"
-                ),
-            ]
-        },
-
-        // ApiIdentity throws if ApiIdentitySources has duplicate ApiPropertyName values
-        new InitializeThrowsTest
-        {
-            Name = $"{nameof(ApiIdentity)} Throws If {nameof(ApiIdentity.ApiIdentitySources)} Has Duplicate {nameof(ApiIdentitySource.ApiPropertyName)} Values",
-            Source = @"
-            {
-                ""ApiName"": ""ApiIdentity Throws If ApiIdentitySources Has Duplicate ApiPropertyName Values"",
-                ""ApiScalarTypes"": [
-                    {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""Int32"",
-                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
-                    }
-                ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
-                    {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""TestObject"",
-                        ""ApiIdentities"": [
-                            {
-                                ""ApiName"": ""Primary"",
-                                ""ApiIdentitySources"": [
-                                    {
-                                        ""ApiPropertyName"": ""WarehouseId""
-                                    },
-                                    {
-                                        ""ApiPropertyName"": ""WarehouseId""
-                                    }
-                                ]
-                            }
-                        ],
-                        ""ApiProperties"": [
-                            {
-                                ""ApiName"": ""WarehouseId"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Int32""
-                                },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""WarehouseId"",
-                                ""ClrMemberKind"": ""Property""
-                            }
-                        ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.ProductInventory, Evoogle.ApiFramework.Core.Tests""
-                    }
-                ]
-            }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
-            ExpectedIssues =
-            [
-                new ApiInitializationIssue
-                (
-                    path: $"{nameof(ApiObjectType)}[\"TestObject\"].{nameof(ApiIdentity)}[\"Primary\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.API_IDENTITY_DUPLICATE_SOURCE_API_PROPERTY_NAME,
-                    description: $"Duplicate {nameof(ApiIdentitySource)}.{nameof(ApiIdentitySource.ApiPropertyName)} values: 'WarehouseId'",
-                    remediation: $"Verify that each {nameof(ApiIdentitySource)} has a unique {nameof(ApiIdentitySource.ApiPropertyName)} value"
-                ),
-            ]
-        },
-
-        //
-        // ApiIdentitySource Initialization Tests
-        //
-
-        // ApiIdentitySource throws if ApiPropertyName is invalid
-        new InitializeThrowsTest
-        {
-            Name = $"{nameof(ApiIdentitySource)} Throws If {nameof(ApiIdentitySource.ApiPropertyName)} Is Invalid",
-            Source = @"
-            {
-                ""ApiName"": ""ApiIdentitySource Throws If ApiPropertyName Is Invalid"",
-                ""ApiScalarTypes"": [
-                    {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""Int32"",
-                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
-                    }
-                ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
-                    {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""TestObject"",
-                        ""ApiIdentities"": [
-                            {
-                                ""ApiName"": ""Primary"",
-                                ""ApiIdentitySources"": [
-                                    {
-                                        ""ApiPropertyName"": """"
-                                    }
-                                ]
-                            }
-                        ],
-                        ""ApiProperties"": [
-                            {
-                                ""ApiName"": ""WarehouseId"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Int32""
-                                },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""WarehouseId"",
-                                ""ClrMemberKind"": ""Property""
-                            }
-                        ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.ProductInventory, Evoogle.ApiFramework.Core.Tests""
-                    }
-                ]
-            }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
-            ExpectedIssues =
-            [
-                new ApiInitializationIssue
-                (
-                    path: $"{nameof(ApiObjectType)}[\"TestObject\"].{nameof(ApiIdentity)}[\"Primary\"].{nameof(ApiIdentitySource)}",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.API_IDENTITY_SOURCE_INVALID_API_PROPERTY_NAME,
-                    description: $"{nameof(ApiIdentitySource.ApiPropertyName)} must not be null, empty, or whitespace",
-                    remediation: $"Specify a valid {nameof(ApiIdentitySource.ApiPropertyName)} value"
-                ),
-            ]
-        },
-
-        // ApiIdentitySource throws if ApiPropertyName is unresolved
-        new InitializeThrowsTest
-        {
-            Name = $"{nameof(ApiIdentitySource)} Throws If {nameof(ApiIdentitySource.ApiPropertyName)} Is Unresolved",
-            Source = @"
-            {
-                ""ApiName"": ""ApiIdentitySource Throws If ApiPropertyName Is Unresolved"",
-                ""ApiScalarTypes"": [
-                    {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""Int32"",
-                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
-                    }
-                ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
-                    {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""TestObject"",
-                        ""ApiIdentities"": [
-                            {
-                                ""ApiName"": ""Primary"",
-                                ""ApiIdentitySources"": [
-                                    {
-                                        ""ApiPropertyName"": ""DoesNotExist""
-                                    }
-                                ]
-                            }
-                        ],
-                        ""ApiProperties"": [
-                            {
-                                ""ApiName"": ""WarehouseId"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Int32""
-                                },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""WarehouseId"",
-                                ""ClrMemberKind"": ""Property""
-                            }
-                        ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.ProductInventory, Evoogle.ApiFramework.Core.Tests""
-                    }
-                ]
-            }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
-            ExpectedIssues =
-            [
-                new ApiInitializationIssue
-                (
-                    path: $"{nameof(ApiObjectType)}[\"TestObject\"].{nameof(ApiIdentity)}[\"Primary\"].{nameof(ApiIdentitySource)}[\"DoesNotExist\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.API_IDENTITY_SOURCE_UNRESOLVED_PROPERTY,
-                    description: $"{nameof(ApiIdentitySource.ApiProperty)} could not be resolved for {nameof(ApiIdentitySource.ApiPropertyName)}='DoesNotExist'",
-                    remediation: $"Verify that {nameof(ApiIdentitySource.ApiPropertyName)} refers to a valid property on the parent {nameof(ApiObjectType)}"
-                ),
-            ]
-        },
-
-        // ApiIdentitySource throws if ClrScalarType is not ApiId compatible
-        new InitializeThrowsTest
-        {
-            Name = $"{nameof(ApiIdentitySource)} Throws If {nameof(ApiIdentitySource.ClrScalarType)} Is Invalid",
-            Source = @"
-            {
-                ""ApiName"": ""ApiIdentitySource Throws If ClrScalarType Is Invalid"",
-                ""ApiScalarTypes"": [
-                    {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""Int32"",
-                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
-                    }
-                ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
-                    {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""TestObject"",
-                        ""ApiIdentities"": [
-                            {
-                                ""ApiName"": ""Primary"",
-                                ""ApiIdentitySources"": [
-                                    {
-                                        ""ApiPropertyName"": ""WarehouseId"",
-                                        ""ClrScalarType"": ""System.Net.Sockets.Socket, System.Net.Sockets""
-                                    }
-                                ]
-                            }
-                        ],
-                        ""ApiProperties"": [
-                            {
-                                ""ApiName"": ""WarehouseId"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Int32""
-                                },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""WarehouseId"",
-                                ""ClrMemberKind"": ""Property""
-                            }
-                        ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.ProductInventory, Evoogle.ApiFramework.Core.Tests""
-                    }
-                ]
-            }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
-            ExpectedIssues =
-            [
-                new ApiInitializationIssue
-                (
-                    path: $"{nameof(ApiObjectType)}[\"TestObject\"].{nameof(ApiIdentity)}[\"Primary\"].{nameof(ApiIdentitySource)}[\"WarehouseId\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.API_IDENTITY_SOURCE_INVALID_SCALAR_TYPE,
-                    description: $"Scalar type 'Socket' is not compatible with {nameof(ApiId)}",
-                    remediation: $"Use one of the supported scalar types: {string.Join(",", ApiId.GetCompatibleScalarTypes().Select(t => t.SafeToName()).OrderBy(n => n, StringComparer.Ordinal))}"
-                ),
-            ]
-        },
-
-        // ApiIdentitySource warns if identity source requires string parsing for a non-string scalar type
-        new InitializeThrowsTest
-        {
-            Name = $"{nameof(ApiIdentitySource)} Warns If {nameof(String)} Requires Coercion",
-            Source = @"
-            {
-                ""ApiName"": ""ApiIdentitySource Warns If String Requires Coercion"",
-                ""ApiScalarTypes"": [
+                    },
                     {
                         ""ApiKind"": ""Scalar"",
                         ""ApiName"": ""String"",
@@ -1828,31 +1398,345 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
                 ""ApiObjectTypes"": [
                     {
                         ""ApiKind"": ""Object"",
-                        ""ApiName"": ""TestObject"",
+                        ""ApiName"": ""IdentityScalar"",
                         ""ApiIdentities"": [
                             {
-                                ""ApiName"": """",
-                                ""ApiIdentitySources"": [
+                                ""ApiName"": ""PK_IdentityScalar"",
+                                ""ApiIdentityParts"": []
+                            }
+                        ],
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""Id"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""Int32""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Id"",
+                                ""ClrMemberKind"": ""Property""
+                            },
+                            {
+                                ""ApiName"": ""Name"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""String""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Name"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityScalar, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiObjectType)}[\"IdentityScalar\"].{nameof(ApiIdentity)}[\"PK_IdentityScalar\"]",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_IDENTITY_NULL_OR_EMPTY_PARTS,
+                    description: $"{nameof(ApiIdentity.ApiIdentityParts)} must not be null or empty",
+                    remediation: $"Specify at least one {nameof(ApiIdentityPart)}"
+                ),
+            ]
+        },
+
+        // ApiIdentity throws if ApiIdentityParts has duplicate ApiPropertyName values
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiIdentity)} Throws If {nameof(ApiIdentity.ApiIdentityParts)} Has Duplicate {nameof(ApiPropertyIdentityPart.ApiPropertyName)} Values",
+            Part = @"
+            {
+                ""ApiName"": ""ApiIdentity Throws If ApiIdentityParts Has Duplicate ApiPropertyName Values"",
+                ""ApiScalarTypes"": [
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""Int32"",
+                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                    },
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""String"",
+                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                    }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""IdentityScalar"",
+                        ""ApiIdentities"": [
+                            {
+                                ""ApiName"": ""PK_IdentityScalar"",
+                                ""ApiIdentityParts"": [
                                     {
-                                        ""ApiPropertyName"": ""ProductCode"",
-                                        ""ClrScalarType"": ""System.Guid, System.Private.CoreLib""
+                                        ""ApiKind"": ""Scalar"",
+                                        ""ApiPropertyName"": ""Id""
+                                    },
+                                    {
+                                        ""ApiKind"": ""Scalar"",
+                                        ""ApiPropertyName"": ""Id""
                                     }
                                 ]
                             }
                         ],
                         ""ApiProperties"": [
                             {
-                                ""ApiName"": ""ProductCode"",
+                                ""ApiName"": ""Id"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""Int32""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Id"",
+                                ""ClrMemberKind"": ""Property""
+                            },
+                            {
+                                ""ApiName"": ""Name"",
                                 ""ApiType"": {
                                     ""ApiKind"": ""Scalar"",
                                     ""ApiName"": ""String""
                                 },
                                 ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""ProductCode"",
+                                ""ClrName"": ""Name"",
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.ProductInventory, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityScalar, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiObjectType)}[\"IdentityScalar\"].{nameof(ApiIdentity)}[\"PK_IdentityScalar\"]",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_IDENTITY_DUPLICATE_PART_API_PROPERTY_NAME,
+                    description: $"Duplicate {nameof(ApiPropertyIdentityPart)}.{nameof(ApiPropertyIdentityPart.ApiPropertyName)} values: 'Id'",
+                    remediation: $"Verify that each {nameof(ApiPropertyIdentityPart)} has a unique {nameof(ApiPropertyIdentityPart.ApiPropertyName)} value"
+                ),
+            ]
+        },
+
+        //
+        // ApiPropertyIdentityPart Initialization Tests
+        //
+
+        // ApiPropertyIdentityPart throws if ApiPropertyName is invalid
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiPropertyIdentityPart)} Throws If {nameof(ApiPropertyIdentityPart.ApiPropertyName)} Is Invalid",
+            Part = @"
+            {
+                ""ApiName"": ""ApiPropertyIdentityPart Throws If ApiPropertyName Is Invalid"",
+                ""ApiScalarTypes"": [
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""Int32"",
+                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                    },
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""String"",
+                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                    }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""IdentityScalar"",
+                        ""ApiIdentities"": [
+                            {
+                                ""ApiName"": ""PK_IdentityScalar"",
+                                ""ApiIdentityParts"": [
+                                    {
+                                        ""ApiKind"": ""Scalar"",
+                                        ""ApiPropertyName"": """"
+                                    }
+                                ]
+                            }
+                        ],
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""Id"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""Int32""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Id"",
+                                ""ClrMemberKind"": ""Property""
+                            },
+                            {
+                                ""ApiName"": ""Name"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""String""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Name"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityScalar, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiObjectType)}[\"IdentityScalar\"].{nameof(ApiIdentity)}[\"PK_IdentityScalar\"].{nameof(ApiScalarIdentityPart)}",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_IDENTITY_PART_INVALID_API_PROPERTY_NAME,
+                    description: $"{nameof(ApiPropertyIdentityPart.ApiPropertyName)} must not be null, empty, or whitespace",
+                    remediation: $"Specify a valid {nameof(ApiPropertyIdentityPart.ApiPropertyName)} value"
+                ),
+            ]
+        },
+
+        // ApiPropertyIdentityPart throws if ApiPropertyName is unresolved
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiPropertyIdentityPart)} Throws If {nameof(ApiPropertyIdentityPart.ApiPropertyName)} Is Unresolved",
+            Part = @"
+            {
+                ""ApiName"": ""ApiPropertyIdentityPart Throws If ApiPropertyName Is Unresolved"",
+                ""ApiScalarTypes"": [
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""Int32"",
+                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                    },
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""String"",
+                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                    }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""IdentityScalar"",
+                        ""ApiIdentities"": [
+                            {
+                                ""ApiName"": ""PK_IdentityScalar"",
+                                ""ApiIdentityParts"": [
+                                    {
+                                        ""ApiKind"": ""Scalar"",
+                                        ""ApiPropertyName"": ""DoesNotExist""
+                                    }
+                                ]
+                            }
+                        ],
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""Id"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""Int32""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Id"",
+                                ""ClrMemberKind"": ""Property""
+                            },
+                            {
+                                ""ApiName"": ""Name"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""String""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Name"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityScalar, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiObjectType)}[\"IdentityScalar\"].{nameof(ApiIdentity)}[\"PK_IdentityScalar\"].{nameof(ApiScalarIdentityPart)}[\"DoesNotExist\"]",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_IDENTITY_PART_UNRESOLVED_API_PROPERTY,
+                    description: $"{nameof(ApiPropertyIdentityPart.ApiProperty)} could not be resolved for {nameof(ApiPropertyIdentityPart.ApiPropertyName)}='DoesNotExist'",
+                    remediation: $"Verify that {nameof(ApiPropertyIdentityPart.ApiPropertyName)} refers to a valid property on {nameof(ApiObjectType)}[\"IdentityScalar\"]"
+                ),
+            ]
+        },
+
+        // ApiScalarIdentityPart warns if identity part requires string parsing for a non-string scalar type
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiScalarIdentityPart)} Warns If {nameof(String)} Requires Coercion",
+            Part = @"
+            {
+                ""ApiName"": ""ApiScalarIdentityPart Warns If String Requires Coercion"",
+                ""ApiScalarTypes"": [
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""Int32"",
+                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                    },
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""String"",
+                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                    }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""IdentityScalar"",
+                        ""ApiIdentities"": [
+                            {
+                                ""ApiName"": """",
+                                ""ApiIdentityParts"": [
+                                    {
+                                        ""ApiKind"": ""Scalar"",
+                                        ""ApiPropertyName"": ""Id"",
+                                        ""ClrScalarTypeHint"": ""System.String,System.Private.CoreLib""
+                                    }
+                                ]
+                            }
+                        ],
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""Id"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""Int32""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Id"",
+                                ""ClrMemberKind"": ""Property""
+                            },
+                            {
+                                ""ApiName"": ""Name"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""String""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Name"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityScalar, Evoogle.ApiFramework.Core.Tests""
                     }
                 ]
             }",
@@ -1861,7 +1745,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"TestObject\"].{nameof(ApiIdentity)}",
+                    path: $"{nameof(ApiObjectType)}[\"IdentityScalar\"].{nameof(ApiIdentity)}",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_IDENTITY_INVALID_API_NAME,
                     description: $"{nameof(ApiIdentity.ApiName)} must not be null, empty, or whitespace",
@@ -1869,160 +1753,11 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
                 ),
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"TestObject\"].{nameof(ApiIdentity)}.{nameof(ApiIdentitySource)}[\"ProductCode\"]",
+                    path: $"{nameof(ApiObjectType)}[\"IdentityScalar\"].{nameof(ApiIdentity)}.{nameof(ApiScalarIdentityPart)}[\"Id\"]",
                     severity: ApiInitializationSeverity.Warning,
-                    code: ApiInitializationCode.API_IDENTITY_SOURCE_PERFORMANCE_CONCERN,
-                    description: $"Identity source 'ProductCode' requires type coercion between {nameof(String)} and Guid, which may impact performance",
-                    remediation: "Consider using Guid as the property type directly, or be aware of the parsing overhead"
-                ),
-            ]
-        },
-
-        // ApiIdentitySource throws if identity source references a type that creates a circular dependency
-        new InitializeThrowsTest
-        {
-            Name = $"{nameof(ApiIdentitySource)} Throws If Identity Reference Is Circular",
-            Source = @"
-            {
-                ""ApiName"": ""ApiIdentitySource Throws If Identity Reference Is Circular"",
-                ""ApiScalarTypes"": [],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
-                    {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""Node"",
-                        ""ApiIdentities"": [
-                            {
-                                ""ApiName"": ""Primary"",
-                                ""ApiIdentitySources"": [
-                                    {
-                                        ""ApiPropertyName"": ""Self""
-                                    }
-                                ]
-                            }
-                        ],
-                        ""ApiProperties"": [
-                            {
-                                ""ApiName"": ""Self"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Object"",
-                                    ""ApiName"": ""Node""
-                                },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Self"",
-                                ""ClrMemberKind"": ""Property""
-                            }
-                        ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+CircularIdentityNodeType, Evoogle.ApiFramework.Core.Tests""
-                    }
-                ]
-            }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=2, Errors=2, Warnings=0.",
-            ExpectedIssues =
-            [
-                new ApiInitializationIssue
-                (
-                    path: $"{nameof(ApiObjectType)}[\"Node\"].{nameof(ApiIdentity)}[\"Primary\"].{nameof(ApiIdentitySource)}[\"Self\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.API_IDENTITY_SOURCE_CIRCULAR_REFERENCE,
-                    description: "Circular identity reference detected: property 'Self' references type 'Node' which has an identity that depends on the current type",
-                    remediation: "Remove the circular dependency by restructuring the identity definitions or using a non-identity property"
-                ),
-                new ApiInitializationIssue
-                (
-                    path: $"{nameof(ApiObjectType)}[\"Node\"].{nameof(ApiIdentity)}[\"Primary\"].{nameof(ApiIdentitySource)}[\"Self\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.API_IDENTITY_SOURCE_UNRESOLVED_PROPERTY,
-                    description: $"{nameof(ApiIdentitySource.ApiProperty)} could not be resolved for {nameof(ApiIdentitySource.ApiPropertyName)}='Self'",
-                    remediation: $"Verify that {nameof(ApiIdentitySource.ApiPropertyName)} refers to a valid property on the parent {nameof(ApiObjectType)}"
-                ),
-            ]
-        },
-
-        // ApiIdentitySource throws if two object types reference each other in their identities
-        new InitializeThrowsTest
-        {
-            Name = $"{nameof(ApiIdentitySource)} Throws If Two Identity References Are Circular",
-            Source = @"
-            {
-                ""ApiName"": ""ApiIdentitySource Throws If Two Identity References Are Circular"",
-                ""ApiScalarTypes"": [],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
-                    {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""Alpha"",
-                        ""ApiIdentities"": [
-                            {
-                                ""ApiName"": ""Primary"",
-                                ""ApiIdentitySources"": [
-                                    {
-                                        ""ApiPropertyName"": ""Beta""
-                                    }
-                                ]
-                            }
-                        ],
-                        ""ApiProperties"": [
-                            {
-                                ""ApiName"": ""Beta"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Object"",
-                                    ""ApiName"": ""Beta""
-                                },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Beta"",
-                                ""ClrMemberKind"": ""Property""
-                            }
-                        ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+CircularIdentityAlphaType, Evoogle.ApiFramework.Core.Tests""
-                    },
-                    {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""Beta"",
-                        ""ApiIdentities"": [
-                            {
-                                ""ApiName"": ""Primary"",
-                                ""ApiIdentitySources"": [
-                                    {
-                                        ""ApiPropertyName"": ""Alpha""
-                                    }
-                                ]
-                            }
-                        ],
-                        ""ApiProperties"": [
-                            {
-                                ""ApiName"": ""Alpha"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Object"",
-                                    ""ApiName"": ""Alpha""
-                                },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Alpha"",
-                                ""ClrMemberKind"": ""Property""
-                            }
-                        ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+CircularIdentityBetaType, Evoogle.ApiFramework.Core.Tests""
-                    }
-                ]
-            }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=2, Errors=2, Warnings=0.",
-            ExpectedIssues =
-            [
-                new ApiInitializationIssue
-                (
-                    path: $"{nameof(ApiObjectType)}[\"Beta\"].{nameof(ApiIdentity)}[\"Primary\"].{nameof(ApiIdentitySource)}[\"Alpha\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.API_IDENTITY_SOURCE_CIRCULAR_REFERENCE,
-                    description: "Circular identity reference detected: property 'Alpha' references type 'Alpha' which has an identity that depends on the current type",
-                    remediation: "Remove the circular dependency by restructuring the identity definitions or using a non-identity property"
-                ),
-                new ApiInitializationIssue
-                (
-                    path: $"{nameof(ApiObjectType)}[\"Beta\"].{nameof(ApiIdentity)}[\"Primary\"].{nameof(ApiIdentitySource)}[\"Alpha\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.API_IDENTITY_SOURCE_UNRESOLVED_PROPERTY,
-                    description: $"{nameof(ApiIdentitySource.ApiProperty)} could not be resolved for {nameof(ApiIdentitySource.ApiPropertyName)}='Alpha'",
-                    remediation: $"Verify that {nameof(ApiIdentitySource.ApiPropertyName)} refers to a valid property on the parent {nameof(ApiObjectType)}"
+                    code: ApiInitializationCode.API_IDENTITY_PART_PERFORMANCE_CONCERN,
+                    description: $"Identity part 'Id' has CLR property type {nameof(Int32)} but resolves to scalar type {nameof(String)}, requiring string parse/format on every identity operation",
+                    remediation: $"Align the 'Id' property type with the resolved scalar type {nameof(String)} to eliminate string coercion, or accept the overhead if the type mismatch is intentional"
                 ),
             ]
         },

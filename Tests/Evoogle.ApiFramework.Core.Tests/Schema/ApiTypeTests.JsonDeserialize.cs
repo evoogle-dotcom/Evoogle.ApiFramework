@@ -3,31 +3,15 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using System.Diagnostics.CodeAnalysis;
 using Evoogle.ApiFramework.TestData;
 using Evoogle.XUnit;
 
 using static Evoogle.ApiFramework.Schema.TestData.ApiSchemaFactory;
-using static Evoogle.XUnit.Tests.JsonUnitTests;
 
 namespace Evoogle.ApiFramework.Schema;
 
 public partial class ApiTypeTests
 {
-    #region Test Types
-    private class JsonDeserializeTest : JsonDeserializeTest<ApiType, ApiTypeDescriptor>
-    {
-        #region Constructors
-        [SetsRequiredMembers]
-        public JsonDeserializeTest()
-        {
-            this.ExpectedFactoryExpression = (arg) => BuildTestApiType(arg);
-            this.ExcludeMembers = _excludeMembers;
-        }
-        #endregion
-    }
-    #endregion
-
     #region Theory Data
     public static TheoryDataRow<IXUnitTest>[] JsonDeserializeTheoryData =>
     [
@@ -821,16 +805,19 @@ public partial class ApiTypeTests
                 ""ApiIdentities"": [
                     {
                         ""ApiName"": ""PK_Company_Id"",
-                        ""ApiIdentitySources"": [
+                        ""ApiIdentityParts"": [
                             {
-                                ""ApiPropertyName"": ""Id""
+                                ""ApiKind"": ""Scalar"",
+                                ""ApiPropertyName"": ""Id"",
+					            ""ClrScalarTypeHint"": ""System.String,System.Private.CoreLib""
                             }
                         ]
                     },
                     {
                         ""ApiName"": ""AK_Company_Name"",
-                        ""ApiIdentitySources"": [
+                        ""ApiIdentityParts"": [
                             {
+                                ""ApiKind"": ""Scalar"",
                                 ""ApiPropertyName"": ""Name""
                             }
                         ]
@@ -914,21 +901,24 @@ public partial class ApiTypeTests
                         new ApiIdentityConfig
                         (
                             ApiName: "PK_Company_Id",
-                            ApiIdentitySources:
+                            ApiIdentityParts:
                             [
-                                new ApiIdentitySourceConfig
+                                new ApiIdentityPartConfig
                                 (
-                                    ApiPropertyName: nameof(Company.Id)
+                                    ApiKind: ApiIdentityPartKind.Scalar,
+                                    ApiPropertyName: nameof(Company.Id),
+                                    ClrScalarTypeHint: typeof(string)
                                 )
                             ]
                         ),
                         new ApiIdentityConfig
                         (
                             ApiName: "AK_Company_Name",
-                            ApiIdentitySources:
+                            ApiIdentityParts:
                             [
-                                new ApiIdentitySourceConfig
+                                new ApiIdentityPartConfig
                                 (
+                                    ApiKind: ApiIdentityPartKind.Scalar,
                                     ApiPropertyName: nameof(Company.Name)
                                 )
                             ]
@@ -1418,17 +1408,19 @@ public partial class ApiTypeTests
                 ""ApiIdentities"": [
                     {
                         ""ApiName"": ""PK_Company_Id"",
-                        ""ApiIdentitySources"": [
+                        ""ApiIdentityParts"": [
                             {
+                                ""ApiKind"": ""Scalar"",
                                 ""ApiPropertyName"": ""Id"",
-					            ""ClrScalarType"": ""System.String,System.Private.CoreLib""
+					            ""ClrScalarTypeHint"": ""System.String,System.Private.CoreLib""
                             }
                         ]
                     },
                     {
                         ""ApiName"": ""AK_Company_Name"",
-                        ""ApiIdentitySources"": [
+                        ""ApiIdentityParts"": [
                             {
+                                ""ApiKind"": ""Scalar"",
                                 ""ApiPropertyName"": ""Name""
                             }
                         ]
@@ -1508,22 +1500,24 @@ public partial class ApiTypeTests
                         new ApiIdentityConfig
                         (
                             ApiName: "PK_Company_Id",
-                            ApiIdentitySources:
+                            ApiIdentityParts:
                             [
-                                new ApiIdentitySourceConfig
+                                new ApiIdentityPartConfig
                                 (
+                                    ApiKind: ApiIdentityPartKind.Scalar,
                                     ApiPropertyName: nameof(Company.Id),
-                                    ClrScalarType: typeof(string)
+                                    ClrScalarTypeHint: typeof(string)
                                 )
                             ]
                         ),
                         new ApiIdentityConfig
                         (
                             ApiName: "AK_Company_Name",
-                            ApiIdentitySources:
+                            ApiIdentityParts:
                             [
-                                new ApiIdentitySourceConfig
+                                new ApiIdentityPartConfig
                                 (
+                                    ApiKind: ApiIdentityPartKind.Scalar,
                                     ApiPropertyName: nameof(Company.Name)
                                 )
                             ]

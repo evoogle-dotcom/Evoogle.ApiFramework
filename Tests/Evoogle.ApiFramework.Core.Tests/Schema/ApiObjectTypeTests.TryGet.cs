@@ -14,6 +14,37 @@ public partial class ApiObjectTypeTests
     #region Theory Data
     public static TheoryDataRow<IXUnitTest>[] TryGetTheoryData =>
     [
+        // TryGetIdentityByApiName
+        new TryGetTest
+        {
+            Name = $"{nameof(ApiObjectType.TryGetIdentityByApiName)} returns true when {nameof(ApiIdentity)} exists with exact case match",
+            ApiSchemaKind = ApiSchemaKind.Identity,
+            ApiObjectTypeName = nameof(IdentityScalar),
+            TryGetMethod = TryGetMethod.TryGetIdentityByApiName,
+            SearchKey = "PK_IdentityScalar",
+            ExpectedResult = true
+        },
+
+        new TryGetTest
+        {
+            Name = $"{nameof(ApiObjectType.TryGetIdentityByApiName)} returns false when {nameof(ApiIdentity)} exists but case mismatch",
+            ApiSchemaKind = ApiSchemaKind.Identity,
+            ApiObjectTypeName = nameof(IdentityScalar),
+            TryGetMethod = TryGetMethod.TryGetIdentityByApiName,
+            SearchKey = "pk_identityscalar",
+            ExpectedResult = false
+        },
+
+        new TryGetTest
+        {
+            Name = $"{nameof(ApiObjectType.TryGetIdentityByApiName)} returns false when {nameof(ApiIdentity)} does not exist",
+            ApiSchemaKind = ApiSchemaKind.Identity,
+            ApiObjectTypeName = nameof(IdentityScalar),
+            TryGetMethod = TryGetMethod.TryGetIdentityByApiName,
+            SearchKey = "Unknown_Identity",
+            ExpectedResult = false
+        },
+
         // TryGetPropertyByApiName
         new TryGetTest
         {
@@ -27,7 +58,7 @@ public partial class ApiObjectTypeTests
 
         new TryGetTest
         {
-            Name = $"{nameof(ApiObjectType.TryGetPropertyByApiName)} returns true when {nameof(ApiProperty)} exists but with case-insensitive search",
+            Name = $"{nameof(ApiObjectType.TryGetPropertyByApiName)} returns false when {nameof(ApiProperty)} exists but case mismatch",
             ApiSchemaKind = ApiSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             TryGetMethod = TryGetMethod.TryGetPropertyByApiName,
@@ -58,7 +89,7 @@ public partial class ApiObjectTypeTests
 
         new TryGetTest
         {
-            Name = $"{nameof(ApiObjectType.TryGetPropertyByClrName)} returns true when {nameof(ApiProperty)} exists but with case-insensitive search",
+            Name = $"{nameof(ApiObjectType.TryGetPropertyByClrName)} returns false when {nameof(ApiProperty)} exists but case mismatch",
             ApiSchemaKind = ApiSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             TryGetMethod = TryGetMethod.TryGetPropertyByClrName,
@@ -89,7 +120,7 @@ public partial class ApiObjectTypeTests
 
         new TryGetTest
         {
-            Name = $"{nameof(ApiObjectType.TryGetRelationshipByApiName)} returns true when {nameof(ApiRelationship)} exists but with case-insensitive search",
+            Name = $"{nameof(ApiObjectType.TryGetRelationshipByApiName)} returns false when {nameof(ApiRelationship)} exists but case mismatch",
             ApiSchemaKind = ApiSchemaKind.Simple,
             ApiObjectTypeName = nameof(Company),
             TryGetMethod = TryGetMethod.TryGetRelationshipByApiName,

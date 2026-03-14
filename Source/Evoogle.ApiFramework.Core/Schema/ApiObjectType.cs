@@ -49,12 +49,14 @@ public sealed partial class ApiObjectType
     private Dictionary<string, ApiRelationship>? _apiRelationshipApiNameLookup = null;
     #endregion
 
+    #region ApiSchemaElement Properties
+    /// <inheritdoc/>
+    protected override string ApiElementName => nameof(ApiObjectType);
+    #endregion
+
     #region ApiType Properties
     /// <inheritdoc/>
     public override ApiTypeKind ApiKind => ApiTypeKind.Object;
-
-    /// <inheritdoc/>
-    protected override string ApiTypeName => nameof(ApiObjectType);
     #endregion
 
     #region ApiObject Properties
@@ -70,7 +72,7 @@ public sealed partial class ApiObjectType
     ///     By convention, the first identity in <see cref="ApiIdentities"/> is the primary identity.
     ///     Returns null if no identities are configured.
     /// </remarks>
-    public ApiIdentity? ApiPrimaryIdentity => this.ApiIdentities.Length > 0 ? this.ApiIdentities[0] : null;
+    public ApiIdentity? ApiPrimaryIdentity => this.HasIdentity ? this.ApiIdentities[0] : null;
 
     /// <summary>
     ///     Gets the configuration options for the object type.
@@ -87,15 +89,30 @@ public sealed partial class ApiObjectType
     /// </summary>
     public ApiRelationship[] ApiRelationships { get; } = [.. apiRelationships.EmptyIfNull().Where(x => x is not null)];
 
-    /// <summary>
-    ///     Indicates whether this object type has any API identities defined.
-    /// </summary>
-    public bool HasIdentity => this.ApiIdentities.Length > 0;
-
     private Dictionary<string, ApiIdentity> ApiIdentityApiNameLookup => this.ThrowIfNotInitialized(_apiIdentityApiNameLookup);
     private Dictionary<string, ApiProperty> ApiPropertyApiNameLookup => this.ThrowIfNotInitialized(_apiPropertyApiNameLookup);
     private Dictionary<string, ApiProperty> ApiPropertyClrNameLookup => this.ThrowIfNotInitialized(_apiPropertyClrNameLookup);
     private Dictionary<string, ApiRelationship> ApiRelationshipApiNameLookup => this.ThrowIfNotInitialized(_apiRelationshipApiNameLookup);
+    #endregion
+
+    #region ApiObject Computed Properties
+    /// <summary>
+    ///     Indicates whether this object type has any API identities defined.
+    /// </summary>
+    public bool HasIdentity => this.ApiIdentities.Length > 0;
+    #endregion
+
+    #region Object Methods
+    /// <inheritdoc/>
+    public override string ToString()
+    {
+        var apiName = this.ApiName.SafeToString();
+        var apiOptions = this.ApiOptions.SafeToString();
+        var extensionCount = this.ExtensionCount.SafeToString();
+        var clrType = this.ClrType.SafeToString();
+
+        return $"{nameof(ApiObjectType)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ApiOptions)}={apiOptions}, {nameof(this.ExtensionCount)}={extensionCount}}} [{clrType}]";
+    }
     #endregion
 
     #region ApiSchemaElement Methods
@@ -150,61 +167,6 @@ public sealed partial class ApiObjectType
 
     #region ApiObjectType Identity Methods
     /// <summary>
-    ///     Gets the API names of all properties that constitute a specific identity.
-    /// </summary>
-    /// <param name="apiIdentityName">Optional identity name. If null, uses the primary identity.</param>
-    /// <returns>A read-only list of property API names, or an empty list if the identity is not found.</returns>
-    /// <remarks>
-    ///     <para><b>Use Cases:</b></para>
-    ///     <list type="bullet">
-    ///         <item><description>UI form generation - Mark identity fields as required</description></item>
-    ///         <item><description>Query building - Generate WHERE clauses based on identity properties</description></item>
-    ///         <item><description>Validation - Auto-generate validation rules for identity fields</description></item>
-    ///         <item><description>Serialization - Optimize identity property handling</description></item>
-    ///     </list>
-    /// </remarks>
-    public string[] GetIdentityApiPropertyNames(string? apiIdentityName = null)
-    {
-        if (!this.HasIdentity)
-        {
-            return [];
-        }
-
-        var identity = this.ResolveIdentityForBuild(apiIdentityName);
-        if (identity is null)
-        {
-            return [];
-        }
-
-        return [.. identity.ApiIdentitySources.Select(part => part.ApiPropertyName)];
-    }
-
-    /// <summary>
-    ///     Checks if a property is part of any identity on this object type.
-    /// </summary>
-    /// <param name="apiPropertyName">The API name of the property to check.</param>
-    /// <returns><c>true</c> if the property is part of at least one identity; otherwise, <c>false</c>.</returns>
-    /// <remarks>
-    ///     <para><b>Use Cases:</b></para>
-    ///     <list type="bullet">
-    ///         <item><description>Validation - Mark identity properties as required in forms</description></item>
-    ///         <item><description>Security - Prevent modification of identity properties</description></item>
-    ///         <item><description>Change tracking - Detect identity changes that require special handling</description></item>
-    ///     </list>
-    /// </remarks>
-    public bool IsIdentityProperty(string apiPropertyName)
-    {
-        if (!this.HasIdentity || string.IsNullOrWhiteSpace(apiPropertyName))
-        {
-            return false;
-        }
-
-        return this.ApiIdentities
-            .Any(identity => identity.ApiIdentitySources
-                .Any(part => string.Equals(part.ApiPropertyName, apiPropertyName, StringComparison.OrdinalIgnoreCase)));
-    }
-
-    /// <summary>
     ///     Gets the API names of all identities defined on this object type.
     /// </summary>
     /// <returns>A read-only list of identity API names, or an empty list if no identities are defined.</returns>
@@ -243,43 +205,14 @@ public sealed partial class ApiObjectType
     }
     #endregion
 
-    #region Object Methods
-    /// <inheritdoc/>
-    public override string ToString()
-    {
-        var apiName = this.ApiName.SafeToString();
-        var apiOptions = this.ApiOptions.SafeToString();
-        var extensionCount = this.ExtensionCount.SafeToString();
-        var clrType = this.ClrType.SafeToString();
-
-        return $"{nameof(ApiObjectType)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ApiOptions)}={apiOptions}, {nameof(this.ExtensionCount)}={extensionCount}}} [{clrType}]";
-    }
-    #endregion
-
     #region Implementation Methods
     private void InitializeApiIdentities(ApiInitializationContext context)
     {
-        // Initialize identity lookup dictionary
-        _apiIdentityApiNameLookup = null;
-
         if (this.ApiIdentities.Length == 0)
         {
             // No identities defined; this is acceptable as identities are optional.
             return;
         }
-
-        // Initialize identity lookup dictionary
-        ApiSchemaHelpers.InitializeLookupDictionary
-        (
-            parts: this.ApiIdentities,
-            partKeySelector: x => x.ApiName,
-            partKeyFilter: x => ApiSchemaHelpers.IsNameValid(x),
-            partKeyPropertyName: nameof(ApiIdentity.ApiName),
-            path: this.ApiPath,
-            code: ApiInitializationCode.API_OBJECT_TYPE_DUPLICATE_IDENTITY_API_NAME,
-            context: context,
-            lookupDictionary: out _apiIdentityApiNameLookup
-        );
 
         // Initialize each identity
         var apiIdentitiesCount = this.ApiIdentities.Length;
@@ -287,12 +220,9 @@ public sealed partial class ApiObjectType
         {
             var apiIdentity = this.ApiIdentities[i];
 
-            var childContext = context.WithParentObjectType(this);
+            var childContext = context.WithDeclaringObjectType(this);
             apiIdentity.Initialize(childContext);
         }
-
-        // Perform additional validation after identities initialization
-        this.ValidateIdentityConfiguration(context);
     }
 
     private void InitializeApiProperties(ApiInitializationContext context)
@@ -313,7 +243,7 @@ public sealed partial class ApiObjectType
         {
             var apiProperty = this.ApiProperties[i];
 
-            var childContext = context.WithParentObjectType(this);
+            var childContext = context.WithDeclaringObjectType(this);
             apiProperty.Initialize(childContext);
         }
     }
@@ -331,7 +261,7 @@ public sealed partial class ApiObjectType
         {
             var apiRelationship = this.ApiRelationships[i];
 
-            var childContext = context.WithParentObjectType(this);
+            var childContext = context.WithDeclaringObjectType(this);
             apiRelationship.Initialize(childContext);
         }
     }
@@ -339,11 +269,25 @@ public sealed partial class ApiObjectType
     private void InitializeLookupDictionaries(ApiInitializationContext context)
     {
         // Initialize lookup dictionaries for lookup of:
+        // - Identity by API name
         // - Property by API name and CLR name
         // - Relationship by API name
+        _apiIdentityApiNameLookup = null;
         _apiPropertyApiNameLookup = null;
         _apiPropertyClrNameLookup = null;
         _apiRelationshipApiNameLookup = null;
+
+        ApiSchemaHelpers.InitializeLookupDictionary
+        (
+            parts: this.ApiIdentities,
+            partKeySelector: x => x.ApiName,
+            partKeyFilter: x => ApiSchemaHelpers.IsNameValid(x),
+            partKeyPropertyName: nameof(ApiIdentity.ApiName),
+            path: this.ApiPath,
+            code: ApiInitializationCode.API_OBJECT_TYPE_DUPLICATE_IDENTITY_API_NAME,
+            context: context,
+            lookupDictionary: out _apiIdentityApiNameLookup
+        );
 
         ApiSchemaHelpers.InitializeLookupDictionary
         (
@@ -380,47 +324,6 @@ public sealed partial class ApiObjectType
             context: context,
             lookupDictionary: out _apiRelationshipApiNameLookup
         );
-    }
-
-    private void ValidateIdentityConfiguration(ApiInitializationContext context)
-    {
-        if (this.ApiIdentities.Length <= 1)
-        {
-            // No validation needed for single or no identities
-            return;
-        }
-
-        // Check for ambiguous identities (same property sets)
-        var identities = this.ApiIdentities;
-        for (var i = 0; i < identities.Length; i++)
-        {
-            for (var j = i + 1; j < identities.Length; j++)
-            {
-                var identity1 = identities[i];
-                var identity2 = identities[j];
-
-                var props1 = identity1.ApiIdentitySources
-                    .Select(p => p.ApiPropertyName)
-                    .OrderBy(n => n, StringComparer.OrdinalIgnoreCase)
-                    .ToArray();
-
-                var props2 = identity2.ApiIdentitySources
-                    .Select(p => p.ApiPropertyName)
-                    .OrderBy(n => n, StringComparer.OrdinalIgnoreCase)
-                    .ToArray();
-
-                if (props1.SequenceEqual(props2, StringComparer.OrdinalIgnoreCase))
-                {
-                    var path = this.ApiPath;
-                    var severity = ApiInitializationSeverity.Warning;
-                    var code = ApiInitializationCode.API_OBJECT_TYPE_AMBIGUOUS_IDENTITIES;
-                    var description = $"Identities '{identity1.ApiName}' and '{identity2.ApiName}' use the same property set [{string.Join(", ", props1)}], which may cause ambiguity";
-                    var remediation = "Consider using different property combinations for each identity, or remove one of the duplicate identities";
-
-                    context.AddIssue(path, severity, code, description, remediation);
-                }
-            }
-        }
     }
     #endregion
 }

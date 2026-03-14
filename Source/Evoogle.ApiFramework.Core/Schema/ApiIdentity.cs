@@ -11,45 +11,40 @@ using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema;
 
-/// <summary>
-///     Represents a unique identity for an <see cref="ApiObjectType"/> consisting of one or more <see cref="ApiIdentitySource"/> entries.
-/// </summary>
-/// <remarks>
-///     <para>
-///         An identity can be simple (single source) or composite (multiple sources).
-///         Each source may be scalar (resolving directly to a value) or nested (delegating to a referenced object type's identity).
-///     </para>
-/// </remarks>
-/// <param name="apiName">The name of the identity.</param>
-/// <param name="apiIdentitySources">The collection of sources that make up this identity.</param>
 [JsonConverter(typeof(ApiIdentityJsonConverter))]
-public sealed class ApiIdentity
-(
-    string apiName,
-    IEnumerable<ApiIdentitySource> apiIdentitySources
-) : ApiSchemaElement
+public class ApiIdentity(string apiName, IEnumerable<ApiIdentityPart> apiIdentityParts) : ApiSchemaElement
 {
-    #region Properties
-    /// <summary>
-    ///     Gets the API name of the identity.
-    /// </summary>
+    #region ApiSchemaElement Properties
+    /// <inheritdoc/>
+    protected override string ApiElementName => nameof(ApiIdentity);
+    #endregion
+
+    #region ApiIdentity Properties
     public string ApiName { get; } = apiName;
 
-    /// <summary>
-    ///     Gets the collection of sources that constitute this identity.
-    /// </summary>
-    public ApiIdentitySource[] ApiIdentitySources { get; } = [.. apiIdentitySources.EmptyIfNull().Where(x => x is not null)];
+    public ApiIdentityPart[] ApiIdentityParts { get; } = [.. apiIdentityParts.EmptyIfNull().Where(x => x is not null)];
+    #endregion
 
-    /// <summary>
-    ///     Gets a value indicating whether this identity is composite (has two or more sources).
-    /// </summary>
-    public bool IsComposite => this.ApiIdentitySources.Length >= 2;
+    #region ApiIdentity Computed Properties
+    public bool IsComposite => this.ApiIdentityParts.Length >= 2;
+    #endregion
+
+    #region Object Methods
+    /// <inheritdoc />
+    public override string ToString()
+    {
+        var apiName = this.ApiName.SafeToString();
+        var partCount = this.ApiIdentityParts.Length.SafeToString();
+        var extensionCount = this.ExtensionCount.SafeToString();
+
+        return $"{nameof(ApiIdentity)} {{{nameof(this.ApiName)}={apiName}, PartCount={partCount}, {nameof(this.ExtensionCount)}={extensionCount}}}";
+    }
     #endregion
 
     #region ApiSchemaElement Methods
     /// <inheritdoc />
-    protected override string BuildPath(string? apiParentPath)
-        => ApiSchemaHelpers.BuildPath(apiParentPath, apiChildPath: nameof(ApiIdentity), apiApiName: this.ApiName);
+    protected override string BuildPath(string? apiPreviousPath)
+        => ApiSchemaHelpers.BuildPath(basePath: apiPreviousPath, segment: nameof(ApiIdentity), segmentName: this.ApiName);
 
     /// <inheritdoc />
     internal override void Initialize(ApiInitializationContext context)
@@ -59,19 +54,7 @@ public sealed class ApiIdentity
         base.Initialize(context);
 
         this.InitializeApiName(context);
-        this.InitializeApiIdentitySources(context);
-    }
-    #endregion
-
-    #region Object Methods
-    /// <inheritdoc />
-    public override string ToString()
-    {
-        var apiName = this.ApiName.SafeToString();
-        var sourceCount = this.ApiIdentitySources.Length.SafeToString();
-        var extensionCount = this.ExtensionCount.SafeToString();
-
-        return $"{nameof(ApiIdentity)} {{{nameof(this.ApiName)}={apiName}, SourceCount={sourceCount}, {nameof(this.ExtensionCount)}={extensionCount}}}";
+        this.InitializeApiIdentityParts(context);
     }
     #endregion
 
@@ -91,31 +74,41 @@ public sealed class ApiIdentity
         }
     }
 
-    private void InitializeApiIdentitySources(ApiInitializationContext context)
+    private void InitializeApiIdentityParts(ApiInitializationContext context)
     {
-        if (this.ApiIdentitySources is null || this.ApiIdentitySources.Length == 0)
+        if (this.ApiIdentityParts is null || this.ApiIdentityParts.Length == 0)
         {
             var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.API_IDENTITY_NULL_OR_EMPTY_SOURCES;
-            var description = $"{nameof(this.ApiIdentitySources)} must not be null or empty";
-            var remediation = $"Specify at least one {nameof(ApiIdentitySource)}";
+            var code = ApiInitializationCode.API_IDENTITY_NULL_OR_EMPTY_PARTS;
+            var description = $"{nameof(this.ApiIdentityParts)} must not be null or empty";
+            var remediation = $"Specify at least one {nameof(ApiIdentityPart)}";
 
             context.AddIssue(path, severity, code, description, remediation);
             return;
         }
 
-        // No duplicate source property names
+        // No duplicate part property names
+        var apiPropertyIdentityParts = this.ApiIdentityParts.Where(x => x is ApiPropertyIdentityPart).Cast<ApiPropertyIdentityPart>();
         ApiSchemaHelpers.ValidateUnique
         (
-            parts: this.ApiIdentitySources,
+            parts: apiPropertyIdentityParts,
             partKeySelector: x => x.ApiPropertyName,
             partKeyFilter: x => !string.IsNullOrWhiteSpace(x),
-            partKeyPropertyName: nameof(ApiIdentitySource.ApiPropertyName),
+            partKeyPropertyName: nameof(ApiPropertyIdentityPart.ApiPropertyName),
             path: this.ApiPath,
-            code: ApiInitializationCode.API_IDENTITY_DUPLICATE_SOURCE_API_PROPERTY_NAME,
+            code: ApiInitializationCode.API_IDENTITY_DUPLICATE_PART_API_PROPERTY_NAME,
             context: context
         );
+
+        var apiIdentityPartsCount = this.ApiIdentityParts.Length;
+        for (var i = 0; i < apiIdentityPartsCount; ++i)
+        {
+            var apiIdentityPart = this.ApiIdentityParts[i];
+
+            var childContext = context.WithDeclaringSchemaElement(this);
+            apiIdentityPart.Initialize(childContext);
+        }
     }
     #endregion
 }

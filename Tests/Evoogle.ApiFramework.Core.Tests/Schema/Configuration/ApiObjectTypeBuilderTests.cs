@@ -3,6 +3,8 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Diagnostics.CodeAnalysis;
+
 using Evoogle.ApiFramework.Schema.TestData;
 using Evoogle.ApiFramework.TestData;
 using Evoogle.Extensions;
@@ -21,7 +23,7 @@ public class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
     {
         #region User Supplied Properties
         public required ApiSchemaKind ApiSchemaKind { get; init; }
-        public required string ApiObjectTypeName { get; init; }
+        public required string ApiObjectTypeName { get; init; } = null!;
         public Type? ApiExtensionType1 { get; init; }
         public Type? ApiExtensionType2 { get; init; }
         #endregion
@@ -29,6 +31,15 @@ public class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
         #region Calculated Properties
         private ApiType? ApiTypeExpected { get; set; }
         private ApiType? ApiTypeActual { get; set; }
+        #endregion
+
+        #region Constructors
+        [SetsRequiredMembers]
+        public BuildTest()
+        {
+            this.Name = nameof(BuildTest);
+            this.ExcludeMembers = ApiSchemaExcludeMembers.Standard;
+        }
         #endregion
 
         #region XUnitTest Methods
@@ -77,9 +88,59 @@ public class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
             {
                 builder.AddIdentity(apiIdentity.ApiName, identityBuilder =>
                 {
-                    foreach (var apiIdentitySource in apiIdentity.ApiIdentitySources)
+                    foreach (var apiIdentityPart in apiIdentity.ApiIdentityParts)
                     {
-                        identityBuilder.AddSource(apiIdentitySource.ApiPropertyName, apiIdentitySource.ClrScalarType);
+                        var apiKind = apiIdentityPart.ApiKind;
+                        switch (apiKind)
+                        {
+                            case ApiIdentityPartKind.Scalar:
+                                {
+                                    var scalarPart = (ApiScalarIdentityPart)apiIdentityPart;
+                                    var clrScalarTypeHint = scalarPart.ClrScalarTypeHint;
+                                    if (clrScalarTypeHint is not null)
+                                    {
+                                        identityBuilder.AddScalar(scalarPart.ApiPropertyName, clrScalarTypeHint);
+                                    }
+                                    else
+                                    {
+                                        identityBuilder.AddScalar(scalarPart.ApiPropertyName);
+                                    }
+                                    break;
+                                }
+
+                            case ApiIdentityPartKind.Nested:
+                                {
+                                    var nestedPart = (ApiNestedIdentityPart)apiIdentityPart;
+                                    var apiIdentityName = nestedPart.ApiIdentityName;
+                                    if (apiIdentityName is not null)
+                                    {
+                                        identityBuilder.AddNested(nestedPart.ApiPropertyName, apiIdentityName);
+                                    }
+                                    else
+                                    {
+                                        identityBuilder.AddNested(nestedPart.ApiPropertyName);
+                                    }
+                                    break;
+                                }
+
+                            case ApiIdentityPartKind.Parent:
+                                {
+                                    var parentPart = (ApiParentIdentityPart)apiIdentityPart;
+                                    var apiIdentityName = parentPart.ApiIdentityName;
+                                    if (apiIdentityName is not null)
+                                    {
+                                        identityBuilder.AddParent(apiIdentityName);
+                                    }
+                                    else
+                                    {
+                                        identityBuilder.AddParent(parentPart.ApiIdentityName!);
+                                    }
+                                    break;
+                                }
+
+                            default:
+                                throw new InvalidOperationException($"Unsupported API identity part kind: {apiKind}");
+                        }
                     }
                 });
             }
@@ -125,18 +186,7 @@ public class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
             this.ApiTypeActual.Should().BeOfType<ApiObjectType>();
             this.ApiTypeExpected.Should().BeOfType<ApiObjectType>();
 
-            this.ApiTypeActual.As<ApiObjectType>().Should().BeEquivalentTo
-            (
-                this.ApiTypeExpected.As<ApiObjectType>(),
-                opt => opt
-                    .Excluding(info => info.Path.Contains(nameof(ApiSchemaElement.ApiPath)))
-                    // .Excluding(info => info.DeclaringType == typeof(ApiIdentitySource) && info.Name == nameof(ApiIdentitySource.ApiPropertyName))
-                    // .Excluding(info => info.DeclaringType == typeof(ApiIdentitySource) && info.Name == nameof(ApiIdentitySource.ClrScalarType))
-                    .Excluding(info => info.DeclaringType == typeof(ApiProperty) && info.Name == nameof(ApiProperty.ApiType))
-                    .Excluding(info => info.DeclaringType == typeof(ApiRelationship) && info.Name == nameof(ApiRelationship.ApiProperty))
-                    .Excluding(info => info.DeclaringType == typeof(ApiRelationship) && info.Name == nameof(ApiRelationship.ApiCardinality))
-                    .WithStrictOrdering()
-            );
+            this.AssertBeEquivalentTo(this.ApiTypeActual, this.ApiTypeExpected);
         }
         #endregion
     }

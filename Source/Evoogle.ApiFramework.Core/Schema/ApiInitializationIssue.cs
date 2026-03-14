@@ -24,7 +24,7 @@ public sealed class ApiInitializationIssue
     string? remediation
 )
 {
-    #region Properties
+    #region ApiInitializationIssue Properties
     /// <summary>
     ///     Gets the path to the schema element where the issue occurred.
     /// </summary>
@@ -51,20 +51,6 @@ public sealed class ApiInitializationIssue
     public string? Remediation { get; } = remediation;
     #endregion
 
-    #region Methods
-    /// <summary>
-    ///     Converts the issue to a formatted message string.
-    /// </summary>
-    /// <returns>A formatted string containing the issue's path, severity, code, description, and optional remediation.</returns>
-    public string ToMessage()
-    {
-        var core = $"{this.Path}: {this.Severity} | {this.Code} - {this.Description}.";
-        return string.IsNullOrWhiteSpace(this.Remediation)
-            ? core
-            : $"{core} {this.Remediation}.";
-    }
-    #endregion
-
     #region Object Methods
     /// <inheritdoc/>
     public override string ToString()
@@ -76,6 +62,20 @@ public sealed class ApiInitializationIssue
         var remediation = this.Remediation.SafeToString();
 
         return $"{nameof(ApiInitializationIssue)} {{{nameof(this.Path)}={path}, {nameof(this.Severity)}={severity}, {nameof(this.Code)}={code}, {nameof(this.Description)}={description}, {nameof(this.Remediation)}={remediation}}}";
+    }
+    #endregion
+
+    #region ApiInitializationIssue Methods
+    /// <summary>
+    ///     Converts the issue to a formatted message string.
+    /// </summary>
+    /// <returns>A formatted string containing the issue's path, severity, code, description, and optional remediation.</returns>
+    public string ToMessage()
+    {
+        var core = $"{this.Path}: {this.Severity} | {this.Code} - {this.Description}.";
+        return string.IsNullOrWhiteSpace(this.Remediation)
+            ? core
+            : $"{core} {this.Remediation}.";
     }
     #endregion
 }

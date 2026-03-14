@@ -3,31 +3,15 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using System.Diagnostics.CodeAnalysis;
 using Evoogle.ApiFramework.TestData;
 using Evoogle.XUnit;
 
 using static Evoogle.ApiFramework.Schema.TestData.ApiSchemaFactory;
-using static Evoogle.XUnit.Tests.JsonUnitTests;
 
 namespace Evoogle.ApiFramework.Schema;
 
 public partial class ApiSchemaTests
 {
-
-    #region Test Types
-    private class JsonSerializeTest : JsonSerializeTest<ApiSchema, ApiSchemaDescriptor>
-    {
-        #region Constructors
-        [SetsRequiredMembers]
-        public JsonSerializeTest()
-        {
-            this.SourceFactoryExpression = (arg) => BuildTestApiSchema(arg);
-        }
-        #endregion
-    }
-    #endregion
-
     #region Theory Data
     public static TheoryDataRow<IXUnitTest>[] JsonSerializeTheoryData =>
     [
@@ -671,10 +655,11 @@ public partial class ApiSchemaTests
                                 new ApiIdentityConfig
                                 (
                                     ApiName: "PK_Person_Id",
-                                    ApiIdentitySources:
+                                    ApiIdentityParts:
                                     [
-                                        new ApiIdentitySourceConfig
+                                        new ApiIdentityPartConfig
                                         (
+                                            ApiKind: ApiIdentityPartKind.Scalar,
                                             ApiPropertyName: nameof(Person.Id)
                                         )
                                     ]
@@ -682,10 +667,11 @@ public partial class ApiSchemaTests
                                 new ApiIdentityConfig
                                 (
                                     ApiName: "AK_Person_Name",
-                                    ApiIdentitySources:
+                                    ApiIdentityParts:
                                     [
-                                        new ApiIdentitySourceConfig
+                                        new ApiIdentityPartConfig
                                         (
+                                            ApiKind: ApiIdentityPartKind.Scalar,
                                             ApiPropertyName: nameof(Person.Name)
                                         )
                                     ]
@@ -811,6 +797,7 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""PK_Person_Id"",
                                 ""ApiIdentityParts"": [
                                     {
+                                        ""ApiKind"": ""Scalar"",
                                         ""ApiPropertyName"": ""Id""
                                     }
                                 ]
@@ -819,6 +806,7 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""AK_Person_Name"",
                                 ""ApiIdentityParts"": [
                                     {
+                                        ""ApiKind"": ""Scalar"",
                                         ""ApiPropertyName"": ""Name""
                                     }
                                 ]
@@ -979,10 +967,11 @@ public partial class ApiSchemaTests
                                 new ApiIdentityConfig
                                 (
                                     ApiName: "PK_Person_Id",
-                                    ApiIdentitySources:
+                                    ApiIdentityParts:
                                     [
-                                        new ApiIdentitySourceConfig
+                                        new ApiIdentityPartConfig
                                         (
+                                            ApiKind: ApiIdentityPartKind.Scalar,
                                             ApiPropertyName: nameof(Person.Id)
                                         )
                                     ]
@@ -990,10 +979,11 @@ public partial class ApiSchemaTests
                                 new ApiIdentityConfig
                                 (
                                     ApiName: "AK_Person_Name",
-                                    ApiIdentitySources:
+                                    ApiIdentityParts:
                                     [
-                                        new ApiIdentitySourceConfig
+                                        new ApiIdentityPartConfig
                                         (
+                                            ApiKind: ApiIdentityPartKind.Scalar,
                                             ApiPropertyName: nameof(Person.Name)
                                         )
                                     ]
@@ -1119,6 +1109,7 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""PK_Person_Id"",
                                 ""ApiIdentityParts"": [
                                     {
+                                        ""ApiKind"": ""Scalar"",
                                         ""ApiPropertyName"": ""Id""
                                     }
                                 ]
@@ -1127,6 +1118,7 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""AK_Person_Name"",
                                 ""ApiIdentityParts"": [
                                     {
+                                        ""ApiKind"": ""Scalar"",
                                         ""ApiPropertyName"": ""Name""
                                     }
                                 ]
@@ -1294,22 +1286,24 @@ public partial class ApiSchemaTests
                                 new ApiIdentityConfig
                                 (
                                     ApiName: "PK_Company_Id",
-                                    ApiIdentitySources:
+                                    ApiIdentityParts:
                                     [
-                                        new ApiIdentitySourceConfig
+                                        new ApiIdentityPartConfig
                                         (
+                                            ApiKind: ApiIdentityPartKind.Scalar,
                                             ApiPropertyName: nameof(Company.Id),
-                                            ClrScalarType: typeof(string)
+                                            ClrScalarTypeHint: typeof(string)
                                         )
                                     ]
                                 ),
                                 new ApiIdentityConfig
                                 (
                                     ApiName: "AK_Company_Name",
-                                    ApiIdentitySources:
+                                    ApiIdentityParts:
                                     [
-                                        new ApiIdentitySourceConfig
+                                        new ApiIdentityPartConfig
                                         (
+                                            ApiKind: ApiIdentityPartKind.Scalar,
                                             ApiPropertyName: nameof(Company.Name)
                                         )
                                     ]
@@ -1383,10 +1377,11 @@ public partial class ApiSchemaTests
                                 new ApiIdentityConfig
                                 (
                                     ApiName: "PK_Person_Id",
-                                    ApiIdentitySources:
+                                    ApiIdentityParts:
                                     [
-                                        new ApiIdentitySourceConfig
+                                        new ApiIdentityPartConfig
                                         (
+                                            ApiKind: ApiIdentityPartKind.Scalar,
                                             ApiPropertyName: nameof(Person.Id)
                                         )
                                     ]
@@ -1394,10 +1389,11 @@ public partial class ApiSchemaTests
                                 new ApiIdentityConfig
                                 (
                                     ApiName: "AK_Person_Name",
-                                    ApiIdentitySources:
+                                    ApiIdentityParts:
                                     [
-                                        new ApiIdentitySourceConfig
+                                        new ApiIdentityPartConfig
                                         (
+                                            ApiKind: ApiIdentityPartKind.Scalar,
                                             ApiPropertyName: nameof(Person.Name)
                                         )
                                     ]
@@ -1523,8 +1519,9 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""PK_Company_Id"",
                                 ""ApiIdentityParts"": [
                                     {
+                                        ""ApiKind"": ""Scalar"",
                                         ""ApiPropertyName"": ""Id"",
-					                    ""ClrScalarType"": ""System.String,System.Private.CoreLib""
+					                    ""ClrScalarTypeHint"": ""System.String,System.Private.CoreLib""
                                     }
                                 ]
                             },
@@ -1532,6 +1529,7 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""AK_Company_Name"",
                                 ""ApiIdentityParts"": [
                                     {
+                                        ""ApiKind"": ""Scalar"",
                                         ""ApiPropertyName"": ""Name""
                                     }
                                 ]
@@ -1606,6 +1604,7 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""PK_Person_Id"",
                                 ""ApiIdentityParts"": [
                                     {
+                                        ""ApiKind"": ""Scalar"",
                                         ""ApiPropertyName"": ""Id""
                                     }
                                 ]
@@ -1614,6 +1613,7 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""AK_Person_Name"",
                                 ""ApiIdentityParts"": [
                                     {
+                                        ""ApiKind"": ""Scalar"",
                                         ""ApiPropertyName"": ""Name""
                                     }
                                 ]

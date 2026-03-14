@@ -572,15 +572,16 @@ public sealed partial class ApiProperty
     {
         ArgumentNullException.ThrowIfNull(this.ApiSchemaContext);
 
-        var targetType = clrValueType ?? this.ApiTypeExpression.ClrType ?? throw new InvalidOperationException(
-            $"Cannot coerce value for property '{this.ClrName}' because neither a target type was provided nor does the property have a resolved CLR type.");
+        var targetType = clrValueType ?? this.ApiTypeExpression.ClrType ?? throw new ApiSchemaException($"Cannot coerce value for property '{this.ClrName}' because neither a target type was provided nor does the property have a resolved CLR type.");
 
         try
         {
-            return this.ApiSchemaContext.TypeCoercion.Coerce(
+            return this.ApiSchemaContext.TypeCoercion.Coerce
+            (
                 rawValue,
                 targetType,
-                this.ApiSchemaContext.TypeCoercionContext);
+                this.ApiSchemaContext.TypeCoercionContext
+            );
         }
         catch (Exception ex)
         {
@@ -619,10 +620,12 @@ public sealed partial class ApiProperty
 
         try
         {
-            coercedValue = this.ApiSchemaContext.TypeCoercion.Coerce(
+            coercedValue = this.ApiSchemaContext.TypeCoercion.Coerce
+            (
                 rawValue,
                 targetType,
-                this.ApiSchemaContext.TypeCoercionContext);
+                this.ApiSchemaContext.TypeCoercionContext
+            );
             return true;
         }
         catch

@@ -12,27 +12,20 @@ using Microsoft.Extensions.Logging;
 namespace Evoogle.ApiFramework.Schema.Json;
 
 /// <summary>
-///     Provides System.Text.Json serialization support for <see cref="ApiIdentity"/> instances, including
-///     extension payloads and schema-specific naming policies.
+///     Handles JSON serialization for <see cref="ApiIdentity"/> instances, including support for extensions.
 /// </summary>
 /// <param name="logger">The optional logger used to emit diagnostics during JSON operations.</param>
 public class ApiIdentityJsonConverter(ILogger<ApiIdentityJsonConverter>? logger) : JsonConverterBase<ApiIdentity>(logger)
 {
     #region Property Types
-    /// <summary>
-    ///     Provides cached JSON property names for <see cref="ApiIdentity"/> members under a specific naming policy.
-    /// </summary>
     private readonly record struct ApiIdentityPropertyNames
     {
         #region Immutable Properties
         public required string ApiName { get; init; }
-        public required string ApiIdentitySources { get; init; }
+        public required string ApiIdentityParts { get; init; }
         #endregion
     }
 
-    /// <summary>
-    ///     Aggregates the property name sets used while reading or writing relationships and extension data.
-    /// </summary>
     private readonly record struct PropertyNames
     {
         #region Immutable Properties
@@ -47,7 +40,7 @@ public class ApiIdentityJsonConverter(ILogger<ApiIdentityJsonConverter>? logger)
                 ApiIdentity = new ApiIdentityPropertyNames
                 {
                     ApiName = policy.ConvertName(nameof(Schema.ApiIdentity.ApiName)),
-                    ApiIdentitySources = policy.ConvertName(nameof(Schema.ApiIdentity.ApiIdentitySources))
+                    ApiIdentityParts = policy.ConvertName(nameof(Schema.ApiIdentity.ApiIdentityParts))
                 },
                 ExtensibleBase = GetExtensiblePropertyNames(policy),
             };
@@ -56,20 +49,14 @@ public class ApiIdentityJsonConverter(ILogger<ApiIdentityJsonConverter>? logger)
     #endregion
 
     #region Read Types
-    /// <summary>
-    ///     Temporary storage used while reading the primitive relationship properties from JSON.
-    /// </summary>
     private class ApiIdentityReadData
     {
         #region Properties
         public string? ApiName { get; set; }
-        public List<ApiIdentitySource>? ApiIdentitySources { get; set; }
+        public List<ApiIdentityPart>? ApiIdentityParts { get; set; }
         #endregion
     }
 
-    /// <summary>
-    ///     Collects all data encountered while deserializing a relationship, including extensions.
-    /// </summary>
     private class ReadData : ExtensibleReadData
     {
         #region Properties
@@ -77,9 +64,6 @@ public class ApiIdentityJsonConverter(ILogger<ApiIdentityJsonConverter>? logger)
         #endregion
     }
 
-    /// <summary>
-    ///     Provides handlers that map JSON property names to strongly typed relationship data assignments.
-    /// </summary>
     private class ReadHandlers(PropertyNames propertyNames)
     {
         #region ApiIdentity Fields
@@ -87,7 +71,7 @@ public class ApiIdentityJsonConverter(ILogger<ApiIdentityJsonConverter>? logger)
         {
             // ApiIdentity Property Handlers
             { propertyNames.ApiIdentity.ApiName, HandleApiIdentityApiName },
-            { propertyNames.ApiIdentity.ApiIdentitySources, HandleApiIdentityApiIdentitySources },
+            { propertyNames.ApiIdentity.ApiIdentityParts, HandleApiIdentityApiIdentityParts },
 
             // ExtensibleBase Property Handlers
             { propertyNames.ExtensibleBase.Extensions, CreateExtensionsHandler<PropertyNames, ReadData, ReadHandlers>() },
@@ -102,23 +86,23 @@ public class ApiIdentityJsonConverter(ILogger<ApiIdentityJsonConverter>? logger)
             context.ReadData.ApiIdentity.ApiName = reader.GetString();
         }
 
-        private static void HandleApiIdentityApiIdentitySources(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiIdentityApiIdentityParts(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiIdentity ??= new ApiIdentityReadData();
-            context.ReadData.ApiIdentity.ApiIdentitySources ??= new List<ApiIdentitySource>();
+            context.ReadData.ApiIdentity.ApiIdentityParts ??= new List<ApiIdentityPart>();
 
-            ReadJsonArray(ref reader, context, (x) => HandleApiIdentityApiIdentitySourcesArrayItem);
+            ReadJsonArray(ref reader, context, (x) => HandleApiIdentityApiIdentityPartsArrayItem);
         }
 
-        private static void HandleApiIdentityApiIdentitySourcesArrayItem(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiIdentityApiIdentityPartsArrayItem(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
-            var apiIdentitySource = JsonSerializer.Deserialize<ApiIdentitySource>(ref reader, context.Options);
-            if (apiIdentitySource == null)
+            var apiIdentityPart = JsonSerializer.Deserialize<ApiIdentityPart>(ref reader, context.Options);
+            if (apiIdentityPart == null)
             {
                 return;
             }
 
-            context.ReadData.ApiIdentity!.ApiIdentitySources!.Add(apiIdentitySource);
+            context.ReadData.ApiIdentity!.ApiIdentityParts!.Add(apiIdentityPart);
         }
         #endregion
     }
@@ -156,9 +140,9 @@ public class ApiIdentityJsonConverter(ILogger<ApiIdentityJsonConverter>? logger)
         var readData = readContext.ReadData.ApiIdentity;
 
         var apiName = readData?.ApiName;
-        var apiIdentitySources = readData?.ApiIdentitySources;
+        var apiIdentityParts = readData?.ApiIdentityParts;
 
-        var apiIdentity = new ApiIdentity(apiName!, apiIdentitySources!);
+        var apiIdentity = new ApiIdentity(apiName!, apiIdentityParts!);
 
         var extensions = readContext.ReadData.Extensions;
         AttachExtensions(apiIdentity, extensions);
@@ -181,7 +165,7 @@ public class ApiIdentityJsonConverter(ILogger<ApiIdentityJsonConverter>? logger)
         WriteJsonObject(writer, () =>
         {
             WriteApiIdentityApiName(writer, value, writeContext);
-            WriteApiIdentityApiIdentitySources(writer, value, writeContext);
+            WriteApiIdentityApiIdentityParts(writer, value, writeContext);
 
             WriteExtensibleBaseExtensions(writer, writeContext.PropertyNames.ExtensibleBase.Extensions, value, writeContext);
         });
@@ -198,16 +182,16 @@ public class ApiIdentityJsonConverter(ILogger<ApiIdentityJsonConverter>? logger)
         writer.TryWritePropertyAsString(propertyName, value, options);
     }
 
-    private static void WriteApiIdentityApiIdentitySources(Utf8JsonWriter writer, ApiIdentity apiIdentity, DefaultWriteContext<PropertyNames> context)
+    private static void WriteApiIdentityApiIdentityParts(Utf8JsonWriter writer, ApiIdentity apiIdentity, DefaultWriteContext<PropertyNames> context)
     {
-        var propertyName = context.PropertyNames.ApiIdentity.ApiIdentitySources;
-        var apiIdentitySources = apiIdentity.ApiIdentitySources;
+        var propertyName = context.PropertyNames.ApiIdentity.ApiIdentityParts;
+        var apiIdentityParts = apiIdentity.ApiIdentityParts;
         var options = context.Options;
 
         writer.TryWritePropertyWithAction
         (
             propertyName,
-            apiIdentitySources,
+            apiIdentityParts,
             options,
             collection => WriteJsonArray(writer, collection, item => writer.TryWriteWithSerializer(item, options))
         );

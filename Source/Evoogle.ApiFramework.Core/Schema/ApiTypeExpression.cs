@@ -55,7 +55,9 @@ public sealed class ApiTypeExpression
     ///     Thrown if the expression has not been resolved yet.
     /// </exception>
     public ApiType ApiType => this.ThrowIfNotInitialized(_apiResolvedType);
+    #endregion
 
+    #region Computed Properties
     /// <summary>
     ///     Gets a value indicating whether this is an inline type (i.e., <see cref="ApiInlineType"/> is not null).
     /// </summary>
@@ -163,7 +165,7 @@ public sealed class ApiTypeExpression
         }
         else
         {
-            var path = context.ApiParentPath!;
+            var path = context.ApiDeclaringPath!;
             var severity = ApiInitializationSeverity.Error;
             var code = parentUnresolvedCode;
             var description = $"{parentUnresolvedName} could not be resolved because none of the following are set: {nameof(this.ApiInlineType)}, a valid combination of {nameof(this.ApiKind)} and {nameof(this.ApiName)}, or {nameof(this.ClrType)}";
@@ -228,7 +230,7 @@ public sealed class ApiTypeExpression
 
             case ApiTypeKind.Collection:
                 {
-                    var path = context.ApiParentPath!;
+                    var path = context.ApiDeclaringPath!;
                     var severity = ApiInitializationSeverity.Error;
                     var code = parentUnresolvedCode;
                     var description = $"{parentUnresolvedName} could not be resolved for {nameof(this.ApiKind)}={this.ApiKind.SafeToString()} and {nameof(this.ApiName)}={this.ApiName.SafeToString()} because {nameof(ApiTypeKind.Collection)} types must be defined inline";
@@ -244,7 +246,7 @@ public sealed class ApiTypeExpression
 
         if (_apiResolvedType is null)
         {
-            var path = context.ApiParentPath!;
+            var path = context.ApiDeclaringPath!;
             var severity = ApiInitializationSeverity.Error;
             var code = parentUnresolvedCode;
             var description = $"{parentUnresolvedName} could not be resolved for {nameof(this.ApiKind)}='{this.ApiKind.SafeToString()}' and {nameof(this.ApiName)}='{this.ApiName.SafeToString()}'";
@@ -267,7 +269,7 @@ public sealed class ApiTypeExpression
 
         if (_apiResolvedType is null)
         {
-            var path = context.ApiParentPath!;
+            var path = context.ApiDeclaringPath!;
             var severity = ApiInitializationSeverity.Error;
             var code = parentUnresolvedCode;
             var description = $"{parentUnresolvedName} could not be resolved for {nameof(this.ClrType)}='{this.ClrType.SafeToName()}'";

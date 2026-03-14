@@ -698,7 +698,8 @@ public readonly struct ApiId
     }
 
     /// <summary>
-    ///   Gets the compatible scalar CLR type for <see cref="ApiId"/> conversion.
+    ///     Gets the compatible scalar CLR type for <see cref="ApiId"/> conversion.
+    ///     If the provided <paramref name="type"/> is already compatible, it is returned as-is; otherwise, returns <see cref="string"/> as a fallback.
     /// </summary>
     /// <param name="type">The CLR type to check.</param>
     /// <returns>The compatible scalar CLR type for <see cref="ApiId"/> conversion.</returns>

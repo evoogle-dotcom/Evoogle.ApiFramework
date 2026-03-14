@@ -24,9 +24,6 @@ public abstract class ApiType(Type clrType) : ApiSchemaElement
     /// <summary>Gets the kind of API type represented by this instance.</summary>
     public abstract ApiTypeKind ApiKind { get; }
 
-    /// <summary>Gets runtime API type name of the API type.</summary>
-    protected abstract string ApiTypeName { get; }
-
     /// <summary>Gets the CLR type associated with the API type.</summary>
     public Type ClrType { get; } = clrType;
 

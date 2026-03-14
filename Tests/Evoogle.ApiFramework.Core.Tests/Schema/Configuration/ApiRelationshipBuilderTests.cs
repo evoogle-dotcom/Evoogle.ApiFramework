@@ -3,6 +3,9 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Diagnostics.CodeAnalysis;
+
+using Evoogle.ApiFramework.Schema.TestData;
 using Evoogle.ApiFramework.TestData;
 using Evoogle.Extensions;
 using Evoogle.XUnit;
@@ -26,6 +29,16 @@ public class ApiRelationshipBuilderTests(ITestOutputHelper output) : XUnitTests(
         private ApiRelationship? ApiRelationshipActual { get; set; }
         #endregion
 
+        #region Constructors
+        [SetsRequiredMembers]
+        public BuildTest()
+        {
+            this.Name = nameof(BuildTest);
+            this.ExcludeMembers = ApiSchemaExcludeMembers.Standard;
+        }
+        #endregion
+
+        #region XUnitTest Methods
         protected override void Arrange()
         {
             this.WriteLine($"ApiName: {this.ApiName}");
@@ -51,17 +64,9 @@ public class ApiRelationshipBuilderTests(ITestOutputHelper output) : XUnitTests(
         protected override void Assert()
         {
             this.ApiRelationshipActual.Should().NotBeNull();
-
-            this.ApiRelationshipActual.Should().BeEquivalentTo
-            (
-                this.ApiRelationshipExpected,
-                opt => opt
-                    .Excluding(info => info.Path.Contains(nameof(ApiSchemaElement.ApiPath)))
-                    .Excluding(r => r.ApiProperty)
-                    .Excluding(r => r.ApiCardinality)
-                    .WithStrictOrdering()
-            );
+            this.AssertBeEquivalentTo(this.ApiRelationshipActual, this.ApiRelationshipExpected);
         }
+        #endregion
     }
 
     #region Theory Data

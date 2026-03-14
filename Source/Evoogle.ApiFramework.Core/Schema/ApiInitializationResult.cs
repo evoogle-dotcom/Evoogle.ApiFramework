@@ -14,14 +14,14 @@ namespace Evoogle.ApiFramework.Schema;
 /// <param name="issues">Optional collection of issues encountered during initialization.</param>
 public sealed class ApiInitializationResult(IEnumerable<ApiInitializationIssue>? issues = null)
 {
-    #region Fields
+    #region ApiInitializationResult Fields
     /// <summary>
     ///     Represents a successful initialization result with no issues.
     /// </summary>
     public static readonly ApiInitializationResult Success = new();
     #endregion
 
-    #region Properties
+    #region ApiInitializationResult Properties
     /// <summary>
     ///     Gets a value indicating whether the initialization was successful (no errors).
     /// </summary>
@@ -49,7 +49,20 @@ public sealed class ApiInitializationResult(IEnumerable<ApiInitializationIssue>?
         : null;
     #endregion
 
-    #region Methods
+    #region Object Methods
+    /// <inheritdoc/>
+    public override string ToString()
+    {
+        var isValid = this.IsValid.SafeToString();
+        var issuesCount = this.Issues?.Length ?? 0;
+        var errorsCount = this.Errors?.Length ?? 0;
+        var warningsCount = this.Warnings?.Length ?? 0;
+
+        return $"{nameof(ApiInitializationResult)} {{{nameof(this.IsValid)}={isValid}, IssuesCount={issuesCount}, ErrorsCount={errorsCount}, WarningsCount={warningsCount}}}";
+    }
+    #endregion
+
+    #region ApiInitializationResult Methods
     /// <summary>
     ///     Throws an <see cref="ApiSchemaInitializationException"/> if the initialization result contains errors.
     /// </summary>
@@ -64,18 +77,5 @@ public sealed class ApiInitializationResult(IEnumerable<ApiInitializationIssue>?
         throw new ApiSchemaInitializationException(this);
     }
 
-    #endregion
-
-    #region Object Methods
-    /// <inheritdoc/>
-    public override string ToString()
-    {
-        var isValid = this.IsValid.SafeToString();
-        var issuesCount = this.Issues?.Length ?? 0;
-        var errorsCount = this.Errors?.Length ?? 0;
-        var warningsCount = this.Warnings?.Length ?? 0;
-
-        return $"{nameof(ApiInitializationResult)} {{{nameof(this.IsValid)}={isValid}, IssuesCount={issuesCount}, ErrorsCount={errorsCount}, WarningsCount={warningsCount}}}";
-    }
     #endregion
 }

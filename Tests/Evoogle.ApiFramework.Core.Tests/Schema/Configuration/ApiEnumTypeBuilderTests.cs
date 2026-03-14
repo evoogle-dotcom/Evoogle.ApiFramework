@@ -3,6 +3,9 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Diagnostics.CodeAnalysis;
+
+using Evoogle.ApiFramework.Schema.TestData;
 using Evoogle.ApiFramework.TestData;
 using Evoogle.Extensions;
 using Evoogle.XUnit;
@@ -26,6 +29,15 @@ public class ApiEnumTypeBuilderTests(ITestOutputHelper output) : XUnitTests(outp
 
         #region Calculated Properties
         private ApiType? ApiTypeActual { get; set; }
+        #endregion
+
+        #region Constructors
+        [SetsRequiredMembers]
+        public BuildTest()
+        {
+            this.Name = nameof(BuildTest);
+            this.ExcludeMembers = ApiSchemaExcludeMembers.Standard;
+        }
         #endregion
 
         #region XUnitTest Methods
@@ -66,13 +78,7 @@ public class ApiEnumTypeBuilderTests(ITestOutputHelper output) : XUnitTests(outp
             this.ApiTypeActual.Should().BeOfType<ApiEnumType>();
             this.ApiTypeExpected.Should().BeOfType<ApiEnumType>();
 
-            this.ApiTypeActual.As<ApiEnumType>().Should().BeEquivalentTo
-            (
-                this.ApiTypeExpected.As<ApiEnumType>(),
-                opt => opt
-                    .Excluding(info => info.Path.Contains(nameof(ApiSchemaElement.ApiPath)))
-                    .WithStrictOrdering()
-            );
+            this.AssertBeEquivalentTo(this.ApiTypeActual, this.ApiTypeExpected);
         }
         #endregion
     }
@@ -139,4 +145,3 @@ public class ApiEnumTypeBuilderTests(ITestOutputHelper output) : XUnitTests(outp
     public void Build(IXUnitTest test) => test.Execute(this);
     #endregion
 }
-

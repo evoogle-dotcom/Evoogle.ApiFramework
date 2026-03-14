@@ -16,42 +16,60 @@ public class ApiIdentityBuilder(string apiName) : ExtensionBuilder<ApiIdentityBu
 {
     #region Fields
     private readonly string _apiName = apiName;
-    private readonly List<ApiIdentitySourceBuilder> _apiIdentitySourceBuilders = [];
+    private readonly List<ApiIdentityPartBuilder> _apiIdentityPartBuilders = [];
     #endregion
 
     #region Builder Methods
-    public ApiIdentityBuilder AddSource(string apiPropertyName, Type? clrScalarType = null, string? apiNestedName = null, Action<ApiIdentitySourceBuilder>? configure = null)
+    public ApiIdentityBuilder AddPart
+    (
+        ApiIdentityPartKind apiKind,
+        string? apiPropertyName,
+        string? apiIdentityName,
+        Type? clrScalarTypeHint,
+        Action<ApiIdentityPartBuilder>? configure = null)
     {
-        var apiIdentitySourceBuilder = new ApiIdentitySourceBuilder(apiPropertyName, clrScalarType, apiNestedName);
+        var apiIdentityPartBuilder = new ApiIdentityPartBuilder(apiKind, apiPropertyName, apiIdentityName, clrScalarTypeHint);
 
-        configure?.Invoke(apiIdentitySourceBuilder);
+        configure?.Invoke(apiIdentityPartBuilder);
 
-        _apiIdentitySourceBuilders.Add(apiIdentitySourceBuilder);
+        _apiIdentityPartBuilders.Add(apiIdentityPartBuilder);
 
         return this;
     }
 
-    public ApiIdentityBuilder AddScalar(string apiPropertyName, Action<ApiIdentitySourceBuilder>? configure = null)
+    public ApiIdentityBuilder AddScalar(string apiPropertyName, Action<ApiIdentityPartBuilder>? configure = null)
     {
-        this.AddSource(apiPropertyName, null, null, configure);
+        this.AddPart(ApiIdentityPartKind.Scalar, apiPropertyName, null, null, configure);
         return this;
     }
 
-    public ApiIdentityBuilder AddScalar(string apiPropertyName, Type clrScalarType, Action<ApiIdentitySourceBuilder>? configure = null)
+    public ApiIdentityBuilder AddScalar(string apiPropertyName, Type clrScalarTypeHint, Action<ApiIdentityPartBuilder>? configure = null)
     {
-        this.AddSource(apiPropertyName, clrScalarType, null, configure);
+        this.AddPart(ApiIdentityPartKind.Scalar, apiPropertyName, null, clrScalarTypeHint, configure);
         return this;
     }
 
-    public ApiIdentityBuilder AddNested(string apiPropertyName, Action<ApiIdentitySourceBuilder>? configure = null)
+    public ApiIdentityBuilder AddNested(string apiPropertyName, Action<ApiIdentityPartBuilder>? configure = null)
     {
-        this.AddSource(apiPropertyName, null, null, configure);
+        this.AddPart(ApiIdentityPartKind.Nested, apiPropertyName, null, null, configure);
         return this;
     }
 
-    public ApiIdentityBuilder AddNested(string apiPropertyName, string apiNestedName, Action<ApiIdentitySourceBuilder>? configure = null)
+    public ApiIdentityBuilder AddNested(string apiPropertyName, string apiIdentityName, Action<ApiIdentityPartBuilder>? configure = null)
     {
-        this.AddSource(apiPropertyName, null, apiNestedName, configure);
+        this.AddPart(ApiIdentityPartKind.Nested, apiPropertyName, apiIdentityName, null, configure);
+        return this;
+    }
+
+    public ApiIdentityBuilder AddParent(Action<ApiIdentityPartBuilder>? configure = null)
+    {
+        this.AddPart(ApiIdentityPartKind.Parent, null, null, null, configure);
+        return this;
+    }
+
+    public ApiIdentityBuilder AddParent(string apiIdentityName, Action<ApiIdentityPartBuilder>? configure = null)
+    {
+        this.AddPart(ApiIdentityPartKind.Parent, null, apiIdentityName, null, configure);
         return this;
     }
 
@@ -61,10 +79,10 @@ public class ApiIdentityBuilder(string apiName) : ExtensionBuilder<ApiIdentityBu
     /// <returns>A new <see cref="ApiIdentity"/> instance.</returns>
     internal ApiIdentity Build()
     {
-        var apiIdentitySources = _apiIdentitySourceBuilders
+        var apiIdentityParts = _apiIdentityPartBuilders
             .Select(b => b.Build());
 
-        var apiIdentity = new ApiIdentity(_apiName, apiIdentitySources);
+        var apiIdentity = new ApiIdentity(_apiName, apiIdentityParts);
 
         var extensions = this.BuildExtensions();
         if (extensions != null)

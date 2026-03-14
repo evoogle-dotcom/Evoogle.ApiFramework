@@ -3,6 +3,8 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Exceptions;
+
 namespace Evoogle.ApiFramework.Schema.Internal;
 
 /// <summary>
@@ -12,8 +14,8 @@ namespace Evoogle.ApiFramework.Schema.Internal;
 internal class ApiInitializationContext
 {
     #region Fields
-    private readonly string? _apiParentPath;
-    private readonly ApiObjectType? _apiParentObjectType;
+    private readonly string? _apiDeclaringPath;
+    private readonly ApiObjectType? _apiDeclaringObjectType;
     private readonly List<ApiInitializationIssue> _issues; // shared, non-null
     private readonly HashSet<string> _identityTraversalPath; // shared, tracks identity resolution path for cycle detection
     #endregion
@@ -21,9 +23,9 @@ internal class ApiInitializationContext
     #region Properties
     public ApiSchema ApiSchema { get; }
 
-    public string? ApiParentPath => _apiParentPath;
+    public string? ApiDeclaringPath => _apiDeclaringPath;
 
-    public ApiObjectType ApiParentObjectType => _apiParentObjectType ?? throw new InvalidOperationException($"No parent {nameof(ApiObjectType)} in this context.");
+    public ApiObjectType ApiDeclaringObjectType => _apiDeclaringObjectType ?? throw new ApiSchemaException($"No parent {nameof(ApiObjectType)} in this context.");
 
     public IEnumerable<ApiInitializationIssue> Issues => _issues;
 
@@ -34,8 +36,8 @@ internal class ApiInitializationContext
     private ApiInitializationContext
     (
         ApiSchema apiSchema,
-        string? apiParentPath,
-        ApiObjectType? apiParentObjectType,
+        string? apiDeclaringPath,
+        ApiObjectType? apiDeclaringObjectType,
         List<ApiInitializationIssue> issues,
         HashSet<string> identityTraversalPath
     )
@@ -44,8 +46,8 @@ internal class ApiInitializationContext
         ArgumentNullException.ThrowIfNull(issues);
         ArgumentNullException.ThrowIfNull(identityTraversalPath);
 
-        _apiParentPath = apiParentPath;
-        _apiParentObjectType = apiParentObjectType;
+        _apiDeclaringPath = apiDeclaringPath;
+        _apiDeclaringObjectType = apiDeclaringObjectType;
 
         this.ApiSchema = apiSchema;
         _issues = issues; // keep shared reference
@@ -77,36 +79,36 @@ internal class ApiInitializationContext
         return new ApiInitializationContext
         (
             apiSchema: apiSchema,
-            apiParentPath: null,
-            apiParentObjectType: null,
+            apiDeclaringPath: null,
+            apiDeclaringObjectType: null,
             issues: [], // always non-null shared list
             identityTraversalPath: [] // always non-null shared set
         );
     }
 
-    public ApiInitializationContext WithParentObjectType(ApiObjectType apiParentObjectType)
+    public ApiInitializationContext WithDeclaringObjectType(ApiObjectType apiDeclaringObjectType)
     {
-        var apiParentPath = apiParentObjectType.ApiPath;
+        var apiDeclaringPath = apiDeclaringObjectType.ApiPath;
 
         return new ApiInitializationContext
         (
             this.ApiSchema,
-            apiParentPath,
-            apiParentObjectType,
+            apiDeclaringPath,
+            apiDeclaringObjectType,
             _issues, // share the same list
             _identityTraversalPath // share the same set
         );
     }
 
-    public ApiInitializationContext WithParentSchemaElement(ApiSchemaElement apiParentSchemaElement)
+    public ApiInitializationContext WithDeclaringSchemaElement(ApiSchemaElement apiDeclaringSchemaElement)
     {
-        var apiParentPath = apiParentSchemaElement.ApiPath;
+        var apiDeclaringPath = apiDeclaringSchemaElement.ApiPath;
 
         return new ApiInitializationContext
         (
             this.ApiSchema,
-            apiParentPath,
-            _apiParentObjectType,
+            apiDeclaringPath,
+            _apiDeclaringObjectType,
             _issues, // share the same list
             _identityTraversalPath // share the same set
         );

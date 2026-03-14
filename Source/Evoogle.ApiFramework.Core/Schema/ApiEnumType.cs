@@ -33,12 +33,14 @@ public sealed class ApiEnumType
     private Dictionary<int, ApiEnumValue>? _clrOrdinalLookup = null;
     #endregion
 
+    #region ApiSchemaElement Properties
+    /// <inheritdoc/>
+    protected override string ApiElementName => nameof(ApiEnumType);
+    #endregion
+
     #region ApiType Properties
     /// <inheritdoc/>
     public override ApiTypeKind ApiKind => ApiTypeKind.Enum;
-
-    /// <inheritdoc/>
-    protected override string ApiTypeName => nameof(ApiEnumType);
     #endregion
 
     #region ApiEnumType Properties
@@ -48,6 +50,18 @@ public sealed class ApiEnumType
     private Dictionary<string, ApiEnumValue> ApiNameLookup => this.ThrowIfNotInitialized(_apiNameLookup);
     private Dictionary<string, ApiEnumValue> ClrNameLookup => this.ThrowIfNotInitialized(_clrNameLookup);
     private Dictionary<int, ApiEnumValue> ClrOrdinalLookup => this.ThrowIfNotInitialized(_clrOrdinalLookup);
+    #endregion
+
+    #region Object Methods
+    /// <inheritdoc/>
+    public override string ToString()
+    {
+        var apiName = this.ApiName.SafeToString();
+        var clrType = this.ClrType.SafeToString();
+        var extensionCount = this.ExtensionCount.SafeToString();
+
+        return $"{nameof(ApiEnumType)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ExtensionCount)}={extensionCount}}} [{clrType}]";
+    }
     #endregion
 
     #region ApiSchemaElement Methods
@@ -91,18 +105,6 @@ public sealed class ApiEnumType
     public bool TryGetValueByClrOrdinal(int clrOrdinal, [NotNullWhen(true)] out ApiEnumValue? value) => this.ClrOrdinalLookup.TryGetValue(clrOrdinal, out value);
     #endregion
 
-    #region Object Methods
-    /// <inheritdoc/>
-    public override string ToString()
-    {
-        var apiName = this.ApiName.SafeToString();
-        var clrType = this.ClrType.SafeToString();
-        var extensionCount = this.ExtensionCount.SafeToString();
-
-        return $"{nameof(ApiEnumType)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ExtensionCount)}={extensionCount}}} [{clrType}]";
-    }
-    #endregion
-
     #region Implementation Methods
     private void InitializeApiEnumValues(ApiInitializationContext context)
     {
@@ -123,7 +125,7 @@ public sealed class ApiEnumType
         {
             var apiEnumValue = this.ApiEnumValues[i];
 
-            var childContext = context.WithParentSchemaElement(this);
+            var childContext = context.WithDeclaringSchemaElement(this);
             apiEnumValue.Initialize(childContext);
         }
     }

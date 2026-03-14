@@ -34,6 +34,9 @@ public abstract class ApiSchemaElement : ExtensibleBase
     /// </remarks>
     public string ApiPath => this.ThrowIfNotInitialized(_apiPath);
 
+    /// <summary>Gets runtime API element name of the API schema element.</summary>
+    protected abstract string ApiElementName { get; }
+
     /// <summary>
     ///     Gets the runtime context for the API schema containing this element.
     /// </summary>
@@ -53,22 +56,22 @@ public abstract class ApiSchemaElement : ExtensibleBase
 
     #region Methods
     /// <summary>
-    ///     Builds the API path for this schema element based on the parent path.
+    ///     Builds the API path for this schema element.
     /// </summary>
-    /// <param name="apiParentPath">The API path of the parent element, or <c>null</c> if this is a root element.</param>
+    /// <param name="apiPreviousPath">The optional API path of the previous element, or <c>null</c> if this is a root element.</param>
     /// <returns>The complete API path for this element.</returns>
-    protected abstract string BuildPath(string? apiParentPath);
+    protected abstract string BuildPath(string? apiPreviousPath);
 
     /// <summary>
     ///     Initializes this schema element with the specified context.
     /// </summary>
-    /// <param name="context">The initialization context containing the schema and parent path information.</param>
+    /// <param name="context">The runtime initialization context needed for initializing this schema element.</param>
     /// <exception cref="ArgumentNullException"><paramref name="context"/> is <c>null</c>.</exception>
     internal virtual void Initialize(ApiInitializationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        _apiPath = this.BuildPath(context.ApiParentPath);
+        _apiPath = this.BuildPath(context.ApiDeclaringPath);
         _apiSchemaContext = context.ApiSchema.ApiSchemaContext;
     }
     #endregion

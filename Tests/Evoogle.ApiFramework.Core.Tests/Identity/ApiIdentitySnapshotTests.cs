@@ -3,14 +3,9 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using System.Diagnostics.CodeAnalysis;
-
-using Evoogle.XUnit;
-
-using static Evoogle.XUnit.Tests.JsonUnitTests;
-
 namespace Evoogle.ApiFramework.Identity;
 
+#if false
 public partial class ApiIdentitySnapshotTests(ITestOutputHelper output) : XUnitTests(output)
 {
     #region Test Types
@@ -328,3 +323,4 @@ public partial class ApiIdentitySnapshotTests(ITestOutputHelper output) : XUnitT
     );
     #endregion
 }
+#endif

@@ -3,6 +3,9 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Diagnostics.CodeAnalysis;
+
+using Evoogle.ApiFramework.Schema.TestData;
 using Evoogle.ApiFramework.TestData;
 using Evoogle.Extensions;
 using Evoogle.XUnit;
@@ -25,6 +28,15 @@ public class ApiScalarTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
 
         #region Calculated Properties
         private ApiType? ApiTypeActual { get; set; }
+        #endregion
+
+        #region Constructors
+        [SetsRequiredMembers]
+        public BuildTest()
+        {
+            this.Name = nameof(BuildTest);
+            this.ExcludeMembers = ApiSchemaExcludeMembers.Standard;
+        }
         #endregion
 
         #region XUnitTest Methods
@@ -60,13 +72,7 @@ public class ApiScalarTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
             this.ApiTypeActual.Should().BeOfType<ApiScalarType>();
             this.ApiTypeExpected.Should().BeOfType<ApiScalarType>();
 
-            this.ApiTypeActual.As<ApiScalarType>().Should().BeEquivalentTo
-            (
-                this.ApiTypeExpected.As<ApiScalarType>(),
-                opt => opt
-                    .Excluding(info => info.Path.Contains(nameof(ApiSchemaElement.ApiPath)))
-                    .WithStrictOrdering()
-            );
+            this.AssertBeEquivalentTo(this.ApiTypeActual, this.ApiTypeExpected);
         }
         #endregion
     }

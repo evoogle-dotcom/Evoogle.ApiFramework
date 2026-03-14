@@ -18,34 +18,41 @@ namespace Evoogle.ApiFramework.Schema.Internal;
 internal static class ApiSchemaHelpers
 {
     #region Validation Methods
-    public static string BuildPath(string? apiParentPath, string apiChildPath, string? apiApiName)
+    public static string BuildPath(string? basePath, string segment, string? segmentName)
     {
-        var hasParent = !string.IsNullOrWhiteSpace(apiParentPath);
-        var hasName = !string.IsNullOrWhiteSpace(apiApiName);
+        var hasBasePath = !string.IsNullOrWhiteSpace(basePath);
+        var hasSegmentName = !string.IsNullOrWhiteSpace(segmentName);
 
-        if (!hasParent && !hasName)
+        if (!hasBasePath)
         {
-            return apiChildPath;
+            return !hasSegmentName
+                ? segment
+                : $"{segment}[\"{segmentName}\"]";
         }
 
-        var capacity = (hasParent ? apiParentPath!.Length + 1 : 0)
-            + apiChildPath.Length
-            + (hasName ? apiApiName!.Length + 4 : 0);
+        if (!hasSegmentName)
+        {
+            return $"{basePath}.{segment}";
+        }
+
+        var capacity = (hasBasePath ? basePath!.Length + 1 : 0)
+            + segment.Length
+            + (hasSegmentName ? segmentName!.Length + 4 : 0);
 
         var sb = new StringBuilder(capacity);
 
-        if (hasParent)
+        if (hasBasePath)
         {
-            sb.Append(apiParentPath);
+            sb.Append(basePath);
             sb.Append('.');
         }
 
-        sb.Append(apiChildPath);
+        sb.Append(segment);
 
-        if (hasName)
+        if (hasSegmentName)
         {
             sb.Append("[\"");
-            sb.Append(apiApiName);
+            sb.Append(segmentName);
             sb.Append("\"]");
         }
 

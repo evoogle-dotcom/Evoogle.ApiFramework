@@ -1,0 +1,90 @@
+﻿// Copyright (c) 2024-2025 Evoogle.com
+// SPDX-License-Identifier: MIT
+//
+// This file is licensed under the MIT License.
+// See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Identity;
+using Evoogle.ApiFramework.Schema.Internal;
+using Evoogle.Extensions;
+
+namespace Evoogle.ApiFramework.Schema;
+
+public class ApiScalarIdentityPart(string apiPropertyName, Type? clrScalarTypeHint = null) : ApiPropertyIdentityPart(apiPropertyName)
+{
+    #region ApiScalarIdentityPart Fields
+    private Type? _clrResolvedScalarType = null;
+    #endregion
+
+    #region ApiSchemaElement Properties
+    /// <inheritdoc/>
+    protected override string ApiElementName => nameof(ApiScalarIdentityPart);
+    #endregion
+
+    #region ApiIdentityPart Properties
+    /// <inheritdoc/>
+    public override ApiIdentityPartKind ApiKind => ApiIdentityPartKind.Scalar;
+    #endregion
+
+    #region ApiScalarIdentityPart Properties
+    public Type? ClrScalarTypeHint { get; } = clrScalarTypeHint;
+
+    public Type ClrScalarType => this.ThrowIfNotInitialized(_clrResolvedScalarType);
+    #endregion
+
+    #region Object Methods
+    /// <inheritdoc />
+    public override string ToString()
+    {
+        var apiPropertyName = this.ApiPropertyName.SafeToString();
+        var clrScalarTypeHint = this.ClrScalarTypeHint.SafeToName();
+        var extensionCount = this.ExtensionCount.SafeToString();
+
+        return $"{nameof(ApiScalarIdentityPart)} {{{nameof(this.ApiPropertyName)}={apiPropertyName}, {nameof(this.ClrScalarTypeHint)}={clrScalarTypeHint}, {nameof(this.ExtensionCount)}={extensionCount}}}";
+    }
+    #endregion
+
+    #region ApiSchemaElement Methods
+    /// <inheritdoc />
+    internal override void Initialize(ApiInitializationContext context)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+
+        base.Initialize(context);
+
+        this.InitializeClrScalarType(context);
+    }
+    #endregion
+
+    #region Implementation Methods
+    private void InitializeClrScalarType(ApiInitializationContext context)
+    {
+        if (_apiResolvedProperty is null)
+        {
+            _clrResolvedScalarType = null;
+            return;
+        }
+
+        var apiPropertyScalarType = (ApiScalarType)_apiResolvedProperty.ApiType;
+        var clrPropertyScalarType = apiPropertyScalarType.ClrType;
+
+        var clrScalarType = this.ClrScalarTypeHint ?? clrPropertyScalarType;
+
+        _clrResolvedScalarType = ApiId.GetCompatibleScalarType(clrScalarType);
+
+        var clrPropertyScalarTypeIsString = clrPropertyScalarType == typeof(string);
+        var clrResolvedScalarTypeIsString = _clrResolvedScalarType == typeof(string);
+        var possiblePerformanceConcern = clrPropertyScalarTypeIsString != clrResolvedScalarTypeIsString;
+
+        if (possiblePerformanceConcern)
+        {
+            var path = this.ApiPath;
+            var severity = ApiInitializationSeverity.Warning;
+            var code = ApiInitializationCode.API_IDENTITY_PART_PERFORMANCE_CONCERN;
+            var description = $"Identity part '{this.ApiPropertyName}' has CLR property type {clrPropertyScalarType.SafeToName()} but resolves to scalar type {_clrResolvedScalarType.SafeToName()}, requiring string parse/format on every identity operation";
+            var remediation = $"Align the '{this.ApiPropertyName}' property type with the resolved scalar type {_clrResolvedScalarType.SafeToName()} to eliminate string coercion, or accept the overhead if the type mismatch is intentional";
+
+            context.AddIssue(path, severity, code, description, remediation);
+        }
+    }
+    #endregion
+}
