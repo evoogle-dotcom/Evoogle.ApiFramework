@@ -47,12 +47,21 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
         return this;
     }
 
+    /// <summary>
+    ///     Configures schema-wide options for the schema being built.
+    /// </summary>
+    /// <param name="configure">Callback to configure the <see cref="ApiSchemaOptionsBuilder"/>.</param>
+    /// <returns>The current builder instance.</returns>
     public ApiSchemaBuilder WithOptions(Action<ApiSchemaOptionsBuilder> configure)
     {
         _apiOptionsConfiguration = configure;
         return this;
     }
 
+    /// <summary>
+    ///     Resets the schema options to their out-of-the-box defaults.
+    /// </summary>
+    /// <returns>The current builder instance.</returns>
     public ApiSchemaBuilder WithDefaultOptions()
     {
         _apiOptionsConfiguration = null;

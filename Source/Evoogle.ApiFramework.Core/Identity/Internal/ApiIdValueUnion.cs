@@ -16,7 +16,7 @@ namespace Evoogle.ApiFramework.Identity.Internal;
 ///         and is not intended for direct use in application code. It may change or be removed in future releases.
 ///     </para>
 ///     <para>
-///         Uses <see cref="StructLayout"/> with <see cref="LayoutKind.Explicit"/> to overlay all value-type fields
+///         Uses <see cref="System.Runtime.InteropServices.StructLayoutAttribute"/> with <see cref="LayoutKind.Explicit"/> to overlay all value-type fields
 ///         in the same memory location, enabling zero-allocation storage of primitives within <see cref="ApiId"/>.
 ///     </para>
 ///     <para>

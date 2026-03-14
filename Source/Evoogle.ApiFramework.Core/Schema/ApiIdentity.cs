@@ -11,6 +11,12 @@ using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema;
 
+/// <summary>
+///     Defines a named identity for an <see cref="ApiObjectType"/>, composed of one or more <see cref="ApiIdentityPart"/> instances
+///     that together uniquely identify an object at runtime.
+/// </summary>
+/// <param name="apiName">The API name used to reference this identity within the schema.</param>
+/// <param name="apiIdentityParts">The ordered collection of parts that compose this identity.</param>
 [JsonConverter(typeof(ApiIdentityJsonConverter))]
 public class ApiIdentity(string apiName, IEnumerable<ApiIdentityPart> apiIdentityParts) : ApiSchemaElement
 {
@@ -20,12 +26,15 @@ public class ApiIdentity(string apiName, IEnumerable<ApiIdentityPart> apiIdentit
     #endregion
 
     #region ApiIdentity Properties
+    /// <summary>Gets the API name that uniquely identifies this identity within its containing <see cref="ApiObjectType"/>.</summary>
     public string ApiName { get; } = apiName;
 
+    /// <summary>Gets the ordered array of <see cref="ApiIdentityPart"/> instances that compose this identity.</summary>
     public ApiIdentityPart[] ApiIdentityParts { get; } = [.. apiIdentityParts.EmptyIfNull().Where(x => x is not null)];
     #endregion
 
     #region ApiIdentity Computed Properties
+    /// <summary>Gets a value indicating whether this identity is composite (has two or more parts).</summary>
     public bool IsComposite => this.ApiIdentityParts.Length >= 2;
     #endregion
 

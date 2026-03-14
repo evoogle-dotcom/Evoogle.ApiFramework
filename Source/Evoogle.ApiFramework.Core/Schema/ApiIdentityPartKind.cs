@@ -10,9 +10,12 @@ namespace Evoogle.ApiFramework.Schema;
 /// </summary>
 public enum ApiIdentityPartKind
 {
+    /// <summary>The part sources its value directly from a scalar property on the declaring object type.</summary>
     Scalar,
 
+    /// <summary>The part sources its value from the identity of a nested object property.</summary>
     Nested,
 
+    /// <summary>The part sources its value from the identity of the parent object in a parent-child relationship.</summary>
     Parent
 }

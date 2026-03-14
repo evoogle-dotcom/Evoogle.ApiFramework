@@ -8,6 +8,10 @@ generated_code = true
 [obj/**]
 generated_code = true
 
+# "Core" is an organizational folder, not a namespace segment
+[**/Core/**]
+dotnet_diagnostic.IDE0130.severity = none
+
 # =========================================================
 # Core formatting
 # =========================================================
@@ -158,3 +162,30 @@ dotnet_naming_rule.locals_camel.severity = error
 dotnet_naming_rule.parameters_camel.symbols = parameters
 dotnet_naming_rule.parameters_camel.style = camel_case
 dotnet_naming_rule.parameters_camel.severity = error
+
+# =========================================================
+# C# Diagnostics
+# =========================================================
+
+[*.cs]
+# Missing XML comment for publicly visible type or member
+dotnet_diagnostic.CS1591.severity = error
+
+# Generated files — suppress missing XML doc requirement
+[*.Designer.cs]
+dotnet_diagnostic.CS1591.severity = none
+
+[*.g.cs]
+dotnet_diagnostic.CS1591.severity = none
+
+[*.g.i.cs]
+dotnet_diagnostic.CS1591.severity = none
+
+[*.generated.cs]
+dotnet_diagnostic.CS1591.severity = none
+
+[**/Generated/**/*.cs]
+dotnet_diagnostic.CS1591.severity = none
+
+[**/Migrations/**/*.cs]
+dotnet_diagnostic.CS1591.severity = none

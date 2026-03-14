@@ -33,7 +33,7 @@ public sealed partial class ApiProperty
     ///     </para>
     ///     <para>
     ///         When <paramref name="clrValueType"/> is specified, the retrieved value is coerced using the
-    ///         schema's <see cref="TypeCoercion"/> instance. This handles type conversions
+    ///         schema's <see cref="Evoogle.Coercion.TypeCoercion"/> instance. This handles type conversions
     ///         such as unboxing, downcasting, enum conversions, and custom coercion definitions.
     ///     </para>
     /// </remarks>
@@ -293,7 +293,7 @@ public sealed partial class ApiProperty
     ///     </para>
     ///     <para>
     ///         When <paramref name="clrValueType"/> is specified, the retrieved value is coerced using the
-    ///         schema's <see cref="TypeCoercion"/> instance. This handles type conversions
+    ///         schema's <see cref="Evoogle.Coercion.TypeCoercion"/> instance. This handles type conversions
     ///         such as unboxing, downcasting, enum conversions, and custom coercion definitions.
     ///     </para>
     /// </remarks>
@@ -565,7 +565,7 @@ public sealed partial class ApiProperty
     ///     </para>
     ///     <para>
     ///         The coercion uses the same cached compiled expressions as the property accessors,
-    ///         providing better performance than direct <see cref="TypeCoercion"/> calls for frequently-used type pairs.
+    ///         providing better performance than direct <see cref="Evoogle.Coercion.TypeCoercion"/> calls for frequently-used type pairs.
     ///     </para>
     /// </remarks>
     public object? CoerceValue(object? rawValue, Type? clrValueType = null)

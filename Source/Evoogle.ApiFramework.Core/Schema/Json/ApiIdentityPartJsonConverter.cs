@@ -134,6 +134,7 @@ public class ApiIdentityPartJsonConverter(ILogger<ApiIdentityPartJsonConverter>?
     #endregion
 
     #region JsonConverterBase<T> Methods
+    /// <inheritdoc/>
     protected override IReadContext CreateReadContext(ILogger logger, JsonSerializerOptions options)
         => CreateDefaultReadContext<PropertyNames, ReadData, ReadHandlers>
             (
@@ -143,6 +144,7 @@ public class ApiIdentityPartJsonConverter(ILogger<ApiIdentityPartJsonConverter>?
                 buildReadHandlers: names => new ReadHandlers(names)
             );
 
+    /// <inheritdoc/>
     protected override IWriteContext CreateWriteContext(ILogger logger, JsonSerializerOptions options)
         => CreateDefaultWriteContext
             (
@@ -151,6 +153,7 @@ public class ApiIdentityPartJsonConverter(ILogger<ApiIdentityPartJsonConverter>?
                 buildPropertyNames: PropertyNames.Create
             );
 
+    /// <inheritdoc/>
     protected override ApiIdentityPart? CreateValue(IReadContext context)
     {
         var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
@@ -195,6 +198,7 @@ public class ApiIdentityPartJsonConverter(ILogger<ApiIdentityPartJsonConverter>?
         return apiIdentityPart;
     }
 
+    /// <inheritdoc/>
     protected override void ReadCore(ref Utf8JsonReader reader, IReadContext context)
     {
         var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
@@ -203,6 +207,7 @@ public class ApiIdentityPartJsonConverter(ILogger<ApiIdentityPartJsonConverter>?
         ReadJsonObject(ref reader, readContext, handlers);
     }
 
+    /// <inheritdoc/>
     protected override void WriteCore(Utf8JsonWriter writer, ApiIdentityPart value, IWriteContext context)
     {
         var writeContext = (DefaultWriteContext<PropertyNames>)context;

@@ -74,12 +74,24 @@ public static class Dummy
         public Customer? Customer { get; set; }
     }
 
+    /// <summary>
+    ///     Represents an order line-item domain model used by the sample schema builder extensions.
+    /// </summary>
     public class OrderItem
     {
+        /// <summary>Gets or sets the identifier of the order that owns this line item.</summary>
         public Guid OrderId { get; set; }
+
+        /// <summary>Gets or sets the sequential line-item number within its parent order.</summary>
         public long LineItemNumber { get; set; }
+
+        /// <summary>Gets or sets the display name of the product on this line item.</summary>
         public string ProductName { get; set; } = string.Empty;
+
+        /// <summary>Gets or sets the quantity of units ordered for this line item.</summary>
         public int Quantity { get; set; }
+
+        /// <summary>Gets or sets the per-unit price for this line item.</summary>
         public decimal UnitPrice { get; set; }
     }
 
@@ -88,9 +100,16 @@ public static class Dummy
     /// </summary>
     public enum OrderStatus
     {
+        /// <summary>The order has been placed but not yet processed or shipped.</summary>
         Pending,
+
+        /// <summary>The order has been dispatched and is in transit.</summary>
         Shipped,
+
+        /// <summary>The order has been received by the customer.</summary>
         Delivered,
+
+        /// <summary>The order was cancelled before or after shipment.</summary>
         Cancelled
     }
 

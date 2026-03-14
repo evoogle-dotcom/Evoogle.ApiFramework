@@ -10,10 +10,18 @@ using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema;
 
+/// <summary>
+///     Holds optional per-type configuration for an <see cref="ApiObjectType"/>, allowing identity and
+///     serialization behaviours to be overridden on a type-by-type basis.
+/// </summary>
 [JsonConverter(typeof(ApiObjectTypeOptionsJsonConverter))]
 public record class ApiObjectTypeOptions
 {
     #region Properties
+    /// <summary>
+    ///     Gets the null-handling strategy applied when resolving identities on this object type.
+    ///     When <see langword="null"/>, the strategy is inherited from the containing <see cref="ApiSchema"/>'s options.
+    /// </summary>
     public ApiIdentityNullHandling? ApiIdentityNullHandling { get; init; }
     #endregion
 

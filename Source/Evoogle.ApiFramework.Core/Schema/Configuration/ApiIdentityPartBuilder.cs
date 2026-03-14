@@ -7,6 +7,13 @@ using Evoogle.ApiFramework.Exceptions;
 
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
+/// <summary>
+///     Fluent builder used to configure an individual <see cref="ApiIdentityPart"/> within an <see cref="ApiIdentityBuilder"/>.
+/// </summary>
+/// <param name="apiKind">The kind of identity part to build.</param>
+/// <param name="apiPropertyName">The API property name for property-based parts (<see cref="ApiIdentityPartKind.Scalar"/> and <see cref="ApiIdentityPartKind.Nested"/>). <see langword="null"/> for <see cref="ApiIdentityPartKind.Parent"/> parts.</param>
+/// <param name="apiIdentityName">An optional explicit identity name for <see cref="ApiIdentityPartKind.Nested"/> and <see cref="ApiIdentityPartKind.Parent"/> parts.</param>
+/// <param name="clrScalarTypeHint">An optional CLR type hint used to override scalar type resolution for <see cref="ApiIdentityPartKind.Scalar"/> parts.</param>
 public class ApiIdentityPartBuilder
 (
     ApiIdentityPartKind apiKind,
@@ -24,6 +31,10 @@ public class ApiIdentityPartBuilder
     #endregion
 
     #region Methods
+    /// <summary>
+    ///     Builds the <see cref="ApiIdentityPart"/> configured by this builder.
+    /// </summary>
+    /// <returns>A fully constructed <see cref="ApiIdentityPart"/> instance.</returns>
     internal ApiIdentityPart Build()
     {
         ApiIdentityPart apiIdentityPart = _apiKind switch

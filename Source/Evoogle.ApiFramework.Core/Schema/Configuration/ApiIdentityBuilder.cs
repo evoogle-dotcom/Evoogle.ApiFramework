@@ -20,6 +20,15 @@ public class ApiIdentityBuilder(string apiName) : ExtensionBuilder<ApiIdentityBu
     #endregion
 
     #region Builder Methods
+    /// <summary>
+    ///     Adds a part of the specified kind to this identity definition.
+    /// </summary>
+    /// <param name="apiKind">The kind of identity part to add.</param>
+    /// <param name="apiPropertyName">The API property name for scalar/nested parts; <see langword="null"/> for parent parts.</param>
+    /// <param name="apiIdentityName">Optional explicit identity name for nested/parent parts.</param>
+    /// <param name="clrScalarTypeHint">Optional CLR type hint for scalar parts.</param>
+    /// <param name="configure">Optional callback to further configure the part builder.</param>
+    /// <returns>The current builder instance.</returns>
     public ApiIdentityBuilder AddPart
     (
         ApiIdentityPartKind apiKind,
@@ -37,36 +46,61 @@ public class ApiIdentityBuilder(string apiName) : ExtensionBuilder<ApiIdentityBu
         return this;
     }
 
+    /// <summary>Adds a scalar identity part sourced from the property named <paramref name="apiPropertyName"/>.</summary>
+    /// <param name="apiPropertyName">The API property name of the scalar property.</param>
+    /// <param name="configure">Optional callback to further configure the part builder.</param>
+    /// <returns>The current builder instance.</returns>
     public ApiIdentityBuilder AddScalar(string apiPropertyName, Action<ApiIdentityPartBuilder>? configure = null)
     {
         this.AddPart(ApiIdentityPartKind.Scalar, apiPropertyName, null, null, configure);
         return this;
     }
 
+    /// <summary>Adds a scalar identity part sourced from the property named <paramref name="apiPropertyName"/> with an explicit CLR type hint.</summary>
+    /// <param name="apiPropertyName">The API property name of the scalar property.</param>
+    /// <param name="clrScalarTypeHint">The CLR type to use when extracting the scalar value, overriding the property's inferred type.</param>
+    /// <param name="configure">Optional callback to further configure the part builder.</param>
+    /// <returns>The current builder instance.</returns>
     public ApiIdentityBuilder AddScalar(string apiPropertyName, Type clrScalarTypeHint, Action<ApiIdentityPartBuilder>? configure = null)
     {
         this.AddPart(ApiIdentityPartKind.Scalar, apiPropertyName, null, clrScalarTypeHint, configure);
         return this;
     }
 
+    /// <summary>Adds a nested identity part sourced from the primary identity of the object property named <paramref name="apiPropertyName"/>.</summary>
+    /// <param name="apiPropertyName">The API property name of the nested object.</param>
+    /// <param name="configure">Optional callback to further configure the part builder.</param>
+    /// <returns>The current builder instance.</returns>
     public ApiIdentityBuilder AddNested(string apiPropertyName, Action<ApiIdentityPartBuilder>? configure = null)
     {
         this.AddPart(ApiIdentityPartKind.Nested, apiPropertyName, null, null, configure);
         return this;
     }
 
+    /// <summary>Adds a nested identity part sourced from a named identity of the object property named <paramref name="apiPropertyName"/>.</summary>
+    /// <param name="apiPropertyName">The API property name of the nested object.</param>
+    /// <param name="apiIdentityName">The explicit name of the identity to use on the nested object type.</param>
+    /// <param name="configure">Optional callback to further configure the part builder.</param>
+    /// <returns>The current builder instance.</returns>
     public ApiIdentityBuilder AddNested(string apiPropertyName, string apiIdentityName, Action<ApiIdentityPartBuilder>? configure = null)
     {
         this.AddPart(ApiIdentityPartKind.Nested, apiPropertyName, apiIdentityName, null, configure);
         return this;
     }
 
+    /// <summary>Adds a parent identity part sourced from the primary identity of the parent object in a parent-child relationship.</summary>
+    /// <param name="configure">Optional callback to further configure the part builder.</param>
+    /// <returns>The current builder instance.</returns>
     public ApiIdentityBuilder AddParent(Action<ApiIdentityPartBuilder>? configure = null)
     {
         this.AddPart(ApiIdentityPartKind.Parent, null, null, null, configure);
         return this;
     }
 
+    /// <summary>Adds a parent identity part sourced from a named identity of the parent object in a parent-child relationship.</summary>
+    /// <param name="apiIdentityName">The explicit name of the identity to use on the parent object type.</param>
+    /// <param name="configure">Optional callback to further configure the part builder.</param>
+    /// <returns>The current builder instance.</returns>
     public ApiIdentityBuilder AddParent(string apiIdentityName, Action<ApiIdentityPartBuilder>? configure = null)
     {
         this.AddPart(ApiIdentityPartKind.Parent, null, apiIdentityName, null, configure);

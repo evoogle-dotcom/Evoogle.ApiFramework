@@ -11,6 +11,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Evoogle.ApiFramework.Schema.Json;
 
+/// <summary>
+///     JSON converter for serializing and deserializing <see cref="ApiSchemaOptions"/> instances.
+/// </summary>
 public class ApiSchemaOptionsJsonConverter(ILogger<ApiSchemaOptionsJsonConverter>? logger) : JsonConverterBase<ApiSchemaOptions>(logger)
 {
     #region Property Types
@@ -74,6 +77,7 @@ public class ApiSchemaOptionsJsonConverter(ILogger<ApiSchemaOptionsJsonConverter
     #endregion
 
     #region JsonConverterBase<T> Methods
+    /// <inheritdoc/>
     protected override IReadContext CreateReadContext(ILogger logger, JsonSerializerOptions options)
         => CreateDefaultReadContext<PropertyNames, ReadData, ReadHandlers>
             (
@@ -83,6 +87,7 @@ public class ApiSchemaOptionsJsonConverter(ILogger<ApiSchemaOptionsJsonConverter
                 buildReadHandlers: names => new ReadHandlers(names)
             );
 
+    /// <inheritdoc/>
     protected override IWriteContext CreateWriteContext(ILogger logger, JsonSerializerOptions options)
         => CreateDefaultWriteContext
             (
@@ -91,6 +96,7 @@ public class ApiSchemaOptionsJsonConverter(ILogger<ApiSchemaOptionsJsonConverter
                 buildPropertyNames: PropertyNames.Create
             );
 
+    /// <inheritdoc/>
     protected override ApiSchemaOptions? CreateValue(IReadContext context)
     {
         var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
@@ -106,6 +112,7 @@ public class ApiSchemaOptionsJsonConverter(ILogger<ApiSchemaOptionsJsonConverter
         return apiSchemaOptions;
     }
 
+    /// <inheritdoc/>
     protected override void ReadCore(ref Utf8JsonReader reader, IReadContext context)
     {
         var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
@@ -114,6 +121,7 @@ public class ApiSchemaOptionsJsonConverter(ILogger<ApiSchemaOptionsJsonConverter
         ReadJsonObject(ref reader, readContext, handlers);
     }
 
+    /// <inheritdoc/>
     protected override void WriteCore(Utf8JsonWriter writer, ApiSchemaOptions value, IWriteContext context)
     {
         var writeContext = (DefaultWriteContext<PropertyNames>)context;

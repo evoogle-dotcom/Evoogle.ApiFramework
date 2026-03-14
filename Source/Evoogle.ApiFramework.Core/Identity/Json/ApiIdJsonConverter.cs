@@ -38,7 +38,7 @@ public sealed class ApiIdJsonConverter(ILogger<ApiIdJsonConverter>? logger) : Js
         /// <summary>Gets the JSON property name used for the <see cref="ApiId.Kind"/> value.</summary>
         public required string Kind { get; init; }
 
-        /// <summary>Gets the JSON property name used for the <see cref="ApiId.Value"/> value or the composite parts.</summary>
+        /// <summary>Gets the JSON property name used for the <see cref="ApiId"/> value or composite parts.</summary>
         public required string Value { get; init; }
         #endregion
     }
@@ -55,7 +55,7 @@ public sealed class ApiIdJsonConverter(ILogger<ApiIdJsonConverter>? logger) : Js
         /// <summary>Gets the JSON property name used for the part <see cref="ApiId.Kind"/> value.</summary>
         public required string Kind { get; init; }
 
-        /// <summary>Gets the JSON property name used for the part <see cref="ApiId.Value"/> value.</summary>
+        /// <summary>Gets the JSON property name used for the <see cref="ApiId"/> part value.</summary>
         public required string Value { get; init; }
         #endregion
     }

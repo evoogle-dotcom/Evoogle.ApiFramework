@@ -8,23 +8,23 @@ namespace Evoogle.ApiFramework.Schema;
 public sealed partial class ApiObjectType
 {
     #region Identity Methods
-    /// <summary>
-    ///     Checks if two instances have equal identities.
-    /// </summary>
-    /// <param name="clrInstance1">The first CLR instance.</param>
-    /// <param name="clrInstance2">The second CLR instance.</param>
-    /// <param name="apiIdentityName">Optional identity name. If null, uses the primary identity.</param>
-    /// <returns><c>true</c> if both instances have the same identity; otherwise, <c>false</c>.</returns>
-    /// <remarks>
-    ///     <para>Returns <c>false</c> if either instance is null or if identity building fails for either instance.</para>
-    ///     <para><b>Performance:</b> Builds two identities and compares them - roughly 2x the cost of single identity build</para>
-    ///     <para><b>Use Cases:</b></para>
-    ///     <list type="bullet">
-    ///         <item><description>Detecting duplicate entities in collections</description></item>
-    ///         <item><description>Change detection (comparing old vs new entity state)</description></item>
-    ///         <item><description>Verifying entity equality without full property comparison</description></item>
-    ///     </list>
-    /// </remarks>
+    // <summary>
+    //     Checks if two instances have equal identities.
+    // </summary>
+    // <param name="clrInstance1">The first CLR instance.</param>
+    // <param name="clrInstance2">The second CLR instance.</param>
+    // <param name="apiIdentityName">Optional identity name. If null, uses the primary identity.</param>
+    // <returns><c>true</c> if both instances have the same identity; otherwise, <c>false</c>.</returns>
+    // <remarks>
+    //     <para>Returns <c>false</c> if either instance is null or if identity building fails for either instance.</para>
+    //     <para><b>Performance:</b> Builds two identities and compares them - roughly 2x the cost of single identity build</para>
+    //     <para><b>Use Cases:</b></para>
+    //     <list type="bullet">
+    //         <item><description>Detecting duplicate entities in collections</description></item>
+    //         <item><description>Change detection (comparing old vs new entity state)</description></item>
+    //         <item><description>Verifying entity equality without full property comparison</description></item>
+    //     </list>
+    // </remarks>
     // public bool IdentitiesEqual(object clrInstance1, object clrInstance2, string? apiIdentityName = null)
     // {
     //     if (clrInstance1 is null || clrInstance2 is null)
@@ -57,18 +57,18 @@ public sealed partial class ApiObjectType
     //     return equal;
     // }
 
-    /// <summary>
-    ///     Checks if an instance's identity matches a given <see cref="ApiId"/>.
-    /// </summary>
-    /// <param name="clrInstance">The CLR instance to check.</param>
-    /// <param name="apiId">The identity to compare against.</param>
-    /// <param name="apiIdentityName">Optional identity name. If null, uses the primary identity.</param>
-    /// <returns><c>true</c> if the instance's identity matches the given id; otherwise, <c>false</c>.</returns>
-    /// <remarks>
-    ///     <para>This is a convenience method that builds the identity and compares it.</para>
-    ///     <para>Returns <c>false</c> if identity building fails or if the object type has no identity.</para>
-    ///     <para><b>Performance:</b> Same as <see cref="TryGetIdentity(object, out ApiId, string?)"/> plus equality check (~5-10ns)</para>
-    /// </remarks>
+    // <summary>
+    //     Checks if an instance's identity matches a given <see cref="ApiId"/>.
+    // </summary>
+    // <param name="clrInstance">The CLR instance to check.</param>
+    // <param name="apiId">The identity to compare against.</param>
+    // <param name="apiIdentityName">Optional identity name. If null, uses the primary identity.</param>
+    // <returns><c>true</c> if the instance's identity matches the given id; otherwise, <c>false</c>.</returns>
+    // <remarks>
+    //     <para>This is a convenience method that builds the identity and compares it.</para>
+    //     <para>Returns <c>false</c> if identity building fails or if the object type has no identity.</para>
+    //     <para><b>Performance:</b> Same as <see cref="TryGetIdentity(object, out ApiId, string?)"/> plus equality check (~5-10ns)</para>
+    // </remarks>
     // public bool MatchesIdentity(object clrInstance, ApiId id, string? apiIdentityName = null)
     // {
     //     if (clrInstance is null || !id.HasValue)
@@ -89,31 +89,31 @@ public sealed partial class ApiObjectType
     //     return matches;
     // }
 
-    /// <summary>
-    ///     Attempts to get an identity from a CLR instance without throwing exceptions.
-    /// </summary>
-    /// <param name="clrInstance">The CLR instance to get the identity from.</param>
-    /// <param name="apiId">When this method returns, contains the identity if successful; otherwise, <see cref="ApiId.Empty" />.</param>
-    /// <param name="apiIdentityName">Optional identity name. If null, uses the primary identity.</param>
-    /// <returns><c>true</c> if the identity was retrieved successfully; otherwise, <c>false</c>.</returns>
-    /// <remarks>
-    ///     <para>This method never throws exceptions and returns <c>false</c> on any failure.</para>
-    ///     <para>Use <see cref="GetIdentity(object, string?)"/> if you need exception details.</para>
-    ///     <para><b>Performance Characteristics:</b></para>
-    ///     <list type="bullet">
-    ///         <item><description><b>Property Access:</b> Uses compiled accessors (reflection-free after initialization) for O(1) property reads</description></item>
-    ///         <item><description><b>Memory Allocation:</b> Allocates O(n) memory where n = number of identity parts (typically 1-3 parts)</description></item>
-    ///         <item><description><b>Type Coercion:</b> Cost depends on source/target type compatibility - primitive conversions are fastest (~10-50ns), string parsing is slower (~100-500ns)</description></item>
-    ///         <item><description><b>Typical Performance:</b> Simple identities: ~50-100ns, Composite identities: ~50-200ns per part</description></item>
-    ///         <item><description><b>Caching:</b> No built-in caching - results are computed on every call</description></item>
-    ///     </list>
-    ///     <para><b>When to Use:</b></para>
-    ///     <list type="bullet">
-    ///         <item><description>Use <c>TryGetIdentity</c> when failures are expected and should be handled gracefully</description></item>
-    ///         <item><description>Use <c>GetIdentity</c> when failures indicate bugs and you need detailed exception information</description></item>
-    ///         <item><description>Consider caching results if calling repeatedly for the same instance</description></item>
-    ///     </list>
-    /// </remarks>
+    // <summary>
+    //     Attempts to get an identity from a CLR instance without throwing exceptions.
+    // </summary>
+    // <param name="clrInstance">The CLR instance to get the identity from.</param>
+    // <param name="apiId">When this method returns, contains the identity if successful; otherwise, <see cref="ApiId.Empty" />.</param>
+    // <param name="apiIdentityName">Optional identity name. If null, uses the primary identity.</param>
+    // <returns><c>true</c> if the identity was retrieved successfully; otherwise, <c>false</c>.</returns>
+    // <remarks>
+    //     <para>This method never throws exceptions and returns <c>false</c> on any failure.</para>
+    //     <para>Use <see cref="GetIdentity(object, string?)"/> if you need exception details.</para>
+    //     <para><b>Performance Characteristics:</b></para>
+    //     <list type="bullet">
+    //         <item><description><b>Property Access:</b> Uses compiled accessors (reflection-free after initialization) for O(1) property reads</description></item>
+    //         <item><description><b>Memory Allocation:</b> Allocates O(n) memory where n = number of identity parts (typically 1-3 parts)</description></item>
+    //         <item><description><b>Type Coercion:</b> Cost depends on source/target type compatibility - primitive conversions are fastest (~10-50ns), string parsing is slower (~100-500ns)</description></item>
+    //         <item><description><b>Typical Performance:</b> Simple identities: ~50-100ns, Composite identities: ~50-200ns per part</description></item>
+    //         <item><description><b>Caching:</b> No built-in caching - results are computed on every call</description></item>
+    //     </list>
+    //     <para><b>When to Use:</b></para>
+    //     <list type="bullet">
+    //         <item><description>Use <c>TryGetIdentity</c> when failures are expected and should be handled gracefully</description></item>
+    //         <item><description>Use <c>GetIdentity</c> when failures indicate bugs and you need detailed exception information</description></item>
+    //         <item><description>Consider caching results if calling repeatedly for the same instance</description></item>
+    //     </list>
+    // </remarks>
     // public bool TryGetIdentity(object clrInstance, out ApiId apiId, string? apiIdentityName = null)
     // {
     //     apiId = default;
@@ -169,30 +169,30 @@ public sealed partial class ApiObjectType
     //     }
     // }
 
-    /// <summary>
-    ///     Attempts to get an identity from a dictionary of property values without throwing exceptions.
-    /// </summary>
-    /// <param name="values">The dictionary of property names to values.</param>
-    /// <param name="apiId">When this method returns, contains the identity if successful; otherwise, <see cref="ApiId.Empty" />.</param>
-    /// <param name="apiIdentityName">Optional identity name. If null, uses the primary identity.</param>
-    /// <returns><c>true</c> if the identity was retrieved successfully; otherwise, <c>false</c>.</returns>
-    /// <remarks>
-    ///     <para>This method never throws exceptions and returns <c>false</c> on any failure.</para>
-    ///     <para>Use <see cref="GetIdentity(IReadOnlyDictionary{string, object?}, string?)"/> if you need exception details.</para>
-    ///     <para><b>Performance Characteristics:</b></para>
-    ///     <list type="bullet">
-    ///         <item><description><b>Dictionary Lookup:</b> O(1) lookups per identity part (typically 1-3 lookups)</description></item>
-    ///         <item><description><b>Memory Allocation:</b> Allocates O(n) memory where n = number of identity parts</description></item>
-    ///         <item><description><b>Type Coercion:</b> Same as instance-based method - cost depends on type compatibility</description></item>
-    ///         <item><description><b>Typical Performance:</b> Similar to instance-based method plus dictionary lookup overhead (~10-20ns per lookup)</description></item>
-    ///     </list>
-    ///     <para><b>Use Cases:</b></para>
-    ///     <list type="bullet">
-    ///         <item><description>Building identities from deserialized data (JSON, XML, etc.)</description></item>
-    ///         <item><description>Query parameter parsing (HTTP GET requests)</description></item>
-    ///         <item><description>Batch operations where property values are pre-extracted</description></item>
-    ///     </list>
-    /// </remarks>
+    // <summary>
+    //     Attempts to get an identity from a dictionary of property values without throwing exceptions.
+    // </summary>
+    // <param name="values">The dictionary of property names to values.</param>
+    // <param name="apiId">When this method returns, contains the identity if successful; otherwise, <see cref="ApiId.Empty" />.</param>
+    // <param name="apiIdentityName">Optional identity name. If null, uses the primary identity.</param>
+    // <returns><c>true</c> if the identity was retrieved successfully; otherwise, <c>false</c>.</returns>
+    // <remarks>
+    //     <para>This method never throws exceptions and returns <c>false</c> on any failure.</para>
+    //     <para>Use <see cref="GetIdentity(IReadOnlyDictionary{string, object?}, string?)"/> if you need exception details.</para>
+    //     <para><b>Performance Characteristics:</b></para>
+    //     <list type="bullet">
+    //         <item><description><b>Dictionary Lookup:</b> O(1) lookups per identity part (typically 1-3 lookups)</description></item>
+    //         <item><description><b>Memory Allocation:</b> Allocates O(n) memory where n = number of identity parts</description></item>
+    //         <item><description><b>Type Coercion:</b> Same as instance-based method - cost depends on type compatibility</description></item>
+    //         <item><description><b>Typical Performance:</b> Similar to instance-based method plus dictionary lookup overhead (~10-20ns per lookup)</description></item>
+    //     </list>
+    //     <para><b>Use Cases:</b></para>
+    //     <list type="bullet">
+    //         <item><description>Building identities from deserialized data (JSON, XML, etc.)</description></item>
+    //         <item><description>Query parameter parsing (HTTP GET requests)</description></item>
+    //         <item><description>Batch operations where property values are pre-extracted</description></item>
+    //     </list>
+    // </remarks>
     // public bool TryGetIdentity(IReadOnlyDictionary<string, object?> values, out ApiId apiId, string? apiIdentityName = null)
     // {
     //     apiId = default;
@@ -248,23 +248,23 @@ public sealed partial class ApiObjectType
     //     }
     // }
 
-    /// <summary>
-    ///     Attempts to get a dictionary mapping instances to their identities without throwing exceptions.
-    /// </summary>
-    /// <param name="clrInstances">The collection of CLR instances to get identities for.</param>
-    /// <param name="apiIdentityMap">When this method returns, contains the dictionary mapping instances to identities if successful; otherwise, an empty dictionary.</param>
-    /// <param name="apiIdentityName">Optional identity name. If null, uses the primary identity.</param>
-    /// <returns><c>true</c> if all identities were built successfully; otherwise, <c>false</c>.</returns>
-    /// <remarks>
-    ///     <para>This method never throws exceptions and returns <c>false</c> on any failure.</para>
-    ///     <para>The <paramref name="apiIdentityMap" /> will contain partial results up to the first failure.</para>
-    ///     <para><b>Performance Characteristics:</b></para>
-    ///     <list type="bullet">
-    ///         <item><description><b>Dictionary Overhead:</b> Additional O(n) memory for reference mapping</description></item>
-    ///         <item><description><b>Lookup Performance:</b> O(1) identity lookup by instance reference</description></item>
-    ///         <item><description><b>Fail-Fast:</b> Stops on first failure for consistency</description></item>
-    ///     </list>
-    /// </remarks>
+    // <summary>
+    //     Attempts to get a dictionary mapping instances to their identities without throwing exceptions.
+    // </summary>
+    // <param name="clrInstances">The collection of CLR instances to get identities for.</param>
+    // <param name="apiIdentityMap">When this method returns, contains the dictionary mapping instances to identities if successful; otherwise, an empty dictionary.</param>
+    // <param name="apiIdentityName">Optional identity name. If null, uses the primary identity.</param>
+    // <returns><c>true</c> if all identities were built successfully; otherwise, <c>false</c>.</returns>
+    // <remarks>
+    //     <para>This method never throws exceptions and returns <c>false</c> on any failure.</para>
+    //     <para>The <paramref name="apiIdentityMap" /> will contain partial results up to the first failure.</para>
+    //     <para><b>Performance Characteristics:</b></para>
+    //     <list type="bullet">
+    //         <item><description><b>Dictionary Overhead:</b> Additional O(n) memory for reference mapping</description></item>
+    //         <item><description><b>Lookup Performance:</b> O(1) identity lookup by instance reference</description></item>
+    //         <item><description><b>Fail-Fast:</b> Stops on first failure for consistency</description></item>
+    //     </list>
+    // </remarks>
     // public bool TryGetIdentityMap(IEnumerable<object?> clrInstances, out IReadOnlyDictionary<object, ApiId> apiIdentityMap, string? apiIdentityName = null)
     // {
     //     apiIdentityMap = new Dictionary<object, ApiId>();
@@ -316,28 +316,28 @@ public sealed partial class ApiObjectType
     //     return true;
     // }
 
-    /// <summary>
-    ///     Attempts to get identities for a collection of instances without throwing exceptions.
-    /// </summary>
-    /// <param name="clrInstances">The collection of CLR instances to get identities for.</param>
-    /// <param name="apiIdentityName">Optional identity name. If null, uses the primary identity.</param>
-    /// <returns>A read-only list of <see cref="ApiIdentityBuildResult"/> containing the result for each instance.</returns>
-    /// <remarks>
-    ///     <para>This method never throws exceptions. Failed identity builds are indicated in the result tuple.</para>
-    ///     <para>Null instances are skipped and not included in the results.</para>
-    ///     <para><b>Performance Characteristics:</b></para>
-    ///     <list type="bullet">
-    ///         <item><description><b>Identity Resolution:</b> Resolved once for all instances (O(1) vs O(n))</description></item>
-    ///         <item><description><b>Fault Tolerance:</b> Continues processing all instances even if some fail</description></item>
-    ///         <item><description><b>Result Pairing:</b> Returns instance-identity pairs with success flag for correlation</description></item>
-    ///     </list>
-    ///     <para><b>Use Cases:</b></para>
-    ///     <list type="bullet">
-    ///         <item><description>Validation - identify which instances have invalid identities</description></item>
-    ///         <item><description>Partial processing - continue with valid identities, log failures</description></item>
-    ///         <item><description>Data import - process as much as possible despite errors</description></item>
-    ///     </list>
-    /// </remarks>
+    // <summary>
+    //     Attempts to get identities for a collection of instances without throwing exceptions.
+    // </summary>
+    // <param name="clrInstances">The collection of CLR instances to get identities for.</param>
+    // <param name="apiIdentityName">Optional identity name. If null, uses the primary identity.</param>
+    // <returns>A read-only list of <see cref="ApiIdentityBuildResult"/> containing the result for each instance.</returns>
+    // <remarks>
+    //     <para>This method never throws exceptions. Failed identity builds are indicated in the result tuple.</para>
+    //     <para>Null instances are skipped and not included in the results.</para>
+    //     <para><b>Performance Characteristics:</b></para>
+    //     <list type="bullet">
+    //         <item><description><b>Identity Resolution:</b> Resolved once for all instances (O(1) vs O(n))</description></item>
+    //         <item><description><b>Fault Tolerance:</b> Continues processing all instances even if some fail</description></item>
+    //         <item><description><b>Result Pairing:</b> Returns instance-identity pairs with success flag for correlation</description></item>
+    //     </list>
+    //     <para><b>Use Cases:</b></para>
+    //     <list type="bullet">
+    //         <item><description>Validation - identify which instances have invalid identities</description></item>
+    //         <item><description>Partial processing - continue with valid identities, log failures</description></item>
+    //         <item><description>Data import - process as much as possible despite errors</description></item>
+    //     </list>
+    // </remarks>
     // public IReadOnlyList<ApiIdentityBuildResult> TryGetIdentities(IEnumerable<object?> clrInstances, string? apiIdentityName = null)
     // {
     //     if (clrInstances is null)
@@ -393,28 +393,28 @@ public sealed partial class ApiObjectType
     //     return results;
     // }
 
-    /// <summary>
-    ///     Attempts to build an <see cref="ApiIdentitySnapshot"/> from a CLR instance without throwing exceptions.
-    /// </summary>
-    /// <param name="clrInstance">The CLR instance to build the identity snapshot from.</param>
-    /// <param name="snapshot">When this method returns, contains the identity snapshot if successful; otherwise, <c>default</c>.</param>
-    /// <param name="apiIdentityName">Optional identity name. If null, uses the primary identity.</param>
-    /// <returns><c>true</c> if the identity snapshot was built successfully; otherwise, <c>false</c>.</returns>
-    /// <remarks>
-    ///     <para>This method never throws exceptions and returns <c>false</c> on any failure.</para>
-    ///     <para>
-    ///         <see cref="ApiIdentitySnapshot"/> preserves the full nested identity structure, enabling path-based navigation
-    ///         and diagnostics before flattening to <see cref="ApiId"/>.
-    ///         Use <see cref="TryGetIdentity(object, out ApiId, string?)"/> when the full structure is not needed.
-    ///     </para>
-    ///     <para><b>Nested Identity:</b></para>
-    ///     <para>
-    ///         When a source references a nested <see cref="ApiObjectType"/>, this method recursively resolves
-    ///         the nested object's identity, producing a composite snapshot with named parts.
-    ///         Null nested objects produce an unresolved part (structure metadata preserved) according to the
-    ///         configured <see cref="ApiIdentityNullHandling"/> policy.
-    ///     </para>
-    /// </remarks>
+    // <summary>
+    //     Attempts to build an <see cref="ApiIdentitySnapshot"/> from a CLR instance without throwing exceptions.
+    // </summary>
+    // <param name="clrInstance">The CLR instance to build the identity snapshot from.</param>
+    // <param name="snapshot">When this method returns, contains the identity snapshot if successful; otherwise, <c>default</c>.</param>
+    // <param name="apiIdentityName">Optional identity name. If null, uses the primary identity.</param>
+    // <returns><c>true</c> if the identity snapshot was built successfully; otherwise, <c>false</c>.</returns>
+    // <remarks>
+    //     <para>This method never throws exceptions and returns <c>false</c> on any failure.</para>
+    //     <para>
+    //         <see cref="ApiIdentitySnapshot"/> preserves the full nested identity structure, enabling path-based navigation
+    //         and diagnostics before flattening to <see cref="ApiId"/>.
+    //         Use <see cref="TryGetIdentity(object, out ApiId, string?)"/> when the full structure is not needed.
+    //     </para>
+    //     <para><b>Nested Identity:</b></para>
+    //     <para>
+    //         When a source references a nested <see cref="ApiObjectType"/>, this method recursively resolves
+    //         the nested object's identity, producing a composite snapshot with named parts.
+    //         Null nested objects produce an unresolved part (structure metadata preserved) according to the
+    //         configured <see cref="ApiIdentityNullHandling"/> policy.
+    //     </para>
+    // </remarks>
     // public bool TryGetIdentitySnapshot(object clrInstance, out ApiIdentitySnapshot? snapshot, string? apiIdentityName = null)
     // {
     //     snapshot = default;
@@ -454,37 +454,37 @@ public sealed partial class ApiObjectType
     //     }
     // }
 
-    /// <summary>
-    ///     Attempts to build an <see cref="ApiIdentitySnapshot"/> from a dictionary of property values without throwing exceptions.
-    /// </summary>
-    /// <param name="values">
-    ///     The dictionary of property names to values.
-    ///     For nested identity sources, the value must be an <see cref="IReadOnlyDictionary{String, Object}"/>
-    ///     containing the nested object's property values, or <c>null</c> to represent an unresolved nested object.
-    /// </param>
-    /// <param name="snapshot">When this method returns, contains the identity snapshot if successful; otherwise, <c>default</c>.</param>
-    /// <param name="apiIdentityName">Optional identity name. If null, uses the primary identity.</param>
-    /// <returns><c>true</c> if the identity snapshot was built successfully; otherwise, <c>false</c>.</returns>
-    /// <remarks>
-    ///     <para>This method never throws exceptions and returns <c>false</c> on any failure.</para>
-    ///     <para>
-    ///         <see cref="ApiIdentitySnapshot"/> preserves the full nested identity structure, enabling path-based navigation
-    ///         and diagnostics before flattening to <see cref="ApiId"/>.
-    ///         Use <see cref="TryGetIdentity(IReadOnlyDictionary{string, object?}, out ApiId, string?)"/> when the full structure is not needed.
-    ///     </para>
-    ///     <para><b>Values Dictionary Format:</b></para>
-    ///     <para>
-    ///         Scalar sources expect a primitive-compatible value keyed by the property's API name.
-    ///         Nested sources expect a nested <see cref="IReadOnlyDictionary{String, Object}"/> (or <c>null</c> for unresolved)
-    ///         keyed by the property's API name.
-    ///     </para>
-    ///     <para><b>Use Cases:</b></para>
-    ///     <list type="bullet">
-    ///         <item><description>Building identities from deserialized data (JSON, XML, query parameters)</description></item>
-    ///         <item><description>Batch operations where property values are pre-extracted</description></item>
-    ///         <item><description>Integration with external systems that provide structured identity data</description></item>
-    ///     </list>
-    /// </remarks>
+    // <summary>
+    //     Attempts to build an <see cref="ApiIdentitySnapshot"/> from a dictionary of property values without throwing exceptions.
+    // </summary>
+    // <param name="values">
+    //     The dictionary of property names to values.
+    //     For nested identity sources, the value must be an <see cref="IReadOnlyDictionary{String, Object}"/>
+    //     containing the nested object's property values, or <c>null</c> to represent an unresolved nested object.
+    // </param>
+    // <param name="snapshot">When this method returns, contains the identity snapshot if successful; otherwise, <c>default</c>.</param>
+    // <param name="apiIdentityName">Optional identity name. If null, uses the primary identity.</param>
+    // <returns><c>true</c> if the identity snapshot was built successfully; otherwise, <c>false</c>.</returns>
+    // <remarks>
+    //     <para>This method never throws exceptions and returns <c>false</c> on any failure.</para>
+    //     <para>
+    //         <see cref="ApiIdentitySnapshot"/> preserves the full nested identity structure, enabling path-based navigation
+    //         and diagnostics before flattening to <see cref="ApiId"/>.
+    //         Use <see cref="TryGetIdentity(IReadOnlyDictionary{string, object?}, out ApiId, string?)"/> when the full structure is not needed.
+    //     </para>
+    //     <para><b>Values Dictionary Format:</b></para>
+    //     <para>
+    //         Scalar sources expect a primitive-compatible value keyed by the property's API name.
+    //         Nested sources expect a nested <see cref="IReadOnlyDictionary{String, Object}"/> (or <c>null</c> for unresolved)
+    //         keyed by the property's API name.
+    //     </para>
+    //     <para><b>Use Cases:</b></para>
+    //     <list type="bullet">
+    //         <item><description>Building identities from deserialized data (JSON, XML, query parameters)</description></item>
+    //         <item><description>Batch operations where property values are pre-extracted</description></item>
+    //         <item><description>Integration with external systems that provide structured identity data</description></item>
+    //     </list>
+    // </remarks>
     // public bool TryGetIdentitySnapshot(IReadOnlyDictionary<string, object?> values, out ApiIdentitySnapshot? snapshot, string? apiIdentityName = null)
     // {
     //     snapshot = default;
@@ -824,12 +824,12 @@ public sealed partial class ApiObjectType
     //     return ApiIdentitySnapshot.Composite(parentPath, parts);
     // }
 
-    /// <summary>
-    ///     Builds a structural skeleton of <see cref="ApiIdentityPart"/> entries for the given identity.
-    ///     This structure captures the expected shape of a resolved snapshot and is attached to unresolved
-    ///     nested parts so that <see cref="ApiIdentitySnapshot.ToApiId"/> can emit the correct number of
-    ///     empty slots under <see cref="ApiUnresolvedIdentityPartBehavior.UseEmpty"/>.
-    /// </summary>
+    // <summary>
+    //     Builds a structural skeleton of <see cref="ApiIdentityPart"/> entries for the given identity.
+    //     This structure captures the expected shape of a resolved snapshot and is attached to unresolved
+    //     nested parts so that <see cref="ApiIdentitySnapshot.ToApiId"/> can emit the correct number of
+    //     empty slots under <see cref="ApiUnresolvedIdentityPartBehavior.UseEmpty"/>.
+    // </summary>
     // private static ApiIdentityPart[]? BuildIdentityStructure(ApiIdentity apiIdentity)
     // {
     //     var sources = apiIdentity.ApiIdentitySources;

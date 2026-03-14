@@ -131,6 +131,7 @@ public class ApiEnumValueJsonConverter(ILogger<ApiEnumValueJsonConverter>? logge
     #endregion
 
     #region JsonConverterBase<T> Methods
+    /// <inheritdoc/>
     protected override IReadContext CreateReadContext(ILogger logger, JsonSerializerOptions options)
         => CreateDefaultReadContext<PropertyNames, ReadData, ReadHandlers>
             (
@@ -140,6 +141,7 @@ public class ApiEnumValueJsonConverter(ILogger<ApiEnumValueJsonConverter>? logge
                 buildReadHandlers: names => new ReadHandlers(names)
             );
 
+    /// <inheritdoc/>
     protected override IWriteContext CreateWriteContext(ILogger logger, JsonSerializerOptions options)
         => CreateDefaultWriteContext
             (
@@ -148,6 +150,7 @@ public class ApiEnumValueJsonConverter(ILogger<ApiEnumValueJsonConverter>? logge
                 buildPropertyNames: PropertyNames.Create
             );
 
+    /// <inheritdoc/>
     protected override ApiEnumValue? CreateValue(IReadContext context)
     {
         var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
@@ -165,6 +168,7 @@ public class ApiEnumValueJsonConverter(ILogger<ApiEnumValueJsonConverter>? logge
         return apiEnumValue;
     }
 
+    /// <inheritdoc/>
     protected override void ReadCore(ref Utf8JsonReader reader, IReadContext context)
     {
         var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
@@ -173,6 +177,7 @@ public class ApiEnumValueJsonConverter(ILogger<ApiEnumValueJsonConverter>? logge
         ReadJsonObject(ref reader, readContext, handlers);
     }
 
+    /// <inheritdoc/>
     protected override void WriteCore(Utf8JsonWriter writer, ApiEnumValue value, IWriteContext context)
     {
         var writeContext = (DefaultWriteContext<PropertyNames>)context;

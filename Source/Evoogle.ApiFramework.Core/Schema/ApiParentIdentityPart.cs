@@ -8,6 +8,10 @@ using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema;
 
+/// <summary>
+///     Represents an identity part that sources its value from the identity of a parent object in a parent-child relationship.
+/// </summary>
+/// <param name="apiIdentityName">The optional explicit name of the identity to use on the parent object type. When <see langword="null"/>, the primary identity of the parent type is used.</param>
 public class ApiParentIdentityPart(string? apiIdentityName = null) : ApiIdentityPart
 {
     #region ApiSchemaElement Properties
@@ -21,6 +25,10 @@ public class ApiParentIdentityPart(string? apiIdentityName = null) : ApiIdentity
     #endregion
 
     #region ApiParentIdentityPart Properties
+    /// <summary>
+    ///     Gets the optional explicit identity name used to select a specific identity on the parent object type.
+    ///     When <see langword="null"/>, the primary identity of the parent type is used.
+    /// </summary>
     public string? ApiIdentityName { get; } = apiIdentityName;
     #endregion
 

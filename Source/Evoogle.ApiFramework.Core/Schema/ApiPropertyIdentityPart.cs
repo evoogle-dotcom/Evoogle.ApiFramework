@@ -8,15 +8,22 @@ using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema;
 
+/// <summary>
+///     Abstract base class for identity parts that derive their value from a named <see cref="ApiProperty"/> on the declaring object type.
+/// </summary>
+/// <param name="apiPropertyName">The API property name used to locate the backing <see cref="ApiProperty"/> during initialization.</param>
 public abstract class ApiPropertyIdentityPart(string apiPropertyName) : ApiIdentityPart
 {
     #region ApiPropertyIdentityPart Fields
+    /// <summary>The resolved <see cref="ApiProperty"/> backing this identity part. Set during initialization; <see langword="null"/> before or if resolution fails.</summary>
     protected ApiProperty? _apiResolvedProperty = null;
     #endregion
 
     #region ApiPropertyIdentityPart Properties
+    /// <summary>Gets the API property name used to locate the backing property on the declaring object type.</summary>
     public string ApiPropertyName { get; } = apiPropertyName;
 
+    /// <summary>Gets the resolved <see cref="ApiProperty"/> that backs this identity part. Available after initialization.</summary>
     public ApiProperty ApiProperty => this.ThrowIfNotInitialized(_apiResolvedProperty);
     #endregion
 

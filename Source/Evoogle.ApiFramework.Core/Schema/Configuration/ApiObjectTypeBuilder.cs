@@ -77,12 +77,21 @@ public sealed class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext c
         return this;
     }
 
+    /// <summary>
+    ///     Resets the object type options to their schema-wide defaults.
+    /// </summary>
+    /// <returns>The current builder instance.</returns>
     public ApiObjectTypeBuilder WithDefaultOptions()
     {
         _apiOptionsConfiguration = null;
         return this;
     }
 
+    /// <summary>
+    ///     Configures type-specific options for this object type.
+    /// </summary>
+    /// <param name="configure">Callback to configure the <see cref="ApiObjectTypeOptionsBuilder"/>.</param>
+    /// <returns>The current builder instance.</returns>
     public ApiObjectTypeBuilder WithOptions(Action<ApiObjectTypeOptionsBuilder> configure)
     {
         _apiOptionsConfiguration = configure;

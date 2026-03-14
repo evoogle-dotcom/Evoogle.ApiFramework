@@ -1,0 +1,19 @@
+﻿<Project>
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <WarningsAsErrors>$(WarningsAsErrors);CS1591</WarningsAsErrors>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest</AnalysisLevel>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="
+      '$(IsTestProject)' == 'true'
+      Or $([System.String]::Copy('$(MSBuildProjectName)').EndsWith('.Tests'))
+      Or $([System.String]::Copy('$(MSBuildProjectName)').EndsWith('.UnitTests'))
+      Or $([System.String]::Copy('$(MSBuildProjectName)').EndsWith('.IntegrationTests'))">
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+</Project>

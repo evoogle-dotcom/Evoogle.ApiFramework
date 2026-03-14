@@ -31,7 +31,7 @@ namespace Evoogle.ApiFramework.Identity;
 ///         <see cref="ApiId"/> serves as the performance layer in the identity system:
 ///         <list type="bullet">
 ///             <item><strong>Schema Layer:</strong> <see cref="Schema.ApiIdentity"/> defines what constitutes an identity (build-time).</item>
-///             <item><strong>Semantic Layer:</strong> <see cref="ApiIdentitySnapshot"/> preserves object graph structure for navigation and diagnostics.</item>
+///             <item><strong>Semantic Layer:</strong> <c>ApiIdentitySnapshot</c> preserves object graph structure for navigation and diagnostics.</item>
 ///             <item><strong>Runtime Layer:</strong> <see cref="ApiId"/> provides flat, efficient identity values for operations.</item>
 ///         </list>
 ///     </para>
@@ -57,8 +57,8 @@ namespace Evoogle.ApiFramework.Identity;
 ///     </para>
 ///     <para>
 ///         <strong>Relationship with ApiIdentitySnapshot:</strong>
-///         <see cref="ApiIdentitySnapshot"/> extracts structured identity snapshots from objects and can flatten them to <see cref="ApiId"/>
-///         via <see cref="ApiIdentitySnapshot.ToApiId(bool)"/>. The client controls whether parts are named (semantic, readable) or
+///         <c>ApiIdentitySnapshot</c> extracts structured identity snapshots from objects and can flatten them to <see cref="ApiId"/>
+///         via <c>ApiIdentitySnapshot.ToApiId</c>. The client controls whether parts are named (semantic, readable) or
 ///         unnamed (compact, performance-oriented):
 ///         <code>
 ///         // Semantic layer: preserves structure
@@ -156,7 +156,7 @@ public readonly struct ApiId
     ///     Frozen set of CLR types supported as scalar identity values.
     /// </summary>
     /// <remarks>
-    ///     Used by <see cref="IsScalarType(Type)"/> to validate type compatibility before creating <see cref="ApiId"/> instances.
+    ///     Used by <c>IsScalarType</c> to validate type compatibility before creating <see cref="ApiId"/> instances.
     ///     Supports: <see cref="string"/>, <see cref="int"/>, <see cref="long"/>, <see cref="Guid"/>,
     ///     <see cref="Ulid"/>, and <see cref="CultureInfo"/>.
     /// </remarks>
@@ -803,18 +803,28 @@ public readonly struct ApiId
     public readonly bool TryGet([NotNullWhen(true)] out string? value) { value = this.Kind == ApiIdKind.String ? (string?)_ref : null; return this.Kind == ApiIdKind.String; }
 
     /// <summary>Attempts to get the Int32 value if kind is <see cref="ApiIdKind.Int32"/>.</summary>
+    /// <param name="value">The output Int32 value, or the default of <see langword="int"/> if the kind is not <see cref="ApiIdKind.Int32"/>.</param>
+    /// <returns><see langword="true"/> if the kind is <see cref="ApiIdKind.Int32"/>; otherwise <see langword="false"/>.</returns>
     public readonly bool TryGet(out int value) { value = _val.Int32; return this.Kind == ApiIdKind.Int32; }
 
     /// <summary>Attempts to get the Int64 value if kind is <see cref="ApiIdKind.Int64"/>.</summary>
+    /// <param name="value">The output Int64 value, or the default of <see langword="long"/> if the kind is not <see cref="ApiIdKind.Int64"/>.</param>
+    /// <returns><see langword="true"/> if the kind is <see cref="ApiIdKind.Int64"/>; otherwise <see langword="false"/>.</returns>
     public readonly bool TryGet(out long value) { value = _val.Int64; return this.Kind == ApiIdKind.Int64; }
 
     /// <summary>Attempts to get the Guid value if kind is <see cref="ApiIdKind.Guid"/>.</summary>
+    /// <param name="value">The output <see cref="Guid"/> value, or <see cref="Guid.Empty"/> if the kind is not <see cref="ApiIdKind.Guid"/>.</param>
+    /// <returns><see langword="true"/> if the kind is <see cref="ApiIdKind.Guid"/>; otherwise <see langword="false"/>.</returns>
     public readonly bool TryGet(out Guid value) { value = _val.Guid; return this.Kind == ApiIdKind.Guid; }
 
     /// <summary>Attempts to get the Ulid value if kind is <see cref="ApiIdKind.Ulid"/>.</summary>
+    /// <param name="value">The output <see cref="Ulid"/> value, or <see cref="Ulid.Empty"/> if the kind is not <see cref="ApiIdKind.Ulid"/>.</param>
+    /// <returns><see langword="true"/> if the kind is <see cref="ApiIdKind.Ulid"/>; otherwise <see langword="false"/>.</returns>
     public readonly bool TryGet(out Ulid value) { value = _val.Ulid; return this.Kind == ApiIdKind.Ulid; }
 
     /// <summary>Attempts to get the culture value if kind is <see cref="ApiIdKind.Culture"/>.</summary>
+    /// <param name="value">The output <see cref="CultureInfo"/> value, or <see langword="null"/> if the kind is not <see cref="ApiIdKind.Culture"/>.</param>
+    /// <returns><see langword="true"/> if the kind is <see cref="ApiIdKind.Culture"/>; otherwise <see langword="false"/>.</returns>
     public readonly bool TryGet([NotNullWhen(true)] out CultureInfo? value) { value = this.Kind == ApiIdKind.Culture ? (CultureInfo?)_ref : null; return this.Kind == ApiIdKind.Culture; }
 
     /// <summary>
@@ -1049,12 +1059,12 @@ public readonly struct ApiId
     }
 
     /// <summary>
-    ///     Attempts to parse <paramref name="text"/> into an identifier of the specified <paramref name="kind"/>.
+    ///     Attempts to parse <paramref name="text"/> into an <see cref="ApiId"/>.
     /// </summary>
-    /// <param name="kind">The expected kind.</param>
-    /// <param name="text">The textual representation.</param>
-    /// <param name="id">Outputs the parsed identifier on success; otherwise empty.</param>
-    /// <returns>True if parsing succeeded.</returns>
+    /// <param name="text">The string to parse.</param>
+    /// <param name="provider">Format provider (currently unused; parsing is culture-invariant).</param>
+    /// <param name="result">Outputs the parsed identifier on success; otherwise <see cref="ApiId.Empty"/>.</param>
+    /// <returns><see langword="true"/> if parsing succeeded; otherwise <see langword="false"/>.</returns>
     public static bool TryParse([NotNullWhen(true)] string? text, IFormatProvider? provider, [MaybeNullWhen(false)] out ApiId result)
     {
         if (string.IsNullOrWhiteSpace(text))
@@ -1068,12 +1078,12 @@ public readonly struct ApiId
     }
 
     /// <summary>
-    ///     Attempts to parse <paramref name="text"/> into an identifier of the specified <paramref name="kind"/>.
+    ///     Attempts to parse <paramref name="text"/> into an <see cref="ApiId"/>.
     /// </summary>
-    /// <param name="kind">The expected kind.</param>
-    /// <param name="text">The textual representation.</param>
-    /// <param name="id">Outputs the parsed identifier on success; otherwise empty.</param>
-    /// <returns>True if parsing succeeded.</returns>
+    /// <param name="text">The span to parse.</param>
+    /// <param name="provider">Format provider (currently unused; parsing is culture-invariant).</param>
+    /// <param name="result">Outputs the parsed identifier on success; otherwise <see cref="ApiId.Empty"/>.</param>
+    /// <returns><see langword="true"/> if parsing succeeded; otherwise <see langword="false"/>.</returns>
     public static bool TryParse(ReadOnlySpan<char> text, IFormatProvider? provider, [MaybeNullWhen(false)] out ApiId result)
     {
         if (text.IsEmpty)

@@ -8,6 +8,11 @@ using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema;
 
+/// <summary>
+///     Represents an identity part that sources its value from the <see cref="ApiIdentity"/> of a nested object property.
+/// </summary>
+/// <param name="apiPropertyName">The API property name of the nested object whose identity is used.</param>
+/// <param name="apiIdentityName">The optional explicit name of the identity to use on the nested object type. When <see langword="null"/>, the primary identity is used.</param>
 public class ApiNestedIdentityPart(string apiPropertyName, string? apiIdentityName = null) : ApiPropertyIdentityPart(apiPropertyName)
 {
     #region ApiNestedIdentityPart Fields
@@ -25,8 +30,13 @@ public class ApiNestedIdentityPart(string apiPropertyName, string? apiIdentityNa
     #endregion
 
     #region ApiNestedIdentityPart Properties
+    /// <summary>Gets the resolved <see cref="ApiIdentity"/> from the nested object type. Available after initialization.</summary>
     public ApiIdentity ApiIdentity => this.ThrowIfNotInitialized(_apiResolvedIdentity);
 
+    /// <summary>
+    ///     Gets the optional explicit identity name used to select a specific identity on the nested object type.
+    ///     When <see langword="null"/>, the primary identity of the nested type is used.
+    /// </summary>
     public string? ApiIdentityName { get; } = apiIdentityName;
     #endregion
 

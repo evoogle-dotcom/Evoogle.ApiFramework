@@ -9,6 +9,11 @@ using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema;
 
+/// <summary>
+///     Represents an identity part that sources its value directly from a scalar property on the declaring object type.
+/// </summary>
+/// <param name="apiPropertyName">The API property name of the scalar property whose value becomes the identity component.</param>
+/// <param name="clrScalarTypeHint">An optional CLR type hint that overrides the default scalar type resolved from the property. When <see langword="null"/>, the type is inferred from the property's <see cref="ApiScalarType"/>.</param>
 public class ApiScalarIdentityPart(string apiPropertyName, Type? clrScalarTypeHint = null) : ApiPropertyIdentityPart(apiPropertyName)
 {
     #region ApiScalarIdentityPart Fields
@@ -26,8 +31,13 @@ public class ApiScalarIdentityPart(string apiPropertyName, Type? clrScalarTypeHi
     #endregion
 
     #region ApiScalarIdentityPart Properties
+    /// <summary>
+    ///     Gets the optional CLR type hint provided at construction time that overrides automatic scalar type resolution.
+    ///     When <see langword="null"/>, the scalar type is inferred from the backing property's <see cref="ApiScalarType"/>.
+    /// </summary>
     public Type? ClrScalarTypeHint { get; } = clrScalarTypeHint;
 
+    /// <summary>Gets the resolved CLR scalar type used when extracting this identity part's value. Available after initialization.</summary>
     public Type ClrScalarType => this.ThrowIfNotInitialized(_clrResolvedScalarType);
     #endregion
 

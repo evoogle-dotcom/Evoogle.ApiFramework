@@ -117,7 +117,7 @@ public sealed class ApiIdCompositeBuilder
     /// <returns>
     ///     A composite <see cref="ApiId"/> containing all added parts, or <see cref="ApiId.Empty"/> if no parts were added.
     /// </returns>
-    /// <exception cref="ApiIdentityException">
+    /// <exception cref="Evoogle.ApiFramework.Exceptions.ApiIdentityException">
     ///     Thrown if validation fails, such as:
     ///     <list type="bullet">
     ///         <item>Mixing named and unnamed parts in the same composite.</item>

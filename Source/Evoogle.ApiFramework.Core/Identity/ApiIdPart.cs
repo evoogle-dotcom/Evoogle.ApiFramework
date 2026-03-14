@@ -25,8 +25,8 @@ namespace Evoogle.ApiFramework.Identity;
 ///         </list>
 ///     </para>
 /// </remarks>
-/// <param name="name">The optional name for this part. Non-null/non-whitespace for named composites, null for ordered composites.</param>
-/// <param name="value">The <see cref="ApiId"/> value for this part. Must be a scalar (non-composite) identifier.</param>
+/// <param name="Name">The optional name for this part. Non-null/non-whitespace for named composites, null for ordered composites.</param>
+/// <param name="Value">The <see cref="ApiId"/> value for this part. Must be a scalar (non-composite) identifier.</param>
 public readonly record struct ApiIdPart(string? Name, ApiId Value)
 {
     #region Properties

@@ -9,6 +9,10 @@ using Evoogle.ApiFramework.Schema.Json;
 
 namespace Evoogle.ApiFramework.Schema;
 
+/// <summary>
+///     Holds schema-wide configuration options that control identity resolution and serialization behaviour
+///     for all types within an <see cref="ApiSchema"/>.
+/// </summary>
 [JsonConverter(typeof(ApiSchemaOptionsJsonConverter))]
 public record class ApiSchemaOptions
 {
@@ -17,8 +21,13 @@ public record class ApiSchemaOptions
     #endregion
 
     #region Properties
+    /// <summary>Gets the default <see cref="ApiSchemaOptions"/> instance with all settings at their out-of-the-box defaults.</summary>
     public static ApiSchemaOptions Default => _default;
 
+    /// <summary>
+    ///     Gets the null-handling strategy applied when resolving identities across the entire schema.
+    ///     Defaults to <see cref="ApiIdentityNullHandling.ReturnEmpty"/>.
+    /// </summary>
     public ApiIdentityNullHandling ApiIdentityNullHandling { get; init; } = ApiIdentityNullHandling.ReturnEmpty;
     #endregion
 }
