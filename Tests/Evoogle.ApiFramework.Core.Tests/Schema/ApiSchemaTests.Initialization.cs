@@ -61,11 +61,110 @@ public partial class ApiSchemaTests
         public int Id { get; set; }
         public int Code { get; set; }
     }
+
+    public class TypeWithListProperty
+    {
+        public List<string>? Items { get; set; }
+    }
     #endregion
 
     #region Theory Data
     public static TheoryDataRow<IXUnitTest>[] InitializeThrowsTheoryData =>
     [
+        //
+        // ApiCollectionType Initialization Tests
+        //
+
+        // ApiCollectionType throws if item type expression is null
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiCollectionType)} Throws If {nameof(ApiCollectionType.ApiItemType)} Is Null",
+            Part = @"
+            {
+                ""ApiName"": ""ApiCollectionType Throws If ApiItemType Is Null"",
+                ""ApiScalarTypes"": [],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""TestObject"",
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""Items"",
+                                ""ApiType"": {
+                                    ""ApiInlineType"": {
+                                        ""ApiKind"": ""Collection"",
+                                        ""ClrType"": ""System.Collections.Generic.List`1[[System.String, System.Private.CoreLib]], System.Private.CoreLib""
+                                    }
+                                },
+                                ""ClrName"": ""Items""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+TypeWithListProperty, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiObjectType)}[\"TestObject\"].{nameof(ApiProperty)}[\"Items\"].{nameof(ApiCollectionType)}",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_COLLECTION_TYPE_NULL_ITEM_TYPE,
+                    description: $"{nameof(ApiCollectionType.ApiItemType)} must not be null",
+                    remediation: $"Specify a valid {nameof(ApiCollectionType.ApiItemType)}"
+                ),
+            ]
+        },
+
+        // ApiCollectionType throws if item type expression cannot be resolved
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiCollectionType)} Throws If {nameof(ApiCollectionType.ApiItemType)} Is Unresolved",
+            Part = @"
+            {
+                ""ApiName"": ""ApiCollectionType Throws If ApiItemType Is Unresolved"",
+                ""ApiScalarTypes"": [],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""TestObject"",
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""Items"",
+                                ""ApiType"": {
+                                    ""ApiInlineType"": {
+                                        ""ApiKind"": ""Collection"",
+                                        ""ApiItemType"": {
+                                            ""ApiKind"": ""Scalar"",
+                                            ""ApiName"": ""String""
+                                        },
+                                        ""ClrType"": ""System.Collections.Generic.List`1[[System.String, System.Private.CoreLib]], System.Private.CoreLib""
+                                    }
+                                },
+                                ""ClrName"": ""Items""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+TypeWithListProperty, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiObjectType)}[\"TestObject\"].{nameof(ApiProperty)}[\"Items\"].{nameof(ApiCollectionType)}",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_COLLECTION_TYPE_UNRESOLVED_ITEM_TYPE,
+                    description: $"{nameof(ApiCollectionType.ApiItemType)} could not be resolved for {nameof(ApiTypeExpression.ApiKind)}='{ApiTypeKind.Scalar}' and {nameof(ApiTypeExpression.ApiName)}='String'",
+                    remediation: $"Verify that a type is declared in the schema for {nameof(ApiTypeExpression.ApiKind)}='{ApiTypeKind.Scalar}' and {nameof(ApiTypeExpression.ApiName)}='String'"
+                ),
+            ]
+        },
+
         //
         // ApiEnumType Initialization Tests
         //
