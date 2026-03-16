@@ -77,9 +77,9 @@ public enum ApiInitializationCode
     API_IDENTITY_INVALID_API_NAME,
 
     /// <summary>
-    ///    More than one parent identity part is defined, which is not allowed.
+    ///    More than one owner identity part is defined, which is not allowed.
     /// </summary>
-    API_IDENTITY_MULTIPLE_PARENT_PARTS,
+    API_IDENTITY_MULTIPLE_OWNER_PARTS,
 
     /// <summary>
     ///     Multiple identity parts reference the same property API name.

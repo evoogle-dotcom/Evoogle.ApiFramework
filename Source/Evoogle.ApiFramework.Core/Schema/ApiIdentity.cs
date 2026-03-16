@@ -111,13 +111,13 @@ public sealed class ApiIdentity(string apiName, IEnumerable<ApiIdentityPart> api
         );
 
         // At most one parent part allowed
-        var parentPartCount = this.ApiIdentityParts.Count(x => x is ApiOwnerIdentityPart);
-        if (parentPartCount > 1)
+        var ownerPartCount = this.ApiIdentityParts.Count(x => x is ApiOwnerIdentityPart);
+        if (ownerPartCount > 1)
         {
             var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.API_IDENTITY_MULTIPLE_PARENT_PARTS;
-            var description = $"An {nameof(ApiIdentity)} may contain at most one {nameof(ApiOwnerIdentityPart)}, but {parentPartCount} were found";
+            var code = ApiInitializationCode.API_IDENTITY_MULTIPLE_OWNER_PARTS;
+            var description = $"An {nameof(ApiIdentity)} may contain at most one {nameof(ApiOwnerIdentityPart)}, but {ownerPartCount} were found";
             var remediation = $"Remove the extra {nameof(ApiOwnerIdentityPart)} instances, leaving exactly one";
 
             context.AddIssue(path, severity, code, description, remediation);
