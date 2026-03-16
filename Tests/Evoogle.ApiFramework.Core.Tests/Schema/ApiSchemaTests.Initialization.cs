@@ -66,6 +66,29 @@ public partial class ApiSchemaTests
     {
         public List<string>? Items { get; set; }
     }
+
+    public class OwnedType
+    {
+        public int Id { get; set; }
+    }
+
+    public class OwnerType
+    {
+        public int Id { get; set; }
+        public OwnedType? Item { get; set; }
+    }
+
+    public class OwnerTypeA
+    {
+        public int Id { get; set; }
+        public OwnedType? Item { get; set; }
+    }
+
+    public class OwnerTypeB
+    {
+        public int Id { get; set; }
+        public OwnedType? Item { get; set; }
+    }
     #endregion
 
     #region Theory Data
@@ -1857,6 +1880,564 @@ public partial class ApiSchemaTests
                     code: ApiInitializationCode.API_IDENTITY_PART_PERFORMANCE_CONCERN,
                     description: $"Identity part 'Id' has CLR property type {nameof(Int32)} but resolves to scalar type {nameof(String)}, requiring string parse/format on every identity operation",
                     remediation: $"Align the 'Id' property type with the resolved scalar type {nameof(String)} to eliminate string coercion, or accept the overhead if the type mismatch is intentional"
+                ),
+            ]
+        },
+
+        //
+        // ApiIdentity: Owner and Nested Identity Part Initialization Tests
+        //
+
+        // ApiIdentity throws if it contains multiple owner parts
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiIdentity)} Throws If {nameof(ApiIdentity.ApiIdentityParts)} Contains Multiple {nameof(ApiOwnerIdentityPart)} Instances",
+            Part = @"
+            {
+                ""ApiName"": ""ApiIdentity Throws If ApiIdentityParts Contains Multiple ApiOwnerIdentityPart Instances"",
+                ""ApiScalarTypes"": [
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""Int32"",
+                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                    }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""OwnerType"",
+                        ""ApiIdentities"": [
+                            {
+                                ""ApiName"": ""PK_OwnerType"",
+                                ""ApiIdentityParts"": [
+                                    {
+                                        ""ApiKind"": ""Scalar"",
+                                        ""ApiPropertyName"": ""Id""
+                                    }
+                                ]
+                            }
+                        ],
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""Id"",
+                                ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Id"",
+                                ""ClrMemberKind"": ""Property""
+                            },
+                            {
+                                ""ApiName"": ""Item"",
+                                ""ApiType"": { ""ApiKind"": ""Object"", ""ApiName"": ""OwnedType"" },
+                                ""ClrName"": ""Item"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+OwnerType, Evoogle.ApiFramework.Core.Tests""
+                    },
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""OwnedType"",
+                        ""ApiIdentities"": [
+                            {
+                                ""ApiName"": ""PK_OwnedType"",
+                                ""ApiIdentityParts"": [
+                                    { ""ApiKind"": ""Owner"" },
+                                    { ""ApiKind"": ""Owner"" }
+                                ]
+                            }
+                        ],
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""Id"",
+                                ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Id"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+OwnedType, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiObjectType)}[\"OwnedType\"].{nameof(ApiIdentity)}[\"PK_OwnedType\"]",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_IDENTITY_MULTIPLE_OWNER_PARTS,
+                    description: $"An {nameof(ApiIdentity)} may contain at most one {nameof(ApiOwnerIdentityPart)}, but 2 were found",
+                    remediation: $"Remove the extra {nameof(ApiOwnerIdentityPart)} instances, leaving exactly one"
+                ),
+            ]
+        },
+
+        // ApiScalarIdentityPart throws if the identity property is not a scalar type
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiScalarIdentityPart)} Throws If {nameof(ApiScalarIdentityPart.ApiPropertyName)} Resolves To A Non-Scalar Type",
+            Part = @"
+            {
+                ""ApiName"": ""ApiScalarIdentityPart Throws If ApiPropertyName Resolves To A Non-Scalar Type"",
+                ""ApiScalarTypes"": [
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""Int32"",
+                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                    },
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""String"",
+                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                    }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""IdentityNested"",
+                        ""ApiIdentities"": [
+                            {
+                                ""ApiName"": ""PK_IdentityNested"",
+                                ""ApiIdentityParts"": [
+                                    { ""ApiKind"": ""Scalar"", ""ApiPropertyName"": ""Id"" }
+                                ]
+                            }
+                        ],
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""Id"",
+                                ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Id"",
+                                ""ClrMemberKind"": ""Property""
+                            },
+                            {
+                                ""ApiName"": ""Description"",
+                                ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""String"" },
+                                ""ClrName"": ""Description"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityNested, Evoogle.ApiFramework.Core.Tests""
+                    },
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""IdentityNestedComposite"",
+                        ""ApiIdentities"": [
+                            {
+                                ""ApiName"": ""PK_InvalidScalarPart"",
+                                ""ApiIdentityParts"": [
+                                    { ""ApiKind"": ""Scalar"", ""ApiPropertyName"": ""NestedPart"" }
+                                ]
+                            }
+                        ],
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""NestedPart"",
+                                ""ApiType"": { ""ApiKind"": ""Object"", ""ApiName"": ""IdentityNested"" },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""NestedPart"",
+                                ""ClrMemberKind"": ""Property""
+                            },
+                            {
+                                ""ApiName"": ""Name"",
+                                ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""String"" },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Name"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityNestedComposite, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiObjectType)}[\"IdentityNestedComposite\"].{nameof(ApiIdentity)}[\"PK_InvalidScalarPart\"].{nameof(ApiScalarIdentityPart)}[\"NestedPart\"]",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_IDENTITY_PART_INVALID_API_PROPERTY_TYPE,
+                    description: "Property 'NestedPart' must be a scalar type for a scalar identity part",
+                    remediation: $"Use a scalar-typed property or switch to {nameof(ApiNestedIdentityPart)}"
+                ),
+            ]
+        },
+
+        // ApiNestedIdentityPart throws if the identity property is not an object type
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiNestedIdentityPart)} Throws If {nameof(ApiNestedIdentityPart.ApiPropertyName)} Resolves To A Non-Object Type",
+            Part = @"
+            {
+                ""ApiName"": ""ApiNestedIdentityPart Throws If ApiPropertyName Resolves To A Non-Object Type"",
+                ""ApiScalarTypes"": [
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""Int32"",
+                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                    },
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""String"",
+                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                    }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""IdentityNested"",
+                        ""ApiIdentities"": [
+                            {
+                                ""ApiName"": ""PK_InvalidNestedPart"",
+                                ""ApiIdentityParts"": [
+                                    { ""ApiKind"": ""Nested"", ""ApiPropertyName"": ""Id"" }
+                                ]
+                            }
+                        ],
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""Id"",
+                                ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Id"",
+                                ""ClrMemberKind"": ""Property""
+                            },
+                            {
+                                ""ApiName"": ""Description"",
+                                ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""String"" },
+                                ""ClrName"": ""Description"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityNested, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiObjectType)}[\"IdentityNested\"].{nameof(ApiIdentity)}[\"PK_InvalidNestedPart\"].{nameof(ApiNestedIdentityPart)}[\"Id\"]",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_IDENTITY_PART_INVALID_API_PROPERTY_TYPE,
+                    description: "Property 'Id' must be an object type for a nested identity part",
+                    remediation: $"Use an object-typed property or switch to {nameof(ApiScalarIdentityPart)}"
+                ),
+            ]
+        },
+
+        // ApiNestedIdentityPart throws if the referenced identity name is unresolved
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiNestedIdentityPart)} Throws If {nameof(ApiNestedIdentityPart.ApiIdentityName)} Is Unresolved",
+            Part = @"
+            {
+                ""ApiName"": ""ApiNestedIdentityPart Throws If ApiIdentityName Is Unresolved"",
+                ""ApiScalarTypes"": [
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""Int32"",
+                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                    },
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""String"",
+                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                    }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""IdentityNested"",
+                        ""ApiIdentities"": [
+                            {
+                                ""ApiName"": ""PK_IdentityNested"",
+                                ""ApiIdentityParts"": [
+                                    { ""ApiKind"": ""Scalar"", ""ApiPropertyName"": ""Id"" }
+                                ]
+                            }
+                        ],
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""Id"",
+                                ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Id"",
+                                ""ClrMemberKind"": ""Property""
+                            },
+                            {
+                                ""ApiName"": ""Description"",
+                                ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""String"" },
+                                ""ClrName"": ""Description"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityNested, Evoogle.ApiFramework.Core.Tests""
+                    },
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""IdentityNestedComposite"",
+                        ""ApiIdentities"": [
+                            {
+                                ""ApiName"": ""PK_IdentityNestedComposite"",
+                                ""ApiIdentityParts"": [
+                                    {
+                                        ""ApiKind"": ""Nested"",
+                                        ""ApiPropertyName"": ""NestedPart"",
+                                        ""ApiIdentityName"": ""NonExistentId""
+                                    }
+                                ]
+                            }
+                        ],
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""NestedPart"",
+                                ""ApiType"": { ""ApiKind"": ""Object"", ""ApiName"": ""IdentityNested"" },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""NestedPart"",
+                                ""ClrMemberKind"": ""Property""
+                            },
+                            {
+                                ""ApiName"": ""Name"",
+                                ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""String"" },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Name"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityNestedComposite, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiObjectType)}[\"IdentityNestedComposite\"].{nameof(ApiIdentity)}[\"PK_IdentityNestedComposite\"].{nameof(ApiNestedIdentityPart)}[\"NestedPart\"]",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_IDENTITY_PART_UNRESOLVED_NESTED_IDENTITY,
+                    description: "Referenced identity 'NonExistentId' could not be found on object type 'IdentityNested'",
+                    remediation: "Use one of the available identities: 'PK_IdentityNested'"
+                ),
+            ]
+        },
+
+        // ApiOwnerIdentityPart throws if no candidate owner object types exist
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiOwnerIdentityPart)} Throws If No Candidate Owner Object Type Exists",
+            Part = @"
+            {
+                ""ApiName"": ""ApiOwnerIdentityPart Throws If No Candidate Owner Object Type Exists"",
+                ""ApiScalarTypes"": [
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""Int32"",
+                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                    }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""OwnedType"",
+                        ""ApiIdentities"": [
+                            {
+                                ""ApiName"": ""PK_OwnedType"",
+                                ""ApiIdentityParts"": [
+                                    { ""ApiKind"": ""Owner"" }
+                                ]
+                            }
+                        ],
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""Id"",
+                                ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Id"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+OwnedType, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiObjectType)}[\"OwnedType\"].{nameof(ApiIdentity)}[\"PK_OwnedType\"].{nameof(ApiOwnerIdentityPart)}",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_IDENTITY_PART_UNRESOLVED_OWNER,
+                    description: "No owner object type was found for 'OwnedType' \u2014 no other object type has a collection or direct object property of this type",
+                    remediation: $"Ensure another {nameof(ApiObjectType)} has a collection or direct object property typed as 'OwnedType', or remove the {nameof(ApiOwnerIdentityPart)}"
+                ),
+            ]
+        },
+
+        // ApiOwnerIdentityPart throws if multiple candidate owner object types exist
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiOwnerIdentityPart)} Throws If Multiple Candidate Owner Object Types Exist",
+            Part = @"
+            {
+                ""ApiName"": ""ApiOwnerIdentityPart Throws If Multiple Candidate Owner Object Types Exist"",
+                ""ApiScalarTypes"": [
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""Int32"",
+                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                    }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""OwnerTypeA"",
+                        ""ApiIdentities"": [
+                            {
+                                ""ApiName"": ""PK_OwnerTypeA"",
+                                ""ApiIdentityParts"": [
+                                    { ""ApiKind"": ""Scalar"", ""ApiPropertyName"": ""Id"" }
+                                ]
+                            }
+                        ],
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""Id"",
+                                ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Id"",
+                                ""ClrMemberKind"": ""Property""
+                            },
+                            {
+                                ""ApiName"": ""Item"",
+                                ""ApiType"": { ""ApiKind"": ""Object"", ""ApiName"": ""OwnedType"" },
+                                ""ClrName"": ""Item"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+OwnerTypeA, Evoogle.ApiFramework.Core.Tests""
+                    },
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""OwnerTypeB"",
+                        ""ApiIdentities"": [
+                            {
+                                ""ApiName"": ""PK_OwnerTypeB"",
+                                ""ApiIdentityParts"": [
+                                    { ""ApiKind"": ""Scalar"", ""ApiPropertyName"": ""Id"" }
+                                ]
+                            }
+                        ],
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""Id"",
+                                ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Id"",
+                                ""ClrMemberKind"": ""Property""
+                            },
+                            {
+                                ""ApiName"": ""Item"",
+                                ""ApiType"": { ""ApiKind"": ""Object"", ""ApiName"": ""OwnedType"" },
+                                ""ClrName"": ""Item"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+OwnerTypeB, Evoogle.ApiFramework.Core.Tests""
+                    },
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""OwnedType"",
+                        ""ApiIdentities"": [
+                            {
+                                ""ApiName"": ""PK_OwnedType"",
+                                ""ApiIdentityParts"": [
+                                    { ""ApiKind"": ""Owner"" }
+                                ]
+                            }
+                        ],
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""Id"",
+                                ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Id"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+OwnedType, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiObjectType)}[\"OwnedType\"].{nameof(ApiIdentity)}[\"PK_OwnedType\"].{nameof(ApiOwnerIdentityPart)}",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_IDENTITY_PART_AMBIGUOUS_OWNER,
+                    description: "Multiple candidate owner object types found for 'OwnedType': 'OwnerTypeA', 'OwnerTypeB'",
+                    remediation: $"Disambiguate by ensuring only one {nameof(ApiObjectType)} holds a collection or direct object property of 'OwnedType'"
+                ),
+            ]
+        },
+
+        // ApiOwnerIdentityPart throws if a cyclic owner reference is detected
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiOwnerIdentityPart)} Throws If A Cyclic Owner Reference Is Detected",
+            Part = @"
+            {
+                ""ApiName"": ""ApiOwnerIdentityPart Throws If A Cyclic Owner Reference Is Detected"",
+                ""ApiScalarTypes"": [],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""CircularIdentityNodeType"",
+                        ""ApiIdentities"": [
+                            {
+                                ""ApiName"": ""PK_NodeType"",
+                                ""ApiIdentityParts"": [
+                                    { ""ApiKind"": ""Owner"" }
+                                ]
+                            }
+                        ],
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""Self"",
+                                ""ApiType"": { ""ApiKind"": ""Object"", ""ApiName"": ""CircularIdentityNodeType"" },
+                                ""ClrName"": ""Self"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+CircularIdentityNodeType, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiObjectType)}[\"CircularIdentityNodeType\"].{nameof(ApiIdentity)}[\"PK_NodeType\"].{nameof(ApiOwnerIdentityPart)}",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_IDENTITY_PART_CYCLIC_OWNER,
+                    description: "A cyclic owner identity reference was detected involving 'CircularIdentityNodeType'",
+                    remediation: $"Remove the cyclic {nameof(ApiOwnerIdentityPart)} reference"
                 ),
             ]
         },
