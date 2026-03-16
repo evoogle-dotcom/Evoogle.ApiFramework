@@ -1761,6 +1761,472 @@ public partial class ApiSchemaTests
                 ),
             ]
         },
+
+        //
+        // ApiSchema Initialization Tests
+        //
+
+        // ApiSchema throws if ApiName is invalid (warning - uses null ClrType scalar type as companion error)
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiSchema)} Throws If {nameof(ApiSchema.ApiName)} Is Invalid",
+            Part = @"
+            {
+                ""ApiName"": """",
+                ""ApiScalarTypes"": [
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""String""
+                    }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": []
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=2, Errors=1, Warnings=1.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiSchema)}",
+                    severity: ApiInitializationSeverity.Warning,
+                    code: ApiInitializationCode.API_SCHEMA_INVALID_NAME,
+                    description: $"{nameof(ApiSchema.ApiName)} must not be null, empty, or whitespace",
+                    remediation: $"Specify a valid {nameof(ApiSchema.ApiName)} value"
+                ),
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiScalarType)}[\"String\"]",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_TYPE_NULL_CLR_TYPE,
+                    description: $"{nameof(ApiScalarType.ClrType)} must not be null",
+                    remediation: "Specify a valid ClrType"
+                ),
+            ]
+        },
+
+        // ApiSchema throws if scalar types have duplicate ApiName
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiSchema)} Throws If {nameof(ApiSchema.ApiScalarTypes)} Has Duplicate {nameof(ApiScalarType.ApiName)}",
+            Part = @"
+            {
+                ""ApiName"": ""ApiSchema Throws If ApiScalarTypes Has Duplicate ApiName"",
+                ""ApiScalarTypes"": [
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""String"",
+                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                    },
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""String"",
+                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                    }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": []
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=2, Errors=2, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiScalarTypes Has Duplicate ApiName\"]",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_SCHEMA_DUPLICATE_NAMED_TYPE_API_NAME,
+                    description: $"Duplicate {nameof(ApiNamedType)}.{nameof(ApiNamedType.ApiName)} values: 'String'",
+                    remediation: $"Verify that each {nameof(ApiNamedType)} has a unique {nameof(ApiNamedType.ApiName)} value"
+                ),
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiScalarTypes Has Duplicate ApiName\"]",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_SCHEMA_DUPLICATE_SCALAR_TYPE_API_NAME,
+                    description: $"Duplicate {nameof(ApiScalarType)}.{nameof(ApiScalarType.ApiName)} values: 'String'",
+                    remediation: $"Verify that each {nameof(ApiScalarType)} has a unique {nameof(ApiScalarType.ApiName)} value"
+                ),
+            ]
+        },
+
+        // ApiSchema throws if scalar types have duplicate ClrType
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiSchema)} Throws If {nameof(ApiSchema.ApiScalarTypes)} Has Duplicate {nameof(ApiScalarType.ClrType)}",
+            Part = @"
+            {
+                ""ApiName"": ""ApiSchema Throws If ApiScalarTypes Has Duplicate ClrType"",
+                ""ApiScalarTypes"": [
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""String"",
+                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                    },
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""StringAlias"",
+                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                    }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": []
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=2, Errors=2, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiScalarTypes Has Duplicate ClrType\"]",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_SCHEMA_DUPLICATE_NAMED_TYPE_CLR_TYPE,
+                    description: $"Duplicate {nameof(ApiNamedType)}.{nameof(ApiNamedType.ClrType)} values: '{typeof(string)}'",
+                    remediation: $"Verify that each {nameof(ApiNamedType)} has a unique {nameof(ApiNamedType.ClrType)} value"
+                ),
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiScalarTypes Has Duplicate ClrType\"]",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_SCHEMA_DUPLICATE_SCALAR_TYPE_CLR_TYPE,
+                    description: $"Duplicate {nameof(ApiScalarType)}.{nameof(ApiScalarType.ClrType)} values: '{typeof(string)}'",
+                    remediation: $"Verify that each {nameof(ApiScalarType)} has a unique {nameof(ApiScalarType.ClrType)} value"
+                ),
+            ]
+        },
+
+        // ApiSchema throws if enum types have duplicate ApiName
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiSchema)} Throws If {nameof(ApiSchema.ApiEnumTypes)} Has Duplicate {nameof(ApiEnumType.ApiName)}",
+            Part = @"
+            {
+                ""ApiName"": ""ApiSchema Throws If ApiEnumTypes Has Duplicate ApiName"",
+                ""ApiScalarTypes"": [],
+                ""ApiEnumTypes"": [
+                    {
+                        ""ApiKind"": ""Enum"",
+                        ""ApiName"": ""Gender"",
+                        ""ApiEnumValues"": [
+                            { ""ApiName"": ""Unspecified"", ""ClrName"": ""Unspecified"", ""ClrOrdinal"": 0 },
+                            { ""ApiName"": ""Male"", ""ClrName"": ""Male"", ""ClrOrdinal"": 1 },
+                            { ""ApiName"": ""Female"", ""ClrName"": ""Female"", ""ClrOrdinal"": 2 }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
+                    },
+                    {
+                        ""ApiKind"": ""Enum"",
+                        ""ApiName"": ""Gender"",
+                        ""ApiEnumValues"": [
+                            { ""ApiName"": ""None"", ""ClrName"": ""None"", ""ClrOrdinal"": 0 },
+                            { ""ApiName"": ""Green"", ""ClrName"": ""Green"", ""ClrOrdinal"": 1 },
+                            { ""ApiName"": ""Yellow"", ""ClrName"": ""Yellow"", ""ClrOrdinal"": 2 },
+                            { ""ApiName"": ""Red"", ""ClrName"": ""Red"", ""ClrOrdinal"": 3 }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.StopLight, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ],
+                ""ApiObjectTypes"": []
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=2, Errors=2, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiEnumTypes Has Duplicate ApiName\"]",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_SCHEMA_DUPLICATE_NAMED_TYPE_API_NAME,
+                    description: $"Duplicate {nameof(ApiNamedType)}.{nameof(ApiNamedType.ApiName)} values: 'Gender'",
+                    remediation: $"Verify that each {nameof(ApiNamedType)} has a unique {nameof(ApiNamedType.ApiName)} value"
+                ),
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiEnumTypes Has Duplicate ApiName\"]",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_SCHEMA_DUPLICATE_ENUM_TYPE_API_NAME,
+                    description: $"Duplicate {nameof(ApiEnumType)}.{nameof(ApiEnumType.ApiName)} values: 'Gender'",
+                    remediation: $"Verify that each {nameof(ApiEnumType)} has a unique {nameof(ApiEnumType.ApiName)} value"
+                ),
+            ]
+        },
+
+        // ApiSchema throws if enum types have duplicate ClrType
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiSchema)} Throws If {nameof(ApiSchema.ApiEnumTypes)} Has Duplicate {nameof(ApiEnumType.ClrType)}",
+            Part = @"
+            {
+                ""ApiName"": ""ApiSchema Throws If ApiEnumTypes Has Duplicate ClrType"",
+                ""ApiScalarTypes"": [],
+                ""ApiEnumTypes"": [
+                    {
+                        ""ApiKind"": ""Enum"",
+                        ""ApiName"": ""Gender"",
+                        ""ApiEnumValues"": [
+                            { ""ApiName"": ""Unspecified"", ""ClrName"": ""Unspecified"", ""ClrOrdinal"": 0 },
+                            { ""ApiName"": ""Male"", ""ClrName"": ""Male"", ""ClrOrdinal"": 1 },
+                            { ""ApiName"": ""Female"", ""ClrName"": ""Female"", ""ClrOrdinal"": 2 }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
+                    },
+                    {
+                        ""ApiKind"": ""Enum"",
+                        ""ApiName"": ""GenderAlias"",
+                        ""ApiEnumValues"": [
+                            { ""ApiName"": ""Unspecified"", ""ClrName"": ""Unspecified"", ""ClrOrdinal"": 0 },
+                            { ""ApiName"": ""Male"", ""ClrName"": ""Male"", ""ClrOrdinal"": 1 },
+                            { ""ApiName"": ""Female"", ""ClrName"": ""Female"", ""ClrOrdinal"": 2 }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ],
+                ""ApiObjectTypes"": []
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=2, Errors=2, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiEnumTypes Has Duplicate ClrType\"]",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_SCHEMA_DUPLICATE_NAMED_TYPE_CLR_TYPE,
+                    description: $"Duplicate {nameof(ApiNamedType)}.{nameof(ApiNamedType.ClrType)} values: '{typeof(Gender)}'",
+                    remediation: $"Verify that each {nameof(ApiNamedType)} has a unique {nameof(ApiNamedType.ClrType)} value"
+                ),
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiEnumTypes Has Duplicate ClrType\"]",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_SCHEMA_DUPLICATE_ENUM_TYPE_CLR_TYPE,
+                    description: $"Duplicate {nameof(ApiEnumType)}.{nameof(ApiEnumType.ClrType)} values: '{typeof(Gender)}'",
+                    remediation: $"Verify that each {nameof(ApiEnumType)} has a unique {nameof(ApiEnumType.ClrType)} value"
+                ),
+            ]
+        },
+
+        // ApiSchema throws if object types have duplicate ApiName
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiSchema)} Throws If {nameof(ApiSchema.ApiObjectTypes)} Has Duplicate {nameof(ApiObjectType.ApiName)}",
+            Part = @"
+            {
+                ""ApiName"": ""ApiSchema Throws If ApiObjectTypes Has Duplicate ApiName"",
+                ""ApiScalarTypes"": [
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""String"",
+                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                    }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""TestObject"",
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""Name"",
+                                ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""String"" },
+                                ""ClrName"": ""Name""
+                            },
+                            {
+                                ""ApiName"": ""NameAlt"",
+                                ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""String"" },
+                                ""ClrName"": ""NameAlt""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicatePropertyApiNameType, Evoogle.ApiFramework.Core.Tests""
+                    },
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""TestObject"",
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""Name"",
+                                ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""String"" },
+                                ""ClrName"": ""Name""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicatePropertyClrNameType, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=2, Errors=2, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiObjectTypes Has Duplicate ApiName\"]",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_SCHEMA_DUPLICATE_NAMED_TYPE_API_NAME,
+                    description: $"Duplicate {nameof(ApiNamedType)}.{nameof(ApiNamedType.ApiName)} values: 'TestObject'",
+                    remediation: $"Verify that each {nameof(ApiNamedType)} has a unique {nameof(ApiNamedType.ApiName)} value"
+                ),
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiObjectTypes Has Duplicate ApiName\"]",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_SCHEMA_DUPLICATE_OBJECT_TYPE_API_NAME,
+                    description: $"Duplicate {nameof(ApiObjectType)}.{nameof(ApiObjectType.ApiName)} values: 'TestObject'",
+                    remediation: $"Verify that each {nameof(ApiObjectType)} has a unique {nameof(ApiObjectType.ApiName)} value"
+                ),
+            ]
+        },
+
+        // ApiSchema throws if object types have duplicate ClrType
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiSchema)} Throws If {nameof(ApiSchema.ApiObjectTypes)} Has Duplicate {nameof(ApiObjectType.ClrType)}",
+            Part = @"
+            {
+                ""ApiName"": ""ApiSchema Throws If ApiObjectTypes Has Duplicate ClrType"",
+                ""ApiScalarTypes"": [
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""String"",
+                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                    }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""TestObjectA"",
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""Name"",
+                                ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""String"" },
+                                ""ClrName"": ""Name""
+                            },
+                            {
+                                ""ApiName"": ""NameAlt"",
+                                ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""String"" },
+                                ""ClrName"": ""NameAlt""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicatePropertyApiNameType, Evoogle.ApiFramework.Core.Tests""
+                    },
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""TestObjectB"",
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""Name"",
+                                ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""String"" },
+                                ""ClrName"": ""Name""
+                            },
+                            {
+                                ""ApiName"": ""NameAlt"",
+                                ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""String"" },
+                                ""ClrName"": ""NameAlt""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicatePropertyApiNameType, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=2, Errors=2, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiObjectTypes Has Duplicate ClrType\"]",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_SCHEMA_DUPLICATE_NAMED_TYPE_CLR_TYPE,
+                    description: $"Duplicate {nameof(ApiNamedType)}.{nameof(ApiNamedType.ClrType)} values: '{typeof(DuplicatePropertyApiNameType)}'",
+                    remediation: $"Verify that each {nameof(ApiNamedType)} has a unique {nameof(ApiNamedType.ClrType)} value"
+                ),
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiObjectTypes Has Duplicate ClrType\"]",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_SCHEMA_DUPLICATE_OBJECT_TYPE_CLR_TYPE,
+                    description: $"Duplicate {nameof(ApiObjectType)}.{nameof(ApiObjectType.ClrType)} values: '{typeof(DuplicatePropertyApiNameType)}'",
+                    remediation: $"Verify that each {nameof(ApiObjectType)} has a unique {nameof(ApiObjectType.ClrType)} value"
+                ),
+            ]
+        },
+
+        // ApiSchema throws if named types have duplicate ApiName (cross-type: scalar + enum with same API name)
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiSchema)} Throws If {nameof(ApiSchema.ApiNamedTypes)} Has Duplicate {nameof(ApiNamedType.ApiName)}",
+            Part = @"
+            {
+                ""ApiName"": ""ApiSchema Throws If ApiNamedTypes Has Duplicate ApiName"",
+                ""ApiScalarTypes"": [
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""MyType"",
+                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                    }
+                ],
+                ""ApiEnumTypes"": [
+                    {
+                        ""ApiKind"": ""Enum"",
+                        ""ApiName"": ""MyType"",
+                        ""ApiEnumValues"": [
+                            { ""ApiName"": ""Unspecified"", ""ClrName"": ""Unspecified"", ""ClrOrdinal"": 0 },
+                            { ""ApiName"": ""Male"", ""ClrName"": ""Male"", ""ClrOrdinal"": 1 },
+                            { ""ApiName"": ""Female"", ""ClrName"": ""Female"", ""ClrOrdinal"": 2 }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ],
+                ""ApiObjectTypes"": []
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiNamedTypes Has Duplicate ApiName\"]",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_SCHEMA_DUPLICATE_NAMED_TYPE_API_NAME,
+                    description: $"Duplicate {nameof(ApiNamedType)}.{nameof(ApiNamedType.ApiName)} values: 'MyType'",
+                    remediation: $"Verify that each {nameof(ApiNamedType)} has a unique {nameof(ApiNamedType.ApiName)} value"
+                ),
+            ]
+        },
+
+        // ApiSchema throws if named types have duplicate ClrType (cross-type: scalar + enum with same CLR type)
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiSchema)} Throws If {nameof(ApiSchema.ApiNamedTypes)} Has Duplicate {nameof(ApiNamedType.ClrType)}",
+            Part = @"
+            {
+                ""ApiName"": ""ApiSchema Throws If ApiNamedTypes Has Duplicate ClrType"",
+                ""ApiScalarTypes"": [
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""GenderScalar"",
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ],
+                ""ApiEnumTypes"": [
+                    {
+                        ""ApiKind"": ""Enum"",
+                        ""ApiName"": ""GenderEnum"",
+                        ""ApiEnumValues"": [
+                            { ""ApiName"": ""Unspecified"", ""ClrName"": ""Unspecified"", ""ClrOrdinal"": 0 },
+                            { ""ApiName"": ""Male"", ""ClrName"": ""Male"", ""ClrOrdinal"": 1 },
+                            { ""ApiName"": ""Female"", ""ClrName"": ""Female"", ""ClrOrdinal"": 2 }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ],
+                ""ApiObjectTypes"": []
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiNamedTypes Has Duplicate ClrType\"]",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_SCHEMA_DUPLICATE_NAMED_TYPE_CLR_TYPE,
+                    description: $"Duplicate {nameof(ApiNamedType)}.{nameof(ApiNamedType.ClrType)} values: '{typeof(Gender)}'",
+                    remediation: $"Verify that each {nameof(ApiNamedType)} has a unique {nameof(ApiNamedType.ClrType)} value"
+                ),
+            ]
+        },
     ];
     #endregion
 
