@@ -142,6 +142,8 @@ public sealed partial class ApiProperty
 
     /// <summary>Gets a value indicating whether this property is required.</summary>
     public bool IsRequired => this.ApiTypeModifiers.HasFlag(ApiTypeModifiers.Required);
+
+    internal bool IsResolved => this.ApiTypeExpression?.IsResolved == true;
     #endregion
 
     #region Object Methods

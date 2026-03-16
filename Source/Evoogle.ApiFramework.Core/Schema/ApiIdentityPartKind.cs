@@ -16,6 +16,6 @@ public enum ApiIdentityPartKind
     /// <summary>The part sources its value from the identity of a nested object property.</summary>
     Nested,
 
-    /// <summary>The part sources its value from the identity of the parent object in a parent-child relationship.</summary>
-    Parent
+    /// <summary>The part sources its value from the identity of the owning object in an owner-owned relationship.</summary>
+    Owner
 }

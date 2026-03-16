@@ -20,8 +20,9 @@ public class IdentityScalar
 /// </summary>
 public class IdentityTwoScalarPartComposite
 {
-    public int Part1 { get; set; }
-    public string? Part2 { get; set; }
+    public int Id1 { get; set; }
+    public string? Id2 { get; set; }
+    public string? Description { get; set; }
 }
 
 /// <summary>
@@ -29,18 +30,19 @@ public class IdentityTwoScalarPartComposite
 /// </summary>
 public class IdentityThreeScalarPartComposite
 {
-    public int Part1 { get; set; }
-    public string? Part2 { get; set; }
-    public Guid Part3 { get; set; }
+    public int Id1 { get; set; }
+    public string? Id2 { get; set; }
+    public Guid Id3 { get; set; }
+    public string? Description { get; set; }
 }
 
 /// <summary>
 ///     Test type to be used as a nested part for identity testing.
 /// </summary>
-public class IdentityNestedPart
+public class IdentityNested
 {
     public int Id { get; set; }
-    public string Code { get; set; } = string.Empty;
+    public string? Description { get; set; }
 }
 
 /// <summary>
@@ -48,23 +50,34 @@ public class IdentityNestedPart
 /// </summary>
 public class IdentityNestedComposite
 {
-    public IdentityNestedPart NestedPart { get; set; } = null!;
+    public IdentityNested NestedPart { get; set; } = null!;
     public string Name { get; set; } = string.Empty;
 }
 
 /// <summary>
-///     Test type to be used as a parent for a child type with composite identity for identity testing.
+///     Test type to be used as an owner for an owned type with composite identity for identity testing.
 /// </summary>
-public class IdentityParent
+public class IdentityOwner
 {
     public int Id { get; set; }
+    public string? Description { get; set; }
+    public List<IdentityOwnedComposite> Dependents { get; set; } = [];
+    public IdentityOwnedDependent Dependent { get; set; } = null!;
 }
 
 /// <summary>
-///     Test type with composite identity that includes a parent identity and scalar identity composite for identity testing.
+///     Test type with composite identity that includes an owner identity and scalar identity composite for identity testing.
 /// </summary>
-public class IdentityChildComposite
+public class IdentityOwnedComposite
 {
-    public int ChildId { get; set; }
-    public string ChildName { get; set; } = string.Empty;
+    public int LineNumber { get; set; }
+    public string Description { get; set; } = string.Empty;
+}
+
+/// <summary>
+///     Test type with a 1-to-1 relationship with the owner type for identity testing.
+/// </summary>
+public class IdentityOwnedDependent
+{
+    public string Description { get; set; } = string.Empty;
 }

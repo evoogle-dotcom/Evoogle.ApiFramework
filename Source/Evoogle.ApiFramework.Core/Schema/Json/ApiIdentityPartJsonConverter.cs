@@ -177,8 +177,8 @@ public class ApiIdentityPartJsonConverter(ILogger<ApiIdentityPartJsonConverter>?
                     apiIdentityPart = new ApiNestedIdentityPart(apiPropertyName!, apiIdentityName);
                     break;
 
-                case ApiIdentityPartKind.Parent:
-                    apiIdentityPart = new ApiParentIdentityPart(apiIdentityName);
+                case ApiIdentityPartKind.Owner:
+                    apiIdentityPart = new ApiOwnerIdentityPart(apiIdentityName);
                     break;
 
                 default:
@@ -261,10 +261,10 @@ public class ApiIdentityPartJsonConverter(ILogger<ApiIdentityPartJsonConverter>?
             var apiNestedIdentityPart = (ApiNestedIdentityPart)apiIdentityPart;
             value = apiNestedIdentityPart.ApiIdentityName;
         }
-        else if (apiKind == ApiIdentityPartKind.Parent)
+        else if (apiKind == ApiIdentityPartKind.Owner)
         {
-            var apiParentIdentityPart = (ApiParentIdentityPart)apiIdentityPart;
-            value = apiParentIdentityPart.ApiIdentityName;
+            var apiOwnerIdentityPart = (ApiOwnerIdentityPart)apiIdentityPart;
+            value = apiOwnerIdentityPart.ApiIdentityName;
         }
 
         var propertyName = context.PropertyNames.ApiIdentityPart.ApiIdentityName;

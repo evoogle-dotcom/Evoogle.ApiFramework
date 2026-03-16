@@ -10,6 +10,7 @@ using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.ApiFramework.Schema.Json;
 using Evoogle.Extension;
 using Evoogle.Extensions;
+
 using Microsoft.Extensions.Logging;
 
 namespace Evoogle.ApiFramework.Schema;
@@ -196,6 +197,8 @@ public sealed class ApiSchema : ExtensibleBase
         this.InitializeApiEnumTypes(context);
         this.InitializeApiObjectTypes(context);
 
+        this.ResolveOwnerIdentityParts(context);
+
         var issues = context.Issues;
         return new ApiInitializationResult(issues);
     }
@@ -359,6 +362,154 @@ public sealed class ApiSchema : ExtensibleBase
         foreach (var apiObjectType in this.ApiObjectTypes)
         {
             apiObjectType.Initialize(context);
+        }
+    }
+
+    private void ResolveOwnerIdentityParts(ApiInitializationContext context)
+    {
+        // Pre-compute the set of object types that have at least one ApiOwnerIdentityPart.
+        // A type with no identities at all cannot contain an owner part, so HasIdentity is a cheap pre-filter.
+        var typesWithOwnerPart = this.ApiObjectTypes
+            .Where(t => t.HasIdentity && t.ApiIdentities.Any(i => i.ApiIdentityParts.Any(p => p is ApiOwnerIdentityPart)))
+            .ToHashSet();
+
+        // Fast path: no type in the schema uses owner-based identity — skip all work.
+        if (typesWithOwnerPart.Count == 0)
+        {
+            return;
+        }
+
+        // Build a reverse lookup: for each owned type C, collect every object type P that
+        // owns C either via a collection property (1-to-many) or a direct object property (1-to-1).
+        // Only insert entries for owned types that actually need resolution.
+        var ownerLookup = new Dictionary<ApiObjectType, List<ApiObjectType>>();
+        foreach (var ownerType in this.ApiObjectTypes)
+        {
+            foreach (var property in ownerType.ApiProperties)
+            {
+                // Skip properties whose type expression failed to resolve during phase 1 initialization.
+                if (!property.IsResolved)
+                {
+                    continue;
+                }
+
+                // 1-to-many: owner has a collection property whose item type is the owned object type.
+                if (property.ApiType is ApiCollectionType collectionType &&
+                    collectionType.ApiItemType is ApiObjectType collectionOwnedType &&
+                    typesWithOwnerPart.Contains(collectionOwnedType))
+                {
+                    AddOwnerCandidate(ownerLookup, collectionOwnedType, ownerType);
+                }
+                // 1-to-1: owner has a direct object property typed as the owned object type.
+                else if (property.ApiType is ApiObjectType directOwnedType &&
+                         typesWithOwnerPart.Contains(directOwnedType))
+                {
+                    AddOwnerCandidate(ownerLookup, directOwnedType, ownerType);
+                }
+            }
+        }
+
+        static void AddOwnerCandidate(Dictionary<ApiObjectType, List<ApiObjectType>> lookup, ApiObjectType ownedType, ApiObjectType ownerType)
+        {
+            if (!lookup.TryGetValue(ownedType, out var owners))
+            {
+                owners = [];
+                lookup[ownedType] = owners;
+            }
+
+            owners.Add(ownerType);
+        }
+
+        // Detect ownership cycles: find object types whose single-candidate ownership chain forms a loop.
+        // A cycle means two or more types transitively own each other, making identity composition impossible.
+        var cycleMembers = new HashSet<ApiObjectType>();
+        var checkedTypes = new HashSet<ApiObjectType>();
+
+        foreach (var startType in typesWithOwnerPart)
+        {
+            if (checkedTypes.Contains(startType))
+            {
+                continue;
+            }
+
+            var chain = new List<ApiObjectType>();
+            var chainSet = new HashSet<ApiObjectType>();
+            var current = startType;
+
+            while (current != null && typesWithOwnerPart.Contains(current) && !checkedTypes.Contains(current))
+            {
+                if (chainSet.Contains(current))
+                {
+                    // Cycle found: mark all types in the cycle (from the re-entry point onward) as members.
+                    var cycleStart = current;
+                    var inCycle = false;
+                    foreach (var t in chain)
+                    {
+                        if (t == cycleStart)
+                        {
+                            inCycle = true;
+                        }
+
+                        if (inCycle)
+                        {
+                            cycleMembers.Add(t);
+                        }
+                    }
+                    break;
+                }
+
+                chainSet.Add(current);
+                chain.Add(current);
+
+                ownerLookup.TryGetValue(current, out var singleOwner);
+                current = singleOwner?.Count == 1 ? singleOwner[0] : null;
+            }
+
+            foreach (var t in chain)
+            {
+                checkedTypes.Add(t);
+            }
+        }
+
+        // Report errors for all cycle members.
+        foreach (var cycleType in cycleMembers)
+        {
+            foreach (var identity in cycleType.ApiIdentities)
+            {
+                foreach (var part in identity.ApiIdentityParts.OfType<ApiOwnerIdentityPart>())
+                {
+                    var path = part.ApiPath;
+                    var severity = ApiInitializationSeverity.Error;
+                    var code = ApiInitializationCode.API_IDENTITY_PART_CYCLIC_OWNER;
+                    var description = $"A cyclic owner identity reference was detected involving '{cycleType.ApiName}'";
+                    var remediation = $"Remove the cyclic {nameof(ApiOwnerIdentityPart)} reference";
+
+                    context.AddIssue(path, severity, code, description, remediation);
+                }
+            }
+        }
+
+        // Walk only owned types that need resolution, skipping any that form a cycle.
+        foreach (var ownedType in typesWithOwnerPart)
+        {
+            if (cycleMembers.Contains(ownedType))
+            {
+                continue;
+            }
+
+            foreach (var identity in ownedType.ApiIdentities)
+            {
+                foreach (var ownerPart in identity.ApiIdentityParts.OfType<ApiOwnerIdentityPart>())
+                {
+                    ownerLookup.TryGetValue(ownedType, out var candidateOwners);
+
+                    var partContext = context
+                        .WithDeclaringObjectType(ownedType)
+                        .WithDeclaringSchemaElement(identity);
+
+                    ownerPart.ResolveOwnerIdentity(ownedType, candidateOwners ?? [], partContext);
+                }
+            }
         }
     }
 

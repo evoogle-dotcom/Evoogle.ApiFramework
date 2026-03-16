@@ -217,7 +217,7 @@ public static class Dummy
                 .WithName("OrderItem")
                 .WithDefaultOptions()
                 .AddIdentity("PrimaryKey", identity => identity
-                    .AddParent()
+                    .AddOwner()
                     .AddScalar("OrderId", x => x.AddExtension(new VisibleMetadata { Visible = true }))
                     .AddScalar("LineItemNumber", typeof(long)))
                 .AddProperty("OrderId", "OrderId", p => p.WithModifiers(m => m.Required()))

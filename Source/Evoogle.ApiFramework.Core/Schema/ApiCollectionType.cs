@@ -52,6 +52,8 @@ public sealed class ApiCollectionType
 
     /// <summary>Gets a value indicating whether this item type is required.</summary>
     public bool IsItemRequired => this.ApiItemTypeModifiers.HasFlag(ApiTypeModifiers.Required);
+
+    internal bool IsItemTypeResolved => this.ApiItemTypeExpression.IsResolved;
     #endregion
 
     #region Object Methods

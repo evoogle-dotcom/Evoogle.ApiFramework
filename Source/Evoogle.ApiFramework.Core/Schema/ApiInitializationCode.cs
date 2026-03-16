@@ -77,6 +77,11 @@ public enum ApiInitializationCode
     API_IDENTITY_INVALID_API_NAME,
 
     /// <summary>
+    ///    More than one parent identity part is defined, which is not allowed.
+    /// </summary>
+    API_IDENTITY_MULTIPLE_PARENT_PARTS,
+
+    /// <summary>
     ///     Multiple identity parts reference the same property API name.
     /// </summary>
     API_IDENTITY_NULL_OR_EMPTY_PARTS,
@@ -87,6 +92,11 @@ public enum ApiInitializationCode
     ///     The identity part's property API name is null, empty, or whitespace.
     /// </summary>
     API_IDENTITY_PART_INVALID_API_PROPERTY_NAME,
+
+    /// <summary>
+    ///    The identity part's property reference is of an invalid type for the identity part kind (e.g., non-scalar type for a scalar identity part).
+    /// </summary>
+    API_IDENTITY_PART_INVALID_API_PROPERTY_TYPE,
 
     /// <summary>
     ///     An identity part uses a property CLR type that may have performance implications for identity operations.
@@ -102,6 +112,21 @@ public enum ApiInitializationCode
     ///    The identity part's nested identity reference could not be resolved to a defined identity.
     /// </summary>
     API_IDENTITY_PART_UNRESOLVED_NESTED_IDENTITY,
+
+    /// <summary>
+    ///     No owner object type could be found for an owner identity part.
+    /// </summary>
+    API_IDENTITY_PART_UNRESOLVED_OWNER,
+
+    /// <summary>
+    ///     Multiple candidate owner object types were found for an owner identity part and could not be disambiguated.
+    /// </summary>
+    API_IDENTITY_PART_AMBIGUOUS_OWNER,
+
+    /// <summary>
+    ///     A cyclic owner identity reference was detected (e.g., A owns B owns A).
+    /// </summary>
+    API_IDENTITY_PART_CYCLIC_OWNER,
     #endregion
 
     #region ApiNamedType Initialization Codes

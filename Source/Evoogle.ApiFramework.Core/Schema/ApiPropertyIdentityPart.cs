@@ -16,7 +16,7 @@ public abstract class ApiPropertyIdentityPart(string apiPropertyName) : ApiIdent
 {
     #region ApiPropertyIdentityPart Fields
     /// <summary>The resolved <see cref="ApiProperty"/> backing this identity part. Set during initialization; <see langword="null"/> before or if resolution fails.</summary>
-    protected ApiProperty? _apiResolvedProperty = null;
+    private ApiProperty? _apiResolvedProperty = null;
     #endregion
 
     #region ApiPropertyIdentityPart Properties
@@ -25,6 +25,9 @@ public abstract class ApiPropertyIdentityPart(string apiPropertyName) : ApiIdent
 
     /// <summary>Gets the resolved <see cref="ApiProperty"/> that backs this identity part. Available after initialization.</summary>
     public ApiProperty ApiProperty => this.ThrowIfNotInitialized(_apiResolvedProperty);
+
+    /// <summary>Gets the resolved <see cref="ApiProperty"/> that backs this identity part.</summary>
+    protected ApiProperty? ApiResolvedProperty => _apiResolvedProperty;
     #endregion
 
     #region ApiSchemaElement Methods

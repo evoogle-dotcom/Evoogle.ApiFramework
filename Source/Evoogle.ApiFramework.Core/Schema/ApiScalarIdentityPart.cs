@@ -14,7 +14,7 @@ namespace Evoogle.ApiFramework.Schema;
 /// </summary>
 /// <param name="apiPropertyName">The API property name of the scalar property whose value becomes the identity component.</param>
 /// <param name="clrScalarTypeHint">An optional CLR type hint that overrides the default scalar type resolved from the property. When <see langword="null"/>, the type is inferred from the property's <see cref="ApiScalarType"/>.</param>
-public class ApiScalarIdentityPart(string apiPropertyName, Type? clrScalarTypeHint = null) : ApiPropertyIdentityPart(apiPropertyName)
+public sealed class ApiScalarIdentityPart(string apiPropertyName, Type? clrScalarTypeHint = null) : ApiPropertyIdentityPart(apiPropertyName)
 {
     #region ApiScalarIdentityPart Fields
     private Type? _clrResolvedScalarType = null;
@@ -68,13 +68,28 @@ public class ApiScalarIdentityPart(string apiPropertyName, Type? clrScalarTypeHi
     #region Implementation Methods
     private void InitializeClrScalarType(ApiInitializationContext context)
     {
-        if (_apiResolvedProperty is null)
+        if (this.ApiResolvedProperty is null)
         {
             _clrResolvedScalarType = null;
             return;
         }
 
-        var apiPropertyScalarType = (ApiScalarType)_apiResolvedProperty.ApiType;
+        if (!this.ApiResolvedProperty.IsResolved)
+        {
+            _clrResolvedScalarType = null;
+            return;
+        }
+
+        if (this.ApiResolvedProperty.ApiType is not ApiScalarType apiPropertyScalarType)
+        {
+            context.AddIssue(this.ApiPath, ApiInitializationSeverity.Error,
+                ApiInitializationCode.API_IDENTITY_PART_INVALID_API_PROPERTY_TYPE,
+                $"Property '{this.ApiPropertyName}' must be a scalar type for a scalar identity part",
+                $"Use a scalar-typed property or switch to {nameof(ApiNestedIdentityPart)}");
+            _clrResolvedScalarType = null;
+            return;
+        }
+
         var clrPropertyScalarType = apiPropertyScalarType.ClrType;
 
         var clrScalarType = this.ClrScalarTypeHint ?? clrPropertyScalarType;

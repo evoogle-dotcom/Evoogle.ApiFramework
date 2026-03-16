@@ -18,7 +18,7 @@ namespace Evoogle.ApiFramework.Schema;
 /// <param name="apiName">The API name used to reference this identity within the schema.</param>
 /// <param name="apiIdentityParts">The ordered collection of parts that compose this identity.</param>
 [JsonConverter(typeof(ApiIdentityJsonConverter))]
-public class ApiIdentity(string apiName, IEnumerable<ApiIdentityPart> apiIdentityParts) : ApiSchemaElement
+public sealed class ApiIdentity(string apiName, IEnumerable<ApiIdentityPart> apiIdentityParts) : ApiSchemaElement
 {
     #region ApiSchemaElement Properties
     /// <inheritdoc/>
@@ -85,7 +85,7 @@ public class ApiIdentity(string apiName, IEnumerable<ApiIdentityPart> apiIdentit
 
     private void InitializeApiIdentityParts(ApiInitializationContext context)
     {
-        if (this.ApiIdentityParts is null || this.ApiIdentityParts.Length == 0)
+        if (this.ApiIdentityParts.Length == 0)
         {
             var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
@@ -109,6 +109,19 @@ public class ApiIdentity(string apiName, IEnumerable<ApiIdentityPart> apiIdentit
             code: ApiInitializationCode.API_IDENTITY_DUPLICATE_PART_API_PROPERTY_NAME,
             context: context
         );
+
+        // At most one parent part allowed
+        var parentPartCount = this.ApiIdentityParts.Count(x => x is ApiOwnerIdentityPart);
+        if (parentPartCount > 1)
+        {
+            var path = this.ApiPath;
+            var severity = ApiInitializationSeverity.Error;
+            var code = ApiInitializationCode.API_IDENTITY_MULTIPLE_PARENT_PARTS;
+            var description = $"An {nameof(ApiIdentity)} may contain at most one {nameof(ApiOwnerIdentityPart)}, but {parentPartCount} were found";
+            var remediation = $"Remove the extra {nameof(ApiOwnerIdentityPart)} instances, leaving exactly one";
+
+            context.AddIssue(path, severity, code, description, remediation);
+        }
 
         var apiIdentityPartsCount = this.ApiIdentityParts.Length;
         for (var i = 0; i < apiIdentityPartsCount; ++i)

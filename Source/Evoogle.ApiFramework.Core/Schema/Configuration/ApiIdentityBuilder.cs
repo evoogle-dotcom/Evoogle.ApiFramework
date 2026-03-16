@@ -88,22 +88,22 @@ public class ApiIdentityBuilder(string apiName) : ExtensionBuilder<ApiIdentityBu
         return this;
     }
 
-    /// <summary>Adds a parent identity part sourced from the primary identity of the parent object in a parent-child relationship.</summary>
+    /// <summary>Adds an owner identity part sourced from the primary identity of the owning object.</summary>
     /// <param name="configure">Optional callback to further configure the part builder.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiIdentityBuilder AddParent(Action<ApiIdentityPartBuilder>? configure = null)
+    public ApiIdentityBuilder AddOwner(Action<ApiIdentityPartBuilder>? configure = null)
     {
-        this.AddPart(ApiIdentityPartKind.Parent, null, null, null, configure);
+        this.AddPart(ApiIdentityPartKind.Owner, null, null, null, configure);
         return this;
     }
 
-    /// <summary>Adds a parent identity part sourced from a named identity of the parent object in a parent-child relationship.</summary>
-    /// <param name="apiIdentityName">The explicit name of the identity to use on the parent object type.</param>
+    /// <summary>Adds an owner identity part sourced from a named identity of the owning object.</summary>
+    /// <param name="apiIdentityName">The explicit name of the identity to use on the owner object type.</param>
     /// <param name="configure">Optional callback to further configure the part builder.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiIdentityBuilder AddParent(string apiIdentityName, Action<ApiIdentityPartBuilder>? configure = null)
+    public ApiIdentityBuilder AddOwner(string apiIdentityName, Action<ApiIdentityPartBuilder>? configure = null)
     {
-        this.AddPart(ApiIdentityPartKind.Parent, null, apiIdentityName, null, configure);
+        this.AddPart(ApiIdentityPartKind.Owner, null, apiIdentityName, null, configure);
         return this;
     }
 

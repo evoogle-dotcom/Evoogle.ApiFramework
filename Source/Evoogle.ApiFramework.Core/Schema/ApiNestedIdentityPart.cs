@@ -13,7 +13,7 @@ namespace Evoogle.ApiFramework.Schema;
 /// </summary>
 /// <param name="apiPropertyName">The API property name of the nested object whose identity is used.</param>
 /// <param name="apiIdentityName">The optional explicit name of the identity to use on the nested object type. When <see langword="null"/>, the primary identity is used.</param>
-public class ApiNestedIdentityPart(string apiPropertyName, string? apiIdentityName = null) : ApiPropertyIdentityPart(apiPropertyName)
+public sealed class ApiNestedIdentityPart(string apiPropertyName, string? apiIdentityName = null) : ApiPropertyIdentityPart(apiPropertyName)
 {
     #region ApiNestedIdentityPart Fields
     private ApiIdentity? _apiResolvedIdentity = null;
@@ -67,13 +67,27 @@ public class ApiNestedIdentityPart(string apiPropertyName, string? apiIdentityNa
     #region Implementation Methods
     private void InitializeApiIdentity(ApiInitializationContext context)
     {
-        if (_apiResolvedProperty is null)
+        if (this.ApiResolvedProperty is null)
         {
             _apiResolvedIdentity = null;
             return;
         }
 
-        var apiPropertyObjectType = (ApiObjectType)_apiResolvedProperty.ApiType;
+        if (!this.ApiResolvedProperty.IsResolved)
+        {
+            _apiResolvedIdentity = null;
+            return;
+        }
+
+        if (this.ApiResolvedProperty.ApiType is not ApiObjectType apiPropertyObjectType)
+        {
+            context.AddIssue(this.ApiPath, ApiInitializationSeverity.Error,
+                ApiInitializationCode.API_IDENTITY_PART_INVALID_API_PROPERTY_TYPE,
+                $"Property '{this.ApiPropertyName}' must be an object type for a nested identity part",
+                $"Use an object-typed property or switch to {nameof(ApiScalarIdentityPart)}");
+            _apiResolvedIdentity = null;
+            return;
+        }
 
         if (this.ApiIdentityName is not null)
         {

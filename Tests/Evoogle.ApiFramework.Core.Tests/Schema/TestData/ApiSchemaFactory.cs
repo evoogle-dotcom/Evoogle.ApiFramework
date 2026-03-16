@@ -268,8 +268,8 @@ public static class ApiSchemaFactory
     private static ApiIdentityPart IPN(string propertyName, string? identityName = null)
         => new ApiNestedIdentityPart(propertyName, identityName);
 
-    private static ApiIdentityPart IPP(string? identityName = null)
-        => new ApiParentIdentityPart(identityName);
+    private static ApiIdentityPart IPO(string? identityName = null)
+        => new ApiOwnerIdentityPart(identityName);
 #pragma warning restore CA1859 // Use concrete types when possible for improved performance
 
     private static ApiObjectType O(string name, Type clr, IEnumerable<ApiProperty> properties, IEnumerable<ApiIdentity>? identities = null, IEnumerable<ApiRelationship>? relationships = null, ApiObjectTypeOptions? options = null, OrderedDictionary<Type, object>? extensions = null)
@@ -704,8 +704,8 @@ public static class ApiSchemaFactory
         var scalars = new List<ApiScalarType>
         {
             S(name: nameof(Guid),   clr: typeof(Guid)),
+            S(name: nameof(Int32),  clr: typeof(int)),
             S(name: nameof(String), clr: typeof(string)),
-            S(name: nameof(Int32),  clr: typeof(int))
         };
 
         // IdentityScalar: Single scalar identity
@@ -715,7 +715,7 @@ public static class ApiSchemaFactory
             identities:
             [
                 I(name: "PK_IdentityScalar", parts: [IPS(nameof(IdentityScalar.Id))]),
-                I(name: "AK_IdentityScalar_Name", parts: [IPS(nameof(IdentityScalar.Name))])
+                I(name: "AK_IdentityScalar", parts: [IPS(nameof(IdentityScalar.Name))])
             ],
             properties:
             [
@@ -730,43 +730,45 @@ public static class ApiSchemaFactory
             clr: typeof(IdentityTwoScalarPartComposite),
             identities:
             [
-                I(name: "PK_IdentityTwoScalarPartComposite", parts: [IPS(nameof(IdentityTwoScalarPartComposite.Part1)), IPS(nameof(IdentityTwoScalarPartComposite.Part2))])
+                I(name: "PK_IdentityTwoScalarPartComposite", parts: [IPS(nameof(IdentityTwoScalarPartComposite.Id1)), IPS(nameof(IdentityTwoScalarPartComposite.Id2))])
             ],
             properties:
             [
-                P(name: nameof(IdentityTwoScalarPartComposite.Part1), expression: TE.ClrRef<int>(), required: true),
-                P(name: nameof(IdentityTwoScalarPartComposite.Part2), expression: TE.ClrRef<string>(), required: false)
+                P(name: nameof(IdentityTwoScalarPartComposite.Id1), expression: TE.ClrRef<int>(), required: true),
+                P(name: nameof(IdentityTwoScalarPartComposite.Id2), expression: TE.ClrRef<string>(), required: false),
+                P(name: nameof(IdentityTwoScalarPartComposite.Description), expression: TE.ClrRef<string>(), required: false)
             ]
         );
 
-        // IdentityThreeScalarPartComposite: Composite identity (int + string + int)
+        // IdentityThreeScalarPartComposite: Composite identity (int + string + Guid)
         var identityThreeScalarPartComposite = O(
             name: nameof(IdentityThreeScalarPartComposite),
             clr: typeof(IdentityThreeScalarPartComposite),
             identities:
             [
-                I(name: "PK_IdentityThreeScalarPartComposite", parts: [IPS(nameof(IdentityThreeScalarPartComposite.Part1)), IPS(nameof(IdentityThreeScalarPartComposite.Part2)), IPS(nameof(IdentityThreeScalarPartComposite.Part3))])
+                I(name: "PK_IdentityThreeScalarPartComposite", parts: [IPS(nameof(IdentityThreeScalarPartComposite.Id1)), IPS(nameof(IdentityThreeScalarPartComposite.Id2)), IPS(nameof(IdentityThreeScalarPartComposite.Id3))])
             ],
             properties:
             [
-                P(name: nameof(IdentityThreeScalarPartComposite.Part1), expression: TE.ClrRef<int>(), required: true),
-                P(name: nameof(IdentityThreeScalarPartComposite.Part2), expression: TE.ClrRef<string>(), required: false),
-                P(name: nameof(IdentityThreeScalarPartComposite.Part3), expression: TE.ClrRef<int>(), required: true)
+                P(name: nameof(IdentityThreeScalarPartComposite.Id1), expression: TE.ClrRef<int>(), required: true),
+                P(name: nameof(IdentityThreeScalarPartComposite.Id2), expression: TE.ClrRef<string>(), required: false),
+                P(name: nameof(IdentityThreeScalarPartComposite.Id3), expression: TE.ClrRef<Guid>(), required: true),
+                P(name: nameof(IdentityThreeScalarPartComposite.Description), expression: TE.ClrRef<string>(), required: false)
             ]
         );
 
-        // IdentityNestedPart: Nested part for identity testing
-        var identityNestedPart = O(
-            name: nameof(IdentityNestedPart),
-            clr: typeof(IdentityNestedPart),
+        // IdentityNested: Nested part for identity testing
+        var identityNested = O(
+            name: nameof(IdentityNested),
+            clr: typeof(IdentityNested),
             identities:
             [
-                I(name: "PK_IdentityNestedPart", parts: [IPS(nameof(IdentityNestedPart.Id))])
+                I(name: "PK_IdentityNestedPart", parts: [IPS(nameof(IdentityNested.Id))])
             ],
             properties:
             [
-                P(name: nameof(IdentityNestedPart.Id), expression: TE.ClrRef<int>(), required: true),
-                P(name: nameof(IdentityNestedPart.Code), expression: TE.ClrRef<string>(), required: true)
+                P(name: nameof(IdentityNested.Id), expression: TE.ClrRef<int>(), required: true),
+                P(name: nameof(IdentityNested.Description), expression: TE.ClrRef<string>(), required: false)
             ]
         );
 
@@ -780,37 +782,54 @@ public static class ApiSchemaFactory
             ],
             properties:
             [
-                P(name: nameof(IdentityNestedComposite.NestedPart), expression: TE.ClrRef<IdentityNestedPart>(), required: true),
+                P(name: nameof(IdentityNestedComposite.NestedPart), expression: TE.ClrRef<IdentityNested>(), required: true),
                 P(name: nameof(IdentityNestedComposite.Name), expression: TE.ClrRef<string>(), required: true)
             ]
         );
 
-        // IdentityParent: Parent identity reference for testing parent identity handling
-        var identityParent = O(
-            name: nameof(IdentityParent),
-            clr: typeof(IdentityParent),
+        // IdentityOwner: Owner identity reference for testing owner identity handling
+        var identityOwner = O(
+            name: nameof(IdentityOwner),
+            clr: typeof(IdentityOwner),
             identities:
             [
-                I(name: "PK_IdentityParent", parts: [IPS(nameof(IdentityParent.Id))])
+                I(name: "PK_IdentityOwner", parts: [IPS(nameof(IdentityOwner.Id))])
             ],
             properties:
             [
-                P(name: nameof(IdentityParent.Id), expression: TE.ClrRef<int>(), required: true)
+                P(name: nameof(IdentityOwner.Id), expression: TE.ClrRef<int>(), required: true),
+                P(name: nameof(IdentityOwner.Description), expression: TE.ClrRef<string>(), required: false),
+                P(name: nameof(IdentityOwner.Dependents), expression: TE.ListOf<IdentityOwnedComposite>(required: true), required: true),
+                P(name: nameof(IdentityOwner.Dependent), expression: TE.ClrRef<IdentityOwnedDependent>(), required: true)
             ]
         );
 
-        // IdentityChildComposite: Composite identity with parent reference
-        var identityChildComposite = O(
-            name: nameof(IdentityChildComposite),
-            clr: typeof(IdentityChildComposite),
+        // IdentityOwnedComposite: Composite identity with owner identity and secondary child identity
+        var identityOwnedComposite = O(
+            name: nameof(IdentityOwnedComposite),
+            clr: typeof(IdentityOwnedComposite),
             identities:
             [
-                I(name: "PK_IdentityChildComposite", parts: [IPP(), IPS(nameof(IdentityChildComposite.ChildId))])
+                I(name: "PK_IdentityOwnedComposite", parts: [IPO(), IPS(nameof(IdentityOwnedComposite.LineNumber))])
             ],
             properties:
             [
-                P(name: nameof(IdentityChildComposite.ChildId), expression: TE.ClrRef<int>(), required: true),
-                P(name: nameof(IdentityChildComposite.ChildName), expression: TE.ClrRef<string>(), required: true)
+                P(name: nameof(IdentityOwnedComposite.LineNumber), expression: TE.ClrRef<int>(), required: true),
+                P(name: nameof(IdentityOwnedComposite.Description), expression: TE.ClrRef<string>(), required: true),
+            ]
+        );
+
+        // IdentityOwnedDependent: Composite identity with owner identity only
+        var identityOwnedDependent = O(
+            name: nameof(IdentityOwnedDependent),
+            clr: typeof(IdentityOwnedDependent),
+            identities:
+            [
+                I(name: "PK_IdentityOwnedDependent", parts: [IPO()])
+            ],
+            properties:
+            [
+                P(name: nameof(IdentityOwnedDependent.Description), expression: TE.ClrRef<string>(), required: true)
             ]
         );
 
@@ -819,10 +838,11 @@ public static class ApiSchemaFactory
             identityScalar,
             identityTwoScalarPartComposite,
             identityThreeScalarPartComposite,
-            identityNestedPart,
+            identityNested,
             identityNestedComposite,
-            identityParent,
-            identityChildComposite
+            identityOwner,
+            identityOwnedComposite,
+            identityOwnedDependent
         };
 
         var schema = ApiSchema.Create
@@ -907,7 +927,7 @@ public static class ApiSchemaFactory
                             {
                                 ApiIdentityPartKind.Scalar => new ApiScalarIdentityPart(part.ApiPropertyName!, part.ClrScalarTypeHint),
                                 ApiIdentityPartKind.Nested => new ApiNestedIdentityPart(part.ApiPropertyName!, part.ApiIdentityName),
-                                ApiIdentityPartKind.Parent => new ApiParentIdentityPart(part.ApiIdentityName),
+                                ApiIdentityPartKind.Owner => new ApiOwnerIdentityPart(part.ApiIdentityName),
                                 _ => throw new InvalidOperationException($"Unsupported ApiIdentityPartKind: {apiKind}"),
                             };
                             return apiIdentityPart;

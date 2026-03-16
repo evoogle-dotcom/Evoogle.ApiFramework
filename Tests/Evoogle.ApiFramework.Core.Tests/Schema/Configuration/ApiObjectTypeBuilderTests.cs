@@ -123,17 +123,17 @@ public class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
                                     break;
                                 }
 
-                            case ApiIdentityPartKind.Parent:
+                            case ApiIdentityPartKind.Owner:
                                 {
-                                    var parentPart = (ApiParentIdentityPart)apiIdentityPart;
-                                    var apiIdentityName = parentPart.ApiIdentityName;
+                                    var ownerPart = (ApiOwnerIdentityPart)apiIdentityPart;
+                                    var apiIdentityName = ownerPart.ApiIdentityName;
                                     if (apiIdentityName is not null)
                                     {
-                                        identityBuilder.AddParent(apiIdentityName);
+                                        identityBuilder.AddOwner(apiIdentityName);
                                     }
                                     else
                                     {
-                                        identityBuilder.AddParent(parentPart.ApiIdentityName!);
+                                        identityBuilder.AddOwner(ownerPart.ApiIdentityName!);
                                     }
                                     break;
                                 }
