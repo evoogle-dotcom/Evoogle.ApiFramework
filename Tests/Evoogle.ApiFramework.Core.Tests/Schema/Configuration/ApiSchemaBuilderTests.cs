@@ -391,14 +391,14 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
     [
         new BuildTest
         {
-            Name = $"Build {ApiEmptySchema}",
+            Name = $"Builds {ApiEmptySchema}",
             ApiName = nameof(ApiEmptySchema),
             ApiVersion = "1.0",
             Expected = ApiEmptySchema,
         },
         new BuildTest
         {
-            Name = $"Build {ApiEmptySchemaWithExtension}",
+            Name = $"Builds {ApiEmptySchemaWithExtension}",
             ApiName = nameof(ApiEmptySchemaWithExtension),
             ApiVersion = "1.0",
             Expected = ApiEmptySchemaWithExtension,
@@ -406,7 +406,7 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
         },
         new BuildTest
         {
-            Name = $"Build {ApiScalarsOnlySchema}",
+            Name = $"Builds {ApiScalarsOnlySchema}",
             ApiName = nameof(ApiScalarsOnlySchema),
             ApiVersion = "1.0",
             ApiScalarTypes =
@@ -421,7 +421,7 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
         },
         new BuildTest
         {
-            Name = $"Build {ApiScalarsOnlySchemaWithExtension}",
+            Name = $"Builds {ApiScalarsOnlySchemaWithExtension}",
             ApiName = nameof(ApiScalarsOnlySchemaWithExtension),
             ApiVersion = "1.0",
             ApiScalarTypes =
@@ -437,7 +437,7 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
         },
         new BuildTest
         {
-            Name = $"Build {ApiScalarsOnlyObjectTypeSchema}",
+            Name = $"Builds {ApiScalarsOnlyObjectTypeSchema}",
             ApiName = nameof(ApiScalarsOnlyObjectTypeSchema),
             ApiVersion = "1.0",
             ApiScalarTypes =
@@ -455,7 +455,7 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
         },
         new BuildTest
         {
-            Name = $"Build {ApiScalarsOnlyObjectTypeSchema} fails with missing scalar types",
+            Name = $"Builds {ApiScalarsOnlyObjectTypeSchema} throws when missing scalar types",
             ApiName = nameof(ApiScalarsOnlyObjectTypeSchema),
             ApiVersion = "1.0",
             ApiScalarTypes =
@@ -491,7 +491,7 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
         },
         new BuildTest
         {
-            Name = $"Build {ApiPersonObjectTypeSchema}",
+            Name = $"Builds {ApiPersonObjectTypeSchema}",
             ApiName = nameof(ApiPersonObjectTypeSchema),
             ApiVersion = "1.0",
             ApiScalarTypes =
@@ -511,7 +511,7 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
         },
         new BuildTest
         {
-            Name = $"Build {ApiPersonObjectTypeSchema} fails with missing scalar and enum types",
+            Name = $"Builds {ApiPersonObjectTypeSchema} throws when missing scalar and enum types",
             ApiName = nameof(ApiPersonObjectTypeSchema),
             ApiVersion = "1.0",
             ApiScalarTypes =
@@ -554,7 +554,7 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
         },
         new BuildTest
         {
-            Name = $"Build {ApiCompanyObjectTypeSchema}",
+            Name = $"Builds {ApiCompanyObjectTypeSchema}",
             ApiName = nameof(ApiCompanyObjectTypeSchema),
             ApiVersion = "1.0",
             ApiScalarTypes =
@@ -575,7 +575,7 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
         },
         new BuildTest
         {
-            Name = $"Build {ApiCompanyObjectTypeSchema} fails with missing object types",
+            Name = $"Builds {ApiCompanyObjectTypeSchema} throws when object types are missing",
             ApiName = nameof(ApiCompanyObjectTypeSchema),
             ApiVersion = "1.0",
             ApiScalarTypes =
@@ -610,7 +610,7 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
         },
         new BuildTest
         {
-            Name = $"Build {ApiCompanyObjectTypeSchema} fails with missing relationship properties",
+            Name = $"Builds {ApiCompanyObjectTypeSchema} throws when relationship properties are missing",
             ApiName = nameof(ApiCompanyObjectTypeSchema),
             ApiVersion = "1.0",
             ApiScalarTypes =

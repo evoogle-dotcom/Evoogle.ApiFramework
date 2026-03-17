@@ -58,19 +58,19 @@ public class ApiSchemaBuilderContextTests(ITestOutputHelper output) : XUnitTests
     [
         new GetOrAddTest
         {
-            Name = "Scalar builder cached",
+            Name = "GetOrAddScalarTypeBuilder returns same instance for same CLR type",
             MethodName = nameof(ApiSchemaBuilderContext.GetOrAddScalarTypeBuilder),
             ClrType = typeof(int)
         },
         new GetOrAddTest
         {
-            Name = "Enum builder cached",
+            Name = "GetOrAddEnumTypeBuilder returns same instance for same CLR type",
             MethodName = nameof(ApiSchemaBuilderContext.GetOrAddEnumTypeBuilder),
             ClrType = typeof(OrderStatus)
         },
         new GetOrAddTest
         {
-            Name = "Object builder cached",
+            Name = "GetOrAddObjectTypeBuilder returns same instance for same CLR type",
             MethodName = nameof(ApiSchemaBuilderContext.GetOrAddObjectTypeBuilder),
             ClrType = typeof(Order)
         }

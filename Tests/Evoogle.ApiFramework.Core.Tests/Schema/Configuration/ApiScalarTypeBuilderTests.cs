@@ -101,21 +101,21 @@ public class ApiScalarTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
     [
         new BuildTest
         {
-            Name = $"Build {Int64Type}",
+            Name = $"Builds {Int64Type}",
             ApiName = Int64Type.ApiName,
             ClrType = Int64Type.ClrType,
             ApiTypeExpected = Int64Type,
         },
         new BuildTest
         {
-            Name = $"Build {StringType}",
+            Name = $"Builds {StringType}",
             ApiName = StringType.ApiName,
             ClrType = StringType.ClrType,
             ApiTypeExpected = StringType,
         },
         new BuildTest
         {
-            Name = $"Build {Int64TypeWithExtension} with extension",
+            Name = $"Builds {Int64TypeWithExtension} with extension",
             ApiName = Int64TypeWithExtension.ApiName,
             ClrType = Int64TypeWithExtension.ClrType,
             ApiTypeExpected = Int64TypeWithExtension,
@@ -123,7 +123,7 @@ public class ApiScalarTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
         },
         new BuildTest
         {
-            Name = $"Build {StringTypeWithExtension} with extension",
+            Name = $"Builds {StringTypeWithExtension} with extension",
             ApiName = StringTypeWithExtension.ApiName,
             ClrType = StringTypeWithExtension.ClrType,
             ApiTypeExpected = StringTypeWithExtension,
