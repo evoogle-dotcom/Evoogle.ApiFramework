@@ -13,15 +13,15 @@ public class ApiIdentityValue
 {
     #region Properties
     /// <summary>
-    ///     Gets the schema path of the identity from which this value was resolved,
+    ///     Gets the API schema path of the identity from which this value was resolved,
     ///     or <see langword="null"/> if the path is not available.
     /// </summary>
-    public string? Path { get; }
+    public string? ApiPath { get; }
 
     /// <summary>
-    ///     Gets the ordered array of resolved part values that make up this identity snapshot,
-    ///     or <see langword="null"/> if no parts were resolved.
+    ///     Gets the ordered array of resolved API part values that make up this identity snapshot,
+    ///     or <see langword="null"/> if no API parts were resolved.
     /// </summary>
-    public ApiIdentityPartValue[]? Parts { get; }
+    public ApiIdentityPartValue[]? ApiParts { get; }
     #endregion
 }

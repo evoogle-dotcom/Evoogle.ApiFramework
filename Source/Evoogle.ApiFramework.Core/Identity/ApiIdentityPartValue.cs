@@ -13,21 +13,21 @@ public class ApiIdentityPartValue
 {
     #region Properties
     /// <summary>Gets or sets the name of the identity part as declared in the schema.</summary>
-    public string Name { get; set; } = null!;
+    public string ApiName { get; set; } = null!;
 
     /// <summary>Gets or sets the kind of value stored in this part: scalar or nested object.</summary>
-    public ApiIdentityPartValueKind Kind { get; set; }
+    public ApiIdentityPartValueKind ApiKind { get; set; }
 
     /// <summary>
-    ///     Gets or sets the scalar <see cref="ApiId"/> value when <see cref="Kind"/> is <see cref="ApiIdentityPartValueKind.Scalar"/>.
-    ///     <see langword="null"/> when <see cref="Kind"/> is <see cref="ApiIdentityPartValueKind.Object"/>.
+    ///     Gets or sets the scalar <see cref="ApiId"/> value when <see cref="ApiKind"/> is <see cref="ApiIdentityPartValueKind.Scalar"/>.
+    ///     <see langword="null"/> when <see cref="ApiKind"/> is <see cref="ApiIdentityPartValueKind.Object"/>.
     /// </summary>
-    public ApiId? ScalarValue { get; set; }
+    public ApiId? ApiScalarValue { get; set; }
 
     /// <summary>
-    ///     Gets or sets the nested <see cref="ApiIdentityValue"/> when <see cref="Kind"/> is <see cref="ApiIdentityPartValueKind.Object"/>.
-    ///     <see langword="null"/> when <see cref="Kind"/> is <see cref="ApiIdentityPartValueKind.Scalar"/>.
+    ///     Gets or sets the nested <see cref="ApiIdentityValue"/> when <see cref="ApiKind"/> is <see cref="ApiIdentityPartValueKind.Object"/>.
+    ///     <see langword="null"/> when <see cref="ApiKind"/> is <see cref="ApiIdentityPartValueKind.Scalar"/>.
     /// </summary>
-    public ApiIdentityValue? ObjectValue { get; set; }
+    public ApiIdentityValue? ApiObjectValue { get; set; }
     #endregion
 }
