@@ -3,31 +3,25 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Text.Json.Serialization;
+
+using Evoogle.ApiFramework.Identity.Json;
+
 namespace Evoogle.ApiFramework.Identity;
 
 /// <summary>
-///     Represents a single resolved part value within an <see cref="ApiIdentityValue"/> snapshot,
+///     Abstract base class for a single resolved part value within an <see cref="ApiIdentityValue"/>,
 ///     holding either a scalar <see cref="ApiId"/> or a nested <see cref="ApiIdentityValue"/>.
 /// </summary>
-public class ApiIdentityPartValue
+/// <param name="apiName">The name of the identity part as declared in the schema.</param>
+[JsonConverter(typeof(ApiIdentityPartValueJsonConverter))]
+public abstract class ApiIdentityPartValue(string apiName)
 {
     #region Properties
-    /// <summary>Gets or sets the name of the identity part as declared in the schema.</summary>
-    public string ApiName { get; set; } = null!;
+    /// <summary>Gets the name of the identity part as declared in the schema.</summary>
+    public string ApiName { get; } = apiName;
 
-    /// <summary>Gets or sets the kind of value stored in this part: scalar or nested object.</summary>
-    public ApiIdentityPartValueKind ApiKind { get; set; }
-
-    /// <summary>
-    ///     Gets or sets the scalar <see cref="ApiId"/> value when <see cref="ApiKind"/> is <see cref="ApiIdentityPartValueKind.Scalar"/>.
-    ///     <see langword="null"/> when <see cref="ApiKind"/> is <see cref="ApiIdentityPartValueKind.Object"/>.
-    /// </summary>
-    public ApiId? ApiScalarValue { get; set; }
-
-    /// <summary>
-    ///     Gets or sets the nested <see cref="ApiIdentityValue"/> when <see cref="ApiKind"/> is <see cref="ApiIdentityPartValueKind.Object"/>.
-    ///     <see langword="null"/> when <see cref="ApiKind"/> is <see cref="ApiIdentityPartValueKind.Scalar"/>.
-    /// </summary>
-    public ApiIdentityValue? ApiObjectValue { get; set; }
+    /// <summary>Gets the kind of value stored in this part: scalar or nested object.</summary>
+    public abstract ApiIdentityPartValueKind ApiKind { get; }
     #endregion
 }

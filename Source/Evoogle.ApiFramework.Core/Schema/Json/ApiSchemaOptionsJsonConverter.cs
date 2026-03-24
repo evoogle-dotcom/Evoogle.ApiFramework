@@ -5,6 +5,7 @@
 // See the LICENSE file in the project root for more information.
 using System.Text.Json;
 
+using Evoogle.ApiFramework.Identity;
 using Evoogle.Json;
 
 using Microsoft.Extensions.Logging;

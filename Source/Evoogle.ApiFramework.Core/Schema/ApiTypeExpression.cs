@@ -94,11 +94,11 @@ public sealed class ApiTypeExpression
     /// <summary>
     ///     Initializes an API named reference to a declared API type within a schema.
     /// </summary>
-    /// <param name="kind">The expected kind of the referenced API type.</param>
+    /// <param name="apiKind">The expected kind of the referenced API type.</param>
     /// <param name="apiName">The name of the API type to be resolved in the schema.</param>
-    public ApiTypeExpression(ApiTypeKind kind, string apiName)
+    public ApiTypeExpression(ApiTypeKind apiKind, string apiName)
     {
-        this.ApiKind = kind;
+        this.ApiKind = apiKind;
         this.ApiName = apiName;
     }
 
@@ -111,12 +111,12 @@ public sealed class ApiTypeExpression
     /// <summary>
     ///     Initializes either an API named reference or a CLR typed reference to a declared API type within a schema.
     /// </summary>
-    /// <param name="kind">The expected kind of the referenced API type.</param>
+    /// <param name="apiKind">The expected kind of the referenced API type.</param>
     /// <param name="apiName">The name of the API type to be resolved in the schema.</param>
     /// <param name="clrType">The CLR type to be resolved in the schema.</param>
-    public ApiTypeExpression(ApiTypeKind? kind, string? apiName, Type? clrType)
+    public ApiTypeExpression(ApiTypeKind? apiKind, string? apiName, Type? clrType)
     {
-        this.ApiKind = kind;
+        this.ApiKind = apiKind;
         this.ApiName = apiName;
         this.ClrType = clrType;
     }

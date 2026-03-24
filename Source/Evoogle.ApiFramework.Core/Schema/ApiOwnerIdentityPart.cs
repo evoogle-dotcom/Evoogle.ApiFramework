@@ -17,6 +17,7 @@ public sealed class ApiOwnerIdentityPart(string? apiIdentityName = null) : ApiId
 {
     #region ApiOwnerIdentityPart Fields
     private ApiIdentity? _apiResolvedOwnerIdentity = null;
+    private ApiObjectType? _apiResolvedOwnerType = null;
     #endregion
 
     #region ApiSchemaElement Properties
@@ -38,6 +39,9 @@ public sealed class ApiOwnerIdentityPart(string? apiIdentityName = null) : ApiId
 
     /// <summary>Gets the resolved owner <see cref="ApiIdentity"/> from the owning object type. Available after schema initialization.</summary>
     public ApiIdentity ApiOwnerIdentity => this.ThrowIfNotInitialized(_apiResolvedOwnerIdentity);
+
+    /// <summary>Gets the resolved owner <see cref="ApiObjectType"/>. Available after schema initialization.</summary>
+    public ApiObjectType ApiOwnerType => this.ThrowIfNotInitialized(_apiResolvedOwnerType);
     #endregion
 
     #region Object Methods
@@ -66,6 +70,7 @@ public sealed class ApiOwnerIdentityPart(string? apiIdentityName = null) : ApiId
     )
     {
         _apiResolvedOwnerIdentity = null;
+        _apiResolvedOwnerType = null;
 
         if (candidateOwners.Count == 0)
         {
@@ -100,6 +105,7 @@ public sealed class ApiOwnerIdentityPart(string? apiIdentityName = null) : ApiId
             if (ownerType.TryGetIdentityByApiName(this.ApiIdentityName, out var namedIdentity))
             {
                 _apiResolvedOwnerIdentity = namedIdentity;
+                _apiResolvedOwnerType = ownerType;
             }
             else
             {
@@ -119,6 +125,7 @@ public sealed class ApiOwnerIdentityPart(string? apiIdentityName = null) : ApiId
         {
             // Use primary identity (first by convention)
             _apiResolvedOwnerIdentity = ownerType.ApiPrimaryIdentity;
+            _apiResolvedOwnerType = ownerType;
 
             if (_apiResolvedOwnerIdentity is null)
             {

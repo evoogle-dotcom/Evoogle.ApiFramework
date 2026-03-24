@@ -1,8 +1,9 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Identity;
 using Evoogle.ApiFramework.TestData;
 using Evoogle.XUnit;
 
@@ -446,7 +447,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(Person.Id),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
                                     ApiTypeModifiers: ApiTypeModifiers.Required,
                                     ClrName: nameof(Person.Id),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -454,7 +455,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(Person.Name),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
                                     ApiTypeModifiers: ApiTypeModifiers.Required,
                                     ClrName: nameof(Person.Name),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -462,7 +463,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(Person.Age),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
                                     ApiTypeModifiers: ApiTypeModifiers.None,
                                     ClrName: nameof(Person.Age),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -470,7 +471,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(Person.Gender),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Enum, apiName: nameof(Gender)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Enum, apiName: nameof(Gender)),
                                     ApiTypeModifiers: ApiTypeModifiers.None,
                                     ClrName: nameof(Person.Gender),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -482,7 +483,7 @@ public partial class ApiSchemaTests
                                     (
                                         apiInlineType: new ApiCollectionType
                                         (
-                                            apiItemTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                            apiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
                                             apiItemTypeModifiers: ApiTypeModifiers.Required,
                                             clrCollectionType: typeof(List<string>)
                                         )
@@ -494,7 +495,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(Person.CompanyId),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Ulid)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Ulid)),
                                     ApiTypeModifiers: ApiTypeModifiers.None,
                                     ClrName: nameof(Person.CompanyId),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -612,7 +613,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(Person.Id),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
                                     ApiTypeModifiers: ApiTypeModifiers.Required,
                                     ClrName: nameof(Person.Id),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -620,7 +621,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(Person.Name),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
                                     ApiTypeModifiers: ApiTypeModifiers.Required,
                                     ClrName: nameof(Person.Name),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -628,7 +629,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(Person.Age),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
                                     ApiTypeModifiers: ApiTypeModifiers.None,
                                     ClrName: nameof(Person.Age),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -636,7 +637,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(Person.Gender),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Enum, apiName: nameof(Gender)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Enum, apiName: nameof(Gender)),
                                     ApiTypeModifiers: ApiTypeModifiers.None,
                                     ClrName: nameof(Person.Gender),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -648,7 +649,7 @@ public partial class ApiSchemaTests
                                     (
                                         apiInlineType: new ApiCollectionType
                                         (
-                                            apiItemTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                            apiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
                                             apiItemTypeModifiers: ApiTypeModifiers.Required,
                                             clrCollectionType: typeof(List<string>)
                                         )
@@ -660,7 +661,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(Person.CompanyId),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Ulid)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Ulid)),
                                     ApiTypeModifiers: ApiTypeModifiers.None,
                                     ClrName: nameof(Person.CompanyId),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -778,7 +779,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(Company.Id),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Ulid)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Ulid)),
                                     ApiTypeModifiers: ApiTypeModifiers.Required,
                                     ClrName: nameof(Company.Id),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -786,7 +787,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(Company.Name),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
                                     ApiTypeModifiers: ApiTypeModifiers.Required,
                                     ClrName: nameof(Company.Name),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -794,7 +795,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(Company.Owner),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Object, apiName: nameof(Person)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(Person)),
                                     ApiTypeModifiers: ApiTypeModifiers.None,
                                     ClrName: nameof(Company.Owner),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -806,7 +807,7 @@ public partial class ApiSchemaTests
                                     (
                                         apiInlineType: new ApiCollectionType
                                         (
-                                            apiItemTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Object, apiName: nameof(Person)),
+                                            apiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(Person)),
                                             apiItemTypeModifiers: ApiTypeModifiers.Required,
                                             clrCollectionType: typeof(List<Person>)
                                         )
@@ -868,7 +869,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(Person.Id),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
                                     ApiTypeModifiers: ApiTypeModifiers.Required,
                                     ClrName: nameof(Person.Id),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -876,7 +877,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(Person.Name),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
                                     ApiTypeModifiers: ApiTypeModifiers.Required,
                                     ClrName: nameof(Person.Name),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -884,7 +885,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(Person.Age),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
                                     ApiTypeModifiers: ApiTypeModifiers.None,
                                     ClrName: nameof(Person.Age),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -892,7 +893,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(Person.Gender),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Enum, apiName: nameof(Gender)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Enum, apiName: nameof(Gender)),
                                     ApiTypeModifiers: ApiTypeModifiers.None,
                                     ClrName: nameof(Person.Gender),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -904,7 +905,7 @@ public partial class ApiSchemaTests
                                     (
                                         apiInlineType: new ApiCollectionType
                                         (
-                                            apiItemTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                            apiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
                                             apiItemTypeModifiers: ApiTypeModifiers.Required,
                                             clrCollectionType: typeof(List<string>)
                                         )
@@ -916,7 +917,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(Person.CompanyId),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Ulid)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Ulid)),
                                     ApiTypeModifiers: ApiTypeModifiers.None,
                                     ClrName: nameof(Person.CompanyId),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -1008,7 +1009,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(IdentityScalar.Id),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
                                     ApiTypeModifiers: ApiTypeModifiers.Required,
                                     ClrName: nameof(IdentityScalar.Id),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -1016,7 +1017,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(IdentityScalar.Name),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
                                     ApiTypeModifiers: ApiTypeModifiers.Required,
                                     ClrName: nameof(IdentityScalar.Name),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -1102,7 +1103,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(IdentityTwoScalarPartComposite.Id1),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
                                     ApiTypeModifiers: ApiTypeModifiers.Required,
                                     ClrName: nameof(IdentityTwoScalarPartComposite.Id1),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -1110,7 +1111,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(IdentityTwoScalarPartComposite.Id2),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
                                     ApiTypeModifiers: ApiTypeModifiers.None,
                                     ClrName: nameof(IdentityTwoScalarPartComposite.Id2),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -1118,7 +1119,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(IdentityTwoScalarPartComposite.Description),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
                                     ApiTypeModifiers: ApiTypeModifiers.None,
                                     ClrName: nameof(IdentityTwoScalarPartComposite.Description),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -1221,7 +1222,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(IdentityThreeScalarPartComposite.Id1),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
                                     ApiTypeModifiers: ApiTypeModifiers.Required,
                                     ClrName: nameof(IdentityThreeScalarPartComposite.Id1),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -1229,7 +1230,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(IdentityThreeScalarPartComposite.Id2),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
                                     ApiTypeModifiers: ApiTypeModifiers.None,
                                     ClrName: nameof(IdentityThreeScalarPartComposite.Id2),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -1237,7 +1238,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(IdentityThreeScalarPartComposite.Id3),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Guid)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Guid)),
                                     ApiTypeModifiers: ApiTypeModifiers.Required,
                                     ClrName: nameof(IdentityThreeScalarPartComposite.Id3),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -1245,7 +1246,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(IdentityThreeScalarPartComposite.Description),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
                                     ApiTypeModifiers: ApiTypeModifiers.None,
                                     ClrName: nameof(IdentityThreeScalarPartComposite.Description),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -1326,7 +1327,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(IdentityNested.Id),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
                                     ApiTypeModifiers: ApiTypeModifiers.Required,
                                     ClrName: nameof(IdentityNested.Id),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -1334,7 +1335,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(IdentityNested.Description),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
                                     ApiTypeModifiers: ApiTypeModifiers.None,
                                     ClrName: nameof(IdentityNested.Description),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -1380,7 +1381,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(IdentityNestedComposite.NestedPart),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Object, apiName: nameof(IdentityNested)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(IdentityNested)),
                                     ApiTypeModifiers: ApiTypeModifiers.Required,
                                     ClrName: nameof(IdentityNestedComposite.NestedPart),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -1388,7 +1389,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(IdentityNestedComposite.Name),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
                                     ApiTypeModifiers: ApiTypeModifiers.Required,
                                     ClrName: nameof(IdentityNestedComposite.Name),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -1469,7 +1470,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(IdentityOwner.Id),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
                                     ApiTypeModifiers: ApiTypeModifiers.Required,
                                     ClrName: nameof(IdentityOwner.Id),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -1477,7 +1478,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(IdentityOwner.Description),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
                                     ApiTypeModifiers: ApiTypeModifiers.None,
                                     ClrName: nameof(IdentityOwner.Description),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -1489,7 +1490,7 @@ public partial class ApiSchemaTests
                                     (
                                         apiInlineType: new ApiCollectionType
                                         (
-                                            apiItemTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Object, apiName: nameof(IdentityOwnedComposite)),
+                                            apiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(IdentityOwnedComposite)),
                                             apiItemTypeModifiers: ApiTypeModifiers.Required,
                                             clrCollectionType: typeof(List<IdentityOwnedComposite>)
                                         )
@@ -1501,7 +1502,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(IdentityOwner.Dependent),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Object, apiName: nameof(IdentityOwnedDependent)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(IdentityOwnedDependent)),
                                     ApiTypeModifiers: ApiTypeModifiers.Required,
                                     ClrName: nameof(IdentityOwner.Dependent),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -1546,7 +1547,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(IdentityOwnedComposite.LineNumber),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
                                     ApiTypeModifiers: ApiTypeModifiers.Required,
                                     ClrName: nameof(IdentityOwnedComposite.LineNumber),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -1554,7 +1555,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(IdentityOwnedComposite.Description),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
                                     ApiTypeModifiers: ApiTypeModifiers.Required,
                                     ClrName: nameof(IdentityOwnedComposite.Description),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -1594,7 +1595,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(IdentityOwnedDependent.Description),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
                                     ApiTypeModifiers: ApiTypeModifiers.Required,
                                     ClrName: nameof(IdentityOwnedDependent.Description),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -1699,7 +1700,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(IdentityScalar.Id),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
                                     ApiTypeModifiers: ApiTypeModifiers.Required,
                                     ClrName: nameof(IdentityScalar.Id),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -1707,7 +1708,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(IdentityScalar.Name),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
                                     ApiTypeModifiers: ApiTypeModifiers.Required,
                                     ClrName: nameof(IdentityScalar.Name),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -1753,7 +1754,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(IdentityTwoScalarPartComposite.Id1),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
                                     ApiTypeModifiers: ApiTypeModifiers.Required,
                                     ClrName: nameof(IdentityTwoScalarPartComposite.Id1),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -1761,7 +1762,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(IdentityTwoScalarPartComposite.Id2),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
                                     ApiTypeModifiers: ApiTypeModifiers.None,
                                     ClrName: nameof(IdentityTwoScalarPartComposite.Id2),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -1769,7 +1770,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(IdentityTwoScalarPartComposite.Description),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
                                     ApiTypeModifiers: ApiTypeModifiers.None,
                                     ClrName: nameof(IdentityTwoScalarPartComposite.Description),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -1820,7 +1821,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(IdentityThreeScalarPartComposite.Id1),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
                                     ApiTypeModifiers: ApiTypeModifiers.Required,
                                     ClrName: nameof(IdentityThreeScalarPartComposite.Id1),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -1828,7 +1829,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(IdentityThreeScalarPartComposite.Id2),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
                                     ApiTypeModifiers: ApiTypeModifiers.None,
                                     ClrName: nameof(IdentityThreeScalarPartComposite.Id2),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -1836,7 +1837,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(IdentityThreeScalarPartComposite.Id3),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Guid)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Guid)),
                                     ApiTypeModifiers: ApiTypeModifiers.Required,
                                     ClrName: nameof(IdentityThreeScalarPartComposite.Id3),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -1844,7 +1845,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(IdentityThreeScalarPartComposite.Description),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
                                     ApiTypeModifiers: ApiTypeModifiers.None,
                                     ClrName: nameof(IdentityThreeScalarPartComposite.Description),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -1885,7 +1886,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(IdentityNested.Id),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
                                     ApiTypeModifiers: ApiTypeModifiers.Required,
                                     ClrName: nameof(IdentityNested.Id),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -1893,7 +1894,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(IdentityNested.Description),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
                                     ApiTypeModifiers: ApiTypeModifiers.None,
                                     ClrName: nameof(IdentityNested.Description),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -1939,7 +1940,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(IdentityNestedComposite.NestedPart),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Object, apiName: nameof(IdentityNested)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(IdentityNested)),
                                     ApiTypeModifiers: ApiTypeModifiers.Required,
                                     ClrName: nameof(IdentityNestedComposite.NestedPart),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -1947,7 +1948,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(IdentityNestedComposite.Name),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
                                     ApiTypeModifiers: ApiTypeModifiers.Required,
                                     ClrName: nameof(IdentityNestedComposite.Name),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -1988,7 +1989,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(IdentityOwner.Id),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
                                     ApiTypeModifiers: ApiTypeModifiers.Required,
                                     ClrName: nameof(IdentityOwner.Id),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -1996,7 +1997,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(IdentityOwner.Description),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
                                     ApiTypeModifiers: ApiTypeModifiers.None,
                                     ClrName: nameof(IdentityOwner.Description),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -2008,7 +2009,7 @@ public partial class ApiSchemaTests
                                     (
                                         apiInlineType: new ApiCollectionType
                                         (
-                                            apiItemTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Object, apiName: nameof(IdentityOwnedComposite)),
+                                            apiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(IdentityOwnedComposite)),
                                             apiItemTypeModifiers: ApiTypeModifiers.Required,
                                             clrCollectionType: typeof(List<IdentityOwnedComposite>)
                                         )
@@ -2020,7 +2021,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(IdentityOwner.Dependent),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Object, apiName: nameof(IdentityOwnedDependent)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(IdentityOwnedDependent)),
                                     ApiTypeModifiers: ApiTypeModifiers.Required,
                                     ClrName: nameof(IdentityOwner.Dependent),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -2065,7 +2066,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(IdentityOwnedComposite.LineNumber),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
                                     ApiTypeModifiers: ApiTypeModifiers.Required,
                                     ClrName: nameof(IdentityOwnedComposite.LineNumber),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -2073,7 +2074,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(IdentityOwnedComposite.Description),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
                                     ApiTypeModifiers: ApiTypeModifiers.Required,
                                     ClrName: nameof(IdentityOwnedComposite.Description),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -2113,7 +2114,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(IdentityOwnedDependent.Description),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
                                     ApiTypeModifiers: ApiTypeModifiers.Required,
                                     ClrName: nameof(IdentityOwnedDependent.Description),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -2194,7 +2195,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(IdentityNested.Id),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
                                     ApiTypeModifiers: ApiTypeModifiers.Required,
                                     ClrName: nameof(IdentityNested.Id),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -2202,7 +2203,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(IdentityNested.Description),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
                                     ApiTypeModifiers: ApiTypeModifiers.None,
                                     ClrName: nameof(IdentityNested.Description),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -2249,7 +2250,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(IdentityNestedComposite.NestedPart),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Object, apiName: nameof(IdentityNested)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(IdentityNested)),
                                     ApiTypeModifiers: ApiTypeModifiers.Required,
                                     ClrName: nameof(IdentityNestedComposite.NestedPart),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -2257,7 +2258,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(IdentityNestedComposite.Name),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
                                     ApiTypeModifiers: ApiTypeModifiers.Required,
                                     ClrName: nameof(IdentityNestedComposite.Name),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -2338,7 +2339,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(IdentityOwner.Id),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
                                     ApiTypeModifiers: ApiTypeModifiers.Required,
                                     ClrName: nameof(IdentityOwner.Id),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -2346,7 +2347,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(IdentityOwner.Description),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
                                     ApiTypeModifiers: ApiTypeModifiers.None,
                                     ClrName: nameof(IdentityOwner.Description),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -2358,7 +2359,7 @@ public partial class ApiSchemaTests
                                     (
                                         apiInlineType: new ApiCollectionType
                                         (
-                                            apiItemTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Object, apiName: nameof(IdentityOwnedComposite)),
+                                            apiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(IdentityOwnedComposite)),
                                             apiItemTypeModifiers: ApiTypeModifiers.Required,
                                             clrCollectionType: typeof(List<IdentityOwnedComposite>)
                                         )
@@ -2370,7 +2371,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(IdentityOwner.Dependent),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Object, apiName: nameof(IdentityOwnedDependent)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(IdentityOwnedDependent)),
                                     ApiTypeModifiers: ApiTypeModifiers.Required,
                                     ClrName: nameof(IdentityOwner.Dependent),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -2416,7 +2417,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(IdentityOwnedComposite.LineNumber),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
                                     ApiTypeModifiers: ApiTypeModifiers.Required,
                                     ClrName: nameof(IdentityOwnedComposite.LineNumber),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -2424,7 +2425,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(IdentityOwnedComposite.Description),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
                                     ApiTypeModifiers: ApiTypeModifiers.Required,
                                     ClrName: nameof(IdentityOwnedComposite.Description),
                                     ClrMemberKind: ClrMemberKind.Property
@@ -2465,7 +2466,7 @@ public partial class ApiSchemaTests
                                 new ApiPropertyConfig
                                 (
                                     ApiName: nameof(IdentityOwnedDependent.Description),
-                                    ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
                                     ApiTypeModifiers: ApiTypeModifiers.Required,
                                     ClrName: nameof(IdentityOwnedDependent.Description),
                                     ClrMemberKind: ClrMemberKind.Property

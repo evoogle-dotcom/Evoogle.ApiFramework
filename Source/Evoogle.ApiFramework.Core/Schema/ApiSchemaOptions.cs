@@ -5,6 +5,7 @@
 // See the LICENSE file in the project root for more information.
 using System.Text.Json.Serialization;
 
+using Evoogle.ApiFramework.Identity;
 using Evoogle.ApiFramework.Schema.Json;
 
 namespace Evoogle.ApiFramework.Schema;

@@ -60,9 +60,7 @@ public sealed partial class ApiObjectType
     #endregion
 
     #region ApiObject Properties
-    /// <summary>
-    ///     Gets all identities defined for the object type.
-    /// </summary>
+    /// <summary>Gets all identities defined for the object type.</summary>
     public ApiIdentity[] ApiIdentities { get; } = [.. apiIdentities.EmptyIfNull().Where(x => x is not null)];
 
     /// <summary>
@@ -74,19 +72,13 @@ public sealed partial class ApiObjectType
     /// </remarks>
     public ApiIdentity? ApiPrimaryIdentity => this.HasIdentity ? this.ApiIdentities[0] : null;
 
-    /// <summary>
-    ///     Gets the configuration options for the object type.
-    /// </summary>
+    /// <summary>Gets the configuration options for the object type.</summary>
     public ApiObjectTypeOptions? ApiOptions => apiOptions;
 
-    /// <summary>
-    ///     Gets the collection of API properties defined on this object type.
-    /// </summary>
+    /// <summary>Gets the collection of API properties defined on this object type.</summary>
     public ApiProperty[] ApiProperties { get; } = [.. apiProperties.EmptyIfNull().Where(x => x is not null)];
 
-    /// <summary>
-    ///     Gets the collection of API relationships defined on this object type.
-    /// </summary>
+    /// <summary>Gets the collection of API relationships defined on this object type.</summary>
     public ApiRelationship[] ApiRelationships { get; } = [.. apiRelationships.EmptyIfNull().Where(x => x is not null)];
 
     private Dictionary<string, ApiIdentity> ApiIdentityApiNameLookup => this.ThrowIfNotInitialized(_apiIdentityApiNameLookup);
@@ -96,9 +88,7 @@ public sealed partial class ApiObjectType
     #endregion
 
     #region ApiObject Computed Properties
-    /// <summary>
-    ///     Indicates whether this object type has any API identities defined.
-    /// </summary>
+    /// <summary>Indicates whether this object type has any API identities defined.</summary>
     public bool HasIdentity => this.ApiIdentities.Length > 0;
     #endregion
 

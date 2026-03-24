@@ -41,10 +41,10 @@ public class ApiIdentityPartJsonConverter(ILogger<ApiIdentityPartJsonConverter>?
             {
                 ApiIdentityPart = new ApiIdentityPartPropertyNames
                 {
-                    ApiKind = policy.ConvertName(nameof(ApiIdentityPart.ApiKind)),
-                    ApiPropertyName = policy.ConvertName(nameof(ApiIdentityPart.ApiPropertyName)),
-                    ApiIdentityName = policy.ConvertName(nameof(ApiIdentityPart.ApiIdentityName)),
-                    ClrScalarTypeHint = policy.ConvertName(nameof(ApiIdentityPart.ClrScalarTypeHint)),
+                    ApiKind = policy.ConvertName(nameof(Schema.ApiIdentityPart.ApiKind)),
+                    ApiPropertyName = policy.ConvertName(nameof(ApiPropertyIdentityPart.ApiPropertyName)),
+                    ApiIdentityName = policy.ConvertName(nameof(ApiOwnerIdentityPart.ApiIdentityName)),
+                    ClrScalarTypeHint = policy.ConvertName(nameof(ApiScalarIdentityPart.ClrScalarTypeHint)),
                 },
                 ExtensibleBase = GetExtensiblePropertyNames(policy),
             };
@@ -182,7 +182,7 @@ public class ApiIdentityPartJsonConverter(ILogger<ApiIdentityPartJsonConverter>?
                     break;
 
                 default:
-                    readContext.Logger.LogError("Unsupported {Kind} enumeration value: '{KindValue}'", nameof(ApiIdentityPartKind), apiKind);
+                    readContext.Logger.LogError("Unsupported {ApiKind} enumeration value: '{ApiKindValue}'", nameof(ApiIdentityPartKind), apiKind);
                     break;
             }
         }

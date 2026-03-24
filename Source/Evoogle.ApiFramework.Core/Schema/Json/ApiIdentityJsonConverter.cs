@@ -89,7 +89,7 @@ public class ApiIdentityJsonConverter(ILogger<ApiIdentityJsonConverter>? logger)
         private static void HandleApiIdentityApiIdentityParts(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiIdentity ??= new ApiIdentityReadData();
-            context.ReadData.ApiIdentity.ApiIdentityParts ??= new List<ApiIdentityPart>();
+            context.ReadData.ApiIdentity.ApiIdentityParts ??= [];
 
             ReadJsonArray(ref reader, context, (x) => HandleApiIdentityApiIdentityPartsArrayItem);
         }

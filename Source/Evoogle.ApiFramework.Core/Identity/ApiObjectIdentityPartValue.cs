@@ -1,0 +1,48 @@
+﻿// Copyright (c) 2024-2025 Evoogle.com
+// SPDX-License-Identifier: MIT
+//
+// This file is licensed under the MIT License.
+// See the LICENSE file in the project root for more information.
+namespace Evoogle.ApiFramework.Identity;
+
+/// <summary>
+///     Represents an object identity part value that holds a nested <see cref="ApiIdentityValue"/>,
+///     representing either a nested object identity or an owner object identity.
+/// </summary>
+/// <param name="apiName">The name of the identity part as declared in the schema.</param>
+/// <param name="apiObjectValue">
+///     The nested <see cref="ApiIdentityValue"/> when fully resolved, or <see langword="null"/> when the nested object
+///     was not available at build time (unresolved). When unresolved, <paramref name="apiStructure"/> preserves the
+///     expected shape for flattening operations.
+/// </param>
+/// <param name="apiStructure">
+///     The structural skeleton of <see cref="ApiIdentityPartValue"/> entries representing the expected shape
+///     of the nested identity. Used when <paramref name="apiObjectValue"/> is <see langword="null"/> so that
+///     <see cref="ApiIdentityValue.ToApiId"/> can emit the correct number of <see cref="ApiId.Empty"/> slots.
+///     <see langword="null"/> when the nested identity resolves to a single scalar (no composite wrapper needed).
+/// </param>
+public sealed class ApiObjectIdentityPartValue(string apiName, ApiIdentityValue? apiObjectValue, ApiIdentityPartValue[]? apiStructure = null) : ApiIdentityPartValue(apiName)
+{
+    #region ApiIdentityPartValue Properties
+    /// <inheritdoc/>
+    public override ApiIdentityPartValueKind ApiKind => ApiIdentityPartValueKind.Object;
+    #endregion
+
+    #region Properties
+    /// <summary>
+    ///     Gets the nested <see cref="ApiIdentityValue"/> when fully resolved, or <see langword="null"/> when unresolved.
+    /// </summary>
+    public ApiIdentityValue? ApiObjectValue { get; } = apiObjectValue;
+
+    /// <summary>
+    ///     Gets the structural skeleton for unresolved nested parts, or <see langword="null"/> when the nested identity
+    ///     resolves to a single scalar (no composite wrapper needed).
+    /// </summary>
+    public ApiIdentityPartValue[]? ApiStructure { get; } = apiStructure;
+    #endregion
+
+    #region Computed Properties
+    /// <summary>Gets a value indicating whether the nested object identity was fully resolved at build time.</summary>
+    public bool IsResolved => this.ApiObjectValue is not null;
+    #endregion
+}

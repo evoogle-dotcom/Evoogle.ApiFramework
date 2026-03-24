@@ -18,7 +18,7 @@ namespace Evoogle.ApiFramework.Schema;
 /// <param name="apiName">The API name used to reference this identity within the schema.</param>
 /// <param name="apiIdentityParts">The ordered collection of parts that compose this identity.</param>
 [JsonConverter(typeof(ApiIdentityJsonConverter))]
-public sealed class ApiIdentity(string apiName, IEnumerable<ApiIdentityPart> apiIdentityParts) : ApiSchemaElement
+public sealed partial class ApiIdentity(string apiName, IEnumerable<ApiIdentityPart> apiIdentityParts) : ApiSchemaElement
 {
     #region ApiSchemaElement Properties
     /// <inheritdoc/>

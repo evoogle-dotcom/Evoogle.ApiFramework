@@ -3,6 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Identity;
 using Evoogle.ApiFramework.TestData;
 using Evoogle.XUnit;
 
@@ -265,7 +266,7 @@ public partial class ApiTypeTests
                 ),
                 ApiCollectionType: new ApiCollectionTypeConfig
                 (
-                    ApiItemTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "String"),
+                    ApiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: "String"),
                     ApiItemTypeModifiers: ApiTypeModifiers.Required
                 )
             )
@@ -293,7 +294,7 @@ public partial class ApiTypeTests
                 ),
                 ApiCollectionType: new ApiCollectionTypeConfig
                 (
-                    ApiItemTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: "String"),
+                    ApiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: "String"),
                     ApiItemTypeModifiers: ApiTypeModifiers.None
                 )
             )
@@ -321,7 +322,7 @@ public partial class ApiTypeTests
                 ),
                 ApiCollectionType: new ApiCollectionTypeConfig
                 (
-                    ApiItemTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Enum, apiName: nameof(StopLight)),
+                    ApiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Enum, apiName: nameof(StopLight)),
                     ApiItemTypeModifiers: ApiTypeModifiers.Required
                 )
             )
@@ -349,7 +350,7 @@ public partial class ApiTypeTests
                 ),
                 ApiCollectionType: new ApiCollectionTypeConfig
                 (
-                    ApiItemTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Enum, apiName: nameof(StopLight)),
+                    ApiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Enum, apiName: nameof(StopLight)),
                     ApiItemTypeModifiers: ApiTypeModifiers.None
                 )
             )
@@ -447,7 +448,7 @@ public partial class ApiTypeTests
                         new ApiPropertyConfig
                         (
                             ApiName: nameof(ScalarsOnly.RequiredName),
-                            ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                            ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
                             ApiTypeModifiers: ApiTypeModifiers.Required,
                             ClrName: nameof(ScalarsOnly.RequiredName),
                             ClrMemberKind: ClrMemberKind.Property
@@ -455,7 +456,7 @@ public partial class ApiTypeTests
                         new ApiPropertyConfig
                         (
                             ApiName: nameof(ScalarsOnly.RequiredNumber),
-                            ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Int64)),
+                            ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int64)),
                             ApiTypeModifiers: ApiTypeModifiers.Required,
                             ClrName: nameof(ScalarsOnly.RequiredNumber),
                             ClrMemberKind: ClrMemberKind.Property
@@ -463,7 +464,7 @@ public partial class ApiTypeTests
                         new ApiPropertyConfig
                         (
                             ApiName: nameof(ScalarsOnly.RequiredPredicate),
-                            ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Boolean)),
+                            ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Boolean)),
                             ApiTypeModifiers: ApiTypeModifiers.Required,
                             ClrName: nameof(ScalarsOnly.RequiredPredicate),
                             ClrMemberKind: ClrMemberKind.Property
@@ -471,7 +472,7 @@ public partial class ApiTypeTests
                         new ApiPropertyConfig
                         (
                             ApiName: nameof(ScalarsOnly.OptionalName),
-                            ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                            ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
                             ApiTypeModifiers: ApiTypeModifiers.None,
                             ClrName: nameof(ScalarsOnly.OptionalName),
                             ClrMemberKind: ClrMemberKind.Field
@@ -479,7 +480,7 @@ public partial class ApiTypeTests
                         new ApiPropertyConfig
                         (
                             ApiName: nameof(ScalarsOnly.OptionalNumber),
-                            ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Int64)),
+                            ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int64)),
                             ApiTypeModifiers: ApiTypeModifiers.None,
                             ClrName: nameof(ScalarsOnly.OptionalNumber),
                             ClrMemberKind: ClrMemberKind.Field
@@ -487,7 +488,7 @@ public partial class ApiTypeTests
                         new ApiPropertyConfig
                         (
                             ApiName: nameof(ScalarsOnly.OptionalPredicate),
-                            ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Boolean)),
+                            ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Boolean)),
                             ApiTypeModifiers: ApiTypeModifiers.None,
                             ClrName: nameof(ScalarsOnly.OptionalPredicate),
                             ClrMemberKind: ClrMemberKind.Field
@@ -595,7 +596,7 @@ public partial class ApiTypeTests
                         new ApiPropertyConfig
                         (
                             ApiName: nameof(ScalarsOnly.RequiredName),
-                            ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                            ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
                             ApiTypeModifiers: ApiTypeModifiers.Required,
                             ClrName: nameof(ScalarsOnly.RequiredName),
                             ClrMemberKind: ClrMemberKind.Property
@@ -603,7 +604,7 @@ public partial class ApiTypeTests
                         new ApiPropertyConfig
                         (
                             ApiName: nameof(ScalarsOnly.RequiredNumber),
-                            ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Int64)),
+                            ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int64)),
                             ApiTypeModifiers: ApiTypeModifiers.Required,
                             ClrName: nameof(ScalarsOnly.RequiredNumber),
                             ClrMemberKind: ClrMemberKind.Property
@@ -611,7 +612,7 @@ public partial class ApiTypeTests
                         new ApiPropertyConfig
                         (
                             ApiName: nameof(ScalarsOnly.RequiredPredicate),
-                            ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Boolean)),
+                            ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Boolean)),
                             ApiTypeModifiers: ApiTypeModifiers.Required,
                             ClrName: nameof(ScalarsOnly.RequiredPredicate),
                             ClrMemberKind: ClrMemberKind.Property
@@ -619,7 +620,7 @@ public partial class ApiTypeTests
                         new ApiPropertyConfig
                         (
                             ApiName: nameof(ScalarsOnly.OptionalName),
-                            ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                            ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
                             ApiTypeModifiers: ApiTypeModifiers.None,
                             ClrName: nameof(ScalarsOnly.OptionalName),
                             ClrMemberKind: ClrMemberKind.Field
@@ -627,7 +628,7 @@ public partial class ApiTypeTests
                         new ApiPropertyConfig
                         (
                             ApiName: nameof(ScalarsOnly.OptionalNumber),
-                            ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Int64)),
+                            ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int64)),
                             ApiTypeModifiers: ApiTypeModifiers.None,
                             ClrName: nameof(ScalarsOnly.OptionalNumber),
                             ClrMemberKind: ClrMemberKind.Field
@@ -635,7 +636,7 @@ public partial class ApiTypeTests
                         new ApiPropertyConfig
                         (
                             ApiName: nameof(ScalarsOnly.OptionalPredicate),
-                            ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Boolean)),
+                            ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Boolean)),
                             ApiTypeModifiers: ApiTypeModifiers.None,
                             ClrName: nameof(ScalarsOnly.OptionalPredicate),
                             ClrMemberKind: ClrMemberKind.Field
@@ -745,7 +746,7 @@ public partial class ApiTypeTests
                         new ApiPropertyConfig
                         (
                             ApiName: nameof(ScalarsOnly.RequiredName),
-                            ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                            ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
                             ApiTypeModifiers: ApiTypeModifiers.Required,
                             ClrName: nameof(ScalarsOnly.RequiredName),
                             ClrMemberKind: ClrMemberKind.Property
@@ -753,7 +754,7 @@ public partial class ApiTypeTests
                         new ApiPropertyConfig
                         (
                             ApiName: nameof(ScalarsOnly.RequiredNumber),
-                            ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Int64)),
+                            ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int64)),
                             ApiTypeModifiers: ApiTypeModifiers.Required,
                             ClrName: nameof(ScalarsOnly.RequiredNumber),
                             ClrMemberKind: ClrMemberKind.Property
@@ -761,7 +762,7 @@ public partial class ApiTypeTests
                         new ApiPropertyConfig
                         (
                             ApiName: nameof(ScalarsOnly.RequiredPredicate),
-                            ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Boolean)),
+                            ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Boolean)),
                             ApiTypeModifiers: ApiTypeModifiers.Required,
                             ClrName: nameof(ScalarsOnly.RequiredPredicate),
                             ClrMemberKind: ClrMemberKind.Property
@@ -769,7 +770,7 @@ public partial class ApiTypeTests
                         new ApiPropertyConfig
                         (
                             ApiName: nameof(ScalarsOnly.OptionalName),
-                            ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                            ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
                             ApiTypeModifiers: ApiTypeModifiers.None,
                             ClrName: nameof(ScalarsOnly.OptionalName),
                             ClrMemberKind: ClrMemberKind.Field
@@ -777,7 +778,7 @@ public partial class ApiTypeTests
                         new ApiPropertyConfig
                         (
                             ApiName: nameof(ScalarsOnly.OptionalNumber),
-                            ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Int64)),
+                            ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int64)),
                             ApiTypeModifiers: ApiTypeModifiers.None,
                             ClrName: nameof(ScalarsOnly.OptionalNumber),
                             ClrMemberKind: ClrMemberKind.Field
@@ -785,7 +786,7 @@ public partial class ApiTypeTests
                         new ApiPropertyConfig
                         (
                             ApiName: nameof(ScalarsOnly.OptionalPredicate),
-                            ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Boolean)),
+                            ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Boolean)),
                             ApiTypeModifiers: ApiTypeModifiers.None,
                             ClrName: nameof(ScalarsOnly.OptionalPredicate),
                             ClrMemberKind: ClrMemberKind.Field
@@ -929,7 +930,7 @@ public partial class ApiTypeTests
                         new ApiPropertyConfig
                         (
                             ApiName: nameof(Company.Id),
-                            ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(Ulid)),
+                            ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Ulid)),
                             ApiTypeModifiers: ApiTypeModifiers.Required,
                             ClrName: nameof(Company.Id),
                             ClrMemberKind: ClrMemberKind.Property
@@ -937,7 +938,7 @@ public partial class ApiTypeTests
                         new ApiPropertyConfig
                         (
                             ApiName: nameof(Company.Name),
-                            ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                            ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
                             ApiTypeModifiers: ApiTypeModifiers.Required,
                             ClrName: nameof(Company.Name),
                             ClrMemberKind: ClrMemberKind.Property
@@ -945,7 +946,7 @@ public partial class ApiTypeTests
                         new ApiPropertyConfig
                         (
                             ApiName: nameof(Company.Owner),
-                            ApiTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Object, apiName: nameof(Person)),
+                            ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(Person)),
                             ApiTypeModifiers: ApiTypeModifiers.None,
                             ClrName: nameof(Company.Owner),
                             ClrMemberKind: ClrMemberKind.Property
@@ -957,7 +958,7 @@ public partial class ApiTypeTests
                             (
                                 apiInlineType: new ApiCollectionType
                                 (
-                                    apiItemTypeExpression: new ApiTypeExpression(kind: ApiTypeKind.Object, apiName: nameof(Person)),
+                                    apiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(Person)),
                                     apiItemTypeModifiers: ApiTypeModifiers.Required,
                                     clrCollectionType: typeof(List<Person>)
                                 )

@@ -158,7 +158,7 @@ public class ApiEnumValueJsonConverter(ILogger<ApiEnumValueJsonConverter>? logge
 
         var apiName = readData?.ApiName;
         var clrName = readData?.ClrName;
-        var clrOrdinal = readData?.ClrOrdinal.GetValueOrDefault() ?? 0;
+        var clrOrdinal = readData?.ClrOrdinal.GetValueOrDefault() ?? default;
 
         var apiEnumValue = new ApiEnumValue(apiName!, clrName!, clrOrdinal);
 
