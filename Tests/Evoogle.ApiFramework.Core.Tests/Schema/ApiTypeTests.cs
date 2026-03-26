@@ -3,8 +3,6 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using System.Diagnostics.CodeAnalysis;
-
 using Evoogle.ApiFramework.Schema.TestData;
 using Evoogle.XUnit;
 
@@ -19,12 +17,16 @@ public partial class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
     private class JsonDeserializeTest : JsonDeserializeTest<ApiType, ApiTypeDescriptor>
     {
         #region Constructors
-        [SetsRequiredMembers]
         public JsonDeserializeTest()
         {
-            this.Name = nameof(JsonDeserializeTest);
-            this.ExpectedFactoryExpression = (arg) => BuildTestApiType(arg);
             this.ExcludeMembers = ApiSchemaExcludeMembers.Standard;
+        }
+        #endregion
+
+        #region JsonDeserializeTest<T, TFactoryArg> Methods
+        protected override ApiType? CreateExpected(ApiTypeDescriptor? descriptor)
+        {
+            return BuildTestApiType(descriptor);
         }
         #endregion
     }
@@ -32,24 +34,27 @@ public partial class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
     private class JsonRoundtripTest : JsonRoundtripTest<ApiType, ApiTypeDescriptor>
     {
         #region Constructors
-        [SetsRequiredMembers]
         public JsonRoundtripTest()
         {
-            this.Name = nameof(JsonRoundtripTest);
-            this.ExpectedFactoryExpression = (arg) => BuildTestApiType(arg);
             this.ExcludeMembers = ApiSchemaExcludeMembers.Standard;
+        }
+
+        #endregion
+
+        #region JsonRoundtripTest<T, TFactoryArg> Methods
+        protected override ApiType? CreateExpected(ApiTypeDescriptor? descriptor)
+        {
+            return BuildTestApiType(descriptor);
         }
         #endregion
     }
 
     private class JsonSerializeTest : JsonSerializeTest<ApiType, ApiTypeDescriptor>
     {
-        #region Constructors
-        [SetsRequiredMembers]
-        public JsonSerializeTest()
+        #region JsonSerializeTest<T, TFactoryArg> Methods
+        protected override ApiType? CreateSource(ApiTypeDescriptor? descriptor)
         {
-            this.Name = nameof(JsonSerializeTest);
-            this.SourceFactoryExpression = (arg) => BuildTestApiType(arg);
+            return BuildTestApiType(descriptor);
         }
         #endregion
     }

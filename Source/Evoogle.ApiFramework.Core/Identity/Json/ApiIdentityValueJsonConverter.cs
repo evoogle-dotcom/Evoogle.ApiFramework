@@ -22,7 +22,6 @@ public sealed class ApiIdentityValueJsonConverter(ILogger<ApiIdentityValueJsonCo
     private readonly record struct ApiIdentityValuePropertyNames
     {
         #region Immutable Properties
-        public required string ApiPath { get; init; }
         public required string ApiParts { get; init; }
         #endregion
     }
@@ -39,7 +38,6 @@ public sealed class ApiIdentityValueJsonConverter(ILogger<ApiIdentityValueJsonCo
             {
                 ApiIdentityValue = new ApiIdentityValuePropertyNames
                 {
-                    ApiPath = policy.ConvertName(nameof(Identity.ApiIdentityValue.ApiPath)),
                     ApiParts = policy.ConvertName(nameof(Identity.ApiIdentityValue.ApiParts)),
                 }
             };
@@ -51,7 +49,6 @@ public sealed class ApiIdentityValueJsonConverter(ILogger<ApiIdentityValueJsonCo
     private class ApiIdentityValueReadData
     {
         #region Properties
-        public string? ApiPath { get; set; }
         public List<ApiIdentityPartValue>? ApiParts { get; set; }
         #endregion
     }
@@ -68,21 +65,11 @@ public sealed class ApiIdentityValueJsonConverter(ILogger<ApiIdentityValueJsonCo
         #region ApiIdentityValue Fields
         public readonly Dictionary<string, JsonReaderHandler<DefaultReadContext<PropertyNames, ReadData, ReadHandlers>>> ApiIdentityValuePropertyHandlers = new()
         {
-            { propertyNames.ApiIdentityValue.ApiPath, HandleApiIdentityValueApiPath },
             { propertyNames.ApiIdentityValue.ApiParts, HandleApiIdentityValueApiParts },
         };
         #endregion
 
         #region ApiIdentityValue Methods
-        private static void HandleApiIdentityValueApiPath(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
-        {
-            context.ReadData.ApiIdentityValue ??= new ApiIdentityValueReadData();
-
-            var apiPath = reader.GetString();
-
-            context.ReadData.ApiIdentityValue.ApiPath = apiPath;
-        }
-
         private static void HandleApiIdentityValueApiParts(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiIdentityValue ??= new ApiIdentityValueReadData();
@@ -131,10 +118,9 @@ public sealed class ApiIdentityValueJsonConverter(ILogger<ApiIdentityValueJsonCo
         var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
         var readData = readContext.ReadData.ApiIdentityValue;
 
-        var apiPath = readData?.ApiPath;
         var apiParts = readData?.ApiParts;
 
-        return new ApiIdentityValue(apiPath, apiParts);
+        return new ApiIdentityValue(apiParts);
     }
 
     /// <inheritdoc/>
@@ -153,22 +139,12 @@ public sealed class ApiIdentityValueJsonConverter(ILogger<ApiIdentityValueJsonCo
 
         WriteJsonObject(writer, () =>
         {
-            WriteApiIdentityValueApiPath(writer, value, writeContext);
             WriteApiIdentityValueApiParts(writer, value, writeContext);
         });
     }
     #endregion
 
     #region Write Methods
-    private static void WriteApiIdentityValueApiPath(Utf8JsonWriter writer, ApiIdentityValue apiIdentityValue, DefaultWriteContext<PropertyNames> context)
-    {
-        var propertyName = context.PropertyNames.ApiIdentityValue.ApiPath;
-        var value = apiIdentityValue.ApiPath;
-        var options = context.Options;
-
-        writer.TryWritePropertyAsString(propertyName, value, options);
-    }
-
     private static void WriteApiIdentityValueApiParts(Utf8JsonWriter writer, ApiIdentityValue apiIdentityValue, DefaultWriteContext<PropertyNames> context)
     {
         var propertyName = context.PropertyNames.ApiIdentityValue.ApiParts;

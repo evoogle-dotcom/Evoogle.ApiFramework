@@ -152,7 +152,7 @@ public partial class ApiIdentityValueTests
         new PropertiesTest
         {
             Name = "Scalar identity with int value",
-            Value = ScalarValue,
+            Value = ScalarIntegerPart,
             ExpectedIsScalar = true,
             ExpectedIsComposite = false,
             ExpectedPartCount = 1,
@@ -162,7 +162,7 @@ public partial class ApiIdentityValueTests
         new PropertiesTest
         {
             Name = "Scalar identity with empty value",
-            Value = ScalarEmptyValue,
+            Value = ScalarEmptyPart,
             ExpectedIsScalar = true,
             ExpectedIsComposite = false,
             ExpectedPartCount = 1,
@@ -180,8 +180,8 @@ public partial class ApiIdentityValueTests
         },
         new PropertiesTest
         {
-            Name = "Composite with resolved nested parts",
-            Value = CompositeWithNestedParts,
+            Name = "Composite with resolved object parts",
+            Value = CompositeWithObjectParts,
             ExpectedIsScalar = false,
             ExpectedIsComposite = true,
             ExpectedPartCount = 2,
@@ -189,8 +189,8 @@ public partial class ApiIdentityValueTests
         },
         new PropertiesTest
         {
-            Name = "Composite with unresolved nested parts is not fully resolved",
-            Value = CompositeWithUnresolvedNestedParts,
+            Name = "Composite with unresolved object parts is not fully resolved",
+            Value = CompositeWithUnresolvedObjectParts,
             ExpectedIsScalar = false,
             ExpectedIsComposite = true,
             ExpectedPartCount = 2,
@@ -198,8 +198,8 @@ public partial class ApiIdentityValueTests
         },
         new PropertiesTest
         {
-            Name = "Composite with partially unresolved nested parts is not fully resolved",
-            Value = CompositeWithPartiallyUnresolvedNestedParts,
+            Name = "Composite with partially unresolved object parts is not fully resolved",
+            Value = CompositeWithPartiallyUnresolvedObjectParts,
             ExpectedIsScalar = false,
             ExpectedIsComposite = true,
             ExpectedPartCount = 2,
@@ -207,8 +207,8 @@ public partial class ApiIdentityValueTests
         },
         new PropertiesTest
         {
-            Name = "Composite with deeply nested parts",
-            Value = CompositeWithDeeplyNestedParts,
+            Name = "Composite with deep object parts",
+            Value = CompositeWithDeepObjectParts,
             ExpectedIsScalar = false,
             ExpectedIsComposite = true,
             ExpectedPartCount = 2,
@@ -221,13 +221,13 @@ public partial class ApiIdentityValueTests
         new ApiScalarValueTest
         {
             Name = "Scalar identity with int value returns scalar value",
-            Value = ScalarValue,
+            Value = ScalarIntegerPart,
             ExpectedScalarValue = ApiId.FromInt32(42)
         },
         new ApiScalarValueTest
         {
             Name = "Scalar identity with empty value returns empty scalar value",
-            Value = ScalarEmptyValue,
+            Value = ScalarEmptyPart,
             ExpectedScalarValue = ApiId.Empty
         },
         new ApiScalarValueTest

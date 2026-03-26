@@ -3,7 +3,6 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 using Evoogle.Extensions;
@@ -293,36 +292,30 @@ public partial class ApiIdTests(ITestOutputHelper output) : XUnitTests(output)
 
     private class JsonDeserializeTest : JsonDeserializeTest<ApiId, ApiIdDescriptor>
     {
-        #region Constructors
-        [SetsRequiredMembers]
-        public JsonDeserializeTest()
+        #region JsonDeserializeTest<T, TFactoryArg> Methods
+        protected override ApiId CreateExpected(ApiIdDescriptor? descriptor)
         {
-            this.Name = nameof(JsonDeserializeTest);
-            this.ExpectedFactoryExpression = (arg) => BuildApiId(arg);
+            return BuildApiId(descriptor);
         }
         #endregion
     }
 
     private class JsonRoundtripTest : JsonRoundtripTest<ApiId, ApiIdDescriptor>
     {
-        #region Constructors
-        [SetsRequiredMembers]
-        public JsonRoundtripTest()
+        #region JsonRoundtripTest<T, TFactoryArg> Methods
+        protected override ApiId CreateExpected(ApiIdDescriptor? descriptor)
         {
-            this.Name = nameof(JsonRoundtripTest);
-            this.ExpectedFactoryExpression = (arg) => BuildApiId(arg);
+            return BuildApiId(descriptor);
         }
         #endregion
     }
 
     private class JsonSerializeTest : JsonSerializeTest<ApiId, ApiIdDescriptor>
     {
-        #region Constructors
-        [SetsRequiredMembers]
-        public JsonSerializeTest()
+        #region JsonSerializeTest<T, TFactoryArg> Methods
+        protected override ApiId CreateSource(ApiIdDescriptor? descriptor)
         {
-            this.Name = nameof(JsonSerializeTest);
-            this.SourceFactoryExpression = (arg) => BuildApiId(arg);
+            return BuildApiId(descriptor);
         }
         #endregion
     }

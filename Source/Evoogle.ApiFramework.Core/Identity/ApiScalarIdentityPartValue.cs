@@ -3,6 +3,8 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.Extensions;
+
 namespace Evoogle.ApiFramework.Identity;
 
 /// <summary>
@@ -17,8 +19,19 @@ public sealed class ApiScalarIdentityPartValue(string apiName, ApiId apiScalarVa
     public override ApiIdentityPartValueKind ApiKind => ApiIdentityPartValueKind.Scalar;
     #endregion
 
-    #region Properties
+    #region ApiScalarIdentityPartValue Properties
     /// <summary>Gets the scalar <see cref="ApiId"/> value for this identity part.</summary>
     public ApiId ApiScalarValue { get; } = apiScalarValue;
+    #endregion
+
+    #region Object Methods
+    /// <inheritdoc/>
+    public override string ToString()
+    {
+        var apiName = this.ApiName.SafeToString();
+        var apiPropertyName = this.ApiScalarValue.SafeToString();
+
+        return $"{nameof(ApiScalarIdentityPartValue)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ApiScalarValue)}={apiPropertyName}}}";
+    }
     #endregion
 }

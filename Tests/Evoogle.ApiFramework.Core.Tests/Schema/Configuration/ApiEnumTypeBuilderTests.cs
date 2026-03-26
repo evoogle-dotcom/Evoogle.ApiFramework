@@ -3,8 +3,6 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using System.Diagnostics.CodeAnalysis;
-
 using Evoogle.ApiFramework.Schema.TestData;
 using Evoogle.ApiFramework.TestData;
 using Evoogle.Extensions;
@@ -32,10 +30,8 @@ public class ApiEnumTypeBuilderTests(ITestOutputHelper output) : XUnitTests(outp
         #endregion
 
         #region Constructors
-        [SetsRequiredMembers]
         public BuildTest()
         {
-            this.Name = nameof(BuildTest);
             this.ExcludeMembers = ApiSchemaExcludeMembers.Standard;
         }
         #endregion

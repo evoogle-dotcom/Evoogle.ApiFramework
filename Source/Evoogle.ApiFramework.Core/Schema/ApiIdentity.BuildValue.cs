@@ -32,7 +32,7 @@ public sealed partial class ApiIdentity
             parts[i] = BuildPartValue(this.ApiIdentityParts[i], context.ClrInstance, context.ClrOwnerInstance, context.NullHandling);
         }
 
-        return ApiIdentityValue.Composite(parts, this.ApiPath);
+        return ApiIdentityValue.Composite(parts);
     }
 
     /// <summary>
@@ -56,7 +56,7 @@ public sealed partial class ApiIdentity
             parts[i] = BuildPartValueFromValues(this.ApiIdentityParts[i], context.Values, context.OwnerValues, context.NullHandling);
         }
 
-        return ApiIdentityValue.Composite(parts, this.ApiPath);
+        return ApiIdentityValue.Composite(parts);
     }
     #endregion
 

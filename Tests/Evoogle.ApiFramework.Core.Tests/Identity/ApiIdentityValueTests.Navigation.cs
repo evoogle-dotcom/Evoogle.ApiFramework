@@ -71,7 +71,7 @@ public partial class ApiIdentityValueTests
         new TryNavigateTest
         {
             Name = "Navigate to direct scalar part",
-            Value = CompositeWithNestedParts,
+            Value = CompositeWithObjectParts,
             DottedPath = "OrderNumber",
             ExpectedFound = true,
             ExpectedPartName = "OrderNumber",
@@ -82,7 +82,7 @@ public partial class ApiIdentityValueTests
         new TryNavigateTest
         {
             Name = "Navigate to direct object part",
-            Value = CompositeWithNestedParts,
+            Value = CompositeWithObjectParts,
             DottedPath = "Customer",
             ExpectedFound = true,
             ExpectedPartName = "Customer",
@@ -93,7 +93,7 @@ public partial class ApiIdentityValueTests
         new TryNavigateTest
         {
             Name = "Navigate to nested scalar part via dotted path",
-            Value = CompositeWithNestedParts,
+            Value = CompositeWithObjectParts,
             DottedPath = "Customer.CustomerId",
             ExpectedFound = true,
             ExpectedPartName = "CustomerId",
@@ -104,7 +104,7 @@ public partial class ApiIdentityValueTests
         new TryNavigateTest
         {
             Name = "Navigate to deeply nested scalar part",
-            Value = CompositeWithNestedParts,
+            Value = CompositeWithObjectParts,
             DottedPath = "Customer.Country.Id",
             ExpectedFound = true,
             ExpectedPartName = "Id",
@@ -115,7 +115,7 @@ public partial class ApiIdentityValueTests
         new TryNavigateTest
         {
             Name = "Navigate four levels deep",
-            Value = CompositeWithDeeplyNestedParts,
+            Value = CompositeWithDeepObjectParts,
             DottedPath = "Level1.Level2.Level3.Level4",
             ExpectedFound = true,
             ExpectedPartName = "Level4",
@@ -126,7 +126,7 @@ public partial class ApiIdentityValueTests
         new TryNavigateTest
         {
             Name = "Navigate to nonexistent part returns null",
-            Value = CompositeWithNestedParts,
+            Value = CompositeWithObjectParts,
             DottedPath = "NonExistent",
             ExpectedFound = false
         },
@@ -135,7 +135,7 @@ public partial class ApiIdentityValueTests
         new TryNavigateTest
         {
             Name = "Navigate past scalar returns null",
-            Value = CompositeWithNestedParts,
+            Value = CompositeWithObjectParts,
             DottedPath = "OrderNumber.Something",
             ExpectedFound = false
         },
@@ -144,7 +144,7 @@ public partial class ApiIdentityValueTests
         new TryNavigateTest
         {
             Name = "Navigate into unresolved object via structure skeleton",
-            Value = CompositeWithUnresolvedNestedParts,
+            Value = CompositeWithUnresolvedObjectParts,
             DottedPath = "Customer.CustomerId",
             ExpectedFound = true,
             ExpectedPartName = "CustomerId",
@@ -155,7 +155,7 @@ public partial class ApiIdentityValueTests
         new TryNavigateTest
         {
             Name = "Navigate deeply into unresolved structure skeleton",
-            Value = CompositeWithUnresolvedNestedParts,
+            Value = CompositeWithUnresolvedObjectParts,
             DottedPath = "Customer.Country.Id",
             ExpectedFound = true,
             ExpectedPartName = "Id",
@@ -166,7 +166,7 @@ public partial class ApiIdentityValueTests
         new TryNavigateTest
         {
             Name = "Empty path returns null",
-            Value = CompositeWithNestedParts,
+            Value = CompositeWithObjectParts,
             DottedPath = "",
             ExpectedFound = false
         },

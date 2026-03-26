@@ -24,8 +24,8 @@ public class ApiIdentityBuilder(string apiName) : ExtensionBuilder<ApiIdentityBu
     ///     Adds a part of the specified kind to this identity definition.
     /// </summary>
     /// <param name="apiKind">The kind of identity part to add.</param>
-    /// <param name="apiPropertyName">The API property name for scalar/nested parts; <see langword="null"/> for parent parts.</param>
-    /// <param name="apiIdentityName">Optional explicit identity name for nested/parent parts.</param>
+    /// <param name="apiPropertyName">The API property name for scalar/object parts; <see langword="null"/> for owner parts.</param>
+    /// <param name="apiIdentityName">Optional explicit identity name for object/owner parts.</param>
     /// <param name="clrScalarTypeHint">Optional CLR type hint for scalar parts.</param>
     /// <param name="configure">Optional callback to further configure the part builder.</param>
     /// <returns>The current builder instance.</returns>

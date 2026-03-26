@@ -85,13 +85,13 @@ public partial class ApiIdentityValueTests
         new ToApiIdTest
         {
             Name = "Scalar identity flattens to scalar ApiId",
-            Value = ScalarValue,
+            Value = ScalarIntegerPart,
             ExpectedApiId = ApiId.FromInt32(42)
         },
         new ToApiIdTest
         {
             Name = "Scalar empty identity flattens to empty ApiId",
-            Value = ScalarEmptyValue,
+            Value = ScalarEmptyPart,
             ExpectedApiId = ApiId.Empty
         },
 
@@ -119,11 +119,11 @@ public partial class ApiIdentityValueTests
             )
         },
 
-        // Composite with resolved nested parts
+        // Composite with resolved object parts
         new ToApiIdTest
         {
-            Name = "Composite with resolved nested parts flattens to named composite with dotted names",
-            Value = CompositeWithNestedParts,
+            Name = "Composite with resolved object parts flattens to named composite with dotted names",
+            Value = CompositeWithObjectParts,
             UseNamedParts = true,
             ExpectedApiId = ApiId.Composite
             (
@@ -134,8 +134,8 @@ public partial class ApiIdentityValueTests
         },
         new ToApiIdTest
         {
-            Name = "Composite with resolved nested parts flattens to unnamed composite",
-            Value = CompositeWithNestedParts,
+            Name = "Composite with resolved object parts flattens to unnamed composite",
+            Value = CompositeWithObjectParts,
             UseNamedParts = false,
             ExpectedApiId = ApiId.Composite
             (
@@ -145,20 +145,20 @@ public partial class ApiIdentityValueTests
             )
         },
 
-        // Composite with unresolved nested parts — ThrowException
+        // Composite with unresolved object parts — ThrowException
         new ToApiIdTest
         {
-            Name = "Composite with unresolved nested parts throws when ThrowException",
-            Value = CompositeWithUnresolvedNestedParts,
+            Name = "Composite with unresolved object parts throws when ThrowException",
+            Value = CompositeWithUnresolvedObjectParts,
             NullHandling = ApiIdentityNullHandling.ThrowException,
             ExpectedExceptionType = typeof(ApiIdentityException)
         },
 
-        // Composite with unresolved nested parts — ReturnEmpty
+        // Composite with unresolved object parts — ReturnEmpty
         new ToApiIdTest
         {
-            Name = "Composite with unresolved nested parts flattens to named composite with empty slots",
-            Value = CompositeWithUnresolvedNestedParts,
+            Name = "Composite with unresolved object parts flattens to named composite with empty slots",
+            Value = CompositeWithUnresolvedObjectParts,
             UseNamedParts = true,
             NullHandling = ApiIdentityNullHandling.ReturnEmpty,
             ExpectedApiId = ApiId.Composite
@@ -170,8 +170,8 @@ public partial class ApiIdentityValueTests
         },
         new ToApiIdTest
         {
-            Name = "Composite with unresolved nested parts flattens to unnamed composite with empty slots",
-            Value = CompositeWithUnresolvedNestedParts,
+            Name = "Composite with unresolved object parts flattens to unnamed composite with empty slots",
+            Value = CompositeWithUnresolvedObjectParts,
             UseNamedParts = false,
             NullHandling = ApiIdentityNullHandling.ReturnEmpty,
             ExpectedApiId = ApiId.Composite
@@ -182,20 +182,20 @@ public partial class ApiIdentityValueTests
             )
         },
 
-        // Composite with partially unresolved nested parts — ThrowException
+        // Composite with partially unresolved object parts — ThrowException
         new ToApiIdTest
         {
-            Name = "Composite with partially unresolved nested parts throws when ThrowException",
-            Value = CompositeWithPartiallyUnresolvedNestedParts,
+            Name = "Composite with partially unresolved object parts throws when ThrowException",
+            Value = CompositeWithPartiallyUnresolvedObjectParts,
             NullHandling = ApiIdentityNullHandling.ThrowException,
             ExpectedExceptionType = typeof(ApiIdentityException)
         },
 
-        // Composite with partially unresolved nested parts — ReturnEmpty
+        // Composite with partially unresolved object parts — ReturnEmpty
         new ToApiIdTest
         {
-            Name = "Composite with partially unresolved nested parts flattens to named composite",
-            Value = CompositeWithPartiallyUnresolvedNestedParts,
+            Name = "Composite with partially unresolved object parts flattens to named composite",
+            Value = CompositeWithPartiallyUnresolvedObjectParts,
             UseNamedParts = true,
             NullHandling = ApiIdentityNullHandling.ReturnEmpty,
             ExpectedApiId = ApiId.Composite
@@ -207,8 +207,8 @@ public partial class ApiIdentityValueTests
         },
         new ToApiIdTest
         {
-            Name = "Composite with partially unresolved nested parts flattens to unnamed composite",
-            Value = CompositeWithPartiallyUnresolvedNestedParts,
+            Name = "Composite with partially unresolved object parts flattens to unnamed composite",
+            Value = CompositeWithPartiallyUnresolvedObjectParts,
             UseNamedParts = false,
             NullHandling = ApiIdentityNullHandling.ReturnEmpty,
             ExpectedApiId = ApiId.Composite
@@ -219,11 +219,11 @@ public partial class ApiIdentityValueTests
             )
         },
 
-        // Deeply nested parts
+        // Deep object parts
         new ToApiIdTest
         {
-            Name = "Composite with deeply nested parts flattens to named composite with deep dotted names",
-            Value = CompositeWithDeeplyNestedParts,
+            Name = "Composite with deep object parts flattens to named composite with deep dotted names",
+            Value = CompositeWithDeepObjectParts,
             UseNamedParts = true,
             ExpectedApiId = ApiId.Composite
             (
@@ -234,8 +234,8 @@ public partial class ApiIdentityValueTests
         },
         new ToApiIdTest
         {
-            Name = "Composite with deeply nested parts flattens to unnamed composite",
-            Value = CompositeWithDeeplyNestedParts,
+            Name = "Composite with deep object parts flattens to unnamed composite",
+            Value = CompositeWithDeepObjectParts,
             UseNamedParts = false,
             ExpectedApiId = ApiId.Composite
             (

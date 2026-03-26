@@ -12,8 +12,8 @@ using Evoogle.Extensions;
 namespace Evoogle.ApiFramework.Identity;
 
 /// <summary>
-///     Represents a structured snapshot of a resolved object identity, capturing the schema path and
-///     all resolved part values at a single point in time.
+///     Represents a structured snapshot of a resolved object identity, capturing all resolved part values
+///     at a single point in time.
 /// </summary>
 /// <remarks>
 ///     <para>
@@ -31,15 +31,9 @@ namespace Evoogle.ApiFramework.Identity;
 ///     </para>
 /// </remarks>
 [JsonConverter(typeof(ApiIdentityValueJsonConverter))]
-public sealed class ApiIdentityValue(string? apiPath, IEnumerable<ApiIdentityPartValue>? apiParts)
+public sealed class ApiIdentityValue(IEnumerable<ApiIdentityPartValue>? apiParts)
 {
     #region Properties
-    /// <summary>
-    ///     Gets the API schema path of the identity from which this value was resolved,
-    ///     or <see langword="null"/> if the path is not available.
-    /// </summary>
-    public string? ApiPath { get; } = apiPath;
-
     /// <summary>
     ///     Gets the ordered array of resolved API part values that make up this identity.
     ///     Always non-null and contains at least one element.
@@ -91,23 +85,21 @@ public sealed class ApiIdentityValue(string? apiPath, IEnumerable<ApiIdentityPar
     ///     Creates an <see cref="ApiIdentityValue"/> from one or more pre-built parts.
     /// </summary>
     /// <param name="apiParts">The parts composing this identity. Must contain at least one element.</param>
-    /// <param name="apiPath">The optional schema path.</param>
     /// <returns>An <see cref="ApiIdentityValue"/> containing the specified parts.</returns>
-    internal static ApiIdentityValue Composite(ApiIdentityPartValue[] apiParts, string? apiPath = null)
-        => new(apiPath, apiParts);
+    internal static ApiIdentityValue Composite(ApiIdentityPartValue[] apiParts)
+        => new(apiParts);
 
     /// <summary>
     ///     Creates an <see cref="ApiIdentityValue"/> representing a single scalar identity.
     /// </summary>
     /// <param name="apiPartName">The name of the scalar identity part.</param>
     /// <param name="apiScalarValue">The scalar <see cref="ApiId"/> value.</param>
-    /// <param name="apiPath">The optional schema path.</param>
     /// <returns>An <see cref="ApiIdentityValue"/> containing one <see cref="ApiScalarIdentityPartValue"/>.</returns>
-    internal static ApiIdentityValue Scalar(string apiPartName, ApiId apiScalarValue, string? apiPath = null)
-        => new(apiPath, [new ApiScalarIdentityPartValue(apiPartName, apiScalarValue)]);
+    internal static ApiIdentityValue Scalar(string apiPartName, ApiId apiScalarValue)
+        => new([new ApiScalarIdentityPartValue(apiPartName, apiScalarValue)]);
     #endregion
 
-    #region Public Methods
+    #region ApiIdentityValue Methods
     /// <summary>
     ///     Flattens this hierarchical identity into a flat <see cref="ApiId"/> suitable for dictionary lookups,
     ///     equality comparisons, and other performance-critical operations.
@@ -161,6 +153,15 @@ public sealed class ApiIdentityValue(string? apiPath, IEnumerable<ApiIdentityPar
 
         var segments = dottedPath.Split('.');
         return NavigateParts(this.ApiParts, segments, segmentIndex: 0);
+    }
+    #endregion
+
+    #region Object Methods
+    /// <inheritdoc/>
+    public override string ToString()
+    {
+        var apiId = this.ToApiId(useNamedParts: true, nullHandling: ApiIdentityNullHandling.ReturnEmpty);
+        return apiId.ToString()!;
     }
     #endregion
 

@@ -3,7 +3,6 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 
 using Evoogle.ApiFramework.Exceptions;
@@ -89,12 +88,16 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
     private class JsonDeserializeTest : JsonDeserializeTest<ApiSchema, ApiSchemaDescriptor>
     {
         #region Constructors
-        [SetsRequiredMembers]
         public JsonDeserializeTest()
         {
-            this.Name = nameof(JsonDeserializeTest);
-            this.ExpectedFactoryExpression = (arg) => BuildTestApiSchema(arg);
             this.ExcludeMembers = ApiSchemaExcludeMembers.SchemaInitialized;
+        }
+        #endregion
+
+        #region JsonDeserializeTest<T, TFactoryArg> Methods
+        protected override ApiSchema? CreateExpected(ApiSchemaDescriptor? descriptor)
+        {
+            return BuildTestApiSchema(descriptor);
         }
         #endregion
     }
@@ -102,24 +105,26 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
     private class JsonRoundtripTest : JsonRoundtripTest<ApiSchema, ApiSchemaDescriptor>
     {
         #region Constructors
-        [SetsRequiredMembers]
         public JsonRoundtripTest()
         {
-            this.Name = nameof(JsonRoundtripTest);
-            this.ExpectedFactoryExpression = (arg) => BuildTestApiSchema(arg);
             this.ExcludeMembers = ApiSchemaExcludeMembers.SchemaInitialized;
+        }
+        #endregion
+
+        #region JsonRoundtripTest<T, TFactoryArg> Methods
+        protected override ApiSchema? CreateExpected(ApiSchemaDescriptor? descriptor)
+        {
+            return BuildTestApiSchema(descriptor);
         }
         #endregion
     }
 
     private class JsonSerializeTest : JsonSerializeTest<ApiSchema, ApiSchemaDescriptor>
     {
-        #region Constructors
-        [SetsRequiredMembers]
-        public JsonSerializeTest()
+        #region JsonSerializeTest<T, TFactoryArg> Methods
+        protected override ApiSchema? CreateSource(ApiSchemaDescriptor? descriptor)
         {
-            this.Name = nameof(JsonSerializeTest);
-            this.SourceFactoryExpression = (arg) => BuildTestApiSchema(arg);
+            return BuildTestApiSchema(descriptor);
         }
         #endregion
     }
