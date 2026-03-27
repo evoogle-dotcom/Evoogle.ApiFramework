@@ -25,19 +25,19 @@ namespace Evoogle.ApiFramework.Identity;
 ///         </list>
 ///     </para>
 /// </remarks>
-/// <param name="Name">The optional name for this part. Non-null/non-whitespace for named composites, null for ordered composites.</param>
-/// <param name="Value">The <see cref="ApiId"/> value for this part. Must be a scalar (non-composite) identifier.</param>
-public readonly record struct ApiIdPart(string? Name, ApiId Value)
+/// <param name="ApiName">The optional name for this part. Non-null/non-whitespace for named composites, null for ordered composites.</param>
+/// <param name="ApiValue">The <see cref="ApiId"/> value for this part. Must be a scalar (non-composite) identifier.</param>
+public readonly record struct ApiIdPart(string? ApiName, ApiId ApiValue)
 {
     #region Properties
     /// <summary>
-    ///     Gets whether this part is named (has a non-null, non-whitespace <see cref="Name"/>).
+    ///     Gets whether this part is named (has a non-null, non-whitespace <see cref="ApiName"/>).
     /// </summary>
     /// <value>
-    ///     <see langword="true"/> if <see cref="Name"/> is non-null and contains at least one non-whitespace character;
+    ///     <see langword="true"/> if <see cref="ApiName"/> is non-null and contains at least one non-whitespace character;
     ///     otherwise <see langword="false"/>.
     /// </value>
-    public bool IsNamed => !string.IsNullOrWhiteSpace(this.Name);
+    public bool IsNamed => !string.IsNullOrWhiteSpace(this.ApiName);
     #endregion
 
     #region Factory Methods
@@ -46,8 +46,8 @@ public readonly record struct ApiIdPart(string? Name, ApiId Value)
     /// </summary>
     /// <param name="value">The scalar identifier value for this part.</param>
     /// <returns>
-    ///     A new <see cref="ApiIdPart"/> with <see cref="Name"/> set to <see langword="null"/> and
-    ///     <see cref="Value"/> set to <paramref name="value"/>.
+    ///     A new <see cref="ApiIdPart"/> with <see cref="ApiName"/> set to <see langword="null"/> and
+    ///     <see cref="ApiValue"/> set to <paramref name="value"/>.
     /// </returns>
     /// <remarks>
     ///     Use this factory method when building ordered/positional composite identifiers where
@@ -64,8 +64,8 @@ public readonly record struct ApiIdPart(string? Name, ApiId Value)
     /// </param>
     /// <param name="value">The scalar identifier value for this part.</param>
     /// <returns>
-    ///     A new <see cref="ApiIdPart"/> with <see cref="Name"/> set to <paramref name="name"/> and
-    ///     <see cref="Value"/> set to <paramref name="value"/>.
+    ///     A new <see cref="ApiIdPart"/> with <see cref="ApiName"/> set to <paramref name="name"/> and
+    ///     <see cref="ApiValue"/> set to <paramref name="value"/>.
     /// </returns>
     /// <remarks>
     ///     Use this factory method when building named composite identifiers where each part
@@ -76,6 +76,6 @@ public readonly record struct ApiIdPart(string? Name, ApiId Value)
 
     #region Object Methods
     /// <inheritdoc/>
-    public override string ToString() => this.Name is null ? this.Value.SafeToString() : $"{this.Name}={this.Value.SafeToString()}";
+    public override string ToString() => this.ApiName is null ? this.ApiValue.SafeToString() : $"{this.ApiName}={this.ApiValue.SafeToString()}";
     #endregion
 }

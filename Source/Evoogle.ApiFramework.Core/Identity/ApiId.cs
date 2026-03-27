@@ -130,7 +130,7 @@ public readonly struct ApiId
     /// </summary>
     /// <remarks>
     ///     Equivalent to <c>default(<see cref="ApiId"/>)</c>. Used to represent the absence of an identity value.
-    ///     Has <see cref="Kind"/> equal to <see cref="ApiIdKind.Empty"/>.
+    ///     Has <see cref="ApiKind"/> equal to <see cref="ApiIdKind.Empty"/>.
     /// </remarks>
     public static readonly ApiId Empty = default;
 
@@ -199,7 +199,7 @@ public readonly struct ApiId
     /// <remarks>
     ///     Used for type-safe access to the underlying value via pattern matching, type checking, and conversion methods.
     /// </remarks>
-    public ApiIdKind Kind { get; }
+    public ApiIdKind ApiKind { get; }
 
     /// <summary>
     ///     Gets the original string representation used to create this identifier, if applicable.
@@ -210,15 +210,15 @@ public readonly struct ApiId
     /// <remarks>
     ///     <para>
     ///         This property is for diagnostics and round-tripping only. It is <strong>not used for equality or hashing</strong>.
-    ///         Two <see cref="ApiId"/> instances with different <see cref="OriginalString"/> values but identical runtime values
+    ///         Two <see cref="ApiId"/> instances with different <see cref="ApiOriginalString"/> values but identical runtime values
     ///         are considered equal.
     ///     </para>
     ///     <para>
     ///         Example: <c>ApiId.FromString("  42  ")</c> and <c>ApiId.FromString("42")</c> are equal if both represent
-    ///         the same string value after normalization, even if <see cref="OriginalString"/> differs.
+    ///         the same string value after normalization, even if <see cref="ApiOriginalString"/> differs.
     ///     </para>
     /// </remarks>
-    public string? OriginalString { get; }
+    public string? ApiOriginalString { get; }
     #endregion
 
     #region Computed Properties
@@ -226,49 +226,49 @@ public readonly struct ApiId
     ///     Gets whether this identifier has a value (is not empty).
     /// </summary>
     /// <value>
-    ///     <see langword="true"/> if <see cref="Kind"/> is not <see cref="ApiIdKind.Empty"/>; otherwise, <see langword="false"/>.
+    ///     <see langword="true"/> if <see cref="ApiKind"/> is not <see cref="ApiIdKind.Empty"/>; otherwise, <see langword="false"/>.
     /// </value>
     /// <remarks>
     ///     Use this property to check for the presence of an identity value before accessing its components.
     ///     Equivalent to <c>!Equals(<see cref="Empty"/>)</c>.
     /// </remarks>
-    public readonly bool HasValue => this.Kind != ApiIdKind.Empty;
+    public readonly bool HasValue => this.ApiKind != ApiIdKind.Empty;
 
     /// <summary>Gets whether this identifier is a <see cref="string"/> value.</summary>
-    /// <value><see langword="true"/> if <see cref="Kind"/> is <see cref="ApiIdKind.String"/>; otherwise, <see langword="false"/>.</value>
-    public readonly bool IsString => this.Kind == ApiIdKind.String;
+    /// <value><see langword="true"/> if <see cref="ApiKind"/> is <see cref="ApiIdKind.String"/>; otherwise, <see langword="false"/>.</value>
+    public readonly bool IsString => this.ApiKind == ApiIdKind.String;
 
     /// <summary>Gets whether this identifier is an <see cref="int"/> value.</summary>
-    /// <value><see langword="true"/> if <see cref="Kind"/> is <see cref="ApiIdKind.Int32"/>; otherwise, <see langword="false"/>.</value>
-    public readonly bool IsInt32 => this.Kind == ApiIdKind.Int32;
+    /// <value><see langword="true"/> if <see cref="ApiKind"/> is <see cref="ApiIdKind.Int32"/>; otherwise, <see langword="false"/>.</value>
+    public readonly bool IsInt32 => this.ApiKind == ApiIdKind.Int32;
 
     /// <summary>Gets whether this identifier is a <see cref="long"/> value.</summary>
-    /// <value><see langword="true"/> if <see cref="Kind"/> is <see cref="ApiIdKind.Int64"/>; otherwise, <see langword="false"/>.</value>
-    public readonly bool IsInt64 => this.Kind == ApiIdKind.Int64;
+    /// <value><see langword="true"/> if <see cref="ApiKind"/> is <see cref="ApiIdKind.Int64"/>; otherwise, <see langword="false"/>.</value>
+    public readonly bool IsInt64 => this.ApiKind == ApiIdKind.Int64;
 
     /// <summary>Gets whether this identifier is a <see cref="Guid"/> value.</summary>
-    /// <value><see langword="true"/> if <see cref="Kind"/> is <see cref="ApiIdKind.Guid"/>; otherwise, <see langword="false"/>.</value>
-    public readonly bool IsGuid => this.Kind == ApiIdKind.Guid;
+    /// <value><see langword="true"/> if <see cref="ApiKind"/> is <see cref="ApiIdKind.Guid"/>; otherwise, <see langword="false"/>.</value>
+    public readonly bool IsGuid => this.ApiKind == ApiIdKind.Guid;
 
     /// <summary>Gets whether this identifier is a <see cref="Ulid"/> value.</summary>
-    /// <value><see langword="true"/> if <see cref="Kind"/> is <see cref="ApiIdKind.Ulid"/>; otherwise, <see langword="false"/>.</value>
-    public readonly bool IsUlid => this.Kind == ApiIdKind.Ulid;
+    /// <value><see langword="true"/> if <see cref="ApiKind"/> is <see cref="ApiIdKind.Ulid"/>; otherwise, <see langword="false"/>.</value>
+    public readonly bool IsUlid => this.ApiKind == ApiIdKind.Ulid;
 
     /// <summary>Gets whether this identifier is a <see cref="CultureInfo"/> value.</summary>
-    /// <value><see langword="true"/> if <see cref="Kind"/> is <see cref="ApiIdKind.Culture"/>; otherwise, <see langword="false"/>.</value>
-    public readonly bool IsCulture => this.Kind == ApiIdKind.Culture;
+    /// <value><see langword="true"/> if <see cref="ApiKind"/> is <see cref="ApiIdKind.Culture"/>; otherwise, <see langword="false"/>.</value>
+    public readonly bool IsCulture => this.ApiKind == ApiIdKind.Culture;
 
     /// <summary>Gets whether this identifier is a composite (multi-part) value.</summary>
-    /// <value><see langword="true"/> if <see cref="Kind"/> is <see cref="ApiIdKind.Composite"/>; otherwise, <see langword="false"/>.</value>
+    /// <value><see langword="true"/> if <see cref="ApiKind"/> is <see cref="ApiIdKind.Composite"/>; otherwise, <see langword="false"/>.</value>
     /// <remarks>
     ///     Composite identities contain an array of <see cref="ApiIdPart"/> elements, all of which must be scalar values.
     ///     Use <see cref="PartsAsSpan"/>, <see cref="PartsAsEnumerable"/>, or indexers to access individual parts.
     /// </remarks>
-    public readonly bool IsComposite => this.Kind == ApiIdKind.Composite;
+    public readonly bool IsComposite => this.ApiKind == ApiIdKind.Composite;
 
     /// <summary>Gets whether this identifier is a scalar (single-value, non-composite) value.</summary>
     /// <value>
-    ///     <see langword="true"/> if <see cref="Kind"/> is any scalar type (<see cref="ApiIdKind.String"/>, <see cref="ApiIdKind.Int32"/>,
+    ///     <see langword="true"/> if <see cref="ApiKind"/> is any scalar type (<see cref="ApiIdKind.String"/>, <see cref="ApiIdKind.Int32"/>,
     ///     <see cref="ApiIdKind.Int64"/>, <see cref="ApiIdKind.Guid"/>, <see cref="ApiIdKind.Ulid"/>, <see cref="ApiIdKind.Culture"/>);
     ///     otherwise, <see langword="false"/>.
     /// </value>
@@ -277,7 +277,7 @@ public readonly struct ApiId
     ///     Scalar identifiers can be stored without allocation (for value types) or as a single reference (for <see cref="string"/>
     ///     and <see cref="CultureInfo"/>).
     /// </remarks>
-    public readonly bool IsScalar => this.Kind != ApiIdKind.Empty && this.Kind != ApiIdKind.Composite;
+    public readonly bool IsScalar => this.ApiKind != ApiIdKind.Empty && this.ApiKind != ApiIdKind.Composite;
 
     /// <summary>
     ///     Gets whether this is a named composite (all parts have non-null names).
@@ -309,7 +309,7 @@ public readonly struct ApiId
                 return false;
             }
 
-            return string.IsNullOrWhiteSpace(parts[0].Name) is false;
+            return string.IsNullOrWhiteSpace(parts[0].ApiName) is false;
         }
     }
 
@@ -344,7 +344,7 @@ public readonly struct ApiId
                 return false;
             }
 
-            return string.IsNullOrWhiteSpace(parts[0].Name);
+            return string.IsNullOrWhiteSpace(parts[0].ApiName);
         }
     }
 
@@ -398,8 +398,8 @@ public readonly struct ApiId
         _val = val;
         _ref = reference;
 
-        this.Kind = kind;
-        this.OriginalString = original;
+        this.ApiKind = kind;
+        this.ApiOriginalString = original;
 
         // Pre-compute hash code for composites
         _hashCode = kind switch
@@ -495,7 +495,7 @@ public readonly struct ApiId
             return Empty;
         }
 
-        var clone = parts.Select(p => new ApiIdPart(p.Name, p.Value)).ToArray();
+        var clone = parts.Select(p => new ApiIdPart(p.ApiName, p.ApiValue)).ToArray();
 
         ValidateCompositeParts(clone);
 
@@ -647,12 +647,12 @@ public readonly struct ApiId
         foreach (var p in parts)
         {
             // Reject nested composites
-            if (p.Value.Kind == ApiIdKind.Composite)
+            if (p.ApiValue.ApiKind == ApiIdKind.Composite)
             {
                 throw new ApiIdentityException($"Nested composite parts are not allowed in {nameof(ApiId)}.");
             }
 
-            if (string.IsNullOrWhiteSpace(p.Name))
+            if (string.IsNullOrWhiteSpace(p.ApiName))
             {
                 anyUnnamed = true;
             }
@@ -673,7 +673,7 @@ public readonly struct ApiId
         if (anyNamed)
         {
             var duplicateNames = parts
-                .GroupBy(p => p.Name)
+                .GroupBy(p => p.ApiName)
                 .Where(g => g.Count() > 1)
                 .Select(g => g.Key)
                 .ToList();
@@ -764,12 +764,12 @@ public readonly struct ApiId
             }
 
             var part = arr[i];
-            if (part.Name is not null)
+            if (part.ApiName is not null)
             {
-                sb.Append(part.Name);
+                sb.Append(part.ApiName);
                 sb.Append('=');
             }
-            sb.Append(part.Value.ToString());
+            sb.Append(part.ApiValue.ToString());
         }
 
         return sb.ToString();
@@ -778,54 +778,54 @@ public readonly struct ApiId
 
     #region AsOrThrow Methods
     /// <summary>Gets the string value or throws if the kind is not <see cref="ApiIdKind.String"/>.</summary>
-    public readonly string AsStringOrThrow() => this.Kind == ApiIdKind.String ? (string)_ref! : throw new ApiIdentityException($"Kind {this.Kind} is not {nameof(ApiIdKind.String)}.");
+    public readonly string AsStringOrThrow() => this.ApiKind == ApiIdKind.String ? (string)_ref! : throw new ApiIdentityException($"Kind {this.ApiKind} is not {nameof(ApiIdKind.String)}.");
 
     /// <summary>Gets the Int32 value or throws if the kind is not <see cref="ApiIdKind.Int32"/>.</summary>
-    public readonly int AsInt32OrThrow() => this.Kind == ApiIdKind.Int32 ? _val.Int32 : throw new ApiIdentityException($"Kind {this.Kind} is not {nameof(ApiIdKind.Int32)}.");
+    public readonly int AsInt32OrThrow() => this.ApiKind == ApiIdKind.Int32 ? _val.Int32 : throw new ApiIdentityException($"Kind {this.ApiKind} is not {nameof(ApiIdKind.Int32)}.");
 
     /// <summary>Gets the Int64 value or throws if the kind is not <see cref="ApiIdKind.Int64"/>.</summary>
-    public readonly long AsInt64OrThrow() => this.Kind == ApiIdKind.Int64 ? _val.Int64 : throw new ApiIdentityException($"Kind {this.Kind} is not {nameof(ApiIdKind.Int64)}.");
+    public readonly long AsInt64OrThrow() => this.ApiKind == ApiIdKind.Int64 ? _val.Int64 : throw new ApiIdentityException($"Kind {this.ApiKind} is not {nameof(ApiIdKind.Int64)}.");
 
     /// <summary>Gets the Guid value or throws if the kind is not <see cref="ApiIdKind.Guid"/>.</summary>
-    public readonly Guid AsGuidOrThrow() => this.Kind == ApiIdKind.Guid ? _val.Guid : throw new ApiIdentityException($"Kind {this.Kind} is not {nameof(ApiIdKind.Guid)}.");
+    public readonly Guid AsGuidOrThrow() => this.ApiKind == ApiIdKind.Guid ? _val.Guid : throw new ApiIdentityException($"Kind {this.ApiKind} is not {nameof(ApiIdKind.Guid)}.");
 
     /// <summary>Gets the Ulid value or throws if the kind is not <see cref="ApiIdKind.Ulid"/>.</summary>
-    public readonly Ulid AsUlidOrThrow() => this.Kind == ApiIdKind.Ulid ? _val.Ulid : throw new ApiIdentityException($"Kind {this.Kind} is not {nameof(ApiIdKind.Ulid)}.");
+    public readonly Ulid AsUlidOrThrow() => this.ApiKind == ApiIdKind.Ulid ? _val.Ulid : throw new ApiIdentityException($"Kind {this.ApiKind} is not {nameof(ApiIdKind.Ulid)}.");
 
     /// <summary>Gets the culture value or throws if the kind is not <see cref="ApiIdKind.Culture"/>.</summary>
-    public readonly CultureInfo AsCultureOrThrow() => this.Kind == ApiIdKind.Culture ? (CultureInfo)_ref! : throw new ApiIdentityException($"Kind {this.Kind} is not {nameof(ApiIdKind.Culture)}.");
+    public readonly CultureInfo AsCultureOrThrow() => this.ApiKind == ApiIdKind.Culture ? (CultureInfo)_ref! : throw new ApiIdentityException($"Kind {this.ApiKind} is not {nameof(ApiIdKind.Culture)}.");
     #endregion
 
     #region TryGet Methods
     /// <summary>Attempts to get the string value if kind is <see cref="ApiIdKind.String"/>.</summary>
     /// <param name="value">The output value or null.</param>
     /// <returns>True if successful.</returns>
-    public readonly bool TryGet([NotNullWhen(true)] out string? value) { value = this.Kind == ApiIdKind.String ? (string?)_ref : null; return this.Kind == ApiIdKind.String; }
+    public readonly bool TryGet([NotNullWhen(true)] out string? value) { value = this.ApiKind == ApiIdKind.String ? (string?)_ref : null; return this.ApiKind == ApiIdKind.String; }
 
     /// <summary>Attempts to get the Int32 value if kind is <see cref="ApiIdKind.Int32"/>.</summary>
     /// <param name="value">The output Int32 value, or the default of <see langword="int"/> if the kind is not <see cref="ApiIdKind.Int32"/>.</param>
     /// <returns><see langword="true"/> if the kind is <see cref="ApiIdKind.Int32"/>; otherwise <see langword="false"/>.</returns>
-    public readonly bool TryGet(out int value) { value = _val.Int32; return this.Kind == ApiIdKind.Int32; }
+    public readonly bool TryGet(out int value) { value = _val.Int32; return this.ApiKind == ApiIdKind.Int32; }
 
     /// <summary>Attempts to get the Int64 value if kind is <see cref="ApiIdKind.Int64"/>.</summary>
     /// <param name="value">The output Int64 value, or the default of <see langword="long"/> if the kind is not <see cref="ApiIdKind.Int64"/>.</param>
     /// <returns><see langword="true"/> if the kind is <see cref="ApiIdKind.Int64"/>; otherwise <see langword="false"/>.</returns>
-    public readonly bool TryGet(out long value) { value = _val.Int64; return this.Kind == ApiIdKind.Int64; }
+    public readonly bool TryGet(out long value) { value = _val.Int64; return this.ApiKind == ApiIdKind.Int64; }
 
     /// <summary>Attempts to get the Guid value if kind is <see cref="ApiIdKind.Guid"/>.</summary>
     /// <param name="value">The output <see cref="Guid"/> value, or <see cref="Guid.Empty"/> if the kind is not <see cref="ApiIdKind.Guid"/>.</param>
     /// <returns><see langword="true"/> if the kind is <see cref="ApiIdKind.Guid"/>; otherwise <see langword="false"/>.</returns>
-    public readonly bool TryGet(out Guid value) { value = _val.Guid; return this.Kind == ApiIdKind.Guid; }
+    public readonly bool TryGet(out Guid value) { value = _val.Guid; return this.ApiKind == ApiIdKind.Guid; }
 
     /// <summary>Attempts to get the Ulid value if kind is <see cref="ApiIdKind.Ulid"/>.</summary>
     /// <param name="value">The output <see cref="Ulid"/> value, or <see cref="Ulid.Empty"/> if the kind is not <see cref="ApiIdKind.Ulid"/>.</param>
     /// <returns><see langword="true"/> if the kind is <see cref="ApiIdKind.Ulid"/>; otherwise <see langword="false"/>.</returns>
-    public readonly bool TryGet(out Ulid value) { value = _val.Ulid; return this.Kind == ApiIdKind.Ulid; }
+    public readonly bool TryGet(out Ulid value) { value = _val.Ulid; return this.ApiKind == ApiIdKind.Ulid; }
 
     /// <summary>Attempts to get the culture value if kind is <see cref="ApiIdKind.Culture"/>.</summary>
     /// <param name="value">The output <see cref="CultureInfo"/> value, or <see langword="null"/> if the kind is not <see cref="ApiIdKind.Culture"/>.</param>
     /// <returns><see langword="true"/> if the kind is <see cref="ApiIdKind.Culture"/>; otherwise <see langword="false"/>.</returns>
-    public readonly bool TryGet([NotNullWhen(true)] out CultureInfo? value) { value = this.Kind == ApiIdKind.Culture ? (CultureInfo?)_ref : null; return this.Kind == ApiIdKind.Culture; }
+    public readonly bool TryGet([NotNullWhen(true)] out CultureInfo? value) { value = this.ApiKind == ApiIdKind.Culture ? (CultureInfo?)_ref : null; return this.ApiKind == ApiIdKind.Culture; }
 
     /// <summary>
     ///     Attempts to retrieve a part identifier by <paramref name="name"/> from a named composite.
@@ -842,9 +842,9 @@ public readonly struct ApiId
         }
         foreach (var p in (ApiIdPart[])_ref!)
         {
-            if (string.Equals(p.Name, name, StringComparison.Ordinal))
+            if (string.Equals(p.ApiName, name, StringComparison.Ordinal))
             {
-                value = p.Value;
+                value = p.ApiValue;
                 return true;
             }
         }
@@ -859,7 +859,7 @@ public readonly struct ApiId
     /// </summary>
     public override readonly string? ToString()
     {
-        var result = this.Kind switch
+        var result = this.ApiKind switch
         {
             ApiIdKind.Empty => null,
             ApiIdKind.String => (string?)_ref,
@@ -884,7 +884,7 @@ public readonly struct ApiId
     public readonly string ToString(string? format, IFormatProvider? formatProvider)
     {
         var provider = formatProvider ?? CultureInfo.InvariantCulture;
-        var result = this.Kind switch
+        var result = this.ApiKind switch
         {
             ApiIdKind.Empty => null,
             ApiIdKind.String => (string?)_ref,
@@ -934,7 +934,7 @@ public readonly struct ApiId
     }
 
     /// <summary>Returns a debugger-friendly display string.</summary>
-    internal readonly string ToDebuggerDisplay() => this.HasValue ? $"{this.Kind}:{this}" : EmptyDisplayText;
+    internal readonly string ToDebuggerDisplay() => this.HasValue ? $"{this.ApiKind}:{this}" : EmptyDisplayText;
     #endregion
 
     #region Parsing
@@ -1180,12 +1180,12 @@ public readonly struct ApiId
     /// <returns>True if equal.</returns>
     public readonly bool Equals(ApiId other)
     {
-        if (this.Kind != other.Kind)
+        if (this.ApiKind != other.ApiKind)
         {
             return false;
         }
 
-        return this.Kind switch
+        return this.ApiKind switch
         {
             ApiIdKind.Empty => true,
             ApiIdKind.String => string.Equals((string?)_ref, (string?)other._ref, StringComparison.Ordinal),
@@ -1215,12 +1215,12 @@ public readonly struct ApiId
 
         for (var i = 0; i < a.Length; i++)
         {
-            if (!string.Equals(a[i].Name, b[i].Name, StringComparison.Ordinal))
+            if (!string.Equals(a[i].ApiName, b[i].ApiName, StringComparison.Ordinal))
             {
                 return false;
             }
 
-            if (!a[i].Value.Equals(b[i].Value))
+            if (!a[i].ApiValue.Equals(b[i].ApiValue))
             {
                 return false;
             }
@@ -1235,22 +1235,22 @@ public readonly struct ApiId
     public override readonly int GetHashCode()
     {
         // Composite: Use cached hash code from constructor
-        if (this.Kind == ApiIdKind.Composite)
+        if (this.ApiKind == ApiIdKind.Composite)
         {
             return _hashCode;
         }
 
         // Scalars: Compute inline
-        return this.Kind switch
+        return this.ApiKind switch
         {
             ApiIdKind.Empty => 0,
-            ApiIdKind.String => HashCode.Combine((int)this.Kind, (string?)_ref),
-            ApiIdKind.Int32 => HashCode.Combine((int)this.Kind, _val.Int32),
-            ApiIdKind.Int64 => HashCode.Combine((int)this.Kind, _val.Int64),
-            ApiIdKind.Guid => HashCode.Combine((int)this.Kind, _val.Guid),
-            ApiIdKind.Ulid => HashCode.Combine((int)this.Kind, _val.Ulid),
-            ApiIdKind.Culture => HashCode.Combine((int)this.Kind, ((CultureInfo?)_ref)?.Name?.ToUpperInvariant()),
-            _ => (int)this.Kind
+            ApiIdKind.String => HashCode.Combine((int)this.ApiKind, (string?)_ref),
+            ApiIdKind.Int32 => HashCode.Combine((int)this.ApiKind, _val.Int32),
+            ApiIdKind.Int64 => HashCode.Combine((int)this.ApiKind, _val.Int64),
+            ApiIdKind.Guid => HashCode.Combine((int)this.ApiKind, _val.Guid),
+            ApiIdKind.Ulid => HashCode.Combine((int)this.ApiKind, _val.Ulid),
+            ApiIdKind.Culture => HashCode.Combine((int)this.ApiKind, ((CultureInfo?)_ref)?.Name?.ToUpperInvariant()),
+            _ => (int)this.ApiKind
         };
     }
 
@@ -1261,8 +1261,8 @@ public readonly struct ApiId
         h.Add((int)ApiIdKind.Composite);
         foreach (var p in parts)
         {
-            h.Add(p.Name, StringComparer.Ordinal);
-            h.Add(p.Value);
+            h.Add(p.ApiName, StringComparer.Ordinal);
+            h.Add(p.ApiValue);
         }
         return h.ToHashCode();
     }
@@ -1274,13 +1274,13 @@ public readonly struct ApiId
     /// <returns>Negative, zero, or positive depending on ordering.</returns>
     public readonly int CompareTo(ApiId other)
     {
-        var kindCmp = this.Kind.CompareTo(other.Kind);
+        var kindCmp = this.ApiKind.CompareTo(other.ApiKind);
         if (kindCmp != 0)
         {
             return Math.Sign(kindCmp);
         }
 
-        return this.Kind switch
+        return this.ApiKind switch
         {
             ApiIdKind.Empty => 0,
             ApiIdKind.String => Math.Sign(string.Compare((string?)_ref, (string?)other._ref, StringComparison.Ordinal)),
@@ -1305,13 +1305,13 @@ public readonly struct ApiId
 
         for (var i = 0; i < a.Length; i++)
         {
-            var nameCmp = Math.Sign(string.Compare(a[i].Name, b[i].Name, StringComparison.Ordinal));
+            var nameCmp = Math.Sign(string.Compare(a[i].ApiName, b[i].ApiName, StringComparison.Ordinal));
             if (nameCmp != 0)
             {
                 return nameCmp;
             }
 
-            var valCmp = a[i].Value.CompareTo(b[i].Value);
+            var valCmp = a[i].ApiValue.CompareTo(b[i].ApiValue);
             if (valCmp != 0)
             {
                 return valCmp;
@@ -1344,7 +1344,7 @@ public readonly struct ApiId
                 throw new ArgumentOutOfRangeException(nameof(index), index, $"Index out of range. Valid range: [0..{parts.Length - 1}].");
             }
 
-            return parts[index].Value;
+            return parts[index].ApiValue;
         }
     }
 
@@ -1416,7 +1416,7 @@ public readonly struct ApiId
     public static implicit operator ApiId(CultureInfo value) => FromCulture(value);
 
     /// <summary>Explicit conversion to <see cref="string"/> returns null if not a string identifier.</summary>
-    public static explicit operator string?(ApiId id) => id.Kind == ApiIdKind.String ? (string?)id._ref : null;
+    public static explicit operator string?(ApiId id) => id.ApiKind == ApiIdKind.String ? (string?)id._ref : null;
 
     /// <summary>Explicit conversion to <see cref="int"/>; throws if kind mismatch.</summary>
     public static explicit operator int(ApiId id) => id.AsInt32OrThrow();
@@ -1431,6 +1431,6 @@ public readonly struct ApiId
     public static explicit operator Ulid(ApiId id) => id.AsUlidOrThrow();
 
     /// <summary>Explicit conversion to <see cref="CultureInfo"/> returns null if not a culture identifier.</summary>
-    public static explicit operator CultureInfo?(ApiId id) => id.Kind == ApiIdKind.Culture ? (CultureInfo?)id._ref : null;
+    public static explicit operator CultureInfo?(ApiId id) => id.ApiKind == ApiIdKind.Culture ? (CultureInfo?)id._ref : null;
     #endregion
 }

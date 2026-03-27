@@ -52,8 +52,8 @@ public partial class ApiIdentityValueTests
                         ""ApiName"": ""Id"",
                         ""ApiKind"": ""Scalar"",
                         ""ApiScalarValue"": {
-                            ""Kind"": ""Int32"",
-                            ""Value"": 42
+                            ""ApiKind"": ""Int32"",
+                            ""ApiValue"": 42
                         }
                     }
                 ]
@@ -82,16 +82,16 @@ public partial class ApiIdentityValueTests
                         ""ApiName"": ""Id"",
                         ""ApiKind"": ""Scalar"",
                         ""ApiScalarValue"": {
-                            ""Kind"": ""Int32"",
-                            ""Value"": 42
+                            ""ApiKind"": ""Int32"",
+                            ""ApiValue"": 42
                         }
                     },
                     {
                         ""ApiName"": ""OrderNumber"",
                         ""ApiKind"": ""Scalar"",
                         ""ApiScalarValue"": {
-                            ""Kind"": ""Int32"",
-                            ""Value"": 1001
+                            ""ApiKind"": ""Int32"",
+                            ""ApiValue"": 1001
                         }
                     }
                 ]
@@ -136,8 +136,8 @@ public partial class ApiIdentityValueTests
                                                 ""ApiName"": ""Id"",
                                                 ""ApiKind"": ""Scalar"",
                                                 ""ApiScalarValue"": {
-                                                    ""Kind"": ""Int32"",
-                                                    ""Value"": 1
+                                                    ""ApiKind"": ""Int32"",
+                                                    ""ApiValue"": 1
                                                 }
                                             }
                                         ]
@@ -147,8 +147,8 @@ public partial class ApiIdentityValueTests
                                     ""ApiName"": ""CustomerId"",
                                     ""ApiKind"": ""Scalar"",
                                     ""ApiScalarValue"": {
-                                        ""Kind"": ""Int32"",
-                                        ""Value"": 42
+                                        ""ApiKind"": ""Int32"",
+                                        ""ApiValue"": 42
                                     }
                                 }
                             ]
@@ -158,8 +158,8 @@ public partial class ApiIdentityValueTests
                         ""ApiName"": ""OrderNumber"",
                         ""ApiKind"": ""Scalar"",
                         ""ApiScalarValue"": {
-                            ""Kind"": ""Int32"",
-                            ""Value"": 1001
+                            ""ApiKind"": ""Int32"",
+                            ""ApiValue"": 1001
                         }
                     }
                 ]
@@ -314,16 +314,16 @@ public partial class ApiIdentityValueTests
                                                             ""ApiName"": ""Level4"",
                                                             ""ApiKind"": ""Scalar"",
                                                             ""ApiScalarValue"": {
-                                                                ""Kind"": ""String"",
-                                                                ""Value"": ""DeepValue""
+                                                                ""ApiKind"": ""String"",
+                                                                ""ApiValue"": ""DeepValue""
                                                             }
                                                         },
                                                         {
                                                             ""ApiName"": ""SequenceNumber"",
                                                             ""ApiKind"": ""Scalar"",
                                                             ""ApiScalarValue"": {
-                                                                ""Kind"": ""Int32"",
-                                                                ""Value"": 42
+                                                                ""ApiKind"": ""Int32"",
+                                                                ""ApiValue"": 42
                                                             }
                                                         }
                                                     ]
@@ -339,8 +339,8 @@ public partial class ApiIdentityValueTests
                         ""ApiName"": ""RootId"",
                         ""ApiKind"": ""Scalar"",
                         ""ApiScalarValue"": {
-                            ""Kind"": ""Guid"",
-                            ""Value"": ""12345678-1234-1234-1234-123456789abc""
+                            ""ApiKind"": ""Guid"",
+                            ""ApiValue"": ""12345678-1234-1234-1234-123456789abc""
                         }
                     }
                 ]
@@ -674,8 +674,8 @@ public partial class ApiIdentityValueTests
                         ""ApiName"": ""Id"",
                         ""ApiKind"": ""Scalar"",
                         ""ApiScalarValue"": {
-                            ""Kind"": ""Int32"",
-                            ""Value"": 42
+                            ""ApiKind"": ""Int32"",
+                            ""ApiValue"": 42
                         }
                     }
                 ]
@@ -710,16 +710,16 @@ public partial class ApiIdentityValueTests
                         ""ApiName"": ""Id"",
                         ""ApiKind"": ""Scalar"",
                         ""ApiScalarValue"": {
-                            ""Kind"": ""Int32"",
-                            ""Value"": 42
+                            ""ApiKind"": ""Int32"",
+                            ""ApiValue"": 42
                         }
                     },
                     {
                         ""ApiName"": ""OrderNumber"",
                         ""ApiKind"": ""Scalar"",
                         ""ApiScalarValue"": {
-                            ""Kind"": ""Int32"",
-                            ""Value"": 1001
+                            ""ApiKind"": ""Int32"",
+                            ""ApiValue"": 1001
                         }
                     }
                 ]
@@ -792,8 +792,8 @@ public partial class ApiIdentityValueTests
                                                 ""ApiName"": ""Id"",
                                                 ""ApiKind"": ""Scalar"",
                                                 ""ApiScalarValue"": {
-                                                    ""Kind"": ""Int32"",
-                                                    ""Value"": 1
+                                                    ""ApiKind"": ""Int32"",
+                                                    ""ApiValue"": 1
                                                 }
                                             }
                                         ]
@@ -803,8 +803,8 @@ public partial class ApiIdentityValueTests
                                     ""ApiName"": ""CustomerId"",
                                     ""ApiKind"": ""Scalar"",
                                     ""ApiScalarValue"": {
-                                        ""Kind"": ""Int32"",
-                                        ""Value"": 42
+                                        ""ApiKind"": ""Int32"",
+                                        ""ApiValue"": 42
                                     }
                                 }
                             ]
@@ -814,8 +814,8 @@ public partial class ApiIdentityValueTests
                         ""ApiName"": ""OrderNumber"",
                         ""ApiKind"": ""Scalar"",
                         ""ApiScalarValue"": {
-                            ""Kind"": ""Int32"",
-                            ""Value"": 1001
+                            ""ApiKind"": ""Int32"",
+                            ""ApiValue"": 1001
                         }
                     }
                 ]
@@ -981,16 +981,16 @@ public partial class ApiIdentityValueTests
                                                             ""ApiName"": ""Level4"",
                                                             ""ApiKind"": ""Scalar"",
                                                             ""ApiScalarValue"": {
-                                                                ""Kind"": ""String"",
-                                                                ""Value"": ""DeepValue""
+                                                                ""ApiKind"": ""String"",
+                                                                ""ApiValue"": ""DeepValue""
                                                             }
                                                         },
                                                         {
                                                             ""ApiName"": ""SequenceNumber"",
                                                             ""ApiKind"": ""Scalar"",
                                                             ""ApiScalarValue"": {
-                                                                ""Kind"": ""Int32"",
-                                                                ""Value"": 42
+                                                                ""ApiKind"": ""Int32"",
+                                                                ""ApiValue"": 42
                                                             }
                                                         }
                                                     ]
@@ -1006,8 +1006,8 @@ public partial class ApiIdentityValueTests
                         ""ApiName"": ""RootId"",
                         ""ApiKind"": ""Scalar"",
                         ""ApiScalarValue"": {
-                            ""Kind"": ""Guid"",
-                            ""Value"": ""12345678-1234-1234-1234-123456789abc""
+                            ""ApiKind"": ""Guid"",
+                            ""ApiValue"": ""12345678-1234-1234-1234-123456789abc""
                         }
                     }
                 ]

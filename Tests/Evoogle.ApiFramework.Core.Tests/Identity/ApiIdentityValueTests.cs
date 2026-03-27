@@ -3,7 +3,6 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using Evoogle.ApiFramework.Schema.TestData;
 using Evoogle.XUnit;
 
 using static Evoogle.XUnit.Tests.JsonUnitTests;
