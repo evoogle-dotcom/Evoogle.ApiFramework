@@ -32,7 +32,7 @@ public partial class ApiIdTests
         new JsonDeserializeTest
         {
             Name = $"Scalar: {nameof(ApiIdKind.String)}:alpha",
-            SourceJson = @"{""ApiKind"":""String"",""ApiValue"":""alpha""}",
+            SourceJson = @"{""ApiKind"":""String"",""ClrValue"":""alpha""}",
             ExpectedFactoryArgument = new ApiIdDescriptor
             (
                 ScalarConfig: new ApiIdScalarConfig
@@ -46,7 +46,7 @@ public partial class ApiIdTests
         new JsonDeserializeTest
         {
             Name = $"Scalar: {nameof(ApiIdKind.String)}:ALPHA",
-            SourceJson = @"{""ApiKind"":""String"",""ApiValue"":""ALPHA""}",
+            SourceJson = @"{""ApiKind"":""String"",""ClrValue"":""ALPHA""}",
             ExpectedFactoryArgument = new ApiIdDescriptor
             (
                 ScalarConfig: new ApiIdScalarConfig
@@ -61,7 +61,7 @@ public partial class ApiIdTests
         new JsonDeserializeTest
         {
             Name = $"Scalar: {nameof(ApiIdKind.Int32)}:42",
-            SourceJson = @"{""ApiKind"":""Int32"",""ApiValue"":42}",
+            SourceJson = @"{""ApiKind"":""Int32"",""ClrValue"":42}",
             ExpectedFactoryArgument = new ApiIdDescriptor
             (
                 ScalarConfig: new ApiIdScalarConfig
@@ -76,7 +76,7 @@ public partial class ApiIdTests
         new JsonDeserializeTest
         {
             Name = $"Scalar: {nameof(ApiIdKind.Int64)}:24",
-            SourceJson = @"{""ApiKind"":""Int64"",""ApiValue"":24}",
+            SourceJson = @"{""ApiKind"":""Int64"",""ClrValue"":24}",
             ExpectedFactoryArgument = new ApiIdDescriptor
             (
                 ScalarConfig: new ApiIdScalarConfig
@@ -91,7 +91,7 @@ public partial class ApiIdTests
         new JsonDeserializeTest
         {
             Name = $"Scalar: {nameof(ApiIdKind.Guid)}:{TestGuid}",
-            SourceJson = @"{""ApiKind"":""Guid"",""ApiValue"":""" + TestGuid + @"""}",
+            SourceJson = @"{""ApiKind"":""Guid"",""ClrValue"":""" + TestGuid + @"""}",
             ExpectedFactoryArgument = new ApiIdDescriptor
             (
                 ScalarConfig: new ApiIdScalarConfig
@@ -106,7 +106,7 @@ public partial class ApiIdTests
         new JsonDeserializeTest
         {
             Name = $"Scalar: {nameof(ApiIdKind.Ulid)}:{TestUlid}",
-            SourceJson = @"{""ApiKind"":""Ulid"",""ApiValue"":""" + TestUlid + @"""}",
+            SourceJson = @"{""ApiKind"":""Ulid"",""ClrValue"":""" + TestUlid + @"""}",
             ExpectedFactoryArgument = new ApiIdDescriptor
             (
                 ScalarConfig: new ApiIdScalarConfig
@@ -121,7 +121,7 @@ public partial class ApiIdTests
         new JsonDeserializeTest
         {
             Name = $"Scalar: {nameof(ApiIdKind.Culture)}:en-US",
-            SourceJson = @"{""ApiKind"":""Culture"",""ApiValue"":""en-US""}",
+            SourceJson = @"{""ApiKind"":""Culture"",""ClrValue"":""en-US""}",
             ExpectedFactoryArgument = new ApiIdDescriptor
             (
                 ScalarConfig: new ApiIdScalarConfig
@@ -135,7 +135,7 @@ public partial class ApiIdTests
         new JsonDeserializeTest
         {
             Name = $"Scalar: {nameof(ApiIdKind.Culture)}:fr-FR",
-            SourceJson = @"{""ApiKind"":""Culture"",""ApiValue"":""fr-FR""}",
+            SourceJson = @"{""ApiKind"":""Culture"",""ClrValue"":""fr-FR""}",
             ExpectedFactoryArgument = new ApiIdDescriptor
             (
                 ScalarConfig: new ApiIdScalarConfig
@@ -152,7 +152,7 @@ public partial class ApiIdTests
         new JsonDeserializeTest
         {
             Name = $"Composite: Composite:24|24",
-            SourceJson = @"{""ApiKind"":""Composite"",""ApiValue"":[{""ApiKind"":""Int32"",""ApiValue"":24},{""ApiKind"":""Int32"",""ApiValue"":24}]}",
+            SourceJson = @"{""ApiKind"":""Composite"",""ApiParts"":[{""ApiKind"":""Int32"",""ClrValue"":24},{""ApiKind"":""Int32"",""ClrValue"":24}]}",
             ExpectedFactoryArgument = new ApiIdDescriptor
             (
                 CompositePartsConfig: [
@@ -179,7 +179,7 @@ public partial class ApiIdTests
         new JsonDeserializeTest
         {
             Name = $"Composite: Composite:24|42",
-            SourceJson = @"{""ApiKind"":""Composite"",""ApiValue"":[{""ApiKind"":""Int32"",""ApiValue"":24},{""ApiKind"":""Int32"",""ApiValue"":42}]}",
+            SourceJson = @"{""ApiKind"":""Composite"",""ApiParts"":[{""ApiKind"":""Int32"",""ClrValue"":24},{""ApiKind"":""Int32"",""ClrValue"":42}]}",
             ExpectedFactoryArgument = new ApiIdDescriptor
             (
                 CompositePartsConfig: [
@@ -207,7 +207,7 @@ public partial class ApiIdTests
         new JsonDeserializeTest
         {
             Name = $"Composite: Composite:alpha=24|beta=24",
-            SourceJson = @"{""ApiKind"":""Composite"",""ApiValue"":[{""ApiName"":""alpha"",""ApiKind"":""Int32"",""ApiValue"":24},{""ApiName"":""beta"",""ApiKind"":""Int32"",""ApiValue"":24}]}",
+            SourceJson = @"{""ApiKind"":""Composite"",""ApiParts"":[{""ApiName"":""alpha"",""ApiKind"":""Int32"",""ClrValue"":24},{""ApiName"":""beta"",""ApiKind"":""Int32"",""ClrValue"":24}]}",
             ExpectedFactoryArgument = new ApiIdDescriptor
             (
                 CompositePartsConfig: [
@@ -235,7 +235,7 @@ public partial class ApiIdTests
         new JsonDeserializeTest
         {
             Name = $"Composite: Composite:alpha=24|beta=42",
-            SourceJson = @"{""ApiKind"":""Composite"",""ApiValue"":[{""ApiName"":""alpha"",""ApiKind"":""Int32"",""ApiValue"":24},{""ApiName"":""beta"",""ApiKind"":""Int32"",""ApiValue"":42}]}",
+            SourceJson = @"{""ApiKind"":""Composite"",""ApiParts"":[{""ApiName"":""alpha"",""ApiKind"":""Int32"",""ClrValue"":24},{""ApiName"":""beta"",""ApiKind"":""Int32"",""ClrValue"":42}]}",
             ExpectedFactoryArgument = new ApiIdDescriptor
             (
                 CompositePartsConfig: [
@@ -263,7 +263,7 @@ public partial class ApiIdTests
         new JsonDeserializeTest
         {
             Name = $"Composite: Composite:alpha=24|zeta=42",
-            SourceJson = @"{""ApiKind"":""Composite"",""ApiValue"":[{""ApiName"":""alpha"",""ApiKind"":""Int32"",""ApiValue"":24},{""ApiName"":""zeta"",""ApiKind"":""Int32"",""ApiValue"":42}]}",
+            SourceJson = @"{""ApiKind"":""Composite"",""ApiParts"":[{""ApiName"":""alpha"",""ApiKind"":""Int32"",""ClrValue"":24},{""ApiName"":""zeta"",""ApiKind"":""Int32"",""ClrValue"":42}]}",
             ExpectedFactoryArgument = new ApiIdDescriptor
             (
                 CompositePartsConfig: [
@@ -586,7 +586,7 @@ public partial class ApiIdTests
                     StringValue: "alpha"
                 )
             ),
-            ExpectedJson = @"{""ApiKind"":""String"",""ApiValue"":""alpha""}"
+            ExpectedJson = @"{""ApiKind"":""String"",""ClrValue"":""alpha""}"
         },
 
         new JsonSerializeTest
@@ -600,7 +600,7 @@ public partial class ApiIdTests
                     StringValue: "ALPHA"
                 )
             ),
-            ExpectedJson = @"{""ApiKind"":""String"",""ApiValue"":""ALPHA""}"
+            ExpectedJson = @"{""ApiKind"":""String"",""ClrValue"":""ALPHA""}"
         },
 
         // .. Int32
@@ -615,7 +615,7 @@ public partial class ApiIdTests
                     Int32Value: 42
                 )
             ),
-            ExpectedJson = @"{""ApiKind"":""Int32"",""ApiValue"":42}"
+            ExpectedJson = @"{""ApiKind"":""Int32"",""ClrValue"":42}"
         },
 
         // .. Int64
@@ -630,7 +630,7 @@ public partial class ApiIdTests
                     Int64Value: 24
                 )
             ),
-            ExpectedJson = @"{""ApiKind"":""Int64"",""ApiValue"":24}"
+            ExpectedJson = @"{""ApiKind"":""Int64"",""ClrValue"":24}"
         },
 
         // .. Guid
@@ -645,7 +645,7 @@ public partial class ApiIdTests
                     GuidValue: TestGuid
                 )
             ),
-            ExpectedJson = @"{""ApiKind"":""Guid"",""ApiValue"":""" + TestGuid + @"""}"
+            ExpectedJson = @"{""ApiKind"":""Guid"",""ClrValue"":""" + TestGuid + @"""}"
         },
 
         // .. Ulid
@@ -660,7 +660,7 @@ public partial class ApiIdTests
                     UlidValue: TestUlid
                 )
             ),
-            ExpectedJson = @"{""ApiKind"":""Ulid"",""ApiValue"":""" + TestUlid + @"""}"
+            ExpectedJson = @"{""ApiKind"":""Ulid"",""ClrValue"":""" + TestUlid + @"""}"
         },
 
         // .. Culture
@@ -675,7 +675,7 @@ public partial class ApiIdTests
                     CultureValue: "en-US"
                 )
             ),
-            ExpectedJson = @"{""ApiKind"":""Culture"",""ApiValue"":""en-US""}"
+            ExpectedJson = @"{""ApiKind"":""Culture"",""ClrValue"":""en-US""}"
         },
 
         new JsonSerializeTest
@@ -689,7 +689,7 @@ public partial class ApiIdTests
                     CultureValue: "fr-FR"
                 )
             ),
-            ExpectedJson = @"{""ApiKind"":""Culture"",""ApiValue"":""fr-FR""}"
+            ExpectedJson = @"{""ApiKind"":""Culture"",""ClrValue"":""fr-FR""}"
         },
 
         // Composites
@@ -719,7 +719,7 @@ public partial class ApiIdTests
                     )
                 ]
             ),
-            ExpectedJson = @"{""ApiKind"":""Composite"",""ApiValue"":[{""ApiKind"":""Int32"",""ApiValue"":24},{""ApiKind"":""Int32"",""ApiValue"":24}]}"
+            ExpectedJson = @"{""ApiKind"":""Composite"",""ApiParts"":[{""ApiKind"":""Int32"",""ClrValue"":24},{""ApiKind"":""Int32"",""ClrValue"":24}]}"
         },
 
         new JsonSerializeTest
@@ -746,7 +746,7 @@ public partial class ApiIdTests
                     )
                 ]
             ),
-            ExpectedJson = @"{""ApiKind"":""Composite"",""ApiValue"":[{""ApiKind"":""Int32"",""ApiValue"":24},{""ApiKind"":""Int32"",""ApiValue"":42}]}"
+            ExpectedJson = @"{""ApiKind"":""Composite"",""ApiParts"":[{""ApiKind"":""Int32"",""ClrValue"":24},{""ApiKind"":""Int32"",""ClrValue"":42}]}"
         },
 
         // .. Named (named parts)
@@ -776,7 +776,7 @@ public partial class ApiIdTests
                     )
                 ]
             ),
-            ExpectedJson = @"{""ApiKind"":""Composite"",""ApiValue"":[{""ApiName"":""alpha"",""ApiKind"":""Int32"",""ApiValue"":24},{""ApiName"":""beta"",""ApiKind"":""Int32"",""ApiValue"":24}]}"
+            ExpectedJson = @"{""ApiKind"":""Composite"",""ApiParts"":[{""ApiName"":""alpha"",""ApiKind"":""Int32"",""ClrValue"":24},{""ApiName"":""beta"",""ApiKind"":""Int32"",""ClrValue"":24}]}"
         },
         new JsonSerializeTest
         {
@@ -804,7 +804,7 @@ public partial class ApiIdTests
                     )
                 ]
             ),
-            ExpectedJson = @"{""ApiKind"":""Composite"",""ApiValue"":[{""ApiName"":""alpha"",""ApiKind"":""Int32"",""ApiValue"":24},{""ApiName"":""beta"",""ApiKind"":""Int32"",""ApiValue"":42}]}"
+            ExpectedJson = @"{""ApiKind"":""Composite"",""ApiParts"":[{""ApiName"":""alpha"",""ApiKind"":""Int32"",""ClrValue"":24},{""ApiName"":""beta"",""ApiKind"":""Int32"",""ClrValue"":42}]}"
         },
         new JsonSerializeTest
         {
@@ -832,7 +832,7 @@ public partial class ApiIdTests
                     )
                 ]
             ),
-            ExpectedJson = @"{""ApiKind"":""Composite"",""ApiValue"":[{""ApiName"":""alpha"",""ApiKind"":""Int32"",""ApiValue"":24},{""ApiName"":""zeta"",""ApiKind"":""Int32"",""ApiValue"":42}]}"
+            ExpectedJson = @"{""ApiKind"":""Composite"",""ApiParts"":[{""ApiName"":""alpha"",""ApiKind"":""Int32"",""ClrValue"":24},{""ApiName"":""zeta"",""ApiKind"":""Int32"",""ClrValue"":42}]}"
         },
     ];
     #endregion

@@ -53,7 +53,7 @@ public partial class ApiIdentityValueTests
                         ""ApiKind"": ""Scalar"",
                         ""ApiScalarValue"": {
                             ""ApiKind"": ""Int32"",
-                            ""ApiValue"": 42
+                            ""ClrValue"": 42
                         }
                     }
                 ]
@@ -83,7 +83,7 @@ public partial class ApiIdentityValueTests
                         ""ApiKind"": ""Scalar"",
                         ""ApiScalarValue"": {
                             ""ApiKind"": ""Int32"",
-                            ""ApiValue"": 42
+                            ""ClrValue"": 42
                         }
                     },
                     {
@@ -91,7 +91,7 @@ public partial class ApiIdentityValueTests
                         ""ApiKind"": ""Scalar"",
                         ""ApiScalarValue"": {
                             ""ApiKind"": ""Int32"",
-                            ""ApiValue"": 1001
+                            ""ClrValue"": 1001
                         }
                     }
                 ]
@@ -137,7 +137,7 @@ public partial class ApiIdentityValueTests
                                                 ""ApiKind"": ""Scalar"",
                                                 ""ApiScalarValue"": {
                                                     ""ApiKind"": ""Int32"",
-                                                    ""ApiValue"": 1
+                                                    ""ClrValue"": 1
                                                 }
                                             }
                                         ]
@@ -148,7 +148,7 @@ public partial class ApiIdentityValueTests
                                     ""ApiKind"": ""Scalar"",
                                     ""ApiScalarValue"": {
                                         ""ApiKind"": ""Int32"",
-                                        ""ApiValue"": 42
+                                        ""ClrValue"": 42
                                     }
                                 }
                             ]
@@ -159,7 +159,7 @@ public partial class ApiIdentityValueTests
                         ""ApiKind"": ""Scalar"",
                         ""ApiScalarValue"": {
                             ""ApiKind"": ""Int32"",
-                            ""ApiValue"": 1001
+                            ""ClrValue"": 1001
                         }
                     }
                 ]
@@ -315,7 +315,7 @@ public partial class ApiIdentityValueTests
                                                             ""ApiKind"": ""Scalar"",
                                                             ""ApiScalarValue"": {
                                                                 ""ApiKind"": ""String"",
-                                                                ""ApiValue"": ""DeepValue""
+                                                                ""ClrValue"": ""DeepValue""
                                                             }
                                                         },
                                                         {
@@ -323,7 +323,7 @@ public partial class ApiIdentityValueTests
                                                             ""ApiKind"": ""Scalar"",
                                                             ""ApiScalarValue"": {
                                                                 ""ApiKind"": ""Int32"",
-                                                                ""ApiValue"": 42
+                                                                ""ClrValue"": 42
                                                             }
                                                         }
                                                     ]
@@ -340,7 +340,7 @@ public partial class ApiIdentityValueTests
                         ""ApiKind"": ""Scalar"",
                         ""ApiScalarValue"": {
                             ""ApiKind"": ""Guid"",
-                            ""ApiValue"": ""12345678-1234-1234-1234-123456789abc""
+                            ""ClrValue"": ""12345678-1234-1234-1234-123456789abc""
                         }
                     }
                 ]
@@ -675,7 +675,7 @@ public partial class ApiIdentityValueTests
                         ""ApiKind"": ""Scalar"",
                         ""ApiScalarValue"": {
                             ""ApiKind"": ""Int32"",
-                            ""ApiValue"": 42
+                            ""ClrValue"": 42
                         }
                     }
                 ]
@@ -711,7 +711,7 @@ public partial class ApiIdentityValueTests
                         ""ApiKind"": ""Scalar"",
                         ""ApiScalarValue"": {
                             ""ApiKind"": ""Int32"",
-                            ""ApiValue"": 42
+                            ""ClrValue"": 42
                         }
                     },
                     {
@@ -719,7 +719,7 @@ public partial class ApiIdentityValueTests
                         ""ApiKind"": ""Scalar"",
                         ""ApiScalarValue"": {
                             ""ApiKind"": ""Int32"",
-                            ""ApiValue"": 1001
+                            ""ClrValue"": 1001
                         }
                     }
                 ]
@@ -793,7 +793,7 @@ public partial class ApiIdentityValueTests
                                                 ""ApiKind"": ""Scalar"",
                                                 ""ApiScalarValue"": {
                                                     ""ApiKind"": ""Int32"",
-                                                    ""ApiValue"": 1
+                                                    ""ClrValue"": 1
                                                 }
                                             }
                                         ]
@@ -804,7 +804,7 @@ public partial class ApiIdentityValueTests
                                     ""ApiKind"": ""Scalar"",
                                     ""ApiScalarValue"": {
                                         ""ApiKind"": ""Int32"",
-                                        ""ApiValue"": 42
+                                        ""ClrValue"": 42
                                     }
                                 }
                             ]
@@ -815,7 +815,7 @@ public partial class ApiIdentityValueTests
                         ""ApiKind"": ""Scalar"",
                         ""ApiScalarValue"": {
                             ""ApiKind"": ""Int32"",
-                            ""ApiValue"": 1001
+                            ""ClrValue"": 1001
                         }
                     }
                 ]
@@ -982,7 +982,7 @@ public partial class ApiIdentityValueTests
                                                             ""ApiKind"": ""Scalar"",
                                                             ""ApiScalarValue"": {
                                                                 ""ApiKind"": ""String"",
-                                                                ""ApiValue"": ""DeepValue""
+                                                                ""ClrValue"": ""DeepValue""
                                                             }
                                                         },
                                                         {
@@ -990,7 +990,7 @@ public partial class ApiIdentityValueTests
                                                             ""ApiKind"": ""Scalar"",
                                                             ""ApiScalarValue"": {
                                                                 ""ApiKind"": ""Int32"",
-                                                                ""ApiValue"": 42
+                                                                ""ClrValue"": 42
                                                             }
                                                         }
                                                     ]
@@ -1007,7 +1007,7 @@ public partial class ApiIdentityValueTests
                         ""ApiKind"": ""Scalar"",
                         ""ApiScalarValue"": {
                             ""ApiKind"": ""Guid"",
-                            ""ApiValue"": ""12345678-1234-1234-1234-123456789abc""
+                            ""ClrValue"": ""12345678-1234-1234-1234-123456789abc""
                         }
                     }
                 ]

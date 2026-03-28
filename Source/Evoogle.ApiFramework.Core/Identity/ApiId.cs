@@ -31,7 +31,7 @@ namespace Evoogle.ApiFramework.Identity;
 ///         <see cref="ApiId"/> serves as the performance layer in the identity system:
 ///         <list type="bullet">
 ///             <item><strong>Schema Layer:</strong> <see cref="Schema.ApiIdentity"/> defines what constitutes an identity (build-time).</item>
-///             <item><strong>Semantic Layer:</strong> <c>ApiIdentitySnapshot</c> preserves object graph structure for navigation and diagnostics.</item>
+///             <item><strong>Semantic Layer:</strong> <see cref="ApiIdentityValue"/> preserves object graph structure for navigation and diagnostics.</item>
 ///             <item><strong>Runtime Layer:</strong> <see cref="ApiId"/> provides flat, efficient identity values for operations.</item>
 ///         </list>
 ///     </para>
@@ -56,18 +56,17 @@ namespace Evoogle.ApiFramework.Identity;
 ///         </list>
 ///     </para>
 ///     <para>
-///         <strong>Relationship with ApiIdentitySnapshot:</strong>
-///         <c>ApiIdentitySnapshot</c> extracts structured identity snapshots from objects and can flatten them to <see cref="ApiId"/>
-///         via <c>ApiIdentitySnapshot.ToApiId</c>. The client controls whether parts are named (semantic, readable) or
-///         unnamed (compact, performance-oriented):
+///         <strong>Relationship with ApiIdentityValue:</strong>
+///         <see cref="ApiIdentityValue"/> extracts structured identity values from objects and can flatten them to <see cref="ApiId"/>
+///         via <see cref="ApiIdentityValue.ToApiId"/>. The client controls whether parts are named (semantic, readable) or unnamed (compact, performance-oriented):
 ///         <code>
 ///         // Semantic layer: preserves structure
-///         ApiIdentitySnapshot snapshot = orderIdentity.Extract(order);
-///         int customerId = snapshot.GetScalarValue&lt;int&gt;("Customer.Id");
+///         ApiIdentityValue apiIdentityValue = orderIdentity.Extract(order);
+///         int customerId = apiIdentityValue.GetScalarValue&lt;int&gt;("Customer.Id");
 ///
 ///         // Runtime layer: flatten for operations
-///         ApiId namedId = snapshot.ToApiId(useNamedParts: true);    // "Customer.Id=42|OrderNumber=1001"
-///         ApiId unnamedId = snapshot.ToApiId(useNamedParts: false); // "42|1001"
+///         ApiId namedId = apiIdentityValue.ToApiId(useNamedParts: true);    // "Customer.Id=42|OrderNumber=1001"
+///         ApiId unnamedId = apiIdentityValue.ToApiId(useNamedParts: false); // "42|1001"
 ///
 ///         // Use in performance-critical operations
 ///         cache[unnamedId] = order;
@@ -81,8 +80,8 @@ namespace Evoogle.ApiFramework.Identity;
 ///             <item><strong>Named:</strong> Each part has a semantic name (e.g., "CustomerId=42|OrderNumber=1001").</item>
 ///             <item><strong>Unnamed/Positional:</strong> Parts are ordered without names (e.g., "42|1001").</item>
 ///         </list>
-///         All parts in a composite must be consistently named or unnamed (no mixing). Nested composites are explicitly forbidden
-///         to maintain performance characteristics and simplicity.
+///         All parts in a composite must be consistently named or unnamed (no mixing).
+///         Nested composites are explicitly forbidden to maintain performance characteristics and simplicity.
 ///     </para>
 /// </remarks>
 /// <example>
