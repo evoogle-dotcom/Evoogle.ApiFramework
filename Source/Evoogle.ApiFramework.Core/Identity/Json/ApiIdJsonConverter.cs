@@ -3,7 +3,6 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using System.Globalization;
 using System.Text.Json;
 
 using Evoogle.Json;
@@ -16,11 +15,6 @@ namespace Evoogle.ApiFramework.Identity.Json;
 ///     JSON converter for <see cref="ApiId"/> values that supports both scalar and composite
 ///     representations for read and write using System.Text.Json.
 /// </summary>
-/// <remarks>
-///     This converter integrates with the Evoogle JSON infrastructure and writes/reads an object with
-///     two properties: a <c>kind</c> enum and a <c>value</c> that is either a string (scalar) or an array
-///     of parts (composite). Null values are written as JSON <c>null</c>.
-/// </remarks>
 /// <remarks>
 ///     Initializes a new instance of the <see cref="ApiIdJsonConverter"/> class.
 /// </remarks>
@@ -85,7 +79,9 @@ public sealed class ApiIdJsonConverter(ILogger<ApiIdJsonConverter>? logger) : Js
         #region Properties
         public ApiIdKind? ApiKind { get; set; }
         public List<ApiIdPartReadData?>? ApiParts { get; set; }
-        public string? ClrValue { get; set; }
+
+        public long? ClrValueAsInt64 { get; set; }
+        public string? ClrValueAsString { get; set; }
         #endregion
     }
 
@@ -94,7 +90,9 @@ public sealed class ApiIdJsonConverter(ILogger<ApiIdJsonConverter>? logger) : Js
         #region Properties
         public string? ApiName { get; set; }
         public ApiIdKind? ApiKind { get; set; }
-        public string? ClrValue { get; set; }
+
+        public long? ClrValueAsInt64 { get; set; }
+        public string? ClrValueAsString { get; set; }
         #endregion
     }
 
@@ -142,6 +140,8 @@ public sealed class ApiIdJsonConverter(ILogger<ApiIdJsonConverter>? logger) : Js
             context.ReadData.ApiId ??= new ApiIdReadData();
             context.ReadData.ApiId.ApiParts ??= [];
 
+            // The context argument is intentionally discarded:
+            // The same fixed handler is used for every element regardless of context; the handler itself receives the context at invocation time.
             ReadJsonArray(ref reader, context, static _ => HandleApiIdApiPartsArrayItem);
         }
 
@@ -157,17 +157,12 @@ public sealed class ApiIdJsonConverter(ILogger<ApiIdJsonConverter>? logger) : Js
         private static void HandleApiIdClrValue(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiId ??= new ApiIdReadData();
-            var propertyName = context.PropertyNames.ApiIdPart.ClrValue;
-            var apiKind = context.ReadData.ApiId.ApiKind;
-            var apiKindKnown = apiKind is not null;
+            var propertyName = context.PropertyNames.ApiId.ClrValue;
 
-            if (apiKindKnown)
-            {
-                context.ReadData.ApiId.ClrValue = ReadClrValueKnownKind(ref reader, apiKind!.Value, propertyName);
-                return;
-            }
+            var (clrValueAsInt64, clrValueAsString) = ReadClrValue(ref reader, propertyName);
 
-            context.ReadData.ApiId.ClrValue = ReadClrValueUnknownKind(ref reader, propertyName);
+            context.ReadData.ApiId.ClrValueAsInt64 = clrValueAsInt64;
+            context.ReadData.ApiId.ClrValueAsString = clrValueAsString;
         }
         #endregion
 
@@ -191,89 +186,36 @@ public sealed class ApiIdJsonConverter(ILogger<ApiIdJsonConverter>? logger) : Js
         {
             context.ReadData.ApiIdPart ??= new ApiIdPartReadData();
             var propertyName = context.PropertyNames.ApiIdPart.ClrValue;
-            var apiKind = context.ReadData.ApiIdPart.ApiKind;
-            var apiKindKnown = apiKind is not null;
 
-            if (apiKindKnown)
-            {
-                context.ReadData.ApiIdPart.ClrValue = ReadClrValueKnownKind(ref reader, apiKind!.Value, propertyName);
-                return;
-            }
+            var (clrValueAsInt64, clrValueAsString) = ReadClrValue(ref reader, propertyName);
 
-            context.ReadData.ApiIdPart.ClrValue = ReadClrValueUnknownKind(ref reader, propertyName);
+            context.ReadData.ApiIdPart.ClrValueAsInt64 = clrValueAsInt64;
+            context.ReadData.ApiIdPart.ClrValueAsString = clrValueAsString;
         }
         #endregion
 
         #region Helper Methods
-        /// <summary>
-        ///     Reads a scalar JSON token and normalizes it to an invariant string when the ApiIdKind is known.
-        ///     Enforces token expectations (e.g. forbids numeric for Guid/Ulid/Culture) and range checks for integers.
-        /// </summary>
-        private static string ReadClrValueKnownKind(ref Utf8JsonReader reader, ApiIdKind kind, string propertyName)
+        private static (long? ClrValueAsInt64, string? ClrValueAsString) ReadClrValue(ref Utf8JsonReader reader, string propertyName)
         {
-            if (reader.TokenType == JsonTokenType.String)
-            {
-                return reader.GetString()!;
-            }
+            var jsonTokenType = reader.TokenType;
 
-            if (reader.TokenType == JsonTokenType.Number)
+            if (jsonTokenType == JsonTokenType.Number)
             {
-                switch (kind)
+                if (!reader.TryGetInt64(out var clrValueAsInt64))
                 {
-                    case ApiIdKind.Int32:
-                        if (!reader.TryGetInt64(out var i64For32))
-                        {
-                            throw new JsonException($"Numeric value for {propertyName} could not be read as integer.");
-                        }
-                        if (i64For32 < int.MinValue || i64For32 > int.MaxValue)
-                        {
-                            throw new JsonException($"Numeric value for {propertyName} is out of range for Int32: {i64For32}.");
-                        }
-                        return ((int)i64For32).ToString(CultureInfo.InvariantCulture);
-
-                    case ApiIdKind.Int64:
-                        if (!reader.TryGetInt64(out var i64))
-                        {
-                            throw new JsonException($"Numeric value for {propertyName} could not be read as Int64.");
-                        }
-                        return i64.ToString(CultureInfo.InvariantCulture);
-
-                    case ApiIdKind.String:
-                        if (!reader.TryGetInt64(out var numberAsText))
-                        {
-                            throw new JsonException($"Numeric value for {propertyName} could not be read as integer for String kind.");
-                        }
-                        return numberAsText.ToString(CultureInfo.InvariantCulture);
-
-                    default:
-                        throw new JsonException($"Invalid numeric token for {propertyName} with kind {kind}. Expected string.");
+                    throw new JsonException($"Numeric value for {propertyName} could not be read as integer.");
                 }
+
+                return (clrValueAsInt64, null);
             }
 
-            throw new JsonException($"Invalid token type for {propertyName} with kind {kind}: {reader.TokenType}.");
-        }
-
-        /// <summary>
-        ///     Reads a scalar JSON token and normalizes it to an invariant string when the ApiIdKind is not yet known.
-        ///     Accepts string or integer number tokens only.
-        /// </summary>
-        private static string ReadClrValueUnknownKind(ref Utf8JsonReader reader, string propertyName)
-        {
-            if (reader.TokenType == JsonTokenType.String)
+            if (jsonTokenType == JsonTokenType.String)
             {
-                return reader.GetString()!;
+                var clrValueAsString = reader.GetString();
+                return (null, clrValueAsString);
             }
 
-            if (reader.TokenType == JsonTokenType.Number)
-            {
-                if (!reader.TryGetInt64(out var number))
-                {
-                    throw new JsonException($"Numeric value for {propertyName} is not an integer.");
-                }
-                return number.ToString(CultureInfo.InvariantCulture);
-            }
-
-            throw new JsonException($"Invalid token type for {propertyName} : {reader.TokenType}.");
+            throw new JsonException($"Unexpected JSON token type for {propertyName}: {jsonTokenType}. Expected number or string.");
         }
         #endregion
     }
@@ -377,26 +319,13 @@ public sealed class ApiIdJsonConverter(ILogger<ApiIdJsonConverter>? logger) : Js
         return ApiId.Empty;
     }
 
-    private static ApiId CreateScalar(ApiIdKind apiKind, PropertyNames propertyNames, ReadData readData)
-    {
-        var clrValueAsString = readData.ApiId?.ClrValue;
-        if (!ApiId.TryParse(apiKind, clrValueAsString, out var apiId))
-        {
-            var propertyName = propertyNames.ApiId.ClrValue;
-            throw new JsonException($"Value '{clrValueAsString}' is not a valid {apiKind} for property: {propertyName}.");
-        }
-
-        // Create and return scalar ApiId
-        return apiId;
-    }
-
     private static ApiId CreateComposite(PropertyNames propertyNames, ReadData readData)
     {
         var nullableOrEmptyApiParts = readData.ApiId?.ApiParts;
         if (nullableOrEmptyApiParts is null || nullableOrEmptyApiParts.Count == 0)
         {
             var propertyName = propertyNames.ApiId.ApiParts;
-            throw new JsonException($"Composite ApiId requires non-empty array property: {propertyName}.");
+            throw new JsonException($"Composite {nameof(ApiId)} requires non-empty array property: {propertyName}.");
         }
 
         var apiIdPartsCount = nullableOrEmptyApiParts.Count;
@@ -407,7 +336,7 @@ public sealed class ApiIdJsonConverter(ILogger<ApiIdJsonConverter>? logger) : Js
             if (apiPart is null)
             {
                 var propertyName = propertyNames.ApiId.ApiParts;
-                throw new JsonException($"Null composite ApiId part at index {index} in property: {propertyName}.");
+                throw new JsonException($"Null composite {nameof(ApiId)} part at index {index} in property: {propertyName}.");
             }
 
             // Get part name (not required)
@@ -423,12 +352,17 @@ public sealed class ApiIdJsonConverter(ILogger<ApiIdJsonConverter>? logger) : Js
             var apiKind = nullableApiKind.Value;
 
             // Get and validate part value (required)
-            var clrValueAsString = apiPart.ClrValue;
-            if (!ApiId.TryParse(apiKind, clrValueAsString, out var apiId))
-            {
-                var propertyName = propertyNames.ApiIdPart.ClrValue;
-                throw new JsonException($"Value '{clrValueAsString}' is not a valid {apiKind} for property: {propertyName} of composite part at index {index}.");
-            }
+            var clrValuePropertyName = propertyNames.ApiIdPart.ClrValue;
+            var clrValueAsInt64 = apiPart.ClrValueAsInt64;
+            var clrValueAsString = apiPart.ClrValueAsString;
+
+            var apiId = CreateScalarCore
+            (
+                apiKind,
+                clrValuePropertyName,
+                clrValueAsInt64,
+                clrValueAsString
+            );
 
             // Create and add composite part to collection
             var apiIdPart = new ApiIdPart(apiName, apiId);
@@ -437,6 +371,75 @@ public sealed class ApiIdJsonConverter(ILogger<ApiIdJsonConverter>? logger) : Js
 
         // Create and return composite ApiId
         return ApiId.Composite(apiIdParts);
+    }
+
+    private static ApiId CreateScalar(ApiIdKind apiKind, PropertyNames propertyNames, ReadData readData)
+    {
+        var clrValuePropertyName = propertyNames.ApiId.ClrValue;
+        var clrValueAsInt64 = readData.ApiId?.ClrValueAsInt64;
+        var clrValueAsString = readData.ApiId?.ClrValueAsString;
+
+        var apiId = CreateScalarCore
+        (
+            apiKind,
+            clrValuePropertyName,
+            clrValueAsInt64,
+            clrValueAsString
+        );
+        return apiId;
+    }
+
+    private static ApiId CreateScalarCore
+    (
+        ApiIdKind apiKind,
+        string clrValuePropertyName,
+        long? clrValueAsInt64,
+        string? clrValueAsString)
+    {
+        switch (apiKind)
+        {
+            case ApiIdKind.Empty:
+            case ApiIdKind.Composite:
+                throw new JsonException($"ApiIdKind.{apiKind} is not valid as a scalar value in property: {clrValuePropertyName}.");
+
+            case ApiIdKind.Int32:
+            case ApiIdKind.Int64:
+                {
+                    var nullableInt64 = clrValueAsInt64 ?? throw new JsonException($"Missing required numeric value for {apiKind} in property: {clrValuePropertyName}.");
+                    var int64 = nullableInt64;
+
+                    if (apiKind == ApiIdKind.Int64)
+                    {
+                        // Create and return Int64 ApiId
+                        var apiId = ApiId.FromInt64(int64);
+                        return apiId;
+                    }
+                    else
+                    {
+                        // For Int32 kind, we still validate the range and throw if it's out of bounds, even if it was provided as Int64.
+                        if (int64 < int.MinValue || int64 > int.MaxValue)
+                        {
+                            throw new JsonException($"Numeric value for {apiKind} in property {clrValuePropertyName} is out of range for Int32: {int64}.");
+                        }
+                        var int32 = (int)int64;
+
+                        // Create and return Int32 ApiId
+                        var apiId = ApiId.FromInt32(int32);
+                        return apiId;
+                    }
+                }
+
+            default:
+                {
+                    var text = clrValueAsString;
+                    if (!ApiId.TryParse(apiKind, text, out var apiId))
+                    {
+                        throw new JsonException($"Value '{text}' is not a valid {apiKind} for property: {clrValuePropertyName}.");
+                    }
+
+                    return apiId;
+                }
+        }
     }
     #endregion
 
