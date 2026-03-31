@@ -102,7 +102,7 @@ public partial class ApiSchemaTests
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiCollectionType)} Throws If {nameof(ApiCollectionType.ApiItemType)} Is Null",
-            Part = @"
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiCollectionType Throws If ApiItemType Is Null"",
                 ""ApiScalarTypes"": [],
@@ -145,7 +145,7 @@ public partial class ApiSchemaTests
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiCollectionType)} Throws If {nameof(ApiCollectionType.ApiItemType)} Is Unresolved",
-            Part = @"
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiCollectionType Throws If ApiItemType Is Unresolved"",
                 ""ApiScalarTypes"": [],
@@ -196,7 +196,7 @@ public partial class ApiSchemaTests
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiEnumType)} Throws If {nameof(ApiEnumType.ApiName)} Is Invalid",
-            Part = @"
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiEnumType Throws If ApiName Is Invalid"",
                 ""ApiScalarTypes"": [],
@@ -244,7 +244,7 @@ public partial class ApiSchemaTests
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiEnumType)} Throws If {nameof(ApiEnumType.ClrType)} Is Null",
-            Part = @"
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiEnumType Throws If ClrType Is Null"",
                 ""ApiScalarTypes"": [],
@@ -291,7 +291,7 @@ public partial class ApiSchemaTests
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiEnumType)} Throws If {nameof(ApiEnumType.ClrType)} Is Not a CLR Enum",
-            Part = @"
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiEnumType Throws If ClrType Is Not a CLR Enum"",
                 ""ApiScalarTypes"": [],
@@ -339,7 +339,7 @@ public partial class ApiSchemaTests
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiEnumType)} Throws If {nameof(ApiEnumType.ApiEnumValues)} Is Null",
-            Part = @"
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiEnumType Throws If ApiEnumValues Is Null"",
                 ""ApiScalarTypes"": [],
@@ -370,7 +370,7 @@ public partial class ApiSchemaTests
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiEnumType)} Throws If {nameof(ApiEnumType.ApiEnumValues)} Is Empty",
-            Part = @"
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiEnumType Throws If ApiEnumValues Is Empty"",
                 ""ApiScalarTypes"": [],
@@ -402,7 +402,7 @@ public partial class ApiSchemaTests
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiEnumType)} Throws If {nameof(ApiEnumType.ApiEnumValues)} Has Duplicate {nameof(ApiEnumValue.ApiName)} Values",
-            Part = @"
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiEnumType Throws If ApiEnumValues Has Duplicate ApiName Values"",
                 ""ApiScalarTypes"": [],
@@ -450,7 +450,7 @@ public partial class ApiSchemaTests
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiEnumType)} Throws If {nameof(ApiEnumType.ApiEnumValues)} Has Duplicate {nameof(ApiEnumValue.ClrName)} Values",
-            Part = @"
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiEnumType Throws If ApiEnumValues Has Duplicate ClrName Values"",
                 ""ApiScalarTypes"": [],
@@ -498,7 +498,7 @@ public partial class ApiSchemaTests
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiEnumType)} Throws If {nameof(ApiEnumType.ApiEnumValues)} Has Duplicate {nameof(ApiEnumValue.ClrOrdinal)} Values",
-            Part = @"
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiEnumType Throws If ApiEnumValues Has Duplicate ClrOrdinal Values"",
                 ""ApiScalarTypes"": [],
@@ -555,7 +555,7 @@ public partial class ApiSchemaTests
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiEnumValue)} Throws If {nameof(ApiEnumValue.ApiName)} Is Invalid",
-            Part = @"
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiEnumValue Throws If ApiName Is Invalid"",
                 ""ApiScalarTypes"": [],
@@ -603,7 +603,7 @@ public partial class ApiSchemaTests
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiEnumValue)} Throws If {nameof(ApiEnumValue.ClrName)} Is Invalid",
-            Part = @"
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiEnumValue Throws If ClrName Is Invalid"",
                 ""ApiScalarTypes"": [],
@@ -655,7 +655,7 @@ public partial class ApiSchemaTests
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiIdentity)} Throws If {nameof(ApiIdentity.ApiName)} Is Invalid",
-            Part = @"
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiIdentity Throws If ApiName Is Invalid"",
                 ""ApiScalarTypes"": [
@@ -730,7 +730,7 @@ public partial class ApiSchemaTests
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiIdentity)} Throws If {nameof(ApiIdentity.ApiIdentityParts)} Is Empty",
-            Part = @"
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiIdentity Throws If ApiIdentityParts Is Empty"",
                 ""ApiScalarTypes"": [
@@ -800,7 +800,7 @@ public partial class ApiSchemaTests
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiIdentity)} Throws If {nameof(ApiIdentity.ApiIdentityParts)} Has Duplicate {nameof(ApiPropertyIdentityPart.ApiPropertyName)} Values",
-            Part = @"
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiIdentity Throws If ApiIdentityParts Has Duplicate ApiPropertyName Values"",
                 ""ApiScalarTypes"": [
@@ -879,7 +879,7 @@ public partial class ApiSchemaTests
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiIdentity)} Throws If {nameof(ApiIdentity.ApiIdentityParts)} Contains Multiple {nameof(ApiOwnerIdentityPart)} Instances",
-            Part = @"
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiIdentity Throws If ApiIdentityParts Contains Multiple ApiOwnerIdentityPart Instances"",
                 ""ApiScalarTypes"": [
@@ -969,7 +969,7 @@ public partial class ApiSchemaTests
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiNestedIdentityPart)} Throws If {nameof(ApiNestedIdentityPart.ApiPropertyName)} Is Not An {nameof(ApiObjectType)}",
-            Part = @"
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiNestedIdentityPart Throws If ApiPropertyName Is Not An ApiObjectType"",
                 ""ApiScalarTypes"": [
@@ -1034,7 +1034,7 @@ public partial class ApiSchemaTests
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiNestedIdentityPart)} Throws If {nameof(ApiNestedIdentityPart.ApiIdentityName)} Is Unresolved",
-            Part = @"
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiNestedIdentityPart Throws If ApiIdentityName Is Unresolved"",
                 ""ApiScalarTypes"": [
@@ -1132,7 +1132,7 @@ public partial class ApiSchemaTests
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiOwnerIdentityPart)} Throws If No Candidate Owner {nameof(ApiObjectType)} Exists",
-            Part = @"
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiOwnerIdentityPart Throws If No Candidate Owner ApiObjectType Exists"",
                 ""ApiScalarTypes"": [
@@ -1186,7 +1186,7 @@ public partial class ApiSchemaTests
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiOwnerIdentityPart)} Throws If Multiple Candidate Owner {nameof(ApiObjectType)}s Exist",
-            Part = @"
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiOwnerIdentityPart Throws If Multiple Candidate Owner ApiObjectTypes Exist"",
                 ""ApiScalarTypes"": [
@@ -1296,7 +1296,7 @@ public partial class ApiSchemaTests
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiOwnerIdentityPart)} Throws If A Cyclic Owner Reference Is Detected",
-            Part = @"
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiOwnerIdentityPart Throws If A Cyclic Owner Reference Is Detected"",
                 ""ApiScalarTypes"": [],
@@ -1343,7 +1343,7 @@ public partial class ApiSchemaTests
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiPropertyIdentityPart)} Throws If {nameof(ApiPropertyIdentityPart.ApiPropertyName)} Is Invalid",
-            Part = @"
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiPropertyIdentityPart Throws If ApiPropertyName Is Invalid"",
                 ""ApiScalarTypes"": [
@@ -1418,7 +1418,7 @@ public partial class ApiSchemaTests
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiPropertyIdentityPart)} Throws If {nameof(ApiPropertyIdentityPart.ApiPropertyName)} Is Unresolved",
-            Part = @"
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiPropertyIdentityPart Throws If ApiPropertyName Is Unresolved"",
                 ""ApiScalarTypes"": [
@@ -1493,7 +1493,7 @@ public partial class ApiSchemaTests
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiScalarIdentityPart)} Warns If {nameof(String)} Requires Coercion",
-            Part = @"
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiScalarIdentityPart Warns If String Requires Coercion"",
                 ""ApiScalarTypes"": [
@@ -1577,7 +1577,7 @@ public partial class ApiSchemaTests
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiScalarIdentityPart)} Throws If {nameof(ApiScalarIdentityPart.ApiPropertyName)} Is Not An {nameof(ApiScalarType)}",
-            Part = @"
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiScalarIdentityPart Throws If ApiPropertyName Is Not An ApiScalarType"",
                 ""ApiScalarTypes"": [
@@ -1675,7 +1675,7 @@ public partial class ApiSchemaTests
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiProperty)} Throws If {nameof(ApiProperty.ApiName)} Is Invalid",
-            Part = @"
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiProperty Throws If ApiName Is Invalid"",
                 ""ApiScalarTypes"": [
@@ -1724,7 +1724,7 @@ public partial class ApiSchemaTests
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiProperty)} Throws If {nameof(ApiProperty.ClrName)} Is Invalid",
-            Part = @"
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiProperty Throws If ClrName Is Invalid"",
                 ""ApiScalarTypes"": [
@@ -1773,7 +1773,7 @@ public partial class ApiSchemaTests
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiProperty)} Throws If CLR Member Is Missing",
-            Part = @"
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiProperty Throws If CLR Member Is Missing"",
                 ""ApiScalarTypes"": [
@@ -1822,7 +1822,7 @@ public partial class ApiSchemaTests
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiProperty)} Throws If {nameof(ApiProperty.ApiType)} Type Is Null",
-            Part = @"
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiProperty Throws If Type Is Null"",
                 ""ApiScalarTypes"": [],
@@ -1861,7 +1861,7 @@ public partial class ApiSchemaTests
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiProperty)} Throws If Type Is An Invalid CLR Member",
-            Part = @"
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiProperty Throws If Type Is An Invalid CLR Member"",
                 ""ApiScalarTypes"": [
@@ -1942,7 +1942,7 @@ public partial class ApiSchemaTests
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiProperty)} Throws If {nameof(ApiProperty.ApiType)} Is Unresolved Because Api Named Reference Type Does Not Exist",
-            Part = @"
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiProperty Throws If Type Is Unresolved Because Api Named Reference Type Does Not Exist"",
                 ""ApiScalarTypes"": [],
@@ -1984,7 +1984,7 @@ public partial class ApiSchemaTests
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiProperty)} Throws If {nameof(ApiProperty.ApiType)} Is Unresolved Because CLR Reference Type Does Not Exist",
-            Part = @"
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiProperty Throws If Type Is Unresolved Because CLR Reference Type Does Not Exist"",
                 ""ApiScalarTypes"": [],
@@ -2025,7 +2025,7 @@ public partial class ApiSchemaTests
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiProperty)} Throws If {nameof(ApiProperty.ApiType)} Is Unresolved Because Type Reference Is Invalid",
-            Part = @"
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiProperty Throws If Type Is Unresolved Because Type Reference Is Invalid"",
                 ""ApiScalarTypes"": [],
@@ -2065,7 +2065,7 @@ public partial class ApiSchemaTests
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiProperty)} Throws If Unable To Get Or Set Field/Property Value",
-            Part = @"
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiProperty Throws If Unable To Get Or Set Field/Property Value"",
                 ""ApiScalarTypes"": [
@@ -2152,7 +2152,7 @@ public partial class ApiSchemaTests
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiObjectType)} Throws If ApiProperties Is Null Or Empty",
-            Part = @"
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiObjectType Throws If ApiProperties Is Null Or Empty"",
                 ""ApiScalarTypes"": [],
@@ -2192,7 +2192,7 @@ public partial class ApiSchemaTests
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiObjectType)} Throws If ApiProperties Has Duplicate ApiName",
-            Part = @"
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiObjectType Throws If ApiProperties Has Duplicate ApiName"",
                 ""ApiScalarTypes"": [
@@ -2247,7 +2247,7 @@ public partial class ApiSchemaTests
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiObjectType)} Throws If ApiProperties Has Duplicate ClrName",
-            Part = @"
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiObjectType Throws If ApiProperties Has Duplicate ClrName"",
                 ""ApiScalarTypes"": [
@@ -2302,7 +2302,7 @@ public partial class ApiSchemaTests
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiObjectType)} Throws If ApiIdentities Has Duplicate ApiName",
-            Part = @"
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiObjectType Throws If ApiIdentities Has Duplicate ApiName"",
                 ""ApiScalarTypes"": [
@@ -2381,7 +2381,7 @@ public partial class ApiSchemaTests
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiScalarType)} Throws If {nameof(ApiScalarType.ApiName)} Is Invalid",
-            Part = @"
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiScalarType Throws If ApiName Is Invalid"",
                 ""ApiScalarTypes"": [
@@ -2412,7 +2412,7 @@ public partial class ApiSchemaTests
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiScalarType)} Throws If {nameof(ApiScalarType.ClrType)} Is Null",
-            Part = @"
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiScalarType Throws If ClrType Is Null"",
                 ""ApiScalarTypes"": [
@@ -2446,7 +2446,7 @@ public partial class ApiSchemaTests
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiSchema)} Throws If {nameof(ApiSchema.ApiName)} Is Invalid",
-            Part = @"
+            SourceJson = @"
             {
                 ""ApiName"": """",
                 ""ApiScalarTypes"": [
@@ -2484,7 +2484,7 @@ public partial class ApiSchemaTests
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiSchema)} Throws If {nameof(ApiSchema.ApiScalarTypes)} Has Duplicate {nameof(ApiScalarType.ApiName)}",
-            Part = @"
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiSchema Throws If ApiScalarTypes Has Duplicate ApiName"",
                 ""ApiScalarTypes"": [
@@ -2528,7 +2528,7 @@ public partial class ApiSchemaTests
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiSchema)} Throws If {nameof(ApiSchema.ApiScalarTypes)} Has Duplicate {nameof(ApiScalarType.ClrType)}",
-            Part = @"
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiSchema Throws If ApiScalarTypes Has Duplicate ClrType"",
                 ""ApiScalarTypes"": [
@@ -2572,7 +2572,7 @@ public partial class ApiSchemaTests
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiSchema)} Throws If {nameof(ApiSchema.ApiEnumTypes)} Has Duplicate {nameof(ApiEnumType.ApiName)}",
-            Part = @"
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiSchema Throws If ApiEnumTypes Has Duplicate ApiName"",
                 ""ApiScalarTypes"": [],
@@ -2627,7 +2627,7 @@ public partial class ApiSchemaTests
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiSchema)} Throws If {nameof(ApiSchema.ApiEnumTypes)} Has Duplicate {nameof(ApiEnumType.ClrType)}",
-            Part = @"
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiSchema Throws If ApiEnumTypes Has Duplicate ClrType"",
                 ""ApiScalarTypes"": [],
@@ -2681,7 +2681,7 @@ public partial class ApiSchemaTests
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiSchema)} Throws If {nameof(ApiSchema.ApiObjectTypes)} Has Duplicate {nameof(ApiObjectType.ApiName)}",
-            Part = @"
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiSchema Throws If ApiObjectTypes Has Duplicate ApiName"",
                 ""ApiScalarTypes"": [
@@ -2750,7 +2750,7 @@ public partial class ApiSchemaTests
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiSchema)} Throws If {nameof(ApiSchema.ApiObjectTypes)} Has Duplicate {nameof(ApiObjectType.ClrType)}",
-            Part = @"
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiSchema Throws If ApiObjectTypes Has Duplicate ClrType"",
                 ""ApiScalarTypes"": [
@@ -2824,7 +2824,7 @@ public partial class ApiSchemaTests
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiSchema)} Throws If {nameof(ApiSchema.ApiNamedTypes)} Has Duplicate {nameof(ApiNamedType.ApiName)}",
-            Part = @"
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiSchema Throws If ApiNamedTypes Has Duplicate ApiName"",
                 ""ApiScalarTypes"": [
@@ -2866,7 +2866,7 @@ public partial class ApiSchemaTests
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiSchema)} Throws If {nameof(ApiSchema.ApiNamedTypes)} Has Duplicate {nameof(ApiNamedType.ClrType)}",
-            Part = @"
+            SourceJson = @"
             {
                 ""ApiName"": ""ApiSchema Throws If ApiNamedTypes Has Duplicate ClrType"",
                 ""ApiScalarTypes"": [

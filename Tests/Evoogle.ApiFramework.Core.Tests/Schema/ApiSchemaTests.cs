@@ -23,25 +23,30 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
     private class InitializeThrowsTest : JsonConverterTestBase<ApiSchema>
     {
         #region User Supplied Properties
-        public required string Part { get; init; }
-        public required string ExpectedExceptionMessage { get; init; }
+        public required string SourceJson { get; init; }
         public required List<ApiInitializationIssue> ExpectedIssues { get; init; }
         #endregion
 
         #region Calculated Properties
-        private bool? ActualExceptionThrown { get; set; }
-        private string? ActualExceptionMessage { get; set; }
         private List<ApiInitializationIssue>? ActualIssues { get; set; }
+        #endregion
+
+        #region Constructors
+        public InitializeThrowsTest()
+        {
+            this.ExpectedExceptionType = typeof(ApiSchemaInitializationException);
+        }
         #endregion
 
         #region XUnitTest Methods
         protected override void Arrange()
         {
-            this.WriteLine($"Part:   {this.Part.SafeToString().RemoveWhitespace()}");
+            this.WriteLine($"Source JSON:\n{this.SourceJson.SafeToString().RemoveWhitespace()}");
             this.WriteLine();
 
-            this.WriteLine($"Expected Exception Message: {this.ExpectedExceptionMessage.SafeToString()}");
+            this.WriteException("Expected", this.ExpectedExceptionType, this.ExpectedExceptionMessage);
             this.WriteLine();
+
             foreach (var expectedIssue in this.ExpectedIssues)
             {
                 this.WriteLine($"Expected Issue: {expectedIssue.SafeToString()}");
@@ -54,32 +59,29 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
         {
             try
             {
-                JsonSerializer.Deserialize<ApiSchema>(this.Part, this.JsonSerializerOptions);
+                JsonSerializer.Deserialize<ApiSchema>(this.SourceJson, this.JsonSerializerOptions);
             }
             catch (ApiSchemaInitializationException ex)
             {
-                this.ActualExceptionThrown = true;
-                this.ActualExceptionMessage = ex.Message;
-                this.ActualIssues = [.. ex.Issues];
-            }
+                this.CaptureException(ex);
 
-            this.WriteLine($"Actual Exception Thrown:  {this.ActualExceptionThrown.SafeToString()}");
-            this.WriteLine($"Actual Exception Message: {this.ActualExceptionMessage.SafeToString()}");
-            this.WriteLine();
-            if (this.ActualIssues is not null)
-            {
+                this.ActualIssues = [.. ex.Issues];
+                this.WriteLine();
                 foreach (var actualIssue in this.ActualIssues)
                 {
                     this.WriteLine($"Actual Issue: {actualIssue.SafeToString()}");
                 }
             }
-            this.WriteLine();
+            catch (Exception ex)
+            {
+                this.CaptureException(ex);
+            }
         }
 
         protected override void Assert()
         {
-            this.ActualExceptionThrown.Should().BeTrue();
-            this.ActualExceptionMessage.Should().Be(this.ExpectedExceptionMessage);
+            base.AssertException();
+
             this.ActualIssues.Should().NotBeNull();
             this.ActualIssues.Should().BeEquivalentTo(this.ExpectedIssues);
         }
