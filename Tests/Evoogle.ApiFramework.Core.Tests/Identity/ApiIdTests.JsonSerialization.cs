@@ -290,6 +290,90 @@ public partial class ApiIdTests
         },
     ];
 
+    public static TheoryDataRow<IXUnitTest>[] JsonDeserializeExceptionTheoryData =>
+    [
+        // Missing top-level ApiKind property
+        new JsonDeserializeTest
+        {
+            Name = "Error: Missing top-level ApiKind",
+            SourceJson = @"{""ClrValue"":""alpha""}",
+            ExpectedFactoryArgument = null,
+            ExpectedExceptionType = typeof(System.Text.Json.JsonException),
+            ExpectedExceptionMessage = "Missing required property"
+        },
+
+        // Empty ApiParts array for Composite
+        new JsonDeserializeTest
+        {
+            Name = "Error: Composite with empty ApiParts array",
+            SourceJson = @"{""ApiKind"":""Composite"",""ApiParts"":[]}",
+            ExpectedFactoryArgument = null,
+            ExpectedExceptionType = typeof(System.Text.Json.JsonException),
+            ExpectedExceptionMessage = "requires non-empty array property"
+        },
+
+        // Null element inside ApiParts array — the base framework skips null array items,
+        // so [null] produces an empty ApiParts list, triggering the same guard as [].
+        new JsonDeserializeTest
+        {
+            Name = "Error: Composite with null element in ApiParts",
+            SourceJson = @"{""ApiKind"":""Composite"",""ApiParts"":[null]}",
+            ExpectedFactoryArgument = null,
+            ExpectedExceptionType = typeof(System.Text.Json.JsonException),
+            ExpectedExceptionMessage = "requires non-empty array property"
+        },
+
+        // Missing ApiKind inside a composite part
+        new JsonDeserializeTest
+        {
+            Name = "Error: Composite part missing ApiKind",
+            SourceJson = @"{""ApiKind"":""Composite"",""ApiParts"":[{""ClrValue"":42}]}",
+            ExpectedFactoryArgument = null,
+            ExpectedExceptionType = typeof(System.Text.Json.JsonException),
+            ExpectedExceptionMessage = "Missing required property"
+        },
+
+        // Composite kind used as a composite part's ApiKind (exercises Issue 2 fix)
+        new JsonDeserializeTest
+        {
+            Name = "Error: Composite part ApiKind is Composite",
+            SourceJson = @"{""ApiKind"":""Composite"",""ApiParts"":[{""ApiKind"":""Composite"",""ClrValue"":42}]}",
+            ExpectedFactoryArgument = null,
+            ExpectedExceptionType = typeof(System.Text.Json.JsonException),
+            ExpectedExceptionMessage = "is not valid as a scalar value"
+        },
+
+        // Empty kind used as a composite part's ApiKind (exercises Issue 2 fix)
+        new JsonDeserializeTest
+        {
+            Name = "Error: Composite part ApiKind is Empty",
+            SourceJson = @"{""ApiKind"":""Composite"",""ApiParts"":[{""ApiKind"":""Empty"",""ClrValue"":42}]}",
+            ExpectedFactoryArgument = null,
+            ExpectedExceptionType = typeof(System.Text.Json.JsonException),
+            ExpectedExceptionMessage = "is not valid as a scalar value"
+        },
+
+        // Int32 ClrValue out of range (exceeds int.MaxValue)
+        new JsonDeserializeTest
+        {
+            Name = "Error: Int32 ClrValue out of range",
+            SourceJson = @"{""ApiKind"":""Int32"",""ClrValue"":2147483648}",
+            ExpectedFactoryArgument = null,
+            ExpectedExceptionType = typeof(System.Text.Json.JsonException),
+            ExpectedExceptionMessage = "out of range for Int32"
+        },
+
+        // Non-integer numeric ClrValue (floating-point) for Int32
+        new JsonDeserializeTest
+        {
+            Name = "Error: Int32 ClrValue is floating-point",
+            SourceJson = @"{""ApiKind"":""Int32"",""ClrValue"":1.5}",
+            ExpectedFactoryArgument = null,
+            ExpectedExceptionType = typeof(System.Text.Json.JsonException),
+            ExpectedExceptionMessage = "could not be read as integer"
+        },
+    ];
+
     public static TheoryDataRow<IXUnitTest>[] JsonRoundtripTheoryData =>
     [
         // Empty
@@ -841,6 +925,10 @@ public partial class ApiIdTests
     [Theory]
     [MemberData(nameof(JsonDeserializeTheoryData))]
     public void JsonDeserialize(IXUnitTest test) => test.Execute(this);
+
+    [Theory]
+    [MemberData(nameof(JsonDeserializeExceptionTheoryData))]
+    public void JsonDeserializeException(IXUnitTest test) => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(JsonRoundtripTheoryData))]
