@@ -154,6 +154,20 @@ public sealed class ApiIdentityValue(IEnumerable<ApiIdentityPartValue>? apiParts
         var segments = dottedPath.Split('.');
         return NavigateParts(this.ApiParts, segments, segmentIndex: 0);
     }
+
+    /// <summary>
+    ///     Returns the <see cref="ApiIdentityPartValue"/> reached by following the dotted path,
+    ///     or <see langword="null"/> if any segment is not found, the path navigates into a scalar part,
+    ///     or any intermediate <see cref="ApiObjectIdentityPartValue"/> is unresolved.
+    /// </summary>
+    /// <param name="dottedPath">
+    ///     A dot-separated sequence of part names to follow from this identity value's parts
+    ///     (e.g., <c>"Customer.Country.Id"</c>).
+    /// </param>
+    /// <remarks>
+    ///     This indexer is powered by <see cref="TryNavigate"/>. See that method for full navigation semantics.
+    /// </remarks>
+    public ApiIdentityPartValue? this[string dottedPath] => this.TryNavigate(dottedPath);
     #endregion
 
     #region Object Methods
