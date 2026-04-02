@@ -860,7 +860,7 @@ public readonly struct ApiId
     {
         var result = this.ApiKind switch
         {
-            ApiIdKind.Empty => null,
+            ApiIdKind.Empty => string.Empty,
             ApiIdKind.String => (string?)_ref,
             ApiIdKind.Int32 => _val.Int32.ToString(CultureInfo.InvariantCulture),
             ApiIdKind.Int64 => _val.Int64.ToString(CultureInfo.InvariantCulture),
@@ -885,7 +885,7 @@ public readonly struct ApiId
         var provider = formatProvider ?? CultureInfo.InvariantCulture;
         var result = this.ApiKind switch
         {
-            ApiIdKind.Empty => null,
+            ApiIdKind.Empty => string.Empty,
             ApiIdKind.String => (string?)_ref,
             ApiIdKind.Int32 => _val.Int32.ToString(format, provider),
             ApiIdKind.Int64 => _val.Int64.ToString(format, provider),

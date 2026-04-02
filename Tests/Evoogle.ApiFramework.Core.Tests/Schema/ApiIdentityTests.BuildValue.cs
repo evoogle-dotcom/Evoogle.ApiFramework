@@ -1,0 +1,707 @@
+﻿// Copyright (c) 2024-2025 Evoogle.com
+// SPDX-License-Identifier: MIT
+//
+// This file is licensed under the MIT License.
+// See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Exceptions;
+using Evoogle.ApiFramework.Identity;
+using Evoogle.ApiFramework.TestData;
+using Evoogle.Extensions;
+using Evoogle.XUnit;
+
+using FluentAssertions;
+
+namespace Evoogle.ApiFramework.Schema;
+
+public partial class ApiIdentityTests
+{
+    #region Test Types
+    private class BuildValueFromInstanceTest : XUnitTest
+    {
+        #region User Supplied Properties
+        public required string ApiObjectTypeName { get; init; }
+        public string? ApiIdentityName { get; init; }
+        public required object ClrInstance { get; init; }
+        public object? ClrOwnerInstance { get; init; }
+        public ApiIdentityNullHandling NullHandling { get; init; }
+        public ApiIdentityValue? ExpectedValue { get; init; }
+        public Type? ExpectedExceptionType { get; init; }
+        #endregion
+
+        #region Calculated Properties
+        private ApiIdentity? ApiIdentity { get; set; }
+        private ApiIdentityValue? ActualValue { get; set; }
+        private Type? ActualExceptionType { get; set; }
+        #endregion
+
+        #region XUnitTest Methods
+        protected override void Arrange()
+        {
+            this.ApiIdentity = this.ApiIdentityName is not null
+                ? GetIdentityByName(this.ApiObjectTypeName, this.ApiIdentityName)
+                : GetPrimaryIdentity(this.ApiObjectTypeName);
+
+            this.WriteLine($"ApiObjectType: {this.ApiObjectTypeName.SafeToString()}");
+            this.WriteLine($"ApiIdentity:   {this.ApiIdentity.ApiName.SafeToString()}");
+            this.WriteLine($"ClrInstance:   {this.ClrInstance.SafeToString()}");
+            this.WriteLine($"ClrOwner:      {this.ClrOwnerInstance.SafeToString()}");
+            this.WriteLine($"NullHandling:  {this.NullHandling.SafeToString()}");
+            this.WriteLine();
+
+            if (this.ExpectedValue is not null)
+            {
+                this.WriteLine($"Expected Value: {this.ExpectedValue.SafeToString()}");
+            }
+            else if (this.ExpectedExceptionType is not null)
+            {
+                this.WriteLine($"Expected Exception: {this.ExpectedExceptionType.SafeToName()}");
+            }
+        }
+
+        protected override void Act()
+        {
+            try
+            {
+                var context = new ApiIdentityValueBuildContext
+                {
+                    ClrInstance = this.ClrInstance,
+                    ClrOwnerInstance = this.ClrOwnerInstance,
+                    NullHandling = this.NullHandling
+                };
+                this.ActualValue = this.ApiIdentity!.BuildValue(context);
+                this.WriteLine($"Actual Value:   {this.ActualValue.SafeToString()}");
+            }
+            catch (Exception ex)
+            {
+                this.ActualExceptionType = ex.GetType();
+                this.WriteLine($"Actual Exception:   {this.ActualExceptionType.SafeToName()} - {ex.Message}");
+            }
+        }
+
+        protected override void Assert()
+        {
+            if (this.ExpectedValue is not null)
+            {
+                this.ActualExceptionType.Should().BeNull();
+                this.ActualValue.Should().NotBeNull();
+                this.ActualValue.Should().BeEquivalentTo(this.ExpectedValue, options => options
+                    .Excluding(ctx => ctx.Path.EndsWith(nameof(ApiIdentityValue.ApiScalarValue), StringComparison.Ordinal)));
+            }
+            else if (this.ExpectedExceptionType is not null)
+            {
+                this.ActualExceptionType.Should().NotBeNull();
+                this.ActualExceptionType.Should().Be(this.ExpectedExceptionType);
+            }
+        }
+        #endregion
+    }
+
+    private class BuildValueFromValuesTest : XUnitTest
+    {
+        #region User Supplied Properties
+        public required string ApiObjectTypeName { get; init; }
+        public string? ApiIdentityName { get; init; }
+        public required IReadOnlyDictionary<string, object?> Values { get; init; }
+        public IReadOnlyDictionary<string, object?>? OwnerValues { get; init; }
+        public ApiIdentityNullHandling NullHandling { get; init; }
+        public ApiIdentityValue? ExpectedValue { get; init; }
+        public Type? ExpectedExceptionType { get; init; }
+        #endregion
+
+        #region Calculated Properties
+        private ApiIdentity? ApiIdentity { get; set; }
+        private ApiIdentityValue? ActualValue { get; set; }
+        private Type? ActualExceptionType { get; set; }
+        #endregion
+
+        #region XUnitTest Methods
+        protected override void Arrange()
+        {
+            this.ApiIdentity = this.ApiIdentityName is not null
+                ? GetIdentityByName(this.ApiObjectTypeName, this.ApiIdentityName)
+                : GetPrimaryIdentity(this.ApiObjectTypeName);
+
+            static string FormatValue(object? value) =>
+                value is IReadOnlyDictionary<string, object?> nested
+                    ? $"{{{string.Join(',', nested.Select(kvp => $"{kvp.Key}={FormatValue(kvp.Value)}"))}}}"
+                    : value.SafeToString();
+
+            var valuesDisplay = this.Values is not null
+                ? $"[{string.Join(',', this.Values.Select(kvp => $"{kvp.Key.SafeToString()}={FormatValue(kvp.Value)}"))}]"
+                : "<null>";
+
+            var ownerValuesDisplay = this.OwnerValues is not null
+                ? $"[{string.Join(',', this.OwnerValues.Select(kvp => $"{kvp.Key.SafeToString()}={FormatValue(kvp.Value)}"))}]"
+                : "<null>";
+
+            this.WriteLine($"ApiObjectType: {this.ApiObjectTypeName.SafeToString()}");
+            this.WriteLine($"ApiIdentity:   {this.ApiIdentity.ApiName.SafeToString()}");
+            this.WriteLine($"Values:        {valuesDisplay}");
+            this.WriteLine($"OwnerValues:   {ownerValuesDisplay}");
+            this.WriteLine($"NullHandling:  {this.NullHandling.SafeToString()}");
+            this.WriteLine();
+
+            if (this.ExpectedValue is not null)
+            {
+                this.WriteLine($"Expected Value: {this.ExpectedValue.SafeToString()}");
+            }
+            else if (this.ExpectedExceptionType is not null)
+            {
+                this.WriteLine($"Expected Exception: {this.ExpectedExceptionType.SafeToName()}");
+            }
+        }
+
+        protected override void Act()
+        {
+            try
+            {
+                var context = new ApiIdentityValueBuildFromValuesContext
+                {
+                    Values = this.Values,
+                    OwnerValues = this.OwnerValues,
+                    NullHandling = this.NullHandling
+                };
+                this.ActualValue = this.ApiIdentity!.BuildValue(context);
+                this.WriteLine($"Actual Value:   {this.ActualValue.SafeToString()}");
+            }
+            catch (Exception ex)
+            {
+                this.ActualExceptionType = ex.GetType();
+                this.WriteLine($"Actual Exception:   {this.ActualExceptionType.SafeToName()} - {ex.Message}");
+            }
+        }
+
+        protected override void Assert()
+        {
+            if (this.ExpectedValue is not null)
+            {
+                this.ActualExceptionType.Should().BeNull();
+                this.ActualValue.Should().NotBeNull();
+                this.ActualValue.Should().BeEquivalentTo(this.ExpectedValue, options => options
+                    .Excluding(ctx => ctx.Path.EndsWith(nameof(ApiIdentityValue.ApiScalarValue), StringComparison.Ordinal)));
+            }
+            else if (this.ExpectedExceptionType is not null)
+            {
+                this.ActualExceptionType.Should().NotBeNull();
+                this.ActualExceptionType.Should().Be(this.ExpectedExceptionType);
+            }
+        }
+        #endregion
+    }
+
+    private class BuildValueNullContextTest : XUnitTest
+    {
+        #region User Supplied Properties
+        public required string ApiObjectTypeName { get; init; }
+        public required bool UseInstanceOverload { get; init; }
+        #endregion
+
+        #region Calculated Properties
+        private ApiIdentity? ApiIdentity { get; set; }
+        private Type? ActualExceptionType { get; set; }
+        #endregion
+
+        #region XUnitTest Methods
+        protected override void Arrange()
+        {
+            this.ApiIdentity = GetPrimaryIdentity(this.ApiObjectTypeName);
+
+            this.WriteLine($"ApiObjectType:       {this.ApiObjectTypeName.SafeToString()}");
+            this.WriteLine($"UseInstanceOverload: {this.UseInstanceOverload}");
+        }
+
+        protected override void Act()
+        {
+            try
+            {
+                if (this.UseInstanceOverload)
+                {
+                    this.ApiIdentity!.BuildValue((ApiIdentityValueBuildContext)null!);
+                }
+                else
+                {
+                    this.ApiIdentity!.BuildValue((ApiIdentityValueBuildFromValuesContext)null!);
+                }
+            }
+            catch (Exception ex)
+            {
+                this.ActualExceptionType = ex.GetType();
+                this.WriteLine($"Actual Exception: {this.ActualExceptionType.SafeToName()}");
+            }
+        }
+
+        protected override void Assert()
+        {
+            this.ActualExceptionType.Should().NotBeNull();
+            this.ActualExceptionType.Should().Be(typeof(ArgumentNullException));
+        }
+        #endregion
+    }
+    #endregion
+
+    #region BuildValueFromInstance Theory Data
+    public static TheoryDataRow<IXUnitTest>[] BuildValueFromInstanceTheoryData =>
+    [
+        // Scalar identity — single part (int)
+        new BuildValueFromInstanceTest
+        {
+            Name = "Scalar identity with int value",
+            ApiObjectTypeName = nameof(IdentityScalar),
+            ApiIdentityName = "PK_IdentityScalar",
+            ClrInstance = ScalarInstance,
+            ExpectedValue = ApiIdentityValue.Composite(
+            [
+                new ApiScalarIdentityPartValue("Id", ApiId.FromInt32(42))
+            ])
+        },
+
+        // Scalar identity — alternate key (string)
+        new BuildValueFromInstanceTest
+        {
+            Name = "Alternate key identity with string value",
+            ApiObjectTypeName = nameof(IdentityScalar),
+            ApiIdentityName = "AK_IdentityScalar",
+            ClrInstance = ScalarInstance,
+            ExpectedValue = ApiIdentityValue.Composite(
+            [
+                new ApiScalarIdentityPartValue("Name", ApiId.FromString("TestName"))
+            ])
+        },
+
+        // Composite identity — two scalar parts (int + string)
+        new BuildValueFromInstanceTest
+        {
+            Name = "Composite identity with two scalar parts",
+            ApiObjectTypeName = nameof(IdentityTwoScalarPartComposite),
+            ClrInstance = TwoPartInstance,
+            ExpectedValue = ApiIdentityValue.Composite(
+            [
+                new ApiScalarIdentityPartValue("Id1", ApiId.FromInt32(1)),
+                new ApiScalarIdentityPartValue("Id2", ApiId.FromString("abc"))
+            ])
+        },
+
+        // Composite identity — three scalar parts (int + string + Guid)
+        new BuildValueFromInstanceTest
+        {
+            Name = "Composite identity with three scalar parts",
+            ApiObjectTypeName = nameof(IdentityThreeScalarPartComposite),
+            ClrInstance = ThreePartInstance,
+            ExpectedValue = ApiIdentityValue.Composite(
+            [
+                new ApiScalarIdentityPartValue("Id1", ApiId.FromInt32(10)),
+                new ApiScalarIdentityPartValue("Id2", ApiId.FromString("xyz")),
+                new ApiScalarIdentityPartValue("Id3", ApiId.FromGuid(Guid.Parse("11111111-1111-1111-1111-111111111111")))
+            ])
+        },
+
+        // Nested identity — composite with nested object part
+        new BuildValueFromInstanceTest
+        {
+            Name = "Composite identity with nested object part",
+            ApiObjectTypeName = nameof(IdentityNestedComposite),
+            ClrInstance = NestedCompositeInstance,
+            ExpectedValue = ApiIdentityValue.Composite(
+            [
+                new ApiObjectIdentityPartValue("NestedPart",
+                    ApiIdentityValue.Composite(
+                    [
+                        new ApiScalarIdentityPartValue("Id", ApiId.FromInt32(5))
+                    ])),
+                new ApiScalarIdentityPartValue("Name", ApiId.FromString("Nested"))
+            ])
+        },
+
+        // Owner identity — owned composite with owner instance
+        new BuildValueFromInstanceTest
+        {
+            Name = "Owned composite identity with owner instance",
+            ApiObjectTypeName = nameof(IdentityOwnedComposite),
+            ClrInstance = OwnedCompositeInstance,
+            ClrOwnerInstance = OwnerInstance,
+            ExpectedValue = ApiIdentityValue.Composite(
+            [
+                new ApiObjectIdentityPartValue("IdentityOwner",
+                    ApiIdentityValue.Composite(
+                    [
+                        new ApiScalarIdentityPartValue("Id", ApiId.FromInt32(99))
+                    ])),
+                new ApiScalarIdentityPartValue("LineNumber", ApiId.FromInt32(3))
+            ])
+        },
+
+        // Owner identity — owned dependent with owner only
+        new BuildValueFromInstanceTest
+        {
+            Name = "Owned dependent identity with owner only",
+            ApiObjectTypeName = nameof(IdentityOwnedDependent),
+            ClrInstance = OwnedDependentInstance,
+            ClrOwnerInstance = OwnerInstance,
+            ExpectedValue = ApiIdentityValue.Composite(
+            [
+                new ApiObjectIdentityPartValue("IdentityOwner",
+                    ApiIdentityValue.Composite(
+                    [
+                        new ApiScalarIdentityPartValue("Id", ApiId.FromInt32(99))
+                    ]))
+            ])
+        },
+
+        // Null handling — ReturnEmpty: scalar with null value
+        new BuildValueFromInstanceTest
+        {
+            Name = "Scalar null value returns empty with ReturnEmpty",
+            ApiObjectTypeName = nameof(IdentityTwoScalarPartComposite),
+            ClrInstance = TwoPartNullId2Instance,
+            NullHandling = ApiIdentityNullHandling.ReturnEmpty,
+            ExpectedValue = ApiIdentityValue.Composite(
+            [
+                new ApiScalarIdentityPartValue("Id1", ApiId.FromInt32(1)),
+                new ApiScalarIdentityPartValue("Id2", ApiId.Empty)
+            ])
+        },
+
+        // Null handling — ReturnEmpty: nested with null object
+        new BuildValueFromInstanceTest
+        {
+            Name = "Nested null object returns skeleton with ReturnEmpty",
+            ApiObjectTypeName = nameof(IdentityNestedComposite),
+            ClrInstance = NestedCompositeNullNestedPartInstance,
+            NullHandling = ApiIdentityNullHandling.ReturnEmpty,
+            ExpectedValue = ApiIdentityValue.Composite(
+            [
+                new ApiObjectIdentityPartValue("NestedPart", apiObjectValue: null, apiStructure:
+                [
+                    new ApiScalarIdentityPartValue("Id", ApiId.Empty)
+                ]),
+                new ApiScalarIdentityPartValue("Name", ApiId.FromString("NoNested"))
+            ])
+        },
+
+        // Null handling — ReturnEmpty: owner with null owner instance
+        new BuildValueFromInstanceTest
+        {
+            Name = "Null owner instance returns skeleton with ReturnEmpty",
+            ApiObjectTypeName = nameof(IdentityOwnedComposite),
+            ClrInstance = OwnedCompositeInstance,
+            ClrOwnerInstance = null,
+            NullHandling = ApiIdentityNullHandling.ReturnEmpty,
+            ExpectedValue = ApiIdentityValue.Composite(
+            [
+                new ApiObjectIdentityPartValue("IdentityOwner", apiObjectValue: null, apiStructure:
+                [
+                    new ApiScalarIdentityPartValue("Id", ApiId.Empty)
+                ]),
+                new ApiScalarIdentityPartValue("LineNumber", ApiId.FromInt32(3))
+            ])
+        },
+
+        // Null handling — ThrowException: scalar with null value
+        new BuildValueFromInstanceTest
+        {
+            Name = "Scalar null value throws with ThrowException",
+            ApiObjectTypeName = nameof(IdentityTwoScalarPartComposite),
+            ClrInstance = TwoPartNullId2Instance,
+            NullHandling = ApiIdentityNullHandling.ThrowException,
+            ExpectedExceptionType = typeof(ApiIdentityException)
+        },
+
+        // Null handling — ThrowException: nested with null object
+        new BuildValueFromInstanceTest
+        {
+            Name = "Nested null object throws with ThrowException",
+            ApiObjectTypeName = nameof(IdentityNestedComposite),
+            ClrInstance = NestedCompositeNullNestedPartInstance,
+            NullHandling = ApiIdentityNullHandling.ThrowException,
+            ExpectedExceptionType = typeof(ApiIdentityException)
+        },
+
+        // Null handling — ThrowException: owner with null owner instance
+        new BuildValueFromInstanceTest
+        {
+            Name = "Null owner instance throws with ThrowException",
+            ApiObjectTypeName = nameof(IdentityOwnedComposite),
+            ClrInstance = OwnedCompositeInstance,
+            ClrOwnerInstance = null,
+            NullHandling = ApiIdentityNullHandling.ThrowException,
+            ExpectedExceptionType = typeof(ApiIdentityException)
+        },
+    ];
+    #endregion
+
+    #region BuildValueFromValues Theory Data
+    public static TheoryDataRow<IXUnitTest>[] BuildValueFromValuesTheoryData =>
+    [
+        // Scalar identity from dictionary (int)
+        new BuildValueFromValuesTest
+        {
+            Name = "Scalar identity from dictionary with int value",
+            ApiObjectTypeName = nameof(IdentityScalar),
+            ApiIdentityName = "PK_IdentityScalar",
+            Values = new Dictionary<string, object?> { ["Id"] = 42 },
+            ExpectedValue = ApiIdentityValue.Composite(
+            [
+                new ApiScalarIdentityPartValue("Id", ApiId.FromInt32(42))
+            ])
+        },
+
+        // Alternate key from dictionary (string)
+        new BuildValueFromValuesTest
+        {
+            Name = "Alternate key identity from dictionary with string value",
+            ApiObjectTypeName = nameof(IdentityScalar),
+            ApiIdentityName = "AK_IdentityScalar",
+            Values = new Dictionary<string, object?> { ["Name"] = "TestName" },
+            ExpectedValue = ApiIdentityValue.Composite(
+            [
+                new ApiScalarIdentityPartValue("Name", ApiId.FromString("TestName"))
+            ])
+        },
+
+        // Composite identity from dictionary — two parts
+        new BuildValueFromValuesTest
+        {
+            Name = "Composite identity from dictionary with two scalar parts",
+            ApiObjectTypeName = nameof(IdentityTwoScalarPartComposite),
+            Values = new Dictionary<string, object?> { ["Id1"] = 1, ["Id2"] = "abc" },
+            ExpectedValue = ApiIdentityValue.Composite(
+            [
+                new ApiScalarIdentityPartValue("Id1", ApiId.FromInt32(1)),
+                new ApiScalarIdentityPartValue("Id2", ApiId.FromString("abc"))
+            ])
+        },
+
+        // Composite identity from dictionary — three parts
+        new BuildValueFromValuesTest
+        {
+            Name = "Composite identity from dictionary with three scalar parts",
+            ApiObjectTypeName = nameof(IdentityThreeScalarPartComposite),
+            Values = new Dictionary<string, object?>
+            {
+                ["Id1"] = 10,
+                ["Id2"] = "xyz",
+                ["Id3"] = Guid.Parse("11111111-1111-1111-1111-111111111111")
+            },
+            ExpectedValue = ApiIdentityValue.Composite(
+            [
+                new ApiScalarIdentityPartValue("Id1", ApiId.FromInt32(10)),
+                new ApiScalarIdentityPartValue("Id2", ApiId.FromString("xyz")),
+                new ApiScalarIdentityPartValue("Id3", ApiId.FromGuid(Guid.Parse("11111111-1111-1111-1111-111111111111")))
+            ])
+        },
+
+        // Nested identity from dictionary — nested dict
+        new BuildValueFromValuesTest
+        {
+            Name = "Nested identity from dictionary with nested dictionary",
+            ApiObjectTypeName = nameof(IdentityNestedComposite),
+            Values = new Dictionary<string, object?>
+            {
+                ["NestedPart"] = new Dictionary<string, object?> { ["Id"] = 5 },
+                ["Name"] = "Nested"
+            },
+            ExpectedValue = ApiIdentityValue.Composite(
+            [
+                new ApiObjectIdentityPartValue("NestedPart",
+                    ApiIdentityValue.Composite(
+                    [
+                        new ApiScalarIdentityPartValue("Id", ApiId.FromInt32(5))
+                    ])),
+                new ApiScalarIdentityPartValue("Name", ApiId.FromString("Nested"))
+            ])
+        },
+
+        // Nested identity from dictionary — CLR object fallback
+        new BuildValueFromValuesTest
+        {
+            Name = "Nested identity from dictionary with CLR instance fallback",
+            ApiObjectTypeName = nameof(IdentityNestedComposite),
+            Values = new Dictionary<string, object?>
+            {
+                ["NestedPart"] = NestedPartInstance,
+                ["Name"] = "Nested"
+            },
+            ExpectedValue = ApiIdentityValue.Composite(
+            [
+                new ApiObjectIdentityPartValue("NestedPart",
+                    ApiIdentityValue.Composite(
+                    [
+                        new ApiScalarIdentityPartValue("Id", ApiId.FromInt32(5))
+                    ])),
+                new ApiScalarIdentityPartValue("Name", ApiId.FromString("Nested"))
+            ])
+        },
+
+        // Owner identity from dictionary — with owner values
+        new BuildValueFromValuesTest
+        {
+            Name = "Owner identity from dictionary with owner values",
+            ApiObjectTypeName = nameof(IdentityOwnedComposite),
+            Values = new Dictionary<string, object?> { ["LineNumber"] = 3 },
+            OwnerValues = new Dictionary<string, object?> { ["Id"] = 99 },
+            ExpectedValue = ApiIdentityValue.Composite(
+            [
+                new ApiObjectIdentityPartValue("IdentityOwner",
+                    ApiIdentityValue.Composite(
+                    [
+                        new ApiScalarIdentityPartValue("Id", ApiId.FromInt32(99))
+                    ])),
+                new ApiScalarIdentityPartValue("LineNumber", ApiId.FromInt32(3))
+            ])
+        },
+
+        // Owner-only identity from dictionary
+        new BuildValueFromValuesTest
+        {
+            Name = "Owner-only identity from dictionary",
+            ApiObjectTypeName = nameof(IdentityOwnedDependent),
+            Values = new Dictionary<string, object?>(),
+            OwnerValues = new Dictionary<string, object?> { ["Id"] = 99 },
+            ExpectedValue = ApiIdentityValue.Composite(
+            [
+                new ApiObjectIdentityPartValue("IdentityOwner",
+                    ApiIdentityValue.Composite(
+                    [
+                        new ApiScalarIdentityPartValue("Id", ApiId.FromInt32(99))
+                    ]))
+            ])
+        },
+
+        // Null handling — ReturnEmpty: missing key in dictionary
+        new BuildValueFromValuesTest
+        {
+            Name = "Missing key in dictionary returns empty with ReturnEmpty",
+            ApiObjectTypeName = nameof(IdentityTwoScalarPartComposite),
+            Values = new Dictionary<string, object?> { ["Id1"] = 1 },
+            NullHandling = ApiIdentityNullHandling.ReturnEmpty,
+            ExpectedValue = ApiIdentityValue.Composite(
+            [
+                new ApiScalarIdentityPartValue("Id1", ApiId.FromInt32(1)),
+                new ApiScalarIdentityPartValue("Id2", ApiId.Empty)
+            ])
+        },
+
+        // Null handling — ReturnEmpty: null value in dictionary
+        new BuildValueFromValuesTest
+        {
+            Name = "Null value in dictionary returns empty with ReturnEmpty",
+            ApiObjectTypeName = nameof(IdentityTwoScalarPartComposite),
+            Values = new Dictionary<string, object?> { ["Id1"] = 1, ["Id2"] = null },
+            NullHandling = ApiIdentityNullHandling.ReturnEmpty,
+            ExpectedValue = ApiIdentityValue.Composite(
+            [
+                new ApiScalarIdentityPartValue("Id1", ApiId.FromInt32(1)),
+                new ApiScalarIdentityPartValue("Id2", ApiId.Empty)
+            ])
+        },
+
+        // Null handling — ReturnEmpty: null nested value
+        new BuildValueFromValuesTest
+        {
+            Name = "Null nested value in dictionary returns skeleton with ReturnEmpty",
+            ApiObjectTypeName = nameof(IdentityNestedComposite),
+            Values = new Dictionary<string, object?> { ["NestedPart"] = null, ["Name"] = "NoNested" },
+            NullHandling = ApiIdentityNullHandling.ReturnEmpty,
+            ExpectedValue = ApiIdentityValue.Composite(
+            [
+                new ApiObjectIdentityPartValue("NestedPart", apiObjectValue: null, apiStructure:
+                [
+                    new ApiScalarIdentityPartValue("Id", ApiId.Empty)
+                ]),
+                new ApiScalarIdentityPartValue("Name", ApiId.FromString("NoNested"))
+            ])
+        },
+
+        // Null handling — ReturnEmpty: null owner values
+        new BuildValueFromValuesTest
+        {
+            Name = "Null owner values returns skeleton with ReturnEmpty",
+            ApiObjectTypeName = nameof(IdentityOwnedComposite),
+            Values = new Dictionary<string, object?> { ["LineNumber"] = 3 },
+            OwnerValues = null,
+            NullHandling = ApiIdentityNullHandling.ReturnEmpty,
+            ExpectedValue = ApiIdentityValue.Composite(
+            [
+                new ApiObjectIdentityPartValue("IdentityOwner", apiObjectValue: null, apiStructure:
+                [
+                    new ApiScalarIdentityPartValue("Id", ApiId.Empty)
+                ]),
+                new ApiScalarIdentityPartValue("LineNumber", ApiId.FromInt32(3))
+            ])
+        },
+
+        // Null handling — ThrowException: missing key
+        new BuildValueFromValuesTest
+        {
+            Name = "Missing key in dictionary throws with ThrowException",
+            ApiObjectTypeName = nameof(IdentityTwoScalarPartComposite),
+            Values = new Dictionary<string, object?> { ["Id1"] = 1 },
+            NullHandling = ApiIdentityNullHandling.ThrowException,
+            ExpectedExceptionType = typeof(ApiIdentityException)
+        },
+
+        // Null handling — ThrowException: null value
+        new BuildValueFromValuesTest
+        {
+            Name = "Null value in dictionary throws with ThrowException",
+            ApiObjectTypeName = nameof(IdentityTwoScalarPartComposite),
+            Values = new Dictionary<string, object?> { ["Id1"] = 1, ["Id2"] = null },
+            NullHandling = ApiIdentityNullHandling.ThrowException,
+            ExpectedExceptionType = typeof(ApiIdentityException)
+        },
+
+        // Null handling — ThrowException: null nested value
+        new BuildValueFromValuesTest
+        {
+            Name = "Null nested value in dictionary throws with ThrowException",
+            ApiObjectTypeName = nameof(IdentityNestedComposite),
+            Values = new Dictionary<string, object?> { ["NestedPart"] = null, ["Name"] = "Nested" },
+            NullHandling = ApiIdentityNullHandling.ThrowException,
+            ExpectedExceptionType = typeof(ApiIdentityException)
+        },
+
+        // Null handling — ThrowException: null owner values
+        new BuildValueFromValuesTest
+        {
+            Name = "Null owner values throws with ThrowException",
+            ApiObjectTypeName = nameof(IdentityOwnedComposite),
+            Values = new Dictionary<string, object?> { ["LineNumber"] = 3 },
+            OwnerValues = null,
+            NullHandling = ApiIdentityNullHandling.ThrowException,
+            ExpectedExceptionType = typeof(ApiIdentityException)
+        },
+    ];
+    #endregion
+
+    #region BuildValueNullContext Theory Data
+    public static TheoryDataRow<IXUnitTest>[] BuildValueNullContextTheoryData =>
+    [
+        new BuildValueNullContextTest
+        {
+            Name = "Null context throws ArgumentNullException for instance overload",
+            ApiObjectTypeName = nameof(IdentityScalar),
+            UseInstanceOverload = true
+        },
+        new BuildValueNullContextTest
+        {
+            Name = "Null context throws ArgumentNullException for values overload",
+            ApiObjectTypeName = nameof(IdentityScalar),
+            UseInstanceOverload = false
+        },
+    ];
+    #endregion
+
+    #region Test Methods
+    [Theory]
+    [MemberData(nameof(BuildValueFromInstanceTheoryData))]
+    public void BuildValueFromInstance(IXUnitTest test) => test.Execute(this);
+
+    [Theory]
+    [MemberData(nameof(BuildValueFromValuesTheoryData))]
+    public void BuildValueFromValues(IXUnitTest test) => test.Execute(this);
+
+    [Theory]
+    [MemberData(nameof(BuildValueNullContextTheoryData))]
+    public void BuildValueNullContext(IXUnitTest test) => test.Execute(this);
+    #endregion
+}
