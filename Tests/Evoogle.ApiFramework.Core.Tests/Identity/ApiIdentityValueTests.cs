@@ -37,7 +37,11 @@ public partial class ApiIdentityValueTests(ITestOutputHelper output) : XUnitTest
         #region Constructors
         public JsonDeserializeTest()
         {
-            this.ExcludeMembers = [new ExcludeMember(typeof(ApiIdentityValue), nameof(ApiIdentityValue.ApiScalarValue))];
+            this.ExcludeMembers =
+            [
+                new ExcludeMember(typeof(ApiIdentityValue), nameof(ApiIdentityValue.ApiScalarValue)),
+                new ExcludeMember(typeof(ApiIdentityValue), nameof(ApiIdentityValue.ApiObjectValue)),
+            ];
         }
         #endregion
 
@@ -54,7 +58,11 @@ public partial class ApiIdentityValueTests(ITestOutputHelper output) : XUnitTest
         #region Constructors
         public JsonRoundtripTest()
         {
-            this.ExcludeMembers = [new ExcludeMember(typeof(ApiIdentityValue), nameof(ApiIdentityValue.ApiScalarValue))];
+            this.ExcludeMembers =
+            [
+                new ExcludeMember(typeof(ApiIdentityValue), nameof(ApiIdentityValue.ApiScalarValue)),
+                new ExcludeMember(typeof(ApiIdentityValue), nameof(ApiIdentityValue.ApiObjectValue)),
+            ];
         }
         #endregion
 
@@ -124,6 +132,12 @@ public partial class ApiIdentityValueTests(ITestOutputHelper output) : XUnitTest
 
     private static ApiIdentityValue ScalarIntegerPart { get; } =
         ApiIdentityValue.Scalar("Id", ApiId.FromInt32(42));
+
+    private static ApiIdentityValue ObjectSinglePart { get; } =
+        ApiIdentityValue.Object("User", ApiIdentityValue.Scalar("Id", ApiId.FromInt32(42)));
+
+    private static ApiIdentityValue ObjectSinglePartUnresolved { get; } =
+        new ApiIdentityValue([new ApiObjectIdentityPartValue("User", apiObjectValue: null)]);
 
     private static ApiIdentityValue CompositeWithScalarParts { get; } =
         ApiIdentityValue.Composite(

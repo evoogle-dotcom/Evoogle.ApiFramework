@@ -19,7 +19,7 @@ namespace Evoogle.ApiFramework.Identity;
 ///     <para>
 ///         An <see cref="ApiIdentityValue"/> always contains at least one <see cref="ApiIdentityPartValue"/> in <see cref="ApiParts"/>.
 ///         When the identity is a single scalar property, <see cref="ApiParts"/> contains one <see cref="ApiScalarIdentityPartValue"/>
-///         and the convenience property <see cref="IsScalar"/> returns <see langword="true"/>.
+///         and the convenience property <see cref="IsScalarValue"/> returns <see langword="true"/>.
 ///     </para>
 ///     <para>
 ///         Use <see cref="ToApiId"/> to flatten the hierarchical identity into a flat <see cref="ApiId"/> for
@@ -38,23 +38,23 @@ public sealed class ApiIdentityValue(IEnumerable<ApiIdentityPartValue>? apiParts
     ///     Gets the ordered array of resolved API part values that make up this identity.
     ///     Always non-null and contains at least one element.
     /// </summary>
-    public ApiIdentityPartValue[] ApiParts { get; } = [.. apiParts.EmptyIfNull().Where(x => x is not null)];
+    public ApiIdentityPartValue[] ApiParts { get; } = ValidateParts([.. apiParts.EmptyIfNull().Where(x => x is not null)]);
     #endregion
 
     #region Computed Properties
     /// <summary>
-    ///     Gets the scalar <see cref="ApiId"/> value when <see cref="IsScalar"/> is <see langword="true"/>.
+    ///     Gets the scalar <see cref="ApiId"/> value when <see cref="IsScalarValue"/> is <see langword="true"/>.
     /// </summary>
     /// <exception cref="ApiIdentityException">
-    ///     Thrown when <see cref="IsScalar"/> is <see langword="false"/>.
+    ///     Thrown when <see cref="IsScalarValue"/> is <see langword="false"/>.
     /// </exception>
     public ApiId ApiScalarValue
     {
         get
         {
-            if (!this.IsScalar)
+            if (!this.IsScalarValue)
             {
-                throw new ApiIdentityException($"Cannot access {nameof(this.ApiScalarValue)} on a composite {nameof(ApiIdentityValue)}. Check {nameof(this.IsScalar)} first.");
+                throw new ApiIdentityException($"Cannot access {nameof(this.ApiScalarValue)} on a non-scalar {nameof(ApiIdentityValue)}. Check {nameof(this.IsScalarValue)} first.");
             }
 
             return ((ApiScalarIdentityPartValue)this.ApiParts[0]).ApiScalarValue;
@@ -62,8 +62,38 @@ public sealed class ApiIdentityValue(IEnumerable<ApiIdentityPartValue>? apiParts
     }
 
     /// <summary>
-    ///     Gets a value indicating whether this identity is composite (has two or more parts).
+    ///     Gets the nested <see cref="ApiIdentityValue"/> when <see cref="IsObjectValue"/> is <see langword="true"/>.
     /// </summary>
+    /// <exception cref="ApiIdentityException">
+    ///     Thrown when <see cref="IsObjectValue"/> is <see langword="false"/>.
+    /// </exception>
+    /// <exception cref="ApiIdentityException">
+    ///     Thrown when <see cref="IsObjectValue"/> is <see langword="true"/> but the object part is unresolved
+    ///     (<see cref="ApiObjectIdentityPartValue.ApiObjectValue"/> is <see langword="null"/>).
+    ///     Check <see cref="IsFullyResolved"/> before accessing.
+    /// </exception>
+    public ApiIdentityValue ApiObjectValue
+    {
+        get
+        {
+            if (!this.IsObjectValue)
+            {
+                throw new ApiIdentityException($"Cannot access {nameof(this.ApiObjectValue)} on a non-object {nameof(ApiIdentityValue)}. Check {nameof(this.IsObjectValue)} first.");
+            }
+
+            return ((ApiObjectIdentityPartValue)this.ApiParts[0]).ApiObjectValue
+                ?? throw new ApiIdentityException($"Cannot access {nameof(this.ApiObjectValue)} on an unresolved object part. Check {nameof(this.IsFullyResolved)} first.");
+        }
+    }
+
+    /// <summary>
+    ///     Gets a value indicating whether this identity has two or more parts.
+    /// </summary>
+    /// <remarks>
+    ///     Every valid <see cref="ApiIdentityValue"/> satisfies exactly one of three mutually exclusive and
+    ///     exhaustive shape predicates: <see cref="IsScalarValue"/>, <see cref="IsObjectValue"/>, or
+    ///     <see cref="IsComposite"/>.
+    /// </remarks>
     public bool IsComposite => this.ApiParts.Length >= 2;
 
     /// <summary>
@@ -77,7 +107,15 @@ public sealed class ApiIdentityValue(IEnumerable<ApiIdentityPartValue>? apiParts
     ///     Gets a value indicating whether this identity is a single scalar value.
     ///     When <see langword="true"/>, <see cref="ApiScalarValue"/> can be used to access the scalar <see cref="ApiId"/> directly.
     /// </summary>
-    public bool IsScalar => this.ApiParts.Length == 1 && this.ApiParts[0] is ApiScalarIdentityPartValue;
+    public bool IsScalarValue => this.ApiParts.Length == 1 && this.ApiParts[0] is ApiScalarIdentityPartValue;
+
+    /// <summary>
+    ///     Gets a value indicating whether this identity is a single owned object value — a 1-to-1 identity
+    ///     sourced from an owner object (e.g., a <c>UserProfile</c> identity derived from its owning <c>User</c>).
+    ///     When <see langword="true"/>, <see cref="ApiObjectValue"/> can be used to access the nested
+    ///     <see cref="ApiIdentityValue"/> directly.
+    /// </summary>
+    public bool IsObjectValue => this.ApiParts.Length == 1 && this.ApiParts[0] is ApiObjectIdentityPartValue;
     #endregion
 
     #region Factory Methods
@@ -88,6 +126,15 @@ public sealed class ApiIdentityValue(IEnumerable<ApiIdentityPartValue>? apiParts
     /// <returns>An <see cref="ApiIdentityValue"/> containing the specified parts.</returns>
     internal static ApiIdentityValue Composite(ApiIdentityPartValue[] apiParts)
         => new(apiParts);
+
+    /// <summary>
+    ///     Creates an <see cref="ApiIdentityValue"/> representing a single owned object identity derived from an owner object.
+    /// </summary>
+    /// <param name="apiPartName">The name of the object identity part (typically the owner type name).</param>
+    /// <param name="apiObjectValue">The nested <see cref="ApiIdentityValue"/> of the owner object.</param>
+    /// <returns>An <see cref="ApiIdentityValue"/> containing one <see cref="ApiObjectIdentityPartValue"/>.</returns>
+    internal static ApiIdentityValue Object(string apiPartName, ApiIdentityValue apiObjectValue)
+        => new([new ApiObjectIdentityPartValue(apiPartName, apiObjectValue)]);
 
     /// <summary>
     ///     Creates an <see cref="ApiIdentityValue"/> representing a single scalar identity.
@@ -113,7 +160,7 @@ public sealed class ApiIdentityValue(IEnumerable<ApiIdentityPartValue>? apiParts
     ///     (<see cref="ApiObjectIdentityPartValue.ApiObjectValue"/> is <see langword="null"/>).
     /// </param>
     /// <returns>
-    ///     A flat <see cref="ApiId"/>. When <see cref="IsScalar"/> is <see langword="true"/>, returns the scalar
+    ///     A flat <see cref="ApiId"/>. When <see cref="IsScalarValue"/> is <see langword="true"/>, returns the scalar
     ///     value directly. Otherwise returns a composite <see cref="ApiId"/> with one entry per scalar leaf.
     /// </returns>
     /// <exception cref="ApiIdentityException">
@@ -122,7 +169,7 @@ public sealed class ApiIdentityValue(IEnumerable<ApiIdentityPartValue>? apiParts
     /// </exception>
     public ApiId ToApiId(bool useNamedParts = true, ApiIdentityNullHandling nullHandling = ApiIdentityNullHandling.ReturnEmpty)
     {
-        if (this.IsScalar)
+        if (this.IsScalarValue)
         {
             return this.ApiScalarValue;
         }
@@ -141,9 +188,14 @@ public sealed class ApiIdentityValue(IEnumerable<ApiIdentityPartValue>? apiParts
     /// </param>
     /// <returns>
     ///     The <see cref="ApiIdentityPartValue"/> at the end of the path, or <see langword="null"/> if any
-    ///     segment is not found, the path attempts to navigate into a scalar part, or any intermediate
-    ///     <see cref="ApiObjectIdentityPartValue"/> is unresolved.
+    ///     segment is not found or the path attempts to navigate into a scalar part.
+    ///     Navigation into unresolved <see cref="ApiObjectIdentityPartValue"/> parts is supported via the
+    ///     structure skeleton (<see cref="ApiObjectIdentityPartValue.ApiStructure"/>).
     /// </returns>
+    /// <remarks>
+    ///     Part name matching is case-sensitive (ordinal comparison). Ensure that part names in
+    ///     <paramref name="dottedPath"/> exactly match the casing declared in the schema.
+    /// </remarks>
     public ApiIdentityPartValue? TryNavigate(string? dottedPath)
     {
         if (string.IsNullOrWhiteSpace(dottedPath))
@@ -157,8 +209,9 @@ public sealed class ApiIdentityValue(IEnumerable<ApiIdentityPartValue>? apiParts
 
     /// <summary>
     ///     Returns the <see cref="ApiIdentityPartValue"/> reached by following the dotted path,
-    ///     or <see langword="null"/> if any segment is not found, the path navigates into a scalar part,
-    ///     or any intermediate <see cref="ApiObjectIdentityPartValue"/> is unresolved.
+    ///     or <see langword="null"/> if any segment is not found or the path navigates into a scalar part.
+    ///     Navigation into unresolved <see cref="ApiObjectIdentityPartValue"/> parts is supported via the
+    ///     structure skeleton (<see cref="ApiObjectIdentityPartValue.ApiStructure"/>).
     /// </summary>
     /// <param name="dottedPath">
     ///     A dot-separated sequence of part names to follow from this identity value's parts
@@ -175,11 +228,21 @@ public sealed class ApiIdentityValue(IEnumerable<ApiIdentityPartValue>? apiParts
     public override string ToString()
     {
         var apiId = this.ToApiId(useNamedParts: true, nullHandling: ApiIdentityNullHandling.ReturnEmpty);
-        return apiId.ToString()!;
+        return apiId.ToString() ?? string.Empty;
     }
     #endregion
 
     #region Implementation Methods
+    private static ApiIdentityPartValue[] ValidateParts(ApiIdentityPartValue[] parts)
+    {
+        if (parts.Length == 0)
+        {
+            throw new ApiIdentityException($"{nameof(ApiIdentityValue)} must contain at least one non-null part.");
+        }
+
+        return parts;
+    }
+
     private static bool CheckFullyResolved(ApiIdentityPartValue[] parts)
     {
         foreach (var part in parts)
@@ -244,6 +307,9 @@ public sealed class ApiIdentityValue(IEnumerable<ApiIdentityPartValue>? apiParts
                         FlattenUnresolvedParts(objectPart, qualifiedName, useNamedParts, builder);
                     }
                     break;
+
+                default:
+                    throw new ApiIdentityException($"Unknown {nameof(ApiIdentityPartValue)} subtype encountered during flattening: {part.GetType().Name}.");
             }
         }
     }

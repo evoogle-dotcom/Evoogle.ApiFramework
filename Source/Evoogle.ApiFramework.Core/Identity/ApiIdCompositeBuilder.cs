@@ -130,7 +130,9 @@ public sealed class ApiIdCompositeBuilder
     /// </remarks>
     public ApiId Build()
     {
-        return ApiId.Composite(_parts);
+        var result = ApiId.Composite(_parts);
+        _parts = null;
+        return result;
     }
     #endregion
 }

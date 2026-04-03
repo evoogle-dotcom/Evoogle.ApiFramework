@@ -18,7 +18,8 @@ public partial class ApiIdentityValueTests
     {
         #region User Supplied Properties
         public required ApiIdentityValue Value { get; init; }
-        public required bool ExpectedIsScalar { get; init; }
+        public required bool ExpectedIsScalarValue { get; init; }
+        public bool ExpectedIsObjectValue { get; init; }
         public required bool ExpectedIsComposite { get; init; }
         public required int ExpectedPartCount { get; init; }
         public required bool ExpectedIsFullyResolved { get; init; }
@@ -26,7 +27,8 @@ public partial class ApiIdentityValueTests
         #endregion
 
         #region Calculated Properties
-        private bool ActualIsScalar { get; set; }
+        private bool ActualIsScalarValue { get; set; }
+        private bool ActualIsObjectValue { get; set; }
         private bool ActualIsComposite { get; set; }
         private int ActualPartCount { get; set; }
         private bool ActualIsFullyResolved { get; set; }
@@ -37,16 +39,18 @@ public partial class ApiIdentityValueTests
         #region XUnitTest Methods
         protected override void Arrange()
         {
-            this.WriteLine($"Value:                  {this.Value.SafeToString()}");
-            this.WriteLine($"Expected IsScalar:      {this.ExpectedIsScalar}");
-            this.WriteLine($"Expected IsComposite:   {this.ExpectedIsComposite}");
-            this.WriteLine($"Expected PartCount:     {this.ExpectedPartCount}");
-            this.WriteLine($"Expected FullyResolved: {this.ExpectedIsFullyResolved}");
+            this.WriteLine($"Value:                   {this.Value.SafeToString()}");
+            this.WriteLine($"Expected IsScalarValue:  {this.ExpectedIsScalarValue}");
+            this.WriteLine($"Expected IsObjectValue:  {this.ExpectedIsObjectValue}");
+            this.WriteLine($"Expected IsComposite:    {this.ExpectedIsComposite}");
+            this.WriteLine($"Expected PartCount:      {this.ExpectedPartCount}");
+            this.WriteLine($"Expected FullyResolved:  {this.ExpectedIsFullyResolved}");
         }
 
         protected override void Act()
         {
-            this.ActualIsScalar = this.Value.IsScalar;
+            this.ActualIsScalarValue = this.Value.IsScalarValue;
+            this.ActualIsObjectValue = this.Value.IsObjectValue;
             this.ActualIsComposite = this.Value.IsComposite;
             this.ActualPartCount = this.Value.ApiParts.Length;
             this.ActualIsFullyResolved = this.Value.IsFullyResolved;
@@ -57,22 +61,24 @@ public partial class ApiIdentityValueTests
                 {
                     this.ActualScalarValue = this.Value.ApiScalarValue;
                 }
-                catch (InvalidOperationException)
+                catch (ApiIdentityException)
                 {
                     this.ScalarAccessThrew = true;
                 }
             }
 
             this.WriteLine();
-            this.WriteLine($"Actual IsScalar:      {this.ActualIsScalar}");
-            this.WriteLine($"Actual IsComposite:   {this.ActualIsComposite}");
-            this.WriteLine($"Actual PartCount:     {this.ActualPartCount}");
-            this.WriteLine($"Actual FullyResolved: {this.ActualIsFullyResolved}");
+            this.WriteLine($"Actual IsScalarValue:  {this.ActualIsScalarValue}");
+            this.WriteLine($"Actual IsObjectValue:  {this.ActualIsObjectValue}");
+            this.WriteLine($"Actual IsComposite:    {this.ActualIsComposite}");
+            this.WriteLine($"Actual PartCount:      {this.ActualPartCount}");
+            this.WriteLine($"Actual FullyResolved:  {this.ActualIsFullyResolved}");
         }
 
         protected override void Assert()
         {
-            this.ActualIsScalar.Should().Be(this.ExpectedIsScalar);
+            this.ActualIsScalarValue.Should().Be(this.ExpectedIsScalarValue);
+            this.ActualIsObjectValue.Should().Be(this.ExpectedIsObjectValue);
             this.ActualIsComposite.Should().Be(this.ExpectedIsComposite);
             this.ActualPartCount.Should().Be(this.ExpectedPartCount);
             this.ActualIsFullyResolved.Should().Be(this.ExpectedIsFullyResolved);
@@ -144,6 +150,67 @@ public partial class ApiIdentityValueTests
         }
         #endregion
     }
+
+    private class ApiObjectValueTest : XUnitTest
+    {
+        #region User Supplied Properties
+        public required ApiIdentityValue Value { get; init; }
+        public ApiIdentityValue? ExpectedObjectValue { get; init; }
+        public Type? ExpectedExceptionType { get; init; }
+        #endregion
+
+        #region Calculated Properties
+        private ApiIdentityValue? ActualObjectValue { get; set; }
+        private Type? ActualExceptionType { get; set; }
+        #endregion
+
+        #region XUnitTest Methods
+        protected override void Arrange()
+        {
+            this.WriteLine($"Value: {this.Value.SafeToString()}");
+            this.WriteLine();
+
+            if (this.ExpectedObjectValue is not null)
+            {
+                this.WriteLine($"Expected ObjectValue: {this.ExpectedObjectValue.SafeToString()}");
+            }
+            else if (this.ExpectedExceptionType is not null)
+            {
+                this.WriteLine($"Expected Exception: {this.ExpectedExceptionType.SafeToName()}");
+            }
+        }
+
+        protected override void Act()
+        {
+            try
+            {
+                this.ActualObjectValue = this.Value.ApiObjectValue;
+                this.WriteLine($"Actual ObjectValue: {this.ActualObjectValue.SafeToString()}");
+            }
+            catch (Exception ex)
+            {
+                this.ActualExceptionType = ex.GetType();
+                this.WriteLine($"Actual Exception: {this.ActualExceptionType.SafeToName()}");
+            }
+        }
+
+        protected override void Assert()
+        {
+            if (this.ExpectedObjectValue is not null)
+            {
+                this.ActualObjectValue.Should().NotBeNull();
+                this.ActualObjectValue.Should().BeEquivalentTo(this.ExpectedObjectValue, options => options
+                    .Excluding(ctx => ctx.Path.EndsWith(nameof(ApiIdentityValue.ApiScalarValue), StringComparison.Ordinal))
+                    .Excluding(ctx => ctx.Path.EndsWith(nameof(ApiIdentityValue.ApiObjectValue), StringComparison.Ordinal)));
+            }
+            else if (this.ExpectedExceptionType is not null)
+            {
+                this.ActualExceptionType.Should().NotBeNull();
+                this.ActualExceptionType.Should().Be(this.ExpectedExceptionType);
+            }
+        }
+        #endregion
+    }
     #endregion
 
     #region Theory Data
@@ -153,7 +220,8 @@ public partial class ApiIdentityValueTests
         {
             Name = "Scalar identity with int value",
             Value = ScalarIntegerPart,
-            ExpectedIsScalar = true,
+            ExpectedIsScalarValue = true,
+            ExpectedIsObjectValue = false,
             ExpectedIsComposite = false,
             ExpectedPartCount = 1,
             ExpectedIsFullyResolved = true,
@@ -163,7 +231,8 @@ public partial class ApiIdentityValueTests
         {
             Name = "Scalar identity with empty value",
             Value = ScalarEmptyPart,
-            ExpectedIsScalar = true,
+            ExpectedIsScalarValue = true,
+            ExpectedIsObjectValue = false,
             ExpectedIsComposite = false,
             ExpectedPartCount = 1,
             ExpectedIsFullyResolved = true,
@@ -171,9 +240,30 @@ public partial class ApiIdentityValueTests
         },
         new PropertiesTest
         {
+            Name = "Object single part with resolved value",
+            Value = ObjectSinglePart,
+            ExpectedIsScalarValue = false,
+            ExpectedIsObjectValue = true,
+            ExpectedIsComposite = false,
+            ExpectedPartCount = 1,
+            ExpectedIsFullyResolved = true
+        },
+        new PropertiesTest
+        {
+            Name = "Object single part with unresolved value is not fully resolved",
+            Value = ObjectSinglePartUnresolved,
+            ExpectedIsScalarValue = false,
+            ExpectedIsObjectValue = true,
+            ExpectedIsComposite = false,
+            ExpectedPartCount = 1,
+            ExpectedIsFullyResolved = false
+        },
+        new PropertiesTest
+        {
             Name = "Composite with scalar parts",
             Value = CompositeWithScalarParts,
-            ExpectedIsScalar = false,
+            ExpectedIsScalarValue = false,
+            ExpectedIsObjectValue = false,
             ExpectedIsComposite = true,
             ExpectedPartCount = 2,
             ExpectedIsFullyResolved = true
@@ -182,7 +272,8 @@ public partial class ApiIdentityValueTests
         {
             Name = "Composite with resolved object parts",
             Value = CompositeWithObjectParts,
-            ExpectedIsScalar = false,
+            ExpectedIsScalarValue = false,
+            ExpectedIsObjectValue = false,
             ExpectedIsComposite = true,
             ExpectedPartCount = 2,
             ExpectedIsFullyResolved = true
@@ -191,7 +282,8 @@ public partial class ApiIdentityValueTests
         {
             Name = "Composite with unresolved object parts is not fully resolved",
             Value = CompositeWithUnresolvedObjectParts,
-            ExpectedIsScalar = false,
+            ExpectedIsScalarValue = false,
+            ExpectedIsObjectValue = false,
             ExpectedIsComposite = true,
             ExpectedPartCount = 2,
             ExpectedIsFullyResolved = false
@@ -200,7 +292,8 @@ public partial class ApiIdentityValueTests
         {
             Name = "Composite with partially unresolved object parts is not fully resolved",
             Value = CompositeWithPartiallyUnresolvedObjectParts,
-            ExpectedIsScalar = false,
+            ExpectedIsScalarValue = false,
+            ExpectedIsObjectValue = false,
             ExpectedIsComposite = true,
             ExpectedPartCount = 2,
             ExpectedIsFullyResolved = false
@@ -209,7 +302,8 @@ public partial class ApiIdentityValueTests
         {
             Name = "Composite with deep object parts",
             Value = CompositeWithDeepObjectParts,
-            ExpectedIsScalar = false,
+            ExpectedIsScalarValue = false,
+            ExpectedIsObjectValue = false,
             ExpectedIsComposite = true,
             ExpectedPartCount = 2,
             ExpectedIsFullyResolved = true
@@ -237,6 +331,34 @@ public partial class ApiIdentityValueTests
             ExpectedExceptionType = typeof(ApiIdentityException)
         },
     ];
+
+    public static TheoryDataRow<IXUnitTest>[] ApiObjectValueTheoryData =>
+    [
+        new ApiObjectValueTest
+        {
+            Name = "Object single part with resolved value returns nested identity",
+            Value = ObjectSinglePart,
+            ExpectedObjectValue = ApiIdentityValue.Scalar("Id", ApiId.FromInt32(42))
+        },
+        new ApiObjectValueTest
+        {
+            Name = "Object single part with unresolved value throws ApiIdentityException",
+            Value = ObjectSinglePartUnresolved,
+            ExpectedExceptionType = typeof(ApiIdentityException)
+        },
+        new ApiObjectValueTest
+        {
+            Name = "Scalar identity throws ApiIdentityException",
+            Value = ScalarIntegerPart,
+            ExpectedExceptionType = typeof(ApiIdentityException)
+        },
+        new ApiObjectValueTest
+        {
+            Name = "Composite identity throws ApiIdentityException",
+            Value = CompositeWithScalarParts,
+            ExpectedExceptionType = typeof(ApiIdentityException)
+        },
+    ];
     #endregion
 
     #region Test Methods
@@ -247,5 +369,9 @@ public partial class ApiIdentityValueTests
     [Theory]
     [MemberData(nameof(ApiScalarValueTheoryData))]
     public void ApiScalarValue(IXUnitTest test) => test.Execute(this);
+
+    [Theory]
+    [MemberData(nameof(ApiObjectValueTheoryData))]
+    public void ApiObjectValue(IXUnitTest test) => test.Execute(this);
     #endregion
 }

@@ -85,7 +85,8 @@ public partial class ApiIdentityTests
                 this.ActualExceptionType.Should().BeNull();
                 this.ActualValue.Should().NotBeNull();
                 this.ActualValue.Should().BeEquivalentTo(this.ExpectedValue, options => options
-                    .Excluding(ctx => ctx.Path.EndsWith(nameof(ApiIdentityValue.ApiScalarValue), StringComparison.Ordinal)));
+                    .Excluding(ctx => ctx.Path.EndsWith(nameof(ApiIdentityValue.ApiScalarValue), StringComparison.Ordinal))
+                    .Excluding(ctx => ctx.Path.EndsWith(nameof(ApiIdentityValue.ApiObjectValue), StringComparison.Ordinal)));
             }
             else if (this.ExpectedExceptionType is not null)
             {
@@ -178,7 +179,8 @@ public partial class ApiIdentityTests
                 this.ActualExceptionType.Should().BeNull();
                 this.ActualValue.Should().NotBeNull();
                 this.ActualValue.Should().BeEquivalentTo(this.ExpectedValue, options => options
-                    .Excluding(ctx => ctx.Path.EndsWith(nameof(ApiIdentityValue.ApiScalarValue), StringComparison.Ordinal)));
+                    .Excluding(ctx => ctx.Path.EndsWith(nameof(ApiIdentityValue.ApiScalarValue), StringComparison.Ordinal))
+                    .Excluding(ctx => ctx.Path.EndsWith(nameof(ApiIdentityValue.ApiObjectValue), StringComparison.Ordinal)));
             }
             else if (this.ExpectedExceptionType is not null)
             {
