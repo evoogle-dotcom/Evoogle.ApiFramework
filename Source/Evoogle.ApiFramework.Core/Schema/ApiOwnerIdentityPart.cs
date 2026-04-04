@@ -13,6 +13,24 @@ namespace Evoogle.ApiFramework.Schema;
 ///     This applies to both 1-to-many containment (e.g., Order → OrderLine) and 1-to-1 dependent identity (e.g., Person → PersonProfile).
 /// </summary>
 /// <param name="apiIdentityName">The optional explicit name of the identity to use on the owner object type. When <see langword="null"/>, the primary identity of the owner type is used.</param>
+/// <remarks>
+///     <para>
+///         Owner resolution follows a two-phase initialization model. During the standard
+///         <see cref="ApiSchemaElement.Initialize"/> call, no property-level resolution occurs for this
+///         part type — unlike <see cref="ApiScalarIdentityPart"/> and <see cref="ApiNestedIdentityPart"/>
+///         which resolve their backing properties in the standard phase.
+///     </para>
+///     <para>
+///         Owner identity is instead resolved in a second schema-wide pass (via
+///         <c>ApiSchema.ResolveOwnerIdentityParts</c>) that runs after all object types have been
+///         initialized, because determining the owner requires inspecting the full object-type graph
+///         for types that hold a collection or direct property of the owned type.
+///     </para>
+///     <para>
+///         Accessing <see cref="ApiOwnerIdentity"/> or <see cref="ApiOwnerType"/> before schema
+///         initialization completes will throw.
+///     </para>
+/// </remarks>
 public sealed class ApiOwnerIdentityPart(string? apiIdentityName = null) : ApiIdentityPart
 {
     #region ApiOwnerIdentityPart Fields

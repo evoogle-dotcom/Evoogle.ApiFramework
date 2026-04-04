@@ -47,6 +47,7 @@ public sealed partial class ApiObjectType
     private Dictionary<string, ApiProperty>? _apiPropertyApiNameLookup = null;
     private Dictionary<string, ApiProperty>? _apiPropertyClrNameLookup = null;
     private Dictionary<string, ApiRelationship>? _apiRelationshipApiNameLookup = null;
+    private string[]? _apiIdentityApiNames = null;
     #endregion
 
     #region ApiSchemaElement Properties
@@ -176,7 +177,7 @@ public sealed partial class ApiObjectType
             return [];
         }
 
-        return [.. this.ApiIdentities.Select(identity => identity.ApiName)];
+        return _apiIdentityApiNames ??= [.. this.ApiIdentities.Select(identity => identity.ApiName)];
     }
 
     /// <summary>

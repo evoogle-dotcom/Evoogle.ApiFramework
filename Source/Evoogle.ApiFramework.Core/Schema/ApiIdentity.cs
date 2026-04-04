@@ -36,6 +36,14 @@ public sealed partial class ApiIdentity(string apiName, IEnumerable<ApiIdentityP
     #region ApiIdentity Computed Properties
     /// <summary>Gets a value indicating whether this identity is composite (has two or more parts).</summary>
     public bool IsComposite => this.ApiIdentityParts.Length >= 2;
+
+    /// <summary>Gets a value indicating whether this identity is defined by a single scalar part.</summary>
+    /// <remarks>Mirrors <see cref="Identity.ApiIdentityValue.IsScalarValue"/> at the schema definition level.</remarks>
+    public bool IsScalarDefinition => this.ApiIdentityParts.Length == 1 && this.ApiIdentityParts[0] is ApiScalarIdentityPart;
+
+    /// <summary>Gets a value indicating whether this identity is defined by a single object part (nested or owner).</summary>
+    /// <remarks>Mirrors <see cref="Identity.ApiIdentityValue.IsObjectValue"/> at the schema definition level.</remarks>
+    public bool IsObjectDefinition => this.ApiIdentityParts.Length == 1 && this.ApiIdentityParts[0] is ApiNestedIdentityPart or ApiOwnerIdentityPart;
     #endregion
 
     #region Object Methods

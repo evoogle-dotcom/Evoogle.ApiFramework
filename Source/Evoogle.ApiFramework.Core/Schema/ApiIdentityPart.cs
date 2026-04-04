@@ -20,13 +20,4 @@ public abstract class ApiIdentityPart : ApiSchemaElement
     /// <summary>Gets the kind of this identity part, which determines how its value is resolved at runtime.</summary>
     public abstract ApiIdentityPartKind ApiKind { get; }
     #endregion
-
-    #region Object Methods
-    #endregion
-
-    #region ApiSchemaElement Methods
-    #endregion
-
-    #region Implementation Methods
-    #endregion
 }
