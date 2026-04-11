@@ -25,6 +25,7 @@ public class ApiPropertyBuilderTests(ITestOutputHelper output) : XUnitTests(outp
         public string ClrName { get; init; } = null!;
         public ApiProperty ApiPropertyExpected { get; init; } = null!;
         public Type? ApiExtensionType { get; init; }
+        public Action<ApiPropertyBuilder>? Configure { get; init; }
         #endregion
 
         #region Calculated Properties
@@ -59,7 +60,7 @@ public class ApiPropertyBuilderTests(ITestOutputHelper output) : XUnitTests(outp
                 var extension = Activator.CreateInstance(this.ApiExtensionType);
                 builder.AddExtension(this.ApiExtensionType, extension!);
             }
-
+            this.Configure?.Invoke(builder);
             this.ApiPropertyActual = builder.Build(this.ClrObjectType);
             this.WriteLine($"Actual:   {this.ApiPropertyActual.SafeToString()}");
         }
@@ -127,6 +128,44 @@ public class ApiPropertyBuilderTests(ITestOutputHelper output) : XUnitTests(outp
             ClrName = OptionalNumberPropertyWithExtension.ClrName,
             ApiPropertyExpected = OptionalNumberPropertyWithExtension,
             ApiExtensionType = typeof(TestExtension),
+        },
+
+        // IsRequired / IsOptional shortcut tests
+        new BuildTest
+        {
+            Name = "IsRequired() marks property as required",
+            ClrObjectType = typeof(ScalarsOnly),
+            ApiName = RequiredNameProperty.ApiName,
+            ClrName = RequiredNameProperty.ClrName,
+            Configure = b => b.IsRequired(),
+            ApiPropertyExpected = RequiredNameProperty,
+        },
+        new BuildTest
+        {
+            Name = "IsOptional() marks property as optional",
+            ClrObjectType = typeof(ScalarsOnly),
+            ApiName = OptionalNumberProperty.ApiName,
+            ClrName = OptionalNumberProperty.ClrName,
+            Configure = b => b.IsOptional(),
+            ApiPropertyExpected = OptionalNumberProperty,
+        },
+        new BuildTest
+        {
+            Name = "IsRequired() overrides IsOptional() — last call wins",
+            ClrObjectType = typeof(ScalarsOnly),
+            ApiName = RequiredNameProperty.ApiName,
+            ClrName = RequiredNameProperty.ClrName,
+            Configure = b => b.IsOptional().IsRequired(),
+            ApiPropertyExpected = RequiredNameProperty,
+        },
+        new BuildTest
+        {
+            Name = "IsOptional() overrides IsRequired() — last call wins",
+            ClrObjectType = typeof(ScalarsOnly),
+            ApiName = OptionalNumberProperty.ApiName,
+            ClrName = OptionalNumberProperty.ClrName,
+            Configure = b => b.IsRequired().IsOptional(),
+            ApiPropertyExpected = OptionalNumberProperty,
         },
     ];
     #endregion

@@ -42,6 +42,24 @@ public class ApiPropertyBuilder(string apiName, string clrName) : ExtensionBuild
     }
 
     /// <summary>
+    ///     Marks this property as required, overriding any nullability-inferred modifier.
+    /// </summary>
+    /// <returns>The current builder instance.</returns>
+    public ApiPropertyBuilder IsRequired()
+    {
+        return this.WithModifiers(m => m.Required());
+    }
+
+    /// <summary>
+    ///     Marks this property as optional, overriding any nullability-inferred modifier.
+    /// </summary>
+    /// <returns>The current builder instance.</returns>
+    public ApiPropertyBuilder IsOptional()
+    {
+        return this.WithModifiers(m => m.Optional());
+    }
+
+    /// <summary>
     ///     Builds an <see cref="ApiProperty"/> for the specified CLR object type.
     /// </summary>
     /// <param name="clrObjectType">The CLR type declaring the property/field.</param>

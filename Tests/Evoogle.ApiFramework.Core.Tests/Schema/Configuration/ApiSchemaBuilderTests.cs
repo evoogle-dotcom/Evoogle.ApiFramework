@@ -188,6 +188,56 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
         }
         #endregion
     }
+
+    private class BuildGenericOverloadTest : XUnitTest
+    {
+        #region User Supplied Properties
+        public required ApiSchema Expected { get; init; }
+        public required Action<ApiSchemaBuilder> ConfigureGeneric { get; init; }
+        #endregion
+
+        #region Calculated Properties
+        private ApiSchema? Actual { get; set; }
+        #endregion
+
+        #region Constructors
+        [SetsRequiredMembers]
+        public BuildGenericOverloadTest()
+        {
+            this.Name = nameof(BuildGenericOverloadTest);
+            this.ExcludeMembers = ApiSchemaExcludeMembers.SchemaInitialized;
+        }
+        #endregion
+
+        #region XUnitTest Methods
+        protected override void Arrange()
+        {
+            this.WriteLine($"Expected: {this.Expected.SafeToString()}");
+        }
+
+        protected override void Act()
+        {
+            var builder = new ApiSchemaBuilder()
+                .WithName(this.Expected.ApiName);
+
+            if (this.Expected.ApiVersion != null)
+            {
+                builder = builder.WithVersion(this.Expected.ApiVersion);
+            }
+
+            this.ConfigureGeneric(builder);
+
+            this.Actual = builder.Build();
+            this.WriteLine($"Actual:   {this.Actual.SafeToString()}");
+        }
+
+        protected override void Assert()
+        {
+            this.Actual.Should().NotBeNull();
+            this.AssertBeEquivalentTo(this.Actual, this.Expected);
+        }
+        #endregion
+    }
     #endregion
 
     #region Theory Data
@@ -370,6 +420,66 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
         ],
         apiVersion: "1.0"
     );
+
+    public static TheoryDataRow<IXUnitTest>[] BuildGenericOverloadTheoryData =>
+    [
+        new BuildGenericOverloadTest
+        {
+            Name = "AddScalar<T> lambda overload produces same schema as AddScalar(typeof(T))",
+            Expected = ApiScalarsOnlySchema,
+            ConfigureGeneric = b => b
+                .WithVersion("1.0")
+                .AddScalar<string>(x => x.WithName(nameof(String)))
+                .AddScalar<long>(x => x.WithName(nameof(Int64)))
+                .AddScalar<bool>(x => x.WithName(nameof(Boolean))),
+        },
+        new BuildGenericOverloadTest
+        {
+            Name = "AddScalar<T> configuration class overload produces same schema as AddScalar(typeof(T))",
+            Expected = ApiScalarsOnlySchema,
+            ConfigureGeneric = b => b
+                .WithVersion("1.0")
+                .AddScalar<string>(new StringScalarTypeConfiguration())
+                .AddScalar<long>(new Int64ScalarTypeConfiguration())
+                .AddScalar<bool>(new BooleanScalarTypeConfiguration()),
+        },
+        new BuildGenericOverloadTest
+        {
+            Name = "AddEnum<T> lambda overload produces same schema as AddEnum(typeof(T))",
+            Expected = ApiGenderEnumSchema,
+            ConfigureGeneric = b => b
+                .WithVersion("1.0")
+                .AddEnum<Gender>(x => x
+                    .WithName(nameof(Gender))
+                    .AddValue(nameof(Gender.Unspecified), nameof(Gender.Unspecified), (int)Gender.Unspecified)
+                    .AddValue(nameof(Gender.Male), nameof(Gender.Male), (int)Gender.Male)
+                    .AddValue(nameof(Gender.Female), nameof(Gender.Female), (int)Gender.Female)),
+        },
+    ];
+
+    private static ApiSchema ApiGenderEnumSchema { get; } = ApiSchema.Create
+    (
+        apiName: nameof(ApiGenderEnumSchema),
+        apiScalarTypes: [],
+        apiEnumTypes: [(ApiEnumType)ApiGenderEnumType.DeepCopy()!],
+        apiObjectTypes: [],
+        apiVersion: "1.0"
+    );
+
+    private class StringScalarTypeConfiguration : IApiScalarTypeConfiguration
+    {
+        public void Configure(ApiScalarTypeBuilder builder) => builder.WithName(nameof(String));
+    }
+
+    private class Int64ScalarTypeConfiguration : IApiScalarTypeConfiguration
+    {
+        public void Configure(ApiScalarTypeBuilder builder) => builder.WithName(nameof(Int64));
+    }
+
+    private class BooleanScalarTypeConfiguration : IApiScalarTypeConfiguration
+    {
+        public void Configure(ApiScalarTypeBuilder builder) => builder.WithName(nameof(Boolean));
+    }
 
     public static TheoryDataRow<IXUnitTest>[] BuildTheoryData =>
     [
@@ -599,5 +709,9 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
     [Theory]
     [MemberData(nameof(BuildTheoryData))]
     public void Build(IXUnitTest test) => test.Execute(this);
+
+    [Theory]
+    [MemberData(nameof(BuildGenericOverloadTheoryData))]
+    public void BuildGenericOverload(IXUnitTest test) => test.Execute(this);
     #endregion
 }

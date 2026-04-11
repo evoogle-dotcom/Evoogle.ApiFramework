@@ -41,6 +41,18 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     }
 
     /// <summary>
+    ///     Adds an <see cref="ApiProperty"/> definition to the object type, using <paramref name="name"/> as both
+    ///     the API name and the CLR property name.
+    /// </summary>
+    /// <param name="name">The API and CLR property name.</param>
+    /// <param name="configure">Optional callback to configure the added property.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiObjectTypeBuilder AddProperty(string name, Action<ApiPropertyBuilder>? configure = null)
+    {
+        return this.AddProperty(name, name, configure);
+    }
+
+    /// <summary>
     ///     Adds an <see cref="ApiProperty"/> definition to the object type.
     /// </summary>
     /// <param name="apiName">The API property name.</param>

@@ -103,6 +103,38 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     }
 
     /// <summary>
+    ///     Adds an enumeration type to the schema using an inline configuration action.
+    /// </summary>
+    /// <typeparam name="T">The CLR enum type.</typeparam>
+    /// <param name="configure">Callback to configure the added enumeration type.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiSchemaBuilder AddEnum<T>(Action<ApiEnumTypeBuilder> configure) where T : Enum
+    {
+        ArgumentNullException.ThrowIfNull(configure);
+
+        var builder = _context.GetOrAddEnumTypeBuilder<T>();
+
+        configure(builder);
+        return this;
+    }
+
+    /// <summary>
+    ///     Adds an enumeration type to the schema using an implementation of <see cref="IApiEnumTypeConfiguration"/>.
+    /// </summary>
+    /// <typeparam name="T">The CLR enum type.</typeparam>
+    /// <param name="configuration">The configuration implementation.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiSchemaBuilder AddEnum<T>(IApiEnumTypeConfiguration configuration) where T : Enum
+    {
+        ArgumentNullException.ThrowIfNull(configuration);
+
+        var builder = _context.GetOrAddEnumTypeBuilder<T>();
+
+        configuration.Configure(builder);
+        return this;
+    }
+
+    /// <summary>
     ///     Adds an object type to the schema using an inline configuration action.
     /// </summary>
     /// <param name="clrType">The CLR object type.</param>
@@ -197,6 +229,38 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
         ArgumentNullException.ThrowIfNull(configuration);
 
         var builder = _context.GetOrAddScalarTypeBuilder(clrType);
+
+        configuration.Configure(builder);
+        return this;
+    }
+
+    /// <summary>
+    ///     Adds a scalar type to the schema using an inline configuration action.
+    /// </summary>
+    /// <typeparam name="T">The CLR scalar type.</typeparam>
+    /// <param name="configure">Callback to configure the added scalar type.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiSchemaBuilder AddScalar<T>(Action<ApiScalarTypeBuilder> configure)
+    {
+        ArgumentNullException.ThrowIfNull(configure);
+
+        var builder = _context.GetOrAddScalarTypeBuilder<T>();
+
+        configure(builder);
+        return this;
+    }
+
+    /// <summary>
+    ///     Adds a scalar type to the schema using an implementation of <see cref="IApiScalarTypeConfiguration"/>.
+    /// </summary>
+    /// <typeparam name="T">The CLR scalar type.</typeparam>
+    /// <param name="configuration">The configuration implementation.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiSchemaBuilder AddScalar<T>(IApiScalarTypeConfiguration configuration)
+    {
+        ArgumentNullException.ThrowIfNull(configuration);
+
+        var builder = _context.GetOrAddScalarTypeBuilder<T>();
 
         configuration.Configure(builder);
         return this;

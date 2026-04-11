@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -185,7 +185,74 @@ public class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
     }
     #endregion
 
+    private class AddPropertySingleNameTest : XUnitTest
+    {
+        #region User Supplied Properties
+        public string PropertyName { get; init; } = null!;
+        #endregion
+
+        #region Calculated Properties
+        private ApiObjectType? ApiTypeFromSingleName { get; set; }
+        private ApiObjectType? ApiTypeFromTwoNames { get; set; }
+        #endregion
+
+        #region Constructors
+        [SetsRequiredMembers]
+        public AddPropertySingleNameTest()
+        {
+            this.Name = nameof(AddPropertySingleNameTest);
+            this.ExcludeMembers = ApiSchemaExcludeMembers.Standard;
+        }
+        #endregion
+
+        #region XUnitTest Methods
+        protected override void Arrange()
+        {
+            this.WriteLine($"PropertyName: {this.PropertyName}");
+        }
+
+        protected override void Act()
+        {
+            var context = new ApiSchemaBuilderContext();
+
+            this.ApiTypeFromSingleName = new ApiObjectTypeBuilder(typeof(ScalarsOnly), context)
+                .WithName(nameof(ScalarsOnly))
+                .AddProperty(this.PropertyName)
+                .Build();
+
+            this.ApiTypeFromTwoNames = new ApiObjectTypeBuilder(typeof(ScalarsOnly), context)
+                .WithName(nameof(ScalarsOnly))
+                .AddProperty(this.PropertyName, this.PropertyName)
+                .Build();
+
+            this.WriteLine($"Single-name result: {this.ApiTypeFromSingleName.SafeToString()}");
+            this.WriteLine($"Two-name result:    {this.ApiTypeFromTwoNames.SafeToString()}");
+        }
+
+        protected override void Assert()
+        {
+            this.ApiTypeFromSingleName.Should().NotBeNull();
+            this.ApiTypeFromTwoNames.Should().NotBeNull();
+            this.AssertBeEquivalentTo(this.ApiTypeFromSingleName, this.ApiTypeFromTwoNames);
+        }
+        #endregion
+    }
+
     #region Theory Data
+    public static TheoryDataRow<IXUnitTest>[] AddPropertySingleNameTheoryData =>
+    [
+        new AddPropertySingleNameTest
+        {
+            Name = "AddProperty(name) is equivalent to AddProperty(name, name) for a required property",
+            PropertyName = nameof(ScalarsOnly.RequiredName),
+        },
+        new AddPropertySingleNameTest
+        {
+            Name = "AddProperty(name) is equivalent to AddProperty(name, name) for an optional property",
+            PropertyName = nameof(ScalarsOnly.OptionalName),
+        },
+    ];
+
     public static TheoryDataRow<IXUnitTest>[] BuildTheoryData =>
     [
         new BuildTest
@@ -251,6 +318,10 @@ public class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
     [Theory]
     [MemberData(nameof(BuildTheoryData))]
     public void Build(IXUnitTest test) => test.Execute(this);
+
+    [Theory]
+    [MemberData(nameof(AddPropertySingleNameTheoryData))]
+    public void AddPropertySingleName(IXUnitTest test) => test.Execute(this);
     #endregion
 }
 

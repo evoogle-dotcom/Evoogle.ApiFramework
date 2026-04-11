@@ -34,6 +34,22 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null)
 
     #region Methods
     /// <summary>
+    ///     Gets existing or adds new <see cref="ApiScalarTypeBuilder"/> for the CLR type <typeparamref name="T"/>.
+    /// </summary>
+    /// <typeparam name="T">The CLR scalar type.</typeparam>
+    /// <returns>The corresponding <see cref="ApiScalarTypeBuilder"/>.</returns>
+    internal ApiScalarTypeBuilder GetOrAddScalarTypeBuilder<T>() =>
+        this.GetOrAddScalarTypeBuilder(typeof(T));
+
+    /// <summary>
+    ///     Gets existing or adds new <see cref="ApiEnumTypeBuilder"/> for the CLR type <typeparamref name="T"/>.
+    /// </summary>
+    /// <typeparam name="T">The CLR enum type.</typeparam>
+    /// <returns>The corresponding <see cref="ApiEnumTypeBuilder"/>.</returns>
+    internal ApiEnumTypeBuilder GetOrAddEnumTypeBuilder<T>() =>
+        this.GetOrAddEnumTypeBuilder(typeof(T));
+
+    /// <summary>
     ///     Gets existing or adds new <see cref="ApiEnumTypeBuilder"/> for the specified CLR type.
     /// </summary>
     /// <param name="clrType">The CLR enum type.</param>
