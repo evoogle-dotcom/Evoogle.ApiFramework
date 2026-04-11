@@ -107,36 +107,6 @@ public partial class ApiObjectTypeTests
             ExpectedResult = false
         },
 
-        // TryGetRelationshipByApiName
-        new TryGetTest
-        {
-            Name = $"{nameof(ApiObjectType.TryGetRelationshipByApiName)} returns true when {nameof(ApiRelationship)} exists with exact case match",
-            ApiSchemaKind = ApiSchemaKind.Simple,
-            ApiObjectTypeName = nameof(Company),
-            TryGetMethod = TryGetMethod.TryGetRelationshipByApiName,
-            SearchKey = "Company_Owner",
-            ExpectedResult = true
-        },
-
-        new TryGetTest
-        {
-            Name = $"{nameof(ApiObjectType.TryGetRelationshipByApiName)} returns false when {nameof(ApiRelationship)} exists but case mismatch",
-            ApiSchemaKind = ApiSchemaKind.Simple,
-            ApiObjectTypeName = nameof(Company),
-            TryGetMethod = TryGetMethod.TryGetRelationshipByApiName,
-            SearchKey = "COMPANY_OWNER",
-            ExpectedResult = false
-        },
-
-        new TryGetTest
-        {
-            Name = $"{nameof(ApiObjectType.TryGetRelationshipByApiName)} returns false when {nameof(ApiRelationship)} does not exist",
-            ApiSchemaKind = ApiSchemaKind.Simple,
-            ApiObjectTypeName = nameof(Company),
-            TryGetMethod = TryGetMethod.TryGetRelationshipByApiName,
-            SearchKey = "Unknown_Relationship",
-            ExpectedResult = false
-        },
     ];
     #endregion
 

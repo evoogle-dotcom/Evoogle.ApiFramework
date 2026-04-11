@@ -11,17 +11,17 @@ namespace Evoogle.ApiFramework.Schema;
 /// <summary>
 ///     Represents an identity part that sources its value from the <see cref="ApiIdentity"/> of a nested object property.
 /// </summary>
-/// <param name="apiPropertyName">The API property name of the nested object whose identity is used.</param>
+/// <param name="clrPropertyName">The CLR property name of the nested object whose identity is used.</param>
 /// <param name="apiIdentityName">The optional explicit name of the identity to use on the nested object type. When <see langword="null"/>, the primary identity is used.</param>
-public sealed class ApiNestedIdentityPart(string apiPropertyName, string? apiIdentityName = null) : ApiPropertyIdentityPart(apiPropertyName)
+public sealed class ApiIdentityNestedPart(string clrPropertyName, string? apiIdentityName = null) : ApiIdentityPropertyPart(clrPropertyName)
 {
-    #region ApiNestedIdentityPart Fields
+    #region ApiIdentityNestedPart Fields
     private ApiIdentity? _apiResolvedIdentity = null;
     #endregion
 
     #region ApiSchemaElement Properties
     /// <inheritdoc/>
-    protected override string ApiElementName => nameof(ApiNestedIdentityPart);
+    protected override string ApiElementName => nameof(ApiIdentityNestedPart);
     #endregion
 
     #region ApiIdentityPart Properties
@@ -29,7 +29,7 @@ public sealed class ApiNestedIdentityPart(string apiPropertyName, string? apiIde
     public override ApiIdentityPartKind ApiKind => ApiIdentityPartKind.Nested;
     #endregion
 
-    #region ApiNestedIdentityPart Properties
+    #region ApiIdentityNestedPart Properties
     /// <summary>Gets the resolved <see cref="ApiIdentity"/> from the nested object type. Available after initialization.</summary>
     public ApiIdentity ApiIdentity => this.ThrowIfNotInitialized(_apiResolvedIdentity);
 
@@ -44,11 +44,11 @@ public sealed class ApiNestedIdentityPart(string apiPropertyName, string? apiIde
     /// <inheritdoc />
     public override string ToString()
     {
-        var apiPropertyName = this.ApiPropertyName.SafeToString();
+        var clrPropertyName = this.ClrPropertyName.SafeToString();
         var apiIdentityName = this.ApiIdentityName.SafeToString();
         var extensionCount = this.ExtensionCount.SafeToString();
 
-        return $"{nameof(ApiNestedIdentityPart)} {{{nameof(this.ApiPropertyName)}={apiPropertyName}, {nameof(this.ApiIdentityName)}={apiIdentityName}, {nameof(this.ExtensionCount)}={extensionCount}}}";
+        return $"{nameof(ApiIdentityNestedPart)} {{{nameof(this.ClrPropertyName)}={clrPropertyName}, {nameof(this.ApiIdentityName)}={apiIdentityName}, {nameof(this.ExtensionCount)}={extensionCount}}}";
     }
     #endregion
 
@@ -83,8 +83,8 @@ public sealed class ApiNestedIdentityPart(string apiPropertyName, string? apiIde
         {
             context.AddIssue(this.ApiPath, ApiInitializationSeverity.Error,
                 ApiInitializationCode.API_IDENTITY_PART_INVALID_API_PROPERTY_TYPE,
-                $"Property '{this.ApiPropertyName}' must be an object type for a nested identity part",
-                $"Use an object-typed property or switch to {nameof(ApiScalarIdentityPart)}");
+                $"Property '{this.ClrPropertyName}' must be an object type for a nested identity part",
+                $"Use an object-typed property or switch to {nameof(ApiIdentityScalarPart)}");
             _apiResolvedIdentity = null;
             return;
         }
@@ -122,7 +122,7 @@ public sealed class ApiNestedIdentityPart(string apiPropertyName, string? apiIde
                 var path = this.ApiPath;
                 var severity = ApiInitializationSeverity.Error;
                 var code = ApiInitializationCode.API_IDENTITY_PART_UNRESOLVED_NESTED_IDENTITY;
-                var description = $"Property '{this.ApiPropertyName}' references object type '{apiPropertyObjectType.ApiName}' which has no primary identity";
+                var description = $"Property '{this.ClrPropertyName}' references object type '{apiPropertyObjectType.ApiName}' which has no primary identity";
                 var remediation = $"Define a primary identity on '{apiPropertyObjectType.ApiName}' or specify {nameof(this.ApiIdentityName)} explicitly";
 
                 context.AddIssue(path, severity, code, description, remediation);

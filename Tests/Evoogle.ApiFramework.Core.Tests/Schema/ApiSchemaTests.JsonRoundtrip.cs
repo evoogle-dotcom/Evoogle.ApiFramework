@@ -816,11 +816,6 @@ public partial class ApiSchemaTests
                                     ClrName: nameof(Company.Employees),
                                     ClrMemberKind: ClrMemberKind.Property
                                 ),
-                            ],
-                            ApiRelationships:
-                            [
-                                new ApiRelationshipConfig(ApiName: "Company_Owner", ApiPropertyName: nameof(Company.Owner)),
-                                new ApiRelationshipConfig(ApiName: "Company_Employees", ApiPropertyName: nameof(Company.Employees))
                             ]
                         )
                     ),

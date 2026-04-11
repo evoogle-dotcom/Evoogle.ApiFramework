@@ -22,14 +22,14 @@ namespace Evoogle.ApiFramework.Identity;
 ///     of the nested identity.
 ///     Used when <paramref name="apiObjectValue"/> is <see langword="null"/> so that <see cref="ApiIdentityValue.ToApiId"/> can emit the correct number of <see cref="ApiId.Empty"/> slots.
 /// </param>
-public sealed class ApiObjectIdentityPartValue(string apiName, ApiIdentityValue? apiObjectValue, IEnumerable<ApiIdentityPartValue>? apiStructure = null) : ApiIdentityPartValue(apiName)
+public sealed class ApiIdentityObjectPartValue(string apiName, ApiIdentityValue? apiObjectValue, IEnumerable<ApiIdentityPartValue>? apiStructure = null) : ApiIdentityPartValue(apiName)
 {
     #region ApiIdentityPartValue Properties
     /// <inheritdoc/>
     public override ApiIdentityPartValueKind ApiKind => ApiIdentityPartValueKind.Object;
     #endregion
 
-    #region ApiObjectIdentityPartValue Properties
+    #region ApiIdentityObjectPartValue Properties
     /// <summary>
     ///     Gets the nested <see cref="ApiIdentityValue"/> when fully resolved, or <see langword="null"/> when unresolved.
     /// </summary>
@@ -42,7 +42,7 @@ public sealed class ApiObjectIdentityPartValue(string apiName, ApiIdentityValue?
     public ApiIdentityPartValue[]? ApiStructure { get; } = apiStructure != null ? [.. apiStructure.Where(x => x is not null)] : null;
     #endregion
 
-    #region ApiObjectIdentityPartValue Computed Properties
+    #region ApiIdentityObjectPartValue Computed Properties
     /// <summary>Gets a value indicating whether the nested object identity was fully resolved at build time.</summary>
     public bool IsResolved => this.ApiObjectValue is not null;
     #endregion
@@ -55,7 +55,7 @@ public sealed class ApiObjectIdentityPartValue(string apiName, ApiIdentityValue?
         var apiObjectValue = this.ApiObjectValue.SafeToString();
         var apiStructure = this.ApiStructure.SafeToDelimitedString(',');
 
-        return $"{nameof(ApiObjectIdentityPartValue)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ApiObjectValue)}={apiObjectValue}, {nameof(this.ApiStructure)}={apiStructure}}}";
+        return $"{nameof(ApiIdentityObjectPartValue)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ApiObjectValue)}={apiObjectValue}, {nameof(this.ApiStructure)}={apiStructure}}}";
     }
     #endregion
 }

@@ -24,7 +24,7 @@ public sealed record ApiIdentityValueBuildContext
     /// </summary>
     /// <remarks>
     ///     Only a single level of owner relationship is supported at runtime. If the owner type itself
-    ///     contains an <see cref="ApiOwnerIdentityPart"/>, its grandparent CLR instance cannot be provided
+    ///     contains an <see cref="ApiIdentityOwnerPart"/>, its grandparent CLR instance cannot be provided
     ///     through this context and its owner parts will fall back to the configured
     ///     <see cref="NullHandling"/> policy.
     /// </remarks>

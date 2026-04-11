@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -43,7 +43,8 @@ public partial class ApiSchemaTests
                 },
                 ""ApiScalarTypes"": [],
                 ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": []
+                ""ApiObjectTypes"": [],
+                ""ApiRelationships"": []
             }"
         },
 
@@ -70,7 +71,8 @@ public partial class ApiSchemaTests
                 },
                 ""ApiScalarTypes"": [],
                 ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": []
+                ""ApiObjectTypes"": [],
+                ""ApiRelationships"": []
             }"
         },
 
@@ -115,7 +117,8 @@ public partial class ApiSchemaTests
                     }
                 ],
                 ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": []
+                ""ApiObjectTypes"": [],
+                ""ApiRelationships"": []
             }"
         },
 
@@ -164,7 +167,8 @@ public partial class ApiSchemaTests
                     }
                 ],
                 ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": []
+                ""ApiObjectTypes"": [],
+                ""ApiRelationships"": []
             }"
         },
 
@@ -211,6 +215,7 @@ public partial class ApiSchemaTests
                 ],
                 ""ApiEnumTypes"": [],
                 ""ApiObjectTypes"": [],
+                ""ApiRelationships"": [],
                 ""Extensions"": {
                     ""Evoogle.ApiFramework.TestData.GraphQlExtension, Evoogle.ApiFramework.Core.Tests"": {
                         ""Count"": 42
@@ -277,7 +282,8 @@ public partial class ApiSchemaTests
                     }
                 ],
                 ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": []
+                ""ApiObjectTypes"": [],
+                ""ApiRelationships"": []
             }"
         },
 
@@ -356,7 +362,8 @@ public partial class ApiSchemaTests
                     }
                 ],
                 ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": []
+                ""ApiObjectTypes"": [],
+                ""ApiRelationships"": []
             }"
         },
 
@@ -437,6 +444,7 @@ public partial class ApiSchemaTests
                 ],
                 ""ApiEnumTypes"": [],
                 ""ApiObjectTypes"": [],
+                ""ApiRelationships"": [],
                 ""Extensions"": {
                     ""Evoogle.ApiFramework.TestData.GraphQlExtension, Evoogle.ApiFramework.Core.Tests"": {
                         ""Count"": 42
@@ -506,7 +514,8 @@ public partial class ApiSchemaTests
                         ""ClrType"": ""Evoogle.ApiFramework.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
                     }
                 ],
-                ""ApiObjectTypes"": []
+                ""ApiObjectTypes"": [],
+                ""ApiRelationships"": []
             }"
         },
 
@@ -570,6 +579,7 @@ public partial class ApiSchemaTests
                     }
                 ],
                 ""ApiObjectTypes"": [],
+                ""ApiRelationships"": [],
                 ""Extensions"": {
                     ""Evoogle.ApiFramework.TestData.ProtobufExtension, Evoogle.ApiFramework.Core.Tests"": {
                         ""Edition"": 2024
@@ -799,7 +809,7 @@ public partial class ApiSchemaTests
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id""
+                                        ""ClrPropertyName"": ""Id""
                                     }
                                 ]
                             },
@@ -808,7 +818,7 @@ public partial class ApiSchemaTests
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Name""
+                                        ""ClrPropertyName"": ""Name""
                                     }
                                 ]
                             }
@@ -882,10 +892,10 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiRelationships"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.TestData.Person, Evoogle.ApiFramework.Core.Tests""
                     }
-                ]
+                ],
+                ""ApiRelationships"": []
             }"
         },
 
@@ -1111,7 +1121,7 @@ public partial class ApiSchemaTests
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id""
+                                        ""ClrPropertyName"": ""Id""
                                     }
                                 ]
                             },
@@ -1120,7 +1130,7 @@ public partial class ApiSchemaTests
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Name""
+                                        ""ClrPropertyName"": ""Name""
                                     }
                                 ]
                             }
@@ -1194,10 +1204,10 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiRelationships"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.TestData.Person, Evoogle.ApiFramework.Core.Tests""
                     }
                 ],
+                ""ApiRelationships"": [],
                 ""Extensions"": {
                     ""Evoogle.ApiFramework.TestData.GraphQlExtension, Evoogle.ApiFramework.Core.Tests"": {
                         ""Count"": 42
@@ -1352,11 +1362,6 @@ public partial class ApiSchemaTests
                                     ClrName: nameof(Company.Employees),
                                     ClrMemberKind: ClrMemberKind.Property
                                 ),
-                            ],
-                            ApiRelationships:
-                            [
-                                new ApiRelationshipConfig(ApiName: "Company_Owner", ApiPropertyName: nameof(Company.Owner)),
-                                new ApiRelationshipConfig(ApiName: "Company_Employees", ApiPropertyName: nameof(Company.Employees))
                             ]
                         )
                     ),
@@ -1521,7 +1526,7 @@ public partial class ApiSchemaTests
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id"",
+                                        ""ClrPropertyName"": ""Id"",
 					                    ""ClrScalarTypeHint"": ""System.String,System.Private.CoreLib""
                                     }
                                 ]
@@ -1531,7 +1536,7 @@ public partial class ApiSchemaTests
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Name""
+                                        ""ClrPropertyName"": ""Name""
                                     }
                                 ]
                             }
@@ -1585,16 +1590,6 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiRelationships"": [
-                            {
-                                ""ApiName"": ""Company_Owner"",
-                                ""ApiPropertyName"": ""Owner""
-                            },
-                            {
-                                ""ApiName"": ""Company_Employees"",
-                                ""ApiPropertyName"": ""Employees""
-                            }
-                        ],
                         ""ClrType"": ""Evoogle.ApiFramework.TestData.Company, Evoogle.ApiFramework.Core.Tests""
                     },
                     {
@@ -1606,7 +1601,7 @@ public partial class ApiSchemaTests
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id""
+                                        ""ClrPropertyName"": ""Id""
                                     }
                                 ]
                             },
@@ -1615,7 +1610,7 @@ public partial class ApiSchemaTests
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Name""
+                                        ""ClrPropertyName"": ""Name""
                                     }
                                 ]
                             }
@@ -1689,14 +1684,14 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiRelationships"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.TestData.Person, Evoogle.ApiFramework.Core.Tests""
                     }
-                ]
+                ],
+                ""ApiRelationships"": []
             }"
         },
 
-        // TC1: ApiSchema With Identity Schema (IdentityScalar)
+        // ApiSchema With Identity Schema (IdentityScalar)
         new JsonSerializeTest
         {
             Name = $"{nameof(ApiSchema)} With Identity Schema ({nameof(IdentityScalar)})",
@@ -1825,7 +1820,7 @@ public partial class ApiSchemaTests
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id""
+                                        ""ClrPropertyName"": ""Id""
                                     }
                                 ]
                             },
@@ -1834,7 +1829,7 @@ public partial class ApiSchemaTests
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Name""
+                                        ""ClrPropertyName"": ""Name""
                                     }
                                 ]
                             }
@@ -1861,14 +1856,14 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiRelationships"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityScalar, Evoogle.ApiFramework.Core.Tests""
                     }
-                ]
+                ],
+                ""ApiRelationships"": []
             }"
         },
 
-        // TC2: ApiSchema With Identity Schema (IdentityTwoScalarPartComposite)
+        // ApiSchema With Identity Schema (IdentityTwoScalarPartComposite)
         new JsonSerializeTest
         {
             Name = $"{nameof(ApiSchema)} With Identity Schema ({nameof(IdentityTwoScalarPartComposite)})",
@@ -1998,11 +1993,11 @@ public partial class ApiSchemaTests
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id1""
+                                        ""ClrPropertyName"": ""Id1""
                                     },
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id2""
+                                        ""ClrPropertyName"": ""Id2""
                                     }
                                 ]
                             }
@@ -2039,14 +2034,14 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiRelationships"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityTwoScalarPartComposite, Evoogle.ApiFramework.Core.Tests""
                     }
-                ]
+                ],
+                ""ApiRelationships"": []
             }"
         },
 
-        // TC3: ApiSchema With Identity Schema (IdentityThreeScalarPartComposite)
+        // ApiSchema With Identity Schema (IdentityThreeScalarPartComposite)
         new JsonSerializeTest
         {
             Name = $"{nameof(ApiSchema)} With Identity Schema ({nameof(IdentityThreeScalarPartComposite)})",
@@ -2206,15 +2201,15 @@ public partial class ApiSchemaTests
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id1""
+                                        ""ClrPropertyName"": ""Id1""
                                     },
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id2""
+                                        ""ClrPropertyName"": ""Id2""
                                     },
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id3""
+                                        ""ClrPropertyName"": ""Id3""
                                     }
                                 ]
                             }
@@ -2261,14 +2256,14 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiRelationships"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityThreeScalarPartComposite, Evoogle.ApiFramework.Core.Tests""
                     }
-                ]
+                ],
+                ""ApiRelationships"": []
             }"
         },
 
-        // TC4: ApiSchema With Identity Schema (IdentityNested And IdentityNestedComposite Without Explicit ApiIdentityName)
+        // ApiSchema With Identity Schema (IdentityNested And IdentityNestedComposite Without Explicit ApiIdentityName)
         new JsonSerializeTest
         {
             Name = $"{nameof(ApiSchema)} With Identity Schema ({nameof(IdentityNested)} And {nameof(IdentityNestedComposite)} Without Explicit ApiIdentityName)",
@@ -2439,7 +2434,7 @@ public partial class ApiSchemaTests
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id""
+                                        ""ClrPropertyName"": ""Id""
                                     }
                                 ]
                             }
@@ -2466,7 +2461,6 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiRelationships"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityNested, Evoogle.ApiFramework.Core.Tests""
                     },
                     {
@@ -2478,11 +2472,11 @@ public partial class ApiSchemaTests
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Nested"",
-                                        ""ApiPropertyName"": ""NestedPart""
+                                        ""ClrPropertyName"": ""NestedPart""
                                     },
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Name""
+                                        ""ClrPropertyName"": ""Name""
                                     }
                                 ]
                             }
@@ -2509,14 +2503,14 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiRelationships"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityNestedComposite, Evoogle.ApiFramework.Core.Tests""
                     }
-                ]
+                ],
+                ""ApiRelationships"": []
             }"
         },
 
-        // TC5: ApiSchema With Identity Schema (IdentityOwner, IdentityOwnedComposite, And IdentityOwnedDependent Without Explicit ApiIdentityName)
+        // ApiSchema With Identity Schema (IdentityOwner, IdentityOwnedComposite, And IdentityOwnedDependent Without Explicit ApiIdentityName)
         new JsonSerializeTest
         {
             Name = $"{nameof(ApiSchema)} With Identity Schema ({nameof(IdentityOwner)}, {nameof(IdentityOwnedComposite)}, And {nameof(IdentityOwnedDependent)} Without Explicit ApiIdentityName)",
@@ -2753,7 +2747,7 @@ public partial class ApiSchemaTests
                                     },
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""LineNumber""
+                                        ""ClrPropertyName"": ""LineNumber""
                                     }
                                 ]
                             }
@@ -2780,7 +2774,6 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiRelationships"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityOwnedComposite, Evoogle.ApiFramework.Core.Tests""
                     },
                     {
@@ -2808,7 +2801,6 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiRelationships"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityOwnedDependent, Evoogle.ApiFramework.Core.Tests""
                     },
                     {
@@ -2820,7 +2812,7 @@ public partial class ApiSchemaTests
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id""
+                                        ""ClrPropertyName"": ""Id""
                                     }
                                 ]
                             }
@@ -2874,14 +2866,14 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiRelationships"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityOwner, Evoogle.ApiFramework.Core.Tests""
                     }
-                ]
+                ],
+                ""ApiRelationships"": []
             }"
         },
 
-        // TC6: ApiSchema With Full Identity Schema
+        // ApiSchema With Full Identity Schema
         new JsonSerializeTest
         {
             Name = $"{nameof(ApiSchema)} With Full Identity Schema",
@@ -3433,7 +3425,7 @@ public partial class ApiSchemaTests
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id""
+                                        ""ClrPropertyName"": ""Id""
                                     }
                                 ]
                             }
@@ -3460,7 +3452,6 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiRelationships"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityNested, Evoogle.ApiFramework.Core.Tests""
                     },
                     {
@@ -3472,11 +3463,11 @@ public partial class ApiSchemaTests
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Nested"",
-                                        ""ApiPropertyName"": ""NestedPart""
+                                        ""ClrPropertyName"": ""NestedPart""
                                     },
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Name""
+                                        ""ClrPropertyName"": ""Name""
                                     }
                                 ]
                             }
@@ -3503,7 +3494,6 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiRelationships"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityNestedComposite, Evoogle.ApiFramework.Core.Tests""
                     },
                     {
@@ -3518,7 +3508,7 @@ public partial class ApiSchemaTests
                                     },
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""LineNumber""
+                                        ""ClrPropertyName"": ""LineNumber""
                                     }
                                 ]
                             }
@@ -3545,7 +3535,6 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiRelationships"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityOwnedComposite, Evoogle.ApiFramework.Core.Tests""
                     },
                     {
@@ -3573,7 +3562,6 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiRelationships"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityOwnedDependent, Evoogle.ApiFramework.Core.Tests""
                     },
                     {
@@ -3585,7 +3573,7 @@ public partial class ApiSchemaTests
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id""
+                                        ""ClrPropertyName"": ""Id""
                                     }
                                 ]
                             }
@@ -3639,7 +3627,6 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiRelationships"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityOwner, Evoogle.ApiFramework.Core.Tests""
                     },
                     {
@@ -3651,7 +3638,7 @@ public partial class ApiSchemaTests
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id""
+                                        ""ClrPropertyName"": ""Id""
                                     }
                                 ]
                             },
@@ -3660,7 +3647,7 @@ public partial class ApiSchemaTests
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Name""
+                                        ""ClrPropertyName"": ""Name""
                                     }
                                 ]
                             }
@@ -3687,7 +3674,6 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiRelationships"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityScalar, Evoogle.ApiFramework.Core.Tests""
                     },
                     {
@@ -3699,15 +3685,15 @@ public partial class ApiSchemaTests
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id1""
+                                        ""ClrPropertyName"": ""Id1""
                                     },
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id2""
+                                        ""ClrPropertyName"": ""Id2""
                                     },
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id3""
+                                        ""ClrPropertyName"": ""Id3""
                                     }
                                 ]
                             }
@@ -3754,7 +3740,6 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiRelationships"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityThreeScalarPartComposite, Evoogle.ApiFramework.Core.Tests""
                     },
                     {
@@ -3766,11 +3751,11 @@ public partial class ApiSchemaTests
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id1""
+                                        ""ClrPropertyName"": ""Id1""
                                     },
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id2""
+                                        ""ClrPropertyName"": ""Id2""
                                     }
                                 ]
                             }
@@ -3807,14 +3792,14 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiRelationships"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityTwoScalarPartComposite, Evoogle.ApiFramework.Core.Tests""
                     }
-                ]
+                ],
+                ""ApiRelationships"": []
             }"
         },
 
-        // TC7: ApiSchema With Identity Schema (IdentityNested And IdentityNestedComposite With Explicit ApiIdentityName)
+        // ApiSchema With Identity Schema (IdentityNested And IdentityNestedComposite With Explicit ApiIdentityName)
         new JsonSerializeTest
         {
             Name = $"{nameof(ApiSchema)} With Identity Schema ({nameof(IdentityNested)} And {nameof(IdentityNestedComposite)} With Explicit ApiIdentityName)",
@@ -3986,7 +3971,7 @@ public partial class ApiSchemaTests
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id""
+                                        ""ClrPropertyName"": ""Id""
                                     }
                                 ]
                             }
@@ -4013,7 +3998,6 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiRelationships"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityNested, Evoogle.ApiFramework.Core.Tests""
                     },
                     {
@@ -4025,12 +4009,12 @@ public partial class ApiSchemaTests
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Nested"",
-                                        ""ApiPropertyName"": ""NestedPart"",
+                                        ""ClrPropertyName"": ""NestedPart"",
                                         ""ApiIdentityName"": ""PK_IdentityNestedPart""
                                     },
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Name""
+                                        ""ClrPropertyName"": ""Name""
                                     }
                                 ]
                             }
@@ -4057,14 +4041,14 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiRelationships"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityNestedComposite, Evoogle.ApiFramework.Core.Tests""
                     }
-                ]
+                ],
+                ""ApiRelationships"": []
             }"
         },
 
-        // TC8: ApiSchema With Identity Schema (IdentityOwner, IdentityOwnedComposite, And IdentityOwnedDependent With Explicit ApiIdentityName)
+        // ApiSchema With Identity Schema (IdentityOwner, IdentityOwnedComposite, And IdentityOwnedDependent With Explicit ApiIdentityName)
         new JsonSerializeTest
         {
             Name = $"{nameof(ApiSchema)} With Identity Schema ({nameof(IdentityOwner)}, {nameof(IdentityOwnedComposite)}, And {nameof(IdentityOwnedDependent)} With Explicit ApiIdentityName)",
@@ -4304,7 +4288,7 @@ public partial class ApiSchemaTests
                                     },
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""LineNumber""
+                                        ""ClrPropertyName"": ""LineNumber""
                                     }
                                 ]
                             }
@@ -4331,7 +4315,6 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiRelationships"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityOwnedComposite, Evoogle.ApiFramework.Core.Tests""
                     },
                     {
@@ -4360,7 +4343,6 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiRelationships"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityOwnedDependent, Evoogle.ApiFramework.Core.Tests""
                     },
                     {
@@ -4372,7 +4354,7 @@ public partial class ApiSchemaTests
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id""
+                                        ""ClrPropertyName"": ""Id""
                                     }
                                 ]
                             }
@@ -4426,10 +4408,10 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiRelationships"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityOwner, Evoogle.ApiFramework.Core.Tests""
                     }
-                ]
+                ],
+                ""ApiRelationships"": []
             }"
         },
     ];

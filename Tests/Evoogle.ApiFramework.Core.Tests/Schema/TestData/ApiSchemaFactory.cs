@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -64,8 +64,7 @@ public static class ApiSchemaFactory
     (
         ApiObjectTypeOptionsConfig? ApiOptions = null,
         List<ApiIdentityConfig>? ApiIdentities = null,
-        List<ApiPropertyConfig>? ApiProperties = null,
-        List<ApiRelationshipConfig>? ApiRelationships = null
+        List<ApiPropertyConfig>? ApiProperties = null
     );
 
     public record ApiObjectTypeOptionsConfig
@@ -94,12 +93,6 @@ public static class ApiSchemaFactory
         ApiTypeModifiers ApiTypeModifiers,
         string ClrName,
         ClrMemberKind ClrMemberKind
-    );
-
-    public record ApiRelationshipConfig
-    (
-        string ApiName,
-        string? ApiPropertyName = null
     );
     #endregion
 
@@ -264,17 +257,17 @@ public static class ApiSchemaFactory
 
 #pragma warning disable CA1859 // Use concrete types when possible for improved performance
     private static ApiIdentityPart IPS(string propertyName, Type? type = null)
-        => new ApiScalarIdentityPart(propertyName, type);
+        => new ApiIdentityScalarPart(propertyName, type);
 
     private static ApiIdentityPart IPN(string propertyName, string? identityName = null)
-        => new ApiNestedIdentityPart(propertyName, identityName);
+        => new ApiIdentityNestedPart(propertyName, identityName);
 
     private static ApiIdentityPart IPO(string? identityName = null)
-        => new ApiOwnerIdentityPart(identityName);
+        => new ApiIdentityOwnerPart(identityName);
 #pragma warning restore CA1859 // Use concrete types when possible for improved performance
 
-    private static ApiObjectType O(string name, Type clr, IEnumerable<ApiProperty> properties, IEnumerable<ApiIdentity>? identities = null, IEnumerable<ApiRelationship>? relationships = null, ApiObjectTypeOptions? options = null, OrderedDictionary<Type, object>? extensions = null)
-        => new(name, options, identities, properties, relationships ?? [], clr)
+    private static ApiObjectType O(string name, Type clr, IEnumerable<ApiProperty> properties, IEnumerable<ApiIdentity>? identities = null, ApiObjectTypeOptions? options = null, OrderedDictionary<Type, object>? extensions = null)
+        => new(name, options, identities, properties, clr)
         {
             Extensions = extensions
         };
@@ -287,12 +280,6 @@ public static class ApiSchemaFactory
 
     private static ApiProperty P(string name, ApiTypeExpression expression, bool required, ClrMemberKind clrMemberKind = ClrMemberKind.Property, OrderedDictionary<Type, object>? extensions = null)
         => new(name, expression, required ? ApiTypeModifiers.Required : ApiTypeModifiers.None, name, clrMemberKind)
-        {
-            Extensions = extensions
-        };
-
-    private static ApiRelationship R(string name, string propertyName, OrderedDictionary<Type, object>? extensions = null)
-        => new(name, propertyName)
         {
             Extensions = extensions
         };
@@ -412,9 +399,6 @@ public static class ApiSchemaFactory
         [
             I("PK_Customer", [IPS(nameof(Customer.Id))]),
             I("AK_Customer_Email", [IPS(nameof(Customer.Email))])
-        ], relationships:
-        [
-            R(name: "Customer_Orders", propertyName: nameof(Customer.Orders))
         ]);
 
         // Product Object Types
@@ -430,10 +414,6 @@ public static class ApiSchemaFactory
         [
             I("PK_Category", [IPS(nameof(Category.Id))]),
             I("AK_Category_Name", [IPS(nameof(Category.Name))])
-        ], relationships:
-        [
-            R(name: "Category_Children", propertyName: nameof(Category.Children)),
-            R(name: "Category_Parent", propertyName: nameof(Category.Parent))
         ]);
 
         // Tag (M2M with ProductBase)
@@ -446,9 +426,6 @@ public static class ApiSchemaFactory
         [
             I("PK_Tag", [IPS(nameof(Tag.Id))]),
             I("AK_Tag_Name", [IPS(nameof(Tag.Name))])
-        ], relationships:
-        [
-            R(name: "Product_Tags", propertyName: "Products")
         ]);
 
         // // Abstract ProductBase + two derived types (polymorphism)
@@ -475,9 +452,6 @@ public static class ApiSchemaFactory
         [
             I("PK_DigitalProduct", [IPS(nameof(DigitalProduct.Id))]),
             I("AK_DigitalProduct_Sku", [IPS(nameof(DigitalProduct.Sku))])
-        ], relationships:
-        [
-            R(name: "Product_Tags", propertyName: nameof(DigitalProduct.Tags))
         ]);
 
         var physicalProduct = O(name: nameof(PhysicalProduct), clr: typeof(PhysicalProduct), properties:
@@ -494,9 +468,6 @@ public static class ApiSchemaFactory
         [
             I("PK_PhysicalProduct", [IPS(nameof(PhysicalProduct.Id))]),
             I("AK_PhysicalProduct_Sku", [IPS(nameof(PhysicalProduct.Sku))])
-        ], relationships:
-        [
-            R(name: "Product_Tags", propertyName: nameof(PhysicalProduct.Tags))
         ]);
 
         // Order/Payment Object Types
@@ -514,10 +485,6 @@ public static class ApiSchemaFactory
         ], identities:
         [
             I("PK_Order", [IPS(nameof(Order.Id))])
-        ], relationships:
-        [
-            R(name: "Customer_Orders", propertyName: nameof(Order.Customer)),
-            R(name: "Order_Payment", propertyName: nameof(Order.Payment))
         ]);
 
         // OrderLine
@@ -548,23 +515,7 @@ public static class ApiSchemaFactory
             I("PK_Payment", [IPS(nameof(Payment.Id))])
         ]);
 
-        // 5) Relationships (optional if you encode via properties; include here when you want explicit cardinality tests)
-        var relationships = new List<ApiRelationship>
-        {
-            // Customer 1–many Orders
-            R(name: "Customer_Orders", propertyName: nameof(Customer.Orders)),
-
-            // Order optional 1–1 Payment
-            R(name: "Order_Payment", propertyName: nameof(Order.Payment)),
-
-            // ProductBase many–many Tag
-            R(name: "Product_Tags", propertyName: nameof(ProductBase.Tags)),
-
-            // Category self-reference
-            R(name: "Category_Children", propertyName: nameof(Category.Children)),
-        };
-
-        // 6) Objects list (include value objects + entities + abstract base + derived)
+        // 5) Objects list (include value objects + entities + abstract base + derived)
         var objects = new List<ApiObjectType>
         {
             money, quantity, emailAddress, address,
@@ -573,7 +524,7 @@ public static class ApiSchemaFactory
             order, orderLine, payment
         };
 
-        // 7) Assemble schema
+        // 6) Assemble schema
         var schema = ApiSchema.Create
         (
             apiName: name,
@@ -665,10 +616,6 @@ public static class ApiSchemaFactory
             P(name: nameof(Company.Name),      expression: TE.ClrRef<string>(),               required: true),
             P(name: nameof(Company.Owner),     expression: TE.ClrRef<Person>(),               required: false),
             P(name: nameof(Company.Employees), expression: TE.ListOf<Person>(required: true), required: false)
-        ], relationships:
-        [
-            R(name: "Company_Owner",      propertyName: nameof(Company.Owner)),
-            R(name: "Company_Employees",  propertyName: nameof(Company.Employees))
         ]);
 
         // 4) Objects list
@@ -926,9 +873,9 @@ public static class ApiSchemaFactory
                             var apiKind = part.ApiKind;
                             ApiIdentityPart apiIdentityPart = apiKind switch
                             {
-                                ApiIdentityPartKind.Scalar => new ApiScalarIdentityPart(part.ApiPropertyName!, part.ClrScalarTypeHint),
-                                ApiIdentityPartKind.Nested => new ApiNestedIdentityPart(part.ApiPropertyName!, part.ApiIdentityName),
-                                ApiIdentityPartKind.Owner => new ApiOwnerIdentityPart(part.ApiIdentityName),
+                                ApiIdentityPartKind.Scalar => new ApiIdentityScalarPart(part.ApiPropertyName!, part.ClrScalarTypeHint),
+                                ApiIdentityPartKind.Nested => new ApiIdentityNestedPart(part.ApiPropertyName!, part.ApiIdentityName),
+                                ApiIdentityPartKind.Owner => new ApiIdentityOwnerPart(part.ApiIdentityName),
                                 _ => throw new InvalidOperationException($"Unsupported ApiIdentityPartKind: {apiKind}"),
                             };
                             return apiIdentityPart;
@@ -951,24 +898,12 @@ public static class ApiSchemaFactory
                     return apiProperty;
                 });
 
-        var apiRelationships = apiObjectTypeConfig.ApiRelationships?
-                .Select(x =>
-                {
-                    var apiRelationship = new ApiRelationship
-                    (
-                        apiName: x.ApiName,
-                        apiPropertyName: x.ApiPropertyName
-                    );
-                    return apiRelationship;
-                });
-
         var apiObjectType = (ApiType)new ApiObjectType
         (
             apiName,
             apiOptions,
             apiIdentities,
             apiProperties,
-            apiRelationships,
             clrObjectType
         );
         return apiObjectType;

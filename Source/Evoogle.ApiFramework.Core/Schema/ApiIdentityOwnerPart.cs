@@ -17,7 +17,7 @@ namespace Evoogle.ApiFramework.Schema;
 ///     <para>
 ///         Owner resolution follows a two-phase initialization model. During the standard
 ///         <see cref="ApiSchemaElement.Initialize"/> call, no property-level resolution occurs for this
-///         part type — unlike <see cref="ApiScalarIdentityPart"/> and <see cref="ApiNestedIdentityPart"/>
+///         part type — unlike <see cref="ApiIdentityScalarPart"/> and <see cref="ApiIdentityNestedPart"/>
 ///         which resolve their backing properties in the standard phase.
 ///     </para>
 ///     <para>
@@ -31,16 +31,16 @@ namespace Evoogle.ApiFramework.Schema;
 ///         initialization completes will throw.
 ///     </para>
 /// </remarks>
-public sealed class ApiOwnerIdentityPart(string? apiIdentityName = null) : ApiIdentityPart
+public sealed class ApiIdentityOwnerPart(string? apiIdentityName = null) : ApiIdentityPart
 {
-    #region ApiOwnerIdentityPart Fields
+    #region ApiIdentityOwnerPart Fields
     private ApiIdentity? _apiResolvedOwnerIdentity = null;
     private ApiObjectType? _apiResolvedOwnerType = null;
     #endregion
 
     #region ApiSchemaElement Properties
     /// <inheritdoc/>
-    protected override string ApiElementName => nameof(ApiOwnerIdentityPart);
+    protected override string ApiElementName => nameof(ApiIdentityOwnerPart);
     #endregion
 
     #region ApiIdentityPart Properties
@@ -48,7 +48,7 @@ public sealed class ApiOwnerIdentityPart(string? apiIdentityName = null) : ApiId
     public override ApiIdentityPartKind ApiKind => ApiIdentityPartKind.Owner;
     #endregion
 
-    #region ApiOwnerIdentityPart Properties
+    #region ApiIdentityOwnerPart Properties
     /// <summary>
     ///     Gets the optional explicit identity name used to select a specific identity on the owner object type.
     ///     When <see langword="null"/>, the primary identity of the owner type is used.
@@ -69,14 +69,14 @@ public sealed class ApiOwnerIdentityPart(string? apiIdentityName = null) : ApiId
         var apiIdentityName = this.ApiIdentityName.SafeToString();
         var extensionCount = this.ExtensionCount.SafeToString();
 
-        return $"{nameof(ApiOwnerIdentityPart)} {{{nameof(this.ApiIdentityName)}={apiIdentityName}, {nameof(this.ExtensionCount)}={extensionCount}}}";
+        return $"{nameof(ApiIdentityOwnerPart)} {{{nameof(this.ApiIdentityName)}={apiIdentityName}, {nameof(this.ExtensionCount)}={extensionCount}}}";
     }
     #endregion
 
     #region ApiSchemaElement Methods
     /// <inheritdoc />
     protected override string BuildPath(string? apiPreviousPath)
-        => ApiSchemaHelpers.BuildPath(basePath: apiPreviousPath, segment: nameof(ApiOwnerIdentityPart), null);
+        => ApiSchemaHelpers.BuildPath(basePath: apiPreviousPath, segment: this.ApiElementName, segmentName: null);
     #endregion
 
     #region Implementation Methods
@@ -96,7 +96,7 @@ public sealed class ApiOwnerIdentityPart(string? apiIdentityName = null) : ApiId
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_IDENTITY_PART_UNRESOLVED_OWNER;
             var description = $"No owner object type was found for '{ownedType.ApiName}' — no other object type has a collection or direct object property of this type";
-            var remediation = $"Ensure another {nameof(ApiObjectType)} has a collection or direct object property typed as '{ownedType.ApiName}', or remove the {nameof(ApiOwnerIdentityPart)}";
+var remediation = $"Ensure another {nameof(ApiObjectType)} has a collection or direct object property typed as '{ownedType.ApiName}', or remove the {nameof(ApiIdentityOwnerPart)}";
 
             context.AddIssue(path, severity, code, description, remediation);
             return;

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -681,7 +681,7 @@ public partial class ApiSchemaTests
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id""
+                                        ""ClrPropertyName"": ""Id""
                                     }
                                 ]
                             }
@@ -799,7 +799,7 @@ public partial class ApiSchemaTests
         // ApiIdentity throws if ApiIdentityParts has duplicate ApiPropertyName values
         new InitializeThrowsTest
         {
-            Name = $"{nameof(ApiIdentity)} Throws If {nameof(ApiIdentity.ApiIdentityParts)} Has Duplicate {nameof(ApiPropertyIdentityPart.ApiPropertyName)} Values",
+            Name = $"{nameof(ApiIdentity)} Throws If {nameof(ApiIdentity.ApiIdentityParts)} Has Duplicate {nameof(ApiIdentityPropertyPart.ClrPropertyName)} Values",
             SourceJson = @"
             {
                 ""ApiName"": ""ApiIdentity Throws If ApiIdentityParts Has Duplicate ApiPropertyName Values"",
@@ -826,11 +826,11 @@ public partial class ApiSchemaTests
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id""
+                                        ""ClrPropertyName"": ""Id""
                                     },
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id""
+                                        ""ClrPropertyName"": ""Id""
                                     }
                                 ]
                             }
@@ -869,19 +869,19 @@ public partial class ApiSchemaTests
                     path: $"{nameof(ApiObjectType)}[\"IdentityScalar\"].{nameof(ApiIdentity)}[\"PK_IdentityScalar\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_IDENTITY_DUPLICATE_PART_API_PROPERTY_NAME,
-                    description: $"Duplicate {nameof(ApiPropertyIdentityPart)}.{nameof(ApiPropertyIdentityPart.ApiPropertyName)} values: 'Id'",
-                    remediation: $"Verify that each {nameof(ApiPropertyIdentityPart)} has a unique {nameof(ApiPropertyIdentityPart.ApiPropertyName)} value"
+                    description: $"Duplicate {nameof(ApiIdentityPropertyPart)}.{nameof(ApiIdentityPropertyPart.ClrPropertyName)} values: 'Id'",
+                    remediation: $"Verify that each {nameof(ApiIdentityPropertyPart)} has a unique {nameof(ApiIdentityPropertyPart.ClrPropertyName)} value"
                 ),
             ]
         },
 
-        // ApiIdentity throws if ApiIdentityParts contains multiple ApiOwnerIdentityPart instances
+        // ApiIdentity throws if ApiIdentityParts contains multiple ApiIdentityOwnerPart instances
         new InitializeThrowsTest
         {
-            Name = $"{nameof(ApiIdentity)} Throws If {nameof(ApiIdentity.ApiIdentityParts)} Contains Multiple {nameof(ApiOwnerIdentityPart)} Instances",
+            Name = $"{nameof(ApiIdentity)} Throws If {nameof(ApiIdentity.ApiIdentityParts)} Contains Multiple {nameof(ApiIdentityOwnerPart)} Instances",
             SourceJson = @"
             {
-                ""ApiName"": ""ApiIdentity Throws If ApiIdentityParts Contains Multiple ApiOwnerIdentityPart Instances"",
+                ""ApiName"": ""ApiIdentity Throws If ApiIdentityParts Contains Multiple ApiIdentityOwnerPart Instances"",
                 ""ApiScalarTypes"": [
                     {
                         ""ApiKind"": ""Scalar"",
@@ -900,7 +900,7 @@ public partial class ApiSchemaTests
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id""
+                                        ""ClrPropertyName"": ""Id""
                                     }
                                 ]
                             }
@@ -955,8 +955,8 @@ public partial class ApiSchemaTests
                     path: $"{nameof(ApiObjectType)}[\"OwnedType\"].{nameof(ApiIdentity)}[\"PK_OwnedType\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_IDENTITY_MULTIPLE_OWNER_PARTS,
-                    description: $"An {nameof(ApiIdentity)} may contain at most one {nameof(ApiOwnerIdentityPart)}, but 2 were found",
-                    remediation: $"Remove the extra {nameof(ApiOwnerIdentityPart)} instances, leaving exactly one"
+                    description: $"An {nameof(ApiIdentity)} may contain at most one {nameof(ApiIdentityOwnerPart)}, but 2 were found",
+                    remediation: $"Remove the extra {nameof(ApiIdentityOwnerPart)} instances, leaving exactly one"
                 ),
             ]
         },
@@ -965,13 +965,13 @@ public partial class ApiSchemaTests
         // ApiIdentityPart Initialization Tests
         //
 
-        // ApiNestedIdentityPart throws if the identity property is not an ApiObjectType
+        // ApiIdentityNestedPart throws if the identity property is not an ApiObjectType
         new InitializeThrowsTest
         {
-            Name = $"{nameof(ApiNestedIdentityPart)} Throws If {nameof(ApiNestedIdentityPart.ApiPropertyName)} Is Not An {nameof(ApiObjectType)}",
+            Name = $"{nameof(ApiIdentityNestedPart)} Throws If {nameof(ApiIdentityNestedPart.ClrPropertyName)} Is Not An {nameof(ApiObjectType)}",
             SourceJson = @"
             {
-                ""ApiName"": ""ApiNestedIdentityPart Throws If ApiPropertyName Is Not An ApiObjectType"",
+                ""ApiName"": ""ApiIdentityNestedPart Throws If ApiPropertyName Is Not An ApiObjectType"",
                 ""ApiScalarTypes"": [
                     {
                         ""ApiKind"": ""Scalar"",
@@ -993,7 +993,7 @@ public partial class ApiSchemaTests
                             {
                                 ""ApiName"": ""PK_InvalidNestedPart"",
                                 ""ApiIdentityParts"": [
-                                    { ""ApiKind"": ""Nested"", ""ApiPropertyName"": ""Id"" }
+                                    { ""ApiKind"": ""Nested"", ""ClrPropertyName"": ""Id"" }
                                 ]
                             }
                         ],
@@ -1021,22 +1021,22 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"IdentityNested\"].{nameof(ApiIdentity)}[\"PK_InvalidNestedPart\"].{nameof(ApiNestedIdentityPart)}[\"Id\"]",
+                    path: $"{nameof(ApiObjectType)}[\"IdentityNested\"].{nameof(ApiIdentity)}[\"PK_InvalidNestedPart\"].{nameof(ApiIdentityNestedPart)}[\"Id\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_IDENTITY_PART_INVALID_API_PROPERTY_TYPE,
                     description: "Property 'Id' must be an object type for a nested identity part",
-                    remediation: $"Use an object-typed property or switch to {nameof(ApiScalarIdentityPart)}"
+                    remediation: $"Use an object-typed property or switch to {nameof(ApiIdentityScalarPart)}"
                 ),
             ]
         },
 
-        // ApiNestedIdentityPart throws if the referenced identity name is unresolved
+        // ApiIdentityNestedPart throws if the referenced identity name is unresolved
         new InitializeThrowsTest
         {
-            Name = $"{nameof(ApiNestedIdentityPart)} Throws If {nameof(ApiNestedIdentityPart.ApiIdentityName)} Is Unresolved",
+            Name = $"{nameof(ApiIdentityNestedPart)} Throws If {nameof(ApiIdentityNestedPart.ApiIdentityName)} Is Unresolved",
             SourceJson = @"
             {
-                ""ApiName"": ""ApiNestedIdentityPart Throws If ApiIdentityName Is Unresolved"",
+                ""ApiName"": ""ApiIdentityNestedPart Throws If ApiIdentityName Is Unresolved"",
                 ""ApiScalarTypes"": [
                     {
                         ""ApiKind"": ""Scalar"",
@@ -1058,7 +1058,7 @@ public partial class ApiSchemaTests
                             {
                                 ""ApiName"": ""PK_IdentityNested"",
                                 ""ApiIdentityParts"": [
-                                    { ""ApiKind"": ""Scalar"", ""ApiPropertyName"": ""Id"" }
+                                    { ""ApiKind"": ""Scalar"", ""ClrPropertyName"": ""Id"" }
                                 ]
                             }
                         ],
@@ -1088,7 +1088,7 @@ public partial class ApiSchemaTests
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Nested"",
-                                        ""ApiPropertyName"": ""NestedPart"",
+                                        ""ClrPropertyName"": ""NestedPart"",
                                         ""ApiIdentityName"": ""NonExistentId""
                                     }
                                 ]
@@ -1119,7 +1119,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"IdentityNestedComposite\"].{nameof(ApiIdentity)}[\"PK_IdentityNestedComposite\"].{nameof(ApiNestedIdentityPart)}[\"NestedPart\"]",
+                    path: $"{nameof(ApiObjectType)}[\"IdentityNestedComposite\"].{nameof(ApiIdentity)}[\"PK_IdentityNestedComposite\"].{nameof(ApiIdentityNestedPart)}[\"NestedPart\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_IDENTITY_PART_UNRESOLVED_NESTED_IDENTITY,
                     description: "Referenced identity 'NonExistentId' could not be found on object type 'IdentityNested'",
@@ -1128,13 +1128,13 @@ public partial class ApiSchemaTests
             ]
         },
 
-        // ApiOwnerIdentityPart throws if no candidate owner ApiObjectType exists
+        // ApiIdentityOwnerPart throws if no candidate owner ApiObjectType exists
         new InitializeThrowsTest
         {
-            Name = $"{nameof(ApiOwnerIdentityPart)} Throws If No Candidate Owner {nameof(ApiObjectType)} Exists",
+            Name = $"{nameof(ApiIdentityOwnerPart)} Throws If No Candidate Owner {nameof(ApiObjectType)} Exists",
             SourceJson = @"
             {
-                ""ApiName"": ""ApiOwnerIdentityPart Throws If No Candidate Owner ApiObjectType Exists"",
+                ""ApiName"": ""ApiIdentityOwnerPart Throws If No Candidate Owner ApiObjectType Exists"",
                 ""ApiScalarTypes"": [
                     {
                         ""ApiKind"": ""Scalar"",
@@ -1173,22 +1173,22 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"OwnedType\"].{nameof(ApiIdentity)}[\"PK_OwnedType\"].{nameof(ApiOwnerIdentityPart)}",
+                    path: $"{nameof(ApiObjectType)}[\"OwnedType\"].{nameof(ApiIdentity)}[\"PK_OwnedType\"].{nameof(ApiIdentityOwnerPart)}",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_IDENTITY_PART_UNRESOLVED_OWNER,
                     description: "No owner object type was found for 'OwnedType' \u2014 no other object type has a collection or direct object property of this type",
-                    remediation: $"Ensure another {nameof(ApiObjectType)} has a collection or direct object property typed as 'OwnedType', or remove the {nameof(ApiOwnerIdentityPart)}"
+                    remediation: $"Ensure another {nameof(ApiObjectType)} has a collection or direct object property typed as 'OwnedType', or remove the {nameof(ApiIdentityOwnerPart)}"
                 ),
             ]
         },
 
-        // ApiOwnerIdentityPart throws if multiple candidate owner ApiObjectTypes exist
+        // ApiIdentityOwnerPart throws if multiple candidate owner ApiObjectTypes exist
         new InitializeThrowsTest
         {
-            Name = $"{nameof(ApiOwnerIdentityPart)} Throws If Multiple Candidate Owner {nameof(ApiObjectType)}s Exist",
+            Name = $"{nameof(ApiIdentityOwnerPart)} Throws If Multiple Candidate Owner {nameof(ApiObjectType)}s Exist",
             SourceJson = @"
             {
-                ""ApiName"": ""ApiOwnerIdentityPart Throws If Multiple Candidate Owner ApiObjectTypes Exist"",
+                ""ApiName"": ""ApiIdentityOwnerPart Throws If Multiple Candidate Owner ApiObjectTypes Exist"",
                 ""ApiScalarTypes"": [
                     {
                         ""ApiKind"": ""Scalar"",
@@ -1205,7 +1205,7 @@ public partial class ApiSchemaTests
                             {
                                 ""ApiName"": ""PK_OwnerTypeA"",
                                 ""ApiIdentityParts"": [
-                                    { ""ApiKind"": ""Scalar"", ""ApiPropertyName"": ""Id"" }
+                                    { ""ApiKind"": ""Scalar"", ""ClrPropertyName"": ""Id"" }
                                 ]
                             }
                         ],
@@ -1233,7 +1233,7 @@ public partial class ApiSchemaTests
                             {
                                 ""ApiName"": ""PK_OwnerTypeB"",
                                 ""ApiIdentityParts"": [
-                                    { ""ApiKind"": ""Scalar"", ""ApiPropertyName"": ""Id"" }
+                                    { ""ApiKind"": ""Scalar"", ""ClrPropertyName"": ""Id"" }
                                 ]
                             }
                         ],
@@ -1283,7 +1283,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"OwnedType\"].{nameof(ApiIdentity)}[\"PK_OwnedType\"].{nameof(ApiOwnerIdentityPart)}",
+                    path: $"{nameof(ApiObjectType)}[\"OwnedType\"].{nameof(ApiIdentity)}[\"PK_OwnedType\"].{nameof(ApiIdentityOwnerPart)}",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_IDENTITY_PART_AMBIGUOUS_OWNER,
                     description: "Multiple candidate owner object types found for 'OwnedType': 'OwnerTypeA', 'OwnerTypeB'",
@@ -1292,13 +1292,13 @@ public partial class ApiSchemaTests
             ]
         },
 
-        // ApiOwnerIdentityPart throws if a cyclic owner reference is detected
+        // ApiIdentityOwnerPart throws if a cyclic owner reference is detected
         new InitializeThrowsTest
         {
-            Name = $"{nameof(ApiOwnerIdentityPart)} Throws If A Cyclic Owner Reference Is Detected",
+            Name = $"{nameof(ApiIdentityOwnerPart)} Throws If A Cyclic Owner Reference Is Detected",
             SourceJson = @"
             {
-                ""ApiName"": ""ApiOwnerIdentityPart Throws If A Cyclic Owner Reference Is Detected"",
+                ""ApiName"": ""ApiIdentityOwnerPart Throws If A Cyclic Owner Reference Is Detected"",
                 ""ApiScalarTypes"": [],
                 ""ApiEnumTypes"": [],
                 ""ApiObjectTypes"": [
@@ -1330,22 +1330,22 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"CircularIdentityNodeType\"].{nameof(ApiIdentity)}[\"PK_NodeType\"].{nameof(ApiOwnerIdentityPart)}",
+                    path: $"{nameof(ApiObjectType)}[\"CircularIdentityNodeType\"].{nameof(ApiIdentity)}[\"PK_NodeType\"].{nameof(ApiIdentityOwnerPart)}",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_IDENTITY_PART_CYCLIC_OWNER,
                     description: "A cyclic owner identity reference was detected involving 'CircularIdentityNodeType'",
-                    remediation: $"Remove the cyclic {nameof(ApiOwnerIdentityPart)} reference"
+                    remediation: $"Remove the cyclic {nameof(ApiIdentityOwnerPart)} reference"
                 ),
             ]
         },
 
-        // ApiPropertyIdentityPart throws if ApiPropertyName is invalid
+        // ApiIdentityPropertyPart throws if ApiPropertyName is invalid
         new InitializeThrowsTest
         {
-            Name = $"{nameof(ApiPropertyIdentityPart)} Throws If {nameof(ApiPropertyIdentityPart.ApiPropertyName)} Is Invalid",
+            Name = $"{nameof(ApiIdentityPropertyPart)} Throws If {nameof(ApiIdentityPropertyPart.ClrPropertyName)} Is Invalid",
             SourceJson = @"
             {
-                ""ApiName"": ""ApiPropertyIdentityPart Throws If ApiPropertyName Is Invalid"",
+                ""ApiName"": ""ApiIdentityPropertyPart Throws If ApiPropertyName Is Invalid"",
                 ""ApiScalarTypes"": [
                     {
                         ""ApiKind"": ""Scalar"",
@@ -1369,7 +1369,7 @@ public partial class ApiSchemaTests
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": """"
+                                        ""ClrPropertyName"": """"
                                     }
                                 ]
                             }
@@ -1405,22 +1405,22 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"IdentityScalar\"].{nameof(ApiIdentity)}[\"PK_IdentityScalar\"].{nameof(ApiScalarIdentityPart)}",
+                    path: $"{nameof(ApiObjectType)}[\"IdentityScalar\"].{nameof(ApiIdentity)}[\"PK_IdentityScalar\"].{nameof(ApiIdentityScalarPart)}",
                     severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.API_IDENTITY_PART_INVALID_API_PROPERTY_NAME,
-                    description: $"{nameof(ApiPropertyIdentityPart.ApiPropertyName)} must not be null, empty, or whitespace",
-                    remediation: $"Specify a valid {nameof(ApiPropertyIdentityPart.ApiPropertyName)} value"
+                    code: ApiInitializationCode.API_IDENTITY_PART_INVALID_CLR_PROPERTY_NAME,
+                    description: $"{nameof(ApiIdentityPropertyPart.ClrPropertyName)} must not be null, empty, or whitespace",
+                    remediation: $"Specify a valid {nameof(ApiIdentityPropertyPart.ClrPropertyName)} value"
                 ),
             ]
         },
 
-        // ApiPropertyIdentityPart throws if ApiPropertyName is unresolved
+        // ApiIdentityPropertyPart throws if ApiPropertyName is unresolved
         new InitializeThrowsTest
         {
-            Name = $"{nameof(ApiPropertyIdentityPart)} Throws If {nameof(ApiPropertyIdentityPart.ApiPropertyName)} Is Unresolved",
+            Name = $"{nameof(ApiIdentityPropertyPart)} Throws If {nameof(ApiIdentityPropertyPart.ClrPropertyName)} Is Unresolved",
             SourceJson = @"
             {
-                ""ApiName"": ""ApiPropertyIdentityPart Throws If ApiPropertyName Is Unresolved"",
+                ""ApiName"": ""ApiIdentityPropertyPart Throws If ApiPropertyName Is Unresolved"",
                 ""ApiScalarTypes"": [
                     {
                         ""ApiKind"": ""Scalar"",
@@ -1444,7 +1444,7 @@ public partial class ApiSchemaTests
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""DoesNotExist""
+                                        ""ClrPropertyName"": ""DoesNotExist""
                                     }
                                 ]
                             }
@@ -1480,22 +1480,22 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"IdentityScalar\"].{nameof(ApiIdentity)}[\"PK_IdentityScalar\"].{nameof(ApiScalarIdentityPart)}[\"DoesNotExist\"]",
+                    path: $"{nameof(ApiObjectType)}[\"IdentityScalar\"].{nameof(ApiIdentity)}[\"PK_IdentityScalar\"].{nameof(ApiIdentityScalarPart)}[\"DoesNotExist\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_IDENTITY_PART_UNRESOLVED_API_PROPERTY,
-                    description: $"{nameof(ApiPropertyIdentityPart.ApiProperty)} could not be resolved for {nameof(ApiPropertyIdentityPart.ApiPropertyName)}='DoesNotExist'",
-                    remediation: $"Verify that {nameof(ApiPropertyIdentityPart.ApiPropertyName)} refers to a valid property on {nameof(ApiObjectType)}[\"IdentityScalar\"]"
+                    description: $"{nameof(ApiIdentityPropertyPart.ApiProperty)} could not be resolved for {nameof(ApiIdentityPropertyPart.ClrPropertyName)}='DoesNotExist'",
+                    remediation: $"Verify that {nameof(ApiIdentityPropertyPart.ClrPropertyName)} refers to a valid property on {nameof(ApiObjectType)}[\"IdentityScalar\"]"
                 ),
             ]
         },
 
-        // ApiScalarIdentityPart warns if identity part requires string parsing for a non-string scalar type
+        // ApiIdentityScalarPart warns if identity part requires string parsing for a non-string scalar type
         new InitializeThrowsTest
         {
-            Name = $"{nameof(ApiScalarIdentityPart)} Warns If {nameof(String)} Requires Coercion",
+            Name = $"{nameof(ApiIdentityScalarPart)} Warns If {nameof(String)} Requires Coercion",
             SourceJson = @"
             {
-                ""ApiName"": ""ApiScalarIdentityPart Warns If String Requires Coercion"",
+                ""ApiName"": ""ApiIdentityScalarPart Warns If String Requires Coercion"",
                 ""ApiScalarTypes"": [
                     {
                         ""ApiKind"": ""Scalar"",
@@ -1519,7 +1519,7 @@ public partial class ApiSchemaTests
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id"",
+                                        ""ClrPropertyName"": ""Id"",
                                         ""ClrScalarTypeHint"": ""System.String,System.Private.CoreLib""
                                     }
                                 ]
@@ -1564,7 +1564,7 @@ public partial class ApiSchemaTests
                 ),
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"IdentityScalar\"].{nameof(ApiIdentity)}.{nameof(ApiScalarIdentityPart)}[\"Id\"]",
+                    path: $"{nameof(ApiObjectType)}[\"IdentityScalar\"].{nameof(ApiIdentity)}.{nameof(ApiIdentityScalarPart)}[\"Id\"]",
                     severity: ApiInitializationSeverity.Warning,
                     code: ApiInitializationCode.API_IDENTITY_PART_PERFORMANCE_CONCERN,
                     description: $"Identity part 'Id' has CLR property type {nameof(Int32)} but resolves to scalar type {nameof(String)}, requiring string parse/format on every identity operation",
@@ -1573,13 +1573,13 @@ public partial class ApiSchemaTests
             ]
         },
 
-        // ApiScalarIdentityPart throws if the identity property is not an ApiScalarType
+        // ApiIdentityScalarPart throws if the identity property is not an ApiScalarType
         new InitializeThrowsTest
         {
-            Name = $"{nameof(ApiScalarIdentityPart)} Throws If {nameof(ApiScalarIdentityPart.ApiPropertyName)} Is Not An {nameof(ApiScalarType)}",
+            Name = $"{nameof(ApiIdentityScalarPart)} Throws If {nameof(ApiIdentityScalarPart.ClrPropertyName)} Is Not An {nameof(ApiScalarType)}",
             SourceJson = @"
             {
-                ""ApiName"": ""ApiScalarIdentityPart Throws If ApiPropertyName Is Not An ApiScalarType"",
+                ""ApiName"": ""ApiIdentityScalarPart Throws If ApiPropertyName Is Not An ApiScalarType"",
                 ""ApiScalarTypes"": [
                     {
                         ""ApiKind"": ""Scalar"",
@@ -1601,7 +1601,7 @@ public partial class ApiSchemaTests
                             {
                                 ""ApiName"": ""PK_IdentityNested"",
                                 ""ApiIdentityParts"": [
-                                    { ""ApiKind"": ""Scalar"", ""ApiPropertyName"": ""Id"" }
+                                    { ""ApiKind"": ""Scalar"", ""ClrPropertyName"": ""Id"" }
                                 ]
                             }
                         ],
@@ -1629,7 +1629,7 @@ public partial class ApiSchemaTests
                             {
                                 ""ApiName"": ""PK_InvalidScalarPart"",
                                 ""ApiIdentityParts"": [
-                                    { ""ApiKind"": ""Scalar"", ""ApiPropertyName"": ""NestedPart"" }
+                                    { ""ApiKind"": ""Scalar"", ""ClrPropertyName"": ""NestedPart"" }
                                 ]
                             }
                         ],
@@ -1658,11 +1658,11 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"IdentityNestedComposite\"].{nameof(ApiIdentity)}[\"PK_InvalidScalarPart\"].{nameof(ApiScalarIdentityPart)}[\"NestedPart\"]",
+                    path: $"{nameof(ApiObjectType)}[\"IdentityNestedComposite\"].{nameof(ApiIdentity)}[\"PK_InvalidScalarPart\"].{nameof(ApiIdentityScalarPart)}[\"NestedPart\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_IDENTITY_PART_INVALID_API_PROPERTY_TYPE,
                     description: "Property 'NestedPart' must be a scalar type for a scalar identity part",
-                    remediation: $"Use a scalar-typed property or switch to {nameof(ApiNestedIdentityPart)}"
+                    remediation: $"Use a scalar-typed property or switch to {nameof(ApiIdentityNestedPart)}"
                 ),
             ]
         },
@@ -2323,7 +2323,7 @@ public partial class ApiSchemaTests
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id""
+                                        ""ClrPropertyName"": ""Id""
                                     }
                                 ]
                             },
@@ -2332,7 +2332,7 @@ public partial class ApiSchemaTests
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Code""
+                                        ""ClrPropertyName"": ""Code""
                                     }
                                 ]
                             }

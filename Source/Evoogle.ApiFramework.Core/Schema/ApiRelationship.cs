@@ -5,7 +5,6 @@
 // See the LICENSE file in the project root for more information.
 using System.Text.Json.Serialization;
 
-using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.ApiFramework.Schema.Json;
 using Evoogle.Extensions;
@@ -13,30 +12,22 @@ using Evoogle.Extensions;
 namespace Evoogle.ApiFramework.Schema;
 
 /// <summary>
-///     Represents semantic metadata for a named relationship within an <see cref="ApiObjectType"/> that
-///     expresses object-to-object linkage and cardinality.
+///     Abstract base class for all first-class relationships declared at the <see cref="ApiSchema"/> level.
 /// </summary>
 /// <remarks>
-///     <para>
-///         <see cref="ApiRelationship"/> refers to a specific <see cref="ApiProperty"/> on the parent object
-///         and interprets it as a navigational link to another object type. Relationships capture
-///         semantic context (e.g., "customer → orders", "user → roles") that goes beyond the property's
-///         structural definition.
-///     </para>
+///     Concrete subclasses express specific structural kinds:
+///     <see cref="ApiRelationshipOneToOne"/>, <see cref="ApiRelationshipOneToMany"/>,
+///     and <see cref="ApiRelationshipManyToMany"/>.
+///     The <see cref="ApiKind"/> property serves as the JSON polymorphic discriminator.
 /// </remarks>
 [JsonConverter(typeof(ApiRelationshipJsonConverter))]
-public sealed class ApiRelationship
+public abstract class ApiRelationship
 (
     string apiName,
-    string? apiPropertyName = null
+    string? apiDisplayName = null,
+    string? apiDescription = null
 ) : ApiSchemaElement
 {
-    #region ApiRelationship Fields
-    private readonly string? _apiPropertyName = apiPropertyName;
-
-    private ApiProperty? _apiResolvedProperty = null;
-    #endregion
-
     #region ApiSchemaElement Properties
     /// <inheritdoc/>
     protected override string ApiElementName => nameof(ApiRelationship);
@@ -44,64 +35,38 @@ public sealed class ApiRelationship
 
     #region ApiRelationship Properties
     /// <summary>
-    ///     Gets the API name of the relationship.
+    ///     Gets the structural kind of this relationship. Used as the JSON polymorphic discriminator.
     /// </summary>
+    public abstract ApiRelationshipKind ApiKind { get; }
+
+    /// <summary>Gets the API name that uniquely identifies this relationship within the schema.</summary>
     public string ApiName { get; } = apiName;
 
-    /// <summary>
-    ///     Gets the API property name this relationship refers to.
-    ///     If no property name is explicitly provided, defaults to <see cref="ApiName"/>.
-    /// </summary>
-    public string ApiPropertyName => _apiPropertyName ?? this.ApiName;
+    /// <summary>Gets the optional human-readable display name for this relationship.</summary>
+    public string? ApiDisplayName { get; } = apiDisplayName;
 
-    /// <summary>
-    ///     Gets the resolved <see cref="ApiProperty"/> backing this relationship.
-    ///     This property must be resolved first using <see cref="Initialize"/>.
-    /// </summary>
-    /// <exception cref="ApiSchemaException">
-    ///     Thrown if the property has not yet been resolved via <see cref="Initialize"/>.
-    /// </exception>
-    public ApiProperty ApiProperty => this.ThrowIfNotInitialized(_apiResolvedProperty);
-
-    /// <summary>
-    ///     Gets the relationship cardinality (<see cref="ApiRelationshipCardinality.ToOne"/> or <see cref="ApiRelationshipCardinality.ToMany"/>) based on the <see cref="ApiProperty.ApiType"/> kind.
-    /// </summary>
-    /// <exception cref="ApiSchemaException">
-    ///     Thrown if the property type is not an object or collection.
-    /// </exception>
-    public ApiRelationshipCardinality ApiCardinality => this.ApiProperty.ApiType.ApiKind switch
-    {
-        ApiTypeKind.Object => ApiRelationshipCardinality.ToOne,
-        ApiTypeKind.Collection => ApiRelationshipCardinality.ToMany,
-        _ => throw new ApiSchemaException($"Unsupported {nameof(ApiTypeKind)}: {this.ApiProperty.ApiType.ApiKind.SafeToString()} for {this}. Only Object and Collection types are supported.")
-    };
+    /// <summary>Gets the optional description for this relationship.</summary>
+    public string? ApiDescription { get; } = apiDescription;
     #endregion
 
     #region Object Methods
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override string ToString()
     {
         var apiName = this.ApiName.SafeToString();
-        var apiPropertyName = this.ApiPropertyName.SafeToString();
+        var apiKind = this.ApiKind.SafeToString();
         var extensionCount = this.ExtensionCount.SafeToString();
 
-        if (apiName.Equals(apiPropertyName, StringComparison.OrdinalIgnoreCase))
-        {
-            return $"{nameof(ApiRelationship)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ExtensionCount)}={extensionCount}}}";
-        }
-        else
-        {
-            return $"{nameof(ApiRelationship)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ApiPropertyName)}={apiPropertyName}, {nameof(this.ExtensionCount)}={extensionCount}}}";
-        }
+        return $"{nameof(ApiRelationship)} {{{nameof(this.ApiKind)}={apiKind}, {nameof(this.ApiName)}={apiName}, {nameof(this.ExtensionCount)}={extensionCount}}}";
     }
     #endregion
 
     #region ApiSchemaElement Methods
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override string BuildPath(string? apiPreviousPath)
         => ApiSchemaHelpers.BuildPath(basePath: apiPreviousPath, segment: nameof(ApiRelationship), segmentName: this.ApiName);
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     internal override void Initialize(ApiInitializationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
@@ -109,53 +74,21 @@ public sealed class ApiRelationship
         base.Initialize(context);
 
         this.InitializeApiName(context);
-        this.InitializeApiProperty(context);
     }
     #endregion
 
     #region Implementation Methods
     private void InitializeApiName(ApiInitializationContext context)
     {
-        var isApiNameInvalid = ApiSchemaHelpers.IsNameInvalid(this.ApiName);
-        if (isApiNameInvalid)
+        if (!ApiSchemaHelpers.IsNameInvalid(this.ApiName))
         {
-            var path = this.ApiPath;
-            var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.API_RELATIONSHIP_INVALID_NAME;
-            var description = $"{nameof(this.ApiName)} must not be null, empty, or whitespace";
-            var remediation = $"Specify a valid {nameof(this.ApiName)} value";
-
-            context.AddIssue(path, severity, code, description, remediation);
-        }
-    }
-
-    private void InitializeApiProperty(ApiInitializationContext context)
-    {
-        _apiResolvedProperty = null;
-
-        var isApiPropertyNameValid = ApiSchemaHelpers.IsNameValid(this.ApiPropertyName);
-        if (isApiPropertyNameValid)
-        {
-            // Resolve the related API property for the parent API object type.
-            var apiParentObjectType = context.ApiDeclaringObjectType;
-            if (apiParentObjectType.TryGetPropertyByApiName(this.ApiPropertyName, out var apiResolvedProperty))
-            {
-                _apiResolvedProperty = apiResolvedProperty;
-            }
+            return;
         }
 
-        if (_apiResolvedProperty is null)
-        {
-            var apiObjectTypeName = context.ApiDeclaringObjectType.ApiName.SafeToString();
-
-            var path = this.ApiPath;
-            var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.API_RELATIONSHIP_UNRESOLVED_PROPERTY;
-            var description = $"{nameof(this.ApiProperty)} could not be resolved for {nameof(this.ApiPropertyName)}='{this.ApiPropertyName.SafeToString()}' on parent {nameof(ApiObjectType)}='{apiObjectTypeName}'";
-            var remediation = $"Verify that {nameof(this.ApiPropertyName)} refers to a valid property on parent {nameof(ApiObjectType)}='{apiObjectTypeName}'";
-
-            context.AddIssue(path, severity, code, description, remediation);
-        }
+        context.AddIssue(this.ApiPath, ApiInitializationSeverity.Error,
+            ApiInitializationCode.API_RELATIONSHIP_INVALID_API_NAME,
+            $"{nameof(this.ApiName)} must not be null, empty, or whitespace",
+            $"Specify a valid {nameof(this.ApiName)} value");
     }
     #endregion
 }

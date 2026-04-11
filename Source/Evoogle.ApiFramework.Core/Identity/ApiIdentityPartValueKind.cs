@@ -23,11 +23,11 @@ namespace Evoogle.ApiFramework.Identity;
 ///             </listheader>
 ///             <item>
 ///                 <term><see cref="Scalar"/></term>
-///                 <description><see cref="ApiScalarIdentityPartValue"/></description>
+///                 <description><see cref="ApiIdentityScalarPartValue"/></description>
 ///             </item>
 ///             <item>
 ///                 <term><see cref="Object"/></term>
-///                 <description><see cref="ApiObjectIdentityPartValue"/></description>
+///                 <description><see cref="ApiIdentityObjectPartValue"/></description>
 ///             </item>
 ///         </list>
 ///     </para>
@@ -39,8 +39,8 @@ public enum ApiIdentityPartValueKind
     ///     <see cref="string"/>, <see cref="Guid"/>).
     /// </summary>
     /// <remarks>
-    ///     The concrete type is <see cref="ApiScalarIdentityPartValue"/>. Access the underlying value via
-    ///     <see cref="ApiScalarIdentityPartValue.ApiScalarValue"/>.
+    ///     The concrete type is <see cref="ApiIdentityScalarPartValue"/>. Access the underlying value via
+    ///     <see cref="ApiIdentityScalarPartValue.ApiScalarValue"/>.
     /// </remarks>
     Scalar,
 
@@ -50,9 +50,9 @@ public enum ApiIdentityPartValueKind
     ///     identity derived from its owning <c>User</c>).
     /// </summary>
     /// <remarks>
-    ///     The concrete type is <see cref="ApiObjectIdentityPartValue"/>. Access the nested identity via
-    ///     <see cref="ApiObjectIdentityPartValue.ApiObjectValue"/>, which may be <see langword="null"/>
-    ///     when the object part is unresolved. Use <see cref="ApiObjectIdentityPartValue.IsResolved"/>
+    ///     The concrete type is <see cref="ApiIdentityObjectPartValue"/>. Access the nested identity via
+    ///     <see cref="ApiIdentityObjectPartValue.ApiObjectValue"/>, which may be <see langword="null"/>
+    ///     when the object part is unresolved. Use <see cref="ApiIdentityObjectPartValue.IsResolved"/>
     ///     to check before accessing.
     /// </remarks>
     Object

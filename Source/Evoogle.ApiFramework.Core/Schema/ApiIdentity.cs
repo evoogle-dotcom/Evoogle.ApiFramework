@@ -39,11 +39,11 @@ public sealed partial class ApiIdentity(string apiName, IEnumerable<ApiIdentityP
 
     /// <summary>Gets a value indicating whether this identity is defined by a single scalar part.</summary>
     /// <remarks>Mirrors <see cref="Identity.ApiIdentityValue.IsScalarValue"/> at the schema definition level.</remarks>
-    public bool IsScalarDefinition => this.ApiIdentityParts.Length == 1 && this.ApiIdentityParts[0] is ApiScalarIdentityPart;
+    public bool IsScalarDefinition => this.ApiIdentityParts.Length == 1 && this.ApiIdentityParts[0] is ApiIdentityScalarPart;
 
     /// <summary>Gets a value indicating whether this identity is defined by a single object part (nested or owner).</summary>
     /// <remarks>Mirrors <see cref="Identity.ApiIdentityValue.IsObjectValue"/> at the schema definition level.</remarks>
-    public bool IsObjectDefinition => this.ApiIdentityParts.Length == 1 && this.ApiIdentityParts[0] is ApiNestedIdentityPart or ApiOwnerIdentityPart;
+    public bool IsObjectDefinition => this.ApiIdentityParts.Length == 1 && this.ApiIdentityParts[0] is ApiIdentityNestedPart or ApiIdentityOwnerPart;
     #endregion
 
     #region Object Methods
@@ -61,7 +61,7 @@ public sealed partial class ApiIdentity(string apiName, IEnumerable<ApiIdentityP
     #region ApiSchemaElement Methods
     /// <inheritdoc />
     protected override string BuildPath(string? apiPreviousPath)
-        => ApiSchemaHelpers.BuildPath(basePath: apiPreviousPath, segment: nameof(ApiIdentity), segmentName: this.ApiName);
+        => ApiSchemaHelpers.BuildPath(basePath: apiPreviousPath, segment: this.ApiElementName, segmentName: this.ApiName);
 
     /// <inheritdoc />
     internal override void Initialize(ApiInitializationContext context)
@@ -106,27 +106,27 @@ public sealed partial class ApiIdentity(string apiName, IEnumerable<ApiIdentityP
         }
 
         // No duplicate part property names
-        var apiPropertyIdentityParts = this.ApiIdentityParts.Where(x => x is ApiPropertyIdentityPart).Cast<ApiPropertyIdentityPart>();
+        var apiPropertyIdentityParts = this.ApiIdentityParts.Where(x => x is ApiIdentityPropertyPart).Cast<ApiIdentityPropertyPart>();
         ApiSchemaHelpers.ValidateUnique
         (
             parts: apiPropertyIdentityParts,
-            partKeySelector: x => x.ApiPropertyName,
+            partKeySelector: x => x.ClrPropertyName,
             partKeyFilter: x => !string.IsNullOrWhiteSpace(x),
-            partKeyPropertyName: nameof(ApiPropertyIdentityPart.ApiPropertyName),
+            partKeyPropertyName: nameof(ApiIdentityPropertyPart.ClrPropertyName),
             path: this.ApiPath,
             code: ApiInitializationCode.API_IDENTITY_DUPLICATE_PART_API_PROPERTY_NAME,
             context: context
         );
 
         // At most one parent part allowed
-        var ownerPartCount = this.ApiIdentityParts.Count(x => x is ApiOwnerIdentityPart);
+        var ownerPartCount = this.ApiIdentityParts.Count(x => x is ApiIdentityOwnerPart);
         if (ownerPartCount > 1)
         {
             var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_IDENTITY_MULTIPLE_OWNER_PARTS;
-            var description = $"An {nameof(ApiIdentity)} may contain at most one {nameof(ApiOwnerIdentityPart)}, but {ownerPartCount} were found";
-            var remediation = $"Remove the extra {nameof(ApiOwnerIdentityPart)} instances, leaving exactly one";
+            var description = $"An {nameof(ApiIdentity)} may contain at most one {nameof(ApiIdentityOwnerPart)}, but {ownerPartCount} were found";
+            var remediation = $"Remove the extra {nameof(ApiIdentityOwnerPart)} instances, leaving exactly one";
 
             context.AddIssue(path, severity, code, description, remediation);
         }

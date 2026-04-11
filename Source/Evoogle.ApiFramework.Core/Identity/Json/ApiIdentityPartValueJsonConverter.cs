@@ -47,9 +47,9 @@ public sealed class ApiIdentityPartValueJsonConverter(ILogger<ApiIdentityPartVal
                 {
                     ApiName = policy.ConvertName(nameof(Identity.ApiIdentityPartValue.ApiName)),
                     ApiKind = policy.ConvertName(nameof(Identity.ApiIdentityPartValue.ApiKind)),
-                    ApiObjectValue = policy.ConvertName(nameof(ApiObjectIdentityPartValue.ApiObjectValue)),
-                    ApiStructure = policy.ConvertName(nameof(ApiObjectIdentityPartValue.ApiStructure)),
-                    ApiScalarValue = policy.ConvertName(nameof(ApiScalarIdentityPartValue.ApiScalarValue)),
+                    ApiObjectValue = policy.ConvertName(nameof(ApiIdentityObjectPartValue.ApiObjectValue)),
+                    ApiStructure = policy.ConvertName(nameof(ApiIdentityObjectPartValue.ApiStructure)),
+                    ApiScalarValue = policy.ConvertName(nameof(ApiIdentityScalarPartValue.ApiScalarValue)),
                 }
             };
         #endregion
@@ -192,11 +192,11 @@ public sealed class ApiIdentityPartValueJsonConverter(ILogger<ApiIdentityPartVal
             switch (apiKind.Value)
             {
                 case ApiIdentityPartValueKind.Scalar:
-                    apiIdentityPartValue = new ApiScalarIdentityPartValue(apiName!, apiScalarValue);
+                    apiIdentityPartValue = new ApiIdentityScalarPartValue(apiName!, apiScalarValue);
                     break;
 
                 case ApiIdentityPartValueKind.Object:
-                    apiIdentityPartValue = new ApiObjectIdentityPartValue(apiName!, apiObjectValue, apiStructure?.ToArray());
+                    apiIdentityPartValue = new ApiIdentityObjectPartValue(apiName!, apiObjectValue, apiStructure?.ToArray());
                     break;
 
                 default:
@@ -259,7 +259,7 @@ public sealed class ApiIdentityPartValueJsonConverter(ILogger<ApiIdentityPartVal
         var value = default(ApiIdentityValue?);
         if (apiKind == ApiIdentityPartValueKind.Object)
         {
-            var apiObjectIdentityPartValue = (ApiObjectIdentityPartValue)apiIdentityPartValue;
+            var apiObjectIdentityPartValue = (ApiIdentityObjectPartValue)apiIdentityPartValue;
             value = apiObjectIdentityPartValue.ApiObjectValue;
         }
 
@@ -276,7 +276,7 @@ public sealed class ApiIdentityPartValueJsonConverter(ILogger<ApiIdentityPartVal
         var value = default(ApiIdentityPartValue[]?);
         if (apiKind == ApiIdentityPartValueKind.Object)
         {
-            var apiObjectIdentityPartValue = (ApiObjectIdentityPartValue)apiIdentityPartValue;
+            var apiObjectIdentityPartValue = (ApiIdentityObjectPartValue)apiIdentityPartValue;
             value = apiObjectIdentityPartValue.ApiStructure;
         }
 
@@ -299,7 +299,7 @@ public sealed class ApiIdentityPartValueJsonConverter(ILogger<ApiIdentityPartVal
         var value = default(ApiId?);
         if (apiKind == ApiIdentityPartValueKind.Scalar)
         {
-            var apiScalarIdentityPartValue = (ApiScalarIdentityPartValue)apiIdentityPartValue;
+            var apiScalarIdentityPartValue = (ApiIdentityScalarPartValue)apiIdentityPartValue;
             value = apiScalarIdentityPartValue.ApiScalarValue;
         }
 

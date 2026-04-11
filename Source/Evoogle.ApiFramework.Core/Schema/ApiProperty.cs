@@ -22,8 +22,7 @@ namespace Evoogle.ApiFramework.Schema;
 /// <remarks>
 ///     <para>
 ///         <see cref="ApiProperty"/> captures type-level structure for fields such as primitives,
-///         objects, collections, and complex types. Properties may be referenced by one or more
-///         <see cref="ApiRelationship"/> instances to convey semantic meaning (e.g., parent-child, references).
+///         objects, collections, and complex types.
 ///     </para>
 ///     <para>
 ///         For optimal performance, getter and setter accessors are compiled once during initialization
@@ -164,7 +163,7 @@ public sealed partial class ApiProperty
     #region ApiSchemaElement Methods
     /// <inheritdoc />
     protected override string BuildPath(string? apiPreviousPath)
-        => ApiSchemaHelpers.BuildPath(basePath: apiPreviousPath, segment: nameof(ApiProperty), segmentName: this.ApiName);
+        => ApiSchemaHelpers.BuildPath(basePath: apiPreviousPath, segment: this.ApiElementName, segmentName: this.ApiName);
 
     /// <inheritdoc />
     internal override void Initialize(ApiInitializationContext context)

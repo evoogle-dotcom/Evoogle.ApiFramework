@@ -10,13 +10,12 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 /// </summary>
 /// <param name="clrType">The CLR type represented by the API object type.</param>
 /// <param name="context">The shared builder context.</param>
-public sealed class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
+public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     : ApiNamedTypeBuilder<ApiObjectTypeBuilder>(clrType, context)
 {
     #region Fields
     private readonly List<ApiIdentityBuilder> _apiIdentityBuilders = [];
     private readonly List<ApiPropertyBuilder> _apiPropertyBuilders = [];
-    private readonly List<ApiRelationshipBuilder> _apiRelationshipBuilders = [];
     private Action<ApiObjectTypeOptionsBuilder>? _apiOptionsConfiguration = null;
     #endregion
 
@@ -60,24 +59,6 @@ public sealed class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext c
     }
 
     /// <summary>
-    ///     Adds an <see cref="ApiRelationship"/> definition to the object type.
-    /// </summary>
-    /// <param name="apiName">The API name of the relationship.</param>
-    /// <param name="apiPropertyName">Optional API property name backing the relationship.</param>
-    /// <param name="configure">Optional callback to configure the added relationship.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiObjectTypeBuilder AddRelationship(string apiName, string? apiPropertyName = null, Action<ApiRelationshipBuilder>? configure = null)
-    {
-        var apiRelationshipBuilder = new ApiRelationshipBuilder(apiName, apiPropertyName);
-
-        configure?.Invoke(apiRelationshipBuilder);
-
-        _apiRelationshipBuilders.Add(apiRelationshipBuilder);
-
-        return this;
-    }
-
-    /// <summary>
     ///     Resets the object type options to their schema-wide defaults.
     /// </summary>
     /// <returns>The current builder instance.</returns>
@@ -116,16 +97,12 @@ public sealed class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext c
         var apiProperties = _apiPropertyBuilders
             .Select(b => b.Build(clrObjectType));
 
-        var apiRelationships = _apiRelationshipBuilders
-            .Select(b => b.Build());
-
         var apiObjectType = new ApiObjectType
         (
             apiName,
             apiOptions,
             apiIdentities,
             apiProperties,
-            apiRelationships,
             clrObjectType
         );
 
@@ -141,6 +118,16 @@ public sealed class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext c
     #endregion
 
     #region Implementation Methods
+    /// <summary>
+    ///     Adds a pre-constructed identity builder to this object type, allowing subclasses to inject
+    ///     typed builders without bypassing internal list management.
+    /// </summary>
+    protected void AddIdentityBuilderCore(ApiIdentityBuilder builder)
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+        _apiIdentityBuilders.Add(builder);
+    }
+
     private ApiObjectTypeOptions? BuildOptions()
     {
         if (_apiOptionsConfiguration == null)

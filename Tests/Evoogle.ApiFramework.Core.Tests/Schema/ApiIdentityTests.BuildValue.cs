@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -253,7 +253,7 @@ public partial class ApiIdentityTests
             ClrInstance = ScalarInstance,
             ExpectedValue = ApiIdentityValue.Composite(
             [
-                new ApiScalarIdentityPartValue("Id", ApiId.FromInt32(42))
+                new ApiIdentityScalarPartValue("Id", ApiId.FromInt32(42))
             ])
         },
 
@@ -266,7 +266,7 @@ public partial class ApiIdentityTests
             ClrInstance = ScalarInstance,
             ExpectedValue = ApiIdentityValue.Composite(
             [
-                new ApiScalarIdentityPartValue("Name", ApiId.FromString("TestName"))
+                new ApiIdentityScalarPartValue("Name", ApiId.FromString("TestName"))
             ])
         },
 
@@ -278,8 +278,8 @@ public partial class ApiIdentityTests
             ClrInstance = TwoPartInstance,
             ExpectedValue = ApiIdentityValue.Composite(
             [
-                new ApiScalarIdentityPartValue("Id1", ApiId.FromInt32(1)),
-                new ApiScalarIdentityPartValue("Id2", ApiId.FromString("abc"))
+                new ApiIdentityScalarPartValue("Id1", ApiId.FromInt32(1)),
+                new ApiIdentityScalarPartValue("Id2", ApiId.FromString("abc"))
             ])
         },
 
@@ -291,9 +291,9 @@ public partial class ApiIdentityTests
             ClrInstance = ThreePartInstance,
             ExpectedValue = ApiIdentityValue.Composite(
             [
-                new ApiScalarIdentityPartValue("Id1", ApiId.FromInt32(10)),
-                new ApiScalarIdentityPartValue("Id2", ApiId.FromString("xyz")),
-                new ApiScalarIdentityPartValue("Id3", ApiId.FromGuid(Guid.Parse("11111111-1111-1111-1111-111111111111")))
+                new ApiIdentityScalarPartValue("Id1", ApiId.FromInt32(10)),
+                new ApiIdentityScalarPartValue("Id2", ApiId.FromString("xyz")),
+                new ApiIdentityScalarPartValue("Id3", ApiId.FromGuid(Guid.Parse("11111111-1111-1111-1111-111111111111")))
             ])
         },
 
@@ -305,12 +305,12 @@ public partial class ApiIdentityTests
             ClrInstance = NestedCompositeInstance,
             ExpectedValue = ApiIdentityValue.Composite(
             [
-                new ApiObjectIdentityPartValue("NestedPart",
+                new ApiIdentityObjectPartValue("NestedPart",
                     ApiIdentityValue.Composite(
                     [
-                        new ApiScalarIdentityPartValue("Id", ApiId.FromInt32(5))
+                        new ApiIdentityScalarPartValue("Id", ApiId.FromInt32(5))
                     ])),
-                new ApiScalarIdentityPartValue("Name", ApiId.FromString("Nested"))
+                new ApiIdentityScalarPartValue("Name", ApiId.FromString("Nested"))
             ])
         },
 
@@ -323,12 +323,12 @@ public partial class ApiIdentityTests
             ClrOwnerInstance = OwnerInstance,
             ExpectedValue = ApiIdentityValue.Composite(
             [
-                new ApiObjectIdentityPartValue("IdentityOwner",
+                new ApiIdentityObjectPartValue("IdentityOwner",
                     ApiIdentityValue.Composite(
                     [
-                        new ApiScalarIdentityPartValue("Id", ApiId.FromInt32(99))
+                        new ApiIdentityScalarPartValue("Id", ApiId.FromInt32(99))
                     ])),
-                new ApiScalarIdentityPartValue("LineNumber", ApiId.FromInt32(3))
+                new ApiIdentityScalarPartValue("LineNumber", ApiId.FromInt32(3))
             ])
         },
 
@@ -341,10 +341,10 @@ public partial class ApiIdentityTests
             ClrOwnerInstance = OwnerInstance,
             ExpectedValue = ApiIdentityValue.Composite(
             [
-                new ApiObjectIdentityPartValue("IdentityOwner",
+                new ApiIdentityObjectPartValue("IdentityOwner",
                     ApiIdentityValue.Composite(
                     [
-                        new ApiScalarIdentityPartValue("Id", ApiId.FromInt32(99))
+                        new ApiIdentityScalarPartValue("Id", ApiId.FromInt32(99))
                     ]))
             ])
         },
@@ -358,8 +358,8 @@ public partial class ApiIdentityTests
             NullHandling = ApiIdentityNullHandling.ReturnEmpty,
             ExpectedValue = ApiIdentityValue.Composite(
             [
-                new ApiScalarIdentityPartValue("Id1", ApiId.FromInt32(1)),
-                new ApiScalarIdentityPartValue("Id2", ApiId.Empty)
+                new ApiIdentityScalarPartValue("Id1", ApiId.FromInt32(1)),
+                new ApiIdentityScalarPartValue("Id2", ApiId.Empty)
             ])
         },
 
@@ -372,11 +372,11 @@ public partial class ApiIdentityTests
             NullHandling = ApiIdentityNullHandling.ReturnEmpty,
             ExpectedValue = ApiIdentityValue.Composite(
             [
-                new ApiObjectIdentityPartValue("NestedPart", apiObjectValue: null, apiStructure:
+                new ApiIdentityObjectPartValue("NestedPart", apiObjectValue: null, apiStructure:
                 [
-                    new ApiScalarIdentityPartValue("Id", ApiId.Empty)
+                    new ApiIdentityScalarPartValue("Id", ApiId.Empty)
                 ]),
-                new ApiScalarIdentityPartValue("Name", ApiId.FromString("NoNested"))
+                new ApiIdentityScalarPartValue("Name", ApiId.FromString("NoNested"))
             ])
         },
 
@@ -390,11 +390,11 @@ public partial class ApiIdentityTests
             NullHandling = ApiIdentityNullHandling.ReturnEmpty,
             ExpectedValue = ApiIdentityValue.Composite(
             [
-                new ApiObjectIdentityPartValue("IdentityOwner", apiObjectValue: null, apiStructure:
+                new ApiIdentityObjectPartValue("IdentityOwner", apiObjectValue: null, apiStructure:
                 [
-                    new ApiScalarIdentityPartValue("Id", ApiId.Empty)
+                    new ApiIdentityScalarPartValue("Id", ApiId.Empty)
                 ]),
-                new ApiScalarIdentityPartValue("LineNumber", ApiId.FromInt32(3))
+                new ApiIdentityScalarPartValue("LineNumber", ApiId.FromInt32(3))
             ])
         },
 
@@ -443,7 +443,7 @@ public partial class ApiIdentityTests
             Values = new Dictionary<string, object?> { ["Id"] = 42 },
             ExpectedValue = ApiIdentityValue.Composite(
             [
-                new ApiScalarIdentityPartValue("Id", ApiId.FromInt32(42))
+                new ApiIdentityScalarPartValue("Id", ApiId.FromInt32(42))
             ])
         },
 
@@ -456,7 +456,7 @@ public partial class ApiIdentityTests
             Values = new Dictionary<string, object?> { ["Name"] = "TestName" },
             ExpectedValue = ApiIdentityValue.Composite(
             [
-                new ApiScalarIdentityPartValue("Name", ApiId.FromString("TestName"))
+                new ApiIdentityScalarPartValue("Name", ApiId.FromString("TestName"))
             ])
         },
 
@@ -468,8 +468,8 @@ public partial class ApiIdentityTests
             Values = new Dictionary<string, object?> { ["Id1"] = 1, ["Id2"] = "abc" },
             ExpectedValue = ApiIdentityValue.Composite(
             [
-                new ApiScalarIdentityPartValue("Id1", ApiId.FromInt32(1)),
-                new ApiScalarIdentityPartValue("Id2", ApiId.FromString("abc"))
+                new ApiIdentityScalarPartValue("Id1", ApiId.FromInt32(1)),
+                new ApiIdentityScalarPartValue("Id2", ApiId.FromString("abc"))
             ])
         },
 
@@ -486,9 +486,9 @@ public partial class ApiIdentityTests
             },
             ExpectedValue = ApiIdentityValue.Composite(
             [
-                new ApiScalarIdentityPartValue("Id1", ApiId.FromInt32(10)),
-                new ApiScalarIdentityPartValue("Id2", ApiId.FromString("xyz")),
-                new ApiScalarIdentityPartValue("Id3", ApiId.FromGuid(Guid.Parse("11111111-1111-1111-1111-111111111111")))
+                new ApiIdentityScalarPartValue("Id1", ApiId.FromInt32(10)),
+                new ApiIdentityScalarPartValue("Id2", ApiId.FromString("xyz")),
+                new ApiIdentityScalarPartValue("Id3", ApiId.FromGuid(Guid.Parse("11111111-1111-1111-1111-111111111111")))
             ])
         },
 
@@ -504,12 +504,12 @@ public partial class ApiIdentityTests
             },
             ExpectedValue = ApiIdentityValue.Composite(
             [
-                new ApiObjectIdentityPartValue("NestedPart",
+                new ApiIdentityObjectPartValue("NestedPart",
                     ApiIdentityValue.Composite(
                     [
-                        new ApiScalarIdentityPartValue("Id", ApiId.FromInt32(5))
+                        new ApiIdentityScalarPartValue("Id", ApiId.FromInt32(5))
                     ])),
-                new ApiScalarIdentityPartValue("Name", ApiId.FromString("Nested"))
+                new ApiIdentityScalarPartValue("Name", ApiId.FromString("Nested"))
             ])
         },
 
@@ -525,12 +525,12 @@ public partial class ApiIdentityTests
             },
             ExpectedValue = ApiIdentityValue.Composite(
             [
-                new ApiObjectIdentityPartValue("NestedPart",
+                new ApiIdentityObjectPartValue("NestedPart",
                     ApiIdentityValue.Composite(
                     [
-                        new ApiScalarIdentityPartValue("Id", ApiId.FromInt32(5))
+                        new ApiIdentityScalarPartValue("Id", ApiId.FromInt32(5))
                     ])),
-                new ApiScalarIdentityPartValue("Name", ApiId.FromString("Nested"))
+                new ApiIdentityScalarPartValue("Name", ApiId.FromString("Nested"))
             ])
         },
 
@@ -543,12 +543,12 @@ public partial class ApiIdentityTests
             OwnerValues = new Dictionary<string, object?> { ["Id"] = 99 },
             ExpectedValue = ApiIdentityValue.Composite(
             [
-                new ApiObjectIdentityPartValue("IdentityOwner",
+                new ApiIdentityObjectPartValue("IdentityOwner",
                     ApiIdentityValue.Composite(
                     [
-                        new ApiScalarIdentityPartValue("Id", ApiId.FromInt32(99))
+                        new ApiIdentityScalarPartValue("Id", ApiId.FromInt32(99))
                     ])),
-                new ApiScalarIdentityPartValue("LineNumber", ApiId.FromInt32(3))
+                new ApiIdentityScalarPartValue("LineNumber", ApiId.FromInt32(3))
             ])
         },
 
@@ -561,10 +561,10 @@ public partial class ApiIdentityTests
             OwnerValues = new Dictionary<string, object?> { ["Id"] = 99 },
             ExpectedValue = ApiIdentityValue.Composite(
             [
-                new ApiObjectIdentityPartValue("IdentityOwner",
+                new ApiIdentityObjectPartValue("IdentityOwner",
                     ApiIdentityValue.Composite(
                     [
-                        new ApiScalarIdentityPartValue("Id", ApiId.FromInt32(99))
+                        new ApiIdentityScalarPartValue("Id", ApiId.FromInt32(99))
                     ]))
             ])
         },
@@ -578,8 +578,8 @@ public partial class ApiIdentityTests
             NullHandling = ApiIdentityNullHandling.ReturnEmpty,
             ExpectedValue = ApiIdentityValue.Composite(
             [
-                new ApiScalarIdentityPartValue("Id1", ApiId.FromInt32(1)),
-                new ApiScalarIdentityPartValue("Id2", ApiId.Empty)
+                new ApiIdentityScalarPartValue("Id1", ApiId.FromInt32(1)),
+                new ApiIdentityScalarPartValue("Id2", ApiId.Empty)
             ])
         },
 
@@ -592,8 +592,8 @@ public partial class ApiIdentityTests
             NullHandling = ApiIdentityNullHandling.ReturnEmpty,
             ExpectedValue = ApiIdentityValue.Composite(
             [
-                new ApiScalarIdentityPartValue("Id1", ApiId.FromInt32(1)),
-                new ApiScalarIdentityPartValue("Id2", ApiId.Empty)
+                new ApiIdentityScalarPartValue("Id1", ApiId.FromInt32(1)),
+                new ApiIdentityScalarPartValue("Id2", ApiId.Empty)
             ])
         },
 
@@ -606,11 +606,11 @@ public partial class ApiIdentityTests
             NullHandling = ApiIdentityNullHandling.ReturnEmpty,
             ExpectedValue = ApiIdentityValue.Composite(
             [
-                new ApiObjectIdentityPartValue("NestedPart", apiObjectValue: null, apiStructure:
+                new ApiIdentityObjectPartValue("NestedPart", apiObjectValue: null, apiStructure:
                 [
-                    new ApiScalarIdentityPartValue("Id", ApiId.Empty)
+                    new ApiIdentityScalarPartValue("Id", ApiId.Empty)
                 ]),
-                new ApiScalarIdentityPartValue("Name", ApiId.FromString("NoNested"))
+                new ApiIdentityScalarPartValue("Name", ApiId.FromString("NoNested"))
             ])
         },
 
@@ -624,11 +624,11 @@ public partial class ApiIdentityTests
             NullHandling = ApiIdentityNullHandling.ReturnEmpty,
             ExpectedValue = ApiIdentityValue.Composite(
             [
-                new ApiObjectIdentityPartValue("IdentityOwner", apiObjectValue: null, apiStructure:
+                new ApiIdentityObjectPartValue("IdentityOwner", apiObjectValue: null, apiStructure:
                 [
-                    new ApiScalarIdentityPartValue("Id", ApiId.Empty)
+                    new ApiIdentityScalarPartValue("Id", ApiId.Empty)
                 ]),
-                new ApiScalarIdentityPartValue("LineNumber", ApiId.FromInt32(3))
+                new ApiIdentityScalarPartValue("LineNumber", ApiId.FromInt32(3))
             ])
         },
 

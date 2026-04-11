@@ -524,11 +524,6 @@ public partial class ApiTypeTests
                             ClrName: nameof(Company.Employees),
                             ClrMemberKind: ClrMemberKind.Property
                         ),
-                    ],
-                    ApiRelationships:
-                    [
-                        new ApiRelationshipConfig(ApiName: "OwnedBy", ApiPropertyName: nameof(Company.Owner)),
-                        new ApiRelationshipConfig(ApiName: nameof(Company.Employees))
                     ]
                 )
             )
@@ -839,11 +834,6 @@ public partial class ApiTypeTests
                             ClrName: nameof(Company.Employees),
                             ClrMemberKind: ClrMemberKind.Property
                         ),
-                    ],
-                    ApiRelationships:
-                    [
-                        new ApiRelationshipConfig(ApiName: "OwnedBy", ApiPropertyName: nameof(Company.Owner)),
-                        new ApiRelationshipConfig(ApiName: nameof(Company.Employees))
                     ]
                 )
             )

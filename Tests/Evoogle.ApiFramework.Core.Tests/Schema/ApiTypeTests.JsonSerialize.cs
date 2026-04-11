@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -493,7 +493,6 @@ public partial class ApiTypeTests
                         ""ClrMemberKind"": ""Field""
                     }
                 ],
-                ""ApiRelationships"": [],
                 ""ClrType"": ""Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Core.Tests""
             }"
         },
@@ -641,7 +640,6 @@ public partial class ApiTypeTests
                         ""ClrMemberKind"": ""Field""
                     }
                 ],
-                ""ApiRelationships"": [],
                 ""ClrType"": ""Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Core.Tests""
             }"
         },
@@ -783,7 +781,6 @@ public partial class ApiTypeTests
                         ""ClrMemberKind"": ""Field""
                     }
                 ],
-                ""ApiRelationships"": [],
                 ""ClrType"": ""Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Core.Tests"",
                 ""Extensions"": {
                     ""Evoogle.ApiFramework.TestData.GraphQlExtension, Evoogle.ApiFramework.Core.Tests"": {
@@ -882,11 +879,6 @@ public partial class ApiTypeTests
                             ClrName: nameof(Company.Employees),
                             ClrMemberKind: ClrMemberKind.Property
                         ),
-                    ],
-                    ApiRelationships:
-                    [
-                        new ApiRelationshipConfig(ApiName: "OwnedBy", ApiPropertyName: nameof(Company.Owner)),
-                        new ApiRelationshipConfig(ApiName: nameof(Company.Employees))
                     ]
                 )
             ),
@@ -900,7 +892,7 @@ public partial class ApiTypeTests
                         ""ApiIdentityParts"": [
                             {
                                 ""ApiKind"": ""Scalar"",
-                                ""ApiPropertyName"": ""Id"",
+                                ""ClrPropertyName"": ""Id"",
                                 ""ClrScalarTypeHint"": ""System.String,System.Private.CoreLib""
                             }
                         ]
@@ -910,7 +902,7 @@ public partial class ApiTypeTests
                         ""ApiIdentityParts"": [
                             {
                                 ""ApiKind"": ""Scalar"",
-                                ""ApiPropertyName"": ""Name""
+                                ""ClrPropertyName"": ""Name""
                             }
                         ]
                     }
@@ -962,15 +954,6 @@ public partial class ApiTypeTests
                         ""ApiTypeModifiers"": ""None"",
                         ""ClrName"": ""Employees"",
                         ""ClrMemberKind"": ""Property""
-                    }
-                ],
-                ""ApiRelationships"": [
-                    {
-                        ""ApiName"": ""OwnedBy"",
-                        ""ApiPropertyName"": ""Owner""
-                    },
-                    {
-                        ""ApiName"": ""Employees""
                     }
                 ],
                 ""ClrType"": ""Evoogle.ApiFramework.TestData.Company, Evoogle.ApiFramework.Core.Tests""
@@ -1108,7 +1091,6 @@ public partial class ApiTypeTests
                         ""ClrMemberKind"": ""Field""
                     }
                 ],
-                ""ApiRelationships"": [],
                 ""ClrType"": ""Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Core.Tests""
             }"
         },
@@ -1250,7 +1232,6 @@ public partial class ApiTypeTests
                         ""ClrMemberKind"": ""Field""
                     }
                 ],
-                ""ApiRelationships"": [],
                 ""ClrType"": ""Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Core.Tests""
             }"
         },
@@ -1386,7 +1367,6 @@ public partial class ApiTypeTests
                         ""ClrMemberKind"": ""Field""
                     }
                 ],
-                ""ApiRelationships"": [],
                 ""ClrType"": ""Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Core.Tests"",
                 ""Extensions"": {
                     ""Evoogle.ApiFramework.TestData.GraphQlExtension, Evoogle.ApiFramework.Core.Tests"": {
@@ -1485,11 +1465,6 @@ public partial class ApiTypeTests
                             ClrName: nameof(Company.Employees),
                             ClrMemberKind: ClrMemberKind.Property
                         ),
-                    ],
-                    ApiRelationships:
-                    [
-                        new ApiRelationshipConfig(ApiName: "OwnedBy", ApiPropertyName: nameof(Company.Owner)),
-                        new ApiRelationshipConfig(ApiName: nameof(Company.Employees))
                     ]
                 )
             ),
@@ -1503,7 +1478,7 @@ public partial class ApiTypeTests
                         ""ApiIdentityParts"": [
                             {
                                 ""ApiKind"": ""Scalar"",
-                                ""ApiPropertyName"": ""Id"",
+                                ""ClrPropertyName"": ""Id"",
 					            ""ClrScalarTypeHint"": ""System.String,System.Private.CoreLib""
                             }
                         ]
@@ -1513,7 +1488,7 @@ public partial class ApiTypeTests
                         ""ApiIdentityParts"": [
                             {
                                 ""ApiKind"": ""Scalar"",
-                                ""ApiPropertyName"": ""Name""
+                                ""ClrPropertyName"": ""Name""
                             }
                         ]
                     }
@@ -1561,15 +1536,6 @@ public partial class ApiTypeTests
                         ""ApiTypeModifiers"": ""None"",
                         ""ClrName"": ""Employees"",
                         ""ClrMemberKind"": ""Property""
-                    }
-                ],
-                ""ApiRelationships"": [
-                    {
-                        ""ApiName"": ""OwnedBy"",
-                        ""ApiPropertyName"": ""Owner""
-                    },
-                    {
-                        ""ApiName"": ""Employees""
                     }
                 ],
                 ""ClrType"": ""Evoogle.ApiFramework.TestData.Company, Evoogle.ApiFramework.Core.Tests""

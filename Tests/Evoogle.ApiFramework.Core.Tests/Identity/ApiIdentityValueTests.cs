@@ -24,11 +24,11 @@ public partial class ApiIdentityValueTests(ITestOutputHelper output) : XUnitTest
         public required string ApiName { get; init; }
         public required ApiIdentityPartValueKind ApiKind { get; init; }
 
-        // ApiObjectIdentityPartValue
+        // ApiIdentityObjectPartValue
         public ApiIdentityValueConfig? ApiObjectValue { get; init; }
         public ApiIdentityPartValueConfig[]? ApiStructure { get; init; }
 
-        // ApiScalarIdentityPartValue
+        // ApiIdentityScalarPartValue
         public ApiId? ApiScalarValue { get; init; }
     };
 
@@ -109,7 +109,7 @@ public partial class ApiIdentityValueTests(ITestOutputHelper output) : XUnitTest
         switch (apiKind)
         {
             case ApiIdentityPartValueKind.Scalar:
-                return new ApiScalarIdentityPartValue(apiName, config.ApiScalarValue.GetValueOrDefault());
+                return new ApiIdentityScalarPartValue(apiName, config.ApiScalarValue.GetValueOrDefault());
 
             case ApiIdentityPartValueKind.Object:
                 var apiObjectValue = config.ApiObjectValue is not null
@@ -118,7 +118,7 @@ public partial class ApiIdentityValueTests(ITestOutputHelper output) : XUnitTest
 
                 var apiStructure = config.ApiStructure?.Select(CreateApiIdentityPartValue);
 
-                return new ApiObjectIdentityPartValue(apiName, apiObjectValue, apiStructure);
+                return new ApiIdentityObjectPartValue(apiName, apiObjectValue, apiStructure);
 
             default:
                 throw new ArgumentException($"Unsupported ApiIdentityPartValueKind: {apiKind}. ApiName: {apiName}");
@@ -137,77 +137,77 @@ public partial class ApiIdentityValueTests(ITestOutputHelper output) : XUnitTest
         ApiIdentityValue.Object("User", ApiIdentityValue.Scalar("Id", ApiId.FromInt32(42)));
 
     private static ApiIdentityValue ObjectSinglePartUnresolved { get; } =
-        new ApiIdentityValue([new ApiObjectIdentityPartValue("User", apiObjectValue: null)]);
+        new ApiIdentityValue([new ApiIdentityObjectPartValue("User", apiObjectValue: null)]);
 
     private static ApiIdentityValue CompositeWithScalarParts { get; } =
         ApiIdentityValue.Composite(
         [
-            new ApiScalarIdentityPartValue("CustomerId", ApiId.FromInt32(42)),
-            new ApiScalarIdentityPartValue("OrderNumber", ApiId.FromInt32(1001))
+            new ApiIdentityScalarPartValue("CustomerId", ApiId.FromInt32(42)),
+            new ApiIdentityScalarPartValue("OrderNumber", ApiId.FromInt32(1001))
         ]);
 
     private static ApiIdentityValue CompositeWithObjectParts { get; } =
         ApiIdentityValue.Composite(
         [
-            new ApiObjectIdentityPartValue("Customer",
+            new ApiIdentityObjectPartValue("Customer",
                 ApiIdentityValue.Composite(
                 [
-                    new ApiObjectIdentityPartValue("Country",
+                    new ApiIdentityObjectPartValue("Country",
                         ApiIdentityValue.Composite(
                         [
-                            new ApiScalarIdentityPartValue("Id", ApiId.FromInt32(1))
+                            new ApiIdentityScalarPartValue("Id", ApiId.FromInt32(1))
                         ])),
-                    new ApiScalarIdentityPartValue("CustomerId", ApiId.FromInt32(42))
+                    new ApiIdentityScalarPartValue("CustomerId", ApiId.FromInt32(42))
                 ])),
-            new ApiScalarIdentityPartValue("OrderNumber", ApiId.FromInt32(1001))
+            new ApiIdentityScalarPartValue("OrderNumber", ApiId.FromInt32(1001))
         ]);
 
     private static ApiIdentityValue CompositeWithUnresolvedObjectParts { get; } =
         ApiIdentityValue.Composite(
         [
-            new ApiObjectIdentityPartValue("Customer", apiObjectValue: null, apiStructure:
+            new ApiIdentityObjectPartValue("Customer", apiObjectValue: null, apiStructure:
             [
-                new ApiObjectIdentityPartValue("Country", apiObjectValue: null, apiStructure:
+                new ApiIdentityObjectPartValue("Country", apiObjectValue: null, apiStructure:
                 [
-                    new ApiScalarIdentityPartValue("Id", ApiId.Empty)
+                    new ApiIdentityScalarPartValue("Id", ApiId.Empty)
                 ]),
-                new ApiScalarIdentityPartValue("CustomerId", ApiId.Empty)
+                new ApiIdentityScalarPartValue("CustomerId", ApiId.Empty)
             ]),
-            new ApiScalarIdentityPartValue("OrderNumber", ApiId.Empty)
+            new ApiIdentityScalarPartValue("OrderNumber", ApiId.Empty)
         ]);
 
     private static ApiIdentityValue CompositeWithPartiallyUnresolvedObjectParts { get; } =
         ApiIdentityValue.Composite(
         [
-            new ApiObjectIdentityPartValue("Customer", apiObjectValue: null, apiStructure:
+            new ApiIdentityObjectPartValue("Customer", apiObjectValue: null, apiStructure:
             [
-                new ApiObjectIdentityPartValue("Country", apiObjectValue: null, apiStructure:
+                new ApiIdentityObjectPartValue("Country", apiObjectValue: null, apiStructure:
                 [
-                    new ApiScalarIdentityPartValue("Id", ApiId.Empty)
+                    new ApiIdentityScalarPartValue("Id", ApiId.Empty)
                 ]),
-                new ApiScalarIdentityPartValue("CustomerId", ApiId.Empty)
+                new ApiIdentityScalarPartValue("CustomerId", ApiId.Empty)
             ]),
-            new ApiScalarIdentityPartValue("OrderNumber", ApiId.FromInt32(1001))
+            new ApiIdentityScalarPartValue("OrderNumber", ApiId.FromInt32(1001))
         ]);
 
     private static ApiIdentityValue CompositeWithDeepObjectParts { get; } =
         ApiIdentityValue.Composite(
         [
-            new ApiObjectIdentityPartValue("Level1",
+            new ApiIdentityObjectPartValue("Level1",
                 ApiIdentityValue.Composite(
                 [
-                    new ApiObjectIdentityPartValue("Level2",
+                    new ApiIdentityObjectPartValue("Level2",
                         ApiIdentityValue.Composite(
                         [
-                            new ApiObjectIdentityPartValue("Level3",
+                            new ApiIdentityObjectPartValue("Level3",
                                 ApiIdentityValue.Composite(
                                 [
-                                    new ApiScalarIdentityPartValue("Level4", ApiId.FromString("DeepValue")),
-                                    new ApiScalarIdentityPartValue("SequenceNumber", ApiId.FromInt32(42))
+                                    new ApiIdentityScalarPartValue("Level4", ApiId.FromString("DeepValue")),
+                                    new ApiIdentityScalarPartValue("SequenceNumber", ApiId.FromInt32(42))
                                 ]))
                         ]))
                 ])),
-            new ApiScalarIdentityPartValue("RootId", ApiId.FromGuid(Guid.Parse("12345678-1234-1234-1234-123456789abc")))
+            new ApiIdentityScalarPartValue("RootId", ApiId.FromGuid(Guid.Parse("12345678-1234-1234-1234-123456789abc")))
         ]);
     #endregion
 }

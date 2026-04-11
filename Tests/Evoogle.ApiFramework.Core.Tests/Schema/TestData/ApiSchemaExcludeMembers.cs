@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -20,18 +20,15 @@ public static class ApiSchemaExcludeMembers
         // ApiProperty — cycle: ApiType → ApiObjectType → ApiProperties[].ApiType → ...
         new ExcludeMember(typeof(ApiProperty), nameof(ApiProperty.ApiType)),
 
-        // ApiRelationship — cycle: ApiProperty → ApiProperty.ApiType → ApiObjectType → ...
-        new ExcludeMember(typeof(ApiRelationship), nameof(ApiRelationship.ApiProperty)),
+        // ApiIdentityPropertyPart — cycle: ApiProperty → ApiType → ApiObjectType → ApiIdentities[].ApiIdentityParts[].ApiProperty → ...
+        new ExcludeMember(typeof(ApiIdentityPropertyPart), nameof(ApiIdentityPropertyPart.ApiProperty)),
 
-        // ApiPropertyIdentityPart — cycle: ApiProperty → ApiType → ApiObjectType → ApiIdentities[].ApiIdentityParts[].ApiProperty → ...
-        new ExcludeMember(typeof(ApiPropertyIdentityPart), nameof(ApiPropertyIdentityPart.ApiProperty)),
+        // ApiIdentityOwnerPart — cycle: ApiOwnerType → ApiObjectType → ... / ApiOwnerIdentity → ApiIdentity → ...
+        new ExcludeMember(typeof(ApiIdentityOwnerPart), nameof(ApiIdentityOwnerPart.ApiOwnerType)),
+        new ExcludeMember(typeof(ApiIdentityOwnerPart), nameof(ApiIdentityOwnerPart.ApiOwnerIdentity)),
 
-        // ApiOwnerIdentityPart — cycle: ApiOwnerType → ApiObjectType → ... / ApiOwnerIdentity → ApiIdentity → ...
-        new ExcludeMember(typeof(ApiOwnerIdentityPart), nameof(ApiOwnerIdentityPart.ApiOwnerType)),
-        new ExcludeMember(typeof(ApiOwnerIdentityPart), nameof(ApiOwnerIdentityPart.ApiOwnerIdentity)),
-
-        // ApiNestedIdentityPart — cycle: ApiIdentity → ApiObjectType → ApiIdentities[].ApiIdentityParts[].ApiProperty → ...
-        new ExcludeMember(typeof(ApiNestedIdentityPart), nameof(ApiNestedIdentityPart.ApiIdentity)),
+        // ApiIdentityNestedPart — cycle: ApiIdentity → ApiObjectType → ApiIdentities[].ApiIdentityParts[].ApiProperty → ...
+        new ExcludeMember(typeof(ApiIdentityNestedPart), nameof(ApiIdentityNestedPart.ApiIdentity)),
     ];
 
     public static readonly List<ExcludeMember> Standard =
@@ -50,16 +47,44 @@ public static class ApiSchemaExcludeMembers
         new ExcludeMember(typeof(ApiCollectionType), nameof(ApiCollectionType.ApiItemType)),
 
         // ApiIdentityPart
-        new ExcludeMember(typeof(ApiPropertyIdentityPart), nameof(ApiPropertyIdentityPart.ApiProperty)),
-        new ExcludeMember(typeof(ApiOwnerIdentityPart), nameof(ApiOwnerIdentityPart.ApiOwnerIdentity)),
-        new ExcludeMember(typeof(ApiOwnerIdentityPart), nameof(ApiOwnerIdentityPart.ApiOwnerType)),
-        new ExcludeMember(typeof(ApiScalarIdentityPart), nameof(ApiScalarIdentityPart.ClrScalarType)),
+        new ExcludeMember(typeof(ApiIdentityPropertyPart), nameof(ApiIdentityPropertyPart.ApiProperty)),
+        new ExcludeMember(typeof(ApiIdentityOwnerPart), nameof(ApiIdentityOwnerPart.ApiOwnerIdentity)),
+        new ExcludeMember(typeof(ApiIdentityOwnerPart), nameof(ApiIdentityOwnerPart.ApiOwnerType)),
+        new ExcludeMember(typeof(ApiIdentityScalarPart), nameof(ApiIdentityScalarPart.ClrScalarType)),
+        new ExcludeMember(typeof(ApiIdentityNestedPart), nameof(ApiIdentityNestedPart.ApiIdentity)),
 
         // ApiProperty
         new ExcludeMember(typeof(ApiProperty), nameof(ApiProperty.ApiType)),
+    ];
 
-        // ApiRelationship
-        new ExcludeMember(typeof(ApiRelationship), nameof(ApiRelationship.ApiCardinality)),
-        new ExcludeMember(typeof(ApiRelationship), nameof(ApiRelationship.ApiProperty)),
+    /// <summary>
+    ///     Exclusions for comparing pre-initialization <see cref="ApiRelationship"/> objects built directly via builders
+    ///     without running the full schema initialization pass.
+    /// </summary>
+    public static readonly List<ExcludeMember> Relationship =
+    [
+        // ApiSchemaElement
+        new ExcludeMember(typeof(ApiSchemaElement), nameof(ApiSchemaElement.ApiPath)),
+
+        // ApiRelationshipEnd — back-references resolved during initialization
+        new ExcludeMember(typeof(ApiRelationshipEnd), nameof(ApiRelationshipEnd.ApiObjectType)),
+        new ExcludeMember(typeof(ApiRelationshipEnd), nameof(ApiRelationshipEnd.ApiRelationship)),
+        new ExcludeMember(typeof(ApiRelationshipEnd), nameof(ApiRelationshipEnd.ApiOppositeEnd)),
+
+        // ApiRelationshipPrincipalEnd — identity and opposite end resolved during initialization
+        new ExcludeMember(typeof(ApiRelationshipPrincipalEnd), nameof(ApiRelationshipPrincipalEnd.ApiIdentity)),
+        new ExcludeMember(typeof(ApiRelationshipPrincipalEnd), nameof(ApiRelationshipPrincipalEnd.ApiDependentEnd)),
+
+        // ApiRelationshipDependentEnd — opposite end call that throws before initialization
+        new ExcludeMember(typeof(ApiRelationshipDependentEnd), nameof(ApiRelationshipDependentEnd.ApiPrincipalEnd)),
+
+        // ApiRelationshipManyToMany — association type resolved during initialization
+        new ExcludeMember(typeof(ApiRelationshipManyToMany), nameof(ApiRelationshipManyToMany.ApiAssociationObjectType)),
+
+        // Key path nodes — property and object type references resolved during initialization
+        new ExcludeMember(typeof(ApiRelationshipScalarKeyPath), nameof(ApiRelationshipScalarKeyPath.ApiProperty)),
+        new ExcludeMember(typeof(ApiRelationshipNestedKeyPath), nameof(ApiRelationshipNestedKeyPath.ApiProperty)),
+        new ExcludeMember(typeof(ApiRelationshipNestedKeyPath), nameof(ApiRelationshipNestedKeyPath.ApiObjectType)),
+        new ExcludeMember(typeof(ApiRelationshipOwnerKeyPath), nameof(ApiRelationshipOwnerKeyPath.ApiOwnerType)),
     ];
 }

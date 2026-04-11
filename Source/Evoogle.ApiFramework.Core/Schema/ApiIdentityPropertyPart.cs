@@ -11,17 +11,16 @@ namespace Evoogle.ApiFramework.Schema;
 /// <summary>
 ///     Abstract base class for identity parts that derive their value from a named <see cref="ApiProperty"/> on the declaring object type.
 /// </summary>
-/// <param name="apiPropertyName">The API property name used to locate the backing <see cref="ApiProperty"/> during initialization.</param>
-public abstract class ApiPropertyIdentityPart(string apiPropertyName) : ApiIdentityPart
+/// <param name="clrPropertyName">The CLR property name used to locate the backing <see cref="ApiProperty"/> during initialization.</param>
+public abstract class ApiIdentityPropertyPart(string clrPropertyName) : ApiIdentityPart
 {
-    #region ApiPropertyIdentityPart Fields
-    /// <summary>The resolved <see cref="ApiProperty"/> backing this identity part. Set during initialization; <see langword="null"/> before or if resolution fails.</summary>
+    #region ApiIdentityPropertyPart Fields
     private ApiProperty? _apiResolvedProperty = null;
     #endregion
 
-    #region ApiPropertyIdentityPart Properties
-    /// <summary>Gets the API property name used to locate the backing property on the declaring object type.</summary>
-    public string ApiPropertyName { get; } = apiPropertyName;
+    #region ApiIdentityPropertyPart Properties
+    /// <summary>Gets the CLR property name used to locate the backing property on the declaring object type.</summary>
+    public string ClrPropertyName { get; } = clrPropertyName;
 
     /// <summary>Gets the resolved <see cref="ApiProperty"/> that backs this identity part. Available after initialization.</summary>
     public ApiProperty ApiProperty => this.ThrowIfNotInitialized(_apiResolvedProperty);
@@ -33,7 +32,7 @@ public abstract class ApiPropertyIdentityPart(string apiPropertyName) : ApiIdent
     #region ApiSchemaElement Methods
     /// <inheritdoc />
     protected override string BuildPath(string? apiPreviousPath)
-        => ApiSchemaHelpers.BuildPath(basePath: apiPreviousPath, segment: this.ApiElementName, segmentName: this.ApiPropertyName);
+        => ApiSchemaHelpers.BuildPath(basePath: apiPreviousPath, segment: this.ApiElementName, segmentName: this.ClrPropertyName);
 
     /// <inheritdoc />
     internal override void Initialize(ApiInitializationContext context)
@@ -42,22 +41,22 @@ public abstract class ApiPropertyIdentityPart(string apiPropertyName) : ApiIdent
 
         base.Initialize(context);
 
-        this.InitializeApiPropertyName(context);
+        this.InitializeClrPropertyName(context);
         this.InitializeApiProperty(context);
     }
     #endregion
 
     #region Implementation Methods
-    private void InitializeApiPropertyName(ApiInitializationContext context)
+    private void InitializeClrPropertyName(ApiInitializationContext context)
     {
-        var isApiPropertyNameInvalid = ApiSchemaHelpers.IsNameInvalid(this.ApiPropertyName);
-        if (isApiPropertyNameInvalid)
+        var isClrPropertyNameInvalid = ApiSchemaHelpers.IsNameInvalid(this.ClrPropertyName);
+        if (isClrPropertyNameInvalid)
         {
             var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.API_IDENTITY_PART_INVALID_API_PROPERTY_NAME;
-            var description = $"{nameof(this.ApiPropertyName)} must not be null, empty, or whitespace";
-            var remediation = $"Specify a valid {nameof(this.ApiPropertyName)} value";
+            var code = ApiInitializationCode.API_IDENTITY_PART_INVALID_CLR_PROPERTY_NAME;
+            var description = $"{nameof(this.ClrPropertyName)} must not be null, empty, or whitespace";
+            var remediation = $"Specify a valid {nameof(this.ClrPropertyName)} value";
 
             context.AddIssue(path, severity, code, description, remediation);
         }
@@ -67,14 +66,14 @@ public abstract class ApiPropertyIdentityPart(string apiPropertyName) : ApiIdent
     {
         _apiResolvedProperty = null;
 
-        var isApiPropertyNameInvalid = ApiSchemaHelpers.IsNameInvalid(this.ApiPropertyName);
-        if (isApiPropertyNameInvalid)
+        var isClrPropertyNameInvalid = ApiSchemaHelpers.IsNameInvalid(this.ClrPropertyName);
+        if (isClrPropertyNameInvalid)
         {
             return;
         }
 
         var apiDeclaringObjectType = context.ApiDeclaringObjectType;
-        if (apiDeclaringObjectType.TryGetPropertyByApiName(this.ApiPropertyName, out var apiResolvedProperty))
+        if (apiDeclaringObjectType.TryGetPropertyByClrName(this.ClrPropertyName, out var apiResolvedProperty))
         {
             _apiResolvedProperty = apiResolvedProperty;
         }
@@ -86,8 +85,8 @@ public abstract class ApiPropertyIdentityPart(string apiPropertyName) : ApiIdent
             var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_IDENTITY_PART_UNRESOLVED_API_PROPERTY;
-            var description = $"{nameof(this.ApiProperty)} could not be resolved for {nameof(this.ApiPropertyName)}='{this.ApiPropertyName.SafeToString()}'";
-            var remediation = $"Verify that {nameof(this.ApiPropertyName)} refers to a valid property on {nameof(ApiObjectType)}[\"{apiObjectTypeName}\"]";
+            var description = $"{nameof(this.ApiProperty)} could not be resolved for {nameof(this.ClrPropertyName)}='{this.ClrPropertyName.SafeToString()}'";
+            var remediation = $"Verify that {nameof(this.ClrPropertyName)} refers to a valid property on {nameof(ApiObjectType)}[\"{apiObjectTypeName}\"]";
 
             context.AddIssue(path, severity, code, description, remediation);
         }

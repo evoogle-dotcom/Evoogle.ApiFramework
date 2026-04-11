@@ -12,14 +12,14 @@ namespace Evoogle.ApiFramework.Identity;
 /// </summary>
 /// <param name="apiName">The name of the identity part as declared in the schema.</param>
 /// <param name="apiScalarValue">The scalar <see cref="ApiId"/> value. Use <see cref="ApiId.Empty"/> for unresolved parts.</param>
-public sealed class ApiScalarIdentityPartValue(string apiName, ApiId apiScalarValue) : ApiIdentityPartValue(apiName)
+public sealed class ApiIdentityScalarPartValue(string apiName, ApiId apiScalarValue) : ApiIdentityPartValue(apiName)
 {
     #region ApiIdentityPartValue Properties
     /// <inheritdoc/>
     public override ApiIdentityPartValueKind ApiKind => ApiIdentityPartValueKind.Scalar;
     #endregion
 
-    #region ApiScalarIdentityPartValue Properties
+    #region ApiIdentityScalarPartValue Properties
     /// <summary>Gets the scalar <see cref="ApiId"/> value for this identity part.</summary>
     public ApiId ApiScalarValue { get; } = apiScalarValue;
     #endregion
@@ -31,7 +31,7 @@ public sealed class ApiScalarIdentityPartValue(string apiName, ApiId apiScalarVa
         var apiName = this.ApiName.SafeToString();
         var apiPropertyName = this.ApiScalarValue.SafeToString();
 
-        return $"{nameof(ApiScalarIdentityPartValue)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ApiScalarValue)}={apiPropertyName}}}";
+        return $"{nameof(ApiIdentityScalarPartValue)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ApiScalarValue)}={apiPropertyName}}}";
     }
     #endregion
 }

@@ -37,7 +37,7 @@ public class ApiSchemaBuilderContextTests(ITestOutputHelper output) : XUnitTests
         protected override void Act()
         {
             var context = new ApiSchemaBuilderContext();
-            var method = typeof(ApiSchemaBuilderContext).GetMethod(this.MethodName, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
+            var method = typeof(ApiSchemaBuilderContext).GetMethod(this.MethodName, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic, [typeof(Type)]);
 
             this.Builder1 = method!.Invoke(context, [this.ClrType]);
             this.Builder2 = method!.Invoke(context, [this.ClrType]);

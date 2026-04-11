@@ -11,18 +11,9 @@ using Evoogle.Extensions;
 namespace Evoogle.ApiFramework.Schema;
 
 /// <summary>
-///     Represents metadata of an API object type that defines a set of named structural properties and semantic relationships
+///     Represents metadata of an API object type that defines a set of named structural properties
 ///     for API input/output.
 /// </summary>
-/// <remarks>
-///     <para>
-///         <see cref="ApiObjectType"/> distinguishes between:
-///         <list type="bullet">
-///             <item><description><see cref="ApiProperty"/> — structural metadata describing individual named data members (e.g., strings, numbers, collections) of the object.</description></item>
-///             <item><description><see cref="ApiRelationship"/> — semantic metadata describing navigation or linkage from one object type to another, based on one of its properties and expressing cardinality.</description></item>
-///         </list>
-///     </para>
-/// </remarks>
 /// <remarks>
 ///     Initializes a new instance of the <see cref="ApiObjectType"/> class.
 /// </remarks>
@@ -30,7 +21,6 @@ namespace Evoogle.ApiFramework.Schema;
 /// <param name="apiOptions">The configuration options for the object type.</param>
 /// <param name="apiIdentities">The collection of API identities defined for this object type.</param>
 /// <param name="apiProperties">The collection of API properties defined on this object type.</param>
-/// <param name="apiRelationships">The collection of API relationships defined on this object type.</param>
 /// <param name="clrObjectType">The CLR type representing this API object.</param>
 public sealed partial class ApiObjectType
 (
@@ -38,16 +28,19 @@ public sealed partial class ApiObjectType
     ApiObjectTypeOptions? apiOptions,
     IEnumerable<ApiIdentity>? apiIdentities,
     IEnumerable<ApiProperty>? apiProperties,
-    IEnumerable<ApiRelationship>? apiRelationships,
     Type clrObjectType
 ) : ApiNamedType(apiName, clrObjectType)
 {
     #region ApiObjectType Fields
     private Dictionary<string, ApiIdentity>? _apiIdentityApiNameLookup = null;
+    private string[]? _apiIdentityApiNames = null;
+
     private Dictionary<string, ApiProperty>? _apiPropertyApiNameLookup = null;
     private Dictionary<string, ApiProperty>? _apiPropertyClrNameLookup = null;
-    private Dictionary<string, ApiRelationship>? _apiRelationshipApiNameLookup = null;
-    private string[]? _apiIdentityApiNames = null;
+
+    private List<ApiRelationshipEnd>? _apiRelationshipEnds = null;
+    private List<ApiRelationshipPrincipalEnd>? _apiPrincipalRelationshipEnds = null;
+    private List<ApiRelationshipDependentEnd>? _apiDependentRelationshipEnds = null;
     #endregion
 
     #region ApiSchemaElement Properties
@@ -60,7 +53,7 @@ public sealed partial class ApiObjectType
     public override ApiTypeKind ApiKind => ApiTypeKind.Object;
     #endregion
 
-    #region ApiObject Properties
+    #region ApiObjectType Properties
     /// <summary>Gets all identities defined for the object type.</summary>
     public ApiIdentity[] ApiIdentities { get; } = [.. apiIdentities.EmptyIfNull().Where(x => x is not null)];
 
@@ -74,23 +67,40 @@ public sealed partial class ApiObjectType
     public ApiIdentity? ApiPrimaryIdentity => this.HasIdentity ? this.ApiIdentities[0] : null;
 
     /// <summary>Gets the configuration options for the object type.</summary>
-    public ApiObjectTypeOptions? ApiOptions => apiOptions;
+    public ApiObjectTypeOptions? ApiOptions { get; } = apiOptions;
 
     /// <summary>Gets the collection of API properties defined on this object type.</summary>
     public ApiProperty[] ApiProperties { get; } = [.. apiProperties.EmptyIfNull().Where(x => x is not null)];
 
-    /// <summary>Gets the collection of API relationships defined on this object type.</summary>
-    public ApiRelationship[] ApiRelationships { get; } = [.. apiRelationships.EmptyIfNull().Where(x => x is not null)];
+    /// <summary>
+    ///     Gets all relationship ends where this object type participates, whether as principal or dependent.
+    ///     Populated during <see cref="ApiSchema"/> initialization. Returns an empty array before initialization completes.
+    /// </summary>
+    public ApiRelationshipEnd[] ApiRelationshipEnds => _apiRelationshipEnds is not null ? [.. _apiRelationshipEnds] : [];
+
+    /// <summary>
+    ///     Gets all relationship ends where this object type acts as the principal (owns the join key identity).
+    ///     Populated during <see cref="ApiSchema"/> initialization. Returns an empty array before initialization completes.
+    /// </summary>
+    public ApiRelationshipPrincipalEnd[] ApiRelationshipPrincipalEnds => _apiPrincipalRelationshipEnds is not null ? [.. _apiPrincipalRelationshipEnds] : [];
+
+    /// <summary>
+    ///     Gets all relationship ends where this object type acts as the dependent (holds the FK binding).
+    ///     Populated during <see cref="ApiSchema"/> initialization. Returns an empty array before initialization completes.
+    /// </summary>
+    public ApiRelationshipDependentEnd[] ApiRelationshipDependentEnds => _apiDependentRelationshipEnds is not null ? [.. _apiDependentRelationshipEnds] : [];
 
     private Dictionary<string, ApiIdentity> ApiIdentityApiNameLookup => this.ThrowIfNotInitialized(_apiIdentityApiNameLookup);
     private Dictionary<string, ApiProperty> ApiPropertyApiNameLookup => this.ThrowIfNotInitialized(_apiPropertyApiNameLookup);
     private Dictionary<string, ApiProperty> ApiPropertyClrNameLookup => this.ThrowIfNotInitialized(_apiPropertyClrNameLookup);
-    private Dictionary<string, ApiRelationship> ApiRelationshipApiNameLookup => this.ThrowIfNotInitialized(_apiRelationshipApiNameLookup);
     #endregion
 
-    #region ApiObject Computed Properties
+    #region ApiObjectType Computed Properties
     /// <summary>Indicates whether this object type has any API identities defined.</summary>
     public bool HasIdentity => this.ApiIdentities.Length > 0;
+
+    /// <summary>Indicates whether this object type participates in any relationships.</summary>
+    public bool HasRelationshipEnds => _apiRelationshipEnds?.Count > 0;
     #endregion
 
     #region Object Methods
@@ -117,7 +127,6 @@ public sealed partial class ApiObjectType
         this.InitializeLookupDictionaries(context);
 
         this.InitializeApiProperties(context);
-        this.InitializeApiRelationships(context);
         this.InitializeApiIdentities(context);
     }
     #endregion
@@ -147,13 +156,6 @@ public sealed partial class ApiObjectType
     /// <returns>True if the property was found; otherwise, false.</returns>
     public bool TryGetPropertyByClrName(string clrName, [NotNullWhen(true)] out ApiProperty? value) => this.ApiPropertyClrNameLookup.TryGetValue(clrName, out value);
 
-    /// <summary>
-    ///     Attempts to retrieve an API relationship by its API name.
-    /// </summary>
-    /// <param name="apiName">The API name of the relationship to retrieve.</param>
-    /// <param name="value">When this method returns, contains the <see cref="ApiRelationship"/> if found; otherwise, null.</param>
-    /// <returns>True if the relationship was found; otherwise, false.</returns>
-    public bool TryGetRelationshipByApiName(string apiName, [NotNullWhen(true)] out ApiRelationship? value) => this.ApiRelationshipApiNameLookup.TryGetValue(apiName, out value);
     #endregion
 
     #region ApiObjectType Identity Methods
@@ -197,6 +199,32 @@ public sealed partial class ApiObjectType
     #endregion
 
     #region Implementation Methods
+    internal void AddRelationshipEnd(ApiRelationshipEnd end)
+    {
+        ArgumentNullException.ThrowIfNull(end);
+
+        _apiRelationshipEnds ??= [];
+        _apiRelationshipEnds.Add(end);
+
+        if (end is ApiRelationshipPrincipalEnd principalEnd)
+        {
+            _apiPrincipalRelationshipEnds ??= [];
+            _apiPrincipalRelationshipEnds.Add(principalEnd);
+        }
+        else if (end is ApiRelationshipDependentEnd dependentEnd)
+        {
+            _apiDependentRelationshipEnds ??= [];
+            _apiDependentRelationshipEnds.Add(dependentEnd);
+        }
+    }
+
+    internal void ClearRelationshipEnds()
+    {
+        _apiRelationshipEnds = null;
+        _apiPrincipalRelationshipEnds = null;
+        _apiDependentRelationshipEnds = null;
+    }
+
     private void InitializeApiIdentities(ApiInitializationContext context)
     {
         if (this.ApiIdentities.Length == 0)
@@ -239,34 +267,14 @@ public sealed partial class ApiObjectType
         }
     }
 
-    private void InitializeApiRelationships(ApiInitializationContext context)
-    {
-        if (this.ApiRelationships is null || this.ApiRelationships.Length == 0)
-        {
-            // No relationships defined; this is acceptable as relationships are optional.
-            return;
-        }
-
-        var apiRelationshipsCount = this.ApiRelationships.Length;
-        for (var i = 0; i < apiRelationshipsCount; ++i)
-        {
-            var apiRelationship = this.ApiRelationships[i];
-
-            var childContext = context.WithDeclaringObjectType(this);
-            apiRelationship.Initialize(childContext);
-        }
-    }
-
     private void InitializeLookupDictionaries(ApiInitializationContext context)
     {
         // Initialize lookup dictionaries for lookup of:
         // - Identity by API name
         // - Property by API name and CLR name
-        // - Relationship by API name
         _apiIdentityApiNameLookup = null;
         _apiPropertyApiNameLookup = null;
         _apiPropertyClrNameLookup = null;
-        _apiRelationshipApiNameLookup = null;
 
         ApiSchemaHelpers.InitializeLookupDictionary
         (
@@ -302,18 +310,6 @@ public sealed partial class ApiObjectType
             code: ApiInitializationCode.API_OBJECT_TYPE_DUPLICATE_PROPERTY_CLR_NAME,
             context: context,
             lookupDictionary: out _apiPropertyClrNameLookup
-        );
-
-        ApiSchemaHelpers.InitializeLookupDictionary
-        (
-            parts: this.ApiRelationships,
-            partKeySelector: x => x.ApiName,
-            partKeyFilter: x => ApiSchemaHelpers.IsNameValid(x),
-            partKeyPropertyName: nameof(ApiRelationship.ApiName),
-            path: this.ApiPath,
-            code: ApiInitializationCode.API_OBJECT_TYPE_DUPLICATE_RELATIONSHIP_API_NAME,
-            context: context,
-            lookupDictionary: out _apiRelationshipApiNameLookup
         );
     }
     #endregion

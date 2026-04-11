@@ -22,7 +22,7 @@ public class ApiIdentityPartJsonConverter(ILogger<ApiIdentityPartJsonConverter>?
     {
         #region Immutable Properties
         public required string ApiKind { get; init; }
-        public required string ApiPropertyName { get; init; }
+        public required string ClrPropertyName { get; init; }
         public required string ApiIdentityName { get; init; }
         public required string ClrScalarTypeHint { get; init; }
         #endregion
@@ -42,9 +42,9 @@ public class ApiIdentityPartJsonConverter(ILogger<ApiIdentityPartJsonConverter>?
                 ApiIdentityPart = new ApiIdentityPartPropertyNames
                 {
                     ApiKind = policy.ConvertName(nameof(Schema.ApiIdentityPart.ApiKind)),
-                    ApiPropertyName = policy.ConvertName(nameof(ApiPropertyIdentityPart.ApiPropertyName)),
-                    ApiIdentityName = policy.ConvertName(nameof(ApiOwnerIdentityPart.ApiIdentityName)),
-                    ClrScalarTypeHint = policy.ConvertName(nameof(ApiScalarIdentityPart.ClrScalarTypeHint)),
+                    ClrPropertyName = policy.ConvertName(nameof(ApiIdentityPropertyPart.ClrPropertyName)),
+                    ApiIdentityName = policy.ConvertName(nameof(ApiIdentityOwnerPart.ApiIdentityName)),
+                    ClrScalarTypeHint = policy.ConvertName(nameof(ApiIdentityScalarPart.ClrScalarTypeHint)),
                 },
                 ExtensibleBase = GetExtensiblePropertyNames(policy),
             };
@@ -57,7 +57,7 @@ public class ApiIdentityPartJsonConverter(ILogger<ApiIdentityPartJsonConverter>?
     {
         #region Properties
         public ApiIdentityPartKind? ApiKind { get; set; }
-        public string? ApiPropertyName { get; set; }
+        public string? ClrPropertyName { get; set; }
         public string? ApiIdentityName { get; set; }
         public Type? ClrScalarTypeHint { get; set; }
         #endregion
@@ -77,7 +77,7 @@ public class ApiIdentityPartJsonConverter(ILogger<ApiIdentityPartJsonConverter>?
         {
             // ApiIdentityPart Property Handlers
             { propertyNames.ApiIdentityPart.ApiKind, HandleApiIdentityPartApiKind },
-            { propertyNames.ApiIdentityPart.ApiPropertyName, HandleApiIdentityPartApiPropertyName },
+            { propertyNames.ApiIdentityPart.ClrPropertyName, HandleApiIdentityPartClrPropertyName },
             { propertyNames.ApiIdentityPart.ApiIdentityName, HandleApiIdentityPartApiIdentityName },
             { propertyNames.ApiIdentityPart.ClrScalarTypeHint, HandleApiIdentityPartClrScalarTypeHint },
 
@@ -95,11 +95,11 @@ public class ApiIdentityPartJsonConverter(ILogger<ApiIdentityPartJsonConverter>?
             context.ReadData.ApiIdentityPart.ApiKind = _apiIdentityPartKindJsonConverter.Read(ref reader, typeof(ApiIdentityPartKind), options);
         }
 
-        private static void HandleApiIdentityPartApiPropertyName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiIdentityPartClrPropertyName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiIdentityPart ??= new ApiIdentityPartReadData();
 
-            context.ReadData.ApiIdentityPart.ApiPropertyName = reader.GetString();
+            context.ReadData.ApiIdentityPart.ClrPropertyName = reader.GetString();
         }
 
         private static void HandleApiIdentityPartApiIdentityName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
@@ -160,7 +160,7 @@ public class ApiIdentityPartJsonConverter(ILogger<ApiIdentityPartJsonConverter>?
         var readData = readContext.ReadData.ApiIdentityPart;
 
         var apiKind = readData?.ApiKind;
-        var apiPropertyName = readData?.ApiPropertyName;
+        var clrPropertyName = readData?.ClrPropertyName;
         var apiIdentityName = readData?.ApiIdentityName;
         var clrScalarTypeHint = readData?.ClrScalarTypeHint;
 
@@ -170,15 +170,15 @@ public class ApiIdentityPartJsonConverter(ILogger<ApiIdentityPartJsonConverter>?
             switch (apiKind.Value)
             {
                 case ApiIdentityPartKind.Scalar:
-                    apiIdentityPart = new ApiScalarIdentityPart(apiPropertyName!, clrScalarTypeHint);
+                    apiIdentityPart = new ApiIdentityScalarPart(clrPropertyName!, clrScalarTypeHint);
                     break;
 
                 case ApiIdentityPartKind.Nested:
-                    apiIdentityPart = new ApiNestedIdentityPart(apiPropertyName!, apiIdentityName);
+                    apiIdentityPart = new ApiIdentityNestedPart(clrPropertyName!, apiIdentityName);
                     break;
 
                 case ApiIdentityPartKind.Owner:
-                    apiIdentityPart = new ApiOwnerIdentityPart(apiIdentityName);
+                    apiIdentityPart = new ApiIdentityOwnerPart(apiIdentityName);
                     break;
 
                 default:
@@ -215,7 +215,7 @@ public class ApiIdentityPartJsonConverter(ILogger<ApiIdentityPartJsonConverter>?
         WriteJsonObject(writer, () =>
         {
             WriteApiIdentityPartApiKind(writer, value, writeContext);
-            WriteApiIdentityPartApiPropertyName(writer, value, writeContext);
+            WriteApiIdentityPartClrPropertyName(writer, value, writeContext);
             WriteApiIdentityPartApiIdentityName(writer, value, writeContext);
             WriteApiIdentityPartClrScalarTypeHint(writer, value, writeContext);
 
@@ -234,18 +234,18 @@ public class ApiIdentityPartJsonConverter(ILogger<ApiIdentityPartJsonConverter>?
         writer.TryWritePropertyWithConverter(propertyName, kind, options, _apiIdentityPartKindJsonConverter);
     }
 
-    private static void WriteApiIdentityPartApiPropertyName(Utf8JsonWriter writer, ApiIdentityPart apiIdentityPart, DefaultWriteContext<PropertyNames> context)
+    private static void WriteApiIdentityPartClrPropertyName(Utf8JsonWriter writer, ApiIdentityPart apiIdentityPart, DefaultWriteContext<PropertyNames> context)
     {
         var apiKind = apiIdentityPart.ApiKind;
 
         var value = default(string);
         if (apiKind == ApiIdentityPartKind.Scalar || apiKind == ApiIdentityPartKind.Nested)
         {
-            var apiPropertyIdentityPart = (ApiPropertyIdentityPart)apiIdentityPart;
-            value = apiPropertyIdentityPart.ApiPropertyName;
+            var apiPropertyIdentityPart = (ApiIdentityPropertyPart)apiIdentityPart;
+            value = apiPropertyIdentityPart.ClrPropertyName;
         }
 
-        var propertyName = context.PropertyNames.ApiIdentityPart.ApiPropertyName;
+        var propertyName = context.PropertyNames.ApiIdentityPart.ClrPropertyName;
         var options = context.Options;
 
         writer.TryWritePropertyAsString(propertyName, value, options);
@@ -258,12 +258,12 @@ public class ApiIdentityPartJsonConverter(ILogger<ApiIdentityPartJsonConverter>?
         var value = default(string);
         if (apiKind == ApiIdentityPartKind.Nested)
         {
-            var apiNestedIdentityPart = (ApiNestedIdentityPart)apiIdentityPart;
+            var apiNestedIdentityPart = (ApiIdentityNestedPart)apiIdentityPart;
             value = apiNestedIdentityPart.ApiIdentityName;
         }
         else if (apiKind == ApiIdentityPartKind.Owner)
         {
-            var apiOwnerIdentityPart = (ApiOwnerIdentityPart)apiIdentityPart;
+            var apiOwnerIdentityPart = (ApiIdentityOwnerPart)apiIdentityPart;
             value = apiOwnerIdentityPart.ApiIdentityName;
         }
 
@@ -280,7 +280,7 @@ public class ApiIdentityPartJsonConverter(ILogger<ApiIdentityPartJsonConverter>?
         var value = default(Type);
         if (apiKind == ApiIdentityPartKind.Scalar)
         {
-            var apiScalarIdentityPart = (ApiScalarIdentityPart)apiIdentityPart;
+            var apiScalarIdentityPart = (ApiIdentityScalarPart)apiIdentityPart;
             value = apiScalarIdentityPart.ClrScalarTypeHint;
         }
 

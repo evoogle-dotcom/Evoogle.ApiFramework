@@ -29,7 +29,7 @@ public sealed partial class ApiIdentity
         // Fast path: single-scalar identity avoids pre-allocating the intermediate parts array.
         if (this.IsScalarDefinition)
         {
-            var singleScalarPart = (ApiScalarIdentityPart)this.ApiIdentityParts[0];
+            var singleScalarPart = (ApiIdentityScalarPart)this.ApiIdentityParts[0];
             return ApiIdentityValue.Composite([BuildScalarPartValue(singleScalarPart, context)]);
         }
 
@@ -60,7 +60,7 @@ public sealed partial class ApiIdentity
         // Fast path: single-scalar identity avoids pre-allocating the intermediate parts array.
         if (this.IsScalarDefinition)
         {
-            var singleScalarPart = (ApiScalarIdentityPart)this.ApiIdentityParts[0];
+            var singleScalarPart = (ApiIdentityScalarPart)this.ApiIdentityParts[0];
             return ApiIdentityValue.Composite([BuildScalarPartValueFromValues(singleScalarPart, context)]);
         }
 
@@ -79,16 +79,16 @@ public sealed partial class ApiIdentity
     {
         return schemaPart switch
         {
-            ApiScalarIdentityPart scalarPart => BuildScalarPartValue(scalarPart, context),
-            ApiNestedIdentityPart nestedPart => BuildNestedPartValue(nestedPart, context),
-            ApiOwnerIdentityPart ownerPart => BuildOwnerPartValue(ownerPart, context),
+            ApiIdentityScalarPart scalarPart => BuildScalarPartValue(scalarPart, context),
+            ApiIdentityNestedPart nestedPart => BuildNestedPartValue(nestedPart, context),
+            ApiIdentityOwnerPart ownerPart => BuildOwnerPartValue(ownerPart, context),
             _ => throw new ApiIdentityException($"Unsupported identity part type: {schemaPart.GetType().Name}")
         };
     }
 
-    private static ApiScalarIdentityPartValue BuildScalarPartValue(ApiScalarIdentityPart schemaPart, ApiIdentityValueBuildContext context)
+    private static ApiIdentityScalarPartValue BuildScalarPartValue(ApiIdentityScalarPart schemaPart, ApiIdentityValueBuildContext context)
     {
-        var partName = schemaPart.ApiPropertyName;
+        var partName = schemaPart.ClrPropertyName;
 
         if (!schemaPart.ApiProperty.TryGetValue(context.ClrInstance, out var rawValue, schemaPart.ClrScalarType))
         {
@@ -99,7 +99,7 @@ public sealed partial class ApiIdentity
                     $"Set {nameof(ApiIdentityNullHandling)} to {nameof(ApiIdentityNullHandling.ReturnEmpty)} to suppress this error.");
             }
 
-            return new ApiScalarIdentityPartValue(partName, ApiId.Empty);
+            return new ApiIdentityScalarPartValue(partName, ApiId.Empty);
         }
 
         if (rawValue is null)
@@ -111,16 +111,16 @@ public sealed partial class ApiIdentity
                     $"Set {nameof(ApiIdentityNullHandling)} to {nameof(ApiIdentityNullHandling.ReturnEmpty)} to allow null values.");
             }
 
-            return new ApiScalarIdentityPartValue(partName, ApiId.Empty);
+            return new ApiIdentityScalarPartValue(partName, ApiId.Empty);
         }
 
         var apiId = ApiId.FromObject(rawValue, schemaPart.ClrScalarType);
-        return new ApiScalarIdentityPartValue(partName, apiId);
+        return new ApiIdentityScalarPartValue(partName, apiId);
     }
 
-    private static ApiObjectIdentityPartValue BuildNestedPartValue(ApiNestedIdentityPart schemaPart, ApiIdentityValueBuildContext context)
+    private static ApiIdentityObjectPartValue BuildNestedPartValue(ApiIdentityNestedPart schemaPart, ApiIdentityValueBuildContext context)
     {
-        var partName = schemaPart.ApiPropertyName;
+        var partName = schemaPart.ClrPropertyName;
 
         if (!schemaPart.ApiProperty.TryGetValue(context.ClrInstance, out var nestedObj))
         {
@@ -132,7 +132,7 @@ public sealed partial class ApiIdentity
             }
 
             var skeleton = BuildStructureSkeleton(schemaPart.ApiIdentity);
-            return new ApiObjectIdentityPartValue(partName, apiObjectValue: null, apiStructure: skeleton);
+            return new ApiIdentityObjectPartValue(partName, apiObjectValue: null, apiStructure: skeleton);
         }
 
         if (nestedObj is null)
@@ -145,15 +145,15 @@ public sealed partial class ApiIdentity
             }
 
             var skeleton = BuildStructureSkeleton(schemaPart.ApiIdentity);
-            return new ApiObjectIdentityPartValue(partName, apiObjectValue: null, apiStructure: skeleton);
+            return new ApiIdentityObjectPartValue(partName, apiObjectValue: null, apiStructure: skeleton);
         }
 
         var nestedContext = context with { ClrInstance = nestedObj, ClrOwnerInstance = context.ClrInstance };
         var nestedValue = schemaPart.ApiIdentity.BuildValue(nestedContext);
-        return new ApiObjectIdentityPartValue(partName, nestedValue);
+        return new ApiIdentityObjectPartValue(partName, nestedValue);
     }
 
-    private static ApiObjectIdentityPartValue BuildOwnerPartValue(ApiOwnerIdentityPart schemaPart, ApiIdentityValueBuildContext context)
+    private static ApiIdentityObjectPartValue BuildOwnerPartValue(ApiIdentityOwnerPart schemaPart, ApiIdentityValueBuildContext context)
     {
         var partName = schemaPart.ApiOwnerType.ApiName;
 
@@ -167,12 +167,12 @@ public sealed partial class ApiIdentity
             }
 
             var skeleton = BuildStructureSkeleton(schemaPart.ApiOwnerIdentity);
-            return new ApiObjectIdentityPartValue(partName, apiObjectValue: null, apiStructure: skeleton);
+            return new ApiIdentityObjectPartValue(partName, apiObjectValue: null, apiStructure: skeleton);
         }
 
         var ownerContext = context with { ClrInstance = context.ClrOwnerInstance, ClrOwnerInstance = null };
         var ownerValue = schemaPart.ApiOwnerIdentity.BuildValue(ownerContext);
-        return new ApiObjectIdentityPartValue(partName, ownerValue);
+        return new ApiIdentityObjectPartValue(partName, ownerValue);
     }
 
     private static ApiIdentityPartValue[] BuildStructureSkeleton(ApiIdentity schemaIdentity)
@@ -190,14 +190,14 @@ public sealed partial class ApiIdentity
     {
         return schemaPart switch
         {
-            ApiScalarIdentityPart scalarPart
-                => new ApiScalarIdentityPartValue(scalarPart.ApiPropertyName, ApiId.Empty),
+            ApiIdentityScalarPart scalarPart
+                => new ApiIdentityScalarPartValue(scalarPart.ClrPropertyName, ApiId.Empty),
 
-            ApiNestedIdentityPart nestedPart
-                => new ApiObjectIdentityPartValue(nestedPart.ApiPropertyName, apiObjectValue: null, apiStructure: BuildStructureSkeleton(nestedPart.ApiIdentity)),
+            ApiIdentityNestedPart nestedPart
+                => new ApiIdentityObjectPartValue(nestedPart.ClrPropertyName, apiObjectValue: null, apiStructure: BuildStructureSkeleton(nestedPart.ApiIdentity)),
 
-            ApiOwnerIdentityPart ownerPart
-                => new ApiObjectIdentityPartValue(ownerPart.ApiOwnerType.ApiName, apiObjectValue: null, apiStructure: BuildStructureSkeleton(ownerPart.ApiOwnerIdentity)),
+            ApiIdentityOwnerPart ownerPart
+                => new ApiIdentityObjectPartValue(ownerPart.ApiOwnerType.ApiName, apiObjectValue: null, apiStructure: BuildStructureSkeleton(ownerPart.ApiOwnerIdentity)),
 
             _ => throw new ApiIdentityException($"Unsupported identity part type in skeleton: {schemaPart.GetType().Name}")
         };
@@ -207,16 +207,16 @@ public sealed partial class ApiIdentity
     {
         return schemaPart switch
         {
-            ApiScalarIdentityPart scalarPart => BuildScalarPartValueFromValues(scalarPart, context),
-            ApiNestedIdentityPart nestedPart => BuildNestedPartValueFromValues(nestedPart, context),
-            ApiOwnerIdentityPart ownerPart => BuildOwnerPartValueFromValues(ownerPart, context),
+            ApiIdentityScalarPart scalarPart => BuildScalarPartValueFromValues(scalarPart, context),
+            ApiIdentityNestedPart nestedPart => BuildNestedPartValueFromValues(nestedPart, context),
+            ApiIdentityOwnerPart ownerPart => BuildOwnerPartValueFromValues(ownerPart, context),
             _ => throw new ApiIdentityException($"Unsupported identity part type: {schemaPart.GetType().Name}")
         };
     }
 
-    private static ApiScalarIdentityPartValue BuildScalarPartValueFromValues(ApiScalarIdentityPart schemaPart, ApiIdentityValueBuildFromValuesContext context)
+    private static ApiIdentityScalarPartValue BuildScalarPartValueFromValues(ApiIdentityScalarPart schemaPart, ApiIdentityValueBuildFromValuesContext context)
     {
-        var partName = schemaPart.ApiPropertyName;
+        var partName = schemaPart.ClrPropertyName;
 
         if (!context.Values.TryGetValue(partName, out var rawValue))
         {
@@ -227,7 +227,7 @@ public sealed partial class ApiIdentity
                     $"Set {nameof(ApiIdentityNullHandling)} to {nameof(ApiIdentityNullHandling.ReturnEmpty)} to allow missing values.");
             }
 
-            return new ApiScalarIdentityPartValue(partName, ApiId.Empty);
+            return new ApiIdentityScalarPartValue(partName, ApiId.Empty);
         }
 
         if (rawValue is null)
@@ -239,16 +239,16 @@ public sealed partial class ApiIdentity
                     $"Set {nameof(ApiIdentityNullHandling)} to {nameof(ApiIdentityNullHandling.ReturnEmpty)} to allow null values.");
             }
 
-            return new ApiScalarIdentityPartValue(partName, ApiId.Empty);
+            return new ApiIdentityScalarPartValue(partName, ApiId.Empty);
         }
 
         var apiId = ApiId.FromObject(rawValue, schemaPart.ClrScalarType);
-        return new ApiScalarIdentityPartValue(partName, apiId);
+        return new ApiIdentityScalarPartValue(partName, apiId);
     }
 
-    private static ApiObjectIdentityPartValue BuildNestedPartValueFromValues(ApiNestedIdentityPart schemaPart, ApiIdentityValueBuildFromValuesContext context)
+    private static ApiIdentityObjectPartValue BuildNestedPartValueFromValues(ApiIdentityNestedPart schemaPart, ApiIdentityValueBuildFromValuesContext context)
     {
-        var partName = schemaPart.ApiPropertyName;
+        var partName = schemaPart.ClrPropertyName;
 
         if (!context.Values.TryGetValue(partName, out var nestedValue))
         {
@@ -260,7 +260,7 @@ public sealed partial class ApiIdentity
             }
 
             var skeleton = BuildStructureSkeleton(schemaPart.ApiIdentity);
-            return new ApiObjectIdentityPartValue(partName, apiObjectValue: null, apiStructure: skeleton);
+            return new ApiIdentityObjectPartValue(partName, apiObjectValue: null, apiStructure: skeleton);
         }
 
         if (nestedValue is null)
@@ -273,7 +273,7 @@ public sealed partial class ApiIdentity
             }
 
             var skeleton = BuildStructureSkeleton(schemaPart.ApiIdentity);
-            return new ApiObjectIdentityPartValue(partName, apiObjectValue: null, apiStructure: skeleton);
+            return new ApiIdentityObjectPartValue(partName, apiObjectValue: null, apiStructure: skeleton);
         }
 
         // The nested value can be provided in two forms:
@@ -285,7 +285,7 @@ public sealed partial class ApiIdentity
         {
             var nestedContext = context with { Values = nestedDict, OwnerValues = null };
             var nestedIdentityValue = schemaPart.ApiIdentity.BuildValue(nestedContext);
-            return new ApiObjectIdentityPartValue(partName, nestedIdentityValue);
+            return new ApiIdentityObjectPartValue(partName, nestedIdentityValue);
         }
 
         var instanceContext = new ApiIdentityValueBuildContext
@@ -295,10 +295,10 @@ public sealed partial class ApiIdentity
             NullHandling = context.NullHandling
         };
         var nestedInstanceValue = schemaPart.ApiIdentity.BuildValue(instanceContext);
-        return new ApiObjectIdentityPartValue(partName, nestedInstanceValue);
+        return new ApiIdentityObjectPartValue(partName, nestedInstanceValue);
     }
 
-    private static ApiObjectIdentityPartValue BuildOwnerPartValueFromValues(ApiOwnerIdentityPart schemaPart, ApiIdentityValueBuildFromValuesContext context)
+    private static ApiIdentityObjectPartValue BuildOwnerPartValueFromValues(ApiIdentityOwnerPart schemaPart, ApiIdentityValueBuildFromValuesContext context)
     {
         var partName = schemaPart.ApiOwnerType.ApiName;
 
@@ -312,12 +312,12 @@ public sealed partial class ApiIdentity
             }
 
             var skeleton = BuildStructureSkeleton(schemaPart.ApiOwnerIdentity);
-            return new ApiObjectIdentityPartValue(partName, apiObjectValue: null, apiStructure: skeleton);
+            return new ApiIdentityObjectPartValue(partName, apiObjectValue: null, apiStructure: skeleton);
         }
 
         var ownerContext = context with { Values = context.OwnerValues, OwnerValues = null };
         var ownerValue = schemaPart.ApiOwnerIdentity.BuildValue(ownerContext);
-        return new ApiObjectIdentityPartValue(partName, ownerValue);
+        return new ApiIdentityObjectPartValue(partName, ownerValue);
     }
     #endregion
 }

@@ -12,17 +12,17 @@ namespace Evoogle.ApiFramework.Schema;
 /// <summary>
 ///     Represents an identity part that sources its value directly from a scalar property on the declaring object type.
 /// </summary>
-/// <param name="apiPropertyName">The API property name of the scalar property whose value becomes the identity component.</param>
+/// <param name="clrPropertyName">The CLR property name of the scalar property whose value becomes the identity component.</param>
 /// <param name="clrScalarTypeHint">An optional CLR type hint that overrides the default scalar type resolved from the property. When <see langword="null"/>, the type is inferred from the property's <see cref="ApiScalarType"/>.</param>
-public sealed class ApiScalarIdentityPart(string apiPropertyName, Type? clrScalarTypeHint = null) : ApiPropertyIdentityPart(apiPropertyName)
+public sealed class ApiIdentityScalarPart(string clrPropertyName, Type? clrScalarTypeHint = null) : ApiIdentityPropertyPart(clrPropertyName)
 {
-    #region ApiScalarIdentityPart Fields
+    #region ApiIdentityScalarPart Fields
     private Type? _clrResolvedScalarType = null;
     #endregion
 
     #region ApiSchemaElement Properties
     /// <inheritdoc/>
-    protected override string ApiElementName => nameof(ApiScalarIdentityPart);
+    protected override string ApiElementName => nameof(ApiIdentityScalarPart);
     #endregion
 
     #region ApiIdentityPart Properties
@@ -30,7 +30,7 @@ public sealed class ApiScalarIdentityPart(string apiPropertyName, Type? clrScala
     public override ApiIdentityPartKind ApiKind => ApiIdentityPartKind.Scalar;
     #endregion
 
-    #region ApiScalarIdentityPart Properties
+    #region ApiIdentityScalarPart Properties
     /// <summary>
     ///     Gets the optional CLR type hint provided at construction time that overrides automatic scalar type resolution.
     ///     When <see langword="null"/>, the scalar type is inferred from the backing property's <see cref="ApiScalarType"/>.
@@ -45,11 +45,11 @@ public sealed class ApiScalarIdentityPart(string apiPropertyName, Type? clrScala
     /// <inheritdoc />
     public override string ToString()
     {
-        var apiPropertyName = this.ApiPropertyName.SafeToString();
+        var clrPropertyName = this.ClrPropertyName.SafeToString();
         var clrScalarTypeHint = this.ClrScalarTypeHint.SafeToName();
         var extensionCount = this.ExtensionCount.SafeToString();
 
-        return $"{nameof(ApiScalarIdentityPart)} {{{nameof(this.ApiPropertyName)}={apiPropertyName}, {nameof(this.ClrScalarTypeHint)}={clrScalarTypeHint}, {nameof(this.ExtensionCount)}={extensionCount}}}";
+        return $"{nameof(ApiIdentityScalarPart)} {{{nameof(this.ClrPropertyName)}={clrPropertyName}, {nameof(this.ClrScalarTypeHint)}={clrScalarTypeHint}, {nameof(this.ExtensionCount)}={extensionCount}}}";
     }
     #endregion
 
@@ -84,8 +84,8 @@ public sealed class ApiScalarIdentityPart(string apiPropertyName, Type? clrScala
         {
             context.AddIssue(this.ApiPath, ApiInitializationSeverity.Error,
                 ApiInitializationCode.API_IDENTITY_PART_INVALID_API_PROPERTY_TYPE,
-                $"Property '{this.ApiPropertyName}' must be a scalar type for a scalar identity part",
-                $"Use a scalar-typed property or switch to {nameof(ApiNestedIdentityPart)}");
+                $"Property '{this.ClrPropertyName}' must be a scalar type for a scalar identity part",
+                $"Use a scalar-typed property or switch to {nameof(ApiIdentityNestedPart)}");
             _clrResolvedScalarType = null;
             return;
         }
@@ -105,8 +105,8 @@ public sealed class ApiScalarIdentityPart(string apiPropertyName, Type? clrScala
             var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Warning;
             var code = ApiInitializationCode.API_IDENTITY_PART_PERFORMANCE_CONCERN;
-            var description = $"Identity part '{this.ApiPropertyName}' has CLR property type {clrPropertyScalarType.SafeToName()} but resolves to scalar type {_clrResolvedScalarType.SafeToName()}, requiring string parse/format on every identity operation";
-            var remediation = $"Align the '{this.ApiPropertyName}' property type with the resolved scalar type {_clrResolvedScalarType.SafeToName()} to eliminate string coercion, or accept the overhead if the type mismatch is intentional";
+            var description = $"Identity part '{this.ClrPropertyName}' has CLR property type {clrPropertyScalarType.SafeToName()} but resolves to scalar type {_clrResolvedScalarType.SafeToName()}, requiring string parse/format on every identity operation";
+            var remediation = $"Align the '{this.ClrPropertyName}' property type with the resolved scalar type {_clrResolvedScalarType.SafeToName()} to eliminate string coercion, or accept the overhead if the type mismatch is intentional";
 
             context.AddIssue(path, severity, code, description, remediation);
         }

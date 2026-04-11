@@ -166,8 +166,7 @@ public partial class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(o
     {
         TryGetIdentityByApiName,
         TryGetPropertyByApiName,
-        TryGetPropertyByClrName,
-        TryGetRelationshipByApiName
+        TryGetPropertyByClrName
     }
 
     private class TryGetTest : XUnitTest
@@ -210,7 +209,6 @@ public partial class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(o
                 TryGetMethod.TryGetIdentityByApiName => this.ApiObjectType!.TryGetIdentityByApiName(this.SearchKey!, out _),
                 TryGetMethod.TryGetPropertyByApiName => this.ApiObjectType!.TryGetPropertyByApiName(this.SearchKey!, out _),
                 TryGetMethod.TryGetPropertyByClrName => this.ApiObjectType!.TryGetPropertyByClrName(this.SearchKey!, out _),
-                TryGetMethod.TryGetRelationshipByApiName => this.ApiObjectType!.TryGetRelationshipByApiName(this.SearchKey!, out _),
                 _ => throw new InvalidOperationException($"Unknown {nameof(this.TryGetMethod)}: {this.TryGetMethod}"),
             };
 

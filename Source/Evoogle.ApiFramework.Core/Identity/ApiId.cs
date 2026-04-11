@@ -1352,9 +1352,8 @@ public readonly struct ApiId
     /// </summary>
     /// <param name="name">The part name.</param>
     /// <returns>The part identifier.</returns>
-    /// <exception cref="ApiIdentityException">Thrown if not a composite.</exception>
-    /// <exception cref="KeyNotFoundException">Thrown if part name not found.</exception>
-    public readonly ApiId this[string name] => this.TryGetPart(name, out var v) ? v : throw new KeyNotFoundException($"Part name '{name}' not found in composite ApiId.");
+    /// <exception cref="ApiIdentityException">Thrown if part name not found.</exception>
+    public readonly ApiId this[string name] => this.TryGetPart(name, out var v) ? v : throw new ApiIdentityException($"Part name '{name}' not found in composite ApiId.");
     #endregion
 
     #region Equality/Ordering Operators

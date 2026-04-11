@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -37,7 +37,8 @@ public partial class ApiSchemaTests
                 },
                 ""ApiScalarTypes"": [],
                 ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": []
+                ""ApiObjectTypes"": [],
+                ""ApiRelationships"": []
             }",
             ExpectedFactoryArgument = new ApiSchemaDescriptor
             (
@@ -60,7 +61,8 @@ public partial class ApiSchemaTests
                 },
                 ""ApiScalarTypes"": [],
                 ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": []
+                ""ApiObjectTypes"": [],
+                ""ApiRelationships"": []
             }",
             ExpectedFactoryArgument = new ApiSchemaDescriptor
             (
@@ -94,7 +96,8 @@ public partial class ApiSchemaTests
                     }
                 ],
                 ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": []
+                ""ApiObjectTypes"": [],
+                ""ApiRelationships"": []
             }",
             ExpectedFactoryArgument = new ApiSchemaDescriptor
             (
@@ -139,7 +142,8 @@ public partial class ApiSchemaTests
                     }
                 ],
                 ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": []
+                ""ApiObjectTypes"": [],
+                ""ApiRelationships"": []
             }",
             ExpectedFactoryArgument = new ApiSchemaDescriptor
             (
@@ -189,6 +193,7 @@ public partial class ApiSchemaTests
                 ],
                 ""ApiEnumTypes"": [],
                 ""ApiObjectTypes"": [],
+                ""ApiRelationships"": [],
                 ""Extensions"": {
                     ""Evoogle.ApiFramework.TestData.GraphQlExtension, Evoogle.ApiFramework.Core.Tests"": {
                         ""Count"": 42
@@ -244,7 +249,8 @@ public partial class ApiSchemaTests
                     }
                 ],
                 ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": []
+                ""ApiObjectTypes"": [],
+                ""ApiRelationships"": []
             }",
             ExpectedFactoryArgument = new ApiSchemaDescriptor
             (
@@ -311,7 +317,8 @@ public partial class ApiSchemaTests
                     }
                 ],
                 ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": []
+                ""ApiObjectTypes"": [],
+                ""ApiRelationships"": []
             }",
             ExpectedFactoryArgument = new ApiSchemaDescriptor
             (
@@ -391,6 +398,7 @@ public partial class ApiSchemaTests
                 ],
                 ""ApiEnumTypes"": [],
                 ""ApiObjectTypes"": [],
+                ""ApiRelationships"": [],
                 ""Extensions"": {
                     ""Evoogle.ApiFramework.TestData.GraphQlExtension, Evoogle.ApiFramework.Core.Tests"": {
                         ""Count"": 42
@@ -485,7 +493,8 @@ public partial class ApiSchemaTests
                         ""ClrType"": ""Evoogle.ApiFramework.TestData.Gender, Evoogle.ApiFramework.Core.Tests""
                     }
                 ],
-                ""ApiObjectTypes"": []
+                ""ApiObjectTypes"": [],
+                ""ApiRelationships"": []
             }",
             ExpectedFactoryArgument = new ApiSchemaDescriptor
             (
@@ -548,6 +557,7 @@ public partial class ApiSchemaTests
                     }
                 ],
                 ""ApiObjectTypes"": [],
+                ""ApiRelationships"": [],
                 ""Extensions"": {
                     ""Evoogle.ApiFramework.TestData.ProtobufExtension, Evoogle.ApiFramework.Core.Tests"": {
                         ""Edition"": 2024
@@ -641,7 +651,7 @@ public partial class ApiSchemaTests
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id""
+                                        ""ClrPropertyName"": ""Id""
                                     }
                                 ]
                             },
@@ -650,7 +660,7 @@ public partial class ApiSchemaTests
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Name""
+                                        ""ClrPropertyName"": ""Name""
                                     }
                                 ]
                             }
@@ -724,10 +734,10 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiRelationships"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.TestData.Person, Evoogle.ApiFramework.Core.Tests""
                     }
-                ]
+                ],
+                ""ApiRelationships"": []
             }",
             ExpectedFactoryArgument = new ApiSchemaDescriptor
             (
@@ -952,7 +962,7 @@ public partial class ApiSchemaTests
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id""
+                                        ""ClrPropertyName"": ""Id""
                                     }
                                 ]
                             },
@@ -961,7 +971,7 @@ public partial class ApiSchemaTests
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Name""
+                                        ""ClrPropertyName"": ""Name""
                                     }
                                 ]
                             }
@@ -1035,10 +1045,10 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiRelationships"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.TestData.Person, Evoogle.ApiFramework.Core.Tests""
                     }
                 ],
+                ""ApiRelationships"": [],
                 ""Extensions"": {
                     ""Evoogle.ApiFramework.TestData.GraphQlExtension, Evoogle.ApiFramework.Core.Tests"": {
                         ""Count"": 42
@@ -1272,7 +1282,7 @@ public partial class ApiSchemaTests
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id"",
+                                        ""ClrPropertyName"": ""Id"",
 					                    ""ClrScalarTypeHint"": ""System.String,System.Private.CoreLib""
                                     }
                                 ]
@@ -1282,7 +1292,7 @@ public partial class ApiSchemaTests
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Name""
+                                        ""ClrPropertyName"": ""Name""
                                     }
                                 ]
                             }
@@ -1336,16 +1346,6 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiRelationships"": [
-                            {
-                                ""ApiName"": ""Company_Owner"",
-                                ""ApiPropertyName"": ""Owner""
-                            },
-                            {
-                                ""ApiName"": ""Company_Employees"",
-                                ""ApiPropertyName"": ""Employees""
-                            }
-                        ],
                         ""ClrType"": ""Evoogle.ApiFramework.TestData.Company, Evoogle.ApiFramework.Core.Tests""
                     },
                     {
@@ -1357,7 +1357,7 @@ public partial class ApiSchemaTests
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id""
+                                        ""ClrPropertyName"": ""Id""
                                     }
                                 ]
                             },
@@ -1366,7 +1366,7 @@ public partial class ApiSchemaTests
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Name""
+                                        ""ClrPropertyName"": ""Name""
                                     }
                                 ]
                             }
@@ -1440,10 +1440,10 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiRelationships"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.TestData.Person, Evoogle.ApiFramework.Core.Tests""
                     }
-                ]
+                ],
+                ""ApiRelationships"": []
             }",
             ExpectedFactoryArgument = new ApiSchemaDescriptor
             (
@@ -1584,11 +1584,6 @@ public partial class ApiSchemaTests
                                     ClrName: nameof(Company.Employees),
                                     ClrMemberKind: ClrMemberKind.Property
                                 ),
-                            ],
-                            ApiRelationships:
-                            [
-                                new ApiRelationshipConfig(ApiName: "Company_Owner", ApiPropertyName: nameof(Company.Owner)),
-                                new ApiRelationshipConfig(ApiName: "Company_Employees", ApiPropertyName: nameof(Company.Employees))
                             ]
                         )
                     ),
@@ -1696,10 +1691,82 @@ public partial class ApiSchemaTests
                 ]
             )
         },
-        // TC1: ApiSchema With Identity Schema (IdentityScalar)
+
+        // ApiSchema With Identity Schema (IdentityScalar)
         new JsonDeserializeTest
         {
             Name = $"{nameof(ApiSchema)} With Identity Schema ({nameof(IdentityScalar)})",
+            SourceJson = @"
+            {
+                ""ApiName"": ""ApiSchema With Identity Schema (IdentityScalar)"",
+                ""ApiVersion"": ""0.1.0"",
+                ""ApiOptions"": {
+                    ""ApiIdentityNullHandling"": ""ReturnEmpty""
+                },
+                ""ApiScalarTypes"": [
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""Int32"",
+                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                    },
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""String"",
+                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                    }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""IdentityScalar"",
+                        ""ApiIdentities"": [
+                            {
+                                ""ApiName"": ""PK_IdentityScalar"",
+                                ""ApiIdentityParts"": [
+                                    {
+                                        ""ApiKind"": ""Scalar"",
+                                        ""ClrPropertyName"": ""Id""
+                                    }
+                                ]
+                            },
+                            {
+                                ""ApiName"": ""AK_IdentityScalar"",
+                                ""ApiIdentityParts"": [
+                                    {
+                                        ""ApiKind"": ""Scalar"",
+                                        ""ClrPropertyName"": ""Name""
+                                    }
+                                ]
+                            }
+                        ],
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""Id"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""Int32""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Id"",
+                                ""ClrMemberKind"": ""Property""
+                            },
+                            {
+                                ""ApiName"": ""Name"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""String""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Name"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityScalar, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ],
+                ""ApiRelationships"": []
+            }",
             ExpectedFactoryArgument = new ApiSchemaDescriptor
             (
                 ApiSchema: new ApiSchemaConfig
@@ -1794,10 +1861,16 @@ public partial class ApiSchemaTests
                         )
                     )
                 ]
-            ),
+            )
+        },
+
+        // ApiSchema With Identity Schema (IdentityTwoScalarPartComposite)
+        new JsonDeserializeTest
+        {
+            Name = $"{nameof(ApiSchema)} With Identity Schema ({nameof(IdentityTwoScalarPartComposite)})",
             SourceJson = @"
             {
-                ""ApiName"": ""ApiSchema With Identity Schema (IdentityScalar)"",
+                ""ApiName"": ""ApiSchema With Identity Schema (IdentityTwoScalarPartComposite)"",
                 ""ApiVersion"": ""0.1.0"",
                 ""ApiOptions"": {
                     ""ApiIdentityNullHandling"": ""ReturnEmpty""
@@ -1818,60 +1891,59 @@ public partial class ApiSchemaTests
                 ""ApiObjectTypes"": [
                     {
                         ""ApiKind"": ""Object"",
-                        ""ApiName"": ""IdentityScalar"",
+                        ""ApiName"": ""IdentityTwoScalarPartComposite"",
                         ""ApiIdentities"": [
                             {
-                                ""ApiName"": ""PK_IdentityScalar"",
+                                ""ApiName"": ""PK_IdentityTwoScalarPartComposite"",
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id""
-                                    }
-                                ]
-                            },
-                            {
-                                ""ApiName"": ""AK_IdentityScalar"",
-                                ""ApiIdentityParts"": [
+                                        ""ClrPropertyName"": ""Id1""
+                                    },
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Name""
+                                        ""ClrPropertyName"": ""Id2""
                                     }
                                 ]
                             }
                         ],
                         ""ApiProperties"": [
                             {
-                                ""ApiName"": ""Id"",
+                                ""ApiName"": ""Id1"",
                                 ""ApiType"": {
                                     ""ApiKind"": ""Scalar"",
                                     ""ApiName"": ""Int32""
                                 },
                                 ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Id"",
+                                ""ClrName"": ""Id1"",
                                 ""ClrMemberKind"": ""Property""
                             },
                             {
-                                ""ApiName"": ""Name"",
+                                ""ApiName"": ""Id2"",
                                 ""ApiType"": {
                                     ""ApiKind"": ""Scalar"",
                                     ""ApiName"": ""String""
                                 },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Name"",
+                                ""ApiTypeModifiers"": ""None"",
+                                ""ClrName"": ""Id2"",
+                                ""ClrMemberKind"": ""Property""
+                            },
+                            {
+                                ""ApiName"": ""Description"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""String""
+                                },
+                                ""ApiTypeModifiers"": ""None"",
+                                ""ClrName"": ""Description"",
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiRelationships"": [],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityScalar, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityTwoScalarPartComposite, Evoogle.ApiFramework.Core.Tests""
                     }
-                ]
-            }"
-        },
-
-        // TC2: ApiSchema With Identity Schema (IdentityTwoScalarPartComposite)
-        new JsonDeserializeTest
-        {
-            Name = $"{nameof(ApiSchema)} With Identity Schema ({nameof(IdentityTwoScalarPartComposite)})",
+                ],
+                ""ApiRelationships"": []
+            }",
             ExpectedFactoryArgument = new ApiSchemaDescriptor
             (
                 ApiSchema: new ApiSchemaConfig
@@ -1967,15 +2039,26 @@ public partial class ApiSchemaTests
                         )
                     )
                 ]
-            ),
+            )
+        },
+
+        // ApiSchema With Identity Schema (IdentityThreeScalarPartComposite)
+        new JsonDeserializeTest
+        {
+            Name = $"{nameof(ApiSchema)} With Identity Schema ({nameof(IdentityThreeScalarPartComposite)})",
             SourceJson = @"
             {
-                ""ApiName"": ""ApiSchema With Identity Schema (IdentityTwoScalarPartComposite)"",
+                ""ApiName"": ""ApiSchema With Identity Schema (IdentityThreeScalarPartComposite)"",
                 ""ApiVersion"": ""0.1.0"",
                 ""ApiOptions"": {
                     ""ApiIdentityNullHandling"": ""ReturnEmpty""
                 },
                 ""ApiScalarTypes"": [
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""Guid"",
+                        ""ClrType"": ""System.Guid, System.Private.CoreLib""
+                    },
                     {
                         ""ApiKind"": ""Scalar"",
                         ""ApiName"": ""Int32"",
@@ -1991,18 +2074,22 @@ public partial class ApiSchemaTests
                 ""ApiObjectTypes"": [
                     {
                         ""ApiKind"": ""Object"",
-                        ""ApiName"": ""IdentityTwoScalarPartComposite"",
+                        ""ApiName"": ""IdentityThreeScalarPartComposite"",
                         ""ApiIdentities"": [
                             {
-                                ""ApiName"": ""PK_IdentityTwoScalarPartComposite"",
+                                ""ApiName"": ""PK_IdentityThreeScalarPartComposite"",
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id1""
+                                        ""ClrPropertyName"": ""Id1""
                                     },
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id2""
+                                        ""ClrPropertyName"": ""Id2""
+                                    },
+                                    {
+                                        ""ApiKind"": ""Scalar"",
+                                        ""ClrPropertyName"": ""Id3""
                                     }
                                 ]
                             }
@@ -2029,6 +2116,16 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             },
                             {
+                                ""ApiName"": ""Id3"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""Guid""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Id3"",
+                                ""ClrMemberKind"": ""Property""
+                            },
+                            {
                                 ""ApiName"": ""Description"",
                                 ""ApiType"": {
                                     ""ApiKind"": ""Scalar"",
@@ -2039,17 +2136,11 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiRelationships"": [],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityTwoScalarPartComposite, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityThreeScalarPartComposite, Evoogle.ApiFramework.Core.Tests""
                     }
-                ]
-            }"
-        },
-
-        // TC3: ApiSchema With Identity Schema (IdentityThreeScalarPartComposite)
-        new JsonDeserializeTest
-        {
-            Name = $"{nameof(ApiSchema)} With Identity Schema ({nameof(IdentityThreeScalarPartComposite)})",
+                ],
+                ""ApiRelationships"": []
+            }",
             ExpectedFactoryArgument = new ApiSchemaDescriptor
             (
                 ApiSchema: new ApiSchemaConfig
@@ -2170,20 +2261,21 @@ public partial class ApiSchemaTests
                         )
                     )
                 ]
-            ),
+            )
+        },
+
+        // ApiSchema With Identity Schema (IdentityNested And IdentityNestedComposite Without Explicit ApiIdentityName)
+        new JsonDeserializeTest
+        {
+            Name = $"{nameof(ApiSchema)} With Identity Schema ({nameof(IdentityNested)} And {nameof(IdentityNestedComposite)} Without Explicit ApiIdentityName)",
             SourceJson = @"
             {
-                ""ApiName"": ""ApiSchema With Identity Schema (IdentityThreeScalarPartComposite)"",
+                ""ApiName"": ""ApiSchema With Identity Schema (IdentityNested And IdentityNestedComposite Without Explicit ApiIdentityName)"",
                 ""ApiVersion"": ""0.1.0"",
                 ""ApiOptions"": {
                     ""ApiIdentityNullHandling"": ""ReturnEmpty""
                 },
                 ""ApiScalarTypes"": [
-                    {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""Guid"",
-                        ""ClrType"": ""System.Guid, System.Private.CoreLib""
-                    },
                     {
                         ""ApiKind"": ""Scalar"",
                         ""ApiName"": ""Int32"",
@@ -2199,55 +2291,27 @@ public partial class ApiSchemaTests
                 ""ApiObjectTypes"": [
                     {
                         ""ApiKind"": ""Object"",
-                        ""ApiName"": ""IdentityThreeScalarPartComposite"",
+                        ""ApiName"": ""IdentityNested"",
                         ""ApiIdentities"": [
                             {
-                                ""ApiName"": ""PK_IdentityThreeScalarPartComposite"",
+                                ""ApiName"": ""PK_IdentityNestedPart"",
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id1""
-                                    },
-                                    {
-                                        ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id2""
-                                    },
-                                    {
-                                        ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id3""
+                                        ""ClrPropertyName"": ""Id""
                                     }
                                 ]
                             }
                         ],
                         ""ApiProperties"": [
                             {
-                                ""ApiName"": ""Id1"",
+                                ""ApiName"": ""Id"",
                                 ""ApiType"": {
                                     ""ApiKind"": ""Scalar"",
                                     ""ApiName"": ""Int32""
                                 },
                                 ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Id1"",
-                                ""ClrMemberKind"": ""Property""
-                            },
-                            {
-                                ""ApiName"": ""Id2"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""String""
-                                },
-                                ""ApiTypeModifiers"": ""None"",
-                                ""ClrName"": ""Id2"",
-                                ""ClrMemberKind"": ""Property""
-                            },
-                            {
-                                ""ApiName"": ""Id3"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Guid""
-                                },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Id3"",
+                                ""ClrName"": ""Id"",
                                 ""ClrMemberKind"": ""Property""
                             },
                             {
@@ -2261,17 +2325,53 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiRelationships"": [],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityThreeScalarPartComposite, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityNested, Evoogle.ApiFramework.Core.Tests""
+                    },
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""IdentityNestedComposite"",
+                        ""ApiIdentities"": [
+                            {
+                                ""ApiName"": ""PK_IdentityNestedComposite"",
+                                ""ApiIdentityParts"": [
+                                    {
+                                        ""ApiKind"": ""Nested"",
+                                        ""ClrPropertyName"": ""NestedPart""
+                                    },
+                                    {
+                                        ""ApiKind"": ""Scalar"",
+                                        ""ClrPropertyName"": ""Name""
+                                    }
+                                ]
+                            }
+                        ],
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""NestedPart"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Object"",
+                                    ""ApiName"": ""IdentityNested""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""NestedPart"",
+                                ""ClrMemberKind"": ""Property""
+                            },
+                            {
+                                ""ApiName"": ""Name"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""String""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Name"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityNestedComposite, Evoogle.ApiFramework.Core.Tests""
                     }
-                ]
-            }"
-        },
-
-        // TC4: ApiSchema With Identity Schema (IdentityNested And IdentityNestedComposite Without Explicit ApiIdentityName)
-        new JsonDeserializeTest
-        {
-            Name = $"{nameof(ApiSchema)} With Identity Schema ({nameof(IdentityNested)} And {nameof(IdentityNestedComposite)} Without Explicit ApiIdentityName)",
+                ],
+                ""ApiRelationships"": []
+            }",
             ExpectedFactoryArgument = new ApiSchemaDescriptor
             (
                 ApiSchema: new ApiSchemaConfig
@@ -2408,10 +2508,16 @@ public partial class ApiSchemaTests
                         )
                     )
                 ]
-            ),
+            )
+        },
+
+        // ApiSchema With Identity Schema (IdentityOwner, IdentityOwnedComposite, And IdentityOwnedDependent Without Explicit ApiIdentityName)
+        new JsonDeserializeTest
+        {
+            Name = $"{nameof(ApiSchema)} With Identity Schema ({nameof(IdentityOwner)}, {nameof(IdentityOwnedComposite)}, And {nameof(IdentityOwnedDependent)} Without Explicit ApiIdentityName)",
             SourceJson = @"
             {
-                ""ApiName"": ""ApiSchema With Identity Schema (IdentityNested And IdentityNestedComposite Without Explicit ApiIdentityName)"",
+                ""ApiName"": ""ApiSchema With Identity Schema (IdentityOwner, IdentityOwnedComposite, And IdentityOwnedDependent Without Explicit ApiIdentityName)"",
                 ""ApiVersion"": ""0.1.0"",
                 ""ApiOptions"": {
                     ""ApiIdentityNullHandling"": ""ReturnEmpty""
@@ -2432,14 +2538,14 @@ public partial class ApiSchemaTests
                 ""ApiObjectTypes"": [
                     {
                         ""ApiKind"": ""Object"",
-                        ""ApiName"": ""IdentityNested"",
+                        ""ApiName"": ""IdentityOwner"",
                         ""ApiIdentities"": [
                             {
-                                ""ApiName"": ""PK_IdentityNestedPart"",
+                                ""ApiName"": ""PK_IdentityOwner"",
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id""
+                                        ""ClrPropertyName"": ""Id""
                                     }
                                 ]
                             }
@@ -2464,62 +2570,108 @@ public partial class ApiSchemaTests
                                 ""ApiTypeModifiers"": ""None"",
                                 ""ClrName"": ""Description"",
                                 ""ClrMemberKind"": ""Property""
+                            },
+                            {
+                                ""ApiName"": ""Dependents"",
+                                ""ApiType"": {
+                                    ""ApiInlineType"": {
+                                        ""ApiKind"": ""Collection"",
+                                        ""ApiItemType"": {
+                                            ""ApiKind"": ""Object"",
+                                            ""ApiName"": ""IdentityOwnedComposite""
+                                        },
+                                        ""ApiItemTypeModifiers"": ""Required"",
+                                        ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.TestData.IdentityOwnedComposite,Evoogle.ApiFramework.Core.Tests]], System.Private.CoreLib""
+                                    }
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Dependents"",
+                                ""ClrMemberKind"": ""Property""
+                            },
+                            {
+                                ""ApiName"": ""Dependent"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Object"",
+                                    ""ApiName"": ""IdentityOwnedDependent""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Dependent"",
+                                ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiRelationships"": [],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityNested, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityOwner, Evoogle.ApiFramework.Core.Tests""
                     },
                     {
                         ""ApiKind"": ""Object"",
-                        ""ApiName"": ""IdentityNestedComposite"",
+                        ""ApiName"": ""IdentityOwnedComposite"",
                         ""ApiIdentities"": [
                             {
-                                ""ApiName"": ""PK_IdentityNestedComposite"",
+                                ""ApiName"": ""PK_IdentityOwnedComposite"",
                                 ""ApiIdentityParts"": [
                                     {
-                                        ""ApiKind"": ""Nested"",
-                                        ""ApiPropertyName"": ""NestedPart""
+                                        ""ApiKind"": ""Owner""
                                     },
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Name""
+                                        ""ClrPropertyName"": ""LineNumber""
                                     }
                                 ]
                             }
                         ],
                         ""ApiProperties"": [
                             {
-                                ""ApiName"": ""NestedPart"",
+                                ""ApiName"": ""LineNumber"",
                                 ""ApiType"": {
-                                    ""ApiKind"": ""Object"",
-                                    ""ApiName"": ""IdentityNested""
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""Int32""
                                 },
                                 ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""NestedPart"",
+                                ""ClrName"": ""LineNumber"",
                                 ""ClrMemberKind"": ""Property""
                             },
                             {
-                                ""ApiName"": ""Name"",
+                                ""ApiName"": ""Description"",
                                 ""ApiType"": {
                                     ""ApiKind"": ""Scalar"",
                                     ""ApiName"": ""String""
                                 },
                                 ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Name"",
+                                ""ClrName"": ""Description"",
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiRelationships"": [],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityNestedComposite, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityOwnedComposite, Evoogle.ApiFramework.Core.Tests""
+                    },
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""IdentityOwnedDependent"",
+                        ""ApiIdentities"": [
+                            {
+                                ""ApiName"": ""PK_IdentityOwnedDependent"",
+                                ""ApiIdentityParts"": [
+                                    {
+                                        ""ApiKind"": ""Owner""
+                                    }
+                                ]
+                            }
+                        ],
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""Description"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""String""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Description"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityOwnedDependent, Evoogle.ApiFramework.Core.Tests""
                     }
-                ]
-            }"
-        },
-
-        // TC5: ApiSchema With Identity Schema (IdentityOwner, IdentityOwnedComposite, And IdentityOwnedDependent Without Explicit ApiIdentityName)
-        new JsonDeserializeTest
-        {
-            Name = $"{nameof(ApiSchema)} With Identity Schema ({nameof(IdentityOwner)}, {nameof(IdentityOwnedComposite)}, And {nameof(IdentityOwnedDependent)} Without Explicit ApiIdentityName)",
+                ],
+                ""ApiRelationships"": []
+            }",
             ExpectedFactoryArgument = new ApiSchemaDescriptor
             (
                 ApiSchema: new ApiSchemaConfig
@@ -2719,15 +2871,26 @@ public partial class ApiSchemaTests
                         )
                     )
                 ]
-            ),
+            )
+        },
+
+        // ApiSchema With Full Identity Schema
+        new JsonDeserializeTest
+        {
+            Name = $"{nameof(ApiSchema)} With Full Identity Schema",
             SourceJson = @"
             {
-                ""ApiName"": ""ApiSchema With Identity Schema (IdentityOwner, IdentityOwnedComposite, And IdentityOwnedDependent Without Explicit ApiIdentityName)"",
+                ""ApiName"": ""ApiSchema With Full Identity Schema"",
                 ""ApiVersion"": ""0.1.0"",
                 ""ApiOptions"": {
                     ""ApiIdentityNullHandling"": ""ReturnEmpty""
                 },
                 ""ApiScalarTypes"": [
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""Guid"",
+                        ""ClrType"": ""System.Guid, System.Private.CoreLib""
+                    },
                     {
                         ""ApiKind"": ""Scalar"",
                         ""ApiName"": ""Int32"",
@@ -2743,6 +2906,251 @@ public partial class ApiSchemaTests
                 ""ApiObjectTypes"": [
                     {
                         ""ApiKind"": ""Object"",
+                        ""ApiName"": ""IdentityScalar"",
+                        ""ApiIdentities"": [
+                            {
+                                ""ApiName"": ""PK_IdentityScalar"",
+                                ""ApiIdentityParts"": [
+                                    {
+                                        ""ApiKind"": ""Scalar"",
+                                        ""ClrPropertyName"": ""Id""
+                                    }
+                                ]
+                            },
+                            {
+                                ""ApiName"": ""AK_IdentityScalar"",
+                                ""ApiIdentityParts"": [
+                                    {
+                                        ""ApiKind"": ""Scalar"",
+                                        ""ClrPropertyName"": ""Name""
+                                    }
+                                ]
+                            }
+                        ],
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""Id"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""Int32""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Id"",
+                                ""ClrMemberKind"": ""Property""
+                            },
+                            {
+                                ""ApiName"": ""Name"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""String""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Name"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityScalar, Evoogle.ApiFramework.Core.Tests""
+                    },
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""IdentityTwoScalarPartComposite"",
+                        ""ApiIdentities"": [
+                            {
+                                ""ApiName"": ""PK_IdentityTwoScalarPartComposite"",
+                                ""ApiIdentityParts"": [
+                                    {
+                                        ""ApiKind"": ""Scalar"",
+                                        ""ClrPropertyName"": ""Id1""
+                                    },
+                                    {
+                                        ""ApiKind"": ""Scalar"",
+                                        ""ClrPropertyName"": ""Id2""
+                                    }
+                                ]
+                            }
+                        ],
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""Id1"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""Int32""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Id1"",
+                                ""ClrMemberKind"": ""Property""
+                            },
+                            {
+                                ""ApiName"": ""Id2"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""String""
+                                },
+                                ""ApiTypeModifiers"": ""None"",
+                                ""ClrName"": ""Id2"",
+                                ""ClrMemberKind"": ""Property""
+                            },
+                            {
+                                ""ApiName"": ""Description"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""String""
+                                },
+                                ""ApiTypeModifiers"": ""None"",
+                                ""ClrName"": ""Description"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityTwoScalarPartComposite, Evoogle.ApiFramework.Core.Tests""
+                    },
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""IdentityThreeScalarPartComposite"",
+                        ""ApiIdentities"": [
+                            {
+                                ""ApiName"": ""PK_IdentityThreeScalarPartComposite"",
+                                ""ApiIdentityParts"": [
+                                    {
+                                        ""ApiKind"": ""Scalar"",
+                                        ""ClrPropertyName"": ""Id1""
+                                    },
+                                    {
+                                        ""ApiKind"": ""Scalar"",
+                                        ""ClrPropertyName"": ""Id2""
+                                    },
+                                    {
+                                        ""ApiKind"": ""Scalar"",
+                                        ""ClrPropertyName"": ""Id3""
+                                    }
+                                ]
+                            }
+                        ],
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""Id1"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""Int32""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Id1"",
+                                ""ClrMemberKind"": ""Property""
+                            },
+                            {
+                                ""ApiName"": ""Id2"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""String""
+                                },
+                                ""ApiTypeModifiers"": ""None"",
+                                ""ClrName"": ""Id2"",
+                                ""ClrMemberKind"": ""Property""
+                            },
+                            {
+                                ""ApiName"": ""Id3"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""Guid""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Id3"",
+                                ""ClrMemberKind"": ""Property""
+                            },
+                            {
+                                ""ApiName"": ""Description"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""String""
+                                },
+                                ""ApiTypeModifiers"": ""None"",
+                                ""ClrName"": ""Description"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityThreeScalarPartComposite, Evoogle.ApiFramework.Core.Tests""
+                    },
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""IdentityNested"",
+                        ""ApiIdentities"": [
+                            {
+                                ""ApiName"": ""PK_IdentityNestedPart"",
+                                ""ApiIdentityParts"": [
+                                    {
+                                        ""ApiKind"": ""Scalar"",
+                                        ""ClrPropertyName"": ""Id""
+                                    }
+                                ]
+                            }
+                        ],
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""Id"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""Int32""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Id"",
+                                ""ClrMemberKind"": ""Property""
+                            },
+                            {
+                                ""ApiName"": ""Description"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""String""
+                                },
+                                ""ApiTypeModifiers"": ""None"",
+                                ""ClrName"": ""Description"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityNested, Evoogle.ApiFramework.Core.Tests""
+                    },
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""IdentityNestedComposite"",
+                        ""ApiIdentities"": [
+                            {
+                                ""ApiName"": ""PK_IdentityNestedComposite"",
+                                ""ApiIdentityParts"": [
+                                    {
+                                        ""ApiKind"": ""Nested"",
+                                        ""ClrPropertyName"": ""NestedPart""
+                                    },
+                                    {
+                                        ""ApiKind"": ""Scalar"",
+                                        ""ClrPropertyName"": ""Name""
+                                    }
+                                ]
+                            }
+                        ],
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""NestedPart"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Object"",
+                                    ""ApiName"": ""IdentityNested""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""NestedPart"",
+                                ""ClrMemberKind"": ""Property""
+                            },
+                            {
+                                ""ApiName"": ""Name"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""String""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Name"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityNestedComposite, Evoogle.ApiFramework.Core.Tests""
+                    },
+                    {
+                        ""ApiKind"": ""Object"",
                         ""ApiName"": ""IdentityOwner"",
                         ""ApiIdentities"": [
                             {
@@ -2750,7 +3158,7 @@ public partial class ApiSchemaTests
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id""
+                                        ""ClrPropertyName"": ""Id""
                                     }
                                 ]
                             }
@@ -2804,7 +3212,6 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiRelationships"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityOwner, Evoogle.ApiFramework.Core.Tests""
                     },
                     {
@@ -2819,7 +3226,7 @@ public partial class ApiSchemaTests
                                     },
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""LineNumber""
+                                        ""ClrPropertyName"": ""LineNumber""
                                     }
                                 ]
                             }
@@ -2846,7 +3253,6 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiRelationships"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityOwnedComposite, Evoogle.ApiFramework.Core.Tests""
                     },
                     {
@@ -2874,17 +3280,11 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiRelationships"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityOwnedDependent, Evoogle.ApiFramework.Core.Tests""
                     }
-                ]
-            }"
-        },
-
-        // TC6: ApiSchema With Full Identity Schema
-        new JsonDeserializeTest
-        {
-            Name = $"{nameof(ApiSchema)} With Full Identity Schema",
+                ],
+                ""ApiRelationships"": []
+            }",
             ExpectedFactoryArgument = new ApiSchemaDescriptor
             (
                 ApiSchema: new ApiSchemaConfig
@@ -3397,20 +3797,21 @@ public partial class ApiSchemaTests
                         )
                     )
                 ]
-            ),
+            )
+        },
+
+        // ApiSchema With Identity Schema (IdentityNested And IdentityNestedComposite With Explicit ApiIdentityName)
+        new JsonDeserializeTest
+        {
+            Name = $"{nameof(ApiSchema)} With Identity Schema ({nameof(IdentityNested)} And {nameof(IdentityNestedComposite)} With Explicit ApiIdentityName)",
             SourceJson = @"
             {
-                ""ApiName"": ""ApiSchema With Full Identity Schema"",
+                ""ApiName"": ""ApiSchema With Identity Schema (IdentityNested And IdentityNestedComposite With Explicit ApiIdentityName)"",
                 ""ApiVersion"": ""0.1.0"",
                 ""ApiOptions"": {
                     ""ApiIdentityNullHandling"": ""ReturnEmpty""
                 },
                 ""ApiScalarTypes"": [
-                    {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""Guid"",
-                        ""ClrType"": ""System.Guid, System.Private.CoreLib""
-                    },
                     {
                         ""ApiKind"": ""Scalar"",
                         ""ApiName"": ""Int32"",
@@ -3426,174 +3827,6 @@ public partial class ApiSchemaTests
                 ""ApiObjectTypes"": [
                     {
                         ""ApiKind"": ""Object"",
-                        ""ApiName"": ""IdentityScalar"",
-                        ""ApiIdentities"": [
-                            {
-                                ""ApiName"": ""PK_IdentityScalar"",
-                                ""ApiIdentityParts"": [
-                                    {
-                                        ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id""
-                                    }
-                                ]
-                            },
-                            {
-                                ""ApiName"": ""AK_IdentityScalar"",
-                                ""ApiIdentityParts"": [
-                                    {
-                                        ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Name""
-                                    }
-                                ]
-                            }
-                        ],
-                        ""ApiProperties"": [
-                            {
-                                ""ApiName"": ""Id"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Int32""
-                                },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Id"",
-                                ""ClrMemberKind"": ""Property""
-                            },
-                            {
-                                ""ApiName"": ""Name"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""String""
-                                },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Name"",
-                                ""ClrMemberKind"": ""Property""
-                            }
-                        ],
-                        ""ApiRelationships"": [],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityScalar, Evoogle.ApiFramework.Core.Tests""
-                    },
-                    {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""IdentityTwoScalarPartComposite"",
-                        ""ApiIdentities"": [
-                            {
-                                ""ApiName"": ""PK_IdentityTwoScalarPartComposite"",
-                                ""ApiIdentityParts"": [
-                                    {
-                                        ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id1""
-                                    },
-                                    {
-                                        ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id2""
-                                    }
-                                ]
-                            }
-                        ],
-                        ""ApiProperties"": [
-                            {
-                                ""ApiName"": ""Id1"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Int32""
-                                },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Id1"",
-                                ""ClrMemberKind"": ""Property""
-                            },
-                            {
-                                ""ApiName"": ""Id2"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""String""
-                                },
-                                ""ApiTypeModifiers"": ""None"",
-                                ""ClrName"": ""Id2"",
-                                ""ClrMemberKind"": ""Property""
-                            },
-                            {
-                                ""ApiName"": ""Description"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""String""
-                                },
-                                ""ApiTypeModifiers"": ""None"",
-                                ""ClrName"": ""Description"",
-                                ""ClrMemberKind"": ""Property""
-                            }
-                        ],
-                        ""ApiRelationships"": [],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityTwoScalarPartComposite, Evoogle.ApiFramework.Core.Tests""
-                    },
-                    {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""IdentityThreeScalarPartComposite"",
-                        ""ApiIdentities"": [
-                            {
-                                ""ApiName"": ""PK_IdentityThreeScalarPartComposite"",
-                                ""ApiIdentityParts"": [
-                                    {
-                                        ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id1""
-                                    },
-                                    {
-                                        ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id2""
-                                    },
-                                    {
-                                        ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id3""
-                                    }
-                                ]
-                            }
-                        ],
-                        ""ApiProperties"": [
-                            {
-                                ""ApiName"": ""Id1"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Int32""
-                                },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Id1"",
-                                ""ClrMemberKind"": ""Property""
-                            },
-                            {
-                                ""ApiName"": ""Id2"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""String""
-                                },
-                                ""ApiTypeModifiers"": ""None"",
-                                ""ClrName"": ""Id2"",
-                                ""ClrMemberKind"": ""Property""
-                            },
-                            {
-                                ""ApiName"": ""Id3"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Guid""
-                                },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Id3"",
-                                ""ClrMemberKind"": ""Property""
-                            },
-                            {
-                                ""ApiName"": ""Description"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""String""
-                                },
-                                ""ApiTypeModifiers"": ""None"",
-                                ""ClrName"": ""Description"",
-                                ""ClrMemberKind"": ""Property""
-                            }
-                        ],
-                        ""ApiRelationships"": [],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityThreeScalarPartComposite, Evoogle.ApiFramework.Core.Tests""
-                    },
-                    {
-                        ""ApiKind"": ""Object"",
                         ""ApiName"": ""IdentityNested"",
                         ""ApiIdentities"": [
                             {
@@ -3601,7 +3834,7 @@ public partial class ApiSchemaTests
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id""
+                                        ""ClrPropertyName"": ""Id""
                                     }
                                 ]
                             }
@@ -3628,7 +3861,6 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiRelationships"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityNested, Evoogle.ApiFramework.Core.Tests""
                     },
                     {
@@ -3640,11 +3872,12 @@ public partial class ApiSchemaTests
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Nested"",
-                                        ""ApiPropertyName"": ""NestedPart""
+                                        ""ClrPropertyName"": ""NestedPart"",
+                                        ""ApiIdentityName"": ""PK_IdentityNestedPart""
                                     },
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Name""
+                                        ""ClrPropertyName"": ""Name""
                                     }
                                 ]
                             }
@@ -3671,153 +3904,11 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiRelationships"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityNestedComposite, Evoogle.ApiFramework.Core.Tests""
-                    },
-                    {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""IdentityOwner"",
-                        ""ApiIdentities"": [
-                            {
-                                ""ApiName"": ""PK_IdentityOwner"",
-                                ""ApiIdentityParts"": [
-                                    {
-                                        ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id""
-                                    }
-                                ]
-                            }
-                        ],
-                        ""ApiProperties"": [
-                            {
-                                ""ApiName"": ""Id"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Int32""
-                                },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Id"",
-                                ""ClrMemberKind"": ""Property""
-                            },
-                            {
-                                ""ApiName"": ""Description"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""String""
-                                },
-                                ""ApiTypeModifiers"": ""None"",
-                                ""ClrName"": ""Description"",
-                                ""ClrMemberKind"": ""Property""
-                            },
-                            {
-                                ""ApiName"": ""Dependents"",
-                                ""ApiType"": {
-                                    ""ApiInlineType"": {
-                                        ""ApiKind"": ""Collection"",
-                                        ""ApiItemType"": {
-                                            ""ApiKind"": ""Object"",
-                                            ""ApiName"": ""IdentityOwnedComposite""
-                                        },
-                                        ""ApiItemTypeModifiers"": ""Required"",
-                                        ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.TestData.IdentityOwnedComposite,Evoogle.ApiFramework.Core.Tests]], System.Private.CoreLib""
-                                    }
-                                },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Dependents"",
-                                ""ClrMemberKind"": ""Property""
-                            },
-                            {
-                                ""ApiName"": ""Dependent"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Object"",
-                                    ""ApiName"": ""IdentityOwnedDependent""
-                                },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Dependent"",
-                                ""ClrMemberKind"": ""Property""
-                            }
-                        ],
-                        ""ApiRelationships"": [],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityOwner, Evoogle.ApiFramework.Core.Tests""
-                    },
-                    {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""IdentityOwnedComposite"",
-                        ""ApiIdentities"": [
-                            {
-                                ""ApiName"": ""PK_IdentityOwnedComposite"",
-                                ""ApiIdentityParts"": [
-                                    {
-                                        ""ApiKind"": ""Owner""
-                                    },
-                                    {
-                                        ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""LineNumber""
-                                    }
-                                ]
-                            }
-                        ],
-                        ""ApiProperties"": [
-                            {
-                                ""ApiName"": ""LineNumber"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Int32""
-                                },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""LineNumber"",
-                                ""ClrMemberKind"": ""Property""
-                            },
-                            {
-                                ""ApiName"": ""Description"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""String""
-                                },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Description"",
-                                ""ClrMemberKind"": ""Property""
-                            }
-                        ],
-                        ""ApiRelationships"": [],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityOwnedComposite, Evoogle.ApiFramework.Core.Tests""
-                    },
-                    {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""IdentityOwnedDependent"",
-                        ""ApiIdentities"": [
-                            {
-                                ""ApiName"": ""PK_IdentityOwnedDependent"",
-                                ""ApiIdentityParts"": [
-                                    {
-                                        ""ApiKind"": ""Owner""
-                                    }
-                                ]
-                            }
-                        ],
-                        ""ApiProperties"": [
-                            {
-                                ""ApiName"": ""Description"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""String""
-                                },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Description"",
-                                ""ClrMemberKind"": ""Property""
-                            }
-                        ],
-                        ""ApiRelationships"": [],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityOwnedDependent, Evoogle.ApiFramework.Core.Tests""
                     }
-                ]
-            }"
-        },
-
-        // TC7: ApiSchema With Identity Schema (IdentityNested And IdentityNestedComposite With Explicit ApiIdentityName)
-        new JsonDeserializeTest
-        {
-            Name = $"{nameof(ApiSchema)} With Identity Schema ({nameof(IdentityNested)} And {nameof(IdentityNestedComposite)} With Explicit ApiIdentityName)",
+                ],
+                ""ApiRelationships"": []
+            }",
             ExpectedFactoryArgument = new ApiSchemaDescriptor
             (
                 ApiSchema: new ApiSchemaConfig
@@ -3955,10 +4046,16 @@ public partial class ApiSchemaTests
                         )
                     )
                 ]
-            ),
+            )
+        },
+
+        // ApiSchema With Identity Schema (IdentityOwner, IdentityOwnedComposite, And IdentityOwnedDependent With Explicit ApiIdentityName)
+        new JsonDeserializeTest
+        {
+            Name = $"{nameof(ApiSchema)} With Identity Schema ({nameof(IdentityOwner)}, {nameof(IdentityOwnedComposite)}, And {nameof(IdentityOwnedDependent)} With Explicit ApiIdentityName)",
             SourceJson = @"
             {
-                ""ApiName"": ""ApiSchema With Identity Schema (IdentityNested And IdentityNestedComposite With Explicit ApiIdentityName)"",
+                ""ApiName"": ""ApiSchema With Identity Schema (IdentityOwner, IdentityOwnedComposite, And IdentityOwnedDependent With Explicit ApiIdentityName)"",
                 ""ApiVersion"": ""0.1.0"",
                 ""ApiOptions"": {
                     ""ApiIdentityNullHandling"": ""ReturnEmpty""
@@ -3979,14 +4076,14 @@ public partial class ApiSchemaTests
                 ""ApiObjectTypes"": [
                     {
                         ""ApiKind"": ""Object"",
-                        ""ApiName"": ""IdentityNested"",
+                        ""ApiName"": ""IdentityOwner"",
                         ""ApiIdentities"": [
                             {
-                                ""ApiName"": ""PK_IdentityNestedPart"",
+                                ""ApiName"": ""PK_IdentityOwner"",
                                 ""ApiIdentityParts"": [
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id""
+                                        ""ClrPropertyName"": ""Id""
                                     }
                                 ]
                             }
@@ -4011,63 +4108,110 @@ public partial class ApiSchemaTests
                                 ""ApiTypeModifiers"": ""None"",
                                 ""ClrName"": ""Description"",
                                 ""ClrMemberKind"": ""Property""
+                            },
+                            {
+                                ""ApiName"": ""Dependents"",
+                                ""ApiType"": {
+                                    ""ApiInlineType"": {
+                                        ""ApiKind"": ""Collection"",
+                                        ""ApiItemType"": {
+                                            ""ApiKind"": ""Object"",
+                                            ""ApiName"": ""IdentityOwnedComposite""
+                                        },
+                                        ""ApiItemTypeModifiers"": ""Required"",
+                                        ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.TestData.IdentityOwnedComposite,Evoogle.ApiFramework.Core.Tests]], System.Private.CoreLib""
+                                    }
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Dependents"",
+                                ""ClrMemberKind"": ""Property""
+                            },
+                            {
+                                ""ApiName"": ""Dependent"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Object"",
+                                    ""ApiName"": ""IdentityOwnedDependent""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Dependent"",
+                                ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiRelationships"": [],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityNested, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityOwner, Evoogle.ApiFramework.Core.Tests""
                     },
                     {
                         ""ApiKind"": ""Object"",
-                        ""ApiName"": ""IdentityNestedComposite"",
+                        ""ApiName"": ""IdentityOwnedComposite"",
                         ""ApiIdentities"": [
                             {
-                                ""ApiName"": ""PK_IdentityNestedComposite"",
+                                ""ApiName"": ""PK_IdentityOwnedComposite"",
                                 ""ApiIdentityParts"": [
                                     {
-                                        ""ApiKind"": ""Nested"",
-                                        ""ApiPropertyName"": ""NestedPart"",
-                                        ""ApiIdentityName"": ""PK_IdentityNestedPart""
+                                        ""ApiKind"": ""Owner"",
+                                        ""ApiIdentityName"": ""PK_IdentityOwner""
                                     },
                                     {
                                         ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Name""
+                                        ""ClrPropertyName"": ""LineNumber""
                                     }
                                 ]
                             }
                         ],
                         ""ApiProperties"": [
                             {
-                                ""ApiName"": ""NestedPart"",
+                                ""ApiName"": ""LineNumber"",
                                 ""ApiType"": {
-                                    ""ApiKind"": ""Object"",
-                                    ""ApiName"": ""IdentityNested""
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""Int32""
                                 },
                                 ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""NestedPart"",
+                                ""ClrName"": ""LineNumber"",
                                 ""ClrMemberKind"": ""Property""
                             },
                             {
-                                ""ApiName"": ""Name"",
+                                ""ApiName"": ""Description"",
                                 ""ApiType"": {
                                     ""ApiKind"": ""Scalar"",
                                     ""ApiName"": ""String""
                                 },
                                 ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Name"",
+                                ""ClrName"": ""Description"",
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiRelationships"": [],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityNestedComposite, Evoogle.ApiFramework.Core.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityOwnedComposite, Evoogle.ApiFramework.Core.Tests""
+                    },
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""IdentityOwnedDependent"",
+                        ""ApiIdentities"": [
+                            {
+                                ""ApiName"": ""PK_IdentityOwnedDependent"",
+                                ""ApiIdentityParts"": [
+                                    {
+                                        ""ApiKind"": ""Owner"",
+                                        ""ApiIdentityName"": ""PK_IdentityOwner""
+                                    }
+                                ]
+                            }
+                        ],
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""Description"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""String""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Description"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityOwnedDependent, Evoogle.ApiFramework.Core.Tests""
                     }
-                ]
-            }"
-        },
-
-        // TC8: ApiSchema With Identity Schema (IdentityOwner, IdentityOwnedComposite, And IdentityOwnedDependent With Explicit ApiIdentityName)
-        new JsonDeserializeTest
-        {
-            Name = $"{nameof(ApiSchema)} With Identity Schema ({nameof(IdentityOwner)}, {nameof(IdentityOwnedComposite)}, And {nameof(IdentityOwnedDependent)} With Explicit ApiIdentityName)",
+                ],
+                ""ApiRelationships"": []
+            }",
             ExpectedFactoryArgument = new ApiSchemaDescriptor
             (
                 ApiSchema: new ApiSchemaConfig
@@ -4269,168 +4413,7 @@ public partial class ApiSchemaTests
                         )
                     )
                 ]
-            ),
-            SourceJson = @"
-            {
-                ""ApiName"": ""ApiSchema With Identity Schema (IdentityOwner, IdentityOwnedComposite, And IdentityOwnedDependent With Explicit ApiIdentityName)"",
-                ""ApiVersion"": ""0.1.0"",
-                ""ApiOptions"": {
-                    ""ApiIdentityNullHandling"": ""ReturnEmpty""
-                },
-                ""ApiScalarTypes"": [
-                    {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""Int32"",
-                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
-                    },
-                    {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""String"",
-                        ""ClrType"": ""System.String, System.Private.CoreLib""
-                    }
-                ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
-                    {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""IdentityOwner"",
-                        ""ApiIdentities"": [
-                            {
-                                ""ApiName"": ""PK_IdentityOwner"",
-                                ""ApiIdentityParts"": [
-                                    {
-                                        ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""Id""
-                                    }
-                                ]
-                            }
-                        ],
-                        ""ApiProperties"": [
-                            {
-                                ""ApiName"": ""Id"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Int32""
-                                },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Id"",
-                                ""ClrMemberKind"": ""Property""
-                            },
-                            {
-                                ""ApiName"": ""Description"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""String""
-                                },
-                                ""ApiTypeModifiers"": ""None"",
-                                ""ClrName"": ""Description"",
-                                ""ClrMemberKind"": ""Property""
-                            },
-                            {
-                                ""ApiName"": ""Dependents"",
-                                ""ApiType"": {
-                                    ""ApiInlineType"": {
-                                        ""ApiKind"": ""Collection"",
-                                        ""ApiItemType"": {
-                                            ""ApiKind"": ""Object"",
-                                            ""ApiName"": ""IdentityOwnedComposite""
-                                        },
-                                        ""ApiItemTypeModifiers"": ""Required"",
-                                        ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.TestData.IdentityOwnedComposite,Evoogle.ApiFramework.Core.Tests]], System.Private.CoreLib""
-                                    }
-                                },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Dependents"",
-                                ""ClrMemberKind"": ""Property""
-                            },
-                            {
-                                ""ApiName"": ""Dependent"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Object"",
-                                    ""ApiName"": ""IdentityOwnedDependent""
-                                },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Dependent"",
-                                ""ClrMemberKind"": ""Property""
-                            }
-                        ],
-                        ""ApiRelationships"": [],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityOwner, Evoogle.ApiFramework.Core.Tests""
-                    },
-                    {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""IdentityOwnedComposite"",
-                        ""ApiIdentities"": [
-                            {
-                                ""ApiName"": ""PK_IdentityOwnedComposite"",
-                                ""ApiIdentityParts"": [
-                                    {
-                                        ""ApiKind"": ""Owner"",
-                                        ""ApiIdentityName"": ""PK_IdentityOwner""
-                                    },
-                                    {
-                                        ""ApiKind"": ""Scalar"",
-                                        ""ApiPropertyName"": ""LineNumber""
-                                    }
-                                ]
-                            }
-                        ],
-                        ""ApiProperties"": [
-                            {
-                                ""ApiName"": ""LineNumber"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Int32""
-                                },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""LineNumber"",
-                                ""ClrMemberKind"": ""Property""
-                            },
-                            {
-                                ""ApiName"": ""Description"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""String""
-                                },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Description"",
-                                ""ClrMemberKind"": ""Property""
-                            }
-                        ],
-                        ""ApiRelationships"": [],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityOwnedComposite, Evoogle.ApiFramework.Core.Tests""
-                    },
-                    {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""IdentityOwnedDependent"",
-                        ""ApiIdentities"": [
-                            {
-                                ""ApiName"": ""PK_IdentityOwnedDependent"",
-                                ""ApiIdentityParts"": [
-                                    {
-                                        ""ApiKind"": ""Owner"",
-                                        ""ApiIdentityName"": ""PK_IdentityOwner""
-                                    }
-                                ]
-                            }
-                        ],
-                        ""ApiProperties"": [
-                            {
-                                ""ApiName"": ""Description"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""String""
-                                },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Description"",
-                                ""ClrMemberKind"": ""Property""
-                            }
-                        ],
-                        ""ApiRelationships"": [],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityOwnedDependent, Evoogle.ApiFramework.Core.Tests""
-                    }
-                ]
-            }"
+            )
         },
     ];
     #endregion

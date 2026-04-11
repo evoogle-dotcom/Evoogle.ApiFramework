@@ -287,33 +287,6 @@ public static class ApiObjectTypeExtensions
         throw new ApiSchemaException(errorMessage);
     }
 
-    /// <summary>
-    ///     Gets an <see cref="ApiRelationship"/> by its API name.
-    /// </summary>
-    /// <param name="apiObjectType">The API object type to search.</param>
-    /// <param name="apiName">The API name of the relationship to retrieve.</param>
-    /// <returns>The <see cref="ApiRelationship"/> with the specified API name.</returns>
-    /// <exception cref="ApiSchemaException">
-    ///     Thrown if no relationship with the specified API name exists in the object type.
-    ///     The exception message includes a list of all available relationship API names.
-    /// </exception>
-    /// <remarks>
-    ///     This method performs a case-sensitive search for the relationship by its API name.
-    ///     Use <see cref="ApiObjectType.TryGetRelationshipByApiName"/> if you prefer non-throwing behavior.
-    /// </remarks>
-    public static ApiRelationship GetRelationshipByApiName(this ApiObjectType apiObjectType, string apiName)
-    {
-        if (apiObjectType.TryGetRelationshipByApiName(apiName, out var apiRelationship))
-        {
-            return apiRelationship!;
-        }
-
-        var availableRelationshipsByApiName = string.Join(',', apiObjectType.ApiRelationships.OrderBy(r => r.ApiName).Select(r => r.ApiName));
-        var errorMessage = $"{nameof(ApiRelationship)} with {nameof(ApiRelationship.ApiName)} '{apiName.SafeToString()}' not found in {apiObjectType.SafeToString()}. " +
-            $"Available {nameof(ApiRelationship)} by {nameof(ApiRelationship.ApiName)} are: {availableRelationshipsByApiName}.";
-        throw new ApiSchemaException(errorMessage);
-    }
-
     // <summary>
     //     Attempts to get identities for a collection of instances without throwing exceptions.
     // </summary>

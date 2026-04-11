@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -94,37 +94,37 @@ public class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
                         {
                             case ApiIdentityPartKind.Scalar:
                                 {
-                                    var scalarPart = (ApiScalarIdentityPart)apiIdentityPart;
+                                    var scalarPart = (ApiIdentityScalarPart)apiIdentityPart;
                                     var clrScalarTypeHint = scalarPart.ClrScalarTypeHint;
                                     if (clrScalarTypeHint is not null)
                                     {
-                                        identityBuilder.AddScalar(scalarPart.ApiPropertyName, clrScalarTypeHint);
+                                        identityBuilder.AddScalar(scalarPart.ClrPropertyName, clrScalarTypeHint);
                                     }
                                     else
                                     {
-                                        identityBuilder.AddScalar(scalarPart.ApiPropertyName);
+                                        identityBuilder.AddScalar(scalarPart.ClrPropertyName);
                                     }
                                     break;
                                 }
 
                             case ApiIdentityPartKind.Nested:
                                 {
-                                    var nestedPart = (ApiNestedIdentityPart)apiIdentityPart;
+                                    var nestedPart = (ApiIdentityNestedPart)apiIdentityPart;
                                     var apiIdentityName = nestedPart.ApiIdentityName;
                                     if (apiIdentityName is not null)
                                     {
-                                        identityBuilder.AddNested(nestedPart.ApiPropertyName, apiIdentityName);
+                                        identityBuilder.AddNested(nestedPart.ClrPropertyName, apiIdentityName);
                                     }
                                     else
                                     {
-                                        identityBuilder.AddNested(nestedPart.ApiPropertyName);
+                                        identityBuilder.AddNested(nestedPart.ClrPropertyName);
                                     }
                                     break;
                                 }
 
                             case ApiIdentityPartKind.Owner:
                                 {
-                                    var ownerPart = (ApiOwnerIdentityPart)apiIdentityPart;
+                                    var ownerPart = (ApiIdentityOwnerPart)apiIdentityPart;
                                     var apiIdentityName = ownerPart.ApiIdentityName;
                                     if (apiIdentityName is not null)
                                     {
@@ -148,12 +148,6 @@ public class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
             foreach (var apiProperty in apiProperties ?? [])
             {
                 builder.AddProperty(apiProperty.ApiName, apiProperty.ClrName);
-            }
-
-            var apiRelationships = apiObjectType.ApiRelationships;
-            foreach (var apiRelationship in apiRelationships ?? [])
-            {
-                builder.AddRelationship(apiRelationship.ApiName, apiRelationship.ApiPropertyName);
             }
 
             var apiOptions = apiObjectType.ApiOptions;

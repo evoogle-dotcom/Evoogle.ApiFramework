@@ -4,7 +4,6 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using System.Text.Json;
-
 using Evoogle.Json;
 
 using Microsoft.Extensions.Logging;
@@ -34,6 +33,7 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
         public required string ApiScalarTypes { get; init; }
         public required string ApiEnumTypes { get; init; }
         public required string ApiObjectTypes { get; init; }
+        public required string ApiRelationships { get; init; }
         #endregion
     }
 
@@ -59,6 +59,7 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
                     ApiScalarTypes = policy.ConvertName(nameof(Schema.ApiSchema.ApiScalarTypes)),
                     ApiEnumTypes = policy.ConvertName(nameof(Schema.ApiSchema.ApiEnumTypes)),
                     ApiObjectTypes = policy.ConvertName(nameof(Schema.ApiSchema.ApiObjectTypes)),
+                    ApiRelationships = policy.ConvertName(nameof(Schema.ApiSchema.ApiRelationships)),
                 },
                 ExtensibleBase = GetExtensiblePropertyNames(policy),
             };
@@ -79,6 +80,7 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
         public List<ApiScalarType>? ApiScalarTypes { get; set; }
         public List<ApiEnumType>? ApiEnumTypes { get; set; }
         public List<ApiObjectType>? ApiObjectTypes { get; set; }
+        public List<ApiRelationship>? ApiRelationships { get; set; }
         #endregion
     }
 
@@ -107,6 +109,7 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
             { propertyNames.ApiSchema.ApiScalarTypes, HandleApiScalarTypes },
             { propertyNames.ApiSchema.ApiEnumTypes, HandleApiEnumTypes },
             { propertyNames.ApiSchema.ApiObjectTypes, HandleApiObjectTypes },
+            { propertyNames.ApiSchema.ApiRelationships, HandleApiRelationships },
 
             // ExtensibleBase Property Handlers
             { propertyNames.ExtensibleBase.Extensions, CreateExtensionsHandler<PropertyNames, ReadData, ReadHandlers>() },
@@ -167,6 +170,17 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
 
             context.ReadData.ApiSchema.ApiObjectTypes = apiObjectTypes;
         }
+
+        private static void HandleApiRelationships(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        {
+            context.ReadData.ApiSchema ??= new ApiSchemaReadData();
+
+            var options = context.Options;
+            var propertyName = context.PropertyNames.ApiSchema.ApiRelationships;
+            var apiRelationships = DeserializeListOf<ApiRelationship>(ref reader, options, propertyName);
+
+            context.ReadData.ApiSchema.ApiRelationships = apiRelationships;
+        }
         #endregion
     }
     #endregion
@@ -211,6 +225,7 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
         var apiScalarTypes = readContext.ReadData.ApiSchema?.ApiScalarTypes;
         var apiEnumTypes = readContext.ReadData.ApiSchema?.ApiEnumTypes;
         var apiObjectTypes = readContext.ReadData.ApiSchema?.ApiObjectTypes;
+        var apiRelationships = readContext.ReadData.ApiSchema?.ApiRelationships;
 
         var apiSchema = new ApiSchema
         (
@@ -219,7 +234,8 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
             apiOptions,
             apiScalarTypes,
             apiEnumTypes,
-            apiObjectTypes
+            apiObjectTypes,
+            apiRelationships
         );
 
         // Attach the extensions if present.
@@ -258,6 +274,7 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
             WriteApiScalarTypes(writer, value, writeContext);
             WriteApiEnumTypes(writer, value, writeContext);
             WriteApiObjectTypes(writer, value, writeContext);
+            WriteApiRelationships(writer, value, writeContext);
 
             // Epilog
             WriteExtensions(writer, value, writeContext);
@@ -333,6 +350,21 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
         (
             propertyName,
             apiObjectTypes,
+            options,
+            collection => WriteJsonArray(writer, collection, item => writer.TryWriteWithSerializer(item, options))
+        );
+    }
+
+    private static void WriteApiRelationships(Utf8JsonWriter writer, ApiSchema apiSchema, DefaultWriteContext<PropertyNames> context)
+    {
+        var propertyName = context.PropertyNames.ApiSchema.ApiRelationships;
+        var apiRelationships = apiSchema.ApiRelationships;
+        var options = context.Options;
+
+        writer.TryWritePropertyWithAction
+        (
+            propertyName,
+            apiRelationships,
             options,
             collection => WriteJsonArray(writer, collection, item => writer.TryWriteWithSerializer(item, options))
         );

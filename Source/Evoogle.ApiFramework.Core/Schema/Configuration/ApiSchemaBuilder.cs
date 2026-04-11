@@ -137,6 +137,38 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     }
 
     /// <summary>
+    ///     Adds an object type to the schema using a strongly-typed inline configuration action.
+    /// </summary>
+    /// <typeparam name="T">The CLR object type.</typeparam>
+    /// <param name="configure">Callback to configure the added object type.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiSchemaBuilder AddObject<T>(Action<ApiObjectTypeBuilder<T>> configure)
+    {
+        ArgumentNullException.ThrowIfNull(configure);
+
+        var builder = _context.GetOrAddObjectTypeBuilder<T>();
+
+        configure(builder);
+        return this;
+    }
+
+    /// <summary>
+    ///     Adds an object type to the schema using a strongly-typed <see cref="IApiObjectTypeConfiguration{T}"/>.
+    /// </summary>
+    /// <typeparam name="T">The CLR object type.</typeparam>
+    /// <param name="configuration">The typed configuration implementation.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiSchemaBuilder AddObject<T>(IApiObjectTypeConfiguration<T> configuration)
+    {
+        ArgumentNullException.ThrowIfNull(configuration);
+
+        var builder = _context.GetOrAddObjectTypeBuilder<T>();
+
+        configuration.Configure(builder);
+        return this;
+    }
+
+    /// <summary>
     ///     Adds a scalar type to the schema using an inline configuration action.
     /// </summary>
     /// <param name="clrType">The CLR scalar type.</param>
@@ -171,6 +203,108 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     }
 
     /// <summary>
+    ///     Adds a one-to-one relationship to the schema using an inline configuration action.
+    /// </summary>
+    /// <param name="apiName">The schema-unique API name of the relationship.</param>
+    /// <param name="configure">Callback to configure the relationship.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiSchemaBuilder AddOneToOneRelationship(string apiName, Action<ApiRelationshipOneToOneBuilder> configure)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
+        ArgumentNullException.ThrowIfNull(configure);
+
+        var builder = _context.GetOrAddOneToOneRelationshipBuilder(apiName);
+
+        configure(builder);
+        return this;
+    }
+
+    /// <summary>
+    ///     Adds a one-to-one relationship to the schema using an <see cref="IApiRelationshipOneToOneConfiguration"/>.
+    /// </summary>
+    /// <param name="apiName">The schema-unique API name of the relationship.</param>
+    /// <param name="configuration">The configuration implementation.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiSchemaBuilder AddOneToOneRelationship(string apiName, IApiRelationshipOneToOneConfiguration configuration)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
+        ArgumentNullException.ThrowIfNull(configuration);
+
+        var builder = _context.GetOrAddOneToOneRelationshipBuilder(apiName);
+
+        configuration.Configure(builder);
+        return this;
+    }
+
+    /// <summary>
+    ///     Adds a one-to-many relationship to the schema using an inline configuration action.
+    /// </summary>
+    /// <param name="apiName">The schema-unique API name of the relationship.</param>
+    /// <param name="configure">Callback to configure the relationship.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiSchemaBuilder AddOneToManyRelationship(string apiName, Action<ApiRelationshipOneToManyBuilder> configure)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
+        ArgumentNullException.ThrowIfNull(configure);
+
+        var builder = _context.GetOrAddOneToManyRelationshipBuilder(apiName);
+
+        configure(builder);
+        return this;
+    }
+
+    /// <summary>
+    ///     Adds a one-to-many relationship to the schema using an <see cref="IApiRelationshipOneToManyConfiguration"/>.
+    /// </summary>
+    /// <param name="apiName">The schema-unique API name of the relationship.</param>
+    /// <param name="configuration">The configuration implementation.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiSchemaBuilder AddOneToManyRelationship(string apiName, IApiRelationshipOneToManyConfiguration configuration)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
+        ArgumentNullException.ThrowIfNull(configuration);
+
+        var builder = _context.GetOrAddOneToManyRelationshipBuilder(apiName);
+
+        configuration.Configure(builder);
+        return this;
+    }
+
+    /// <summary>
+    ///     Adds a many-to-many relationship to the schema using an inline configuration action.
+    /// </summary>
+    /// <param name="apiName">The schema-unique API name of the relationship.</param>
+    /// <param name="configure">Callback to configure the relationship.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiSchemaBuilder AddManyToManyRelationship(string apiName, Action<ApiRelationshipManyToManyBuilder> configure)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
+        ArgumentNullException.ThrowIfNull(configure);
+
+        var builder = _context.GetOrAddManyToManyRelationshipBuilder(apiName);
+
+        configure(builder);
+        return this;
+    }
+
+    /// <summary>
+    ///     Adds a many-to-many relationship to the schema using an <see cref="IApiRelationshipManyToManyConfiguration"/>.
+    /// </summary>
+    /// <param name="apiName">The schema-unique API name of the relationship.</param>
+    /// <param name="configuration">The configuration implementation.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiSchemaBuilder AddManyToManyRelationship(string apiName, IApiRelationshipManyToManyConfiguration configuration)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
+        ArgumentNullException.ThrowIfNull(configuration);
+
+        var builder = _context.GetOrAddManyToManyRelationshipBuilder(apiName);
+
+        configuration.Configure(builder);
+        return this;
+    }
+
+    /// <summary>
     ///     Constructs the <see cref="ApiSchema"/> using the configured components.
     /// </summary>
     /// <returns>The built <see cref="ApiSchema"/>.</returns>
@@ -184,6 +318,7 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
         var apiScalarTypes = _context.ApiScalarTypeBuilders.Select(b => b.Build());
         var apiEnumTypes = _context.ApiEnumTypeBuilders.Select(b => b.Build());
         var apiObjectTypes = _context.ApiObjectTypeBuilders.Select(b => b.Build());
+        var apiRelationships = _context.ApiRelationshipBuilders.Select(b => b.Build());
 
         var apiSchema = new ApiSchema
         (
@@ -192,7 +327,8 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
             apiOptions,
             apiScalarTypes,
             apiEnumTypes,
-            apiObjectTypes
+            apiObjectTypes,
+            apiRelationships
         );
 
         // Add any extensions that were configured.

@@ -138,10 +138,6 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
                             )
                         );
                     }
-                    foreach (var apiRelationship in apiObjectType.ApiRelationships.SafeCast<ApiRelationship>())
-                    {
-                        x.AddRelationship(apiRelationship.ApiName, apiRelationship.ApiPropertyName);
-                    }
                 });
             }
 
@@ -224,7 +220,6 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
             new (apiName: nameof(ScalarsOnly.OptionalNumber), apiTypeExpression: ApiTypeExpression.ClrRef<long>(), apiTypeModifiers: ApiTypeModifiers.None, clrName: nameof(ScalarsOnly.OptionalNumber), clrMemberKind: ClrMemberKind.Field),
             new (apiName: nameof(ScalarsOnly.OptionalPredicate), apiTypeExpression: ApiTypeExpression.ClrRef<bool>(), apiTypeModifiers: ApiTypeModifiers.None, clrName: nameof(ScalarsOnly.OptionalPredicate), clrMemberKind: ClrMemberKind.Field),
         ],
-        apiRelationships: null,
         apiIdentities: null,
         apiOptions: null,
         clrObjectType: typeof(ScalarsOnly)
@@ -240,7 +235,6 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
             new (apiName: nameof(Person.Gender), apiTypeExpression: ApiTypeExpression.ClrRef<Gender>(), apiTypeModifiers: ApiTypeModifiers.None, clrName: nameof(Person.Gender), clrMemberKind: ClrMemberKind.Property),
             new (apiName: nameof(Person.Hobbies), apiTypeExpression: ApiTypeExpression.ListOf<string>(apiItemTypeModifiers: ApiTypeModifiers.Required), apiTypeModifiers: ApiTypeModifiers.None, clrName: nameof(Person.Hobbies), clrMemberKind: ClrMemberKind.Property),
         ],
-        apiRelationships: null,
         apiIdentities: null,
         apiOptions: null,
         clrObjectType: typeof(Person)
@@ -255,11 +249,6 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
             new (apiName: nameof(Company.Owner), apiTypeExpression: ApiTypeExpression.ClrRef<Person>(), apiTypeModifiers: ApiTypeModifiers.None, clrName: nameof(Company.Owner), clrMemberKind: ClrMemberKind.Property),
             new (apiName: nameof(Company.Employees), apiTypeExpression: ApiTypeExpression.ListOf<Person>(apiItemTypeModifiers: ApiTypeModifiers.Required), apiTypeModifiers: ApiTypeModifiers.None, clrName: nameof(Company.Employees), clrMemberKind: ClrMemberKind.Property),
         ],
-        apiRelationships:
-        [
-            new (apiName: nameof(Company.Owner)),
-            new (apiName: nameof(Company.Employees)),
-        ],
         apiIdentities: null,
         apiOptions: null,
         clrObjectType: typeof(Company)
@@ -273,11 +262,6 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
             new (apiName: nameof(Company.Name), apiTypeExpression: ApiTypeExpression.ClrRef<string>(), apiTypeModifiers: ApiTypeModifiers.Required, clrName: nameof(Company.Name), clrMemberKind: ClrMemberKind.Property),
             new (apiName: nameof(Company.Owner), apiTypeExpression: ApiTypeExpression.ClrRef<Person>(), apiTypeModifiers: ApiTypeModifiers.None, clrName: nameof(Company.Owner), clrMemberKind: ClrMemberKind.Property),
             new (apiName: nameof(Company.Employees), apiTypeExpression: ApiTypeExpression.ListOf<Person>(apiItemTypeModifiers: ApiTypeModifiers.Required), apiTypeModifiers: ApiTypeModifiers.None, clrName: nameof(Company.Employees), clrMemberKind: ClrMemberKind.Property),
-        ],
-        apiRelationships:
-        [
-            new (apiName: nameof(Company.Owner), apiPropertyName: nameof(Company.Owner) + "Missing"),
-            new (apiName: nameof(Company.Employees), apiPropertyName: nameof(Company.Employees) + "Missing"),
         ],
         apiIdentities: null,
         apiOptions: null,
@@ -605,46 +589,6 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
                     code: ApiInitializationCode.API_COLLECTION_TYPE_UNRESOLVED_ITEM_TYPE,
                     description: $"{nameof(ApiCollectionType.ApiItemType)} could not be resolved for {nameof(ApiTypeExpression.ClrType)}='{nameof(Person)}'",
                     remediation: $"Verify that a type is declared in the schema for {nameof(ApiTypeExpression.ClrType)}='{nameof(Person)}'"
-                ),
-            ]
-        },
-        new BuildTest
-        {
-            Name = $"Builds {ApiCompanyObjectTypeSchema} throws when relationship properties are missing",
-            ApiName = nameof(ApiCompanyObjectTypeSchema),
-            ApiVersion = "1.0",
-            ApiScalarTypes =
-            [
-                ApiStringScalarType,
-                ApiInt32ScalarType,
-            ],
-            ApiEnumTypes =
-            [
-                ApiGenderEnumType,
-            ],
-            ApiObjectTypes =
-            [
-                ApiCompanyObjectTypeWithMissingRelatedProperties,
-                ApiPersonObjectType,
-            ],
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=2, Errors=2, Warnings=0.",
-            ExpectedIssues =
-            [
-                new ApiInitializationIssue
-                (
-                    path: $"{nameof(ApiObjectType)}[\"{nameof(Company)}\"].{nameof(ApiRelationship)}[\"{nameof(Company.Owner)}\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.API_RELATIONSHIP_UNRESOLVED_PROPERTY,
-                    description: $"{nameof(ApiRelationship.ApiProperty)} could not be resolved for {nameof(ApiRelationship.ApiPropertyName)}='OwnerMissing' on parent {nameof(ApiObjectType)}='{nameof(Company)}'",
-                    remediation: $"Verify that {nameof(ApiRelationship.ApiPropertyName)} refers to a valid property on parent {nameof(ApiObjectType)}='{nameof(Company)}'"
-                ),
-                new ApiInitializationIssue
-                (
-                    path: $"{nameof(ApiObjectType)}[\"{nameof(Company)}\"].{nameof(ApiRelationship)}[\"{nameof(Company.Employees)}\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.API_RELATIONSHIP_UNRESOLVED_PROPERTY,
-                    description: $"{nameof(ApiRelationship.ApiProperty)} could not be resolved for {nameof(ApiRelationship.ApiPropertyName)}='EmployeesMissing' on parent {nameof(ApiObjectType)}='{nameof(Company)}'",
-                    remediation: $"Verify that {nameof(ApiRelationship.ApiPropertyName)} refers to a valid property on parent {nameof(ApiObjectType)}='{nameof(Company)}'"
                 ),
             ]
         },

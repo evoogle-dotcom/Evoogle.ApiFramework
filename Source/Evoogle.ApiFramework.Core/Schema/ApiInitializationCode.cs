@@ -89,14 +89,14 @@ public enum ApiInitializationCode
 
     #region ApiIdentityPart Initialization Codes
     /// <summary>
-    ///     The identity part's property API name is null, empty, or whitespace.
-    /// </summary>
-    API_IDENTITY_PART_INVALID_API_PROPERTY_NAME,
-
-    /// <summary>
     ///    The identity part's property reference is of an invalid type for the identity part kind (e.g., non-scalar type for a scalar identity part).
     /// </summary>
     API_IDENTITY_PART_INVALID_API_PROPERTY_TYPE,
+
+    /// <summary>
+    ///     The identity part's property CLR name is null, empty, or whitespace.
+    /// </summary>
+    API_IDENTITY_PART_INVALID_CLR_PROPERTY_NAME,
 
     /// <summary>
     ///     An identity part uses a property CLR type that may have performance implications for identity operations.
@@ -129,6 +129,106 @@ public enum ApiInitializationCode
     API_IDENTITY_PART_CYCLIC_OWNER,
     #endregion
 
+    #region ApiRelationship Initialization Codes
+    /// <summary>
+    ///     The relationship's API name is null, empty, or whitespace.
+    /// </summary>
+    API_RELATIONSHIP_INVALID_API_NAME,
+
+    /// <summary>
+    ///     The relationship's principal end is null.
+    /// </summary>
+    API_RELATIONSHIP_NULL_PRINCIPAL_END,
+
+    /// <summary>
+    ///     The relationship's dependent end is null.
+    /// </summary>
+    API_RELATIONSHIP_NULL_DEPENDENT_END,
+    #endregion
+
+    #region ApiRelationshipEnd Initialization Codes
+    /// <summary>
+    ///     The relationship end's object type name is null, empty, or whitespace.
+    /// </summary>
+    API_RELATIONSHIP_END_INVALID_OBJECT_TYPE_NAME,
+
+    /// <summary>
+    ///     The relationship end's object type name could not be resolved to a defined object type in the schema.
+    /// </summary>
+    API_RELATIONSHIP_END_UNRESOLVED_OBJECT_TYPE,
+
+    /// <summary>
+    ///     The principal end's referenced identity could not be resolved, or the principal type has no primary identity.
+    /// </summary>
+    API_RELATIONSHIP_END_UNRESOLVED_IDENTITY,
+    #endregion
+
+    #region ApiRelationshipManyToMany Initialization Codes
+    /// <summary>
+    ///     The many-to-many relationship's principal end A is null.
+    /// </summary>
+    API_RELATIONSHIP_MANY_TO_MANY_NULL_PRINCIPAL_END_A,
+
+    /// <summary>
+    ///     The many-to-many relationship's principal end B is null.
+    /// </summary>
+    API_RELATIONSHIP_MANY_TO_MANY_NULL_PRINCIPAL_END_B,
+
+    /// <summary>
+    ///     The many-to-many relationship's dependent end A is null.
+    /// </summary>
+    API_RELATIONSHIP_MANY_TO_MANY_NULL_DEPENDENT_END_A,
+
+    /// <summary>
+    ///     The many-to-many relationship's dependent end B is null.
+    /// </summary>
+    API_RELATIONSHIP_MANY_TO_MANY_NULL_DEPENDENT_END_B,
+
+    /// <summary>
+    ///     The many-to-many relationship's association type name is null, empty, or whitespace.
+    /// </summary>
+    API_RELATIONSHIP_MANY_TO_MANY_INVALID_ASSOCIATION_TYPE_NAME,
+
+    /// <summary>
+    ///     The many-to-many relationship's association type name could not be resolved to a defined object type in the schema.
+    /// </summary>
+    API_RELATIONSHIP_MANY_TO_MANY_UNRESOLVED_ASSOCIATION_TYPE,
+
+    /// <summary>
+    ///     A dependent end of a many-to-many relationship references an object type that does not match the declared association type.
+    /// </summary>
+    API_RELATIONSHIP_MANY_TO_MANY_DEPENDENT_TYPE_MISMATCH,
+
+    /// <summary>
+    ///     A dependent end of a many-to-many relationship has null or empty key paths.
+    ///     Purely navigational many-to-many relationships are not supported.
+    /// </summary>
+    API_RELATIONSHIP_MANY_TO_MANY_EMPTY_KEY_PATHS,
+    #endregion
+
+    #region ApiRelationshipKeyPath Initialization Codes
+    /// <summary>
+    ///    The relationship key path's CLR property name is null, empty, or whitespace.
+    /// </summary>
+    API_RELATIONSHIP_KEY_PATH_INVALID_CLR_PROPERTY_NAME,
+
+    /// <summary>
+    ///    The relationship key path's property reference could not be resolved to a defined property on the declaring object type.
+    /// </summary>
+    API_RELATIONSHIP_KEY_PATH_UNRESOLVED_API_PROPERTY,
+
+    /// <summary>
+    ///     The relationship key path's property reference is of an invalid type for the path kind
+    ///     (e.g., a non-object property used as a nested key path navigation property).
+    /// </summary>
+    API_RELATIONSHIP_KEY_PATH_INVALID_API_PROPERTY_TYPE,
+
+    /// <summary>
+    ///     A nested or owner relationship key path contains no child paths.
+    /// </summary>
+    API_RELATIONSHIP_KEY_PATH_NULL_OR_EMPTY_PATHS,
+    #endregion
+
     #region ApiNamedType Initialization Codes
     /// <summary>
     ///     The named type's API name is null, empty, or whitespace.
@@ -151,11 +251,6 @@ public enum ApiInitializationCode
     ///     Multiple properties have the same CLR name.
     /// </summary>
     API_OBJECT_TYPE_DUPLICATE_PROPERTY_CLR_NAME,
-
-    /// <summary>
-    ///     Multiple relationships have the same API name.
-    /// </summary>
-    API_OBJECT_TYPE_DUPLICATE_RELATIONSHIP_API_NAME,
 
     /// <summary>
     ///     The object type has no properties defined.
@@ -215,18 +310,6 @@ public enum ApiInitializationCode
     API_PROPERTY_UNRESOLVED_TYPE,
     #endregion
 
-    #region ApiRelationship Initialization Codes
-    /// <summary>
-    ///     The relationship's API name is null, empty, or whitespace.
-    /// </summary>
-    API_RELATIONSHIP_INVALID_NAME,
-
-    /// <summary>
-    ///     The relationship's property reference could not be resolved to a defined property.
-    /// </summary>
-    API_RELATIONSHIP_UNRESOLVED_PROPERTY,
-    #endregion
-
     #region ApiSchema Initialization Codes
     /// <summary>
     ///     Multiple enum types have the same API name.
@@ -257,6 +340,11 @@ public enum ApiInitializationCode
     ///     Multiple object types have the same CLR type.
     /// </summary>
     API_SCHEMA_DUPLICATE_OBJECT_TYPE_CLR_TYPE,
+
+    /// <summary>
+    ///     Multiple relationships have the same API name.
+    /// </summary>
+    API_SCHEMA_DUPLICATE_RELATIONSHIP_API_NAME,
 
     /// <summary>
     ///     Multiple scalar types have the same API name.
