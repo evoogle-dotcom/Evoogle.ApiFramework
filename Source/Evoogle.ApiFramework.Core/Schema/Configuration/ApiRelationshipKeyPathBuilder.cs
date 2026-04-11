@@ -39,6 +39,27 @@ public class ApiRelationshipKeyPathBuilder
 
     #region Builder Methods
     /// <summary>
+    ///     Adds an extension value associated with the specified <paramref name="type"/>.
+    /// </summary>
+    /// <param name="type">The type used as the extension key.</param>
+    /// <param name="value">The extension value to store.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiRelationshipKeyPathBuilder AddKeyPathExtension(Type type, object value)
+    {
+        base.AddExtension(type, value);
+        return this;
+    }
+
+    /// <summary>
+    ///     Adds an extension value keyed by its own type.
+    /// </summary>
+    /// <typeparam name="T">The extension value type.</typeparam>
+    /// <param name="value">The extension value.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiRelationshipKeyPathBuilder AddKeyPathExtension<T>(T value) where T : notnull
+        => this.AddKeyPathExtension(typeof(T), value);
+
+    /// <summary>
     ///     Adds a <see cref="ApiRelationshipScalarKeyPath"/> child to this node.
     ///     Valid only on <see cref="ApiRelationshipKeyPathKind.Nested"/> and
     ///     <see cref="ApiRelationshipKeyPathKind.Owner"/> parent nodes.

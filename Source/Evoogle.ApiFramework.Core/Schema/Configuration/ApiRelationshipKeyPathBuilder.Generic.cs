@@ -25,6 +25,17 @@ public sealed class ApiRelationshipKeyPathBuilder<T>(ApiRelationshipKeyPathKind 
     : ApiRelationshipKeyPathBuilder(apiKind, clrPropertyName)
 {
     #region Builder Methods
+    /// <inheritdoc cref="ApiRelationshipKeyPathBuilder.AddKeyPathExtension(Type, object)"/>
+    public new ApiRelationshipKeyPathBuilder<T> AddKeyPathExtension(Type type, object value)
+    {
+        base.AddKeyPathExtension(type, value);
+        return this;
+    }
+
+    /// <inheritdoc cref="ApiRelationshipKeyPathBuilder.AddKeyPathExtension{TExt}(TExt)"/>
+    public new ApiRelationshipKeyPathBuilder<T> AddKeyPathExtension<TExt>(TExt value) where TExt : notnull
+        => this.AddKeyPathExtension(typeof(TExt), value);
+
     /// <summary>
     ///     Adds a scalar child key path, deriving the CLR property name from <paramref name="clrProperty"/>.
     /// </summary>

@@ -22,6 +22,27 @@ public abstract class ApiRelationshipBuilder(string apiName) : ExtensionBuilder<
 
     #region Builder Methods
     /// <summary>
+    ///     Adds an extension value associated with the specified <paramref name="type"/>.
+    /// </summary>
+    /// <param name="type">The type used as the extension key.</param>
+    /// <param name="value">The extension value to store.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiRelationshipBuilder AddRelationshipExtension(Type type, object value)
+    {
+        base.AddExtension(type, value);
+        return this;
+    }
+
+    /// <summary>
+    ///     Adds an extension value keyed by its own type.
+    /// </summary>
+    /// <typeparam name="T">The extension value type.</typeparam>
+    /// <param name="value">The extension value.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiRelationshipBuilder AddRelationshipExtension<T>(T value) where T : notnull
+        => this.AddRelationshipExtension(typeof(T), value);
+
+    /// <summary>
     ///     Sets an optional human-readable display name for the relationship.
     /// </summary>
     /// <param name="apiDisplayName">The display name.</param>

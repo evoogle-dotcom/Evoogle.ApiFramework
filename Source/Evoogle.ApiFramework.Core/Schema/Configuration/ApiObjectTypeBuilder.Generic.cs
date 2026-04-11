@@ -20,6 +20,17 @@ public sealed class ApiObjectTypeBuilder<T>(ApiSchemaBuilderContext context)
     : ApiObjectTypeBuilder(typeof(T), context)
 {
     #region Builder Methods
+    /// <inheritdoc cref="ApiObjectTypeBuilder.AddObjectExtension(Type, object)"/>
+    public new ApiObjectTypeBuilder<T> AddObjectExtension(Type type, object value)
+    {
+        base.AddObjectExtension(type, value);
+        return this;
+    }
+
+    /// <inheritdoc cref="ApiObjectTypeBuilder.AddObjectExtension{TExt}(TExt)"/>
+    public new ApiObjectTypeBuilder<T> AddObjectExtension<TExt>(TExt value) where TExt : notnull
+        => this.AddObjectExtension(typeof(TExt), value);
+
     /// <summary>
     ///     Adds an <see cref="ApiProperty"/> definition, deriving the CLR name from <paramref name="clrProperty"/>
     ///     and using it as the API name as well.

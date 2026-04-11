@@ -32,6 +32,27 @@ public class ApiIdentityPartBuilder
 
     #region Methods
     /// <summary>
+    ///     Adds an extension value associated with the specified <paramref name="type"/>.
+    /// </summary>
+    /// <param name="type">The type used as the extension key.</param>
+    /// <param name="value">The extension value to store.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiIdentityPartBuilder AddIdentityPartExtension(Type type, object value)
+    {
+        base.AddExtension(type, value);
+        return this;
+    }
+
+    /// <summary>
+    ///     Adds an extension value keyed by its own type.
+    /// </summary>
+    /// <typeparam name="T">The extension value type.</typeparam>
+    /// <param name="value">The extension value.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiIdentityPartBuilder AddIdentityPartExtension<T>(T value) where T : notnull
+        => this.AddIdentityPartExtension(typeof(T), value);
+
+    /// <summary>
     ///     Builds the <see cref="ApiIdentityPart"/> configured by this builder.
     /// </summary>
     /// <returns>A fully constructed <see cref="ApiIdentityPart"/> instance.</returns>

@@ -60,6 +60,27 @@ public class ApiPropertyBuilder(string apiName, string clrName) : ExtensionBuild
     }
 
     /// <summary>
+    ///     Adds an extension value associated with the specified <paramref name="type"/>.
+    /// </summary>
+    /// <param name="type">The type used as the extension key.</param>
+    /// <param name="value">The extension value to store.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiPropertyBuilder AddPropertyExtension(Type type, object value)
+    {
+        base.AddExtension(type, value);
+        return this;
+    }
+
+    /// <summary>
+    ///     Adds an extension value keyed by its own type.
+    /// </summary>
+    /// <typeparam name="T">The extension value type.</typeparam>
+    /// <param name="value">The extension value.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiPropertyBuilder AddPropertyExtension<T>(T value) where T : notnull
+        => this.AddPropertyExtension(typeof(T), value);
+
+    /// <summary>
     ///     Builds an <see cref="ApiProperty"/> for the specified CLR object type.
     /// </summary>
     /// <param name="clrObjectType">The CLR type declaring the property/field.</param>

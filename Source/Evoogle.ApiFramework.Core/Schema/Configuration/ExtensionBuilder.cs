@@ -20,11 +20,12 @@ public abstract class ExtensionBuilder<TBuilder>
     #region Methods
     /// <summary>
     ///     Adds an extension value associated with the specified <paramref name="type"/>.
+    ///     Called by the concrete builder's named extension method (e.g. <c>AddSchemaExtension</c>).
     /// </summary>
     /// <param name="type">The type used as the extension key.</param>
     /// <param name="value">The extension value to store.</param>
     /// <returns>The current <typeparamref name="TBuilder"/> instance.</returns>
-    public TBuilder AddExtension(Type type, object value)
+    protected TBuilder AddExtension(Type type, object value)
     {
         ArgumentNullException.ThrowIfNull(type);
         ArgumentNullException.ThrowIfNull(value);

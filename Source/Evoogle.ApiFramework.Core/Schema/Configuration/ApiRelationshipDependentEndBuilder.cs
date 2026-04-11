@@ -26,6 +26,27 @@ public class ApiRelationshipDependentEndBuilder
 
     #region Builder Methods
     /// <summary>
+    ///     Adds an extension value associated with the specified <paramref name="type"/>.
+    /// </summary>
+    /// <param name="type">The type used as the extension key.</param>
+    /// <param name="value">The extension value to store.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiRelationshipDependentEndBuilder AddDependentEndExtension(Type type, object value)
+    {
+        base.AddExtension(type, value);
+        return this;
+    }
+
+    /// <summary>
+    ///     Adds an extension value keyed by its own type.
+    /// </summary>
+    /// <typeparam name="T">The extension value type.</typeparam>
+    /// <param name="value">The extension value.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiRelationshipDependentEndBuilder AddDependentEndExtension<T>(T value) where T : notnull
+        => this.AddDependentEndExtension(typeof(T), value);
+
+    /// <summary>
     ///     Sets the delete behavior that governs what happens to the principal objects when a dependent object is deleted.
     /// </summary>
     /// <param name="apiDeleteBehavior">The desired delete behavior.</param>

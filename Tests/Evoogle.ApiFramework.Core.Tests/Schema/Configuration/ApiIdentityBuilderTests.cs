@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -91,7 +91,7 @@ public class ApiIdentityBuilderTests(ITestOutputHelper output) : XUnitTests(outp
                         ? extensions =>
                         {
                             var extension = Activator.CreateInstance(extensionType);
-                            extensions.AddExtension(extensionType, extension!);
+                            extensions.AddIdentityPartExtension(extensionType, extension!);
                         }
                 : null
                 );
@@ -100,7 +100,7 @@ public class ApiIdentityBuilderTests(ITestOutputHelper output) : XUnitTests(outp
             if (this.ExtensionType != null)
             {
                 var extension = Activator.CreateInstance(this.ExtensionType);
-                builder.AddExtension(this.ExtensionType, extension!);
+                builder.AddIdentityExtension(this.ExtensionType, extension!);
             }
 
             this.ApiIdentityActual = builder.Build();

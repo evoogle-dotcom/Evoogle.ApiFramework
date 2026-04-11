@@ -144,7 +144,7 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
             if (this.ApiExtensionType != null)
             {
                 var extension = Activator.CreateInstance(this.ApiExtensionType);
-                builder.AddExtension(this.ApiExtensionType, extension!);
+                builder.AddSchemaExtension(this.ApiExtensionType, extension!);
             }
 
             try
@@ -201,7 +201,6 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
         #endregion
 
         #region Constructors
-        [SetsRequiredMembers]
         public BuildGenericOverloadTest()
         {
             this.Name = nameof(BuildGenericOverloadTest);

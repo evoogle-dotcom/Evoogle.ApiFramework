@@ -165,7 +165,7 @@ public class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
             var extensions = apiObjectType.Extensions;
             foreach (var extension in extensions ?? [])
             {
-                builder.AddExtension(extension.Key, extension.Value);
+                builder.AddObjectExtension(extension.Key, extension.Value);
             }
 
             this.ApiTypeActual = builder.Build();

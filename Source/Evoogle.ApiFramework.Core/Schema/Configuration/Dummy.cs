@@ -184,7 +184,7 @@ public static class Dummy
         {
             builder
                 .WithName("Email")
-                .AddExtension(new VisibleMetadata { Visible = true });
+                .AddScalarExtension(new VisibleMetadata { Visible = true });
         }
     }
 
@@ -202,7 +202,7 @@ public static class Dummy
                 .AddValue("Shipped", "Shipped", 1)
                 .AddValue("Delivered", "Delivered", 2)
                 .AddValue("Cancelled", "Cancelled", 3)
-                .AddExtension(new VisibleMetadata { Visible = true });
+                .AddEnumExtension(new VisibleMetadata { Visible = true });
         }
     }
 
@@ -219,7 +219,7 @@ public static class Dummy
                 .AddProperty("id", "Id")
                 .AddProperty("status", "Status")
                 .AddProperty("total", "Total")
-                .AddExtension(new VisibleMetadata { Visible = true });
+                .AddObjectExtension(new VisibleMetadata { Visible = true });
         }
     }
 
@@ -299,7 +299,7 @@ public static class Dummy
                     "Customer",
                     p => p
                         .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Cascade)
-                        .AddExtension(new VisibleMetadata { Visible = true })
+                        .AddPrincipalEndExtension(new VisibleMetadata { Visible = true })
                 )
                 .WithDependentEnd
                 (
@@ -331,7 +331,7 @@ public static class Dummy
                     p => p
                         .WithIdentityName("PrimaryKey")
                         .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Cascade)
-                        .AddExtension(new VisibleMetadata { Visible = true })
+                        .AddPrincipalEndExtension(new VisibleMetadata { Visible = true })
                 )
                 .WithPrincipalEndB
                 (
@@ -431,7 +431,7 @@ public static class Dummy
                 .WithIdentityNullHandling(ApiIdentityNullHandling.ReturnEmpty))
             .AddScalar(typeof(EmailAddress), x => x
                 .WithName("EmailAddress"))
-                .AddExtension(new VisibleMetadata { Visible = true })
+                .AddSchemaExtension(new VisibleMetadata { Visible = true })
             .AddObject(typeof(Country), x => x
                 .WithName("Country")
                 .AddIdentity("PrimaryKey", identity => identity
@@ -446,10 +446,10 @@ public static class Dummy
                     .AddNested("Country")
                     .AddScalar("Name"))
                 .AddProperty("Id", "Id", p => p.WithModifiers(m => m.Required()))
-                .AddProperty("Name", "Name", p => p.WithModifiers(m => m.Required()).AddExtension(new VisibleMetadata { Visible = true }))
+                .AddProperty("Name", "Name", p => p.WithModifiers(m => m.Required()).AddPropertyExtension(new VisibleMetadata { Visible = true }))
                 .AddProperty("Email", "Email", p => p.WithModifiers(m => m.Optional()))
                 .AddProperty("Orders", "Orders", p => p.WithModifiers(m => m.Required())))
-                .AddExtension(new VisibleMetadata { Visible = true })
+                .AddSchemaExtension(new VisibleMetadata { Visible = true })
             .AddObject(typeof(Order), x => x
                 .WithName("Order")
                 .WithDefaultOptions()
@@ -463,7 +463,7 @@ public static class Dummy
                 .WithDefaultOptions()
                 .AddIdentity("PrimaryKey", identity => identity
                     .AddOwner()
-                    .AddScalar("OrderId", x => x.AddExtension(new VisibleMetadata { Visible = true }))
+                    .AddScalar("OrderId", x => x.AddIdentityPartExtension(new VisibleMetadata { Visible = true }))
                     .AddScalar("LineItemNumber", typeof(long)))
                 .AddProperty("OrderId", "OrderId", p => p.WithModifiers(m => m.Required()))
                 .AddProperty("LineItemNumber", "LineItemNumber", p => p.WithModifiers(m => m.Required()))
@@ -471,7 +471,7 @@ public static class Dummy
                 .AddProperty("Quantity", "Quantity", p => p.WithModifiers(m => m.Required()))
                 .AddProperty("UnitPrice", "UnitPrice", p => p.WithModifiers(m => m.Required())))
             .AddEnum(typeof(OrderStatus), x => x
-                .AddExtension(new VisibleMetadata { Visible = true })
+                .AddEnumExtension(new VisibleMetadata { Visible = true })
                 .WithName("OrderStatus")
                 .AddValue("Pending", "Pending", 0)
                 .AddValue("Shipped", "Shipped", 1)
@@ -575,7 +575,7 @@ public static class Dummy
                         p => p
                             .WithIdentityName("PrimaryKey")
                             .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Cascade)
-                            .AddExtension(new VisibleMetadata { Visible = true })
+                            .AddPrincipalEndExtension(new VisibleMetadata { Visible = true })
                     )
                     .WithPrincipalEndB
                     (
@@ -589,7 +589,7 @@ public static class Dummy
                         "ProductTag",
                         d => d
                             .AddScalarPath("ProductId")
-                            .AddExtension(new VisibleMetadata { Visible = true })
+                            .AddDependentEndExtension(new VisibleMetadata { Visible = true })
                     )
                     .WithDependentEndB
                     (
@@ -598,9 +598,9 @@ public static class Dummy
                     )
                     .WithDisplayName("ProductTagsInline")
                     .WithDescription("Inline M:N variant demonstrating all four end methods.")
-                    .AddExtension(new VisibleMetadata { Visible = true })
+                    .AddRelationshipExtension(new VisibleMetadata { Visible = true })
             )
-            .AddExtension(new VisibleMetadata { Visible = true })
+            .AddSchemaExtension(new VisibleMetadata { Visible = true })
             .Build();
     }
 

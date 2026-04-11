@@ -20,6 +20,17 @@ public sealed class ApiRelationshipDependentEndBuilder<T>(string apiObjectTypeNa
     : ApiRelationshipDependentEndBuilder(apiObjectTypeName)
 {
     #region Builder Methods
+    /// <inheritdoc cref="ApiRelationshipDependentEndBuilder.AddDependentEndExtension(Type, object)"/>
+    public new ApiRelationshipDependentEndBuilder<T> AddDependentEndExtension(Type type, object value)
+    {
+        base.AddDependentEndExtension(type, value);
+        return this;
+    }
+
+    /// <inheritdoc cref="ApiRelationshipDependentEndBuilder.AddDependentEndExtension{TExt}(TExt)"/>
+    public new ApiRelationshipDependentEndBuilder<T> AddDependentEndExtension<TExt>(TExt value) where TExt : notnull
+        => this.AddDependentEndExtension(typeof(TExt), value);
+
     /// <summary>
     ///     Adds a scalar FK key path, deriving the CLR property name from <paramref name="clrProperty"/>.
     /// </summary>

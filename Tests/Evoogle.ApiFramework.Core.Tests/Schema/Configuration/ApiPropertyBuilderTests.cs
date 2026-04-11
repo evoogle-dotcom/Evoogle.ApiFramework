@@ -58,7 +58,7 @@ public class ApiPropertyBuilderTests(ITestOutputHelper output) : XUnitTests(outp
             if (this.ApiExtensionType != null)
             {
                 var extension = Activator.CreateInstance(this.ApiExtensionType);
-                builder.AddExtension(this.ApiExtensionType, extension!);
+                builder.AddPropertyExtension(this.ApiExtensionType, extension!);
             }
             this.Configure?.Invoke(builder);
             this.ApiPropertyActual = builder.Build(this.ClrObjectType);

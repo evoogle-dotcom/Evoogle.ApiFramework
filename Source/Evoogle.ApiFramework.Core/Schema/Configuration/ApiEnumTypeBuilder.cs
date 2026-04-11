@@ -19,6 +19,27 @@ public sealed class ApiEnumTypeBuilder(Type clrType, ApiSchemaBuilderContext con
 
     #region Builder Methods
     /// <summary>
+    ///     Adds an extension value associated with the specified <paramref name="type"/>.
+    /// </summary>
+    /// <param name="type">The type used as the extension key.</param>
+    /// <param name="value">The extension value to store.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiEnumTypeBuilder AddEnumExtension(Type type, object value)
+    {
+        base.AddExtension(type, value);
+        return this;
+    }
+
+    /// <summary>
+    ///     Adds an extension value keyed by its own type.
+    /// </summary>
+    /// <typeparam name="T">The extension value type.</typeparam>
+    /// <param name="value">The extension value.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiEnumTypeBuilder AddEnumExtension<T>(T value) where T : notnull
+        => this.AddEnumExtension(typeof(T), value);
+
+    /// <summary>
     ///     Adds an <see cref="ApiEnumValue"/> definition to the enumeration.
     /// </summary>
     /// <param name="apiName">The API name of the enumeration value.</param>

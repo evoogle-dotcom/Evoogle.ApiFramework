@@ -5,24 +5,12 @@
 // See the LICENSE file in the project root for more information.
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
-/// <summary>
-///     Provides helper methods for adding strongly typed extensions to
-///     <see cref="ExtensionBuilder{TBuilder}"/> instances.
-/// </summary>
+// ExtensionBuilderExtensions is intentionally empty.
+// The generic AddExtension<T> convenience overload is now a named, type-specific method
+// on each concrete builder (e.g. AddSchemaExtension<T>, AddObjectExtension<T>),
+// which prevents the silent mis-attachment bug where a top-level .AddExtension() call
+// after a lambda could attach to the outer schema builder instead of the intended type.
 public static class ExtensionBuilderExtensions
 {
-    #region Methods
-    /// <summary>
-    ///     Adds an extension value keyed by its type and returns the original builder for chaining.
-    /// </summary>
-    /// <typeparam name="TBuilder">The concrete builder type.</typeparam>
-    /// <typeparam name="T">The extension value type.</typeparam>
-    /// <param name="builder">The builder to attach the extension to.</param>
-    /// <param name="value">The extension value.</param>
-    /// <returns>The same <typeparamref name="TBuilder"/> instance to support fluent calls.</returns>
-    public static TBuilder AddExtension<TBuilder, T>(this ExtensionBuilder<TBuilder> builder, T value)
-        where TBuilder : ExtensionBuilder<TBuilder>
-        where T : notnull => builder.AddExtension(typeof(T), value);
-    #endregion
 }
 
