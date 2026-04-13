@@ -13,7 +13,7 @@ namespace Evoogle.ApiFramework.Schema;
 ///     The principal end owns the join key: its <see cref="ApiIdentity"/> uniquely identifies
 ///     the objects on this side and is referenced by the <see cref="ApiRelationshipDependentEnd"/>.
 /// </summary>
-/// <param name="apiObjectTypeName">The API name of the principal <see cref="ApiObjectType"/>.</param>
+/// <param name="clrObjectType">The CLR type of the principal <see cref="ApiObjectType"/>.</param>
 /// <param name="apiIdentityName">
 ///     The optional name of the <see cref="ApiIdentity"/> on the principal type that serves as the join key.
 ///     When <see langword="null"/>, the primary identity (<see cref="ApiObjectType.ApiPrimaryIdentity"/>) is used.
@@ -24,10 +24,10 @@ namespace Evoogle.ApiFramework.Schema;
 /// </param>
 public sealed class ApiRelationshipPrincipalEnd
 (
-    string apiObjectTypeName,
+    Type clrObjectType,
     string? apiIdentityName = null,
     ApiRelationshipDeleteBehavior apiDeleteBehavior = ApiRelationshipDeleteBehavior.None
-) : ApiRelationshipEnd(apiObjectTypeName, apiDeleteBehavior)
+) : ApiRelationshipEnd(clrObjectType, apiDeleteBehavior)
 {
     #region ApiRelationshipPrincipalEnd Fields
     private ApiIdentity? _apiResolvedIdentity = null;
@@ -67,12 +67,12 @@ public sealed class ApiRelationshipPrincipalEnd
     /// <inheritdoc/>
     public override string ToString()
     {
-        var apiObjectTypeName = this.ApiObjectTypeName.SafeToString();
+        var clrObjectType = this.ClrObjectType.SafeToName();
         var apiIdentityName = this.ApiIdentityName.SafeToString();
         var apiDeleteBehavior = this.ApiDeleteBehavior.SafeToString();
         var extensionCount = this.ExtensionCount.SafeToString();
 
-        return $"{nameof(ApiRelationshipPrincipalEnd)} {{{nameof(this.ApiObjectTypeName)}={apiObjectTypeName}, {nameof(this.ApiIdentityName)}={apiIdentityName}, {nameof(this.ApiDeleteBehavior)}={apiDeleteBehavior}, {nameof(this.ExtensionCount)}={extensionCount}}}";
+        return $"{nameof(ApiRelationshipPrincipalEnd)} {{{nameof(this.ClrObjectType)}={clrObjectType}, {nameof(this.ApiIdentityName)}={apiIdentityName}, {nameof(this.ApiDeleteBehavior)}={apiDeleteBehavior}, {nameof(this.ExtensionCount)}={extensionCount}}}";
     }
     #endregion
 

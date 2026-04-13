@@ -16,7 +16,7 @@ namespace Evoogle.ApiFramework.Schema;
 ///     Concrete subclasses are <see cref="ApiRelationshipOneToOne"/> and <see cref="ApiRelationshipOneToMany"/>.
 ///     The FK always resides on the dependent side; the principal side owns the join-key identity.
 ///     Self-referential relationships are supported by setting both ends to the same
-///     <see cref="ApiRelationshipEnd.ApiObjectTypeName"/>.
+///     <see cref="ApiRelationshipEnd.ClrObjectType"/>.
 /// </remarks>
 public abstract class ApiRelationshipOneTo
 (
@@ -41,8 +41,8 @@ public abstract class ApiRelationshipOneTo
     {
         var apiName = this.ApiName.SafeToString();
         var apiKind = this.ApiKind.SafeToString();
-        var principalType = this.ApiPrincipalEnd?.ApiObjectTypeName.SafeToString();
-        var dependentType = this.ApiDependentEnd?.ApiObjectTypeName.SafeToString();
+        var principalType = this.ApiPrincipalEnd?.ClrObjectType?.Name.SafeToString();
+        var dependentType = this.ApiDependentEnd?.ClrObjectType?.Name.SafeToString();
         var extensionCount = this.ExtensionCount.SafeToString();
 
         return $"{this.GetType().Name} {{{nameof(this.ApiKind)}={apiKind}, {nameof(this.ApiName)}={apiName}, Principal={principalType}, Dependent={dependentType}, {nameof(this.ExtensionCount)}={extensionCount}}}";

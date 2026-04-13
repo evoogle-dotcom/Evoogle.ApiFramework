@@ -15,10 +15,12 @@ namespace Evoogle.ApiFramework.Schema;
 ///     Each end describes one participating <see cref="ApiObjectType"/> and the delete behavior
 ///     applied to objects at the opposite end when an object on this end is deleted.
 /// </summary>
+/// <param name="clrObjectType">The CLR type of the participating <see cref="ApiObjectType"/> on this end of the relationship.</param>
+/// <param name="apiDeleteBehavior">The delete behavior applied to objects at the opposite end when an object on this end is deleted.</param>
 [JsonConverter(typeof(ApiRelationshipEndJsonConverter))]
 public abstract class ApiRelationshipEnd
 (
-    string apiObjectTypeName,
+    Type clrObjectType,
     ApiRelationshipDeleteBehavior apiDeleteBehavior = ApiRelationshipDeleteBehavior.None
 ) : ApiSchemaElement
 {
@@ -37,8 +39,8 @@ public abstract class ApiRelationshipEnd
     /// <summary>Gets the kind of this relationship end, either <see cref="ApiRelationshipEndKind.Principal"/> or <see cref="ApiRelationshipEndKind.Dependent"/>.</summary>
     public abstract ApiRelationshipEndKind ApiKind { get; }
 
-    /// <summary>Gets the API name of the participating <see cref="ApiObjectType"/> on this end of the relationship.</summary>
-    public string ApiObjectTypeName { get; } = apiObjectTypeName;
+    /// <summary>Gets the CLR type of the participating <see cref="ApiObjectType"/> on this end of the relationship.</summary>
+    public Type ClrObjectType { get; } = clrObjectType;
 
     /// <summary>
     ///     Gets the delete behavior applied to objects at the opposite end when an object on this end is deleted.
@@ -69,7 +71,7 @@ public abstract class ApiRelationshipEnd
 
         base.Initialize(context);
 
-        this.InitializeApiObjectTypeName(context);
+        this.InitializeClrObjectType(context);
         this.InitializeApiObjectType(context);
     }
     #endregion
@@ -86,42 +88,42 @@ public abstract class ApiRelationshipEnd
     #endregion
 
     #region Implementation Methods
-    private void InitializeApiObjectTypeName(ApiInitializationContext context)
+    private void InitializeClrObjectType(ApiInitializationContext context)
     {
-        if (!ApiSchemaHelpers.IsNameInvalid(this.ApiObjectTypeName))
+        if (this.ClrObjectType is not null)
         {
             return;
         }
 
         context.AddIssue(this.ApiPath, ApiInitializationSeverity.Error,
-            ApiInitializationCode.API_RELATIONSHIP_END_INVALID_OBJECT_TYPE_NAME,
-            $"{nameof(this.ApiObjectTypeName)} must not be null, empty, or whitespace",
-            $"Specify a valid {nameof(this.ApiObjectTypeName)} value");
+            ApiInitializationCode.API_RELATIONSHIP_END_NULL_CLR_OBJECT_TYPE,
+            $"{nameof(this.ClrObjectType)} must not be null",
+            $"Specify a valid {nameof(this.ClrObjectType)} value");
     }
 
     private void InitializeApiObjectType(ApiInitializationContext context)
     {
         _apiResolvedObjectType = null;
 
-        if (ApiSchemaHelpers.IsNameInvalid(this.ApiObjectTypeName))
+        if (this.ClrObjectType is null)
         {
             return;
         }
 
-        if (context.ApiSchema.TryGetObjectTypeByApiName(this.ApiObjectTypeName, out var apiObjectType))
+        if (context.ApiSchema.TryGetObjectTypeByClrType(this.ClrObjectType, out var apiObjectType))
         {
             _apiResolvedObjectType = apiObjectType;
             return;
         }
 
-        var availableTypes = string.Join(", ", context.ApiSchema.ApiObjectTypes.Select(t => $"'{t.ApiName}'"));
+        var availableTypes = string.Join(", ", context.ApiSchema.ApiObjectTypes.Select(t => $"'{t.ApiName}' ({t.ClrType.Name})"));
         var remediation = !string.IsNullOrEmpty(availableTypes)
             ? $"Use one of the available object types: {availableTypes}"
-            : $"Define an {nameof(Schema.ApiObjectType)} with name '{this.ApiObjectTypeName}' in the schema";
+            : $"Define an {nameof(Schema.ApiObjectType)} for CLR type '{this.ClrObjectType.FullName}' in the schema";
 
         context.AddIssue(this.ApiPath, ApiInitializationSeverity.Error,
             ApiInitializationCode.API_RELATIONSHIP_END_UNRESOLVED_OBJECT_TYPE,
-            $"Object type '{this.ApiObjectTypeName}' could not be found in the schema",
+            $"No {nameof(Schema.ApiObjectType)} is registered for CLR type '{this.ClrObjectType.FullName}'",
             remediation);
     }
     #endregion

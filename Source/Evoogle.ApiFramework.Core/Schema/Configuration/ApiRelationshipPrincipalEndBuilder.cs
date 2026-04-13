@@ -13,10 +13,10 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 ///     non-primary identity, and <see cref="WithDeleteBehavior"/> to control what happens to dependent
 ///     objects when an object on this end is deleted.
 /// </remarks>
-/// <param name="apiObjectTypeName">The API name of the principal <see cref="ApiObjectType"/>.</param>
+/// <param name="clrObjectType">The CLR type of the principal <see cref="ApiObjectType"/>.</param>
 public sealed class ApiRelationshipPrincipalEndBuilder
 (
-    string apiObjectTypeName
+    Type clrObjectType
 ) : ExtensionBuilder<ApiRelationshipPrincipalEndBuilder>
 {
     #region Fields
@@ -80,7 +80,7 @@ public sealed class ApiRelationshipPrincipalEndBuilder
     {
         var end = new ApiRelationshipPrincipalEnd
         (
-            apiObjectTypeName,
+            clrObjectType,
             _apiIdentityName,
             _apiDeleteBehavior
         );

@@ -121,6 +121,9 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null)
     internal ApiRelationshipManyToManyBuilder GetOrAddManyToManyRelationshipBuilder(string apiName)
         => this.GetOrAddTypedRelationshipBuilder(apiName, static n => new ApiRelationshipManyToManyBuilder(n));
 
+    internal ApiRelationshipManyToManyBuilder<TAssociation> GetOrAddManyToManyRelationshipBuilder<TAssociation>(string apiName)
+        => this.GetOrAddTypedRelationshipBuilder(apiName, n => new ApiRelationshipManyToManyBuilder<TAssociation>(n));
+
     private TBuilder GetOrAddTypedRelationshipBuilder<TBuilder>(string apiName, Func<string, TBuilder> factory)
         where TBuilder : ApiRelationshipBuilder
     {
@@ -135,31 +138,8 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null)
         }
 
         var builder = factory(apiName);
-        builder.Context = this;
         _apiRelationshipBuilders[apiName] = builder;
         return builder;
-    }
-
-    /// <summary>
-    ///     Looks up the API name configured for the specified CLR object type.
-    ///     Used by typed relationship end builders to resolve type names at configuration time.
-    /// </summary>
-    /// <param name="clrType">The CLR type to resolve.</param>
-    /// <returns>The API name as configured on the registered <see cref="ApiObjectTypeBuilder"/>.</returns>
-    /// <exception cref="InvalidOperationException">
-    ///     Thrown when <paramref name="clrType"/> has not been registered via
-    ///     <see cref="GetOrAddObjectTypeBuilder(Type)"/> or <see cref="GetOrAddObjectTypeBuilder{T}()"/>.
-    /// </exception>
-    internal string GetObjectTypeApiName(Type clrType)
-    {
-        if (_apiObjectTypeBuilders.TryGetValue(clrType, out var builder))
-        {
-            return builder.ApiName;
-        }
-
-        throw new ApiSchemaException(
-            $"Object type '{clrType.Name}' has not been registered in the schema. " +
-            $"Call AddObject for '{clrType.Name}' before using typed relationship end builders that reference it.");
     }
 
     private static TBuilder GetOrAddBuilder<TBuilder>

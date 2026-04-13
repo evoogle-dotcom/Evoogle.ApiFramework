@@ -15,9 +15,8 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 ///     Extends <see cref="ApiRelationshipDependentEndBuilder"/> with expression-based overloads for FK key paths.
 /// </summary>
 /// <typeparam name="T">The CLR type of the dependent object.</typeparam>
-/// <param name="apiObjectTypeName">The API name of the dependent <see cref="ApiObjectType"/>.</param>
-public sealed class ApiRelationshipDependentEndBuilder<T>(string apiObjectTypeName)
-    : ApiRelationshipDependentEndBuilder(apiObjectTypeName)
+public sealed class ApiRelationshipDependentEndBuilder<T>()
+    : ApiRelationshipDependentEndBuilder(typeof(T))
 {
     #region Builder Methods
     /// <inheritdoc cref="ApiRelationshipDependentEndBuilder.AddDependentEndExtension(Type, object)"/>

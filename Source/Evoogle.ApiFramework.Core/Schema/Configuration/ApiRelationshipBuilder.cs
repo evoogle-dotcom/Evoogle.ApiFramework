@@ -85,9 +85,6 @@ public abstract class ApiRelationshipBuilder(string apiName) : ExtensionBuilder<
 
     /// <summary>Gets the configured description.</summary>
     protected string? ApiDescription => _apiDescription;
-
-    /// <summary>Gets or sets the shared schema builder context used for typed end resolution.</summary>
-    internal ApiSchemaBuilderContext? Context { get; set; }
     #endregion
 }
 

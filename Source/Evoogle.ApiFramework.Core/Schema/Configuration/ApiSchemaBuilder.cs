@@ -373,6 +373,27 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     }
 
     /// <summary>
+    ///     Adds a many-to-many relationship to the schema using a strongly-typed inline configuration action.
+    ///     The association CLR type <typeparamref name="TAssociation"/> is fixed for the builder so that
+    ///     <see cref="ApiRelationshipManyToManyBuilder{TAssociation}.WithDependentEndA"/> and
+    ///     <see cref="ApiRelationshipManyToManyBuilder{TAssociation}.WithDependentEndB"/> require no explicit type argument.
+    /// </summary>
+    /// <typeparam name="TAssociation">The CLR type of the association object type that mediates the relationship.</typeparam>
+    /// <param name="apiName">The schema-unique API name of the relationship.</param>
+    /// <param name="configure">Callback to configure the relationship.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiSchemaBuilder AddManyToManyRelationship<TAssociation>(string apiName, Action<ApiRelationshipManyToManyBuilder<TAssociation>> configure)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
+        ArgumentNullException.ThrowIfNull(configure);
+
+        var builder = _context.GetOrAddManyToManyRelationshipBuilder<TAssociation>(apiName);
+
+        configure(builder);
+        return this;
+    }
+
+    /// <summary>
     ///     Adds a many-to-many relationship to the schema using an <see cref="IApiRelationshipManyToManyConfiguration"/>.
     /// </summary>
     /// <param name="apiName">The schema-unique API name of the relationship.</param>
@@ -384,6 +405,25 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
         ArgumentNullException.ThrowIfNull(configuration);
 
         var builder = _context.GetOrAddManyToManyRelationshipBuilder(apiName);
+
+        configuration.Configure(builder);
+        return this;
+    }
+
+    /// <summary>
+    ///     Adds a many-to-many relationship to the schema using a strongly-typed <see cref="IApiRelationshipManyToManyConfiguration{TAssociation}"/>.
+    ///     The association CLR type <typeparamref name="TAssociation"/> is inferred from the configuration implementation.
+    /// </summary>
+    /// <typeparam name="TAssociation">The CLR type of the association object type that mediates the relationship.</typeparam>
+    /// <param name="apiName">The schema-unique API name of the relationship.</param>
+    /// <param name="configuration">The typed configuration implementation.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiSchemaBuilder AddManyToManyRelationship<TAssociation>(string apiName, IApiRelationshipManyToManyConfiguration<TAssociation> configuration)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
+        ArgumentNullException.ThrowIfNull(configuration);
+
+        var builder = _context.GetOrAddManyToManyRelationshipBuilder<TAssociation>(apiName);
 
         configuration.Configure(builder);
         return this;

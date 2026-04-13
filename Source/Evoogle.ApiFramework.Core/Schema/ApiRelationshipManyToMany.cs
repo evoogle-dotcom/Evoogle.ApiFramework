@@ -38,8 +38,8 @@ namespace Evoogle.ApiFramework.Schema;
 /// <param name="apiDependentEndB">
 ///     Dependent end B, targeting the association type and holding FK key paths back to principal end B.
 /// </param>
-/// <param name="apiAssociationTypeName">
-///     The API name of the association <see cref="ApiObjectType"/> that mediates the relationship.
+/// <param name="clrAssociationObjectType">
+///     The CLR type of the association <see cref="ApiObjectType"/> that mediates the relationship.
 ///     Must be a registered object type in the schema; both dependent ends must reference this type.
 /// </param>
 /// <param name="apiDisplayName">The optional human-readable display name for this relationship.</param>
@@ -51,7 +51,7 @@ public sealed class ApiRelationshipManyToMany
     ApiRelationshipPrincipalEnd apiPrincipalEndB,
     ApiRelationshipDependentEnd apiDependentEndA,
     ApiRelationshipDependentEnd apiDependentEndB,
-    string apiAssociationTypeName,
+    Type clrAssociationObjectType,
     string? apiDisplayName = null,
     string? apiDescription = null
 ) : ApiRelationship(apiName, apiDisplayName, apiDescription)
@@ -89,11 +89,8 @@ public sealed class ApiRelationshipManyToMany
     /// </summary>
     public ApiRelationshipDependentEnd ApiDependentEndB { get; } = apiDependentEndB;
 
-    /// <summary>
-    ///     Gets the API name of the association <see cref="ApiObjectType"/> that mediates the relationship.
-    ///     Both <see cref="ApiDependentEndA"/> and <see cref="ApiDependentEndB"/> must reference this type.
-    /// </summary>
-    public string ApiAssociationTypeName { get; } = apiAssociationTypeName;
+    /// <summary>Gets the CLR type of the association <see cref="ApiObjectType"/> that mediates the relationship.</summary>
+    public Type ClrAssociationObjectType { get; } = clrAssociationObjectType;
 
     /// <summary>Gets the resolved association <see cref="ApiObjectType"/>. Available after initialization.</summary>
     public ApiObjectType ApiAssociationObjectType => this.ThrowIfNotInitialized(_apiResolvedAssociationObjectType);
@@ -104,12 +101,14 @@ public sealed class ApiRelationshipManyToMany
     public override string ToString()
     {
         var apiName = this.ApiName.SafeToString();
-        var typeA = this.ApiPrincipalEndA?.ApiObjectTypeName.SafeToString();
-        var typeB = this.ApiPrincipalEndB?.ApiObjectTypeName.SafeToString();
-        var associationType = this.ApiAssociationTypeName.SafeToString();
+        var apiPrincipalEndA = this.ApiPrincipalEndA.SafeToString();
+        var apiPrincipalEndB = this.ApiPrincipalEndB.SafeToString();
+        var clrAssociationObjectType = this.ClrAssociationObjectType.SafeToName();
+        var apiDependentEndA = this.ApiDependentEndA.SafeToString();
+        var apiDependentEndB = this.ApiDependentEndB.SafeToString();
         var extensionCount = this.ExtensionCount.SafeToString();
 
-        return $"{nameof(ApiRelationshipManyToMany)} {{{nameof(this.ApiName)}={apiName}, A={typeA}, B={typeB}, Association={associationType}, {nameof(this.ExtensionCount)}={extensionCount}}}";
+        return $"{nameof(ApiRelationshipManyToMany)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ApiPrincipalEndA)}={apiPrincipalEndA}, {nameof(this.ApiPrincipalEndB)}={apiPrincipalEndB}, {nameof(this.ApiDependentEndA)}={apiDependentEndA}, {nameof(this.ApiDependentEndB)}={apiDependentEndB}, {nameof(this.ClrAssociationObjectType)}={clrAssociationObjectType}, {nameof(this.ExtensionCount)}={extensionCount}}}";
     }
     #endregion
 
@@ -139,29 +138,29 @@ public sealed class ApiRelationshipManyToMany
     {
         _apiResolvedAssociationObjectType = null;
 
-        if (ApiSchemaHelpers.IsNameInvalid(this.ApiAssociationTypeName))
+        if (this.ClrAssociationObjectType is null)
         {
             context.AddIssue(this.ApiPath, ApiInitializationSeverity.Error,
                 ApiInitializationCode.API_RELATIONSHIP_MANY_TO_MANY_INVALID_ASSOCIATION_TYPE_NAME,
-                $"{nameof(this.ApiAssociationTypeName)} must not be null, empty, or whitespace",
-                $"Specify a valid {nameof(this.ApiAssociationTypeName)} value");
+                $"{nameof(this.ClrAssociationObjectType)} must not be null",
+                $"Specify a valid {nameof(this.ClrAssociationObjectType)} value");
             return;
         }
 
-        if (context.ApiSchema.TryGetObjectTypeByApiName(this.ApiAssociationTypeName, out var apiObjectType))
+        if (context.ApiSchema.TryGetObjectTypeByClrType(this.ClrAssociationObjectType, out var apiObjectType))
         {
             _apiResolvedAssociationObjectType = apiObjectType;
             return;
         }
 
-        var availableTypes = string.Join(", ", context.ApiSchema.ApiObjectTypes.Select(t => $"'{t.ApiName}'"));
+        var availableTypes = string.Join(", ", context.ApiSchema.ApiObjectTypes.Select(t => $"'{t.ApiName}' ({t.ClrType.Name})"));
         var remediation = !string.IsNullOrEmpty(availableTypes)
             ? $"Use one of the available object types: {availableTypes}"
-            : $"Define an {nameof(ApiObjectType)} with name '{this.ApiAssociationTypeName}' in the schema";
+            : $"Define an {nameof(ApiObjectType)} for CLR type '{this.ClrAssociationObjectType.FullName}' in the schema";
 
         context.AddIssue(this.ApiPath, ApiInitializationSeverity.Error,
             ApiInitializationCode.API_RELATIONSHIP_MANY_TO_MANY_UNRESOLVED_ASSOCIATION_TYPE,
-            $"Association type '{this.ApiAssociationTypeName}' could not be found in the schema",
+            $"No {nameof(ApiObjectType)} is registered for CLR type '{this.ClrAssociationObjectType.FullName}'",
             remediation);
     }
 
@@ -202,18 +201,18 @@ public sealed class ApiRelationshipManyToMany
             return;
         }
 
-        if (ApiSchemaHelpers.IsNameInvalid(this.ApiAssociationTypeName))
+        if (this.ClrAssociationObjectType is null)
         {
             return;
         }
 
-        if (!string.Equals(this.ApiDependentEndA.ApiObjectTypeName, this.ApiAssociationTypeName, StringComparison.Ordinal))
+        if (this.ApiDependentEndA.ClrObjectType != this.ClrAssociationObjectType)
         {
             context.AddIssue(this.ApiPath, ApiInitializationSeverity.Error,
                 ApiInitializationCode.API_RELATIONSHIP_MANY_TO_MANY_DEPENDENT_TYPE_MISMATCH,
-                $"{nameof(this.ApiDependentEndA)}.{nameof(ApiRelationshipDependentEnd.ApiObjectTypeName)} " +
-                $"'{this.ApiDependentEndA.ApiObjectTypeName}' must match {nameof(this.ApiAssociationTypeName)} '{this.ApiAssociationTypeName}'",
-                $"Set dependent end A's object type name to '{this.ApiAssociationTypeName}'");
+                $"{nameof(this.ApiDependentEndA)}.{nameof(ApiRelationshipDependentEnd.ClrObjectType)} " +
+                $"'{this.ApiDependentEndA.ClrObjectType?.Name}' must match {nameof(this.ClrAssociationObjectType)} '{this.ClrAssociationObjectType.Name}'",
+                $"Set dependent end A's CLR object type to '{this.ClrAssociationObjectType.FullName}'");
         }
     }
 
@@ -270,18 +269,18 @@ public sealed class ApiRelationshipManyToMany
             return;
         }
 
-        if (ApiSchemaHelpers.IsNameInvalid(this.ApiAssociationTypeName))
+        if (this.ClrAssociationObjectType is null)
         {
             return;
         }
 
-        if (!string.Equals(this.ApiDependentEndB.ApiObjectTypeName, this.ApiAssociationTypeName, StringComparison.Ordinal))
+        if (this.ApiDependentEndB.ClrObjectType != this.ClrAssociationObjectType)
         {
             context.AddIssue(this.ApiPath, ApiInitializationSeverity.Error,
                 ApiInitializationCode.API_RELATIONSHIP_MANY_TO_MANY_DEPENDENT_TYPE_MISMATCH,
-                $"{nameof(this.ApiDependentEndB)}.{nameof(ApiRelationshipDependentEnd.ApiObjectTypeName)} " +
-                $"'{this.ApiDependentEndB.ApiObjectTypeName}' must match {nameof(this.ApiAssociationTypeName)} '{this.ApiAssociationTypeName}'",
-                $"Set dependent end B's object type name to '{this.ApiAssociationTypeName}'");
+                $"{nameof(this.ApiDependentEndB)}.{nameof(ApiRelationshipDependentEnd.ClrObjectType)} " +
+                $"'{this.ApiDependentEndB.ClrObjectType?.Name}' must match {nameof(this.ClrAssociationObjectType)} '{this.ClrAssociationObjectType.Name}'",
+                $"Set dependent end B's CLR object type to '{this.ClrAssociationObjectType.FullName}'");
         }
     }
 

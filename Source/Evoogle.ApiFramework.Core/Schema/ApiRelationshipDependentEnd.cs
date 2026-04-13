@@ -13,7 +13,7 @@ namespace Evoogle.ApiFramework.Schema;
 ///     The dependent end holds the FK binding: its <see cref="ApiKeyPaths"/> describe how scalar leaves
 ///     of the principal <see cref="ApiIdentity"/> map to properties on the dependent object graph.
 /// </summary>
-/// <param name="apiObjectTypeName">The API name of the dependent <see cref="ApiObjectType"/>.</param>
+/// <param name="clrObjectType">The CLR type of the dependent <see cref="ApiObjectType"/>.</param>
 /// <param name="apiKeyPaths">
 ///     The optional FK key paths that map the principal identity's scalar leaves to properties
 ///     on the dependent object graph. When <see langword="null"/>, the relationship is purely
@@ -30,11 +30,11 @@ namespace Evoogle.ApiFramework.Schema;
 /// </param>
 public sealed class ApiRelationshipDependentEnd
 (
-    string apiObjectTypeName,
+    Type clrObjectType,
     IEnumerable<ApiRelationshipKeyPath>? apiKeyPaths = null,
     ApiRelationshipDeleteBehavior apiDeleteBehavior = ApiRelationshipDeleteBehavior.None,
     ApiRelationshipDeleteBehavior? apiForcedDeleteBehavior = null
-) : ApiRelationshipEnd(apiObjectTypeName, apiDeleteBehavior)
+) : ApiRelationshipEnd(clrObjectType, apiDeleteBehavior)
 {
     #region ApiSchemaElement Properties
     /// <inheritdoc/>
@@ -74,12 +74,12 @@ public sealed class ApiRelationshipDependentEnd
     /// <inheritdoc/>
     public override string ToString()
     {
-        var apiObjectTypeName = this.ApiObjectTypeName.SafeToString();
-        var keyBindingCount = (this.ApiKeyPaths?.Length ?? 0).SafeToString();
+        var clrObjectType = this.ClrObjectType.SafeToName();
+        var apiKeyPathsCount = (this.ApiKeyPaths?.Length ?? 0).SafeToString();
         var apiEffectiveDeleteBehavior = this.ApiEffectiveDeleteBehavior.SafeToString();
         var extensionCount = this.ExtensionCount.SafeToString();
 
-        return $"{nameof(ApiRelationshipDependentEnd)} {{{nameof(this.ApiObjectTypeName)}={apiObjectTypeName}, KeyPathCount={keyBindingCount}, {nameof(this.ApiEffectiveDeleteBehavior)}={apiEffectiveDeleteBehavior}, {nameof(this.ExtensionCount)}={extensionCount}}}";
+        return $"{nameof(ApiRelationshipDependentEnd)} {{{nameof(this.ClrObjectType)}={clrObjectType}, {nameof(this.ApiKeyPaths)}Count={apiKeyPathsCount}, {nameof(this.ApiEffectiveDeleteBehavior)}={apiEffectiveDeleteBehavior}, {nameof(this.ExtensionCount)}={extensionCount}}}";
     }
     #endregion
 
@@ -106,7 +106,7 @@ public sealed class ApiRelationshipDependentEnd
 
         // ApiObjectType is resolved by the base class. Key paths resolve their
         // properties against the dependent object type.
-        if (ApiSchemaHelpers.IsNameInvalid(this.ApiObjectTypeName))
+        if (this.ClrObjectType is null)
         {
             return;
         }

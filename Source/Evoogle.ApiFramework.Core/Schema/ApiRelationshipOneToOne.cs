@@ -16,7 +16,7 @@ namespace Evoogle.ApiFramework.Schema;
 ///     </para>
 ///     <para>
 ///         Self-referential one-to-one relationships are supported by setting both ends to the same
-///         <see cref="ApiRelationshipEnd.ApiObjectTypeName"/>.
+///         <see cref="ApiRelationshipEnd.ClrObjectType"/>.
 ///     </para>
 /// </remarks>
 /// <param name="apiName">The schema-unique API name of the relationship.</param>

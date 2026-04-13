@@ -148,9 +148,9 @@ public enum ApiInitializationCode
 
     #region ApiRelationshipEnd Initialization Codes
     /// <summary>
-    ///     The relationship end's object type name is null, empty, or whitespace.
+    ///     The relationship end's CLR object type is null.
     /// </summary>
-    API_RELATIONSHIP_END_INVALID_OBJECT_TYPE_NAME,
+    API_RELATIONSHIP_END_NULL_CLR_OBJECT_TYPE,
 
     /// <summary>
     ///     The relationship end's object type name could not be resolved to a defined object type in the schema.

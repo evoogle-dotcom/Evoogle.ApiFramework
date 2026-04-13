@@ -35,7 +35,7 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
         public required string ApiPrincipalEndB { get; init; }
         public required string ApiDependentEndA { get; init; }
         public required string ApiDependentEndB { get; init; }
-        public required string ApiAssociationTypeName { get; init; }
+        public required string ClrAssociationObjectType { get; init; }
     }
 
     private readonly record struct PropertyNames
@@ -58,7 +58,7 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
                     ApiPrincipalEndB = policy.ConvertName(nameof(ApiRelationshipManyToMany.ApiPrincipalEndB)),
                     ApiDependentEndA = policy.ConvertName(nameof(ApiRelationshipManyToMany.ApiDependentEndA)),
                     ApiDependentEndB = policy.ConvertName(nameof(ApiRelationshipManyToMany.ApiDependentEndB)),
-                    ApiAssociationTypeName = policy.ConvertName(nameof(ApiRelationshipManyToMany.ApiAssociationTypeName)),
+                    ClrAssociationObjectType = policy.ConvertName(nameof(ApiRelationshipManyToMany.ClrAssociationObjectType)),
                 },
                 ExtensibleBase = GetExtensiblePropertyNames(policy),
             };
@@ -80,7 +80,7 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
         public ApiRelationshipPrincipalEnd? ApiPrincipalEndB { get; set; }
         public ApiRelationshipDependentEnd? ApiDependentEndA { get; set; }
         public ApiRelationshipDependentEnd? ApiDependentEndB { get; set; }
-        public string? ApiAssociationTypeName { get; set; }
+        public Type? ClrAssociationObjectType { get; set; }
     }
 
     private class ReadData : ExtensibleReadData
@@ -102,7 +102,7 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
             { propertyNames.ApiRelationship.ApiPrincipalEndB, HandleApiPrincipalEndB },
             { propertyNames.ApiRelationship.ApiDependentEndA, HandleApiDependentEndA },
             { propertyNames.ApiRelationship.ApiDependentEndB, HandleApiDependentEndB },
-            { propertyNames.ApiRelationship.ApiAssociationTypeName, HandleApiAssociationTypeName },
+            { propertyNames.ApiRelationship.ClrAssociationObjectType, HandleClrAssociationObjectType },
             { propertyNames.ExtensibleBase.Extensions, CreateExtensionsHandler<PropertyNames, ReadData, ReadHandlers>() },
         };
 
@@ -172,16 +172,17 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
             context.ReadData.ApiRelationship.ApiDependentEndB = end as ApiRelationshipDependentEnd;
         }
 
-        private static void HandleApiAssociationTypeName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleClrAssociationObjectType(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiRelationship ??= new ApiRelationshipReadData();
-            context.ReadData.ApiRelationship.ApiAssociationTypeName = reader.GetString();
+            context.ReadData.ApiRelationship.ClrAssociationObjectType = _typeJsonConverter.Read(ref reader, typeof(Type), context.Options);
         }
     }
     #endregion
 
     #region Fields
     private static readonly EnumJsonConverter<ApiRelationshipKind> _kindConverter = new();
+    private static readonly TypeJsonConverter _typeJsonConverter = new();
     #endregion
 
     #region Constructors
@@ -240,16 +241,16 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
                 readData.ApiPrincipalEndB!,
                 // Re-apply forced Cascade when deserializing M:N dependent ends.
                 new ApiRelationshipDependentEnd(
-                    readData.ApiDependentEndA!.ApiObjectTypeName,
+                    readData.ApiDependentEndA!.ClrObjectType,
                     readData.ApiDependentEndA.ApiKeyPaths,
                     ApiRelationshipDeleteBehavior.None,
                     ApiRelationshipDeleteBehavior.Cascade),
                 new ApiRelationshipDependentEnd(
-                    readData.ApiDependentEndB!.ApiObjectTypeName,
+                    readData.ApiDependentEndB!.ClrObjectType,
                     readData.ApiDependentEndB.ApiKeyPaths,
                     ApiRelationshipDeleteBehavior.None,
                     ApiRelationshipDeleteBehavior.Cascade),
-                readData.ApiAssociationTypeName!,
+                readData.ClrAssociationObjectType!,
                 readData.ApiDisplayName,
                 readData.ApiDescription),
 
@@ -298,7 +299,7 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
                     WriteApiPrincipalEndB(writer, manyToMany, writeContext);
                     WriteApiDependentEndA(writer, manyToMany, writeContext);
                     WriteApiDependentEndB(writer, manyToMany, writeContext);
-                    WriteApiAssociationTypeName(writer, manyToMany, writeContext);
+                    WriteClrAssociationObjectType(writer, manyToMany, writeContext);
                     break;
             }
 
@@ -392,7 +393,7 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
             end => writer.TryWriteWithSerializer(end, options));
     }
 
-    private static void WriteApiAssociationTypeName(Utf8JsonWriter writer, ApiRelationshipManyToMany relationship, DefaultWriteContext<PropertyNames> context)
-        => writer.TryWritePropertyAsString(context.PropertyNames.ApiRelationship.ApiAssociationTypeName, relationship.ApiAssociationTypeName, context.Options);
+    private static void WriteClrAssociationObjectType(Utf8JsonWriter writer, ApiRelationshipManyToMany relationship, DefaultWriteContext<PropertyNames> context)
+        => writer.TryWritePropertyWithConverter(context.PropertyNames.ApiRelationship.ClrAssociationObjectType, relationship.ClrAssociationObjectType, context.Options, _typeJsonConverter);
     #endregion
 }

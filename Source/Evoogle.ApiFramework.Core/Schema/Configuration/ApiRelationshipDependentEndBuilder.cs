@@ -13,10 +13,10 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 ///     <see cref="AddScalarPath"/>, <see cref="AddNestedPath"/>, or <see cref="AddOwnerPath"/>.
 ///     When no paths are added the relationship is treated as purely navigational.
 /// </remarks>
-/// <param name="apiObjectTypeName">The API name of the dependent <see cref="ApiObjectType"/>.</param>
+/// <param name="clrObjectType">The CLR type of the dependent <see cref="ApiObjectType"/>.</param>
 public class ApiRelationshipDependentEndBuilder
 (
-    string apiObjectTypeName
+    Type clrObjectType
 ) : ExtensionBuilder<ApiRelationshipDependentEndBuilder>
 {
     #region Fields
@@ -140,7 +140,7 @@ public class ApiRelationshipDependentEndBuilder
 
         var end = new ApiRelationshipDependentEnd
         (
-            apiObjectTypeName,
+            clrObjectType,
             apiKeyPaths,
             _apiDeleteBehavior
         );
@@ -166,7 +166,7 @@ public class ApiRelationshipDependentEndBuilder
 
         var end = new ApiRelationshipDependentEnd
         (
-            apiObjectTypeName,
+            clrObjectType,
             apiKeyPaths,
             _apiDeleteBehavior,
             forcedDeleteBehavior

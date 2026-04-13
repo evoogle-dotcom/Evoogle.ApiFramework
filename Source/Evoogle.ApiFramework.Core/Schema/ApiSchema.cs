@@ -163,14 +163,14 @@ public sealed class ApiSchema : ExtensibleBase
         var apiName = this.ApiName.SafeToString();
         var apiVersion = this.ApiVersion.SafeToString();
         var apiOptions = this.ApiOptions.SafeToString();
-        var apiNamedTypeCount = this.ApiNamedTypes.Length.SafeToString();
-        var apiScalarTypeCount = this.ApiScalarTypes.Length.SafeToString();
-        var apiEnumTypeCount = this.ApiEnumTypes.Length.SafeToString();
-        var apiObjectTypeCount = this.ApiObjectTypes.Length.SafeToString();
-        var apiRelationshipCount = this.ApiRelationships.Length.SafeToString();
+        var apiNamedTypesCount = this.ApiNamedTypes.Length.SafeToString();
+        var apiScalarTypesCount = this.ApiScalarTypes.Length.SafeToString();
+        var apiEnumTypesCount = this.ApiEnumTypes.Length.SafeToString();
+        var apiObjectTypesCount = this.ApiObjectTypes.Length.SafeToString();
+        var apiRelationshipsCount = this.ApiRelationships.Length.SafeToString();
         var extensionCount = this.ExtensionCount.SafeToString();
 
-        return $"{nameof(ApiSchema)} {{ApiName={apiName}, ApiVersion={apiVersion}, {nameof(this.ApiOptions)}={apiOptions}, ApiNamedTypeCount={apiNamedTypeCount}, ApiScalarTypeCount={apiScalarTypeCount}, ApiEnumTypeCount={apiEnumTypeCount}, ApiObjectTypeCount={apiObjectTypeCount}, ApiRelationshipCount={apiRelationshipCount}, {nameof(this.ExtensionCount)}={extensionCount}}}";
+        return $"{nameof(ApiSchema)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ApiVersion)}={apiVersion}, {nameof(this.ApiOptions)}={apiOptions}, {nameof(this.ApiNamedTypes)}Count={apiNamedTypesCount}, {nameof(this.ApiScalarTypes)}Count={apiScalarTypesCount}, {nameof(this.ApiEnumTypes)}Count={apiEnumTypesCount}, {nameof(this.ApiObjectTypes)}Count={apiObjectTypesCount}, {nameof(this.ApiRelationships)}Count={apiRelationshipsCount}, {nameof(this.ExtensionCount)}={extensionCount}}}";
     }
     #endregion
 
@@ -561,12 +561,12 @@ public sealed class ApiSchema : ExtensibleBase
 
         void TryRegisterEnd(ApiRelationshipEnd? end)
         {
-            if (end is null || ApiSchemaHelpers.IsNameInvalid(end.ApiObjectTypeName))
+            if (end?.ClrObjectType is null)
             {
                 return;
             }
 
-            if (!this.TryGetObjectTypeByApiName(end.ApiObjectTypeName, out var apiObjectType))
+            if (!this.TryGetObjectTypeByClrType(end.ClrObjectType, out var apiObjectType))
             {
                 return;
             }
