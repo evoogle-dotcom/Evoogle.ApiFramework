@@ -454,6 +454,24 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
                     .AddValue(nameof(Gender.Male), nameof(Gender.Male), (int)Gender.Male)
                     .AddValue(nameof(Gender.Female), nameof(Gender.Female), (int)Gender.Female)),
         },
+        new BuildGenericOverloadTest
+        {
+            Name = "AddScalar<T>() no-configure overload uses CLR type name as default API name",
+            Expected = ApiScalarsOnlySchema,
+            ConfigureGeneric = b => b
+                .WithVersion("1.0")
+                .AddScalar<string>()
+                .AddScalar<long>()
+                .AddScalar<bool>(),
+        },
+        new BuildGenericOverloadTest
+        {
+            Name = "AddObject<T>() no-configure overload uses CLR type name as default API name",
+            Expected = ApiEmptyObjectTypeSchemaWithDefaultName,
+            ConfigureGeneric = b => b
+                .WithVersion("1.0")
+                .AddObject<Empty>(),
+        },
     ];
 
     private static ApiSchema ApiGenderEnumSchema { get; } = ApiSchema.Create
@@ -464,6 +482,12 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
         apiObjectTypes: [],
         apiVersion: "1.0"
     );
+
+    private static ApiSchema ApiEmptyObjectTypeSchemaWithDefaultName { get; } = new ApiSchemaBuilder()
+        .WithName(nameof(ApiEmptyObjectTypeSchemaWithDefaultName))
+        .WithVersion("1.0")
+        .AddObject<Empty>(x => x.WithName(nameof(Empty)))
+        .Build();
 
     private class StringScalarTypeConfiguration : IApiScalarTypeConfiguration
     {

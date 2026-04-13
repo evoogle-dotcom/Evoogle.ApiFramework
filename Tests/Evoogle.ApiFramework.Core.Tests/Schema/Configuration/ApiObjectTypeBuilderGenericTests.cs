@@ -307,6 +307,48 @@ public class ApiObjectTypeBuilderGenericTests(ITestOutputHelper output) : XUnitT
                     .Build();
             }
         },
+
+        new BuildObjectTypeTest
+        {
+            Name = "ApiObjectTypeBuilder<Customer> AddIdentity(name) without configure builds empty identity",
+            BuildExpected = static () =>
+            {
+                var ctx = new ApiSchemaBuilderContext();
+                return new ApiObjectTypeBuilder(typeof(Customer), ctx)
+                    .WithName("Customer")
+                    .AddIdentity("PK_Customer")
+                    .Build();
+            },
+            BuildActual = static () =>
+            {
+                var ctx = new ApiSchemaBuilderContext();
+                return new ApiObjectTypeBuilder<Customer>(ctx)
+                    .WithName("Customer")
+                    .AddIdentity("PK_Customer", configure: (Action<ApiIdentityBuilder>?)null)
+                    .Build();
+            }
+        },
+
+        new BuildObjectTypeTest
+        {
+            Name = "ApiObjectTypeBuilder<Customer> AddIdentity(name, Action<ApiIdentityBuilder<T>>?) without configure builds empty identity",
+            BuildExpected = static () =>
+            {
+                var ctx = new ApiSchemaBuilderContext();
+                return new ApiObjectTypeBuilder(typeof(Customer), ctx)
+                    .WithName("Customer")
+                    .AddIdentity("PK_Customer")
+                    .Build();
+            },
+            BuildActual = static () =>
+            {
+                var ctx = new ApiSchemaBuilderContext();
+                return new ApiObjectTypeBuilder<Customer>(ctx)
+                    .WithName("Customer")
+                    .AddIdentity("PK_Customer", configure: (Action<ApiIdentityBuilder<Customer>>?)null)
+                    .Build();
+            }
+        },
     ];
 
     public static TheoryDataRow<IXUnitTest>[] BuildIdentityTheoryData =>

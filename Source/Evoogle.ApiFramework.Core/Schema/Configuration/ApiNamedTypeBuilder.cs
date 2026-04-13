@@ -3,6 +3,8 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.Extensions;
+
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
 /// <summary>
@@ -15,14 +17,14 @@ public abstract class ApiNamedTypeBuilder<TBuilder>(Type clrType, ApiSchemaBuild
     where TBuilder : ApiNamedTypeBuilder<TBuilder>
 {
     #region Fields
-    private string? _apiName;
+    private string _apiName = clrType.SafeToName();
     #endregion
 
     #region Properties
     /// <summary>
     ///     Gets the API name configured for the type.
     /// </summary>
-    internal string ApiName => _apiName!;
+    internal string ApiName => _apiName;
 
     /// <summary>
     ///     Gets the CLR type represented by this builder.

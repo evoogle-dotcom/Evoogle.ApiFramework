@@ -68,7 +68,7 @@ public sealed class ApiObjectTypeBuilder<T>(ApiSchemaBuilderContext context)
     }
 
     /// <inheritdoc cref="ApiObjectTypeBuilder.AddIdentity"/>
-    public new ApiObjectTypeBuilder<T> AddIdentity(string apiName, Action<ApiIdentityBuilder> configure)
+    public new ApiObjectTypeBuilder<T> AddIdentity(string apiName, Action<ApiIdentityBuilder>? configure = null)
     {
         base.AddIdentity(apiName, configure);
         return this;
@@ -79,14 +79,12 @@ public sealed class ApiObjectTypeBuilder<T>(ApiSchemaBuilderContext context)
     ///     callback that supports expression-based property selection.
     /// </summary>
     /// <param name="apiName">The API name of the identity.</param>
-    /// <param name="configure">Callback to configure the identity using a typed builder.</param>
+    /// <param name="configure">Optional callback to configure the identity using a typed builder.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiObjectTypeBuilder<T> AddIdentity(string apiName, Action<ApiIdentityBuilder<T>> configure)
+    public ApiObjectTypeBuilder<T> AddIdentity(string apiName, Action<ApiIdentityBuilder<T>>? configure = null)
     {
-        ArgumentNullException.ThrowIfNull(configure);
-
         var apiIdentityBuilder = new ApiIdentityBuilder<T>(apiName);
-        configure(apiIdentityBuilder);
+        configure?.Invoke(apiIdentityBuilder);
         base.AddIdentityBuilderCore(apiIdentityBuilder);
         return this;
     }

@@ -48,13 +48,13 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     ///     The first identity added is the primary identity by convention unless specified otherwise.
     /// </remarks>
     /// <param name="apiName">The API name of the identity.</param>
-    /// <param name="configure">Callback to configure the added identity.</param>
+    /// <param name="configure">Optional callback to configure the added identity.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiObjectTypeBuilder AddIdentity(string apiName, Action<ApiIdentityBuilder> configure)
+    public ApiObjectTypeBuilder AddIdentity(string apiName, Action<ApiIdentityBuilder>? configure = null)
     {
         var apiIdentityBuilder = new ApiIdentityBuilder(apiName);
 
-        configure.Invoke(apiIdentityBuilder);
+        configure?.Invoke(apiIdentityBuilder);
 
         _apiIdentityBuilders.Add(apiIdentityBuilder);
 

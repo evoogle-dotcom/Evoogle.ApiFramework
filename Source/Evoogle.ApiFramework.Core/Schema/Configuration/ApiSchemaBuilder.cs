@@ -20,89 +20,20 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     private readonly ApiSchemaBuilderContext _context = new(logger);
     #endregion
 
-    #region Builder Methods
+    #region AddEnum Methods
     /// <summary>
-    ///     Adds an extension value associated with the specified <paramref name="type"/>.
-    /// </summary>
-    /// <param name="type">The type used as the extension key.</param>
-    /// <param name="value">The extension value to store.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiSchemaBuilder AddSchemaExtension(Type type, object value)
-    {
-        base.AddExtension(type, value);
-        return this;
-    }
-
-    /// <summary>
-    ///     Adds an extension value keyed by its own type.
-    /// </summary>
-    /// <typeparam name="T">The extension value type.</typeparam>
-    /// <param name="value">The extension value.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiSchemaBuilder AddSchemaExtension<T>(T value) where T : notnull
-        => this.AddSchemaExtension(typeof(T), value);
-
-    /// <summary>
-    ///     Sets the name of the schema being built.
-    /// </summary>
-    /// <param name="apiName">The schema name.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiSchemaBuilder WithName(string apiName)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
-
-        _apiName = apiName;
-        return this;
-    }
-
-    /// <summary>
-    ///     Sets the optional version string for the schema.
-    /// </summary>
-    /// <param name="apiVersion">The version identifier.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiSchemaBuilder WithVersion(string apiVersion)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiVersion, nameof(apiVersion));
-
-        _apiVersion = apiVersion;
-        return this;
-    }
-
-    /// <summary>
-    ///     Configures schema-wide options for the schema being built.
-    /// </summary>
-    /// <param name="configure">Callback to configure the <see cref="ApiSchemaOptionsBuilder"/>.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiSchemaBuilder WithOptions(Action<ApiSchemaOptionsBuilder> configure)
-    {
-        _apiOptionsConfiguration = configure;
-        return this;
-    }
-
-    /// <summary>
-    ///     Resets the schema options to their out-of-the-box defaults.
-    /// </summary>
-    /// <returns>The current builder instance.</returns>
-    public ApiSchemaBuilder WithDefaultOptions()
-    {
-        _apiOptionsConfiguration = null;
-        return this;
-    }
-
-    /// <summary>
-    ///     Adds an enumeration type to the schema using an inline configuration action.
+    ///     Adds an enumeration type to the schema using an optional inline configuration action.
     /// </summary>
     /// <param name="clrType">The CLR enum type.</param>
-    /// <param name="configure">Callback to configure the added enumeration type.</param>
+    /// <param name="configure">Optional callback to configure the added enumeration type.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiSchemaBuilder AddEnum(Type clrType, Action<ApiEnumTypeBuilder> configure)
+    public ApiSchemaBuilder AddEnum(Type clrType, Action<ApiEnumTypeBuilder>? configure = null)
     {
         ArgumentNullException.ThrowIfNull(clrType);
-        ArgumentNullException.ThrowIfNull(configure);
 
         var builder = _context.GetOrAddEnumTypeBuilder(clrType);
 
-        configure(builder);
+        configure?.Invoke(builder);
         return this;
     }
 
@@ -124,18 +55,16 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     }
 
     /// <summary>
-    ///     Adds an enumeration type to the schema using an inline configuration action.
+    ///     Adds an enumeration type to the schema using an optional inline configuration action.
     /// </summary>
     /// <typeparam name="T">The CLR enum type.</typeparam>
-    /// <param name="configure">Callback to configure the added enumeration type.</param>
+    /// <param name="configure">Optional callback to configure the added enumeration type.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiSchemaBuilder AddEnum<T>(Action<ApiEnumTypeBuilder> configure) where T : Enum
+    public ApiSchemaBuilder AddEnum<T>(Action<ApiEnumTypeBuilder>? configure = null) where T : Enum
     {
-        ArgumentNullException.ThrowIfNull(configure);
-
         var builder = _context.GetOrAddEnumTypeBuilder<T>();
 
-        configure(builder);
+        configure?.Invoke(builder);
         return this;
     }
 
@@ -154,21 +83,22 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
         configuration.Configure(builder);
         return this;
     }
+    #endregion
 
+    #region AddObject Methods
     /// <summary>
-    ///     Adds an object type to the schema using an inline configuration action.
+    ///     Adds an object type to the schema using an optional inline configuration action.
     /// </summary>
     /// <param name="clrType">The CLR object type.</param>
-    /// <param name="configure">Callback to configure the added object type.</param>
+    /// <param name="configure">Optional callback to configure the added object type.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiSchemaBuilder AddObject(Type clrType, Action<ApiObjectTypeBuilder> configure)
+    public ApiSchemaBuilder AddObject(Type clrType, Action<ApiObjectTypeBuilder>? configure = null)
     {
         ArgumentNullException.ThrowIfNull(clrType);
-        ArgumentNullException.ThrowIfNull(configure);
 
         var builder = _context.GetOrAddObjectTypeBuilder(clrType);
 
-        configure(builder);
+        configure?.Invoke(builder);
         return this;
     }
 
@@ -190,18 +120,16 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     }
 
     /// <summary>
-    ///     Adds an object type to the schema using a strongly-typed inline configuration action.
+    ///     Adds an object type to the schema using a strongly-typed optional inline configuration action.
     /// </summary>
     /// <typeparam name="T">The CLR object type.</typeparam>
-    /// <param name="configure">Callback to configure the added object type.</param>
+    /// <param name="configure">Optional callback to configure the added object type.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiSchemaBuilder AddObject<T>(Action<ApiObjectTypeBuilder<T>> configure)
+    public ApiSchemaBuilder AddObject<T>(Action<ApiObjectTypeBuilder<T>>? configure = null)
     {
-        ArgumentNullException.ThrowIfNull(configure);
-
         var builder = _context.GetOrAddObjectTypeBuilder<T>();
 
-        configure(builder);
+        configure?.Invoke(builder);
         return this;
     }
 
@@ -220,21 +148,22 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
         configuration.Configure(builder);
         return this;
     }
+    #endregion
 
+    #region AddScalar Methods
     /// <summary>
     ///     Adds a scalar type to the schema using an inline configuration action.
     /// </summary>
     /// <param name="clrType">The CLR scalar type.</param>
-    /// <param name="configure">Callback to configure the added scalar type.</param>
+    /// <param name="configure">Optional callback to configure the added scalar type.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiSchemaBuilder AddScalar(Type clrType, Action<ApiScalarTypeBuilder> configure)
+    public ApiSchemaBuilder AddScalar(Type clrType, Action<ApiScalarTypeBuilder>? configure = null)
     {
         ArgumentNullException.ThrowIfNull(clrType);
-        ArgumentNullException.ThrowIfNull(configure);
 
         var builder = _context.GetOrAddScalarTypeBuilder(clrType);
 
-        configure(builder);
+        configure?.Invoke(builder);
         return this;
     }
 
@@ -259,15 +188,13 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     ///     Adds a scalar type to the schema using an inline configuration action.
     /// </summary>
     /// <typeparam name="T">The CLR scalar type.</typeparam>
-    /// <param name="configure">Callback to configure the added scalar type.</param>
+    /// <param name="configure">Optional callback to configure the added scalar type.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiSchemaBuilder AddScalar<T>(Action<ApiScalarTypeBuilder> configure)
+    public ApiSchemaBuilder AddScalar<T>(Action<ApiScalarTypeBuilder>? configure = null)
     {
-        ArgumentNullException.ThrowIfNull(configure);
-
         var builder = _context.GetOrAddScalarTypeBuilder<T>();
 
-        configure(builder);
+        configure?.Invoke(builder);
         return this;
     }
 
@@ -286,7 +213,32 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
         configuration.Configure(builder);
         return this;
     }
+    #endregion
 
+    #region AddSchemaExtension Methods
+    /// <summary>
+    ///     Adds an extension value associated with the specified <paramref name="type"/>.
+    /// </summary>
+    /// <param name="type">The type used as the extension key.</param>
+    /// <param name="value">The extension value to store.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiSchemaBuilder AddSchemaExtension(Type type, object value)
+    {
+        base.AddExtension(type, value);
+        return this;
+    }
+
+    /// <summary>
+    ///     Adds an extension value keyed by its own type.
+    /// </summary>
+    /// <typeparam name="T">The extension value type.</typeparam>
+    /// <param name="value">The extension value.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiSchemaBuilder AddSchemaExtension<T>(T value) where T : notnull
+        => this.AddSchemaExtension(typeof(T), value);
+    #endregion
+
+    #region AddRelationship Methods
     /// <summary>
     ///     Adds a one-to-one relationship to the schema using an inline configuration action.
     /// </summary>
@@ -428,7 +380,58 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
         configuration.Configure(builder);
         return this;
     }
+    #endregion
 
+    #region With Methods
+    /// <summary>
+    ///     Sets the name of the schema being built.
+    /// </summary>
+    /// <param name="apiName">The schema name.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiSchemaBuilder WithName(string apiName)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
+
+        _apiName = apiName;
+        return this;
+    }
+
+    /// <summary>
+    ///     Sets the optional version string for the schema.
+    /// </summary>
+    /// <param name="apiVersion">The version identifier.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiSchemaBuilder WithVersion(string apiVersion)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiVersion, nameof(apiVersion));
+
+        _apiVersion = apiVersion;
+        return this;
+    }
+
+    /// <summary>
+    ///     Configures schema-wide options for the schema being built.
+    /// </summary>
+    /// <param name="configure">Callback to configure the <see cref="ApiSchemaOptionsBuilder"/>.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiSchemaBuilder WithOptions(Action<ApiSchemaOptionsBuilder> configure)
+    {
+        _apiOptionsConfiguration = configure;
+        return this;
+    }
+
+    /// <summary>
+    ///     Resets the schema options to their out-of-the-box defaults.
+    /// </summary>
+    /// <returns>The current builder instance.</returns>
+    public ApiSchemaBuilder WithDefaultOptions()
+    {
+        _apiOptionsConfiguration = null;
+        return this;
+    }
+    #endregion
+
+    #region Build Methods
     /// <summary>
     ///     Constructs the <see cref="ApiSchema"/> using the configured components.
     /// </summary>

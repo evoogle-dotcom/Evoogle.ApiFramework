@@ -185,6 +185,49 @@ public class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
     }
     #endregion
 
+    private class AddIdentityNullConfigureTest : XUnitTest
+    {
+        #region User Supplied Properties
+        public required string IdentityApiName { get; init; }
+        #endregion
+
+        #region Calculated Properties
+        private ApiObjectType? Actual { get; set; }
+        #endregion
+
+        #region Constructors
+        public AddIdentityNullConfigureTest()
+        {
+            this.Name = nameof(AddIdentityNullConfigureTest);
+            this.ExcludeMembers = ApiSchemaExcludeMembers.Standard;
+        }
+        #endregion
+
+        #region XUnitTest Methods
+        protected override void Arrange()
+        {
+            this.WriteLine($"IdentityApiName: {this.IdentityApiName}");
+        }
+
+        protected override void Act()
+        {
+            var context = new ApiSchemaBuilderContext();
+            this.Actual = new ApiObjectTypeBuilder(typeof(Customer), context)
+                .WithName(nameof(Customer))
+                .AddIdentity(this.IdentityApiName)
+                .Build();
+            this.WriteLine($"Actual: {this.Actual.SafeToString()}");
+        }
+
+        protected override void Assert()
+        {
+            this.Actual.Should().NotBeNull();
+            this.Actual!.ApiIdentities.Should().ContainSingle()
+                .Which.ApiName.Should().Be(this.IdentityApiName);
+        }
+        #endregion
+    }
+
     private class AddPropertySingleNameTest : XUnitTest
     {
         #region User Supplied Properties
@@ -312,6 +355,15 @@ public class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
             ApiExtensionType1 = typeof(GraphQlExtension),
         },
     ];
+
+    public static TheoryDataRow<IXUnitTest>[] AddIdentityNullConfigureTheoryData =>
+    [
+        new AddIdentityNullConfigureTest
+        {
+            Name = "AddIdentity(name) without configure builds empty identity with correct API name",
+            IdentityApiName = "PK_Customer",
+        },
+    ];
     #endregion
 
     #region Test Methods
@@ -322,6 +374,10 @@ public class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
     [Theory]
     [MemberData(nameof(AddPropertySingleNameTheoryData))]
     public void AddPropertySingleName(IXUnitTest test) => test.Execute(this);
+
+    [Theory]
+    [MemberData(nameof(AddIdentityNullConfigureTheoryData))]
+    public void AddIdentityNullConfigure(IXUnitTest test) => test.Execute(this);
     #endregion
 }
 

@@ -590,6 +590,7 @@ public static class Dummy
             .WithName("CustomerOrdersAPI")
             .WithVersion("v1")
             .AddScalar(typeof(EmailAddress), x => x.WithName("EmailAddress"))
+            .AddScalar(typeof(EmailAddress))
             .AddEnum(typeof(OrderStatus), x => x
                 .WithName("OrderStatus")
                 .AddValue("Pending", "Pending", 0)

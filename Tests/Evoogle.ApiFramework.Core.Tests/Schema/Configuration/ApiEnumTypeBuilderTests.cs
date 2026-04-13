@@ -78,6 +78,47 @@ public class ApiEnumTypeBuilderTests(ITestOutputHelper output) : XUnitTests(outp
         }
         #endregion
     }
+
+    private class BuildWithDefaultNameTest : XUnitTest
+    {
+        #region User Supplied Properties
+        public required Type ClrType { get; init; }
+        public required string ExpectedApiName { get; init; }
+        #endregion
+
+        #region Calculated Properties
+        private ApiEnumType? Actual { get; set; }
+        #endregion
+
+        #region Constructors
+        public BuildWithDefaultNameTest()
+        {
+            this.Name = nameof(BuildWithDefaultNameTest);
+            this.ExcludeMembers = ApiSchemaExcludeMembers.Standard;
+        }
+        #endregion
+
+        #region XUnitTest Methods
+        protected override void Arrange()
+        {
+            this.WriteLine($"ClrType: {this.ClrType.SafeToName()}");
+            this.WriteLine($"ExpectedApiName: {this.ExpectedApiName}");
+        }
+
+        protected override void Act()
+        {
+            var context = new ApiSchemaBuilderContext();
+            this.Actual = new ApiEnumTypeBuilder(this.ClrType, context).Build();
+            this.WriteLine($"Actual ApiName: {this.Actual.ApiName}");
+        }
+
+        protected override void Assert()
+        {
+            this.Actual.Should().NotBeNull();
+            this.Actual!.ApiName.Should().Be(this.ExpectedApiName);
+        }
+        #endregion
+    }
     #endregion
 
     #region Theory Data
@@ -133,11 +174,25 @@ public class ApiEnumTypeBuilderTests(ITestOutputHelper output) : XUnitTests(outp
             ApiExtensionType = typeof(TestExtension),
         },
     ];
+
+    public static TheoryDataRow<IXUnitTest>[] BuildWithDefaultNameTheoryData =>
+    [
+        new BuildWithDefaultNameTest
+        {
+            Name = $"Builds {nameof(OrderStatus)} enum using CLR type name as default API name when configure is omitted",
+            ClrType = typeof(OrderStatus),
+            ExpectedApiName = nameof(OrderStatus),
+        },
+    ];
     #endregion
 
     #region Test Methods
     [Theory]
     [MemberData(nameof(BuildTheoryData))]
     public void Build(IXUnitTest test) => test.Execute(this);
+
+    [Theory]
+    [MemberData(nameof(BuildWithDefaultNameTheoryData))]
+    public void BuildWithDefaultName(IXUnitTest test) => test.Execute(this);
     #endregion
 }
