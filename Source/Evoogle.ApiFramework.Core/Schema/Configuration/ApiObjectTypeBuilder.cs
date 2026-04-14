@@ -112,6 +112,192 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
         return this;
     }
 
+    #endregion
+
+    #region AddRelationship Methods
+    /// <summary>
+    ///     Registers a one-to-one relationship at the schema level while authoring this object type.
+    /// </summary>
+    /// <remarks>
+    ///     This is a convenience entry point equivalent to calling
+    ///     <see cref="ApiSchemaBuilder.AddOneToOneRelationship(string, Action{ApiRelationshipOneToOneBuilder})"/>
+    ///     directly on the schema builder.  The resulting <see cref="ApiRelationship"/> is owned by the
+    ///     schema, not by this object type.
+    /// </remarks>
+    /// <param name="apiName">The schema-unique API name of the relationship.</param>
+    /// <param name="configure">Callback to configure the relationship.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiObjectTypeBuilder AddOneToOneRelationship(string apiName, Action<ApiRelationshipOneToOneBuilder> configure)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
+        ArgumentNullException.ThrowIfNull(configure);
+
+        var builder = this.Context.GetOrAddOneToOneRelationshipBuilder(apiName);
+        configure(builder);
+        return this;
+    }
+
+    /// <summary>
+    ///     Registers a one-to-one relationship at the schema level while authoring this object type,
+    ///     using an <see cref="IApiRelationshipOneToOneConfiguration"/> implementation.
+    /// </summary>
+    /// <remarks>
+    ///     This is a convenience entry point equivalent to calling
+    ///     <see cref="ApiSchemaBuilder.AddOneToOneRelationship(string, IApiRelationshipOneToOneConfiguration)"/>
+    ///     directly on the schema builder.  The resulting <see cref="ApiRelationship"/> is owned by the
+    ///     schema, not by this object type.
+    /// </remarks>
+    /// <param name="apiName">The schema-unique API name of the relationship.</param>
+    /// <param name="configuration">The configuration implementation.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiObjectTypeBuilder AddOneToOneRelationship(string apiName, IApiRelationshipOneToOneConfiguration configuration)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
+        ArgumentNullException.ThrowIfNull(configuration);
+
+        var builder = this.Context.GetOrAddOneToOneRelationshipBuilder(apiName);
+        configuration.Configure(builder);
+        return this;
+    }
+
+    /// <summary>
+    ///     Registers a one-to-many relationship at the schema level while authoring this object type.
+    /// </summary>
+    /// <remarks>
+    ///     This is a convenience entry point equivalent to calling
+    ///     <see cref="ApiSchemaBuilder.AddOneToManyRelationship(string, Action{ApiRelationshipOneToManyBuilder})"/>
+    ///     directly on the schema builder.  The resulting <see cref="ApiRelationship"/> is owned by the
+    ///     schema, not by this object type.
+    /// </remarks>
+    /// <param name="apiName">The schema-unique API name of the relationship.</param>
+    /// <param name="configure">Callback to configure the relationship.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiObjectTypeBuilder AddOneToManyRelationship(string apiName, Action<ApiRelationshipOneToManyBuilder> configure)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
+        ArgumentNullException.ThrowIfNull(configure);
+
+        var builder = this.Context.GetOrAddOneToManyRelationshipBuilder(apiName);
+        configure(builder);
+        return this;
+    }
+
+    /// <summary>
+    ///     Registers a one-to-many relationship at the schema level while authoring this object type,
+    ///     using an <see cref="IApiRelationshipOneToManyConfiguration"/> implementation.
+    /// </summary>
+    /// <remarks>
+    ///     This is a convenience entry point equivalent to calling
+    ///     <see cref="ApiSchemaBuilder.AddOneToManyRelationship(string, IApiRelationshipOneToManyConfiguration)"/>
+    ///     directly on the schema builder.  The resulting <see cref="ApiRelationship"/> is owned by the
+    ///     schema, not by this object type.
+    /// </remarks>
+    /// <param name="apiName">The schema-unique API name of the relationship.</param>
+    /// <param name="configuration">The configuration implementation.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiObjectTypeBuilder AddOneToManyRelationship(string apiName, IApiRelationshipOneToManyConfiguration configuration)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
+        ArgumentNullException.ThrowIfNull(configuration);
+
+        var builder = this.Context.GetOrAddOneToManyRelationshipBuilder(apiName);
+        configuration.Configure(builder);
+        return this;
+    }
+
+    /// <summary>
+    ///     Registers a many-to-many relationship at the schema level while authoring this object type.
+    /// </summary>
+    /// <remarks>
+    ///     This is a convenience entry point equivalent to calling
+    ///     <see cref="ApiSchemaBuilder.AddManyToManyRelationship(string, Action{ApiRelationshipManyToManyBuilder})"/>
+    ///     directly on the schema builder.  The resulting <see cref="ApiRelationship"/> is owned by the
+    ///     schema, not by this object type.
+    /// </remarks>
+    /// <param name="apiName">The schema-unique API name of the relationship.</param>
+    /// <param name="configure">Callback to configure the relationship.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiObjectTypeBuilder AddManyToManyRelationship(string apiName, Action<ApiRelationshipManyToManyBuilder> configure)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
+        ArgumentNullException.ThrowIfNull(configure);
+
+        var builder = this.Context.GetOrAddManyToManyRelationshipBuilder(apiName);
+        configure(builder);
+        return this;
+    }
+
+    /// <summary>
+    ///     Registers a many-to-many relationship at the schema level while authoring this object type,
+    ///     using an <see cref="IApiRelationshipManyToManyConfiguration"/> implementation.
+    /// </summary>
+    /// <remarks>
+    ///     This is a convenience entry point equivalent to calling
+    ///     <see cref="ApiSchemaBuilder.AddManyToManyRelationship(string, IApiRelationshipManyToManyConfiguration)"/>
+    ///     directly on the schema builder.  The resulting <see cref="ApiRelationship"/> is owned by the
+    ///     schema, not by this object type.
+    /// </remarks>
+    /// <param name="apiName">The schema-unique API name of the relationship.</param>
+    /// <param name="configuration">The configuration implementation.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiObjectTypeBuilder AddManyToManyRelationship(string apiName, IApiRelationshipManyToManyConfiguration configuration)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
+        ArgumentNullException.ThrowIfNull(configuration);
+
+        var builder = this.Context.GetOrAddManyToManyRelationshipBuilder(apiName);
+        configuration.Configure(builder);
+        return this;
+    }
+
+    /// <summary>
+    ///     Registers a many-to-many relationship at the schema level while authoring this object type,
+    ///     with the association CLR type <typeparamref name="TAssociation"/> fixed for the builder.
+    /// </summary>
+    /// <remarks>
+    ///     This is a convenience entry point equivalent to calling
+    ///     <see cref="ApiSchemaBuilder.AddManyToManyRelationship{TAssociation}(string, Action{ApiRelationshipManyToManyBuilder{TAssociation}})"/>
+    ///     directly on the schema builder.  The resulting <see cref="ApiRelationship"/> is owned by the
+    ///     schema, not by this object type.
+    /// </remarks>
+    /// <typeparam name="TAssociation">The CLR type of the association object type that mediates the relationship.</typeparam>
+    /// <param name="apiName">The schema-unique API name of the relationship.</param>
+    /// <param name="configure">Callback to configure the relationship.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiObjectTypeBuilder AddManyToManyRelationship<TAssociation>(string apiName, Action<ApiRelationshipManyToManyBuilder<TAssociation>> configure)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
+        ArgumentNullException.ThrowIfNull(configure);
+
+        var builder = this.Context.GetOrAddManyToManyRelationshipBuilder<TAssociation>(apiName);
+        configure(builder);
+        return this;
+    }
+
+    /// <summary>
+    ///     Registers a many-to-many relationship at the schema level while authoring this object type,
+    ///     using a strongly-typed <see cref="IApiRelationshipManyToManyConfiguration{TAssociation}"/>.
+    /// </summary>
+    /// <remarks>
+    ///     This is a convenience entry point equivalent to calling
+    ///     <see cref="ApiSchemaBuilder.AddManyToManyRelationship{TAssociation}(string, IApiRelationshipManyToManyConfiguration{TAssociation})"/>
+    ///     directly on the schema builder.  The resulting <see cref="ApiRelationship"/> is owned by the
+    ///     schema, not by this object type.
+    /// </remarks>
+    /// <typeparam name="TAssociation">The CLR type of the association object type that mediates the relationship.</typeparam>
+    /// <param name="apiName">The schema-unique API name of the relationship.</param>
+    /// <param name="configuration">The typed configuration implementation.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiObjectTypeBuilder AddManyToManyRelationship<TAssociation>(string apiName, IApiRelationshipManyToManyConfiguration<TAssociation> configuration)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
+        ArgumentNullException.ThrowIfNull(configuration);
+
+        var builder = this.Context.GetOrAddManyToManyRelationshipBuilder<TAssociation>(apiName);
+        configuration.Configure(builder);
+        return this;
+    }
+
     /// <summary>
     ///     Builds the <see cref="ApiObjectType"/> using the configured properties and relationships.
     /// </summary>

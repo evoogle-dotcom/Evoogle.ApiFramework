@@ -109,5 +109,61 @@ public sealed class ApiObjectTypeBuilder<T>(ApiSchemaBuilderContext context)
         base.WithDefaultOptions();
         return this;
     }
+
+    /// <inheritdoc cref="ApiObjectTypeBuilder.AddOneToOneRelationship(string, Action{ApiRelationshipOneToOneBuilder})"/>
+    public new ApiObjectTypeBuilder<T> AddOneToOneRelationship(string apiName, Action<ApiRelationshipOneToOneBuilder> configure)
+    {
+        base.AddOneToOneRelationship(apiName, configure);
+        return this;
+    }
+
+    /// <inheritdoc cref="ApiObjectTypeBuilder.AddOneToOneRelationship(string, IApiRelationshipOneToOneConfiguration)"/>
+    public new ApiObjectTypeBuilder<T> AddOneToOneRelationship(string apiName, IApiRelationshipOneToOneConfiguration configuration)
+    {
+        base.AddOneToOneRelationship(apiName, configuration);
+        return this;
+    }
+
+    /// <inheritdoc cref="ApiObjectTypeBuilder.AddOneToManyRelationship(string, Action{ApiRelationshipOneToManyBuilder})"/>
+    public new ApiObjectTypeBuilder<T> AddOneToManyRelationship(string apiName, Action<ApiRelationshipOneToManyBuilder> configure)
+    {
+        base.AddOneToManyRelationship(apiName, configure);
+        return this;
+    }
+
+    /// <inheritdoc cref="ApiObjectTypeBuilder.AddOneToManyRelationship(string, IApiRelationshipOneToManyConfiguration)"/>
+    public new ApiObjectTypeBuilder<T> AddOneToManyRelationship(string apiName, IApiRelationshipOneToManyConfiguration configuration)
+    {
+        base.AddOneToManyRelationship(apiName, configuration);
+        return this;
+    }
+
+    /// <inheritdoc cref="ApiObjectTypeBuilder.AddManyToManyRelationship(string, Action{ApiRelationshipManyToManyBuilder})"/>
+    public new ApiObjectTypeBuilder<T> AddManyToManyRelationship(string apiName, Action<ApiRelationshipManyToManyBuilder> configure)
+    {
+        base.AddManyToManyRelationship(apiName, configure);
+        return this;
+    }
+
+    /// <inheritdoc cref="ApiObjectTypeBuilder.AddManyToManyRelationship(string, IApiRelationshipManyToManyConfiguration)"/>
+    public new ApiObjectTypeBuilder<T> AddManyToManyRelationship(string apiName, IApiRelationshipManyToManyConfiguration configuration)
+    {
+        base.AddManyToManyRelationship(apiName, configuration);
+        return this;
+    }
+
+    /// <inheritdoc cref="ApiObjectTypeBuilder.AddManyToManyRelationship{TAssociation}(string, Action{ApiRelationshipManyToManyBuilder{TAssociation}})"/>
+    public new ApiObjectTypeBuilder<T> AddManyToManyRelationship<TAssociation>(string apiName, Action<ApiRelationshipManyToManyBuilder<TAssociation>> configure)
+    {
+        base.AddManyToManyRelationship(apiName, configure);
+        return this;
+    }
+
+    /// <inheritdoc cref="ApiObjectTypeBuilder.AddManyToManyRelationship{TAssociation}(string, IApiRelationshipManyToManyConfiguration{TAssociation})"/>
+    public new ApiObjectTypeBuilder<T> AddManyToManyRelationship<TAssociation>(string apiName, IApiRelationshipManyToManyConfiguration<TAssociation> configuration)
+    {
+        base.AddManyToManyRelationship(apiName, configuration);
+        return this;
+    }
     #endregion
 }
