@@ -317,7 +317,6 @@ public static class Dummy
                 .WithPrincipalEndA<Product>
                 (
                     p => p
-                        .WithIdentityName("PrimaryKey")
                         .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Cascade)
                         .AddPrincipalEndExtension(new VisibleMetadata { Visible = true })
                 )

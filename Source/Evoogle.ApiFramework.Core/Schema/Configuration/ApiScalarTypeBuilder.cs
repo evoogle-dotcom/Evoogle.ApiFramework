@@ -10,7 +10,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 /// </summary>
 /// <param name="clrType">The CLR scalar type.</param>
 /// <param name="context">The shared builder context.</param>
-public sealed class ApiScalarTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
+public class ApiScalarTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     : ApiNamedTypeBuilder<ApiScalarTypeBuilder>(clrType, context)
 {
     #region Builder Methods

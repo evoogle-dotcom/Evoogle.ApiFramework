@@ -60,7 +60,7 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     /// <typeparam name="T">The CLR enum type.</typeparam>
     /// <param name="configure">Optional callback to configure the added enumeration type.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiSchemaBuilder AddEnum<T>(Action<ApiEnumTypeBuilder>? configure = null) where T : Enum
+    public ApiSchemaBuilder AddEnum<T>(Action<ApiEnumTypeBuilder<T>>? configure = null) where T : Enum
     {
         var builder = _context.GetOrAddEnumTypeBuilder<T>();
 
@@ -190,7 +190,7 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     /// <typeparam name="T">The CLR scalar type.</typeparam>
     /// <param name="configure">Optional callback to configure the added scalar type.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiSchemaBuilder AddScalar<T>(Action<ApiScalarTypeBuilder>? configure = null)
+    public ApiSchemaBuilder AddScalar<T>(Action<ApiScalarTypeBuilder<T>>? configure = null)
     {
         var builder = _context.GetOrAddScalarTypeBuilder<T>();
 

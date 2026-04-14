@@ -10,7 +10,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 /// </summary>
 /// <param name="clrType">The CLR enum type being described.</param>
 /// <param name="context">The shared builder context.</param>
-public sealed class ApiEnumTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
+public class ApiEnumTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     : ApiNamedTypeBuilder<ApiEnumTypeBuilder>(clrType, context)
 {
     #region Fields

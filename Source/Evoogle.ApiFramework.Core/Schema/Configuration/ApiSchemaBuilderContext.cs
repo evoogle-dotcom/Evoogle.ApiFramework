@@ -34,20 +34,52 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null)
 
     #region Methods
     /// <summary>
-    ///     Gets existing or adds new <see cref="ApiScalarTypeBuilder"/> for the CLR type <typeparamref name="T"/>.
+    ///     Gets existing or adds new <see cref="ApiScalarTypeBuilder{T}"/> for the CLR type <typeparamref name="T"/>.
     /// </summary>
     /// <typeparam name="T">The CLR scalar type.</typeparam>
-    /// <returns>The corresponding <see cref="ApiScalarTypeBuilder"/>.</returns>
-    internal ApiScalarTypeBuilder GetOrAddScalarTypeBuilder<T>() =>
-        this.GetOrAddScalarTypeBuilder(typeof(T));
+    /// <returns>The corresponding <see cref="ApiScalarTypeBuilder{T}"/>.</returns>
+    internal ApiScalarTypeBuilder<T> GetOrAddScalarTypeBuilder<T>()
+    {
+        var clrType = typeof(T);
+        if (_apiScalarTypeBuilders.TryGetValue(clrType, out var existing))
+        {
+            if (existing is not ApiScalarTypeBuilder<T> typed)
+            {
+                throw new ApiSchemaException(
+                    $"Scalar type '{clrType.Name}' was already registered as {existing.GetType().Name} and cannot be reconfigured as {typeof(ApiScalarTypeBuilder<T>).Name}.");
+            }
+
+            return typed;
+        }
+
+        var builder = new ApiScalarTypeBuilder<T>(this);
+        _apiScalarTypeBuilders[clrType] = builder;
+        return builder;
+    }
 
     /// <summary>
-    ///     Gets existing or adds new <see cref="ApiEnumTypeBuilder"/> for the CLR type <typeparamref name="T"/>.
+    ///     Gets existing or adds new <see cref="ApiEnumTypeBuilder{T}"/> for the CLR type <typeparamref name="T"/>.
     /// </summary>
     /// <typeparam name="T">The CLR enum type.</typeparam>
-    /// <returns>The corresponding <see cref="ApiEnumTypeBuilder"/>.</returns>
-    internal ApiEnumTypeBuilder GetOrAddEnumTypeBuilder<T>() =>
-        this.GetOrAddEnumTypeBuilder(typeof(T));
+    /// <returns>The corresponding <see cref="ApiEnumTypeBuilder{T}"/>.</returns>
+    internal ApiEnumTypeBuilder<T> GetOrAddEnumTypeBuilder<T>() where T : Enum
+    {
+        var clrType = typeof(T);
+        if (_apiEnumTypeBuilders.TryGetValue(clrType, out var existing))
+        {
+            if (existing is not ApiEnumTypeBuilder<T> typed)
+            {
+                throw new ApiSchemaException(
+                    $"Enum type '{clrType.Name}' was already registered as {existing.GetType().Name} and cannot be reconfigured as {typeof(ApiEnumTypeBuilder<T>).Name}.");
+            }
+
+            return typed;
+        }
+
+        var builder = new ApiEnumTypeBuilder<T>(this);
+        _apiEnumTypeBuilders[clrType] = builder;
+        return builder;
+    }
 
     /// <summary>
     ///     Gets existing or adds new <see cref="ApiEnumTypeBuilder"/> for the specified CLR type.

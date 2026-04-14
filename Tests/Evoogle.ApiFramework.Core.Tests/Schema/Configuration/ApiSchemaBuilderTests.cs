@@ -456,6 +456,28 @@ public class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTests(output
         },
         new BuildGenericOverloadTest
         {
+            Name = "AddEnum<T> typed AddValue(T) overload produces same schema as string-based AddValue",
+            Expected = ApiGenderEnumSchema,
+            ConfigureGeneric = b => b
+                .WithVersion("1.0")
+                .AddEnum<Gender>(x => x
+                    .WithName(nameof(Gender))
+                    .AddValue(Gender.Unspecified)
+                    .AddValue(Gender.Male)
+                    .AddValue(Gender.Female)),
+        },
+        new BuildGenericOverloadTest
+        {
+            Name = "AddEnum<T> AddAllValues() produces same schema as string-based AddValue",
+            Expected = ApiGenderEnumSchema,
+            ConfigureGeneric = b => b
+                .WithVersion("1.0")
+                .AddEnum<Gender>(x => x
+                    .WithName(nameof(Gender))
+                    .AddAllValues()),
+        },
+        new BuildGenericOverloadTest
+        {
             Name = "AddScalar<T>() no-configure overload uses CLR type name as default API name",
             Expected = ApiScalarsOnlySchema,
             ConfigureGeneric = b => b
