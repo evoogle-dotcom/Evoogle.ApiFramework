@@ -23,9 +23,7 @@ namespace Evoogle.ApiFramework.Schema;
 [JsonConverter(typeof(ApiRelationshipJsonConverter))]
 public abstract class ApiRelationship
 (
-    string apiName,
-    string? apiDisplayName = null,
-    string? apiDescription = null
+    string apiName
 ) : ApiSchemaElement
 {
     #region ApiSchemaElement Properties
@@ -41,12 +39,6 @@ public abstract class ApiRelationship
 
     /// <summary>Gets the API name that uniquely identifies this relationship within the schema.</summary>
     public string ApiName { get; } = apiName;
-
-    /// <summary>Gets the optional human-readable display name for this relationship.</summary>
-    public string? ApiDisplayName { get; } = apiDisplayName;
-
-    /// <summary>Gets the optional description for this relationship.</summary>
-    public string? ApiDescription { get; } = apiDescription;
     #endregion
 
     #region Object Methods

@@ -25,8 +25,6 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
     {
         public required string ApiKind { get; init; }
         public required string ApiName { get; init; }
-        public required string ApiDisplayName { get; init; }
-        public required string ApiDescription { get; init; }
         // One-to-one / one-to-many
         public required string ApiPrincipalEnd { get; init; }
         public required string ApiDependentEnd { get; init; }
@@ -50,8 +48,6 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
                 {
                     ApiKind = policy.ConvertName(nameof(ApiRelationship.ApiKind)),
                     ApiName = policy.ConvertName(nameof(ApiRelationship.ApiName)),
-                    ApiDisplayName = policy.ConvertName(nameof(ApiRelationship.ApiDisplayName)),
-                    ApiDescription = policy.ConvertName(nameof(ApiRelationship.ApiDescription)),
                     ApiPrincipalEnd = policy.ConvertName(nameof(ApiRelationshipOneTo.ApiPrincipalEnd)),
                     ApiDependentEnd = policy.ConvertName(nameof(ApiRelationshipOneTo.ApiDependentEnd)),
                     ApiPrincipalEndA = policy.ConvertName(nameof(ApiRelationshipManyToMany.ApiPrincipalEndA)),
@@ -70,8 +66,6 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
     {
         public ApiRelationshipKind? ApiKind { get; set; }
         public string? ApiName { get; set; }
-        public string? ApiDisplayName { get; set; }
-        public string? ApiDescription { get; set; }
         // One-to-one / one-to-many
         public ApiRelationshipPrincipalEnd? ApiPrincipalEnd { get; set; }
         public ApiRelationshipDependentEnd? ApiDependentEnd { get; set; }
@@ -94,8 +88,6 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
         {
             { propertyNames.ApiRelationship.ApiKind, HandleApiKind },
             { propertyNames.ApiRelationship.ApiName, HandleApiName },
-            { propertyNames.ApiRelationship.ApiDisplayName, HandleApiDisplayName },
-            { propertyNames.ApiRelationship.ApiDescription, HandleApiDescription },
             { propertyNames.ApiRelationship.ApiPrincipalEnd, HandleApiPrincipalEnd },
             { propertyNames.ApiRelationship.ApiDependentEnd, HandleApiDependentEnd },
             { propertyNames.ApiRelationship.ApiPrincipalEndA, HandleApiPrincipalEndA },
@@ -116,18 +108,6 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
         {
             context.ReadData.ApiRelationship ??= new ApiRelationshipReadData();
             context.ReadData.ApiRelationship.ApiName = reader.GetString();
-        }
-
-        private static void HandleApiDisplayName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
-        {
-            context.ReadData.ApiRelationship ??= new ApiRelationshipReadData();
-            context.ReadData.ApiRelationship.ApiDisplayName = reader.GetString();
-        }
-
-        private static void HandleApiDescription(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
-        {
-            context.ReadData.ApiRelationship ??= new ApiRelationshipReadData();
-            context.ReadData.ApiRelationship.ApiDescription = reader.GetString();
         }
 
         private static void HandleApiPrincipalEnd(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
@@ -224,16 +204,12 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
             ApiRelationshipKind.OneToOne => new ApiRelationshipOneToOne(
                 readData.ApiName,
                 readData.ApiPrincipalEnd!,
-                readData.ApiDependentEnd!,
-                readData.ApiDisplayName,
-                readData.ApiDescription),
+                readData.ApiDependentEnd!),
 
             ApiRelationshipKind.OneToMany => new ApiRelationshipOneToMany(
                 readData.ApiName,
                 readData.ApiPrincipalEnd!,
-                readData.ApiDependentEnd!,
-                readData.ApiDisplayName,
-                readData.ApiDescription),
+                readData.ApiDependentEnd!),
 
             ApiRelationshipKind.ManyToMany => new ApiRelationshipManyToMany(
                 readData.ApiName,
@@ -250,9 +226,7 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
                     readData.ApiDependentEndB.ApiKeyPaths,
                     ApiRelationshipDeleteBehavior.None,
                     ApiRelationshipDeleteBehavior.Cascade),
-                readData.ClrAssociationObjectType!,
-                readData.ApiDisplayName,
-                readData.ApiDescription),
+                readData.ClrAssociationObjectType!),
 
             _ => null
         };
@@ -284,8 +258,6 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
         {
             WriteApiKind(writer, value, writeContext);
             WriteApiName(writer, value, writeContext);
-            WriteApiDisplayName(writer, value, writeContext);
-            WriteApiDescription(writer, value, writeContext);
 
             switch (value)
             {
@@ -314,12 +286,6 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
 
     private static void WriteApiName(Utf8JsonWriter writer, ApiRelationship relationship, DefaultWriteContext<PropertyNames> context)
         => writer.TryWritePropertyAsString(context.PropertyNames.ApiRelationship.ApiName, relationship.ApiName, context.Options);
-
-    private static void WriteApiDisplayName(Utf8JsonWriter writer, ApiRelationship relationship, DefaultWriteContext<PropertyNames> context)
-        => writer.TryWritePropertyAsString(context.PropertyNames.ApiRelationship.ApiDisplayName, relationship.ApiDisplayName, context.Options);
-
-    private static void WriteApiDescription(Utf8JsonWriter writer, ApiRelationship relationship, DefaultWriteContext<PropertyNames> context)
-        => writer.TryWritePropertyAsString(context.PropertyNames.ApiRelationship.ApiDescription, relationship.ApiDescription, context.Options);
 
     private static void WriteApiPrincipalEnd(Utf8JsonWriter writer, ApiRelationshipOneTo relationship, DefaultWriteContext<PropertyNames> context)
     {

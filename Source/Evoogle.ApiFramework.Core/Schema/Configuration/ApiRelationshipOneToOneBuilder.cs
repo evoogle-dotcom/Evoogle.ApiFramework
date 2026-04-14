@@ -69,9 +69,7 @@ public sealed class ApiRelationshipOneToOneBuilder(string apiName) : ApiRelation
         (
             this.ApiName,
             apiPrincipalEnd,
-            apiDependentEnd,
-            this.ApiDisplayName,
-            this.ApiDescription
+            apiDependentEnd
         );
 
         var extensions = this.BuildExtensions();

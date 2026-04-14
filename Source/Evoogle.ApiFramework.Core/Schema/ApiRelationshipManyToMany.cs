@@ -42,8 +42,6 @@ namespace Evoogle.ApiFramework.Schema;
 ///     The CLR type of the association <see cref="ApiObjectType"/> that mediates the relationship.
 ///     Must be a registered object type in the schema; both dependent ends must reference this type.
 /// </param>
-/// <param name="apiDisplayName">The optional human-readable display name for this relationship.</param>
-/// <param name="apiDescription">The optional description for this relationship.</param>
 public sealed class ApiRelationshipManyToMany
 (
     string apiName,
@@ -51,10 +49,8 @@ public sealed class ApiRelationshipManyToMany
     ApiRelationshipPrincipalEnd apiPrincipalEndB,
     ApiRelationshipDependentEnd apiDependentEndA,
     ApiRelationshipDependentEnd apiDependentEndB,
-    Type clrAssociationObjectType,
-    string? apiDisplayName = null,
-    string? apiDescription = null
-) : ApiRelationship(apiName, apiDisplayName, apiDescription)
+    Type clrAssociationObjectType
+) : ApiRelationship(apiName)
 {
     #region ApiRelationshipManyToMany Fields
     private ApiObjectType? _apiResolvedAssociationObjectType = null;

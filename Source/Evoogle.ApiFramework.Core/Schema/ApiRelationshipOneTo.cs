@@ -22,10 +22,8 @@ public abstract class ApiRelationshipOneTo
 (
     string apiName,
     ApiRelationshipPrincipalEnd apiPrincipalEnd,
-    ApiRelationshipDependentEnd apiDependentEnd,
-    string? apiDisplayName = null,
-    string? apiDescription = null
-) : ApiRelationship(apiName, apiDisplayName, apiDescription)
+    ApiRelationshipDependentEnd apiDependentEnd
+) : ApiRelationship(apiName)
 {
     #region ApiRelationshipOneTo Properties
     /// <summary>Gets the principal end of the relationship, which owns the join key identity.</summary>

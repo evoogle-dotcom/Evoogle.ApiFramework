@@ -129,9 +129,7 @@ public class ApiRelationshipManyToManyBuilder(string apiName) : ApiRelationshipB
             apiPrincipalEndB,
             apiDependentEndA!,
             apiDependentEndB!,
-            _apiAssociationType!,
-            this.ApiDisplayName,
-            this.ApiDescription
+            _apiAssociationType!
         );
 
         var extensions = this.BuildExtensions();

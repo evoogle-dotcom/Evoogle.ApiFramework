@@ -240,8 +240,7 @@ public static class Dummy
                 .WithDependentEnd<Order>
                 (
                     d => d.AddScalarPath("CustomerId")
-                )
-                .WithDisplayName("CustomerOrders");
+                );
         }
     }
 
@@ -264,8 +263,7 @@ public static class Dummy
                     d => d
                         .AddScalarPath("OrderId")
                         .AddScalarPath("LineItemNumber")
-                )
-                .WithDisplayName("OrderOrderItems");
+                );
         }
     }
 
@@ -300,9 +298,7 @@ public static class Dummy
                 (
                     // FK is NOT a direct scalar — it lives inside the nested CustomerRef property.
                     d => d.AddNestedPath("CustomerRef", n => n.AddScalarPath("CustomerId"))
-                )
-                .WithDisplayName("CustomerProfile")
-                .WithDescription("Associates each customer with their optional extended profile.");
+                );
         }
     }
 
@@ -338,9 +334,7 @@ public static class Dummy
                 .WithDependentEndB
                 (
                     d => d.AddScalarPath("TagId")
-                )
-                .WithDisplayName("ProductTags")
-                .WithDescription("Maps which tags are applied to which products.");
+                );
         }
     }
 
@@ -369,8 +363,7 @@ public static class Dummy
         {
             builder
                 .WithPrincipalEnd<Customer>(p => p.WithDeleteBehavior(ApiRelationshipDeleteBehavior.Cascade))
-                .WithDependentEnd<Order>(d => d.AddScalarPath(o => o.CustomerId))
-                .WithDisplayName("CustomerOrders");
+                .WithDependentEnd<Order>(d => d.AddScalarPath(o => o.CustomerId));
         }
     }
 
@@ -382,9 +375,7 @@ public static class Dummy
                 .WithPrincipalEnd<Customer>(p => p.WithDeleteBehavior(ApiRelationshipDeleteBehavior.Cascade))
                 .WithDependentEnd<CustomerProfile>(d => d
                     .AddNestedPath(cp => cp.CustomerRef, n => n
-                        .AddScalarPath(r => r.CustomerId)))
-                .WithDisplayName("CustomerProfile")
-                .WithDescription("Associates each customer with their optional extended profile.");
+                        .AddScalarPath(r => r.CustomerId)));
         }
     }
 
@@ -400,9 +391,7 @@ public static class Dummy
                     .WithIdentityName("PrimaryKey")
                     .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Cascade))
                 .WithDependentEndA(d => d.AddScalarPath(pt => pt.ProductId))
-                .WithDependentEndB(d => d.AddScalarPath(pt => pt.TagId))
-                .WithDisplayName("ProductTags")
-                .WithDescription("Maps which tags are applied to which products.");
+                .WithDependentEndB(d => d.AddScalarPath(pt => pt.TagId));
         }
     }
 
@@ -540,8 +529,6 @@ public static class Dummy
                     (
                         d => d.AddNestedPath("CustomerRef", n => n.AddScalarPath("CustomerId"))
                     )
-                    .WithDisplayName("CustomerProfileInline")
-                    .WithDescription("Inline 1:1 variant demonstrating AddNestedPath on the dependent end.")
             )
             // M:N — configuration class style; demonstrates WithIdentityName and extensions on principal ends.
             .AddManyToManyRelationship<ProductTag>("ProductHasTags", new ProductTagRelationshipConfiguration())
@@ -573,8 +560,6 @@ public static class Dummy
                     (
                         d => d.AddScalarPath("TagId")
                     )
-                    .WithDisplayName("ProductTagsInline")
-                    .WithDescription("Inline M:N variant demonstrating all four end methods.")
                     .AddRelationshipExtension(new VisibleMetadata { Visible = true })
             )
             .AddSchemaExtension(new VisibleMetadata { Visible = true })
@@ -656,8 +641,7 @@ public static class Dummy
                     .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Cascade))
                 .WithDependentEnd<CustomerProfile>(d => d
                     .AddNestedPath(cp => cp.CustomerRef, n => n
-                        .AddScalarPath(r => r.CustomerId)))
-                .WithDisplayName("CustomerProfileInline"))
+                        .AddScalarPath(r => r.CustomerId))))
             .AddManyToManyRelationship<ProductTag>("ProductHasTags", new ProductTagConfigurationGeneric())
             .AddManyToManyRelationship<ProductTag>("ProductHasTagsInline", r => r
                 .WithPrincipalEndA<Product>(p => p
@@ -667,8 +651,7 @@ public static class Dummy
                     .WithIdentityName("PrimaryKey")
                     .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Cascade))
                 .WithDependentEndA(d => d.AddScalarPath(pt => pt.ProductId))
-                .WithDependentEndB(d => d.AddScalarPath(pt => pt.TagId))
-                .WithDisplayName("ProductTagsInline"))
+                .WithDependentEndB(d => d.AddScalarPath(pt => pt.TagId)))
             .Build();
     }
 }
