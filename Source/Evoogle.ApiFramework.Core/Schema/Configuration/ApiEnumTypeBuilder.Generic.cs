@@ -63,7 +63,7 @@ public sealed class ApiEnumTypeBuilder<T>(ApiSchemaBuilderContext context)
     }
     #endregion
 
-    #region Build Methods
+    #region With Methods
     /// <inheritdoc cref="ApiNamedTypeBuilder{TBuilder}.WithName"/>
     public new ApiEnumTypeBuilder<T> WithName(string apiName)
     {

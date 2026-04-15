@@ -107,6 +107,15 @@ public class ApiRelationshipDependentEndBuilder
         _keyPathBuilders.Add(builder);
         return this;
     }
+
+    /// <summary>
+    ///     Allows subclasses to add a pre-constructed key path builder without bypassing internal list management.
+    /// </summary>
+    protected void AddKeyPathBuilderCore(ApiRelationshipKeyPathBuilder builder)
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+        _keyPathBuilders.Add(builder);
+    }
     #endregion
 
     #region With Methods
@@ -123,15 +132,6 @@ public class ApiRelationshipDependentEndBuilder
     #endregion
 
     #region Build Methods
-    /// <summary>
-    ///     Allows subclasses to add a pre-constructed key path builder without bypassing internal list management.
-    /// </summary>
-    protected void AddKeyPathBuilderCore(ApiRelationshipKeyPathBuilder builder)
-    {
-        ArgumentNullException.ThrowIfNull(builder);
-        _keyPathBuilders.Add(builder);
-    }
-
     /// <summary>
     ///     Builds the <see cref="ApiRelationshipDependentEnd"/> configured by this builder.
     /// </summary>

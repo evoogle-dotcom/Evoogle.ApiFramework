@@ -306,7 +306,7 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
 
     #region Build Methods
     /// <summary>
-    ///     Builds the <see cref="ApiObjectType"/> using the configured properties, identity, and relationships.
+    ///     Builds the <see cref="ApiObjectType"/> using the configured properties and identity.
     /// </summary>
     /// <returns>The constructed <see cref="ApiObjectType"/>.</returns>
     internal ApiObjectType Build()
@@ -341,18 +341,6 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
 
         return apiObjectType;
     }
-    #endregion
-
-    #region Implementation Methods
-    /// <summary>
-    ///     Adds a pre-constructed identity builder to this object type, allowing subclasses to inject
-    ///     typed builders without bypassing internal list management.
-    /// </summary>
-    protected void AddIdentityBuilderCore(ApiIdentityBuilder builder)
-    {
-        ArgumentNullException.ThrowIfNull(builder);
-        _apiIdentityBuilders.Add(builder);
-    }
 
     private ApiObjectTypeOptions? BuildOptions()
     {
@@ -364,6 +352,18 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
         var apiOptionsBuilder = new ApiObjectTypeOptionsBuilder();
         _apiOptionsConfiguration.Invoke(apiOptionsBuilder);
         return apiOptionsBuilder.Build();
+    }
+    #endregion
+
+    #region Implementation Methods
+    /// <summary>
+    ///     Adds a pre-constructed identity builder to this object type, allowing subclasses to inject
+    ///     typed builders without bypassing internal list management.
+    /// </summary>
+    protected void AddIdentityBuilderCore(ApiIdentityBuilder builder)
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+        _apiIdentityBuilders.Add(builder);
     }
     #endregion
 }
