@@ -133,7 +133,7 @@ public class ApiPropertyBuilder(string apiName, string clrName) : ExtensionBuild
     private ApiProperty BuildFromNullabilityInfo(MemberNullableInfo clrNullabilityInfo, ClrMemberKind clrMemberKind)
     {
         var apiTypeExpression = ApiTypeExpressionBuilder.Build(clrNullabilityInfo);
-        var apiInitialTypeModifiers = clrNullabilityInfo.IsNullable ? ApiTypeModifiers.None : ApiTypeModifiers.Required;
+        var apiInitialTypeModifiers = clrNullabilityInfo.Nullability == MemberNullability.NonNullable ? ApiTypeModifiers.Required : ApiTypeModifiers.None;
         var apiTypeModifiers = this.BuildModifiers(apiInitialTypeModifiers);
 
         return this.CreateAndBuildExtensions(_apiName, apiTypeExpression, apiTypeModifiers, _clrName, clrMemberKind);

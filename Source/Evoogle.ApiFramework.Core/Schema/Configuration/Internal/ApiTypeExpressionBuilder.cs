@@ -41,7 +41,7 @@ internal static class ApiTypeExpressionBuilder
         for (var i = clrCollectionChainCount - 1; i >= 0; --i)
         {
             var clrCollectionInfo = clrCollectionChain[i];
-            var apiItemTypeModifiers = clrCollectionInfo.IsElementNullable ? ApiTypeModifiers.None : ApiTypeModifiers.Required;
+            var apiItemTypeModifiers = clrCollectionInfo.ElementNullability == MemberNullability.NonNullable ? ApiTypeModifiers.Required : ApiTypeModifiers.None;
             var clrCollectionType = clrCollectionInfo.CollectionType;
 
             var apiCollectionType = new ApiCollectionType(apiTypeExpression, apiItemTypeModifiers, clrCollectionType);
