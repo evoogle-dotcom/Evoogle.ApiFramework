@@ -87,6 +87,58 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
         }
     }
 
+    private class InitializeWarnsTest : XUnitTest
+    {
+        #region User Supplied Properties
+        public required string SourceJson { get; init; }
+        public required List<ApiInitializationIssue> ExpectedWarnings { get; init; }
+        #endregion
+
+        #region Calculated Properties
+        private List<ApiInitializationIssue>? ActualWarnings { get; set; }
+        #endregion
+
+        #region XUnitTest Methods
+        protected override void Arrange()
+        {
+            this.WriteLine($"Source JSON:\n{this.SourceJson.SafeToString().RemoveWhitespace()}");
+            this.WriteLine();
+
+            foreach (var expectedWarning in this.ExpectedWarnings)
+            {
+                this.WriteLine($"Expected Warning: {expectedWarning.SafeToString()}");
+            }
+            this.WriteLine();
+        }
+
+        protected override void Act()
+        {
+            // Deserialize the schema — succeeds because warnings do not throw
+            var schema = JsonSerializer.Deserialize<ApiSchema>(this.SourceJson);
+
+            if (schema is not null)
+            {
+                // Re-initialize to capture the ApiInitializationResult with warnings
+                // (the initial result is discarded by the JSON converter after ThrowIfInvalid)
+                var result = schema.Initialize();
+                this.ActualWarnings = result.Warnings is not null ? [.. result.Warnings] : [];
+            }
+
+            this.WriteLine();
+            foreach (var actualWarning in this.ActualWarnings ?? [])
+            {
+                this.WriteLine($"Actual Warning: {actualWarning.SafeToString()}");
+            }
+        }
+
+        protected override void Assert()
+        {
+            this.ActualWarnings.Should().NotBeNull();
+            this.ActualWarnings.Should().BeEquivalentTo(this.ExpectedWarnings);
+        }
+        #endregion
+    }
+
     private class JsonDeserializeTest : JsonDeserializeTest<ApiSchema, ApiSchemaDescriptor>
     {
         #region Constructors

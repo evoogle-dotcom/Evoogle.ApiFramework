@@ -6,6 +6,7 @@
 using System.Collections.Concurrent;
 using System.Reflection;
 using System.Text.Json.Serialization;
+
 using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.ApiFramework.Schema.Json;
@@ -246,6 +247,10 @@ public sealed partial class ApiProperty
             var remediation = $"Verify that field '{clrMemberName}' is writable and can be used in expression trees";
             context.AddIssue(path, severity, code, description, remediation);
         }
+
+        // Validate nullability alignment between API declaration and CLR member
+        var clrFieldNullableInfo = FieldReflection.GetNullabilityInfo(clrFieldInfo);
+        this.ValidateNullabilityMismatch(context, clrFieldNullableInfo, clrMemberName);
     }
 
     private void InitializeClrPropertyGetterAndSetter(ApiInitializationContext context, PropertyInfo clrPropertyInfo)
@@ -296,6 +301,10 @@ public sealed partial class ApiProperty
 
             context.AddIssue(path, severity, code, description, remediation);
         }
+
+        // Validate nullability alignment between API declaration and CLR member
+        var clrPropertyNullableInfo = PropertyReflection.GetNullabilityInfo(clrPropertyInfo);
+        this.ValidateNullabilityMismatch(context, clrPropertyNullableInfo, clrMemberName);
     }
 
     private void InitializeClrGetterAndSetter(ApiInitializationContext context)
@@ -385,6 +394,80 @@ public sealed partial class ApiProperty
     #endregion
 
     #region Validation Methods
+    private void ValidateNullabilityMismatch(ApiInitializationContext context, MemberNullableInfo clrNullableInfo, string clrMemberName)
+    {
+        // Skip if nullability cannot be determined (defensive guard for types from assemblies without NRT)
+        if (clrNullableInfo.Nullability == MemberNullability.Unknown)
+        {
+            return;
+        }
+
+        // Required + CLR Nullable: API contract demands a value but CLR type permits null
+        if (this.IsRequired && clrNullableInfo.Nullability == MemberNullability.Nullable)
+        {
+            var path = this.ApiPath;
+            var severity = ApiInitializationSeverity.Warning;
+            var code = ApiInitializationCode.API_PROPERTY_REQUIRED_NULLABLE_MISMATCH;
+            var description = $"CLR member '{clrMemberName}' is nullable but property '{this.ApiName}' is declared Required";
+            var remediation = $"Change CLR member '{clrMemberName}' to a non-nullable type, or change property '{this.ApiName}' to Optional";
+
+            context.AddIssue(path, severity, code, description, remediation);
+            return;
+        }
+
+        // Optional + CLR NonNullable (reference types only): absent optional value may assign null
+        // to a CLR member that cannot hold it. Value types are excluded: absent value → default, never null.
+        if (this.IsOptional && clrNullableInfo.Nullability == MemberNullability.NonNullable && !clrNullableInfo.MemberType.IsValueType)
+        {
+            var path = this.ApiPath;
+            var severity = ApiInitializationSeverity.Warning;
+            var code = ApiInitializationCode.API_PROPERTY_OPTIONAL_NON_NULLABLE_MISMATCH;
+            var description = $"CLR member '{clrMemberName}' is non-nullable but property '{this.ApiName}' is declared Optional";
+            var remediation = $"Change CLR member '{clrMemberName}' to a nullable reference type, or change property '{this.ApiName}' to Required";
+
+            context.AddIssue(path, severity, code, description, remediation);
+        }
+
+        // Check collection item nullability against ApiCollectionType.ApiItemTypeModifiers
+        if (clrNullableInfo.CollectionChain.Count > 0 && this.ApiType is ApiCollectionType apiCollectionType)
+        {
+            var itemNullability = clrNullableInfo.CollectionChain[0].ElementNullability;
+            var itemElementType = clrNullableInfo.CollectionChain[0].ElementType;
+
+            // Skip if item nullability cannot be determined
+            if (itemNullability == MemberNullability.Unknown)
+            {
+                return;
+            }
+
+            // Item Required + CLR element Nullable: API contract demands a value but CLR element permits null
+            if (apiCollectionType.IsItemRequired && itemNullability == MemberNullability.Nullable)
+            {
+                var path = this.ApiPath;
+                var severity = ApiInitializationSeverity.Warning;
+                var code = ApiInitializationCode.API_COLLECTION_ITEM_REQUIRED_NULLABLE_MISMATCH;
+                var description = $"CLR collection element in '{clrMemberName}' is nullable but item is declared Required";
+                var remediation = $"Change the CLR element type in '{clrMemberName}' to non-nullable, or change the item modifier to Optional";
+
+                context.AddIssue(path, severity, code, description, remediation);
+                return;
+            }
+
+            // Item Optional + CLR element NonNullable (reference types only): absent item may assign null
+            // to a CLR element that cannot hold it. Value types are excluded: absent item → default, never null.
+            if (apiCollectionType.IsItemOptional && itemNullability == MemberNullability.NonNullable && !itemElementType.IsValueType)
+            {
+                var path = this.ApiPath;
+                var severity = ApiInitializationSeverity.Warning;
+                var code = ApiInitializationCode.API_COLLECTION_ITEM_OPTIONAL_NON_NULLABLE_MISMATCH;
+                var description = $"CLR collection element in '{clrMemberName}' is non-nullable but item is declared Optional";
+                var remediation = $"Change the CLR element type in '{clrMemberName}' to a nullable reference type, or change the item modifier to Required";
+
+                context.AddIssue(path, severity, code, description, remediation);
+            }
+        }
+    }
+
     private bool ValidateClrMemberType(ApiInitializationContext context, Type memberType, string memberName)
     {
         // Check if the type is a ref struct (cannot be boxed/unboxed)

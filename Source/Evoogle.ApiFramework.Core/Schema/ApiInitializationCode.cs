@@ -24,6 +24,18 @@ public enum ApiInitializationCode
     ///     The collection type's item type expression could not be resolved to a valid API type.
     /// </summary>
     API_COLLECTION_TYPE_UNRESOLVED_ITEM_TYPE,
+
+    /// <summary>
+    ///     The collection item is declared Required but the CLR element type is nullable.
+    ///     The API contract demands a value, but the CLR element type permits null.
+    /// </summary>
+    API_COLLECTION_ITEM_REQUIRED_NULLABLE_MISMATCH,
+
+    /// <summary>
+    ///     The collection item is declared Optional but the CLR element type is a non-nullable reference type.
+    ///     An absent Optional item may assign null to a CLR element that cannot hold it.
+    /// </summary>
+    API_COLLECTION_ITEM_OPTIONAL_NON_NULLABLE_MISMATCH,
     #endregion
 
     #region ApiEnumType Initialization Codes
@@ -308,6 +320,18 @@ public enum ApiInitializationCode
     ///     The property's type expression could not be resolved to a valid API type.
     /// </summary>
     API_PROPERTY_UNRESOLVED_TYPE,
+
+    /// <summary>
+    ///     The property is declared Required but the CLR member is nullable.
+    ///     The API contract demands a value, but the CLR type permits null.
+    /// </summary>
+    API_PROPERTY_REQUIRED_NULLABLE_MISMATCH,
+
+    /// <summary>
+    ///     The property is declared Optional but the CLR member is a non-nullable reference type.
+    ///     An absent Optional property may assign null to a CLR member that cannot hold it.
+    /// </summary>
+    API_PROPERTY_OPTIONAL_NON_NULLABLE_MISMATCH,
     #endregion
 
     #region ApiSchema Initialization Codes

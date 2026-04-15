@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -117,6 +117,7 @@ public partial class ApiSchemaTests
                                 ""ApiType"": {
                                     ""ApiInlineType"": {
                                         ""ApiKind"": ""Collection"",
+                                        ""ApiItemTypeModifiers"": ""Required"",
                                         ""ClrType"": ""System.Collections.Generic.List`1[[System.String, System.Private.CoreLib]], System.Private.CoreLib""
                                     }
                                 },
@@ -164,6 +165,7 @@ public partial class ApiSchemaTests
                                             ""ApiKind"": ""Scalar"",
                                             ""ApiName"": ""String""
                                         },
+                                        ""ApiItemTypeModifiers"": ""Required"",
                                         ""ClrType"": ""System.Collections.Generic.List`1[[System.String, System.Private.CoreLib]], System.Private.CoreLib""
                                     }
                                 },
@@ -2214,6 +2216,7 @@ public partial class ApiSchemaTests
                                     ""ApiKind"": ""Scalar"",
                                     ""ApiName"": ""String""
                                 },
+                                ""ApiTypeModifiers"": ""Required"",
                                 ""ClrName"": ""Name""
                             },
                             {
@@ -2222,6 +2225,7 @@ public partial class ApiSchemaTests
                                     ""ApiKind"": ""Scalar"",
                                     ""ApiName"": ""String""
                                 },
+                                ""ApiTypeModifiers"": ""Required"",
                                 ""ClrName"": ""NameAlt""
                             }
                         ],
@@ -2269,6 +2273,7 @@ public partial class ApiSchemaTests
                                     ""ApiKind"": ""Scalar"",
                                     ""ApiName"": ""String""
                                 },
+                                ""ApiTypeModifiers"": ""Required"",
                                 ""ClrName"": ""Name""
                             },
                             {
@@ -2277,6 +2282,7 @@ public partial class ApiSchemaTests
                                     ""ApiKind"": ""Scalar"",
                                     ""ApiName"": ""String""
                                 },
+                                ""ApiTypeModifiers"": ""Required"",
                                 ""ClrName"": ""Name""
                             }
                         ],
@@ -2700,11 +2706,13 @@ public partial class ApiSchemaTests
                             {
                                 ""ApiName"": ""Name"",
                                 ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""String"" },
+                                ""ApiTypeModifiers"": ""Required"",
                                 ""ClrName"": ""Name""
                             },
                             {
                                 ""ApiName"": ""NameAlt"",
                                 ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""String"" },
+                                ""ApiTypeModifiers"": ""Required"",
                                 ""ClrName"": ""NameAlt""
                             }
                         ],
@@ -2717,6 +2725,7 @@ public partial class ApiSchemaTests
                             {
                                 ""ApiName"": ""Name"",
                                 ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""String"" },
+                                ""ApiTypeModifiers"": ""Required"",
                                 ""ClrName"": ""Name""
                             }
                         ],
@@ -2769,11 +2778,13 @@ public partial class ApiSchemaTests
                             {
                                 ""ApiName"": ""Name"",
                                 ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""String"" },
+                                ""ApiTypeModifiers"": ""Required"",
                                 ""ClrName"": ""Name""
                             },
                             {
                                 ""ApiName"": ""NameAlt"",
                                 ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""String"" },
+                                ""ApiTypeModifiers"": ""Required"",
                                 ""ClrName"": ""NameAlt""
                             }
                         ],
@@ -2786,11 +2797,13 @@ public partial class ApiSchemaTests
                             {
                                 ""ApiName"": ""Name"",
                                 ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""String"" },
+                                ""ApiTypeModifiers"": ""Required"",
                                 ""ClrName"": ""Name""
                             },
                             {
                                 ""ApiName"": ""NameAlt"",
                                 ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""String"" },
+                                ""ApiTypeModifiers"": ""Required"",
                                 ""ClrName"": ""NameAlt""
                             }
                         ],
@@ -2904,11 +2917,209 @@ public partial class ApiSchemaTests
             ]
         },
     ];
+
+    public static TheoryDataRow<IXUnitTest>[] InitializeWarnsTheoryData =>
+    [
+        // ApiProperty warns if Required property maps to a nullable CLR member
+        new InitializeWarnsTest
+        {
+            Name = $"{nameof(ApiProperty)} Warns If Required Property Maps To Nullable CLR Member",
+            SourceJson = @"
+            {
+                ""ApiName"": ""ApiProperty Warns If Required Property Maps To Nullable CLR Member"",
+                ""ApiScalarTypes"": [
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""String"",
+                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                    }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""NullabilityMismatch"",
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""NullableProp"",
+                                ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""String"" },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""NullableProp"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.NullabilityMismatch, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ]
+            }",
+            ExpectedWarnings =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiObjectType)}[\"NullabilityMismatch\"].{nameof(ApiProperty)}[\"NullableProp\"]",
+                    severity: ApiInitializationSeverity.Warning,
+                    code: ApiInitializationCode.API_PROPERTY_REQUIRED_NULLABLE_MISMATCH,
+                    description: "CLR member 'NullableProp' is nullable but property 'NullableProp' is declared Required",
+                    remediation: "Change CLR member 'NullableProp' to a non-nullable type, or change property 'NullableProp' to Optional"
+                ),
+            ]
+        },
+
+        // ApiProperty warns if Optional property maps to a non-nullable CLR reference type member
+        new InitializeWarnsTest
+        {
+            Name = $"{nameof(ApiProperty)} Warns If Optional Property Maps To Non-Nullable CLR Reference Type Member",
+            SourceJson = @"
+            {
+                ""ApiName"": ""ApiProperty Warns If Optional Property Maps To Non-Nullable CLR Reference Type Member"",
+                ""ApiScalarTypes"": [
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""String"",
+                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                    }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""NullabilityMismatch"",
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""NonNullableProp"",
+                                ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""String"" },
+                                ""ClrName"": ""NonNullableProp"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.NullabilityMismatch, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ]
+            }",
+            ExpectedWarnings =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiObjectType)}[\"NullabilityMismatch\"].{nameof(ApiProperty)}[\"NonNullableProp\"]",
+                    severity: ApiInitializationSeverity.Warning,
+                    code: ApiInitializationCode.API_PROPERTY_OPTIONAL_NON_NULLABLE_MISMATCH,
+                    description: "CLR member 'NonNullableProp' is non-nullable but property 'NonNullableProp' is declared Optional",
+                    remediation: "Change CLR member 'NonNullableProp' to a nullable reference type, or change property 'NonNullableProp' to Required"
+                ),
+            ]
+        },
+
+        // ApiProperty warns if Required item modifier maps to a nullable CLR collection element type
+        new InitializeWarnsTest
+        {
+            Name = $"{nameof(ApiProperty)} Warns If Required Collection Item Maps To Nullable CLR Element Type",
+            SourceJson = @"
+            {
+                ""ApiName"": ""ApiProperty Warns If Required Collection Item Maps To Nullable CLR Element Type"",
+                ""ApiScalarTypes"": [
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""String"",
+                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                    }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""CollectionNullabilityMismatch"",
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""NullableItemsProp"",
+                                ""ApiType"": {
+                                    ""ApiInlineType"": {
+                                        ""ApiKind"": ""Collection"",
+                                        ""ApiItemType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""String"" },
+                                        ""ApiItemTypeModifiers"": ""Required"",
+                                        ""ClrType"": ""System.Collections.Generic.List`1[[System.String, System.Private.CoreLib]], System.Private.CoreLib""
+                                    }
+                                },
+                                ""ClrName"": ""NullableItemsProp"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.CollectionNullabilityMismatch, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ]
+            }",
+            ExpectedWarnings =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiObjectType)}[\"CollectionNullabilityMismatch\"].{nameof(ApiProperty)}[\"NullableItemsProp\"]",
+                    severity: ApiInitializationSeverity.Warning,
+                    code: ApiInitializationCode.API_COLLECTION_ITEM_REQUIRED_NULLABLE_MISMATCH,
+                    description: "CLR collection element in 'NullableItemsProp' is nullable but item is declared Required",
+                    remediation: "Change the CLR element type in 'NullableItemsProp' to non-nullable, or change the item modifier to Optional"
+                ),
+            ]
+        },
+
+        // ApiProperty warns if Optional item modifier maps to a non-nullable CLR collection element reference type
+        new InitializeWarnsTest
+        {
+            Name = $"{nameof(ApiProperty)} Warns If Optional Collection Item Maps To Non-Nullable CLR Element Reference Type",
+            SourceJson = @"
+            {
+                ""ApiName"": ""ApiProperty Warns If Optional Collection Item Maps To Non-Nullable CLR Element Reference Type"",
+                ""ApiScalarTypes"": [
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""String"",
+                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                    }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""CollectionNullabilityMismatch"",
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""NonNullableItemsProp"",
+                                ""ApiType"": {
+                                    ""ApiInlineType"": {
+                                        ""ApiKind"": ""Collection"",
+                                        ""ApiItemType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""String"" },
+                                        ""ClrType"": ""System.Collections.Generic.List`1[[System.String, System.Private.CoreLib]], System.Private.CoreLib""
+                                    }
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""NonNullableItemsProp"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.CollectionNullabilityMismatch, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ]
+            }",
+            ExpectedWarnings =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiObjectType)}[\"CollectionNullabilityMismatch\"].{nameof(ApiProperty)}[\"NonNullableItemsProp\"]",
+                    severity: ApiInitializationSeverity.Warning,
+                    code: ApiInitializationCode.API_COLLECTION_ITEM_OPTIONAL_NON_NULLABLE_MISMATCH,
+                    description: "CLR collection element in 'NonNullableItemsProp' is non-nullable but item is declared Optional",
+                    remediation: "Change the CLR element type in 'NonNullableItemsProp' to a nullable reference type, or change the item modifier to Required"
+                ),
+            ]
+        },
+    ];
     #endregion
 
     #region Test Methods
     [Theory]
     [MemberData(nameof(InitializeThrowsTheoryData))]
     public void InitializeThrows(IXUnitTest test) => test.Execute(this);
+
+    [Theory]
+    [MemberData(nameof(InitializeWarnsTheoryData))]
+    public void InitializeWarns(IXUnitTest test) => test.Execute(this);
     #endregion
 }
