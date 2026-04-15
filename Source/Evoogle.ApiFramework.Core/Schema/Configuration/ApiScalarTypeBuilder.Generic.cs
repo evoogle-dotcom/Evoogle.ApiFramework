@@ -16,7 +16,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 public sealed class ApiScalarTypeBuilder<T>(ApiSchemaBuilderContext context)
     : ApiScalarTypeBuilder(typeof(T), context)
 {
-    #region Builder Methods
+    #region AddExtension Methods
     /// <inheritdoc cref="ApiScalarTypeBuilder.AddScalarExtension(Type, object)"/>
     public new ApiScalarTypeBuilder<T> AddScalarExtension(Type type, object value)
     {
@@ -27,7 +27,9 @@ public sealed class ApiScalarTypeBuilder<T>(ApiSchemaBuilderContext context)
     /// <inheritdoc cref="ApiScalarTypeBuilder.AddScalarExtension{TExt}(TExt)"/>
     public new ApiScalarTypeBuilder<T> AddScalarExtension<TExt>(TExt value) where TExt : notnull
         => this.AddScalarExtension(typeof(TExt), value);
+    #endregion
 
+    #region With Methods
     /// <inheritdoc cref="ApiNamedTypeBuilder{TBuilder}.WithName"/>
     public new ApiScalarTypeBuilder<T> WithName(string apiName)
     {

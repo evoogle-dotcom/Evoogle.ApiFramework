@@ -24,7 +24,7 @@ public sealed class ApiRelationshipPrincipalEndBuilder
     private ApiRelationshipDeleteBehavior _apiDeleteBehavior = ApiRelationshipDeleteBehavior.None;
     #endregion
 
-    #region Builder Methods
+    #region AddExtension Methods
     /// <summary>
     ///     Adds an extension value associated with the specified <paramref name="type"/>.
     /// </summary>
@@ -45,7 +45,9 @@ public sealed class ApiRelationshipPrincipalEndBuilder
     /// <returns>The current builder instance.</returns>
     public ApiRelationshipPrincipalEndBuilder AddPrincipalEndExtension<T>(T value) where T : notnull
         => this.AddPrincipalEndExtension(typeof(T), value);
+    #endregion
 
+    #region With Methods
     /// <summary>
     ///     Explicitly selects the <see cref="ApiIdentity"/> on the principal object type that serves as the join key.
     ///     When not called the primary identity is used by convention.

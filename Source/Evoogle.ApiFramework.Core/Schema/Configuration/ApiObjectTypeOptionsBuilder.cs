@@ -16,7 +16,7 @@ public sealed class ApiObjectTypeOptionsBuilder()
     private ApiIdentityNullHandling? _apiIdentityNullHandling = null;
     #endregion
 
-    #region Builder Methods
+    #region With Methods
     /// <summary>
     ///     Sets or clears the identity null handling strategy.
     /// </summary>
@@ -27,7 +27,9 @@ public sealed class ApiObjectTypeOptionsBuilder()
         _apiIdentityNullHandling = handling;
         return this;
     }
+    #endregion
 
+    #region Build Methods
     /// <summary>
     ///     Builds the configured <see cref="ApiObjectTypeOptions"/> instance.
     /// </summary>

@@ -29,7 +29,30 @@ public class ApiPropertyBuilder(string apiName, string clrName) : ExtensionBuild
     internal Action<ApiTypeModifiersBuilder>? Modifiers { get; set; }
     #endregion
 
-    #region Methods
+    #region AddExtension Methods
+    /// <summary>
+    ///     Adds an extension value associated with the specified <paramref name="type"/>.
+    /// </summary>
+    /// <param name="type">The type used as the extension key.</param>
+    /// <param name="value">The extension value to store.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiPropertyBuilder AddPropertyExtension(Type type, object value)
+    {
+        base.AddExtension(type, value);
+        return this;
+    }
+
+    /// <summary>
+    ///     Adds an extension value keyed by its own type.
+    /// </summary>
+    /// <typeparam name="T">The extension value type.</typeparam>
+    /// <param name="value">The extension value.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiPropertyBuilder AddPropertyExtension<T>(T value) where T : notnull
+        => this.AddPropertyExtension(typeof(T), value);
+    #endregion
+
+    #region With Methods
     /// <summary>
     ///     Configures type modifiers for the property.
     /// </summary>
@@ -58,28 +81,9 @@ public class ApiPropertyBuilder(string apiName, string clrName) : ExtensionBuild
     {
         return this.WithModifiers(m => m.Optional());
     }
+    #endregion
 
-    /// <summary>
-    ///     Adds an extension value associated with the specified <paramref name="type"/>.
-    /// </summary>
-    /// <param name="type">The type used as the extension key.</param>
-    /// <param name="value">The extension value to store.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiPropertyBuilder AddPropertyExtension(Type type, object value)
-    {
-        base.AddExtension(type, value);
-        return this;
-    }
-
-    /// <summary>
-    ///     Adds an extension value keyed by its own type.
-    /// </summary>
-    /// <typeparam name="T">The extension value type.</typeparam>
-    /// <param name="value">The extension value.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiPropertyBuilder AddPropertyExtension<T>(T value) where T : notnull
-        => this.AddPropertyExtension(typeof(T), value);
-
+    #region Build Methods
     /// <summary>
     ///     Builds an <see cref="ApiProperty"/> for the specified CLR object type.
     /// </summary>

@@ -25,7 +25,7 @@ public class ApiRelationshipManyToManyBuilder(string apiName) : ApiRelationshipB
     protected ApiRelationshipDependentEndBuilder? _dependentEndBBuilder;
     #endregion
 
-    #region Builder Methods
+    #region With Methods
     /// <summary>
     ///     Sets the CLR type of the association <see cref="ApiObjectType"/> that bridges both sides of the relationship.
     ///     Returns a new <see cref="ApiRelationshipManyToManyBuilder{TAssociation}"/> instance so that subsequent
@@ -140,9 +140,7 @@ public class ApiRelationshipManyToManyBuilder(string apiName) : ApiRelationshipB
 
         return relationship;
     }
-    #endregion
 
-    #region Implementation Methods
     private static ApiRelationshipDependentEnd? BuildForcedCascadeEnd(ApiRelationshipDependentEndBuilder? builder)
     {
         if (builder is null)

@@ -19,7 +19,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 public sealed class ApiObjectTypeBuilder<T>(ApiSchemaBuilderContext context)
     : ApiObjectTypeBuilder(typeof(T), context)
 {
-    #region Builder Methods
+    #region AddExtension Methods
     /// <inheritdoc cref="ApiObjectTypeBuilder.AddObjectExtension(Type, object)"/>
     public new ApiObjectTypeBuilder<T> AddObjectExtension(Type type, object value)
     {
@@ -30,43 +30,9 @@ public sealed class ApiObjectTypeBuilder<T>(ApiSchemaBuilderContext context)
     /// <inheritdoc cref="ApiObjectTypeBuilder.AddObjectExtension{TExt}(TExt)"/>
     public new ApiObjectTypeBuilder<T> AddObjectExtension<TExt>(TExt value) where TExt : notnull
         => this.AddObjectExtension(typeof(TExt), value);
+    #endregion
 
-    /// <summary>
-    ///     Adds an <see cref="ApiProperty"/> definition, deriving the CLR name from <paramref name="clrProperty"/>
-    ///     and using it as the API name as well.
-    /// </summary>
-    /// <typeparam name="TResult">The property return type.</typeparam>
-    /// <param name="clrProperty">Expression selecting the property on <typeparamref name="T"/>.</param>
-    /// <param name="configure">Optional callback to configure the added property.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiObjectTypeBuilder<T> AddProperty<TResult>(
-        Expression<Func<T, TResult>> clrProperty,
-        Action<ApiPropertyBuilder>? configure = null)
-    {
-        var clrName = StaticReflection.GetMemberName(clrProperty);
-        base.AddProperty(clrName, clrName, configure);
-        return this;
-    }
-
-    /// <summary>
-    ///     Adds an <see cref="ApiProperty"/> definition, deriving the CLR name from <paramref name="clrProperty"/>
-    ///     and using the explicitly supplied <paramref name="apiName"/> for the API surface.
-    /// </summary>
-    /// <typeparam name="TResult">The property return type.</typeparam>
-    /// <param name="clrProperty">Expression selecting the property on <typeparamref name="T"/>.</param>
-    /// <param name="apiName">The API property name to expose.</param>
-    /// <param name="configure">Optional callback to configure the added property.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiObjectTypeBuilder<T> AddProperty<TResult>(
-        Expression<Func<T, TResult>> clrProperty,
-        string apiName,
-        Action<ApiPropertyBuilder>? configure = null)
-    {
-        var clrName = StaticReflection.GetMemberName(clrProperty);
-        base.AddProperty(apiName, clrName, configure);
-        return this;
-    }
-
+    #region AddIdentity Methods
     /// <inheritdoc cref="ApiObjectTypeBuilder.AddIdentity"/>
     public new ApiObjectTypeBuilder<T> AddIdentity(string apiName, Action<ApiIdentityBuilder>? configure = null)
     {
@@ -88,28 +54,9 @@ public sealed class ApiObjectTypeBuilder<T>(ApiSchemaBuilderContext context)
         base.AddIdentityBuilderCore(apiIdentityBuilder);
         return this;
     }
+    #endregion
 
-    /// <inheritdoc cref="ApiNamedTypeBuilder{TBuilder}.WithName"/>
-    public new ApiObjectTypeBuilder<T> WithName(string apiName)
-    {
-        base.WithName(apiName);
-        return this;
-    }
-
-    /// <inheritdoc cref="ApiObjectTypeBuilder.WithOptions"/>
-    public new ApiObjectTypeBuilder<T> WithOptions(Action<ApiObjectTypeOptionsBuilder> configure)
-    {
-        base.WithOptions(configure);
-        return this;
-    }
-
-    /// <inheritdoc cref="ApiObjectTypeBuilder.WithDefaultOptions"/>
-    public new ApiObjectTypeBuilder<T> WithDefaultOptions()
-    {
-        base.WithDefaultOptions();
-        return this;
-    }
-
+    #region AddRelationship Methods
     /// <inheritdoc cref="ApiObjectTypeBuilder.AddOneToOneRelationship(string, Action{ApiRelationshipOneToOneBuilder})"/>
     public new ApiObjectTypeBuilder<T> AddOneToOneRelationship(string apiName, Action<ApiRelationshipOneToOneBuilder> configure)
     {
@@ -163,6 +110,67 @@ public sealed class ApiObjectTypeBuilder<T>(ApiSchemaBuilderContext context)
     public new ApiObjectTypeBuilder<T> AddManyToManyRelationship<TAssociation>(string apiName, IApiRelationshipManyToManyConfiguration<TAssociation> configuration)
     {
         base.AddManyToManyRelationship(apiName, configuration);
+        return this;
+    }
+    #endregion
+
+    #region AddProperty Methods
+    /// <summary>
+    ///     Adds an <see cref="ApiProperty"/> definition, deriving the CLR name from <paramref name="clrProperty"/>
+    ///     and using it as the API name as well.
+    /// </summary>
+    /// <typeparam name="TResult">The property return type.</typeparam>
+    /// <param name="clrProperty">Expression selecting the property on <typeparamref name="T"/>.</param>
+    /// <param name="configure">Optional callback to configure the added property.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiObjectTypeBuilder<T> AddProperty<TResult>(
+        Expression<Func<T, TResult>> clrProperty,
+        Action<ApiPropertyBuilder>? configure = null)
+    {
+        var clrName = StaticReflection.GetMemberName(clrProperty);
+        base.AddProperty(clrName, clrName, configure);
+        return this;
+    }
+
+    /// <summary>
+    ///     Adds an <see cref="ApiProperty"/> definition, deriving the CLR name from <paramref name="clrProperty"/>
+    ///     and using the explicitly supplied <paramref name="apiName"/> for the API surface.
+    /// </summary>
+    /// <typeparam name="TResult">The property return type.</typeparam>
+    /// <param name="clrProperty">Expression selecting the property on <typeparamref name="T"/>.</param>
+    /// <param name="apiName">The API property name to expose.</param>
+    /// <param name="configure">Optional callback to configure the added property.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiObjectTypeBuilder<T> AddProperty<TResult>(
+        Expression<Func<T, TResult>> clrProperty,
+        string apiName,
+        Action<ApiPropertyBuilder>? configure = null)
+    {
+        var clrName = StaticReflection.GetMemberName(clrProperty);
+        base.AddProperty(apiName, clrName, configure);
+        return this;
+    }
+    #endregion
+
+    #region With Methods
+    /// <inheritdoc cref="ApiNamedTypeBuilder{TBuilder}.WithName"/>
+    public new ApiObjectTypeBuilder<T> WithName(string apiName)
+    {
+        base.WithName(apiName);
+        return this;
+    }
+
+    /// <inheritdoc cref="ApiObjectTypeBuilder.WithOptions"/>
+    public new ApiObjectTypeBuilder<T> WithOptions(Action<ApiObjectTypeOptionsBuilder> configure)
+    {
+        base.WithOptions(configure);
+        return this;
+    }
+
+    /// <inheritdoc cref="ApiObjectTypeBuilder.WithDefaultOptions"/>
+    public new ApiObjectTypeBuilder<T> WithDefaultOptions()
+    {
+        base.WithDefaultOptions();
         return this;
     }
     #endregion

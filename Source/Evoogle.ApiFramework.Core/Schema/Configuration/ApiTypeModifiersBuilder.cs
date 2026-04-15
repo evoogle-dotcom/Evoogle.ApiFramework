@@ -34,7 +34,9 @@ public sealed class ApiTypeModifiersBuilder(ApiTypeModifiers modifiers = ApiType
         _modifiers &= ~ApiTypeModifiers.Required;
         return this;
     }
+    #endregion
 
+    #region Build Methods
     /// <summary>
     ///     Builds the combined <see cref="ApiTypeModifiers"/> flags.
     /// </summary>

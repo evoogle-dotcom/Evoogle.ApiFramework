@@ -19,7 +19,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 /// <param name="apiName">The API name of the identity.</param>
 public sealed class ApiIdentityBuilder<T>(string apiName) : ApiIdentityBuilder(apiName)
 {
-    #region Builder Methods
+    #region AddExtension Methods
     /// <inheritdoc cref="ApiIdentityBuilder.AddIdentityExtension(Type, object)"/>
     public new ApiIdentityBuilder<T> AddIdentityExtension(Type type, object value)
     {
@@ -30,7 +30,9 @@ public sealed class ApiIdentityBuilder<T>(string apiName) : ApiIdentityBuilder(a
     /// <inheritdoc cref="ApiIdentityBuilder.AddIdentityExtension{TExt}(TExt)"/>
     public new ApiIdentityBuilder<T> AddIdentityExtension<TExt>(TExt value) where TExt : notnull
         => this.AddIdentityExtension(typeof(TExt), value);
+    #endregion
 
+    #region AddPart Methods
     /// <summary>
     ///     Adds a scalar identity part, deriving the CLR property name from <paramref name="clrProperty"/>.
     /// </summary>

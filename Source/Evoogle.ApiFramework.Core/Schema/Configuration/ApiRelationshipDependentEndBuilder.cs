@@ -24,7 +24,7 @@ public class ApiRelationshipDependentEndBuilder
     private ApiRelationshipDeleteBehavior _apiDeleteBehavior = ApiRelationshipDeleteBehavior.None;
     #endregion
 
-    #region Builder Methods
+    #region AddExtension Methods
     /// <summary>
     ///     Adds an extension value associated with the specified <paramref name="type"/>.
     /// </summary>
@@ -45,18 +45,9 @@ public class ApiRelationshipDependentEndBuilder
     /// <returns>The current builder instance.</returns>
     public ApiRelationshipDependentEndBuilder AddDependentEndExtension<T>(T value) where T : notnull
         => this.AddDependentEndExtension(typeof(T), value);
+    #endregion
 
-    /// <summary>
-    ///     Sets the delete behavior that governs what happens to the principal objects when a dependent object is deleted.
-    /// </summary>
-    /// <param name="apiDeleteBehavior">The desired delete behavior.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiRelationshipDependentEndBuilder WithDeleteBehavior(ApiRelationshipDeleteBehavior apiDeleteBehavior)
-    {
-        _apiDeleteBehavior = apiDeleteBehavior;
-        return this;
-    }
-
+    #region AddPath Methods
     /// <summary>
     ///     Adds a scalar FK key path that maps the principal identity's scalar leaf
     ///     directly to a property on the dependent object type.
@@ -114,6 +105,19 @@ public class ApiRelationshipDependentEndBuilder
         var builder = new ApiRelationshipKeyPathBuilder(ApiRelationshipKeyPathKind.Owner, null);
         configure?.Invoke(builder);
         _keyPathBuilders.Add(builder);
+        return this;
+    }
+    #endregion
+
+    #region With Methods
+    /// <summary>
+    ///     Sets the delete behavior that governs what happens to the principal objects when a dependent object is deleted.
+    /// </summary>
+    /// <param name="apiDeleteBehavior">The desired delete behavior.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiRelationshipDependentEndBuilder WithDeleteBehavior(ApiRelationshipDeleteBehavior apiDeleteBehavior)
+    {
+        _apiDeleteBehavior = apiDeleteBehavior;
         return this;
     }
     #endregion

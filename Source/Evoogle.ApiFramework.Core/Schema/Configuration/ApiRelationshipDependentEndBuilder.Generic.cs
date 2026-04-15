@@ -18,7 +18,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 public sealed class ApiRelationshipDependentEndBuilder<T>()
     : ApiRelationshipDependentEndBuilder(typeof(T))
 {
-    #region Builder Methods
+    #region AddExtension Methods
     /// <inheritdoc cref="ApiRelationshipDependentEndBuilder.AddDependentEndExtension(Type, object)"/>
     public new ApiRelationshipDependentEndBuilder<T> AddDependentEndExtension(Type type, object value)
     {
@@ -29,7 +29,9 @@ public sealed class ApiRelationshipDependentEndBuilder<T>()
     /// <inheritdoc cref="ApiRelationshipDependentEndBuilder.AddDependentEndExtension{TExt}(TExt)"/>
     public new ApiRelationshipDependentEndBuilder<T> AddDependentEndExtension<TExt>(TExt value) where TExt : notnull
         => this.AddDependentEndExtension(typeof(TExt), value);
+    #endregion
 
+    #region AddPath Methods
     /// <summary>
     ///     Adds a scalar FK key path, deriving the CLR property name from <paramref name="clrProperty"/>.
     /// </summary>
@@ -68,18 +70,20 @@ public sealed class ApiRelationshipDependentEndBuilder<T>()
         return this;
     }
 
-    /// <inheritdoc cref="ApiRelationshipDependentEndBuilder.WithDeleteBehavior"/>
-    public new ApiRelationshipDependentEndBuilder<T> WithDeleteBehavior(ApiRelationshipDeleteBehavior apiDeleteBehavior)
-    {
-        base.WithDeleteBehavior(apiDeleteBehavior);
-        return this;
-    }
-
     /// <inheritdoc cref="ApiRelationshipDependentEndBuilder.AddOwnerPath"/>
     public new ApiRelationshipDependentEndBuilder<T> AddOwnerPath(
         Action<ApiRelationshipKeyPathBuilder>? configure = null)
     {
         base.AddOwnerPath(configure);
+        return this;
+    }
+    #endregion
+
+    #region With Methods
+    /// <inheritdoc cref="ApiRelationshipDependentEndBuilder.WithDeleteBehavior"/>
+    public new ApiRelationshipDependentEndBuilder<T> WithDeleteBehavior(ApiRelationshipDeleteBehavior apiDeleteBehavior)
+    {
+        base.WithDeleteBehavior(apiDeleteBehavior);
         return this;
     }
     #endregion

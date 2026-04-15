@@ -30,7 +30,7 @@ public class ApiIdentityPartBuilder
     private readonly Type? _clrScalarTypeHint = clrScalarTypeHint;
     #endregion
 
-    #region Methods
+    #region AddExtension Methods
     /// <summary>
     ///     Adds an extension value associated with the specified <paramref name="type"/>.
     /// </summary>
@@ -51,7 +51,9 @@ public class ApiIdentityPartBuilder
     /// <returns>The current builder instance.</returns>
     public ApiIdentityPartBuilder AddIdentityPartExtension<T>(T value) where T : notnull
         => this.AddIdentityPartExtension(typeof(T), value);
+    #endregion
 
+    #region Build Methods
     /// <summary>
     ///     Builds the <see cref="ApiIdentityPart"/> configured by this builder.
     /// </summary>

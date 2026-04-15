@@ -13,7 +13,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 public class ApiScalarTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     : ApiNamedTypeBuilder<ApiScalarTypeBuilder>(clrType, context)
 {
-    #region Builder Methods
+    #region AddExtension Methods
     /// <summary>
     ///     Adds an extension value associated with the specified <paramref name="type"/>.
     /// </summary>
@@ -34,7 +34,9 @@ public class ApiScalarTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     /// <returns>The current builder instance.</returns>
     public ApiScalarTypeBuilder AddScalarExtension<T>(T value) where T : notnull
         => this.AddScalarExtension(typeof(T), value);
+    #endregion
 
+    #region Build Methods
     /// <summary>
     ///     Builds the <see cref="ApiScalarType"/> using the configured settings.
     /// </summary>

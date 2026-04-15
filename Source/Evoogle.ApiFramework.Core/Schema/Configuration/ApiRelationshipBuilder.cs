@@ -15,7 +15,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 /// <param name="apiName">The schema-unique API name of the relationship.</param>
 public abstract class ApiRelationshipBuilder(string apiName) : ExtensionBuilder<ApiRelationshipBuilder>
 {
-    #region Builder Methods
+    #region AddExtension Methods
     /// <summary>
     ///     Adds an extension value associated with the specified <paramref name="type"/>.
     /// </summary>

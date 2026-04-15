@@ -17,7 +17,7 @@ public class ApiEnumTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     private readonly List<ApiEnumValue> _values = [];
     #endregion
 
-    #region Builder Methods
+    #region AddExtension Methods
     /// <summary>
     ///     Adds an extension value associated with the specified <paramref name="type"/>.
     /// </summary>
@@ -38,7 +38,9 @@ public class ApiEnumTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     /// <returns>The current builder instance.</returns>
     public ApiEnumTypeBuilder AddEnumExtension<T>(T value) where T : notnull
         => this.AddEnumExtension(typeof(T), value);
+    #endregion
 
+    #region AddValue Methods
     /// <summary>
     ///     Adds an <see cref="ApiEnumValue"/> definition to the enumeration.
     /// </summary>
@@ -51,7 +53,9 @@ public class ApiEnumTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
         _values.Add(new ApiEnumValue(apiName, clrName, clrOrdinal));
         return this;
     }
+    #endregion
 
+    #region Build Methods
     /// <summary>
     ///     Builds the <see cref="ApiEnumType"/> using the configured values.
     /// </summary>

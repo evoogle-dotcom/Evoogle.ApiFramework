@@ -21,7 +21,7 @@ public sealed class ApiRelationshipOneToOneBuilder(string apiName) : ApiRelation
     private ApiRelationshipDependentEndBuilder? _dependentEndBuilder;
     #endregion
 
-    #region Builder Methods
+    #region With Methods
     /// <summary>
     ///     Configures the principal end of the 1:1 relationship using the CLR type <typeparamref name="TPrincipal"/>.
     /// </summary>

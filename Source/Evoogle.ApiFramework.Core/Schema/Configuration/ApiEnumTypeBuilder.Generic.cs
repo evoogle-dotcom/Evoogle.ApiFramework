@@ -16,7 +16,7 @@ public sealed class ApiEnumTypeBuilder<T>(ApiSchemaBuilderContext context)
     : ApiEnumTypeBuilder(typeof(T), context)
     where T : Enum
 {
-    #region Builder Methods
+    #region AddExtension Methods
     /// <inheritdoc cref="ApiEnumTypeBuilder.AddEnumExtension(Type, object)"/>
     public new ApiEnumTypeBuilder<T> AddEnumExtension(Type type, object value)
     {
@@ -27,7 +27,9 @@ public sealed class ApiEnumTypeBuilder<T>(ApiSchemaBuilderContext context)
     /// <inheritdoc cref="ApiEnumTypeBuilder.AddEnumExtension{TExt}(TExt)"/>
     public new ApiEnumTypeBuilder<T> AddEnumExtension<TExt>(TExt value) where TExt : notnull
         => this.AddEnumExtension(typeof(TExt), value);
+    #endregion
 
+    #region AddValue Methods
     /// <summary>
     ///     Adds an <see cref="ApiEnumValue"/> definition derived from the CLR enum member <paramref name="member"/>.
     ///     The CLR name and ordinal are inferred automatically; the API name defaults to the CLR name.
@@ -59,7 +61,9 @@ public sealed class ApiEnumTypeBuilder<T>(ApiSchemaBuilderContext context)
 
         return this;
     }
+    #endregion
 
+    #region Build Methods
     /// <inheritdoc cref="ApiNamedTypeBuilder{TBuilder}.WithName"/>
     public new ApiEnumTypeBuilder<T> WithName(string apiName)
     {

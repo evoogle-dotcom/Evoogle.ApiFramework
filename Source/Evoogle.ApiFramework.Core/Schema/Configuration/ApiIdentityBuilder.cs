@@ -19,7 +19,7 @@ public class ApiIdentityBuilder(string apiName) : ExtensionBuilder<ApiIdentityBu
     private readonly List<ApiIdentityPartBuilder> _apiIdentityPartBuilders = [];
     #endregion
 
-    #region Builder Methods
+    #region AddExtension Methods
     /// <summary>
     ///     Adds an extension value associated with the specified <paramref name="type"/>.
     /// </summary>
@@ -40,7 +40,9 @@ public class ApiIdentityBuilder(string apiName) : ExtensionBuilder<ApiIdentityBu
     /// <returns>The current builder instance.</returns>
     public ApiIdentityBuilder AddIdentityExtension<T>(T value) where T : notnull
         => this.AddIdentityExtension(typeof(T), value);
+    #endregion
 
+    #region AddPart Methods
     /// <summary>
     ///     Adds a part of the specified kind to this identity definition.
     /// </summary>
@@ -127,7 +129,9 @@ public class ApiIdentityBuilder(string apiName) : ExtensionBuilder<ApiIdentityBu
         this.AddPart(ApiIdentityPartKind.Owner, null, apiIdentityName, null, configure);
         return this;
     }
+    #endregion
 
+    #region Build Methods
     /// <summary>
     ///     Builds the <see cref="ApiIdentity"/> configured by this builder.
     /// </summary>

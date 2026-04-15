@@ -19,7 +19,7 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     private Action<ApiObjectTypeOptionsBuilder>? _apiOptionsConfiguration = null;
     #endregion
 
-    #region Builder Methods
+    #region AddExtension Methods
     /// <summary>
     ///     Adds an extension value associated with the specified <paramref name="type"/>.
     /// </summary>
@@ -40,7 +40,9 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     /// <returns>The current builder instance.</returns>
     public ApiObjectTypeBuilder AddObjectExtension<T>(T value) where T : notnull
         => this.AddObjectExtension(typeof(T), value);
+    #endregion
 
+    #region AddIdentity Methods
     /// <summary>
     ///     Adds an <see cref="ApiIdentity"/> definition to the object type.
     /// </summary>
@@ -60,7 +62,9 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
 
         return this;
     }
+    #endregion
 
+    #region AddProperty Methods
     /// <summary>
     ///     Adds an <see cref="ApiProperty"/> definition to the object type, using <paramref name="name"/> as both
     ///     the API name and the CLR property name.
@@ -90,28 +94,6 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
 
         return this;
     }
-
-    /// <summary>
-    ///     Resets the object type options to their schema-wide defaults.
-    /// </summary>
-    /// <returns>The current builder instance.</returns>
-    public ApiObjectTypeBuilder WithDefaultOptions()
-    {
-        _apiOptionsConfiguration = null;
-        return this;
-    }
-
-    /// <summary>
-    ///     Configures type-specific options for this object type.
-    /// </summary>
-    /// <param name="configure">Callback to configure the <see cref="ApiObjectTypeOptionsBuilder"/>.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiObjectTypeBuilder WithOptions(Action<ApiObjectTypeOptionsBuilder> configure)
-    {
-        _apiOptionsConfiguration = configure;
-        return this;
-    }
-
     #endregion
 
     #region AddRelationship Methods
@@ -297,9 +279,34 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
         configuration.Configure(builder);
         return this;
     }
+    #endregion
+
+    #region With Methods
+    /// <summary>
+    ///     Resets the object type options to their schema-wide defaults.
+    /// </summary>
+    /// <returns>The current builder instance.</returns>
+    public ApiObjectTypeBuilder WithDefaultOptions()
+    {
+        _apiOptionsConfiguration = null;
+        return this;
+    }
 
     /// <summary>
-    ///     Builds the <see cref="ApiObjectType"/> using the configured properties and relationships.
+    ///     Configures type-specific options for this object type.
+    /// </summary>
+    /// <param name="configure">Callback to configure the <see cref="ApiObjectTypeOptionsBuilder"/>.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiObjectTypeBuilder WithOptions(Action<ApiObjectTypeOptionsBuilder> configure)
+    {
+        _apiOptionsConfiguration = configure;
+        return this;
+    }
+    #endregion
+
+    #region Build Methods
+    /// <summary>
+    ///     Builds the <see cref="ApiObjectType"/> using the configured properties, identity, and relationships.
     /// </summary>
     /// <returns>The constructed <see cref="ApiObjectType"/>.</returns>
     internal ApiObjectType Build()

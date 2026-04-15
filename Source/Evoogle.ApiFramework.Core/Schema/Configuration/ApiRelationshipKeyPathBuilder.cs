@@ -37,7 +37,7 @@ public class ApiRelationshipKeyPathBuilder
     private readonly List<ApiRelationshipKeyPathBuilder> _childBuilders = [];
     #endregion
 
-    #region Builder Methods
+    #region AddExtension Methods
     /// <summary>
     ///     Adds an extension value associated with the specified <paramref name="type"/>.
     /// </summary>
@@ -58,7 +58,9 @@ public class ApiRelationshipKeyPathBuilder
     /// <returns>The current builder instance.</returns>
     public ApiRelationshipKeyPathBuilder AddKeyPathExtension<T>(T value) where T : notnull
         => this.AddKeyPathExtension(typeof(T), value);
+    #endregion
 
+    #region AddPath Methods
     /// <summary>
     ///     Adds a <see cref="ApiRelationshipScalarKeyPath"/> child to this node.
     ///     Valid only on <see cref="ApiRelationshipKeyPathKind.Nested"/> and
@@ -121,9 +123,7 @@ public class ApiRelationshipKeyPathBuilder
         _childBuilders.Add(builder);
         return this;
     }
-    #endregion
 
-    #region Build Methods
     /// <summary>
     ///     Allows subclasses to add a pre-constructed child builder without bypassing internal list management.
     /// </summary>
@@ -132,7 +132,9 @@ public class ApiRelationshipKeyPathBuilder
         ArgumentNullException.ThrowIfNull(builder);
         _childBuilders.Add(builder);
     }
+    #endregion
 
+    #region Build Methods
     /// <summary>
     ///     Builds the <see cref="ApiRelationshipKeyPath"/> configured by this builder.
     /// </summary>

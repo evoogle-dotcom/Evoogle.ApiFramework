@@ -37,7 +37,7 @@ public abstract class ApiNamedTypeBuilder<TBuilder>(Type clrType, ApiSchemaBuild
     protected ApiSchemaBuilderContext Context { get; } = context ?? throw new ArgumentNullException(nameof(context));
     #endregion
 
-    #region Builder Methods
+    #region With Methods
     /// <summary>
     ///     Sets the API name for the type being built.
     /// </summary>

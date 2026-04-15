@@ -85,6 +85,29 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     }
     #endregion
 
+    #region AddExtension Methods
+    /// <summary>
+    ///     Adds an extension value associated with the specified <paramref name="type"/>.
+    /// </summary>
+    /// <param name="type">The type used as the extension key.</param>
+    /// <param name="value">The extension value to store.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiSchemaBuilder AddSchemaExtension(Type type, object value)
+    {
+        base.AddExtension(type, value);
+        return this;
+    }
+
+    /// <summary>
+    ///     Adds an extension value keyed by its own type.
+    /// </summary>
+    /// <typeparam name="T">The extension value type.</typeparam>
+    /// <param name="value">The extension value.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiSchemaBuilder AddSchemaExtension<T>(T value) where T : notnull
+        => this.AddSchemaExtension(typeof(T), value);
+    #endregion
+
     #region AddObject Methods
     /// <summary>
     ///     Adds an object type to the schema using an optional inline configuration action.
@@ -213,29 +236,6 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
         configuration.Configure(builder);
         return this;
     }
-    #endregion
-
-    #region AddSchemaExtension Methods
-    /// <summary>
-    ///     Adds an extension value associated with the specified <paramref name="type"/>.
-    /// </summary>
-    /// <param name="type">The type used as the extension key.</param>
-    /// <param name="value">The extension value to store.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiSchemaBuilder AddSchemaExtension(Type type, object value)
-    {
-        base.AddExtension(type, value);
-        return this;
-    }
-
-    /// <summary>
-    ///     Adds an extension value keyed by its own type.
-    /// </summary>
-    /// <typeparam name="T">The extension value type.</typeparam>
-    /// <param name="value">The extension value.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiSchemaBuilder AddSchemaExtension<T>(T value) where T : notnull
-        => this.AddSchemaExtension(typeof(T), value);
     #endregion
 
     #region AddRelationship Methods
@@ -472,9 +472,7 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
 
         return apiSchema;
     }
-    #endregion
 
-    #region Implementation Methods
     private ApiSchemaOptions? BuildOptions()
     {
         if (_apiOptionsConfiguration == null)
