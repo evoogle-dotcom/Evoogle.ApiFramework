@@ -3,7 +3,11 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Linq.Expressions;
+
 using Microsoft.Extensions.Logging;
+
+using Evoogle.Reflection;
 
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
@@ -282,6 +286,32 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     }
 
     /// <summary>
+    ///     Adds a one-to-one relationship to the schema with <typeparamref name="TPrincipal"/> as the principal type
+    ///     and <typeparamref name="TDependent"/> as the dependent type, binding a single scalar FK property on the
+    ///     dependent end via a lambda expression.
+    ///     Use the <see cref="AddOneToOneRelationship{TPrincipal,TDependent}(string,Action{ApiRelationshipDependentEndBuilder{TDependent}}?)"/>
+    ///     overload for composite FK keys or when delete behavior must be configured.
+    /// </summary>
+    /// <typeparam name="TPrincipal">The CLR type of the principal object.</typeparam>
+    /// <typeparam name="TDependent">The CLR type of the dependent object.</typeparam>
+    /// <param name="apiName">The schema-unique API name of the relationship.</param>
+    /// <param name="fk">Expression selecting the scalar FK property on <typeparamref name="TDependent"/>.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiSchemaBuilder AddOneToOneRelationship<TPrincipal, TDependent>(
+        string apiName,
+        Expression<Func<TDependent, object>> fk)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
+        ArgumentNullException.ThrowIfNull(fk);
+
+        var clrName = StaticReflection.GetMemberName(fk);
+        var builder = _context.GetOrAddOneToOneRelationshipBuilder(apiName);
+        builder.WithPrincipalEnd<TPrincipal>();
+        builder.WithDependentEnd<TDependent>(d => d.AddScalarPath(clrName));
+        return this;
+    }
+
+    /// <summary>
     ///     Adds a one-to-one relationship to the schema using an <see cref="IApiRelationshipOneToOneConfiguration"/>.
     /// </summary>
     /// <param name="apiName">The schema-unique API name of the relationship.</param>
@@ -341,6 +371,32 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     }
 
     /// <summary>
+    ///     Adds a one-to-many relationship to the schema with <typeparamref name="TPrincipal"/> as the principal type
+    ///     and <typeparamref name="TDependent"/> as the dependent type, binding a single scalar FK property on the
+    ///     dependent end via a lambda expression.
+    ///     Use the <see cref="AddOneToManyRelationship{TPrincipal,TDependent}(string,Action{ApiRelationshipDependentEndBuilder{TDependent}}?)"/>
+    ///     overload for composite FK keys or when delete behavior must be configured.
+    /// </summary>
+    /// <typeparam name="TPrincipal">The CLR type of the principal object.</typeparam>
+    /// <typeparam name="TDependent">The CLR type of the dependent object.</typeparam>
+    /// <param name="apiName">The schema-unique API name of the relationship.</param>
+    /// <param name="fk">Expression selecting the scalar FK property on <typeparamref name="TDependent"/>.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiSchemaBuilder AddOneToManyRelationship<TPrincipal, TDependent>(
+        string apiName,
+        Expression<Func<TDependent, object>> fk)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
+        ArgumentNullException.ThrowIfNull(fk);
+
+        var clrName = StaticReflection.GetMemberName(fk);
+        var builder = _context.GetOrAddOneToManyRelationshipBuilder(apiName);
+        builder.WithPrincipalEnd<TPrincipal>();
+        builder.WithDependentEnd<TDependent>(d => d.AddScalarPath(clrName));
+        return this;
+    }
+
+    /// <summary>
     ///     Adds a one-to-many relationship to the schema using an <see cref="IApiRelationshipOneToManyConfiguration"/>.
     /// </summary>
     /// <param name="apiName">The schema-unique API name of the relationship.</param>
@@ -392,6 +448,39 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
         var builder = _context.GetOrAddManyToManyRelationshipBuilder<TAssociation>(apiName);
 
         configure(builder);
+        return this;
+    }
+
+    /// <summary>
+    ///     Adds a many-to-many relationship to the schema with <typeparamref name="TPrincipalA"/> and
+    ///     <typeparamref name="TPrincipalB"/> as the two principal types and <typeparamref name="TAssociation"/>
+    ///     as the mediating association type, binding a single scalar FK for each side via lambda expressions.
+    ///     Use the <see cref="AddManyToManyRelationship{TAssociation}(string,Action{ApiRelationshipManyToManyBuilder{TAssociation}})"/>
+    ///     overload for composite FK keys, delete behavior, or non-primary identity selection.
+    /// </summary>
+    /// <typeparam name="TAssociation">The CLR type of the association object that mediates the relationship.</typeparam>
+    /// <typeparam name="TPrincipalA">The CLR type of principal end A.</typeparam>
+    /// <typeparam name="TPrincipalB">The CLR type of principal end B.</typeparam>
+    /// <param name="apiName">The schema-unique API name of the relationship.</param>
+    /// <param name="fkA">Expression selecting the scalar FK property on <typeparamref name="TAssociation"/> that points to principal A.</param>
+    /// <param name="fkB">Expression selecting the scalar FK property on <typeparamref name="TAssociation"/> that points to principal B.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiSchemaBuilder AddManyToManyRelationship<TAssociation, TPrincipalA, TPrincipalB>(
+        string apiName,
+        Expression<Func<TAssociation, object>> fkA,
+        Expression<Func<TAssociation, object>> fkB)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
+        ArgumentNullException.ThrowIfNull(fkA);
+        ArgumentNullException.ThrowIfNull(fkB);
+
+        var clrNameA = StaticReflection.GetMemberName(fkA);
+        var clrNameB = StaticReflection.GetMemberName(fkB);
+        var builder = _context.GetOrAddManyToManyRelationshipBuilder<TAssociation>(apiName);
+        builder.WithPrincipalEndA<TPrincipalA>();
+        builder.WithPrincipalEndB<TPrincipalB>();
+        builder.WithDependentEndA(d => d.AddScalarPath(clrNameA));
+        builder.WithDependentEndB(d => d.AddScalarPath(clrNameB));
         return this;
     }
 
