@@ -92,6 +92,52 @@ public sealed class ApiObjectTypeBuilder<T>(ApiSchemaBuilderContext context)
         base.AddProperty(apiName, clrName, configure);
         return this;
     }
+
+    /// <summary>
+    ///     Adds an <see cref="ApiProperty"/> definition, deriving the CLR name from <paramref name="clrProperty"/>
+    ///     and using it as the API name as well, and explicitly overrides the CLR nullability-inferred
+    ///     required/optional modifier.
+    /// </summary>
+    /// <typeparam name="TResult">The property return type.</typeparam>
+    /// <param name="clrProperty">Expression selecting the property on <typeparamref name="T"/>.</param>
+    /// <param name="required"><see langword="true"/> to mark the property as required; <see langword="false"/> to mark it as optional.</param>
+    /// <param name="configure">Optional callback to further configure the added property.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiObjectTypeBuilder<T> AddProperty<TResult>
+    (
+        Expression<Func<T, TResult>> clrProperty,
+        bool required,
+        Action<ApiPropertyBuilder>? configure = null
+    )
+    {
+        var clrName = StaticReflection.GetMemberName(clrProperty);
+        base.AddProperty(clrName, clrName, required, configure);
+        return this;
+    }
+
+    /// <summary>
+    ///     Adds an <see cref="ApiProperty"/> definition, deriving the CLR name from <paramref name="clrProperty"/>
+    ///     and using the explicitly supplied <paramref name="apiName"/> for the API surface, and explicitly
+    ///     overrides the CLR nullability-inferred required/optional modifier.
+    /// </summary>
+    /// <typeparam name="TResult">The property return type.</typeparam>
+    /// <param name="clrProperty">Expression selecting the property on <typeparamref name="T"/>.</param>
+    /// <param name="apiName">The API property name to expose.</param>
+    /// <param name="required"><see langword="true"/> to mark the property as required; <see langword="false"/> to mark it as optional.</param>
+    /// <param name="configure">Optional callback to further configure the added property.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiObjectTypeBuilder<T> AddProperty<TResult>
+    (
+        Expression<Func<T, TResult>> clrProperty,
+        string apiName,
+        bool required,
+        Action<ApiPropertyBuilder>? configure = null
+    )
+    {
+        var clrName = StaticReflection.GetMemberName(clrProperty);
+        base.AddProperty(apiName, clrName, required, configure);
+        return this;
+    }
     #endregion
 
     #region AddRelationship Methods
