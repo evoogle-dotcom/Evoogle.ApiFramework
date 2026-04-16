@@ -130,41 +130,41 @@ public class ApiPropertyBuilderTests(ITestOutputHelper output) : XUnitTests(outp
             ApiExtensionType = typeof(TestExtension),
         },
 
-        // IsRequired / IsOptional shortcut tests
+        // AsRequired / AsOptional shortcut tests
         new BuildTest
         {
-            Name = "IsRequired() marks property as required",
+            Name = "AsRequired() marks property as required",
             ClrObjectType = typeof(ScalarsOnly),
             ApiName = RequiredNameProperty.ApiName,
             ClrName = RequiredNameProperty.ClrName,
-            Configure = b => b.IsRequired(),
+            Configure = b => b.AsRequired(),
             ApiPropertyExpected = RequiredNameProperty,
         },
         new BuildTest
         {
-            Name = "IsOptional() marks property as optional",
+            Name = "AsOptional() marks property as optional",
             ClrObjectType = typeof(ScalarsOnly),
             ApiName = OptionalNumberProperty.ApiName,
             ClrName = OptionalNumberProperty.ClrName,
-            Configure = b => b.IsOptional(),
+            Configure = b => b.AsOptional(),
             ApiPropertyExpected = OptionalNumberProperty,
         },
         new BuildTest
         {
-            Name = "IsRequired() overrides IsOptional() — last call wins",
+            Name = "AsRequired() overrides AsOptional() — last call wins",
             ClrObjectType = typeof(ScalarsOnly),
             ApiName = RequiredNameProperty.ApiName,
             ClrName = RequiredNameProperty.ClrName,
-            Configure = b => b.IsOptional().IsRequired(),
+            Configure = b => b.AsOptional().AsRequired(),
             ApiPropertyExpected = RequiredNameProperty,
         },
         new BuildTest
         {
-            Name = "IsOptional() overrides IsRequired() — last call wins",
+            Name = "AsOptional() overrides AsRequired() — last call wins",
             ClrObjectType = typeof(ScalarsOnly),
             ApiName = OptionalNumberProperty.ApiName,
             ClrName = OptionalNumberProperty.ClrName,
-            Configure = b => b.IsRequired().IsOptional(),
+            Configure = b => b.AsRequired().AsOptional(),
             ApiPropertyExpected = OptionalNumberProperty,
         },
     ];

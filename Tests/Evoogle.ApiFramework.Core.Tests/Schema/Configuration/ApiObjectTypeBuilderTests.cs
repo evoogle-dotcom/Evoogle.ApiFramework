@@ -4,6 +4,7 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using System.Diagnostics.CodeAnalysis;
+using Evoogle.ApiFramework.Identity;
 using Evoogle.ApiFramework.Schema.TestData;
 using Evoogle.ApiFramework.TestData;
 using Evoogle.Extensions;
@@ -98,11 +99,11 @@ public class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
                                     var clrScalarTypeHint = scalarPart.ClrScalarTypeHint;
                                     if (clrScalarTypeHint is not null)
                                     {
-                                        identityBuilder.AddScalar(scalarPart.ClrPropertyName, clrScalarTypeHint);
+                                        identityBuilder.AddScalarPart(scalarPart.ClrPropertyName, clrScalarTypeHint);
                                     }
                                     else
                                     {
-                                        identityBuilder.AddScalar(scalarPart.ClrPropertyName);
+                                        identityBuilder.AddScalarPart(scalarPart.ClrPropertyName);
                                     }
                                     break;
                                 }
@@ -113,11 +114,11 @@ public class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
                                     var apiIdentityName = nestedPart.ApiIdentityName;
                                     if (apiIdentityName is not null)
                                     {
-                                        identityBuilder.AddNested(nestedPart.ClrPropertyName, apiIdentityName);
+                                        identityBuilder.AddNestedPart(nestedPart.ClrPropertyName, apiIdentityName);
                                     }
                                     else
                                     {
-                                        identityBuilder.AddNested(nestedPart.ClrPropertyName);
+                                        identityBuilder.AddNestedPart(nestedPart.ClrPropertyName);
                                     }
                                     break;
                                 }
@@ -128,11 +129,11 @@ public class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
                                     var apiIdentityName = ownerPart.ApiIdentityName;
                                     if (apiIdentityName is not null)
                                     {
-                                        identityBuilder.AddOwner(apiIdentityName);
+                                        identityBuilder.AddOwnerPart(apiIdentityName);
                                     }
                                     else
                                     {
-                                        identityBuilder.AddOwner(ownerPart.ApiIdentityName!);
+                                        identityBuilder.AddOwnerPart(ownerPart.ApiIdentityName!);
                                     }
                                     break;
                                 }
@@ -157,7 +158,10 @@ public class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
                 {
                     if (apiOptions.ApiIdentityNullHandling.HasValue)
                     {
-                        optionsBuilder.WithIdentityNullHandling(apiOptions.ApiIdentityNullHandling.Value);
+                        if (apiOptions.ApiIdentityNullHandling.Value == ApiIdentityNullHandling.ThrowException)
+                            optionsBuilder.ThrowOnNull();
+                        else
+                            optionsBuilder.ReturnEmptyOnNull();
                     }
                 });
             }

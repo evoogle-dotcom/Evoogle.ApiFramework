@@ -122,7 +122,7 @@ public class ApiObjectTypeBuilderGenericTests(ITestOutputHelper output) : XUnitT
                 .WithName("Customer")
                 .AddProperty(c => c.Id)
                 .AddProperty(c => c.Name)
-                .AddIdentity("PK_Customer", b => b.AddScalar(c => c.Id, typeof(string)));
+                .AddIdentity("PK_Customer", b => b.AddScalarPart(c => c.Id, typeof(string)));
         }
     }
     #endregion
@@ -185,7 +185,7 @@ public class ApiObjectTypeBuilderGenericTests(ITestOutputHelper output) : XUnitT
                 return new ApiObjectTypeBuilder(typeof(Customer), ctx)
                     .WithName("Customer")
                     .AddProperty("Id", "Id")
-                    .AddIdentity("PK_Customer", b => b.AddScalar("Id"))
+                    .AddIdentity("PK_Customer", b => b.AddScalarPart("Id"))
                     .Build();
             },
             BuildActual = static () =>
@@ -194,7 +194,7 @@ public class ApiObjectTypeBuilderGenericTests(ITestOutputHelper output) : XUnitT
                 return new ApiObjectTypeBuilder<Customer>(ctx)
                     .WithName("Customer")
                     .AddProperty(c => c.Id)
-                    .AddIdentity("PK_Customer", b => b.AddScalar(c => c.Id))
+                    .AddIdentity("PK_Customer", b => b.AddScalarPart(c => c.Id))
                     .Build();
             }
         },
@@ -208,7 +208,7 @@ public class ApiObjectTypeBuilderGenericTests(ITestOutputHelper output) : XUnitT
                 return new ApiObjectTypeBuilder(typeof(Customer), ctx)
                     .WithName("Customer")
                     .AddProperty("Id", "Id")
-                    .AddIdentity("PK_Customer", b => b.AddScalar("Id", typeof(string)))
+                    .AddIdentity("PK_Customer", b => b.AddScalarPart("Id", typeof(string)))
                     .Build();
             },
             BuildActual = static () =>
@@ -217,7 +217,7 @@ public class ApiObjectTypeBuilderGenericTests(ITestOutputHelper output) : XUnitT
                 return new ApiObjectTypeBuilder<Customer>(ctx)
                     .WithName("Customer")
                     .AddProperty(c => c.Id)
-                    .AddIdentity("PK_Customer", b => b.AddScalar(c => c.Id, typeof(string)))
+                    .AddIdentity("PK_Customer", b => b.AddScalarPart(c => c.Id, typeof(string)))
                     .Build();
             }
         },
@@ -232,7 +232,7 @@ public class ApiObjectTypeBuilderGenericTests(ITestOutputHelper output) : XUnitT
                     .WithName("Customer")
                     .AddProperty("Id", "Id")
                     .AddProperty("Name", "Name")
-                    .AddIdentity("PK_Customer", b => b.AddScalar("Id", typeof(string)))
+                    .AddIdentity("PK_Customer", b => b.AddScalarPart("Id", typeof(string)))
                     .Build();
             },
             BuildActual = static () =>
@@ -274,7 +274,7 @@ public class ApiObjectTypeBuilderGenericTests(ITestOutputHelper output) : XUnitT
                 var ctx = new ApiSchemaBuilderContext();
                 return new ApiObjectTypeBuilder(typeof(Customer), ctx)
                     .WithName("Customer")
-                    .WithOptions(o => o.WithIdentityNullHandling(ApiIdentityNullHandling.ThrowException))
+                    .WithOptions(o => o.ThrowOnNull())
                     .Build();
             },
             BuildActual = static () =>
@@ -282,7 +282,7 @@ public class ApiObjectTypeBuilderGenericTests(ITestOutputHelper output) : XUnitT
                 var ctx = new ApiSchemaBuilderContext();
                 return new ApiObjectTypeBuilder<Customer>(ctx)
                     .WithName("Customer")
-                    .WithOptions(o => o.WithIdentityNullHandling(ApiIdentityNullHandling.ThrowException))
+                    .WithOptions(o => o.ThrowOnNull())
                     .Build();
             }
         },
@@ -358,11 +358,11 @@ public class ApiObjectTypeBuilderGenericTests(ITestOutputHelper output) : XUnitT
             Name = "ApiIdentityBuilder<Customer> AddScalar(expr) extracts CLR property name",
             BuildExpected = static () =>
                 new ApiIdentityBuilder("PK_Customer")
-                    .AddScalar("Id")
+                    .AddScalarPart("Id")
                     .Build(),
             BuildActual = static () =>
                 new ApiIdentityBuilder<Customer>("PK_Customer")
-                    .AddScalar(c => c.Id)
+                    .AddScalarPart(c => c.Id)
                     .Build()
         },
 
@@ -371,11 +371,11 @@ public class ApiObjectTypeBuilderGenericTests(ITestOutputHelper output) : XUnitT
             Name = "ApiIdentityBuilder<Customer> AddScalar(expr, typeHint) extracts CLR property name with type hint",
             BuildExpected = static () =>
                 new ApiIdentityBuilder("PK_Customer")
-                    .AddScalar("Id", typeof(string))
+                    .AddScalarPart("Id", typeof(string))
                     .Build(),
             BuildActual = static () =>
                 new ApiIdentityBuilder<Customer>("PK_Customer")
-                    .AddScalar(c => c.Id, typeof(string))
+                    .AddScalarPart(c => c.Id, typeof(string))
                     .Build()
         },
 
@@ -384,11 +384,11 @@ public class ApiObjectTypeBuilderGenericTests(ITestOutputHelper output) : XUnitT
             Name = "ApiIdentityBuilder<Customer> AddScalar(expr) with multiple scalar parts",
             BuildExpected = static () =>
                 new ApiIdentityBuilder("AK_Customer_Name")
-                    .AddScalar("Name")
+                    .AddScalarPart("Name")
                     .Build(),
             BuildActual = static () =>
                 new ApiIdentityBuilder<Customer>("AK_Customer_Name")
-                    .AddScalar(c => c.Name)
+                    .AddScalarPart(c => c.Name)
                     .Build()
         },
 
@@ -397,11 +397,11 @@ public class ApiObjectTypeBuilderGenericTests(ITestOutputHelper output) : XUnitT
             Name = "ApiIdentityBuilder<Customer> AddNested(expr) extracts CLR property name",
             BuildExpected = static () =>
                 new ApiIdentityBuilder("PK_Customer_Address")
-                    .AddNested("PrimaryAddress")
+                    .AddNestedPart("PrimaryAddress")
                     .Build(),
             BuildActual = static () =>
                 new ApiIdentityBuilder<Customer>("PK_Customer_Address")
-                    .AddNested(c => c.PrimaryAddress)
+                    .AddNestedPart(c => c.PrimaryAddress)
                     .Build()
         },
 
@@ -410,11 +410,11 @@ public class ApiObjectTypeBuilderGenericTests(ITestOutputHelper output) : XUnitT
             Name = "ApiIdentityBuilder<Customer> AddNested(expr, identityName) extracts CLR property name with explicit identity name",
             BuildExpected = static () =>
                 new ApiIdentityBuilder("PK_Customer_Address_Named")
-                    .AddNested("PrimaryAddress", "PK_Address")
+                    .AddNestedPart("PrimaryAddress", "PK_Address")
                     .Build(),
             BuildActual = static () =>
                 new ApiIdentityBuilder<Customer>("PK_Customer_Address_Named")
-                    .AddNested(c => c.PrimaryAddress, "PK_Address")
+                    .AddNestedPart(c => c.PrimaryAddress, "PK_Address")
                     .Build()
         },
 
@@ -423,13 +423,13 @@ public class ApiObjectTypeBuilderGenericTests(ITestOutputHelper output) : XUnitT
             Name = "ApiIdentityBuilder<Customer> composite AddScalar(expr) + AddScalar(expr) builds two-part identity",
             BuildExpected = static () =>
                 new ApiIdentityBuilder("AK_Customer_Id_Name")
-                    .AddScalar("Id")
-                    .AddScalar("Name")
+                    .AddScalarPart("Id")
+                    .AddScalarPart("Name")
                     .Build(),
             BuildActual = static () =>
                 new ApiIdentityBuilder<Customer>("AK_Customer_Id_Name")
-                    .AddScalar(c => c.Id)
-                    .AddScalar(c => c.Name)
+                    .AddScalarPart(c => c.Id)
+                    .AddScalarPart(c => c.Name)
                     .Build()
         },
 
@@ -438,13 +438,13 @@ public class ApiObjectTypeBuilderGenericTests(ITestOutputHelper output) : XUnitT
             Name = "ApiIdentityBuilder<Customer> mixed AddNested(expr) + AddScalar(expr) builds composite identity",
             BuildExpected = static () =>
                 new ApiIdentityBuilder("AK_Customer_Address_Name")
-                    .AddNested("PrimaryAddress")
-                    .AddScalar("Name")
+                    .AddNestedPart("PrimaryAddress")
+                    .AddScalarPart("Name")
                     .Build(),
             BuildActual = static () =>
                 new ApiIdentityBuilder<Customer>("AK_Customer_Address_Name")
-                    .AddNested(c => c.PrimaryAddress)
-                    .AddScalar(c => c.Name)
+                    .AddNestedPart(c => c.PrimaryAddress)
+                    .AddScalarPart(c => c.Name)
                     .Build()
         },
     ];

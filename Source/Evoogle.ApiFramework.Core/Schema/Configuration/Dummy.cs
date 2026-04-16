@@ -343,12 +343,12 @@ public static class Dummy
         {
             builder
                 .WithName("Customer")
-                .WithOptions(o => o.WithIdentityNullHandling(ApiIdentityNullHandling.ThrowException))
+                .WithOptions(o => o.ThrowOnNull())
                 .AddIdentity("PrimaryKey", b => b
-                    .AddScalar(c => c.Id))
+                    .AddScalarPart(c => c.Id))
                 .AddIdentity("AlternateKey", b => b
-                    .AddNested(c => c.Country)
-                    .AddScalar(c => c.Name))
+                    .AddNestedPart(c => c.Country)
+                    .AddScalarPart(c => c.Name))
                 .AddProperty(c => c.Id, p => p.WithModifiers(m => m.Required()))
                 .AddProperty(c => c.Name, p => p.WithModifiers(m => m.Required()))
                 .AddProperty(c => c.Email, p => p.WithModifiers(m => m.Optional()))
@@ -404,23 +404,23 @@ public static class Dummy
             .WithVersion("v1")
             .WithDefaultOptions()
             .WithOptions(o => o
-                .WithIdentityNullHandling(ApiIdentityNullHandling.ReturnEmpty))
+                .ReturnEmptyOnNull())
             .AddScalar(typeof(EmailAddress), x => x
                 .WithName("EmailAddress"))
                 .AddSchemaExtension(new VisibleMetadata { Visible = true })
             .AddObject(typeof(Country), x => x
                 .WithName("Country")
                 .AddIdentity("PrimaryKey", identity => identity
-                    .AddScalar("Code")))
+                    .AddScalarPart("Code")))
             .AddObject(typeof(Customer), x => x
                 .WithName("Customer")
                 .WithOptions(o => o
-                    .WithIdentityNullHandling(ApiIdentityNullHandling.ThrowException))
+                    .ThrowOnNull())
                 .AddIdentity("PrimaryKey", identity => identity
-                    .AddScalar("Id"))
+                    .AddScalarPart("Id"))
                 .AddIdentity("AlternateKey", identity => identity
-                    .AddNested("Country")
-                    .AddScalar("Name"))
+                    .AddNestedPart("Country")
+                    .AddScalarPart("Name"))
                 .AddProperty("Id", "Id", p => p.WithModifiers(m => m.Required()))
                 .AddProperty("Name", "Name", p => p.WithModifiers(m => m.Required()).AddPropertyExtension(new VisibleMetadata { Visible = true }))
                 .AddProperty("Email", "Email", p => p.WithModifiers(m => m.Optional()))
@@ -438,9 +438,9 @@ public static class Dummy
                 .WithName("OrderItem")
                 .WithDefaultOptions()
                 .AddIdentity("PrimaryKey", identity => identity
-                    .AddOwner()
-                    .AddScalar("OrderId", x => x.AddIdentityPartExtension(new VisibleMetadata { Visible = true }))
-                    .AddScalar("LineItemNumber", typeof(long)))
+                    .AddOwnerPart()
+                    .AddScalarPart("OrderId", x => x.AddIdentityPartExtension(new VisibleMetadata { Visible = true }))
+                    .AddScalarPart("LineItemNumber", typeof(long)))
                 .AddProperty("OrderId", "OrderId", p => p.WithModifiers(m => m.Required()))
                 .AddProperty("LineItemNumber", "LineItemNumber", p => p.WithModifiers(m => m.Required()))
                 .AddProperty("ProductName", "ProductName", p => p.WithModifiers(m => m.Required()))
@@ -459,26 +459,26 @@ public static class Dummy
             .AddObject(typeof(CustomerProfile), x => x
                 .WithName("CustomerProfile")
                 .AddIdentity("PrimaryKey", identity => identity
-                    .AddNested("CustomerRef")
-                    .AddScalar("CustomerId"))
+                    .AddNestedPart("CustomerRef")
+                    .AddScalarPart("CustomerId"))
                 .AddProperty("Biography", "Biography", p => p.WithModifiers(m => m.Required())))
             .AddObject(typeof(Product), x => x
                 .WithName("Product")
                 .AddIdentity("PrimaryKey", identity => identity
-                    .AddScalar("Id"))
+                    .AddScalarPart("Id"))
                 .AddProperty("Id", "Id", p => p.WithModifiers(m => m.Required()))
                 .AddProperty("Name", "Name", p => p.WithModifiers(m => m.Required())))
             .AddObject(typeof(Tag), x => x
                 .WithName("Tag")
                 .AddIdentity("PrimaryKey", identity => identity
-                    .AddScalar("Id"))
+                    .AddScalarPart("Id"))
                 .AddProperty("Id", "Id", p => p.WithModifiers(m => m.Required()))
                 .AddProperty("Name", "Name", p => p.WithModifiers(m => m.Required())))
             .AddObject(typeof(ProductTag), x => x
                 .WithName("ProductTag")
                 .AddIdentity("PrimaryKey", identity => identity
-                    .AddScalar("ProductId")
-                    .AddScalar("TagId"))
+                    .AddScalarPart("ProductId")
+                    .AddScalarPart("TagId"))
                 .AddProperty("ProductId", "ProductId", p => p.WithModifiers(m => m.Required()))
                 .AddProperty("TagId", "TagId", p => p.WithModifiers(m => m.Required())))
             .AddOneToManyRelationship("CustomerHasOrders", new CustomerHasOrdersRelationshipConfiguration())
@@ -583,12 +583,12 @@ public static class Dummy
                 .AddValue("Cancelled", "Cancelled", 3))
             .AddObject<Country>(x => x
                 .WithName("Country")
-                .AddIdentity("PrimaryKey", b => b.AddScalar(c => c.Code))
+                .AddIdentity("PrimaryKey", b => b.AddScalarPart(c => c.Code))
                 .AddProperty(c => c.Code))
             .AddObject(new CustomerConfigurationGeneric())
             .AddObject<Order>(x => x
                 .WithName("Order")
-                .AddIdentity("PrimaryKey", b => b.AddScalar(o => o.Id))
+                .AddIdentity("PrimaryKey", b => b.AddScalarPart(o => o.Id))
                 .AddProperty(o => o.Id, p => p.WithModifiers(m => m.Required()))
                 .AddProperty(o => o.Status, p => p.WithModifiers(m => m.Required()))
                 .AddProperty(o => o.Total, p => p.WithModifiers(m => m.Required()))
@@ -597,9 +597,9 @@ public static class Dummy
             .AddObject<OrderItem>(x => x
                 .WithName("OrderItem")
                 .AddIdentity("PrimaryKey", b => b
-                    .AddOwner()
-                    .AddScalar(oi => oi.OrderId)
-                    .AddScalar(oi => oi.LineItemNumber, typeof(long)))
+                    .AddOwnerPart()
+                    .AddScalarPart(oi => oi.OrderId)
+                    .AddScalarPart(oi => oi.LineItemNumber, typeof(long)))
                 .AddProperty(oi => oi.OrderId, p => p.WithModifiers(m => m.Required()))
                 .AddProperty(oi => oi.LineItemNumber, p => p.WithModifiers(m => m.Required()))
                 .AddProperty(oi => oi.ProductName, p => p.WithModifiers(m => m.Required()))
@@ -607,24 +607,24 @@ public static class Dummy
                 .AddProperty(oi => oi.UnitPrice, p => p.WithModifiers(m => m.Required())))
             .AddObject<CustomerProfile>(x => x
                 .WithName("CustomerProfile")
-                .AddIdentity("PrimaryKey", b => b.AddNested(cp => cp.CustomerRef))
+                .AddIdentity("PrimaryKey", b => b.AddNestedPart(cp => cp.CustomerRef))
                 .AddProperty(cp => cp.CustomerRef, p => p.WithModifiers(m => m.Required()))
                 .AddProperty(cp => cp.Biography, p => p.WithModifiers(m => m.Required())))
             .AddObject<Product>(x => x
                 .WithName("Product")
-                .AddIdentity("PrimaryKey", b => b.AddScalar(p => p.Id))
+                .AddIdentity("PrimaryKey", b => b.AddScalarPart(p => p.Id))
                 .AddProperty(p => p.Id, cfg => cfg.WithModifiers(m => m.Required()))
                 .AddProperty(p => p.Name, cfg => cfg.WithModifiers(m => m.Required())))
             .AddObject<Tag>(x => x
                 .WithName("Tag")
-                .AddIdentity("PrimaryKey", b => b.AddScalar(t => t.Id))
+                .AddIdentity("PrimaryKey", b => b.AddScalarPart(t => t.Id))
                 .AddProperty(t => t.Id, p => p.WithModifiers(m => m.Required()))
                 .AddProperty(t => t.Name, p => p.WithModifiers(m => m.Required())))
             .AddObject<ProductTag>(x => x
                 .WithName("ProductTag")
                 .AddIdentity("PrimaryKey", b => b
-                    .AddScalar(pt => pt.ProductId)
-                    .AddScalar(pt => pt.TagId))
+                    .AddScalarPart(pt => pt.ProductId)
+                    .AddScalarPart(pt => pt.TagId))
                 .AddProperty(pt => pt.ProductId, p => p.WithModifiers(m => m.Required()))
                 .AddProperty(pt => pt.TagId, p => p.WithModifiers(m => m.Required())))
             .AddOneToManyRelationship("CustomerHasOrders", new CustomerHasOrdersConfigurationGeneric())

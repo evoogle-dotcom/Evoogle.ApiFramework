@@ -124,11 +124,11 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
 
         if (required)
         {
-            apiPropertyBuilder.IsRequired();
+            apiPropertyBuilder.AsRequired();
         }
         else
         {
-            apiPropertyBuilder.IsOptional();
+            apiPropertyBuilder.AsOptional();
         }
 
         configure?.Invoke(apiPropertyBuilder);

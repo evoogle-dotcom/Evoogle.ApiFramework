@@ -68,7 +68,7 @@ public class ApiPropertyBuilder(string apiName, string clrName) : ExtensionBuild
     ///     Marks this property as required, overriding any nullability-inferred modifier.
     /// </summary>
     /// <returns>The current builder instance.</returns>
-    public ApiPropertyBuilder IsRequired()
+    public ApiPropertyBuilder AsRequired()
     {
         return this.WithModifiers(m => m.Required());
     }
@@ -77,7 +77,7 @@ public class ApiPropertyBuilder(string apiName, string clrName) : ExtensionBuild
     ///     Marks this property as optional, overriding any nullability-inferred modifier.
     /// </summary>
     /// <returns>The current builder instance.</returns>
-    public ApiPropertyBuilder IsOptional()
+    public ApiPropertyBuilder AsOptional()
     {
         return this.WithModifiers(m => m.Optional());
     }

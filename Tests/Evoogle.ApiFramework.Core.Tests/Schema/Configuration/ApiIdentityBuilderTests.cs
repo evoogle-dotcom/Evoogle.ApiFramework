@@ -91,22 +91,22 @@ public class ApiIdentityBuilderTests(ITestOutputHelper output) : XUnitTests(outp
                 switch (apiKind)
                 {
                     case ApiIdentityPartKind.Scalar when clrScalarTypeHint != null:
-                        builder.AddScalar(clrPropertyName!, clrScalarTypeHint, configure);
+                        builder.AddScalarPart(clrPropertyName!, clrScalarTypeHint, configure);
                         break;
                     case ApiIdentityPartKind.Scalar:
-                        builder.AddScalar(clrPropertyName!, configure);
+                        builder.AddScalarPart(clrPropertyName!, configure);
                         break;
                     case ApiIdentityPartKind.Nested when apiIdentityName != null:
-                        builder.AddNested(clrPropertyName!, apiIdentityName, configure);
+                        builder.AddNestedPart(clrPropertyName!, apiIdentityName, configure);
                         break;
                     case ApiIdentityPartKind.Nested:
-                        builder.AddNested(clrPropertyName!, configure);
+                        builder.AddNestedPart(clrPropertyName!, configure);
                         break;
                     case ApiIdentityPartKind.Owner when apiIdentityName != null:
-                        builder.AddOwner(apiIdentityName, configure);
+                        builder.AddOwnerPart(apiIdentityName, configure);
                         break;
                     default:
-                        builder.AddOwner(configure);
+                        builder.AddOwnerPart(configure);
                         break;
                 }
             }

@@ -18,13 +18,24 @@ public sealed class ApiObjectTypeOptionsBuilder()
 
     #region With Methods
     /// <summary>
-    ///     Sets or clears the identity null handling strategy.
+    ///     Configures identity null handling to return <see cref="ApiId.Empty"/> when a property value
+    ///     is null or a part is unresolved.
     /// </summary>
-    /// <param name="handling">The optional null handling strategy to use.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiObjectTypeOptionsBuilder WithIdentityNullHandling(ApiIdentityNullHandling? handling = null)
+    public ApiObjectTypeOptionsBuilder ReturnEmptyOnNull()
     {
-        _apiIdentityNullHandling = handling;
+        _apiIdentityNullHandling = ApiIdentityNullHandling.ReturnEmpty;
+        return this;
+    }
+
+    /// <summary>
+    ///     Configures identity null handling to throw an <see cref="Exceptions.ApiIdentityException"/>
+    ///     when a property value is null or a part is unresolved.
+    /// </summary>
+    /// <returns>The current builder instance.</returns>
+    public ApiObjectTypeOptionsBuilder ThrowOnNull()
+    {
+        _apiIdentityNullHandling = ApiIdentityNullHandling.ThrowException;
         return this;
     }
     #endregion

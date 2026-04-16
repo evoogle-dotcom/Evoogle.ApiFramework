@@ -40,12 +40,12 @@ public sealed class ApiIdentityBuilder<T>(string apiName) : ApiIdentityBuilder(a
     /// <param name="clrProperty">Expression selecting the scalar property on <typeparamref name="T"/>.</param>
     /// <param name="configure">Optional callback to further configure the part builder.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiIdentityBuilder<T> AddScalar<TResult>(
+    public ApiIdentityBuilder<T> AddScalarPart<TResult>(
         Expression<Func<T, TResult>> clrProperty,
         Action<ApiIdentityPartBuilder>? configure = null)
     {
         var clrName = StaticReflection.GetMemberName(clrProperty);
-        base.AddScalar(clrName, configure);
+        base.AddScalarPart(clrName, configure);
         return this;
     }
 
@@ -58,13 +58,13 @@ public sealed class ApiIdentityBuilder<T>(string apiName) : ApiIdentityBuilder(a
     /// <param name="clrScalarTypeHint">The CLR type to use when extracting the scalar value, overriding the property's inferred type.</param>
     /// <param name="configure">Optional callback to further configure the part builder.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiIdentityBuilder<T> AddScalar<TResult>(
+    public ApiIdentityBuilder<T> AddScalarPart<TResult>(
         Expression<Func<T, TResult>> clrProperty,
         Type clrScalarTypeHint,
         Action<ApiIdentityPartBuilder>? configure = null)
     {
         var clrName = StaticReflection.GetMemberName(clrProperty);
-        base.AddScalar(clrName, clrScalarTypeHint, configure);
+        base.AddScalarPart(clrName, clrScalarTypeHint, configure);
         return this;
     }
 
@@ -76,12 +76,12 @@ public sealed class ApiIdentityBuilder<T>(string apiName) : ApiIdentityBuilder(a
     /// <param name="clrProperty">Expression selecting the nested object property on <typeparamref name="T"/>.</param>
     /// <param name="configure">Optional callback to further configure the part builder.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiIdentityBuilder<T> AddNested<TResult>(
+    public ApiIdentityBuilder<T> AddNestedPart<TResult>(
         Expression<Func<T, TResult>> clrProperty,
         Action<ApiIdentityPartBuilder>? configure = null)
     {
         var clrName = StaticReflection.GetMemberName(clrProperty);
-        base.AddNested(clrName, configure);
+        base.AddNestedPart(clrName, configure);
         return this;
     }
 
@@ -94,27 +94,27 @@ public sealed class ApiIdentityBuilder<T>(string apiName) : ApiIdentityBuilder(a
     /// <param name="apiIdentityName">The explicit name of the identity to use on the nested object type.</param>
     /// <param name="configure">Optional callback to further configure the part builder.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiIdentityBuilder<T> AddNested<TResult>(
+    public ApiIdentityBuilder<T> AddNestedPart<TResult>(
         Expression<Func<T, TResult>> clrProperty,
         string apiIdentityName,
         Action<ApiIdentityPartBuilder>? configure = null)
     {
         var clrName = StaticReflection.GetMemberName(clrProperty);
-        base.AddNested(clrName, apiIdentityName, configure);
+        base.AddNestedPart(clrName, apiIdentityName, configure);
         return this;
     }
 
-    /// <inheritdoc cref="ApiIdentityBuilder.AddOwner(Action{ApiIdentityPartBuilder}?)"/>
-    public new ApiIdentityBuilder<T> AddOwner(Action<ApiIdentityPartBuilder>? configure = null)
+    /// <inheritdoc cref="ApiIdentityBuilder.AddOwnerPart(Action{ApiIdentityPartBuilder}?)"/>
+    public new ApiIdentityBuilder<T> AddOwnerPart(Action<ApiIdentityPartBuilder>? configure = null)
     {
-        base.AddOwner(configure);
+        base.AddOwnerPart(configure);
         return this;
     }
 
-    /// <inheritdoc cref="ApiIdentityBuilder.AddOwner(string, Action{ApiIdentityPartBuilder}?)"/>
-    public new ApiIdentityBuilder<T> AddOwner(string apiIdentityName, Action<ApiIdentityPartBuilder>? configure = null)
+    /// <inheritdoc cref="ApiIdentityBuilder.AddOwnerPart(string, Action{ApiIdentityPartBuilder}?)"/>
+    public new ApiIdentityBuilder<T> AddOwnerPart(string apiIdentityName, Action<ApiIdentityPartBuilder>? configure = null)
     {
-        base.AddOwner(apiIdentityName, configure);
+        base.AddOwnerPart(apiIdentityName, configure);
         return this;
     }
     #endregion

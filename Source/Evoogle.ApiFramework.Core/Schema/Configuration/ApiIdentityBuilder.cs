@@ -73,7 +73,7 @@ public class ApiIdentityBuilder(string apiName) : ExtensionBuilder<ApiIdentityBu
     /// <param name="clrPropertyName">The CLR property name of the scalar property.</param>
     /// <param name="configure">Optional callback to further configure the part builder.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiIdentityBuilder AddScalar(string clrPropertyName, Action<ApiIdentityPartBuilder>? configure = null)
+    public ApiIdentityBuilder AddScalarPart(string clrPropertyName, Action<ApiIdentityPartBuilder>? configure = null)
     {
         this.AddPart(ApiIdentityPartKind.Scalar, clrPropertyName, null, null, configure);
         return this;
@@ -84,7 +84,7 @@ public class ApiIdentityBuilder(string apiName) : ExtensionBuilder<ApiIdentityBu
     /// <param name="clrScalarTypeHint">The CLR type to use when extracting the scalar value, overriding the property's inferred type.</param>
     /// <param name="configure">Optional callback to further configure the part builder.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiIdentityBuilder AddScalar(string clrPropertyName, Type clrScalarTypeHint, Action<ApiIdentityPartBuilder>? configure = null)
+    public ApiIdentityBuilder AddScalarPart(string clrPropertyName, Type clrScalarTypeHint, Action<ApiIdentityPartBuilder>? configure = null)
     {
         this.AddPart(ApiIdentityPartKind.Scalar, clrPropertyName, null, clrScalarTypeHint, configure);
         return this;
@@ -94,7 +94,7 @@ public class ApiIdentityBuilder(string apiName) : ExtensionBuilder<ApiIdentityBu
     /// <param name="clrPropertyName">The CLR property name of the nested object.</param>
     /// <param name="configure">Optional callback to further configure the part builder.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiIdentityBuilder AddNested(string clrPropertyName, Action<ApiIdentityPartBuilder>? configure = null)
+    public ApiIdentityBuilder AddNestedPart(string clrPropertyName, Action<ApiIdentityPartBuilder>? configure = null)
     {
         this.AddPart(ApiIdentityPartKind.Nested, clrPropertyName, null, null, configure);
         return this;
@@ -105,7 +105,7 @@ public class ApiIdentityBuilder(string apiName) : ExtensionBuilder<ApiIdentityBu
     /// <param name="apiIdentityName">The explicit name of the identity to use on the nested object type.</param>
     /// <param name="configure">Optional callback to further configure the part builder.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiIdentityBuilder AddNested(string clrPropertyName, string apiIdentityName, Action<ApiIdentityPartBuilder>? configure = null)
+    public ApiIdentityBuilder AddNestedPart(string clrPropertyName, string apiIdentityName, Action<ApiIdentityPartBuilder>? configure = null)
     {
         this.AddPart(ApiIdentityPartKind.Nested, clrPropertyName, apiIdentityName, null, configure);
         return this;
@@ -114,7 +114,7 @@ public class ApiIdentityBuilder(string apiName) : ExtensionBuilder<ApiIdentityBu
     /// <summary>Adds an owner identity part sourced from the primary identity of the owning object.</summary>
     /// <param name="configure">Optional callback to further configure the part builder.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiIdentityBuilder AddOwner(Action<ApiIdentityPartBuilder>? configure = null)
+    public ApiIdentityBuilder AddOwnerPart(Action<ApiIdentityPartBuilder>? configure = null)
     {
         this.AddPart(ApiIdentityPartKind.Owner, null, null, null, configure);
         return this;
@@ -124,7 +124,7 @@ public class ApiIdentityBuilder(string apiName) : ExtensionBuilder<ApiIdentityBu
     /// <param name="apiIdentityName">The explicit name of the identity to use on the owner object type.</param>
     /// <param name="configure">Optional callback to further configure the part builder.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiIdentityBuilder AddOwner(string apiIdentityName, Action<ApiIdentityPartBuilder>? configure = null)
+    public ApiIdentityBuilder AddOwnerPart(string apiIdentityName, Action<ApiIdentityPartBuilder>? configure = null)
     {
         this.AddPart(ApiIdentityPartKind.Owner, null, apiIdentityName, null, configure);
         return this;
