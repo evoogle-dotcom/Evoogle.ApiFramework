@@ -257,6 +257,31 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     }
 
     /// <summary>
+    ///     Adds a one-to-one relationship to the schema with <typeparamref name="TPrincipal"/> as the principal type
+    ///     and <typeparamref name="TDependent"/> as the dependent type.
+    ///     <typeparamref name="TPrincipal"/> is wired as the principal end automatically; use the full
+    ///     <see cref="AddOneToOneRelationship(string,Action{ApiRelationshipOneToOneBuilder})"/> overload when you
+    ///     need to override the join identity or delete behavior on the principal end.
+    /// </summary>
+    /// <typeparam name="TPrincipal">The CLR type of the principal object.</typeparam>
+    /// <typeparam name="TDependent">The CLR type of the dependent object.</typeparam>
+    /// <param name="apiName">The schema-unique API name of the relationship.</param>
+    /// <param name="configure">Optional callback to configure FK key paths and delete behavior on the dependent end.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiSchemaBuilder AddOneToOneRelationship<TPrincipal, TDependent>(
+        string apiName,
+        Action<ApiRelationshipDependentEndBuilder<TDependent>>? configure = null)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
+
+        var builder = _context.GetOrAddOneToOneRelationshipBuilder(apiName);
+
+        builder.WithPrincipalEnd<TPrincipal>();
+        builder.WithDependentEnd<TDependent>(configure);
+        return this;
+    }
+
+    /// <summary>
     ///     Adds a one-to-one relationship to the schema using an <see cref="IApiRelationshipOneToOneConfiguration"/>.
     /// </summary>
     /// <param name="apiName">The schema-unique API name of the relationship.</param>
@@ -287,6 +312,31 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
         var builder = _context.GetOrAddOneToManyRelationshipBuilder(apiName);
 
         configure(builder);
+        return this;
+    }
+
+    /// <summary>
+    ///     Adds a one-to-many relationship to the schema with <typeparamref name="TPrincipal"/> as the principal type
+    ///     and <typeparamref name="TDependent"/> as the dependent type.
+    ///     <typeparamref name="TPrincipal"/> is wired as the principal end automatically; use the full
+    ///     <see cref="AddOneToManyRelationship(string,Action{ApiRelationshipOneToManyBuilder})"/> overload when you
+    ///     need to override the join identity or delete behavior on the principal end.
+    /// </summary>
+    /// <typeparam name="TPrincipal">The CLR type of the principal object.</typeparam>
+    /// <typeparam name="TDependent">The CLR type of the dependent object.</typeparam>
+    /// <param name="apiName">The schema-unique API name of the relationship.</param>
+    /// <param name="configure">Optional callback to configure FK key paths and delete behavior on the dependent end.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiSchemaBuilder AddOneToManyRelationship<TPrincipal, TDependent>(
+        string apiName,
+        Action<ApiRelationshipDependentEndBuilder<TDependent>>? configure = null)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
+
+        var builder = _context.GetOrAddOneToManyRelationshipBuilder(apiName);
+
+        builder.WithPrincipalEnd<TPrincipal>();
+        builder.WithDependentEnd<TDependent>(configure);
         return this;
     }
 
