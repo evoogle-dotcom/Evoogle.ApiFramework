@@ -33,17 +33,15 @@ public sealed class ApiObjectTypeBuilder<T>(ApiSchemaBuilderContext context)
     #endregion
 
     #region AddIdentity Methods
-    /// <inheritdoc cref="ApiObjectTypeBuilder.AddIdentity"/>
-    public new ApiObjectTypeBuilder<T> AddIdentity(string apiName, Action<ApiIdentityBuilder>? configure = null)
-    {
-        base.AddIdentity(apiName, configure);
-        return this;
-    }
-
     /// <summary>
     ///     Adds an <see cref="ApiIdentity"/> definition using a strongly-typed <see cref="ApiIdentityBuilder{T}"/>
     ///     callback that supports expression-based property selection.
     /// </summary>
+    /// <remarks>
+    ///     The first identity added is the primary identity by convention unless specified otherwise.
+    ///     To configure with string-based property names instead, use the non-generic
+    ///     <see cref="ApiObjectTypeBuilder.AddIdentity"/> overload on the base class.
+    /// </remarks>
     /// <param name="apiName">The API name of the identity.</param>
     /// <param name="configure">Optional callback to configure the identity using a typed builder.</param>
     /// <returns>The current builder instance.</returns>

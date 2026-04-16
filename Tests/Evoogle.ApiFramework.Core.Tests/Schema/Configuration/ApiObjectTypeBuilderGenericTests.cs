@@ -122,7 +122,7 @@ public class ApiObjectTypeBuilderGenericTests(ITestOutputHelper output) : XUnitT
                 .WithName("Customer")
                 .AddProperty(c => c.Id)
                 .AddProperty(c => c.Name)
-                .AddIdentity("PK_Customer", (ApiIdentityBuilder<Customer> b) => b.AddScalar(c => c.Id, typeof(string)));
+                .AddIdentity("PK_Customer", b => b.AddScalar(c => c.Id, typeof(string)));
         }
     }
     #endregion
@@ -194,7 +194,7 @@ public class ApiObjectTypeBuilderGenericTests(ITestOutputHelper output) : XUnitT
                 return new ApiObjectTypeBuilder<Customer>(ctx)
                     .WithName("Customer")
                     .AddProperty(c => c.Id)
-                    .AddIdentity("PK_Customer", (ApiIdentityBuilder<Customer> b) => b.AddScalar(c => c.Id))
+                    .AddIdentity("PK_Customer", b => b.AddScalar(c => c.Id))
                     .Build();
             }
         },
@@ -217,7 +217,7 @@ public class ApiObjectTypeBuilderGenericTests(ITestOutputHelper output) : XUnitT
                 return new ApiObjectTypeBuilder<Customer>(ctx)
                     .WithName("Customer")
                     .AddProperty(c => c.Id)
-                    .AddIdentity("PK_Customer", (ApiIdentityBuilder<Customer> b) => b.AddScalar(c => c.Id, typeof(string)))
+                    .AddIdentity("PK_Customer", b => b.AddScalar(c => c.Id, typeof(string)))
                     .Build();
             }
         },
