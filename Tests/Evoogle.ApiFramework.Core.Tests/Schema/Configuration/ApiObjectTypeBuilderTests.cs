@@ -285,6 +285,48 @@ public class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
         #endregion
     }
 
+    private class AddNamedModifierPropertyTest : XUnitTest
+    {
+        #region User Supplied Properties
+        public required string PropertyName { get; init; }
+        public required Func<string, ApiObjectType> BuildExpected { get; init; }
+        public required Func<string, ApiObjectType> BuildActual { get; init; }
+        #endregion
+
+        #region Calculated Properties
+        private ApiObjectType? Expected { get; set; }
+        private ApiObjectType? Actual { get; set; }
+        #endregion
+
+        #region Constructors
+        public AddNamedModifierPropertyTest()
+        {
+            this.Name = nameof(AddNamedModifierPropertyTest);
+            this.ExcludeMembers = ApiSchemaExcludeMembers.Standard;
+        }
+        #endregion
+
+        #region XUnitTest Methods
+        protected override void Arrange()
+        {
+            this.Expected = this.BuildExpected(this.PropertyName);
+            this.WriteLine($"Expected: {this.Expected.SafeToString()}");
+        }
+
+        protected override void Act()
+        {
+            this.Actual = this.BuildActual(this.PropertyName);
+            this.WriteLine($"Actual:   {this.Actual.SafeToString()}");
+        }
+
+        protected override void Assert()
+        {
+            this.Actual.Should().NotBeNull();
+            this.AssertBeEquivalentTo(this.Actual, this.Expected);
+        }
+        #endregion
+    }
+
     #region Theory Data
     public static TheoryDataRow<IXUnitTest>[] AddPropertySingleNameTheoryData =>
     [
@@ -296,6 +338,98 @@ public class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
         new AddPropertySingleNameTest
         {
             Name = "AddProperty(name) is equivalent to AddProperty(name, name) for an optional property",
+            PropertyName = nameof(ScalarsOnly.OptionalName),
+        },
+    ];
+
+    public static TheoryDataRow<IXUnitTest>[] AddRequiredPropertyTheoryData =>
+    [
+        new AddNamedModifierPropertyTest
+        {
+            Name = "AddRequiredProperty(name) produces same result as AddProperty(name, p => p.AsRequired())",
+            BuildExpected = static name =>
+            {
+                var ctx = new ApiSchemaBuilderContext();
+                return new ApiObjectTypeBuilder(typeof(ScalarsOnly), ctx)
+                    .WithName(nameof(ScalarsOnly))
+                    .AddProperty(name, p => p.AsRequired())
+                    .Build();
+            },
+            BuildActual = static name =>
+            {
+                var ctx = new ApiSchemaBuilderContext();
+                return new ApiObjectTypeBuilder(typeof(ScalarsOnly), ctx)
+                    .WithName(nameof(ScalarsOnly))
+                    .AddRequiredProperty(name)
+                    .Build();
+            },
+            PropertyName = nameof(ScalarsOnly.RequiredName),
+        },
+        new AddNamedModifierPropertyTest
+        {
+            Name = "AddRequiredProperty(apiName, clrName) produces same result as AddProperty(apiName, clrName, p => p.AsRequired())",
+            BuildExpected = static name =>
+            {
+                var ctx = new ApiSchemaBuilderContext();
+                return new ApiObjectTypeBuilder(typeof(ScalarsOnly), ctx)
+                    .WithName(nameof(ScalarsOnly))
+                    .AddProperty(name, name, p => p.AsRequired())
+                    .Build();
+            },
+            BuildActual = static name =>
+            {
+                var ctx = new ApiSchemaBuilderContext();
+                return new ApiObjectTypeBuilder(typeof(ScalarsOnly), ctx)
+                    .WithName(nameof(ScalarsOnly))
+                    .AddRequiredProperty(name, name)
+                    .Build();
+            },
+            PropertyName = nameof(ScalarsOnly.RequiredName),
+        },
+    ];
+
+    public static TheoryDataRow<IXUnitTest>[] AddOptionalPropertyTheoryData =>
+    [
+        new AddNamedModifierPropertyTest
+        {
+            Name = "AddOptionalProperty(name) produces same result as AddProperty(name, p => p.AsOptional())",
+            BuildExpected = static name =>
+            {
+                var ctx = new ApiSchemaBuilderContext();
+                return new ApiObjectTypeBuilder(typeof(ScalarsOnly), ctx)
+                    .WithName(nameof(ScalarsOnly))
+                    .AddProperty(name, p => p.AsOptional())
+                    .Build();
+            },
+            BuildActual = static name =>
+            {
+                var ctx = new ApiSchemaBuilderContext();
+                return new ApiObjectTypeBuilder(typeof(ScalarsOnly), ctx)
+                    .WithName(nameof(ScalarsOnly))
+                    .AddOptionalProperty(name)
+                    .Build();
+            },
+            PropertyName = nameof(ScalarsOnly.OptionalName),
+        },
+        new AddNamedModifierPropertyTest
+        {
+            Name = "AddOptionalProperty(apiName, clrName) produces same result as AddProperty(apiName, clrName, p => p.AsOptional())",
+            BuildExpected = static name =>
+            {
+                var ctx = new ApiSchemaBuilderContext();
+                return new ApiObjectTypeBuilder(typeof(ScalarsOnly), ctx)
+                    .WithName(nameof(ScalarsOnly))
+                    .AddProperty(name, name, p => p.AsOptional())
+                    .Build();
+            },
+            BuildActual = static name =>
+            {
+                var ctx = new ApiSchemaBuilderContext();
+                return new ApiObjectTypeBuilder(typeof(ScalarsOnly), ctx)
+                    .WithName(nameof(ScalarsOnly))
+                    .AddOptionalProperty(name, name)
+                    .Build();
+            },
             PropertyName = nameof(ScalarsOnly.OptionalName),
         },
     ];
@@ -378,6 +512,14 @@ public class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
     [Theory]
     [MemberData(nameof(AddPropertySingleNameTheoryData))]
     public void AddPropertySingleName(IXUnitTest test) => test.Execute(this);
+
+    [Theory]
+    [MemberData(nameof(AddRequiredPropertyTheoryData))]
+    public void AddRequiredProperty(IXUnitTest test) => test.Execute(this);
+
+    [Theory]
+    [MemberData(nameof(AddOptionalPropertyTheoryData))]
+    public void AddOptionalProperty(IXUnitTest test) => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(AddIdentityNullConfigureTheoryData))]

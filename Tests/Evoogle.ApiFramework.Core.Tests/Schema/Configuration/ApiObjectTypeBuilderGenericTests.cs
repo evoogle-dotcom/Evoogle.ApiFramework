@@ -349,6 +349,69 @@ public class ApiObjectTypeBuilderGenericTests(ITestOutputHelper output) : XUnitT
                     .Build();
             }
         },
+
+        new BuildObjectTypeTest
+        {
+            Name = "ApiObjectTypeBuilder<Customer> AddRequiredProperty(expr) marks property as required",
+            BuildExpected = static () =>
+            {
+                var ctx = new ApiSchemaBuilderContext();
+                return new ApiObjectTypeBuilder(typeof(Customer), ctx)
+                    .WithName("Customer")
+                    .AddProperty("Id", "Id", p => p.AsRequired())
+                    .Build();
+            },
+            BuildActual = static () =>
+            {
+                var ctx = new ApiSchemaBuilderContext();
+                return new ApiObjectTypeBuilder<Customer>(ctx)
+                    .WithName("Customer")
+                    .AddRequiredProperty(c => c.Id)
+                    .Build();
+            }
+        },
+
+        new BuildObjectTypeTest
+        {
+            Name = "ApiObjectTypeBuilder<Customer> AddOptionalProperty(expr) marks property as optional",
+            BuildExpected = static () =>
+            {
+                var ctx = new ApiSchemaBuilderContext();
+                return new ApiObjectTypeBuilder(typeof(Customer), ctx)
+                    .WithName("Customer")
+                    .AddProperty("Email", "Email", p => p.AsOptional())
+                    .Build();
+            },
+            BuildActual = static () =>
+            {
+                var ctx = new ApiSchemaBuilderContext();
+                return new ApiObjectTypeBuilder<Customer>(ctx)
+                    .WithName("Customer")
+                    .AddOptionalProperty(c => c.Email)
+                    .Build();
+            }
+        },
+
+        new BuildObjectTypeTest
+        {
+            Name = "ApiObjectTypeBuilder<Customer> AddRequiredProperty(expr, configure) applies required then threads configure callback",
+            BuildExpected = static () =>
+            {
+                var ctx = new ApiSchemaBuilderContext();
+                return new ApiObjectTypeBuilder(typeof(Customer), ctx)
+                    .WithName("Customer")
+                    .AddProperty("Name", "Name", p => p.AsRequired().WithModifiers(m => m.Required()))
+                    .Build();
+            },
+            BuildActual = static () =>
+            {
+                var ctx = new ApiSchemaBuilderContext();
+                return new ApiObjectTypeBuilder<Customer>(ctx)
+                    .WithName("Customer")
+                    .AddRequiredProperty(c => c.Name, p => p.WithModifiers(m => m.Required()))
+                    .Build();
+            }
+        },
     ];
 
     public static TheoryDataRow<IXUnitTest>[] BuildIdentityTheoryData =>

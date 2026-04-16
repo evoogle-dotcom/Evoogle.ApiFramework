@@ -349,10 +349,10 @@ public static class Dummy
                 .AddIdentity("AlternateKey", b => b
                     .AddNestedPart(c => c.Country)
                     .AddScalarPart(c => c.Name))
-                .AddProperty(c => c.Id, p => p.WithModifiers(m => m.Required()))
-                .AddProperty(c => c.Name, p => p.WithModifiers(m => m.Required()))
-                .AddProperty(c => c.Email, p => p.WithModifiers(m => m.Optional()))
-                .AddProperty(c => c.Orders, p => p.WithModifiers(m => m.Required()));
+                .AddRequiredProperty(c => c.Id)
+                .AddRequiredProperty(c => c.Name)
+                .AddOptionalProperty(c => c.Email)
+                .AddRequiredProperty(c => c.Orders);
         }
     }
 

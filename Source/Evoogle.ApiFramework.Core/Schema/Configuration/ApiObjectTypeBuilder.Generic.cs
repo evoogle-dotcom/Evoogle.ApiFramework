@@ -98,49 +98,70 @@ public sealed class ApiObjectTypeBuilder<T>(ApiSchemaBuilderContext context)
         return this;
     }
 
-    /// <summary>
-    ///     Adds an <see cref="ApiProperty"/> definition, deriving the CLR name from <paramref name="clrProperty"/>
-    ///     and using it as the API name as well, and explicitly overrides the CLR nullability-inferred
-    ///     required/optional modifier.
-    /// </summary>
-    /// <typeparam name="TResult">The property return type.</typeparam>
-    /// <param name="clrProperty">Expression selecting the property on <typeparamref name="T"/>.</param>
-    /// <param name="required"><see langword="true"/> to mark the property as required; <see langword="false"/> to mark it as optional.</param>
-    /// <param name="configure">Optional callback to further configure the added property.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiObjectTypeBuilder<T> AddProperty<TResult>
-    (
-        Expression<Func<T, TResult>> clrProperty,
-        bool required,
-        Action<ApiPropertyBuilder>? configure = null
-    )
+    #endregion
+
+    #region AddRequiredProperty Methods
+    /// <inheritdoc cref="ApiObjectTypeBuilder.AddRequiredProperty(string, Action{ApiPropertyBuilder}?)"/>
+    public new ApiObjectTypeBuilder<T> AddRequiredProperty(string name, Action<ApiPropertyBuilder>? configure = null)
     {
-        var clrName = StaticReflection.GetMemberName(clrProperty);
-        base.AddProperty(clrName, clrName, required, configure);
+        base.AddRequiredProperty(name, configure);
+        return this;
+    }
+
+    /// <inheritdoc cref="ApiObjectTypeBuilder.AddRequiredProperty(string, string, Action{ApiPropertyBuilder}?)"/>
+    public new ApiObjectTypeBuilder<T> AddRequiredProperty(string apiName, string clrName, Action<ApiPropertyBuilder>? configure = null)
+    {
+        base.AddRequiredProperty(apiName, clrName, configure);
         return this;
     }
 
     /// <summary>
-    ///     Adds an <see cref="ApiProperty"/> definition, deriving the CLR name from <paramref name="clrProperty"/>
-    ///     and using the explicitly supplied <paramref name="apiName"/> for the API surface, and explicitly
-    ///     overrides the CLR nullability-inferred required/optional modifier.
+    ///     Adds an <see cref="ApiProperty"/> definition marked as required, deriving the CLR name from
+    ///     <paramref name="clrProperty"/> and using it as the API name as well.
     /// </summary>
     /// <typeparam name="TResult">The property return type.</typeparam>
     /// <param name="clrProperty">Expression selecting the property on <typeparamref name="T"/>.</param>
-    /// <param name="apiName">The API property name to expose.</param>
-    /// <param name="required"><see langword="true"/> to mark the property as required; <see langword="false"/> to mark it as optional.</param>
     /// <param name="configure">Optional callback to further configure the added property.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiObjectTypeBuilder<T> AddProperty<TResult>
-    (
+    public ApiObjectTypeBuilder<T> AddRequiredProperty<TResult>(
         Expression<Func<T, TResult>> clrProperty,
-        string apiName,
-        bool required,
-        Action<ApiPropertyBuilder>? configure = null
-    )
+        Action<ApiPropertyBuilder>? configure = null)
     {
         var clrName = StaticReflection.GetMemberName(clrProperty);
-        base.AddProperty(apiName, clrName, required, configure);
+        base.AddRequiredProperty(clrName, configure);
+        return this;
+    }
+    #endregion
+
+    #region AddOptionalProperty Methods
+    /// <inheritdoc cref="ApiObjectTypeBuilder.AddOptionalProperty(string, Action{ApiPropertyBuilder}?)"/>
+    public new ApiObjectTypeBuilder<T> AddOptionalProperty(string name, Action<ApiPropertyBuilder>? configure = null)
+    {
+        base.AddOptionalProperty(name, configure);
+        return this;
+    }
+
+    /// <inheritdoc cref="ApiObjectTypeBuilder.AddOptionalProperty(string, string, Action{ApiPropertyBuilder}?)"/>
+    public new ApiObjectTypeBuilder<T> AddOptionalProperty(string apiName, string clrName, Action<ApiPropertyBuilder>? configure = null)
+    {
+        base.AddOptionalProperty(apiName, clrName, configure);
+        return this;
+    }
+
+    /// <summary>
+    ///     Adds an <see cref="ApiProperty"/> definition marked as optional, deriving the CLR name from
+    ///     <paramref name="clrProperty"/> and using it as the API name as well.
+    /// </summary>
+    /// <typeparam name="TResult">The property return type.</typeparam>
+    /// <param name="clrProperty">Expression selecting the property on <typeparamref name="T"/>.</param>
+    /// <param name="configure">Optional callback to further configure the added property.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiObjectTypeBuilder<T> AddOptionalProperty<TResult>(
+        Expression<Func<T, TResult>> clrProperty,
+        Action<ApiPropertyBuilder>? configure = null)
+    {
+        var clrName = StaticReflection.GetMemberName(clrProperty);
+        base.AddOptionalProperty(clrName, configure);
         return this;
     }
     #endregion

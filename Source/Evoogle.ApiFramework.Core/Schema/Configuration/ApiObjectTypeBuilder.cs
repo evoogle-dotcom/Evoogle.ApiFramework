@@ -95,47 +95,57 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
         return this;
     }
 
+    #endregion
+
+    #region AddRequiredProperty Methods
     /// <summary>
-    ///     Adds an <see cref="ApiProperty"/> definition to the object type, using <paramref name="name"/> as both
-    ///     the API name and the CLR property name, and explicitly overrides the CLR nullability-inferred
-    ///     required/optional modifier.
+    ///     Adds an <see cref="ApiProperty"/> definition to the object type marked as required,
+    ///     using <paramref name="name"/> as both the API name and the CLR property name.
     /// </summary>
     /// <param name="name">The API and CLR property name.</param>
-    /// <param name="required"><see langword="true"/> to mark the property as required; <see langword="false"/> to mark it as optional.</param>
     /// <param name="configure">Optional callback to further configure the added property.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiObjectTypeBuilder AddProperty(string name, bool required, Action<ApiPropertyBuilder>? configure = null)
+    public ApiObjectTypeBuilder AddRequiredProperty(string name, Action<ApiPropertyBuilder>? configure = null)
     {
-        return this.AddProperty(name, name, required, configure);
+        return this.AddProperty(name, name, b => { b.AsRequired(); configure?.Invoke(b); });
     }
 
     /// <summary>
-    ///     Adds an <see cref="ApiProperty"/> definition to the object type and explicitly overrides the
-    ///     CLR nullability-inferred required/optional modifier.
+    ///     Adds an <see cref="ApiProperty"/> definition to the object type marked as required.
     /// </summary>
     /// <param name="apiName">The API property name.</param>
     /// <param name="clrName">The CLR property name.</param>
-    /// <param name="required"><see langword="true"/> to mark the property as required; <see langword="false"/> to mark it as optional.</param>
     /// <param name="configure">Optional callback to further configure the added property.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiObjectTypeBuilder AddProperty(string apiName, string clrName, bool required, Action<ApiPropertyBuilder>? configure = null)
+    public ApiObjectTypeBuilder AddRequiredProperty(string apiName, string clrName, Action<ApiPropertyBuilder>? configure = null)
     {
-        var apiPropertyBuilder = new ApiPropertyBuilder(apiName, clrName);
+        return this.AddProperty(apiName, clrName, b => { b.AsRequired(); configure?.Invoke(b); });
+    }
+    #endregion
 
-        if (required)
-        {
-            apiPropertyBuilder.AsRequired();
-        }
-        else
-        {
-            apiPropertyBuilder.AsOptional();
-        }
+    #region AddOptionalProperty Methods
+    /// <summary>
+    ///     Adds an <see cref="ApiProperty"/> definition to the object type marked as optional,
+    ///     using <paramref name="name"/> as both the API name and the CLR property name.
+    /// </summary>
+    /// <param name="name">The API and CLR property name.</param>
+    /// <param name="configure">Optional callback to further configure the added property.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiObjectTypeBuilder AddOptionalProperty(string name, Action<ApiPropertyBuilder>? configure = null)
+    {
+        return this.AddProperty(name, name, b => { b.AsOptional(); configure?.Invoke(b); });
+    }
 
-        configure?.Invoke(apiPropertyBuilder);
-
-        _apiPropertyBuilders.Add(apiPropertyBuilder);
-
-        return this;
+    /// <summary>
+    ///     Adds an <see cref="ApiProperty"/> definition to the object type marked as optional.
+    /// </summary>
+    /// <param name="apiName">The API property name.</param>
+    /// <param name="clrName">The CLR property name.</param>
+    /// <param name="configure">Optional callback to further configure the added property.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiObjectTypeBuilder AddOptionalProperty(string apiName, string clrName, Action<ApiPropertyBuilder>? configure = null)
+    {
+        return this.AddProperty(apiName, clrName, b => { b.AsOptional(); configure?.Invoke(b); });
     }
     #endregion
 
