@@ -52,7 +52,7 @@ public class ApiIdentityBuilder(string apiName) : ExtensionBuilder<ApiIdentityBu
     /// <param name="clrScalarTypeHint">Optional CLR type hint for scalar parts.</param>
     /// <param name="configure">Optional callback to further configure the part builder.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiIdentityBuilder AddPart
+    protected ApiIdentityBuilder AddPart
     (
         ApiIdentityPartKind apiKind,
         string? clrPropertyName,

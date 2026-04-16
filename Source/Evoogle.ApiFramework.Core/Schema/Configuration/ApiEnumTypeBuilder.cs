@@ -53,6 +53,18 @@ public class ApiEnumTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
         _values.Add(new ApiEnumValue(apiName, clrName, clrOrdinal));
         return this;
     }
+
+    /// <summary>
+    ///     Adds an <see cref="ApiEnumValue"/> definition using <paramref name="name"/> as both the API name
+    ///     and the CLR name of the enumeration value.
+    /// </summary>
+    /// <param name="name">The API and CLR name of the enumeration value.</param>
+    /// <param name="clrOrdinal">The CLR ordinal of the enumeration value.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiEnumTypeBuilder AddValue(string name, int clrOrdinal)
+    {
+        return this.AddValue(name, name, clrOrdinal);
+    }
     #endregion
 
     #region Build Methods

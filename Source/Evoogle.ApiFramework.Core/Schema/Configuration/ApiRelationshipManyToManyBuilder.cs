@@ -28,17 +28,6 @@ public class ApiRelationshipManyToManyBuilder(string apiName) : ApiRelationshipB
     #region With Methods
     /// <summary>
     ///     Sets the CLR type of the association <see cref="ApiObjectType"/> that bridges both sides of the relationship.
-    ///     Returns a new <see cref="ApiRelationshipManyToManyBuilder{TAssociation}"/> instance so that subsequent
-    ///     calls to <see cref="ApiRelationshipManyToManyBuilder{TAssociation}.WithDependentEndA"/> and
-    ///     <see cref="ApiRelationshipManyToManyBuilder{TAssociation}.WithDependentEndB"/> require no explicit type argument.
-    /// </summary>
-    /// <typeparam name="TAssociation">The CLR type of the association object.</typeparam>
-    /// <returns>A new typed builder instance carrying the association CLR type.</returns>
-    public ApiRelationshipManyToManyBuilder<TAssociation> WithAssociationType<TAssociation>()
-        => new(this.ApiName);
-
-    /// <summary>
-    ///     Sets the CLR type of the association <see cref="ApiObjectType"/> that bridges both sides of the relationship.
     /// </summary>
     /// <param name="clrType">The CLR type of the association object.</param>
     /// <returns>The current builder instance.</returns>

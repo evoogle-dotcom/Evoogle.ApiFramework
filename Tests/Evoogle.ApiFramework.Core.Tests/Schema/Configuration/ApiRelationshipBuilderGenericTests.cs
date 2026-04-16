@@ -117,8 +117,7 @@ public class ApiRelationshipBuilderGenericTests(ITestOutputHelper output) : XUni
             Name = "ApiRelationshipManyToManyBuilder typed WithPrincipalEndA<Customer> and WithDependentEndA with AddScalarPath(expr)",
             BuildExpected = static () =>
             {
-                return new ApiRelationshipManyToManyBuilder("REL_Customer_Order_NtoN")
-                    .WithAssociationType<OrderLine>()
+                return new ApiRelationshipManyToManyBuilder<OrderLine>("REL_Customer_Order_NtoN")
                     .WithPrincipalEndA<Customer>()
                     .WithPrincipalEndB<Order>()
                     .WithDependentEndA(b => b.AddScalarPath(ol => ol.OrderId))
@@ -127,8 +126,7 @@ public class ApiRelationshipBuilderGenericTests(ITestOutputHelper output) : XUni
             },
             BuildActual = static () =>
             {
-                return new ApiRelationshipManyToManyBuilder("REL_Customer_Order_NtoN")
-                    .WithAssociationType<OrderLine>()
+                return new ApiRelationshipManyToManyBuilder<OrderLine>("REL_Customer_Order_NtoN")
                     .WithPrincipalEndA<Customer>()
                     .WithPrincipalEndB<Order>()
                     .WithDependentEndA(b => b.AddScalarPath(ol => ol.OrderId))
@@ -207,8 +205,7 @@ public class ApiRelationshipBuilderGenericTests(ITestOutputHelper output) : XUni
             Name = "ApiRelationshipManyToManyBuilder WithDependentEndA and WithDependentEndB resolve independent CLR types",
             BuildExpected = static () =>
             {
-                return new ApiRelationshipManyToManyBuilder("REL_Customer_Order_NtoN_Ends")
-                    .WithAssociationType<OrderLine>()
+                return new ApiRelationshipManyToManyBuilder<OrderLine>("REL_Customer_Order_NtoN_Ends")
                     .WithPrincipalEndA<Customer>()
                     .WithPrincipalEndB<Order>()
                     .WithDependentEndA(b => b.AddScalarPath(ol => ol.OrderId))
@@ -217,8 +214,7 @@ public class ApiRelationshipBuilderGenericTests(ITestOutputHelper output) : XUni
             },
             BuildActual = static () =>
             {
-                return new ApiRelationshipManyToManyBuilder("REL_Customer_Order_NtoN_Ends")
-                    .WithAssociationType<OrderLine>()
+                return new ApiRelationshipManyToManyBuilder<OrderLine>("REL_Customer_Order_NtoN_Ends")
                     .WithPrincipalEndA<Customer>()
                     .WithPrincipalEndB<Order>()
                     .WithDependentEndA(b => b.AddScalarPath(ol => ol.OrderId))

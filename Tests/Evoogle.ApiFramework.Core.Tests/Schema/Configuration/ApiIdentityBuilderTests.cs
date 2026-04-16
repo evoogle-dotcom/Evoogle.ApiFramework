@@ -81,20 +81,34 @@ public class ApiIdentityBuilderTests(ITestOutputHelper output) : XUnitTests(outp
                 var clrScalarTypeHint = part.ClrScalarTypeHint;
                 var extensionType = part.ExtensionType;
 
-                builder.AddPart
-                (
-                    apiKind,
-                    clrPropertyName,
-                    apiIdentityName,
-                    clrScalarTypeHint,
-                    extensionType != null
-                        ? extensions =>
-                        {
-                            var extension = Activator.CreateInstance(extensionType);
-                            extensions.AddIdentityPartExtension(extensionType, extension!);
-                        }
-                : null
-                );
+                Action<ApiIdentityPartBuilder>? configure = extensionType != null
+                    ? extensions =>
+                    {
+                        var extension = Activator.CreateInstance(extensionType);
+                        extensions.AddIdentityPartExtension(extensionType, extension!);
+                    }
+                    : null;
+                switch (apiKind)
+                {
+                    case ApiIdentityPartKind.Scalar when clrScalarTypeHint != null:
+                        builder.AddScalar(clrPropertyName!, clrScalarTypeHint, configure);
+                        break;
+                    case ApiIdentityPartKind.Scalar:
+                        builder.AddScalar(clrPropertyName!, configure);
+                        break;
+                    case ApiIdentityPartKind.Nested when apiIdentityName != null:
+                        builder.AddNested(clrPropertyName!, apiIdentityName, configure);
+                        break;
+                    case ApiIdentityPartKind.Nested:
+                        builder.AddNested(clrPropertyName!, configure);
+                        break;
+                    case ApiIdentityPartKind.Owner when apiIdentityName != null:
+                        builder.AddOwner(apiIdentityName, configure);
+                        break;
+                    default:
+                        builder.AddOwner(configure);
+                        break;
+                }
             }
 
             if (this.ExtensionType != null)

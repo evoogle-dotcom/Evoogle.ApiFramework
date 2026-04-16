@@ -29,13 +29,6 @@ public sealed class ApiRelationshipManyToManyBuilder<TAssociation>
     #endregion
 
     #region With Methods
-    /// <summary>
-    ///     No-op; the association CLR type is already fixed to <typeparamref name="TAssociation"/> by the constructor.
-    ///     Shadowed to preserve the typed return when called in a fluent chain on a typed builder instance.
-    /// </summary>
-    public new ApiRelationshipManyToManyBuilder<TAssociation> WithAssociationType<T>()
-        => this;
-
     /// <inheritdoc cref="ApiRelationshipManyToManyBuilder.WithPrincipalEndA{TPrincipal}"/>
     public new ApiRelationshipManyToManyBuilder<TAssociation> WithPrincipalEndA<TPrincipal>(Action<ApiRelationshipPrincipalEndBuilder>? configure = null)
     {

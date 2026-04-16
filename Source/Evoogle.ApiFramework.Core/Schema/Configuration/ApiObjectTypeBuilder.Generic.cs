@@ -52,6 +52,13 @@ public sealed class ApiObjectTypeBuilder<T>(ApiSchemaBuilderContext context)
         base.AddIdentityBuilderCore(apiIdentityBuilder);
         return this;
     }
+
+    /// <inheritdoc cref="ApiObjectTypeBuilder.AddIdentity(string, Action{ApiIdentityBuilder}?)"/>
+    public new ApiObjectTypeBuilder<T> AddIdentity(string apiName, Action<ApiIdentityBuilder>? configure = null)
+    {
+        base.AddIdentity(apiName, configure);
+        return this;
+    }
     #endregion
 
     #region AddProperty Methods
