@@ -253,7 +253,9 @@ public sealed partial class ApiObjectType
             var code = ApiInitializationCode.API_OBJECT_TYPE_NULL_OR_EMPTY_PROPERTIES;
             var description = $"{nameof(this.ApiProperties)} is null or empty";
 
-            context.AddIssue(path, severity, code, description, remediation: null);
+            var remediation = $"Add at least one {nameof(ApiProperty)} to {nameof(ApiObjectType)}[\"{this.ApiName}\"]";
+
+            context.AddIssue(path, severity, code, description, remediation);
             return;
         }
 

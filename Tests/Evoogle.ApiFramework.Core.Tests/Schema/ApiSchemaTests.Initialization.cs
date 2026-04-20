@@ -872,7 +872,7 @@ public partial class ApiSchemaTests
                 (
                     path: $"{nameof(ApiObjectType)}[\"IdentityScalar\"].{nameof(ApiIdentity)}[\"PK_IdentityScalar\"]",
                     severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.API_IDENTITY_DUPLICATE_PART_API_PROPERTY_NAME,
+                    code: ApiInitializationCode.API_IDENTITY_DUPLICATE_PART_CLR_PROPERTY_NAME,
                     description: $"Duplicate {nameof(ApiIdentityPropertyPart)}.{nameof(ApiIdentityPropertyPart.ClrPropertyName)} values: 'Id'",
                     remediation: $"Verify that each {nameof(ApiIdentityPropertyPart)} has a unique {nameof(ApiIdentityPropertyPart.ClrPropertyName)} value"
                 ),
@@ -2187,7 +2187,7 @@ public partial class ApiSchemaTests
                     severity: ApiInitializationSeverity.Warning,
                     code: ApiInitializationCode.API_OBJECT_TYPE_NULL_OR_EMPTY_PROPERTIES,
                     description: $"{nameof(ApiObjectType.ApiProperties)} is null or empty",
-                    remediation: null
+                    remediation: $"Add at least one {nameof(ApiProperty)} to {nameof(ApiObjectType)}[\"Empty\"]"
                 ),
             ]
         },

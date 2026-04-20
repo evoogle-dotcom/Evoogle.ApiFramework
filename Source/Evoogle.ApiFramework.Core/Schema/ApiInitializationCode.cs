@@ -79,9 +79,9 @@ public enum ApiInitializationCode
 
     #region ApiIdentity Initialization Codes
     /// <summary>
-    ///    Multiple identity parts reference the same property API name, which may cause ambiguity.
+    ///    Multiple identity parts reference the same CLR property name, which may cause ambiguity.
     /// </summary>
-    API_IDENTITY_DUPLICATE_PART_API_PROPERTY_NAME,
+    API_IDENTITY_DUPLICATE_PART_CLR_PROPERTY_NAME,
 
     /// <summary>
     ///     The identity's API name is null, empty, or whitespace.

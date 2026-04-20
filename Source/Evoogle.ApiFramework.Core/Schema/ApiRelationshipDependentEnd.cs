@@ -106,19 +106,10 @@ public sealed class ApiRelationshipDependentEnd
 
         // ApiObjectType is resolved by the base class. Key paths resolve their
         // properties against the dependent object type.
-        if (this.ClrObjectType is null)
+        var apiObjectType = this.ResolvedObjectType;
+        if (apiObjectType is null)
         {
-            return;
-        }
-
-        ApiObjectType apiObjectType;
-        try
-        {
-            apiObjectType = this.ApiObjectType;
-        }
-        catch
-        {
-            // ApiObjectType resolution failed — base already recorded the error.
+            // ClrObjectType is null or failed to resolve — base already recorded the error.
             return;
         }
 

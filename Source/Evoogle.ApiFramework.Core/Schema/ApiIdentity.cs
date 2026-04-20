@@ -114,7 +114,7 @@ public sealed partial class ApiIdentity(string apiName, IEnumerable<ApiIdentityP
             partKeyFilter: x => !string.IsNullOrWhiteSpace(x),
             partKeyPropertyName: nameof(ApiIdentityPropertyPart.ClrPropertyName),
             path: this.ApiPath,
-            duplicatePartCode: ApiInitializationCode.API_IDENTITY_DUPLICATE_PART_API_PROPERTY_NAME,
+            duplicatePartCode: ApiInitializationCode.API_IDENTITY_DUPLICATE_PART_CLR_PROPERTY_NAME,
             context: context
         );
 
