@@ -215,6 +215,11 @@ public sealed class ApiSchema : ExtensibleBase
         // Phase 4: Initialize relationships
         this.InitializeApiRelationships(context);
 
+        // Phase 4a: Resolve owner key paths declared on relationship dependent ends.
+        // This must run after Phase 4 (principal end object types are resolved) but before
+        // Phase 5 (which only populates computed collections and does not depend on this).
+        this.ResolveOwnerRelationshipKeyPaths(context);
+
         // Phase 5: Populate computed relationship end collections on each object type.
         this.PopulateRelationshipEndsOnObjectTypes(context);
 
@@ -399,6 +404,75 @@ public sealed class ApiSchema : ExtensibleBase
         foreach (var apiRelationship in this.ApiRelationships)
         {
             apiRelationship.Initialize(context);
+        }
+    }
+
+    private void ResolveOwnerRelationshipKeyPaths(ApiInitializationContext context)
+    {
+        foreach (var relationship in this.ApiRelationships)
+        {
+            switch (relationship)
+            {
+                case ApiRelationshipOneTo oneTo:
+                    this.ResolveOwnerKeyPathsForEndPair(oneTo.ApiPrincipalEnd, oneTo.ApiDependentEnd, context);
+                    break;
+
+                case ApiRelationshipManyToMany manyToMany:
+                    this.ResolveOwnerKeyPathsForEndPair(manyToMany.ApiPrincipalEndA, manyToMany.ApiDependentEndA, context);
+                    this.ResolveOwnerKeyPathsForEndPair(manyToMany.ApiPrincipalEndB, manyToMany.ApiDependentEndB, context);
+                    break;
+            }
+        }
+    }
+
+    private void ResolveOwnerKeyPathsForEndPair(
+        ApiRelationshipPrincipalEnd? principal,
+        ApiRelationshipDependentEnd? dependent,
+        ApiInitializationContext context)
+    {
+        if (principal is null || dependent is null)
+        {
+            return;
+        }
+
+        if (principal.ClrObjectType is null)
+        {
+            return;
+        }
+
+        // If the principal's object type didn't resolve (error already recorded in Phase 4), skip.
+        if (!this.TryGetObjectTypeByClrType(principal.ClrObjectType, out var principalObjectType))
+        {
+            return;
+        }
+
+        if (dependent.ApiKeyPaths is null || dependent.ApiKeyPaths.Length == 0)
+        {
+            return;
+        }
+
+        WalkKeyPathsForOwnerPaths(dependent.ApiKeyPaths, principalObjectType, context);
+    }
+
+    private static void WalkKeyPathsForOwnerPaths(
+        IEnumerable<ApiRelationshipKeyPath> keyPaths,
+        ApiObjectType principalObjectType,
+        ApiInitializationContext context)
+    {
+        foreach (var keyPath in keyPaths)
+        {
+            switch (keyPath)
+            {
+                case ApiRelationshipOwnerKeyPath ownerKeyPath:
+                    ownerKeyPath.ResolveOwnerType(principalObjectType, context);
+                    break;
+
+                case ApiRelationshipNestedKeyPath nestedKeyPath when nestedKeyPath.ApiKeyPaths.Length > 0:
+                    // The owner is always the principal end regardless of nesting depth — recurse
+                    // with the same principalObjectType rather than the nested object's type.
+                    WalkKeyPathsForOwnerPaths(nestedKeyPath.ApiKeyPaths, principalObjectType, context);
+                    break;
+            }
         }
     }
 

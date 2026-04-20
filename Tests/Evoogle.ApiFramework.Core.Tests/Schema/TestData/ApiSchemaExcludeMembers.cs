@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -85,6 +85,5 @@ public static class ApiSchemaExcludeMembers
         new ExcludeMember(typeof(ApiRelationshipScalarKeyPath), nameof(ApiRelationshipScalarKeyPath.ApiProperty)),
         new ExcludeMember(typeof(ApiRelationshipNestedKeyPath), nameof(ApiRelationshipNestedKeyPath.ApiProperty)),
         new ExcludeMember(typeof(ApiRelationshipNestedKeyPath), nameof(ApiRelationshipNestedKeyPath.ApiObjectType)),
-        new ExcludeMember(typeof(ApiRelationshipOwnerKeyPath), nameof(ApiRelationshipOwnerKeyPath.ApiOwnerType)),
     ];
 }

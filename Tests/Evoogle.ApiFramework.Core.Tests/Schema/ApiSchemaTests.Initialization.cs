@@ -7,6 +7,8 @@ using Evoogle.ApiFramework.TestData;
 using Evoogle.Extensions;
 using Evoogle.XUnit;
 
+using FluentAssertions;
+
 namespace Evoogle.ApiFramework.Schema;
 
 public partial class ApiSchemaTests
@@ -2448,41 +2450,28 @@ public partial class ApiSchemaTests
         // ApiSchema Initialization Tests
         //
 
-        // ApiSchema throws if ApiName is invalid (warning - uses null ClrType scalar type as companion error)
+        // ApiSchema throws if ApiName is invalid
         new InitializeThrowsTest
         {
             Name = $"{nameof(ApiSchema)} Throws If {nameof(ApiSchema.ApiName)} Is Invalid",
             SourceJson = @"
             {
                 ""ApiName"": """",
-                ""ApiScalarTypes"": [
-                    {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""String""
-                    }
-                ],
+                ""ApiScalarTypes"": [],
                 ""ApiEnumTypes"": [],
                 ""ApiObjectTypes"": []
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=2, Errors=1, Warnings=1.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
                 new ApiInitializationIssue
                 (
                     path: $"{nameof(ApiSchema)}",
-                    severity: ApiInitializationSeverity.Warning,
+                    severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_SCHEMA_INVALID_NAME,
                     description: $"{nameof(ApiSchema.ApiName)} must not be null, empty, or whitespace",
                     remediation: $"Specify a valid {nameof(ApiSchema.ApiName)} value"
-                ),
-                new ApiInitializationIssue
-                (
-                    path: $"{nameof(ApiScalarType)}[\"String\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.API_TYPE_NULL_CLR_TYPE,
-                    description: $"{nameof(ApiScalarType.ClrType)} must not be null",
-                    remediation: "Specify a valid ClrType"
-                ),
+                )
             ]
         },
 
@@ -3111,6 +3100,123 @@ public partial class ApiSchemaTests
             ]
         },
     ];
+
+    public static TheoryDataRow<IXUnitTest>[] InitializeOwnerKeyPathThrowsTheoryData
+    {
+        get
+        {
+            //
+            // ApiRelationshipOwnerKeyPath Initialization Tests
+            //
+
+            // Throws when a child key path references a property that does not exist on the owner (principal) type.
+            var badChildPath = new ApiRelationshipScalarKeyPath("NonExistentProp");
+            var ownerKeyPathWithBadChild = new ApiRelationshipOwnerKeyPath([badChildPath]);
+
+            return
+            [
+                new InitializeOwnerKeyPathThrowsTest
+                {
+                    Name = $"{nameof(ApiRelationshipOwnerKeyPath)} Throws If Child Key Path Property Is Unresolved",
+                    OwnerKeyPath = ownerKeyPathWithBadChild,
+                    BuildSchemaAction = () => ApiSchema.Create
+                    (
+                        apiName: $"{nameof(ApiRelationshipOwnerKeyPath)} Throws If Child Key Path Property Is Unresolved",
+                        apiScalarTypes: [new ApiScalarType(nameof(Int32), typeof(int))],
+                        apiEnumTypes: [],
+                        apiObjectTypes:
+                        [
+                            new ApiObjectType(
+                                "OwnerType",
+                                apiOptions: null,
+                                apiIdentities: [new ApiIdentity("PK_OwnerType", [new ApiIdentityScalarPart("Id")])],
+                                apiProperties: [new ApiProperty("Id", ApiTypeExpression.ClrRef<int>(), ApiTypeModifiers.Required, "Id", ClrMemberKind.Property)],
+                                clrObjectType: typeof(OwnerType)),
+                            new ApiObjectType(
+                                "OwnedType",
+                                apiOptions: null,
+                                apiIdentities: null,
+                                apiProperties: [new ApiProperty("Id", ApiTypeExpression.ClrRef<int>(), ApiTypeModifiers.Required, "Id", ClrMemberKind.Property)],
+                                clrObjectType: typeof(OwnedType))
+                        ],
+                        apiRelationships:
+                        [
+                            new ApiRelationshipOneToMany(
+                                "FK_OwnedType_OwnerType",
+                                new ApiRelationshipPrincipalEnd(typeof(OwnerType)),
+                                new ApiRelationshipDependentEnd(typeof(OwnedType), [ownerKeyPathWithBadChild]))
+                        ]
+                    ),
+                    ExpectedIssues =
+                    [
+                        new ApiInitializationIssue
+                        (
+                            path: $"{nameof(ApiObjectType)}[\"OwnerType\"].{nameof(ApiRelationshipScalarKeyPath)}[\"NonExistentProp\"]",
+                            severity: ApiInitializationSeverity.Error,
+                            code: ApiInitializationCode.API_RELATIONSHIP_KEY_PATH_UNRESOLVED_API_PROPERTY,
+                            description: "Property with CLR name 'NonExistentProp' could not be found on object type 'OwnerType'",
+                            remediation: "Verify the CLR property name or add a property with CLR name 'NonExistentProp' to 'OwnerType'"
+                        ),
+                    ]
+                },
+            ];
+        }
+    }
+
+    public static TheoryDataRow<IXUnitTest>[] InitializeOwnerKeyPathResolvedTheoryData
+    {
+        get
+        {
+            //
+            // ApiRelationshipOwnerKeyPath Resolved Tests
+            //
+
+            // Success: ApiOwnerType resolves to the principal object type after schema initialization.
+            var ownerKeyPath = new ApiRelationshipOwnerKeyPath();
+
+            return
+            [
+                new InitializeOwnerKeyPathTest
+                {
+                    Name = $"{nameof(ApiRelationshipOwnerKeyPath)}.{nameof(ApiRelationshipOwnerKeyPath.ApiOwnerType)} Resolves To Principal Object Type",
+                    OwnerKeyPath = ownerKeyPath,
+                    BuildSchema = () => ApiSchema.Create
+                    (
+                        apiName: $"{nameof(ApiRelationshipOwnerKeyPath)}.{nameof(ApiRelationshipOwnerKeyPath.ApiOwnerType)} Resolves To Principal Object Type",
+                        apiScalarTypes: [new ApiScalarType(nameof(Int32), typeof(int))],
+                        apiEnumTypes: [],
+                        apiObjectTypes:
+                        [
+                            new ApiObjectType(
+                                "OwnerType",
+                                apiOptions: null,
+                                apiIdentities: [new ApiIdentity("PK_OwnerType", [new ApiIdentityScalarPart("Id")])],
+                                apiProperties: [new ApiProperty("Id", ApiTypeExpression.ClrRef<int>(), ApiTypeModifiers.Required, "Id", ClrMemberKind.Property)],
+                                clrObjectType: typeof(OwnerType)),
+                            new ApiObjectType(
+                                "OwnedType",
+                                apiOptions: null,
+                                apiIdentities: null,
+                                apiProperties: [new ApiProperty("Id", ApiTypeExpression.ClrRef<int>(), ApiTypeModifiers.Required, "Id", ClrMemberKind.Property)],
+                                clrObjectType: typeof(OwnedType))
+                        ],
+                        apiRelationships:
+                        [
+                            new ApiRelationshipOneToMany(
+                                "FK_OwnedType_OwnerType",
+                                new ApiRelationshipPrincipalEnd(typeof(OwnerType)),
+                                new ApiRelationshipDependentEnd(typeof(OwnedType), [ownerKeyPath]))
+                        ]
+                    ),
+                    AssertAction = schema =>
+                    {
+                        schema.TryGetObjectTypeByClrType(typeof(OwnerType), out var principalObjectType).Should().BeTrue();
+                        ownerKeyPath.ApiOwnerType.Should().BeSameAs(principalObjectType);
+                    }
+                },
+            ];
+        }
+    }
     #endregion
 
     #region Test Methods
@@ -3121,5 +3227,13 @@ public partial class ApiSchemaTests
     [Theory]
     [MemberData(nameof(InitializeWarnsTheoryData))]
     public void InitializeWarns(IXUnitTest test) => test.Execute(this);
+
+    [Theory]
+    [MemberData(nameof(InitializeOwnerKeyPathThrowsTheoryData))]
+    public void InitializeOwnerKeyPathThrows(IXUnitTest test) => test.Execute(this);
+
+    [Theory]
+    [MemberData(nameof(InitializeOwnerKeyPathResolvedTheoryData))]
+    public void InitializeOwnerKeyPathResolved(IXUnitTest test) => test.Execute(this);
     #endregion
 }

@@ -21,7 +21,7 @@ namespace Evoogle.ApiFramework.Schema;
 ///         Owner resolution follows the same two-phase initialization model as <see cref="ApiIdentityOwnerPart"/>.
 ///         During the standard <see cref="ApiSchemaElement.Initialize"/> call, no owner resolution occurs.
 ///         The owner type is resolved in a second schema-wide deferred pass after all object types and
-///         relationships have been initialized, via <c>ApiSchema.ResolveOwnerRelationshipKeyBindings</c>.
+///         relationships have been initialized, via <c>ApiSchema.ResolveOwnerRelationshipKeyPaths</c>.
 ///     </para>
 ///     <para>
 ///         Accessing <see cref="ApiOwnerType"/> before schema initialization completes will throw.
