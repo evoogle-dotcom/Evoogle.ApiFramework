@@ -202,6 +202,12 @@ public sealed class ApiRelationshipManyToMany
             return;
         }
 
+        if (this.ApiDependentEndA.ClrObjectType is null)
+        {
+            // Already reported as API_RELATIONSHIP_END_NULL_CLR_OBJECT_TYPE in Phase 4.
+            return;
+        }
+
         if (this.ApiDependentEndA.ClrObjectType != this.ClrAssociationObjectType)
         {
             context.AddIssue(this.ApiPath, ApiInitializationSeverity.Error,
@@ -267,6 +273,12 @@ public sealed class ApiRelationshipManyToMany
 
         if (this.ClrAssociationObjectType is null)
         {
+            return;
+        }
+
+        if (this.ApiDependentEndB.ClrObjectType is null)
+        {
+            // Already reported as API_RELATIONSHIP_END_NULL_CLR_OBJECT_TYPE in Phase 4.
             return;
         }
 

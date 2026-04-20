@@ -645,14 +645,7 @@ public sealed class ApiSchema : ExtensibleBase
 
             if (!this.TryGetObjectTypeByClrType(end.ClrObjectType, out var apiObjectType))
             {
-                // The CLR type is non-null but no object type is registered for it in the schema CLR-type lookup.
-                var path = end.ApiPath;
-                var severity = ApiInitializationSeverity.Warning;
-                var code = ApiInitializationCode.API_RELATIONSHIP_END_UNRESOLVED_OBJECT_TYPE;
-                var description = $"Relationship end for CLR type '{end.ClrObjectType.SafeToName()}' could not be registered on the corresponding {nameof(ApiObjectType)} because no matching object type was found in the schema CLR-type lookup";
-                var remediation = $"Ensure CLR type '{end.ClrObjectType.SafeToName()}' is registered exactly once as an {nameof(ApiObjectType)} in the schema";
-
-                context.AddIssue(path, severity, code, description, remediation);
+                // Already reported as API_RELATIONSHIP_END_UNRESOLVED_OBJECT_TYPE (Error) in Phase 4.
                 return;
             }
 
