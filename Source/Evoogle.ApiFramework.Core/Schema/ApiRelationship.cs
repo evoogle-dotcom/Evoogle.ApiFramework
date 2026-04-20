@@ -21,16 +21,8 @@ namespace Evoogle.ApiFramework.Schema;
 ///     The <see cref="ApiKind"/> property serves as the JSON polymorphic discriminator.
 /// </remarks>
 [JsonConverter(typeof(ApiRelationshipJsonConverter))]
-public abstract class ApiRelationship
-(
-    string apiName
-) : ApiSchemaElement
+public abstract class ApiRelationship(string apiName) : ApiSchemaElement
 {
-    #region ApiSchemaElement Properties
-    /// <inheritdoc/>
-    protected override string ApiElementName => nameof(ApiRelationship);
-    #endregion
-
     #region ApiRelationship Properties
     /// <summary>
     ///     Gets the structural kind of this relationship. Used as the JSON polymorphic discriminator.
@@ -56,7 +48,7 @@ public abstract class ApiRelationship
     #region ApiSchemaElement Methods
     /// <inheritdoc/>
     protected override string BuildPath(string? apiPreviousPath)
-        => ApiSchemaHelpers.BuildPath(basePath: apiPreviousPath, segment: nameof(ApiRelationship), segmentName: this.ApiName);
+        => ApiSchemaHelpers.BuildPath(basePath: apiPreviousPath, segment: this.ApiElementName, segmentName: this.ApiName);
 
     /// <inheritdoc/>
     internal override void Initialize(ApiInitializationContext context)

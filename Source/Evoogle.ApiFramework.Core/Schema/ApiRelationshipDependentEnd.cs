@@ -113,7 +113,9 @@ public sealed class ApiRelationshipDependentEnd
             return;
         }
 
-        var pathContext = context.WithDeclaringObjectType(apiObjectType);
+        var pathContext = context
+            .WithDeclaringSchemaElement(this)
+            .WithDeclaringObjectTypeOnly(apiObjectType);
         foreach (var keyPath in this.ApiKeyPaths)
         {
             keyPath.Initialize(pathContext);

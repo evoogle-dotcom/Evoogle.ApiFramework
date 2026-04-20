@@ -143,7 +143,9 @@ public sealed class ApiRelationshipNestedKeyPath
         }
 
         // Child paths resolve against the nested object's type, not the declaring parent type.
-        var nestedContext = context.WithDeclaringObjectType(_apiResolvedObjectType);
+        var nestedContext = context
+            .WithDeclaringSchemaElement(this)
+            .WithDeclaringObjectTypeOnly(_apiResolvedObjectType);
         foreach (var keyPath in this.ApiKeyPaths)
         {
             keyPath.Initialize(nestedContext);

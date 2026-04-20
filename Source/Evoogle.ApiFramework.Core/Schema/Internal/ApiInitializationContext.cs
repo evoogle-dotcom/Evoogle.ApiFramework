@@ -99,5 +99,21 @@ internal class ApiInitializationContext
             _issues // share the same list
         );
     }
+
+    /// <summary>
+    ///     Creates a child context with a new declaring object type but the same declaring path.
+    ///     Use this when you need <see cref="ApiDeclaringObjectType"/> for property lookup but must
+    ///     preserve the current path chain (e.g., inside relationship key path initialization).
+    /// </summary>
+    public ApiInitializationContext WithDeclaringObjectTypeOnly(ApiObjectType apiDeclaringObjectType)
+    {
+        return new ApiInitializationContext
+        (
+            this.ApiSchema,
+            _apiDeclaringPath, // preserve current path unchanged
+            apiDeclaringObjectType,
+            _issues // share the same list
+        );
+    }
     #endregion
 }

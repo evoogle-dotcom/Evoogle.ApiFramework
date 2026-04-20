@@ -96,7 +96,7 @@ public sealed class ApiIdentityOwnerPart(string? apiIdentityName = null) : ApiId
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_IDENTITY_PART_UNRESOLVED_OWNER;
             var description = $"No owner object type was found for '{ownedType.ApiName}' — no other object type has a collection or direct object property of this type";
-var remediation = $"Ensure another {nameof(ApiObjectType)} has a collection or direct object property typed as '{ownedType.ApiName}', or remove the {nameof(ApiIdentityOwnerPart)}";
+            var remediation = $"Ensure another {nameof(ApiObjectType)} has a collection or direct object property typed as '{ownedType.ApiName}', or remove the {nameof(ApiIdentityOwnerPart)}";
 
             context.AddIssue(path, severity, code, description, remediation);
             return;

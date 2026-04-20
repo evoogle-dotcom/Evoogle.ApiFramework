@@ -348,5 +348,51 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
         }
         #endregion
     }
+
+    private class InitializeRelationshipKeyPathThrowsTest : XUnitTest
+    {
+        #region User Supplied Properties
+        public required Func<ApiSchema> BuildSchemaAction { get; init; }
+        public required List<ApiInitializationIssue> ExpectedIssues { get; init; }
+        #endregion
+
+        #region Calculated Properties
+        private List<ApiInitializationIssue>? ActualIssues { get; set; }
+        #endregion
+
+        #region XUnitTest Methods
+        protected override void Arrange()
+        {
+            foreach (var issue in this.ExpectedIssues)
+            {
+                this.WriteLine($"Expected Issue: {issue}");
+            }
+            this.WriteLine();
+        }
+
+        protected override void Act()
+        {
+            try
+            {
+                this.BuildSchemaAction();
+            }
+            catch (ApiSchemaInitializationException ex)
+            {
+                this.ActualIssues = [.. ex.Issues];
+                this.WriteLine();
+                foreach (var issue in this.ActualIssues)
+                {
+                    this.WriteLine($"Actual Issue: {issue}");
+                }
+            }
+        }
+
+        protected override void Assert()
+        {
+            this.ActualIssues.Should().NotBeNull("an ApiSchemaInitializationException should have been thrown");
+            this.ActualIssues.Should().BeEquivalentTo(this.ExpectedIssues);
+        }
+        #endregion
+    }
     #endregion
 }

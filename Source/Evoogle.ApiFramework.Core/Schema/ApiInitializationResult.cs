@@ -25,7 +25,7 @@ public sealed class ApiInitializationResult(IEnumerable<ApiInitializationIssue>?
     /// <summary>
     ///     Gets a value indicating whether the initialization was successful (no errors).
     /// </summary>
-    public bool IsValid => !this.Issues?.Any(x => x.Severity == ApiInitializationSeverity.Error) ?? true;
+    public bool IsValid => this.Errors is null || this.Errors.Length == 0;
 
     /// <summary>
     ///     Gets the collection of error-level issues, or <c>null</c> if no issues were encountered.

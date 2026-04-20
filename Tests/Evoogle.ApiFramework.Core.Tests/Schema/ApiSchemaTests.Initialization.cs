@@ -3101,6 +3101,67 @@ public partial class ApiSchemaTests
         },
     ];
 
+    public static TheoryDataRow<IXUnitTest>[] InitializeRelationshipKeyPathThrowsTheoryData
+    {
+        get
+        {
+            //
+            // ApiRelationshipKeyPath Error-Path Tests
+            // Verify that key path initialization errors report paths rooted at the relationship
+            // hierarchy, not at the declaring object type.
+            //
+
+            return
+            [
+                // Scalar key path directly on a dependent end: error path should be rooted at
+                // the relationship end, not at the dependent object type.
+                new InitializeRelationshipKeyPathThrowsTest
+                {
+                    Name = $"{nameof(ApiRelationshipScalarKeyPath)} Error Path Is Rooted At Relationship Hierarchy",
+                    BuildSchemaAction = () => ApiSchema.Create
+                    (
+                        apiName: $"{nameof(ApiRelationshipScalarKeyPath)} Error Path Is Rooted At Relationship Hierarchy",
+                        apiScalarTypes: [new ApiScalarType(nameof(Int32), typeof(int))],
+                        apiEnumTypes: [],
+                        apiObjectTypes:
+                        [
+                            new ApiObjectType(
+                                "OwnerType",
+                                apiOptions: null,
+                                apiIdentities: [new ApiIdentity("PK_OwnerType", [new ApiIdentityScalarPart("Id")])],
+                                apiProperties: [new ApiProperty("Id", ApiTypeExpression.ClrRef<int>(), ApiTypeModifiers.Required, "Id", ClrMemberKind.Property)],
+                                clrObjectType: typeof(OwnerType)),
+                            new ApiObjectType(
+                                "OwnedType",
+                                apiOptions: null,
+                                apiIdentities: null,
+                                apiProperties: [new ApiProperty("Id", ApiTypeExpression.ClrRef<int>(), ApiTypeModifiers.Required, "Id", ClrMemberKind.Property)],
+                                clrObjectType: typeof(OwnedType))
+                        ],
+                        apiRelationships:
+                        [
+                            new ApiRelationshipOneToMany(
+                                "FK_OwnedType_OwnerType",
+                                new ApiRelationshipPrincipalEnd(typeof(OwnerType)),
+                                new ApiRelationshipDependentEnd(typeof(OwnedType), [new ApiRelationshipScalarKeyPath("NonExistentProp")]))
+                        ]
+                    ),
+                    ExpectedIssues =
+                    [
+                        new ApiInitializationIssue
+                        (
+                            path: $"{nameof(ApiRelationshipOneToMany)}[\"FK_OwnedType_OwnerType\"].{nameof(ApiRelationshipDependentEnd)}.{nameof(ApiRelationshipScalarKeyPath)}[\"NonExistentProp\"]",
+                            severity: ApiInitializationSeverity.Error,
+                            code: ApiInitializationCode.API_RELATIONSHIP_KEY_PATH_UNRESOLVED_API_PROPERTY,
+                            description: "Property with CLR name 'NonExistentProp' could not be found on object type 'OwnedType'",
+                            remediation: "Verify the CLR property name or add a property with CLR name 'NonExistentProp' to 'OwnedType'"
+                        ),
+                    ]
+                },
+            ];
+        }
+    }
+
     public static TheoryDataRow<IXUnitTest>[] InitializeOwnerKeyPathThrowsTheoryData
     {
         get
@@ -3151,7 +3212,7 @@ public partial class ApiSchemaTests
                     [
                         new ApiInitializationIssue
                         (
-                            path: $"{nameof(ApiObjectType)}[\"OwnerType\"].{nameof(ApiRelationshipScalarKeyPath)}[\"NonExistentProp\"]",
+                            path: $"{nameof(ApiRelationshipOneToMany)}[\"FK_OwnedType_OwnerType\"].{nameof(ApiRelationshipDependentEnd)}.{nameof(ApiRelationshipOwnerKeyPath)}.{nameof(ApiRelationshipScalarKeyPath)}[\"NonExistentProp\"]",
                             severity: ApiInitializationSeverity.Error,
                             code: ApiInitializationCode.API_RELATIONSHIP_KEY_PATH_UNRESOLVED_API_PROPERTY,
                             description: "Property with CLR name 'NonExistentProp' could not be found on object type 'OwnerType'",
@@ -3227,6 +3288,10 @@ public partial class ApiSchemaTests
     [Theory]
     [MemberData(nameof(InitializeWarnsTheoryData))]
     public void InitializeWarns(IXUnitTest test) => test.Execute(this);
+
+    [Theory]
+    [MemberData(nameof(InitializeRelationshipKeyPathThrowsTheoryData))]
+    public void InitializeRelationshipKeyPathThrows(IXUnitTest test) => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(InitializeOwnerKeyPathThrowsTheoryData))]

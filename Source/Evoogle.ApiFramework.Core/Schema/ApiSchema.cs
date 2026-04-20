@@ -368,8 +368,6 @@ public sealed class ApiSchema : ExtensibleBase
     #region Implementation Methods
     private void InitializeApiName(ApiInitializationContext context)
     {
-        ArgumentNullException.ThrowIfNull(context);
-
         var isApiNameInvalid = ApiSchemaHelpers.IsNameInvalid(this.ApiName);
         if (isApiNameInvalid)
         {

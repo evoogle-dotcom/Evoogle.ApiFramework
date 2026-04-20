@@ -86,7 +86,9 @@ public sealed class ApiRelationshipOwnerKeyPath(IEnumerable<ApiRelationshipKeyPa
         }
 
         // Child paths resolve against the owner's type.
-        var ownerContext = context.WithDeclaringObjectType(ownerType);
+        var ownerContext = context
+            .WithDeclaringSchemaElement(this)
+            .WithDeclaringObjectTypeOnly(ownerType);
         foreach (var keyPath in this.ApiKeyPaths)
         {
             keyPath.Initialize(ownerContext);
