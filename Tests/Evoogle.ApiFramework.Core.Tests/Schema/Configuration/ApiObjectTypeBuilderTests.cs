@@ -4,6 +4,7 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using System.Diagnostics.CodeAnalysis;
+
 using Evoogle.ApiFramework.Identity;
 using Evoogle.ApiFramework.Schema.TestData;
 using Evoogle.ApiFramework.TestData;
@@ -159,9 +160,13 @@ public class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
                     if (apiOptions.ApiIdentityNullHandling.HasValue)
                     {
                         if (apiOptions.ApiIdentityNullHandling.Value == ApiIdentityNullHandling.ThrowException)
+                        {
                             optionsBuilder.ThrowOnNull();
+                        }
                         else
+                        {
                             optionsBuilder.ReturnEmptyOnNull();
+                        }
                     }
                 });
             }

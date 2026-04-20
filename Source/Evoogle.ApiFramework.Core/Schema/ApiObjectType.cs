@@ -283,7 +283,7 @@ public sealed partial class ApiObjectType
             partKeyFilter: x => ApiSchemaHelpers.IsNameValid(x),
             partKeyPropertyName: nameof(ApiIdentity.ApiName),
             path: this.ApiPath,
-            code: ApiInitializationCode.API_OBJECT_TYPE_DUPLICATE_IDENTITY_API_NAME,
+            duplicatePartCode: ApiInitializationCode.API_OBJECT_TYPE_DUPLICATE_IDENTITY_API_NAME,
             context: context,
             lookupDictionary: out _apiIdentityApiNameLookup
         );
@@ -295,7 +295,7 @@ public sealed partial class ApiObjectType
             partKeyFilter: x => ApiSchemaHelpers.IsNameValid(x),
             partKeyPropertyName: nameof(ApiProperty.ApiName),
             path: this.ApiPath,
-            code: ApiInitializationCode.API_OBJECT_TYPE_DUPLICATE_PROPERTY_API_NAME,
+            duplicatePartCode: ApiInitializationCode.API_OBJECT_TYPE_DUPLICATE_PROPERTY_API_NAME,
             context: context,
             lookupDictionary: out _apiPropertyApiNameLookup
         );
@@ -307,7 +307,7 @@ public sealed partial class ApiObjectType
             partKeyFilter: x => ApiSchemaHelpers.IsNameValid(x),
             partKeyPropertyName: nameof(ApiProperty.ClrName),
             path: this.ApiPath,
-            code: ApiInitializationCode.API_OBJECT_TYPE_DUPLICATE_PROPERTY_CLR_NAME,
+            duplicatePartCode: ApiInitializationCode.API_OBJECT_TYPE_DUPLICATE_PROPERTY_CLR_NAME,
             context: context,
             lookupDictionary: out _apiPropertyClrNameLookup
         );

@@ -66,7 +66,7 @@ internal static class ApiSchemaHelpers
         Func<TPartKey, bool>? partKeyFilter,
         string partKeyPropertyName,
         string path,
-        ApiInitializationCode code,
+        ApiInitializationCode duplicatePartCode,
         ApiInitializationContext context,
         out Dictionary<TPartKey, TPart>? lookupDictionary
     )
@@ -88,7 +88,7 @@ internal static class ApiSchemaHelpers
             partKeyFilter: partKeyFilter,
             partKeyPropertyName: partKeyPropertyName,
             path: path,
-            code: code,
+            duplicatePartCode: duplicatePartCode,
             context: context
         );
     }
@@ -136,7 +136,7 @@ internal static class ApiSchemaHelpers
         Func<TPartKey, bool>? partKeyFilter,
         string partKeyPropertyName,
         string path,
-        ApiInitializationCode code,
+        ApiInitializationCode duplicatePartCode,
         ApiInitializationContext context
     )
         where TPartKey : notnull
@@ -163,7 +163,7 @@ internal static class ApiSchemaHelpers
         var description = $"Duplicate {partTypeName}.{partKeyPropertyName} values: '{duplicatesString}'";
         var remediation = $"Verify that each {partTypeName} has a unique {partKeyPropertyName} value";
 
-        context.AddIssue(path, severity, code, description, remediation);
+        context.AddIssue(path, severity, duplicatePartCode, description, remediation);
     }
     #endregion
 }

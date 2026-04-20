@@ -206,10 +206,13 @@ public sealed class ApiSchema : ExtensibleBase
         this.InitializeApiEnumTypes(context);
         this.InitializeApiObjectTypes(context);
 
-        // Phase 3: Deferred owner identity resolution (requires full type graph).
+        // The remaining initialization phases require fully initialized types,
+        // so they come after all types have been initialized.
+
+        // Phase 3: Deferred owner identity resolution
         this.ResolveOwnerIdentityParts(context);
 
-        // Phase 4: Initialize relationships (requires fully initialized type graph).
+        // Phase 4: Initialize relationships
         this.InitializeApiRelationships(context);
 
         // Phase 5: Populate computed relationship end collections on each object type.
@@ -366,7 +369,7 @@ public sealed class ApiSchema : ExtensibleBase
         if (isApiNameInvalid)
         {
             var path = this.ApiPath;
-            var severity = ApiInitializationSeverity.Warning;
+            var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_SCHEMA_INVALID_NAME;
             var description = $"{nameof(this.ApiName)} must not be null, empty, or whitespace";
             var remediation = $"Specify a valid {nameof(this.ApiName)} value";
@@ -431,7 +434,7 @@ public sealed class ApiSchema : ExtensibleBase
             partKeyFilter: x => ApiSchemaHelpers.IsNameValid(x),
             partKeyPropertyName: nameof(ApiNamedType.ApiName),
             path: this.ApiPath,
-            code: ApiInitializationCode.API_SCHEMA_DUPLICATE_NAMED_TYPE_API_NAME,
+            duplicatePartCode: ApiInitializationCode.API_SCHEMA_DUPLICATE_NAMED_TYPE_API_NAME,
             context: context,
             lookupDictionary: out _apiNamedTypeApiNameLookup
         );
@@ -443,7 +446,7 @@ public sealed class ApiSchema : ExtensibleBase
             partKeyFilter: x => x is not null,
             partKeyPropertyName: nameof(ApiNamedType.ClrType),
             path: this.ApiPath,
-            code: ApiInitializationCode.API_SCHEMA_DUPLICATE_NAMED_TYPE_CLR_TYPE,
+            duplicatePartCode: ApiInitializationCode.API_SCHEMA_DUPLICATE_NAMED_TYPE_CLR_TYPE,
             context: context,
             lookupDictionary: out _apiNamedTypeClrTypeLookup
         );
@@ -455,7 +458,7 @@ public sealed class ApiSchema : ExtensibleBase
             partKeyFilter: x => ApiSchemaHelpers.IsNameValid(x),
             partKeyPropertyName: nameof(ApiEnumType.ApiName),
             path: this.ApiPath,
-            code: ApiInitializationCode.API_SCHEMA_DUPLICATE_ENUM_TYPE_API_NAME,
+            duplicatePartCode: ApiInitializationCode.API_SCHEMA_DUPLICATE_ENUM_TYPE_API_NAME,
             context: context,
             lookupDictionary: out _apiEnumTypeApiNameLookup
         );
@@ -467,7 +470,7 @@ public sealed class ApiSchema : ExtensibleBase
             partKeyFilter: x => x is not null,
             partKeyPropertyName: nameof(ApiEnumType.ClrType),
             path: this.ApiPath,
-            code: ApiInitializationCode.API_SCHEMA_DUPLICATE_ENUM_TYPE_CLR_TYPE,
+            duplicatePartCode: ApiInitializationCode.API_SCHEMA_DUPLICATE_ENUM_TYPE_CLR_TYPE,
             context: context,
             lookupDictionary: out _apiEnumTypeClrTypeLookup
         );
@@ -479,7 +482,7 @@ public sealed class ApiSchema : ExtensibleBase
             partKeyFilter: x => ApiSchemaHelpers.IsNameValid(x),
             partKeyPropertyName: nameof(ApiObjectType.ApiName),
             path: this.ApiPath,
-            code: ApiInitializationCode.API_SCHEMA_DUPLICATE_OBJECT_TYPE_API_NAME,
+            duplicatePartCode: ApiInitializationCode.API_SCHEMA_DUPLICATE_OBJECT_TYPE_API_NAME,
             context: context,
             lookupDictionary: out _apiObjectTypeApiNameLookup
         );
@@ -491,7 +494,7 @@ public sealed class ApiSchema : ExtensibleBase
             partKeyFilter: x => x is not null,
             partKeyPropertyName: nameof(ApiObjectType.ClrType),
             path: this.ApiPath,
-            code: ApiInitializationCode.API_SCHEMA_DUPLICATE_OBJECT_TYPE_CLR_TYPE,
+            duplicatePartCode: ApiInitializationCode.API_SCHEMA_DUPLICATE_OBJECT_TYPE_CLR_TYPE,
             context: context,
             lookupDictionary: out _apiObjectTypeClrTypeLookup
         );
@@ -503,7 +506,7 @@ public sealed class ApiSchema : ExtensibleBase
             partKeyFilter: x => ApiSchemaHelpers.IsNameValid(x),
             partKeyPropertyName: nameof(ApiScalarType.ApiName),
             path: this.ApiPath,
-            code: ApiInitializationCode.API_SCHEMA_DUPLICATE_SCALAR_TYPE_API_NAME,
+            duplicatePartCode: ApiInitializationCode.API_SCHEMA_DUPLICATE_SCALAR_TYPE_API_NAME,
             context: context,
             lookupDictionary: out _apiScalarTypeApiNameLookup
         );
@@ -515,7 +518,7 @@ public sealed class ApiSchema : ExtensibleBase
             partKeyFilter: x => x is not null,
             partKeyPropertyName: nameof(ApiScalarType.ClrType),
             path: this.ApiPath,
-            code: ApiInitializationCode.API_SCHEMA_DUPLICATE_SCALAR_TYPE_CLR_TYPE,
+            duplicatePartCode: ApiInitializationCode.API_SCHEMA_DUPLICATE_SCALAR_TYPE_CLR_TYPE,
             context: context,
             lookupDictionary: out _apiScalarTypeClrTypeLookup
         );
@@ -527,7 +530,7 @@ public sealed class ApiSchema : ExtensibleBase
             partKeyFilter: x => ApiSchemaHelpers.IsNameValid(x),
             partKeyPropertyName: nameof(ApiRelationship.ApiName),
             path: this.ApiPath,
-            code: ApiInitializationCode.API_SCHEMA_DUPLICATE_RELATIONSHIP_API_NAME,
+            duplicatePartCode: ApiInitializationCode.API_SCHEMA_DUPLICATE_RELATIONSHIP_API_NAME,
             context: context,
             lookupDictionary: out _apiRelationshipApiNameLookup
         );
@@ -568,6 +571,14 @@ public sealed class ApiSchema : ExtensibleBase
 
             if (!this.TryGetObjectTypeByClrType(end.ClrObjectType, out var apiObjectType))
             {
+                // The CLR type is non-null but no object type is registered for it in the schema CLR-type lookup.
+                var path = end.ApiPath;
+                var severity = ApiInitializationSeverity.Warning;
+                var code = ApiInitializationCode.API_RELATIONSHIP_END_UNRESOLVED_OBJECT_TYPE;
+                var description = $"Relationship end for CLR type '{end.ClrObjectType.SafeToName()}' could not be registered on the corresponding {nameof(ApiObjectType)} because no matching object type was found in the schema CLR-type lookup";
+                var remediation = $"Ensure CLR type '{end.ClrObjectType.SafeToName()}' is registered exactly once as an {nameof(ApiObjectType)} in the schema";
+
+                context.AddIssue(path, severity, code, description, remediation);
                 return;
             }
 
@@ -699,10 +710,63 @@ public sealed class ApiSchema : ExtensibleBase
             }
         }
 
-        // Walk only owned types that need resolution, skipping any that form a cycle.
+        // Propagate tainted status to types whose single resolved owner is itself a cycle
+        // member (or transitively tainted). Such types cannot be safely resolved because their
+        // owner identity is partially initialized, which would cause a runtime throw without a
+        // prior diagnostic.
+        var taintedTypes = new HashSet<ApiObjectType>(cycleMembers);
+        bool anyNewTainted;
+        do
+        {
+            anyNewTainted = false;
+            foreach (var candidate in typesWithOwnerPart)
+            {
+                if (taintedTypes.Contains(candidate))
+                {
+                    continue;
+                }
+
+                ownerLookup.TryGetValue(candidate, out var candidateOwners);
+                if (candidateOwners?.Count == 1 && taintedTypes.Contains(candidateOwners[0]))
+                {
+                    taintedTypes.Add(candidate);
+                    anyNewTainted = true;
+                }
+            }
+        } while (anyNewTainted);
+
+        // Report errors for transitively tainted types (non-cycle members whose single owner
+        // is in or leads to a cycle).
+        foreach (var taintedType in taintedTypes)
+        {
+            if (cycleMembers.Contains(taintedType))
+            {
+                continue;
+            }
+
+            ownerLookup.TryGetValue(taintedType, out var taintedOwners);
+            var ownerName = taintedOwners?.Count == 1 ? taintedOwners[0].ApiName : "an unknown type";
+
+            foreach (var identity in taintedType.ApiIdentities)
+            {
+                foreach (var part in identity.ApiIdentityParts.OfType<ApiIdentityOwnerPart>())
+                {
+                    var path = part.ApiPath;
+                    var severity = ApiInitializationSeverity.Error;
+                    var code = ApiInitializationCode.API_IDENTITY_PART_CYCLIC_OWNER;
+                    var description = $"Owner type '{ownerName}' of '{taintedType.ApiName}' is involved in a cyclic owner identity reference";
+                    var remediation = $"Remove the cyclic {nameof(ApiIdentityOwnerPart)} reference";
+
+                    context.AddIssue(path, severity, code, description, remediation);
+                }
+            }
+        }
+
+        // Walk only owned types that need resolution, skipping any that are tainted
+        // (direct cycle members or types that transitively depend on a cycle member).
         foreach (var ownedType in typesWithOwnerPart)
         {
-            if (cycleMembers.Contains(ownedType))
+            if (taintedTypes.Contains(ownedType))
             {
                 continue;
             }

@@ -72,15 +72,17 @@ public abstract class ApiRelationship
     #region Implementation Methods
     private void InitializeApiName(ApiInitializationContext context)
     {
-        if (!ApiSchemaHelpers.IsNameInvalid(this.ApiName))
+        var isApiNameInvalid = ApiSchemaHelpers.IsNameInvalid(this.ApiName);
+        if (isApiNameInvalid)
         {
-            return;
-        }
+            var path = this.ApiPath;
+            var severity = ApiInitializationSeverity.Error;
+            var code = ApiInitializationCode.API_RELATIONSHIP_INVALID_API_NAME;
+            var description = $"{nameof(this.ApiName)} must not be null, empty, or whitespace";
+            var remediation = $"Specify a valid {nameof(this.ApiName)} value";
 
-        context.AddIssue(this.ApiPath, ApiInitializationSeverity.Error,
-            ApiInitializationCode.API_RELATIONSHIP_INVALID_API_NAME,
-            $"{nameof(this.ApiName)} must not be null, empty, or whitespace",
-            $"Specify a valid {nameof(this.ApiName)} value");
+            context.AddIssue(path, severity, code, description, remediation);
+        }
     }
     #endregion
 }
