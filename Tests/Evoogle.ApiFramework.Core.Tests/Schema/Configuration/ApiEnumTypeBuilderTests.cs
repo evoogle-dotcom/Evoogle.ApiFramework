@@ -18,10 +18,10 @@ public class ApiEnumTypeBuilderTests(ITestOutputHelper output) : XUnitTests(outp
     private class BuildTest : XUnitTest
     {
         #region User Supplied Properties
-        public string ApiName { get; init; } = null!;
-        public Type ClrType { get; init; } = null!;
-        public ApiEnumValue[] ApiEnumValues { get; init; } = null!;
-        public ApiType ApiTypeExpected { get; init; } = null!;
+        public string? ApiName { get; init; }
+        public required Type ClrType { get; init; } = null!;
+        public required ApiEnumValue[] ApiEnumValues { get; init; } = null!;
+        public required ApiType ApiTypeExpected { get; init; } = null!;
         public Type? ApiExtensionType { get; init; }
         #endregion
 
@@ -49,8 +49,11 @@ public class ApiEnumTypeBuilderTests(ITestOutputHelper output) : XUnitTests(outp
         protected override void Act()
         {
             var context = new ApiSchemaBuilderContext();
-            var builder = new ApiEnumTypeBuilder(this.ClrType, context)
-                .WithName(this.ApiName);
+            var builder = new ApiEnumTypeBuilder(this.ClrType, context);
+            if (this.ApiName != null)
+            {
+                builder = builder.WithName(this.ApiName);
+            }
 
             foreach (var apiEnumValue in this.ApiEnumValues)
             {
@@ -75,47 +78,6 @@ public class ApiEnumTypeBuilderTests(ITestOutputHelper output) : XUnitTests(outp
             this.ApiTypeExpected.Should().BeOfType<ApiEnumType>();
 
             this.AssertBeEquivalentTo(this.ApiTypeActual, this.ApiTypeExpected);
-        }
-        #endregion
-    }
-
-    private class BuildWithDefaultNameTest : XUnitTest
-    {
-        #region User Supplied Properties
-        public required Type ClrType { get; init; }
-        public required string ExpectedApiName { get; init; }
-        #endregion
-
-        #region Calculated Properties
-        private ApiEnumType? Actual { get; set; }
-        #endregion
-
-        #region Constructors
-        public BuildWithDefaultNameTest()
-        {
-            this.Name = nameof(BuildWithDefaultNameTest);
-            this.ExcludeMembers = ApiSchemaExcludeMembers.Standard;
-        }
-        #endregion
-
-        #region XUnitTest Methods
-        protected override void Arrange()
-        {
-            this.WriteLine($"ClrType: {this.ClrType.SafeToName()}");
-            this.WriteLine($"ExpectedApiName: {this.ExpectedApiName}");
-        }
-
-        protected override void Act()
-        {
-            var context = new ApiSchemaBuilderContext();
-            this.Actual = new ApiEnumTypeBuilder(this.ClrType, context).Build();
-            this.WriteLine($"Actual ApiName: {this.Actual.ApiName}");
-        }
-
-        protected override void Assert()
-        {
-            this.Actual.Should().NotBeNull();
-            this.Actual!.ApiName.Should().Be(this.ExpectedApiName);
         }
         #endregion
     }
@@ -154,6 +116,19 @@ public class ApiEnumTypeBuilderTests(ITestOutputHelper output) : XUnitTests(outp
         }
     };
 
+    private static ApiEnumType EnumTypeWithDefaultName { get; } = new ApiEnumType
+    (
+        nameof(OrderStatus),
+        [
+            new ApiEnumValue($"{nameof(OrderStatus.Pending)}", $"{nameof(OrderStatus.Pending)}", (int)OrderStatus.Pending),
+            new ApiEnumValue($"{nameof(OrderStatus.Paid)}", $"{nameof(OrderStatus.Paid)}", (int)OrderStatus.Paid),
+            new ApiEnumValue($"{nameof(OrderStatus.Shipped)}", $"{nameof(OrderStatus.Shipped)}", (int)OrderStatus.Shipped),
+            new ApiEnumValue($"{nameof(OrderStatus.Cancelled)}", $"{nameof(OrderStatus.Cancelled)}", (int)OrderStatus.Cancelled),
+            new ApiEnumValue($"{nameof(OrderStatus.Returned)}", $"{nameof(OrderStatus.Returned)}", (int)OrderStatus.Returned)
+        ],
+        typeof(OrderStatus)
+    );
+
     public static TheoryDataRow<IXUnitTest>[] BuildTheoryData =>
     [
         new BuildTest
@@ -173,15 +148,12 @@ public class ApiEnumTypeBuilderTests(ITestOutputHelper output) : XUnitTests(outp
             ApiTypeExpected = EnumTypeWithExtension,
             ApiExtensionType = typeof(TestExtension),
         },
-    ];
-
-    public static TheoryDataRow<IXUnitTest>[] BuildWithDefaultNameTheoryData =>
-    [
-        new BuildWithDefaultNameTest
+        new BuildTest
         {
-            Name = $"Builds {nameof(OrderStatus)} enum using CLR type name as default API name when configure is omitted",
-            ClrType = typeof(OrderStatus),
-            ExpectedApiName = nameof(OrderStatus),
+            Name = $"Builds {EnumTypeWithDefaultName} with default name",
+            ClrType = EnumTypeWithDefaultName.ClrType,
+            ApiEnumValues = [.. EnumTypeWithDefaultName.ApiEnumValues],
+            ApiTypeExpected = EnumTypeWithDefaultName,
         },
     ];
     #endregion
@@ -190,9 +162,5 @@ public class ApiEnumTypeBuilderTests(ITestOutputHelper output) : XUnitTests(outp
     [Theory]
     [MemberData(nameof(BuildTheoryData))]
     public void Build(IXUnitTest test) => test.Execute(this);
-
-    [Theory]
-    [MemberData(nameof(BuildWithDefaultNameTheoryData))]
-    public void BuildWithDefaultName(IXUnitTest test) => test.Execute(this);
     #endregion
 }
