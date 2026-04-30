@@ -164,10 +164,10 @@ public sealed class ApiIdentityValue(IEnumerable<ApiIdentityPartValue>? apiParts
     ///     value directly. Otherwise returns a composite <see cref="ApiId"/> with one entry per scalar leaf.
     /// </returns>
     /// <exception cref="ApiIdentityException">
-    ///     Thrown when <paramref name="nullHandling"/> is <see cref="ApiIdentityNullHandling.ThrowException"/>
+    ///     Thrown when <paramref name="nullHandling"/> is <see cref="ApiIdentityPartNullHandling.ThrowOnNull"/>
     ///     and an unresolved <see cref="ApiIdentityObjectPartValue"/> is encountered.
     /// </exception>
-    public ApiId ToApiId(bool useNamedParts = true, ApiIdentityNullHandling nullHandling = ApiIdentityNullHandling.ReturnEmpty)
+    public ApiId ToApiId(bool useNamedParts = true, ApiIdentityPartNullHandling nullHandling = ApiIdentityPartNullHandling.UseDefaultOnNull)
     {
         if (this.IsScalarValue)
         {
@@ -227,7 +227,7 @@ public sealed class ApiIdentityValue(IEnumerable<ApiIdentityPartValue>? apiParts
     /// <inheritdoc/>
     public override string ToString()
     {
-        var apiId = this.ToApiId(useNamedParts: true, nullHandling: ApiIdentityNullHandling.ReturnEmpty);
+        var apiId = this.ToApiId(useNamedParts: true, nullHandling: ApiIdentityPartNullHandling.UseDefaultOnNull);
         return apiId.ToString() ?? string.Empty;
     }
     #endregion
@@ -269,7 +269,7 @@ public sealed class ApiIdentityValue(IEnumerable<ApiIdentityPartValue>? apiParts
         ApiIdentityPartValue[] parts,
         string? prefix,
         bool useNamedParts,
-        ApiIdentityNullHandling nullHandling,
+        ApiIdentityPartNullHandling nullHandling,
         ApiIdCompositeBuilder builder
     )
     {
@@ -296,11 +296,11 @@ public sealed class ApiIdentityValue(IEnumerable<ApiIdentityPartValue>? apiParts
                     {
                         FlattenParts(objectPart.ApiObjectValue.ApiParts, qualifiedName, useNamedParts, nullHandling, builder);
                     }
-                    else if (nullHandling == ApiIdentityNullHandling.ThrowException)
+                    else if (nullHandling == ApiIdentityPartNullHandling.ThrowOnNull)
                     {
                         throw new ApiIdentityException(
                             $"Unresolved identity part '{qualifiedName}' encountered during flattening. " +
-                            $"Set {nameof(ApiIdentityNullHandling)} to {nameof(ApiIdentityNullHandling.ReturnEmpty)} to allow unresolved parts.");
+                            $"Set {nameof(ApiIdentityPartNullHandling)} to {nameof(ApiIdentityPartNullHandling.UseDefaultOnNull)} to allow unresolved parts.");
                     }
                     else
                     {

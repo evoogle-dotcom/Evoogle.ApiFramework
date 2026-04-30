@@ -23,16 +23,16 @@ public record class ApiObjectTypeOptions
     ///     Gets the null-handling strategy applied when resolving identities on this object type.
     ///     When <see langword="null"/>, the strategy is inherited from the containing <see cref="ApiSchema"/>'s options.
     /// </summary>
-    public ApiIdentityNullHandling? ApiIdentityNullHandling { get; init; }
+    public ApiIdentityPartNullHandling? ApiIdentityPartNullHandling { get; init; }
     #endregion
 
     #region Object Methods
     /// <inheritdoc/>
     public override string ToString()
     {
-        var apiIdentityNullHandling = this.ApiIdentityNullHandling.SafeToString();
+        var apiIdentityPartNullHandling = this.ApiIdentityPartNullHandling.SafeToString();
 
-        return $"{nameof(ApiObjectTypeOptions)} {{{nameof(this.ApiIdentityNullHandling)}={apiIdentityNullHandling}}}";
+        return $"{nameof(ApiObjectTypeOptions)} {{{nameof(this.ApiIdentityPartNullHandling)}={apiIdentityPartNullHandling}}}";
     }
     #endregion
 }

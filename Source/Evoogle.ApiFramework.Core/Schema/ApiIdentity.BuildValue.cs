@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -20,7 +20,7 @@ public sealed partial class ApiIdentity
     /// </returns>
     /// <exception cref="ApiIdentityException">
     ///     Thrown when <see cref="ApiIdentityValueBuildContext.NullHandling"/> is
-    ///     <see cref="ApiIdentityNullHandling.ThrowException"/> and a required property value is <see langword="null"/>.
+    ///     <see cref="ApiIdentityPartNullHandling.ThrowOnNull"/> and a required property value is <see langword="null"/>.
     /// </exception>
     public ApiIdentityValue BuildValue(ApiIdentityValueBuildContext context)
     {
@@ -51,7 +51,7 @@ public sealed partial class ApiIdentity
     /// </returns>
     /// <exception cref="ApiIdentityException">
     ///     Thrown when <see cref="ApiIdentityValueBuildFromValuesContext.NullHandling"/> is
-    ///     <see cref="ApiIdentityNullHandling.ThrowException"/> and a required value is missing or <see langword="null"/>.
+    ///     <see cref="ApiIdentityPartNullHandling.ThrowOnNull"/> and a required value is missing or <see langword="null"/>.
     /// </exception>
     public ApiIdentityValue BuildValue(ApiIdentityValueBuildFromValuesContext context)
     {
@@ -92,11 +92,11 @@ public sealed partial class ApiIdentity
 
         if (!schemaPart.ApiProperty.TryGetValue(context.ClrInstance, out var rawValue, schemaPart.ClrScalarType))
         {
-            if (context.NullHandling == ApiIdentityNullHandling.ThrowException)
+            if (context.NullHandling == ApiIdentityPartNullHandling.ThrowOnNull)
             {
                 throw new ApiIdentityException(
                     $"Identity property '{partName}' could not be read from {context.ClrInstance.GetType().Name}. " +
-                    $"Set {nameof(ApiIdentityNullHandling)} to {nameof(ApiIdentityNullHandling.ReturnEmpty)} to suppress this error.");
+                    $"Set {nameof(ApiIdentityPartNullHandling)} to {nameof(ApiIdentityPartNullHandling.UseDefaultOnNull)} to suppress this error.");
             }
 
             return new ApiIdentityScalarPartValue(partName, ApiId.Empty);
@@ -104,11 +104,11 @@ public sealed partial class ApiIdentity
 
         if (rawValue is null)
         {
-            if (context.NullHandling == ApiIdentityNullHandling.ThrowException)
+            if (context.NullHandling == ApiIdentityPartNullHandling.ThrowOnNull)
             {
                 throw new ApiIdentityException(
                     $"Identity property '{partName}' returned null on {context.ClrInstance.GetType().Name}. " +
-                    $"Set {nameof(ApiIdentityNullHandling)} to {nameof(ApiIdentityNullHandling.ReturnEmpty)} to allow null values.");
+                    $"Set {nameof(ApiIdentityPartNullHandling)} to {nameof(ApiIdentityPartNullHandling.UseDefaultOnNull)} to allow null values.");
             }
 
             return new ApiIdentityScalarPartValue(partName, ApiId.Empty);
@@ -124,11 +124,11 @@ public sealed partial class ApiIdentity
 
         if (!schemaPart.ApiProperty.TryGetValue(context.ClrInstance, out var nestedObj))
         {
-            if (context.NullHandling == ApiIdentityNullHandling.ThrowException)
+            if (context.NullHandling == ApiIdentityPartNullHandling.ThrowOnNull)
             {
                 throw new ApiIdentityException(
                     $"Nested identity property '{partName}' could not be read from {context.ClrInstance.GetType().Name}. " +
-                    $"Set {nameof(ApiIdentityNullHandling)} to {nameof(ApiIdentityNullHandling.ReturnEmpty)} to suppress this error.");
+                    $"Set {nameof(ApiIdentityPartNullHandling)} to {nameof(ApiIdentityPartNullHandling.UseDefaultOnNull)} to suppress this error.");
             }
 
             var skeleton = BuildStructureSkeleton(schemaPart.ApiIdentity);
@@ -137,11 +137,11 @@ public sealed partial class ApiIdentity
 
         if (nestedObj is null)
         {
-            if (context.NullHandling == ApiIdentityNullHandling.ThrowException)
+            if (context.NullHandling == ApiIdentityPartNullHandling.ThrowOnNull)
             {
                 throw new ApiIdentityException(
                     $"Nested identity property '{partName}' returned null on {context.ClrInstance.GetType().Name}. " +
-                    $"Set {nameof(ApiIdentityNullHandling)} to {nameof(ApiIdentityNullHandling.ReturnEmpty)} to allow null values.");
+                    $"Set {nameof(ApiIdentityPartNullHandling)} to {nameof(ApiIdentityPartNullHandling.UseDefaultOnNull)} to allow null values.");
             }
 
             var skeleton = BuildStructureSkeleton(schemaPart.ApiIdentity);
@@ -159,11 +159,11 @@ public sealed partial class ApiIdentity
 
         if (context.ClrOwnerInstance is null)
         {
-            if (context.NullHandling == ApiIdentityNullHandling.ThrowException)
+            if (context.NullHandling == ApiIdentityPartNullHandling.ThrowOnNull)
             {
                 throw new ApiIdentityException(
                     $"Owner instance is null for owner identity part '{partName}'. " +
-                    $"Set {nameof(ApiIdentityNullHandling)} to {nameof(ApiIdentityNullHandling.ReturnEmpty)} to allow null owner.");
+                    $"Set {nameof(ApiIdentityPartNullHandling)} to {nameof(ApiIdentityPartNullHandling.UseDefaultOnNull)} to allow null owner.");
             }
 
             var skeleton = BuildStructureSkeleton(schemaPart.ApiOwnerIdentity);
@@ -220,11 +220,11 @@ public sealed partial class ApiIdentity
 
         if (!context.Values.TryGetValue(partName, out var rawValue))
         {
-            if (context.NullHandling == ApiIdentityNullHandling.ThrowException)
+            if (context.NullHandling == ApiIdentityPartNullHandling.ThrowOnNull)
             {
                 throw new ApiIdentityException(
                     $"Identity value for '{partName}' is missing from the values dictionary. " +
-                    $"Set {nameof(ApiIdentityNullHandling)} to {nameof(ApiIdentityNullHandling.ReturnEmpty)} to allow missing values.");
+                    $"Set {nameof(ApiIdentityPartNullHandling)} to {nameof(ApiIdentityPartNullHandling.UseDefaultOnNull)} to allow missing values.");
             }
 
             return new ApiIdentityScalarPartValue(partName, ApiId.Empty);
@@ -232,11 +232,11 @@ public sealed partial class ApiIdentity
 
         if (rawValue is null)
         {
-            if (context.NullHandling == ApiIdentityNullHandling.ThrowException)
+            if (context.NullHandling == ApiIdentityPartNullHandling.ThrowOnNull)
             {
                 throw new ApiIdentityException(
                     $"Identity value for '{partName}' is null in the values dictionary. " +
-                    $"Set {nameof(ApiIdentityNullHandling)} to {nameof(ApiIdentityNullHandling.ReturnEmpty)} to allow null values.");
+                    $"Set {nameof(ApiIdentityPartNullHandling)} to {nameof(ApiIdentityPartNullHandling.UseDefaultOnNull)} to allow null values.");
             }
 
             return new ApiIdentityScalarPartValue(partName, ApiId.Empty);
@@ -252,11 +252,11 @@ public sealed partial class ApiIdentity
 
         if (!context.Values.TryGetValue(partName, out var nestedValue))
         {
-            if (context.NullHandling == ApiIdentityNullHandling.ThrowException)
+            if (context.NullHandling == ApiIdentityPartNullHandling.ThrowOnNull)
             {
                 throw new ApiIdentityException(
                     $"Nested identity value for '{partName}' is missing from the values dictionary. " +
-                    $"Set {nameof(ApiIdentityNullHandling)} to {nameof(ApiIdentityNullHandling.ReturnEmpty)} to allow missing values.");
+                    $"Set {nameof(ApiIdentityPartNullHandling)} to {nameof(ApiIdentityPartNullHandling.UseDefaultOnNull)} to allow missing values.");
             }
 
             var skeleton = BuildStructureSkeleton(schemaPart.ApiIdentity);
@@ -265,11 +265,11 @@ public sealed partial class ApiIdentity
 
         if (nestedValue is null)
         {
-            if (context.NullHandling == ApiIdentityNullHandling.ThrowException)
+            if (context.NullHandling == ApiIdentityPartNullHandling.ThrowOnNull)
             {
                 throw new ApiIdentityException(
                     $"Nested identity value for '{partName}' is null in the values dictionary. " +
-                    $"Set {nameof(ApiIdentityNullHandling)} to {nameof(ApiIdentityNullHandling.ReturnEmpty)} to allow null values.");
+                    $"Set {nameof(ApiIdentityPartNullHandling)} to {nameof(ApiIdentityPartNullHandling.UseDefaultOnNull)} to allow null values.");
             }
 
             var skeleton = BuildStructureSkeleton(schemaPart.ApiIdentity);
@@ -304,11 +304,11 @@ public sealed partial class ApiIdentity
 
         if (context.OwnerValues is null)
         {
-            if (context.NullHandling == ApiIdentityNullHandling.ThrowException)
+            if (context.NullHandling == ApiIdentityPartNullHandling.ThrowOnNull)
             {
                 throw new ApiIdentityException(
                     $"Owner values are null for owner identity part '{partName}'. " +
-                    $"Set {nameof(ApiIdentityNullHandling)} to {nameof(ApiIdentityNullHandling.ReturnEmpty)} to allow null owner.");
+                    $"Set {nameof(ApiIdentityPartNullHandling)} to {nameof(ApiIdentityPartNullHandling.UseDefaultOnNull)} to allow null owner.");
             }
 
             var skeleton = BuildStructureSkeleton(schemaPart.ApiOwnerIdentity);

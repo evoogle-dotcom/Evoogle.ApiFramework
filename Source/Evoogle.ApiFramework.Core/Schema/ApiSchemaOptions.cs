@@ -27,8 +27,8 @@ public record class ApiSchemaOptions
 
     /// <summary>
     ///     Gets the null-handling strategy applied when resolving identities across the entire schema.
-    ///     Defaults to <see cref="ApiIdentityNullHandling.ReturnEmpty"/>.
+    ///     Defaults to <see cref="ApiIdentityPartNullHandling.UseDefaultOnNull"/>.
     /// </summary>
-    public ApiIdentityNullHandling ApiIdentityNullHandling { get; init; } = ApiIdentityNullHandling.ReturnEmpty;
+    public ApiIdentityPartNullHandling ApiIdentityPartNullHandling { get; init; } = ApiIdentityPartNullHandling.UseDefaultOnNull;
     #endregion
 }

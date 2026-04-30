@@ -3,6 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Identity;
 
 namespace Evoogle.ApiFramework.Schema.Configuration;
@@ -13,29 +14,27 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 public sealed class ApiSchemaOptionsBuilder()
 {
     #region Fields
-    private ApiIdentityNullHandling _apiIdentityNullHandling = ApiSchemaOptions.Default.ApiIdentityNullHandling;
+    private ApiIdentityPartNullHandling _apiIdentityPartNullHandling = ApiSchemaOptions.Default.ApiIdentityPartNullHandling;
     #endregion
 
     #region With Methods
     /// <summary>
-    ///     Configures identity null handling to return <see cref="ApiId.Empty"/> when a property value
-    ///     is null or a part is unresolved.
+    ///     Configures key-part null handling to throw an <see cref="ApiIdentityException"/> when a key part is null or cannot be resolved during identity construction.
     /// </summary>
     /// <returns>The current builder instance.</returns>
-    public ApiSchemaOptionsBuilder ReturnEmptyOnNull()
+    public ApiSchemaOptionsBuilder ThrowOnNullKeyPart()
     {
-        _apiIdentityNullHandling = ApiIdentityNullHandling.ReturnEmpty;
+        _apiIdentityPartNullHandling = ApiIdentityPartNullHandling.ThrowOnNull;
         return this;
     }
 
     /// <summary>
-    ///     Configures identity null handling to throw an <see cref="Exceptions.ApiIdentityException"/>
-    ///     when a property value is null or a part is unresolved.
+    ///     Configures key-part null handling to use the default identity value behavior when a key part is null or cannot be resolved during identity construction, rather than throwing.
     /// </summary>
     /// <returns>The current builder instance.</returns>
-    public ApiSchemaOptionsBuilder ThrowOnNull()
+    public ApiSchemaOptionsBuilder UseDefaultOnNullKeyPart()
     {
-        _apiIdentityNullHandling = ApiIdentityNullHandling.ThrowException;
+        _apiIdentityPartNullHandling = ApiIdentityPartNullHandling.UseDefaultOnNull;
         return this;
     }
     #endregion
@@ -49,7 +48,7 @@ public sealed class ApiSchemaOptionsBuilder()
     {
         return new ApiSchemaOptions
         {
-            ApiIdentityNullHandling = _apiIdentityNullHandling
+            ApiIdentityPartNullHandling = _apiIdentityPartNullHandling
         };
     }
     #endregion

@@ -5,7 +5,7 @@
 // See the LICENSE file in the project root for more information.
 using System.Diagnostics.CodeAnalysis;
 
-using Evoogle.ApiFramework.Identity;
+using Evoogle.ApiFramework.Schema.Configuration.Internal;
 using Evoogle.ApiFramework.Schema.TestData;
 using Evoogle.ApiFramework.TestData;
 using Evoogle.Extensions;
@@ -17,28 +17,26 @@ using static Evoogle.ApiFramework.Schema.TestData.ApiSchemaFactory;
 
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
-public class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnitTests(output)
+public partial class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnitTests(output)
 {
     #region Test Classes
-    private class BuildTest : XUnitTest
+    private class BuildTestCore : XUnitTest
     {
         #region User Supplied Properties
         public required ApiSchemaKind ApiSchemaKind { get; init; }
         public required string ApiObjectTypeName { get; init; } = null!;
-        public Type? ApiExtensionType1 { get; init; }
-        public Type? ApiExtensionType2 { get; init; }
         #endregion
 
         #region Calculated Properties
-        private ApiType? ApiTypeExpected { get; set; }
-        private ApiType? ApiTypeActual { get; set; }
+        protected ApiType? ApiTypeExpected { get; set; }
+        protected ApiType? ApiTypeActual { get; set; }
         #endregion
 
         #region Constructors
         [SetsRequiredMembers]
-        public BuildTest()
+        public BuildTestCore()
         {
-            this.Name = nameof(BuildTest);
+            this.Name = nameof(BuildTestCore);
             this.ExcludeMembers = ApiSchemaExcludeMembers.Standard;
         }
         #endregion
@@ -51,134 +49,24 @@ public class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
 
             var apiTypeExpected = (ApiObjectType)apiType.DeepCopy()!; // Needs to be ApiType here to allow deep copy by JSON serialization/deserialization to work properly
 
-            if (this.ApiExtensionType1 != null)
+            var apiExtensionTypes = this.GetExtensionTypes().SafeToList();
+            var apiExtensionTypesCount = apiExtensionTypes.Count;
+            if (apiExtensionTypesCount > 0)
             {
-                var extensionInstance = Activator.CreateInstance(this.ApiExtensionType1);
                 apiTypeExpected.Extensions ??= [];
-                apiTypeExpected.Extensions[this.ApiExtensionType1] = extensionInstance!;
-            }
 
-            if (this.ApiExtensionType2 != null)
-            {
-                var extensionInstance = Activator.CreateInstance(this.ApiExtensionType2);
-                apiTypeExpected.Extensions ??= [];
-                apiTypeExpected.Extensions[this.ApiExtensionType2] = extensionInstance!;
+                foreach (var apiExtensionType in apiExtensionTypes)
+                {
+                    var extensionInstance = Activator.CreateInstance(apiExtensionType);
+                    apiTypeExpected.Extensions[apiExtensionType] = extensionInstance!;
+                }
             }
 
             this.ApiTypeExpected = apiTypeExpected;
 
-            this.WriteLine($"ApiSchema:     {apiSchema.ApiName.SafeToString()}");
-            this.WriteLine($"ApiObjectType: {apiTypeExpected.ApiName.SafeToString()}");
+            this.WriteLine($"ApiSchema: {apiSchema.ApiName.SafeToString()}");
             this.WriteLine();
-            this.WriteLine($"Expected: {this.ApiTypeExpected.SafeToString()}");
-        }
-
-        protected override void Act()
-        {
-            var apiObjectType = (ApiObjectType)this.ApiTypeExpected!;
-
-            var apiName = apiObjectType.ApiName;
-            var clrType = apiObjectType.ClrType;
-
-            var context = new ApiSchemaBuilderContext();
-            var builder = new ApiObjectTypeBuilder(clrType, context)
-                .WithName(apiName);
-
-            var apiIdentities = apiObjectType.ApiIdentities;
-            foreach (var apiIdentity in apiIdentities ?? [])
-            {
-                builder.AddIdentity(apiIdentity.ApiName, identityBuilder =>
-                {
-                    foreach (var apiIdentityPart in apiIdentity.ApiIdentityParts)
-                    {
-                        var apiKind = apiIdentityPart.ApiKind;
-                        switch (apiKind)
-                        {
-                            case ApiIdentityPartKind.Scalar:
-                                {
-                                    var scalarPart = (ApiIdentityScalarPart)apiIdentityPart;
-                                    var clrScalarTypeHint = scalarPart.ClrScalarTypeHint;
-                                    if (clrScalarTypeHint is not null)
-                                    {
-                                        identityBuilder.AddScalarPart(scalarPart.ClrPropertyName, clrScalarTypeHint);
-                                    }
-                                    else
-                                    {
-                                        identityBuilder.AddScalarPart(scalarPart.ClrPropertyName);
-                                    }
-                                    break;
-                                }
-
-                            case ApiIdentityPartKind.Nested:
-                                {
-                                    var nestedPart = (ApiIdentityNestedPart)apiIdentityPart;
-                                    var apiIdentityName = nestedPart.ApiIdentityName;
-                                    if (apiIdentityName is not null)
-                                    {
-                                        identityBuilder.AddNestedPart(nestedPart.ClrPropertyName, apiIdentityName);
-                                    }
-                                    else
-                                    {
-                                        identityBuilder.AddNestedPart(nestedPart.ClrPropertyName);
-                                    }
-                                    break;
-                                }
-
-                            case ApiIdentityPartKind.Owner:
-                                {
-                                    var ownerPart = (ApiIdentityOwnerPart)apiIdentityPart;
-                                    var apiIdentityName = ownerPart.ApiIdentityName;
-                                    if (apiIdentityName is not null)
-                                    {
-                                        identityBuilder.AddOwnerPart(apiIdentityName);
-                                    }
-                                    else
-                                    {
-                                        identityBuilder.AddOwnerPart(ownerPart.ApiIdentityName!);
-                                    }
-                                    break;
-                                }
-
-                            default:
-                                throw new InvalidOperationException($"Unsupported API identity part kind: {apiKind}");
-                        }
-                    }
-                });
-            }
-
-            var apiProperties = apiObjectType.ApiProperties;
-            foreach (var apiProperty in apiProperties ?? [])
-            {
-                builder.AddProperty(apiProperty.ApiName, apiProperty.ClrName);
-            }
-
-            var apiOptions = apiObjectType.ApiOptions;
-            if (apiOptions is not null)
-            {
-                builder.WithOptions(optionsBuilder =>
-                {
-                    if (apiOptions.ApiIdentityNullHandling.HasValue)
-                    {
-                        if (apiOptions.ApiIdentityNullHandling.Value == ApiIdentityNullHandling.ThrowException)
-                        {
-                            optionsBuilder.ThrowOnNull();
-                        }
-                        else
-                        {
-                            optionsBuilder.ReturnEmptyOnNull();
-                        }
-                    }
-                });
-            }
-
-            var extensions = apiObjectType.Extensions;
-            foreach (var extension in extensions ?? [])
-            {
-                builder.AddObjectExtension(extension.Key, extension.Value);
-            }
-
-            this.ApiTypeActual = builder.Build();
-            this.WriteLine($"Actual:   {this.ApiTypeActual.SafeToString()}");
+            this.WriteLine($"ApiTypeExpected: {this.ApiTypeExpected.SafeToString()}");
         }
 
         protected override void Assert()
@@ -191,320 +79,331 @@ public class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
             this.AssertBeEquivalentTo(this.ApiTypeActual, this.ApiTypeExpected);
         }
         #endregion
-    }
-    #endregion
 
-    private class AddIdentityNullConfigureTest : XUnitTest
-    {
-        #region User Supplied Properties
-        public required string IdentityApiName { get; init; }
-        #endregion
-
-        #region Calculated Properties
-        private ApiObjectType? Actual { get; set; }
-        #endregion
-
-        #region Constructors
-        public AddIdentityNullConfigureTest()
-        {
-            this.Name = nameof(AddIdentityNullConfigureTest);
-            this.ExcludeMembers = ApiSchemaExcludeMembers.Standard;
-        }
-        #endregion
-
-        #region XUnitTest Methods
-        protected override void Arrange()
-        {
-            this.WriteLine($"IdentityApiName: {this.IdentityApiName}");
-        }
-
-        protected override void Act()
-        {
-            var context = new ApiSchemaBuilderContext();
-            this.Actual = new ApiObjectTypeBuilder(typeof(Customer), context)
-                .WithName(nameof(Customer))
-                .AddIdentity(this.IdentityApiName)
-                .Build();
-            this.WriteLine($"Actual: {this.Actual.SafeToString()}");
-        }
-
-        protected override void Assert()
-        {
-            this.Actual.Should().NotBeNull();
-            this.Actual!.ApiIdentities.Should().ContainSingle()
-                .Which.ApiName.Should().Be(this.IdentityApiName);
-        }
+        #region BuildTestCore Methods
+        protected virtual IEnumerable<Type> GetExtensionTypes() => [];
         #endregion
     }
 
-    private class AddPropertySingleNameTest : XUnitTest
+    private class BuildTest : BuildTestCore
     {
         #region User Supplied Properties
-        public string PropertyName { get; init; } = null!;
-        #endregion
-
-        #region Calculated Properties
-        private ApiObjectType? ApiTypeFromSingleName { get; set; }
-        private ApiObjectType? ApiTypeFromTwoNames { get; set; }
+        public Type? ApiExtensionType1 { get; init; }
+        public Type? ApiExtensionType2 { get; init; }
         #endregion
 
         #region Constructors
         [SetsRequiredMembers]
-        public AddPropertySingleNameTest()
+        public BuildTest()
         {
-            this.Name = nameof(AddPropertySingleNameTest);
-            this.ExcludeMembers = ApiSchemaExcludeMembers.Standard;
+            this.Name = nameof(BuildTest);
         }
         #endregion
 
         #region XUnitTest Methods
-        protected override void Arrange()
-        {
-            this.WriteLine($"PropertyName: {this.PropertyName}");
-        }
-
         protected override void Act()
         {
+            var apiObjectType = (ApiObjectType)this.ApiTypeExpected!;
+
+            var apiName = apiObjectType.ApiName;
+            var clrType = apiObjectType.ClrType;
+
             var context = new ApiSchemaBuilderContext();
+            var builder = new ApiObjectTypeBuilder(clrType, context)
+                .WithName(apiName);
 
-            this.ApiTypeFromSingleName = new ApiObjectTypeBuilder(typeof(ScalarsOnly), context)
-                .WithName(nameof(ScalarsOnly))
-                .AddProperty(this.PropertyName)
-                .Build();
+            var apiProperties = apiObjectType.ApiProperties;
+            foreach (var apiProperty in apiProperties ?? [])
+            {
+                var apiPropertyName = apiProperty.ApiName;
+                var clrPropertyName = apiProperty.ClrName;
+                builder.AddProperty(apiPropertyName, clrPropertyName);
+            }
 
-            this.ApiTypeFromTwoNames = new ApiObjectTypeBuilder(typeof(ScalarsOnly), context)
-                .WithName(nameof(ScalarsOnly))
-                .AddProperty(this.PropertyName, this.PropertyName)
-                .Build();
+            builder.ConfigureOptions(apiObjectType);
+            builder.ConfigureIdentities(apiObjectType);
+            builder.ConfigureExtensions(apiObjectType);
 
-            this.WriteLine($"Single-name result: {this.ApiTypeFromSingleName.SafeToString()}");
-            this.WriteLine($"Two-name result:    {this.ApiTypeFromTwoNames.SafeToString()}");
+            this.ApiTypeActual = builder.Build();
+            this.WriteLine($"ApiTypeActual:   {this.ApiTypeActual.SafeToString()}");
         }
+        #endregion
 
-        protected override void Assert()
+        #region BuildTestCore Methods
+        protected override IEnumerable<Type> GetExtensionTypes()
         {
-            this.ApiTypeFromSingleName.Should().NotBeNull();
-            this.ApiTypeFromTwoNames.Should().NotBeNull();
-            this.AssertBeEquivalentTo(this.ApiTypeFromSingleName, this.ApiTypeFromTwoNames);
+            if (this.ApiExtensionType1 != null)
+            {
+                yield return this.ApiExtensionType1;
+            }
+
+            if (this.ApiExtensionType2 != null)
+            {
+                yield return this.ApiExtensionType2;
+            }
         }
         #endregion
     }
 
-    private class AddNamedModifierPropertyTest : XUnitTest
+    private class BuildWithAddRequiredOrOptionalPropertyTest : BuildTest
     {
-        #region User Supplied Properties
-        public required string PropertyName { get; init; }
-        public required Func<string, ApiObjectType> BuildExpected { get; init; }
-        public required Func<string, ApiObjectType> BuildActual { get; init; }
-        #endregion
-
-        #region Calculated Properties
-        private ApiObjectType? Expected { get; set; }
-        private ApiObjectType? Actual { get; set; }
-        #endregion
-
         #region Constructors
-        public AddNamedModifierPropertyTest()
+        [SetsRequiredMembers]
+        public BuildWithAddRequiredOrOptionalPropertyTest()
         {
-            this.Name = nameof(AddNamedModifierPropertyTest);
-            this.ExcludeMembers = ApiSchemaExcludeMembers.Standard;
+            this.Name = nameof(BuildTest);
         }
         #endregion
 
         #region XUnitTest Methods
-        protected override void Arrange()
-        {
-            this.Expected = this.BuildExpected(this.PropertyName);
-            this.WriteLine($"Expected: {this.Expected.SafeToString()}");
-        }
-
         protected override void Act()
         {
-            this.Actual = this.BuildActual(this.PropertyName);
-            this.WriteLine($"Actual:   {this.Actual.SafeToString()}");
-        }
+            var apiObjectType = (ApiObjectType)this.ApiTypeExpected!;
 
-        protected override void Assert()
-        {
-            this.Actual.Should().NotBeNull();
-            this.AssertBeEquivalentTo(this.Actual, this.Expected);
+            var apiName = apiObjectType.ApiName;
+            var clrType = apiObjectType.ClrType;
+
+            var context = new ApiSchemaBuilderContext();
+            var builder = new ApiObjectTypeBuilder(clrType, context)
+                .WithName(apiName);
+
+            var apiProperties = apiObjectType.ApiProperties;
+            foreach (var apiProperty in apiProperties ?? [])
+            {
+                var apiPropertyName = apiProperty.ApiName;
+                var clrPropertyName = apiProperty.ClrName;
+                var isRequired = apiProperty.IsRequired;
+
+                if (apiPropertyName == clrPropertyName)
+                {
+                    var name = apiPropertyName;
+                    if (isRequired)
+                    {
+                        builder.AddRequiredProperty(name);
+                    }
+                    else
+                    {
+                        builder.AddOptionalProperty(name);
+                    }
+                }
+                else
+                {
+                    if (isRequired)
+                    {
+                        builder.AddRequiredProperty(apiPropertyName, clrPropertyName);
+                    }
+                    else
+                    {
+                        builder.AddOptionalProperty(apiPropertyName, clrPropertyName);
+                    }
+                }
+            }
+
+            builder.ConfigureOptions(apiObjectType);
+            builder.ConfigureIdentities(apiObjectType);
+            builder.ConfigureExtensions(apiObjectType);
+
+            this.ApiTypeActual = builder.Build();
+            this.WriteLine($"ApiTypeActual:   {this.ApiTypeActual.SafeToString()}");
         }
         #endregion
     }
+
+    private class BuildWithConfigureAsRequiredOrOptionalPropertyTest : BuildTest
+    {
+        #region Constructors
+        [SetsRequiredMembers]
+        public BuildWithConfigureAsRequiredOrOptionalPropertyTest()
+        {
+            this.Name = nameof(BuildTest);
+        }
+        #endregion
+
+        #region XUnitTest Methods
+        protected override void Act()
+        {
+            var apiObjectType = (ApiObjectType)this.ApiTypeExpected!;
+
+            var apiName = apiObjectType.ApiName;
+            var clrType = apiObjectType.ClrType;
+
+            var context = new ApiSchemaBuilderContext();
+            var builder = new ApiObjectTypeBuilder(clrType, context)
+                .WithName(apiName);
+
+            var apiProperties = apiObjectType.ApiProperties;
+            foreach (var apiProperty in apiProperties ?? [])
+            {
+                var apiPropertyName = apiProperty.ApiName;
+                var clrPropertyName = apiProperty.ClrName;
+                var isRequired = apiProperty.IsRequired;
+
+                if (apiPropertyName == clrPropertyName)
+                {
+                    var name = apiPropertyName;
+                    if (isRequired)
+                    {
+                        builder.AddProperty(name, x => x.AsRequired());
+                    }
+                    else
+                    {
+                        builder.AddProperty(name, x => x.AsOptional());
+                    }
+                }
+                else
+                {
+                    if (isRequired)
+                    {
+                        builder.AddProperty(apiPropertyName, clrPropertyName, x => x.AsRequired());
+                    }
+                    else
+                    {
+                        builder.AddProperty(apiPropertyName, clrPropertyName, x => x.AsOptional());
+                    }
+                }
+            }
+
+            builder.ConfigureOptions(apiObjectType);
+            builder.ConfigureIdentities(apiObjectType);
+            builder.ConfigureExtensions(apiObjectType);
+
+            this.ApiTypeActual = builder.Build();
+            this.WriteLine($"ApiTypeActual:   {this.ApiTypeActual.SafeToString()}");
+        }
+        #endregion
+    }
+    #endregion
 
     #region Theory Data
-    public static TheoryDataRow<IXUnitTest>[] AddPropertySingleNameTheoryData =>
-    [
-        new AddPropertySingleNameTest
-        {
-            Name = "AddProperty(name) is equivalent to AddProperty(name, name) for a required property",
-            PropertyName = nameof(ScalarsOnly.RequiredName),
-        },
-        new AddPropertySingleNameTest
-        {
-            Name = "AddProperty(name) is equivalent to AddProperty(name, name) for an optional property",
-            PropertyName = nameof(ScalarsOnly.OptionalName),
-        },
-    ];
-
-    public static TheoryDataRow<IXUnitTest>[] AddRequiredPropertyTheoryData =>
-    [
-        new AddNamedModifierPropertyTest
-        {
-            Name = "AddRequiredProperty(name) produces same result as AddProperty(name, p => p.AsRequired())",
-            BuildExpected = static name =>
-            {
-                var ctx = new ApiSchemaBuilderContext();
-                return new ApiObjectTypeBuilder(typeof(ScalarsOnly), ctx)
-                    .WithName(nameof(ScalarsOnly))
-                    .AddProperty(name, p => p.AsRequired())
-                    .Build();
-            },
-            BuildActual = static name =>
-            {
-                var ctx = new ApiSchemaBuilderContext();
-                return new ApiObjectTypeBuilder(typeof(ScalarsOnly), ctx)
-                    .WithName(nameof(ScalarsOnly))
-                    .AddRequiredProperty(name)
-                    .Build();
-            },
-            PropertyName = nameof(ScalarsOnly.RequiredName),
-        },
-        new AddNamedModifierPropertyTest
-        {
-            Name = "AddRequiredProperty(apiName, clrName) produces same result as AddProperty(apiName, clrName, p => p.AsRequired())",
-            BuildExpected = static name =>
-            {
-                var ctx = new ApiSchemaBuilderContext();
-                return new ApiObjectTypeBuilder(typeof(ScalarsOnly), ctx)
-                    .WithName(nameof(ScalarsOnly))
-                    .AddProperty(name, name, p => p.AsRequired())
-                    .Build();
-            },
-            BuildActual = static name =>
-            {
-                var ctx = new ApiSchemaBuilderContext();
-                return new ApiObjectTypeBuilder(typeof(ScalarsOnly), ctx)
-                    .WithName(nameof(ScalarsOnly))
-                    .AddRequiredProperty(name, name)
-                    .Build();
-            },
-            PropertyName = nameof(ScalarsOnly.RequiredName),
-        },
-    ];
-
-    public static TheoryDataRow<IXUnitTest>[] AddOptionalPropertyTheoryData =>
-    [
-        new AddNamedModifierPropertyTest
-        {
-            Name = "AddOptionalProperty(name) produces same result as AddProperty(name, p => p.AsOptional())",
-            BuildExpected = static name =>
-            {
-                var ctx = new ApiSchemaBuilderContext();
-                return new ApiObjectTypeBuilder(typeof(ScalarsOnly), ctx)
-                    .WithName(nameof(ScalarsOnly))
-                    .AddProperty(name, p => p.AsOptional())
-                    .Build();
-            },
-            BuildActual = static name =>
-            {
-                var ctx = new ApiSchemaBuilderContext();
-                return new ApiObjectTypeBuilder(typeof(ScalarsOnly), ctx)
-                    .WithName(nameof(ScalarsOnly))
-                    .AddOptionalProperty(name)
-                    .Build();
-            },
-            PropertyName = nameof(ScalarsOnly.OptionalName),
-        },
-        new AddNamedModifierPropertyTest
-        {
-            Name = "AddOptionalProperty(apiName, clrName) produces same result as AddProperty(apiName, clrName, p => p.AsOptional())",
-            BuildExpected = static name =>
-            {
-                var ctx = new ApiSchemaBuilderContext();
-                return new ApiObjectTypeBuilder(typeof(ScalarsOnly), ctx)
-                    .WithName(nameof(ScalarsOnly))
-                    .AddProperty(name, name, p => p.AsOptional())
-                    .Build();
-            },
-            BuildActual = static name =>
-            {
-                var ctx = new ApiSchemaBuilderContext();
-                return new ApiObjectTypeBuilder(typeof(ScalarsOnly), ctx)
-                    .WithName(nameof(ScalarsOnly))
-                    .AddOptionalProperty(name, name)
-                    .Build();
-            },
-            PropertyName = nameof(ScalarsOnly.OptionalName),
-        },
-    ];
-
     public static TheoryDataRow<IXUnitTest>[] BuildTheoryData =>
     [
+        // Simple API Schema
+        // - Empty
         new BuildTest
         {
-            Name = $"Builds {nameof(Empty)} from {ApiSchemaKind.Simple} API schema",
+            Name = $"Build from '{ApiSchemaKind.Simple}' API schema the '{nameof(Empty)}' API object type",
             ApiSchemaKind = ApiSchemaKind.Simple,
             ApiObjectTypeName = nameof(Empty),
         },
         new BuildTest
         {
-            Name = $"Builds {nameof(Empty)} with GraphQl extension from {ApiSchemaKind.Simple} API schema",
+            Name = $"Build from '{ApiSchemaKind.Simple}' API schema the '{nameof(Empty)}' API object type with '{nameof(GraphQlExtension)}'",
             ApiSchemaKind = ApiSchemaKind.Simple,
             ApiObjectTypeName = nameof(Empty),
             ApiExtensionType1 = typeof(GraphQlExtension),
         },
 
+        // Simple API Schema
+        // - ScalarsOnly
         new BuildTest
         {
-            Name = $"Builds {nameof(ScalarsOnly)} from {ApiSchemaKind.Simple} API schema",
+            Name = $"Build from '{ApiSchemaKind.Simple}' API schema the '{nameof(ScalarsOnly)}' API object type",
             ApiSchemaKind = ApiSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
         },
         new BuildTest
         {
-            Name = $"Builds {nameof(ScalarsOnly)} with GraphQl extension from {ApiSchemaKind.Simple} API schema",
+            Name = $"Build from '{ApiSchemaKind.Simple}' API schema the '{nameof(ScalarsOnly)}' API object type with '{nameof(GraphQlExtension)}'",
             ApiSchemaKind = ApiSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiExtensionType1 = typeof(GraphQlExtension),
         },
         new BuildTest
         {
-            Name = $"Builds {nameof(ScalarsOnly)} with JsonApi extension from {ApiSchemaKind.Simple} API schema",
+            Name = $"Build from '{ApiSchemaKind.Simple}' API schema the '{nameof(ScalarsOnly)}' API object type with '{nameof(JsonApiExtension)}'",
             ApiSchemaKind = ApiSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiExtensionType1 = typeof(JsonApiExtension),
         },
         new BuildTest
         {
-            Name = $"Builds {nameof(ScalarsOnly)} with GraphQl and JsonApi extensions from {ApiSchemaKind.Simple} API schema",
+            Name = $"Build from '{ApiSchemaKind.Simple}' API schema the '{nameof(ScalarsOnly)}' API object type with '{nameof(GraphQlExtension)}' and '{nameof(JsonApiExtension)}'",
             ApiSchemaKind = ApiSchemaKind.Simple,
             ApiObjectTypeName = nameof(ScalarsOnly),
             ApiExtensionType1 = typeof(GraphQlExtension),
             ApiExtensionType2 = typeof(JsonApiExtension),
         },
+        new BuildWithAddRequiredOrOptionalPropertyTest
+        {
+            Name = $"Build from '{ApiSchemaKind.Simple}' API schema the '{nameof(ScalarsOnly)}' API object type with explicitly add required/optional properties",
+            ApiSchemaKind = ApiSchemaKind.Simple,
+            ApiObjectTypeName = nameof(ScalarsOnly),
+        },
 
+        // Simple API Schema
+        // - Company
         new BuildTest
         {
-            Name = $"Builds {nameof(Company)} from {ApiSchemaKind.Simple} API schema",
+            Name = $"Build from '{ApiSchemaKind.Simple}' API schema the '{nameof(Company)}' API object type",
             ApiSchemaKind = ApiSchemaKind.Simple,
             ApiObjectTypeName = nameof(Company),
         },
         new BuildTest
         {
-            Name = $"Builds {nameof(Company)} with GraphQl extension from {ApiSchemaKind.Simple} API schema",
+            Name = $"Build from '{ApiSchemaKind.Simple}' API schema the '{nameof(Company)}' API object type with '{nameof(GraphQlExtension)}'",
             ApiSchemaKind = ApiSchemaKind.Simple,
             ApiObjectTypeName = nameof(Company),
             ApiExtensionType1 = typeof(GraphQlExtension),
         },
-    ];
-
-    public static TheoryDataRow<IXUnitTest>[] AddIdentityNullConfigureTheoryData =>
-    [
-        new AddIdentityNullConfigureTest
+        new BuildWithConfigureAsRequiredOrOptionalPropertyTest
         {
-            Name = "AddIdentity(name) without configure builds empty identity with correct API name",
-            IdentityApiName = "PK_Customer",
+            Name = $"Build from '{ApiSchemaKind.Simple}' API schema the '{nameof(Company)}' API object type with explicitly configuring required/optional properties",
+            ApiSchemaKind = ApiSchemaKind.Simple,
+            ApiObjectTypeName = nameof(Company),
+        },
+
+        // Identity API Schema
+        // - IdentityScalar
+        new BuildTest
+        {
+            Name = $"Build from '{ApiSchemaKind.Identity}' API schema the '{nameof(IdentityScalar)}' API object type",
+            ApiSchemaKind = ApiSchemaKind.Identity,
+            ApiObjectTypeName = nameof(IdentityScalar),
+        },
+
+        // Identity API Schema
+        // - IdentityTwoScalarPartComposite
+        new BuildTest
+        {
+            Name = $"Build from '{ApiSchemaKind.Identity}' API schema the '{nameof(IdentityTwoScalarPartComposite)}' API object type",
+            ApiSchemaKind = ApiSchemaKind.Identity,
+            ApiObjectTypeName = nameof(IdentityTwoScalarPartComposite),
+        },
+
+        // Identity API Schema
+        // - IdentityThreeScalarPartComposite
+        new BuildTest
+        {
+            Name = $"Build from '{ApiSchemaKind.Identity}' API schema the '{nameof(IdentityThreeScalarPartComposite)}' API object type",
+            ApiSchemaKind = ApiSchemaKind.Identity,
+            ApiObjectTypeName = nameof(IdentityThreeScalarPartComposite),
+        },
+
+        // Identity API Schema
+        // - IdentityNestedComposite
+        new BuildTest
+        {
+            Name = $"Build from '{ApiSchemaKind.Identity}' API schema the '{nameof(IdentityNestedComposite)}' API object type",
+            ApiSchemaKind = ApiSchemaKind.Identity,
+            ApiObjectTypeName = nameof(IdentityNestedComposite),
+        },
+
+        // Identity API Schema
+        // - IdentityOwnedComposite
+        new BuildTest
+        {
+            Name = $"Build from '{ApiSchemaKind.Identity}' API schema the '{nameof(IdentityOwnedComposite)}' API object type",
+            ApiSchemaKind = ApiSchemaKind.Identity,
+            ApiObjectTypeName = nameof(IdentityOwnedComposite),
+        },
+
+        // Identity API Schema
+        // - IdentityOwnedDependent
+        new BuildTest
+        {
+            Name = $"Build from '{ApiSchemaKind.Identity}' API schema the '{nameof(IdentityOwnedDependent)}' API object type",
+            ApiSchemaKind = ApiSchemaKind.Identity,
+            ApiObjectTypeName = nameof(IdentityOwnedDependent),
         },
     ];
     #endregion
@@ -513,22 +412,6 @@ public class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
     [Theory]
     [MemberData(nameof(BuildTheoryData))]
     public void Build(IXUnitTest test) => test.Execute(this);
-
-    [Theory]
-    [MemberData(nameof(AddPropertySingleNameTheoryData))]
-    public void AddPropertySingleName(IXUnitTest test) => test.Execute(this);
-
-    [Theory]
-    [MemberData(nameof(AddRequiredPropertyTheoryData))]
-    public void AddRequiredProperty(IXUnitTest test) => test.Execute(this);
-
-    [Theory]
-    [MemberData(nameof(AddOptionalPropertyTheoryData))]
-    public void AddOptionalProperty(IXUnitTest test) => test.Execute(this);
-
-    [Theory]
-    [MemberData(nameof(AddIdentityNullConfigureTheoryData))]
-    public void AddIdentityNullConfigure(IXUnitTest test) => test.Execute(this);
     #endregion
 }
 

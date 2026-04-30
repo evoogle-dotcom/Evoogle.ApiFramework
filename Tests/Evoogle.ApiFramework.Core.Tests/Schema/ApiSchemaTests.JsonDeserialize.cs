@@ -33,7 +33,7 @@ public partial class ApiSchemaTests
                 ""ApiName"": ""ApiSchema With 0 ApiType"",
                 ""ApiVersion"": ""0.1.0"",
                 ""ApiOptions"": {
-                    ""ApiIdentityNullHandling"": ""ReturnEmpty""
+                    ""ApiIdentityPartNullHandling"": ""UseDefaultOnNull""
                 },
                 ""ApiScalarTypes"": [],
                 ""ApiEnumTypes"": [],
@@ -57,7 +57,7 @@ public partial class ApiSchemaTests
                 ""ApiName"": ""ApiSchema With 0 ApiType And ApiSchemaOptions"",
                 ""ApiVersion"": ""0.1.0"",
                 ""ApiOptions"": {
-                    ""ApiIdentityNullHandling"": ""ThrowException""
+                    ""ApiIdentityPartNullHandling"": ""ThrowOnNull""
                 },
                 ""ApiScalarTypes"": [],
                 ""ApiEnumTypes"": [],
@@ -71,7 +71,7 @@ public partial class ApiSchemaTests
                     ApiName: $"{nameof(ApiSchema)} With 0 {nameof(ApiType)} And {nameof(ApiSchemaOptions)}",
                     ApiOptions: new ApiSchemaOptionsConfig
                     (
-                        ApiIdentityNullHandling: ApiIdentityNullHandling.ThrowException
+                        ApiIdentityPartNullHandling: ApiIdentityPartNullHandling.ThrowOnNull
                     )
                 )
             )
@@ -86,7 +86,7 @@ public partial class ApiSchemaTests
                 ""ApiName"": ""ApiSchema With 1 ApiScalarType"",
                 ""ApiVersion"": ""0.1.0"",
                 ""ApiOptions"": {
-                    ""ApiIdentityNullHandling"": ""ReturnEmpty""
+                    ""ApiIdentityPartNullHandling"": ""UseDefaultOnNull""
                 },
                 ""ApiScalarTypes"": [
                     {
@@ -132,7 +132,7 @@ public partial class ApiSchemaTests
                 ""ApiName"": ""ApiSchema With 1 ApiScalarType And ApiSchemaOptions"",
                 ""ApiVersion"": ""0.1.0"",
                 ""ApiOptions"": {
-                    ""ApiIdentityNullHandling"": ""ThrowException""
+                    ""ApiIdentityPartNullHandling"": ""ThrowOnNull""
                 },
                 ""ApiScalarTypes"": [
                     {
@@ -152,7 +152,7 @@ public partial class ApiSchemaTests
                     ApiName: $"{nameof(ApiSchema)} With 1 {nameof(ApiScalarType)} And {nameof(ApiSchemaOptions)}",
                     ApiOptions: new ApiSchemaOptionsConfig
                     (
-                        ApiIdentityNullHandling: ApiIdentityNullHandling.ThrowException
+                        ApiIdentityPartNullHandling: ApiIdentityPartNullHandling.ThrowOnNull
                     )
                 ),
                 ApiNamedTypes:
@@ -182,7 +182,7 @@ public partial class ApiSchemaTests
                 ""ApiName"": ""ApiSchema With 1 ApiScalarType And GraphQlExtension"",
                 ""ApiVersion"": ""0.1.0"",
                 ""ApiOptions"": {
-                    ""ApiIdentityNullHandling"": ""ReturnEmpty""
+                    ""ApiIdentityPartNullHandling"": ""UseDefaultOnNull""
                 },
                 ""ApiScalarTypes"": [
                     {
@@ -234,7 +234,7 @@ public partial class ApiSchemaTests
                 ""ApiName"": ""ApiSchema With 2 ApiScalarType"",
                 ""ApiVersion"": ""0.1.0"",
                 ""ApiOptions"": {
-                    ""ApiIdentityNullHandling"": ""ReturnEmpty""
+                    ""ApiIdentityPartNullHandling"": ""UseDefaultOnNull""
                 },
                 ""ApiScalarTypes"": [
                     {
@@ -297,7 +297,7 @@ public partial class ApiSchemaTests
                 ""ApiName"": ""ApiSchema With 3 ApiScalarType"",
                 ""ApiVersion"": ""0.1.0"",
                 ""ApiOptions"": {
-                    ""ApiIdentityNullHandling"": ""ReturnEmpty""
+                    ""ApiIdentityPartNullHandling"": ""UseDefaultOnNull""
                 },
                 ""ApiScalarTypes"": [
                     {
@@ -377,7 +377,7 @@ public partial class ApiSchemaTests
                 ""ApiName"": ""ApiSchema With 3 ApiScalarType And GraphQlExtension And JsonApiExtension"",
                 ""ApiVersion"": ""0.1.0"",
                 ""ApiOptions"": {
-                    ""ApiIdentityNullHandling"": ""ReturnEmpty""
+                    ""ApiIdentityPartNullHandling"": ""UseDefaultOnNull""
                 },
                 ""ApiScalarTypes"": [
                     {
@@ -466,7 +466,7 @@ public partial class ApiSchemaTests
                 ""ApiName"": ""ApiSchema With 1 ApiEnumType"",
                 ""ApiVersion"": ""0.1.0"",
                 ""ApiOptions"": {
-                    ""ApiIdentityNullHandling"": ""ReturnEmpty""
+                    ""ApiIdentityPartNullHandling"": ""UseDefaultOnNull""
                 },
                 ""ApiScalarTypes"": [],
                 ""ApiEnumTypes"": [
@@ -529,7 +529,7 @@ public partial class ApiSchemaTests
                 ""ApiName"": ""ApiSchema With 1 ApiEnumType And ProtobufExtension"",
                 ""ApiVersion"": ""0.1.0"",
                 ""ApiOptions"": {
-                    ""ApiIdentityNullHandling"": ""ReturnEmpty""
+                    ""ApiIdentityPartNullHandling"": ""UseDefaultOnNull""
                 },
                 ""ApiScalarTypes"": [],
                 ""ApiEnumTypes"": [
@@ -598,7 +598,7 @@ public partial class ApiSchemaTests
                 ""ApiName"": ""ApiSchema With 3 ApiScalarType And 1 ApiEnumType And 1 ApiObjectType (Person)"",
                 ""ApiVersion"": ""0.1.0"",
                 ""ApiOptions"": {
-                    ""ApiIdentityNullHandling"": ""ReturnEmpty""
+                    ""ApiIdentityPartNullHandling"": ""UseDefaultOnNull""
                 },
                 ""ApiScalarTypes"": [
                     {
@@ -909,7 +909,7 @@ public partial class ApiSchemaTests
                 ""ApiName"": ""ApiSchema With 3 ApiScalarType And 1 ApiEnumType And 1 ApiObjectType (Person) And GraphQlExtension And JsonApiExtension"",
                 ""ApiVersion"": ""0.1.0"",
                 ""ApiOptions"": {
-                    ""ApiIdentityNullHandling"": ""ReturnEmpty""
+                    ""ApiIdentityPartNullHandling"": ""UseDefaultOnNull""
                 },
                 ""ApiScalarTypes"": [
                     {
@@ -1229,7 +1229,7 @@ public partial class ApiSchemaTests
                 ""ApiName"": ""ApiSchema With 3 ApiScalarType And 1 ApiEnumType And 2 ApiObjectType (Company And Person)"",
                 ""ApiVersion"": ""0.1.0"",
                 ""ApiOptions"": {
-                    ""ApiIdentityNullHandling"": ""ReturnEmpty""
+                    ""ApiIdentityPartNullHandling"": ""UseDefaultOnNull""
                 },
                 ""ApiScalarTypes"": [
                     {
@@ -1701,7 +1701,7 @@ public partial class ApiSchemaTests
                 ""ApiName"": ""ApiSchema With Identity Schema (IdentityScalar)"",
                 ""ApiVersion"": ""0.1.0"",
                 ""ApiOptions"": {
-                    ""ApiIdentityNullHandling"": ""ReturnEmpty""
+                    ""ApiIdentityPartNullHandling"": ""UseDefaultOnNull""
                 },
                 ""ApiScalarTypes"": [
                     {
@@ -1873,7 +1873,7 @@ public partial class ApiSchemaTests
                 ""ApiName"": ""ApiSchema With Identity Schema (IdentityTwoScalarPartComposite)"",
                 ""ApiVersion"": ""0.1.0"",
                 ""ApiOptions"": {
-                    ""ApiIdentityNullHandling"": ""ReturnEmpty""
+                    ""ApiIdentityPartNullHandling"": ""UseDefaultOnNull""
                 },
                 ""ApiScalarTypes"": [
                     {
@@ -2051,7 +2051,7 @@ public partial class ApiSchemaTests
                 ""ApiName"": ""ApiSchema With Identity Schema (IdentityThreeScalarPartComposite)"",
                 ""ApiVersion"": ""0.1.0"",
                 ""ApiOptions"": {
-                    ""ApiIdentityNullHandling"": ""ReturnEmpty""
+                    ""ApiIdentityPartNullHandling"": ""UseDefaultOnNull""
                 },
                 ""ApiScalarTypes"": [
                     {
@@ -2273,7 +2273,7 @@ public partial class ApiSchemaTests
                 ""ApiName"": ""ApiSchema With Identity Schema (IdentityNested And IdentityNestedComposite Without Explicit ApiIdentityName)"",
                 ""ApiVersion"": ""0.1.0"",
                 ""ApiOptions"": {
-                    ""ApiIdentityNullHandling"": ""ReturnEmpty""
+                    ""ApiIdentityPartNullHandling"": ""UseDefaultOnNull""
                 },
                 ""ApiScalarTypes"": [
                     {
@@ -2520,7 +2520,7 @@ public partial class ApiSchemaTests
                 ""ApiName"": ""ApiSchema With Identity Schema (IdentityOwner, IdentityOwnedComposite, And IdentityOwnedDependent Without Explicit ApiIdentityName)"",
                 ""ApiVersion"": ""0.1.0"",
                 ""ApiOptions"": {
-                    ""ApiIdentityNullHandling"": ""ReturnEmpty""
+                    ""ApiIdentityPartNullHandling"": ""UseDefaultOnNull""
                 },
                 ""ApiScalarTypes"": [
                     {
@@ -2883,7 +2883,7 @@ public partial class ApiSchemaTests
                 ""ApiName"": ""ApiSchema With Full Identity Schema"",
                 ""ApiVersion"": ""0.1.0"",
                 ""ApiOptions"": {
-                    ""ApiIdentityNullHandling"": ""ReturnEmpty""
+                    ""ApiIdentityPartNullHandling"": ""UseDefaultOnNull""
                 },
                 ""ApiScalarTypes"": [
                     {
@@ -3809,7 +3809,7 @@ public partial class ApiSchemaTests
                 ""ApiName"": ""ApiSchema With Identity Schema (IdentityNested And IdentityNestedComposite With Explicit ApiIdentityName)"",
                 ""ApiVersion"": ""0.1.0"",
                 ""ApiOptions"": {
-                    ""ApiIdentityNullHandling"": ""ReturnEmpty""
+                    ""ApiIdentityPartNullHandling"": ""UseDefaultOnNull""
                 },
                 ""ApiScalarTypes"": [
                     {
@@ -4058,7 +4058,7 @@ public partial class ApiSchemaTests
                 ""ApiName"": ""ApiSchema With Identity Schema (IdentityOwner, IdentityOwnedComposite, And IdentityOwnedDependent With Explicit ApiIdentityName)"",
                 ""ApiVersion"": ""0.1.0"",
                 ""ApiOptions"": {
-                    ""ApiIdentityNullHandling"": ""ReturnEmpty""
+                    ""ApiIdentityPartNullHandling"": ""UseDefaultOnNull""
                 },
                 ""ApiScalarTypes"": [
                     {

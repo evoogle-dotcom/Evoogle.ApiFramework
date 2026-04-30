@@ -142,21 +142,21 @@ public class ApiScalarTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
     [
         new BuildTest
         {
-            Name = $"Builds {Int64Type}",
+            Name = $"Build {Int64Type}",
             ApiName = Int64Type.ApiName,
             ClrType = Int64Type.ClrType,
             ApiTypeExpected = Int64Type,
         },
         new BuildTest
         {
-            Name = $"Builds {StringType}",
+            Name = $"Build {StringType}",
             ApiName = StringType.ApiName,
             ClrType = StringType.ClrType,
             ApiTypeExpected = StringType,
         },
         new BuildTest
         {
-            Name = $"Builds {Int64TypeWithExtension} with extension",
+            Name = $"Build {Int64TypeWithExtension} with extension",
             ApiName = Int64TypeWithExtension.ApiName,
             ClrType = Int64TypeWithExtension.ClrType,
             ApiTypeExpected = Int64TypeWithExtension,
@@ -164,7 +164,7 @@ public class ApiScalarTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
         },
         new BuildTest
         {
-            Name = $"Builds {StringTypeWithExtension} with extension",
+            Name = $"Build {StringTypeWithExtension} with extension",
             ApiName = StringTypeWithExtension.ApiName,
             ClrType = StringTypeWithExtension.ClrType,
             ApiTypeExpected = StringTypeWithExtension,
@@ -176,13 +176,13 @@ public class ApiScalarTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
     [
         new BuildWithDefaultNameTest
         {
-            Name = $"Builds {nameof(String)} scalar using CLR type name as default API name when configure is omitted",
+            Name = $"Build {nameof(String)} scalar using CLR type name as default API name when configure is omitted",
             ClrType = typeof(string),
             ExpectedApiName = nameof(String),
         },
         new BuildWithDefaultNameTest
         {
-            Name = $"Builds {nameof(Int64)} scalar using CLR type name as default API name when configure is omitted",
+            Name = $"Build {nameof(Int64)} scalar using CLR type name as default API name when configure is omitted",
             ClrType = typeof(long),
             ExpectedApiName = nameof(Int64),
         },

@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -515,7 +515,7 @@ public partial class ApiTypeTests
                 (
                     ApiOptions: new ApiObjectTypeOptionsConfig
                     (
-                        ApiIdentityNullHandling: ApiIdentityNullHandling.ThrowException
+                        ApiIdentityPartNullHandling: ApiIdentityPartNullHandling.ThrowOnNull
                     ),
                     ApiProperties:
                     [
@@ -575,7 +575,7 @@ public partial class ApiTypeTests
                 ""ApiKind"": ""Object"",
                 ""ApiName"": ""ScalarsOnly"",
                 ""ApiOptions"": {
-                    ""ApiIdentityNullHandling"": ""ThrowException""
+                    ""ApiIdentityPartNullHandling"": ""ThrowOnNull""
                 },
                 ""ApiIdentities"": [],
                 ""ApiProperties"": [
@@ -1113,7 +1113,7 @@ public partial class ApiTypeTests
                 (
                     ApiOptions: new ApiObjectTypeOptionsConfig
                     (
-                        ApiIdentityNullHandling: ApiIdentityNullHandling.ThrowException
+                        ApiIdentityPartNullHandling: ApiIdentityPartNullHandling.ThrowOnNull
                     ),
                     ApiProperties:
                     [
@@ -1173,7 +1173,7 @@ public partial class ApiTypeTests
                 ""ApiKind"": ""Object"",
                 ""ApiName"": ""ScalarsOnly"",
                 ""ApiOptions"": {
-                    ""ApiIdentityNullHandling"": ""ThrowException""
+                    ""ApiIdentityPartNullHandling"": ""ThrowOnNull""
                 },
                 ""ApiIdentities"": [],
                 ""ApiProperties"": [

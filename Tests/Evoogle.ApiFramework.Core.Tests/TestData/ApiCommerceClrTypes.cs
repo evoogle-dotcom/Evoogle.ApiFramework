@@ -91,15 +91,15 @@ public sealed class Tag
 {
     public Ulid Id { get; init; }
     public string Name { get; init; } = string.Empty;
-    public List<ProductBase> Products { get; init; } = [];
+    // public List<ProductBase> Products { get; init; } = [];
 
     public override string ToString()
     {
         var id = this.Id.SafeToString();
         var name = this.Name.SafeToString();
-        var products = this.Products.SafeToString();
+        // var products = this.Products.SafeToString();
 
-        return $"{nameof(Tag)} {{{nameof(this.Id)}={id}, {nameof(this.Name)}={name}, {nameof(this.Products)}={products}}}";
+        return $"{nameof(Tag)} {{{nameof(this.Id)}={id}, {nameof(this.Name)}={name}}}";
     }
 }
 
@@ -113,8 +113,19 @@ public abstract class ProductBase
     public Category? Category { get; init; }
 }
 
-public sealed class PhysicalProduct : ProductBase
+// public sealed class PhysicalProduct : ProductBase
+public sealed class PhysicalProduct
 {
+    // ProductBase properties
+    // Note: We have to redefine the base class properties because framework does not support inheritance in CLR types yet.
+    public Ulid Id { get; init; }
+    public string Sku { get; init; } = string.Empty;
+    public string Name { get; init; } = string.Empty;
+    public Money Price { get; init; } = new(0, "USD");
+    public List<Tag>? Tags { get; init; }
+    public Category? Category { get; init; }
+
+    // PhysicalProduct properties
     public decimal Weight { get; init; }
     public Quantity? Size { get; init; }
 
@@ -133,8 +144,19 @@ public sealed class PhysicalProduct : ProductBase
     }
 }
 
-public sealed class DigitalProduct : ProductBase
+// public sealed class DigitalProduct : ProductBase
+public sealed class DigitalProduct
 {
+    // ProductBase properties
+    // Note: We have to redefine the base class properties because framework does not support inheritance in CLR types yet.
+    public Ulid Id { get; init; }
+    public string Sku { get; init; } = string.Empty;
+    public string Name { get; init; } = string.Empty;
+    public Money Price { get; init; } = new(0, "USD");
+    public List<Tag>? Tags { get; init; }
+    public Category? Category { get; init; }
+
+    // DigitalProduct properties
     public Uri? DownloadUrl { get; init; }
     public long? Bytes { get; init; }
 
@@ -183,7 +205,7 @@ public sealed class OrderLine
 {
     public Ulid OrderId { get; init; }
     public int LineNumber { get; init; }
-    public ProductBase Product { get; init; } = default!;
+    // public ProductBase Product { get; init; } = default!;
     public Quantity Qty { get; init; } = new(1, "ea");
     public Money UnitPrice { get; init; } = new(0, "USD");
     public Money LineTotal { get; init; } = new(0, "USD");
@@ -192,12 +214,12 @@ public sealed class OrderLine
     {
         var orderId = this.OrderId.SafeToString();
         var lineNumber = this.LineNumber.SafeToString();
-        var product = this.Product.SafeToString();
+        // var product = this.Product.SafeToString();
         var qty = this.Qty.SafeToString();
         var unitPrice = this.UnitPrice.SafeToString();
         var lineTotal = this.LineTotal.SafeToString();
 
-        return $"{nameof(OrderLine)} {{{nameof(this.OrderId)}={orderId}, {nameof(this.LineNumber)}={lineNumber}, {nameof(this.Product)}={product}, {nameof(this.Qty)}={qty}, {nameof(this.UnitPrice)}={unitPrice}, {nameof(this.LineTotal)}={lineTotal}}}";
+        return $"{nameof(OrderLine)} {{{nameof(this.OrderId)}={orderId}, {nameof(this.LineNumber)}={lineNumber}, {nameof(this.Qty)}={qty}, {nameof(this.UnitPrice)}={unitPrice}, {nameof(this.LineTotal)}={lineTotal}}}";
     }
 }
 

@@ -309,7 +309,7 @@ public partial class ApiTypeTests
                 (
                     ApiOptions: new ApiObjectTypeOptionsConfig
                     (
-                        ApiIdentityNullHandling: ApiIdentityNullHandling.ThrowException
+                        ApiIdentityPartNullHandling: ApiIdentityPartNullHandling.ThrowOnNull
                     ),
                     ApiProperties:
                     [
@@ -619,7 +619,7 @@ public partial class ApiTypeTests
                 (
                     ApiOptions: new ApiObjectTypeOptionsConfig
                     (
-                        ApiIdentityNullHandling: ApiIdentityNullHandling.ThrowException
+                        ApiIdentityPartNullHandling: ApiIdentityPartNullHandling.ThrowOnNull
                     ),
                     ApiProperties:
                     [

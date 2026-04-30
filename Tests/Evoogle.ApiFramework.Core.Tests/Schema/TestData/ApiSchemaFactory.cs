@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -39,7 +39,7 @@ public static class ApiSchemaFactory
 
     public record ApiSchemaOptionsConfig
     (
-        ApiIdentityNullHandling ApiIdentityNullHandling
+        ApiIdentityPartNullHandling ApiIdentityPartNullHandling
     );
 
     public record ApiTypeConfig
@@ -69,7 +69,7 @@ public static class ApiSchemaFactory
 
     public record ApiObjectTypeOptionsConfig
     (
-        ApiIdentityNullHandling? ApiIdentityNullHandling = null
+        ApiIdentityPartNullHandling? ApiIdentityPartNullHandling = null
     );
 
     public record ApiIdentityConfig
@@ -97,9 +97,9 @@ public static class ApiSchemaFactory
     #endregion
 
     #region Fields
-    private static readonly Lazy<ApiSchema> _commerceApiSchema = new(() => BuildCommerceApiSchema());
-    private static readonly Lazy<ApiSchema> _identityApiSchema = new(() => BuildIdentityApiSchema());
-    private static readonly Lazy<ApiSchema> _simpleApiSchema = new(() => BuildSimpleApiSchema());
+    private static readonly Lazy<ApiSchema> _commerceApiSchema = new(() => BuildCommerceApiSchema(nameof(ApiSchemaKind.Commerce)));
+    private static readonly Lazy<ApiSchema> _identityApiSchema = new(() => BuildIdentityApiSchema(nameof(ApiSchemaKind.Identity)));
+    private static readonly Lazy<ApiSchema> _simpleApiSchema = new(() => BuildSimpleApiSchema(nameof(ApiSchemaKind.Simple)));
     #endregion
 
     #region Properties
@@ -272,10 +272,10 @@ public static class ApiSchemaFactory
             Extensions = extensions
         };
 
-    private static ApiObjectTypeOptions OO(ApiIdentityNullHandling identityNullHandling)
+    private static ApiObjectTypeOptions OO(ApiIdentityPartNullHandling identityPartNullHandling)
         => new()
         {
-            ApiIdentityNullHandling = identityNullHandling
+            ApiIdentityPartNullHandling = identityPartNullHandling
         };
 
     private static ApiProperty P(string name, ApiTypeExpression expression, bool required, ClrMemberKind clrMemberKind = ClrMemberKind.Property, OrderedDictionary<Type, object>? extensions = null)
@@ -299,7 +299,7 @@ public static class ApiSchemaFactory
     ///     Builds the reusable “Commerce” API schema:
     ///     Scalars, Enums, Value Objects, Entities, Relationships, Polymorphism, Recursion, and M2M.
     /// </summary>
-    private static ApiSchema BuildCommerceApiSchema(string name = "Commerce")
+    private static ApiSchema BuildCommerceApiSchema(string name)
     {
         // 1) Scalars
         var scalars = new List<ApiScalarType>
@@ -343,7 +343,7 @@ public static class ApiSchemaFactory
                 EV(name: nameof(UserRole.None),   ordinal: 0),
                 EV(name: nameof(UserRole.Reader), ordinal: 1),
                 EV(name: nameof(UserRole.Editor), ordinal: 2),
-                EV(name: nameof(UserRole.Admin),  ordinal: 3)
+                EV(name: nameof(UserRole.Admin),  ordinal: 4)
             ]),
 
             E(name: nameof(CountryCode), clr: typeof(CountryCode), values:
@@ -370,6 +370,9 @@ public static class ApiSchemaFactory
         var emailAddress = O(name: nameof(EmailAddress), clr: typeof(EmailAddress), properties:
         [
             P(name: nameof(EmailAddress.Value), expression: TE.ClrRef<string>(), required: true)
+        ], identities:
+        [
+            I("PK_EmailAddress", [IPS(nameof(EmailAddress.Value))])
         ]);
 
         var address = O(name: nameof(Address), clr: typeof(Address), properties:
@@ -398,7 +401,7 @@ public static class ApiSchemaFactory
         ], identities:
         [
             I("PK_Customer", [IPS(nameof(Customer.Id))]),
-            I("AK_Customer_Email", [IPS(nameof(Customer.Email))])
+            I("AK_Customer_Email", [IPN(nameof(Customer.Email))])
         ]);
 
         // Product Object Types
@@ -421,7 +424,7 @@ public static class ApiSchemaFactory
         [
             P(name: nameof(Tag.Id),        expression: TE.ClrRef<Ulid>(),                      required: true),
             P(name: nameof(Tag.Name),      expression: TE.ClrRef<string>(),                    required: true),
-            P(name: nameof(Tag.Products),  expression: TE.ListOf<ProductBase>(required: true), required: true)
+            // P(name: nameof(Tag.Products),  expression: TE.ListOf<ProductBase>(required: true), required: true)
         ], identities:
         [
             I("PK_Tag", [IPS(nameof(Tag.Id))]),
@@ -440,10 +443,13 @@ public static class ApiSchemaFactory
 
         var digitalProduct = O(name: nameof(DigitalProduct), clr: typeof(DigitalProduct), properties:
         [
-            P(name: nameof(DigitalProduct.Id),             expression: TE.ClrRef<Ulid>(),              required: true),
-            P(name: nameof(DigitalProduct.Sku),            expression: TE.ClrRef<string>(),            required: true),
-            P(name: nameof(DigitalProduct.Name),           expression: TE.ClrRef<string>(),            required: true),
-            P(name: nameof(DigitalProduct.Price),          expression: TE.ClrRef<Money>(),             required: true),
+            // ProductBase properties
+            P(name: nameof(ProductBase.Id),     expression: TE.ClrRef<Ulid>(),      required: true),
+            P(name: nameof(ProductBase.Sku),    expression: TE.ClrRef<string>(),    required: true),
+            P(name: nameof(ProductBase.Name),   expression: TE.ClrRef<string>(),    required: true),
+            P(name: nameof(ProductBase.Price),  expression: TE.ClrRef<Money>(),     required: true),
+
+            // DigitalProduct properties
             P(name: nameof(DigitalProduct.Tags),           expression: TE.ListOf<Tag>(required: true), required: false),
             P(name: nameof(DigitalProduct.Category),       expression: TE.ClrRef<Category>(),          required: false),
             P(name: nameof(DigitalProduct.DownloadUrl),    expression: TE.ClrRef<Uri>(),               required: false),
@@ -456,10 +462,13 @@ public static class ApiSchemaFactory
 
         var physicalProduct = O(name: nameof(PhysicalProduct), clr: typeof(PhysicalProduct), properties:
         [
-            P(name: nameof(PhysicalProduct.Id),        expression: TE.ClrRef<Ulid>(),              required: true),
-            P(name: nameof(PhysicalProduct.Sku),       expression: TE.ClrRef<string>(),            required: true),
-            P(name: nameof(PhysicalProduct.Name),      expression: TE.ClrRef<string>(),            required: true),
-            P(name: nameof(PhysicalProduct.Price),     expression: TE.ClrRef<Money>(),             required: true),
+            // ProductBase properties
+            P(name: nameof(ProductBase.Id),     expression: TE.ClrRef<Ulid>(),      required: true),
+            P(name: nameof(ProductBase.Sku),    expression: TE.ClrRef<string>(),    required: true),
+            P(name: nameof(ProductBase.Name),   expression: TE.ClrRef<string>(),    required: true),
+            P(name: nameof(ProductBase.Price),  expression: TE.ClrRef<Money>(),     required: true),
+
+            // PhysicalProduct properties
             P(name: nameof(PhysicalProduct.Tags),      expression: TE.ListOf<Tag>(required: true), required: false),
             P(name: nameof(PhysicalProduct.Category),  expression: TE.ClrRef<Category>(),          required: false),
             P(name: nameof(PhysicalProduct.Weight),    expression: TE.ClrRef<decimal>(),           required: true),
@@ -492,7 +501,7 @@ public static class ApiSchemaFactory
         [
             P(name: nameof(OrderLine.OrderId),      expression: TE.ClrRef<Ulid>(),        required: true),
             P(name: nameof(OrderLine.LineNumber),   expression: TE.ClrRef<int>(),         required: true),
-            P(name: nameof(OrderLine.Product),      expression: TE.ClrRef<ProductBase>(), required: true),
+            // P(name: nameof(OrderLine.Product),      expression: TE.ClrRef<ProductBase>(), required: true),
             P(name: nameof(OrderLine.Qty),          expression: TE.ClrRef<Quantity>(),    required: true),
             P(name: nameof(OrderLine.UnitPrice),    expression: TE.ClrRef<Money>(),       required: true),
             P(name: nameof(OrderLine.LineTotal),    expression: TE.ClrRef<Money>(),       required: true)
@@ -541,7 +550,7 @@ public static class ApiSchemaFactory
     /// <summary>
     ///    Builds the reusable “Simple” API schema: Scalars, Enums, and Object Types.
     /// </summary>
-    private static ApiSchema BuildSimpleApiSchema(string name = "Simple")
+    private static ApiSchema BuildSimpleApiSchema(string name)
     {
         // 1) Scalars
         var scalars = new List<ApiScalarType>
@@ -573,16 +582,16 @@ public static class ApiSchemaFactory
         };
 
         // 3) Object Types
-        var empty = O(name: nameof(Empty), clr: typeof(Empty), options: OO(ApiIdentityNullHandling.ThrowException), properties: []);
+        var empty = O(name: nameof(Empty), clr: typeof(Empty), options: OO(ApiIdentityPartNullHandling.ThrowOnNull), properties: []);
 
-        var point = O(name: nameof(Point), clr: typeof(Point), options: OO(ApiIdentityNullHandling.ThrowException), properties:
+        var point = O(name: nameof(Point), clr: typeof(Point), options: OO(ApiIdentityPartNullHandling.ThrowOnNull), properties:
         [
-            P(name: nameof(Point.X),    expression: TE.ClrRef<long>(),   required: true),
+            P(name: nameof(Point.X),    expression: TE.ClrRef<long>(),   required: true, ClrMemberKind.Field),
             P(name: nameof(Point.Y),    expression: TE.ClrRef<long>(),   required: true),
             P(name: nameof(Point.Note), expression: TE.ClrRef<string>(), required: false)
         ]);
 
-        var scalarsOnly = O(name: nameof(ScalarsOnly), clr: typeof(ScalarsOnly), options: OO(ApiIdentityNullHandling.ThrowException), properties:
+        var scalarsOnly = O(name: nameof(ScalarsOnly), clr: typeof(ScalarsOnly), options: OO(ApiIdentityPartNullHandling.ThrowOnNull), properties:
         [
             P(name: nameof(ScalarsOnly.RequiredName),      expression: TE.ClrRef<string>(), required: true),
             P(name: nameof(ScalarsOnly.RequiredNumber),    expression: TE.ClrRef<long>(),   required: true),
@@ -592,7 +601,7 @@ public static class ApiSchemaFactory
             P(name: nameof(ScalarsOnly.OptionalPredicate), expression: TE.ClrRef<bool>(),   required: false, ClrMemberKind.Field)
         ]);
 
-        var person = O(name: nameof(Person), clr: typeof(Person), options: OO(ApiIdentityNullHandling.ThrowException), identities:
+        var person = O(name: nameof(Person), clr: typeof(Person), options: OO(ApiIdentityPartNullHandling.ThrowOnNull), identities:
         [
             I("PK_Person_Id", [IPS(nameof(Person.Id))]),
             I("AK_Person_Name", [IPS(nameof(Person.Name))])
@@ -606,7 +615,7 @@ public static class ApiSchemaFactory
             P(name: nameof(Person.CompanyId), expression: TE.ClrRef<Ulid>(),                 required: false),
         ]);
 
-        var company = O(name: nameof(Company), clr: typeof(Company), options: OO(ApiIdentityNullHandling.ThrowException), identities:
+        var company = O(name: nameof(Company), clr: typeof(Company), options: OO(ApiIdentityPartNullHandling.ThrowOnNull), identities:
         [
             I("PK_Company_Id", [IPS(nameof(Company.Id))]),
             I("AK_Company_Name", [IPS(nameof(Company.Name))])
@@ -647,7 +656,7 @@ public static class ApiSchemaFactory
     ///    Supports composite identities, nullable handling (both ReturnEmpty and ThrowException),
     ///    and alternate identities for comprehensive identity testing.
     /// </summary>
-    private static ApiSchema BuildIdentityApiSchema(string name = "Identity")
+    private static ApiSchema BuildIdentityApiSchema(string name)
     {
         var scalars = new List<ApiScalarType>
         {
@@ -917,7 +926,7 @@ public static class ApiSchemaFactory
         var apiOptions = apiObjectTypeConfig.ApiOptions != null
             ? new ApiObjectTypeOptions
             {
-                ApiIdentityNullHandling = apiObjectTypeConfig.ApiOptions.ApiIdentityNullHandling
+                ApiIdentityPartNullHandling = apiObjectTypeConfig.ApiOptions.ApiIdentityPartNullHandling
             }
             : null;
         return apiOptions;
@@ -944,7 +953,7 @@ public static class ApiSchemaFactory
         var apiOptions = apiSchemaConfig.ApiOptions != null
             ? new ApiSchemaOptions
             {
-                ApiIdentityNullHandling = apiSchemaConfig.ApiOptions.ApiIdentityNullHandling
+                ApiIdentityPartNullHandling = apiSchemaConfig.ApiOptions.ApiIdentityPartNullHandling
             }
             : null;
         return apiOptions;

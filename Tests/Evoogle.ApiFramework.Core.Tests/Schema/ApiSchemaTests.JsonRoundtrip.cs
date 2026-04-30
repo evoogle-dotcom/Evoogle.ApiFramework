@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -45,7 +45,7 @@ public partial class ApiSchemaTests
                     ApiName: $"{nameof(ApiSchema)} With 0 {nameof(ApiType)} And {nameof(ApiSchemaOptions)}",
                     ApiOptions: new ApiSchemaOptionsConfig
                     (
-                        ApiIdentityNullHandling: ApiIdentityNullHandling.ThrowException
+                        ApiIdentityPartNullHandling: ApiIdentityPartNullHandling.ThrowOnNull
                     )
                 )
             )
@@ -90,7 +90,7 @@ public partial class ApiSchemaTests
                     ApiName: $"{nameof(ApiSchema)} With 1 {nameof(ApiScalarType)} And {nameof(ApiSchemaOptions)}",
                     ApiOptions: new ApiSchemaOptionsConfig
                     (
-                        ApiIdentityNullHandling: ApiIdentityNullHandling.ThrowException
+                        ApiIdentityPartNullHandling: ApiIdentityPartNullHandling.ThrowOnNull
                     )
                 ),
                 ApiNamedTypes:

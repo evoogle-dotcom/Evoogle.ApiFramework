@@ -97,7 +97,6 @@ public sealed class ApiObjectTypeBuilder<T>(ApiSchemaBuilderContext context)
         base.AddProperty(apiName, clrName, configure);
         return this;
     }
-
     #endregion
 
     #region AddRequiredProperty Methods

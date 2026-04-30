@@ -23,7 +23,7 @@ public partial class ApiIdentityTests
         public string? ApiIdentityName { get; init; }
         public required object ClrInstance { get; init; }
         public object? ClrOwnerInstance { get; init; }
-        public ApiIdentityNullHandling NullHandling { get; init; }
+        public ApiIdentityPartNullHandling NullHandling { get; init; }
         public ApiIdentityValue? ExpectedValue { get; init; }
         public Type? ExpectedExceptionType { get; init; }
         #endregion
@@ -104,7 +104,7 @@ public partial class ApiIdentityTests
         public string? ApiIdentityName { get; init; }
         public required IReadOnlyDictionary<string, object?> Values { get; init; }
         public IReadOnlyDictionary<string, object?>? OwnerValues { get; init; }
-        public ApiIdentityNullHandling NullHandling { get; init; }
+        public ApiIdentityPartNullHandling NullHandling { get; init; }
         public ApiIdentityValue? ExpectedValue { get; init; }
         public Type? ExpectedExceptionType { get; init; }
         #endregion
@@ -355,7 +355,7 @@ public partial class ApiIdentityTests
             Name = "Scalar null value returns empty with ReturnEmpty",
             ApiObjectTypeName = nameof(IdentityTwoScalarPartComposite),
             ClrInstance = TwoPartNullId2Instance,
-            NullHandling = ApiIdentityNullHandling.ReturnEmpty,
+            NullHandling = ApiIdentityPartNullHandling.UseDefaultOnNull,
             ExpectedValue = ApiIdentityValue.Composite(
             [
                 new ApiIdentityScalarPartValue("Id1", ApiId.FromInt32(1)),
@@ -369,7 +369,7 @@ public partial class ApiIdentityTests
             Name = "Nested null object returns skeleton with ReturnEmpty",
             ApiObjectTypeName = nameof(IdentityNestedComposite),
             ClrInstance = NestedCompositeNullNestedPartInstance,
-            NullHandling = ApiIdentityNullHandling.ReturnEmpty,
+            NullHandling = ApiIdentityPartNullHandling.UseDefaultOnNull,
             ExpectedValue = ApiIdentityValue.Composite(
             [
                 new ApiIdentityObjectPartValue("NestedPart", apiObjectValue: null, apiStructure:
@@ -387,7 +387,7 @@ public partial class ApiIdentityTests
             ApiObjectTypeName = nameof(IdentityOwnedComposite),
             ClrInstance = OwnedCompositeInstance,
             ClrOwnerInstance = null,
-            NullHandling = ApiIdentityNullHandling.ReturnEmpty,
+            NullHandling = ApiIdentityPartNullHandling.UseDefaultOnNull,
             ExpectedValue = ApiIdentityValue.Composite(
             [
                 new ApiIdentityObjectPartValue("IdentityOwner", apiObjectValue: null, apiStructure:
@@ -404,7 +404,7 @@ public partial class ApiIdentityTests
             Name = "Scalar null value throws with ThrowException",
             ApiObjectTypeName = nameof(IdentityTwoScalarPartComposite),
             ClrInstance = TwoPartNullId2Instance,
-            NullHandling = ApiIdentityNullHandling.ThrowException,
+            NullHandling = ApiIdentityPartNullHandling.ThrowOnNull,
             ExpectedExceptionType = typeof(ApiIdentityException)
         },
 
@@ -414,7 +414,7 @@ public partial class ApiIdentityTests
             Name = "Nested null object throws with ThrowException",
             ApiObjectTypeName = nameof(IdentityNestedComposite),
             ClrInstance = NestedCompositeNullNestedPartInstance,
-            NullHandling = ApiIdentityNullHandling.ThrowException,
+            NullHandling = ApiIdentityPartNullHandling.ThrowOnNull,
             ExpectedExceptionType = typeof(ApiIdentityException)
         },
 
@@ -425,7 +425,7 @@ public partial class ApiIdentityTests
             ApiObjectTypeName = nameof(IdentityOwnedComposite),
             ClrInstance = OwnedCompositeInstance,
             ClrOwnerInstance = null,
-            NullHandling = ApiIdentityNullHandling.ThrowException,
+            NullHandling = ApiIdentityPartNullHandling.ThrowOnNull,
             ExpectedExceptionType = typeof(ApiIdentityException)
         },
     ];
@@ -575,7 +575,7 @@ public partial class ApiIdentityTests
             Name = "Missing key in dictionary returns empty with ReturnEmpty",
             ApiObjectTypeName = nameof(IdentityTwoScalarPartComposite),
             Values = new Dictionary<string, object?> { ["Id1"] = 1 },
-            NullHandling = ApiIdentityNullHandling.ReturnEmpty,
+            NullHandling = ApiIdentityPartNullHandling.UseDefaultOnNull,
             ExpectedValue = ApiIdentityValue.Composite(
             [
                 new ApiIdentityScalarPartValue("Id1", ApiId.FromInt32(1)),
@@ -589,7 +589,7 @@ public partial class ApiIdentityTests
             Name = "Null value in dictionary returns empty with ReturnEmpty",
             ApiObjectTypeName = nameof(IdentityTwoScalarPartComposite),
             Values = new Dictionary<string, object?> { ["Id1"] = 1, ["Id2"] = null },
-            NullHandling = ApiIdentityNullHandling.ReturnEmpty,
+            NullHandling = ApiIdentityPartNullHandling.UseDefaultOnNull,
             ExpectedValue = ApiIdentityValue.Composite(
             [
                 new ApiIdentityScalarPartValue("Id1", ApiId.FromInt32(1)),
@@ -603,7 +603,7 @@ public partial class ApiIdentityTests
             Name = "Null nested value in dictionary returns skeleton with ReturnEmpty",
             ApiObjectTypeName = nameof(IdentityNestedComposite),
             Values = new Dictionary<string, object?> { ["NestedPart"] = null, ["Name"] = "NoNested" },
-            NullHandling = ApiIdentityNullHandling.ReturnEmpty,
+            NullHandling = ApiIdentityPartNullHandling.UseDefaultOnNull,
             ExpectedValue = ApiIdentityValue.Composite(
             [
                 new ApiIdentityObjectPartValue("NestedPart", apiObjectValue: null, apiStructure:
@@ -621,7 +621,7 @@ public partial class ApiIdentityTests
             ApiObjectTypeName = nameof(IdentityOwnedComposite),
             Values = new Dictionary<string, object?> { ["LineNumber"] = 3 },
             OwnerValues = null,
-            NullHandling = ApiIdentityNullHandling.ReturnEmpty,
+            NullHandling = ApiIdentityPartNullHandling.UseDefaultOnNull,
             ExpectedValue = ApiIdentityValue.Composite(
             [
                 new ApiIdentityObjectPartValue("IdentityOwner", apiObjectValue: null, apiStructure:
@@ -638,7 +638,7 @@ public partial class ApiIdentityTests
             Name = "Missing key in dictionary throws with ThrowException",
             ApiObjectTypeName = nameof(IdentityTwoScalarPartComposite),
             Values = new Dictionary<string, object?> { ["Id1"] = 1 },
-            NullHandling = ApiIdentityNullHandling.ThrowException,
+            NullHandling = ApiIdentityPartNullHandling.ThrowOnNull,
             ExpectedExceptionType = typeof(ApiIdentityException)
         },
 
@@ -648,7 +648,7 @@ public partial class ApiIdentityTests
             Name = "Null value in dictionary throws with ThrowException",
             ApiObjectTypeName = nameof(IdentityTwoScalarPartComposite),
             Values = new Dictionary<string, object?> { ["Id1"] = 1, ["Id2"] = null },
-            NullHandling = ApiIdentityNullHandling.ThrowException,
+            NullHandling = ApiIdentityPartNullHandling.ThrowOnNull,
             ExpectedExceptionType = typeof(ApiIdentityException)
         },
 
@@ -658,7 +658,7 @@ public partial class ApiIdentityTests
             Name = "Null nested value in dictionary throws with ThrowException",
             ApiObjectTypeName = nameof(IdentityNestedComposite),
             Values = new Dictionary<string, object?> { ["NestedPart"] = null, ["Name"] = "Nested" },
-            NullHandling = ApiIdentityNullHandling.ThrowException,
+            NullHandling = ApiIdentityPartNullHandling.ThrowOnNull,
             ExpectedExceptionType = typeof(ApiIdentityException)
         },
 
@@ -669,7 +669,7 @@ public partial class ApiIdentityTests
             ApiObjectTypeName = nameof(IdentityOwnedComposite),
             Values = new Dictionary<string, object?> { ["LineNumber"] = 3 },
             OwnerValues = null,
-            NullHandling = ApiIdentityNullHandling.ThrowException,
+            NullHandling = ApiIdentityPartNullHandling.ThrowOnNull,
             ExpectedExceptionType = typeof(ApiIdentityException)
         },
     ];

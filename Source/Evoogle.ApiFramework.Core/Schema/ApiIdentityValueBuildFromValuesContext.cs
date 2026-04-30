@@ -26,7 +26,7 @@ public sealed record ApiIdentityValueBuildFromValuesContext
 
     /// <summary>
     ///     Gets the behavior when a value is null or a nested object is not available.
-    ///     Defaults to <see cref="ApiIdentityNullHandling.ReturnEmpty"/>.
+    ///     Defaults to <see cref="ApiIdentityPartNullHandling.UseDefaultOnNull"/>.
     /// </summary>
-    public ApiIdentityNullHandling NullHandling { get; init; } = ApiIdentityNullHandling.ReturnEmpty;
+    public ApiIdentityPartNullHandling NullHandling { get; init; } = ApiIdentityPartNullHandling.UseDefaultOnNull;
 }

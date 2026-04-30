@@ -341,7 +341,7 @@ public static class Dummy
         {
             builder
                 .WithName("Customer")
-                .WithOptions(o => o.ThrowOnNull())
+                .WithOptions(o => o.ThrowOnNullKeyPart())
                 .AddIdentity("PrimaryKey", b => b
                     .AddScalarPart(c => c.Id))
                 .AddIdentity("AlternateKey", b => b
@@ -402,7 +402,8 @@ public static class Dummy
             .WithVersion("v1")
             .WithDefaultOptions()
             .WithOptions(o => o
-                .ReturnEmptyOnNull())
+                .UseDefaultOnNullKeyPart()
+                .ThrowOnNullKeyPart())
             .AddScalar(typeof(EmailAddress), x => x
                 .WithName("EmailAddress"))
                 .AddSchemaExtension(new VisibleMetadata { Visible = true })
@@ -413,7 +414,7 @@ public static class Dummy
             .AddObject(typeof(Customer), x => x
                 .WithName("Customer")
                 .WithOptions(o => o
-                    .ThrowOnNull())
+                    .ThrowOnNullKeyPart())
                 .AddIdentity("PrimaryKey", identity => identity
                     .AddScalarPart("Id"))
                 .AddIdentity("AlternateKey", identity => identity

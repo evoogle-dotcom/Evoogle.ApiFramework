@@ -3,10 +3,13 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Linq.Expressions;
+using System.Text.Json.Serialization;
+
 using Evoogle.ApiFramework.Schema.TestData;
-using Evoogle.ApiFramework.TestData;
 using Evoogle.Extensions;
 using Evoogle.XUnit;
+using Evoogle.XUnit.Json;
 
 using FluentAssertions;
 
@@ -29,8 +32,11 @@ public class ApiRelationshipBuilderGenericTests(ITestOutputHelper output) : XUni
     private class BuildRelationshipTest : XUnitTest
     {
         #region User Supplied Properties
-        public required Func<ApiRelationship> BuildExpected { get; init; }
-        public required Func<ApiRelationship> BuildActual { get; init; }
+        [JsonConverter(typeof(ExpressionFuncJsonConverter<ApiRelationship>))]
+        public required Expression<Func<ApiRelationship>> BuildExpected { get; init; }
+
+        [JsonConverter(typeof(ExpressionFuncJsonConverter<ApiRelationship>))]
+        public required Expression<Func<ApiRelationship>> BuildActual { get; init; }
         #endregion
 
         #region Calculated Properties
@@ -50,13 +56,13 @@ public class ApiRelationshipBuilderGenericTests(ITestOutputHelper output) : XUni
         #region XUnitTest Methods
         protected override void Arrange()
         {
-            this.Expected = this.BuildExpected();
+            this.Expected = this.BuildExpected.Compile()();
             this.WriteLine($"Expected: {this.Expected.SafeToString()}");
         }
 
         protected override void Act()
         {
-            this.Actual = this.BuildActual();
+            this.Actual = this.BuildActual.Compile()();
             this.WriteLine($"Actual:   {this.Actual.SafeToString()}");
         }
 
@@ -75,150 +81,50 @@ public class ApiRelationshipBuilderGenericTests(ITestOutputHelper output) : XUni
         new BuildRelationshipTest
         {
             Name = "ApiRelationshipOneToOneBuilder typed WithPrincipalEnd<Customer> and WithDependentEnd<Order> with AddScalarPath(expr)",
-            BuildExpected = static () =>
-            {
-                return new ApiRelationshipOneToOneBuilder("REL_Customer_Order_1to1")
-                    .WithPrincipalEnd<Customer>()
-                    .WithDependentEnd<Order>(b => b.AddScalarPath(o => o.Id))
-                    .Build();
-            },
-            BuildActual = static () =>
-            {
-                return new ApiRelationshipOneToOneBuilder("REL_Customer_Order_1to1")
-                    .WithPrincipalEnd<Customer>()
-                    .WithDependentEnd<Order>(b => b.AddScalarPath(o => o.Id))
-                    .Build();
-            }
+            BuildExpected = static () => ApiRelationshipBuilderGenericTestFactory.BuildExpected_OneToOne_DependentEnd_ScalarPath(),
+            BuildActual = static () => ApiRelationshipBuilderGenericTestFactory.BuildActual_OneToOne_DependentEnd_ScalarPath()
         },
 
         new BuildRelationshipTest
         {
             Name = "ApiRelationshipOneToManyBuilder typed WithPrincipalEnd<Customer> and WithDependentEnd<Order> with AddScalarPath(expr)",
-            BuildExpected = static () =>
-            {
-                return new ApiRelationshipOneToManyBuilder("REL_Customer_Order_1toN")
-                    .WithPrincipalEnd<Customer>()
-                    .WithDependentEnd<Order>(b => b.AddScalarPath(o => o.Id))
-                    .Build();
-            },
-            BuildActual = static () =>
-            {
-                return new ApiRelationshipOneToManyBuilder("REL_Customer_Order_1toN")
-                    .WithPrincipalEnd<Customer>()
-                    .WithDependentEnd<Order>(b => b.AddScalarPath(o => o.Id))
-                    .Build();
-            }
+            BuildExpected = static () => ApiRelationshipBuilderGenericTestFactory.BuildExpected_OneToMany_DependentEnd_ScalarPath(),
+            BuildActual = static () => ApiRelationshipBuilderGenericTestFactory.BuildActual_OneToMany_DependentEnd_ScalarPath()
         },
 
         new BuildRelationshipTest
         {
             Name = "ApiRelationshipManyToManyBuilder typed WithPrincipalEndA<Customer> and WithDependentEndA with AddScalarPath(expr)",
-            BuildExpected = static () =>
-            {
-                return new ApiRelationshipManyToManyBuilder<OrderLine>("REL_Customer_Order_NtoN")
-                    .WithPrincipalEndA<Customer>()
-                    .WithPrincipalEndB<Order>()
-                    .WithDependentEndA(b => b.AddScalarPath(ol => ol.OrderId))
-                    .WithDependentEndB(b => b.AddScalarPath(ol => ol.OrderId))
-                    .Build();
-            },
-            BuildActual = static () =>
-            {
-                return new ApiRelationshipManyToManyBuilder<OrderLine>("REL_Customer_Order_NtoN")
-                    .WithPrincipalEndA<Customer>()
-                    .WithPrincipalEndB<Order>()
-                    .WithDependentEndA(b => b.AddScalarPath(ol => ol.OrderId))
-                    .WithDependentEndB(b => b.AddScalarPath(ol => ol.OrderId))
-                    .Build();
-            }
+            BuildExpected = static () => ApiRelationshipBuilderGenericTestFactory.BuildExpected_ManyToMany_DependentEnds_ScalarPaths(),
+            BuildActual = static () => ApiRelationshipBuilderGenericTestFactory.BuildActual_ManyToMany_DependentEnds_ScalarPaths()
         },
 
         new BuildRelationshipTest
         {
             Name = "ApiRelationshipOneToOneBuilder typed WithDependentEnd<Order> with multiple scalar paths",
-            BuildExpected = static () =>
-            {
-                return new ApiRelationshipOneToOneBuilder("REL_Customer_Order_Nested")
-                    .WithPrincipalEnd<Customer>()
-                    .WithDependentEnd<Order>(b => b
-                        .AddScalarPath(o => o.Id)
-                        .AddScalarPath(o => o.PlacedAt))
-                    .Build();
-            },
-            BuildActual = static () =>
-            {
-                return new ApiRelationshipOneToOneBuilder("REL_Customer_Order_Nested")
-                    .WithPrincipalEnd<Customer>()
-                    .WithDependentEnd<Order>(b => b
-                        .AddScalarPath(o => o.Id)
-                        .AddScalarPath(o => o.PlacedAt))
-                    .Build();
-            }
+            BuildExpected = static () => ApiRelationshipBuilderGenericTestFactory.BuildExpected_OneToOne_DependentEnd_MultipleScalarPaths(),
+            BuildActual = static () => ApiRelationshipBuilderGenericTestFactory.BuildActual_OneToOne_DependentEnd_MultipleScalarPaths()
         },
 
         new BuildRelationshipTest
         {
             Name = "ApiRelationshipOneToOneBuilder typed WithDependentEnd<CustomerProfile> AddNestedPath drill-down",
-            BuildExpected = static () =>
-            {
-                return new ApiRelationshipOneToOneBuilder("REL_Customer_Profile_NestedPath")
-                    .WithPrincipalEnd<Dummy.Customer>()
-                    .WithDependentEnd<Dummy.CustomerProfile>(d => d
-                        .AddNestedPath(cp => cp.CustomerRef, n => n
-                            .AddScalarPath(r => r.CustomerId)))
-                    .Build();
-            },
-            BuildActual = static () =>
-            {
-                return new ApiRelationshipOneToOneBuilder("REL_Customer_Profile_NestedPath")
-                    .WithPrincipalEnd<Dummy.Customer>()
-                    .WithDependentEnd<Dummy.CustomerProfile>(d => d
-                        .AddNestedPath(cp => cp.CustomerRef, n => n
-                            .AddScalarPath(r => r.CustomerId)))
-                    .Build();
-            }
+            BuildExpected = static () => ApiRelationshipBuilderGenericTestFactory.BuildExpected_OneToOne_NestedPath(),
+            BuildActual = static () => ApiRelationshipBuilderGenericTestFactory.BuildActual_OneToOne_NestedPath()
         },
 
         new BuildRelationshipTest
         {
             Name = "ApiRelationshipOneToOneBuilder typed WithPrincipalEnd<Customer>(configure) threads delete behavior through",
-            BuildExpected = static () =>
-            {
-                return new ApiRelationshipOneToOneBuilder("REL_Customer_Order_PrincipalConfigure")
-                    .WithPrincipalEnd<Customer>(p => p.WithDeleteBehavior(ApiRelationshipDeleteBehavior.Cascade))
-                    .WithDependentEnd<Order>()
-                    .Build();
-            },
-            BuildActual = static () =>
-            {
-                return new ApiRelationshipOneToOneBuilder("REL_Customer_Order_PrincipalConfigure")
-                    .WithPrincipalEnd<Customer>(p => p.WithDeleteBehavior(ApiRelationshipDeleteBehavior.Cascade))
-                    .WithDependentEnd<Order>()
-                    .Build();
-            }
+            BuildExpected = static () => ApiRelationshipBuilderGenericTestFactory.BuildExpected_OneToOne_PrincipalConfigure_DeleteBehavior(),
+            BuildActual = static () => ApiRelationshipBuilderGenericTestFactory.BuildActual_OneToOne_PrincipalConfigure_DeleteBehavior()
         },
 
         new BuildRelationshipTest
         {
             Name = "ApiRelationshipManyToManyBuilder WithDependentEndA and WithDependentEndB resolve independent CLR types",
-            BuildExpected = static () =>
-            {
-                return new ApiRelationshipManyToManyBuilder<OrderLine>("REL_Customer_Order_NtoN_Ends")
-                    .WithPrincipalEndA<Customer>()
-                    .WithPrincipalEndB<Order>()
-                    .WithDependentEndA(b => b.AddScalarPath(ol => ol.OrderId))
-                    .WithDependentEndB(b => b.AddScalarPath(ol => ol.LineNumber))
-                    .Build();
-            },
-            BuildActual = static () =>
-            {
-                return new ApiRelationshipManyToManyBuilder<OrderLine>("REL_Customer_Order_NtoN_Ends")
-                    .WithPrincipalEndA<Customer>()
-                    .WithPrincipalEndB<Order>()
-                    .WithDependentEndA(b => b.AddScalarPath(ol => ol.OrderId))
-                    .WithDependentEndB(b => b.AddScalarPath(ol => ol.LineNumber))
-                    .Build();
-            }
+            BuildExpected = static () => ApiRelationshipBuilderGenericTestFactory.BuildExpected_ManyToMany_IndependentEndTypes(),
+            BuildActual = static () => ApiRelationshipBuilderGenericTestFactory.BuildActual_ManyToMany_IndependentEndTypes()
         },
     ];
     #endregion

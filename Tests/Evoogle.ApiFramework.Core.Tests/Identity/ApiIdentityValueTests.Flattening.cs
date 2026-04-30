@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -19,7 +19,7 @@ public partial class ApiIdentityValueTests
         #region User Supplied Properties
         public required ApiIdentityValue Value { get; init; }
         public bool UseNamedParts { get; init; }
-        public ApiIdentityNullHandling NullHandling { get; init; }
+        public ApiIdentityPartNullHandling NullHandling { get; init; }
         public ApiId? ExpectedApiId { get; init; }
         public Type? ExpectedExceptionType { get; init; }
         #endregion
@@ -150,7 +150,7 @@ public partial class ApiIdentityValueTests
         {
             Name = "Composite with unresolved object parts throws when ThrowException",
             Value = CompositeWithUnresolvedObjectParts,
-            NullHandling = ApiIdentityNullHandling.ThrowException,
+            NullHandling = ApiIdentityPartNullHandling.ThrowOnNull,
             ExpectedExceptionType = typeof(ApiIdentityException)
         },
 
@@ -160,7 +160,7 @@ public partial class ApiIdentityValueTests
             Name = "Composite with unresolved object parts flattens to named composite with empty slots",
             Value = CompositeWithUnresolvedObjectParts,
             UseNamedParts = true,
-            NullHandling = ApiIdentityNullHandling.ReturnEmpty,
+            NullHandling = ApiIdentityPartNullHandling.UseDefaultOnNull,
             ExpectedApiId = ApiId.Composite
             (
                 ApiIdPart.Create("Customer.Country.Id", ApiId.Empty),
@@ -173,7 +173,7 @@ public partial class ApiIdentityValueTests
             Name = "Composite with unresolved object parts flattens to unnamed composite with empty slots",
             Value = CompositeWithUnresolvedObjectParts,
             UseNamedParts = false,
-            NullHandling = ApiIdentityNullHandling.ReturnEmpty,
+            NullHandling = ApiIdentityPartNullHandling.UseDefaultOnNull,
             ExpectedApiId = ApiId.Composite
             (
                 ApiIdPart.Create(ApiId.Empty),
@@ -187,7 +187,7 @@ public partial class ApiIdentityValueTests
         {
             Name = "Composite with partially unresolved object parts throws when ThrowException",
             Value = CompositeWithPartiallyUnresolvedObjectParts,
-            NullHandling = ApiIdentityNullHandling.ThrowException,
+            NullHandling = ApiIdentityPartNullHandling.ThrowOnNull,
             ExpectedExceptionType = typeof(ApiIdentityException)
         },
 
@@ -197,7 +197,7 @@ public partial class ApiIdentityValueTests
             Name = "Composite with partially unresolved object parts flattens to named composite",
             Value = CompositeWithPartiallyUnresolvedObjectParts,
             UseNamedParts = true,
-            NullHandling = ApiIdentityNullHandling.ReturnEmpty,
+            NullHandling = ApiIdentityPartNullHandling.UseDefaultOnNull,
             ExpectedApiId = ApiId.Composite
             (
                 ApiIdPart.Create("Customer.Country.Id", ApiId.Empty),
@@ -210,7 +210,7 @@ public partial class ApiIdentityValueTests
             Name = "Composite with partially unresolved object parts flattens to unnamed composite",
             Value = CompositeWithPartiallyUnresolvedObjectParts,
             UseNamedParts = false,
-            NullHandling = ApiIdentityNullHandling.ReturnEmpty,
+            NullHandling = ApiIdentityPartNullHandling.UseDefaultOnNull,
             ExpectedApiId = ApiId.Composite
             (
                 ApiIdPart.Create(ApiId.Empty),

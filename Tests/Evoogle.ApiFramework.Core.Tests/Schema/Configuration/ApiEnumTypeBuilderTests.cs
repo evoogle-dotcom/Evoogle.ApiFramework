@@ -133,7 +133,7 @@ public class ApiEnumTypeBuilderTests(ITestOutputHelper output) : XUnitTests(outp
     [
         new BuildTest
         {
-            Name = $"Builds {EnumType}",
+            Name = $"Build {EnumType}",
             ApiName = EnumType.ApiName,
             ClrType = EnumType.ClrType,
             ApiEnumValues = [.. EnumType.ApiEnumValues],
@@ -141,7 +141,7 @@ public class ApiEnumTypeBuilderTests(ITestOutputHelper output) : XUnitTests(outp
         },
         new BuildTest
         {
-            Name = $"Builds {EnumTypeWithExtension} with extension",
+            Name = $"Build {EnumTypeWithExtension} with extension",
             ApiName = EnumTypeWithExtension.ApiName,
             ClrType = EnumTypeWithExtension.ClrType,
             ApiEnumValues = [.. EnumTypeWithExtension.ApiEnumValues],
@@ -150,7 +150,7 @@ public class ApiEnumTypeBuilderTests(ITestOutputHelper output) : XUnitTests(outp
         },
         new BuildTest
         {
-            Name = $"Builds {EnumTypeWithDefaultName} with default name",
+            Name = $"Build {EnumTypeWithDefaultName} with default name",
             ClrType = EnumTypeWithDefaultName.ClrType,
             ApiEnumValues = [.. EnumTypeWithDefaultName.ApiEnumValues],
             ApiTypeExpected = EnumTypeWithDefaultName,
