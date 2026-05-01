@@ -27,14 +27,14 @@ public partial class ApiTypeTests
         new JsonRoundtripTest
         {
             Name = $"{nameof(ApiScalarType)} [Boolean]",
-            ExpectedFactoryArgument = new ApiTypeDescriptor
+            ExpectedFactoryArgument = new ApiTypeSpec
             (
-                ApiType: new ApiTypeConfig
+                ApiType: new ApiTypeParams
                 (
                     ApiKind: ApiTypeKind.Scalar,
                     ClrType: typeof(bool)
                 ),
-                ApiNamedType: new ApiNamedTypeConfig
+                ApiNamedType: new ApiNamedTypeParams
                 (
                     ApiName: nameof(Boolean)
                 )
@@ -44,15 +44,15 @@ public partial class ApiTypeTests
         new JsonRoundtripTest
         {
             Name = $"{nameof(ApiScalarType)} [{nameof(Boolean)}] With {nameof(GraphQlExtension)}",
-            ExpectedFactoryArgument = new ApiTypeDescriptor
+            ExpectedFactoryArgument = new ApiTypeSpec
             (
-                ApiType: new ApiTypeConfig
+                ApiType: new ApiTypeParams
                 (
                     ApiKind: ApiTypeKind.Scalar,
                     ClrType: typeof(bool),
                     ExtensionTypes: [ typeof(GraphQlExtension) ]
                 ),
-                ApiNamedType: new ApiNamedTypeConfig
+                ApiNamedType: new ApiNamedTypeParams
                 (
                     ApiName: nameof(Boolean)
                 )
@@ -62,14 +62,14 @@ public partial class ApiTypeTests
         new JsonRoundtripTest
         {
             Name = $"{nameof(ApiScalarType)} [{nameof(Int32)}]",
-            ExpectedFactoryArgument = new ApiTypeDescriptor
+            ExpectedFactoryArgument = new ApiTypeSpec
             (
-                ApiType: new ApiTypeConfig
+                ApiType: new ApiTypeParams
                 (
                     ApiKind: ApiTypeKind.Scalar,
                     ClrType: typeof(int)
                 ),
-                ApiNamedType: new ApiNamedTypeConfig
+                ApiNamedType: new ApiNamedTypeParams
                 (
                     ApiName: nameof(Int32)
                 )
@@ -79,14 +79,14 @@ public partial class ApiTypeTests
         new JsonRoundtripTest
         {
             Name = $"{nameof(ApiScalarType)} [{nameof(Single)}]",
-            ExpectedFactoryArgument = new ApiTypeDescriptor
+            ExpectedFactoryArgument = new ApiTypeSpec
             (
-                ApiType: new ApiTypeConfig
+                ApiType: new ApiTypeParams
                 (
                     ApiKind: ApiTypeKind.Scalar,
                     ClrType: typeof(float)
                 ),
-                ApiNamedType: new ApiNamedTypeConfig
+                ApiNamedType: new ApiNamedTypeParams
                 (
                     ApiName: nameof(Single)
                 )
@@ -96,14 +96,14 @@ public partial class ApiTypeTests
         new JsonRoundtripTest
         {
             Name = $"{nameof(ApiScalarType)} [{nameof(String)}]",
-            ExpectedFactoryArgument = new ApiTypeDescriptor
+            ExpectedFactoryArgument = new ApiTypeSpec
             (
-                ApiType: new ApiTypeConfig
+                ApiType: new ApiTypeParams
                 (
                     ApiKind: ApiTypeKind.Scalar,
                     ClrType: typeof(string)
                 ),
-                ApiNamedType: new ApiNamedTypeConfig
+                ApiNamedType: new ApiNamedTypeParams
                 (
                     ApiName: nameof(String)
                 )
@@ -114,14 +114,14 @@ public partial class ApiTypeTests
         new JsonRoundtripTest
         {
             Name = $"{nameof(ApiEnumType)} [{nameof(StopLight)}]",
-            ExpectedFactoryArgument = new ApiTypeDescriptor
+            ExpectedFactoryArgument = new ApiTypeSpec
             (
-                ApiType: new ApiTypeConfig
+                ApiType: new ApiTypeParams
                 (
                     ApiKind: ApiTypeKind.Enum,
                     ClrType: typeof(StopLight)
                 ),
-                ApiNamedType: new ApiNamedTypeConfig
+                ApiNamedType: new ApiNamedTypeParams
                 (
                     ApiName: nameof(StopLight)
                 )
@@ -131,15 +131,15 @@ public partial class ApiTypeTests
         new JsonRoundtripTest
         {
             Name = $"{nameof(ApiEnumType)} [{nameof(StopLight)}] With {nameof(JsonApiExtension)}",
-            ExpectedFactoryArgument = new ApiTypeDescriptor
+            ExpectedFactoryArgument = new ApiTypeSpec
             (
-                ApiType: new ApiTypeConfig
+                ApiType: new ApiTypeParams
                 (
                     ApiKind: ApiTypeKind.Enum,
                     ClrType: typeof(StopLight),
                     ExtensionTypes: [ typeof(JsonApiExtension) ]
                 ),
-                ApiNamedType: new ApiNamedTypeConfig
+                ApiNamedType: new ApiNamedTypeParams
                 (
                     ApiName: nameof(StopLight)
                 )
@@ -150,14 +150,14 @@ public partial class ApiTypeTests
         new JsonRoundtripTest
         {
             Name = $"{nameof(ApiCollectionType)} [List<{nameof(String)}>]",
-            ExpectedFactoryArgument = new ApiTypeDescriptor
+            ExpectedFactoryArgument = new ApiTypeSpec
             (
-                ApiType: new ApiTypeConfig
+                ApiType: new ApiTypeParams
                 (
                     ApiKind: ApiTypeKind.Collection,
                     ClrType: typeof(List<string>)
                 ),
-                ApiCollectionType: new ApiCollectionTypeConfig
+                ApiCollectionType: new ApiCollectionTypeParams
                 (
                     ApiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: "String"),
                     ApiItemTypeModifiers: ApiTypeModifiers.Required
@@ -168,14 +168,14 @@ public partial class ApiTypeTests
         new JsonRoundtripTest
         {
             Name = $"{nameof(ApiCollectionType)} [List<{nameof(String)}?>]",
-            ExpectedFactoryArgument = new ApiTypeDescriptor
+            ExpectedFactoryArgument = new ApiTypeSpec
             (
-                ApiType: new ApiTypeConfig
+                ApiType: new ApiTypeParams
                 (
                     ApiKind: ApiTypeKind.Collection,
                     ClrType: typeof(List<string?>)
                 ),
-                ApiCollectionType: new ApiCollectionTypeConfig
+                ApiCollectionType: new ApiCollectionTypeParams
                 (
                     ApiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: "String"),
                     ApiItemTypeModifiers: ApiTypeModifiers.None
@@ -186,14 +186,14 @@ public partial class ApiTypeTests
         new JsonRoundtripTest
         {
             Name = $"{nameof(ApiCollectionType)} [List<{nameof(StopLight)}>]",
-            ExpectedFactoryArgument = new ApiTypeDescriptor
+            ExpectedFactoryArgument = new ApiTypeSpec
             (
-                ApiType: new ApiTypeConfig
+                ApiType: new ApiTypeParams
                 (
                     ApiKind: ApiTypeKind.Collection,
                     ClrType: typeof(List<StopLight>)
                 ),
-                ApiCollectionType: new ApiCollectionTypeConfig
+                ApiCollectionType: new ApiCollectionTypeParams
                 (
                     ApiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Enum, apiName: nameof(StopLight)),
                     ApiItemTypeModifiers: ApiTypeModifiers.Required
@@ -204,14 +204,14 @@ public partial class ApiTypeTests
         new JsonRoundtripTest
         {
             Name = $"{nameof(ApiCollectionType)} [List<{nameof(StopLight)}?>]",
-            ExpectedFactoryArgument = new ApiTypeDescriptor
+            ExpectedFactoryArgument = new ApiTypeSpec
             (
-                ApiType: new ApiTypeConfig
+                ApiType: new ApiTypeParams
                 (
                     ApiKind: ApiTypeKind.Collection,
                     ClrType: typeof(List<StopLight?>)
                 ),
-                ApiCollectionType: new ApiCollectionTypeConfig
+                ApiCollectionType: new ApiCollectionTypeParams
                 (
                     ApiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Enum, apiName: nameof(StopLight)),
                     ApiItemTypeModifiers: ApiTypeModifiers.None
@@ -223,22 +223,22 @@ public partial class ApiTypeTests
         new JsonRoundtripTest
         {
             Name = $"{nameof(ApiObjectType)} [{nameof(ScalarsOnly)}] With API Named Typed Expressions",
-            ExpectedFactoryArgument = new ApiTypeDescriptor
+            ExpectedFactoryArgument = new ApiTypeSpec
             (
-                ApiType: new ApiTypeConfig
+                ApiType: new ApiTypeParams
                 (
                     ApiKind: ApiTypeKind.Object,
                     ClrType: typeof(ScalarsOnly)
                 ),
-                ApiNamedType: new ApiNamedTypeConfig
+                ApiNamedType: new ApiNamedTypeParams
                 (
                     ApiName: nameof(ScalarsOnly)
                 ),
-                ApiObjectType: new ApiObjectTypeConfig
+                ApiObjectType: new ApiObjectTypeParams
                 (
                     ApiProperties:
                     [
-                        new ApiPropertyConfig
+                        new ApiPropertyParams
                         (
                             ApiName: nameof(ScalarsOnly.RequiredName),
                             ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
@@ -246,7 +246,7 @@ public partial class ApiTypeTests
                             ClrName: nameof(ScalarsOnly.RequiredName),
                             ClrMemberKind: ClrMemberKind.Property
                         ),
-                        new ApiPropertyConfig
+                        new ApiPropertyParams
                         (
                             ApiName: nameof(ScalarsOnly.RequiredNumber),
                             ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int64)),
@@ -254,7 +254,7 @@ public partial class ApiTypeTests
                             ClrName: nameof(ScalarsOnly.RequiredNumber),
                             ClrMemberKind: ClrMemberKind.Property
                         ),
-                        new ApiPropertyConfig
+                        new ApiPropertyParams
                         (
                             ApiName: nameof(ScalarsOnly.RequiredPredicate),
                             ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Boolean)),
@@ -262,7 +262,7 @@ public partial class ApiTypeTests
                             ClrName: nameof(ScalarsOnly.RequiredPredicate),
                             ClrMemberKind: ClrMemberKind.Property
                         ),
-                        new ApiPropertyConfig
+                        new ApiPropertyParams
                         (
                             ApiName: nameof(ScalarsOnly.OptionalName),
                             ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
@@ -270,7 +270,7 @@ public partial class ApiTypeTests
                             ClrName: nameof(ScalarsOnly.OptionalName),
                             ClrMemberKind: ClrMemberKind.Field
                         ),
-                        new ApiPropertyConfig
+                        new ApiPropertyParams
                         (
                             ApiName: nameof(ScalarsOnly.OptionalNumber),
                             ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int64)),
@@ -278,7 +278,7 @@ public partial class ApiTypeTests
                             ClrName: nameof(ScalarsOnly.OptionalNumber),
                             ClrMemberKind: ClrMemberKind.Field
                         ),
-                        new ApiPropertyConfig
+                        new ApiPropertyParams
                         (
                             ApiName: nameof(ScalarsOnly.OptionalPredicate),
                             ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Boolean)),
@@ -294,26 +294,26 @@ public partial class ApiTypeTests
         new JsonRoundtripTest
         {
             Name = $"{nameof(ApiObjectType)} [{nameof(ScalarsOnly)}] With API Named Typed Expressions And API Options",
-            ExpectedFactoryArgument = new ApiTypeDescriptor
+            ExpectedFactoryArgument = new ApiTypeSpec
             (
-                ApiType: new ApiTypeConfig
+                ApiType: new ApiTypeParams
                 (
                     ApiKind: ApiTypeKind.Object,
                     ClrType: typeof(ScalarsOnly)
                 ),
-                ApiNamedType: new ApiNamedTypeConfig
+                ApiNamedType: new ApiNamedTypeParams
                 (
                     ApiName: nameof(ScalarsOnly)
                 ),
-                ApiObjectType: new ApiObjectTypeConfig
+                ApiObjectType: new ApiObjectTypeParams
                 (
-                    ApiOptions: new ApiObjectTypeOptionsConfig
+                    ApiOptions: new ApiObjectTypeOptionsParams
                     (
                         ApiIdentityPartNullHandling: ApiIdentityPartNullHandling.ThrowOnNull
                     ),
                     ApiProperties:
                     [
-                        new ApiPropertyConfig
+                        new ApiPropertyParams
                         (
                             ApiName: nameof(ScalarsOnly.RequiredName),
                             ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
@@ -321,7 +321,7 @@ public partial class ApiTypeTests
                             ClrName: nameof(ScalarsOnly.RequiredName),
                             ClrMemberKind: ClrMemberKind.Property
                         ),
-                        new ApiPropertyConfig
+                        new ApiPropertyParams
                         (
                             ApiName: nameof(ScalarsOnly.RequiredNumber),
                             ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int64)),
@@ -329,7 +329,7 @@ public partial class ApiTypeTests
                             ClrName: nameof(ScalarsOnly.RequiredNumber),
                             ClrMemberKind: ClrMemberKind.Property
                         ),
-                        new ApiPropertyConfig
+                        new ApiPropertyParams
                         (
                             ApiName: nameof(ScalarsOnly.RequiredPredicate),
                             ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Boolean)),
@@ -337,7 +337,7 @@ public partial class ApiTypeTests
                             ClrName: nameof(ScalarsOnly.RequiredPredicate),
                             ClrMemberKind: ClrMemberKind.Property
                         ),
-                        new ApiPropertyConfig
+                        new ApiPropertyParams
                         (
                             ApiName: nameof(ScalarsOnly.OptionalName),
                             ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
@@ -345,7 +345,7 @@ public partial class ApiTypeTests
                             ClrName: nameof(ScalarsOnly.OptionalName),
                             ClrMemberKind: ClrMemberKind.Field
                         ),
-                        new ApiPropertyConfig
+                        new ApiPropertyParams
                         (
                             ApiName: nameof(ScalarsOnly.OptionalNumber),
                             ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int64)),
@@ -353,7 +353,7 @@ public partial class ApiTypeTests
                             ClrName: nameof(ScalarsOnly.OptionalNumber),
                             ClrMemberKind: ClrMemberKind.Field
                         ),
-                        new ApiPropertyConfig
+                        new ApiPropertyParams
                         (
                             ApiName: nameof(ScalarsOnly.OptionalPredicate),
                             ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Boolean)),
@@ -369,23 +369,23 @@ public partial class ApiTypeTests
         new JsonRoundtripTest
         {
             Name = $"{nameof(ApiObjectType)} [{nameof(ScalarsOnly)}] With API Named Typed Expressions And {nameof(GraphQlExtension)} And {nameof(JsonApiExtension)}",
-            ExpectedFactoryArgument = new ApiTypeDescriptor
+            ExpectedFactoryArgument = new ApiTypeSpec
             (
-                ApiType: new ApiTypeConfig
+                ApiType: new ApiTypeParams
                 (
                     ApiKind: ApiTypeKind.Object,
                     ClrType: typeof(ScalarsOnly),
                     ExtensionTypes: [ typeof(GraphQlExtension), typeof(JsonApiExtension) ]
                 ),
-                ApiNamedType: new ApiNamedTypeConfig
+                ApiNamedType: new ApiNamedTypeParams
                 (
                     ApiName: nameof(ScalarsOnly)
                 ),
-                ApiObjectType: new ApiObjectTypeConfig
+                ApiObjectType: new ApiObjectTypeParams
                 (
                     ApiProperties:
                     [
-                        new ApiPropertyConfig
+                        new ApiPropertyParams
                         (
                             ApiName: nameof(ScalarsOnly.RequiredName),
                             ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
@@ -393,7 +393,7 @@ public partial class ApiTypeTests
                             ClrName: nameof(ScalarsOnly.RequiredName),
                             ClrMemberKind: ClrMemberKind.Property
                         ),
-                        new ApiPropertyConfig
+                        new ApiPropertyParams
                         (
                             ApiName: nameof(ScalarsOnly.RequiredNumber),
                             ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int64)),
@@ -401,7 +401,7 @@ public partial class ApiTypeTests
                             ClrName: nameof(ScalarsOnly.RequiredNumber),
                             ClrMemberKind: ClrMemberKind.Property
                         ),
-                        new ApiPropertyConfig
+                        new ApiPropertyParams
                         (
                             ApiName: nameof(ScalarsOnly.RequiredPredicate),
                             ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Boolean)),
@@ -409,7 +409,7 @@ public partial class ApiTypeTests
                             ClrName: nameof(ScalarsOnly.RequiredPredicate),
                             ClrMemberKind: ClrMemberKind.Property
                         ),
-                        new ApiPropertyConfig
+                        new ApiPropertyParams
                         (
                             ApiName: nameof(ScalarsOnly.OptionalName),
                             ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
@@ -417,7 +417,7 @@ public partial class ApiTypeTests
                             ClrName: nameof(ScalarsOnly.OptionalName),
                             ClrMemberKind: ClrMemberKind.Field
                         ),
-                        new ApiPropertyConfig
+                        new ApiPropertyParams
                         (
                             ApiName: nameof(ScalarsOnly.OptionalNumber),
                             ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int64)),
@@ -425,7 +425,7 @@ public partial class ApiTypeTests
                             ClrName: nameof(ScalarsOnly.OptionalNumber),
                             ClrMemberKind: ClrMemberKind.Field
                         ),
-                        new ApiPropertyConfig
+                        new ApiPropertyParams
                         (
                             ApiName: nameof(ScalarsOnly.OptionalPredicate),
                             ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Boolean)),
@@ -441,27 +441,27 @@ public partial class ApiTypeTests
         new JsonRoundtripTest
         {
             Name = $"{nameof(ApiObjectType)} [{nameof(Company)}] With API Named Typed Expressions",
-            ExpectedFactoryArgument = new ApiTypeDescriptor
+            ExpectedFactoryArgument = new ApiTypeSpec
             (
-                ApiType: new ApiTypeConfig
+                ApiType: new ApiTypeParams
                 (
                     ApiKind: ApiTypeKind.Object,
                     ClrType: typeof(Company)
                 ),
-                ApiNamedType: new ApiNamedTypeConfig
+                ApiNamedType: new ApiNamedTypeParams
                 (
                     ApiName: nameof(Company)
                 ),
-                ApiObjectType: new ApiObjectTypeConfig
+                ApiObjectType: new ApiObjectTypeParams
                 (
                     ApiIdentities:
                     [
-                        new ApiIdentityConfig
+                        new ApiIdentityParams
                         (
                             ApiName: "PK_Company_Id",
                             ApiIdentityParts:
                             [
-                                new ApiIdentityPartConfig
+                                new ApiIdentityPartParams
                                 (
                                     ApiKind: ApiIdentityPartKind.Scalar,
                                     ApiPropertyName: nameof(Company.Id),
@@ -469,12 +469,12 @@ public partial class ApiTypeTests
                                 )
                             ]
                         ),
-                        new ApiIdentityConfig
+                        new ApiIdentityParams
                         (
                             ApiName: "AK_Company_Name",
                             ApiIdentityParts:
                             [
-                                new ApiIdentityPartConfig
+                                new ApiIdentityPartParams
                                 (
                                     ApiKind: ApiIdentityPartKind.Scalar,
                                     ApiPropertyName: nameof(Company.Name)
@@ -484,7 +484,7 @@ public partial class ApiTypeTests
                     ],
                     ApiProperties:
                     [
-                        new ApiPropertyConfig
+                        new ApiPropertyParams
                         (
                             ApiName: nameof(Company.Id),
                             ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Ulid)),
@@ -492,7 +492,7 @@ public partial class ApiTypeTests
                             ClrName: nameof(Company.Id),
                             ClrMemberKind: ClrMemberKind.Property
                         ),
-                        new ApiPropertyConfig
+                        new ApiPropertyParams
                         (
                             ApiName: nameof(Company.Name),
                             ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
@@ -500,7 +500,7 @@ public partial class ApiTypeTests
                             ClrName: nameof(Company.Name),
                             ClrMemberKind: ClrMemberKind.Property
                         ),
-                        new ApiPropertyConfig
+                        new ApiPropertyParams
                         (
                             ApiName: nameof(Company.Owner),
                             ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(Person)),
@@ -508,7 +508,7 @@ public partial class ApiTypeTests
                             ClrName: nameof(Company.Owner),
                             ClrMemberKind: ClrMemberKind.Property
                         ),
-                        new ApiPropertyConfig
+                        new ApiPropertyParams
                         (
                             ApiName: nameof(Company.Employees),
                             ApiTypeExpression: new ApiTypeExpression
@@ -533,22 +533,22 @@ public partial class ApiTypeTests
         new JsonRoundtripTest
         {
             Name = $"{nameof(ApiObjectType)} [{nameof(ScalarsOnly)}] With CLR Typed Expressions",
-            ExpectedFactoryArgument = new ApiTypeDescriptor
+            ExpectedFactoryArgument = new ApiTypeSpec
             (
-                ApiType: new ApiTypeConfig
+                ApiType: new ApiTypeParams
                 (
                     ApiKind: ApiTypeKind.Object,
                     ClrType: typeof(ScalarsOnly)
                 ),
-                ApiNamedType: new ApiNamedTypeConfig
+                ApiNamedType: new ApiNamedTypeParams
                 (
                     ApiName: nameof(ScalarsOnly)
                 ),
-                ApiObjectType: new ApiObjectTypeConfig
+                ApiObjectType: new ApiObjectTypeParams
                 (
                     ApiProperties:
                     [
-                        new ApiPropertyConfig
+                        new ApiPropertyParams
                         (
                             ApiName: nameof(ScalarsOnly.RequiredName),
                             ApiTypeExpression: new ApiTypeExpression(clrType: typeof(string)),
@@ -556,7 +556,7 @@ public partial class ApiTypeTests
                             ClrName: nameof(ScalarsOnly.RequiredName),
                             ClrMemberKind: ClrMemberKind.Property
                         ),
-                        new ApiPropertyConfig
+                        new ApiPropertyParams
                         (
                             ApiName: nameof(ScalarsOnly.RequiredNumber),
                             ApiTypeExpression: new ApiTypeExpression(clrType: typeof(long)),
@@ -564,7 +564,7 @@ public partial class ApiTypeTests
                             ClrName: nameof(ScalarsOnly.RequiredNumber),
                             ClrMemberKind: ClrMemberKind.Property
                         ),
-                        new ApiPropertyConfig
+                        new ApiPropertyParams
                         (
                             ApiName: nameof(ScalarsOnly.RequiredPredicate),
                             ApiTypeExpression: new ApiTypeExpression(clrType: typeof(bool)),
@@ -572,7 +572,7 @@ public partial class ApiTypeTests
                             ClrName: nameof(ScalarsOnly.RequiredPredicate),
                             ClrMemberKind: ClrMemberKind.Property
                         ),
-                        new ApiPropertyConfig
+                        new ApiPropertyParams
                         (
                             ApiName: nameof(ScalarsOnly.OptionalName),
                             ApiTypeExpression: new ApiTypeExpression(clrType: typeof(string)),
@@ -580,7 +580,7 @@ public partial class ApiTypeTests
                             ClrName: nameof(ScalarsOnly.OptionalName),
                             ClrMemberKind: ClrMemberKind.Field
                         ),
-                        new ApiPropertyConfig
+                        new ApiPropertyParams
                         (
                             ApiName: nameof(ScalarsOnly.OptionalNumber),
                             ApiTypeExpression: new ApiTypeExpression(clrType: typeof(long)),
@@ -588,7 +588,7 @@ public partial class ApiTypeTests
                             ClrName: nameof(ScalarsOnly.OptionalNumber),
                             ClrMemberKind: ClrMemberKind.Field
                         ),
-                        new ApiPropertyConfig
+                        new ApiPropertyParams
                         (
                             ApiName: nameof(ScalarsOnly.OptionalPredicate),
                             ApiTypeExpression: new ApiTypeExpression(clrType: typeof(bool)),
@@ -604,26 +604,26 @@ public partial class ApiTypeTests
         new JsonRoundtripTest
         {
             Name = $"{nameof(ApiObjectType)} [{nameof(ScalarsOnly)}] With CLR Typed Expressions And API Options",
-            ExpectedFactoryArgument = new ApiTypeDescriptor
+            ExpectedFactoryArgument = new ApiTypeSpec
             (
-                ApiType: new ApiTypeConfig
+                ApiType: new ApiTypeParams
                 (
                     ApiKind: ApiTypeKind.Object,
                     ClrType: typeof(ScalarsOnly)
                 ),
-                ApiNamedType: new ApiNamedTypeConfig
+                ApiNamedType: new ApiNamedTypeParams
                 (
                     ApiName: nameof(ScalarsOnly)
                 ),
-                ApiObjectType: new ApiObjectTypeConfig
+                ApiObjectType: new ApiObjectTypeParams
                 (
-                    ApiOptions: new ApiObjectTypeOptionsConfig
+                    ApiOptions: new ApiObjectTypeOptionsParams
                     (
                         ApiIdentityPartNullHandling: ApiIdentityPartNullHandling.ThrowOnNull
                     ),
                     ApiProperties:
                     [
-                        new ApiPropertyConfig
+                        new ApiPropertyParams
                         (
                             ApiName: nameof(ScalarsOnly.RequiredName),
                             ApiTypeExpression: new ApiTypeExpression(clrType: typeof(string)),
@@ -631,7 +631,7 @@ public partial class ApiTypeTests
                             ClrName: nameof(ScalarsOnly.RequiredName),
                             ClrMemberKind: ClrMemberKind.Property
                         ),
-                        new ApiPropertyConfig
+                        new ApiPropertyParams
                         (
                             ApiName: nameof(ScalarsOnly.RequiredNumber),
                             ApiTypeExpression: new ApiTypeExpression(clrType: typeof(long)),
@@ -639,7 +639,7 @@ public partial class ApiTypeTests
                             ClrName: nameof(ScalarsOnly.RequiredNumber),
                             ClrMemberKind: ClrMemberKind.Property
                         ),
-                        new ApiPropertyConfig
+                        new ApiPropertyParams
                         (
                             ApiName: nameof(ScalarsOnly.RequiredPredicate),
                             ApiTypeExpression: new ApiTypeExpression(clrType: typeof(bool)),
@@ -647,7 +647,7 @@ public partial class ApiTypeTests
                             ClrName: nameof(ScalarsOnly.RequiredPredicate),
                             ClrMemberKind: ClrMemberKind.Property
                         ),
-                        new ApiPropertyConfig
+                        new ApiPropertyParams
                         (
                             ApiName: nameof(ScalarsOnly.OptionalName),
                             ApiTypeExpression: new ApiTypeExpression(clrType: typeof(string)),
@@ -655,7 +655,7 @@ public partial class ApiTypeTests
                             ClrName: nameof(ScalarsOnly.OptionalName),
                             ClrMemberKind: ClrMemberKind.Field
                         ),
-                        new ApiPropertyConfig
+                        new ApiPropertyParams
                         (
                             ApiName: nameof(ScalarsOnly.OptionalNumber),
                             ApiTypeExpression: new ApiTypeExpression(clrType: typeof(long)),
@@ -663,7 +663,7 @@ public partial class ApiTypeTests
                             ClrName: nameof(ScalarsOnly.OptionalNumber),
                             ClrMemberKind: ClrMemberKind.Field
                         ),
-                        new ApiPropertyConfig
+                        new ApiPropertyParams
                         (
                             ApiName: nameof(ScalarsOnly.OptionalPredicate),
                             ApiTypeExpression: new ApiTypeExpression(clrType: typeof(bool)),
@@ -679,23 +679,23 @@ public partial class ApiTypeTests
         new JsonRoundtripTest
         {
             Name = $"{nameof(ApiObjectType)} [{nameof(ScalarsOnly)}] With CLR Typed Expressions And {nameof(GraphQlExtension)} And {nameof(JsonApiExtension)}",
-            ExpectedFactoryArgument = new ApiTypeDescriptor
+            ExpectedFactoryArgument = new ApiTypeSpec
             (
-                ApiType: new ApiTypeConfig
+                ApiType: new ApiTypeParams
                 (
                     ApiKind: ApiTypeKind.Object,
                     ClrType: typeof(ScalarsOnly),
                     ExtensionTypes: [ typeof(GraphQlExtension), typeof(JsonApiExtension) ]
                 ),
-                ApiNamedType: new ApiNamedTypeConfig
+                ApiNamedType: new ApiNamedTypeParams
                 (
                     ApiName: nameof(ScalarsOnly)
                 ),
-                ApiObjectType: new ApiObjectTypeConfig
+                ApiObjectType: new ApiObjectTypeParams
                 (
                     ApiProperties:
                     [
-                        new ApiPropertyConfig
+                        new ApiPropertyParams
                         (
                             ApiName: nameof(ScalarsOnly.RequiredName),
                             ApiTypeExpression: new ApiTypeExpression(clrType: typeof(string)),
@@ -703,7 +703,7 @@ public partial class ApiTypeTests
                             ClrName: nameof(ScalarsOnly.RequiredName),
                             ClrMemberKind: ClrMemberKind.Property
                         ),
-                        new ApiPropertyConfig
+                        new ApiPropertyParams
                         (
                             ApiName: nameof(ScalarsOnly.RequiredNumber),
                             ApiTypeExpression: new ApiTypeExpression(clrType: typeof(long)),
@@ -711,7 +711,7 @@ public partial class ApiTypeTests
                             ClrName: nameof(ScalarsOnly.RequiredNumber),
                             ClrMemberKind: ClrMemberKind.Property
                         ),
-                        new ApiPropertyConfig
+                        new ApiPropertyParams
                         (
                             ApiName: nameof(ScalarsOnly.RequiredPredicate),
                             ApiTypeExpression: new ApiTypeExpression(clrType: typeof(bool)),
@@ -719,7 +719,7 @@ public partial class ApiTypeTests
                             ClrName: nameof(ScalarsOnly.RequiredPredicate),
                             ClrMemberKind: ClrMemberKind.Property
                         ),
-                        new ApiPropertyConfig
+                        new ApiPropertyParams
                         (
                             ApiName: nameof(ScalarsOnly.OptionalName),
                             ApiTypeExpression: new ApiTypeExpression(clrType: typeof(string)),
@@ -727,7 +727,7 @@ public partial class ApiTypeTests
                             ClrName: nameof(ScalarsOnly.OptionalName),
                             ClrMemberKind: ClrMemberKind.Field
                         ),
-                        new ApiPropertyConfig
+                        new ApiPropertyParams
                         (
                             ApiName: nameof(ScalarsOnly.OptionalNumber),
                             ApiTypeExpression: new ApiTypeExpression(clrType: typeof(long)),
@@ -735,7 +735,7 @@ public partial class ApiTypeTests
                             ClrName: nameof(ScalarsOnly.OptionalNumber),
                             ClrMemberKind: ClrMemberKind.Field
                         ),
-                        new ApiPropertyConfig
+                        new ApiPropertyParams
                         (
                             ApiName: nameof(ScalarsOnly.OptionalPredicate),
                             ApiTypeExpression: new ApiTypeExpression(clrType: typeof(bool)),
@@ -751,27 +751,27 @@ public partial class ApiTypeTests
         new JsonRoundtripTest
         {
             Name = $"{nameof(ApiObjectType)} [{nameof(Company)}] With CLR Typed Expressions",
-            ExpectedFactoryArgument = new ApiTypeDescriptor
+            ExpectedFactoryArgument = new ApiTypeSpec
             (
-                ApiType: new ApiTypeConfig
+                ApiType: new ApiTypeParams
                 (
                     ApiKind: ApiTypeKind.Object,
                     ClrType: typeof(Company)
                 ),
-                ApiNamedType: new ApiNamedTypeConfig
+                ApiNamedType: new ApiNamedTypeParams
                 (
                     ApiName: nameof(Company)
                 ),
-                ApiObjectType: new ApiObjectTypeConfig
+                ApiObjectType: new ApiObjectTypeParams
                 (
                     ApiIdentities:
                     [
-                        new ApiIdentityConfig
+                        new ApiIdentityParams
                         (
                             ApiName: "PK_Company_Id",
                             ApiIdentityParts:
                             [
-                                new ApiIdentityPartConfig
+                                new ApiIdentityPartParams
                                 (
                                     ApiKind: ApiIdentityPartKind.Scalar,
                                     ApiPropertyName: nameof(Company.Id),
@@ -779,12 +779,12 @@ public partial class ApiTypeTests
                                 )
                             ]
                         ),
-                        new ApiIdentityConfig
+                        new ApiIdentityParams
                         (
                             ApiName: "AK_Company_Name",
                             ApiIdentityParts:
                             [
-                                new ApiIdentityPartConfig
+                                new ApiIdentityPartParams
                                 (
                                     ApiKind: ApiIdentityPartKind.Scalar,
                                     ApiPropertyName: nameof(Company.Name)
@@ -794,7 +794,7 @@ public partial class ApiTypeTests
                     ],
                     ApiProperties:
                     [
-                        new ApiPropertyConfig
+                        new ApiPropertyParams
                         (
                             ApiName: nameof(Company.Id),
                             ApiTypeExpression: new ApiTypeExpression(clrType: typeof(Ulid)),
@@ -802,7 +802,7 @@ public partial class ApiTypeTests
                             ClrName: nameof(Company.Id),
                             ClrMemberKind: ClrMemberKind.Property
                         ),
-                        new ApiPropertyConfig
+                        new ApiPropertyParams
                         (
                             ApiName: nameof(Company.Name),
                             ApiTypeExpression: new ApiTypeExpression(clrType: typeof(string)),
@@ -810,7 +810,7 @@ public partial class ApiTypeTests
                             ClrName: nameof(Company.Name),
                             ClrMemberKind: ClrMemberKind.Property
                         ),
-                        new ApiPropertyConfig
+                        new ApiPropertyParams
                         (
                             ApiName: nameof(Company.Owner),
                             ApiTypeExpression: new ApiTypeExpression(clrType: typeof(Person)),
@@ -818,7 +818,7 @@ public partial class ApiTypeTests
                             ClrName: nameof(Company.Owner),
                             ClrMemberKind: ClrMemberKind.Property
                         ),
-                        new ApiPropertyConfig
+                        new ApiPropertyParams
                         (
                             ApiName: nameof(Company.Employees),
                             ApiTypeExpression: new ApiTypeExpression

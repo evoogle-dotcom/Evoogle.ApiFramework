@@ -139,7 +139,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
         #endregion
     }
 
-    private class JsonDeserializeTest : JsonDeserializeTest<ApiSchema, ApiSchemaDescriptor>
+    private class JsonDeserializeTest : JsonDeserializeTest<ApiSchema, ApiSchemaSpec>
     {
         #region Constructors
         public JsonDeserializeTest()
@@ -149,14 +149,14 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
         #endregion
 
         #region JsonDeserializeTest<T, TFactoryArg> Methods
-        protected override ApiSchema? CreateExpected(ApiSchemaDescriptor? descriptor)
+        protected override ApiSchema? CreateExpected(ApiSchemaSpec? descriptor)
         {
             return BuildTestApiSchema(descriptor);
         }
         #endregion
     }
 
-    private class JsonRoundtripTest : JsonRoundtripTest<ApiSchema, ApiSchemaDescriptor>
+    private class JsonRoundtripTest : JsonRoundtripTest<ApiSchema, ApiSchemaSpec>
     {
         #region Constructors
         public JsonRoundtripTest()
@@ -166,17 +166,17 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
         #endregion
 
         #region JsonRoundtripTest<T, TFactoryArg> Methods
-        protected override ApiSchema? CreateExpected(ApiSchemaDescriptor? descriptor)
+        protected override ApiSchema? CreateExpected(ApiSchemaSpec? descriptor)
         {
             return BuildTestApiSchema(descriptor);
         }
         #endregion
     }
 
-    private class JsonSerializeTest : JsonSerializeTest<ApiSchema, ApiSchemaDescriptor>
+    private class JsonSerializeTest : JsonSerializeTest<ApiSchema, ApiSchemaSpec>
     {
         #region JsonSerializeTest<T, TFactoryArg> Methods
-        protected override ApiSchema? CreateSource(ApiSchemaDescriptor? descriptor)
+        protected override ApiSchema? CreateSource(ApiSchemaSpec? descriptor)
         {
             return BuildTestApiSchema(descriptor);
         }

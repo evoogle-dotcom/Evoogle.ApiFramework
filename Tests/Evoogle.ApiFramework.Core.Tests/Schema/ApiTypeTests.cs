@@ -14,7 +14,7 @@ namespace Evoogle.ApiFramework.Schema;
 public partial class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
 {
     #region Test Types
-    private class JsonDeserializeTest : JsonDeserializeTest<ApiType, ApiTypeDescriptor>
+    private class JsonDeserializeTest : JsonDeserializeTest<ApiType, ApiTypeSpec>
     {
         #region Constructors
         public JsonDeserializeTest()
@@ -24,14 +24,14 @@ public partial class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
         #endregion
 
         #region JsonDeserializeTest<T, TFactoryArg> Methods
-        protected override ApiType? CreateExpected(ApiTypeDescriptor? descriptor)
+        protected override ApiType? CreateExpected(ApiTypeSpec? descriptor)
         {
             return BuildTestApiType(descriptor);
         }
         #endregion
     }
 
-    private class JsonRoundtripTest : JsonRoundtripTest<ApiType, ApiTypeDescriptor>
+    private class JsonRoundtripTest : JsonRoundtripTest<ApiType, ApiTypeSpec>
     {
         #region Constructors
         public JsonRoundtripTest()
@@ -42,17 +42,17 @@ public partial class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
         #endregion
 
         #region JsonRoundtripTest<T, TFactoryArg> Methods
-        protected override ApiType? CreateExpected(ApiTypeDescriptor? descriptor)
+        protected override ApiType? CreateExpected(ApiTypeSpec? descriptor)
         {
             return BuildTestApiType(descriptor);
         }
         #endregion
     }
 
-    private class JsonSerializeTest : JsonSerializeTest<ApiType, ApiTypeDescriptor>
+    private class JsonSerializeTest : JsonSerializeTest<ApiType, ApiTypeSpec>
     {
         #region JsonSerializeTest<T, TFactoryArg> Methods
-        protected override ApiType? CreateSource(ApiTypeDescriptor? descriptor)
+        protected override ApiType? CreateSource(ApiTypeSpec? descriptor)
         {
             return BuildTestApiType(descriptor);
         }
