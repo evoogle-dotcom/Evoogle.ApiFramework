@@ -28,17 +28,10 @@ public partial class ApiTypeTests
         new JsonSerializeTest
         {
             Name = $"{nameof(ApiScalarType)} [{nameof(Boolean)}]",
-            SourceFactoryArgument = new ApiTypeSpec
+            SourceFactoryArgument = new ApiScalarTypeDef
             (
-                ApiType: new ApiTypeParams
-                (
-                    ApiKind: ApiTypeKind.Scalar,
-                    ClrType: typeof(bool)
-                ),
-                ApiNamedType: new ApiNamedTypeParams
-                (
-                    ApiName: nameof(Boolean)
-                )
+                ApiName: nameof(Boolean),
+                ClrType: typeof(bool)
             ),
             ExpectedJson = @"
             {
@@ -51,18 +44,11 @@ public partial class ApiTypeTests
         new JsonSerializeTest
         {
             Name = $"{nameof(ApiScalarType)} [{nameof(Boolean)}] With {nameof(GraphQlExtension)}",
-            SourceFactoryArgument = new ApiTypeSpec
+            SourceFactoryArgument = new ApiScalarTypeDef
             (
-                ApiType: new ApiTypeParams
-                (
-                    ApiKind: ApiTypeKind.Scalar,
-                    ClrType: typeof(bool),
-                    ExtensionTypes: [ typeof(GraphQlExtension) ]
-                ),
-                ApiNamedType: new ApiNamedTypeParams
-                (
-                    ApiName: nameof(Boolean)
-                )
+                ApiName: nameof(Boolean),
+                ClrType: typeof(bool),
+                ExtensionTypes: [ typeof(GraphQlExtension) ]
             ),
             ExpectedJson = @"
             {
@@ -80,17 +66,10 @@ public partial class ApiTypeTests
         new JsonSerializeTest
         {
             Name = $"{nameof(ApiScalarType)} [{nameof(Int32)}]",
-            SourceFactoryArgument = new ApiTypeSpec
+            SourceFactoryArgument = new ApiScalarTypeDef
             (
-                ApiType: new ApiTypeParams
-                (
-                    ApiKind: ApiTypeKind.Scalar,
-                    ClrType: typeof(int)
-                ),
-                ApiNamedType: new ApiNamedTypeParams
-                (
-                    ApiName: nameof(Int32)
-                )
+                ApiName: nameof(Int32),
+                ClrType: typeof(int)
             ),
             ExpectedJson = @"
             {
@@ -103,17 +82,10 @@ public partial class ApiTypeTests
         new JsonSerializeTest
         {
             Name = $"{nameof(ApiScalarType)} [{nameof(Single)}]",
-            SourceFactoryArgument = new ApiTypeSpec
+            SourceFactoryArgument = new ApiScalarTypeDef
             (
-                ApiType: new ApiTypeParams
-                (
-                    ApiKind: ApiTypeKind.Scalar,
-                    ClrType: typeof(float)
-                ),
-                ApiNamedType: new ApiNamedTypeParams
-                (
-                    ApiName: nameof(Single)
-                )
+                ApiName: nameof(Single),
+                ClrType: typeof(float)
             ),
             ExpectedJson = @"
             {
@@ -126,17 +98,10 @@ public partial class ApiTypeTests
         new JsonSerializeTest
         {
             Name = $"{nameof(ApiScalarType)} [{nameof(String)}]",
-            SourceFactoryArgument = new ApiTypeSpec
+            SourceFactoryArgument = new ApiScalarTypeDef
             (
-                ApiType: new ApiTypeParams
-                (
-                    ApiKind: ApiTypeKind.Scalar,
-                    ClrType: typeof(string)
-                ),
-                ApiNamedType: new ApiNamedTypeParams
-                (
-                    ApiName: nameof(String)
-                )
+                ApiName: nameof(String),
+                ClrType: typeof(string)
             ),
             ExpectedJson = @"
             {
@@ -150,17 +115,10 @@ public partial class ApiTypeTests
         new JsonSerializeTest
         {
             Name = $"{nameof(ApiEnumType)} [{nameof(StopLight)}]",
-            SourceFactoryArgument = new ApiTypeSpec
+            SourceFactoryArgument = new ApiEnumTypeDef
             (
-                ApiType: new ApiTypeParams
-                (
-                    ApiKind: ApiTypeKind.Enum,
-                    ClrType: typeof(StopLight)
-                ),
-                ApiNamedType: new ApiNamedTypeParams
-                (
-                    ApiName: nameof(StopLight)
-                )
+                ApiName: nameof(StopLight),
+                ClrType: typeof(StopLight)
             ),
             ExpectedJson = @"
             {
@@ -195,18 +153,11 @@ public partial class ApiTypeTests
         new JsonSerializeTest
         {
             Name = $"{nameof(ApiEnumType)} [{nameof(StopLight)}] With {nameof(JsonApiExtension)}",
-            SourceFactoryArgument = new ApiTypeSpec
+            SourceFactoryArgument = new ApiEnumTypeDef
             (
-                ApiType: new ApiTypeParams
-                (
-                    ApiKind: ApiTypeKind.Enum,
-                    ClrType: typeof(StopLight),
-                    ExtensionTypes: [ typeof(JsonApiExtension) ]
-                ),
-                ApiNamedType: new ApiNamedTypeParams
-                (
-                    ApiName: nameof(StopLight)
-                )
+                ApiName: nameof(StopLight),
+                ClrType: typeof(StopLight),
+                ExtensionTypes: [ typeof(JsonApiExtension) ]
             ),
             ExpectedJson = @"
             {
@@ -247,18 +198,11 @@ public partial class ApiTypeTests
         new JsonSerializeTest
         {
             Name = $"{nameof(ApiCollectionType)} [List<{nameof(String)}>]",
-            SourceFactoryArgument = new ApiTypeSpec
+            SourceFactoryArgument = new ApiCollectionTypeDef
             (
-                ApiType: new ApiTypeParams
-                (
-                    ApiKind: ApiTypeKind.Collection,
-                    ClrType: typeof(List<string>)
-                ),
-                ApiCollectionType: new ApiCollectionTypeParams
-                (
-                    ApiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: "String"),
-                    ApiItemTypeModifiers: ApiTypeModifiers.Required
-                )
+                ClrType: typeof(List<string>),
+                ApiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: "String"),
+                ApiItemTypeModifiers: ApiTypeModifiers.Required
             ),
             ExpectedJson = @"
             {
@@ -275,18 +219,11 @@ public partial class ApiTypeTests
         new JsonSerializeTest
         {
             Name = $"{nameof(ApiCollectionType)} [List<{nameof(String)}?>]",
-            SourceFactoryArgument = new ApiTypeSpec
+            SourceFactoryArgument = new ApiCollectionTypeDef
             (
-                ApiType: new ApiTypeParams
-                (
-                    ApiKind: ApiTypeKind.Collection,
-                    ClrType: typeof(List<string?>)
-                ),
-                ApiCollectionType: new ApiCollectionTypeParams
-                (
-                    ApiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: "String"),
-                    ApiItemTypeModifiers: ApiTypeModifiers.None
-                )
+                ClrType: typeof(List<string?>),
+                ApiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: "String"),
+                ApiItemTypeModifiers: ApiTypeModifiers.None
             ),
             ExpectedJson = @"
             {
@@ -303,18 +240,11 @@ public partial class ApiTypeTests
         new JsonSerializeTest
         {
             Name = $"{nameof(ApiCollectionType)} [List<{nameof(StopLight)}>]",
-            SourceFactoryArgument = new ApiTypeSpec
+            SourceFactoryArgument = new ApiCollectionTypeDef
             (
-                ApiType: new ApiTypeParams
-                (
-                    ApiKind: ApiTypeKind.Collection,
-                    ClrType: typeof(List<StopLight>)
-                ),
-                ApiCollectionType: new ApiCollectionTypeParams
-                (
-                    ApiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Enum, apiName: nameof(StopLight)),
-                    ApiItemTypeModifiers: ApiTypeModifiers.Required
-                )
+                ClrType: typeof(List<StopLight>),
+                ApiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Enum, apiName: nameof(StopLight)),
+                ApiItemTypeModifiers: ApiTypeModifiers.Required
             ),
             ExpectedJson = @"
             {
@@ -331,18 +261,11 @@ public partial class ApiTypeTests
         new JsonSerializeTest
         {
             Name = $"{nameof(ApiCollectionType)} [List<{nameof(StopLight)}?>]",
-            SourceFactoryArgument = new ApiTypeSpec
+            SourceFactoryArgument = new ApiCollectionTypeDef
             (
-                ApiType: new ApiTypeParams
-                (
-                    ApiKind: ApiTypeKind.Collection,
-                    ClrType: typeof(List<StopLight?>)
-                ),
-                ApiCollectionType: new ApiCollectionTypeParams
-                (
-                    ApiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Enum, apiName: nameof(StopLight)),
-                    ApiItemTypeModifiers: ApiTypeModifiers.None
-                )
+                ClrType: typeof(List<StopLight?>),
+                ApiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Enum, apiName: nameof(StopLight)),
+                ApiItemTypeModifiers: ApiTypeModifiers.None
             ),
             ExpectedJson = @"
             {
@@ -360,71 +283,61 @@ public partial class ApiTypeTests
         new JsonSerializeTest
         {
             Name = $"{nameof(ApiObjectType)} [{nameof(ScalarsOnly)}] With API Named Typed Expressions",
-            SourceFactoryArgument = new ApiTypeSpec
+            SourceFactoryArgument = new ApiObjectTypeDef
             (
-                ApiType: new ApiTypeParams
-                (
-                    ApiKind: ApiTypeKind.Object,
-                    ClrType: typeof(ScalarsOnly)
-                ),
-                ApiNamedType: new ApiNamedTypeParams
-                (
-                    ApiName: nameof(ScalarsOnly)
-                ),
-                ApiObjectType: new ApiObjectTypeParams
-                (
-                    ApiProperties:
-                    [
-                        new ApiPropertyParams
-                        (
-                            ApiName: nameof(ScalarsOnly.RequiredName),
-                            ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
-                            ApiTypeModifiers: ApiTypeModifiers.Required,
-                            ClrName: nameof(ScalarsOnly.RequiredName),
-                            ClrMemberKind: ClrMemberKind.Property
-                        ),
-                        new ApiPropertyParams
-                        (
-                            ApiName: nameof(ScalarsOnly.RequiredNumber),
-                            ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int64)),
-                            ApiTypeModifiers: ApiTypeModifiers.Required,
-                            ClrName: nameof(ScalarsOnly.RequiredNumber),
-                            ClrMemberKind: ClrMemberKind.Property
-                        ),
-                        new ApiPropertyParams
-                        (
-                            ApiName: nameof(ScalarsOnly.RequiredPredicate),
-                            ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Boolean)),
-                            ApiTypeModifiers: ApiTypeModifiers.Required,
-                            ClrName: nameof(ScalarsOnly.RequiredPredicate),
-                            ClrMemberKind: ClrMemberKind.Property
-                        ),
-                        new ApiPropertyParams
-                        (
-                            ApiName: nameof(ScalarsOnly.OptionalName),
-                            ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
-                            ApiTypeModifiers: ApiTypeModifiers.None,
-                            ClrName: nameof(ScalarsOnly.OptionalName),
-                            ClrMemberKind: ClrMemberKind.Field
-                        ),
-                        new ApiPropertyParams
-                        (
-                            ApiName: nameof(ScalarsOnly.OptionalNumber),
-                            ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int64)),
-                            ApiTypeModifiers: ApiTypeModifiers.None,
-                            ClrName: nameof(ScalarsOnly.OptionalNumber),
-                            ClrMemberKind: ClrMemberKind.Field
-                        ),
-                        new ApiPropertyParams
-                        (
-                            ApiName: nameof(ScalarsOnly.OptionalPredicate),
-                            ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Boolean)),
-                            ApiTypeModifiers: ApiTypeModifiers.None,
-                            ClrName: nameof(ScalarsOnly.OptionalPredicate),
-                            ClrMemberKind: ClrMemberKind.Field
-                        ),
-                    ]
-                )
+                ApiName: nameof(ScalarsOnly),
+                ClrType: typeof(ScalarsOnly),
+                ApiProperties:
+                [
+                    new ApiPropertyDef
+                    (
+                        ApiName: nameof(ScalarsOnly.RequiredName),
+                        ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                        ApiTypeModifiers: ApiTypeModifiers.Required,
+                        ClrName: nameof(ScalarsOnly.RequiredName),
+                        ClrMemberKind: ClrMemberKind.Property
+                    ),
+                    new ApiPropertyDef
+                    (
+                        ApiName: nameof(ScalarsOnly.RequiredNumber),
+                        ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int64)),
+                        ApiTypeModifiers: ApiTypeModifiers.Required,
+                        ClrName: nameof(ScalarsOnly.RequiredNumber),
+                        ClrMemberKind: ClrMemberKind.Property
+                    ),
+                    new ApiPropertyDef
+                    (
+                        ApiName: nameof(ScalarsOnly.RequiredPredicate),
+                        ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Boolean)),
+                        ApiTypeModifiers: ApiTypeModifiers.Required,
+                        ClrName: nameof(ScalarsOnly.RequiredPredicate),
+                        ClrMemberKind: ClrMemberKind.Property
+                    ),
+                    new ApiPropertyDef
+                    (
+                        ApiName: nameof(ScalarsOnly.OptionalName),
+                        ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                        ApiTypeModifiers: ApiTypeModifiers.None,
+                        ClrName: nameof(ScalarsOnly.OptionalName),
+                        ClrMemberKind: ClrMemberKind.Field
+                    ),
+                    new ApiPropertyDef
+                    (
+                        ApiName: nameof(ScalarsOnly.OptionalNumber),
+                        ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int64)),
+                        ApiTypeModifiers: ApiTypeModifiers.None,
+                        ClrName: nameof(ScalarsOnly.OptionalNumber),
+                        ClrMemberKind: ClrMemberKind.Field
+                    ),
+                    new ApiPropertyDef
+                    (
+                        ApiName: nameof(ScalarsOnly.OptionalPredicate),
+                        ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Boolean)),
+                        ApiTypeModifiers: ApiTypeModifiers.None,
+                        ClrName: nameof(ScalarsOnly.OptionalPredicate),
+                        ClrMemberKind: ClrMemberKind.Field
+                    ),
+                ]
             ),
             ExpectedJson = @"
             {
@@ -500,75 +413,62 @@ public partial class ApiTypeTests
         new JsonSerializeTest
         {
             Name = $"{nameof(ApiObjectType)} [{nameof(ScalarsOnly)}] With API Named Typed Expressions And API Options",
-            SourceFactoryArgument = new ApiTypeSpec
+            SourceFactoryArgument = new ApiObjectTypeDef
             (
-                ApiType: new ApiTypeParams
-                (
-                    ApiKind: ApiTypeKind.Object,
-                    ClrType: typeof(ScalarsOnly)
-                ),
-                ApiNamedType: new ApiNamedTypeParams
-                (
-                    ApiName: nameof(ScalarsOnly)
-                ),
-                ApiObjectType: new ApiObjectTypeParams
-                (
-                    ApiOptions: new ApiObjectTypeOptionsParams
+                ApiName: nameof(ScalarsOnly),
+                ClrType: typeof(ScalarsOnly),
+                ApiIdentityPartNullHandling: ApiIdentityPartNullHandling.ThrowOnNull,
+                ApiProperties:
+                [
+                    new ApiPropertyDef
                     (
-                        ApiIdentityPartNullHandling: ApiIdentityPartNullHandling.ThrowOnNull
+                        ApiName: nameof(ScalarsOnly.RequiredName),
+                        ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                        ApiTypeModifiers: ApiTypeModifiers.Required,
+                        ClrName: nameof(ScalarsOnly.RequiredName),
+                        ClrMemberKind: ClrMemberKind.Property
                     ),
-                    ApiProperties:
-                    [
-                        new ApiPropertyParams
-                        (
-                            ApiName: nameof(ScalarsOnly.RequiredName),
-                            ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
-                            ApiTypeModifiers: ApiTypeModifiers.Required,
-                            ClrName: nameof(ScalarsOnly.RequiredName),
-                            ClrMemberKind: ClrMemberKind.Property
-                        ),
-                        new ApiPropertyParams
-                        (
-                            ApiName: nameof(ScalarsOnly.RequiredNumber),
-                            ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int64)),
-                            ApiTypeModifiers: ApiTypeModifiers.Required,
-                            ClrName: nameof(ScalarsOnly.RequiredNumber),
-                            ClrMemberKind: ClrMemberKind.Property
-                        ),
-                        new ApiPropertyParams
-                        (
-                            ApiName: nameof(ScalarsOnly.RequiredPredicate),
-                            ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Boolean)),
-                            ApiTypeModifiers: ApiTypeModifiers.Required,
-                            ClrName: nameof(ScalarsOnly.RequiredPredicate),
-                            ClrMemberKind: ClrMemberKind.Property
-                        ),
-                        new ApiPropertyParams
-                        (
-                            ApiName: nameof(ScalarsOnly.OptionalName),
-                            ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
-                            ApiTypeModifiers: ApiTypeModifiers.None,
-                            ClrName: nameof(ScalarsOnly.OptionalName),
-                            ClrMemberKind: ClrMemberKind.Field
-                        ),
-                        new ApiPropertyParams
-                        (
-                            ApiName: nameof(ScalarsOnly.OptionalNumber),
-                            ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int64)),
-                            ApiTypeModifiers: ApiTypeModifiers.None,
-                            ClrName: nameof(ScalarsOnly.OptionalNumber),
-                            ClrMemberKind: ClrMemberKind.Field
-                        ),
-                        new ApiPropertyParams
-                        (
-                            ApiName: nameof(ScalarsOnly.OptionalPredicate),
-                            ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Boolean)),
-                            ApiTypeModifiers: ApiTypeModifiers.None,
-                            ClrName: nameof(ScalarsOnly.OptionalPredicate),
-                            ClrMemberKind: ClrMemberKind.Field
-                        ),
-                    ]
-                )
+                    new ApiPropertyDef
+                    (
+                        ApiName: nameof(ScalarsOnly.RequiredNumber),
+                        ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int64)),
+                        ApiTypeModifiers: ApiTypeModifiers.Required,
+                        ClrName: nameof(ScalarsOnly.RequiredNumber),
+                        ClrMemberKind: ClrMemberKind.Property
+                    ),
+                    new ApiPropertyDef
+                    (
+                        ApiName: nameof(ScalarsOnly.RequiredPredicate),
+                        ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Boolean)),
+                        ApiTypeModifiers: ApiTypeModifiers.Required,
+                        ClrName: nameof(ScalarsOnly.RequiredPredicate),
+                        ClrMemberKind: ClrMemberKind.Property
+                    ),
+                    new ApiPropertyDef
+                    (
+                        ApiName: nameof(ScalarsOnly.OptionalName),
+                        ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                        ApiTypeModifiers: ApiTypeModifiers.None,
+                        ClrName: nameof(ScalarsOnly.OptionalName),
+                        ClrMemberKind: ClrMemberKind.Field
+                    ),
+                    new ApiPropertyDef
+                    (
+                        ApiName: nameof(ScalarsOnly.OptionalNumber),
+                        ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int64)),
+                        ApiTypeModifiers: ApiTypeModifiers.None,
+                        ClrName: nameof(ScalarsOnly.OptionalNumber),
+                        ClrMemberKind: ClrMemberKind.Field
+                    ),
+                    new ApiPropertyDef
+                    (
+                        ApiName: nameof(ScalarsOnly.OptionalPredicate),
+                        ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Boolean)),
+                        ApiTypeModifiers: ApiTypeModifiers.None,
+                        ClrName: nameof(ScalarsOnly.OptionalPredicate),
+                        ClrMemberKind: ClrMemberKind.Field
+                    ),
+                ]
             ),
             ExpectedJson = @"
             {
@@ -647,72 +547,62 @@ public partial class ApiTypeTests
         new JsonSerializeTest
         {
             Name = $"{nameof(ApiObjectType)} [{nameof(ScalarsOnly)}] With API Named Typed Expressions And {nameof(GraphQlExtension)} And {nameof(JsonApiExtension)}",
-            SourceFactoryArgument = new ApiTypeSpec
+            SourceFactoryArgument = new ApiObjectTypeDef
             (
-                ApiType: new ApiTypeParams
-                (
-                    ApiKind: ApiTypeKind.Object,
-                    ClrType: typeof(ScalarsOnly),
-                    ExtensionTypes: [ typeof(GraphQlExtension), typeof(JsonApiExtension) ]
-                ),
-                ApiNamedType: new ApiNamedTypeParams
-                (
-                    ApiName: nameof(ScalarsOnly)
-                ),
-                ApiObjectType: new ApiObjectTypeParams
-                (
-                    ApiProperties:
-                    [
-                        new ApiPropertyParams
-                        (
-                            ApiName: nameof(ScalarsOnly.RequiredName),
-                            ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
-                            ApiTypeModifiers: ApiTypeModifiers.Required,
-                            ClrName: nameof(ScalarsOnly.RequiredName),
-                            ClrMemberKind: ClrMemberKind.Property
-                        ),
-                        new ApiPropertyParams
-                        (
-                            ApiName: nameof(ScalarsOnly.RequiredNumber),
-                            ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int64)),
-                            ApiTypeModifiers: ApiTypeModifiers.Required,
-                            ClrName: nameof(ScalarsOnly.RequiredNumber),
-                            ClrMemberKind: ClrMemberKind.Property
-                        ),
-                        new ApiPropertyParams
-                        (
-                            ApiName: nameof(ScalarsOnly.RequiredPredicate),
-                            ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Boolean)),
-                            ApiTypeModifiers: ApiTypeModifiers.Required,
-                            ClrName: nameof(ScalarsOnly.RequiredPredicate),
-                            ClrMemberKind: ClrMemberKind.Property
-                        ),
-                        new ApiPropertyParams
-                        (
-                            ApiName: nameof(ScalarsOnly.OptionalName),
-                            ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
-                            ApiTypeModifiers: ApiTypeModifiers.None,
-                            ClrName: nameof(ScalarsOnly.OptionalName),
-                            ClrMemberKind: ClrMemberKind.Field
-                        ),
-                        new ApiPropertyParams
-                        (
-                            ApiName: nameof(ScalarsOnly.OptionalNumber),
-                            ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int64)),
-                            ApiTypeModifiers: ApiTypeModifiers.None,
-                            ClrName: nameof(ScalarsOnly.OptionalNumber),
-                            ClrMemberKind: ClrMemberKind.Field
-                        ),
-                        new ApiPropertyParams
-                        (
-                            ApiName: nameof(ScalarsOnly.OptionalPredicate),
-                            ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Boolean)),
-                            ApiTypeModifiers: ApiTypeModifiers.None,
-                            ClrName: nameof(ScalarsOnly.OptionalPredicate),
-                            ClrMemberKind: ClrMemberKind.Field
-                        ),
-                    ]
-                )
+                ApiName: nameof(ScalarsOnly),
+                ClrType: typeof(ScalarsOnly),
+                ExtensionTypes: [ typeof(GraphQlExtension), typeof(JsonApiExtension) ],
+                ApiProperties:
+                [
+                    new ApiPropertyDef
+                    (
+                        ApiName: nameof(ScalarsOnly.RequiredName),
+                        ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                        ApiTypeModifiers: ApiTypeModifiers.Required,
+                        ClrName: nameof(ScalarsOnly.RequiredName),
+                        ClrMemberKind: ClrMemberKind.Property
+                    ),
+                    new ApiPropertyDef
+                    (
+                        ApiName: nameof(ScalarsOnly.RequiredNumber),
+                        ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int64)),
+                        ApiTypeModifiers: ApiTypeModifiers.Required,
+                        ClrName: nameof(ScalarsOnly.RequiredNumber),
+                        ClrMemberKind: ClrMemberKind.Property
+                    ),
+                    new ApiPropertyDef
+                    (
+                        ApiName: nameof(ScalarsOnly.RequiredPredicate),
+                        ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Boolean)),
+                        ApiTypeModifiers: ApiTypeModifiers.Required,
+                        ClrName: nameof(ScalarsOnly.RequiredPredicate),
+                        ClrMemberKind: ClrMemberKind.Property
+                    ),
+                    new ApiPropertyDef
+                    (
+                        ApiName: nameof(ScalarsOnly.OptionalName),
+                        ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                        ApiTypeModifiers: ApiTypeModifiers.None,
+                        ClrName: nameof(ScalarsOnly.OptionalName),
+                        ClrMemberKind: ClrMemberKind.Field
+                    ),
+                    new ApiPropertyDef
+                    (
+                        ApiName: nameof(ScalarsOnly.OptionalNumber),
+                        ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int64)),
+                        ApiTypeModifiers: ApiTypeModifiers.None,
+                        ClrName: nameof(ScalarsOnly.OptionalNumber),
+                        ClrMemberKind: ClrMemberKind.Field
+                    ),
+                    new ApiPropertyDef
+                    (
+                        ApiName: nameof(ScalarsOnly.OptionalPredicate),
+                        ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Boolean)),
+                        ApiTypeModifiers: ApiTypeModifiers.None,
+                        ClrName: nameof(ScalarsOnly.OptionalPredicate),
+                        ClrMemberKind: ClrMemberKind.Field
+                    ),
+                ]
             ),
             ExpectedJson = @"
             {
@@ -796,91 +686,79 @@ public partial class ApiTypeTests
         new JsonSerializeTest
         {
             Name = $"{nameof(ApiObjectType)} [{nameof(Company)}] With API Named Typed Expressions",
-            SourceFactoryArgument = new ApiTypeSpec
+            SourceFactoryArgument = new ApiObjectTypeDef
             (
-                ApiType: new ApiTypeParams
-                (
-                    ApiKind: ApiTypeKind.Object,
-                    ClrType: typeof(Company)
-                ),
-                ApiNamedType: new ApiNamedTypeParams
-                (
-                    ApiName: nameof(Company)
-                ),
-                ApiObjectType: new ApiObjectTypeParams
-                (
-                    ApiIdentities:
-                    [
-                        new ApiIdentityParams
-                        (
-                            ApiName: "PK_Company_Id",
-                            ApiIdentityParts:
-                            [
-                                new ApiIdentityPartParams
-                                (
-                                    ApiKind: ApiIdentityPartKind.Scalar,
-                                    ApiPropertyName: nameof(Company.Id),
-                                    ClrScalarTypeHint: typeof(string)
-                                )
-                            ]
-                        ),
-                        new ApiIdentityParams
-                        (
-                            ApiName: "AK_Company_Name",
-                            ApiIdentityParts:
-                            [
-                                new ApiIdentityPartParams
-                                (
-                                    ApiKind: ApiIdentityPartKind.Scalar,
-                                    ApiPropertyName: nameof(Company.Name)
-                                )
-                            ]
-                        )
-                    ],
-                    ApiProperties:
-                    [
-                        new ApiPropertyParams
-                        (
-                            ApiName: nameof(Company.Id),
-                            ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Ulid)),
-                            ApiTypeModifiers: ApiTypeModifiers.Required,
-                            ClrName: nameof(Company.Id),
-                            ClrMemberKind: ClrMemberKind.Property
-                        ),
-                        new ApiPropertyParams
-                        (
-                            ApiName: nameof(Company.Name),
-                            ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
-                            ApiTypeModifiers: ApiTypeModifiers.Required,
-                            ClrName: nameof(Company.Name),
-                            ClrMemberKind: ClrMemberKind.Property
-                        ),
-                        new ApiPropertyParams
-                        (
-                            ApiName: nameof(Company.Owner),
-                            ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(Person)),
-                            ApiTypeModifiers: ApiTypeModifiers.None,
-                            ClrName: nameof(Company.Owner),
-                            ClrMemberKind: ClrMemberKind.Property
-                        ),
-                        new ApiPropertyParams
-                        (
-                            ApiName: nameof(Company.Employees),
-                            ApiTypeExpression: new ApiTypeExpression
+                ApiName: nameof(Company),
+                ClrType: typeof(Company),
+                ApiIdentities:
+                [
+                    new ApiIdentityDef
+                    (
+                        ApiName: "PK_Company_Id",
+                        Parts:
+                        [
+                            new ApiScalarPartDef
                             (
-                                apiInlineType: new ApiCollectionType
-                                (
-                                    apiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(Person)),
-                                    apiItemTypeModifiers: ApiTypeModifiers.Required,
-                                    clrCollectionType: typeof(List<Person>)
-                                )
-                            ),
-                            ApiTypeModifiers: ApiTypeModifiers.None,
-                            ClrName: nameof(Company.Employees),
-                            ClrMemberKind: ClrMemberKind.Property
+                                ApiPropertyName: nameof(Company.Id),
+                                ClrScalarTypeHint: typeof(string)
+                            )
+                        ]
+                    ),
+                    new ApiIdentityDef
+                    (
+                        ApiName: "AK_Company_Name",
+                        Parts:
+                        [
+                            new ApiScalarPartDef
+                            (
+                                ApiPropertyName: nameof(Company.Name)
+                            )
+                        ]
+                    )
+                ],
+                ApiProperties:
+                [
+                    new ApiPropertyDef
+                    (
+                        ApiName: nameof(Company.Id),
+                        ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Ulid)),
+                        ApiTypeModifiers: ApiTypeModifiers.Required,
+                        ClrName: nameof(Company.Id),
+                        ClrMemberKind: ClrMemberKind.Property
+                    ),
+                    new ApiPropertyDef
+                    (
+                        ApiName: nameof(Company.Name),
+                        ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                        ApiTypeModifiers: ApiTypeModifiers.Required,
+                        ClrName: nameof(Company.Name),
+                        ClrMemberKind: ClrMemberKind.Property
+                    ),
+                    new ApiPropertyDef
+                    (
+                        ApiName: nameof(Company.Owner),
+                        ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(Person)),
+                        ApiTypeModifiers: ApiTypeModifiers.None,
+                        ClrName: nameof(Company.Owner),
+                        ClrMemberKind: ClrMemberKind.Property
+                    ),
+                    new ApiPropertyDef
+                    (
+                        ApiName: nameof(Company.Employees),
+                        ApiTypeExpression: new ApiTypeExpression
+                        (
+                            apiInlineType: new ApiCollectionType
+                            (
+                                apiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(Person)),
+                                apiItemTypeModifiers: ApiTypeModifiers.Required,
+                                clrCollectionType: typeof(List<Person>)
+                            )
                         ),
-                    ]
-                )
+                        ApiTypeModifiers: ApiTypeModifiers.None,
+                        ClrName: nameof(Company.Employees),
+                        ClrMemberKind: ClrMemberKind.Property
+                    ),
+                ]
             ),
             ExpectedJson = @"
             {
@@ -964,71 +842,61 @@ public partial class ApiTypeTests
         new JsonSerializeTest
         {
             Name = $"{nameof(ApiObjectType)} [{nameof(ScalarsOnly)}] With CLR Typed Expressions",
-            SourceFactoryArgument = new ApiTypeSpec
+            SourceFactoryArgument = new ApiObjectTypeDef
             (
-                ApiType: new ApiTypeParams
-                (
-                    ApiKind: ApiTypeKind.Object,
-                    ClrType: typeof(ScalarsOnly)
-                ),
-                ApiNamedType: new ApiNamedTypeParams
-                (
-                    ApiName: nameof(ScalarsOnly)
-                ),
-                ApiObjectType: new ApiObjectTypeParams
-                (
-                    ApiProperties:
-                    [
-                        new ApiPropertyParams
-                        (
-                            ApiName: nameof(ScalarsOnly.RequiredName),
-                            ApiTypeExpression: new ApiTypeExpression(clrType: typeof(string)),
-                            ApiTypeModifiers: ApiTypeModifiers.Required,
-                            ClrName: nameof(ScalarsOnly.RequiredName),
-                            ClrMemberKind: ClrMemberKind.Property
-                        ),
-                        new ApiPropertyParams
-                        (
-                            ApiName: nameof(ScalarsOnly.RequiredNumber),
-                            ApiTypeExpression: new ApiTypeExpression(clrType: typeof(long)),
-                            ApiTypeModifiers: ApiTypeModifiers.Required,
-                            ClrName: nameof(ScalarsOnly.RequiredNumber),
-                            ClrMemberKind: ClrMemberKind.Property
-                        ),
-                        new ApiPropertyParams
-                        (
-                            ApiName: nameof(ScalarsOnly.RequiredPredicate),
-                            ApiTypeExpression: new ApiTypeExpression(clrType: typeof(bool)),
-                            ApiTypeModifiers: ApiTypeModifiers.Required,
-                            ClrName: nameof(ScalarsOnly.RequiredPredicate),
-                            ClrMemberKind: ClrMemberKind.Property
-                        ),
-                        new ApiPropertyParams
-                        (
-                            ApiName: nameof(ScalarsOnly.OptionalName),
-                            ApiTypeExpression: new ApiTypeExpression(clrType: typeof(string)),
-                            ApiTypeModifiers: ApiTypeModifiers.None,
-                            ClrName: nameof(ScalarsOnly.OptionalName),
-                            ClrMemberKind: ClrMemberKind.Field
-                        ),
-                        new ApiPropertyParams
-                        (
-                            ApiName: nameof(ScalarsOnly.OptionalNumber),
-                            ApiTypeExpression: new ApiTypeExpression(clrType: typeof(long)),
-                            ApiTypeModifiers: ApiTypeModifiers.None,
-                            ClrName: nameof(ScalarsOnly.OptionalNumber),
-                            ClrMemberKind: ClrMemberKind.Field
-                        ),
-                        new ApiPropertyParams
-                        (
-                            ApiName: nameof(ScalarsOnly.OptionalPredicate),
-                            ApiTypeExpression: new ApiTypeExpression(clrType: typeof(bool)),
-                            ApiTypeModifiers: ApiTypeModifiers.None,
-                            ClrName: nameof(ScalarsOnly.OptionalPredicate),
-                            ClrMemberKind: ClrMemberKind.Field
-                        ),
-                    ]
-                )
+                ApiName: nameof(ScalarsOnly),
+                ClrType: typeof(ScalarsOnly),
+                ApiProperties:
+                [
+                    new ApiPropertyDef
+                    (
+                        ApiName: nameof(ScalarsOnly.RequiredName),
+                        ApiTypeExpression: new ApiTypeExpression(clrType: typeof(string)),
+                        ApiTypeModifiers: ApiTypeModifiers.Required,
+                        ClrName: nameof(ScalarsOnly.RequiredName),
+                        ClrMemberKind: ClrMemberKind.Property
+                    ),
+                    new ApiPropertyDef
+                    (
+                        ApiName: nameof(ScalarsOnly.RequiredNumber),
+                        ApiTypeExpression: new ApiTypeExpression(clrType: typeof(long)),
+                        ApiTypeModifiers: ApiTypeModifiers.Required,
+                        ClrName: nameof(ScalarsOnly.RequiredNumber),
+                        ClrMemberKind: ClrMemberKind.Property
+                    ),
+                    new ApiPropertyDef
+                    (
+                        ApiName: nameof(ScalarsOnly.RequiredPredicate),
+                        ApiTypeExpression: new ApiTypeExpression(clrType: typeof(bool)),
+                        ApiTypeModifiers: ApiTypeModifiers.Required,
+                        ClrName: nameof(ScalarsOnly.RequiredPredicate),
+                        ClrMemberKind: ClrMemberKind.Property
+                    ),
+                    new ApiPropertyDef
+                    (
+                        ApiName: nameof(ScalarsOnly.OptionalName),
+                        ApiTypeExpression: new ApiTypeExpression(clrType: typeof(string)),
+                        ApiTypeModifiers: ApiTypeModifiers.None,
+                        ClrName: nameof(ScalarsOnly.OptionalName),
+                        ClrMemberKind: ClrMemberKind.Field
+                    ),
+                    new ApiPropertyDef
+                    (
+                        ApiName: nameof(ScalarsOnly.OptionalNumber),
+                        ApiTypeExpression: new ApiTypeExpression(clrType: typeof(long)),
+                        ApiTypeModifiers: ApiTypeModifiers.None,
+                        ClrName: nameof(ScalarsOnly.OptionalNumber),
+                        ClrMemberKind: ClrMemberKind.Field
+                    ),
+                    new ApiPropertyDef
+                    (
+                        ApiName: nameof(ScalarsOnly.OptionalPredicate),
+                        ApiTypeExpression: new ApiTypeExpression(clrType: typeof(bool)),
+                        ApiTypeModifiers: ApiTypeModifiers.None,
+                        ClrName: nameof(ScalarsOnly.OptionalPredicate),
+                        ClrMemberKind: ClrMemberKind.Field
+                    ),
+                ]
             ),
             ExpectedJson = @"
             {
@@ -1098,75 +966,62 @@ public partial class ApiTypeTests
         new JsonSerializeTest
         {
             Name = $"{nameof(ApiObjectType)} [{nameof(ScalarsOnly)}] With CLR Typed Expressions And API Options",
-            SourceFactoryArgument = new ApiTypeSpec
+            SourceFactoryArgument = new ApiObjectTypeDef
             (
-                ApiType: new ApiTypeParams
-                (
-                    ApiKind: ApiTypeKind.Object,
-                    ClrType: typeof(ScalarsOnly)
-                ),
-                ApiNamedType: new ApiNamedTypeParams
-                (
-                    ApiName: nameof(ScalarsOnly)
-                ),
-                ApiObjectType: new ApiObjectTypeParams
-                (
-                    ApiOptions: new ApiObjectTypeOptionsParams
+                ApiName: nameof(ScalarsOnly),
+                ClrType: typeof(ScalarsOnly),
+                ApiIdentityPartNullHandling: ApiIdentityPartNullHandling.ThrowOnNull,
+                ApiProperties:
+                [
+                    new ApiPropertyDef
                     (
-                        ApiIdentityPartNullHandling: ApiIdentityPartNullHandling.ThrowOnNull
+                        ApiName: nameof(ScalarsOnly.RequiredName),
+                        ApiTypeExpression: new ApiTypeExpression(clrType: typeof(string)),
+                        ApiTypeModifiers: ApiTypeModifiers.Required,
+                        ClrName: nameof(ScalarsOnly.RequiredName),
+                        ClrMemberKind: ClrMemberKind.Property
                     ),
-                    ApiProperties:
-                    [
-                        new ApiPropertyParams
-                        (
-                            ApiName: nameof(ScalarsOnly.RequiredName),
-                            ApiTypeExpression: new ApiTypeExpression(clrType: typeof(string)),
-                            ApiTypeModifiers: ApiTypeModifiers.Required,
-                            ClrName: nameof(ScalarsOnly.RequiredName),
-                            ClrMemberKind: ClrMemberKind.Property
-                        ),
-                        new ApiPropertyParams
-                        (
-                            ApiName: nameof(ScalarsOnly.RequiredNumber),
-                            ApiTypeExpression: new ApiTypeExpression(clrType: typeof(long)),
-                            ApiTypeModifiers: ApiTypeModifiers.Required,
-                            ClrName: nameof(ScalarsOnly.RequiredNumber),
-                            ClrMemberKind: ClrMemberKind.Property
-                        ),
-                        new ApiPropertyParams
-                        (
-                            ApiName: nameof(ScalarsOnly.RequiredPredicate),
-                            ApiTypeExpression: new ApiTypeExpression(clrType: typeof(bool)),
-                            ApiTypeModifiers: ApiTypeModifiers.Required,
-                            ClrName: nameof(ScalarsOnly.RequiredPredicate),
-                            ClrMemberKind: ClrMemberKind.Property
-                        ),
-                        new ApiPropertyParams
-                        (
-                            ApiName: nameof(ScalarsOnly.OptionalName),
-                            ApiTypeExpression: new ApiTypeExpression(clrType: typeof(string)),
-                            ApiTypeModifiers: ApiTypeModifiers.None,
-                            ClrName: nameof(ScalarsOnly.OptionalName),
-                            ClrMemberKind: ClrMemberKind.Field
-                        ),
-                        new ApiPropertyParams
-                        (
-                            ApiName: nameof(ScalarsOnly.OptionalNumber),
-                            ApiTypeExpression: new ApiTypeExpression(clrType: typeof(long)),
-                            ApiTypeModifiers: ApiTypeModifiers.None,
-                            ClrName: nameof(ScalarsOnly.OptionalNumber),
-                            ClrMemberKind: ClrMemberKind.Field
-                        ),
-                        new ApiPropertyParams
-                        (
-                            ApiName: nameof(ScalarsOnly.OptionalPredicate),
-                            ApiTypeExpression: new ApiTypeExpression(clrType: typeof(bool)),
-                            ApiTypeModifiers: ApiTypeModifiers.None,
-                            ClrName: nameof(ScalarsOnly.OptionalPredicate),
-                            ClrMemberKind: ClrMemberKind.Field
-                        ),
-                    ]
-                )
+                    new ApiPropertyDef
+                    (
+                        ApiName: nameof(ScalarsOnly.RequiredNumber),
+                        ApiTypeExpression: new ApiTypeExpression(clrType: typeof(long)),
+                        ApiTypeModifiers: ApiTypeModifiers.Required,
+                        ClrName: nameof(ScalarsOnly.RequiredNumber),
+                        ClrMemberKind: ClrMemberKind.Property
+                    ),
+                    new ApiPropertyDef
+                    (
+                        ApiName: nameof(ScalarsOnly.RequiredPredicate),
+                        ApiTypeExpression: new ApiTypeExpression(clrType: typeof(bool)),
+                        ApiTypeModifiers: ApiTypeModifiers.Required,
+                        ClrName: nameof(ScalarsOnly.RequiredPredicate),
+                        ClrMemberKind: ClrMemberKind.Property
+                    ),
+                    new ApiPropertyDef
+                    (
+                        ApiName: nameof(ScalarsOnly.OptionalName),
+                        ApiTypeExpression: new ApiTypeExpression(clrType: typeof(string)),
+                        ApiTypeModifiers: ApiTypeModifiers.None,
+                        ClrName: nameof(ScalarsOnly.OptionalName),
+                        ClrMemberKind: ClrMemberKind.Field
+                    ),
+                    new ApiPropertyDef
+                    (
+                        ApiName: nameof(ScalarsOnly.OptionalNumber),
+                        ApiTypeExpression: new ApiTypeExpression(clrType: typeof(long)),
+                        ApiTypeModifiers: ApiTypeModifiers.None,
+                        ClrName: nameof(ScalarsOnly.OptionalNumber),
+                        ClrMemberKind: ClrMemberKind.Field
+                    ),
+                    new ApiPropertyDef
+                    (
+                        ApiName: nameof(ScalarsOnly.OptionalPredicate),
+                        ApiTypeExpression: new ApiTypeExpression(clrType: typeof(bool)),
+                        ApiTypeModifiers: ApiTypeModifiers.None,
+                        ClrName: nameof(ScalarsOnly.OptionalPredicate),
+                        ClrMemberKind: ClrMemberKind.Field
+                    ),
+                ]
             ),
             ExpectedJson = @"
             {
@@ -1239,72 +1094,62 @@ public partial class ApiTypeTests
         new JsonSerializeTest
         {
             Name = $"{nameof(ApiObjectType)} [{nameof(ScalarsOnly)}] With CLR Typed Expressions And {nameof(GraphQlExtension)} And {nameof(JsonApiExtension)}",
-            SourceFactoryArgument = new ApiTypeSpec
+            SourceFactoryArgument = new ApiObjectTypeDef
             (
-                ApiType: new ApiTypeParams
-                (
-                    ApiKind: ApiTypeKind.Object,
-                    ClrType: typeof(ScalarsOnly),
-                    ExtensionTypes: [ typeof(GraphQlExtension), typeof(JsonApiExtension) ]
-                ),
-                ApiNamedType: new ApiNamedTypeParams
-                (
-                    ApiName: nameof(ScalarsOnly)
-                ),
-                ApiObjectType: new ApiObjectTypeParams
-                (
-                    ApiProperties:
-                    [
-                        new ApiPropertyParams
-                        (
-                            ApiName: nameof(ScalarsOnly.RequiredName),
-                            ApiTypeExpression: new ApiTypeExpression(clrType: typeof(string)),
-                            ApiTypeModifiers: ApiTypeModifiers.Required,
-                            ClrName: nameof(ScalarsOnly.RequiredName),
-                            ClrMemberKind: ClrMemberKind.Property
-                        ),
-                        new ApiPropertyParams
-                        (
-                            ApiName: nameof(ScalarsOnly.RequiredNumber),
-                            ApiTypeExpression: new ApiTypeExpression(clrType: typeof(long)),
-                            ApiTypeModifiers: ApiTypeModifiers.Required,
-                            ClrName: nameof(ScalarsOnly.RequiredNumber),
-                            ClrMemberKind: ClrMemberKind.Property
-                        ),
-                        new ApiPropertyParams
-                        (
-                            ApiName: nameof(ScalarsOnly.RequiredPredicate),
-                            ApiTypeExpression: new ApiTypeExpression(clrType: typeof(bool)),
-                            ApiTypeModifiers: ApiTypeModifiers.Required,
-                            ClrName: nameof(ScalarsOnly.RequiredPredicate),
-                            ClrMemberKind: ClrMemberKind.Property
-                        ),
-                        new ApiPropertyParams
-                        (
-                            ApiName: nameof(ScalarsOnly.OptionalName),
-                            ApiTypeExpression: new ApiTypeExpression(clrType: typeof(string)),
-                            ApiTypeModifiers: ApiTypeModifiers.None,
-                            ClrName: nameof(ScalarsOnly.OptionalName),
-                            ClrMemberKind: ClrMemberKind.Field
-                        ),
-                        new ApiPropertyParams
-                        (
-                            ApiName: nameof(ScalarsOnly.OptionalNumber),
-                            ApiTypeExpression: new ApiTypeExpression(clrType: typeof(long)),
-                            ApiTypeModifiers: ApiTypeModifiers.None,
-                            ClrName: nameof(ScalarsOnly.OptionalNumber),
-                            ClrMemberKind: ClrMemberKind.Field
-                        ),
-                        new ApiPropertyParams
-                        (
-                            ApiName: nameof(ScalarsOnly.OptionalPredicate),
-                            ApiTypeExpression: new ApiTypeExpression(clrType: typeof(bool)),
-                            ApiTypeModifiers: ApiTypeModifiers.None,
-                            ClrName: nameof(ScalarsOnly.OptionalPredicate),
-                            ClrMemberKind: ClrMemberKind.Field
-                        ),
-                    ]
-                )
+                ApiName: nameof(ScalarsOnly),
+                ClrType: typeof(ScalarsOnly),
+                ExtensionTypes: [ typeof(GraphQlExtension), typeof(JsonApiExtension) ],
+                ApiProperties:
+                [
+                    new ApiPropertyDef
+                    (
+                        ApiName: nameof(ScalarsOnly.RequiredName),
+                        ApiTypeExpression: new ApiTypeExpression(clrType: typeof(string)),
+                        ApiTypeModifiers: ApiTypeModifiers.Required,
+                        ClrName: nameof(ScalarsOnly.RequiredName),
+                        ClrMemberKind: ClrMemberKind.Property
+                    ),
+                    new ApiPropertyDef
+                    (
+                        ApiName: nameof(ScalarsOnly.RequiredNumber),
+                        ApiTypeExpression: new ApiTypeExpression(clrType: typeof(long)),
+                        ApiTypeModifiers: ApiTypeModifiers.Required,
+                        ClrName: nameof(ScalarsOnly.RequiredNumber),
+                        ClrMemberKind: ClrMemberKind.Property
+                    ),
+                    new ApiPropertyDef
+                    (
+                        ApiName: nameof(ScalarsOnly.RequiredPredicate),
+                        ApiTypeExpression: new ApiTypeExpression(clrType: typeof(bool)),
+                        ApiTypeModifiers: ApiTypeModifiers.Required,
+                        ClrName: nameof(ScalarsOnly.RequiredPredicate),
+                        ClrMemberKind: ClrMemberKind.Property
+                    ),
+                    new ApiPropertyDef
+                    (
+                        ApiName: nameof(ScalarsOnly.OptionalName),
+                        ApiTypeExpression: new ApiTypeExpression(clrType: typeof(string)),
+                        ApiTypeModifiers: ApiTypeModifiers.None,
+                        ClrName: nameof(ScalarsOnly.OptionalName),
+                        ClrMemberKind: ClrMemberKind.Field
+                    ),
+                    new ApiPropertyDef
+                    (
+                        ApiName: nameof(ScalarsOnly.OptionalNumber),
+                        ApiTypeExpression: new ApiTypeExpression(clrType: typeof(long)),
+                        ApiTypeModifiers: ApiTypeModifiers.None,
+                        ClrName: nameof(ScalarsOnly.OptionalNumber),
+                        ClrMemberKind: ClrMemberKind.Field
+                    ),
+                    new ApiPropertyDef
+                    (
+                        ApiName: nameof(ScalarsOnly.OptionalPredicate),
+                        ApiTypeExpression: new ApiTypeExpression(clrType: typeof(bool)),
+                        ApiTypeModifiers: ApiTypeModifiers.None,
+                        ClrName: nameof(ScalarsOnly.OptionalPredicate),
+                        ClrMemberKind: ClrMemberKind.Field
+                    ),
+                ]
             ),
             ExpectedJson = @"
             {
@@ -1382,91 +1227,79 @@ public partial class ApiTypeTests
         new JsonSerializeTest
         {
             Name = $"{nameof(ApiObjectType)} [{nameof(Company)}] With CLR Typed Expressions",
-            SourceFactoryArgument = new ApiTypeSpec
+            SourceFactoryArgument = new ApiObjectTypeDef
             (
-                ApiType: new ApiTypeParams
-                (
-                    ApiKind: ApiTypeKind.Object,
-                    ClrType: typeof(Company)
-                ),
-                ApiNamedType: new ApiNamedTypeParams
-                (
-                    ApiName: nameof(Company)
-                ),
-                ApiObjectType: new ApiObjectTypeParams
-                (
-                    ApiIdentities:
-                    [
-                        new ApiIdentityParams
-                        (
-                            ApiName: "PK_Company_Id",
-                            ApiIdentityParts:
-                            [
-                                new ApiIdentityPartParams
-                                (
-                                    ApiKind: ApiIdentityPartKind.Scalar,
-                                    ApiPropertyName: nameof(Company.Id),
-                                    ClrScalarTypeHint: typeof(string)
-                                )
-                            ]
-                        ),
-                        new ApiIdentityParams
-                        (
-                            ApiName: "AK_Company_Name",
-                            ApiIdentityParts:
-                            [
-                                new ApiIdentityPartParams
-                                (
-                                    ApiKind: ApiIdentityPartKind.Scalar,
-                                    ApiPropertyName: nameof(Company.Name)
-                                )
-                            ]
-                        )
-                    ],
-                    ApiProperties:
-                    [
-                        new ApiPropertyParams
-                        (
-                            ApiName: nameof(Company.Id),
-                            ApiTypeExpression: new ApiTypeExpression(clrType: typeof(Ulid)),
-                            ApiTypeModifiers: ApiTypeModifiers.Required,
-                            ClrName: nameof(Company.Id),
-                            ClrMemberKind: ClrMemberKind.Property
-                        ),
-                        new ApiPropertyParams
-                        (
-                            ApiName: nameof(Company.Name),
-                            ApiTypeExpression: new ApiTypeExpression(clrType: typeof(string)),
-                            ApiTypeModifiers: ApiTypeModifiers.Required,
-                            ClrName: nameof(Company.Name),
-                            ClrMemberKind: ClrMemberKind.Property
-                        ),
-                        new ApiPropertyParams
-                        (
-                            ApiName: nameof(Company.Owner),
-                            ApiTypeExpression: new ApiTypeExpression(clrType: typeof(Person)),
-                            ApiTypeModifiers: ApiTypeModifiers.None,
-                            ClrName: nameof(Company.Owner),
-                            ClrMemberKind: ClrMemberKind.Property
-                        ),
-                        new ApiPropertyParams
-                        (
-                            ApiName: nameof(Company.Employees),
-                            ApiTypeExpression: new ApiTypeExpression
+                ApiName: nameof(Company),
+                ClrType: typeof(Company),
+                ApiIdentities:
+                [
+                    new ApiIdentityDef
+                    (
+                        ApiName: "PK_Company_Id",
+                        Parts:
+                        [
+                            new ApiScalarPartDef
                             (
-                                apiInlineType: new ApiCollectionType
-                                (
-                                    apiItemTypeExpression: new ApiTypeExpression(clrType: typeof(Person)),
-                                    apiItemTypeModifiers: ApiTypeModifiers.Required,
-                                    clrCollectionType: typeof(List<Person>)
-                                )
-                            ),
-                            ApiTypeModifiers: ApiTypeModifiers.None,
-                            ClrName: nameof(Company.Employees),
-                            ClrMemberKind: ClrMemberKind.Property
+                                ApiPropertyName: nameof(Company.Id),
+                                ClrScalarTypeHint: typeof(string)
+                            )
+                        ]
+                    ),
+                    new ApiIdentityDef
+                    (
+                        ApiName: "AK_Company_Name",
+                        Parts:
+                        [
+                            new ApiScalarPartDef
+                            (
+                                ApiPropertyName: nameof(Company.Name)
+                            )
+                        ]
+                    )
+                ],
+                ApiProperties:
+                [
+                    new ApiPropertyDef
+                    (
+                        ApiName: nameof(Company.Id),
+                        ApiTypeExpression: new ApiTypeExpression(clrType: typeof(Ulid)),
+                        ApiTypeModifiers: ApiTypeModifiers.Required,
+                        ClrName: nameof(Company.Id),
+                        ClrMemberKind: ClrMemberKind.Property
+                    ),
+                    new ApiPropertyDef
+                    (
+                        ApiName: nameof(Company.Name),
+                        ApiTypeExpression: new ApiTypeExpression(clrType: typeof(string)),
+                        ApiTypeModifiers: ApiTypeModifiers.Required,
+                        ClrName: nameof(Company.Name),
+                        ClrMemberKind: ClrMemberKind.Property
+                    ),
+                    new ApiPropertyDef
+                    (
+                        ApiName: nameof(Company.Owner),
+                        ApiTypeExpression: new ApiTypeExpression(clrType: typeof(Person)),
+                        ApiTypeModifiers: ApiTypeModifiers.None,
+                        ClrName: nameof(Company.Owner),
+                        ClrMemberKind: ClrMemberKind.Property
+                    ),
+                    new ApiPropertyDef
+                    (
+                        ApiName: nameof(Company.Employees),
+                        ApiTypeExpression: new ApiTypeExpression
+                        (
+                            apiInlineType: new ApiCollectionType
+                            (
+                                apiItemTypeExpression: new ApiTypeExpression(clrType: typeof(Person)),
+                                apiItemTypeModifiers: ApiTypeModifiers.Required,
+                                clrCollectionType: typeof(List<Person>)
+                            )
                         ),
-                    ]
-                )
+                        ApiTypeModifiers: ApiTypeModifiers.None,
+                        ClrName: nameof(Company.Employees),
+                        ClrMemberKind: ClrMemberKind.Property
+                    ),
+                ]
             ),
             ExpectedJson = @"
             {

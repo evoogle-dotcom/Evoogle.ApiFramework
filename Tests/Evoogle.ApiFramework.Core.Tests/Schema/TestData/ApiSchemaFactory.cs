@@ -16,82 +16,58 @@ public static class ApiSchemaFactory
     #region Types
 
     // ApiSchema
-    public record ApiSchemaSpec
-    (
-        ApiSchemaParams ApiSchema,
-        List<ApiTypeSpec>? ApiNamedTypes = null
-    );
-
-    public record ApiSchemaParams
+    public record ApiSchemaDef
     (
         string ApiName,
         string? ApiVersion = null,
-        ApiSchemaOptionsParams? ApiOptions = null,
-        List<Type>? ExtensionTypes = null
-    );
-
-    public record ApiSchemaOptionsParams
-    (
-        ApiIdentityPartNullHandling ApiIdentityPartNullHandling
+        ApiIdentityPartNullHandling? ApiIdentityPartNullHandling = null,
+        List<Type>? ExtensionTypes = null,
+        List<ApiTypeDef>? ApiNamedTypes = null
     );
 
     // ApiType
-    public record ApiTypeSpec
-    (
-        ApiTypeParams ApiType,
+    public abstract record ApiTypeDef(Type ClrType, List<Type>? ExtensionTypes = null);
 
-        ApiNamedTypeParams? ApiNamedType = null,
-        ApiCollectionTypeParams? ApiCollectionType = null,
-        ApiObjectTypeParams? ApiObjectType = null
-    );
+    public abstract record ApiNamedTypeDef(string ApiName, Type ClrType, List<Type>? ExtensionTypes = null) : ApiTypeDef(ClrType, ExtensionTypes);
 
-    public record ApiTypeParams
-    (
-        ApiTypeKind ApiKind,
-        Type ClrType,
-        List<Type>? ExtensionTypes = null
-    );
+    public record ApiScalarTypeDef(string ApiName, Type ClrType, List<Type>? ExtensionTypes = null)
+        : ApiNamedTypeDef(ApiName, ClrType, ExtensionTypes);
 
-    public record ApiNamedTypeParams
-    (
-        string ApiName
-    );
+    public record ApiEnumTypeDef(string ApiName, Type ClrType, List<Type>? ExtensionTypes = null)
+        : ApiNamedTypeDef(ApiName, ClrType, ExtensionTypes);
 
-    public record ApiCollectionTypeParams
-    (
-        ApiTypeExpression ApiItemTypeExpression,
-        ApiTypeModifiers ApiItemTypeModifiers
-    );
-
-    public record ApiObjectTypeParams
-    (
-        ApiObjectTypeOptionsParams? ApiOptions = null,
-        List<ApiIdentityParams>? ApiIdentities = null,
-        List<ApiPropertyParams>? ApiProperties = null
-    );
-
-    public record ApiObjectTypeOptionsParams
-    (
-        ApiIdentityPartNullHandling? ApiIdentityPartNullHandling = null
-    );
-
-    // ApiIdentity
-    public record ApiIdentityParams
+    public record ApiObjectTypeDef
     (
         string ApiName,
-        List<ApiIdentityPartParams> ApiIdentityParts
-    );
+        Type ClrType,
+        ApiIdentityPartNullHandling? ApiIdentityPartNullHandling = null,
+        List<ApiIdentityDef>? ApiIdentities = null,
+        List<ApiPropertyDef>? ApiProperties = null,
+        List<Type>? ExtensionTypes = null
+    ) : ApiNamedTypeDef(ApiName, ClrType, ExtensionTypes);
 
-    public record ApiIdentityPartParams
+    public record ApiCollectionTypeDef
     (
-        ApiIdentityPartKind ApiKind,
-        string? ApiPropertyName = null,
-        string? ApiIdentityName = null,
-        Type? ClrScalarTypeHint = null
-    );
+        Type ClrType,
+        ApiTypeExpression ApiItemTypeExpression,
+        ApiTypeModifiers ApiItemTypeModifiers,
+        List<Type>? ExtensionTypes = null
+    ) : ApiTypeDef(ClrType, ExtensionTypes);
+
+    // ApiIdentity
+    public record ApiIdentityDef(string ApiName, List<ApiIdentityPartDef> Parts);
+
+    // ApiIdentityPart
+    public abstract record ApiIdentityPartDef;
+
+    public record ApiScalarPartDef(string ApiPropertyName, Type? ClrScalarTypeHint = null) : ApiIdentityPartDef;
+
+    public record ApiNestedPartDef(string ApiPropertyName, string? ApiIdentityName = null) : ApiIdentityPartDef;
+
+    public record ApiOwnerPartDef(string? ApiIdentityName = null) : ApiIdentityPartDef;
 
     // ApiProperty
-    public record ApiPropertyParams
+    public record ApiPropertyDef
     (
         string ApiName,
         ApiTypeExpression ApiTypeExpression,
@@ -101,62 +77,48 @@ public static class ApiSchemaFactory
     );
 
     // ApiRelationship
-    public record ApiRelationashipSpec
-    (
-        ApiRelationashipParams ApiRelationship,
+    public abstract record ApiRelationshipDef(string ApiName);
 
-        ApiRelationashipOneToParams? ApiRelationshipOneToOne = null,
-        ApiRelationashipOneToParams? ApiRelationshipOneToMany = null,
-        ApiRelationashipManyToManyParams? ApiRelationshipManyToMany = null
-    );
+    public record ApiOneToOneRelationshipDef(string ApiName, ApiPrincipalEndDef PrincipalEnd, ApiDependentEndDef DependentEnd)
+        : ApiRelationshipDef(ApiName);
 
-    public record ApiRelationashipParams
+    public record ApiOneToManyRelationshipDef(string ApiName, ApiPrincipalEndDef PrincipalEnd, ApiDependentEndDef DependentEnd)
+        : ApiRelationshipDef(ApiName);
+
+    public record ApiManyToManyRelationshipDef
     (
         string ApiName,
-        ApiRelationshipKind ApiKind
-    );
-
-    public record ApiRelationashipOneToParams
-    (
-        ApiRelationashipEndSpec ApiPrincipalEnd,
-        ApiRelationashipEndSpec ApiDependentEnd
-    );
-
-    public record ApiRelationashipManyToManyParams
-    (
-        ApiRelationashipEndSpec ApiPrincipalEndA,
-        ApiRelationashipEndSpec ApiPrincipalEndB,
-        ApiRelationashipEndSpec ApiDependentEndA,
-        ApiRelationashipEndSpec ApiDependentEndB,
+        ApiPrincipalEndDef PrincipalEndA,
+        ApiPrincipalEndDef PrincipalEndB,
+        ApiDependentEndDef DependentEndA,
+        ApiDependentEndDef DependentEndB,
         Type ClrAssociationObjectType
-    );
+    ) : ApiRelationshipDef(ApiName);
 
     // ApiRelationshipEnd
-    public record ApiRelationashipEndSpec
-    (
-        ApiRelationashipEndParams ApiRelationashipEnd,
-
-        ApiRelationashipPrincipalEndParams? ApiRelationashipPrincipalEnd = null,
-        ApiRelationashipDependentEndParams? ApiRelationashipDependentEnd = null
-    );
-
-    public record ApiRelationashipEndParams
+    public abstract record ApiRelationshipEndDef
     (
         ApiRelationshipEndKind ApiKind,
         Type ClrObjectType,
         ApiRelationshipDeleteBehavior ApiDeleteBehavior
     );
 
-    public record ApiRelationashipPrincipalEndParams
+    public record ApiPrincipalEndDef
     (
-        string? ApiIdentityName
-    );
+        ApiRelationshipEndKind ApiKind,
+        Type ClrObjectType,
+        ApiRelationshipDeleteBehavior ApiDeleteBehavior,
+        string? ApiIdentityName = null
+    ) : ApiRelationshipEndDef(ApiKind, ClrObjectType, ApiDeleteBehavior);
 
-    public record ApiRelationashipDependentEndParams
+    public record ApiDependentEndDef
     (
+        ApiRelationshipEndKind ApiKind,
+        Type ClrObjectType,
+        ApiRelationshipDeleteBehavior ApiDeleteBehavior,
         IEnumerable<ApiRelationshipKeyPath>? ApiKeyPaths = null,
         ApiRelationshipDeleteBehavior? ApiForcedDeleteBehavior = null
-    );
+    ) : ApiRelationshipEndDef(ApiKind, ClrObjectType, ApiDeleteBehavior);
     #endregion
 
     #region Fields
@@ -183,113 +145,58 @@ public static class ApiSchemaFactory
         };
     }
 
-    public static ApiSchema? BuildTestApiSchema(ApiSchemaSpec? apiSchemaSpec)
+    public static ApiSchema? BuildTestApiSchema(ApiSchemaDef? apiSchemaDef)
     {
-        if (apiSchemaSpec == null)
+        if (apiSchemaDef == null)
         {
             return default;
         }
 
-        var apiSchemaParams = apiSchemaSpec.ApiSchema;
-        var apiName = apiSchemaParams.ApiName;
-        var apiVersion = apiSchemaParams.ApiVersion;
+        var apiOptions = apiSchemaDef.ApiIdentityPartNullHandling.HasValue
+            ? new ApiSchemaOptions { ApiIdentityPartNullHandling = apiSchemaDef.ApiIdentityPartNullHandling.Value }
+            : null;
 
-        var apiOptions = BuildApiSchemaOptions(apiSchemaParams);
-
-        var apiNamedTypeSpecs = apiSchemaSpec.ApiNamedTypes ?? [];
-        var apiNamedTypes = apiNamedTypeSpecs
-            .Select(spec => BuildTestApiType(spec))
-            .Where(apiType => apiType != null)
+        var apiNamedTypes = (apiSchemaDef.ApiNamedTypes ?? [])
+            .Select(BuildTestApiType)
+            .Where(t => t != null)
             .Cast<ApiNamedType>()
             .ToList();
 
-        var extensionTypeAndInstances = default(List<(Type ExtensionType, object ExtensionInstance)>?);
+        var extensionTypeAndInstances = BuildExtensionInstances(apiSchemaDef.ExtensionTypes);
 
-        var extensionTypes = apiSchemaParams.ExtensionTypes;
-        if (extensionTypes != null)
-        {
-            extensionTypeAndInstances = [];
-
-            foreach (var extensionType in extensionTypes)
-            {
-                var extensionInstance = Activator.CreateInstance(extensionType)!;
-                extensionTypeAndInstances.Add((extensionType, extensionInstance));
-            }
-        }
-
-        var schema = ApiSchema.Create
+        return ApiSchema.Create
         (
-            apiName: apiName,
-            apiVersion: apiVersion,
+            apiName: apiSchemaDef.ApiName,
+            apiVersion: apiSchemaDef.ApiVersion,
             apiOptions: apiOptions,
             apiNamedTypes: apiNamedTypes,
             extensionTypeAndInstances: extensionTypeAndInstances
         );
-
-        return schema;
     }
 
-    public static ApiType? BuildTestApiType(ApiTypeSpec? apiTypeSpec)
+    public static ApiType? BuildTestApiType(ApiTypeDef? apiTypeDef)
     {
-        if (apiTypeSpec == null)
+        if (apiTypeDef == null)
         {
             return default;
         }
 
-        var apiTypeParams = apiTypeSpec.ApiType;
-        var kind = apiTypeParams.ApiKind;
-
-        var apiType = default(ApiType?);
-        switch (kind)
+        var apiType = apiTypeDef switch
         {
-            case ApiTypeKind.Collection:
-                {
-                    var apiCollectionTypeParams = apiTypeSpec.ApiCollectionType ?? throw new InvalidOperationException("ApiCollectionTypeFactoryArgument is required for ApiTypeKind.Collection");
-                    apiType = BuildApiCollectionType(apiTypeParams, apiCollectionTypeParams);
-                    break;
-                }
+            ApiScalarTypeDef d => BuildApiScalarType(d),
+            ApiEnumTypeDef d => BuildApiEnumType(d),
+            ApiObjectTypeDef d => BuildApiObjectType(d),
+            ApiCollectionTypeDef d => BuildApiCollectionType(d),
+            _ => throw new InvalidOperationException($"Unsupported {nameof(ApiTypeDef)}: {apiTypeDef.GetType().Name}")
+        };
 
-            case ApiTypeKind.Enum:
-                {
-                    var apiNamedTypeParams = apiTypeSpec.ApiNamedType ?? throw new InvalidOperationException("ApiNamedTypeFactoryArgument is required for ApiTypeKind.Enum");
-                    apiType = BuildApiEnumType(apiTypeParams, apiNamedTypeParams);
-                    break;
-                }
-
-            case ApiTypeKind.Object:
-                {
-                    var apiNamedTypeParams = apiTypeSpec.ApiNamedType ?? throw new InvalidOperationException("ApiNamedTypeFactoryArgument is required for ApiTypeKind.Object");
-                    var apiObjectTypeParams = apiTypeSpec.ApiObjectType ?? throw new InvalidOperationException("ApiObjectTypeFactoryArgument is required for ApiTypeKind.Object");
-                    apiType = BuildApiObjectType(apiTypeParams, apiNamedTypeParams, apiObjectTypeParams);
-                    break;
-                }
-
-            case ApiTypeKind.Scalar:
-                {
-                    var apiNamedTypeParams = apiTypeSpec.ApiNamedType ?? throw new InvalidOperationException("ApiNamedTypeFactoryArgument is required for ApiTypeKind.Scalar");
-                    apiType = BuildApiScalarType(apiTypeParams, apiNamedTypeParams);
-                    break;
-                }
-
-            default:
-                {
-                    throw new InvalidOperationException($"Unsupported ApiTypeKind: {kind}");
-                }
+        if (apiTypeDef is ApiNamedTypeDef { ExtensionTypes: { } extensionTypes })
+        {
+            AttachExtensions(apiType, extensionTypes);
         }
-
-        if (apiType == null)
+        else if (apiTypeDef is ApiCollectionTypeDef { ExtensionTypes: { } colExtTypes })
         {
-            throw new InvalidOperationException($"{nameof(ApiType)} creation failed");
-        }
-
-        var extensionTypes = apiTypeParams.ExtensionTypes;
-        if (extensionTypes != null)
-        {
-            foreach (var extensionType in extensionTypes)
-            {
-                var extensionInstance = Activator.CreateInstance(extensionType)!;
-                apiType.AttachExtension(extensionType, extensionInstance);
-            }
+            AttachExtensions(apiType, colExtTypes);
         }
 
         return apiType;
@@ -880,140 +787,86 @@ public static class ApiSchemaFactory
     #endregion
 
     #region Dynamic Schema Builders
-    private static ApiType? BuildApiCollectionType
-    (
-        ApiTypeParams apiTypeParams,
-        ApiCollectionTypeParams apiCollectionTypeParams
-    )
+    private static ApiType BuildApiCollectionType(ApiCollectionTypeDef d)
     {
-        var apiItemTypeExpression = apiCollectionTypeParams.ApiItemTypeExpression;
-        var apiItemTypeModifiers = apiCollectionTypeParams.ApiItemTypeModifiers;
-        var clrCollectionType = apiTypeParams.ClrType;
-
-        var apiCollectionType = (ApiType)new ApiCollectionType(apiItemTypeExpression, apiItemTypeModifiers, clrCollectionType);
-
-        return apiCollectionType;
+        return new ApiCollectionType(d.ApiItemTypeExpression, d.ApiItemTypeModifiers, d.ClrType);
     }
 
-    private static ApiType? BuildApiEnumType
-    (
-        ApiTypeParams apiTypeParams,
-        ApiNamedTypeParams apiNamedTypeParams
-    )
+    private static ApiType BuildApiEnumType(ApiEnumTypeDef d)
     {
-        var apiName = apiNamedTypeParams.ApiName;
-        var clrEnumType = apiTypeParams.ClrType;
-
-        var clrEnumValues = Enum.GetValues(clrEnumType);
+        var clrEnumValues = Enum.GetValues(d.ClrType);
         var apiEnumValues = clrEnumValues
             .Cast<int>()
             .Select(x =>
             {
-                var clrName = Enum.GetName(clrEnumType, x)!;
-                var clrOrdinal = x;
-                var apiEnumValue = new ApiEnumValue(apiName: clrName, clrName: clrName, clrOrdinal: clrOrdinal);
-
-                return apiEnumValue;
+                var clrName = Enum.GetName(d.ClrType, x)!;
+                return new ApiEnumValue(apiName: clrName, clrName: clrName, clrOrdinal: x);
             })
             .ToList();
 
-        var apiEnumType = (ApiType)new ApiEnumType(apiName, apiEnumValues, clrEnumType);
-
-        return apiEnumType;
+        return new ApiEnumType(d.ApiName, apiEnumValues, d.ClrType);
     }
 
-    private static ApiType? BuildApiObjectType
-    (
-        ApiTypeParams apiTypeParams,
-        ApiNamedTypeParams apiNamedTypeParams,
-        ApiObjectTypeParams apiObjectTypeParams
-    )
+    private static ApiType BuildApiObjectType(ApiObjectTypeDef d)
     {
-        var apiName = apiNamedTypeParams.ApiName;
-        var clrObjectType = apiTypeParams.ClrType;
-
-        var apiOptions = BuildApiObjectTypeOptions(apiObjectTypeParams);
-
-        var apiIdentities = apiObjectTypeParams.ApiIdentities?
-                .Select(identity =>
-                {
-                    var apiIdentity = new ApiIdentity
-                    (
-                        apiName: identity.ApiName,
-                        apiIdentityParts: identity.ApiIdentityParts.Select(part =>
-                        {
-                            var apiKind = part.ApiKind;
-                            ApiIdentityPart apiIdentityPart = apiKind switch
-                            {
-                                ApiIdentityPartKind.Scalar => new ApiIdentityScalarPart(part.ApiPropertyName!, part.ClrScalarTypeHint),
-                                ApiIdentityPartKind.Nested => new ApiIdentityNestedPart(part.ApiPropertyName!, part.ApiIdentityName),
-                                ApiIdentityPartKind.Owner => new ApiIdentityOwnerPart(part.ApiIdentityName),
-                                _ => throw new InvalidOperationException($"Unsupported ApiIdentityPartKind: {apiKind}"),
-                            };
-                            return apiIdentityPart;
-                        })
-                    );
-                    return apiIdentity;
-                });
-
-        var apiProperties = apiObjectTypeParams.ApiProperties?
-                .Select(property =>
-                {
-                    var apiProperty = new ApiProperty
-                    (
-                        apiName: property.ApiName,
-                        apiTypeExpression: property.ApiTypeExpression,
-                        apiTypeModifiers: property.ApiTypeModifiers,
-                        clrName: property.ClrName,
-                        clrMemberKind: property.ClrMemberKind
-                    );
-                    return apiProperty;
-                });
-
-        var apiObjectType = (ApiType)new ApiObjectType
-        (
-            apiName,
-            apiOptions,
-            apiIdentities,
-            apiProperties,
-            clrObjectType
-        );
-        return apiObjectType;
-    }
-
-    private static ApiObjectTypeOptions? BuildApiObjectTypeOptions(ApiObjectTypeParams apiObjectTypeParams)
-    {
-        var apiObjectTypeOptions = apiObjectTypeParams.ApiOptions != null
-            ? new ApiObjectTypeOptions
-            {
-                ApiIdentityPartNullHandling = apiObjectTypeParams.ApiOptions.ApiIdentityPartNullHandling
-            }
+        var apiOptions = d.ApiIdentityPartNullHandling.HasValue
+            ? new ApiObjectTypeOptions { ApiIdentityPartNullHandling = d.ApiIdentityPartNullHandling.Value }
             : null;
-        return apiObjectTypeOptions;
+
+        var apiIdentities = d.ApiIdentities?.Select(identity =>
+        {
+            var parts = identity.Parts.Select(BuildApiIdentityPart);
+            return new ApiIdentity(apiName: identity.ApiName, apiIdentityParts: parts);
+        });
+
+        var apiProperties = d.ApiProperties?.Select(p =>
+            new ApiProperty(
+                apiName: p.ApiName,
+                apiTypeExpression: p.ApiTypeExpression,
+                apiTypeModifiers: p.ApiTypeModifiers,
+                clrName: p.ClrName,
+                clrMemberKind: p.ClrMemberKind));
+
+        return new ApiObjectType(d.ApiName, apiOptions, apiIdentities, apiProperties, d.ClrType);
     }
 
-    private static ApiType? BuildApiScalarType
-    (
-        ApiTypeParams apiTypeConfig,
-        ApiNamedTypeParams apiNamedTypeConfig
-    )
+#pragma warning disable CA1859 // Use concrete types when possible for improved performance
+    private static ApiIdentityPart BuildApiIdentityPart(ApiIdentityPartDef part) => part switch
     {
-        var apiName = apiNamedTypeConfig.ApiName;
-        var clrScalarType = apiTypeConfig.ClrType;
+        ApiScalarPartDef d => new ApiIdentityScalarPart(d.ApiPropertyName, d.ClrScalarTypeHint),
+        ApiNestedPartDef d => new ApiIdentityNestedPart(d.ApiPropertyName, d.ApiIdentityName),
+        ApiOwnerPartDef d => new ApiIdentityOwnerPart(d.ApiIdentityName),
+        _ => throw new InvalidOperationException($"Unsupported {nameof(ApiIdentityPartDef)}: {part.GetType().Name}")
+    };
+#pragma warning restore CA1859 // Use concrete types when possible for improved performance
 
-        var apiScalarType = (ApiType)new ApiScalarType(apiName, clrScalarType);
-        return apiScalarType;
+    private static ApiType BuildApiScalarType(ApiScalarTypeDef d)
+    {
+        return new ApiScalarType(d.ApiName, d.ClrType);
     }
 
-    private static ApiSchemaOptions? BuildApiSchemaOptions(ApiSchemaParams apiSchemaParams)
+    private static void AttachExtensions(ApiType apiType, List<Type> extensionTypes)
     {
-        var apiSchemaOptions = apiSchemaParams.ApiOptions != null
-            ? new ApiSchemaOptions
-            {
-                ApiIdentityPartNullHandling = apiSchemaParams.ApiOptions.ApiIdentityPartNullHandling
-            }
-            : null;
-        return apiSchemaOptions;
+        foreach (var extensionType in extensionTypes)
+        {
+            var extensionInstance = Activator.CreateInstance(extensionType)!;
+            apiType.AttachExtension(extensionType, extensionInstance);
+        }
+    }
+
+    private static List<(Type ExtensionType, object ExtensionInstance)>? BuildExtensionInstances(List<Type>? extensionTypes)
+    {
+        if (extensionTypes == null)
+        {
+            return null;
+        }
+
+        var result = new List<(Type, object)>(extensionTypes.Count);
+        foreach (var extensionType in extensionTypes)
+        {
+            result.Add((extensionType, Activator.CreateInstance(extensionType)!));
+        }
+        return result;
     }
     #endregion
 }

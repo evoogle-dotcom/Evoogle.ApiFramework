@@ -26,28 +26,19 @@ public partial class ApiSchemaTests
         new JsonRoundtripTest
         {
             Name = $"{nameof(ApiSchema)} With 0 {nameof(ApiType)}",
-            ExpectedFactoryArgument = new ApiSchemaSpec
+            ExpectedFactoryArgument = new ApiSchemaDef
             (
-                ApiSchema: new ApiSchemaParams
-                (
-                    ApiName: $"{nameof(ApiSchema)} With 0 {nameof(ApiType)}"
-                )
+                ApiName: $"{nameof(ApiSchema)} With 0 {nameof(ApiType)}"
             )
         },
 
         new JsonRoundtripTest
         {
             Name = $"{nameof(ApiSchema)} With 0 {nameof(ApiType)} And {nameof(ApiSchemaOptions)}",
-            ExpectedFactoryArgument = new ApiSchemaSpec
+            ExpectedFactoryArgument = new ApiSchemaDef
             (
-                ApiSchema: new ApiSchemaParams
-                (
-                    ApiName: $"{nameof(ApiSchema)} With 0 {nameof(ApiType)} And {nameof(ApiSchemaOptions)}",
-                    ApiOptions: new ApiSchemaOptionsParams
-                    (
-                        ApiIdentityPartNullHandling: ApiIdentityPartNullHandling.ThrowOnNull
-                    )
-                )
+                ApiName: $"{nameof(ApiSchema)} With 0 {nameof(ApiType)} And {nameof(ApiSchemaOptions)}",
+                ApiIdentityPartNullHandling: ApiIdentityPartNullHandling.ThrowOnNull
             )
         },
 
@@ -55,25 +46,15 @@ public partial class ApiSchemaTests
         new JsonRoundtripTest
         {
             Name = $"{nameof(ApiSchema)} With 1 {nameof(ApiScalarType)}",
-            ExpectedFactoryArgument = new ApiSchemaSpec
+            ExpectedFactoryArgument = new ApiSchemaDef
             (
-                ApiSchema: new ApiSchemaParams
-                (
-                    ApiName: $"{nameof(ApiSchema)} With 1 {nameof(ApiScalarType)}"
-                ),
+                ApiName: $"{nameof(ApiSchema)} With 1 {nameof(ApiScalarType)}",
                 ApiNamedTypes:
                 [
-                    new ApiTypeSpec
+                    new ApiScalarTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Scalar,
-                            ClrType: typeof(bool)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(Boolean)
-                        )
+                        ApiName: nameof(Boolean),
+                        ClrType: typeof(bool)
                     )
                 ]
             )
@@ -83,29 +64,16 @@ public partial class ApiSchemaTests
         new JsonRoundtripTest
         {
             Name = $"{nameof(ApiSchema)} With 1 {nameof(ApiScalarType)} And {nameof(ApiSchemaOptions)}",
-            ExpectedFactoryArgument = new ApiSchemaSpec
+            ExpectedFactoryArgument = new ApiSchemaDef
             (
-                ApiSchema: new ApiSchemaParams
-                (
-                    ApiName: $"{nameof(ApiSchema)} With 1 {nameof(ApiScalarType)} And {nameof(ApiSchemaOptions)}",
-                    ApiOptions: new ApiSchemaOptionsParams
-                    (
-                        ApiIdentityPartNullHandling: ApiIdentityPartNullHandling.ThrowOnNull
-                    )
-                ),
+                ApiName: $"{nameof(ApiSchema)} With 1 {nameof(ApiScalarType)} And {nameof(ApiSchemaOptions)}",
+                ApiIdentityPartNullHandling: ApiIdentityPartNullHandling.ThrowOnNull,
                 ApiNamedTypes:
                 [
-                    new ApiTypeSpec
+                    new ApiScalarTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Scalar,
-                            ClrType: typeof(bool)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(Boolean)
-                        )
+                        ApiName: nameof(Boolean),
+                        ClrType: typeof(bool)
                     )
                 ]
             )
@@ -115,26 +83,16 @@ public partial class ApiSchemaTests
         new JsonRoundtripTest
         {
             Name = $"{nameof(ApiSchema)} With 1 {nameof(ApiScalarType)} And {nameof(GraphQlExtension)}",
-            ExpectedFactoryArgument = new ApiSchemaSpec
+            ExpectedFactoryArgument = new ApiSchemaDef
             (
-                ApiSchema: new ApiSchemaParams
-                (
-                    ApiName: $"{nameof(ApiSchema)} With 1 {nameof(ApiScalarType)} And {nameof(GraphQlExtension)}",
-                    ExtensionTypes: [ typeof(GraphQlExtension) ]
-                ),
+                ApiName: $"{nameof(ApiSchema)} With 1 {nameof(ApiScalarType)} And {nameof(GraphQlExtension)}",
+                ExtensionTypes: [ typeof(GraphQlExtension) ],
                 ApiNamedTypes:
                 [
-                    new ApiTypeSpec
+                    new ApiScalarTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Scalar,
-                            ClrType: typeof(bool)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(Boolean)
-                        )
+                        ApiName: nameof(Boolean),
+                        ClrType: typeof(bool)
                     )
                 ]
             )
@@ -144,37 +102,20 @@ public partial class ApiSchemaTests
         new JsonRoundtripTest
         {
             Name = $"{nameof(ApiSchema)} With 2 {nameof(ApiScalarType)}",
-            ExpectedFactoryArgument = new ApiSchemaSpec
+            ExpectedFactoryArgument = new ApiSchemaDef
             (
-                ApiSchema: new ApiSchemaParams
-                (
-                    ApiName: $"{nameof(ApiSchema)} With 2 {nameof(ApiScalarType)}"
-                ),
+                ApiName: $"{nameof(ApiSchema)} With 2 {nameof(ApiScalarType)}",
                 ApiNamedTypes:
                 [
-                    new ApiTypeSpec
+                    new ApiScalarTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Scalar,
-                            ClrType: typeof(bool)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(Boolean)
-                        )
+                        ApiName: nameof(Boolean),
+                        ClrType: typeof(bool)
                     ),
-                    new ApiTypeSpec
+                    new ApiScalarTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Scalar,
-                            ClrType: typeof(int)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(Int32)
-                        )
+                        ApiName: nameof(Int32),
+                        ClrType: typeof(int)
                     ),
                 ]
             )
@@ -184,49 +125,25 @@ public partial class ApiSchemaTests
         new JsonRoundtripTest
         {
             Name = $"{nameof(ApiSchema)} With 3 {nameof(ApiScalarType)}",
-            ExpectedFactoryArgument = new ApiSchemaSpec
+            ExpectedFactoryArgument = new ApiSchemaDef
             (
-                ApiSchema: new ApiSchemaParams
-                (
-                    ApiName: $"{nameof(ApiSchema)} With 3 {nameof(ApiScalarType)}"
-                ),
+                ApiName: $"{nameof(ApiSchema)} With 3 {nameof(ApiScalarType)}",
                 ApiNamedTypes:
                 [
-                    new ApiTypeSpec
+                    new ApiScalarTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Scalar,
-                            ClrType: typeof(bool)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(Boolean)
-                        )
+                        ApiName: nameof(Boolean),
+                        ClrType: typeof(bool)
                     ),
-                    new ApiTypeSpec
+                    new ApiScalarTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Scalar,
-                            ClrType: typeof(int)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(Int32)
-                        )
+                        ApiName: nameof(Int32),
+                        ClrType: typeof(int)
                     ),
-                    new ApiTypeSpec
+                    new ApiScalarTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Scalar,
-                            ClrType: typeof(string)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(String)
-                        )
+                        ApiName: nameof(String),
+                        ClrType: typeof(string)
                     ),
                 ]
             )
@@ -236,50 +153,26 @@ public partial class ApiSchemaTests
         new JsonRoundtripTest
         {
             Name = $"{nameof(ApiSchema)} With 3 {nameof(ApiScalarType)} And {nameof(GraphQlExtension)} And {nameof(JsonApiExtension)}",
-            ExpectedFactoryArgument = new ApiSchemaSpec
+            ExpectedFactoryArgument = new ApiSchemaDef
             (
-                ApiSchema: new ApiSchemaParams
-                (
-                    ApiName: $"{nameof(ApiSchema)} With 3 {nameof(ApiScalarType)} And {nameof(GraphQlExtension)} And {nameof(JsonApiExtension)}",
-                    ExtensionTypes: [ typeof(GraphQlExtension), typeof(JsonApiExtension) ]
-                ),
+                ApiName: $"{nameof(ApiSchema)} With 3 {nameof(ApiScalarType)} And {nameof(GraphQlExtension)} And {nameof(JsonApiExtension)}",
+                ExtensionTypes: [ typeof(GraphQlExtension), typeof(JsonApiExtension) ],
                 ApiNamedTypes:
                 [
-                    new ApiTypeSpec
+                    new ApiScalarTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Scalar,
-                            ClrType: typeof(bool)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(Boolean)
-                        )
+                        ApiName: nameof(Boolean),
+                        ClrType: typeof(bool)
                     ),
-                    new ApiTypeSpec
+                    new ApiScalarTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Scalar,
-                            ClrType: typeof(int)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(Int32)
-                        )
+                        ApiName: nameof(Int32),
+                        ClrType: typeof(int)
                     ),
-                    new ApiTypeSpec
+                    new ApiScalarTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Scalar,
-                            ClrType: typeof(string)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(String)
-                        )
+                        ApiName: nameof(String),
+                        ClrType: typeof(string)
                     ),
                 ]
             )
@@ -289,25 +182,15 @@ public partial class ApiSchemaTests
         new JsonRoundtripTest
         {
             Name = $"{nameof(ApiSchema)} With 1 {nameof(ApiEnumType)}",
-            ExpectedFactoryArgument = new ApiSchemaSpec
+            ExpectedFactoryArgument = new ApiSchemaDef
             (
-                ApiSchema: new ApiSchemaParams
-                (
-                    ApiName: $"{nameof(ApiSchema)} With 1 {nameof(ApiEnumType)}"
-                ),
+                ApiName: $"{nameof(ApiSchema)} With 1 {nameof(ApiEnumType)}",
                 ApiNamedTypes:
                 [
-                    new ApiTypeSpec
+                    new ApiEnumTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Enum,
-                            ClrType: typeof(Gender)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(Gender)
-                        )
+                        ApiName: nameof(Gender),
+                        ClrType: typeof(Gender)
                     )
                 ]
             )
@@ -317,26 +200,16 @@ public partial class ApiSchemaTests
         new JsonRoundtripTest
         {
             Name = $"{nameof(ApiSchema)} With 1 {nameof(ApiEnumType)} And {nameof(ProtobufExtension)}",
-            ExpectedFactoryArgument = new ApiSchemaSpec
+            ExpectedFactoryArgument = new ApiSchemaDef
             (
-                ApiSchema: new ApiSchemaParams
-                (
-                    ApiName: $"{nameof(ApiSchema)} With 1 {nameof(ApiEnumType)} And {nameof(ProtobufExtension)}",
-                    ExtensionTypes: [ typeof(ProtobufExtension) ]
-                ),
+                ApiName: $"{nameof(ApiSchema)} With 1 {nameof(ApiEnumType)} And {nameof(ProtobufExtension)}",
+                ExtensionTypes: [ typeof(ProtobufExtension) ],
                 ApiNamedTypes:
                 [
-                    new ApiTypeSpec
+                    new ApiEnumTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Enum,
-                            ClrType: typeof(Gender)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(Gender)
-                        )
+                        ApiName: nameof(Gender),
+                        ClrType: typeof(Gender)
                     )
                 ]
             )
@@ -346,162 +219,119 @@ public partial class ApiSchemaTests
         new JsonRoundtripTest
         {
             Name = $"{nameof(ApiSchema)} With 3 {nameof(ApiScalarType)} And 1 {nameof(ApiEnumType)} And 1 {nameof(ApiObjectType)} (Person)",
-            ExpectedFactoryArgument = new ApiSchemaSpec
+            ExpectedFactoryArgument = new ApiSchemaDef
             (
-                ApiSchema: new ApiSchemaParams
-                (
-                    ApiName: $"{nameof(ApiSchema)} With 3 {nameof(ApiScalarType)} And 1 {nameof(ApiEnumType)} And 1 {nameof(ApiObjectType)} (Person)"
-                ),
+                ApiName: $"{nameof(ApiSchema)} With 3 {nameof(ApiScalarType)} And 1 {nameof(ApiEnumType)} And 1 {nameof(ApiObjectType)} (Person)",
                 ApiNamedTypes:
                 [
-                    new ApiTypeSpec
+                    new ApiScalarTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Scalar,
-                            ClrType: typeof(int)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(Int32)
-                        )
+                        ApiName: nameof(Int32),
+                        ClrType: typeof(int)
                     ),
-                    new ApiTypeSpec
+                    new ApiScalarTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Scalar,
-                            ClrType: typeof(string)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(String)
-                        )
+                        ApiName: nameof(String),
+                        ClrType: typeof(string)
                     ),
-                    new ApiTypeSpec
+                    new ApiScalarTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Scalar,
-                            ClrType: typeof(Ulid)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(Ulid)
-                        )
+                        ApiName: nameof(Ulid),
+                        ClrType: typeof(Ulid)
                     ),
-                    new ApiTypeSpec
+                    new ApiEnumTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Enum,
-                            ClrType: typeof(Gender)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(Gender)
-                        )
+                        ApiName: nameof(Gender),
+                        ClrType: typeof(Gender)
                     ),
-                    new ApiTypeSpec
+                    new ApiObjectTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Object,
-                            ClrType: typeof(Person)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(Person)
-                        ),
-                        ApiObjectType: new ApiObjectTypeParams
-                        (
-                            ApiIdentities:
-                            [
-                                new ApiIdentityParams
-                                (
-                                    ApiName: "PK_Person_Id",
-                                    ApiIdentityParts:
-                                    [
-                                        new ApiIdentityPartParams
-                                        (
-                                            ApiKind: ApiIdentityPartKind.Scalar,
-                                            ApiPropertyName: nameof(Person.Id)
-                                        )
-                                    ]
-                                ),
-                                new ApiIdentityParams
-                                (
-                                    ApiName: "AK_Person_Name",
-                                    ApiIdentityParts:
-                                    [
-                                        new ApiIdentityPartParams
-                                        (
-                                            ApiKind: ApiIdentityPartKind.Scalar,
-                                            ApiPropertyName: nameof(Person.Name)
-                                        )
-                                    ]
-                                )
-                            ],
-                            ApiProperties:
-                            [
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(Person.Id),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
-                                    ApiTypeModifiers: ApiTypeModifiers.Required,
-                                    ClrName: nameof(Person.Id),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                ),
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(Person.Name),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
-                                    ApiTypeModifiers: ApiTypeModifiers.Required,
-                                    ClrName: nameof(Person.Name),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                ),
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(Person.Age),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
-                                    ApiTypeModifiers: ApiTypeModifiers.None,
-                                    ClrName: nameof(Person.Age),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                ),
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(Person.Gender),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Enum, apiName: nameof(Gender)),
-                                    ApiTypeModifiers: ApiTypeModifiers.None,
-                                    ClrName: nameof(Person.Gender),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                ),
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(Person.Hobbies),
-                                    ApiTypeExpression: new ApiTypeExpression
+                        ApiName: nameof(Person),
+                        ClrType: typeof(Person),
+                        ApiIdentities:
+                        [
+                            new ApiIdentityDef
+                            (
+                                ApiName: "PK_Person_Id",
+                                Parts:
+                                [
+                                    new ApiScalarPartDef
                                     (
-                                        apiInlineType: new ApiCollectionType
-                                        (
-                                            apiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
-                                            apiItemTypeModifiers: ApiTypeModifiers.Required,
-                                            clrCollectionType: typeof(List<string>)
-                                        )
-                                    ),
-                                    ApiTypeModifiers: ApiTypeModifiers.None,
-                                    ClrName: nameof(Person.Hobbies),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                ),
-                                new ApiPropertyParams
+                                        ApiPropertyName: nameof(Person.Id)
+                                    )
+                                ]
+                            ),
+                            new ApiIdentityDef
+                            (
+                                ApiName: "AK_Person_Name",
+                                Parts:
+                                [
+                                    new ApiScalarPartDef
+                                    (
+                                        ApiPropertyName: nameof(Person.Name)
+                                    )
+                                ]
+                            )
+                        ],
+                        ApiProperties:
+                        [
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(Person.Id),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(Person.Id),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(Person.Name),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(Person.Name),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(Person.Age),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                ApiTypeModifiers: ApiTypeModifiers.None,
+                                ClrName: nameof(Person.Age),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(Person.Gender),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Enum, apiName: nameof(Gender)),
+                                ApiTypeModifiers: ApiTypeModifiers.None,
+                                ClrName: nameof(Person.Gender),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(Person.Hobbies),
+                                ApiTypeExpression: new ApiTypeExpression
                                 (
-                                    ApiName: nameof(Person.CompanyId),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Ulid)),
-                                    ApiTypeModifiers: ApiTypeModifiers.None,
-                                    ClrName: nameof(Person.CompanyId),
-                                    ClrMemberKind: ClrMemberKind.Property
+                                    apiInlineType: new ApiCollectionType
+                                    (
+                                        apiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                        apiItemTypeModifiers: ApiTypeModifiers.Required,
+                                        clrCollectionType: typeof(List<string>)
+                                    )
                                 ),
-                            ]
-                        )
+                                ApiTypeModifiers: ApiTypeModifiers.None,
+                                ClrName: nameof(Person.Hobbies),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(Person.CompanyId),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Ulid)),
+                                ApiTypeModifiers: ApiTypeModifiers.None,
+                                ClrName: nameof(Person.CompanyId),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                        ]
                     ),
                 ]
             )
@@ -511,163 +341,120 @@ public partial class ApiSchemaTests
         new JsonRoundtripTest
         {
             Name = $"{nameof(ApiSchema)} With 3 {nameof(ApiScalarType)} And 1 {nameof(ApiEnumType)} And 1 {nameof(ApiObjectType)} (Person) And {nameof(GraphQlExtension)} And {nameof(JsonApiExtension)}",
-            ExpectedFactoryArgument = new ApiSchemaSpec
+            ExpectedFactoryArgument = new ApiSchemaDef
             (
-                ApiSchema: new ApiSchemaParams
-                (
-                    ApiName: $"{nameof(ApiSchema)} With 3 {nameof(ApiScalarType)} And 1 {nameof(ApiEnumType)} And 1 {nameof(ApiObjectType)} (Person) And {nameof(GraphQlExtension)} And {nameof(JsonApiExtension)}",
-                    ExtensionTypes: [ typeof(GraphQlExtension), typeof(JsonApiExtension) ]
-                ),
+                ApiName: $"{nameof(ApiSchema)} With 3 {nameof(ApiScalarType)} And 1 {nameof(ApiEnumType)} And 1 {nameof(ApiObjectType)} (Person) And {nameof(GraphQlExtension)} And {nameof(JsonApiExtension)}",
+                ExtensionTypes: [ typeof(GraphQlExtension), typeof(JsonApiExtension) ],
                 ApiNamedTypes:
                 [
-                    new ApiTypeSpec
+                    new ApiScalarTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Scalar,
-                            ClrType: typeof(int)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(Int32)
-                        )
+                        ApiName: nameof(Int32),
+                        ClrType: typeof(int)
                     ),
-                    new ApiTypeSpec
+                    new ApiScalarTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Scalar,
-                            ClrType: typeof(string)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(String)
-                        )
+                        ApiName: nameof(String),
+                        ClrType: typeof(string)
                     ),
-                    new ApiTypeSpec
+                    new ApiScalarTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Scalar,
-                            ClrType: typeof(Ulid)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(Ulid)
-                        )
+                        ApiName: nameof(Ulid),
+                        ClrType: typeof(Ulid)
                     ),
-                    new ApiTypeSpec
+                    new ApiEnumTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Enum,
-                            ClrType: typeof(Gender)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(Gender)
-                        )
+                        ApiName: nameof(Gender),
+                        ClrType: typeof(Gender)
                     ),
-                    new ApiTypeSpec
+                    new ApiObjectTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Object,
-                            ClrType: typeof(Person)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(Person)
-                        ),
-                        ApiObjectType: new ApiObjectTypeParams
-                        (
-                            ApiIdentities:
-                            [
-                                new ApiIdentityParams
-                                (
-                                    ApiName: "PK_Person_Id",
-                                    ApiIdentityParts:
-                                    [
-                                        new ApiIdentityPartParams
-                                        (
-                                            ApiKind: ApiIdentityPartKind.Scalar,
-                                            ApiPropertyName: nameof(Person.Id)
-                                        )
-                                    ]
-                                ),
-                                new ApiIdentityParams
-                                (
-                                    ApiName: "AK_Person_Name",
-                                    ApiIdentityParts:
-                                    [
-                                        new ApiIdentityPartParams
-                                        (
-                                            ApiKind: ApiIdentityPartKind.Scalar,
-                                            ApiPropertyName: nameof(Person.Name)
-                                        )
-                                    ]
-                                )
-                            ],
-                            ApiProperties:
-                            [
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(Person.Id),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
-                                    ApiTypeModifiers: ApiTypeModifiers.Required,
-                                    ClrName: nameof(Person.Id),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                ),
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(Person.Name),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
-                                    ApiTypeModifiers: ApiTypeModifiers.Required,
-                                    ClrName: nameof(Person.Name),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                ),
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(Person.Age),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
-                                    ApiTypeModifiers: ApiTypeModifiers.None,
-                                    ClrName: nameof(Person.Age),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                ),
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(Person.Gender),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Enum, apiName: nameof(Gender)),
-                                    ApiTypeModifiers: ApiTypeModifiers.None,
-                                    ClrName: nameof(Person.Gender),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                ),
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(Person.Hobbies),
-                                    ApiTypeExpression: new ApiTypeExpression
+                        ApiName: nameof(Person),
+                        ClrType: typeof(Person),
+                        ApiIdentities:
+                        [
+                            new ApiIdentityDef
+                            (
+                                ApiName: "PK_Person_Id",
+                                Parts:
+                                [
+                                    new ApiScalarPartDef
                                     (
-                                        apiInlineType: new ApiCollectionType
-                                        (
-                                            apiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
-                                            apiItemTypeModifiers: ApiTypeModifiers.Required,
-                                            clrCollectionType: typeof(List<string>)
-                                        )
-                                    ),
-                                    ApiTypeModifiers: ApiTypeModifiers.None,
-                                    ClrName: nameof(Person.Hobbies),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                ),
-                                new ApiPropertyParams
+                                        ApiPropertyName: nameof(Person.Id)
+                                    )
+                                ]
+                            ),
+                            new ApiIdentityDef
+                            (
+                                ApiName: "AK_Person_Name",
+                                Parts:
+                                [
+                                    new ApiScalarPartDef
+                                    (
+                                        ApiPropertyName: nameof(Person.Name)
+                                    )
+                                ]
+                            )
+                        ],
+                        ApiProperties:
+                        [
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(Person.Id),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(Person.Id),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(Person.Name),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(Person.Name),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(Person.Age),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                ApiTypeModifiers: ApiTypeModifiers.None,
+                                ClrName: nameof(Person.Age),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(Person.Gender),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Enum, apiName: nameof(Gender)),
+                                ApiTypeModifiers: ApiTypeModifiers.None,
+                                ClrName: nameof(Person.Gender),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(Person.Hobbies),
+                                ApiTypeExpression: new ApiTypeExpression
                                 (
-                                    ApiName: nameof(Person.CompanyId),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Ulid)),
-                                    ApiTypeModifiers: ApiTypeModifiers.None,
-                                    ClrName: nameof(Person.CompanyId),
-                                    ClrMemberKind: ClrMemberKind.Property
+                                    apiInlineType: new ApiCollectionType
+                                    (
+                                        apiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                        apiItemTypeModifiers: ApiTypeModifiers.Required,
+                                        clrCollectionType: typeof(List<string>)
+                                    )
                                 ),
-                            ]
-                        )
+                                ApiTypeModifiers: ApiTypeModifiers.None,
+                                ClrName: nameof(Person.Hobbies),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(Person.CompanyId),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Ulid)),
+                                ApiTypeModifiers: ApiTypeModifiers.None,
+                                ClrName: nameof(Person.CompanyId),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                        ]
                     ),
                 ]
             )
@@ -677,248 +464,193 @@ public partial class ApiSchemaTests
         new JsonRoundtripTest
         {
             Name = $"{nameof(ApiSchema)} With 3 {nameof(ApiScalarType)} And 1 {nameof(ApiEnumType)} And 2 {nameof(ApiObjectType)} (Company And Person)",
-            ExpectedFactoryArgument = new ApiSchemaSpec
+            ExpectedFactoryArgument = new ApiSchemaDef
             (
-                ApiSchema: new ApiSchemaParams
-                (
-                    ApiName: $"{nameof(ApiSchema)} With 3 {nameof(ApiScalarType)} And 1 {nameof(ApiEnumType)} And 2 {nameof(ApiObjectType)} (Company And Person)"
-                ),
+                ApiName: $"{nameof(ApiSchema)} With 3 {nameof(ApiScalarType)} And 1 {nameof(ApiEnumType)} And 2 {nameof(ApiObjectType)} (Company And Person)",
                 ApiNamedTypes:
                 [
-                    new ApiTypeSpec
+                    new ApiScalarTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Scalar,
-                            ClrType: typeof(int)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(Int32)
-                        )
+                        ApiName: nameof(Int32),
+                        ClrType: typeof(int)
                     ),
-                    new ApiTypeSpec
+                    new ApiScalarTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Scalar,
-                            ClrType: typeof(string)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(String)
-                        )
+                        ApiName: nameof(String),
+                        ClrType: typeof(string)
                     ),
-                    new ApiTypeSpec
+                    new ApiScalarTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Scalar,
-                            ClrType: typeof(Ulid)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(Ulid)
-                        )
+                        ApiName: nameof(Ulid),
+                        ClrType: typeof(Ulid)
                     ),
-                    new ApiTypeSpec
+                    new ApiEnumTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Enum,
-                            ClrType: typeof(Gender)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(Gender)
-                        )
+                        ApiName: nameof(Gender),
+                        ClrType: typeof(Gender)
                     ),
-                    new ApiTypeSpec
+                    new ApiObjectTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Object,
-                            ClrType: typeof(Company)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(Company)
-                        ),
-                        ApiObjectType: new ApiObjectTypeParams
-                        (
-                            ApiIdentities:
-                            [
-                                new ApiIdentityParams
-                                (
-                                    ApiName: "PK_Company_Id",
-                                    ApiIdentityParts:
-                                    [
-                                        new ApiIdentityPartParams
-                                        (
-                                            ApiKind: ApiIdentityPartKind.Scalar,
-                                            ApiPropertyName: nameof(Company.Id),
-                                            ClrScalarTypeHint: typeof(string)
-                                        )
-                                    ]
-                                ),
-                                new ApiIdentityParams
-                                (
-                                    ApiName: "AK_Company_Name",
-                                    ApiIdentityParts:
-                                    [
-                                        new ApiIdentityPartParams
-                                        (
-                                            ApiKind: ApiIdentityPartKind.Scalar,
-                                            ApiPropertyName: nameof(Company.Name)
-                                        )
-                                    ]
-                                )
-                            ],
-                            ApiProperties:
-                            [
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(Company.Id),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Ulid)),
-                                    ApiTypeModifiers: ApiTypeModifiers.Required,
-                                    ClrName: nameof(Company.Id),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                ),
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(Company.Name),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
-                                    ApiTypeModifiers: ApiTypeModifiers.Required,
-                                    ClrName: nameof(Company.Name),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                ),
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(Company.Owner),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(Person)),
-                                    ApiTypeModifiers: ApiTypeModifiers.None,
-                                    ClrName: nameof(Company.Owner),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                ),
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(Company.Employees),
-                                    ApiTypeExpression: new ApiTypeExpression
+                        ApiName: nameof(Company),
+                        ClrType: typeof(Company),
+                        ApiIdentities:
+                        [
+                            new ApiIdentityDef
+                            (
+                                ApiName: "PK_Company_Id",
+                                Parts:
+                                [
+                                    new ApiScalarPartDef
                                     (
-                                        apiInlineType: new ApiCollectionType
-                                        (
-                                            apiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(Person)),
-                                            apiItemTypeModifiers: ApiTypeModifiers.Required,
-                                            clrCollectionType: typeof(List<Person>)
-                                        )
-                                    ),
-                                    ApiTypeModifiers: ApiTypeModifiers.None,
-                                    ClrName: nameof(Company.Employees),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                ),
-                            ]
-                        )
-                    ),
-                    new ApiTypeSpec
-                    (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Object,
-                            ClrType: typeof(Person)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(Person)
-                        ),
-                        ApiObjectType: new ApiObjectTypeParams
-                        (
-                            ApiIdentities:
-                            [
-                                new ApiIdentityParams
-                                (
-                                    ApiName: "PK_Person_Id",
-                                    ApiIdentityParts:
-                                    [
-                                        new ApiIdentityPartParams
-                                        (
-                                            ApiKind: ApiIdentityPartKind.Scalar,
-                                            ApiPropertyName: nameof(Person.Id)
-                                        )
-                                    ]
-                                ),
-                                new ApiIdentityParams
-                                (
-                                    ApiName: "AK_Person_Name",
-                                    ApiIdentityParts:
-                                    [
-                                        new ApiIdentityPartParams
-                                        (
-                                            ApiKind: ApiIdentityPartKind.Scalar,
-                                            ApiPropertyName: nameof(Person.Name)
-                                        )
-                                    ]
-                                )
-                            ],
-                            ApiProperties:
-                            [
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(Person.Id),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
-                                    ApiTypeModifiers: ApiTypeModifiers.Required,
-                                    ClrName: nameof(Person.Id),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                ),
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(Person.Name),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
-                                    ApiTypeModifiers: ApiTypeModifiers.Required,
-                                    ClrName: nameof(Person.Name),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                ),
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(Person.Age),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
-                                    ApiTypeModifiers: ApiTypeModifiers.None,
-                                    ClrName: nameof(Person.Age),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                ),
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(Person.Gender),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Enum, apiName: nameof(Gender)),
-                                    ApiTypeModifiers: ApiTypeModifiers.None,
-                                    ClrName: nameof(Person.Gender),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                ),
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(Person.Hobbies),
-                                    ApiTypeExpression: new ApiTypeExpression
+                                        ApiPropertyName: nameof(Company.Id),
+                                        ClrScalarTypeHint: typeof(string)
+                                    )
+                                ]
+                            ),
+                            new ApiIdentityDef
+                            (
+                                ApiName: "AK_Company_Name",
+                                Parts:
+                                [
+                                    new ApiScalarPartDef
                                     (
-                                        apiInlineType: new ApiCollectionType
-                                        (
-                                            apiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
-                                            apiItemTypeModifiers: ApiTypeModifiers.Required,
-                                            clrCollectionType: typeof(List<string>)
-                                        )
-                                    ),
-                                    ApiTypeModifiers: ApiTypeModifiers.None,
-                                    ClrName: nameof(Person.Hobbies),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                ),
-                                new ApiPropertyParams
+                                        ApiPropertyName: nameof(Company.Name)
+                                    )
+                                ]
+                            )
+                        ],
+                        ApiProperties:
+                        [
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(Company.Id),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Ulid)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(Company.Id),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(Company.Name),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(Company.Name),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(Company.Owner),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(Person)),
+                                ApiTypeModifiers: ApiTypeModifiers.None,
+                                ClrName: nameof(Company.Owner),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(Company.Employees),
+                                ApiTypeExpression: new ApiTypeExpression
                                 (
-                                    ApiName: nameof(Person.CompanyId),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Ulid)),
-                                    ApiTypeModifiers: ApiTypeModifiers.None,
-                                    ClrName: nameof(Person.CompanyId),
-                                    ClrMemberKind: ClrMemberKind.Property
+                                    apiInlineType: new ApiCollectionType
+                                    (
+                                        apiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(Person)),
+                                        apiItemTypeModifiers: ApiTypeModifiers.Required,
+                                        clrCollectionType: typeof(List<Person>)
+                                    )
                                 ),
-                            ]
-                        )
+                                ApiTypeModifiers: ApiTypeModifiers.None,
+                                ClrName: nameof(Company.Employees),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                        ]
+                    ),
+                    new ApiObjectTypeDef
+                    (
+                        ApiName: nameof(Person),
+                        ClrType: typeof(Person),
+                        ApiIdentities:
+                        [
+                            new ApiIdentityDef
+                            (
+                                ApiName: "PK_Person_Id",
+                                Parts:
+                                [
+                                    new ApiScalarPartDef
+                                    (
+                                        ApiPropertyName: nameof(Person.Id)
+                                    )
+                                ]
+                            ),
+                            new ApiIdentityDef
+                            (
+                                ApiName: "AK_Person_Name",
+                                Parts:
+                                [
+                                    new ApiScalarPartDef
+                                    (
+                                        ApiPropertyName: nameof(Person.Name)
+                                    )
+                                ]
+                            )
+                        ],
+                        ApiProperties:
+                        [
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(Person.Id),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(Person.Id),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(Person.Name),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(Person.Name),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(Person.Age),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                ApiTypeModifiers: ApiTypeModifiers.None,
+                                ClrName: nameof(Person.Age),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(Person.Gender),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Enum, apiName: nameof(Gender)),
+                                ApiTypeModifiers: ApiTypeModifiers.None,
+                                ClrName: nameof(Person.Gender),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(Person.Hobbies),
+                                ApiTypeExpression: new ApiTypeExpression
+                                (
+                                    apiInlineType: new ApiCollectionType
+                                    (
+                                        apiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                        apiItemTypeModifiers: ApiTypeModifiers.Required,
+                                        clrCollectionType: typeof(List<string>)
+                                    )
+                                ),
+                                ApiTypeModifiers: ApiTypeModifiers.None,
+                                ClrName: nameof(Person.Hobbies),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(Person.CompanyId),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Ulid)),
+                                ApiTypeModifiers: ApiTypeModifiers.None,
+                                ClrName: nameof(Person.CompanyId),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                        ]
                     ),
                 ]
             )
@@ -927,98 +659,69 @@ public partial class ApiSchemaTests
         new JsonRoundtripTest
         {
             Name = $"{nameof(ApiSchema)} With Identity Schema ({nameof(IdentityScalar)})",
-            ExpectedFactoryArgument = new ApiSchemaSpec
+            ExpectedFactoryArgument = new ApiSchemaDef
             (
-                ApiSchema: new ApiSchemaParams
-                (
-                    ApiName: $"{nameof(ApiSchema)} With Identity Schema ({nameof(IdentityScalar)})"
-                ),
+                ApiName: $"{nameof(ApiSchema)} With Identity Schema ({nameof(IdentityScalar)})",
                 ApiNamedTypes:
                 [
-                    new ApiTypeSpec
+                    new ApiScalarTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Scalar,
-                            ClrType: typeof(int)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(Int32)
-                        )
+                        ApiName: nameof(Int32),
+                        ClrType: typeof(int)
                     ),
-                    new ApiTypeSpec
+                    new ApiScalarTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Scalar,
-                            ClrType: typeof(string)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(String)
-                        )
+                        ApiName: nameof(String),
+                        ClrType: typeof(string)
                     ),
-                    new ApiTypeSpec
+                    new ApiObjectTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Object,
-                            ClrType: typeof(IdentityScalar)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(IdentityScalar)
-                        ),
-                        ApiObjectType: new ApiObjectTypeParams
-                        (
-                            ApiIdentities:
-                            [
-                                new ApiIdentityParams
-                                (
-                                    ApiName: "PK_IdentityScalar",
-                                    ApiIdentityParts:
-                                    [
-                                        new ApiIdentityPartParams
-                                        (
-                                            ApiKind: ApiIdentityPartKind.Scalar,
-                                            ApiPropertyName: nameof(IdentityScalar.Id)
-                                        )
-                                    ]
-                                ),
-                                new ApiIdentityParams
-                                (
-                                    ApiName: "AK_IdentityScalar",
-                                    ApiIdentityParts:
-                                    [
-                                        new ApiIdentityPartParams
-                                        (
-                                            ApiKind: ApiIdentityPartKind.Scalar,
-                                            ApiPropertyName: nameof(IdentityScalar.Name)
-                                        )
-                                    ]
-                                )
-                            ],
-                            ApiProperties:
-                            [
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityScalar.Id),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
-                                    ApiTypeModifiers: ApiTypeModifiers.Required,
-                                    ClrName: nameof(IdentityScalar.Id),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                ),
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityScalar.Name),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
-                                    ApiTypeModifiers: ApiTypeModifiers.Required,
-                                    ClrName: nameof(IdentityScalar.Name),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                )
-                            ]
-                        )
+                        ApiName: nameof(IdentityScalar),
+                        ClrType: typeof(IdentityScalar),
+                        ApiIdentities:
+                        [
+                            new ApiIdentityDef
+                            (
+                                ApiName: "PK_IdentityScalar",
+                                Parts:
+                                [
+                                    new ApiScalarPartDef
+                                    (
+                                        ApiPropertyName: nameof(IdentityScalar.Id)
+                                    )
+                                ]
+                            ),
+                            new ApiIdentityDef
+                            (
+                                ApiName: "AK_IdentityScalar",
+                                Parts:
+                                [
+                                    new ApiScalarPartDef
+                                    (
+                                        ApiPropertyName: nameof(IdentityScalar.Name)
+                                    )
+                                ]
+                            )
+                        ],
+                        ApiProperties:
+                        [
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityScalar.Id),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(IdentityScalar.Id),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityScalar.Name),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(IdentityScalar.Name),
+                                ClrMemberKind: ClrMemberKind.Property
+                            )
+                        ]
                     )
                 ]
             )
@@ -1028,99 +731,70 @@ public partial class ApiSchemaTests
         new JsonRoundtripTest
         {
             Name = $"{nameof(ApiSchema)} With Identity Schema ({nameof(IdentityTwoScalarPartComposite)})",
-            ExpectedFactoryArgument = new ApiSchemaSpec
+            ExpectedFactoryArgument = new ApiSchemaDef
             (
-                ApiSchema: new ApiSchemaParams
-                (
-                    ApiName: $"{nameof(ApiSchema)} With Identity Schema ({nameof(IdentityTwoScalarPartComposite)})"
-                ),
+                ApiName: $"{nameof(ApiSchema)} With Identity Schema ({nameof(IdentityTwoScalarPartComposite)})",
                 ApiNamedTypes:
                 [
-                    new ApiTypeSpec
+                    new ApiScalarTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Scalar,
-                            ClrType: typeof(int)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(Int32)
-                        )
+                        ApiName: nameof(Int32),
+                        ClrType: typeof(int)
                     ),
-                    new ApiTypeSpec
+                    new ApiScalarTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Scalar,
-                            ClrType: typeof(string)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(String)
-                        )
+                        ApiName: nameof(String),
+                        ClrType: typeof(string)
                     ),
-                    new ApiTypeSpec
+                    new ApiObjectTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Object,
-                            ClrType: typeof(IdentityTwoScalarPartComposite)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(IdentityTwoScalarPartComposite)
-                        ),
-                        ApiObjectType: new ApiObjectTypeParams
-                        (
-                            ApiIdentities:
-                            [
-                                new ApiIdentityParams
-                                (
-                                    ApiName: "PK_IdentityTwoScalarPartComposite",
-                                    ApiIdentityParts:
-                                    [
-                                        new ApiIdentityPartParams
-                                        (
-                                            ApiKind: ApiIdentityPartKind.Scalar,
-                                            ApiPropertyName: nameof(IdentityTwoScalarPartComposite.Id1)
-                                        ),
-                                        new ApiIdentityPartParams
-                                        (
-                                            ApiKind: ApiIdentityPartKind.Scalar,
-                                            ApiPropertyName: nameof(IdentityTwoScalarPartComposite.Id2)
-                                        )
-                                    ]
-                                )
-                            ],
-                            ApiProperties:
-                            [
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityTwoScalarPartComposite.Id1),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
-                                    ApiTypeModifiers: ApiTypeModifiers.Required,
-                                    ClrName: nameof(IdentityTwoScalarPartComposite.Id1),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                ),
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityTwoScalarPartComposite.Id2),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
-                                    ApiTypeModifiers: ApiTypeModifiers.None,
-                                    ClrName: nameof(IdentityTwoScalarPartComposite.Id2),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                ),
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityTwoScalarPartComposite.Description),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
-                                    ApiTypeModifiers: ApiTypeModifiers.None,
-                                    ClrName: nameof(IdentityTwoScalarPartComposite.Description),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                )
-                            ]
-                        )
+                        ApiName: nameof(IdentityTwoScalarPartComposite),
+                        ClrType: typeof(IdentityTwoScalarPartComposite),
+                        ApiIdentities:
+                        [
+                            new ApiIdentityDef
+                            (
+                                ApiName: "PK_IdentityTwoScalarPartComposite",
+                                Parts:
+                                [
+                                    new ApiScalarPartDef
+                                    (
+                                        ApiPropertyName: nameof(IdentityTwoScalarPartComposite.Id1)
+                                    ),
+                                    new ApiScalarPartDef
+                                    (
+                                        ApiPropertyName: nameof(IdentityTwoScalarPartComposite.Id2)
+                                    )
+                                ]
+                            )
+                        ],
+                        ApiProperties:
+                        [
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityTwoScalarPartComposite.Id1),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(IdentityTwoScalarPartComposite.Id1),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityTwoScalarPartComposite.Id2),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeModifiers: ApiTypeModifiers.None,
+                                ClrName: nameof(IdentityTwoScalarPartComposite.Id2),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityTwoScalarPartComposite.Description),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeModifiers: ApiTypeModifiers.None,
+                                ClrName: nameof(IdentityTwoScalarPartComposite.Description),
+                                ClrMemberKind: ClrMemberKind.Property
+                            )
+                        ]
                     )
                 ]
             )
@@ -1130,124 +804,87 @@ public partial class ApiSchemaTests
         new JsonRoundtripTest
         {
             Name = $"{nameof(ApiSchema)} With Identity Schema ({nameof(IdentityThreeScalarPartComposite)})",
-            ExpectedFactoryArgument = new ApiSchemaSpec
+            ExpectedFactoryArgument = new ApiSchemaDef
             (
-                ApiSchema: new ApiSchemaParams
-                (
-                    ApiName: $"{nameof(ApiSchema)} With Identity Schema ({nameof(IdentityThreeScalarPartComposite)})"
-                ),
+                ApiName: $"{nameof(ApiSchema)} With Identity Schema ({nameof(IdentityThreeScalarPartComposite)})",
                 ApiNamedTypes:
                 [
-                    new ApiTypeSpec
+                    new ApiScalarTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Scalar,
-                            ClrType: typeof(Guid)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(Guid)
-                        )
+                        ApiName: nameof(Guid),
+                        ClrType: typeof(Guid)
                     ),
-                    new ApiTypeSpec
+                    new ApiScalarTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Scalar,
-                            ClrType: typeof(int)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(Int32)
-                        )
+                        ApiName: nameof(Int32),
+                        ClrType: typeof(int)
                     ),
-                    new ApiTypeSpec
+                    new ApiScalarTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Scalar,
-                            ClrType: typeof(string)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(String)
-                        )
+                        ApiName: nameof(String),
+                        ClrType: typeof(string)
                     ),
-                    new ApiTypeSpec
+                    new ApiObjectTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Object,
-                            ClrType: typeof(IdentityThreeScalarPartComposite)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(IdentityThreeScalarPartComposite)
-                        ),
-                        ApiObjectType: new ApiObjectTypeParams
-                        (
-                            ApiIdentities:
-                            [
-                                new ApiIdentityParams
-                                (
-                                    ApiName: "PK_IdentityThreeScalarPartComposite",
-                                    ApiIdentityParts:
-                                    [
-                                        new ApiIdentityPartParams
-                                        (
-                                            ApiKind: ApiIdentityPartKind.Scalar,
-                                            ApiPropertyName: nameof(IdentityThreeScalarPartComposite.Id1)
-                                        ),
-                                        new ApiIdentityPartParams
-                                        (
-                                            ApiKind: ApiIdentityPartKind.Scalar,
-                                            ApiPropertyName: nameof(IdentityThreeScalarPartComposite.Id2)
-                                        ),
-                                        new ApiIdentityPartParams
-                                        (
-                                            ApiKind: ApiIdentityPartKind.Scalar,
-                                            ApiPropertyName: nameof(IdentityThreeScalarPartComposite.Id3)
-                                        )
-                                    ]
-                                )
-                            ],
-                            ApiProperties:
-                            [
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityThreeScalarPartComposite.Id1),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
-                                    ApiTypeModifiers: ApiTypeModifiers.Required,
-                                    ClrName: nameof(IdentityThreeScalarPartComposite.Id1),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                ),
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityThreeScalarPartComposite.Id2),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
-                                    ApiTypeModifiers: ApiTypeModifiers.None,
-                                    ClrName: nameof(IdentityThreeScalarPartComposite.Id2),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                ),
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityThreeScalarPartComposite.Id3),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Guid)),
-                                    ApiTypeModifiers: ApiTypeModifiers.Required,
-                                    ClrName: nameof(IdentityThreeScalarPartComposite.Id3),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                ),
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityThreeScalarPartComposite.Description),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
-                                    ApiTypeModifiers: ApiTypeModifiers.None,
-                                    ClrName: nameof(IdentityThreeScalarPartComposite.Description),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                )
-                            ]
-                        )
+                        ApiName: nameof(IdentityThreeScalarPartComposite),
+                        ClrType: typeof(IdentityThreeScalarPartComposite),
+                        ApiIdentities:
+                        [
+                            new ApiIdentityDef
+                            (
+                                ApiName: "PK_IdentityThreeScalarPartComposite",
+                                Parts:
+                                [
+                                    new ApiScalarPartDef
+                                    (
+                                        ApiPropertyName: nameof(IdentityThreeScalarPartComposite.Id1)
+                                    ),
+                                    new ApiScalarPartDef
+                                    (
+                                        ApiPropertyName: nameof(IdentityThreeScalarPartComposite.Id2)
+                                    ),
+                                    new ApiScalarPartDef
+                                    (
+                                        ApiPropertyName: nameof(IdentityThreeScalarPartComposite.Id3)
+                                    )
+                                ]
+                            )
+                        ],
+                        ApiProperties:
+                        [
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityThreeScalarPartComposite.Id1),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(IdentityThreeScalarPartComposite.Id1),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityThreeScalarPartComposite.Id2),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeModifiers: ApiTypeModifiers.None,
+                                ClrName: nameof(IdentityThreeScalarPartComposite.Id2),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityThreeScalarPartComposite.Id3),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Guid)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(IdentityThreeScalarPartComposite.Id3),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityThreeScalarPartComposite.Description),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeModifiers: ApiTypeModifiers.None,
+                                ClrName: nameof(IdentityThreeScalarPartComposite.Description),
+                                ClrMemberKind: ClrMemberKind.Property
+                            )
+                        ]
                     )
                 ]
             )
@@ -1257,140 +894,100 @@ public partial class ApiSchemaTests
         new JsonRoundtripTest
         {
             Name = $"{nameof(ApiSchema)} With Identity Schema ({nameof(IdentityNested)} And {nameof(IdentityNestedComposite)} Without Explicit ApiIdentityName)",
-            ExpectedFactoryArgument = new ApiSchemaSpec
+            ExpectedFactoryArgument = new ApiSchemaDef
             (
-                ApiSchema: new ApiSchemaParams
-                (
-                    ApiName: $"{nameof(ApiSchema)} With Identity Schema ({nameof(IdentityNested)} And {nameof(IdentityNestedComposite)} Without Explicit ApiIdentityName)"
-                ),
+                ApiName: $"{nameof(ApiSchema)} With Identity Schema ({nameof(IdentityNested)} And {nameof(IdentityNestedComposite)} Without Explicit ApiIdentityName)",
                 ApiNamedTypes:
                 [
-                    new ApiTypeSpec
+                    new ApiScalarTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Scalar,
-                            ClrType: typeof(int)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(Int32)
-                        )
+                        ApiName: nameof(Int32),
+                        ClrType: typeof(int)
                     ),
-                    new ApiTypeSpec
+                    new ApiScalarTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Scalar,
-                            ClrType: typeof(string)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(String)
-                        )
+                        ApiName: nameof(String),
+                        ClrType: typeof(string)
                     ),
-                    new ApiTypeSpec
+                    new ApiObjectTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Object,
-                            ClrType: typeof(IdentityNested)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(IdentityNested)
-                        ),
-                        ApiObjectType: new ApiObjectTypeParams
-                        (
-                            ApiIdentities:
-                            [
-                                new ApiIdentityParams
-                                (
-                                    ApiName: "PK_IdentityNestedPart",
-                                    ApiIdentityParts:
-                                    [
-                                        new ApiIdentityPartParams
-                                        (
-                                            ApiKind: ApiIdentityPartKind.Scalar,
-                                            ApiPropertyName: nameof(IdentityNested.Id)
-                                        )
-                                    ]
-                                )
-                            ],
-                            ApiProperties:
-                            [
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityNested.Id),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
-                                    ApiTypeModifiers: ApiTypeModifiers.Required,
-                                    ClrName: nameof(IdentityNested.Id),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                ),
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityNested.Description),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
-                                    ApiTypeModifiers: ApiTypeModifiers.None,
-                                    ClrName: nameof(IdentityNested.Description),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                )
-                            ]
-                        )
+                        ApiName: nameof(IdentityNested),
+                        ClrType: typeof(IdentityNested),
+                        ApiIdentities:
+                        [
+                            new ApiIdentityDef
+                            (
+                                ApiName: "PK_IdentityNestedPart",
+                                Parts:
+                                [
+                                    new ApiScalarPartDef
+                                    (
+                                        ApiPropertyName: nameof(IdentityNested.Id)
+                                    )
+                                ]
+                            )
+                        ],
+                        ApiProperties:
+                        [
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityNested.Id),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(IdentityNested.Id),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityNested.Description),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeModifiers: ApiTypeModifiers.None,
+                                ClrName: nameof(IdentityNested.Description),
+                                ClrMemberKind: ClrMemberKind.Property
+                            )
+                        ]
                     ),
-                    new ApiTypeSpec
+                    new ApiObjectTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Object,
-                            ClrType: typeof(IdentityNestedComposite)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(IdentityNestedComposite)
-                        ),
-                        ApiObjectType: new ApiObjectTypeParams
-                        (
-                            ApiIdentities:
-                            [
-                                new ApiIdentityParams
-                                (
-                                    ApiName: "PK_IdentityNestedComposite",
-                                    ApiIdentityParts:
-                                    [
-                                        new ApiIdentityPartParams
-                                        (
-                                            ApiKind: ApiIdentityPartKind.Nested,
-                                            ApiPropertyName: nameof(IdentityNestedComposite.NestedPart)
-                                        ),
-                                        new ApiIdentityPartParams
-                                        (
-                                            ApiKind: ApiIdentityPartKind.Scalar,
-                                            ApiPropertyName: nameof(IdentityNestedComposite.Name)
-                                        )
-                                    ]
-                                )
-                            ],
-                            ApiProperties:
-                            [
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityNestedComposite.NestedPart),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(IdentityNested)),
-                                    ApiTypeModifiers: ApiTypeModifiers.Required,
-                                    ClrName: nameof(IdentityNestedComposite.NestedPart),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                ),
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityNestedComposite.Name),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
-                                    ApiTypeModifiers: ApiTypeModifiers.Required,
-                                    ClrName: nameof(IdentityNestedComposite.Name),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                )
-                            ]
-                        )
+                        ApiName: nameof(IdentityNestedComposite),
+                        ClrType: typeof(IdentityNestedComposite),
+                        ApiIdentities:
+                        [
+                            new ApiIdentityDef
+                            (
+                                ApiName: "PK_IdentityNestedComposite",
+                                Parts:
+                                [
+                                    new ApiNestedPartDef
+                                    (
+                                        ApiPropertyName: nameof(IdentityNestedComposite.NestedPart)
+                                    ),
+                                    new ApiScalarPartDef
+                                    (
+                                        ApiPropertyName: nameof(IdentityNestedComposite.Name)
+                                    )
+                                ]
+                            )
+                        ],
+                        ApiProperties:
+                        [
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityNestedComposite.NestedPart),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(IdentityNested)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(IdentityNestedComposite.NestedPart),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityNestedComposite.Name),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(IdentityNestedComposite.Name),
+                                ClrMemberKind: ClrMemberKind.Property
+                            )
+                        ]
                     )
                 ]
             )
@@ -1400,203 +997,148 @@ public partial class ApiSchemaTests
         new JsonRoundtripTest
         {
             Name = $"{nameof(ApiSchema)} With Identity Schema ({nameof(IdentityOwner)}, {nameof(IdentityOwnedComposite)}, And {nameof(IdentityOwnedDependent)} Without Explicit ApiIdentityName)",
-            ExpectedFactoryArgument = new ApiSchemaSpec
+            ExpectedFactoryArgument = new ApiSchemaDef
             (
-                ApiSchema: new ApiSchemaParams
-                (
-                    ApiName: $"{nameof(ApiSchema)} With Identity Schema ({nameof(IdentityOwner)}, {nameof(IdentityOwnedComposite)}, And {nameof(IdentityOwnedDependent)} Without Explicit ApiIdentityName)"
-                ),
+                ApiName: $"{nameof(ApiSchema)} With Identity Schema ({nameof(IdentityOwner)}, {nameof(IdentityOwnedComposite)}, And {nameof(IdentityOwnedDependent)} Without Explicit ApiIdentityName)",
                 ApiNamedTypes:
                 [
-                    new ApiTypeSpec
+                    new ApiScalarTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Scalar,
-                            ClrType: typeof(int)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(Int32)
-                        )
+                        ApiName: nameof(Int32),
+                        ClrType: typeof(int)
                     ),
-                    new ApiTypeSpec
+                    new ApiScalarTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Scalar,
-                            ClrType: typeof(string)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(String)
-                        )
+                        ApiName: nameof(String),
+                        ClrType: typeof(string)
                     ),
-                    new ApiTypeSpec
+                    new ApiObjectTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Object,
-                            ClrType: typeof(IdentityOwner)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(IdentityOwner)
-                        ),
-                        ApiObjectType: new ApiObjectTypeParams
-                        (
-                            ApiIdentities:
-                            [
-                                new ApiIdentityParams
-                                (
-                                    ApiName: "PK_IdentityOwner",
-                                    ApiIdentityParts:
-                                    [
-                                        new ApiIdentityPartParams
-                                        (
-                                            ApiKind: ApiIdentityPartKind.Scalar,
-                                            ApiPropertyName: nameof(IdentityOwner.Id)
-                                        )
-                                    ]
-                                )
-                            ],
-                            ApiProperties:
-                            [
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityOwner.Id),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
-                                    ApiTypeModifiers: ApiTypeModifiers.Required,
-                                    ClrName: nameof(IdentityOwner.Id),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                ),
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityOwner.Description),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
-                                    ApiTypeModifiers: ApiTypeModifiers.None,
-                                    ClrName: nameof(IdentityOwner.Description),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                ),
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityOwner.Dependents),
-                                    ApiTypeExpression: new ApiTypeExpression
+                        ApiName: nameof(IdentityOwner),
+                        ClrType: typeof(IdentityOwner),
+                        ApiIdentities:
+                        [
+                            new ApiIdentityDef
+                            (
+                                ApiName: "PK_IdentityOwner",
+                                Parts:
+                                [
+                                    new ApiScalarPartDef
                                     (
-                                        apiInlineType: new ApiCollectionType
-                                        (
-                                            apiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(IdentityOwnedComposite)),
-                                            apiItemTypeModifiers: ApiTypeModifiers.Required,
-                                            clrCollectionType: typeof(List<IdentityOwnedComposite>)
-                                        )
-                                    ),
-                                    ApiTypeModifiers: ApiTypeModifiers.Required,
-                                    ClrName: nameof(IdentityOwner.Dependents),
-                                    ClrMemberKind: ClrMemberKind.Property
+                                        ApiPropertyName: nameof(IdentityOwner.Id)
+                                    )
+                                ]
+                            )
+                        ],
+                        ApiProperties:
+                        [
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityOwner.Id),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(IdentityOwner.Id),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityOwner.Description),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeModifiers: ApiTypeModifiers.None,
+                                ClrName: nameof(IdentityOwner.Description),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityOwner.Dependents),
+                                ApiTypeExpression: new ApiTypeExpression
+                                (
+                                    apiInlineType: new ApiCollectionType
+                                    (
+                                        apiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(IdentityOwnedComposite)),
+                                        apiItemTypeModifiers: ApiTypeModifiers.Required,
+                                        clrCollectionType: typeof(List<IdentityOwnedComposite>)
+                                    )
                                 ),
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityOwner.Dependent),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(IdentityOwnedDependent)),
-                                    ApiTypeModifiers: ApiTypeModifiers.Required,
-                                    ClrName: nameof(IdentityOwner.Dependent),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                )
-                            ]
-                        )
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(IdentityOwner.Dependents),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityOwner.Dependent),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(IdentityOwnedDependent)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(IdentityOwner.Dependent),
+                                ClrMemberKind: ClrMemberKind.Property
+                            )
+                        ]
                     ),
-                    new ApiTypeSpec
+                    new ApiObjectTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Object,
-                            ClrType: typeof(IdentityOwnedComposite)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(IdentityOwnedComposite)
-                        ),
-                        ApiObjectType: new ApiObjectTypeParams
-                        (
-                            ApiIdentities:
-                            [
-                                new ApiIdentityParams
-                                (
-                                    ApiName: "PK_IdentityOwnedComposite",
-                                    ApiIdentityParts:
-                                    [
-                                        new ApiIdentityPartParams
-                                        (
-                                            ApiKind: ApiIdentityPartKind.Owner
-                                        ),
-                                        new ApiIdentityPartParams
-                                        (
-                                            ApiKind: ApiIdentityPartKind.Scalar,
-                                            ApiPropertyName: nameof(IdentityOwnedComposite.LineNumber)
-                                        )
-                                    ]
-                                )
-                            ],
-                            ApiProperties:
-                            [
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityOwnedComposite.LineNumber),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
-                                    ApiTypeModifiers: ApiTypeModifiers.Required,
-                                    ClrName: nameof(IdentityOwnedComposite.LineNumber),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                ),
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityOwnedComposite.Description),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
-                                    ApiTypeModifiers: ApiTypeModifiers.Required,
-                                    ClrName: nameof(IdentityOwnedComposite.Description),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                )
-                            ]
-                        )
+                        ApiName: nameof(IdentityOwnedComposite),
+                        ClrType: typeof(IdentityOwnedComposite),
+                        ApiIdentities:
+                        [
+                            new ApiIdentityDef
+                            (
+                                ApiName: "PK_IdentityOwnedComposite",
+                                Parts:
+                                [
+                                    new ApiOwnerPartDef(),
+                                    new ApiScalarPartDef
+                                    (
+                                        ApiPropertyName: nameof(IdentityOwnedComposite.LineNumber)
+                                    )
+                                ]
+                            )
+                        ],
+                        ApiProperties:
+                        [
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityOwnedComposite.LineNumber),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(IdentityOwnedComposite.LineNumber),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityOwnedComposite.Description),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(IdentityOwnedComposite.Description),
+                                ClrMemberKind: ClrMemberKind.Property
+                            )
+                        ]
                     ),
-                    new ApiTypeSpec
+                    new ApiObjectTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Object,
-                            ClrType: typeof(IdentityOwnedDependent)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(IdentityOwnedDependent)
-                        ),
-                        ApiObjectType: new ApiObjectTypeParams
-                        (
-                            ApiIdentities:
-                            [
-                                new ApiIdentityParams
-                                (
-                                    ApiName: "PK_IdentityOwnedDependent",
-                                    ApiIdentityParts:
-                                    [
-                                        new ApiIdentityPartParams
-                                        (
-                                            ApiKind: ApiIdentityPartKind.Owner
-                                        )
-                                    ]
-                                )
-                            ],
-                            ApiProperties:
-                            [
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityOwnedDependent.Description),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
-                                    ApiTypeModifiers: ApiTypeModifiers.Required,
-                                    ClrName: nameof(IdentityOwnedDependent.Description),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                )
-                            ]
-                        )
+                        ApiName: nameof(IdentityOwnedDependent),
+                        ClrType: typeof(IdentityOwnedDependent),
+                        ApiIdentities:
+                        [
+                            new ApiIdentityDef
+                            (
+                                ApiName: "PK_IdentityOwnedDependent",
+                                Parts:
+                                [
+                                    new ApiOwnerPartDef()
+                                ]
+                            )
+                        ],
+                        ApiProperties:
+                        [
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityOwnedDependent.Description),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(IdentityOwnedDependent.Description),
+                                ClrMemberKind: ClrMemberKind.Property
+                            )
+                        ]
                     )
                 ]
             )
@@ -1606,516 +1148,394 @@ public partial class ApiSchemaTests
         new JsonRoundtripTest
         {
             Name = $"{nameof(ApiSchema)} With Full Identity Schema",
-            ExpectedFactoryArgument = new ApiSchemaSpec
+            ExpectedFactoryArgument = new ApiSchemaDef
             (
-                ApiSchema: new ApiSchemaParams
-                (
-                    ApiName: $"{nameof(ApiSchema)} With Full Identity Schema"
-                ),
+                ApiName: $"{nameof(ApiSchema)} With Full Identity Schema",
                 ApiNamedTypes:
                 [
-                    new ApiTypeSpec
+                    new ApiScalarTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Scalar,
-                            ClrType: typeof(Guid)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(Guid)
-                        )
+                        ApiName: nameof(Guid),
+                        ClrType: typeof(Guid)
                     ),
-                    new ApiTypeSpec
+                    new ApiScalarTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Scalar,
-                            ClrType: typeof(int)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(Int32)
-                        )
+                        ApiName: nameof(Int32),
+                        ClrType: typeof(int)
                     ),
-                    new ApiTypeSpec
+                    new ApiScalarTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Scalar,
-                            ClrType: typeof(string)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(String)
-                        )
+                        ApiName: nameof(String),
+                        ClrType: typeof(string)
                     ),
-                    new ApiTypeSpec
+                    new ApiObjectTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Object,
-                            ClrType: typeof(IdentityScalar)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(IdentityScalar)
-                        ),
-                        ApiObjectType: new ApiObjectTypeParams
-                        (
-                            ApiIdentities:
-                            [
-                                new ApiIdentityParams
-                                (
-                                    ApiName: "PK_IdentityScalar",
-                                    ApiIdentityParts:
-                                    [
-                                        new ApiIdentityPartParams
-                                        (
-                                            ApiKind: ApiIdentityPartKind.Scalar,
-                                            ApiPropertyName: nameof(IdentityScalar.Id)
-                                        )
-                                    ]
-                                ),
-                                new ApiIdentityParams
-                                (
-                                    ApiName: "AK_IdentityScalar",
-                                    ApiIdentityParts:
-                                    [
-                                        new ApiIdentityPartParams
-                                        (
-                                            ApiKind: ApiIdentityPartKind.Scalar,
-                                            ApiPropertyName: nameof(IdentityScalar.Name)
-                                        )
-                                    ]
-                                )
-                            ],
-                            ApiProperties:
-                            [
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityScalar.Id),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
-                                    ApiTypeModifiers: ApiTypeModifiers.Required,
-                                    ClrName: nameof(IdentityScalar.Id),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                ),
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityScalar.Name),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
-                                    ApiTypeModifiers: ApiTypeModifiers.Required,
-                                    ClrName: nameof(IdentityScalar.Name),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                )
-                            ]
-                        )
-                    ),
-                    new ApiTypeSpec
-                    (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Object,
-                            ClrType: typeof(IdentityTwoScalarPartComposite)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(IdentityTwoScalarPartComposite)
-                        ),
-                        ApiObjectType: new ApiObjectTypeParams
-                        (
-                            ApiIdentities:
-                            [
-                                new ApiIdentityParams
-                                (
-                                    ApiName: "PK_IdentityTwoScalarPartComposite",
-                                    ApiIdentityParts:
-                                    [
-                                        new ApiIdentityPartParams
-                                        (
-                                            ApiKind: ApiIdentityPartKind.Scalar,
-                                            ApiPropertyName: nameof(IdentityTwoScalarPartComposite.Id1)
-                                        ),
-                                        new ApiIdentityPartParams
-                                        (
-                                            ApiKind: ApiIdentityPartKind.Scalar,
-                                            ApiPropertyName: nameof(IdentityTwoScalarPartComposite.Id2)
-                                        )
-                                    ]
-                                )
-                            ],
-                            ApiProperties:
-                            [
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityTwoScalarPartComposite.Id1),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
-                                    ApiTypeModifiers: ApiTypeModifiers.Required,
-                                    ClrName: nameof(IdentityTwoScalarPartComposite.Id1),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                ),
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityTwoScalarPartComposite.Id2),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
-                                    ApiTypeModifiers: ApiTypeModifiers.None,
-                                    ClrName: nameof(IdentityTwoScalarPartComposite.Id2),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                ),
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityTwoScalarPartComposite.Description),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
-                                    ApiTypeModifiers: ApiTypeModifiers.None,
-                                    ClrName: nameof(IdentityTwoScalarPartComposite.Description),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                )
-                            ]
-                        )
-                    ),
-                    new ApiTypeSpec
-                    (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Object,
-                            ClrType: typeof(IdentityThreeScalarPartComposite)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(IdentityThreeScalarPartComposite)
-                        ),
-                        ApiObjectType: new ApiObjectTypeParams
-                        (
-                            ApiIdentities:
-                            [
-                                new ApiIdentityParams
-                                (
-                                    ApiName: "PK_IdentityThreeScalarPartComposite",
-                                    ApiIdentityParts:
-                                    [
-                                        new ApiIdentityPartParams
-                                        (
-                                            ApiKind: ApiIdentityPartKind.Scalar,
-                                            ApiPropertyName: nameof(IdentityThreeScalarPartComposite.Id1)
-                                        ),
-                                        new ApiIdentityPartParams
-                                        (
-                                            ApiKind: ApiIdentityPartKind.Scalar,
-                                            ApiPropertyName: nameof(IdentityThreeScalarPartComposite.Id2)
-                                        ),
-                                        new ApiIdentityPartParams
-                                        (
-                                            ApiKind: ApiIdentityPartKind.Scalar,
-                                            ApiPropertyName: nameof(IdentityThreeScalarPartComposite.Id3)
-                                        )
-                                    ]
-                                )
-                            ],
-                            ApiProperties:
-                            [
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityThreeScalarPartComposite.Id1),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
-                                    ApiTypeModifiers: ApiTypeModifiers.Required,
-                                    ClrName: nameof(IdentityThreeScalarPartComposite.Id1),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                ),
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityThreeScalarPartComposite.Id2),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
-                                    ApiTypeModifiers: ApiTypeModifiers.None,
-                                    ClrName: nameof(IdentityThreeScalarPartComposite.Id2),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                ),
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityThreeScalarPartComposite.Id3),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Guid)),
-                                    ApiTypeModifiers: ApiTypeModifiers.Required,
-                                    ClrName: nameof(IdentityThreeScalarPartComposite.Id3),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                ),
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityThreeScalarPartComposite.Description),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
-                                    ApiTypeModifiers: ApiTypeModifiers.None,
-                                    ClrName: nameof(IdentityThreeScalarPartComposite.Description),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                )
-                            ]
-                        )
-                    ),
-                    new ApiTypeSpec
-                    (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Object,
-                            ClrType: typeof(IdentityNested)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(IdentityNested)
-                        ),
-                        ApiObjectType: new ApiObjectTypeParams
-                        (
-                            ApiIdentities:
-                            [
-                                new ApiIdentityParams
-                                (
-                                    ApiName: "PK_IdentityNestedPart",
-                                    ApiIdentityParts:
-                                    [
-                                        new ApiIdentityPartParams
-                                        (
-                                            ApiKind: ApiIdentityPartKind.Scalar,
-                                            ApiPropertyName: nameof(IdentityNested.Id)
-                                        )
-                                    ]
-                                )
-                            ],
-                            ApiProperties:
-                            [
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityNested.Id),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
-                                    ApiTypeModifiers: ApiTypeModifiers.Required,
-                                    ClrName: nameof(IdentityNested.Id),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                ),
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityNested.Description),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
-                                    ApiTypeModifiers: ApiTypeModifiers.None,
-                                    ClrName: nameof(IdentityNested.Description),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                )
-                            ]
-                        )
-                    ),
-                    new ApiTypeSpec
-                    (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Object,
-                            ClrType: typeof(IdentityNestedComposite)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(IdentityNestedComposite)
-                        ),
-                        ApiObjectType: new ApiObjectTypeParams
-                        (
-                            ApiIdentities:
-                            [
-                                new ApiIdentityParams
-                                (
-                                    ApiName: "PK_IdentityNestedComposite",
-                                    ApiIdentityParts:
-                                    [
-                                        new ApiIdentityPartParams
-                                        (
-                                            ApiKind: ApiIdentityPartKind.Nested,
-                                            ApiPropertyName: nameof(IdentityNestedComposite.NestedPart)
-                                        ),
-                                        new ApiIdentityPartParams
-                                        (
-                                            ApiKind: ApiIdentityPartKind.Scalar,
-                                            ApiPropertyName: nameof(IdentityNestedComposite.Name)
-                                        )
-                                    ]
-                                )
-                            ],
-                            ApiProperties:
-                            [
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityNestedComposite.NestedPart),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(IdentityNested)),
-                                    ApiTypeModifiers: ApiTypeModifiers.Required,
-                                    ClrName: nameof(IdentityNestedComposite.NestedPart),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                ),
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityNestedComposite.Name),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
-                                    ApiTypeModifiers: ApiTypeModifiers.Required,
-                                    ClrName: nameof(IdentityNestedComposite.Name),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                )
-                            ]
-                        )
-                    ),
-                    new ApiTypeSpec
-                    (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Object,
-                            ClrType: typeof(IdentityOwner)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(IdentityOwner)
-                        ),
-                        ApiObjectType: new ApiObjectTypeParams
-                        (
-                            ApiIdentities:
-                            [
-                                new ApiIdentityParams
-                                (
-                                    ApiName: "PK_IdentityOwner",
-                                    ApiIdentityParts:
-                                    [
-                                        new ApiIdentityPartParams
-                                        (
-                                            ApiKind: ApiIdentityPartKind.Scalar,
-                                            ApiPropertyName: nameof(IdentityOwner.Id)
-                                        )
-                                    ]
-                                )
-                            ],
-                            ApiProperties:
-                            [
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityOwner.Id),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
-                                    ApiTypeModifiers: ApiTypeModifiers.Required,
-                                    ClrName: nameof(IdentityOwner.Id),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                ),
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityOwner.Description),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
-                                    ApiTypeModifiers: ApiTypeModifiers.None,
-                                    ClrName: nameof(IdentityOwner.Description),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                ),
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityOwner.Dependents),
-                                    ApiTypeExpression: new ApiTypeExpression
+                        ApiName: nameof(IdentityScalar),
+                        ClrType: typeof(IdentityScalar),
+                        ApiIdentities:
+                        [
+                            new ApiIdentityDef
+                            (
+                                ApiName: "PK_IdentityScalar",
+                                Parts:
+                                [
+                                    new ApiScalarPartDef
                                     (
-                                        apiInlineType: new ApiCollectionType
-                                        (
-                                            apiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(IdentityOwnedComposite)),
-                                            apiItemTypeModifiers: ApiTypeModifiers.Required,
-                                            clrCollectionType: typeof(List<IdentityOwnedComposite>)
-                                        )
+                                        ApiPropertyName: nameof(IdentityScalar.Id)
+                                    )
+                                ]
+                            ),
+                            new ApiIdentityDef
+                            (
+                                ApiName: "AK_IdentityScalar",
+                                Parts:
+                                [
+                                    new ApiScalarPartDef
+                                    (
+                                        ApiPropertyName: nameof(IdentityScalar.Name)
+                                    )
+                                ]
+                            )
+                        ],
+                        ApiProperties:
+                        [
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityScalar.Id),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(IdentityScalar.Id),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityScalar.Name),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(IdentityScalar.Name),
+                                ClrMemberKind: ClrMemberKind.Property
+                            )
+                        ]
+                    ),
+                    new ApiObjectTypeDef
+                    (
+                        ApiName: nameof(IdentityTwoScalarPartComposite),
+                        ClrType: typeof(IdentityTwoScalarPartComposite),
+                        ApiIdentities:
+                        [
+                            new ApiIdentityDef
+                            (
+                                ApiName: "PK_IdentityTwoScalarPartComposite",
+                                Parts:
+                                [
+                                    new ApiScalarPartDef
+                                    (
+                                        ApiPropertyName: nameof(IdentityTwoScalarPartComposite.Id1)
                                     ),
-                                    ApiTypeModifiers: ApiTypeModifiers.Required,
-                                    ClrName: nameof(IdentityOwner.Dependents),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                ),
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityOwner.Dependent),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(IdentityOwnedDependent)),
-                                    ApiTypeModifiers: ApiTypeModifiers.Required,
-                                    ClrName: nameof(IdentityOwner.Dependent),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                )
-                            ]
-                        )
+                                    new ApiScalarPartDef
+                                    (
+                                        ApiPropertyName: nameof(IdentityTwoScalarPartComposite.Id2)
+                                    )
+                                ]
+                            )
+                        ],
+                        ApiProperties:
+                        [
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityTwoScalarPartComposite.Id1),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(IdentityTwoScalarPartComposite.Id1),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityTwoScalarPartComposite.Id2),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeModifiers: ApiTypeModifiers.None,
+                                ClrName: nameof(IdentityTwoScalarPartComposite.Id2),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityTwoScalarPartComposite.Description),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeModifiers: ApiTypeModifiers.None,
+                                ClrName: nameof(IdentityTwoScalarPartComposite.Description),
+                                ClrMemberKind: ClrMemberKind.Property
+                            )
+                        ]
                     ),
-                    new ApiTypeSpec
+                    new ApiObjectTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Object,
-                            ClrType: typeof(IdentityOwnedComposite)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(IdentityOwnedComposite)
-                        ),
-                        ApiObjectType: new ApiObjectTypeParams
-                        (
-                            ApiIdentities:
-                            [
-                                new ApiIdentityParams
-                                (
-                                    ApiName: "PK_IdentityOwnedComposite",
-                                    ApiIdentityParts:
-                                    [
-                                        new ApiIdentityPartParams
-                                        (
-                                            ApiKind: ApiIdentityPartKind.Owner
-                                        ),
-                                        new ApiIdentityPartParams
-                                        (
-                                            ApiKind: ApiIdentityPartKind.Scalar,
-                                            ApiPropertyName: nameof(IdentityOwnedComposite.LineNumber)
-                                        )
-                                    ]
-                                )
-                            ],
-                            ApiProperties:
-                            [
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityOwnedComposite.LineNumber),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
-                                    ApiTypeModifiers: ApiTypeModifiers.Required,
-                                    ClrName: nameof(IdentityOwnedComposite.LineNumber),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                ),
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityOwnedComposite.Description),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
-                                    ApiTypeModifiers: ApiTypeModifiers.Required,
-                                    ClrName: nameof(IdentityOwnedComposite.Description),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                )
-                            ]
-                        )
+                        ApiName: nameof(IdentityThreeScalarPartComposite),
+                        ClrType: typeof(IdentityThreeScalarPartComposite),
+                        ApiIdentities:
+                        [
+                            new ApiIdentityDef
+                            (
+                                ApiName: "PK_IdentityThreeScalarPartComposite",
+                                Parts:
+                                [
+                                    new ApiScalarPartDef
+                                    (
+                                        ApiPropertyName: nameof(IdentityThreeScalarPartComposite.Id1)
+                                    ),
+                                    new ApiScalarPartDef
+                                    (
+                                        ApiPropertyName: nameof(IdentityThreeScalarPartComposite.Id2)
+                                    ),
+                                    new ApiScalarPartDef
+                                    (
+                                        ApiPropertyName: nameof(IdentityThreeScalarPartComposite.Id3)
+                                    )
+                                ]
+                            )
+                        ],
+                        ApiProperties:
+                        [
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityThreeScalarPartComposite.Id1),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(IdentityThreeScalarPartComposite.Id1),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityThreeScalarPartComposite.Id2),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeModifiers: ApiTypeModifiers.None,
+                                ClrName: nameof(IdentityThreeScalarPartComposite.Id2),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityThreeScalarPartComposite.Id3),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Guid)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(IdentityThreeScalarPartComposite.Id3),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityThreeScalarPartComposite.Description),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeModifiers: ApiTypeModifiers.None,
+                                ClrName: nameof(IdentityThreeScalarPartComposite.Description),
+                                ClrMemberKind: ClrMemberKind.Property
+                            )
+                        ]
                     ),
-                    new ApiTypeSpec
+                    new ApiObjectTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Object,
-                            ClrType: typeof(IdentityOwnedDependent)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(IdentityOwnedDependent)
-                        ),
-                        ApiObjectType: new ApiObjectTypeParams
-                        (
-                            ApiIdentities:
-                            [
-                                new ApiIdentityParams
+                        ApiName: nameof(IdentityNested),
+                        ClrType: typeof(IdentityNested),
+                        ApiIdentities:
+                        [
+                            new ApiIdentityDef
+                            (
+                                ApiName: "PK_IdentityNestedPart",
+                                Parts:
+                                [
+                                    new ApiScalarPartDef
+                                    (
+                                        ApiPropertyName: nameof(IdentityNested.Id)
+                                    )
+                                ]
+                            )
+                        ],
+                        ApiProperties:
+                        [
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityNested.Id),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(IdentityNested.Id),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityNested.Description),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeModifiers: ApiTypeModifiers.None,
+                                ClrName: nameof(IdentityNested.Description),
+                                ClrMemberKind: ClrMemberKind.Property
+                            )
+                        ]
+                    ),
+                    new ApiObjectTypeDef
+                    (
+                        ApiName: nameof(IdentityNestedComposite),
+                        ClrType: typeof(IdentityNestedComposite),
+                        ApiIdentities:
+                        [
+                            new ApiIdentityDef
+                            (
+                                ApiName: "PK_IdentityNestedComposite",
+                                Parts:
+                                [
+                                    new ApiNestedPartDef
+                                    (
+                                        ApiPropertyName: nameof(IdentityNestedComposite.NestedPart)
+                                    ),
+                                    new ApiScalarPartDef
+                                    (
+                                        ApiPropertyName: nameof(IdentityNestedComposite.Name)
+                                    )
+                                ]
+                            )
+                        ],
+                        ApiProperties:
+                        [
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityNestedComposite.NestedPart),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(IdentityNested)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(IdentityNestedComposite.NestedPart),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityNestedComposite.Name),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(IdentityNestedComposite.Name),
+                                ClrMemberKind: ClrMemberKind.Property
+                            )
+                        ]
+                    ),
+                    new ApiObjectTypeDef
+                    (
+                        ApiName: nameof(IdentityOwner),
+                        ClrType: typeof(IdentityOwner),
+                        ApiIdentities:
+                        [
+                            new ApiIdentityDef
+                            (
+                                ApiName: "PK_IdentityOwner",
+                                Parts:
+                                [
+                                    new ApiScalarPartDef
+                                    (
+                                        ApiPropertyName: nameof(IdentityOwner.Id)
+                                    )
+                                ]
+                            )
+                        ],
+                        ApiProperties:
+                        [
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityOwner.Id),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(IdentityOwner.Id),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityOwner.Description),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeModifiers: ApiTypeModifiers.None,
+                                ClrName: nameof(IdentityOwner.Description),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityOwner.Dependents),
+                                ApiTypeExpression: new ApiTypeExpression
                                 (
-                                    ApiName: "PK_IdentityOwnedDependent",
-                                    ApiIdentityParts:
-                                    [
-                                        new ApiIdentityPartParams
-                                        (
-                                            ApiKind: ApiIdentityPartKind.Owner
-                                        )
-                                    ]
-                                )
-                            ],
-                            ApiProperties:
-                            [
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityOwnedDependent.Description),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
-                                    ApiTypeModifiers: ApiTypeModifiers.Required,
-                                    ClrName: nameof(IdentityOwnedDependent.Description),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                )
-                            ]
-                        )
+                                    apiInlineType: new ApiCollectionType
+                                    (
+                                        apiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(IdentityOwnedComposite)),
+                                        apiItemTypeModifiers: ApiTypeModifiers.Required,
+                                        clrCollectionType: typeof(List<IdentityOwnedComposite>)
+                                    )
+                                ),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(IdentityOwner.Dependents),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityOwner.Dependent),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(IdentityOwnedDependent)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(IdentityOwner.Dependent),
+                                ClrMemberKind: ClrMemberKind.Property
+                            )
+                        ]
+                    ),
+                    new ApiObjectTypeDef
+                    (
+                        ApiName: nameof(IdentityOwnedComposite),
+                        ClrType: typeof(IdentityOwnedComposite),
+                        ApiIdentities:
+                        [
+                            new ApiIdentityDef
+                            (
+                                ApiName: "PK_IdentityOwnedComposite",
+                                Parts:
+                                [
+                                    new ApiOwnerPartDef(),
+                                    new ApiScalarPartDef
+                                    (
+                                        ApiPropertyName: nameof(IdentityOwnedComposite.LineNumber)
+                                    )
+                                ]
+                            )
+                        ],
+                        ApiProperties:
+                        [
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityOwnedComposite.LineNumber),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(IdentityOwnedComposite.LineNumber),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityOwnedComposite.Description),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(IdentityOwnedComposite.Description),
+                                ClrMemberKind: ClrMemberKind.Property
+                            )
+                        ]
+                    ),
+                    new ApiObjectTypeDef
+                    (
+                        ApiName: nameof(IdentityOwnedDependent),
+                        ClrType: typeof(IdentityOwnedDependent),
+                        ApiIdentities:
+                        [
+                            new ApiIdentityDef
+                            (
+                                ApiName: "PK_IdentityOwnedDependent",
+                                Parts:
+                                [
+                                    new ApiOwnerPartDef()
+                                ]
+                            )
+                        ],
+                        ApiProperties:
+                        [
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityOwnedDependent.Description),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(IdentityOwnedDependent.Description),
+                                ClrMemberKind: ClrMemberKind.Property
+                            )
+                        ]
                     )
                 ]
             )
@@ -2125,141 +1545,101 @@ public partial class ApiSchemaTests
         new JsonRoundtripTest
         {
             Name = $"{nameof(ApiSchema)} With Identity Schema ({nameof(IdentityNested)} And {nameof(IdentityNestedComposite)} With Explicit ApiIdentityName)",
-            ExpectedFactoryArgument = new ApiSchemaSpec
+            ExpectedFactoryArgument = new ApiSchemaDef
             (
-                ApiSchema: new ApiSchemaParams
-                (
-                    ApiName: $"{nameof(ApiSchema)} With Identity Schema ({nameof(IdentityNested)} And {nameof(IdentityNestedComposite)} With Explicit ApiIdentityName)"
-                ),
+                ApiName: $"{nameof(ApiSchema)} With Identity Schema ({nameof(IdentityNested)} And {nameof(IdentityNestedComposite)} With Explicit ApiIdentityName)",
                 ApiNamedTypes:
                 [
-                    new ApiTypeSpec
+                    new ApiScalarTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Scalar,
-                            ClrType: typeof(int)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(Int32)
-                        )
+                        ApiName: nameof(Int32),
+                        ClrType: typeof(int)
                     ),
-                    new ApiTypeSpec
+                    new ApiScalarTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Scalar,
-                            ClrType: typeof(string)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(String)
-                        )
+                        ApiName: nameof(String),
+                        ClrType: typeof(string)
                     ),
-                    new ApiTypeSpec
+                    new ApiObjectTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Object,
-                            ClrType: typeof(IdentityNested)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(IdentityNested)
-                        ),
-                        ApiObjectType: new ApiObjectTypeParams
-                        (
-                            ApiIdentities:
-                            [
-                                new ApiIdentityParams
-                                (
-                                    ApiName: "PK_IdentityNestedPart",
-                                    ApiIdentityParts:
-                                    [
-                                        new ApiIdentityPartParams
-                                        (
-                                            ApiKind: ApiIdentityPartKind.Scalar,
-                                            ApiPropertyName: nameof(IdentityNested.Id)
-                                        )
-                                    ]
-                                )
-                            ],
-                            ApiProperties:
-                            [
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityNested.Id),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
-                                    ApiTypeModifiers: ApiTypeModifiers.Required,
-                                    ClrName: nameof(IdentityNested.Id),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                ),
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityNested.Description),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
-                                    ApiTypeModifiers: ApiTypeModifiers.None,
-                                    ClrName: nameof(IdentityNested.Description),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                )
-                            ]
-                        )
+                        ApiName: nameof(IdentityNested),
+                        ClrType: typeof(IdentityNested),
+                        ApiIdentities:
+                        [
+                            new ApiIdentityDef
+                            (
+                                ApiName: "PK_IdentityNestedPart",
+                                Parts:
+                                [
+                                    new ApiScalarPartDef
+                                    (
+                                        ApiPropertyName: nameof(IdentityNested.Id)
+                                    )
+                                ]
+                            )
+                        ],
+                        ApiProperties:
+                        [
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityNested.Id),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(IdentityNested.Id),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityNested.Description),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeModifiers: ApiTypeModifiers.None,
+                                ClrName: nameof(IdentityNested.Description),
+                                ClrMemberKind: ClrMemberKind.Property
+                            )
+                        ]
                     ),
-                    new ApiTypeSpec
+                    new ApiObjectTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Object,
-                            ClrType: typeof(IdentityNestedComposite)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(IdentityNestedComposite)
-                        ),
-                        ApiObjectType: new ApiObjectTypeParams
-                        (
-                            ApiIdentities:
-                            [
-                                new ApiIdentityParams
-                                (
-                                    ApiName: "PK_IdentityNestedComposite",
-                                    ApiIdentityParts:
-                                    [
-                                        new ApiIdentityPartParams
-                                        (
-                                            ApiKind: ApiIdentityPartKind.Nested,
-                                            ApiPropertyName: nameof(IdentityNestedComposite.NestedPart),
-                                            ApiIdentityName: "PK_IdentityNestedPart"
-                                        ),
-                                        new ApiIdentityPartParams
-                                        (
-                                            ApiKind: ApiIdentityPartKind.Scalar,
-                                            ApiPropertyName: nameof(IdentityNestedComposite.Name)
-                                        )
-                                    ]
-                                )
-                            ],
-                            ApiProperties:
-                            [
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityNestedComposite.NestedPart),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(IdentityNested)),
-                                    ApiTypeModifiers: ApiTypeModifiers.Required,
-                                    ClrName: nameof(IdentityNestedComposite.NestedPart),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                ),
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityNestedComposite.Name),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
-                                    ApiTypeModifiers: ApiTypeModifiers.Required,
-                                    ClrName: nameof(IdentityNestedComposite.Name),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                )
-                            ]
-                        )
+                        ApiName: nameof(IdentityNestedComposite),
+                        ClrType: typeof(IdentityNestedComposite),
+                        ApiIdentities:
+                        [
+                            new ApiIdentityDef
+                            (
+                                ApiName: "PK_IdentityNestedComposite",
+                                Parts:
+                                [
+                                    new ApiNestedPartDef
+                                    (
+                                        ApiPropertyName: nameof(IdentityNestedComposite.NestedPart),
+                                        ApiIdentityName: "PK_IdentityNestedPart"
+                                    ),
+                                    new ApiScalarPartDef
+                                    (
+                                        ApiPropertyName: nameof(IdentityNestedComposite.Name)
+                                    )
+                                ]
+                            )
+                        ],
+                        ApiProperties:
+                        [
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityNestedComposite.NestedPart),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(IdentityNested)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(IdentityNestedComposite.NestedPart),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityNestedComposite.Name),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(IdentityNestedComposite.Name),
+                                ClrMemberKind: ClrMemberKind.Property
+                            )
+                        ]
                     )
                 ]
             )
@@ -2269,205 +1649,148 @@ public partial class ApiSchemaTests
         new JsonRoundtripTest
         {
             Name = $"{nameof(ApiSchema)} With Identity Schema ({nameof(IdentityOwner)}, {nameof(IdentityOwnedComposite)}, And {nameof(IdentityOwnedDependent)} With Explicit ApiIdentityName)",
-            ExpectedFactoryArgument = new ApiSchemaSpec
+            ExpectedFactoryArgument = new ApiSchemaDef
             (
-                ApiSchema: new ApiSchemaParams
-                (
-                    ApiName: $"{nameof(ApiSchema)} With Identity Schema ({nameof(IdentityOwner)}, {nameof(IdentityOwnedComposite)}, And {nameof(IdentityOwnedDependent)} With Explicit ApiIdentityName)"
-                ),
+                ApiName: $"{nameof(ApiSchema)} With Identity Schema ({nameof(IdentityOwner)}, {nameof(IdentityOwnedComposite)}, And {nameof(IdentityOwnedDependent)} With Explicit ApiIdentityName)",
                 ApiNamedTypes:
                 [
-                    new ApiTypeSpec
+                    new ApiScalarTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Scalar,
-                            ClrType: typeof(int)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(Int32)
-                        )
+                        ApiName: nameof(Int32),
+                        ClrType: typeof(int)
                     ),
-                    new ApiTypeSpec
+                    new ApiScalarTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Scalar,
-                            ClrType: typeof(string)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(String)
-                        )
+                        ApiName: nameof(String),
+                        ClrType: typeof(string)
                     ),
-                    new ApiTypeSpec
+                    new ApiObjectTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Object,
-                            ClrType: typeof(IdentityOwner)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(IdentityOwner)
-                        ),
-                        ApiObjectType: new ApiObjectTypeParams
-                        (
-                            ApiIdentities:
-                            [
-                                new ApiIdentityParams
-                                (
-                                    ApiName: "PK_IdentityOwner",
-                                    ApiIdentityParts:
-                                    [
-                                        new ApiIdentityPartParams
-                                        (
-                                            ApiKind: ApiIdentityPartKind.Scalar,
-                                            ApiPropertyName: nameof(IdentityOwner.Id)
-                                        )
-                                    ]
-                                )
-                            ],
-                            ApiProperties:
-                            [
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityOwner.Id),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
-                                    ApiTypeModifiers: ApiTypeModifiers.Required,
-                                    ClrName: nameof(IdentityOwner.Id),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                ),
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityOwner.Description),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
-                                    ApiTypeModifiers: ApiTypeModifiers.None,
-                                    ClrName: nameof(IdentityOwner.Description),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                ),
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityOwner.Dependents),
-                                    ApiTypeExpression: new ApiTypeExpression
+                        ApiName: nameof(IdentityOwner),
+                        ClrType: typeof(IdentityOwner),
+                        ApiIdentities:
+                        [
+                            new ApiIdentityDef
+                            (
+                                ApiName: "PK_IdentityOwner",
+                                Parts:
+                                [
+                                    new ApiScalarPartDef
                                     (
-                                        apiInlineType: new ApiCollectionType
-                                        (
-                                            apiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(IdentityOwnedComposite)),
-                                            apiItemTypeModifiers: ApiTypeModifiers.Required,
-                                            clrCollectionType: typeof(List<IdentityOwnedComposite>)
-                                        )
-                                    ),
-                                    ApiTypeModifiers: ApiTypeModifiers.Required,
-                                    ClrName: nameof(IdentityOwner.Dependents),
-                                    ClrMemberKind: ClrMemberKind.Property
+                                        ApiPropertyName: nameof(IdentityOwner.Id)
+                                    )
+                                ]
+                            )
+                        ],
+                        ApiProperties:
+                        [
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityOwner.Id),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(IdentityOwner.Id),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityOwner.Description),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeModifiers: ApiTypeModifiers.None,
+                                ClrName: nameof(IdentityOwner.Description),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityOwner.Dependents),
+                                ApiTypeExpression: new ApiTypeExpression
+                                (
+                                    apiInlineType: new ApiCollectionType
+                                    (
+                                        apiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(IdentityOwnedComposite)),
+                                        apiItemTypeModifiers: ApiTypeModifiers.Required,
+                                        clrCollectionType: typeof(List<IdentityOwnedComposite>)
+                                    )
                                 ),
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityOwner.Dependent),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(IdentityOwnedDependent)),
-                                    ApiTypeModifiers: ApiTypeModifiers.Required,
-                                    ClrName: nameof(IdentityOwner.Dependent),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                )
-                            ]
-                        )
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(IdentityOwner.Dependents),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityOwner.Dependent),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(IdentityOwnedDependent)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(IdentityOwner.Dependent),
+                                ClrMemberKind: ClrMemberKind.Property
+                            )
+                        ]
                     ),
-                    new ApiTypeSpec
+                    new ApiObjectTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Object,
-                            ClrType: typeof(IdentityOwnedComposite)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(IdentityOwnedComposite)
-                        ),
-                        ApiObjectType: new ApiObjectTypeParams
-                        (
-                            ApiIdentities:
-                            [
-                                new ApiIdentityParams
-                                (
-                                    ApiName: "PK_IdentityOwnedComposite",
-                                    ApiIdentityParts:
-                                    [
-                                        new ApiIdentityPartParams
-                                        (
-                                            ApiKind: ApiIdentityPartKind.Owner,
-                                            ApiIdentityName: "PK_IdentityOwner"
-                                        ),
-                                        new ApiIdentityPartParams
-                                        (
-                                            ApiKind: ApiIdentityPartKind.Scalar,
-                                            ApiPropertyName: nameof(IdentityOwnedComposite.LineNumber)
-                                        )
-                                    ]
-                                )
-                            ],
-                            ApiProperties:
-                            [
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityOwnedComposite.LineNumber),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
-                                    ApiTypeModifiers: ApiTypeModifiers.Required,
-                                    ClrName: nameof(IdentityOwnedComposite.LineNumber),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                ),
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityOwnedComposite.Description),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
-                                    ApiTypeModifiers: ApiTypeModifiers.Required,
-                                    ClrName: nameof(IdentityOwnedComposite.Description),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                )
-                            ]
-                        )
+                        ApiName: nameof(IdentityOwnedComposite),
+                        ClrType: typeof(IdentityOwnedComposite),
+                        ApiIdentities:
+                        [
+                            new ApiIdentityDef
+                            (
+                                ApiName: "PK_IdentityOwnedComposite",
+                                Parts:
+                                [
+                                    new ApiOwnerPartDef(ApiIdentityName: "PK_IdentityOwner"),
+                                    new ApiScalarPartDef
+                                    (
+                                        ApiPropertyName: nameof(IdentityOwnedComposite.LineNumber)
+                                    )
+                                ]
+                            )
+                        ],
+                        ApiProperties:
+                        [
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityOwnedComposite.LineNumber),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(IdentityOwnedComposite.LineNumber),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityOwnedComposite.Description),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(IdentityOwnedComposite.Description),
+                                ClrMemberKind: ClrMemberKind.Property
+                            )
+                        ]
                     ),
-                    new ApiTypeSpec
+                    new ApiObjectTypeDef
                     (
-                        ApiType: new ApiTypeParams
-                        (
-                            ApiKind: ApiTypeKind.Object,
-                            ClrType: typeof(IdentityOwnedDependent)
-                        ),
-                        ApiNamedType: new ApiNamedTypeParams
-                        (
-                            ApiName: nameof(IdentityOwnedDependent)
-                        ),
-                        ApiObjectType: new ApiObjectTypeParams
-                        (
-                            ApiIdentities:
-                            [
-                                new ApiIdentityParams
-                                (
-                                    ApiName: "PK_IdentityOwnedDependent",
-                                    ApiIdentityParts:
-                                    [
-                                        new ApiIdentityPartParams
-                                        (
-                                            ApiKind: ApiIdentityPartKind.Owner,
-                                            ApiIdentityName: "PK_IdentityOwner"
-                                        )
-                                    ]
-                                )
-                            ],
-                            ApiProperties:
-                            [
-                                new ApiPropertyParams
-                                (
-                                    ApiName: nameof(IdentityOwnedDependent.Description),
-                                    ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
-                                    ApiTypeModifiers: ApiTypeModifiers.Required,
-                                    ClrName: nameof(IdentityOwnedDependent.Description),
-                                    ClrMemberKind: ClrMemberKind.Property
-                                )
-                            ]
-                        )
+                        ApiName: nameof(IdentityOwnedDependent),
+                        ClrType: typeof(IdentityOwnedDependent),
+                        ApiIdentities:
+                        [
+                            new ApiIdentityDef
+                            (
+                                ApiName: "PK_IdentityOwnedDependent",
+                                Parts:
+                                [
+                                    new ApiOwnerPartDef(ApiIdentityName: "PK_IdentityOwner")
+                                ]
+                            )
+                        ],
+                        ApiProperties:
+                        [
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(IdentityOwnedDependent.Description),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(IdentityOwnedDependent.Description),
+                                ClrMemberKind: ClrMemberKind.Property
+                            )
+                        ]
                     )
                 ]
             )
