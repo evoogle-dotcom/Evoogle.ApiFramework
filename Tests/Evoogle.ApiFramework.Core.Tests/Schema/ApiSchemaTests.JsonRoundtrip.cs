@@ -11,13 +11,12 @@ public partial class ApiSchemaTests
 {
     #region Theory Data
     public static TheoryDataRow<IXUnitTest>[] JsonRoundtripTheoryData =>
-        JsonTestCases
+        [.. JsonTestCases
             .Select(c => (TheoryDataRow<IXUnitTest>)new JsonRoundtripTest
             {
                 Name = c.Name,
                 ExpectedFactoryArgument = c.FactoryArgument
-            })
-            .ToArray();
+            })];
     #endregion
 
     #region Test Methods

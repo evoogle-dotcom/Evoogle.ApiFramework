@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -11,14 +11,13 @@ public partial class ApiTypeTests
 {
     #region Theory Data
     public static TheoryDataRow<IXUnitTest>[] JsonDeserializeTheoryData =>
-        JsonTestCases
+        [.. JsonTestCases
             .Select(c => (TheoryDataRow<IXUnitTest>)new JsonDeserializeTest
             {
                 Name = c.Name,
                 SourceJson = c.Json,
                 ExpectedFactoryArgument = c.FactoryArgument
-            })
-            .ToArray();
+            })];
     #endregion
 
     #region Test Methods

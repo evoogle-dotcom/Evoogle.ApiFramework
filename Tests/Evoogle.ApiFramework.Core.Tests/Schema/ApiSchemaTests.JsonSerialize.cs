@@ -11,14 +11,13 @@ public partial class ApiSchemaTests
 {
     #region Theory Data
     public static TheoryDataRow<IXUnitTest>[] JsonSerializeTheoryData =>
-        JsonTestCases
+        [.. JsonTestCases
             .Select(c => (TheoryDataRow<IXUnitTest>)new JsonSerializeTest
             {
                 Name = c.Name,
                 SourceFactoryArgument = c.FactoryArgument,
                 ExpectedJson = c.Json
-            })
-            .ToArray();
+            })];
     #endregion
 
     #region Test Methods
