@@ -29,6 +29,22 @@ public static class ApiSchemaExcludeMembers
 
         // ApiIdentityNestedPart — cycle: ApiIdentity → ApiObjectType → ApiIdentities[].ApiIdentityParts[].ApiProperty → ...
         new ExcludeMember(typeof(ApiIdentityNestedPart), nameof(ApiIdentityNestedPart.ApiIdentity)),
+
+        // ApiObjectType — cycles: ApiProperties[].ApiType → ... / ApiIdentities[].ApiIdentityParts[].ApiProperty → ...
+        new ExcludeMember(typeof(ApiObjectType), nameof(ApiObjectType.ApiRelationshipEnds)),
+        new ExcludeMember(typeof(ApiObjectType), nameof(ApiObjectType.ApiRelationshipPrincipalEnds)),
+        new ExcludeMember(typeof(ApiObjectType), nameof(ApiObjectType.ApiRelationshipDependentEnds)),
+
+        // ApiRelationshipEnd — back-references resolved during initialization
+        new ExcludeMember(typeof(ApiRelationshipEnd), nameof(ApiRelationshipEnd.ApiObjectType)),
+        new ExcludeMember(typeof(ApiRelationshipEnd), nameof(ApiRelationshipEnd.ApiRelationship)),
+        new ExcludeMember(typeof(ApiRelationshipEnd), nameof(ApiRelationshipEnd.ApiOppositeEnd)),
+
+        // ApiRelationshipPrincipalEnd — identity and opposite end resolved during initialization
+        new ExcludeMember(typeof(ApiRelationshipPrincipalEnd), nameof(ApiRelationshipPrincipalEnd.ApiDependentEnd)),
+
+        // ApiRelationshipDependentEnd — opposite end call that throws before initialization
+        new ExcludeMember(typeof(ApiRelationshipDependentEnd), nameof(ApiRelationshipDependentEnd.ApiPrincipalEnd)),
     ];
 
     public static readonly List<ExcludeMember> Standard =

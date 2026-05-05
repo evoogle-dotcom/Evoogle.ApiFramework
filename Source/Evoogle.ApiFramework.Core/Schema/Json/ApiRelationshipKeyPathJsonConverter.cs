@@ -161,29 +161,31 @@ public class ApiRelationshipKeyPathJsonConverter(ILogger<ApiRelationshipKeyPathJ
             return null;
         }
 
-        var path = default(ApiRelationshipKeyPath);
-        switch (readData.ApiKind.Value)
+        var apiKindValue = readData.ApiKind.Value;
+        ApiRelationshipKeyPath? path = apiKindValue switch
         {
-            case ApiRelationshipKeyPathKind.Scalar:
-                path = new ApiRelationshipScalarKeyPath(readData.ClrPropertyName!);
-                break;
+            ApiRelationshipKeyPathKind.Scalar => new ApiRelationshipScalarKeyPath
+            (
+                readData.ClrPropertyName!
+            ),
 
-            case ApiRelationshipKeyPathKind.Nested:
-                path = new ApiRelationshipNestedKeyPath(readData.ClrPropertyName!, readData.ApiKeyPaths ?? []);
-                break;
+            ApiRelationshipKeyPathKind.Nested => new ApiRelationshipNestedKeyPath
+            (
+                readData.ClrPropertyName!,
+                readData.ApiKeyPaths!
+            ),
 
-            case ApiRelationshipKeyPathKind.Owner:
-                path = new ApiRelationshipOwnerKeyPath(readData.ApiKeyPaths);
-                break;
+            ApiRelationshipKeyPathKind.Owner => new ApiRelationshipOwnerKeyPath
+            (
+                readData.ApiKeyPaths
+            ),
 
-            default:
-                readContext.Logger.LogError("Unsupported {ApiKind} enumeration value: '{ApiKindValue}'",
-                    nameof(ApiRelationshipKeyPathKind), readData.ApiKind);
-                break;
-        }
+            _ => null
+        };
 
         if (path is null)
         {
+            readContext.Logger.LogError("Unsupported {ApiKind} enumeration value: '{ApiKindValue}'", nameof(ApiRelationshipKeyPathKind), apiKindValue);
             return null;
         }
 
@@ -206,8 +208,22 @@ public class ApiRelationshipKeyPathJsonConverter(ILogger<ApiRelationshipKeyPathJ
         WriteJsonObject(writer, () =>
         {
             WriteApiKind(writer, value, writeContext);
-            WriteClrPropertyName(writer, value, writeContext);
-            WriteApiKeyPaths(writer, value, writeContext);
+
+            switch (value)
+            {
+                case ApiRelationshipScalarKeyPath apiRelationshipScalarKeyPath:
+                    WriteClrPropertyName(writer, apiRelationshipScalarKeyPath, writeContext);
+                    break;
+
+                case ApiRelationshipNestedKeyPath apiRelationshipNestedKeyPath:
+                    WriteClrPropertyName(writer, apiRelationshipNestedKeyPath, writeContext);
+                    WriteApiKeyPaths(writer, apiRelationshipNestedKeyPath, writeContext);
+                    break;
+
+                case ApiRelationshipOwnerKeyPath apiRelationshipOwnerKeyPath:
+                    WriteApiKeyPaths(writer, apiRelationshipOwnerKeyPath, writeContext);
+                    break;
+            }
 
             WriteExtensibleBaseExtensions(writer, writeContext.PropertyNames.ExtensibleBase.Extensions, value, writeContext);
         });
@@ -221,32 +237,43 @@ public class ApiRelationshipKeyPathJsonConverter(ILogger<ApiRelationshipKeyPathJ
         writer.TryWritePropertyWithConverter(propertyName, path.ApiKind, context.Options, _apiKindJsonConverter);
     }
 
-    private static void WriteClrPropertyName(Utf8JsonWriter writer, ApiRelationshipKeyPath path, DefaultWriteContext<PropertyNames> context)
+    private static void WriteClrPropertyName(Utf8JsonWriter writer, ApiRelationshipScalarKeyPath path, DefaultWriteContext<PropertyNames> context)
     {
-        var value = path.ApiKind switch
-        {
-            ApiRelationshipKeyPathKind.Scalar => ((ApiRelationshipScalarKeyPath)path).ClrPropertyName,
-            ApiRelationshipKeyPathKind.Nested => ((ApiRelationshipNestedKeyPath)path).ClrPropertyName,
-            _ => null
-        };
-
         var propertyName = context.PropertyNames.ApiRelationshipKeyPath.ClrPropertyName;
+        var value = path.ClrPropertyName;
+
         writer.TryWritePropertyAsString(propertyName, value, context.Options);
     }
 
-    private static void WriteApiKeyPaths(Utf8JsonWriter writer, ApiRelationshipKeyPath path, DefaultWriteContext<PropertyNames> context)
+    private static void WriteClrPropertyName(Utf8JsonWriter writer, ApiRelationshipNestedKeyPath path, DefaultWriteContext<PropertyNames> context)
     {
-        var value = path.ApiKind switch
-        {
-            ApiRelationshipKeyPathKind.Nested => ((ApiRelationshipNestedKeyPath)path).ApiKeyPaths,
-            ApiRelationshipKeyPathKind.Owner => ((ApiRelationshipOwnerKeyPath)path).ApiKeyPaths,
-            _ => null
-        };
+        var propertyName = context.PropertyNames.ApiRelationshipKeyPath.ClrPropertyName;
+        var value = path.ClrPropertyName;
 
+        writer.TryWritePropertyAsString(propertyName, value, context.Options);
+    }
+
+    private static void WriteApiKeyPaths(Utf8JsonWriter writer, ApiRelationshipNestedKeyPath path, DefaultWriteContext<PropertyNames> context)
+    {
         var propertyName = context.PropertyNames.ApiRelationshipKeyPath.ApiKeyPaths;
+        var value = path.ApiKeyPaths;
         var options = context.Options;
 
-        // Recursive: each child element uses the same converter via the [JsonConverter] attribute on ApiRelationshipKeyPath.
+        writer.TryWritePropertyWithAction
+        (
+            propertyName,
+            value,
+            options,
+            collection => WriteJsonArray(writer, collection, item => writer.TryWriteWithSerializer(item, options))
+        );
+    }
+
+    private static void WriteApiKeyPaths(Utf8JsonWriter writer, ApiRelationshipOwnerKeyPath path, DefaultWriteContext<PropertyNames> context)
+    {
+        var propertyName = context.PropertyNames.ApiRelationshipKeyPath.ApiKeyPaths;
+        var value = path.ApiKeyPaths;
+        var options = context.Options;
+
         writer.TryWritePropertyWithAction
         (
             propertyName,

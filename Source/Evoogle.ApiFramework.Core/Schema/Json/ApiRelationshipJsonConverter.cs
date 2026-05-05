@@ -194,25 +194,31 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
         var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
         var readData = readContext.ReadData.ApiRelationship;
 
-        if (readData?.ApiKind is null || readData.ApiName is null)
+        if (readData?.ApiKind is null)
         {
             return null;
         }
 
-        ApiRelationship? relationship = readData.ApiKind.Value switch
+        var apiKindValue = readData.ApiKind.Value;
+        ApiRelationship? relationship = apiKindValue switch
         {
-            ApiRelationshipKind.OneToOne => new ApiRelationshipOneToOne(
-                readData.ApiName,
+            ApiRelationshipKind.OneToOne => new ApiRelationshipOneToOne
+            (
+                readData.ApiName!,
                 readData.ApiPrincipalEnd!,
-                readData.ApiDependentEnd!),
+                readData.ApiDependentEnd!
+            ),
 
-            ApiRelationshipKind.OneToMany => new ApiRelationshipOneToMany(
-                readData.ApiName,
+            ApiRelationshipKind.OneToMany => new ApiRelationshipOneToMany
+            (
+                readData.ApiName!,
                 readData.ApiPrincipalEnd!,
-                readData.ApiDependentEnd!),
+                readData.ApiDependentEnd!
+            ),
 
-            ApiRelationshipKind.ManyToMany => new ApiRelationshipManyToMany(
-                readData.ApiName,
+            ApiRelationshipKind.ManyToMany => new ApiRelationshipManyToMany
+            (
+                readData.ApiName!,
                 readData.ApiPrincipalEndA!,
                 readData.ApiPrincipalEndB!,
                 // Re-apply forced Cascade when deserializing M:N dependent ends.
@@ -226,15 +232,15 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
                     readData.ApiDependentEndB.ApiKeyPaths,
                     ApiRelationshipDeleteBehavior.None,
                     ApiRelationshipDeleteBehavior.Cascade),
-                readData.ClrAssociationObjectType!),
+                readData.ClrAssociationObjectType!
+            ),
 
             _ => null
         };
 
         if (relationship is null)
         {
-            readContext.Logger.LogError("Unsupported {ApiKind} enumeration value: '{ApiKindValue}'",
-                nameof(ApiRelationshipKind), readData.ApiKind);
+            readContext.Logger.LogError("Unsupported {ApiKind} enumeration value: '{ApiKindValue}'", nameof(ApiRelationshipKind), apiKindValue);
             return null;
         }
 
@@ -290,73 +296,91 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
     private static void WriteApiPrincipalEnd(Utf8JsonWriter writer, ApiRelationshipOneTo relationship, DefaultWriteContext<PropertyNames> context)
     {
         var propertyName = context.PropertyNames.ApiRelationship.ApiPrincipalEnd;
+        var end = (ApiRelationshipEnd)relationship.ApiPrincipalEnd; // Upcast to base type for serialization
         var options = context.Options;
 
-        writer.TryWritePropertyWithAction(
+        writer.TryWritePropertyWithAction
+        (
             propertyName,
-            relationship.ApiPrincipalEnd,
+            end,
             options,
-            end => writer.TryWriteWithSerializer(end, options));
+            end => writer.TryWriteWithSerializer(end, options)
+        );
     }
 
     private static void WriteApiDependentEnd(Utf8JsonWriter writer, ApiRelationshipOneTo relationship, DefaultWriteContext<PropertyNames> context)
     {
         var propertyName = context.PropertyNames.ApiRelationship.ApiDependentEnd;
+        var end = (ApiRelationshipEnd)relationship.ApiDependentEnd; // Upcast to base type for serialization
         var options = context.Options;
 
-        writer.TryWritePropertyWithAction(
+        writer.TryWritePropertyWithAction
+        (
             propertyName,
-            relationship.ApiDependentEnd,
+            end,
             options,
-            end => writer.TryWriteWithSerializer(end, options));
+            end => writer.TryWriteWithSerializer(end, options)
+        );
     }
 
     private static void WriteApiPrincipalEndA(Utf8JsonWriter writer, ApiRelationshipManyToMany relationship, DefaultWriteContext<PropertyNames> context)
     {
         var propertyName = context.PropertyNames.ApiRelationship.ApiPrincipalEndA;
+        var end = (ApiRelationshipEnd)relationship.ApiPrincipalEndA; // Upcast to base type for serialization
         var options = context.Options;
 
-        writer.TryWritePropertyWithAction(
+        writer.TryWritePropertyWithAction
+        (
             propertyName,
-            relationship.ApiPrincipalEndA,
+            end,
             options,
-            end => writer.TryWriteWithSerializer(end, options));
+            end => writer.TryWriteWithSerializer(end, options)
+        );
     }
 
     private static void WriteApiPrincipalEndB(Utf8JsonWriter writer, ApiRelationshipManyToMany relationship, DefaultWriteContext<PropertyNames> context)
     {
         var propertyName = context.PropertyNames.ApiRelationship.ApiPrincipalEndB;
+        var end = (ApiRelationshipEnd)relationship.ApiPrincipalEndB; // Upcast to base type for serialization
         var options = context.Options;
 
-        writer.TryWritePropertyWithAction(
+        writer.TryWritePropertyWithAction
+        (
             propertyName,
-            relationship.ApiPrincipalEndB,
+            end,
             options,
-            end => writer.TryWriteWithSerializer(end, options));
+            end => writer.TryWriteWithSerializer(end, options)
+        );
     }
 
     private static void WriteApiDependentEndA(Utf8JsonWriter writer, ApiRelationshipManyToMany relationship, DefaultWriteContext<PropertyNames> context)
     {
         var propertyName = context.PropertyNames.ApiRelationship.ApiDependentEndA;
+        var end = (ApiRelationshipEnd)relationship.ApiDependentEndA; // Upcast to base type for serialization
         var options = context.Options;
 
-        writer.TryWritePropertyWithAction(
+        writer.TryWritePropertyWithAction
+        (
             propertyName,
-            relationship.ApiDependentEndA,
+            end,
             options,
-            end => writer.TryWriteWithSerializer(end, options));
+            end => writer.TryWriteWithSerializer(end, options)
+        );
     }
 
     private static void WriteApiDependentEndB(Utf8JsonWriter writer, ApiRelationshipManyToMany relationship, DefaultWriteContext<PropertyNames> context)
     {
         var propertyName = context.PropertyNames.ApiRelationship.ApiDependentEndB;
+        var end = (ApiRelationshipEnd)relationship.ApiDependentEndB; // Upcast to base type for serialization
         var options = context.Options;
 
-        writer.TryWritePropertyWithAction(
+        writer.TryWritePropertyWithAction
+        (
             propertyName,
-            relationship.ApiDependentEndB,
+            end,
             options,
-            end => writer.TryWriteWithSerializer(end, options));
+            end => writer.TryWriteWithSerializer(end, options)
+        );
     }
 
     private static void WriteClrAssociationObjectType(Utf8JsonWriter writer, ApiRelationshipManyToMany relationship, DefaultWriteContext<PropertyNames> context)

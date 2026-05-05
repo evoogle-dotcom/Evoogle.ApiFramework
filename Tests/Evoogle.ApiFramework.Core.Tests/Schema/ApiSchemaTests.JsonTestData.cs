@@ -153,7 +153,6 @@ public partial class ApiSchemaTests
             FactoryArgument = new ApiSchemaDef
             (
                 ApiName: $"{nameof(ApiSchema)} With 1 {nameof(ApiScalarType)} And {nameof(GraphQlExtension)}",
-                ExtensionTypes: [ typeof(GraphQlExtension) ],
                 ApiNamedTypes:
                 [
                     new ApiScalarTypeDef
@@ -161,7 +160,8 @@ public partial class ApiSchemaTests
                         ApiName: nameof(Boolean),
                         ClrType: typeof(bool)
                     )
-                ]
+                ],
+                ExtensionTypes: [ typeof(GraphQlExtension) ]
             ),
             Json = @"
             {
@@ -297,7 +297,6 @@ public partial class ApiSchemaTests
             FactoryArgument = new ApiSchemaDef
             (
                 ApiName: $"{nameof(ApiSchema)} With 3 {nameof(ApiScalarType)} And {nameof(GraphQlExtension)} And {nameof(JsonApiExtension)}",
-                ExtensionTypes: [ typeof(GraphQlExtension), typeof(JsonApiExtension) ],
                 ApiNamedTypes:
                 [
                     new ApiScalarTypeDef
@@ -315,7 +314,8 @@ public partial class ApiSchemaTests
                         ApiName: nameof(String),
                         ClrType: typeof(string)
                     ),
-                ]
+                ],
+                ExtensionTypes: [ typeof(GraphQlExtension), typeof(JsonApiExtension) ]
             ),
             Json = @"
             {
@@ -415,7 +415,6 @@ public partial class ApiSchemaTests
             FactoryArgument = new ApiSchemaDef
             (
                 ApiName: $"{nameof(ApiSchema)} With 1 {nameof(ApiEnumType)} And {nameof(ProtobufExtension)}",
-                ExtensionTypes: [ typeof(ProtobufExtension) ],
                 ApiNamedTypes:
                 [
                     new ApiEnumTypeDef
@@ -423,7 +422,8 @@ public partial class ApiSchemaTests
                         ApiName: nameof(Gender),
                         ClrType: typeof(Gender)
                     )
-                ]
+                ],
+                ExtensionTypes: [ typeof(ProtobufExtension) ]
             ),
             Json = @"
             {
@@ -742,7 +742,6 @@ public partial class ApiSchemaTests
             FactoryArgument = new ApiSchemaDef
             (
                 ApiName: $"{nameof(ApiSchema)} With 3 {nameof(ApiScalarType)} And 1 {nameof(ApiEnumType)} And 1 {nameof(ApiObjectType)} (Person) And {nameof(GraphQlExtension)} And {nameof(JsonApiExtension)}",
-                ExtensionTypes: [ typeof(GraphQlExtension), typeof(JsonApiExtension) ],
                 ApiNamedTypes:
                 [
                     new ApiScalarTypeDef
@@ -854,7 +853,8 @@ public partial class ApiSchemaTests
                             ),
                         ]
                     ),
-                ]
+                ],
+                ExtensionTypes: [ typeof(GraphQlExtension), typeof(JsonApiExtension) ]
             ),
             Json = @"
             {
@@ -3741,6 +3741,427 @@ public partial class ApiSchemaTests
                     }
                 ],
                 ""ApiRelationships"": []
+            }"
+        },
+
+        // ApiSchema With Relationship Schema (RelationshipUser, RelationshipUserProfile)
+        new ApiSchemaJsonTestCase
+        {
+            Name = $"{nameof(ApiSchema)} With Relationship Schema for One-To-One Relationship",
+            FactoryArgument = new ApiSchemaDef
+            (
+                ApiName: $"{nameof(ApiSchema)} With Relationship Schema for One-To-One Relationship",
+                ApiNamedTypes:
+                [
+                    new ApiScalarTypeDef
+                    (
+                        ApiName: nameof(String),
+                        ClrType: typeof(string)
+                    ),
+                    new ApiScalarTypeDef
+                    (
+                        ApiName: nameof(Ulid),
+                        ClrType: typeof(Ulid)
+                    ),
+                    // RelationshipUser
+                    new ApiObjectTypeDef
+                    (
+                        ApiName: nameof(RelationshipUser),
+                        ClrType: typeof(RelationshipUser),
+                        ApiIdentities:
+                        [
+                            new ApiIdentityDef
+                            (
+                                ApiName: "PK_RelationshipUser_Id",
+                                Parts:
+                                [
+                                    new ApiScalarPartDef
+                                    (
+                                        ApiPropertyName: nameof(RelationshipUser.Id)
+                                    )
+                                ]
+                            )
+                        ],
+                        ApiProperties:
+                        [
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(RelationshipUser.Id),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Ulid)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(RelationshipUser.Id),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(RelationshipUser.UserName),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(RelationshipUser.UserName),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(RelationshipUser.Profile),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(RelationshipUserProfile)),
+                                ApiTypeModifiers: ApiTypeModifiers.None,
+                                ClrName: nameof(RelationshipUser.Profile),
+                                ClrMemberKind: ClrMemberKind.Property
+                            )
+                        ]
+                    ),
+                    // RelationshipUserProfile
+                    new ApiObjectTypeDef
+                    (
+                        ApiName: nameof(RelationshipUserProfile),
+                        ClrType: typeof(RelationshipUserProfile),
+                        ApiIdentities:
+                        [
+                            new ApiIdentityDef
+                            (
+                                ApiName: "PK_RelationshipUserProfile_UserId",
+                                Parts:
+                                [
+                                    new ApiScalarPartDef
+                                    (
+                                        ApiPropertyName: nameof(RelationshipUserProfile.UserId)
+                                    )
+                                ]
+                            ),
+                            new ApiIdentityDef
+                            (
+                                ApiName: "AK_RelationshipUserProfile_UserRef",
+                                Parts:
+                                [
+                                    new ApiNestedPartDef
+                                    (
+                                        ApiPropertyName: nameof(RelationshipUserProfile.UserRef)
+                                    )
+                                ]
+                            )
+                        ],
+                        ApiProperties:
+                        [
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(RelationshipUserProfile.UserId),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Ulid)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(RelationshipUserProfile.UserId),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(RelationshipUserProfile.UserRef),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(RelationshipUserRef)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(RelationshipUserProfile.UserRef),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(RelationshipUserProfile.DisplayName),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(RelationshipUserProfile.DisplayName),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(RelationshipUserProfile.User),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(RelationshipUser)),
+                                ApiTypeModifiers: ApiTypeModifiers.None,
+                                ClrName: nameof(RelationshipUserProfile.User),
+                                ClrMemberKind: ClrMemberKind.Property
+                            )
+                        ]
+                    ),
+                    // RelationshipUserRef
+                    new ApiObjectTypeDef
+                    (
+                        ApiName: nameof(RelationshipUserRef),
+                        ClrType: typeof(RelationshipUserRef),
+                        ApiIdentities:
+                        [
+                            new ApiIdentityDef
+                            (
+                                ApiName: "PK_RelationshipUserRef_UserId",
+                                Parts:
+                                [
+                                    new ApiScalarPartDef
+                                    (
+                                        ApiPropertyName: nameof(RelationshipUserRef.UserId)
+                                    )
+                                ]
+                            )
+                        ],
+                        ApiProperties:
+                        [
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(RelationshipUserRef.UserId),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Ulid)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(RelationshipUserRef.UserId),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                        ]
+                    ),
+                ],
+                ApiRelationships:
+                [
+                    new ApiOneToOneRelationshipDef
+                    (
+                        ApiName: "User_Profile_ScalarFK",
+                        PrincipalEnd: new ApiPrincipalEndDef
+                        (
+                            ClrObjectType: typeof(RelationshipUser),
+                            ApiDeleteBehavior: ApiRelationshipDeleteBehavior.None
+                        ),
+                        DependentEnd: new ApiDependentEndDef
+                        (
+                            ClrObjectType: typeof(RelationshipUserProfile),
+                            ApiDeleteBehavior: ApiRelationshipDeleteBehavior.Cascade,
+                            ApiKeyPaths: [new ApiRelationshipScalarKeyPathDef(ClrPropertyName: nameof(RelationshipUserProfile.UserId))]
+                        )
+                    ),
+                    new ApiOneToOneRelationshipDef
+                    (
+                        ApiName: "User_Profile_NestedFK",
+                        PrincipalEnd: new ApiPrincipalEndDef
+                        (
+                            ClrObjectType: typeof(RelationshipUser),
+                            ApiDeleteBehavior: ApiRelationshipDeleteBehavior.None
+                        ),
+                        DependentEnd: new ApiDependentEndDef
+                        (
+                            ClrObjectType: typeof(RelationshipUserProfile),
+                            ApiDeleteBehavior: ApiRelationshipDeleteBehavior.Cascade,
+                            ApiKeyPaths:
+                            [
+                                new ApiRelationshipNestedKeyPathDef
+                                (
+                                    ClrPropertyName: nameof(RelationshipUserProfile.UserRef),
+                                    ApiKeyPaths: [new ApiRelationshipScalarKeyPathDef(ClrPropertyName: nameof(RelationshipUserRef.UserId))]
+                                )
+                            ]
+                        )
+                    )
+                ]
+            ),
+            Json = @"
+            {
+                ""ApiName"": ""ApiSchema With Relationship Schema for One-To-One Relationship"",
+                ""ApiVersion"": ""0.1.0"",
+                ""ApiOptions"": {
+                    ""ApiIdentityPartNullHandling"": ""UseDefaultOnNull""
+                },
+                ""ApiScalarTypes"": [
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""String"",
+                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                    },
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""Ulid"",
+                        ""ClrType"": ""System.Ulid,Ulid""
+                    }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""RelationshipUser"",
+                        ""ApiIdentities"": [
+                            {
+                                ""ApiName"": ""PK_RelationshipUser_Id"",
+                                ""ApiIdentityParts"": [
+                                    {
+                                        ""ApiKind"": ""Scalar"",
+                                        ""ClrPropertyName"": ""Id""
+                                    }
+                                ]
+                            }
+                        ],
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""Id"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""Ulid""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Id"",
+                                ""ClrMemberKind"": ""Property""
+                            },
+                            {
+                                ""ApiName"": ""UserName"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""String""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""UserName"",
+                                ""ClrMemberKind"": ""Property""
+                            },
+                            {
+                                ""ApiName"": ""Profile"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Object"",
+                                    ""ApiName"": ""RelationshipUserProfile""
+                                },
+                                ""ApiTypeModifiers"": ""None"",
+                                ""ClrName"": ""Profile"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.RelationshipUser,Evoogle.ApiFramework.Core.Tests""
+                    },
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""RelationshipUserProfile"",
+                        ""ApiIdentities"": [
+                            {
+                                ""ApiName"": ""PK_RelationshipUserProfile_UserId"",
+                                ""ApiIdentityParts"": [
+                                    {
+                                        ""ApiKind"": ""Scalar"",
+                                        ""ClrPropertyName"": ""UserId""
+                                    }
+                                ]
+                            },
+                            {
+                                ""ApiName"": ""AK_RelationshipUserProfile_UserRef"",
+                                ""ApiIdentityParts"": [
+                                    {
+                                        ""ApiKind"": ""Nested"",
+                                        ""ClrPropertyName"": ""UserRef""
+                                    }
+                                ]
+                            }
+                        ],
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""UserId"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""Ulid""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""UserId"",
+                                ""ClrMemberKind"": ""Property""
+                            },
+                            {
+                                ""ApiName"": ""UserRef"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Object"",
+                                    ""ApiName"": ""RelationshipUserRef""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""UserRef"",
+                                ""ClrMemberKind"": ""Property""
+                            },
+                            {
+                                ""ApiName"": ""DisplayName"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""String""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""DisplayName"",
+                                ""ClrMemberKind"": ""Property""
+                            },
+                            {
+                                ""ApiName"": ""User"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Object"",
+                                    ""ApiName"": ""RelationshipUser""
+                                },
+                                ""ApiTypeModifiers"": ""None"",
+                                ""ClrName"": ""User"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.RelationshipUserProfile,Evoogle.ApiFramework.Core.Tests""
+                    },
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""RelationshipUserRef"",
+                        ""ApiIdentities"": [
+                            {
+                                ""ApiName"": ""PK_RelationshipUserRef_UserId"",
+                                ""ApiIdentityParts"": [
+                                    {
+                                        ""ApiKind"": ""Scalar"",
+                                        ""ClrPropertyName"": ""UserId""
+                                    }
+                                ]
+                            }
+                        ],
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""UserId"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""Ulid""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""UserId"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.RelationshipUserRef,Evoogle.ApiFramework.Core.Tests""
+                    }
+                ],
+                ""ApiRelationships"": [
+                    {
+                        ""ApiKind"": ""OneToOne"",
+                        ""ApiName"": ""User_Profile_NestedFK"",
+                        ""ApiPrincipalEnd"": {
+                            ""ApiKind"": ""Principal"",
+                            ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipUser,Evoogle.ApiFramework.Core.Tests"",
+                            ""ApiDeleteBehavior"": ""None""
+                        },
+                        ""ApiDependentEnd"": {
+                            ""ApiKind"": ""Dependent"",
+                            ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipUserProfile,Evoogle.ApiFramework.Core.Tests"",
+                            ""ApiDeleteBehavior"": ""Cascade"",
+                            ""ApiKeyPaths"": [
+                                {
+                                    ""ApiKind"": ""Nested"",
+                                    ""ClrPropertyName"": ""UserRef"",
+                                    ""ApiKeyPaths"": [
+                                        {
+                                            ""ApiKind"": ""Scalar"",
+                                            ""ClrPropertyName"": ""UserId""
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        ""ApiKind"": ""OneToOne"",
+                        ""ApiName"": ""User_Profile_ScalarFK"",
+                        ""ApiPrincipalEnd"": {
+                            ""ApiKind"": ""Principal"",
+                            ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipUser,Evoogle.ApiFramework.Core.Tests"",
+                            ""ApiDeleteBehavior"": ""None""
+                        },
+                        ""ApiDependentEnd"": {
+                            ""ApiKind"": ""Dependent"",
+                            ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipUserProfile,Evoogle.ApiFramework.Core.Tests"",
+                            ""ApiDeleteBehavior"": ""Cascade"",
+                            ""ApiKeyPaths"": [
+                                {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ClrPropertyName"": ""UserId""
+                                }
+                            ]
+                        }
+                    }
+                ]
             }"
         },
     ];

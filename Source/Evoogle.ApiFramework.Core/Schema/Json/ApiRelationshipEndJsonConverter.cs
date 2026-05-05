@@ -158,36 +158,34 @@ public class ApiRelationshipEndJsonConverter(ILogger<ApiRelationshipEndJsonConve
         var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
         var readData = readContext.ReadData.ApiRelationshipEnd;
 
-        if (readData?.ApiKind is null || readData.ClrObjectType is null)
+        if (readData?.ApiKind is null)
         {
             return null;
         }
 
-        var end = default(ApiRelationshipEnd);
-        switch (readData.ApiKind.Value)
+        var apiKindValue = readData.ApiKind.Value;
+        ApiRelationshipEnd? end = apiKindValue switch
         {
-            case ApiRelationshipEndKind.Principal:
-                end = new ApiRelationshipPrincipalEnd(
-                    readData.ClrObjectType,
-                    readData.ApiIdentityName,
-                    readData.ApiDeleteBehavior ?? ApiRelationshipDeleteBehavior.None);
-                break;
+            ApiRelationshipEndKind.Principal => new ApiRelationshipPrincipalEnd
+            (
+                readData.ClrObjectType!,
+                readData.ApiIdentityName,
+                readData.ApiDeleteBehavior ?? ApiRelationshipDeleteBehavior.None
+            ),
 
-            case ApiRelationshipEndKind.Dependent:
-                end = new ApiRelationshipDependentEnd(
-                    readData.ClrObjectType,
-                    readData.ApiKeyPaths,
-                    readData.ApiDeleteBehavior ?? ApiRelationshipDeleteBehavior.None);
-                break;
+            ApiRelationshipEndKind.Dependent => new ApiRelationshipDependentEnd
+            (
+                readData.ClrObjectType!,
+                readData.ApiKeyPaths,
+                readData.ApiDeleteBehavior ?? ApiRelationshipDeleteBehavior.None
+            ),
 
-            default:
-                readContext.Logger.LogError("Unsupported {ApiKind} enumeration value: '{ApiKindValue}'",
-                    nameof(ApiRelationshipEndKind), readData.ApiKind);
-                break;
-        }
+            _ => null
+        };
 
         if (end is null)
         {
+            readContext.Logger.LogError("Unsupported {ApiKind} enumeration value: '{ApiKindValue}'", nameof(ApiRelationshipEndKind), apiKindValue);
             return null;
         }
 
@@ -212,8 +210,17 @@ public class ApiRelationshipEndJsonConverter(ILogger<ApiRelationshipEndJsonConve
             WriteApiKind(writer, value, writeContext);
             WriteClrObjectType(writer, value, writeContext);
             WriteApiDeleteBehavior(writer, value, writeContext);
-            WriteApiIdentityName(writer, value, writeContext);
-            WriteApiKeyPaths(writer, value, writeContext);
+
+            switch (value)
+            {
+                case ApiRelationshipPrincipalEnd apiRelationshipPrincipalEnd:
+                    WriteApiIdentityName(writer, apiRelationshipPrincipalEnd, writeContext);
+                    break;
+
+                case ApiRelationshipDependentEnd apiRelationshipDependentEnd:
+                    WriteApiKeyPaths(writer, apiRelationshipDependentEnd, writeContext);
+                    break;
+            }
 
             WriteExtensibleBaseExtensions(writer, writeContext.PropertyNames.ExtensibleBase.Extensions, value, writeContext);
         });
@@ -230,29 +237,27 @@ public class ApiRelationshipEndJsonConverter(ILogger<ApiRelationshipEndJsonConve
     private static void WriteApiDeleteBehavior(Utf8JsonWriter writer, ApiRelationshipEnd end, DefaultWriteContext<PropertyNames> context)
         => writer.TryWritePropertyWithConverter(context.PropertyNames.ApiRelationshipEnd.ApiDeleteBehavior, end.ApiDeleteBehavior, context.Options, _deleteBehaviorConverter);
 
-    private static void WriteApiIdentityName(Utf8JsonWriter writer, ApiRelationshipEnd end, DefaultWriteContext<PropertyNames> context)
+    private static void WriteApiIdentityName(Utf8JsonWriter writer, ApiRelationshipPrincipalEnd end, DefaultWriteContext<PropertyNames> context)
     {
-        var value = end.ApiKind == ApiRelationshipEndKind.Principal
-            ? ((ApiRelationshipPrincipalEnd)end).ApiIdentityName
-            : null;
+        var propertyName = context.PropertyNames.ApiRelationshipEnd.ApiIdentityName;
+        var value = end.ApiIdentityName;
 
-        writer.TryWritePropertyAsString(context.PropertyNames.ApiRelationshipEnd.ApiIdentityName, value, context.Options);
+        writer.TryWritePropertyAsString(propertyName, value, context.Options);
     }
 
-    private static void WriteApiKeyPaths(Utf8JsonWriter writer, ApiRelationshipEnd end, DefaultWriteContext<PropertyNames> context)
+    private static void WriteApiKeyPaths(Utf8JsonWriter writer, ApiRelationshipDependentEnd end, DefaultWriteContext<PropertyNames> context)
     {
-        var value = end.ApiKind == ApiRelationshipEndKind.Dependent
-            ? ((ApiRelationshipDependentEnd)end).ApiKeyPaths
-            : null;
-
         var propertyName = context.PropertyNames.ApiRelationshipEnd.ApiKeyPaths;
+        var value = end.ApiKeyPaths;
         var options = context.Options;
 
-        writer.TryWritePropertyWithAction(
+        writer.TryWritePropertyWithAction
+        (
             propertyName,
             value,
             options,
-            collection => WriteJsonArray(writer, collection, item => writer.TryWriteWithSerializer(item, options)));
+            collection => WriteJsonArray(writer, collection, item => writer.TryWriteWithSerializer(item, options))
+        );
     }
     #endregion
 }

@@ -25,8 +25,8 @@ namespace Evoogle.ApiFramework.Schema;
 /// </param>
 /// <param name="apiForcedDeleteBehavior">
 ///     An optional delete behavior that, when set, overrides <paramref name="apiDeleteBehavior"/> and cannot
-///     be changed by the developer.  Used internally by <see cref="ApiRelationshipManyToMany"/> to fix
-///     the cascade behavior on both association ends.
+///     be changed by the developer.
+///     Used internally by <see cref="ApiRelationshipManyToMany"/> to fix the cascade behavior on both association ends.
 /// </param>
 public sealed class ApiRelationshipDependentEnd
 (
