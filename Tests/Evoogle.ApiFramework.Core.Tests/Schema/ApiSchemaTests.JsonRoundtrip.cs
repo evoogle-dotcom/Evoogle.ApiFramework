@@ -11,7 +11,7 @@ public partial class ApiSchemaTests
 {
     #region Theory Data
     public static TheoryDataRow<IXUnitTest>[] JsonRoundtripTheoryData =>
-        [.. JsonTestCases
+        [.. SimpleJsonTestCases.Union(IdentityJsonTestCases).Union(RelationshipJsonTestCases)
             .Select(c => (TheoryDataRow<IXUnitTest>)new JsonRoundtripTest
             {
                 Name = c.Name,

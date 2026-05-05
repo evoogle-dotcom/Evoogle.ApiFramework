@@ -12,8 +12,13 @@ public class RelationshipUser
 {
     public Ulid Id { get; set; }
     public string UserName { get; set; } = string.Empty;
-    public RelationshipUserProfile? Profile { get; set; } // navigational property for one-to-one tests
-    public List<RelationshipPost> Posts { get; set; } = [];
+
+    // TODO: Need a deep dive on how I want to handle "navigation properties"
+    public RelationshipUserProfile? Profile { get; set; }   // navigational property for one-to-one tests
+
+    // TODO: Need a deep dive on how I want to handle "navigation properties"
+    // TODO: Should this be optional or required?
+    public List<RelationshipPost> Posts { get; set; } = []; // navigational property for one-to-many tests
 
     public override string ToString()
     {
@@ -36,7 +41,9 @@ public class RelationshipUserProfile
 
     public string DisplayName { get; set; } = string.Empty;
 
-    public RelationshipUser? User { get; set; } // navigational property back to principal for one-to-one tests
+    // TODO: Need a deep dive on how I want to handle "navigation properties"
+    // TODO: Should this be optional or required? Technically this should be required but what does that really mean?
+    public RelationshipUser User { get; set; } = null!; // navigational property back to principal for one-to-one tests
 
     public override string ToString()
     {
@@ -68,6 +75,10 @@ public class RelationshipPost
     public string Title { get; set; } = string.Empty;
     public List<RelationshipComment> Comments { get; set; } = [];
     public List<RelationshipPostTag> PostTags { get; set; } = [];
+
+    // TODO: Need a deep dive on how I want to handle "navigation properties"
+    // TODO: Should this be optional or required? Technically this should be required but what does that really mean?
+    public RelationshipUser User { get; set; } = null!; // navigational property back to principal for one-to-one tests
 
     public override string ToString()
     {
