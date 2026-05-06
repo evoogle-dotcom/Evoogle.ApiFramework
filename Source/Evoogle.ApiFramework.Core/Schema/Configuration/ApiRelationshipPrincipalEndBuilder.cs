@@ -10,8 +10,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 /// </summary>
 /// <remarks>
 ///     The principal end owns the join key identity.  Use <see cref="WithIdentityName"/> to select a
-///     non-primary identity, and <see cref="WithDeleteBehavior"/> to control what happens to dependent
-///     objects when an object on this end is deleted.
+///     non-primary identity. Delete behavior is configured on the relationship builder, not on individual ends.
 /// </remarks>
 /// <param name="clrObjectType">The CLR type of the principal <see cref="ApiObjectType"/>.</param>
 public sealed class ApiRelationshipPrincipalEndBuilder
@@ -21,7 +20,6 @@ public sealed class ApiRelationshipPrincipalEndBuilder
 {
     #region Fields
     private string? _apiIdentityName;
-    private ApiRelationshipDeleteBehavior _apiDeleteBehavior = ApiRelationshipDeleteBehavior.None;
     #endregion
 
     #region AddExtension Methods
@@ -61,17 +59,6 @@ public sealed class ApiRelationshipPrincipalEndBuilder
         _apiIdentityName = apiIdentityName;
         return this;
     }
-
-    /// <summary>
-    ///     Sets the delete behavior that governs what happens to the dependent objects when a principal object is deleted.
-    /// </summary>
-    /// <param name="apiDeleteBehavior">The desired delete behavior.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiRelationshipPrincipalEndBuilder WithDeleteBehavior(ApiRelationshipDeleteBehavior apiDeleteBehavior)
-    {
-        _apiDeleteBehavior = apiDeleteBehavior;
-        return this;
-    }
     #endregion
 
     #region Build Methods
@@ -83,8 +70,7 @@ public sealed class ApiRelationshipPrincipalEndBuilder
         var end = new ApiRelationshipPrincipalEnd
         (
             clrObjectType,
-            _apiIdentityName,
-            _apiDeleteBehavior
+            _apiIdentityName
         );
 
         var extensions = this.BuildExtensions();

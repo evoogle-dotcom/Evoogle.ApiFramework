@@ -15,14 +15,14 @@ namespace Evoogle.ApiFramework.Schema;
 /// <remarks>
 ///     Concrete subclasses are <see cref="ApiRelationshipOneToOne"/> and <see cref="ApiRelationshipOneToMany"/>.
 ///     The FK always resides on the dependent side; the principal side owns the join-key identity.
-///     Self-referential relationships are supported by setting both ends to the same
-///     <see cref="ApiRelationshipEnd.ClrObjectType"/>.
+///     Self-referential relationships are supported by setting both ends to the same <see cref="ApiRelationshipEnd.ClrObjectType"/>.
 /// </remarks>
 public abstract class ApiRelationshipOneTo
 (
     string apiName,
     ApiRelationshipPrincipalEnd apiPrincipalEnd,
-    ApiRelationshipDependentEnd apiDependentEnd
+    ApiRelationshipDependentEnd apiDependentEnd,
+    ApiRelationshipDeleteBehavior apiDeleteBehavior = ApiRelationshipDeleteBehavior.None
 ) : ApiRelationship(apiName)
 {
     #region ApiRelationshipOneTo Properties
@@ -31,6 +31,15 @@ public abstract class ApiRelationshipOneTo
 
     /// <summary>Gets the dependent end of the relationship, which holds the FK key paths.</summary>
     public ApiRelationshipDependentEnd ApiDependentEnd { get; } = apiDependentEnd;
+
+    /// <summary>
+    ///     Gets the delete behavior that governs what happens to related objects when either end is affected.
+    ///     <list type="bullet">
+    ///         <item><description><strong>Principal deleted:</strong> what happens to dependent objects when the principal is deleted.</description></item>
+    ///         <item><description><strong>Dependent orphaned:</strong> what happens to a dependent when it is removed from the relationship.</description></item>
+    ///     </list>
+    /// </summary>
+    public ApiRelationshipDeleteBehavior ApiDeleteBehavior { get; } = apiDeleteBehavior;
     #endregion
 
     #region Object Methods
@@ -39,11 +48,12 @@ public abstract class ApiRelationshipOneTo
     {
         var apiName = this.ApiName.SafeToString();
         var apiKind = this.ApiKind.SafeToString();
+        var apiDeleteBehavior = this.ApiDeleteBehavior.SafeToString();
         var principalType = this.ApiPrincipalEnd?.ClrObjectType?.Name.SafeToString();
         var dependentType = this.ApiDependentEnd?.ClrObjectType?.Name.SafeToString();
         var extensionCount = this.ExtensionCount.SafeToString();
 
-        return $"{this.GetType().Name} {{{nameof(this.ApiKind)}={apiKind}, {nameof(this.ApiName)}={apiName}, Principal={principalType}, Dependent={dependentType}, {nameof(this.ExtensionCount)}={extensionCount}}}";
+        return $"{this.GetType().Name} {{{nameof(this.ApiKind)}={apiKind}, {nameof(this.ApiName)}={apiName}, {nameof(this.ApiDeleteBehavior)}={apiDeleteBehavior}, Principal={principalType}, Dependent={dependentType}, {nameof(this.ExtensionCount)}={extensionCount}}}";
     }
     #endregion
 

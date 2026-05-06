@@ -19,22 +19,11 @@ namespace Evoogle.ApiFramework.Schema;
 ///     on the dependent object graph. When <see langword="null"/>, the relationship is purely
 ///     navigational with no explicit FK binding declared at the schema level.
 /// </param>
-/// <param name="apiDeleteBehavior">
-///     The delete behavior applied to principal objects when an object on this end is deleted.
-///     Defaults to <see cref="ApiRelationshipDeleteBehavior.None"/>.
-/// </param>
-/// <param name="apiForcedDeleteBehavior">
-///     An optional delete behavior that, when set, overrides <paramref name="apiDeleteBehavior"/> and cannot
-///     be changed by the developer.
-///     Used internally by <see cref="ApiRelationshipManyToMany"/> to fix the cascade behavior on both association ends.
-/// </param>
 public sealed class ApiRelationshipDependentEnd
 (
     Type clrObjectType,
-    IEnumerable<ApiRelationshipKeyPath>? apiKeyPaths = null,
-    ApiRelationshipDeleteBehavior apiDeleteBehavior = ApiRelationshipDeleteBehavior.None,
-    ApiRelationshipDeleteBehavior? apiForcedDeleteBehavior = null
-) : ApiRelationshipEnd(clrObjectType, apiDeleteBehavior)
+    IEnumerable<ApiRelationshipKeyPath>? apiKeyPaths = null
+) : ApiRelationshipEnd(clrObjectType)
 {
     #region ApiSchemaElement Properties
     /// <inheritdoc/>
@@ -57,14 +46,6 @@ public sealed class ApiRelationshipDependentEnd
         : null;
 
     /// <summary>
-    ///     Gets the effective delete behavior, taking into account any forced override.
-    ///     For <see cref="ApiRelationshipManyToMany"/> association ends this is always
-    ///     <see cref="ApiRelationshipDeleteBehavior.Delete"/>.
-    /// </summary>
-    public ApiRelationshipDeleteBehavior ApiEffectiveDeleteBehavior { get; } =
-        apiForcedDeleteBehavior ?? apiDeleteBehavior;
-
-    /// <summary>
     ///     Gets the strongly-typed principal end of the relationship. Available after initialization.
     /// </summary>
     public ApiRelationshipPrincipalEnd ApiPrincipalEnd => (ApiRelationshipPrincipalEnd)this.ApiOppositeEnd;
@@ -76,10 +57,9 @@ public sealed class ApiRelationshipDependentEnd
     {
         var clrObjectType = this.ClrObjectType.SafeToName();
         var apiKeyPathsCount = (this.ApiKeyPaths?.Length ?? 0).SafeToString();
-        var apiEffectiveDeleteBehavior = this.ApiEffectiveDeleteBehavior.SafeToString();
         var extensionCount = this.ExtensionCount.SafeToString();
 
-        return $"{nameof(ApiRelationshipDependentEnd)} {{{nameof(this.ClrObjectType)}={clrObjectType}, {nameof(this.ApiKeyPaths)}Count={apiKeyPathsCount}, {nameof(this.ApiEffectiveDeleteBehavior)}={apiEffectiveDeleteBehavior}, {nameof(this.ExtensionCount)}={extensionCount}}}";
+        return $"{nameof(ApiRelationshipDependentEnd)} {{{nameof(this.ClrObjectType)}={clrObjectType}, {nameof(this.ApiKeyPaths)}Count={apiKeyPathsCount}, {nameof(this.ExtensionCount)}={extensionCount}}}";
     }
     #endregion
 

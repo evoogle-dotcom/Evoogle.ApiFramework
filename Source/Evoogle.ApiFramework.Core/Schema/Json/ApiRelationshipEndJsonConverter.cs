@@ -25,7 +25,6 @@ public class ApiRelationshipEndJsonConverter(ILogger<ApiRelationshipEndJsonConve
     {
         public required string ApiKind { get; init; }
         public required string ClrObjectType { get; init; }
-        public required string ApiDeleteBehavior { get; init; }
         public required string ApiIdentityName { get; init; }   // Principal only
         public required string ApiKeyPaths { get; init; }       // Dependent only
     }
@@ -42,7 +41,6 @@ public class ApiRelationshipEndJsonConverter(ILogger<ApiRelationshipEndJsonConve
                 {
                     ApiKind = policy.ConvertName(nameof(ApiRelationshipEnd.ApiKind)),
                     ClrObjectType = policy.ConvertName(nameof(ApiRelationshipEnd.ClrObjectType)),
-                    ApiDeleteBehavior = policy.ConvertName(nameof(ApiRelationshipEnd.ApiDeleteBehavior)),
                     ApiIdentityName = policy.ConvertName(nameof(ApiRelationshipPrincipalEnd.ApiIdentityName)),
                     ApiKeyPaths = policy.ConvertName(nameof(ApiRelationshipDependentEnd.ApiKeyPaths)),
                 },
@@ -56,7 +54,6 @@ public class ApiRelationshipEndJsonConverter(ILogger<ApiRelationshipEndJsonConve
     {
         public ApiRelationshipEndKind? ApiKind { get; set; }
         public Type? ClrObjectType { get; set; }
-        public ApiRelationshipDeleteBehavior? ApiDeleteBehavior { get; set; }
         public string? ApiIdentityName { get; set; }
         public List<ApiRelationshipKeyPath>? ApiKeyPaths { get; set; }
     }
@@ -72,7 +69,6 @@ public class ApiRelationshipEndJsonConverter(ILogger<ApiRelationshipEndJsonConve
         {
             { propertyNames.ApiRelationshipEnd.ApiKind, HandleApiKind },
             { propertyNames.ApiRelationshipEnd.ClrObjectType, HandleClrObjectType },
-            { propertyNames.ApiRelationshipEnd.ApiDeleteBehavior, HandleApiDeleteBehavior },
             { propertyNames.ApiRelationshipEnd.ApiIdentityName, HandleApiIdentityName },
             { propertyNames.ApiRelationshipEnd.ApiKeyPaths, HandleApiKeyPaths },
             { propertyNames.ExtensibleBase.Extensions, CreateExtensionsHandler<PropertyNames, ReadData, ReadHandlers>() },
@@ -88,12 +84,6 @@ public class ApiRelationshipEndJsonConverter(ILogger<ApiRelationshipEndJsonConve
         {
             context.ReadData.ApiRelationshipEnd ??= new ApiRelationshipEndReadData();
             context.ReadData.ApiRelationshipEnd.ClrObjectType = _typeJsonConverter.Read(ref reader, typeof(Type), context.Options);
-        }
-
-        private static void HandleApiDeleteBehavior(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
-        {
-            context.ReadData.ApiRelationshipEnd ??= new ApiRelationshipEndReadData();
-            context.ReadData.ApiRelationshipEnd.ApiDeleteBehavior = _deleteBehaviorConverter.Read(ref reader, typeof(ApiRelationshipDeleteBehavior), context.Options);
         }
 
         private static void HandleApiIdentityName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
@@ -125,7 +115,6 @@ public class ApiRelationshipEndJsonConverter(ILogger<ApiRelationshipEndJsonConve
 
     #region Fields
     private static readonly EnumJsonConverter<ApiRelationshipEndKind> _endKindConverter = new();
-    private static readonly EnumJsonConverter<ApiRelationshipDeleteBehavior> _deleteBehaviorConverter = new();
     private static readonly TypeJsonConverter _typeJsonConverter = new();
     #endregion
 
@@ -169,15 +158,13 @@ public class ApiRelationshipEndJsonConverter(ILogger<ApiRelationshipEndJsonConve
             ApiRelationshipEndKind.Principal => new ApiRelationshipPrincipalEnd
             (
                 readData.ClrObjectType!,
-                readData.ApiIdentityName,
-                readData.ApiDeleteBehavior ?? ApiRelationshipDeleteBehavior.None
+                readData.ApiIdentityName
             ),
 
             ApiRelationshipEndKind.Dependent => new ApiRelationshipDependentEnd
             (
                 readData.ClrObjectType!,
-                readData.ApiKeyPaths,
-                readData.ApiDeleteBehavior ?? ApiRelationshipDeleteBehavior.None
+                readData.ApiKeyPaths
             ),
 
             _ => null
@@ -209,7 +196,6 @@ public class ApiRelationshipEndJsonConverter(ILogger<ApiRelationshipEndJsonConve
         {
             WriteApiKind(writer, value, writeContext);
             WriteClrObjectType(writer, value, writeContext);
-            WriteApiDeleteBehavior(writer, value, writeContext);
 
             switch (value)
             {
@@ -233,9 +219,6 @@ public class ApiRelationshipEndJsonConverter(ILogger<ApiRelationshipEndJsonConve
 
     private static void WriteClrObjectType(Utf8JsonWriter writer, ApiRelationshipEnd end, DefaultWriteContext<PropertyNames> context)
         => writer.TryWritePropertyWithConverter(context.PropertyNames.ApiRelationshipEnd.ClrObjectType, end.ClrObjectType, context.Options, _typeJsonConverter);
-
-    private static void WriteApiDeleteBehavior(Utf8JsonWriter writer, ApiRelationshipEnd end, DefaultWriteContext<PropertyNames> context)
-        => writer.TryWritePropertyWithConverter(context.PropertyNames.ApiRelationshipEnd.ApiDeleteBehavior, end.ApiDeleteBehavior, context.Options, _deleteBehaviorConverter);
 
     private static void WriteApiIdentityName(Utf8JsonWriter writer, ApiRelationshipPrincipalEnd end, DefaultWriteContext<PropertyNames> context)
     {

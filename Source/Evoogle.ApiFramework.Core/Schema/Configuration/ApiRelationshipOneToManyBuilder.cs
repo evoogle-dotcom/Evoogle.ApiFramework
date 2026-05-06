@@ -9,7 +9,8 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 ///     Fluent builder used to configure an <see cref="ApiRelationshipOneToMany"/> relationship.
 /// </summary>
 /// <remarks>
-///     Call <see cref="WithPrincipalEnd{TPrincipal}"/> and <see cref="WithDependentEnd{TDependent}"/> to configure the two ends.
+///     Call <see cref="WithPrincipalEnd{TPrincipal}"/>, <see cref="WithDependentEnd{TDependent}"/>, and optionally
+///     <see cref="WithDeleteBehavior"/> to configure the relationship.
 ///     At most one principal end and one dependent end are allowed; subsequent calls replace the previous
 ///     configuration for that end.
 /// </remarks>
@@ -19,6 +20,7 @@ public sealed class ApiRelationshipOneToManyBuilder(string apiName) : ApiRelatio
     #region Fields
     private ApiRelationshipPrincipalEndBuilder? _principalEndBuilder;
     private ApiRelationshipDependentEndBuilder? _dependentEndBuilder;
+    private ApiRelationshipDeleteBehavior _apiDeleteBehavior = ApiRelationshipDeleteBehavior.None;
     #endregion
 
     #region With Methods
@@ -26,7 +28,7 @@ public sealed class ApiRelationshipOneToManyBuilder(string apiName) : ApiRelatio
     ///     Configures the principal end of the 1:M relationship using the CLR type <typeparamref name="TPrincipal"/>.
     /// </summary>
     /// <typeparam name="TPrincipal">The CLR type of the principal object.</typeparam>
-    /// <param name="configure">Optional callback to configure identity selection, delete behavior, and extensions.</param>
+    /// <param name="configure">Optional callback to configure identity selection and extensions.</param>
     /// <returns>The current builder instance.</returns>
     public ApiRelationshipOneToManyBuilder WithPrincipalEnd<TPrincipal>
     (
@@ -36,6 +38,17 @@ public sealed class ApiRelationshipOneToManyBuilder(string apiName) : ApiRelatio
         var builder = new ApiRelationshipPrincipalEndBuilder(typeof(TPrincipal));
         configure?.Invoke(builder);
         _principalEndBuilder = builder;
+        return this;
+    }
+
+    /// <summary>
+    ///     Sets the delete behavior for the relationship.
+    /// </summary>
+    /// <param name="apiDeleteBehavior">The desired delete behavior.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiRelationshipOneToManyBuilder WithDeleteBehavior(ApiRelationshipDeleteBehavior apiDeleteBehavior)
+    {
+        _apiDeleteBehavior = apiDeleteBehavior;
         return this;
     }
 
@@ -69,7 +82,8 @@ public sealed class ApiRelationshipOneToManyBuilder(string apiName) : ApiRelatio
         (
             this.ApiName,
             apiPrincipalEnd,
-            apiDependentEnd
+            apiDependentEnd,
+            _apiDeleteBehavior
         );
 
         var extensions = this.BuildExtensions();

@@ -12,16 +12,13 @@ namespace Evoogle.ApiFramework.Schema;
 
 /// <summary>
 ///     Abstract base class for the two ends of an <see cref="ApiRelationship"/>.
-///     Each end describes one participating <see cref="ApiObjectType"/> and the delete behavior
-///     applied to objects at the opposite end when an object on this end is deleted.
+///     Each end describes one participating <see cref="ApiObjectType"/>.
 /// </summary>
 /// <param name="clrObjectType">The CLR type of the participating <see cref="ApiObjectType"/> on this end of the relationship.</param>
-/// <param name="apiDeleteBehavior">The delete behavior applied to objects at the opposite end when an object on this end is deleted.</param>
 [JsonConverter(typeof(ApiRelationshipEndJsonConverter))]
 public abstract class ApiRelationshipEnd
 (
-    Type clrObjectType,
-    ApiRelationshipDeleteBehavior apiDeleteBehavior = ApiRelationshipDeleteBehavior.None
+    Type clrObjectType
 ) : ApiSchemaElement
 {
     #region ApiRelationshipEnd Fields
@@ -41,11 +38,6 @@ public abstract class ApiRelationshipEnd
 
     /// <summary>Gets the CLR type of the participating <see cref="ApiObjectType"/> on this end of the relationship.</summary>
     public Type ClrObjectType { get; } = clrObjectType;
-
-    /// <summary>
-    ///     Gets the delete behavior applied to objects at the opposite end when an object on this end is deleted.
-    /// </summary>
-    public ApiRelationshipDeleteBehavior ApiDeleteBehavior { get; } = apiDeleteBehavior;
 
     /// <summary>Gets the resolved <see cref="ApiObjectType"/> for this end. Available after initialization.</summary>
     public ApiObjectType ApiObjectType => this.ThrowIfNotInitialized(_apiResolvedObjectType);

@@ -79,12 +79,4 @@ public sealed class ApiRelationshipDependentEndBuilder<T>()
     }
     #endregion
 
-    #region With Methods
-    /// <inheritdoc cref="ApiRelationshipDependentEndBuilder.WithDeleteBehavior"/>
-    public new ApiRelationshipDependentEndBuilder<T> WithDeleteBehavior(ApiRelationshipDeleteBehavior apiDeleteBehavior)
-    {
-        base.WithDeleteBehavior(apiDeleteBehavior);
-        return this;
-    }
-    #endregion
 }

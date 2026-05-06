@@ -79,10 +79,10 @@ public static partial class ApiSchemaFactory
     // ApiRelationship
     public abstract record ApiRelationshipDef(string ApiName, List<Type>? ExtensionTypes = null) : ApiSchemaElementDef(ExtensionTypes);
 
-    public record ApiOneToOneRelationshipDef(string ApiName, ApiPrincipalEndDef PrincipalEnd, ApiDependentEndDef DependentEnd, List<Type>? ExtensionTypes = null)
+    public record ApiOneToOneRelationshipDef(string ApiName, ApiPrincipalEndDef PrincipalEnd, ApiDependentEndDef DependentEnd, ApiRelationshipDeleteBehavior ApiDeleteBehavior = ApiRelationshipDeleteBehavior.None, List<Type>? ExtensionTypes = null)
         : ApiRelationshipDef(ApiName, ExtensionTypes);
 
-    public record ApiOneToManyRelationshipDef(string ApiName, ApiPrincipalEndDef PrincipalEnd, ApiDependentEndDef DependentEnd, List<Type>? ExtensionTypes = null)
+    public record ApiOneToManyRelationshipDef(string ApiName, ApiPrincipalEndDef PrincipalEnd, ApiDependentEndDef DependentEnd, ApiRelationshipDeleteBehavior ApiDeleteBehavior = ApiRelationshipDeleteBehavior.None, List<Type>? ExtensionTypes = null)
         : ApiRelationshipDef(ApiName, ExtensionTypes);
 
     public record ApiManyToManyRelationshipDef
@@ -100,26 +100,22 @@ public static partial class ApiSchemaFactory
     public abstract record ApiRelationshipEndDef
     (
         Type ClrObjectType,
-        ApiRelationshipDeleteBehavior ApiDeleteBehavior = ApiRelationshipDeleteBehavior.None,
         List<Type>? ExtensionTypes = null
     ) : ApiSchemaElementDef(ExtensionTypes);
 
     public record ApiPrincipalEndDef
     (
         Type ClrObjectType,
-        ApiRelationshipDeleteBehavior ApiDeleteBehavior = ApiRelationshipDeleteBehavior.None,
         string? ApiIdentityName = null,
         List<Type>? ExtensionTypes = null
-    ) : ApiRelationshipEndDef(ClrObjectType, ApiDeleteBehavior, ExtensionTypes);
+    ) : ApiRelationshipEndDef(ClrObjectType, ExtensionTypes);
 
     public record ApiDependentEndDef
     (
         Type ClrObjectType,
-        ApiRelationshipDeleteBehavior ApiDeleteBehavior = ApiRelationshipDeleteBehavior.None,
         IEnumerable<ApiRelationshipKeyPathDef>? ApiKeyPaths = null,
-        ApiRelationshipDeleteBehavior? ApiForcedDeleteBehavior = null,
         List<Type>? ExtensionTypes = null
-    ) : ApiRelationshipEndDef(ClrObjectType, ApiDeleteBehavior, ExtensionTypes);
+    ) : ApiRelationshipEndDef(ClrObjectType, ExtensionTypes);
 
 
     // ApiRelationshipEnd
@@ -271,8 +267,9 @@ public static partial class ApiSchemaFactory
         var apiName = def.ApiName;
         var apiPrincipalEnd = BuildApiRelationshipPrincipalEnd(def.PrincipalEnd);
         var apiDependentEnd = BuildApiRelationshipDependentEnd(def.DependentEnd);
+        var apiDeleteBehavior = def.ApiDeleteBehavior;
 
-        return new ApiRelationshipOneToOne(apiName, apiPrincipalEnd, apiDependentEnd);
+        return new ApiRelationshipOneToOne(apiName, apiPrincipalEnd, apiDependentEnd, apiDeleteBehavior);
     }
 
     private static ApiRelationshipOneToMany BuildApiRelationshipOneToMany(ApiOneToManyRelationshipDef def)
@@ -280,8 +277,9 @@ public static partial class ApiSchemaFactory
         var apiName = def.ApiName;
         var apiPrincipalEnd = BuildApiRelationshipPrincipalEnd(def.PrincipalEnd);
         var apiDependentEnd = BuildApiRelationshipDependentEnd(def.DependentEnd);
+        var apiDeleteBehavior = def.ApiDeleteBehavior;
 
-        return new ApiRelationshipOneToMany(apiName, apiPrincipalEnd, apiDependentEnd);
+        return new ApiRelationshipOneToMany(apiName, apiPrincipalEnd, apiDependentEnd, apiDeleteBehavior);
     }
 
     private static ApiRelationshipManyToMany BuildApiRelationshipManyToMany(ApiManyToManyRelationshipDef def)
@@ -300,13 +298,11 @@ public static partial class ApiSchemaFactory
     {
         var clrObjectType = def.ClrObjectType;
         var apiIdentityName = def.ApiIdentityName;
-        var apiDeleteBehavior = def.ApiDeleteBehavior;
 
         var apiRelationshipPrincipalEnd = new ApiRelationshipPrincipalEnd
         (
             clrObjectType,
-            apiIdentityName,
-            apiDeleteBehavior
+            apiIdentityName
         );
 
         AttachExtensions(apiRelationshipPrincipalEnd, def);
@@ -318,15 +314,11 @@ public static partial class ApiSchemaFactory
     {
         var clrObjectType = def.ClrObjectType;
         var apiKeyPaths = def.ApiKeyPaths?.Select(BuildApiRelationshipKeyPath);
-        var apiDeleteBehavior = def.ApiDeleteBehavior;
-        var apiForcedDeleteBehavior = def.ApiForcedDeleteBehavior;
 
         var apiRelationshipDependentEnd = new ApiRelationshipDependentEnd
         (
             clrObjectType,
-            apiKeyPaths,
-            apiDeleteBehavior,
-            apiForcedDeleteBehavior
+            apiKeyPaths
         );
 
         AttachExtensions(apiRelationshipDependentEnd, def);

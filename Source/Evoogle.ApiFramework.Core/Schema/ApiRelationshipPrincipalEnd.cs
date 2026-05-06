@@ -18,16 +18,11 @@ namespace Evoogle.ApiFramework.Schema;
 ///     The optional name of the <see cref="ApiIdentity"/> on the principal type that serves as the join key.
 ///     When <see langword="null"/>, the primary identity (<see cref="ApiObjectType.ApiPrimaryIdentity"/>) is used.
 /// </param>
-/// <param name="apiDeleteBehavior">
-///     The delete behavior applied to dependent objects when an object on this end is deleted.
-///     Defaults to <see cref="ApiRelationshipDeleteBehavior.None"/>.
-/// </param>
 public sealed class ApiRelationshipPrincipalEnd
 (
     Type clrObjectType,
-    string? apiIdentityName = null,
-    ApiRelationshipDeleteBehavior apiDeleteBehavior = ApiRelationshipDeleteBehavior.None
-) : ApiRelationshipEnd(clrObjectType, apiDeleteBehavior)
+    string? apiIdentityName = null
+) : ApiRelationshipEnd(clrObjectType)
 {
     #region ApiRelationshipPrincipalEnd Fields
     private ApiIdentity? _apiResolvedIdentity = null;
@@ -69,10 +64,9 @@ public sealed class ApiRelationshipPrincipalEnd
     {
         var clrObjectType = this.ClrObjectType.SafeToName();
         var apiIdentityName = this.ApiIdentityName.SafeToString();
-        var apiDeleteBehavior = this.ApiDeleteBehavior.SafeToString();
         var extensionCount = this.ExtensionCount.SafeToString();
 
-        return $"{nameof(ApiRelationshipPrincipalEnd)} {{{nameof(this.ClrObjectType)}={clrObjectType}, {nameof(this.ApiIdentityName)}={apiIdentityName}, {nameof(this.ApiDeleteBehavior)}={apiDeleteBehavior}, {nameof(this.ExtensionCount)}={extensionCount}}}";
+        return $"{nameof(ApiRelationshipPrincipalEnd)} {{{nameof(this.ClrObjectType)}={clrObjectType}, {nameof(this.ApiIdentityName)}={apiIdentityName}, {nameof(this.ExtensionCount)}={extensionCount}}}";
     }
     #endregion
 

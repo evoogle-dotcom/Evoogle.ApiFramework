@@ -21,7 +21,6 @@ public class ApiRelationshipDependentEndBuilder
 {
     #region Fields
     private readonly List<ApiRelationshipKeyPathBuilder> _keyPathBuilders = [];
-    private ApiRelationshipDeleteBehavior _apiDeleteBehavior = ApiRelationshipDeleteBehavior.None;
     #endregion
 
     #region AddExtension Methods
@@ -118,19 +117,6 @@ public class ApiRelationshipDependentEndBuilder
     }
     #endregion
 
-    #region With Methods
-    /// <summary>
-    ///     Sets the delete behavior that governs what happens to the principal objects when a dependent object is deleted.
-    /// </summary>
-    /// <param name="apiDeleteBehavior">The desired delete behavior.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiRelationshipDependentEndBuilder WithDeleteBehavior(ApiRelationshipDeleteBehavior apiDeleteBehavior)
-    {
-        _apiDeleteBehavior = apiDeleteBehavior;
-        return this;
-    }
-    #endregion
-
     #region Build Methods
     /// <summary>
     ///     Builds the <see cref="ApiRelationshipDependentEnd"/> configured by this builder.
@@ -145,35 +131,7 @@ public class ApiRelationshipDependentEndBuilder
         var end = new ApiRelationshipDependentEnd
         (
             clrObjectType,
-            apiKeyPaths,
-            _apiDeleteBehavior
-        );
-
-        var extensions = this.BuildExtensions();
-        if (extensions != null)
-        {
-            end.Extensions = extensions;
-        }
-
-        return end;
-    }
-
-    /// <summary>
-    ///     Builds the <see cref="ApiRelationshipDependentEnd"/> with a forced delete behavior that overrides
-    ///     any developer-configured value.  Used by M:N builders to enforce cascading deletes.
-    /// </summary>
-    internal ApiRelationshipDependentEnd BuildWithForcedDeleteBehavior(ApiRelationshipDeleteBehavior forcedDeleteBehavior)
-    {
-        var apiKeyPaths = _keyPathBuilders.Count > 0
-            ? _keyPathBuilders.Select(b => b.Build())
-            : null;
-
-        var end = new ApiRelationshipDependentEnd
-        (
-            clrObjectType,
-            apiKeyPaths,
-            _apiDeleteBehavior,
-            forcedDeleteBehavior
+            apiKeyPaths
         );
 
         var extensions = this.BuildExtensions();

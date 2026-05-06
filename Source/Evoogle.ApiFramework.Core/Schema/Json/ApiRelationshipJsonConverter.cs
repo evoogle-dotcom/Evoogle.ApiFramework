@@ -26,6 +26,7 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
         public required string ApiKind { get; init; }
         public required string ApiName { get; init; }
         // One-to-one / one-to-many
+        public required string ApiDeleteBehavior { get; init; }
         public required string ApiPrincipalEnd { get; init; }
         public required string ApiDependentEnd { get; init; }
         // Many-to-many
@@ -48,6 +49,7 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
                 {
                     ApiKind = policy.ConvertName(nameof(ApiRelationship.ApiKind)),
                     ApiName = policy.ConvertName(nameof(ApiRelationship.ApiName)),
+                    ApiDeleteBehavior = policy.ConvertName(nameof(ApiRelationshipOneTo.ApiDeleteBehavior)),
                     ApiPrincipalEnd = policy.ConvertName(nameof(ApiRelationshipOneTo.ApiPrincipalEnd)),
                     ApiDependentEnd = policy.ConvertName(nameof(ApiRelationshipOneTo.ApiDependentEnd)),
                     ApiPrincipalEndA = policy.ConvertName(nameof(ApiRelationshipManyToMany.ApiPrincipalEndA)),
@@ -67,6 +69,7 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
         public ApiRelationshipKind? ApiKind { get; set; }
         public string? ApiName { get; set; }
         // One-to-one / one-to-many
+        public ApiRelationshipDeleteBehavior? ApiDeleteBehavior { get; set; }
         public ApiRelationshipPrincipalEnd? ApiPrincipalEnd { get; set; }
         public ApiRelationshipDependentEnd? ApiDependentEnd { get; set; }
         // Many-to-many
@@ -88,6 +91,7 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
         {
             { propertyNames.ApiRelationship.ApiKind, HandleApiKind },
             { propertyNames.ApiRelationship.ApiName, HandleApiName },
+            { propertyNames.ApiRelationship.ApiDeleteBehavior, HandleApiDeleteBehavior },
             { propertyNames.ApiRelationship.ApiPrincipalEnd, HandleApiPrincipalEnd },
             { propertyNames.ApiRelationship.ApiDependentEnd, HandleApiDependentEnd },
             { propertyNames.ApiRelationship.ApiPrincipalEndA, HandleApiPrincipalEndA },
@@ -108,6 +112,12 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
         {
             context.ReadData.ApiRelationship ??= new ApiRelationshipReadData();
             context.ReadData.ApiRelationship.ApiName = reader.GetString();
+        }
+
+        private static void HandleApiDeleteBehavior(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        {
+            context.ReadData.ApiRelationship ??= new ApiRelationshipReadData();
+            context.ReadData.ApiRelationship.ApiDeleteBehavior = _deleteBehaviorConverter.Read(ref reader, typeof(ApiRelationshipDeleteBehavior), context.Options);
         }
 
         private static void HandleApiPrincipalEnd(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
@@ -162,6 +172,7 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
 
     #region Fields
     private static readonly EnumJsonConverter<ApiRelationshipKind> _kindConverter = new();
+    private static readonly EnumJsonConverter<ApiRelationshipDeleteBehavior> _deleteBehaviorConverter = new();
     private static readonly TypeJsonConverter _typeJsonConverter = new();
     #endregion
 
@@ -206,14 +217,16 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
             (
                 readData.ApiName!,
                 readData.ApiPrincipalEnd!,
-                readData.ApiDependentEnd!
+                readData.ApiDependentEnd!,
+                readData.ApiDeleteBehavior ?? ApiRelationshipDeleteBehavior.None
             ),
 
             ApiRelationshipKind.OneToMany => new ApiRelationshipOneToMany
             (
                 readData.ApiName!,
                 readData.ApiPrincipalEnd!,
-                readData.ApiDependentEnd!
+                readData.ApiDependentEnd!,
+                readData.ApiDeleteBehavior ?? ApiRelationshipDeleteBehavior.None
             ),
 
             ApiRelationshipKind.ManyToMany => new ApiRelationshipManyToMany
@@ -221,17 +234,8 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
                 readData.ApiName!,
                 readData.ApiPrincipalEndA!,
                 readData.ApiPrincipalEndB!,
-                // Re-apply forced Delete when deserializing M:N dependent ends.
-                new ApiRelationshipDependentEnd(
-                    readData.ApiDependentEndA!.ClrObjectType,
-                    readData.ApiDependentEndA.ApiKeyPaths,
-                    ApiRelationshipDeleteBehavior.None,
-                    ApiRelationshipDeleteBehavior.Delete),
-                new ApiRelationshipDependentEnd(
-                    readData.ApiDependentEndB!.ClrObjectType,
-                    readData.ApiDependentEndB.ApiKeyPaths,
-                    ApiRelationshipDeleteBehavior.None,
-                    ApiRelationshipDeleteBehavior.Delete),
+                readData.ApiDependentEndA!,
+                readData.ApiDependentEndB!,
                 readData.ClrAssociationObjectType!
             ),
 
@@ -268,6 +272,7 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
             switch (value)
             {
                 case ApiRelationshipOneTo oneToRelationship:
+                    WriteApiDeleteBehavior(writer, oneToRelationship, writeContext);
                     WriteApiPrincipalEnd(writer, oneToRelationship, writeContext);
                     WriteApiDependentEnd(writer, oneToRelationship, writeContext);
                     break;
@@ -292,6 +297,9 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
 
     private static void WriteApiName(Utf8JsonWriter writer, ApiRelationship relationship, DefaultWriteContext<PropertyNames> context)
         => writer.TryWritePropertyAsString(context.PropertyNames.ApiRelationship.ApiName, relationship.ApiName, context.Options);
+
+    private static void WriteApiDeleteBehavior(Utf8JsonWriter writer, ApiRelationshipOneTo relationship, DefaultWriteContext<PropertyNames> context)
+        => writer.TryWritePropertyWithConverter(context.PropertyNames.ApiRelationship.ApiDeleteBehavior, relationship.ApiDeleteBehavior, context.Options, _deleteBehaviorConverter);
 
     private static void WriteApiPrincipalEnd(Utf8JsonWriter writer, ApiRelationshipOneTo relationship, DefaultWriteContext<PropertyNames> context)
     {

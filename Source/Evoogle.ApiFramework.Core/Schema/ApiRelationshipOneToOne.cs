@@ -11,23 +11,23 @@ namespace Evoogle.ApiFramework.Schema;
 /// <remarks>
 ///     <para>
 ///         The principal value appears exactly once among all principal objects.
-///         A corresponding dependent value may or may not exist, but when it does it appears exactly once —
-///         i.e. the dependent side is 0..1.
+///         A corresponding dependent value may or may not exist, but when it does it appears exactly once — i.e. the dependent side is 0..1.
 ///     </para>
 ///     <para>
-///         Self-referential one-to-one relationships are supported by setting both ends to the same
-///         <see cref="ApiRelationshipEnd.ClrObjectType"/>.
+///         Self-referential one-to-one relationships are supported by setting both ends to the same <see cref="ApiRelationshipEnd.ClrObjectType"/>.
 ///     </para>
 /// </remarks>
 /// <param name="apiName">The schema-unique API name of the relationship.</param>
 /// <param name="apiPrincipalEnd">The principal end, which owns the join key identity.</param>
 /// <param name="apiDependentEnd">The dependent end, which holds the FK key paths.</param>
+/// <param name="apiDeleteBehavior">The delete behavior applied when either end is affected. Defaults to <see cref="ApiRelationshipDeleteBehavior.None"/>.</param>
 public sealed class ApiRelationshipOneToOne
 (
     string apiName,
     ApiRelationshipPrincipalEnd apiPrincipalEnd,
-    ApiRelationshipDependentEnd apiDependentEnd
-) : ApiRelationshipOneTo(apiName, apiPrincipalEnd, apiDependentEnd)
+    ApiRelationshipDependentEnd apiDependentEnd,
+    ApiRelationshipDeleteBehavior apiDeleteBehavior = ApiRelationshipDeleteBehavior.None
+) : ApiRelationshipOneTo(apiName, apiPrincipalEnd, apiDependentEnd, apiDeleteBehavior)
 {
     #region ApiSchemaElement Properties
     /// <inheritdoc/>

@@ -73,16 +73,10 @@ public sealed class ApiRelationshipManyToMany
     /// <summary>Gets principal end B of the relationship, which owns the join key identity for the second outer type.</summary>
     public ApiRelationshipPrincipalEnd ApiPrincipalEndB { get; } = apiPrincipalEndB;
 
-    /// <summary>
-    ///     Gets dependent end A, which targets the association type and carries FK key paths back to principal end A.
-    ///     Delete behavior is fixed to <see cref="ApiRelationshipDeleteBehavior.Delete"/> and is not developer-configurable.
-    /// </summary>
+    /// <summary>Gets dependent end A, which targets the association type and carries FK key paths back to principal end A.</summary>
     public ApiRelationshipDependentEnd ApiDependentEndA { get; } = apiDependentEndA;
 
-    /// <summary>
-    ///     Gets dependent end B, which targets the association type and carries FK key paths back to principal end B.
-    ///     Delete behavior is fixed to <see cref="ApiRelationshipDeleteBehavior.Delete"/> and is not developer-configurable.
-    /// </summary>
+    /// <summary>Gets dependent end B, which targets the association type and carries FK key paths back to principal end B.</summary>
     public ApiRelationshipDependentEnd ApiDependentEndB { get; } = apiDependentEndB;
 
     /// <summary>Gets the CLR type of the association <see cref="ApiObjectType"/> that mediates the relationship.</summary>
@@ -99,9 +93,9 @@ public sealed class ApiRelationshipManyToMany
         var apiName = this.ApiName.SafeToString();
         var apiPrincipalEndA = this.ApiPrincipalEndA.SafeToString();
         var apiPrincipalEndB = this.ApiPrincipalEndB.SafeToString();
-        var clrAssociationObjectType = this.ClrAssociationObjectType.SafeToName();
         var apiDependentEndA = this.ApiDependentEndA.SafeToString();
         var apiDependentEndB = this.ApiDependentEndB.SafeToString();
+        var clrAssociationObjectType = this.ClrAssociationObjectType.SafeToName();
         var extensionCount = this.ExtensionCount.SafeToString();
 
         return $"{nameof(ApiRelationshipManyToMany)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ApiPrincipalEndA)}={apiPrincipalEndA}, {nameof(this.ApiPrincipalEndB)}={apiPrincipalEndB}, {nameof(this.ApiDependentEndA)}={apiDependentEndA}, {nameof(this.ApiDependentEndB)}={apiDependentEndB}, {nameof(this.ClrAssociationObjectType)}={clrAssociationObjectType}, {nameof(this.ExtensionCount)}={extensionCount}}}";

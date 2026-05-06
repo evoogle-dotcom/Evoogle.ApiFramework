@@ -10,9 +10,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 /// </summary>
 /// <remarks>
 ///     A many-to-many relationship requires an explicit association <see cref="ApiObjectType"/> that holds the
-///     foreign-key columns for both sides.  Both dependent ends always use
-///     <see cref="ApiRelationshipDeleteBehavior.Delete"/>, regardless of any delete behavior set on their
-///     individual builders.
+///     foreign-key columns for both sides.
 /// </remarks>
 /// <param name="apiName">The schema-unique API name of the relationship.</param>
 public class ApiRelationshipManyToManyBuilder(string apiName) : ApiRelationshipBuilder(apiName)
@@ -107,9 +105,8 @@ public class ApiRelationshipManyToManyBuilder(string apiName) : ApiRelationshipB
         var apiPrincipalEndA = _principalEndABuilder?.Build()!;
         var apiPrincipalEndB = _principalEndBBuilder?.Build()!;
 
-        // Dependent ends always cascade — the forced delete behavior is injected here.
-        var apiDependentEndA = BuildForcedCascadeEnd(_dependentEndABuilder);
-        var apiDependentEndB = BuildForcedCascadeEnd(_dependentEndBBuilder);
+        var apiDependentEndA = _dependentEndABuilder?.Build();
+        var apiDependentEndB = _dependentEndBBuilder?.Build();
 
         var relationship = new ApiRelationshipManyToMany
         (
@@ -128,19 +125,6 @@ public class ApiRelationshipManyToManyBuilder(string apiName) : ApiRelationshipB
         }
 
         return relationship;
-    }
-
-    private static ApiRelationshipDependentEnd? BuildForcedCascadeEnd(ApiRelationshipDependentEndBuilder? builder)
-    {
-        if (builder is null)
-        {
-            return null;
-        }
-
-        // Build the end first, then promote the delete behavior to Delete regardless of the
-        // developer-configured value — M:N dependent ends always cascade.
-        var end = builder.BuildWithForcedDeleteBehavior(ApiRelationshipDeleteBehavior.Delete);
-        return end;
     }
     #endregion
 }

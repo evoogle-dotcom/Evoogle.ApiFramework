@@ -189,15 +189,14 @@ public partial class ApiSchemaTests
                         ApiName: "User_Profile_ScalarFK",
                         PrincipalEnd: new ApiPrincipalEndDef
                         (
-                            ClrObjectType: typeof(RelationshipUser),
-                            ApiDeleteBehavior: ApiRelationshipDeleteBehavior.None
+                            ClrObjectType: typeof(RelationshipUser)
                         ),
                         DependentEnd: new ApiDependentEndDef
                         (
                             ClrObjectType: typeof(RelationshipUserProfile),
-                            ApiDeleteBehavior: ApiRelationshipDeleteBehavior.Delete,
                             ApiKeyPaths: [new ApiRelationshipScalarKeyPathDef(ClrPropertyName: nameof(RelationshipUserProfile.UserId))]
-                        )
+                        ),
+                        ApiDeleteBehavior: ApiRelationshipDeleteBehavior.Delete
                     ),
 
                     // User_Profile_NestedFK
@@ -206,13 +205,11 @@ public partial class ApiSchemaTests
                         ApiName: "User_Profile_NestedFK",
                         PrincipalEnd: new ApiPrincipalEndDef
                         (
-                            ClrObjectType: typeof(RelationshipUser),
-                            ApiDeleteBehavior: ApiRelationshipDeleteBehavior.None
+                            ClrObjectType: typeof(RelationshipUser)
                         ),
                         DependentEnd: new ApiDependentEndDef
                         (
                             ClrObjectType: typeof(RelationshipUserProfile),
-                            ApiDeleteBehavior: ApiRelationshipDeleteBehavior.Delete,
                             ApiKeyPaths:
                             [
                                 new ApiRelationshipNestedKeyPathDef
@@ -221,7 +218,8 @@ public partial class ApiSchemaTests
                                     ApiKeyPaths: [new ApiRelationshipScalarKeyPathDef(ClrPropertyName: nameof(RelationshipUserRef.UserId))]
                                 )
                             ]
-                        )
+                        ),
+                        ApiDeleteBehavior: ApiRelationshipDeleteBehavior.Delete
                     )
                 ]
             ),
@@ -394,15 +392,14 @@ public partial class ApiSchemaTests
                     {
                         ""ApiKind"": ""OneToOne"",
                         ""ApiName"": ""User_Profile_NestedFK"",
+                        ""ApiDeleteBehavior"": ""Delete"",
                         ""ApiPrincipalEnd"": {
                             ""ApiKind"": ""Principal"",
-                            ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipUser,Evoogle.ApiFramework.Core.Tests"",
-                            ""ApiDeleteBehavior"": ""None""
+                            ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipUser,Evoogle.ApiFramework.Core.Tests""
                         },
                         ""ApiDependentEnd"": {
                             ""ApiKind"": ""Dependent"",
                             ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipUserProfile,Evoogle.ApiFramework.Core.Tests"",
-                            ""ApiDeleteBehavior"": ""Delete"",
                             ""ApiKeyPaths"": [
                                 {
                                     ""ApiKind"": ""Nested"",
@@ -420,15 +417,14 @@ public partial class ApiSchemaTests
                     {
                         ""ApiKind"": ""OneToOne"",
                         ""ApiName"": ""User_Profile_ScalarFK"",
+                        ""ApiDeleteBehavior"": ""Delete"",
                         ""ApiPrincipalEnd"": {
                             ""ApiKind"": ""Principal"",
-                            ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipUser,Evoogle.ApiFramework.Core.Tests"",
-                            ""ApiDeleteBehavior"": ""None""
+                            ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipUser,Evoogle.ApiFramework.Core.Tests""
                         },
                         ""ApiDependentEnd"": {
                             ""ApiKind"": ""Dependent"",
                             ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipUserProfile,Evoogle.ApiFramework.Core.Tests"",
-                            ""ApiDeleteBehavior"": ""Delete"",
                             ""ApiKeyPaths"": [
                                 {
                                     ""ApiKind"": ""Scalar"",
@@ -733,15 +729,14 @@ public partial class ApiSchemaTests
                         ApiName: "User_Posts_ScalarFK",
                         PrincipalEnd: new ApiPrincipalEndDef
                         (
-                            ClrObjectType: typeof(RelationshipUser),
-                            ApiDeleteBehavior: ApiRelationshipDeleteBehavior.None
+                            ClrObjectType: typeof(RelationshipUser)
                         ),
                         DependentEnd: new ApiDependentEndDef
                         (
                             ClrObjectType: typeof(RelationshipPost),
-                            ApiDeleteBehavior: ApiRelationshipDeleteBehavior.Delete,
                             ApiKeyPaths: [new ApiRelationshipScalarKeyPathDef(ClrPropertyName: nameof(RelationshipPost.AuthorUserId))]
-                        )
+                        ),
+                        ApiDeleteBehavior: ApiRelationshipDeleteBehavior.Delete
                     ),
 
                     // User_Posts_NestedFK
@@ -750,13 +745,11 @@ public partial class ApiSchemaTests
                         ApiName: "User_Posts_NestedFK",
                         PrincipalEnd: new ApiPrincipalEndDef
                         (
-                            ClrObjectType: typeof(RelationshipUser),
-                            ApiDeleteBehavior: ApiRelationshipDeleteBehavior.None
+                            ClrObjectType: typeof(RelationshipUser)
                         ),
                         DependentEnd: new ApiDependentEndDef
                         (
                             ClrObjectType: typeof(RelationshipPost),
-                            ApiDeleteBehavior: ApiRelationshipDeleteBehavior.Delete,
                             ApiKeyPaths:
                             [
                                 new ApiRelationshipNestedKeyPathDef
@@ -765,7 +758,8 @@ public partial class ApiSchemaTests
                                     ApiKeyPaths: [new ApiRelationshipScalarKeyPathDef(ClrPropertyName: nameof(RelationshipUserRef.UserId))]
                                 )
                             ]
-                        )
+                        ),
+                        ApiDeleteBehavior: ApiRelationshipDeleteBehavior.Delete
                     ),
 
                     // Post_Comments_ScalarFK
@@ -774,15 +768,14 @@ public partial class ApiSchemaTests
                         ApiName: "Post_Comments_ScalarFK",
                         PrincipalEnd: new ApiPrincipalEndDef
                         (
-                            ClrObjectType: typeof(RelationshipPost),
-                            ApiDeleteBehavior: ApiRelationshipDeleteBehavior.None
+                            ClrObjectType: typeof(RelationshipPost)
                         ),
                         DependentEnd: new ApiDependentEndDef
                         (
                             ClrObjectType: typeof(RelationshipComment),
-                            ApiDeleteBehavior: ApiRelationshipDeleteBehavior.Delete,
                             ApiKeyPaths: [new ApiRelationshipScalarKeyPathDef(ClrPropertyName: nameof(RelationshipComment.PostId))]
-                        )
+                        ),
+                        ApiDeleteBehavior: ApiRelationshipDeleteBehavior.Delete
                     ),
 
                     // Post_Comments_NestedFK
@@ -791,13 +784,11 @@ public partial class ApiSchemaTests
                         ApiName: "Post_Comments_NestedFK",
                         PrincipalEnd: new ApiPrincipalEndDef
                         (
-                            ClrObjectType: typeof(RelationshipPost),
-                            ApiDeleteBehavior: ApiRelationshipDeleteBehavior.None
+                            ClrObjectType: typeof(RelationshipPost)
                         ),
                         DependentEnd: new ApiDependentEndDef
                         (
                             ClrObjectType: typeof(RelationshipComment),
-                            ApiDeleteBehavior: ApiRelationshipDeleteBehavior.Delete,
                             ApiKeyPaths:
                             [
                                 new ApiRelationshipNestedKeyPathDef
@@ -806,7 +797,8 @@ public partial class ApiSchemaTests
                                     ApiKeyPaths: [new ApiRelationshipScalarKeyPathDef(ClrPropertyName: nameof(RelationshipPostRef.PostId))]
                                 )
                             ]
-                        )
+                        ),
+                        ApiDeleteBehavior: ApiRelationshipDeleteBehavior.Delete
                     )
                 ]
             ),
@@ -1100,15 +1092,14 @@ public partial class ApiSchemaTests
                     {
                         ""ApiKind"": ""OneToMany"",
                         ""ApiName"": ""Post_Comments_NestedFK"",
+                        ""ApiDeleteBehavior"": ""Delete"",
                         ""ApiPrincipalEnd"": {
                             ""ApiKind"": ""Principal"",
-                            ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipPost,Evoogle.ApiFramework.Core.Tests"",
-                            ""ApiDeleteBehavior"": ""None""
+                            ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipPost,Evoogle.ApiFramework.Core.Tests""
                         },
                         ""ApiDependentEnd"": {
                             ""ApiKind"": ""Dependent"",
                             ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipComment,Evoogle.ApiFramework.Core.Tests"",
-                            ""ApiDeleteBehavior"": ""Delete"",
                             ""ApiKeyPaths"": [
                                 {
                                     ""ApiKind"": ""Nested"",
@@ -1126,15 +1117,14 @@ public partial class ApiSchemaTests
                     {
                         ""ApiKind"": ""OneToMany"",
                         ""ApiName"": ""Post_Comments_ScalarFK"",
+                        ""ApiDeleteBehavior"": ""Delete"",
                         ""ApiPrincipalEnd"": {
                             ""ApiKind"": ""Principal"",
-                            ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipPost,Evoogle.ApiFramework.Core.Tests"",
-                            ""ApiDeleteBehavior"": ""None""
+                            ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipPost,Evoogle.ApiFramework.Core.Tests""
                         },
                         ""ApiDependentEnd"": {
                             ""ApiKind"": ""Dependent"",
                             ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipComment,Evoogle.ApiFramework.Core.Tests"",
-                            ""ApiDeleteBehavior"": ""Delete"",
                             ""ApiKeyPaths"": [
                                 {
                                     ""ApiKind"": ""Scalar"",
@@ -1146,15 +1136,14 @@ public partial class ApiSchemaTests
                     {
                         ""ApiKind"": ""OneToMany"",
                         ""ApiName"": ""User_Posts_NestedFK"",
+                        ""ApiDeleteBehavior"": ""Delete"",
                         ""ApiPrincipalEnd"": {
                             ""ApiKind"": ""Principal"",
-                            ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipUser,Evoogle.ApiFramework.Core.Tests"",
-                            ""ApiDeleteBehavior"": ""None""
+                            ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipUser,Evoogle.ApiFramework.Core.Tests""
                         },
                         ""ApiDependentEnd"": {
                             ""ApiKind"": ""Dependent"",
                             ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipPost,Evoogle.ApiFramework.Core.Tests"",
-                            ""ApiDeleteBehavior"": ""Delete"",
                             ""ApiKeyPaths"": [
                                 {
                                     ""ApiKind"": ""Nested"",
@@ -1172,15 +1161,14 @@ public partial class ApiSchemaTests
                     {
                         ""ApiKind"": ""OneToMany"",
                         ""ApiName"": ""User_Posts_ScalarFK"",
+                        ""ApiDeleteBehavior"": ""Delete"",
                         ""ApiPrincipalEnd"": {
                             ""ApiKind"": ""Principal"",
-                            ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipUser,Evoogle.ApiFramework.Core.Tests"",
-                            ""ApiDeleteBehavior"": ""None""
+                            ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipUser,Evoogle.ApiFramework.Core.Tests""
                         },
                         ""ApiDependentEnd"": {
                             ""ApiKind"": ""Dependent"",
                             ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipPost,Evoogle.ApiFramework.Core.Tests"",
-                            ""ApiDeleteBehavior"": ""Delete"",
                             ""ApiKeyPaths"": [
                                 {
                                     ""ApiKind"": ""Scalar"",
@@ -1386,14 +1374,12 @@ public partial class ApiSchemaTests
                         DependentEndA: new ApiDependentEndDef
                         (
                             ClrObjectType: typeof(RelationshipPostTag),
-                            ApiKeyPaths: [new ApiRelationshipScalarKeyPathDef(ClrPropertyName: nameof(RelationshipPostTag.PostId))],
-                            ApiForcedDeleteBehavior: ApiRelationshipDeleteBehavior.Delete
+                            ApiKeyPaths: [new ApiRelationshipScalarKeyPathDef(ClrPropertyName: nameof(RelationshipPostTag.PostId))]
                         ),
                         DependentEndB: new ApiDependentEndDef
                         (
                             ClrObjectType: typeof(RelationshipPostTag),
-                            ApiKeyPaths: [new ApiRelationshipScalarKeyPathDef(ClrPropertyName: nameof(RelationshipPostTag.TagId))],
-                            ApiForcedDeleteBehavior: ApiRelationshipDeleteBehavior.Delete
+                            ApiKeyPaths: [new ApiRelationshipScalarKeyPathDef(ClrPropertyName: nameof(RelationshipPostTag.TagId))]
                         ),
                         ClrAssociationObjectType: typeof(RelationshipPostTag)
                     )
@@ -1579,18 +1565,15 @@ public partial class ApiSchemaTests
                         ""ApiName"": ""Post_Tags"",
                         ""ApiPrincipalEndA"": {
                             ""ApiKind"": ""Principal"",
-                            ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipPost,Evoogle.ApiFramework.Core.Tests"",
-                            ""ApiDeleteBehavior"": ""None""
+                            ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipPost,Evoogle.ApiFramework.Core.Tests""
                         },
                         ""ApiPrincipalEndB"": {
                             ""ApiKind"": ""Principal"",
-                            ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipTag,Evoogle.ApiFramework.Core.Tests"",
-                            ""ApiDeleteBehavior"": ""None""
+                            ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipTag,Evoogle.ApiFramework.Core.Tests""
                         },
                         ""ApiDependentEndA"": {
                             ""ApiKind"": ""Dependent"",
                             ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipPostTag,Evoogle.ApiFramework.Core.Tests"",
-                            ""ApiDeleteBehavior"": ""None"",
                             ""ApiKeyPaths"": [
                                 {
                                     ""ApiKind"": ""Scalar"",
@@ -1601,7 +1584,6 @@ public partial class ApiSchemaTests
                         ""ApiDependentEndB"": {
                             ""ApiKind"": ""Dependent"",
                             ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipPostTag,Evoogle.ApiFramework.Core.Tests"",
-                            ""ApiDeleteBehavior"": ""None"",
                             ""ApiKeyPaths"": [
                                 {
                                     ""ApiKind"": ""Scalar"",
