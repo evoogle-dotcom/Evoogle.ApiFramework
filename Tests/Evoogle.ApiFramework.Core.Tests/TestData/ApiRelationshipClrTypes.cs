@@ -73,8 +73,14 @@ public class RelationshipPost
     public Ulid AuthorUserId { get; set; } // scalar FK path candidate
     public RelationshipUserRef AuthorRef { get; set; } = new(); // nested FK path candidate
     public string Title { get; set; } = string.Empty;
+
+    // TODO: Need a deep dive on how I want to handle "navigation properties"
+    // TODO: Should this be optional or required?
     public List<RelationshipComment> Comments { get; set; } = [];
-    public List<RelationshipPostTag> PostTags { get; set; } = [];
+
+    // TODO: Need a deep dive on how I want to handle "navigation properties"
+    // TODO: Should this be optional or required?
+    public List<RelationshipTag> Tags { get; set; } = [];
 
     // TODO: Need a deep dive on how I want to handle "navigation properties"
     // TODO: Should this be optional or required? Technically this should be required but what does that really mean?
@@ -87,9 +93,9 @@ public class RelationshipPost
         var authorRef = this.AuthorRef.SafeToString();
         var title = this.Title.SafeToString();
         var comments = this.Comments.SafeToString();
-        var postTags = this.PostTags.SafeToString();
+        var tags = this.Tags.SafeToString();
 
-        return $"{nameof(RelationshipPost)} {{{nameof(this.Id)}={id}, {nameof(this.AuthorUserId)}={authorUserId}, {nameof(this.AuthorRef)}={authorRef}, {nameof(this.Title)}={title}, {nameof(this.Comments)}={comments}, {nameof(this.PostTags)}={postTags}}}";
+        return $"{nameof(RelationshipPost)} {{{nameof(this.Id)}={id}, {nameof(this.AuthorUserId)}={authorUserId}, {nameof(this.AuthorRef)}={authorRef}, {nameof(this.Title)}={title}, {nameof(this.Comments)}={comments}, {nameof(this.Tags)}={tags}}}";
     }
 }
 
@@ -99,6 +105,10 @@ public class RelationshipComment
     public Ulid PostId { get; set; } // scalar FK path candidate
     public RelationshipPostRef PostRef { get; set; } = new(); // nested FK path candidate
     public string Body { get; set; } = string.Empty;
+
+    // TODO: Need a deep dive on how I want to handle "navigation properties"
+    // TODO: Should this be optional or required? Technically this should be required but what does that really mean?
+    public RelationshipPost Post { get; set; } = null!; // navigational property back to principal for one-to-one tests
 
     public override string ToString()
     {
@@ -130,6 +140,10 @@ public class RelationshipTag
     public Ulid Id { get; set; }
     public string Name { get; set; } = string.Empty;
 
+    // TODO: Need a deep dive on how I want to handle "navigation properties"
+    // TODO: Should this be optional or required?
+    public List<RelationshipPost> Posts { get; set; } = [];
+
     public override string ToString()
     {
         var id = this.Id.SafeToString();
@@ -143,16 +157,14 @@ public class RelationshipTag
 public class RelationshipPostTag
 {
     public Ulid PostId { get; set; } // dependent end A scalar path candidate
-    public Ulid TagId { get; set; } // dependent end B scalar path candidate
-    public DateTimeOffset TaggedAt { get; set; }
+    public Ulid TagId { get; set; }  // dependent end B scalar path candidate
 
     public override string ToString()
     {
         var postId = this.PostId.SafeToString();
         var tagId = this.TagId.SafeToString();
-        var taggedAt = this.TaggedAt.SafeToString();
 
-        return $"{nameof(RelationshipPostTag)} {{{nameof(this.PostId)}={postId}, {nameof(this.TagId)}={tagId}, {nameof(this.TaggedAt)}={taggedAt}}}";
+        return $"{nameof(RelationshipPostTag)} {{{nameof(this.PostId)}={postId}, {nameof(this.TagId)}={tagId}}}";
     }
 }
 #endregion

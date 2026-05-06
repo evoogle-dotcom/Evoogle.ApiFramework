@@ -17,10 +17,10 @@ public partial class ApiSchemaTests
         // ApiSchema With Relationship Schema for One-To-One Relationship
         new ApiSchemaJsonTestCase
         {
-            Name = $"{nameof(ApiSchema)} With Relationship Schema for One-To-One Relationship",
+            Name = $"{nameof(ApiSchema)} With Relationship Schema for One-To-One Relationship And Scalar And Nested Foreign Key Paths",
             FactoryArgument = new ApiSchemaDef
             (
-                ApiName: $"{nameof(ApiSchema)} With Relationship Schema for One-To-One Relationship",
+                ApiName: $"{nameof(ApiSchema)} With Relationship Schema for One-To-One Relationship And Scalar And Nested Foreign Key Paths",
                 ApiNamedTypes:
                 [
                     new ApiScalarTypeDef
@@ -227,7 +227,7 @@ public partial class ApiSchemaTests
             ),
             Json = @"
             {
-                ""ApiName"": ""ApiSchema With Relationship Schema for One-To-One Relationship"",
+                ""ApiName"": ""ApiSchema With Relationship Schema for One-To-One Relationship And Scalar And Nested Foreign Key Paths"",
                 ""ApiVersion"": ""0.1.0"",
                 ""ApiOptions"": {
                     ""ApiIdentityPartNullHandling"": ""UseDefaultOnNull""
@@ -444,10 +444,10 @@ public partial class ApiSchemaTests
         // ApiSchema With Relationship Schema for One-To-Many Relationship
         new ApiSchemaJsonTestCase
         {
-            Name = $"{nameof(ApiSchema)} With Relationship Schema for One-To-Many Relationship",
+            Name = $"{nameof(ApiSchema)} With Relationship Schema for One-To-Many Relationship And Scalar And Nested Foreign Key Paths",
             FactoryArgument = new ApiSchemaDef
             (
-                ApiName: $"{nameof(ApiSchema)} With Relationship Schema for One-To-Many Relationship",
+                ApiName: $"{nameof(ApiSchema)} With Relationship Schema for One-To-Many Relationship And Scalar And Nested Foreign Key Paths",
                 ApiNamedTypes:
                 [
                     new ApiScalarTypeDef
@@ -604,12 +604,124 @@ public partial class ApiSchemaTests
                             ),
                             new ApiPropertyDef
                             (
+                                ApiName: nameof(RelationshipPost.Comments),
+                                ApiTypeExpression: new ApiTypeExpression
+                                (
+                                    apiInlineType: new ApiCollectionType
+                                    (
+                                        apiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(RelationshipComment)),
+                                        apiItemTypeModifiers: ApiTypeModifiers.Required,
+                                        clrCollectionType: typeof(List<RelationshipComment>)
+                                    )
+                                ),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(RelationshipPost.Comments),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
                                 ApiName: nameof(RelationshipPost.User),
                                 ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(RelationshipUser)),
                                 ApiTypeModifiers: ApiTypeModifiers.Required,
                                 ClrName: nameof(RelationshipPost.User),
                                 ClrMemberKind: ClrMemberKind.Property
                             )
+                        ]
+                    ),
+
+                    // RelationshipPostRef
+                    new ApiObjectTypeDef
+                    (
+                        ApiName: nameof(RelationshipPostRef),
+                        ClrType: typeof(RelationshipPostRef),
+                        ApiIdentities:
+                        [
+                            new ApiIdentityDef
+                            (
+                                ApiName: "PK_RelationshipPostRef_PostId",
+                                Parts:
+                                [
+                                    new ApiScalarPartDef
+                                    (
+                                        ApiPropertyName: nameof(RelationshipPostRef.PostId)
+                                    )
+                                ]
+                            )
+                        ],
+                        ApiProperties:
+                        [
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(RelationshipPostRef.PostId),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Ulid)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(RelationshipPostRef.PostId),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                        ]
+                    ),
+
+                    // Comment
+                    new ApiObjectTypeDef
+                    (
+                        ApiName: nameof(RelationshipComment),
+                        ClrType: typeof(RelationshipComment),
+                        ApiIdentities:
+                        [
+                            new ApiIdentityDef
+                            (
+                                ApiName: "PK_RelationshipComment_Id",
+                                Parts:
+                                [
+                                    new ApiScalarPartDef
+                                    (
+                                        ApiPropertyName: nameof(RelationshipComment.Id)
+                                    )
+                                ]
+                            )
+                        ],
+                        ApiProperties:
+                        [
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(RelationshipComment.Id),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Ulid)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(RelationshipComment.Id),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(RelationshipComment.PostId),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Ulid)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(RelationshipComment.PostId),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(RelationshipComment.PostRef),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(RelationshipPostRef)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(RelationshipComment.PostRef),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(RelationshipComment.Body),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(RelationshipComment.Body),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(RelationshipComment.Post),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(RelationshipPost)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(RelationshipComment.Post),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
                         ]
                     ),
                 ],
@@ -654,12 +766,53 @@ public partial class ApiSchemaTests
                                 )
                             ]
                         )
+                    ),
+
+                    // Post_Comments_ScalarFK
+                    new ApiOneToManyRelationshipDef
+                    (
+                        ApiName: "Post_Comments_ScalarFK",
+                        PrincipalEnd: new ApiPrincipalEndDef
+                        (
+                            ClrObjectType: typeof(RelationshipPost),
+                            ApiDeleteBehavior: ApiRelationshipDeleteBehavior.None
+                        ),
+                        DependentEnd: new ApiDependentEndDef
+                        (
+                            ClrObjectType: typeof(RelationshipComment),
+                            ApiDeleteBehavior: ApiRelationshipDeleteBehavior.Cascade,
+                            ApiKeyPaths: [new ApiRelationshipScalarKeyPathDef(ClrPropertyName: nameof(RelationshipComment.PostId))]
+                        )
+                    ),
+
+                    // Post_Comments_NestedFK
+                    new ApiOneToManyRelationshipDef
+                    (
+                        ApiName: "Post_Comments_NestedFK",
+                        PrincipalEnd: new ApiPrincipalEndDef
+                        (
+                            ClrObjectType: typeof(RelationshipPost),
+                            ApiDeleteBehavior: ApiRelationshipDeleteBehavior.None
+                        ),
+                        DependentEnd: new ApiDependentEndDef
+                        (
+                            ClrObjectType: typeof(RelationshipComment),
+                            ApiDeleteBehavior: ApiRelationshipDeleteBehavior.Cascade,
+                            ApiKeyPaths:
+                            [
+                                new ApiRelationshipNestedKeyPathDef
+                                (
+                                    ClrPropertyName: nameof(RelationshipComment.PostRef),
+                                    ApiKeyPaths: [new ApiRelationshipScalarKeyPathDef(ClrPropertyName: nameof(RelationshipPostRef.PostId))]
+                                )
+                            ]
+                        )
                     )
                 ]
             ),
             Json = @"
             {
-                ""ApiName"": ""ApiSchema With Relationship Schema for One-To-Many Relationship"",
+                ""ApiName"": ""ApiSchema With Relationship Schema for One-To-Many Relationship And Scalar And Nested Foreign Key Paths"",
                 ""ApiVersion"": ""0.1.0"",
                 ""ApiOptions"": {
                     ""ApiIdentityPartNullHandling"": ""UseDefaultOnNull""
@@ -678,6 +831,74 @@ public partial class ApiSchemaTests
                 ],
                 ""ApiEnumTypes"": [],
                 ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""RelationshipComment"",
+                        ""ApiIdentities"": [
+                            {
+                                ""ApiName"": ""PK_RelationshipComment_Id"",
+                                ""ApiIdentityParts"": [
+                                    {
+                                        ""ApiKind"": ""Scalar"",
+                                        ""ClrPropertyName"": ""Id""
+                                    }
+                                ]
+                            }
+                        ],
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""Id"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""Ulid""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Id"",
+                                ""ClrMemberKind"": ""Property""
+                            },
+                            {
+                                ""ApiName"": ""PostId"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""Ulid""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""PostId"",
+                                ""ClrMemberKind"": ""Property""
+                            },
+                            {
+                                ""ApiName"": ""PostRef"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Object"",
+                                    ""ApiName"": ""RelationshipPostRef""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""PostRef"",
+                                ""ClrMemberKind"": ""Property""
+                            },
+                            {
+                                ""ApiName"": ""Body"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""String""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Body"",
+                                ""ClrMemberKind"": ""Property""
+                            },
+                            {
+                                ""ApiName"": ""Post"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Object"",
+                                    ""ApiName"": ""RelationshipPost""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Post"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.RelationshipComment,Evoogle.ApiFramework.Core.Tests""
+                    },
                     {
                         ""ApiKind"": ""Object"",
                         ""ApiName"": ""RelationshipPost"",
@@ -734,6 +955,23 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             },
                             {
+                                ""ApiName"": ""Comments"",
+                                ""ApiType"": {
+                                    ""ApiInlineType"": {
+                                        ""ApiKind"": ""Collection"",
+                                        ""ApiItemType"": {
+                                            ""ApiKind"": ""Object"",
+                                            ""ApiName"": ""RelationshipComment""
+                                        },
+                                        ""ApiItemTypeModifiers"": ""Required"",
+                                        ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.TestData.RelationshipComment,Evoogle.ApiFramework.Core.Tests]],System.Private.CoreLib""
+                                    }
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Comments"",
+                                ""ClrMemberKind"": ""Property""
+                            },
+                            {
                                 ""ApiName"": ""User"",
                                 ""ApiType"": {
                                     ""ApiKind"": ""Object"",
@@ -745,6 +983,34 @@ public partial class ApiSchemaTests
                             }
                         ],
                         ""ClrType"": ""Evoogle.ApiFramework.TestData.RelationshipPost,Evoogle.ApiFramework.Core.Tests""
+                    },
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""RelationshipPostRef"",
+                        ""ApiIdentities"": [
+                            {
+                                ""ApiName"": ""PK_RelationshipPostRef_PostId"",
+                                ""ApiIdentityParts"": [
+                                    {
+                                        ""ApiKind"": ""Scalar"",
+                                        ""ClrPropertyName"": ""PostId""
+                                    }
+                                ]
+                            }
+                        ],
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""PostId"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""Ulid""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""PostId"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.RelationshipPostRef,Evoogle.ApiFramework.Core.Tests""
                     },
                     {
                         ""ApiKind"": ""Object"",
@@ -833,6 +1099,52 @@ public partial class ApiSchemaTests
                 ""ApiRelationships"": [
                     {
                         ""ApiKind"": ""OneToMany"",
+                        ""ApiName"": ""Post_Comments_NestedFK"",
+                        ""ApiPrincipalEnd"": {
+                            ""ApiKind"": ""Principal"",
+                            ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipPost,Evoogle.ApiFramework.Core.Tests"",
+                            ""ApiDeleteBehavior"": ""None""
+                        },
+                        ""ApiDependentEnd"": {
+                            ""ApiKind"": ""Dependent"",
+                            ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipComment,Evoogle.ApiFramework.Core.Tests"",
+                            ""ApiDeleteBehavior"": ""Cascade"",
+                            ""ApiKeyPaths"": [
+                                {
+                                    ""ApiKind"": ""Nested"",
+                                    ""ClrPropertyName"": ""PostRef"",
+                                    ""ApiKeyPaths"": [
+                                        {
+                                            ""ApiKind"": ""Scalar"",
+                                            ""ClrPropertyName"": ""PostId""
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        ""ApiKind"": ""OneToMany"",
+                        ""ApiName"": ""Post_Comments_ScalarFK"",
+                        ""ApiPrincipalEnd"": {
+                            ""ApiKind"": ""Principal"",
+                            ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipPost,Evoogle.ApiFramework.Core.Tests"",
+                            ""ApiDeleteBehavior"": ""None""
+                        },
+                        ""ApiDependentEnd"": {
+                            ""ApiKind"": ""Dependent"",
+                            ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipComment,Evoogle.ApiFramework.Core.Tests"",
+                            ""ApiDeleteBehavior"": ""Cascade"",
+                            ""ApiKeyPaths"": [
+                                {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ClrPropertyName"": ""PostId""
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        ""ApiKind"": ""OneToMany"",
                         ""ApiName"": ""User_Posts_NestedFK"",
                         ""ApiPrincipalEnd"": {
                             ""ApiKind"": ""Principal"",
@@ -878,8 +1190,430 @@ public partial class ApiSchemaTests
                         }
                     }
                 ]
-             }"
+            }"
         },
+
+        // ApiSchema With Relationship Schema for Many-To-Many Relationship
+        new ApiSchemaJsonTestCase
+        {
+            Name = $"{nameof(ApiSchema)} With Relationship Schema for Many-To-Many Relationship And Scalar Foreign Key Paths",
+            FactoryArgument = new ApiSchemaDef
+            (
+                ApiName: $"{nameof(ApiSchema)} With Relationship Schema for Many-To-Many Relationship And Scalar Foreign Key Paths",
+                ApiNamedTypes:
+                [
+                    new ApiScalarTypeDef
+                    (
+                        ApiName: nameof(String),
+                        ClrType: typeof(string)
+                    ),
+                    new ApiScalarTypeDef
+                    (
+                        ApiName: nameof(Ulid),
+                        ClrType: typeof(Ulid)
+                    ),
+
+                    // Post
+                    new ApiObjectTypeDef
+                    (
+                        ApiName: nameof(RelationshipPost),
+                        ClrType: typeof(RelationshipPost),
+                        ApiIdentities:
+                        [
+                            new ApiIdentityDef
+                            (
+                                ApiName: "PK_RelationshipPost_Id",
+                                Parts:
+                                [
+                                    new ApiScalarPartDef
+                                    (
+                                        ApiPropertyName: nameof(RelationshipPost.Id)
+                                    )
+                                ]
+                            )
+                        ],
+                        ApiProperties:
+                        [
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(RelationshipPost.Id),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Ulid)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(RelationshipPost.Id),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(RelationshipPost.Title),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(RelationshipPost.Title),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(RelationshipPost.Tags),
+                                ApiTypeExpression: new ApiTypeExpression
+                                (
+                                    apiInlineType: new ApiCollectionType
+                                    (
+                                        apiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(RelationshipTag)),
+                                        apiItemTypeModifiers: ApiTypeModifiers.Required,
+                                        clrCollectionType: typeof(List<RelationshipTag>)
+                                    )
+                                ),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(RelationshipPost.Tags),
+                                ClrMemberKind: ClrMemberKind.Property
+                            )
+                        ]
+                    ),
+
+                    // Tag
+                    new ApiObjectTypeDef
+                    (
+                        ApiName: nameof(RelationshipTag),
+                        ClrType: typeof(RelationshipTag),
+                        ApiIdentities:
+                        [
+                            new ApiIdentityDef
+                            (
+                                ApiName: "PK_RelationshipTag_Id",
+                                Parts:
+                                [
+                                    new ApiScalarPartDef
+                                    (
+                                        ApiPropertyName: nameof(RelationshipTag.Id)
+                                    )
+                                ]
+                            )
+                        ],
+                        ApiProperties:
+                        [
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(RelationshipTag.Id),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Ulid)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(RelationshipTag.Id),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(RelationshipTag.Name),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(RelationshipTag.Name),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(RelationshipTag.Posts),
+                                ApiTypeExpression: new ApiTypeExpression
+                                (
+                                    apiInlineType: new ApiCollectionType
+                                    (
+                                        apiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(RelationshipPost)),
+                                        apiItemTypeModifiers: ApiTypeModifiers.Required,
+                                        clrCollectionType: typeof(List<RelationshipPost>)
+                                    )
+                                ),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(RelationshipTag.Posts),
+                                ClrMemberKind: ClrMemberKind.Property
+                            )
+                        ]
+                    ),
+
+                    // PostTag
+                    new ApiObjectTypeDef
+                    (
+                        ApiName: nameof(RelationshipPostTag),
+                        ClrType: typeof(RelationshipPostTag),
+                        ApiIdentities:
+                        [
+                            new ApiIdentityDef
+                            (
+                                ApiName: "PK_RelationshipPostTag_PostId_TagId",
+                                Parts:
+                                [
+                                    new ApiScalarPartDef
+                                    (
+                                        ApiPropertyName: nameof(RelationshipPostTag.PostId)
+                                    ),
+                                    new ApiScalarPartDef
+                                    (
+                                        ApiPropertyName: nameof(RelationshipPostTag.TagId)
+                                    )
+                                ]
+                            )
+                        ],
+                        ApiProperties:
+                        [
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(RelationshipPostTag.PostId),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Ulid)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(RelationshipPostTag.PostId),
+                                ClrMemberKind: ClrMemberKind.Property
+                            ),
+                            new ApiPropertyDef
+                            (
+                                ApiName: nameof(RelationshipPostTag.TagId),
+                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Ulid)),
+                                ApiTypeModifiers: ApiTypeModifiers.Required,
+                                ClrName: nameof(RelationshipPostTag.TagId),
+                                ClrMemberKind: ClrMemberKind.Property
+                            )
+                        ]
+                    ),
+                ],
+                ApiRelationships:
+                [
+                    // Post_Tags
+                    new ApiManyToManyRelationshipDef
+                    (
+                        ApiName: "Post_Tags",
+                        PrincipalEndA: new ApiPrincipalEndDef
+                        (
+                            ClrObjectType: typeof(RelationshipPost)
+                        ),
+                        PrincipalEndB: new ApiPrincipalEndDef
+                        (
+                            ClrObjectType: typeof(RelationshipTag)
+                        ),
+                        DependentEndA: new ApiDependentEndDef
+                        (
+                            ClrObjectType: typeof(RelationshipPostTag),
+                            ApiKeyPaths: [new ApiRelationshipScalarKeyPathDef(ClrPropertyName: nameof(RelationshipPostTag.PostId))],
+                            ApiForcedDeleteBehavior: ApiRelationshipDeleteBehavior.Cascade
+                        ),
+                        DependentEndB: new ApiDependentEndDef
+                        (
+                            ClrObjectType: typeof(RelationshipPostTag),
+                            ApiKeyPaths: [new ApiRelationshipScalarKeyPathDef(ClrPropertyName: nameof(RelationshipPostTag.TagId))],
+                            ApiForcedDeleteBehavior: ApiRelationshipDeleteBehavior.Cascade
+                        ),
+                        ClrAssociationObjectType: typeof(RelationshipPostTag)
+                    )
+                ]
+            ),
+            Json = @"
+            {
+                ""ApiName"": ""ApiSchema With Relationship Schema for Many-To-Many Relationship And Scalar Foreign Key Paths"",
+                ""ApiVersion"": ""0.1.0"",
+                ""ApiOptions"": {
+                    ""ApiIdentityPartNullHandling"": ""UseDefaultOnNull""
+                },
+                ""ApiScalarTypes"": [
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""String"",
+                        ""ClrType"": ""System.String,System.Private.CoreLib""
+                    },
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""Ulid"",
+                        ""ClrType"": ""System.Ulid,Ulid""
+                    }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""RelationshipPost"",
+                        ""ApiIdentities"": [
+                            {
+                                ""ApiName"": ""PK_RelationshipPost_Id"",
+                                ""ApiIdentityParts"": [
+                                    {
+                                        ""ApiKind"": ""Scalar"",
+                                        ""ClrPropertyName"": ""Id""
+                                    }
+                                ]
+                            }
+                        ],
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""Id"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""Ulid""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Id"",
+                                ""ClrMemberKind"": ""Property""
+                            },
+                            {
+                                ""ApiName"": ""Title"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""String""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Title"",
+                                ""ClrMemberKind"": ""Property""
+                            },
+                            {
+                                ""ApiName"": ""Tags"",
+                                ""ApiType"": {
+                                    ""ApiInlineType"": {
+                                        ""ApiKind"": ""Collection"",
+                                        ""ApiItemType"": {
+                                            ""ApiKind"": ""Object"",
+                                            ""ApiName"": ""RelationshipTag""
+                                        },
+                                        ""ApiItemTypeModifiers"": ""Required"",
+                                        ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.TestData.RelationshipTag,Evoogle.ApiFramework.Core.Tests]],System.Private.CoreLib""
+                                    }
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Tags"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.RelationshipPost,Evoogle.ApiFramework.Core.Tests""
+                    },
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""RelationshipPostTag"",
+                        ""ApiIdentities"": [
+                            {
+                                ""ApiName"": ""PK_RelationshipPostTag_PostId_TagId"",
+                                ""ApiIdentityParts"": [
+                                    {
+                                        ""ApiKind"": ""Scalar"",
+                                        ""ClrPropertyName"": ""PostId""
+                                    },
+                                    {
+                                        ""ApiKind"": ""Scalar"",
+                                        ""ClrPropertyName"": ""TagId""
+                                    }
+                                ]
+                            }
+                        ],
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""PostId"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""Ulid""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""PostId"",
+                                ""ClrMemberKind"": ""Property""
+                            },
+                            {
+                                ""ApiName"": ""TagId"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""Ulid""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""TagId"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.RelationshipPostTag,Evoogle.ApiFramework.Core.Tests""
+                    },
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""RelationshipTag"",
+                        ""ApiIdentities"": [
+                            {
+                                ""ApiName"": ""PK_RelationshipTag_Id"",
+                                ""ApiIdentityParts"": [
+                                    {
+                                        ""ApiKind"": ""Scalar"",
+                                        ""ClrPropertyName"": ""Id""
+                                    }
+                                ]
+                            }
+                        ],
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""Id"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""Ulid""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Id"",
+                                ""ClrMemberKind"": ""Property""
+                            },
+                            {
+                                ""ApiName"": ""Name"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""String""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Name"",
+                                ""ClrMemberKind"": ""Property""
+                            },
+                            {
+                                ""ApiName"": ""Posts"",
+                                ""ApiType"": {
+                                    ""ApiInlineType"": {
+                                        ""ApiKind"": ""Collection"",
+                                        ""ApiItemType"": {
+                                            ""ApiKind"": ""Object"",
+                                            ""ApiName"": ""RelationshipPost""
+                                        },
+                                        ""ApiItemTypeModifiers"": ""Required"",
+                                        ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.TestData.RelationshipPost,Evoogle.ApiFramework.Core.Tests]],System.Private.CoreLib""
+                                    }
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Posts"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.RelationshipTag,Evoogle.ApiFramework.Core.Tests""
+                    }
+                ],
+                ""ApiRelationships"": [
+                    {
+                        ""ApiKind"": ""ManyToMany"",
+                        ""ApiName"": ""Post_Tags"",
+                        ""ApiPrincipalEndA"": {
+                            ""ApiKind"": ""Principal"",
+                            ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipPost,Evoogle.ApiFramework.Core.Tests"",
+                            ""ApiDeleteBehavior"": ""None""
+                        },
+                        ""ApiPrincipalEndB"": {
+                            ""ApiKind"": ""Principal"",
+                            ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipTag,Evoogle.ApiFramework.Core.Tests"",
+                            ""ApiDeleteBehavior"": ""None""
+                        },
+                        ""ApiDependentEndA"": {
+                            ""ApiKind"": ""Dependent"",
+                            ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipPostTag,Evoogle.ApiFramework.Core.Tests"",
+                            ""ApiDeleteBehavior"": ""None"",
+                            ""ApiKeyPaths"": [
+                                {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ClrPropertyName"": ""PostId""
+                                }
+                            ]
+                        },
+                        ""ApiDependentEndB"": {
+                            ""ApiKind"": ""Dependent"",
+                            ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipPostTag,Evoogle.ApiFramework.Core.Tests"",
+                            ""ApiDeleteBehavior"": ""None"",
+                            ""ApiKeyPaths"": [
+                                {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ClrPropertyName"": ""TagId""
+                                }
+                            ]
+                        },
+                        ""ClrAssociationObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipPostTag,Evoogle.ApiFramework.Core.Tests""
+                    }
+                ]
+            }"
+        }
     ];
     #endregion
 }

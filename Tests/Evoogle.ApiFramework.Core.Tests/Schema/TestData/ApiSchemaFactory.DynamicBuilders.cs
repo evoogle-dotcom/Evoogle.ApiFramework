@@ -100,14 +100,14 @@ public static partial class ApiSchemaFactory
     public abstract record ApiRelationshipEndDef
     (
         Type ClrObjectType,
-        ApiRelationshipDeleteBehavior ApiDeleteBehavior,
+        ApiRelationshipDeleteBehavior ApiDeleteBehavior = ApiRelationshipDeleteBehavior.None,
         List<Type>? ExtensionTypes = null
     ) : ApiSchemaElementDef(ExtensionTypes);
 
     public record ApiPrincipalEndDef
     (
         Type ClrObjectType,
-        ApiRelationshipDeleteBehavior ApiDeleteBehavior,
+        ApiRelationshipDeleteBehavior ApiDeleteBehavior = ApiRelationshipDeleteBehavior.None,
         string? ApiIdentityName = null,
         List<Type>? ExtensionTypes = null
     ) : ApiRelationshipEndDef(ClrObjectType, ApiDeleteBehavior, ExtensionTypes);
@@ -115,7 +115,7 @@ public static partial class ApiSchemaFactory
     public record ApiDependentEndDef
     (
         Type ClrObjectType,
-        ApiRelationshipDeleteBehavior ApiDeleteBehavior,
+        ApiRelationshipDeleteBehavior ApiDeleteBehavior = ApiRelationshipDeleteBehavior.None,
         IEnumerable<ApiRelationshipKeyPathDef>? ApiKeyPaths = null,
         ApiRelationshipDeleteBehavior? ApiForcedDeleteBehavior = null,
         List<Type>? ExtensionTypes = null
