@@ -75,13 +75,13 @@ public sealed class ApiRelationshipManyToMany
 
     /// <summary>
     ///     Gets dependent end A, which targets the association type and carries FK key paths back to principal end A.
-    ///     Delete behavior is fixed to <see cref="ApiRelationshipDeleteBehavior.Cascade"/> and is not developer-configurable.
+    ///     Delete behavior is fixed to <see cref="ApiRelationshipDeleteBehavior.Delete"/> and is not developer-configurable.
     /// </summary>
     public ApiRelationshipDependentEnd ApiDependentEndA { get; } = apiDependentEndA;
 
     /// <summary>
     ///     Gets dependent end B, which targets the association type and carries FK key paths back to principal end B.
-    ///     Delete behavior is fixed to <see cref="ApiRelationshipDeleteBehavior.Cascade"/> and is not developer-configurable.
+    ///     Delete behavior is fixed to <see cref="ApiRelationshipDeleteBehavior.Delete"/> and is not developer-configurable.
     /// </summary>
     public ApiRelationshipDependentEnd ApiDependentEndB { get; } = apiDependentEndB;
 

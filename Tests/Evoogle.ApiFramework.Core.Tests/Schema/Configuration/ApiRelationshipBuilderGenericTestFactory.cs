@@ -60,7 +60,7 @@ public static class ApiRelationshipBuilderGenericTestFactory
 
     public static ApiRelationship BuildExpected_OneToOne_PrincipalConfigure_DeleteBehavior()
         => new ApiRelationshipOneToOneBuilder("REL_Customer_Order_PrincipalConfigure")
-            .WithPrincipalEnd<Customer>(p => p.WithDeleteBehavior(ApiRelationshipDeleteBehavior.Cascade))
+            .WithPrincipalEnd<Customer>(p => p.WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete))
             .WithDependentEnd<Order>()
             .Build();
 
@@ -112,7 +112,7 @@ public static class ApiRelationshipBuilderGenericTestFactory
 
     public static ApiRelationship BuildActual_OneToOne_PrincipalConfigure_DeleteBehavior()
         => new ApiRelationshipOneToOneBuilder("REL_Customer_Order_PrincipalConfigure")
-            .WithPrincipalEnd<Customer>(p => p.WithDeleteBehavior(ApiRelationshipDeleteBehavior.Cascade))
+            .WithPrincipalEnd<Customer>(p => p.WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete))
             .WithDependentEnd<Order>()
             .Build();
 

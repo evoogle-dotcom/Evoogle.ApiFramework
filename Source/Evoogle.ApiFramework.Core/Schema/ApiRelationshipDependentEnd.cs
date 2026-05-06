@@ -59,7 +59,7 @@ public sealed class ApiRelationshipDependentEnd
     /// <summary>
     ///     Gets the effective delete behavior, taking into account any forced override.
     ///     For <see cref="ApiRelationshipManyToMany"/> association ends this is always
-    ///     <see cref="ApiRelationshipDeleteBehavior.Cascade"/>.
+    ///     <see cref="ApiRelationshipDeleteBehavior.Delete"/>.
     /// </summary>
     public ApiRelationshipDeleteBehavior ApiEffectiveDeleteBehavior { get; } =
         apiForcedDeleteBehavior ?? apiDeleteBehavior;

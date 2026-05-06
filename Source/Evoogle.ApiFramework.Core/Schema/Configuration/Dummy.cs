@@ -233,7 +233,7 @@ public static class Dummy
             builder
                 .WithPrincipalEnd<Customer>
                 (
-                    p => p.WithDeleteBehavior(ApiRelationshipDeleteBehavior.Cascade)
+                    p => p.WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete)
                 )
                 .WithDependentEnd<Order>
                 (
@@ -254,7 +254,7 @@ public static class Dummy
             builder
                 .WithPrincipalEnd<Order>
                 (
-                    p => p.WithDeleteBehavior(ApiRelationshipDeleteBehavior.Cascade)
+                    p => p.WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete)
                 )
                 .WithDependentEnd<OrderItem>
                 (
@@ -289,7 +289,7 @@ public static class Dummy
                 .WithPrincipalEnd<Customer>
                 (
                     p => p
-                        .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Cascade)
+                        .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete)
                         .AddPrincipalEndExtension(new VisibleMetadata { Visible = true })
                 )
                 .WithDependentEnd<CustomerProfile>
@@ -315,14 +315,14 @@ public static class Dummy
                 .WithPrincipalEndA<Product>
                 (
                     p => p
-                        .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Cascade)
+                        .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete)
                         .AddPrincipalEndExtension(new VisibleMetadata { Visible = true })
                 )
                 .WithPrincipalEndB<Tag>
                 (
                     p => p
                         .WithIdentityName("PrimaryKey")
-                        .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Cascade)
+                        .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete)
                 )
                 .WithDependentEndA
                 (
@@ -359,7 +359,7 @@ public static class Dummy
         public void Configure(ApiRelationshipOneToManyBuilder builder)
         {
             builder
-                .WithPrincipalEnd<Customer>(p => p.WithDeleteBehavior(ApiRelationshipDeleteBehavior.Cascade))
+                .WithPrincipalEnd<Customer>(p => p.WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete))
                 .WithDependentEnd<Order>(d => d.AddScalarPath(o => o.CustomerId));
         }
     }
@@ -369,7 +369,7 @@ public static class Dummy
         public void Configure(ApiRelationshipOneToOneBuilder builder)
         {
             builder
-                .WithPrincipalEnd<Customer>(p => p.WithDeleteBehavior(ApiRelationshipDeleteBehavior.Cascade))
+                .WithPrincipalEnd<Customer>(p => p.WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete))
                 .WithDependentEnd<CustomerProfile>(d => d
                     .AddNestedPath(cp => cp.CustomerRef, n => n
                         .AddScalarPath(r => r.CustomerId)));
@@ -383,10 +383,10 @@ public static class Dummy
             builder
                 .WithPrincipalEndA<Product>(p => p
                     .WithIdentityName("PrimaryKey")
-                    .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Cascade))
+                    .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete))
                 .WithPrincipalEndB<Tag>(p => p
                     .WithIdentityName("PrimaryKey")
-                    .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Cascade))
+                    .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete))
                 .WithDependentEndA(d => d.AddScalarPath(pt => pt.ProductId))
                 .WithDependentEndB(d => d.AddScalarPath(pt => pt.TagId));
         }
@@ -488,7 +488,7 @@ public static class Dummy
                 r => r
                     .WithPrincipalEnd<Customer>
                     (
-                        p => p.WithDeleteBehavior(ApiRelationshipDeleteBehavior.Cascade)
+                        p => p.WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete)
                     )
                     .WithDependentEnd<Order>
                     (
@@ -503,7 +503,7 @@ public static class Dummy
                 r => r
                     .WithPrincipalEnd<Order>
                     (
-                        p => p.WithDeleteBehavior(ApiRelationshipDeleteBehavior.Cascade)
+                        p => p.WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete)
                     )
                     .WithDependentEnd<OrderItem>
                     (
@@ -521,7 +521,7 @@ public static class Dummy
                     (
                         p => p
                             .WithIdentityName("PrimaryKey")
-                            .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Cascade)
+                            .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete)
                     )
                     .WithDependentEnd<CustomerProfile>
                     (
@@ -539,14 +539,14 @@ public static class Dummy
                     (
                         p => p
                             .WithIdentityName("PrimaryKey")
-                            .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Cascade)
+                            .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete)
                             .AddPrincipalEndExtension(new VisibleMetadata { Visible = true })
                     )
                     .WithPrincipalEndB<Tag>
                     (
                         p => p
                             .WithIdentityName("PrimaryKey")
-                            .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Cascade)
+                            .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete)
                     )
                     .WithDependentEndA
                     (
@@ -628,7 +628,7 @@ public static class Dummy
                 .AddProperty(pt => pt.TagId, p => p.WithModifiers(m => m.Required())))
             .AddOneToManyRelationship("CustomerHasOrders", new CustomerHasOrdersConfigurationGeneric())
             .AddOneToManyRelationship("OrderHasOrderItems", r => r
-                .WithPrincipalEnd<Order>(p => p.WithDeleteBehavior(ApiRelationshipDeleteBehavior.Cascade))
+                .WithPrincipalEnd<Order>(p => p.WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete))
                 .WithDependentEnd<OrderItem>(d => d
                     .AddScalarPath(oi => oi.OrderId)
                     .AddScalarPath(oi => oi.LineItemNumber)))
@@ -636,7 +636,7 @@ public static class Dummy
             .AddOneToOneRelationship("CustomerHasProfileInline", r => r
                 .WithPrincipalEnd<Customer>(p => p
                     .WithIdentityName("PrimaryKey")
-                    .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Cascade))
+                    .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete))
                 .WithDependentEnd<CustomerProfile>(d => d
                     .AddNestedPath(cp => cp.CustomerRef, n => n
                         .AddScalarPath(r => r.CustomerId))))
@@ -644,10 +644,10 @@ public static class Dummy
             .AddManyToManyRelationship<ProductTag>("ProductHasTagsInline", r => r
                 .WithPrincipalEndA<Product>(p => p
                     .WithIdentityName("PrimaryKey")
-                    .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Cascade))
+                    .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete))
                 .WithPrincipalEndB<Tag>(p => p
                     .WithIdentityName("PrimaryKey")
-                    .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Cascade))
+                    .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete))
                 .WithDependentEndA(d => d.AddScalarPath(pt => pt.ProductId))
                 .WithDependentEndB(d => d.AddScalarPath(pt => pt.TagId)))
             .Build();

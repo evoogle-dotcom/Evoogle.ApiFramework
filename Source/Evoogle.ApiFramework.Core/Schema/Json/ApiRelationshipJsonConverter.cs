@@ -221,17 +221,17 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
                 readData.ApiName!,
                 readData.ApiPrincipalEndA!,
                 readData.ApiPrincipalEndB!,
-                // Re-apply forced Cascade when deserializing M:N dependent ends.
+                // Re-apply forced Delete when deserializing M:N dependent ends.
                 new ApiRelationshipDependentEnd(
                     readData.ApiDependentEndA!.ClrObjectType,
                     readData.ApiDependentEndA.ApiKeyPaths,
                     ApiRelationshipDeleteBehavior.None,
-                    ApiRelationshipDeleteBehavior.Cascade),
+                    ApiRelationshipDeleteBehavior.Delete),
                 new ApiRelationshipDependentEnd(
                     readData.ApiDependentEndB!.ClrObjectType,
                     readData.ApiDependentEndB.ApiKeyPaths,
                     ApiRelationshipDeleteBehavior.None,
-                    ApiRelationshipDeleteBehavior.Cascade),
+                    ApiRelationshipDeleteBehavior.Delete),
                 readData.ClrAssociationObjectType!
             ),
 

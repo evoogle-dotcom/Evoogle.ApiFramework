@@ -11,7 +11,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 /// <remarks>
 ///     A many-to-many relationship requires an explicit association <see cref="ApiObjectType"/> that holds the
 ///     foreign-key columns for both sides.  Both dependent ends always use
-///     <see cref="ApiRelationshipDeleteBehavior.Cascade"/>, regardless of any delete behavior set on their
+///     <see cref="ApiRelationshipDeleteBehavior.Delete"/>, regardless of any delete behavior set on their
 ///     individual builders.
 /// </remarks>
 /// <param name="apiName">The schema-unique API name of the relationship.</param>
@@ -70,7 +70,7 @@ public class ApiRelationshipManyToManyBuilder(string apiName) : ApiRelationshipB
     /// <summary>
     ///     Configures dependent end A using the CLR type <typeparamref name="TDependent"/>. The typed builder allows
     ///     expression-based FK path configuration.
-    ///     The effective delete behavior is always <see cref="ApiRelationshipDeleteBehavior.Cascade"/>.
+    ///     The effective delete behavior is always <see cref="ApiRelationshipDeleteBehavior.Delete"/>.
     /// </summary>
     /// <typeparam name="TDependent">The CLR type of the dependent (association) object type.</typeparam>
     /// <param name="configure">Optional callback to add FK key paths and attach extensions.</param>
@@ -86,7 +86,7 @@ public class ApiRelationshipManyToManyBuilder(string apiName) : ApiRelationshipB
     /// <summary>
     ///     Configures dependent end B using the CLR type <typeparamref name="TDependent"/>. The typed builder allows
     ///     expression-based FK path configuration.
-    ///     The effective delete behavior is always <see cref="ApiRelationshipDeleteBehavior.Cascade"/>.
+    ///     The effective delete behavior is always <see cref="ApiRelationshipDeleteBehavior.Delete"/>.
     /// </summary>
     /// <typeparam name="TDependent">The CLR type of the dependent (association) object type.</typeparam>
     /// <param name="configure">Optional callback to add FK key paths and attach extensions.</param>
@@ -137,9 +137,9 @@ public class ApiRelationshipManyToManyBuilder(string apiName) : ApiRelationshipB
             return null;
         }
 
-        // Build the end first, then promote the delete behavior to Cascade regardless of the
+        // Build the end first, then promote the delete behavior to Delete regardless of the
         // developer-configured value — M:N dependent ends always cascade.
-        var end = builder.BuildWithForcedDeleteBehavior(ApiRelationshipDeleteBehavior.Cascade);
+        var end = builder.BuildWithForcedDeleteBehavior(ApiRelationshipDeleteBehavior.Delete);
         return end;
     }
     #endregion

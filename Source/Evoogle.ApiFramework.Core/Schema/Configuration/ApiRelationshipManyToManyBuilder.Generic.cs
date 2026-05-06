@@ -45,7 +45,7 @@ public sealed class ApiRelationshipManyToManyBuilder<TAssociation>
 
     /// <summary>
     ///     Configures dependent end A targeting the association type <typeparamref name="TAssociation"/>.
-    ///     The effective delete behavior is always <see cref="ApiRelationshipDeleteBehavior.Cascade"/>.
+    ///     The effective delete behavior is always <see cref="ApiRelationshipDeleteBehavior.Delete"/>.
     /// </summary>
     /// <param name="configure">Optional callback to add FK key paths and attach extensions.</param>
     /// <returns>The current builder instance.</returns>
@@ -59,7 +59,7 @@ public sealed class ApiRelationshipManyToManyBuilder<TAssociation>
 
     /// <summary>
     ///     Configures dependent end B targeting the association type <typeparamref name="TAssociation"/>.
-    ///     The effective delete behavior is always <see cref="ApiRelationshipDeleteBehavior.Cascade"/>.
+    ///     The effective delete behavior is always <see cref="ApiRelationshipDeleteBehavior.Delete"/>.
     /// </summary>
     /// <param name="configure">Optional callback to add FK key paths and attach extensions.</param>
     /// <returns>The current builder instance.</returns>
