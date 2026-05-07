@@ -123,43 +123,43 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
         private static void HandleApiPrincipalEnd(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiRelationship ??= new ApiRelationshipReadData();
-            var end = JsonSerializer.Deserialize<ApiRelationshipEnd>(ref reader, context.Options);
-            context.ReadData.ApiRelationship.ApiPrincipalEnd = end as ApiRelationshipPrincipalEnd;
+            var end = JsonSerializer.Deserialize<ApiRelationshipPrincipalEnd>(ref reader, context.Options);
+            context.ReadData.ApiRelationship.ApiPrincipalEnd = end;
         }
 
         private static void HandleApiDependentEnd(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiRelationship ??= new ApiRelationshipReadData();
-            var end = JsonSerializer.Deserialize<ApiRelationshipEnd>(ref reader, context.Options);
-            context.ReadData.ApiRelationship.ApiDependentEnd = end as ApiRelationshipDependentEnd;
+            var end = JsonSerializer.Deserialize<ApiRelationshipDependentEnd>(ref reader, context.Options);
+            context.ReadData.ApiRelationship.ApiDependentEnd = end;
         }
 
         private static void HandleApiPrincipalEndA(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiRelationship ??= new ApiRelationshipReadData();
-            var end = JsonSerializer.Deserialize<ApiRelationshipEnd>(ref reader, context.Options);
-            context.ReadData.ApiRelationship.ApiPrincipalEndA = end as ApiRelationshipPrincipalEnd;
+            var end = JsonSerializer.Deserialize<ApiRelationshipPrincipalEnd>(ref reader, context.Options);
+            context.ReadData.ApiRelationship.ApiPrincipalEndA = end;
         }
 
         private static void HandleApiPrincipalEndB(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiRelationship ??= new ApiRelationshipReadData();
-            var end = JsonSerializer.Deserialize<ApiRelationshipEnd>(ref reader, context.Options);
-            context.ReadData.ApiRelationship.ApiPrincipalEndB = end as ApiRelationshipPrincipalEnd;
+            var end = JsonSerializer.Deserialize<ApiRelationshipPrincipalEnd>(ref reader, context.Options);
+            context.ReadData.ApiRelationship.ApiPrincipalEndB = end;
         }
 
         private static void HandleApiDependentEndA(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiRelationship ??= new ApiRelationshipReadData();
-            var end = JsonSerializer.Deserialize<ApiRelationshipEnd>(ref reader, context.Options);
-            context.ReadData.ApiRelationship.ApiDependentEndA = end as ApiRelationshipDependentEnd;
+            var end = JsonSerializer.Deserialize<ApiRelationshipDependentEnd>(ref reader, context.Options);
+            context.ReadData.ApiRelationship.ApiDependentEndA = end;
         }
 
         private static void HandleApiDependentEndB(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiRelationship ??= new ApiRelationshipReadData();
-            var end = JsonSerializer.Deserialize<ApiRelationshipEnd>(ref reader, context.Options);
-            context.ReadData.ApiRelationship.ApiDependentEndB = end as ApiRelationshipDependentEnd;
+            var end = JsonSerializer.Deserialize<ApiRelationshipDependentEnd>(ref reader, context.Options);
+            context.ReadData.ApiRelationship.ApiDependentEndB = end;
         }
 
         private static void HandleClrAssociationObjectType(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
@@ -304,7 +304,7 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
     private static void WriteApiPrincipalEnd(Utf8JsonWriter writer, ApiRelationshipOneTo relationship, DefaultWriteContext<PropertyNames> context)
     {
         var propertyName = context.PropertyNames.ApiRelationship.ApiPrincipalEnd;
-        var end = (ApiRelationshipEnd)relationship.ApiPrincipalEnd; // Upcast to base type for serialization
+        var end = relationship.ApiPrincipalEnd;
         var options = context.Options;
 
         writer.TryWritePropertyWithAction
@@ -319,7 +319,7 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
     private static void WriteApiDependentEnd(Utf8JsonWriter writer, ApiRelationshipOneTo relationship, DefaultWriteContext<PropertyNames> context)
     {
         var propertyName = context.PropertyNames.ApiRelationship.ApiDependentEnd;
-        var end = (ApiRelationshipEnd)relationship.ApiDependentEnd; // Upcast to base type for serialization
+        var end = relationship.ApiDependentEnd;
         var options = context.Options;
 
         writer.TryWritePropertyWithAction
@@ -334,7 +334,7 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
     private static void WriteApiPrincipalEndA(Utf8JsonWriter writer, ApiRelationshipManyToMany relationship, DefaultWriteContext<PropertyNames> context)
     {
         var propertyName = context.PropertyNames.ApiRelationship.ApiPrincipalEndA;
-        var end = (ApiRelationshipEnd)relationship.ApiPrincipalEndA; // Upcast to base type for serialization
+        var end = relationship.ApiPrincipalEndA;
         var options = context.Options;
 
         writer.TryWritePropertyWithAction
@@ -349,7 +349,7 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
     private static void WriteApiPrincipalEndB(Utf8JsonWriter writer, ApiRelationshipManyToMany relationship, DefaultWriteContext<PropertyNames> context)
     {
         var propertyName = context.PropertyNames.ApiRelationship.ApiPrincipalEndB;
-        var end = (ApiRelationshipEnd)relationship.ApiPrincipalEndB; // Upcast to base type for serialization
+        var end = relationship.ApiPrincipalEndB;
         var options = context.Options;
 
         writer.TryWritePropertyWithAction
@@ -364,7 +364,7 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
     private static void WriteApiDependentEndA(Utf8JsonWriter writer, ApiRelationshipManyToMany relationship, DefaultWriteContext<PropertyNames> context)
     {
         var propertyName = context.PropertyNames.ApiRelationship.ApiDependentEndA;
-        var end = (ApiRelationshipEnd)relationship.ApiDependentEndA; // Upcast to base type for serialization
+        var end = relationship.ApiDependentEndA;
         var options = context.Options;
 
         writer.TryWritePropertyWithAction
@@ -379,7 +379,7 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
     private static void WriteApiDependentEndB(Utf8JsonWriter writer, ApiRelationshipManyToMany relationship, DefaultWriteContext<PropertyNames> context)
     {
         var propertyName = context.PropertyNames.ApiRelationship.ApiDependentEndB;
-        var end = (ApiRelationshipEnd)relationship.ApiDependentEndB; // Upcast to base type for serialization
+        var end = relationship.ApiDependentEndB;
         var options = context.Options;
 
         writer.TryWritePropertyWithAction

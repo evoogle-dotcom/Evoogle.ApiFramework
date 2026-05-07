@@ -3,10 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using System.Text.Json.Serialization;
-
 using Evoogle.ApiFramework.Schema.Internal;
-using Evoogle.ApiFramework.Schema.Json;
 
 namespace Evoogle.ApiFramework.Schema;
 
@@ -15,7 +12,6 @@ namespace Evoogle.ApiFramework.Schema;
 ///     Each end describes one participating <see cref="ApiObjectType"/>.
 /// </summary>
 /// <param name="clrObjectType">The CLR type of the participating <see cref="ApiObjectType"/> on this end of the relationship.</param>
-[JsonConverter(typeof(ApiRelationshipEndJsonConverter))]
 public abstract class ApiRelationshipEnd
 (
     Type clrObjectType

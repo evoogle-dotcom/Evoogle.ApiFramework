@@ -394,11 +394,9 @@ public partial class ApiSchemaTests
                         ""ApiName"": ""User_Profile_NestedFK"",
                         ""ApiDeleteBehavior"": ""Delete"",
                         ""ApiPrincipalEnd"": {
-                            ""ApiKind"": ""Principal"",
                             ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipUser,Evoogle.ApiFramework.Core.Tests""
                         },
                         ""ApiDependentEnd"": {
-                            ""ApiKind"": ""Dependent"",
                             ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipUserProfile,Evoogle.ApiFramework.Core.Tests"",
                             ""ApiKeyPaths"": [
                                 {
@@ -419,11 +417,9 @@ public partial class ApiSchemaTests
                         ""ApiName"": ""User_Profile_ScalarFK"",
                         ""ApiDeleteBehavior"": ""Delete"",
                         ""ApiPrincipalEnd"": {
-                            ""ApiKind"": ""Principal"",
                             ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipUser,Evoogle.ApiFramework.Core.Tests""
                         },
                         ""ApiDependentEnd"": {
-                            ""ApiKind"": ""Dependent"",
                             ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipUserProfile,Evoogle.ApiFramework.Core.Tests"",
                             ""ApiKeyPaths"": [
                                 {
@@ -1094,11 +1090,9 @@ public partial class ApiSchemaTests
                         ""ApiName"": ""Post_Comments_NestedFK"",
                         ""ApiDeleteBehavior"": ""Delete"",
                         ""ApiPrincipalEnd"": {
-                            ""ApiKind"": ""Principal"",
                             ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipPost,Evoogle.ApiFramework.Core.Tests""
                         },
                         ""ApiDependentEnd"": {
-                            ""ApiKind"": ""Dependent"",
                             ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipComment,Evoogle.ApiFramework.Core.Tests"",
                             ""ApiKeyPaths"": [
                                 {
@@ -1119,11 +1113,9 @@ public partial class ApiSchemaTests
                         ""ApiName"": ""Post_Comments_ScalarFK"",
                         ""ApiDeleteBehavior"": ""Delete"",
                         ""ApiPrincipalEnd"": {
-                            ""ApiKind"": ""Principal"",
                             ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipPost,Evoogle.ApiFramework.Core.Tests""
                         },
                         ""ApiDependentEnd"": {
-                            ""ApiKind"": ""Dependent"",
                             ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipComment,Evoogle.ApiFramework.Core.Tests"",
                             ""ApiKeyPaths"": [
                                 {
@@ -1138,11 +1130,9 @@ public partial class ApiSchemaTests
                         ""ApiName"": ""User_Posts_NestedFK"",
                         ""ApiDeleteBehavior"": ""Delete"",
                         ""ApiPrincipalEnd"": {
-                            ""ApiKind"": ""Principal"",
                             ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipUser,Evoogle.ApiFramework.Core.Tests""
                         },
                         ""ApiDependentEnd"": {
-                            ""ApiKind"": ""Dependent"",
                             ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipPost,Evoogle.ApiFramework.Core.Tests"",
                             ""ApiKeyPaths"": [
                                 {
@@ -1163,11 +1153,9 @@ public partial class ApiSchemaTests
                         ""ApiName"": ""User_Posts_ScalarFK"",
                         ""ApiDeleteBehavior"": ""Delete"",
                         ""ApiPrincipalEnd"": {
-                            ""ApiKind"": ""Principal"",
                             ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipUser,Evoogle.ApiFramework.Core.Tests""
                         },
                         ""ApiDependentEnd"": {
-                            ""ApiKind"": ""Dependent"",
                             ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipPost,Evoogle.ApiFramework.Core.Tests"",
                             ""ApiKeyPaths"": [
                                 {
@@ -1564,15 +1552,12 @@ public partial class ApiSchemaTests
                         ""ApiKind"": ""ManyToMany"",
                         ""ApiName"": ""Post_Tags"",
                         ""ApiPrincipalEndA"": {
-                            ""ApiKind"": ""Principal"",
                             ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipPost,Evoogle.ApiFramework.Core.Tests""
                         },
                         ""ApiPrincipalEndB"": {
-                            ""ApiKind"": ""Principal"",
                             ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipTag,Evoogle.ApiFramework.Core.Tests""
                         },
                         ""ApiDependentEndA"": {
-                            ""ApiKind"": ""Dependent"",
                             ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipPostTag,Evoogle.ApiFramework.Core.Tests"",
                             ""ApiKeyPaths"": [
                                 {
@@ -1582,7 +1567,6 @@ public partial class ApiSchemaTests
                             ]
                         },
                         ""ApiDependentEndB"": {
-                            ""ApiKind"": ""Dependent"",
                             ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipPostTag,Evoogle.ApiFramework.Core.Tests"",
                             ""ApiKeyPaths"": [
                                 {

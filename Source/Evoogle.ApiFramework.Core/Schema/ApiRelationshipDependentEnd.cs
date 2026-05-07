@@ -3,7 +3,10 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Text.Json.Serialization;
+
 using Evoogle.ApiFramework.Schema.Internal;
+using Evoogle.ApiFramework.Schema.Json;
 using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema;
@@ -19,6 +22,7 @@ namespace Evoogle.ApiFramework.Schema;
 ///     on the dependent object graph. When <see langword="null"/>, the relationship is purely
 ///     navigational with no explicit FK binding declared at the schema level.
 /// </param>
+[JsonConverter(typeof(ApiRelationshipDependentEndJsonConverter))]
 public sealed class ApiRelationshipDependentEnd
 (
     Type clrObjectType,

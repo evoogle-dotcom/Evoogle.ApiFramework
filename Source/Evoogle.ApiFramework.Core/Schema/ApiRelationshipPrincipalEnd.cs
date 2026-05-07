@@ -3,7 +3,10 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Text.Json.Serialization;
+
 using Evoogle.ApiFramework.Schema.Internal;
+using Evoogle.ApiFramework.Schema.Json;
 using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema;
@@ -18,6 +21,7 @@ namespace Evoogle.ApiFramework.Schema;
 ///     The optional name of the <see cref="ApiIdentity"/> on the principal type that serves as the join key.
 ///     When <see langword="null"/>, the primary identity (<see cref="ApiObjectType.ApiPrimaryIdentity"/>) is used.
 /// </param>
+[JsonConverter(typeof(ApiRelationshipPrincipalEndJsonConverter))]
 public sealed class ApiRelationshipPrincipalEnd
 (
     Type clrObjectType,

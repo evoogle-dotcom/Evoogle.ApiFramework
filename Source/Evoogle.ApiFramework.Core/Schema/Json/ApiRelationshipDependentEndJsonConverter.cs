@@ -12,26 +12,27 @@ using Microsoft.Extensions.Logging;
 namespace Evoogle.ApiFramework.Schema.Json;
 
 /// <summary>
-///     Handles JSON serialization for <see cref="ApiRelationshipEnd"/> instances, including
-///     polymorphic dispatch across <see cref="ApiRelationshipPrincipalEnd"/> and
-///     <see cref="ApiRelationshipDependentEnd"/>.
+///     Handles JSON serialization for <see cref="ApiRelationshipDependentEnd"/> instances.
 /// </summary>
 /// <param name="logger">The optional logger used to emit diagnostics during JSON operations.</param>
-public class ApiRelationshipEndJsonConverter(ILogger<ApiRelationshipEndJsonConverter>? logger)
-    : JsonConverterBase<ApiRelationshipEnd>(logger)
+public class ApiRelationshipDependentEndJsonConverter(ILogger<ApiRelationshipDependentEndJsonConverter>? logger)
+    : JsonConverterBase<ApiRelationshipDependentEnd>(logger)
 {
     #region Property Types
     private readonly record struct ApiRelationshipEndPropertyNames
     {
-        public required string ApiKind { get; init; }
         public required string ClrObjectType { get; init; }
-        public required string ApiIdentityName { get; init; }   // Principal only
-        public required string ApiKeyPaths { get; init; }       // Dependent only
+    }
+
+    private readonly record struct ApiRelationshipDependentEndPropertyNames
+    {
+        public required string ApiKeyPaths { get; init; }
     }
 
     private readonly record struct PropertyNames
     {
         public required ApiRelationshipEndPropertyNames ApiRelationshipEnd { get; init; }
+        public required ApiRelationshipDependentEndPropertyNames ApiRelationshipDependentEnd { get; init; }
         public required ExtensibleBasePropertyNames ExtensibleBase { get; init; }
 
         public static PropertyNames Create(JsonNamingPolicy policy)
@@ -39,9 +40,10 @@ public class ApiRelationshipEndJsonConverter(ILogger<ApiRelationshipEndJsonConve
             {
                 ApiRelationshipEnd = new ApiRelationshipEndPropertyNames
                 {
-                    ApiKind = policy.ConvertName(nameof(ApiRelationshipEnd.ApiKind)),
                     ClrObjectType = policy.ConvertName(nameof(ApiRelationshipEnd.ClrObjectType)),
-                    ApiIdentityName = policy.ConvertName(nameof(ApiRelationshipPrincipalEnd.ApiIdentityName)),
+                },
+                ApiRelationshipDependentEnd = new ApiRelationshipDependentEndPropertyNames
+                {
                     ApiKeyPaths = policy.ConvertName(nameof(ApiRelationshipDependentEnd.ApiKeyPaths)),
                 },
                 ExtensibleBase = GetExtensiblePropertyNames(policy),
@@ -52,33 +54,28 @@ public class ApiRelationshipEndJsonConverter(ILogger<ApiRelationshipEndJsonConve
     #region Read Types
     private class ApiRelationshipEndReadData
     {
-        public ApiRelationshipEndKind? ApiKind { get; set; }
         public Type? ClrObjectType { get; set; }
-        public string? ApiIdentityName { get; set; }
+    }
+
+    private class ApiRelationshipDependentEndReadData
+    {
         public List<ApiRelationshipKeyPath>? ApiKeyPaths { get; set; }
     }
 
     private class ReadData : ExtensibleReadData
     {
         public ApiRelationshipEndReadData? ApiRelationshipEnd { get; set; }
+        public ApiRelationshipDependentEndReadData? ApiRelationshipDependentEnd { get; set; }
     }
 
     private class ReadHandlers(PropertyNames propertyNames)
     {
         public readonly Dictionary<string, JsonReaderHandler<DefaultReadContext<PropertyNames, ReadData, ReadHandlers>>> PropertyHandlers = new()
         {
-            { propertyNames.ApiRelationshipEnd.ApiKind, HandleApiKind },
             { propertyNames.ApiRelationshipEnd.ClrObjectType, HandleClrObjectType },
-            { propertyNames.ApiRelationshipEnd.ApiIdentityName, HandleApiIdentityName },
-            { propertyNames.ApiRelationshipEnd.ApiKeyPaths, HandleApiKeyPaths },
+            { propertyNames.ApiRelationshipDependentEnd.ApiKeyPaths, HandleApiKeyPaths },
             { propertyNames.ExtensibleBase.Extensions, CreateExtensionsHandler<PropertyNames, ReadData, ReadHandlers>() },
         };
-
-        private static void HandleApiKind(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
-        {
-            context.ReadData.ApiRelationshipEnd ??= new ApiRelationshipEndReadData();
-            context.ReadData.ApiRelationshipEnd.ApiKind = _endKindConverter.Read(ref reader, typeof(ApiRelationshipEndKind), context.Options);
-        }
 
         private static void HandleClrObjectType(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
@@ -86,16 +83,10 @@ public class ApiRelationshipEndJsonConverter(ILogger<ApiRelationshipEndJsonConve
             context.ReadData.ApiRelationshipEnd.ClrObjectType = _typeJsonConverter.Read(ref reader, typeof(Type), context.Options);
         }
 
-        private static void HandleApiIdentityName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
-        {
-            context.ReadData.ApiRelationshipEnd ??= new ApiRelationshipEndReadData();
-            context.ReadData.ApiRelationshipEnd.ApiIdentityName = reader.GetString();
-        }
-
         private static void HandleApiKeyPaths(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
-            context.ReadData.ApiRelationshipEnd ??= new ApiRelationshipEndReadData();
-            context.ReadData.ApiRelationshipEnd.ApiKeyPaths ??= [];
+            context.ReadData.ApiRelationshipDependentEnd ??= new ApiRelationshipDependentEndReadData();
+            context.ReadData.ApiRelationshipDependentEnd.ApiKeyPaths ??= [];
 
             ReadJsonArray(ref reader, context, _ => HandleApiKeyPathsArrayItem);
         }
@@ -108,19 +99,18 @@ public class ApiRelationshipEndJsonConverter(ILogger<ApiRelationshipEndJsonConve
                 return;
             }
 
-            context.ReadData.ApiRelationshipEnd!.ApiKeyPaths!.Add(keyPath);
+            context.ReadData.ApiRelationshipDependentEnd!.ApiKeyPaths!.Add(keyPath);
         }
     }
     #endregion
 
     #region Fields
-    private static readonly EnumJsonConverter<ApiRelationshipEndKind> _endKindConverter = new();
     private static readonly TypeJsonConverter _typeJsonConverter = new();
     #endregion
 
     #region Constructors
     /// <summary>Parameterless constructor for use via [JsonConverter(typeof(...))] attribute.</summary>
-    public ApiRelationshipEndJsonConverter()
+    public ApiRelationshipDependentEndJsonConverter()
         : this(null)
     {
     }
@@ -142,39 +132,18 @@ public class ApiRelationshipEndJsonConverter(ILogger<ApiRelationshipEndJsonConve
         => CreateDefaultWriteContext(logger, options, buildPropertyNames: PropertyNames.Create);
 
     /// <inheritdoc/>
-    protected override ApiRelationshipEnd? CreateValue(IReadContext context)
+    protected override ApiRelationshipDependentEnd? CreateValue(IReadContext context)
     {
         var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
-        var readData = readContext.ReadData.ApiRelationshipEnd;
 
-        if (readData?.ApiKind is null)
-        {
-            return null;
-        }
+        var clrObjectType = readContext.ReadData.ApiRelationshipEnd?.ClrObjectType;
+        var apiKeyPaths = readContext.ReadData.ApiRelationshipDependentEnd?.ApiKeyPaths;
 
-        var apiKindValue = readData.ApiKind.Value;
-        ApiRelationshipEnd? end = apiKindValue switch
-        {
-            ApiRelationshipEndKind.Principal => new ApiRelationshipPrincipalEnd
+        var end = new ApiRelationshipDependentEnd
             (
-                readData.ClrObjectType!,
-                readData.ApiIdentityName
-            ),
-
-            ApiRelationshipEndKind.Dependent => new ApiRelationshipDependentEnd
-            (
-                readData.ClrObjectType!,
-                readData.ApiKeyPaths
-            ),
-
-            _ => null
-        };
-
-        if (end is null)
-        {
-            readContext.Logger.LogError("Unsupported {ApiKind} enumeration value: '{ApiKindValue}'", nameof(ApiRelationshipEndKind), apiKindValue);
-            return null;
-        }
+                clrObjectType!,
+                apiKeyPaths
+            );
 
         AttachExtensions(end, readContext.ReadData.Extensions);
         return end;
@@ -188,25 +157,14 @@ public class ApiRelationshipEndJsonConverter(ILogger<ApiRelationshipEndJsonConve
     }
 
     /// <inheritdoc/>
-    protected override void WriteCore(Utf8JsonWriter writer, ApiRelationshipEnd value, IWriteContext context)
+    protected override void WriteCore(Utf8JsonWriter writer, ApiRelationshipDependentEnd value, IWriteContext context)
     {
         var writeContext = (DefaultWriteContext<PropertyNames>)context;
 
         WriteJsonObject(writer, () =>
         {
-            WriteApiKind(writer, value, writeContext);
             WriteClrObjectType(writer, value, writeContext);
-
-            switch (value)
-            {
-                case ApiRelationshipPrincipalEnd apiRelationshipPrincipalEnd:
-                    WriteApiIdentityName(writer, apiRelationshipPrincipalEnd, writeContext);
-                    break;
-
-                case ApiRelationshipDependentEnd apiRelationshipDependentEnd:
-                    WriteApiKeyPaths(writer, apiRelationshipDependentEnd, writeContext);
-                    break;
-            }
+            WriteApiKeyPaths(writer, value, writeContext);
 
             WriteExtensibleBaseExtensions(writer, writeContext.PropertyNames.ExtensibleBase.Extensions, value, writeContext);
         });
@@ -214,23 +172,12 @@ public class ApiRelationshipEndJsonConverter(ILogger<ApiRelationshipEndJsonConve
     #endregion
 
     #region Write Implementation Methods
-    private static void WriteApiKind(Utf8JsonWriter writer, ApiRelationshipEnd end, DefaultWriteContext<PropertyNames> context)
-        => writer.TryWritePropertyWithConverter(context.PropertyNames.ApiRelationshipEnd.ApiKind, end.ApiKind, context.Options, _endKindConverter);
-
-    private static void WriteClrObjectType(Utf8JsonWriter writer, ApiRelationshipEnd end, DefaultWriteContext<PropertyNames> context)
+    private static void WriteClrObjectType(Utf8JsonWriter writer, ApiRelationshipDependentEnd end, DefaultWriteContext<PropertyNames> context)
         => writer.TryWritePropertyWithConverter(context.PropertyNames.ApiRelationshipEnd.ClrObjectType, end.ClrObjectType, context.Options, _typeJsonConverter);
-
-    private static void WriteApiIdentityName(Utf8JsonWriter writer, ApiRelationshipPrincipalEnd end, DefaultWriteContext<PropertyNames> context)
-    {
-        var propertyName = context.PropertyNames.ApiRelationshipEnd.ApiIdentityName;
-        var value = end.ApiIdentityName;
-
-        writer.TryWritePropertyAsString(propertyName, value, context.Options);
-    }
 
     private static void WriteApiKeyPaths(Utf8JsonWriter writer, ApiRelationshipDependentEnd end, DefaultWriteContext<PropertyNames> context)
     {
-        var propertyName = context.PropertyNames.ApiRelationshipEnd.ApiKeyPaths;
+        var propertyName = context.PropertyNames.ApiRelationshipDependentEnd.ApiKeyPaths;
         var value = end.ApiKeyPaths;
         var options = context.Options;
 
