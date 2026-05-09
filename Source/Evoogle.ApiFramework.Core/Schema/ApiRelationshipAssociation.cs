@@ -12,7 +12,7 @@ using Evoogle.Extensions;
 namespace Evoogle.ApiFramework.Schema;
 
 /// <summary>
-///     Represents the association element of an <see cref="ApiRelationshipManyToMany"/>.
+///     Represents the association element of an <see cref="Schema.ApiRelationshipManyToMany"/>.
 ///     The association is the join-table object type whose properties hold the FK values
 ///     that link the two outer principal object types.
 /// </summary>
@@ -51,7 +51,17 @@ public sealed class ApiRelationshipAssociation
     protected override string ApiElementName => nameof(ApiRelationshipAssociation);
     #endregion
 
+    #region ApiRelationshipAssociation Fields
+    private ApiRelationshipManyToMany? _apiResolvedRelationshipManyToMany = null;
+    #endregion
+
     #region ApiRelationshipAssociation Properties
+    /// <summary>
+    ///     Gets the <see cref="ApiRelationshipManyToMany"/> that owns this association.
+    ///     Available after schema initialization.
+    /// </summary>
+    public ApiRelationshipManyToMany ApiRelationshipManyToMany => this.ThrowIfNotInitialized(_apiResolvedRelationshipManyToMany);
+
     /// <summary>
     ///     Gets the FK key paths that map the scalar leaves of principal end A's join-key identity
     ///     to properties on the association object type.
@@ -94,6 +104,13 @@ public sealed class ApiRelationshipAssociation
 
         this.InitializeApiKeyPaths(context, this.ApiKeyPathsA);
         this.InitializeApiKeyPaths(context, this.ApiKeyPathsB);
+    }
+    #endregion
+
+    #region ApiRelationshipAssociation Methods
+    internal void SetRelationship(ApiRelationshipManyToMany relationship)
+    {
+        _apiResolvedRelationshipManyToMany = relationship;
     }
     #endregion
 

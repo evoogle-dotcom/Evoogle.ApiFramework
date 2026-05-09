@@ -208,19 +208,11 @@ public sealed class ApiSchema : ExtensibleBase
         // The remaining initialization phases require fully initialized types,
         // so they come after all types have been initialized.
 
-        // Phase 3: Deferred owner identity resolution
-        this.ResolveOwnerIdentityParts(context);
+        // Phase 3: Initialize identity
+        this.InitializeApiIdentity(context);
 
         // Phase 4: Initialize relationships
         this.InitializeApiRelationships(context);
-
-        // Phase 5: Resolve owner key paths declared on relationship dependent ends.
-        // This must run after Phase 4 (principal end object types are resolved)
-        // but before Phase 6 (which only populates computed collections and does not depend on this).
-        this.ResolveOwnerRelationshipKeyPaths(context);
-
-        // Phase 6: Populate computed relationship end collections on each object type.
-        this.PopulateRelationshipEndsOnObjectTypes(context);
 
         var issues = context.Issues;
         return new ApiInitializationResult(issues);
@@ -396,12 +388,21 @@ public sealed class ApiSchema : ExtensibleBase
         }
     }
 
+    private void InitializeApiIdentity(ApiInitializationContext context)
+    {
+        this.ResolveOwnerIdentityParts(context);
+    }
+
     private void InitializeApiRelationships(ApiInitializationContext context)
     {
         foreach (var apiRelationship in this.ApiRelationships)
         {
             apiRelationship.Initialize(context);
         }
+
+        this.ResolveOwnerRelationshipKeyPaths(context);
+
+        this.PopulateRelationshipCrossReferences(context);
     }
 
     private void ResolveOwnerRelationshipKeyPaths(ApiInitializationContext context)
@@ -610,7 +611,7 @@ public sealed class ApiSchema : ExtensibleBase
         );
     }
 
-    private void PopulateRelationshipEndsOnObjectTypes(ApiInitializationContext context)
+    private void PopulateRelationshipCrossReferences(ApiInitializationContext context)
     {
         // Clear any previously-registered ends to support idempotent re-initialization.
         foreach (var apiObjectType in this.ApiObjectTypes)
@@ -623,19 +624,22 @@ public sealed class ApiSchema : ExtensibleBase
             switch (relationship)
             {
                 case ApiRelationshipOneTo oneTo:
-                    TryRegisterEnd(oneTo.ApiPrincipalEnd);
-                    TryRegisterEnd(oneTo.ApiDependentEnd);
+                    TryRegisterEnd(oneTo.ApiPrincipalEnd, oneTo);
+                    TryRegisterEnd(oneTo.ApiDependentEnd, oneTo);
                     break;
 
                 case ApiRelationshipManyToMany manyToMany:
-                    TryRegisterEnd(manyToMany.ApiPrincipalEndA);
-                    TryRegisterEnd(manyToMany.ApiPrincipalEndB);
+                    TryRegisterEnd(manyToMany.ApiPrincipalEndA, manyToMany);
+                    TryRegisterEnd(manyToMany.ApiPrincipalEndB, manyToMany);
+                    manyToMany.ApiAssociation?.SetRelationship(manyToMany);
                     break;
             }
         }
 
-        void TryRegisterEnd(ApiRelationshipEnd end)
+        void TryRegisterEnd(ApiRelationshipEnd end, ApiRelationship relationship)
         {
+            end.SetRelationship(relationship);
+
             var clrObjectType = end.ClrObjectType;
             if (!this.TryGetObjectTypeByClrType(clrObjectType, out var apiObjectType))
             {

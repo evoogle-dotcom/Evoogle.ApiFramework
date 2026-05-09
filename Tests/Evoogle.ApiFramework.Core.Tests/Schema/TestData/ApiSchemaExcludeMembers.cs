@@ -38,6 +38,12 @@ public static class ApiSchemaExcludeMembers
         // ApiRelationshipEnd — object type resolved during initialization
         new ExcludeMember(typeof(ApiRelationshipEnd), nameof(ApiRelationshipEnd.ApiObjectType)),
 
+        // ApiRelationshipEnd — cycle: end → relationship → end → ...
+        new ExcludeMember(typeof(ApiRelationshipEnd), nameof(ApiRelationshipEnd.ApiRelationship)),
+
+        // ApiRelationshipAssociation — cycle: assoc → relationship → assoc → ...
+        new ExcludeMember(typeof(ApiRelationshipAssociation), nameof(ApiRelationshipAssociation.ApiRelationshipManyToMany)),
+
         // ApiRelationshipPrincipalEnd — identity resolved during initialization
         new ExcludeMember(typeof(ApiRelationshipPrincipalEnd), nameof(ApiRelationshipPrincipalEnd.ApiIdentity)),
     ];
@@ -79,6 +85,12 @@ public static class ApiSchemaExcludeMembers
 
         // ApiRelationshipElement — object type resolved during initialization
         new ExcludeMember(typeof(ApiRelationshipElement), nameof(ApiRelationshipElement.ApiObjectType)),
+
+        // ApiRelationshipEnd — cycle: end → relationship → end → ...
+        new ExcludeMember(typeof(ApiRelationshipEnd), nameof(ApiRelationshipEnd.ApiRelationship)),
+
+        // ApiRelationshipAssociation — cycle: assoc → relationship → assoc → ...
+        new ExcludeMember(typeof(ApiRelationshipAssociation), nameof(ApiRelationshipAssociation.ApiRelationshipManyToMany)),
 
         // ApiRelationshipPrincipalEnd — identity resolved during initialization
         new ExcludeMember(typeof(ApiRelationshipPrincipalEnd), nameof(ApiRelationshipPrincipalEnd.ApiIdentity)),
