@@ -11,6 +11,33 @@ using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema;
 
+/// <summary>
+///     Represents the association element of an <see cref="ApiRelationshipManyToMany"/>.
+///     The association is the join-table object type whose properties hold the FK values
+///     that link the two outer principal object types.
+/// </summary>
+/// <remarks>
+///     <para>
+///         <see cref="ApiKeyPathsA"/> maps the scalar leaves of principal end A's join-key identity
+///         to properties on the association object type.
+///         <see cref="ApiKeyPathsB"/> maps the scalar leaves of principal end B's join-key identity.
+///     </para>
+///     <para>
+///         Either or both key path collections may be <see langword="null"/>, indicating that the
+///         corresponding side is purely navigational with no explicit FK binding at the schema level.
+///     </para>
+/// </remarks>
+/// <param name="clrObjectType">The CLR type of the association <see cref="ApiObjectType"/>.</param>
+/// <param name="apiKeyPathsA">
+///     The optional FK key paths that map the scalar leaves of principal end A's join-key identity
+///     to properties on the association object type.
+///     When <see langword="null"/>, end A is purely navigational.
+/// </param>
+/// <param name="apiKeyPathsB">
+///     The optional FK key paths that map the scalar leaves of principal end B's join-key identity
+///     to properties on the association object type.
+///     When <see langword="null"/>, end B is purely navigational.
+/// </param>
 [JsonConverter(typeof(ApiRelationshipAssociationJsonConverter))]
 public sealed class ApiRelationshipAssociation
 (
@@ -25,10 +52,20 @@ public sealed class ApiRelationshipAssociation
     #endregion
 
     #region ApiRelationshipAssociation Properties
+    /// <summary>
+    ///     Gets the FK key paths that map the scalar leaves of principal end A's join-key identity
+    ///     to properties on the association object type.
+    ///     <see langword="null"/> when end A is purely navigational.
+    /// </summary>
     public ApiRelationshipKeyPath[]? ApiKeyPathsA { get; } = apiKeyPathsA is not null
         ? [.. apiKeyPathsA.Where(x => x is not null)]
         : null;
 
+    /// <summary>
+    ///     Gets the FK key paths that map the scalar leaves of principal end B's join-key identity
+    ///     to properties on the association object type.
+    ///     <see langword="null"/> when end B is purely navigational.
+    /// </summary>
     public ApiRelationshipKeyPath[]? ApiKeyPathsB { get; } = apiKeyPathsB is not null
         ? [.. apiKeyPathsB.Where(x => x is not null)]
         : null;

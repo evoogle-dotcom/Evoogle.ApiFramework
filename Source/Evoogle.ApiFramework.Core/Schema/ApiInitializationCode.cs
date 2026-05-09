@@ -94,7 +94,7 @@ public enum ApiInitializationCode
     API_IDENTITY_MULTIPLE_OWNER_PARTS,
 
     /// <summary>
-    ///     Multiple identity parts reference the same property API name.
+    ///     The identity has no parts defined.
     /// </summary>
     API_IDENTITY_NULL_OR_EMPTY_PARTS,
     #endregion

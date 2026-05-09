@@ -5,6 +5,18 @@
 // See the LICENSE file in the project root for more information.
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
+/// <summary>
+///     Fluent builder used to configure an <see cref="ApiRelationshipManyToMany"/> relationship.
+/// </summary>
+/// <remarks>
+///     Call <see cref="WithPrincipalEndA{TPrincipal}"/>, <see cref="WithPrincipalEndB{TPrincipal}"/>,
+///     and <see cref="WithAssociation{TAssociation}"/> (or their non-generic overloads) to define
+///     both principal ends and the association object type.
+///     Optionally call <see cref="WithDeleteBehavior"/> to override the default
+///     (<see cref="ApiRelationshipManyToMany.DefaultDeleteBehavior"/>).
+///     Subsequent calls to any <c>With</c> method for the same end replace the previous configuration.
+/// </remarks>
+/// <param name="apiName">The schema-unique API name of the relationship.</param>
 public class ApiRelationshipManyToManyBuilder(string apiName) : ApiRelationshipBuilder(apiName)
 {
     #region Fields
@@ -15,6 +27,12 @@ public class ApiRelationshipManyToManyBuilder(string apiName) : ApiRelationshipB
     #endregion
 
     #region Non-Generic With Methods
+    /// <summary>
+    ///     Configures principal end A of the relationship using the specified CLR type.
+    /// </summary>
+    /// <param name="clrPrincipalType">The CLR type of the principal end A object type.</param>
+    /// <param name="configure">Optional callback to configure identity selection and extensions.</param>
+    /// <returns>The current builder instance.</returns>
     public ApiRelationshipManyToManyBuilder WithPrincipalEndA(Type clrPrincipalType, Action<ApiRelationshipPrincipalEndBuilder>? configure = null)
     {
         var builder = new ApiRelationshipPrincipalEndBuilder(clrPrincipalType);
@@ -23,6 +41,12 @@ public class ApiRelationshipManyToManyBuilder(string apiName) : ApiRelationshipB
         return this;
     }
 
+    /// <summary>
+    ///     Configures principal end B of the relationship using the specified CLR type.
+    /// </summary>
+    /// <param name="clrPrincipalType">The CLR type of the principal end B object type.</param>
+    /// <param name="configure">Optional callback to configure identity selection and extensions.</param>
+    /// <returns>The current builder instance.</returns>
     public ApiRelationshipManyToManyBuilder WithPrincipalEndB(Type clrPrincipalType, Action<ApiRelationshipPrincipalEndBuilder>? configure = null)
     {
         var builder = new ApiRelationshipPrincipalEndBuilder(clrPrincipalType);
@@ -31,6 +55,12 @@ public class ApiRelationshipManyToManyBuilder(string apiName) : ApiRelationshipB
         return this;
     }
 
+    /// <summary>
+    ///     Configures the association using the specified CLR type.
+    /// </summary>
+    /// <param name="clrAssociationType">The CLR type of the association <see cref="ApiObjectType"/>.</param>
+    /// <param name="configure">Optional callback to add FK key paths and extensions to the association.</param>
+    /// <returns>The current builder instance.</returns>
     public ApiRelationshipManyToManyBuilder WithAssociation(Type clrAssociationType, Action<ApiRelationshipAssociationBuilder>? configure = null)
     {
         var builder = new ApiRelationshipAssociationBuilder(clrAssociationType);
@@ -80,6 +110,13 @@ public class ApiRelationshipManyToManyBuilder(string apiName) : ApiRelationshipB
         return this;
     }
 
+    /// <summary>
+    ///     Configures the association using the CLR type <typeparamref name="TAssociation"/>,
+    ///     providing a strongly-typed builder for FK key path configuration.
+    /// </summary>
+    /// <typeparam name="TAssociation">The CLR type of the association object.</typeparam>
+    /// <param name="configure">Optional callback to add FK key paths and extensions using expression-based property selectors.</param>
+    /// <returns>The current builder instance.</returns>
     public ApiRelationshipManyToManyBuilder WithAssociation<TAssociation>(Action<ApiRelationshipAssociationBuilder<TAssociation>>? configure = null)
     {
         var builder = new ApiRelationshipAssociationBuilder<TAssociation>();

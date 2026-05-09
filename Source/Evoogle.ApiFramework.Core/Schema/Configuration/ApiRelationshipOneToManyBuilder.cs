@@ -24,6 +24,12 @@ public sealed class ApiRelationshipOneToManyBuilder(string apiName) : ApiRelatio
     #endregion
 
     #region Non-Generic With Methods
+    /// <summary>
+    ///     Configures the principal end of the 1:M relationship using the specified CLR type.
+    /// </summary>
+    /// <param name="clrPrincipalType">The CLR type of the principal object.</param>
+    /// <param name="configure">Optional callback to configure identity selection and extensions.</param>
+    /// <returns>The current builder instance.</returns>
     public ApiRelationshipOneToManyBuilder WithPrincipalEnd(Type clrPrincipalType, Action<ApiRelationshipPrincipalEndBuilder>? configure = null)
     {
         var builder = new ApiRelationshipPrincipalEndBuilder(clrPrincipalType);
@@ -43,6 +49,12 @@ public sealed class ApiRelationshipOneToManyBuilder(string apiName) : ApiRelatio
         return this;
     }
 
+    /// <summary>
+    ///     Configures the dependent end of the 1:M relationship using the specified CLR type.
+    /// </summary>
+    /// <param name="clrDependentType">The CLR type of the dependent object.</param>
+    /// <param name="configure">Optional callback to add FK key paths and extensions.</param>
+    /// <returns>The current builder instance.</returns>
     public ApiRelationshipOneToManyBuilder WithDependentEnd(Type clrDependentType, Action<ApiRelationshipDependentEndBuilder>? configure = null)
     {
         var builder = new ApiRelationshipDependentEndBuilder(clrDependentType);

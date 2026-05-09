@@ -32,6 +32,10 @@ public sealed class ApiRelationshipOneToMany
 ) : ApiRelationshipOneTo(apiName, apiPrincipalEnd, apiDependentEnd, apiDeleteBehavior)
 {
     #region ApiRelationshipOneToMany Fields
+    /// <summary>
+    ///     The default delete behavior for one-to-many relationships.
+    ///     Dependent objects are left unmodified when the principal is removed.
+    /// </summary>
     public const ApiRelationshipDeleteBehavior DefaultDeleteBehavior = ApiRelationshipDeleteBehavior.None;
     #endregion
 

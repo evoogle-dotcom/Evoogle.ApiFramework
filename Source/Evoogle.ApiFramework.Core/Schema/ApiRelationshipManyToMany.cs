@@ -8,6 +8,34 @@ using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema;
 
+/// <summary>
+///     Represents a many-to-many relationship between two <see cref="ApiObjectType"/> instances,
+///     mediated by an <see cref="ApiRelationshipAssociation"/> join-table object type.
+/// </summary>
+/// <remarks>
+///     <para>
+///         Unlike one-to-one and one-to-many relationships, a many-to-many has two symmetric
+///         <see cref="ApiRelationshipPrincipalEnd"/> instances — <see cref="ApiPrincipalEndA"/> and
+///         <see cref="ApiPrincipalEndB"/> — and no dependent end.
+///         Each principal end owns a join-key identity that is mapped to the association object type
+///         through the corresponding key path collection on <see cref="ApiAssociation"/>.
+///     </para>
+///     <para>
+///         Self-referential many-to-many relationships are supported by setting both principal ends
+///         to the same <see cref="ApiRelationshipElement.ClrObjectType"/>.
+///     </para>
+/// </remarks>
+/// <param name="apiName">The API name that uniquely identifies this relationship within the schema.</param>
+/// <param name="apiPrincipalEndA">The first principal end of the relationship, which owns the A-side join key identity.</param>
+/// <param name="apiPrincipalEndB">The second principal end of the relationship, which owns the B-side join key identity.</param>
+/// <param name="apiAssociation">
+///     The association element that mediates the relationship and holds the FK key path trees
+///     for both principal ends.
+/// </param>
+/// <param name="apiDeleteBehavior">
+///     The delete behavior that governs what happens to the association objects when either principal end is deleted.
+///     Defaults to <see cref="DefaultDeleteBehavior"/>.
+/// </param>
 public sealed class ApiRelationshipManyToMany
 (
     string apiName,
@@ -18,6 +46,10 @@ public sealed class ApiRelationshipManyToMany
 ) : ApiRelationship(apiName, apiDeleteBehavior)
 {
     #region ApiRelationshipManyToMany Fields
+    /// <summary>
+    ///     The default delete behavior for many-to-many relationships.
+    ///     Association rows are deleted automatically when either principal is removed.
+    /// </summary>
     public const ApiRelationshipDeleteBehavior DefaultDeleteBehavior = ApiRelationshipDeleteBehavior.Delete;
     #endregion
 
