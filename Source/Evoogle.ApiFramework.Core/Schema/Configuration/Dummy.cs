@@ -251,13 +251,13 @@ public static class Dummy
         {
             builder
                 .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete)
-                .WithPrincipalEnd<Order>()
-                .WithDependentEnd<OrderItem>
+                .WithPrincipalEnd(typeof(Order))
+                .WithDependentEnd(typeof(OrderItem),
                 (
                     d => d
                         .AddScalarPath("OrderId")
                         .AddScalarPath("LineItemNumber")
-                );
+                ));
         }
     }
 
@@ -302,29 +302,25 @@ public static class Dummy
     ///     Demonstrates <see cref="ApiRelationshipPrincipalEndBuilder.WithIdentityName"/> to select a
     ///     non-primary identity on the principal side, and extensions on principal ends.
     /// </summary>
-    public class ProductTagRelationshipConfiguration : IApiRelationshipManyToManyConfiguration<ProductTag>
+    public class ProductTagRelationshipConfiguration : IApiRelationshipManyToManyConfiguration
     {
         /// <inheritdoc />
-        public void Configure(ApiRelationshipManyToManyBuilder<ProductTag> builder)
+        public void Configure(ApiRelationshipManyToManyBuilder builder)
         {
             builder
                 .WithPrincipalEndA<Product>
                 (
-                    p => p
-                        .AddPrincipalEndExtension(new VisibleMetadata { Visible = true })
+                    p => p.AddPrincipalEndExtension(new VisibleMetadata { Visible = true })
                 )
                 .WithPrincipalEndB<Tag>
                 (
-                    p => p
-                        .WithIdentityName("PrimaryKey")
+                    p => p.WithIdentityName("PrimaryKey")
                 )
-                .WithDependentEndA
+                .WithAssociation<ProductTag>
                 (
-                    d => d.AddScalarPath("ProductId")
-                )
-                .WithDependentEndB
-                (
-                    d => d.AddScalarPath("TagId")
+                    a => a
+                        .AddScalarPathA(p => p.ProductId)
+                        .AddScalarPathB(p => p.TagId)
                 );
         }
     }
@@ -372,17 +368,19 @@ public static class Dummy
         }
     }
 
-    public class ProductTagConfigurationGeneric : IApiRelationshipManyToManyConfiguration<ProductTag>
+    public class ProductTagConfigurationGeneric : IApiRelationshipManyToManyConfiguration
     {
-        public void Configure(ApiRelationshipManyToManyBuilder<ProductTag> builder)
+        public void Configure(ApiRelationshipManyToManyBuilder builder)
         {
             builder
-                .WithPrincipalEndA<Product>(p => p
-                    .WithIdentityName("PrimaryKey"))
-                .WithPrincipalEndB<Tag>(p => p
-                    .WithIdentityName("PrimaryKey"))
-                .WithDependentEndA(d => d.AddScalarPath(pt => pt.ProductId))
-                .WithDependentEndB(d => d.AddScalarPath(pt => pt.TagId));
+                .WithPrincipalEndA<Product>(p => p.WithIdentityName("PrimaryKey"))
+                .WithPrincipalEndB<Tag>(p => p.WithIdentityName("PrimaryKey"))
+                .WithAssociation<ProductTag>
+                (
+                    a => a
+                        .AddScalarPathA(p => p.ProductId)
+                        .AddScalarPathB(p => p.TagId)
+                );
         }
     }
 
@@ -519,9 +517,9 @@ public static class Dummy
                     )
             )
             // M:N — configuration class style; demonstrates WithIdentityName and extensions on principal ends.
-            .AddManyToManyRelationship<ProductTag>("ProductHasTags", new ProductTagRelationshipConfiguration())
+            .AddManyToManyRelationship("ProductHasTags", new ProductTagRelationshipConfiguration())
             // M:N — inline lambda style; demonstrates all four end methods and relationship-level extensions.
-            .AddManyToManyRelationship<ProductTag>
+            .AddManyToManyRelationship
             (
                 "ProductHasTagsInline",
                 r => r
@@ -536,15 +534,12 @@ public static class Dummy
                         p => p
                             .WithIdentityName("PrimaryKey")
                     )
-                    .WithDependentEndA
+                    .WithAssociation<ProductTag>
                     (
-                        d => d
-                            .AddScalarPath("ProductId")
-                            .AddDependentEndExtension(new VisibleMetadata { Visible = true })
-                    )
-                    .WithDependentEndB
-                    (
-                        d => d.AddScalarPath("TagId")
+                        a => a
+                            .AddScalarPathA(p => p.ProductId)
+                            .AddScalarPathB(p => p.TagId)
+                            .AddAssociationExtension(new VisibleMetadata { Visible = true })
                     )
                     .AddRelationshipExtension(new VisibleMetadata { Visible = true })
             )
@@ -629,14 +624,15 @@ public static class Dummy
                 .WithDependentEnd<CustomerProfile>(d => d
                     .AddNestedPath(cp => cp.CustomerRef, n => n
                         .AddScalarPath(r => r.CustomerId))))
-            .AddManyToManyRelationship<ProductTag>("ProductHasTags", new ProductTagConfigurationGeneric())
-            .AddManyToManyRelationship<ProductTag>("ProductHasTagsInline", r => r
+            .AddManyToManyRelationship("ProductHasTags", new ProductTagConfigurationGeneric())
+            .AddManyToManyRelationship("ProductHasTagsInline", r => r
                 .WithPrincipalEndA<Product>(p => p
                     .WithIdentityName("PrimaryKey"))
                 .WithPrincipalEndB<Tag>(p => p
                     .WithIdentityName("PrimaryKey"))
-                .WithDependentEndA(d => d.AddScalarPath(pt => pt.ProductId))
-                .WithDependentEndB(d => d.AddScalarPath(pt => pt.TagId)))
+                .WithAssociation<ProductTag>(a => a
+                    .AddScalarPathA(p => p.ProductId)
+                    .AddScalarPathB(p => p.TagId)))
             .Build();
     }
 }

@@ -703,7 +703,7 @@ public partial class ApiTypeTests
                         ApiName: "PK_Company_Id",
                         Parts:
                         [
-                            new ApiScalarPartDef
+                            new ApiIdentityScalarPartDef
                             (
                                 ApiPropertyName: nameof(Company.Id),
                                 ClrScalarTypeHint: typeof(string)
@@ -715,7 +715,7 @@ public partial class ApiTypeTests
                         ApiName: "AK_Company_Name",
                         Parts:
                         [
-                            new ApiScalarPartDef
+                            new ApiIdentityScalarPartDef
                             (
                                 ApiPropertyName: nameof(Company.Name)
                             )
@@ -1244,7 +1244,7 @@ public partial class ApiTypeTests
                         ApiName: "PK_Company_Id",
                         Parts:
                         [
-                            new ApiScalarPartDef
+                            new ApiIdentityScalarPartDef
                             (
                                 ApiPropertyName: nameof(Company.Id),
                                 ClrScalarTypeHint: typeof(string)
@@ -1256,7 +1256,7 @@ public partial class ApiTypeTests
                         ApiName: "AK_Company_Name",
                         Parts:
                         [
-                            new ApiScalarPartDef
+                            new ApiIdentityScalarPartDef
                             (
                                 ApiPropertyName: nameof(Company.Name)
                             )

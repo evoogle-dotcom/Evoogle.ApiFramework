@@ -7,7 +7,6 @@ using System.Text.Json.Serialization;
 
 using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.ApiFramework.Schema.Json;
-using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema;
 
@@ -20,8 +19,10 @@ namespace Evoogle.ApiFramework.Schema;
 ///     and <see cref="ApiRelationshipManyToMany"/>.
 ///     The <see cref="ApiKind"/> property serves as the JSON polymorphic discriminator.
 /// </remarks>
+/// <param name="apiName">The API name that uniquely identifies this relationship within the schema.</param>
+/// <param name="apiDeleteBehavior">The delete behavior that governs what happens to related objects when either end is affected.</param>
 [JsonConverter(typeof(ApiRelationshipJsonConverter))]
-public abstract class ApiRelationship(string apiName) : ApiSchemaElement
+public abstract class ApiRelationship(string apiName, ApiRelationshipDeleteBehavior apiDeleteBehavior) : ApiSchemaElement
 {
     #region ApiRelationship Properties
     /// <summary>
@@ -31,18 +32,15 @@ public abstract class ApiRelationship(string apiName) : ApiSchemaElement
 
     /// <summary>Gets the API name that uniquely identifies this relationship within the schema.</summary>
     public string ApiName { get; } = apiName;
-    #endregion
 
-    #region Object Methods
-    /// <inheritdoc/>
-    public override string ToString()
-    {
-        var apiName = this.ApiName.SafeToString();
-        var apiKind = this.ApiKind.SafeToString();
-        var extensionCount = this.ExtensionCount.SafeToString();
-
-        return $"{nameof(ApiRelationship)} {{{nameof(this.ApiKind)}={apiKind}, {nameof(this.ApiName)}={apiName}, {nameof(this.ExtensionCount)}={extensionCount}}}";
-    }
+    /// <summary>
+    ///     Gets the delete behavior that governs what happens to related objects when either end is affected.
+    ///     <list type="bullet">
+    ///         <item><description><strong>Principal deleted:</strong> what happens to dependent objects when the principal is deleted.</description></item>
+    ///         <item><description><strong>Dependent orphaned:</strong> what happens to a dependent when it is removed from the relationship.</description></item>
+    ///     </list>
+    /// </summary>
+    public ApiRelationshipDeleteBehavior ApiDeleteBehavior { get; } = apiDeleteBehavior;
     #endregion
 
     #region ApiSchemaElement Methods

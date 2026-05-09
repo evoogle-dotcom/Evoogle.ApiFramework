@@ -25,8 +25,8 @@ public class ApiRelationshipKeyPathJsonConverter(ILogger<ApiRelationshipKeyPathJ
     {
         #region Immutable Properties
         public required string ApiKind { get; init; }
-        public required string ClrPropertyName { get; init; }
         public required string ApiKeyPaths { get; init; }
+        public required string ClrPropertyName { get; init; }
         #endregion
     }
 
@@ -44,8 +44,8 @@ public class ApiRelationshipKeyPathJsonConverter(ILogger<ApiRelationshipKeyPathJ
                 ApiRelationshipKeyPath = new ApiRelationshipKeyPathPropertyNames
                 {
                     ApiKind = policy.ConvertName(nameof(ApiRelationshipKeyPath.ApiKind)),
-                    ClrPropertyName = policy.ConvertName(nameof(ApiRelationshipScalarKeyPath.ClrPropertyName)),
                     ApiKeyPaths = policy.ConvertName(nameof(ApiRelationshipNestedKeyPath.ApiKeyPaths)),
+                    ClrPropertyName = policy.ConvertName(nameof(ApiRelationshipNestedKeyPath.ClrPropertyName)),
                 },
                 ExtensibleBase = GetExtensiblePropertyNames(policy),
             };
@@ -58,8 +58,8 @@ public class ApiRelationshipKeyPathJsonConverter(ILogger<ApiRelationshipKeyPathJ
     {
         #region Properties
         public ApiRelationshipKeyPathKind? ApiKind { get; set; }
-        public string? ClrPropertyName { get; set; }
         public List<ApiRelationshipKeyPath>? ApiKeyPaths { get; set; }
+        public string? ClrPropertyName { get; set; }
         #endregion
     }
 
@@ -76,8 +76,8 @@ public class ApiRelationshipKeyPathJsonConverter(ILogger<ApiRelationshipKeyPathJ
         public readonly Dictionary<string, JsonReaderHandler<DefaultReadContext<PropertyNames, ReadData, ReadHandlers>>> PropertyHandlers = new()
         {
             { propertyNames.ApiRelationshipKeyPath.ApiKind, HandleApiKind },
-            { propertyNames.ApiRelationshipKeyPath.ClrPropertyName, HandleClrPropertyName },
             { propertyNames.ApiRelationshipKeyPath.ApiKeyPaths, HandleApiKeyPaths },
+            { propertyNames.ApiRelationshipKeyPath.ClrPropertyName, HandleClrPropertyName },
             { propertyNames.ExtensibleBase.Extensions, CreateExtensionsHandler<PropertyNames, ReadData, ReadHandlers>() },
         };
         #endregion
@@ -87,12 +87,6 @@ public class ApiRelationshipKeyPathJsonConverter(ILogger<ApiRelationshipKeyPathJ
         {
             context.ReadData.ApiRelationshipKeyPath ??= new ApiRelationshipKeyPathReadData();
             context.ReadData.ApiRelationshipKeyPath.ApiKind = _apiKindJsonConverter.Read(ref reader, typeof(ApiRelationshipKeyPathKind), context.Options);
-        }
-
-        private static void HandleClrPropertyName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
-        {
-            context.ReadData.ApiRelationshipKeyPath ??= new ApiRelationshipKeyPathReadData();
-            context.ReadData.ApiRelationshipKeyPath.ClrPropertyName = reader.GetString();
         }
 
         private static void HandleApiKeyPaths(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
@@ -113,6 +107,12 @@ public class ApiRelationshipKeyPathJsonConverter(ILogger<ApiRelationshipKeyPathJ
             }
 
             context.ReadData.ApiRelationshipKeyPath!.ApiKeyPaths!.Add(childPath);
+        }
+
+        private static void HandleClrPropertyName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        {
+            context.ReadData.ApiRelationshipKeyPath ??= new ApiRelationshipKeyPathReadData();
+            context.ReadData.ApiRelationshipKeyPath.ClrPropertyName = reader.GetString();
         }
         #endregion
     }

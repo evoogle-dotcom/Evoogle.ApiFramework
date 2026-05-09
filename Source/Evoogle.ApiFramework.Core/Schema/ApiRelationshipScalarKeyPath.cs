@@ -73,10 +73,13 @@ public sealed class ApiRelationshipScalarKeyPath(string clrPropertyName) : ApiRe
             return;
         }
 
-        context.AddIssue(this.ApiPath, ApiInitializationSeverity.Error,
-            ApiInitializationCode.API_RELATIONSHIP_KEY_PATH_INVALID_CLR_PROPERTY_NAME,
-            $"{nameof(this.ClrPropertyName)} must not be null, empty, or whitespace",
-            $"Specify a valid {nameof(this.ClrPropertyName)} value");
+        var path = this.ApiPath;
+        var severity = ApiInitializationSeverity.Error;
+        var code = ApiInitializationCode.API_RELATIONSHIP_KEY_PATH_INVALID_CLR_PROPERTY_NAME;
+        var description = $"{nameof(this.ClrPropertyName)} must not be null, empty, or whitespace";
+        var remediation = $"Specify a valid {nameof(this.ClrPropertyName)} value";
+
+        context.AddIssue(path, severity, code, description, remediation);
     }
 
     private void InitializeApiProperty(ApiInitializationContext context)
@@ -95,10 +98,13 @@ public sealed class ApiRelationshipScalarKeyPath(string clrPropertyName) : ApiRe
             return;
         }
 
-        context.AddIssue(this.ApiPath, ApiInitializationSeverity.Error,
-            ApiInitializationCode.API_RELATIONSHIP_KEY_PATH_UNRESOLVED_API_PROPERTY,
-            $"Property with CLR name '{this.ClrPropertyName}' could not be found on object type '{apiDeclaringObjectType.ApiName}'",
-            $"Verify the CLR property name or add a property with CLR name '{this.ClrPropertyName}' to '{apiDeclaringObjectType.ApiName}'");
+        var path = this.ApiPath;
+        var severity = ApiInitializationSeverity.Error;
+        var code = ApiInitializationCode.API_RELATIONSHIP_KEY_PATH_UNRESOLVED_API_PROPERTY;
+        var description = $"Property with CLR name '{this.ClrPropertyName}' could not be found on object type '{apiDeclaringObjectType.ApiName}'";
+        var remediation = $"Verify the CLR property name or add a property with CLR name '{this.ClrPropertyName}' to '{apiDeclaringObjectType.ApiName}'";
+
+        context.AddIssue(path, severity, code, description, remediation);
     }
     #endregion
 }

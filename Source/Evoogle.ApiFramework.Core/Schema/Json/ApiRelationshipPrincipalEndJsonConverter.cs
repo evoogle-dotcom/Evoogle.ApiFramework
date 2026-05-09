@@ -19,7 +19,7 @@ public class ApiRelationshipPrincipalEndJsonConverter(ILogger<ApiRelationshipPri
     : JsonConverterBase<ApiRelationshipPrincipalEnd>(logger)
 {
     #region Property Types
-    private readonly record struct ApiRelationshipEndPropertyNames
+    private readonly record struct ApiRelationshipElementPropertyNames
     {
         public required string ClrObjectType { get; init; }
     }
@@ -31,16 +31,16 @@ public class ApiRelationshipPrincipalEndJsonConverter(ILogger<ApiRelationshipPri
 
     private readonly record struct PropertyNames
     {
-        public required ApiRelationshipEndPropertyNames ApiRelationshipEnd { get; init; }
+        public required ApiRelationshipElementPropertyNames ApiRelationshipElement { get; init; }
         public required ApiRelationshipPrincipalEndPropertyNames ApiRelationshipPrincipalEnd { get; init; }
         public required ExtensibleBasePropertyNames ExtensibleBase { get; init; }
 
         public static PropertyNames Create(JsonNamingPolicy policy)
             => new()
             {
-                ApiRelationshipEnd = new ApiRelationshipEndPropertyNames
+                ApiRelationshipElement = new ApiRelationshipElementPropertyNames
                 {
-                    ClrObjectType = policy.ConvertName(nameof(ApiRelationshipEnd.ClrObjectType)),
+                    ClrObjectType = policy.ConvertName(nameof(ApiRelationshipElement.ClrObjectType)),
                 },
                 ApiRelationshipPrincipalEnd = new ApiRelationshipPrincipalEndPropertyNames
                 {
@@ -52,7 +52,7 @@ public class ApiRelationshipPrincipalEndJsonConverter(ILogger<ApiRelationshipPri
     #endregion
 
     #region Read Types
-    private class ApiRelationshipEndReadData
+    private class ApiRelationshipElementReadData
     {
         public Type? ClrObjectType { get; set; }
     }
@@ -64,7 +64,7 @@ public class ApiRelationshipPrincipalEndJsonConverter(ILogger<ApiRelationshipPri
 
     private class ReadData : ExtensibleReadData
     {
-        public ApiRelationshipEndReadData? ApiRelationshipEnd { get; set; }
+        public ApiRelationshipElementReadData? ApiRelationshipElement { get; set; }
         public ApiRelationshipPrincipalEndReadData? ApiRelationshipPrincipalEnd { get; set; }
     }
 
@@ -72,15 +72,15 @@ public class ApiRelationshipPrincipalEndJsonConverter(ILogger<ApiRelationshipPri
     {
         public readonly Dictionary<string, JsonReaderHandler<DefaultReadContext<PropertyNames, ReadData, ReadHandlers>>> PropertyHandlers = new()
         {
-            { propertyNames.ApiRelationshipEnd.ClrObjectType, HandleClrObjectType },
+            { propertyNames.ApiRelationshipElement.ClrObjectType, HandleClrObjectType },
             { propertyNames.ApiRelationshipPrincipalEnd.ApiIdentityName, HandleApiIdentityName },
             { propertyNames.ExtensibleBase.Extensions, CreateExtensionsHandler<PropertyNames, ReadData, ReadHandlers>() },
         };
 
         private static void HandleClrObjectType(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
-            context.ReadData.ApiRelationshipEnd ??= new ApiRelationshipEndReadData();
-            context.ReadData.ApiRelationshipEnd.ClrObjectType = _typeJsonConverter.Read(ref reader, typeof(Type), context.Options);
+            context.ReadData.ApiRelationshipElement ??= new ApiRelationshipElementReadData();
+            context.ReadData.ApiRelationshipElement.ClrObjectType = _typeJsonConverter.Read(ref reader, typeof(Type), context.Options);
         }
 
         private static void HandleApiIdentityName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
@@ -123,7 +123,7 @@ public class ApiRelationshipPrincipalEndJsonConverter(ILogger<ApiRelationshipPri
     {
         var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
 
-        var clrObjectType = readContext.ReadData.ApiRelationshipEnd?.ClrObjectType;
+        var clrObjectType = readContext.ReadData.ApiRelationshipElement?.ClrObjectType;
         var apiIdentityName = readContext.ReadData.ApiRelationshipPrincipalEnd?.ApiIdentityName;
 
         var end = new ApiRelationshipPrincipalEnd
@@ -160,7 +160,7 @@ public class ApiRelationshipPrincipalEndJsonConverter(ILogger<ApiRelationshipPri
 
     #region Write Implementation Methods
     private static void WriteClrObjectType(Utf8JsonWriter writer, ApiRelationshipPrincipalEnd end, DefaultWriteContext<PropertyNames> context)
-        => writer.TryWritePropertyWithConverter(context.PropertyNames.ApiRelationshipEnd.ClrObjectType, end.ClrObjectType, context.Options, _typeJsonConverter);
+        => writer.TryWritePropertyWithConverter(context.PropertyNames.ApiRelationshipElement.ClrObjectType, end.ClrObjectType, context.Options, _typeJsonConverter);
 
     private static void WriteApiIdentityName(Utf8JsonWriter writer, ApiRelationshipPrincipalEnd end, DefaultWriteContext<PropertyNames> context)
     {

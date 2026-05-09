@@ -207,20 +207,6 @@ public sealed class ApiObjectTypeBuilder<T>(ApiSchemaBuilderContext context)
         base.AddManyToManyRelationship(apiName, configuration);
         return this;
     }
-
-    /// <inheritdoc cref="ApiObjectTypeBuilder.AddManyToManyRelationship{TAssociation}(string, Action{ApiRelationshipManyToManyBuilder{TAssociation}})"/>
-    public new ApiObjectTypeBuilder<T> AddManyToManyRelationship<TAssociation>(string apiName, Action<ApiRelationshipManyToManyBuilder<TAssociation>> configure)
-    {
-        base.AddManyToManyRelationship(apiName, configure);
-        return this;
-    }
-
-    /// <inheritdoc cref="ApiObjectTypeBuilder.AddManyToManyRelationship{TAssociation}(string, IApiRelationshipManyToManyConfiguration{TAssociation})"/>
-    public new ApiObjectTypeBuilder<T> AddManyToManyRelationship<TAssociation>(string apiName, IApiRelationshipManyToManyConfiguration<TAssociation> configuration)
-    {
-        base.AddManyToManyRelationship(apiName, configuration);
-        return this;
-    }
     #endregion
 
     #region With Methods

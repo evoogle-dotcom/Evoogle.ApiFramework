@@ -153,9 +153,6 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null)
     internal ApiRelationshipManyToManyBuilder GetOrAddManyToManyRelationshipBuilder(string apiName)
         => this.GetOrAddTypedRelationshipBuilder(apiName, static n => new ApiRelationshipManyToManyBuilder(n));
 
-    internal ApiRelationshipManyToManyBuilder<TAssociation> GetOrAddManyToManyRelationshipBuilder<TAssociation>(string apiName)
-        => this.GetOrAddTypedRelationshipBuilder(apiName, n => new ApiRelationshipManyToManyBuilder<TAssociation>(n));
-
     private TBuilder GetOrAddTypedRelationshipBuilder<TBuilder>(string apiName, Func<string, TBuilder> factory)
         where TBuilder : ApiRelationshipBuilder
     {

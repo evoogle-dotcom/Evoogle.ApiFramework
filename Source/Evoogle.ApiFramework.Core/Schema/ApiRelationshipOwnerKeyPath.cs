@@ -24,13 +24,13 @@ namespace Evoogle.ApiFramework.Schema;
 ///         relationships have been initialized, via <c>ApiSchema.ResolveOwnerRelationshipKeyPaths</c>.
 ///     </para>
 ///     <para>
-///         Accessing <see cref="ApiOwnerType"/> before schema initialization completes will throw.
+///         Accessing <see cref="ApiObjectType"/> before schema initialization completes will throw.
 ///     </para>
 /// </remarks>
 public sealed class ApiRelationshipOwnerKeyPath(IEnumerable<ApiRelationshipKeyPath>? apiKeyPaths = null) : ApiRelationshipKeyPath
 {
     #region ApiRelationshipOwnerKeyPath Fields
-    private ApiObjectType? _apiResolvedOwnerType = null;
+    private ApiObjectType? _apiResolvedObjectType = null;
     #endregion
 
     #region ApiSchemaElement Properties
@@ -52,8 +52,8 @@ public sealed class ApiRelationshipOwnerKeyPath(IEnumerable<ApiRelationshipKeyPa
         ? [.. apiKeyPaths.Where(x => x is not null)]
         : null;
 
-    /// <summary>Gets the resolved owner <see cref="ApiObjectType"/>. Available after schema initialization.</summary>
-    public ApiObjectType ApiOwnerType => this.ThrowIfNotInitialized(_apiResolvedOwnerType);
+    /// <summary>Gets the resolved owner <see cref="Schema.ApiObjectType"/>. Available after schema initialization.</summary>
+    public ApiObjectType ApiObjectType => this.ThrowIfNotInitialized(_apiResolvedObjectType);
     #endregion
 
     #region Object Methods
@@ -78,7 +78,7 @@ public sealed class ApiRelationshipOwnerKeyPath(IEnumerable<ApiRelationshipKeyPa
         ArgumentNullException.ThrowIfNull(ownerType);
         ArgumentNullException.ThrowIfNull(context);
 
-        _apiResolvedOwnerType = ownerType;
+        _apiResolvedObjectType = ownerType;
 
         if (this.ApiKeyPaths is null || this.ApiKeyPaths.Length == 0)
         {

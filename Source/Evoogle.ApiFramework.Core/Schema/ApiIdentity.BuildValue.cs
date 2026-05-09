@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -155,7 +155,7 @@ public sealed partial class ApiIdentity
 
     private static ApiIdentityObjectPartValue BuildOwnerPartValue(ApiIdentityOwnerPart schemaPart, ApiIdentityValueBuildContext context)
     {
-        var partName = schemaPart.ApiOwnerType.ApiName;
+        var partName = schemaPart.ApiObjectType.ApiName;
 
         if (context.ClrOwnerInstance is null)
         {
@@ -166,12 +166,12 @@ public sealed partial class ApiIdentity
                     $"Set {nameof(ApiIdentityPartNullHandling)} to {nameof(ApiIdentityPartNullHandling.UseDefaultOnNull)} to allow null owner.");
             }
 
-            var skeleton = BuildStructureSkeleton(schemaPart.ApiOwnerIdentity);
+            var skeleton = BuildStructureSkeleton(schemaPart.ApiIdentity);
             return new ApiIdentityObjectPartValue(partName, apiObjectValue: null, apiStructure: skeleton);
         }
 
         var ownerContext = context with { ClrInstance = context.ClrOwnerInstance, ClrOwnerInstance = null };
-        var ownerValue = schemaPart.ApiOwnerIdentity.BuildValue(ownerContext);
+        var ownerValue = schemaPart.ApiIdentity.BuildValue(ownerContext);
         return new ApiIdentityObjectPartValue(partName, ownerValue);
     }
 
@@ -197,7 +197,7 @@ public sealed partial class ApiIdentity
                 => new ApiIdentityObjectPartValue(nestedPart.ClrPropertyName, apiObjectValue: null, apiStructure: BuildStructureSkeleton(nestedPart.ApiIdentity)),
 
             ApiIdentityOwnerPart ownerPart
-                => new ApiIdentityObjectPartValue(ownerPart.ApiOwnerType.ApiName, apiObjectValue: null, apiStructure: BuildStructureSkeleton(ownerPart.ApiOwnerIdentity)),
+                => new ApiIdentityObjectPartValue(ownerPart.ApiObjectType.ApiName, apiObjectValue: null, apiStructure: BuildStructureSkeleton(ownerPart.ApiIdentity)),
 
             _ => throw new ApiIdentityException($"Unsupported identity part type in skeleton: {schemaPart.GetType().Name}")
         };
@@ -300,7 +300,7 @@ public sealed partial class ApiIdentity
 
     private static ApiIdentityObjectPartValue BuildOwnerPartValueFromValues(ApiIdentityOwnerPart schemaPart, ApiIdentityValueBuildFromValuesContext context)
     {
-        var partName = schemaPart.ApiOwnerType.ApiName;
+        var partName = schemaPart.ApiObjectType.ApiName;
 
         if (context.OwnerValues is null)
         {
@@ -311,12 +311,12 @@ public sealed partial class ApiIdentity
                     $"Set {nameof(ApiIdentityPartNullHandling)} to {nameof(ApiIdentityPartNullHandling.UseDefaultOnNull)} to allow null owner.");
             }
 
-            var skeleton = BuildStructureSkeleton(schemaPart.ApiOwnerIdentity);
+            var skeleton = BuildStructureSkeleton(schemaPart.ApiIdentity);
             return new ApiIdentityObjectPartValue(partName, apiObjectValue: null, apiStructure: skeleton);
         }
 
         var ownerContext = context with { Values = context.OwnerValues, OwnerValues = null };
-        var ownerValue = schemaPart.ApiOwnerIdentity.BuildValue(ownerContext);
+        var ownerValue = schemaPart.ApiIdentity.BuildValue(ownerContext);
         return new ApiIdentityObjectPartValue(partName, ownerValue);
     }
     #endregion

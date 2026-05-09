@@ -87,10 +87,13 @@ public sealed class ApiRelationshipNestedKeyPath
             return;
         }
 
-        context.AddIssue(this.ApiPath, ApiInitializationSeverity.Error,
-            ApiInitializationCode.API_RELATIONSHIP_KEY_PATH_INVALID_CLR_PROPERTY_NAME,
-            $"{nameof(this.ClrPropertyName)} must not be null, empty, or whitespace",
-            $"Specify a valid {nameof(this.ClrPropertyName)} value");
+        var path = this.ApiPath;
+        var severity = ApiInitializationSeverity.Error;
+        var code = ApiInitializationCode.API_RELATIONSHIP_KEY_PATH_INVALID_CLR_PROPERTY_NAME;
+        var description = $"{nameof(this.ClrPropertyName)} must not be null, empty, or whitespace";
+        var remediation = $"Specify a valid {nameof(this.ClrPropertyName)} value";
+
+        context.AddIssue(path, severity, code, description, remediation);
     }
 
     private void InitializeApiProperty(ApiInitializationContext context)
@@ -106,19 +109,25 @@ public sealed class ApiRelationshipNestedKeyPath
         var apiDeclaringObjectType = context.ApiDeclaringObjectType;
         if (!apiDeclaringObjectType.TryGetPropertyByClrName(this.ClrPropertyName, out var apiResolvedProperty))
         {
-            context.AddIssue(this.ApiPath, ApiInitializationSeverity.Error,
-                ApiInitializationCode.API_RELATIONSHIP_KEY_PATH_UNRESOLVED_API_PROPERTY,
-                $"Property with CLR name '{this.ClrPropertyName}' could not be found on object type '{apiDeclaringObjectType.ApiName}'",
-                $"Verify the CLR property name or add a property with CLR name '{this.ClrPropertyName}' to '{apiDeclaringObjectType.ApiName}'");
+            var path = this.ApiPath;
+            var severity = ApiInitializationSeverity.Error;
+            var code = ApiInitializationCode.API_RELATIONSHIP_KEY_PATH_UNRESOLVED_API_PROPERTY;
+            var description = $"Property with CLR name '{this.ClrPropertyName}' could not be found on object type '{apiDeclaringObjectType.ApiName}'";
+            var remediation = $"Verify the CLR property name or add a property with CLR name '{this.ClrPropertyName}' to '{apiDeclaringObjectType.ApiName}'";
+
+            context.AddIssue(path, severity, code, description, remediation);
             return;
         }
 
         if (apiResolvedProperty.ApiType is not ApiObjectType apiNestedObjectType)
         {
-            context.AddIssue(this.ApiPath, ApiInitializationSeverity.Error,
-                ApiInitializationCode.API_RELATIONSHIP_KEY_PATH_INVALID_API_PROPERTY_TYPE,
-                $"Property '{this.ClrPropertyName}' must be an object type for a nested key path",
-                $"Use an object-typed property or switch to {nameof(ApiRelationshipScalarKeyPath)}");
+            var path = this.ApiPath;
+            var severity = ApiInitializationSeverity.Error;
+            var code = ApiInitializationCode.API_RELATIONSHIP_KEY_PATH_INVALID_API_PROPERTY_TYPE;
+            var description = $"Property '{this.ClrPropertyName}' must be an object type for a nested key path";
+            var remediation = $"Use an object-typed property or switch to {nameof(ApiRelationshipScalarKeyPath)}";
+
+            context.AddIssue(path, severity, code, description, remediation);
             return;
         }
 
@@ -130,10 +139,13 @@ public sealed class ApiRelationshipNestedKeyPath
     {
         if (this.ApiKeyPaths.Length == 0)
         {
-            context.AddIssue(this.ApiPath, ApiInitializationSeverity.Error,
-                ApiInitializationCode.API_RELATIONSHIP_KEY_PATH_NULL_OR_EMPTY_PATHS,
-                $"{nameof(this.ApiKeyPaths)} must contain at least one key path",
-                $"Add at least one {nameof(ApiRelationshipKeyPath)} inside '{this.ClrPropertyName}'");
+            var path = this.ApiPath;
+            var severity = ApiInitializationSeverity.Error;
+            var code = ApiInitializationCode.API_RELATIONSHIP_KEY_PATH_NULL_OR_EMPTY_PATHS;
+            var description = $"{nameof(this.ApiKeyPaths)} must contain at least one key path";
+            var remediation = $"Add at least one {nameof(ApiRelationshipKeyPath)} inside '{this.ClrPropertyName}'";
+
+            context.AddIssue(path, severity, code, description, remediation);
             return;
         }
 

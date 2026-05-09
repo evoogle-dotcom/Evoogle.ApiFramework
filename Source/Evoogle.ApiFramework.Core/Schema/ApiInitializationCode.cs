@@ -158,17 +158,19 @@ public enum ApiInitializationCode
     API_RELATIONSHIP_NULL_DEPENDENT_END,
     #endregion
 
+    #region ApiRelationshipElement Initialization Codes
+    /// <summary>
+    ///     The relationship element's CLR object type is null.
+    /// </summary>
+    API_RELATIONSHIP_ELEMENT_NULL_CLR_OBJECT_TYPE,
+
+    /// <summary>
+    ///     The relationship element's object type name could not be resolved to a defined object type in the schema.
+    /// </summary>
+    API_RELATIONSHIP_ELEMENT_UNRESOLVED_OBJECT_TYPE,
+    #endregion
+
     #region ApiRelationshipEnd Initialization Codes
-    /// <summary>
-    ///     The relationship end's CLR object type is null.
-    /// </summary>
-    API_RELATIONSHIP_END_NULL_CLR_OBJECT_TYPE,
-
-    /// <summary>
-    ///     The relationship end's object type name could not be resolved to a defined object type in the schema.
-    /// </summary>
-    API_RELATIONSHIP_END_UNRESOLVED_OBJECT_TYPE,
-
     /// <summary>
     ///     The principal end's referenced identity could not be resolved, or the principal type has no primary identity.
     /// </summary>
@@ -187,35 +189,21 @@ public enum ApiInitializationCode
     API_RELATIONSHIP_MANY_TO_MANY_NULL_PRINCIPAL_END_B,
 
     /// <summary>
-    ///     The many-to-many relationship's dependent end A is null.
+    ///     The many-to-many relationship's association is null.
     /// </summary>
-    API_RELATIONSHIP_MANY_TO_MANY_NULL_DEPENDENT_END_A,
+    API_RELATIONSHIP_MANY_TO_MANY_NULL_ASSOCIATION,
 
     /// <summary>
-    ///     The many-to-many relationship's dependent end B is null.
+    ///     The number of scalar leaves in the association's key paths for end A
+    ///     does not match the number of scalar leaves in principal end A's join-key identity.
     /// </summary>
-    API_RELATIONSHIP_MANY_TO_MANY_NULL_DEPENDENT_END_B,
+    API_RELATIONSHIP_MANY_TO_MANY_INVALID_ASSOCIATION_KEY_PATHS_A_COUNT,
 
     /// <summary>
-    ///     The many-to-many relationship's association type name is null, empty, or whitespace.
+    ///     The number of scalar leaves in the association's key paths for end B
+    ///     does not match the number of scalar leaves in principal end B's join-key identity.
     /// </summary>
-    API_RELATIONSHIP_MANY_TO_MANY_INVALID_ASSOCIATION_TYPE_NAME,
-
-    /// <summary>
-    ///     The many-to-many relationship's association type name could not be resolved to a defined object type in the schema.
-    /// </summary>
-    API_RELATIONSHIP_MANY_TO_MANY_UNRESOLVED_ASSOCIATION_TYPE,
-
-    /// <summary>
-    ///     A dependent end of a many-to-many relationship references an object type that does not match the declared association type.
-    /// </summary>
-    API_RELATIONSHIP_MANY_TO_MANY_DEPENDENT_TYPE_MISMATCH,
-
-    /// <summary>
-    ///     A dependent end of a many-to-many relationship has null or empty key paths.
-    ///     Purely navigational many-to-many relationships are not supported.
-    /// </summary>
-    API_RELATIONSHIP_MANY_TO_MANY_EMPTY_KEY_PATHS,
+    API_RELATIONSHIP_MANY_TO_MANY_INVALID_ASSOCIATION_KEY_PATHS_B_COUNT,
     #endregion
 
     #region ApiRelationshipKeyPath Initialization Codes

@@ -24,8 +24,8 @@ public static class ApiSchemaExcludeMembers
         new ExcludeMember(typeof(ApiIdentityPropertyPart), nameof(ApiIdentityPropertyPart.ApiProperty)),
 
         // ApiIdentityOwnerPart — cycle: ApiOwnerType → ApiObjectType → ... / ApiOwnerIdentity → ApiIdentity → ...
-        new ExcludeMember(typeof(ApiIdentityOwnerPart), nameof(ApiIdentityOwnerPart.ApiOwnerType)),
-        new ExcludeMember(typeof(ApiIdentityOwnerPart), nameof(ApiIdentityOwnerPart.ApiOwnerIdentity)),
+        new ExcludeMember(typeof(ApiIdentityOwnerPart), nameof(ApiIdentityOwnerPart.ApiObjectType)),
+        new ExcludeMember(typeof(ApiIdentityOwnerPart), nameof(ApiIdentityOwnerPart.ApiIdentity)),
 
         // ApiIdentityNestedPart — cycle: ApiIdentity → ApiObjectType → ApiIdentities[].ApiIdentityParts[].ApiProperty → ...
         new ExcludeMember(typeof(ApiIdentityNestedPart), nameof(ApiIdentityNestedPart.ApiIdentity)),
@@ -35,16 +35,11 @@ public static class ApiSchemaExcludeMembers
         new ExcludeMember(typeof(ApiObjectType), nameof(ApiObjectType.ApiRelationshipPrincipalEnds)),
         new ExcludeMember(typeof(ApiObjectType), nameof(ApiObjectType.ApiRelationshipDependentEnds)),
 
-        // ApiRelationshipEnd — back-references resolved during initialization
+        // ApiRelationshipEnd — object type resolved during initialization
         new ExcludeMember(typeof(ApiRelationshipEnd), nameof(ApiRelationshipEnd.ApiObjectType)),
-        new ExcludeMember(typeof(ApiRelationshipEnd), nameof(ApiRelationshipEnd.ApiRelationship)),
-        new ExcludeMember(typeof(ApiRelationshipEnd), nameof(ApiRelationshipEnd.ApiOppositeEnd)),
 
-        // ApiRelationshipPrincipalEnd — identity and opposite end resolved during initialization
-        new ExcludeMember(typeof(ApiRelationshipPrincipalEnd), nameof(ApiRelationshipPrincipalEnd.ApiDependentEnd)),
-
-        // ApiRelationshipDependentEnd — opposite end call that throws before initialization
-        new ExcludeMember(typeof(ApiRelationshipDependentEnd), nameof(ApiRelationshipDependentEnd.ApiPrincipalEnd)),
+        // ApiRelationshipPrincipalEnd — identity resolved during initialization
+        new ExcludeMember(typeof(ApiRelationshipPrincipalEnd), nameof(ApiRelationshipPrincipalEnd.ApiIdentity)),
     ];
 
     public static readonly List<ExcludeMember> Standard =
@@ -64,8 +59,8 @@ public static class ApiSchemaExcludeMembers
 
         // ApiIdentityPart
         new ExcludeMember(typeof(ApiIdentityPropertyPart), nameof(ApiIdentityPropertyPart.ApiProperty)),
-        new ExcludeMember(typeof(ApiIdentityOwnerPart), nameof(ApiIdentityOwnerPart.ApiOwnerIdentity)),
-        new ExcludeMember(typeof(ApiIdentityOwnerPart), nameof(ApiIdentityOwnerPart.ApiOwnerType)),
+        new ExcludeMember(typeof(ApiIdentityOwnerPart), nameof(ApiIdentityOwnerPart.ApiIdentity)),
+        new ExcludeMember(typeof(ApiIdentityOwnerPart), nameof(ApiIdentityOwnerPart.ApiObjectType)),
         new ExcludeMember(typeof(ApiIdentityScalarPart), nameof(ApiIdentityScalarPart.ClrScalarType)),
         new ExcludeMember(typeof(ApiIdentityNestedPart), nameof(ApiIdentityNestedPart.ApiIdentity)),
 
@@ -82,24 +77,16 @@ public static class ApiSchemaExcludeMembers
         // ApiSchemaElement
         new ExcludeMember(typeof(ApiSchemaElement), nameof(ApiSchemaElement.ApiPath)),
 
-        // ApiRelationshipEnd — back-references resolved during initialization
-        new ExcludeMember(typeof(ApiRelationshipEnd), nameof(ApiRelationshipEnd.ApiObjectType)),
-        new ExcludeMember(typeof(ApiRelationshipEnd), nameof(ApiRelationshipEnd.ApiRelationship)),
-        new ExcludeMember(typeof(ApiRelationshipEnd), nameof(ApiRelationshipEnd.ApiOppositeEnd)),
+        // ApiRelationshipElement — object type resolved during initialization
+        new ExcludeMember(typeof(ApiRelationshipElement), nameof(ApiRelationshipElement.ApiObjectType)),
 
-        // ApiRelationshipPrincipalEnd — identity and opposite end resolved during initialization
+        // ApiRelationshipPrincipalEnd — identity resolved during initialization
         new ExcludeMember(typeof(ApiRelationshipPrincipalEnd), nameof(ApiRelationshipPrincipalEnd.ApiIdentity)),
-        new ExcludeMember(typeof(ApiRelationshipPrincipalEnd), nameof(ApiRelationshipPrincipalEnd.ApiDependentEnd)),
-
-        // ApiRelationshipDependentEnd — opposite end call that throws before initialization
-        new ExcludeMember(typeof(ApiRelationshipDependentEnd), nameof(ApiRelationshipDependentEnd.ApiPrincipalEnd)),
-
-        // ApiRelationshipManyToMany — association type resolved during initialization
-        new ExcludeMember(typeof(ApiRelationshipManyToMany), nameof(ApiRelationshipManyToMany.ApiAssociationObjectType)),
 
         // Key path nodes — property and object type references resolved during initialization
         new ExcludeMember(typeof(ApiRelationshipScalarKeyPath), nameof(ApiRelationshipScalarKeyPath.ApiProperty)),
         new ExcludeMember(typeof(ApiRelationshipNestedKeyPath), nameof(ApiRelationshipNestedKeyPath.ApiProperty)),
         new ExcludeMember(typeof(ApiRelationshipNestedKeyPath), nameof(ApiRelationshipNestedKeyPath.ApiObjectType)),
+        new ExcludeMember(typeof(ApiRelationshipOwnerKeyPath), nameof(ApiRelationshipOwnerKeyPath.ApiObjectType)),
     ];
 }

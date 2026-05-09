@@ -44,7 +44,7 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_IdentityScalar",
                                 Parts:
                                 [
-                                    new ApiScalarPartDef
+                                    new ApiIdentityScalarPartDef
                                     (
                                         ApiPropertyName: nameof(IdentityScalar.Id)
                                     )
@@ -55,7 +55,7 @@ public partial class ApiSchemaTests
                                 ApiName: "AK_IdentityScalar",
                                 Parts:
                                 [
-                                    new ApiScalarPartDef
+                                    new ApiIdentityScalarPartDef
                                     (
                                         ApiPropertyName: nameof(IdentityScalar.Name)
                                     )
@@ -187,11 +187,11 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_IdentityTwoScalarPartComposite",
                                 Parts:
                                 [
-                                    new ApiScalarPartDef
+                                    new ApiIdentityScalarPartDef
                                     (
                                         ApiPropertyName: nameof(IdentityTwoScalarPartComposite.Id1)
                                     ),
-                                    new ApiScalarPartDef
+                                    new ApiIdentityScalarPartDef
                                     (
                                         ApiPropertyName: nameof(IdentityTwoScalarPartComposite.Id2)
                                     )
@@ -341,15 +341,15 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_IdentityThreeScalarPartComposite",
                                 Parts:
                                 [
-                                    new ApiScalarPartDef
+                                    new ApiIdentityScalarPartDef
                                     (
                                         ApiPropertyName: nameof(IdentityThreeScalarPartComposite.Id1)
                                     ),
-                                    new ApiScalarPartDef
+                                    new ApiIdentityScalarPartDef
                                     (
                                         ApiPropertyName: nameof(IdentityThreeScalarPartComposite.Id2)
                                     ),
-                                    new ApiScalarPartDef
+                                    new ApiIdentityScalarPartDef
                                     (
                                         ApiPropertyName: nameof(IdentityThreeScalarPartComposite.Id3)
                                     )
@@ -521,7 +521,7 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_IdentityNestedPart",
                                 Parts:
                                 [
-                                    new ApiScalarPartDef
+                                    new ApiIdentityScalarPartDef
                                     (
                                         ApiPropertyName: nameof(IdentityNested.Id)
                                     )
@@ -559,11 +559,11 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_IdentityNestedComposite",
                                 Parts:
                                 [
-                                    new ApiNestedPartDef
+                                    new ApiIdentityNestedPartDef
                                     (
                                         ApiPropertyName: nameof(IdentityNestedComposite.NestedPart)
                                     ),
-                                    new ApiScalarPartDef
+                                    new ApiIdentityScalarPartDef
                                     (
                                         ApiPropertyName: nameof(IdentityNestedComposite.Name)
                                     )
@@ -728,7 +728,7 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_IdentityOwner",
                                 Parts:
                                 [
-                                    new ApiScalarPartDef
+                                    new ApiIdentityScalarPartDef
                                     (
                                         ApiPropertyName: nameof(IdentityOwner.Id)
                                     )
@@ -790,8 +790,8 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_IdentityOwnedComposite",
                                 Parts:
                                 [
-                                    new ApiOwnerPartDef(),
-                                    new ApiScalarPartDef
+                                    new ApiIdentityOwnerPartDef(),
+                                    new ApiIdentityScalarPartDef
                                     (
                                         ApiPropertyName: nameof(IdentityOwnedComposite.LineNumber)
                                     )
@@ -829,7 +829,7 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_IdentityOwnedDependent",
                                 Parts:
                                 [
-                                    new ApiOwnerPartDef()
+                                    new ApiIdentityOwnerPartDef()
                                 ]
                             )
                         ],
@@ -1041,7 +1041,7 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_IdentityScalar",
                                 Parts:
                                 [
-                                    new ApiScalarPartDef
+                                    new ApiIdentityScalarPartDef
                                     (
                                         ApiPropertyName: nameof(IdentityScalar.Id)
                                     )
@@ -1052,7 +1052,7 @@ public partial class ApiSchemaTests
                                 ApiName: "AK_IdentityScalar",
                                 Parts:
                                 [
-                                    new ApiScalarPartDef
+                                    new ApiIdentityScalarPartDef
                                     (
                                         ApiPropertyName: nameof(IdentityScalar.Name)
                                     )
@@ -1090,11 +1090,11 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_IdentityTwoScalarPartComposite",
                                 Parts:
                                 [
-                                    new ApiScalarPartDef
+                                    new ApiIdentityScalarPartDef
                                     (
                                         ApiPropertyName: nameof(IdentityTwoScalarPartComposite.Id1)
                                     ),
-                                    new ApiScalarPartDef
+                                    new ApiIdentityScalarPartDef
                                     (
                                         ApiPropertyName: nameof(IdentityTwoScalarPartComposite.Id2)
                                     )
@@ -1140,15 +1140,15 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_IdentityThreeScalarPartComposite",
                                 Parts:
                                 [
-                                    new ApiScalarPartDef
+                                    new ApiIdentityScalarPartDef
                                     (
                                         ApiPropertyName: nameof(IdentityThreeScalarPartComposite.Id1)
                                     ),
-                                    new ApiScalarPartDef
+                                    new ApiIdentityScalarPartDef
                                     (
                                         ApiPropertyName: nameof(IdentityThreeScalarPartComposite.Id2)
                                     ),
-                                    new ApiScalarPartDef
+                                    new ApiIdentityScalarPartDef
                                     (
                                         ApiPropertyName: nameof(IdentityThreeScalarPartComposite.Id3)
                                     )
@@ -1202,7 +1202,7 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_IdentityNestedPart",
                                 Parts:
                                 [
-                                    new ApiScalarPartDef
+                                    new ApiIdentityScalarPartDef
                                     (
                                         ApiPropertyName: nameof(IdentityNested.Id)
                                     )
@@ -1240,11 +1240,11 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_IdentityNestedComposite",
                                 Parts:
                                 [
-                                    new ApiNestedPartDef
+                                    new ApiIdentityNestedPartDef
                                     (
                                         ApiPropertyName: nameof(IdentityNestedComposite.NestedPart)
                                     ),
-                                    new ApiScalarPartDef
+                                    new ApiIdentityScalarPartDef
                                     (
                                         ApiPropertyName: nameof(IdentityNestedComposite.Name)
                                     )
@@ -1282,7 +1282,7 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_IdentityOwner",
                                 Parts:
                                 [
-                                    new ApiScalarPartDef
+                                    new ApiIdentityScalarPartDef
                                     (
                                         ApiPropertyName: nameof(IdentityOwner.Id)
                                     )
@@ -1344,8 +1344,8 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_IdentityOwnedComposite",
                                 Parts:
                                 [
-                                    new ApiOwnerPartDef(),
-                                    new ApiScalarPartDef
+                                    new ApiIdentityOwnerPartDef(),
+                                    new ApiIdentityScalarPartDef
                                     (
                                         ApiPropertyName: nameof(IdentityOwnedComposite.LineNumber)
                                     )
@@ -1383,7 +1383,7 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_IdentityOwnedDependent",
                                 Parts:
                                 [
-                                    new ApiOwnerPartDef()
+                                    new ApiIdentityOwnerPartDef()
                                 ]
                             )
                         ],
@@ -1840,7 +1840,7 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_IdentityNestedPart",
                                 Parts:
                                 [
-                                    new ApiScalarPartDef
+                                    new ApiIdentityScalarPartDef
                                     (
                                         ApiPropertyName: nameof(IdentityNested.Id)
                                     )
@@ -1878,12 +1878,12 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_IdentityNestedComposite",
                                 Parts:
                                 [
-                                    new ApiNestedPartDef
+                                    new ApiIdentityNestedPartDef
                                     (
                                         ApiPropertyName: nameof(IdentityNestedComposite.NestedPart),
                                         ApiIdentityName: "PK_IdentityNestedPart"
                                     ),
-                                    new ApiScalarPartDef
+                                    new ApiIdentityScalarPartDef
                                     (
                                         ApiPropertyName: nameof(IdentityNestedComposite.Name)
                                     )
@@ -2049,7 +2049,7 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_IdentityOwner",
                                 Parts:
                                 [
-                                    new ApiScalarPartDef
+                                    new ApiIdentityScalarPartDef
                                     (
                                         ApiPropertyName: nameof(IdentityOwner.Id)
                                     )
@@ -2111,8 +2111,8 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_IdentityOwnedComposite",
                                 Parts:
                                 [
-                                    new ApiOwnerPartDef(ApiIdentityName: "PK_IdentityOwner"),
-                                    new ApiScalarPartDef
+                                    new ApiIdentityOwnerPartDef(ApiIdentityName: "PK_IdentityOwner"),
+                                    new ApiIdentityScalarPartDef
                                     (
                                         ApiPropertyName: nameof(IdentityOwnedComposite.LineNumber)
                                     )
@@ -2150,7 +2150,7 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_IdentityOwnedDependent",
                                 Parts:
                                 [
-                                    new ApiOwnerPartDef(ApiIdentityName: "PK_IdentityOwner")
+                                    new ApiIdentityOwnerPartDef(ApiIdentityName: "PK_IdentityOwner")
                                 ]
                             )
                         ],

@@ -3,6 +3,8 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.Extensions;
+
 namespace Evoogle.ApiFramework.Schema;
 
 /// <summary>
@@ -14,7 +16,7 @@ namespace Evoogle.ApiFramework.Schema;
 ///         A corresponding dependent value may appear zero or more times among all dependent objects.
 ///     </para>
 ///     <para>
-///         Self-referential one-to-many relationships are supported by setting both ends to the same <see cref="ApiRelationshipEnd.ClrObjectType"/>.
+///         Self-referential one-to-many relationships are supported by setting both ends to the same <see cref="ApiRelationshipElement.ClrObjectType"/>.
 ///     </para>
 /// </remarks>
 /// <param name="apiName">The schema-unique API name of the relationship.</param>
@@ -26,9 +28,13 @@ public sealed class ApiRelationshipOneToMany
     string apiName,
     ApiRelationshipPrincipalEnd apiPrincipalEnd,
     ApiRelationshipDependentEnd apiDependentEnd,
-    ApiRelationshipDeleteBehavior apiDeleteBehavior = ApiRelationshipDeleteBehavior.None
+    ApiRelationshipDeleteBehavior apiDeleteBehavior = ApiRelationshipOneToMany.DefaultDeleteBehavior
 ) : ApiRelationshipOneTo(apiName, apiPrincipalEnd, apiDependentEnd, apiDeleteBehavior)
 {
+    #region ApiRelationshipOneToMany Fields
+    public const ApiRelationshipDeleteBehavior DefaultDeleteBehavior = ApiRelationshipDeleteBehavior.None;
+    #endregion
+
     #region ApiSchemaElement Properties
     /// <inheritdoc/>
     protected override string ApiElementName => nameof(ApiRelationshipOneToMany);
@@ -37,5 +43,18 @@ public sealed class ApiRelationshipOneToMany
     #region ApiRelationship Properties
     /// <inheritdoc/>
     public override ApiRelationshipKind ApiKind => ApiRelationshipKind.OneToMany;
+    #endregion
+
+    #region Object Methods
+    /// <inheritdoc/>
+    public override string ToString()
+    {
+        var apiName = this.ApiName.SafeToString();
+        var apiPrincipalEnd = this.ApiPrincipalEnd.SafeToString();
+        var apiDependentEnd = this.ApiDependentEnd.SafeToString();
+        var extensionCount = this.ExtensionCount.SafeToString();
+
+        return $"{nameof(ApiRelationshipOneToMany)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ApiPrincipalEnd)}={apiPrincipalEnd}, {nameof(this.ApiDependentEnd)}={apiDependentEnd}, {nameof(this.ExtensionCount)}={extensionCount}}}";
+    }
     #endregion
 }

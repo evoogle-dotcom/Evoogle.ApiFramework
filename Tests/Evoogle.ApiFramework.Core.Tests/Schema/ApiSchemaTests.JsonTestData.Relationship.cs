@@ -46,7 +46,7 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_RelationshipUser_Id",
                                 Parts:
                                 [
-                                    new ApiScalarPartDef
+                                    new ApiIdentityScalarPartDef
                                     (
                                         ApiPropertyName: nameof(RelationshipUser.Id)
                                     )
@@ -94,7 +94,7 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_RelationshipUserRef_UserId",
                                 Parts:
                                 [
-                                    new ApiScalarPartDef
+                                    new ApiIdentityScalarPartDef
                                     (
                                         ApiPropertyName: nameof(RelationshipUserRef.UserId)
                                     )
@@ -126,7 +126,7 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_RelationshipUserProfile_UserId",
                                 Parts:
                                 [
-                                    new ApiScalarPartDef
+                                    new ApiIdentityScalarPartDef
                                     (
                                         ApiPropertyName: nameof(RelationshipUserProfile.UserId)
                                     )
@@ -137,7 +137,7 @@ public partial class ApiSchemaTests
                                 ApiName: "AK_RelationshipUserProfile_UserRef",
                                 Parts:
                                 [
-                                    new ApiNestedPartDef
+                                    new ApiIdentityNestedPartDef
                                     (
                                         ApiPropertyName: nameof(RelationshipUserProfile.UserRef)
                                     )
@@ -184,14 +184,14 @@ public partial class ApiSchemaTests
                 ApiRelationships:
                 [
                     // User_Profile_ScalarFK
-                    new ApiOneToOneRelationshipDef
+                    new ApiRelationshipOneToOneDef
                     (
                         ApiName: "User_Profile_ScalarFK",
-                        PrincipalEnd: new ApiPrincipalEndDef
+                        PrincipalEnd: new ApiRelationshipPrincipalEndDef
                         (
                             ClrObjectType: typeof(RelationshipUser)
                         ),
-                        DependentEnd: new ApiDependentEndDef
+                        DependentEnd: new ApiRelationshipDependentEndDef
                         (
                             ClrObjectType: typeof(RelationshipUserProfile),
                             ApiKeyPaths: [new ApiRelationshipScalarKeyPathDef(ClrPropertyName: nameof(RelationshipUserProfile.UserId))]
@@ -200,14 +200,14 @@ public partial class ApiSchemaTests
                     ),
 
                     // User_Profile_NestedFK
-                    new ApiOneToOneRelationshipDef
+                    new ApiRelationshipOneToOneDef
                     (
                         ApiName: "User_Profile_NestedFK",
-                        PrincipalEnd: new ApiPrincipalEndDef
+                        PrincipalEnd: new ApiRelationshipPrincipalEndDef
                         (
                             ClrObjectType: typeof(RelationshipUser)
                         ),
-                        DependentEnd: new ApiDependentEndDef
+                        DependentEnd: new ApiRelationshipDependentEndDef
                         (
                             ClrObjectType: typeof(RelationshipUserProfile),
                             ApiKeyPaths:
@@ -392,7 +392,6 @@ public partial class ApiSchemaTests
                     {
                         ""ApiKind"": ""OneToOne"",
                         ""ApiName"": ""User_Profile_NestedFK"",
-                        ""ApiDeleteBehavior"": ""Delete"",
                         ""ApiPrincipalEnd"": {
                             ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipUser,Evoogle.ApiFramework.Core.Tests""
                         },
@@ -410,12 +409,12 @@ public partial class ApiSchemaTests
                                     ]
                                 }
                             ]
-                        }
+                        },
+                        ""ApiDeleteBehavior"": ""Delete""
                     },
                     {
                         ""ApiKind"": ""OneToOne"",
                         ""ApiName"": ""User_Profile_ScalarFK"",
-                        ""ApiDeleteBehavior"": ""Delete"",
                         ""ApiPrincipalEnd"": {
                             ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipUser,Evoogle.ApiFramework.Core.Tests""
                         },
@@ -427,7 +426,8 @@ public partial class ApiSchemaTests
                                     ""ClrPropertyName"": ""UserId""
                                 }
                             ]
-                        }
+                        },
+                        ""ApiDeleteBehavior"": ""Delete""
                     }
                 ]
             }"
@@ -465,7 +465,7 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_RelationshipUser_Id",
                                 Parts:
                                 [
-                                    new ApiScalarPartDef
+                                    new ApiIdentityScalarPartDef
                                     (
                                         ApiPropertyName: nameof(RelationshipUser.Id)
                                     )
@@ -521,7 +521,7 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_RelationshipUserRef_UserId",
                                 Parts:
                                 [
-                                    new ApiScalarPartDef
+                                    new ApiIdentityScalarPartDef
                                     (
                                         ApiPropertyName: nameof(RelationshipUserRef.UserId)
                                     )
@@ -553,7 +553,7 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_RelationshipPost_Id",
                                 Parts:
                                 [
-                                    new ApiScalarPartDef
+                                    new ApiIdentityScalarPartDef
                                     (
                                         ApiPropertyName: nameof(RelationshipPost.Id)
                                     )
@@ -633,7 +633,7 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_RelationshipPostRef_PostId",
                                 Parts:
                                 [
-                                    new ApiScalarPartDef
+                                    new ApiIdentityScalarPartDef
                                     (
                                         ApiPropertyName: nameof(RelationshipPostRef.PostId)
                                     )
@@ -665,7 +665,7 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_RelationshipComment_Id",
                                 Parts:
                                 [
-                                    new ApiScalarPartDef
+                                    new ApiIdentityScalarPartDef
                                     (
                                         ApiPropertyName: nameof(RelationshipComment.Id)
                                     )
@@ -720,14 +720,14 @@ public partial class ApiSchemaTests
                 ApiRelationships:
                 [
                     // User_Posts_ScalarFK
-                    new ApiOneToManyRelationshipDef
+                    new ApiRelationshipOneToManyDef
                     (
                         ApiName: "User_Posts_ScalarFK",
-                        PrincipalEnd: new ApiPrincipalEndDef
+                        PrincipalEnd: new ApiRelationshipPrincipalEndDef
                         (
                             ClrObjectType: typeof(RelationshipUser)
                         ),
-                        DependentEnd: new ApiDependentEndDef
+                        DependentEnd: new ApiRelationshipDependentEndDef
                         (
                             ClrObjectType: typeof(RelationshipPost),
                             ApiKeyPaths: [new ApiRelationshipScalarKeyPathDef(ClrPropertyName: nameof(RelationshipPost.AuthorUserId))]
@@ -736,14 +736,14 @@ public partial class ApiSchemaTests
                     ),
 
                     // User_Posts_NestedFK
-                    new ApiOneToManyRelationshipDef
+                    new ApiRelationshipOneToManyDef
                     (
                         ApiName: "User_Posts_NestedFK",
-                        PrincipalEnd: new ApiPrincipalEndDef
+                        PrincipalEnd: new ApiRelationshipPrincipalEndDef
                         (
                             ClrObjectType: typeof(RelationshipUser)
                         ),
-                        DependentEnd: new ApiDependentEndDef
+                        DependentEnd: new ApiRelationshipDependentEndDef
                         (
                             ClrObjectType: typeof(RelationshipPost),
                             ApiKeyPaths:
@@ -759,14 +759,14 @@ public partial class ApiSchemaTests
                     ),
 
                     // Post_Comments_ScalarFK
-                    new ApiOneToManyRelationshipDef
+                    new ApiRelationshipOneToManyDef
                     (
                         ApiName: "Post_Comments_ScalarFK",
-                        PrincipalEnd: new ApiPrincipalEndDef
+                        PrincipalEnd: new ApiRelationshipPrincipalEndDef
                         (
                             ClrObjectType: typeof(RelationshipPost)
                         ),
-                        DependentEnd: new ApiDependentEndDef
+                        DependentEnd: new ApiRelationshipDependentEndDef
                         (
                             ClrObjectType: typeof(RelationshipComment),
                             ApiKeyPaths: [new ApiRelationshipScalarKeyPathDef(ClrPropertyName: nameof(RelationshipComment.PostId))]
@@ -775,14 +775,14 @@ public partial class ApiSchemaTests
                     ),
 
                     // Post_Comments_NestedFK
-                    new ApiOneToManyRelationshipDef
+                    new ApiRelationshipOneToManyDef
                     (
                         ApiName: "Post_Comments_NestedFK",
-                        PrincipalEnd: new ApiPrincipalEndDef
+                        PrincipalEnd: new ApiRelationshipPrincipalEndDef
                         (
                             ClrObjectType: typeof(RelationshipPost)
                         ),
-                        DependentEnd: new ApiDependentEndDef
+                        DependentEnd: new ApiRelationshipDependentEndDef
                         (
                             ClrObjectType: typeof(RelationshipComment),
                             ApiKeyPaths:
@@ -1088,7 +1088,6 @@ public partial class ApiSchemaTests
                     {
                         ""ApiKind"": ""OneToMany"",
                         ""ApiName"": ""Post_Comments_NestedFK"",
-                        ""ApiDeleteBehavior"": ""Delete"",
                         ""ApiPrincipalEnd"": {
                             ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipPost,Evoogle.ApiFramework.Core.Tests""
                         },
@@ -1106,12 +1105,12 @@ public partial class ApiSchemaTests
                                     ]
                                 }
                             ]
-                        }
+                        },
+                        ""ApiDeleteBehavior"": ""Delete""
                     },
                     {
                         ""ApiKind"": ""OneToMany"",
                         ""ApiName"": ""Post_Comments_ScalarFK"",
-                        ""ApiDeleteBehavior"": ""Delete"",
                         ""ApiPrincipalEnd"": {
                             ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipPost,Evoogle.ApiFramework.Core.Tests""
                         },
@@ -1123,12 +1122,12 @@ public partial class ApiSchemaTests
                                     ""ClrPropertyName"": ""PostId""
                                 }
                             ]
-                        }
+                        },
+                        ""ApiDeleteBehavior"": ""Delete""
                     },
                     {
                         ""ApiKind"": ""OneToMany"",
                         ""ApiName"": ""User_Posts_NestedFK"",
-                        ""ApiDeleteBehavior"": ""Delete"",
                         ""ApiPrincipalEnd"": {
                             ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipUser,Evoogle.ApiFramework.Core.Tests""
                         },
@@ -1146,12 +1145,12 @@ public partial class ApiSchemaTests
                                     ]
                                 }
                             ]
-                        }
+                        },
+                        ""ApiDeleteBehavior"": ""Delete""
                     },
                     {
                         ""ApiKind"": ""OneToMany"",
                         ""ApiName"": ""User_Posts_ScalarFK"",
-                        ""ApiDeleteBehavior"": ""Delete"",
                         ""ApiPrincipalEnd"": {
                             ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipUser,Evoogle.ApiFramework.Core.Tests""
                         },
@@ -1163,7 +1162,8 @@ public partial class ApiSchemaTests
                                     ""ClrPropertyName"": ""AuthorUserId""
                                 }
                             ]
-                        }
+                        },
+                        ""ApiDeleteBehavior"": ""Delete""
                     }
                 ]
             }"
@@ -1201,7 +1201,7 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_RelationshipPost_Id",
                                 Parts:
                                 [
-                                    new ApiScalarPartDef
+                                    new ApiIdentityScalarPartDef
                                     (
                                         ApiPropertyName: nameof(RelationshipPost.Id)
                                     )
@@ -1257,7 +1257,7 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_RelationshipTag_Id",
                                 Parts:
                                 [
-                                    new ApiScalarPartDef
+                                    new ApiIdentityScalarPartDef
                                     (
                                         ApiPropertyName: nameof(RelationshipTag.Id)
                                     )
@@ -1313,11 +1313,11 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_RelationshipPostTag_PostId_TagId",
                                 Parts:
                                 [
-                                    new ApiScalarPartDef
+                                    new ApiIdentityScalarPartDef
                                     (
                                         ApiPropertyName: nameof(RelationshipPostTag.PostId)
                                     ),
-                                    new ApiScalarPartDef
+                                    new ApiIdentityScalarPartDef
                                     (
                                         ApiPropertyName: nameof(RelationshipPostTag.TagId)
                                     )
@@ -1348,28 +1348,23 @@ public partial class ApiSchemaTests
                 ApiRelationships:
                 [
                     // Post_Tags
-                    new ApiManyToManyRelationshipDef
+                    new ApiRelationshipManyToManyDef
                     (
                         ApiName: "Post_Tags",
-                        PrincipalEndA: new ApiPrincipalEndDef
+                        PrincipalEndA: new ApiRelationshipPrincipalEndDef
                         (
                             ClrObjectType: typeof(RelationshipPost)
                         ),
-                        PrincipalEndB: new ApiPrincipalEndDef
+                        PrincipalEndB: new ApiRelationshipPrincipalEndDef
                         (
                             ClrObjectType: typeof(RelationshipTag)
                         ),
-                        DependentEndA: new ApiDependentEndDef
+                        Association: new ApiRelationshipAssociationDef
                         (
                             ClrObjectType: typeof(RelationshipPostTag),
-                            ApiKeyPaths: [new ApiRelationshipScalarKeyPathDef(ClrPropertyName: nameof(RelationshipPostTag.PostId))]
-                        ),
-                        DependentEndB: new ApiDependentEndDef
-                        (
-                            ClrObjectType: typeof(RelationshipPostTag),
-                            ApiKeyPaths: [new ApiRelationshipScalarKeyPathDef(ClrPropertyName: nameof(RelationshipPostTag.TagId))]
-                        ),
-                        ClrAssociationObjectType: typeof(RelationshipPostTag)
+                            ApiKeyPathsA: [new ApiRelationshipScalarKeyPathDef(ClrPropertyName: nameof(RelationshipPostTag.PostId))],
+                            ApiKeyPathsB: [new ApiRelationshipScalarKeyPathDef(ClrPropertyName: nameof(RelationshipPostTag.TagId))]
+                        )
                     )
                 ]
             ),
@@ -1557,25 +1552,22 @@ public partial class ApiSchemaTests
                         ""ApiPrincipalEndB"": {
                             ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipTag,Evoogle.ApiFramework.Core.Tests""
                         },
-                        ""ApiDependentEndA"": {
+                        ""ApiAssociation"": {
                             ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipPostTag,Evoogle.ApiFramework.Core.Tests"",
-                            ""ApiKeyPaths"": [
+                            ""ApiKeyPathsA"": [
                                 {
                                     ""ApiKind"": ""Scalar"",
                                     ""ClrPropertyName"": ""PostId""
                                 }
-                            ]
-                        },
-                        ""ApiDependentEndB"": {
-                            ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipPostTag,Evoogle.ApiFramework.Core.Tests"",
-                            ""ApiKeyPaths"": [
+                            ],
+                            ""ApiKeyPathsB"": [
                                 {
                                     ""ApiKind"": ""Scalar"",
                                     ""ClrPropertyName"": ""TagId""
                                 }
                             ]
                         },
-                        ""ClrAssociationObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipPostTag,Evoogle.ApiFramework.Core.Tests""
+                        ""ApiDeleteBehavior"": ""Delete""
                     }
                 ]
             }"

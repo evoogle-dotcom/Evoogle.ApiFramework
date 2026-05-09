@@ -27,14 +27,14 @@ namespace Evoogle.ApiFramework.Schema;
 ///         for types that hold a collection or direct property of the owned type.
 ///     </para>
 ///     <para>
-///         Accessing <see cref="ApiOwnerIdentity"/> or <see cref="ApiOwnerType"/> before schema
+///         Accessing <see cref="ApiIdentity"/> or <see cref="ApiObjectType"/> before schema
 ///         initialization completes will throw.
 ///     </para>
 /// </remarks>
 public sealed class ApiIdentityOwnerPart(string? apiIdentityName = null) : ApiIdentityPart
 {
     #region ApiIdentityOwnerPart Fields
-    private ApiIdentity? _apiResolvedOwnerIdentity = null;
+    private ApiIdentity? _apiResolvedIdentity = null;
     private ApiObjectType? _apiResolvedOwnerType = null;
     #endregion
 
@@ -55,11 +55,11 @@ public sealed class ApiIdentityOwnerPart(string? apiIdentityName = null) : ApiId
     /// </summary>
     public string? ApiIdentityName { get; } = apiIdentityName;
 
-    /// <summary>Gets the resolved owner <see cref="ApiIdentity"/> from the owning object type. Available after schema initialization.</summary>
-    public ApiIdentity ApiOwnerIdentity => this.ThrowIfNotInitialized(_apiResolvedOwnerIdentity);
+    /// <summary>Gets the resolved owner <see cref="Schema.ApiIdentity"/> from the owning object type. Available after schema initialization.</summary>
+    public ApiIdentity ApiIdentity => this.ThrowIfNotInitialized(_apiResolvedIdentity);
 
-    /// <summary>Gets the resolved owner <see cref="ApiObjectType"/>. Available after schema initialization.</summary>
-    public ApiObjectType ApiOwnerType => this.ThrowIfNotInitialized(_apiResolvedOwnerType);
+    /// <summary>Gets the resolved owner <see cref="Schema.ApiObjectType"/>. Available after schema initialization.</summary>
+    public ApiObjectType ApiObjectType => this.ThrowIfNotInitialized(_apiResolvedOwnerType);
     #endregion
 
     #region Object Methods
@@ -87,7 +87,7 @@ public sealed class ApiIdentityOwnerPart(string? apiIdentityName = null) : ApiId
         ApiInitializationContext context
     )
     {
-        _apiResolvedOwnerIdentity = null;
+        _apiResolvedIdentity = null;
         _apiResolvedOwnerType = null;
 
         if (candidateOwners.Count == 0)
@@ -96,7 +96,7 @@ public sealed class ApiIdentityOwnerPart(string? apiIdentityName = null) : ApiId
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_IDENTITY_PART_UNRESOLVED_OWNER;
             var description = $"No owner object type was found for '{ownedType.ApiName}' — no other object type has a collection or direct object property of this type";
-            var remediation = $"Ensure another {nameof(ApiObjectType)} has a collection or direct object property typed as '{ownedType.ApiName}', or remove the {nameof(ApiIdentityOwnerPart)}";
+            var remediation = $"Ensure another {nameof(Schema.ApiObjectType)} has a collection or direct object property typed as '{ownedType.ApiName}', or remove the {nameof(ApiIdentityOwnerPart)}";
 
             context.AddIssue(path, severity, code, description, remediation);
             return;
@@ -109,7 +109,7 @@ public sealed class ApiIdentityOwnerPart(string? apiIdentityName = null) : ApiId
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_IDENTITY_PART_AMBIGUOUS_OWNER;
             var description = $"Multiple candidate owner object types found for '{ownedType.ApiName}': {ownerNames}";
-            var remediation = $"Disambiguate by ensuring only one {nameof(ApiObjectType)} holds a collection or direct object property of '{ownedType.ApiName}'";
+            var remediation = $"Disambiguate by ensuring only one {nameof(Schema.ApiObjectType)} holds a collection or direct object property of '{ownedType.ApiName}'";
 
             context.AddIssue(path, severity, code, description, remediation);
             return;
@@ -122,7 +122,7 @@ public sealed class ApiIdentityOwnerPart(string? apiIdentityName = null) : ApiId
             // Resolve by explicit name
             if (ownerType.TryGetIdentityByApiName(this.ApiIdentityName, out var namedIdentity))
             {
-                _apiResolvedOwnerIdentity = namedIdentity;
+                _apiResolvedIdentity = namedIdentity;
                 _apiResolvedOwnerType = ownerType;
             }
             else
@@ -142,10 +142,10 @@ public sealed class ApiIdentityOwnerPart(string? apiIdentityName = null) : ApiId
         else
         {
             // Use primary identity (first by convention)
-            _apiResolvedOwnerIdentity = ownerType.ApiPrimaryIdentity;
+            _apiResolvedIdentity = ownerType.ApiPrimaryIdentity;
             _apiResolvedOwnerType = ownerType;
 
-            if (_apiResolvedOwnerIdentity is null)
+            if (_apiResolvedIdentity is null)
             {
                 var path = this.ApiPath;
                 var severity = ApiInitializationSeverity.Error;

@@ -25,21 +25,28 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
     {
         public required string ApiKind { get; init; }
         public required string ApiName { get; init; }
-        // One-to-one / one-to-many
         public required string ApiDeleteBehavior { get; init; }
+    }
+
+    private readonly record struct ApiRelationshipOneToPropertyNames
+    {
         public required string ApiPrincipalEnd { get; init; }
         public required string ApiDependentEnd { get; init; }
-        // Many-to-many
+    }
+
+    private readonly record struct ApiRelationshipManyToManyPropertyNames
+    {
         public required string ApiPrincipalEndA { get; init; }
         public required string ApiPrincipalEndB { get; init; }
-        public required string ApiDependentEndA { get; init; }
-        public required string ApiDependentEndB { get; init; }
-        public required string ClrAssociationObjectType { get; init; }
+        public required string ApiAssociation { get; init; }
     }
 
     private readonly record struct PropertyNames
     {
         public required ApiRelationshipPropertyNames ApiRelationship { get; init; }
+        public required ApiRelationshipOneToPropertyNames ApiRelationshipOneTo { get; init; }
+        public required ApiRelationshipManyToManyPropertyNames ApiRelationshipManyToMany { get; init; }
+
         public required ExtensibleBasePropertyNames ExtensibleBase { get; init; }
 
         public static PropertyNames Create(JsonNamingPolicy policy)
@@ -49,14 +56,18 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
                 {
                     ApiKind = policy.ConvertName(nameof(ApiRelationship.ApiKind)),
                     ApiName = policy.ConvertName(nameof(ApiRelationship.ApiName)),
-                    ApiDeleteBehavior = policy.ConvertName(nameof(ApiRelationshipOneTo.ApiDeleteBehavior)),
+                    ApiDeleteBehavior = policy.ConvertName(nameof(ApiRelationship.ApiDeleteBehavior)),
+                },
+                ApiRelationshipOneTo = new ApiRelationshipOneToPropertyNames
+                {
                     ApiPrincipalEnd = policy.ConvertName(nameof(ApiRelationshipOneTo.ApiPrincipalEnd)),
                     ApiDependentEnd = policy.ConvertName(nameof(ApiRelationshipOneTo.ApiDependentEnd)),
+                },
+                ApiRelationshipManyToMany = new ApiRelationshipManyToManyPropertyNames
+                {
                     ApiPrincipalEndA = policy.ConvertName(nameof(ApiRelationshipManyToMany.ApiPrincipalEndA)),
                     ApiPrincipalEndB = policy.ConvertName(nameof(ApiRelationshipManyToMany.ApiPrincipalEndB)),
-                    ApiDependentEndA = policy.ConvertName(nameof(ApiRelationshipManyToMany.ApiDependentEndA)),
-                    ApiDependentEndB = policy.ConvertName(nameof(ApiRelationshipManyToMany.ApiDependentEndB)),
-                    ClrAssociationObjectType = policy.ConvertName(nameof(ApiRelationshipManyToMany.ClrAssociationObjectType)),
+                    ApiAssociation = policy.ConvertName(nameof(ApiRelationshipManyToMany.ApiAssociation)),
                 },
                 ExtensibleBase = GetExtensiblePropertyNames(policy),
             };
@@ -68,21 +79,27 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
     {
         public ApiRelationshipKind? ApiKind { get; set; }
         public string? ApiName { get; set; }
-        // One-to-one / one-to-many
         public ApiRelationshipDeleteBehavior? ApiDeleteBehavior { get; set; }
+    }
+
+    private class ApiRelationshipOneToReadData
+    {
         public ApiRelationshipPrincipalEnd? ApiPrincipalEnd { get; set; }
         public ApiRelationshipDependentEnd? ApiDependentEnd { get; set; }
-        // Many-to-many
+    }
+
+    private class ApiRelationshipManyToManyReadData
+    {
         public ApiRelationshipPrincipalEnd? ApiPrincipalEndA { get; set; }
         public ApiRelationshipPrincipalEnd? ApiPrincipalEndB { get; set; }
-        public ApiRelationshipDependentEnd? ApiDependentEndA { get; set; }
-        public ApiRelationshipDependentEnd? ApiDependentEndB { get; set; }
-        public Type? ClrAssociationObjectType { get; set; }
+        public ApiRelationshipAssociation? ApiAssociation { get; set; }
     }
 
     private class ReadData : ExtensibleReadData
     {
         public ApiRelationshipReadData? ApiRelationship { get; set; }
+        public ApiRelationshipOneToReadData? ApiRelationshipOneTo { get; set; }
+        public ApiRelationshipManyToManyReadData? ApiRelationshipManyToMany { get; set; }
     }
 
     private class ReadHandlers(PropertyNames propertyNames)
@@ -92,13 +109,11 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
             { propertyNames.ApiRelationship.ApiKind, HandleApiKind },
             { propertyNames.ApiRelationship.ApiName, HandleApiName },
             { propertyNames.ApiRelationship.ApiDeleteBehavior, HandleApiDeleteBehavior },
-            { propertyNames.ApiRelationship.ApiPrincipalEnd, HandleApiPrincipalEnd },
-            { propertyNames.ApiRelationship.ApiDependentEnd, HandleApiDependentEnd },
-            { propertyNames.ApiRelationship.ApiPrincipalEndA, HandleApiPrincipalEndA },
-            { propertyNames.ApiRelationship.ApiPrincipalEndB, HandleApiPrincipalEndB },
-            { propertyNames.ApiRelationship.ApiDependentEndA, HandleApiDependentEndA },
-            { propertyNames.ApiRelationship.ApiDependentEndB, HandleApiDependentEndB },
-            { propertyNames.ApiRelationship.ClrAssociationObjectType, HandleClrAssociationObjectType },
+            { propertyNames.ApiRelationshipOneTo.ApiPrincipalEnd, HandleApiPrincipalEnd },
+            { propertyNames.ApiRelationshipOneTo.ApiDependentEnd, HandleApiDependentEnd },
+            { propertyNames.ApiRelationshipManyToMany.ApiPrincipalEndA, HandleApiPrincipalEndA },
+            { propertyNames.ApiRelationshipManyToMany.ApiPrincipalEndB, HandleApiPrincipalEndB },
+            { propertyNames.ApiRelationshipManyToMany.ApiAssociation, HandleApiAssociation },
             { propertyNames.ExtensibleBase.Extensions, CreateExtensionsHandler<PropertyNames, ReadData, ReadHandlers>() },
         };
 
@@ -122,50 +137,37 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
 
         private static void HandleApiPrincipalEnd(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
-            context.ReadData.ApiRelationship ??= new ApiRelationshipReadData();
+            context.ReadData.ApiRelationshipOneTo ??= new ApiRelationshipOneToReadData();
             var end = JsonSerializer.Deserialize<ApiRelationshipPrincipalEnd>(ref reader, context.Options);
-            context.ReadData.ApiRelationship.ApiPrincipalEnd = end;
+            context.ReadData.ApiRelationshipOneTo.ApiPrincipalEnd = end;
         }
 
         private static void HandleApiDependentEnd(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
-            context.ReadData.ApiRelationship ??= new ApiRelationshipReadData();
+            context.ReadData.ApiRelationshipOneTo ??= new ApiRelationshipOneToReadData();
             var end = JsonSerializer.Deserialize<ApiRelationshipDependentEnd>(ref reader, context.Options);
-            context.ReadData.ApiRelationship.ApiDependentEnd = end;
+            context.ReadData.ApiRelationshipOneTo.ApiDependentEnd = end;
         }
 
         private static void HandleApiPrincipalEndA(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
-            context.ReadData.ApiRelationship ??= new ApiRelationshipReadData();
+            context.ReadData.ApiRelationshipManyToMany ??= new ApiRelationshipManyToManyReadData();
             var end = JsonSerializer.Deserialize<ApiRelationshipPrincipalEnd>(ref reader, context.Options);
-            context.ReadData.ApiRelationship.ApiPrincipalEndA = end;
+            context.ReadData.ApiRelationshipManyToMany.ApiPrincipalEndA = end;
         }
 
         private static void HandleApiPrincipalEndB(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
-            context.ReadData.ApiRelationship ??= new ApiRelationshipReadData();
+            context.ReadData.ApiRelationshipManyToMany ??= new ApiRelationshipManyToManyReadData();
             var end = JsonSerializer.Deserialize<ApiRelationshipPrincipalEnd>(ref reader, context.Options);
-            context.ReadData.ApiRelationship.ApiPrincipalEndB = end;
+            context.ReadData.ApiRelationshipManyToMany.ApiPrincipalEndB = end;
         }
 
-        private static void HandleApiDependentEndA(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiAssociation(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
-            context.ReadData.ApiRelationship ??= new ApiRelationshipReadData();
-            var end = JsonSerializer.Deserialize<ApiRelationshipDependentEnd>(ref reader, context.Options);
-            context.ReadData.ApiRelationship.ApiDependentEndA = end;
-        }
-
-        private static void HandleApiDependentEndB(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
-        {
-            context.ReadData.ApiRelationship ??= new ApiRelationshipReadData();
-            var end = JsonSerializer.Deserialize<ApiRelationshipDependentEnd>(ref reader, context.Options);
-            context.ReadData.ApiRelationship.ApiDependentEndB = end;
-        }
-
-        private static void HandleClrAssociationObjectType(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
-        {
-            context.ReadData.ApiRelationship ??= new ApiRelationshipReadData();
-            context.ReadData.ApiRelationship.ClrAssociationObjectType = _typeJsonConverter.Read(ref reader, typeof(Type), context.Options);
+            context.ReadData.ApiRelationshipManyToMany ??= new ApiRelationshipManyToManyReadData();
+            var end = JsonSerializer.Deserialize<ApiRelationshipAssociation>(ref reader, context.Options);
+            context.ReadData.ApiRelationshipManyToMany.ApiAssociation = end;
         }
     }
     #endregion
@@ -173,7 +175,6 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
     #region Fields
     private static readonly EnumJsonConverter<ApiRelationshipKind> _kindConverter = new();
     private static readonly EnumJsonConverter<ApiRelationshipDeleteBehavior> _deleteBehaviorConverter = new();
-    private static readonly TypeJsonConverter _typeJsonConverter = new();
     #endregion
 
     #region Constructors
@@ -203,40 +204,39 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
     protected override ApiRelationship? CreateValue(IReadContext context)
     {
         var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
-        var readData = readContext.ReadData.ApiRelationship;
+        var readData = readContext.ReadData;
 
-        if (readData?.ApiKind is null)
+        if (readData.ApiRelationship?.ApiKind is null)
         {
             return null;
         }
 
-        var apiKindValue = readData.ApiKind.Value;
+        var apiKindValue = readData.ApiRelationship.ApiKind.Value;
         ApiRelationship? relationship = apiKindValue switch
         {
             ApiRelationshipKind.OneToOne => new ApiRelationshipOneToOne
             (
-                readData.ApiName!,
-                readData.ApiPrincipalEnd!,
-                readData.ApiDependentEnd!,
-                readData.ApiDeleteBehavior ?? ApiRelationshipDeleteBehavior.None
+                readData.ApiRelationship.ApiName!,
+                readData.ApiRelationshipOneTo?.ApiPrincipalEnd!,
+                readData.ApiRelationshipOneTo?.ApiDependentEnd!,
+                readData.ApiRelationship?.ApiDeleteBehavior ?? ApiRelationshipOneToOne.DefaultDeleteBehavior
             ),
 
             ApiRelationshipKind.OneToMany => new ApiRelationshipOneToMany
             (
-                readData.ApiName!,
-                readData.ApiPrincipalEnd!,
-                readData.ApiDependentEnd!,
-                readData.ApiDeleteBehavior ?? ApiRelationshipDeleteBehavior.None
+                readData.ApiRelationship.ApiName!,
+                readData.ApiRelationshipOneTo?.ApiPrincipalEnd!,
+                readData.ApiRelationshipOneTo?.ApiDependentEnd!,
+                readData.ApiRelationship?.ApiDeleteBehavior ?? ApiRelationshipOneToMany.DefaultDeleteBehavior
             ),
 
             ApiRelationshipKind.ManyToMany => new ApiRelationshipManyToMany
             (
-                readData.ApiName!,
-                readData.ApiPrincipalEndA!,
-                readData.ApiPrincipalEndB!,
-                readData.ApiDependentEndA!,
-                readData.ApiDependentEndB!,
-                readData.ClrAssociationObjectType!
+                readData.ApiRelationship?.ApiName!,
+                readData.ApiRelationshipManyToMany?.ApiPrincipalEndA!,
+                readData.ApiRelationshipManyToMany?.ApiPrincipalEndB!,
+                readData.ApiRelationshipManyToMany?.ApiAssociation!,
+                readData.ApiRelationship?.ApiDeleteBehavior ?? ApiRelationshipManyToMany.DefaultDeleteBehavior
             ),
 
             _ => null
@@ -272,7 +272,6 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
             switch (value)
             {
                 case ApiRelationshipOneTo oneToRelationship:
-                    WriteApiDeleteBehavior(writer, oneToRelationship, writeContext);
                     WriteApiPrincipalEnd(writer, oneToRelationship, writeContext);
                     WriteApiDependentEnd(writer, oneToRelationship, writeContext);
                     break;
@@ -280,11 +279,11 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
                 case ApiRelationshipManyToMany manyToMany:
                     WriteApiPrincipalEndA(writer, manyToMany, writeContext);
                     WriteApiPrincipalEndB(writer, manyToMany, writeContext);
-                    WriteApiDependentEndA(writer, manyToMany, writeContext);
-                    WriteApiDependentEndB(writer, manyToMany, writeContext);
-                    WriteClrAssociationObjectType(writer, manyToMany, writeContext);
+                    WriteApiAssociation(writer, manyToMany, writeContext);
                     break;
             }
+
+            WriteApiDeleteBehavior(writer, value, writeContext);
 
             WriteExtensibleBaseExtensions(writer, writeContext.PropertyNames.ExtensibleBase.Extensions, value, writeContext);
         });
@@ -295,15 +294,15 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
     private static void WriteApiKind(Utf8JsonWriter writer, ApiRelationship relationship, DefaultWriteContext<PropertyNames> context)
         => writer.TryWritePropertyWithConverter(context.PropertyNames.ApiRelationship.ApiKind, relationship.ApiKind, context.Options, _kindConverter);
 
+    private static void WriteApiDeleteBehavior(Utf8JsonWriter writer, ApiRelationship relationship, DefaultWriteContext<PropertyNames> context)
+        => writer.TryWritePropertyWithConverter(context.PropertyNames.ApiRelationship.ApiDeleteBehavior, relationship.ApiDeleteBehavior, context.Options, _deleteBehaviorConverter);
+
     private static void WriteApiName(Utf8JsonWriter writer, ApiRelationship relationship, DefaultWriteContext<PropertyNames> context)
         => writer.TryWritePropertyAsString(context.PropertyNames.ApiRelationship.ApiName, relationship.ApiName, context.Options);
 
-    private static void WriteApiDeleteBehavior(Utf8JsonWriter writer, ApiRelationshipOneTo relationship, DefaultWriteContext<PropertyNames> context)
-        => writer.TryWritePropertyWithConverter(context.PropertyNames.ApiRelationship.ApiDeleteBehavior, relationship.ApiDeleteBehavior, context.Options, _deleteBehaviorConverter);
-
     private static void WriteApiPrincipalEnd(Utf8JsonWriter writer, ApiRelationshipOneTo relationship, DefaultWriteContext<PropertyNames> context)
     {
-        var propertyName = context.PropertyNames.ApiRelationship.ApiPrincipalEnd;
+        var propertyName = context.PropertyNames.ApiRelationshipOneTo.ApiPrincipalEnd;
         var end = relationship.ApiPrincipalEnd;
         var options = context.Options;
 
@@ -318,7 +317,7 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
 
     private static void WriteApiDependentEnd(Utf8JsonWriter writer, ApiRelationshipOneTo relationship, DefaultWriteContext<PropertyNames> context)
     {
-        var propertyName = context.PropertyNames.ApiRelationship.ApiDependentEnd;
+        var propertyName = context.PropertyNames.ApiRelationshipOneTo.ApiDependentEnd;
         var end = relationship.ApiDependentEnd;
         var options = context.Options;
 
@@ -333,7 +332,7 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
 
     private static void WriteApiPrincipalEndA(Utf8JsonWriter writer, ApiRelationshipManyToMany relationship, DefaultWriteContext<PropertyNames> context)
     {
-        var propertyName = context.PropertyNames.ApiRelationship.ApiPrincipalEndA;
+        var propertyName = context.PropertyNames.ApiRelationshipManyToMany.ApiPrincipalEndA;
         var end = relationship.ApiPrincipalEndA;
         var options = context.Options;
 
@@ -348,7 +347,7 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
 
     private static void WriteApiPrincipalEndB(Utf8JsonWriter writer, ApiRelationshipManyToMany relationship, DefaultWriteContext<PropertyNames> context)
     {
-        var propertyName = context.PropertyNames.ApiRelationship.ApiPrincipalEndB;
+        var propertyName = context.PropertyNames.ApiRelationshipManyToMany.ApiPrincipalEndB;
         var end = relationship.ApiPrincipalEndB;
         var options = context.Options;
 
@@ -361,10 +360,10 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
         );
     }
 
-    private static void WriteApiDependentEndA(Utf8JsonWriter writer, ApiRelationshipManyToMany relationship, DefaultWriteContext<PropertyNames> context)
+    private static void WriteApiAssociation(Utf8JsonWriter writer, ApiRelationshipManyToMany relationship, DefaultWriteContext<PropertyNames> context)
     {
-        var propertyName = context.PropertyNames.ApiRelationship.ApiDependentEndA;
-        var end = relationship.ApiDependentEndA;
+        var propertyName = context.PropertyNames.ApiRelationshipManyToMany.ApiAssociation;
+        var end = relationship.ApiAssociation;
         var options = context.Options;
 
         writer.TryWritePropertyWithAction
@@ -375,23 +374,5 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
             end => writer.TryWriteWithSerializer(end, options)
         );
     }
-
-    private static void WriteApiDependentEndB(Utf8JsonWriter writer, ApiRelationshipManyToMany relationship, DefaultWriteContext<PropertyNames> context)
-    {
-        var propertyName = context.PropertyNames.ApiRelationship.ApiDependentEndB;
-        var end = relationship.ApiDependentEndB;
-        var options = context.Options;
-
-        writer.TryWritePropertyWithAction
-        (
-            propertyName,
-            end,
-            options,
-            end => writer.TryWriteWithSerializer(end, options)
-        );
-    }
-
-    private static void WriteClrAssociationObjectType(Utf8JsonWriter writer, ApiRelationshipManyToMany relationship, DefaultWriteContext<PropertyNames> context)
-        => writer.TryWritePropertyWithConverter(context.PropertyNames.ApiRelationship.ClrAssociationObjectType, relationship.ClrAssociationObjectType, context.Options, _typeJsonConverter);
     #endregion
 }

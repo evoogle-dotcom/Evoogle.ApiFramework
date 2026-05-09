@@ -431,44 +431,23 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     }
 
     /// <summary>
-    ///     Adds a many-to-many relationship to the schema using a strongly-typed inline configuration action.
-    ///     The association CLR type <typeparamref name="TAssociation"/> is fixed for the builder so that
-    ///     <see cref="ApiRelationshipManyToManyBuilder{TAssociation}.WithDependentEndA"/> and
-    ///     <see cref="ApiRelationshipManyToManyBuilder{TAssociation}.WithDependentEndB"/> require no explicit type argument.
-    /// </summary>
-    /// <typeparam name="TAssociation">The CLR type of the association object type that mediates the relationship.</typeparam>
-    /// <param name="apiName">The schema-unique API name of the relationship.</param>
-    /// <param name="configure">Callback to configure the relationship.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiSchemaBuilder AddManyToManyRelationship<TAssociation>(string apiName, Action<ApiRelationshipManyToManyBuilder<TAssociation>> configure)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
-        ArgumentNullException.ThrowIfNull(configure);
-
-        var builder = _context.GetOrAddManyToManyRelationshipBuilder<TAssociation>(apiName);
-
-        configure(builder);
-        return this;
-    }
-
-    /// <summary>
     ///     Adds a many-to-many relationship to the schema with <typeparamref name="TPrincipalA"/> and
     ///     <typeparamref name="TPrincipalB"/> as the two principal types and <typeparamref name="TAssociation"/>
     ///     as the mediating association type, binding a single scalar FK for each side via lambda expressions.
-    ///     Use the <see cref="AddManyToManyRelationship{TAssociation}(string,Action{ApiRelationshipManyToManyBuilder{TAssociation}})"/>
-    ///     overload for composite FK keys, delete behavior, or non-primary identity selection.
     /// </summary>
-    /// <typeparam name="TAssociation">The CLR type of the association object that mediates the relationship.</typeparam>
     /// <typeparam name="TPrincipalA">The CLR type of principal end A.</typeparam>
     /// <typeparam name="TPrincipalB">The CLR type of principal end B.</typeparam>
+    /// <typeparam name="TAssociation">The CLR type of the association object that mediates the relationship.</typeparam>
     /// <param name="apiName">The schema-unique API name of the relationship.</param>
     /// <param name="fkA">Expression selecting the scalar FK property on <typeparamref name="TAssociation"/> that points to principal A.</param>
     /// <param name="fkB">Expression selecting the scalar FK property on <typeparamref name="TAssociation"/> that points to principal B.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiSchemaBuilder AddManyToManyRelationship<TAssociation, TPrincipalA, TPrincipalB>(
+    public ApiSchemaBuilder AddManyToManyRelationship<TPrincipalA, TPrincipalB, TAssociation>
+    (
         string apiName,
         Expression<Func<TAssociation, object>> fkA,
-        Expression<Func<TAssociation, object>> fkB)
+        Expression<Func<TAssociation, object>> fkB
+    )
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
         ArgumentNullException.ThrowIfNull(fkA);
@@ -476,11 +455,13 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
 
         var clrNameA = StaticReflection.GetMemberName(fkA);
         var clrNameB = StaticReflection.GetMemberName(fkB);
-        var builder = _context.GetOrAddManyToManyRelationshipBuilder<TAssociation>(apiName);
+        var builder = _context.GetOrAddManyToManyRelationshipBuilder(apiName);
         builder.WithPrincipalEndA<TPrincipalA>();
         builder.WithPrincipalEndB<TPrincipalB>();
-        builder.WithDependentEndA(d => d.AddScalarPath(clrNameA));
-        builder.WithDependentEndB(d => d.AddScalarPath(clrNameB));
+        builder.WithAssociation<TAssociation>(a => a
+            .AddScalarPathA(clrNameA)
+            .AddScalarPathB(clrNameB));
+
         return this;
     }
 
@@ -496,25 +477,6 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
         ArgumentNullException.ThrowIfNull(configuration);
 
         var builder = _context.GetOrAddManyToManyRelationshipBuilder(apiName);
-
-        configuration.Configure(builder);
-        return this;
-    }
-
-    /// <summary>
-    ///     Adds a many-to-many relationship to the schema using a strongly-typed <see cref="IApiRelationshipManyToManyConfiguration{TAssociation}"/>.
-    ///     The association CLR type <typeparamref name="TAssociation"/> is inferred from the configuration implementation.
-    /// </summary>
-    /// <typeparam name="TAssociation">The CLR type of the association object type that mediates the relationship.</typeparam>
-    /// <param name="apiName">The schema-unique API name of the relationship.</param>
-    /// <param name="configuration">The typed configuration implementation.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiSchemaBuilder AddManyToManyRelationship<TAssociation>(string apiName, IApiRelationshipManyToManyConfiguration<TAssociation> configuration)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
-        ArgumentNullException.ThrowIfNull(configuration);
-
-        var builder = _context.GetOrAddManyToManyRelationshipBuilder<TAssociation>(apiName);
 
         configuration.Configure(builder);
         return this;

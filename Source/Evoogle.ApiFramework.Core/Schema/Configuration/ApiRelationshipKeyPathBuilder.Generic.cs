@@ -45,9 +45,11 @@ public sealed class ApiRelationshipKeyPathBuilder<T>(ApiRelationshipKeyPathKind 
     /// <param name="clrProperty">Expression selecting the scalar FK property on <typeparamref name="T"/>.</param>
     /// <param name="configure">Optional callback to attach extensions to the scalar path.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipKeyPathBuilder<T> AddScalarPath<TResult>(
+    public ApiRelationshipKeyPathBuilder<T> AddScalarPath<TResult>
+    (
         Expression<Func<T, TResult>> clrProperty,
-        Action<ApiRelationshipKeyPathBuilder<T>>? configure = null)
+        Action<ApiRelationshipKeyPathBuilder<T>>? configure = null
+    )
     {
         var clrName = StaticReflection.GetMemberName(clrProperty);
         var builder = new ApiRelationshipKeyPathBuilder<T>(ApiRelationshipKeyPathKind.Scalar, clrName);
@@ -63,9 +65,11 @@ public sealed class ApiRelationshipKeyPathBuilder<T>(ApiRelationshipKeyPathKind 
     /// <param name="clrProperty">Expression selecting the nested object property on <typeparamref name="T"/>.</param>
     /// <param name="configure">Callback to add child paths within the nested object type.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipKeyPathBuilder<T> AddNestedPath<TResult>(
+    public ApiRelationshipKeyPathBuilder<T> AddNestedPath<TResult>
+    (
         Expression<Func<T, TResult>> clrProperty,
-        Action<ApiRelationshipKeyPathBuilder<TResult>> configure)
+        Action<ApiRelationshipKeyPathBuilder<TResult>> configure
+    )
     {
         ArgumentNullException.ThrowIfNull(configure);
 

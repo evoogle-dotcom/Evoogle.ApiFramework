@@ -13,10 +13,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 ///     non-primary identity. Delete behavior is configured on the relationship builder, not on individual ends.
 /// </remarks>
 /// <param name="clrObjectType">The CLR type of the principal <see cref="ApiObjectType"/>.</param>
-public sealed class ApiRelationshipPrincipalEndBuilder
-(
-    Type clrObjectType
-) : ExtensionBuilder<ApiRelationshipPrincipalEndBuilder>
+public sealed class ApiRelationshipPrincipalEndBuilder(Type clrObjectType) : ExtensionBuilder<ApiRelationshipPrincipalEndBuilder>
 {
     #region Fields
     private string? _apiIdentityName;

@@ -15,8 +15,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 ///     Extends <see cref="ApiRelationshipDependentEndBuilder"/> with expression-based overloads for FK key paths.
 /// </summary>
 /// <typeparam name="T">The CLR type of the dependent object.</typeparam>
-public sealed class ApiRelationshipDependentEndBuilder<T>()
-    : ApiRelationshipDependentEndBuilder(typeof(T))
+public sealed class ApiRelationshipDependentEndBuilder<T>() : ApiRelationshipDependentEndBuilder(typeof(T))
 {
     #region AddExtension Methods
     /// <inheritdoc cref="ApiRelationshipDependentEndBuilder.AddDependentEndExtension(Type, object)"/>
@@ -39,9 +38,11 @@ public sealed class ApiRelationshipDependentEndBuilder<T>()
     /// <param name="clrProperty">Expression selecting the scalar FK property on <typeparamref name="T"/>.</param>
     /// <param name="configure">Optional callback to attach extensions to the path.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipDependentEndBuilder<T> AddScalarPath<TResult>(
+    public ApiRelationshipDependentEndBuilder<T> AddScalarPath<TResult>
+    (
         Expression<Func<T, TResult>> clrProperty,
-        Action<ApiRelationshipKeyPathBuilder<T>>? configure = null)
+        Action<ApiRelationshipKeyPathBuilder<T>>? configure = null
+    )
     {
         var clrName = StaticReflection.GetMemberName(clrProperty);
         var builder = new ApiRelationshipKeyPathBuilder<T>(ApiRelationshipKeyPathKind.Scalar, clrName);
@@ -57,9 +58,11 @@ public sealed class ApiRelationshipDependentEndBuilder<T>()
     /// <param name="clrProperty">Expression selecting the nested object property on <typeparamref name="T"/>.</param>
     /// <param name="configure">Callback to add child paths within the nested object type.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipDependentEndBuilder<T> AddNestedPath<TResult>(
+    public ApiRelationshipDependentEndBuilder<T> AddNestedPath<TResult>
+    (
         Expression<Func<T, TResult>> clrProperty,
-        Action<ApiRelationshipKeyPathBuilder<TResult>> configure)
+        Action<ApiRelationshipKeyPathBuilder<TResult>> configure
+    )
     {
         ArgumentNullException.ThrowIfNull(configure);
 
@@ -71,8 +74,7 @@ public sealed class ApiRelationshipDependentEndBuilder<T>()
     }
 
     /// <inheritdoc cref="ApiRelationshipDependentEndBuilder.AddOwnerPath"/>
-    public new ApiRelationshipDependentEndBuilder<T> AddOwnerPath(
-        Action<ApiRelationshipKeyPathBuilder>? configure = null)
+    public new ApiRelationshipDependentEndBuilder<T> AddOwnerPath(Action<ApiRelationshipKeyPathBuilder>? configure = null)
     {
         base.AddOwnerPath(configure);
         return this;

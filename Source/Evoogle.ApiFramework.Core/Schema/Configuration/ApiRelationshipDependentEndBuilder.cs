@@ -14,10 +14,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 ///     When no paths are added the relationship is treated as purely navigational.
 /// </remarks>
 /// <param name="clrObjectType">The CLR type of the dependent <see cref="ApiObjectType"/>.</param>
-public class ApiRelationshipDependentEndBuilder
-(
-    Type clrObjectType
-) : ExtensionBuilder<ApiRelationshipDependentEndBuilder>
+public class ApiRelationshipDependentEndBuilder(Type clrObjectType) : ExtensionBuilder<ApiRelationshipDependentEndBuilder>
 {
     #region Fields
     private readonly List<ApiRelationshipKeyPathBuilder> _keyPathBuilders = [];
@@ -54,11 +51,7 @@ public class ApiRelationshipDependentEndBuilder
     /// <param name="clrPropertyName">The CLR property name on the dependent type that holds the FK value.</param>
     /// <param name="configure">Optional callback to attach extensions to the path.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipDependentEndBuilder AddScalarPath
-    (
-        string clrPropertyName,
-        Action<ApiRelationshipKeyPathBuilder>? configure = null
-    )
+    public ApiRelationshipDependentEndBuilder AddScalarPath(string clrPropertyName, Action<ApiRelationshipKeyPathBuilder>? configure = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(clrPropertyName, nameof(clrPropertyName));
 
@@ -75,11 +68,7 @@ public class ApiRelationshipDependentEndBuilder
     /// <param name="clrPropertyName">The CLR property name of the nested object on the dependent type to navigate into.</param>
     /// <param name="configure">Callback to add child paths within the nested object type.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipDependentEndBuilder AddNestedPath
-    (
-        string clrPropertyName,
-        Action<ApiRelationshipKeyPathBuilder> configure
-    )
+    public ApiRelationshipDependentEndBuilder AddNestedPath(string clrPropertyName, Action<ApiRelationshipKeyPathBuilder> configure)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(clrPropertyName, nameof(clrPropertyName));
         ArgumentNullException.ThrowIfNull(configure, nameof(configure));
@@ -96,10 +85,7 @@ public class ApiRelationshipDependentEndBuilder
     /// </summary>
     /// <param name="configure">Optional callback to add child paths within the owner object type.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipDependentEndBuilder AddOwnerPath
-    (
-        Action<ApiRelationshipKeyPathBuilder>? configure = null
-    )
+    public ApiRelationshipDependentEndBuilder AddOwnerPath(Action<ApiRelationshipKeyPathBuilder>? configure = null)
     {
         var builder = new ApiRelationshipKeyPathBuilder(ApiRelationshipKeyPathKind.Owner, null);
         configure?.Invoke(builder);

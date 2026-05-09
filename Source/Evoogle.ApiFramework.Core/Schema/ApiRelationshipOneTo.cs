@@ -4,7 +4,6 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using Evoogle.ApiFramework.Schema.Internal;
-using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema;
 
@@ -15,15 +14,19 @@ namespace Evoogle.ApiFramework.Schema;
 /// <remarks>
 ///     Concrete subclasses are <see cref="ApiRelationshipOneToOne"/> and <see cref="ApiRelationshipOneToMany"/>.
 ///     The FK always resides on the dependent side; the principal side owns the join-key identity.
-///     Self-referential relationships are supported by setting both ends to the same <see cref="ApiRelationshipEnd.ClrObjectType"/>.
+///     Self-referential relationships are supported by setting both ends to the same <see cref="ApiRelationshipElement.ClrObjectType"/>.
 /// </remarks>
+/// <param name="apiName">The API name that uniquely identifies this relationship within the schema.</param>
+/// <param name="apiPrincipalEnd">The principal end of the relationship, which owns the join key identity.</param>
+/// <param name="apiDependentEnd">The dependent end of the relationship, which holds the FK key paths.</param>
+/// <param name="apiDeleteBehavior">The delete behavior that governs what happens to related objects when either end is affected.</param>
 public abstract class ApiRelationshipOneTo
 (
     string apiName,
     ApiRelationshipPrincipalEnd apiPrincipalEnd,
     ApiRelationshipDependentEnd apiDependentEnd,
-    ApiRelationshipDeleteBehavior apiDeleteBehavior = ApiRelationshipDeleteBehavior.None
-) : ApiRelationship(apiName)
+    ApiRelationshipDeleteBehavior apiDeleteBehavior
+) : ApiRelationship(apiName, apiDeleteBehavior)
 {
     #region ApiRelationshipOneTo Properties
     /// <summary>Gets the principal end of the relationship, which owns the join key identity.</summary>
@@ -31,30 +34,6 @@ public abstract class ApiRelationshipOneTo
 
     /// <summary>Gets the dependent end of the relationship, which holds the FK key paths.</summary>
     public ApiRelationshipDependentEnd ApiDependentEnd { get; } = apiDependentEnd;
-
-    /// <summary>
-    ///     Gets the delete behavior that governs what happens to related objects when either end is affected.
-    ///     <list type="bullet">
-    ///         <item><description><strong>Principal deleted:</strong> what happens to dependent objects when the principal is deleted.</description></item>
-    ///         <item><description><strong>Dependent orphaned:</strong> what happens to a dependent when it is removed from the relationship.</description></item>
-    ///     </list>
-    /// </summary>
-    public ApiRelationshipDeleteBehavior ApiDeleteBehavior { get; } = apiDeleteBehavior;
-    #endregion
-
-    #region Object Methods
-    /// <inheritdoc/>
-    public override string ToString()
-    {
-        var apiName = this.ApiName.SafeToString();
-        var apiKind = this.ApiKind.SafeToString();
-        var apiDeleteBehavior = this.ApiDeleteBehavior.SafeToString();
-        var principalType = this.ApiPrincipalEnd?.ClrObjectType?.Name.SafeToString();
-        var dependentType = this.ApiDependentEnd?.ClrObjectType?.Name.SafeToString();
-        var extensionCount = this.ExtensionCount.SafeToString();
-
-        return $"{this.GetType().Name} {{{nameof(this.ApiKind)}={apiKind}, {nameof(this.ApiName)}={apiName}, {nameof(this.ApiDeleteBehavior)}={apiDeleteBehavior}, Principal={principalType}, Dependent={dependentType}, {nameof(this.ExtensionCount)}={extensionCount}}}";
-    }
     #endregion
 
     #region ApiSchemaElement Methods
@@ -67,7 +46,6 @@ public abstract class ApiRelationshipOneTo
 
         this.InitializeApiPrincipalEnd(context);
         this.InitializeApiDependentEnd(context);
-        this.WireBackReferences();
     }
     #endregion
 
@@ -76,10 +54,13 @@ public abstract class ApiRelationshipOneTo
     {
         if (this.ApiPrincipalEnd is null)
         {
-            context.AddIssue(this.ApiPath, ApiInitializationSeverity.Error,
-                ApiInitializationCode.API_RELATIONSHIP_NULL_PRINCIPAL_END,
-                $"{nameof(this.ApiPrincipalEnd)} must not be null",
-                $"Provide a valid {nameof(ApiRelationshipPrincipalEnd)}");
+            var path = this.ApiPath;
+            var severity = ApiInitializationSeverity.Error;
+            var code = ApiInitializationCode.API_RELATIONSHIP_NULL_PRINCIPAL_END;
+            var description = $"{nameof(this.ApiPrincipalEnd)} must not be null";
+            var remediation = $"Provide a valid {nameof(ApiRelationshipPrincipalEnd)}";
+
+            context.AddIssue(path, severity, code, description, remediation);
             return;
         }
 
@@ -91,26 +72,18 @@ public abstract class ApiRelationshipOneTo
     {
         if (this.ApiDependentEnd is null)
         {
-            context.AddIssue(this.ApiPath, ApiInitializationSeverity.Error,
-                ApiInitializationCode.API_RELATIONSHIP_NULL_DEPENDENT_END,
-                $"{nameof(this.ApiDependentEnd)} must not be null",
-                $"Provide a valid {nameof(ApiRelationshipDependentEnd)}");
+            var path = this.ApiPath;
+            var severity = ApiInitializationSeverity.Error;
+            var code = ApiInitializationCode.API_RELATIONSHIP_NULL_DEPENDENT_END;
+            var description = $"{nameof(this.ApiDependentEnd)} must not be null";
+            var remediation = $"Provide a valid {nameof(ApiRelationshipDependentEnd)}";
+
+            context.AddIssue(path, severity, code, description, remediation);
             return;
         }
 
         var endContext = context.WithDeclaringSchemaElement(this);
         this.ApiDependentEnd.Initialize(endContext);
-    }
-
-    private void WireBackReferences()
-    {
-        if (this.ApiPrincipalEnd is null || this.ApiDependentEnd is null)
-        {
-            return;
-        }
-
-        this.ApiPrincipalEnd.WireBackReferences(this, this.ApiDependentEnd);
-        this.ApiDependentEnd.WireBackReferences(this, this.ApiPrincipalEnd);
     }
     #endregion
 }

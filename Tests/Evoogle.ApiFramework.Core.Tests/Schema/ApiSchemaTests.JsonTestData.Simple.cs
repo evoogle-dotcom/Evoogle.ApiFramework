@@ -500,7 +500,7 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_Person_Id",
                                 Parts:
                                 [
-                                    new ApiScalarPartDef
+                                    new ApiIdentityScalarPartDef
                                     (
                                         ApiPropertyName: nameof(Person.Id)
                                     )
@@ -511,7 +511,7 @@ public partial class ApiSchemaTests
                                 ApiName: "AK_Person_Name",
                                 Parts:
                                 [
-                                    new ApiScalarPartDef
+                                    new ApiIdentityScalarPartDef
                                     (
                                         ApiPropertyName: nameof(Person.Name)
                                     )
@@ -768,7 +768,7 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_Person_Id",
                                 Parts:
                                 [
-                                    new ApiScalarPartDef
+                                    new ApiIdentityScalarPartDef
                                     (
                                         ApiPropertyName: nameof(Person.Id)
                                     )
@@ -779,7 +779,7 @@ public partial class ApiSchemaTests
                                 ApiName: "AK_Person_Name",
                                 Parts:
                                 [
-                                    new ApiScalarPartDef
+                                    new ApiIdentityScalarPartDef
                                     (
                                         ApiPropertyName: nameof(Person.Name)
                                     )
@@ -1045,7 +1045,7 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_Company_Id",
                                 Parts:
                                 [
-                                    new ApiScalarPartDef
+                                    new ApiIdentityScalarPartDef
                                     (
                                         ApiPropertyName: nameof(Company.Id),
                                         ClrScalarTypeHint: typeof(string)
@@ -1057,7 +1057,7 @@ public partial class ApiSchemaTests
                                 ApiName: "AK_Company_Name",
                                 Parts:
                                 [
-                                    new ApiScalarPartDef
+                                    new ApiIdentityScalarPartDef
                                     (
                                         ApiPropertyName: nameof(Company.Name)
                                     )
@@ -1119,7 +1119,7 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_Person_Id",
                                 Parts:
                                 [
-                                    new ApiScalarPartDef
+                                    new ApiIdentityScalarPartDef
                                     (
                                         ApiPropertyName: nameof(Person.Id)
                                     )
@@ -1130,7 +1130,7 @@ public partial class ApiSchemaTests
                                 ApiName: "AK_Person_Name",
                                 Parts:
                                 [
-                                    new ApiScalarPartDef
+                                    new ApiIdentityScalarPartDef
                                     (
                                         ApiPropertyName: nameof(Person.Name)
                                     )

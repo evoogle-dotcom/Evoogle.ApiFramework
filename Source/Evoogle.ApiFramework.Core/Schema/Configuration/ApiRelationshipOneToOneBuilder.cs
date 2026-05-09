@@ -20,24 +20,23 @@ public sealed class ApiRelationshipOneToOneBuilder(string apiName) : ApiRelation
     #region Fields
     private ApiRelationshipPrincipalEndBuilder? _principalEndBuilder;
     private ApiRelationshipDependentEndBuilder? _dependentEndBuilder;
-    private ApiRelationshipDeleteBehavior _apiDeleteBehavior = ApiRelationshipDeleteBehavior.None;
+    private ApiRelationshipDeleteBehavior _apiDeleteBehavior = ApiRelationshipOneToOne.DefaultDeleteBehavior;
     #endregion
 
-    #region With Methods
-    /// <summary>
-    ///     Configures the principal end of the 1:1 relationship using the CLR type <typeparamref name="TPrincipal"/>.
-    /// </summary>
-    /// <typeparam name="TPrincipal">The CLR type of the principal object.</typeparam>
-    /// <param name="configure">Optional callback to configure identity selection and extensions.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiRelationshipOneToOneBuilder WithPrincipalEnd<TPrincipal>
-    (
-        Action<ApiRelationshipPrincipalEndBuilder>? configure = null
-    )
+    #region Non-Generic With Methods
+    public ApiRelationshipOneToOneBuilder WithPrincipalEnd(Type clrPrincipalType, Action<ApiRelationshipPrincipalEndBuilder>? configure = null)
     {
-        var builder = new ApiRelationshipPrincipalEndBuilder(typeof(TPrincipal));
+        var builder = new ApiRelationshipPrincipalEndBuilder(clrPrincipalType);
         configure?.Invoke(builder);
         _principalEndBuilder = builder;
+        return this;
+    }
+
+    public ApiRelationshipOneToOneBuilder WithDependentEnd(Type clrDependentType, Action<ApiRelationshipDependentEndBuilder>? configure = null)
+    {
+        var builder = new ApiRelationshipDependentEndBuilder(clrDependentType);
+        configure?.Invoke(builder);
+        _dependentEndBuilder = builder;
         return this;
     }
 
@@ -51,6 +50,22 @@ public sealed class ApiRelationshipOneToOneBuilder(string apiName) : ApiRelation
         _apiDeleteBehavior = apiDeleteBehavior;
         return this;
     }
+    #endregion
+
+    #region Generic With Methods
+    /// <summary>
+    ///     Configures the principal end of the 1:1 relationship using the CLR type <typeparamref name="TPrincipal"/>.
+    /// </summary>
+    /// <typeparam name="TPrincipal">The CLR type of the principal object.</typeparam>
+    /// <param name="configure">Optional callback to configure identity selection and extensions.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiRelationshipOneToOneBuilder WithPrincipalEnd<TPrincipal>(Action<ApiRelationshipPrincipalEndBuilder>? configure = null)
+    {
+        var builder = new ApiRelationshipPrincipalEndBuilder(typeof(TPrincipal));
+        configure?.Invoke(builder);
+        _principalEndBuilder = builder;
+        return this;
+    }
 
     /// <summary>
     ///     Configures the dependent end of the 1:1 relationship using the CLR type <typeparamref name="TDependent"/>,
@@ -59,10 +74,7 @@ public sealed class ApiRelationshipOneToOneBuilder(string apiName) : ApiRelation
     /// <typeparam name="TDependent">The CLR type of the dependent object.</typeparam>
     /// <param name="configure">Optional callback to add FK key paths using expression-based property selectors.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipOneToOneBuilder WithDependentEnd<TDependent>
-    (
-        Action<ApiRelationshipDependentEndBuilder<TDependent>>? configure = null
-    )
+    public ApiRelationshipOneToOneBuilder WithDependentEnd<TDependent>(Action<ApiRelationshipDependentEndBuilder<TDependent>>? configure = null)
     {
         var builder = new ApiRelationshipDependentEndBuilder<TDependent>();
         configure?.Invoke(builder);
@@ -75,15 +87,17 @@ public sealed class ApiRelationshipOneToOneBuilder(string apiName) : ApiRelation
     /// <inheritdoc/>
     internal override ApiRelationship Build()
     {
+        var apiName = this.ApiName;
         var apiPrincipalEnd = _principalEndBuilder?.Build()!;
         var apiDependentEnd = _dependentEndBuilder?.Build()!;
+        var apiDeleteBehavior = _apiDeleteBehavior;
 
         var relationship = new ApiRelationshipOneToOne
         (
-            this.ApiName,
+            apiName,
             apiPrincipalEnd,
             apiDependentEnd,
-            _apiDeleteBehavior
+            apiDeleteBehavior
         );
 
         var extensions = this.BuildExtensions();

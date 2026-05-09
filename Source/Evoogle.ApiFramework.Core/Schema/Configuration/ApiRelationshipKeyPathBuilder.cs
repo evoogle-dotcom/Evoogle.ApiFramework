@@ -27,11 +27,8 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 ///     <see cref="ApiRelationshipKeyPathKind.Nested"/> kinds; <see langword="null"/> for
 ///     <see cref="ApiRelationshipKeyPathKind.Owner"/>.
 /// </param>
-public class ApiRelationshipKeyPathBuilder
-(
-    ApiRelationshipKeyPathKind apiKind,
-    string? clrPropertyName
-) : ExtensionBuilder<ApiRelationshipKeyPathBuilder>
+public class ApiRelationshipKeyPathBuilder(ApiRelationshipKeyPathKind apiKind, string? clrPropertyName)
+    : ExtensionBuilder<ApiRelationshipKeyPathBuilder>
 {
     #region Fields
     private readonly List<ApiRelationshipKeyPathBuilder> _childBuilders = [];
@@ -69,11 +66,7 @@ public class ApiRelationshipKeyPathBuilder
     /// <param name="clrPropertyName">The CLR property name of the scalar FK property on the current object type.</param>
     /// <param name="configure">Optional callback to attach extensions to the scalar path.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipKeyPathBuilder AddScalarPath
-    (
-        string clrPropertyName,
-        Action<ApiRelationshipKeyPathBuilder>? configure = null
-    )
+    public ApiRelationshipKeyPathBuilder AddScalarPath(string clrPropertyName, Action<ApiRelationshipKeyPathBuilder>? configure = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(clrPropertyName, nameof(clrPropertyName));
 
@@ -91,11 +84,7 @@ public class ApiRelationshipKeyPathBuilder
     /// <param name="clrPropertyName">The CLR property name of the nested object property to navigate into.</param>
     /// <param name="configure">Callback to add child paths within the nested object type.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipKeyPathBuilder AddNestedPath
-    (
-        string clrPropertyName,
-        Action<ApiRelationshipKeyPathBuilder> configure
-    )
+    public ApiRelationshipKeyPathBuilder AddNestedPath(string clrPropertyName, Action<ApiRelationshipKeyPathBuilder> configure)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(clrPropertyName, nameof(clrPropertyName));
         ArgumentNullException.ThrowIfNull(configure, nameof(configure));
@@ -113,10 +102,7 @@ public class ApiRelationshipKeyPathBuilder
     /// </summary>
     /// <param name="configure">Optional callback to add child paths within the owner object type.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipKeyPathBuilder AddOwnerPath
-    (
-        Action<ApiRelationshipKeyPathBuilder>? configure = null
-    )
+    public ApiRelationshipKeyPathBuilder AddOwnerPath(Action<ApiRelationshipKeyPathBuilder>? configure = null)
     {
         var builder = new ApiRelationshipKeyPathBuilder(ApiRelationshipKeyPathKind.Owner, null);
         configure?.Invoke(builder);
@@ -142,7 +128,10 @@ public class ApiRelationshipKeyPathBuilder
     {
         ApiRelationshipKeyPath path = apiKind switch
         {
-            ApiRelationshipKeyPathKind.Scalar => new ApiRelationshipScalarKeyPath(clrPropertyName!),
+            ApiRelationshipKeyPathKind.Scalar => new ApiRelationshipScalarKeyPath
+            (
+                clrPropertyName!
+            ),
 
             ApiRelationshipKeyPathKind.Nested => new ApiRelationshipNestedKeyPath
             (

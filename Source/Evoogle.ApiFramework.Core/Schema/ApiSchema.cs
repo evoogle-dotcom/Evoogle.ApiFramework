@@ -122,7 +122,7 @@ public sealed class ApiSchema : ExtensibleBase
         // Initialize the API schema options.
         this.ApiOptions = apiOptions ?? ApiSchemaOptions.Default;
 
-        // Initialize the collections for API types, scalar types, enum types, and object types.
+        // Initialize the collections for API named types, scalar types, enum types, and object types.
         this.ApiScalarTypes = [.. apiScalarTypes.EmptyIfNull().Where(x => x is not null).OrderBy(x => x.ApiName, StringComparer.OrdinalIgnoreCase)];
 
         this.ApiEnumTypes = [.. apiEnumTypes.EmptyIfNull().Where(x => x is not null).OrderBy(x => x.ApiName, StringComparer.OrdinalIgnoreCase)];
@@ -163,14 +163,13 @@ public sealed class ApiSchema : ExtensibleBase
         var apiName = this.ApiName.SafeToString();
         var apiVersion = this.ApiVersion.SafeToString();
         var apiOptions = this.ApiOptions.SafeToString();
-        var apiNamedTypesCount = this.ApiNamedTypes.Length.SafeToString();
         var apiScalarTypesCount = this.ApiScalarTypes.Length.SafeToString();
         var apiEnumTypesCount = this.ApiEnumTypes.Length.SafeToString();
         var apiObjectTypesCount = this.ApiObjectTypes.Length.SafeToString();
         var apiRelationshipsCount = this.ApiRelationships.Length.SafeToString();
         var extensionCount = this.ExtensionCount.SafeToString();
 
-        return $"{nameof(ApiSchema)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ApiVersion)}={apiVersion}, {nameof(this.ApiOptions)}={apiOptions}, {nameof(this.ApiNamedTypes)}Count={apiNamedTypesCount}, {nameof(this.ApiScalarTypes)}Count={apiScalarTypesCount}, {nameof(this.ApiEnumTypes)}Count={apiEnumTypesCount}, {nameof(this.ApiObjectTypes)}Count={apiObjectTypesCount}, {nameof(this.ApiRelationships)}Count={apiRelationshipsCount}, {nameof(this.ExtensionCount)}={extensionCount}}}";
+        return $"{nameof(ApiSchema)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ApiVersion)}={apiVersion}, {nameof(this.ApiOptions)}={apiOptions}, {nameof(this.ApiScalarTypes)}Count={apiScalarTypesCount}, {nameof(this.ApiEnumTypes)}Count={apiEnumTypesCount}, {nameof(this.ApiObjectTypes)}Count={apiObjectTypesCount}, {nameof(this.ApiRelationships)}Count={apiRelationshipsCount}, {nameof(this.ExtensionCount)}={extensionCount}}}";
     }
     #endregion
 
@@ -215,12 +214,12 @@ public sealed class ApiSchema : ExtensibleBase
         // Phase 4: Initialize relationships
         this.InitializeApiRelationships(context);
 
-        // Phase 4a: Resolve owner key paths declared on relationship dependent ends.
-        // This must run after Phase 4 (principal end object types are resolved) but before
-        // Phase 5 (which only populates computed collections and does not depend on this).
+        // Phase 5: Resolve owner key paths declared on relationship dependent ends.
+        // This must run after Phase 4 (principal end object types are resolved)
+        // but before Phase 6 (which only populates computed collections and does not depend on this).
         this.ResolveOwnerRelationshipKeyPaths(context);
 
-        // Phase 5: Populate computed relationship end collections on each object type.
+        // Phase 6: Populate computed relationship end collections on each object type.
         this.PopulateRelationshipEndsOnObjectTypes(context);
 
         var issues = context.Issues;
@@ -412,23 +411,25 @@ public sealed class ApiSchema : ExtensibleBase
             switch (relationship)
             {
                 case ApiRelationshipOneTo oneTo:
-                    this.ResolveOwnerKeyPathsForEndPair(oneTo.ApiPrincipalEnd, oneTo.ApiDependentEnd, context);
+                    this.ResolveOwnerKeyPathsForPrincipal(oneTo.ApiPrincipalEnd, oneTo.ApiDependentEnd?.ApiKeyPaths, context);
                     break;
 
                 case ApiRelationshipManyToMany manyToMany:
-                    this.ResolveOwnerKeyPathsForEndPair(manyToMany.ApiPrincipalEndA, manyToMany.ApiDependentEndA, context);
-                    this.ResolveOwnerKeyPathsForEndPair(manyToMany.ApiPrincipalEndB, manyToMany.ApiDependentEndB, context);
+                    this.ResolveOwnerKeyPathsForPrincipal(manyToMany.ApiPrincipalEndA, manyToMany.ApiAssociation?.ApiKeyPathsA, context);
+                    this.ResolveOwnerKeyPathsForPrincipal(manyToMany.ApiPrincipalEndB, manyToMany.ApiAssociation?.ApiKeyPathsB, context);
                     break;
             }
         }
     }
 
-    private void ResolveOwnerKeyPathsForEndPair(
+    private void ResolveOwnerKeyPathsForPrincipal
+    (
         ApiRelationshipPrincipalEnd? principal,
-        ApiRelationshipDependentEnd? dependent,
-        ApiInitializationContext context)
+        ApiRelationshipKeyPath[]? keyPaths,
+        ApiInitializationContext context
+    )
     {
-        if (principal is null || dependent is null)
+        if (principal is null)
         {
             return;
         }
@@ -444,18 +445,20 @@ public sealed class ApiSchema : ExtensibleBase
             return;
         }
 
-        if (dependent.ApiKeyPaths is null || dependent.ApiKeyPaths.Length == 0)
+        if (keyPaths is null || keyPaths.Length == 0)
         {
             return;
         }
 
-        WalkKeyPathsForOwnerPaths(dependent.ApiKeyPaths, principalObjectType, context);
+        WalkKeyPathsForOwnerPaths(keyPaths, principalObjectType, context);
     }
 
-    private static void WalkKeyPathsForOwnerPaths(
+    private static void WalkKeyPathsForOwnerPaths
+    (
         IEnumerable<ApiRelationshipKeyPath> keyPaths,
         ApiObjectType principalObjectType,
-        ApiInitializationContext context)
+        ApiInitializationContext context
+    )
     {
         foreach (var keyPath in keyPaths)
         {
@@ -466,8 +469,7 @@ public sealed class ApiSchema : ExtensibleBase
                     break;
 
                 case ApiRelationshipNestedKeyPath nestedKeyPath when nestedKeyPath.ApiKeyPaths.Length > 0:
-                    // The owner is always the principal end regardless of nesting depth — recurse
-                    // with the same principalObjectType rather than the nested object's type.
+                    // The owner is always the principal end regardless of nesting depth — recurse with the same principalObjectType rather than the nested object's type.
                     WalkKeyPathsForOwnerPaths(nestedKeyPath.ApiKeyPaths, principalObjectType, context);
                     break;
             }
@@ -628,20 +630,14 @@ public sealed class ApiSchema : ExtensibleBase
                 case ApiRelationshipManyToMany manyToMany:
                     TryRegisterEnd(manyToMany.ApiPrincipalEndA);
                     TryRegisterEnd(manyToMany.ApiPrincipalEndB);
-                    TryRegisterEnd(manyToMany.ApiDependentEndA);
-                    TryRegisterEnd(manyToMany.ApiDependentEndB);
                     break;
             }
         }
 
-        void TryRegisterEnd(ApiRelationshipEnd? end)
+        void TryRegisterEnd(ApiRelationshipEnd end)
         {
-            if (end?.ClrObjectType is null)
-            {
-                return;
-            }
-
-            if (!this.TryGetObjectTypeByClrType(end.ClrObjectType, out var apiObjectType))
+            var clrObjectType = end.ClrObjectType;
+            if (!this.TryGetObjectTypeByClrType(clrObjectType, out var apiObjectType))
             {
                 // Already reported as API_RELATIONSHIP_END_UNRESOLVED_OBJECT_TYPE (Error) in Phase 4.
                 return;
@@ -665,8 +661,11 @@ public sealed class ApiSchema : ExtensibleBase
             return;
         }
 
-        // Build a reverse lookup: for each owned type C, collect every object type P that
-        // owns C either via a collection property (1-to-many) or a direct object property (1-to-1).
+        // Build a reverse lookup:
+        // For each owned type C, collect every object type P that owns C either via:
+        // 1. A collection property (1-to-many)
+        // 2. A direct object property (1-to-1)
+        //
         // Only insert entries for owned types that actually need resolution.
         var ownerLookup = new Dictionary<ApiObjectType, List<ApiObjectType>>();
         foreach (var ownerType in this.ApiObjectTypes)
@@ -679,16 +678,19 @@ public sealed class ApiSchema : ExtensibleBase
                     continue;
                 }
 
-                // 1-to-many: owner has a collection property whose item type is the owned object type.
-                if (property.ApiType is ApiCollectionType collectionType &&
-                    collectionType.ApiItemType is ApiObjectType collectionOwnedType &&
-                    typesWithOwnerPart.Contains(collectionOwnedType))
+                // 1-to-many: Owner has a collection property whose item type is the owned object type.
+                var collectionType = property.ApiType as ApiCollectionType;
+                if (collectionType is not null)
                 {
-                    AddOwnerCandidate(ownerLookup, collectionOwnedType, ownerType);
+                    var collectionOwnedType = collectionType.ApiItemType as ApiObjectType;
+                    if (collectionOwnedType is not null && typesWithOwnerPart.Contains(collectionOwnedType))
+                    {
+                        AddOwnerCandidate(ownerLookup, collectionOwnedType, ownerType);
+                    }
                 }
-                // 1-to-1: owner has a direct object property typed as the owned object type.
-                else if (property.ApiType is ApiObjectType directOwnedType &&
-                         typesWithOwnerPart.Contains(directOwnedType))
+                // 1-to-1: Owner has a direct object property typed as the owned object type.
+                var directOwnedType = property.ApiType as ApiObjectType;
+                if (directOwnedType is not null && typesWithOwnerPart.Contains(directOwnedType))
                 {
                     AddOwnerCandidate(ownerLookup, directOwnedType, ownerType);
                 }
@@ -706,7 +708,8 @@ public sealed class ApiSchema : ExtensibleBase
             owners.Add(ownerType);
         }
 
-        // Detect ownership cycles: find object types whose single-candidate ownership chain forms a loop.
+        // Detect ownership cycles: Find object types whose single-candidate ownership chain forms a loop.
+        //
         // A cycle means two or more types transitively own each other, making identity composition impossible.
         var cycleMembers = new HashSet<ApiObjectType>();
         var checkedTypes = new HashSet<ApiObjectType>();
@@ -775,10 +778,10 @@ public sealed class ApiSchema : ExtensibleBase
             }
         }
 
-        // Propagate tainted status to types whose single resolved owner is itself a cycle
-        // member (or transitively tainted). Such types cannot be safely resolved because their
-        // owner identity is partially initialized, which would cause a runtime throw without a
-        // prior diagnostic.
+        // Propagate tainted status to types whose single resolved owner is itself a cycle member (or transitively tainted).
+        //
+        // Such types cannot be safely resolved because their owner identity is partially initialized,
+        // which would cause a runtime throw without a prior diagnostic.
         var taintedTypes = new HashSet<ApiObjectType>(cycleMembers);
         bool anyNewTainted;
         do
@@ -800,8 +803,7 @@ public sealed class ApiSchema : ExtensibleBase
             }
         } while (anyNewTainted);
 
-        // Report errors for transitively tainted types (non-cycle members whose single owner
-        // is in or leads to a cycle).
+        // Report errors for transitively tainted types (non-cycle members whose single owner is in or leads to a cycle).
         foreach (var taintedType in taintedTypes)
         {
             if (cycleMembers.Contains(taintedType))
@@ -827,8 +829,8 @@ public sealed class ApiSchema : ExtensibleBase
             }
         }
 
-        // Walk only owned types that need resolution, skipping any that are tainted
-        // (direct cycle members or types that transitively depend on a cycle member).
+        // Walk only owned types that need resolution,
+        // skipping any that are tainted (direct cycle members or types that transitively depend on a cycle member).
         foreach (var ownedType in typesWithOwnerPart)
         {
             if (taintedTypes.Contains(ownedType))

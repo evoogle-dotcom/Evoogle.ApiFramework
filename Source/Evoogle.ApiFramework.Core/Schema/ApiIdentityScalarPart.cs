@@ -82,10 +82,13 @@ public sealed class ApiIdentityScalarPart(string clrPropertyName, Type? clrScala
 
         if (this.ApiResolvedProperty.ApiType is not ApiScalarType apiPropertyScalarType)
         {
-            context.AddIssue(this.ApiPath, ApiInitializationSeverity.Error,
-                ApiInitializationCode.API_IDENTITY_PART_INVALID_API_PROPERTY_TYPE,
-                $"Property '{this.ClrPropertyName}' must be a scalar type for a scalar identity part",
-                $"Use a scalar-typed property or switch to {nameof(ApiIdentityNestedPart)}");
+            var path = this.ApiPath;
+            var severity = ApiInitializationSeverity.Error;
+            var code = ApiInitializationCode.API_IDENTITY_PART_INVALID_API_PROPERTY_TYPE;
+            var description = $"Property '{this.ClrPropertyName}' must be a scalar type for a scalar identity part";
+            var remediation = $"Use a scalar-typed property or switch to {nameof(ApiIdentityNestedPart)}";
+
+            context.AddIssue(path, severity, code, description, remediation);
             _clrResolvedScalarType = null;
             return;
         }

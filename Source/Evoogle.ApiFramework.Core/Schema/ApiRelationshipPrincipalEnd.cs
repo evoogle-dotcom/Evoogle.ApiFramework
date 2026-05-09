@@ -56,10 +56,8 @@ public sealed class ApiRelationshipPrincipalEnd
     /// </summary>
     public ApiIdentity ApiIdentity => this.ThrowIfNotInitialized(_apiResolvedIdentity);
 
-    /// <summary>
-    ///     Gets the strongly-typed dependent end of the relationship. Available after initialization.
-    /// </summary>
-    public ApiRelationshipDependentEnd ApiDependentEnd => (ApiRelationshipDependentEnd)this.ApiOppositeEnd;
+    /// <summary>Gets the resolved join-key <see cref="ApiIdentity"/>, or <see langword="null"/> if initialization failed or has not yet run.</summary>
+    internal ApiIdentity? ResolvedIdentity => _apiResolvedIdentity;
     #endregion
 
     #region Object Methods
@@ -112,10 +110,12 @@ public sealed class ApiRelationshipPrincipalEnd
                 ? $"Use one of the available identities: {availableIdentities}"
                 : $"Define an identity on '{apiObjectType.ApiName}' or remove {nameof(this.ApiIdentityName)}";
 
-            context.AddIssue(this.ApiPath, ApiInitializationSeverity.Error,
-                ApiInitializationCode.API_RELATIONSHIP_END_UNRESOLVED_IDENTITY,
-                $"Referenced identity '{this.ApiIdentityName}' could not be found on object type '{apiObjectType.ApiName}'",
-                remediation);
+            var path = this.ApiPath;
+            var severity = ApiInitializationSeverity.Error;
+            var code = ApiInitializationCode.API_RELATIONSHIP_END_UNRESOLVED_IDENTITY;
+            var description = $"Referenced identity '{this.ApiIdentityName}' could not be found on object type '{apiObjectType.ApiName}'";
+
+            context.AddIssue(path, severity, code, description, remediation);
             return;
         }
 
@@ -124,10 +124,13 @@ public sealed class ApiRelationshipPrincipalEnd
 
         if (_apiResolvedIdentity is null)
         {
-            context.AddIssue(this.ApiPath, ApiInitializationSeverity.Error,
-                ApiInitializationCode.API_RELATIONSHIP_END_UNRESOLVED_IDENTITY,
-                $"Object type '{apiObjectType.ApiName}' has no primary identity and cannot act as a principal end",
-                $"Define a primary identity on '{apiObjectType.ApiName}' or specify {nameof(this.ApiIdentityName)} explicitly");
+            var path = this.ApiPath;
+            var severity = ApiInitializationSeverity.Error;
+            var code = ApiInitializationCode.API_RELATIONSHIP_END_UNRESOLVED_IDENTITY;
+            var description = $"Object type '{apiObjectType.ApiName}' has no primary identity and cannot act as a principal end";
+            var remediation = $"Define a primary identity on '{apiObjectType.ApiName}' or specify {nameof(this.ApiIdentityName)} explicitly";
+
+            context.AddIssue(path, severity, code, description, remediation);
         }
     }
     #endregion

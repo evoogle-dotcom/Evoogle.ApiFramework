@@ -5,38 +5,53 @@
 // See the LICENSE file in the project root for more information.
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
-/// <summary>
-///     Fluent builder used to configure an <see cref="ApiRelationshipManyToMany"/> relationship.
-/// </summary>
-/// <remarks>
-///     A many-to-many relationship requires an explicit association <see cref="ApiObjectType"/> that holds the
-///     foreign-key columns for both sides.
-/// </remarks>
-/// <param name="apiName">The schema-unique API name of the relationship.</param>
 public class ApiRelationshipManyToManyBuilder(string apiName) : ApiRelationshipBuilder(apiName)
 {
     #region Fields
-    protected Type? _apiAssociationType;
     protected ApiRelationshipPrincipalEndBuilder? _principalEndABuilder;
     protected ApiRelationshipPrincipalEndBuilder? _principalEndBBuilder;
-    protected ApiRelationshipDependentEndBuilder? _dependentEndABuilder;
-    protected ApiRelationshipDependentEndBuilder? _dependentEndBBuilder;
+    protected ApiRelationshipAssociationBuilder? _associationBuilder;
+    protected ApiRelationshipDeleteBehavior _apiDeleteBehavior = ApiRelationshipManyToMany.DefaultDeleteBehavior;
     #endregion
 
-    #region With Methods
-    /// <summary>
-    ///     Sets the CLR type of the association <see cref="ApiObjectType"/> that bridges both sides of the relationship.
-    /// </summary>
-    /// <param name="clrType">The CLR type of the association object.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiRelationshipManyToManyBuilder WithAssociationType(Type clrType)
+    #region Non-Generic With Methods
+    public ApiRelationshipManyToManyBuilder WithPrincipalEndA(Type clrPrincipalType, Action<ApiRelationshipPrincipalEndBuilder>? configure = null)
     {
-        ArgumentNullException.ThrowIfNull(clrType);
-
-        _apiAssociationType = clrType;
+        var builder = new ApiRelationshipPrincipalEndBuilder(clrPrincipalType);
+        configure?.Invoke(builder);
+        _principalEndABuilder = builder;
         return this;
     }
 
+    public ApiRelationshipManyToManyBuilder WithPrincipalEndB(Type clrPrincipalType, Action<ApiRelationshipPrincipalEndBuilder>? configure = null)
+    {
+        var builder = new ApiRelationshipPrincipalEndBuilder(clrPrincipalType);
+        configure?.Invoke(builder);
+        _principalEndBBuilder = builder;
+        return this;
+    }
+
+    public ApiRelationshipManyToManyBuilder WithAssociation(Type clrAssociationType, Action<ApiRelationshipAssociationBuilder>? configure = null)
+    {
+        var builder = new ApiRelationshipAssociationBuilder(clrAssociationType);
+        configure?.Invoke(builder);
+        _associationBuilder = builder;
+        return this;
+    }
+
+    /// <summary>
+    ///     Sets the delete behavior for the relationship.
+    /// </summary>
+    /// <param name="apiDeleteBehavior">The desired delete behavior.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiRelationshipManyToManyBuilder WithDeleteBehavior(ApiRelationshipDeleteBehavior apiDeleteBehavior)
+    {
+        _apiDeleteBehavior = apiDeleteBehavior;
+        return this;
+    }
+    #endregion
+
+    #region Generic With Methods
     /// <summary>
     ///     Configures principal end A using the CLR type <typeparamref name="TPrincipal"/>.
     /// </summary>
@@ -65,35 +80,11 @@ public class ApiRelationshipManyToManyBuilder(string apiName) : ApiRelationshipB
         return this;
     }
 
-    /// <summary>
-    ///     Configures dependent end A using the CLR type <typeparamref name="TDependent"/>. The typed builder allows
-    ///     expression-based FK path configuration.
-    ///     The effective delete behavior is always <see cref="ApiRelationshipDeleteBehavior.Delete"/>.
-    /// </summary>
-    /// <typeparam name="TDependent">The CLR type of the dependent (association) object type.</typeparam>
-    /// <param name="configure">Optional callback to add FK key paths and attach extensions.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiRelationshipManyToManyBuilder WithDependentEndA<TDependent>(Action<ApiRelationshipDependentEndBuilder<TDependent>>? configure = null)
+    public ApiRelationshipManyToManyBuilder WithAssociation<TAssociation>(Action<ApiRelationshipAssociationBuilder<TAssociation>>? configure = null)
     {
-        var builder = new ApiRelationshipDependentEndBuilder<TDependent>();
+        var builder = new ApiRelationshipAssociationBuilder<TAssociation>();
         configure?.Invoke(builder);
-        _dependentEndABuilder = builder;
-        return this;
-    }
-
-    /// <summary>
-    ///     Configures dependent end B using the CLR type <typeparamref name="TDependent"/>. The typed builder allows
-    ///     expression-based FK path configuration.
-    ///     The effective delete behavior is always <see cref="ApiRelationshipDeleteBehavior.Delete"/>.
-    /// </summary>
-    /// <typeparam name="TDependent">The CLR type of the dependent (association) object type.</typeparam>
-    /// <param name="configure">Optional callback to add FK key paths and attach extensions.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiRelationshipManyToManyBuilder WithDependentEndB<TDependent>(Action<ApiRelationshipDependentEndBuilder<TDependent>>? configure = null)
-    {
-        var builder = new ApiRelationshipDependentEndBuilder<TDependent>();
-        configure?.Invoke(builder);
-        _dependentEndBBuilder = builder;
+        _associationBuilder = builder;
         return this;
     }
     #endregion
@@ -102,20 +93,19 @@ public class ApiRelationshipManyToManyBuilder(string apiName) : ApiRelationshipB
     /// <inheritdoc/>
     internal override ApiRelationship Build()
     {
+        var apiName = this.ApiName;
         var apiPrincipalEndA = _principalEndABuilder?.Build()!;
         var apiPrincipalEndB = _principalEndBBuilder?.Build()!;
-
-        var apiDependentEndA = _dependentEndABuilder?.Build();
-        var apiDependentEndB = _dependentEndBBuilder?.Build();
+        var apiAssociation = _associationBuilder?.Build()!;
+        var apiDeleteBehavior = _apiDeleteBehavior;
 
         var relationship = new ApiRelationshipManyToMany
         (
-            this.ApiName,
+            apiName,
             apiPrincipalEndA,
             apiPrincipalEndB,
-            apiDependentEndA!,
-            apiDependentEndB!,
-            _apiAssociationType!
+            apiAssociation,
+            apiDeleteBehavior
         );
 
         var extensions = this.BuildExtensions();

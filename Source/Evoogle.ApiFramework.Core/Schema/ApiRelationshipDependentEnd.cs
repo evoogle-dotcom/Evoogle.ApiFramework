@@ -48,11 +48,6 @@ public sealed class ApiRelationshipDependentEnd
     public ApiRelationshipKeyPath[]? ApiKeyPaths { get; } = apiKeyPaths is not null
         ? [.. apiKeyPaths.Where(x => x is not null)]
         : null;
-
-    /// <summary>
-    ///     Gets the strongly-typed principal end of the relationship. Available after initialization.
-    /// </summary>
-    public ApiRelationshipPrincipalEnd ApiPrincipalEnd => (ApiRelationshipPrincipalEnd)this.ApiOppositeEnd;
     #endregion
 
     #region Object Methods

@@ -33,6 +33,9 @@ public sealed class ApiIdentityNestedPart(string clrPropertyName, string? apiIde
     /// <summary>Gets the resolved <see cref="ApiIdentity"/> from the nested object type. Available after initialization.</summary>
     public ApiIdentity ApiIdentity => this.ThrowIfNotInitialized(_apiResolvedIdentity);
 
+    /// <summary>Gets the resolved <see cref="ApiIdentity"/> from the nested object type, or <see langword="null"/> if initialization failed or has not yet run.</summary>
+    internal ApiIdentity? ResolvedIdentity => _apiResolvedIdentity;
+
     /// <summary>
     ///     Gets the optional explicit identity name used to select a specific identity on the nested object type.
     ///     When <see langword="null"/>, the primary identity of the nested type is used.
@@ -81,10 +84,13 @@ public sealed class ApiIdentityNestedPart(string clrPropertyName, string? apiIde
 
         if (this.ApiResolvedProperty.ApiType is not ApiObjectType apiPropertyObjectType)
         {
-            context.AddIssue(this.ApiPath, ApiInitializationSeverity.Error,
-                ApiInitializationCode.API_IDENTITY_PART_INVALID_API_PROPERTY_TYPE,
-                $"Property '{this.ClrPropertyName}' must be an object type for a nested identity part",
-                $"Use an object-typed property or switch to {nameof(ApiIdentityScalarPart)}");
+            var path = this.ApiPath;
+            var severity = ApiInitializationSeverity.Error;
+            var code = ApiInitializationCode.API_IDENTITY_PART_INVALID_API_PROPERTY_TYPE;
+            var description = $"Property '{this.ClrPropertyName}' must be an object type for a nested identity part";
+            var remediation = $"Use an object-typed property or switch to {nameof(ApiIdentityScalarPart)}";
+
+            context.AddIssue(path, severity, code, description, remediation);
             _apiResolvedIdentity = null;
             return;
         }

@@ -60,11 +60,11 @@ public static partial class ApiSchemaFactory
     // ApiIdentityPart
     public abstract record ApiIdentityPartDef;
 
-    public record ApiScalarPartDef(string ApiPropertyName, Type? ClrScalarTypeHint = null) : ApiIdentityPartDef;
+    public record ApiIdentityScalarPartDef(string ApiPropertyName, Type? ClrScalarTypeHint = null) : ApiIdentityPartDef;
 
-    public record ApiNestedPartDef(string ApiPropertyName, string? ApiIdentityName = null) : ApiIdentityPartDef;
+    public record ApiIdentityNestedPartDef(string ApiPropertyName, string? ApiIdentityName = null) : ApiIdentityPartDef;
 
-    public record ApiOwnerPartDef(string? ApiIdentityName = null) : ApiIdentityPartDef;
+    public record ApiIdentityOwnerPartDef(string? ApiIdentityName = null) : ApiIdentityPartDef;
 
     // ApiProperty
     public record ApiPropertyDef
@@ -79,50 +79,62 @@ public static partial class ApiSchemaFactory
     // ApiRelationship
     public abstract record ApiRelationshipDef(string ApiName, List<Type>? ExtensionTypes = null) : ApiSchemaElementDef(ExtensionTypes);
 
-    public record ApiOneToOneRelationshipDef(string ApiName, ApiPrincipalEndDef PrincipalEnd, ApiDependentEndDef DependentEnd, ApiRelationshipDeleteBehavior ApiDeleteBehavior = ApiRelationshipDeleteBehavior.None, List<Type>? ExtensionTypes = null)
-        : ApiRelationshipDef(ApiName, ExtensionTypes);
+    public abstract record ApiRelationshipElementDef(Type ClrObjectType, List<Type>? ExtensionTypes = null) : ApiSchemaElementDef(ExtensionTypes);
 
-    public record ApiOneToManyRelationshipDef(string ApiName, ApiPrincipalEndDef PrincipalEnd, ApiDependentEndDef DependentEnd, ApiRelationshipDeleteBehavior ApiDeleteBehavior = ApiRelationshipDeleteBehavior.None, List<Type>? ExtensionTypes = null)
-        : ApiRelationshipDef(ApiName, ExtensionTypes);
-
-    public record ApiManyToManyRelationshipDef
+    public record ApiRelationshipOneToOneDef
     (
         string ApiName,
-        ApiPrincipalEndDef PrincipalEndA,
-        ApiPrincipalEndDef PrincipalEndB,
-        ApiDependentEndDef DependentEndA,
-        ApiDependentEndDef DependentEndB,
-        Type ClrAssociationObjectType,
+        ApiRelationshipPrincipalEndDef PrincipalEnd,
+        ApiRelationshipDependentEndDef DependentEnd,
+        ApiRelationshipDeleteBehavior ApiDeleteBehavior = ApiRelationshipOneToOne.DefaultDeleteBehavior,
         List<Type>? ExtensionTypes = null
     ) : ApiRelationshipDef(ApiName, ExtensionTypes);
 
-    // ApiRelationshipEnd
-    public abstract record ApiRelationshipEndDef
+    public record ApiRelationshipOneToManyDef
+    (
+        string ApiName,
+        ApiRelationshipPrincipalEndDef PrincipalEnd,
+        ApiRelationshipDependentEndDef DependentEnd,
+        ApiRelationshipDeleteBehavior ApiDeleteBehavior = ApiRelationshipOneToMany.DefaultDeleteBehavior,
+        List<Type>? ExtensionTypes = null
+    ) : ApiRelationshipDef(ApiName, ExtensionTypes);
+
+    public record ApiRelationshipManyToManyDef
+    (
+        string ApiName,
+        ApiRelationshipPrincipalEndDef PrincipalEndA,
+        ApiRelationshipPrincipalEndDef PrincipalEndB,
+        ApiRelationshipAssociationDef Association,
+        ApiRelationshipDeleteBehavior ApiDeleteBehavior = ApiRelationshipManyToMany.DefaultDeleteBehavior,
+        List<Type>? ExtensionTypes = null
+    ) : ApiRelationshipDef(ApiName, ExtensionTypes);
+
+    // ApiRelationshipAssociation
+    public record ApiRelationshipAssociationDef
     (
         Type ClrObjectType,
+        IEnumerable<ApiRelationshipKeyPathDef>? ApiKeyPathsA = null,
+        IEnumerable<ApiRelationshipKeyPathDef>? ApiKeyPathsB = null,
         List<Type>? ExtensionTypes = null
-    ) : ApiSchemaElementDef(ExtensionTypes);
+    ) : ApiRelationshipElementDef(ClrObjectType, ExtensionTypes);
 
-    public record ApiPrincipalEndDef
+    // ApiRelationshipEnd
+    public record ApiRelationshipPrincipalEndDef
     (
         Type ClrObjectType,
         string? ApiIdentityName = null,
         List<Type>? ExtensionTypes = null
-    ) : ApiRelationshipEndDef(ClrObjectType, ExtensionTypes);
+    ) : ApiRelationshipElementDef(ClrObjectType, ExtensionTypes);
 
-    public record ApiDependentEndDef
+    public record ApiRelationshipDependentEndDef
     (
         Type ClrObjectType,
         IEnumerable<ApiRelationshipKeyPathDef>? ApiKeyPaths = null,
         List<Type>? ExtensionTypes = null
-    ) : ApiRelationshipEndDef(ClrObjectType, ExtensionTypes);
+    ) : ApiRelationshipElementDef(ClrObjectType, ExtensionTypes);
 
-
-    // ApiRelationshipEnd
-    public abstract record ApiRelationshipKeyPathDef
-    (
-        List<Type>? ExtensionTypes = null
-    ) : ApiSchemaElementDef(ExtensionTypes);
+    // ApiRelationshipKeyPath
+    public abstract record ApiRelationshipKeyPathDef(List<Type>? ExtensionTypes = null) : ApiSchemaElementDef(ExtensionTypes);
 
     public record ApiRelationshipScalarKeyPathDef
     (
@@ -211,9 +223,9 @@ public static partial class ApiSchemaFactory
 
     private static ApiIdentityPart BuildApiIdentityPart(ApiIdentityPartDef def) => def switch
     {
-        ApiScalarPartDef d => new ApiIdentityScalarPart(d.ApiPropertyName, d.ClrScalarTypeHint),
-        ApiNestedPartDef d => new ApiIdentityNestedPart(d.ApiPropertyName, d.ApiIdentityName),
-        ApiOwnerPartDef d => new ApiIdentityOwnerPart(d.ApiIdentityName),
+        ApiIdentityScalarPartDef d => new ApiIdentityScalarPart(d.ApiPropertyName, d.ClrScalarTypeHint),
+        ApiIdentityNestedPartDef d => new ApiIdentityNestedPart(d.ApiPropertyName, d.ApiIdentityName),
+        ApiIdentityOwnerPartDef d => new ApiIdentityOwnerPart(d.ApiIdentityName),
         _ => throw new InvalidOperationException($"Unsupported {nameof(ApiIdentityPartDef)}: {def.GetType().Name}")
     };
     #endregion
@@ -251,9 +263,9 @@ public static partial class ApiSchemaFactory
     {
         var apiRelationship = (ApiRelationship)((object?)def switch
         {
-            ApiOneToOneRelationshipDef d => BuildApiRelationshipOneToOne(d),
-            ApiOneToManyRelationshipDef d => BuildApiRelationshipOneToMany(d),
-            ApiManyToManyRelationshipDef d => BuildApiRelationshipManyToMany(d),
+            ApiRelationshipOneToOneDef d => BuildApiRelationshipOneToOne(d),
+            ApiRelationshipOneToManyDef d => BuildApiRelationshipOneToMany(d),
+            ApiRelationshipManyToManyDef d => BuildApiRelationshipManyToMany(d),
             _ => throw new InvalidOperationException($"Unsupported {nameof(ApiRelationshipDef)}: {def.GetType().Name}")
         });
 
@@ -262,7 +274,7 @@ public static partial class ApiSchemaFactory
         return apiRelationship;
     }
 
-    private static ApiRelationshipOneToOne BuildApiRelationshipOneToOne(ApiOneToOneRelationshipDef def)
+    private static ApiRelationshipOneToOne BuildApiRelationshipOneToOne(ApiRelationshipOneToOneDef def)
     {
         var apiName = def.ApiName;
         var apiPrincipalEnd = BuildApiRelationshipPrincipalEnd(def.PrincipalEnd);
@@ -272,7 +284,7 @@ public static partial class ApiSchemaFactory
         return new ApiRelationshipOneToOne(apiName, apiPrincipalEnd, apiDependentEnd, apiDeleteBehavior);
     }
 
-    private static ApiRelationshipOneToMany BuildApiRelationshipOneToMany(ApiOneToManyRelationshipDef def)
+    private static ApiRelationshipOneToMany BuildApiRelationshipOneToMany(ApiRelationshipOneToManyDef def)
     {
         var apiName = def.ApiName;
         var apiPrincipalEnd = BuildApiRelationshipPrincipalEnd(def.PrincipalEnd);
@@ -282,19 +294,36 @@ public static partial class ApiSchemaFactory
         return new ApiRelationshipOneToMany(apiName, apiPrincipalEnd, apiDependentEnd, apiDeleteBehavior);
     }
 
-    private static ApiRelationshipManyToMany BuildApiRelationshipManyToMany(ApiManyToManyRelationshipDef def)
+    private static ApiRelationshipManyToMany BuildApiRelationshipManyToMany(ApiRelationshipManyToManyDef def)
     {
         var apiName = def.ApiName;
         var apiPrincipalEndA = BuildApiRelationshipPrincipalEnd(def.PrincipalEndA);
         var apiPrincipalEndB = BuildApiRelationshipPrincipalEnd(def.PrincipalEndB);
-        var apiDependentEndA = BuildApiRelationshipDependentEnd(def.DependentEndA);
-        var apiDependentEndB = BuildApiRelationshipDependentEnd(def.DependentEndB);
-        var clrAssociationObjectType = def.ClrAssociationObjectType;
+        var apiAssociation = BuildApiRelationshipAssociation(def.Association);
+        var apiDeleteBehavior = def.ApiDeleteBehavior;
 
-        return new ApiRelationshipManyToMany(apiName, apiPrincipalEndA, apiPrincipalEndB, apiDependentEndA, apiDependentEndB, clrAssociationObjectType);
+        return new ApiRelationshipManyToMany(apiName, apiPrincipalEndA, apiPrincipalEndB, apiAssociation, apiDeleteBehavior);
     }
 
-    private static ApiRelationshipPrincipalEnd BuildApiRelationshipPrincipalEnd(ApiPrincipalEndDef def)
+    private static ApiRelationshipAssociation BuildApiRelationshipAssociation(ApiRelationshipAssociationDef def)
+    {
+        var clrObjectType = def.ClrObjectType;
+        var apiKeyPathsA = def.ApiKeyPathsA?.Select(BuildApiRelationshipKeyPath);
+        var apiKeyPathsB = def.ApiKeyPathsB?.Select(BuildApiRelationshipKeyPath);
+
+        var apiRelationshipDependentEnd = new ApiRelationshipAssociation
+        (
+            clrObjectType,
+            apiKeyPathsA,
+            apiKeyPathsB
+        );
+
+        AttachExtensions(apiRelationshipDependentEnd, def);
+
+        return apiRelationshipDependentEnd;
+    }
+
+    private static ApiRelationshipPrincipalEnd BuildApiRelationshipPrincipalEnd(ApiRelationshipPrincipalEndDef def)
     {
         var clrObjectType = def.ClrObjectType;
         var apiIdentityName = def.ApiIdentityName;
@@ -310,7 +339,7 @@ public static partial class ApiSchemaFactory
         return apiRelationshipPrincipalEnd;
     }
 
-    private static ApiRelationshipDependentEnd BuildApiRelationshipDependentEnd(ApiDependentEndDef def)
+    private static ApiRelationshipDependentEnd BuildApiRelationshipDependentEnd(ApiRelationshipDependentEndDef def)
     {
         var clrObjectType = def.ClrObjectType;
         var apiKeyPaths = def.ApiKeyPaths?.Select(BuildApiRelationshipKeyPath);

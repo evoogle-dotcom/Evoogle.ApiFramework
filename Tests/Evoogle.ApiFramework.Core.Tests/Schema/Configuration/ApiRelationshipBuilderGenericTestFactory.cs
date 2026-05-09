@@ -35,11 +35,12 @@ public static class ApiRelationshipBuilderGenericTestFactory
             .Build();
 
     public static ApiRelationship BuildExpected_ManyToMany_DependentEnds_ScalarPaths()
-        => new ApiRelationshipManyToManyBuilder<OrderLine>("REL_Customer_Order_NtoN")
+        => new ApiRelationshipManyToManyBuilder("REL_Customer_Order_NtoN")
             .WithPrincipalEndA<Customer>()
             .WithPrincipalEndB<Order>()
-            .WithDependentEndA(b => b.AddScalarPath(ol => ol.OrderId))
-            .WithDependentEndB(b => b.AddScalarPath(ol => ol.OrderId))
+            .WithAssociation<OrderLine>(a => a
+                .AddScalarPathA(ol => ol.OrderId)
+                .AddScalarPathB(ol => ol.OrderId))
             .Build();
 
     public static ApiRelationship BuildExpected_OneToOne_DependentEnd_MultipleScalarPaths()
@@ -66,11 +67,12 @@ public static class ApiRelationshipBuilderGenericTestFactory
             .Build();
 
     public static ApiRelationship BuildExpected_ManyToMany_IndependentEndTypes()
-        => new ApiRelationshipManyToManyBuilder<OrderLine>("REL_Customer_Order_NtoN_Ends")
+        => new ApiRelationshipManyToManyBuilder("REL_Customer_Order_NtoN_Ends")
             .WithPrincipalEndA<Customer>()
             .WithPrincipalEndB<Order>()
-            .WithDependentEndA(b => b.AddScalarPath(ol => ol.OrderId))
-            .WithDependentEndB(b => b.AddScalarPath(ol => ol.LineNumber))
+            .WithAssociation<OrderLine>(a => a
+                .AddScalarPathA(ol => ol.OrderId)
+                .AddScalarPathB(ol => ol.OrderId))
             .Build();
     #endregion
 
@@ -88,11 +90,12 @@ public static class ApiRelationshipBuilderGenericTestFactory
             .Build();
 
     public static ApiRelationship BuildActual_ManyToMany_DependentEnds_ScalarPaths()
-        => new ApiRelationshipManyToManyBuilder<OrderLine>("REL_Customer_Order_NtoN")
+        => new ApiRelationshipManyToManyBuilder("REL_Customer_Order_NtoN")
             .WithPrincipalEndA<Customer>()
             .WithPrincipalEndB<Order>()
-            .WithDependentEndA(b => b.AddScalarPath(ol => ol.OrderId))
-            .WithDependentEndB(b => b.AddScalarPath(ol => ol.OrderId))
+            .WithAssociation<OrderLine>(a => a
+                .AddScalarPathA(ol => ol.OrderId)
+                .AddScalarPathB(ol => ol.OrderId))
             .Build();
 
     public static ApiRelationship BuildActual_OneToOne_DependentEnd_MultipleScalarPaths()
@@ -119,11 +122,12 @@ public static class ApiRelationshipBuilderGenericTestFactory
             .Build();
 
     public static ApiRelationship BuildActual_ManyToMany_IndependentEndTypes()
-        => new ApiRelationshipManyToManyBuilder<OrderLine>("REL_Customer_Order_NtoN_Ends")
+        => new ApiRelationshipManyToManyBuilder("REL_Customer_Order_NtoN_Ends")
             .WithPrincipalEndA<Customer>()
             .WithPrincipalEndB<Order>()
-            .WithDependentEndA(b => b.AddScalarPath(ol => ol.OrderId))
-            .WithDependentEndB(b => b.AddScalarPath(ol => ol.LineNumber))
+            .WithAssociation<OrderLine>(a => a
+                .AddScalarPathA(ol => ol.OrderId)
+                .AddScalarPathB(ol => ol.OrderId))
             .Build();
     #endregion
 }
