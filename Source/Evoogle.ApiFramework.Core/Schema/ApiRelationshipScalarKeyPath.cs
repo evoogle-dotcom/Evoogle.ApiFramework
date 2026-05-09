@@ -94,17 +94,30 @@ public sealed class ApiRelationshipScalarKeyPath(string clrPropertyName) : ApiRe
         var apiDeclaringObjectType = context.ApiDeclaringObjectType;
         if (apiDeclaringObjectType.TryGetPropertyByClrName(this.ClrPropertyName, out var apiResolvedProperty))
         {
+            if (apiResolvedProperty.ApiType is not ApiScalarType)
+            {
+                var path = this.ApiPath;
+                var severity = ApiInitializationSeverity.Error;
+                var code = ApiInitializationCode.API_RELATIONSHIP_KEY_PATH_INVALID_API_PROPERTY_TYPE;
+                var description = $"Property '{this.ClrPropertyName}' is not a scalar type but a scalar type is required for a scalar key path";
+                var remediation = $"Use an object-typed property with {nameof(ApiRelationshipNestedKeyPath)} or choose a scalar property for '{this.ClrPropertyName}'";
+
+                context.AddIssue(path, severity, code, description, remediation);
+                return;
+            }
+
             _apiResolvedProperty = apiResolvedProperty;
-            return;
         }
+        else
+        {
+            var path = this.ApiPath;
+            var severity = ApiInitializationSeverity.Error;
+            var code = ApiInitializationCode.API_RELATIONSHIP_KEY_PATH_UNRESOLVED_API_PROPERTY;
+            var description = $"Property with CLR name '{this.ClrPropertyName}' could not be found on object type '{apiDeclaringObjectType.ApiName}'";
+            var remediation = $"Verify the CLR property name or add a property with CLR name '{this.ClrPropertyName}' to '{apiDeclaringObjectType.ApiName}'";
 
-        var path = this.ApiPath;
-        var severity = ApiInitializationSeverity.Error;
-        var code = ApiInitializationCode.API_RELATIONSHIP_KEY_PATH_UNRESOLVED_API_PROPERTY;
-        var description = $"Property with CLR name '{this.ClrPropertyName}' could not be found on object type '{apiDeclaringObjectType.ApiName}'";
-        var remediation = $"Verify the CLR property name or add a property with CLR name '{this.ClrPropertyName}' to '{apiDeclaringObjectType.ApiName}'";
-
-        context.AddIssue(path, severity, code, description, remediation);
+            context.AddIssue(path, severity, code, description, remediation);
+        }
     }
     #endregion
 }

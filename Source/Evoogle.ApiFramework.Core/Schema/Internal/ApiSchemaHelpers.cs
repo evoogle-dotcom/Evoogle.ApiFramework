@@ -165,5 +165,62 @@ internal static class ApiSchemaHelpers
 
         context.AddIssue(path, severity, duplicatePartCode, description, remediation);
     }
+
+    public static int? CountIdentityLeaves(ApiIdentity identity)
+    {
+        var count = 0;
+        foreach (var part in identity.ApiIdentityParts)
+        {
+            switch (part)
+            {
+                case ApiIdentityScalarPart:
+                    count += 1;
+                    break;
+                case ApiIdentityNestedPart nestedPart:
+                    var nestedIdentity = nestedPart.ResolvedIdentity;
+                    if (nestedIdentity is null)
+                    {
+                        return null;
+                    }
+                    var nestedCount = CountIdentityLeaves(nestedIdentity);
+                    if (nestedCount is null)
+                    {
+                        return null;
+                    }
+                    count += nestedCount.Value;
+                    break;
+                case ApiIdentityOwnerPart:
+                    // Owner identity is resolved in a later phase; count is indeterminate here.
+                    return null;
+            }
+        }
+        return count;
+    }
+
+    public static int? CountKeyPathLeaves(ApiRelationshipKeyPath[] paths)
+    {
+        var count = 0;
+        foreach (var path in paths)
+        {
+            switch (path)
+            {
+                case ApiRelationshipScalarKeyPath:
+                    count += 1;
+                    break;
+                case ApiRelationshipNestedKeyPath nestedPath:
+                    var nestedCount = CountKeyPathLeaves(nestedPath.ApiKeyPaths);
+                    if (nestedCount is null)
+                    {
+                        return null;
+                    }
+                    count += nestedCount.Value;
+                    break;
+                case ApiRelationshipOwnerKeyPath:
+                    // Owner key paths are unexpected in an FK context; treat as indeterminate.
+                    return null;
+            }
+        }
+        return count;
+    }
     #endregion
 }

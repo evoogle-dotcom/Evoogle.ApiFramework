@@ -46,6 +46,7 @@ public abstract class ApiRelationshipOneTo
 
         this.InitializeApiPrincipalEnd(context);
         this.InitializeApiDependentEnd(context);
+        this.InitializeDependentKeyPathAlignment(context);
     }
     #endregion
 
@@ -84,6 +85,45 @@ public abstract class ApiRelationshipOneTo
 
         var endContext = context.WithDeclaringSchemaElement(this);
         this.ApiDependentEnd.Initialize(endContext);
+    }
+
+    private void InitializeDependentKeyPathAlignment(ApiInitializationContext context)
+    {
+        var principal = this.ApiPrincipalEnd;
+        var dependent = this.ApiDependentEnd;
+
+        if (principal is null || dependent is null)
+        {
+            return;
+        }
+
+        var keyPaths = dependent.ApiKeyPaths;
+        if (keyPaths is null || keyPaths.Length == 0)
+        {
+            // Null or empty means purely navigational — no FK alignment to validate.
+            return;
+        }
+
+        var identity = principal.ResolvedIdentity;
+        if (identity is null)
+        {
+            // Principal identity failed to resolve — error already recorded in InitializeApiPrincipalEnd.
+            return;
+        }
+
+        var keyPathCount = ApiSchemaHelpers.CountKeyPathLeaves(keyPaths);
+        var identityCount = ApiSchemaHelpers.CountIdentityLeaves(identity);
+
+        if (keyPathCount is not null && identityCount is not null && keyPathCount != identityCount)
+        {
+            var path = this.ApiPath;
+            var severity = ApiInitializationSeverity.Error;
+            var code = ApiInitializationCode.API_RELATIONSHIP_ONE_TO_INVALID_DEPENDENT_KEY_PATHS_COUNT;
+            var description = $"{nameof(this.ApiDependentEnd)}.{nameof(this.ApiDependentEnd.ApiKeyPaths)} has {keyPathCount} scalar leaf(s) but principal identity '{identity.ApiName}' has {identityCount} scalar leaf(s)";
+            var remediation = $"Ensure {nameof(this.ApiDependentEnd)}.{nameof(this.ApiDependentEnd.ApiKeyPaths)} contains exactly {identityCount} scalar leaf(s) to match the principal end's join-key identity";
+
+            context.AddIssue(path, severity, code, description, remediation);
+        }
     }
     #endregion
 }

@@ -113,8 +113,8 @@ public sealed class ApiRelationshipManyToMany
             var identityA = this.ApiPrincipalEndA.ResolvedIdentity;
             if (keyPathsA is { Length: > 0 } && identityA is not null)
             {
-                var keyPathCount = CountKeyPathLeaves(keyPathsA);
-                var identityCount = CountIdentityLeaves(identityA);
+                var keyPathCount = ApiSchemaHelpers.CountKeyPathLeaves(keyPathsA);
+                var identityCount = ApiSchemaHelpers.CountIdentityLeaves(identityA);
                 if (keyPathCount is not null && identityCount is not null && keyPathCount != identityCount)
                 {
                     var path = this.ApiPath;
@@ -135,8 +135,8 @@ public sealed class ApiRelationshipManyToMany
             var identityB = this.ApiPrincipalEndB.ResolvedIdentity;
             if (keyPathsB is { Length: > 0 } && identityB is not null)
             {
-                var keyPathCount = CountKeyPathLeaves(keyPathsB);
-                var identityCount = CountIdentityLeaves(identityB);
+                var keyPathCount = ApiSchemaHelpers.CountKeyPathLeaves(keyPathsB);
+                var identityCount = ApiSchemaHelpers.CountIdentityLeaves(identityB);
                 if (keyPathCount is not null && identityCount is not null && keyPathCount != identityCount)
                 {
                     var path = this.ApiPath;
@@ -205,61 +205,5 @@ public sealed class ApiRelationshipManyToMany
         this.ApiPrincipalEndB.Initialize(endContext);
     }
 
-    private static int? CountIdentityLeaves(ApiIdentity identity)
-    {
-        var count = 0;
-        foreach (var part in identity.ApiIdentityParts)
-        {
-            switch (part)
-            {
-                case ApiIdentityScalarPart:
-                    count += 1;
-                    break;
-                case ApiIdentityNestedPart nestedPart:
-                    var nestedIdentity = nestedPart.ResolvedIdentity;
-                    if (nestedIdentity is null)
-                    {
-                        return null;
-                    }
-                    var nestedCount = CountIdentityLeaves(nestedIdentity);
-                    if (nestedCount is null)
-                    {
-                        return null;
-                    }
-                    count += nestedCount.Value;
-                    break;
-                case ApiIdentityOwnerPart:
-                    // Owner identity is resolved in a later phase; count is indeterminate here.
-                    return null;
-            }
-        }
-        return count;
-    }
-
-    private static int? CountKeyPathLeaves(ApiRelationshipKeyPath[] paths)
-    {
-        var count = 0;
-        foreach (var path in paths)
-        {
-            switch (path)
-            {
-                case ApiRelationshipScalarKeyPath:
-                    count += 1;
-                    break;
-                case ApiRelationshipNestedKeyPath nestedPath:
-                    var nestedCount = CountKeyPathLeaves(nestedPath.ApiKeyPaths);
-                    if (nestedCount is null)
-                    {
-                        return null;
-                    }
-                    count += nestedCount.Value;
-                    break;
-                case ApiRelationshipOwnerKeyPath:
-                    // Owner key paths are unexpected in an FK context; treat as indeterminate.
-                    return null;
-            }
-        }
-        return count;
-    }
     #endregion
 }
