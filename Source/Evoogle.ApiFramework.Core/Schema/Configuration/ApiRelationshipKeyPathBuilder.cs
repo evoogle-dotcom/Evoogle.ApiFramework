@@ -128,21 +128,13 @@ public class ApiRelationshipKeyPathBuilder(ApiRelationshipKeyPathKind apiKind, s
     {
         ApiRelationshipKeyPath path = apiKind switch
         {
-            ApiRelationshipKeyPathKind.Scalar => new ApiRelationshipScalarKeyPath
-            (
-                clrPropertyName!
-            ),
+            ApiRelationshipKeyPathKind.Scalar => new ApiRelationshipScalarKeyPath(clrPropertyName!),
 
-            ApiRelationshipKeyPathKind.Nested => new ApiRelationshipNestedKeyPath
-            (
-                clrPropertyName!,
-                _childBuilders.Select(b => b.Build())
-            ),
+            ApiRelationshipKeyPathKind.Nested => new ApiRelationshipNestedKeyPath(clrPropertyName!, _childBuilders.Select(b => b.Build())),
 
-            ApiRelationshipKeyPathKind.Owner => new ApiRelationshipOwnerKeyPath
-            (
-                _childBuilders.Count > 0 ? _childBuilders.Select(b => b.Build()) : null
-            ),
+            ApiRelationshipKeyPathKind.Owner => _childBuilders.Count > 0
+                ? new ApiRelationshipOwnerKeyPath(_childBuilders.Select(b => b.Build()))
+                : new ApiRelationshipOwnerKeyPath(),
 
             _ => throw new ApiSchemaException($"Unsupported API relationship key path kind: {apiKind}")
         };

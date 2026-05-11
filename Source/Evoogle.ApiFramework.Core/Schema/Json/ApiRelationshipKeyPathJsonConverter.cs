@@ -164,21 +164,13 @@ public class ApiRelationshipKeyPathJsonConverter(ILogger<ApiRelationshipKeyPathJ
         var apiKindValue = readData.ApiKind.Value;
         ApiRelationshipKeyPath? path = apiKindValue switch
         {
-            ApiRelationshipKeyPathKind.Scalar => new ApiRelationshipScalarKeyPath
-            (
-                readData.ClrPropertyName!
-            ),
+            ApiRelationshipKeyPathKind.Scalar => new ApiRelationshipScalarKeyPath(readData.ClrPropertyName!),
 
-            ApiRelationshipKeyPathKind.Nested => new ApiRelationshipNestedKeyPath
-            (
-                readData.ClrPropertyName!,
-                readData.ApiKeyPaths!
-            ),
+            ApiRelationshipKeyPathKind.Nested => new ApiRelationshipNestedKeyPath(readData.ClrPropertyName!, readData.ApiKeyPaths!),
 
-            ApiRelationshipKeyPathKind.Owner => new ApiRelationshipOwnerKeyPath
-            (
-                readData.ApiKeyPaths
-            ),
+            ApiRelationshipKeyPathKind.Owner => readData.ApiKeyPaths?.Count > 0
+                ? new ApiRelationshipOwnerKeyPath(readData.ApiKeyPaths)
+                : new ApiRelationshipOwnerKeyPath(),
 
             _ => null
         };

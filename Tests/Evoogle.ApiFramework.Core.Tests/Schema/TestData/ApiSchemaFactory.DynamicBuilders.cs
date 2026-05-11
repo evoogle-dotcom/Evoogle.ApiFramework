@@ -311,16 +311,13 @@ public static partial class ApiSchemaFactory
         var apiKeyPathsA = def.ApiKeyPathsA?.Select(BuildApiRelationshipKeyPath);
         var apiKeyPathsB = def.ApiKeyPathsB?.Select(BuildApiRelationshipKeyPath);
 
-        var apiRelationshipDependentEnd = new ApiRelationshipAssociation
-        (
-            clrObjectType,
-            apiKeyPathsA,
-            apiKeyPathsB
-        );
+        var apiRelationshipAssociation = apiKeyPathsA != null && apiKeyPathsB != null
+            ? new ApiRelationshipAssociation(clrObjectType!, apiKeyPathsA, apiKeyPathsB)
+            : new ApiRelationshipAssociation(clrObjectType!);
 
-        AttachExtensions(apiRelationshipDependentEnd, def);
+        AttachExtensions(apiRelationshipAssociation, def);
 
-        return apiRelationshipDependentEnd;
+        return apiRelationshipAssociation;
     }
 
     private static ApiRelationshipPrincipalEnd BuildApiRelationshipPrincipalEnd(ApiRelationshipPrincipalEndDef def)
@@ -344,11 +341,9 @@ public static partial class ApiSchemaFactory
         var clrObjectType = def.ClrObjectType;
         var apiKeyPaths = def.ApiKeyPaths?.Select(BuildApiRelationshipKeyPath);
 
-        var apiRelationshipDependentEnd = new ApiRelationshipDependentEnd
-        (
-            clrObjectType,
-            apiKeyPaths
-        );
+        var apiRelationshipDependentEnd = apiKeyPaths != null
+            ? new ApiRelationshipDependentEnd(clrObjectType, apiKeyPaths)
+            : new ApiRelationshipDependentEnd(clrObjectType);
 
         AttachExtensions(apiRelationshipDependentEnd, def);
 
@@ -389,7 +384,9 @@ public static partial class ApiSchemaFactory
     {
         var apiKeyPaths = def.ApiKeyPaths?.Select(BuildApiRelationshipKeyPath);
 
-        return new ApiRelationshipOwnerKeyPath(apiKeyPaths);
+        return apiKeyPaths?.Any() == true
+            ? new ApiRelationshipOwnerKeyPath(apiKeyPaths)
+            : new ApiRelationshipOwnerKeyPath();
     }
     #endregion
 

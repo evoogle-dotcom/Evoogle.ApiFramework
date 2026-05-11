@@ -440,7 +440,7 @@ public sealed class ApiSchema : ExtensibleBase
             return;
         }
 
-        // If the principal's object type didn't resolve (error already recorded in Phase 4), skip.
+        // If the principal's object type didn't resolve (error already recorded), skip.
         if (!this.TryGetObjectTypeByClrType(principal.ClrObjectType, out var principalObjectType))
         {
             return;
@@ -613,41 +613,65 @@ public sealed class ApiSchema : ExtensibleBase
 
     private void PopulateRelationshipCrossReferences(ApiInitializationContext context)
     {
-        // Clear any previously-registered ends to support idempotent re-initialization.
-        foreach (var apiObjectType in this.ApiObjectTypes)
-        {
-            apiObjectType.ClearRelationshipEnds();
-        }
+        // Collect phase: bucket ends by target object type using lists (no reallocation per insertion).
+        var endMap = new Dictionary<ApiObjectType, (List<ApiRelationshipEnd> All, List<ApiRelationshipPrincipalEnd> Principal, List<ApiRelationshipDependentEnd> Dependent)>();
 
         foreach (var relationship in this.ApiRelationships)
         {
             switch (relationship)
             {
                 case ApiRelationshipOneTo oneTo:
-                    TryRegisterEnd(oneTo.ApiPrincipalEnd, oneTo);
-                    TryRegisterEnd(oneTo.ApiDependentEnd, oneTo);
+                    Collect(oneTo.ApiPrincipalEnd, oneTo);
+                    Collect(oneTo.ApiDependentEnd, oneTo);
                     break;
 
                 case ApiRelationshipManyToMany manyToMany:
-                    TryRegisterEnd(manyToMany.ApiPrincipalEndA, manyToMany);
-                    TryRegisterEnd(manyToMany.ApiPrincipalEndB, manyToMany);
+                    Collect(manyToMany.ApiPrincipalEndA, manyToMany);
+                    Collect(manyToMany.ApiPrincipalEndB, manyToMany);
                     manyToMany.ApiAssociation?.SetRelationship(manyToMany);
                     break;
             }
         }
 
-        void TryRegisterEnd(ApiRelationshipEnd end, ApiRelationship relationship)
+        // Apply phase: deliver final arrays to each object type in a single call.
+        // Types not present in the map receive a clear (supports idempotent re-initialization).
+        foreach (var apiObjectType in this.ApiObjectTypes)
+        {
+            if (endMap.TryGetValue(apiObjectType, out var lists))
+            {
+                apiObjectType.SetRelationshipEnds([.. lists.All], [.. lists.Principal], [.. lists.Dependent]);
+            }
+            else
+            {
+                apiObjectType.ClearRelationshipEnds();
+            }
+        }
+
+        void Collect(ApiRelationshipEnd end, ApiRelationship relationship)
         {
             end.SetRelationship(relationship);
 
-            var clrObjectType = end.ClrObjectType;
-            if (!this.TryGetObjectTypeByClrType(clrObjectType, out var apiObjectType))
+            if (!this.TryGetObjectTypeByClrType(end.ClrObjectType, out var apiObjectType))
             {
-                // Already reported as API_RELATIONSHIP_END_UNRESOLVED_OBJECT_TYPE (Error) in Phase 4.
+                // Already reported as API_RELATIONSHIP_END_UNRESOLVED_OBJECT_TYPE (Error).
                 return;
             }
 
-            apiObjectType.AddRelationshipEnd(end);
+            if (!endMap.TryGetValue(apiObjectType, out var lists))
+            {
+                lists = ([], [], []);
+                endMap[apiObjectType] = lists;
+            }
+
+            lists.All.Add(end);
+            if (end is ApiRelationshipPrincipalEnd principalEnd)
+            {
+                lists.Principal.Add(principalEnd);
+            }
+            else if (end is ApiRelationshipDependentEnd dependentEnd)
+            {
+                lists.Dependent.Add(dependentEnd);
+            }
         }
     }
 

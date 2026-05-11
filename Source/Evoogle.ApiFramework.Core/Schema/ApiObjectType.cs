@@ -38,9 +38,9 @@ public sealed partial class ApiObjectType
     private Dictionary<string, ApiProperty>? _apiPropertyApiNameLookup = null;
     private Dictionary<string, ApiProperty>? _apiPropertyClrNameLookup = null;
 
-    private List<ApiRelationshipEnd>? _apiRelationshipEnds = null;
-    private List<ApiRelationshipPrincipalEnd>? _apiPrincipalRelationshipEnds = null;
-    private List<ApiRelationshipDependentEnd>? _apiDependentRelationshipEnds = null;
+    private ApiRelationshipEnd[]? _apiRelationshipEnds = null;
+    private ApiRelationshipPrincipalEnd[]? _apiPrincipalRelationshipEnds = null;
+    private ApiRelationshipDependentEnd[]? _apiDependentRelationshipEnds = null;
     #endregion
 
     #region ApiSchemaElement Properties
@@ -76,19 +76,19 @@ public sealed partial class ApiObjectType
     ///     Gets all relationship ends where this object type participates, whether as principal or dependent.
     ///     Populated during <see cref="ApiSchema"/> initialization. Returns an empty array before initialization completes.
     /// </summary>
-    public ApiRelationshipEnd[] ApiRelationshipEnds => _apiRelationshipEnds is not null ? [.. _apiRelationshipEnds] : [];
+    public ApiRelationshipEnd[] ApiRelationshipEnds => _apiRelationshipEnds is not null ? _apiRelationshipEnds : [];
 
     /// <summary>
     ///     Gets all relationship ends where this object type acts as the principal (owns the join key identity).
     ///     Populated during <see cref="ApiSchema"/> initialization. Returns an empty array before initialization completes.
     /// </summary>
-    public ApiRelationshipPrincipalEnd[] ApiRelationshipPrincipalEnds => _apiPrincipalRelationshipEnds is not null ? [.. _apiPrincipalRelationshipEnds] : [];
+    public ApiRelationshipPrincipalEnd[] ApiRelationshipPrincipalEnds => _apiPrincipalRelationshipEnds is not null ? _apiPrincipalRelationshipEnds : [];
 
     /// <summary>
     ///     Gets all relationship ends where this object type acts as the dependent (holds the FK binding).
     ///     Populated during <see cref="ApiSchema"/> initialization. Returns an empty array before initialization completes.
     /// </summary>
-    public ApiRelationshipDependentEnd[] ApiRelationshipDependentEnds => _apiDependentRelationshipEnds is not null ? [.. _apiDependentRelationshipEnds] : [];
+    public ApiRelationshipDependentEnd[] ApiRelationshipDependentEnds => _apiDependentRelationshipEnds is not null ? _apiDependentRelationshipEnds : [];
 
     private Dictionary<string, ApiIdentity> ApiIdentityApiNameLookup => this.ThrowIfNotInitialized(_apiIdentityApiNameLookup);
     private Dictionary<string, ApiProperty> ApiPropertyApiNameLookup => this.ThrowIfNotInitialized(_apiPropertyApiNameLookup);
@@ -100,7 +100,7 @@ public sealed partial class ApiObjectType
     public bool HasIdentity => this.ApiIdentities.Length > 0;
 
     /// <summary>Indicates whether this object type participates in any relationships.</summary>
-    public bool HasRelationshipEnds => _apiRelationshipEnds?.Count > 0;
+    public bool HasRelationshipEnds => _apiRelationshipEnds?.Length > 0;
     #endregion
 
     #region Object Methods
@@ -199,23 +199,16 @@ public sealed partial class ApiObjectType
     #endregion
 
     #region Implementation Methods
-    internal void AddRelationshipEnd(ApiRelationshipEnd end)
+    internal void SetRelationshipEnds
+    (
+        ApiRelationshipEnd[] ends,
+        ApiRelationshipPrincipalEnd[] principalEnds,
+        ApiRelationshipDependentEnd[] dependentEnds
+    )
     {
-        ArgumentNullException.ThrowIfNull(end);
-
-        _apiRelationshipEnds ??= [];
-        _apiRelationshipEnds.Add(end);
-
-        if (end is ApiRelationshipPrincipalEnd principalEnd)
-        {
-            _apiPrincipalRelationshipEnds ??= [];
-            _apiPrincipalRelationshipEnds.Add(principalEnd);
-        }
-        else if (end is ApiRelationshipDependentEnd dependentEnd)
-        {
-            _apiDependentRelationshipEnds ??= [];
-            _apiDependentRelationshipEnds.Add(dependentEnd);
-        }
+        _apiRelationshipEnds = ends;
+        _apiPrincipalRelationshipEnds = principalEnds;
+        _apiDependentRelationshipEnds = dependentEnds;
     }
 
     internal void ClearRelationshipEnds()

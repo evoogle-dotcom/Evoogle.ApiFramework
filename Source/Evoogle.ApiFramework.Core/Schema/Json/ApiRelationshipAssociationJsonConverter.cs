@@ -151,7 +151,9 @@ public class ApiRelationshipAssociationJsonConverter(ILogger<ApiRelationshipAsso
         var apiKeyPathsA = readContext.ReadData.ApiRelationshipAssociation?.ApiKeyPathsA;
         var apiKeyPathsB = readContext.ReadData.ApiRelationshipAssociation?.ApiKeyPathsB;
 
-        var apiRelationshipAssociation = new ApiRelationshipAssociation(clrObjectType!, apiKeyPathsA, apiKeyPathsB);
+        var apiRelationshipAssociation = apiKeyPathsA != null && apiKeyPathsB != null
+            ? new ApiRelationshipAssociation(clrObjectType!, apiKeyPathsA, apiKeyPathsB)
+            : new ApiRelationshipAssociation(clrObjectType!);
 
         AttachExtensions(apiRelationshipAssociation, readContext.ReadData.Extensions);
         return apiRelationshipAssociation;

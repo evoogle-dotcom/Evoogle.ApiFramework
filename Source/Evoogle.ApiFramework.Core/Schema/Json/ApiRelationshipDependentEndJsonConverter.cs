@@ -139,11 +139,9 @@ public class ApiRelationshipDependentEndJsonConverter(ILogger<ApiRelationshipDep
         var clrObjectType = readContext.ReadData.ApiRelationshipElement?.ClrObjectType;
         var apiKeyPaths = readContext.ReadData.ApiRelationshipDependentEnd?.ApiKeyPaths;
 
-        var end = new ApiRelationshipDependentEnd
-            (
-                clrObjectType!,
-                apiKeyPaths
-            );
+        var end = apiKeyPaths != null
+            ? new ApiRelationshipDependentEnd(clrObjectType!, apiKeyPaths)
+            : new ApiRelationshipDependentEnd(clrObjectType!);
 
         AttachExtensions(end, readContext.ReadData.Extensions);
         return end;

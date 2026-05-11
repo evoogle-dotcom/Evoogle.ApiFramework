@@ -114,11 +114,9 @@ public class ApiRelationshipDependentEndBuilder(Type clrObjectType) : ExtensionB
             ? _keyPathBuilders.Select(b => b.Build())
             : null;
 
-        var end = new ApiRelationshipDependentEnd
-        (
-            clrObjectType,
-            apiKeyPaths
-        );
+        var end = apiKeyPaths != null
+            ? new ApiRelationshipDependentEnd(clrObjectType, apiKeyPaths)
+            : new ApiRelationshipDependentEnd(clrObjectType);
 
         var extensions = this.BuildExtensions();
         if (extensions != null)

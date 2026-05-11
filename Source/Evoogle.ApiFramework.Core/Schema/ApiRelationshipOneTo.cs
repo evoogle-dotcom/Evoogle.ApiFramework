@@ -97,19 +97,19 @@ public abstract class ApiRelationshipOneTo
             return;
         }
 
-        var keyPaths = dependent.ApiKeyPaths;
-        if (keyPaths is null || keyPaths.Length == 0)
-        {
-            // Null or empty means purely navigational — no FK alignment to validate.
-            return;
-        }
-
         var identity = principal.ResolvedIdentity;
         if (identity is null)
         {
             // Principal identity failed to resolve — error already recorded in InitializeApiPrincipalEnd.
             return;
         }
+
+        if (dependent.IsNavigational)
+        {
+            // Purely navigational — no FK alignment to validate.
+            return;
+        }
+        var keyPaths = dependent.ApiKeyPaths;
 
         var keyPathCount = ApiSchemaHelpers.CountKeyPathLeaves(keyPaths);
         var identityCount = ApiSchemaHelpers.CountIdentityLeaves(identity);

@@ -180,20 +180,17 @@ public class ApiRelationshipAssociationBuilder(Type clrObjectType) : ExtensionBu
             ? _keyPathBuildersB.Select(b => b.Build())
             : null;
 
-        var association = new ApiRelationshipAssociation
-        (
-            clrObjectType,
-            apiKeyPathsA,
-            apiKeyPathsB
-        );
+        var apiRelationshipAssociation = apiKeyPathsA != null && apiKeyPathsB != null
+            ? new ApiRelationshipAssociation(clrObjectType, apiKeyPathsA, apiKeyPathsB)
+            : new ApiRelationshipAssociation(clrObjectType);
 
         var extensions = this.BuildExtensions();
         if (extensions != null)
         {
-            association.Extensions = extensions;
+            apiRelationshipAssociation.Extensions = extensions;
         }
 
-        return association;
+        return apiRelationshipAssociation;
     }
     #endregion
 }
