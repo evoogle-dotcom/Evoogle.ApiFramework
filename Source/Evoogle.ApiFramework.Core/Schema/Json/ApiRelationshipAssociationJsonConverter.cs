@@ -200,9 +200,9 @@ public class ApiRelationshipAssociationJsonConverter(ILogger<ApiRelationshipAsso
     }
 
     private static void WriteApiKeyPathsA(Utf8JsonWriter writer, ApiRelationshipAssociation end, DefaultWriteContext<PropertyNames> context)
-        => WriteApiKeyPaths(writer, end, context, context.PropertyNames.ApiRelationshipAssociation.ApiKeyPathsA, end.ApiKeyPathsA);
+        => WriteApiKeyPaths(writer, end, context, context.PropertyNames.ApiRelationshipAssociation.ApiKeyPathsA, end.HasKeyBinding ? end.ApiKeyPathsA : null);
 
     private static void WriteApiKeyPathsB(Utf8JsonWriter writer, ApiRelationshipAssociation end, DefaultWriteContext<PropertyNames> context)
-        => WriteApiKeyPaths(writer, end, context, context.PropertyNames.ApiRelationshipAssociation.ApiKeyPathsB, end.ApiKeyPathsB);
+        => WriteApiKeyPaths(writer, end, context, context.PropertyNames.ApiRelationshipAssociation.ApiKeyPathsB, end.HasKeyBinding ? end.ApiKeyPathsB : null);
     #endregion
 }

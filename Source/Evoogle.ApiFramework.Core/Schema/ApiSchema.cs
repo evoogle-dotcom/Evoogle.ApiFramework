@@ -613,8 +613,9 @@ public sealed class ApiSchema : ExtensibleBase
 
     private void PopulateRelationshipCrossReferences(ApiInitializationContext context)
     {
-        // Collect phase: bucket ends by target object type using lists (no reallocation per insertion).
+        // Collect phase: bucket ends and associations by target object type using lists (no reallocation per insertion).
         var endMap = new Dictionary<ApiObjectType, (List<ApiRelationshipEnd> All, List<ApiRelationshipPrincipalEnd> Principal, List<ApiRelationshipDependentEnd> Dependent)>();
+        var associationMap = new Dictionary<ApiObjectType, List<ApiRelationshipAssociation>>();
 
         foreach (var relationship in this.ApiRelationships)
         {
@@ -628,13 +629,13 @@ public sealed class ApiSchema : ExtensibleBase
                 case ApiRelationshipManyToMany manyToMany:
                     Collect(manyToMany.ApiPrincipalEndA, manyToMany);
                     Collect(manyToMany.ApiPrincipalEndB, manyToMany);
-                    manyToMany.ApiAssociation?.SetRelationship(manyToMany);
+                    CollectAssociation(manyToMany.ApiAssociation, manyToMany);
                     break;
             }
         }
 
         // Apply phase: deliver final arrays to each object type in a single call.
-        // Types not present in the map receive a clear (supports idempotent re-initialization).
+        // Types not present in a map receive null via ClearRelationshipEnds (supports idempotent re-initialization).
         foreach (var apiObjectType in this.ApiObjectTypes)
         {
             if (endMap.TryGetValue(apiObjectType, out var lists))
@@ -644,6 +645,11 @@ public sealed class ApiSchema : ExtensibleBase
             else
             {
                 apiObjectType.ClearRelationshipEnds();
+            }
+
+            if (associationMap.TryGetValue(apiObjectType, out var associations))
+            {
+                apiObjectType.SetRelationshipAssociations([.. associations]);
             }
         }
 
@@ -672,6 +678,30 @@ public sealed class ApiSchema : ExtensibleBase
             {
                 lists.Dependent.Add(dependentEnd);
             }
+        }
+
+        void CollectAssociation(ApiRelationshipAssociation? association, ApiRelationshipManyToMany relationship)
+        {
+            if (association is null)
+            {
+                return;
+            }
+
+            association.SetRelationship(relationship);
+
+            if (!this.TryGetObjectTypeByClrType(association.ClrObjectType, out var apiObjectType))
+            {
+                // Already reported as API_RELATIONSHIP_END_UNRESOLVED_OBJECT_TYPE (Error).
+                return;
+            }
+
+            if (!associationMap.TryGetValue(apiObjectType, out var list))
+            {
+                list = [];
+                associationMap[apiObjectType] = list;
+            }
+
+            list.Add(association);
         }
     }
 

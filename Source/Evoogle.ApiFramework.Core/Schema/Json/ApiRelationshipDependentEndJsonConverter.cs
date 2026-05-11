@@ -176,7 +176,7 @@ public class ApiRelationshipDependentEndJsonConverter(ILogger<ApiRelationshipDep
     private static void WriteApiKeyPaths(Utf8JsonWriter writer, ApiRelationshipDependentEnd end, DefaultWriteContext<PropertyNames> context)
     {
         var propertyName = context.PropertyNames.ApiRelationshipDependentEnd.ApiKeyPaths;
-        var value = end.ApiKeyPaths;
+        var value = end.HasKeyBinding ? end.ApiKeyPaths : null;
         var options = context.Options;
 
         writer.TryWritePropertyWithAction

@@ -41,6 +41,7 @@ public sealed partial class ApiObjectType
     private ApiRelationshipEnd[]? _apiRelationshipEnds = null;
     private ApiRelationshipPrincipalEnd[]? _apiPrincipalRelationshipEnds = null;
     private ApiRelationshipDependentEnd[]? _apiDependentRelationshipEnds = null;
+    private ApiRelationshipAssociation[]? _apiRelationshipAssociations = null;
     #endregion
 
     #region ApiSchemaElement Properties
@@ -90,6 +91,12 @@ public sealed partial class ApiObjectType
     /// </summary>
     public ApiRelationshipDependentEnd[] ApiRelationshipDependentEnds => _apiDependentRelationshipEnds is not null ? _apiDependentRelationshipEnds : [];
 
+    /// <summary>
+    ///     Gets all M:N relationship associations where this object type acts as the join table.
+    ///     Populated during <see cref="ApiSchema"/> initialization. Returns an empty array before initialization completes.
+    /// </summary>
+    public ApiRelationshipAssociation[] ApiRelationshipAssociations => _apiRelationshipAssociations is not null ? _apiRelationshipAssociations : [];
+
     private Dictionary<string, ApiIdentity> ApiIdentityApiNameLookup => this.ThrowIfNotInitialized(_apiIdentityApiNameLookup);
     private Dictionary<string, ApiProperty> ApiPropertyApiNameLookup => this.ThrowIfNotInitialized(_apiPropertyApiNameLookup);
     private Dictionary<string, ApiProperty> ApiPropertyClrNameLookup => this.ThrowIfNotInitialized(_apiPropertyClrNameLookup);
@@ -101,6 +108,9 @@ public sealed partial class ApiObjectType
 
     /// <summary>Indicates whether this object type participates in any relationships.</summary>
     public bool HasRelationshipEnds => _apiRelationshipEnds?.Length > 0;
+
+    /// <summary>Indicates whether this object type acts as a join table in any M:N relationships.</summary>
+    public bool HasAssociationRole => _apiRelationshipAssociations?.Length > 0;
     #endregion
 
     #region Object Methods
@@ -211,11 +221,17 @@ public sealed partial class ApiObjectType
         _apiDependentRelationshipEnds = dependentEnds;
     }
 
+    internal void SetRelationshipAssociations(ApiRelationshipAssociation[] associations)
+    {
+        _apiRelationshipAssociations = associations;
+    }
+
     internal void ClearRelationshipEnds()
     {
         _apiRelationshipEnds = null;
         _apiPrincipalRelationshipEnds = null;
         _apiDependentRelationshipEnds = null;
+        _apiRelationshipAssociations = null;
     }
 
     private void InitializeApiIdentities(ApiInitializationContext context)
