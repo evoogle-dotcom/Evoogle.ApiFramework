@@ -666,6 +666,10 @@ public sealed class ApiSchema : ExtensibleBase
             {
                 apiObjectType.SetRelationshipAssociations([.. associations]);
             }
+            else
+            {
+                apiObjectType.SetRelationshipAssociations([]);
+            }
         }
 
         void Collect(ApiRelationshipEnd end, ApiRelationship relationship)
@@ -674,7 +678,7 @@ public sealed class ApiSchema : ExtensibleBase
 
             if (!this.TryGetObjectTypeByClrType(end.ClrObjectType, out var apiObjectType))
             {
-                // Already reported as API_RELATIONSHIP_END_UNRESOLVED_OBJECT_TYPE (Error).
+                // Already reported as API_RELATIONSHIP_ELEMENT_UNRESOLVED_OBJECT_TYPE (Error).
                 return;
             }
 
@@ -706,7 +710,7 @@ public sealed class ApiSchema : ExtensibleBase
 
             if (!this.TryGetObjectTypeByClrType(association.ClrObjectType, out var apiObjectType))
             {
-                // Already reported as API_RELATIONSHIP_END_UNRESOLVED_OBJECT_TYPE (Error).
+                // Already reported as API_RELATIONSHIP_ELEMENT_UNRESOLVED_OBJECT_TYPE (Error).
                 return;
             }
 

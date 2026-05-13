@@ -204,6 +204,11 @@ public enum ApiInitializationCode
     ///     does not match the number of scalar leaves in principal end B's join-key identity.
     /// </summary>
     API_RELATIONSHIP_MANY_TO_MANY_INVALID_ASSOCIATION_KEY_PATHS_B_COUNT,
+
+    /// <summary>
+    ///     The association key-path binding is asymmetric: one side declares key paths while the other does not.
+    /// </summary>
+    API_RELATIONSHIP_MANY_TO_MANY_ASYMMETRIC_ASSOCIATION_KEY_PATH_BINDING,
     #endregion
 
     #region ApiRelationshipOneTo Initialization Codes

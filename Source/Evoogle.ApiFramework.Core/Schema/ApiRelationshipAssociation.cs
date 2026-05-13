@@ -36,6 +36,7 @@ public sealed class ApiRelationshipAssociation : ApiRelationshipElement
     #region ApiRelationshipAssociation Fields
     private readonly ApiRelationshipKeyPath[]? _apiKeyPathsA;
     private readonly ApiRelationshipKeyPath[]? _apiKeyPathsB;
+    private readonly bool _hasAsymmetricKeyBinding;
 
     private ApiRelationshipManyToMany? _apiResolvedRelationshipManyToMany;
     #endregion
@@ -132,17 +133,21 @@ public sealed class ApiRelationshipAssociation : ApiRelationshipElement
         ArgumentNullException.ThrowIfNull(apiKeyPathsB);
 
         ApiRelationshipKeyPath[] pathsA = [.. apiKeyPathsA.Where(x => x is not null)];
-        _apiKeyPathsA = pathsA.Length > 0 ? pathsA : null; // Treat empty collection as null (i.e. no key binding).
-
         ApiRelationshipKeyPath[] pathsB = [.. apiKeyPathsB.Where(x => x is not null)];
-        _apiKeyPathsB = pathsB.Length > 0 ? pathsB : null; // Treat empty collection as null (i.e. no key binding).
 
-        // Enforce symmetry: both sides must be bound or both navigational.
-        if (_apiKeyPathsA is null || _apiKeyPathsB is null)
+        var hasPathsA = pathsA.Length > 0;
+        var hasPathsB = pathsB.Length > 0;
+        _hasAsymmetricKeyBinding = hasPathsA != hasPathsB;
+
+        if (!hasPathsA)
         {
             _apiKeyPathsA = null;
             _apiKeyPathsB = null;
+            return;
         }
+
+        _apiKeyPathsA = pathsA;
+        _apiKeyPathsB = hasPathsB ? pathsB : null;
     }
     #endregion
 
@@ -183,6 +188,18 @@ public sealed class ApiRelationshipAssociation : ApiRelationshipElement
     #region Implementation Methods
     private void InitializeApiKeyPaths(ApiInitializationContext context)
     {
+        if (_hasAsymmetricKeyBinding)
+        {
+            var path = this.ApiPath;
+            var severity = ApiInitializationSeverity.Error;
+            var code = ApiInitializationCode.API_RELATIONSHIP_MANY_TO_MANY_ASYMMETRIC_ASSOCIATION_KEY_PATH_BINDING;
+            var description = $"{nameof(this.ApiKeyPathsA)} and {nameof(this.ApiKeyPathsB)} must either both contain at least one key path or both be empty";
+            var remediation = $"Provide matching key-path binding shape for both {nameof(this.ApiKeyPathsA)} and {nameof(this.ApiKeyPathsB)}";
+
+            context.AddIssue(path, severity, code, description, remediation);
+            return;
+        }
+
         if (this.IsNavigational)
         {
             // No key binding declared — purely navigational relationship.
