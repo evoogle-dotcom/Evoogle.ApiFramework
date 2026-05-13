@@ -32,6 +32,7 @@ public abstract class ApiRelationshipEnd(Type clrObjectType) : ApiRelationshipEl
     #region ApiRelationshipEnd Methods
     internal void SetRelationship(ApiRelationship relationship)
     {
+        ArgumentNullException.ThrowIfNull(relationship);
         _apiResolvedRelationship = relationship;
     }
     #endregion

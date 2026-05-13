@@ -412,12 +412,27 @@ public sealed class ApiSchema : ExtensibleBase
             switch (relationship)
             {
                 case ApiRelationshipOneTo oneTo:
-                    this.ResolveOwnerKeyPathsForPrincipal(oneTo.ApiPrincipalEnd, oneTo.ApiDependentEnd?.ApiKeyPaths, context);
+                    this.ResolveOwnerKeyPathsForPrincipal
+                    (
+                        oneTo.ApiPrincipalEnd,
+                        oneTo.ApiDependentEnd is { HasKeyBinding: true } d ? d.ApiKeyPaths : null,
+                        context
+                    );
                     break;
 
                 case ApiRelationshipManyToMany manyToMany:
-                    this.ResolveOwnerKeyPathsForPrincipal(manyToMany.ApiPrincipalEndA, manyToMany.ApiAssociation?.ApiKeyPathsA, context);
-                    this.ResolveOwnerKeyPathsForPrincipal(manyToMany.ApiPrincipalEndB, manyToMany.ApiAssociation?.ApiKeyPathsB, context);
+                    this.ResolveOwnerKeyPathsForPrincipal
+                    (
+                        manyToMany.ApiPrincipalEndA,
+                        manyToMany.ApiAssociation is { HasKeyBinding: true } a ? a.ApiKeyPathsA : null,
+                        context
+                    );
+                    this.ResolveOwnerKeyPathsForPrincipal
+                    (
+                        manyToMany.ApiPrincipalEndB,
+                        manyToMany.ApiAssociation is { HasKeyBinding: true } b ? b.ApiKeyPathsB : null,
+                        context
+                    );
                     break;
             }
         }

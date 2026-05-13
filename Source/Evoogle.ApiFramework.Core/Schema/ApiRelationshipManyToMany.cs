@@ -107,7 +107,7 @@ public sealed class ApiRelationshipManyToMany
     private void InitializeApiAssociationKeyPathAlignment(ApiInitializationContext context)
     {
         // End A alignment
-        if (this.ApiPrincipalEndA is not null && this.ApiAssociation is not null)
+        if (this.ApiPrincipalEndA is not null && this.ApiAssociation is not null && this.ApiAssociation.HasKeyBinding)
         {
             var keyPathsA = this.ApiAssociation.ApiKeyPathsA;
             var identityA = this.ApiPrincipalEndA.ResolvedIdentity;
@@ -129,7 +129,7 @@ public sealed class ApiRelationshipManyToMany
         }
 
         // End B alignment
-        if (this.ApiPrincipalEndB is not null && this.ApiAssociation is not null)
+        if (this.ApiPrincipalEndB is not null && this.ApiAssociation is not null && this.ApiAssociation.HasKeyBinding)
         {
             var keyPathsB = this.ApiAssociation.ApiKeyPathsB;
             var identityB = this.ApiPrincipalEndB.ResolvedIdentity;

@@ -216,7 +216,7 @@ internal static class ApiSchemaHelpers
                     count += nestedCount.Value;
                     break;
                 case ApiRelationshipOwnerKeyPath:
-                    // Owner key paths are unexpected in an FK context; treat as indeterminate.
+                    // Owner key paths are resolved in a later phase; leaf count is indeterminate until then.
                     return null;
             }
         }

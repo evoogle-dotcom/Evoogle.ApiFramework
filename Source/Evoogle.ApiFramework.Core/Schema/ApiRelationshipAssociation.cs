@@ -136,6 +136,13 @@ public sealed class ApiRelationshipAssociation : ApiRelationshipElement
 
         ApiRelationshipKeyPath[] pathsB = [.. apiKeyPathsB.Where(x => x is not null)];
         _apiKeyPathsB = pathsB.Length > 0 ? pathsB : null; // Treat empty collection as null (i.e. no key binding).
+
+        // Enforce symmetry: both sides must be bound or both navigational.
+        if (_apiKeyPathsA is null || _apiKeyPathsB is null)
+        {
+            _apiKeyPathsA = null;
+            _apiKeyPathsB = null;
+        }
     }
     #endregion
 
@@ -168,6 +175,7 @@ public sealed class ApiRelationshipAssociation : ApiRelationshipElement
     #region ApiRelationshipAssociation Methods
     internal void SetRelationship(ApiRelationshipManyToMany relationship)
     {
+        ArgumentNullException.ThrowIfNull(relationship);
         _apiResolvedRelationshipManyToMany = relationship;
     }
     #endregion
