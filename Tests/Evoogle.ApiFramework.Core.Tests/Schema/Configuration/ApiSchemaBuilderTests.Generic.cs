@@ -38,7 +38,8 @@ public partial class ApiSchemaBuilderTests
             var apiSchemaActualBuildLambda = this.ApiSchemaActualBuildExpression.Compile();
             this.ApiSchemaActual = apiSchemaActualBuildLambda();
 
-            this.WriteLine($"ApiSchemaActual:   {this.ApiSchemaActual.SafeToString()}");
+            this.WriteLine("ApiSchemaActual:");
+            this.WriteLine($"{this.ApiSchemaActual.SafeToJson(_defaultToJsonOptions)}");
         }
         #endregion
     }
@@ -89,6 +90,13 @@ public partial class ApiSchemaBuilderTests
             Name = $"Build '{ApiSchemaKind.Commerce}' API schema",
             ApiSchemaKind = ApiSchemaKind.Commerce,
             ApiSchemaActualBuildExpression = static () => ApiSchemaBuilderTestsGenericTestFactory.BuildCommerceApiSchema(),
+        },
+
+        new BuildTestGeneric
+        {
+            Name = $"Build '{ApiSchemaKind.Relationship}' API schema",
+            ApiSchemaKind = ApiSchemaKind.Relationship,
+            ApiSchemaActualBuildExpression = static () => ApiSchemaBuilderTestsGenericTestFactory.BuildRelationshipApiSchema(),
         },
     ];
     #endregion

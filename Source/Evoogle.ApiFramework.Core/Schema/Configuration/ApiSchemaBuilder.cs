@@ -272,9 +272,7 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     /// <param name="apiName">The schema-unique API name of the relationship.</param>
     /// <param name="configure">Optional callback to configure FK key paths and delete behavior on the dependent end.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiSchemaBuilder AddOneToOneRelationship<TPrincipal, TDependent>(
-        string apiName,
-        Action<ApiRelationshipDependentEndBuilder<TDependent>>? configure = null)
+    public ApiSchemaBuilder AddOneToOneRelationship<TPrincipal, TDependent>(string apiName, Action<ApiRelationshipDependentEndBuilder<TDependent>>? configure = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
 
@@ -297,9 +295,7 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     /// <param name="apiName">The schema-unique API name of the relationship.</param>
     /// <param name="fk">Expression selecting the scalar FK property on <typeparamref name="TDependent"/>.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiSchemaBuilder AddOneToOneRelationship<TPrincipal, TDependent>(
-        string apiName,
-        Expression<Func<TDependent, object>> fk)
+    public ApiSchemaBuilder AddOneToOneRelationship<TPrincipal, TDependent>(string apiName, Expression<Func<TDependent, object>> fk)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
         ArgumentNullException.ThrowIfNull(fk);
@@ -357,9 +353,7 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     /// <param name="apiName">The schema-unique API name of the relationship.</param>
     /// <param name="configure">Optional callback to configure FK key paths and delete behavior on the dependent end.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiSchemaBuilder AddOneToManyRelationship<TPrincipal, TDependent>(
-        string apiName,
-        Action<ApiRelationshipDependentEndBuilder<TDependent>>? configure = null)
+    public ApiSchemaBuilder AddOneToManyRelationship<TPrincipal, TDependent>(string apiName, Action<ApiRelationshipDependentEndBuilder<TDependent>>? configure = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
 
@@ -382,9 +376,7 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     /// <param name="apiName">The schema-unique API name of the relationship.</param>
     /// <param name="fk">Expression selecting the scalar FK property on <typeparamref name="TDependent"/>.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiSchemaBuilder AddOneToManyRelationship<TPrincipal, TDependent>(
-        string apiName,
-        Expression<Func<TDependent, object>> fk)
+    public ApiSchemaBuilder AddOneToManyRelationship<TPrincipal, TDependent>(string apiName, Expression<Func<TDependent, object>> fk)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
         ArgumentNullException.ThrowIfNull(fk);

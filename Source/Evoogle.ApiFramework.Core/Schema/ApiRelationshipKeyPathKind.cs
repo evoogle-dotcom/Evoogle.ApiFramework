@@ -5,6 +5,9 @@
 // See the LICENSE file in the project root for more information.
 namespace Evoogle.ApiFramework.Schema;
 
+/// <summary>
+///     Specifies the kind of an <see cref="ApiRelationshipKeyPath"/>, which determines how the key path is resolved to locate principal identity scalar values for relationship binding.
+/// </summary>
 public enum ApiRelationshipKeyPathKind
 {
     #region Values

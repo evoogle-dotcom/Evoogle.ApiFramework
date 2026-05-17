@@ -153,24 +153,6 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null)
     internal ApiRelationshipManyToManyBuilder GetOrAddManyToManyRelationshipBuilder(string apiName)
         => this.GetOrAddTypedRelationshipBuilder(apiName, static n => new ApiRelationshipManyToManyBuilder(n));
 
-    private TBuilder GetOrAddTypedRelationshipBuilder<TBuilder>(string apiName, Func<string, TBuilder> factory)
-        where TBuilder : ApiRelationshipBuilder
-    {
-        if (_apiRelationshipBuilders.TryGetValue(apiName, out var existing))
-        {
-            if (existing is not TBuilder typed)
-            {
-                throw new ApiSchemaException($"Relationship '{apiName}' was already registered as {existing.GetType().Name} and cannot be reconfigured as {typeof(TBuilder).Name}.");
-            }
-
-            return typed;
-        }
-
-        var builder = factory(apiName);
-        _apiRelationshipBuilders[apiName] = builder;
-        return builder;
-    }
-
     private static TBuilder GetOrAddBuilder<TBuilder>
     (
         Type clrType,
@@ -187,6 +169,24 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null)
             builders[clrType] = builder;
         }
 
+        return builder;
+    }
+
+    private TBuilder GetOrAddTypedRelationshipBuilder<TBuilder>(string apiName, Func<string, TBuilder> factory)
+        where TBuilder : ApiRelationshipBuilder
+    {
+        if (_apiRelationshipBuilders.TryGetValue(apiName, out var existing))
+        {
+            if (existing is not TBuilder typed)
+            {
+                throw new ApiSchemaException($"Relationship '{apiName}' was already registered as {existing.GetType().Name} and cannot be reconfigured as {typeof(TBuilder).Name}.");
+            }
+
+            return typed;
+        }
+
+        var builder = factory(apiName);
+        _apiRelationshipBuilders[apiName] = builder;
         return builder;
     }
     #endregion

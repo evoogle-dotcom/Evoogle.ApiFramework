@@ -71,7 +71,7 @@ public class RelationshipPost
 {
     public Ulid Id { get; set; }
     public Ulid AuthorUserId { get; set; } // scalar FK path candidate
-    public RelationshipUserRef AuthorRef { get; set; } = new(); // nested FK path candidate
+    public RelationshipUserRef AuthorUserRef { get; set; } = new(); // nested FK path candidate
     public string Title { get; set; } = string.Empty;
 
     // TODO: Need a deep dive on how I want to handle "navigation properties"
@@ -90,12 +90,24 @@ public class RelationshipPost
     {
         var id = this.Id.SafeToString();
         var authorUserId = this.AuthorUserId.SafeToString();
-        var authorRef = this.AuthorRef.SafeToString();
+        var authorUserRef = this.AuthorUserRef.SafeToString();
         var title = this.Title.SafeToString();
         var comments = this.Comments.SafeToString();
         var tags = this.Tags.SafeToString();
 
-        return $"{nameof(RelationshipPost)} {{{nameof(this.Id)}={id}, {nameof(this.AuthorUserId)}={authorUserId}, {nameof(this.AuthorRef)}={authorRef}, {nameof(this.Title)}={title}, {nameof(this.Comments)}={comments}, {nameof(this.Tags)}={tags}}}";
+        return $"{nameof(RelationshipPost)} {{{nameof(this.Id)}={id}, {nameof(this.AuthorUserId)}={authorUserId}, {nameof(this.AuthorUserRef)}={authorUserRef}, {nameof(this.Title)}={title}, {nameof(this.Comments)}={comments}, {nameof(this.Tags)}={tags}}}";
+    }
+}
+
+public class RelationshipPostRef
+{
+    public Ulid PostId { get; set; }
+
+    public override string ToString()
+    {
+        var postId = this.PostId.SafeToString();
+
+        return $"{nameof(RelationshipPostRef)} {{{nameof(this.PostId)}={postId}}}";
     }
 }
 
@@ -118,18 +130,6 @@ public class RelationshipComment
         var body = this.Body.SafeToString();
 
         return $"{nameof(RelationshipComment)} {{{nameof(this.Id)}={id}, {nameof(this.PostId)}={postId}, {nameof(this.PostRef)}={postRef}, {nameof(this.Body)}={body}}}";
-    }
-}
-
-public class RelationshipPostRef
-{
-    public Ulid PostId { get; set; }
-
-    public override string ToString()
-    {
-        var postId = this.PostId.SafeToString();
-
-        return $"{nameof(RelationshipPostRef)} {{{nameof(this.PostId)}={postId}}}";
     }
 }
 #endregion
@@ -186,24 +186,6 @@ public class RelationshipCatalogItem
     }
 }
 
-public class RelationshipOrderLine
-{
-    public Ulid OrderId { get; set; }
-    public int LineNumber { get; set; }
-
-    // Nested key path target to map composite principal identity leaves (Sku + Revision).
-    public RelationshipCatalogKey ProductKey { get; set; } = new();
-
-    public override string ToString()
-    {
-        var orderId = this.OrderId.SafeToString();
-        var lineNumber = this.LineNumber.SafeToString();
-        var productKey = this.ProductKey.SafeToString();
-
-        return $"{nameof(RelationshipOrderLine)} {{{nameof(this.OrderId)}={orderId}, {nameof(this.LineNumber)}={lineNumber}, {nameof(this.ProductKey)}={productKey}}}";
-    }
-}
-
 public class RelationshipCatalogKey
 {
     public string Sku { get; set; } = string.Empty;
@@ -215,6 +197,28 @@ public class RelationshipCatalogKey
         var revision = this.Revision.SafeToString();
 
         return $"{nameof(RelationshipCatalogKey)} {{{nameof(this.Sku)}={sku}, {nameof(this.Revision)}={revision}}}";
+    }
+}
+
+public class RelationshipOrderLine
+{
+    public Ulid OrderId { get; set; }
+    public int LineNumber { get; set; }
+
+    // Scalar key paths to composite principal identity leaves (Sku + Revision).
+    public string ProductSku { get; set; } = string.Empty;
+    public int ProductRevision { get; set; }
+
+    // Nested key path target to composite principal identity leaves (Sku + Revision).
+    public RelationshipCatalogKey ProductKey { get; set; } = new();
+
+    public override string ToString()
+    {
+        var orderId = this.OrderId.SafeToString();
+        var lineNumber = this.LineNumber.SafeToString();
+        var productKey = this.ProductKey.SafeToString();
+
+        return $"{nameof(RelationshipOrderLine)} {{{nameof(this.OrderId)}={orderId}, {nameof(this.LineNumber)}={lineNumber}, {nameof(this.ProductKey)}={productKey}}}";
     }
 }
 #endregion

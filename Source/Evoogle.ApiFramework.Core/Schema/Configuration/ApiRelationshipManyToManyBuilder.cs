@@ -17,13 +17,34 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 ///     Subsequent calls to any <c>With</c> method for the same end replace the previous configuration.
 /// </remarks>
 /// <param name="apiName">The schema-unique API name of the relationship.</param>
-public class ApiRelationshipManyToManyBuilder(string apiName) : ApiRelationshipBuilder(apiName)
+public class ApiRelationshipManyToManyBuilder(string apiName)
+    : ApiRelationshipBuilder(apiName, ApiRelationshipManyToMany.DefaultDeleteBehavior)
 {
     #region Fields
-    protected ApiRelationshipPrincipalEndBuilder? _principalEndABuilder;
-    protected ApiRelationshipPrincipalEndBuilder? _principalEndBBuilder;
-    protected ApiRelationshipAssociationBuilder? _associationBuilder;
-    protected ApiRelationshipDeleteBehavior _apiDeleteBehavior = ApiRelationshipManyToMany.DefaultDeleteBehavior;
+    private ApiRelationshipPrincipalEndBuilder? _principalEndABuilder;
+    private ApiRelationshipPrincipalEndBuilder? _principalEndBBuilder;
+    private ApiRelationshipAssociationBuilder? _associationBuilder;
+    #endregion
+
+    #region AddExtension Methods
+    /// <summary>
+    ///     Adds an extension value associated with the specified <paramref name="type"/>.
+    /// </summary>
+    /// <param name="type">The type used as the extension key.</param>
+    /// <param name="value">The extension value to store.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiRelationshipManyToManyBuilder AddRelationshipExtension(Type type, object value)
+        => base.AddRelationshipExtension<ApiRelationshipManyToManyBuilder>(type, value);
+
+    /// <summary>
+    ///     Adds an extension value keyed by its own type.
+    /// </summary>
+    /// <typeparam name="T">The extension value type.</typeparam>
+    /// <param name="value">The extension value.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiRelationshipManyToManyBuilder AddRelationshipExtension<T>(T value)
+        where T : notnull
+        => base.AddRelationshipExtension<ApiRelationshipManyToManyBuilder>(typeof(T), value);
     #endregion
 
     #region Non-Generic With Methods
@@ -75,10 +96,7 @@ public class ApiRelationshipManyToManyBuilder(string apiName) : ApiRelationshipB
     /// <param name="apiDeleteBehavior">The desired delete behavior.</param>
     /// <returns>The current builder instance.</returns>
     public ApiRelationshipManyToManyBuilder WithDeleteBehavior(ApiRelationshipDeleteBehavior apiDeleteBehavior)
-    {
-        _apiDeleteBehavior = apiDeleteBehavior;
-        return this;
-    }
+        => base.WithDeleteBehavior<ApiRelationshipManyToManyBuilder>(apiDeleteBehavior);
     #endregion
 
     #region Generic With Methods

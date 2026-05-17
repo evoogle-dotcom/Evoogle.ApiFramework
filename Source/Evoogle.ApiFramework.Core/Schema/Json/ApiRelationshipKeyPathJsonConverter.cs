@@ -263,7 +263,7 @@ public class ApiRelationshipKeyPathJsonConverter(ILogger<ApiRelationshipKeyPathJ
     private static void WriteApiKeyPaths(Utf8JsonWriter writer, ApiRelationshipOwnerKeyPath path, DefaultWriteContext<PropertyNames> context)
     {
         var propertyName = context.PropertyNames.ApiRelationshipKeyPath.ApiKeyPaths;
-        var value = path.ApiKeyPaths;
+        var value = path.HasKeyBinding ? path.ApiKeyPaths : null;
         var options = context.Options;
 
         writer.TryWritePropertyWithAction

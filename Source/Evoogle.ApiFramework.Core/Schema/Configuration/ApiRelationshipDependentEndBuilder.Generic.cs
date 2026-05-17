@@ -74,9 +74,11 @@ public sealed class ApiRelationshipDependentEndBuilder<T>() : ApiRelationshipDep
     }
 
     /// <inheritdoc cref="ApiRelationshipDependentEndBuilder.AddOwnerPath"/>
-    public new ApiRelationshipDependentEndBuilder<T> AddOwnerPath(Action<ApiRelationshipKeyPathBuilder>? configure = null)
+    public ApiRelationshipDependentEndBuilder<T> AddOwnerPath<TResult>(Action<ApiRelationshipKeyPathBuilder<TResult>>? configure = null)
     {
-        base.AddOwnerPath(configure);
+        var builder = new ApiRelationshipKeyPathBuilder<TResult>(ApiRelationshipKeyPathKind.Owner, null);
+        configure?.Invoke(builder);
+        base.AddKeyPathBuilderCore(builder);
         return this;
     }
     #endregion

@@ -15,12 +15,33 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 ///     configuration for that end.
 /// </remarks>
 /// <param name="apiName">The schema-unique API name of the relationship.</param>
-public sealed class ApiRelationshipOneToManyBuilder(string apiName) : ApiRelationshipBuilder(apiName)
+public sealed class ApiRelationshipOneToManyBuilder(string apiName)
+    : ApiRelationshipBuilder(apiName, ApiRelationshipOneToMany.DefaultDeleteBehavior)
 {
     #region Fields
     private ApiRelationshipPrincipalEndBuilder? _principalEndBuilder;
     private ApiRelationshipDependentEndBuilder? _dependentEndBuilder;
-    private ApiRelationshipDeleteBehavior _apiDeleteBehavior = ApiRelationshipOneToMany.DefaultDeleteBehavior;
+    #endregion
+
+    #region AddExtension Methods
+    /// <summary>
+    ///     Adds an extension value associated with the specified <paramref name="type"/>.
+    /// </summary>
+    /// <param name="type">The type used as the extension key.</param>
+    /// <param name="value">The extension value to store.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiRelationshipOneToManyBuilder AddRelationshipExtension(Type type, object value)
+        => base.AddRelationshipExtension<ApiRelationshipOneToManyBuilder>(type, value);
+
+    /// <summary>
+    ///     Adds an extension value keyed by its own type.
+    /// </summary>
+    /// <typeparam name="T">The extension value type.</typeparam>
+    /// <param name="value">The extension value.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiRelationshipOneToManyBuilder AddRelationshipExtension<T>(T value)
+        where T : notnull
+        => base.AddRelationshipExtension<ApiRelationshipOneToManyBuilder>(typeof(T), value);
     #endregion
 
     #region Non-Generic With Methods
@@ -44,10 +65,7 @@ public sealed class ApiRelationshipOneToManyBuilder(string apiName) : ApiRelatio
     /// <param name="apiDeleteBehavior">The desired delete behavior.</param>
     /// <returns>The current builder instance.</returns>
     public ApiRelationshipOneToManyBuilder WithDeleteBehavior(ApiRelationshipDeleteBehavior apiDeleteBehavior)
-    {
-        _apiDeleteBehavior = apiDeleteBehavior;
-        return this;
-    }
+        => base.WithDeleteBehavior<ApiRelationshipOneToManyBuilder>(apiDeleteBehavior);
 
     /// <summary>
     ///     Configures the dependent end of the 1:M relationship using the specified CLR type.

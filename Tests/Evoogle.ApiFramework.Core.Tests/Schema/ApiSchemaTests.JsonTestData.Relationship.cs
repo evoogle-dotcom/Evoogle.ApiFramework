@@ -580,10 +580,10 @@ public partial class ApiSchemaTests
                             ),
                             new ApiPropertyDef
                             (
-                                ApiName: nameof(RelationshipPost.AuthorRef),
+                                ApiName: nameof(RelationshipPost.AuthorUserRef),
                                 ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(RelationshipUserRef)),
                                 ApiTypeModifiers: ApiTypeModifiers.Required,
-                                ClrName: nameof(RelationshipPost.AuthorRef),
+                                ClrName: nameof(RelationshipPost.AuthorUserRef),
                                 ClrMemberKind: ClrMemberKind.Property
                             ),
                             new ApiPropertyDef
@@ -750,7 +750,7 @@ public partial class ApiSchemaTests
                             [
                                 new ApiRelationshipNestedKeyPathDef
                                 (
-                                    ClrPropertyName: nameof(RelationshipPost.AuthorRef),
+                                    ClrPropertyName: nameof(RelationshipPost.AuthorUserRef),
                                     ApiKeyPaths: [new ApiRelationshipScalarKeyPathDef(ClrPropertyName: nameof(RelationshipUserRef.UserId))]
                                 )
                             ]
@@ -923,13 +923,13 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             },
                             {
-                                ""ApiName"": ""AuthorRef"",
+                                ""ApiName"": ""AuthorUserRef"",
                                 ""ApiType"": {
                                     ""ApiKind"": ""Object"",
                                     ""ApiName"": ""RelationshipUserRef""
                                 },
                                 ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""AuthorRef"",
+                                ""ClrName"": ""AuthorUserRef"",
                                 ""ClrMemberKind"": ""Property""
                             },
                             {
@@ -1136,7 +1136,7 @@ public partial class ApiSchemaTests
                             ""ApiKeyPaths"": [
                                 {
                                     ""ApiKind"": ""Nested"",
-                                    ""ClrPropertyName"": ""AuthorRef"",
+                                    ""ClrPropertyName"": ""AuthorUserRef"",
                                     ""ApiKeyPaths"": [
                                         {
                                             ""ApiKind"": ""Scalar"",

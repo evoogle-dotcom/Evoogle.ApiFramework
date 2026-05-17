@@ -3,6 +3,9 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
 /// <summary>

@@ -14,15 +14,6 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Internal;
 internal static class ApiObjectTypeBuilderExtensions
 {
     #region Methods
-    public static void ConfigureExtensions(this ApiObjectTypeBuilder builder, ApiObjectType apiObjectType)
-    {
-        var extensions = apiObjectType.Extensions;
-        foreach (var extension in extensions ?? [])
-        {
-            builder.AddObjectExtension(extension.Key, extension.Value);
-        }
-    }
-
     public static void ConfigureIdentities(this ApiObjectTypeBuilder builder, ApiObjectType apiObjectType)
     {
         var apiIdentities = apiObjectType.ApiIdentities;
@@ -41,11 +32,11 @@ internal static class ApiObjectTypeBuilderExtensions
                                 var clrScalarTypeHint = scalarPart.ClrScalarTypeHint;
                                 if (clrScalarTypeHint is not null)
                                 {
-                                    identityBuilder.AddScalarPart(scalarPart.ClrPropertyName, clrScalarTypeHint);
+                                    identityBuilder.AddScalarPart(scalarPart.ClrPropertyName, clrScalarTypeHint, p => p.ConfigureExtensions(scalarPart));
                                 }
                                 else
                                 {
-                                    identityBuilder.AddScalarPart(scalarPart.ClrPropertyName);
+                                    identityBuilder.AddScalarPart(scalarPart.ClrPropertyName, p => p.ConfigureExtensions(scalarPart));
                                 }
                                 break;
                             }
@@ -56,11 +47,11 @@ internal static class ApiObjectTypeBuilderExtensions
                                 var apiIdentityName = nestedPart.ApiIdentityName;
                                 if (apiIdentityName is not null)
                                 {
-                                    identityBuilder.AddNestedPart(nestedPart.ClrPropertyName, apiIdentityName);
+                                    identityBuilder.AddNestedPart(nestedPart.ClrPropertyName, apiIdentityName, p => p.ConfigureExtensions(nestedPart));
                                 }
                                 else
                                 {
-                                    identityBuilder.AddNestedPart(nestedPart.ClrPropertyName);
+                                    identityBuilder.AddNestedPart(nestedPart.ClrPropertyName, p => p.ConfigureExtensions(nestedPart));
                                 }
                                 break;
                             }
@@ -71,11 +62,11 @@ internal static class ApiObjectTypeBuilderExtensions
                                 var apiIdentityName = ownerPart.ApiIdentityName;
                                 if (apiIdentityName is not null)
                                 {
-                                    identityBuilder.AddOwnerPart(apiIdentityName);
+                                    identityBuilder.AddOwnerPart(apiIdentityName, p => p.ConfigureExtensions(ownerPart));
                                 }
                                 else
                                 {
-                                    identityBuilder.AddOwnerPart();
+                                    identityBuilder.AddOwnerPart(p => p.ConfigureExtensions(ownerPart));
                                 }
                                 break;
                             }
@@ -84,6 +75,8 @@ internal static class ApiObjectTypeBuilderExtensions
                             throw new InvalidOperationException($"Unsupported API identity part kind: {apiKind}");
                     }
                 }
+
+                identityBuilder.ConfigureExtensions(apiIdentity);
             });
         }
     }

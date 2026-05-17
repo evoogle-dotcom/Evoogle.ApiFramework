@@ -73,6 +73,7 @@ public sealed class Category
 {
     public Ulid Id { get; init; }
     public string Name { get; init; } = string.Empty;
+    public Ulid? ParentId { get; init; }
     public Category? Parent { get; init; }
     public List<Category> Children { get; init; } = [];
 
@@ -80,10 +81,11 @@ public sealed class Category
     {
         var id = this.Id.SafeToString();
         var name = this.Name.SafeToString();
+        var parentId = this.ParentId.SafeToString();
         var parent = this.Parent.SafeToString();
         var children = this.Children.SafeToString();
 
-        return $"{nameof(Category)} {{{nameof(this.Id)}={id}, {nameof(this.Name)}={name}, {nameof(this.Parent)}={parent}, {nameof(this.Children)}={children}}}";
+        return $"{nameof(Category)} {{{nameof(this.Id)}={id}, {nameof(this.Name)}={name}, {nameof(this.ParentId)}={parentId}, {nameof(this.Parent)}={parent}, {nameof(this.Children)}={children}}}";
     }
 }
 
@@ -126,6 +128,7 @@ public sealed class PhysicalProduct
     public Category? Category { get; init; }
 
     // PhysicalProduct properties
+    public Ulid? CategoryId { get; init; }
     public decimal Weight { get; init; }
     public Quantity? Size { get; init; }
 
@@ -137,10 +140,11 @@ public sealed class PhysicalProduct
         var price = this.Price.SafeToString();
         var tags = this.Tags.SafeToString();
         var category = this.Category.SafeToString();
+        var categoryId = this.CategoryId.SafeToString();
         var weight = this.Weight.SafeToString();
         var size = this.Size.SafeToString();
 
-        return $"{nameof(PhysicalProduct)} {{{nameof(this.Id)}={id}, {nameof(this.Sku)}={sku}, {nameof(this.Name)}={name}, {nameof(this.Price)}={price}, {nameof(this.Tags)}={tags}, {nameof(this.Category)}={category}, {nameof(this.Weight)}={weight}, {nameof(this.Size)}={size}}}";
+        return $"{nameof(PhysicalProduct)} {{{nameof(this.Id)}={id}, {nameof(this.Sku)}={sku}, {nameof(this.Name)}={name}, {nameof(this.Price)}={price}, {nameof(this.Tags)}={tags}, {nameof(this.Category)}={category}, {nameof(this.CategoryId)}={categoryId}, {nameof(this.Weight)}={weight}, {nameof(this.Size)}={size}}}";
     }
 }
 
@@ -157,6 +161,7 @@ public sealed class DigitalProduct
     public Category? Category { get; init; }
 
     // DigitalProduct properties
+    public Ulid? CategoryId { get; init; }
     public Uri? DownloadUrl { get; init; }
     public long? Bytes { get; init; }
 
@@ -168,10 +173,41 @@ public sealed class DigitalProduct
         var price = this.Price.SafeToString();
         var tags = this.Tags.SafeToString();
         var category = this.Category.SafeToString();
+        var categoryId = this.CategoryId.SafeToString();
         var downloadUrl = this.DownloadUrl.SafeToString();
         var bytes = this.Bytes.SafeToString();
 
-        return $"{nameof(DigitalProduct)} {{{nameof(this.Id)}={id}, {nameof(this.Sku)}={sku}, {nameof(this.Name)}={name}, {nameof(this.Price)}={price}, {nameof(this.Tags)}={tags}, {nameof(this.Category)}={category}, {nameof(this.DownloadUrl)}={downloadUrl}, {nameof(this.Bytes)}={bytes}}}";
+        return $"{nameof(DigitalProduct)} {{{nameof(this.Id)}={id}, {nameof(this.Sku)}={sku}, {nameof(this.Name)}={name}, {nameof(this.Price)}={price}, {nameof(this.Tags)}={tags}, {nameof(this.Category)}={category}, {nameof(this.CategoryId)}={categoryId}, {nameof(this.DownloadUrl)}={downloadUrl}, {nameof(this.Bytes)}={bytes}}}";
+    }
+}
+#endregion
+
+#region Product Join Types
+public sealed class DigitalProductTag
+{
+    public Ulid DigitalProductId { get; init; }
+    public Ulid TagId { get; init; }
+
+    public override string ToString()
+    {
+        var digitalProductId = this.DigitalProductId.SafeToString();
+        var tagId = this.TagId.SafeToString();
+
+        return $"{nameof(DigitalProductTag)} {{{nameof(this.DigitalProductId)}={digitalProductId}, {nameof(this.TagId)}={tagId}}}";
+    }
+}
+
+public sealed class PhysicalProductTag
+{
+    public Ulid PhysicalProductId { get; init; }
+    public Ulid TagId { get; init; }
+
+    public override string ToString()
+    {
+        var physicalProductId = this.PhysicalProductId.SafeToString();
+        var tagId = this.TagId.SafeToString();
+
+        return $"{nameof(PhysicalProductTag)} {{{nameof(this.PhysicalProductId)}={physicalProductId}, {nameof(this.TagId)}={tagId}}}";
     }
 }
 #endregion

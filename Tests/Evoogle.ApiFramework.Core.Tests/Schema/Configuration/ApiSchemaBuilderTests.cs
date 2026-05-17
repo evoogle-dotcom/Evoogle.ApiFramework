@@ -4,6 +4,8 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
 using Evoogle.ApiFramework.Schema.TestData;
@@ -21,6 +23,14 @@ public partial class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTest
     #region Test Classes
     private class BuildTestCore : XUnitTest
     {
+        #region Fields
+        protected static readonly JsonSerializerOptions _defaultToJsonOptions = new()
+        {
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+            WriteIndented = false,
+        };
+        #endregion
+
         #region User Supplied Properties
         public required ApiSchemaKind ApiSchemaKind { get; init; }
         #endregion
@@ -62,7 +72,9 @@ public partial class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTest
 
             this.WriteLine($"ApiSchemaKind: {this.ApiSchemaKind.SafeToString()}");
             this.WriteLine();
-            this.WriteLine($"ApiSchemaExpected: {this.ApiSchemaExpected.SafeToString()}");
+            this.WriteLine("ApiSchemaExpected:");
+            this.WriteLine($"{this.ApiSchemaExpected.SafeToJson(_defaultToJsonOptions)}");
+            this.WriteLine();
         }
 
         protected override void Assert()
@@ -105,7 +117,11 @@ public partial class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTest
             {
                 var apiName = apiScalarType.ApiName;
                 var clrType = apiScalarType.ClrType;
-                builder = builder.AddScalar(clrType, x => x.WithName(apiName));
+                builder = builder.AddScalar(clrType, x =>
+                {
+                    x.WithName(apiName);
+                    x.ConfigureExtensions(apiScalarType);
+                });
             }
 
             var apiEnumTypes = this.ApiSchemaExpected!.ApiEnumTypes;
@@ -120,6 +136,7 @@ public partial class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTest
                     {
                         x.AddValue(apiEnumValue.ApiName, apiEnumValue.ClrName, apiEnumValue.ClrOrdinal);
                     }
+                    x.ConfigureExtensions(apiEnumType);
                 });
             }
 
@@ -135,7 +152,7 @@ public partial class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTest
                     {
                         var apiPropertyName = apiProperty.ApiName;
                         var clrPropertyName = apiProperty.ClrName;
-                        x.AddProperty(apiPropertyName, clrPropertyName);
+                        x.AddProperty(apiPropertyName, clrPropertyName, p => p.ConfigureExtensions(apiProperty));
                     }
 
                     x.ConfigureOptions(apiObjectType);
@@ -144,14 +161,63 @@ public partial class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTest
                 });
             }
 
-            var extensions = this.ApiSchemaExpected!.Extensions;
-            foreach (var extension in extensions ?? [])
+            var apiRelationships = this.ApiSchemaExpected!.ApiRelationships;
+            foreach (var apiRelationship in apiRelationships.SafeCast<ApiRelationship>())
             {
-                builder.AddSchemaExtension(extension.Key, extension.Value);
+                var apiName = apiRelationship.ApiName;
+                var apiKind = apiRelationship.ApiKind;
+                var apiDeleteBehavior = apiRelationship.ApiDeleteBehavior;
+
+                builder = apiKind switch
+                {
+                    ApiRelationshipKind.OneToOne => builder.AddOneToOneRelationship(apiName, x =>
+                        {
+                            var apiRelationshipOneToOne = (ApiRelationshipOneToOne)apiRelationship;
+                            var apiPrincipalEnd = apiRelationshipOneToOne.ApiPrincipalEnd;
+                            var apiDependentEnd = apiRelationshipOneToOne.ApiDependentEnd;
+                            var clrPrincipalType = apiPrincipalEnd.ClrObjectType;
+
+                            x.WithPrincipalEnd(clrPrincipalType, p => p.ConfigureExtensions(apiPrincipalEnd));
+                            x.ConfigureDependentEnd(apiDependentEnd);
+                            x.WithDeleteBehavior(apiDeleteBehavior);
+                            x.ConfigureExtensions(apiRelationshipOneToOne);
+                        }),
+                    ApiRelationshipKind.OneToMany => builder.AddOneToManyRelationship(apiName, x =>
+                        {
+                            var apiRelationshipOneToMany = (ApiRelationshipOneToMany)apiRelationship;
+                            var apiPrincipalEnd = apiRelationshipOneToMany.ApiPrincipalEnd;
+                            var apiDependentEnd = apiRelationshipOneToMany.ApiDependentEnd;
+                            var clrPrincipalType = apiPrincipalEnd.ClrObjectType;
+
+                            x.WithPrincipalEnd(clrPrincipalType, p => p.ConfigureExtensions(apiPrincipalEnd));
+                            x.ConfigureDependentEnd(apiDependentEnd);
+                            x.WithDeleteBehavior(apiDeleteBehavior);
+                            x.ConfigureExtensions(apiRelationshipOneToMany);
+                        }),
+                    ApiRelationshipKind.ManyToMany => builder.AddManyToManyRelationship(apiName, x =>
+                    {
+                        var apiRelationshipManyToMany = (ApiRelationshipManyToMany)apiRelationship;
+                        var apiPrincipalEndA = apiRelationshipManyToMany.ApiPrincipalEndA;
+                        var apiPrincipalEndB = apiRelationshipManyToMany.ApiPrincipalEndB;
+                        var apiAssociation = apiRelationshipManyToMany.ApiAssociation;
+                        var clrPrincipalTypeA = apiPrincipalEndA.ClrObjectType;
+                        var clrPrincipalTypeB = apiPrincipalEndB.ClrObjectType;
+
+                        x.WithPrincipalEndA(clrPrincipalTypeA, p => p.ConfigureExtensions(apiPrincipalEndA));
+                        x.WithPrincipalEndB(clrPrincipalTypeB, p => p.ConfigureExtensions(apiPrincipalEndB));
+                        x.ConfigureAssociation(apiAssociation);
+                        x.WithDeleteBehavior(apiDeleteBehavior);
+                        x.ConfigureExtensions(apiRelationshipManyToMany);
+                    }),
+                    _ => throw new InvalidOperationException($"Unsupported {nameof(ApiRelationshipKind)}: {apiKind.SafeToString()}"),
+                };
             }
 
+            builder.ConfigureExtensions(this.ApiSchemaExpected!);
+
             this.ApiSchemaActual = builder.Build();
-            this.WriteLine($"ApiSchemaActual:   {this.ApiSchemaActual.SafeToString()}");
+            this.WriteLine("ApiSchemaActual:");
+            this.WriteLine($"{this.ApiSchemaActual.SafeToJson(_defaultToJsonOptions)}");
         }
         #endregion
     }
@@ -174,6 +240,11 @@ public partial class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTest
         {
             Name = $"Build '{ApiSchemaKind.Identity}' API schema",
             ApiSchemaKind = ApiSchemaKind.Identity,
+        },
+        new BuildTest
+        {
+            Name = $"Build '{ApiSchemaKind.Relationship}' API schema",
+            ApiSchemaKind = ApiSchemaKind.Relationship,
         },
     ];
     #endregion

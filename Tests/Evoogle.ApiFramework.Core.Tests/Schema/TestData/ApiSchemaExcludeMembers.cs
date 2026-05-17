@@ -35,8 +35,8 @@ public static class ApiSchemaExcludeMembers
         new ExcludeMember(typeof(ApiObjectType), nameof(ApiObjectType.ApiRelationshipPrincipalEnds)),
         new ExcludeMember(typeof(ApiObjectType), nameof(ApiObjectType.ApiRelationshipDependentEnds)),
 
-        // ApiRelationshipEnd — object type resolved during initialization
-        new ExcludeMember(typeof(ApiRelationshipEnd), nameof(ApiRelationshipEnd.ApiObjectType)),
+        // ApiRelationshipElement — object type resolved during initialization
+        new ExcludeMember(typeof(ApiRelationshipElement), nameof(ApiRelationshipElement.ApiObjectType)),
 
         // ApiRelationshipEnd — cycle: end → relationship → end → ...
         new ExcludeMember(typeof(ApiRelationshipEnd), nameof(ApiRelationshipEnd.ApiRelationship)),
@@ -46,6 +46,9 @@ public static class ApiSchemaExcludeMembers
 
         // ApiRelationshipPrincipalEnd — identity resolved during initialization
         new ExcludeMember(typeof(ApiRelationshipPrincipalEnd), nameof(ApiRelationshipPrincipalEnd.ApiIdentity)),
+
+        // ApiRelationshipOwnerKeyPath — key paths not available when using convention
+        new ExcludeMember(typeof(ApiRelationshipOwnerKeyPath), nameof(ApiRelationshipOwnerKeyPath.ApiKeyPaths)),
     ];
 
     public static readonly List<ExcludeMember> Standard =
@@ -100,5 +103,14 @@ public static class ApiSchemaExcludeMembers
         new ExcludeMember(typeof(ApiRelationshipNestedKeyPath), nameof(ApiRelationshipNestedKeyPath.ApiProperty)),
         new ExcludeMember(typeof(ApiRelationshipNestedKeyPath), nameof(ApiRelationshipNestedKeyPath.ApiObjectType)),
         new ExcludeMember(typeof(ApiRelationshipOwnerKeyPath), nameof(ApiRelationshipOwnerKeyPath.ApiObjectType)),
+
+        // ApiRelationshipDependentEnd — key paths not available on navigational (no-key-binding) dependent ends
+        new ExcludeMember(typeof(ApiRelationshipDependentEnd), nameof(ApiRelationshipDependentEnd.ApiKeyPaths)),
+
+        // ApiRelationshipOwnerKeyPath — key paths not available when using convention
+        new ExcludeMember(typeof(ApiRelationshipOwnerKeyPath), nameof(ApiRelationshipOwnerKeyPath.ApiKeyPaths)),
+
+        new ExcludeMember(typeof(ApiRelationshipElement), nameof(ApiRelationshipElement.ApiObjectType)),
+
     ];
 }
