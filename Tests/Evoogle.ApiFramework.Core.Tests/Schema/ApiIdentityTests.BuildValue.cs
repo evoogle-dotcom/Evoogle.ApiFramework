@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -247,7 +247,7 @@ public partial class ApiIdentityTests
         // Scalar identity — single part (int)
         new BuildValueFromInstanceTest
         {
-            Name = "Scalar identity with int value",
+            Name = $"{ScalarInstance} with primary identity",
             ApiObjectTypeName = nameof(IdentityScalar),
             ApiIdentityName = "PK_IdentityScalar",
             ClrInstance = ScalarInstance,
@@ -260,7 +260,7 @@ public partial class ApiIdentityTests
         // Scalar identity — alternate key (string)
         new BuildValueFromInstanceTest
         {
-            Name = "Alternate key identity with string value",
+            Name = $"{ScalarInstance} with alternate identity",
             ApiObjectTypeName = nameof(IdentityScalar),
             ApiIdentityName = "AK_IdentityScalar",
             ClrInstance = ScalarInstance,
@@ -273,7 +273,7 @@ public partial class ApiIdentityTests
         // Composite identity — two scalar parts (int + string)
         new BuildValueFromInstanceTest
         {
-            Name = "Composite identity with two scalar parts",
+            Name = $"{TwoPartInstance}",
             ApiObjectTypeName = nameof(IdentityTwoScalarPartComposite),
             ClrInstance = TwoPartInstance,
             ExpectedValue = ApiIdentityValue.Composite(
@@ -286,7 +286,7 @@ public partial class ApiIdentityTests
         // Composite identity — three scalar parts (int + string + Guid)
         new BuildValueFromInstanceTest
         {
-            Name = "Composite identity with three scalar parts",
+            Name = $"{ThreePartInstance}",
             ApiObjectTypeName = nameof(IdentityThreeScalarPartComposite),
             ClrInstance = ThreePartInstance,
             ExpectedValue = ApiIdentityValue.Composite(
@@ -300,7 +300,7 @@ public partial class ApiIdentityTests
         // Nested identity — composite with nested object part
         new BuildValueFromInstanceTest
         {
-            Name = "Composite identity with nested object part",
+            Name = $"{NestedCompositeInstance}",
             ApiObjectTypeName = nameof(IdentityNestedComposite),
             ClrInstance = NestedCompositeInstance,
             ExpectedValue = ApiIdentityValue.Composite(
@@ -317,7 +317,7 @@ public partial class ApiIdentityTests
         // Owner identity — owned composite with owner instance
         new BuildValueFromInstanceTest
         {
-            Name = "Owned composite identity with owner instance",
+            Name = $"{OwnedCompositeInstance} with owner {OwnerInstance}",
             ApiObjectTypeName = nameof(IdentityOwnedComposite),
             ClrInstance = OwnedCompositeInstance,
             ClrOwnerInstance = OwnerInstance,
@@ -335,7 +335,7 @@ public partial class ApiIdentityTests
         // Owner identity — owned dependent with owner only
         new BuildValueFromInstanceTest
         {
-            Name = "Owned dependent identity with owner only",
+            Name = $"{OwnedDependentInstance} with owner {OwnerInstance}",
             ApiObjectTypeName = nameof(IdentityOwnedDependent),
             ClrInstance = OwnedDependentInstance,
             ClrOwnerInstance = OwnerInstance,
@@ -349,10 +349,10 @@ public partial class ApiIdentityTests
             ])
         },
 
-        // Null handling — ReturnEmpty: scalar with null value
+        // Null handling — UseDefaultOnNull: scalar with null value
         new BuildValueFromInstanceTest
         {
-            Name = "Scalar null value returns empty with ReturnEmpty",
+            Name = $"{TwoPartNullId2Instance} returns empty with {ApiIdentityPartNullHandling.UseDefaultOnNull}",
             ApiObjectTypeName = nameof(IdentityTwoScalarPartComposite),
             ClrInstance = TwoPartNullId2Instance,
             NullHandling = ApiIdentityPartNullHandling.UseDefaultOnNull,
@@ -363,10 +363,10 @@ public partial class ApiIdentityTests
             ])
         },
 
-        // Null handling — ReturnEmpty: nested with null object
+        // Null handling — UseDefaultOnNull: nested with null object
         new BuildValueFromInstanceTest
         {
-            Name = "Nested null object returns skeleton with ReturnEmpty",
+            Name = $"{NestedCompositeNullNestedPartInstance} returns skeleton with {ApiIdentityPartNullHandling.UseDefaultOnNull}",
             ApiObjectTypeName = nameof(IdentityNestedComposite),
             ClrInstance = NestedCompositeNullNestedPartInstance,
             NullHandling = ApiIdentityPartNullHandling.UseDefaultOnNull,
@@ -380,10 +380,10 @@ public partial class ApiIdentityTests
             ])
         },
 
-        // Null handling — ReturnEmpty: owner with null owner instance
+        // Null handling — UseDefaultOnNull: owner with null owner instance
         new BuildValueFromInstanceTest
         {
-            Name = "Null owner instance returns skeleton with ReturnEmpty",
+            Name = $"{OwnedCompositeInstance} with null owner returns skeleton with {ApiIdentityPartNullHandling.UseDefaultOnNull}",
             ApiObjectTypeName = nameof(IdentityOwnedComposite),
             ClrInstance = OwnedCompositeInstance,
             ClrOwnerInstance = null,
@@ -398,30 +398,30 @@ public partial class ApiIdentityTests
             ])
         },
 
-        // Null handling — ThrowException: scalar with null value
+        // Null handling — ThrowOnNull: scalar with null value
         new BuildValueFromInstanceTest
         {
-            Name = "Scalar null value throws with ThrowException",
+            Name = $"{TwoPartNullId2Instance} throws with {ApiIdentityPartNullHandling.ThrowOnNull}",
             ApiObjectTypeName = nameof(IdentityTwoScalarPartComposite),
             ClrInstance = TwoPartNullId2Instance,
             NullHandling = ApiIdentityPartNullHandling.ThrowOnNull,
             ExpectedExceptionType = typeof(ApiIdentityException)
         },
 
-        // Null handling — ThrowException: nested with null object
+        // Null handling — ThrowOnNull: nested with null object
         new BuildValueFromInstanceTest
         {
-            Name = "Nested null object throws with ThrowException",
+            Name = $"{NestedCompositeNullNestedPartInstance} throws with {ApiIdentityPartNullHandling.ThrowOnNull}",
             ApiObjectTypeName = nameof(IdentityNestedComposite),
             ClrInstance = NestedCompositeNullNestedPartInstance,
             NullHandling = ApiIdentityPartNullHandling.ThrowOnNull,
             ExpectedExceptionType = typeof(ApiIdentityException)
         },
 
-        // Null handling — ThrowException: owner with null owner instance
+        // Null handling — ThrowOnNull: owner with null owner instance
         new BuildValueFromInstanceTest
         {
-            Name = "Null owner instance throws with ThrowException",
+            Name = $"{OwnedCompositeInstance} with null owner throws with {ApiIdentityPartNullHandling.ThrowOnNull}",
             ApiObjectTypeName = nameof(IdentityOwnedComposite),
             ClrInstance = OwnedCompositeInstance,
             ClrOwnerInstance = null,
@@ -437,7 +437,7 @@ public partial class ApiIdentityTests
         // Scalar identity from dictionary (int)
         new BuildValueFromValuesTest
         {
-            Name = "Scalar identity from dictionary with int value",
+            Name = $"{nameof(IdentityScalar)} with primary identity",
             ApiObjectTypeName = nameof(IdentityScalar),
             ApiIdentityName = "PK_IdentityScalar",
             Values = new Dictionary<string, object?> { ["Id"] = 42 },
@@ -450,7 +450,7 @@ public partial class ApiIdentityTests
         // Alternate key from dictionary (string)
         new BuildValueFromValuesTest
         {
-            Name = "Alternate key identity from dictionary with string value",
+            Name = $"{nameof(IdentityScalar)} with alternate identity",
             ApiObjectTypeName = nameof(IdentityScalar),
             ApiIdentityName = "AK_IdentityScalar",
             Values = new Dictionary<string, object?> { ["Name"] = "TestName" },
@@ -463,7 +463,7 @@ public partial class ApiIdentityTests
         // Composite identity from dictionary — two parts
         new BuildValueFromValuesTest
         {
-            Name = "Composite identity from dictionary with two scalar parts",
+            Name = $"{nameof(IdentityTwoScalarPartComposite)}",
             ApiObjectTypeName = nameof(IdentityTwoScalarPartComposite),
             Values = new Dictionary<string, object?> { ["Id1"] = 1, ["Id2"] = "abc" },
             ExpectedValue = ApiIdentityValue.Composite(
@@ -476,7 +476,7 @@ public partial class ApiIdentityTests
         // Composite identity from dictionary — three parts
         new BuildValueFromValuesTest
         {
-            Name = "Composite identity from dictionary with three scalar parts",
+            Name = $"{nameof(IdentityThreeScalarPartComposite)}",
             ApiObjectTypeName = nameof(IdentityThreeScalarPartComposite),
             Values = new Dictionary<string, object?>
             {
@@ -495,7 +495,7 @@ public partial class ApiIdentityTests
         // Nested identity from dictionary — nested dict
         new BuildValueFromValuesTest
         {
-            Name = "Nested identity from dictionary with nested dictionary",
+            Name = $"{nameof(IdentityNestedComposite)} with nested dictionary",
             ApiObjectTypeName = nameof(IdentityNestedComposite),
             Values = new Dictionary<string, object?>
             {
@@ -516,7 +516,7 @@ public partial class ApiIdentityTests
         // Nested identity from dictionary — CLR object fallback
         new BuildValueFromValuesTest
         {
-            Name = "Nested identity from dictionary with CLR instance fallback",
+            Name = $"{nameof(IdentityNestedComposite)} with CLR instance fallback",
             ApiObjectTypeName = nameof(IdentityNestedComposite),
             Values = new Dictionary<string, object?>
             {
@@ -537,7 +537,7 @@ public partial class ApiIdentityTests
         // Owner identity from dictionary — with owner values
         new BuildValueFromValuesTest
         {
-            Name = "Owner identity from dictionary with owner values",
+            Name = $"{nameof(IdentityOwnedComposite)}",
             ApiObjectTypeName = nameof(IdentityOwnedComposite),
             Values = new Dictionary<string, object?> { ["LineNumber"] = 3 },
             OwnerValues = new Dictionary<string, object?> { ["Id"] = 99 },
@@ -555,7 +555,7 @@ public partial class ApiIdentityTests
         // Owner-only identity from dictionary
         new BuildValueFromValuesTest
         {
-            Name = "Owner-only identity from dictionary",
+            Name = $"{nameof(IdentityOwnedDependent)}",
             ApiObjectTypeName = nameof(IdentityOwnedDependent),
             Values = new Dictionary<string, object?>(),
             OwnerValues = new Dictionary<string, object?> { ["Id"] = 99 },
@@ -569,10 +569,10 @@ public partial class ApiIdentityTests
             ])
         },
 
-        // Null handling — ReturnEmpty: missing key in dictionary
+        // Null handling — UseDefaultOnNull: missing key in dictionary
         new BuildValueFromValuesTest
         {
-            Name = "Missing key in dictionary returns empty with ReturnEmpty",
+            Name = $"Missing key in dictionary returns empty with {ApiIdentityPartNullHandling.UseDefaultOnNull}",
             ApiObjectTypeName = nameof(IdentityTwoScalarPartComposite),
             Values = new Dictionary<string, object?> { ["Id1"] = 1 },
             NullHandling = ApiIdentityPartNullHandling.UseDefaultOnNull,
@@ -583,10 +583,10 @@ public partial class ApiIdentityTests
             ])
         },
 
-        // Null handling — ReturnEmpty: null value in dictionary
+        // Null handling — UseDefaultOnNull: null value in dictionary
         new BuildValueFromValuesTest
         {
-            Name = "Null value in dictionary returns empty with ReturnEmpty",
+            Name = $"Null value in dictionary returns empty with {ApiIdentityPartNullHandling.UseDefaultOnNull}",
             ApiObjectTypeName = nameof(IdentityTwoScalarPartComposite),
             Values = new Dictionary<string, object?> { ["Id1"] = 1, ["Id2"] = null },
             NullHandling = ApiIdentityPartNullHandling.UseDefaultOnNull,
@@ -597,10 +597,10 @@ public partial class ApiIdentityTests
             ])
         },
 
-        // Null handling — ReturnEmpty: null nested value
+        // Null handling — UseDefaultOnNull: null nested value
         new BuildValueFromValuesTest
         {
-            Name = "Null nested value in dictionary returns skeleton with ReturnEmpty",
+            Name = $"Null nested value in dictionary returns skeleton with {ApiIdentityPartNullHandling.UseDefaultOnNull}",
             ApiObjectTypeName = nameof(IdentityNestedComposite),
             Values = new Dictionary<string, object?> { ["NestedPart"] = null, ["Name"] = "NoNested" },
             NullHandling = ApiIdentityPartNullHandling.UseDefaultOnNull,
@@ -614,10 +614,10 @@ public partial class ApiIdentityTests
             ])
         },
 
-        // Null handling — ReturnEmpty: null owner values
+        // Null handling — UseDefaultOnNull: null owner values
         new BuildValueFromValuesTest
         {
-            Name = "Null owner values returns skeleton with ReturnEmpty",
+            Name = $"Null owner values returns skeleton with {ApiIdentityPartNullHandling.UseDefaultOnNull}",
             ApiObjectTypeName = nameof(IdentityOwnedComposite),
             Values = new Dictionary<string, object?> { ["LineNumber"] = 3 },
             OwnerValues = null,
@@ -632,40 +632,40 @@ public partial class ApiIdentityTests
             ])
         },
 
-        // Null handling — ThrowException: missing key
+        // Null handling — ThrowOnNull: missing key
         new BuildValueFromValuesTest
         {
-            Name = "Missing key in dictionary throws with ThrowException",
+            Name = $"Missing key in dictionary throws with {ApiIdentityPartNullHandling.ThrowOnNull}",
             ApiObjectTypeName = nameof(IdentityTwoScalarPartComposite),
             Values = new Dictionary<string, object?> { ["Id1"] = 1 },
             NullHandling = ApiIdentityPartNullHandling.ThrowOnNull,
             ExpectedExceptionType = typeof(ApiIdentityException)
         },
 
-        // Null handling — ThrowException: null value
+        // Null handling — ThrowOnNull: null value
         new BuildValueFromValuesTest
         {
-            Name = "Null value in dictionary throws with ThrowException",
+            Name = $"Null value in dictionary throws with {ApiIdentityPartNullHandling.ThrowOnNull}",
             ApiObjectTypeName = nameof(IdentityTwoScalarPartComposite),
             Values = new Dictionary<string, object?> { ["Id1"] = 1, ["Id2"] = null },
             NullHandling = ApiIdentityPartNullHandling.ThrowOnNull,
             ExpectedExceptionType = typeof(ApiIdentityException)
         },
 
-        // Null handling — ThrowException: null nested value
+        // Null handling — ThrowOnNull: null nested value
         new BuildValueFromValuesTest
         {
-            Name = "Null nested value in dictionary throws with ThrowException",
+            Name = $"Null nested value in dictionary throws with {ApiIdentityPartNullHandling.ThrowOnNull}",
             ApiObjectTypeName = nameof(IdentityNestedComposite),
             Values = new Dictionary<string, object?> { ["NestedPart"] = null, ["Name"] = "Nested" },
             NullHandling = ApiIdentityPartNullHandling.ThrowOnNull,
             ExpectedExceptionType = typeof(ApiIdentityException)
         },
 
-        // Null handling — ThrowException: null owner values
+        // Null handling — ThrowOnNull: null owner values
         new BuildValueFromValuesTest
         {
-            Name = "Null owner values throws with ThrowException",
+            Name = $"Null owner values throws with {ApiIdentityPartNullHandling.ThrowOnNull}",
             ApiObjectTypeName = nameof(IdentityOwnedComposite),
             Values = new Dictionary<string, object?> { ["LineNumber"] = 3 },
             OwnerValues = null,

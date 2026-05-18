@@ -40,7 +40,7 @@ public class IdentityTwoScalarPartComposite
         var id2 = this.Id2.SafeToString();
         var description = this.Description.SafeToString();
 
-        return $"{nameof(IdentityTwoScalarPartComposite)} {{{nameof(this.Id1)}={id1}, {nameof(this.Id2)}={id2}, {nameof(this.Description)}={description}}}";
+        return $"{nameof(IdentityTwoScalarPartComposite)} {{{nameof(this.Id1)}={id1}, {nameof(this.Id2)}={id2}}}";
     }
 }
 
@@ -61,7 +61,7 @@ public class IdentityThreeScalarPartComposite
         var id3 = this.Id3.SafeToString();
         var description = this.Description.SafeToString();
 
-        return $"{nameof(IdentityThreeScalarPartComposite)} {{{nameof(this.Id1)}={id1}, {nameof(this.Id2)}={id2}, {nameof(this.Id3)}={id3}, {nameof(this.Description)}={description}}}";
+        return $"{nameof(IdentityThreeScalarPartComposite)} {{{nameof(this.Id1)}={id1}, {nameof(this.Id2)}={id2}, {nameof(this.Id3)}={id3}}}";
     }
 }
 
@@ -78,7 +78,7 @@ public class IdentityNested
         var id = this.Id.SafeToString();
         var description = this.Description.SafeToString();
 
-        return $"{nameof(IdentityNested)} {{{nameof(this.Id)}={id}, {nameof(this.Description)}={description}}}";
+        return $"{nameof(IdentityNested)} {{{nameof(this.Id)}={id}}}";
     }
 }
 
@@ -116,7 +116,7 @@ public class IdentityOwner
         var dependents = $"[{this.Dependents.SafeToDelimitedString(',')}]";
         var dependent = this.Dependent.SafeToString();
 
-        return $"{nameof(IdentityOwner)} {{{nameof(this.Id)}={id}, {nameof(this.Description)}={description}, {nameof(this.Dependents)}={dependents}, {nameof(this.Dependent)}={dependent}}}";
+        return $"{nameof(IdentityOwner)} {{{nameof(this.Id)}={id}}}";
     }
 }
 
@@ -133,7 +133,7 @@ public class IdentityOwnedComposite
         var lineNumber = this.LineNumber.SafeToString();
         var description = this.Description.SafeToString();
 
-        return $"{nameof(IdentityOwnedComposite)} {{{nameof(this.LineNumber)}={lineNumber}, {nameof(this.Description)}={description}}}";
+        return $"{nameof(IdentityOwnedComposite)} {{{nameof(this.LineNumber)}={lineNumber}}}";
     }
 }
 
@@ -148,6 +148,6 @@ public class IdentityOwnedDependent
     {
         var description = this.Description.SafeToString();
 
-        return $"{nameof(IdentityOwnedDependent)} {{{nameof(this.Description)}={description}}}";
+        return $"{nameof(IdentityOwnedDependent)}";
     }
 }
