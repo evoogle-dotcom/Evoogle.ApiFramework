@@ -672,13 +672,19 @@ public sealed class ApiSchema : ExtensibleBase
             }
         }
 
-        void Collect(ApiRelationshipEnd end, ApiRelationship relationship)
+        void Collect(ApiRelationshipEnd? end, ApiRelationship relationship)
         {
+            if (end is null)
+            {
+                // Already reported as API_RELATIONSHIP_NULL_PRINCIPAL_END or API_RELATIONSHIP_NULL_DEPENDENT_END (Error).
+                return;
+            }
+
             end.SetRelationship(relationship);
 
-            if (!this.TryGetObjectTypeByClrType(end.ClrObjectType, out var apiObjectType))
+            if (end.ClrObjectType is null || !this.TryGetObjectTypeByClrType(end.ClrObjectType, out var apiObjectType))
             {
-                // Already reported as API_RELATIONSHIP_ELEMENT_UNRESOLVED_OBJECT_TYPE (Error).
+                // Already reported as API_RELATIONSHIP_ELEMENT_NULL_CLR_OBJECT_TYPE or API_RELATIONSHIP_ELEMENT_UNRESOLVED_OBJECT_TYPE (Error).
                 return;
             }
 

@@ -89,6 +89,39 @@ public partial class ApiSchemaTests
         public int Id { get; set; }
         public OwnedType? Item { get; set; }
     }
+
+    public class RelPrincipalType
+    {
+        public int Id { get; set; }
+    }
+
+    public class RelPrincipalBType
+    {
+        public int Id { get; set; }
+    }
+
+    public class RelDependentType
+    {
+        public int PrincipalId { get; set; }
+        public int PrincipalId2 { get; set; }
+    }
+
+    public class RelAssociationType
+    {
+        public int PrincipalAId { get; set; }
+        public int PrincipalBId { get; set; }
+    }
+
+    public class RelNestedType
+    {
+        public int Id { get; set; }
+    }
+
+    public class RelDependentWithObjectType
+    {
+        public int PrincipalId { get; set; }
+        public RelNestedType? Nested { get; set; }
+    }
     #endregion
 
     #region Theory Data
@@ -1491,90 +1524,6 @@ public partial class ApiSchemaTests
             ]
         },
 
-        // ApiIdentityScalarPart warns if identity part requires string parsing for a non-string scalar type
-        new InitializeThrowsTest
-        {
-            Name = $"{nameof(ApiIdentityScalarPart)} Warns If {nameof(String)} Requires Coercion",
-            SourceJson = @"
-            {
-                ""ApiName"": ""ApiIdentityScalarPart Warns If String Requires Coercion"",
-                ""ApiScalarTypes"": [
-                    {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""Int32"",
-                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
-                    },
-                    {
-                        ""ApiKind"": ""Scalar"",
-                        ""ApiName"": ""String"",
-                        ""ClrType"": ""System.String, System.Private.CoreLib""
-                    }
-                ],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
-                    {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""IdentityScalar"",
-                        ""ApiIdentities"": [
-                            {
-                                ""ApiName"": """",
-                                ""ApiIdentityParts"": [
-                                    {
-                                        ""ApiKind"": ""Scalar"",
-                                        ""ClrPropertyName"": ""Id"",
-                                        ""ClrScalarTypeHint"": ""System.String,System.Private.CoreLib""
-                                    }
-                                ]
-                            }
-                        ],
-                        ""ApiProperties"": [
-                            {
-                                ""ApiName"": ""Id"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""Int32""
-                                },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Id"",
-                                ""ClrMemberKind"": ""Property""
-                            },
-                            {
-                                ""ApiName"": ""Name"",
-                                ""ApiType"": {
-                                    ""ApiKind"": ""Scalar"",
-                                    ""ApiName"": ""String""
-                                },
-                                ""ApiTypeModifiers"": ""Required"",
-                                ""ClrName"": ""Name"",
-                                ""ClrMemberKind"": ""Property""
-                            }
-                        ],
-                        ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityScalar, Evoogle.ApiFramework.Core.Tests""
-                    }
-                ]
-            }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=2, Errors=1, Warnings=1.",
-            ExpectedIssues =
-            [
-                new ApiInitializationIssue
-                (
-                    path: $"{nameof(ApiObjectType)}[\"IdentityScalar\"].{nameof(ApiIdentity)}",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.API_IDENTITY_INVALID_API_NAME,
-                    description: $"{nameof(ApiIdentity.ApiName)} must not be null, empty, or whitespace",
-                    remediation: $"Specify a valid {nameof(ApiIdentity.ApiName)} value"
-                ),
-                new ApiInitializationIssue
-                (
-                    path: $"{nameof(ApiObjectType)}[\"IdentityScalar\"].{nameof(ApiIdentity)}.{nameof(ApiIdentityScalarPart)}[\"Id\"]",
-                    severity: ApiInitializationSeverity.Warning,
-                    code: ApiInitializationCode.API_IDENTITY_PART_PERFORMANCE_CONCERN,
-                    description: $"Identity part 'Id' has CLR property type {nameof(Int32)} but resolves to scalar type {nameof(String)}, requiring string parse/format on every identity operation",
-                    remediation: $"Align the 'Id' property type with the resolved scalar type {nameof(String)} to eliminate string coercion, or accept the overhead if the type mismatch is intentional"
-                ),
-            ]
-        },
-
         // ApiIdentityScalarPart throws if the identity property is not an ApiScalarType
         new InitializeThrowsTest
         {
@@ -2149,46 +2098,6 @@ public partial class ApiSchemaTests
         //
         // ApiObjectType Initialization Tests
         //
-
-        // ApiObjectType throws if ApiProperties is null or empty
-        new InitializeThrowsTest
-        {
-            Name = $"{nameof(ApiObjectType)} Throws If ApiProperties Is Null Or Empty",
-            SourceJson = @"
-            {
-                ""ApiName"": ""ApiObjectType Throws If ApiProperties Is Null Or Empty"",
-                ""ApiScalarTypes"": [],
-                ""ApiEnumTypes"": [],
-                ""ApiObjectTypes"": [
-                    {
-                        ""ApiKind"": ""Object"",
-                        ""ApiName"": ""Empty"",
-                        ""ApiProperties"": [],
-                        ""ClrType"": null
-                    }
-                ]
-            }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=2, Errors=1, Warnings=1.",
-            ExpectedIssues =
-            [
-                new ApiInitializationIssue
-                (
-                    path: $"{nameof(ApiObjectType)}[\"Empty\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.API_TYPE_NULL_CLR_TYPE,
-                    description: $"{nameof(ApiObjectType.ClrType)} must not be null",
-                    remediation: "Specify a valid ClrType"
-                ),
-                new ApiInitializationIssue
-                (
-                    path: $"{nameof(ApiObjectType)}[\"Empty\"]",
-                    severity: ApiInitializationSeverity.Warning,
-                    code: ApiInitializationCode.API_OBJECT_TYPE_NULL_OR_EMPTY_PROPERTIES,
-                    description: $"{nameof(ApiObjectType.ApiProperties)} is null or empty",
-                    remediation: $"Add at least one {nameof(ApiProperty)} to {nameof(ApiObjectType)}[\"Empty\"]"
-                ),
-            ]
-        },
 
         // ApiObjectType throws if ApiProperties has duplicate ApiName
         new InitializeThrowsTest
@@ -2903,10 +2812,1255 @@ public partial class ApiSchemaTests
                 ),
             ]
         },
+
+        //
+        // ApiRelationship Initialization Tests
+        //
+
+        // ApiRelationship throws if ApiName is invalid (empty)
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiRelationship)} Throws If {nameof(ApiRelationship.ApiName)} Is Invalid",
+            SourceJson = @"
+            {
+                ""ApiName"": ""ApiRelationship Throws If ApiName Is Invalid"",
+                ""ApiScalarTypes"": [
+                    { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"", ""ClrType"": ""System.Int32, System.Private.CoreLib"" }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""RelPrincipal"",
+                        ""ApiIdentities"": [
+                            { ""ApiName"": ""Id"", ""ApiIdentityParts"": [ { ""ApiKind"": ""Scalar"", ""ClrPropertyName"": ""Id"" } ] }
+                        ],
+                        ""ApiProperties"": [
+                            { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Core.Tests""
+                    },
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""RelDependent"",
+                        ""ApiProperties"": [
+                            { ""ApiName"": ""PrincipalId"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""PrincipalId"", ""ClrMemberKind"": ""Property"" }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ],
+                ""ApiRelationships"": [
+                    {
+                        ""ApiKind"": ""OneToMany"",
+                        ""ApiName"": """",
+                        ""ApiPrincipalEnd"": { ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Core.Tests"" },
+                        ""ApiDependentEnd"": { ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Core.Tests"" }
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiRelationshipOneToMany)}",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_RELATIONSHIP_INVALID_API_NAME,
+                    description: $"{nameof(ApiRelationship.ApiName)} must not be null, empty, or whitespace",
+                    remediation: $"Specify a valid {nameof(ApiRelationship.ApiName)} value"
+                ),
+            ]
+        },
+
+        // ApiRelationshipOneTo throws if ApiPrincipalEnd is null
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiRelationshipOneTo)} Throws If {nameof(ApiRelationshipOneTo.ApiPrincipalEnd)} Is Null",
+            SourceJson = @"
+            {
+                ""ApiName"": ""ApiRelationshipOneTo Throws If ApiPrincipalEnd Is Null"",
+                ""ApiScalarTypes"": [
+                    { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"", ""ClrType"": ""System.Int32, System.Private.CoreLib"" }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""RelDependent"",
+                        ""ApiProperties"": [
+                            { ""ApiName"": ""PrincipalId"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""PrincipalId"", ""ClrMemberKind"": ""Property"" }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ],
+                ""ApiRelationships"": [
+                    {
+                        ""ApiKind"": ""OneToMany"",
+                        ""ApiName"": ""TestRel"",
+                        ""ApiDependentEnd"": { ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Core.Tests"" }
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"]",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_RELATIONSHIP_NULL_PRINCIPAL_END,
+                    description: $"{nameof(ApiRelationshipOneTo.ApiPrincipalEnd)} must not be null",
+                    remediation: $"Provide a valid {nameof(ApiRelationshipPrincipalEnd)}"
+                ),
+            ]
+        },
+
+        // ApiRelationshipOneTo throws if ApiDependentEnd is null
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiRelationshipOneTo)} Throws If {nameof(ApiRelationshipOneTo.ApiDependentEnd)} Is Null",
+            SourceJson = @"
+            {
+                ""ApiName"": ""ApiRelationshipOneTo Throws If ApiDependentEnd Is Null"",
+                ""ApiScalarTypes"": [
+                    { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"", ""ClrType"": ""System.Int32, System.Private.CoreLib"" }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""RelPrincipal"",
+                        ""ApiIdentities"": [
+                            { ""ApiName"": ""Id"", ""ApiIdentityParts"": [ { ""ApiKind"": ""Scalar"", ""ClrPropertyName"": ""Id"" } ] }
+                        ],
+                        ""ApiProperties"": [
+                            { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ],
+                ""ApiRelationships"": [
+                    {
+                        ""ApiKind"": ""OneToMany"",
+                        ""ApiName"": ""TestRel"",
+                        ""ApiPrincipalEnd"": { ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Core.Tests"" }
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"]",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_RELATIONSHIP_NULL_DEPENDENT_END,
+                    description: $"{nameof(ApiRelationshipOneTo.ApiDependentEnd)} must not be null",
+                    remediation: $"Provide a valid {nameof(ApiRelationshipDependentEnd)}"
+                ),
+            ]
+        },
+
+        // ApiRelationshipElement throws if ClrObjectType is null
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiRelationshipElement)} Throws If {nameof(ApiRelationshipElement.ClrObjectType)} Is Null",
+            SourceJson = @"
+            {
+                ""ApiName"": ""ApiRelationshipElement Throws If ClrObjectType Is Null"",
+                ""ApiScalarTypes"": [
+                    { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"", ""ClrType"": ""System.Int32, System.Private.CoreLib"" }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""RelDependent"",
+                        ""ApiProperties"": [
+                            { ""ApiName"": ""PrincipalId"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""PrincipalId"", ""ClrMemberKind"": ""Property"" }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ],
+                ""ApiRelationships"": [
+                    {
+                        ""ApiKind"": ""OneToMany"",
+                        ""ApiName"": ""TestRel"",
+                        ""ApiPrincipalEnd"": { },
+                        ""ApiDependentEnd"": { ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Core.Tests"" }
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"].{nameof(ApiRelationshipPrincipalEnd)}",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_RELATIONSHIP_ELEMENT_NULL_CLR_OBJECT_TYPE,
+                    description: $"{nameof(ApiRelationshipElement.ClrObjectType)} must not be null",
+                    remediation: $"Specify a valid {nameof(ApiRelationshipElement.ClrObjectType)} value"
+                ),
+            ]
+        },
+
+        // ApiRelationshipElement throws if ClrObjectType is not registered as an ApiObjectType
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiRelationshipElement)} Throws If {nameof(ApiRelationshipElement.ClrObjectType)} Is Unresolved",
+            SourceJson = @"
+            {
+                ""ApiName"": ""ApiRelationshipElement Throws If ClrObjectType Is Unresolved"",
+                ""ApiScalarTypes"": [
+                    { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"", ""ClrType"": ""System.Int32, System.Private.CoreLib"" }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""RelDependent"",
+                        ""ApiProperties"": [
+                            { ""ApiName"": ""PrincipalId"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""PrincipalId"", ""ClrMemberKind"": ""Property"" }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ],
+                ""ApiRelationships"": [
+                    {
+                        ""ApiKind"": ""OneToMany"",
+                        ""ApiName"": ""TestRel"",
+                        ""ApiPrincipalEnd"": { ""ClrObjectType"": ""System.Object, System.Private.CoreLib"" },
+                        ""ApiDependentEnd"": { ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Core.Tests"" }
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"].{nameof(ApiRelationshipPrincipalEnd)}",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_RELATIONSHIP_ELEMENT_UNRESOLVED_OBJECT_TYPE,
+                    description: $"No {nameof(ApiObjectType)} is registered for CLR type '{typeof(object).FullName}'",
+                    remediation: $"Use one of the available object types: 'RelDependent' ({nameof(RelDependentType)})"
+                ),
+            ]
+        },
+
+        // ApiRelationshipPrincipalEnd throws if referenced ApiIdentityName cannot be resolved
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiRelationshipPrincipalEnd)} Throws If {nameof(ApiRelationshipPrincipalEnd.ApiIdentityName)} Is Unresolved",
+            SourceJson = @"
+            {
+                ""ApiName"": ""ApiRelationshipPrincipalEnd Throws If ApiIdentityName Is Unresolved"",
+                ""ApiScalarTypes"": [
+                    { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"", ""ClrType"": ""System.Int32, System.Private.CoreLib"" }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""RelPrincipal"",
+                        ""ApiIdentities"": [
+                            { ""ApiName"": ""Id"", ""ApiIdentityParts"": [ { ""ApiKind"": ""Scalar"", ""ClrPropertyName"": ""Id"" } ] }
+                        ],
+                        ""ApiProperties"": [
+                            { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Core.Tests""
+                    },
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""RelDependent"",
+                        ""ApiProperties"": [
+                            { ""ApiName"": ""PrincipalId"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""PrincipalId"", ""ClrMemberKind"": ""Property"" }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ],
+                ""ApiRelationships"": [
+                    {
+                        ""ApiKind"": ""OneToMany"",
+                        ""ApiName"": ""TestRel"",
+                        ""ApiPrincipalEnd"": {
+                            ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Core.Tests"",
+                            ""ApiIdentityName"": ""NonExistentIdentity""
+                        },
+                        ""ApiDependentEnd"": { ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Core.Tests"" }
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"].{nameof(ApiRelationshipPrincipalEnd)}",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_RELATIONSHIP_END_UNRESOLVED_IDENTITY,
+                    description: "Referenced identity 'NonExistentIdentity' could not be found on object type 'RelPrincipal'",
+                    remediation: "Use one of the available identities: 'Id'"
+                ),
+            ]
+        },
+
+        // ApiRelationshipManyToMany throws if ApiPrincipalEndA is null
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiRelationshipManyToMany)} Throws If {nameof(ApiRelationshipManyToMany.ApiPrincipalEndA)} Is Null",
+            SourceJson = @"
+            {
+                ""ApiName"": ""ApiRelationshipManyToMany Throws If ApiPrincipalEndA Is Null"",
+                ""ApiScalarTypes"": [
+                    { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"", ""ClrType"": ""System.Int32, System.Private.CoreLib"" }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""RelPrincipal"",
+                        ""ApiIdentities"": [
+                            { ""ApiName"": ""Id"", ""ApiIdentityParts"": [ { ""ApiKind"": ""Scalar"", ""ClrPropertyName"": ""Id"" } ] }
+                        ],
+                        ""ApiProperties"": [
+                            { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Core.Tests""
+                    },
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""RelAssociation"",
+                        ""ApiProperties"": [
+                            { ""ApiName"": ""PrincipalAId"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""PrincipalAId"", ""ClrMemberKind"": ""Property"" },
+                            { ""ApiName"": ""PrincipalBId"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""PrincipalBId"", ""ClrMemberKind"": ""Property"" }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ],
+                ""ApiRelationships"": [
+                    {
+                        ""ApiKind"": ""ManyToMany"",
+                        ""ApiName"": ""TestRel"",
+                        ""ApiPrincipalEndB"": { ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Core.Tests"" },
+                        ""ApiAssociation"": { ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Core.Tests"" }
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiRelationshipManyToMany)}[\"TestRel\"]",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_RELATIONSHIP_MANY_TO_MANY_NULL_PRINCIPAL_END_A,
+                    description: $"{nameof(ApiRelationshipManyToMany.ApiPrincipalEndA)} must not be null",
+                    remediation: $"Provide a valid {nameof(ApiRelationshipPrincipalEnd)} for end A"
+                ),
+            ]
+        },
+
+        // ApiRelationshipManyToMany throws if ApiPrincipalEndB is null
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiRelationshipManyToMany)} Throws If {nameof(ApiRelationshipManyToMany.ApiPrincipalEndB)} Is Null",
+            SourceJson = @"
+            {
+                ""ApiName"": ""ApiRelationshipManyToMany Throws If ApiPrincipalEndB Is Null"",
+                ""ApiScalarTypes"": [
+                    { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"", ""ClrType"": ""System.Int32, System.Private.CoreLib"" }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""RelPrincipal"",
+                        ""ApiIdentities"": [
+                            { ""ApiName"": ""Id"", ""ApiIdentityParts"": [ { ""ApiKind"": ""Scalar"", ""ClrPropertyName"": ""Id"" } ] }
+                        ],
+                        ""ApiProperties"": [
+                            { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Core.Tests""
+                    },
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""RelAssociation"",
+                        ""ApiProperties"": [
+                            { ""ApiName"": ""PrincipalAId"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""PrincipalAId"", ""ClrMemberKind"": ""Property"" },
+                            { ""ApiName"": ""PrincipalBId"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""PrincipalBId"", ""ClrMemberKind"": ""Property"" }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ],
+                ""ApiRelationships"": [
+                    {
+                        ""ApiKind"": ""ManyToMany"",
+                        ""ApiName"": ""TestRel"",
+                        ""ApiPrincipalEndA"": { ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Core.Tests"" },
+                        ""ApiAssociation"": { ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Core.Tests"" }
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiRelationshipManyToMany)}[\"TestRel\"]",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_RELATIONSHIP_MANY_TO_MANY_NULL_PRINCIPAL_END_B,
+                    description: $"{nameof(ApiRelationshipManyToMany.ApiPrincipalEndB)} must not be null",
+                    remediation: $"Provide a valid {nameof(ApiRelationshipPrincipalEnd)} for end B"
+                ),
+            ]
+        },
+
+        // ApiRelationshipManyToMany throws if ApiAssociation is null
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiRelationshipManyToMany)} Throws If {nameof(ApiRelationshipManyToMany.ApiAssociation)} Is Null",
+            SourceJson = @"
+            {
+                ""ApiName"": ""ApiRelationshipManyToMany Throws If ApiAssociation Is Null"",
+                ""ApiScalarTypes"": [
+                    { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"", ""ClrType"": ""System.Int32, System.Private.CoreLib"" }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""RelPrincipal"",
+                        ""ApiIdentities"": [
+                            { ""ApiName"": ""Id"", ""ApiIdentityParts"": [ { ""ApiKind"": ""Scalar"", ""ClrPropertyName"": ""Id"" } ] }
+                        ],
+                        ""ApiProperties"": [
+                            { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ],
+                ""ApiRelationships"": [
+                    {
+                        ""ApiKind"": ""ManyToMany"",
+                        ""ApiName"": ""TestRel"",
+                        ""ApiPrincipalEndA"": { ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Core.Tests"" },
+                        ""ApiPrincipalEndB"": { ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Core.Tests"" }
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiRelationshipManyToMany)}[\"TestRel\"]",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_RELATIONSHIP_MANY_TO_MANY_NULL_ASSOCIATION,
+                    description: $"{nameof(ApiRelationshipManyToMany.ApiAssociation)} must not be null",
+                    remediation: $"Provide a valid {nameof(ApiRelationshipAssociation)} for the association between the two principal ends"
+                ),
+            ]
+        },
+
+        // ApiRelationshipManyToMany throws if ApiAssociation.ApiKeyPathsA count does not match principal end A identity leaf count
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiRelationshipManyToMany)} Throws If {nameof(ApiRelationshipAssociation.ApiKeyPathsA)} Count Does Not Match Principal End A Identity",
+            SourceJson = @"
+            {
+                ""ApiName"": ""ApiRelationshipManyToMany Throws If ApiKeyPathsA Count Mismatch"",
+                ""ApiScalarTypes"": [
+                    { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"", ""ClrType"": ""System.Int32, System.Private.CoreLib"" }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""RelPrincipal"",
+                        ""ApiIdentities"": [
+                            { ""ApiName"": ""Id"", ""ApiIdentityParts"": [ { ""ApiKind"": ""Scalar"", ""ClrPropertyName"": ""Id"" } ] }
+                        ],
+                        ""ApiProperties"": [
+                            { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Core.Tests""
+                    },
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""RelPrincipalB"",
+                        ""ApiIdentities"": [
+                            { ""ApiName"": ""Id"", ""ApiIdentityParts"": [ { ""ApiKind"": ""Scalar"", ""ClrPropertyName"": ""Id"" } ] }
+                        ],
+                        ""ApiProperties"": [
+                            { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalBType, Evoogle.ApiFramework.Core.Tests""
+                    },
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""RelAssociation"",
+                        ""ApiProperties"": [
+                            { ""ApiName"": ""PrincipalAId"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""PrincipalAId"", ""ClrMemberKind"": ""Property"" },
+                            { ""ApiName"": ""PrincipalBId"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""PrincipalBId"", ""ClrMemberKind"": ""Property"" }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ],
+                ""ApiRelationships"": [
+                    {
+                        ""ApiKind"": ""ManyToMany"",
+                        ""ApiName"": ""TestRel"",
+                        ""ApiPrincipalEndA"": { ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Core.Tests"" },
+                        ""ApiPrincipalEndB"": { ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalBType, Evoogle.ApiFramework.Core.Tests"" },
+                        ""ApiAssociation"": {
+                            ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Core.Tests"",
+                            ""ApiKeyPathsA"": [
+                                { ""ApiKind"": ""Scalar"", ""ClrPropertyName"": ""PrincipalAId"" },
+                                { ""ApiKind"": ""Scalar"", ""ClrPropertyName"": ""PrincipalBId"" }
+                            ],
+                            ""ApiKeyPathsB"": [
+                                { ""ApiKind"": ""Scalar"", ""ClrPropertyName"": ""PrincipalBId"" }
+                            ]
+                        }
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiRelationshipManyToMany)}[\"TestRel\"]",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_RELATIONSHIP_MANY_TO_MANY_INVALID_ASSOCIATION_KEY_PATHS_A_COUNT,
+                    description: $"{nameof(ApiRelationshipManyToMany.ApiAssociation)}.{nameof(ApiRelationshipAssociation.ApiKeyPathsA)} has 2 scalar leaf(s) but principal end A identity 'Id' has 1 scalar leaf(s)",
+                    remediation: $"Ensure {nameof(ApiRelationshipManyToMany.ApiAssociation)}.{nameof(ApiRelationshipAssociation.ApiKeyPathsA)} contains exactly 1 scalar leaf(s) to match principal end A's join-key identity"
+                ),
+            ]
+        },
+
+        // ApiRelationshipManyToMany throws if ApiAssociation.ApiKeyPathsB count does not match principal end B identity leaf count
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiRelationshipManyToMany)} Throws If {nameof(ApiRelationshipAssociation.ApiKeyPathsB)} Count Does Not Match Principal End B Identity",
+            SourceJson = @"
+            {
+                ""ApiName"": ""ApiRelationshipManyToMany Throws If ApiKeyPathsB Count Mismatch"",
+                ""ApiScalarTypes"": [
+                    { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"", ""ClrType"": ""System.Int32, System.Private.CoreLib"" }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""RelPrincipal"",
+                        ""ApiIdentities"": [
+                            { ""ApiName"": ""Id"", ""ApiIdentityParts"": [ { ""ApiKind"": ""Scalar"", ""ClrPropertyName"": ""Id"" } ] }
+                        ],
+                        ""ApiProperties"": [
+                            { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Core.Tests""
+                    },
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""RelPrincipalB"",
+                        ""ApiIdentities"": [
+                            { ""ApiName"": ""Id"", ""ApiIdentityParts"": [ { ""ApiKind"": ""Scalar"", ""ClrPropertyName"": ""Id"" } ] }
+                        ],
+                        ""ApiProperties"": [
+                            { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalBType, Evoogle.ApiFramework.Core.Tests""
+                    },
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""RelAssociation"",
+                        ""ApiProperties"": [
+                            { ""ApiName"": ""PrincipalAId"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""PrincipalAId"", ""ClrMemberKind"": ""Property"" },
+                            { ""ApiName"": ""PrincipalBId"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""PrincipalBId"", ""ClrMemberKind"": ""Property"" }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ],
+                ""ApiRelationships"": [
+                    {
+                        ""ApiKind"": ""ManyToMany"",
+                        ""ApiName"": ""TestRel"",
+                        ""ApiPrincipalEndA"": { ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Core.Tests"" },
+                        ""ApiPrincipalEndB"": { ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalBType, Evoogle.ApiFramework.Core.Tests"" },
+                        ""ApiAssociation"": {
+                            ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Core.Tests"",
+                            ""ApiKeyPathsA"": [
+                                { ""ApiKind"": ""Scalar"", ""ClrPropertyName"": ""PrincipalAId"" }
+                            ],
+                            ""ApiKeyPathsB"": [
+                                { ""ApiKind"": ""Scalar"", ""ClrPropertyName"": ""PrincipalAId"" },
+                                { ""ApiKind"": ""Scalar"", ""ClrPropertyName"": ""PrincipalBId"" }
+                            ]
+                        }
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiRelationshipManyToMany)}[\"TestRel\"]",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_RELATIONSHIP_MANY_TO_MANY_INVALID_ASSOCIATION_KEY_PATHS_B_COUNT,
+                    description: $"{nameof(ApiRelationshipManyToMany.ApiAssociation)}.{nameof(ApiRelationshipAssociation.ApiKeyPathsB)} has 2 scalar leaf(s) but principal end B identity 'Id' has 1 scalar leaf(s)",
+                    remediation: $"Ensure {nameof(ApiRelationshipManyToMany.ApiAssociation)}.{nameof(ApiRelationshipAssociation.ApiKeyPathsB)} contains exactly 1 scalar leaf(s) to match principal end B's join-key identity"
+                ),
+            ]
+        },
+
+        // ApiRelationshipAssociation throws if ApiKeyPathsA and ApiKeyPathsB have asymmetric binding shape
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiRelationshipAssociation)} Throws If {nameof(ApiRelationshipAssociation.ApiKeyPathsA)} And {nameof(ApiRelationshipAssociation.ApiKeyPathsB)} Have Asymmetric Binding",
+            SourceJson = @"
+            {
+                ""ApiName"": ""ApiRelationshipAssociation Throws If Asymmetric Key Path Binding"",
+                ""ApiScalarTypes"": [
+                    { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"", ""ClrType"": ""System.Int32, System.Private.CoreLib"" }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""RelPrincipal"",
+                        ""ApiIdentities"": [
+                            { ""ApiName"": ""Id"", ""ApiIdentityParts"": [ { ""ApiKind"": ""Scalar"", ""ClrPropertyName"": ""Id"" } ] }
+                        ],
+                        ""ApiProperties"": [
+                            { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Core.Tests""
+                    },
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""RelPrincipalB"",
+                        ""ApiIdentities"": [
+                            { ""ApiName"": ""Id"", ""ApiIdentityParts"": [ { ""ApiKind"": ""Scalar"", ""ClrPropertyName"": ""Id"" } ] }
+                        ],
+                        ""ApiProperties"": [
+                            { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalBType, Evoogle.ApiFramework.Core.Tests""
+                    },
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""RelAssociation"",
+                        ""ApiProperties"": [
+                            { ""ApiName"": ""PrincipalAId"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""PrincipalAId"", ""ClrMemberKind"": ""Property"" }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ],
+                ""ApiRelationships"": [
+                    {
+                        ""ApiKind"": ""ManyToMany"",
+                        ""ApiName"": ""TestRel"",
+                        ""ApiPrincipalEndA"": { ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Core.Tests"" },
+                        ""ApiPrincipalEndB"": { ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalBType, Evoogle.ApiFramework.Core.Tests"" },
+                        ""ApiAssociation"": {
+                            ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Core.Tests"",
+                            ""ApiKeyPathsA"": [
+                                { ""ApiKind"": ""Scalar"", ""ClrPropertyName"": ""PrincipalAId"" }
+                            ],
+                            ""ApiKeyPathsB"": []
+                        }
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiRelationshipManyToMany)}[\"TestRel\"].{nameof(ApiRelationshipAssociation)}",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_RELATIONSHIP_MANY_TO_MANY_ASYMMETRIC_ASSOCIATION_KEY_PATH_BINDING,
+                    description: $"{nameof(ApiRelationshipAssociation.ApiKeyPathsA)} and {nameof(ApiRelationshipAssociation.ApiKeyPathsB)} must either both contain at least one key path or both be empty",
+                    remediation: $"Provide matching key-path binding shape for both {nameof(ApiRelationshipAssociation.ApiKeyPathsA)} and {nameof(ApiRelationshipAssociation.ApiKeyPathsB)}"
+                ),
+            ]
+        },
+
+        // ApiRelationshipOneTo throws if ApiDependentEnd key path count does not match principal identity leaf count
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiRelationshipOneTo)} Throws If {nameof(ApiRelationshipDependentEnd.ApiKeyPaths)} Count Does Not Match Principal Identity",
+            SourceJson = @"
+            {
+                ""ApiName"": ""ApiRelationshipOneTo Throws If Dependent Key Paths Count Mismatch"",
+                ""ApiScalarTypes"": [
+                    { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"", ""ClrType"": ""System.Int32, System.Private.CoreLib"" }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""RelPrincipal"",
+                        ""ApiIdentities"": [
+                            { ""ApiName"": ""Id"", ""ApiIdentityParts"": [ { ""ApiKind"": ""Scalar"", ""ClrPropertyName"": ""Id"" } ] }
+                        ],
+                        ""ApiProperties"": [
+                            { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Core.Tests""
+                    },
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""RelDependent"",
+                        ""ApiProperties"": [
+                            { ""ApiName"": ""PrincipalId"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""PrincipalId"", ""ClrMemberKind"": ""Property"" },
+                            { ""ApiName"": ""PrincipalId2"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""PrincipalId2"", ""ClrMemberKind"": ""Property"" }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ],
+                ""ApiRelationships"": [
+                    {
+                        ""ApiKind"": ""OneToMany"",
+                        ""ApiName"": ""TestRel"",
+                        ""ApiPrincipalEnd"": { ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Core.Tests"" },
+                        ""ApiDependentEnd"": {
+                            ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Core.Tests"",
+                            ""ApiKeyPaths"": [
+                                { ""ApiKind"": ""Scalar"", ""ClrPropertyName"": ""PrincipalId"" },
+                                { ""ApiKind"": ""Scalar"", ""ClrPropertyName"": ""PrincipalId2"" }
+                            ]
+                        }
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"]",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_RELATIONSHIP_ONE_TO_INVALID_DEPENDENT_KEY_PATHS_COUNT,
+                    description: $"{nameof(ApiRelationshipOneTo.ApiDependentEnd)}.{nameof(ApiRelationshipDependentEnd.ApiKeyPaths)} has 2 scalar leaf(s) but principal identity 'Id' has 1 scalar leaf(s)",
+                    remediation: $"Ensure {nameof(ApiRelationshipOneTo.ApiDependentEnd)}.{nameof(ApiRelationshipDependentEnd.ApiKeyPaths)} contains exactly 1 scalar leaf(s) to match the principal end's join-key identity"
+                ),
+            ]
+        },
+
+        // ApiRelationshipKeyPath throws if ClrPropertyName is null, empty, or whitespace
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiRelationshipKeyPath)} Throws If {nameof(ApiRelationshipScalarKeyPath.ClrPropertyName)} Is Invalid",
+            SourceJson = @"
+            {
+                ""ApiName"": ""ApiRelationshipKeyPath Throws If ClrPropertyName Is Invalid"",
+                ""ApiScalarTypes"": [
+                    { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"", ""ClrType"": ""System.Int32, System.Private.CoreLib"" }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""RelPrincipal"",
+                        ""ApiIdentities"": [
+                            { ""ApiName"": ""Id"", ""ApiIdentityParts"": [ { ""ApiKind"": ""Scalar"", ""ClrPropertyName"": ""Id"" } ] }
+                        ],
+                        ""ApiProperties"": [
+                            { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Core.Tests""
+                    },
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""RelDependent"",
+                        ""ApiProperties"": [
+                            { ""ApiName"": ""PrincipalId"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""PrincipalId"", ""ClrMemberKind"": ""Property"" }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ],
+                ""ApiRelationships"": [
+                    {
+                        ""ApiKind"": ""OneToMany"",
+                        ""ApiName"": ""TestRel"",
+                        ""ApiPrincipalEnd"": { ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Core.Tests"" },
+                        ""ApiDependentEnd"": {
+                            ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Core.Tests"",
+                            ""ApiKeyPaths"": [
+                                { ""ApiKind"": ""Scalar"", ""ClrPropertyName"": """" }
+                            ]
+                        }
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"].{nameof(ApiRelationshipDependentEnd)}.{nameof(ApiRelationshipScalarKeyPath)}",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_RELATIONSHIP_KEY_PATH_INVALID_CLR_PROPERTY_NAME,
+                    description: $"{nameof(ApiRelationshipScalarKeyPath.ClrPropertyName)} must not be null, empty, or whitespace",
+                    remediation: $"Specify a valid {nameof(ApiRelationshipScalarKeyPath.ClrPropertyName)} value"
+                ),
+            ]
+        },
+
+        // ApiRelationshipKeyPath throws if ClrPropertyName cannot be resolved on the dependent object type
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiRelationshipKeyPath)} Throws If {nameof(ApiRelationshipScalarKeyPath.ClrPropertyName)} Is Unresolved",
+            SourceJson = @"
+            {
+                ""ApiName"": ""ApiRelationshipKeyPath Throws If ClrPropertyName Is Unresolved"",
+                ""ApiScalarTypes"": [
+                    { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"", ""ClrType"": ""System.Int32, System.Private.CoreLib"" }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""RelPrincipal"",
+                        ""ApiIdentities"": [
+                            { ""ApiName"": ""Id"", ""ApiIdentityParts"": [ { ""ApiKind"": ""Scalar"", ""ClrPropertyName"": ""Id"" } ] }
+                        ],
+                        ""ApiProperties"": [
+                            { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Core.Tests""
+                    },
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""RelDependent"",
+                        ""ApiProperties"": [
+                            { ""ApiName"": ""PrincipalId"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""PrincipalId"", ""ClrMemberKind"": ""Property"" }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ],
+                ""ApiRelationships"": [
+                    {
+                        ""ApiKind"": ""OneToMany"",
+                        ""ApiName"": ""TestRel"",
+                        ""ApiPrincipalEnd"": { ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Core.Tests"" },
+                        ""ApiDependentEnd"": {
+                            ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Core.Tests"",
+                            ""ApiKeyPaths"": [
+                                { ""ApiKind"": ""Scalar"", ""ClrPropertyName"": ""NonExistent"" }
+                            ]
+                        }
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"].{nameof(ApiRelationshipDependentEnd)}.{nameof(ApiRelationshipScalarKeyPath)}[\"NonExistent\"]",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_RELATIONSHIP_KEY_PATH_UNRESOLVED_API_PROPERTY,
+                    description: "Property with CLR name 'NonExistent' could not be found on object type 'RelDependent'",
+                    remediation: "Verify the CLR property name or add a property with CLR name 'NonExistent' to 'RelDependent'"
+                ),
+            ]
+        },
+
+        // ApiRelationshipScalarKeyPath throws if the resolved property is not a scalar type
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiRelationshipScalarKeyPath)} Throws If Resolved Property Is Not A Scalar Type",
+            SourceJson = @"
+            {
+                ""ApiName"": ""ApiRelationshipScalarKeyPath Throws If Property Is Not Scalar"",
+                ""ApiScalarTypes"": [
+                    { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"", ""ClrType"": ""System.Int32, System.Private.CoreLib"" }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""RelPrincipal"",
+                        ""ApiIdentities"": [
+                            { ""ApiName"": ""Id"", ""ApiIdentityParts"": [ { ""ApiKind"": ""Scalar"", ""ClrPropertyName"": ""Id"" } ] }
+                        ],
+                        ""ApiProperties"": [
+                            { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Core.Tests""
+                    },
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""RelNested"",
+                        ""ApiProperties"": [
+                            { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelNestedType, Evoogle.ApiFramework.Core.Tests""
+                    },
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""RelDependentWithObject"",
+                        ""ApiProperties"": [
+                            { ""ApiName"": ""PrincipalId"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""PrincipalId"", ""ClrMemberKind"": ""Property"" },
+                            { ""ApiName"": ""Nested"", ""ApiType"": { ""ApiKind"": ""Object"", ""ApiName"": ""RelNested"" }, ""ClrName"": ""Nested"", ""ClrMemberKind"": ""Property"" }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentWithObjectType, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ],
+                ""ApiRelationships"": [
+                    {
+                        ""ApiKind"": ""OneToMany"",
+                        ""ApiName"": ""TestRel"",
+                        ""ApiPrincipalEnd"": { ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Core.Tests"" },
+                        ""ApiDependentEnd"": {
+                            ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentWithObjectType, Evoogle.ApiFramework.Core.Tests"",
+                            ""ApiKeyPaths"": [
+                                { ""ApiKind"": ""Scalar"", ""ClrPropertyName"": ""Nested"" }
+                            ]
+                        }
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"].{nameof(ApiRelationshipDependentEnd)}.{nameof(ApiRelationshipScalarKeyPath)}[\"Nested\"]",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_RELATIONSHIP_KEY_PATH_INVALID_API_PROPERTY_TYPE,
+                    description: "Property 'Nested' is not a scalar type but a scalar type is required for a scalar key path",
+                    remediation: $"Use an object-typed property with {nameof(ApiRelationshipNestedKeyPath)} or choose a scalar property for 'Nested'"
+                ),
+            ]
+        },
+
+        // ApiRelationshipNestedKeyPath throws if the resolved property is not an object type
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiRelationshipNestedKeyPath)} Throws If Resolved Property Is Not An Object Type",
+            SourceJson = @"
+            {
+                ""ApiName"": ""ApiRelationshipNestedKeyPath Throws If Property Is Not Object Type"",
+                ""ApiScalarTypes"": [
+                    { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"", ""ClrType"": ""System.Int32, System.Private.CoreLib"" }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""RelPrincipal"",
+                        ""ApiIdentities"": [
+                            { ""ApiName"": ""Id"", ""ApiIdentityParts"": [ { ""ApiKind"": ""Scalar"", ""ClrPropertyName"": ""Id"" } ] }
+                        ],
+                        ""ApiProperties"": [
+                            { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Core.Tests""
+                    },
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""RelDependent"",
+                        ""ApiProperties"": [
+                            { ""ApiName"": ""PrincipalId"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""PrincipalId"", ""ClrMemberKind"": ""Property"" }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ],
+                ""ApiRelationships"": [
+                    {
+                        ""ApiKind"": ""OneToMany"",
+                        ""ApiName"": ""TestRel"",
+                        ""ApiPrincipalEnd"": { ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Core.Tests"" },
+                        ""ApiDependentEnd"": {
+                            ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Core.Tests"",
+                            ""ApiKeyPaths"": [
+                                {
+                                    ""ApiKind"": ""Nested"",
+                                    ""ClrPropertyName"": ""PrincipalId"",
+                                    ""ApiKeyPaths"": [
+                                        { ""ApiKind"": ""Scalar"", ""ClrPropertyName"": ""Dummy"" }
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"].{nameof(ApiRelationshipDependentEnd)}.{nameof(ApiRelationshipNestedKeyPath)}[\"PrincipalId\"]",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_RELATIONSHIP_KEY_PATH_INVALID_API_PROPERTY_TYPE,
+                    description: "Property 'PrincipalId' must be an object type for a nested key path",
+                    remediation: $"Use an object-typed property or switch to {nameof(ApiRelationshipScalarKeyPath)}"
+                ),
+            ]
+        },
+
+        // ApiRelationshipNestedKeyPath throws if ApiKeyPaths is empty
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiRelationshipNestedKeyPath)} Throws If {nameof(ApiRelationshipNestedKeyPath.ApiKeyPaths)} Is Empty",
+            SourceJson = @"
+            {
+                ""ApiName"": ""ApiRelationshipNestedKeyPath Throws If ApiKeyPaths Is Empty"",
+                ""ApiScalarTypes"": [
+                    { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"", ""ClrType"": ""System.Int32, System.Private.CoreLib"" }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""RelPrincipal"",
+                        ""ApiIdentities"": [
+                            { ""ApiName"": ""Id"", ""ApiIdentityParts"": [ { ""ApiKind"": ""Scalar"", ""ClrPropertyName"": ""Id"" } ] }
+                        ],
+                        ""ApiProperties"": [
+                            { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Core.Tests""
+                    },
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""RelNested"",
+                        ""ApiProperties"": [
+                            { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelNestedType, Evoogle.ApiFramework.Core.Tests""
+                    },
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""RelDependentWithObject"",
+                        ""ApiProperties"": [
+                            { ""ApiName"": ""PrincipalId"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""PrincipalId"", ""ClrMemberKind"": ""Property"" },
+                            { ""ApiName"": ""Nested"", ""ApiType"": { ""ApiKind"": ""Object"", ""ApiName"": ""RelNested"" }, ""ClrName"": ""Nested"", ""ClrMemberKind"": ""Property"" }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentWithObjectType, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ],
+                ""ApiRelationships"": [
+                    {
+                        ""ApiKind"": ""OneToMany"",
+                        ""ApiName"": ""TestRel"",
+                        ""ApiPrincipalEnd"": { ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Core.Tests"" },
+                        ""ApiDependentEnd"": {
+                            ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentWithObjectType, Evoogle.ApiFramework.Core.Tests"",
+                            ""ApiKeyPaths"": [
+                                {
+                                    ""ApiKind"": ""Nested"",
+                                    ""ClrPropertyName"": ""Nested"",
+                                    ""ApiKeyPaths"": []
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=2, Errors=2, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"].{nameof(ApiRelationshipDependentEnd)}.{nameof(ApiRelationshipNestedKeyPath)}[\"Nested\"]",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_RELATIONSHIP_KEY_PATH_NULL_OR_EMPTY_PATHS,
+                    description: $"{nameof(ApiRelationshipNestedKeyPath.ApiKeyPaths)} must contain at least one key path",
+                    remediation: $"Add at least one {nameof(ApiRelationshipKeyPath)} inside 'Nested'"
+                ),
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"]",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_RELATIONSHIP_ONE_TO_INVALID_DEPENDENT_KEY_PATHS_COUNT,
+                    description: $"{nameof(ApiRelationshipOneTo.ApiDependentEnd)}.{nameof(ApiRelationshipDependentEnd.ApiKeyPaths)} has 0 scalar leaf(s) but principal identity 'Id' has 1 scalar leaf(s)",
+                    remediation: $"Ensure {nameof(ApiRelationshipOneTo.ApiDependentEnd)}.{nameof(ApiRelationshipDependentEnd.ApiKeyPaths)} contains exactly 1 scalar leaf(s) to match the principal end's join-key identity"
+                ),
+            ]
+        },
+
+        // ApiSchema throws if ApiRelationships contains entries with duplicate ApiName values
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiSchema)} Throws If {nameof(ApiSchema.ApiRelationships)} Has Duplicate {nameof(ApiRelationship.ApiName)}",
+            SourceJson = @"
+            {
+                ""ApiName"": ""ApiSchema Throws If ApiRelationships Has Duplicate ApiName"",
+                ""ApiScalarTypes"": [
+                    { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"", ""ClrType"": ""System.Int32, System.Private.CoreLib"" }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""RelPrincipal"",
+                        ""ApiIdentities"": [
+                            { ""ApiName"": ""Id"", ""ApiIdentityParts"": [ { ""ApiKind"": ""Scalar"", ""ClrPropertyName"": ""Id"" } ] }
+                        ],
+                        ""ApiProperties"": [
+                            { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Core.Tests""
+                    },
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""RelDependent"",
+                        ""ApiProperties"": [
+                            { ""ApiName"": ""PrincipalId"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""PrincipalId"", ""ClrMemberKind"": ""Property"" }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ],
+                ""ApiRelationships"": [
+                    {
+                        ""ApiKind"": ""OneToMany"",
+                        ""ApiName"": ""DupRel"",
+                        ""ApiPrincipalEnd"": { ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Core.Tests"" },
+                        ""ApiDependentEnd"": { ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Core.Tests"" }
+                    },
+                    {
+                        ""ApiKind"": ""OneToMany"",
+                        ""ApiName"": ""DupRel"",
+                        ""ApiPrincipalEnd"": { ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Core.Tests"" },
+                        ""ApiDependentEnd"": { ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Core.Tests"" }
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiRelationships Has Duplicate ApiName\"]",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_SCHEMA_DUPLICATE_RELATIONSHIP_API_NAME,
+                    description: $"Duplicate {nameof(ApiRelationship)}.{nameof(ApiRelationship.ApiName)} values: 'DupRel'",
+                    remediation: $"Verify that each {nameof(ApiRelationship)} has a unique {nameof(ApiRelationship.ApiName)} value"
+                ),
+            ]
+        },
     ];
 
     public static TheoryDataRow<IXUnitTest>[] InitializeWarnsTheoryData =>
     [
+        // ApiIdentityScalarPart warns if identity part requires string parsing for a non-string scalar type
+        new InitializeWarnsTest
+        {
+            Name = $"{nameof(ApiIdentityScalarPart)} Warns If {nameof(String)} Requires Coercion",
+            SourceJson = @"
+            {
+                ""ApiName"": ""ApiIdentityScalarPart Warns If String Requires Coercion"",
+                ""ApiScalarTypes"": [
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""Int32"",
+                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                    },
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""String"",
+                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                    }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""IdentityScalar"",
+                        ""ApiIdentities"": [
+                            {
+                                ""ApiName"": ""PK_IdentityScalar"",
+                                ""ApiIdentityParts"": [
+                                    {
+                                        ""ApiKind"": ""Scalar"",
+                                        ""ClrPropertyName"": ""Id"",
+                                        ""ClrScalarTypeHint"": ""System.String,System.Private.CoreLib""
+                                    }
+                                ]
+                            }
+                        ],
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""Id"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""Int32""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Id"",
+                                ""ClrMemberKind"": ""Property""
+                            },
+                            {
+                                ""ApiName"": ""Name"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""String""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Name"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.TestData.IdentityScalar, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ]
+            }",
+            ExpectedWarnings =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiObjectType)}[\"IdentityScalar\"].{nameof(ApiIdentity)}[\"PK_IdentityScalar\"].{nameof(ApiIdentityScalarPart)}[\"Id\"]",
+                    severity: ApiInitializationSeverity.Warning,
+                    code: ApiInitializationCode.API_IDENTITY_PART_PERFORMANCE_CONCERN,
+                    description: $"Identity part 'Id' has CLR property type {nameof(Int32)} but resolves to scalar type {nameof(String)}, requiring string parse/format on every identity operation",
+                    remediation: $"Align the 'Id' property type with the resolved scalar type {nameof(String)} to eliminate string coercion, or accept the overhead if the type mismatch is intentional"
+                ),
+            ]
+        },
+
+        // ApiObjectType warns if ApiProperties is null or empty
+        new InitializeWarnsTest
+        {
+            Name = $"{nameof(ApiObjectType)} Warns If ApiProperties Is Null Or Empty",
+            SourceJson = @"
+            {
+                ""ApiName"": ""ApiObjectType Warns If ApiProperties Is Null Or Empty"",
+                ""ApiScalarTypes"": [],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""Empty"",
+                        ""ApiProperties"": [],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ]
+            }",
+            ExpectedWarnings =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiObjectType)}[\"Empty\"]",
+                    severity: ApiInitializationSeverity.Warning,
+                    code: ApiInitializationCode.API_OBJECT_TYPE_NULL_OR_EMPTY_PROPERTIES,
+                    description: $"{nameof(ApiObjectType.ApiProperties)} is null or empty",
+                    remediation: $"Add at least one {nameof(ApiProperty)} to {nameof(ApiObjectType)}[\"Empty\"]"
+                ),
+            ]
+        },
+
         // ApiProperty warns if Required property maps to a nullable CLR member
         new InitializeWarnsTest
         {
