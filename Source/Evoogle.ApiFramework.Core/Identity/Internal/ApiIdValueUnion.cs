@@ -3,6 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Globalization;
 using System.Runtime.InteropServices;
 
 namespace Evoogle.ApiFramework.Identity.Internal;
@@ -21,7 +22,7 @@ namespace Evoogle.ApiFramework.Identity.Internal;
 ///     </para>
 ///     <para>
 ///         Supports: <see cref="int"/>, <see cref="long"/>, <see cref="Guid"/>, and <see cref="Ulid"/>.
-///         Reference types (<see cref="string"/>, <see cref="System.Globalization.CultureInfo"/>, composite arrays)
+///         Reference types (<see cref="string"/>, <see cref="CultureInfo"/>, composite arrays)
 ///         are stored separately in <see cref="ApiId"/>'s reference field.
 ///     </para>
 /// </remarks>

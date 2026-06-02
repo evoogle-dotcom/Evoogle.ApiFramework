@@ -11,7 +11,7 @@ public partial class ApiSchemaTests
 {
     #region Theory Data
     public static TheoryDataRow<IXUnitTest>[] JsonDeserializeTheoryData =>
-        [.. SimpleJsonTestCases.Union(IdentityJsonTestCases).Union(RelationshipJsonTestCases)
+        [.. SimpleJsonTestCases.Union(KeyJsonTestCases).Union(RelationshipJsonTestCases)
             .Select(c => (TheoryDataRow<IXUnitTest>)new JsonDeserializeTest
             {
                 Name = c.Name,

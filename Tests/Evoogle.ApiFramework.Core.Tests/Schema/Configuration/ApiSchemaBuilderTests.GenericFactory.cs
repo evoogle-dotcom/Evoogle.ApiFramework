@@ -41,27 +41,27 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
         return builder.Build();
     }
 
-    public static ApiSchema BuildIdentityApiSchema()
+    public static ApiSchema BuildKeyApiSchema()
     {
-        var builder = CreateIdentityApiSchemaBuilder();
+        var builder = CreateKeyApiSchemaBuilder();
 
         return builder.Build();
     }
 
-    public static ApiSchema BuildIdentityApiSchema<TExtension>()
+    public static ApiSchema BuildKeyApiSchema<TExtension>()
         where TExtension : notnull, new()
     {
-        var builder = CreateIdentityApiSchemaBuilder()
+        var builder = CreateKeyApiSchemaBuilder()
             .AddSchemaExtension(new TExtension());
 
         return builder.Build();
     }
 
-    public static ApiSchema BuildIdentityApiSchema<TExtension1, TExtension2>()
+    public static ApiSchema BuildKeyApiSchema<TExtension1, TExtension2>()
         where TExtension1 : notnull, new()
         where TExtension2 : notnull, new()
     {
-        var builder = CreateIdentityApiSchemaBuilder()
+        var builder = CreateKeyApiSchemaBuilder()
             .AddSchemaExtension(new TExtension1())
             .AddSchemaExtension(new TExtension2());
 
@@ -178,9 +178,7 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
                 .AddProperty(p => p.Country))
 
             .AddObject<EmailAddress>(o => o
-                .AddProperty(p => p.Value)
-                .AddIdentity("PK_EmailAddress", i => i
-                    .AddScalarPart(p => p.Value)))
+                .AddProperty(p => p.Value))
 
             .AddObject<Money>(o => o
                 .AddProperty(p => p.Amount)
@@ -198,10 +196,8 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
                 .AddProperty(p => p.PrimaryAddress)
                 .AddProperty(p => p.Addresses)
                 .AddProperty(p => p.Orders)
-                .AddIdentity("PK_Customer", i => i
-                    .AddScalarPart(p => p.Id))
-                .AddIdentity("AK_Customer_Email", i => i
-                    .AddNestedPart(p => p.Email)))
+                .AddKeyType("PK_Customer", k => k.AddKeyPath(p => p.Id))
+                .AddKeyType("AK_Customer_Email", k => k.AddKeyPath(p => p.Email.Value)))
 
             // Product Objects
             .AddObject<Category>(o => o
@@ -210,10 +206,8 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
                 .AddProperty(p => p.ParentId)
                 .AddProperty(p => p.Parent)
                 .AddProperty(p => p.Children)
-                .AddIdentity("PK_Category", i => i
-                    .AddScalarPart(p => p.Id))
-                .AddIdentity("AK_Category_Name", i => i
-                    .AddScalarPart(p => p.Name)))
+                .AddKeyType("PK_Category", k => k.AddKeyPath(p => p.Id))
+                .AddKeyType("AK_Category_Name", k => k.AddKeyPath(p => p.Name)))
 
             .AddObject<DigitalProduct>(o => o
                 .AddProperty(p => p.Id)
@@ -225,10 +219,8 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
                 .AddProperty(p => p.CategoryId)
                 .AddProperty(p => p.DownloadUrl)
                 .AddProperty(p => p.Bytes)
-                .AddIdentity("PK_DigitalProduct", i => i
-                    .AddScalarPart(p => p.Id))
-                .AddIdentity("AK_DigitalProduct_Sku", i => i
-                    .AddScalarPart(p => p.Sku)))
+                .AddKeyType("PK_DigitalProduct", k => k.AddKeyPath(p => p.Id))
+                .AddKeyType("AK_DigitalProduct_Sku", k => k.AddKeyPath(p => p.Sku)))
 
             .AddObject<PhysicalProduct>(o => o
                 .AddProperty(p => p.Id)
@@ -240,32 +232,28 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
                 .AddProperty(p => p.CategoryId)
                 .AddProperty(p => p.Weight)
                 .AddProperty(p => p.Size)
-                .AddIdentity("PK_PhysicalProduct", i => i
-                    .AddScalarPart(p => p.Id))
-                .AddIdentity("AK_PhysicalProduct_Sku", i => i
-                    .AddScalarPart(p => p.Sku)))
+                .AddKeyType("PK_PhysicalProduct", k => k.AddKeyPath(p => p.Id))
+                .AddKeyType("AK_PhysicalProduct_Sku", k => k.AddKeyPath(p => p.Sku)))
 
             .AddObject<Tag>(o => o
                 .AddProperty(p => p.Id)
                 .AddProperty(p => p.Name)
-                .AddIdentity("PK_Tag", i => i
-                    .AddScalarPart(p => p.Id))
-                .AddIdentity("AK_Tag_Name", i => i
-                    .AddScalarPart(p => p.Name)))
+                .AddKeyType("PK_Tag", k => k.AddKeyPath(p => p.Id))
+                .AddKeyType("AK_Tag_Name", k => k.AddKeyPath(p => p.Name)))
 
             .AddObject<DigitalProductTag>(o => o
                 .AddProperty(p => p.DigitalProductId)
                 .AddProperty(p => p.TagId)
-                .AddIdentity("PK_DigitalProductTag", i => i
-                    .AddScalarPart(p => p.DigitalProductId)
-                    .AddScalarPart(p => p.TagId)))
+                .AddKeyType("PK_DigitalProductTag", k => k
+                    .AddKeyPath(p => p.DigitalProductId)
+                    .AddKeyPath(p => p.TagId)))
 
             .AddObject<PhysicalProductTag>(o => o
                 .AddProperty(p => p.PhysicalProductId)
                 .AddProperty(p => p.TagId)
-                .AddIdentity("PK_PhysicalProductTag", i => i
-                    .AddScalarPart(p => p.PhysicalProductId)
-                    .AddScalarPart(p => p.TagId)))
+                .AddKeyType("PK_PhysicalProductTag", k => k
+                    .AddKeyPath(p => p.PhysicalProductId)
+                    .AddKeyPath(p => p.TagId)))
 
             // Order Objects
             .AddObject<Order>(o => o
@@ -276,8 +264,7 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
                 .AddProperty(p => p.Lines)
                 .AddProperty(p => p.Payment)
                 .AddProperty(p => p.Total)
-                .AddIdentity("PK_Order", i => i
-                    .AddScalarPart(p => p.Id)))
+                .AddKeyType("PK_Order", k => k.AddKeyPath(p => p.Id)))
 
             .AddObject<OrderLine>(o => o
                 .AddProperty(p => p.OrderId)
@@ -285,9 +272,9 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
                 .AddProperty(p => p.Qty)
                 .AddProperty(p => p.UnitPrice)
                 .AddProperty(p => p.LineTotal)
-                .AddIdentity("PK_OrderLine", i => i
-                    .AddOwnerPart()
-                    .AddScalarPart(p => p.LineNumber)))
+                .AddKeyType("PK_OrderLine", k => k
+                    .AddKeyPath<Order, Ulid>(p => p.Id)
+                    .AddKeyPath(p => p.LineNumber)))
 
             // Payment Objects
             .AddObject<Payment>(o => o
@@ -295,56 +282,56 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
                 .AddProperty(p => p.Method)
                 .AddProperty(p => p.Amount)
                 .AddProperty(p => p.CapturedAt)
-                .AddIdentity("PK_Payment", i => i
-                    .AddScalarPart(p => p.Id)))
+                .AddKeyType("PK_Payment", k => k
+                    .AddKeyPath(p => p.Id)))
 
             // Relationships
             .AddOneToManyRelationship("REL_Customer_Order_1toN", r => r
                 .WithPrincipalEnd<Customer>()
-                .WithDependentEnd<Order>(np => np.AddNestedPath(np => np.Customer, sp => sp.AddScalarPath(p => p.Id))))
+                .WithDependentEnd<Order>(de => de.WithForeignKeyType("FK_Customer_Order", fk => fk.AddKeyPath(p => p.Customer.Id))))
 
             .AddOneToManyRelationship("REL_Order_OrderLine_1toN", r => r
                 .WithPrincipalEnd<Order>()
-                .WithDependentEnd<OrderLine>(np => np.AddOwnerPath())
+                .WithDependentEnd<OrderLine>(de => de.WithForeignKeyType("FK_Order_OrderLine", fk => fk.AddKeyPath<Order, Ulid>(p => p.Id)))
                 .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete))
 
             .AddOneToOneRelationship("REL_Payment_Order_1to1", r => r
                 .WithPrincipalEnd<Payment>()
-                .WithDependentEnd<Order>(np => np.AddNestedPath(np => np.Payment, sp => sp.AddScalarPath(p => p.Id))))
+                .WithDependentEnd<Order>(de => de.WithForeignKeyType("FK_Payment_Order", fk => fk.AddKeyPath(p => p.Payment.Id))))
 
             .AddOneToManyRelationship("REL_Category_Category_1toN", r => r
                 .WithPrincipalEnd<Category>()
-                .WithDependentEnd<Category>(sp => sp.AddScalarPath(p => p.ParentId)))
+                .WithDependentEnd<Category>(de => de.WithForeignKeyType("FK_Category_Category_ParentId", fk => fk.AddKeyPath(p => p.ParentId))))
 
             .AddOneToManyRelationship("REL_Category_DigitalProduct_1toN", r => r
                 .WithPrincipalEnd<Category>()
-                .WithDependentEnd<DigitalProduct>(sp => sp.AddScalarPath(p => p.CategoryId)))
+                .WithDependentEnd<DigitalProduct>(de => de.WithForeignKeyType("FK_Category_DigitalProduct", fk => fk.AddKeyPath(p => p.CategoryId))))
 
             .AddOneToManyRelationship("REL_Category_PhysicalProduct_1toN", r => r
                 .WithPrincipalEnd<Category>()
-                .WithDependentEnd<PhysicalProduct>(sp => sp.AddScalarPath(p => p.CategoryId)))
+                .WithDependentEnd<PhysicalProduct>(de => de.WithForeignKeyType("FK_Category_PhysicalProduct", fk => fk.AddKeyPath(p => p.CategoryId))))
 
             .AddManyToManyRelationship("REL_DigitalProduct_Tag_NtoN", r => r
                 .WithPrincipalEndA<DigitalProduct>()
                 .WithPrincipalEndB<Tag>()
-                .WithAssociation<DigitalProductTag>(sp => sp
-                    .AddScalarPathA(p => p.DigitalProductId)
-                    .AddScalarPathB(p => p.TagId)))
+                .WithAssociation<DigitalProductTag>(a => a
+                    .WithForeignKeyTypeA("FK_DigitalProduct_DigitalProductTag", fk => fk.AddKeyPath(p => p.DigitalProductId))
+                    .WithForeignKeyTypeB("FK_Tag_DigitalProductTag", fk => fk.AddKeyPath(p => p.TagId))))
 
             .AddManyToManyRelationship("REL_PhysicalProduct_Tag_NtoN", r => r
                 .WithPrincipalEndA<PhysicalProduct>()
                 .WithPrincipalEndB<Tag>()
-                .WithAssociation<PhysicalProductTag>(sp => sp
-                    .AddScalarPathA(p => p.PhysicalProductId)
-                    .AddScalarPathB(p => p.TagId)));
+                .WithAssociation<PhysicalProductTag>(a => a
+                    .WithForeignKeyTypeA("FK_PhysicalProduct_PhysicalProductTag", fk => fk.AddKeyPath(p => p.PhysicalProductId))
+                    .WithForeignKeyTypeB("FK_Tag_PhysicalProductTag", fk => fk.AddKeyPath(p => p.TagId))));
 
         return builder;
     }
 
-    private static ApiSchemaBuilder CreateIdentityApiSchemaBuilder()
+    private static ApiSchemaBuilder CreateKeyApiSchemaBuilder()
     {
         var builder = new ApiSchemaBuilder()
-            .WithName(nameof(ApiSchemaKind.Identity))
+            .WithName(nameof(ApiSchemaKind.Key))
 
             // Scalars
             .AddScalar<Guid>()
@@ -354,64 +341,62 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
             // Enums
 
             // Objects
-            .AddObject<IdentityScalar>(o => o
+            .AddObject<KeyOneScalarPart>(o => o
                 .AddProperty(p => p.Id)
                 .AddProperty(p => p.Name)
-                .AddIdentity("PK_IdentityScalar", i => i
-                    .AddScalarPart(p => p.Id))
-                .AddIdentity("AK_IdentityScalar", i => i
-                    .AddScalarPart(p => p.Name)))
+                .AddKeyType("PK_KeyOneScalarPart", k => k.AddKeyPath(p => p.Id))
+                .AddKeyType("AK_KeyOneScalarPart", k => k.AddKeyPath(p => p.Name)))
 
-            .AddObject<IdentityTwoScalarPartComposite>(o => o
+            .AddObject<KeyTwoScalarPartComposite>(o => o
                 .AddProperty(p => p.Id1)
                 .AddProperty(p => p.Id2)
                 .AddProperty(p => p.Description)
-                .AddIdentity("PK_IdentityTwoScalarPartComposite", i => i
-                    .AddScalarPart(p => p.Id1)
-                    .AddScalarPart(p => p.Id2)))
+                .AddKeyType("PK_KeyTwoScalarPartComposite", k => k
+                    .AddKeyPath(p => p.Id1)
+                    .AddKeyPath(p => p.Id2)))
 
-            .AddObject<IdentityThreeScalarPartComposite>(o => o
+            .AddObject<KeyThreeScalarPartComposite>(o => o
                 .AddProperty(p => p.Id1)
                 .AddProperty(p => p.Id2)
                 .AddProperty(p => p.Id3)
                 .AddProperty(p => p.Description)
-                .AddIdentity("PK_IdentityThreeScalarPartComposite", i => i
-                    .AddScalarPart(p => p.Id1)
-                    .AddScalarPart(p => p.Id2)
-                    .AddScalarPart(p => p.Id3)))
+                .AddKeyType("PK_KeyThreeScalarPartComposite", k => k
+                    .AddKeyPath(p => p.Id1)
+                    .AddKeyPath(p => p.Id2)
+                    .AddKeyPath(p => p.Id3)))
 
-            .AddObject<IdentityNested>(o => o
+            .AddObject<KeyNested>(o => o
                 .AddProperty(p => p.Id)
                 .AddProperty(p => p.Description)
-                .AddIdentity("PK_IdentityNestedPart", i => i
-                    .AddScalarPart(p => p.Id)))
+                .AddKeyType("PK_KeyNestedPart", k => k
+                    .AddKeyPath(p => p.Id)))
 
-            .AddObject<IdentityNestedComposite>(o => o
+            .AddObject<KeyNestedComposite>(o => o
                 .AddProperty(p => p.NestedPart)
                 .AddProperty(p => p.Name)
-                .AddIdentity("PK_IdentityNestedComposite", i => i
-                    .AddNestedPart(p => p.NestedPart)
-                    .AddScalarPart(p => p.Name)))
+                .AddKeyType("PK_KeyNestedComposite", k => k
+                    .AddKeyPath(p => p.NestedPart.Id)
+                    .AddKeyPath(p => p.Name)))
 
-            .AddObject<IdentityOwner>(o => o
+            .AddObject<KeyOwner>(o => o
                 .AddProperty(p => p.Id)
                 .AddProperty(p => p.Description)
                 .AddProperty(p => p.Dependents)
                 .AddProperty(p => p.Dependent)
-                .AddIdentity("PK_IdentityOwner", i => i
-                    .AddScalarPart(p => p.Id)))
+                .AddKeyType("PK_KeyOwner", k => k
+                    .AddKeyPath(p => p.Id)))
 
-            .AddObject<IdentityOwnedComposite>(o => o
+            .AddObject<KeyOwnedComposite>(o => o
                 .AddProperty(p => p.LineNumber)
                 .AddProperty(p => p.Description)
-                .AddIdentity("PK_IdentityOwnedComposite", i => i
-                    .AddOwnerPart()
-                    .AddScalarPart(p => p.LineNumber)))
+                .AddKeyType("PK_KeyOwnedComposite", k => k
+                    .AddKeyPath<KeyOwner, int>(p => p.Id)
+                    .AddKeyPath(p => p.LineNumber)))
 
-            .AddObject<IdentityOwnedDependent>(o => o
+            .AddObject<KeyOwnedDependent>(o => o
                 .AddProperty(p => p.Description)
-                .AddIdentity("PK_IdentityOwnedDependent", i => i
-                    .AddOwnerPart()));
+                .AddKeyType("PK_KeyOwnedDependent", k => k
+                    .AddKeyPath<KeyOwner, int>(p => p.Id)));
 
         return builder;
     }
@@ -467,10 +452,10 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
                 .AddProperty(p => p.Gender)
                 .AddProperty(p => p.Hobbies)
                 .AddProperty(p => p.CompanyId)
-                .AddIdentity("PK_Person_Id", i => i
-                    .AddScalarPart(p => p.Id))
-                .AddIdentity("AK_Person_Name", i => i
-                    .AddScalarPart(p => p.Name)))
+                .AddKeyType("PK_Person_Id", k => k
+                    .AddKeyPath(p => p.Id))
+                .AddKeyType("AK_Person_Name", k => k
+                    .AddKeyPath(p => p.Name)))
 
             .AddObject<Company>(o => o
                 .WithOptions(opt => opt.ThrowOnNullKeyPart())
@@ -478,10 +463,10 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
                 .AddProperty(p => p.Name)
                 .AddProperty(p => p.Owner)
                 .AddProperty(p => p.Employees)
-                .AddIdentity("PK_Company_Id", i => i
-                    .AddScalarPart(p => p.Id))
-                .AddIdentity("AK_Company_Name", i => i
-                    .AddScalarPart(p => p.Name)));
+                .AddKeyType("PK_Company_Id", k => k
+                    .AddKeyPath(p => p.Id))
+                .AddKeyType("AK_Company_Name", k => k
+                    .AddKeyPath(p => p.Name)));
 
         return builder;
     }
@@ -515,7 +500,8 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
                 .AddProperty(p => p.UserName)
                 .AddProperty(p => p.Profile)
                 .AddProperty(p => p.Posts)
-                .AddIdentity("PK_RelationshipUser", i => i.AddScalarPart(p => p.Id)))
+                .AddKeyType("PK_RelationshipUser", k => k
+                    .AddKeyPath(p => p.Id)))
 
             // RelationshipUserProfile
             .AddObject<RelationshipUserProfile>(o => o
@@ -523,7 +509,8 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
                 .AddProperty(p => p.UserRef)
                 .AddProperty(p => p.DisplayName)
                 .AddProperty(p => p.User)
-                .AddIdentity("PK_RelationshipUserProfile", i => i.AddScalarPart(p => p.UserId)))
+                .AddKeyType("PK_RelationshipUserProfile", k => k
+                    .AddKeyPath(p => p.UserId)))
 
             // RelationshipPost
             .AddObject<RelationshipPost>(o => o
@@ -534,7 +521,8 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
                 .AddProperty(p => p.Comments)
                 .AddProperty(p => p.Tags)
                 .AddProperty(p => p.User)
-                .AddIdentity("PK_RelationshipPost", i => i.AddScalarPart(p => p.Id)))
+                .AddKeyType("PK_RelationshipPost", k => k
+                    .AddKeyPath(p => p.Id)))
 
             // RelationshipComment
             .AddObject<RelationshipComment>(o => o
@@ -543,37 +531,39 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
                 .AddProperty(p => p.PostRef)
                 .AddProperty(p => p.Body)
                 .AddProperty(p => p.Post)
-                .AddIdentity("PK_RelationshipComment", i => i.AddScalarPart(p => p.Id)))
+                .AddKeyType("PK_RelationshipComment", k => k
+                    .AddKeyPath(p => p.Id)))
 
             // RelationshipTag
             .AddObject<RelationshipTag>(o => o
                 .AddProperty(p => p.Id)
                 .AddProperty(p => p.Name)
                 .AddProperty(p => p.Posts)
-                .AddIdentity("PK_RelationshipTag", i => i.AddScalarPart(p => p.Id)))
+                .AddKeyType("PK_RelationshipTag", k => k
+                    .AddKeyPath(p => p.Id)))
 
             // RelationshipPostTag
             .AddObject<RelationshipPostTag>(o => o
                 .AddProperty(p => p.PostId)
                 .AddProperty(p => p.TagId)
-                .AddIdentity("PK_RelationshipPostTag", i => i
-                    .AddScalarPart(p => p.PostId)
-                    .AddScalarPart(p => p.TagId)))
+                .AddKeyType("PK_RelationshipPostTag", k => k
+                    .AddKeyPath(p => p.PostId)
+                    .AddKeyPath(p => p.TagId)))
 
             // RelationshipCatalogItem
             .AddObject<RelationshipCatalogItem>(o => o
                 .AddProperty(p => p.Sku)
                 .AddProperty(p => p.Revision)
                 .AddProperty(p => p.Name)
-                .AddIdentity("PK_RelationshipCatalogItem", i => i
-                    .AddScalarPart(p => p.Sku)
-                    .AddScalarPart(p => p.Revision)))
+                .AddKeyType("PK_RelationshipCatalogItem", k => k
+                    .AddKeyPath(p => p.Sku)
+                    .AddKeyPath(p => p.Revision)))
 
             // RelationshipOrder
             .AddObject<RelationshipOrder>(o => o
                 .AddProperty(p => p.Id)
                 .AddProperty(p => p.Lines)
-                .AddIdentity("PK_RelationshipOrder", i => i.AddScalarPart(p => p.Id)))
+                .AddKeyType("PK_RelationshipOrder", k => k.AddKeyPath(p => p.Id)))
 
             // RelationshipOrderLine
             .AddObject<RelationshipOrderLine>(o => o
@@ -582,17 +572,17 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
                 .AddProperty(p => p.ProductSku)
                 .AddProperty(p => p.ProductRevision)
                 .AddProperty(p => p.ProductKey)
-                .AddIdentity("PK_RelationshipOrderLine", i => i
-                    .AddScalarPart(p => p.OrderId)
-                    .AddScalarPart(p => p.LineNumber)))
+                .AddKeyType("PK_RelationshipOrderLine", k => k
+                    .AddKeyPath(p => p.OrderId)
+                    .AddKeyPath(p => p.LineNumber)))
 
             // RelationshipOwnedLine
             .AddObject<RelationshipOwnedLine>(o => o
                 .AddProperty(p => p.LineNumber)
                 .AddProperty(p => p.Notes)
-                .AddIdentity("PK_RelationshipOwnedLine", i => i
-                    .AddOwnerPart()
-                    .AddScalarPart(p => p.LineNumber)))
+                .AddKeyType("PK_RelationshipOwnedLine", k => k
+                    .AddKeyPath<RelationshipOrder, Ulid>(p => p.Id)
+                    .AddKeyPath(p => p.LineNumber)))
 
             // RelationshipOrgUnit
             .AddObject<RelationshipOrgUnit>(o => o
@@ -600,62 +590,59 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
                 .AddProperty(p => p.ParentId)
                 .AddProperty(p => p.Name)
                 .AddProperty(p => p.Children)
-                .AddIdentity("PK_RelationshipOrgUnit", i => i.AddScalarPart(p => p.Id))
+                .AddKeyType("PK_RelationshipOrgUnit", k => k.AddKeyPath(p => p.Id)))
 
             // Relationships
             .AddOneToOneRelationship("REL_User_UserProfile_1to1ViaScalar", r => r
                 .WithPrincipalEnd<RelationshipUser>()
-                .WithDependentEnd<RelationshipUserProfile>(de => de.AddScalarPath(p => p.UserId)))
+                .WithDependentEnd<RelationshipUserProfile>(de => de.WithForeignKeyType("FK_User_UserProfile_UserId", fk => fk.AddKeyPath(p => p.UserId))))
 
             .AddOneToOneRelationship("REL_User_UserProfile_1to1ViaNested", r => r
                 .WithPrincipalEnd<RelationshipUser>()
-                .WithDependentEnd<RelationshipUserProfile>(de => de.AddNestedPath(p => p.UserRef, sp => sp.AddScalarPath(p => p.UserId))))
+                .WithDependentEnd<RelationshipUserProfile>(de => de.WithForeignKeyType("FK_User_UserProfile_UserRef_UserId", fk => fk.AddKeyPath(p => p.UserRef.UserId))))
 
             .AddOneToManyRelationship("REL_User_Post_1toN_ViaScalar", r => r
                 .WithPrincipalEnd<RelationshipUser>()
-                .WithDependentEnd<RelationshipPost>(de => de.AddScalarPath(p => p.AuthorUserId)))
+                .WithDependentEnd<RelationshipPost>(de => de.WithForeignKeyType("FK_User_Post_AuthorUserId", fk => fk.AddKeyPath(p => p.AuthorUserId))))
 
             .AddOneToManyRelationship("REL_User_Post_1toN_ViaNested", r => r
                 .WithPrincipalEnd<RelationshipUser>()
-                .WithDependentEnd<RelationshipPost>(de => de.AddNestedPath(p => p.AuthorUserRef, sp => sp.AddScalarPath(p => p.UserId))))
+                .WithDependentEnd<RelationshipPost>(de => de.WithForeignKeyType("FK_User_Post_AuthorUserRef_UserId", fk => fk.AddKeyPath(p => p.AuthorUserRef.UserId))))
 
             .AddOneToManyRelationship("REL_Post_Comment_1toN_ViaScalar", r => r
                 .WithPrincipalEnd<RelationshipPost>()
-                .WithDependentEnd<RelationshipComment>(de => de.AddScalarPath(p => p.PostId)))
+                .WithDependentEnd<RelationshipComment>(de => de.WithForeignKeyType("FK_Post_Comment_PostId", fk => fk.AddKeyPath(p => p.PostId))))
 
             .AddOneToManyRelationship("REL_Post_Comment_1toN_ViaNested", r => r
                 .WithPrincipalEnd<RelationshipPost>()
-                .WithDependentEnd<RelationshipComment>(de => de.AddNestedPath(p => p.PostRef, sp => sp.AddScalarPath(p => p.PostId))))
+                .WithDependentEnd<RelationshipComment>(de => de.WithForeignKeyType("FK_Post_Comment_PostRef_PostId", fk => fk.AddKeyPath(p => p.PostRef.PostId))))
 
             .AddManyToManyRelationship("REL_Post_Tag_NtoN_ViaPostTag", r => r
                 .WithPrincipalEndA<RelationshipPost>()
                 .WithPrincipalEndB<RelationshipTag>()
                 .WithAssociation<RelationshipPostTag>(a => a
-                    .AddScalarPathA(p => p.PostId)
-                    .AddScalarPathB(p => p.TagId)))
+                    .WithForeignKeyTypeA("FK_Post_PostTag_PostId", fk => fk.AddKeyPath(p => p.PostId))
+                    .WithForeignKeyTypeB("FK_Tag_PostTag_TagId", fk => fk.AddKeyPath(p => p.TagId))))
 
             .AddOneToManyRelationship("REL_CatalogItem_OrderLine_1toN_ViaScalarComposite", r => r
                 .WithPrincipalEnd<RelationshipCatalogItem>()
-                .WithDependentEnd<RelationshipOrderLine>(de => de
-                    .AddScalarPath(p => p.ProductSku)
-                    .AddScalarPath(p => p.ProductRevision)))
+                .WithDependentEnd<RelationshipOrderLine>(de => de.WithForeignKeyType("FK_CatalogItem_OrderLine_ProductKeys", fk => fk
+                    .AddKeyPath(p => p.ProductSku)
+                    .AddKeyPath(p => p.ProductRevision))))
 
             .AddOneToManyRelationship("REL_CatalogItem_OrderLine_1toN_ViaNestedComposite", r => r
                 .WithPrincipalEnd<RelationshipCatalogItem>()
-                .WithDependentEnd<RelationshipOrderLine>(de => de
-                    .AddNestedPath(p => p.ProductKey, sp => sp
-                        .AddScalarPath(p => p.Sku)
-                        .AddScalarPath(p => p.Revision))))
+                .WithDependentEnd<RelationshipOrderLine>(de => de.WithForeignKeyType("FK_CatalogItem_OrderLine_ProductKey", fk => fk
+                    .AddKeyPath(p => p.ProductKey.Sku)
+                    .AddKeyPath(p => p.ProductKey.Revision))))
 
             .AddOneToManyRelationship("REL_Order_OwnedLine_1toN_ViaOwnerKeyPath", r => r
                 .WithPrincipalEnd<RelationshipOrder>()
-                .WithDependentEnd<RelationshipOwnedLine>(de => de
-                    .AddOwnerPath<RelationshipOrder>(sp => sp.AddScalarPath(p => p.Id))
-                    .AddScalarPath(p => p.LineNumber)))
+                .WithDependentEnd<RelationshipOwnedLine>())
 
             .AddOneToManyRelationship("REL_OrgUnit_OrgUnit_1toN", r => r
                 .WithPrincipalEnd<RelationshipOrgUnit>()
-                .WithDependentEnd<RelationshipOrgUnit>(de => de.AddScalarPath(p => p.ParentId))));
+                .WithDependentEnd<RelationshipOrgUnit>(de => de.WithForeignKeyType("FK_OrgUnit_OrgUnit_ParentId", fk => fk.AddKeyPath(p => p.ParentId))));
 
         return builder;
     }

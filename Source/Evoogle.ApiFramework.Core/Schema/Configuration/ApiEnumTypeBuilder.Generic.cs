@@ -17,16 +17,16 @@ public sealed class ApiEnumTypeBuilder<T>(ApiSchemaBuilderContext context)
     where T : Enum
 {
     #region AddExtension Methods
-    /// <inheritdoc cref="ApiEnumTypeBuilder.AddEnumExtension(Type, object)"/>
-    public new ApiEnumTypeBuilder<T> AddEnumExtension(Type type, object value)
+    /// <inheritdoc cref="ApiEnumTypeBuilder.AddEnumTypeExtension(Type, object)"/>
+    public new ApiEnumTypeBuilder<T> AddEnumTypeExtension(Type type, object value)
     {
-        base.AddEnumExtension(type, value);
+        base.AddEnumTypeExtension(type, value);
         return this;
     }
 
-    /// <inheritdoc cref="ApiEnumTypeBuilder.AddEnumExtension{TExt}(TExt)"/>
-    public new ApiEnumTypeBuilder<T> AddEnumExtension<TExt>(TExt value) where TExt : notnull
-        => this.AddEnumExtension(typeof(TExt), value);
+    /// <inheritdoc cref="ApiEnumTypeBuilder.AddEnumTypeExtension{TExt}(TExt)"/>
+    public new ApiEnumTypeBuilder<T> AddEnumTypeExtension<TExt>(TExt value) where TExt : notnull
+        => this.AddEnumTypeExtension(typeof(TExt), value);
     #endregion
 
     #region AddValue Methods

@@ -80,16 +80,9 @@ public partial class ApiSchemaBuilderTests
 
         new BuildTestGeneric
         {
-            Name = $"Build '{ApiSchemaKind.Identity}' API schema",
-            ApiSchemaKind = ApiSchemaKind.Identity,
-            ApiSchemaActualBuildExpression = static () => ApiSchemaBuilderTestsGenericTestFactory.BuildIdentityApiSchema(),
-        },
-
-        new BuildTestGeneric
-        {
-            Name = $"Build '{ApiSchemaKind.Commerce}' API schema",
-            ApiSchemaKind = ApiSchemaKind.Commerce,
-            ApiSchemaActualBuildExpression = static () => ApiSchemaBuilderTestsGenericTestFactory.BuildCommerceApiSchema(),
+            Name = $"Build '{ApiSchemaKind.Key}' API schema",
+            ApiSchemaKind = ApiSchemaKind.Key,
+            ApiSchemaActualBuildExpression = static () => ApiSchemaBuilderTestsGenericTestFactory.BuildKeyApiSchema(),
         },
 
         new BuildTestGeneric
@@ -97,6 +90,13 @@ public partial class ApiSchemaBuilderTests
             Name = $"Build '{ApiSchemaKind.Relationship}' API schema",
             ApiSchemaKind = ApiSchemaKind.Relationship,
             ApiSchemaActualBuildExpression = static () => ApiSchemaBuilderTestsGenericTestFactory.BuildRelationshipApiSchema(),
+        },
+
+        new BuildTestGeneric
+        {
+            Name = $"Build '{ApiSchemaKind.Commerce}' API schema",
+            ApiSchemaKind = ApiSchemaKind.Commerce,
+            ApiSchemaActualBuildExpression = static () => ApiSchemaBuilderTestsGenericTestFactory.BuildCommerceApiSchema(),
         },
     ];
     #endregion

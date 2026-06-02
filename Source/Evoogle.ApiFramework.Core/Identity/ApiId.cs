@@ -1062,7 +1062,7 @@ public readonly struct ApiId
     /// </summary>
     /// <param name="text">The string to parse.</param>
     /// <param name="provider">Format provider (currently unused; parsing is culture-invariant).</param>
-    /// <param name="result">Outputs the parsed identifier on success; otherwise <see cref="ApiId.Empty"/>.</param>
+    /// <param name="result">Outputs the parsed identifier on success; otherwise <see cref="Empty"/>.</param>
     /// <returns><see langword="true"/> if parsing succeeded; otherwise <see langword="false"/>.</returns>
     public static bool TryParse([NotNullWhen(true)] string? text, IFormatProvider? provider, [MaybeNullWhen(false)] out ApiId result)
     {
@@ -1081,7 +1081,7 @@ public readonly struct ApiId
     /// </summary>
     /// <param name="text">The span to parse.</param>
     /// <param name="provider">Format provider (currently unused; parsing is culture-invariant).</param>
-    /// <param name="result">Outputs the parsed identifier on success; otherwise <see cref="ApiId.Empty"/>.</param>
+    /// <param name="result">Outputs the parsed identifier on success; otherwise <see cref="Empty"/>.</param>
     /// <returns><see langword="true"/> if parsing succeeded; otherwise <see langword="false"/>.</returns>
     public static bool TryParse(ReadOnlySpan<char> text, IFormatProvider? provider, [MaybeNullWhen(false)] out ApiId result)
     {

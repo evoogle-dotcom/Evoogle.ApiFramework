@@ -63,7 +63,7 @@ public class ApiEnumTypeBuilderTests(ITestOutputHelper output) : XUnitTests(outp
             if (this.ApiExtensionType != null)
             {
                 var extension = Activator.CreateInstance(this.ApiExtensionType);
-                builder.AddEnumExtension(this.ApiExtensionType, extension!);
+                builder.AddEnumTypeExtension(this.ApiExtensionType, extension!);
             }
 
             this.ApiTypeActual = builder.Build();

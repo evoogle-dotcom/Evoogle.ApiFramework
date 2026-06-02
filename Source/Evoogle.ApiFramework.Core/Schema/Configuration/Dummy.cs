@@ -185,7 +185,7 @@ public static class Dummy
         {
             builder
                 .WithName("Email")
-                .AddScalarExtension(new VisibleMetadata { Visible = true });
+                .AddScalarTypeExtension(new VisibleMetadata { Visible = true });
         }
     }
 
@@ -203,7 +203,7 @@ public static class Dummy
                 .AddValue("Shipped", "Shipped", 1)
                 .AddValue("Delivered", "Delivered", 2)
                 .AddValue("Cancelled", "Cancelled", 3)
-                .AddEnumExtension(new VisibleMetadata { Visible = true });
+                .AddEnumTypeExtension(new VisibleMetadata { Visible = true });
         }
     }
 
@@ -220,7 +220,7 @@ public static class Dummy
                 .AddProperty("id", "Id")
                 .AddProperty("status", "Status")
                 .AddProperty("total", "Total")
-                .AddObjectExtension(new VisibleMetadata { Visible = true });
+                .AddObjectTypeExtension(new VisibleMetadata { Visible = true });
         }
     }
 
@@ -238,7 +238,7 @@ public static class Dummy
                 .WithPrincipalEnd<Customer>()
                 .WithDependentEnd<Order>
                 (
-                    d => d.AddScalarPath("CustomerId")
+                    d => d.WithForeignKeyType("FK", b => b.AddKeyPath(typeof(Order), "CustomerId"))
                 );
         }
     }
@@ -257,9 +257,9 @@ public static class Dummy
                 .WithPrincipalEnd(typeof(Order))
                 .WithDependentEnd(typeof(OrderItem),
                 (
-                    d => d
-                        .AddScalarPath("OrderId")
-                        .AddScalarPath("LineItemNumber")
+                    d => d.WithForeignKeyType("FK", b => b
+                        .AddKeyPath(typeof(OrderItem), "OrderId")
+                        .AddKeyPath(typeof(OrderItem), "LineItemNumber"))
                 ));
         }
     }
@@ -289,12 +289,12 @@ public static class Dummy
                 .WithPrincipalEnd<Customer>
                 (
                     p => p
-                        .AddPrincipalEndExtension(new VisibleMetadata { Visible = true })
+                        .AddRelationshipPrincipalEndExtension(new VisibleMetadata { Visible = true })
                 )
                 .WithDependentEnd<CustomerProfile>
                 (
                     // FK is NOT a direct scalar — it lives inside the nested CustomerRef property.
-                    d => d.AddNestedPath("CustomerRef", n => n.AddScalarPath("CustomerId"))
+                    d => d.WithForeignKeyType("FK", b => b.AddKeyPath(typeof(CustomerProfile), "CustomerRef", "CustomerId"))
                 );
         }
     }
@@ -313,7 +313,7 @@ public static class Dummy
             builder
                 .WithPrincipalEndA<Product>
                 (
-                    p => p.AddPrincipalEndExtension(new VisibleMetadata { Visible = true })
+                    p => p.AddRelationshipPrincipalEndExtension(new VisibleMetadata { Visible = true })
                 )
                 .WithPrincipalEndB<Tag>
                 (
@@ -322,8 +322,8 @@ public static class Dummy
                 .WithAssociation<ProductTag>
                 (
                     a => a
-                        .AddScalarPathA(p => p.ProductId)
-                        .AddScalarPathB(p => p.TagId)
+                        .WithForeignKeyTypeA("FKA", b => b.AddKeyPath(typeof(ProductTag), "ProductId"))
+                        .WithForeignKeyTypeB("FKB", b => b.AddKeyPath(typeof(ProductTag), "TagId"))
                 );
         }
     }
@@ -335,15 +335,14 @@ public static class Dummy
             builder
                 .WithName("Customer")
                 .WithOptions(o => o.ThrowOnNullKeyPart())
-                .AddIdentity("PrimaryKey", b => b
-                    .AddScalarPart(c => c.Id))
-                .AddIdentity("AlternateKey", b => b
-                    .AddNestedPart(c => c.Country)
-                    .AddScalarPart(c => c.Name))
                 .AddRequiredProperty(c => c.Id)
                 .AddRequiredProperty(c => c.Name)
                 .AddOptionalProperty(c => c.Email)
-                .AddRequiredProperty(c => c.Orders);
+                .AddRequiredProperty(c => c.Orders)
+                .AddKeyType("PrimaryKey", b => b
+                    .AddKeyPath(c => c.Id))
+                .AddKeyType("AlternateKey", b => b
+                    .AddKeyPath(c => c.Country.Code));
         }
     }
 
@@ -354,7 +353,7 @@ public static class Dummy
             builder
                 .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete)
                 .WithPrincipalEnd<Customer>()
-                .WithDependentEnd<Order>(d => d.AddScalarPath(o => o.CustomerId));
+                .WithDependentEnd<Order>(d => d.WithForeignKeyType("FK", b => b.AddKeyPath(o => o.CustomerId)));
         }
     }
 
@@ -366,8 +365,7 @@ public static class Dummy
                 .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete)
                 .WithPrincipalEnd<Customer>()
                 .WithDependentEnd<CustomerProfile>(d => d
-                    .AddNestedPath(cp => cp.CustomerRef, n => n
-                        .AddScalarPath(r => r.CustomerId)));
+                    .WithForeignKeyType("FK", b => b.AddKeyPath(cp => cp.CustomerRef.CustomerId)));
         }
     }
 
@@ -381,8 +379,8 @@ public static class Dummy
                 .WithAssociation<ProductTag>
                 (
                     a => a
-                        .AddScalarPathA(p => p.ProductId)
-                        .AddScalarPathB(p => p.TagId)
+                        .WithForeignKeyTypeA("FKA", b => b.AddKeyPath(p => p.ProductId))
+                        .WithForeignKeyTypeB("FKB", b => b.AddKeyPath(p => p.TagId))
                 );
         }
     }
@@ -404,22 +402,20 @@ public static class Dummy
                 .AddSchemaExtension(new VisibleMetadata { Visible = true })
             .AddObject(typeof(Country), x => x
                 .WithName("Country")
-                .AddIdentity("PrimaryKey", identity => identity
-                    .AddScalarPart("Code")))
+                .AddKeyType("PrimaryKey", b => b
+                    .AddKeyPath(typeof(Country), "Code")))
             .AddObject(typeof(Customer), x => x
                 .WithName("Customer")
                 .WithOptions(o => o
                     .ThrowOnNullKeyPart())
-                .AddIdentity("PrimaryKey", identity => identity
-                    .AddScalarPart("Id"))
-                .AddIdentity("AlternateKey", identity => identity
-                    .AddNestedPart("Country")
-                    .AddScalarPart("Name"))
                 .AddProperty("Id", "Id", p => p.WithModifiers(m => m.Required()))
                 .AddProperty("Name", "Name", p => p.WithModifiers(m => m.Required()).AddPropertyExtension(new VisibleMetadata { Visible = true }))
                 .AddProperty("Email", "Email", p => p.WithModifiers(m => m.Optional()))
-                .AddProperty("Orders", "Orders", p => p.WithModifiers(m => m.Required())))
-                .AddSchemaExtension(new VisibleMetadata { Visible = true })
+                .AddProperty("Orders", "Orders", p => p.WithModifiers(m => m.Required()))
+                .AddKeyType("PrimaryKey", b => b
+                    .AddKeyPath(typeof(Customer), "Id"))
+                .AddKeyType("AlternateKey", b => b
+                    .AddKeyPath(typeof(Customer), "Country", "Code")))
             .AddObject(typeof(Order), x => x
                 .WithName("Order")
                 .WithDefaultOptions()
@@ -431,17 +427,19 @@ public static class Dummy
             .AddObject(typeof(OrderItem), x => x
                 .WithName("OrderItem")
                 .WithDefaultOptions()
-                .AddIdentity("PrimaryKey", identity => identity
-                    .AddOwnerPart()
-                    .AddScalarPart("OrderId", x => x.AddIdentityPartExtension(new VisibleMetadata { Visible = true }))
-                    .AddScalarPart("LineItemNumber", typeof(long)))
                 .AddProperty("OrderId", "OrderId", p => p.WithModifiers(m => m.Required()))
                 .AddProperty("LineItemNumber", "LineItemNumber", p => p.WithModifiers(m => m.Required()))
                 .AddProperty("ProductName", "ProductName", p => p.WithModifiers(m => m.Required()))
                 .AddProperty("Quantity", "Quantity", p => p.WithModifiers(m => m.Required()))
-                .AddProperty("UnitPrice", "UnitPrice", p => p.WithModifiers(m => m.Required())))
+                .AddProperty("UnitPrice", "UnitPrice", p => p.WithModifiers(m => m.Required()))
+                .AddKeyType("PrimaryKey", b => b
+                    .AddKeyPath(typeof(OrderItem), ["OrderId"], p => p.AddKeyPathExtension(new VisibleMetadata { Visible = true }))
+                    .AddKeyPath(typeof(OrderItem), "LineItemNumber"))
+                .AddKeyType("AlternateKey", b => b
+                    .AddKeyPath(typeof(Order), ["Id"], p => p.AddKeyPathExtension(new VisibleMetadata { Visible = true }))
+                    .AddKeyPath(typeof(OrderItem), "LineItemNumber")))
             .AddEnum(typeof(OrderStatus), x => x
-                .AddEnumExtension(new VisibleMetadata { Visible = true })
+                .AddEnumTypeExtension(new VisibleMetadata { Visible = true })
                 .WithName("OrderStatus")
                 .AddValue("Pending", "Pending", 0)
                 .AddValue("Shipped", "Shipped", 1)
@@ -452,29 +450,28 @@ public static class Dummy
             .AddObject(typeof(Order), new OrderConfiguration())
             .AddObject(typeof(CustomerProfile), x => x
                 .WithName("CustomerProfile")
-                .AddIdentity("PrimaryKey", identity => identity
-                    .AddNestedPart("CustomerRef")
-                    .AddScalarPart("CustomerId"))
-                .AddProperty("Biography", "Biography", p => p.WithModifiers(m => m.Required())))
+                .AddProperty("Biography", "Biography", p => p.WithModifiers(m => m.Required()))
+                .AddKeyType("PrimaryKey", b => b
+                    .AddKeyPath(typeof(CustomerProfile), "CustomerRef", "CustomerId")))
             .AddObject(typeof(Product), x => x
                 .WithName("Product")
-                .AddIdentity("PrimaryKey", identity => identity
-                    .AddScalarPart("Id"))
                 .AddProperty("Id", "Id", p => p.WithModifiers(m => m.Required()))
-                .AddProperty("Name", "Name", p => p.WithModifiers(m => m.Required())))
+                .AddProperty("Name", "Name", p => p.WithModifiers(m => m.Required()))
+                .AddKeyType("PrimaryKey", b => b
+                    .AddKeyPath(typeof(Product), "Id")))
             .AddObject(typeof(Tag), x => x
                 .WithName("Tag")
-                .AddIdentity("PrimaryKey", identity => identity
-                    .AddScalarPart("Id"))
                 .AddProperty("Id", "Id", p => p.WithModifiers(m => m.Required()))
-                .AddProperty("Name", "Name", p => p.WithModifiers(m => m.Required())))
+                .AddProperty("Name", "Name", p => p.WithModifiers(m => m.Required()))
+                .AddKeyType("PrimaryKey", b => b
+                    .AddKeyPath(typeof(Tag), "Id")))
             .AddObject(typeof(ProductTag), x => x
                 .WithName("ProductTag")
-                .AddIdentity("PrimaryKey", identity => identity
-                    .AddScalarPart("ProductId")
-                    .AddScalarPart("TagId"))
                 .AddProperty("ProductId", "ProductId", p => p.WithModifiers(m => m.Required()))
-                .AddProperty("TagId", "TagId", p => p.WithModifiers(m => m.Required())))
+                .AddProperty("TagId", "TagId", p => p.WithModifiers(m => m.Required()))
+                .AddKeyType("PrimaryKey", b => b
+                    .AddKeyPath(typeof(ProductTag), "ProductId")
+                    .AddKeyPath(typeof(ProductTag), "TagId")))
             .AddOneToManyRelationship("CustomerHasOrders", new CustomerHasOrdersRelationshipConfiguration())
             .AddOneToManyRelationship("OrderHasOrderItems", new OrderHasOrderItemsRelationshipConfiguration())
             .AddOneToManyRelationship
@@ -485,11 +482,10 @@ public static class Dummy
                     .WithPrincipalEnd<Customer>()
                     .WithDependentEnd<Order>
                     (
-                        d => d.AddScalarPath("CustomerId")
+                        d => d.WithForeignKeyType("FK", b => b.AddKeyPath(typeof(Order), "CustomerId"))
                     )
             )
-            // 1:M — inline lambda; demonstrates AddOwnerPath for a dependent type whose FK
-            //        is expressed through the owner reference in its composite identity.
+            // 1:M — inline lambda; demonstrates WithForeignKeyType for composite FK.
             .AddOneToManyRelationship
             (
                 "OrderOrderItemsViaOwner",
@@ -498,7 +494,9 @@ public static class Dummy
                     .WithPrincipalEnd<Order>()
                     .WithDependentEnd<OrderItem>
                     (
-                        d => d.AddOwnerPath()
+                        d => d.WithForeignKeyType("FK", b => b
+                            .AddKeyPath(typeof(OrderItem), "OrderId")
+                            .AddKeyPath(typeof(OrderItem), "LineItemNumber"))
                     )
             )
             // 1:1 — configuration class style; demonstrates AddNestedPath on the dependent end.
@@ -516,7 +514,7 @@ public static class Dummy
                     )
                     .WithDependentEnd<CustomerProfile>
                     (
-                        d => d.AddNestedPath("CustomerRef", n => n.AddScalarPath("CustomerId"))
+                        d => d.WithForeignKeyType("FK", b => b.AddKeyPath(typeof(CustomerProfile), "CustomerRef", "CustomerId"))
                     )
             )
             // M:N — configuration class style; demonstrates WithIdentityName and extensions on principal ends.
@@ -530,7 +528,7 @@ public static class Dummy
                     (
                         p => p
                             .WithIdentityName("PrimaryKey")
-                            .AddPrincipalEndExtension(new VisibleMetadata { Visible = true })
+                            .AddRelationshipPrincipalEndExtension(new VisibleMetadata { Visible = true })
                     )
                     .WithPrincipalEndB<Tag>
                     (
@@ -540,9 +538,9 @@ public static class Dummy
                     .WithAssociation<ProductTag>
                     (
                         a => a
-                            .AddScalarPathA(p => p.ProductId)
-                            .AddScalarPathB(p => p.TagId)
-                            .AddAssociationExtension(new VisibleMetadata { Visible = true })
+                            .WithForeignKeyTypeA("FKA", b => b.AddKeyPath(typeof(ProductTag), "ProductId"))
+                            .WithForeignKeyTypeB("FKB", b => b.AddKeyPath(typeof(ProductTag), "TagId"))
+                            .AddRelationshipAssociationExtension(new VisibleMetadata { Visible = true })
                     )
                     .AddRelationshipExtension(new VisibleMetadata { Visible = true })
             )
@@ -568,65 +566,67 @@ public static class Dummy
                 .AddValue("Cancelled", "Cancelled", 3))
             .AddObject<Country>(x => x
                 .WithName("Country")
-                .AddIdentity("PrimaryKey", b => b.AddScalarPart(c => c.Code))
-                .AddProperty(c => c.Code))
+                .AddProperty(c => c.Code)
+                .AddKeyType("PrimaryKey", b => b.AddKeyPath(c => c.Code)))
             .AddObject(new CustomerConfigurationGeneric())
             .AddObject<Order>(x => x
                 .WithName("Order")
-                .AddIdentity("PrimaryKey", b => b.AddScalarPart(o => o.Id))
                 .AddProperty(o => o.Id, p => p.WithModifiers(m => m.Required()))
                 .AddProperty(o => o.Status, p => p.WithModifiers(m => m.Required()))
                 .AddProperty(o => o.Total, p => p.WithModifiers(m => m.Required()))
                 .AddProperty(o => o.CustomerId, p => p.WithModifiers(m => m.Optional()))
-                .AddProperty(o => o.Customer, p => p.WithModifiers(m => m.Optional())))
+                .AddProperty(o => o.Customer, p => p.WithModifiers(m => m.Optional()))
+                .AddKeyType("PrimaryKey", b => b.AddKeyPath(o => o.Id)))
             .AddObject<OrderItem>(x => x
                 .WithName("OrderItem")
-                .AddIdentity("PrimaryKey", b => b
-                    .AddOwnerPart()
-                    .AddScalarPart(oi => oi.OrderId)
-                    .AddScalarPart(oi => oi.LineItemNumber, typeof(long)))
                 .AddProperty(oi => oi.OrderId, p => p.WithModifiers(m => m.Required()))
                 .AddProperty(oi => oi.LineItemNumber, p => p.WithModifiers(m => m.Required()))
                 .AddProperty(oi => oi.ProductName, p => p.WithModifiers(m => m.Required()))
                 .AddProperty(oi => oi.Quantity, p => p.WithModifiers(m => m.Required()))
-                .AddProperty(oi => oi.UnitPrice, p => p.WithModifiers(m => m.Required())))
+                .AddProperty(oi => oi.UnitPrice, p => p.WithModifiers(m => m.Required()))
+                .AddKeyType("PrimaryKey", b => b
+                    .AddKeyPath(oi => oi.OrderId)
+                    .AddKeyPath(oi => oi.LineItemNumber))
+                .AddKeyType("AlternateKey", b => b
+                    .AddKeyPath<Order, Guid>(o => o.Id)
+                    .AddKeyPath(oi => oi.LineItemNumber)))
             .AddObject<CustomerProfile>(x => x
                 .WithName("CustomerProfile")
-                .AddIdentity("PrimaryKey", b => b.AddNestedPart(cp => cp.CustomerRef))
                 .AddProperty(cp => cp.CustomerRef, p => p.WithModifiers(m => m.Required()))
-                .AddProperty(cp => cp.Biography, p => p.WithModifiers(m => m.Required())))
+                .AddProperty(cp => cp.Biography, p => p.WithModifiers(m => m.Required()))
+                .AddKeyType("PrimaryKey", b => b.AddKeyPath(cp => cp.CustomerRef.CustomerId)))
             .AddObject<Product>(x => x
                 .WithName("Product")
-                .AddIdentity("PrimaryKey", b => b.AddScalarPart(p => p.Id))
                 .AddProperty(p => p.Id, cfg => cfg.WithModifiers(m => m.Required()))
-                .AddProperty(p => p.Name, cfg => cfg.WithModifiers(m => m.Required())))
+                .AddProperty(p => p.Name, cfg => cfg.WithModifiers(m => m.Required()))
+                .AddKeyType("PrimaryKey", b => b.AddKeyPath(p => p.Id)))
             .AddObject<Tag>(x => x
                 .WithName("Tag")
-                .AddIdentity("PrimaryKey", b => b.AddScalarPart(t => t.Id))
                 .AddProperty(t => t.Id, p => p.WithModifiers(m => m.Required()))
-                .AddProperty(t => t.Name, p => p.WithModifiers(m => m.Required())))
+                .AddProperty(t => t.Name, p => p.WithModifiers(m => m.Required()))
+                .AddKeyType("PrimaryKey", b => b.AddKeyPath(t => t.Id)))
             .AddObject<ProductTag>(x => x
                 .WithName("ProductTag")
-                .AddIdentity("PrimaryKey", b => b
-                    .AddScalarPart(pt => pt.ProductId)
-                    .AddScalarPart(pt => pt.TagId))
                 .AddProperty(pt => pt.ProductId, p => p.WithModifiers(m => m.Required()))
-                .AddProperty(pt => pt.TagId, p => p.WithModifiers(m => m.Required())))
+                .AddProperty(pt => pt.TagId, p => p.WithModifiers(m => m.Required()))
+                .AddKeyType("PrimaryKey", b => b
+                    .AddKeyPath(pt => pt.ProductId)
+                    .AddKeyPath(pt => pt.TagId)))
             .AddOneToManyRelationship("CustomerHasOrders", new CustomerHasOrdersConfigurationGeneric())
             .AddOneToManyRelationship("OrderHasOrderItems", r => r
                 .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete)
                 .WithPrincipalEnd<Order>()
                 .WithDependentEnd<OrderItem>(d => d
-                    .AddScalarPath(oi => oi.OrderId)
-                    .AddScalarPath(oi => oi.LineItemNumber)))
+                    .WithForeignKeyType("FK", b => b
+                        .AddKeyPath(oi => oi.OrderId)
+                        .AddKeyPath(oi => oi.LineItemNumber))))
             .AddOneToOneRelationship("CustomerHasProfile", new CustomerHasProfileConfigurationGeneric())
             .AddOneToOneRelationship("CustomerHasProfileInline", r => r
                 .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete)
                 .WithPrincipalEnd<Customer>(p => p
                     .WithIdentityName("PrimaryKey"))
                 .WithDependentEnd<CustomerProfile>(d => d
-                    .AddNestedPath(cp => cp.CustomerRef, n => n
-                        .AddScalarPath(r => r.CustomerId))))
+                    .WithForeignKeyType("FK", b => b.AddKeyPath(cp => cp.CustomerRef.CustomerId))))
             .AddManyToManyRelationship("ProductHasTags", new ProductTagConfigurationGeneric())
             .AddManyToManyRelationship("ProductHasTagsInline", r => r
                 .WithPrincipalEndA<Product>(p => p
@@ -634,8 +634,8 @@ public static class Dummy
                 .WithPrincipalEndB<Tag>(p => p
                     .WithIdentityName("PrimaryKey"))
                 .WithAssociation<ProductTag>(a => a
-                    .AddScalarPathA(p => p.ProductId)
-                    .AddScalarPathB(p => p.TagId)))
+                    .WithForeignKeyTypeA("FKA", b => b.AddKeyPath(p => p.ProductId))
+                    .WithForeignKeyTypeB("FKB", b => b.AddKeyPath(p => p.TagId))))
             .Build();
     }
 }

@@ -58,7 +58,7 @@ public class ApiScalarTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
             if (this.ApiExtensionType != null)
             {
                 var extension = Activator.CreateInstance(this.ApiExtensionType);
-                builder.AddScalarExtension(this.ApiExtensionType, extension!);
+                builder.AddScalarTypeExtension(this.ApiExtensionType, extension!);
             }
 
             this.ApiTypeActual = builder.Build();

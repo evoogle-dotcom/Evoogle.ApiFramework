@@ -14,34 +14,34 @@ public partial class ApiObjectTypeTests
     #region Theory Data
     public static TheoryDataRow<IXUnitTest>[] TryGetTheoryData =>
     [
-        // TryGetIdentityByApiName
+        // TryGetKeyTypeByApiName
         new TryGetTest
         {
-            Name = $"{nameof(ApiObjectType.TryGetIdentityByApiName)} returns true when {nameof(ApiIdentity)} exists with exact case match",
-            ApiSchemaKind = ApiSchemaKind.Identity,
-            ApiObjectTypeName = nameof(IdentityScalar),
-            TryGetMethod = TryGetMethod.TryGetIdentityByApiName,
-            SearchKey = "PK_IdentityScalar",
+            Name = $"{nameof(ApiObjectType.TryGetKeyTypeByApiName)} returns true when {nameof(ApiKeyType)} exists with exact case match",
+            ApiSchemaKind = ApiSchemaKind.Key,
+            ApiObjectTypeName = nameof(KeyOneScalarPart),
+            TryGetMethod = TryGetMethod.TryGetKeyTypeByApiName,
+            SearchKey = "PK_KeyOneScalarPart",
             ExpectedResult = true
         },
 
         new TryGetTest
         {
-            Name = $"{nameof(ApiObjectType.TryGetIdentityByApiName)} returns false when {nameof(ApiIdentity)} exists but case mismatch",
-            ApiSchemaKind = ApiSchemaKind.Identity,
-            ApiObjectTypeName = nameof(IdentityScalar),
-            TryGetMethod = TryGetMethod.TryGetIdentityByApiName,
-            SearchKey = "pk_identityscalar",
+            Name = $"{nameof(ApiObjectType.TryGetKeyTypeByApiName)} returns false when {nameof(ApiKeyType)} exists but case mismatch",
+            ApiSchemaKind = ApiSchemaKind.Key,
+            ApiObjectTypeName = nameof(KeyOneScalarPart),
+            TryGetMethod = TryGetMethod.TryGetKeyTypeByApiName,
+            SearchKey = "pk_keyonescalarpart",
             ExpectedResult = false
         },
 
         new TryGetTest
         {
-            Name = $"{nameof(ApiObjectType.TryGetIdentityByApiName)} returns false when {nameof(ApiIdentity)} does not exist",
-            ApiSchemaKind = ApiSchemaKind.Identity,
-            ApiObjectTypeName = nameof(IdentityScalar),
-            TryGetMethod = TryGetMethod.TryGetIdentityByApiName,
-            SearchKey = "Unknown_Identity",
+            Name = $"{nameof(ApiObjectType.TryGetKeyTypeByApiName)} returns false when {nameof(ApiKeyType)} does not exist",
+            ApiSchemaKind = ApiSchemaKind.Key,
+            ApiObjectTypeName = nameof(KeyOneScalarPart),
+            TryGetMethod = TryGetMethod.TryGetKeyTypeByApiName,
+            SearchKey = "Unknown_KeyType",
             ExpectedResult = false
         },
 

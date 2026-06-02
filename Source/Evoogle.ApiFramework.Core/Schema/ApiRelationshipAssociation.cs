@@ -19,12 +19,12 @@ namespace Evoogle.ApiFramework.Schema;
 ///     that link the two outer principal object types.
 ///
 ///     An association is either <em>navigational</em> — where no FK binding is declared at the schema level —
-///     or <em>key-bound</em>, where <see cref="ApiKeyPathsA"/> and <see cref="ApiKeyPathsB"/> explicitly
+///     or <em>key-bound</em>, where <see cref="ApiForeignKeyTypeA"/> and <see cref="ApiForeignKeyTypeB"/> explicitly
 ///     map the scalar leaves of each principal's join-key identity to properties on the association object type.
 /// </summary>
 /// <remarks>
 ///     Use <see cref="HasKeyBinding"/> to determine which state applies before accessing
-///     <see cref="ApiKeyPathsA"/> or <see cref="ApiKeyPathsB"/>.
+///     <see cref="ApiForeignKeyTypeA"/> or <see cref="ApiForeignKeyTypeB"/>.
 ///
 ///     The state is symmetric: both sides are either bound or navigational together.
 ///
@@ -34,9 +34,8 @@ namespace Evoogle.ApiFramework.Schema;
 public sealed class ApiRelationshipAssociation : ApiRelationshipElement
 {
     #region ApiRelationshipAssociation Fields
-    private readonly ApiRelationshipKeyPath[]? _apiKeyPathsA;
-    private readonly ApiRelationshipKeyPath[]? _apiKeyPathsB;
-    private readonly bool _hasAsymmetricKeyBinding;
+    private readonly ApiKeyType? _apiForeignKeyTypeA;
+    private readonly ApiKeyType? _apiForeignKeyTypeB;
 
     private ApiRelationshipManyToMany? _apiResolvedRelationshipManyToMany;
     #endregion
@@ -54,36 +53,36 @@ public sealed class ApiRelationshipAssociation : ApiRelationshipElement
     public ApiRelationshipManyToMany ApiRelationshipManyToMany => this.ThrowIfNotInitialized(_apiResolvedRelationshipManyToMany);
 
     /// <summary>
-    ///     Gets the FK key paths that map scalar leaves of principal end A's join-key <see cref="ApiIdentity"/>
+    ///     Gets the FK key type that maps scalar leaves of principal end A's join-key <see cref="ApiIdentity"/>
     ///     to properties on the association object type.
     /// </summary>
     /// <exception cref="ApiSchemaException">
     ///     Thrown when <see cref="IsNavigational"/> is <see langword="true"/>.
     ///     Check <see cref="HasKeyBinding"/> before accessing this property.
     /// </exception>
-    public ApiRelationshipKeyPath[] ApiKeyPathsA => this.HasKeyBinding
-        ? _apiKeyPathsA!
+    public ApiKeyType ApiForeignKeyTypeA => this.HasKeyBinding
+        ? _apiForeignKeyTypeA!
         : throw new ApiSchemaException("No key binding declared for this association of the many-to-many relationship.");
 
     /// <summary>
-    ///     Gets the FK key paths that map scalar leaves of principal end B's join-key <see cref="ApiIdentity"/>
+    ///     Gets the FK key type that maps scalar leaves of principal end B's join-key <see cref="ApiIdentity"/>
     ///     to properties on the association object type.
     /// </summary>
     /// <exception cref="ApiSchemaException">
     ///     Thrown when <see cref="IsNavigational"/> is <see langword="true"/>.
     ///     Check <see cref="HasKeyBinding"/> before accessing this property.
     /// </exception>
-    public ApiRelationshipKeyPath[] ApiKeyPathsB => this.HasKeyBinding
-        ? _apiKeyPathsB!
+    public ApiKeyType ApiForeignKeyTypeB => this.HasKeyBinding
+        ? _apiForeignKeyTypeB!
         : throw new ApiSchemaException("No key binding declared for this association of the many-to-many relationship.");
     #endregion
 
     #region ApiRelationshipAssociation Computed Properties
     /// <summary>
-    ///     Gets a value indicating whether this association has explicit FK key paths declared for both principal ends.
-    ///     When <see langword="true"/>, both <see cref="ApiKeyPathsA"/> and <see cref="ApiKeyPathsB"/> are available.
+    ///     Gets a value indicating whether this association has explicit FK key types declared for both principal ends.
+    ///     When <see langword="true"/>, both <see cref="ApiForeignKeyTypeA"/> and <see cref="ApiForeignKeyTypeB"/> are available.
     /// </summary>
-    public bool HasKeyBinding => _apiKeyPathsA is not null && _apiKeyPathsB is not null;
+    public bool HasKeyBinding => _apiForeignKeyTypeA is not null && _apiForeignKeyTypeB is not null;
 
     /// <summary>
     ///     Gets a value indicating whether this association is navigational (i.e. has no explicit FK key binding
@@ -102,52 +101,38 @@ public sealed class ApiRelationshipAssociation : ApiRelationshipElement
     public ApiRelationshipAssociation(Type clrObjectType)
         : base(clrObjectType)
     {
-        _apiKeyPathsA = null;
-        _apiKeyPathsB = null;
+        _apiForeignKeyTypeA = null;
+        _apiForeignKeyTypeB = null;
     }
 
     /// <summary>
-    ///     Initializes a key-bound association with explicit FK key paths for both principal ends.
+    ///     Initializes a key-bound association with explicit FK key types for both principal ends.
     /// </summary>
     /// <param name="clrObjectType">The CLR type of the association <see cref="ApiObjectType"/>.</param>
-    /// <param name="apiKeyPathsA">
-    ///     The FK key paths that map the scalar leaves of principal end A's join-key identity
-    ///     to properties on the association object type. Must be non-null and contain at least one non-null entry.
+    /// <param name="apiForeignKeyTypeA">
+    ///     The FK key type that maps the scalar leaves of principal end A's join-key identity
+    ///     to properties on the association object type.
     /// </param>
-    /// <param name="apiKeyPathsB">
-    ///     The FK key paths that map the scalar leaves of principal end B's join-key identity
-    ///     to properties on the association object type. Must be non-null and contain at least one non-null entry.
+    /// <param name="apiForeignKeyTypeB">
+    ///     The FK key type that maps the scalar leaves of principal end B's join-key identity
+    ///     to properties on the association object type.
     /// </param>
     /// <exception cref="ArgumentNullException">
-    ///     Thrown when <paramref name="apiKeyPathsA"/> or <paramref name="apiKeyPathsB"/> is <see langword="null"/>.
+    ///     Thrown when <paramref name="apiForeignKeyTypeA"/> or <paramref name="apiForeignKeyTypeB"/> is <see langword="null"/>.
     /// </exception>
     public ApiRelationshipAssociation
     (
         Type clrObjectType,
-        IEnumerable<ApiRelationshipKeyPath> apiKeyPathsA,
-        IEnumerable<ApiRelationshipKeyPath> apiKeyPathsB
+        ApiKeyType apiForeignKeyTypeA,
+        ApiKeyType apiForeignKeyTypeB
     )
         : base(clrObjectType)
     {
-        ArgumentNullException.ThrowIfNull(apiKeyPathsA);
-        ArgumentNullException.ThrowIfNull(apiKeyPathsB);
+        ArgumentNullException.ThrowIfNull(apiForeignKeyTypeA);
+        ArgumentNullException.ThrowIfNull(apiForeignKeyTypeB);
 
-        ApiRelationshipKeyPath[] pathsA = [.. apiKeyPathsA.Where(x => x is not null)];
-        ApiRelationshipKeyPath[] pathsB = [.. apiKeyPathsB.Where(x => x is not null)];
-
-        var hasPathsA = pathsA.Length > 0;
-        var hasPathsB = pathsB.Length > 0;
-        _hasAsymmetricKeyBinding = hasPathsA != hasPathsB;
-
-        if (!hasPathsA)
-        {
-            _apiKeyPathsA = null;
-            _apiKeyPathsB = null;
-            return;
-        }
-
-        _apiKeyPathsA = pathsA;
-        _apiKeyPathsB = hasPathsB ? pathsB : null;
+        _apiForeignKeyTypeA = apiForeignKeyTypeA;
+        _apiForeignKeyTypeB = apiForeignKeyTypeB;
     }
     #endregion
 
@@ -157,11 +142,11 @@ public sealed class ApiRelationshipAssociation : ApiRelationshipElement
     {
         var clrObjectType = this.ClrObjectType.SafeToName();
         var hasKeyBinding = this.HasKeyBinding;
-        var apiKeyPathsACount = hasKeyBinding ? _apiKeyPathsA!.Length.SafeToString() : "None";
-        var apiKeyPathsBCount = hasKeyBinding ? _apiKeyPathsB!.Length.SafeToString() : "None";
+        var apiForeignKeyTypeA = hasKeyBinding ? _apiForeignKeyTypeA!.SafeToString() : "None";
+        var apiForeignKeyTypeB = hasKeyBinding ? _apiForeignKeyTypeB!.SafeToString() : "None";
         var extensionCount = this.ExtensionCount.SafeToString();
 
-        return $"{nameof(ApiRelationshipAssociation)} {{{nameof(this.ClrObjectType)}={clrObjectType}, {nameof(this.HasKeyBinding)}={hasKeyBinding}, {nameof(this.ApiKeyPathsA)}Count={apiKeyPathsACount}, {nameof(this.ApiKeyPathsB)}Count={apiKeyPathsBCount}, {nameof(this.ExtensionCount)}={extensionCount}}}";
+        return $"{nameof(ApiRelationshipAssociation)} {{{nameof(this.ClrObjectType)}={clrObjectType}, {nameof(this.HasKeyBinding)}={hasKeyBinding}, {nameof(this.ApiForeignKeyTypeA)}={apiForeignKeyTypeA}, {nameof(this.ApiForeignKeyTypeB)}={apiForeignKeyTypeB}, {nameof(this.ExtensionCount)}={extensionCount}}}";
     }
     #endregion
 
@@ -173,7 +158,7 @@ public sealed class ApiRelationshipAssociation : ApiRelationshipElement
 
         base.Initialize(context);
 
-        this.InitializeApiKeyPaths(context);
+        this.InitializeApiForeignKeyTypes(context);
     }
     #endregion
 
@@ -186,48 +171,17 @@ public sealed class ApiRelationshipAssociation : ApiRelationshipElement
     #endregion
 
     #region Implementation Methods
-    private void InitializeApiKeyPaths(ApiInitializationContext context)
+    private void InitializeApiForeignKeyTypes(ApiInitializationContext context)
     {
-        if (_hasAsymmetricKeyBinding)
-        {
-            var path = this.ApiPath;
-            var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.API_RELATIONSHIP_MANY_TO_MANY_ASYMMETRIC_ASSOCIATION_KEY_PATH_BINDING;
-            var description = $"{nameof(this.ApiKeyPathsA)} and {nameof(this.ApiKeyPathsB)} must either both contain at least one key path or both be empty";
-            var remediation = $"Provide matching key-path binding shape for both {nameof(this.ApiKeyPathsA)} and {nameof(this.ApiKeyPathsB)}";
-
-            context.AddIssue(path, severity, code, description, remediation);
-            return;
-        }
-
         if (this.IsNavigational)
         {
             // No key binding declared — purely navigational relationship.
             return;
         }
 
-        // ApiObjectType is resolved by the base class.
-        // Key paths resolve their properties against the assocation object type.
-        var apiObjectType = this.ResolvedObjectType;
-        if (apiObjectType is null)
-        {
-            // ClrObjectType is null or failed to resolve — base already recorded the error.
-            return;
-        }
-
-        var pathContext = context
-            .WithDeclaringSchemaElement(this)
-            .WithDeclaringObjectTypeOnly(apiObjectType);
-
-        foreach (var keyPathA in this.ApiKeyPathsA)
-        {
-            keyPathA.Initialize(pathContext);
-        }
-
-        foreach (var keyPathB in this.ApiKeyPathsB)
-        {
-            keyPathB.Initialize(pathContext);
-        }
+        var fkContext = context.WithDeclaringSchemaElement(this);
+        _apiForeignKeyTypeA!.Initialize(fkContext);
+        _apiForeignKeyTypeB!.Initialize(fkContext);
     }
     #endregion
 }

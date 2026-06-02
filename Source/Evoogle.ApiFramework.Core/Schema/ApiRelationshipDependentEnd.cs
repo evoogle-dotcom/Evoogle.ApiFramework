@@ -16,21 +16,21 @@ namespace Evoogle.ApiFramework.Schema;
 ///     Represents the dependent end of an <see cref="ApiRelationship"/>.
 ///
 ///     A dependent end is either <em>navigational</em> — where no FK binding is declared
-///     at the schema level — or <em>key-bound</em>, where <see cref="ApiKeyPaths"/>
+///     at the schema level — or <em>key-bound</em>, where <see cref="ApiForeignKeyType"/>
 ///     explicitly maps scalar leaves of the principal <see cref="ApiIdentity"/> to
 ///     properties on the dependent object graph.
 /// </summary>
 /// <remarks>
 ///     Use <see cref="HasKeyBinding"/> to determine which state applies before
-///     accessing <see cref="ApiKeyPaths"/>.
-/// 
+///     accessing <see cref="ApiForeignKeyType"/>.
+///
 ///     The state is fixed at construction and does not change after initialization.
 /// </remarks>
 [JsonConverter(typeof(ApiRelationshipDependentEndJsonConverter))]
 public sealed class ApiRelationshipDependentEnd : ApiRelationshipEnd
 {
     #region ApiRelationshipDependentEnd Fields
-    private readonly ApiRelationshipKeyPath[]? _apiKeyPaths;
+    private readonly ApiKeyType? _apiForeignKeyType;
     #endregion
 
     #region ApiSchemaElement Properties
@@ -45,15 +45,15 @@ public sealed class ApiRelationshipDependentEnd : ApiRelationshipEnd
 
     #region ApiRelationshipDependentEnd Properties
     /// <summary>
-    ///     Gets the FK key paths that map scalar leaves of the principal's <see cref="ApiIdentity"/>
+    ///     Gets the FK key type that maps scalar leaves of the principal's <see cref="ApiIdentity"/>
     ///     to properties on this dependent object graph.
     /// </summary>
     /// <exception cref="ApiSchemaException">
     ///     Thrown when <see cref="IsNavigational"/> is <see langword="true"/>.
     ///     Check <see cref="HasKeyBinding"/> before accessing this property.
     /// </exception>
-    public ApiRelationshipKeyPath[] ApiKeyPaths => this.HasKeyBinding
-        ? _apiKeyPaths!
+    public ApiKeyType ApiForeignKeyType => this.HasKeyBinding
+        ? _apiForeignKeyType!
         : throw new ApiSchemaException("No key binding declared for this dependent end of the relationship.");
     #endregion
 
@@ -61,7 +61,7 @@ public sealed class ApiRelationshipDependentEnd : ApiRelationshipEnd
     /// <summary>
     ///    Gets a value indicating whether this dependent end has an explicit key binding declared at the schema level.
     /// </summary>
-    public bool HasKeyBinding => _apiKeyPaths is not null;
+    public bool HasKeyBinding => _apiForeignKeyType is not null;
 
     /// <summary>
     ///   Gets a value indicating whether this dependent end is navigational (i.e. has no explicit key binding declared at the schema level).
@@ -80,26 +80,25 @@ public sealed class ApiRelationshipDependentEnd : ApiRelationshipEnd
     public ApiRelationshipDependentEnd(Type clrObjectType)
         : base(clrObjectType)
     {
-        _apiKeyPaths = null;
+        _apiForeignKeyType = null;
     }
 
     /// <summary>
-    ///     Initializes a key-bound dependent end with explicit FK key paths that map the principal
+    ///     Initializes a key-bound dependent end with an explicit FK key type that maps the principal
     ///     identity's scalar leaves to properties on the dependent object graph.
     /// </summary>
     /// <param name="clrObjectType">The CLR type of the dependent <see cref="ApiObjectType"/>.</param>
-    /// <param name="apiKeyPaths">
-    ///     The FK key paths that map the principal identity's scalar leaves to properties
-    ///     on the dependent object graph. Must be non-null and contain at least one non-null entry.
+    /// <param name="apiForeignKeyType">
+    ///     The FK key type that maps the principal identity's scalar leaves to properties
+    ///     on the dependent object graph.
     /// </param>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="apiKeyPaths"/> is <see langword="null"/>.</exception>
-    public ApiRelationshipDependentEnd(Type clrObjectType, IEnumerable<ApiRelationshipKeyPath> apiKeyPaths)
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="apiForeignKeyType"/> is <see langword="null"/>.</exception>
+    public ApiRelationshipDependentEnd(Type clrObjectType, ApiKeyType apiForeignKeyType)
         : base(clrObjectType)
     {
-        ArgumentNullException.ThrowIfNull(apiKeyPaths);
+        ArgumentNullException.ThrowIfNull(apiForeignKeyType);
 
-        ApiRelationshipKeyPath[] paths = [.. apiKeyPaths.Where(x => x is not null)];
-        _apiKeyPaths = paths.Length > 0 ? paths : null; // Treat empty collection as null (i.e. no key binding).
+        _apiForeignKeyType = apiForeignKeyType;
     }
     #endregion
 
@@ -109,10 +108,10 @@ public sealed class ApiRelationshipDependentEnd : ApiRelationshipEnd
     {
         var clrObjectType = this.ClrObjectType.SafeToName();
         var hasKeyBinding = this.HasKeyBinding;
-        var apiKeyPathsCount = hasKeyBinding ? _apiKeyPaths!.Length.SafeToString() : "None";
+        var apiForeignKeyType = hasKeyBinding ? _apiForeignKeyType!.SafeToString() : "None";
         var extensionCount = this.ExtensionCount.SafeToString();
 
-        return $"{nameof(ApiRelationshipDependentEnd)} {{{nameof(this.ClrObjectType)}={clrObjectType}, {nameof(this.HasKeyBinding)}={hasKeyBinding}, {nameof(this.ApiKeyPaths)}Count={apiKeyPathsCount}, {nameof(this.ExtensionCount)}={extensionCount}}}";
+        return $"{nameof(ApiRelationshipDependentEnd)} {{{nameof(this.ClrObjectType)}={clrObjectType}, {nameof(this.HasKeyBinding)}={hasKeyBinding}, {nameof(this.ApiForeignKeyType)}={apiForeignKeyType}, {nameof(this.ExtensionCount)}={extensionCount}}}";
     }
     #endregion
 
@@ -124,12 +123,12 @@ public sealed class ApiRelationshipDependentEnd : ApiRelationshipEnd
 
         base.Initialize(context);
 
-        this.InitializeApiKeyPaths(context);
+        this.InitializeApiForeignKeyType(context);
     }
     #endregion
 
     #region Implementation Methods
-    private void InitializeApiKeyPaths(ApiInitializationContext context)
+    private void InitializeApiForeignKeyType(ApiInitializationContext context)
     {
         if (this.IsNavigational)
         {
@@ -137,23 +136,8 @@ public sealed class ApiRelationshipDependentEnd : ApiRelationshipEnd
             return;
         }
 
-        // ApiObjectType is resolved by the base class.
-        // Key paths resolve their properties against the dependent object type.
-        var apiObjectType = this.ResolvedObjectType;
-        if (apiObjectType is null)
-        {
-            // ClrObjectType is null or failed to resolve — base already recorded the error.
-            return;
-        }
-
-        var pathContext = context
-            .WithDeclaringSchemaElement(this)
-            .WithDeclaringObjectTypeOnly(apiObjectType);
-
-        foreach (var keyPath in this.ApiKeyPaths)
-        {
-            keyPath.Initialize(pathContext);
-        }
+        var fkContext = context.WithDeclaringSchemaElement(this);
+        _apiForeignKeyType!.Initialize(fkContext);
     }
     #endregion
 }

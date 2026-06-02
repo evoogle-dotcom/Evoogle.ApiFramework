@@ -349,7 +349,6 @@ public partial class ApiTypeTests
             {
                 ""ApiKind"": ""Object"",
                 ""ApiName"": ""ScalarsOnly"",
-                ""ApiIdentities"": [],
                 ""ApiProperties"": [
                     {
                         ""ApiName"": ""RequiredName"",
@@ -412,6 +411,7 @@ public partial class ApiTypeTests
                         ""ClrMemberKind"": ""Field""
                     }
                 ],
+                ""ApiKeyTypes"": [],
                 ""ClrType"": ""Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Core.Tests""
             }"
         },
@@ -483,7 +483,6 @@ public partial class ApiTypeTests
                 ""ApiOptions"": {
                     ""ApiIdentityPartNullHandling"": ""ThrowOnNull""
                 },
-                ""ApiIdentities"": [],
                 ""ApiProperties"": [
                     {
                         ""ApiName"": ""RequiredName"",
@@ -546,6 +545,7 @@ public partial class ApiTypeTests
                         ""ClrMemberKind"": ""Field""
                     }
                 ],
+                ""ApiKeyTypes"": [],
                 ""ClrType"": ""Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Core.Tests""
             }"
         },
@@ -614,7 +614,6 @@ public partial class ApiTypeTests
             {
                 ""ApiKind"": ""Object"",
                 ""ApiName"": ""ScalarsOnly"",
-                ""ApiIdentities"": [],
                 ""ApiProperties"": [
                     {
                         ""ApiName"": ""RequiredName"",
@@ -677,6 +676,7 @@ public partial class ApiTypeTests
                         ""ClrMemberKind"": ""Field""
                     }
                 ],
+                ""ApiKeyTypes"": [],
                 ""ClrType"": ""Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Core.Tests"",
                 ""Extensions"": {
                     ""Evoogle.ApiFramework.TestData.GraphQlExtension, Evoogle.ApiFramework.Core.Tests"": {
@@ -696,32 +696,6 @@ public partial class ApiTypeTests
             (
                 ApiName: nameof(Company),
                 ClrType: typeof(Company),
-                ApiIdentities:
-                [
-                    new ApiIdentityDef
-                    (
-                        ApiName: "PK_Company_Id",
-                        Parts:
-                        [
-                            new ApiIdentityScalarPartDef
-                            (
-                                ApiPropertyName: nameof(Company.Id),
-                                ClrScalarTypeHint: typeof(string)
-                            )
-                        ]
-                    ),
-                    new ApiIdentityDef
-                    (
-                        ApiName: "AK_Company_Name",
-                        Parts:
-                        [
-                            new ApiIdentityScalarPartDef
-                            (
-                                ApiPropertyName: nameof(Company.Name)
-                            )
-                        ]
-                    )
-                ],
                 ApiProperties:
                 [
                     new ApiPropertyDef
@@ -764,33 +738,25 @@ public partial class ApiTypeTests
                         ClrName: nameof(Company.Employees),
                         ClrMemberKind: ClrMemberKind.Property
                     ),
+                ],
+                ApiKeyTypes:
+                [
+                    new ApiKeyTypeDef
+                    (
+                        ApiName: "PK_Company_Id",
+                        ApiKeyPaths: [new ApiKeyPathDef(ClrRootType: typeof(Company), [new ApiKeyPathSegmentDef(ClrPropertyName: nameof(Company.Id))])]
+                    ),
+                    new ApiKeyTypeDef
+                    (
+                        ApiName: "AK_Company_Name",
+                        ApiKeyPaths: [new ApiKeyPathDef(ClrRootType: typeof(Company), [new ApiKeyPathSegmentDef(ClrPropertyName: nameof(Company.Name))])]
+                    )
                 ]
             ),
             Json = @"
             {
                 ""ApiKind"": ""Object"",
                 ""ApiName"": ""Company"",
-                ""ApiIdentities"": [
-                    {
-                        ""ApiName"": ""PK_Company_Id"",
-                        ""ApiIdentityParts"": [
-                            {
-                                ""ApiKind"": ""Scalar"",
-                                ""ClrPropertyName"": ""Id"",
-                                ""ClrScalarTypeHint"": ""System.String,System.Private.CoreLib""
-                            }
-                        ]
-                    },
-                    {
-                        ""ApiName"": ""AK_Company_Name"",
-                        ""ApiIdentityParts"": [
-                            {
-                                ""ApiKind"": ""Scalar"",
-                                ""ClrPropertyName"": ""Name""
-                            }
-                        ]
-                    }
-                ],
                 ""ApiProperties"": [
                     {
                         ""ApiName"": ""Id"",
@@ -838,6 +804,34 @@ public partial class ApiTypeTests
                         ""ApiTypeModifiers"": ""None"",
                         ""ClrName"": ""Employees"",
                         ""ClrMemberKind"": ""Property""
+                    }
+                ],
+                ""ApiKeyTypes"": [
+                    {
+                        ""ApiName"": ""PK_Company_Id"",
+                        ""ApiKeyPaths"": [
+                            {
+                                ""ClrRootType"": ""Evoogle.ApiFramework.TestData.Company, Evoogle.ApiFramework.Core.Tests"",
+                                ""ApiSegments"": [
+                                    {
+                                        ""ClrPropertyName"": ""Id""
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        ""ApiName"": ""AK_Company_Name"",
+                        ""ApiKeyPaths"": [
+                            {
+                                ""ClrRootType"": ""Evoogle.ApiFramework.TestData.Company, Evoogle.ApiFramework.Core.Tests"",
+                                ""ApiSegments"": [
+                                    {
+                                        ""ClrPropertyName"": ""Name""
+                                    }
+                                ]
+                            }
+                        ]
                     }
                 ],
                 ""ClrType"": ""Evoogle.ApiFramework.TestData.Company, Evoogle.ApiFramework.Core.Tests""
@@ -908,7 +902,6 @@ public partial class ApiTypeTests
             {
                 ""ApiKind"": ""Object"",
                 ""ApiName"": ""ScalarsOnly"",
-                ""ApiIdentities"": [],
                 ""ApiProperties"": [
                     {
                         ""ApiName"": ""RequiredName"",
@@ -965,6 +958,7 @@ public partial class ApiTypeTests
                         ""ClrMemberKind"": ""Field""
                     }
                 ],
+                ""ApiKeyTypes"": [],
                 ""ClrType"": ""Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Core.Tests""
             }"
         },
@@ -1036,7 +1030,6 @@ public partial class ApiTypeTests
                 ""ApiOptions"": {
                     ""ApiIdentityPartNullHandling"": ""ThrowOnNull""
                 },
-                ""ApiIdentities"": [],
                 ""ApiProperties"": [
                     {
                         ""ApiName"": ""RequiredName"",
@@ -1093,6 +1086,7 @@ public partial class ApiTypeTests
                         ""ClrMemberKind"": ""Field""
                     }
                 ],
+                ""ApiKeyTypes"": [],
                 ""ClrType"": ""Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Core.Tests""
             }"
         },
@@ -1161,7 +1155,6 @@ public partial class ApiTypeTests
             {
                 ""ApiKind"": ""Object"",
                 ""ApiName"": ""ScalarsOnly"",
-                ""ApiIdentities"": [],
                 ""ApiProperties"": [
                     {
                         ""ApiName"": ""RequiredName"",
@@ -1218,6 +1211,7 @@ public partial class ApiTypeTests
                         ""ClrMemberKind"": ""Field""
                     }
                 ],
+                ""ApiKeyTypes"": [],
                 ""ClrType"": ""Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Core.Tests"",
                 ""Extensions"": {
                     ""Evoogle.ApiFramework.TestData.GraphQlExtension, Evoogle.ApiFramework.Core.Tests"": {
@@ -1237,32 +1231,6 @@ public partial class ApiTypeTests
             (
                 ApiName: nameof(Company),
                 ClrType: typeof(Company),
-                ApiIdentities:
-                [
-                    new ApiIdentityDef
-                    (
-                        ApiName: "PK_Company_Id",
-                        Parts:
-                        [
-                            new ApiIdentityScalarPartDef
-                            (
-                                ApiPropertyName: nameof(Company.Id),
-                                ClrScalarTypeHint: typeof(string)
-                            )
-                        ]
-                    ),
-                    new ApiIdentityDef
-                    (
-                        ApiName: "AK_Company_Name",
-                        Parts:
-                        [
-                            new ApiIdentityScalarPartDef
-                            (
-                                ApiPropertyName: nameof(Company.Name)
-                            )
-                        ]
-                    )
-                ],
                 ApiProperties:
                 [
                     new ApiPropertyDef
@@ -1305,33 +1273,25 @@ public partial class ApiTypeTests
                         ClrName: nameof(Company.Employees),
                         ClrMemberKind: ClrMemberKind.Property
                     ),
+                ],
+                ApiKeyTypes:
+                [
+                    new ApiKeyTypeDef
+                    (
+                        ApiName: "PK_Company_Id",
+                        ApiKeyPaths: [new ApiKeyPathDef(ClrRootType: typeof(Company), [new ApiKeyPathSegmentDef(ClrPropertyName: nameof(Company.Id))])]
+                    ),
+                    new ApiKeyTypeDef
+                    (
+                        ApiName: "AK_Company_Name",
+                        ApiKeyPaths: [new ApiKeyPathDef(ClrRootType: typeof(Company), [new ApiKeyPathSegmentDef(ClrPropertyName: nameof(Company.Name))])]
+                    )
                 ]
             ),
             Json = @"
             {
                 ""ApiKind"": ""Object"",
                 ""ApiName"": ""Company"",
-                ""ApiIdentities"": [
-                    {
-                        ""ApiName"": ""PK_Company_Id"",
-                        ""ApiIdentityParts"": [
-                            {
-                                ""ApiKind"": ""Scalar"",
-                                ""ClrPropertyName"": ""Id"",
-					            ""ClrScalarTypeHint"": ""System.String,System.Private.CoreLib""
-                            }
-                        ]
-                    },
-                    {
-                        ""ApiName"": ""AK_Company_Name"",
-                        ""ApiIdentityParts"": [
-                            {
-                                ""ApiKind"": ""Scalar"",
-                                ""ClrPropertyName"": ""Name""
-                            }
-                        ]
-                    }
-                ],
                 ""ApiProperties"": [
                     {
                         ""ApiName"": ""Id"",
@@ -1375,6 +1335,34 @@ public partial class ApiTypeTests
                         ""ApiTypeModifiers"": ""None"",
                         ""ClrName"": ""Employees"",
                         ""ClrMemberKind"": ""Property""
+                    }
+                ],
+                ""ApiKeyTypes"": [
+                    {
+                        ""ApiName"": ""PK_Company_Id"",
+                        ""ApiKeyPaths"": [
+                            {
+                                ""ClrRootType"": ""Evoogle.ApiFramework.TestData.Company, Evoogle.ApiFramework.Core.Tests"",
+                                ""ApiSegments"": [
+                                    {
+                                        ""ClrPropertyName"": ""Id""
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        ""ApiName"": ""AK_Company_Name"",
+                        ""ApiKeyPaths"": [
+                            {
+                                ""ClrRootType"": ""Evoogle.ApiFramework.TestData.Company, Evoogle.ApiFramework.Core.Tests"",
+                                ""ApiSegments"": [
+                                    {
+                                        ""ClrPropertyName"": ""Name""
+                                    }
+                                ]
+                            }
+                        ]
                     }
                 ],
                 ""ClrType"": ""Evoogle.ApiFramework.TestData.Company, Evoogle.ApiFramework.Core.Tests""

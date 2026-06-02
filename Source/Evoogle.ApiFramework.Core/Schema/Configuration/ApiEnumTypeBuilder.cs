@@ -24,7 +24,7 @@ public class ApiEnumTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     /// <param name="type">The type used as the extension key.</param>
     /// <param name="value">The extension value to store.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiEnumTypeBuilder AddEnumExtension(Type type, object value)
+    public ApiEnumTypeBuilder AddEnumTypeExtension(Type type, object value)
     {
         base.AddExtension(type, value);
         return this;
@@ -36,8 +36,8 @@ public class ApiEnumTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     /// <typeparam name="T">The extension value type.</typeparam>
     /// <param name="value">The extension value.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiEnumTypeBuilder AddEnumExtension<T>(T value) where T : notnull
-        => this.AddEnumExtension(typeof(T), value);
+    public ApiEnumTypeBuilder AddEnumTypeExtension<T>(T value) where T : notnull
+        => this.AddEnumTypeExtension(typeof(T), value);
     #endregion
 
     #region AddValue Methods

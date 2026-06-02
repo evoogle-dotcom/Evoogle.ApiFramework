@@ -3,84 +3,44 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using System.Linq.Expressions;
-
-using Evoogle.Reflection;
-
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
 /// <summary>
 ///     Strongly-typed fluent builder for configuring the dependent end of an <see cref="ApiRelationship"/>
 ///     whose CLR type is <typeparamref name="T"/>.
-///     Extends <see cref="ApiRelationshipDependentEndBuilder"/> with expression-based overloads for FK key paths.
+///     Extends <see cref="ApiRelationshipDependentEndBuilder"/> with a strongly-typed
+///     <see cref="WithForeignKeyType"/> overload.
 /// </summary>
 /// <typeparam name="T">The CLR type of the dependent object.</typeparam>
 public sealed class ApiRelationshipDependentEndBuilder<T>() : ApiRelationshipDependentEndBuilder(typeof(T))
 {
     #region AddExtension Methods
-    /// <inheritdoc cref="ApiRelationshipDependentEndBuilder.AddDependentEndExtension(Type, object)"/>
-    public new ApiRelationshipDependentEndBuilder<T> AddDependentEndExtension(Type type, object value)
+    /// <inheritdoc cref="ApiRelationshipDependentEndBuilder.AddRelationshipDependentEndExtension(Type, object)"/>
+    public new ApiRelationshipDependentEndBuilder<T> AddRelationshipDependentEndExtension(Type type, object value)
     {
-        base.AddDependentEndExtension(type, value);
+        base.AddRelationshipDependentEndExtension(type, value);
         return this;
     }
 
-    /// <inheritdoc cref="ApiRelationshipDependentEndBuilder.AddDependentEndExtension{TExt}(TExt)"/>
-    public new ApiRelationshipDependentEndBuilder<T> AddDependentEndExtension<TExt>(TExt value) where TExt : notnull
-        => this.AddDependentEndExtension(typeof(TExt), value);
+    /// <inheritdoc cref="ApiRelationshipDependentEndBuilder.AddRelationshipDependentEndExtension{TExt}(TExt)"/>
+    public new ApiRelationshipDependentEndBuilder<T> AddRelationshipDependentEndExtension<TExt>(TExt value) where TExt : notnull
+        => this.AddRelationshipDependentEndExtension(typeof(TExt), value);
     #endregion
 
-    #region AddPath Methods
+    #region WithForeignKeyType Methods
     /// <summary>
-    ///     Adds a scalar FK key path, deriving the CLR property name from <paramref name="clrProperty"/>.
+    ///     Sets the FK key type with the given <paramref name="apiName"/>, using a strongly-typed builder for
+    ///     <typeparamref name="T"/>.
     /// </summary>
-    /// <typeparam name="TResult">The property return type.</typeparam>
-    /// <param name="clrProperty">Expression selecting the scalar FK property on <typeparamref name="T"/>.</param>
-    /// <param name="configure">Optional callback to attach extensions to the path.</param>
+    /// <param name="apiName">The API name of the FK key type.</param>
+    /// <param name="configure">Optional callback to configure key paths on the FK key type.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipDependentEndBuilder<T> AddScalarPath<TResult>
-    (
-        Expression<Func<T, TResult>> clrProperty,
-        Action<ApiRelationshipKeyPathBuilder<T>>? configure = null
-    )
+    public ApiRelationshipDependentEndBuilder<T> WithForeignKeyType(string apiName, Action<ApiKeyTypeBuilder<T>>? configure = null)
     {
-        var clrName = StaticReflection.GetMemberName(clrProperty);
-        var builder = new ApiRelationshipKeyPathBuilder<T>(ApiRelationshipKeyPathKind.Scalar, clrName);
+        var builder = new ApiKeyTypeBuilder<T>(apiName);
         configure?.Invoke(builder);
-        base.AddKeyPathBuilderCore(builder);
-        return this;
-    }
-
-    /// <summary>
-    ///     Adds a nested FK key path, deriving the CLR property name from <paramref name="clrProperty"/>.
-    /// </summary>
-    /// <typeparam name="TResult">The nested object property return type.</typeparam>
-    /// <param name="clrProperty">Expression selecting the nested object property on <typeparamref name="T"/>.</param>
-    /// <param name="configure">Callback to add child paths within the nested object type.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiRelationshipDependentEndBuilder<T> AddNestedPath<TResult>
-    (
-        Expression<Func<T, TResult>> clrProperty,
-        Action<ApiRelationshipKeyPathBuilder<TResult>> configure
-    )
-    {
-        ArgumentNullException.ThrowIfNull(configure);
-
-        var clrName = StaticReflection.GetMemberName(clrProperty);
-        var builder = new ApiRelationshipKeyPathBuilder<TResult>(ApiRelationshipKeyPathKind.Nested, clrName);
-        configure(builder);
-        base.AddKeyPathBuilderCore(builder);
-        return this;
-    }
-
-    /// <inheritdoc cref="ApiRelationshipDependentEndBuilder.AddOwnerPath"/>
-    public ApiRelationshipDependentEndBuilder<T> AddOwnerPath<TResult>(Action<ApiRelationshipKeyPathBuilder<TResult>>? configure = null)
-    {
-        var builder = new ApiRelationshipKeyPathBuilder<TResult>(ApiRelationshipKeyPathKind.Owner, null);
-        configure?.Invoke(builder);
-        base.AddKeyPathBuilderCore(builder);
+        base.SetForeignKeyTypeBuilderCore(builder);
         return this;
     }
     #endregion
-
 }

@@ -14,26 +14,23 @@ namespace Evoogle.ApiFramework.Schema;
 ///     Represents metadata of an API object type that defines a set of named structural properties
 ///     for API input/output.
 /// </summary>
-/// <remarks>
-///     Initializes a new instance of the <see cref="ApiObjectType"/> class.
-/// </remarks>
 /// <param name="apiName">The API name of the object type.</param>
 /// <param name="apiOptions">The configuration options for the object type.</param>
-/// <param name="apiIdentities">The collection of API identities defined for this object type.</param>
 /// <param name="apiProperties">The collection of API properties defined on this object type.</param>
+/// <param name="apiKeyTypes">The collection of API key types defined for this object type.</param>
 /// <param name="clrObjectType">The CLR type representing this API object.</param>
 public sealed partial class ApiObjectType
 (
     string apiName,
     ApiObjectTypeOptions? apiOptions,
-    IEnumerable<ApiIdentity>? apiIdentities,
     IEnumerable<ApiProperty>? apiProperties,
+    IEnumerable<ApiKeyType>? apiKeyTypes,
     Type clrObjectType
 ) : ApiNamedType(apiName, clrObjectType)
 {
     #region ApiObjectType Fields
-    private Dictionary<string, ApiIdentity>? _apiIdentityApiNameLookup = null;
-    private string[]? _apiIdentityApiNames = null;
+    private Dictionary<string, ApiKeyType>? _apiKeyTypeApiNameLookup = null;
+    private string[]? _apiKeyTypeApiNames = null;
 
     private Dictionary<string, ApiProperty>? _apiPropertyApiNameLookup = null;
     private Dictionary<string, ApiProperty>? _apiPropertyClrNameLookup = null;
@@ -55,17 +52,17 @@ public sealed partial class ApiObjectType
     #endregion
 
     #region ApiObjectType Properties
-    /// <summary>Gets all identities defined for the object type.</summary>
-    public ApiIdentity[] ApiIdentities { get; } = [.. apiIdentities.EmptyIfNull().Where(x => x is not null)];
+    /// <summary>Gets all key types defined for the object type.</summary>
+    public ApiKeyType[] ApiKeyTypes { get; } = [.. apiKeyTypes.EmptyIfNull().Where(x => x is not null)];
 
     /// <summary>
-    ///     Gets the primary API identity for this object type, if available.
+    ///     Gets the primary <see cref="ApiKeyType"/> for this object type, if available.
     /// </summary>
     /// <remarks>
-    ///     By convention, the first identity in <see cref="ApiIdentities"/> is the primary identity.
-    ///     Returns null if no identities are configured.
+    ///     By convention, the first key type in <see cref="ApiKeyTypes"/> is the primary key type.
+    ///     Returns null if no key types are configured.
     /// </remarks>
-    public ApiIdentity? ApiPrimaryIdentity => this.HasIdentity ? this.ApiIdentities[0] : null;
+    public ApiKeyType? ApiPrimaryKeyType => this.HasKeyType ? this.ApiKeyTypes[0] : null;
 
     /// <summary>Gets the configuration options for the object type.</summary>
     public ApiObjectTypeOptions? ApiOptions { get; } = apiOptions;
@@ -80,7 +77,7 @@ public sealed partial class ApiObjectType
     public ApiRelationshipEnd[] ApiRelationshipEnds => _apiRelationshipEnds is not null ? _apiRelationshipEnds : [];
 
     /// <summary>
-    ///     Gets all relationship ends where this object type acts as the principal (owns the join key identity).
+    ///     Gets all relationship ends where this object type acts as the principal (holds the PK binding).
     ///     Populated during <see cref="ApiSchema"/> initialization. Returns an empty array before initialization completes.
     /// </summary>
     public ApiRelationshipPrincipalEnd[] ApiRelationshipPrincipalEnds => _apiPrincipalRelationshipEnds is not null ? _apiPrincipalRelationshipEnds : [];
@@ -97,14 +94,14 @@ public sealed partial class ApiObjectType
     /// </summary>
     public ApiRelationshipAssociation[] ApiRelationshipAssociations => _apiRelationshipAssociations is not null ? _apiRelationshipAssociations : [];
 
-    private Dictionary<string, ApiIdentity> ApiIdentityApiNameLookup => this.ThrowIfNotInitialized(_apiIdentityApiNameLookup);
+    private Dictionary<string, ApiKeyType> ApiKeyTypeApiNameLookup => this.ThrowIfNotInitialized(_apiKeyTypeApiNameLookup);
     private Dictionary<string, ApiProperty> ApiPropertyApiNameLookup => this.ThrowIfNotInitialized(_apiPropertyApiNameLookup);
     private Dictionary<string, ApiProperty> ApiPropertyClrNameLookup => this.ThrowIfNotInitialized(_apiPropertyClrNameLookup);
     #endregion
 
     #region ApiObjectType Computed Properties
-    /// <summary>Indicates whether this object type has any API identities defined.</summary>
-    public bool HasIdentity => this.ApiIdentities.Length > 0;
+    /// <summary>Indicates whether this object type has any API key types defined.</summary>
+    public bool HasKeyType => this.ApiKeyTypes.Length > 0;
 
     /// <summary>Indicates whether this object type participates in any relationships.</summary>
     public bool HasRelationshipEnds => _apiRelationshipEnds?.Length > 0;
@@ -135,20 +132,29 @@ public sealed partial class ApiObjectType
         base.Initialize(context);
 
         this.InitializeLookupDictionaries(context);
-
         this.InitializeApiProperties(context);
-        this.InitializeApiIdentities(context);
+    }
+
+    /// <summary>
+    ///    Initializes the API key types defined for this object type.
+    /// </summary>
+    /// <param name="context">The initialization context.</param>
+    internal void InitializeKeyTypes(ApiInitializationContext context)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+
+        this.InitializeApiKeyTypes(context);
     }
     #endregion
 
     #region ApiObjectType Methods
     /// <summary>
-    ///     Attempts to retrieve an API identity by its API name.
+    ///     Attempts to retrieve an API key type by its API name.
     /// </summary>
-    /// <param name="apiName">The name of the identity to retrieve.</param>
-    /// <param name="apiIdentity">When this method returns, contains the <see cref="ApiIdentity"/> if found; otherwise, null.</param>
-    /// <returns>True if the identity was found; otherwise, false.</returns>
-    public bool TryGetIdentityByApiName(string apiName, [NotNullWhen(true)] out ApiIdentity? apiIdentity) => this.ApiIdentityApiNameLookup.TryGetValue(apiName, out apiIdentity);
+    /// <param name="apiName">The name of the key type to retrieve.</param>
+    /// <param name="apiKeyType">When this method returns, contains the <see cref="ApiKeyType"/> if found; otherwise, null.</param>
+    /// <returns>True if the key type was found; otherwise, false.</returns>
+    public bool TryGetKeyTypeByApiName(string apiName, [NotNullWhen(true)] out ApiKeyType? apiKeyType) => this.ApiKeyTypeApiNameLookup.TryGetValue(apiName, out apiKeyType);
 
     /// <summary>
     ///     Attempts to retrieve an API property by its API name.
@@ -168,43 +174,34 @@ public sealed partial class ApiObjectType
 
     #endregion
 
-    #region ApiObjectType Identity Methods
+    #region ApiObjectType KeyType Methods
     /// <summary>
-    ///     Gets the API names of all identities defined on this object type.
+    ///     Gets the API names of all key types defined on this object type.
     /// </summary>
-    /// <returns>A read-only list of identity API names, or an empty list if no identities are defined.</returns>
-    /// <remarks>
-    ///     <para>The returned list includes both the primary identity and any alternate identities.</para>
-    ///     <para><b>Use Cases:</b></para>
-    ///     <list type="bullet">
-    ///         <item><description>Runtime discovery - Allow users to choose which identity to use</description></item>
-    ///         <item><description>API documentation - Generate documentation for available identity schemes</description></item>
-    ///         <item><description>Query optimization - Select most efficient identity for lookup operations</description></item>
-    ///     </list>
-    /// </remarks>
-    public string[] GetIdentityApiNames()
+    /// <returns>An array of key type API names, or an empty array if no key types are defined.</returns>
+    public string[] GetKeyTypeApiNames()
     {
-        if (!this.HasIdentity)
+        if (!this.HasKeyType)
         {
             return [];
         }
 
-        return _apiIdentityApiNames ??= [.. this.ApiIdentities.Select(identity => identity.ApiName)];
+        return _apiKeyTypeApiNames ??= [.. this.ApiKeyTypes.Select(keyType => keyType.ApiName)];
     }
 
     /// <summary>
-    ///     Checks if this object type has a specific identity by API name.
+    ///     Checks if this object type has a specific key type by API name.
     /// </summary>
-    /// <param name="apiIdentityName">The API name of the identity to check for.</param>
-    /// <returns><c>true</c> if the identity exists; otherwise, <c>false</c>.</returns>
-    public bool HasIdentityByApiName(string apiIdentityName)
+    /// <param name="apiKeyTypeName">The API name of the key type to check for.</param>
+    /// <returns><c>true</c> if the key type exists; otherwise, <c>false</c>.</returns>
+    public bool HasKeyTypeByApiName(string apiKeyTypeName)
     {
-        if (!this.HasIdentity || string.IsNullOrWhiteSpace(apiIdentityName))
+        if (!this.HasKeyType || string.IsNullOrWhiteSpace(apiKeyTypeName))
         {
             return false;
         }
 
-        return this.TryGetIdentityByApiName(apiIdentityName, out _);
+        return this.TryGetKeyTypeByApiName(apiKeyTypeName, out _);
     }
     #endregion
 
@@ -234,22 +231,22 @@ public sealed partial class ApiObjectType
         _apiRelationshipAssociations = null;
     }
 
-    private void InitializeApiIdentities(ApiInitializationContext context)
+    private void InitializeApiKeyTypes(ApiInitializationContext context)
     {
-        if (this.ApiIdentities.Length == 0)
+        if (this.ApiKeyTypes.Length == 0)
         {
-            // No identities defined; this is acceptable as identities are optional.
+            // No key types defined; this is acceptable as key types are optional.
             return;
         }
 
-        // Initialize each identity
-        var apiIdentitiesCount = this.ApiIdentities.Length;
-        for (var i = 0; i < apiIdentitiesCount; ++i)
+        // Initialize each key type
+        var apiKeyTypesCount = this.ApiKeyTypes.Length;
+        for (var i = 0; i < apiKeyTypesCount; ++i)
         {
-            var apiIdentity = this.ApiIdentities[i];
+            var apiKeyType = this.ApiKeyTypes[i];
 
             var childContext = context.WithDeclaringObjectType(this);
-            apiIdentity.Initialize(childContext);
+            apiKeyType.Initialize(childContext);
         }
     }
 
@@ -281,22 +278,22 @@ public sealed partial class ApiObjectType
     private void InitializeLookupDictionaries(ApiInitializationContext context)
     {
         // Initialize lookup dictionaries for lookup of:
-        // - Identity by API name
+        // - Key types by API name
         // - Property by API name and CLR name
-        _apiIdentityApiNameLookup = null;
+        _apiKeyTypeApiNameLookup = null;
         _apiPropertyApiNameLookup = null;
         _apiPropertyClrNameLookup = null;
 
         ApiSchemaHelpers.InitializeLookupDictionary
         (
-            parts: this.ApiIdentities,
+            parts: this.ApiKeyTypes,
             partKeySelector: x => x.ApiName,
             partKeyFilter: x => ApiSchemaHelpers.IsNameValid(x),
-            partKeyPropertyName: nameof(ApiIdentity.ApiName),
+            partKeyPropertyName: nameof(ApiKeyType.ApiName),
             path: this.ApiPath,
-            duplicatePartCode: ApiInitializationCode.API_OBJECT_TYPE_DUPLICATE_IDENTITY_API_NAME,
+            duplicatePartCode: ApiInitializationCode.API_OBJECT_TYPE_DUPLICATE_KEY_TYPE_API_NAME,
             context: context,
-            lookupDictionary: out _apiIdentityApiNameLookup
+            lookupDictionary: out _apiKeyTypeApiNameLookup
         );
 
         ApiSchemaHelpers.InitializeLookupDictionary

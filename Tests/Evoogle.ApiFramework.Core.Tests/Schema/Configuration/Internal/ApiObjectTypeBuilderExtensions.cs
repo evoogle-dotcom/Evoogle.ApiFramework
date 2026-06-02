@@ -16,67 +16,14 @@ internal static class ApiObjectTypeBuilderExtensions
     #region Methods
     public static void ConfigureIdentities(this ApiObjectTypeBuilder builder, ApiObjectType apiObjectType)
     {
-        var apiIdentities = apiObjectType.ApiIdentities;
-        foreach (var apiIdentity in apiIdentities ?? [])
+        foreach (var apiKeyType in apiObjectType.ApiKeyTypes)
         {
-            builder.AddIdentity(apiIdentity.ApiName, identityBuilder =>
+            builder.AddKeyType(apiKeyType.ApiName, k =>
             {
-                foreach (var apiIdentityPart in apiIdentity.ApiIdentityParts)
+                foreach (var keyPath in apiKeyType.ApiKeyPaths)
                 {
-                    var apiKind = apiIdentityPart.ApiKind;
-                    switch (apiKind)
-                    {
-                        case ApiIdentityPartKind.Scalar:
-                            {
-                                var scalarPart = (ApiIdentityScalarPart)apiIdentityPart;
-                                var clrScalarTypeHint = scalarPart.ClrScalarTypeHint;
-                                if (clrScalarTypeHint is not null)
-                                {
-                                    identityBuilder.AddScalarPart(scalarPart.ClrPropertyName, clrScalarTypeHint, p => p.ConfigureExtensions(scalarPart));
-                                }
-                                else
-                                {
-                                    identityBuilder.AddScalarPart(scalarPart.ClrPropertyName, p => p.ConfigureExtensions(scalarPart));
-                                }
-                                break;
-                            }
-
-                        case ApiIdentityPartKind.Nested:
-                            {
-                                var nestedPart = (ApiIdentityNestedPart)apiIdentityPart;
-                                var apiIdentityName = nestedPart.ApiIdentityName;
-                                if (apiIdentityName is not null)
-                                {
-                                    identityBuilder.AddNestedPart(nestedPart.ClrPropertyName, apiIdentityName, p => p.ConfigureExtensions(nestedPart));
-                                }
-                                else
-                                {
-                                    identityBuilder.AddNestedPart(nestedPart.ClrPropertyName, p => p.ConfigureExtensions(nestedPart));
-                                }
-                                break;
-                            }
-
-                        case ApiIdentityPartKind.Owner:
-                            {
-                                var ownerPart = (ApiIdentityOwnerPart)apiIdentityPart;
-                                var apiIdentityName = ownerPart.ApiIdentityName;
-                                if (apiIdentityName is not null)
-                                {
-                                    identityBuilder.AddOwnerPart(apiIdentityName, p => p.ConfigureExtensions(ownerPart));
-                                }
-                                else
-                                {
-                                    identityBuilder.AddOwnerPart(p => p.ConfigureExtensions(ownerPart));
-                                }
-                                break;
-                            }
-
-                        default:
-                            throw new InvalidOperationException($"Unsupported API identity part kind: {apiKind}");
-                    }
+                    k.AddKeyPath(keyPath.ClrRootType, keyPath.ApiSegments.Select(s => s.ClrPropertyName));
                 }
-
-                identityBuilder.ConfigureExtensions(apiIdentity);
             });
         }
     }

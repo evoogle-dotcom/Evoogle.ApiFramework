@@ -166,61 +166,11 @@ internal static class ApiSchemaHelpers
         context.AddIssue(path, severity, duplicatePartCode, description, remediation);
     }
 
-    public static int? CountIdentityLeaves(ApiIdentity identity)
+    public static int? CountIdentityLeaves(ApiKeyType keyType)
     {
-        var count = 0;
-        foreach (var part in identity.ApiIdentityParts)
-        {
-            switch (part)
-            {
-                case ApiIdentityScalarPart:
-                    count += 1;
-                    break;
-                case ApiIdentityNestedPart nestedPart:
-                    var nestedIdentity = nestedPart.ResolvedIdentity;
-                    if (nestedIdentity is null)
-                    {
-                        return null;
-                    }
-                    var nestedCount = CountIdentityLeaves(nestedIdentity);
-                    if (nestedCount is null)
-                    {
-                        return null;
-                    }
-                    count += nestedCount.Value;
-                    break;
-                case ApiIdentityOwnerPart:
-                    // Owner identity is resolved in a later phase; count is indeterminate here.
-                    return null;
-            }
-        }
-        return count;
+        // Each ApiKeyPath in a key type corresponds to exactly one scalar leaf.
+        return keyType.ApiKeyPaths.Length;
     }
 
-    public static int? CountKeyPathLeaves(ApiRelationshipKeyPath[] paths)
-    {
-        var count = 0;
-        foreach (var path in paths)
-        {
-            switch (path)
-            {
-                case ApiRelationshipScalarKeyPath:
-                    count += 1;
-                    break;
-                case ApiRelationshipNestedKeyPath nestedPath:
-                    var nestedCount = CountKeyPathLeaves(nestedPath.ApiKeyPaths);
-                    if (nestedCount is null)
-                    {
-                        return null;
-                    }
-                    count += nestedCount.Value;
-                    break;
-                case ApiRelationshipOwnerKeyPath:
-                    // Owner key paths are resolved in a later phase; leaf count is indeterminate until then.
-                    return null;
-            }
-        }
-        return count;
-    }
     #endregion
 }

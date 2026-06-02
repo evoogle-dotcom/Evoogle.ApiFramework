@@ -356,54 +356,54 @@ public partial class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnit
         // - IdentityScalar
         new BuildTest
         {
-            Name = $"Build from '{ApiSchemaKind.Identity}' API schema the '{nameof(IdentityScalar)}' API object type",
-            ApiSchemaKind = ApiSchemaKind.Identity,
-            ApiObjectTypeName = nameof(IdentityScalar),
+            Name = $"Build from '{ApiSchemaKind.Key}' API schema the '{nameof(KeyOneScalarPart)}' API object type",
+            ApiSchemaKind = ApiSchemaKind.Key,
+            ApiObjectTypeName = nameof(KeyOneScalarPart),
         },
 
         // Identity API Schema
         // - IdentityTwoScalarPartComposite
         new BuildTest
         {
-            Name = $"Build from '{ApiSchemaKind.Identity}' API schema the '{nameof(IdentityTwoScalarPartComposite)}' API object type",
-            ApiSchemaKind = ApiSchemaKind.Identity,
-            ApiObjectTypeName = nameof(IdentityTwoScalarPartComposite),
+            Name = $"Build from '{ApiSchemaKind.Key}' API schema the '{nameof(KeyTwoScalarPartComposite)}' API object type",
+            ApiSchemaKind = ApiSchemaKind.Key,
+            ApiObjectTypeName = nameof(KeyTwoScalarPartComposite),
         },
 
         // Identity API Schema
         // - IdentityThreeScalarPartComposite
         new BuildTest
         {
-            Name = $"Build from '{ApiSchemaKind.Identity}' API schema the '{nameof(IdentityThreeScalarPartComposite)}' API object type",
-            ApiSchemaKind = ApiSchemaKind.Identity,
-            ApiObjectTypeName = nameof(IdentityThreeScalarPartComposite),
+            Name = $"Build from '{ApiSchemaKind.Key}' API schema the '{nameof(KeyThreeScalarPartComposite)}' API object type",
+            ApiSchemaKind = ApiSchemaKind.Key,
+            ApiObjectTypeName = nameof(KeyThreeScalarPartComposite),
         },
 
         // Identity API Schema
         // - IdentityNestedComposite
         new BuildTest
         {
-            Name = $"Build from '{ApiSchemaKind.Identity}' API schema the '{nameof(IdentityNestedComposite)}' API object type",
-            ApiSchemaKind = ApiSchemaKind.Identity,
-            ApiObjectTypeName = nameof(IdentityNestedComposite),
+            Name = $"Build from '{ApiSchemaKind.Key}' API schema the '{nameof(KeyNestedComposite)}' API object type",
+            ApiSchemaKind = ApiSchemaKind.Key,
+            ApiObjectTypeName = nameof(KeyNestedComposite),
         },
 
         // Identity API Schema
         // - IdentityOwnedComposite
         new BuildTest
         {
-            Name = $"Build from '{ApiSchemaKind.Identity}' API schema the '{nameof(IdentityOwnedComposite)}' API object type",
-            ApiSchemaKind = ApiSchemaKind.Identity,
-            ApiObjectTypeName = nameof(IdentityOwnedComposite),
+            Name = $"Build from '{ApiSchemaKind.Key}' API schema the '{nameof(KeyOwnedComposite)}' API object type",
+            ApiSchemaKind = ApiSchemaKind.Key,
+            ApiObjectTypeName = nameof(KeyOwnedComposite),
         },
 
         // Identity API Schema
         // - IdentityOwnedDependent
         new BuildTest
         {
-            Name = $"Build from '{ApiSchemaKind.Identity}' API schema the '{nameof(IdentityOwnedDependent)}' API object type",
-            ApiSchemaKind = ApiSchemaKind.Identity,
-            ApiObjectTypeName = nameof(IdentityOwnedDependent),
+            Name = $"Build from '{ApiSchemaKind.Key}' API schema the '{nameof(KeyOwnedDependent)}' API object type",
+            ApiSchemaKind = ApiSchemaKind.Key,
+            ApiObjectTypeName = nameof(KeyOwnedDependent),
         },
     ];
     #endregion

@@ -231,20 +231,23 @@ public partial class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTest
             Name = $"Build '{ApiSchemaKind.Simple}' API schema",
             ApiSchemaKind = ApiSchemaKind.Simple,
         },
+
         new BuildTest
         {
-            Name = $"Build '{ApiSchemaKind.Commerce}' API schema",
-            ApiSchemaKind = ApiSchemaKind.Commerce,
+            Name = $"Build '{ApiSchemaKind.Key}' API schema",
+            ApiSchemaKind = ApiSchemaKind.Key,
         },
-        new BuildTest
-        {
-            Name = $"Build '{ApiSchemaKind.Identity}' API schema",
-            ApiSchemaKind = ApiSchemaKind.Identity,
-        },
+
         new BuildTest
         {
             Name = $"Build '{ApiSchemaKind.Relationship}' API schema",
             ApiSchemaKind = ApiSchemaKind.Relationship,
+        },
+
+        new BuildTest
+        {
+            Name = $"Build '{ApiSchemaKind.Commerce}' API schema",
+            ApiSchemaKind = ApiSchemaKind.Commerce,
         },
     ];
     #endregion

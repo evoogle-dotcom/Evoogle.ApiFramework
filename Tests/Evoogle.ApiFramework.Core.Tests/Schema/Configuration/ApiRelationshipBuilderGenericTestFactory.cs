@@ -25,13 +25,13 @@ public static class ApiRelationshipBuilderGenericTestFactory
     public static ApiRelationship BuildExpected_OneToOne_DependentEnd_ScalarPath()
         => new ApiRelationshipOneToOneBuilder("REL_Customer_Order_1to1")
             .WithPrincipalEnd<Customer>()
-            .WithDependentEnd<Order>(b => b.AddScalarPath(o => o.Id))
+            .WithDependentEnd<Order>(b => b.WithForeignKeyType("FK", fk => fk.AddKeyPath(o => o.Id)))
             .Build();
 
     public static ApiRelationship BuildExpected_OneToMany_DependentEnd_ScalarPath()
         => new ApiRelationshipOneToManyBuilder("REL_Customer_Order_1toN")
             .WithPrincipalEnd<Customer>()
-            .WithDependentEnd<Order>(b => b.AddScalarPath(o => o.Id))
+            .WithDependentEnd<Order>(b => b.WithForeignKeyType("FK", fk => fk.AddKeyPath(o => o.Id)))
             .Build();
 
     public static ApiRelationship BuildExpected_ManyToMany_DependentEnds_ScalarPaths()
@@ -39,24 +39,23 @@ public static class ApiRelationshipBuilderGenericTestFactory
             .WithPrincipalEndA<Customer>()
             .WithPrincipalEndB<Order>()
             .WithAssociation<OrderLine>(a => a
-                .AddScalarPathA(ol => ol.OrderId)
-                .AddScalarPathB(ol => ol.OrderId))
+                .WithForeignKeyTypeA("FKA", fk => fk.AddKeyPath(ol => ol.OrderId))
+                .WithForeignKeyTypeB("FKB", fk => fk.AddKeyPath(ol => ol.OrderId)))
             .Build();
 
     public static ApiRelationship BuildExpected_OneToOne_DependentEnd_MultipleScalarPaths()
         => new ApiRelationshipOneToOneBuilder("REL_Customer_Order_Nested")
             .WithPrincipalEnd<Customer>()
-            .WithDependentEnd<Order>(b => b
-                .AddScalarPath(o => o.Id)
-                .AddScalarPath(o => o.PlacedAt))
+            .WithDependentEnd<Order>(b => b.WithForeignKeyType("FK", fk => fk
+                .AddKeyPath(o => o.Id)
+                .AddKeyPath(o => o.PlacedAt)))
             .Build();
 
     public static ApiRelationship BuildExpected_OneToOne_NestedPath()
         => new ApiRelationshipOneToOneBuilder("REL_Customer_Profile_NestedPath")
             .WithPrincipalEnd<Dummy.Customer>()
             .WithDependentEnd<Dummy.CustomerProfile>(d => d
-                .AddNestedPath(cp => cp.CustomerRef, n => n
-                    .AddScalarPath(r => r.CustomerId)))
+                .WithForeignKeyType("FK", fk => fk.AddKeyPath(cp => cp.CustomerRef.CustomerId)))
             .Build();
 
     public static ApiRelationship BuildExpected_OneToOne_PrincipalConfigure_DeleteBehavior()
@@ -71,8 +70,8 @@ public static class ApiRelationshipBuilderGenericTestFactory
             .WithPrincipalEndA<Customer>()
             .WithPrincipalEndB<Order>()
             .WithAssociation<OrderLine>(a => a
-                .AddScalarPathA(ol => ol.OrderId)
-                .AddScalarPathB(ol => ol.OrderId))
+                .WithForeignKeyTypeA("FKA", fk => fk.AddKeyPath(ol => ol.OrderId))
+                .WithForeignKeyTypeB("FKB", fk => fk.AddKeyPath(ol => ol.OrderId)))
             .Build();
     #endregion
 
@@ -80,13 +79,13 @@ public static class ApiRelationshipBuilderGenericTestFactory
     public static ApiRelationship BuildActual_OneToOne_DependentEnd_ScalarPath()
         => new ApiRelationshipOneToOneBuilder("REL_Customer_Order_1to1")
             .WithPrincipalEnd<Customer>()
-            .WithDependentEnd<Order>(b => b.AddScalarPath(o => o.Id))
+            .WithDependentEnd<Order>(b => b.WithForeignKeyType("FK", fk => fk.AddKeyPath(o => o.Id)))
             .Build();
 
     public static ApiRelationship BuildActual_OneToMany_DependentEnd_ScalarPath()
         => new ApiRelationshipOneToManyBuilder("REL_Customer_Order_1toN")
             .WithPrincipalEnd<Customer>()
-            .WithDependentEnd<Order>(b => b.AddScalarPath(o => o.Id))
+            .WithDependentEnd<Order>(b => b.WithForeignKeyType("FK", fk => fk.AddKeyPath(o => o.Id)))
             .Build();
 
     public static ApiRelationship BuildActual_ManyToMany_DependentEnds_ScalarPaths()
@@ -94,24 +93,23 @@ public static class ApiRelationshipBuilderGenericTestFactory
             .WithPrincipalEndA<Customer>()
             .WithPrincipalEndB<Order>()
             .WithAssociation<OrderLine>(a => a
-                .AddScalarPathA(ol => ol.OrderId)
-                .AddScalarPathB(ol => ol.OrderId))
+                .WithForeignKeyTypeA("FKA", fk => fk.AddKeyPath(ol => ol.OrderId))
+                .WithForeignKeyTypeB("FKB", fk => fk.AddKeyPath(ol => ol.OrderId)))
             .Build();
 
     public static ApiRelationship BuildActual_OneToOne_DependentEnd_MultipleScalarPaths()
         => new ApiRelationshipOneToOneBuilder("REL_Customer_Order_Nested")
             .WithPrincipalEnd<Customer>()
-            .WithDependentEnd<Order>(b => b
-                .AddScalarPath(o => o.Id)
-                .AddScalarPath(o => o.PlacedAt))
+            .WithDependentEnd<Order>(b => b.WithForeignKeyType("FK", fk => fk
+                .AddKeyPath(o => o.Id)
+                .AddKeyPath(o => o.PlacedAt)))
             .Build();
 
     public static ApiRelationship BuildActual_OneToOne_NestedPath()
         => new ApiRelationshipOneToOneBuilder("REL_Customer_Profile_NestedPath")
             .WithPrincipalEnd<Dummy.Customer>()
             .WithDependentEnd<Dummy.CustomerProfile>(d => d
-                .AddNestedPath(cp => cp.CustomerRef, n => n
-                    .AddScalarPath(r => r.CustomerId)))
+                .WithForeignKeyType("FK", fk => fk.AddKeyPath(cp => cp.CustomerRef.CustomerId)))
             .Build();
 
     public static ApiRelationship BuildActual_OneToOne_PrincipalConfigure_DeleteBehavior()
@@ -126,8 +124,8 @@ public static class ApiRelationshipBuilderGenericTestFactory
             .WithPrincipalEndA<Customer>()
             .WithPrincipalEndB<Order>()
             .WithAssociation<OrderLine>(a => a
-                .AddScalarPathA(ol => ol.OrderId)
-                .AddScalarPathB(ol => ol.OrderId))
+                .WithForeignKeyTypeA("FKA", fk => fk.AddKeyPath(ol => ol.OrderId))
+                .WithForeignKeyTypeB("FKB", fk => fk.AddKeyPath(ol => ol.OrderId)))
             .Build();
     #endregion
 }

@@ -9,6 +9,6 @@ public enum ApiSchemaKind
 {
     Simple,
     Commerce,
-    Identity,
+    Key,
     Relationship
 }

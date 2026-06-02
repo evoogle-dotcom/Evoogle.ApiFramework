@@ -14,7 +14,7 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     : ApiNamedTypeBuilder<ApiObjectTypeBuilder>(clrType, context)
 {
     #region Fields
-    private readonly List<ApiIdentityBuilder> _apiIdentityBuilders = [];
+    private readonly List<ApiKeyTypeBuilder> _apiKeyTypeBuilders = [];
     private readonly List<ApiPropertyBuilder> _apiPropertyBuilders = [];
     private Action<ApiObjectTypeOptionsBuilder>? _apiOptionsConfiguration = null;
     #endregion
@@ -26,7 +26,7 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     /// <param name="type">The type used as the extension key.</param>
     /// <param name="value">The extension value to store.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiObjectTypeBuilder AddObjectExtension(Type type, object value)
+    public ApiObjectTypeBuilder AddObjectTypeExtension(Type type, object value)
     {
         base.AddExtension(type, value);
         return this;
@@ -38,27 +38,27 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     /// <typeparam name="T">The extension value type.</typeparam>
     /// <param name="value">The extension value.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiObjectTypeBuilder AddObjectExtension<T>(T value) where T : notnull
-        => this.AddObjectExtension(typeof(T), value);
+    public ApiObjectTypeBuilder AddObjectTypeExtension<T>(T value) where T : notnull
+        => this.AddObjectTypeExtension(typeof(T), value);
     #endregion
 
-    #region AddIdentity Methods
+    #region AddKeyType Methods
     /// <summary>
-    ///     Adds an <see cref="ApiIdentity"/> definition to the object type.
+    ///     Adds an <see cref="ApiKeyType"/> definition to the object type.
     /// </summary>
     /// <remarks>
-    ///     The first identity added is the primary identity by convention unless specified otherwise.
+    ///     The first key type added is the primary key type by convention.
     /// </remarks>
-    /// <param name="apiName">The API name of the identity.</param>
-    /// <param name="configure">Optional callback to configure the added identity.</param>
+    /// <param name="apiName">The API name of the key type.</param>
+    /// <param name="configure">Optional callback to configure the added key type.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiObjectTypeBuilder AddIdentity(string apiName, Action<ApiIdentityBuilder>? configure = null)
+    public ApiObjectTypeBuilder AddKeyType(string apiName, Action<ApiKeyTypeBuilder>? configure = null)
     {
-        var apiIdentityBuilder = new ApiIdentityBuilder(apiName);
+        var apiKeyTypeBuilder = new ApiKeyTypeBuilder(apiName);
 
-        configure?.Invoke(apiIdentityBuilder);
+        configure?.Invoke(apiKeyTypeBuilder);
 
-        _apiIdentityBuilders.Add(apiIdentityBuilder);
+        _apiKeyTypeBuilders.Add(apiKeyTypeBuilder);
 
         return this;
     }
@@ -322,18 +322,19 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
 
         var apiOptions = this.BuildOptions();
 
-        var apiIdentities = _apiIdentityBuilders
-            .Select(b => b.Build());
-
         var apiProperties = _apiPropertyBuilders
             .Select(b => b.Build(clrObjectType));
+
+        var apiKeyTypes = _apiKeyTypeBuilders.Count > 0
+            ? _apiKeyTypeBuilders.Select(b => b.Build())
+            : null;
 
         var apiObjectType = new ApiObjectType
         (
             apiName,
             apiOptions,
-            apiIdentities,
             apiProperties,
+            apiKeyTypes,
             clrObjectType
         );
 
@@ -362,13 +363,12 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
 
     #region Implementation Methods
     /// <summary>
-    ///     Adds a pre-constructed identity builder to this object type, allowing subclasses to inject
-    ///     typed builders without bypassing internal list management.
+    ///     Allows subclasses to add a pre-constructed key type builder without bypassing internal list management.
     /// </summary>
-    protected void AddIdentityBuilderCore(ApiIdentityBuilder builder)
+    protected void AddKeyTypeBuilderCore(ApiKeyTypeBuilder builder)
     {
         ArgumentNullException.ThrowIfNull(builder);
-        _apiIdentityBuilders.Add(builder);
+        _apiKeyTypeBuilders.Add(builder);
     }
     #endregion
 }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -493,31 +493,6 @@ public partial class ApiSchemaTests
                     (
                         ApiName: nameof(Person),
                         ClrType: typeof(Person),
-                        ApiIdentities:
-                        [
-                            new ApiIdentityDef
-                            (
-                                ApiName: "PK_Person_Id",
-                                Parts:
-                                [
-                                    new ApiIdentityScalarPartDef
-                                    (
-                                        ApiPropertyName: nameof(Person.Id)
-                                    )
-                                ]
-                            ),
-                            new ApiIdentityDef
-                            (
-                                ApiName: "AK_Person_Name",
-                                Parts:
-                                [
-                                    new ApiIdentityScalarPartDef
-                                    (
-                                        ApiPropertyName: nameof(Person.Name)
-                                    )
-                                ]
-                            )
-                        ],
                         ApiProperties:
                         [
                             new ApiPropertyDef
@@ -576,6 +551,25 @@ public partial class ApiSchemaTests
                                 ClrName: nameof(Person.CompanyId),
                                 ClrMemberKind: ClrMemberKind.Property
                             ),
+                        ],
+                        ApiKeyTypes:
+                        [
+                            new ApiKeyTypeDef
+                            (
+                                ApiName: "PK_Person_Id",
+                                ApiKeyPaths:
+                                [
+                                    new ApiKeyPathDef(ClrRootType: typeof(Person), [new ApiKeyPathSegmentDef(ClrPropertyName: nameof(Person.Id))])
+                                ]
+                            ),
+                            new ApiKeyTypeDef
+                            (
+                                ApiName: "AK_Person_Name",
+                                ApiKeyPaths:
+                                [
+                                    new ApiKeyPathDef(ClrRootType: typeof(Person), [new ApiKeyPathSegmentDef(ClrPropertyName: nameof(Person.Name))])
+                                ]
+                            )
                         ]
                     ),
                 ]
@@ -632,26 +626,6 @@ public partial class ApiSchemaTests
                     {
                         ""ApiKind"": ""Object"",
                         ""ApiName"": ""Person"",
-                        ""ApiIdentities"": [
-                            {
-                                ""ApiName"": ""PK_Person_Id"",
-                                ""ApiIdentityParts"": [
-                                    {
-                                        ""ApiKind"": ""Scalar"",
-                                        ""ClrPropertyName"": ""Id""
-                                    }
-                                ]
-                            },
-                            {
-                                ""ApiName"": ""AK_Person_Name"",
-                                ""ApiIdentityParts"": [
-                                    {
-                                        ""ApiKind"": ""Scalar"",
-                                        ""ClrPropertyName"": ""Name""
-                                    }
-                                ]
-                            }
-                        ],
                         ""ApiProperties"": [
                             {
                                 ""ApiName"": ""Id"",
@@ -721,6 +695,30 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
+                        ""ApiKeyTypes"": [
+                            {
+                                ""ApiName"": ""PK_Person_Id"",
+                                ""ApiKeyPaths"": [
+                                    {
+                                        ""ClrRootType"": ""Evoogle.ApiFramework.TestData.Person, Evoogle.ApiFramework.Core.Tests"",
+                                        ""ApiSegments"": [
+                                            { ""ClrPropertyName"": ""Id"" }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                ""ApiName"": ""AK_Person_Name"",
+                                ""ApiKeyPaths"": [
+                                    {
+                                        ""ClrRootType"": ""Evoogle.ApiFramework.TestData.Person, Evoogle.ApiFramework.Core.Tests"",
+                                        ""ApiSegments"": [
+                                            { ""ClrPropertyName"": ""Name"" }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
                         ""ClrType"": ""Evoogle.ApiFramework.TestData.Person, Evoogle.ApiFramework.Core.Tests""
                     }
                 ],
@@ -761,31 +759,6 @@ public partial class ApiSchemaTests
                     (
                         ApiName: nameof(Person),
                         ClrType: typeof(Person),
-                        ApiIdentities:
-                        [
-                            new ApiIdentityDef
-                            (
-                                ApiName: "PK_Person_Id",
-                                Parts:
-                                [
-                                    new ApiIdentityScalarPartDef
-                                    (
-                                        ApiPropertyName: nameof(Person.Id)
-                                    )
-                                ]
-                            ),
-                            new ApiIdentityDef
-                            (
-                                ApiName: "AK_Person_Name",
-                                Parts:
-                                [
-                                    new ApiIdentityScalarPartDef
-                                    (
-                                        ApiPropertyName: nameof(Person.Name)
-                                    )
-                                ]
-                            )
-                        ],
                         ApiProperties:
                         [
                             new ApiPropertyDef
@@ -844,6 +817,25 @@ public partial class ApiSchemaTests
                                 ClrName: nameof(Person.CompanyId),
                                 ClrMemberKind: ClrMemberKind.Property
                             ),
+                        ],
+                        ApiKeyTypes:
+                        [
+                            new ApiKeyTypeDef
+                            (
+                                ApiName: "PK_Person_Id",
+                                ApiKeyPaths:
+                                [
+                                    new ApiKeyPathDef(ClrRootType: typeof(Person), [new ApiKeyPathSegmentDef(ClrPropertyName: nameof(Person.Id))])
+                                ]
+                            ),
+                            new ApiKeyTypeDef
+                            (
+                                ApiName: "AK_Person_Name",
+                                ApiKeyPaths:
+                                [
+                                    new ApiKeyPathDef(ClrRootType: typeof(Person), [new ApiKeyPathSegmentDef(ClrPropertyName: nameof(Person.Name))])
+                                ]
+                            )
                         ]
                     ),
                 ],
@@ -901,26 +893,6 @@ public partial class ApiSchemaTests
                     {
                         ""ApiKind"": ""Object"",
                         ""ApiName"": ""Person"",
-                        ""ApiIdentities"": [
-                            {
-                                ""ApiName"": ""PK_Person_Id"",
-                                ""ApiIdentityParts"": [
-                                    {
-                                        ""ApiKind"": ""Scalar"",
-                                        ""ClrPropertyName"": ""Id""
-                                    }
-                                ]
-                            },
-                            {
-                                ""ApiName"": ""AK_Person_Name"",
-                                ""ApiIdentityParts"": [
-                                    {
-                                        ""ApiKind"": ""Scalar"",
-                                        ""ClrPropertyName"": ""Name""
-                                    }
-                                ]
-                            }
-                        ],
                         ""ApiProperties"": [
                             {
                                 ""ApiName"": ""Id"",
@@ -990,6 +962,30 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
+                        ""ApiKeyTypes"": [
+                            {
+                                ""ApiName"": ""PK_Person_Id"",
+                                ""ApiKeyPaths"": [
+                                    {
+                                        ""ClrRootType"": ""Evoogle.ApiFramework.TestData.Person, Evoogle.ApiFramework.Core.Tests"",
+                                        ""ApiSegments"": [
+                                            { ""ClrPropertyName"": ""Id"" }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                ""ApiName"": ""AK_Person_Name"",
+                                ""ApiKeyPaths"": [
+                                    {
+                                        ""ClrRootType"": ""Evoogle.ApiFramework.TestData.Person, Evoogle.ApiFramework.Core.Tests"",
+                                        ""ApiSegments"": [
+                                            { ""ClrPropertyName"": ""Name"" }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
                         ""ClrType"": ""Evoogle.ApiFramework.TestData.Person, Evoogle.ApiFramework.Core.Tests""
                     }
                 ],
@@ -1038,32 +1034,6 @@ public partial class ApiSchemaTests
                     (
                         ApiName: nameof(Company),
                         ClrType: typeof(Company),
-                        ApiIdentities:
-                        [
-                            new ApiIdentityDef
-                            (
-                                ApiName: "PK_Company_Id",
-                                Parts:
-                                [
-                                    new ApiIdentityScalarPartDef
-                                    (
-                                        ApiPropertyName: nameof(Company.Id),
-                                        ClrScalarTypeHint: typeof(string)
-                                    )
-                                ]
-                            ),
-                            new ApiIdentityDef
-                            (
-                                ApiName: "AK_Company_Name",
-                                Parts:
-                                [
-                                    new ApiIdentityScalarPartDef
-                                    (
-                                        ApiPropertyName: nameof(Company.Name)
-                                    )
-                                ]
-                            )
-                        ],
                         ApiProperties:
                         [
                             new ApiPropertyDef
@@ -1106,37 +1076,31 @@ public partial class ApiSchemaTests
                                 ClrName: nameof(Company.Employees),
                                 ClrMemberKind: ClrMemberKind.Property
                             ),
+                        ],
+                        ApiKeyTypes:
+                        [
+                            new ApiKeyTypeDef
+                            (
+                                ApiName: "PK_Company_Id",
+                                ApiKeyPaths:
+                                [
+                                    new ApiKeyPathDef(ClrRootType: typeof(Company), [new ApiKeyPathSegmentDef(ClrPropertyName: nameof(Company.Id))])
+                                ]
+                            ),
+                            new ApiKeyTypeDef
+                            (
+                                ApiName: "AK_Company_Name",
+                                ApiKeyPaths:
+                                [
+                                    new ApiKeyPathDef(ClrRootType: typeof(Company), [new ApiKeyPathSegmentDef(ClrPropertyName: nameof(Company.Name))])
+                                ]
+                            )
                         ]
                     ),
                     new ApiObjectTypeDef
                     (
                         ApiName: nameof(Person),
                         ClrType: typeof(Person),
-                        ApiIdentities:
-                        [
-                            new ApiIdentityDef
-                            (
-                                ApiName: "PK_Person_Id",
-                                Parts:
-                                [
-                                    new ApiIdentityScalarPartDef
-                                    (
-                                        ApiPropertyName: nameof(Person.Id)
-                                    )
-                                ]
-                            ),
-                            new ApiIdentityDef
-                            (
-                                ApiName: "AK_Person_Name",
-                                Parts:
-                                [
-                                    new ApiIdentityScalarPartDef
-                                    (
-                                        ApiPropertyName: nameof(Person.Name)
-                                    )
-                                ]
-                            )
-                        ],
                         ApiProperties:
                         [
                             new ApiPropertyDef
@@ -1195,6 +1159,25 @@ public partial class ApiSchemaTests
                                 ClrName: nameof(Person.CompanyId),
                                 ClrMemberKind: ClrMemberKind.Property
                             ),
+                        ],
+                        ApiKeyTypes:
+                        [
+                            new ApiKeyTypeDef
+                            (
+                                ApiName: "PK_Person_Id",
+                                ApiKeyPaths:
+                                [
+                                    new ApiKeyPathDef(ClrRootType: typeof(Person), [new ApiKeyPathSegmentDef(ClrPropertyName: nameof(Person.Id))])
+                                ]
+                            ),
+                            new ApiKeyTypeDef
+                            (
+                                ApiName: "AK_Person_Name",
+                                ApiKeyPaths:
+                                [
+                                    new ApiKeyPathDef(ClrRootType: typeof(Person), [new ApiKeyPathSegmentDef(ClrPropertyName: nameof(Person.Name))])
+                                ]
+                            )
                         ]
                     ),
                 ]
@@ -1251,27 +1234,6 @@ public partial class ApiSchemaTests
                     {
                         ""ApiKind"": ""Object"",
                         ""ApiName"": ""Company"",
-                        ""ApiIdentities"": [
-                            {
-                                ""ApiName"": ""PK_Company_Id"",
-                                ""ApiIdentityParts"": [
-                                    {
-                                        ""ApiKind"": ""Scalar"",
-                                        ""ClrPropertyName"": ""Id"",
-					                    ""ClrScalarTypeHint"": ""System.String,System.Private.CoreLib""
-                                    }
-                                ]
-                            },
-                            {
-                                ""ApiName"": ""AK_Company_Name"",
-                                ""ApiIdentityParts"": [
-                                    {
-                                        ""ApiKind"": ""Scalar"",
-                                        ""ClrPropertyName"": ""Name""
-                                    }
-                                ]
-                            }
-                        ],
                         ""ApiProperties"": [
                             {
                                 ""ApiName"": ""Id"",
@@ -1321,31 +1283,35 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
+                        ""ApiKeyTypes"": [
+                            {
+                                ""ApiName"": ""PK_Company_Id"",
+                                ""ApiKeyPaths"": [
+                                    {
+                                        ""ClrRootType"": ""Evoogle.ApiFramework.TestData.Company, Evoogle.ApiFramework.Core.Tests"",
+                                        ""ApiSegments"": [
+                                            { ""ClrPropertyName"": ""Id"" }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                ""ApiName"": ""AK_Company_Name"",
+                                ""ApiKeyPaths"": [
+                                    {
+                                        ""ClrRootType"": ""Evoogle.ApiFramework.TestData.Company, Evoogle.ApiFramework.Core.Tests"",
+                                        ""ApiSegments"": [
+                                            { ""ClrPropertyName"": ""Name"" }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
                         ""ClrType"": ""Evoogle.ApiFramework.TestData.Company, Evoogle.ApiFramework.Core.Tests""
                     },
                     {
                         ""ApiKind"": ""Object"",
                         ""ApiName"": ""Person"",
-                        ""ApiIdentities"": [
-                            {
-                                ""ApiName"": ""PK_Person_Id"",
-                                ""ApiIdentityParts"": [
-                                    {
-                                        ""ApiKind"": ""Scalar"",
-                                        ""ClrPropertyName"": ""Id""
-                                    }
-                                ]
-                            },
-                            {
-                                ""ApiName"": ""AK_Person_Name"",
-                                ""ApiIdentityParts"": [
-                                    {
-                                        ""ApiKind"": ""Scalar"",
-                                        ""ClrPropertyName"": ""Name""
-                                    }
-                                ]
-                            }
-                        ],
                         ""ApiProperties"": [
                             {
                                 ""ApiName"": ""Id"",
@@ -1413,6 +1379,30 @@ public partial class ApiSchemaTests
                                 ""ApiTypeModifiers"": ""None"",
                                 ""ClrName"": ""CompanyId"",
                                 ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ApiKeyTypes"": [
+                            {
+                                ""ApiName"": ""PK_Person_Id"",
+                                ""ApiKeyPaths"": [
+                                    {
+                                        ""ClrRootType"": ""Evoogle.ApiFramework.TestData.Person, Evoogle.ApiFramework.Core.Tests"",
+                                        ""ApiSegments"": [
+                                            { ""ClrPropertyName"": ""Id"" }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                ""ApiName"": ""AK_Person_Name"",
+                                ""ApiKeyPaths"": [
+                                    {
+                                        ""ClrRootType"": ""Evoogle.ApiFramework.TestData.Person, Evoogle.ApiFramework.Core.Tests"",
+                                        ""ApiSegments"": [
+                                            { ""ClrPropertyName"": ""Name"" }
+                                        ]
+                                    }
+                                ]
                             }
                         ],
                         ""ClrType"": ""Evoogle.ApiFramework.TestData.Person, Evoogle.ApiFramework.Core.Tests""

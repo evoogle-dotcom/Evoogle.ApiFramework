@@ -22,7 +22,7 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
                 .WithName("Customer")
                 .AddProperty(c => c.Id)
                 .AddProperty(c => c.Name)
-                .AddIdentity("PK_Customer", b => b.AddScalarPart(c => c.Id, typeof(string)));
+                .AddKeyType("PK_Person_Id", c => c.AddKeyPath(p => p.Id));
         }
     }
     #endregion
@@ -41,7 +41,7 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
     {
         var ctx = new ApiSchemaBuilderContext();
         var builder = CreateFromSimpleApiSchemaTheEmptyTypeBuilder(ctx)
-            .AddObjectExtension(new TExtension());
+            .AddObjectTypeExtension(new TExtension());
 
         return builder.Build();
     }
@@ -52,8 +52,8 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
     {
         var ctx = new ApiSchemaBuilderContext();
         var builder = CreateFromSimpleApiSchemaTheEmptyTypeBuilder(ctx)
-            .AddObjectExtension(new TExtension1())
-            .AddObjectExtension(new TExtension2());
+            .AddObjectTypeExtension(new TExtension1())
+            .AddObjectTypeExtension(new TExtension2());
 
         return builder.Build();
     }
@@ -71,7 +71,7 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
     {
         var ctx = new ApiSchemaBuilderContext();
         var builder = CreateFromSimpleApiSchemaTheScalarsOnlyTypeBuilder(ctx)
-            .AddObjectExtension(new TExtension());
+            .AddObjectTypeExtension(new TExtension());
 
         return builder.Build();
     }
@@ -82,8 +82,8 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
     {
         var ctx = new ApiSchemaBuilderContext();
         var builder = CreateFromSimpleApiSchemaTheScalarsOnlyTypeBuilder(ctx)
-            .AddObjectExtension(new TExtension1())
-            .AddObjectExtension(new TExtension2());
+            .AddObjectTypeExtension(new TExtension1())
+            .AddObjectTypeExtension(new TExtension2());
 
         return builder.Build();
     }
@@ -117,7 +117,7 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
     {
         var ctx = new ApiSchemaBuilderContext();
         var builder = CreateFromSimpleApiSchemaTheCompanyTypeBuilder(ctx)
-            .AddObjectExtension(new TExtension());
+            .AddObjectTypeExtension(new TExtension());
 
         return builder.Build();
     }
@@ -128,8 +128,8 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
     {
         var ctx = new ApiSchemaBuilderContext();
         var builder = CreateFromSimpleApiSchemaTheCompanyTypeBuilder(ctx)
-            .AddObjectExtension(new TExtension1())
-            .AddObjectExtension(new TExtension2());
+            .AddObjectTypeExtension(new TExtension1())
+            .AddObjectTypeExtension(new TExtension2());
 
         return builder.Build();
     }
@@ -232,8 +232,8 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
             .AddProperty(c => c.Name)
             .AddProperty(c => c.Owner)
             .AddProperty(c => c.Employees)
-            .AddIdentity("PK_Company_Id", b => b.AddScalarPart(c => c.Id))
-            .AddIdentity("AK_Company_Name", b => b.AddScalarPart(c => c.Name));
+            .AddKeyType("PK_Company_Id", c => c.AddKeyPath(p => p.Id))
+            .AddKeyType("AK_Company_Name", c => c.AddKeyPath(p => p.Name));
 
         return builder;
     }
@@ -247,87 +247,87 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
             .AddProperty(c => c.Name, p => p.AsRequired())
             .AddProperty(c => c.Owner, p => p.AsOptional())
             .AddProperty(c => c.Employees, p => p.AsOptional())
-            .AddIdentity("PK_Company_Id", b => b.AddScalarPart(c => c.Id))
-            .AddIdentity("AK_Company_Name", b => b.AddScalarPart(c => c.Name));
+            .AddKeyType("PK_Company_Id", c => c.AddKeyPath(p => p.Id))
+            .AddKeyType("AK_Company_Name", c => c.AddKeyPath(p => p.Name));
 
         return builder;
     }
 
-    private static ApiObjectTypeBuilder<IdentityScalar> CreateFromIdentityApiSchemaTheIdentityScalarTypeBuilder(ApiSchemaBuilderContext ctx)
+    private static ApiObjectTypeBuilder<KeyOneScalarPart> CreateFromIdentityApiSchemaTheIdentityScalarTypeBuilder(ApiSchemaBuilderContext ctx)
     {
-        var builder = new ApiObjectTypeBuilder<IdentityScalar>(ctx)
-            .WithName(nameof(IdentityScalar))
+        var builder = new ApiObjectTypeBuilder<KeyOneScalarPart>(ctx)
+            .WithName(nameof(KeyOneScalarPart))
             .AddProperty(c => c.Id)
             .AddProperty(c => c.Name)
-            .AddIdentity("PK_IdentityScalar", b => b.AddScalarPart(c => c.Id))
-            .AddIdentity("AK_IdentityScalar", b => b.AddScalarPart(c => c.Name));
+            .AddKeyType("PK_KeyOneScalarPart", c => c.AddKeyPath(p => p.Id))
+            .AddKeyType("AK_KeyOneScalarPart", c => c.AddKeyPath(p => p.Name));
 
         return builder;
     }
 
-    private static ApiObjectTypeBuilder<IdentityTwoScalarPartComposite> CreateFromIdentityApiSchemaTheIdentityTwoScalarPartCompositeTypeBuilder(ApiSchemaBuilderContext ctx)
+    private static ApiObjectTypeBuilder<KeyTwoScalarPartComposite> CreateFromIdentityApiSchemaTheIdentityTwoScalarPartCompositeTypeBuilder(ApiSchemaBuilderContext ctx)
     {
-        var builder = new ApiObjectTypeBuilder<IdentityTwoScalarPartComposite>(ctx)
-            .WithName(nameof(IdentityTwoScalarPartComposite))
+        var builder = new ApiObjectTypeBuilder<KeyTwoScalarPartComposite>(ctx)
+            .WithName(nameof(KeyTwoScalarPartComposite))
             .AddProperty(c => c.Id1)
             .AddProperty(c => c.Id2)
             .AddProperty(c => c.Description)
-            .AddIdentity("PK_IdentityTwoScalarPartComposite",
-                b => b.AddScalarPart(c => c.Id1)
-                      .AddScalarPart(c => c.Id2));
+            .AddKeyType("PK_KeyTwoScalarPartComposite", c => c
+                .AddKeyPath(p => p.Id1)
+                .AddKeyPath(p => p.Id2));
 
         return builder;
     }
 
-    private static ApiObjectTypeBuilder<IdentityThreeScalarPartComposite> CreateFromIdentityApiSchemaTheIdentityThreeScalarPartCompositeTypeBuilder(ApiSchemaBuilderContext ctx)
+    private static ApiObjectTypeBuilder<KeyThreeScalarPartComposite> CreateFromIdentityApiSchemaTheIdentityThreeScalarPartCompositeTypeBuilder(ApiSchemaBuilderContext ctx)
     {
-        var builder = new ApiObjectTypeBuilder<IdentityThreeScalarPartComposite>(ctx)
-            .WithName(nameof(IdentityThreeScalarPartComposite))
+        var builder = new ApiObjectTypeBuilder<KeyThreeScalarPartComposite>(ctx)
+            .WithName(nameof(KeyThreeScalarPartComposite))
             .AddProperty(c => c.Id1)
             .AddProperty(c => c.Id2)
             .AddProperty(c => c.Id3)
             .AddProperty(c => c.Description)
-            .AddIdentity("PK_IdentityThreeScalarPartComposite",
-                b => b.AddScalarPart(c => c.Id1)
-                      .AddScalarPart(c => c.Id2)
-                      .AddScalarPart(c => c.Id3));
+            .AddKeyType("PK_KeyThreeScalarPartComposite", c => c
+                .AddKeyPath(p => p.Id1)
+                .AddKeyPath(p => p.Id2)
+                .AddKeyPath(p => p.Id3));
 
         return builder;
     }
 
-    private static ApiObjectTypeBuilder<IdentityNestedComposite> CreateFromIdentityApiSchemaTheIdentityNestedCompositeTypeBuilder(ApiSchemaBuilderContext ctx)
+    private static ApiObjectTypeBuilder<KeyNestedComposite> CreateFromIdentityApiSchemaTheIdentityNestedCompositeTypeBuilder(ApiSchemaBuilderContext ctx)
     {
-        var builder = new ApiObjectTypeBuilder<IdentityNestedComposite>(ctx)
-            .WithName(nameof(IdentityNestedComposite))
+        var builder = new ApiObjectTypeBuilder<KeyNestedComposite>(ctx)
+            .WithName(nameof(KeyNestedComposite))
             .AddProperty(c => c.NestedPart)
             .AddProperty(c => c.Name)
-            .AddIdentity("PK_IdentityNestedComposite",
-                b => b.AddNestedPart(c => c.NestedPart)
-                      .AddScalarPart(c => c.Name));
+            .AddKeyType("PK_KeyNestedComposite", c => c
+                .AddKeyPath(p => p.NestedPart.Id)
+                .AddKeyPath(p => p.Name));
 
         return builder;
     }
 
-    private static ApiObjectTypeBuilder<IdentityOwnedComposite> CreateFromIdentityApiSchemaTheIdentityOwnedCompositeTypeBuilder(ApiSchemaBuilderContext ctx)
+    private static ApiObjectTypeBuilder<KeyOwnedComposite> CreateFromIdentityApiSchemaTheIdentityOwnedCompositeTypeBuilder(ApiSchemaBuilderContext ctx)
     {
-        var builder = new ApiObjectTypeBuilder<IdentityOwnedComposite>(ctx)
-            .WithName(nameof(IdentityOwnedComposite))
+        var builder = new ApiObjectTypeBuilder<KeyOwnedComposite>(ctx)
+            .WithName(nameof(KeyOwnedComposite))
             .AddProperty(c => c.LineNumber)
             .AddProperty(c => c.Description)
-            .AddIdentity("PK_IdentityOwnedComposite",
-                b => b.AddOwnerPart()
-                      .AddScalarPart(c => c.LineNumber));
+            .AddKeyType("PK_KeyOwnedComposite", c => c
+                .AddKeyPath<KeyOwner, int>(p => p.Id)
+                .AddKeyPath(p => p.LineNumber));
 
         return builder;
     }
 
-    private static ApiObjectTypeBuilder<IdentityOwnedDependent> CreateFromIdentityApiSchemaTheIdentityOwnedDependentTypeBuilder(ApiSchemaBuilderContext ctx)
+    private static ApiObjectTypeBuilder<KeyOwnedDependent> CreateFromIdentityApiSchemaTheIdentityOwnedDependentTypeBuilder(ApiSchemaBuilderContext ctx)
     {
-        var builder = new ApiObjectTypeBuilder<IdentityOwnedDependent>(ctx)
-            .WithName(nameof(IdentityOwnedDependent))
+        var builder = new ApiObjectTypeBuilder<KeyOwnedDependent>(ctx)
+            .WithName(nameof(KeyOwnedDependent))
             .AddProperty(c => c.Description)
-            .AddIdentity("PK_IdentityOwnedDependent",
-                b => b.AddOwnerPart());
+            .AddKeyType("PK_KeyOwnedDependent", c => c
+                .AddKeyPath<KeyOwner, int>(p => p.Id));
 
         return builder;
     }

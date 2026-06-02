@@ -77,170 +77,52 @@ public enum ApiInitializationCode
     API_ENUM_VALUE_INVALID_CLR_NAME,
     #endregion
 
-    #region ApiIdentity Initialization Codes
+    #region ApiKeyPath Initialization Codes
     /// <summary>
-    ///    Multiple identity parts reference the same CLR property name, which may cause ambiguity.
+    ///     An <see cref="ApiKeyPath"/> has no segments. At least one segment is required to identify a scalar property.
     /// </summary>
-    API_IDENTITY_DUPLICATE_PART_CLR_PROPERTY_NAME,
+    API_KEY_PATH_EMPTY_SEGMENTS,
 
     /// <summary>
-    ///     The identity's API name is null, empty, or whitespace.
+    ///     A non-terminal (navigation) segment of an <see cref="ApiKeyPath"/> resolved to a property whose type is not
+    ///     an <see cref="ApiObjectType"/>. Navigation segments must refer to object-typed properties.
     /// </summary>
-    API_IDENTITY_INVALID_API_NAME,
+    API_KEY_PATH_NAVIGATION_SEGMENT_INVALID_TYPE,
 
     /// <summary>
-    ///    More than one owner identity part is defined, which is not allowed.
+    ///     The terminal (scalar) segment of an <see cref="ApiKeyPath"/> resolved to a property whose type is not
+    ///     an <see cref="ApiScalarType"/>. The last segment must refer to a scalar-typed property.
     /// </summary>
-    API_IDENTITY_MULTIPLE_OWNER_PARTS,
+    API_KEY_PATH_SCALAR_SEGMENT_INVALID_TYPE,
 
     /// <summary>
-    ///     The identity has no parts defined.
+    ///     An <see cref="ApiKeyPath"/>'s root CLR type is not registered as an <see cref="ApiObjectType"/> in the schema.
     /// </summary>
-    API_IDENTITY_NULL_OR_EMPTY_PARTS,
+    API_KEY_PATH_UNRESOLVED_ROOT_TYPE,
     #endregion
 
-    #region ApiIdentityPart Initialization Codes
+    #region ApiKeyPathSegment Initialization Codes
     /// <summary>
-    ///    The identity part's property reference is of an invalid type for the identity part kind (e.g., non-scalar type for a scalar identity part).
+    ///     An <see cref="ApiKeyPath"/> segment's CLR property name is null, empty, or whitespace.
     /// </summary>
-    API_IDENTITY_PART_INVALID_API_PROPERTY_TYPE,
+    API_KEY_PATH_SEGMENT_INVALID_CLR_PROPERTY_NAME,
 
     /// <summary>
-    ///     The identity part's property CLR name is null, empty, or whitespace.
+    ///     An <see cref="ApiKeyPath"/> segment's CLR property name could not be resolved to a defined property on the current object type.
     /// </summary>
-    API_IDENTITY_PART_INVALID_CLR_PROPERTY_NAME,
-
-    /// <summary>
-    ///     An identity part uses a property CLR type that may have performance implications for identity operations.
-    /// </summary>
-    API_IDENTITY_PART_PERFORMANCE_CONCERN,
-
-    /// <summary>
-    ///     The identity part's property reference could not be resolved to a defined property.
-    /// </summary>
-    API_IDENTITY_PART_UNRESOLVED_API_PROPERTY,
-
-    /// <summary>
-    ///    The identity part's nested identity reference could not be resolved to a defined identity.
-    /// </summary>
-    API_IDENTITY_PART_UNRESOLVED_NESTED_IDENTITY,
-
-    /// <summary>
-    ///     No owner object type could be found for an owner identity part.
-    /// </summary>
-    API_IDENTITY_PART_UNRESOLVED_OWNER,
-
-    /// <summary>
-    ///     Multiple candidate owner object types were found for an owner identity part and could not be disambiguated.
-    /// </summary>
-    API_IDENTITY_PART_AMBIGUOUS_OWNER,
-
-    /// <summary>
-    ///     A cyclic owner identity reference was detected (e.g., A owns B owns A).
-    /// </summary>
-    API_IDENTITY_PART_CYCLIC_OWNER,
+    API_KEY_PATH_SEGMENT_UNRESOLVED_API_PROPERTY,
     #endregion
 
-    #region ApiRelationship Initialization Codes
+    #region ApiKeyType Initialization Codes
     /// <summary>
-    ///     The relationship's API name is null, empty, or whitespace.
+    ///     An <see cref="ApiKeyType"/>'s API name is null, empty, or whitespace.
     /// </summary>
-    API_RELATIONSHIP_INVALID_API_NAME,
+    API_KEY_TYPE_INVALID_API_NAME,
 
     /// <summary>
-    ///     The relationship's principal end is null.
+    ///     An <see cref="ApiKeyType"/> has no key paths defined. At least one <see cref="ApiKeyPath"/> is required.
     /// </summary>
-    API_RELATIONSHIP_NULL_PRINCIPAL_END,
-
-    /// <summary>
-    ///     The relationship's dependent end is null.
-    /// </summary>
-    API_RELATIONSHIP_NULL_DEPENDENT_END,
-    #endregion
-
-    #region ApiRelationshipElement Initialization Codes
-    /// <summary>
-    ///     The relationship element's CLR object type is null.
-    /// </summary>
-    API_RELATIONSHIP_ELEMENT_NULL_CLR_OBJECT_TYPE,
-
-    /// <summary>
-    ///     The relationship element's object type name could not be resolved to a defined object type in the schema.
-    /// </summary>
-    API_RELATIONSHIP_ELEMENT_UNRESOLVED_OBJECT_TYPE,
-    #endregion
-
-    #region ApiRelationshipEnd Initialization Codes
-    /// <summary>
-    ///     The principal end's referenced identity could not be resolved, or the principal type has no primary identity.
-    /// </summary>
-    API_RELATIONSHIP_END_UNRESOLVED_IDENTITY,
-    #endregion
-
-    #region ApiRelationshipManyToMany Initialization Codes
-    /// <summary>
-    ///     The many-to-many relationship's principal end A is null.
-    /// </summary>
-    API_RELATIONSHIP_MANY_TO_MANY_NULL_PRINCIPAL_END_A,
-
-    /// <summary>
-    ///     The many-to-many relationship's principal end B is null.
-    /// </summary>
-    API_RELATIONSHIP_MANY_TO_MANY_NULL_PRINCIPAL_END_B,
-
-    /// <summary>
-    ///     The many-to-many relationship's association is null.
-    /// </summary>
-    API_RELATIONSHIP_MANY_TO_MANY_NULL_ASSOCIATION,
-
-    /// <summary>
-    ///     The number of scalar leaves in the association's key paths for end A
-    ///     does not match the number of scalar leaves in principal end A's join-key identity.
-    /// </summary>
-    API_RELATIONSHIP_MANY_TO_MANY_INVALID_ASSOCIATION_KEY_PATHS_A_COUNT,
-
-    /// <summary>
-    ///     The number of scalar leaves in the association's key paths for end B
-    ///     does not match the number of scalar leaves in principal end B's join-key identity.
-    /// </summary>
-    API_RELATIONSHIP_MANY_TO_MANY_INVALID_ASSOCIATION_KEY_PATHS_B_COUNT,
-
-    /// <summary>
-    ///     The association key-path binding is asymmetric: one side declares key paths while the other does not.
-    /// </summary>
-    API_RELATIONSHIP_MANY_TO_MANY_ASYMMETRIC_ASSOCIATION_KEY_PATH_BINDING,
-    #endregion
-
-    #region ApiRelationshipOneTo Initialization Codes
-    /// <summary>
-    ///     The number of scalar leaves in the dependent end's key paths does not match
-    ///     the number of scalar leaves in the principal end's join-key identity in either
-    ///     one-to-one or one-to-many relationships.
-    /// </summary>
-    API_RELATIONSHIP_ONE_TO_INVALID_DEPENDENT_KEY_PATHS_COUNT,
-    #endregion
-
-    #region ApiRelationshipKeyPath Initialization Codes
-    /// <summary>
-    ///    The relationship key path's CLR property name is null, empty, or whitespace.
-    /// </summary>
-    API_RELATIONSHIP_KEY_PATH_INVALID_CLR_PROPERTY_NAME,
-
-    /// <summary>
-    ///    The relationship key path's property reference could not be resolved to a defined property on the declaring object type.
-    /// </summary>
-    API_RELATIONSHIP_KEY_PATH_UNRESOLVED_API_PROPERTY,
-
-    /// <summary>
-    ///     The relationship key path's property reference is of an invalid type for the path kind
-    ///     (e.g., a non-object property used as a nested key path navigation property).
-    /// </summary>
-    API_RELATIONSHIP_KEY_PATH_INVALID_API_PROPERTY_TYPE,
-
-    /// <summary>
-    ///     A nested or owner relationship key path contains no child paths.
-    /// </summary>
-    API_RELATIONSHIP_KEY_PATH_NULL_OR_EMPTY_PATHS,
+    API_KEY_TYPE_NULL_OR_EMPTY_PATHS,
     #endregion
 
     #region ApiNamedType Initialization Codes
@@ -252,9 +134,9 @@ public enum ApiInitializationCode
 
     #region ApiObjectType Initialization Codes
     /// <summary>
-    ///     Multiple identities have the same API name.
+    ///     Multiple key types have the same API name.
     /// </summary>
-    API_OBJECT_TYPE_DUPLICATE_IDENTITY_API_NAME,
+    API_OBJECT_TYPE_DUPLICATE_KEY_TYPE_API_NAME,
 
     /// <summary>
     ///     Multiple properties have the same API name.
@@ -334,6 +216,81 @@ public enum ApiInitializationCode
     ///     An absent Optional property may assign null to a CLR member that cannot hold it.
     /// </summary>
     API_PROPERTY_OPTIONAL_NON_NULLABLE_MISMATCH,
+    #endregion
+
+    #region ApiRelationship Initialization Codes
+    /// <summary>
+    ///     The relationship's API name is null, empty, or whitespace.
+    /// </summary>
+    API_RELATIONSHIP_INVALID_API_NAME,
+
+    /// <summary>
+    ///     The relationship's principal end is null.
+    /// </summary>
+    API_RELATIONSHIP_NULL_PRINCIPAL_END,
+
+    /// <summary>
+    ///     The relationship's dependent end is null.
+    /// </summary>
+    API_RELATIONSHIP_NULL_DEPENDENT_END,
+    #endregion
+
+    #region ApiRelationshipElement Initialization Codes
+    /// <summary>
+    ///     The relationship element's CLR object type is null.
+    /// </summary>
+    API_RELATIONSHIP_ELEMENT_NULL_CLR_OBJECT_TYPE,
+
+    /// <summary>
+    ///     The relationship element's object type name could not be resolved to a defined object type in the schema.
+    /// </summary>
+    API_RELATIONSHIP_ELEMENT_UNRESOLVED_OBJECT_TYPE,
+    #endregion
+
+    #region ApiRelationshipEnd Initialization Codes
+    /// <summary>
+    ///     The principal end's referenced identity could not be resolved, or the principal type has no primary identity.
+    /// </summary>
+    API_RELATIONSHIP_END_UNRESOLVED_IDENTITY,
+    #endregion
+
+    #region ApiRelationshipManyToMany Initialization Codes
+    /// <summary>
+    ///     The many-to-many relationship's principal end A is null.
+    /// </summary>
+    API_RELATIONSHIP_MANY_TO_MANY_NULL_PRINCIPAL_END_A,
+
+    /// <summary>
+    ///     The many-to-many relationship's principal end B is null.
+    /// </summary>
+    API_RELATIONSHIP_MANY_TO_MANY_NULL_PRINCIPAL_END_B,
+
+    /// <summary>
+    ///     The many-to-many relationship's association is null.
+    /// </summary>
+    API_RELATIONSHIP_MANY_TO_MANY_NULL_ASSOCIATION,
+
+    /// <summary>
+    ///     The number of scalar leaves in the association's key paths for end A
+    ///     does not match the number of scalar leaves in principal end A's join-key identity.
+    /// </summary>
+    API_RELATIONSHIP_MANY_TO_MANY_INVALID_ASSOCIATION_KEY_PATHS_A_COUNT,
+
+    /// <summary>
+    ///     The number of scalar leaves in the association's key paths for end B
+    ///     does not match the number of scalar leaves in principal end B's join-key identity.
+    /// </summary>
+    API_RELATIONSHIP_MANY_TO_MANY_INVALID_ASSOCIATION_KEY_PATHS_B_COUNT,
+
+    #endregion
+
+    #region ApiRelationshipOneTo Initialization Codes
+    /// <summary>
+    ///     The number of scalar leaves in the dependent end's key paths does not match
+    ///     the number of scalar leaves in the principal end's join-key identity in either
+    ///     one-to-one or one-to-many relationships.
+    /// </summary>
+    API_RELATIONSHIP_ONE_TO_INVALID_DEPENDENT_KEY_PATHS_COUNT,
     #endregion
 
     #region ApiSchema Initialization Codes

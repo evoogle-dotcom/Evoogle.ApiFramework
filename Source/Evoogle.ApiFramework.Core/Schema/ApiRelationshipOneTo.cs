@@ -109,18 +109,18 @@ public abstract class ApiRelationshipOneTo
             // Purely navigational — no FK alignment to validate.
             return;
         }
-        var keyPaths = dependent.ApiKeyPaths;
+        var foreignKeyType = dependent.ApiForeignKeyType;
 
-        var keyPathCount = ApiSchemaHelpers.CountKeyPathLeaves(keyPaths);
+        var keyPathCount = foreignKeyType.ApiKeyPaths.Length;
         var identityCount = ApiSchemaHelpers.CountIdentityLeaves(identity);
 
-        if (keyPathCount is not null && identityCount is not null && keyPathCount != identityCount)
+        if (identityCount is not null && keyPathCount != identityCount)
         {
             var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_RELATIONSHIP_ONE_TO_INVALID_DEPENDENT_KEY_PATHS_COUNT;
-            var description = $"{nameof(this.ApiDependentEnd)}.{nameof(this.ApiDependentEnd.ApiKeyPaths)} has {keyPathCount} scalar leaf(s) but principal identity '{identity.ApiName}' has {identityCount} scalar leaf(s)";
-            var remediation = $"Ensure {nameof(this.ApiDependentEnd)}.{nameof(this.ApiDependentEnd.ApiKeyPaths)} contains exactly {identityCount} scalar leaf(s) to match the principal end's join-key identity";
+            var description = $"{nameof(this.ApiDependentEnd)}.{nameof(this.ApiDependentEnd.ApiForeignKeyType)}.{nameof(ApiKeyType.ApiKeyPaths)} has {keyPathCount} key path(s) but principal identity '{identity.ApiName}' has {identityCount} key path(s)";
+            var remediation = $"Ensure {nameof(this.ApiDependentEnd)}.{nameof(this.ApiDependentEnd.ApiForeignKeyType)}.{nameof(ApiKeyType.ApiKeyPaths)} contains exactly {identityCount} key path(s) to match the principal end's join-key identity";
 
             context.AddIssue(path, severity, code, description, remediation);
         }

@@ -195,12 +195,12 @@ public sealed class ApiSchema : ExtensibleBase
         // Set path
         _apiPath = this.BuildPath();
 
-        // Phase 1: Validate schema name and build all lookup dictionaries.
+        // Phase 1: Validate schema name and build all lookup dictionaries
         var context = ApiInitializationContext.CreateRootContext(this);
         this.InitializeApiName(context);
         this.InitializeLookupDictionaries(context);
 
-        // Phase 2: Initialize all type definitions.
+        // Phase 2: Initialize all type definitions
         this.InitializeApiScalarTypes(context);
         this.InitializeApiEnumTypes(context);
         this.InitializeApiObjectTypes(context);
@@ -208,8 +208,8 @@ public sealed class ApiSchema : ExtensibleBase
         // The remaining initialization phases require fully initialized types,
         // so they come after all types have been initialized.
 
-        // Phase 3: Initialize identity
-        this.InitializeApiIdentity(context);
+        // Phase 3. Initialize key types
+        this.InitializeApiKeyTypes(context);
 
         // Phase 4: Initialize relationships
         this.InitializeApiRelationships(context);
@@ -388,9 +388,12 @@ public sealed class ApiSchema : ExtensibleBase
         }
     }
 
-    private void InitializeApiIdentity(ApiInitializationContext context)
+    private void InitializeApiKeyTypes(ApiInitializationContext context)
     {
-        this.ResolveOwnerIdentityParts(context);
+        foreach (var apiObjectType in this.ApiObjectTypes)
+        {
+            apiObjectType.InitializeKeyTypes(context);
+        }
     }
 
     private void InitializeApiRelationships(ApiInitializationContext context)
@@ -400,96 +403,7 @@ public sealed class ApiSchema : ExtensibleBase
             apiRelationship.Initialize(context);
         }
 
-        this.ResolveOwnerRelationshipKeyPaths(context);
-
         this.PopulateRelationshipCrossReferences(context);
-    }
-
-    private void ResolveOwnerRelationshipKeyPaths(ApiInitializationContext context)
-    {
-        foreach (var relationship in this.ApiRelationships)
-        {
-            switch (relationship)
-            {
-                case ApiRelationshipOneTo oneTo:
-                    this.ResolveOwnerKeyPathsForPrincipal
-                    (
-                        oneTo.ApiPrincipalEnd,
-                        oneTo.ApiDependentEnd is { HasKeyBinding: true } d ? d.ApiKeyPaths : null,
-                        context
-                    );
-                    break;
-
-                case ApiRelationshipManyToMany manyToMany:
-                    this.ResolveOwnerKeyPathsForPrincipal
-                    (
-                        manyToMany.ApiPrincipalEndA,
-                        manyToMany.ApiAssociation is { HasKeyBinding: true } a ? a.ApiKeyPathsA : null,
-                        context
-                    );
-                    this.ResolveOwnerKeyPathsForPrincipal
-                    (
-                        manyToMany.ApiPrincipalEndB,
-                        manyToMany.ApiAssociation is { HasKeyBinding: true } b ? b.ApiKeyPathsB : null,
-                        context
-                    );
-                    break;
-            }
-        }
-    }
-
-    private void ResolveOwnerKeyPathsForPrincipal
-    (
-        ApiRelationshipPrincipalEnd? principal,
-        ApiRelationshipKeyPath[]? keyPaths,
-        ApiInitializationContext context
-    )
-    {
-        if (principal is null)
-        {
-            return;
-        }
-
-        if (principal.ClrObjectType is null)
-        {
-            return;
-        }
-
-        // If the principal's object type didn't resolve (error already recorded), skip.
-        if (!this.TryGetObjectTypeByClrType(principal.ClrObjectType, out var principalObjectType))
-        {
-            return;
-        }
-
-        if (keyPaths is null || keyPaths.Length == 0)
-        {
-            return;
-        }
-
-        WalkKeyPathsForOwnerPaths(keyPaths, principalObjectType, context);
-    }
-
-    private static void WalkKeyPathsForOwnerPaths
-    (
-        IEnumerable<ApiRelationshipKeyPath> keyPaths,
-        ApiObjectType principalObjectType,
-        ApiInitializationContext context
-    )
-    {
-        foreach (var keyPath in keyPaths)
-        {
-            switch (keyPath)
-            {
-                case ApiRelationshipOwnerKeyPath ownerKeyPath:
-                    ownerKeyPath.ResolveOwnerType(principalObjectType, context);
-                    break;
-
-                case ApiRelationshipNestedKeyPath nestedKeyPath when nestedKeyPath.ApiKeyPaths.Length > 0:
-                    // The owner is always the principal end regardless of nesting depth — recurse with the same principalObjectType rather than the nested object's type.
-                    WalkKeyPathsForOwnerPaths(nestedKeyPath.ApiKeyPaths, principalObjectType, context);
-                    break;
-            }
-        }
     }
 
     private void InitializeApiScalarTypes(ApiInitializationContext context)
@@ -730,211 +644,5 @@ public sealed class ApiSchema : ExtensibleBase
         }
     }
 
-    private void ResolveOwnerIdentityParts(ApiInitializationContext context)
-    {
-        // Pre-compute the set of object types that have at least one ApiIdentityOwnerPart.
-        // A type with no identities at all cannot contain an owner part, so HasIdentity is a cheap pre-filter.
-        var typesWithOwnerPart = this.ApiObjectTypes
-            .Where(t => t.HasIdentity && t.ApiIdentities.Any(i => i.ApiIdentityParts.Any(p => p is ApiIdentityOwnerPart)))
-            .ToHashSet();
-
-        // Fast path: no type in the schema uses owner-based identity — skip all work.
-        if (typesWithOwnerPart.Count == 0)
-        {
-            return;
-        }
-
-        // Build a reverse lookup:
-        // For each owned type C, collect every object type P that owns C either via:
-        // 1. A collection property (1-to-many)
-        // 2. A direct object property (1-to-1)
-        //
-        // Only insert entries for owned types that actually need resolution.
-        var ownerLookup = new Dictionary<ApiObjectType, List<ApiObjectType>>();
-        foreach (var ownerType in this.ApiObjectTypes)
-        {
-            foreach (var property in ownerType.ApiProperties)
-            {
-                // Skip properties whose type expression failed to resolve during phase 1 initialization.
-                if (!property.IsResolved)
-                {
-                    continue;
-                }
-
-                // 1-to-many: Owner has a collection property whose item type is the owned object type.
-                var collectionType = property.ApiType as ApiCollectionType;
-                if (collectionType is not null)
-                {
-                    var collectionOwnedType = collectionType.ApiItemType as ApiObjectType;
-                    if (collectionOwnedType is not null && typesWithOwnerPart.Contains(collectionOwnedType))
-                    {
-                        AddOwnerCandidate(ownerLookup, collectionOwnedType, ownerType);
-                    }
-                }
-                // 1-to-1: Owner has a direct object property typed as the owned object type.
-                var directOwnedType = property.ApiType as ApiObjectType;
-                if (directOwnedType is not null && typesWithOwnerPart.Contains(directOwnedType))
-                {
-                    AddOwnerCandidate(ownerLookup, directOwnedType, ownerType);
-                }
-            }
-        }
-
-        static void AddOwnerCandidate(Dictionary<ApiObjectType, List<ApiObjectType>> lookup, ApiObjectType ownedType, ApiObjectType ownerType)
-        {
-            if (!lookup.TryGetValue(ownedType, out var owners))
-            {
-                owners = [];
-                lookup[ownedType] = owners;
-            }
-
-            owners.Add(ownerType);
-        }
-
-        // Detect ownership cycles: Find object types whose single-candidate ownership chain forms a loop.
-        //
-        // A cycle means two or more types transitively own each other, making identity composition impossible.
-        var cycleMembers = new HashSet<ApiObjectType>();
-        var checkedTypes = new HashSet<ApiObjectType>();
-
-        foreach (var startType in typesWithOwnerPart)
-        {
-            if (checkedTypes.Contains(startType))
-            {
-                continue;
-            }
-
-            var chain = new List<ApiObjectType>();
-            var chainSet = new HashSet<ApiObjectType>();
-            var current = startType;
-
-            while (current != null && typesWithOwnerPart.Contains(current) && !checkedTypes.Contains(current))
-            {
-                if (chainSet.Contains(current))
-                {
-                    // Cycle found: mark all types in the cycle (from the re-entry point onward) as members.
-                    var cycleStart = current;
-                    var inCycle = false;
-                    foreach (var t in chain)
-                    {
-                        if (t == cycleStart)
-                        {
-                            inCycle = true;
-                        }
-
-                        if (inCycle)
-                        {
-                            cycleMembers.Add(t);
-                        }
-                    }
-                    break;
-                }
-
-                chainSet.Add(current);
-                chain.Add(current);
-
-                ownerLookup.TryGetValue(current, out var singleOwner);
-                current = singleOwner?.Count == 1 ? singleOwner[0] : null;
-            }
-
-            foreach (var t in chain)
-            {
-                checkedTypes.Add(t);
-            }
-        }
-
-        // Report errors for all cycle members.
-        foreach (var cycleType in cycleMembers)
-        {
-            foreach (var identity in cycleType.ApiIdentities)
-            {
-                foreach (var part in identity.ApiIdentityParts.OfType<ApiIdentityOwnerPart>())
-                {
-                    var path = part.ApiPath;
-                    var severity = ApiInitializationSeverity.Error;
-                    var code = ApiInitializationCode.API_IDENTITY_PART_CYCLIC_OWNER;
-                    var description = $"A cyclic owner identity reference was detected involving '{cycleType.ApiName}'";
-                    var remediation = $"Remove the cyclic {nameof(ApiIdentityOwnerPart)} reference";
-
-                    context.AddIssue(path, severity, code, description, remediation);
-                }
-            }
-        }
-
-        // Propagate tainted status to types whose single resolved owner is itself a cycle member (or transitively tainted).
-        //
-        // Such types cannot be safely resolved because their owner identity is partially initialized,
-        // which would cause a runtime throw without a prior diagnostic.
-        var taintedTypes = new HashSet<ApiObjectType>(cycleMembers);
-        bool anyNewTainted;
-        do
-        {
-            anyNewTainted = false;
-            foreach (var candidate in typesWithOwnerPart)
-            {
-                if (taintedTypes.Contains(candidate))
-                {
-                    continue;
-                }
-
-                ownerLookup.TryGetValue(candidate, out var candidateOwners);
-                if (candidateOwners?.Count == 1 && taintedTypes.Contains(candidateOwners[0]))
-                {
-                    taintedTypes.Add(candidate);
-                    anyNewTainted = true;
-                }
-            }
-        } while (anyNewTainted);
-
-        // Report errors for transitively tainted types (non-cycle members whose single owner is in or leads to a cycle).
-        foreach (var taintedType in taintedTypes)
-        {
-            if (cycleMembers.Contains(taintedType))
-            {
-                continue;
-            }
-
-            ownerLookup.TryGetValue(taintedType, out var taintedOwners);
-            var ownerName = taintedOwners?.Count == 1 ? taintedOwners[0].ApiName : "an unknown type";
-
-            foreach (var identity in taintedType.ApiIdentities)
-            {
-                foreach (var part in identity.ApiIdentityParts.OfType<ApiIdentityOwnerPart>())
-                {
-                    var path = part.ApiPath;
-                    var severity = ApiInitializationSeverity.Error;
-                    var code = ApiInitializationCode.API_IDENTITY_PART_CYCLIC_OWNER;
-                    var description = $"Owner type '{ownerName}' of '{taintedType.ApiName}' is involved in a cyclic owner identity reference";
-                    var remediation = $"Remove the cyclic {nameof(ApiIdentityOwnerPart)} reference";
-
-                    context.AddIssue(path, severity, code, description, remediation);
-                }
-            }
-        }
-
-        // Walk only owned types that need resolution,
-        // skipping any that are tainted (direct cycle members or types that transitively depend on a cycle member).
-        foreach (var ownedType in typesWithOwnerPart)
-        {
-            if (taintedTypes.Contains(ownedType))
-            {
-                continue;
-            }
-
-            foreach (var identity in ownedType.ApiIdentities)
-            {
-                foreach (var ownerPart in identity.ApiIdentityParts.OfType<ApiIdentityOwnerPart>())
-                {
-                    ownerLookup.TryGetValue(ownedType, out var candidateOwners);
-
-                    var partContext = context
-                        .WithDeclaringObjectType(ownedType)
-                        .WithDeclaringSchemaElement(identity);
-
-                    ownerPart.ResolveOwnerIdentity(ownedType, candidateOwners ?? [], partContext);
-                }
-            }
-        }
-    }
     #endregion
 }

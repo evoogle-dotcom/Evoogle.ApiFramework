@@ -17,16 +17,16 @@ public sealed class ApiScalarTypeBuilder<T>(ApiSchemaBuilderContext context)
     : ApiScalarTypeBuilder(typeof(T), context)
 {
     #region AddExtension Methods
-    /// <inheritdoc cref="ApiScalarTypeBuilder.AddScalarExtension(Type, object)"/>
-    public new ApiScalarTypeBuilder<T> AddScalarExtension(Type type, object value)
+    /// <inheritdoc cref="ApiScalarTypeBuilder.AddScalarTypeExtension(Type, object)"/>
+    public new ApiScalarTypeBuilder<T> AddScalarTypeExtension(Type type, object value)
     {
-        base.AddScalarExtension(type, value);
+        base.AddScalarTypeExtension(type, value);
         return this;
     }
 
-    /// <inheritdoc cref="ApiScalarTypeBuilder.AddScalarExtension{TExt}(TExt)"/>
-    public new ApiScalarTypeBuilder<T> AddScalarExtension<TExt>(TExt value) where TExt : notnull
-        => this.AddScalarExtension(typeof(TExt), value);
+    /// <inheritdoc cref="ApiScalarTypeBuilder.AddScalarTypeExtension{TExt}(TExt)"/>
+    public new ApiScalarTypeBuilder<T> AddScalarTypeExtension<TExt>(TExt value) where TExt : notnull
+        => this.AddScalarTypeExtension(typeof(TExt), value);
     #endregion
 
     #region With Methods

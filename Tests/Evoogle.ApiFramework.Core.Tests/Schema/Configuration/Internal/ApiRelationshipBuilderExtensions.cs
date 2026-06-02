@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -18,7 +18,7 @@ internal static class ApiRelationshipBuilderExtensions
         {
             if (apiDependentEnd.HasKeyBinding)
             {
-                ConfigureDependentEndKeyPaths(y, apiDependentEnd.ApiKeyPaths);
+                ConfigureForeignKeyType(y, apiDependentEnd.ApiForeignKeyType);
             }
             y.ConfigureExtensions(apiDependentEnd);
         });
@@ -30,7 +30,7 @@ internal static class ApiRelationshipBuilderExtensions
         {
             if (apiDependentEnd.HasKeyBinding)
             {
-                ConfigureDependentEndKeyPaths(y, apiDependentEnd.ApiKeyPaths);
+                ConfigureForeignKeyType(y, apiDependentEnd.ApiForeignKeyType);
             }
             y.ConfigureExtensions(apiDependentEnd);
         });
@@ -42,7 +42,8 @@ internal static class ApiRelationshipBuilderExtensions
         {
             if (apiAssociation.HasKeyBinding)
             {
-                ConfigureAssociationKeyPaths(y, apiAssociation.ApiKeyPathsA, apiAssociation.ApiKeyPathsB);
+                ConfigureForeignKeyType(y, apiAssociation.ApiForeignKeyTypeA, isA: true);
+                ConfigureForeignKeyType(y, apiAssociation.ApiForeignKeyTypeB, isA: false);
             }
             y.ConfigureExtensions(apiAssociation);
         });
@@ -50,180 +51,44 @@ internal static class ApiRelationshipBuilderExtensions
     #endregion
 
     #region Implementation Methods
-    private static void ConfigureDependentEndKeyPaths(ApiRelationshipDependentEndBuilder builder, IEnumerable<ApiRelationshipKeyPath> keyPaths)
+    private static void ConfigureForeignKeyType(ApiRelationshipDependentEndBuilder builder, ApiKeyType apiForeignKeyType)
     {
-        foreach (var keyPath in keyPaths)
+        builder.WithForeignKeyType(apiForeignKeyType.ApiName, fk =>
         {
-            switch (keyPath.ApiKind)
+            foreach (var keyPath in apiForeignKeyType.ApiKeyPaths)
             {
-                case ApiRelationshipKeyPathKind.Scalar:
-                    {
-                        var scalarPath = (ApiRelationshipScalarKeyPath)keyPath;
-                        builder.AddScalarPath(scalarPath.ClrPropertyName, p => p.ConfigureExtensions(scalarPath));
-                        break;
-                    }
-                case ApiRelationshipKeyPathKind.Nested:
-                    {
-                        var nestedPath = (ApiRelationshipNestedKeyPath)keyPath;
-                        builder.AddNestedPath(nestedPath.ClrPropertyName, z =>
-                        {
-                            ConfigureChildKeyPaths(z, nestedPath.ApiKeyPaths);
-                            z.ConfigureExtensions(nestedPath);
-                        });
-                        break;
-                    }
-                case ApiRelationshipKeyPathKind.Owner:
-                    {
-                        var ownerPath = (ApiRelationshipOwnerKeyPath)keyPath;
-                        if (ownerPath.HasKeyBinding)
-                        {
-                            builder.AddOwnerPath(z =>
-                            {
-                                ConfigureChildKeyPaths(z, ownerPath.ApiKeyPaths);
-                                z.ConfigureExtensions(ownerPath);
-                            });
-                        }
-                        else
-                        {
-                            builder.AddOwnerPath(z => z.ConfigureExtensions(ownerPath));
-                        }
-                        break;
-                    }
-                default:
-                    throw new InvalidOperationException($"Unsupported {nameof(ApiRelationshipKeyPathKind)}: {keyPath.ApiKind}");
+                var clrPropertyNames = keyPath.ApiSegments.Select(s => s.ClrPropertyName);
+                fk.AddKeyPath(keyPath.ClrRootType, clrPropertyNames, p => p.ConfigureExtensions(keyPath));
             }
-        }
+            fk.ConfigureExtensions(apiForeignKeyType);
+        });
     }
 
-    private static void ConfigureAssociationKeyPaths(ApiRelationshipAssociationBuilder builder, IEnumerable<ApiRelationshipKeyPath> keyPathsA, IEnumerable<ApiRelationshipKeyPath> keyPathsB)
+    private static void ConfigureForeignKeyType(ApiRelationshipAssociationBuilder builder, ApiKeyType apiForeignKeyType, bool isA)
     {
-        foreach (var keyPath in keyPathsA)
+        if (isA)
         {
-            switch (keyPath.ApiKind)
+            builder.WithForeignKeyTypeA(apiForeignKeyType.ApiName, fk =>
             {
-                case ApiRelationshipKeyPathKind.Scalar:
-                    {
-                        var scalarPath = (ApiRelationshipScalarKeyPath)keyPath;
-                        builder.AddScalarPathA(scalarPath.ClrPropertyName, p => p.ConfigureExtensions(scalarPath));
-                        break;
-                    }
-                case ApiRelationshipKeyPathKind.Nested:
-                    {
-                        var nestedPath = (ApiRelationshipNestedKeyPath)keyPath;
-                        builder.AddNestedPathA(nestedPath.ClrPropertyName, z =>
-                        {
-                            ConfigureChildKeyPaths(z, nestedPath.ApiKeyPaths);
-                            z.ConfigureExtensions(nestedPath);
-                        });
-                        break;
-                    }
-                case ApiRelationshipKeyPathKind.Owner:
-                    {
-                        var ownerPath = (ApiRelationshipOwnerKeyPath)keyPath;
-                        if (ownerPath.HasKeyBinding)
-                        {
-                            builder.AddOwnerPathA(z =>
-                            {
-                                ConfigureChildKeyPaths(z, ownerPath.ApiKeyPaths);
-                                z.ConfigureExtensions(ownerPath);
-                            });
-                        }
-                        else
-                        {
-                            builder.AddOwnerPathA(z => z.ConfigureExtensions(ownerPath));
-                        }
-                        break;
-                    }
-                default:
-                    throw new InvalidOperationException($"Unsupported {nameof(ApiRelationshipKeyPathKind)}: {keyPath.ApiKind}");
-            }
+                foreach (var keyPath in apiForeignKeyType.ApiKeyPaths)
+                {
+                    var clrPropertyNames = keyPath.ApiSegments.Select(s => s.ClrPropertyName);
+                    fk.AddKeyPath(keyPath.ClrRootType, clrPropertyNames, p => p.ConfigureExtensions(keyPath));
+                }
+                fk.ConfigureExtensions(apiForeignKeyType);
+            });
         }
-
-        foreach (var keyPath in keyPathsB)
+        else
         {
-            switch (keyPath.ApiKind)
+            builder.WithForeignKeyTypeB(apiForeignKeyType.ApiName, fk =>
             {
-                case ApiRelationshipKeyPathKind.Scalar:
-                    {
-                        var scalarPath = (ApiRelationshipScalarKeyPath)keyPath;
-                        builder.AddScalarPathB(scalarPath.ClrPropertyName, p => p.ConfigureExtensions(scalarPath));
-                        break;
-                    }
-                case ApiRelationshipKeyPathKind.Nested:
-                    {
-                        var nestedPath = (ApiRelationshipNestedKeyPath)keyPath;
-                        builder.AddNestedPathB(nestedPath.ClrPropertyName, z =>
-                        {
-                            ConfigureChildKeyPaths(z, nestedPath.ApiKeyPaths);
-                            z.ConfigureExtensions(nestedPath);
-                        });
-                        break;
-                    }
-                case ApiRelationshipKeyPathKind.Owner:
-                    {
-                        var ownerPath = (ApiRelationshipOwnerKeyPath)keyPath;
-                        if (ownerPath.HasKeyBinding)
-                        {
-                            builder.AddOwnerPathB(z =>
-                            {
-                                ConfigureChildKeyPaths(z, ownerPath.ApiKeyPaths);
-                                z.ConfigureExtensions(ownerPath);
-                            });
-                        }
-                        else
-                        {
-                            builder.AddOwnerPathB(z => z.ConfigureExtensions(ownerPath));
-                        }
-                        break;
-                    }
-                default:
-                    throw new InvalidOperationException($"Unsupported {nameof(ApiRelationshipKeyPathKind)}: {keyPath.ApiKind}");
-            }
-        }
-    }
-
-    private static void ConfigureChildKeyPaths(ApiRelationshipKeyPathBuilder builder, IEnumerable<ApiRelationshipKeyPath> keyPaths)
-    {
-        foreach (var keyPath in keyPaths)
-        {
-            switch (keyPath.ApiKind)
-            {
-                case ApiRelationshipKeyPathKind.Scalar:
-                    {
-                        var scalarPath = (ApiRelationshipScalarKeyPath)keyPath;
-                        builder.AddScalarPath(scalarPath.ClrPropertyName, p => p.ConfigureExtensions(scalarPath));
-                        break;
-                    }
-                case ApiRelationshipKeyPathKind.Nested:
-                    {
-                        var nestedPath = (ApiRelationshipNestedKeyPath)keyPath;
-                        builder.AddNestedPath(nestedPath.ClrPropertyName, z =>
-                        {
-                            ConfigureChildKeyPaths(z, nestedPath.ApiKeyPaths);
-                            z.ConfigureExtensions(nestedPath);
-                        });
-                        break;
-                    }
-                case ApiRelationshipKeyPathKind.Owner:
-                    {
-                        var ownerPath = (ApiRelationshipOwnerKeyPath)keyPath;
-                        if (ownerPath.HasKeyBinding)
-                        {
-                            builder.AddOwnerPath(z =>
-                            {
-                                ConfigureChildKeyPaths(z, ownerPath.ApiKeyPaths);
-                                z.ConfigureExtensions(ownerPath);
-                            });
-                        }
-                        else
-                        {
-                            builder.AddOwnerPath(z => z.ConfigureExtensions(ownerPath));
-                        }
-                        break;
-                    }
-                default:
-                    throw new InvalidOperationException($"Unsupported {nameof(ApiRelationshipKeyPathKind)}: {keyPath.ApiKind}");
-            }
+                foreach (var keyPath in apiForeignKeyType.ApiKeyPaths)
+                {
+                    var clrPropertyNames = keyPath.ApiSegments.Select(s => s.ClrPropertyName);
+                    fk.AddKeyPath(keyPath.ClrRootType, clrPropertyNames, p => p.ConfigureExtensions(keyPath));
+                }
+                fk.ConfigureExtensions(apiForeignKeyType);
+            });
         }
     }
     #endregion

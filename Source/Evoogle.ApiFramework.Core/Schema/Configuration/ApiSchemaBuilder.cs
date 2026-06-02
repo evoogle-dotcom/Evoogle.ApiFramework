@@ -279,7 +279,7 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
         var builder = _context.GetOrAddOneToOneRelationshipBuilder(apiName);
 
         builder.WithPrincipalEnd<TPrincipal>();
-        builder.WithDependentEnd<TDependent>(configure);
+        builder.WithDependentEnd(configure);
         return this;
     }
 
@@ -303,7 +303,7 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
         var clrName = StaticReflection.GetMemberName(fk);
         var builder = _context.GetOrAddOneToOneRelationshipBuilder(apiName);
         builder.WithPrincipalEnd<TPrincipal>();
-        builder.WithDependentEnd<TDependent>(d => d.AddScalarPath(clrName));
+        builder.WithDependentEnd<TDependent>(d => d.WithForeignKeyType("FK", b => b.AddKeyPath(typeof(TDependent), clrName)));
         return this;
     }
 
@@ -360,7 +360,7 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
         var builder = _context.GetOrAddOneToManyRelationshipBuilder(apiName);
 
         builder.WithPrincipalEnd<TPrincipal>();
-        builder.WithDependentEnd<TDependent>(configure);
+        builder.WithDependentEnd(configure);
         return this;
     }
 
@@ -384,7 +384,7 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
         var clrName = StaticReflection.GetMemberName(fk);
         var builder = _context.GetOrAddOneToManyRelationshipBuilder(apiName);
         builder.WithPrincipalEnd<TPrincipal>();
-        builder.WithDependentEnd<TDependent>(d => d.AddScalarPath(clrName));
+        builder.WithDependentEnd<TDependent>(d => d.WithForeignKeyType("FK", b => b.AddKeyPath(typeof(TDependent), clrName)));
         return this;
     }
 
@@ -451,8 +451,8 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
         builder.WithPrincipalEndA<TPrincipalA>();
         builder.WithPrincipalEndB<TPrincipalB>();
         builder.WithAssociation<TAssociation>(a => a
-            .AddScalarPathA(clrNameA)
-            .AddScalarPathB(clrNameB));
+            .WithForeignKeyTypeA("FKA", b => b.AddKeyPath(typeof(TAssociation), clrNameA))
+            .WithForeignKeyTypeB("FKB", b => b.AddKeyPath(typeof(TAssociation), clrNameB)));
 
         return this;
     }

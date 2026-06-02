@@ -74,23 +74,32 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
     private static void WriteApiObjectType(Utf8JsonWriter writer, ApiObjectType apiObjectType, DefaultWriteContext<PropertyNames> context)
     {
         WriteApiObjectTypeApiOptions(writer, apiObjectType, context);
-        WriteApiObjectTypeApiIdentities(writer, apiObjectType, context);
         WriteApiObjectTypeApiProperties(writer, apiObjectType, context);
+        WriteApiObjectTypeApiKeyTypes(writer, apiObjectType, context);
     }
 
-    private static void WriteApiObjectTypeApiIdentities(Utf8JsonWriter writer, ApiObjectType apiObjectType, DefaultWriteContext<PropertyNames> context)
+    private static void WriteApiObjectTypeApiKeyTypes(Utf8JsonWriter writer, ApiObjectType apiObjectType, DefaultWriteContext<PropertyNames> context)
     {
-        var propertyName = context.PropertyNames.ApiObjectType.ApiIdentities;
-        var apiIdentities = apiObjectType.ApiIdentities;
+        var propertyName = context.PropertyNames.ApiObjectType.ApiKeyTypes;
+        var apiKeyTypes = apiObjectType.ApiKeyTypes;
         var options = context.Options;
 
         writer.TryWritePropertyWithAction
         (
             propertyName,
-            apiIdentities,
+            apiKeyTypes,
             options,
             collection => WriteJsonArray(writer, collection, item => writer.TryWriteWithSerializer(item, options))
         );
+    }
+
+    private static void WriteApiObjectTypeApiOptions(Utf8JsonWriter writer, ApiObjectType apiObjectType, DefaultWriteContext<PropertyNames> context)
+    {
+        var propertyName = context.PropertyNames.ApiObjectType.ApiOptions;
+        var apiOptions = apiObjectType.ApiOptions;
+        var options = context.Options;
+
+        writer.TryWritePropertyWithSerializer(propertyName, apiOptions, options);
     }
 
     private static void WriteApiObjectTypeApiProperties(Utf8JsonWriter writer, ApiObjectType apiObjectType, DefaultWriteContext<PropertyNames> context)
@@ -106,15 +115,6 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
             options,
             collection => WriteJsonArray(writer, collection, item => writer.TryWriteWithSerializer(item, options))
         );
-    }
-
-    private static void WriteApiObjectTypeApiOptions(Utf8JsonWriter writer, ApiObjectType apiObjectType, DefaultWriteContext<PropertyNames> context)
-    {
-        var propertyName = context.PropertyNames.ApiObjectType.ApiOptions;
-        var apiOptions = apiObjectType.ApiOptions;
-        var options = context.Options;
-
-        writer.TryWritePropertyWithSerializer(propertyName, apiOptions, options);
     }
 
     // ApiScalarType

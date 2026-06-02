@@ -20,43 +20,43 @@ public sealed class ApiObjectTypeBuilder<T>(ApiSchemaBuilderContext context)
     : ApiObjectTypeBuilder(typeof(T), context)
 {
     #region AddExtension Methods
-    /// <inheritdoc cref="ApiObjectTypeBuilder.AddObjectExtension(Type, object)"/>
-    public new ApiObjectTypeBuilder<T> AddObjectExtension(Type type, object value)
+    /// <inheritdoc cref="ApiObjectTypeBuilder.AddObjectTypeExtension(Type, object)"/>
+    public new ApiObjectTypeBuilder<T> AddObjectTypeExtension(Type type, object value)
     {
-        base.AddObjectExtension(type, value);
+        base.AddObjectTypeExtension(type, value);
         return this;
     }
 
-    /// <inheritdoc cref="ApiObjectTypeBuilder.AddObjectExtension{TExt}(TExt)"/>
-    public new ApiObjectTypeBuilder<T> AddObjectExtension<TExt>(TExt value) where TExt : notnull
-        => this.AddObjectExtension(typeof(TExt), value);
+    /// <inheritdoc cref="ApiObjectTypeBuilder.AddObjectTypeExtension{TExt}(TExt)"/>
+    public new ApiObjectTypeBuilder<T> AddObjectTypeExtension<TExt>(TExt value) where TExt : notnull
+        => this.AddObjectTypeExtension(typeof(TExt), value);
     #endregion
 
-    #region AddIdentity Methods
+    #region AddKeyType Methods
     /// <summary>
-    ///     Adds an <see cref="ApiIdentity"/> definition using a strongly-typed <see cref="ApiIdentityBuilder{T}"/>
+    ///     Adds an <see cref="ApiKeyType"/> definition using a strongly-typed <see cref="ApiKeyTypeBuilder{T}"/>
     ///     callback that supports expression-based property selection.
     /// </summary>
     /// <remarks>
-    ///     The first identity added is the primary identity by convention unless specified otherwise.
+    ///     The first key type added is the primary key type by convention.
     ///     To configure with string-based property names instead, use the non-generic
-    ///     <see cref="ApiObjectTypeBuilder.AddIdentity"/> overload on the base class.
+    ///     <see cref="ApiObjectTypeBuilder.AddKeyType"/> overload on the base class.
     /// </remarks>
-    /// <param name="apiName">The API name of the identity.</param>
-    /// <param name="configure">Optional callback to configure the identity using a typed builder.</param>
+    /// <param name="apiName">The API name of the key type.</param>
+    /// <param name="configure">Optional callback to configure the key type using a typed builder.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiObjectTypeBuilder<T> AddIdentity(string apiName, Action<ApiIdentityBuilder<T>>? configure = null)
+    public ApiObjectTypeBuilder<T> AddKeyType(string apiName, Action<ApiKeyTypeBuilder<T>>? configure = null)
     {
-        var apiIdentityBuilder = new ApiIdentityBuilder<T>(apiName);
-        configure?.Invoke(apiIdentityBuilder);
-        base.AddIdentityBuilderCore(apiIdentityBuilder);
+        var apiKeyTypeBuilder = new ApiKeyTypeBuilder<T>(apiName);
+        configure?.Invoke(apiKeyTypeBuilder);
+        base.AddKeyTypeBuilderCore(apiKeyTypeBuilder);
         return this;
     }
 
-    /// <inheritdoc cref="ApiObjectTypeBuilder.AddIdentity(string, Action{ApiIdentityBuilder}?)"/>
-    public new ApiObjectTypeBuilder<T> AddIdentity(string apiName, Action<ApiIdentityBuilder>? configure = null)
+    /// <inheritdoc cref="ApiObjectTypeBuilder.AddKeyType(string, Action{ApiKeyTypeBuilder}?)"/>
+    public new ApiObjectTypeBuilder<T> AddKeyType(string apiName, Action<ApiKeyTypeBuilder>? configure = null)
     {
-        base.AddIdentity(apiName, configure);
+        base.AddKeyType(apiName, configure);
         return this;
     }
     #endregion

@@ -11,24 +11,17 @@ public static class ApiSchemaExcludeMembers
 {
     public static readonly List<ExcludeMember> SchemaInitialized =
     [
-        // ApiSchema - cycle: ApiSchema → ApiSchemaContext → ApiSchema → ...
-        new ExcludeMember(typeof(ApiSchema), nameof(ApiSchema.ApiSchemaContext)),
-
         // ApiCollectionType — cycle: ApiItemType → ApiObjectType → ApiProperties[].ApiType → ...
         new ExcludeMember(typeof(ApiCollectionType), nameof(ApiCollectionType.ApiItemType)),
 
+        // ApiKeyPath — cycle: ApiRootObjectType → ApiObjectType → ApiKeyTypes[].ApiKeyPaths[].ApiRootObjectType → ...
+        new ExcludeMember(typeof(ApiKeyPath), nameof(ApiKeyPath.ApiRootObjectType)),
+
+        // ApiKeyPathSegment — cycle: ApiProperty → ApiType → ApiObjectType → ApiKeyTypes[].ApiKeyPaths[].ApiRootObjectType → ...
+        new ExcludeMember(typeof(ApiKeyPathSegment), nameof(ApiKeyPathSegment.ApiProperty)),
+
         // ApiProperty — cycle: ApiType → ApiObjectType → ApiProperties[].ApiType → ...
         new ExcludeMember(typeof(ApiProperty), nameof(ApiProperty.ApiType)),
-
-        // ApiIdentityPropertyPart — cycle: ApiProperty → ApiType → ApiObjectType → ApiIdentities[].ApiIdentityParts[].ApiProperty → ...
-        new ExcludeMember(typeof(ApiIdentityPropertyPart), nameof(ApiIdentityPropertyPart.ApiProperty)),
-
-        // ApiIdentityOwnerPart — cycle: ApiOwnerType → ApiObjectType → ... / ApiOwnerIdentity → ApiIdentity → ...
-        new ExcludeMember(typeof(ApiIdentityOwnerPart), nameof(ApiIdentityOwnerPart.ApiObjectType)),
-        new ExcludeMember(typeof(ApiIdentityOwnerPart), nameof(ApiIdentityOwnerPart.ApiIdentity)),
-
-        // ApiIdentityNestedPart — cycle: ApiIdentity → ApiObjectType → ApiIdentities[].ApiIdentityParts[].ApiProperty → ...
-        new ExcludeMember(typeof(ApiIdentityNestedPart), nameof(ApiIdentityNestedPart.ApiIdentity)),
 
         // ApiObjectType — cycles: ApiProperties[].ApiType → ... / ApiIdentities[].ApiIdentityParts[].ApiProperty → ...
         new ExcludeMember(typeof(ApiObjectType), nameof(ApiObjectType.ApiRelationshipEnds)),
@@ -47,12 +40,27 @@ public static class ApiSchemaExcludeMembers
         // ApiRelationshipPrincipalEnd — identity resolved during initialization
         new ExcludeMember(typeof(ApiRelationshipPrincipalEnd), nameof(ApiRelationshipPrincipalEnd.ApiIdentity)),
 
-        // ApiRelationshipOwnerKeyPath — key paths not available when using convention
-        new ExcludeMember(typeof(ApiRelationshipOwnerKeyPath), nameof(ApiRelationshipOwnerKeyPath.ApiKeyPaths)),
+        // ApiRelationshipDependentEnd — ApiForeignKeyType throws when IsNavigational (HasKeyBinding=false)
+        new ExcludeMember(typeof(ApiRelationshipDependentEnd), nameof(ApiRelationshipDependentEnd.ApiForeignKeyType)),
+
+        // ApiSchema - cycle: ApiSchema → ApiSchemaContext → ApiSchema → ...
+        new ExcludeMember(typeof(ApiSchema), nameof(ApiSchema.ApiSchemaContext)),
     ];
 
     public static readonly List<ExcludeMember> Standard =
     [
+        // ApiCollectionType
+        new ExcludeMember(typeof(ApiCollectionType), nameof(ApiCollectionType.ApiItemType)),
+
+        // ApiKeyPath
+        new ExcludeMember(typeof(ApiKeyPath), nameof(ApiKeyPath.ApiRootObjectType)),
+
+        // ApiKeyPathSegment
+        new ExcludeMember(typeof(ApiKeyPathSegment), nameof(ApiKeyPathSegment.ApiProperty)),
+
+        // ApiProperty
+        new ExcludeMember(typeof(ApiProperty), nameof(ApiProperty.ApiType)),
+
         // ApiSchema
         new ExcludeMember(typeof(ApiSchema), nameof(ApiSchema.ApiPath)),
         new ExcludeMember(typeof(ApiSchema), nameof(ApiSchema.ApiSchemaContext)),
@@ -62,19 +70,6 @@ public static class ApiSchemaExcludeMembers
 
         // ApiTypeExpression
         new ExcludeMember(typeof(ApiTypeExpression), nameof(ApiTypeExpression.ApiType)),
-
-        // ApiCollectionType
-        new ExcludeMember(typeof(ApiCollectionType), nameof(ApiCollectionType.ApiItemType)),
-
-        // ApiIdentityPart
-        new ExcludeMember(typeof(ApiIdentityPropertyPart), nameof(ApiIdentityPropertyPart.ApiProperty)),
-        new ExcludeMember(typeof(ApiIdentityOwnerPart), nameof(ApiIdentityOwnerPart.ApiIdentity)),
-        new ExcludeMember(typeof(ApiIdentityOwnerPart), nameof(ApiIdentityOwnerPart.ApiObjectType)),
-        new ExcludeMember(typeof(ApiIdentityScalarPart), nameof(ApiIdentityScalarPart.ClrScalarType)),
-        new ExcludeMember(typeof(ApiIdentityNestedPart), nameof(ApiIdentityNestedPart.ApiIdentity)),
-
-        // ApiProperty
-        new ExcludeMember(typeof(ApiProperty), nameof(ApiProperty.ApiType)),
     ];
 
     /// <summary>
@@ -83,10 +78,12 @@ public static class ApiSchemaExcludeMembers
     /// </summary>
     public static readonly List<ExcludeMember> Relationship =
     [
-        // ApiSchemaElement
-        new ExcludeMember(typeof(ApiSchemaElement), nameof(ApiSchemaElement.ApiPath)),
-
         // ApiRelationshipElement — object type resolved during initialization
+        new ExcludeMember(typeof(ApiRelationshipElement), nameof(ApiRelationshipElement.ApiObjectType)),
+
+        // ApiRelationshipDependentEnd — ApiForeignKeyType throws when IsNavigational (HasKeyBinding=false)
+        new ExcludeMember(typeof(ApiRelationshipDependentEnd), nameof(ApiRelationshipDependentEnd.ApiForeignKeyType)),
+
         new ExcludeMember(typeof(ApiRelationshipElement), nameof(ApiRelationshipElement.ApiObjectType)),
 
         // ApiRelationshipEnd — cycle: end → relationship → end → ...
@@ -99,18 +96,10 @@ public static class ApiSchemaExcludeMembers
         new ExcludeMember(typeof(ApiRelationshipPrincipalEnd), nameof(ApiRelationshipPrincipalEnd.ApiIdentity)),
 
         // Key path nodes — property and object type references resolved during initialization
-        new ExcludeMember(typeof(ApiRelationshipScalarKeyPath), nameof(ApiRelationshipScalarKeyPath.ApiProperty)),
-        new ExcludeMember(typeof(ApiRelationshipNestedKeyPath), nameof(ApiRelationshipNestedKeyPath.ApiProperty)),
-        new ExcludeMember(typeof(ApiRelationshipNestedKeyPath), nameof(ApiRelationshipNestedKeyPath.ApiObjectType)),
-        new ExcludeMember(typeof(ApiRelationshipOwnerKeyPath), nameof(ApiRelationshipOwnerKeyPath.ApiObjectType)),
+        new ExcludeMember(typeof(ApiKeyPath), nameof(ApiKeyPath.ApiRootObjectType)),
+        new ExcludeMember(typeof(ApiKeyPathSegment), nameof(ApiKeyPathSegment.ApiProperty)),
 
-        // ApiRelationshipDependentEnd — key paths not available on navigational (no-key-binding) dependent ends
-        new ExcludeMember(typeof(ApiRelationshipDependentEnd), nameof(ApiRelationshipDependentEnd.ApiKeyPaths)),
-
-        // ApiRelationshipOwnerKeyPath — key paths not available when using convention
-        new ExcludeMember(typeof(ApiRelationshipOwnerKeyPath), nameof(ApiRelationshipOwnerKeyPath.ApiKeyPaths)),
-
-        new ExcludeMember(typeof(ApiRelationshipElement), nameof(ApiRelationshipElement.ApiObjectType)),
-
+        // ApiSchemaElement
+        new ExcludeMember(typeof(ApiSchemaElement), nameof(ApiSchemaElement.ApiPath)),
     ];
 }

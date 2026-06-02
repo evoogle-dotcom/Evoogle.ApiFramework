@@ -109,19 +109,19 @@ public sealed class ApiRelationshipManyToMany
         // End A alignment
         if (this.ApiPrincipalEndA is not null && this.ApiAssociation is not null && this.ApiAssociation.HasKeyBinding)
         {
-            var keyPathsA = this.ApiAssociation.ApiKeyPathsA;
+            var foreignKeyTypeA = this.ApiAssociation.ApiForeignKeyTypeA;
             var identityA = this.ApiPrincipalEndA.ResolvedIdentity;
-            if (keyPathsA is { Length: > 0 } && identityA is not null)
+            if (identityA is not null)
             {
-                var keyPathCount = ApiSchemaHelpers.CountKeyPathLeaves(keyPathsA);
+                var keyPathCount = foreignKeyTypeA.ApiKeyPaths.Length;
                 var identityCount = ApiSchemaHelpers.CountIdentityLeaves(identityA);
-                if (keyPathCount is not null && identityCount is not null && keyPathCount != identityCount)
+                if (identityCount is not null && keyPathCount != identityCount)
                 {
                     var path = this.ApiPath;
                     var severity = ApiInitializationSeverity.Error;
                     var code = ApiInitializationCode.API_RELATIONSHIP_MANY_TO_MANY_INVALID_ASSOCIATION_KEY_PATHS_A_COUNT;
-                    var description = $"{nameof(this.ApiAssociation)}.{nameof(this.ApiAssociation.ApiKeyPathsA)} has {keyPathCount} scalar leaf(s) but principal end A identity '{identityA.ApiName}' has {identityCount} scalar leaf(s)";
-                    var remediation = $"Ensure {nameof(this.ApiAssociation)}.{nameof(this.ApiAssociation.ApiKeyPathsA)} contains exactly {identityCount} scalar leaf(s) to match principal end A's join-key identity";
+                    var description = $"{nameof(this.ApiAssociation)}.{nameof(this.ApiAssociation.ApiForeignKeyTypeA)}.{nameof(ApiKeyType.ApiKeyPaths)} has {keyPathCount} key path(s) but principal end A identity '{identityA.ApiName}' has {identityCount} key path(s)";
+                    var remediation = $"Ensure {nameof(this.ApiAssociation)}.{nameof(this.ApiAssociation.ApiForeignKeyTypeA)}.{nameof(ApiKeyType.ApiKeyPaths)} contains exactly {identityCount} key path(s) to match principal end A's join-key identity";
 
                     context.AddIssue(path, severity, code, description, remediation);
                 }
@@ -131,19 +131,19 @@ public sealed class ApiRelationshipManyToMany
         // End B alignment
         if (this.ApiPrincipalEndB is not null && this.ApiAssociation is not null && this.ApiAssociation.HasKeyBinding)
         {
-            var keyPathsB = this.ApiAssociation.ApiKeyPathsB;
+            var foreignKeyTypeB = this.ApiAssociation.ApiForeignKeyTypeB;
             var identityB = this.ApiPrincipalEndB.ResolvedIdentity;
-            if (keyPathsB is { Length: > 0 } && identityB is not null)
+            if (identityB is not null)
             {
-                var keyPathCount = ApiSchemaHelpers.CountKeyPathLeaves(keyPathsB);
+                var keyPathCount = foreignKeyTypeB.ApiKeyPaths.Length;
                 var identityCount = ApiSchemaHelpers.CountIdentityLeaves(identityB);
-                if (keyPathCount is not null && identityCount is not null && keyPathCount != identityCount)
+                if (identityCount is not null && keyPathCount != identityCount)
                 {
                     var path = this.ApiPath;
                     var severity = ApiInitializationSeverity.Error;
                     var code = ApiInitializationCode.API_RELATIONSHIP_MANY_TO_MANY_INVALID_ASSOCIATION_KEY_PATHS_B_COUNT;
-                    var description = $"{nameof(this.ApiAssociation)}.{nameof(this.ApiAssociation.ApiKeyPathsB)} has {keyPathCount} scalar leaf(s) but principal end B identity '{identityB.ApiName}' has {identityCount} scalar leaf(s)";
-                    var remediation = $"Ensure {nameof(this.ApiAssociation)}.{nameof(this.ApiAssociation.ApiKeyPathsB)} contains exactly {identityCount} scalar leaf(s) to match principal end B's join-key identity";
+                    var description = $"{nameof(this.ApiAssociation)}.{nameof(this.ApiAssociation.ApiForeignKeyTypeB)}.{nameof(ApiKeyType.ApiKeyPaths)} has {keyPathCount} key path(s) but principal end B identity '{identityB.ApiName}' has {identityCount} key path(s)";
+                    var remediation = $"Ensure {nameof(this.ApiAssociation)}.{nameof(this.ApiAssociation.ApiForeignKeyTypeB)}.{nameof(ApiKeyType.ApiKeyPaths)} contains exactly {identityCount} key path(s) to match principal end B's join-key identity";
 
                     context.AddIssue(path, severity, code, description, remediation);
                 }

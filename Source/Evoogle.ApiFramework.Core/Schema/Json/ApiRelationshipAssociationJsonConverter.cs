@@ -26,8 +26,8 @@ public class ApiRelationshipAssociationJsonConverter(ILogger<ApiRelationshipAsso
 
     private readonly record struct ApiRelationshipAssociationPropertyNames
     {
-        public required string ApiKeyPathsA { get; init; }
-        public required string ApiKeyPathsB { get; init; }
+        public required string ApiForeignKeyTypeA { get; init; }
+        public required string ApiForeignKeyTypeB { get; init; }
     }
 
     private readonly record struct PropertyNames
@@ -45,8 +45,8 @@ public class ApiRelationshipAssociationJsonConverter(ILogger<ApiRelationshipAsso
                 },
                 ApiRelationshipAssociation = new ApiRelationshipAssociationPropertyNames
                 {
-                    ApiKeyPathsA = policy.ConvertName(nameof(ApiRelationshipAssociation.ApiKeyPathsA)),
-                    ApiKeyPathsB = policy.ConvertName(nameof(ApiRelationshipAssociation.ApiKeyPathsB)),
+                    ApiForeignKeyTypeA = policy.ConvertName(nameof(ApiRelationshipAssociation.ApiForeignKeyTypeA)),
+                    ApiForeignKeyTypeB = policy.ConvertName(nameof(ApiRelationshipAssociation.ApiForeignKeyTypeB)),
                 },
                 ExtensibleBase = GetExtensiblePropertyNames(policy),
             };
@@ -61,8 +61,8 @@ public class ApiRelationshipAssociationJsonConverter(ILogger<ApiRelationshipAsso
 
     private class ApiRelationshipAssociationReadData
     {
-        public List<ApiRelationshipKeyPath>? ApiKeyPathsA { get; set; }
-        public List<ApiRelationshipKeyPath>? ApiKeyPathsB { get; set; }
+        public ApiKeyType? ApiForeignKeyTypeA { get; set; }
+        public ApiKeyType? ApiForeignKeyTypeB { get; set; }
     }
 
     private class ReadData : ExtensibleReadData
@@ -76,8 +76,8 @@ public class ApiRelationshipAssociationJsonConverter(ILogger<ApiRelationshipAsso
         public readonly Dictionary<string, JsonReaderHandler<DefaultReadContext<PropertyNames, ReadData, ReadHandlers>>> PropertyHandlers = new()
         {
             { propertyNames.ApiRelationshipElement.ClrObjectType, HandleClrObjectType },
-            { propertyNames.ApiRelationshipAssociation.ApiKeyPathsA, HandleApiKeyPathsA },
-            { propertyNames.ApiRelationshipAssociation.ApiKeyPathsB, HandleApiKeyPathsB },
+            { propertyNames.ApiRelationshipAssociation.ApiForeignKeyTypeA, HandleApiForeignKeyTypeA },
+            { propertyNames.ApiRelationshipAssociation.ApiForeignKeyTypeB, HandleApiForeignKeyTypeB },
             { propertyNames.ExtensibleBase.Extensions, CreateExtensionsHandler<PropertyNames, ReadData, ReadHandlers>() },
         };
 
@@ -87,30 +87,16 @@ public class ApiRelationshipAssociationJsonConverter(ILogger<ApiRelationshipAsso
             context.ReadData.ApiRelationshipElement.ClrObjectType = _typeJsonConverter.Read(ref reader, typeof(Type), context.Options);
         }
 
-        private static void HandleApiKeyPathsA(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
-            => HandleApiKeyPaths(ref reader, context, paths => paths.ApiKeyPathsA ??= []);
-
-        private static void HandleApiKeyPathsB(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
-            => HandleApiKeyPaths(ref reader, context, paths => paths.ApiKeyPathsB ??= []);
-
-        private static void HandleApiKeyPaths(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context, Func<ApiRelationshipAssociationReadData, List<ApiRelationshipKeyPath>> getPathsList)
+        private static void HandleApiForeignKeyTypeA(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiRelationshipAssociation ??= new ApiRelationshipAssociationReadData();
-            var pathsList = getPathsList(context.ReadData.ApiRelationshipAssociation);
-
-            void itemHandler(ref Utf8JsonReader itemReader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> ctx) => HandleApiKeyPathItem(ref itemReader, ctx, pathsList);
-            ReadJsonArray(ref reader, context, _ => itemHandler);
+            context.ReadData.ApiRelationshipAssociation.ApiForeignKeyTypeA = JsonSerializer.Deserialize<ApiKeyType>(ref reader, context.Options);
         }
 
-        private static void HandleApiKeyPathItem(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context, List<ApiRelationshipKeyPath> pathsList)
+        private static void HandleApiForeignKeyTypeB(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
-            var keyPath = JsonSerializer.Deserialize<ApiRelationshipKeyPath>(ref reader, context.Options);
-            if (keyPath is null)
-            {
-                return;
-            }
-
-            pathsList.Add(keyPath);
+            context.ReadData.ApiRelationshipAssociation ??= new ApiRelationshipAssociationReadData();
+            context.ReadData.ApiRelationshipAssociation.ApiForeignKeyTypeB = JsonSerializer.Deserialize<ApiKeyType>(ref reader, context.Options);
         }
     }
     #endregion
@@ -148,11 +134,11 @@ public class ApiRelationshipAssociationJsonConverter(ILogger<ApiRelationshipAsso
         var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
 
         var clrObjectType = readContext.ReadData.ApiRelationshipElement?.ClrObjectType;
-        var apiKeyPathsA = readContext.ReadData.ApiRelationshipAssociation?.ApiKeyPathsA;
-        var apiKeyPathsB = readContext.ReadData.ApiRelationshipAssociation?.ApiKeyPathsB;
+        var apiForeignKeyTypeA = readContext.ReadData.ApiRelationshipAssociation?.ApiForeignKeyTypeA;
+        var apiForeignKeyTypeB = readContext.ReadData.ApiRelationshipAssociation?.ApiForeignKeyTypeB;
 
-        var apiRelationshipAssociation = apiKeyPathsA != null && apiKeyPathsB != null
-            ? new ApiRelationshipAssociation(clrObjectType!, apiKeyPathsA, apiKeyPathsB)
+        var apiRelationshipAssociation = apiForeignKeyTypeA != null && apiForeignKeyTypeB != null
+            ? new ApiRelationshipAssociation(clrObjectType!, apiForeignKeyTypeA, apiForeignKeyTypeB)
             : new ApiRelationshipAssociation(clrObjectType!);
 
         AttachExtensions(apiRelationshipAssociation, readContext.ReadData.Extensions);
@@ -174,8 +160,8 @@ public class ApiRelationshipAssociationJsonConverter(ILogger<ApiRelationshipAsso
         WriteJsonObject(writer, () =>
         {
             WriteClrObjectType(writer, value, writeContext);
-            WriteApiKeyPathsA(writer, value, writeContext);
-            WriteApiKeyPathsB(writer, value, writeContext);
+            WriteApiForeignKeyType(writer, value.HasKeyBinding ? value.ApiForeignKeyTypeA : null, writeContext.PropertyNames.ApiRelationshipAssociation.ApiForeignKeyTypeA, writeContext);
+            WriteApiForeignKeyType(writer, value.HasKeyBinding ? value.ApiForeignKeyTypeB : null, writeContext.PropertyNames.ApiRelationshipAssociation.ApiForeignKeyTypeB, writeContext);
 
             WriteExtensibleBaseExtensions(writer, writeContext.PropertyNames.ExtensibleBase.Extensions, value, writeContext);
         });
@@ -186,23 +172,15 @@ public class ApiRelationshipAssociationJsonConverter(ILogger<ApiRelationshipAsso
     private static void WriteClrObjectType(Utf8JsonWriter writer, ApiRelationshipAssociation end, DefaultWriteContext<PropertyNames> context)
         => writer.TryWritePropertyWithConverter(context.PropertyNames.ApiRelationshipElement.ClrObjectType, end.ClrObjectType, context.Options, _typeJsonConverter);
 
-    private static void WriteApiKeyPaths(Utf8JsonWriter writer, ApiRelationshipAssociation end, DefaultWriteContext<PropertyNames> context, string propertyName, IEnumerable<ApiRelationshipKeyPath>? value)
+    private static void WriteApiForeignKeyType(Utf8JsonWriter writer, ApiKeyType? value, string propertyName, DefaultWriteContext<PropertyNames> context)
     {
-        var options = context.Options;
+        if (value is null)
+        {
+            return;
+        }
 
-        writer.TryWritePropertyWithAction
-        (
-            propertyName,
-            value,
-            options,
-            collection => WriteJsonArray(writer, collection, item => writer.TryWriteWithSerializer(item, options))
-        );
+        writer.WritePropertyName(propertyName);
+        writer.TryWriteWithSerializer(value, context.Options);
     }
-
-    private static void WriteApiKeyPathsA(Utf8JsonWriter writer, ApiRelationshipAssociation end, DefaultWriteContext<PropertyNames> context)
-        => WriteApiKeyPaths(writer, end, context, context.PropertyNames.ApiRelationshipAssociation.ApiKeyPathsA, end.HasKeyBinding ? end.ApiKeyPathsA : null);
-
-    private static void WriteApiKeyPathsB(Utf8JsonWriter writer, ApiRelationshipAssociation end, DefaultWriteContext<PropertyNames> context)
-        => WriteApiKeyPaths(writer, end, context, context.PropertyNames.ApiRelationshipAssociation.ApiKeyPathsB, end.HasKeyBinding ? end.ApiKeyPathsB : null);
     #endregion
 }

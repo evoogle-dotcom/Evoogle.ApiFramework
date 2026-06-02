@@ -26,7 +26,7 @@ public class ApiRelationshipDependentEndJsonConverter(ILogger<ApiRelationshipDep
 
     private readonly record struct ApiRelationshipDependentEndPropertyNames
     {
-        public required string ApiKeyPaths { get; init; }
+        public required string ApiForeignKeyType { get; init; }
     }
 
     private readonly record struct PropertyNames
@@ -44,7 +44,7 @@ public class ApiRelationshipDependentEndJsonConverter(ILogger<ApiRelationshipDep
                 },
                 ApiRelationshipDependentEnd = new ApiRelationshipDependentEndPropertyNames
                 {
-                    ApiKeyPaths = policy.ConvertName(nameof(ApiRelationshipDependentEnd.ApiKeyPaths)),
+                    ApiForeignKeyType = policy.ConvertName(nameof(ApiRelationshipDependentEnd.ApiForeignKeyType)),
                 },
                 ExtensibleBase = GetExtensiblePropertyNames(policy),
             };
@@ -59,7 +59,7 @@ public class ApiRelationshipDependentEndJsonConverter(ILogger<ApiRelationshipDep
 
     private class ApiRelationshipDependentEndReadData
     {
-        public List<ApiRelationshipKeyPath>? ApiKeyPaths { get; set; }
+        public ApiKeyType? ApiForeignKeyType { get; set; }
     }
 
     private class ReadData : ExtensibleReadData
@@ -73,7 +73,7 @@ public class ApiRelationshipDependentEndJsonConverter(ILogger<ApiRelationshipDep
         public readonly Dictionary<string, JsonReaderHandler<DefaultReadContext<PropertyNames, ReadData, ReadHandlers>>> PropertyHandlers = new()
         {
             { propertyNames.ApiRelationshipElement.ClrObjectType, HandleClrObjectType },
-            { propertyNames.ApiRelationshipDependentEnd.ApiKeyPaths, HandleApiKeyPaths },
+            { propertyNames.ApiRelationshipDependentEnd.ApiForeignKeyType, HandleApiForeignKeyType },
             { propertyNames.ExtensibleBase.Extensions, CreateExtensionsHandler<PropertyNames, ReadData, ReadHandlers>() },
         };
 
@@ -83,23 +83,10 @@ public class ApiRelationshipDependentEndJsonConverter(ILogger<ApiRelationshipDep
             context.ReadData.ApiRelationshipElement.ClrObjectType = _typeJsonConverter.Read(ref reader, typeof(Type), context.Options);
         }
 
-        private static void HandleApiKeyPaths(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiForeignKeyType(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiRelationshipDependentEnd ??= new ApiRelationshipDependentEndReadData();
-            context.ReadData.ApiRelationshipDependentEnd.ApiKeyPaths ??= [];
-
-            ReadJsonArray(ref reader, context, _ => HandleApiKeyPathsArrayItem);
-        }
-
-        private static void HandleApiKeyPathsArrayItem(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
-        {
-            var keyPath = JsonSerializer.Deserialize<ApiRelationshipKeyPath>(ref reader, context.Options);
-            if (keyPath is null)
-            {
-                return;
-            }
-
-            context.ReadData.ApiRelationshipDependentEnd!.ApiKeyPaths!.Add(keyPath);
+            context.ReadData.ApiRelationshipDependentEnd.ApiForeignKeyType = JsonSerializer.Deserialize<ApiKeyType>(ref reader, context.Options);
         }
     }
     #endregion
@@ -137,10 +124,10 @@ public class ApiRelationshipDependentEndJsonConverter(ILogger<ApiRelationshipDep
         var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
 
         var clrObjectType = readContext.ReadData.ApiRelationshipElement?.ClrObjectType;
-        var apiKeyPaths = readContext.ReadData.ApiRelationshipDependentEnd?.ApiKeyPaths;
+        var apiForeignKeyType = readContext.ReadData.ApiRelationshipDependentEnd?.ApiForeignKeyType;
 
-        var end = apiKeyPaths != null
-            ? new ApiRelationshipDependentEnd(clrObjectType!, apiKeyPaths)
+        var end = apiForeignKeyType != null
+            ? new ApiRelationshipDependentEnd(clrObjectType!, apiForeignKeyType)
             : new ApiRelationshipDependentEnd(clrObjectType!);
 
         AttachExtensions(end, readContext.ReadData.Extensions);
@@ -162,7 +149,7 @@ public class ApiRelationshipDependentEndJsonConverter(ILogger<ApiRelationshipDep
         WriteJsonObject(writer, () =>
         {
             WriteClrObjectType(writer, value, writeContext);
-            WriteApiKeyPaths(writer, value, writeContext);
+            WriteApiForeignKeyType(writer, value, writeContext);
 
             WriteExtensibleBaseExtensions(writer, writeContext.PropertyNames.ExtensibleBase.Extensions, value, writeContext);
         });
@@ -173,19 +160,18 @@ public class ApiRelationshipDependentEndJsonConverter(ILogger<ApiRelationshipDep
     private static void WriteClrObjectType(Utf8JsonWriter writer, ApiRelationshipDependentEnd end, DefaultWriteContext<PropertyNames> context)
         => writer.TryWritePropertyWithConverter(context.PropertyNames.ApiRelationshipElement.ClrObjectType, end.ClrObjectType, context.Options, _typeJsonConverter);
 
-    private static void WriteApiKeyPaths(Utf8JsonWriter writer, ApiRelationshipDependentEnd end, DefaultWriteContext<PropertyNames> context)
+    private static void WriteApiForeignKeyType(Utf8JsonWriter writer, ApiRelationshipDependentEnd end, DefaultWriteContext<PropertyNames> context)
     {
-        var propertyName = context.PropertyNames.ApiRelationshipDependentEnd.ApiKeyPaths;
-        var value = end.HasKeyBinding ? end.ApiKeyPaths : null;
-        var options = context.Options;
+        var propertyName = context.PropertyNames.ApiRelationshipDependentEnd.ApiForeignKeyType;
+        var value = end.HasKeyBinding ? end.ApiForeignKeyType : null;
 
-        writer.TryWritePropertyWithAction
-        (
-            propertyName,
-            value,
-            options,
-            collection => WriteJsonArray(writer, collection, item => writer.TryWriteWithSerializer(item, options))
-        );
+        if (value is null)
+        {
+            return;
+        }
+
+        writer.WritePropertyName(propertyName);
+        writer.TryWriteWithSerializer(value, context.Options);
     }
     #endregion
 }

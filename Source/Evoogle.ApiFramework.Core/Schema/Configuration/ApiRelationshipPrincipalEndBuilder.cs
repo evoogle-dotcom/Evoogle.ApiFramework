@@ -26,7 +26,7 @@ public sealed class ApiRelationshipPrincipalEndBuilder(Type clrObjectType) : Ext
     /// <param name="type">The type used as the extension key.</param>
     /// <param name="value">The extension value to store.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipPrincipalEndBuilder AddPrincipalEndExtension(Type type, object value)
+    public ApiRelationshipPrincipalEndBuilder AddRelationshipPrincipalEndExtension(Type type, object value)
     {
         base.AddExtension(type, value);
         return this;
@@ -38,8 +38,8 @@ public sealed class ApiRelationshipPrincipalEndBuilder(Type clrObjectType) : Ext
     /// <typeparam name="T">The extension value type.</typeparam>
     /// <param name="value">The extension value.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipPrincipalEndBuilder AddPrincipalEndExtension<T>(T value) where T : notnull
-        => this.AddPrincipalEndExtension(typeof(T), value);
+    public ApiRelationshipPrincipalEndBuilder AddRelationshipPrincipalEndExtension<T>(T value) where T : notnull
+        => this.AddRelationshipPrincipalEndExtension(typeof(T), value);
     #endregion
 
     #region With Methods

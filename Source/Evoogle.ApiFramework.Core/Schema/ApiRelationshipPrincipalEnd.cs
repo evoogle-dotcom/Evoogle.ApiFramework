@@ -13,13 +13,13 @@ namespace Evoogle.ApiFramework.Schema;
 
 /// <summary>
 ///     Represents the principal end of an <see cref="ApiRelationship"/>.
-///     The principal end owns the join key: its <see cref="ApiIdentity"/> uniquely identifies
+///     The principal end owns the join key: its <see cref="ApiKeyType"/> uniquely identifies
 ///     the objects on this side and is referenced by the <see cref="ApiRelationshipDependentEnd"/>.
 /// </summary>
 /// <param name="clrObjectType">The CLR type of the principal <see cref="ApiObjectType"/>.</param>
 /// <param name="apiIdentityName">
-///     The optional name of the <see cref="ApiIdentity"/> on the principal type that serves as the join key.
-///     When <see langword="null"/>, the primary identity (<see cref="ApiObjectType.ApiPrimaryIdentity"/>) is used.
+///     The optional name of the <see cref="ApiKeyType"/> on the principal type that serves as the join key.
+///     When <see langword="null"/>, the primary identity (<see cref="ApiObjectType.ApiPrimaryKeyType"/>) is used.
 /// </param>
 [JsonConverter(typeof(ApiRelationshipPrincipalEndJsonConverter))]
 public sealed class ApiRelationshipPrincipalEnd
@@ -29,7 +29,7 @@ public sealed class ApiRelationshipPrincipalEnd
 ) : ApiRelationshipEnd(clrObjectType)
 {
     #region ApiRelationshipPrincipalEnd Fields
-    private ApiIdentity? _apiResolvedIdentity = null;
+    private ApiKeyType? _apiResolvedIdentity = null;
     #endregion
 
     #region ApiSchemaElement Properties
@@ -52,12 +52,12 @@ public sealed class ApiRelationshipPrincipalEnd
     public string? ApiIdentityName { get; } = apiIdentityName;
 
     /// <summary>
-    ///     Gets the resolved join-key <see cref="ApiIdentity"/> from the principal object type. Available after initialization.
+    ///     Gets the resolved join-key <see cref="ApiKeyType"/> from the principal object type. Available after initialization.
     /// </summary>
-    public ApiIdentity ApiIdentity => this.ThrowIfNotInitialized(_apiResolvedIdentity);
+    public ApiKeyType ApiIdentity => this.ThrowIfNotInitialized(_apiResolvedIdentity);
 
-    /// <summary>Gets the resolved join-key <see cref="ApiIdentity"/>, or <see langword="null"/> if initialization failed or has not yet run.</summary>
-    internal ApiIdentity? ResolvedIdentity => _apiResolvedIdentity;
+    /// <summary>Gets the resolved join-key <see cref="ApiKeyType"/>, or <see langword="null"/> if initialization failed or has not yet run.</summary>
+    internal ApiKeyType? ResolvedIdentity => _apiResolvedIdentity;
     #endregion
 
     #region Object Methods
@@ -99,13 +99,13 @@ public sealed class ApiRelationshipPrincipalEnd
         if (this.ApiIdentityName is not null)
         {
             // Resolve by explicit name — same pattern as ApiIdentityNestedPart.InitializeApiIdentity.
-            if (apiObjectType.TryGetIdentityByApiName(this.ApiIdentityName, out var apiResolvedIdentity))
+            if (apiObjectType.TryGetKeyTypeByApiName(this.ApiIdentityName, out var apiResolvedIdentity))
             {
                 _apiResolvedIdentity = apiResolvedIdentity;
                 return;
             }
 
-            var availableIdentities = string.Join(", ", apiObjectType.ApiIdentities.Select(i => $"'{i.ApiName}'"));
+            var availableIdentities = string.Join(", ", apiObjectType.ApiKeyTypes.Select(i => $"'{i.ApiName}'"));
             var remediation = !string.IsNullOrEmpty(availableIdentities)
                 ? $"Use one of the available identities: {availableIdentities}"
                 : $"Define an identity on '{apiObjectType.ApiName}' or remove {nameof(this.ApiIdentityName)}";
@@ -120,7 +120,7 @@ public sealed class ApiRelationshipPrincipalEnd
         }
 
         // Use primary identity by convention.
-        _apiResolvedIdentity = apiObjectType.ApiPrimaryIdentity;
+        _apiResolvedIdentity = apiObjectType.ApiPrimaryKeyType;
 
         if (_apiResolvedIdentity is null)
         {

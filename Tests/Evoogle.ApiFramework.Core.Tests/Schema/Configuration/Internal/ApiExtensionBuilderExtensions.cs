@@ -17,25 +17,34 @@ internal static class ApiExtensionBuilderExtensions
         var extensions = apiEnumType.Extensions;
         foreach (var extension in extensions ?? [])
         {
-            builder.AddEnumExtension(extension.Key, extension.Value);
+            builder.AddEnumTypeExtension(extension.Key, extension.Value);
         }
     }
 
-    public static void ConfigureExtensions(this ApiIdentityBuilder builder, ApiIdentity apiIdentity)
+    public static void ConfigureExtensions(this ApiKeyPathBuilder builder, ApiKeyPath apiKeyPath)
     {
-        var extensions = apiIdentity.Extensions;
+        var extensions = apiKeyPath.Extensions;
         foreach (var extension in extensions ?? [])
         {
-            builder.AddIdentityExtension(extension.Key, extension.Value);
+            builder.AddKeyPathExtension(extension.Key, extension.Value);
         }
     }
 
-    public static void ConfigureExtensions(this ApiIdentityPartBuilder builder, ApiIdentityPart apiIdentityPart)
+    public static void ConfigureExtensions(this ApiKeyPathSegmentBuilder builder, ApiKeyPathSegment apiKeyPathSegment)
     {
-        var extensions = apiIdentityPart.Extensions;
+        var extensions = apiKeyPathSegment.Extensions;
         foreach (var extension in extensions ?? [])
         {
-            builder.AddIdentityPartExtension(extension.Key, extension.Value);
+            builder.AddKeyPathSegmentExtension(extension.Key, extension.Value);
+        }
+    }
+
+    public static void ConfigureExtensions(this ApiKeyTypeBuilder builder, ApiKeyType apiKeyType)
+    {
+        var extensions = apiKeyType.Extensions;
+        foreach (var extension in extensions ?? [])
+        {
+            builder.AddKeyTypeExtension(extension.Key, extension.Value);
         }
     }
 
@@ -44,7 +53,7 @@ internal static class ApiExtensionBuilderExtensions
         var extensions = apiObjectType.Extensions;
         foreach (var extension in extensions ?? [])
         {
-            builder.AddObjectExtension(extension.Key, extension.Value);
+            builder.AddObjectTypeExtension(extension.Key, extension.Value);
         }
     }
 
@@ -62,7 +71,7 @@ internal static class ApiExtensionBuilderExtensions
         var extensions = apiRelationshipAssociation.Extensions;
         foreach (var extension in extensions ?? [])
         {
-            builder.AddAssociationExtension(extension.Key, extension.Value);
+            builder.AddRelationshipAssociationExtension(extension.Key, extension.Value);
         }
     }
 
@@ -71,16 +80,7 @@ internal static class ApiExtensionBuilderExtensions
         var extensions = apiRelationshipDependentEnd.Extensions;
         foreach (var extension in extensions ?? [])
         {
-            builder.AddDependentEndExtension(extension.Key, extension.Value);
-        }
-    }
-
-    public static void ConfigureExtensions(this ApiRelationshipKeyPathBuilder builder, ApiRelationshipKeyPath apiRelationshipKeyPath)
-    {
-        var extensions = apiRelationshipKeyPath.Extensions;
-        foreach (var extension in extensions ?? [])
-        {
-            builder.AddKeyPathExtension(extension.Key, extension.Value);
+            builder.AddRelationshipDependentEndExtension(extension.Key, extension.Value);
         }
     }
 
@@ -116,7 +116,7 @@ internal static class ApiExtensionBuilderExtensions
         var extensions = apiRelationshipPrincipalEnd.Extensions;
         foreach (var extension in extensions ?? [])
         {
-            builder.AddPrincipalEndExtension(extension.Key, extension.Value);
+            builder.AddRelationshipPrincipalEndExtension(extension.Key, extension.Value);
         }
     }
 
@@ -125,7 +125,7 @@ internal static class ApiExtensionBuilderExtensions
         var extensions = apiScalarType.Extensions;
         foreach (var extension in extensions ?? [])
         {
-            builder.AddScalarExtension(extension.Key, extension.Value);
+            builder.AddScalarTypeExtension(extension.Key, extension.Value);
         }
     }
 
