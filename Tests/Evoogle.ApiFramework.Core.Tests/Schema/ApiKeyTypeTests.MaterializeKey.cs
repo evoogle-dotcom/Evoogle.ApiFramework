@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -24,14 +24,13 @@ public partial class ApiKeyTypeTests
         public object? SelfObject { get; init; }
         public object? OwnerObject { get; init; }
         public ApiKeyNullHandling NullHandling { get; init; }
-        public ApiKeyPartNameBuilderKind PartNameBuilderKind { get; init; }
+        public ApiKeyPartNameBuilder PartNameBuilder { get; init; }
         public ApiKey? ExpectedValue { get; init; }
         public Type? ExpectedExceptionType { get; init; }
         #endregion
 
         #region Calculated Properties
         private ApiKeyType? ApiKeyType { get; set; }
-        private ApiKeyPartNameBuilder? ApiPartNameBuilder { get; set; }
         private ApiKey? ActualValue { get; set; }
         private Type? ActualExceptionType { get; set; }
         #endregion
@@ -43,14 +42,12 @@ public partial class ApiKeyTypeTests
                 ? GetKeyTypeByName(this.ApiObjectTypeName, this.ApiKeyTypeName)
                 : GetPrimaryKeyType(this.ApiObjectTypeName);
 
-            this.ApiPartNameBuilder = GetApiKeyPartNameBuilder(this.PartNameBuilderKind);
-
             this.WriteLine($"ApiObjectType:     {this.ApiObjectTypeName.SafeToString()}");
             this.WriteLine($"ApiKeyType:        {this.ApiKeyType?.ApiName.SafeToString()}");
             this.WriteLine($"SelfObject:        {this.SelfObject.SafeToString()}");
             this.WriteLine($"OwnerObject:       {this.OwnerObject.SafeToString()}");
             this.WriteLine($"NullHandling:      {this.NullHandling.SafeToString()}");
-            this.WriteLine($"PartNameBuilder:   {this.PartNameBuilderKind}");
+            this.WriteLine($"PartNameBuilder:   {this.PartNameBuilder}");
             this.WriteLine();
 
             if (this.ExpectedValue is not null)
@@ -67,15 +64,11 @@ public partial class ApiKeyTypeTests
         {
             try
             {
-                var context = new ApiKeyMaterializationContext { NullHandling = this.NullHandling };
-                if (this.ApiPartNameBuilder is not null)
+                var context = new ApiKeyMaterializationContext
                 {
-                    context = new ApiKeyMaterializationContext
-                    {
-                        NullHandling = this.NullHandling,
-                        PartNameBuilder = this.ApiPartNameBuilder
-                    };
-                }
+                    NullHandling = this.NullHandling,
+                    PartNameBuilder = this.PartNameBuilder
+                };
 
                 if (this.SelfObject is not null)
                 {
@@ -269,7 +262,7 @@ public partial class ApiKeyTypeTests
             ApiObjectTypeName = nameof(KeyOneScalarPart),
             ApiKeyTypeName = "PK_KeyOneScalarPart",
             SelfObject = KeyOneScalarPartInstance,
-            PartNameBuilderKind = ApiKeyPartNameBuilderKind.None,
+            PartNameBuilder = ApiKeyPartNameBuilder.None,
             ExpectedValue = ApiKey.Composite(ApiKeyPart.Create(null, ApiKey.FromInt32(KeyOneScalarPartInstance.Id)))
         },
 
@@ -279,7 +272,7 @@ public partial class ApiKeyTypeTests
             ApiObjectTypeName = nameof(KeyOneScalarPart),
             ApiKeyTypeName = "PK_KeyOneScalarPart",
             SelfObject = KeyOneScalarPartInstance,
-            PartNameBuilderKind = ApiKeyPartNameBuilderKind.ClrPathOnly,
+            PartNameBuilder = ApiKeyPartNameBuilder.ClrPathOnly,
             ExpectedValue = ApiKey.Composite(ApiKeyPart.Create(nameof(KeyOneScalarPart.Id), ApiKey.FromInt32(KeyOneScalarPartInstance.Id)))
         },
 
@@ -289,7 +282,7 @@ public partial class ApiKeyTypeTests
             ApiObjectTypeName = nameof(KeyOneScalarPart),
             ApiKeyTypeName = "PK_KeyOneScalarPart",
             SelfObject = KeyOneScalarPartInstance,
-            PartNameBuilderKind = ApiKeyPartNameBuilderKind.ClrRootAndPath,
+            PartNameBuilder = ApiKeyPartNameBuilder.ClrRootAndPath,
             ExpectedValue = ApiKey.Composite(ApiKeyPart.Create(nameof(KeyOneScalarPart) + "." + nameof(KeyOneScalarPart.Id), ApiKey.FromInt32(KeyOneScalarPartInstance.Id)))
         },
 
@@ -299,7 +292,7 @@ public partial class ApiKeyTypeTests
             ApiObjectTypeName = nameof(KeyOneScalarPart),
             ApiKeyTypeName = "AK_KeyOneScalarPart",
             SelfObject = KeyOneScalarPartInstance,
-            PartNameBuilderKind = ApiKeyPartNameBuilderKind.None,
+            PartNameBuilder = ApiKeyPartNameBuilder.None,
             ExpectedValue = ApiKey.Composite(ApiKeyPart.Create(null, ApiKey.FromString(KeyOneScalarPartInstance.Name)))
         },
 
@@ -309,7 +302,7 @@ public partial class ApiKeyTypeTests
             ApiObjectTypeName = nameof(KeyOneScalarPart),
             ApiKeyTypeName = "AK_KeyOneScalarPart",
             SelfObject = KeyOneScalarPartInstance,
-            PartNameBuilderKind = ApiKeyPartNameBuilderKind.ClrPathOnly,
+            PartNameBuilder = ApiKeyPartNameBuilder.ClrPathOnly,
             ExpectedValue = ApiKey.Composite(ApiKeyPart.Create(nameof(KeyOneScalarPart.Name), ApiKey.FromString(KeyOneScalarPartInstance.Name)))
         },
 
@@ -320,7 +313,7 @@ public partial class ApiKeyTypeTests
             ApiObjectTypeName = nameof(KeyOneScalarPart),
             ApiKeyTypeName = "AK_KeyOneScalarPart",
             SelfObject = KeyOneScalarPartInstance,
-            PartNameBuilderKind = ApiKeyPartNameBuilderKind.ClrRootAndPath,
+            PartNameBuilder = ApiKeyPartNameBuilder.ClrRootAndPath,
             ExpectedValue = ApiKey.Composite(ApiKeyPart.Create(nameof(KeyOneScalarPart) + "." + nameof(KeyOneScalarPart.Name), ApiKey.FromString(KeyOneScalarPartInstance.Name)))
         },
 
@@ -330,7 +323,7 @@ public partial class ApiKeyTypeTests
             Name = $"{KeyTwoScalarPartCompositeInstance} with primary composite key (int + string) and none name builder",
             ApiObjectTypeName = nameof(KeyTwoScalarPartComposite),
             SelfObject = KeyTwoScalarPartCompositeInstance,
-            PartNameBuilderKind = ApiKeyPartNameBuilderKind.None,
+            PartNameBuilder = ApiKeyPartNameBuilder.None,
             ExpectedValue = ApiKey.Composite
             (
                 ApiKeyPart.Create(null, ApiKey.FromInt32(KeyTwoScalarPartCompositeInstance.Id1)),
@@ -343,7 +336,7 @@ public partial class ApiKeyTypeTests
             Name = $"{KeyTwoScalarPartCompositeInstance} with primary composite key (int + string) and CLR path only name builder",
             ApiObjectTypeName = nameof(KeyTwoScalarPartComposite),
             SelfObject = KeyTwoScalarPartCompositeInstance,
-            PartNameBuilderKind = ApiKeyPartNameBuilderKind.ClrPathOnly,
+            PartNameBuilder = ApiKeyPartNameBuilder.ClrPathOnly,
             ExpectedValue = ApiKey.Composite
             (
                 ApiKeyPart.Create(nameof(KeyTwoScalarPartComposite.Id1), ApiKey.FromInt32(KeyTwoScalarPartCompositeInstance.Id1)),
@@ -356,7 +349,7 @@ public partial class ApiKeyTypeTests
             Name = $"{KeyTwoScalarPartCompositeInstance} with primary composite key (int + string) and CLR root and path name builder",
             ApiObjectTypeName = nameof(KeyTwoScalarPartComposite),
             SelfObject = KeyTwoScalarPartCompositeInstance,
-            PartNameBuilderKind = ApiKeyPartNameBuilderKind.ClrRootAndPath,
+            PartNameBuilder = ApiKeyPartNameBuilder.ClrRootAndPath,
             ExpectedValue = ApiKey.Composite
             (
                 ApiKeyPart.Create(nameof(KeyTwoScalarPartComposite) + "." + nameof(KeyTwoScalarPartComposite.Id1), ApiKey.FromInt32(KeyTwoScalarPartCompositeInstance.Id1)),
@@ -370,7 +363,7 @@ public partial class ApiKeyTypeTests
             Name = $"{KeyThreeScalarPartCompositeInstance} with primary composite key (int + string + Guid) and none name builder",
             ApiObjectTypeName = nameof(KeyThreeScalarPartComposite),
             SelfObject = KeyThreeScalarPartCompositeInstance,
-            PartNameBuilderKind = ApiKeyPartNameBuilderKind.None,
+            PartNameBuilder = ApiKeyPartNameBuilder.None,
             ExpectedValue = ApiKey.Composite
             (
                 ApiKeyPart.Create(null, ApiKey.FromInt32(KeyThreeScalarPartCompositeInstance.Id1)),
@@ -384,7 +377,7 @@ public partial class ApiKeyTypeTests
             Name = $"{KeyThreeScalarPartCompositeInstance} with primary composite key (int + string + Guid) and CLR path only name builder",
             ApiObjectTypeName = nameof(KeyThreeScalarPartComposite),
             SelfObject = KeyThreeScalarPartCompositeInstance,
-            PartNameBuilderKind = ApiKeyPartNameBuilderKind.ClrPathOnly,
+            PartNameBuilder = ApiKeyPartNameBuilder.ClrPathOnly,
             ExpectedValue = ApiKey.Composite
             (
                 ApiKeyPart.Create(nameof(KeyThreeScalarPartComposite.Id1), ApiKey.FromInt32(KeyThreeScalarPartCompositeInstance.Id1)),
@@ -398,7 +391,7 @@ public partial class ApiKeyTypeTests
             Name = $"{KeyThreeScalarPartCompositeInstance} with primary composite key (int + string + Guid) and CLR root and path name builder",
             ApiObjectTypeName = nameof(KeyThreeScalarPartComposite),
             SelfObject = KeyThreeScalarPartCompositeInstance,
-            PartNameBuilderKind = ApiKeyPartNameBuilderKind.ClrRootAndPath,
+            PartNameBuilder = ApiKeyPartNameBuilder.ClrRootAndPath,
             ExpectedValue = ApiKey.Composite
             (
                 ApiKeyPart.Create(nameof(KeyThreeScalarPartComposite) + "." + nameof(KeyThreeScalarPartComposite.Id1), ApiKey.FromInt32(KeyThreeScalarPartCompositeInstance.Id1)),
@@ -413,7 +406,7 @@ public partial class ApiKeyTypeTests
             Name = $"{KeyNestedCompositeInstance} with primary composite key (int + string) and none name builder",
             ApiObjectTypeName = nameof(KeyNestedComposite),
             SelfObject = KeyNestedCompositeInstance,
-            PartNameBuilderKind = ApiKeyPartNameBuilderKind.None,
+            PartNameBuilder = ApiKeyPartNameBuilder.None,
             ExpectedValue = ApiKey.Composite
             (
                 ApiKeyPart.Create(null, ApiKey.FromInt32(KeyNestedCompositeInstance.NestedPart.Id)),
@@ -426,7 +419,7 @@ public partial class ApiKeyTypeTests
             Name = $"{KeyNestedCompositeInstance} with primary composite key (int + string) and CLR path only name builder",
             ApiObjectTypeName = nameof(KeyNestedComposite),
             SelfObject = KeyNestedCompositeInstance,
-            PartNameBuilderKind = ApiKeyPartNameBuilderKind.ClrPathOnly,
+            PartNameBuilder = ApiKeyPartNameBuilder.ClrPathOnly,
             ExpectedValue = ApiKey.Composite
             (
                 ApiKeyPart.Create(nameof(KeyNestedComposite.NestedPart) + "." + nameof(KeyNested.Id), ApiKey.FromInt32(KeyNestedCompositeInstance.NestedPart.Id)),
@@ -439,7 +432,7 @@ public partial class ApiKeyTypeTests
             Name = $"{KeyNestedCompositeInstance} with primary composite key (int + string) and CLR root and path name builder",
             ApiObjectTypeName = nameof(KeyNestedComposite),
             SelfObject = KeyNestedCompositeInstance,
-            PartNameBuilderKind = ApiKeyPartNameBuilderKind.ClrRootAndPath,
+            PartNameBuilder = ApiKeyPartNameBuilder.ClrRootAndPath,
             ExpectedValue = ApiKey.Composite
             (
                 ApiKeyPart.Create(nameof(KeyNestedComposite) + "." + nameof(KeyNestedComposite.NestedPart) + "." + nameof(KeyNested.Id), ApiKey.FromInt32(KeyNestedCompositeInstance.NestedPart.Id)),
@@ -454,7 +447,7 @@ public partial class ApiKeyTypeTests
             ApiObjectTypeName = nameof(KeyOwnedComposite),
             SelfObject = KeyOwnedCompositeInstance,
             OwnerObject = KeyOwnerInstance,
-            PartNameBuilderKind = ApiKeyPartNameBuilderKind.None,
+            PartNameBuilder = ApiKeyPartNameBuilder.None,
             ExpectedValue = ApiKey.Composite
             (
                 ApiKeyPart.Create(null, ApiKey.FromInt32(KeyOwnerInstance.Id)),
@@ -468,7 +461,7 @@ public partial class ApiKeyTypeTests
             ApiObjectTypeName = nameof(KeyOwnedComposite),
             SelfObject = KeyOwnedCompositeInstance,
             OwnerObject = KeyOwnerInstance,
-            PartNameBuilderKind = ApiKeyPartNameBuilderKind.ClrPathOnly,
+            PartNameBuilder = ApiKeyPartNameBuilder.ClrPathOnly,
             ExpectedValue = ApiKey.Composite
             (
                 ApiKeyPart.Create(nameof(KeyOwner.Id), ApiKey.FromInt32(KeyOwnerInstance.Id)),
@@ -482,7 +475,7 @@ public partial class ApiKeyTypeTests
             ApiObjectTypeName = nameof(KeyOwnedComposite),
             SelfObject = KeyOwnedCompositeInstance,
             OwnerObject = KeyOwnerInstance,
-            PartNameBuilderKind = ApiKeyPartNameBuilderKind.ClrRootAndPath,
+            PartNameBuilder = ApiKeyPartNameBuilder.ClrRootAndPath,
             ExpectedValue = ApiKey.Composite
             (
                 ApiKeyPart.Create(nameof(KeyOwner) + "." + nameof(KeyOwner.Id), ApiKey.FromInt32(KeyOwnerInstance.Id)),
@@ -497,7 +490,7 @@ public partial class ApiKeyTypeTests
             ApiObjectTypeName = nameof(KeyOwnedDependent),
             SelfObject = KeyOwnedDependentInstance,
             OwnerObject = KeyOwnerInstance,
-            PartNameBuilderKind = ApiKeyPartNameBuilderKind.None,
+            PartNameBuilder = ApiKeyPartNameBuilder.None,
             ExpectedValue = ApiKey.Composite
             (
                 ApiKeyPart.Create(null, ApiKey.FromInt32(KeyOwnerInstance.Id))
@@ -510,7 +503,7 @@ public partial class ApiKeyTypeTests
             ApiObjectTypeName = nameof(KeyOwnedDependent),
             SelfObject = KeyOwnedDependentInstance,
             OwnerObject = KeyOwnerInstance,
-            PartNameBuilderKind = ApiKeyPartNameBuilderKind.ClrPathOnly,
+            PartNameBuilder = ApiKeyPartNameBuilder.ClrPathOnly,
             ExpectedValue = ApiKey.Composite
             (
                 ApiKeyPart.Create(nameof(KeyOwner.Id), ApiKey.FromInt32(KeyOwnerInstance.Id))
@@ -523,7 +516,7 @@ public partial class ApiKeyTypeTests
             ApiObjectTypeName = nameof(KeyOwnedDependent),
             SelfObject = KeyOwnedDependentInstance,
             OwnerObject = KeyOwnerInstance,
-            PartNameBuilderKind = ApiKeyPartNameBuilderKind.ClrRootAndPath,
+            PartNameBuilder = ApiKeyPartNameBuilder.ClrRootAndPath,
             ExpectedValue = ApiKey.Composite
             (
                 ApiKeyPart.Create(nameof(KeyOwner) + "." + nameof(KeyOwner.Id), ApiKey.FromInt32(KeyOwnerInstance.Id))
@@ -537,7 +530,7 @@ public partial class ApiKeyTypeTests
             ApiObjectTypeName = nameof(KeyTwoScalarPartComposite),
             SelfObject = KeyTwoScalarPartCompositeWithNullId2PropertyInstance,
             NullHandling = ApiKeyNullHandling.UseDefaultOnNull,
-            PartNameBuilderKind = ApiKeyPartNameBuilderKind.ClrRootAndPath,
+            PartNameBuilder = ApiKeyPartNameBuilder.ClrRootAndPath,
             ExpectedValue = ApiKey.Composite
             (
                 ApiKeyPart.Create(nameof(KeyTwoScalarPartComposite) + "." + nameof(KeyTwoScalarPartComposite.Id1), ApiKey.FromInt32(KeyTwoScalarPartCompositeWithNullId2PropertyInstance.Id1)),
@@ -551,7 +544,7 @@ public partial class ApiKeyTypeTests
             ApiObjectTypeName = nameof(KeyNestedComposite),
             SelfObject = KeyNestedCompositeWithNullNestedPartPropertyInstance,
             NullHandling = ApiKeyNullHandling.UseDefaultOnNull,
-            PartNameBuilderKind = ApiKeyPartNameBuilderKind.ClrRootAndPath,
+            PartNameBuilder = ApiKeyPartNameBuilder.ClrRootAndPath,
             ExpectedValue = ApiKey.Composite
             (
                 ApiKeyPart.Create(nameof(KeyNestedComposite) + "." + nameof(KeyNestedComposite.NestedPart) + "." + nameof(KeyNested.Id), ApiKey.Empty),
@@ -566,7 +559,7 @@ public partial class ApiKeyTypeTests
             SelfObject = KeyOwnedCompositeInstance,
             OwnerObject = null,
             NullHandling = ApiKeyNullHandling.UseDefaultOnNull,
-            PartNameBuilderKind = ApiKeyPartNameBuilderKind.ClrRootAndPath,
+            PartNameBuilder = ApiKeyPartNameBuilder.ClrRootAndPath,
             ExpectedValue = ApiKey.Composite
             (
                 ApiKeyPart.Create(nameof(KeyOwner) + "." + nameof(KeyOwner.Id), ApiKey.Empty),

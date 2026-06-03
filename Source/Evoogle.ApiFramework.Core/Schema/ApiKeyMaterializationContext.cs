@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -21,13 +21,13 @@ public sealed class ApiKeyMaterializationContext
     #region Properties
     /// <summary>
     ///     Gets the builder used to create optional <see cref="ApiKeyPart.ApiName"/> values during materialization.
-    ///     Defaults to <see cref="ApiKeyPartNameBuilders.None"/>.
+    ///     Defaults to <see cref="ApiKeyPartNameBuilder.None"/>.
     /// </summary>
     /// <remarks>
-    ///     Return <see langword="null"/> from the builder to materialize unnamed/positional key parts.
+    ///     Use <see cref="ApiKeyPartNameBuilder.None"/> to materialize unnamed/positional key parts.
     ///     A single composite key must still be consistently named or unnamed.
     /// </remarks>
-    public ApiKeyPartNameBuilder PartNameBuilder { get; init; } = ApiKeyPartNameBuilders.None;
+    public ApiKeyPartNameBuilder PartNameBuilder { get; init; } = ApiKeyPartNameBuilder.None;
 
     /// <summary>
     ///     Gets the behavior when any property in a path — whether an intermediate navigation property

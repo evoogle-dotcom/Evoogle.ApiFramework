@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -12,13 +12,6 @@ namespace Evoogle.ApiFramework.Schema;
 public partial class ApiKeyTypeTests(ITestOutputHelper output) : XUnitTests(output)
 {
     #region Test Data
-    private enum ApiKeyPartNameBuilderKind
-    {
-        None,
-        ClrRootAndPath,
-        ClrPathOnly
-    }
-
     private static ApiSchema KeyApiSchema { get; } = ApiSchemaFactory.KeyApiSchema;
 
     private static ApiKeyType GetPrimaryKeyType(string apiObjectTypeName)
@@ -34,14 +27,6 @@ public partial class ApiKeyTypeTests(ITestOutputHelper output) : XUnitTests(outp
             ? keyType
             : throw new InvalidOperationException($"Key type '{apiKeyTypeName}' not found on '{apiObjectTypeName}'.");
     }
-
-    private static ApiKeyPartNameBuilder GetApiKeyPartNameBuilder(ApiKeyPartNameBuilderKind kind) => kind switch
-    {
-        ApiKeyPartNameBuilderKind.None => ApiKeyPartNameBuilders.None,
-        ApiKeyPartNameBuilderKind.ClrRootAndPath => ApiKeyPartNameBuilders.ClrRootAndPath,
-        ApiKeyPartNameBuilderKind.ClrPathOnly => ApiKeyPartNameBuilders.ClrPathOnly,
-        _ => throw new ArgumentOutOfRangeException(nameof(kind), $"Unsupported {nameof(ApiKeyPartNameBuilderKind)}: {kind}.")
-    };
 
     // CLR instances with fully populated values
     private static KeyOneScalarPart KeyOneScalarPartInstance { get; } = new() { Id = 42, Name = "TestName" };
