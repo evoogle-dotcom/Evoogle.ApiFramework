@@ -23,7 +23,7 @@ public static class ApiSchemaExcludeMembers
         // ApiProperty — cycle: ApiType → ApiObjectType → ApiProperties[].ApiType → ...
         new ExcludeMember(typeof(ApiProperty), nameof(ApiProperty.ApiType)),
 
-        // ApiObjectType — cycles: ApiProperties[].ApiType → ... / ApiIdentities[].ApiIdentityParts[].ApiProperty → ...
+        // ApiObjectType — cycles: ApiProperties[].ApiType → ... / ApiKeyTypes[].ApiKeyPaths[].ApiProperty → ...
         new ExcludeMember(typeof(ApiObjectType), nameof(ApiObjectType.ApiRelationshipEnds)),
         new ExcludeMember(typeof(ApiObjectType), nameof(ApiObjectType.ApiRelationshipPrincipalEnds)),
         new ExcludeMember(typeof(ApiObjectType), nameof(ApiObjectType.ApiRelationshipDependentEnds)),
@@ -37,8 +37,8 @@ public static class ApiSchemaExcludeMembers
         // ApiRelationshipAssociation — cycle: assoc → relationship → assoc → ...
         new ExcludeMember(typeof(ApiRelationshipAssociation), nameof(ApiRelationshipAssociation.ApiRelationshipManyToMany)),
 
-        // ApiRelationshipPrincipalEnd — identity resolved during initialization
-        new ExcludeMember(typeof(ApiRelationshipPrincipalEnd), nameof(ApiRelationshipPrincipalEnd.ApiIdentity)),
+        // ApiRelationshipPrincipalEnd — key type resolved during initialization
+        new ExcludeMember(typeof(ApiRelationshipPrincipalEnd), nameof(ApiRelationshipPrincipalEnd.ApiKeyType)),
 
         // ApiRelationshipDependentEnd — ApiForeignKeyType throws when IsNavigational (HasKeyBinding=false)
         new ExcludeMember(typeof(ApiRelationshipDependentEnd), nameof(ApiRelationshipDependentEnd.ApiForeignKeyType)),
@@ -92,8 +92,8 @@ public static class ApiSchemaExcludeMembers
         // ApiRelationshipAssociation — cycle: assoc → relationship → assoc → ...
         new ExcludeMember(typeof(ApiRelationshipAssociation), nameof(ApiRelationshipAssociation.ApiRelationshipManyToMany)),
 
-        // ApiRelationshipPrincipalEnd — identity resolved during initialization
-        new ExcludeMember(typeof(ApiRelationshipPrincipalEnd), nameof(ApiRelationshipPrincipalEnd.ApiIdentity)),
+        // ApiRelationshipPrincipalEnd — key type resolved during initialization
+        new ExcludeMember(typeof(ApiRelationshipPrincipalEnd), nameof(ApiRelationshipPrincipalEnd.ApiKeyType)),
 
         // Key path nodes — property and object type references resolved during initialization
         new ExcludeMember(typeof(ApiKeyPath), nameof(ApiKeyPath.ApiRootObjectType)),

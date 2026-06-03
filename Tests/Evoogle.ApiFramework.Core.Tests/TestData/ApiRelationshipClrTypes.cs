@@ -169,7 +169,7 @@ public class RelationshipPostTag
 }
 #endregion
 
-#region Composite Identity / Nested Key Path Types
+#region Composite Key / Nested Key Path Types
 public class RelationshipCatalogItem
 {
     public string Sku { get; set; } = string.Empty;

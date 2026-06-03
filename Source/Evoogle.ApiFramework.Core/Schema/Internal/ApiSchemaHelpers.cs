@@ -166,7 +166,7 @@ internal static class ApiSchemaHelpers
         context.AddIssue(path, severity, duplicatePartCode, description, remediation);
     }
 
-    public static int? CountIdentityLeaves(ApiKeyType keyType)
+    public static int? CountKeyLeaves(ApiKeyType keyType)
     {
         // Each ApiKeyPath in a key type corresponds to exactly one scalar leaf.
         return keyType.ApiKeyPaths.Length;

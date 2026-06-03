@@ -301,7 +301,7 @@ public static class Dummy
     /// <summary>
     ///     Demonstrates how to configure a M:N relationship using the fluent schema builder APIs.
     ///     Models the "Products are tagged with Tags" relationship via the <see cref="ProductTag"/> association type.
-    ///     Demonstrates <see cref="ApiRelationshipPrincipalEndBuilder.WithIdentityName"/> to select a
+    ///     Demonstrates <see cref="ApiRelationshipPrincipalEndBuilder.WithKeyTypeName"/> to select a
     ///     non-primary key type on the principal side, and extensions on principal ends.
     /// </summary>
     public class ProductTagRelationshipConfiguration : IApiRelationshipManyToManyConfiguration
@@ -316,7 +316,7 @@ public static class Dummy
                 )
                 .WithPrincipalEndB<Tag>
                 (
-                    p => p.WithIdentityName("PrimaryKey")
+                    p => p.WithKeyTypeName("PrimaryKey")
                 )
                 .WithAssociation<ProductTag>
                 (
@@ -373,8 +373,8 @@ public static class Dummy
         public void Configure(ApiRelationshipManyToManyBuilder builder)
         {
             builder
-                .WithPrincipalEndA<Product>(p => p.WithIdentityName("PrimaryKey"))
-                .WithPrincipalEndB<Tag>(p => p.WithIdentityName("PrimaryKey"))
+                .WithPrincipalEndA<Product>(p => p.WithKeyTypeName("PrimaryKey"))
+                .WithPrincipalEndB<Tag>(p => p.WithKeyTypeName("PrimaryKey"))
                 .WithAssociation<ProductTag>
                 (
                     a => a
@@ -509,14 +509,14 @@ public static class Dummy
                     .WithPrincipalEnd<Customer>
                     (
                         p => p
-                            .WithIdentityName("PrimaryKey")
+                            .WithKeyTypeName("PrimaryKey")
                     )
                     .WithDependentEnd<CustomerProfile>
                     (
                         d => d.WithForeignKeyType("FK", b => b.AddKeyPath(typeof(CustomerProfile), "CustomerRef", "CustomerId"))
                     )
             )
-            // M:N — configuration class style; demonstrates WithIdentityName and extensions on principal ends.
+            // M:N — configuration class style; demonstrates WithKeyTypeName and extensions on principal ends.
             .AddManyToManyRelationship("ProductHasTags", new ProductTagRelationshipConfiguration())
             // M:N — inline lambda style; demonstrates all four end methods and relationship-level extensions.
             .AddManyToManyRelationship
@@ -526,13 +526,13 @@ public static class Dummy
                     .WithPrincipalEndA<Product>
                     (
                         p => p
-                            .WithIdentityName("PrimaryKey")
+                            .WithKeyTypeName("PrimaryKey")
                             .AddRelationshipPrincipalEndExtension(new VisibleMetadata { Visible = true })
                     )
                     .WithPrincipalEndB<Tag>
                     (
                         p => p
-                            .WithIdentityName("PrimaryKey")
+                            .WithKeyTypeName("PrimaryKey")
                     )
                     .WithAssociation<ProductTag>
                     (
@@ -623,15 +623,15 @@ public static class Dummy
             .AddOneToOneRelationship("CustomerHasProfileInline", r => r
                 .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete)
                 .WithPrincipalEnd<Customer>(p => p
-                    .WithIdentityName("PrimaryKey"))
+                    .WithKeyTypeName("PrimaryKey"))
                 .WithDependentEnd<CustomerProfile>(d => d
                     .WithForeignKeyType("FK", b => b.AddKeyPath(cp => cp.CustomerRef.CustomerId))))
             .AddManyToManyRelationship("ProductHasTags", new ProductTagConfigurationGeneric())
             .AddManyToManyRelationship("ProductHasTagsInline", r => r
                 .WithPrincipalEndA<Product>(p => p
-                    .WithIdentityName("PrimaryKey"))
+                    .WithKeyTypeName("PrimaryKey"))
                 .WithPrincipalEndB<Tag>(p => p
-                    .WithIdentityName("PrimaryKey"))
+                    .WithKeyTypeName("PrimaryKey"))
                 .WithAssociation<ProductTag>(a => a
                     .WithForeignKeyTypeA("FKA", b => b.AddKeyPath(p => p.ProductId))
                     .WithForeignKeyTypeB("FKB", b => b.AddKeyPath(p => p.TagId))))

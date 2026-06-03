@@ -251,7 +251,7 @@ public enum ApiInitializationCode
     /// <summary>
     ///     The principal end's referenced key type could not be resolved, or the principal type has no primary key type.
     /// </summary>
-    API_RELATIONSHIP_END_UNRESOLVED_IDENTITY,
+    API_RELATIONSHIP_END_UNRESOLVED_KEY_TYPE,
     #endregion
 
     #region ApiRelationshipManyToMany Initialization Codes

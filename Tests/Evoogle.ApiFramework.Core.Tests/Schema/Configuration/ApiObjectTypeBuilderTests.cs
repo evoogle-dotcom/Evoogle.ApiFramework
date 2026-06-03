@@ -352,8 +352,8 @@ public partial class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnit
             ApiObjectTypeName = nameof(Company),
         },
 
-        // Identity API Schema
-        // - IdentityScalar
+        // Key API Schema
+        // - KeyOneScalarPart
         new BuildTest
         {
             Name = $"Build from '{ApiSchemaKind.Key}' API schema the '{nameof(KeyOneScalarPart)}' API object type",
@@ -361,8 +361,8 @@ public partial class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnit
             ApiObjectTypeName = nameof(KeyOneScalarPart),
         },
 
-        // Identity API Schema
-        // - IdentityTwoScalarPartComposite
+        // Key API Schema
+        // - KeyTwoScalarPartComposite
         new BuildTest
         {
             Name = $"Build from '{ApiSchemaKind.Key}' API schema the '{nameof(KeyTwoScalarPartComposite)}' API object type",
@@ -370,8 +370,8 @@ public partial class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnit
             ApiObjectTypeName = nameof(KeyTwoScalarPartComposite),
         },
 
-        // Identity API Schema
-        // - IdentityThreeScalarPartComposite
+        // Key API Schema
+        // - KeyThreeScalarPartComposite
         new BuildTest
         {
             Name = $"Build from '{ApiSchemaKind.Key}' API schema the '{nameof(KeyThreeScalarPartComposite)}' API object type",
@@ -379,8 +379,8 @@ public partial class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnit
             ApiObjectTypeName = nameof(KeyThreeScalarPartComposite),
         },
 
-        // Identity API Schema
-        // - IdentityNestedComposite
+        // Key API Schema
+        // - KeyNestedComposite
         new BuildTest
         {
             Name = $"Build from '{ApiSchemaKind.Key}' API schema the '{nameof(KeyNestedComposite)}' API object type",
@@ -388,8 +388,8 @@ public partial class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnit
             ApiObjectTypeName = nameof(KeyNestedComposite),
         },
 
-        // Identity API Schema
-        // - IdentityOwnedComposite
+        // Key API Schema
+        // - KeyOwnedComposite
         new BuildTest
         {
             Name = $"Build from '{ApiSchemaKind.Key}' API schema the '{nameof(KeyOwnedComposite)}' API object type",
@@ -397,8 +397,8 @@ public partial class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnit
             ApiObjectTypeName = nameof(KeyOwnedComposite),
         },
 
-        // Identity API Schema
-        // - IdentityOwnedDependent
+        // Key API Schema
+        // - KeyOwnedDependent
         new BuildTest
         {
             Name = $"Build from '{ApiSchemaKind.Key}' API schema the '{nameof(KeyOwnedDependent)}' API object type",

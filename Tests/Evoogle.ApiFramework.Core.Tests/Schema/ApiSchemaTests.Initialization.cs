@@ -30,19 +30,19 @@ public partial class ApiSchemaTests
         public byte* PointerProperty { get; set; }
     }
 
-    public class CircularIdentityNodeType
+    public class CircularKeyNodeType
     {
-        public CircularIdentityNodeType? Self { get; set; }
+        public CircularKeyNodeType? Self { get; set; }
     }
 
-    public class CircularIdentityAlphaType
+    public class CircularKeyAlphaType
     {
-        public CircularIdentityBetaType? Beta { get; set; }
+        public CircularKeyBetaType? Beta { get; set; }
     }
 
-    public class CircularIdentityBetaType
+    public class CircularKeyBetaType
     {
-        public CircularIdentityAlphaType? Alpha { get; set; }
+        public CircularKeyAlphaType? Alpha { get; set; }
     }
 
     public class DuplicatePropertyApiNameType
@@ -1310,26 +1310,6 @@ public partial class ApiSchemaTests
                     {
                         ""ApiKind"": ""Object"",
                         ""ApiName"": ""TestObject"",
-                        ""ApiIdentities"": [
-                            {
-                                ""ApiName"": ""Primary"",
-                                ""ApiIdentityParts"": [
-                                    {
-                                        ""ApiKind"": ""Scalar"",
-                                        ""ClrPropertyName"": ""Id""
-                                    }
-                                ]
-                            },
-                            {
-                                ""ApiName"": ""Primary"",
-                                ""ApiIdentityParts"": [
-                                    {
-                                        ""ApiKind"": ""Scalar"",
-                                        ""ClrPropertyName"": ""Code""
-                                    }
-                                ]
-                            }
-                        ],
                         ""ApiProperties"": [
                             {
                                 ""ApiName"": ""Id"",
@@ -2151,13 +2131,13 @@ public partial class ApiSchemaTests
             ]
         },
 
-        // ApiRelationshipPrincipalEnd throws if referenced ApiIdentityName cannot be resolved
+        // ApiRelationshipPrincipalEnd throws if referenced ApiKeyTypeName cannot be resolved
         new InitializeThrowsTest
         {
-            Name = $"{nameof(ApiRelationshipPrincipalEnd)} Throws If {nameof(ApiRelationshipPrincipalEnd.ApiIdentityName)} Is Unresolved",
+            Name = $"{nameof(ApiRelationshipPrincipalEnd)} Throws If {nameof(ApiRelationshipPrincipalEnd.ApiKeyTypeName)} Is Unresolved",
             SourceJson = @"
             {
-                ""ApiName"": ""ApiRelationshipPrincipalEnd Throws If ApiIdentityName Is Unresolved"",
+                ""ApiName"": ""ApiRelationshipPrincipalEnd Throws If ApiKeyTypeName Is Unresolved"",
                 ""ApiScalarTypes"": [
                     { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"", ""ClrType"": ""System.Int32, System.Private.CoreLib"" }
                 ],
@@ -2189,7 +2169,7 @@ public partial class ApiSchemaTests
                         ""ApiName"": ""TestRel"",
                         ""ApiPrincipalEnd"": {
                             ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Core.Tests"",
-                            ""ApiIdentityName"": ""NonExistentIdentity""
+                            ""ApiKeyTypeName"": ""NonExistentKeyType""
                         },
                         ""ApiDependentEnd"": { ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Core.Tests"" }
                     }
@@ -2202,9 +2182,9 @@ public partial class ApiSchemaTests
                 (
                     path: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"].{nameof(ApiRelationshipPrincipalEnd)}",
                     severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.API_RELATIONSHIP_END_UNRESOLVED_IDENTITY,
-                    description: "Referenced identity 'NonExistentIdentity' could not be found on object type 'RelPrincipal'",
-                    remediation: "Use one of the available identities: 'Id'"
+                    code: ApiInitializationCode.API_RELATIONSHIP_END_UNRESOLVED_KEY_TYPE,
+                    description: "Referenced key type 'NonExistentKeyType' could not be found on object type 'RelPrincipal'",
+                    remediation: "Use one of the available key types: 'Id'"
                 ),
             ]
         },
@@ -2368,10 +2348,10 @@ public partial class ApiSchemaTests
             ]
         },
 
-        // ApiRelationshipManyToMany throws if ApiAssociation.ApiForeignKeyTypeA.ApiKeyPaths count does not match principal end A identity key path count
+        // ApiRelationshipManyToMany throws if ApiAssociation.ApiForeignKeyTypeA.ApiKeyPaths count does not match principal end A key type path count
         new InitializeThrowsTest
         {
-            Name = $"{nameof(ApiRelationshipManyToMany)} Throws If {nameof(ApiRelationshipAssociation.ApiForeignKeyTypeA)}.{nameof(ApiKeyType.ApiKeyPaths)} Count Does Not Match Principal End A Identity",
+            Name = $"{nameof(ApiRelationshipManyToMany)} Throws If {nameof(ApiRelationshipAssociation.ApiForeignKeyTypeA)}.{nameof(ApiKeyType.ApiKeyPaths)} Count Does Not Match Principal End A Key Type",
             SourceJson = @"
             {
                 ""ApiName"": ""ApiRelationshipManyToMany Throws If ApiForeignKeyTypeA ApiKeyPaths Count Mismatch"",
@@ -2445,16 +2425,16 @@ public partial class ApiSchemaTests
                     path: $"{nameof(ApiRelationshipManyToMany)}[\"TestRel\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_RELATIONSHIP_MANY_TO_MANY_INVALID_ASSOCIATION_KEY_PATHS_A_COUNT,
-                    description: $"{nameof(ApiRelationshipManyToMany.ApiAssociation)}.{nameof(ApiRelationshipAssociation.ApiForeignKeyTypeA)}.{nameof(ApiKeyType.ApiKeyPaths)} has 2 key path(s) but principal end A identity 'Id' has 1 key path(s)",
-                    remediation: $"Ensure {nameof(ApiRelationshipManyToMany.ApiAssociation)}.{nameof(ApiRelationshipAssociation.ApiForeignKeyTypeA)}.{nameof(ApiKeyType.ApiKeyPaths)} contains exactly 1 key path(s) to match principal end A's join-key identity"
+                    description: $"{nameof(ApiRelationshipManyToMany.ApiAssociation)}.{nameof(ApiRelationshipAssociation.ApiForeignKeyTypeA)}.{nameof(ApiKeyType.ApiKeyPaths)} has 2 key path(s) but principal end A key type 'Id' has 1 key path(s)",
+                    remediation: $"Ensure {nameof(ApiRelationshipManyToMany.ApiAssociation)}.{nameof(ApiRelationshipAssociation.ApiForeignKeyTypeA)}.{nameof(ApiKeyType.ApiKeyPaths)} contains exactly 1 key path(s) to match principal end A's key type"
                 ),
             ]
         },
 
-        // ApiRelationshipManyToMany throws if ApiAssociation.ApiForeignKeyTypeB.ApiKeyPaths count does not match principal end B identity key path count
+        // ApiRelationshipManyToMany throws if ApiAssociation.ApiForeignKeyTypeB.ApiKeyPaths count does not match principal end B key type path count
         new InitializeThrowsTest
         {
-            Name = $"{nameof(ApiRelationshipManyToMany)} Throws If {nameof(ApiRelationshipAssociation.ApiForeignKeyTypeB)}.{nameof(ApiKeyType.ApiKeyPaths)} Count Does Not Match Principal End B Identity",
+            Name = $"{nameof(ApiRelationshipManyToMany)} Throws If {nameof(ApiRelationshipAssociation.ApiForeignKeyTypeB)}.{nameof(ApiKeyType.ApiKeyPaths)} Count Does Not Match Principal End B Key Type",
             SourceJson = @"
             {
                 ""ApiName"": ""ApiRelationshipManyToMany Throws If ApiForeignKeyTypeB ApiKeyPaths Count Mismatch"",
@@ -2528,16 +2508,16 @@ public partial class ApiSchemaTests
                     path: $"{nameof(ApiRelationshipManyToMany)}[\"TestRel\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_RELATIONSHIP_MANY_TO_MANY_INVALID_ASSOCIATION_KEY_PATHS_B_COUNT,
-                    description: $"{nameof(ApiRelationshipManyToMany.ApiAssociation)}.{nameof(ApiRelationshipAssociation.ApiForeignKeyTypeB)}.{nameof(ApiKeyType.ApiKeyPaths)} has 2 key path(s) but principal end B identity 'Id' has 1 key path(s)",
-                    remediation: $"Ensure {nameof(ApiRelationshipManyToMany.ApiAssociation)}.{nameof(ApiRelationshipAssociation.ApiForeignKeyTypeB)}.{nameof(ApiKeyType.ApiKeyPaths)} contains exactly 1 key path(s) to match principal end B's join-key identity"
+                    description: $"{nameof(ApiRelationshipManyToMany.ApiAssociation)}.{nameof(ApiRelationshipAssociation.ApiForeignKeyTypeB)}.{nameof(ApiKeyType.ApiKeyPaths)} has 2 key path(s) but principal end B key type 'Id' has 1 key path(s)",
+                    remediation: $"Ensure {nameof(ApiRelationshipManyToMany.ApiAssociation)}.{nameof(ApiRelationshipAssociation.ApiForeignKeyTypeB)}.{nameof(ApiKeyType.ApiKeyPaths)} contains exactly 1 key path(s) to match principal end B's key type"
                 ),
             ]
         },
 
-        // ApiRelationshipOneTo throws if ApiDependentEnd.ApiForeignKeyType.ApiKeyPaths count does not match principal identity key path count
+        // ApiRelationshipOneTo throws if ApiDependentEnd.ApiForeignKeyType.ApiKeyPaths count does not match principal key type path count
         new InitializeThrowsTest
         {
-            Name = $"{nameof(ApiRelationshipOneTo)} Throws If {nameof(ApiRelationshipDependentEnd.ApiForeignKeyType)}.{nameof(ApiKeyType.ApiKeyPaths)} Count Does Not Match Principal Identity",
+            Name = $"{nameof(ApiRelationshipOneTo)} Throws If {nameof(ApiRelationshipDependentEnd.ApiForeignKeyType)}.{nameof(ApiKeyType.ApiKeyPaths)} Count Does Not Match Principal Key Type",
             SourceJson = @"
             {
                 ""ApiName"": ""ApiRelationshipOneTo Throws If Dependent ForeignKeyType ApiKeyPaths Count Mismatch"",
@@ -2593,8 +2573,8 @@ public partial class ApiSchemaTests
                     path: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_RELATIONSHIP_ONE_TO_INVALID_DEPENDENT_KEY_PATHS_COUNT,
-                    description: $"{nameof(ApiRelationshipOneTo.ApiDependentEnd)}.{nameof(ApiRelationshipDependentEnd.ApiForeignKeyType)}.{nameof(ApiKeyType.ApiKeyPaths)} has 2 key path(s) but principal identity 'Id' has 1 key path(s)",
-                    remediation: $"Ensure {nameof(ApiRelationshipOneTo.ApiDependentEnd)}.{nameof(ApiRelationshipDependentEnd.ApiForeignKeyType)}.{nameof(ApiKeyType.ApiKeyPaths)} contains exactly 1 key path(s) to match the principal end's join-key identity"
+                    description: $"{nameof(ApiRelationshipOneTo.ApiDependentEnd)}.{nameof(ApiRelationshipDependentEnd.ApiForeignKeyType)}.{nameof(ApiKeyType.ApiKeyPaths)} has 2 key path(s) but principal key type 'Id' has 1 key path(s)",
+                    remediation: $"Ensure {nameof(ApiRelationshipOneTo.ApiDependentEnd)}.{nameof(ApiRelationshipDependentEnd.ApiForeignKeyType)}.{nameof(ApiKeyType.ApiKeyPaths)} contains exactly 1 key path(s) to match the principal end's key type"
                 ),
             ]
         },

@@ -117,7 +117,7 @@ public static partial class ApiSchemaFactory
     public record ApiRelationshipPrincipalEndDef
     (
         Type ClrObjectType,
-        string? ApiIdentityName = null,
+        string? ApiKeyTypeName = null,
         List<Type>? ExtensionTypes = null
     ) : ApiRelationshipElementDef(ClrObjectType, ExtensionTypes);
 
@@ -334,12 +334,12 @@ public static partial class ApiSchemaFactory
     private static ApiRelationshipPrincipalEnd BuildApiRelationshipPrincipalEnd(ApiRelationshipPrincipalEndDef def)
     {
         var clrObjectType = def.ClrObjectType;
-        var apiIdentityName = def.ApiIdentityName;
+        var apiKeyTypeName = def.ApiKeyTypeName;
 
         var apiRelationshipPrincipalEnd = new ApiRelationshipPrincipalEnd
         (
             clrObjectType,
-            apiIdentityName
+            apiKeyTypeName
         );
 
         AttachExtensions(apiRelationshipPrincipalEnd, def);

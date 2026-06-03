@@ -151,64 +151,64 @@ public partial class ApiObjectTypeBuilderTests
             ApiTypeActualBuildExpression = static () => ApiObjectTypeBuilderTestsGenericTestFactory.BuildFromSimpleApiSchemaTheCompanyTypeWithConfigureRequiredOrOptionalProperty(),
         },
 
-        // Identity API Schema
-        // - IdentityScalar
+        // Key API Schema
+        // - KeyOneScalarPart
         new BuildTestGeneric
         {
             Name = $"Build from '{ApiSchemaKind.Key}' API schema the '{nameof(KeyOneScalarPart)}' API object type",
             ApiSchemaKind = ApiSchemaKind.Key,
             ApiObjectTypeName = nameof(KeyOneScalarPart),
-            ApiTypeActualBuildExpression = static () => ApiObjectTypeBuilderTestsGenericTestFactory.BuildFromIdentityApiSchemaTheIdentityScalarType(),
+            ApiTypeActualBuildExpression = static () => ApiObjectTypeBuilderTestsGenericTestFactory.BuildFromKeyApiSchemaTheKeyOneScalarPartType(),
         },
 
-        // Identity API Schema
-        // - IdentityTwoScalarPartComposite
+        // Key API Schema
+        // - KeyTwoScalarPartComposite
         new BuildTestGeneric
         {
             Name = $"Build from '{ApiSchemaKind.Key}' API schema the '{nameof(KeyTwoScalarPartComposite)}' API object type",
             ApiSchemaKind = ApiSchemaKind.Key,
             ApiObjectTypeName = nameof(KeyTwoScalarPartComposite),
-            ApiTypeActualBuildExpression = static () => ApiObjectTypeBuilderTestsGenericTestFactory.BuildFromIdentityApiSchemaTheIdentityTwoScalarPartCompositeType(),
+            ApiTypeActualBuildExpression = static () => ApiObjectTypeBuilderTestsGenericTestFactory.BuildFromKeyApiSchemaTheKeyTwoScalarPartCompositeType(),
         },
 
-        // Identity API Schema
-        // - IdentityThreeScalarPartComposite
+        // Key API Schema
+        // - KeyThreeScalarPartComposite
         new BuildTestGeneric
         {
             Name = $"Build from '{ApiSchemaKind.Key}' API schema the '{nameof(KeyThreeScalarPartComposite)}' API object type",
             ApiSchemaKind = ApiSchemaKind.Key,
             ApiObjectTypeName = nameof(KeyThreeScalarPartComposite),
-            ApiTypeActualBuildExpression = static () => ApiObjectTypeBuilderTestsGenericTestFactory.BuildFromIdentityApiSchemaTheIdentityThreeScalarPartCompositeType(),
+            ApiTypeActualBuildExpression = static () => ApiObjectTypeBuilderTestsGenericTestFactory.BuildFromKeyApiSchemaTheKeyThreeScalarPartCompositeType(),
         },
 
-        // Identity API Schema
-        // - IdentityNestedComposite
+        // Key API Schema
+        // - KeyNestedComposite
         new BuildTestGeneric
         {
             Name = $"Build from '{ApiSchemaKind.Key}' API schema the '{nameof(KeyNestedComposite)}' API object type",
             ApiSchemaKind = ApiSchemaKind.Key,
             ApiObjectTypeName = nameof(KeyNestedComposite),
-            ApiTypeActualBuildExpression = static () => ApiObjectTypeBuilderTestsGenericTestFactory.BuildFromIdentityApiSchemaTheIdentityNestedCompositeType(),
+            ApiTypeActualBuildExpression = static () => ApiObjectTypeBuilderTestsGenericTestFactory.BuildFromKeyApiSchemaTheKeyNestedCompositeType(),
         },
 
-        // Identity API Schema
-        // - IdentityOwnedComposite
+        // Key API Schema
+        // - KeyOwnedComposite
         new BuildTestGeneric
         {
             Name = $"Build from '{ApiSchemaKind.Key}' API schema the '{nameof(KeyOwnedComposite)}' API object type",
             ApiSchemaKind = ApiSchemaKind.Key,
             ApiObjectTypeName = nameof(KeyOwnedComposite),
-            ApiTypeActualBuildExpression = static () => ApiObjectTypeBuilderTestsGenericTestFactory.BuildFromIdentityApiSchemaTheIdentityOwnedCompositeType(),
+            ApiTypeActualBuildExpression = static () => ApiObjectTypeBuilderTestsGenericTestFactory.BuildFromKeyApiSchemaTheKeyOwnedCompositeType(),
         },
 
-        // Identity API Schema
-        // - IdentityOwnedDependent
+        // Key API Schema
+        // - KeyOwnedDependent
         new BuildTestGeneric
         {
             Name = $"Build from '{ApiSchemaKind.Key}' API schema the '{nameof(KeyOwnedDependent)}' API object type",
             ApiSchemaKind = ApiSchemaKind.Key,
             ApiObjectTypeName = nameof(KeyOwnedDependent),
-            ApiTypeActualBuildExpression = static () => ApiObjectTypeBuilderTestsGenericTestFactory.BuildFromIdentityApiSchemaTheIdentityOwnedDependentType(),
+            ApiTypeActualBuildExpression = static () => ApiObjectTypeBuilderTestsGenericTestFactory.BuildFromKeyApiSchemaTheKeyOwnedDependentType(),
         },
     ];
     #endregion

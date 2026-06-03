@@ -83,7 +83,7 @@ public partial class ApiSchemaTests
                 ""ApiName"": ""ApiSchema With Key Schema (KeyOneScalarPart)"",
                 ""ApiVersion"": ""0.1.0"",
                 ""ApiOptions"": {
-                    ""ApiIdentityPartNullHandling"": ""UseDefaultOnNull""
+                    ""ApiKeyNullHandling"": ""UseDefaultOnNull""
                 },
                 ""ApiScalarTypes"": [
                     {
@@ -225,7 +225,7 @@ public partial class ApiSchemaTests
                 ""ApiName"": ""ApiSchema With Key Schema (KeyTwoScalarPartComposite)"",
                 ""ApiVersion"": ""0.1.0"",
                 ""ApiOptions"": {
-                    ""ApiIdentityPartNullHandling"": ""UseDefaultOnNull""
+                    ""ApiKeyNullHandling"": ""UseDefaultOnNull""
                 },
                 ""ApiScalarTypes"": [
                     {
@@ -386,7 +386,7 @@ public partial class ApiSchemaTests
                 ""ApiName"": ""ApiSchema With Key Schema (KeyThreeScalarPartComposite)"",
                 ""ApiVersion"": ""0.1.0"",
                 ""ApiOptions"": {
-                    ""ApiIdentityPartNullHandling"": ""UseDefaultOnNull""
+                    ""ApiKeyNullHandling"": ""UseDefaultOnNull""
                 },
                 ""ApiScalarTypes"": [
                     {
@@ -581,7 +581,7 @@ public partial class ApiSchemaTests
                 ""ApiName"": ""ApiSchema With Key Schema (KeyNested And KeyNestedComposite)"",
                 ""ApiVersion"": ""0.1.0"",
                 ""ApiOptions"": {
-                    ""ApiIdentityPartNullHandling"": ""UseDefaultOnNull""
+                    ""ApiKeyNullHandling"": ""UseDefaultOnNull""
                 },
                 ""ApiScalarTypes"": [
                     {
@@ -837,7 +837,7 @@ public partial class ApiSchemaTests
                 ""ApiName"": ""ApiSchema With Key Schema (KeyOwner, KeyOwnedComposite, And KeyOwnedDependent)"",
                 ""ApiVersion"": ""0.1.0"",
                 ""ApiOptions"": {
-                    ""ApiIdentityPartNullHandling"": ""UseDefaultOnNull""
+                    ""ApiKeyNullHandling"": ""UseDefaultOnNull""
                 },
                 ""ApiScalarTypes"": [
                     {
@@ -1365,7 +1365,7 @@ public partial class ApiSchemaTests
                 ""ApiName"": ""ApiSchema With Full Key Schema"",
                 ""ApiVersion"": ""0.1.0"",
                 ""ApiOptions"": {
-                    ""ApiIdentityPartNullHandling"": ""UseDefaultOnNull""
+                    ""ApiKeyNullHandling"": ""UseDefaultOnNull""
                 },
                 ""ApiScalarTypes"": [
                     {

@@ -134,50 +134,50 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
         return builder.Build();
     }
 
-    public static ApiObjectType BuildFromIdentityApiSchemaTheIdentityScalarType()
+    public static ApiObjectType BuildFromKeyApiSchemaTheKeyOneScalarPartType()
     {
         var ctx = new ApiSchemaBuilderContext();
-        var builder = CreateFromIdentityApiSchemaTheIdentityScalarTypeBuilder(ctx);
+        var builder = CreateFromKeyApiSchemaTheKeyOneScalarPartTypeBuilder(ctx);
 
         return builder.Build();
     }
 
-    public static ApiObjectType BuildFromIdentityApiSchemaTheIdentityTwoScalarPartCompositeType()
+    public static ApiObjectType BuildFromKeyApiSchemaTheKeyTwoScalarPartCompositeType()
     {
         var ctx = new ApiSchemaBuilderContext();
-        var builder = CreateFromIdentityApiSchemaTheIdentityTwoScalarPartCompositeTypeBuilder(ctx);
+        var builder = CreateFromKeyApiSchemaTheKeyTwoScalarPartCompositeTypeBuilder(ctx);
 
         return builder.Build();
     }
 
-    public static ApiObjectType BuildFromIdentityApiSchemaTheIdentityThreeScalarPartCompositeType()
+    public static ApiObjectType BuildFromKeyApiSchemaTheKeyThreeScalarPartCompositeType()
     {
         var ctx = new ApiSchemaBuilderContext();
-        var builder = CreateFromIdentityApiSchemaTheIdentityThreeScalarPartCompositeTypeBuilder(ctx);
+        var builder = CreateFromKeyApiSchemaTheKeyThreeScalarPartCompositeTypeBuilder(ctx);
 
         return builder.Build();
     }
 
-    public static ApiObjectType BuildFromIdentityApiSchemaTheIdentityNestedCompositeType()
+    public static ApiObjectType BuildFromKeyApiSchemaTheKeyNestedCompositeType()
     {
         var ctx = new ApiSchemaBuilderContext();
-        var builder = CreateFromIdentityApiSchemaTheIdentityNestedCompositeTypeBuilder(ctx);
+        var builder = CreateFromKeyApiSchemaTheKeyNestedCompositeTypeBuilder(ctx);
 
         return builder.Build();
     }
 
-    public static ApiObjectType BuildFromIdentityApiSchemaTheIdentityOwnedCompositeType()
+    public static ApiObjectType BuildFromKeyApiSchemaTheKeyOwnedCompositeType()
     {
         var ctx = new ApiSchemaBuilderContext();
-        var builder = CreateFromIdentityApiSchemaTheIdentityOwnedCompositeTypeBuilder(ctx);
+        var builder = CreateFromKeyApiSchemaTheKeyOwnedCompositeTypeBuilder(ctx);
 
         return builder.Build();
     }
 
-    public static ApiObjectType BuildFromIdentityApiSchemaTheIdentityOwnedDependentType()
+    public static ApiObjectType BuildFromKeyApiSchemaTheKeyOwnedDependentType()
     {
         var ctx = new ApiSchemaBuilderContext();
-        var builder = CreateFromIdentityApiSchemaTheIdentityOwnedDependentTypeBuilder(ctx);
+        var builder = CreateFromKeyApiSchemaTheKeyOwnedDependentTypeBuilder(ctx);
 
         return builder.Build();
     }
@@ -253,7 +253,7 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
         return builder;
     }
 
-    private static ApiObjectTypeBuilder<KeyOneScalarPart> CreateFromIdentityApiSchemaTheIdentityScalarTypeBuilder(ApiSchemaBuilderContext ctx)
+    private static ApiObjectTypeBuilder<KeyOneScalarPart> CreateFromKeyApiSchemaTheKeyOneScalarPartTypeBuilder(ApiSchemaBuilderContext ctx)
     {
         var builder = new ApiObjectTypeBuilder<KeyOneScalarPart>(ctx)
             .WithName(nameof(KeyOneScalarPart))
@@ -265,7 +265,7 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
         return builder;
     }
 
-    private static ApiObjectTypeBuilder<KeyTwoScalarPartComposite> CreateFromIdentityApiSchemaTheIdentityTwoScalarPartCompositeTypeBuilder(ApiSchemaBuilderContext ctx)
+    private static ApiObjectTypeBuilder<KeyTwoScalarPartComposite> CreateFromKeyApiSchemaTheKeyTwoScalarPartCompositeTypeBuilder(ApiSchemaBuilderContext ctx)
     {
         var builder = new ApiObjectTypeBuilder<KeyTwoScalarPartComposite>(ctx)
             .WithName(nameof(KeyTwoScalarPartComposite))
@@ -279,7 +279,7 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
         return builder;
     }
 
-    private static ApiObjectTypeBuilder<KeyThreeScalarPartComposite> CreateFromIdentityApiSchemaTheIdentityThreeScalarPartCompositeTypeBuilder(ApiSchemaBuilderContext ctx)
+    private static ApiObjectTypeBuilder<KeyThreeScalarPartComposite> CreateFromKeyApiSchemaTheKeyThreeScalarPartCompositeTypeBuilder(ApiSchemaBuilderContext ctx)
     {
         var builder = new ApiObjectTypeBuilder<KeyThreeScalarPartComposite>(ctx)
             .WithName(nameof(KeyThreeScalarPartComposite))
@@ -295,7 +295,7 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
         return builder;
     }
 
-    private static ApiObjectTypeBuilder<KeyNestedComposite> CreateFromIdentityApiSchemaTheIdentityNestedCompositeTypeBuilder(ApiSchemaBuilderContext ctx)
+    private static ApiObjectTypeBuilder<KeyNestedComposite> CreateFromKeyApiSchemaTheKeyNestedCompositeTypeBuilder(ApiSchemaBuilderContext ctx)
     {
         var builder = new ApiObjectTypeBuilder<KeyNestedComposite>(ctx)
             .WithName(nameof(KeyNestedComposite))
@@ -308,7 +308,7 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
         return builder;
     }
 
-    private static ApiObjectTypeBuilder<KeyOwnedComposite> CreateFromIdentityApiSchemaTheIdentityOwnedCompositeTypeBuilder(ApiSchemaBuilderContext ctx)
+    private static ApiObjectTypeBuilder<KeyOwnedComposite> CreateFromKeyApiSchemaTheKeyOwnedCompositeTypeBuilder(ApiSchemaBuilderContext ctx)
     {
         var builder = new ApiObjectTypeBuilder<KeyOwnedComposite>(ctx)
             .WithName(nameof(KeyOwnedComposite))
@@ -321,7 +321,7 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
         return builder;
     }
 
-    private static ApiObjectTypeBuilder<KeyOwnedDependent> CreateFromIdentityApiSchemaTheIdentityOwnedDependentTypeBuilder(ApiSchemaBuilderContext ctx)
+    private static ApiObjectTypeBuilder<KeyOwnedDependent> CreateFromKeyApiSchemaTheKeyOwnedDependentTypeBuilder(ApiSchemaBuilderContext ctx)
     {
         var builder = new ApiObjectTypeBuilder<KeyOwnedDependent>(ctx)
             .WithName(nameof(KeyOwnedDependent))

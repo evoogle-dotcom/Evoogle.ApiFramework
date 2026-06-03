@@ -97,8 +97,8 @@ public abstract class ApiRelationshipOneTo
             return;
         }
 
-        var identity = principal.ResolvedIdentity;
-        if (identity is null)
+        var principalKeyType = principal.ResolvedKeyType;
+        if (principalKeyType is null)
         {
             // Principal key type failed to resolve; the principal end already recorded the error.
             return;
@@ -112,15 +112,15 @@ public abstract class ApiRelationshipOneTo
         var foreignKeyType = dependent.ApiForeignKeyType;
 
         var keyPathCount = foreignKeyType.ApiKeyPaths.Length;
-        var identityCount = ApiSchemaHelpers.CountIdentityLeaves(identity);
+        var keyTypePathCount = ApiSchemaHelpers.CountKeyLeaves(principalKeyType);
 
-        if (identityCount is not null && keyPathCount != identityCount)
+        if (keyTypePathCount is not null && keyPathCount != keyTypePathCount)
         {
             var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_RELATIONSHIP_ONE_TO_INVALID_DEPENDENT_KEY_PATHS_COUNT;
-            var description = $"{nameof(this.ApiDependentEnd)}.{nameof(this.ApiDependentEnd.ApiForeignKeyType)}.{nameof(ApiKeyType.ApiKeyPaths)} has {keyPathCount} key path(s) but principal key type '{identity.ApiName}' has {identityCount} key path(s)";
-            var remediation = $"Ensure {nameof(this.ApiDependentEnd)}.{nameof(this.ApiDependentEnd.ApiForeignKeyType)}.{nameof(ApiKeyType.ApiKeyPaths)} contains exactly {identityCount} key path(s) to match the principal end's key type";
+            var description = $"{nameof(this.ApiDependentEnd)}.{nameof(this.ApiDependentEnd.ApiForeignKeyType)}.{nameof(ApiKeyType.ApiKeyPaths)} has {keyPathCount} key path(s) but principal key type '{principalKeyType.ApiName}' has {keyTypePathCount} key path(s)";
+            var remediation = $"Ensure {nameof(this.ApiDependentEnd)}.{nameof(this.ApiDependentEnd.ApiForeignKeyType)}.{nameof(ApiKeyType.ApiKeyPaths)} contains exactly {keyTypePathCount} key path(s) to match the principal end's key type";
 
             context.AddIssue(path, severity, code, description, remediation);
         }

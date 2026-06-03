@@ -217,7 +217,7 @@ public partial class ApiSchemaTests
                 ""ApiName"": ""ApiSchema With Relationship Schema for One-To-One Relationship And Scalar And Nested Foreign Key Paths"",
                 ""ApiVersion"": ""0.1.0"",
                 ""ApiOptions"": {
-                    ""ApiIdentityPartNullHandling"": ""UseDefaultOnNull""
+                    ""ApiKeyNullHandling"": ""UseDefaultOnNull""
                 },
                 ""ApiScalarTypes"": [
                     {
@@ -793,7 +793,7 @@ public partial class ApiSchemaTests
                 ""ApiName"": ""ApiSchema With Relationship Schema for One-To-Many Relationship And Scalar And Nested Foreign Key Paths"",
                 ""ApiVersion"": ""0.1.0"",
                 ""ApiOptions"": {
-                    ""ApiIdentityPartNullHandling"": ""UseDefaultOnNull""
+                    ""ApiKeyNullHandling"": ""UseDefaultOnNull""
                 },
                 ""ApiScalarTypes"": [
                     {
@@ -1379,7 +1379,7 @@ public partial class ApiSchemaTests
                 ""ApiName"": ""ApiSchema With Relationship Schema for Many-To-Many Relationship And Scalar Foreign Key Paths"",
                 ""ApiVersion"": ""0.1.0"",
                 ""ApiOptions"": {
-                    ""ApiIdentityPartNullHandling"": ""UseDefaultOnNull""
+                    ""ApiKeyNullHandling"": ""UseDefaultOnNull""
                 },
                 ""ApiScalarTypes"": [
                     {
