@@ -15,9 +15,9 @@ namespace Evoogle.ApiFramework.Schema;
 /// <summary>
 ///     Represents the dependent end of an <see cref="ApiRelationship"/>.
 ///
-///     A dependent end is either <em>navigational</em> — where no FK binding is declared
+///     A dependent end is either <em>navigational</em> — where no foreign key binding is declared
 ///     at the schema level — or <em>key-bound</em>, where <see cref="ApiForeignKeyType"/>
-///     explicitly maps scalar leaves of the principal <see cref="ApiIdentity"/> to
+///     explicitly maps scalar leaves of the principal <see cref="ApiKeyType"/> to
 ///     properties on the dependent object graph.
 /// </summary>
 /// <remarks>
@@ -45,7 +45,7 @@ public sealed class ApiRelationshipDependentEnd : ApiRelationshipEnd
 
     #region ApiRelationshipDependentEnd Properties
     /// <summary>
-    ///     Gets the FK key type that maps scalar leaves of the principal's <see cref="ApiIdentity"/>
+    ///     Gets the foreign key role's <see cref="ApiKeyType"/> that maps scalar leaves of the principal key type
     ///     to properties on this dependent object graph.
     /// </summary>
     /// <exception cref="ApiSchemaException">
@@ -71,9 +71,9 @@ public sealed class ApiRelationshipDependentEnd : ApiRelationshipEnd
 
     #region Constructors
     /// <summary>
-    ///     Initializes a navigational dependent end with no FK binding declared at the schema level.
+    ///     Initializes a navigational dependent end with no foreign key binding declared at the schema level.
     ///
-    ///     Use when cardinality or delete behavior needs to be expressed but FK property mapping is
+    ///     Use when cardinality or delete behavior needs to be expressed but key property mapping is
     ///     intentionally left to the downstream layer.
     /// </summary>
     /// <param name="clrObjectType">The CLR type of the dependent <see cref="ApiObjectType"/>.</param>
@@ -84,12 +84,11 @@ public sealed class ApiRelationshipDependentEnd : ApiRelationshipEnd
     }
 
     /// <summary>
-    ///     Initializes a key-bound dependent end with an explicit FK key type that maps the principal
-    ///     identity's scalar leaves to properties on the dependent object graph.
+    ///     Initializes a key-bound dependent end with an explicit <see cref="ApiKeyType"/> for the foreign key role.
     /// </summary>
     /// <param name="clrObjectType">The CLR type of the dependent <see cref="ApiObjectType"/>.</param>
     /// <param name="apiForeignKeyType">
-    ///     The FK key type that maps the principal identity's scalar leaves to properties
+    ///     The <see cref="ApiKeyType"/> that maps the principal key type's scalar leaves to properties
     ///     on the dependent object graph.
     /// </param>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="apiForeignKeyType"/> is <see langword="null"/>.</exception>

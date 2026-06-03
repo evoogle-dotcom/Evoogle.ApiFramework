@@ -52,7 +52,7 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
     ///     Configures principal end A of the relationship using the specified CLR type.
     /// </summary>
     /// <param name="clrPrincipalType">The CLR type of the principal end A object type.</param>
-    /// <param name="configure">Optional callback to configure identity selection and extensions.</param>
+    /// <param name="configure">Optional callback to configure principal key type selection and extensions.</param>
     /// <returns>The current builder instance.</returns>
     public ApiRelationshipManyToManyBuilder WithPrincipalEndA(Type clrPrincipalType, Action<ApiRelationshipPrincipalEndBuilder>? configure = null)
     {
@@ -66,7 +66,7 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
     ///     Configures principal end B of the relationship using the specified CLR type.
     /// </summary>
     /// <param name="clrPrincipalType">The CLR type of the principal end B object type.</param>
-    /// <param name="configure">Optional callback to configure identity selection and extensions.</param>
+    /// <param name="configure">Optional callback to configure principal key type selection and extensions.</param>
     /// <returns>The current builder instance.</returns>
     public ApiRelationshipManyToManyBuilder WithPrincipalEndB(Type clrPrincipalType, Action<ApiRelationshipPrincipalEndBuilder>? configure = null)
     {
@@ -80,7 +80,7 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
     ///     Configures the association using the specified CLR type.
     /// </summary>
     /// <param name="clrAssociationType">The CLR type of the association <see cref="ApiObjectType"/>.</param>
-    /// <param name="configure">Optional callback to add FK key paths and extensions to the association.</param>
+    /// <param name="configure">Optional callback to add foreign key role key paths and extensions to the association.</param>
     /// <returns>The current builder instance.</returns>
     public ApiRelationshipManyToManyBuilder WithAssociation(Type clrAssociationType, Action<ApiRelationshipAssociationBuilder>? configure = null)
     {
@@ -130,10 +130,10 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
 
     /// <summary>
     ///     Configures the association using the CLR type <typeparamref name="TAssociation"/>,
-    ///     providing a strongly-typed builder for FK key path configuration.
+    ///     providing a strongly-typed builder for foreign key role key path configuration.
     /// </summary>
     /// <typeparam name="TAssociation">The CLR type of the association object.</typeparam>
-    /// <param name="configure">Optional callback to add FK key paths and extensions using expression-based property selectors.</param>
+    /// <param name="configure">Optional callback to add key paths and extensions using expression-based property selectors.</param>
     /// <returns>The current builder instance.</returns>
     public ApiRelationshipManyToManyBuilder WithAssociation<TAssociation>(Action<ApiRelationshipAssociationBuilder<TAssociation>>? configure = null)
     {

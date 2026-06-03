@@ -13,12 +13,12 @@ namespace Evoogle.ApiFramework.Schema;
 /// </summary>
 /// <remarks>
 ///     Concrete subclasses are <see cref="ApiRelationshipOneToOne"/> and <see cref="ApiRelationshipOneToMany"/>.
-///     The FK always resides on the dependent side; the principal side owns the join-key identity.
+///     The foreign key role always resides on the dependent side; the principal side provides the referenced key type.
 ///     Self-referential relationships are supported by setting both ends to the same <see cref="ApiRelationshipElement.ClrObjectType"/>.
 /// </remarks>
 /// <param name="apiName">The API name that uniquely identifies this relationship within the schema.</param>
-/// <param name="apiPrincipalEnd">The principal end of the relationship, which owns the join key identity.</param>
-/// <param name="apiDependentEnd">The dependent end of the relationship, which holds the FK key paths.</param>
+/// <param name="apiPrincipalEnd">The principal end of the relationship, which provides the referenced key type.</param>
+/// <param name="apiDependentEnd">The dependent end of the relationship, which may provide the foreign key role's key paths.</param>
 /// <param name="apiDeleteBehavior">The delete behavior that governs what happens to related objects when either end is affected.</param>
 public abstract class ApiRelationshipOneTo
 (
@@ -29,10 +29,10 @@ public abstract class ApiRelationshipOneTo
 ) : ApiRelationship(apiName, apiDeleteBehavior)
 {
     #region ApiRelationshipOneTo Properties
-    /// <summary>Gets the principal end of the relationship, which owns the join key identity.</summary>
+    /// <summary>Gets the principal end of the relationship, which provides the referenced key type.</summary>
     public ApiRelationshipPrincipalEnd ApiPrincipalEnd { get; } = apiPrincipalEnd;
 
-    /// <summary>Gets the dependent end of the relationship, which holds the FK key paths.</summary>
+    /// <summary>Gets the dependent end of the relationship, which may provide the foreign key role's key paths.</summary>
     public ApiRelationshipDependentEnd ApiDependentEnd { get; } = apiDependentEnd;
     #endregion
 
@@ -100,13 +100,13 @@ public abstract class ApiRelationshipOneTo
         var identity = principal.ResolvedIdentity;
         if (identity is null)
         {
-            // Principal identity failed to resolve — error already recorded in InitializeApiPrincipalEnd.
+            // Principal key type failed to resolve; the principal end already recorded the error.
             return;
         }
 
         if (dependent.IsNavigational)
         {
-            // Purely navigational — no FK alignment to validate.
+            // Purely navigational; no key path alignment to validate.
             return;
         }
         var foreignKeyType = dependent.ApiForeignKeyType;
@@ -119,8 +119,8 @@ public abstract class ApiRelationshipOneTo
             var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_RELATIONSHIP_ONE_TO_INVALID_DEPENDENT_KEY_PATHS_COUNT;
-            var description = $"{nameof(this.ApiDependentEnd)}.{nameof(this.ApiDependentEnd.ApiForeignKeyType)}.{nameof(ApiKeyType.ApiKeyPaths)} has {keyPathCount} key path(s) but principal identity '{identity.ApiName}' has {identityCount} key path(s)";
-            var remediation = $"Ensure {nameof(this.ApiDependentEnd)}.{nameof(this.ApiDependentEnd.ApiForeignKeyType)}.{nameof(ApiKeyType.ApiKeyPaths)} contains exactly {identityCount} key path(s) to match the principal end's join-key identity";
+            var description = $"{nameof(this.ApiDependentEnd)}.{nameof(this.ApiDependentEnd.ApiForeignKeyType)}.{nameof(ApiKeyType.ApiKeyPaths)} has {keyPathCount} key path(s) but principal key type '{identity.ApiName}' has {identityCount} key path(s)";
+            var remediation = $"Ensure {nameof(this.ApiDependentEnd)}.{nameof(this.ApiDependentEnd.ApiForeignKeyType)}.{nameof(ApiKeyType.ApiKeyPaths)} contains exactly {identityCount} key path(s) to match the principal end's key type";
 
             context.AddIssue(path, severity, code, description, remediation);
         }

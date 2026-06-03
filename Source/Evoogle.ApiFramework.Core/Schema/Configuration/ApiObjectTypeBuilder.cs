@@ -311,7 +311,7 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
 
     #region Build Methods
     /// <summary>
-    ///     Builds the <see cref="ApiObjectType"/> using the configured properties and identity.
+    ///     Builds the <see cref="ApiObjectType"/> using the configured properties and key types.
     /// </summary>
     /// <returns>The constructed <see cref="ApiObjectType"/>.</returns>
     internal ApiObjectType Build()

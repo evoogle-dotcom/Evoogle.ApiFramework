@@ -30,13 +30,13 @@ public sealed class ApiRelationshipAssociationBuilder<T>()
 
     #region WithForeignKeyType Methods
     /// <summary>
-    ///     Sets the A-side FK key type with the given <paramref name="apiName"/>, using a strongly-typed builder for
+    ///     Sets the A-side foreign key role's <see cref="ApiKeyType"/> with the given <paramref name="apiName"/>, using a strongly-typed builder for
     ///     <typeparamref name="T"/>.
     /// </summary>
-    /// <param name="apiName">The API name of the A-side FK key type.</param>
-    /// <param name="configure">Optional callback to configure key paths on the FK key type.</param>
+    /// <param name="apiName">The API name of the A-side key type used for the foreign key role.</param>
+    /// <param name="configure">Optional callback to configure key paths on the key type.</param>
     /// <returns>The current builder instance.</returns>
-    public new ApiRelationshipAssociationBuilder<T> WithForeignKeyTypeA(string apiName, Action<ApiKeyTypeBuilder<T>>? configure = null)
+    public ApiRelationshipAssociationBuilder<T> WithForeignKeyTypeA(string apiName, Action<ApiKeyTypeBuilder<T>>? configure = null)
     {
         var builder = new ApiKeyTypeBuilder<T>(apiName);
         configure?.Invoke(builder);
@@ -45,13 +45,13 @@ public sealed class ApiRelationshipAssociationBuilder<T>()
     }
 
     /// <summary>
-    ///     Sets the B-side FK key type with the given <paramref name="apiName"/>, using a strongly-typed builder for
+    ///     Sets the B-side foreign key role's <see cref="ApiKeyType"/> with the given <paramref name="apiName"/>, using a strongly-typed builder for
     ///     <typeparamref name="T"/>.
     /// </summary>
-    /// <param name="apiName">The API name of the B-side FK key type.</param>
-    /// <param name="configure">Optional callback to configure key paths on the FK key type.</param>
+    /// <param name="apiName">The API name of the B-side key type used for the foreign key role.</param>
+    /// <param name="configure">Optional callback to configure key paths on the key type.</param>
     /// <returns>The current builder instance.</returns>
-    public new ApiRelationshipAssociationBuilder<T> WithForeignKeyTypeB(string apiName, Action<ApiKeyTypeBuilder<T>>? configure = null)
+    public ApiRelationshipAssociationBuilder<T> WithForeignKeyTypeB(string apiName, Action<ApiKeyTypeBuilder<T>>? configure = null)
     {
         var builder = new ApiKeyTypeBuilder<T>(apiName);
         configure?.Invoke(builder);

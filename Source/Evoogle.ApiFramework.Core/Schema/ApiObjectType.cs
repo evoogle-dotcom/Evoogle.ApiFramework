@@ -77,13 +77,13 @@ public sealed partial class ApiObjectType
     public ApiRelationshipEnd[] ApiRelationshipEnds => _apiRelationshipEnds is not null ? _apiRelationshipEnds : [];
 
     /// <summary>
-    ///     Gets all relationship ends where this object type acts as the principal (holds the PK binding).
+    ///     Gets all relationship ends where this object type acts as the principal and provides the referenced key type.
     ///     Populated during <see cref="ApiSchema"/> initialization. Returns an empty array before initialization completes.
     /// </summary>
     public ApiRelationshipPrincipalEnd[] ApiRelationshipPrincipalEnds => _apiPrincipalRelationshipEnds is not null ? _apiPrincipalRelationshipEnds : [];
 
     /// <summary>
-    ///     Gets all relationship ends where this object type acts as the dependent (holds the FK binding).
+    ///     Gets all relationship ends where this object type acts as the dependent and may provide a foreign key role binding.
     ///     Populated during <see cref="ApiSchema"/> initialization. Returns an empty array before initialization completes.
     /// </summary>
     public ApiRelationshipDependentEnd[] ApiRelationshipDependentEnds => _apiDependentRelationshipEnds is not null ? _apiDependentRelationshipEnds : [];

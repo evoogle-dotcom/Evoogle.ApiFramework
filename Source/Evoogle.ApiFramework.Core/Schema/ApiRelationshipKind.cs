@@ -26,7 +26,7 @@ public enum ApiRelationshipKind
 
     /// <summary>
     ///     A many-to-many relationship: modeled through an explicit association <see cref="ApiObjectType"/>
-    ///     that holds FK references to both sides.
+    ///     that holds key values referencing both sides.
     /// </summary>
     ManyToMany
     #endregion

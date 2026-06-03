@@ -29,11 +29,11 @@ public sealed class ApiRelationshipDependentEndBuilder<T>() : ApiRelationshipDep
 
     #region WithForeignKeyType Methods
     /// <summary>
-    ///     Sets the FK key type with the given <paramref name="apiName"/>, using a strongly-typed builder for
+    ///     Sets the foreign key role's <see cref="ApiKeyType"/> with the given <paramref name="apiName"/>, using a strongly-typed builder for
     ///     <typeparamref name="T"/>.
     /// </summary>
-    /// <param name="apiName">The API name of the FK key type.</param>
-    /// <param name="configure">Optional callback to configure key paths on the FK key type.</param>
+    /// <param name="apiName">The API name of the key type used for the foreign key role.</param>
+    /// <param name="configure">Optional callback to configure key paths on the key type.</param>
     /// <returns>The current builder instance.</returns>
     public ApiRelationshipDependentEndBuilder<T> WithForeignKeyType(string apiName, Action<ApiKeyTypeBuilder<T>>? configure = null)
     {

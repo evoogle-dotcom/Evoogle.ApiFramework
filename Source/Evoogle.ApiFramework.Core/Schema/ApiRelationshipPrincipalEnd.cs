@@ -13,13 +13,13 @@ namespace Evoogle.ApiFramework.Schema;
 
 /// <summary>
 ///     Represents the principal end of an <see cref="ApiRelationship"/>.
-///     The principal end owns the join key: its <see cref="ApiKeyType"/> uniquely identifies
+///     The principal end provides the key type used for relationship matching: its <see cref="ApiKeyType"/> uniquely identifies
 ///     the objects on this side and is referenced by the <see cref="ApiRelationshipDependentEnd"/>.
 /// </summary>
 /// <param name="clrObjectType">The CLR type of the principal <see cref="ApiObjectType"/>.</param>
 /// <param name="apiIdentityName">
 ///     The optional name of the <see cref="ApiKeyType"/> on the principal type that serves as the join key.
-///     When <see langword="null"/>, the primary identity (<see cref="ApiObjectType.ApiPrimaryKeyType"/>) is used.
+///     When <see langword="null"/>, the primary key type (<see cref="ApiObjectType.ApiPrimaryKeyType"/>) is used.
 /// </param>
 [JsonConverter(typeof(ApiRelationshipPrincipalEndJsonConverter))]
 public sealed class ApiRelationshipPrincipalEnd
@@ -44,19 +44,17 @@ public sealed class ApiRelationshipPrincipalEnd
 
     #region ApiRelationshipPrincipalEnd Properties
     /// <summary>
-    ///     Gets the optional explicit identity name used to select a specific identity on the principal object type as the join key.
-    ///     When <see langword="null"/>, the primary identity of the principal type is used.
-    ///     Follows the same null-means-primary convention as <see cref="ApiIdentityNestedPart.ApiIdentityName"/>
-    ///     and <see cref="ApiIdentityOwnerPart.ApiIdentityName"/>.
+    ///     Gets the optional explicit key type name used to select a specific key type on the principal object type as the join key.
+    ///     When <see langword="null"/>, the primary key type of the principal type is used.
     /// </summary>
     public string? ApiIdentityName { get; } = apiIdentityName;
 
     /// <summary>
-    ///     Gets the resolved join-key <see cref="ApiKeyType"/> from the principal object type. Available after initialization.
+    ///     Gets the resolved principal <see cref="ApiKeyType"/> used for relationship matching. Available after initialization.
     /// </summary>
     public ApiKeyType ApiIdentity => this.ThrowIfNotInitialized(_apiResolvedIdentity);
 
-    /// <summary>Gets the resolved join-key <see cref="ApiKeyType"/>, or <see langword="null"/> if initialization failed or has not yet run.</summary>
+    /// <summary>Gets the resolved principal <see cref="ApiKeyType"/>, or <see langword="null"/> if initialization failed or has not yet run.</summary>
     internal ApiKeyType? ResolvedIdentity => _apiResolvedIdentity;
     #endregion
 
@@ -98,7 +96,7 @@ public sealed class ApiRelationshipPrincipalEnd
 
         if (this.ApiIdentityName is not null)
         {
-            // Resolve by explicit name — same pattern as ApiIdentityNestedPart.InitializeApiIdentity.
+            // Resolve by explicit key type name.
             if (apiObjectType.TryGetKeyTypeByApiName(this.ApiIdentityName, out var apiResolvedIdentity))
             {
                 _apiResolvedIdentity = apiResolvedIdentity;
@@ -107,19 +105,19 @@ public sealed class ApiRelationshipPrincipalEnd
 
             var availableIdentities = string.Join(", ", apiObjectType.ApiKeyTypes.Select(i => $"'{i.ApiName}'"));
             var remediation = !string.IsNullOrEmpty(availableIdentities)
-                ? $"Use one of the available identities: {availableIdentities}"
-                : $"Define an identity on '{apiObjectType.ApiName}' or remove {nameof(this.ApiIdentityName)}";
+                ? $"Use one of the available key types: {availableIdentities}"
+                : $"Define a key type on '{apiObjectType.ApiName}' or remove {nameof(this.ApiIdentityName)}";
 
             var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_RELATIONSHIP_END_UNRESOLVED_IDENTITY;
-            var description = $"Referenced identity '{this.ApiIdentityName}' could not be found on object type '{apiObjectType.ApiName}'";
+            var description = $"Referenced key type '{this.ApiIdentityName}' could not be found on object type '{apiObjectType.ApiName}'";
 
             context.AddIssue(path, severity, code, description, remediation);
             return;
         }
 
-        // Use primary identity by convention.
+        // Use primary key type by convention.
         _apiResolvedIdentity = apiObjectType.ApiPrimaryKeyType;
 
         if (_apiResolvedIdentity is null)
@@ -127,8 +125,8 @@ public sealed class ApiRelationshipPrincipalEnd
             var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_RELATIONSHIP_END_UNRESOLVED_IDENTITY;
-            var description = $"Object type '{apiObjectType.ApiName}' has no primary identity and cannot act as a principal end";
-            var remediation = $"Define a primary identity on '{apiObjectType.ApiName}' or specify {nameof(this.ApiIdentityName)} explicitly";
+            var description = $"Object type '{apiObjectType.ApiName}' has no primary key type and cannot act as a principal end";
+            var remediation = $"Define a primary key type on '{apiObjectType.ApiName}' or specify {nameof(this.ApiIdentityName)} explicitly";
 
             context.AddIssue(path, severity, code, description, remediation);
         }

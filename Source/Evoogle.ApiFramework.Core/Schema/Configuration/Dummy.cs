@@ -99,7 +99,7 @@ public static class Dummy
     }
 
     /// <summary>
-    ///     Represents a nested customer reference — used to demonstrate FK key paths stored inside a complex property.
+    ///     Represents a nested customer reference used to demonstrate key paths stored inside a complex property.
     /// </summary>
     public class CustomerRef
     {
@@ -109,11 +109,11 @@ public static class Dummy
 
     /// <summary>
     ///     Represents a customer profile domain model — a 1:1 extension of <see cref="Customer"/>.
-    ///     The FK back to <see cref="Customer"/> is stored inside the nested <see cref="CustomerRef"/> property.
+    ///     The key value back to <see cref="Customer"/> is stored inside the nested <see cref="CustomerRef"/> property.
     /// </summary>
     public class CustomerProfile
     {
-        /// <summary>Gets or sets the nested customer reference that carries the FK.</summary>
+        /// <summary>Gets or sets the nested customer reference that carries the key value.</summary>
         public CustomerRef CustomerRef { get; set; } = new CustomerRef();
 
         /// <summary>Gets or sets the customer biography text.</summary>
@@ -276,8 +276,7 @@ public static class Dummy
     /// <summary>
     ///     Demonstrates how to configure a 1:1 relationship using the fluent schema builder APIs.
     ///     Models the "a Customer has at most one CustomerProfile" relationship.
-    ///     Demonstrates <see cref="ApiRelationshipDependentEndBuilder.AddNestedPath"/> for FK values
-    ///     that are stored inside a complex/nested property on the dependent type.
+    ///     Demonstrates nested <see cref="ApiKeyPath"/> values stored inside a complex property on the dependent type.
     /// </summary>
     public class CustomerHasProfileRelationshipConfiguration : IApiRelationshipOneToOneConfiguration
     {
@@ -293,7 +292,7 @@ public static class Dummy
                 )
                 .WithDependentEnd<CustomerProfile>
                 (
-                    // FK is NOT a direct scalar — it lives inside the nested CustomerRef property.
+                    // The key value is not a direct scalar; it lives inside the nested CustomerRef property.
                     d => d.WithForeignKeyType("FK", b => b.AddKeyPath(typeof(CustomerProfile), "CustomerRef", "CustomerId"))
                 );
         }
@@ -303,7 +302,7 @@ public static class Dummy
     ///     Demonstrates how to configure a M:N relationship using the fluent schema builder APIs.
     ///     Models the "Products are tagged with Tags" relationship via the <see cref="ProductTag"/> association type.
     ///     Demonstrates <see cref="ApiRelationshipPrincipalEndBuilder.WithIdentityName"/> to select a
-    ///     non-primary identity on the principal side, and extensions on principal ends.
+    ///     non-primary key type on the principal side, and extensions on principal ends.
     /// </summary>
     public class ProductTagRelationshipConfiguration : IApiRelationshipManyToManyConfiguration
     {
@@ -485,7 +484,7 @@ public static class Dummy
                         d => d.WithForeignKeyType("FK", b => b.AddKeyPath(typeof(Order), "CustomerId"))
                     )
             )
-            // 1:M — inline lambda; demonstrates WithForeignKeyType for composite FK.
+            // 1:M — inline lambda; demonstrates WithForeignKeyType for a composite key role.
             .AddOneToManyRelationship
             (
                 "OrderOrderItemsViaOwner",

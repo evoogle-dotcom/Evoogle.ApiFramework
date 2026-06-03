@@ -49,7 +49,7 @@ public sealed class ApiRelationshipOneToManyBuilder(string apiName)
     ///     Configures the principal end of the 1:M relationship using the specified CLR type.
     /// </summary>
     /// <param name="clrPrincipalType">The CLR type of the principal object.</param>
-    /// <param name="configure">Optional callback to configure identity selection and extensions.</param>
+    /// <param name="configure">Optional callback to configure principal key type selection and extensions.</param>
     /// <returns>The current builder instance.</returns>
     public ApiRelationshipOneToManyBuilder WithPrincipalEnd(Type clrPrincipalType, Action<ApiRelationshipPrincipalEndBuilder>? configure = null)
     {
@@ -71,7 +71,7 @@ public sealed class ApiRelationshipOneToManyBuilder(string apiName)
     ///     Configures the dependent end of the 1:M relationship using the specified CLR type.
     /// </summary>
     /// <param name="clrDependentType">The CLR type of the dependent object.</param>
-    /// <param name="configure">Optional callback to add FK key paths and extensions.</param>
+    /// <param name="configure">Optional callback to add foreign key role key paths and extensions.</param>
     /// <returns>The current builder instance.</returns>
     public ApiRelationshipOneToManyBuilder WithDependentEnd(Type clrDependentType, Action<ApiRelationshipDependentEndBuilder>? configure = null)
     {
@@ -87,7 +87,7 @@ public sealed class ApiRelationshipOneToManyBuilder(string apiName)
     ///     Configures the principal end of the 1:M relationship using the CLR type <typeparamref name="TPrincipal"/>.
     /// </summary>
     /// <typeparam name="TPrincipal">The CLR type of the principal object.</typeparam>
-    /// <param name="configure">Optional callback to configure identity selection and extensions.</param>
+    /// <param name="configure">Optional callback to configure principal key type selection and extensions.</param>
     /// <returns>The current builder instance.</returns>
     public ApiRelationshipOneToManyBuilder WithPrincipalEnd<TPrincipal>(Action<ApiRelationshipPrincipalEndBuilder>? configure = null)
     {
@@ -99,10 +99,10 @@ public sealed class ApiRelationshipOneToManyBuilder(string apiName)
 
     /// <summary>
     ///     Configures the dependent end of the 1:M relationship using the CLR type <typeparamref name="TDependent"/>,
-    ///     and provides a strongly-typed builder for FK key path configuration.
+    ///     and provides a strongly-typed builder for foreign key role key path configuration.
     /// </summary>
     /// <typeparam name="TDependent">The CLR type of the dependent object.</typeparam>
-    /// <param name="configure">Optional callback to add FK key paths using expression-based property selectors.</param>
+    /// <param name="configure">Optional callback to add key paths using expression-based property selectors.</param>
     /// <returns>The current builder instance.</returns>
     public ApiRelationshipOneToManyBuilder WithDependentEnd<TDependent>(Action<ApiRelationshipDependentEndBuilder<TDependent>>? configure = null)
     {

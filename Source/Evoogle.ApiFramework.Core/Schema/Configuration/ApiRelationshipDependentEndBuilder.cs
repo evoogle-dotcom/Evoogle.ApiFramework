@@ -9,8 +9,8 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 ///     Fluent builder used to configure the dependent end of an <see cref="ApiRelationship"/>.
 /// </summary>
 /// <remarks>
-///     Set the FK key type with <see cref="WithForeignKeyType"/>.
-///     When no FK key type is configured the relationship is treated as purely navigational.
+///     Set the foreign key role's <see cref="ApiKeyType"/> with <see cref="WithForeignKeyType"/>.
+///     When no key type is configured the relationship is treated as purely navigational.
 /// </remarks>
 /// <param name="clrObjectType">The CLR type of the dependent <see cref="ApiObjectType"/>.</param>
 public class ApiRelationshipDependentEndBuilder(Type clrObjectType) : ExtensionBuilder<ApiRelationshipDependentEndBuilder>
@@ -44,10 +44,10 @@ public class ApiRelationshipDependentEndBuilder(Type clrObjectType) : ExtensionB
 
     #region WithForeignKeyType Methods
     /// <summary>
-    ///     Sets the FK key type with the given <paramref name="apiName"/>, optionally configuring it further.
+    ///     Sets the foreign key role's <see cref="ApiKeyType"/> with the given <paramref name="apiName"/>, optionally configuring it further.
     /// </summary>
-    /// <param name="apiName">The API name of the FK key type.</param>
-    /// <param name="configure">Optional callback to configure key paths on the FK key type.</param>
+    /// <param name="apiName">The API name of the key type used for the foreign key role.</param>
+    /// <param name="configure">Optional callback to configure key paths on the key type.</param>
     /// <returns>The current builder instance.</returns>
     public ApiRelationshipDependentEndBuilder WithForeignKeyType(string apiName, Action<ApiKeyTypeBuilder>? configure = null)
     {
@@ -57,7 +57,7 @@ public class ApiRelationshipDependentEndBuilder(Type clrObjectType) : ExtensionB
     }
 
     /// <summary>
-    ///     Allows subclasses to set a pre-constructed FK key type builder.
+    ///     Allows subclasses to set a pre-constructed key type builder for the foreign key role.
     /// </summary>
     protected void SetForeignKeyTypeBuilderCore(ApiKeyTypeBuilder builder)
     {

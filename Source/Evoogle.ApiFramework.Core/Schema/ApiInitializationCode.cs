@@ -249,7 +249,7 @@ public enum ApiInitializationCode
 
     #region ApiRelationshipEnd Initialization Codes
     /// <summary>
-    ///     The principal end's referenced identity could not be resolved, or the principal type has no primary identity.
+    ///     The principal end's referenced key type could not be resolved, or the principal type has no primary key type.
     /// </summary>
     API_RELATIONSHIP_END_UNRESOLVED_IDENTITY,
     #endregion
@@ -272,13 +272,13 @@ public enum ApiInitializationCode
 
     /// <summary>
     ///     The number of scalar leaves in the association's key paths for end A
-    ///     does not match the number of scalar leaves in principal end A's join-key identity.
+    ///     does not match the number of scalar leaves in principal end A's key type.
     /// </summary>
     API_RELATIONSHIP_MANY_TO_MANY_INVALID_ASSOCIATION_KEY_PATHS_A_COUNT,
 
     /// <summary>
     ///     The number of scalar leaves in the association's key paths for end B
-    ///     does not match the number of scalar leaves in principal end B's join-key identity.
+    ///     does not match the number of scalar leaves in principal end B's key type.
     /// </summary>
     API_RELATIONSHIP_MANY_TO_MANY_INVALID_ASSOCIATION_KEY_PATHS_B_COUNT,
 
@@ -287,7 +287,7 @@ public enum ApiInitializationCode
     #region ApiRelationshipOneTo Initialization Codes
     /// <summary>
     ///     The number of scalar leaves in the dependent end's key paths does not match
-    ///     the number of scalar leaves in the principal end's join-key identity in either
+    ///     the number of scalar leaves in the principal end's key type in either
     ///     one-to-one or one-to-many relationships.
     /// </summary>
     API_RELATIONSHIP_ONE_TO_INVALID_DEPENDENT_KEY_PATHS_COUNT,

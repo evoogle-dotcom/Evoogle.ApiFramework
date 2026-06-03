@@ -15,12 +15,12 @@ namespace Evoogle.ApiFramework.Schema;
 /// <summary>
 ///     Represents the association element of an <see cref="ApiRelationshipManyToMany"/> relationship.
 ///
-///     The association identifies the join-table <see cref="ApiObjectType"/> whose properties hold the FK values
+///     The association identifies the join-table <see cref="ApiObjectType"/> whose properties hold key values
 ///     that link the two outer principal object types.
 ///
-///     An association is either <em>navigational</em> — where no FK binding is declared at the schema level —
+///     An association is either <em>navigational</em> — where no foreign key binding is declared at the schema level —
 ///     or <em>key-bound</em>, where <see cref="ApiForeignKeyTypeA"/> and <see cref="ApiForeignKeyTypeB"/> explicitly
-///     map the scalar leaves of each principal's join-key identity to properties on the association object type.
+///     map the scalar leaves of each principal key type to properties on the association object type.
 /// </summary>
 /// <remarks>
 ///     Use <see cref="HasKeyBinding"/> to determine which state applies before accessing
@@ -53,7 +53,7 @@ public sealed class ApiRelationshipAssociation : ApiRelationshipElement
     public ApiRelationshipManyToMany ApiRelationshipManyToMany => this.ThrowIfNotInitialized(_apiResolvedRelationshipManyToMany);
 
     /// <summary>
-    ///     Gets the FK key type that maps scalar leaves of principal end A's join-key <see cref="ApiIdentity"/>
+    ///     Gets the A-side foreign key role's <see cref="ApiKeyType"/> that maps scalar leaves of principal end A's key type
     ///     to properties on the association object type.
     /// </summary>
     /// <exception cref="ApiSchemaException">
@@ -65,7 +65,7 @@ public sealed class ApiRelationshipAssociation : ApiRelationshipElement
         : throw new ApiSchemaException("No key binding declared for this association of the many-to-many relationship.");
 
     /// <summary>
-    ///     Gets the FK key type that maps scalar leaves of principal end B's join-key <see cref="ApiIdentity"/>
+    ///     Gets the B-side foreign key role's <see cref="ApiKeyType"/> that maps scalar leaves of principal end B's key type
     ///     to properties on the association object type.
     /// </summary>
     /// <exception cref="ApiSchemaException">
@@ -79,13 +79,13 @@ public sealed class ApiRelationshipAssociation : ApiRelationshipElement
 
     #region ApiRelationshipAssociation Computed Properties
     /// <summary>
-    ///     Gets a value indicating whether this association has explicit FK key types declared for both principal ends.
+    ///     Gets a value indicating whether this association has explicit key bindings declared for both principal ends.
     ///     When <see langword="true"/>, both <see cref="ApiForeignKeyTypeA"/> and <see cref="ApiForeignKeyTypeB"/> are available.
     /// </summary>
     public bool HasKeyBinding => _apiForeignKeyTypeA is not null && _apiForeignKeyTypeB is not null;
 
     /// <summary>
-    ///     Gets a value indicating whether this association is navigational (i.e. has no explicit FK key binding
+    ///     Gets a value indicating whether this association is navigational (i.e. has no explicit key binding
     ///     declared at the schema level for either principal end).
     /// </summary>
     public bool IsNavigational => !this.HasKeyBinding;
@@ -93,8 +93,8 @@ public sealed class ApiRelationshipAssociation : ApiRelationshipElement
 
     #region Constructors
     /// <summary>
-    ///     Initializes a navigational association with no FK binding declared at the schema level for either principal end.
-    ///     Use when the join-table object type needs to be identified but FK property mapping
+    ///     Initializes a navigational association with no foreign key binding declared at the schema level for either principal end.
+    ///     Use when the join-table object type needs to be identified but key property mapping
     ///     is intentionally left to the downstream layer.
     /// </summary>
     /// <param name="clrObjectType">The CLR type of the association <see cref="ApiObjectType"/>.</param>
@@ -106,15 +106,15 @@ public sealed class ApiRelationshipAssociation : ApiRelationshipElement
     }
 
     /// <summary>
-    ///     Initializes a key-bound association with explicit FK key types for both principal ends.
+    ///     Initializes a key-bound association with explicit <see cref="ApiKeyType"/> instances for both foreign key roles.
     /// </summary>
     /// <param name="clrObjectType">The CLR type of the association <see cref="ApiObjectType"/>.</param>
     /// <param name="apiForeignKeyTypeA">
-    ///     The FK key type that maps the scalar leaves of principal end A's join-key identity
+    ///     The <see cref="ApiKeyType"/> that maps the scalar leaves of principal end A's key type
     ///     to properties on the association object type.
     /// </param>
     /// <param name="apiForeignKeyTypeB">
-    ///     The FK key type that maps the scalar leaves of principal end B's join-key identity
+    ///     The <see cref="ApiKeyType"/> that maps the scalar leaves of principal end B's key type
     ///     to properties on the association object type.
     /// </param>
     /// <exception cref="ArgumentNullException">

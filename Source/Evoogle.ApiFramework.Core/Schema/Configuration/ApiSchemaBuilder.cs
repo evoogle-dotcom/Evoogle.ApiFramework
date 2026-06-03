@@ -265,12 +265,12 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     ///     and <typeparamref name="TDependent"/> as the dependent type.
     ///     <typeparamref name="TPrincipal"/> is wired as the principal end automatically; use the full
     ///     <see cref="AddOneToOneRelationship(string,Action{ApiRelationshipOneToOneBuilder})"/> overload when you
-    ///     need to override the join identity or delete behavior on the principal end.
+    ///     need to override the principal key type or delete behavior.
     /// </summary>
     /// <typeparam name="TPrincipal">The CLR type of the principal object.</typeparam>
     /// <typeparam name="TDependent">The CLR type of the dependent object.</typeparam>
     /// <param name="apiName">The schema-unique API name of the relationship.</param>
-    /// <param name="configure">Optional callback to configure FK key paths and delete behavior on the dependent end.</param>
+    /// <param name="configure">Optional callback to configure the foreign key role's key paths and delete behavior.</param>
     /// <returns>The current builder instance.</returns>
     public ApiSchemaBuilder AddOneToOneRelationship<TPrincipal, TDependent>(string apiName, Action<ApiRelationshipDependentEndBuilder<TDependent>>? configure = null)
     {
@@ -285,15 +285,15 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
 
     /// <summary>
     ///     Adds a one-to-one relationship to the schema with <typeparamref name="TPrincipal"/> as the principal type
-    ///     and <typeparamref name="TDependent"/> as the dependent type, binding a single scalar FK property on the
+    ///     and <typeparamref name="TDependent"/> as the dependent type, binding a single scalar key property on the
     ///     dependent end via a lambda expression.
     ///     Use the <see cref="AddOneToOneRelationship{TPrincipal,TDependent}(string,Action{ApiRelationshipDependentEndBuilder{TDependent}}?)"/>
-    ///     overload for composite FK keys or when delete behavior must be configured.
+    ///     overload for composite keys or when delete behavior must be configured.
     /// </summary>
     /// <typeparam name="TPrincipal">The CLR type of the principal object.</typeparam>
     /// <typeparam name="TDependent">The CLR type of the dependent object.</typeparam>
     /// <param name="apiName">The schema-unique API name of the relationship.</param>
-    /// <param name="fk">Expression selecting the scalar FK property on <typeparamref name="TDependent"/>.</param>
+    /// <param name="fk">Expression selecting the scalar key property on <typeparamref name="TDependent"/> for the foreign key role.</param>
     /// <returns>The current builder instance.</returns>
     public ApiSchemaBuilder AddOneToOneRelationship<TPrincipal, TDependent>(string apiName, Expression<Func<TDependent, object>> fk)
     {
@@ -346,12 +346,12 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     ///     and <typeparamref name="TDependent"/> as the dependent type.
     ///     <typeparamref name="TPrincipal"/> is wired as the principal end automatically; use the full
     ///     <see cref="AddOneToManyRelationship(string,Action{ApiRelationshipOneToManyBuilder})"/> overload when you
-    ///     need to override the join identity or delete behavior on the principal end.
+    ///     need to override the principal key type or delete behavior.
     /// </summary>
     /// <typeparam name="TPrincipal">The CLR type of the principal object.</typeparam>
     /// <typeparam name="TDependent">The CLR type of the dependent object.</typeparam>
     /// <param name="apiName">The schema-unique API name of the relationship.</param>
-    /// <param name="configure">Optional callback to configure FK key paths and delete behavior on the dependent end.</param>
+    /// <param name="configure">Optional callback to configure the foreign key role's key paths and delete behavior.</param>
     /// <returns>The current builder instance.</returns>
     public ApiSchemaBuilder AddOneToManyRelationship<TPrincipal, TDependent>(string apiName, Action<ApiRelationshipDependentEndBuilder<TDependent>>? configure = null)
     {
@@ -366,15 +366,15 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
 
     /// <summary>
     ///     Adds a one-to-many relationship to the schema with <typeparamref name="TPrincipal"/> as the principal type
-    ///     and <typeparamref name="TDependent"/> as the dependent type, binding a single scalar FK property on the
+    ///     and <typeparamref name="TDependent"/> as the dependent type, binding a single scalar key property on the
     ///     dependent end via a lambda expression.
     ///     Use the <see cref="AddOneToManyRelationship{TPrincipal,TDependent}(string,Action{ApiRelationshipDependentEndBuilder{TDependent}}?)"/>
-    ///     overload for composite FK keys or when delete behavior must be configured.
+    ///     overload for composite keys or when delete behavior must be configured.
     /// </summary>
     /// <typeparam name="TPrincipal">The CLR type of the principal object.</typeparam>
     /// <typeparam name="TDependent">The CLR type of the dependent object.</typeparam>
     /// <param name="apiName">The schema-unique API name of the relationship.</param>
-    /// <param name="fk">Expression selecting the scalar FK property on <typeparamref name="TDependent"/>.</param>
+    /// <param name="fk">Expression selecting the scalar key property on <typeparamref name="TDependent"/> for the foreign key role.</param>
     /// <returns>The current builder instance.</returns>
     public ApiSchemaBuilder AddOneToManyRelationship<TPrincipal, TDependent>(string apiName, Expression<Func<TDependent, object>> fk)
     {
@@ -425,14 +425,14 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     /// <summary>
     ///     Adds a many-to-many relationship to the schema with <typeparamref name="TPrincipalA"/> and
     ///     <typeparamref name="TPrincipalB"/> as the two principal types and <typeparamref name="TAssociation"/>
-    ///     as the mediating association type, binding a single scalar FK for each side via lambda expressions.
+    ///     as the mediating association type, binding a single scalar key property for each foreign key role via lambda expressions.
     /// </summary>
     /// <typeparam name="TPrincipalA">The CLR type of principal end A.</typeparam>
     /// <typeparam name="TPrincipalB">The CLR type of principal end B.</typeparam>
     /// <typeparam name="TAssociation">The CLR type of the association object that mediates the relationship.</typeparam>
     /// <param name="apiName">The schema-unique API name of the relationship.</param>
-    /// <param name="fkA">Expression selecting the scalar FK property on <typeparamref name="TAssociation"/> that points to principal A.</param>
-    /// <param name="fkB">Expression selecting the scalar FK property on <typeparamref name="TAssociation"/> that points to principal B.</param>
+    /// <param name="fkA">Expression selecting the scalar key property on <typeparamref name="TAssociation"/> for principal A's foreign key role.</param>
+    /// <param name="fkB">Expression selecting the scalar key property on <typeparamref name="TAssociation"/> for principal B's foreign key role.</param>
     /// <returns>The current builder instance.</returns>
     public ApiSchemaBuilder AddManyToManyRelationship<TPrincipalA, TPrincipalB, TAssociation>
     (

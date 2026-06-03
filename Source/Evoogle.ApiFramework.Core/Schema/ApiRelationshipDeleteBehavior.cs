@@ -67,12 +67,12 @@ public enum ApiRelationshipDeleteBehavior
     Delete,
 
     /// <summary>
-    ///     The foreign-key properties on related objects are set to <see langword="null"/> when the operation occurs,
+    ///     The key properties for the foreign key role on related objects are set to <see langword="null"/> when the operation occurs,
     ///     leaving those objects intact as unassociated records.
-    ///     Only valid when the dependent foreign-key is nullable.
+    ///     Only valid when the dependent key properties are nullable.
     ///     <list type="bullet">
-    ///         <item><description><strong>Principal deleted:</strong> the FK properties on all dependent objects are set to <see langword="null"/>.</description></item>
-    ///         <item><description><strong>Dependent orphaned:</strong> the FK properties on the orphaned dependent are set to <see langword="null"/>.</description></item>
+    ///         <item><description><strong>Principal deleted:</strong> the dependent key properties are set to <see langword="null"/>.</description></item>
+    ///         <item><description><strong>Dependent orphaned:</strong> the orphaned dependent's key properties are set to <see langword="null"/>.</description></item>
     ///     </list>
     /// </summary>
     SetNull

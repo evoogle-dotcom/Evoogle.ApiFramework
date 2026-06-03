@@ -20,8 +20,8 @@ namespace Evoogle.ApiFramework.Schema;
 ///     </para>
 /// </remarks>
 /// <param name="apiName">The schema-unique API name of the relationship.</param>
-/// <param name="apiPrincipalEnd">The principal end, which owns the join key identity.</param>
-/// <param name="apiDependentEnd">The dependent end, which holds the FK key paths.</param>
+/// <param name="apiPrincipalEnd">The principal end, which provides the referenced key type.</param>
+/// <param name="apiDependentEnd">The dependent end, which may provide the foreign key role's key paths.</param>
 /// <param name="apiDeleteBehavior">The delete behavior applied when either end is affected. Defaults to <see cref="ApiRelationshipDeleteBehavior.None"/>.</param>
 public sealed class ApiRelationshipOneToMany
 (

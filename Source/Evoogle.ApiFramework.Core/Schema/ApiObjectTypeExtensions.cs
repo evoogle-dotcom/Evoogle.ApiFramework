@@ -18,7 +18,7 @@ public static class ApiObjectTypeExtensions
     ///     Gets an <see cref="ApiKeyType"/> by its API name.
     /// </summary>
     /// <param name="apiObjectType">The API object type to search.</param>
-    /// <param name="apiName">The API name of the identity to retrieve.</param>
+    /// <param name="apiName">The API name of the key type to retrieve.</param>
     /// <returns>The <see cref="ApiKeyType"/> with the specified API name.</returns>
     /// <exception cref="ApiSchemaException">
     ///     Thrown if no key type with the specified API name exists in the object type.

@@ -183,7 +183,7 @@ public readonly struct ApiKey
     ///     <see langword="true"/> if <see cref="ApiKind"/> is not <see cref="ApiKeyKind.Empty"/>; otherwise, <see langword="false"/>.
     /// </value>
     /// <remarks>
-    ///     Use this property to check for the presence of an identity value before accessing its components.
+    ///     Use this property to check for the presence of a key value before accessing its components.
     ///     Equivalent to <c>!Equals(<see cref="Empty"/>)</c>.
     /// </remarks>
     public readonly bool HasValue => this.ApiKind != ApiKeyKind.Empty;

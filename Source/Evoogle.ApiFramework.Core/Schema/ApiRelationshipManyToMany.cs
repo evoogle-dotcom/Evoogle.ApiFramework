@@ -17,7 +17,7 @@ namespace Evoogle.ApiFramework.Schema;
 ///         Unlike one-to-one and one-to-many relationships, a many-to-many has two symmetric
 ///         <see cref="ApiRelationshipPrincipalEnd"/> instances — <see cref="ApiPrincipalEndA"/> and
 ///         <see cref="ApiPrincipalEndB"/> — and no dependent end.
-///         Each principal end owns a join-key identity that is mapped to the association object type
+///         Each principal end provides a referenced key type that is mapped to the association object type
 ///         through the corresponding key path collection on <see cref="ApiAssociation"/>.
 ///     </para>
 ///     <para>
@@ -26,10 +26,10 @@ namespace Evoogle.ApiFramework.Schema;
 ///     </para>
 /// </remarks>
 /// <param name="apiName">The API name that uniquely identifies this relationship within the schema.</param>
-/// <param name="apiPrincipalEndA">The first principal end of the relationship, which owns the A-side join key identity.</param>
-/// <param name="apiPrincipalEndB">The second principal end of the relationship, which owns the B-side join key identity.</param>
+/// <param name="apiPrincipalEndA">The first principal end of the relationship, which provides the A-side referenced key type.</param>
+/// <param name="apiPrincipalEndB">The second principal end of the relationship, which provides the B-side referenced key type.</param>
 /// <param name="apiAssociation">
-///     The association element that mediates the relationship and holds the FK key path trees
+///     The association element that mediates the relationship and may provide the foreign key role's key path trees
 ///     for both principal ends.
 /// </param>
 /// <param name="apiDeleteBehavior">
@@ -64,10 +64,10 @@ public sealed class ApiRelationshipManyToMany
     #endregion
 
     #region ApiRelationshipManyToMany Properties
-    /// <summary>Gets principal end A of the relationship, which owns the join key identity for the first outer type.</summary>
+    /// <summary>Gets principal end A of the relationship, which provides the referenced key type for the first outer type.</summary>
     public ApiRelationshipPrincipalEnd ApiPrincipalEndA { get; } = apiPrincipalEndA;
 
-    /// <summary>Gets principal end B of the relationship, which owns the join key identity for the second outer type.</summary>
+    /// <summary>Gets principal end B of the relationship, which provides the referenced key type for the second outer type.</summary>
     public ApiRelationshipPrincipalEnd ApiPrincipalEndB { get; } = apiPrincipalEndB;
 
     /// <summary>Gets the association element that mediates the relationship.</summary>
@@ -120,8 +120,8 @@ public sealed class ApiRelationshipManyToMany
                     var path = this.ApiPath;
                     var severity = ApiInitializationSeverity.Error;
                     var code = ApiInitializationCode.API_RELATIONSHIP_MANY_TO_MANY_INVALID_ASSOCIATION_KEY_PATHS_A_COUNT;
-                    var description = $"{nameof(this.ApiAssociation)}.{nameof(this.ApiAssociation.ApiForeignKeyTypeA)}.{nameof(ApiKeyType.ApiKeyPaths)} has {keyPathCount} key path(s) but principal end A identity '{identityA.ApiName}' has {identityCount} key path(s)";
-                    var remediation = $"Ensure {nameof(this.ApiAssociation)}.{nameof(this.ApiAssociation.ApiForeignKeyTypeA)}.{nameof(ApiKeyType.ApiKeyPaths)} contains exactly {identityCount} key path(s) to match principal end A's join-key identity";
+                    var description = $"{nameof(this.ApiAssociation)}.{nameof(this.ApiAssociation.ApiForeignKeyTypeA)}.{nameof(ApiKeyType.ApiKeyPaths)} has {keyPathCount} key path(s) but principal end A key type '{identityA.ApiName}' has {identityCount} key path(s)";
+                    var remediation = $"Ensure {nameof(this.ApiAssociation)}.{nameof(this.ApiAssociation.ApiForeignKeyTypeA)}.{nameof(ApiKeyType.ApiKeyPaths)} contains exactly {identityCount} key path(s) to match principal end A's key type";
 
                     context.AddIssue(path, severity, code, description, remediation);
                 }
@@ -142,8 +142,8 @@ public sealed class ApiRelationshipManyToMany
                     var path = this.ApiPath;
                     var severity = ApiInitializationSeverity.Error;
                     var code = ApiInitializationCode.API_RELATIONSHIP_MANY_TO_MANY_INVALID_ASSOCIATION_KEY_PATHS_B_COUNT;
-                    var description = $"{nameof(this.ApiAssociation)}.{nameof(this.ApiAssociation.ApiForeignKeyTypeB)}.{nameof(ApiKeyType.ApiKeyPaths)} has {keyPathCount} key path(s) but principal end B identity '{identityB.ApiName}' has {identityCount} key path(s)";
-                    var remediation = $"Ensure {nameof(this.ApiAssociation)}.{nameof(this.ApiAssociation.ApiForeignKeyTypeB)}.{nameof(ApiKeyType.ApiKeyPaths)} contains exactly {identityCount} key path(s) to match principal end B's join-key identity";
+                    var description = $"{nameof(this.ApiAssociation)}.{nameof(this.ApiAssociation.ApiForeignKeyTypeB)}.{nameof(ApiKeyType.ApiKeyPaths)} has {keyPathCount} key path(s) but principal end B key type '{identityB.ApiName}' has {identityCount} key path(s)";
+                    var remediation = $"Ensure {nameof(this.ApiAssociation)}.{nameof(this.ApiAssociation.ApiForeignKeyTypeB)}.{nameof(ApiKeyType.ApiKeyPaths)} contains exactly {identityCount} key path(s) to match principal end B's key type";
 
                     context.AddIssue(path, severity, code, description, remediation);
                 }
