@@ -3,8 +3,6 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using Evoogle.ApiFramework.Identity;
-
 namespace Evoogle.ApiFramework.Schema.Configuration.Internal;
 
 /// <summary>
@@ -14,7 +12,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Internal;
 internal static class ApiObjectTypeBuilderExtensions
 {
     #region Methods
-    public static void ConfigureIdentities(this ApiObjectTypeBuilder builder, ApiObjectType apiObjectType)
+    public static void ConfigureKeyTypes(this ApiObjectTypeBuilder builder, ApiObjectType apiObjectType)
     {
         foreach (var apiKeyType in apiObjectType.ApiKeyTypes)
         {
@@ -35,13 +33,13 @@ internal static class ApiObjectTypeBuilderExtensions
         {
             builder.WithOptions(optionsBuilder =>
             {
-                if (apiOptions.ApiIdentityPartNullHandling.HasValue)
+                if (apiOptions.ApiKeyNullHandling.HasValue)
                 {
-                    var apiIdentityPartNullHandling = apiOptions.ApiIdentityPartNullHandling.Value;
+                    var apiKeyNullHandling = apiOptions.ApiKeyNullHandling.Value;
 
-                    switch (apiIdentityPartNullHandling)
+                    switch (apiKeyNullHandling)
                     {
-                        case ApiIdentityPartNullHandling.ThrowOnNull:
+                        case ApiKeyNullHandling.ThrowOnNull:
                             optionsBuilder.ThrowOnNullKeyPart();
                             break;
 

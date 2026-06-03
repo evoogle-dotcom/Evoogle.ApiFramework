@@ -3,7 +3,6 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using Evoogle.ApiFramework.Identity;
 using Evoogle.Extension;
 
 namespace Evoogle.ApiFramework.Schema.TestData;
@@ -16,7 +15,7 @@ public static partial class ApiSchemaFactory
     (
         string ApiName,
         string? ApiVersion = null,
-        ApiIdentityPartNullHandling? ApiIdentityPartNullHandling = null,
+        ApiKeyNullHandling? ApiKeyNullHandling = null,
         List<ApiTypeDef>? ApiNamedTypes = null,
         List<ApiRelationshipDef>? ApiRelationships = null,
         List<Type>? ExtensionTypes = null
@@ -40,7 +39,7 @@ public static partial class ApiSchemaFactory
     (
         string ApiName,
         Type ClrType,
-        ApiIdentityPartNullHandling? ApiIdentityPartNullHandling = null,
+        ApiKeyNullHandling? ApiKeyNullHandling = null,
         List<ApiPropertyDef>? ApiProperties = null,
         List<ApiKeyTypeDef>? ApiKeyTypes = null,
         List<Type>? ExtensionTypes = null
@@ -229,14 +228,14 @@ public static partial class ApiSchemaFactory
     #region Dynamic Object Options Builders
     private static ApiObjectTypeOptions? BuildApiObjectTypeOptions(ApiObjectTypeDef def)
     {
-        if (!def.ApiIdentityPartNullHandling.HasValue)
+        if (!def.ApiKeyNullHandling.HasValue)
         {
             return null;
         }
 
         return new ApiObjectTypeOptions
         {
-            ApiIdentityPartNullHandling = def.ApiIdentityPartNullHandling.Value
+            ApiKeyNullHandling = def.ApiKeyNullHandling.Value
         };
     }
     #endregion
@@ -366,14 +365,14 @@ public static partial class ApiSchemaFactory
     #region Dynamic Schema Options Builders
     private static ApiSchemaOptions? BuildApiSchemaOptions(ApiSchemaDef def)
     {
-        if (!def.ApiIdentityPartNullHandling.HasValue)
+        if (!def.ApiKeyNullHandling.HasValue)
         {
             return null;
         }
 
         return new ApiSchemaOptions
         {
-            ApiIdentityPartNullHandling = def.ApiIdentityPartNullHandling.Value
+            ApiKeyNullHandling = def.ApiKeyNullHandling.Value
         };
     }
     #endregion

@@ -3,7 +3,6 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using Evoogle.ApiFramework.Identity;
 using Evoogle.ApiFramework.TestData;
 
 using static Evoogle.ApiFramework.Schema.TestData.ApiSchemaFactory;
@@ -423,7 +422,7 @@ public partial class ApiTypeTests
             (
                 ApiName: nameof(ScalarsOnly),
                 ClrType: typeof(ScalarsOnly),
-                ApiIdentityPartNullHandling: ApiIdentityPartNullHandling.ThrowOnNull,
+                ApiKeyNullHandling: ApiKeyNullHandling.ThrowOnNull,
                 ApiProperties:
                 [
                     new ApiPropertyDef
@@ -481,7 +480,7 @@ public partial class ApiTypeTests
                 ""ApiKind"": ""Object"",
                 ""ApiName"": ""ScalarsOnly"",
                 ""ApiOptions"": {
-                    ""ApiIdentityPartNullHandling"": ""ThrowOnNull""
+                    ""ApiKeyNullHandling"": ""ThrowOnNull""
                 },
                 ""ApiProperties"": [
                     {
@@ -970,7 +969,7 @@ public partial class ApiTypeTests
             (
                 ApiName: nameof(ScalarsOnly),
                 ClrType: typeof(ScalarsOnly),
-                ApiIdentityPartNullHandling: ApiIdentityPartNullHandling.ThrowOnNull,
+                ApiKeyNullHandling: ApiKeyNullHandling.ThrowOnNull,
                 ApiProperties:
                 [
                     new ApiPropertyDef
@@ -1028,7 +1027,7 @@ public partial class ApiTypeTests
                 ""ApiKind"": ""Object"",
                 ""ApiName"": ""ScalarsOnly"",
                 ""ApiOptions"": {
-                    ""ApiIdentityPartNullHandling"": ""ThrowOnNull""
+                    ""ApiKeyNullHandling"": ""ThrowOnNull""
                 },
                 ""ApiProperties"": [
                     {

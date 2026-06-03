@@ -5,7 +5,6 @@
 // See the LICENSE file in the project root for more information.
 using System.Text.Json;
 
-using Evoogle.ApiFramework.Identity;
 using Evoogle.Json;
 
 using Microsoft.Extensions.Logging;
@@ -21,14 +20,14 @@ public class ApiSchemaOptionsJsonConverter(ILogger<ApiSchemaOptionsJsonConverter
     private readonly record struct PropertyNames
     {
         #region Immutable Properties
-        public required string ApiIdentityPartNullHandling { get; init; }
+        public required string ApiKeyNullHandling { get; init; }
         #endregion
 
         #region Factory Methods
         public static PropertyNames Create(JsonNamingPolicy policy)
             => new()
             {
-                ApiIdentityPartNullHandling = policy.ConvertName(nameof(ApiSchemaOptions.ApiIdentityPartNullHandling)),
+                ApiKeyNullHandling = policy.ConvertName(nameof(ApiSchemaOptions.ApiKeyNullHandling)),
             };
         #endregion
     }
@@ -38,35 +37,35 @@ public class ApiSchemaOptionsJsonConverter(ILogger<ApiSchemaOptionsJsonConverter
     private class ReadData
     {
         #region Properties
-        public ApiIdentityPartNullHandling? ApiIdentityPartNullHandling { get; set; }
+        public ApiKeyNullHandling? ApiKeyNullHandling { get; set; }
         #endregion
     }
 
     private class ReadHandlers(PropertyNames propertyNames)
     {
         #region Constants
-        private static readonly Type _apiIdentityPartNullHandlingType = typeof(ApiIdentityPartNullHandling);
+        private static readonly Type _apiKeyNullHandlingType = typeof(ApiKeyNullHandling);
         #endregion
 
         #region Fields
         public readonly Dictionary<string, JsonReaderHandler<DefaultReadContext<PropertyNames, ReadData, ReadHandlers>>> PropertyHandlers = new()
         {
-            { propertyNames.ApiIdentityPartNullHandling, HandleApiIdentityPartNullHandling },
+            { propertyNames.ApiKeyNullHandling, HandleApiKeyNullHandling },
         };
         #endregion
 
         #region Methods
-        private static void HandleApiIdentityPartNullHandling(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiKeyNullHandling(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             var options = context.Options;
-            context.ReadData.ApiIdentityPartNullHandling = _apiIdentityPartNullHandlingJsonConverter.Read(ref reader, _apiIdentityPartNullHandlingType, options);
+            context.ReadData.ApiKeyNullHandling = _apiKeyNullHandlingJsonConverter.Read(ref reader, _apiKeyNullHandlingType, options);
         }
         #endregion
     }
     #endregion
 
     #region Fields
-    private static readonly EnumJsonConverter<ApiIdentityPartNullHandling> _apiIdentityPartNullHandlingJsonConverter = new();
+    private static readonly EnumJsonConverter<ApiKeyNullHandling> _apiKeyNullHandlingJsonConverter = new();
     #endregion
 
     #region Constructors
@@ -103,11 +102,11 @@ public class ApiSchemaOptionsJsonConverter(ILogger<ApiSchemaOptionsJsonConverter
         var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
         var readData = readContext.ReadData;
 
-        var apiIdentityPartNullHandling = readData.ApiIdentityPartNullHandling ?? ApiSchemaOptions.Default.ApiIdentityPartNullHandling;
+        var apiKeyNullHandling = readData.ApiKeyNullHandling ?? ApiSchemaOptions.Default.ApiKeyNullHandling;
 
         var apiSchemaOptions = new ApiSchemaOptions()
         {
-            ApiIdentityPartNullHandling = apiIdentityPartNullHandling,
+            ApiKeyNullHandling = apiKeyNullHandling,
         };
 
         return apiSchemaOptions;
@@ -129,19 +128,19 @@ public class ApiSchemaOptionsJsonConverter(ILogger<ApiSchemaOptionsJsonConverter
 
         WriteJsonObject(writer, () =>
         {
-            WriteApiIdentityPartNullHandling(writer, value, writeContext);
+            WriteApiKeyNullHandling(writer, value, writeContext);
         });
     }
     #endregion
 
     #region Write Implementation Methods
-    private static void WriteApiIdentityPartNullHandling(Utf8JsonWriter writer, ApiSchemaOptions apiSchemaOptions, DefaultWriteContext<PropertyNames> context)
+    private static void WriteApiKeyNullHandling(Utf8JsonWriter writer, ApiSchemaOptions apiSchemaOptions, DefaultWriteContext<PropertyNames> context)
     {
-        var propertyName = context.PropertyNames.ApiIdentityPartNullHandling;
-        var apiIdentityPartNullHandling = apiSchemaOptions.ApiIdentityPartNullHandling;
+        var propertyName = context.PropertyNames.ApiKeyNullHandling;
+        var apiKeyNullHandling = apiSchemaOptions.ApiKeyNullHandling;
         var options = context.Options;
 
-        writer.TryWritePropertyWithConverter(propertyName, apiIdentityPartNullHandling, options, _apiIdentityPartNullHandlingJsonConverter);
+        writer.TryWritePropertyWithConverter(propertyName, apiKeyNullHandling, options, _apiKeyNullHandlingJsonConverter);
     }
     #endregion
 }

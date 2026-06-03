@@ -156,7 +156,7 @@ public partial class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTest
                     }
 
                     x.ConfigureOptions(apiObjectType);
-                    x.ConfigureIdentities(apiObjectType);
+                    x.ConfigureKeyTypes(apiObjectType);
                     x.ConfigureExtensions(apiObjectType);
                 });
             }

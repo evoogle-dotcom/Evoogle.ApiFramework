@@ -4,7 +4,6 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using Evoogle.ApiFramework.Exceptions;
-using Evoogle.ApiFramework.Identity;
 
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
@@ -14,27 +13,27 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 public sealed class ApiObjectTypeOptionsBuilder()
 {
     #region Fields
-    private ApiIdentityPartNullHandling? _apiIdentityPartNullHandling = null;
+    private ApiKeyNullHandling? _apiKeyNullHandling = null;
     #endregion
 
     #region With Methods
     /// <summary>
-    ///     Configures key-part null handling to throw an <see cref="ApiIdentityException"/> when a key part is null or cannot be resolved during identity construction.
+    ///     Configures key null handling to throw an <see cref="ApiKeyException"/> when a key path segment is null or cannot be resolved during key construction.
     /// </summary>
     /// <returns>The current builder instance.</returns>
     public ApiObjectTypeOptionsBuilder ThrowOnNullKeyPart()
     {
-        _apiIdentityPartNullHandling = ApiIdentityPartNullHandling.ThrowOnNull;
+        _apiKeyNullHandling = ApiKeyNullHandling.ThrowOnNull;
         return this;
     }
 
     /// <summary>
-    ///     Configures key-part null handling to use the default identity value behavior when a key part is null or cannot be resolved during identity construction, rather than throwing.
+    ///     Configures key null handling to use the default key value behavior when a key path segment is null or cannot be resolved during key construction, rather than throwing.
     /// </summary>
     /// <returns>The current builder instance.</returns>
     public ApiObjectTypeOptionsBuilder UseDefaultOnNullKeyPart()
     {
-        _apiIdentityPartNullHandling = ApiIdentityPartNullHandling.UseDefaultOnNull;
+        _apiKeyNullHandling = ApiKeyNullHandling.UseDefaultOnNull;
         return this;
     }
     #endregion
@@ -48,7 +47,7 @@ public sealed class ApiObjectTypeOptionsBuilder()
     {
         return new ApiObjectTypeOptions
         {
-            ApiIdentityPartNullHandling = _apiIdentityPartNullHandling
+            ApiKeyNullHandling = _apiKeyNullHandling
         };
     }
     #endregion

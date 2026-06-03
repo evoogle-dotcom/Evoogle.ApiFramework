@@ -3,7 +3,6 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using Evoogle.ApiFramework.Identity;
 using Evoogle.ApiFramework.TestData;
 
 namespace Evoogle.ApiFramework.Schema.TestData;
@@ -81,10 +80,10 @@ public static partial class ApiSchemaFactory
             Extensions = extensions
         };
 
-    private static ApiObjectTypeOptions OO(ApiIdentityPartNullHandling identityPartNullHandling)
+    private static ApiObjectTypeOptions OO(ApiKeyNullHandling keyNullHandling)
         => new()
         {
-            ApiIdentityPartNullHandling = identityPartNullHandling
+            ApiKeyNullHandling = keyNullHandling
         };
 
     private static ApiProperty P(string name, ApiTypeExpression expression, bool required, ClrMemberKind clrMemberKind = ClrMemberKind.Property, OrderedDictionary<Type, object>? extensions = null)
@@ -973,10 +972,10 @@ public static partial class ApiSchemaFactory
         };
 
         // 3) Object Types
-        var empty = O(name: nameof(Empty), clr: typeof(Empty), options: OO(ApiIdentityPartNullHandling.ThrowOnNull),
+        var empty = O(name: nameof(Empty), clr: typeof(Empty), options: OO(ApiKeyNullHandling.ThrowOnNull),
         properties: []);
 
-        var point = O(name: nameof(Point), clr: typeof(Point), options: OO(ApiIdentityPartNullHandling.ThrowOnNull),
+        var point = O(name: nameof(Point), clr: typeof(Point), options: OO(ApiKeyNullHandling.ThrowOnNull),
         properties:
         [
             P(name: nameof(Point.X),    expression: TE.ClrRef<long>(),   required: true, ClrMemberKind.Field),
@@ -984,7 +983,7 @@ public static partial class ApiSchemaFactory
             P(name: nameof(Point.Note), expression: TE.ClrRef<string>(), required: false)
         ]);
 
-        var scalarsOnly = O(name: nameof(ScalarsOnly), clr: typeof(ScalarsOnly), options: OO(ApiIdentityPartNullHandling.ThrowOnNull),
+        var scalarsOnly = O(name: nameof(ScalarsOnly), clr: typeof(ScalarsOnly), options: OO(ApiKeyNullHandling.ThrowOnNull),
         properties:
         [
             P(name: nameof(ScalarsOnly.RequiredName),      expression: TE.ClrRef<string>(), required: true),
@@ -995,7 +994,7 @@ public static partial class ApiSchemaFactory
             P(name: nameof(ScalarsOnly.OptionalPredicate), expression: TE.ClrRef<bool>(),   required: false, ClrMemberKind.Field)
         ]);
 
-        var person = O(name: nameof(Person), clr: typeof(Person), options: OO(ApiIdentityPartNullHandling.ThrowOnNull),
+        var person = O(name: nameof(Person), clr: typeof(Person), options: OO(ApiKeyNullHandling.ThrowOnNull),
         properties:
         [
             P(name: nameof(Person.Id),        expression: TE.ClrRef<int>(),                  required: true),
@@ -1011,7 +1010,7 @@ public static partial class ApiSchemaFactory
             KT("AK_Person_Name", [KP(typeof(Person), [KPS(nameof(Person.Name))])])
         ]);
 
-        var company = O(name: nameof(Company), clr: typeof(Company), options: OO(ApiIdentityPartNullHandling.ThrowOnNull),
+        var company = O(name: nameof(Company), clr: typeof(Company), options: OO(ApiKeyNullHandling.ThrowOnNull),
         properties:
         [
             P(name: nameof(Company.Id),        expression: TE.ClrRef<Ulid>(),                 required: true),

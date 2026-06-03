@@ -5,14 +5,13 @@
 // See the LICENSE file in the project root for more information.
 using System.Text.Json.Serialization;
 
-using Evoogle.ApiFramework.Identity;
 using Evoogle.ApiFramework.Schema.Json;
+using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema;
 
 /// <summary>
-///     Holds schema-wide configuration options that control identity resolution and serialization behaviour
-///     for all types within an <see cref="ApiSchema"/>.
+///     Holds schema-wide configuration options for all types within an <see cref="ApiSchema"/>.
 /// </summary>
 [JsonConverter(typeof(ApiSchemaOptionsJsonConverter))]
 public record class ApiSchemaOptions
@@ -26,9 +25,19 @@ public record class ApiSchemaOptions
     public static ApiSchemaOptions Default => _default;
 
     /// <summary>
-    ///     Gets the null-handling strategy applied when resolving identities across the entire schema.
-    ///     Defaults to <see cref="ApiIdentityPartNullHandling.UseDefaultOnNull"/>.
+    ///     Gets the null-handling strategy applied when resolving keys across the entire schema.
+    ///     Defaults to <see cref="ApiKeyNullHandling.UseDefaultOnNull"/>.
     /// </summary>
-    public ApiIdentityPartNullHandling ApiIdentityPartNullHandling { get; init; } = ApiIdentityPartNullHandling.UseDefaultOnNull;
+    public ApiKeyNullHandling ApiKeyNullHandling { get; init; } = ApiKeyNullHandling.UseDefaultOnNull;
+    #endregion
+
+    #region Object Methods
+    /// <inheritdoc/>
+    public override string ToString()
+    {
+        var apiKeyNullHandling = this.ApiKeyNullHandling.SafeToString();
+
+        return $"{nameof(ApiSchemaOptions)} {{{nameof(this.ApiKeyNullHandling)}={apiKeyNullHandling}}}";
+    }
     #endregion
 }

@@ -121,7 +121,7 @@ public partial class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnit
             }
 
             builder.ConfigureOptions(apiObjectType);
-            builder.ConfigureIdentities(apiObjectType);
+            builder.ConfigureKeyTypes(apiObjectType);
             builder.ConfigureExtensions(apiObjectType);
 
             this.ApiTypeActual = builder.Build();
@@ -200,7 +200,7 @@ public partial class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnit
             }
 
             builder.ConfigureOptions(apiObjectType);
-            builder.ConfigureIdentities(apiObjectType);
+            builder.ConfigureKeyTypes(apiObjectType);
             builder.ConfigureExtensions(apiObjectType);
 
             this.ApiTypeActual = builder.Build();
@@ -264,7 +264,7 @@ public partial class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnit
             }
 
             builder.ConfigureOptions(apiObjectType);
-            builder.ConfigureIdentities(apiObjectType);
+            builder.ConfigureKeyTypes(apiObjectType);
             builder.ConfigureExtensions(apiObjectType);
 
             this.ApiTypeActual = builder.Build();
