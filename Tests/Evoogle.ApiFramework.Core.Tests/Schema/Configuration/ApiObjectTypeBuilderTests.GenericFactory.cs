@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -315,7 +315,7 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
             .AddProperty(c => c.LineNumber)
             .AddProperty(c => c.Description)
             .AddKeyType("PK_KeyOwnedComposite", c => c
-                .AddKeyPath<KeyOwner, int>(p => p.Id)
+                .AddKeyPath<KeyOwner>(p => p.Id)
                 .AddKeyPath(p => p.LineNumber));
 
         return builder;
@@ -327,7 +327,7 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
             .WithName(nameof(KeyOwnedDependent))
             .AddProperty(c => c.Description)
             .AddKeyType("PK_KeyOwnedDependent", c => c
-                .AddKeyPath<KeyOwner, int>(p => p.Id));
+                .AddKeyPath<KeyOwner>(p => p.Id));
 
         return builder;
     }

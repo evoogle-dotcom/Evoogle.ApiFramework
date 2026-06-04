@@ -14,26 +14,19 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 ///     compile-time-safe lambda expressions for property selection.
 /// </summary>
 /// <typeparam name="T">The root CLR type from which the key path navigation begins.</typeparam>
-public sealed class ApiKeyPathBuilder<T> : ApiKeyPathBuilder
+/// <remarks>
+///     Initializes an <see cref="ApiKeyPathBuilder{T}"/> with the specified root CLR type and pre-configured
+///     segment builders.
+/// </remarks>
+/// <param name="clrRootType">The CLR type from which the navigation chain begins.</param>
+/// <param name="segmentBuilders">
+///     Ordered <see cref="ApiKeyPathSegmentBuilder"/> instances from the root type to the terminal scalar property.
+///     Must contain at least one builder.
+/// </param>
+/// <exception cref="ArgumentNullException">Thrown when <paramref name="clrRootType"/> or <paramref name="segmentBuilders"/> is <c>null</c>.</exception>
+/// <exception cref="ArgumentException">Thrown when <paramref name="segmentBuilders"/> contains no elements.</exception>
+public sealed class ApiKeyPathBuilder<T>(Type clrRootType, IEnumerable<ApiKeyPathSegmentBuilder> segmentBuilders) : ApiKeyPathBuilder(clrRootType, segmentBuilders)
 {
-    #region Constructors
-    /// <summary>
-    ///     Initializes an <see cref="ApiKeyPathBuilder{T}"/> with the specified root CLR type and pre-configured
-    ///     segment builders.
-    /// </summary>
-    /// <param name="clrRootType">The CLR type from which the navigation chain begins.</param>
-    /// <param name="segmentBuilders">
-    ///     Ordered <see cref="ApiKeyPathSegmentBuilder"/> instances from the root type to the terminal scalar property.
-    ///     Must contain at least one builder.
-    /// </param>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="clrRootType"/> or <paramref name="segmentBuilders"/> is <c>null</c>.</exception>
-    /// <exception cref="ArgumentException">Thrown when <paramref name="segmentBuilders"/> contains no elements.</exception>
-    public ApiKeyPathBuilder(Type clrRootType, IEnumerable<ApiKeyPathSegmentBuilder> segmentBuilders)
-        : base(clrRootType, segmentBuilders)
-    {
-    }
-    #endregion
-
     #region Factory Methods
     /// <summary>
     ///     Creates a builder for a path rooted at <typeparamref name="T"/> using a type-safe lambda expression.
@@ -55,15 +48,15 @@ public sealed class ApiKeyPathBuilder<T> : ApiKeyPathBuilder
 
     /// <summary>
     ///     Creates a builder for a path rooted at <typeparamref name="TRoot"/> using a type-safe lambda expression.
-    ///     The expression must consist only of chained member access (e.g. <c>root => root.Department.Id</c>).
+    ///     This overload allows callers to specify only the root type while the terminal value is boxed to
+    ///     <see cref="object"/>.
     /// </summary>
     /// <typeparam name="TRoot">The CLR type from which the navigation begins.</typeparam>
-    /// <typeparam name="TScalar">The return type of the terminal scalar property.</typeparam>
     /// <param name="expression">A lambda expression selecting the scalar property on <typeparamref name="TRoot"/>, optionally through navigation properties.</param>
     /// <returns>A new <see cref="ApiKeyPathBuilder{T}"/> with <typeparamref name="TRoot"/> as the root CLR type.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="expression"/> is <c>null</c>.</exception>
     /// <exception cref="ArgumentException">Thrown when <paramref name="expression"/> is not a simple member access chain.</exception>
-    public static ApiKeyPathBuilder<T> For<TRoot, TScalar>(Expression<Func<TRoot, TScalar>> expression)
+    public static ApiKeyPathBuilder<T> For<TRoot>(Expression<Func<TRoot, object?>> expression)
     {
         ArgumentNullException.ThrowIfNull(expression);
 

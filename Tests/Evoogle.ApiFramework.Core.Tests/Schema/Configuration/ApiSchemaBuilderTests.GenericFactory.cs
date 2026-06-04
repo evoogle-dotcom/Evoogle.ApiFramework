@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -273,7 +273,7 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
                 .AddProperty(p => p.UnitPrice)
                 .AddProperty(p => p.LineTotal)
                 .AddKeyType("PK_OrderLine", k => k
-                    .AddKeyPath<Order, Ulid>(p => p.Id)
+                    .AddKeyPath<Order>(p => p.Id)
                     .AddKeyPath(p => p.LineNumber)))
 
             // Payment Objects
@@ -292,7 +292,7 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
 
             .AddOneToManyRelationship("REL_Order_OrderLine_1toN", r => r
                 .WithPrincipalEnd<Order>()
-                .WithDependentEnd<OrderLine>(de => de.WithForeignKeyType("FK_Order_OrderLine", fk => fk.AddKeyPath<Order, Ulid>(p => p.Id)))
+                .WithDependentEnd<OrderLine>(de => de.WithForeignKeyType("FK_Order_OrderLine", fk => fk.AddKeyPath<Order>(p => p.Id)))
                 .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete))
 
             .AddOneToOneRelationship("REL_Payment_Order_1to1", r => r
@@ -390,13 +390,13 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
                 .AddProperty(p => p.LineNumber)
                 .AddProperty(p => p.Description)
                 .AddKeyType("PK_KeyOwnedComposite", k => k
-                    .AddKeyPath<KeyOwner, int>(p => p.Id)
+                    .AddKeyPath<KeyOwner>(p => p.Id)
                     .AddKeyPath(p => p.LineNumber)))
 
             .AddObject<KeyOwnedDependent>(o => o
                 .AddProperty(p => p.Description)
                 .AddKeyType("PK_KeyOwnedDependent", k => k
-                    .AddKeyPath<KeyOwner, int>(p => p.Id)));
+                    .AddKeyPath<KeyOwner>(p => p.Id)));
 
         return builder;
     }
@@ -581,7 +581,7 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
                 .AddProperty(p => p.LineNumber)
                 .AddProperty(p => p.Notes)
                 .AddKeyType("PK_RelationshipOwnedLine", k => k
-                    .AddKeyPath<RelationshipOrder, Ulid>(p => p.Id)
+                    .AddKeyPath<RelationshipOrder>(p => p.Id)
                     .AddKeyPath(p => p.LineNumber)))
 
             // RelationshipOrgUnit

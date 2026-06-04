@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -582,7 +582,7 @@ public static class Dummy
                     .AddKeyPath(oi => oi.OrderId)
                     .AddKeyPath(oi => oi.LineItemNumber))
                 .AddKeyType("AlternateKey", b => b
-                    .AddKeyPath<Order, Guid>(o => o.Id)
+                    .AddKeyPath<Order>(o => o.Id)
                     .AddKeyPath(oi => oi.LineItemNumber)))
             .AddObject<CustomerProfile>(x => x
                 .WithName("CustomerProfile")
