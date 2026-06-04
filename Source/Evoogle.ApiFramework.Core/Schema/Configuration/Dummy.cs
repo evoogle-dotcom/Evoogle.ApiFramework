@@ -254,13 +254,8 @@ public static class Dummy
         {
             builder
                 .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete)
-                .WithPrincipalEnd(typeof(Order))
-                .WithDependentEnd(typeof(OrderItem),
-                (
-                    d => d.WithForeignKeyType("FK", b => b
-                        .AddKeyPath(typeof(OrderItem), "OrderId")
-                        .AddKeyPath(typeof(OrderItem), "LineItemNumber"))
-                ));
+                .WithPrincipalEnd<Order>()
+                .WithDependentEnd<OrderItem>();
         }
     }
 
@@ -396,14 +391,14 @@ public static class Dummy
             .WithOptions(o => o
                 .UseDefaultOnNullKeyPart()
                 .ThrowOnNullKeyPart())
-            .AddScalar(typeof(EmailAddress), x => x
+            .AddScalar<EmailAddress>(x => x
                 .WithName("EmailAddress"))
                 .AddSchemaExtension(new VisibleMetadata { Visible = true })
-            .AddObject(typeof(Country), x => x
+            .AddObject<Country>(x => x
                 .WithName("Country")
                 .AddKeyType("PrimaryKey", b => b
                     .AddKeyPath(typeof(Country), "Code")))
-            .AddObject(typeof(Customer), x => x
+            .AddObject<Customer>(x => x
                 .WithName("Customer")
                 .WithOptions(o => o
                     .ThrowOnNullKeyPart())
@@ -415,7 +410,7 @@ public static class Dummy
                     .AddKeyPath(typeof(Customer), "Id"))
                 .AddKeyType("AlternateKey", b => b
                     .AddKeyPath(typeof(Customer), "Country", "Code")))
-            .AddObject(typeof(Order), x => x
+            .AddObject<Order>(x => x
                 .WithName("Order")
                 .WithDefaultOptions()
                 .AddProperty("Id", "Id", p => p.WithModifiers(m => m.Required()))
@@ -423,7 +418,7 @@ public static class Dummy
                 .AddProperty("Total", "Total", p => p.WithModifiers(m => m.Required()))
                 .AddProperty("CustomerId", "CustomerId", p => p.WithModifiers(m => m.Optional()))
                 .AddProperty("Customer", "Customer", p => p.WithModifiers(m => m.Optional())))
-            .AddObject(typeof(OrderItem), x => x
+            .AddObject<OrderItem>(x => x
                 .WithName("OrderItem")
                 .WithDefaultOptions()
                 .AddProperty("OrderId", "OrderId", p => p.WithModifiers(m => m.Required()))
@@ -437,34 +432,34 @@ public static class Dummy
                 .AddKeyType("AlternateKey", b => b
                     .AddKeyPath(typeof(Order), ["Id"], p => p.AddKeyPathExtension(new VisibleMetadata { Visible = true }))
                     .AddKeyPath(typeof(OrderItem), "LineItemNumber")))
-            .AddEnum(typeof(OrderStatus), x => x
+            .AddEnum<OrderStatus>(x => x
                 .AddEnumTypeExtension(new VisibleMetadata { Visible = true })
                 .WithName("OrderStatus")
                 .AddValue("Pending", "Pending", 0)
                 .AddValue("Shipped", "Shipped", 1)
                 .AddValue("Delivered", "Delivered", 2)
                 .AddValue("Cancelled", "Cancelled", 3))
-            .AddScalar(typeof(EmailAddress), new EmailAddressConfiguration())
-            .AddEnum(typeof(OrderStatus), new OrderStatusConfiguration())
+            .AddScalar<EmailAddress>(new EmailAddressConfiguration())
+            .AddEnum<OrderStatus>(new OrderStatusConfiguration())
             .AddObject(typeof(Order), new OrderConfiguration())
-            .AddObject(typeof(CustomerProfile), x => x
+            .AddObject<CustomerProfile>(x => x
                 .WithName("CustomerProfile")
                 .AddProperty("Biography", "Biography", p => p.WithModifiers(m => m.Required()))
                 .AddKeyType("PrimaryKey", b => b
                     .AddKeyPath(typeof(CustomerProfile), "CustomerRef", "CustomerId")))
-            .AddObject(typeof(Product), x => x
+            .AddObject<Product>(x => x
                 .WithName("Product")
                 .AddProperty("Id", "Id", p => p.WithModifiers(m => m.Required()))
                 .AddProperty("Name", "Name", p => p.WithModifiers(m => m.Required()))
                 .AddKeyType("PrimaryKey", b => b
                     .AddKeyPath(typeof(Product), "Id")))
-            .AddObject(typeof(Tag), x => x
+            .AddObject<Tag>(x => x
                 .WithName("Tag")
                 .AddProperty("Id", "Id", p => p.WithModifiers(m => m.Required()))
                 .AddProperty("Name", "Name", p => p.WithModifiers(m => m.Required()))
                 .AddKeyType("PrimaryKey", b => b
                     .AddKeyPath(typeof(Tag), "Id")))
-            .AddObject(typeof(ProductTag), x => x
+            .AddObject<ProductTag>(x => x
                 .WithName("ProductTag")
                 .AddProperty("ProductId", "ProductId", p => p.WithModifiers(m => m.Required()))
                 .AddProperty("TagId", "TagId", p => p.WithModifiers(m => m.Required()))
@@ -555,9 +550,9 @@ public static class Dummy
         var schema = new ApiSchemaBuilder()
             .WithName("CustomerOrdersAPI")
             .WithVersion("v1")
-            .AddScalar(typeof(EmailAddress), x => x.WithName("EmailAddress"))
-            .AddScalar(typeof(EmailAddress))
-            .AddEnum(typeof(OrderStatus), x => x
+            .AddScalar<EmailAddress>(x => x.WithName("EmailAddress"))
+            .AddScalar<EmailAddress>()
+            .AddEnum<OrderStatus>(x => x
                 .WithName("OrderStatus")
                 .AddValue("Pending", "Pending", 0)
                 .AddValue("Shipped", "Shipped", 1)

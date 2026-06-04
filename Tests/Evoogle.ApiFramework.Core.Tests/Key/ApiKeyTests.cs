@@ -174,14 +174,14 @@ public partial class ApiKeyTests(ITestOutputHelper output) : XUnitTests(output)
 
             if (partCollection is not null)
             {
-                var apiId = new ApiKey
+                var apiKey = new ApiKey
                 (
                     ApiKeyKind.Composite,
                     default,
                     partCollection,
                     ApiKey.ToCompositeString(partCollection)
                 );
-                return apiId;
+                return apiKey;
             }
 
             throw new InvalidOperationException($"Unsupported factory {this.Factory}.");

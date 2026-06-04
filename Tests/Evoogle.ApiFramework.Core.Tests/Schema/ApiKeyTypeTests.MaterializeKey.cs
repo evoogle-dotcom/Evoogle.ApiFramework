@@ -1,13 +1,17 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Linq.Expressions;
+using System.Text.Json.Serialization;
+
 using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Key;
 using Evoogle.ApiFramework.TestData;
 using Evoogle.Extensions;
 using Evoogle.XUnit;
+using Evoogle.XUnit.Json;
 
 using FluentAssertions;
 
@@ -15,12 +19,14 @@ namespace Evoogle.ApiFramework.Schema;
 
 public partial class ApiKeyTypeTests
 {
-    #region Test Types
+    #region Test Fields
     private static readonly IReadOnlyDictionary<string, ApiKeyPartNameBuildDelegate> _customPartNameBuilders = new Dictionary<string, ApiKeyPartNameBuildDelegate>
     {
         ["Custom"] = static c => $"{c.ApiKeyType.ApiName}[{c.PartIndex}]"
     };
+    #endregion
 
+    #region Test Types
     private class MaterializeKeyFromInstanceTest : XUnitTest
     {
         #region User Supplied Properties
@@ -127,148 +133,103 @@ public partial class ApiKeyTypeTests
         #endregion
     }
 
-    // private class BuildValueFromValuesTest : XUnitTest
-    // {
-    //     #region User Supplied Properties
-    //     public required string ApiObjectTypeName { get; init; }
-    //     public string? ApiIdentityName { get; init; }
-    //     public required IReadOnlyDictionary<string, object?> Values { get; init; }
-    //     public IReadOnlyDictionary<string, object?>? OwnerValues { get; init; }
-    //     public ApiIdentityPartNullHandling NullHandling { get; init; }
-    //     public ApiIdentityValue? ExpectedValue { get; init; }
-    //     public Type? ExpectedExceptionType { get; init; }
-    //     #endregion
+    private class MaterializeKeyFromValuesTest : XUnitTest
+    {
+        #region User Supplied Properties
+        public required string ApiObjectTypeName { get; init; }
+        public string? ApiKeyTypeName { get; init; }
 
-    //     #region Calculated Properties
-    //     private ApiIdentity? ApiIdentity { get; set; }
-    //     private ApiIdentityValue? ActualValue { get; set; }
-    //     private Type? ActualExceptionType { get; set; }
-    //     #endregion
+        [JsonConverter(typeof(ExpressionActionJsonConverter<ApiKeyMaterializationContext>))]
+        public required Expression<Action<ApiKeyMaterializationContext>> ConfigureValuesExpression { get; init; }
 
-    //     #region XUnitTest Methods
-    //     protected override void Arrange()
-    //     {
-    //         this.ApiIdentity = this.ApiIdentityName is not null
-    //             ? GetIdentityByName(this.ApiObjectTypeName, this.ApiIdentityName)
-    //             : GetPrimaryIdentity(this.ApiObjectTypeName);
+        public ApiKeyNullHandling NullHandling { get; init; }
+        public ApiKeyPartNameBuilder? PartNameBuilder { get; init; }
+        public string? CustomPartNameBuilderName { get; init; }
+        public ApiKey? ExpectedValue { get; init; }
+        public Type? ExpectedExceptionType { get; init; }
+        #endregion
 
-    //         static string FormatValue(object? value) =>
-    //             value is IReadOnlyDictionary<string, object?> nested
-    //                 ? $"{{{string.Join(',', nested.Select(kvp => $"{kvp.Key}={FormatValue(kvp.Value)}"))}}}"
-    //                 : value.SafeToString();
+        #region Calculated Properties
+        private ApiKeyType? ApiKeyType { get; set; }
+        private ApiKeyPartNameBuildDelegate? CustomPartNameBuilder { get; set; }
+        private ApiKey? ActualValue { get; set; }
+        private Type? ActualExceptionType { get; set; }
+        #endregion
 
-    //         var valuesDisplay = this.Values is not null
-    //             ? $"[{string.Join(',', this.Values.Select(kvp => $"{kvp.Key.SafeToString()}={FormatValue(kvp.Value)}"))}]"
-    //             : "<null>";
+        #region XUnitTest Methods
+        protected override void Arrange()
+        {
+            this.ApiKeyType = this.ApiKeyTypeName is not null
+                ? GetKeyTypeByName(this.ApiObjectTypeName, this.ApiKeyTypeName)
+                : GetPrimaryKeyType(this.ApiObjectTypeName);
 
-    //         var ownerValuesDisplay = this.OwnerValues is not null
-    //             ? $"[{string.Join(',', this.OwnerValues.Select(kvp => $"{kvp.Key.SafeToString()}={FormatValue(kvp.Value)}"))}]"
-    //             : "<null>";
+            if (this.CustomPartNameBuilderName is not null)
+            {
+                if (!_customPartNameBuilders.TryGetValue(this.CustomPartNameBuilderName, out var builder))
+                {
+                    throw new InvalidOperationException($"Custom part name builder with name '{this.CustomPartNameBuilderName}' not found.");
+                }
 
-    //         this.WriteLine($"ApiObjectType: {this.ApiObjectTypeName.SafeToString()}");
-    //         this.WriteLine($"ApiIdentity:   {this.ApiIdentity.ApiName.SafeToString()}");
-    //         this.WriteLine($"Values:        {valuesDisplay}");
-    //         this.WriteLine($"OwnerValues:   {ownerValuesDisplay}");
-    //         this.WriteLine($"NullHandling:  {this.NullHandling.SafeToString()}");
-    //         this.WriteLine();
+                this.CustomPartNameBuilder = builder;
+            }
 
-    //         if (this.ExpectedValue is not null)
-    //         {
-    //             this.WriteLine($"Expected Value: {this.ExpectedValue.SafeToString()}");
-    //         }
-    //         else if (this.ExpectedExceptionType is not null)
-    //         {
-    //             this.WriteLine($"Expected Exception: {this.ExpectedExceptionType.SafeToName()}");
-    //         }
-    //     }
+            this.WriteLine($"ApiObjectType:   {this.ApiObjectTypeName.SafeToString()}");
+            this.WriteLine($"ApiKeyType:      {this.ApiKeyType?.ApiName.SafeToString()}");
+            this.WriteLine($"NullHandling:    {this.NullHandling.SafeToString()}");
+            this.WriteLine($"PartNameBuilder: {this.PartNameBuilder.SafeToString()}");
+            this.WriteLine($"CustomBuilder:   {this.CustomPartNameBuilderName.SafeToString()}");
+            this.WriteLine();
 
-    //     protected override void Act()
-    //     {
-    //         try
-    //         {
-    //             var context = new ApiIdentityValueBuildFromValuesContext
-    //             {
-    //                 Values = this.Values,
-    //                 OwnerValues = this.OwnerValues,
-    //                 NullHandling = this.NullHandling
-    //             };
-    //             this.ActualValue = this.ApiIdentity!.BuildValue(context);
-    //             this.WriteLine($"Actual Value:   {this.ActualValue.SafeToString()}");
-    //         }
-    //         catch (Exception ex)
-    //         {
-    //             this.ActualExceptionType = ex.GetType();
-    //             this.WriteLine($"Actual Exception:   {this.ActualExceptionType.SafeToName()} - {ex.Message}");
-    //         }
-    //     }
+            if (this.ExpectedValue is not null)
+            {
+                this.WriteLine($"Expected Value: {this.ExpectedValue.SafeToString()}");
+            }
+            else if (this.ExpectedExceptionType is not null)
+            {
+                this.WriteLine($"Expected Exception: {this.ExpectedExceptionType.SafeToName()}");
+            }
+        }
 
-    //     protected override void Assert()
-    //     {
-    //         if (this.ExpectedValue is not null)
-    //         {
-    //             this.ActualExceptionType.Should().BeNull();
-    //             this.ActualValue.Should().NotBeNull();
-    //             this.ActualValue.Should().BeEquivalentTo(this.ExpectedValue, options => options
-    //                 .Excluding(ctx => ctx.Path.EndsWith(nameof(ApiIdentityValue.ApiScalarValue), StringComparison.Ordinal))
-    //                 .Excluding(ctx => ctx.Path.EndsWith(nameof(ApiIdentityValue.ApiObjectValue), StringComparison.Ordinal)));
-    //         }
-    //         else if (this.ExpectedExceptionType is not null)
-    //         {
-    //             this.ActualExceptionType.Should().NotBeNull();
-    //             this.ActualExceptionType.Should().Be(this.ExpectedExceptionType);
-    //         }
-    //     }
-    //     #endregion
-    // }
+        protected override void Act()
+        {
+            try
+            {
+                var context = new ApiKeyMaterializationContext
+                {
+                    NullHandling = this.NullHandling,
+                    PartNameBuilder = this.PartNameBuilder.GetValueOrDefault(ApiKeyPartNameBuilder.None),
+                    CustomPartNameBuilder = this.CustomPartNameBuilder
+                };
 
-    // private class BuildValueNullContextTest : XUnitTest
-    // {
-    //     #region User Supplied Properties
-    //     public required string ApiObjectTypeName { get; init; }
-    //     public required bool UseInstanceOverload { get; init; }
-    //     #endregion
+                this.ConfigureValuesExpression.Compile()(context);
 
-    //     #region Calculated Properties
-    //     private ApiIdentity? ApiIdentity { get; set; }
-    //     private Type? ActualExceptionType { get; set; }
-    //     #endregion
+                this.ActualValue = this.ApiKeyType!.MaterializeKeyFromValues(context);
+                this.WriteLine($"Actual Value:   {this.ActualValue.SafeToString()}");
+            }
+            catch (Exception ex)
+            {
+                this.ActualExceptionType = ex.GetType();
+                this.WriteLine($"Actual Exception:   {this.ActualExceptionType.SafeToName()} - {ex.Message}");
+            }
+        }
 
-    //     #region XUnitTest Methods
-    //     protected override void Arrange()
-    //     {
-    //         this.ApiIdentity = GetPrimaryIdentity(this.ApiObjectTypeName);
-
-    //         this.WriteLine($"ApiObjectType:       {this.ApiObjectTypeName.SafeToString()}");
-    //         this.WriteLine($"UseInstanceOverload: {this.UseInstanceOverload}");
-    //     }
-
-    //     protected override void Act()
-    //     {
-    //         try
-    //         {
-    //             if (this.UseInstanceOverload)
-    //             {
-    //                 this.ApiIdentity!.BuildValue((ApiIdentityValueBuildContext)null!);
-    //             }
-    //             else
-    //             {
-    //                 this.ApiIdentity!.BuildValue((ApiIdentityValueBuildFromValuesContext)null!);
-    //             }
-    //         }
-    //         catch (Exception ex)
-    //         {
-    //             this.ActualExceptionType = ex.GetType();
-    //             this.WriteLine($"Actual Exception: {this.ActualExceptionType.SafeToName()}");
-    //         }
-    //     }
-
-    //     protected override void Assert()
-    //     {
-    //         this.ActualExceptionType.Should().NotBeNull();
-    //         this.ActualExceptionType.Should().Be(typeof(ArgumentNullException));
-    //     }
-    //     #endregion
-    // }
+        protected override void Assert()
+        {
+            if (this.ExpectedValue is not null)
+            {
+                this.ActualExceptionType.Should().BeNull();
+                this.ActualValue.Should().NotBeNull();
+                this.ActualValue.Should().BeEquivalentTo(this.ExpectedValue);
+            }
+            else if (this.ExpectedExceptionType is not null)
+            {
+                this.ActualExceptionType.Should().NotBeNull();
+                this.ActualExceptionType.Should().Be(this.ExpectedExceptionType);
+                this.ActualValue.Should().BeNull();
+            }
+        }
+        #endregion
+    }
     #endregion
 
     #region MaterializeKeyFromInstance Theory Data
@@ -627,284 +588,182 @@ public partial class ApiKeyTypeTests
             NullHandling = ApiKeyNullHandling.ThrowOnNull,
             ExpectedExceptionType = typeof(ApiKeyException)
         },
-
-        // // Composite key — custom part names
-        // new MaterializeKeyFromInstanceTest
-        // {
-        //     Name = $"{TwoPartInstance} with custom part names",
-        //     ApiObjectTypeName = nameof(KeyTwoScalarPartComposite),
-        //     SelfObject = TwoPartInstance,
-        //     PartNameBuilder = static c => $"{c.ApiKeyType.ApiName}[{c.PartIndex}]",
-        //     ExpectedValue = ApiKey.Composite
-        //     (
-        //         ApiKeyPart.Create("PK_KeyTwoScalarPartComposite[0]", ApiKey.FromInt32(TwoPartInstance.Id1)),
-        //         ApiKeyPart.Create("PK_KeyTwoScalarPartComposite[1]", ApiKey.FromString(TwoPartInstance.Id2!))
-        //     )
-        // },
-
     ];
     #endregion
 
-    #region BuildValueFromValues Theory Data
-    // public static TheoryDataRow<IXUnitTest>[] BuildValueFromValuesTheoryData =>
-    // [
-    //     // Scalar key from dictionary (int)
-    //     new BuildValueFromValuesTest
-    //     {
-    //         Name = $"{nameof(KeyOneScalarPart)} with primary key",
-    //         ApiObjectTypeName = nameof(KeyOneScalarPart),
-    //         ApiIdentityName = "PK_IdentityScalar",
-    //         Values = new Dictionary<string, object?> { ["Id"] = 42 },
-    //         ExpectedValue = ApiIdentityValue.Composite(
-    //         [
-    //             new ApiIdentityScalarPartValue("Id", ApiId.FromInt32(42))
-    //         ])
-    //     },
+    #region MaterializeKeyFromValues Theory Data
+    public static TheoryDataRow<IXUnitTest>[] MaterializeKeyFromValuesTheoryData =>
+    [
+        new MaterializeKeyFromValuesTest
+        {
+            Name = $"{nameof(KeyOneScalarPart)} values with primary scalar key (int) and CLR path only name builder",
+            ApiObjectTypeName = nameof(KeyOneScalarPart),
+            ApiKeyTypeName = "PK_KeyOneScalarPart",
+            ConfigureValuesExpression = static a => ApiKeyTypeMaterializeKeyFromValuesTestFactory.ConfigureTextIntTerminalScalar(a),
+            PartNameBuilder = ApiKeyPartNameBuilder.ClrPathOnly,
+            ExpectedValue = ApiKey.Composite(ApiKeyPart.Create(nameof(KeyOneScalarPart.Id), ApiKey.FromInt32(1234)))
+        },
 
-    //     // Alternate key from dictionary (string)
-    //     new BuildValueFromValuesTest
-    //     {
-    //         Name = $"{nameof(KeyOneScalarPart)} with alternate key",
-    //         ApiObjectTypeName = nameof(KeyOneScalarPart),
-    //         ApiIdentityName = "AK_IdentityScalar",
-    //         Values = new Dictionary<string, object?> { ["Name"] = "TestName" },
-    //         ExpectedValue = ApiIdentityValue.Composite(
-    //         [
-    //             new ApiIdentityScalarPartValue("Name", ApiId.FromString("TestName"))
-    //         ])
-    //     },
+        new MaterializeKeyFromValuesTest
+        {
+            Name = $"{nameof(KeyOneScalarPart)} values with alternate scalar key (string) and CLR path only name builder",
+            ApiObjectTypeName = nameof(KeyOneScalarPart),
+            ApiKeyTypeName = "AK_KeyOneScalarPart",
+            ConfigureValuesExpression = static a => ApiKeyTypeMaterializeKeyFromValuesTestFactory.ConfigureTextStringTerminalScalar(a),
+            PartNameBuilder = ApiKeyPartNameBuilder.ClrPathOnly,
+            ExpectedValue = ApiKey.Composite(ApiKeyPart.Create(nameof(KeyOneScalarPart.Name), ApiKey.FromString("1234")))
+        },
 
-    //     // Composite key from dictionary — two parts
-    //     new BuildValueFromValuesTest
-    //     {
-    //         Name = $"{nameof(KeyTwoScalarPartComposite)}",
-    //         ApiObjectTypeName = nameof(KeyTwoScalarPartComposite),
-    //         Values = new Dictionary<string, object?> { ["Id1"] = 1, ["Id2"] = "abc" },
-    //         ExpectedValue = ApiIdentityValue.Composite(
-    //         [
-    //             new ApiIdentityScalarPartValue("Id1", ApiId.FromInt32(1)),
-    //             new ApiIdentityScalarPartValue("Id2", ApiId.FromString("abc"))
-    //         ])
-    //     },
+        new MaterializeKeyFromValuesTest
+        {
+            Name = $"{nameof(KeyTwoScalarPartComposite)} values with primary composite key (int + string) and CLR path only name builder",
+            ApiObjectTypeName = nameof(KeyTwoScalarPartComposite),
+            ConfigureValuesExpression = static a => ApiKeyTypeMaterializeKeyFromValuesTestFactory.ConfigureCompositeApiKeyValues(a),
+            PartNameBuilder = ApiKeyPartNameBuilder.ClrPathOnly,
+            ExpectedValue = ApiKey.Composite
+            (
+                ApiKeyPart.Create(nameof(KeyTwoScalarPartComposite.Id1), ApiKey.FromInt32(KeyTwoScalarPartCompositeInstance.Id1)),
+                ApiKeyPart.Create(nameof(KeyTwoScalarPartComposite.Id2), ApiKey.FromString(KeyTwoScalarPartCompositeInstance.Id2!))
+            )
+        },
 
-    //     // Composite key from dictionary — three parts
-    //     new BuildValueFromValuesTest
-    //     {
-    //         Name = $"{nameof(KeyThreeScalarPartComposite)}",
-    //         ApiObjectTypeName = nameof(KeyThreeScalarPartComposite),
-    //         Values = new Dictionary<string, object?>
-    //         {
-    //             ["Id1"] = 10,
-    //             ["Id2"] = "xyz",
-    //             ["Id3"] = Guid.Parse("11111111-1111-1111-1111-111111111111")
-    //         },
-    //         ExpectedValue = ApiIdentityValue.Composite(
-    //         [
-    //             new ApiIdentityScalarPartValue("Id1", ApiId.FromInt32(10)),
-    //             new ApiIdentityScalarPartValue("Id2", ApiId.FromString("xyz")),
-    //             new ApiIdentityScalarPartValue("Id3", ApiId.FromGuid(Guid.Parse("11111111-1111-1111-1111-111111111111")))
-    //         ])
-    //     },
+        new MaterializeKeyFromValuesTest
+        {
+            Name = $"{nameof(KeyThreeScalarPartComposite)} values with primary composite key (int + string + Guid) and CLR path only name builder",
+            ApiObjectTypeName = nameof(KeyThreeScalarPartComposite),
+            ConfigureValuesExpression = static a => ApiKeyTypeMaterializeKeyFromValuesTestFactory.ConfigureTypedConvenienceValues(a),
+            PartNameBuilder = ApiKeyPartNameBuilder.ClrPathOnly,
+            ExpectedValue = ApiKey.Composite
+            (
+                ApiKeyPart.Create(nameof(KeyThreeScalarPartComposite.Id1), ApiKey.FromInt32(KeyThreeScalarPartCompositeInstance.Id1)),
+                ApiKeyPart.Create(nameof(KeyThreeScalarPartComposite.Id2), ApiKey.FromString(KeyThreeScalarPartCompositeInstance.Id2!)),
+                ApiKeyPart.Create(nameof(KeyThreeScalarPartComposite.Id3), ApiKey.FromGuid(KeyThreeScalarPartCompositeInstance.Id3))
+            )
+        },
 
-    //     // Nested key from dictionary — nested dict
-    //     new BuildValueFromValuesTest
-    //     {
-    //         Name = $"{nameof(KeyNestedComposite)} with nested dictionary",
-    //         ApiObjectTypeName = nameof(KeyNestedComposite),
-    //         Values = new Dictionary<string, object?>
-    //         {
-    //             ["NestedPart"] = new Dictionary<string, object?> { ["Id"] = 5 },
-    //             ["Name"] = "Nested"
-    //         },
-    //         ExpectedValue = ApiIdentityValue.Composite(
-    //         [
-    //             new ApiIdentityObjectPartValue("NestedPart",
-    //                 ApiIdentityValue.Composite(
-    //                 [
-    //                     new ApiIdentityScalarPartValue("Id", ApiId.FromInt32(5))
-    //                 ])),
-    //             new ApiIdentityScalarPartValue("Name", ApiId.FromString("Nested"))
-    //         ])
-    //     },
+        new MaterializeKeyFromValuesTest
+        {
+            Name = $"{nameof(KeyNestedComposite)} values with primary composite key (int + string) and CLR path only name builder",
+            ApiObjectTypeName = nameof(KeyNestedComposite),
+            ConfigureValuesExpression = static a => ApiKeyTypeMaterializeKeyFromValuesTestFactory.ConfigureNestedClrPathValues(a),
+            PartNameBuilder = ApiKeyPartNameBuilder.ClrPathOnly,
+            ExpectedValue = ApiKey.Composite
+            (
+                ApiKeyPart.Create(nameof(KeyNestedComposite.NestedPart) + "." + nameof(KeyNested.Id), ApiKey.FromInt32(KeyNestedCompositeInstance.NestedPart.Id)),
+                ApiKeyPart.Create(nameof(KeyNestedComposite.Name), ApiKey.FromString(KeyNestedCompositeInstance.Name))
+            )
+        },
 
-    //     // Nested key from dictionary — CLR object fallback
-    //     new BuildValueFromValuesTest
-    //     {
-    //         Name = $"{nameof(KeyNestedComposite)} with CLR instance fallback",
-    //         ApiObjectTypeName = nameof(KeyNestedComposite),
-    //         Values = new Dictionary<string, object?>
-    //         {
-    //             ["NestedPart"] = NestedPartInstance,
-    //             ["Name"] = "Nested"
-    //         },
-    //         ExpectedValue = ApiIdentityValue.Composite(
-    //         [
-    //             new ApiIdentityObjectPartValue("NestedPart",
-    //                 ApiIdentityValue.Composite(
-    //                 [
-    //                     new ApiIdentityScalarPartValue("Id", ApiId.FromInt32(5))
-    //                 ])),
-    //             new ApiIdentityScalarPartValue("Name", ApiId.FromString("Nested"))
-    //         ])
-    //     },
+        new MaterializeKeyFromValuesTest
+        {
+            Name = $"{nameof(KeyOwnedComposite)} values with primary composite key (int + int) and CLR root and path name builder",
+            ApiObjectTypeName = nameof(KeyOwnedComposite),
+            ConfigureValuesExpression = static a => ApiKeyTypeMaterializeKeyFromValuesTestFactory.ConfigureOwnerAndDependentRootValues(a),
+            PartNameBuilder = ApiKeyPartNameBuilder.ClrRootAndPath,
+            ExpectedValue = ApiKey.Composite
+            (
+                ApiKeyPart.Create(nameof(KeyOwner) + "." + nameof(KeyOwner.Id), ApiKey.FromInt32(KeyOwnerInstance.Id)),
+                ApiKeyPart.Create(nameof(KeyOwnedComposite) + "." + nameof(KeyOwnedComposite.LineNumber), ApiKey.FromInt32(KeyOwnedCompositeInstance.LineNumber))
+            )
+        },
 
-    //     // Owner key from dictionary — with owner values
-    //     new BuildValueFromValuesTest
-    //     {
-    //         Name = $"{nameof(KeyOwnedComposite)}",
-    //         ApiObjectTypeName = nameof(KeyOwnedComposite),
-    //         Values = new Dictionary<string, object?> { ["LineNumber"] = 3 },
-    //         OwnerValues = new Dictionary<string, object?> { ["Id"] = 99 },
-    //         ExpectedValue = ApiIdentityValue.Composite(
-    //         [
-    //             new ApiIdentityObjectPartValue("IdentityOwner",
-    //                 ApiIdentityValue.Composite(
-    //                 [
-    //                     new ApiIdentityScalarPartValue("Id", ApiId.FromInt32(99))
-    //                 ])),
-    //             new ApiIdentityScalarPartValue("LineNumber", ApiId.FromInt32(3))
-    //         ])
-    //     },
+        new MaterializeKeyFromValuesTest
+        {
+            Name = $"{nameof(KeyOwnedDependent)} values with primary scalar key (int) and CLR path only name builder",
+            ApiObjectTypeName = nameof(KeyOwnedDependent),
+            ConfigureValuesExpression = static a => ApiKeyTypeMaterializeKeyFromValuesTestFactory.ConfigureOwnerOnlyDependentKey(a),
+            PartNameBuilder = ApiKeyPartNameBuilder.ClrPathOnly,
+            ExpectedValue = ApiKey.Composite(ApiKeyPart.Create(nameof(KeyOwner.Id), ApiKey.FromInt32(KeyOwnerInstance.Id)))
+        },
 
-    //     // Owner-only key from dictionary
-    //     new BuildValueFromValuesTest
-    //     {
-    //         Name = $"{nameof(KeyOwnedDependent)}",
-    //         ApiObjectTypeName = nameof(KeyOwnedDependent),
-    //         Values = new Dictionary<string, object?>(),
-    //         OwnerValues = new Dictionary<string, object?> { ["Id"] = 99 },
-    //         ExpectedValue = ApiIdentityValue.Composite(
-    //         [
-    //             new ApiIdentityObjectPartValue("IdentityOwner",
-    //                 ApiIdentityValue.Composite(
-    //                 [
-    //                     new ApiIdentityScalarPartValue("Id", ApiId.FromInt32(99))
-    //                 ]))
-    //         ])
-    //     },
+        new MaterializeKeyFromValuesTest
+        {
+            Name = $"{nameof(KeyTwoScalarPartComposite)} values with primary composite key (int + string) and custom name builder",
+            ApiObjectTypeName = nameof(KeyTwoScalarPartComposite),
+            ConfigureValuesExpression = static a => ApiKeyTypeMaterializeKeyFromValuesTestFactory.ConfigureCustomPartNameBuilderValues(a),
+            CustomPartNameBuilderName = "Custom",
+            ExpectedValue = ApiKey.Composite
+            (
+                ApiKeyPart.Create("PK_KeyTwoScalarPartComposite[0]", ApiKey.FromInt32(KeyTwoScalarPartCompositeInstance.Id1)),
+                ApiKeyPart.Create("PK_KeyTwoScalarPartComposite[1]", ApiKey.FromString(KeyTwoScalarPartCompositeInstance.Id2!))
+            )
+        },
 
-    //     // Null handling — UseDefaultOnNull: missing key in dictionary
-    //     new BuildValueFromValuesTest
-    //     {
-    //         Name = $"Missing key in dictionary returns empty with {ApiIdentityPartNullHandling.UseDefaultOnNull}",
-    //         ApiObjectTypeName = nameof(KeyTwoScalarPartComposite),
-    //         Values = new Dictionary<string, object?> { ["Id1"] = 1 },
-    //         NullHandling = ApiIdentityPartNullHandling.UseDefaultOnNull,
-    //         ExpectedValue = ApiIdentityValue.Composite(
-    //         [
-    //             new ApiIdentityScalarPartValue("Id1", ApiId.FromInt32(1)),
-    //             new ApiIdentityScalarPartValue("Id2", ApiId.Empty)
-    //         ])
-    //     },
+        new MaterializeKeyFromValuesTest
+        {
+            Name = $"{nameof(KeyTwoScalarPartComposite)} values return empty key part when {nameof(ApiKeyNullHandling)}={ApiKeyNullHandling.UseDefaultOnNull}",
+            ApiObjectTypeName = nameof(KeyTwoScalarPartComposite),
+            ConfigureValuesExpression = static a => ApiKeyTypeMaterializeKeyFromValuesTestFactory.ConfigureMissingCompositeValue(a),
+            NullHandling = ApiKeyNullHandling.UseDefaultOnNull,
+            PartNameBuilder = ApiKeyPartNameBuilder.ClrPathOnly,
+            ExpectedValue = ApiKey.Composite
+            (
+                ApiKeyPart.Create(nameof(KeyTwoScalarPartComposite.Id1), ApiKey.FromInt32(KeyTwoScalarPartCompositeInstance.Id1)),
+                ApiKeyPart.Create(nameof(KeyTwoScalarPartComposite.Id2), ApiKey.Empty)
+            )
+        },
 
-    //     // Null handling — UseDefaultOnNull: null value in dictionary
-    //     new BuildValueFromValuesTest
-    //     {
-    //         Name = $"Null value in dictionary returns empty with {ApiIdentityPartNullHandling.UseDefaultOnNull}",
-    //         ApiObjectTypeName = nameof(KeyTwoScalarPartComposite),
-    //         Values = new Dictionary<string, object?> { ["Id1"] = 1, ["Id2"] = null },
-    //         NullHandling = ApiIdentityPartNullHandling.UseDefaultOnNull,
-    //         ExpectedValue = ApiIdentityValue.Composite(
-    //         [
-    //             new ApiIdentityScalarPartValue("Id1", ApiId.FromInt32(1)),
-    //             new ApiIdentityScalarPartValue("Id2", ApiId.Empty)
-    //         ])
-    //     },
+        new MaterializeKeyFromValuesTest
+        {
+            Name = $"{nameof(KeyOneScalarPart)} values return empty key part when text is null and {nameof(ApiKeyNullHandling)}={ApiKeyNullHandling.UseDefaultOnNull}",
+            ApiObjectTypeName = nameof(KeyOneScalarPart),
+            ApiKeyTypeName = "PK_KeyOneScalarPart",
+            ConfigureValuesExpression = static a => ApiKeyTypeMaterializeKeyFromValuesTestFactory.ConfigureNullText(a),
+            NullHandling = ApiKeyNullHandling.UseDefaultOnNull,
+            PartNameBuilder = ApiKeyPartNameBuilder.ClrPathOnly,
+            ExpectedValue = ApiKey.Composite(ApiKeyPart.Create(nameof(KeyOneScalarPart.Id), ApiKey.Empty))
+        },
 
-    //     // Null handling — UseDefaultOnNull: null nested value
-    //     new BuildValueFromValuesTest
-    //     {
-    //         Name = $"Null nested value in dictionary returns skeleton with {ApiIdentityPartNullHandling.UseDefaultOnNull}",
-    //         ApiObjectTypeName = nameof(KeyNestedComposite),
-    //         Values = new Dictionary<string, object?> { ["NestedPart"] = null, ["Name"] = "NoNested" },
-    //         NullHandling = ApiIdentityPartNullHandling.UseDefaultOnNull,
-    //         ExpectedValue = ApiIdentityValue.Composite(
-    //         [
-    //             new ApiIdentityObjectPartValue("NestedPart", apiObjectValue: null, apiStructure:
-    //             [
-    //                 new ApiIdentityScalarPartValue("Id", ApiId.Empty)
-    //             ]),
-    //             new ApiIdentityScalarPartValue("Name", ApiId.FromString("NoNested"))
-    //         ])
-    //     },
+        new MaterializeKeyFromValuesTest
+        {
+            Name = $"{nameof(KeyOneScalarPart)} values return empty key part when text is whitespace and {nameof(ApiKeyNullHandling)}={ApiKeyNullHandling.UseDefaultOnNull}",
+            ApiObjectTypeName = nameof(KeyOneScalarPart),
+            ApiKeyTypeName = "PK_KeyOneScalarPart",
+            ConfigureValuesExpression = static a => ApiKeyTypeMaterializeKeyFromValuesTestFactory.ConfigureWhitespaceText(a),
+            NullHandling = ApiKeyNullHandling.UseDefaultOnNull,
+            PartNameBuilder = ApiKeyPartNameBuilder.ClrPathOnly,
+            ExpectedValue = ApiKey.Composite(ApiKeyPart.Create(nameof(KeyOneScalarPart.Id), ApiKey.Empty))
+        },
 
-    //     // Null handling — UseDefaultOnNull: null owner values
-    //     new BuildValueFromValuesTest
-    //     {
-    //         Name = $"Null owner values returns skeleton with {ApiIdentityPartNullHandling.UseDefaultOnNull}",
-    //         ApiObjectTypeName = nameof(KeyOwnedComposite),
-    //         Values = new Dictionary<string, object?> { ["LineNumber"] = 3 },
-    //         OwnerValues = null,
-    //         NullHandling = ApiIdentityPartNullHandling.UseDefaultOnNull,
-    //         ExpectedValue = ApiIdentityValue.Composite(
-    //         [
-    //             new ApiIdentityObjectPartValue("IdentityOwner", apiObjectValue: null, apiStructure:
-    //             [
-    //                 new ApiIdentityScalarPartValue("Id", ApiId.Empty)
-    //             ]),
-    //             new ApiIdentityScalarPartValue("LineNumber", ApiId.FromInt32(3))
-    //         ])
-    //     },
+        new MaterializeKeyFromValuesTest
+        {
+            Name = $"{nameof(KeyOneScalarPart)} values return empty key part when ApiKey is empty and {nameof(ApiKeyNullHandling)}={ApiKeyNullHandling.UseDefaultOnNull}",
+            ApiObjectTypeName = nameof(KeyOneScalarPart),
+            ApiKeyTypeName = "PK_KeyOneScalarPart",
+            ConfigureValuesExpression = static a => ApiKeyTypeMaterializeKeyFromValuesTestFactory.ConfigureEmptyApiKey(a),
+            NullHandling = ApiKeyNullHandling.UseDefaultOnNull,
+            PartNameBuilder = ApiKeyPartNameBuilder.ClrPathOnly,
+            ExpectedValue = ApiKey.Composite(ApiKeyPart.Create(nameof(KeyOneScalarPart.Id), ApiKey.Empty))
+        },
 
-    //     // Null handling — ThrowOnNull: missing key
-    //     new BuildValueFromValuesTest
-    //     {
-    //         Name = $"Missing key in dictionary throws with {ApiIdentityPartNullHandling.ThrowOnNull}",
-    //         ApiObjectTypeName = nameof(KeyTwoScalarPartComposite),
-    //         Values = new Dictionary<string, object?> { ["Id1"] = 1 },
-    //         NullHandling = ApiIdentityPartNullHandling.ThrowOnNull,
-    //         ExpectedExceptionType = typeof(ApiIdentityException)
-    //     },
+        new MaterializeKeyFromValuesTest
+        {
+            Name = $"{nameof(KeyTwoScalarPartComposite)} values throw when {nameof(ApiKeyNullHandling)}={ApiKeyNullHandling.ThrowOnNull}",
+            ApiObjectTypeName = nameof(KeyTwoScalarPartComposite),
+            ConfigureValuesExpression = static a => ApiKeyTypeMaterializeKeyFromValuesTestFactory.ConfigureMissingCompositeValue(a),
+            NullHandling = ApiKeyNullHandling.ThrowOnNull,
+            ExpectedExceptionType = typeof(ApiKeyException)
+        },
 
-    //     // Null handling — ThrowOnNull: null value
-    //     new BuildValueFromValuesTest
-    //     {
-    //         Name = $"Null value in dictionary throws with {ApiIdentityPartNullHandling.ThrowOnNull}",
-    //         ApiObjectTypeName = nameof(KeyTwoScalarPartComposite),
-    //         Values = new Dictionary<string, object?> { ["Id1"] = 1, ["Id2"] = null },
-    //         NullHandling = ApiIdentityPartNullHandling.ThrowOnNull,
-    //         ExpectedExceptionType = typeof(ApiIdentityException)
-    //     },
+        new MaterializeKeyFromValuesTest
+        {
+            Name = $"{nameof(KeyOneScalarPart)} values throw when primary scalar key (int) text cannot parse",
+            ApiObjectTypeName = nameof(KeyOneScalarPart),
+            ApiKeyTypeName = "PK_KeyOneScalarPart",
+            ConfigureValuesExpression = static a => ApiKeyTypeMaterializeKeyFromValuesTestFactory.ConfigureInvalidTextParse(a),
+            NullHandling = ApiKeyNullHandling.UseDefaultOnNull,
+            ExpectedExceptionType = typeof(ApiKeyException)
+        },
 
-    //     // Null handling — ThrowOnNull: null nested value
-    //     new BuildValueFromValuesTest
-    //     {
-    //         Name = $"Null nested value in dictionary throws with {ApiIdentityPartNullHandling.ThrowOnNull}",
-    //         ApiObjectTypeName = nameof(KeyNestedComposite),
-    //         Values = new Dictionary<string, object?> { ["NestedPart"] = null, ["Name"] = "Nested" },
-    //         NullHandling = ApiIdentityPartNullHandling.ThrowOnNull,
-    //         ExpectedExceptionType = typeof(ApiIdentityException)
-    //     },
-
-    //     // Null handling — ThrowOnNull: null owner values
-    //     new BuildValueFromValuesTest
-    //     {
-    //         Name = $"Null owner values throws with {ApiIdentityPartNullHandling.ThrowOnNull}",
-    //         ApiObjectTypeName = nameof(KeyOwnedComposite),
-    //         Values = new Dictionary<string, object?> { ["LineNumber"] = 3 },
-    //         OwnerValues = null,
-    //         NullHandling = ApiIdentityPartNullHandling.ThrowOnNull,
-    //         ExpectedExceptionType = typeof(ApiIdentityException)
-    //     },
-    // ];
-    #endregion
-
-    #region BuildValueNullContext Theory Data
-    // public static TheoryDataRow<IXUnitTest>[] BuildValueNullContextTheoryData =>
-    // [
-    //     new BuildValueNullContextTest
-    //     {
-    //         Name = "Null context throws ArgumentNullException for instance overload",
-    //         ApiObjectTypeName = nameof(KeyOneScalarPart),
-    //         UseInstanceOverload = true
-    //     },
-    //     new BuildValueNullContextTest
-    //     {
-    //         Name = "Null context throws ArgumentNullException for values overload",
-    //         ApiObjectTypeName = nameof(KeyOneScalarPart),
-    //         UseInstanceOverload = false
-    //     },
-    // ];
+        new MaterializeKeyFromValuesTest
+        {
+            Name = $"{nameof(KeyOneScalarPart)} values throw when primary scalar key (int) value has mismatched ApiKey kind",
+            ApiObjectTypeName = nameof(KeyOneScalarPart),
+            ApiKeyTypeName = "PK_KeyOneScalarPart",
+            ConfigureValuesExpression = static a => ApiKeyTypeMaterializeKeyFromValuesTestFactory.ConfigureMismatchedApiKeyKind(a),
+            ExpectedExceptionType = typeof(ApiKeyException)
+        },
+    ];
     #endregion
 
     #region Test Methods
@@ -912,12 +771,8 @@ public partial class ApiKeyTypeTests
     [MemberData(nameof(MaterializeKeyFromInstanceTheoryData))]
     public void MaterializeKeyFromInstance(IXUnitTest test) => test.Execute(this);
 
-    // [Theory]
-    // [MemberData(nameof(BuildValueFromValuesTheoryData))]
-    // public void BuildValueFromValues(IXUnitTest test) => test.Execute(this);
-
-    // [Theory]
-    // [MemberData(nameof(BuildValueNullContextTheoryData))]
-    // public void BuildValueNullContext(IXUnitTest test) => test.Execute(this);
+    [Theory]
+    [MemberData(nameof(MaterializeKeyFromValuesTheoryData))]
+    public void MaterializeKeyFromValues(IXUnitTest test) => test.Execute(this);
     #endregion
 }

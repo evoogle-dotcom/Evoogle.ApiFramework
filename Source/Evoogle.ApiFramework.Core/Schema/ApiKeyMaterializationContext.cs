@@ -1,8 +1,10 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Globalization;
+
 using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Key;
 using Evoogle.Extensions;
@@ -26,6 +28,35 @@ public delegate string? ApiKeyPartNameBuildDelegate(ApiKeyPartNameContext contex
 /// <param name="PartIndex">The zero-based index of the current part.</param>
 public readonly record struct ApiKeyPartNameContext(ApiKeyType ApiKeyType, ApiKeyPath ApiKeyPath, int PartIndex);
 
+internal enum ApiKeyMaterializationValueKind
+{
+    Key,
+    Text
+}
+
+internal readonly record struct ApiKeyMaterializationValue
+{
+    #region Constructors
+    private ApiKeyMaterializationValue(ApiKeyMaterializationValueKind kind, ApiKey apiKey, string? text)
+    {
+        this.Kind = kind;
+        this.ApiKey = apiKey;
+        this.Text = text;
+    }
+    #endregion
+
+    #region Properties
+    public ApiKeyMaterializationValueKind Kind { get; }
+    public ApiKey ApiKey { get; }
+    public string? Text { get; }
+    #endregion
+
+    #region Factory Methods
+    public static ApiKeyMaterializationValue FromKey(ApiKey value) => new(ApiKeyMaterializationValueKind.Key, value, text: null);
+    public static ApiKeyMaterializationValue FromText(string? value) => new(ApiKeyMaterializationValueKind.Text, ApiKey.Empty, value);
+    #endregion
+}
+
 /// <summary>
 ///     Provides context for materializing an <see cref="ApiKey"/> from CLR object instances
 ///     using <see cref="ApiKeyType.MaterializeKey(ApiKeyMaterializationContext)"/>.
@@ -34,6 +65,7 @@ public sealed class ApiKeyMaterializationContext
 {
     #region Fields
     private readonly Dictionary<Type, object> _roots = [];
+    private readonly Dictionary<ApiKeyMaterializationValuePath, ApiKeyMaterializationValue> _values = [];
     #endregion
 
     #region Properties
@@ -90,6 +122,73 @@ public sealed class ApiKeyMaterializationContext
     }
 
     /// <summary>
+    ///     Registers an already-materialized <see cref="ApiKey"/> value for the specified root CLR type and CLR property path.
+    /// </summary>
+    /// <typeparam name="T">The root CLR type of the key path.</typeparam>
+    /// <param name="clrPath">The full dotted CLR property path from the root type to the scalar property.</param>
+    /// <param name="value">The materialized key value.</param>
+    /// <returns>The current context for fluent chaining.</returns>
+    public ApiKeyMaterializationContext WithKey<T>(string clrPath, ApiKey value) => this.WithKey(typeof(T), clrPath, value);
+
+    /// <summary>
+    ///     Registers an already-materialized <see cref="ApiKey"/> value for the specified root CLR type and CLR property path.
+    /// </summary>
+    /// <param name="clrRootType">The root CLR type of the key path.</param>
+    /// <param name="clrPath">The full dotted CLR property path from the root type to the scalar property.</param>
+    /// <param name="value">The materialized key value.</param>
+    /// <returns>The current context for fluent chaining.</returns>
+    public ApiKeyMaterializationContext WithKey(Type clrRootType, string clrPath, ApiKey value)
+    {
+        var valuePath = CreateValuePath(clrRootType, clrPath);
+        _values[valuePath] = ApiKeyMaterializationValue.FromKey(value);
+        return this;
+    }
+
+    /// <summary>Registers an <see cref="int"/> key value without boxing.</summary>
+    public ApiKeyMaterializationContext WithKey<T>(string clrPath, int value) => this.WithKey<T>(clrPath, ApiKey.FromInt32(value));
+
+    /// <summary>Registers a <see cref="long"/> key value without boxing.</summary>
+    public ApiKeyMaterializationContext WithKey<T>(string clrPath, long value) => this.WithKey<T>(clrPath, ApiKey.FromInt64(value));
+
+    /// <summary>Registers a <see cref="Guid"/> key value without boxing.</summary>
+    public ApiKeyMaterializationContext WithKey<T>(string clrPath, Guid value) => this.WithKey<T>(clrPath, ApiKey.FromGuid(value));
+
+    /// <summary>Registers an <see cref="Ulid"/> key value without boxing.</summary>
+    public ApiKeyMaterializationContext WithKey<T>(string clrPath, Ulid value) => this.WithKey<T>(clrPath, ApiKey.FromUlid(value));
+
+    /// <summary>Registers a <see cref="CultureInfo"/> key value.</summary>
+    public ApiKeyMaterializationContext WithKey<T>(string clrPath, CultureInfo value)
+    {
+        ArgumentNullException.ThrowIfNull(value);
+        return this.WithKey<T>(clrPath, ApiKey.FromCulture(value));
+    }
+
+    /// <summary>
+    ///     Registers raw text for the specified root CLR type and CLR property path.
+    ///     The text is parsed according to schema metadata during value-based materialization.
+    /// </summary>
+    /// <typeparam name="T">The root CLR type of the key path.</typeparam>
+    /// <param name="clrPath">The full dotted CLR property path from the root type to the scalar property.</param>
+    /// <param name="value">The raw text value.</param>
+    /// <returns>The current context for fluent chaining.</returns>
+    public ApiKeyMaterializationContext WithText<T>(string clrPath, string? value) => this.WithText(typeof(T), clrPath, value);
+
+    /// <summary>
+    ///     Registers raw text for the specified root CLR type and CLR property path.
+    ///     The text is parsed according to schema metadata during value-based materialization.
+    /// </summary>
+    /// <param name="clrRootType">The root CLR type of the key path.</param>
+    /// <param name="clrPath">The full dotted CLR property path from the root type to the scalar property.</param>
+    /// <param name="value">The raw text value.</param>
+    /// <returns>The current context for fluent chaining.</returns>
+    public ApiKeyMaterializationContext WithText(Type clrRootType, string clrPath, string? value)
+    {
+        var valuePath = CreateValuePath(clrRootType, clrPath);
+        _values[valuePath] = ApiKeyMaterializationValue.FromText(value);
+        return this;
+    }
+
+    /// <summary>
     ///     Resolves the root object for a given CLR type.
     ///     Tries an exact match first, then falls back to a registered instance whose declared type is assignable to <paramref name="type"/>.
     /// </summary>
@@ -127,5 +226,23 @@ public sealed class ApiKeyMaterializationContext
         result = null;
         return false;
     }
+
+    internal bool TryResolveValue(Type clrRootType, string clrPath, out ApiKeyMaterializationValue value)
+    {
+        var valuePath = CreateValuePath(clrRootType, clrPath);
+        return _values.TryGetValue(valuePath, out value);
+    }
+
+    private static ApiKeyMaterializationValuePath CreateValuePath(Type clrRootType, string clrPath)
+    {
+        ArgumentNullException.ThrowIfNull(clrRootType);
+        ArgumentException.ThrowIfNullOrWhiteSpace(clrPath);
+
+        return new ApiKeyMaterializationValuePath(clrRootType, clrPath);
+    }
+    #endregion
+
+    #region Nested Types
+    private readonly record struct ApiKeyMaterializationValuePath(Type ClrRootType, string ClrPath);
     #endregion
 }

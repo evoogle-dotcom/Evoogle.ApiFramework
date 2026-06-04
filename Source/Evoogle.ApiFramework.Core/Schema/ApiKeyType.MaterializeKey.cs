@@ -35,6 +35,32 @@ public sealed partial class ApiKeyType
     {
         ArgumentNullException.ThrowIfNull(context);
 
+        return this.MaterializeKeyCore(context, WalkPath);
+    }
+
+    /// <summary>
+    ///     Materializes an <see cref="ApiKey"/> from caller-supplied values registered in <paramref name="context"/>.
+    /// </summary>
+    /// <param name="context">The materialization context containing value-path inputs and configuration.</param>
+    /// <returns>
+    ///     A composite <see cref="ApiKey"/> whose part values are read from the configured key paths.
+    ///     Text values are parsed according to the terminal scalar CLR type for each path.
+    /// </returns>
+    /// <exception cref="ApiKeyException">
+    ///     Thrown when a required value is missing, a text value cannot be parsed, a supplied
+    ///     <see cref="ApiKey"/> has the wrong kind, or the terminal scalar CLR type is unsupported.
+    /// </exception>
+    public ApiKey MaterializeKeyFromValues(ApiKeyMaterializationContext context)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+
+        return this.MaterializeKeyCore(context, MaterializeValuePath);
+    }
+    #endregion
+
+    #region MaterializeKey Implementation Methods
+    private ApiKey MaterializeKeyCore(ApiKeyMaterializationContext context, Func<ApiKeyPath, ApiKeyMaterializationContext, ApiKey> valueFactory)
+    {
         // All keys produce a named-composite ApiKey regardless of path count,
         // so callers can always inspect part names uniformly.
         var partNameBuilder = context.CustomPartNameBuilder ?? ApiKeyPartNameBuilders.Resolve(context.PartNameBuilder);
@@ -43,18 +69,16 @@ public sealed partial class ApiKeyType
         {
             var path = this.ApiKeyPaths[i];
             var partName = partNameBuilder(new ApiKeyPartNameContext(this, path, i));
-            var partValue = WalkPath(path, context);
+            var partValue = valueFactory(path, context);
             parts[i] = new ApiKeyPart(partName, partValue);
         }
 
         return ApiKey.Composite(parts);
     }
-    #endregion
 
-    #region MaterializeKey Implementation Methods
     private static ApiKey WalkPath(ApiKeyPath path, ApiKeyMaterializationContext context)
     {
-        var pathName = string.Join(".", path.ApiSegments.Select(static s => s.ClrPropertyName));
+        var pathName = GetPathName(path);
 
         var rootObject = context.TryResolveRoot(path.ClrRootType, out var root)
             ? root
@@ -98,6 +122,79 @@ public sealed partial class ApiKeyType
         }
 
         return ApiKey.FromObject(current, path.ApiScalarSegment.ApiProperty.ApiType.ClrType);
+    }
+
+    private static ApiKey MaterializeValuePath(ApiKeyPath path, ApiKeyMaterializationContext context)
+    {
+        var pathName = GetPathName(path);
+        var expectedClrType = path.ApiScalarSegment.ApiProperty.ApiType.ClrType;
+
+        if (context.TryResolveValue(path.ClrRootType, pathName, out var value) is false)
+        {
+            return HandleMissingValue(context, path, pathName);
+        }
+
+        return value.Kind switch
+        {
+            ApiKeyMaterializationValueKind.Key => MaterializeKeyValue(value.ApiKey, expectedClrType, context, path, pathName),
+            ApiKeyMaterializationValueKind.Text => MaterializeTextValue(value.Text, expectedClrType, context, path, pathName),
+            _ => throw new ApiKeyException($"Key path '{pathName}' has an unsupported materialization value kind '{value.Kind}'."),
+        };
+
+    }
+
+    private static ApiKey MaterializeKeyValue(ApiKey value, Type expectedClrType, ApiKeyMaterializationContext context, ApiKeyPath path, string pathName)
+    {
+        if (value == ApiKey.Empty)
+        {
+            return HandleMissingValue(context, path, pathName);
+        }
+
+        var expectedKind = GetExpectedScalarKind(expectedClrType, pathName);
+        if (value.ApiKind != expectedKind)
+        {
+            throw new ApiKeyException($"Key path '{pathName}' expected {expectedKind} but received {value.ApiKind}.");
+        }
+
+        return value;
+    }
+
+    private static ApiKey MaterializeTextValue(string? value, Type expectedClrType, ApiKeyMaterializationContext context, ApiKeyPath path, string pathName)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return HandleMissingValue(context, path, pathName);
+        }
+
+        if (ApiKey.TryParse(expectedClrType, value, out var apiKey))
+        {
+            return apiKey;
+        }
+
+        var expectedKind = GetExpectedScalarKind(expectedClrType, pathName);
+        throw new ApiKeyException($"Text '{value}' is not a valid {expectedKind} value for key path '{pathName}'.");
+    }
+
+    private static ApiKey HandleMissingValue(ApiKeyMaterializationContext context, ApiKeyPath path, string pathName)
+    {
+        if (context.NullHandling == ApiKeyNullHandling.ThrowOnNull)
+        {
+            throw new ApiKeyException($"Cannot materialize key path '{pathName}': no value registered for type '{path.ClrRootType.Name}'.");
+        }
+
+        return ApiKey.Empty;
+    }
+
+    private static string GetPathName(ApiKeyPath path) => string.Join(".", path.ApiSegments.Select(static s => s.ClrPropertyName));
+
+    private static ApiKeyKind GetExpectedScalarKind(Type clrType, string pathName)
+    {
+        if (ApiKey.TryGetCompatibleScalarKind(clrType, out var kind))
+        {
+            return kind;
+        }
+
+        throw new ApiKeyException($"Key path '{pathName}' has unsupported terminal scalar CLR type '{clrType.Name}'.");
     }
     #endregion
 }

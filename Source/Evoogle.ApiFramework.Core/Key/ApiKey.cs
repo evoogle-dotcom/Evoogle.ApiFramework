@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -114,17 +114,15 @@ public readonly struct ApiKey
     ///     Supports: <see cref="string"/>, <see cref="int"/>, <see cref="long"/>, <see cref="Guid"/>,
     ///     <see cref="Ulid"/>, and <see cref="CultureInfo"/>.
     /// </remarks>
-    private static readonly FrozenSet<Type> _scalarTypes = FrozenSet.ToFrozenSet
-    (
-        [
-            typeof(string),
-            typeof(int),
-            typeof(long),
-            typeof(Guid),
-            typeof(Ulid),
-            typeof(CultureInfo)
-        ]
-    );
+    private static readonly FrozenDictionary<Type, ApiKeyKind> _scalarTypeKinds = new Dictionary<Type, ApiKeyKind>
+    {
+        [typeof(string)] = ApiKeyKind.String,
+        [typeof(int)] = ApiKeyKind.Int32,
+        [typeof(long)] = ApiKeyKind.Int64,
+        [typeof(Guid)] = ApiKeyKind.Guid,
+        [typeof(Ulid)] = ApiKeyKind.Ulid,
+        [typeof(CultureInfo)] = ApiKeyKind.Culture
+    }.ToFrozenDictionary();
 
     /// <summary>
     ///     Pre-computed hash code for composite keys.
@@ -168,7 +166,7 @@ public readonly struct ApiKey
     ///         are considered equal.
     ///     </para>
     ///     <para>
-    ///         Example: <c>ApiId.FromString("  42  ")</c> and <c>ApiId.FromString("42")</c> are equal if both represent
+    ///         Example: <c>ApiKey.FromString("  42  ")</c> and <c>ApiKey.FromString("42")</c> are equal if both represent
     ///         the same string value after normalization, even if <see cref="ApiOriginalString"/> differs.
     ///     </para>
     /// </remarks>
@@ -531,10 +529,10 @@ public readonly struct ApiKey
     {
         ArgumentNullException.ThrowIfNull(value, nameof(value));
 
-        // Handle ApiId passthrough
-        if (value is ApiKey apiId)
+        // Handle ApiKey passthrough
+        if (value is ApiKey apiKey)
         {
-            return apiId;
+            return apiKey;
         }
 
         // Determine the effective type
@@ -648,7 +646,7 @@ public readonly struct ApiKey
     /// <returns>The compatible scalar CLR types for <see cref="ApiKey"/> conversion.</returns>
     public static Type[] GetCompatibleScalarTypes()
     {
-        return [.. _scalarTypes];
+        return [.. _scalarTypeKinds.Keys];
     }
 
     /// <summary>
@@ -680,7 +678,20 @@ public readonly struct ApiKey
     {
         ArgumentNullException.ThrowIfNull(type, nameof(type));
 
-        return _scalarTypes.Contains(type);
+        return _scalarTypeKinds.ContainsKey(type);
+    }
+
+    /// <summary>
+    ///     Attempts to get the <see cref="ApiKeyKind"/> represented by a compatible scalar CLR type.
+    /// </summary>
+    /// <param name="type">The CLR type to check.</param>
+    /// <param name="kind">The key kind associated with <paramref name="type"/>, when compatible.</param>
+    /// <returns>True if the type is a compatible scalar type; otherwise, false.</returns>
+    public static bool TryGetCompatibleScalarKind(Type type, out ApiKeyKind kind)
+    {
+        ArgumentNullException.ThrowIfNull(type, nameof(type));
+
+        return _scalarTypeKinds.TryGetValue(type, out kind);
     }
 
     /// <summary>
@@ -928,7 +939,7 @@ public readonly struct ApiKey
             throw new ApiKeyException("Text is null/empty.");
         }
 
-        throw new ApiKeyException($"Text '{text}' is not a valid ApiId.");
+        throw new ApiKeyException($"Text '{text}' is not a valid {nameof(ApiKey)}.");
     }
 
     /// <summary>
@@ -950,7 +961,7 @@ public readonly struct ApiKey
             throw new ApiKeyException("Text is null/empty.");
         }
 
-        throw new ApiKeyException($"Text '{text}' is not a valid ApiId.");
+        throw new ApiKeyException($"Text '{text}' is not a valid {nameof(ApiKey)}.");
     }
 
     /// <summary>
@@ -986,6 +997,24 @@ public readonly struct ApiKey
 
         id = default;
         return false;
+    }
+
+    /// <summary>
+    ///     Attempts to parse <paramref name="text"/> into an key matching the specified compatible scalar CLR type.
+    /// </summary>
+    /// <param name="type">The expected scalar CLR type.</param>
+    /// <param name="text">The textual representation.</param>
+    /// <param name="id">Outputs the parsed key on success; otherwise empty.</param>
+    /// <returns>True if the type is compatible and parsing succeeded.</returns>
+    public static bool TryParse(Type type, string? text, out ApiKey id)
+    {
+        if (TryGetCompatibleScalarKind(type, out var kind) is false)
+        {
+            id = default;
+            return false;
+        }
+
+        return TryParse(kind, text, out id);
     }
 
     /// <summary>
@@ -1289,7 +1318,7 @@ public readonly struct ApiKey
         {
             if (!this.IsComposite)
             {
-                throw new ApiKeyException("Indexing only applies to composite ApiId.");
+                throw new ApiKeyException($"Indexing only applies to composite {nameof(ApiKey)}.");
             }
 
             var parts = (ApiKeyPart[])_ref!;
@@ -1308,7 +1337,7 @@ public readonly struct ApiKey
     /// <param name="name">The part name.</param>
     /// <returns>The part key.</returns>
     /// <exception cref="ApiKeyException">Thrown if part name not found.</exception>
-    public readonly ApiKey this[string name] => this.TryGetPart(name, out var v) ? v : throw new ApiKeyException($"Part name '{name}' not found in composite ApiId.");
+    public readonly ApiKey this[string name] => this.TryGetPart(name, out var v) ? v : throw new ApiKeyException($"Part name '{name}' not found in composite {nameof(ApiKey)}.");
     #endregion
 
     #region Equality/Ordering Operators
