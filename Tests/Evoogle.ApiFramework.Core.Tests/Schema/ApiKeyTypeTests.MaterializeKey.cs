@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -16,6 +16,11 @@ namespace Evoogle.ApiFramework.Schema;
 public partial class ApiKeyTypeTests
 {
     #region Test Types
+    private static readonly IReadOnlyDictionary<string, ApiKeyPartNameBuildDelegate> _customPartNameBuilders = new Dictionary<string, ApiKeyPartNameBuildDelegate>
+    {
+        ["Custom"] = static c => $"{c.ApiKeyType.ApiName}[{c.PartIndex}]"
+    };
+
     private class MaterializeKeyFromInstanceTest : XUnitTest
     {
         #region User Supplied Properties
@@ -24,13 +29,15 @@ public partial class ApiKeyTypeTests
         public object? SelfObject { get; init; }
         public object? OwnerObject { get; init; }
         public ApiKeyNullHandling NullHandling { get; init; }
-        public ApiKeyPartNameBuilder PartNameBuilder { get; init; }
+        public ApiKeyPartNameBuilder? PartNameBuilder { get; init; }
+        public string? CustomPartNameBuilderName { get; init; }
         public ApiKey? ExpectedValue { get; init; }
         public Type? ExpectedExceptionType { get; init; }
         #endregion
 
         #region Calculated Properties
         private ApiKeyType? ApiKeyType { get; set; }
+        private ApiKeyPartNameBuildDelegate? CustomPartNameBuilder { get; set; }
         private ApiKey? ActualValue { get; set; }
         private Type? ActualExceptionType { get; set; }
         #endregion
@@ -42,12 +49,23 @@ public partial class ApiKeyTypeTests
                 ? GetKeyTypeByName(this.ApiObjectTypeName, this.ApiKeyTypeName)
                 : GetPrimaryKeyType(this.ApiObjectTypeName);
 
+            if (this.CustomPartNameBuilderName is not null)
+            {
+                if (!_customPartNameBuilders.TryGetValue(this.CustomPartNameBuilderName, out var builder))
+                {
+                    throw new InvalidOperationException($"Custom part name builder with name '{this.CustomPartNameBuilderName}' not found.");
+                }
+
+                this.CustomPartNameBuilder = builder;
+            }
+
             this.WriteLine($"ApiObjectType:     {this.ApiObjectTypeName.SafeToString()}");
             this.WriteLine($"ApiKeyType:        {this.ApiKeyType?.ApiName.SafeToString()}");
             this.WriteLine($"SelfObject:        {this.SelfObject.SafeToString()}");
             this.WriteLine($"OwnerObject:       {this.OwnerObject.SafeToString()}");
             this.WriteLine($"NullHandling:      {this.NullHandling.SafeToString()}");
-            this.WriteLine($"PartNameBuilder:   {this.PartNameBuilder}");
+            this.WriteLine($"PartNameBuilder:   {this.PartNameBuilder.SafeToString()}");
+            this.WriteLine($"CustomBuilder:     {this.CustomPartNameBuilderName.SafeToString()}");
             this.WriteLine();
 
             if (this.ExpectedValue is not null)
@@ -67,7 +85,8 @@ public partial class ApiKeyTypeTests
                 var context = new ApiKeyMaterializationContext
                 {
                     NullHandling = this.NullHandling,
-                    PartNameBuilder = this.PartNameBuilder
+                    PartNameBuilder = this.PartNameBuilder.GetValueOrDefault(ApiKeyPartNameBuilder.None),
+                    CustomPartNameBuilder = this.CustomPartNameBuilder
                 };
 
                 if (this.SelfObject is not null)
@@ -354,6 +373,19 @@ public partial class ApiKeyTypeTests
             (
                 ApiKeyPart.Create(nameof(KeyTwoScalarPartComposite) + "." + nameof(KeyTwoScalarPartComposite.Id1), ApiKey.FromInt32(KeyTwoScalarPartCompositeInstance.Id1)),
                 ApiKeyPart.Create(nameof(KeyTwoScalarPartComposite) + "." + nameof(KeyTwoScalarPartComposite.Id2), ApiKey.FromString(KeyTwoScalarPartCompositeInstance.Id2!))
+            )
+        },
+
+        new MaterializeKeyFromInstanceTest
+        {
+            Name = $"{KeyTwoScalarPartCompositeInstance} with primary composite key (int + string) and custom name builder",
+            ApiObjectTypeName = nameof(KeyTwoScalarPartComposite),
+            SelfObject = KeyTwoScalarPartCompositeInstance,
+            CustomPartNameBuilderName = "Custom",
+            ExpectedValue = ApiKey.Composite
+            (
+                ApiKeyPart.Create("PK_KeyTwoScalarPartComposite[0]", ApiKey.FromInt32(KeyTwoScalarPartCompositeInstance.Id1)),
+                ApiKeyPart.Create("PK_KeyTwoScalarPartComposite[1]", ApiKey.FromString(KeyTwoScalarPartCompositeInstance.Id2!))
             )
         },
 

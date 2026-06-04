@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -7,23 +7,6 @@ using Evoogle.ApiFramework.Key;
 using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema.Internal;
-
-/// <summary>
-///     Builds the optional part name used when materializing one <see cref="ApiKeyPart"/>.
-/// </summary>
-/// <param name="context">The part naming context.</param>
-/// <returns>
-///     The part name to use, or <see langword="null"/> to create an unnamed/positional key part.
-/// </returns>
-internal delegate string? ApiKeyPartNameBuildDelegate(ApiKeyPartNameContext context);
-
-/// <summary>
-///     Provides metadata to an <see cref="ApiKeyPartNameBuildDelegate"/> while materializing an <see cref="ApiKey"/>.
-/// </summary>
-/// <param name="ApiKeyType">The key type being materialized.</param>
-/// <param name="ApiKeyPath">The key path for the current part.</param>
-/// <param name="PartIndex">The zero-based index of the current part.</param>
-internal readonly record struct ApiKeyPartNameContext(ApiKeyType ApiKeyType, ApiKeyPath ApiKeyPath, int PartIndex);
 
 /// <summary>
 ///     Provides common <see cref="ApiKeyPartNameBuildDelegate"/> implementations.

@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -7,6 +7,23 @@ using Evoogle.ApiFramework.Key;
 using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema;
+
+/// <summary>
+///     Builds the optional part name used when materializing one <see cref="ApiKeyPart"/>.
+/// </summary>
+/// <param name="context">The part naming context.</param>
+/// <returns>
+///     The part name to use, or <see langword="null"/> to create an unnamed/positional key part.
+/// </returns>
+public delegate string? ApiKeyPartNameBuildDelegate(ApiKeyPartNameContext context);
+
+/// <summary>
+///     Provides metadata to an <see cref="ApiKeyPartNameBuildDelegate"/> while materializing an <see cref="ApiKey"/>.
+/// </summary>
+/// <param name="ApiKeyType">The key type being materialized.</param>
+/// <param name="ApiKeyPath">The key path for the current part.</param>
+/// <param name="PartIndex">The zero-based index of the current part.</param>
+public readonly record struct ApiKeyPartNameContext(ApiKeyType ApiKeyType, ApiKeyPath ApiKeyPath, int PartIndex);
 
 /// <summary>
 ///     Provides context for materializing an <see cref="ApiKey"/> from CLR object instances
@@ -28,6 +45,15 @@ public sealed class ApiKeyMaterializationContext
     ///     A single composite key must still be consistently named or unnamed.
     /// </remarks>
     public ApiKeyPartNameBuilder PartNameBuilder { get; init; } = ApiKeyPartNameBuilder.None;
+
+    /// <summary>
+    ///     Gets an optional custom builder used to create <see cref="ApiKeyPart.ApiName"/> values during materialization.
+    /// </summary>
+    /// <remarks>
+    ///     When provided, this delegate takes precedence over <see cref="PartNameBuilder"/>.
+    ///     Return <see langword="null"/> to materialize unnamed/positional key parts.
+    /// </remarks>
+    public ApiKeyPartNameBuildDelegate? CustomPartNameBuilder { get; init; }
 
     /// <summary>
     ///     Gets the behavior when any property in a path — whether an intermediate navigation property
