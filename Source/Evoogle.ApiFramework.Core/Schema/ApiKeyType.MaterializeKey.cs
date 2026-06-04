@@ -22,7 +22,7 @@ public sealed partial class ApiKeyType
     ///     Part names are created according to <see cref="ApiKeyMaterializationContext.CustomPartNameBuilder"/>,
     ///     when provided; otherwise they are created according to <see cref="ApiKeyMaterializationContext.PartNameBuilder"/>.
     /// </returns>
-    /// <exception cref="InvalidOperationException">
+    /// <exception cref="ApiKeyException">
     ///     Thrown when no root object is registered in <paramref name="context"/> for a path's
     ///     <see cref="ApiKeyPath.ClrRootType"/>.
     /// </exception>

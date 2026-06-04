@@ -1,8 +1,9 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Key;
 using Evoogle.Extensions;
 
@@ -94,7 +95,7 @@ public sealed class ApiKeyMaterializationContext
     /// </summary>
     /// <param name="type">The CLR type to resolve a root object for.</param>
     /// <returns>The registered root object.</returns>
-    /// <exception cref="InvalidOperationException">Thrown when no root object is registered for <paramref name="type"/>.</exception>
+    /// <exception cref="ApiKeyException">Thrown when no root object is registered for <paramref name="type"/>.</exception>
     internal object ResolveRoot(Type type)
     {
         if (this.TryResolveRoot(type, out var result))
@@ -103,7 +104,7 @@ public sealed class ApiKeyMaterializationContext
         }
 
         var typeName = type.SafeToName();
-        throw new InvalidOperationException($"No root object registered for type '{typeName}'. Call With<{typeName}>() before materializing.");
+        throw new ApiKeyException($"No root object registered for type '{typeName}'. Call With<{typeName}>() before materializing.");
     }
 
     internal bool TryResolveRoot(Type type, out object? result)
