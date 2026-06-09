@@ -97,33 +97,32 @@ public abstract class ApiRelationshipOneTo
             return;
         }
 
-        var principalKeyType = principal.ResolvedKeyType;
-        if (principalKeyType is null)
-        {
-            // Principal key type failed to resolve; the principal end already recorded the error.
-            return;
-        }
-
         if (dependent.IsNavigational)
         {
             // Purely navigational; no key path alignment to validate.
             return;
         }
-        var foreignKeyType = dependent.ApiForeignKeyType;
 
-        var keyPathCount = foreignKeyType.ApiKeyPaths.Length;
-        var keyTypePathCount = ApiSchemaHelpers.CountKeyLeaves(principalKeyType);
+        var principalKeyDesc = principal.ApiKeyTypeName is not null ? $"key type '{principal.ApiKeyTypeName}'" : "primary key";
+        var foreignKeyPath = $"{nameof(this.ApiDependentEnd)}.{nameof(this.ApiDependentEnd.ApiForeignKeyType)}";
+        var compatibilityRemediation = $"Ensure {foreignKeyPath} paths are ordered to match the principal end's key type and use compatible scalar types";
 
-        if (keyTypePathCount is not null && keyPathCount != keyTypePathCount)
-        {
-            var path = this.ApiPath;
-            var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.API_RELATIONSHIP_ONE_TO_INVALID_DEPENDENT_KEY_PATHS_COUNT;
-            var description = $"{nameof(this.ApiDependentEnd)}.{nameof(this.ApiDependentEnd.ApiForeignKeyType)}.{nameof(ApiKeyType.ApiKeyPaths)} has {keyPathCount} key path(s) but principal key type '{principalKeyType.ApiName}' has {keyTypePathCount} key path(s)";
-            var remediation = $"Ensure {nameof(this.ApiDependentEnd)}.{nameof(this.ApiDependentEnd.ApiForeignKeyType)}.{nameof(ApiKeyType.ApiKeyPaths)} contains exactly {keyTypePathCount} key path(s) to match the principal end's key type";
-
-            context.AddIssue(path, severity, code, description, remediation);
-        }
+        ApiRelationshipKeyAlignment.ValidatePrincipalForeignKeyAlignment
+        (
+            context: context,
+            relationshipPath: this.ApiPath,
+            principalEnd: principal,
+            foreignKeyType: dependent.ApiForeignKeyType,
+            countMismatchCode: ApiInitializationCode.API_RELATIONSHIP_ONE_TO_INVALID_DEPENDENT_KEY_PATHS_COUNT,
+            foreignKeyPath: foreignKeyPath,
+            principalCountLabel: principalKeyDesc,
+            principalCompatibilityLabel: $"principal end {principalKeyDesc}",
+            principalEndQualifier: null,
+            explicitKeyTarget: nameof(ApiRelationshipPrincipalEnd.ApiKeyTypeName),
+            inferredForeignKeyLabel: "foreign key",
+            countMismatchRemediationTarget: "the principal end's key type",
+            compatibilityRemediation: compatibilityRemediation
+        );
     }
     #endregion
 }

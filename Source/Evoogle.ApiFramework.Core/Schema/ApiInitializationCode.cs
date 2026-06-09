@@ -291,6 +291,19 @@ public enum ApiInitializationCode
     ///     one-to-one or one-to-many relationships.
     /// </summary>
     API_RELATIONSHIP_ONE_TO_INVALID_DEPENDENT_KEY_PATHS_COUNT,
+
+    /// <summary>
+    ///     The principal end's key type cannot be automatically determined because multiple key types
+    ///     on the principal object type are compatible with the foreign key type.
+    ///     Specify the key type explicitly using <see cref="ApiRelationshipPrincipalEnd.ApiKeyTypeName"/>.
+    /// </summary>
+    API_RELATIONSHIP_AMBIGUOUS_PRINCIPAL_KEY,
+
+    /// <summary>
+    ///     The principal end's key type could not be matched to the foreign key type because their ordered scalar
+    ///     leaf types are incompatible.
+    /// </summary>
+    API_RELATIONSHIP_INCOMPATIBLE_PRINCIPAL_FOREIGN_KEY,
     #endregion
 
     #region ApiSchema Initialization Codes

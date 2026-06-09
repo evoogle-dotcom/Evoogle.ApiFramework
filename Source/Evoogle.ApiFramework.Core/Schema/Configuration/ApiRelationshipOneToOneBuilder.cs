@@ -9,7 +9,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 ///     Fluent builder used to configure an <see cref="ApiRelationshipOneToOne"/> relationship.
 /// </summary>
 /// <remarks>
-///     Call <see cref="WithPrincipalEnd{TPrincipal}"/>, <see cref="WithDependentEnd{TDependent}"/>, and optionally
+///     Call <see cref="From{TPrincipal}"/>, <see cref="To{TDependent}"/>, and optionally
 ///     <see cref="WithDeleteBehavior"/> to configure the relationship.
 ///     At most one principal end and one dependent end are allowed; subsequent calls replace the previous
 ///     configuration for that end.
@@ -51,7 +51,7 @@ public sealed class ApiRelationshipOneToOneBuilder(string apiName)
     /// <param name="clrPrincipalType">The CLR type of the principal object.</param>
     /// <param name="configure">Optional callback to configure principal key type selection and extensions.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipOneToOneBuilder WithPrincipalEnd(Type clrPrincipalType, Action<ApiRelationshipPrincipalEndBuilder>? configure = null)
+    public ApiRelationshipOneToOneBuilder From(Type clrPrincipalType, Action<ApiRelationshipPrincipalEndBuilder>? configure = null)
     {
         var builder = new ApiRelationshipPrincipalEndBuilder(clrPrincipalType);
         configure?.Invoke(builder);
@@ -65,7 +65,7 @@ public sealed class ApiRelationshipOneToOneBuilder(string apiName)
     /// <param name="clrDependentType">The CLR type of the dependent object.</param>
     /// <param name="configure">Optional callback to add foreign key role key paths and extensions.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipOneToOneBuilder WithDependentEnd(Type clrDependentType, Action<ApiRelationshipDependentEndBuilder>? configure = null)
+    public ApiRelationshipOneToOneBuilder To(Type clrDependentType, Action<ApiRelationshipDependentEndBuilder>? configure = null)
     {
         var builder = new ApiRelationshipDependentEndBuilder(clrDependentType);
         configure?.Invoke(builder);
@@ -89,7 +89,7 @@ public sealed class ApiRelationshipOneToOneBuilder(string apiName)
     /// <typeparam name="TPrincipal">The CLR type of the principal object.</typeparam>
     /// <param name="configure">Optional callback to configure principal key type selection and extensions.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipOneToOneBuilder WithPrincipalEnd<TPrincipal>(Action<ApiRelationshipPrincipalEndBuilder>? configure = null)
+    public ApiRelationshipOneToOneBuilder From<TPrincipal>(Action<ApiRelationshipPrincipalEndBuilder>? configure = null)
     {
         var builder = new ApiRelationshipPrincipalEndBuilder(typeof(TPrincipal));
         configure?.Invoke(builder);
@@ -104,7 +104,7 @@ public sealed class ApiRelationshipOneToOneBuilder(string apiName)
     /// <typeparam name="TDependent">The CLR type of the dependent object.</typeparam>
     /// <param name="configure">Optional callback to add key paths using expression-based property selectors.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipOneToOneBuilder WithDependentEnd<TDependent>(Action<ApiRelationshipDependentEndBuilder<TDependent>>? configure = null)
+    public ApiRelationshipOneToOneBuilder To<TDependent>(Action<ApiRelationshipDependentEndBuilder<TDependent>>? configure = null)
     {
         var builder = new ApiRelationshipDependentEndBuilder<TDependent>();
         configure?.Invoke(builder);

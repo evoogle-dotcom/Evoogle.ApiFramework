@@ -106,49 +106,62 @@ public sealed class ApiRelationshipManyToMany
     #region Implementation Methods
     private void InitializeApiAssociationKeyPathAlignment(ApiInitializationContext context)
     {
-        // End A alignment
         if (this.ApiPrincipalEndA is not null && this.ApiAssociation is not null && this.ApiAssociation.HasKeyBinding)
         {
-            var foreignKeyTypeA = this.ApiAssociation.ApiForeignKeyTypeA;
-            var principalKeyTypeA = this.ApiPrincipalEndA.ResolvedKeyType;
-            if (principalKeyTypeA is not null)
-            {
-                var keyPathCount = foreignKeyTypeA.ApiKeyPaths.Length;
-                var keyTypePathCount = ApiSchemaHelpers.CountKeyLeaves(principalKeyTypeA);
-                if (keyTypePathCount is not null && keyPathCount != keyTypePathCount)
-                {
-                    var path = this.ApiPath;
-                    var severity = ApiInitializationSeverity.Error;
-                    var code = ApiInitializationCode.API_RELATIONSHIP_MANY_TO_MANY_INVALID_ASSOCIATION_KEY_PATHS_A_COUNT;
-                    var description = $"{nameof(this.ApiAssociation)}.{nameof(this.ApiAssociation.ApiForeignKeyTypeA)}.{nameof(ApiKeyType.ApiKeyPaths)} has {keyPathCount} key path(s) but principal end A key type '{principalKeyTypeA.ApiName}' has {keyTypePathCount} key path(s)";
-                    var remediation = $"Ensure {nameof(this.ApiAssociation)}.{nameof(this.ApiAssociation.ApiForeignKeyTypeA)}.{nameof(ApiKeyType.ApiKeyPaths)} contains exactly {keyTypePathCount} key path(s) to match principal end A's key type";
-
-                    context.AddIssue(path, severity, code, description, remediation);
-                }
-            }
+            this.InitializeApiAssociationKeyPathAlignment
+            (
+                context,
+                this.ApiPrincipalEndA,
+                this.ApiAssociation.ApiForeignKeyTypeA,
+                ApiInitializationCode.API_RELATIONSHIP_MANY_TO_MANY_INVALID_ASSOCIATION_KEY_PATHS_A_COUNT,
+                nameof(ApiRelationshipAssociation.ApiForeignKeyTypeA),
+                "A"
+            );
         }
 
-        // End B alignment
         if (this.ApiPrincipalEndB is not null && this.ApiAssociation is not null && this.ApiAssociation.HasKeyBinding)
         {
-            var foreignKeyTypeB = this.ApiAssociation.ApiForeignKeyTypeB;
-            var principalKeyTypeB = this.ApiPrincipalEndB.ResolvedKeyType;
-            if (principalKeyTypeB is not null)
-            {
-                var keyPathCount = foreignKeyTypeB.ApiKeyPaths.Length;
-                var keyTypePathCount = ApiSchemaHelpers.CountKeyLeaves(principalKeyTypeB);
-                if (keyTypePathCount is not null && keyPathCount != keyTypePathCount)
-                {
-                    var path = this.ApiPath;
-                    var severity = ApiInitializationSeverity.Error;
-                    var code = ApiInitializationCode.API_RELATIONSHIP_MANY_TO_MANY_INVALID_ASSOCIATION_KEY_PATHS_B_COUNT;
-                    var description = $"{nameof(this.ApiAssociation)}.{nameof(this.ApiAssociation.ApiForeignKeyTypeB)}.{nameof(ApiKeyType.ApiKeyPaths)} has {keyPathCount} key path(s) but principal end B key type '{principalKeyTypeB.ApiName}' has {keyTypePathCount} key path(s)";
-                    var remediation = $"Ensure {nameof(this.ApiAssociation)}.{nameof(this.ApiAssociation.ApiForeignKeyTypeB)}.{nameof(ApiKeyType.ApiKeyPaths)} contains exactly {keyTypePathCount} key path(s) to match principal end B's key type";
-
-                    context.AddIssue(path, severity, code, description, remediation);
-                }
-            }
+            this.InitializeApiAssociationKeyPathAlignment
+            (
+                context,
+                this.ApiPrincipalEndB,
+                this.ApiAssociation.ApiForeignKeyTypeB,
+                ApiInitializationCode.API_RELATIONSHIP_MANY_TO_MANY_INVALID_ASSOCIATION_KEY_PATHS_B_COUNT,
+                nameof(ApiRelationshipAssociation.ApiForeignKeyTypeB),
+                "B"
+            );
         }
+    }
+
+    private void InitializeApiAssociationKeyPathAlignment
+    (
+        ApiInitializationContext context,
+        ApiRelationshipPrincipalEnd principalEnd,
+        ApiKeyType foreignKeyType,
+        ApiInitializationCode countMismatchCode,
+        string foreignKeyPropertyName,
+        string principalEndName
+    )
+    {
+        var principalKeyDesc = principalEnd.ApiKeyTypeName is not null ? $"key type '{principalEnd.ApiKeyTypeName}'" : "primary key";
+        var foreignKeyPath = $"{nameof(this.ApiAssociation)}.{foreignKeyPropertyName}";
+
+        ApiRelationshipKeyAlignment.ValidatePrincipalForeignKeyAlignment
+        (
+            context: context,
+            relationshipPath: this.ApiPath,
+            principalEnd: principalEnd,
+            foreignKeyType: foreignKeyType,
+            countMismatchCode: countMismatchCode,
+            foreignKeyPath: foreignKeyPath,
+            principalCountLabel: $"principal end {principalEndName} {principalKeyDesc}",
+            principalCompatibilityLabel: $"principal end {principalEndName} {principalKeyDesc}",
+            principalEndQualifier: $"for principal end {principalEndName}",
+            explicitKeyTarget: $"{nameof(ApiRelationshipPrincipalEnd.ApiKeyTypeName)} on principal end {principalEndName}",
+            inferredForeignKeyLabel: $"{principalEndName}-side foreign key",
+            countMismatchRemediationTarget: $"principal end {principalEndName}'s key type",
+            compatibilityRemediation: $"Ensure {foreignKeyPath} paths are ordered to match principal end {principalEndName}'s key type and use compatible scalar types"
+        );
     }
 
     private void InitializeApiAssociation(ApiInitializationContext context)

@@ -30,22 +30,25 @@ namespace Evoogle.ApiFramework.Schema;
 ///         <see cref="ApiKeyMaterializationContext.PartNameBuilder"/>.
 ///     </para>
 /// </remarks>
-/// <param name="apiName">The API name that identifies this key type within its containing <see cref="ApiObjectType"/>.</param>
 /// <param name="apiKeyPaths">The ordered collection of key paths that compose this key type.</param>
 [JsonConverter(typeof(ApiKeyTypeJsonConverter))]
-public sealed partial class ApiKeyType(string apiName, IEnumerable<ApiKeyPath> apiKeyPaths) : ApiSchemaElement
+public sealed partial class ApiKeyType(IEnumerable<ApiKeyPath> apiKeyPaths) : ApiSchemaElement
 {
+    #region Fields
+    private string? _contextualName = null;
+    #endregion
+
     #region ApiSchemaElement Properties
     /// <inheritdoc/>
     protected override string ApiElementName => nameof(ApiKeyType);
     #endregion
 
     #region ApiKeyType Properties
-    /// <summary>Gets the API name that uniquely identifies this key type within its containing <see cref="ApiObjectType"/>.</summary>
-    public string ApiName { get; } = apiName;
-
     /// <summary>Gets the ordered array of <see cref="ApiKeyPath"/> instances that compose this key type.</summary>
     public ApiKeyPath[] ApiKeyPaths { get; } = [.. apiKeyPaths.EmptyIfNull().Where(x => x is not null)];
+
+    /// <summary>Gets the contextual name assigned by the containing <see cref="ApiObjectType"/>, or null for anonymous (FK) key types.</summary>
+    internal string? ContextualName => _contextualName;
     #endregion
 
     #region ApiKeyType Computed Properties
@@ -60,18 +63,18 @@ public sealed partial class ApiKeyType(string apiName, IEnumerable<ApiKeyPath> a
     /// <inheritdoc/>
     public override string ToString()
     {
-        var apiName = this.ApiName.SafeToString();
+        var name = (_contextualName ?? "(anonymous)").SafeToString();
         var pathCount = this.ApiKeyPaths.Length.SafeToString();
         var extensionCount = this.ExtensionCount.SafeToString();
 
-        return $"{nameof(ApiKeyType)} {{{nameof(this.ApiName)}={apiName}, PathCount={pathCount}, {nameof(this.ExtensionCount)}={extensionCount}}}";
+        return $"{nameof(ApiKeyType)} {{Name={name}, PathCount={pathCount}, {nameof(this.ExtensionCount)}={extensionCount}}}";
     }
     #endregion
 
     #region ApiSchemaElement Methods
     /// <inheritdoc/>
     protected override string BuildPath(string? apiPreviousPath)
-        => ApiSchemaHelpers.BuildPath(basePath: apiPreviousPath, segment: this.ApiElementName, segmentName: this.ApiName);
+        => ApiSchemaHelpers.BuildPath(basePath: apiPreviousPath, segment: this.ApiElementName, segmentName: _contextualName ?? "(anonymous)");
 
     /// <inheritdoc/>
     internal override void Initialize(ApiInitializationContext context)
@@ -80,27 +83,18 @@ public sealed partial class ApiKeyType(string apiName, IEnumerable<ApiKeyPath> a
 
         base.Initialize(context);
 
-        this.InitializeApiName(context);
         this.InitializeApiKeyPaths(context);
     }
     #endregion
 
-    #region Implementation Methods
-    private void InitializeApiName(ApiInitializationContext context)
+    #region Internal Methods
+    internal void SetContextualName(string name)
     {
-        var isApiNameInvalid = ApiSchemaHelpers.IsNameInvalid(this.ApiName);
-        if (isApiNameInvalid)
-        {
-            var path = this.ApiPath;
-            var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.API_KEY_TYPE_INVALID_API_NAME;
-            var description = $"{nameof(this.ApiName)} must not be null, empty, or whitespace";
-            var remediation = $"Specify a valid {nameof(this.ApiName)} value";
-
-            context.AddIssue(path, severity, code, description, remediation);
-        }
+        _contextualName = name;
     }
+    #endregion
 
+    #region Implementation Methods
     private void InitializeApiKeyPaths(ApiInitializationContext context)
     {
         if (this.ApiKeyPaths.Length == 0)

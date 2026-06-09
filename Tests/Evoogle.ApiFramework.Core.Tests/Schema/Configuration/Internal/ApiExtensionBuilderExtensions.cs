@@ -113,6 +113,11 @@ internal static class ApiExtensionBuilderExtensions
 
     public static void ConfigureExtensions(this ApiRelationshipPrincipalEndBuilder builder, ApiRelationshipPrincipalEnd apiRelationshipPrincipalEnd)
     {
+        if (apiRelationshipPrincipalEnd.ApiKeyTypeName is not null)
+        {
+            builder.WithPrimaryKey(apiRelationshipPrincipalEnd.ApiKeyTypeName);
+        }
+
         var extensions = apiRelationshipPrincipalEnd.Extensions;
         foreach (var extension in extensions ?? [])
         {

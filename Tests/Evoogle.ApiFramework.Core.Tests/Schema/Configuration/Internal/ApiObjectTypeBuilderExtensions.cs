@@ -14,13 +14,13 @@ internal static class ApiObjectTypeBuilderExtensions
     #region Methods
     public static void ConfigureKeyTypes(this ApiObjectTypeBuilder builder, ApiObjectType apiObjectType)
     {
-        foreach (var apiKeyType in apiObjectType.ApiKeyTypes)
+        foreach (var (name, apiKeyType) in apiObjectType.ApiKeyTypes)
         {
-            builder.AddKeyType(apiKeyType.ApiName, k =>
+            builder.AddKey(name, k =>
             {
                 foreach (var keyPath in apiKeyType.ApiKeyPaths)
                 {
-                    k.AddKeyPath(keyPath.ClrRootType, keyPath.ApiSegments.Select(s => s.ClrPropertyName));
+                    k.AddPath(keyPath.ClrRootType, keyPath.ApiSegments.Select(s => s.ClrPropertyName));
                 }
             });
         }

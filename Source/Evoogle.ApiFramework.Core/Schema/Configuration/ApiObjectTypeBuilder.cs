@@ -14,7 +14,7 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     : ApiNamedTypeBuilder<ApiObjectTypeBuilder>(clrType, context)
 {
     #region Fields
-    private readonly List<ApiKeyTypeBuilder> _apiKeyTypeBuilders = [];
+    private readonly List<(string Name, ApiKeyTypeBuilder Builder)> _apiKeyTypeBuilders = [];
     private readonly List<ApiPropertyBuilder> _apiPropertyBuilders = [];
     private Action<ApiObjectTypeOptionsBuilder>? _apiOptionsConfiguration = null;
     #endregion
@@ -42,23 +42,26 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
         => this.AddObjectTypeExtension(typeof(T), value);
     #endregion
 
-    #region AddKeyType Methods
+    #region AddKey Methods
     /// <summary>
     ///     Adds an <see cref="ApiKeyType"/> definition to the object type.
     /// </summary>
     /// <remarks>
-    ///     The first key type added is the primary key type by convention.
+    ///     The first key added is the object type's primary key. Key-bound relationship principal ends infer
+    ///     the best compatible key from the corresponding foreign key when no key name is supplied; call
+    ///     <see cref="ApiRelationshipPrincipalEndBuilder.WithPrimaryKey"/> on the principal end builder to
+    ///     select a named key explicitly.
     /// </remarks>
     /// <param name="apiName">The API name of the key type.</param>
     /// <param name="configure">Optional callback to configure the added key type.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiObjectTypeBuilder AddKeyType(string apiName, Action<ApiKeyTypeBuilder>? configure = null)
+    public ApiObjectTypeBuilder AddKey(string apiName, Action<ApiKeyTypeBuilder>? configure = null)
     {
-        var apiKeyTypeBuilder = new ApiKeyTypeBuilder(apiName);
+        var apiKeyTypeBuilder = new ApiKeyTypeBuilder();
 
         configure?.Invoke(apiKeyTypeBuilder);
 
-        _apiKeyTypeBuilders.Add(apiKeyTypeBuilder);
+        _apiKeyTypeBuilders.Add((apiName, apiKeyTypeBuilder));
 
         return this;
     }
@@ -326,7 +329,7 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
             .Select(b => b.Build(clrObjectType));
 
         var apiKeyTypes = _apiKeyTypeBuilders.Count > 0
-            ? _apiKeyTypeBuilders.Select(b => b.Build())
+            ? _apiKeyTypeBuilders.Select(e => new KeyValuePair<string, ApiKeyType>(e.Name, e.Builder.Build()))
             : null;
 
         var apiObjectType = new ApiObjectType
@@ -365,10 +368,10 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     /// <summary>
     ///     Allows subclasses to add a pre-constructed key type builder without bypassing internal list management.
     /// </summary>
-    protected void AddKeyTypeBuilderCore(ApiKeyTypeBuilder builder)
+    protected void AddKeyTypeBuilderCore(string apiName, ApiKeyTypeBuilder builder)
     {
         ArgumentNullException.ThrowIfNull(builder);
-        _apiKeyTypeBuilders.Add(builder);
+        _apiKeyTypeBuilders.Add((apiName, builder));
     }
     #endregion
 }

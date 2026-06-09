@@ -172,5 +172,65 @@ internal static class ApiSchemaHelpers
         return keyType.ApiKeyPaths.Length;
     }
 
+    public static bool AreKeyTypesCompatible(ApiKeyType principalKeyType, ApiKeyType foreignKeyType)
+        => TryAreKeyTypesCompatible(principalKeyType, foreignKeyType, out var compatible) && compatible;
+
+    public static bool TryAreKeyTypesCompatible(ApiKeyType principalKeyType, ApiKeyType foreignKeyType, out bool compatible)
+    {
+        compatible = false;
+
+        if (!TryGetKeyLeafTypes(principalKeyType, out var principalLeafTypes) ||
+            !TryGetKeyLeafTypes(foreignKeyType, out var foreignLeafTypes))
+        {
+            return false;
+        }
+
+        if (principalLeafTypes.Length != foreignLeafTypes.Length)
+        {
+            return true;
+        }
+
+        for (var i = 0; i < principalLeafTypes.Length; i++)
+        {
+            if (principalLeafTypes[i] != foreignLeafTypes[i])
+            {
+                return true;
+            }
+        }
+
+        compatible = true;
+        return true;
+    }
+
+    public static string DescribeKeyLeafTypes(ApiKeyType keyType)
+    {
+        if (!TryGetKeyLeafTypes(keyType, out var leafTypes))
+        {
+            return "(unresolved)";
+        }
+
+        return string.Join(", ", leafTypes.Select(static t => t.SafeToName()));
+    }
+
+    private static bool TryGetKeyLeafTypes(ApiKeyType keyType, out Type[] leafTypes)
+    {
+        var paths = keyType.ApiKeyPaths;
+        leafTypes = new Type[paths.Length];
+
+        for (var i = 0; i < paths.Length; i++)
+        {
+            var scalarSegment = paths[i].ApiSegments.Length > 0 ? paths[i].ApiScalarSegment : null;
+            if (scalarSegment?.IsPropertyResolved != true || !scalarSegment.ApiProperty.IsResolved)
+            {
+                leafTypes = [];
+                return false;
+            }
+
+            leafTypes[i] = scalarSegment.ApiProperty.ApiType.ClrType;
+        }
+
+        return true;
+    }
+
     #endregion
 }

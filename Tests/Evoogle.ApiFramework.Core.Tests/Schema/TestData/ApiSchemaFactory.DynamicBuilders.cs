@@ -191,10 +191,9 @@ public static partial class ApiSchemaFactory
     #region Dynamic Key Builders
     private static ApiKeyType BuildApiKeyType(ApiKeyTypeDef def)
     {
-        var apiName = def.ApiName;
         var apiKeyPaths = def.ApiKeyPaths.Select(BuildApiKeyPath);
 
-        var apiKeyType = new ApiKeyType(apiName, apiKeyPaths);
+        var apiKeyType = new ApiKeyType(apiKeyPaths);
 
         AttachExtensions(apiKeyType, def);
 
@@ -410,7 +409,7 @@ public static partial class ApiSchemaFactory
         var apiName = def.ApiName;
         var apiOptions = BuildApiObjectTypeOptions(def);
         var apiProperties = def.ApiProperties?.Select(BuildApiProperty);
-        var apiKeyTypes = def.ApiKeyTypes?.Select(BuildApiKeyType);
+        var apiKeyTypes = def.ApiKeyTypes?.Select(d => new KeyValuePair<string, ApiKeyType>(d.ApiName, BuildApiKeyType(d)));
         var clrType = def.ClrType;
 
         return new ApiObjectType(apiName, apiOptions, apiProperties, apiKeyTypes, clrType);

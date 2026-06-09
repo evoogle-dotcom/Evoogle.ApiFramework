@@ -9,7 +9,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 ///     Fluent builder used to configure the association of an <see cref="ApiRelationshipManyToMany"/>.
 /// </summary>
 /// <remarks>
-///     Set the foreign key role key types with <see cref="WithForeignKeyTypeA"/> and <see cref="WithForeignKeyTypeB"/>.
+///     Set the foreign key role key types with <see cref="WithForeignKeyA"/> and <see cref="WithForeignKeyB"/>.
 ///     When neither side is configured the relationship is treated as purely navigational.
 /// </remarks>
 /// <param name="clrObjectType">The CLR type of the association <see cref="ApiObjectType"/>.</param>
@@ -43,29 +43,27 @@ public class ApiRelationshipAssociationBuilder(Type clrObjectType) : ExtensionBu
         => this.AddRelationshipAssociationExtension(typeof(T), value);
     #endregion
 
-    #region WithForeignKeyType Methods
+    #region WithForeignKey Methods
     /// <summary>
-    ///     Sets the A-side foreign key role's <see cref="ApiKeyType"/> with the given <paramref name="apiName"/>, optionally configuring it further.
+    ///     Sets the A-side foreign key role's <see cref="ApiKeyType"/>, optionally configuring it further.
     /// </summary>
-    /// <param name="apiName">The API name of the A-side key type used for the foreign key role.</param>
     /// <param name="configure">Optional callback to configure key paths on the key type.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipAssociationBuilder WithForeignKeyTypeA(string apiName, Action<ApiKeyTypeBuilder>? configure = null)
+    public ApiRelationshipAssociationBuilder WithForeignKeyA(Action<ApiKeyTypeBuilder>? configure = null)
     {
-        _foreignKeyTypeBuilderA = new ApiKeyTypeBuilder(apiName);
+        _foreignKeyTypeBuilderA = new ApiKeyTypeBuilder();
         configure?.Invoke(_foreignKeyTypeBuilderA);
         return this;
     }
 
     /// <summary>
-    ///     Sets the B-side foreign key role's <see cref="ApiKeyType"/> with the given <paramref name="apiName"/>, optionally configuring it further.
+    ///     Sets the B-side foreign key role's <see cref="ApiKeyType"/>, optionally configuring it further.
     /// </summary>
-    /// <param name="apiName">The API name of the B-side key type used for the foreign key role.</param>
     /// <param name="configure">Optional callback to configure key paths on the key type.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipAssociationBuilder WithForeignKeyTypeB(string apiName, Action<ApiKeyTypeBuilder>? configure = null)
+    public ApiRelationshipAssociationBuilder WithForeignKeyB(Action<ApiKeyTypeBuilder>? configure = null)
     {
-        _foreignKeyTypeBuilderB = new ApiKeyTypeBuilder(apiName);
+        _foreignKeyTypeBuilderB = new ApiKeyTypeBuilder();
         configure?.Invoke(_foreignKeyTypeBuilderB);
         return this;
     }

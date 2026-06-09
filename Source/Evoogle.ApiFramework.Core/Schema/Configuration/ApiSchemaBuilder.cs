@@ -278,8 +278,8 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
 
         var builder = _context.GetOrAddOneToOneRelationshipBuilder(apiName);
 
-        builder.WithPrincipalEnd<TPrincipal>();
-        builder.WithDependentEnd(configure);
+        builder.From<TPrincipal>();
+        builder.To(configure);
         return this;
     }
 
@@ -302,8 +302,8 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
 
         var clrName = StaticReflection.GetMemberName(fk);
         var builder = _context.GetOrAddOneToOneRelationshipBuilder(apiName);
-        builder.WithPrincipalEnd<TPrincipal>();
-        builder.WithDependentEnd<TDependent>(d => d.WithForeignKeyType("FK", b => b.AddKeyPath(typeof(TDependent), clrName)));
+        builder.From<TPrincipal>();
+        builder.To<TDependent>(d => d.WithForeignKey(b => b.AddPath(typeof(TDependent), clrName)));
         return this;
     }
 
@@ -359,8 +359,8 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
 
         var builder = _context.GetOrAddOneToManyRelationshipBuilder(apiName);
 
-        builder.WithPrincipalEnd<TPrincipal>();
-        builder.WithDependentEnd(configure);
+        builder.From<TPrincipal>();
+        builder.To(configure);
         return this;
     }
 
@@ -383,8 +383,8 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
 
         var clrName = StaticReflection.GetMemberName(fk);
         var builder = _context.GetOrAddOneToManyRelationshipBuilder(apiName);
-        builder.WithPrincipalEnd<TPrincipal>();
-        builder.WithDependentEnd<TDependent>(d => d.WithForeignKeyType("FK", b => b.AddKeyPath(typeof(TDependent), clrName)));
+        builder.From<TPrincipal>();
+        builder.To<TDependent>(d => d.WithForeignKey(b => b.AddPath(typeof(TDependent), clrName)));
         return this;
     }
 
@@ -448,11 +448,11 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
         var clrNameA = StaticReflection.GetMemberName(fkA);
         var clrNameB = StaticReflection.GetMemberName(fkB);
         var builder = _context.GetOrAddManyToManyRelationshipBuilder(apiName);
-        builder.WithPrincipalEndA<TPrincipalA>();
-        builder.WithPrincipalEndB<TPrincipalB>();
+        builder.Between<TPrincipalA>();
+        builder.And<TPrincipalB>();
         builder.WithAssociation<TAssociation>(a => a
-            .WithForeignKeyTypeA("FKA", b => b.AddKeyPath(typeof(TAssociation), clrNameA))
-            .WithForeignKeyTypeB("FKB", b => b.AddKeyPath(typeof(TAssociation), clrNameB)));
+            .WithForeignKeyA(b => b.AddPath(typeof(TAssociation), clrNameA))
+            .WithForeignKeyB(b => b.AddPath(typeof(TAssociation), clrNameB)));
 
         return this;
     }

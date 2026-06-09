@@ -13,13 +13,16 @@ namespace Evoogle.ApiFramework.Schema;
 
 /// <summary>
 ///     Represents the principal end of an <see cref="ApiRelationship"/>.
-///     The principal end provides the key type used for relationship matching: its <see cref="ApiKeyType"/> uniquely identifies
-///     the objects on this side and is referenced by the <see cref="ApiRelationshipDependentEnd"/>.
+///
+///     The principal end provides the key type used for relationship matching:
+///     its <see cref="ApiKeyType"/> uniquely identifies the objects on this side and is referenced
+///     by the <see cref="ApiRelationshipDependentEnd"/>.
 /// </summary>
 /// <param name="clrObjectType">The CLR type of the principal <see cref="ApiObjectType"/>.</param>
 /// <param name="apiKeyTypeName">
 ///     The optional name of the <see cref="ApiKeyType"/> on the principal type that serves as the join key.
-///     When <see langword="null"/>, the primary key type (<see cref="ApiObjectType.ApiPrimaryKeyType"/>) is used.
+///     When <see langword="null"/>, relationship initialization uses the foreign key binding, when present,
+///     to infer the best compatible key type on the principal object type.
 /// </param>
 [JsonConverter(typeof(ApiRelationshipPrincipalEndJsonConverter))]
 public sealed class ApiRelationshipPrincipalEnd
@@ -45,7 +48,8 @@ public sealed class ApiRelationshipPrincipalEnd
     #region ApiRelationshipPrincipalEnd Properties
     /// <summary>
     ///     Gets the optional explicit key type name used to select a specific key type on the principal object type as the join key.
-    ///     When <see langword="null"/>, the primary key type of the principal type is used.
+    ///     When <see langword="null"/>, key-bound relationships infer the best compatible principal key type from the
+    ///     corresponding foreign key; navigational relationships use the principal type's primary key by convention.
     /// </summary>
     public string? ApiKeyTypeName { get; } = apiKeyTypeName;
 
@@ -56,6 +60,9 @@ public sealed class ApiRelationshipPrincipalEnd
 
     /// <summary>Gets the resolved principal <see cref="ApiKeyType"/>, or <see langword="null"/> if initialization failed or has not yet run.</summary>
     internal ApiKeyType? ResolvedKeyType => _apiResolvedKeyType;
+
+    /// <summary>Gets the resolved <see cref="ApiObjectType"/> for this end, or <see langword="null"/> if initialization failed or has not yet run.</summary>
+    internal ApiObjectType? ResolvedApiObjectType => this.ResolvedObjectType;
     #endregion
 
     #region Object Methods
@@ -83,6 +90,12 @@ public sealed class ApiRelationshipPrincipalEnd
     #endregion
 
     #region Implementation Methods
+    /// <summary>Overrides the resolved key type; used by shape-match disambiguation during relationship initialization.</summary>
+    internal void OverrideResolvedKeyType(ApiKeyType keyType)
+    {
+        _apiResolvedKeyType = keyType;
+    }
+
     private void InitializeApiKeyType(ApiInitializationContext context)
     {
         _apiResolvedKeyType = null;
@@ -103,7 +116,7 @@ public sealed class ApiRelationshipPrincipalEnd
                 return;
             }
 
-            var availableKeyTypes = string.Join(", ", apiObjectType.ApiKeyTypes.Select(i => $"'{i.ApiName}'"));
+            var availableKeyTypes = string.Join(", ", apiObjectType.ApiKeyTypes.Keys.Select(k => $"'{k}'"));
             var remediation = !string.IsNullOrEmpty(availableKeyTypes)
                 ? $"Use one of the available key types: {availableKeyTypes}"
                 : $"Define a key type on '{apiObjectType.ApiName}' or remove {nameof(this.ApiKeyTypeName)}";
@@ -117,7 +130,8 @@ public sealed class ApiRelationshipPrincipalEnd
             return;
         }
 
-        // Use primary key type by convention.
+        // Use primary key type by convention. Key-bound relationships may override this during alignment
+        // when another principal key type is the best compatible match for the foreign key.
         _apiResolvedKeyType = apiObjectType.ApiPrimaryKeyType;
 
         if (_apiResolvedKeyType is null)

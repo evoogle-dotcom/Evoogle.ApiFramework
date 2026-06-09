@@ -26,7 +26,8 @@ public delegate string? ApiKeyPartNameBuildDelegate(ApiKeyPartNameContext contex
 /// <param name="ApiKeyType">The key type being materialized.</param>
 /// <param name="ApiKeyPath">The key path for the current part.</param>
 /// <param name="PartIndex">The zero-based index of the current part.</param>
-public readonly record struct ApiKeyPartNameContext(ApiKeyType ApiKeyType, ApiKeyPath ApiKeyPath, int PartIndex);
+/// <param name="ApiKeyTypeName">The contextual name of the key type being materialized, or <see langword="null"/> for anonymous key types.</param>
+public readonly record struct ApiKeyPartNameContext(ApiKeyType ApiKeyType, ApiKeyPath ApiKeyPath, int PartIndex, string? ApiKeyTypeName);
 
 internal enum ApiKeyMaterializationValueKind
 {
@@ -94,6 +95,12 @@ public sealed class ApiKeyMaterializationContext
     ///     Defaults to <see cref="ApiKeyNullHandling.UseDefaultOnNull"/>.
     /// </summary>
     public ApiKeyNullHandling NullHandling { get; init; } = ApiKeyNullHandling.UseDefaultOnNull;
+
+    /// <summary>
+    ///     Gets the optional name of the key type being materialized.
+    ///     Propagated into <see cref="ApiKeyPartNameContext.ApiKeyTypeName"/> for each part during materialization.
+    /// </summary>
+    public string? KeyTypeName { get; init; }
     #endregion
 
     #region Methods

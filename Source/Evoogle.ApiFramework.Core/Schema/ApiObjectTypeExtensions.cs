@@ -35,10 +35,10 @@ public static class ApiObjectTypeExtensions
             return apiKeyType;
         }
 
-        var availableKeyTypesByApiName = string.Join(',', apiObjectType.ApiKeyTypes.OrderBy(i => i.ApiName).Select(i => i.ApiName));
+        var availableKeyTypesByApiName = string.Join(',', apiObjectType.ApiKeyTypes.Keys.OrderBy(k => k));
         var errorMessage =
-            $"{nameof(ApiKeyType)} with {nameof(ApiKeyType.ApiName)} '{apiName.SafeToString()}' not found in {apiObjectType.SafeToString()}. " +
-            $"Available {nameof(ApiKeyType)} by {nameof(ApiKeyType.ApiName)} are: {availableKeyTypesByApiName}.";
+            $"{nameof(ApiKeyType)} with name '{apiName.SafeToString()}' not found in {apiObjectType.SafeToString()}. " +
+            $"Available {nameof(ApiKeyType)} names are: {availableKeyTypesByApiName}.";
         throw new ApiSchemaException(errorMessage);
     }
 

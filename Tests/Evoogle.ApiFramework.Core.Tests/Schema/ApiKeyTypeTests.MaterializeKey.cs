@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -22,7 +22,7 @@ public partial class ApiKeyTypeTests
     #region Test Fields
     private static readonly IReadOnlyDictionary<string, ApiKeyPartNameBuildDelegate> _customPartNameBuilders = new Dictionary<string, ApiKeyPartNameBuildDelegate>
     {
-        ["Custom"] = static c => $"{c.ApiKeyType.ApiName}[{c.PartIndex}]"
+        ["Custom"] = static c => $"{c.ApiKeyType.ContextualName ?? "(anonymous)"}[{c.PartIndex}]"
     };
     #endregion
 
@@ -66,7 +66,7 @@ public partial class ApiKeyTypeTests
             }
 
             this.WriteLine($"ApiObjectType:     {this.ApiObjectTypeName.SafeToString()}");
-            this.WriteLine($"ApiKeyType:        {this.ApiKeyType?.ApiName.SafeToString()}");
+            this.WriteLine($"ApiKeyType:        {this.ApiKeyType?.ToString().SafeToString()}");
             this.WriteLine($"SelfObject:        {this.SelfObject.SafeToString()}");
             this.WriteLine($"OwnerObject:       {this.OwnerObject.SafeToString()}");
             this.WriteLine($"NullHandling:      {this.NullHandling.SafeToString()}");
@@ -174,7 +174,7 @@ public partial class ApiKeyTypeTests
             }
 
             this.WriteLine($"ApiObjectType:   {this.ApiObjectTypeName.SafeToString()}");
-            this.WriteLine($"ApiKeyType:      {this.ApiKeyType?.ApiName.SafeToString()}");
+            this.WriteLine($"ApiKeyType:      {this.ApiKeyType?.ToString().SafeToString()}");
             this.WriteLine($"NullHandling:    {this.NullHandling.SafeToString()}");
             this.WriteLine($"PartNameBuilder: {this.PartNameBuilder.SafeToString()}");
             this.WriteLine($"CustomBuilder:   {this.CustomPartNameBuilderName.SafeToString()}");

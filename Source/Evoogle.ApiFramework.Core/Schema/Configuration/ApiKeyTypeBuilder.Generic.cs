@@ -13,14 +13,9 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 ///     CLR property names are extracted at compile time rather than supplied as raw strings.
 /// </summary>
 /// <typeparam name="T">The default root CLR type for key paths added via expression overloads.</typeparam>
-/// <remarks>
-///     Initializes an <see cref="ApiKeyTypeBuilder{T}"/> with the specified API name.
-/// </remarks>
-/// <param name="apiName">The API name that identifies this key type within its containing <see cref="ApiObjectType"/>.</param>
-/// <exception cref="ArgumentException">Thrown when <paramref name="apiName"/> is <c>null</c>, empty, or whitespace.</exception>
-public sealed class ApiKeyTypeBuilder<T>(string apiName) : ApiKeyTypeBuilder(apiName)
+public sealed class ApiKeyTypeBuilder<T>() : ApiKeyTypeBuilder()
 {
-    #region AddKeyPath Methods
+    #region AddPath Methods
     /// <summary>
     ///     Adds a key path rooted at <typeparamref name="T"/> using a type-safe lambda expression.
     ///     The expression must consist only of chained member access (e.g. <c>x => x.Address.CityId</c>).
@@ -31,7 +26,7 @@ public sealed class ApiKeyTypeBuilder<T>(string apiName) : ApiKeyTypeBuilder(api
     /// <returns>The current builder instance.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="expression"/> is <c>null</c>.</exception>
     /// <exception cref="ArgumentException">Thrown when <paramref name="expression"/> is not a simple member access chain.</exception>
-    public ApiKeyTypeBuilder<T> AddKeyPath<TScalar>
+    public ApiKeyTypeBuilder<T> AddPath<TScalar>
     (
         Expression<Func<T, TScalar>> expression,
         Action<ApiKeyPathBuilder<T>>? configure = null
@@ -39,7 +34,7 @@ public sealed class ApiKeyTypeBuilder<T>(string apiName) : ApiKeyTypeBuilder(api
     {
         ArgumentNullException.ThrowIfNull(expression);
 
-        var builder = ApiKeyPathBuilder<T>.For<TScalar>(expression);
+        var builder = ApiKeyPathBuilder<T>.For(expression);
         configure?.Invoke(builder);
         base.AddKeyPathBuilderCore(builder);
         return this;
@@ -56,7 +51,7 @@ public sealed class ApiKeyTypeBuilder<T>(string apiName) : ApiKeyTypeBuilder(api
     /// <returns>The current builder instance.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="expression"/> is <c>null</c>.</exception>
     /// <exception cref="ArgumentException">Thrown when <paramref name="expression"/> is not a simple member access chain.</exception>
-    public ApiKeyTypeBuilder<T> AddKeyPath<TRoot>
+    public ApiKeyTypeBuilder<T> AddPathFrom<TRoot>
     (
         Expression<Func<TRoot, object?>> expression,
         Action<ApiKeyPathBuilder<T>>? configure = null
@@ -64,7 +59,7 @@ public sealed class ApiKeyTypeBuilder<T>(string apiName) : ApiKeyTypeBuilder(api
     {
         ArgumentNullException.ThrowIfNull(expression);
 
-        var builder = ApiKeyPathBuilder<T>.For<TRoot>(expression);
+        var builder = ApiKeyPathBuilder<T>.For(expression);
         configure?.Invoke(builder);
         base.AddKeyPathBuilderCore(builder);
         return this;

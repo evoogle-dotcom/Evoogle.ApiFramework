@@ -7,6 +7,7 @@ using System.Linq.Expressions;
 using System.Text.Json.Serialization;
 
 using Evoogle.ApiFramework.Schema.TestData;
+using Evoogle.ApiFramework.TestData;
 using Evoogle.Extensions;
 using Evoogle.XUnit;
 using Evoogle.XUnit.Json;
@@ -17,10 +18,10 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 
 /// <summary>
 ///     Unit tests for the typed relationship end builder overloads:
-///     <see cref="ApiRelationshipOneToOneBuilder.WithPrincipalEnd{TPrincipal}"/>,
-///     <see cref="ApiRelationshipOneToOneBuilder.WithDependentEnd{TDependent}"/>,
-///     <see cref="ApiRelationshipOneToManyBuilder.WithDependentEnd{TDependent}"/>,
-///     <see cref="ApiRelationshipManyToManyBuilder.WithDependentEndA{TDependent}"/>, and related overloads.
+///     <see cref="ApiRelationshipOneToOneBuilder.From{TPrincipal}"/>,
+///     <see cref="ApiRelationshipOneToOneBuilder.To{TDependent}"/>,
+///     <see cref="ApiRelationshipOneToManyBuilder.To{TDependent}"/>,
+///     <see cref="ApiRelationshipManyToManyBuilder.Between{TPrincipal}"/>, and related overloads.
 /// </summary>
 public class ApiRelationshipBuilderGenericTests(ITestOutputHelper output) : XUnitTests(output)
 {
@@ -133,6 +134,22 @@ public class ApiRelationshipBuilderGenericTests(ITestOutputHelper output) : XUni
     [Theory]
     [MemberData(nameof(BuildRelationshipTheoryData))]
     public void BuildRelationship(IXUnitTest test) => test.Execute(this);
+
+    [Fact]
+    public void WithForeignKeyGenericSupportsFourExpressionParts()
+    {
+        var dependentEnd = new ApiRelationshipDependentEndBuilder<RelationshipOrderLine>()
+            .WithForeignKey
+            (
+                p => p.OrderId,
+                p => p.LineNumber,
+                p => p.ProductSku,
+                p => p.ProductRevision
+            )
+            .Build();
+
+        dependentEnd.ApiForeignKeyType.ApiKeyPaths.Should().HaveCount(4);
+    }
     #endregion
 }
 

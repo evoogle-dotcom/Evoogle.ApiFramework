@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -22,7 +22,7 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
                 .WithName("Customer")
                 .AddProperty(c => c.Id)
                 .AddProperty(c => c.Name)
-                .AddKeyType("PK_Person_Id", c => c.AddKeyPath(p => p.Id));
+                .AddKey("PK_Person_Id", c => c.AddPath(p => p.Id));
         }
     }
     #endregion
@@ -232,8 +232,8 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
             .AddProperty(c => c.Name)
             .AddProperty(c => c.Owner)
             .AddProperty(c => c.Employees)
-            .AddKeyType("PK_Company_Id", c => c.AddKeyPath(p => p.Id))
-            .AddKeyType("AK_Company_Name", c => c.AddKeyPath(p => p.Name));
+            .AddKey("PK_Company_Id", c => c.AddPath(p => p.Id))
+            .AddKey("AK_Company_Name", c => c.AddPath(p => p.Name));
 
         return builder;
     }
@@ -247,8 +247,8 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
             .AddProperty(c => c.Name, p => p.AsRequired())
             .AddProperty(c => c.Owner, p => p.AsOptional())
             .AddProperty(c => c.Employees, p => p.AsOptional())
-            .AddKeyType("PK_Company_Id", c => c.AddKeyPath(p => p.Id))
-            .AddKeyType("AK_Company_Name", c => c.AddKeyPath(p => p.Name));
+            .AddKey("PK_Company_Id", c => c.AddPath(p => p.Id))
+            .AddKey("AK_Company_Name", c => c.AddPath(p => p.Name));
 
         return builder;
     }
@@ -259,8 +259,8 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
             .WithName(nameof(KeyOneScalarPart))
             .AddProperty(c => c.Id)
             .AddProperty(c => c.Name)
-            .AddKeyType("PK_KeyOneScalarPart", c => c.AddKeyPath(p => p.Id))
-            .AddKeyType("AK_KeyOneScalarPart", c => c.AddKeyPath(p => p.Name));
+            .AddKey("PK_KeyOneScalarPart", c => c.AddPath(p => p.Id))
+            .AddKey("AK_KeyOneScalarPart", c => c.AddPath(p => p.Name));
 
         return builder;
     }
@@ -272,9 +272,7 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
             .AddProperty(c => c.Id1)
             .AddProperty(c => c.Id2)
             .AddProperty(c => c.Description)
-            .AddKeyType("PK_KeyTwoScalarPartComposite", c => c
-                .AddKeyPath(p => p.Id1)
-                .AddKeyPath(p => p.Id2));
+            .AddKey("PK_KeyTwoScalarPartComposite", p => p.Id1, p => p.Id2);
 
         return builder;
     }
@@ -287,10 +285,7 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
             .AddProperty(c => c.Id2)
             .AddProperty(c => c.Id3)
             .AddProperty(c => c.Description)
-            .AddKeyType("PK_KeyThreeScalarPartComposite", c => c
-                .AddKeyPath(p => p.Id1)
-                .AddKeyPath(p => p.Id2)
-                .AddKeyPath(p => p.Id3));
+            .AddKey("PK_KeyThreeScalarPartComposite", p => p.Id1, p => p.Id2, p => p.Id3);
 
         return builder;
     }
@@ -301,9 +296,7 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
             .WithName(nameof(KeyNestedComposite))
             .AddProperty(c => c.NestedPart)
             .AddProperty(c => c.Name)
-            .AddKeyType("PK_KeyNestedComposite", c => c
-                .AddKeyPath(p => p.NestedPart.Id)
-                .AddKeyPath(p => p.Name));
+            .AddKey("PK_KeyNestedComposite", p => p.NestedPart.Id, p => p.Name);
 
         return builder;
     }
@@ -314,9 +307,9 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
             .WithName(nameof(KeyOwnedComposite))
             .AddProperty(c => c.LineNumber)
             .AddProperty(c => c.Description)
-            .AddKeyType("PK_KeyOwnedComposite", c => c
-                .AddKeyPath<KeyOwner>(p => p.Id)
-                .AddKeyPath(p => p.LineNumber));
+            .AddKey("PK_KeyOwnedComposite", c => c
+                .AddPathFrom<KeyOwner>(p => p.Id)
+                .AddPath(p => p.LineNumber));
 
         return builder;
     }
@@ -326,8 +319,8 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
         var builder = new ApiObjectTypeBuilder<KeyOwnedDependent>(ctx)
             .WithName(nameof(KeyOwnedDependent))
             .AddProperty(c => c.Description)
-            .AddKeyType("PK_KeyOwnedDependent", c => c
-                .AddKeyPath<KeyOwner>(p => p.Id));
+            .AddKey("PK_KeyOwnedDependent", c => c
+                .AddPathFrom<KeyOwner>(p => p.Id));
 
         return builder;
     }

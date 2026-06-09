@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -68,7 +68,7 @@ public sealed partial class ApiKeyType
         for (var i = 0; i < this.ApiKeyPaths.Length; i++)
         {
             var path = this.ApiKeyPaths[i];
-            var partName = partNameBuilder(new ApiKeyPartNameContext(this, path, i));
+            var partName = partNameBuilder(new ApiKeyPartNameContext(this, path, i, context.KeyTypeName));
             var partValue = valueFactory(path, context);
             parts[i] = new ApiKeyPart(partName, partValue);
         }

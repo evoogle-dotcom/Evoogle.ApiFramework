@@ -54,7 +54,7 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
         #region Properties
         public ApiObjectTypeOptions? ApiOptions { get; set; }
         public List<ApiProperty>? ApiProperties { get; set; }
-        public List<ApiKeyType>? ApiKeyTypes { get; set; }
+        public List<KeyValuePair<string, ApiKeyType>>? ApiKeyTypes { get; set; }
         #endregion
     }
 
@@ -172,18 +172,36 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
             context.ReadData.ApiObjectType ??= new ApiObjectTypeReadData();
             context.ReadData.ApiObjectType.ApiKeyTypes ??= [];
 
-            ReadJsonArray(ref reader, context, (x) => HandleApiObjectTypeApiKeyTypesArrayItem);
-        }
-
-        private static void HandleApiObjectTypeApiKeyTypesArrayItem(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
-        {
-            var apiKeyType = JsonSerializer.Deserialize<ApiKeyType>(ref reader, context.Options);
-            if (apiKeyType == null)
+            if (reader.TokenType != JsonTokenType.StartObject)
             {
                 return;
             }
 
-            context.ReadData.ApiObjectType!.ApiKeyTypes!.Add(apiKeyType);
+            while (reader.Read())
+            {
+                if (reader.TokenType == JsonTokenType.EndObject)
+                {
+                    break;
+                }
+
+                if (reader.TokenType != JsonTokenType.PropertyName)
+                {
+                    break;
+                }
+
+                var keyTypeName = reader.GetString()!;
+
+                if (!reader.Read())
+                {
+                    break;
+                }
+
+                var apiKeyType = JsonSerializer.Deserialize<ApiKeyType>(ref reader, context.Options);
+                if (apiKeyType != null)
+                {
+                    context.ReadData.ApiObjectType!.ApiKeyTypes!.Add(new KeyValuePair<string, ApiKeyType>(keyTypeName, apiKeyType));
+                }
+            }
         }
 
         private static void HandleApiObjectTypeApiOptions(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)

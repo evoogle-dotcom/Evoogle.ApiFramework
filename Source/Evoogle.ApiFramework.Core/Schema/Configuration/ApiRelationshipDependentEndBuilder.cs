@@ -9,7 +9,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 ///     Fluent builder used to configure the dependent end of an <see cref="ApiRelationship"/>.
 /// </summary>
 /// <remarks>
-///     Set the foreign key role's <see cref="ApiKeyType"/> with <see cref="WithForeignKeyType"/>.
+///     Set the foreign key role's <see cref="ApiKeyType"/> with <see cref="WithForeignKey"/>.
 ///     When no key type is configured the relationship is treated as purely navigational.
 /// </remarks>
 /// <param name="clrObjectType">The CLR type of the dependent <see cref="ApiObjectType"/>.</param>
@@ -42,16 +42,15 @@ public class ApiRelationshipDependentEndBuilder(Type clrObjectType) : ExtensionB
         => this.AddRelationshipDependentEndExtension(typeof(T), value);
     #endregion
 
-    #region WithForeignKeyType Methods
+    #region WithForeignKey Methods
     /// <summary>
-    ///     Sets the foreign key role's <see cref="ApiKeyType"/> with the given <paramref name="apiName"/>, optionally configuring it further.
+    ///     Sets the foreign key role's <see cref="ApiKeyType"/>, optionally configuring its key paths.
     /// </summary>
-    /// <param name="apiName">The API name of the key type used for the foreign key role.</param>
     /// <param name="configure">Optional callback to configure key paths on the key type.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipDependentEndBuilder WithForeignKeyType(string apiName, Action<ApiKeyTypeBuilder>? configure = null)
+    public ApiRelationshipDependentEndBuilder WithForeignKey(Action<ApiKeyTypeBuilder>? configure = null)
     {
-        _foreignKeyTypeBuilder = new ApiKeyTypeBuilder(apiName);
+        _foreignKeyTypeBuilder = new ApiKeyTypeBuilder();
         configure?.Invoke(_foreignKeyTypeBuilder);
         return this;
     }

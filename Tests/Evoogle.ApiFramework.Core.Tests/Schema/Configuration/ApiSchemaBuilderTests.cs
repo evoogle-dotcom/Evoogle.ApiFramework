@@ -177,7 +177,7 @@ public partial class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTest
                             var apiDependentEnd = apiRelationshipOneToOne.ApiDependentEnd;
                             var clrPrincipalType = apiPrincipalEnd.ClrObjectType;
 
-                            x.WithPrincipalEnd(clrPrincipalType, p => p.ConfigureExtensions(apiPrincipalEnd));
+                            x.From(clrPrincipalType, p => p.ConfigureExtensions(apiPrincipalEnd));
                             x.ConfigureDependentEnd(apiDependentEnd);
                             x.WithDeleteBehavior(apiDeleteBehavior);
                             x.ConfigureExtensions(apiRelationshipOneToOne);
@@ -189,7 +189,7 @@ public partial class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTest
                             var apiDependentEnd = apiRelationshipOneToMany.ApiDependentEnd;
                             var clrPrincipalType = apiPrincipalEnd.ClrObjectType;
 
-                            x.WithPrincipalEnd(clrPrincipalType, p => p.ConfigureExtensions(apiPrincipalEnd));
+                            x.From(clrPrincipalType, p => p.ConfigureExtensions(apiPrincipalEnd));
                             x.ConfigureDependentEnd(apiDependentEnd);
                             x.WithDeleteBehavior(apiDeleteBehavior);
                             x.ConfigureExtensions(apiRelationshipOneToMany);
@@ -203,8 +203,8 @@ public partial class ApiSchemaBuilderTests(ITestOutputHelper output) : XUnitTest
                         var clrPrincipalTypeA = apiPrincipalEndA.ClrObjectType;
                         var clrPrincipalTypeB = apiPrincipalEndB.ClrObjectType;
 
-                        x.WithPrincipalEndA(clrPrincipalTypeA, p => p.ConfigureExtensions(apiPrincipalEndA));
-                        x.WithPrincipalEndB(clrPrincipalTypeB, p => p.ConfigureExtensions(apiPrincipalEndB));
+                        x.Between(clrPrincipalTypeA, p => p.ConfigureExtensions(apiPrincipalEndA));
+                        x.And(clrPrincipalTypeB, p => p.ConfigureExtensions(apiPrincipalEndB));
                         x.ConfigureAssociation(apiAssociation);
                         x.WithDeleteBehavior(apiDeleteBehavior);
                         x.ConfigureExtensions(apiRelationshipManyToMany);

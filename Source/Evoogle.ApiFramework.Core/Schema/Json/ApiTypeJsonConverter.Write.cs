@@ -84,13 +84,19 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
         var apiKeyTypes = apiObjectType.ApiKeyTypes;
         var options = context.Options;
 
-        writer.TryWritePropertyWithAction
-        (
-            propertyName,
-            apiKeyTypes,
-            options,
-            collection => WriteJsonArray(writer, collection, item => writer.TryWriteWithSerializer(item, options))
-        );
+        if (apiKeyTypes.Count == 0)
+        {
+            return;
+        }
+
+        writer.WritePropertyName(propertyName);
+        writer.WriteStartObject();
+        foreach (var (name, keyType) in apiKeyTypes)
+        {
+            writer.WritePropertyName(name);
+            JsonSerializer.Serialize(writer, keyType, options);
+        }
+        writer.WriteEndObject();
     }
 
     private static void WriteApiObjectTypeApiOptions(Utf8JsonWriter writer, ApiObjectType apiObjectType, DefaultWriteContext<PropertyNames> context)

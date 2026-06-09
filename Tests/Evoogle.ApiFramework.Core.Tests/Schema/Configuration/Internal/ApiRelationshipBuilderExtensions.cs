@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -14,7 +14,7 @@ internal static class ApiRelationshipBuilderExtensions
     #region Methods
     public static void ConfigureDependentEnd(this ApiRelationshipOneToOneBuilder builder, ApiRelationshipDependentEnd apiDependentEnd)
     {
-        builder.WithDependentEnd(apiDependentEnd.ClrObjectType, y =>
+        builder.To(apiDependentEnd.ClrObjectType, y =>
         {
             if (apiDependentEnd.HasKeyBinding)
             {
@@ -26,7 +26,7 @@ internal static class ApiRelationshipBuilderExtensions
 
     public static void ConfigureDependentEnd(this ApiRelationshipOneToManyBuilder builder, ApiRelationshipDependentEnd apiDependentEnd)
     {
-        builder.WithDependentEnd(apiDependentEnd.ClrObjectType, y =>
+        builder.To(apiDependentEnd.ClrObjectType, y =>
         {
             if (apiDependentEnd.HasKeyBinding)
             {
@@ -53,12 +53,12 @@ internal static class ApiRelationshipBuilderExtensions
     #region Implementation Methods
     private static void ConfigureForeignKeyType(ApiRelationshipDependentEndBuilder builder, ApiKeyType apiForeignKeyType)
     {
-        builder.WithForeignKeyType(apiForeignKeyType.ApiName, fk =>
+        builder.WithForeignKey(fk =>
         {
             foreach (var keyPath in apiForeignKeyType.ApiKeyPaths)
             {
                 var clrPropertyNames = keyPath.ApiSegments.Select(s => s.ClrPropertyName);
-                fk.AddKeyPath(keyPath.ClrRootType, clrPropertyNames, p => p.ConfigureExtensions(keyPath));
+                fk.AddPath(keyPath.ClrRootType, clrPropertyNames, p => p.ConfigureExtensions(keyPath));
             }
             fk.ConfigureExtensions(apiForeignKeyType);
         });
@@ -68,24 +68,24 @@ internal static class ApiRelationshipBuilderExtensions
     {
         if (isA)
         {
-            builder.WithForeignKeyTypeA(apiForeignKeyType.ApiName, fk =>
+            builder.WithForeignKeyA(fk =>
             {
                 foreach (var keyPath in apiForeignKeyType.ApiKeyPaths)
                 {
                     var clrPropertyNames = keyPath.ApiSegments.Select(s => s.ClrPropertyName);
-                    fk.AddKeyPath(keyPath.ClrRootType, clrPropertyNames, p => p.ConfigureExtensions(keyPath));
+                    fk.AddPath(keyPath.ClrRootType, clrPropertyNames, p => p.ConfigureExtensions(keyPath));
                 }
                 fk.ConfigureExtensions(apiForeignKeyType);
             });
         }
         else
         {
-            builder.WithForeignKeyTypeB(apiForeignKeyType.ApiName, fk =>
+            builder.WithForeignKeyB(fk =>
             {
                 foreach (var keyPath in apiForeignKeyType.ApiKeyPaths)
                 {
                     var clrPropertyNames = keyPath.ApiSegments.Select(s => s.ClrPropertyName);
-                    fk.AddKeyPath(keyPath.ClrRootType, clrPropertyNames, p => p.ConfigureExtensions(keyPath));
+                    fk.AddPath(keyPath.ClrRootType, clrPropertyNames, p => p.ConfigureExtensions(keyPath));
                 }
                 fk.ConfigureExtensions(apiForeignKeyType);
             });

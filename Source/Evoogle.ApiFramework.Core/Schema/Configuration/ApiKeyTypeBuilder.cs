@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -11,20 +11,15 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 public class ApiKeyTypeBuilder : ExtensionBuilder<ApiKeyTypeBuilder>
 {
     #region Fields
-    private readonly string _apiName;
     private readonly List<ApiKeyPathBuilder> _keyPathBuilders = [];
     #endregion
 
     #region Constructors
     /// <summary>
-    ///     Initializes an <see cref="ApiKeyTypeBuilder"/> with the specified API name.
+    ///     Initializes an <see cref="ApiKeyTypeBuilder"/>.
     /// </summary>
-    /// <param name="apiName">The API name that identifies this key type within its containing <see cref="ApiObjectType"/>.</param>
-    /// <exception cref="ArgumentException">Thrown when <paramref name="apiName"/> is <c>null</c>, empty, or whitespace.</exception>
-    public ApiKeyTypeBuilder(string apiName)
+    public ApiKeyTypeBuilder()
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiName);
-        _apiName = apiName;
     }
     #endregion
 
@@ -51,7 +46,7 @@ public class ApiKeyTypeBuilder : ExtensionBuilder<ApiKeyTypeBuilder>
         => this.AddKeyTypeExtension(typeof(T), value);
     #endregion
 
-    #region AddKeyPath Methods
+    #region AddPath Methods
     /// <summary>
     ///     Adds a key path to this key type using plain CLR property names.
     /// </summary>
@@ -60,7 +55,7 @@ public class ApiKeyTypeBuilder : ExtensionBuilder<ApiKeyTypeBuilder>
     /// <returns>The current builder instance.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="clrRootType"/> is <c>null</c>.</exception>
     /// <exception cref="ArgumentException">Thrown when <paramref name="clrPropertyNames"/> is empty.</exception>
-    public ApiKeyTypeBuilder AddKeyPath(Type clrRootType, params string[] clrPropertyNames)
+    public ApiKeyTypeBuilder AddPath(Type clrRootType, params string[] clrPropertyNames)
     {
         _keyPathBuilders.Add(ApiKeyPathBuilder.For(clrRootType, clrPropertyNames));
         return this;
@@ -75,7 +70,7 @@ public class ApiKeyTypeBuilder : ExtensionBuilder<ApiKeyTypeBuilder>
     /// <returns>The current builder instance.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="clrRootType"/> is <c>null</c>.</exception>
     /// <exception cref="ArgumentException">Thrown when <paramref name="clrPropertyNames"/> is empty.</exception>
-    public ApiKeyTypeBuilder AddKeyPath(Type clrRootType, IEnumerable<string> clrPropertyNames, Action<ApiKeyPathBuilder>? configure = null)
+    public ApiKeyTypeBuilder AddPath(Type clrRootType, IEnumerable<string> clrPropertyNames, Action<ApiKeyPathBuilder>? configure = null)
     {
         var builder = new ApiKeyPathBuilder(clrRootType, clrPropertyNames);
         configure?.Invoke(builder);
@@ -90,7 +85,7 @@ public class ApiKeyTypeBuilder : ExtensionBuilder<ApiKeyTypeBuilder>
     /// <param name="keyPathBuilder">The pre-configured key path builder.</param>
     /// <returns>The current builder instance.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="keyPathBuilder"/> is <c>null</c>.</exception>
-    public ApiKeyTypeBuilder AddKeyPath(ApiKeyPathBuilder keyPathBuilder)
+    public ApiKeyTypeBuilder AddPath(ApiKeyPathBuilder keyPathBuilder)
     {
         ArgumentNullException.ThrowIfNull(keyPathBuilder);
         _keyPathBuilders.Add(keyPathBuilder);
@@ -105,7 +100,7 @@ public class ApiKeyTypeBuilder : ExtensionBuilder<ApiKeyTypeBuilder>
     internal ApiKeyType Build()
     {
         var keyPaths = _keyPathBuilders.Select(b => b.Build());
-        var keyType = new ApiKeyType(_apiName, keyPaths);
+        var keyType = new ApiKeyType(keyPaths);
 
         var extensions = this.BuildExtensions();
         if (extensions != null)

@@ -9,12 +9,12 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 ///     Fluent builder used to configure an <see cref="ApiRelationshipManyToMany"/> relationship.
 /// </summary>
 /// <remarks>
-///     Call <see cref="WithPrincipalEndA{TPrincipal}"/>, <see cref="WithPrincipalEndB{TPrincipal}"/>,
+///     Call <see cref="Between{TPrincipal}"/>, <see cref="And{TPrincipal}"/>,
 ///     and <see cref="WithAssociation{TAssociation}"/> (or their non-generic overloads) to define
 ///     both principal ends and the association object type.
 ///     Optionally call <see cref="WithDeleteBehavior"/> to override the default
 ///     (<see cref="ApiRelationshipManyToMany.DefaultDeleteBehavior"/>).
-///     Subsequent calls to any <c>With</c> method for the same end replace the previous configuration.
+///     Subsequent calls to any configuration method for the same end replace the previous configuration.
 /// </remarks>
 /// <param name="apiName">The schema-unique API name of the relationship.</param>
 public class ApiRelationshipManyToManyBuilder(string apiName)
@@ -54,7 +54,7 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
     /// <param name="clrPrincipalType">The CLR type of the principal end A object type.</param>
     /// <param name="configure">Optional callback to configure principal key type selection and extensions.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipManyToManyBuilder WithPrincipalEndA(Type clrPrincipalType, Action<ApiRelationshipPrincipalEndBuilder>? configure = null)
+    public ApiRelationshipManyToManyBuilder Between(Type clrPrincipalType, Action<ApiRelationshipPrincipalEndBuilder>? configure = null)
     {
         var builder = new ApiRelationshipPrincipalEndBuilder(clrPrincipalType);
         configure?.Invoke(builder);
@@ -68,7 +68,7 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
     /// <param name="clrPrincipalType">The CLR type of the principal end B object type.</param>
     /// <param name="configure">Optional callback to configure principal key type selection and extensions.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipManyToManyBuilder WithPrincipalEndB(Type clrPrincipalType, Action<ApiRelationshipPrincipalEndBuilder>? configure = null)
+    public ApiRelationshipManyToManyBuilder And(Type clrPrincipalType, Action<ApiRelationshipPrincipalEndBuilder>? configure = null)
     {
         var builder = new ApiRelationshipPrincipalEndBuilder(clrPrincipalType);
         configure?.Invoke(builder);
@@ -106,7 +106,7 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
     /// <typeparam name="TPrincipal">The CLR type of the principal end A object type.</typeparam>
     /// <param name="configure">Optional callback to configure the principal end.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipManyToManyBuilder WithPrincipalEndA<TPrincipal>(Action<ApiRelationshipPrincipalEndBuilder>? configure = null)
+    public ApiRelationshipManyToManyBuilder Between<TPrincipal>(Action<ApiRelationshipPrincipalEndBuilder>? configure = null)
     {
         var builder = new ApiRelationshipPrincipalEndBuilder(typeof(TPrincipal));
         configure?.Invoke(builder);
@@ -120,7 +120,7 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
     /// <typeparam name="TPrincipal">The CLR type of the principal end B object type.</typeparam>
     /// <param name="configure">Optional callback to configure the principal end.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipManyToManyBuilder WithPrincipalEndB<TPrincipal>(Action<ApiRelationshipPrincipalEndBuilder>? configure = null)
+    public ApiRelationshipManyToManyBuilder And<TPrincipal>(Action<ApiRelationshipPrincipalEndBuilder>? configure = null)
     {
         var builder = new ApiRelationshipPrincipalEndBuilder(typeof(TPrincipal));
         configure?.Invoke(builder);
