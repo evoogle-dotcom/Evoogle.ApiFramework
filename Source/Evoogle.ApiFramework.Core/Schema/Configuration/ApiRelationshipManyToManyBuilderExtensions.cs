@@ -1,0 +1,80 @@
+// Copyright (c) 2024-2025 Evoogle.com
+// SPDX-License-Identifier: MIT
+//
+// This file is licensed under the MIT License.
+// See the LICENSE file in the project root for more information.
+namespace Evoogle.ApiFramework.Schema.Configuration;
+
+/// <summary>
+///     Extension methods for <see cref="ApiRelationshipManyToManyBuilder"/>.
+/// </summary>
+public static class ApiRelationshipManyToManyBuilderExtensions
+{
+    #region Between/And Methods
+    /// <summary>
+    ///     Configures principal end A using the CLR type <typeparamref name="TPrincipal"/>.
+    /// </summary>
+    public static ApiRelationshipManyToManyBuilder Between<TPrincipal>
+    (
+        this ApiRelationshipManyToManyBuilder builder,
+        Action<ApiRelationshipPrincipalEndBuilder>? configure = null
+    )
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+
+        return builder.Between(typeof(TPrincipal), configure);
+    }
+
+    /// <summary>
+    ///     Configures principal end A using the CLR type <typeparamref name="TPrincipal"/>.
+    /// </summary>
+    public static ApiRelationshipManyToManyBuilder Between<TPrincipal>(this ApiRelationshipManyToManyBuilder builder, string apiPrimaryKeyTypeName)
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+
+        return builder.Between(typeof(TPrincipal), apiPrimaryKeyTypeName);
+    }
+
+    /// <summary>
+    ///     Configures principal end B using the CLR type <typeparamref name="TPrincipal"/>.
+    /// </summary>
+    public static ApiRelationshipManyToManyBuilder And<TPrincipal>
+    (
+        this ApiRelationshipManyToManyBuilder builder,
+        Action<ApiRelationshipPrincipalEndBuilder>? configure = null
+    )
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+
+        return builder.And(typeof(TPrincipal), configure);
+    }
+
+    /// <summary>
+    ///     Configures principal end B using the CLR type <typeparamref name="TPrincipal"/>.
+    /// </summary>
+    public static ApiRelationshipManyToManyBuilder And<TPrincipal>(this ApiRelationshipManyToManyBuilder builder, string apiPrimaryKeyTypeName)
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+
+        return builder.And(typeof(TPrincipal), apiPrimaryKeyTypeName);
+    }
+    #endregion
+
+    #region WithAssociation Methods
+    /// <summary>
+    ///     Configures the association using the CLR type <typeparamref name="TAssociation"/>.
+    /// </summary>
+    public static ApiRelationshipManyToManyBuilder WithAssociation<TAssociation>
+    (
+        this ApiRelationshipManyToManyBuilder builder,
+        Action<ApiRelationshipAssociationBuilder<TAssociation>>? configure = null
+    )
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+
+        var associationBuilder = new ApiRelationshipAssociationBuilder<TAssociation>();
+        configure?.Invoke(associationBuilder);
+        return builder.SetAssociationBuilderCore(associationBuilder);
+    }
+    #endregion
+}

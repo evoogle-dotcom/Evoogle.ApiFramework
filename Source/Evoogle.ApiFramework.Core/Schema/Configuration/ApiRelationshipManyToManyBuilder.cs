@@ -9,9 +9,9 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 ///     Fluent builder used to configure an <see cref="ApiRelationshipManyToMany"/> relationship.
 /// </summary>
 /// <remarks>
-///     Call <see cref="Between{TPrincipal}(Action{ApiRelationshipPrincipalEndBuilder})"/>,
-///     <see cref="And{TPrincipal}(Action{ApiRelationshipPrincipalEndBuilder})"/>,
-///     and <see cref="WithAssociation{TAssociation}"/> (or their non-generic overloads) to define
+///     Call <see cref="Between(Type, Action{ApiRelationshipPrincipalEndBuilder}?)"/>,
+///     <see cref="And(Type, Action{ApiRelationshipPrincipalEndBuilder}?)"/>,
+///     and <see cref="WithAssociation(Type, Action{ApiRelationshipAssociationBuilder}?)"/> to define
 ///     both principal ends and the association object type.
 ///     Optionally call <see cref="WithDeleteBehavior"/> to override the default
 ///     (<see cref="ApiRelationshipManyToMany.DefaultDeleteBehavior"/>).
@@ -122,81 +122,6 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
         => base.WithDeleteBehavior<ApiRelationshipManyToManyBuilder>(apiDeleteBehavior);
     #endregion
 
-    #region Generic Between/And Methods
-    /// <summary>
-    ///     Configures principal end A using the CLR type <typeparamref name="TPrincipal"/>.
-    /// </summary>
-    /// <typeparam name="TPrincipal">The CLR type of the principal end A object type.</typeparam>
-    /// <param name="configure">Optional callback to configure the principal end.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiRelationshipManyToManyBuilder Between<TPrincipal>(Action<ApiRelationshipPrincipalEndBuilder>? configure = null)
-    {
-        var builder = new ApiRelationshipPrincipalEndBuilder(typeof(TPrincipal));
-        configure?.Invoke(builder);
-        _principalEndABuilder = builder;
-        return this;
-    }
-
-    /// <summary>
-    ///     Configures principal end A using the CLR type <typeparamref name="TPrincipal"/>,
-    ///     and selects the named primary key type for the relationship.
-    /// </summary>
-    /// <typeparam name="TPrincipal">The CLR type of the principal end A object type.</typeparam>
-    /// <param name="apiPrimaryKeyTypeName">The name of the primary key type to use for the relationship.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiRelationshipManyToManyBuilder Between<TPrincipal>(string apiPrimaryKeyTypeName)
-    {
-        var builder = new ApiRelationshipPrincipalEndBuilder(typeof(TPrincipal));
-        builder.WithPrimaryKey(apiPrimaryKeyTypeName);
-        _principalEndABuilder = builder;
-        return this;
-    }
-
-    /// <summary>
-    ///     Configures principal end B using the CLR type <typeparamref name="TPrincipal"/>.
-    /// </summary>
-    /// <typeparam name="TPrincipal">The CLR type of the principal end B object type.</typeparam>
-    /// <param name="configure">Optional callback to configure the principal end.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiRelationshipManyToManyBuilder And<TPrincipal>(Action<ApiRelationshipPrincipalEndBuilder>? configure = null)
-    {
-        var builder = new ApiRelationshipPrincipalEndBuilder(typeof(TPrincipal));
-        configure?.Invoke(builder);
-        _principalEndBBuilder = builder;
-        return this;
-    }
-
-    /// <summary>
-    ///     Configures principal end B using the CLR type <typeparamref name="TPrincipal"/>,
-    ///     and selects the named primary key type for the relationship.
-    /// </summary>
-    /// <typeparam name="TPrincipal">The CLR type of the principal end B object type.</typeparam>
-    /// <param name="apiPrimaryKeyTypeName">The name of the primary key type to use for the relationship.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiRelationshipManyToManyBuilder And<TPrincipal>(string apiPrimaryKeyTypeName)
-    {
-        var builder = new ApiRelationshipPrincipalEndBuilder(typeof(TPrincipal));
-        builder.WithPrimaryKey(apiPrimaryKeyTypeName);
-        _principalEndBBuilder = builder;
-        return this;
-    }
-
-    /// <summary>
-    ///     Configures the association using the CLR type <typeparamref name="TAssociation"/>,
-    ///     providing a strongly-typed builder for foreign key role key path configuration.
-    /// </summary>
-    /// <typeparam name="TAssociation">The CLR type of the association object.</typeparam>
-    /// <param name="configure">Optional callback to add key paths and extensions using expression-based property selectors.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiRelationshipManyToManyBuilder WithAssociation<TAssociation>(Action<ApiRelationshipAssociationBuilder<TAssociation>>? configure = null)
-    {
-        var builder = new ApiRelationshipAssociationBuilder<TAssociation>();
-        configure?.Invoke(builder);
-        _associationBuilder = builder;
-        return this;
-    }
-    #endregion
-
     #region Build Methods
     /// <inheritdoc/>
     internal override ApiRelationship Build()
@@ -223,6 +148,18 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
         }
 
         return relationship;
+    }
+    #endregion
+
+    #region Implementation Methods
+    /// <summary>
+    ///     Allows extension methods to set a pre-constructed association builder.
+    /// </summary>
+    internal ApiRelationshipManyToManyBuilder SetAssociationBuilderCore(ApiRelationshipAssociationBuilder builder)
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+        _associationBuilder = builder;
+        return this;
     }
     #endregion
 }

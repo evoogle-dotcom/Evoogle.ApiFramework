@@ -9,8 +9,8 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 ///     Fluent builder used to configure an <see cref="ApiRelationshipOneToMany"/> relationship.
 /// </summary>
 /// <remarks>
-///     Call <see cref="From{TPrincipal}(Action{ApiRelationshipPrincipalEndBuilder})"/>,
-///     <see cref="To{TDependent}"/>, and optionally
+///     Call <see cref="From(Type, Action{ApiRelationshipPrincipalEndBuilder}?)"/>,
+///     <see cref="To(Type, Action{ApiRelationshipDependentEndBuilder}?)"/>, and optionally
 ///     <see cref="WithDeleteBehavior"/> to configure the relationship.
 ///     At most one principal end and one dependent end are allowed; subsequent calls replace the previous
 ///     configuration for that end.
@@ -90,52 +90,6 @@ public sealed class ApiRelationshipOneToManyBuilder(string apiName)
         => base.WithDeleteBehavior<ApiRelationshipOneToManyBuilder>(apiDeleteBehavior);
     #endregion
 
-    #region Generic From/To Methods
-    /// <summary>
-    ///     Configures the principal end of the 1:M relationship using the CLR type <typeparamref name="TPrincipal"/>.
-    /// </summary>
-    /// <typeparam name="TPrincipal">The CLR type of the principal object.</typeparam>
-    /// <param name="configure">Optional callback to configure principal key type selection and extensions.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiRelationshipOneToManyBuilder From<TPrincipal>(Action<ApiRelationshipPrincipalEndBuilder>? configure = null)
-    {
-        var builder = new ApiRelationshipPrincipalEndBuilder(typeof(TPrincipal));
-        configure?.Invoke(builder);
-        _principalEndBuilder = builder;
-        return this;
-    }
-
-    /// <summary>
-    ///     Configures the principal end of the 1:M relationship using the CLR type <typeparamref name="TPrincipal"/>,
-    ///     and selects the named primary key type for the relationship.
-    /// </summary>
-    /// <typeparam name="TPrincipal">The CLR type of the principal object.</typeparam>
-    /// <param name="apiPrimaryKeyTypeName">The name of the primary key type to use for the relationship.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiRelationshipOneToManyBuilder From<TPrincipal>(string apiPrimaryKeyTypeName)
-    {
-        var builder = new ApiRelationshipPrincipalEndBuilder(typeof(TPrincipal));
-        builder.WithPrimaryKey(apiPrimaryKeyTypeName);
-        _principalEndBuilder = builder;
-        return this;
-    }
-
-    /// <summary>
-    ///     Configures the dependent end of the 1:M relationship using the CLR type <typeparamref name="TDependent"/>,
-    ///     and provides a strongly-typed builder for foreign key role key path configuration.
-    /// </summary>
-    /// <typeparam name="TDependent">The CLR type of the dependent object.</typeparam>
-    /// <param name="configure">Optional callback to add key paths using expression-based property selectors.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiRelationshipOneToManyBuilder To<TDependent>(Action<ApiRelationshipDependentEndBuilder<TDependent>>? configure = null)
-    {
-        var builder = new ApiRelationshipDependentEndBuilder<TDependent>();
-        configure?.Invoke(builder);
-        _dependentEndBuilder = builder;
-        return this;
-    }
-    #endregion
-
     #region Build Methods
     /// <inheritdoc/>
     internal override ApiRelationship Build()
@@ -160,6 +114,18 @@ public sealed class ApiRelationshipOneToManyBuilder(string apiName)
         }
 
         return relationship;
+    }
+    #endregion
+
+    #region Implementation Methods
+    /// <summary>
+    ///     Allows extension methods to set a pre-constructed dependent end builder.
+    /// </summary>
+    internal ApiRelationshipOneToManyBuilder SetDependentEndBuilderCore(ApiRelationshipDependentEndBuilder builder)
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+        _dependentEndBuilder = builder;
+        return this;
     }
     #endregion
 }
