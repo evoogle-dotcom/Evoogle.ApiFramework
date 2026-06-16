@@ -10,6 +10,19 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 /// </summary>
 public static class ApiRelationshipManyToManyBuilderExtensions
 {
+    #region Extension Methods
+    /// <summary>
+    ///     Adds a relationship extension value keyed by its own type.
+    /// </summary>
+    /// <typeparam name="TExtension">The extension value type.</typeparam>
+    /// <param name="builder">The relationship builder to configure.</param>
+    /// <param name="extension">The extension value.</param>
+    /// <returns>The current builder instance.</returns>
+    public static ApiRelationshipManyToManyBuilder AddRelationshipExtension<TExtension>(this ApiRelationshipManyToManyBuilder builder, TExtension extension)
+        where TExtension : class
+        => builder.AddRelationshipExtension(typeof(TExtension), extension);
+    #endregion
+
     #region Between/And Methods
     /// <summary>
     ///     Configures principal end A using the CLR type <typeparamref name="TPrincipal"/>.

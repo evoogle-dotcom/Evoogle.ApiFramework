@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -54,37 +54,6 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
         return this;
     }
 
-    /// <summary>
-    ///     Adds an enumeration type to the schema using an optional inline configuration action.
-    /// </summary>
-    /// <typeparam name="T">The CLR enum type.</typeparam>
-    /// <param name="configure">Optional callback to configure the added enumeration type.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiSchemaBuilder AddEnum<T>(Action<ApiEnumTypeBuilder<T>>? configure = null)
-        where T : Enum
-    {
-        var builder = _context.GetOrAddEnumTypeBuilder<T>();
-
-        configure?.Invoke(builder);
-        return this;
-    }
-
-    /// <summary>
-    ///     Adds an enumeration type to the schema using an implementation of <see cref="IApiEnumTypeConfiguration"/>.
-    /// </summary>
-    /// <typeparam name="T">The CLR enum type.</typeparam>
-    /// <param name="configuration">The configuration implementation.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiSchemaBuilder AddEnum<T>(IApiEnumTypeConfiguration configuration)
-        where T : Enum
-    {
-        ArgumentNullException.ThrowIfNull(configuration);
-
-        var builder = _context.GetOrAddEnumTypeBuilder<T>();
-
-        configuration.Configure(builder);
-        return this;
-    }
     #endregion
 
     #region AddExtension Methods
@@ -135,35 +104,6 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
         return this;
     }
 
-    /// <summary>
-    ///     Adds an object type to the schema using a strongly-typed optional inline configuration action.
-    /// </summary>
-    /// <typeparam name="T">The CLR object type.</typeparam>
-    /// <param name="configure">Optional callback to configure the added object type.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiSchemaBuilder AddObject<T>(Action<ApiObjectTypeBuilder<T>>? configure = null)
-    {
-        var builder = _context.GetOrAddObjectTypeBuilder<T>();
-
-        configure?.Invoke(builder);
-        return this;
-    }
-
-    /// <summary>
-    ///     Adds an object type to the schema using a strongly-typed <see cref="IApiObjectTypeConfiguration{T}"/>.
-    /// </summary>
-    /// <typeparam name="T">The CLR object type.</typeparam>
-    /// <param name="configuration">The typed configuration implementation.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiSchemaBuilder AddObject<T>(IApiObjectTypeConfiguration<T> configuration)
-    {
-        ArgumentNullException.ThrowIfNull(configuration);
-
-        var builder = _context.GetOrAddObjectTypeBuilder<T>();
-
-        configuration.Configure(builder);
-        return this;
-    }
     #endregion
 
     #region AddScalar Methods
@@ -200,35 +140,6 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
         return this;
     }
 
-    /// <summary>
-    ///     Adds a scalar type to the schema using an inline configuration action.
-    /// </summary>
-    /// <typeparam name="T">The CLR scalar type.</typeparam>
-    /// <param name="configure">Optional callback to configure the added scalar type.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiSchemaBuilder AddScalar<T>(Action<ApiScalarTypeBuilder<T>>? configure = null)
-    {
-        var builder = _context.GetOrAddScalarTypeBuilder<T>();
-
-        configure?.Invoke(builder);
-        return this;
-    }
-
-    /// <summary>
-    ///     Adds a scalar type to the schema using an implementation of <see cref="IApiScalarTypeConfiguration"/>.
-    /// </summary>
-    /// <typeparam name="T">The CLR scalar type.</typeparam>
-    /// <param name="configuration">The configuration implementation.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiSchemaBuilder AddScalar<T>(IApiScalarTypeConfiguration configuration)
-    {
-        ArgumentNullException.ThrowIfNull(configuration);
-
-        var builder = _context.GetOrAddScalarTypeBuilder<T>();
-
-        configuration.Configure(builder);
-        return this;
-    }
     #endregion
 
     #region AddRelationship Methods
@@ -436,6 +347,39 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
         var apiOptionsBuilder = new ApiSchemaOptionsBuilder();
         _apiOptionsConfiguration.Invoke(apiOptionsBuilder);
         return apiOptionsBuilder.Build();
+    }
+    #endregion
+
+    #region Implementation Methods
+    /// <summary>
+    ///     Allows extension methods to configure a strongly-typed enum builder.
+    /// </summary>
+    internal ApiSchemaBuilder AddEnumCore<T>(Action<ApiEnumTypeBuilder<T>>? configure = null)
+        where T : Enum
+    {
+        var builder = _context.GetOrAddEnumTypeBuilder<T>();
+        configure?.Invoke(builder);
+        return this;
+    }
+
+    /// <summary>
+    ///     Allows extension methods to configure a strongly-typed object builder.
+    /// </summary>
+    internal ApiSchemaBuilder AddObjectCore<T>(Action<ApiObjectTypeBuilder<T>>? configure = null)
+    {
+        var builder = _context.GetOrAddObjectTypeBuilder<T>();
+        configure?.Invoke(builder);
+        return this;
+    }
+
+    /// <summary>
+    ///     Allows extension methods to configure a strongly-typed scalar builder.
+    /// </summary>
+    internal ApiSchemaBuilder AddScalarCore<T>(Action<ApiScalarTypeBuilder<T>>? configure = null)
+    {
+        var builder = _context.GetOrAddScalarTypeBuilder<T>();
+        configure?.Invoke(builder);
+        return this;
     }
     #endregion
 }

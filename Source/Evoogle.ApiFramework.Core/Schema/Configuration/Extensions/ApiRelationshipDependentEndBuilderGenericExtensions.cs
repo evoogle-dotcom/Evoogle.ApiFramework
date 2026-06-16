@@ -14,6 +14,35 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 /// </summary>
 public static class ApiRelationshipDependentEndBuilderGenericExtensions
 {
+    #region Extension Methods
+    /// <summary>
+    ///     Adds a dependent end extension value keyed by its own type.
+    /// </summary>
+    /// <typeparam name="TExtension">The extension value type.</typeparam>
+    /// <param name="builder">The dependent end builder to configure.</param>
+    /// <param name="extension">The extension value.</param>
+    /// <returns>The current builder instance.</returns>
+    public static ApiRelationshipDependentEndBuilder AddRelationshipDependentEndExtension<TExtension>(this ApiRelationshipDependentEndBuilder builder, TExtension extension)
+        where TExtension : class
+        => builder.AddRelationshipDependentEndExtension(typeof(TExtension), extension);
+
+    /// <summary>
+    ///     Adds a dependent end extension value keyed by its own type.
+    /// </summary>
+    /// <typeparam name="TDependent">The CLR dependent type represented by the builder.</typeparam>
+    /// <typeparam name="TExtension">The extension value type.</typeparam>
+    /// <param name="builder">The dependent end builder to configure.</param>
+    /// <param name="extension">The extension value.</param>
+    /// <returns>The current builder instance.</returns>
+    public static ApiRelationshipDependentEndBuilder<TDependent> AddRelationshipDependentEndExtension<TDependent, TExtension>
+    (
+        this ApiRelationshipDependentEndBuilder<TDependent> builder,
+        TExtension extension
+    )
+        where TExtension : class
+        => builder.AddRelationshipDependentEndExtension(typeof(TExtension), extension);
+    #endregion
+
     #region WithForeignKey Methods
     /// <summary>
     ///     Sets the foreign key role's <see cref="ApiKeyType"/> with a single key path using a type-safe expression.

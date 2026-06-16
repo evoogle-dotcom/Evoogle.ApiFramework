@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -8,7 +8,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 /// <summary>
 ///     Strongly-typed fluent builder for configuring an <see cref="ApiScalarType"/> whose CLR type is <typeparamref name="T"/>.
 ///     Extends <see cref="ApiScalarTypeBuilder"/> ensuring that the typed callback passed to
-///     <see cref="ApiSchemaBuilder.AddScalar{T}(System.Action{ApiScalarTypeBuilder{T}}?)"/> receives
+///     <see cref="ApiSchemaBuilderExtensions.AddScalar{T}(ApiSchemaBuilder, Action{ApiScalarTypeBuilder{T}}?)"/> receives
 ///     a <typeparamref name="T"/>-parameterized builder, consistent with <see cref="ApiObjectTypeBuilder{T}"/>.
 /// </summary>
 /// <typeparam name="T">The CLR scalar type.</typeparam>

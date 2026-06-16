@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -903,31 +903,7 @@ public readonly struct ApiKey
     #endregion
 
     #region Parsing
-    /// <summary>
-    ///     Parses <paramref name="text"/> into the specified <paramref name="kind"/> or throws.
-    /// </summary>
-    /// <param name="kind">The expected kind.</param>
-    /// <param name="text">The textual representation.</param>
-    /// <returns>The parsed key.</returns>
-    /// <exception cref="ApiKeyException">Thrown if parsing fails.</exception>
-    public static ApiKey Parse(ApiKeyKind kind, string text) => TryParse(kind, text, out var id) ? id : throw new ApiKeyException($"Text '{text}' is not a valid {kind} id.");
-
-    /// <summary>
-    ///     Parses <paramref name="text"/> inferring key kind or throws.
-    /// </summary>
-    /// <param name="text">The textual representation.</param>
-    /// <returns>The parsed key.</returns>
-    /// <exception cref="ApiKeyException">Thrown if text is null/empty or invalid.</exception>
-    public static ApiKey Parse(string text) => TryParse(text, out var id) ? id : throw new ApiKeyException("Text is null/empty.");
-
-    /// <summary>
-    ///     Parses <paramref name="text"/> using the specified <paramref name="provider"/>.
-    /// </summary>
-    /// <param name="text">The textual representation.</param>
-    /// <param name="provider">The format provider.</param>
-    /// <returns>The parsed key.</returns>
-    /// <exception cref="ApiKeyException">Thrown if text is null/empty or invalid.</exception>
-    public static ApiKey Parse(string text, IFormatProvider? provider)
+    static ApiKey IParsable<ApiKey>.Parse(string text, IFormatProvider? provider)
     {
         if (TryParse(text, provider, out var id))
         {
@@ -942,14 +918,7 @@ public readonly struct ApiKey
         throw new ApiKeyException($"Text '{text}' is not a valid {nameof(ApiKey)}.");
     }
 
-    /// <summary>
-    ///     Parses <paramref name="text"/> using the specified <paramref name="provider"/>.
-    /// </summary>
-    /// <param name="text">The textual representation.</param>
-    /// <param name="provider">The format provider.</param>
-    /// <returns>The parsed key.</returns>
-    /// <exception cref="ApiKeyException">Thrown if text is null/empty or invalid.</exception>
-    public static ApiKey Parse(ReadOnlySpan<char> text, IFormatProvider? provider)
+    static ApiKey ISpanParsable<ApiKey>.Parse(ReadOnlySpan<char> text, IFormatProvider? provider)
     {
         if (TryParse(text, provider, out var id))
         {

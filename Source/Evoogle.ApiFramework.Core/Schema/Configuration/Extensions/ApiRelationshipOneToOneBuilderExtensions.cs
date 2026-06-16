@@ -10,6 +10,19 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 /// </summary>
 public static class ApiRelationshipOneToOneBuilderExtensions
 {
+    #region Extension Methods
+    /// <summary>
+    ///     Adds a relationship extension value keyed by its own type.
+    /// </summary>
+    /// <typeparam name="TExtension">The extension value type.</typeparam>
+    /// <param name="builder">The relationship builder to configure.</param>
+    /// <param name="extension">The extension value.</param>
+    /// <returns>The current builder instance.</returns>
+    public static ApiRelationshipOneToOneBuilder AddRelationshipExtension<TExtension>(this ApiRelationshipOneToOneBuilder builder, TExtension extension)
+        where TExtension : class
+        => builder.AddRelationshipExtension(typeof(TExtension), extension);
+    #endregion
+
     #region From/To Methods
     /// <summary>
     ///     Configures the principal end of the 1:1 relationship using the CLR type <typeparamref name="TPrincipal"/>.
