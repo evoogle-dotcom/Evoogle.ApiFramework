@@ -160,8 +160,8 @@ public class ApiRelationshipAssociationJsonConverter(ILogger<ApiRelationshipAsso
         WriteJsonObject(writer, () =>
         {
             WriteClrObjectType(writer, value, writeContext);
-            WriteApiForeignKeyType(writer, value.HasKeyBinding ? value.ApiForeignKeyTypeA : null, writeContext.PropertyNames.ApiRelationshipAssociation.ApiForeignKeyTypeA, writeContext);
-            WriteApiForeignKeyType(writer, value.HasKeyBinding ? value.ApiForeignKeyTypeB : null, writeContext.PropertyNames.ApiRelationshipAssociation.ApiForeignKeyTypeB, writeContext);
+            WriteApiForeignKeyType(writer, value.HasForeignKeys ? value.ApiForeignKeyTypeA : null, writeContext.PropertyNames.ApiRelationshipAssociation.ApiForeignKeyTypeA, writeContext);
+            WriteApiForeignKeyType(writer, value.HasForeignKeys ? value.ApiForeignKeyTypeB : null, writeContext.PropertyNames.ApiRelationshipAssociation.ApiForeignKeyTypeB, writeContext);
 
             WriteExtensibleBaseExtensions(writer, writeContext.PropertyNames.ExtensibleBase.Extensions, value, writeContext);
         });
@@ -174,11 +174,6 @@ public class ApiRelationshipAssociationJsonConverter(ILogger<ApiRelationshipAsso
 
     private static void WriteApiForeignKeyType(Utf8JsonWriter writer, ApiKeyType? value, string propertyName, DefaultWriteContext<PropertyNames> context)
     {
-        if (value is null)
-        {
-            return;
-        }
-
         writer.WritePropertyName(propertyName);
         writer.TryWriteWithSerializer(value, context.Options);
     }

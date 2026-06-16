@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -26,7 +26,7 @@ public class ApiRelationshipPrincipalEndJsonConverter(ILogger<ApiRelationshipPri
 
     private readonly record struct ApiRelationshipPrincipalEndPropertyNames
     {
-        public required string ApiKeyTypeName { get; init; }
+        public required string ApiPrimaryKeyTypeName { get; init; }
     }
 
     private readonly record struct PropertyNames
@@ -44,7 +44,7 @@ public class ApiRelationshipPrincipalEndJsonConverter(ILogger<ApiRelationshipPri
                 },
                 ApiRelationshipPrincipalEnd = new ApiRelationshipPrincipalEndPropertyNames
                 {
-                    ApiKeyTypeName = policy.ConvertName(nameof(ApiRelationshipPrincipalEnd.ApiKeyTypeName)),
+                    ApiPrimaryKeyTypeName = policy.ConvertName(nameof(ApiRelationshipPrincipalEnd.ApiPrimaryKeyTypeName)),
                 },
                 ExtensibleBase = GetExtensiblePropertyNames(policy),
             };
@@ -59,7 +59,7 @@ public class ApiRelationshipPrincipalEndJsonConverter(ILogger<ApiRelationshipPri
 
     private class ApiRelationshipPrincipalEndReadData
     {
-        public string? ApiKeyTypeName { get; set; }
+        public string? ApiPrimaryKeyTypeName { get; set; }
     }
 
     private class ReadData : ExtensibleReadData
@@ -73,7 +73,7 @@ public class ApiRelationshipPrincipalEndJsonConverter(ILogger<ApiRelationshipPri
         public readonly Dictionary<string, JsonReaderHandler<DefaultReadContext<PropertyNames, ReadData, ReadHandlers>>> PropertyHandlers = new()
         {
             { propertyNames.ApiRelationshipElement.ClrObjectType, HandleClrObjectType },
-            { propertyNames.ApiRelationshipPrincipalEnd.ApiKeyTypeName, HandleApiKeyTypeName },
+            { propertyNames.ApiRelationshipPrincipalEnd.ApiPrimaryKeyTypeName, HandleApiPrimaryKeyTypeName },
             { propertyNames.ExtensibleBase.Extensions, CreateExtensionsHandler<PropertyNames, ReadData, ReadHandlers>() },
         };
 
@@ -83,10 +83,10 @@ public class ApiRelationshipPrincipalEndJsonConverter(ILogger<ApiRelationshipPri
             context.ReadData.ApiRelationshipElement.ClrObjectType = _typeJsonConverter.Read(ref reader, typeof(Type), context.Options);
         }
 
-        private static void HandleApiKeyTypeName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiPrimaryKeyTypeName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
         {
             context.ReadData.ApiRelationshipPrincipalEnd ??= new ApiRelationshipPrincipalEndReadData();
-            context.ReadData.ApiRelationshipPrincipalEnd.ApiKeyTypeName = reader.GetString();
+            context.ReadData.ApiRelationshipPrincipalEnd.ApiPrimaryKeyTypeName = reader.GetString();
         }
     }
     #endregion
@@ -124,12 +124,12 @@ public class ApiRelationshipPrincipalEndJsonConverter(ILogger<ApiRelationshipPri
         var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
 
         var clrObjectType = readContext.ReadData.ApiRelationshipElement?.ClrObjectType;
-        var apiKeyTypeName = readContext.ReadData.ApiRelationshipPrincipalEnd?.ApiKeyTypeName;
+        var apiPrimaryKeyTypeName = readContext.ReadData.ApiRelationshipPrincipalEnd?.ApiPrimaryKeyTypeName;
 
         var end = new ApiRelationshipPrincipalEnd
             (
                 clrObjectType!,
-                apiKeyTypeName
+                apiPrimaryKeyTypeName
             );
 
         AttachExtensions(end, readContext.ReadData.Extensions);
@@ -151,7 +151,7 @@ public class ApiRelationshipPrincipalEndJsonConverter(ILogger<ApiRelationshipPri
         WriteJsonObject(writer, () =>
         {
             WriteClrObjectType(writer, value, writeContext);
-            WriteApiKeyTypeName(writer, value, writeContext);
+            WriteApiPrimaryKeyTypeName(writer, value, writeContext);
 
             WriteExtensibleBaseExtensions(writer, writeContext.PropertyNames.ExtensibleBase.Extensions, value, writeContext);
         });
@@ -162,10 +162,10 @@ public class ApiRelationshipPrincipalEndJsonConverter(ILogger<ApiRelationshipPri
     private static void WriteClrObjectType(Utf8JsonWriter writer, ApiRelationshipPrincipalEnd end, DefaultWriteContext<PropertyNames> context)
         => writer.TryWritePropertyWithConverter(context.PropertyNames.ApiRelationshipElement.ClrObjectType, end.ClrObjectType, context.Options, _typeJsonConverter);
 
-    private static void WriteApiKeyTypeName(Utf8JsonWriter writer, ApiRelationshipPrincipalEnd end, DefaultWriteContext<PropertyNames> context)
+    private static void WriteApiPrimaryKeyTypeName(Utf8JsonWriter writer, ApiRelationshipPrincipalEnd end, DefaultWriteContext<PropertyNames> context)
     {
-        var propertyName = context.PropertyNames.ApiRelationshipPrincipalEnd.ApiKeyTypeName;
-        var value = end.ApiKeyTypeName;
+        var propertyName = context.PropertyNames.ApiRelationshipPrincipalEnd.ApiPrimaryKeyTypeName;
+        var value = end.ApiPrimaryKeyTypeName;
 
         writer.TryWritePropertyAsString(propertyName, value, context.Options);
     }

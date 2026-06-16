@@ -63,10 +63,10 @@ public sealed class ApiKeyPath(Type clrRootType, IEnumerable<ApiKeyPathSegment> 
     public override string ToString()
     {
         var clrRootTypeName = this.ClrRootType.Name.SafeToString();
-        var segments = string.Join(".", this.ApiSegments.Select(s => s.ClrPropertyName));
+        var apiSegments = string.Join(".", this.ApiSegments.Select(s => s.ClrPropertyName));
         var extensionCount = this.ExtensionCount.SafeToString();
 
-        return $"{nameof(ApiKeyPath)} {{{nameof(this.ClrRootType)}={clrRootTypeName}, Segments=\"{segments}\", {nameof(this.ExtensionCount)}={extensionCount}}}";
+        return $"{nameof(ApiKeyPath)} {{{nameof(this.ClrRootType)}={clrRootTypeName}, {nameof(this.ApiSegments)}=\"{apiSegments}\", {nameof(this.ExtensionCount)}={extensionCount}}}";
     }
     #endregion
 

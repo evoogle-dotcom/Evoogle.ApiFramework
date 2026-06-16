@@ -156,7 +156,7 @@ public partial class ApiKeyTests(ITestOutputHelper output) : XUnitTests(output)
                             return ApiKey.Empty;
                         }
 
-                        partCollection = this.PartCollection!;
+                        partCollection = this.PartCollection;
                         break;
                     }
 

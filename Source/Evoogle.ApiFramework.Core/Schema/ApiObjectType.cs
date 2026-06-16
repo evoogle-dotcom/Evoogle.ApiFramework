@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -24,12 +24,12 @@ public sealed partial class ApiObjectType
     string apiName,
     ApiObjectTypeOptions? apiOptions,
     IEnumerable<ApiProperty>? apiProperties,
-    IEnumerable<KeyValuePair<string, ApiKeyType>>? apiKeyTypes,
+    IEnumerable<ApiKeyType>? apiKeyTypes,
     Type clrObjectType
 ) : ApiNamedType(apiName, clrObjectType)
 {
     #region ApiObjectType Fields
-    private readonly (OrderedDictionary<string, ApiKeyType> Dict, string[]? DuplicateNames) _keyTypeData = BuildApiKeyTypeData(apiKeyTypes);
+    private Dictionary<string, ApiKeyType>? _apiKeyTypeApiNameLookup = null;
     private string[]? _apiKeyTypeApiNames = null;
 
     private Dictionary<string, ApiProperty>? _apiPropertyApiNameLookup = null;
@@ -52,17 +52,8 @@ public sealed partial class ApiObjectType
     #endregion
 
     #region ApiObjectType Properties
-    /// <summary>Gets all key types defined for the object type, keyed by their API name.</summary>
-    public OrderedDictionary<string, ApiKeyType> ApiKeyTypes => _keyTypeData.Dict;
-
-    /// <summary>
-    ///     Gets the primary <see cref="ApiKeyType"/> for this object type, if available.
-    /// </summary>
-    /// <remarks>
-    ///     By convention, the first key type in <see cref="ApiKeyTypes"/> is the primary key type.
-    ///     Returns null if no key types are configured.
-    /// </remarks>
-    public ApiKeyType? ApiPrimaryKeyType => this.HasKeyType ? this.ApiKeyTypes.GetAt(0).Value : null;
+    /// <summary>Gets all key types defined for the object type.</summary>
+    public ApiKeyType[] ApiKeyTypes { get; } = [.. apiKeyTypes.EmptyIfNull().Where(x => x is not null)];
 
     /// <summary>Gets the configuration options for the object type.</summary>
     public ApiObjectTypeOptions? ApiOptions { get; } = apiOptions;
@@ -94,13 +85,14 @@ public sealed partial class ApiObjectType
     /// </summary>
     public ApiRelationshipAssociation[] ApiRelationshipAssociations => _apiRelationshipAssociations is not null ? _apiRelationshipAssociations : [];
 
+    private Dictionary<string, ApiKeyType> ApiKeyTypeApiNameLookup => this.ThrowIfNotInitialized(_apiKeyTypeApiNameLookup);
     private Dictionary<string, ApiProperty> ApiPropertyApiNameLookup => this.ThrowIfNotInitialized(_apiPropertyApiNameLookup);
     private Dictionary<string, ApiProperty> ApiPropertyClrNameLookup => this.ThrowIfNotInitialized(_apiPropertyClrNameLookup);
     #endregion
 
     #region ApiObjectType Computed Properties
-    /// <summary>Indicates whether this object type has any API key types defined.</summary>
-    public bool HasKeyType => this.ApiKeyTypes.Count > 0;
+    /// <summary>Indicates whether this object type has any API key types.</summary>
+    public bool HasKeyTypes => this.ApiKeyTypes.Length > 0;
 
     /// <summary>Indicates whether this object type participates in any relationships.</summary>
     public bool HasRelationshipEnds => _apiRelationshipEnds?.Length > 0;
@@ -153,7 +145,7 @@ public sealed partial class ApiObjectType
     /// <param name="apiName">The name of the key type to retrieve.</param>
     /// <param name="apiKeyType">When this method returns, contains the <see cref="ApiKeyType"/> if found; otherwise, null.</param>
     /// <returns>True if the key type was found; otherwise, false.</returns>
-    public bool TryGetKeyTypeByApiName(string apiName, [NotNullWhen(true)] out ApiKeyType? apiKeyType) => this.ApiKeyTypes.TryGetValue(apiName, out apiKeyType);
+    public bool TryGetKeyTypeByApiName(string apiName, [NotNullWhen(true)] out ApiKeyType? apiKeyType) => this.ApiKeyTypeApiNameLookup.TryGetValue(apiName, out apiKeyType);
 
     /// <summary>
     ///     Attempts to retrieve an API property by its API name.
@@ -180,12 +172,12 @@ public sealed partial class ApiObjectType
     /// <returns>An array of key type API names, or an empty array if no key types are defined.</returns>
     public string[] GetKeyTypeApiNames()
     {
-        if (!this.HasKeyType)
+        if (!this.HasKeyTypes)
         {
             return [];
         }
 
-        return _apiKeyTypeApiNames ??= [.. this.ApiKeyTypes.Keys];
+        return _apiKeyTypeApiNames ??= [.. this.ApiKeyTypeApiNameLookup.Keys];
     }
 
     /// <summary>
@@ -195,12 +187,12 @@ public sealed partial class ApiObjectType
     /// <returns><c>true</c> if the key type exists; otherwise, <c>false</c>.</returns>
     public bool HasKeyTypeByApiName(string apiKeyTypeName)
     {
-        if (!this.HasKeyType || string.IsNullOrWhiteSpace(apiKeyTypeName))
+        if (!this.HasKeyTypes || string.IsNullOrWhiteSpace(apiKeyTypeName))
         {
             return false;
         }
 
-        return this.ApiKeyTypes.ContainsKey(apiKeyTypeName);
+        return this.ApiKeyTypeApiNameLookup.ContainsKey(apiKeyTypeName);
     }
     #endregion
 
@@ -232,32 +224,20 @@ public sealed partial class ApiObjectType
 
     private void InitializeApiKeyTypes(ApiInitializationContext context)
     {
-        if (this.ApiKeyTypes.Count == 0 && _keyTypeData.DuplicateNames == null)
+        if (this.ApiKeyTypes.Length == 0)
         {
             // No key types defined; this is acceptable as key types are optional.
             return;
         }
 
-        // Report any duplicate key type names detected during construction.
-        if (_keyTypeData.DuplicateNames != null)
+        // Initialize each key type
+        var apiKeyTypesCount = this.ApiKeyTypes.Length;
+        for (var i = 0; i < apiKeyTypesCount; ++i)
         {
-            var duplicateNames = string.Join(", ", _keyTypeData.DuplicateNames.Select(n => $"'{n}'"));
-            var path = this.ApiPath;
-            var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.API_OBJECT_TYPE_DUPLICATE_KEY_TYPE_API_NAME;
-            var description = $"Duplicate {nameof(ApiKeyType)} name values: {duplicateNames}";
-            var remediation = $"Verify that each {nameof(ApiKeyType)} has a unique name value";
-
-            context.AddIssue(path, severity, code, description, remediation);
-        }
-
-        // Initialize each key type, assigning its contextual name first.
-        foreach (var (name, keyType) in this.ApiKeyTypes)
-        {
-            keyType.SetContextualName(name);
+            var apiKeyType = this.ApiKeyTypes[i];
 
             var childContext = context.WithDeclaringObjectType(this);
-            keyType.Initialize(childContext);
+            apiKeyType.Initialize(childContext);
         }
     }
 
@@ -290,8 +270,21 @@ public sealed partial class ApiObjectType
     {
         // Initialize lookup dictionaries for lookup of:
         // - Property by API name and CLR name
+        _apiKeyTypeApiNameLookup = null;
         _apiPropertyApiNameLookup = null;
         _apiPropertyClrNameLookup = null;
+
+        ApiSchemaHelpers.InitializeLookupDictionary
+        (
+            parts: this.ApiKeyTypes,
+            partKeySelector: x => x.ApiName,
+            partKeyFilter: x => ApiSchemaHelpers.IsNameValid(x),
+            partKeyPropertyName: nameof(ApiKeyType.ApiName),
+            path: this.ApiPath,
+            duplicatePartCode: ApiInitializationCode.API_OBJECT_TYPE_DUPLICATE_KEY_TYPE_API_NAME,
+            context: context,
+            lookupDictionary: out _apiKeyTypeApiNameLookup
+        );
 
         ApiSchemaHelpers.InitializeLookupDictionary
         (
@@ -318,29 +311,5 @@ public sealed partial class ApiObjectType
         );
     }
 
-    private static (OrderedDictionary<string, ApiKeyType>, string[]?) BuildApiKeyTypeData(
-        IEnumerable<KeyValuePair<string, ApiKeyType>>? pairs)
-    {
-        var dict = new OrderedDictionary<string, ApiKeyType>();
-        if (pairs == null)
-        {
-            return (dict, null);
-        }
-
-        List<string>? duplicates = null;
-        foreach (var (name, keyType) in pairs.Where(p => p.Value is not null))
-        {
-            if (!dict.TryAdd(name, keyType))
-            {
-                duplicates ??= [];
-                if (!duplicates.Contains(name))
-                {
-                    duplicates.Add(name);
-                }
-            }
-        }
-
-        return (dict, duplicates?.ToArray());
-    }
     #endregion
 }

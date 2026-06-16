@@ -17,7 +17,7 @@ public partial class ApiKeyTypeTests(ITestOutputHelper output) : XUnitTests(outp
     private static ApiKeyType GetPrimaryKeyType(string apiObjectTypeName)
     {
         var apiObjectType = KeyApiSchema.GetObjectTypeByApiName(apiObjectTypeName);
-        return apiObjectType.ApiPrimaryKeyType ?? throw new InvalidOperationException($"No primary key type on '{apiObjectTypeName}'.");
+        return apiObjectType.ApiKeyTypes.FirstOrDefault() ?? throw new InvalidOperationException($"No key type on '{apiObjectTypeName}'.");
     }
 
     private static ApiKeyType GetKeyTypeByName(string apiObjectTypeName, string apiKeyTypeName)

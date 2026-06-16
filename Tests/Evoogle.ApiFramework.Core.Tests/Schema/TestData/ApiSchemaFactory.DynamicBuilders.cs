@@ -117,7 +117,7 @@ public static partial class ApiSchemaFactory
     public record ApiRelationshipPrincipalEndDef
     (
         Type ClrObjectType,
-        string? ApiKeyTypeName = null,
+        string? ApiPrimaryKeyTypeName = null,
         List<Type>? ExtensionTypes = null
     ) : ApiRelationshipElementDef(ClrObjectType, ExtensionTypes);
 
@@ -191,9 +191,10 @@ public static partial class ApiSchemaFactory
     #region Dynamic Key Builders
     private static ApiKeyType BuildApiKeyType(ApiKeyTypeDef def)
     {
+        var apiName = def.ApiName;
         var apiKeyPaths = def.ApiKeyPaths.Select(BuildApiKeyPath);
 
-        var apiKeyType = new ApiKeyType(apiKeyPaths);
+        var apiKeyType = new ApiKeyType(apiName, apiKeyPaths);
 
         AttachExtensions(apiKeyType, def);
 
@@ -322,8 +323,8 @@ public static partial class ApiSchemaFactory
         var apiForeignKeyTypeB = def.ApiForeignKeyTypeB != null ? BuildApiKeyType(def.ApiForeignKeyTypeB) : null;
 
         var apiRelationshipAssociation = apiForeignKeyTypeA != null && apiForeignKeyTypeB != null
-            ? new ApiRelationshipAssociation(clrObjectType!, apiForeignKeyTypeA, apiForeignKeyTypeB)
-            : new ApiRelationshipAssociation(clrObjectType!);
+            ? new ApiRelationshipAssociation(clrObjectType, apiForeignKeyTypeA, apiForeignKeyTypeB)
+            : new ApiRelationshipAssociation(clrObjectType);
 
         AttachExtensions(apiRelationshipAssociation, def);
 
@@ -333,12 +334,12 @@ public static partial class ApiSchemaFactory
     private static ApiRelationshipPrincipalEnd BuildApiRelationshipPrincipalEnd(ApiRelationshipPrincipalEndDef def)
     {
         var clrObjectType = def.ClrObjectType;
-        var apiKeyTypeName = def.ApiKeyTypeName;
+        var apiPrimaryKeyTypeName = def.ApiPrimaryKeyTypeName;
 
         var apiRelationshipPrincipalEnd = new ApiRelationshipPrincipalEnd
         (
             clrObjectType,
-            apiKeyTypeName
+            apiPrimaryKeyTypeName
         );
 
         AttachExtensions(apiRelationshipPrincipalEnd, def);
@@ -409,7 +410,7 @@ public static partial class ApiSchemaFactory
         var apiName = def.ApiName;
         var apiOptions = BuildApiObjectTypeOptions(def);
         var apiProperties = def.ApiProperties?.Select(BuildApiProperty);
-        var apiKeyTypes = def.ApiKeyTypes?.Select(d => new KeyValuePair<string, ApiKeyType>(d.ApiName, BuildApiKeyType(d)));
+        var apiKeyTypes = def.ApiKeyTypes?.Select(BuildApiKeyType);
         var clrType = def.ClrType;
 
         return new ApiObjectType(apiName, apiOptions, apiProperties, apiKeyTypes, clrType);

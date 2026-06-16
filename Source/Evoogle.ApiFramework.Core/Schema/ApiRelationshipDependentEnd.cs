@@ -21,16 +21,20 @@ namespace Evoogle.ApiFramework.Schema;
 ///     properties on the dependent object graph.
 /// </summary>
 /// <remarks>
-///     Use <see cref="HasKeyBinding"/> to determine which state applies before
-///     accessing <see cref="ApiForeignKeyType"/>.
+///     Use <see cref="HasForeignKey"/> to determine which state applies before accessing <see cref="ApiForeignKeyType"/>.
 ///
 ///     The state is fixed at construction and does not change after initialization.
 /// </remarks>
+/// <param name="clrObjectType">The CLR type of the dependent <see cref="ApiObjectType"/>.</param>
+/// <param name="apiForeignKeyType">
+///     The optional <see cref="ApiKeyType"/> that maps the principal key type's scalar leaves to properties
+///     on the dependent object graph. When <see langword="null"/>, the dependent end is navigational.
+/// </param>
 [JsonConverter(typeof(ApiRelationshipDependentEndJsonConverter))]
-public sealed class ApiRelationshipDependentEnd : ApiRelationshipEnd
+public sealed class ApiRelationshipDependentEnd(Type clrObjectType, ApiKeyType? apiForeignKeyType = null) : ApiRelationshipEnd(clrObjectType)
 {
     #region ApiRelationshipDependentEnd Fields
-    private readonly ApiKeyType? _apiForeignKeyType;
+    private readonly ApiKeyType? _apiForeignKeyType = apiForeignKeyType;
     #endregion
 
     #region ApiSchemaElement Properties
@@ -50,55 +54,23 @@ public sealed class ApiRelationshipDependentEnd : ApiRelationshipEnd
     /// </summary>
     /// <exception cref="ApiSchemaException">
     ///     Thrown when <see cref="IsNavigational"/> is <see langword="true"/>.
-    ///     Check <see cref="HasKeyBinding"/> before accessing this property.
+    ///     Check <see cref="HasForeignKey"/> before accessing this property.
     /// </exception>
-    public ApiKeyType ApiForeignKeyType => this.HasKeyBinding
+    public ApiKeyType ApiForeignKeyType => this.HasForeignKey
         ? _apiForeignKeyType!
-        : throw new ApiSchemaException("No key binding declared for this dependent end of the relationship.");
+        : throw new ApiSchemaException("No foreign key declared for this dependent end of the relationship.");
     #endregion
 
     #region ApiRelationshipDependentEnd Computed Properties
     /// <summary>
-    ///    Gets a value indicating whether this dependent end has an explicit key binding declared at the schema level.
+    ///    Gets a value indicating whether this dependent end has an explicit foreign key declared at the schema level.
     /// </summary>
-    public bool HasKeyBinding => _apiForeignKeyType is not null;
+    public bool HasForeignKey => _apiForeignKeyType is not null;
 
     /// <summary>
-    ///   Gets a value indicating whether this dependent end is navigational (i.e. has no explicit key binding declared at the schema level).
+    ///   Gets a value indicating whether this dependent end is navigational (i.e. has no explicit foreign key declared at the schema level).
     /// </summary>
-    public bool IsNavigational => !this.HasKeyBinding;
-    #endregion
-
-    #region Constructors
-    /// <summary>
-    ///     Initializes a navigational dependent end with no foreign key binding declared at the schema level.
-    ///
-    ///     Use when cardinality or delete behavior needs to be expressed but key property mapping is
-    ///     intentionally left to the downstream layer.
-    /// </summary>
-    /// <param name="clrObjectType">The CLR type of the dependent <see cref="ApiObjectType"/>.</param>
-    public ApiRelationshipDependentEnd(Type clrObjectType)
-        : base(clrObjectType)
-    {
-        _apiForeignKeyType = null;
-    }
-
-    /// <summary>
-    ///     Initializes a key-bound dependent end with an explicit <see cref="ApiKeyType"/> for the foreign key role.
-    /// </summary>
-    /// <param name="clrObjectType">The CLR type of the dependent <see cref="ApiObjectType"/>.</param>
-    /// <param name="apiForeignKeyType">
-    ///     The <see cref="ApiKeyType"/> that maps the principal key type's scalar leaves to properties
-    ///     on the dependent object graph.
-    /// </param>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="apiForeignKeyType"/> is <see langword="null"/>.</exception>
-    public ApiRelationshipDependentEnd(Type clrObjectType, ApiKeyType apiForeignKeyType)
-        : base(clrObjectType)
-    {
-        ArgumentNullException.ThrowIfNull(apiForeignKeyType);
-
-        _apiForeignKeyType = apiForeignKeyType;
-    }
+    public bool IsNavigational => !this.HasForeignKey;
     #endregion
 
     #region Object Methods
@@ -106,11 +78,10 @@ public sealed class ApiRelationshipDependentEnd : ApiRelationshipEnd
     public override string ToString()
     {
         var clrObjectType = this.ClrObjectType.SafeToName();
-        var hasKeyBinding = this.HasKeyBinding;
-        var apiForeignKeyType = hasKeyBinding ? _apiForeignKeyType!.SafeToString() : "None";
+        var apiForeignKeyType = _apiForeignKeyType?.SafeToString();
         var extensionCount = this.ExtensionCount.SafeToString();
 
-        return $"{nameof(ApiRelationshipDependentEnd)} {{{nameof(this.ClrObjectType)}={clrObjectType}, {nameof(this.HasKeyBinding)}={hasKeyBinding}, {nameof(this.ApiForeignKeyType)}={apiForeignKeyType}, {nameof(this.ExtensionCount)}={extensionCount}}}";
+        return $"{nameof(ApiRelationshipDependentEnd)} {{{nameof(this.ClrObjectType)}={clrObjectType}, {nameof(this.ApiForeignKeyType)}={apiForeignKeyType}, {nameof(this.ExtensionCount)}={extensionCount}}}";
     }
     #endregion
 
@@ -131,7 +102,7 @@ public sealed class ApiRelationshipDependentEnd : ApiRelationshipEnd
     {
         if (this.IsNavigational)
         {
-            // No key binding declared — purely navigational relationship.
+            // No foreign key declared — purely navigational relationship.
             return;
         }
 

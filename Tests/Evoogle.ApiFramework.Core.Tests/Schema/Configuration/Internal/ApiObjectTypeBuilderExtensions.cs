@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -14,9 +14,9 @@ internal static class ApiObjectTypeBuilderExtensions
     #region Methods
     public static void ConfigureKeyTypes(this ApiObjectTypeBuilder builder, ApiObjectType apiObjectType)
     {
-        foreach (var (name, apiKeyType) in apiObjectType.ApiKeyTypes)
+        foreach (var apiKeyType in apiObjectType.ApiKeyTypes)
         {
-            builder.AddKey(name, k =>
+            builder.AddKey(apiKeyType.ApiName!, k =>
             {
                 foreach (var keyPath in apiKeyType.ApiKeyPaths)
                 {

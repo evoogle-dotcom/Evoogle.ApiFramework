@@ -13,7 +13,12 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 ///     CLR property names are extracted at compile time rather than supplied as raw strings.
 /// </summary>
 /// <typeparam name="T">The default root CLR type for key paths added via expression overloads.</typeparam>
-public sealed class ApiKeyTypeBuilder<T>() : ApiKeyTypeBuilder()
+/// <param name="apiName">The optional API name of the key type.</param>
+/// <remarks>
+///    <para>Key types are reusable components that define how to extract key values from CLR objects via one or more key paths. They are primarily used to configure API keys, but can also be used for other purposes such as defining unique identifiers for object types.</para>
+///    <para>Each key path represents a navigation chain from a specified CLR root type to a terminal scalar property, and can be configured with extensions at both the path and segment levels. When multiple key paths are defined within a key type, the resulting key value is a composite of the individual path values.</para>
+/// </remarks>
+public sealed class ApiKeyTypeBuilder<T>(string? apiName = null) : ApiKeyTypeBuilder(apiName)
 {
     #region AddPath Methods
     /// <summary>
@@ -62,6 +67,15 @@ public sealed class ApiKeyTypeBuilder<T>() : ApiKeyTypeBuilder()
         var builder = ApiKeyPathBuilder<T>.For(expression);
         configure?.Invoke(builder);
         base.AddKeyPathBuilderCore(builder);
+        return this;
+    }
+    #endregion
+
+    #region With Methods
+    /// <inheritdoc cref="ApiKeyTypeBuilder.WithName(string)"/>
+    public new ApiKeyTypeBuilder<T> WithName(string apiName)
+    {
+        base.WithName(apiName);
         return this;
     }
     #endregion

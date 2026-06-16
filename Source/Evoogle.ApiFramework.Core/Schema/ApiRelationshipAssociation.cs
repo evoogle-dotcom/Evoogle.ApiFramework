@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -23,7 +23,7 @@ namespace Evoogle.ApiFramework.Schema;
 ///     map the scalar leaves of each principal key type to properties on the association object type.
 /// </summary>
 /// <remarks>
-///     Use <see cref="HasKeyBinding"/> to determine which state applies before accessing
+///     Use <see cref="HasForeignKeys"/> to determine which state applies before accessing
 ///     <see cref="ApiForeignKeyTypeA"/> or <see cref="ApiForeignKeyTypeB"/>.
 ///
 ///     The state is symmetric: both sides are either bound or navigational together.
@@ -58,11 +58,11 @@ public sealed class ApiRelationshipAssociation : ApiRelationshipElement
     /// </summary>
     /// <exception cref="ApiSchemaException">
     ///     Thrown when <see cref="IsNavigational"/> is <see langword="true"/>.
-    ///     Check <see cref="HasKeyBinding"/> before accessing this property.
+    ///     Check <see cref="HasForeignKeys"/> before accessing this property.
     /// </exception>
-    public ApiKeyType ApiForeignKeyTypeA => this.HasKeyBinding
+    public ApiKeyType ApiForeignKeyTypeA => this.HasForeignKeys
         ? _apiForeignKeyTypeA!
-        : throw new ApiSchemaException("No key binding declared for this association of the many-to-many relationship.");
+        : throw new ApiSchemaException("No foreign keys declared for this association of the many-to-many relationship.");
 
     /// <summary>
     ///     Gets the B-side foreign key role's <see cref="ApiKeyType"/> that maps scalar leaves of principal end B's key type
@@ -70,25 +70,25 @@ public sealed class ApiRelationshipAssociation : ApiRelationshipElement
     /// </summary>
     /// <exception cref="ApiSchemaException">
     ///     Thrown when <see cref="IsNavigational"/> is <see langword="true"/>.
-    ///     Check <see cref="HasKeyBinding"/> before accessing this property.
+    ///     Check <see cref="HasForeignKeys"/> before accessing this property.
     /// </exception>
-    public ApiKeyType ApiForeignKeyTypeB => this.HasKeyBinding
+    public ApiKeyType ApiForeignKeyTypeB => this.HasForeignKeys
         ? _apiForeignKeyTypeB!
-        : throw new ApiSchemaException("No key binding declared for this association of the many-to-many relationship.");
+        : throw new ApiSchemaException("No foreign keys declared for this association of the many-to-many relationship.");
     #endregion
 
     #region ApiRelationshipAssociation Computed Properties
     /// <summary>
-    ///     Gets a value indicating whether this association has explicit key bindings declared for both principal ends.
+    ///     Gets a value indicating whether this association has explicit foreign keys declared for both principal ends.
     ///     When <see langword="true"/>, both <see cref="ApiForeignKeyTypeA"/> and <see cref="ApiForeignKeyTypeB"/> are available.
     /// </summary>
-    public bool HasKeyBinding => _apiForeignKeyTypeA is not null && _apiForeignKeyTypeB is not null;
+    public bool HasForeignKeys => _apiForeignKeyTypeA is not null && _apiForeignKeyTypeB is not null;
 
     /// <summary>
-    ///     Gets a value indicating whether this association is navigational (i.e. has no explicit key binding
+    ///     Gets a value indicating whether this association is navigational (i.e. has no explicit foreign keys
     ///     declared at the schema level for either principal end).
     /// </summary>
-    public bool IsNavigational => !this.HasKeyBinding;
+    public bool IsNavigational => !this.HasForeignKeys;
     #endregion
 
     #region Constructors
@@ -141,12 +141,11 @@ public sealed class ApiRelationshipAssociation : ApiRelationshipElement
     public override string ToString()
     {
         var clrObjectType = this.ClrObjectType.SafeToName();
-        var hasKeyBinding = this.HasKeyBinding;
-        var apiForeignKeyTypeA = hasKeyBinding ? _apiForeignKeyTypeA!.SafeToString() : "None";
-        var apiForeignKeyTypeB = hasKeyBinding ? _apiForeignKeyTypeB!.SafeToString() : "None";
+        var apiForeignKeyTypeA = _apiForeignKeyTypeA.SafeToString();
+        var apiForeignKeyTypeB = _apiForeignKeyTypeB.SafeToString();
         var extensionCount = this.ExtensionCount.SafeToString();
 
-        return $"{nameof(ApiRelationshipAssociation)} {{{nameof(this.ClrObjectType)}={clrObjectType}, {nameof(this.HasKeyBinding)}={hasKeyBinding}, {nameof(this.ApiForeignKeyTypeA)}={apiForeignKeyTypeA}, {nameof(this.ApiForeignKeyTypeB)}={apiForeignKeyTypeB}, {nameof(this.ExtensionCount)}={extensionCount}}}";
+        return $"{nameof(ApiRelationshipAssociation)} {{{nameof(this.ClrObjectType)}={clrObjectType}, {nameof(this.ApiForeignKeyTypeA)}={apiForeignKeyTypeA}, {nameof(this.ApiForeignKeyTypeB)}={apiForeignKeyTypeB}, {nameof(this.ExtensionCount)}={extensionCount}}}";
     }
     #endregion
 
@@ -175,7 +174,7 @@ public sealed class ApiRelationshipAssociation : ApiRelationshipElement
     {
         if (this.IsNavigational)
         {
-            // No key binding declared — purely navigational relationship.
+            // No foreign keys declared — purely navigational relationship.
             return;
         }
 

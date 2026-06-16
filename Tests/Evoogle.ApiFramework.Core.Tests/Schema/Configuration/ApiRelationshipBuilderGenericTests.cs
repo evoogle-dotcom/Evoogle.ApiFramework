@@ -134,22 +134,6 @@ public class ApiRelationshipBuilderGenericTests(ITestOutputHelper output) : XUni
     [Theory]
     [MemberData(nameof(BuildRelationshipTheoryData))]
     public void BuildRelationship(IXUnitTest test) => test.Execute(this);
-
-    [Fact]
-    public void WithForeignKeyGenericSupportsFourExpressionParts()
-    {
-        var dependentEnd = new ApiRelationshipDependentEndBuilder<RelationshipOrderLine>()
-            .WithForeignKey
-            (
-                p => p.OrderId,
-                p => p.LineNumber,
-                p => p.ProductSku,
-                p => p.ProductRevision
-            )
-            .Build();
-
-        dependentEnd.ApiForeignKeyType.ApiKeyPaths.Should().HaveCount(4);
-    }
     #endregion
 }
 

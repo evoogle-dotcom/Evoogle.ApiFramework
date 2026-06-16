@@ -32,7 +32,7 @@ public static class ApiEnumTypeExtensions
     {
         if (apiEnumType.TryGetValueByApiName(apiName, out var apiEnumValue))
         {
-            return apiEnumValue!;
+            return apiEnumValue;
         }
 
         var validValuesByApiName = string.Join(',', apiEnumType.ApiEnumValues.OrderBy(v => v.ApiName).Select(v => v.ApiName));
@@ -61,7 +61,7 @@ public static class ApiEnumTypeExtensions
     {
         if (apiEnumType.TryGetValueByClrName(clrName, out var apiEnumValue))
         {
-            return apiEnumValue!;
+            return apiEnumValue;
         }
 
         var validValuesByClrName = string.Join(',', apiEnumType.ApiEnumValues.OrderBy(v => v.ClrName).Select(v => v.ClrName));
@@ -89,7 +89,7 @@ public static class ApiEnumTypeExtensions
     {
         if (apiEnumType.TryGetValueByClrOrdinal(clrOrdinal, out var apiEnumValue))
         {
-            return apiEnumValue!;
+            return apiEnumValue;
         }
 
         var validValuesByClrOrdinal = string.Join(',', apiEnumType.ApiEnumValues.OrderBy(v => v.ClrOrdinal).Select(v => v.ClrOrdinal));

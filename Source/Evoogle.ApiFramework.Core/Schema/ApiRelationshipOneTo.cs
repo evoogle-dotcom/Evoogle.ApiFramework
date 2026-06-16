@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -13,11 +13,11 @@ namespace Evoogle.ApiFramework.Schema;
 /// </summary>
 /// <remarks>
 ///     Concrete subclasses are <see cref="ApiRelationshipOneToOne"/> and <see cref="ApiRelationshipOneToMany"/>.
-///     The foreign key role always resides on the dependent side; the principal side provides the referenced key type.
+///     The foreign key role always resides on the dependent side; the principal side provides the referenced primary key type.
 ///     Self-referential relationships are supported by setting both ends to the same <see cref="ApiRelationshipElement.ClrObjectType"/>.
 /// </remarks>
 /// <param name="apiName">The API name that uniquely identifies this relationship within the schema.</param>
-/// <param name="apiPrincipalEnd">The principal end of the relationship, which provides the referenced key type.</param>
+/// <param name="apiPrincipalEnd">The principal end of the relationship, which provides the referenced primary key type.</param>
 /// <param name="apiDependentEnd">The dependent end of the relationship, which may provide the foreign key role's key paths.</param>
 /// <param name="apiDeleteBehavior">The delete behavior that governs what happens to related objects when either end is affected.</param>
 public abstract class ApiRelationshipOneTo
@@ -29,7 +29,7 @@ public abstract class ApiRelationshipOneTo
 ) : ApiRelationship(apiName, apiDeleteBehavior)
 {
     #region ApiRelationshipOneTo Properties
-    /// <summary>Gets the principal end of the relationship, which provides the referenced key type.</summary>
+    /// <summary>Gets the principal end of the relationship, which provides the referenced primary key type.</summary>
     public ApiRelationshipPrincipalEnd ApiPrincipalEnd { get; } = apiPrincipalEnd;
 
     /// <summary>Gets the dependent end of the relationship, which may provide the foreign key role's key paths.</summary>
@@ -103,9 +103,9 @@ public abstract class ApiRelationshipOneTo
             return;
         }
 
-        var principalKeyDesc = principal.ApiKeyTypeName is not null ? $"key type '{principal.ApiKeyTypeName}'" : "primary key";
+        var primaryKeyDesc = principal.ApiPrimaryKeyTypeName is not null ? $"primary key type '{principal.ApiPrimaryKeyTypeName}'" : "primary key type";
         var foreignKeyPath = $"{nameof(this.ApiDependentEnd)}.{nameof(this.ApiDependentEnd.ApiForeignKeyType)}";
-        var compatibilityRemediation = $"Ensure {foreignKeyPath} paths are ordered to match the principal end's key type and use compatible scalar types";
+        var compatibilityRemediation = $"Ensure {foreignKeyPath} paths are ordered to match the principal end's primary key type and use compatible scalar types";
 
         ApiRelationshipKeyAlignment.ValidatePrincipalForeignKeyAlignment
         (
@@ -115,12 +115,12 @@ public abstract class ApiRelationshipOneTo
             foreignKeyType: dependent.ApiForeignKeyType,
             countMismatchCode: ApiInitializationCode.API_RELATIONSHIP_ONE_TO_INVALID_DEPENDENT_KEY_PATHS_COUNT,
             foreignKeyPath: foreignKeyPath,
-            principalCountLabel: principalKeyDesc,
-            principalCompatibilityLabel: $"principal end {principalKeyDesc}",
+            principalCountLabel: primaryKeyDesc,
+            principalCompatibilityLabel: $"principal end {primaryKeyDesc}",
             principalEndQualifier: null,
-            explicitKeyTarget: nameof(ApiRelationshipPrincipalEnd.ApiKeyTypeName),
+            explicitKeyTarget: nameof(ApiRelationshipPrincipalEnd.ApiPrimaryKeyTypeName),
             inferredForeignKeyLabel: "foreign key",
-            countMismatchRemediationTarget: "the principal end's key type",
+            countMismatchRemediationTarget: "the principal end's primary key type",
             compatibilityRemediation: compatibilityRemediation
         );
     }

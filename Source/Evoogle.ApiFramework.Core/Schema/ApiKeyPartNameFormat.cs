@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -10,7 +10,7 @@ namespace Evoogle.ApiFramework.Schema;
 /// <summary>
 ///     Specifies how optional <see cref="ApiKeyPart.ApiName"/> values are created during key materialization.
 /// </summary>
-public enum ApiKeyPartNameBuilder
+public enum ApiKeyPartNameFormat
 {
     /// <summary>
     ///     Creates unnamed/positional key parts.

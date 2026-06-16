@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -37,10 +37,10 @@ public static class ApiSchemaExcludeMembers
         // ApiRelationshipAssociation — cycle: assoc → relationship → assoc → ...
         new ExcludeMember(typeof(ApiRelationshipAssociation), nameof(ApiRelationshipAssociation.ApiRelationshipManyToMany)),
 
-        // ApiRelationshipPrincipalEnd — key type resolved during initialization
-        new ExcludeMember(typeof(ApiRelationshipPrincipalEnd), nameof(ApiRelationshipPrincipalEnd.ApiKeyType)),
+        // ApiRelationshipPrincipalEnd — primary key type resolved during initialization
+        new ExcludeMember(typeof(ApiRelationshipPrincipalEnd), nameof(ApiRelationshipPrincipalEnd.ApiPrimaryKeyType)),
 
-        // ApiRelationshipDependentEnd — ApiForeignKeyType throws when IsNavigational (HasKeyBinding=false)
+        // ApiRelationshipDependentEnd — ApiForeignKeyType throws when IsNavigational (HasForeignKey=false)
         new ExcludeMember(typeof(ApiRelationshipDependentEnd), nameof(ApiRelationshipDependentEnd.ApiForeignKeyType)),
 
         // ApiSchema - cycle: ApiSchema → ApiSchemaContext → ApiSchema → ...
@@ -81,7 +81,7 @@ public static class ApiSchemaExcludeMembers
         // ApiRelationshipElement — object type resolved during initialization
         new ExcludeMember(typeof(ApiRelationshipElement), nameof(ApiRelationshipElement.ApiObjectType)),
 
-        // ApiRelationshipDependentEnd — ApiForeignKeyType throws when IsNavigational (HasKeyBinding=false)
+        // ApiRelationshipDependentEnd — ApiForeignKeyType throws when IsNavigational (HasForeignKey=false)
         new ExcludeMember(typeof(ApiRelationshipDependentEnd), nameof(ApiRelationshipDependentEnd.ApiForeignKeyType)),
 
         new ExcludeMember(typeof(ApiRelationshipElement), nameof(ApiRelationshipElement.ApiObjectType)),
@@ -92,8 +92,8 @@ public static class ApiSchemaExcludeMembers
         // ApiRelationshipAssociation — cycle: assoc → relationship → assoc → ...
         new ExcludeMember(typeof(ApiRelationshipAssociation), nameof(ApiRelationshipAssociation.ApiRelationshipManyToMany)),
 
-        // ApiRelationshipPrincipalEnd — key type resolved during initialization
-        new ExcludeMember(typeof(ApiRelationshipPrincipalEnd), nameof(ApiRelationshipPrincipalEnd.ApiKeyType)),
+        // ApiRelationshipPrincipalEnd — primary key type resolved during initialization
+        new ExcludeMember(typeof(ApiRelationshipPrincipalEnd), nameof(ApiRelationshipPrincipalEnd.ApiPrimaryKeyType)),
 
         // Key path nodes — property and object type references resolved during initialization
         new ExcludeMember(typeof(ApiKeyPath), nameof(ApiKeyPath.ApiRootObjectType)),

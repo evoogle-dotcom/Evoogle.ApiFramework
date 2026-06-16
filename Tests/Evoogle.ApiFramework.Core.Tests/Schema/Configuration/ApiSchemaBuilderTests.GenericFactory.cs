@@ -303,7 +303,7 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
                 .To<DigitalProduct>(de => de.WithForeignKey(p => p.CategoryId)))
 
             .AddOneToManyRelationship("REL_Category_PhysicalProduct_1toN", r => r
-                .From<Category>()
+                .From<Category>("PK_Category")
                 .To<PhysicalProduct>(de => de.WithForeignKey(p => p.CategoryId)))
 
             .AddManyToManyRelationship("REL_DigitalProduct_Tag_NtoN", r => r
@@ -314,8 +314,8 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
                     .WithForeignKeyB(p => p.TagId)))
 
             .AddManyToManyRelationship("REL_PhysicalProduct_Tag_NtoN", r => r
-                .Between<PhysicalProduct>()
-                .And<Tag>()
+                .Between<PhysicalProduct>("PK_PhysicalProduct")
+                .And<Tag>("PK_Tag")
                 .WithAssociation<PhysicalProductTag>(a => a
                     .WithForeignKeyA(p => p.PhysicalProductId)
                     .WithForeignKeyB(p => p.TagId)));

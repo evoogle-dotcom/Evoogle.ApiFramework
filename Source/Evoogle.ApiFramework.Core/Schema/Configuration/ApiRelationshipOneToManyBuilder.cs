@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -9,7 +9,8 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 ///     Fluent builder used to configure an <see cref="ApiRelationshipOneToMany"/> relationship.
 /// </summary>
 /// <remarks>
-///     Call <see cref="From{TPrincipal}"/>, <see cref="To{TDependent}"/>, and optionally
+///     Call <see cref="From{TPrincipal}(Action{ApiRelationshipPrincipalEndBuilder})"/>,
+///     <see cref="To{TDependent}"/>, and optionally
 ///     <see cref="WithDeleteBehavior"/> to configure the relationship.
 ///     At most one principal end and one dependent end are allowed; subsequent calls replace the previous
 ///     configuration for that end.
@@ -44,7 +45,7 @@ public sealed class ApiRelationshipOneToManyBuilder(string apiName)
         => base.AddRelationshipExtension<ApiRelationshipOneToManyBuilder>(typeof(T), value);
     #endregion
 
-    #region Non-Generic With Methods
+    #region Non-Generic From/To Methods
     /// <summary>
     ///     Configures the principal end of the 1:M relationship using the specified CLR type.
     /// </summary>
@@ -60,12 +61,19 @@ public sealed class ApiRelationshipOneToManyBuilder(string apiName)
     }
 
     /// <summary>
-    ///     Sets the delete behavior for the relationship.
+    ///     Configures the principal end of the 1:M relationship using the specified CLR type,
+    ///     and selects the named primary key type for the relationship.
     /// </summary>
-    /// <param name="apiDeleteBehavior">The desired delete behavior.</param>
+    /// <param name="clrPrincipalType">The CLR type of the principal object.</param>
+    /// <param name="apiPrimaryKeyTypeName">The name of the primary key type to use for the relationship.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipOneToManyBuilder WithDeleteBehavior(ApiRelationshipDeleteBehavior apiDeleteBehavior)
-        => base.WithDeleteBehavior<ApiRelationshipOneToManyBuilder>(apiDeleteBehavior);
+    public ApiRelationshipOneToManyBuilder From(Type clrPrincipalType, string apiPrimaryKeyTypeName)
+    {
+        var builder = new ApiRelationshipPrincipalEndBuilder(clrPrincipalType);
+        builder.WithPrimaryKey(apiPrimaryKeyTypeName);
+        _principalEndBuilder = builder;
+        return this;
+    }
 
     /// <summary>
     ///     Configures the dependent end of the 1:M relationship using the specified CLR type.
@@ -82,7 +90,17 @@ public sealed class ApiRelationshipOneToManyBuilder(string apiName)
     }
     #endregion
 
-    #region With Methods
+    #region Non-Generic With Methods
+    /// <summary>
+    ///     Sets the delete behavior for the relationship.
+    /// </summary>
+    /// <param name="apiDeleteBehavior">The desired delete behavior.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiRelationshipOneToManyBuilder WithDeleteBehavior(ApiRelationshipDeleteBehavior apiDeleteBehavior)
+        => base.WithDeleteBehavior<ApiRelationshipOneToManyBuilder>(apiDeleteBehavior);
+    #endregion
+
+    #region Generic From/To Methods
     /// <summary>
     ///     Configures the principal end of the 1:M relationship using the CLR type <typeparamref name="TPrincipal"/>.
     /// </summary>
@@ -93,6 +111,21 @@ public sealed class ApiRelationshipOneToManyBuilder(string apiName)
     {
         var builder = new ApiRelationshipPrincipalEndBuilder(typeof(TPrincipal));
         configure?.Invoke(builder);
+        _principalEndBuilder = builder;
+        return this;
+    }
+
+    /// <summary>
+    ///     Configures the principal end of the 1:M relationship using the CLR type <typeparamref name="TPrincipal"/>,
+    ///     and selects the named primary key type for the relationship.
+    /// </summary>
+    /// <typeparam name="TPrincipal">The CLR type of the principal object.</typeparam>
+    /// <param name="apiPrimaryKeyTypeName">The name of the primary key type to use for the relationship.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiRelationshipOneToManyBuilder From<TPrincipal>(string apiPrimaryKeyTypeName)
+    {
+        var builder = new ApiRelationshipPrincipalEndBuilder(typeof(TPrincipal));
+        builder.WithPrimaryKey(apiPrimaryKeyTypeName);
         _principalEndBuilder = builder;
         return this;
     }

@@ -61,8 +61,8 @@ internal static class ApiSchemaHelpers
 
     public static void InitializeLookupDictionary<TPart, TPartKey>
     (
-        IEnumerable<TPart> parts,
-        Func<TPart, TPartKey> partKeySelector,
+        IEnumerable<TPart?> parts,
+        Func<TPart, TPartKey?> partKeySelector,
         Func<TPartKey, bool>? partKeyFilter,
         string partKeyPropertyName,
         string path,
@@ -70,35 +70,37 @@ internal static class ApiSchemaHelpers
         ApiInitializationContext context,
         out Dictionary<TPartKey, TPart>? lookupDictionary
     )
+        where TPart : class
         where TPartKey : notnull
     {
-        partKeyFilter ??= (_ => true);
+        partKeyFilter ??= static _ => true;
 
-        lookupDictionary = parts
-            .Where(p => p is not null)
-            .GroupBy(partKeySelector)
-            .Where(g => partKeyFilter(g.Key))
+        var keyedParts = parts
+            .OfType<TPart>()
+            .Select(part => (Part: part, Key: partKeySelector(part)))
+            .Where(x => x.Key is not null && partKeyFilter(x.Key));
+
+        lookupDictionary = keyedParts
+            .GroupBy(x => x.Key!)
             .Where(g => g.Count() == 1)
-            .ToDictionary(g => g.Key, g => g.Single());
+            .ToDictionary(g => g.Key, g => g.Single().Part);
 
-        ValidateUnique
-        (
+        ValidateUnique(
             parts: parts,
             partKeySelector: partKeySelector,
             partKeyFilter: partKeyFilter,
             partKeyPropertyName: partKeyPropertyName,
             path: path,
             duplicatePartCode: duplicatePartCode,
-            context: context
-        );
+            context: context);
     }
 
-    public static bool IsNameInvalid(string name)
+    public static bool IsNameInvalid(string? name)
     {
         return string.IsNullOrWhiteSpace(name);
     }
 
-    public static bool IsNameValid(string name)
+    public static bool IsNameValid(string? name)
     {
         return !IsNameInvalid(name);
     }
@@ -131,22 +133,24 @@ internal static class ApiSchemaHelpers
 
     public static void ValidateUnique<TPart, TPartKey>
     (
-        IEnumerable<TPart> parts,
-        Func<TPart, TPartKey> partKeySelector,
+        IEnumerable<TPart?> parts,
+        Func<TPart, TPartKey?> partKeySelector,
         Func<TPartKey, bool>? partKeyFilter,
         string partKeyPropertyName,
         string path,
         ApiInitializationCode duplicatePartCode,
         ApiInitializationContext context
     )
+        where TPart : class
         where TPartKey : notnull
     {
-        partKeyFilter ??= (_ => true);
+        partKeyFilter ??= static _ => true;
 
         var duplicates = parts
-            .Where(p => p is not null)
-            .GroupBy(partKeySelector)
-            .Where(g => partKeyFilter(g.Key))
+            .OfType<TPart>()
+            .Select(part => (Part: part, Key: partKeySelector(part)))
+            .Where(x => x.Key is not null && partKeyFilter(x.Key))
+            .GroupBy(x => x.Key!)
             .Where(g => g.Count() > 1)
             .Select(g => g.Key)
             .ToList();
@@ -231,6 +235,5 @@ internal static class ApiSchemaHelpers
 
         return true;
     }
-
     #endregion
 }

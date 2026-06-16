@@ -3,29 +3,28 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using Evoogle.ApiFramework.Key;
 using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema.Internal;
 
 /// <summary>
-///     Provides common <see cref="ApiKeyPartNameBuildDelegate"/> implementations.
+///     Provides common <see cref="ApiKeyPartNameFormatterDelegate"/> implementations.
 /// </summary>
-internal static class ApiKeyPartNameBuilders
+internal static class ApiKeyPartNameFormatters
 {
     #region Methods
     /// <summary>
-    ///     Resolves a part name builder from the configured public option.
+    ///     Resolves a part name formatter from the configured public format.
     /// </summary>
-    /// <param name="builder">The configured part name builder option.</param>
-    /// <returns>The matching part name builder implementation.</returns>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="builder"/> is unsupported.</exception>
-    internal static ApiKeyPartNameBuildDelegate Resolve(ApiKeyPartNameBuilder builder) => builder switch
+    /// <param name="format">The configured part name format.</param>
+    /// <returns>The matching part name formatter implementation.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="format"/> is unsupported.</exception>
+    internal static ApiKeyPartNameFormatterDelegate Resolve(ApiKeyPartNameFormat format) => format switch
     {
-        ApiKeyPartNameBuilder.None => None,
-        ApiKeyPartNameBuilder.ClrPathOnly => ClrPathOnly,
-        ApiKeyPartNameBuilder.ClrRootAndPath => ClrRootAndPath,
-        _ => throw new ArgumentOutOfRangeException(nameof(builder), $"Unsupported {nameof(ApiKeyPartNameBuilder)}: {builder}.")
+        ApiKeyPartNameFormat.None => None,
+        ApiKeyPartNameFormat.ClrPathOnly => ClrPathOnly,
+        ApiKeyPartNameFormat.ClrRootAndPath => ClrRootAndPath,
+        _ => throw new ArgumentOutOfRangeException(nameof(format), $"Unsupported {nameof(ApiKeyPartNameFormat)}: {format}.")
     };
 
     /// <summary>

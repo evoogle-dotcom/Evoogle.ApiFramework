@@ -18,7 +18,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 public class ApiPropertyBuilder(string apiName, string clrName) : ExtensionBuilder<ApiPropertyBuilder>
 {
     #region Fields
-    private readonly string _apiName = apiName;
+    private string _apiName = apiName;
     private readonly string _clrName = clrName;
     #endregion
 
@@ -52,18 +52,7 @@ public class ApiPropertyBuilder(string apiName, string clrName) : ExtensionBuild
         => this.AddPropertyExtension(typeof(T), value);
     #endregion
 
-    #region With Methods
-    /// <summary>
-    ///     Configures type modifiers for the property.
-    /// </summary>
-    /// <param name="configure">Callback to configure type modifiers.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiPropertyBuilder WithModifiers(Action<ApiTypeModifiersBuilder> configure)
-    {
-        this.Modifiers = configure;
-        return this;
-    }
-
+    #region As Methods
     /// <summary>
     ///     Marks this property as required, overriding any nullability-inferred modifier.
     /// </summary>
@@ -80,6 +69,30 @@ public class ApiPropertyBuilder(string apiName, string clrName) : ExtensionBuild
     public ApiPropertyBuilder AsOptional()
     {
         return this.WithModifiers(m => m.Optional());
+    }
+    #endregion
+
+    #region With Methods
+    /// <summary>
+    ///     Configures type modifiers for the property.
+    /// </summary>
+    /// <param name="configure">Callback to configure type modifiers.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiPropertyBuilder WithModifiers(Action<ApiTypeModifiersBuilder> configure)
+    {
+        this.Modifiers = configure;
+        return this;
+    }
+
+    /// <summary>
+    ///    Sets the API name for the property being built.
+    /// </summary>
+    /// <param name="apiName">The API name to use.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiPropertyBuilder WithName(string apiName)
+    {
+        _apiName = apiName;
+        return this;
     }
     #endregion
 

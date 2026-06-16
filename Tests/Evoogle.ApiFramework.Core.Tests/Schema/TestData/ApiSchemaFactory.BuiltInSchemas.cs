@@ -74,10 +74,10 @@ public static partial class ApiSchemaFactory
             Extensions = extensions
         };
 
-    private static KeyValuePair<string, ApiKeyType> KT(string name, IEnumerable<ApiKeyPath> paths, OrderedDictionary<Type, object>? extensions = null)
-        => new(name, new ApiKeyType(paths) { Extensions = extensions });
+    private static ApiKeyType KT(string name, IEnumerable<ApiKeyPath> paths, OrderedDictionary<Type, object>? extensions = null)
+        => new(name, paths) { Extensions = extensions };
 
-    private static ApiObjectType O(string name, Type clr, IEnumerable<ApiProperty> properties, IEnumerable<KeyValuePair<string, ApiKeyType>>? keyTypes = null, ApiObjectTypeOptions? options = null, OrderedDictionary<Type, object>? extensions = null)
+    private static ApiObjectType O(string name, Type clr, IEnumerable<ApiProperty> properties, IEnumerable<ApiKeyType>? keyTypes = null, ApiObjectTypeOptions? options = null, OrderedDictionary<Type, object>? extensions = null)
         => new(name, options, properties, keyTypes, clr)
         {
             Extensions = extensions
@@ -257,7 +257,8 @@ public static partial class ApiSchemaFactory
             P(name: nameof(Category.ParentId), expression: TE.ClrRef<Ulid>(),                   required: false),
             P(name: nameof(Category.Parent),   expression: TE.ClrRef<Category>(),               required: false),
             P(name: nameof(Category.Children), expression: TE.ListOf<Category>(required: true), required: true)
-        ], keyTypes:
+        ],
+        keyTypes:
         [
             KT("PK_Category", [KP(typeof(Category), [KPS(nameof(Category.Id))])]),
             KT("AK_Category_Name", [KP(typeof(Category), [KPS(nameof(Category.Name))])])
@@ -423,7 +424,7 @@ public static partial class ApiSchemaFactory
 
         // Customer → Order (1:M, nested FK via Order.Customer.Id)
         var customerToOrder = R1M("REL_Customer_Order_1toN",
-            RPE(typeof(Customer), "PK_Customer"),
+            RPE(typeof(Customer)),
             RDE(typeof(Order), KT([KP(typeof(Order), [KPS(nameof(Order.Customer)), KPS(nameof(Customer.Id))])])));
 
         // Order → OrderLine (1:M, owner key path)
@@ -439,12 +440,12 @@ public static partial class ApiSchemaFactory
 
         // Category → Category (1:M self-referential, scalar FK via Category.ParentId)
         var categoryToCategory = R1M("REL_Category_Category_1toN",
-            RPE(typeof(Category), "PK_Category"),
+            RPE(typeof(Category)),
             RDE(typeof(Category), KT([KP(typeof(Category), [KPS(nameof(Category.ParentId))])])));
 
         // Category → DigitalProduct (1:M, scalar FK via DigitalProduct.CategoryId)
         var categoryToDigitalProduct = R1M("REL_Category_DigitalProduct_1toN",
-            RPE(typeof(Category), "PK_Category"),
+            RPE(typeof(Category)),
             RDE(typeof(DigitalProduct), KT([KP(typeof(DigitalProduct), [KPS(nameof(DigitalProduct.CategoryId))])])));
 
         // Category → PhysicalProduct (1:M, scalar FK via PhysicalProduct.CategoryId)
@@ -454,8 +455,8 @@ public static partial class ApiSchemaFactory
 
         // DigitalProduct ↔ Tag (M:M via DigitalProductTag)
         var digitalProductToTag = RMN("REL_DigitalProduct_Tag_NtoN",
-            RPE(typeof(DigitalProduct), "PK_DigitalProduct"),
-            RPE(typeof(Tag), "PK_Tag"),
+            RPE(typeof(DigitalProduct)),
+            RPE(typeof(Tag)),
             RAS(typeof(DigitalProductTag),
                 KT([KP(typeof(DigitalProductTag), [KPS(nameof(DigitalProductTag.DigitalProductId))])]),
                 KT([KP(typeof(DigitalProductTag), [KPS(nameof(DigitalProductTag.TagId))])])));

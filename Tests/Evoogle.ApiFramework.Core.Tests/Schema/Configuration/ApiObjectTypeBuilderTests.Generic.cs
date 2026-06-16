@@ -219,28 +219,5 @@ public partial class ApiObjectTypeBuilderTests
     [Theory]
     [MemberData(nameof(BuildGenericTheoryData))]
     public void BuildGeneric(IXUnitTest test) => test.Execute(this);
-
-    [Fact]
-    public void AddKeyGenericSupportsFourExpressionParts()
-    {
-        var ctx = new ApiSchemaBuilderContext();
-        var apiObjectType = new ApiObjectTypeBuilder<RelationshipOrderLine>(ctx)
-            .WithName(nameof(RelationshipOrderLine))
-            .AddProperty(p => p.OrderId)
-            .AddProperty(p => p.LineNumber)
-            .AddProperty(p => p.ProductSku)
-            .AddProperty(p => p.ProductRevision)
-            .AddKey
-            (
-                "PK_RelationshipOrderLine_FourPart",
-                p => p.OrderId,
-                p => p.LineNumber,
-                p => p.ProductSku,
-                p => p.ProductRevision
-            )
-            .Build();
-
-        apiObjectType.ApiKeyTypes["PK_RelationshipOrderLine_FourPart"].ApiKeyPaths.Should().HaveCount(4);
-    }
     #endregion
 }

@@ -25,7 +25,7 @@ public static class ApiSchemaExtensions
     {
         if (apiSchema.TryGetTypeByApiName(apiName, out var result))
         {
-            return result!;
+            return result;
         }
 
         var availableTypesByApiName = string.Join(", ", apiSchema.ApiNamedTypes.OrderBy(t => t.ApiName).Select(t => t.ApiName));
@@ -46,7 +46,7 @@ public static class ApiSchemaExtensions
     {
         if (apiSchema.TryGetTypeByClrType(clrType, out var result))
         {
-            return result!;
+            return result;
         }
 
         var errorMessage =
@@ -83,7 +83,7 @@ public static class ApiSchemaExtensions
     {
         if (apiSchema.TryGetEnumTypeByApiName(apiName, out var result))
         {
-            return result!;
+            return result;
         }
 
         var availableEnumTypesByApiName = string.Join(", ", apiSchema.ApiEnumTypes.OrderBy(t => t.ApiName).Select(t => t.ApiName));
@@ -104,7 +104,7 @@ public static class ApiSchemaExtensions
     {
         if (apiSchema.TryGetEnumTypeByClrType(clrType, out var result))
         {
-            return result!;
+            return result;
         }
 
         var errorMessage =
@@ -141,7 +141,7 @@ public static class ApiSchemaExtensions
     {
         if (apiSchema.TryGetObjectTypeByApiName(apiName, out var result))
         {
-            return result!;
+            return result;
         }
 
         var availableObjectTypesByApiName = string.Join(", ", apiSchema.ApiObjectTypes.OrderBy(t => t.ApiName).Select(t => t.ApiName));
@@ -162,7 +162,7 @@ public static class ApiSchemaExtensions
     {
         if (apiSchema.TryGetObjectTypeByClrType(clrType, out var result))
         {
-            return result!;
+            return result;
         }
 
         var errorMessage =
@@ -199,7 +199,7 @@ public static class ApiSchemaExtensions
     {
         if (apiSchema.TryGetScalarTypeByApiName(apiName, out var result))
         {
-            return result!;
+            return result;
         }
 
         var availableScalarTypesByApiName = string.Join(", ", apiSchema.ApiScalarTypes.OrderBy(t => t.ApiName).Select(t => t.ApiName));
@@ -220,7 +220,7 @@ public static class ApiSchemaExtensions
     {
         if (apiSchema.TryGetScalarTypeByClrType(clrType, out var result))
         {
-            return result!;
+            return result;
         }
 
         var errorMessage =

@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -33,21 +33,16 @@ internal static class ApiRelationshipKeyAlignment
         ArgumentNullException.ThrowIfNull(principalEnd);
         ArgumentNullException.ThrowIfNull(foreignKeyType);
 
-        var principalKeyType = principalEnd.ResolvedKeyType;
-        if (principalKeyType is null)
-        {
-            // Principal key type failed to resolve; the principal end already recorded the error.
-            return;
-        }
-
         var keyPathCount = foreignKeyType.ApiKeyPaths.Length;
         var runCountCheck = true;
+        var principalKeyType = principalEnd.ResolvedPrimaryKeyType;
 
         var principalObjectType = principalEnd.ResolvedApiObjectType;
-        if (principalEnd.ApiKeyTypeName is null && principalObjectType is not null)
+        if (principalEnd.ApiPrimaryKeyTypeName is null && principalObjectType is not null)
         {
             var matchingShapeKeys = principalObjectType.ApiKeyTypes
-                .Where(kvp => ApiSchemaHelpers.CountKeyLeaves(kvp.Value) == keyPathCount)
+                .Where(keyType => ApiSchemaHelpers.CountKeyLeaves(keyType) == keyPathCount)
+                .Select(static keyType => new KeyValuePair<string, ApiKeyType>(keyType.ApiName!, keyType))
                 .ToList();
             var matchingKeys = matchingShapeKeys
                 .Where(kvp => ApiSchemaHelpers.AreKeyTypesCompatible(kvp.Value, foreignKeyType))
@@ -61,9 +56,9 @@ internal static class ApiRelationshipKeyAlignment
             else if (matchingKeys.Count == 1)
             {
                 principalKeyType = matchingKeys[0].Value;
-                if (!ReferenceEquals(principalKeyType, principalEnd.ResolvedKeyType))
+                if (!ReferenceEquals(principalKeyType, principalEnd.ResolvedPrimaryKeyType))
                 {
-                    principalEnd.OverrideResolvedKeyType(principalKeyType);
+                    principalEnd.OverrideResolvedPrimaryKeyType(principalKeyType);
                 }
             }
             else if (matchingShapeKeys.Count > 0)
@@ -83,6 +78,29 @@ internal static class ApiRelationshipKeyAlignment
 
                 runCountCheck = false;
             }
+            else
+            {
+                AddInferredCountMismatchIssue
+                (
+                    context,
+                    relationshipPath,
+                    foreignKeyPath,
+                    principalObjectType,
+                    keyPathCount,
+                    countMismatchCode,
+                    principalEndQualifier,
+                    explicitKeyTarget
+                );
+
+                runCountCheck = false;
+            }
+        }
+
+        if (principalKeyType is null)
+        {
+            // Explicit principal key resolution failed, or inference could not run because the principal
+            // object type failed to resolve. The owning element already recorded the relevant issue.
+            return;
         }
 
         if (!runCountCheck)
@@ -138,8 +156,8 @@ internal static class ApiRelationshipKeyAlignment
         var qualifier = string.IsNullOrWhiteSpace(principalEndQualifier) ? null : $" {principalEndQualifier}";
         var severity = ApiInitializationSeverity.Error;
         var code = ApiInitializationCode.API_RELATIONSHIP_AMBIGUOUS_PRINCIPAL_KEY;
-        var description = $"Cannot automatically determine the referenced key type{qualifier}: {matchingKeys.Count} key types on '{principalObjectType.ApiName}' are compatible with the foreign key type: {keyTypeNames}";
-        var remediation = $"Set {explicitKeyTarget} to specify the key type explicitly; available key types: {keyTypeNames}";
+        var description = $"Cannot automatically determine the referenced primary key type{qualifier}: {matchingKeys.Count} key types on '{principalObjectType.ApiName}' are compatible with the foreign key type: {keyTypeNames}";
+        var remediation = $"Set {explicitKeyTarget} to specify the primary key type explicitly; available key types: {keyTypeNames}";
 
         context.AddIssue(relationshipPath, severity, code, description, remediation);
     }
@@ -159,6 +177,29 @@ internal static class ApiRelationshipKeyAlignment
         var severity = ApiInitializationSeverity.Error;
         var description = $"{foreignKeyPath}.{nameof(ApiKeyType.ApiKeyPaths)} has {keyPathCount} key path(s) but {principalCountLabel} has {keyTypePathCount} key path(s)";
         var remediation = $"Ensure {foreignKeyPath}.{nameof(ApiKeyType.ApiKeyPaths)} contains exactly {keyTypePathCount} key path(s) to match {countMismatchRemediationTarget}";
+
+        context.AddIssue(relationshipPath, severity, countMismatchCode, description, remediation);
+    }
+
+    private static void AddInferredCountMismatchIssue
+    (
+        ApiInitializationContext context,
+        string relationshipPath,
+        string foreignKeyPath,
+        ApiObjectType principalObjectType,
+        int keyPathCount,
+        ApiInitializationCode countMismatchCode,
+        string? principalEndQualifier,
+        string explicitKeyTarget
+    )
+    {
+        var keyTypeNames = string.Join(", ", principalObjectType.ApiKeyTypes.Select(static keyType => $"'{keyType.ApiName}'"));
+        var qualifier = string.IsNullOrWhiteSpace(principalEndQualifier) ? null : $" {principalEndQualifier}";
+        var severity = ApiInitializationSeverity.Error;
+        var description = $"Cannot automatically determine the referenced key type{qualifier}: {foreignKeyPath}.{nameof(ApiKeyType.ApiKeyPaths)} has {keyPathCount} key path(s), but no key type on '{principalObjectType.ApiName}' has {keyPathCount} key path(s)";
+        var remediation = principalObjectType.ApiKeyTypes.Length > 0
+            ? $"Set {explicitKeyTarget} explicitly or align the foreign key shape with one of these key types: {keyTypeNames}"
+            : $"Define a key type on '{principalObjectType.ApiName}' or set {explicitKeyTarget} explicitly";
 
         context.AddIssue(relationshipPath, severity, countMismatchCode, description, remediation);
     }

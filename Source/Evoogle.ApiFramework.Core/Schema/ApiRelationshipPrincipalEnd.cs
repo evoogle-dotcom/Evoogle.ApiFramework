@@ -5,6 +5,7 @@
 // See the LICENSE file in the project root for more information.
 using System.Text.Json.Serialization;
 
+using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.ApiFramework.Schema.Json;
 using Evoogle.Extensions;
@@ -14,25 +15,21 @@ namespace Evoogle.ApiFramework.Schema;
 /// <summary>
 ///     Represents the principal end of an <see cref="ApiRelationship"/>.
 ///
-///     The principal end provides the key type used for relationship matching:
-///     its <see cref="ApiKeyType"/> uniquely identifies the objects on this side and is referenced
-///     by the <see cref="ApiRelationshipDependentEnd"/>.
+///     The principal end identifies the object type that provides the primary key type used for relationship matching.
+///     Key-bound relationships either select a named primary key explicitly or infer the compatible primary key type from the
+///     corresponding foreign key binding.
 /// </summary>
 /// <param name="clrObjectType">The CLR type of the principal <see cref="ApiObjectType"/>.</param>
-/// <param name="apiKeyTypeName">
+/// <param name="apiPrimaryKeyTypeName">
 ///     The optional name of the <see cref="ApiKeyType"/> on the principal type that serves as the join key.
 ///     When <see langword="null"/>, relationship initialization uses the foreign key binding, when present,
 ///     to infer the best compatible key type on the principal object type.
 /// </param>
 [JsonConverter(typeof(ApiRelationshipPrincipalEndJsonConverter))]
-public sealed class ApiRelationshipPrincipalEnd
-(
-    Type clrObjectType,
-    string? apiKeyTypeName = null
-) : ApiRelationshipEnd(clrObjectType)
+public sealed class ApiRelationshipPrincipalEnd(Type clrObjectType, string? apiPrimaryKeyTypeName = null) : ApiRelationshipEnd(clrObjectType)
 {
     #region ApiRelationshipPrincipalEnd Fields
-    private ApiKeyType? _apiResolvedKeyType = null;
+    private ApiKeyType? _apiResolvedPrimaryKeyType = null;
     #endregion
 
     #region ApiSchemaElement Properties
@@ -47,19 +44,35 @@ public sealed class ApiRelationshipPrincipalEnd
 
     #region ApiRelationshipPrincipalEnd Properties
     /// <summary>
-    ///     Gets the optional explicit key type name used to select a specific key type on the principal object type as the join key.
-    ///     When <see langword="null"/>, key-bound relationships infer the best compatible principal key type from the
-    ///     corresponding foreign key; navigational relationships use the principal type's primary key by convention.
+    ///     Gets the optional explicit primary key type name used to select a specific key type on the principal object type as the join key.
+    ///     When <see langword="null"/>, key-bound relationships infer the best compatible principal primary key type from the
+    ///     corresponding foreign key; navigational relationships have no key binding declared at the schema level.
     /// </summary>
-    public string? ApiKeyTypeName { get; } = apiKeyTypeName;
+    public string? ApiPrimaryKeyTypeName { get; } = apiPrimaryKeyTypeName;
 
     /// <summary>
-    ///     Gets the resolved principal <see cref="ApiKeyType"/> used for relationship matching. Available after initialization.
+    ///     Gets the resolved principal primary <see cref="ApiKeyType"/> used for relationship matching.
     /// </summary>
-    public ApiKeyType ApiKeyType => this.ThrowIfNotInitialized(_apiResolvedKeyType);
+    /// <exception cref="ApiSchemaException">
+    ///     Thrown when <see cref="IsNavigational"/> is <see langword="true"/>.
+    ///     Check <see cref="HasPrimaryKey"/> before accessing this property.
+    /// </exception>
+    public ApiKeyType ApiPrimaryKeyType => this.HasPrimaryKey
+        ? _apiResolvedPrimaryKeyType!
+        : throw new ApiSchemaException("No primary key declared or resolved for this principal end of the relationship.");
 
-    /// <summary>Gets the resolved principal <see cref="ApiKeyType"/>, or <see langword="null"/> if initialization failed or has not yet run.</summary>
-    internal ApiKeyType? ResolvedKeyType => _apiResolvedKeyType;
+    /// <summary>
+    ///     Gets a value indicating whether this principal end has a resolved primary key declared explicitly or inferred from a foreign key.
+    /// </summary>
+    public bool HasPrimaryKey => _apiResolvedPrimaryKeyType is not null;
+
+    /// <summary>
+    ///     Gets a value indicating whether this principal end is navigational (i.e. has no resolved primary key at the schema level).
+    /// </summary>
+    public bool IsNavigational => !this.HasPrimaryKey;
+
+    /// <summary>Gets the resolved principal primary <see cref="ApiKeyType"/>, or <see langword="null"/> if initialization failed or has not yet run.</summary>
+    internal ApiKeyType? ResolvedPrimaryKeyType => _apiResolvedPrimaryKeyType;
 
     /// <summary>Gets the resolved <see cref="ApiObjectType"/> for this end, or <see langword="null"/> if initialization failed or has not yet run.</summary>
     internal ApiObjectType? ResolvedApiObjectType => this.ResolvedObjectType;
@@ -70,10 +83,10 @@ public sealed class ApiRelationshipPrincipalEnd
     public override string ToString()
     {
         var clrObjectType = this.ClrObjectType.SafeToName();
-        var apiKeyTypeName = this.ApiKeyTypeName.SafeToString();
+        var apiPrimaryKeyTypeName = this.ApiPrimaryKeyTypeName.SafeToString();
         var extensionCount = this.ExtensionCount.SafeToString();
 
-        return $"{nameof(ApiRelationshipPrincipalEnd)} {{{nameof(this.ClrObjectType)}={clrObjectType}, {nameof(this.ApiKeyTypeName)}={apiKeyTypeName}, {nameof(this.ExtensionCount)}={extensionCount}}}";
+        return $"{nameof(ApiRelationshipPrincipalEnd)} {{{nameof(this.ClrObjectType)}={clrObjectType}, {nameof(this.ApiPrimaryKeyTypeName)}={apiPrimaryKeyTypeName}, {nameof(this.ExtensionCount)}={extensionCount}}}";
     }
     #endregion
 
@@ -85,20 +98,20 @@ public sealed class ApiRelationshipPrincipalEnd
 
         base.Initialize(context);
 
-        this.InitializeApiKeyType(context);
+        this.InitializeApiPrimaryKeyType(context);
     }
     #endregion
 
     #region Implementation Methods
-    /// <summary>Overrides the resolved key type; used by shape-match disambiguation during relationship initialization.</summary>
-    internal void OverrideResolvedKeyType(ApiKeyType keyType)
+    /// <summary>Overrides the resolved primary key type; used by shape-match disambiguation during relationship initialization.</summary>
+    internal void OverrideResolvedPrimaryKeyType(ApiKeyType keyType)
     {
-        _apiResolvedKeyType = keyType;
+        _apiResolvedPrimaryKeyType = keyType;
     }
 
-    private void InitializeApiKeyType(ApiInitializationContext context)
+    private void InitializeApiPrimaryKeyType(ApiInitializationContext context)
     {
-        _apiResolvedKeyType = null;
+        _apiResolvedPrimaryKeyType = null;
 
         // ApiObjectType is resolved by the base class. If it didn't resolve, we cannot proceed.
         var apiObjectType = this.ResolvedObjectType;
@@ -107,43 +120,32 @@ public sealed class ApiRelationshipPrincipalEnd
             return;
         }
 
-        if (this.ApiKeyTypeName is not null)
+        if (this.ApiPrimaryKeyTypeName is not null)
         {
-            // Resolve by explicit key type name.
-            if (apiObjectType.TryGetKeyTypeByApiName(this.ApiKeyTypeName, out var apiResolvedKeyType))
+            // Resolve by explicit primary key type name.
+            if (apiObjectType.TryGetKeyTypeByApiName(this.ApiPrimaryKeyTypeName, out var apiResolvedPrimaryKeyType))
             {
-                _apiResolvedKeyType = apiResolvedKeyType;
+                _apiResolvedPrimaryKeyType = apiResolvedPrimaryKeyType;
                 return;
             }
 
-            var availableKeyTypes = string.Join(", ", apiObjectType.ApiKeyTypes.Keys.Select(k => $"'{k}'"));
+            var availableKeyTypes = string.Join(", ", apiObjectType.GetKeyTypeApiNames().Select(k => $"'{k}'"));
             var remediation = !string.IsNullOrEmpty(availableKeyTypes)
                 ? $"Use one of the available key types: {availableKeyTypes}"
-                : $"Define a key type on '{apiObjectType.ApiName}' or remove {nameof(this.ApiKeyTypeName)}";
+                : $"Define a key type on '{apiObjectType.ApiName}' or remove {nameof(this.ApiPrimaryKeyTypeName)}";
 
             var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.API_RELATIONSHIP_END_UNRESOLVED_KEY_TYPE;
-            var description = $"Referenced key type '{this.ApiKeyTypeName}' could not be found on object type '{apiObjectType.ApiName}'";
+            var description = $"Referenced primary key type '{this.ApiPrimaryKeyTypeName}' could not be found on object type '{apiObjectType.ApiName}'";
 
             context.AddIssue(path, severity, code, description, remediation);
             return;
         }
 
-        // Use primary key type by convention. Key-bound relationships may override this during alignment
-        // when another principal key type is the best compatible match for the foreign key.
-        _apiResolvedKeyType = apiObjectType.ApiPrimaryKeyType;
-
-        if (_apiResolvedKeyType is null)
-        {
-            var path = this.ApiPath;
-            var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.API_RELATIONSHIP_END_UNRESOLVED_KEY_TYPE;
-            var description = $"Object type '{apiObjectType.ApiName}' has no primary key type and cannot act as a principal end";
-            var remediation = $"Define a primary key type on '{apiObjectType.ApiName}' or specify {nameof(this.ApiKeyTypeName)} explicitly";
-
-            context.AddIssue(path, severity, code, description, remediation);
-        }
+        // No explicit primary key type name was supplied. Key-bound relationship initialization may infer
+        // the compatible primary key type from the corresponding foreign key binding; navigational relationships
+        // intentionally leave the principal primary key unresolved.
     }
     #endregion
 }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -12,16 +12,16 @@ using Evoogle.Extensions;
 namespace Evoogle.ApiFramework.Schema;
 
 /// <summary>
-///     Builds the optional part name used when materializing one <see cref="ApiKeyPart"/>.
+///     Formats the optional part name used when materializing one <see cref="ApiKeyPart"/>.
 /// </summary>
 /// <param name="context">The part naming context.</param>
 /// <returns>
 ///     The part name to use, or <see langword="null"/> to create an unnamed/positional key part.
 /// </returns>
-public delegate string? ApiKeyPartNameBuildDelegate(ApiKeyPartNameContext context);
+public delegate string? ApiKeyPartNameFormatterDelegate(ApiKeyPartNameContext context);
 
 /// <summary>
-///     Provides metadata to an <see cref="ApiKeyPartNameBuildDelegate"/> while materializing an <see cref="ApiKey"/>.
+///     Provides metadata to an <see cref="ApiKeyPartNameFormatterDelegate"/> while materializing an <see cref="ApiKey"/>.
 /// </summary>
 /// <param name="ApiKeyType">The key type being materialized.</param>
 /// <param name="ApiKeyPath">The key path for the current part.</param>
@@ -71,23 +71,23 @@ public sealed class ApiKeyMaterializationContext
 
     #region Properties
     /// <summary>
-    ///     Gets the builder used to create optional <see cref="ApiKeyPart.ApiName"/> values during materialization.
-    ///     Defaults to <see cref="ApiKeyPartNameBuilder.None"/>.
+    ///     Gets the predefined format used to create optional <see cref="ApiKeyPart.ApiName"/> values during materialization.
+    ///     Defaults to <see cref="ApiKeyPartNameFormat.None"/>.
     /// </summary>
     /// <remarks>
-    ///     Use <see cref="ApiKeyPartNameBuilder.None"/> to materialize unnamed/positional key parts.
+    ///     Use <see cref="ApiKeyPartNameFormat.None"/> to materialize unnamed/positional key parts.
     ///     A single composite key must still be consistently named or unnamed.
     /// </remarks>
-    public ApiKeyPartNameBuilder PartNameBuilder { get; init; } = ApiKeyPartNameBuilder.None;
+    public ApiKeyPartNameFormat PartNameFormat { get; init; } = ApiKeyPartNameFormat.None;
 
     /// <summary>
-    ///     Gets an optional custom builder used to create <see cref="ApiKeyPart.ApiName"/> values during materialization.
+    ///     Gets an optional custom formatter used to create <see cref="ApiKeyPart.ApiName"/> values during materialization.
     /// </summary>
     /// <remarks>
-    ///     When provided, this delegate takes precedence over <see cref="PartNameBuilder"/>.
+    ///     When provided, this delegate takes precedence over <see cref="PartNameFormat"/>.
     ///     Return <see langword="null"/> to materialize unnamed/positional key parts.
     /// </remarks>
-    public ApiKeyPartNameBuildDelegate? CustomPartNameBuilder { get; init; }
+    public ApiKeyPartNameFormatterDelegate? CustomPartNameFormatter { get; init; }
 
     /// <summary>
     ///     Gets the behavior when any property in a path — whether an intermediate navigation property

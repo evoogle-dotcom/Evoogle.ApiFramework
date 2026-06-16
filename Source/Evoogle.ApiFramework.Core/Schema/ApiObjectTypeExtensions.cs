@@ -35,7 +35,7 @@ public static class ApiObjectTypeExtensions
             return apiKeyType;
         }
 
-        var availableKeyTypesByApiName = string.Join(',', apiObjectType.ApiKeyTypes.Keys.OrderBy(k => k));
+        var availableKeyTypesByApiName = string.Join(',', apiObjectType.GetKeyTypeApiNames().OrderBy(k => k));
         var errorMessage =
             $"{nameof(ApiKeyType)} with name '{apiName.SafeToString()}' not found in {apiObjectType.SafeToString()}. " +
             $"Available {nameof(ApiKeyType)} names are: {availableKeyTypesByApiName}.";
@@ -60,7 +60,7 @@ public static class ApiObjectTypeExtensions
     {
         if (apiObjectType.TryGetPropertyByApiName(apiName, out var apiProperty))
         {
-            return apiProperty!;
+            return apiProperty;
         }
 
         var availablePropertiesByApiName = string.Join(',', apiObjectType.ApiProperties.OrderBy(p => p.ApiName).Select(p => p.ApiName));
@@ -89,7 +89,7 @@ public static class ApiObjectTypeExtensions
     {
         if (apiObjectType.TryGetPropertyByClrName(clrName, out var apiProperty))
         {
-            return apiProperty!;
+            return apiProperty;
         }
 
         var availablePropertiesByClrName = string.Join(',', apiObjectType.ApiProperties.OrderBy(p => p.ClrName).Select(p => p.ClrName));

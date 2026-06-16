@@ -8,19 +8,16 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 /// <summary>
 ///     Fluent builder used to configure a single <see cref="ApiKeyType"/>.
 /// </summary>
-public class ApiKeyTypeBuilder : ExtensionBuilder<ApiKeyTypeBuilder>
+/// <param name="apiName">The optional API name of the key type.</param>
+/// <remarks>
+///    <para>Key types are reusable components that define how to extract key values from CLR objects via one or more key paths. They are primarily used to configure API keys, but can also be used for other purposes such as defining unique identifiers for object types.</para>
+///    <para>Each key path represents a navigation chain from a specified CLR root type to a terminal scalar property, and can be configured with extensions at both the path and segment levels. When multiple key paths are defined within a key type, the resulting key value is a composite of the individual path values.</para>
+/// </remarks>
+public class ApiKeyTypeBuilder(string? apiName = null) : ExtensionBuilder<ApiKeyTypeBuilder>
 {
     #region Fields
+    private string? _apiName = apiName;
     private readonly List<ApiKeyPathBuilder> _keyPathBuilders = [];
-    #endregion
-
-    #region Constructors
-    /// <summary>
-    ///     Initializes an <see cref="ApiKeyTypeBuilder"/>.
-    /// </summary>
-    public ApiKeyTypeBuilder()
-    {
-    }
     #endregion
 
     #region AddExtension Methods
@@ -77,18 +74,17 @@ public class ApiKeyTypeBuilder : ExtensionBuilder<ApiKeyTypeBuilder>
         _keyPathBuilders.Add(builder);
         return this;
     }
+    #endregion
 
+    #region With Methods
     /// <summary>
-    ///     Adds a key path to this key type using a pre-configured <see cref="ApiKeyPathBuilder"/>.
-    ///     Use this overload when the path requires segment-level extensions.
+    ///    Sets the API name for the key type being built.
     /// </summary>
-    /// <param name="keyPathBuilder">The pre-configured key path builder.</param>
+    /// <param name="apiName">The API name to use.</param>
     /// <returns>The current builder instance.</returns>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="keyPathBuilder"/> is <c>null</c>.</exception>
-    public ApiKeyTypeBuilder AddPath(ApiKeyPathBuilder keyPathBuilder)
+    public ApiKeyTypeBuilder WithName(string apiName)
     {
-        ArgumentNullException.ThrowIfNull(keyPathBuilder);
-        _keyPathBuilders.Add(keyPathBuilder);
+        _apiName = apiName;
         return this;
     }
     #endregion
@@ -99,8 +95,9 @@ public class ApiKeyTypeBuilder : ExtensionBuilder<ApiKeyTypeBuilder>
     /// </summary>
     internal ApiKeyType Build()
     {
+        var apiName = _apiName;
         var keyPaths = _keyPathBuilders.Select(b => b.Build());
-        var keyType = new ApiKeyType(keyPaths);
+        var keyType = new ApiKeyType(apiName, keyPaths);
 
         var extensions = this.BuildExtensions();
         if (extensions != null)

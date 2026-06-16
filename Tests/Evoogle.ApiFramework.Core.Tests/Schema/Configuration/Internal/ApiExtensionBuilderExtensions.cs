@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -113,9 +113,9 @@ internal static class ApiExtensionBuilderExtensions
 
     public static void ConfigureExtensions(this ApiRelationshipPrincipalEndBuilder builder, ApiRelationshipPrincipalEnd apiRelationshipPrincipalEnd)
     {
-        if (apiRelationshipPrincipalEnd.ApiKeyTypeName is not null)
+        if (apiRelationshipPrincipalEnd.ApiPrimaryKeyTypeName is not null)
         {
-            builder.WithPrimaryKey(apiRelationshipPrincipalEnd.ApiKeyTypeName);
+            builder.WithPrimaryKey(apiRelationshipPrincipalEnd.ApiPrimaryKeyTypeName);
         }
 
         var extensions = apiRelationshipPrincipalEnd.Extensions;

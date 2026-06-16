@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -19,8 +19,8 @@ public sealed partial class ApiKeyType
     /// <param name="context">The materialization context containing the CLR instances and configuration.</param>
     /// <returns>
     ///     A composite <see cref="ApiKey"/> whose part values are read from the configured key paths.
-    ///     Part names are created according to <see cref="ApiKeyMaterializationContext.CustomPartNameBuilder"/>,
-    ///     when provided; otherwise they are created according to <see cref="ApiKeyMaterializationContext.PartNameBuilder"/>.
+    ///     Part names are formatted by <see cref="ApiKeyMaterializationContext.CustomPartNameFormatter"/>,
+    ///     when provided; otherwise they are formatted according to <see cref="ApiKeyMaterializationContext.PartNameFormat"/>.
     /// </returns>
     /// <exception cref="ApiKeyException">
     ///     Thrown when no root object is registered in <paramref name="context"/> for a path's
@@ -63,12 +63,12 @@ public sealed partial class ApiKeyType
     {
         // All keys produce a named-composite ApiKey regardless of path count,
         // so callers can always inspect part names uniformly.
-        var partNameBuilder = context.CustomPartNameBuilder ?? ApiKeyPartNameBuilders.Resolve(context.PartNameBuilder);
+        var partNameFormatter = context.CustomPartNameFormatter ?? ApiKeyPartNameFormatters.Resolve(context.PartNameFormat);
         var parts = new ApiKeyPart[this.ApiKeyPaths.Length];
         for (var i = 0; i < this.ApiKeyPaths.Length; i++)
         {
             var path = this.ApiKeyPaths[i];
-            var partName = partNameBuilder(new ApiKeyPartNameContext(this, path, i, context.KeyTypeName));
+            var partName = partNameFormatter(new ApiKeyPartNameContext(this, path, i, context.KeyTypeName));
             var partValue = valueFactory(path, context);
             parts[i] = new ApiKeyPart(partName, partValue);
         }

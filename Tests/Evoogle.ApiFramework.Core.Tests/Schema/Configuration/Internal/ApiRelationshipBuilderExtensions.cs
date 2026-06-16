@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -16,7 +16,7 @@ internal static class ApiRelationshipBuilderExtensions
     {
         builder.To(apiDependentEnd.ClrObjectType, y =>
         {
-            if (apiDependentEnd.HasKeyBinding)
+            if (apiDependentEnd.HasForeignKey)
             {
                 ConfigureForeignKeyType(y, apiDependentEnd.ApiForeignKeyType);
             }
@@ -28,7 +28,7 @@ internal static class ApiRelationshipBuilderExtensions
     {
         builder.To(apiDependentEnd.ClrObjectType, y =>
         {
-            if (apiDependentEnd.HasKeyBinding)
+            if (apiDependentEnd.HasForeignKey)
             {
                 ConfigureForeignKeyType(y, apiDependentEnd.ApiForeignKeyType);
             }
@@ -40,7 +40,7 @@ internal static class ApiRelationshipBuilderExtensions
     {
         builder.WithAssociation(apiAssociation.ClrObjectType, y =>
         {
-            if (apiAssociation.HasKeyBinding)
+            if (apiAssociation.HasForeignKeys)
             {
                 ConfigureForeignKeyType(y, apiAssociation.ApiForeignKeyTypeA, isA: true);
                 ConfigureForeignKeyType(y, apiAssociation.ApiForeignKeyTypeB, isA: false);

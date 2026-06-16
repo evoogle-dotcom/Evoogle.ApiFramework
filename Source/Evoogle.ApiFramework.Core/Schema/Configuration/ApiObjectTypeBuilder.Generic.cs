@@ -39,8 +39,8 @@ public sealed class ApiObjectTypeBuilder<T>(ApiSchemaBuilderContext context)
     ///     callback that supports expression-based property selection.
     /// </summary>
     /// <remarks>
-    ///     The first key added is the object type's primary key. Key-bound relationship principal ends infer
-    ///     the best compatible key from the corresponding foreign key when no key name is supplied; call
+    ///     Key-bound relationship principal ends infer the best compatible key from the corresponding foreign key
+    ///     when no key name is supplied; call
     ///     <see cref="ApiRelationshipPrincipalEndBuilder.WithPrimaryKey"/> on the principal end builder to
     ///     select a named key explicitly.
     ///     To configure with string-based property names instead, use the non-generic
@@ -51,9 +51,9 @@ public sealed class ApiObjectTypeBuilder<T>(ApiSchemaBuilderContext context)
     /// <returns>The current builder instance.</returns>
     public ApiObjectTypeBuilder<T> AddKey(string apiName, Action<ApiKeyTypeBuilder<T>>? configure = null)
     {
-        var apiKeyTypeBuilder = new ApiKeyTypeBuilder<T>();
+        var apiKeyTypeBuilder = new ApiKeyTypeBuilder<T>(apiName);
         configure?.Invoke(apiKeyTypeBuilder);
-        base.AddKeyTypeBuilderCore(apiName, apiKeyTypeBuilder);
+        base.AddKeyTypeBuilderCore(apiKeyTypeBuilder);
         return this;
     }
 
@@ -62,8 +62,8 @@ public sealed class ApiObjectTypeBuilder<T>(ApiSchemaBuilderContext context)
     ///     without requiring an explicit <see cref="ApiKeyTypeBuilder{T}"/> callback.
     /// </summary>
     /// <remarks>
-    ///     The first key added is the object type's primary key. Key-bound relationship principal ends infer
-    ///     the best compatible key from the corresponding foreign key when no key name is supplied; call
+    ///     Key-bound relationship principal ends infer the best compatible key from the corresponding foreign key
+    ///     when no key name is supplied; call
     ///     <see cref="ApiRelationshipPrincipalEndBuilder.WithPrimaryKey"/> on the principal end builder to
     ///     select a named key explicitly.
     /// </remarks>
@@ -74,9 +74,9 @@ public sealed class ApiObjectTypeBuilder<T>(ApiSchemaBuilderContext context)
     public ApiObjectTypeBuilder<T> AddKey<TScalar>(string apiName, Expression<Func<T, TScalar>> expression)
     {
         ArgumentNullException.ThrowIfNull(expression);
-        var apiKeyTypeBuilder = new ApiKeyTypeBuilder<T>();
+        var apiKeyTypeBuilder = new ApiKeyTypeBuilder<T>(apiName);
         apiKeyTypeBuilder.AddPath(expression);
-        base.AddKeyTypeBuilderCore(apiName, apiKeyTypeBuilder);
+        base.AddKeyTypeBuilderCore(apiKeyTypeBuilder);
         return this;
     }
 
@@ -100,11 +100,11 @@ public sealed class ApiObjectTypeBuilder<T>(ApiSchemaBuilderContext context)
         ArgumentNullException.ThrowIfNull(expression1);
         ArgumentNullException.ThrowIfNull(expression2);
 
-        var apiKeyTypeBuilder = new ApiKeyTypeBuilder<T>();
+        var apiKeyTypeBuilder = new ApiKeyTypeBuilder<T>(apiName);
         apiKeyTypeBuilder
             .AddPath(expression1)
             .AddPath(expression2);
-        base.AddKeyTypeBuilderCore(apiName, apiKeyTypeBuilder);
+        base.AddKeyTypeBuilderCore(apiKeyTypeBuilder);
         return this;
     }
 
@@ -132,12 +132,12 @@ public sealed class ApiObjectTypeBuilder<T>(ApiSchemaBuilderContext context)
         ArgumentNullException.ThrowIfNull(expression2);
         ArgumentNullException.ThrowIfNull(expression3);
 
-        var apiKeyTypeBuilder = new ApiKeyTypeBuilder<T>();
+        var apiKeyTypeBuilder = new ApiKeyTypeBuilder<T>(apiName);
         apiKeyTypeBuilder
             .AddPath(expression1)
             .AddPath(expression2)
             .AddPath(expression3);
-        base.AddKeyTypeBuilderCore(apiName, apiKeyTypeBuilder);
+        base.AddKeyTypeBuilderCore(apiKeyTypeBuilder);
         return this;
     }
 
@@ -169,13 +169,13 @@ public sealed class ApiObjectTypeBuilder<T>(ApiSchemaBuilderContext context)
         ArgumentNullException.ThrowIfNull(expression3);
         ArgumentNullException.ThrowIfNull(expression4);
 
-        var apiKeyTypeBuilder = new ApiKeyTypeBuilder<T>();
+        var apiKeyTypeBuilder = new ApiKeyTypeBuilder<T>(apiName);
         apiKeyTypeBuilder
             .AddPath(expression1)
             .AddPath(expression2)
             .AddPath(expression3)
             .AddPath(expression4);
-        base.AddKeyTypeBuilderCore(apiName, apiKeyTypeBuilder);
+        base.AddKeyTypeBuilderCore(apiKeyTypeBuilder);
         return this;
     }
 
@@ -195,9 +195,9 @@ public sealed class ApiObjectTypeBuilder<T>(ApiSchemaBuilderContext context)
     public ApiObjectTypeBuilder<T> AddKeyFrom<TRoot>(string apiName, Expression<Func<TRoot, object?>> expression)
     {
         ArgumentNullException.ThrowIfNull(expression);
-        var apiKeyTypeBuilder = new ApiKeyTypeBuilder<T>();
+        var apiKeyTypeBuilder = new ApiKeyTypeBuilder<T>(apiName);
         apiKeyTypeBuilder.AddPathFrom(expression);
-        base.AddKeyTypeBuilderCore(apiName, apiKeyTypeBuilder);
+        base.AddKeyTypeBuilderCore(apiKeyTypeBuilder);
         return this;
     }
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -58,7 +58,7 @@ public static class ApiKeyTypeMaterializeKeyFromValuesTestFactory
         context.WithText<KeyOwner>(nameof(KeyOwner.Id), "99");
     }
 
-    public static void ConfigureCustomPartNameBuilderValues(ApiKeyMaterializationContext context)
+    public static void ConfigureCustomPartNameFormatterValues(ApiKeyMaterializationContext context)
     {
         context
             .WithKey<KeyTwoScalarPartComposite>(nameof(KeyTwoScalarPartComposite.Id1), 1)

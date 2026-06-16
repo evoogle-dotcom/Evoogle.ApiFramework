@@ -29,6 +29,10 @@ internal class ApiInitializationContext
     public IEnumerable<ApiInitializationIssue> Issues => _issues;
     #endregion
 
+    #region Computed Properties
+    public bool HasDeclaringObjectType => _apiDeclaringObjectType is not null;
+    #endregion
+
     #region Constructor
     private ApiInitializationContext
     (
@@ -100,11 +104,6 @@ internal class ApiInitializationContext
         );
     }
 
-    /// <summary>
-    ///     Creates a child context with a new declaring object type but the same declaring path.
-    ///     Use this when you need <see cref="ApiDeclaringObjectType"/> for property lookup but must
-    ///     preserve the current path chain (e.g., inside relationship key path initialization).
-    /// </summary>
     public ApiInitializationContext WithDeclaringObjectTypeOnly(ApiObjectType apiDeclaringObjectType)
     {
         return new ApiInitializationContext

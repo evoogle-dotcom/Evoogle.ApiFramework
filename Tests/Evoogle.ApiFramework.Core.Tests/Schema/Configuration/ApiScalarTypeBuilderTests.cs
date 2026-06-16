@@ -113,7 +113,7 @@ public class ApiScalarTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
         protected override void Assert()
         {
             this.Actual.Should().NotBeNull();
-            this.Actual!.ApiName.Should().Be(this.ExpectedApiName);
+            this.Actual.ApiName.Should().Be(this.ExpectedApiName);
         }
         #endregion
     }

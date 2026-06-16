@@ -163,12 +163,7 @@ public class ApiRelationshipDependentEndJsonConverter(ILogger<ApiRelationshipDep
     private static void WriteApiForeignKeyType(Utf8JsonWriter writer, ApiRelationshipDependentEnd end, DefaultWriteContext<PropertyNames> context)
     {
         var propertyName = context.PropertyNames.ApiRelationshipDependentEnd.ApiForeignKeyType;
-        var value = end.HasKeyBinding ? end.ApiForeignKeyType : null;
-
-        if (value is null)
-        {
-            return;
-        }
+        var value = end.HasForeignKey ? end.ApiForeignKeyType : null;
 
         writer.WritePropertyName(propertyName);
         writer.TryWriteWithSerializer(value, context.Options);

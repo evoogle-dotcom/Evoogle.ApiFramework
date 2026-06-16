@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -17,7 +17,7 @@ namespace Evoogle.ApiFramework.Schema;
 ///         Unlike one-to-one and one-to-many relationships, a many-to-many has two symmetric
 ///         <see cref="ApiRelationshipPrincipalEnd"/> instances — <see cref="ApiPrincipalEndA"/> and
 ///         <see cref="ApiPrincipalEndB"/> — and no dependent end.
-///         Each principal end provides a referenced key type that is mapped to the association object type
+///         Each principal end provides a referenced primary key type that is mapped to the association object type
 ///         through the corresponding key path collection on <see cref="ApiAssociation"/>.
 ///     </para>
 ///     <para>
@@ -26,8 +26,8 @@ namespace Evoogle.ApiFramework.Schema;
 ///     </para>
 /// </remarks>
 /// <param name="apiName">The API name that uniquely identifies this relationship within the schema.</param>
-/// <param name="apiPrincipalEndA">The first principal end of the relationship, which provides the A-side referenced key type.</param>
-/// <param name="apiPrincipalEndB">The second principal end of the relationship, which provides the B-side referenced key type.</param>
+/// <param name="apiPrincipalEndA">The first principal end of the relationship, which provides the A-side referenced primary key type.</param>
+/// <param name="apiPrincipalEndB">The second principal end of the relationship, which provides the B-side referenced primary key type.</param>
 /// <param name="apiAssociation">
 ///     The association element that mediates the relationship and may provide the foreign key role's key path trees
 ///     for both principal ends.
@@ -64,10 +64,10 @@ public sealed class ApiRelationshipManyToMany
     #endregion
 
     #region ApiRelationshipManyToMany Properties
-    /// <summary>Gets principal end A of the relationship, which provides the referenced key type for the first outer type.</summary>
+    /// <summary>Gets principal end A of the relationship, which provides the referenced primary key type for the first outer type.</summary>
     public ApiRelationshipPrincipalEnd ApiPrincipalEndA { get; } = apiPrincipalEndA;
 
-    /// <summary>Gets principal end B of the relationship, which provides the referenced key type for the second outer type.</summary>
+    /// <summary>Gets principal end B of the relationship, which provides the referenced primary key type for the second outer type.</summary>
     public ApiRelationshipPrincipalEnd ApiPrincipalEndB { get; } = apiPrincipalEndB;
 
     /// <summary>Gets the association element that mediates the relationship.</summary>
@@ -106,7 +106,7 @@ public sealed class ApiRelationshipManyToMany
     #region Implementation Methods
     private void InitializeApiAssociationKeyPathAlignment(ApiInitializationContext context)
     {
-        if (this.ApiPrincipalEndA is not null && this.ApiAssociation is not null && this.ApiAssociation.HasKeyBinding)
+        if (this.ApiPrincipalEndA is not null && this.ApiAssociation is not null && this.ApiAssociation.HasForeignKeys)
         {
             this.InitializeApiAssociationKeyPathAlignment
             (
@@ -119,7 +119,7 @@ public sealed class ApiRelationshipManyToMany
             );
         }
 
-        if (this.ApiPrincipalEndB is not null && this.ApiAssociation is not null && this.ApiAssociation.HasKeyBinding)
+        if (this.ApiPrincipalEndB is not null && this.ApiAssociation is not null && this.ApiAssociation.HasForeignKeys)
         {
             this.InitializeApiAssociationKeyPathAlignment
             (
@@ -143,7 +143,7 @@ public sealed class ApiRelationshipManyToMany
         string principalEndName
     )
     {
-        var principalKeyDesc = principalEnd.ApiKeyTypeName is not null ? $"key type '{principalEnd.ApiKeyTypeName}'" : "primary key";
+        var primaryKeyDesc = principalEnd.ApiPrimaryKeyTypeName is not null ? $"primary key type '{principalEnd.ApiPrimaryKeyTypeName}'" : "primary key type";
         var foreignKeyPath = $"{nameof(this.ApiAssociation)}.{foreignKeyPropertyName}";
 
         ApiRelationshipKeyAlignment.ValidatePrincipalForeignKeyAlignment
@@ -154,13 +154,13 @@ public sealed class ApiRelationshipManyToMany
             foreignKeyType: foreignKeyType,
             countMismatchCode: countMismatchCode,
             foreignKeyPath: foreignKeyPath,
-            principalCountLabel: $"principal end {principalEndName} {principalKeyDesc}",
-            principalCompatibilityLabel: $"principal end {principalEndName} {principalKeyDesc}",
+            principalCountLabel: $"principal end {principalEndName} {primaryKeyDesc}",
+            principalCompatibilityLabel: $"principal end {principalEndName} {primaryKeyDesc}",
             principalEndQualifier: $"for principal end {principalEndName}",
-            explicitKeyTarget: $"{nameof(ApiRelationshipPrincipalEnd.ApiKeyTypeName)} on principal end {principalEndName}",
+            explicitKeyTarget: $"{nameof(ApiRelationshipPrincipalEnd.ApiPrimaryKeyTypeName)} on principal end {principalEndName}",
             inferredForeignKeyLabel: $"{principalEndName}-side foreign key",
-            countMismatchRemediationTarget: $"principal end {principalEndName}'s key type",
-            compatibilityRemediation: $"Ensure {foreignKeyPath} paths are ordered to match principal end {principalEndName}'s key type and use compatible scalar types"
+            countMismatchRemediationTarget: $"principal end {principalEndName}'s primary key type",
+            compatibilityRemediation: $"Ensure {foreignKeyPath} paths are ordered to match principal end {principalEndName}'s primary key type and use compatible scalar types"
         );
     }
 
