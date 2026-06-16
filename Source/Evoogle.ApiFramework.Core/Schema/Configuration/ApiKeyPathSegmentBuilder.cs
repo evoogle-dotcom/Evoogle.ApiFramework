@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -43,22 +43,13 @@ public class ApiKeyPathSegmentBuilder : ExtensionBuilder<ApiKeyPathSegmentBuilde
     ///     Adds an extension value associated with the specified <paramref name="type"/>.
     /// </summary>
     /// <param name="type">The type used as the extension key.</param>
-    /// <param name="value">The extension value to store.</param>
+    /// <param name="extension">The extension value to store.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiKeyPathSegmentBuilder AddKeyPathSegmentExtension(Type type, object value)
+    public ApiKeyPathSegmentBuilder AddKeyPathSegmentExtension(Type type, object extension)
     {
-        base.AddExtension(type, value);
+        base.AddExtension(type, extension);
         return this;
     }
-
-    /// <summary>
-    ///     Adds an extension value keyed by its own type.
-    /// </summary>
-    /// <typeparam name="T">The extension value type.</typeparam>
-    /// <param name="value">The extension value.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiKeyPathSegmentBuilder AddKeyPathSegmentExtension<T>(T value) where T : notnull
-        => this.AddKeyPathSegmentExtension(typeof(T), value);
     #endregion
 
     #region Build Methods

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -18,15 +18,11 @@ public sealed class ApiScalarTypeBuilder<T>(ApiSchemaBuilderContext context)
 {
     #region AddExtension Methods
     /// <inheritdoc cref="ApiScalarTypeBuilder.AddScalarTypeExtension(Type, object)"/>
-    public new ApiScalarTypeBuilder<T> AddScalarTypeExtension(Type type, object value)
+    public new ApiScalarTypeBuilder<T> AddScalarTypeExtension(Type type, object extension)
     {
-        base.AddScalarTypeExtension(type, value);
+        base.AddScalarTypeExtension(type, extension);
         return this;
     }
-
-    /// <inheritdoc cref="ApiScalarTypeBuilder.AddScalarTypeExtension{TExt}(TExt)"/>
-    public new ApiScalarTypeBuilder<T> AddScalarTypeExtension<TExt>(TExt value) where TExt : notnull
-        => this.AddScalarTypeExtension(typeof(TExt), value);
     #endregion
 
     #region With Methods

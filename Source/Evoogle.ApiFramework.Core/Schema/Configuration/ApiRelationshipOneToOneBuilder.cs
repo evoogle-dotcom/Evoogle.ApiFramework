@@ -29,20 +29,10 @@ public sealed class ApiRelationshipOneToOneBuilder(string apiName)
     ///     Adds an extension value associated with the specified <paramref name="type"/>.
     /// </summary>
     /// <param name="type">The type used as the extension key.</param>
-    /// <param name="value">The extension value to store.</param>
+    /// <param name="extension">The extension value to store.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipOneToOneBuilder AddRelationshipExtension(Type type, object value)
-        => base.AddRelationshipExtension<ApiRelationshipOneToOneBuilder>(type, value);
-
-    /// <summary>
-    ///     Adds an extension value keyed by its own type.
-    /// </summary>
-    /// <typeparam name="T">The extension value type.</typeparam>
-    /// <param name="value">The extension value.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiRelationshipOneToOneBuilder AddRelationshipExtension<T>(T value)
-        where T : notnull
-        => base.AddRelationshipExtension<ApiRelationshipOneToOneBuilder>(typeof(T), value);
+    public ApiRelationshipOneToOneBuilder AddRelationshipExtension(Type type, object extension)
+        => base.AddRelationshipExtension<ApiRelationshipOneToOneBuilder>(type, extension);
     #endregion
 
     #region Non-Generic From/To Methods

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -18,15 +18,11 @@ public sealed class ApiRelationshipDependentEndBuilder<T>() : ApiRelationshipDep
 {
     #region AddExtension Methods
     /// <inheritdoc cref="ApiRelationshipDependentEndBuilder.AddRelationshipDependentEndExtension(Type, object)"/>
-    public new ApiRelationshipDependentEndBuilder<T> AddRelationshipDependentEndExtension(Type type, object value)
+    public new ApiRelationshipDependentEndBuilder<T> AddRelationshipDependentEndExtension(Type type, object extension)
     {
-        base.AddRelationshipDependentEndExtension(type, value);
+        base.AddRelationshipDependentEndExtension(type, extension);
         return this;
     }
-
-    /// <inheritdoc cref="ApiRelationshipDependentEndBuilder.AddRelationshipDependentEndExtension{TExt}(TExt)"/>
-    public new ApiRelationshipDependentEndBuilder<T> AddRelationshipDependentEndExtension<TExt>(TExt value) where TExt : notnull
-        => this.AddRelationshipDependentEndExtension(typeof(TExt), value);
     #endregion
 
     #region WithForeignKey Methods

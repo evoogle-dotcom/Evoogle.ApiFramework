@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -19,15 +19,11 @@ public sealed class ApiRelationshipAssociationBuilder<T>()
 {
     #region AddExtension Methods
     /// <inheritdoc cref="ApiRelationshipAssociationBuilder.AddRelationshipAssociationExtension(Type, object)"/>
-    public new ApiRelationshipAssociationBuilder<T> AddRelationshipAssociationExtension(Type type, object value)
+    public new ApiRelationshipAssociationBuilder<T> AddRelationshipAssociationExtension(Type type, object extension)
     {
-        base.AddRelationshipAssociationExtension(type, value);
+        base.AddRelationshipAssociationExtension(type, extension);
         return this;
     }
-
-    /// <inheritdoc cref="ApiRelationshipAssociationBuilder.AddRelationshipAssociationExtension{TExt}(TExt)"/>
-    public new ApiRelationshipAssociationBuilder<T> AddRelationshipAssociationExtension<TExt>(TExt value) where TExt : notnull
-        => this.AddRelationshipAssociationExtension(typeof(TExt), value);
     #endregion
 
     #region WithForeignKey Methods

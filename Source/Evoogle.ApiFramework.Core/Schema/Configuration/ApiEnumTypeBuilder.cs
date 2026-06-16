@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -22,22 +22,13 @@ public class ApiEnumTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     ///     Adds an extension value associated with the specified <paramref name="type"/>.
     /// </summary>
     /// <param name="type">The type used as the extension key.</param>
-    /// <param name="value">The extension value to store.</param>
+    /// <param name="extension">The extension value to store.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiEnumTypeBuilder AddEnumTypeExtension(Type type, object value)
+    public ApiEnumTypeBuilder AddEnumTypeExtension(Type type, object extension)
     {
-        base.AddExtension(type, value);
+        base.AddExtension(type, extension);
         return this;
     }
-
-    /// <summary>
-    ///     Adds an extension value keyed by its own type.
-    /// </summary>
-    /// <typeparam name="T">The extension value type.</typeparam>
-    /// <param name="value">The extension value.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiEnumTypeBuilder AddEnumTypeExtension<T>(T value) where T : notnull
-        => this.AddEnumTypeExtension(typeof(T), value);
     #endregion
 
     #region AddValue Methods
@@ -52,18 +43,6 @@ public class ApiEnumTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     {
         _values.Add(new ApiEnumValue(apiName, clrName, clrOrdinal));
         return this;
-    }
-
-    /// <summary>
-    ///     Adds an <see cref="ApiEnumValue"/> definition using <paramref name="name"/> as both the API name
-    ///     and the CLR name of the enumeration value.
-    /// </summary>
-    /// <param name="name">The API and CLR name of the enumeration value.</param>
-    /// <param name="clrOrdinal">The CLR ordinal of the enumeration value.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiEnumTypeBuilder AddValue(string name, int clrOrdinal)
-    {
-        return this.AddValue(name, name, clrOrdinal);
     }
     #endregion
 

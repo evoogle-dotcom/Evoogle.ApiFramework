@@ -32,20 +32,10 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
     ///     Adds an extension value associated with the specified <paramref name="type"/>.
     /// </summary>
     /// <param name="type">The type used as the extension key.</param>
-    /// <param name="value">The extension value to store.</param>
+    /// <param name="extension">The extension value to store.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipManyToManyBuilder AddRelationshipExtension(Type type, object value)
-        => base.AddRelationshipExtension<ApiRelationshipManyToManyBuilder>(type, value);
-
-    /// <summary>
-    ///     Adds an extension value keyed by its own type.
-    /// </summary>
-    /// <typeparam name="T">The extension value type.</typeparam>
-    /// <param name="value">The extension value.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiRelationshipManyToManyBuilder AddRelationshipExtension<T>(T value)
-        where T : notnull
-        => base.AddRelationshipExtension<ApiRelationshipManyToManyBuilder>(typeof(T), value);
+    public ApiRelationshipManyToManyBuilder AddRelationshipExtension(Type type, object extension)
+        => base.AddRelationshipExtension<ApiRelationshipManyToManyBuilder>(type, extension);
     #endregion
 
     #region Non-Generic Between/And Methods

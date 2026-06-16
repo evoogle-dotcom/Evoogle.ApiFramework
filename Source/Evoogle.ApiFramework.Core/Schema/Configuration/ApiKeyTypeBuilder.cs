@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -25,22 +25,13 @@ public class ApiKeyTypeBuilder(string? apiName = null) : ExtensionBuilder<ApiKey
     ///     Adds an extension value associated with the specified <paramref name="type"/>.
     /// </summary>
     /// <param name="type">The type used as the extension key.</param>
-    /// <param name="value">The extension value to store.</param>
+    /// <param name="extension">The extension value to store.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiKeyTypeBuilder AddKeyTypeExtension(Type type, object value)
+    public ApiKeyTypeBuilder AddKeyTypeExtension(Type type, object extension)
     {
-        base.AddExtension(type, value);
+        base.AddExtension(type, extension);
         return this;
     }
-
-    /// <summary>
-    ///     Adds an extension value keyed by its own type.
-    /// </summary>
-    /// <typeparam name="T">The extension value type.</typeparam>
-    /// <param name="value">The extension value.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiKeyTypeBuilder AddKeyTypeExtension<T>(T value) where T : notnull
-        => this.AddKeyTypeExtension(typeof(T), value);
     #endregion
 
     #region AddPath Methods

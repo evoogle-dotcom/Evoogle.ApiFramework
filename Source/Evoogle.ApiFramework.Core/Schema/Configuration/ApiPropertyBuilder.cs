@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -34,41 +34,12 @@ public class ApiPropertyBuilder(string apiName, string clrName) : ExtensionBuild
     ///     Adds an extension value associated with the specified <paramref name="type"/>.
     /// </summary>
     /// <param name="type">The type used as the extension key.</param>
-    /// <param name="value">The extension value to store.</param>
+    /// <param name="extension">The extension value to store.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiPropertyBuilder AddPropertyExtension(Type type, object value)
+    public ApiPropertyBuilder AddPropertyExtension(Type type, object extension)
     {
-        base.AddExtension(type, value);
+        base.AddExtension(type, extension);
         return this;
-    }
-
-    /// <summary>
-    ///     Adds an extension value keyed by its own type.
-    /// </summary>
-    /// <typeparam name="T">The extension value type.</typeparam>
-    /// <param name="value">The extension value.</param>
-    /// <returns>The current builder instance.</returns>
-    public ApiPropertyBuilder AddPropertyExtension<T>(T value) where T : notnull
-        => this.AddPropertyExtension(typeof(T), value);
-    #endregion
-
-    #region As Methods
-    /// <summary>
-    ///     Marks this property as required, overriding any nullability-inferred modifier.
-    /// </summary>
-    /// <returns>The current builder instance.</returns>
-    public ApiPropertyBuilder AsRequired()
-    {
-        return this.WithModifiers(m => m.Required());
-    }
-
-    /// <summary>
-    ///     Marks this property as optional, overriding any nullability-inferred modifier.
-    /// </summary>
-    /// <returns>The current builder instance.</returns>
-    public ApiPropertyBuilder AsOptional()
-    {
-        return this.WithModifiers(m => m.Optional());
     }
     #endregion
 

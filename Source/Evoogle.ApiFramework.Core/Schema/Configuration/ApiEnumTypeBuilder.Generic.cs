@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -18,15 +18,11 @@ public sealed class ApiEnumTypeBuilder<T>(ApiSchemaBuilderContext context)
 {
     #region AddExtension Methods
     /// <inheritdoc cref="ApiEnumTypeBuilder.AddEnumTypeExtension(Type, object)"/>
-    public new ApiEnumTypeBuilder<T> AddEnumTypeExtension(Type type, object value)
+    public new ApiEnumTypeBuilder<T> AddEnumTypeExtension(Type type, object extension)
     {
-        base.AddEnumTypeExtension(type, value);
+        base.AddEnumTypeExtension(type, extension);
         return this;
     }
-
-    /// <inheritdoc cref="ApiEnumTypeBuilder.AddEnumTypeExtension{TExt}(TExt)"/>
-    public new ApiEnumTypeBuilder<T> AddEnumTypeExtension<TExt>(TExt value) where TExt : notnull
-        => this.AddEnumTypeExtension(typeof(TExt), value);
     #endregion
 
     #region AddValue Methods

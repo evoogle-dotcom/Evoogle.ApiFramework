@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -22,15 +22,11 @@ public sealed class ApiObjectTypeBuilder<T>(ApiSchemaBuilderContext context)
 {
     #region AddExtension Methods
     /// <inheritdoc cref="ApiObjectTypeBuilder.AddObjectTypeExtension(Type, object)"/>
-    public new ApiObjectTypeBuilder<T> AddObjectTypeExtension(Type type, object value)
+    public new ApiObjectTypeBuilder<T> AddObjectTypeExtension(Type type, object extension)
     {
-        base.AddObjectTypeExtension(type, value);
+        base.AddObjectTypeExtension(type, extension);
         return this;
     }
-
-    /// <inheritdoc cref="ApiObjectTypeBuilder.AddObjectTypeExtension{TExt}(TExt)"/>
-    public new ApiObjectTypeBuilder<T> AddObjectTypeExtension<TExt>(TExt value) where TExt : notnull
-        => this.AddObjectTypeExtension(typeof(TExt), value);
     #endregion
 
     #region AddKey Methods
@@ -248,20 +244,6 @@ public sealed class ApiObjectTypeBuilder<T>(ApiSchemaBuilderContext context)
     #endregion
 
     #region AddRequiredProperty Methods
-    /// <inheritdoc cref="ApiObjectTypeBuilder.AddRequiredProperty(string, Action{ApiPropertyBuilder}?)"/>
-    public new ApiObjectTypeBuilder<T> AddRequiredProperty(string name, Action<ApiPropertyBuilder>? configure = null)
-    {
-        base.AddRequiredProperty(name, configure);
-        return this;
-    }
-
-    /// <inheritdoc cref="ApiObjectTypeBuilder.AddRequiredProperty(string, string, Action{ApiPropertyBuilder}?)"/>
-    public new ApiObjectTypeBuilder<T> AddRequiredProperty(string apiName, string clrName, Action<ApiPropertyBuilder>? configure = null)
-    {
-        base.AddRequiredProperty(apiName, clrName, configure);
-        return this;
-    }
-
     /// <summary>
     ///     Adds an <see cref="ApiProperty"/> definition marked as required, deriving the CLR name from
     ///     <paramref name="clrProperty"/> and using it as the API name as well.
@@ -277,26 +259,12 @@ public sealed class ApiObjectTypeBuilder<T>(ApiSchemaBuilderContext context)
     )
     {
         var clrName = StaticReflection.GetMemberName(clrProperty);
-        base.AddRequiredProperty(clrName, configure);
+        base.AddProperty(clrName, clrName, b => { b.AsRequired(); configure?.Invoke(b); });
         return this;
     }
     #endregion
 
     #region AddOptionalProperty Methods
-    /// <inheritdoc cref="ApiObjectTypeBuilder.AddOptionalProperty(string, Action{ApiPropertyBuilder}?)"/>
-    public new ApiObjectTypeBuilder<T> AddOptionalProperty(string name, Action<ApiPropertyBuilder>? configure = null)
-    {
-        base.AddOptionalProperty(name, configure);
-        return this;
-    }
-
-    /// <inheritdoc cref="ApiObjectTypeBuilder.AddOptionalProperty(string, string, Action{ApiPropertyBuilder}?)"/>
-    public new ApiObjectTypeBuilder<T> AddOptionalProperty(string apiName, string clrName, Action<ApiPropertyBuilder>? configure = null)
-    {
-        base.AddOptionalProperty(apiName, clrName, configure);
-        return this;
-    }
-
     /// <summary>
     ///     Adds an <see cref="ApiProperty"/> definition marked as optional, deriving the CLR name from
     ///     <paramref name="clrProperty"/> and using it as the API name as well.
@@ -312,51 +280,7 @@ public sealed class ApiObjectTypeBuilder<T>(ApiSchemaBuilderContext context)
     )
     {
         var clrName = StaticReflection.GetMemberName(clrProperty);
-        base.AddOptionalProperty(clrName, configure);
-        return this;
-    }
-    #endregion
-
-    #region AddRelationship Methods
-    /// <inheritdoc cref="ApiObjectTypeBuilder.AddOneToOneRelationship(string, Action{ApiRelationshipOneToOneBuilder})"/>
-    public new ApiObjectTypeBuilder<T> AddOneToOneRelationship(string apiName, Action<ApiRelationshipOneToOneBuilder> configure)
-    {
-        base.AddOneToOneRelationship(apiName, configure);
-        return this;
-    }
-
-    /// <inheritdoc cref="ApiObjectTypeBuilder.AddOneToOneRelationship(string, IApiRelationshipOneToOneConfiguration)"/>
-    public new ApiObjectTypeBuilder<T> AddOneToOneRelationship(string apiName, IApiRelationshipOneToOneConfiguration configuration)
-    {
-        base.AddOneToOneRelationship(apiName, configuration);
-        return this;
-    }
-
-    /// <inheritdoc cref="ApiObjectTypeBuilder.AddOneToManyRelationship(string, Action{ApiRelationshipOneToManyBuilder})"/>
-    public new ApiObjectTypeBuilder<T> AddOneToManyRelationship(string apiName, Action<ApiRelationshipOneToManyBuilder> configure)
-    {
-        base.AddOneToManyRelationship(apiName, configure);
-        return this;
-    }
-
-    /// <inheritdoc cref="ApiObjectTypeBuilder.AddOneToManyRelationship(string, IApiRelationshipOneToManyConfiguration)"/>
-    public new ApiObjectTypeBuilder<T> AddOneToManyRelationship(string apiName, IApiRelationshipOneToManyConfiguration configuration)
-    {
-        base.AddOneToManyRelationship(apiName, configuration);
-        return this;
-    }
-
-    /// <inheritdoc cref="ApiObjectTypeBuilder.AddManyToManyRelationship(string, Action{ApiRelationshipManyToManyBuilder})"/>
-    public new ApiObjectTypeBuilder<T> AddManyToManyRelationship(string apiName, Action<ApiRelationshipManyToManyBuilder> configure)
-    {
-        base.AddManyToManyRelationship(apiName, configure);
-        return this;
-    }
-
-    /// <inheritdoc cref="ApiObjectTypeBuilder.AddManyToManyRelationship(string, IApiRelationshipManyToManyConfiguration)"/>
-    public new ApiObjectTypeBuilder<T> AddManyToManyRelationship(string apiName, IApiRelationshipManyToManyConfiguration configuration)
-    {
-        base.AddManyToManyRelationship(apiName, configuration);
+        base.AddProperty(clrName, clrName, b => { b.AsOptional(); configure?.Invoke(b); });
         return this;
     }
     #endregion

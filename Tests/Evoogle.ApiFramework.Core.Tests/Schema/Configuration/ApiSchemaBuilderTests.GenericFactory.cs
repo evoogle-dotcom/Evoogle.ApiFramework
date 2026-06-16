@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -22,7 +22,7 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
     }
 
     public static ApiSchema BuildCommerceApiSchema<TExtension>()
-        where TExtension : notnull, new()
+        where TExtension : class, new()
     {
         var builder = CreateCommerceApiSchemaBuilder()
             .AddSchemaExtension(new TExtension());
@@ -31,8 +31,8 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
     }
 
     public static ApiSchema BuildCommerceApiSchema<TExtension1, TExtension2>()
-        where TExtension1 : notnull, new()
-        where TExtension2 : notnull, new()
+        where TExtension1 : class, new()
+        where TExtension2 : class, new()
     {
         var builder = CreateCommerceApiSchemaBuilder()
             .AddSchemaExtension(new TExtension1())
@@ -49,7 +49,7 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
     }
 
     public static ApiSchema BuildKeyApiSchema<TExtension>()
-        where TExtension : notnull, new()
+        where TExtension : class, new()
     {
         var builder = CreateKeyApiSchemaBuilder()
             .AddSchemaExtension(new TExtension());
@@ -58,8 +58,8 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
     }
 
     public static ApiSchema BuildKeyApiSchema<TExtension1, TExtension2>()
-        where TExtension1 : notnull, new()
-        where TExtension2 : notnull, new()
+        where TExtension1 : class, new()
+        where TExtension2 : class, new()
     {
         var builder = CreateKeyApiSchemaBuilder()
             .AddSchemaExtension(new TExtension1())
@@ -76,7 +76,7 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
     }
 
     public static ApiSchema BuildRelationshipApiSchema<TExtension>()
-        where TExtension : notnull, new()
+        where TExtension : class, new()
     {
         var builder = CreateRelationshipApiSchemaBuilder()
             .AddSchemaExtension(new TExtension());
@@ -85,8 +85,8 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
     }
 
     public static ApiSchema BuildRelationshipApiSchema<TExtension1, TExtension2>()
-        where TExtension1 : notnull, new()
-        where TExtension2 : notnull, new()
+        where TExtension1 : class, new()
+        where TExtension2 : class, new()
     {
         var builder = CreateRelationshipApiSchemaBuilder()
             .AddSchemaExtension(new TExtension1())
@@ -103,7 +103,7 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
     }
 
     public static ApiSchema BuildSimpleApiSchema<TExtension>()
-        where TExtension : notnull, new()
+        where TExtension : class, new()
     {
         var builder = CreateSimpleApiSchemaBuilder()
             .AddSchemaExtension(new TExtension());
@@ -112,8 +112,8 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
     }
 
     public static ApiSchema BuildSimpleApiSchema<TExtension1, TExtension2>()
-        where TExtension1 : notnull, new()
-        where TExtension2 : notnull, new()
+        where TExtension1 : class, new()
+        where TExtension2 : class, new()
     {
         var builder = CreateSimpleApiSchemaBuilder()
             .AddSchemaExtension(new TExtension1())

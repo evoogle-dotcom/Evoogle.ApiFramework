@@ -3,8 +3,6 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using System.Globalization;
-
 using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Key;
 using Evoogle.Extensions;
@@ -131,15 +129,6 @@ public sealed class ApiKeyMaterializationContext
     /// <summary>
     ///     Registers an already-materialized <see cref="ApiKey"/> value for the specified root CLR type and CLR property path.
     /// </summary>
-    /// <typeparam name="T">The root CLR type of the key path.</typeparam>
-    /// <param name="clrPath">The full dotted CLR property path from the root type to the scalar property.</param>
-    /// <param name="value">The materialized key value.</param>
-    /// <returns>The current context for fluent chaining.</returns>
-    public ApiKeyMaterializationContext WithKey<T>(string clrPath, ApiKey value) => this.WithKey(typeof(T), clrPath, value);
-
-    /// <summary>
-    ///     Registers an already-materialized <see cref="ApiKey"/> value for the specified root CLR type and CLR property path.
-    /// </summary>
     /// <param name="clrRootType">The root CLR type of the key path.</param>
     /// <param name="clrPath">The full dotted CLR property path from the root type to the scalar property.</param>
     /// <param name="value">The materialized key value.</param>
@@ -150,35 +139,6 @@ public sealed class ApiKeyMaterializationContext
         _values[valuePath] = ApiKeyMaterializationValue.FromKey(value);
         return this;
     }
-
-    /// <summary>Registers an <see cref="int"/> key value without boxing.</summary>
-    public ApiKeyMaterializationContext WithKey<T>(string clrPath, int value) => this.WithKey<T>(clrPath, ApiKey.FromInt32(value));
-
-    /// <summary>Registers a <see cref="long"/> key value without boxing.</summary>
-    public ApiKeyMaterializationContext WithKey<T>(string clrPath, long value) => this.WithKey<T>(clrPath, ApiKey.FromInt64(value));
-
-    /// <summary>Registers a <see cref="Guid"/> key value without boxing.</summary>
-    public ApiKeyMaterializationContext WithKey<T>(string clrPath, Guid value) => this.WithKey<T>(clrPath, ApiKey.FromGuid(value));
-
-    /// <summary>Registers an <see cref="Ulid"/> key value without boxing.</summary>
-    public ApiKeyMaterializationContext WithKey<T>(string clrPath, Ulid value) => this.WithKey<T>(clrPath, ApiKey.FromUlid(value));
-
-    /// <summary>Registers a <see cref="CultureInfo"/> key value.</summary>
-    public ApiKeyMaterializationContext WithKey<T>(string clrPath, CultureInfo value)
-    {
-        ArgumentNullException.ThrowIfNull(value);
-        return this.WithKey<T>(clrPath, ApiKey.FromCulture(value));
-    }
-
-    /// <summary>
-    ///     Registers raw text for the specified root CLR type and CLR property path.
-    ///     The text is parsed according to schema metadata during value-based materialization.
-    /// </summary>
-    /// <typeparam name="T">The root CLR type of the key path.</typeparam>
-    /// <param name="clrPath">The full dotted CLR property path from the root type to the scalar property.</param>
-    /// <param name="value">The raw text value.</param>
-    /// <returns>The current context for fluent chaining.</returns>
-    public ApiKeyMaterializationContext WithText<T>(string clrPath, string? value) => this.WithText(typeof(T), clrPath, value);
 
     /// <summary>
     ///     Registers raw text for the specified root CLR type and CLR property path.

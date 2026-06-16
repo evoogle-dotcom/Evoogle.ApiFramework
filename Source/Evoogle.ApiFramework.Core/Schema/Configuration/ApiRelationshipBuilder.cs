@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -31,12 +31,12 @@ public abstract class ApiRelationshipBuilder(string apiName, ApiRelationshipDele
     ///     Adds an extension value associated with the specified <paramref name="type"/>.
     /// </summary>
     /// <param name="type">The type used as the extension key.</param>
-    /// <param name="value">The extension value to store.</param>
+    /// <param name="extension">The extension value to store.</param>
     /// <returns>The current builder instance.</returns>
-    protected TBuilder AddRelationshipExtension<TBuilder>(Type type, object value)
+    protected TBuilder AddRelationshipExtension<TBuilder>(Type type, object extension)
         where TBuilder : ApiRelationshipBuilder
     {
-        base.AddExtension(type, value);
+        base.AddExtension(type, extension);
         return (TBuilder)this;
     }
 
@@ -44,13 +44,13 @@ public abstract class ApiRelationshipBuilder(string apiName, ApiRelationshipDele
     ///     Adds an extension value keyed by its own type.
     /// </summary>
     /// <typeparam name="TBuilder">The type of the current builder.</typeparam>
-    /// <typeparam name="T">The extension value type.</typeparam>
-    /// <param name="value">The extension value.</param>
+    /// <typeparam name="TExtension">The extension value type.</typeparam>
+    /// <param name="extension">The extension value.</param>
     /// <returns>The current builder instance.</returns>
-    protected TBuilder AddRelationshipExtension<TBuilder, T>(T value)
+    protected TBuilder AddRelationshipExtension<TBuilder, TExtension>(TExtension extension)
         where TBuilder : ApiRelationshipBuilder
-        where T : notnull
-        => this.AddRelationshipExtension<TBuilder>(typeof(T), value);
+        where TExtension : class
+        => this.AddRelationshipExtension<TBuilder>(typeof(TExtension), extension);
     #endregion
 
     #region With Methods
