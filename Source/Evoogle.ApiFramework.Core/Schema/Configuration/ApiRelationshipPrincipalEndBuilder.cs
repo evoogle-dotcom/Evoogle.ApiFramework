@@ -18,6 +18,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 public sealed class ApiRelationshipPrincipalEndBuilder(Type clrObjectType) : ExtensionBuilder<ApiRelationshipPrincipalEndBuilder>
 {
     #region Fields
+    private readonly Type _clrObjectType = clrObjectType ?? throw new ArgumentNullException(nameof(clrObjectType));
     private string? _apiPrimaryKeyTypeName;
     #endregion
 
@@ -59,7 +60,7 @@ public sealed class ApiRelationshipPrincipalEndBuilder(Type clrObjectType) : Ext
     {
         var end = new ApiRelationshipPrincipalEnd
         (
-            clrObjectType,
+            _clrObjectType,
             _apiPrimaryKeyTypeName
         );
 

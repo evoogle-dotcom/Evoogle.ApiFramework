@@ -16,6 +16,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 public class ApiRelationshipAssociationBuilder(Type clrObjectType) : ExtensionBuilder<ApiRelationshipAssociationBuilder>
 {
     #region Fields
+    private readonly Type _clrObjectType = clrObjectType ?? throw new ArgumentNullException(nameof(clrObjectType));
     private ApiKeyTypeBuilder? _foreignKeyTypeBuilderA;
     private ApiKeyTypeBuilder? _foreignKeyTypeBuilderB;
     #endregion
@@ -88,8 +89,8 @@ public class ApiRelationshipAssociationBuilder(Type clrObjectType) : ExtensionBu
         var fkB = _foreignKeyTypeBuilderB?.Build();
 
         var apiRelationshipAssociation = fkA != null && fkB != null
-            ? new ApiRelationshipAssociation(clrObjectType, fkA, fkB)
-            : new ApiRelationshipAssociation(clrObjectType);
+            ? new ApiRelationshipAssociation(_clrObjectType, fkA, fkB)
+            : new ApiRelationshipAssociation(_clrObjectType);
 
         var extensions = this.BuildExtensions();
         if (extensions != null)

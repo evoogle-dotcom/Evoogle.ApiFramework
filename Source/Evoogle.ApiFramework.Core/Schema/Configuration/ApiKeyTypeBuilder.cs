@@ -75,6 +75,8 @@ public class ApiKeyTypeBuilder(string? apiName = null) : ExtensionBuilder<ApiKey
     /// <returns>The current builder instance.</returns>
     public ApiKeyTypeBuilder WithName(string apiName)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
+
         _apiName = apiName;
         return this;
     }

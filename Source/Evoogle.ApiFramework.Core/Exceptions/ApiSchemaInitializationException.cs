@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -107,7 +107,9 @@ public sealed class ApiSchemaInitializationException : ApiSchemaException
         var total = this.Issues.Length;
         var header = $"{nameof(ApiSchema)} initialization failed.";
         var counts = $"Issues={total}, Errors={errors}, Warnings={warnings}.";
-        return $"{header} {counts}";
+        var issueMessages = this.Issues.Select(static issue => issue.ToMessage());
+
+        return $"{header} {counts}{Environment.NewLine}{string.Join(Environment.NewLine, issueMessages)}";
     }
     #endregion
 }

@@ -1,4 +1,4 @@
-﻿# Repository
+# Repository
 
 This repository is home to the following **Evoogle** projects. These projects are maintained by [Evoogle](https://github.com/evoogle-dotcom) and licensed under the [MIT License](License.txt).
 
@@ -9,6 +9,48 @@ This repository is home to the following **Evoogle** projects. These projects ar
 TBD: Need a high-level description.
 
 - **Schema**. Library that represents an API schema where a schema defines a type system that describes what data can be queried or mutated from an API.
+
+### Configuring a Schema
+
+Use `ApiSchemaBuilder` when defining schemas in code. The fluent API is designed around familiar .NET patterns:
+
+- Register scalar, enum, and object CLR types with `AddScalar<T>()`, `AddEnum<T>()`, and `AddObject<T>()`.
+- Prefer expression-based overloads such as `AddProperty(c => c.Name)` and `AddKey("PK_Customer", c => c.Id)` so CLR member names are refactor-safe.
+- Use `AddRequiredProperty` or `AddOptionalProperty` only when the API contract should override CLR nullable reference type inference.
+- Configure larger schemas with `IApiObjectTypeConfiguration<T>` and relationship configuration classes when inline lambdas become too large.
+- Use relationship shortcuts for common cases, or the full relationship builders when you need named principal keys, composite keys, or extensions.
+
+```csharp
+var schema = new ApiSchemaBuilder()
+    .WithName("Commerce")
+    .WithVersion("v1")
+    .WithOptions(o => o.ThrowOnNullKeyPart())
+    .AddScalar<Guid>()
+    .AddScalar<string>()
+    .AddEnum<OrderStatus>(e => e.AddAllValues())
+    .AddObject<Customer>(o => o
+        .AddProperty(c => c.Id)
+        .AddProperty(c => c.Name)
+        .AddProperty(c => c.Orders)
+        .AddKey("PK_Customer", c => c.Id))
+    .AddObject<Order>(order => order
+        .AddProperty(o => o.Id)
+        .AddProperty(o => o.CustomerId)
+        .AddKey("PK_Order", o => o.Id))
+    .AddOneToManyRelationship<Customer, Order>("CustomerOrders", o => o.CustomerId)
+    .Build();
+```
+
+Schema-wide options can be overridden on individual object types:
+
+```csharp
+.AddObject<Customer>(o => o
+    .WithOptions(options => options.UseDefaultOnNullKeyPart())
+    .AddProperty(c => c.Id)
+    .AddKey("PK_Customer", c => c.Id))
+```
+
+`Build()` initializes and validates the schema. If validation fails, `ApiSchemaInitializationException` includes a summary plus the individual issue messages with paths, issue codes, descriptions, and remediation guidance.
 
 ## Naming Conventions
 

@@ -1,17 +1,15 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
 /// <summary>
-///     Provides sample domain types and schema configurations that are used in documentation and tests.
+///     Provides sample domain types and schema configurations used by internal examples and tests.
 /// </summary>
-public static class Dummy
+internal static class Dummy
 {
     /// <summary>
     ///     Represents a lightweight value object that wraps a raw email address string.

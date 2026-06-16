@@ -18,8 +18,8 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 public class ApiPropertyBuilder(string apiName, string clrName) : ExtensionBuilder<ApiPropertyBuilder>
 {
     #region Fields
-    private string _apiName = apiName;
-    private readonly string _clrName = clrName;
+    private string _apiName = !string.IsNullOrWhiteSpace(apiName) ? apiName : throw new ArgumentException("The value cannot be null, empty, or whitespace.", nameof(apiName));
+    private readonly string _clrName = !string.IsNullOrWhiteSpace(clrName) ? clrName : throw new ArgumentException("The value cannot be null, empty, or whitespace.", nameof(clrName));
     #endregion
 
     #region Properties
@@ -51,6 +51,8 @@ public class ApiPropertyBuilder(string apiName, string clrName) : ExtensionBuild
     /// <returns>The current builder instance.</returns>
     public ApiPropertyBuilder WithModifiers(Action<ApiTypeModifiersBuilder> configure)
     {
+        ArgumentNullException.ThrowIfNull(configure);
+
         this.Modifiers = configure;
         return this;
     }
@@ -62,6 +64,8 @@ public class ApiPropertyBuilder(string apiName, string clrName) : ExtensionBuild
     /// <returns>The current builder instance.</returns>
     public ApiPropertyBuilder WithName(string apiName)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
+
         _apiName = apiName;
         return this;
     }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -45,6 +45,8 @@ public abstract class ApiNamedTypeBuilder<TBuilder>(Type clrType, ApiSchemaBuild
     /// <returns>The current builder instance.</returns>
     public TBuilder WithName(string apiName)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
+
         _apiName = apiName;
         return (TBuilder)this;
     }

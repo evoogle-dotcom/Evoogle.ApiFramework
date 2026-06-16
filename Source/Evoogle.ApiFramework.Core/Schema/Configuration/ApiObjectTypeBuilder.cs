@@ -48,6 +48,8 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     /// <returns>The current builder instance.</returns>
     public ApiObjectTypeBuilder AddKey(string apiName, Action<ApiKeyTypeBuilder>? configure = null)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
+
         var apiKeyTypeBuilder = new ApiKeyTypeBuilder(apiName);
 
         configure?.Invoke(apiKeyTypeBuilder);
@@ -68,6 +70,9 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     /// <returns>The current builder instance.</returns>
     public ApiObjectTypeBuilder AddProperty(string apiName, string clrName, Action<ApiPropertyBuilder>? configure = null)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
+        ArgumentException.ThrowIfNullOrWhiteSpace(clrName, nameof(clrName));
+
         var apiPropertyBuilder = new ApiPropertyBuilder(apiName, clrName);
 
         configure?.Invoke(apiPropertyBuilder);
@@ -96,6 +101,8 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     /// <returns>The current builder instance.</returns>
     public ApiObjectTypeBuilder WithOptions(Action<ApiObjectTypeOptionsBuilder> configure)
     {
+        ArgumentNullException.ThrowIfNull(configure);
+
         _apiOptionsConfiguration = configure;
         return this;
     }
