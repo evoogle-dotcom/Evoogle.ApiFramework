@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -37,8 +37,8 @@ public static class ApiSchemaExcludeMembers
         // ApiRelationshipAssociation — cycle: assoc → relationship → assoc → ...
         new ExcludeMember(typeof(ApiRelationshipAssociation), nameof(ApiRelationshipAssociation.ApiRelationshipManyToMany)),
 
-        // ApiRelationshipPrincipalEnd — primary key type resolved during initialization
-        new ExcludeMember(typeof(ApiRelationshipPrincipalEnd), nameof(ApiRelationshipPrincipalEnd.ApiPrimaryKeyType)),
+        // ApiRelationshipPrincipalEnd — principal key type resolved during initialization
+        new ExcludeMember(typeof(ApiRelationshipPrincipalEnd), nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyType)),
 
         // ApiRelationshipDependentEnd — ApiForeignKeyType throws when IsNavigational (HasForeignKey=false)
         new ExcludeMember(typeof(ApiRelationshipDependentEnd), nameof(ApiRelationshipDependentEnd.ApiForeignKeyType)),
@@ -92,8 +92,8 @@ public static class ApiSchemaExcludeMembers
         // ApiRelationshipAssociation — cycle: assoc → relationship → assoc → ...
         new ExcludeMember(typeof(ApiRelationshipAssociation), nameof(ApiRelationshipAssociation.ApiRelationshipManyToMany)),
 
-        // ApiRelationshipPrincipalEnd — primary key type resolved during initialization
-        new ExcludeMember(typeof(ApiRelationshipPrincipalEnd), nameof(ApiRelationshipPrincipalEnd.ApiPrimaryKeyType)),
+        // ApiRelationshipPrincipalEnd — principal key type resolved during initialization
+        new ExcludeMember(typeof(ApiRelationshipPrincipalEnd), nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyType)),
 
         // Key path nodes — property and object type references resolved during initialization
         new ExcludeMember(typeof(ApiKeyPath), nameof(ApiKeyPath.ApiRootObjectType)),

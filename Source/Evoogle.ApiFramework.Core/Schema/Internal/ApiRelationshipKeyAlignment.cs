@@ -35,10 +35,10 @@ internal static class ApiRelationshipKeyAlignment
 
         var keyPathCount = foreignKeyType.ApiKeyPaths.Length;
         var runCountCheck = true;
-        var principalKeyType = principalEnd.ResolvedPrimaryKeyType;
+        var principalKeyType = principalEnd.ResolvedPrincipalKeyType;
 
         var principalObjectType = principalEnd.ResolvedApiObjectType;
-        if (principalEnd.ApiPrimaryKeyTypeName is null && principalObjectType is not null)
+        if (principalEnd.ApiPrincipalKeyTypeName is null && principalObjectType is not null)
         {
             var matchingShapeKeys = principalObjectType.ApiKeyTypes
                 .Where(keyType => ApiSchemaHelpers.CountKeyLeaves(keyType) == keyPathCount)
@@ -56,9 +56,9 @@ internal static class ApiRelationshipKeyAlignment
             else if (matchingKeys.Count == 1)
             {
                 principalKeyType = matchingKeys[0].Value;
-                if (!ReferenceEquals(principalKeyType, principalEnd.ResolvedPrimaryKeyType))
+                if (!ReferenceEquals(principalKeyType, principalEnd.ResolvedPrincipalKeyType))
                 {
-                    principalEnd.OverrideResolvedPrimaryKeyType(principalKeyType);
+                    principalEnd.OverrideResolvedPrincipalKeyType(principalKeyType);
                 }
             }
             else if (matchingShapeKeys.Count > 0)
@@ -156,8 +156,8 @@ internal static class ApiRelationshipKeyAlignment
         var qualifier = string.IsNullOrWhiteSpace(principalEndQualifier) ? null : $" {principalEndQualifier}";
         var severity = ApiInitializationSeverity.Error;
         var code = ApiInitializationCode.API_RELATIONSHIP_AMBIGUOUS_PRINCIPAL_KEY;
-        var description = $"Cannot automatically determine the referenced primary key type{qualifier}: {matchingKeys.Count} key types on '{principalObjectType.ApiName}' are compatible with the foreign key type: {keyTypeNames}";
-        var remediation = $"Set {explicitKeyTarget} to specify the primary key type explicitly; available key types: {keyTypeNames}";
+        var description = $"Cannot automatically determine the referenced principal key type{qualifier}: {matchingKeys.Count} key types on '{principalObjectType.ApiName}' are compatible with the foreign key type: {keyTypeNames}";
+        var remediation = $"Set {explicitKeyTarget} to specify the principal key type explicitly; available key types: {keyTypeNames}";
 
         context.AddIssue(relationshipPath, severity, code, description, remediation);
     }
@@ -196,7 +196,7 @@ internal static class ApiRelationshipKeyAlignment
         var keyTypeNames = string.Join(", ", principalObjectType.ApiKeyTypes.Select(static keyType => $"'{keyType.ApiName}'"));
         var qualifier = string.IsNullOrWhiteSpace(principalEndQualifier) ? null : $" {principalEndQualifier}";
         var severity = ApiInitializationSeverity.Error;
-        var description = $"Cannot automatically determine the referenced key type{qualifier}: {foreignKeyPath}.{nameof(ApiKeyType.ApiKeyPaths)} has {keyPathCount} key path(s), but no key type on '{principalObjectType.ApiName}' has {keyPathCount} key path(s)";
+        var description = $"Cannot automatically determine the referenced principal key type{qualifier}: {foreignKeyPath}.{nameof(ApiKeyType.ApiKeyPaths)} has {keyPathCount} key path(s), but no key type on '{principalObjectType.ApiName}' has {keyPathCount} key path(s)";
         var remediation = principalObjectType.ApiKeyTypes.Length > 0
             ? $"Set {explicitKeyTarget} explicitly or align the foreign key shape with one of these key types: {keyTypeNames}"
             : $"Define a key type on '{principalObjectType.ApiName}' or set {explicitKeyTarget} explicitly";
@@ -248,7 +248,7 @@ internal static class ApiRelationshipKeyAlignment
         var qualifier = string.IsNullOrWhiteSpace(principalEndQualifier) ? null : $" {principalEndQualifier}";
         var severity = ApiInitializationSeverity.Error;
         var code = ApiInitializationCode.API_RELATIONSHIP_INCOMPATIBLE_PRINCIPAL_FOREIGN_KEY;
-        var description = $"Cannot automatically determine the referenced key type{qualifier}: no key type on '{principalObjectType.ApiName}' with {keyPathCount} key path(s) is compatible with foreign key leaf type(s) [{foreignKeyTypes}]";
+        var description = $"Cannot automatically determine the referenced principal key type{qualifier}: no key type on '{principalObjectType.ApiName}' with {keyPathCount} key path(s) is compatible with foreign key leaf type(s) [{foreignKeyTypes}]";
         var remediation = $"Set {explicitKeyTarget} explicitly or align the {inferredForeignKeyLabel} leaf type(s) with one of these key types: {keyTypeNames}";
 
         context.AddIssue(relationshipPath, severity, code, description, remediation);

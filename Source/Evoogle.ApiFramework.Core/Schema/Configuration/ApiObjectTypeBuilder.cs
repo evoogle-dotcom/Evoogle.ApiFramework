@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -40,7 +40,7 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     /// <remarks>
     ///     Key-bound relationship principal ends infer the best compatible key from the corresponding foreign key
     ///     when no key name is supplied; call
-    ///     <see cref="ApiRelationshipPrincipalEndBuilder.WithPrimaryKey"/> on the principal end builder to
+    ///     <see cref="ApiRelationshipPrincipalEndBuilder.WithPrincipalKey"/> on the principal end builder to
     ///     select a named key explicitly.
     /// </remarks>
     /// <param name="apiName">The API name of the key type.</param>

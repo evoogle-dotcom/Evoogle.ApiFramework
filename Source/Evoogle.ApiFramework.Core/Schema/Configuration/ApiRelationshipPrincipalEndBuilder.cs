@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -9,9 +9,9 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 ///     Fluent builder used to configure the principal end of an <see cref="ApiRelationship"/>.
 /// </summary>
 /// <remarks>
-///     The principal end provides the primary key for the relationship. For key-bound relationships, initialization
-///     infers the best compatible primary key type from the corresponding foreign key when no name is supplied. Call
-///     <see cref="WithPrimaryKey"/> to specify the named primary key type explicitly. Delete behavior is configured on the
+///     The principal end provides the principal key for the relationship. For key-bound relationships, initialization
+///     infers the best compatible principal key type from the corresponding foreign key when no name is supplied. Call
+///     <see cref="WithPrincipalKey"/> to specify the named principal key type explicitly. Delete behavior is configured on the
 ///     relationship builder, not on individual ends.
 /// </remarks>
 /// <param name="clrObjectType">The CLR type of the principal <see cref="ApiObjectType"/>.</param>
@@ -19,7 +19,7 @@ public sealed class ApiRelationshipPrincipalEndBuilder(Type clrObjectType) : Ext
 {
     #region Fields
     private readonly Type _clrObjectType = clrObjectType ?? throw new ArgumentNullException(nameof(clrObjectType));
-    private string? _apiPrimaryKeyTypeName;
+    private string? _apiKeyTypeName;
     #endregion
 
     #region AddExtension Methods
@@ -38,16 +38,16 @@ public sealed class ApiRelationshipPrincipalEndBuilder(Type clrObjectType) : Ext
 
     #region With Methods
     /// <summary>
-    ///     Selects a named key type on the principal object type to use as the relationship's primary key,
+    ///     Selects a named key type on the principal object type to use as the relationship's principal key,
     ///     overriding automatic compatibility-based key inference.
     /// </summary>
-    /// <param name="apiPrimaryKeyTypeName">The name of the primary key type to use for the relationship.</param>
+    /// <param name="apiKeyTypeName">The name of the principal key type to use for the relationship.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipPrincipalEndBuilder WithPrimaryKey(string apiPrimaryKeyTypeName)
+    public ApiRelationshipPrincipalEndBuilder WithPrincipalKey(string apiKeyTypeName)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiPrimaryKeyTypeName, nameof(apiPrimaryKeyTypeName));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKeyTypeName, nameof(apiKeyTypeName));
 
-        _apiPrimaryKeyTypeName = apiPrimaryKeyTypeName;
+        _apiKeyTypeName = apiKeyTypeName;
         return this;
     }
     #endregion
@@ -61,7 +61,7 @@ public sealed class ApiRelationshipPrincipalEndBuilder(Type clrObjectType) : Ext
         var end = new ApiRelationshipPrincipalEnd
         (
             _clrObjectType,
-            _apiPrimaryKeyTypeName
+            _apiKeyTypeName
         );
 
         var extensions = this.BuildExtensions();

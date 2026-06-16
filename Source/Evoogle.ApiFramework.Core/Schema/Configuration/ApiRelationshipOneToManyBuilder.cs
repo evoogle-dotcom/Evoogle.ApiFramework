@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -52,15 +52,15 @@ public sealed class ApiRelationshipOneToManyBuilder(string apiName)
 
     /// <summary>
     ///     Configures the principal end of the 1:M relationship using the specified CLR type,
-    ///     and selects the named primary key type for the relationship.
+    ///     and selects the named principal key type for the relationship.
     /// </summary>
     /// <param name="clrPrincipalType">The CLR type of the principal object.</param>
-    /// <param name="apiPrimaryKeyTypeName">The name of the primary key type to use for the relationship.</param>
+    /// <param name="apiKeyTypeName">The name of the principal key type to use for the relationship.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipOneToManyBuilder From(Type clrPrincipalType, string apiPrimaryKeyTypeName)
+    public ApiRelationshipOneToManyBuilder From(Type clrPrincipalType, string apiKeyTypeName)
     {
         var builder = new ApiRelationshipPrincipalEndBuilder(clrPrincipalType);
-        builder.WithPrimaryKey(apiPrimaryKeyTypeName);
+        builder.WithPrincipalKey(apiKeyTypeName);
         _principalEndBuilder = builder;
         return this;
     }

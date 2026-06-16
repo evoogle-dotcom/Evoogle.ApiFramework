@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -55,15 +55,15 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
 
     /// <summary>
     ///     Configures principal end A of the relationship using the specified CLR type,
-    ///     and selects the named primary key type for the relationship.
+    ///     and selects the named principal key type for the relationship.
     /// </summary>
     /// <param name="clrPrincipalType">The CLR type of the principal end A object type.</param>
-    /// <param name="apiPrimaryKeyTypeName">The name of the primary key type to use for the relationship.</param>
+    /// <param name="apiKeyTypeName">The name of the principal key type to use for the relationship.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipManyToManyBuilder Between(Type clrPrincipalType, string apiPrimaryKeyTypeName)
+    public ApiRelationshipManyToManyBuilder Between(Type clrPrincipalType, string apiKeyTypeName)
     {
         var builder = new ApiRelationshipPrincipalEndBuilder(clrPrincipalType);
-        builder.WithPrimaryKey(apiPrimaryKeyTypeName);
+        builder.WithPrincipalKey(apiKeyTypeName);
         _principalEndABuilder = builder;
         return this;
     }
@@ -84,15 +84,15 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
 
     /// <summary>
     ///     Configures principal end B of the relationship using the specified CLR type,
-    ///     and selects the named primary key type for the relationship.
+    ///     and selects the named principal key type for the relationship.
     /// </summary>
     /// <param name="clrPrincipalType">The CLR type of the principal end B object type.</param>
-    /// <param name="apiPrimaryKeyTypeName">The name of the primary key type to use for the relationship.</param>
+    /// <param name="apiKeyTypeName">The name of the principal key type to use for the relationship.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipManyToManyBuilder And(Type clrPrincipalType, string apiPrimaryKeyTypeName)
+    public ApiRelationshipManyToManyBuilder And(Type clrPrincipalType, string apiKeyTypeName)
     {
         var builder = new ApiRelationshipPrincipalEndBuilder(clrPrincipalType);
-        builder.WithPrimaryKey(apiPrimaryKeyTypeName);
+        builder.WithPrincipalKey(apiKeyTypeName);
         _principalEndBBuilder = builder;
         return this;
     }

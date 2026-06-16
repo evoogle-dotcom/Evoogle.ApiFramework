@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -13,11 +13,11 @@ namespace Evoogle.ApiFramework.Schema;
 /// </summary>
 /// <remarks>
 ///     Concrete subclasses are <see cref="ApiRelationshipOneToOne"/> and <see cref="ApiRelationshipOneToMany"/>.
-///     The foreign key role always resides on the dependent side; the principal side provides the referenced primary key type.
+///     The foreign key role always resides on the dependent side; the principal side provides the referenced principal key type.
 ///     Self-referential relationships are supported by setting both ends to the same <see cref="ApiRelationshipElement.ClrObjectType"/>.
 /// </remarks>
 /// <param name="apiName">The API name that uniquely identifies this relationship within the schema.</param>
-/// <param name="apiPrincipalEnd">The principal end of the relationship, which provides the referenced primary key type.</param>
+/// <param name="apiPrincipalEnd">The principal end of the relationship, which provides the referenced principal key type.</param>
 /// <param name="apiDependentEnd">The dependent end of the relationship, which may provide the foreign key role's key paths.</param>
 /// <param name="apiDeleteBehavior">The delete behavior that governs what happens to related objects when either end is affected.</param>
 public abstract class ApiRelationshipOneTo
@@ -29,7 +29,7 @@ public abstract class ApiRelationshipOneTo
 ) : ApiRelationship(apiName, apiDeleteBehavior)
 {
     #region ApiRelationshipOneTo Properties
-    /// <summary>Gets the principal end of the relationship, which provides the referenced primary key type.</summary>
+    /// <summary>Gets the principal end of the relationship, which provides the referenced principal key type.</summary>
     public ApiRelationshipPrincipalEnd ApiPrincipalEnd { get; } = apiPrincipalEnd;
 
     /// <summary>Gets the dependent end of the relationship, which may provide the foreign key role's key paths.</summary>
@@ -103,9 +103,9 @@ public abstract class ApiRelationshipOneTo
             return;
         }
 
-        var primaryKeyDesc = principal.ApiPrimaryKeyTypeName is not null ? $"primary key type '{principal.ApiPrimaryKeyTypeName}'" : "primary key type";
+        var principalKeyDesc = principal.ApiPrincipalKeyTypeName is not null ? $"principal key type '{principal.ApiPrincipalKeyTypeName}'" : "principal key type";
         var foreignKeyPath = $"{nameof(this.ApiDependentEnd)}.{nameof(this.ApiDependentEnd.ApiForeignKeyType)}";
-        var compatibilityRemediation = $"Ensure {foreignKeyPath} paths are ordered to match the principal end's primary key type and use compatible scalar types";
+        var compatibilityRemediation = $"Ensure {foreignKeyPath} paths are ordered to match the principal end's principal key type and use compatible scalar types";
 
         ApiRelationshipKeyAlignment.ValidatePrincipalForeignKeyAlignment
         (
@@ -115,12 +115,12 @@ public abstract class ApiRelationshipOneTo
             foreignKeyType: dependent.ApiForeignKeyType,
             countMismatchCode: ApiInitializationCode.API_RELATIONSHIP_ONE_TO_INVALID_DEPENDENT_KEY_PATHS_COUNT,
             foreignKeyPath: foreignKeyPath,
-            principalCountLabel: primaryKeyDesc,
-            principalCompatibilityLabel: $"principal end {primaryKeyDesc}",
+            principalCountLabel: principalKeyDesc,
+            principalCompatibilityLabel: $"principal end {principalKeyDesc}",
             principalEndQualifier: null,
-            explicitKeyTarget: nameof(ApiRelationshipPrincipalEnd.ApiPrimaryKeyTypeName),
+            explicitKeyTarget: nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyTypeName),
             inferredForeignKeyLabel: "foreign key",
-            countMismatchRemediationTarget: "the principal end's primary key type",
+            countMismatchRemediationTarget: "the principal end's principal key type",
             compatibilityRemediation: compatibilityRemediation
         );
     }

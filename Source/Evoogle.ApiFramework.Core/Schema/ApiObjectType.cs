@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -68,7 +68,7 @@ public sealed partial class ApiObjectType
     public ApiRelationshipEnd[] ApiRelationshipEnds => _apiRelationshipEnds is not null ? _apiRelationshipEnds : [];
 
     /// <summary>
-    ///     Gets all relationship ends where this object type acts as the principal and provides the referenced key type.
+    ///     Gets all relationship ends where this object type acts as the principal and provides the principal key type.
     ///     Populated during <see cref="ApiSchema"/> initialization. Returns an empty array before initialization completes.
     /// </summary>
     public ApiRelationshipPrincipalEnd[] ApiRelationshipPrincipalEnds => _apiPrincipalRelationshipEnds is not null ? _apiPrincipalRelationshipEnds : [];

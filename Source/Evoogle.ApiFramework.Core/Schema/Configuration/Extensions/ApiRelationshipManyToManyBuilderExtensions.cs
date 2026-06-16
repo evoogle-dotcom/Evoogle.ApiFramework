@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -41,11 +41,11 @@ public static class ApiRelationshipManyToManyBuilderExtensions
     /// <summary>
     ///     Configures principal end A using the CLR type <typeparamref name="TPrincipal"/>.
     /// </summary>
-    public static ApiRelationshipManyToManyBuilder Between<TPrincipal>(this ApiRelationshipManyToManyBuilder builder, string apiPrimaryKeyTypeName)
+    public static ApiRelationshipManyToManyBuilder Between<TPrincipal>(this ApiRelationshipManyToManyBuilder builder, string apiKeyTypeName)
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        return builder.Between(typeof(TPrincipal), apiPrimaryKeyTypeName);
+        return builder.Between(typeof(TPrincipal), apiKeyTypeName);
     }
 
     /// <summary>
@@ -65,11 +65,11 @@ public static class ApiRelationshipManyToManyBuilderExtensions
     /// <summary>
     ///     Configures principal end B using the CLR type <typeparamref name="TPrincipal"/>.
     /// </summary>
-    public static ApiRelationshipManyToManyBuilder And<TPrincipal>(this ApiRelationshipManyToManyBuilder builder, string apiPrimaryKeyTypeName)
+    public static ApiRelationshipManyToManyBuilder And<TPrincipal>(this ApiRelationshipManyToManyBuilder builder, string apiKeyTypeName)
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        return builder.And(typeof(TPrincipal), apiPrimaryKeyTypeName);
+        return builder.And(typeof(TPrincipal), apiKeyTypeName);
     }
     #endregion
 

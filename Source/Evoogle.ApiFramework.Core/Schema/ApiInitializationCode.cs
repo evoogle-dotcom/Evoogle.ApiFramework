@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -249,7 +249,7 @@ public enum ApiInitializationCode
 
     #region ApiRelationshipEnd Initialization Codes
     /// <summary>
-    ///     The principal end's explicitly referenced key type could not be resolved.
+    ///     The principal end's explicitly referenced principal key type could not be resolved.
     /// </summary>
     API_RELATIONSHIP_END_UNRESOLVED_KEY_TYPE,
     #endregion
@@ -295,7 +295,7 @@ public enum ApiInitializationCode
     /// <summary>
     ///     The principal end's key type cannot be automatically determined because multiple key types
     ///     on the principal object type are compatible with the foreign key type.
-    ///     Specify the primary key type explicitly using <see cref="ApiRelationshipPrincipalEnd.ApiPrimaryKeyTypeName"/>.
+    ///     Specify the principal key type explicitly using <see cref="ApiRelationshipPrincipalEnd.ApiPrincipalKeyTypeName"/>.
     /// </summary>
     API_RELATIONSHIP_AMBIGUOUS_PRINCIPAL_KEY,
 

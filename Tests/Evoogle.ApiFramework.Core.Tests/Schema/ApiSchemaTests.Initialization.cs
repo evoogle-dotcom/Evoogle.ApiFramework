@@ -2257,13 +2257,13 @@ public partial class ApiSchemaTests
             ]
         },
 
-        // ApiRelationshipPrincipalEnd throws if referenced ApiPrimaryKeyTypeName cannot be resolved
+        // ApiRelationshipPrincipalEnd throws if referenced ApiPrincipalKeyTypeName cannot be resolved
         new InitializeThrowsTest
         {
-            Name = $"{nameof(ApiRelationshipPrincipalEnd)} Throws If {nameof(ApiRelationshipPrincipalEnd.ApiPrimaryKeyTypeName)} Is Unresolved",
+            Name = $"{nameof(ApiRelationshipPrincipalEnd)} Throws If {nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyTypeName)} Is Unresolved",
             SourceJson = @"
             {
-                ""ApiName"": ""ApiRelationshipPrincipalEnd Throws If ApiPrimaryKeyTypeName Is Unresolved"",
+                ""ApiName"": ""ApiRelationshipPrincipalEnd Throws If ApiPrincipalKeyTypeName Is Unresolved"",
                 ""ApiScalarTypes"": [
                     { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"", ""ClrType"": ""System.Int32, System.Private.CoreLib"" }
                 ],
@@ -2298,7 +2298,7 @@ public partial class ApiSchemaTests
                         ""ApiName"": ""TestRel"",
                         ""ApiPrincipalEnd"": {
                             ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Core.Tests"",
-                            ""ApiPrimaryKeyTypeName"": ""NonExistentKeyType""
+                            ""ApiPrincipalKeyTypeName"": ""NonExistentKeyType""
                         },
                         ""ApiDependentEnd"": { ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Core.Tests"" }
                     }
@@ -2312,7 +2312,7 @@ public partial class ApiSchemaTests
                     path: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"].{nameof(ApiRelationshipPrincipalEnd)}",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_RELATIONSHIP_END_UNRESOLVED_KEY_TYPE,
-                    description: "Referenced primary key type 'NonExistentKeyType' could not be found on object type 'RelPrincipal'",
+                    description: "Referenced principal key type 'NonExistentKeyType' could not be found on object type 'RelPrincipal'",
                     remediation: "Use one of the available key types: 'Id'"
                 ),
             ]
@@ -2567,8 +2567,8 @@ public partial class ApiSchemaTests
                     path: $"{nameof(ApiRelationshipManyToMany)}[\"TestRel\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_RELATIONSHIP_MANY_TO_MANY_INVALID_ASSOCIATION_KEY_PATHS_A_COUNT,
-                    description: $"Cannot automatically determine the referenced key type for principal end A: {nameof(ApiRelationshipManyToMany.ApiAssociation)}.{nameof(ApiRelationshipAssociation.ApiForeignKeyTypeA)}.{nameof(ApiKeyType.ApiKeyPaths)} has 2 key path(s), but no key type on 'RelPrincipal' has 2 key path(s)",
-                    remediation: $"Set {nameof(ApiRelationshipPrincipalEnd.ApiPrimaryKeyTypeName)} on principal end A explicitly or align the foreign key shape with one of these key types: 'Id'"
+                    description: $"Cannot automatically determine the referenced principal key type for principal end A: {nameof(ApiRelationshipManyToMany.ApiAssociation)}.{nameof(ApiRelationshipAssociation.ApiForeignKeyTypeA)}.{nameof(ApiKeyType.ApiKeyPaths)} has 2 key path(s), but no key type on 'RelPrincipal' has 2 key path(s)",
+                    remediation: $"Set {nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyTypeName)} on principal end A explicitly or align the foreign key shape with one of these key types: 'Id'"
                 ),
             ]
         },
@@ -2654,8 +2654,8 @@ public partial class ApiSchemaTests
                     path: $"{nameof(ApiRelationshipManyToMany)}[\"TestRel\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_RELATIONSHIP_MANY_TO_MANY_INVALID_ASSOCIATION_KEY_PATHS_B_COUNT,
-                    description: $"Cannot automatically determine the referenced key type for principal end B: {nameof(ApiRelationshipManyToMany.ApiAssociation)}.{nameof(ApiRelationshipAssociation.ApiForeignKeyTypeB)}.{nameof(ApiKeyType.ApiKeyPaths)} has 2 key path(s), but no key type on 'RelPrincipalB' has 2 key path(s)",
-                    remediation: $"Set {nameof(ApiRelationshipPrincipalEnd.ApiPrimaryKeyTypeName)} on principal end B explicitly or align the foreign key shape with one of these key types: 'Id'"
+                    description: $"Cannot automatically determine the referenced principal key type for principal end B: {nameof(ApiRelationshipManyToMany.ApiAssociation)}.{nameof(ApiRelationshipAssociation.ApiForeignKeyTypeB)}.{nameof(ApiKeyType.ApiKeyPaths)} has 2 key path(s), but no key type on 'RelPrincipalB' has 2 key path(s)",
+                    remediation: $"Set {nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyTypeName)} on principal end B explicitly or align the foreign key shape with one of these key types: 'Id'"
                 ),
             ]
         },
@@ -2721,8 +2721,8 @@ public partial class ApiSchemaTests
                     path: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_RELATIONSHIP_ONE_TO_INVALID_DEPENDENT_KEY_PATHS_COUNT,
-                    description: $"Cannot automatically determine the referenced key type: {nameof(ApiRelationshipOneTo.ApiDependentEnd)}.{nameof(ApiRelationshipDependentEnd.ApiForeignKeyType)}.{nameof(ApiKeyType.ApiKeyPaths)} has 2 key path(s), but no key type on 'RelPrincipal' has 2 key path(s)",
-                    remediation: $"Set {nameof(ApiRelationshipPrincipalEnd.ApiPrimaryKeyTypeName)} explicitly or align the foreign key shape with one of these key types: 'Id'"
+                    description: $"Cannot automatically determine the referenced principal key type: {nameof(ApiRelationshipOneTo.ApiDependentEnd)}.{nameof(ApiRelationshipDependentEnd.ApiForeignKeyType)}.{nameof(ApiKeyType.ApiKeyPaths)} has 2 key path(s), but no key type on 'RelPrincipal' has 2 key path(s)",
+                    remediation: $"Set {nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyTypeName)} explicitly or align the foreign key shape with one of these key types: 'Id'"
                 ),
             ]
         },
@@ -2767,7 +2767,7 @@ public partial class ApiSchemaTests
                     {
                         ""ApiKind"": ""OneToMany"",
                         ""ApiName"": ""TestRel"",
-                        ""ApiPrincipalEnd"": { ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyTypeApiNameType, Evoogle.ApiFramework.Core.Tests"", ""ApiPrimaryKeyTypeName"": ""PK_Id"" },
+                        ""ApiPrincipalEnd"": { ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyTypeApiNameType, Evoogle.ApiFramework.Core.Tests"", ""ApiPrincipalKeyTypeName"": ""PK_Id"" },
                         ""ApiDependentEnd"": {
                             ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Core.Tests"",
                             ""ApiForeignKeyType"": {
@@ -2787,8 +2787,8 @@ public partial class ApiSchemaTests
                     path: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_RELATIONSHIP_INCOMPATIBLE_PRINCIPAL_FOREIGN_KEY,
-                    description: $"{nameof(ApiRelationshipOneTo.ApiDependentEnd)}.{nameof(ApiRelationshipDependentEnd.ApiForeignKeyType)} leaf type(s) [String] are not compatible with principal end primary key type 'PK_Id' leaf type(s) [Int32]",
-                    remediation: $"Ensure {nameof(ApiRelationshipOneTo.ApiDependentEnd)}.{nameof(ApiRelationshipDependentEnd.ApiForeignKeyType)} paths are ordered to match the principal end's primary key type and use compatible scalar types"
+                    description: $"{nameof(ApiRelationshipOneTo.ApiDependentEnd)}.{nameof(ApiRelationshipDependentEnd.ApiForeignKeyType)} leaf type(s) [String] are not compatible with principal end principal key type 'PK_Id' leaf type(s) [Int32]",
+                    remediation: $"Ensure {nameof(ApiRelationshipOneTo.ApiDependentEnd)}.{nameof(ApiRelationshipDependentEnd.ApiForeignKeyType)} paths are ordered to match the principal end's principal key type and use compatible scalar types"
                 ),
             ]
         },
@@ -2921,8 +2921,8 @@ public partial class ApiSchemaTests
                     path: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.API_RELATIONSHIP_AMBIGUOUS_PRINCIPAL_KEY,
-                    description: "Cannot automatically determine the referenced primary key type: 2 key types on 'RelPrincipal' are compatible with the foreign key type: 'PK_Id', 'PK_Code'",
-                    remediation: $"Set {nameof(ApiRelationshipPrincipalEnd.ApiPrimaryKeyTypeName)} to specify the primary key type explicitly; available key types: 'PK_Id', 'PK_Code'"
+                    description: "Cannot automatically determine the referenced principal key type: 2 key types on 'RelPrincipal' are compatible with the foreign key type: 'PK_Id', 'PK_Code'",
+                    remediation: $"Set {nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyTypeName)} to specify the principal key type explicitly; available key types: 'PK_Id', 'PK_Code'"
                 ),
             ]
         },
@@ -3287,7 +3287,7 @@ public partial class ApiSchemaTests
     //         apiRelationships: [relationship]
     //     );
 
-    //     Assert.Equal("AK_ExternalCode", relationship.ApiPrincipalEnd.ApiPrimaryKeyType.ApiName);
+    //     Assert.Equal("AK_ExternalCode", relationship.ApiPrincipalEnd.ApiPrincipalKeyType.ApiName);
     // }
 
     // [Fact]
@@ -3343,9 +3343,9 @@ public partial class ApiSchemaTests
     //         apiRelationships: [relationship]
     //     );
 
-    //     Assert.False(relationship.ApiPrincipalEnd.HasPrimaryKey);
+    //     Assert.False(relationship.ApiPrincipalEnd.HasPrincipalKey);
     //     Assert.True(relationship.ApiPrincipalEnd.IsNavigational);
-    //     Assert.Throws<ApiSchemaException>(() => relationship.ApiPrincipalEnd.ApiPrimaryKeyType);
+    //     Assert.Throws<ApiSchemaException>(() => relationship.ApiPrincipalEnd.ApiPrincipalKeyType);
     // }
 
     // [Fact]
@@ -3406,9 +3406,9 @@ public partial class ApiSchemaTests
     //         apiRelationships: [relationship]
     //     );
 
-    //     Assert.True(relationship.ApiPrincipalEnd.HasPrimaryKey);
+    //     Assert.True(relationship.ApiPrincipalEnd.HasPrincipalKey);
     //     Assert.False(relationship.ApiPrincipalEnd.IsNavigational);
-    //     Assert.Equal("AK_ExternalCode", relationship.ApiPrincipalEnd.ApiPrimaryKeyType.ApiName);
+    //     Assert.Equal("AK_ExternalCode", relationship.ApiPrincipalEnd.ApiPrincipalKeyType.ApiName);
     // }
 
     // [Fact]
@@ -3491,8 +3491,8 @@ public partial class ApiSchemaTests
     //         apiRelationships: [relationship]
     //     );
 
-    //     Assert.Equal("AK_ExternalCode", relationship.ApiPrincipalEndA.ApiPrimaryKeyType.ApiName);
-    //     Assert.Equal("PK_BId", relationship.ApiPrincipalEndB.ApiPrimaryKeyType.ApiName);
+    //     Assert.Equal("AK_ExternalCode", relationship.ApiPrincipalEndA.ApiPrincipalKeyType.ApiName);
+    //     Assert.Equal("PK_BId", relationship.ApiPrincipalEndB.ApiPrincipalKeyType.ApiName);
     // }
     #endregion
 }

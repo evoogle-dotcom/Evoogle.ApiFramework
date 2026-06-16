@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -41,11 +41,11 @@ public static class ApiRelationshipOneToManyBuilderExtensions
     /// <summary>
     ///     Configures the principal end of the 1:M relationship using the CLR type <typeparamref name="TPrincipal"/>.
     /// </summary>
-    public static ApiRelationshipOneToManyBuilder From<TPrincipal>(this ApiRelationshipOneToManyBuilder builder, string apiPrimaryKeyTypeName)
+    public static ApiRelationshipOneToManyBuilder From<TPrincipal>(this ApiRelationshipOneToManyBuilder builder, string apiKeyTypeName)
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        return builder.From(typeof(TPrincipal), apiPrimaryKeyTypeName);
+        return builder.From(typeof(TPrincipal), apiKeyTypeName);
     }
 
     /// <summary>

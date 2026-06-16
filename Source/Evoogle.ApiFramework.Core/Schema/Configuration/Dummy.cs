@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -294,8 +294,8 @@ internal static class Dummy
     /// <summary>
     ///     Demonstrates how to configure a M:N relationship using the fluent schema builder APIs.
     ///     Models the "Products are tagged with Tags" relationship via the <see cref="ProductTag"/> association type.
-    ///     Demonstrates <see cref="ApiRelationshipPrincipalEndBuilder.WithPrimaryKey"/> to select a
-    ///     non-primary key type on the principal side, and extensions on principal ends.
+    ///     Demonstrates <see cref="ApiRelationshipPrincipalEndBuilder.WithPrincipalKey"/> to select a
+    ///     non-principal key type on the principal side, and extensions on principal ends.
     /// </summary>
     public class ProductTagRelationshipConfiguration : IApiRelationshipManyToManyConfiguration
     {
@@ -309,7 +309,7 @@ internal static class Dummy
                 )
                 .And<Tag>
                 (
-                    p => p.WithPrimaryKey("PrimaryKey")
+                    p => p.WithPrincipalKey("PrimaryKey")
                 )
                 .WithAssociation<ProductTag>
                 (
@@ -364,8 +364,8 @@ internal static class Dummy
         public void Configure(ApiRelationshipManyToManyBuilder builder)
         {
             builder
-                .Between<Product>(p => p.WithPrimaryKey("PrimaryKey"))
-                .And<Tag>(p => p.WithPrimaryKey("PrimaryKey"))
+                .Between<Product>(p => p.WithPrincipalKey("PrimaryKey"))
+                .And<Tag>(p => p.WithPrincipalKey("PrimaryKey"))
                 .WithAssociation<ProductTag>
                 (
                     a => a
@@ -500,7 +500,7 @@ internal static class Dummy
                     .From<Customer>
                     (
                         p => p
-                            .WithPrimaryKey("PrimaryKey")
+                            .WithPrincipalKey("PrimaryKey")
                     )
                     .To<CustomerProfile>
                     (
@@ -517,13 +517,13 @@ internal static class Dummy
                     .Between<Product>
                     (
                         p => p
-                            .WithPrimaryKey("PrimaryKey")
+                            .WithPrincipalKey("PrimaryKey")
                             .AddRelationshipPrincipalEndExtension(new VisibleMetadata { Visible = true })
                     )
                     .And<Tag>
                     (
                         p => p
-                            .WithPrimaryKey("PrimaryKey")
+                            .WithPrincipalKey("PrimaryKey")
                     )
                     .WithAssociation<ProductTag>
                     (
@@ -614,15 +614,15 @@ internal static class Dummy
             .AddOneToOneRelationship("CustomerHasProfileInline", r => r
                 .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete)
                 .From<Customer>(p => p
-                    .WithPrimaryKey("PrimaryKey"))
+                    .WithPrincipalKey("PrimaryKey"))
                 .To<CustomerProfile>(d => d
                     .WithForeignKey(cp => cp.CustomerRef.CustomerId)))      // shorthand: navigated expression
             .AddManyToManyRelationship("ProductHasTags", new ProductTagConfigurationGeneric())
             .AddManyToManyRelationship("ProductHasTagsInline", r => r
                 .Between<Product>(p => p
-                    .WithPrimaryKey("PrimaryKey"))
+                    .WithPrincipalKey("PrimaryKey"))
                 .And<Tag>(p => p
-                    .WithPrimaryKey("PrimaryKey"))
+                    .WithPrincipalKey("PrimaryKey"))
                 .WithAssociation<ProductTag>(a => a
                     .WithForeignKeyA(p => p.ProductId)                      // shorthand: single expression
                     .WithForeignKeyB(p => p.TagId)))                        // shorthand: single expression
