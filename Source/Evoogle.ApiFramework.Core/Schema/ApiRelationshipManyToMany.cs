@@ -4,6 +4,7 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using Evoogle.ApiFramework.Schema.Internal;
+using Evoogle.ApiFramework.Exceptions;
 using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema;
@@ -51,6 +52,9 @@ public sealed class ApiRelationshipManyToMany
     ///     Association rows are deleted automatically when either principal is removed.
     /// </summary>
     public const ApiRelationshipDeleteBehavior DefaultDeleteBehavior = ApiRelationshipDeleteBehavior.Delete;
+
+    private ApiRelationshipKeyBinding? _apiResolvedKeyBindingA = null;
+    private ApiRelationshipKeyBinding? _apiResolvedKeyBindingB = null;
     #endregion
 
     #region ApiSchemaElement Properties
@@ -72,6 +76,30 @@ public sealed class ApiRelationshipManyToMany
 
     /// <summary>Gets the association element that mediates the relationship.</summary>
     public ApiRelationshipAssociation ApiAssociation { get; } = apiAssociation;
+
+    /// <summary>Gets the resolved key binding for principal end A.</summary>
+    /// <exception cref="ApiSchemaException">
+    ///     Thrown when <see cref="IsNavigational"/> is <see langword="true"/> or initialization failed.
+    ///     Check <see cref="HasKeyBindings"/> before accessing this property.
+    /// </exception>
+    public ApiRelationshipKeyBinding ApiKeyBindingA => this.HasKeyBindings
+        ? _apiResolvedKeyBindingA!
+        : throw new ApiSchemaException("No A-side key binding declared or resolved for this relationship.");
+
+    /// <summary>Gets the resolved key binding for principal end B.</summary>
+    /// <exception cref="ApiSchemaException">
+    ///     Thrown when <see cref="IsNavigational"/> is <see langword="true"/> or initialization failed.
+    ///     Check <see cref="HasKeyBindings"/> before accessing this property.
+    /// </exception>
+    public ApiRelationshipKeyBinding ApiKeyBindingB => this.HasKeyBindings
+        ? _apiResolvedKeyBindingB!
+        : throw new ApiSchemaException("No B-side key binding declared or resolved for this relationship.");
+
+    /// <summary>Gets a value indicating whether both many-to-many key bindings resolved.</summary>
+    public bool HasKeyBindings => _apiResolvedKeyBindingA is not null && _apiResolvedKeyBindingB is not null;
+
+    /// <summary>Gets a value indicating whether this relationship has no association foreign key bindings declared at the schema level.</summary>
+    public bool IsNavigational => this.ApiAssociation is null || !this.ApiAssociation.HasForeignKeys;
     #endregion
 
     #region Object Methods
@@ -96,6 +124,9 @@ public sealed class ApiRelationshipManyToMany
 
         base.Initialize(context);
 
+        _apiResolvedKeyBindingA = null;
+        _apiResolvedKeyBindingB = null;
+
         this.InitializeApiPrincipalEndA(context);
         this.InitializeApiPrincipalEndB(context);
         this.InitializeApiAssociation(context);
@@ -108,7 +139,7 @@ public sealed class ApiRelationshipManyToMany
     {
         if (this.ApiPrincipalEndA is not null && this.ApiAssociation is not null && this.ApiAssociation.HasForeignKeys)
         {
-            this.InitializeApiAssociationKeyPathAlignment
+            _apiResolvedKeyBindingA = this.InitializeApiAssociationKeyPathAlignment
             (
                 context,
                 this.ApiPrincipalEndA,
@@ -121,7 +152,7 @@ public sealed class ApiRelationshipManyToMany
 
         if (this.ApiPrincipalEndB is not null && this.ApiAssociation is not null && this.ApiAssociation.HasForeignKeys)
         {
-            this.InitializeApiAssociationKeyPathAlignment
+            _apiResolvedKeyBindingB = this.InitializeApiAssociationKeyPathAlignment
             (
                 context,
                 this.ApiPrincipalEndB,
@@ -131,9 +162,15 @@ public sealed class ApiRelationshipManyToMany
                 "B"
             );
         }
+
+        if (this.ApiAssociation is not null && !this.ApiAssociation.HasForeignKeys)
+        {
+            this.ValidateNavigationalPrincipalKey(context, this.ApiPrincipalEndA, $"{nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyTypeName)} on principal end A");
+            this.ValidateNavigationalPrincipalKey(context, this.ApiPrincipalEndB, $"{nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyTypeName)} on principal end B");
+        }
     }
 
-    private void InitializeApiAssociationKeyPathAlignment
+    private ApiRelationshipKeyBinding? InitializeApiAssociationKeyPathAlignment
     (
         ApiInitializationContext context,
         ApiRelationshipPrincipalEnd principalEnd,
@@ -146,7 +183,7 @@ public sealed class ApiRelationshipManyToMany
         var principalKeyDesc = principalEnd.ApiPrincipalKeyTypeName is not null ? $"principal key type '{principalEnd.ApiPrincipalKeyTypeName}'" : "principal key type";
         var foreignKeyPath = $"{nameof(this.ApiAssociation)}.{foreignKeyPropertyName}";
 
-        ApiRelationshipKeyAlignment.ValidatePrincipalForeignKeyAlignment
+        return ApiRelationshipKeyAlignment.ResolvePrincipalForeignKeyBinding
         (
             context: context,
             relationshipPath: this.ApiPath,
@@ -162,6 +199,22 @@ public sealed class ApiRelationshipManyToMany
             countMismatchRemediationTarget: $"principal end {principalEndName}'s principal key type",
             compatibilityRemediation: $"Ensure {foreignKeyPath} paths are ordered to match principal end {principalEndName}'s principal key type and use compatible scalar types"
         );
+    }
+
+    private void ValidateNavigationalPrincipalKey(ApiInitializationContext context, ApiRelationshipPrincipalEnd? principalEnd, string explicitKeyTarget)
+    {
+        if (principalEnd?.ApiPrincipalKeyTypeName is null)
+        {
+            return;
+        }
+
+        var path = this.ApiPath;
+        var severity = ApiInitializationSeverity.Error;
+        var code = ApiInitializationCode.API_RELATIONSHIP_END_PRINCIPAL_KEY_WITHOUT_FOREIGN_KEY;
+        var description = $"Cannot resolve {explicitKeyTarget} '{principalEnd.ApiPrincipalKeyTypeName}' because this relationship has no association foreign key bindings";
+        var remediation = $"Declare {nameof(this.ApiAssociation)}.{nameof(ApiRelationshipAssociation.ApiForeignKeyTypeA)} and {nameof(this.ApiAssociation)}.{nameof(ApiRelationshipAssociation.ApiForeignKeyTypeB)} or remove {explicitKeyTarget}";
+
+        context.AddIssue(path, severity, code, description, remediation);
     }
 
     private void InitializeApiAssociation(ApiInitializationContext context)

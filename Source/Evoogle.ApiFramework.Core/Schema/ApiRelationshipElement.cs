@@ -37,7 +37,7 @@ public abstract class ApiRelationshipElement(Type clrObjectType) : ApiSchemaElem
     ///     Gets the resolved <see cref="ApiObjectType"/>, or <see langword="null"/> if initialization
     ///     has not yet run or failed to resolve the object type.
     /// </summary>
-    protected ApiObjectType? ResolvedObjectType => _apiResolvedObjectType;
+    internal ApiObjectType? ApiResolvedObjectType => _apiResolvedObjectType;
     #endregion
 
     #region ApiSchemaElement Methods

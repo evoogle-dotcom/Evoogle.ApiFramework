@@ -12,7 +12,7 @@ namespace Evoogle.ApiFramework.Schema.Internal;
 internal static class ApiRelationshipKeyAlignment
 {
     #region ApiRelationshipKeyAlignment Methods
-    public static void ValidatePrincipalForeignKeyAlignment
+    public static ApiRelationshipKeyBinding? ResolvePrincipalForeignKeyBinding
     (
         ApiInitializationContext context,
         string relationshipPath,
@@ -35,10 +35,26 @@ internal static class ApiRelationshipKeyAlignment
 
         var keyPathCount = foreignKeyType.ApiKeyPaths.Length;
         var runCountCheck = true;
-        var principalKeyType = principalEnd.ResolvedPrincipalKeyType;
+        ApiKeyType? principalKeyType = null;
+        var principalKeyResolutionSource = ApiRelationshipPrincipalKeyResolutionSource.Inferred;
 
-        var principalObjectType = principalEnd.ResolvedApiObjectType;
-        if (principalEnd.ApiPrincipalKeyTypeName is null && principalObjectType is not null)
+        var principalObjectType = principalEnd.ApiResolvedObjectType;
+        if (principalObjectType is null)
+        {
+            // The principal end already recorded the unresolved object type issue.
+            return null;
+        }
+
+        if (principalEnd.ApiPrincipalKeyTypeName is not null)
+        {
+            principalKeyResolutionSource = ApiRelationshipPrincipalKeyResolutionSource.Explicit;
+            if (!principalObjectType.TryGetKeyTypeByApiName(principalEnd.ApiPrincipalKeyTypeName, out principalKeyType))
+            {
+                AddUnresolvedExplicitPrincipalKeyIssue(context, principalEnd, principalObjectType);
+                return null;
+            }
+        }
+        else
         {
             var matchingShapeKeys = principalObjectType.ApiKeyTypes
                 .Where(keyType => ApiSchemaHelpers.CountKeyLeaves(keyType) == keyPathCount)
@@ -56,10 +72,6 @@ internal static class ApiRelationshipKeyAlignment
             else if (matchingKeys.Count == 1)
             {
                 principalKeyType = matchingKeys[0].Value;
-                if (!ReferenceEquals(principalKeyType, principalEnd.ResolvedPrincipalKeyType))
-                {
-                    principalEnd.OverrideResolvedPrincipalKeyType(principalKeyType);
-                }
             }
             else if (matchingShapeKeys.Count > 0)
             {
@@ -98,14 +110,13 @@ internal static class ApiRelationshipKeyAlignment
 
         if (principalKeyType is null)
         {
-            // Explicit principal key resolution failed, or inference could not run because the principal
-            // object type failed to resolve. The owning element already recorded the relevant issue.
-            return;
+            // Inference failed and the relevant issue was already recorded.
+            return null;
         }
 
         if (!runCountCheck)
         {
-            return;
+            return null;
         }
 
         var keyTypePathCount = ApiSchemaHelpers.CountKeyLeaves(principalKeyType);
@@ -122,7 +133,7 @@ internal static class ApiRelationshipKeyAlignment
                 principalCountLabel,
                 countMismatchRemediationTarget
             );
-            return;
+            return null;
         }
 
         if (ApiSchemaHelpers.TryAreKeyTypesCompatible(principalKeyType, foreignKeyType, out var compatible) && !compatible)
@@ -137,11 +148,41 @@ internal static class ApiRelationshipKeyAlignment
                 principalCompatibilityLabel,
                 compatibilityRemediation
             );
+
+            return null;
         }
+
+        return new ApiRelationshipKeyBinding
+        (
+            principalEnd,
+            principalKeyType,
+            foreignKeyType,
+            principalKeyResolutionSource
+        );
     }
     #endregion
 
     #region Implementation Methods
+    private static void AddUnresolvedExplicitPrincipalKeyIssue
+    (
+        ApiInitializationContext context,
+        ApiRelationshipPrincipalEnd principalEnd,
+        ApiObjectType principalObjectType
+    )
+    {
+        var availableKeyTypes = string.Join(", ", principalObjectType.GetKeyTypeApiNames().Select(static k => $"'{k}'"));
+        var remediation = !string.IsNullOrEmpty(availableKeyTypes)
+            ? $"Use one of the available key types: {availableKeyTypes}"
+            : $"Define a key type on '{principalObjectType.ApiName}' or remove {nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyTypeName)}";
+
+        var path = principalEnd.ApiPath;
+        var severity = ApiInitializationSeverity.Error;
+        var code = ApiInitializationCode.API_RELATIONSHIP_END_UNRESOLVED_KEY_TYPE;
+        var description = $"Referenced principal key type '{principalEnd.ApiPrincipalKeyTypeName}' could not be found on object type '{principalObjectType.ApiName}'";
+
+        context.AddIssue(path, severity, code, description, remediation);
+    }
+
     private static void AddAmbiguousPrincipalKeyIssue
     (
         ApiInitializationContext context,

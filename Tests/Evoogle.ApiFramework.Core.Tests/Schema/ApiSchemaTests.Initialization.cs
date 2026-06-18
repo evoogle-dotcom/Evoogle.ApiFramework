@@ -2300,7 +2300,14 @@ public partial class ApiSchemaTests
                             ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Core.Tests"",
                             ""ApiPrincipalKeyTypeName"": ""NonExistentKeyType""
                         },
-                        ""ApiDependentEnd"": { ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Core.Tests"" }
+                        ""ApiDependentEnd"": {
+                            ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Core.Tests"",
+                            ""ApiForeignKeyType"": {
+                                ""ApiKeyPaths"": [
+                                    { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Core.Tests"", ""ApiSegments"": [ { ""ClrPropertyName"": ""PrincipalId"" } ] }
+                                ]
+                            }
+                        }
                     }
                 ]
             }",
@@ -2314,6 +2321,67 @@ public partial class ApiSchemaTests
                     code: ApiInitializationCode.API_RELATIONSHIP_END_UNRESOLVED_KEY_TYPE,
                     description: "Referenced principal key type 'NonExistentKeyType' could not be found on object type 'RelPrincipal'",
                     remediation: "Use one of the available key types: 'Id'"
+                ),
+            ]
+        },
+
+        // ApiRelationshipOneTo throws if principal key type is named on a navigational relationship
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiRelationshipOneTo)} Throws If {nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyTypeName)} Is Supplied Without Foreign Key",
+            SourceJson = @"
+            {
+                ""ApiName"": ""ApiRelationshipOneTo Throws If Principal Key Name Is Supplied Without Foreign Key"",
+                ""ApiScalarTypes"": [
+                    { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"", ""ClrType"": ""System.Int32, System.Private.CoreLib"" }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""RelPrincipal"",
+                        ""ApiProperties"": [
+                            { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
+                        ],
+                        ""ApiKeyTypes"": [
+                            {
+                                ""ApiName"": ""Id"",
+                                ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Core.Tests"", ""ApiSegments"": [ { ""ClrPropertyName"": ""Id"" } ] } ]
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Core.Tests""
+                    },
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""RelDependent"",
+                        ""ApiProperties"": [
+                            { ""ApiName"": ""PrincipalId"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""PrincipalId"", ""ClrMemberKind"": ""Property"" }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ],
+                ""ApiRelationships"": [
+                    {
+                        ""ApiKind"": ""OneToMany"",
+                        ""ApiName"": ""TestRel"",
+                        ""ApiPrincipalEnd"": {
+                            ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Core.Tests"",
+                            ""ApiPrincipalKeyTypeName"": ""Id""
+                        },
+                        ""ApiDependentEnd"": { ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Core.Tests"" }
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    path: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"]",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.API_RELATIONSHIP_END_PRINCIPAL_KEY_WITHOUT_FOREIGN_KEY,
+                    description: $"Cannot resolve {nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyTypeName)} 'Id' because this relationship has no foreign key binding",
+                    remediation: $"Declare {nameof(ApiRelationshipOneTo.ApiDependentEnd)}.{nameof(ApiRelationshipDependentEnd.ApiForeignKeyType)} or remove {nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyTypeName)}"
                 ),
             ]
         },
@@ -3162,6 +3230,240 @@ public partial class ApiSchemaTests
     [Theory]
     [MemberData(nameof(InitializeWarnsTheoryData))]
     public void InitializeWarns(IXUnitTest test) => test.Execute(this);
+
+    [Fact]
+    public void InitializeResolvesExplicitOneToKeyBindingOnRelationship()
+    {
+        var intType = new ApiScalarType(nameof(Int32), typeof(int));
+        var stringType = new ApiScalarType(nameof(String), typeof(string));
+
+        var principalObjectType = new ApiObjectType(
+            apiName: nameof(DuplicateKeyTypeApiNameType),
+            apiOptions: null,
+            apiProperties:
+            [
+                new ApiProperty(nameof(DuplicateKeyTypeApiNameType.Id), ApiTypeExpression.ClrRef<int>(), ApiTypeModifiers.Required, nameof(DuplicateKeyTypeApiNameType.Id), ClrMemberKind.Property),
+                new ApiProperty(nameof(DuplicateKeyTypeApiNameType.ExternalCode), ApiTypeExpression.ClrRef<string>(), ApiTypeModifiers.Required, nameof(DuplicateKeyTypeApiNameType.ExternalCode), ClrMemberKind.Property)
+            ],
+            apiKeyTypes:
+            [
+                new ApiKeyType("PK_Id", [new ApiKeyPath(typeof(DuplicateKeyTypeApiNameType), [new ApiKeyPathSegment(nameof(DuplicateKeyTypeApiNameType.Id))])]),
+                new ApiKeyType("AK_ExternalCode", [new ApiKeyPath(typeof(DuplicateKeyTypeApiNameType), [new ApiKeyPathSegment(nameof(DuplicateKeyTypeApiNameType.ExternalCode))])])
+            ],
+            clrObjectType: typeof(DuplicateKeyTypeApiNameType));
+
+        var dependentObjectType = new ApiObjectType(
+            apiName: nameof(RelDependentType),
+            apiOptions: null,
+            apiProperties:
+            [
+                new ApiProperty(nameof(RelDependentType.PrincipalCode), ApiTypeExpression.ClrRef<string>(), ApiTypeModifiers.Required, nameof(RelDependentType.PrincipalCode), ClrMemberKind.Property)
+            ],
+            apiKeyTypes: Array.Empty<ApiKeyType>(),
+            clrObjectType: typeof(RelDependentType));
+
+        var relationship = new ApiRelationshipOneToMany(
+            apiName: "TestRel",
+            apiPrincipalEnd: new ApiRelationshipPrincipalEnd(typeof(DuplicateKeyTypeApiNameType), "AK_ExternalCode"),
+            apiDependentEnd: new ApiRelationshipDependentEnd(
+                typeof(RelDependentType),
+                new ApiKeyType([new ApiKeyPath(typeof(RelDependentType), [new ApiKeyPathSegment(nameof(RelDependentType.PrincipalCode))])])));
+
+        ApiSchema.Create
+        (
+            apiName: "ExplicitRelationshipKeySchema",
+            apiVersion: null,
+            apiOptions: null,
+            apiScalarTypes: [intType, stringType],
+            apiEnumTypes: [],
+            apiObjectTypes: [principalObjectType, dependentObjectType],
+            apiRelationships: [relationship]
+        );
+
+        Assert.False(relationship.IsNavigational);
+        Assert.True(relationship.HasKeyBinding);
+        Assert.Equal("AK_ExternalCode", relationship.ApiKeyBinding.ApiPrincipalKeyTypeName);
+        Assert.Equal(ApiRelationshipPrincipalKeyResolutionSource.Explicit, relationship.ApiKeyBinding.ApiPrincipalKeyResolutionSource);
+        Assert.Same(relationship.ApiPrincipalEnd, relationship.ApiKeyBinding.ApiPrincipalEnd);
+        Assert.Same(relationship.ApiDependentEnd.ApiForeignKeyType, relationship.ApiKeyBinding.ApiForeignKeyType);
+    }
+
+    [Fact]
+    public void InitializeInfersOneToKeyBindingOnRelationship()
+    {
+        var intType = new ApiScalarType(nameof(Int32), typeof(int));
+        var stringType = new ApiScalarType(nameof(String), typeof(string));
+
+        var principalObjectType = new ApiObjectType(
+            apiName: nameof(DuplicateKeyTypeApiNameType),
+            apiOptions: null,
+            apiProperties:
+            [
+                new ApiProperty(nameof(DuplicateKeyTypeApiNameType.Id), ApiTypeExpression.ClrRef<int>(), ApiTypeModifiers.Required, nameof(DuplicateKeyTypeApiNameType.Id), ClrMemberKind.Property),
+                new ApiProperty(nameof(DuplicateKeyTypeApiNameType.ExternalCode), ApiTypeExpression.ClrRef<string>(), ApiTypeModifiers.Required, nameof(DuplicateKeyTypeApiNameType.ExternalCode), ClrMemberKind.Property)
+            ],
+            apiKeyTypes:
+            [
+                new ApiKeyType("PK_Id", [new ApiKeyPath(typeof(DuplicateKeyTypeApiNameType), [new ApiKeyPathSegment(nameof(DuplicateKeyTypeApiNameType.Id))])]),
+                new ApiKeyType("AK_ExternalCode", [new ApiKeyPath(typeof(DuplicateKeyTypeApiNameType), [new ApiKeyPathSegment(nameof(DuplicateKeyTypeApiNameType.ExternalCode))])])
+            ],
+            clrObjectType: typeof(DuplicateKeyTypeApiNameType));
+
+        var dependentObjectType = new ApiObjectType(
+            apiName: nameof(RelDependentType),
+            apiOptions: null,
+            apiProperties:
+            [
+                new ApiProperty(nameof(RelDependentType.PrincipalCode), ApiTypeExpression.ClrRef<string>(), ApiTypeModifiers.Required, nameof(RelDependentType.PrincipalCode), ClrMemberKind.Property)
+            ],
+            apiKeyTypes: Array.Empty<ApiKeyType>(),
+            clrObjectType: typeof(RelDependentType));
+
+        var relationship = new ApiRelationshipOneToMany(
+            apiName: "TestRel",
+            apiPrincipalEnd: new ApiRelationshipPrincipalEnd(typeof(DuplicateKeyTypeApiNameType)),
+            apiDependentEnd: new ApiRelationshipDependentEnd(
+                typeof(RelDependentType),
+                new ApiKeyType([new ApiKeyPath(typeof(RelDependentType), [new ApiKeyPathSegment(nameof(RelDependentType.PrincipalCode))])])));
+
+        ApiSchema.Create
+        (
+            apiName: "RelationshipKeyInferenceSchema",
+            apiVersion: null,
+            apiOptions: null,
+            apiScalarTypes: [intType, stringType],
+            apiEnumTypes: [],
+            apiObjectTypes: [principalObjectType, dependentObjectType],
+            apiRelationships: [relationship]
+        );
+
+        Assert.False(relationship.IsNavigational);
+        Assert.True(relationship.HasKeyBinding);
+        Assert.Equal("AK_ExternalCode", relationship.ApiKeyBinding.ApiPrincipalKeyTypeName);
+        Assert.Equal(ApiRelationshipPrincipalKeyResolutionSource.Inferred, relationship.ApiKeyBinding.ApiPrincipalKeyResolutionSource);
+    }
+
+    [Fact]
+    public void InitializeLeavesNavigationalOneToRelationshipWithoutKeyBinding()
+    {
+        var intType = new ApiScalarType(nameof(Int32), typeof(int));
+
+        var principalObjectType = new ApiObjectType(
+            apiName: nameof(RelPrincipalType),
+            apiOptions: null,
+            apiProperties:
+            [
+                new ApiProperty(nameof(RelPrincipalType.Id), ApiTypeExpression.ClrRef<int>(), ApiTypeModifiers.Required, nameof(RelPrincipalType.Id), ClrMemberKind.Property)
+            ],
+            apiKeyTypes:
+            [
+                new ApiKeyType("Id", [new ApiKeyPath(typeof(RelPrincipalType), [new ApiKeyPathSegment(nameof(RelPrincipalType.Id))])])
+            ],
+            clrObjectType: typeof(RelPrincipalType));
+
+        var dependentObjectType = new ApiObjectType(
+            apiName: nameof(RelDependentType),
+            apiOptions: null,
+            apiProperties:
+            [
+                new ApiProperty(nameof(RelDependentType.PrincipalId), ApiTypeExpression.ClrRef<int>(), ApiTypeModifiers.Required, nameof(RelDependentType.PrincipalId), ClrMemberKind.Property)
+            ],
+            apiKeyTypes: Array.Empty<ApiKeyType>(),
+            clrObjectType: typeof(RelDependentType));
+
+        var relationship = new ApiRelationshipOneToMany(
+            apiName: "TestRel",
+            apiPrincipalEnd: new ApiRelationshipPrincipalEnd(typeof(RelPrincipalType)),
+            apiDependentEnd: new ApiRelationshipDependentEnd(typeof(RelDependentType)));
+
+        ApiSchema.Create
+        (
+            apiName: "NavigationalRelationshipSchema",
+            apiVersion: null,
+            apiOptions: null,
+            apiScalarTypes: [intType],
+            apiEnumTypes: [],
+            apiObjectTypes: [principalObjectType, dependentObjectType],
+            apiRelationships: [relationship]
+        );
+
+        Assert.True(relationship.IsNavigational);
+        Assert.False(relationship.HasKeyBinding);
+        Assert.Throws<ApiSchemaException>(() => relationship.ApiKeyBinding);
+    }
+
+    [Fact]
+    public void InitializeInfersManyToManyKeyBindingsIndependently()
+    {
+        var intType = new ApiScalarType(nameof(Int32), typeof(int));
+        var stringType = new ApiScalarType(nameof(String), typeof(string));
+
+        var principalAObjectType = new ApiObjectType(
+            apiName: nameof(DuplicateKeyTypeApiNameType),
+            apiOptions: null,
+            apiProperties:
+            [
+                new ApiProperty(nameof(DuplicateKeyTypeApiNameType.Id), ApiTypeExpression.ClrRef<int>(), ApiTypeModifiers.Required, nameof(DuplicateKeyTypeApiNameType.Id), ClrMemberKind.Property),
+                new ApiProperty(nameof(DuplicateKeyTypeApiNameType.ExternalCode), ApiTypeExpression.ClrRef<string>(), ApiTypeModifiers.Required, nameof(DuplicateKeyTypeApiNameType.ExternalCode), ClrMemberKind.Property)
+            ],
+            apiKeyTypes:
+            [
+                new ApiKeyType("PK_Id", [new ApiKeyPath(typeof(DuplicateKeyTypeApiNameType), [new ApiKeyPathSegment(nameof(DuplicateKeyTypeApiNameType.Id))])]),
+                new ApiKeyType("AK_ExternalCode", [new ApiKeyPath(typeof(DuplicateKeyTypeApiNameType), [new ApiKeyPathSegment(nameof(DuplicateKeyTypeApiNameType.ExternalCode))])])
+            ],
+            clrObjectType: typeof(DuplicateKeyTypeApiNameType));
+
+        var principalBObjectType = new ApiObjectType(
+            apiName: nameof(RelPrincipalBType),
+            apiOptions: null,
+            apiProperties:
+            [
+                new ApiProperty(nameof(RelPrincipalBType.Id), ApiTypeExpression.ClrRef<int>(), ApiTypeModifiers.Required, nameof(RelPrincipalBType.Id), ClrMemberKind.Property)
+            ],
+            apiKeyTypes:
+            [
+                new ApiKeyType("PK_BId", [new ApiKeyPath(typeof(RelPrincipalBType), [new ApiKeyPathSegment(nameof(RelPrincipalBType.Id))])])
+            ],
+            clrObjectType: typeof(RelPrincipalBType));
+
+        var associationObjectType = new ApiObjectType(
+            apiName: nameof(RelAssociationType),
+            apiOptions: null,
+            apiProperties:
+            [
+                new ApiProperty(nameof(RelAssociationType.PrincipalACode), ApiTypeExpression.ClrRef<string>(), ApiTypeModifiers.Required, nameof(RelAssociationType.PrincipalACode), ClrMemberKind.Property),
+                new ApiProperty(nameof(RelAssociationType.PrincipalBId), ApiTypeExpression.ClrRef<int>(), ApiTypeModifiers.Required, nameof(RelAssociationType.PrincipalBId), ClrMemberKind.Property)
+            ],
+            apiKeyTypes: Array.Empty<ApiKeyType>(),
+            clrObjectType: typeof(RelAssociationType));
+
+        var relationship = new ApiRelationshipManyToMany(
+            apiName: "TestRel",
+            apiPrincipalEndA: new ApiRelationshipPrincipalEnd(typeof(DuplicateKeyTypeApiNameType)),
+            apiPrincipalEndB: new ApiRelationshipPrincipalEnd(typeof(RelPrincipalBType)),
+            apiAssociation: new ApiRelationshipAssociation(
+                typeof(RelAssociationType),
+                new ApiKeyType([new ApiKeyPath(typeof(RelAssociationType), [new ApiKeyPathSegment(nameof(RelAssociationType.PrincipalACode))])]),
+                new ApiKeyType([new ApiKeyPath(typeof(RelAssociationType), [new ApiKeyPathSegment(nameof(RelAssociationType.PrincipalBId))])])));
+
+        ApiSchema.Create
+        (
+            apiName: "ManyToManyRelationshipKeyInferenceSchema",
+            apiVersion: null,
+            apiOptions: null,
+            apiScalarTypes: [intType, stringType],
+            apiEnumTypes: [],
+            apiObjectTypes: [principalAObjectType, principalBObjectType, associationObjectType],
+            apiRelationships: [relationship]
+        );
+
+        Assert.False(relationship.IsNavigational);
+        Assert.True(relationship.HasKeyBindings);
+        Assert.Equal("AK_ExternalCode", relationship.ApiKeyBindingA.ApiPrincipalKeyTypeName);
+        Assert.Equal("PK_BId", relationship.ApiKeyBindingB.ApiPrincipalKeyTypeName);
+        Assert.Equal(ApiRelationshipPrincipalKeyResolutionSource.Inferred, relationship.ApiKeyBindingA.ApiPrincipalKeyResolutionSource);
+        Assert.Equal(ApiRelationshipPrincipalKeyResolutionSource.Inferred, relationship.ApiKeyBindingB.ApiPrincipalKeyResolutionSource);
+    }
 
     // [Fact]
     // public void InitializeDoesNotThrowWhenKeyTypeNavigatesThroughAlphabeticallyLaterObjectType()

@@ -252,6 +252,11 @@ public enum ApiInitializationCode
     ///     The principal end's explicitly referenced principal key type could not be resolved.
     /// </summary>
     API_RELATIONSHIP_END_UNRESOLVED_KEY_TYPE,
+
+    /// <summary>
+    ///     A principal key type name was supplied for a navigational relationship that has no foreign key binding.
+    /// </summary>
+    API_RELATIONSHIP_END_PRINCIPAL_KEY_WITHOUT_FOREIGN_KEY,
     #endregion
 
     #region ApiRelationshipManyToMany Initialization Codes

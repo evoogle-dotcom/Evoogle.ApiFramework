@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -18,17 +18,16 @@ namespace Evoogle.ApiFramework.Schema;
 ///     The association identifies the join-table <see cref="ApiObjectType"/> whose properties hold key values
 ///     that link the two outer principal object types.
 ///
-///     An association is either <em>navigational</em> — where no foreign key binding is declared at the schema level —
-///     or <em>key-bound</em>, where <see cref="ApiForeignKeyTypeA"/> and <see cref="ApiForeignKeyTypeB"/> explicitly
-///     map the scalar leaves of each principal key type to properties on the association object type.
+///     An association may declare <see cref="ApiForeignKeyTypeA"/> and <see cref="ApiForeignKeyTypeB"/>
+///     to map the scalar leaves of each principal key type to properties on the association object type.
 /// </summary>
 /// <remarks>
-///     Use <see cref="HasForeignKeys"/> to determine which state applies before accessing
-///     <see cref="ApiForeignKeyTypeA"/> or <see cref="ApiForeignKeyTypeB"/>.
+///     Use <see cref="HasForeignKeys"/> before accessing <see cref="ApiForeignKeyTypeA"/> or
+///     <see cref="ApiForeignKeyTypeB"/>.
 ///
-///     The state is symmetric: both sides are either bound or navigational together.
+///     The state is symmetric: both sides are either declared together or omitted together.
 ///
-///     The state is fixed at construction and does not change after initialization.
+///     When no foreign keys are declared, the owning many-to-many relationship is navigational at the schema level.
 /// </remarks>
 [JsonConverter(typeof(ApiRelationshipAssociationJsonConverter))]
 public sealed class ApiRelationshipAssociation : ApiRelationshipElement
@@ -57,8 +56,7 @@ public sealed class ApiRelationshipAssociation : ApiRelationshipElement
     ///     to properties on the association object type.
     /// </summary>
     /// <exception cref="ApiSchemaException">
-    ///     Thrown when <see cref="IsNavigational"/> is <see langword="true"/>.
-    ///     Check <see cref="HasForeignKeys"/> before accessing this property.
+    ///     Thrown when <see cref="HasForeignKeys"/> is <see langword="false"/>.
     /// </exception>
     public ApiKeyType ApiForeignKeyTypeA => this.HasForeignKeys
         ? _apiForeignKeyTypeA!
@@ -69,8 +67,7 @@ public sealed class ApiRelationshipAssociation : ApiRelationshipElement
     ///     to properties on the association object type.
     /// </summary>
     /// <exception cref="ApiSchemaException">
-    ///     Thrown when <see cref="IsNavigational"/> is <see langword="true"/>.
-    ///     Check <see cref="HasForeignKeys"/> before accessing this property.
+    ///     Thrown when <see cref="HasForeignKeys"/> is <see langword="false"/>.
     /// </exception>
     public ApiKeyType ApiForeignKeyTypeB => this.HasForeignKeys
         ? _apiForeignKeyTypeB!
@@ -83,17 +80,11 @@ public sealed class ApiRelationshipAssociation : ApiRelationshipElement
     ///     When <see langword="true"/>, both <see cref="ApiForeignKeyTypeA"/> and <see cref="ApiForeignKeyTypeB"/> are available.
     /// </summary>
     public bool HasForeignKeys => _apiForeignKeyTypeA is not null && _apiForeignKeyTypeB is not null;
-
-    /// <summary>
-    ///     Gets a value indicating whether this association is navigational (i.e. has no explicit foreign keys
-    ///     declared at the schema level for either principal end).
-    /// </summary>
-    public bool IsNavigational => !this.HasForeignKeys;
     #endregion
 
     #region Constructors
     /// <summary>
-    ///     Initializes a navigational association with no foreign key binding declared at the schema level for either principal end.
+    ///     Initializes an association with no foreign key binding declared at the schema level for either principal end.
     ///     Use when the join-table object type needs to be identified but key property mapping
     ///     is intentionally left to the downstream layer.
     /// </summary>
@@ -172,9 +163,9 @@ public sealed class ApiRelationshipAssociation : ApiRelationshipElement
     #region Implementation Methods
     private void InitializeApiForeignKeyTypes(ApiInitializationContext context)
     {
-        if (this.IsNavigational)
+        if (!this.HasForeignKeys)
         {
-            // No foreign keys declared — purely navigational relationship.
+            // No foreign keys declared; the owning relationship is navigational.
             return;
         }
 

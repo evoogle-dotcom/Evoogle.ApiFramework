@@ -37,10 +37,14 @@ public static class ApiSchemaExcludeMembers
         // ApiRelationshipAssociation — cycle: assoc → relationship → assoc → ...
         new ExcludeMember(typeof(ApiRelationshipAssociation), nameof(ApiRelationshipAssociation.ApiRelationshipManyToMany)),
 
-        // ApiRelationshipPrincipalEnd — principal key type resolved during initialization
-        new ExcludeMember(typeof(ApiRelationshipPrincipalEnd), nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyType)),
+        // ApiRelationshipOneTo — ApiKeyBinding throws when IsNavigational (HasKeyBinding=false)
+        new ExcludeMember(typeof(ApiRelationshipOneTo), nameof(ApiRelationshipOneTo.ApiKeyBinding)),
 
-        // ApiRelationshipDependentEnd — ApiForeignKeyType throws when IsNavigational (HasForeignKey=false)
+        // ApiRelationshipManyToMany — ApiKeyBindingA/B throw when IsNavigational (HasKeyBindings=false)
+        new ExcludeMember(typeof(ApiRelationshipManyToMany), nameof(ApiRelationshipManyToMany.ApiKeyBindingA)),
+        new ExcludeMember(typeof(ApiRelationshipManyToMany), nameof(ApiRelationshipManyToMany.ApiKeyBindingB)),
+
+        // ApiRelationshipDependentEnd — ApiForeignKeyType throws when HasForeignKey=false
         new ExcludeMember(typeof(ApiRelationshipDependentEnd), nameof(ApiRelationshipDependentEnd.ApiForeignKeyType)),
 
         // ApiSchema - cycle: ApiSchema → ApiSchemaContext → ApiSchema → ...
@@ -81,7 +85,7 @@ public static class ApiSchemaExcludeMembers
         // ApiRelationshipElement — object type resolved during initialization
         new ExcludeMember(typeof(ApiRelationshipElement), nameof(ApiRelationshipElement.ApiObjectType)),
 
-        // ApiRelationshipDependentEnd — ApiForeignKeyType throws when IsNavigational (HasForeignKey=false)
+        // ApiRelationshipDependentEnd — ApiForeignKeyType throws when HasForeignKey=false
         new ExcludeMember(typeof(ApiRelationshipDependentEnd), nameof(ApiRelationshipDependentEnd.ApiForeignKeyType)),
 
         new ExcludeMember(typeof(ApiRelationshipElement), nameof(ApiRelationshipElement.ApiObjectType)),
@@ -92,8 +96,12 @@ public static class ApiSchemaExcludeMembers
         // ApiRelationshipAssociation — cycle: assoc → relationship → assoc → ...
         new ExcludeMember(typeof(ApiRelationshipAssociation), nameof(ApiRelationshipAssociation.ApiRelationshipManyToMany)),
 
-        // ApiRelationshipPrincipalEnd — principal key type resolved during initialization
-        new ExcludeMember(typeof(ApiRelationshipPrincipalEnd), nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyType)),
+        // ApiRelationshipOneTo — ApiKeyBinding throws when IsNavigational (HasKeyBinding=false)
+        new ExcludeMember(typeof(ApiRelationshipOneTo), nameof(ApiRelationshipOneTo.ApiKeyBinding)),
+
+        // ApiRelationshipManyToMany — ApiKeyBindingA/B throw when IsNavigational (HasKeyBindings=false)
+        new ExcludeMember(typeof(ApiRelationshipManyToMany), nameof(ApiRelationshipManyToMany.ApiKeyBindingA)),
+        new ExcludeMember(typeof(ApiRelationshipManyToMany), nameof(ApiRelationshipManyToMany.ApiKeyBindingB)),
 
         // Key path nodes — property and object type references resolved during initialization
         new ExcludeMember(typeof(ApiKeyPath), nameof(ApiKeyPath.ApiRootObjectType)),
