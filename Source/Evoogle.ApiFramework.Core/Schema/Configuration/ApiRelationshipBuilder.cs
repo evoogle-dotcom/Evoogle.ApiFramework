@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -24,6 +24,8 @@ public abstract class ApiRelationshipBuilder(string apiName, ApiRelationshipDele
     ///     Used when building the final <see cref="ApiRelationship"/> instance.
     /// </summary>
     protected ApiRelationshipDeleteBehavior _apiDeleteBehavior = apiDefaultDeleteBehavior;
+
+    private readonly string _apiName = ValidateApiName(apiName);
     #endregion
 
     #region AddExtension Methods
@@ -73,6 +75,14 @@ public abstract class ApiRelationshipBuilder(string apiName, ApiRelationshipDele
 
     #region Protected Helpers
     /// <summary>Gets the configured API name.</summary>
-    protected string ApiName => apiName;
+    protected string ApiName => _apiName;
+    #endregion
+
+    #region Implementation Methods
+    private static string ValidateApiName(string apiName)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
+        return apiName;
+    }
     #endregion
 }

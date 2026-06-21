@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -21,6 +21,7 @@ public static class ApiObjectTypeBuilderGenericExtensions
     public static ApiObjectTypeBuilder<T> AddKey<T, TScalar>(this ApiObjectTypeBuilder<T> builder, string apiName, Expression<Func<T, TScalar>> expression)
     {
         ArgumentNullException.ThrowIfNull(builder);
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
         ArgumentNullException.ThrowIfNull(expression);
 
         return builder.AddKey(apiName, b => b.AddPath(expression));
@@ -38,6 +39,7 @@ public static class ApiObjectTypeBuilderGenericExtensions
     )
     {
         ArgumentNullException.ThrowIfNull(builder);
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
         ArgumentNullException.ThrowIfNull(expression1);
         ArgumentNullException.ThrowIfNull(expression2);
 
@@ -59,6 +61,7 @@ public static class ApiObjectTypeBuilderGenericExtensions
     )
     {
         ArgumentNullException.ThrowIfNull(builder);
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
         ArgumentNullException.ThrowIfNull(expression1);
         ArgumentNullException.ThrowIfNull(expression2);
         ArgumentNullException.ThrowIfNull(expression3);
@@ -83,6 +86,7 @@ public static class ApiObjectTypeBuilderGenericExtensions
     )
     {
         ArgumentNullException.ThrowIfNull(builder);
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
         ArgumentNullException.ThrowIfNull(expression1);
         ArgumentNullException.ThrowIfNull(expression2);
         ArgumentNullException.ThrowIfNull(expression3);
@@ -101,6 +105,7 @@ public static class ApiObjectTypeBuilderGenericExtensions
     public static ApiObjectTypeBuilder AddKeyFrom<TRoot>(this ApiObjectTypeBuilder builder, string apiName, Expression<Func<TRoot, object?>> expression)
     {
         ArgumentNullException.ThrowIfNull(builder);
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
         ArgumentNullException.ThrowIfNull(expression);
 
         var clrPropertyNames = StaticReflection.GetMemberPath(expression);
@@ -113,6 +118,7 @@ public static class ApiObjectTypeBuilderGenericExtensions
     public static ApiObjectTypeBuilder<T> AddKeyFrom<T, TRoot>(this ApiObjectTypeBuilder<T> builder, string apiName, Expression<Func<TRoot, object?>> expression)
     {
         ArgumentNullException.ThrowIfNull(builder);
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
         ArgumentNullException.ThrowIfNull(expression);
 
         return builder.AddKey(apiName, b => b.AddPathFrom(expression));
@@ -131,6 +137,7 @@ public static class ApiObjectTypeBuilderGenericExtensions
     )
     {
         ArgumentNullException.ThrowIfNull(builder);
+        ArgumentNullException.ThrowIfNull(clrProperty);
 
         var clrName = StaticReflection.GetMemberName(clrProperty);
         builder.AddProperty(clrName, clrName, configure);
@@ -149,6 +156,8 @@ public static class ApiObjectTypeBuilderGenericExtensions
     )
     {
         ArgumentNullException.ThrowIfNull(builder);
+        ArgumentNullException.ThrowIfNull(clrProperty);
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
 
         var clrName = StaticReflection.GetMemberName(clrProperty);
         builder.AddProperty(apiName, clrName, configure);
@@ -168,6 +177,7 @@ public static class ApiObjectTypeBuilderGenericExtensions
     )
     {
         ArgumentNullException.ThrowIfNull(builder);
+        ArgumentNullException.ThrowIfNull(clrProperty);
 
         var clrName = StaticReflection.GetMemberName(clrProperty);
         builder.AddProperty(clrName, clrName, b => { b.AsRequired(); configure?.Invoke(b); });
@@ -187,6 +197,7 @@ public static class ApiObjectTypeBuilderGenericExtensions
     )
     {
         ArgumentNullException.ThrowIfNull(builder);
+        ArgumentNullException.ThrowIfNull(clrProperty);
 
         var clrName = StaticReflection.GetMemberName(clrProperty);
         builder.AddProperty(clrName, clrName, b => { b.AsOptional(); configure?.Invoke(b); });

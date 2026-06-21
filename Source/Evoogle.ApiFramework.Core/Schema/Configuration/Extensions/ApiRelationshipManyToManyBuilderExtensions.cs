@@ -20,7 +20,11 @@ public static class ApiRelationshipManyToManyBuilderExtensions
     /// <returns>The current builder instance.</returns>
     public static ApiRelationshipManyToManyBuilder AddRelationshipExtension<TExtension>(this ApiRelationshipManyToManyBuilder builder, TExtension extension)
         where TExtension : class
-        => builder.AddRelationshipExtension(typeof(TExtension), extension);
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+
+        return builder.AddRelationshipExtension(typeof(TExtension), extension);
+    }
     #endregion
 
     #region Between/And Methods
@@ -44,6 +48,7 @@ public static class ApiRelationshipManyToManyBuilderExtensions
     public static ApiRelationshipManyToManyBuilder Between<TPrincipal>(this ApiRelationshipManyToManyBuilder builder, string apiKeyTypeName)
     {
         ArgumentNullException.ThrowIfNull(builder);
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKeyTypeName, nameof(apiKeyTypeName));
 
         return builder.Between(typeof(TPrincipal), apiKeyTypeName);
     }
@@ -68,6 +73,7 @@ public static class ApiRelationshipManyToManyBuilderExtensions
     public static ApiRelationshipManyToManyBuilder And<TPrincipal>(this ApiRelationshipManyToManyBuilder builder, string apiKeyTypeName)
     {
         ArgumentNullException.ThrowIfNull(builder);
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKeyTypeName, nameof(apiKeyTypeName));
 
         return builder.And(typeof(TPrincipal), apiKeyTypeName);
     }

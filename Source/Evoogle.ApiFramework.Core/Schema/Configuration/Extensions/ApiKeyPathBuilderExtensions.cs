@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -19,5 +19,9 @@ public static class ApiKeyPathBuilderExtensions
     /// <returns>The current builder instance.</returns>
     public static ApiKeyPathBuilder AddKeyPathExtension<TExtension>(this ApiKeyPathBuilder builder, TExtension extension)
         where TExtension : class
-        => builder.AddKeyPathExtension(typeof(TExtension), extension);
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+
+        return builder.AddKeyPathExtension(typeof(TExtension), extension);
+    }
 }

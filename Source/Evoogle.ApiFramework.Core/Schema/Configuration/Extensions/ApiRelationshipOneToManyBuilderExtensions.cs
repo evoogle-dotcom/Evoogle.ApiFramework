@@ -20,7 +20,11 @@ public static class ApiRelationshipOneToManyBuilderExtensions
     /// <returns>The current builder instance.</returns>
     public static ApiRelationshipOneToManyBuilder AddRelationshipExtension<TExtension>(this ApiRelationshipOneToManyBuilder builder, TExtension extension)
         where TExtension : class
-        => builder.AddRelationshipExtension(typeof(TExtension), extension);
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+
+        return builder.AddRelationshipExtension(typeof(TExtension), extension);
+    }
     #endregion
 
     #region From/To Methods
@@ -44,6 +48,7 @@ public static class ApiRelationshipOneToManyBuilderExtensions
     public static ApiRelationshipOneToManyBuilder From<TPrincipal>(this ApiRelationshipOneToManyBuilder builder, string apiKeyTypeName)
     {
         ArgumentNullException.ThrowIfNull(builder);
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKeyTypeName, nameof(apiKeyTypeName));
 
         return builder.From(typeof(TPrincipal), apiKeyTypeName);
     }

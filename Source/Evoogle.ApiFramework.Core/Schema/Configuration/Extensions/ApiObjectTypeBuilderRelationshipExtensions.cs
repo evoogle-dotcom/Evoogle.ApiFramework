@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -20,6 +20,7 @@ public static class ApiObjectTypeBuilderRelationshipExtensions
     /// <returns>The current builder instance.</returns>
     public static ApiObjectTypeBuilder AddOneToOneRelationship(this ApiObjectTypeBuilder builder, string apiName, Action<ApiRelationshipOneToOneBuilder> configure)
     {
+        ArgumentNullException.ThrowIfNull(builder);
         ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
         ArgumentNullException.ThrowIfNull(configure);
 
@@ -55,6 +56,7 @@ public static class ApiObjectTypeBuilderRelationshipExtensions
     /// <returns>The current builder instance.</returns>
     public static ApiObjectTypeBuilder AddOneToOneRelationship(this ApiObjectTypeBuilder builder, string apiName, IApiRelationshipOneToOneConfiguration configuration)
     {
+        ArgumentNullException.ThrowIfNull(builder);
         ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
         ArgumentNullException.ThrowIfNull(configuration);
 
@@ -92,6 +94,7 @@ public static class ApiObjectTypeBuilderRelationshipExtensions
     /// <returns>The current builder instance.</returns>
     public static ApiObjectTypeBuilder AddOneToManyRelationship(this ApiObjectTypeBuilder builder, string apiName, Action<ApiRelationshipOneToManyBuilder> configure)
     {
+        ArgumentNullException.ThrowIfNull(builder);
         ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
         ArgumentNullException.ThrowIfNull(configure);
 
@@ -127,6 +130,7 @@ public static class ApiObjectTypeBuilderRelationshipExtensions
     /// <returns>The current builder instance.</returns>
     public static ApiObjectTypeBuilder AddOneToManyRelationship(this ApiObjectTypeBuilder builder, string apiName, IApiRelationshipOneToManyConfiguration configuration)
     {
+        ArgumentNullException.ThrowIfNull(builder);
         ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
         ArgumentNullException.ThrowIfNull(configuration);
 
@@ -164,6 +168,7 @@ public static class ApiObjectTypeBuilderRelationshipExtensions
     /// <returns>The current builder instance.</returns>
     public static ApiObjectTypeBuilder AddManyToManyRelationship(this ApiObjectTypeBuilder builder, string apiName, Action<ApiRelationshipManyToManyBuilder> configure)
     {
+        ArgumentNullException.ThrowIfNull(builder);
         ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
         ArgumentNullException.ThrowIfNull(configure);
 
@@ -199,6 +204,7 @@ public static class ApiObjectTypeBuilderRelationshipExtensions
     /// <returns>The current builder instance.</returns>
     public static ApiObjectTypeBuilder AddManyToManyRelationship(this ApiObjectTypeBuilder builder, string apiName, IApiRelationshipManyToManyConfiguration configuration)
     {
+        ArgumentNullException.ThrowIfNull(builder);
         ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
         ArgumentNullException.ThrowIfNull(configuration);
 

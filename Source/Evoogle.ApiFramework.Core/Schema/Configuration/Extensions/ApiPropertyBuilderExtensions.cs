@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -19,7 +19,11 @@ public static class ApiPropertyBuilderExtensions
     /// <returns>The current builder instance.</returns>
     public static ApiPropertyBuilder AddPropertyExtension<TExtension>(this ApiPropertyBuilder builder, TExtension extension)
         where TExtension : class
-        => builder.AddPropertyExtension(typeof(TExtension), extension);
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+
+        return builder.AddPropertyExtension(typeof(TExtension), extension);
+    }
 
     /// <summary>
     ///     Marks this property as required, overriding any nullability-inferred modifier.
@@ -27,7 +31,11 @@ public static class ApiPropertyBuilderExtensions
     /// <param name="builder">The property builder to configure.</param>
     /// <returns>The current builder instance.</returns>
     public static ApiPropertyBuilder AsRequired(this ApiPropertyBuilder builder)
-        => builder.WithModifiers(m => m.Required());
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+
+        return builder.WithModifiers(m => m.Required());
+    }
 
     /// <summary>
     ///     Marks this property as optional, overriding any nullability-inferred modifier.
@@ -35,5 +43,9 @@ public static class ApiPropertyBuilderExtensions
     /// <param name="builder">The property builder to configure.</param>
     /// <returns>The current builder instance.</returns>
     public static ApiPropertyBuilder AsOptional(this ApiPropertyBuilder builder)
-        => builder.WithModifiers(m => m.Optional());
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+
+        return builder.WithModifiers(m => m.Optional());
+    }
 }

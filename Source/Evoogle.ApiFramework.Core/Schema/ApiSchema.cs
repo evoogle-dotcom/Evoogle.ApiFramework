@@ -628,7 +628,14 @@ public sealed class ApiSchema : ExtensibleBase
 
             association.SetRelationship(relationship);
 
-            if (!this.TryGetObjectTypeByClrType(association.ClrObjectType, out var apiObjectType))
+            var clrObjectType = association.ClrObjectType;
+            if (clrObjectType is null)
+            {
+                // Already reported as API_RELATIONSHIP_ELEMENT_NULL_CLR_OBJECT_TYPE (Error).
+                return;
+            }
+
+            if (!this.TryGetObjectTypeByClrType(clrObjectType, out var apiObjectType))
             {
                 // Already reported as API_RELATIONSHIP_ELEMENT_UNRESOLVED_OBJECT_TYPE (Error).
                 return;
@@ -643,6 +650,5 @@ public sealed class ApiSchema : ExtensibleBase
             list.Add(association);
         }
     }
-
     #endregion
 }

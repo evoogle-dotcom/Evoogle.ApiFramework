@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -19,5 +19,9 @@ public static class ApiRelationshipPrincipalEndBuilderExtensions
     /// <returns>The current builder instance.</returns>
     public static ApiRelationshipPrincipalEndBuilder AddRelationshipPrincipalEndExtension<TExtension>(this ApiRelationshipPrincipalEndBuilder builder, TExtension extension)
         where TExtension : class
-        => builder.AddRelationshipPrincipalEndExtension(typeof(TExtension), extension);
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+
+        return builder.AddRelationshipPrincipalEndExtension(typeof(TExtension), extension);
+    }
 }

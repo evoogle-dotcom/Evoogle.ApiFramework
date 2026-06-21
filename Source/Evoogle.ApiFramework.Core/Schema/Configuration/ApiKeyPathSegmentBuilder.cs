@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -35,7 +35,11 @@ public class ApiKeyPathSegmentBuilder : ExtensionBuilder<ApiKeyPathSegmentBuilde
     /// <returns>A new <see cref="ApiKeyPathSegmentBuilder"/> for the specified property name.</returns>
     /// <exception cref="ArgumentException">Thrown when <paramref name="clrPropertyName"/> is <c>null</c>, empty, or whitespace.</exception>
     public static ApiKeyPathSegmentBuilder For(string clrPropertyName)
-        => new(clrPropertyName);
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(clrPropertyName);
+
+        return new(clrPropertyName);
+    }
     #endregion
 
     #region AddExtension Methods
@@ -47,8 +51,7 @@ public class ApiKeyPathSegmentBuilder : ExtensionBuilder<ApiKeyPathSegmentBuilde
     /// <returns>The current builder instance.</returns>
     public ApiKeyPathSegmentBuilder AddKeyPathSegmentExtension(Type type, object extension)
     {
-        base.AddExtension(type, extension);
-        return this;
+        return this.AddExtension(type, extension);
     }
     #endregion
 

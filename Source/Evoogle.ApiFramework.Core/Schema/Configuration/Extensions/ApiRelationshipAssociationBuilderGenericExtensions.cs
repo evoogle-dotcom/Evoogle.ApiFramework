@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -22,7 +22,11 @@ public static class ApiRelationshipAssociationBuilderGenericExtensions
     /// <returns>The current builder instance.</returns>
     public static ApiRelationshipAssociationBuilder AddRelationshipAssociationExtension<TExtension>(this ApiRelationshipAssociationBuilder builder, TExtension extension)
         where TExtension : class
-        => builder.AddRelationshipAssociationExtension(typeof(TExtension), extension);
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+
+        return builder.AddRelationshipAssociationExtension(typeof(TExtension), extension);
+    }
 
     /// <summary>
     ///     Adds an association extension value keyed by its own type.
@@ -38,7 +42,11 @@ public static class ApiRelationshipAssociationBuilderGenericExtensions
         TExtension extension
     )
         where TExtension : class
-        => builder.AddRelationshipAssociationExtension(typeof(TExtension), extension);
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+
+        return builder.AddRelationshipAssociationExtension(typeof(TExtension), extension);
+    }
     #endregion
 
     #region WithForeignKey Methods

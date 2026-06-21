@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -26,8 +26,7 @@ public class ApiEnumTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     /// <returns>The current builder instance.</returns>
     public ApiEnumTypeBuilder AddEnumTypeExtension(Type type, object extension)
     {
-        base.AddExtension(type, extension);
-        return this;
+        return this.AddExtension(type, extension);
     }
     #endregion
 
@@ -41,6 +40,9 @@ public class ApiEnumTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     /// <returns>The current builder instance.</returns>
     public ApiEnumTypeBuilder AddValue(string apiName, string clrName, int clrOrdinal)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
+        ArgumentException.ThrowIfNullOrWhiteSpace(clrName, nameof(clrName));
+
         _values.Add(new ApiEnumValue(apiName, clrName, clrOrdinal));
         return this;
     }

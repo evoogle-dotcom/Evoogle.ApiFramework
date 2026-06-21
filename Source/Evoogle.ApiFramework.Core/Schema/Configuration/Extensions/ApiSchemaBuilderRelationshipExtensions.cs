@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -24,6 +24,7 @@ public static class ApiSchemaBuilderRelationshipExtensions
     )
     {
         ArgumentNullException.ThrowIfNull(builder);
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
 
         return builder.AddOneToOneRelationship(apiName, r => r
             .From<TPrincipal>()
@@ -41,6 +42,7 @@ public static class ApiSchemaBuilderRelationshipExtensions
     )
     {
         ArgumentNullException.ThrowIfNull(builder);
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
         ArgumentNullException.ThrowIfNull(fk);
 
         return builder.AddOneToOneRelationship<TPrincipal, TDependent>(apiName, d => d.WithForeignKey(fk));
@@ -59,6 +61,7 @@ public static class ApiSchemaBuilderRelationshipExtensions
     )
     {
         ArgumentNullException.ThrowIfNull(builder);
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
 
         return builder.AddOneToManyRelationship(apiName, r => r
             .From<TPrincipal>()
@@ -76,6 +79,7 @@ public static class ApiSchemaBuilderRelationshipExtensions
     )
     {
         ArgumentNullException.ThrowIfNull(builder);
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
         ArgumentNullException.ThrowIfNull(fk);
 
         return builder.AddOneToManyRelationship<TPrincipal, TDependent>(apiName, d => d.WithForeignKey(fk));
@@ -95,6 +99,7 @@ public static class ApiSchemaBuilderRelationshipExtensions
     )
     {
         ArgumentNullException.ThrowIfNull(builder);
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
         ArgumentNullException.ThrowIfNull(fkA);
         ArgumentNullException.ThrowIfNull(fkB);
 

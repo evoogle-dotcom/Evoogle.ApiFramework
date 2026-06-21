@@ -44,6 +44,8 @@ public sealed class ApiRelationshipOneToOneBuilder(string apiName)
     /// <returns>The current builder instance.</returns>
     public ApiRelationshipOneToOneBuilder From(Type clrPrincipalType, Action<ApiRelationshipPrincipalEndBuilder>? configure = null)
     {
+        ArgumentNullException.ThrowIfNull(clrPrincipalType);
+
         var builder = new ApiRelationshipPrincipalEndBuilder(clrPrincipalType);
         configure?.Invoke(builder);
         _principalEndBuilder = builder;
@@ -59,6 +61,9 @@ public sealed class ApiRelationshipOneToOneBuilder(string apiName)
     /// <returns>The current builder instance.</returns>
     public ApiRelationshipOneToOneBuilder From(Type clrPrincipalType, string apiKeyTypeName)
     {
+        ArgumentNullException.ThrowIfNull(clrPrincipalType);
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKeyTypeName, nameof(apiKeyTypeName));
+
         var builder = new ApiRelationshipPrincipalEndBuilder(clrPrincipalType);
         builder.WithPrincipalKey(apiKeyTypeName);
         _principalEndBuilder = builder;
@@ -73,6 +78,8 @@ public sealed class ApiRelationshipOneToOneBuilder(string apiName)
     /// <returns>The current builder instance.</returns>
     public ApiRelationshipOneToOneBuilder To(Type clrDependentType, Action<ApiRelationshipDependentEndBuilder>? configure = null)
     {
+        ArgumentNullException.ThrowIfNull(clrDependentType);
+
         var builder = new ApiRelationshipDependentEndBuilder(clrDependentType);
         configure?.Invoke(builder);
         _dependentEndBuilder = builder;

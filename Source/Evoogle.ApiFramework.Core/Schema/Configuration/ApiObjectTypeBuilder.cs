@@ -28,8 +28,7 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     /// <returns>The current builder instance.</returns>
     public ApiObjectTypeBuilder AddObjectTypeExtension(Type type, object extension)
     {
-        base.AddExtension(type, extension);
-        return this;
+        return this.AddExtension(type, extension);
     }
     #endregion
 

@@ -43,6 +43,8 @@ public sealed class ApiObjectTypeBuilder<T>(ApiSchemaBuilderContext context)
     /// <returns>The current builder instance.</returns>
     public ApiObjectTypeBuilder<T> AddKey(string apiName, Action<ApiKeyTypeBuilder<T>>? configure = null)
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
+
         var apiKeyTypeBuilder = new ApiKeyTypeBuilder<T>(apiName);
         configure?.Invoke(apiKeyTypeBuilder);
         base.AddKeyTypeBuilderCore(apiKeyTypeBuilder);

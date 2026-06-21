@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -17,7 +17,7 @@ public abstract class ApiNamedTypeBuilder<TBuilder>(Type clrType, ApiSchemaBuild
     where TBuilder : ApiNamedTypeBuilder<TBuilder>
 {
     #region Fields
-    private string _apiName = clrType.SafeToName();
+    private string _apiName = ValidateClrType(clrType).SafeToName();
     #endregion
 
     #region Properties
@@ -29,7 +29,7 @@ public abstract class ApiNamedTypeBuilder<TBuilder>(Type clrType, ApiSchemaBuild
     /// <summary>
     ///     Gets the CLR type represented by this builder.
     /// </summary>
-    internal Type ClrType { get; } = clrType;
+    internal Type ClrType { get; } = ValidateClrType(clrType);
 
     /// <summary>
     ///     Gets the shared builder context.
@@ -49,6 +49,14 @@ public abstract class ApiNamedTypeBuilder<TBuilder>(Type clrType, ApiSchemaBuild
 
         _apiName = apiName;
         return (TBuilder)this;
+    }
+    #endregion
+
+    #region Implementation Methods
+    private static Type ValidateClrType(Type clrType)
+    {
+        ArgumentNullException.ThrowIfNull(clrType);
+        return clrType;
     }
     #endregion
 }

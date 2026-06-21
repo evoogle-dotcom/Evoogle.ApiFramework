@@ -47,6 +47,8 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
     /// <returns>The current builder instance.</returns>
     public ApiRelationshipManyToManyBuilder Between(Type clrPrincipalType, Action<ApiRelationshipPrincipalEndBuilder>? configure = null)
     {
+        ArgumentNullException.ThrowIfNull(clrPrincipalType);
+
         var builder = new ApiRelationshipPrincipalEndBuilder(clrPrincipalType);
         configure?.Invoke(builder);
         _principalEndABuilder = builder;
@@ -62,6 +64,9 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
     /// <returns>The current builder instance.</returns>
     public ApiRelationshipManyToManyBuilder Between(Type clrPrincipalType, string apiKeyTypeName)
     {
+        ArgumentNullException.ThrowIfNull(clrPrincipalType);
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKeyTypeName, nameof(apiKeyTypeName));
+
         var builder = new ApiRelationshipPrincipalEndBuilder(clrPrincipalType);
         builder.WithPrincipalKey(apiKeyTypeName);
         _principalEndABuilder = builder;
@@ -76,6 +81,8 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
     /// <returns>The current builder instance.</returns>
     public ApiRelationshipManyToManyBuilder And(Type clrPrincipalType, Action<ApiRelationshipPrincipalEndBuilder>? configure = null)
     {
+        ArgumentNullException.ThrowIfNull(clrPrincipalType);
+
         var builder = new ApiRelationshipPrincipalEndBuilder(clrPrincipalType);
         configure?.Invoke(builder);
         _principalEndBBuilder = builder;
@@ -91,6 +98,9 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
     /// <returns>The current builder instance.</returns>
     public ApiRelationshipManyToManyBuilder And(Type clrPrincipalType, string apiKeyTypeName)
     {
+        ArgumentNullException.ThrowIfNull(clrPrincipalType);
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKeyTypeName, nameof(apiKeyTypeName));
+
         var builder = new ApiRelationshipPrincipalEndBuilder(clrPrincipalType);
         builder.WithPrincipalKey(apiKeyTypeName);
         _principalEndBBuilder = builder;
@@ -107,6 +117,8 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
     /// <returns>The current builder instance.</returns>
     public ApiRelationshipManyToManyBuilder WithAssociation(Type clrAssociationType, Action<ApiRelationshipAssociationBuilder>? configure = null)
     {
+        ArgumentNullException.ThrowIfNull(clrAssociationType);
+
         var builder = new ApiRelationshipAssociationBuilder(clrAssociationType);
         configure?.Invoke(builder);
         _associationBuilder = builder;

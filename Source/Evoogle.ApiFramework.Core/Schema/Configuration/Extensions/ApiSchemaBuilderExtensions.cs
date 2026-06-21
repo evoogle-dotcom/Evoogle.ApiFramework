@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -108,5 +108,9 @@ public static class ApiSchemaBuilderExtensions
     /// <returns>The current builder instance.</returns>
     public static ApiSchemaBuilder AddSchemaExtension<TExtension>(this ApiSchemaBuilder builder, TExtension extension)
         where TExtension : class
-        => builder.AddSchemaExtension(typeof(TExtension), extension);
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+
+        return builder.AddSchemaExtension(typeof(TExtension), extension);
+    }
 }

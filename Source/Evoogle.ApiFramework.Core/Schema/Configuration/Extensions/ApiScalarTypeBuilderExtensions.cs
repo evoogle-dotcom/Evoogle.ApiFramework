@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -19,7 +19,11 @@ public static class ApiScalarTypeBuilderExtensions
     /// <returns>The current builder instance.</returns>
     public static ApiScalarTypeBuilder AddScalarTypeExtension<TExtension>(this ApiScalarTypeBuilder builder, TExtension extension)
         where TExtension : class
-        => builder.AddScalarTypeExtension(typeof(TExtension), extension);
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+
+        return builder.AddScalarTypeExtension(typeof(TExtension), extension);
+    }
 
     /// <summary>
     ///     Adds a scalar type extension value keyed by its own type.
@@ -31,5 +35,9 @@ public static class ApiScalarTypeBuilderExtensions
     /// <returns>The current builder instance.</returns>
     public static ApiScalarTypeBuilder<TScalar> AddScalarTypeExtension<TScalar, TExtension>(this ApiScalarTypeBuilder<TScalar> builder, TExtension extension)
         where TExtension : class
-        => builder.AddScalarTypeExtension(typeof(TExtension), extension);
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+
+        return builder.AddScalarTypeExtension(typeof(TExtension), extension);
+    }
 }

@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -30,8 +30,7 @@ public class ApiRelationshipAssociationBuilder(Type clrObjectType) : ExtensionBu
     /// <returns>The current builder instance.</returns>
     public ApiRelationshipAssociationBuilder AddRelationshipAssociationExtension(Type type, object extension)
     {
-        base.AddExtension(type, extension);
-        return this;
+        return this.AddExtension(type, extension);
     }
     #endregion
 

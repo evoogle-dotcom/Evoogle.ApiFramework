@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -20,7 +20,11 @@ public static class ApiObjectTypeBuilderExtensions
     /// <returns>The current builder instance.</returns>
     public static ApiObjectTypeBuilder AddObjectTypeExtension<TExtension>(this ApiObjectTypeBuilder builder, TExtension extension)
         where TExtension : class
-        => builder.AddObjectTypeExtension(typeof(TExtension), extension);
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+
+        return builder.AddObjectTypeExtension(typeof(TExtension), extension);
+    }
 
     /// <summary>
     ///     Adds an object type extension value keyed by its own type.
@@ -32,7 +36,11 @@ public static class ApiObjectTypeBuilderExtensions
     /// <returns>The current builder instance.</returns>
     public static ApiObjectTypeBuilder<TObject> AddObjectTypeExtension<TObject, TExtension>(this ApiObjectTypeBuilder<TObject> builder, TExtension extension)
         where TExtension : class
-        => builder.AddObjectTypeExtension(typeof(TExtension), extension);
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+
+        return builder.AddObjectTypeExtension(typeof(TExtension), extension);
+    }
     #endregion
 
     #region AddProperty Methods
@@ -44,7 +52,12 @@ public static class ApiObjectTypeBuilderExtensions
     /// <param name="configure">Optional callback to configure the added property.</param>
     /// <returns>The current builder instance.</returns>
     public static ApiObjectTypeBuilder AddProperty(this ApiObjectTypeBuilder builder, string name, Action<ApiPropertyBuilder>? configure = null)
-        => builder.AddProperty(name, name, configure);
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+        ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
+
+        return builder.AddProperty(name, name, configure);
+    }
 
     /// <summary>
     ///     Adds an <see cref="ApiProperty"/> definition using <paramref name="name"/> as both the API name and CLR property name.
@@ -56,6 +69,9 @@ public static class ApiObjectTypeBuilderExtensions
     /// <returns>The current builder instance.</returns>
     public static ApiObjectTypeBuilder<TObject> AddProperty<TObject>(this ApiObjectTypeBuilder<TObject> builder, string name, Action<ApiPropertyBuilder>? configure = null)
     {
+        ArgumentNullException.ThrowIfNull(builder);
+        ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
+
         builder.AddProperty(name, name, configure);
         return builder;
     }
@@ -70,7 +86,12 @@ public static class ApiObjectTypeBuilderExtensions
     /// <param name="configure">Optional callback to further configure the added property.</param>
     /// <returns>The current builder instance.</returns>
     public static ApiObjectTypeBuilder AddRequiredProperty(this ApiObjectTypeBuilder builder, string name, Action<ApiPropertyBuilder>? configure = null)
-        => builder.AddRequiredProperty(name, name, configure);
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+        ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
+
+        return builder.AddRequiredProperty(name, name, configure);
+    }
 
     /// <summary>
     ///     Adds an <see cref="ApiProperty"/> definition marked as required.
@@ -81,7 +102,13 @@ public static class ApiObjectTypeBuilderExtensions
     /// <param name="configure">Optional callback to further configure the added property.</param>
     /// <returns>The current builder instance.</returns>
     public static ApiObjectTypeBuilder AddRequiredProperty(this ApiObjectTypeBuilder builder, string apiName, string clrName, Action<ApiPropertyBuilder>? configure = null)
-        => builder.AddProperty(apiName, clrName, b => { b.AsRequired(); configure?.Invoke(b); });
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
+        ArgumentException.ThrowIfNullOrWhiteSpace(clrName, nameof(clrName));
+
+        return builder.AddProperty(apiName, clrName, b => { b.AsRequired(); configure?.Invoke(b); });
+    }
 
     /// <summary>
     ///     Adds an <see cref="ApiProperty"/> definition marked as required.
@@ -92,7 +119,12 @@ public static class ApiObjectTypeBuilderExtensions
     /// <param name="configure">Optional callback to further configure the added property.</param>
     /// <returns>The current builder instance.</returns>
     public static ApiObjectTypeBuilder<TObject> AddRequiredProperty<TObject>(this ApiObjectTypeBuilder<TObject> builder, string name, Action<ApiPropertyBuilder>? configure = null)
-        => builder.AddRequiredProperty(name, name, configure);
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+        ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
+
+        return builder.AddRequiredProperty(name, name, configure);
+    }
 
     /// <summary>
     ///     Adds an <see cref="ApiProperty"/> definition marked as required.
@@ -111,6 +143,10 @@ public static class ApiObjectTypeBuilderExtensions
         Action<ApiPropertyBuilder>? configure = null
     )
     {
+        ArgumentNullException.ThrowIfNull(builder);
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
+        ArgumentException.ThrowIfNullOrWhiteSpace(clrName, nameof(clrName));
+
         builder.AddProperty(apiName, clrName, b => { b.AsRequired(); configure?.Invoke(b); });
         return builder;
     }
@@ -125,7 +161,12 @@ public static class ApiObjectTypeBuilderExtensions
     /// <param name="configure">Optional callback to further configure the added property.</param>
     /// <returns>The current builder instance.</returns>
     public static ApiObjectTypeBuilder AddOptionalProperty(this ApiObjectTypeBuilder builder, string name, Action<ApiPropertyBuilder>? configure = null)
-        => builder.AddOptionalProperty(name, name, configure);
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+        ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
+
+        return builder.AddOptionalProperty(name, name, configure);
+    }
 
     /// <summary>
     ///     Adds an <see cref="ApiProperty"/> definition marked as optional.
@@ -136,7 +177,13 @@ public static class ApiObjectTypeBuilderExtensions
     /// <param name="configure">Optional callback to further configure the added property.</param>
     /// <returns>The current builder instance.</returns>
     public static ApiObjectTypeBuilder AddOptionalProperty(this ApiObjectTypeBuilder builder, string apiName, string clrName, Action<ApiPropertyBuilder>? configure = null)
-        => builder.AddProperty(apiName, clrName, b => { b.AsOptional(); configure?.Invoke(b); });
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
+        ArgumentException.ThrowIfNullOrWhiteSpace(clrName, nameof(clrName));
+
+        return builder.AddProperty(apiName, clrName, b => { b.AsOptional(); configure?.Invoke(b); });
+    }
 
     /// <summary>
     ///     Adds an <see cref="ApiProperty"/> definition marked as optional.
@@ -147,7 +194,12 @@ public static class ApiObjectTypeBuilderExtensions
     /// <param name="configure">Optional callback to further configure the added property.</param>
     /// <returns>The current builder instance.</returns>
     public static ApiObjectTypeBuilder<TObject> AddOptionalProperty<TObject>(this ApiObjectTypeBuilder<TObject> builder, string name, Action<ApiPropertyBuilder>? configure = null)
-        => builder.AddOptionalProperty(name, name, configure);
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+        ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
+
+        return builder.AddOptionalProperty(name, name, configure);
+    }
 
     /// <summary>
     ///     Adds an <see cref="ApiProperty"/> definition marked as optional.
@@ -166,6 +218,10 @@ public static class ApiObjectTypeBuilderExtensions
         Action<ApiPropertyBuilder>? configure = null
     )
     {
+        ArgumentNullException.ThrowIfNull(builder);
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
+        ArgumentException.ThrowIfNullOrWhiteSpace(clrName, nameof(clrName));
+
         builder.AddProperty(apiName, clrName, b => { b.AsOptional(); configure?.Invoke(b); });
         return builder;
     }

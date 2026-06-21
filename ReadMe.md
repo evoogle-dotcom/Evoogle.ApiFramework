@@ -1,4 +1,4 @@
-# Repository
+﻿# Repository
 
 This repository is home to the following **Evoogle** projects. These projects are maintained by [Evoogle](https://github.com/evoogle-dotcom) and licensed under the [MIT License](License.txt).
 
@@ -50,7 +50,15 @@ Schema-wide options can be overridden on individual object types:
     .AddKey("PK_Customer", c => c.Id))
 ```
 
-`Build()` initializes and validates the schema. If validation fails, `ApiSchemaInitializationException` includes a summary plus the individual issue messages with paths, issue codes, descriptions, and remediation guidance.
+`Build()` initializes and validates the schema.
+
+### Validation and Error Reporting
+
+Schema validation is centralized in `ApiSchema.Initialize()`. `Build()` and JSON deserialization construct as much schema state as they can, run initialization, and collect all initialization issues before deciding whether the schema is usable. They do not stop at the first schema issue. If initialization records one or more errors, the framework throws one `ApiSchemaInitializationException` that packages the full `ApiInitializationResult`, including errors and warnings. Consumers can catch the exception and inspect `Issues`, `Errors`, or `Warnings` to produce a complete report.
+
+This aggregation applies to schema validity problems such as duplicate API names, unresolved CLR types, invalid key paths, missing properties, invalid relationship definitions, and other whole-schema consistency issues. Malformed JSON or incompatible JSON token shapes may still be rejected by the JSON serializer before schema initialization runs.
+
+Fluent builder methods are stricter because they are explicit authoring APIs. A builder method may fail fast with standard argument exceptions when the method call itself violates its parameter contract, such as passing a `null` callback, `null` configuration object, `null` `Type`, blank name, invalid expression, or invalid extension metadata. Those precondition failures are treated as programmer errors and are separate from schema initialization diagnostics.
 
 ## Naming Conventions
 

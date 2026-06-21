@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -29,8 +29,7 @@ public class ApiKeyTypeBuilder(string? apiName = null) : ExtensionBuilder<ApiKey
     /// <returns>The current builder instance.</returns>
     public ApiKeyTypeBuilder AddKeyTypeExtension(Type type, object extension)
     {
-        base.AddExtension(type, extension);
-        return this;
+        return this.AddExtension(type, extension);
     }
     #endregion
 
@@ -45,6 +44,9 @@ public class ApiKeyTypeBuilder(string? apiName = null) : ExtensionBuilder<ApiKey
     /// <exception cref="ArgumentException">Thrown when <paramref name="clrPropertyNames"/> is empty.</exception>
     public ApiKeyTypeBuilder AddPath(Type clrRootType, params string[] clrPropertyNames)
     {
+        ArgumentNullException.ThrowIfNull(clrRootType);
+        ArgumentNullException.ThrowIfNull(clrPropertyNames);
+
         _keyPathBuilders.Add(ApiKeyPathBuilder.For(clrRootType, clrPropertyNames));
         return this;
     }
@@ -60,6 +62,9 @@ public class ApiKeyTypeBuilder(string? apiName = null) : ExtensionBuilder<ApiKey
     /// <exception cref="ArgumentException">Thrown when <paramref name="clrPropertyNames"/> is empty.</exception>
     public ApiKeyTypeBuilder AddPath(Type clrRootType, IEnumerable<string> clrPropertyNames, Action<ApiKeyPathBuilder>? configure = null)
     {
+        ArgumentNullException.ThrowIfNull(clrRootType);
+        ArgumentNullException.ThrowIfNull(clrPropertyNames);
+
         var builder = new ApiKeyPathBuilder(clrRootType, clrPropertyNames);
         configure?.Invoke(builder);
         _keyPathBuilders.Add(builder);

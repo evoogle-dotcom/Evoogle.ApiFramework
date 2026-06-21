@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -18,8 +18,8 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 public class ApiPropertyBuilder(string apiName, string clrName) : ExtensionBuilder<ApiPropertyBuilder>
 {
     #region Fields
-    private string _apiName = !string.IsNullOrWhiteSpace(apiName) ? apiName : throw new ArgumentException("The value cannot be null, empty, or whitespace.", nameof(apiName));
-    private readonly string _clrName = !string.IsNullOrWhiteSpace(clrName) ? clrName : throw new ArgumentException("The value cannot be null, empty, or whitespace.", nameof(clrName));
+    private string _apiName = ValidateName(apiName, nameof(apiName));
+    private readonly string _clrName = ValidateName(clrName, nameof(clrName));
     #endregion
 
     #region Properties
@@ -38,8 +38,7 @@ public class ApiPropertyBuilder(string apiName, string clrName) : ExtensionBuild
     /// <returns>The current builder instance.</returns>
     public ApiPropertyBuilder AddPropertyExtension(Type type, object extension)
     {
-        base.AddExtension(type, extension);
-        return this;
+        return this.AddExtension(type, extension);
     }
     #endregion
 
@@ -145,6 +144,12 @@ public class ApiPropertyBuilder(string apiName, string clrName) : ExtensionBuild
         }
 
         return apiProperty;
+    }
+
+    private static string ValidateName(string name, string paramName)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(name, paramName);
+        return name;
     }
     #endregion
 }

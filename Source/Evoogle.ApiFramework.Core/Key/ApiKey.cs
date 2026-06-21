@@ -334,7 +334,15 @@ public readonly struct ApiKey
     ///     Use <see cref="PartsAsSpan"/> instead when possible for better performance (zero allocation).
     /// </remarks>
     public readonly IEnumerable<ApiKeyPart> PartsAsEnumerable =>
-        this.IsComposite ? (ApiKeyPart[])_ref! : Enumerable.Empty<ApiKeyPart>();
+         this.IsComposite ? EnumerateParts((ApiKeyPart[])_ref!) : Enumerable.Empty<ApiKeyPart>();
+
+    private static IEnumerable<ApiKeyPart> EnumerateParts(ApiKeyPart[] parts)
+    {
+        foreach (var part in parts)
+        {
+            yield return part;
+        }
+    }
     #endregion
 
     #region Constructors
@@ -366,17 +374,17 @@ public readonly struct ApiKey
     /// <summary>
     ///     Creates a composite key from an ordered sequence of part keys. Parts are treated as unnamed.
     /// </summary>
-    /// <param name="partCollection">The ordered part keys.</param>
-    /// <returns>The composite key or <see cref="Empty"/> if <paramref name="partCollection"/> is null or empty.</returns>
-    public static ApiKey Composite(IEnumerable<ApiKey>? partCollection)
+    /// <param name="apiKeyCollection">The ordered part keys.</param>
+    /// <returns>The composite key or <see cref="Empty"/> if <paramref name="apiKeyCollection"/> is null or empty.</returns>
+    public static ApiKey Composite(IEnumerable<ApiKey>? apiKeyCollection)
     {
-        if (partCollection is null)
+        if (apiKeyCollection is null)
         {
             return Empty;
         }
 
         // Try fast path for common collection types
-        if (partCollection is ICollection<ApiKey> collection)
+        if (apiKeyCollection is ICollection<ApiKey> collection)
         {
             if (collection.Count == 0)
             {
@@ -396,7 +404,7 @@ public readonly struct ApiKey
 
         // Slow path: materialize to list
         var list = new List<ApiKeyPart>();
-        foreach (var id in partCollection)
+        foreach (var id in apiKeyCollection)
         {
             list.Add(new ApiKeyPart(null, id));
         }
@@ -415,19 +423,19 @@ public readonly struct ApiKey
     /// <summary>
     ///     Creates a composite key from ordered unnamed part keys (params overload).
     /// </summary>
-    /// <param name="partArray">The ordered part keys.</param>
+    /// <param name="apiKeyArray">The ordered part keys.</param>
     /// <returns>The composite key or <see cref="Empty"/>.</returns>
-    public static ApiKey Composite(params ApiKey[] partArray)
+    public static ApiKey Composite(params ApiKey[] apiKeyArray)
     {
-        if (partArray is null || partArray.Length == 0)
+        if (apiKeyArray is null || apiKeyArray.Length == 0)
         {
             return Empty;
         }
 
-        var parts = new ApiKeyPart[partArray.Length];
-        for (var i = 0; i < partArray.Length; i++)
+        var parts = new ApiKeyPart[apiKeyArray.Length];
+        for (var i = 0; i < apiKeyArray.Length; i++)
         {
-            parts[i] = new ApiKeyPart(null, partArray[i]);
+            parts[i] = new ApiKeyPart(null, apiKeyArray[i]);
         }
 
         ValidateCompositeParts(parts);
@@ -438,16 +446,23 @@ public readonly struct ApiKey
     /// <summary>
     ///     Creates a composite key from part structures.
     /// </summary>
-    /// <param name="parts">The sequence of parts.</param>
+    /// <param name="apiKeyPartCollection">The sequence of parts.</param>
     /// <returns>The composite key or <see cref="Empty"/>.</returns>
-    public static ApiKey Composite(IEnumerable<ApiKeyPart>? parts)
+    public static ApiKey Composite(IEnumerable<ApiKeyPart>? apiKeyPartCollection)
     {
-        if (parts is null || !parts.Any())
+        if (apiKeyPartCollection is null)
         {
             return Empty;
         }
 
-        var clone = parts.Select(p => new ApiKeyPart(p.ApiName, p.ApiValue)).ToArray();
+        var clone = apiKeyPartCollection
+            .Select(p => new ApiKeyPart(p.ApiName, p.ApiValue))
+            .ToArray();
+
+        if (clone.Length == 0)
+        {
+            return Empty;
+        }
 
         ValidateCompositeParts(clone);
 
@@ -457,19 +472,25 @@ public readonly struct ApiKey
     /// <summary>
     ///     Creates a composite key from parts (params overload).
     /// </summary>
-    /// <param name="partArray">The sequence of parts.</param>
+    /// <param name="apiKeyPartArray">The sequence of parts.</param>
     /// <returns>The composite key or <see cref="Empty"/>.</returns>
-    public static ApiKey Composite(params ApiKeyPart[] partArray)
+    public static ApiKey Composite(params ApiKeyPart[] apiKeyPartArray)
     {
-        if (partArray is null || partArray.Length == 0)
+        if (apiKeyPartArray is null || apiKeyPartArray.Length == 0)
         {
             return Empty;
         }
 
-        // params array is compiler-generated, safe to use directly
-        ValidateCompositeParts(partArray);
+        var clone = new ApiKeyPart[apiKeyPartArray.Length];
+        for (var i = 0; i < apiKeyPartArray.Length; i++)
+        {
+            var part = apiKeyPartArray[i];
+            clone[i] = new ApiKeyPart(part.ApiName, part.ApiValue);
+        }
 
-        return new ApiKey(ApiKeyKind.Composite, default, partArray, ToCompositeString(partArray));
+        ValidateCompositeParts(clone);
+
+        return new ApiKey(ApiKeyKind.Composite, default, clone, ToCompositeString(clone));
     }
 
     /// <summary>Creates a culture key from a <see cref="CultureInfo"/> instance.</summary>

@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -38,12 +38,19 @@ public class ApiKeyPathBuilder : ExtensionBuilder<ApiKeyPathBuilder>
         ArgumentNullException.ThrowIfNull(clrPropertyNames);
 
         _clrRootType = clrRootType;
-        _segmentBuilders = [.. clrPropertyNames.Select(n => new ApiKeyPathSegmentBuilder(n))];
+        var names = clrPropertyNames as string[] ?? [.. clrPropertyNames];
 
-        if (_segmentBuilders.Count == 0)
+        if (names.Length == 0)
         {
             throw new ArgumentException("At least one CLR property name must be provided.", nameof(clrPropertyNames));
         }
+
+        if (names.Any(static name => string.IsNullOrWhiteSpace(name)))
+        {
+            throw new ArgumentException("CLR property names must not contain null, empty, or whitespace values.", nameof(clrPropertyNames));
+        }
+
+        _segmentBuilders = [.. names.Select(static n => new ApiKeyPathSegmentBuilder(n))];
     }
 
     /// <summary>
@@ -69,6 +76,11 @@ public class ApiKeyPathBuilder : ExtensionBuilder<ApiKeyPathBuilder>
         {
             throw new ArgumentException("At least one segment builder must be provided.", nameof(segmentBuilders));
         }
+
+        if (_segmentBuilders.Any(static builder => builder is null))
+        {
+            throw new ArgumentException("Segment builders must not contain null values.", nameof(segmentBuilders));
+        }
     }
     #endregion
 
@@ -87,7 +99,12 @@ public class ApiKeyPathBuilder : ExtensionBuilder<ApiKeyPathBuilder>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="clrRootType"/> is <c>null</c>.</exception>
     /// <exception cref="ArgumentException">Thrown when <paramref name="clrPropertyNames"/> is empty.</exception>
     public static ApiKeyPathBuilder For(Type clrRootType, params string[] clrPropertyNames)
-        => new(clrRootType, clrPropertyNames);
+    {
+        ArgumentNullException.ThrowIfNull(clrRootType);
+        ArgumentNullException.ThrowIfNull(clrPropertyNames);
+
+        return new(clrRootType, clrPropertyNames);
+    }
 
     /// <summary>
     ///     Creates a builder for a path that starts from the specified root CLR type, using pre-configured
@@ -101,7 +118,12 @@ public class ApiKeyPathBuilder : ExtensionBuilder<ApiKeyPathBuilder>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="clrRootType"/> is <c>null</c>.</exception>
     /// <exception cref="ArgumentException">Thrown when <paramref name="segmentBuilders"/> is empty.</exception>
     public static ApiKeyPathBuilder For(Type clrRootType, params ApiKeyPathSegmentBuilder[] segmentBuilders)
-        => new(clrRootType, segmentBuilders);
+    {
+        ArgumentNullException.ThrowIfNull(clrRootType);
+        ArgumentNullException.ThrowIfNull(segmentBuilders);
+
+        return new(clrRootType, segmentBuilders);
+    }
     #endregion
 
     #region AddExtension Methods
@@ -113,8 +135,7 @@ public class ApiKeyPathBuilder : ExtensionBuilder<ApiKeyPathBuilder>
     /// <returns>The current builder instance.</returns>
     public ApiKeyPathBuilder AddKeyPathExtension(Type type, object extension)
     {
-        base.AddExtension(type, extension);
-        return this;
+        return this.AddExtension(type, extension);
     }
     #endregion
 

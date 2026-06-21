@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -19,7 +19,11 @@ public static class ApiEnumTypeBuilderExtensions
     /// <returns>The current builder instance.</returns>
     public static ApiEnumTypeBuilder AddEnumTypeExtension<TExtension>(this ApiEnumTypeBuilder builder, TExtension extension)
         where TExtension : class
-        => builder.AddEnumTypeExtension(typeof(TExtension), extension);
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+
+        return builder.AddEnumTypeExtension(typeof(TExtension), extension);
+    }
 
     /// <summary>
     ///     Adds an enum type extension value keyed by its own type.
@@ -32,7 +36,11 @@ public static class ApiEnumTypeBuilderExtensions
     public static ApiEnumTypeBuilder<TEnum> AddEnumTypeExtension<TEnum, TExtension>(this ApiEnumTypeBuilder<TEnum> builder, TExtension extension)
         where TEnum : Enum
         where TExtension : class
-        => builder.AddEnumTypeExtension(typeof(TExtension), extension);
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+
+        return builder.AddEnumTypeExtension(typeof(TExtension), extension);
+    }
 
     /// <summary>
     ///     Adds an <see cref="ApiEnumValue"/> definition using <paramref name="name"/> as both the API name and CLR name.
@@ -42,5 +50,10 @@ public static class ApiEnumTypeBuilderExtensions
     /// <param name="clrOrdinal">The CLR ordinal of the enumeration value.</param>
     /// <returns>The current builder instance.</returns>
     public static ApiEnumTypeBuilder AddValue(this ApiEnumTypeBuilder builder, string name, int clrOrdinal)
-        => builder.AddValue(name, name, clrOrdinal);
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+        ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
+
+        return builder.AddValue(name, name, clrOrdinal);
+    }
 }

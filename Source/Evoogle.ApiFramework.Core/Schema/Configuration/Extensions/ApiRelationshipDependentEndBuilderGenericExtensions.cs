@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -24,7 +24,11 @@ public static class ApiRelationshipDependentEndBuilderGenericExtensions
     /// <returns>The current builder instance.</returns>
     public static ApiRelationshipDependentEndBuilder AddRelationshipDependentEndExtension<TExtension>(this ApiRelationshipDependentEndBuilder builder, TExtension extension)
         where TExtension : class
-        => builder.AddRelationshipDependentEndExtension(typeof(TExtension), extension);
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+
+        return builder.AddRelationshipDependentEndExtension(typeof(TExtension), extension);
+    }
 
     /// <summary>
     ///     Adds a dependent end extension value keyed by its own type.
@@ -40,7 +44,11 @@ public static class ApiRelationshipDependentEndBuilderGenericExtensions
         TExtension extension
     )
         where TExtension : class
-        => builder.AddRelationshipDependentEndExtension(typeof(TExtension), extension);
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+
+        return builder.AddRelationshipDependentEndExtension(typeof(TExtension), extension);
+    }
     #endregion
 
     #region WithForeignKey Methods

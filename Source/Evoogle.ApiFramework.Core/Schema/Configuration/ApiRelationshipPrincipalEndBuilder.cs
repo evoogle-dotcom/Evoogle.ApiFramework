@@ -31,8 +31,7 @@ public sealed class ApiRelationshipPrincipalEndBuilder(Type clrObjectType) : Ext
     /// <returns>The current builder instance.</returns>
     public ApiRelationshipPrincipalEndBuilder AddRelationshipPrincipalEndExtension(Type type, object extension)
     {
-        base.AddExtension(type, extension);
-        return this;
+        return this.AddExtension(type, extension);
     }
     #endregion
 
