@@ -78,7 +78,7 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
     /// <summary>
     ///     Collects the data required to instantiate an <see cref="ApiProperty"/> during deserialization.
     /// </summary>
-    private class ReadData : ExtensibleReadData
+    private class ReadState : ExtensibleReadData
     {
         #region Properties
         public ApiPropertyReadData? ApiProperty { get; set; }
@@ -86,7 +86,7 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
     }
 
     /// <summary>
-    ///     Supplies JSON property handlers for mapping serialized values to a <see cref="ReadData"/> instance.
+    ///     Supplies JSON property handlers for mapping serialized values to a <see cref="ReadState"/> instance.
     /// </summary>
     private class ReadHandlers(PropertyNames propertyNames)
     {
@@ -96,7 +96,7 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
         #endregion
 
         #region ApiProperty Fields
-        public readonly Dictionary<string, JsonReaderHandler<DefaultReadContext<PropertyNames, ReadData, ReadHandlers>>> PropertyHandlers = new()
+        public readonly Dictionary<string, JsonReaderHandler<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>>> PropertyHandlers = new()
         {
             // ApiProperty Property Handlers
             { propertyNames.ApiProperty.ApiName, HandleApiPropertyApiName },
@@ -106,19 +106,19 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
             { propertyNames.ApiProperty.ClrMemberKind, HandleApiPropertyClrMemberKind },
 
             // ExtensibleBase Property Handlers
-            { propertyNames.ExtensibleBase.Extensions, CreateExtensionsHandler<PropertyNames, ReadData, ReadHandlers>() },
+            { propertyNames.ExtensibleBase.Extensions, CreateExtensionsHandler<PropertyNames, ReadState, ReadHandlers>() },
         };
         #endregion
 
         #region ApiProperty Methods
-        private static void HandleApiPropertyApiName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiPropertyApiName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
             context.ReadData.ApiProperty ??= new ApiPropertyReadData();
 
             context.ReadData.ApiProperty.ApiName = reader.GetString();
         }
 
-        private static void HandleApiPropertyApiTypeModifiers(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiPropertyApiTypeModifiers(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
             context.ReadData.ApiProperty ??= new ApiPropertyReadData();
 
@@ -126,7 +126,7 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
             context.ReadData.ApiProperty.ApiTypeModifiers = _apiTypeModifiersJsonConverter.Read(ref reader, _apiTypeModifiersType, options);
         }
 
-        private static void HandleApiPropertyApiTypeExpression(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiPropertyApiTypeExpression(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
             context.ReadData.ApiProperty ??= new ApiPropertyReadData();
 
@@ -134,14 +134,14 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
             context.ReadData.ApiProperty.ApiTypeExpression = JsonSerializer.Deserialize<ApiTypeExpression>(ref reader, options);
         }
 
-        private static void HandleApiPropertyClrName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiPropertyClrName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
             context.ReadData.ApiProperty ??= new ApiPropertyReadData();
 
             context.ReadData.ApiProperty.ClrName = reader.GetString();
         }
 
-        private static void HandleApiPropertyClrMemberKind(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiPropertyClrMemberKind(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
             context.ReadData.ApiProperty ??= new ApiPropertyReadData();
 
@@ -168,7 +168,7 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
     #region JsonConverterBase<T> Methods
     /// <inheritdoc/>
     protected override IReadContext CreateReadContext(ILogger logger, JsonSerializerOptions options)
-        => CreateDefaultReadContext<PropertyNames, ReadData, ReadHandlers>
+        => CreateDefaultReadContext<PropertyNames, ReadState, ReadHandlers>
             (
                 logger,
                 options,
@@ -188,14 +188,14 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
     /// <inheritdoc/>
     protected override ApiProperty? CreateValue(IReadContext context)
     {
-        var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
-        var readData = readContext.ReadData.ApiProperty;
+        var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
+        var readState = readContext.ReadData.ApiProperty;
 
-        var apiName = readData?.ApiName;
-        var apiTypeExpression = readData?.ApiTypeExpression;
-        var apiTypeModifiers = readData?.ApiTypeModifiers ?? ApiTypeModifiers.None;
-        var clrName = readData?.ClrName;
-        var clrMemberKind = readData?.ClrMemberKind ?? ClrMemberKind.Unknown;
+        var apiName = readState?.ApiName;
+        var apiTypeExpression = readState?.ApiTypeExpression;
+        var apiTypeModifiers = readState?.ApiTypeModifiers ?? ApiTypeModifiers.None;
+        var clrName = readState?.ClrName;
+        var clrMemberKind = readState?.ClrMemberKind ?? ClrMemberKind.Unknown;
 
         var apiProperty = new ApiProperty(apiName!, apiTypeExpression!, apiTypeModifiers, clrName!, clrMemberKind);
 
@@ -208,7 +208,7 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
     /// <inheritdoc/>
     protected override void ReadCore(ref Utf8JsonReader reader, IReadContext context)
     {
-        var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
+        var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
         var handlers = readContext.ReadHandlers.PropertyHandlers;
 
         ReadJsonObject(ref reader, readContext, handlers);

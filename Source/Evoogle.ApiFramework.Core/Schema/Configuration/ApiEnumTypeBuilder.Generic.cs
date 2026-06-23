@@ -6,21 +6,21 @@
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
 /// <summary>
-///     Strongly-typed fluent builder for configuring an <see cref="ApiEnumType"/> whose CLR type is <typeparamref name="T"/>.
+///     Strongly-typed fluent builder for configuring an <see cref="ApiEnumType"/> whose CLR type is <typeparamref name="TEnum"/>.
 ///     Extends <see cref="ApiEnumTypeBuilder"/> with enum-member overloads so CLR names and ordinals are
 ///     inferred from the enum constant rather than supplied as raw strings.
 /// </summary>
-/// <typeparam name="T">The CLR enum type.</typeparam>
+/// <typeparam name="TEnum">The CLR enum type.</typeparam>
 /// <param name="context">The shared builder context.</param>
-public sealed class ApiEnumTypeBuilder<T>(ApiSchemaBuilderContext context)
-    : ApiEnumTypeBuilder(typeof(T), context)
-    where T : Enum
+public sealed class ApiEnumTypeBuilder<TEnum>(ApiSchemaBuilderContext context)
+    : ApiEnumTypeBuilder(typeof(TEnum), context)
+    where TEnum : Enum
 {
     #region AddExtension Methods
     /// <inheritdoc cref="ApiEnumTypeBuilder.AddEnumTypeExtension(Type, object)"/>
-    public new ApiEnumTypeBuilder<T> AddEnumTypeExtension(Type type, object extension)
+    public new ApiEnumTypeBuilder<TEnum> AddEnumTypeExtension(Type extensionType, object extension)
     {
-        base.AddEnumTypeExtension(type, extension);
+        base.AddEnumTypeExtension(extensionType, extension);
         return this;
     }
     #endregion
@@ -35,7 +35,7 @@ public sealed class ApiEnumTypeBuilder<T>(ApiSchemaBuilderContext context)
     ///     Optional API name override. When <see langword="null"/> the CLR member name is used as the API name.
     /// </param>
     /// <returns>The current builder instance.</returns>
-    public ApiEnumTypeBuilder<T> AddValue(T member, string? apiName = null)
+    public ApiEnumTypeBuilder<TEnum> AddValue(TEnum member, string? apiName = null)
     {
         var clrName = member.ToString();
         var ordinal = Convert.ToInt32(member);
@@ -44,13 +44,13 @@ public sealed class ApiEnumTypeBuilder<T>(ApiSchemaBuilderContext context)
     }
 
     /// <summary>
-    ///     Adds an <see cref="ApiEnumValue"/> definition for every member declared on <typeparamref name="T"/>.
+    ///     Adds an <see cref="ApiEnumValue"/> definition for every member declared on <typeparamref name="TEnum"/>.
     ///     Each member uses its CLR name as the API name.
     /// </summary>
     /// <returns>The current builder instance.</returns>
-    public ApiEnumTypeBuilder<T> AddAllValues()
+    public ApiEnumTypeBuilder<TEnum> AddAllValues()
     {
-        foreach (T member in Enum.GetValues(typeof(T)))
+        foreach (TEnum member in Enum.GetValues(typeof(TEnum)))
         {
             this.AddValue(member);
         }
@@ -61,7 +61,7 @@ public sealed class ApiEnumTypeBuilder<T>(ApiSchemaBuilderContext context)
 
     #region With Methods
     /// <inheritdoc cref="ApiNamedTypeBuilder{TBuilder}.WithName"/>
-    public new ApiEnumTypeBuilder<T> WithName(string apiName)
+    public new ApiEnumTypeBuilder<TEnum> WithName(string apiName)
     {
         base.WithName(apiName);
         return this;

@@ -44,34 +44,34 @@ public readonly record struct ApiKeyPart(string? ApiName, ApiKey ApiValue)
     /// <summary>
     ///     Creates an unnamed (positional) key part.
     /// </summary>
-    /// <param name="value">The scalar key value for this part.</param>
+    /// <param name="apiValue">The scalar key value for this part.</param>
     /// <returns>
     ///     A new <see cref="ApiKeyPart"/> with <see cref="ApiName"/> set to <see langword="null"/> and
-    ///     <see cref="ApiValue"/> set to <paramref name="value"/>.
+    ///     <see cref="ApiValue"/> set to <paramref name="apiValue"/>.
     /// </returns>
     /// <remarks>
     ///     Use this factory method when building ordered/positional composite keys where
     ///     part order matters and names are not needed.
     /// </remarks>
-    public static ApiKeyPart Create(ApiKey value) => new(null, value);
+    public static ApiKeyPart Create(ApiKey apiValue) => new(null, apiValue);
 
     /// <summary>
-    ///     Creates a named key part with the specified name and value.
+    ///     Creates a named key part with the specified API name and value.
     /// </summary>
-    /// <param name="name">
-    ///     The name for this part. Can be <see langword="null"/> for unnamed parts,
+    /// <param name="apiName">
+    ///     The API name for this part. Can be <see langword="null"/> for unnamed parts,
     ///     but typically should be non-null/non-whitespace for named composites.
     /// </param>
-    /// <param name="value">The scalar key value for this part.</param>
+    /// <param name="apiValue">The scalar key value for this part.</param>
     /// <returns>
-    ///     A new <see cref="ApiKeyPart"/> with <see cref="ApiName"/> set to <paramref name="name"/> and
-    ///     <see cref="ApiValue"/> set to <paramref name="value"/>.
+    ///     A new <see cref="ApiKeyPart"/> with <see cref="ApiName"/> set to <paramref name="apiName"/> and
+    ///     <see cref="ApiValue"/> set to <paramref name="apiValue"/>.
     /// </returns>
     /// <remarks>
     ///     Use this factory method when building named composite keys where each part
     ///     has semantic meaning indicated by its name (e.g., "CustomerId", "OrderNumber").
     /// </remarks>
-    public static ApiKeyPart Create(string? name, ApiKey value) => new(name, value);
+    public static ApiKeyPart Create(string? apiName, ApiKey apiValue) => new(apiName, apiValue);
     #endregion
 
     #region Object Methods

@@ -65,7 +65,7 @@ public class ApiRelationshipAssociationJsonConverter(ILogger<ApiRelationshipAsso
         public ApiKeyType? ApiForeignKeyTypeB { get; set; }
     }
 
-    private class ReadData : ExtensibleReadData
+    private class ReadState : ExtensibleReadData
     {
         public ApiRelationshipElementReadData? ApiRelationshipElement { get; set; }
         public ApiRelationshipAssociationReadData? ApiRelationshipAssociation { get; set; }
@@ -73,27 +73,27 @@ public class ApiRelationshipAssociationJsonConverter(ILogger<ApiRelationshipAsso
 
     private class ReadHandlers(PropertyNames propertyNames)
     {
-        public readonly Dictionary<string, JsonReaderHandler<DefaultReadContext<PropertyNames, ReadData, ReadHandlers>>> PropertyHandlers = new()
+        public readonly Dictionary<string, JsonReaderHandler<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>>> PropertyHandlers = new()
         {
             { propertyNames.ApiRelationshipElement.ClrObjectType, HandleClrObjectType },
             { propertyNames.ApiRelationshipAssociation.ApiForeignKeyTypeA, HandleApiForeignKeyTypeA },
             { propertyNames.ApiRelationshipAssociation.ApiForeignKeyTypeB, HandleApiForeignKeyTypeB },
-            { propertyNames.ExtensibleBase.Extensions, CreateExtensionsHandler<PropertyNames, ReadData, ReadHandlers>() },
+            { propertyNames.ExtensibleBase.Extensions, CreateExtensionsHandler<PropertyNames, ReadState, ReadHandlers>() },
         };
 
-        private static void HandleClrObjectType(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleClrObjectType(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
             context.ReadData.ApiRelationshipElement ??= new ApiRelationshipElementReadData();
             context.ReadData.ApiRelationshipElement.ClrObjectType = _typeJsonConverter.Read(ref reader, typeof(Type), context.Options);
         }
 
-        private static void HandleApiForeignKeyTypeA(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiForeignKeyTypeA(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
             context.ReadData.ApiRelationshipAssociation ??= new ApiRelationshipAssociationReadData();
             context.ReadData.ApiRelationshipAssociation.ApiForeignKeyTypeA = JsonSerializer.Deserialize<ApiKeyType>(ref reader, context.Options);
         }
 
-        private static void HandleApiForeignKeyTypeB(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiForeignKeyTypeB(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
             context.ReadData.ApiRelationshipAssociation ??= new ApiRelationshipAssociationReadData();
             context.ReadData.ApiRelationshipAssociation.ApiForeignKeyTypeB = JsonSerializer.Deserialize<ApiKeyType>(ref reader, context.Options);
@@ -116,7 +116,7 @@ public class ApiRelationshipAssociationJsonConverter(ILogger<ApiRelationshipAsso
     #region JsonConverterBase<T> Methods
     /// <inheritdoc/>
     protected override IReadContext CreateReadContext(ILogger logger, JsonSerializerOptions options)
-        => CreateDefaultReadContext<PropertyNames, ReadData, ReadHandlers>
+        => CreateDefaultReadContext<PropertyNames, ReadState, ReadHandlers>
             (
                 logger,
                 options,
@@ -131,7 +131,7 @@ public class ApiRelationshipAssociationJsonConverter(ILogger<ApiRelationshipAsso
     /// <inheritdoc/>
     protected override ApiRelationshipAssociation? CreateValue(IReadContext context)
     {
-        var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
+        var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
 
         var clrObjectType = readContext.ReadData.ApiRelationshipElement?.ClrObjectType;
         var apiForeignKeyTypeA = readContext.ReadData.ApiRelationshipAssociation?.ApiForeignKeyTypeA;
@@ -148,7 +148,7 @@ public class ApiRelationshipAssociationJsonConverter(ILogger<ApiRelationshipAsso
     /// <inheritdoc/>
     protected override void ReadCore(ref Utf8JsonReader reader, IReadContext context)
     {
-        var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
+        var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
         ReadJsonObject(ref reader, readContext, readContext.ReadHandlers.PropertyHandlers);
     }
 

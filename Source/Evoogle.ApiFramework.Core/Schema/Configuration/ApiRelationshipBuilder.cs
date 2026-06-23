@@ -30,15 +30,15 @@ public abstract class ApiRelationshipBuilder(string apiName, ApiRelationshipDele
 
     #region AddExtension Methods
     /// <summary>
-    ///     Adds an extension value associated with the specified <paramref name="type"/>.
+    ///     Adds an extension value associated with the specified <paramref name="extensionType"/>.
     /// </summary>
-    /// <param name="type">The type used as the extension key.</param>
+    /// <param name="extensionType">The type used as the extension key.</param>
     /// <param name="extension">The extension value to store.</param>
     /// <returns>The current builder instance.</returns>
-    protected TBuilder AddRelationshipExtension<TBuilder>(Type type, object extension)
+    protected TBuilder AddRelationshipExtension<TBuilder>(Type extensionType, object extension)
         where TBuilder : ApiRelationshipBuilder
     {
-        base.AddExtension(type, extension);
+        base.AddExtension(extensionType, extension);
         return (TBuilder)this;
     }
 

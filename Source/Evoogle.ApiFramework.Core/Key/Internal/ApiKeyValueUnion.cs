@@ -43,16 +43,16 @@ internal readonly struct ApiKeyValueUnion
     #endregion
 
     #region Constructors
-    private ApiKeyValueUnion(int i) { this = default; Int32 = i; }
-    private ApiKeyValueUnion(long l) { this = default; Int64 = l; }
-    private ApiKeyValueUnion(Guid g) { this = default; Guid = g; }
-    private ApiKeyValueUnion(Ulid u) { this = default; Ulid = u; }
+    private ApiKeyValueUnion(int int32) { this = default; Int32 = int32; }
+    private ApiKeyValueUnion(long int64) { this = default; Int64 = int64; }
+    private ApiKeyValueUnion(Guid guid) { this = default; Guid = guid; }
+    private ApiKeyValueUnion(Ulid ulid) { this = default; Ulid = ulid; }
     #endregion
 
     #region Factory Methods
-    public static ApiKeyValueUnion FromInt32(int i) => new(i);
-    public static ApiKeyValueUnion FromInt64(long l) => new(l);
-    public static ApiKeyValueUnion FromGuid(Guid g) => new(g);
-    public static ApiKeyValueUnion FromUlid(Ulid u) => new(u);
+    public static ApiKeyValueUnion FromInt32(int int32) => new(int32);
+    public static ApiKeyValueUnion FromInt64(long int64) => new(int64);
+    public static ApiKeyValueUnion FromGuid(Guid guid) => new(guid);
+    public static ApiKeyValueUnion FromUlid(Ulid ulid) => new(ulid);
     #endregion
 }

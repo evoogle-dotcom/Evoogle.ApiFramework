@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -51,8 +51,8 @@ internal readonly record struct ApiKeyMaterializationValue
     #endregion
 
     #region Factory Methods
-    public static ApiKeyMaterializationValue FromKey(ApiKey value) => new(ApiKeyMaterializationValueKind.Key, value, text: null);
-    public static ApiKeyMaterializationValue FromText(string? value) => new(ApiKeyMaterializationValueKind.Text, ApiKey.Empty, value);
+    public static ApiKeyMaterializationValue FromKey(ApiKey apiKey) => new(ApiKeyMaterializationValueKind.Key, apiKey, text: null);
+    public static ApiKeyMaterializationValue FromText(string? text) => new(ApiKeyMaterializationValueKind.Text, ApiKey.Empty, text);
     #endregion
 }
 
@@ -104,15 +104,15 @@ public sealed class ApiKeyMaterializationContext
     #region Methods
     /// <summary>
     ///     Registers a CLR object instance as the root for any <see cref="ApiKeyPath"/> whose
-    ///     <see cref="ApiKeyPath.ClrRootType"/> is <typeparamref name="T"/> or assignable from <typeparamref name="T"/>.
+    ///     <see cref="ApiKeyPath.ClrRootType"/> is <typeparamref name="TRoot"/> or assignable from <typeparamref name="TRoot"/>.
     /// </summary>
-    /// <typeparam name="T">The CLR type of the root object.</typeparam>
+    /// <typeparam name="TRoot">The CLR type of the root object.</typeparam>
     /// <param name="instance">The root object instance.</param>
     /// <returns>The current context for fluent chaining.</returns>
-    public ApiKeyMaterializationContext With<T>(T instance) where T : class
+    public ApiKeyMaterializationContext With<TRoot>(TRoot instance) where TRoot : class
     {
         ArgumentNullException.ThrowIfNull(instance);
-        _roots[typeof(T)] = instance;
+        _roots[typeof(TRoot)] = instance;
         return this;
     }
 
@@ -131,12 +131,12 @@ public sealed class ApiKeyMaterializationContext
     /// </summary>
     /// <param name="clrRootType">The root CLR type of the key path.</param>
     /// <param name="clrPath">The full dotted CLR property path from the root type to the scalar property.</param>
-    /// <param name="value">The materialized key value.</param>
+    /// <param name="apiKey">The materialized key value.</param>
     /// <returns>The current context for fluent chaining.</returns>
-    public ApiKeyMaterializationContext WithKey(Type clrRootType, string clrPath, ApiKey value)
+    public ApiKeyMaterializationContext WithKey(Type clrRootType, string clrPath, ApiKey apiKey)
     {
         var valuePath = CreateValuePath(clrRootType, clrPath);
-        _values[valuePath] = ApiKeyMaterializationValue.FromKey(value);
+        _values[valuePath] = ApiKeyMaterializationValue.FromKey(apiKey);
         return this;
     }
 
@@ -146,36 +146,36 @@ public sealed class ApiKeyMaterializationContext
     /// </summary>
     /// <param name="clrRootType">The root CLR type of the key path.</param>
     /// <param name="clrPath">The full dotted CLR property path from the root type to the scalar property.</param>
-    /// <param name="value">The raw text value.</param>
+    /// <param name="text">The raw text value.</param>
     /// <returns>The current context for fluent chaining.</returns>
-    public ApiKeyMaterializationContext WithText(Type clrRootType, string clrPath, string? value)
+    public ApiKeyMaterializationContext WithText(Type clrRootType, string clrPath, string? text)
     {
         var valuePath = CreateValuePath(clrRootType, clrPath);
-        _values[valuePath] = ApiKeyMaterializationValue.FromText(value);
+        _values[valuePath] = ApiKeyMaterializationValue.FromText(text);
         return this;
     }
 
     /// <summary>
     ///     Resolves the root object for a given CLR type.
-    ///     Tries an exact match first, then falls back to a registered instance whose declared type is assignable to <paramref name="type"/>.
+    ///     Tries an exact match first, then falls back to a registered instance whose declared type is assignable to <paramref name="clrRootType"/>.
     /// </summary>
-    /// <param name="type">The CLR type to resolve a root object for.</param>
+    /// <param name="clrRootType">The CLR type to resolve a root object for.</param>
     /// <returns>The registered root object.</returns>
-    /// <exception cref="ApiKeyException">Thrown when no root object is registered for <paramref name="type"/>.</exception>
-    internal object ResolveRoot(Type type)
+    /// <exception cref="ApiKeyException">Thrown when no root object is registered for <paramref name="clrRootType"/>.</exception>
+    internal object ResolveRoot(Type clrRootType)
     {
-        if (this.TryResolveRoot(type, out var result))
+        if (this.TryResolveRoot(clrRootType, out var result))
         {
             return result!;
         }
 
-        var typeName = type.SafeToName();
+        var typeName = clrRootType.SafeToName();
         throw new ApiKeyException($"No root object registered for type '{typeName}'. Call With<{typeName}>() before materializing.");
     }
 
-    internal bool TryResolveRoot(Type type, out object? result)
+    internal bool TryResolveRoot(Type clrRootType, out object? result)
     {
-        if (_roots.TryGetValue(type, out var exact))
+        if (_roots.TryGetValue(clrRootType, out var exact))
         {
             result = exact;
             return true;
@@ -183,7 +183,7 @@ public sealed class ApiKeyMaterializationContext
 
         foreach (var (key, value) in _roots)
         {
-            if (type.IsAssignableFrom(key))
+            if (clrRootType.IsAssignableFrom(key))
             {
                 result = value;
                 return true;
@@ -194,10 +194,10 @@ public sealed class ApiKeyMaterializationContext
         return false;
     }
 
-    internal bool TryResolveValue(Type clrRootType, string clrPath, out ApiKeyMaterializationValue value)
+    internal bool TryResolveValue(Type clrRootType, string clrPath, out ApiKeyMaterializationValue materializationValue)
     {
         var valuePath = CreateValuePath(clrRootType, clrPath);
-        return _values.TryGetValue(valuePath, out value);
+        return _values.TryGetValue(valuePath, out materializationValue);
     }
 
     private static ApiKeyMaterializationValuePath CreateValuePath(Type clrRootType, string clrPath)

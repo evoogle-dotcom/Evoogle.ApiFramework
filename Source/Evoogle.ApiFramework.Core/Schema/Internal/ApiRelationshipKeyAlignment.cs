@@ -57,11 +57,11 @@ internal static class ApiRelationshipKeyAlignment
         else
         {
             var matchingShapeKeys = principalObjectType.ApiKeyTypes
-                .Where(keyType => ApiSchemaHelpers.CountKeyLeaves(keyType) == keyPathCount)
+                .Where(keyType => ApiRelationshipKeyCompatibility.CountKeyLeaves(keyType) == keyPathCount)
                 .Select(static keyType => new KeyValuePair<string, ApiKeyType>(keyType.ApiName!, keyType))
                 .ToList();
             var matchingKeys = matchingShapeKeys
-                .Where(kvp => ApiSchemaHelpers.AreKeyTypesCompatible(kvp.Value, foreignKeyType))
+                .Where(kvp => ApiRelationshipKeyCompatibility.AreKeyTypesCompatible(kvp.Value, foreignKeyType))
                 .ToList();
 
             if (matchingKeys.Count > 1)
@@ -119,7 +119,7 @@ internal static class ApiRelationshipKeyAlignment
             return null;
         }
 
-        var keyTypePathCount = ApiSchemaHelpers.CountKeyLeaves(principalKeyType);
+        var keyTypePathCount = ApiRelationshipKeyCompatibility.CountKeyLeaves(principalKeyType);
         if (keyTypePathCount is not null && keyPathCount != keyTypePathCount)
         {
             AddCountMismatchIssue
@@ -136,7 +136,7 @@ internal static class ApiRelationshipKeyAlignment
             return null;
         }
 
-        if (ApiSchemaHelpers.TryAreKeyTypesCompatible(principalKeyType, foreignKeyType, out var compatible) && !compatible)
+        if (ApiRelationshipKeyCompatibility.TryAreKeyTypesCompatible(principalKeyType, foreignKeyType, out var isCompatible) && !isCompatible)
         {
             AddExplicitIncompatiblePrincipalKeyIssue
             (
@@ -256,8 +256,8 @@ internal static class ApiRelationshipKeyAlignment
         string compatibilityRemediation
     )
     {
-        var principalKeyTypes = ApiSchemaHelpers.DescribeKeyLeafTypes(principalKeyType);
-        var foreignKeyTypes = ApiSchemaHelpers.DescribeKeyLeafTypes(foreignKeyType);
+        var principalKeyTypes = ApiRelationshipKeyCompatibility.DescribeKeyLeafTypes(principalKeyType);
+        var foreignKeyTypes = ApiRelationshipKeyCompatibility.DescribeKeyLeafTypes(foreignKeyType);
         var severity = ApiInitializationSeverity.Error;
         var code = ApiInitializationCode.API_RELATIONSHIP_INCOMPATIBLE_PRINCIPAL_FOREIGN_KEY;
         var description = $"{foreignKeyPath} leaf type(s) [{foreignKeyTypes}] are not compatible with {principalCompatibilityLabel} leaf type(s) [{principalKeyTypes}]";
@@ -278,14 +278,14 @@ internal static class ApiRelationshipKeyAlignment
         string inferredForeignKeyLabel
     )
     {
-        var canCompare = matchingShapeKeys.Any(kvp => ApiSchemaHelpers.TryAreKeyTypesCompatible(kvp.Value, foreignKeyType, out _));
+        var canCompare = matchingShapeKeys.Any(kvp => ApiRelationshipKeyCompatibility.TryAreKeyTypesCompatible(kvp.Value, foreignKeyType, out _));
         if (!canCompare)
         {
             return;
         }
 
         var keyTypeNames = string.Join(", ", matchingShapeKeys.Select(static kvp => $"'{kvp.Key}'"));
-        var foreignKeyTypes = ApiSchemaHelpers.DescribeKeyLeafTypes(foreignKeyType);
+        var foreignKeyTypes = ApiRelationshipKeyCompatibility.DescribeKeyLeafTypes(foreignKeyType);
         var qualifier = string.IsNullOrWhiteSpace(principalEndQualifier) ? null : $" {principalEndQualifier}";
         var severity = ApiInitializationSeverity.Error;
         var code = ApiInitializationCode.API_RELATIONSHIP_INCOMPATIBLE_PRINCIPAL_FOREIGN_KEY;

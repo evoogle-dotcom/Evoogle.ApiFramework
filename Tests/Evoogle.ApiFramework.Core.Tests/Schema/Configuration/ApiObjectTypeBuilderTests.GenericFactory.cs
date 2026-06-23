@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -13,7 +13,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 public static class ApiObjectTypeBuilderTestsGenericTestFactory
 {
     #region Helper Types
-    /// <summary>Local configuration class used by <see cref="IApiObjectTypeConfiguration{T}"/> tests.</summary>
+    /// <summary>Local configuration class used by <see cref="IApiObjectTypeConfiguration{TObject}"/> tests.</summary>
     internal sealed class TestCustomerConfiguration : IApiObjectTypeConfiguration<Customer>
     {
         public void Configure(ApiObjectTypeBuilder<Customer> builder)

@@ -7,27 +7,27 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 
 
 /// <summary>
-///     Strongly-typed fluent builder for configuring an <see cref="ApiObjectType"/> whose CLR type is <typeparamref name="T"/>.
+///     Strongly-typed fluent builder for configuring an <see cref="ApiObjectType"/> whose CLR type is <typeparamref name="TObject"/>.
 ///     Extends <see cref="ApiObjectTypeBuilder"/> with expression-based overloads so CLR member names are
 ///     extracted at compile time rather than supplied as raw strings.
 /// </summary>
-/// <typeparam name="T">The CLR type represented by the API object type.</typeparam>
+/// <typeparam name="TObject">The CLR type represented by the API object type.</typeparam>
 /// <param name="context">The shared builder context.</param>
-public sealed class ApiObjectTypeBuilder<T>(ApiSchemaBuilderContext context)
-    : ApiObjectTypeBuilder(typeof(T), context)
+public sealed class ApiObjectTypeBuilder<TObject>(ApiSchemaBuilderContext context)
+    : ApiObjectTypeBuilder(typeof(TObject), context)
 {
     #region AddExtension Methods
     /// <inheritdoc cref="ApiObjectTypeBuilder.AddObjectTypeExtension(Type, object)"/>
-    public new ApiObjectTypeBuilder<T> AddObjectTypeExtension(Type type, object extension)
+    public new ApiObjectTypeBuilder<TObject> AddObjectTypeExtension(Type extensionType, object extension)
     {
-        base.AddObjectTypeExtension(type, extension);
+        base.AddObjectTypeExtension(extensionType, extension);
         return this;
     }
     #endregion
 
     #region AddKey Methods
     /// <summary>
-    ///     Adds an <see cref="ApiKeyType"/> definition using a strongly-typed <see cref="ApiKeyTypeBuilder{T}"/>
+    ///     Adds an <see cref="ApiKeyType"/> definition using a strongly-typed <see cref="ApiKeyTypeBuilder{TObject}"/>
     ///     callback that supports expression-based property selection.
     /// </summary>
     /// <remarks>
@@ -41,18 +41,18 @@ public sealed class ApiObjectTypeBuilder<T>(ApiSchemaBuilderContext context)
     /// <param name="apiName">The API name of the key type.</param>
     /// <param name="configure">Optional callback to configure the key type using a typed builder.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiObjectTypeBuilder<T> AddKey(string apiName, Action<ApiKeyTypeBuilder<T>>? configure = null)
+    public ApiObjectTypeBuilder<TObject> AddKey(string apiName, Action<ApiKeyTypeBuilder<TObject>>? configure = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
 
-        var apiKeyTypeBuilder = new ApiKeyTypeBuilder<T>(apiName);
+        var apiKeyTypeBuilder = new ApiKeyTypeBuilder<TObject>(apiName);
         configure?.Invoke(apiKeyTypeBuilder);
         base.AddKeyTypeBuilderCore(apiKeyTypeBuilder);
         return this;
     }
 
     /// <inheritdoc cref="ApiObjectTypeBuilder.AddKey(string, Action{ApiKeyTypeBuilder}?)"/>
-    public new ApiObjectTypeBuilder<T> AddKey(string apiName, Action<ApiKeyTypeBuilder>? configure = null)
+    public new ApiObjectTypeBuilder<TObject> AddKey(string apiName, Action<ApiKeyTypeBuilder>? configure = null)
     {
         base.AddKey(apiName, configure);
         return this;
@@ -61,21 +61,21 @@ public sealed class ApiObjectTypeBuilder<T>(ApiSchemaBuilderContext context)
 
     #region With Methods
     /// <inheritdoc cref="ApiNamedTypeBuilder{TBuilder}.WithName"/>
-    public new ApiObjectTypeBuilder<T> WithName(string apiName)
+    public new ApiObjectTypeBuilder<TObject> WithName(string apiName)
     {
         base.WithName(apiName);
         return this;
     }
 
     /// <inheritdoc cref="ApiObjectTypeBuilder.WithOptions"/>
-    public new ApiObjectTypeBuilder<T> WithOptions(Action<ApiObjectTypeOptionsBuilder> configure)
+    public new ApiObjectTypeBuilder<TObject> WithOptions(Action<ApiObjectTypeOptionsBuilder> configure)
     {
         base.WithOptions(configure);
         return this;
     }
 
     /// <inheritdoc cref="ApiObjectTypeBuilder.WithDefaultOptions"/>
-    public new ApiObjectTypeBuilder<T> WithDefaultOptions()
+    public new ApiObjectTypeBuilder<TObject> WithDefaultOptions()
     {
         base.WithDefaultOptions();
         return this;

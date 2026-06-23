@@ -57,7 +57,7 @@ public class ApiKeyTypeJsonConverter(ILogger<ApiKeyTypeJsonConverter>? logger) :
         #endregion
     }
 
-    private class ReadData : ExtensibleReadData
+    private class ReadState : ExtensibleReadData
     {
         #region Properties
         public ApiKeyTypeReadData? ApiKeyType { get; set; }
@@ -67,25 +67,25 @@ public class ApiKeyTypeJsonConverter(ILogger<ApiKeyTypeJsonConverter>? logger) :
     private class ReadHandlers(PropertyNames propertyNames)
     {
         #region ApiKeyType Fields
-        public readonly Dictionary<string, JsonReaderHandler<DefaultReadContext<PropertyNames, ReadData, ReadHandlers>>> PropertyHandlers = new()
+        public readonly Dictionary<string, JsonReaderHandler<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>>> PropertyHandlers = new()
         {
             // ApiKeyType Property Handlers
             { propertyNames.ApiKeyType.ApiName, HandleApiKeyTypeApiName },
             { propertyNames.ApiKeyType.ApiKeyPaths, HandleApiKeyTypeApiKeyPaths },
 
             // ExtensibleBase Property Handlers
-            { propertyNames.ExtensibleBase.Extensions, CreateExtensionsHandler<PropertyNames, ReadData, ReadHandlers>() },
+            { propertyNames.ExtensibleBase.Extensions, CreateExtensionsHandler<PropertyNames, ReadState, ReadHandlers>() },
         };
         #endregion
 
         #region ApiKeyType Methods
-        private static void HandleApiKeyTypeApiName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiKeyTypeApiName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
             context.ReadData.ApiKeyType ??= new ApiKeyTypeReadData();
             context.ReadData.ApiKeyType.ApiName = reader.GetString();
         }
 
-        private static void HandleApiKeyTypeApiKeyPaths(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiKeyTypeApiKeyPaths(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
             context.ReadData.ApiKeyType ??= new ApiKeyTypeReadData();
             context.ReadData.ApiKeyType.ApiKeyPaths ??= new List<ApiKeyPath>();
@@ -93,7 +93,7 @@ public class ApiKeyTypeJsonConverter(ILogger<ApiKeyTypeJsonConverter>? logger) :
             ReadJsonArray(ref reader, context, (x) => HandleApiKeyTypeApiKeyPathsArrayItem);
         }
 
-        private static void HandleApiKeyTypeApiKeyPathsArrayItem(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiKeyTypeApiKeyPathsArrayItem(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
             var apiKeyPath = JsonSerializer.Deserialize<ApiKeyPath>(ref reader, context.Options);
             if (apiKeyPath == null)
@@ -118,7 +118,7 @@ public class ApiKeyTypeJsonConverter(ILogger<ApiKeyTypeJsonConverter>? logger) :
     #region JsonConverterBase<T> Methods
     /// <inheritdoc/>
     protected override IReadContext CreateReadContext(ILogger logger, JsonSerializerOptions options)
-        => CreateDefaultReadContext<PropertyNames, ReadData, ReadHandlers>
+        => CreateDefaultReadContext<PropertyNames, ReadState, ReadHandlers>
             (
                 logger,
                 options,
@@ -138,11 +138,11 @@ public class ApiKeyTypeJsonConverter(ILogger<ApiKeyTypeJsonConverter>? logger) :
     /// <inheritdoc/>
     protected override ApiKeyType? CreateValue(IReadContext context)
     {
-        var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
-        var readData = readContext.ReadData.ApiKeyType;
+        var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
+        var readState = readContext.ReadData.ApiKeyType;
 
-        var apiName = readData?.ApiName;
-        var apiKeyPaths = readData?.ApiKeyPaths;
+        var apiName = readState?.ApiName;
+        var apiKeyPaths = readState?.ApiKeyPaths;
 
         var apiKeyType = new ApiKeyType(apiName, apiKeyPaths!);
 
@@ -155,7 +155,7 @@ public class ApiKeyTypeJsonConverter(ILogger<ApiKeyTypeJsonConverter>? logger) :
     /// <inheritdoc/>
     protected override void ReadCore(ref Utf8JsonReader reader, IReadContext context)
     {
-        var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
+        var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
         var handlers = readContext.ReadHandlers.PropertyHandlers;
 
         ReadJsonObject(ref reader, readContext, handlers);

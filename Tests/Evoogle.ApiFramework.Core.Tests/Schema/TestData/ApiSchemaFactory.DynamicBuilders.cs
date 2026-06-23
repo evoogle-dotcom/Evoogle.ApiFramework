@@ -334,12 +334,12 @@ public static partial class ApiSchemaFactory
     private static ApiRelationshipPrincipalEnd BuildApiRelationshipPrincipalEnd(ApiRelationshipPrincipalEndDef def)
     {
         var clrObjectType = def.ClrObjectType;
-        var apiKeyTypeName = def.ApiPrincipalKeyTypeName;
+        var apiPrincipalKeyTypeName = def.ApiPrincipalKeyTypeName;
 
         var apiRelationshipPrincipalEnd = new ApiRelationshipPrincipalEnd
         (
             clrObjectType,
-            apiKeyTypeName
+            apiPrincipalKeyTypeName
         );
 
         AttachExtensions(apiRelationshipPrincipalEnd, def);

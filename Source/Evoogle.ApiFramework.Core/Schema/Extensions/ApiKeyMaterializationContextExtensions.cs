@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -18,72 +18,72 @@ public static class ApiKeyMaterializationContextExtensions
     /// <summary>
     ///     Registers an already-materialized <see cref="ApiKey"/> value for the specified root CLR type and CLR property path.
     /// </summary>
-    /// <typeparam name="T">The root CLR type of the key path.</typeparam>
+    /// <typeparam name="TRoot">The root CLR type of the key path.</typeparam>
     /// <param name="context">The materialization context to configure.</param>
     /// <param name="clrPath">The full dotted CLR property path from the root type to the scalar property.</param>
-    /// <param name="value">The materialized key value.</param>
+    /// <param name="apiKey">The materialized key value.</param>
     /// <returns>The current context for fluent chaining.</returns>
-    public static ApiKeyMaterializationContext WithKey<T>(this ApiKeyMaterializationContext context, string clrPath, ApiKey value)
-        => context.WithKey(typeof(T), clrPath, value);
+    public static ApiKeyMaterializationContext WithKey<TRoot>(this ApiKeyMaterializationContext context, string clrPath, ApiKey apiKey)
+        => context.WithKey(typeof(TRoot), clrPath, apiKey);
 
     /// <summary>Registers an <see cref="int"/> key value without boxing.</summary>
-    /// <typeparam name="T">The root CLR type of the key path.</typeparam>
+    /// <typeparam name="TRoot">The root CLR type of the key path.</typeparam>
     /// <param name="context">The materialization context to configure.</param>
     /// <param name="clrPath">The full dotted CLR property path from the root type to the scalar property.</param>
     /// <param name="value">The scalar key value.</param>
     /// <returns>The current context for fluent chaining.</returns>
-    public static ApiKeyMaterializationContext WithKey<T>(this ApiKeyMaterializationContext context, string clrPath, int value)
-        => context.WithKey<T>(clrPath, ApiKey.FromInt32(value));
+    public static ApiKeyMaterializationContext WithKey<TRoot>(this ApiKeyMaterializationContext context, string clrPath, int value)
+        => context.WithKey<TRoot>(clrPath, ApiKey.FromInt32(value));
 
     /// <summary>Registers a <see cref="long"/> key value without boxing.</summary>
-    /// <typeparam name="T">The root CLR type of the key path.</typeparam>
+    /// <typeparam name="TRoot">The root CLR type of the key path.</typeparam>
     /// <param name="context">The materialization context to configure.</param>
     /// <param name="clrPath">The full dotted CLR property path from the root type to the scalar property.</param>
     /// <param name="value">The scalar key value.</param>
     /// <returns>The current context for fluent chaining.</returns>
-    public static ApiKeyMaterializationContext WithKey<T>(this ApiKeyMaterializationContext context, string clrPath, long value)
-        => context.WithKey<T>(clrPath, ApiKey.FromInt64(value));
+    public static ApiKeyMaterializationContext WithKey<TRoot>(this ApiKeyMaterializationContext context, string clrPath, long value)
+        => context.WithKey<TRoot>(clrPath, ApiKey.FromInt64(value));
 
     /// <summary>Registers a <see cref="Guid"/> key value without boxing.</summary>
-    /// <typeparam name="T">The root CLR type of the key path.</typeparam>
+    /// <typeparam name="TRoot">The root CLR type of the key path.</typeparam>
     /// <param name="context">The materialization context to configure.</param>
     /// <param name="clrPath">The full dotted CLR property path from the root type to the scalar property.</param>
     /// <param name="value">The scalar key value.</param>
     /// <returns>The current context for fluent chaining.</returns>
-    public static ApiKeyMaterializationContext WithKey<T>(this ApiKeyMaterializationContext context, string clrPath, Guid value)
-        => context.WithKey<T>(clrPath, ApiKey.FromGuid(value));
+    public static ApiKeyMaterializationContext WithKey<TRoot>(this ApiKeyMaterializationContext context, string clrPath, Guid value)
+        => context.WithKey<TRoot>(clrPath, ApiKey.FromGuid(value));
 
     /// <summary>Registers an <see cref="Ulid"/> key value without boxing.</summary>
-    /// <typeparam name="T">The root CLR type of the key path.</typeparam>
+    /// <typeparam name="TRoot">The root CLR type of the key path.</typeparam>
     /// <param name="context">The materialization context to configure.</param>
     /// <param name="clrPath">The full dotted CLR property path from the root type to the scalar property.</param>
     /// <param name="value">The scalar key value.</param>
     /// <returns>The current context for fluent chaining.</returns>
-    public static ApiKeyMaterializationContext WithKey<T>(this ApiKeyMaterializationContext context, string clrPath, Ulid value)
-        => context.WithKey<T>(clrPath, ApiKey.FromUlid(value));
+    public static ApiKeyMaterializationContext WithKey<TRoot>(this ApiKeyMaterializationContext context, string clrPath, Ulid value)
+        => context.WithKey<TRoot>(clrPath, ApiKey.FromUlid(value));
 
     /// <summary>Registers a <see cref="CultureInfo"/> key value.</summary>
-    /// <typeparam name="T">The root CLR type of the key path.</typeparam>
+    /// <typeparam name="TRoot">The root CLR type of the key path.</typeparam>
     /// <param name="context">The materialization context to configure.</param>
     /// <param name="clrPath">The full dotted CLR property path from the root type to the scalar property.</param>
     /// <param name="value">The culture key value.</param>
     /// <returns>The current context for fluent chaining.</returns>
-    public static ApiKeyMaterializationContext WithKey<T>(this ApiKeyMaterializationContext context, string clrPath, CultureInfo value)
+    public static ApiKeyMaterializationContext WithKey<TRoot>(this ApiKeyMaterializationContext context, string clrPath, CultureInfo value)
     {
         ArgumentNullException.ThrowIfNull(value);
-        return context.WithKey<T>(clrPath, ApiKey.FromCulture(value));
+        return context.WithKey<TRoot>(clrPath, ApiKey.FromCulture(value));
     }
 
     /// <summary>
     ///     Registers raw text for the specified root CLR type and CLR property path.
     ///     The text is parsed according to schema metadata during value-based materialization.
     /// </summary>
-    /// <typeparam name="T">The root CLR type of the key path.</typeparam>
+    /// <typeparam name="TRoot">The root CLR type of the key path.</typeparam>
     /// <param name="context">The materialization context to configure.</param>
     /// <param name="clrPath">The full dotted CLR property path from the root type to the scalar property.</param>
-    /// <param name="value">The raw text value.</param>
+    /// <param name="text">The raw text value.</param>
     /// <returns>The current context for fluent chaining.</returns>
-    public static ApiKeyMaterializationContext WithText<T>(this ApiKeyMaterializationContext context, string clrPath, string? value)
-        => context.WithText(typeof(T), clrPath, value);
+    public static ApiKeyMaterializationContext WithText<TRoot>(this ApiKeyMaterializationContext context, string clrPath, string? text)
+        => context.WithText(typeof(TRoot), clrPath, text);
     #endregion
 }

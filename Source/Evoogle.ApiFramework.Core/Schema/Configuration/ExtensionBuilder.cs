@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -19,20 +19,20 @@ public abstract class ExtensionBuilder<TBuilder>
 
     #region Methods
     /// <summary>
-    ///     Adds an extension value associated with the specified <paramref name="type"/>.
+    ///     Adds an extension value associated with the specified <paramref name="extensionType"/>.
     ///     Called by the concrete builder's named extension method (e.g. <c>AddSchemaExtension</c>).
     /// </summary>
-    /// <param name="type">The type used as the extension key.</param>
+    /// <param name="extensionType">The type used as the extension key.</param>
     /// <param name="extension">The extension value to store.</param>
     /// <returns>The current <typeparamref name="TBuilder"/> instance.</returns>
-    protected TBuilder AddExtension(Type type, object extension)
+    protected TBuilder AddExtension(Type extensionType, object extension)
     {
-        ArgumentNullException.ThrowIfNull(type);
+        ArgumentNullException.ThrowIfNull(extensionType);
         ArgumentNullException.ThrowIfNull(extension);
 
-        if (type.IsValueType)
+        if (extensionType.IsValueType)
         {
-            throw new ArgumentException("Extension metadata keys must be reference types.", nameof(type));
+            throw new ArgumentException("Extension metadata keys must be reference types.", nameof(extensionType));
         }
 
         if (extension.GetType().IsValueType)
@@ -40,7 +40,7 @@ public abstract class ExtensionBuilder<TBuilder>
             throw new ArgumentException("Extension metadata values must be reference types.", nameof(extension));
         }
 
-        _extensions[type] = extension;
+        _extensions[extensionType] = extension;
         return (TBuilder)this;
     }
 

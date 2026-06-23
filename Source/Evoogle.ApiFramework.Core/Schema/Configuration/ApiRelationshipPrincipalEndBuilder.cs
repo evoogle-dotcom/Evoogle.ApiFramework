@@ -19,19 +19,19 @@ public sealed class ApiRelationshipPrincipalEndBuilder(Type clrObjectType) : Ext
 {
     #region Fields
     private readonly Type _clrObjectType = clrObjectType ?? throw new ArgumentNullException(nameof(clrObjectType));
-    private string? _apiKeyTypeName;
+    private string? _apiPrincipalKeyTypeName;
     #endregion
 
     #region AddExtension Methods
     /// <summary>
-    ///     Adds an extension value associated with the specified <paramref name="type"/>.
+    ///     Adds an extension value associated with the specified <paramref name="extensionType"/>.
     /// </summary>
-    /// <param name="type">The type used as the extension key.</param>
+    /// <param name="extensionType">The type used as the extension key.</param>
     /// <param name="extension">The extension value to store.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipPrincipalEndBuilder AddRelationshipPrincipalEndExtension(Type type, object extension)
+    public ApiRelationshipPrincipalEndBuilder AddRelationshipPrincipalEndExtension(Type extensionType, object extension)
     {
-        return this.AddExtension(type, extension);
+        return this.AddExtension(extensionType, extension);
     }
     #endregion
 
@@ -40,13 +40,13 @@ public sealed class ApiRelationshipPrincipalEndBuilder(Type clrObjectType) : Ext
     ///     Selects a named key type on the principal object type to use as the relationship's principal key,
     ///     overriding automatic compatibility-based key inference.
     /// </summary>
-    /// <param name="apiKeyTypeName">The name of the principal key type to use for the relationship.</param>
+    /// <param name="apiPrincipalKeyTypeName">The name of the principal key type to use for the relationship.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipPrincipalEndBuilder WithPrincipalKey(string apiKeyTypeName)
+    public ApiRelationshipPrincipalEndBuilder WithPrincipalKey(string apiPrincipalKeyTypeName)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiKeyTypeName, nameof(apiKeyTypeName));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiPrincipalKeyTypeName, nameof(apiPrincipalKeyTypeName));
 
-        _apiKeyTypeName = apiKeyTypeName;
+        _apiPrincipalKeyTypeName = apiPrincipalKeyTypeName;
         return this;
     }
     #endregion
@@ -60,7 +60,7 @@ public sealed class ApiRelationshipPrincipalEndBuilder(Type clrObjectType) : Ext
         var end = new ApiRelationshipPrincipalEnd
         (
             _clrObjectType,
-            _apiKeyTypeName
+            _apiPrincipalKeyTypeName
         );
 
         var extensions = this.BuildExtensions();

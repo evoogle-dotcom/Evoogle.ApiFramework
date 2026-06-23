@@ -273,7 +273,7 @@ public sealed class ApiSchema : ExtensibleBase
     public bool TryGetRelationshipByApiName(string apiName, [NotNullWhen(true)] out ApiRelationship? apiRelationship) => this.ApiRelationshipApiNameLookup.TryGetValue(apiName, out apiRelationship);
 
     private string BuildPath()
-        => ApiSchemaHelpers.BuildPath(null, segment: nameof(ApiSchema), segmentName: this.ApiName);
+        => ApiSchemaPathFormatting.BuildPath(null, segment: nameof(ApiSchema), segmentName: this.ApiName);
     #endregion
 
     #region Factory Methods
@@ -359,7 +359,7 @@ public sealed class ApiSchema : ExtensibleBase
     #region Implementation Methods
     private void InitializeApiName(ApiInitializationContext context)
     {
-        var isApiNameInvalid = ApiSchemaHelpers.IsNameInvalid(this.ApiName);
+        var isApiNameInvalid = ApiSchemaNameValidation.IsNameInvalid(this.ApiName);
         if (isApiNameInvalid)
         {
             var path = this.ApiPath;
@@ -431,11 +431,11 @@ public sealed class ApiSchema : ExtensibleBase
 
         _apiRelationshipApiNameLookup = null;
 
-        ApiSchemaHelpers.InitializeLookupDictionary
+        ApiSchemaInitializationLookup.InitializeLookupDictionary
         (
             parts: this.ApiNamedTypes,
             partKeySelector: x => x.ApiName,
-            partKeyFilter: x => ApiSchemaHelpers.IsNameValid(x),
+            partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
             partKeyPropertyName: nameof(ApiNamedType.ApiName),
             path: this.ApiPath,
             duplicatePartCode: ApiInitializationCode.API_SCHEMA_DUPLICATE_NAMED_TYPE_API_NAME,
@@ -443,7 +443,7 @@ public sealed class ApiSchema : ExtensibleBase
             lookupDictionary: out _apiNamedTypeApiNameLookup
         );
 
-        ApiSchemaHelpers.InitializeLookupDictionary
+        ApiSchemaInitializationLookup.InitializeLookupDictionary
         (
             parts: this.ApiNamedTypes,
             partKeySelector: x => x.ClrType,
@@ -455,11 +455,11 @@ public sealed class ApiSchema : ExtensibleBase
             lookupDictionary: out _apiNamedTypeClrTypeLookup
         );
 
-        ApiSchemaHelpers.InitializeLookupDictionary
+        ApiSchemaInitializationLookup.InitializeLookupDictionary
         (
             parts: this.ApiEnumTypes,
             partKeySelector: x => x.ApiName,
-            partKeyFilter: x => ApiSchemaHelpers.IsNameValid(x),
+            partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
             partKeyPropertyName: nameof(ApiEnumType.ApiName),
             path: this.ApiPath,
             duplicatePartCode: ApiInitializationCode.API_SCHEMA_DUPLICATE_ENUM_TYPE_API_NAME,
@@ -467,7 +467,7 @@ public sealed class ApiSchema : ExtensibleBase
             lookupDictionary: out _apiEnumTypeApiNameLookup
         );
 
-        ApiSchemaHelpers.InitializeLookupDictionary
+        ApiSchemaInitializationLookup.InitializeLookupDictionary
         (
             parts: this.ApiEnumTypes,
             partKeySelector: x => x.ClrType,
@@ -479,11 +479,11 @@ public sealed class ApiSchema : ExtensibleBase
             lookupDictionary: out _apiEnumTypeClrTypeLookup
         );
 
-        ApiSchemaHelpers.InitializeLookupDictionary
+        ApiSchemaInitializationLookup.InitializeLookupDictionary
         (
             parts: this.ApiObjectTypes,
             partKeySelector: x => x.ApiName,
-            partKeyFilter: x => ApiSchemaHelpers.IsNameValid(x),
+            partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
             partKeyPropertyName: nameof(ApiObjectType.ApiName),
             path: this.ApiPath,
             duplicatePartCode: ApiInitializationCode.API_SCHEMA_DUPLICATE_OBJECT_TYPE_API_NAME,
@@ -491,7 +491,7 @@ public sealed class ApiSchema : ExtensibleBase
             lookupDictionary: out _apiObjectTypeApiNameLookup
         );
 
-        ApiSchemaHelpers.InitializeLookupDictionary
+        ApiSchemaInitializationLookup.InitializeLookupDictionary
         (
             parts: this.ApiObjectTypes,
             partKeySelector: x => x.ClrType,
@@ -503,11 +503,11 @@ public sealed class ApiSchema : ExtensibleBase
             lookupDictionary: out _apiObjectTypeClrTypeLookup
         );
 
-        ApiSchemaHelpers.InitializeLookupDictionary
+        ApiSchemaInitializationLookup.InitializeLookupDictionary
         (
             parts: this.ApiScalarTypes,
             partKeySelector: x => x.ApiName,
-            partKeyFilter: x => ApiSchemaHelpers.IsNameValid(x),
+            partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
             partKeyPropertyName: nameof(ApiScalarType.ApiName),
             path: this.ApiPath,
             duplicatePartCode: ApiInitializationCode.API_SCHEMA_DUPLICATE_SCALAR_TYPE_API_NAME,
@@ -515,7 +515,7 @@ public sealed class ApiSchema : ExtensibleBase
             lookupDictionary: out _apiScalarTypeApiNameLookup
         );
 
-        ApiSchemaHelpers.InitializeLookupDictionary
+        ApiSchemaInitializationLookup.InitializeLookupDictionary
         (
             parts: this.ApiScalarTypes,
             partKeySelector: x => x.ClrType,
@@ -527,11 +527,11 @@ public sealed class ApiSchema : ExtensibleBase
             lookupDictionary: out _apiScalarTypeClrTypeLookup
         );
 
-        ApiSchemaHelpers.InitializeLookupDictionary
+        ApiSchemaInitializationLookup.InitializeLookupDictionary
         (
             parts: this.ApiRelationships,
             partKeySelector: x => x.ApiName,
-            partKeyFilter: x => ApiSchemaHelpers.IsNameValid(x),
+            partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
             partKeyPropertyName: nameof(ApiRelationship.ApiName),
             path: this.ApiPath,
             duplicatePartCode: ApiInitializationCode.API_SCHEMA_DUPLICATE_RELATIONSHIP_API_NAME,

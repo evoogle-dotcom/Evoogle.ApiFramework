@@ -56,7 +56,7 @@ public sealed class ApiKeyPathSegment(string clrPropertyName) : ApiSchemaElement
     #region ApiSchemaElement Methods
     /// <inheritdoc/>
     protected override string BuildPath(string? apiPreviousPath)
-        => ApiSchemaHelpers.BuildPath(basePath: apiPreviousPath, segment: this.ApiElementName, segmentName: this.ClrPropertyName);
+        => ApiSchemaPathFormatting.BuildPath(basePath: apiPreviousPath, segment: this.ApiElementName, segmentName: this.ClrPropertyName);
 
     /// <inheritdoc/>
     internal override void Initialize(ApiInitializationContext context)
@@ -73,7 +73,7 @@ public sealed class ApiKeyPathSegment(string clrPropertyName) : ApiSchemaElement
     #region Implementation Methods
     private void InitializeClrPropertyName(ApiInitializationContext context)
     {
-        if (!ApiSchemaHelpers.IsNameInvalid(this.ClrPropertyName))
+        if (!ApiSchemaNameValidation.IsNameInvalid(this.ClrPropertyName))
         {
             return;
         }
@@ -91,7 +91,7 @@ public sealed class ApiKeyPathSegment(string clrPropertyName) : ApiSchemaElement
     {
         _apiResolvedProperty = null;
 
-        if (ApiSchemaHelpers.IsNameInvalid(this.ClrPropertyName))
+        if (ApiSchemaNameValidation.IsNameInvalid(this.ClrPropertyName))
         {
             return;
         }

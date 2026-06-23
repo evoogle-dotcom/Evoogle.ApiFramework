@@ -177,24 +177,24 @@ public sealed class ApiTypeExpression
     #endregion
 
     #region Factory Methods
-    /// <summary>Creates an <see cref="ApiTypeExpression"/> that references the CLR type <typeparamref name="T"/>.</summary>
-    /// <typeparam name="T">The CLR type to reference.</typeparam>
-    /// <returns>A new <see cref="ApiTypeExpression"/> backed by <typeparamref name="T"/>.</returns>
-    public static ApiTypeExpression ClrRef<T>() => new(typeof(T));
+    /// <summary>Creates an <see cref="ApiTypeExpression"/> that references the CLR type <typeparamref name="TClr"/>.</summary>
+    /// <typeparam name="TClr">The CLR type to reference.</typeparam>
+    /// <returns>A new <see cref="ApiTypeExpression"/> backed by <typeparamref name="TClr"/>.</returns>
+    public static ApiTypeExpression ClrRef<TClr>() => new(typeof(TClr));
 
-    /// <summary>Creates an <see cref="ApiTypeExpression"/> whose items are of CLR type <typeparamref name="T"/> collected into a <see cref="HashSet{T}"/>.</summary>
-    /// <typeparam name="T">The CLR item type.</typeparam>
+    /// <summary>Creates an <see cref="ApiTypeExpression"/> whose items are of CLR type <typeparamref name="TClr"/> collected into a <see cref="HashSet{TClr}"/>.</summary>
+    /// <typeparam name="TClr">The CLR item type.</typeparam>
     /// <param name="apiItemTypeModifiers">Modifiers applied to each item type expression.</param>
-    /// <returns>A new collection <see cref="ApiTypeExpression"/> backed by <see cref="HashSet{T}"/>.</returns>
-    public static ApiTypeExpression HashSetOf<T>(ApiTypeModifiers apiItemTypeModifiers)
-        => new(new ApiCollectionType(ClrRef<T>(), apiItemTypeModifiers, typeof(HashSet<T>)));
+    /// <returns>A new collection <see cref="ApiTypeExpression"/> backed by <see cref="HashSet{TClr}"/>.</returns>
+    public static ApiTypeExpression HashSetOf<TClr>(ApiTypeModifiers apiItemTypeModifiers)
+        => new(new ApiCollectionType(ClrRef<TClr>(), apiItemTypeModifiers, typeof(HashSet<TClr>)));
 
-    /// <summary>Creates an <see cref="ApiTypeExpression"/> whose items are of CLR type <typeparamref name="T"/> collected into a <see cref="List{T}"/>.</summary>
-    /// <typeparam name="T">The CLR item type.</typeparam>
+    /// <summary>Creates an <see cref="ApiTypeExpression"/> whose items are of CLR type <typeparamref name="TClr"/> collected into a <see cref="List{TClr}"/>.</summary>
+    /// <typeparam name="TClr">The CLR item type.</typeparam>
     /// <param name="apiItemTypeModifiers">Modifiers applied to each item type expression.</param>
-    /// <returns>A new collection <see cref="ApiTypeExpression"/> backed by <see cref="List{T}"/>.</returns>
-    public static ApiTypeExpression ListOf<T>(ApiTypeModifiers apiItemTypeModifiers)
-        => new(new ApiCollectionType(ClrRef<T>(), apiItemTypeModifiers, typeof(List<T>)));
+    /// <returns>A new collection <see cref="ApiTypeExpression"/> backed by <see cref="List{TClr}"/>.</returns>
+    public static ApiTypeExpression ListOf<TClr>(ApiTypeModifiers apiItemTypeModifiers)
+        => new(new ApiCollectionType(ClrRef<TClr>(), apiItemTypeModifiers, typeof(List<TClr>)));
     #endregion
 
     #region Object Methods

@@ -30,9 +30,9 @@ namespace Evoogle.ApiFramework.Key;
 ///     </para>
 ///     <para>
 ///         Scalar value-type arms (<see cref="int"/>, <see cref="long"/>, <see cref="Guid"/>,
-///         <see cref="Ulid"/>) are stored without boxing in an explicit-layout union (<c>_val</c>).
+///         <see cref="Ulid"/>) are stored without boxing in an explicit-layout union (<c>_valueUnion</c>).
 ///         Reference-type arms (<see cref="string"/>, <see cref="CultureInfo"/>) and the composite
-///         part array are stored in a single <c>object?</c> reference slot (<c>_ref</c>), keeping the
+///         part array are stored in a single <c>object?</c> reference slot (<c>_referenceValue</c>), keeping the
 ///         struct footprint minimal.
 ///     </para>
 ///     <para>
@@ -95,7 +95,7 @@ public readonly struct ApiKey
     ///     Overlays <see cref="int"/>, <see cref="long"/>, <see cref="Guid"/>, and <see cref="Ulid"/> in the same
     ///     memory location, enabling zero-allocation storage of scalar keys.
     /// </remarks>
-    private readonly ApiKeyValueUnion _val;
+    private readonly ApiKeyValueUnion _valueUnion;
 
     /// <summary>
     ///     Reference slot for reference-type arms and composite arrays.
@@ -104,7 +104,7 @@ public readonly struct ApiKey
     ///     Stores <see cref="string"/>, <see cref="CultureInfo"/>, or <see cref="ApiKeyPart"/>[] for composite keys.
     ///     Null for scalar value-type keys.
     /// </remarks>
-    private readonly object? _ref;
+    private readonly object? _referenceValue;
 
     /// <summary>
     ///     Frozen set of CLR types supported as scalar key values.
@@ -255,7 +255,7 @@ public readonly struct ApiKey
                 return false;
             }
 
-            var parts = (ApiKeyPart[])_ref!;
+            var parts = (ApiKeyPart[])_referenceValue!;
             if (parts.Length == 0)
             {
                 return false;
@@ -290,7 +290,7 @@ public readonly struct ApiKey
                 return false;
             }
 
-            var parts = (ApiKeyPart[])_ref!;
+            var parts = (ApiKeyPart[])_referenceValue!;
             if (parts.Length == 0)
             {
                 return false;
@@ -309,7 +309,7 @@ public readonly struct ApiKey
     /// <remarks>
     ///     For non-composite keys (scalars and <see cref="Empty"/>), this property returns 0.
     /// </remarks>
-    public readonly int PartCount => this.IsComposite ? ((ApiKeyPart[])_ref!).Length : 0;
+    public readonly int PartCount => this.IsComposite ? ((ApiKeyPart[])_referenceValue!).Length : 0;
 
     /// <summary>
     ///     Gets the parts of this composite key as a read-only span.
@@ -322,7 +322,7 @@ public readonly struct ApiKey
     ///     for performance-sensitive code.
     /// </remarks>
     public readonly ReadOnlySpan<ApiKeyPart> PartsAsSpan =>
-        this.IsComposite ? ((ApiKeyPart[])_ref!).AsSpan() : ReadOnlySpan<ApiKeyPart>.Empty;
+        this.IsComposite ? ((ApiKeyPart[])_referenceValue!).AsSpan() : ReadOnlySpan<ApiKeyPart>.Empty;
 
     /// <summary>
     ///     Gets the parts of this composite key as an enumerable sequence.
@@ -334,7 +334,7 @@ public readonly struct ApiKey
     ///     Use <see cref="PartsAsSpan"/> instead when possible for better performance (zero allocation).
     /// </remarks>
     public readonly IEnumerable<ApiKeyPart> PartsAsEnumerable =>
-         this.IsComposite ? EnumerateParts((ApiKeyPart[])_ref!) : Enumerable.Empty<ApiKeyPart>();
+         this.IsComposite ? EnumerateParts((ApiKeyPart[])_referenceValue!) : Enumerable.Empty<ApiKeyPart>();
 
     private static IEnumerable<ApiKeyPart> EnumerateParts(ApiKeyPart[] parts)
     {
@@ -350,13 +350,13 @@ public readonly struct ApiKey
     ///     Internal constructor used by factory methods to create a new <see cref="ApiKey"/> instance.
     /// </summary>
     /// <param name="kind">The discriminated kind.</param>
-    /// <param name="val">Union value storage for value-type arms.</param>
-    /// <param name="reference">Reference storage for reference-type arms.</param>
+    /// <param name="valueUnion">Union value storage for value-type arms.</param>
+    /// <param name="referenceValue">Reference storage for reference-type arms.</param>
     /// <param name="original">Original string representation (optional).</param>
-    internal ApiKey(ApiKeyKind kind, in ApiKeyValueUnion val, object? reference, string? original)
+    internal ApiKey(ApiKeyKind kind, in ApiKeyValueUnion valueUnion, object? referenceValue, string? original)
     {
-        _val = val;
-        _ref = reference;
+        _valueUnion = valueUnion;
+        _referenceValue = referenceValue;
 
         this.ApiKind = kind;
         this.ApiOriginalString = original;
@@ -364,7 +364,7 @@ public readonly struct ApiKey
         // Pre-compute hash code for composites
         _hashCode = kind switch
         {
-            ApiKeyKind.Composite => GetCompositeHash((ApiKeyPart[])reference!),
+            ApiKeyKind.Composite => GetCompositeHash((ApiKeyPart[])referenceValue!),
             _ => 0  // Computed lazily for scalars
         };
     }
@@ -617,15 +617,15 @@ public readonly struct ApiKey
         // No mixing (named <-> unnamed)
         var anyNamed = false;
         var anyUnnamed = false;
-        foreach (var p in parts)
+        foreach (var part in parts)
         {
             // Reject nested composites
-            if (p.ApiValue.ApiKind == ApiKeyKind.Composite)
+            if (part.ApiValue.ApiKind == ApiKeyKind.Composite)
             {
                 throw new ApiKeyException($"Nested composite parts are not allowed in {nameof(ApiKey)}.");
             }
 
-            if (string.IsNullOrWhiteSpace(p.ApiName))
+            if (string.IsNullOrWhiteSpace(part.ApiName))
             {
                 anyUnnamed = true;
             }
@@ -672,18 +672,18 @@ public readonly struct ApiKey
 
     /// <summary>
     ///     Gets the compatible scalar CLR type for <see cref="ApiKey"/> conversion.
-    ///     If the provided <paramref name="type"/> is already compatible, it is returned as-is; otherwise, returns <see cref="string"/> as a fallback.
+    ///     If the provided <paramref name="clrType"/> is already compatible, it is returned as-is; otherwise, returns <see cref="string"/> as a fallback.
     /// </summary>
-    /// <param name="type">The CLR type to check.</param>
+    /// <param name="clrType">The CLR type to check.</param>
     /// <returns>The compatible scalar CLR type for <see cref="ApiKey"/> conversion.</returns>
-    public static Type GetCompatibleScalarType(Type type)
+    public static Type GetCompatibleScalarType(Type clrType)
     {
-        ArgumentNullException.ThrowIfNull(type, nameof(type));
+        ArgumentNullException.ThrowIfNull(clrType, nameof(clrType));
 
         // If already compatible, return as-is
-        if (IsCompatibleScalarType(type))
+        if (IsCompatibleScalarType(clrType))
         {
-            return type;
+            return clrType;
         }
 
         // Default fallback to string for all other types
@@ -693,26 +693,26 @@ public readonly struct ApiKey
     /// <summary>
     ///    Determines whether the specified <see cref="Type"/> is a compatible scalar type for <see cref="ApiKey"/>.
     /// </summary>
-    /// <param name="type">The type to check.</param>
+    /// <param name="clrType">The type to check.</param>
     /// <returns>True if the type is a compatible scalar type; otherwise, false.</returns>
-    public static bool IsCompatibleScalarType(Type type)
+    public static bool IsCompatibleScalarType(Type clrType)
     {
-        ArgumentNullException.ThrowIfNull(type, nameof(type));
+        ArgumentNullException.ThrowIfNull(clrType, nameof(clrType));
 
-        return _scalarTypeKinds.ContainsKey(type);
+        return _scalarTypeKinds.ContainsKey(clrType);
     }
 
     /// <summary>
     ///     Attempts to get the <see cref="ApiKeyKind"/> represented by a compatible scalar CLR type.
     /// </summary>
-    /// <param name="type">The CLR type to check.</param>
-    /// <param name="kind">The key kind associated with <paramref name="type"/>, when compatible.</param>
+    /// <param name="clrType">The CLR type to check.</param>
+    /// <param name="kind">The key kind associated with <paramref name="clrType"/>, when compatible.</param>
     /// <returns>True if the type is a compatible scalar type; otherwise, false.</returns>
-    public static bool TryGetCompatibleScalarKind(Type type, out ApiKeyKind kind)
+    public static bool TryGetCompatibleScalarKind(Type clrType, out ApiKeyKind kind)
     {
-        ArgumentNullException.ThrowIfNull(type, nameof(type));
+        ArgumentNullException.ThrowIfNull(clrType, nameof(clrType));
 
-        return _scalarTypeKinds.TryGetValue(type, out kind);
+        return _scalarTypeKinds.TryGetValue(clrType, out kind);
     }
 
     /// <summary>
@@ -741,100 +741,100 @@ public readonly struct ApiKey
 
         // Use string.Create for zero-allocation formatting (advanced)
         // OR simpler: pre-calculate size and use StringBuilder
-        var sb = new StringBuilder();
+        var stringBuilder = new StringBuilder();
         for (var i = 0; i < arr.Length; i++)
         {
             if (i > 0)
             {
-                sb.Append('|');
+                stringBuilder.Append('|');
             }
 
             var part = arr[i];
             if (part.ApiName is not null)
             {
-                sb.Append(part.ApiName);
-                sb.Append('=');
+                stringBuilder.Append(part.ApiName);
+                stringBuilder.Append('=');
             }
-            sb.Append(part.ApiValue.ToString());
+            stringBuilder.Append(part.ApiValue.ToString());
         }
 
-        return sb.ToString();
+        return stringBuilder.ToString();
     }
     #endregion
 
     #region AsOrThrow Methods
     /// <summary>Gets the string value or throws if the kind is not <see cref="ApiKeyKind.String"/>.</summary>
-    public readonly string AsStringOrThrow() => this.ApiKind == ApiKeyKind.String ? (string)_ref! : throw new ApiKeyException($"Kind {this.ApiKind} is not {nameof(ApiKeyKind.String)}.");
+    public readonly string AsStringOrThrow() => this.ApiKind == ApiKeyKind.String ? (string)_referenceValue! : throw new ApiKeyException($"Kind {this.ApiKind} is not {nameof(ApiKeyKind.String)}.");
 
     /// <summary>Gets the Int32 value or throws if the kind is not <see cref="ApiKeyKind.Int32"/>.</summary>
-    public readonly int AsInt32OrThrow() => this.ApiKind == ApiKeyKind.Int32 ? _val.Int32 : throw new ApiKeyException($"Kind {this.ApiKind} is not {nameof(ApiKeyKind.Int32)}.");
+    public readonly int AsInt32OrThrow() => this.ApiKind == ApiKeyKind.Int32 ? _valueUnion.Int32 : throw new ApiKeyException($"Kind {this.ApiKind} is not {nameof(ApiKeyKind.Int32)}.");
 
     /// <summary>Gets the Int64 value or throws if the kind is not <see cref="ApiKeyKind.Int64"/>.</summary>
-    public readonly long AsInt64OrThrow() => this.ApiKind == ApiKeyKind.Int64 ? _val.Int64 : throw new ApiKeyException($"Kind {this.ApiKind} is not {nameof(ApiKeyKind.Int64)}.");
+    public readonly long AsInt64OrThrow() => this.ApiKind == ApiKeyKind.Int64 ? _valueUnion.Int64 : throw new ApiKeyException($"Kind {this.ApiKind} is not {nameof(ApiKeyKind.Int64)}.");
 
     /// <summary>Gets the Guid value or throws if the kind is not <see cref="ApiKeyKind.Guid"/>.</summary>
-    public readonly Guid AsGuidOrThrow() => this.ApiKind == ApiKeyKind.Guid ? _val.Guid : throw new ApiKeyException($"Kind {this.ApiKind} is not {nameof(ApiKeyKind.Guid)}.");
+    public readonly Guid AsGuidOrThrow() => this.ApiKind == ApiKeyKind.Guid ? _valueUnion.Guid : throw new ApiKeyException($"Kind {this.ApiKind} is not {nameof(ApiKeyKind.Guid)}.");
 
     /// <summary>Gets the Ulid value or throws if the kind is not <see cref="ApiKeyKind.Ulid"/>.</summary>
-    public readonly Ulid AsUlidOrThrow() => this.ApiKind == ApiKeyKind.Ulid ? _val.Ulid : throw new ApiKeyException($"Kind {this.ApiKind} is not {nameof(ApiKeyKind.Ulid)}.");
+    public readonly Ulid AsUlidOrThrow() => this.ApiKind == ApiKeyKind.Ulid ? _valueUnion.Ulid : throw new ApiKeyException($"Kind {this.ApiKind} is not {nameof(ApiKeyKind.Ulid)}.");
 
     /// <summary>Gets the culture value or throws if the kind is not <see cref="ApiKeyKind.Culture"/>.</summary>
-    public readonly CultureInfo AsCultureOrThrow() => this.ApiKind == ApiKeyKind.Culture ? (CultureInfo)_ref! : throw new ApiKeyException($"Kind {this.ApiKind} is not {nameof(ApiKeyKind.Culture)}.");
+    public readonly CultureInfo AsCultureOrThrow() => this.ApiKind == ApiKeyKind.Culture ? (CultureInfo)_referenceValue! : throw new ApiKeyException($"Kind {this.ApiKind} is not {nameof(ApiKeyKind.Culture)}.");
     #endregion
 
     #region TryGet Methods
     /// <summary>Attempts to get the string value if kind is <see cref="ApiKeyKind.String"/>.</summary>
     /// <param name="value">The output value or null.</param>
     /// <returns>True if successful.</returns>
-    public readonly bool TryGet([NotNullWhen(true)] out string? value) { value = this.ApiKind == ApiKeyKind.String ? (string?)_ref : null; return this.ApiKind == ApiKeyKind.String; }
+    public readonly bool TryGet([NotNullWhen(true)] out string? value) { value = this.ApiKind == ApiKeyKind.String ? (string?)_referenceValue : null; return this.ApiKind == ApiKeyKind.String; }
 
     /// <summary>Attempts to get the Int32 value if kind is <see cref="ApiKeyKind.Int32"/>.</summary>
     /// <param name="value">The output Int32 value, or the default of <see langword="int"/> if the kind is not <see cref="ApiKeyKind.Int32"/>.</param>
     /// <returns><see langword="true"/> if the kind is <see cref="ApiKeyKind.Int32"/>; otherwise <see langword="false"/>.</returns>
-    public readonly bool TryGet(out int value) { value = _val.Int32; return this.ApiKind == ApiKeyKind.Int32; }
+    public readonly bool TryGet(out int value) { value = _valueUnion.Int32; return this.ApiKind == ApiKeyKind.Int32; }
 
     /// <summary>Attempts to get the Int64 value if kind is <see cref="ApiKeyKind.Int64"/>.</summary>
     /// <param name="value">The output Int64 value, or the default of <see langword="long"/> if the kind is not <see cref="ApiKeyKind.Int64"/>.</param>
     /// <returns><see langword="true"/> if the kind is <see cref="ApiKeyKind.Int64"/>; otherwise <see langword="false"/>.</returns>
-    public readonly bool TryGet(out long value) { value = _val.Int64; return this.ApiKind == ApiKeyKind.Int64; }
+    public readonly bool TryGet(out long value) { value = _valueUnion.Int64; return this.ApiKind == ApiKeyKind.Int64; }
 
     /// <summary>Attempts to get the Guid value if kind is <see cref="ApiKeyKind.Guid"/>.</summary>
     /// <param name="value">The output <see cref="Guid"/> value, or <see cref="Guid.Empty"/> if the kind is not <see cref="ApiKeyKind.Guid"/>.</param>
     /// <returns><see langword="true"/> if the kind is <see cref="ApiKeyKind.Guid"/>; otherwise <see langword="false"/>.</returns>
-    public readonly bool TryGet(out Guid value) { value = _val.Guid; return this.ApiKind == ApiKeyKind.Guid; }
+    public readonly bool TryGet(out Guid value) { value = _valueUnion.Guid; return this.ApiKind == ApiKeyKind.Guid; }
 
     /// <summary>Attempts to get the Ulid value if kind is <see cref="ApiKeyKind.Ulid"/>.</summary>
     /// <param name="value">The output <see cref="Ulid"/> value, or <see cref="Ulid.Empty"/> if the kind is not <see cref="ApiKeyKind.Ulid"/>.</param>
     /// <returns><see langword="true"/> if the kind is <see cref="ApiKeyKind.Ulid"/>; otherwise <see langword="false"/>.</returns>
-    public readonly bool TryGet(out Ulid value) { value = _val.Ulid; return this.ApiKind == ApiKeyKind.Ulid; }
+    public readonly bool TryGet(out Ulid value) { value = _valueUnion.Ulid; return this.ApiKind == ApiKeyKind.Ulid; }
 
     /// <summary>Attempts to get the culture value if kind is <see cref="ApiKeyKind.Culture"/>.</summary>
     /// <param name="value">The output <see cref="CultureInfo"/> value, or <see langword="null"/> if the kind is not <see cref="ApiKeyKind.Culture"/>.</param>
     /// <returns><see langword="true"/> if the kind is <see cref="ApiKeyKind.Culture"/>; otherwise <see langword="false"/>.</returns>
-    public readonly bool TryGet([NotNullWhen(true)] out CultureInfo? value) { value = this.ApiKind == ApiKeyKind.Culture ? (CultureInfo?)_ref : null; return this.ApiKind == ApiKeyKind.Culture; }
+    public readonly bool TryGet([NotNullWhen(true)] out CultureInfo? value) { value = this.ApiKind == ApiKeyKind.Culture ? (CultureInfo?)_referenceValue : null; return this.ApiKind == ApiKeyKind.Culture; }
 
     /// <summary>
-    ///     Attempts to retrieve a part key by <paramref name="name"/> from a named composite.
+    ///     Attempts to retrieve a part key by <paramref name="apiName"/> from a named composite.
     /// </summary>
-    /// <param name="name">The part name.</param>
-    /// <param name="value">Outputs the matching part value if found; otherwise default.</param>
+    /// <param name="apiName">The part API name.</param>
+    /// <param name="apiValue">Outputs the matching part value if found; otherwise default.</param>
     /// <returns>True if the named part was found.</returns>
-    public readonly bool TryGetPart(string name, out ApiKey value)
+    public readonly bool TryGetPart(string apiName, out ApiKey apiValue)
     {
         if (!this.IsComposite)
         {
-            value = default;
+            apiValue = default;
             return false;
         }
-        foreach (var p in (ApiKeyPart[])_ref!)
+        foreach (var part in (ApiKeyPart[])_referenceValue!)
         {
-            if (string.Equals(p.ApiName, name, StringComparison.Ordinal))
+            if (string.Equals(part.ApiName, apiName, StringComparison.Ordinal))
             {
-                value = p.ApiValue;
+                apiValue = part.ApiValue;
                 return true;
             }
         }
-        value = default;
+        apiValue = default;
         return false;
     }
     #endregion
@@ -848,14 +848,14 @@ public readonly struct ApiKey
         var result = this.ApiKind switch
         {
             ApiKeyKind.Empty => string.Empty,
-            ApiKeyKind.String => (string?)_ref,
-            ApiKeyKind.Int32 => _val.Int32.ToString(CultureInfo.InvariantCulture),
-            ApiKeyKind.Int64 => _val.Int64.ToString(CultureInfo.InvariantCulture),
-            ApiKeyKind.Guid => _val.Guid.ToString("D"),
-            ApiKeyKind.Ulid => _val.Ulid.ToString(),
-            ApiKeyKind.Culture => ((CultureInfo)_ref!).Name,
-            ApiKeyKind.Composite => ToCompositeString((ApiKeyPart[])_ref!),
-            _ => (string?)_ref
+            ApiKeyKind.String => (string?)_referenceValue,
+            ApiKeyKind.Int32 => _valueUnion.Int32.ToString(CultureInfo.InvariantCulture),
+            ApiKeyKind.Int64 => _valueUnion.Int64.ToString(CultureInfo.InvariantCulture),
+            ApiKeyKind.Guid => _valueUnion.Guid.ToString("D"),
+            ApiKeyKind.Ulid => _valueUnion.Ulid.ToString(),
+            ApiKeyKind.Culture => ((CultureInfo)_referenceValue!).Name,
+            ApiKeyKind.Composite => ToCompositeString((ApiKeyPart[])_referenceValue!),
+            _ => (string?)_referenceValue
         };
 
         return result.SafeToString();
@@ -873,14 +873,14 @@ public readonly struct ApiKey
         var result = this.ApiKind switch
         {
             ApiKeyKind.Empty => string.Empty,
-            ApiKeyKind.String => (string?)_ref,
-            ApiKeyKind.Int32 => _val.Int32.ToString(format, provider),
-            ApiKeyKind.Int64 => _val.Int64.ToString(format, provider),
-            ApiKeyKind.Guid => string.IsNullOrEmpty(format) ? _val.Guid.ToString("D") : _val.Guid.ToString(format),
-            ApiKeyKind.Ulid => _val.Ulid.ToString(),
-            ApiKeyKind.Culture => ((CultureInfo)_ref!).Name,
-            ApiKeyKind.Composite => ToCompositeString((ApiKeyPart[])_ref!),
-            _ => (string?)_ref
+            ApiKeyKind.String => (string?)_referenceValue,
+            ApiKeyKind.Int32 => _valueUnion.Int32.ToString(format, provider),
+            ApiKeyKind.Int64 => _valueUnion.Int64.ToString(format, provider),
+            ApiKeyKind.Guid => string.IsNullOrEmpty(format) ? _valueUnion.Guid.ToString("D") : _valueUnion.Guid.ToString(format),
+            ApiKeyKind.Ulid => _valueUnion.Ulid.ToString(),
+            ApiKeyKind.Culture => ((CultureInfo)_referenceValue!).Name,
+            ApiKeyKind.Composite => ToCompositeString((ApiKeyPart[])_referenceValue!),
+            _ => (string?)_referenceValue
         };
 
         return result.SafeToString();
@@ -900,17 +900,17 @@ public readonly struct ApiKey
             var providerEffective = provider ?? CultureInfo.InvariantCulture;
             // Convert the incoming format span to a string (null if empty) and reuse the existing ToString(format, provider) logic.
             var fmt = format.Length == 0 ? null : format.ToString();
-            var s = this.ToString(fmt, providerEffective);
+            var formattedText = this.ToString(fmt, providerEffective);
 
-            if (string.IsNullOrEmpty(s))
+            if (string.IsNullOrEmpty(formattedText))
             {
                 charsWritten = 0;
                 return true;
             }
 
-            if (s.AsSpan().TryCopyTo(destination))
+            if (formattedText.AsSpan().TryCopyTo(destination))
             {
-                charsWritten = s.Length;
+                charsWritten = formattedText.Length;
                 return true;
             }
 
@@ -926,9 +926,9 @@ public readonly struct ApiKey
     #region Parsing
     static ApiKey IParsable<ApiKey>.Parse(string text, IFormatProvider? provider)
     {
-        if (TryParse(text, provider, out var id))
+        if (TryParse(text, provider, out var apiKey))
         {
-            return id;
+            return apiKey;
         }
 
         if (string.IsNullOrWhiteSpace(text))
@@ -941,9 +941,9 @@ public readonly struct ApiKey
 
     static ApiKey ISpanParsable<ApiKey>.Parse(ReadOnlySpan<char> text, IFormatProvider? provider)
     {
-        if (TryParse(text, provider, out var id))
+        if (TryParse(text, provider, out var apiKey))
         {
-            return id;
+            return apiKey;
         }
 
         if (text.IsEmpty)
@@ -959,75 +959,75 @@ public readonly struct ApiKey
     /// </summary>
     /// <param name="kind">The expected kind.</param>
     /// <param name="text">The textual representation.</param>
-    /// <param name="id">Outputs the parsed key on success; otherwise empty.</param>
+    /// <param name="apiKey">Outputs the parsed key on success; otherwise empty.</param>
     /// <returns>True if parsing succeeded.</returns>
-    public static bool TryParse(ApiKeyKind kind, string? text, out ApiKey id)
+    public static bool TryParse(ApiKeyKind kind, string? text, out ApiKey apiKey)
     {
         if (kind == ApiKeyKind.Composite)
         {
-            id = default;
+            apiKey = default;
             return false;
         }
 
         if (string.IsNullOrWhiteSpace(text))
         {
-            id = default;
+            apiKey = default;
             return false;
         }
 
         switch (kind)
         {
-            case ApiKeyKind.String: return TryParseString(text, out id);
-            case ApiKeyKind.Int32: return TryParseInt32(text, out id);
-            case ApiKeyKind.Int64: return TryParseInt64(text, out id);
-            case ApiKeyKind.Guid: return TryParseGuid(text, out id);
-            case ApiKeyKind.Ulid: return TryParseUlid(text, out id);
-            case ApiKeyKind.Culture: return TryParseCulture(text, out id);
+            case ApiKeyKind.String: return TryParseString(text, out apiKey);
+            case ApiKeyKind.Int32: return TryParseInt32(text, out apiKey);
+            case ApiKeyKind.Int64: return TryParseInt64(text, out apiKey);
+            case ApiKeyKind.Guid: return TryParseGuid(text, out apiKey);
+            case ApiKeyKind.Ulid: return TryParseUlid(text, out apiKey);
+            case ApiKeyKind.Culture: return TryParseCulture(text, out apiKey);
         }
 
-        id = default;
+        apiKey = default;
         return false;
     }
 
     /// <summary>
     ///     Attempts to parse <paramref name="text"/> into an key matching the specified compatible scalar CLR type.
     /// </summary>
-    /// <param name="type">The expected scalar CLR type.</param>
+    /// <param name="clrType">The expected scalar CLR type.</param>
     /// <param name="text">The textual representation.</param>
-    /// <param name="id">Outputs the parsed key on success; otherwise empty.</param>
+    /// <param name="apiKey">Outputs the parsed key on success; otherwise empty.</param>
     /// <returns>True if the type is compatible and parsing succeeded.</returns>
-    public static bool TryParse(Type type, string? text, out ApiKey id)
+    public static bool TryParse(Type clrType, string? text, out ApiKey apiKey)
     {
-        if (TryGetCompatibleScalarKind(type, out var kind) is false)
+        if (TryGetCompatibleScalarKind(clrType, out var kind) is false)
         {
-            id = default;
+            apiKey = default;
             return false;
         }
 
-        return TryParse(kind, text, out id);
+        return TryParse(kind, text, out apiKey);
     }
 
     /// <summary>
     ///     Attempts to parse <paramref name="text"/> inferring the key kind heuristically.
     /// </summary>
     /// <param name="text">The textual representation.</param>
-    /// <param name="id">Outputs the parsed key on success.</param>
+    /// <param name="apiKey">Outputs the parsed key on success.</param>
     /// <returns>True if parsing succeeded.</returns>
-    public static bool TryParse(string? text, out ApiKey id)
+    public static bool TryParse(string? text, out ApiKey apiKey)
     {
         if (string.IsNullOrWhiteSpace(text))
         {
-            id = default;
+            apiKey = default;
             return false;
         }
 
-        if (TryParseInt32(text, out id)) { return true; }
-        if (TryParseInt64(text, out id)) { return true; }
-        if (TryParseGuid(text, out id)) { return true; }
-        if (TryParseUlid(text, out id)) { return true; }
-        if (TryParseCulture(text, out id)) { return true; }
+        if (TryParseInt32(text, out apiKey)) { return true; }
+        if (TryParseInt64(text, out apiKey)) { return true; }
+        if (TryParseGuid(text, out apiKey)) { return true; }
+        if (TryParseUlid(text, out apiKey)) { return true; }
+        if (TryParseCulture(text, out apiKey)) { return true; }
 
-        id = FromString(text);
+        apiKey = FromString(text);
         return true;
     }
 
@@ -1070,77 +1070,77 @@ public readonly struct ApiKey
     }
 
     /// <summary>Attempts to parse a culture key.</summary>
-    private static bool TryParseCulture(string text, out ApiKey id)
+    private static bool TryParseCulture(string text, out ApiKey apiKey)
     {
         try
         {
-            var c = CultureInfo.GetCultureInfo(text, predefinedOnly: true);
-            id = FromCulture(c);
+            var cultureInfo = CultureInfo.GetCultureInfo(text, predefinedOnly: true);
+            apiKey = FromCulture(cultureInfo);
             return true;
         }
         catch
         {
-            id = default;
+            apiKey = default;
             return false;
         }
     }
 
     /// <summary>Attempts to parse a Guid key.</summary>
-    private static bool TryParseGuid(string text, out ApiKey id)
+    private static bool TryParseGuid(string text, out ApiKey apiKey)
     {
-        if (Guid.TryParse(text, out var g))
+        if (Guid.TryParse(text, out var guid))
         {
-            id = FromGuid(g);
+            apiKey = FromGuid(guid);
             return true;
         }
 
-        id = default;
+        apiKey = default;
         return false;
     }
 
     /// <summary>Attempts to parse an Int32 key.</summary>
-    private static bool TryParseInt32(string text, out ApiKey id)
+    private static bool TryParseInt32(string text, out ApiKey apiKey)
     {
         if (int.TryParse(text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var i32))
         {
-            id = FromInt32(i32);
+            apiKey = FromInt32(i32);
             return true;
         }
 
-        id = default;
+        apiKey = default;
         return false;
     }
 
     /// <summary>Attempts to parse an Int64 key.</summary>
-    private static bool TryParseInt64(string text, out ApiKey id)
+    private static bool TryParseInt64(string text, out ApiKey apiKey)
     {
         if (long.TryParse(text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var i64))
         {
-            id = FromInt64(i64);
+            apiKey = FromInt64(i64);
             return true;
         }
 
-        id = default;
+        apiKey = default;
         return false;
     }
 
     /// <summary>Attempts to parse a string key.</summary>
-    private static bool TryParseString(string text, out ApiKey id)
+    private static bool TryParseString(string text, out ApiKey apiKey)
     {
-        id = FromString(text);
+        apiKey = FromString(text);
         return true;
     }
 
     /// <summary>Attempts to parse a Ulid key.</summary>
-    private static bool TryParseUlid(string text, out ApiKey id)
+    private static bool TryParseUlid(string text, out ApiKey apiKey)
     {
-        if (Ulid.TryParse(text, out var u))
+        if (Ulid.TryParse(text, out var ulid))
         {
-            id = FromUlid(u);
+            apiKey = FromUlid(ulid);
             return true;
         }
 
-        id = default;
+        apiKey = default;
         return false;
     }
     #endregion
@@ -1161,39 +1161,39 @@ public readonly struct ApiKey
         return this.ApiKind switch
         {
             ApiKeyKind.Empty => true,
-            ApiKeyKind.String => string.Equals((string?)_ref, (string?)other._ref, StringComparison.Ordinal),
-            ApiKeyKind.Int32 => _val.Int32 == other._val.Int32,
-            ApiKeyKind.Int64 => _val.Int64 == other._val.Int64,
-            ApiKeyKind.Guid => _val.Guid == other._val.Guid,
-            ApiKeyKind.Ulid => _val.Ulid == other._val.Ulid,
-            ApiKeyKind.Culture => string.Equals(((CultureInfo)_ref!).Name, ((CultureInfo)other._ref!).Name, StringComparison.OrdinalIgnoreCase),
-            ApiKeyKind.Composite => ReferenceEquals(_ref, other._ref) || PartsEqual((ApiKeyPart[])_ref!, (ApiKeyPart[])other._ref!),
+            ApiKeyKind.String => string.Equals((string?)_referenceValue, (string?)other._referenceValue, StringComparison.Ordinal),
+            ApiKeyKind.Int32 => _valueUnion.Int32 == other._valueUnion.Int32,
+            ApiKeyKind.Int64 => _valueUnion.Int64 == other._valueUnion.Int64,
+            ApiKeyKind.Guid => _valueUnion.Guid == other._valueUnion.Guid,
+            ApiKeyKind.Ulid => _valueUnion.Ulid == other._valueUnion.Ulid,
+            ApiKeyKind.Culture => string.Equals(((CultureInfo)_referenceValue!).Name, ((CultureInfo)other._referenceValue!).Name, StringComparison.OrdinalIgnoreCase),
+            ApiKeyKind.Composite => ReferenceEquals(_referenceValue, other._referenceValue) || PartsEqual((ApiKeyPart[])_referenceValue!, (ApiKeyPart[])other._referenceValue!),
             _ => false
         };
     }
     /// <summary>
     ///     Compares two composite part arrays for structural equality.
     /// </summary>
-    private static bool PartsEqual(ApiKeyPart[] a, ApiKeyPart[] b)
+    private static bool PartsEqual(ApiKeyPart[] leftParts, ApiKeyPart[] rightParts)
     {
-        if (ReferenceEquals(a, b))
+        if (ReferenceEquals(leftParts, rightParts))
         {
             return true;
         }
 
-        if (a.Length != b.Length)
+        if (leftParts.Length != rightParts.Length)
         {
             return false;
         }
 
-        for (var i = 0; i < a.Length; i++)
+        for (var i = 0; i < leftParts.Length; i++)
         {
-            if (!string.Equals(a[i].ApiName, b[i].ApiName, StringComparison.Ordinal))
+            if (!string.Equals(leftParts[i].ApiName, rightParts[i].ApiName, StringComparison.Ordinal))
             {
                 return false;
             }
 
-            if (!a[i].ApiValue.Equals(b[i].ApiValue))
+            if (!leftParts[i].ApiValue.Equals(rightParts[i].ApiValue))
             {
                 return false;
             }
@@ -1217,12 +1217,12 @@ public readonly struct ApiKey
         return this.ApiKind switch
         {
             ApiKeyKind.Empty => 0,
-            ApiKeyKind.String => HashCode.Combine((int)this.ApiKind, (string?)_ref),
-            ApiKeyKind.Int32 => HashCode.Combine((int)this.ApiKind, _val.Int32),
-            ApiKeyKind.Int64 => HashCode.Combine((int)this.ApiKind, _val.Int64),
-            ApiKeyKind.Guid => HashCode.Combine((int)this.ApiKind, _val.Guid),
-            ApiKeyKind.Ulid => HashCode.Combine((int)this.ApiKind, _val.Ulid),
-            ApiKeyKind.Culture => HashCode.Combine((int)this.ApiKind, ((CultureInfo?)_ref)?.Name?.ToUpperInvariant()),
+            ApiKeyKind.String => HashCode.Combine((int)this.ApiKind, (string?)_referenceValue),
+            ApiKeyKind.Int32 => HashCode.Combine((int)this.ApiKind, _valueUnion.Int32),
+            ApiKeyKind.Int64 => HashCode.Combine((int)this.ApiKind, _valueUnion.Int64),
+            ApiKeyKind.Guid => HashCode.Combine((int)this.ApiKind, _valueUnion.Guid),
+            ApiKeyKind.Ulid => HashCode.Combine((int)this.ApiKind, _valueUnion.Ulid),
+            ApiKeyKind.Culture => HashCode.Combine((int)this.ApiKind, ((CultureInfo?)_referenceValue)?.Name?.ToUpperInvariant()),
             _ => (int)this.ApiKind
         };
     }
@@ -1230,14 +1230,14 @@ public readonly struct ApiKey
     /// <summary>Computes a hash code for a composite parts array.</summary>
     private static int GetCompositeHash(ApiKeyPart[] parts)
     {
-        var h = new HashCode();
-        h.Add((int)ApiKeyKind.Composite);
-        foreach (var p in parts)
+        var hashCode = new HashCode();
+        hashCode.Add((int)ApiKeyKind.Composite);
+        foreach (var part in parts)
         {
-            h.Add(p.ApiName, StringComparer.Ordinal);
-            h.Add(p.ApiValue);
+            hashCode.Add(part.ApiName, StringComparer.Ordinal);
+            hashCode.Add(part.ApiValue);
         }
-        return h.ToHashCode();
+        return hashCode.ToHashCode();
     }
 
     /// <summary>
@@ -1256,38 +1256,38 @@ public readonly struct ApiKey
         return this.ApiKind switch
         {
             ApiKeyKind.Empty => 0,
-            ApiKeyKind.String => Math.Sign(string.Compare((string?)_ref, (string?)other._ref, StringComparison.Ordinal)),
-            ApiKeyKind.Int32 => _val.Int32.CompareTo(other._val.Int32),
-            ApiKeyKind.Int64 => _val.Int64.CompareTo(other._val.Int64),
-            ApiKeyKind.Guid => _val.Guid.CompareTo(other._val.Guid),
-            ApiKeyKind.Ulid => _val.Ulid.CompareTo(other._val.Ulid),
-            ApiKeyKind.Culture => Math.Sign(string.Compare(((CultureInfo)_ref!).Name, ((CultureInfo)other._ref!).Name, StringComparison.OrdinalIgnoreCase)),
-            ApiKeyKind.Composite => CompareParts((ApiKeyPart[])_ref!, (ApiKeyPart[])other._ref!),
+            ApiKeyKind.String => Math.Sign(string.Compare((string?)_referenceValue, (string?)other._referenceValue, StringComparison.Ordinal)),
+            ApiKeyKind.Int32 => _valueUnion.Int32.CompareTo(other._valueUnion.Int32),
+            ApiKeyKind.Int64 => _valueUnion.Int64.CompareTo(other._valueUnion.Int64),
+            ApiKeyKind.Guid => _valueUnion.Guid.CompareTo(other._valueUnion.Guid),
+            ApiKeyKind.Ulid => _valueUnion.Ulid.CompareTo(other._valueUnion.Ulid),
+            ApiKeyKind.Culture => Math.Sign(string.Compare(((CultureInfo)_referenceValue!).Name, ((CultureInfo)other._referenceValue!).Name, StringComparison.OrdinalIgnoreCase)),
+            ApiKeyKind.Composite => CompareParts((ApiKeyPart[])_referenceValue!, (ApiKeyPart[])other._referenceValue!),
             _ => 0
         };
     }
 
     /// <summary>Compares two composite part arrays for ordering.</summary>
-    private static int CompareParts(ApiKeyPart[] a, ApiKeyPart[] b)
+    private static int CompareParts(ApiKeyPart[] leftParts, ApiKeyPart[] rightParts)
     {
-        var lenCmp = a.Length.CompareTo(b.Length);
-        if (lenCmp != 0)
+        var lengthComparison = leftParts.Length.CompareTo(rightParts.Length);
+        if (lengthComparison != 0)
         {
-            return lenCmp;
+            return lengthComparison;
         }
 
-        for (var i = 0; i < a.Length; i++)
+        for (var i = 0; i < leftParts.Length; i++)
         {
-            var nameCmp = Math.Sign(string.Compare(a[i].ApiName, b[i].ApiName, StringComparison.Ordinal));
-            if (nameCmp != 0)
+            var apiNameComparison = Math.Sign(string.Compare(leftParts[i].ApiName, rightParts[i].ApiName, StringComparison.Ordinal));
+            if (apiNameComparison != 0)
             {
-                return nameCmp;
+                return apiNameComparison;
             }
 
-            var valCmp = a[i].ApiValue.CompareTo(b[i].ApiValue);
-            if (valCmp != 0)
+            var apiValueComparison = leftParts[i].ApiValue.CompareTo(rightParts[i].ApiValue);
+            if (apiValueComparison != 0)
             {
-                return valCmp;
+                return apiValueComparison;
             }
         }
         return 0;
@@ -1311,7 +1311,7 @@ public readonly struct ApiKey
                 throw new ApiKeyException($"Indexing only applies to composite {nameof(ApiKey)}.");
             }
 
-            var parts = (ApiKeyPart[])_ref!;
+            var parts = (ApiKeyPart[])_referenceValue!;
             if ((uint)index >= (uint)parts.Length)
             {
                 throw new ArgumentOutOfRangeException(nameof(index), index, $"Index out of range. Valid range: [0..{parts.Length - 1}].");
@@ -1324,10 +1324,10 @@ public readonly struct ApiKey
     /// <summary>
     ///     Gets the named part key from a named composite.
     /// </summary>
-    /// <param name="name">The part name.</param>
+    /// <param name="apiName">The part API name.</param>
     /// <returns>The part key.</returns>
     /// <exception cref="ApiKeyException">Thrown if part name not found.</exception>
-    public readonly ApiKey this[string name] => this.TryGetPart(name, out var v) ? v : throw new ApiKeyException($"Part name '{name}' not found in composite {nameof(ApiKey)}.");
+    public readonly ApiKey this[string apiName] => this.TryGetPart(apiName, out var apiValue) ? apiValue : throw new ApiKeyException($"Part name '{apiName}' not found in composite {nameof(ApiKey)}.");
     #endregion
 
     #region Equality/Ordering Operators
@@ -1388,21 +1388,21 @@ public readonly struct ApiKey
     public static implicit operator ApiKey(CultureInfo value) => FromCulture(value);
 
     /// <summary>Explicit conversion to <see cref="string"/> returns null if not a string key.</summary>
-    public static explicit operator string?(ApiKey id) => id.ApiKind == ApiKeyKind.String ? (string?)id._ref : null;
+    public static explicit operator string?(ApiKey apiKey) => apiKey.ApiKind == ApiKeyKind.String ? (string?)apiKey._referenceValue : null;
 
     /// <summary>Explicit conversion to <see cref="int"/>; throws if kind mismatch.</summary>
-    public static explicit operator int(ApiKey id) => id.AsInt32OrThrow();
+    public static explicit operator int(ApiKey apiKey) => apiKey.AsInt32OrThrow();
 
     /// <summary>Explicit conversion to <see cref="long"/>; throws if kind mismatch.</summary>
-    public static explicit operator long(ApiKey id) => id.AsInt64OrThrow();
+    public static explicit operator long(ApiKey apiKey) => apiKey.AsInt64OrThrow();
 
     /// <summary>Explicit conversion to <see cref="Guid"/>; throws if kind mismatch.</summary>
-    public static explicit operator Guid(ApiKey id) => id.AsGuidOrThrow();
+    public static explicit operator Guid(ApiKey apiKey) => apiKey.AsGuidOrThrow();
 
     /// <summary>Explicit conversion to <see cref="Ulid"/>; throws if kind mismatch.</summary>
-    public static explicit operator Ulid(ApiKey id) => id.AsUlidOrThrow();
+    public static explicit operator Ulid(ApiKey apiKey) => apiKey.AsUlidOrThrow();
 
     /// <summary>Explicit conversion to <see cref="CultureInfo"/> returns null if not a culture key.</summary>
-    public static explicit operator CultureInfo?(ApiKey id) => id.ApiKind == ApiKeyKind.Culture ? (CultureInfo?)id._ref : null;
+    public static explicit operator CultureInfo?(ApiKey apiKey) => apiKey.ApiKind == ApiKeyKind.Culture ? (CultureInfo?)apiKey._referenceValue : null;
     #endregion
 }

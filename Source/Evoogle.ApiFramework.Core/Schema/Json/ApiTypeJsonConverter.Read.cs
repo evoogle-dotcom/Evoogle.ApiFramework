@@ -72,7 +72,7 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
     /// <summary>
     ///     Aggregates all temporary data required to create an <see cref="ApiType"/> instance from JSON.
     /// </summary>
-    private class ReadData : ExtensibleReadData
+    private class ReadState : ExtensibleReadData
     {
         #region Properties
         public ApiCollectionTypeReadData? ApiCollectionType { get; set; }
@@ -84,7 +84,7 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
     }
 
     /// <summary>
-    ///     Provides JSON property handlers that map serialized data to <see cref="ReadData"/> during deserialization.
+    ///     Provides JSON property handlers that map serialized data to <see cref="ReadState"/> during deserialization.
     /// </summary>
     private class ReadHandlers(PropertyNames propertyNames)
     {
@@ -93,7 +93,7 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
         #endregion
 
         #region ApiType Fields
-        public readonly Dictionary<string, JsonReaderHandler<DefaultReadContext<PropertyNames, ReadData, ReadHandlers>>> PropertyHandlers = new()
+        public readonly Dictionary<string, JsonReaderHandler<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>>> PropertyHandlers = new()
         {
             // ApiCollectionType Property Handlers
             { propertyNames.ApiCollectionType.ApiItemTypeExpression, HandleApiCollectionTypeApiItemTypeExpression },
@@ -115,19 +115,19 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
             { propertyNames.ApiType.ClrType, HandleApiTypeClrType },
 
             // ExtensibleBase Property Handlers
-            { propertyNames.ExtensibleBase.Extensions, CreateExtensionsHandler<PropertyNames, ReadData, ReadHandlers>() },
+            { propertyNames.ExtensibleBase.Extensions, CreateExtensionsHandler<PropertyNames, ReadState, ReadHandlers>() },
         };
         #endregion
 
         #region ApiCollectionType Methods
-        private static void HandleApiCollectionTypeApiItemTypeExpression(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiCollectionTypeApiItemTypeExpression(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
             context.ReadData.ApiCollectionType ??= new ApiCollectionTypeReadData();
 
             context.ReadData.ApiCollectionType.ApiItemTypeExpression = JsonSerializer.Deserialize<ApiTypeExpression>(ref reader, context.Options);
         }
 
-        private static void HandleApiCollectionTypeApiItemTypeModifiers(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiCollectionTypeApiItemTypeModifiers(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
             context.ReadData.ApiCollectionType ??= new ApiCollectionTypeReadData();
 
@@ -137,7 +137,7 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
         #endregion
 
         #region ApiEnumType Methods
-        private static void HandleApiEnumTypeApiEnumValues(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiEnumTypeApiEnumValues(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
             context.ReadData.ApiEnumType ??= new ApiEnumTypeReadData();
             context.ReadData.ApiEnumType.ApiEnumValues ??= [];
@@ -145,7 +145,7 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
             ReadJsonArray(ref reader, context, (x) => HandleApiEnumTypeApiEnumValuesArrayItem);
         }
 
-        private static void HandleApiEnumTypeApiEnumValuesArrayItem(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiEnumTypeApiEnumValuesArrayItem(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
             var apiEnumValue = JsonSerializer.Deserialize<ApiEnumValue>(ref reader, context.Options);
             if (apiEnumValue == null)
@@ -158,7 +158,7 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
         #endregion
 
         #region ApiNamedType Methods
-        private static void HandleApiNamedTypeApiName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiNamedTypeApiName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
             context.ReadData.ApiNamedType ??= new ApiNamedTypeReadData();
 
@@ -167,7 +167,7 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
         #endregion
 
         #region ApiObjectType Methods
-        private static void HandleApiObjectTypeApiKeyTypes(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiObjectTypeApiKeyTypes(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
             context.ReadData.ApiObjectType ??= new ApiObjectTypeReadData();
             context.ReadData.ApiObjectType.ApiKeyTypes ??= [];
@@ -175,7 +175,7 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
             ReadJsonArray(ref reader, context, (x) => HandleApiObjectTypeApiKeyTypesArrayItem);
         }
 
-        private static void HandleApiObjectTypeApiKeyTypesArrayItem(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiObjectTypeApiKeyTypesArrayItem(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
             var apiKeyType = JsonSerializer.Deserialize<ApiKeyType>(ref reader, context.Options);
             if (apiKeyType == null)
@@ -196,14 +196,14 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
             return named;
         }
 
-        private static void HandleApiObjectTypeApiOptions(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiObjectTypeApiOptions(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
             context.ReadData.ApiObjectType ??= new ApiObjectTypeReadData();
 
             context.ReadData.ApiObjectType.ApiOptions = JsonSerializer.Deserialize<ApiObjectTypeOptions>(ref reader, context.Options);
         }
 
-        private static void HandleApiObjectTypeApiProperties(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiObjectTypeApiProperties(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
             context.ReadData.ApiObjectType ??= new ApiObjectTypeReadData();
             context.ReadData.ApiObjectType.ApiProperties ??= [];
@@ -211,7 +211,7 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
             ReadJsonArray(ref reader, context, (x) => HandleApiObjectTypeApiPropertiesArrayItem);
         }
 
-        private static void HandleApiObjectTypeApiPropertiesArrayItem(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiObjectTypeApiPropertiesArrayItem(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
             var apiProperty = JsonSerializer.Deserialize<ApiProperty>(ref reader, context.Options);
             if (apiProperty == null)
@@ -224,7 +224,7 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
         #endregion
 
         #region ApiType Methods
-        private static void HandleApiTypeApiKind(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiTypeApiKind(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
             context.ReadData.ApiType ??= new ApiTypeReadData();
 
@@ -232,7 +232,7 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
             context.ReadData.ApiType.ApiKind = _apiTypeKindJsonConverter.Read(ref reader, typeof(ApiTypeKind), options);
         }
 
-        private static void HandleApiTypeClrType(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiTypeClrType(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
             context.ReadData.ApiType ??= new ApiTypeReadData();
 

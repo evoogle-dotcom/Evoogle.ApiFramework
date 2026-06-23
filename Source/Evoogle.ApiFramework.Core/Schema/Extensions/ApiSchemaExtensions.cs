@@ -58,17 +58,17 @@ public static class ApiSchemaExtensions
     /// <summary>
     ///     Gets an <see cref="ApiNamedType"/> by its CLR type using a generic type parameter.
     /// </summary>
-    /// <typeparam name="T">The CLR type to search for in the schema.</typeparam>
+    /// <typeparam name="TClr">The CLR type to search for in the schema.</typeparam>
     /// <param name="apiSchema">The API schema to search.</param>
     /// <returns>The matching <see cref="ApiNamedType"/> for the specified CLR type.</returns>
     /// <exception cref="ApiSchemaException">Thrown if no type with the specified CLR type exists in the schema.</exception>
     /// <remarks>
     ///     This is a convenience overload that uses the generic type parameter to determine the CLR type,
-    ///     avoiding the need to explicitly pass <c>typeof(T)</c>.
+    ///     avoiding the need to explicitly pass <c>typeof(TClr)</c>.
     /// </remarks>
-    public static ApiNamedType GetTypeByClrType<T>(this ApiSchema apiSchema)
+    public static ApiNamedType GetTypeByClrType<TClr>(this ApiSchema apiSchema)
     {
-        var clrType = typeof(T);
+        var clrType = typeof(TClr);
         return apiSchema.GetTypeByClrType(clrType);
     }
 

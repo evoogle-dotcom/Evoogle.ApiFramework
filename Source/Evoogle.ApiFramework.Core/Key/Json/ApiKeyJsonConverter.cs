@@ -96,7 +96,7 @@ public sealed class ApiKeyJsonConverter(ILogger<ApiKeyJsonConverter>? logger) : 
         #endregion
     }
 
-    private class ReadData
+    private class ReadState
     {
         #region Properties
         public ApiKeyReadData? ApiKey { get; set; }
@@ -107,7 +107,7 @@ public sealed class ApiKeyJsonConverter(ILogger<ApiKeyJsonConverter>? logger) : 
     private class ReadHandlers(PropertyNames propertyNames)
     {
         #region ApiKey Fields
-        public readonly Dictionary<string, JsonReaderHandler<DefaultReadContext<PropertyNames, ReadData, ReadHandlers>>> ApiKeyPropertyHandlers = new()
+        public readonly Dictionary<string, JsonReaderHandler<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>>> ApiKeyPropertyHandlers = new()
         {
             // ApiKey Property Handlers
             { propertyNames.ApiKey.ApiKind, HandleApiKeyApiKind },
@@ -117,7 +117,7 @@ public sealed class ApiKeyJsonConverter(ILogger<ApiKeyJsonConverter>? logger) : 
         #endregion
 
         #region ApiKeyPart Fields
-        public readonly Dictionary<string, JsonReaderHandler<DefaultReadContext<PropertyNames, ReadData, ReadHandlers>>> ApiKeyPartPropertyHandlers = new()
+        public readonly Dictionary<string, JsonReaderHandler<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>>> ApiKeyPartPropertyHandlers = new()
         {
             // ApiKeyPart Property Handlers
             { propertyNames.ApiKeyPart.ApiName, HandleApiKeyPartApiName },
@@ -127,7 +127,7 @@ public sealed class ApiKeyJsonConverter(ILogger<ApiKeyJsonConverter>? logger) : 
         #endregion
 
         #region ApiKey Methods
-        private static void HandleApiKeyApiKind(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiKeyApiKind(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
             context.ReadData.ApiKey ??= new ApiKeyReadData();
 
@@ -135,7 +135,7 @@ public sealed class ApiKeyJsonConverter(ILogger<ApiKeyJsonConverter>? logger) : 
             context.ReadData.ApiKey.ApiKind = _apiKeyKindJsonConverter.Read(ref reader, typeof(ApiKeyKind), options);
         }
 
-        private static void HandleApiKeyApiParts(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiKeyApiParts(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
             context.ReadData.ApiKey ??= new ApiKeyReadData();
             context.ReadData.ApiKey.ApiParts ??= [];
@@ -145,7 +145,7 @@ public sealed class ApiKeyJsonConverter(ILogger<ApiKeyJsonConverter>? logger) : 
             ReadJsonArray(ref reader, context, static _ => HandleApiKeyApiPartsArrayItem);
         }
 
-        private static void HandleApiKeyApiPartsArrayItem(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiKeyApiPartsArrayItem(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
             context.ReadData.ApiKeyPart = null;
             ReadJsonObject(ref reader, context, context.ReadHandlers.ApiKeyPartPropertyHandlers);
@@ -154,7 +154,7 @@ public sealed class ApiKeyJsonConverter(ILogger<ApiKeyJsonConverter>? logger) : 
             context.ReadData.ApiKey!.ApiParts!.Add(apiKeyPartReadData);
         }
 
-        private static void HandleApiKeyClrValue(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiKeyClrValue(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
             context.ReadData.ApiKey ??= new ApiKeyReadData();
             var propertyName = context.PropertyNames.ApiKey.ClrValue;
@@ -167,14 +167,14 @@ public sealed class ApiKeyJsonConverter(ILogger<ApiKeyJsonConverter>? logger) : 
         #endregion
 
         #region ApiKeyPart Methods
-        private static void HandleApiKeyPartApiName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiKeyPartApiName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
             context.ReadData.ApiKeyPart ??= new ApiKeyPartReadData();
 
             context.ReadData.ApiKeyPart.ApiName = reader.GetString();
         }
 
-        private static void HandleApiKeyPartApiKind(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiKeyPartApiKind(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
             context.ReadData.ApiKeyPart ??= new ApiKeyPartReadData();
 
@@ -182,7 +182,7 @@ public sealed class ApiKeyJsonConverter(ILogger<ApiKeyJsonConverter>? logger) : 
             context.ReadData.ApiKeyPart.ApiKind = _apiKeyKindJsonConverter.Read(ref reader, typeof(ApiKeyKind), options);
         }
 
-        private static void HandleApiKeyPartClrValue(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiKeyPartClrValue(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
             context.ReadData.ApiKeyPart ??= new ApiKeyPartReadData();
             var propertyName = context.PropertyNames.ApiKeyPart.ClrValue;
@@ -236,7 +236,7 @@ public sealed class ApiKeyJsonConverter(ILogger<ApiKeyJsonConverter>? logger) : 
     #region JsonConverterBase<T> Methods
     /// <inheritdoc/>
     protected override IReadContext CreateReadContext(ILogger logger, JsonSerializerOptions options)
-        => CreateDefaultReadContext<PropertyNames, ReadData, ReadHandlers>
+        => CreateDefaultReadContext<PropertyNames, ReadState, ReadHandlers>
             (
                 logger,
                 options,
@@ -256,12 +256,12 @@ public sealed class ApiKeyJsonConverter(ILogger<ApiKeyJsonConverter>? logger) : 
     /// <inheritdoc/>
     protected override ApiKey CreateValue(IReadContext context)
     {
-        var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
+        var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
         var propertyNames = readContext.PropertyNames;
-        var readData = readContext.ReadData;
+        var readState = readContext.ReadData;
 
         // Determine ApiKey kind
-        var nullableApiKind = readData.ApiKey?.ApiKind;
+        var nullableApiKind = readState.ApiKey?.ApiKind;
         if (nullableApiKind is null)
         {
             var propertyName = propertyNames.ApiKey.ApiKind;
@@ -272,15 +272,15 @@ public sealed class ApiKeyJsonConverter(ILogger<ApiKeyJsonConverter>? logger) : 
         return apiKind switch
         {
             ApiKeyKind.Empty => CreateEmpty(),
-            ApiKeyKind.Composite => CreateComposite(propertyNames, readData),
-            _ => CreateScalar(apiKind, propertyNames, readData)
+            ApiKeyKind.Composite => CreateComposite(propertyNames, readState),
+            _ => CreateScalar(apiKind, propertyNames, readState)
         };
     }
 
     /// <inheritdoc/>
     protected override void ReadCore(ref Utf8JsonReader reader, IReadContext context)
     {
-        var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
+        var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
         var handlers = readContext.ReadHandlers.ApiKeyPropertyHandlers;
 
         ReadJsonObject(ref reader, readContext, handlers);
@@ -318,9 +318,9 @@ public sealed class ApiKeyJsonConverter(ILogger<ApiKeyJsonConverter>? logger) : 
         return ApiKey.Empty;
     }
 
-    private static ApiKey CreateComposite(PropertyNames propertyNames, ReadData readData)
+    private static ApiKey CreateComposite(PropertyNames propertyNames, ReadState readState)
     {
-        var nullableOrEmptyApiParts = readData.ApiKey?.ApiParts;
+        var nullableOrEmptyApiParts = readState.ApiKey?.ApiParts;
         if (nullableOrEmptyApiParts is null || nullableOrEmptyApiParts.Count == 0)
         {
             var propertyName = propertyNames.ApiKey.ApiParts;
@@ -372,11 +372,11 @@ public sealed class ApiKeyJsonConverter(ILogger<ApiKeyJsonConverter>? logger) : 
         return ApiKey.Composite(apiKeyParts);
     }
 
-    private static ApiKey CreateScalar(ApiKeyKind apiKind, PropertyNames propertyNames, ReadData readData)
+    private static ApiKey CreateScalar(ApiKeyKind apiKind, PropertyNames propertyNames, ReadState readState)
     {
         var clrValuePropertyName = propertyNames.ApiKey.ClrValue;
-        var clrValueAsInt64 = readData.ApiKey?.ClrValueAsInt64;
-        var clrValueAsString = readData.ApiKey?.ClrValueAsString;
+        var clrValueAsInt64 = readState.ApiKey?.ClrValueAsInt64;
+        var clrValueAsString = readState.ApiKey?.ClrValueAsString;
 
         var apiKey = CreateScalarCore
         (

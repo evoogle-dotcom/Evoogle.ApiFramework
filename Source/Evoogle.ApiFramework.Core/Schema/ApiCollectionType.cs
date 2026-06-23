@@ -72,7 +72,7 @@ public sealed class ApiCollectionType
     #region ApiSchemaElement Methods
     /// <inheritdoc />
     protected override string BuildPath(string? apiPreviousPath)
-        => ApiSchemaHelpers.BuildPath(basePath: apiPreviousPath, segment: this.ApiElementName, segmentName: null);
+        => ApiSchemaPathFormatting.BuildPath(basePath: apiPreviousPath, segment: this.ApiElementName, segmentName: null);
 
     /// <inheritdoc />
     internal override void Initialize(ApiInitializationContext context)

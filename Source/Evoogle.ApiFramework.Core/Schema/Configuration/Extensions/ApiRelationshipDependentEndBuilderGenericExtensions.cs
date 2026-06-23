@@ -10,7 +10,7 @@ using Evoogle.Reflection;
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
 /// <summary>
-///     Extension methods for <see cref="ApiRelationshipDependentEndBuilder{T}"/>.
+///     Extension methods for <see cref="ApiRelationshipDependentEndBuilder{TDependent}"/>.
 /// </summary>
 public static class ApiRelationshipDependentEndBuilderGenericExtensions
 {
@@ -55,10 +55,10 @@ public static class ApiRelationshipDependentEndBuilderGenericExtensions
     /// <summary>
     ///     Sets the foreign key role's <see cref="ApiKeyType"/> with a single key path using a type-safe expression.
     /// </summary>
-    public static ApiRelationshipDependentEndBuilder<T> WithForeignKey<T, TScalar>
+    public static ApiRelationshipDependentEndBuilder<TDependent> WithForeignKey<TDependent, TScalar>
     (
-        this ApiRelationshipDependentEndBuilder<T> builder,
-        Expression<Func<T, TScalar>> expression
+        this ApiRelationshipDependentEndBuilder<TDependent> builder,
+        Expression<Func<TDependent, TScalar>> expression
     )
     {
         ArgumentNullException.ThrowIfNull(builder);
@@ -70,11 +70,11 @@ public static class ApiRelationshipDependentEndBuilderGenericExtensions
     /// <summary>
     ///     Sets the foreign key role's <see cref="ApiKeyType"/> with two key paths using type-safe expressions.
     /// </summary>
-    public static ApiRelationshipDependentEndBuilder<T> WithForeignKey<T, TScalar1, TScalar2>
+    public static ApiRelationshipDependentEndBuilder<TDependent> WithForeignKey<TDependent, TScalar1, TScalar2>
     (
-        this ApiRelationshipDependentEndBuilder<T> builder,
-        Expression<Func<T, TScalar1>> expression1,
-        Expression<Func<T, TScalar2>> expression2
+        this ApiRelationshipDependentEndBuilder<TDependent> builder,
+        Expression<Func<TDependent, TScalar1>> expression1,
+        Expression<Func<TDependent, TScalar2>> expression2
     )
     {
         ArgumentNullException.ThrowIfNull(builder);
@@ -89,12 +89,12 @@ public static class ApiRelationshipDependentEndBuilderGenericExtensions
     /// <summary>
     ///     Sets the foreign key role's <see cref="ApiKeyType"/> with three key paths using type-safe expressions.
     /// </summary>
-    public static ApiRelationshipDependentEndBuilder<T> WithForeignKey<T, TScalar1, TScalar2, TScalar3>
+    public static ApiRelationshipDependentEndBuilder<TDependent> WithForeignKey<TDependent, TScalar1, TScalar2, TScalar3>
     (
-        this ApiRelationshipDependentEndBuilder<T> builder,
-        Expression<Func<T, TScalar1>> expression1,
-        Expression<Func<T, TScalar2>> expression2,
-        Expression<Func<T, TScalar3>> expression3
+        this ApiRelationshipDependentEndBuilder<TDependent> builder,
+        Expression<Func<TDependent, TScalar1>> expression1,
+        Expression<Func<TDependent, TScalar2>> expression2,
+        Expression<Func<TDependent, TScalar3>> expression3
     )
     {
         ArgumentNullException.ThrowIfNull(builder);
@@ -111,13 +111,13 @@ public static class ApiRelationshipDependentEndBuilderGenericExtensions
     /// <summary>
     ///     Sets the foreign key role's <see cref="ApiKeyType"/> with four key paths using type-safe expressions.
     /// </summary>
-    public static ApiRelationshipDependentEndBuilder<T> WithForeignKey<T, TScalar1, TScalar2, TScalar3, TScalar4>
+    public static ApiRelationshipDependentEndBuilder<TDependent> WithForeignKey<TDependent, TScalar1, TScalar2, TScalar3, TScalar4>
     (
-        this ApiRelationshipDependentEndBuilder<T> builder,
-        Expression<Func<T, TScalar1>> expression1,
-        Expression<Func<T, TScalar2>> expression2,
-        Expression<Func<T, TScalar3>> expression3,
-        Expression<Func<T, TScalar4>> expression4
+        this ApiRelationshipDependentEndBuilder<TDependent> builder,
+        Expression<Func<TDependent, TScalar1>> expression1,
+        Expression<Func<TDependent, TScalar2>> expression2,
+        Expression<Func<TDependent, TScalar3>> expression3,
+        Expression<Func<TDependent, TScalar4>> expression4
     )
     {
         ArgumentNullException.ThrowIfNull(builder);
@@ -150,12 +150,12 @@ public static class ApiRelationshipDependentEndBuilderGenericExtensions
     }
 
     /// <summary>
-    ///     Sets the foreign key role's <see cref="ApiKeyType"/> with a single key path rooted at <typeparamref name="TRoot"/>.
+    ///     Sets the foreign key role's <see cref="ApiKeyType"/> with a single key path rooted at <typeparamref name="TPathRoot"/>.
     /// </summary>
-    public static ApiRelationshipDependentEndBuilder<T> WithForeignKeyFrom<T, TRoot>
+    public static ApiRelationshipDependentEndBuilder<TDependent> WithForeignKeyFrom<TDependent, TPathRoot>
     (
-        this ApiRelationshipDependentEndBuilder<T> builder,
-        Expression<Func<TRoot, object?>> expression
+        this ApiRelationshipDependentEndBuilder<TDependent> builder,
+        Expression<Func<TPathRoot, object?>> expression
     )
     {
         ArgumentNullException.ThrowIfNull(builder);

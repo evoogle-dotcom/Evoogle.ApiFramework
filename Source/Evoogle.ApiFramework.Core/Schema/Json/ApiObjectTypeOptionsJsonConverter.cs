@@ -34,7 +34,7 @@ public class ApiObjectTypeOptionsJsonConverter(ILogger<ApiObjectTypeOptionsJsonC
     #endregion
 
     #region Read Types
-    private class ReadData
+    private class ReadState
     {
         #region Properties
         public ApiKeyNullHandling? ApiKeyNullHandling { get; set; }
@@ -48,14 +48,14 @@ public class ApiObjectTypeOptionsJsonConverter(ILogger<ApiObjectTypeOptionsJsonC
         #endregion
 
         #region Fields
-        public readonly Dictionary<string, JsonReaderHandler<DefaultReadContext<PropertyNames, ReadData, ReadHandlers>>> PropertyHandlers = new()
+        public readonly Dictionary<string, JsonReaderHandler<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>>> PropertyHandlers = new()
         {
             { propertyNames.ApiKeyNullHandling, HandleApiKeyNullHandling },
         };
         #endregion
 
         #region Methods
-        private static void HandleApiKeyNullHandling(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiKeyNullHandling(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
             var options = context.Options;
             context.ReadData.ApiKeyNullHandling = _apiKeyNullHandlingJsonConverter.Read(ref reader, _apiKeyNullHandlingType, options);
@@ -79,7 +79,7 @@ public class ApiObjectTypeOptionsJsonConverter(ILogger<ApiObjectTypeOptionsJsonC
     #region JsonConverterBase<T> Methods
     /// <inheritdoc/>
     protected override IReadContext CreateReadContext(ILogger logger, JsonSerializerOptions options)
-        => CreateDefaultReadContext<PropertyNames, ReadData, ReadHandlers>
+        => CreateDefaultReadContext<PropertyNames, ReadState, ReadHandlers>
             (
                 logger,
                 options,
@@ -99,10 +99,10 @@ public class ApiObjectTypeOptionsJsonConverter(ILogger<ApiObjectTypeOptionsJsonC
     /// <inheritdoc/>
     protected override ApiObjectTypeOptions? CreateValue(IReadContext context)
     {
-        var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
-        var readData = readContext.ReadData;
+        var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
+        var readState = readContext.ReadData;
 
-        var apiKeyNullHandling = readData.ApiKeyNullHandling;
+        var apiKeyNullHandling = readState.ApiKeyNullHandling;
 
         var apiObjectTypeOptions = new ApiObjectTypeOptions()
         {
@@ -115,7 +115,7 @@ public class ApiObjectTypeOptionsJsonConverter(ILogger<ApiObjectTypeOptionsJsonC
     /// <inheritdoc/>
     protected override void ReadCore(ref Utf8JsonReader reader, IReadContext context)
     {
-        var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
+        var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
         var handlers = readContext.ReadHandlers.PropertyHandlers;
 
         ReadJsonObject(ref reader, readContext, handlers);

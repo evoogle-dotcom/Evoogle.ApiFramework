@@ -45,12 +45,12 @@ public static class ApiRelationshipOneToOneBuilderExtensions
     /// <summary>
     ///     Configures the principal end of the 1:1 relationship using the CLR type <typeparamref name="TPrincipal"/>.
     /// </summary>
-    public static ApiRelationshipOneToOneBuilder From<TPrincipal>(this ApiRelationshipOneToOneBuilder builder, string apiKeyTypeName)
+    public static ApiRelationshipOneToOneBuilder From<TPrincipal>(this ApiRelationshipOneToOneBuilder builder, string apiPrincipalKeyTypeName)
     {
         ArgumentNullException.ThrowIfNull(builder);
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiKeyTypeName, nameof(apiKeyTypeName));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiPrincipalKeyTypeName, nameof(apiPrincipalKeyTypeName));
 
-        return builder.From(typeof(TPrincipal), apiKeyTypeName);
+        return builder.From(typeof(TPrincipal), apiPrincipalKeyTypeName);
     }
 
     /// <summary>

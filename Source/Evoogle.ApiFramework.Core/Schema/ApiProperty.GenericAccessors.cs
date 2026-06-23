@@ -29,7 +29,7 @@ public sealed partial class ApiProperty
     /// <returns>A cache value containing the compiled getter delegate, or null if the member cannot be accessed.</returns>
     private static ClrGetterCacheValue<TObject, TValue> BuildGenericClrGetter<TObject, TValue>(Type clrObjectType, string clrMemberName)
     {
-        if (!TryResolveMember(clrObjectType, clrMemberName, forWrite: false, out var clrMemberInfo, out var clrMemberType))
+        if (!TryResolveMember(clrObjectType, clrMemberName, requiresWriteAccess: false, out var clrMemberInfo, out var clrMemberType))
         {
             return new ClrGetterCacheValue<TObject, TValue>(null);
         }
@@ -97,7 +97,7 @@ public sealed partial class ApiProperty
     /// <returns>A cache value containing the compiled setter delegate, or null if the member cannot be modified.</returns>
     private static ClrSetterCacheValue<TObject, TValue> BuildGenericClrSetter<TObject, TValue>(Type clrObjectType, string clrMemberName)
     {
-        if (!TryResolveMember(clrObjectType, clrMemberName, forWrite: true, out var clrMemberInfo, out var clrMemberType))
+        if (!TryResolveMember(clrObjectType, clrMemberName, requiresWriteAccess: true, out var clrMemberInfo, out var clrMemberType))
         {
             return new ClrSetterCacheValue<TObject, TValue>(null);
         }
@@ -176,7 +176,7 @@ public sealed partial class ApiProperty
             return new ClrSetterByRefCacheValue<TObject, TValue>(null);
         }
 
-        if (!TryResolveMember(clrObjectType, clrMemberName, forWrite: true, out var clrMemberInfo, out var clrMemberType))
+        if (!TryResolveMember(clrObjectType, clrMemberName, requiresWriteAccess: true, out var clrMemberInfo, out var clrMemberType))
         {
             return new ClrSetterByRefCacheValue<TObject, TValue>(null);
         }
@@ -267,11 +267,11 @@ public sealed partial class ApiProperty
     /// </summary>
     /// <param name="clrObjectType">The CLR type to search for the member.</param>
     /// <param name="clrMemberName">The name of the property or field.</param>
-    /// <param name="forWrite">True if the member will be written to; false for read-only access.</param>
+    /// <param name="requiresWriteAccess">True if the member will be written to; false for read-only access.</param>
     /// <param name="clrMemberInfo">The resolved member info, or default if not found.</param>
     /// <param name="clrMemberType">The type of the resolved member, or default if not found.</param>
     /// <returns>True if the member was successfully resolved; otherwise false.</returns>
-    private static bool TryResolveMember(Type clrObjectType, string clrMemberName, bool forWrite, [NotNullWhen(true)] out MemberInfo clrMemberInfo, [NotNullWhen(true)] out Type clrMemberType)
+    private static bool TryResolveMember(Type clrObjectType, string clrMemberName, bool requiresWriteAccess, [NotNullWhen(true)] out MemberInfo clrMemberInfo, [NotNullWhen(true)] out Type clrMemberType)
     {
         // Prefer property, then field
         var clrPropertyInfo = TypeReflection.GetProperty(clrObjectType, clrMemberName, BindingFlags.Public | BindingFlags.Instance);
@@ -286,7 +286,7 @@ public sealed partial class ApiProperty
             }
 
             // For write operations, require CanWrite
-            if (forWrite && !clrPropertyInfo.CanWrite)
+            if (requiresWriteAccess && !clrPropertyInfo.CanWrite)
             {
                 clrMemberInfo = default!;
                 clrMemberType = default!;
@@ -302,7 +302,7 @@ public sealed partial class ApiProperty
         if (clrFieldInfo is not null)
         {
             // For write operations, exclude init-only fields
-            if (forWrite && clrFieldInfo.IsInitOnly)
+            if (requiresWriteAccess && clrFieldInfo.IsInitOnly)
             {
                 clrMemberInfo = default!;
                 clrMemberType = default!;

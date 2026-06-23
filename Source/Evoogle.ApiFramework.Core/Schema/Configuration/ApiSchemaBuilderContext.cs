@@ -34,49 +34,49 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null)
 
     #region Methods
     /// <summary>
-    ///     Gets existing or adds new <see cref="ApiScalarTypeBuilder{T}"/> for the CLR type <typeparamref name="T"/>.
+    ///     Gets existing or adds new <see cref="ApiScalarTypeBuilder{TScalar}"/> for the CLR type <typeparamref name="TScalar"/>.
     /// </summary>
-    /// <typeparam name="T">The CLR scalar type.</typeparam>
-    /// <returns>The corresponding <see cref="ApiScalarTypeBuilder{T}"/>.</returns>
-    internal ApiScalarTypeBuilder<T> GetOrAddScalarTypeBuilder<T>()
+    /// <typeparam name="TScalar">The CLR scalar type.</typeparam>
+    /// <returns>The corresponding <see cref="ApiScalarTypeBuilder{TScalar}"/>.</returns>
+    internal ApiScalarTypeBuilder<TScalar> GetOrAddScalarTypeBuilder<TScalar>()
     {
-        var clrType = typeof(T);
+        var clrType = typeof(TScalar);
         if (_apiScalarTypeBuilders.TryGetValue(clrType, out var existing))
         {
-            if (existing is not ApiScalarTypeBuilder<T> typed)
+            if (existing is not ApiScalarTypeBuilder<TScalar> typed)
             {
                 throw new ApiSchemaException(
-                    $"Scalar type '{clrType.Name}' was already registered as {existing.GetType().Name} and cannot be reconfigured as {typeof(ApiScalarTypeBuilder<T>).Name}.");
+                    $"Scalar type '{clrType.Name}' was already registered as {existing.GetType().Name} and cannot be reconfigured as {typeof(ApiScalarTypeBuilder<TScalar>).Name}.");
             }
 
             return typed;
         }
 
-        var builder = new ApiScalarTypeBuilder<T>(this);
+        var builder = new ApiScalarTypeBuilder<TScalar>(this);
         _apiScalarTypeBuilders[clrType] = builder;
         return builder;
     }
 
     /// <summary>
-    ///     Gets existing or adds new <see cref="ApiEnumTypeBuilder{T}"/> for the CLR type <typeparamref name="T"/>.
+    ///     Gets existing or adds new <see cref="ApiEnumTypeBuilder{TEnum}"/> for the CLR type <typeparamref name="TEnum"/>.
     /// </summary>
-    /// <typeparam name="T">The CLR enum type.</typeparam>
-    /// <returns>The corresponding <see cref="ApiEnumTypeBuilder{T}"/>.</returns>
-    internal ApiEnumTypeBuilder<T> GetOrAddEnumTypeBuilder<T>() where T : Enum
+    /// <typeparam name="TEnum">The CLR enum type.</typeparam>
+    /// <returns>The corresponding <see cref="ApiEnumTypeBuilder{TEnum}"/>.</returns>
+    internal ApiEnumTypeBuilder<TEnum> GetOrAddEnumTypeBuilder<TEnum>() where TEnum : Enum
     {
-        var clrType = typeof(T);
+        var clrType = typeof(TEnum);
         if (_apiEnumTypeBuilders.TryGetValue(clrType, out var existing))
         {
-            if (existing is not ApiEnumTypeBuilder<T> typed)
+            if (existing is not ApiEnumTypeBuilder<TEnum> typed)
             {
                 throw new ApiSchemaException(
-                    $"Enum type '{clrType.Name}' was already registered as {existing.GetType().Name} and cannot be reconfigured as {typeof(ApiEnumTypeBuilder<T>).Name}.");
+                    $"Enum type '{clrType.Name}' was already registered as {existing.GetType().Name} and cannot be reconfigured as {typeof(ApiEnumTypeBuilder<TEnum>).Name}.");
             }
 
             return typed;
         }
 
-        var builder = new ApiEnumTypeBuilder<T>(this);
+        var builder = new ApiEnumTypeBuilder<TEnum>(this);
         _apiEnumTypeBuilders[clrType] = builder;
         return builder;
     }
@@ -98,25 +98,25 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null)
         GetOrAddBuilder(clrType, _apiObjectTypeBuilders, static (t, ctx) => new ApiObjectTypeBuilder(t, ctx), this);
 
     /// <summary>
-    ///     Gets existing or adds new <see cref="ApiObjectTypeBuilder{T}"/> for the CLR type <typeparamref name="T"/>.
+    ///     Gets existing or adds new <see cref="ApiObjectTypeBuilder{TObject}"/> for the CLR type <typeparamref name="TObject"/>.
     /// </summary>
-    /// <typeparam name="T">The CLR object type.</typeparam>
-    /// <returns>The corresponding <see cref="ApiObjectTypeBuilder{T}"/>.</returns>
-    internal ApiObjectTypeBuilder<T> GetOrAddObjectTypeBuilder<T>()
+    /// <typeparam name="TObject">The CLR object type.</typeparam>
+    /// <returns>The corresponding <see cref="ApiObjectTypeBuilder{TObject}"/>.</returns>
+    internal ApiObjectTypeBuilder<TObject> GetOrAddObjectTypeBuilder<TObject>()
     {
-        var clrType = typeof(T);
+        var clrType = typeof(TObject);
         if (_apiObjectTypeBuilders.TryGetValue(clrType, out var existing))
         {
-            if (existing is not ApiObjectTypeBuilder<T> typed)
+            if (existing is not ApiObjectTypeBuilder<TObject> typed)
             {
                 throw new ApiSchemaException(
-                    $"Object type '{clrType.Name}' was already registered as {existing.GetType().Name} and cannot be reconfigured as {typeof(ApiObjectTypeBuilder<T>).Name}.");
+                    $"Object type '{clrType.Name}' was already registered as {existing.GetType().Name} and cannot be reconfigured as {typeof(ApiObjectTypeBuilder<TObject>).Name}.");
             }
 
             return typed;
         }
 
-        var builder = new ApiObjectTypeBuilder<T>(this);
+        var builder = new ApiObjectTypeBuilder<TObject>(this);
         _apiObjectTypeBuilders[clrType] = builder;
         return builder;
     }

@@ -99,11 +99,11 @@ public static partial class ApiSchemaFactory
 
     private static class TE
     {
-        public static ApiTypeExpression ClrRef<T>() => ApiTypeExpression.ClrRef<T>();
+        public static ApiTypeExpression ClrRef<TClr>() => ApiTypeExpression.ClrRef<TClr>();
 
-        public static ApiTypeExpression HashSetOf<T>(bool required) => ApiTypeExpression.HashSetOf<T>(required ? ApiTypeModifiers.Required : ApiTypeModifiers.None);
+        public static ApiTypeExpression HashSetOf<TClr>(bool required) => ApiTypeExpression.HashSetOf<TClr>(required ? ApiTypeModifiers.Required : ApiTypeModifiers.None);
 
-        public static ApiTypeExpression ListOf<T>(bool required) => ApiTypeExpression.ListOf<T>(required ? ApiTypeModifiers.Required : ApiTypeModifiers.None);
+        public static ApiTypeExpression ListOf<TClr>(bool required) => ApiTypeExpression.ListOf<TClr>(required ? ApiTypeModifiers.Required : ApiTypeModifiers.None);
     }
 
     // Relationship Presets

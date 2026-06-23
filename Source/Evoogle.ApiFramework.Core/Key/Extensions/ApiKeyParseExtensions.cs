@@ -21,8 +21,8 @@ public static class ApiKeyParseExtensions
     /// <returns>The parsed key.</returns>
     /// <exception cref="ApiKeyException">Thrown if parsing fails.</exception>
     public static ApiKey Parse(this ApiKeyKind kind, string text)
-        => ApiKey.TryParse(kind, text, out var id)
-            ? id
+        => ApiKey.TryParse(kind, text, out var apiKey)
+            ? apiKey
             : throw new ApiKeyException($"Text '{text}' is not a valid {kind} id.");
 
     /// <summary>
@@ -32,7 +32,7 @@ public static class ApiKeyParseExtensions
     /// <returns>The parsed key.</returns>
     /// <exception cref="ApiKeyException">Thrown if text is null/empty or invalid.</exception>
     public static ApiKey Parse(this string text)
-        => ApiKey.TryParse(text, out var id) ? id : throw new ApiKeyException("Text is null/empty.");
+        => ApiKey.TryParse(text, out var apiKey) ? apiKey : throw new ApiKeyException("Text is null/empty.");
 
     /// <summary>
     ///     Parses <paramref name="text"/> using the specified <paramref name="provider"/>.
@@ -43,9 +43,9 @@ public static class ApiKeyParseExtensions
     /// <exception cref="ApiKeyException">Thrown if text is null/empty or invalid.</exception>
     public static ApiKey Parse(this string text, IFormatProvider? provider)
     {
-        if (ApiKey.TryParse(text, provider, out var id))
+        if (ApiKey.TryParse(text, provider, out var apiKey))
         {
-            return id;
+            return apiKey;
         }
 
         if (string.IsNullOrWhiteSpace(text))
@@ -65,9 +65,9 @@ public static class ApiKeyParseExtensions
     /// <exception cref="ApiKeyException">Thrown if text is null/empty or invalid.</exception>
     public static ApiKey Parse(this ReadOnlySpan<char> text, IFormatProvider? provider)
     {
-        if (ApiKey.TryParse(text, provider, out var id))
+        if (ApiKey.TryParse(text, provider, out var apiKey))
         {
-            return id;
+            return apiKey;
         }
 
         if (text.IsEmpty)

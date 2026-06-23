@@ -26,13 +26,13 @@ public sealed class ApiRelationshipOneToManyBuilder(string apiName)
 
     #region AddExtension Methods
     /// <summary>
-    ///     Adds an extension value associated with the specified <paramref name="type"/>.
+    ///     Adds an extension value associated with the specified <paramref name="extensionType"/>.
     /// </summary>
-    /// <param name="type">The type used as the extension key.</param>
+    /// <param name="extensionType">The type used as the extension key.</param>
     /// <param name="extension">The extension value to store.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipOneToManyBuilder AddRelationshipExtension(Type type, object extension)
-        => base.AddRelationshipExtension<ApiRelationshipOneToManyBuilder>(type, extension);
+    public ApiRelationshipOneToManyBuilder AddRelationshipExtension(Type extensionType, object extension)
+        => base.AddRelationshipExtension<ApiRelationshipOneToManyBuilder>(extensionType, extension);
     #endregion
 
     #region Non-Generic From/To Methods
@@ -57,15 +57,15 @@ public sealed class ApiRelationshipOneToManyBuilder(string apiName)
     ///     and selects the named principal key type for the relationship.
     /// </summary>
     /// <param name="clrPrincipalType">The CLR type of the principal object.</param>
-    /// <param name="apiKeyTypeName">The name of the principal key type to use for the relationship.</param>
+    /// <param name="apiPrincipalKeyTypeName">The name of the principal key type to use for the relationship.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipOneToManyBuilder From(Type clrPrincipalType, string apiKeyTypeName)
+    public ApiRelationshipOneToManyBuilder From(Type clrPrincipalType, string apiPrincipalKeyTypeName)
     {
         ArgumentNullException.ThrowIfNull(clrPrincipalType);
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiKeyTypeName, nameof(apiKeyTypeName));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiPrincipalKeyTypeName, nameof(apiPrincipalKeyTypeName));
 
         var builder = new ApiRelationshipPrincipalEndBuilder(clrPrincipalType);
-        builder.WithPrincipalKey(apiKeyTypeName);
+        builder.WithPrincipalKey(apiPrincipalKeyTypeName);
         _principalEndBuilder = builder;
         return this;
     }

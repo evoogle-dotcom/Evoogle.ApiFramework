@@ -157,11 +157,11 @@ public sealed class ApiEnumType
         _clrNameLookup = null;
         _clrOrdinalLookup = null;
 
-        ApiSchemaHelpers.InitializeLookupDictionary
+        ApiSchemaInitializationLookup.InitializeLookupDictionary
         (
             parts: this.ApiEnumValues,
             partKeySelector: x => x.ApiName,
-            partKeyFilter: x => ApiSchemaHelpers.IsNameValid(x),
+            partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
             partKeyPropertyName: nameof(ApiEnumValue.ApiName),
             path: this.ApiPath,
             duplicatePartCode: ApiInitializationCode.API_ENUM_TYPE_DUPLICATE_VALUE_API_NAME,
@@ -169,11 +169,11 @@ public sealed class ApiEnumType
             lookupDictionary: out _apiNameLookup
         );
 
-        ApiSchemaHelpers.InitializeLookupDictionary
+        ApiSchemaInitializationLookup.InitializeLookupDictionary
         (
             parts: this.ApiEnumValues,
             partKeySelector: x => x.ClrName,
-            partKeyFilter: x => ApiSchemaHelpers.IsNameValid(x),
+            partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
             partKeyPropertyName: nameof(ApiEnumValue.ClrName),
             path: this.ApiPath,
             duplicatePartCode: ApiInitializationCode.API_ENUM_TYPE_DUPLICATE_VALUE_CLR_NAME,
@@ -181,7 +181,7 @@ public sealed class ApiEnumType
             lookupDictionary: out _clrNameLookup
         );
 
-        ApiSchemaHelpers.InitializeLookupDictionary
+        ApiSchemaInitializationLookup.InitializeLookupDictionary
         (
             parts: this.ApiEnumValues,
             partKeySelector: x => x.ClrOrdinal,

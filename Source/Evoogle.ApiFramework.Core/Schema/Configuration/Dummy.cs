@@ -183,7 +183,7 @@ internal static class Dummy
         {
             builder
                 .WithName("Email")
-                .AddScalarTypeExtension(new VisibleMetadata { Visible = true });
+                .AddScalarTypeExtension(new VisibleMetadata { IsVisible = true });
         }
     }
 
@@ -201,7 +201,7 @@ internal static class Dummy
                 .AddValue("Shipped", "Shipped", 1)
                 .AddValue("Delivered", "Delivered", 2)
                 .AddValue("Cancelled", "Cancelled", 3)
-                .AddEnumTypeExtension(new VisibleMetadata { Visible = true });
+                .AddEnumTypeExtension(new VisibleMetadata { IsVisible = true });
         }
     }
 
@@ -218,7 +218,7 @@ internal static class Dummy
                 .AddProperty("id", "Id")
                 .AddProperty("status", "Status")
                 .AddProperty("total", "Total")
-                .AddObjectTypeExtension(new VisibleMetadata { Visible = true });
+                .AddObjectTypeExtension(new VisibleMetadata { IsVisible = true });
         }
     }
 
@@ -263,7 +263,7 @@ internal static class Dummy
     public class VisibleMetadata
     {
         /// <summary>Gets or sets a value indicating whether the target artifact should be visible.</summary>
-        public bool Visible { get; set; }
+        public bool IsVisible { get; set; }
     }
 
     /// <summary>
@@ -281,7 +281,7 @@ internal static class Dummy
                 .From<Customer>
                 (
                     p => p
-                        .AddRelationshipPrincipalEndExtension(new VisibleMetadata { Visible = true })
+                        .AddRelationshipPrincipalEndExtension(new VisibleMetadata { IsVisible = true })
                 )
                 .To<CustomerProfile>
                 (
@@ -305,7 +305,7 @@ internal static class Dummy
             builder
                 .Between<Product>
                 (
-                    p => p.AddRelationshipPrincipalEndExtension(new VisibleMetadata { Visible = true })
+                    p => p.AddRelationshipPrincipalEndExtension(new VisibleMetadata { IsVisible = true })
                 )
                 .And<Tag>
                 (
@@ -389,7 +389,7 @@ internal static class Dummy
                 .ThrowOnNullKeyPart())
             .AddScalar<EmailAddress>(x => x
                 .WithName("EmailAddress"))
-                .AddSchemaExtension(new VisibleMetadata { Visible = true })
+                .AddSchemaExtension(new VisibleMetadata { IsVisible = true })
             .AddObject<Country>(x => x
                 .WithName("Country")
                 .AddKey("PrimaryKey", b => b
@@ -399,7 +399,7 @@ internal static class Dummy
                 .WithOptions(o => o
                     .ThrowOnNullKeyPart())
                 .AddProperty("Id", "Id", p => p.WithModifiers(m => m.Required()))
-                .AddProperty("Name", "Name", p => p.WithModifiers(m => m.Required()).AddPropertyExtension(new VisibleMetadata { Visible = true }))
+                .AddProperty("Name", "Name", p => p.WithModifiers(m => m.Required()).AddPropertyExtension(new VisibleMetadata { IsVisible = true }))
                 .AddProperty("Email", "Email", p => p.WithModifiers(m => m.Optional()))
                 .AddProperty("Orders", "Orders", p => p.WithModifiers(m => m.Required()))
                 .AddKey("PrimaryKey", b => b
@@ -423,13 +423,13 @@ internal static class Dummy
                 .AddProperty("Quantity", "Quantity", p => p.WithModifiers(m => m.Required()))
                 .AddProperty("UnitPrice", "UnitPrice", p => p.WithModifiers(m => m.Required()))
                 .AddKey("PrimaryKey", b => b
-                    .AddPath(typeof(OrderItem), ["OrderId"], p => p.AddKeyPathExtension(new VisibleMetadata { Visible = true }))
+                    .AddPath(typeof(OrderItem), ["OrderId"], p => p.AddKeyPathExtension(new VisibleMetadata { IsVisible = true }))
                     .AddPath(typeof(OrderItem), "LineItemNumber"))
                 .AddKey("AlternateKey", b => b
-                    .AddPath(typeof(Order), ["Id"], p => p.AddKeyPathExtension(new VisibleMetadata { Visible = true }))
+                    .AddPath(typeof(Order), ["Id"], p => p.AddKeyPathExtension(new VisibleMetadata { IsVisible = true }))
                     .AddPath(typeof(OrderItem), "LineItemNumber")))
             .AddEnum<OrderStatus>(x => x
-                .AddEnumTypeExtension(new VisibleMetadata { Visible = true })
+                .AddEnumTypeExtension(new VisibleMetadata { IsVisible = true })
                 .WithName("OrderStatus")
                 .AddValue("Pending", "Pending", 0)
                 .AddValue("Shipped", "Shipped", 1)
@@ -518,7 +518,7 @@ internal static class Dummy
                     (
                         p => p
                             .WithPrincipalKey("PrimaryKey")
-                            .AddRelationshipPrincipalEndExtension(new VisibleMetadata { Visible = true })
+                            .AddRelationshipPrincipalEndExtension(new VisibleMetadata { IsVisible = true })
                     )
                     .And<Tag>
                     (
@@ -530,11 +530,11 @@ internal static class Dummy
                         a => a
                             .WithForeignKeyA(b => b.AddPath(typeof(ProductTag), "ProductId"))
                             .WithForeignKeyB(b => b.AddPath(typeof(ProductTag), "TagId"))
-                            .AddRelationshipAssociationExtension(new VisibleMetadata { Visible = true })
+                            .AddRelationshipAssociationExtension(new VisibleMetadata { IsVisible = true })
                     )
-                    .AddRelationshipExtension(new VisibleMetadata { Visible = true })
+                    .AddRelationshipExtension(new VisibleMetadata { IsVisible = true })
             )
-            .AddSchemaExtension(new VisibleMetadata { Visible = true })
+            .AddSchemaExtension(new VisibleMetadata { IsVisible = true })
             .Build();
     }
 

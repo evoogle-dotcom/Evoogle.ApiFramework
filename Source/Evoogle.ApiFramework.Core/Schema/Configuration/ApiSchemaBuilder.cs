@@ -58,14 +58,14 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
 
     #region AddExtension Methods
     /// <summary>
-    ///     Adds an extension value associated with the specified <paramref name="type"/>.
+    ///     Adds an extension value associated with the specified <paramref name="extensionType"/>.
     /// </summary>
-    /// <param name="type">The type used as the extension key.</param>
+    /// <param name="extensionType">The type used as the extension key.</param>
     /// <param name="extension">The extension value to store.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiSchemaBuilder AddSchemaExtension(Type type, object extension)
+    public ApiSchemaBuilder AddSchemaExtension(Type extensionType, object extension)
     {
-        return this.AddExtension(type, extension);
+        return this.AddExtension(extensionType, extension);
     }
     #endregion
 
@@ -355,10 +355,10 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     /// <summary>
     ///     Allows extension methods to configure a strongly-typed enum builder.
     /// </summary>
-    internal ApiSchemaBuilder AddEnumCore<T>(Action<ApiEnumTypeBuilder<T>>? configure = null)
-        where T : Enum
+    internal ApiSchemaBuilder AddEnumCore<TEnum>(Action<ApiEnumTypeBuilder<TEnum>>? configure = null)
+        where TEnum : Enum
     {
-        var builder = _context.GetOrAddEnumTypeBuilder<T>();
+        var builder = _context.GetOrAddEnumTypeBuilder<TEnum>();
         configure?.Invoke(builder);
         return this;
     }
@@ -366,9 +366,9 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     /// <summary>
     ///     Allows extension methods to configure a strongly-typed object builder.
     /// </summary>
-    internal ApiSchemaBuilder AddObjectCore<T>(Action<ApiObjectTypeBuilder<T>>? configure = null)
+    internal ApiSchemaBuilder AddObjectCore<TObject>(Action<ApiObjectTypeBuilder<TObject>>? configure = null)
     {
-        var builder = _context.GetOrAddObjectTypeBuilder<T>();
+        var builder = _context.GetOrAddObjectTypeBuilder<TObject>();
         configure?.Invoke(builder);
         return this;
     }
@@ -376,9 +376,9 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     /// <summary>
     ///     Allows extension methods to configure a strongly-typed scalar builder.
     /// </summary>
-    internal ApiSchemaBuilder AddScalarCore<T>(Action<ApiScalarTypeBuilder<T>>? configure = null)
+    internal ApiSchemaBuilder AddScalarCore<TScalar>(Action<ApiScalarTypeBuilder<TScalar>>? configure = null)
     {
-        var builder = _context.GetOrAddScalarTypeBuilder<T>();
+        var builder = _context.GetOrAddScalarTypeBuilder<TScalar>();
         configure?.Invoke(builder);
         return this;
     }

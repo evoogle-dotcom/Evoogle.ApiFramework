@@ -22,14 +22,14 @@ public class ApiRelationshipDependentEndBuilder(Type clrObjectType) : ExtensionB
 
     #region AddExtension Methods
     /// <summary>
-    ///     Adds an extension value associated with the specified <paramref name="type"/>.
+    ///     Adds an extension value associated with the specified <paramref name="extensionType"/>.
     /// </summary>
-    /// <param name="type">The type used as the extension key.</param>
+    /// <param name="extensionType">The type used as the extension key.</param>
     /// <param name="extension">The extension value to store.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipDependentEndBuilder AddRelationshipDependentEndExtension(Type type, object extension)
+    public ApiRelationshipDependentEndBuilder AddRelationshipDependentEndExtension(Type extensionType, object extension)
     {
-        return this.AddExtension(type, extension);
+        return this.AddExtension(extensionType, extension);
     }
     #endregion
 

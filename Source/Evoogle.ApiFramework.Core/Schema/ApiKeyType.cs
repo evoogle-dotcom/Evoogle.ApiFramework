@@ -87,7 +87,7 @@ public sealed partial class ApiKeyType(string? apiName, IEnumerable<ApiKeyPath> 
     #region ApiSchemaElement Methods
     /// <inheritdoc/>
     protected override string BuildPath(string? apiPreviousPath)
-        => ApiSchemaHelpers.BuildPath(basePath: apiPreviousPath, segment: this.ApiElementName, segmentName: this.ApiName);
+        => ApiSchemaPathFormatting.BuildPath(basePath: apiPreviousPath, segment: this.ApiElementName, segmentName: this.ApiName);
 
     /// <inheritdoc/>
     internal override void Initialize(ApiInitializationContext context)
@@ -112,7 +112,7 @@ public sealed partial class ApiKeyType(string? apiName, IEnumerable<ApiKeyPath> 
             return;
         }
 
-        var isApiNameInvalid = ApiSchemaHelpers.IsNameInvalid(this.ApiName);
+        var isApiNameInvalid = ApiSchemaNameValidation.IsNameInvalid(this.ApiName);
         if (isApiNameInvalid)
         {
             var path = this.ApiPath;

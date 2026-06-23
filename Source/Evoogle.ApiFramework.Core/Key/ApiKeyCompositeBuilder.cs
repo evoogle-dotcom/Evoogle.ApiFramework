@@ -57,7 +57,7 @@ public sealed class ApiKeyCompositeBuilder
     /// <summary>
     ///     Adds an unnamed (positional) key part.
     /// </summary>
-    /// <param name="value">The scalar key value to add as a positional part.</param>
+    /// <param name="apiValue">The scalar key value to add as a positional part.</param>
     /// <returns>
     ///     The current <see cref="ApiKeyCompositeBuilder"/> instance for method chaining.
     /// </returns>
@@ -67,29 +67,29 @@ public sealed class ApiKeyCompositeBuilder
     ///         All parts in the composite must be unnamed if this method is used.
     ///     </para>
     ///     <para>
-    ///         The <paramref name="value"/> must be a scalar <see cref="ApiKey"/> (not a composite).
+    ///         The <paramref name="apiValue"/> must be a scalar <see cref="ApiKey"/> (not a composite).
     ///         Validation occurs during <see cref="Build"/>.
     ///     </para>
     /// </remarks>
-    public ApiKeyCompositeBuilder Add(ApiKey value)
+    public ApiKeyCompositeBuilder Add(ApiKey apiValue)
     {
         _parts ??= [];
-        _parts.Add(new ApiKeyPart(null, value));
+        _parts.Add(new ApiKeyPart(null, apiValue));
         return this;
     }
 
     /// <summary>
     ///     Adds a named key part to the composite sequence.
     /// </summary>
-    /// <param name="name">
-    ///     The name for this part. Must be non-null and contain at least one non-whitespace character.
+    /// <param name="apiName">
+    ///     The API name for this part. Must be non-null and contain at least one non-whitespace character.
     /// </param>
-    /// <param name="value">The scalar key value associated with <paramref name="name"/>.</param>
+    /// <param name="apiValue">The scalar key value associated with <paramref name="apiName"/>.</param>
     /// <returns>
     ///     The current <see cref="ApiKeyCompositeBuilder"/> instance for method chaining.
     /// </returns>
     /// <exception cref="ArgumentException">
-    ///     Thrown if <paramref name="name"/> is <see langword="null"/>, empty, or contains only whitespace.
+    ///     Thrown if <paramref name="apiName"/> is <see langword="null"/>, empty, or contains only whitespace.
     /// </exception>
     /// <remarks>
     ///     <para>
@@ -97,19 +97,19 @@ public sealed class ApiKeyCompositeBuilder
     ///         All parts in the composite must be named if this method is used.
     ///     </para>
     ///     <para>
-    ///         The <paramref name="value"/> must be a scalar <see cref="ApiKey"/> (not a composite).
+    ///         The <paramref name="apiValue"/> must be a scalar <see cref="ApiKey"/> (not a composite).
     ///         Duplicate names and name uniqueness are validated during <see cref="Build"/>.
     ///     </para>
     /// </remarks>
-    public ApiKeyCompositeBuilder Add(string name, ApiKey value)
+    public ApiKeyCompositeBuilder Add(string apiName, ApiKey apiValue)
     {
-        if (string.IsNullOrWhiteSpace(name))
+        if (string.IsNullOrWhiteSpace(apiName))
         {
-            throw new ArgumentException("Name must be non-empty for a named part.", nameof(name));
+            throw new ArgumentException("Name must be non-empty for a named part.", nameof(apiName));
         }
 
         _parts ??= [];
-        _parts.Add(new ApiKeyPart(name.Trim(), value));
+        _parts.Add(new ApiKeyPart(apiName.Trim(), apiValue));
         return this;
     }
 

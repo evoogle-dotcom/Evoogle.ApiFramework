@@ -76,7 +76,7 @@ public sealed class ApiKeyPath(Type clrRootType, IEnumerable<ApiKeyPathSegment> 
     {
         var clrRootType = this.ClrRootType;
         var segmentName = clrRootType is not null ? $"{clrRootType.Name}.{string.Join(".", this.ApiSegments.Select(s => s.ClrPropertyName))}" : null;
-        return ApiSchemaHelpers.BuildPath(basePath: apiPreviousPath, segment: this.ApiElementName, segmentName: segmentName);
+        return ApiSchemaPathFormatting.BuildPath(basePath: apiPreviousPath, segment: this.ApiElementName, segmentName: segmentName);
     }
 
     /// <inheritdoc/>

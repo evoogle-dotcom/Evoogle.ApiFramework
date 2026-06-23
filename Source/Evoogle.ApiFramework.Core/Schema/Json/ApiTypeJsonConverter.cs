@@ -141,7 +141,7 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
     #region JsonConverterBase<T> Methods
     /// <inheritdoc/>
     protected override IReadContext CreateReadContext(ILogger logger, JsonSerializerOptions options)
-        => CreateDefaultReadContext<PropertyNames, ReadData, ReadHandlers>
+        => CreateDefaultReadContext<PropertyNames, ReadState, ReadHandlers>
             (
                 logger,
                 options,
@@ -161,7 +161,7 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
     /// <inheritdoc/>
     protected override ApiType? CreateValue(IReadContext context)
     {
-        var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
+        var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
 
         var apiType = default(ApiType);
 
@@ -210,7 +210,7 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
     /// <inheritdoc/>
     protected override void ReadCore(ref Utf8JsonReader reader, IReadContext context)
     {
-        var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
+        var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
         var handlers = readContext.ReadHandlers.PropertyHandlers;
 
         ReadJsonObject(ref reader, readContext, handlers);

@@ -43,7 +43,7 @@ public abstract class ApiRelationshipElement(Type clrObjectType) : ApiSchemaElem
     #region ApiSchemaElement Methods
     /// <inheritdoc/>
     protected override string BuildPath(string? apiPreviousPath)
-        => ApiSchemaHelpers.BuildPath(basePath: apiPreviousPath, segment: this.ApiElementName, segmentName: null);
+        => ApiSchemaPathFormatting.BuildPath(basePath: apiPreviousPath, segment: this.ApiElementName, segmentName: null);
 
     /// <inheritdoc/>
     internal override void Initialize(ApiInitializationContext context)

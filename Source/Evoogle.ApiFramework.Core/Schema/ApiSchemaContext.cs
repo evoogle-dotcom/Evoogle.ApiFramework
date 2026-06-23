@@ -64,7 +64,7 @@ public sealed class ApiSchemaContext
     /// <summary>
     ///     Creates a logger for the specified type.
     /// </summary>
-    internal ILogger<T>? CreateLogger<T>() => this.LoggerFactory?.CreateLogger<T>();
+    internal ILogger<TCategory>? CreateLogger<TCategory>() => this.LoggerFactory?.CreateLogger<TCategory>();
 
     /// <summary>
     ///     Initializes the logger for this context.

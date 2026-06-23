@@ -29,13 +29,13 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
 
     #region AddExtension Methods
     /// <summary>
-    ///     Adds an extension value associated with the specified <paramref name="type"/>.
+    ///     Adds an extension value associated with the specified <paramref name="extensionType"/>.
     /// </summary>
-    /// <param name="type">The type used as the extension key.</param>
+    /// <param name="extensionType">The type used as the extension key.</param>
     /// <param name="extension">The extension value to store.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipManyToManyBuilder AddRelationshipExtension(Type type, object extension)
-        => base.AddRelationshipExtension<ApiRelationshipManyToManyBuilder>(type, extension);
+    public ApiRelationshipManyToManyBuilder AddRelationshipExtension(Type extensionType, object extension)
+        => base.AddRelationshipExtension<ApiRelationshipManyToManyBuilder>(extensionType, extension);
     #endregion
 
     #region Non-Generic Between/And Methods
@@ -60,15 +60,15 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
     ///     and selects the named principal key type for the relationship.
     /// </summary>
     /// <param name="clrPrincipalType">The CLR type of the principal end A object type.</param>
-    /// <param name="apiKeyTypeName">The name of the principal key type to use for the relationship.</param>
+    /// <param name="apiPrincipalKeyTypeName">The name of the principal key type to use for the relationship.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipManyToManyBuilder Between(Type clrPrincipalType, string apiKeyTypeName)
+    public ApiRelationshipManyToManyBuilder Between(Type clrPrincipalType, string apiPrincipalKeyTypeName)
     {
         ArgumentNullException.ThrowIfNull(clrPrincipalType);
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiKeyTypeName, nameof(apiKeyTypeName));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiPrincipalKeyTypeName, nameof(apiPrincipalKeyTypeName));
 
         var builder = new ApiRelationshipPrincipalEndBuilder(clrPrincipalType);
-        builder.WithPrincipalKey(apiKeyTypeName);
+        builder.WithPrincipalKey(apiPrincipalKeyTypeName);
         _principalEndABuilder = builder;
         return this;
     }
@@ -94,15 +94,15 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
     ///     and selects the named principal key type for the relationship.
     /// </summary>
     /// <param name="clrPrincipalType">The CLR type of the principal end B object type.</param>
-    /// <param name="apiKeyTypeName">The name of the principal key type to use for the relationship.</param>
+    /// <param name="apiPrincipalKeyTypeName">The name of the principal key type to use for the relationship.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipManyToManyBuilder And(Type clrPrincipalType, string apiKeyTypeName)
+    public ApiRelationshipManyToManyBuilder And(Type clrPrincipalType, string apiPrincipalKeyTypeName)
     {
         ArgumentNullException.ThrowIfNull(clrPrincipalType);
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiKeyTypeName, nameof(apiKeyTypeName));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiPrincipalKeyTypeName, nameof(apiPrincipalKeyTypeName));
 
         var builder = new ApiRelationshipPrincipalEndBuilder(clrPrincipalType);
-        builder.WithPrincipalKey(apiKeyTypeName);
+        builder.WithPrincipalKey(apiPrincipalKeyTypeName);
         _principalEndBBuilder = builder;
         return this;
     }

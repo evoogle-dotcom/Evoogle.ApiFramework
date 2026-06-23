@@ -274,11 +274,11 @@ public sealed partial class ApiObjectType
         _apiPropertyApiNameLookup = null;
         _apiPropertyClrNameLookup = null;
 
-        ApiSchemaHelpers.InitializeLookupDictionary
+        ApiSchemaInitializationLookup.InitializeLookupDictionary
         (
             parts: this.ApiKeyTypes,
             partKeySelector: x => x.ApiName,
-            partKeyFilter: x => ApiSchemaHelpers.IsNameValid(x),
+            partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
             partKeyPropertyName: nameof(ApiKeyType.ApiName),
             path: this.ApiPath,
             duplicatePartCode: ApiInitializationCode.API_OBJECT_TYPE_DUPLICATE_KEY_TYPE_API_NAME,
@@ -286,11 +286,11 @@ public sealed partial class ApiObjectType
             lookupDictionary: out _apiKeyTypeApiNameLookup
         );
 
-        ApiSchemaHelpers.InitializeLookupDictionary
+        ApiSchemaInitializationLookup.InitializeLookupDictionary
         (
             parts: this.ApiProperties,
             partKeySelector: x => x.ApiName,
-            partKeyFilter: x => ApiSchemaHelpers.IsNameValid(x),
+            partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
             partKeyPropertyName: nameof(ApiProperty.ApiName),
             path: this.ApiPath,
             duplicatePartCode: ApiInitializationCode.API_OBJECT_TYPE_DUPLICATE_PROPERTY_API_NAME,
@@ -298,11 +298,11 @@ public sealed partial class ApiObjectType
             lookupDictionary: out _apiPropertyApiNameLookup
         );
 
-        ApiSchemaHelpers.InitializeLookupDictionary
+        ApiSchemaInitializationLookup.InitializeLookupDictionary
         (
             parts: this.ApiProperties,
             partKeySelector: x => x.ClrName,
-            partKeyFilter: x => ApiSchemaHelpers.IsNameValid(x),
+            partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
             partKeyPropertyName: nameof(ApiProperty.ClrName),
             path: this.ApiPath,
             duplicatePartCode: ApiInitializationCode.API_OBJECT_TYPE_DUPLICATE_PROPERTY_CLR_NAME,

@@ -95,7 +95,7 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
         public ApiRelationshipAssociation? ApiAssociation { get; set; }
     }
 
-    private class ReadData : ExtensibleReadData
+    private class ReadState : ExtensibleReadData
     {
         public ApiRelationshipReadData? ApiRelationship { get; set; }
         public ApiRelationshipOneToReadData? ApiRelationshipOneTo { get; set; }
@@ -104,7 +104,7 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
 
     private class ReadHandlers(PropertyNames propertyNames)
     {
-        public readonly Dictionary<string, JsonReaderHandler<DefaultReadContext<PropertyNames, ReadData, ReadHandlers>>> PropertyHandlers = new()
+        public readonly Dictionary<string, JsonReaderHandler<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>>> PropertyHandlers = new()
         {
             { propertyNames.ApiRelationship.ApiKind, HandleApiKind },
             { propertyNames.ApiRelationship.ApiName, HandleApiName },
@@ -114,56 +114,56 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
             { propertyNames.ApiRelationshipManyToMany.ApiPrincipalEndA, HandleApiPrincipalEndA },
             { propertyNames.ApiRelationshipManyToMany.ApiPrincipalEndB, HandleApiPrincipalEndB },
             { propertyNames.ApiRelationshipManyToMany.ApiAssociation, HandleApiAssociation },
-            { propertyNames.ExtensibleBase.Extensions, CreateExtensionsHandler<PropertyNames, ReadData, ReadHandlers>() },
+            { propertyNames.ExtensibleBase.Extensions, CreateExtensionsHandler<PropertyNames, ReadState, ReadHandlers>() },
         };
 
-        private static void HandleApiKind(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiKind(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
             context.ReadData.ApiRelationship ??= new ApiRelationshipReadData();
             context.ReadData.ApiRelationship.ApiKind = _kindConverter.Read(ref reader, typeof(ApiRelationshipKind), context.Options);
         }
 
-        private static void HandleApiName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
             context.ReadData.ApiRelationship ??= new ApiRelationshipReadData();
             context.ReadData.ApiRelationship.ApiName = reader.GetString();
         }
 
-        private static void HandleApiDeleteBehavior(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiDeleteBehavior(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
             context.ReadData.ApiRelationship ??= new ApiRelationshipReadData();
             context.ReadData.ApiRelationship.ApiDeleteBehavior = _deleteBehaviorConverter.Read(ref reader, typeof(ApiRelationshipDeleteBehavior), context.Options);
         }
 
-        private static void HandleApiPrincipalEnd(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiPrincipalEnd(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
             context.ReadData.ApiRelationshipOneTo ??= new ApiRelationshipOneToReadData();
             var end = JsonSerializer.Deserialize<ApiRelationshipPrincipalEnd>(ref reader, context.Options);
             context.ReadData.ApiRelationshipOneTo.ApiPrincipalEnd = end;
         }
 
-        private static void HandleApiDependentEnd(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiDependentEnd(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
             context.ReadData.ApiRelationshipOneTo ??= new ApiRelationshipOneToReadData();
             var end = JsonSerializer.Deserialize<ApiRelationshipDependentEnd>(ref reader, context.Options);
             context.ReadData.ApiRelationshipOneTo.ApiDependentEnd = end;
         }
 
-        private static void HandleApiPrincipalEndA(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiPrincipalEndA(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
             context.ReadData.ApiRelationshipManyToMany ??= new ApiRelationshipManyToManyReadData();
             var end = JsonSerializer.Deserialize<ApiRelationshipPrincipalEnd>(ref reader, context.Options);
             context.ReadData.ApiRelationshipManyToMany.ApiPrincipalEndA = end;
         }
 
-        private static void HandleApiPrincipalEndB(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiPrincipalEndB(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
             context.ReadData.ApiRelationshipManyToMany ??= new ApiRelationshipManyToManyReadData();
             var end = JsonSerializer.Deserialize<ApiRelationshipPrincipalEnd>(ref reader, context.Options);
             context.ReadData.ApiRelationshipManyToMany.ApiPrincipalEndB = end;
         }
 
-        private static void HandleApiAssociation(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadData, ReadHandlers> context)
+        private static void HandleApiAssociation(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
             context.ReadData.ApiRelationshipManyToMany ??= new ApiRelationshipManyToManyReadData();
             var end = JsonSerializer.Deserialize<ApiRelationshipAssociation>(ref reader, context.Options);
@@ -188,7 +188,7 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
     #region JsonConverterBase<T> Methods
     /// <inheritdoc/>
     protected override IReadContext CreateReadContext(ILogger logger, JsonSerializerOptions options)
-        => CreateDefaultReadContext<PropertyNames, ReadData, ReadHandlers>
+        => CreateDefaultReadContext<PropertyNames, ReadState, ReadHandlers>
             (
                 logger,
                 options,
@@ -203,40 +203,40 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
     /// <inheritdoc/>
     protected override ApiRelationship? CreateValue(IReadContext context)
     {
-        var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
-        var readData = readContext.ReadData;
+        var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
+        var readState = readContext.ReadData;
 
-        if (readData.ApiRelationship?.ApiKind is null)
+        if (readState.ApiRelationship?.ApiKind is null)
         {
             return null;
         }
 
-        var apiKindValue = readData.ApiRelationship.ApiKind.Value;
+        var apiKindValue = readState.ApiRelationship.ApiKind.Value;
         ApiRelationship? relationship = apiKindValue switch
         {
             ApiRelationshipKind.OneToOne => new ApiRelationshipOneToOne
             (
-                readData.ApiRelationship.ApiName!,
-                readData.ApiRelationshipOneTo?.ApiPrincipalEnd!,
-                readData.ApiRelationshipOneTo?.ApiDependentEnd!,
-                readData.ApiRelationship?.ApiDeleteBehavior ?? ApiRelationshipOneToOne.DefaultDeleteBehavior
+                readState.ApiRelationship.ApiName!,
+                readState.ApiRelationshipOneTo?.ApiPrincipalEnd!,
+                readState.ApiRelationshipOneTo?.ApiDependentEnd!,
+                readState.ApiRelationship?.ApiDeleteBehavior ?? ApiRelationshipOneToOne.DefaultDeleteBehavior
             ),
 
             ApiRelationshipKind.OneToMany => new ApiRelationshipOneToMany
             (
-                readData.ApiRelationship.ApiName!,
-                readData.ApiRelationshipOneTo?.ApiPrincipalEnd!,
-                readData.ApiRelationshipOneTo?.ApiDependentEnd!,
-                readData.ApiRelationship?.ApiDeleteBehavior ?? ApiRelationshipOneToMany.DefaultDeleteBehavior
+                readState.ApiRelationship.ApiName!,
+                readState.ApiRelationshipOneTo?.ApiPrincipalEnd!,
+                readState.ApiRelationshipOneTo?.ApiDependentEnd!,
+                readState.ApiRelationship?.ApiDeleteBehavior ?? ApiRelationshipOneToMany.DefaultDeleteBehavior
             ),
 
             ApiRelationshipKind.ManyToMany => new ApiRelationshipManyToMany
             (
-                readData.ApiRelationship?.ApiName!,
-                readData.ApiRelationshipManyToMany?.ApiPrincipalEndA!,
-                readData.ApiRelationshipManyToMany?.ApiPrincipalEndB!,
-                readData.ApiRelationshipManyToMany?.ApiAssociation!,
-                readData.ApiRelationship?.ApiDeleteBehavior ?? ApiRelationshipManyToMany.DefaultDeleteBehavior
+                readState.ApiRelationship?.ApiName!,
+                readState.ApiRelationshipManyToMany?.ApiPrincipalEndA!,
+                readState.ApiRelationshipManyToMany?.ApiPrincipalEndB!,
+                readState.ApiRelationshipManyToMany?.ApiAssociation!,
+                readState.ApiRelationship?.ApiDeleteBehavior ?? ApiRelationshipManyToMany.DefaultDeleteBehavior
             ),
 
             _ => null
@@ -255,7 +255,7 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
     /// <inheritdoc/>
     protected override void ReadCore(ref Utf8JsonReader reader, IReadContext context)
     {
-        var readContext = (DefaultReadContext<PropertyNames, ReadData, ReadHandlers>)context;
+        var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
         ReadJsonObject(ref reader, readContext, readContext.ReadHandlers.PropertyHandlers);
     }
 

@@ -164,7 +164,7 @@ public sealed partial class ApiProperty
     #region ApiSchemaElement Methods
     /// <inheritdoc />
     protected override string BuildPath(string? apiPreviousPath)
-        => ApiSchemaHelpers.BuildPath(basePath: apiPreviousPath, segment: this.ApiElementName, segmentName: this.ApiName);
+        => ApiSchemaPathFormatting.BuildPath(basePath: apiPreviousPath, segment: this.ApiElementName, segmentName: this.ApiName);
 
     /// <inheritdoc />
     internal override void Initialize(ApiInitializationContext context)
@@ -181,7 +181,7 @@ public sealed partial class ApiProperty
 
     private void InitializeApiName(ApiInitializationContext context)
     {
-        var isApiNameInvalid = ApiSchemaHelpers.IsNameInvalid(this.ApiName);
+        var isApiNameInvalid = ApiSchemaNameValidation.IsNameInvalid(this.ApiName);
         if (isApiNameInvalid)
         {
             var path = this.ApiPath;
@@ -320,7 +320,7 @@ public sealed partial class ApiProperty
             return;
         }
 
-        var isClrMemberNameInvalid = ApiSchemaHelpers.IsNameInvalid(clrMemberName);
+        var isClrMemberNameInvalid = ApiSchemaNameValidation.IsNameInvalid(clrMemberName);
         if (isClrMemberNameInvalid)
         {
             // If the CLR member name is invalid, skip further processing
@@ -379,7 +379,7 @@ public sealed partial class ApiProperty
 
     private void InitializeClrName(ApiInitializationContext context)
     {
-        var isClrNameInvalid = ApiSchemaHelpers.IsNameInvalid(this.ClrName);
+        var isClrNameInvalid = ApiSchemaNameValidation.IsNameInvalid(this.ClrName);
         if (isClrNameInvalid)
         {
             var path = this.ApiPath;

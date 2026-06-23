@@ -13,7 +13,7 @@ namespace Evoogle.ApiFramework.Schema.Json.Internal;
 ///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used directly from your code.
 ///     This API may change or be removed in future releases.
 /// </summary>
-internal static class ApiJsonConverterHelpers
+internal static class ApiTypeKindJsonParsing
 {
     #region Utility Methods
     public static ApiTypeKind? GetApiTypeKind(ILogger logger, string? kindAsString)

@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -129,50 +129,50 @@ public sealed partial class ApiKeyType
         var pathName = GetPathName(path);
         var expectedClrType = path.ApiScalarSegment.ApiProperty.ApiType.ClrType;
 
-        if (context.TryResolveValue(path.ClrRootType, pathName, out var value) is false)
+        if (context.TryResolveValue(path.ClrRootType, pathName, out var materializationValue) is false)
         {
             return HandleMissingValue(context, path, pathName);
         }
 
-        return value.Kind switch
+        return materializationValue.Kind switch
         {
-            ApiKeyMaterializationValueKind.Key => MaterializeKeyValue(value.ApiKey, expectedClrType, context, path, pathName),
-            ApiKeyMaterializationValueKind.Text => MaterializeTextValue(value.Text, expectedClrType, context, path, pathName),
-            _ => throw new ApiKeyException($"Key path '{pathName}' has an unsupported materialization value kind '{value.Kind}'."),
+            ApiKeyMaterializationValueKind.Key => MaterializeKeyValue(materializationValue.ApiKey, expectedClrType, context, path, pathName),
+            ApiKeyMaterializationValueKind.Text => MaterializeTextValue(materializationValue.Text, expectedClrType, context, path, pathName),
+            _ => throw new ApiKeyException($"Key path '{pathName}' has an unsupported materialization value kind '{materializationValue.Kind}'."),
         };
 
     }
 
-    private static ApiKey MaterializeKeyValue(ApiKey value, Type expectedClrType, ApiKeyMaterializationContext context, ApiKeyPath path, string pathName)
+    private static ApiKey MaterializeKeyValue(ApiKey apiKey, Type expectedClrType, ApiKeyMaterializationContext context, ApiKeyPath path, string pathName)
     {
-        if (value == ApiKey.Empty)
+        if (apiKey == ApiKey.Empty)
         {
             return HandleMissingValue(context, path, pathName);
         }
 
         var expectedKind = GetExpectedScalarKind(expectedClrType, pathName);
-        if (value.ApiKind != expectedKind)
+        if (apiKey.ApiKind != expectedKind)
         {
-            throw new ApiKeyException($"Key path '{pathName}' expected {expectedKind} but received {value.ApiKind}.");
+            throw new ApiKeyException($"Key path '{pathName}' expected {expectedKind} but received {apiKey.ApiKind}.");
         }
 
-        return value;
+        return apiKey;
     }
 
-    private static ApiKey MaterializeTextValue(string? value, Type expectedClrType, ApiKeyMaterializationContext context, ApiKeyPath path, string pathName)
+    private static ApiKey MaterializeTextValue(string? text, Type expectedClrType, ApiKeyMaterializationContext context, ApiKeyPath path, string pathName)
     {
-        if (string.IsNullOrWhiteSpace(value))
+        if (string.IsNullOrWhiteSpace(text))
         {
             return HandleMissingValue(context, path, pathName);
         }
 
-        if (ApiKey.TryParse(expectedClrType, value, out var apiKey))
+        if (ApiKey.TryParse(expectedClrType, text, out var apiKey))
         {
             return apiKey;
         }
 
         var expectedKind = GetExpectedScalarKind(expectedClrType, pathName);
-        throw new ApiKeyException($"Text '{value}' is not a valid {expectedKind} value for key path '{pathName}'.");
+        throw new ApiKeyException($"Text '{text}' is not a valid {expectedKind} value for key path '{pathName}'.");
     }
 
     private static ApiKey HandleMissingValue(ApiKeyMaterializationContext context, ApiKeyPath path, string pathName)

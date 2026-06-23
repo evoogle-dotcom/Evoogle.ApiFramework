@@ -10,7 +10,7 @@ using Evoogle.Reflection;
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
 /// <summary>
-///     Extension methods for <see cref="ApiObjectTypeBuilder{T}"/>.
+///     Extension methods for <see cref="ApiObjectTypeBuilder{TObject}"/>.
 /// </summary>
 public static class ApiObjectTypeBuilderGenericExtensions
 {
@@ -18,7 +18,7 @@ public static class ApiObjectTypeBuilderGenericExtensions
     /// <summary>
     ///     Adds an <see cref="ApiKeyType"/> definition with a single key path using a type-safe expression.
     /// </summary>
-    public static ApiObjectTypeBuilder<T> AddKey<T, TScalar>(this ApiObjectTypeBuilder<T> builder, string apiName, Expression<Func<T, TScalar>> expression)
+    public static ApiObjectTypeBuilder<TObject> AddKey<TObject, TScalar>(this ApiObjectTypeBuilder<TObject> builder, string apiName, Expression<Func<TObject, TScalar>> expression)
     {
         ArgumentNullException.ThrowIfNull(builder);
         ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
@@ -30,12 +30,12 @@ public static class ApiObjectTypeBuilderGenericExtensions
     /// <summary>
     ///     Adds an <see cref="ApiKeyType"/> definition with two key paths using type-safe expressions.
     /// </summary>
-    public static ApiObjectTypeBuilder<T> AddKey<T, TScalar1, TScalar2>
+    public static ApiObjectTypeBuilder<TObject> AddKey<TObject, TScalar1, TScalar2>
     (
-        this ApiObjectTypeBuilder<T> builder,
+        this ApiObjectTypeBuilder<TObject> builder,
         string apiName,
-        Expression<Func<T, TScalar1>> expression1,
-        Expression<Func<T, TScalar2>> expression2
+        Expression<Func<TObject, TScalar1>> expression1,
+        Expression<Func<TObject, TScalar2>> expression2
     )
     {
         ArgumentNullException.ThrowIfNull(builder);
@@ -51,13 +51,13 @@ public static class ApiObjectTypeBuilderGenericExtensions
     /// <summary>
     ///     Adds an <see cref="ApiKeyType"/> definition with three key paths using type-safe expressions.
     /// </summary>
-    public static ApiObjectTypeBuilder<T> AddKey<T, TScalar1, TScalar2, TScalar3>
+    public static ApiObjectTypeBuilder<TObject> AddKey<TObject, TScalar1, TScalar2, TScalar3>
     (
-        this ApiObjectTypeBuilder<T> builder,
+        this ApiObjectTypeBuilder<TObject> builder,
         string apiName,
-        Expression<Func<T, TScalar1>> expression1,
-        Expression<Func<T, TScalar2>> expression2,
-        Expression<Func<T, TScalar3>> expression3
+        Expression<Func<TObject, TScalar1>> expression1,
+        Expression<Func<TObject, TScalar2>> expression2,
+        Expression<Func<TObject, TScalar3>> expression3
     )
     {
         ArgumentNullException.ThrowIfNull(builder);
@@ -75,14 +75,14 @@ public static class ApiObjectTypeBuilderGenericExtensions
     /// <summary>
     ///     Adds an <see cref="ApiKeyType"/> definition with four key paths using type-safe expressions.
     /// </summary>
-    public static ApiObjectTypeBuilder<T> AddKey<T, TScalar1, TScalar2, TScalar3, TScalar4>
+    public static ApiObjectTypeBuilder<TObject> AddKey<TObject, TScalar1, TScalar2, TScalar3, TScalar4>
     (
-        this ApiObjectTypeBuilder<T> builder,
+        this ApiObjectTypeBuilder<TObject> builder,
         string apiName,
-        Expression<Func<T, TScalar1>> expression1,
-        Expression<Func<T, TScalar2>> expression2,
-        Expression<Func<T, TScalar3>> expression3,
-        Expression<Func<T, TScalar4>> expression4
+        Expression<Func<TObject, TScalar1>> expression1,
+        Expression<Func<TObject, TScalar2>> expression2,
+        Expression<Func<TObject, TScalar3>> expression3,
+        Expression<Func<TObject, TScalar4>> expression4
     )
     {
         ArgumentNullException.ThrowIfNull(builder);
@@ -113,9 +113,9 @@ public static class ApiObjectTypeBuilderGenericExtensions
     }
 
     /// <summary>
-    ///     Adds an <see cref="ApiKeyType"/> definition with a single key path rooted at <typeparamref name="TRoot"/>.
+    ///     Adds an <see cref="ApiKeyType"/> definition with a single key path rooted at <typeparamref name="TPathRoot"/>.
     /// </summary>
-    public static ApiObjectTypeBuilder<T> AddKeyFrom<T, TRoot>(this ApiObjectTypeBuilder<T> builder, string apiName, Expression<Func<TRoot, object?>> expression)
+    public static ApiObjectTypeBuilder<TObject> AddKeyFrom<TObject, TPathRoot>(this ApiObjectTypeBuilder<TObject> builder, string apiName, Expression<Func<TPathRoot, object?>> expression)
     {
         ArgumentNullException.ThrowIfNull(builder);
         ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
@@ -129,10 +129,10 @@ public static class ApiObjectTypeBuilderGenericExtensions
     /// <summary>
     ///     Adds an <see cref="ApiProperty"/> definition, deriving the CLR name from <paramref name="clrProperty"/>.
     /// </summary>
-    public static ApiObjectTypeBuilder<T> AddProperty<T, TResult>
+    public static ApiObjectTypeBuilder<TObject> AddProperty<TObject, TResult>
     (
-        this ApiObjectTypeBuilder<T> builder,
-        Expression<Func<T, TResult>> clrProperty,
+        this ApiObjectTypeBuilder<TObject> builder,
+        Expression<Func<TObject, TResult>> clrProperty,
         Action<ApiPropertyBuilder>? configure = null
     )
     {
@@ -147,10 +147,10 @@ public static class ApiObjectTypeBuilderGenericExtensions
     /// <summary>
     ///     Adds an <see cref="ApiProperty"/> definition using a type-safe CLR property selector and explicit API name.
     /// </summary>
-    public static ApiObjectTypeBuilder<T> AddProperty<T, TResult>
+    public static ApiObjectTypeBuilder<TObject> AddProperty<TObject, TResult>
     (
-        this ApiObjectTypeBuilder<T> builder,
-        Expression<Func<T, TResult>> clrProperty,
+        this ApiObjectTypeBuilder<TObject> builder,
+        Expression<Func<TObject, TResult>> clrProperty,
         string apiName,
         Action<ApiPropertyBuilder>? configure = null
     )
@@ -169,10 +169,10 @@ public static class ApiObjectTypeBuilderGenericExtensions
     /// <summary>
     ///     Adds an <see cref="ApiProperty"/> definition marked as required using a type-safe CLR property selector.
     /// </summary>
-    public static ApiObjectTypeBuilder<T> AddRequiredProperty<T, TResult>
+    public static ApiObjectTypeBuilder<TObject> AddRequiredProperty<TObject, TResult>
     (
-        this ApiObjectTypeBuilder<T> builder,
-        Expression<Func<T, TResult>> clrProperty,
+        this ApiObjectTypeBuilder<TObject> builder,
+        Expression<Func<TObject, TResult>> clrProperty,
         Action<ApiPropertyBuilder>? configure = null
     )
     {
@@ -189,10 +189,10 @@ public static class ApiObjectTypeBuilderGenericExtensions
     /// <summary>
     ///     Adds an <see cref="ApiProperty"/> definition marked as optional using a type-safe CLR property selector.
     /// </summary>
-    public static ApiObjectTypeBuilder<T> AddOptionalProperty<T, TResult>
+    public static ApiObjectTypeBuilder<TObject> AddOptionalProperty<TObject, TResult>
     (
-        this ApiObjectTypeBuilder<T> builder,
-        Expression<Func<T, TResult>> clrProperty,
+        this ApiObjectTypeBuilder<TObject> builder,
+        Expression<Func<TObject, TResult>> clrProperty,
         Action<ApiPropertyBuilder>? configure = null
     )
     {
