@@ -117,7 +117,7 @@ public sealed partial class ApiKeyType(string? apiName, IEnumerable<ApiKeyPath> 
         {
             var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.API_KEY_TYPE_INVALID_API_NAME;
+            var code = ApiInitializationCode.ApiKeyTypeInvalidApiName;
             var description = $"{nameof(this.ApiName)} must not be null, empty, or whitespace";
             var remediation = $"Specify a valid {nameof(this.ApiName)} value";
 
@@ -131,7 +131,7 @@ public sealed partial class ApiKeyType(string? apiName, IEnumerable<ApiKeyPath> 
         {
             var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.API_KEY_TYPE_NULL_OR_EMPTY_PATHS;
+            var code = ApiInitializationCode.ApiKeyTypeNullOrEmptyPaths;
             var description = $"{nameof(this.ApiKeyPaths)} must not be null or empty";
             var remediation = $"Specify at least one {nameof(ApiKeyPath)}";
 

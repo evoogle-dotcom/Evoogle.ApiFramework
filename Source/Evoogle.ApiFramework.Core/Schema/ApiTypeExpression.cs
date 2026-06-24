@@ -125,12 +125,12 @@ public sealed class ApiTypeExpression
     #region ApiTypeExpression Methods
     internal void InitializeForCollection(ApiInitializationContext context)
     {
-        this.Initialize(context, ApiInitializationCode.API_COLLECTION_TYPE_UNRESOLVED_ITEM_TYPE, nameof(ApiCollectionType.ApiItemType));
+        this.Initialize(context, ApiInitializationCode.ApiCollectionTypeUnresolvedItemType, nameof(ApiCollectionType.ApiItemType));
     }
 
     internal void InitializeForProperty(ApiInitializationContext context)
     {
-        this.Initialize(context, ApiInitializationCode.API_PROPERTY_UNRESOLVED_TYPE, nameof(ApiProperty.ApiType));
+        this.Initialize(context, ApiInitializationCode.ApiPropertyUnresolvedType, nameof(ApiProperty.ApiType));
     }
 
     private void Initialize

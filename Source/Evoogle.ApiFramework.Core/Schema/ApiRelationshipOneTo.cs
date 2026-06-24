@@ -79,7 +79,7 @@ public abstract class ApiRelationshipOneTo
         {
             var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.API_RELATIONSHIP_NULL_PRINCIPAL_END;
+            var code = ApiInitializationCode.ApiRelationshipNullPrincipalEnd;
             var description = $"{nameof(this.ApiPrincipalEnd)} must not be null";
             var remediation = $"Provide a valid {nameof(ApiRelationshipPrincipalEnd)}";
 
@@ -97,7 +97,7 @@ public abstract class ApiRelationshipOneTo
         {
             var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.API_RELATIONSHIP_NULL_DEPENDENT_END;
+            var code = ApiInitializationCode.ApiRelationshipNullDependentEnd;
             var description = $"{nameof(this.ApiDependentEnd)} must not be null";
             var remediation = $"Provide a valid {nameof(ApiRelationshipDependentEnd)}";
 
@@ -137,7 +137,7 @@ public abstract class ApiRelationshipOneTo
             relationshipPath: this.ApiPath,
             principalEnd: principal,
             foreignKeyType: dependent.ApiForeignKeyType,
-            countMismatchCode: ApiInitializationCode.API_RELATIONSHIP_ONE_TO_INVALID_DEPENDENT_KEY_PATHS_COUNT,
+            countMismatchCode: ApiInitializationCode.ApiRelationshipOneToInvalidDependentKeyPathsCount,
             foreignKeyPath: foreignKeyPath,
             principalCountLabel: principalKeyDesc,
             principalCompatibilityLabel: $"principal end {principalKeyDesc}",
@@ -158,7 +158,7 @@ public abstract class ApiRelationshipOneTo
 
         var path = this.ApiPath;
         var severity = ApiInitializationSeverity.Error;
-        var code = ApiInitializationCode.API_RELATIONSHIP_END_PRINCIPAL_KEY_WITHOUT_FOREIGN_KEY;
+        var code = ApiInitializationCode.ApiRelationshipEndPrincipalKeyWithoutForeignKey;
         var description = $"Cannot resolve {explicitKeyTarget} '{principal.ApiPrincipalKeyTypeName}' because this relationship has no foreign key binding";
         var remediation = $"Declare {nameof(this.ApiDependentEnd)}.{nameof(ApiRelationshipDependentEnd.ApiForeignKeyType)} or remove {explicitKeyTarget}";
 

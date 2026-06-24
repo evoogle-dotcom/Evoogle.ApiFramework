@@ -79,7 +79,7 @@ public sealed class ApiEnumValue
         {
             var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.API_ENUM_VALUE_INVALID_API_NAME;
+            var code = ApiInitializationCode.ApiEnumValueInvalidApiName;
             var description = $"{nameof(this.ApiName)} must not be null, empty, or whitespace";
             var remediation = $"Specify a valid {nameof(this.ApiName)} value";
 
@@ -94,7 +94,7 @@ public sealed class ApiEnumValue
         {
             var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.API_ENUM_VALUE_INVALID_CLR_NAME;
+            var code = ApiInitializationCode.ApiEnumValueInvalidClrName;
             var description = $"{nameof(this.ClrName)} must not be null, empty, or whitespace";
             var remediation = $"Specify a valid {nameof(this.ClrName)} value";
 

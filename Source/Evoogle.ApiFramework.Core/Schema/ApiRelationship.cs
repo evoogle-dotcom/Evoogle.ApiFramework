@@ -67,7 +67,7 @@ public abstract class ApiRelationship(string apiName, ApiRelationshipDeleteBehav
         {
             var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.API_RELATIONSHIP_INVALID_API_NAME;
+            var code = ApiInitializationCode.ApiRelationshipInvalidApiName;
             var description = $"{nameof(this.ApiName)} must not be null, empty, or whitespace";
             var remediation = $"Specify a valid {nameof(this.ApiName)} value";
 

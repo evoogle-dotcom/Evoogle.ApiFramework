@@ -177,7 +177,7 @@ internal static class ApiRelationshipKeyAlignment
 
         var path = principalEnd.ApiPath;
         var severity = ApiInitializationSeverity.Error;
-        var code = ApiInitializationCode.API_RELATIONSHIP_END_UNRESOLVED_KEY_TYPE;
+        var code = ApiInitializationCode.ApiRelationshipEndUnresolvedKeyType;
         var description = $"Referenced principal key type '{principalEnd.ApiPrincipalKeyTypeName}' could not be found on object type '{principalObjectType.ApiName}'";
 
         context.AddIssue(path, severity, code, description, remediation);
@@ -196,7 +196,7 @@ internal static class ApiRelationshipKeyAlignment
         var keyTypeNames = string.Join(", ", matchingKeys.Select(static kvp => $"'{kvp.Key}'"));
         var qualifier = string.IsNullOrWhiteSpace(principalEndQualifier) ? null : $" {principalEndQualifier}";
         var severity = ApiInitializationSeverity.Error;
-        var code = ApiInitializationCode.API_RELATIONSHIP_AMBIGUOUS_PRINCIPAL_KEY;
+        var code = ApiInitializationCode.ApiRelationshipAmbiguousPrincipalKey;
         var description = $"Cannot automatically determine the referenced principal key type{qualifier}: {matchingKeys.Count} key types on '{principalObjectType.ApiName}' are compatible with the foreign key type: {keyTypeNames}";
         var remediation = $"Set {explicitKeyTarget} to specify the principal key type explicitly; available key types: {keyTypeNames}";
 
@@ -259,7 +259,7 @@ internal static class ApiRelationshipKeyAlignment
         var principalKeyTypes = ApiRelationshipKeyCompatibility.DescribeKeyLeafTypes(principalKeyType);
         var foreignKeyTypes = ApiRelationshipKeyCompatibility.DescribeKeyLeafTypes(foreignKeyType);
         var severity = ApiInitializationSeverity.Error;
-        var code = ApiInitializationCode.API_RELATIONSHIP_INCOMPATIBLE_PRINCIPAL_FOREIGN_KEY;
+        var code = ApiInitializationCode.ApiRelationshipIncompatiblePrincipalForeignKey;
         var description = $"{foreignKeyPath} leaf type(s) [{foreignKeyTypes}] are not compatible with {principalCompatibilityLabel} leaf type(s) [{principalKeyTypes}]";
 
         context.AddIssue(relationshipPath, severity, code, description, compatibilityRemediation);
@@ -288,7 +288,7 @@ internal static class ApiRelationshipKeyAlignment
         var foreignKeyTypes = ApiRelationshipKeyCompatibility.DescribeKeyLeafTypes(foreignKeyType);
         var qualifier = string.IsNullOrWhiteSpace(principalEndQualifier) ? null : $" {principalEndQualifier}";
         var severity = ApiInitializationSeverity.Error;
-        var code = ApiInitializationCode.API_RELATIONSHIP_INCOMPATIBLE_PRINCIPAL_FOREIGN_KEY;
+        var code = ApiInitializationCode.ApiRelationshipIncompatiblePrincipalForeignKey;
         var description = $"Cannot automatically determine the referenced principal key type{qualifier}: no key type on '{principalObjectType.ApiName}' with {keyPathCount} key path(s) is compatible with foreign key leaf type(s) [{foreignKeyTypes}]";
         var remediation = $"Set {explicitKeyTarget} explicitly or align the {inferredForeignKeyLabel} leaf type(s) with one of these key types: {keyTypeNames}";
 

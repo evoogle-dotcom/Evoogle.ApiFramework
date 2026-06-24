@@ -112,7 +112,7 @@ public sealed class ApiEnumType
         {
             var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.API_ENUM_TYPE_NULL_OR_EMPTY_VALUES;
+            var code = ApiInitializationCode.ApiEnumTypeNullOrEmptyValues;
             var description = $"{nameof(this.ApiEnumValues)} must not be null or empty";
             var remediation = $"Define at least one {nameof(ApiEnumValue)}";
 
@@ -142,7 +142,7 @@ public sealed class ApiEnumType
         {
             var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.API_ENUM_TYPE_INVALID_CLR_TYPE;
+            var code = ApiInitializationCode.ApiEnumTypeInvalidClrType;
             var description = $"{nameof(this.ClrType)} '{this.ClrType.SafeToName()}' must be a CLR Enum";
             var remediation = $"Set {nameof(this.ClrType)} to a CLR Enum type";
 
@@ -164,7 +164,7 @@ public sealed class ApiEnumType
             partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
             partKeyPropertyName: nameof(ApiEnumValue.ApiName),
             path: this.ApiPath,
-            duplicatePartCode: ApiInitializationCode.API_ENUM_TYPE_DUPLICATE_VALUE_API_NAME,
+            duplicatePartCode: ApiInitializationCode.ApiEnumTypeDuplicateValueApiName,
             context: context,
             lookupDictionary: out _apiNameLookup
         );
@@ -176,7 +176,7 @@ public sealed class ApiEnumType
             partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
             partKeyPropertyName: nameof(ApiEnumValue.ClrName),
             path: this.ApiPath,
-            duplicatePartCode: ApiInitializationCode.API_ENUM_TYPE_DUPLICATE_VALUE_CLR_NAME,
+            duplicatePartCode: ApiInitializationCode.ApiEnumTypeDuplicateValueClrName,
             context: context,
             lookupDictionary: out _clrNameLookup
         );
@@ -188,7 +188,7 @@ public sealed class ApiEnumType
             partKeyFilter: null,
             partKeyPropertyName: nameof(ApiEnumValue.ClrOrdinal),
             path: this.ApiPath,
-            duplicatePartCode: ApiInitializationCode.API_ENUM_TYPE_DUPLICATE_VALUE_CLR_ORDINAL,
+            duplicatePartCode: ApiInitializationCode.ApiEnumTypeDuplicateValueClrOrdinal,
             context: context,
             lookupDictionary: out _clrOrdinalLookup
         );

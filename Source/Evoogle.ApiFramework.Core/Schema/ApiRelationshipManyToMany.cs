@@ -144,7 +144,7 @@ public sealed class ApiRelationshipManyToMany
                 context,
                 this.ApiPrincipalEndA,
                 this.ApiAssociation.ApiForeignKeyTypeA,
-                ApiInitializationCode.API_RELATIONSHIP_MANY_TO_MANY_INVALID_ASSOCIATION_KEY_PATHS_A_COUNT,
+                ApiInitializationCode.ApiRelationshipManyToManyInvalidAssociationKeyPathsACount,
                 nameof(ApiRelationshipAssociation.ApiForeignKeyTypeA),
                 "A"
             );
@@ -157,7 +157,7 @@ public sealed class ApiRelationshipManyToMany
                 context,
                 this.ApiPrincipalEndB,
                 this.ApiAssociation.ApiForeignKeyTypeB,
-                ApiInitializationCode.API_RELATIONSHIP_MANY_TO_MANY_INVALID_ASSOCIATION_KEY_PATHS_B_COUNT,
+                ApiInitializationCode.ApiRelationshipManyToManyInvalidAssociationKeyPathsBCount,
                 nameof(ApiRelationshipAssociation.ApiForeignKeyTypeB),
                 "B"
             );
@@ -210,7 +210,7 @@ public sealed class ApiRelationshipManyToMany
 
         var path = this.ApiPath;
         var severity = ApiInitializationSeverity.Error;
-        var code = ApiInitializationCode.API_RELATIONSHIP_END_PRINCIPAL_KEY_WITHOUT_FOREIGN_KEY;
+        var code = ApiInitializationCode.ApiRelationshipEndPrincipalKeyWithoutForeignKey;
         var description = $"Cannot resolve {explicitKeyTarget} '{principalEnd.ApiPrincipalKeyTypeName}' because this relationship has no association foreign key bindings";
         var remediation = $"Declare {nameof(this.ApiAssociation)}.{nameof(ApiRelationshipAssociation.ApiForeignKeyTypeA)} and {nameof(this.ApiAssociation)}.{nameof(ApiRelationshipAssociation.ApiForeignKeyTypeB)} or remove {explicitKeyTarget}";
 
@@ -223,7 +223,7 @@ public sealed class ApiRelationshipManyToMany
         {
             var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.API_RELATIONSHIP_MANY_TO_MANY_NULL_ASSOCIATION;
+            var code = ApiInitializationCode.ApiRelationshipManyToManyNullAssociation;
             var description = $"{nameof(this.ApiAssociation)} must not be null";
             var remediation = $"Provide a valid {nameof(ApiRelationshipAssociation)} for the association between the two principal ends";
 
@@ -241,7 +241,7 @@ public sealed class ApiRelationshipManyToMany
         {
             var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.API_RELATIONSHIP_MANY_TO_MANY_NULL_PRINCIPAL_END_A;
+            var code = ApiInitializationCode.ApiRelationshipManyToManyNullPrincipalEndA;
             var description = $"{nameof(this.ApiPrincipalEndA)} must not be null";
             var remediation = $"Provide a valid {nameof(ApiRelationshipPrincipalEnd)} for end A";
 
@@ -259,7 +259,7 @@ public sealed class ApiRelationshipManyToMany
         {
             var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.API_RELATIONSHIP_MANY_TO_MANY_NULL_PRINCIPAL_END_B;
+            var code = ApiInitializationCode.ApiRelationshipManyToManyNullPrincipalEndB;
             var description = $"{nameof(this.ApiPrincipalEndB)} must not be null";
             var remediation = $"Provide a valid {nameof(ApiRelationshipPrincipalEnd)} for end B";
 

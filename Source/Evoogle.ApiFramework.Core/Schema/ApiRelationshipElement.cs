@@ -67,7 +67,7 @@ public abstract class ApiRelationshipElement(Type clrObjectType) : ApiSchemaElem
 
         var path = this.ApiPath;
         var severity = ApiInitializationSeverity.Error;
-        var code = ApiInitializationCode.API_RELATIONSHIP_ELEMENT_NULL_CLR_OBJECT_TYPE;
+        var code = ApiInitializationCode.ApiRelationshipElementNullClrObjectType;
         var description = $"{nameof(this.ClrObjectType)} must not be null";
         var remediation = $"Specify a valid {nameof(this.ClrObjectType)} value";
 
@@ -91,7 +91,7 @@ public abstract class ApiRelationshipElement(Type clrObjectType) : ApiSchemaElem
 
         var path = this.ApiPath;
         var severity = ApiInitializationSeverity.Error;
-        var code = ApiInitializationCode.API_RELATIONSHIP_ELEMENT_UNRESOLVED_OBJECT_TYPE;
+        var code = ApiInitializationCode.ApiRelationshipElementUnresolvedObjectType;
         var description = $"No {nameof(Schema.ApiObjectType)} is registered for CLR type '{this.ClrObjectType.FullName}'";
         var availableTypes = string.Join(", ", context.ApiSchema.ApiObjectTypes.Select(t => $"'{t.ApiName}' ({t.ClrType.Name})"));
         var remediation = !string.IsNullOrEmpty(availableTypes)

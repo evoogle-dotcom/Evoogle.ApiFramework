@@ -127,29 +127,29 @@ public sealed class Company
 }
 
 /// <summary>
-///     CLR type used to test API_PROPERTY_REQUIRED_NULLABLE_MISMATCH and API_PROPERTY_OPTIONAL_NON_NULLABLE_MISMATCH
+///     CLR type used to test ApiPropertyRequiredNullableMismatch and ApiPropertyOptionalNonNullableMismatch
 ///     initialization warnings by deliberately pairing nullable/non-nullable CLR members with mismatched API modifiers.
 /// </summary>
 public sealed class NullabilityMismatch
 {
-    /// <summary>Nullable reference type: triggers API_PROPERTY_REQUIRED_NULLABLE_MISMATCH when declared Required.</summary>
+    /// <summary>Nullable reference type: triggers ApiPropertyRequiredNullableMismatch when declared Required.</summary>
     public string? NullableProp { get; set; }
 
-    /// <summary>Non-nullable reference type: triggers API_PROPERTY_OPTIONAL_NON_NULLABLE_MISMATCH when declared Optional.</summary>
+    /// <summary>Non-nullable reference type: triggers ApiPropertyOptionalNonNullableMismatch when declared Optional.</summary>
     public string NonNullableProp { get; set; } = string.Empty;
 }
 
 /// <summary>
-///     CLR type used to test API_COLLECTION_ITEM_REQUIRED_NULLABLE_MISMATCH and
-///     API_COLLECTION_ITEM_OPTIONAL_NON_NULLABLE_MISMATCH initialization warnings by deliberately
+///     CLR type used to test ApiCollectionItemRequiredNullableMismatch and
+///     ApiCollectionItemOptionalNonNullableMismatch initialization warnings by deliberately
 ///     pairing nullable/non-nullable CLR collection element types with mismatched API item modifiers.
 /// </summary>
 public sealed class CollectionNullabilityMismatch
 {
-    /// <summary>Collection with nullable elements: triggers API_COLLECTION_ITEM_REQUIRED_NULLABLE_MISMATCH when item declared Required.</summary>
+    /// <summary>Collection with nullable elements: triggers ApiCollectionItemRequiredNullableMismatch when item declared Required.</summary>
     public List<string?>? NullableItemsProp { get; set; }
 
-    /// <summary>Collection with non-nullable elements: triggers API_COLLECTION_ITEM_OPTIONAL_NON_NULLABLE_MISMATCH when item declared Optional.</summary>
+    /// <summary>Collection with non-nullable elements: triggers ApiCollectionItemOptionalNonNullableMismatch when item declared Optional.</summary>
     public List<string> NonNullableItemsProp { get; set; } = [];
 }
 #endregion

@@ -50,7 +50,7 @@ public abstract class ApiType(Type clrType) : ApiSchemaElement
         {
             var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.API_TYPE_NULL_CLR_TYPE;
+            var code = ApiInitializationCode.ApiTypeNullClrType;
             var description = $"{nameof(this.ClrType)} must not be null";
             var remediation = $"Specify a valid {nameof(this.ClrType)}";
 

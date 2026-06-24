@@ -364,7 +364,7 @@ public sealed class ApiSchema : ExtensibleBase
         {
             var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.API_SCHEMA_INVALID_NAME;
+            var code = ApiInitializationCode.ApiSchemaInvalidName;
             var description = $"{nameof(this.ApiName)} must not be null, empty, or whitespace";
             var remediation = $"Specify a valid {nameof(this.ApiName)} value";
 
@@ -438,7 +438,7 @@ public sealed class ApiSchema : ExtensibleBase
             partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
             partKeyPropertyName: nameof(ApiNamedType.ApiName),
             path: this.ApiPath,
-            duplicatePartCode: ApiInitializationCode.API_SCHEMA_DUPLICATE_NAMED_TYPE_API_NAME,
+            duplicatePartCode: ApiInitializationCode.ApiSchemaDuplicateNamedTypeApiName,
             context: context,
             lookupDictionary: out _apiNamedTypeApiNameLookup
         );
@@ -450,7 +450,7 @@ public sealed class ApiSchema : ExtensibleBase
             partKeyFilter: x => x is not null,
             partKeyPropertyName: nameof(ApiNamedType.ClrType),
             path: this.ApiPath,
-            duplicatePartCode: ApiInitializationCode.API_SCHEMA_DUPLICATE_NAMED_TYPE_CLR_TYPE,
+            duplicatePartCode: ApiInitializationCode.ApiSchemaDuplicateNamedTypeClrType,
             context: context,
             lookupDictionary: out _apiNamedTypeClrTypeLookup
         );
@@ -462,7 +462,7 @@ public sealed class ApiSchema : ExtensibleBase
             partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
             partKeyPropertyName: nameof(ApiEnumType.ApiName),
             path: this.ApiPath,
-            duplicatePartCode: ApiInitializationCode.API_SCHEMA_DUPLICATE_ENUM_TYPE_API_NAME,
+            duplicatePartCode: ApiInitializationCode.ApiSchemaDuplicateEnumTypeApiName,
             context: context,
             lookupDictionary: out _apiEnumTypeApiNameLookup
         );
@@ -474,7 +474,7 @@ public sealed class ApiSchema : ExtensibleBase
             partKeyFilter: x => x is not null,
             partKeyPropertyName: nameof(ApiEnumType.ClrType),
             path: this.ApiPath,
-            duplicatePartCode: ApiInitializationCode.API_SCHEMA_DUPLICATE_ENUM_TYPE_CLR_TYPE,
+            duplicatePartCode: ApiInitializationCode.ApiSchemaDuplicateEnumTypeClrType,
             context: context,
             lookupDictionary: out _apiEnumTypeClrTypeLookup
         );
@@ -486,7 +486,7 @@ public sealed class ApiSchema : ExtensibleBase
             partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
             partKeyPropertyName: nameof(ApiObjectType.ApiName),
             path: this.ApiPath,
-            duplicatePartCode: ApiInitializationCode.API_SCHEMA_DUPLICATE_OBJECT_TYPE_API_NAME,
+            duplicatePartCode: ApiInitializationCode.ApiSchemaDuplicateObjectTypeApiName,
             context: context,
             lookupDictionary: out _apiObjectTypeApiNameLookup
         );
@@ -498,7 +498,7 @@ public sealed class ApiSchema : ExtensibleBase
             partKeyFilter: x => x is not null,
             partKeyPropertyName: nameof(ApiObjectType.ClrType),
             path: this.ApiPath,
-            duplicatePartCode: ApiInitializationCode.API_SCHEMA_DUPLICATE_OBJECT_TYPE_CLR_TYPE,
+            duplicatePartCode: ApiInitializationCode.ApiSchemaDuplicateObjectTypeClrType,
             context: context,
             lookupDictionary: out _apiObjectTypeClrTypeLookup
         );
@@ -510,7 +510,7 @@ public sealed class ApiSchema : ExtensibleBase
             partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
             partKeyPropertyName: nameof(ApiScalarType.ApiName),
             path: this.ApiPath,
-            duplicatePartCode: ApiInitializationCode.API_SCHEMA_DUPLICATE_SCALAR_TYPE_API_NAME,
+            duplicatePartCode: ApiInitializationCode.ApiSchemaDuplicateScalarTypeApiName,
             context: context,
             lookupDictionary: out _apiScalarTypeApiNameLookup
         );
@@ -522,7 +522,7 @@ public sealed class ApiSchema : ExtensibleBase
             partKeyFilter: x => x is not null,
             partKeyPropertyName: nameof(ApiScalarType.ClrType),
             path: this.ApiPath,
-            duplicatePartCode: ApiInitializationCode.API_SCHEMA_DUPLICATE_SCALAR_TYPE_CLR_TYPE,
+            duplicatePartCode: ApiInitializationCode.ApiSchemaDuplicateScalarTypeClrType,
             context: context,
             lookupDictionary: out _apiScalarTypeClrTypeLookup
         );
@@ -534,7 +534,7 @@ public sealed class ApiSchema : ExtensibleBase
             partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
             partKeyPropertyName: nameof(ApiRelationship.ApiName),
             path: this.ApiPath,
-            duplicatePartCode: ApiInitializationCode.API_SCHEMA_DUPLICATE_RELATIONSHIP_API_NAME,
+            duplicatePartCode: ApiInitializationCode.ApiSchemaDuplicateRelationshipApiName,
             context: context,
             lookupDictionary: out _apiRelationshipApiNameLookup
         );
@@ -590,7 +590,7 @@ public sealed class ApiSchema : ExtensibleBase
         {
             if (end is null)
             {
-                // Already reported as API_RELATIONSHIP_NULL_PRINCIPAL_END or API_RELATIONSHIP_NULL_DEPENDENT_END (Error).
+                // Already reported as ApiRelationshipNullPrincipalEnd or ApiRelationshipNullDependentEnd (Error).
                 return;
             }
 
@@ -598,7 +598,7 @@ public sealed class ApiSchema : ExtensibleBase
 
             if (end.ClrObjectType is null || !this.TryGetObjectTypeByClrType(end.ClrObjectType, out var apiObjectType))
             {
-                // Already reported as API_RELATIONSHIP_ELEMENT_NULL_CLR_OBJECT_TYPE or API_RELATIONSHIP_ELEMENT_UNRESOLVED_OBJECT_TYPE (Error).
+                // Already reported as ApiRelationshipElementNullClrObjectType or ApiRelationshipElementUnresolvedObjectType (Error).
                 return;
             }
 
@@ -631,13 +631,13 @@ public sealed class ApiSchema : ExtensibleBase
             var clrObjectType = association.ClrObjectType;
             if (clrObjectType is null)
             {
-                // Already reported as API_RELATIONSHIP_ELEMENT_NULL_CLR_OBJECT_TYPE (Error).
+                // Already reported as ApiRelationshipElementNullClrObjectType (Error).
                 return;
             }
 
             if (!this.TryGetObjectTypeByClrType(clrObjectType, out var apiObjectType))
             {
-                // Already reported as API_RELATIONSHIP_ELEMENT_UNRESOLVED_OBJECT_TYPE (Error).
+                // Already reported as ApiRelationshipElementUnresolvedObjectType (Error).
                 return;
             }
 

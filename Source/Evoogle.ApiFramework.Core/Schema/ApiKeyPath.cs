@@ -103,7 +103,7 @@ public sealed class ApiKeyPath(Type clrRootType, IEnumerable<ApiKeyPathSegment> 
         {
             var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.API_KEY_PATH_UNRESOLVED_ROOT_TYPE;
+            var code = ApiInitializationCode.ApiKeyPathUnresolvedRootType;
             var description = $"Root CLR type '{this.ClrRootType.Name}' is not registered as an {nameof(ApiObjectType)} in the schema";
             var remediation = $"Add an {nameof(ApiObjectType)} for '{this.ClrRootType.Name}' to the schema, or correct the root CLR type";
 
@@ -123,7 +123,7 @@ public sealed class ApiKeyPath(Type clrRootType, IEnumerable<ApiKeyPathSegment> 
 
         var path = this.ApiPath;
         var severity = ApiInitializationSeverity.Error;
-        var code = ApiInitializationCode.API_KEY_PATH_EMPTY_SEGMENTS;
+        var code = ApiInitializationCode.ApiKeyPathEmptySegments;
         var description = $"{nameof(this.ApiSegments)} must contain at least one property name";
         var remediation = $"Specify at least one CLR property name when creating an {nameof(ApiKeyPath)}";
 
@@ -159,7 +159,7 @@ public sealed class ApiKeyPath(Type clrRootType, IEnumerable<ApiKeyPathSegment> 
                 {
                     var path = segment.ApiPath;
                     var severity = ApiInitializationSeverity.Error;
-                    var code = ApiInitializationCode.API_KEY_PATH_SCALAR_SEGMENT_INVALID_TYPE;
+                    var code = ApiInitializationCode.ApiKeyPathScalarSegmentInvalidType;
                     var description = $"Terminal segment property '{segment.ClrPropertyName}' must resolve to a scalar type; found '{apiProperty.ApiType.GetType().Name}'";
                     var remediation = $"Change the terminal property to a scalar-typed property or remove extra navigation segments";
 
@@ -172,7 +172,7 @@ public sealed class ApiKeyPath(Type clrRootType, IEnumerable<ApiKeyPathSegment> 
                 {
                     var path = segment.ApiPath;
                     var severity = ApiInitializationSeverity.Error;
-                    var code = ApiInitializationCode.API_KEY_PATH_NAVIGATION_SEGMENT_INVALID_TYPE;
+                    var code = ApiInitializationCode.ApiKeyPathNavigationSegmentInvalidType;
                     var description = $"Navigation segment property '{segment.ClrPropertyName}' must resolve to an object type; found '{apiProperty.ApiType.GetType().Name}'";
                     var remediation = $"Change the navigation property to an object-typed property or restructure the path segments";
 

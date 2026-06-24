@@ -80,7 +80,7 @@ public sealed class ApiKeyPathSegment(string clrPropertyName) : ApiSchemaElement
 
         var path = this.ApiPath;
         var severity = ApiInitializationSeverity.Error;
-        var code = ApiInitializationCode.API_KEY_PATH_SEGMENT_INVALID_CLR_PROPERTY_NAME;
+        var code = ApiInitializationCode.ApiKeyPathSegmentInvalidClrPropertyName;
         var description = $"{nameof(this.ClrPropertyName)} must not be null, empty, or whitespace";
         var remediation = $"Specify a valid {nameof(this.ClrPropertyName)} value";
 
@@ -105,7 +105,7 @@ public sealed class ApiKeyPathSegment(string clrPropertyName) : ApiSchemaElement
 
         var path = this.ApiPath;
         var severity = ApiInitializationSeverity.Error;
-        var code = ApiInitializationCode.API_KEY_PATH_SEGMENT_UNRESOLVED_API_PROPERTY;
+        var code = ApiInitializationCode.ApiKeyPathSegmentUnresolvedApiProperty;
         var description = $"Property with CLR name '{this.ClrPropertyName}' could not be found on object type '{apiDeclaringObjectType.ApiName}'";
         var remediation = $"Verify the CLR property name or add a property with CLR name '{this.ClrPropertyName}' to '{apiDeclaringObjectType.ApiName}'";
 

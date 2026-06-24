@@ -50,7 +50,7 @@ public abstract class ApiNamedType
         {
             var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.API_NAMED_TYPE_INVALID_API_NAME;
+            var code = ApiInitializationCode.ApiNamedTypeInvalidApiName;
             var description = $"{nameof(this.ApiName)} must not be null, empty, or whitespace";
             var remediation = $"Specify a valid {nameof(this.ApiName)} value";
 

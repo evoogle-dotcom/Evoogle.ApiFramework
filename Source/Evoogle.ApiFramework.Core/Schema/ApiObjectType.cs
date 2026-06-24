@@ -247,7 +247,7 @@ public sealed partial class ApiObjectType
         {
             var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Warning;
-            var code = ApiInitializationCode.API_OBJECT_TYPE_NULL_OR_EMPTY_PROPERTIES;
+            var code = ApiInitializationCode.ApiObjectTypeNullOrEmptyProperties;
             var description = $"{nameof(this.ApiProperties)} is null or empty";
 
             var remediation = $"Add at least one {nameof(ApiProperty)} to {nameof(ApiObjectType)}[\"{this.ApiName}\"]";
@@ -281,7 +281,7 @@ public sealed partial class ApiObjectType
             partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
             partKeyPropertyName: nameof(ApiKeyType.ApiName),
             path: this.ApiPath,
-            duplicatePartCode: ApiInitializationCode.API_OBJECT_TYPE_DUPLICATE_KEY_TYPE_API_NAME,
+            duplicatePartCode: ApiInitializationCode.ApiObjectTypeDuplicateKeyTypeApiName,
             context: context,
             lookupDictionary: out _apiKeyTypeApiNameLookup
         );
@@ -293,7 +293,7 @@ public sealed partial class ApiObjectType
             partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
             partKeyPropertyName: nameof(ApiProperty.ApiName),
             path: this.ApiPath,
-            duplicatePartCode: ApiInitializationCode.API_OBJECT_TYPE_DUPLICATE_PROPERTY_API_NAME,
+            duplicatePartCode: ApiInitializationCode.ApiObjectTypeDuplicatePropertyApiName,
             context: context,
             lookupDictionary: out _apiPropertyApiNameLookup
         );
@@ -305,7 +305,7 @@ public sealed partial class ApiObjectType
             partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
             partKeyPropertyName: nameof(ApiProperty.ClrName),
             path: this.ApiPath,
-            duplicatePartCode: ApiInitializationCode.API_OBJECT_TYPE_DUPLICATE_PROPERTY_CLR_NAME,
+            duplicatePartCode: ApiInitializationCode.ApiObjectTypeDuplicatePropertyClrName,
             context: context,
             lookupDictionary: out _apiPropertyClrNameLookup
         );
