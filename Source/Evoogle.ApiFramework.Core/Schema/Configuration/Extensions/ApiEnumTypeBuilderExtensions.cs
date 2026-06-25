@@ -43,17 +43,17 @@ public static class ApiEnumTypeBuilderExtensions
     }
 
     /// <summary>
-    ///     Adds an <see cref="ApiEnumValue"/> definition using <paramref name="name"/> as both the API name and CLR name.
+    ///     Adds an <see cref="ApiEnumValue"/> definition using <paramref name="apiAndClrName"/> as both the API name and CLR name.
     /// </summary>
     /// <param name="builder">The enum type builder to configure.</param>
-    /// <param name="name">The API and CLR name of the enumeration value.</param>
+    /// <param name="apiAndClrName">The API and CLR name of the enumeration value.</param>
     /// <param name="clrOrdinal">The CLR ordinal of the enumeration value.</param>
     /// <returns>The current builder instance.</returns>
-    public static ApiEnumTypeBuilder AddValue(this ApiEnumTypeBuilder builder, string name, int clrOrdinal)
+    public static ApiEnumTypeBuilder AddValue(this ApiEnumTypeBuilder builder, string apiAndClrName, int clrOrdinal)
     {
         ArgumentNullException.ThrowIfNull(builder);
-        ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiAndClrName, nameof(apiAndClrName));
 
-        return builder.AddValue(name, name, clrOrdinal);
+        return builder.AddValue(apiAndClrName, apiAndClrName, clrOrdinal);
     }
 }

@@ -56,14 +56,14 @@ internal class ApiInitializationContext
     #region Methods
     public void AddIssue
     (
-        string path,
+        string apiPath,
         ApiInitializationSeverity severity,
         ApiInitializationCode code,
         string description,
         string? remediation
     )
     {
-        var issue = new ApiInitializationIssue(path, severity, code, description, remediation);
+        var issue = new ApiInitializationIssue(apiPath, severity, code, description, remediation);
         _issues.Add(issue);
     }
 

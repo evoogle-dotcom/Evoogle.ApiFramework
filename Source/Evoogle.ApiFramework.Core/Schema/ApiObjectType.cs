@@ -280,7 +280,7 @@ public sealed partial class ApiObjectType
             partKeySelector: x => x.ApiName,
             partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
             partKeyPropertyName: nameof(ApiKeyType.ApiName),
-            path: this.ApiPath,
+            apiPath: this.ApiPath,
             duplicatePartCode: ApiInitializationCode.ApiObjectTypeDuplicateKeyTypeApiName,
             context: context,
             lookupDictionary: out _apiKeyTypeApiNameLookup
@@ -292,7 +292,7 @@ public sealed partial class ApiObjectType
             partKeySelector: x => x.ApiName,
             partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
             partKeyPropertyName: nameof(ApiProperty.ApiName),
-            path: this.ApiPath,
+            apiPath: this.ApiPath,
             duplicatePartCode: ApiInitializationCode.ApiObjectTypeDuplicatePropertyApiName,
             context: context,
             lookupDictionary: out _apiPropertyApiNameLookup
@@ -304,7 +304,7 @@ public sealed partial class ApiObjectType
             partKeySelector: x => x.ClrName,
             partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
             partKeyPropertyName: nameof(ApiProperty.ClrName),
-            path: this.ApiPath,
+            apiPath: this.ApiPath,
             duplicatePartCode: ApiInitializationCode.ApiObjectTypeDuplicatePropertyClrName,
             context: context,
             lookupDictionary: out _apiPropertyClrNameLookup

@@ -10,14 +10,14 @@ namespace Evoogle.ApiFramework.Schema;
 /// <summary>
 ///     Represents an issue encountered during API schema initialization.
 /// </summary>
-/// <param name="path">The path to the schema element where the issue occurred.</param>
+/// <param name="apiPath">The API path to the schema element where the issue occurred.</param>
 /// <param name="severity">The severity level of the issue.</param>
 /// <param name="code">The specific error or warning code identifying the issue.</param>
 /// <param name="description">A human-readable description of the issue.</param>
 /// <param name="remediation">Optional guidance on how to resolve the issue.</param>
 public sealed class ApiInitializationIssue
 (
-    string path,
+    string apiPath,
     ApiInitializationSeverity severity,
     ApiInitializationCode code,
     string description,
@@ -26,9 +26,9 @@ public sealed class ApiInitializationIssue
 {
     #region ApiInitializationIssue Properties
     /// <summary>
-    ///     Gets the path to the schema element where the issue occurred.
+    ///     Gets the API path to the schema element where the issue occurred.
     /// </summary>
-    public string Path { get; } = path;
+    public string ApiPath { get; } = apiPath;
 
     /// <summary>
     ///     Gets the severity level of the issue.
@@ -55,13 +55,13 @@ public sealed class ApiInitializationIssue
     /// <inheritdoc/>
     public override string ToString()
     {
-        var path = this.Path.SafeToString();
+        var apiPath = this.ApiPath.SafeToString();
         var severity = this.Severity.SafeToString();
         var code = this.Code.SafeToString();
         var description = this.Description.SafeToString();
         var remediation = this.Remediation.SafeToString();
 
-        return $"{nameof(ApiInitializationIssue)} {{{nameof(this.Path)}={path}, {nameof(this.Severity)}={severity}, {nameof(this.Code)}={code}, {nameof(this.Description)}={description}, {nameof(this.Remediation)}={remediation}}}";
+        return $"{nameof(ApiInitializationIssue)} {{{nameof(this.ApiPath)}={apiPath}, {nameof(this.Severity)}={severity}, {nameof(this.Code)}={code}, {nameof(this.Description)}={description}, {nameof(this.Remediation)}={remediation}}}";
     }
     #endregion
 
@@ -69,10 +69,10 @@ public sealed class ApiInitializationIssue
     /// <summary>
     ///     Converts the issue to a formatted message string.
     /// </summary>
-    /// <returns>A formatted string containing the issue's path, severity, code, description, and optional remediation.</returns>
+    /// <returns>A formatted string containing the issue's API path, severity, code, description, and optional remediation.</returns>
     public string ToMessage()
     {
-        var core = $"{this.Path}: {this.Severity} | {this.Code} - {this.Description}.";
+        var core = $"{this.ApiPath}: {this.Severity} | {this.Code} - {this.Description}.";
         return string.IsNullOrWhiteSpace(this.Remediation)
             ? core
             : $"{core} {this.Remediation}.";

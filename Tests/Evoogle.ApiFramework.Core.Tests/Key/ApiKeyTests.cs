@@ -178,8 +178,7 @@ public partial class ApiKeyTests(ITestOutputHelper output) : XUnitTests(output)
                 (
                     ApiKeyKind.Composite,
                     default,
-                    partCollection,
-                    ApiKey.ToCompositeString(partCollection)
+                    partCollection
                 );
                 return apiKey;
             }

@@ -20,7 +20,7 @@ internal static class ApiSchemaInitializationLookup
         Func<TPart, TPartKey?> partKeySelector,
         Func<TPartKey, bool>? partKeyFilter,
         string partKeyPropertyName,
-        string path,
+        string apiPath,
         ApiInitializationCode duplicatePartCode,
         ApiInitializationContext context,
         out Dictionary<TPartKey, TPart>? lookupDictionary
@@ -45,7 +45,7 @@ internal static class ApiSchemaInitializationLookup
             partKeySelector: partKeySelector,
             partKeyFilter: partKeyFilter,
             partKeyPropertyName: partKeyPropertyName,
-            path: path,
+            apiPath: apiPath,
             duplicatePartCode: duplicatePartCode,
             context: context);
     }
@@ -56,7 +56,7 @@ internal static class ApiSchemaInitializationLookup
         Func<TPart, TPartKey?> partKeySelector,
         Func<TPartKey, bool>? partKeyFilter,
         string partKeyPropertyName,
-        string path,
+        string apiPath,
         ApiInitializationCode duplicatePartCode,
         ApiInitializationContext context
     )
@@ -86,7 +86,7 @@ internal static class ApiSchemaInitializationLookup
         var description = $"Duplicate {partTypeName}.{partKeyPropertyName} values: '{duplicatesString}'";
         var remediation = $"Verify that each {partTypeName} has a unique {partKeyPropertyName} value";
 
-        context.AddIssue(path, severity, duplicatePartCode, description, remediation);
+        context.AddIssue(apiPath, severity, duplicatePartCode, description, remediation);
     }
     #endregion
 }

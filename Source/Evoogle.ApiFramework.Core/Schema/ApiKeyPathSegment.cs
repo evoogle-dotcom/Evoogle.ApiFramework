@@ -56,7 +56,7 @@ public sealed class ApiKeyPathSegment(string clrPropertyName) : ApiSchemaElement
     #region ApiSchemaElement Methods
     /// <inheritdoc/>
     protected override string BuildPath(string? apiPreviousPath)
-        => ApiSchemaPathFormatting.BuildPath(basePath: apiPreviousPath, segment: this.ApiElementName, segmentName: this.ClrPropertyName);
+        => ApiSchemaPathFormatting.BuildPath(apiBasePath: apiPreviousPath, apiPathSegment: this.ApiElementName, apiPathSegmentName: this.ClrPropertyName);
 
     /// <inheritdoc/>
     internal override void Initialize(ApiInitializationContext context)

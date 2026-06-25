@@ -45,34 +45,34 @@ public static class ApiObjectTypeBuilderExtensions
 
     #region AddProperty Methods
     /// <summary>
-    ///     Adds an <see cref="ApiProperty"/> definition using <paramref name="name"/> as both the API name and CLR property name.
+    ///     Adds an <see cref="ApiProperty"/> definition using <paramref name="apiAndClrName"/> as both the API name and CLR property name.
     /// </summary>
     /// <param name="builder">The object type builder to configure.</param>
-    /// <param name="name">The API and CLR property name.</param>
+    /// <param name="apiAndClrName">The API and CLR property name.</param>
     /// <param name="configure">Optional callback to configure the added property.</param>
     /// <returns>The current builder instance.</returns>
-    public static ApiObjectTypeBuilder AddProperty(this ApiObjectTypeBuilder builder, string name, Action<ApiPropertyBuilder>? configure = null)
+    public static ApiObjectTypeBuilder AddProperty(this ApiObjectTypeBuilder builder, string apiAndClrName, Action<ApiPropertyBuilder>? configure = null)
     {
         ArgumentNullException.ThrowIfNull(builder);
-        ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiAndClrName, nameof(apiAndClrName));
 
-        return builder.AddProperty(name, name, configure);
+        return builder.AddProperty(apiAndClrName, apiAndClrName, configure);
     }
 
     /// <summary>
-    ///     Adds an <see cref="ApiProperty"/> definition using <paramref name="name"/> as both the API name and CLR property name.
+    ///     Adds an <see cref="ApiProperty"/> definition using <paramref name="apiAndClrName"/> as both the API name and CLR property name.
     /// </summary>
     /// <typeparam name="TObject">The CLR object type represented by the builder.</typeparam>
     /// <param name="builder">The object type builder to configure.</param>
-    /// <param name="name">The API and CLR property name.</param>
+    /// <param name="apiAndClrName">The API and CLR property name.</param>
     /// <param name="configure">Optional callback to configure the added property.</param>
     /// <returns>The current builder instance.</returns>
-    public static ApiObjectTypeBuilder<TObject> AddProperty<TObject>(this ApiObjectTypeBuilder<TObject> builder, string name, Action<ApiPropertyBuilder>? configure = null)
+    public static ApiObjectTypeBuilder<TObject> AddProperty<TObject>(this ApiObjectTypeBuilder<TObject> builder, string apiAndClrName, Action<ApiPropertyBuilder>? configure = null)
     {
         ArgumentNullException.ThrowIfNull(builder);
-        ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiAndClrName, nameof(apiAndClrName));
 
-        builder.AddProperty(name, name, configure);
+        builder.AddProperty(apiAndClrName, apiAndClrName, configure);
         return builder;
     }
     #endregion
@@ -82,15 +82,15 @@ public static class ApiObjectTypeBuilderExtensions
     ///     Adds an <see cref="ApiProperty"/> definition marked as required.
     /// </summary>
     /// <param name="builder">The object type builder to configure.</param>
-    /// <param name="name">The API and CLR property name.</param>
+    /// <param name="apiAndClrName">The API and CLR property name.</param>
     /// <param name="configure">Optional callback to further configure the added property.</param>
     /// <returns>The current builder instance.</returns>
-    public static ApiObjectTypeBuilder AddRequiredProperty(this ApiObjectTypeBuilder builder, string name, Action<ApiPropertyBuilder>? configure = null)
+    public static ApiObjectTypeBuilder AddRequiredProperty(this ApiObjectTypeBuilder builder, string apiAndClrName, Action<ApiPropertyBuilder>? configure = null)
     {
         ArgumentNullException.ThrowIfNull(builder);
-        ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiAndClrName, nameof(apiAndClrName));
 
-        return builder.AddRequiredProperty(name, name, configure);
+        return builder.AddRequiredProperty(apiAndClrName, apiAndClrName, configure);
     }
 
     /// <summary>
@@ -115,15 +115,15 @@ public static class ApiObjectTypeBuilderExtensions
     /// </summary>
     /// <typeparam name="TObject">The CLR object type represented by the builder.</typeparam>
     /// <param name="builder">The object type builder to configure.</param>
-    /// <param name="name">The API and CLR property name.</param>
+    /// <param name="apiAndClrName">The API and CLR property name.</param>
     /// <param name="configure">Optional callback to further configure the added property.</param>
     /// <returns>The current builder instance.</returns>
-    public static ApiObjectTypeBuilder<TObject> AddRequiredProperty<TObject>(this ApiObjectTypeBuilder<TObject> builder, string name, Action<ApiPropertyBuilder>? configure = null)
+    public static ApiObjectTypeBuilder<TObject> AddRequiredProperty<TObject>(this ApiObjectTypeBuilder<TObject> builder, string apiAndClrName, Action<ApiPropertyBuilder>? configure = null)
     {
         ArgumentNullException.ThrowIfNull(builder);
-        ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiAndClrName, nameof(apiAndClrName));
 
-        return builder.AddRequiredProperty(name, name, configure);
+        return builder.AddRequiredProperty(apiAndClrName, apiAndClrName, configure);
     }
 
     /// <summary>
@@ -157,15 +157,15 @@ public static class ApiObjectTypeBuilderExtensions
     ///     Adds an <see cref="ApiProperty"/> definition marked as optional.
     /// </summary>
     /// <param name="builder">The object type builder to configure.</param>
-    /// <param name="name">The API and CLR property name.</param>
+    /// <param name="apiAndClrName">The API and CLR property name.</param>
     /// <param name="configure">Optional callback to further configure the added property.</param>
     /// <returns>The current builder instance.</returns>
-    public static ApiObjectTypeBuilder AddOptionalProperty(this ApiObjectTypeBuilder builder, string name, Action<ApiPropertyBuilder>? configure = null)
+    public static ApiObjectTypeBuilder AddOptionalProperty(this ApiObjectTypeBuilder builder, string apiAndClrName, Action<ApiPropertyBuilder>? configure = null)
     {
         ArgumentNullException.ThrowIfNull(builder);
-        ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiAndClrName, nameof(apiAndClrName));
 
-        return builder.AddOptionalProperty(name, name, configure);
+        return builder.AddOptionalProperty(apiAndClrName, apiAndClrName, configure);
     }
 
     /// <summary>
@@ -190,15 +190,15 @@ public static class ApiObjectTypeBuilderExtensions
     /// </summary>
     /// <typeparam name="TObject">The CLR object type represented by the builder.</typeparam>
     /// <param name="builder">The object type builder to configure.</param>
-    /// <param name="name">The API and CLR property name.</param>
+    /// <param name="apiAndClrName">The API and CLR property name.</param>
     /// <param name="configure">Optional callback to further configure the added property.</param>
     /// <returns>The current builder instance.</returns>
-    public static ApiObjectTypeBuilder<TObject> AddOptionalProperty<TObject>(this ApiObjectTypeBuilder<TObject> builder, string name, Action<ApiPropertyBuilder>? configure = null)
+    public static ApiObjectTypeBuilder<TObject> AddOptionalProperty<TObject>(this ApiObjectTypeBuilder<TObject> builder, string apiAndClrName, Action<ApiPropertyBuilder>? configure = null)
     {
         ArgumentNullException.ThrowIfNull(builder);
-        ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiAndClrName, nameof(apiAndClrName));
 
-        return builder.AddOptionalProperty(name, name, configure);
+        return builder.AddOptionalProperty(apiAndClrName, apiAndClrName, configure);
     }
 
     /// <summary>

@@ -14,41 +14,41 @@ namespace Evoogle.ApiFramework.Schema.Internal;
 internal static class ApiSchemaPathFormatting
 {
     #region Utility Methods
-    public static string BuildPath(string? basePath, string segment, string? segmentName)
+    public static string BuildPath(string? apiBasePath, string apiPathSegment, string? apiPathSegmentName)
     {
-        var hasBasePath = !string.IsNullOrWhiteSpace(basePath);
-        var hasSegmentName = !string.IsNullOrWhiteSpace(segmentName);
+        var hasBasePath = !string.IsNullOrWhiteSpace(apiBasePath);
+        var hasSegmentName = !string.IsNullOrWhiteSpace(apiPathSegmentName);
 
         if (!hasBasePath)
         {
             return !hasSegmentName
-                ? segment
-                : $"{segment}[\"{segmentName}\"]";
+                ? apiPathSegment
+                : $"{apiPathSegment}[\"{apiPathSegmentName}\"]";
         }
 
         if (!hasSegmentName)
         {
-            return $"{basePath}.{segment}";
+            return $"{apiBasePath}.{apiPathSegment}";
         }
 
-        var capacity = (hasBasePath ? basePath!.Length + 1 : 0)
-            + segment.Length
-            + (hasSegmentName ? segmentName!.Length + 4 : 0);
+        var capacity = (hasBasePath ? apiBasePath!.Length + 1 : 0)
+            + apiPathSegment.Length
+            + (hasSegmentName ? apiPathSegmentName!.Length + 4 : 0);
 
         var stringBuilder = new StringBuilder(capacity);
 
         if (hasBasePath)
         {
-            stringBuilder.Append(basePath);
+            stringBuilder.Append(apiBasePath);
             stringBuilder.Append('.');
         }
 
-        stringBuilder.Append(segment);
+        stringBuilder.Append(apiPathSegment);
 
         if (hasSegmentName)
         {
             stringBuilder.Append("[\"");
-            stringBuilder.Append(segmentName);
+            stringBuilder.Append(apiPathSegmentName);
             stringBuilder.Append("\"]");
         }
 

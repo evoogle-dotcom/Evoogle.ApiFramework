@@ -3,8 +3,8 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using Evoogle.ApiFramework.TestData;
 using Evoogle.ApiFramework.Exceptions;
+using Evoogle.ApiFramework.TestData;
 using Evoogle.Extensions;
 using Evoogle.XUnit;
 
@@ -184,7 +184,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"TestObject\"].{nameof(ApiProperty)}[\"Items\"].{nameof(ApiCollectionType)}",
+                    apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"].{nameof(ApiProperty)}[\"Items\"].{nameof(ApiCollectionType)}",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiCollectionTypeNullItemType,
                     description: $"{nameof(ApiCollectionType.ApiItemType)} must not be null",
@@ -232,7 +232,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"TestObject\"].{nameof(ApiProperty)}[\"Items\"].{nameof(ApiCollectionType)}",
+                    apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"].{nameof(ApiProperty)}[\"Items\"].{nameof(ApiCollectionType)}",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiCollectionTypeUnresolvedItemType,
                     description: $"{nameof(ApiCollectionType.ApiItemType)} could not be resolved for {nameof(ApiTypeExpression.ApiKind)}='{ApiTypeKind.Scalar}' and {nameof(ApiTypeExpression.ApiName)}='String'",
@@ -284,7 +284,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiEnumType)}",
+                    apiPath: $"{nameof(ApiEnumType)}",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiNamedTypeInvalidApiName,
                     description: $"{nameof(ApiEnumType.ApiName)} must not be null, empty, or whitespace",
@@ -331,7 +331,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"]",
+                    apiPath: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiTypeNullClrType,
                     description: $"{nameof(ApiEnumType.ClrType)} must not be null",
@@ -379,7 +379,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"]",
+                    apiPath: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiEnumTypeInvalidClrType,
                     description: $"{nameof(ApiEnumType.ClrType)} 'String' must be a CLR Enum",
@@ -410,7 +410,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"]",
+                    apiPath: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiEnumTypeNullOrEmptyValues,
                     description: $"{nameof(ApiEnumType.ApiEnumValues)} must not be null or empty",
@@ -442,7 +442,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"]",
+                    apiPath: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiEnumTypeNullOrEmptyValues,
                     description: $"{nameof(ApiEnumType.ApiEnumValues)} must not be null or empty",
@@ -490,7 +490,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"]",
+                    apiPath: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiEnumTypeDuplicateValueApiName,
                     description: $"Duplicate {nameof(ApiEnumValue)}.{nameof(ApiEnumValue.ApiName)} values: 'Female'",
@@ -538,7 +538,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"]",
+                    apiPath: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiEnumTypeDuplicateValueClrName,
                     description: $"Duplicate {nameof(ApiEnumValue)}.{nameof(ApiEnumValue.ClrName)} values: 'Female'",
@@ -591,7 +591,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"]",
+                    apiPath: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiEnumTypeDuplicateValueClrOrdinal,
                     description: $"Duplicate {nameof(ApiEnumValue)}.{nameof(ApiEnumValue.ClrOrdinal)} values: '2'",
@@ -643,7 +643,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"].{nameof(ApiEnumValue)}",
+                    apiPath: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"].{nameof(ApiEnumValue)}",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiEnumValueInvalidApiName,
                     description: $"{nameof(ApiEnumValue.ApiName)} must not be null, empty, or whitespace",
@@ -691,7 +691,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"].{nameof(ApiEnumValue)}[\"{nameof(Gender.Male)}\"]",
+                    apiPath: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"].{nameof(ApiEnumValue)}[\"{nameof(Gender.Male)}\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiEnumValueInvalidClrName,
                     description: $"{nameof(ApiEnumValue.ClrName)} must not be null, empty, or whitespace",
@@ -744,7 +744,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}",
+                    apiPath: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiPropertyInvalidApiName,
                     description: $"{nameof(ApiProperty.ApiName)} must not be null, empty, or whitespace",
@@ -793,7 +793,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"RequiredName\"]",
+                    apiPath: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"RequiredName\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiPropertyInvalidClrName,
                     description: $"{nameof(ApiProperty.ClrName)} must not be null, empty, or whitespace",
@@ -842,7 +842,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"NonExistent\"]",
+                    apiPath: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"NonExistent\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiPropertyMissingClrMember,
                     description: $"CLR member 'NonExistentProperty' was not found on CLR type '{nameof(ScalarsOnly)}'",
@@ -881,7 +881,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"RequiredName\"]",
+                    apiPath: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"RequiredName\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiPropertyNullType,
                     description: $"{nameof(ApiProperty.ApiType)} must not be null",
@@ -954,7 +954,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"{nameof(TypesWithRefStructMembers)}\"].{nameof(ApiProperty)}[\"SpanField\"]",
+                    apiPath: $"{nameof(ApiObjectType)}[\"{nameof(TypesWithRefStructMembers)}\"].{nameof(ApiProperty)}[\"SpanField\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiPropertyInvalidClrMember,
                     description: $"CLR member '{nameof(TypesWithRefStructMembers.SpanField)}' has type '{typeof(Span<byte>).SafeToName()}' which is a ref struct. Ref structs cannot be boxed to object and are not supported for API properties.",
@@ -962,7 +962,7 @@ public partial class ApiSchemaTests
                 ),
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"{nameof(TypesWithRefStructMembers)}\"].{nameof(ApiProperty)}[\"SpanProperty\"]",
+                    apiPath: $"{nameof(ApiObjectType)}[\"{nameof(TypesWithRefStructMembers)}\"].{nameof(ApiProperty)}[\"SpanProperty\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiPropertyInvalidClrMember,
                     description: $"CLR member '{nameof(TypesWithRefStructMembers.SpanProperty)}' has type '{typeof(Span<byte>).SafeToName()}' which is a ref struct. Ref structs cannot be boxed to object and are not supported for API properties.",
@@ -1005,7 +1005,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"RequiredName\"]",
+                    apiPath: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"RequiredName\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiPropertyUnresolvedType,
                     description: $"{nameof(ApiProperty.ApiType)} could not be resolved for {nameof(ApiTypeExpression.ApiKind)}='Scalar' and {nameof(ApiTypeExpression.ApiName)}='String'",
@@ -1046,7 +1046,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"RequiredName\"]",
+                    apiPath: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"RequiredName\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiPropertyUnresolvedType,
                     description: $"{nameof(ApiProperty.ApiType)} could not be resolved for {nameof(ApiTypeExpression.ClrType)}='{nameof(String)}'",
@@ -1085,7 +1085,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"RequiredName\"]",
+                    apiPath: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"RequiredName\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiPropertyUnresolvedType,
                     description: $"{nameof(ApiProperty.ApiType)} could not be resolved because none of the following are set: {nameof(ApiTypeExpression.ApiInlineType)}, a valid combination of {nameof(ApiTypeExpression.ApiKind)} and {nameof(ApiTypeExpression.ApiName)}, or {nameof(ApiTypeExpression.ClrType)}",
@@ -1144,7 +1144,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"{nameof(TypesWithPointerMembers)}\"].{nameof(ApiProperty)}[\"PointerField\"]",
+                    apiPath: $"{nameof(ApiObjectType)}[\"{nameof(TypesWithPointerMembers)}\"].{nameof(ApiProperty)}[\"PointerField\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiPropertyInvalidFieldGetter,
                     description: $"Failed to compile field getter for '{nameof(TypesWithPointerMembers.PointerField)}': No coercion operator is defined between types 'System.Byte*' and 'System.Object'",
@@ -1152,7 +1152,7 @@ public partial class ApiSchemaTests
                 ),
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"{nameof(TypesWithPointerMembers)}\"].{nameof(ApiProperty)}[\"PointerField\"]",
+                    apiPath: $"{nameof(ApiObjectType)}[\"{nameof(TypesWithPointerMembers)}\"].{nameof(ApiProperty)}[\"PointerField\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiPropertyInvalidFieldSetter,
                     description: $"Failed to compile field setter for '{nameof(TypesWithPointerMembers.PointerField)}': Type must not be a pointer type (Parameter 'type')",
@@ -1160,7 +1160,7 @@ public partial class ApiSchemaTests
                 ),
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"{nameof(TypesWithPointerMembers)}\"].{nameof(ApiProperty)}[\"PointerProperty\"]",
+                    apiPath: $"{nameof(ApiObjectType)}[\"{nameof(TypesWithPointerMembers)}\"].{nameof(ApiProperty)}[\"PointerProperty\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiPropertyInvalidPropertyGetter,
                     description: $"Failed to compile property getter for '{nameof(TypesWithPointerMembers.PointerProperty)}': No coercion operator is defined between types 'System.Byte*' and 'System.Object'",
@@ -1168,7 +1168,7 @@ public partial class ApiSchemaTests
                 ),
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"{nameof(TypesWithPointerMembers)}\"].{nameof(ApiProperty)}[\"PointerProperty\"]",
+                    apiPath: $"{nameof(ApiObjectType)}[\"{nameof(TypesWithPointerMembers)}\"].{nameof(ApiProperty)}[\"PointerProperty\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiPropertyInvalidPropertySetter,
                     description: $"Failed to compile property setter for '{nameof(TypesWithPointerMembers.PointerProperty)}': Type must not be a pointer type (Parameter 'type')",
@@ -1229,7 +1229,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"TestObject\"]",
+                    apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiObjectTypeDuplicatePropertyApiName,
                     description: $"Duplicate {nameof(ApiProperty)}.{nameof(ApiProperty.ApiName)} values: 'Name'",
@@ -1286,7 +1286,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"TestObject\"]",
+                    apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiObjectTypeDuplicatePropertyClrName,
                     description: $"Duplicate {nameof(ApiProperty)}.{nameof(ApiProperty.ClrName)} values: 'Name'",
@@ -1365,7 +1365,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"TestObject\"]",
+                    apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiObjectTypeDuplicateKeyTypeApiName,
                     description: $"Duplicate {nameof(ApiKeyType)}.{nameof(ApiKeyType.ApiName)} values: 'Primary'",
@@ -1400,7 +1400,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiScalarType)}",
+                    apiPath: $"{nameof(ApiScalarType)}",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiNamedTypeInvalidApiName,
                     description: $"{nameof(ApiScalarType.ApiName)} must not be null, empty, or whitespace",
@@ -1430,7 +1430,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiScalarType)}[\"String\"]",
+                    apiPath: $"{nameof(ApiScalarType)}[\"String\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiTypeNullClrType,
                     description: $"{nameof(ApiScalarType.ClrType)} must not be null",
@@ -1459,7 +1459,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiSchema)}",
+                    apiPath: $"{nameof(ApiSchema)}",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiSchemaInvalidName,
                     description: $"{nameof(ApiSchema.ApiName)} must not be null, empty, or whitespace",
@@ -1495,7 +1495,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiScalarTypes Has Duplicate ApiName\"]",
+                    apiPath: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiScalarTypes Has Duplicate ApiName\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiSchemaDuplicateNamedTypeApiName,
                     description: $"Duplicate {nameof(ApiNamedType)}.{nameof(ApiNamedType.ApiName)} values: 'String'",
@@ -1503,7 +1503,7 @@ public partial class ApiSchemaTests
                 ),
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiScalarTypes Has Duplicate ApiName\"]",
+                    apiPath: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiScalarTypes Has Duplicate ApiName\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiSchemaDuplicateScalarTypeApiName,
                     description: $"Duplicate {nameof(ApiScalarType)}.{nameof(ApiScalarType.ApiName)} values: 'String'",
@@ -1539,7 +1539,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiScalarTypes Has Duplicate ClrType\"]",
+                    apiPath: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiScalarTypes Has Duplicate ClrType\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiSchemaDuplicateNamedTypeClrType,
                     description: $"Duplicate {nameof(ApiNamedType)}.{nameof(ApiNamedType.ClrType)} values: '{typeof(string)}'",
@@ -1547,7 +1547,7 @@ public partial class ApiSchemaTests
                 ),
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiScalarTypes Has Duplicate ClrType\"]",
+                    apiPath: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiScalarTypes Has Duplicate ClrType\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiSchemaDuplicateScalarTypeClrType,
                     description: $"Duplicate {nameof(ApiScalarType)}.{nameof(ApiScalarType.ClrType)} values: '{typeof(string)}'",
@@ -1594,7 +1594,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiEnumTypes Has Duplicate ApiName\"]",
+                    apiPath: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiEnumTypes Has Duplicate ApiName\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiSchemaDuplicateNamedTypeApiName,
                     description: $"Duplicate {nameof(ApiNamedType)}.{nameof(ApiNamedType.ApiName)} values: 'Gender'",
@@ -1602,7 +1602,7 @@ public partial class ApiSchemaTests
                 ),
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiEnumTypes Has Duplicate ApiName\"]",
+                    apiPath: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiEnumTypes Has Duplicate ApiName\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiSchemaDuplicateEnumTypeApiName,
                     description: $"Duplicate {nameof(ApiEnumType)}.{nameof(ApiEnumType.ApiName)} values: 'Gender'",
@@ -1648,7 +1648,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiEnumTypes Has Duplicate ClrType\"]",
+                    apiPath: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiEnumTypes Has Duplicate ClrType\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiSchemaDuplicateNamedTypeClrType,
                     description: $"Duplicate {nameof(ApiNamedType)}.{nameof(ApiNamedType.ClrType)} values: '{typeof(Gender)}'",
@@ -1656,7 +1656,7 @@ public partial class ApiSchemaTests
                 ),
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiEnumTypes Has Duplicate ClrType\"]",
+                    apiPath: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiEnumTypes Has Duplicate ClrType\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiSchemaDuplicateEnumTypeClrType,
                     description: $"Duplicate {nameof(ApiEnumType)}.{nameof(ApiEnumType.ClrType)} values: '{typeof(Gender)}'",
@@ -1720,7 +1720,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiObjectTypes Has Duplicate ApiName\"]",
+                    apiPath: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiObjectTypes Has Duplicate ApiName\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiSchemaDuplicateNamedTypeApiName,
                     description: $"Duplicate {nameof(ApiNamedType)}.{nameof(ApiNamedType.ApiName)} values: 'TestObject'",
@@ -1728,7 +1728,7 @@ public partial class ApiSchemaTests
                 ),
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiObjectTypes Has Duplicate ApiName\"]",
+                    apiPath: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiObjectTypes Has Duplicate ApiName\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiSchemaDuplicateObjectTypeApiName,
                     description: $"Duplicate {nameof(ApiObjectType)}.{nameof(ApiObjectType.ApiName)} values: 'TestObject'",
@@ -1798,7 +1798,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiObjectTypes Has Duplicate ClrType\"]",
+                    apiPath: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiObjectTypes Has Duplicate ClrType\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiSchemaDuplicateNamedTypeClrType,
                     description: $"Duplicate {nameof(ApiNamedType)}.{nameof(ApiNamedType.ClrType)} values: '{typeof(DuplicatePropertyApiNameType)}'",
@@ -1806,7 +1806,7 @@ public partial class ApiSchemaTests
                 ),
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiObjectTypes Has Duplicate ClrType\"]",
+                    apiPath: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiObjectTypes Has Duplicate ClrType\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiSchemaDuplicateObjectTypeClrType,
                     description: $"Duplicate {nameof(ApiObjectType)}.{nameof(ApiObjectType.ClrType)} values: '{typeof(DuplicatePropertyApiNameType)}'",
@@ -1848,7 +1848,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiNamedTypes Has Duplicate ApiName\"]",
+                    apiPath: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiNamedTypes Has Duplicate ApiName\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiSchemaDuplicateNamedTypeApiName,
                     description: $"Duplicate {nameof(ApiNamedType)}.{nameof(ApiNamedType.ApiName)} values: 'MyType'",
@@ -1890,7 +1890,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiNamedTypes Has Duplicate ClrType\"]",
+                    apiPath: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiNamedTypes Has Duplicate ClrType\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiSchemaDuplicateNamedTypeClrType,
                     description: $"Duplicate {nameof(ApiNamedType)}.{nameof(ApiNamedType.ClrType)} values: '{typeof(Gender)}'",
@@ -1953,7 +1953,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"TestObject\"].{nameof(ApiKeyType)}",
+                    apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"].{nameof(ApiKeyType)}",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiKeyTypeInvalidApiName,
                     description: $"{nameof(ApiKeyType.ApiName)} must not be null, empty, or whitespace",
@@ -2006,7 +2006,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"TestObject\"].{nameof(ApiKeyType)}[\"PrimaryKey\"]",
+                    apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"].{nameof(ApiKeyType)}[\"PrimaryKey\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiKeyTypeNullOrEmptyPaths,
                     description: $"{nameof(ApiKeyType.ApiKeyPaths)} must not be null or empty",
@@ -2068,7 +2068,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiRelationshipOneToMany)}",
+                    apiPath: $"{nameof(ApiRelationshipOneToMany)}",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiRelationshipInvalidApiName,
                     description: $"{nameof(ApiRelationship.ApiName)} must not be null, empty, or whitespace",
@@ -2111,7 +2111,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"]",
+                    apiPath: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiRelationshipNullPrincipalEnd,
                     description: $"{nameof(ApiRelationshipOneTo.ApiPrincipalEnd)} must not be null",
@@ -2160,7 +2160,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"]",
+                    apiPath: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiRelationshipNullDependentEnd,
                     description: $"{nameof(ApiRelationshipOneTo.ApiDependentEnd)} must not be null",
@@ -2204,7 +2204,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"].{nameof(ApiRelationshipPrincipalEnd)}",
+                    apiPath: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"].{nameof(ApiRelationshipPrincipalEnd)}",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiRelationshipElementNullClrObjectType,
                     description: $"{nameof(ApiRelationshipElement.ClrObjectType)} must not be null",
@@ -2248,7 +2248,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"].{nameof(ApiRelationshipPrincipalEnd)}",
+                    apiPath: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"].{nameof(ApiRelationshipPrincipalEnd)}",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiRelationshipElementUnresolvedObjectType,
                     description: $"No {nameof(ApiObjectType)} is registered for CLR type '{typeof(object).FullName}'",
@@ -2316,7 +2316,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"].{nameof(ApiRelationshipPrincipalEnd)}",
+                    apiPath: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"].{nameof(ApiRelationshipPrincipalEnd)}",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiRelationshipEndUnresolvedKeyType,
                     description: "Referenced principal key type 'NonExistentKeyType' could not be found on object type 'RelPrincipal'",
@@ -2377,7 +2377,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"]",
+                    apiPath: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiRelationshipEndPrincipalKeyWithoutForeignKey,
                     description: $"Cannot resolve {nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyTypeName)} 'Id' because this relationship has no foreign key binding",
@@ -2436,7 +2436,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiRelationshipManyToMany)}[\"TestRel\"]",
+                    apiPath: $"{nameof(ApiRelationshipManyToMany)}[\"TestRel\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiRelationshipManyToManyNullPrincipalEndA,
                     description: $"{nameof(ApiRelationshipManyToMany.ApiPrincipalEndA)} must not be null",
@@ -2495,7 +2495,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiRelationshipManyToMany)}[\"TestRel\"]",
+                    apiPath: $"{nameof(ApiRelationshipManyToMany)}[\"TestRel\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiRelationshipManyToManyNullPrincipalEndB,
                     description: $"{nameof(ApiRelationshipManyToMany.ApiPrincipalEndB)} must not be null",
@@ -2545,7 +2545,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiRelationshipManyToMany)}[\"TestRel\"]",
+                    apiPath: $"{nameof(ApiRelationshipManyToMany)}[\"TestRel\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiRelationshipManyToManyNullAssociation,
                     description: $"{nameof(ApiRelationshipManyToMany.ApiAssociation)} must not be null",
@@ -2632,7 +2632,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiRelationshipManyToMany)}[\"TestRel\"]",
+                    apiPath: $"{nameof(ApiRelationshipManyToMany)}[\"TestRel\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiRelationshipManyToManyInvalidAssociationKeyPathsACount,
                     description: $"Cannot automatically determine the referenced principal key type for principal end A: {nameof(ApiRelationshipManyToMany.ApiAssociation)}.{nameof(ApiRelationshipAssociation.ApiForeignKeyTypeA)}.{nameof(ApiKeyType.ApiKeyPaths)} has 2 key path(s), but no key type on 'RelPrincipal' has 2 key path(s)",
@@ -2719,7 +2719,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiRelationshipManyToMany)}[\"TestRel\"]",
+                    apiPath: $"{nameof(ApiRelationshipManyToMany)}[\"TestRel\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiRelationshipManyToManyInvalidAssociationKeyPathsBCount,
                     description: $"Cannot automatically determine the referenced principal key type for principal end B: {nameof(ApiRelationshipManyToMany.ApiAssociation)}.{nameof(ApiRelationshipAssociation.ApiForeignKeyTypeB)}.{nameof(ApiKeyType.ApiKeyPaths)} has 2 key path(s), but no key type on 'RelPrincipalB' has 2 key path(s)",
@@ -2786,7 +2786,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"]",
+                    apiPath: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiRelationshipOneToInvalidDependentKeyPathsCount,
                     description: $"Cannot automatically determine the referenced principal key type: {nameof(ApiRelationshipOneTo.ApiDependentEnd)}.{nameof(ApiRelationshipDependentEnd.ApiForeignKeyType)}.{nameof(ApiKeyType.ApiKeyPaths)} has 2 key path(s), but no key type on 'RelPrincipal' has 2 key path(s)",
@@ -2852,7 +2852,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"]",
+                    apiPath: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiRelationshipIncompatiblePrincipalForeignKey,
                     description: $"{nameof(ApiRelationshipOneTo.ApiDependentEnd)}.{nameof(ApiRelationshipDependentEnd.ApiForeignKeyType)} leaf type(s) [String] are not compatible with principal end principal key type 'PK_Id' leaf type(s) [Int32]",
@@ -2916,7 +2916,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiRelationships Has Duplicate ApiName\"]",
+                    apiPath: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiRelationships Has Duplicate ApiName\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiSchemaDuplicateRelationshipApiName,
                     description: $"Duplicate {nameof(ApiRelationship)}.{nameof(ApiRelationship.ApiName)} values: 'DupRel'",
@@ -2986,7 +2986,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"]",
+                    apiPath: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiRelationshipAmbiguousPrincipalKey,
                     description: "Cannot automatically determine the referenced principal key type: 2 key types on 'RelPrincipal' are compatible with the foreign key type: 'PK_Id', 'PK_Code'",
@@ -3020,7 +3020,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"Empty\"]",
+                    apiPath: $"{nameof(ApiObjectType)}[\"Empty\"]",
                     severity: ApiInitializationSeverity.Warning,
                     code: ApiInitializationCode.ApiObjectTypeNullOrEmptyProperties,
                     description: $"{nameof(ApiObjectType.ApiProperties)} is null or empty",
@@ -3065,7 +3065,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"NullabilityMismatch\"].{nameof(ApiProperty)}[\"NullableProp\"]",
+                    apiPath: $"{nameof(ApiObjectType)}[\"NullabilityMismatch\"].{nameof(ApiProperty)}[\"NullableProp\"]",
                     severity: ApiInitializationSeverity.Warning,
                     code: ApiInitializationCode.ApiPropertyRequiredNullableMismatch,
                     description: "CLR member 'NullableProp' is nullable but property 'NullableProp' is declared Required",
@@ -3109,7 +3109,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"NullabilityMismatch\"].{nameof(ApiProperty)}[\"NonNullableProp\"]",
+                    apiPath: $"{nameof(ApiObjectType)}[\"NullabilityMismatch\"].{nameof(ApiProperty)}[\"NonNullableProp\"]",
                     severity: ApiInitializationSeverity.Warning,
                     code: ApiInitializationCode.ApiPropertyOptionalNonNullableMismatch,
                     description: "CLR member 'NonNullableProp' is non-nullable but property 'NonNullableProp' is declared Optional",
@@ -3160,7 +3160,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"CollectionNullabilityMismatch\"].{nameof(ApiProperty)}[\"NullableItemsProp\"]",
+                    apiPath: $"{nameof(ApiObjectType)}[\"CollectionNullabilityMismatch\"].{nameof(ApiProperty)}[\"NullableItemsProp\"]",
                     severity: ApiInitializationSeverity.Warning,
                     code: ApiInitializationCode.ApiCollectionItemRequiredNullableMismatch,
                     description: "CLR collection element in 'NullableItemsProp' is nullable but item is declared Required",
@@ -3211,7 +3211,7 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    path: $"{nameof(ApiObjectType)}[\"CollectionNullabilityMismatch\"].{nameof(ApiProperty)}[\"NonNullableItemsProp\"]",
+                    apiPath: $"{nameof(ApiObjectType)}[\"CollectionNullabilityMismatch\"].{nameof(ApiProperty)}[\"NonNullableItemsProp\"]",
                     severity: ApiInitializationSeverity.Warning,
                     code: ApiInitializationCode.ApiCollectionItemOptionalNonNullableMismatch,
                     description: "CLR collection element in 'NonNullableItemsProp' is non-nullable but item is declared Optional",

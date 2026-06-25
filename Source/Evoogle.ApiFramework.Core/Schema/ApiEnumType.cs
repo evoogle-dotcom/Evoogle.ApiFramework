@@ -163,7 +163,7 @@ public sealed class ApiEnumType
             partKeySelector: x => x.ApiName,
             partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
             partKeyPropertyName: nameof(ApiEnumValue.ApiName),
-            path: this.ApiPath,
+            apiPath: this.ApiPath,
             duplicatePartCode: ApiInitializationCode.ApiEnumTypeDuplicateValueApiName,
             context: context,
             lookupDictionary: out _apiNameLookup
@@ -175,7 +175,7 @@ public sealed class ApiEnumType
             partKeySelector: x => x.ClrName,
             partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
             partKeyPropertyName: nameof(ApiEnumValue.ClrName),
-            path: this.ApiPath,
+            apiPath: this.ApiPath,
             duplicatePartCode: ApiInitializationCode.ApiEnumTypeDuplicateValueClrName,
             context: context,
             lookupDictionary: out _clrNameLookup
@@ -187,7 +187,7 @@ public sealed class ApiEnumType
             partKeySelector: x => x.ClrOrdinal,
             partKeyFilter: null,
             partKeyPropertyName: nameof(ApiEnumValue.ClrOrdinal),
-            path: this.ApiPath,
+            apiPath: this.ApiPath,
             duplicatePartCode: ApiInitializationCode.ApiEnumTypeDuplicateValueClrOrdinal,
             context: context,
             lookupDictionary: out _clrOrdinalLookup

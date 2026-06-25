@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -43,7 +43,7 @@ public partial class ApiKeyTypeTests
 
         #region Calculated Properties
         private ApiKeyType? ApiKeyType { get; set; }
-        private ApiKeyPartNameFormatterDelegate? CustomPartNameFormatter { get; set; }
+        private ApiKeyPartNameFormatterDelegate? PartNameFormatter { get; set; }
         private ApiKey? ActualValue { get; set; }
         private Type? ActualExceptionType { get; set; }
         #endregion
@@ -62,7 +62,7 @@ public partial class ApiKeyTypeTests
                     throw new InvalidOperationException($"Custom part name formatter with name '{this.CustomPartNameFormatterName}' not found.");
                 }
 
-                this.CustomPartNameFormatter = formatter;
+                this.PartNameFormatter = formatter;
             }
 
             this.WriteLine($"ApiObjectType:     {this.ApiObjectTypeName.SafeToString()}");
@@ -92,7 +92,7 @@ public partial class ApiKeyTypeTests
                 {
                     NullHandling = this.NullHandling,
                     PartNameFormat = this.PartNameFormat.GetValueOrDefault(ApiKeyPartNameFormat.None),
-                    CustomPartNameFormatter = this.CustomPartNameFormatter
+                    PartNameFormatter = this.PartNameFormatter
                 };
 
                 if (this.SelfObject is not null)
@@ -151,7 +151,7 @@ public partial class ApiKeyTypeTests
 
         #region Calculated Properties
         private ApiKeyType? ApiKeyType { get; set; }
-        private ApiKeyPartNameFormatterDelegate? CustomPartNameFormatter { get; set; }
+        private ApiKeyPartNameFormatterDelegate? PartNameFormatter { get; set; }
         private ApiKey? ActualValue { get; set; }
         private Type? ActualExceptionType { get; set; }
         #endregion
@@ -170,7 +170,7 @@ public partial class ApiKeyTypeTests
                     throw new InvalidOperationException($"Custom part name formatter with name '{this.CustomPartNameFormatterName}' not found.");
                 }
 
-                this.CustomPartNameFormatter = formatter;
+                this.PartNameFormatter = formatter;
             }
 
             this.WriteLine($"ApiObjectType:   {this.ApiObjectTypeName.SafeToString()}");
@@ -198,7 +198,7 @@ public partial class ApiKeyTypeTests
                 {
                     NullHandling = this.NullHandling,
                     PartNameFormat = this.PartNameFormat.GetValueOrDefault(ApiKeyPartNameFormat.None),
-                    CustomPartNameFormatter = this.CustomPartNameFormatter
+                    PartNameFormatter = this.PartNameFormatter
                 };
 
                 this.ConfigureValuesExpression.Compile()(context);

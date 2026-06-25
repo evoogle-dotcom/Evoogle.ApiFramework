@@ -19,7 +19,7 @@ public sealed partial class ApiKeyType
     /// <param name="context">The materialization context containing the CLR instances and configuration.</param>
     /// <returns>
     ///     A composite <see cref="ApiKey"/> whose part values are read from the configured key paths.
-    ///     Part names are formatted by <see cref="ApiKeyMaterializationContext.CustomPartNameFormatter"/>,
+    ///     Part names are formatted by <see cref="ApiKeyMaterializationContext.PartNameFormatter"/>,
     ///     when provided; otherwise they are formatted according to <see cref="ApiKeyMaterializationContext.PartNameFormat"/>.
     /// </returns>
     /// <exception cref="ApiKeyException">
@@ -63,7 +63,7 @@ public sealed partial class ApiKeyType
     {
         // All keys produce a named-composite ApiKey regardless of path count,
         // so callers can always inspect part names uniformly.
-        var partNameFormatter = context.CustomPartNameFormatter ?? ApiKeyPartNameFormatters.Resolve(context.PartNameFormat);
+        var partNameFormatter = context.PartNameFormatter ?? ApiKeyPartNameFormatters.Resolve(context.PartNameFormat);
         var parts = new ApiKeyPart[this.ApiKeyPaths.Length];
         for (var i = 0; i < this.ApiKeyPaths.Length; i++)
         {

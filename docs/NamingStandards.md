@@ -28,40 +28,40 @@ ApiFramework models two related naming spaces:
 - `Api`: the framework/API schema abstraction.
 - `Clr`: the .NET CLR/BCL backing representation.
 
-Use these prefixes when they clarify which naming space a member belongs to. The prefix is
-part of the domain vocabulary, not decoration.
+Use these prefixes to mark the boundary between the framework/API-schema representation
+and the CLR/BCL representation. They are not general domain prefixes and should not repeat
+information already supplied by the containing type, parameter type, or local scope.
 
 ### Use `Api`
 
-Use `Api` when a member represents an ApiFramework-level concept.
-
-Use `Api` when the member's type is itself an `Api*` type:
-
-```csharp
-public ApiTypeKind ApiKind { get; }
-public ApiType? ApiInlineType { get; }
-public ApiTypeExpression ApiTypeExpression { get; }
-```
-
-Use `Api` when the same or similar concept also exists at the CLR level:
+Use `Api` when a member names the API/schema-side representation of a concept that also
+has, or can easily be confused with, a CLR/BCL-side representation:
 
 ```csharp
 public string ApiName { get; }
-public ApiTypeModifiers ApiTypeModifiers { get; }
+public string ApiPath { get; }
+public ApiType? ApiInlineType { get; }
 public ApiKeyType? ApiPrincipalKeyType { get; }
 ```
 
-Use `Api` when the concept is consistently expressed that way across the type system, even
-if a single property would not strictly need disambiguation:
+Use `Api` for canonical framework terms that are intentionally named that way across the
+model, especially when a shorter name would create a second spelling for the same concept:
 
 ```csharp
-public string? ApiVersion { get; }
+public string ApiName { get; }
 public string ApiPath { get; }
-public ApiObjectTypeOptions? ApiOptions { get; }
+public ApiTypeKind ApiKind { get; }
 ```
 
-Do not introduce a second name for the same concept just because a simpler type has no
-local ambiguity. If the framework concept is `ApiName`, keep using `ApiName`.
+Do not add `Api` merely because the containing type or property type starts with `Api`.
+Name the member by its semantic role. If the role is already clear in context, use the
+shorter name.
+
+```csharp
+public IEnumerable<ApiInitializationIssue> Issues { get; }
+public ApiKeyPartNameFormat PartNameFormat { get; init; }
+public ApiKeyNullHandling NullHandling { get; init; }
+```
 
 ### Use `Clr`
 
@@ -96,6 +96,8 @@ public ApiInitializationSeverity Severity { get; }
 public string Description { get; }
 public bool IsValid { get; }
 public bool HasErrors { get; }
+public ApiKeyPartNameFormat PartNameFormat { get; init; }
+public ApiKeyNullHandling NullHandling { get; init; }
 ```
 
 Computed predicates and state flags should stay natural and self-describing:
@@ -136,6 +138,8 @@ public string PropertyName { get; }
 Use framework terminology consistently.
 
 - Use `ApiName` for schema-visible names.
+- Use `ApiPath` for schema element paths because path-like values can otherwise mean
+  schema paths, CLR property paths, JSON paths, or file-system paths.
 - Use `ClrName`, `ClrType`, `ClrObjectType`, and `ClrPropertyName` for CLR-side backing
   information.
 - Use `PrincipalKey` for relationship principal-end key terminology, not `PrimaryKey`.
@@ -165,7 +169,8 @@ Do not document `ApiName` as just "name" when the distinction from `ClrName` mat
 | Local variable or parameter | `camelCase` |
 | Non-public instance field | `_camelCase` |
 | Acronym inside identifier | Treat as a word: `Api`, `Clr`, `Rpc` |
-| ApiFramework-level concept | Prefix with `Api` when needed or already standardized |
+| API/schema side of an API-vs-CLR boundary | Prefix with `Api` |
+| Canonical schema term such as `ApiName` or `ApiPath` | Prefix with `Api` |
 | CLR/BCL backing concept | Prefix with `Clr` |
 | No API/CLR ambiguity | No prefix |
 | Relationship principal key terminology | `PrincipalKey` |

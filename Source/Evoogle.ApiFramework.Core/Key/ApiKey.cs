@@ -43,8 +43,7 @@ namespace Evoogle.ApiFramework.Key;
 ///     </para>
 ///     <para>
 ///         Hash codes for composite keys are pre-computed at construction time; scalar hash codes are
-///         computed on-demand. <see cref="ApiOriginalString"/> is preserved for diagnostics and
-///         round-tripping but is <strong>not</strong> considered during equality or ordering.
+///         computed on-demand.
 ///     </para>
 ///     <para>
 ///         Use the static factory methods (<see cref="FromString"/>, <see cref="FromInt32"/>,
@@ -55,7 +54,7 @@ namespace Evoogle.ApiFramework.Key;
 ///     </para>
 ///     <para>
 ///         <see cref="ApiKey"/> implements <see cref="IParsable{TSelf}"/> and
-///         <see cref="ISpanParsable{TSelf}"/> for string round-tripping, and
+///         <see cref="ISpanParsable{TSelf}"/> for string parsing, and
 ///         <see cref="IFormattable"/> / <see cref="ISpanFormattable"/> for culture-aware formatting.
 ///         It also implements <see cref="IEquatable{T}"/> and <see cref="IComparable{T}"/> for use
 ///         as dictionary keys and in sorted collections.
@@ -153,24 +152,6 @@ public readonly struct ApiKey
     /// </remarks>
     public ApiKeyKind ApiKind { get; }
 
-    /// <summary>
-    ///     Gets the original string representation used to create this key, if applicable.
-    /// </summary>
-    /// <value>
-    ///     The original string from parsing or factory methods, or <see langword="null"/> if not tracked.
-    /// </value>
-    /// <remarks>
-    ///     <para>
-    ///         This property is for diagnostics and round-tripping only. It is <strong>not used for equality or hashing</strong>.
-    ///         Two <see cref="ApiKey"/> instances with different <see cref="ApiOriginalString"/> values but identical runtime values
-    ///         are considered equal.
-    ///     </para>
-    ///     <para>
-    ///         Example: <c>ApiKey.FromString("  42  ")</c> and <c>ApiKey.FromString("42")</c> are equal if both represent
-    ///         the same string value after normalization, even if <see cref="ApiOriginalString"/> differs.
-    ///     </para>
-    /// </remarks>
-    public string? ApiOriginalString { get; }
     #endregion
 
     #region Computed Properties
@@ -352,14 +333,12 @@ public readonly struct ApiKey
     /// <param name="kind">The discriminated kind.</param>
     /// <param name="valueUnion">Union value storage for value-type arms.</param>
     /// <param name="referenceValue">Reference storage for reference-type arms.</param>
-    /// <param name="original">Original string representation (optional).</param>
-    internal ApiKey(ApiKeyKind kind, in ApiKeyValueUnion valueUnion, object? referenceValue, string? original)
+    internal ApiKey(ApiKeyKind kind, in ApiKeyValueUnion valueUnion, object? referenceValue)
     {
         _valueUnion = valueUnion;
         _referenceValue = referenceValue;
 
         this.ApiKind = kind;
-        this.ApiOriginalString = original;
 
         // Pre-compute hash code for composites
         _hashCode = kind switch
@@ -399,7 +378,7 @@ public readonly struct ApiKey
             }
 
             ValidateCompositeParts(parts);
-            return new ApiKey(ApiKeyKind.Composite, default, parts, ToCompositeString(parts));
+            return new ApiKey(ApiKeyKind.Composite, default, parts);
         }
 
         // Slow path: materialize to list
@@ -417,7 +396,7 @@ public readonly struct ApiKey
         var partsArray = list.ToArray();
         ValidateCompositeParts(partsArray);
 
-        return new ApiKey(ApiKeyKind.Composite, default, partsArray, ToCompositeString(partsArray));
+        return new ApiKey(ApiKeyKind.Composite, default, partsArray);
     }
 
     /// <summary>
@@ -440,7 +419,7 @@ public readonly struct ApiKey
 
         ValidateCompositeParts(parts);
 
-        return new ApiKey(ApiKeyKind.Composite, default, parts, ToCompositeString(parts));
+        return new ApiKey(ApiKeyKind.Composite, default, parts);
     }
 
     /// <summary>
@@ -466,7 +445,7 @@ public readonly struct ApiKey
 
         ValidateCompositeParts(clone);
 
-        return new ApiKey(ApiKeyKind.Composite, default, clone, ToCompositeString(clone));
+        return new ApiKey(ApiKeyKind.Composite, default, clone);
     }
 
     /// <summary>
@@ -490,7 +469,7 @@ public readonly struct ApiKey
 
         ValidateCompositeParts(clone);
 
-        return new ApiKey(ApiKeyKind.Composite, default, clone, ToCompositeString(clone));
+        return new ApiKey(ApiKeyKind.Composite, default, clone);
     }
 
     /// <summary>Creates a culture key from a <see cref="CultureInfo"/> instance.</summary>
@@ -499,7 +478,7 @@ public readonly struct ApiKey
     public static ApiKey FromCulture(CultureInfo value)
     {
         ArgumentNullException.ThrowIfNull(value, nameof(value));
-        return new ApiKey(ApiKeyKind.Culture, default, value, value.Name);
+        return new ApiKey(ApiKeyKind.Culture, default, value);
     }
 
     /// <summary>Creates a culture key from a culture name string.</summary>
@@ -508,7 +487,7 @@ public readonly struct ApiKey
     public static ApiKey FromCulture(string name)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
-        return new ApiKey(ApiKeyKind.Culture, default, CultureInfo.GetCultureInfo(name, predefinedOnly: true), name);
+        return new ApiKey(ApiKeyKind.Culture, default, CultureInfo.GetCultureInfo(name, predefinedOnly: true));
     }
 
     /// <summary>Creates a string key.</summary>
@@ -517,23 +496,23 @@ public readonly struct ApiKey
     public static ApiKey FromString(string value)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(value, nameof(value));
-        return new ApiKey(ApiKeyKind.String, default, value, value);
+        return new ApiKey(ApiKeyKind.String, default, value);
     }
 
     /// <summary>Creates an Int32 key.</summary>
     /// <param name="value">The <see cref="int"/> value.</param>
     /// <returns>A new Int32 <see cref="ApiKey"/>.</returns>
-    public static ApiKey FromInt32(int value) => new(ApiKeyKind.Int32, ApiKeyValueUnion.FromInt32(value), null, value.ToString(CultureInfo.InvariantCulture));
+    public static ApiKey FromInt32(int value) => new(ApiKeyKind.Int32, ApiKeyValueUnion.FromInt32(value), null);
 
     /// <summary>Creates an Int64 key.</summary>
     /// <param name="value">The <see cref="long"/> value.</param>
     /// <returns>A new Int64 <see cref="ApiKey"/>.</returns>
-    public static ApiKey FromInt64(long value) => new(ApiKeyKind.Int64, ApiKeyValueUnion.FromInt64(value), null, value.ToString(CultureInfo.InvariantCulture));
+    public static ApiKey FromInt64(long value) => new(ApiKeyKind.Int64, ApiKeyValueUnion.FromInt64(value), null);
 
     /// <summary>Creates a Guid key.</summary>
     /// <param name="value">The <see cref="Guid"/> value.</param>
     /// <returns>A new Guid <see cref="ApiKey"/>.</returns>
-    public static ApiKey FromGuid(Guid value) => new(ApiKeyKind.Guid, ApiKeyValueUnion.FromGuid(value), null, value.ToString("D"));
+    public static ApiKey FromGuid(Guid value) => new(ApiKeyKind.Guid, ApiKeyValueUnion.FromGuid(value), null);
 
     /// <summary>
     ///     Converts the specified <paramref name="value"/> into an <see cref="ApiKey"/>.
@@ -603,7 +582,7 @@ public readonly struct ApiKey
     /// <summary>Creates a Ulid key.</summary>
     /// <param name="value">The <see cref="Ulid"/> value.</param>
     /// <returns>A new Ulid <see cref="ApiKey"/>.</returns>
-    public static ApiKey FromUlid(Ulid value) => new(ApiKeyKind.Ulid, ApiKeyValueUnion.FromUlid(value), null, value.ToString());
+    public static ApiKey FromUlid(Ulid value) => new(ApiKeyKind.Ulid, ApiKeyValueUnion.FromUlid(value), null);
 
     /// <summary>
     ///     Validates the supplied composite <paramref name="parts"/> ensuring no nested composites,

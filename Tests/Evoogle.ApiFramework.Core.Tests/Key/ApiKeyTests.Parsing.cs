@@ -20,42 +20,42 @@ public partial class ApiKeyTests
             Name = "FromString creates ApiKey with String kind",
             Factory = ApiKeyFromFactory.FromString,
             Value = "alpha",
-            ExpectedApiKey = new ApiKey(ApiKeyKind.String, default, "alpha", "alpha")
+            ExpectedApiKey = new ApiKey(ApiKeyKind.String, default, "alpha")
         },
         new FromScalarTest
         {
             Name = "FromInt32 creates ApiKey with Int32 kind",
             Factory = ApiKeyFromFactory.FromInt32,
             Value = "42",
-            ExpectedApiKey = new ApiKey(ApiKeyKind.Int32, ApiKeyValueUnion.FromInt32(42), null, "42")
+            ExpectedApiKey = new ApiKey(ApiKeyKind.Int32, ApiKeyValueUnion.FromInt32(42), null)
         },
         new FromScalarTest
         {
             Name = "FromInt64 creates ApiKey with Int64 kind",
             Factory = ApiKeyFromFactory.FromInt64,
             Value = "8675309",
-            ExpectedApiKey = new ApiKey(ApiKeyKind.Int64, ApiKeyValueUnion.FromInt64(8675309), null, "8675309")
+            ExpectedApiKey = new ApiKey(ApiKeyKind.Int64, ApiKeyValueUnion.FromInt64(8675309), null)
         },
         new FromScalarTest
         {
             Name = "FromGuid creates ApiKey with Guid kind",
             Factory = ApiKeyFromFactory.FromGuid,
             Value = TestGuidString,
-            ExpectedApiKey = new ApiKey(ApiKeyKind.Guid, ApiKeyValueUnion.FromGuid(TestGuid), null, TestGuidString)
+            ExpectedApiKey = new ApiKey(ApiKeyKind.Guid, ApiKeyValueUnion.FromGuid(TestGuid), null)
         },
         new FromScalarTest
         {
             Name = "FromUlid creates ApiKey with Ulid kind",
             Factory = ApiKeyFromFactory.FromUlid,
             Value = TestUlidString,
-            ExpectedApiKey = new ApiKey(ApiKeyKind.Ulid, ApiKeyValueUnion.FromUlid(TestUlid), null, TestUlidString)
+            ExpectedApiKey = new ApiKey(ApiKeyKind.Ulid, ApiKeyValueUnion.FromUlid(TestUlid), null)
         },
         new FromScalarTest
         {
             Name = "FromCulture creates ApiKey with Culture kind",
             Factory = ApiKeyFromFactory.FromCulture,
             Value = "en-us",
-            ExpectedApiKey = new ApiKey(ApiKeyKind.Culture, default, new CultureInfo("en-us"), "en-us")
+            ExpectedApiKey = new ApiKey(ApiKeyKind.Culture, default, new CultureInfo("en-us"))
         }
     ];
 
@@ -69,7 +69,7 @@ public partial class ApiKeyTests
             Kind = ApiKeyKind.String,
             Text = "orders/123",
             ExpectedResult = true,
-            ExpectedApiKey = new ApiKey(ApiKeyKind.String, default, "orders/123", "orders/123")
+            ExpectedApiKey = new ApiKey(ApiKeyKind.String, default, "orders/123")
         },
         new TryParseTest
         {
@@ -102,7 +102,7 @@ public partial class ApiKeyTests
             Kind = ApiKeyKind.Int32,
             Text = "42",
             ExpectedResult = true,
-            ExpectedApiKey = new ApiKey(ApiKeyKind.Int32, ApiKeyValueUnion.FromInt32(42), null, "42")
+            ExpectedApiKey = new ApiKey(ApiKeyKind.Int32, ApiKeyValueUnion.FromInt32(42), null)
         },
         new TryParseTest
         {
@@ -119,7 +119,7 @@ public partial class ApiKeyTests
             Kind = ApiKeyKind.Int64,
             Text = "42",
             ExpectedResult = true,
-            ExpectedApiKey = new ApiKey(ApiKeyKind.Int64, ApiKeyValueUnion.FromInt64(42), null, "42")
+            ExpectedApiKey = new ApiKey(ApiKeyKind.Int64, ApiKeyValueUnion.FromInt64(42), null)
         },
         new TryParseTest
         {
@@ -136,7 +136,7 @@ public partial class ApiKeyTests
             Kind = ApiKeyKind.Guid,
             Text = TestGuidString,
             ExpectedResult = true,
-            ExpectedApiKey = new ApiKey(ApiKeyKind.Guid, ApiKeyValueUnion.FromGuid(TestGuid), null, TestGuidString)
+            ExpectedApiKey = new ApiKey(ApiKeyKind.Guid, ApiKeyValueUnion.FromGuid(TestGuid), null)
         },
         new TryParseTest
         {
@@ -153,7 +153,7 @@ public partial class ApiKeyTests
             Kind = ApiKeyKind.Ulid,
             Text = TestUlidString,
             ExpectedResult = true,
-            ExpectedApiKey = new ApiKey(ApiKeyKind.Ulid, ApiKeyValueUnion.FromUlid(TestUlid), null, TestUlidString)
+            ExpectedApiKey = new ApiKey(ApiKeyKind.Ulid, ApiKeyValueUnion.FromUlid(TestUlid), null)
         },
         new TryParseTest
         {
@@ -170,7 +170,7 @@ public partial class ApiKeyTests
             Kind = ApiKeyKind.Culture,
             Text = "fr-FR",
             ExpectedResult = true,
-            ExpectedApiKey = new ApiKey(ApiKeyKind.Culture, default, new CultureInfo("fr-FR"), "fr-FR")
+            ExpectedApiKey = new ApiKey(ApiKeyKind.Culture, default, new CultureInfo("fr-FR"))
         },
         new TryParseTest
         {

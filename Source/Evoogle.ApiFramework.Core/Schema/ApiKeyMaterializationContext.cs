@@ -85,7 +85,7 @@ public sealed class ApiKeyMaterializationContext
     ///     When provided, this delegate takes precedence over <see cref="PartNameFormat"/>.
     ///     Return <see langword="null"/> to materialize unnamed/positional key parts.
     /// </remarks>
-    public ApiKeyPartNameFormatterDelegate? CustomPartNameFormatter { get; init; }
+    public ApiKeyPartNameFormatterDelegate? PartNameFormatter { get; init; }
 
     /// <summary>
     ///     Gets the behavior when any property in a path — whether an intermediate navigation property
