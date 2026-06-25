@@ -292,7 +292,7 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
 
             .AddOneToOneRelationship("REL_Payment_Order_1to1", r => r
                 .From<Payment>()
-                .To<Order>(de => de.WithForeignKey(p => p.Payment.Id)))
+                .To<Order>(de => de.WithForeignKey(p => p.Payment!.Id)))
 
             .AddOneToManyRelationship("REL_Category_Category_1toN", r => r
                 .From<Category>()
