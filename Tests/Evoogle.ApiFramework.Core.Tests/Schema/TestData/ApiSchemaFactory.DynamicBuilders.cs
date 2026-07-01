@@ -130,6 +130,26 @@ public static partial class ApiSchemaFactory
     #endregion
 
     #region Dynamic Builder Methods
+    public static ApiRelationship? BuildTestApiRelationship(ApiRelationshipDef? apiRelationshipDef)
+    {
+        if (apiRelationshipDef == null)
+        {
+            return default;
+        }
+
+        var apiRelationship = (ApiRelationship)((object?)apiRelationshipDef switch
+        {
+            ApiRelationshipOneToOneDef d => BuildApiRelationshipOneToOne(d),
+            ApiRelationshipOneToManyDef d => BuildApiRelationshipOneToMany(d),
+            ApiRelationshipManyToManyDef d => BuildApiRelationshipManyToMany(d),
+            _ => throw new InvalidOperationException($"Unsupported {nameof(ApiRelationshipDef)}: {apiRelationshipDef.GetType().Name}")
+        });
+
+        AttachExtensions(apiRelationship, apiRelationshipDef);
+
+        return apiRelationship;
+    }
+
     public static ApiSchema? BuildTestApiSchema(ApiSchemaDef? apiSchemaDef)
     {
         if (apiSchemaDef == null)
@@ -149,8 +169,9 @@ public static partial class ApiSchemaFactory
             .ToList();
 
         var apiRelationships = (apiSchemaDef.ApiRelationships ?? [])
-            .Select(BuildApiRelationship)
+            .Select(BuildTestApiRelationship)
             .Where(r => r != null)
+            .Cast<ApiRelationship>()
             .ToList();
 
         var extensionTypeAndInstances = BuildExtensionInstances(apiSchemaDef.ExtensionTypes);
@@ -258,21 +279,6 @@ public static partial class ApiSchemaFactory
     #endregion
 
     #region Dynamic Relationship Builders
-    private static ApiRelationship BuildApiRelationship(ApiRelationshipDef def)
-    {
-        var apiRelationship = (ApiRelationship)((object?)def switch
-        {
-            ApiRelationshipOneToOneDef d => BuildApiRelationshipOneToOne(d),
-            ApiRelationshipOneToManyDef d => BuildApiRelationshipOneToMany(d),
-            ApiRelationshipManyToManyDef d => BuildApiRelationshipManyToMany(d),
-            _ => throw new InvalidOperationException($"Unsupported {nameof(ApiRelationshipDef)}: {def.GetType().Name}")
-        });
-
-        AttachExtensions(apiRelationship, def);
-
-        return apiRelationship;
-    }
-
     private static ApiRelationshipOneToOne BuildApiRelationshipOneToOne(ApiRelationshipOneToOneDef def)
     {
         var apiName = def.ApiName;

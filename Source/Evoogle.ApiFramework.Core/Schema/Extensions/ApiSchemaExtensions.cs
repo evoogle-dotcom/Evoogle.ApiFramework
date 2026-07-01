@@ -189,6 +189,27 @@ public static class ApiSchemaExtensions
     }
 
     /// <summary>
+    ///     Gets an <see cref="ApiRelationship"/> by its API name.
+    /// </summary>
+    /// <param name="apiSchema">The API schema to search.</param>
+    /// <param name="apiName">The API name of the relationship.</param>
+    /// <returns>The matching <see cref="ApiRelationship"/>.</returns>
+    /// <exception cref="ApiSchemaException">Thrown if the relationship is not found in the schema.</exception>
+    public static ApiRelationship GetRelationshipByApiName(this ApiSchema apiSchema, string apiName)
+    {
+        if (apiSchema.TryGetRelationshipByApiName(apiName, out var result))
+        {
+            return result;
+        }
+
+        var availableRelationshipsByApiName = string.Join(", ", apiSchema.ApiRelationships.OrderBy(t => t.ApiName).Select(t => t.ApiName));
+        var errorMessage =
+            $"{nameof(ApiRelationship)} with {nameof(ApiNamedType.ApiName)} '{apiName}' not found in {apiSchema.SafeToString()}. " +
+            $"Available {nameof(ApiRelationship)} by {nameof(ApiRelationship.ApiName)} are: {availableRelationshipsByApiName}.";
+        throw new ApiSchemaException(errorMessage);
+    }
+
+    /// <summary>
     ///     Gets an <see cref="ApiScalarType"/> by its API name.
     /// </summary>
     /// <param name="apiSchema">The API schema to search.</param>
