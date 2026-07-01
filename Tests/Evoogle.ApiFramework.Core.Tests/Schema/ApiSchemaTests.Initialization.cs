@@ -2015,6 +2015,396 @@ public partial class ApiSchemaTests
             ]
         },
 
+        // ApiKeyPath throws if ApiSegments is empty
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiKeyPath)} Throws If {nameof(ApiKeyPath.ApiSegments)} Is Empty",
+            SourceJson = @"
+            {
+                ""ApiName"": ""ApiKeyPath Throws If ApiSegments Is Empty"",
+                ""ApiScalarTypes"": [
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""Int32"",
+                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                    }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""TestObject"",
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""Id"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""Int32""
+                                },
+                                ""ClrName"": ""Id""
+                            }
+                        ],
+                        ""ApiKeyTypes"": [
+                            {
+                                ""ApiName"": ""PrimaryKey"",
+                                ""ApiKeyPaths"": [
+                                    {
+                                        ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyTypeApiNameType, Evoogle.ApiFramework.Core.Tests"",
+                                        ""ApiSegments"": []
+                                    }
+                                ]
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyTypeApiNameType, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"].{nameof(ApiKeyType)}[\"PrimaryKey\"].{nameof(ApiKeyPath)}[\"{nameof(DuplicateKeyTypeApiNameType)}.\"]",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.ApiKeyPathEmptySegments,
+                    description: $"{nameof(ApiKeyPath.ApiSegments)} must contain at least one property name",
+                    remediation: $"Specify at least one CLR property name when creating an {nameof(ApiKeyPath)}"
+                ),
+            ]
+        },
+
+        // ApiKeyPath throws if ClrRootType is not registered as an ApiObjectType
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiKeyPath)} Throws If {nameof(ApiKeyPath.ClrRootType)} Is Unresolved",
+            SourceJson = @"
+            {
+                ""ApiName"": ""ApiKeyPath Throws If ClrRootType Is Unresolved"",
+                ""ApiScalarTypes"": [
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""Int32"",
+                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                    }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""TestObject"",
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""Id"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""Int32""
+                                },
+                                ""ClrName"": ""Id""
+                            }
+                        ],
+                        ""ApiKeyTypes"": [
+                            {
+                                ""ApiName"": ""PrimaryKey"",
+                                ""ApiKeyPaths"": [
+                                    {
+                                        ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+TypeWithListProperty, Evoogle.ApiFramework.Core.Tests"",
+                                        ""ApiSegments"": [
+                                            { ""ClrPropertyName"": ""Id"" }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyTypeApiNameType, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"].{nameof(ApiKeyType)}[\"PrimaryKey\"].{nameof(ApiKeyPath)}[\"{nameof(TypeWithListProperty)}.Id\"]",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.ApiKeyPathUnresolvedRootType,
+                    description: $"Root CLR type '{nameof(TypeWithListProperty)}' is not registered as an {nameof(ApiObjectType)} in the schema",
+                    remediation: $"Add an {nameof(ApiObjectType)} for '{nameof(TypeWithListProperty)}' to the schema, or correct the root CLR type"
+                ),
+            ]
+        },
+
+        // ApiKeyPathSegment throws if ClrPropertyName is invalid
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiKeyPathSegment)} Throws If {nameof(ApiKeyPathSegment.ClrPropertyName)} Is Invalid",
+            SourceJson = @"
+            {
+                ""ApiName"": ""ApiKeyPathSegment Throws If ClrPropertyName Is Invalid"",
+                ""ApiScalarTypes"": [
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""Int32"",
+                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                    }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""TestObject"",
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""Id"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""Int32""
+                                },
+                                ""ClrName"": ""Id""
+                            }
+                        ],
+                        ""ApiKeyTypes"": [
+                            {
+                                ""ApiName"": ""PrimaryKey"",
+                                ""ApiKeyPaths"": [
+                                    {
+                                        ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyTypeApiNameType, Evoogle.ApiFramework.Core.Tests"",
+                                        ""ApiSegments"": [
+                                            { ""ClrPropertyName"": """" }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyTypeApiNameType, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"].{nameof(ApiKeyType)}[\"PrimaryKey\"].{nameof(ApiKeyPath)}[\"{nameof(DuplicateKeyTypeApiNameType)}.\"].{nameof(ApiKeyPathSegment)}",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.ApiKeyPathSegmentInvalidClrPropertyName,
+                    description: $"{nameof(ApiKeyPathSegment.ClrPropertyName)} must not be null, empty, or whitespace",
+                    remediation: $"Specify a valid {nameof(ApiKeyPathSegment.ClrPropertyName)} value"
+                ),
+            ]
+        },
+
+        // ApiKeyPathSegment throws if ClrPropertyName cannot resolve to a property
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiKeyPathSegment)} Throws If {nameof(ApiKeyPathSegment.ClrPropertyName)} Is Unresolved",
+            SourceJson = @"
+            {
+                ""ApiName"": ""ApiKeyPathSegment Throws If ClrPropertyName Is Unresolved"",
+                ""ApiScalarTypes"": [
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""Int32"",
+                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                    }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""TestObject"",
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""Id"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""Int32""
+                                },
+                                ""ClrName"": ""Id""
+                            }
+                        ],
+                        ""ApiKeyTypes"": [
+                            {
+                                ""ApiName"": ""PrimaryKey"",
+                                ""ApiKeyPaths"": [
+                                    {
+                                        ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyTypeApiNameType, Evoogle.ApiFramework.Core.Tests"",
+                                        ""ApiSegments"": [
+                                            { ""ClrPropertyName"": ""MissingId"" }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyTypeApiNameType, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"].{nameof(ApiKeyType)}[\"PrimaryKey\"].{nameof(ApiKeyPath)}[\"{nameof(DuplicateKeyTypeApiNameType)}.MissingId\"].{nameof(ApiKeyPathSegment)}[\"MissingId\"]",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.ApiKeyPathSegmentUnresolvedApiProperty,
+                    description: $"Property with CLR name 'MissingId' could not be found on object type 'TestObject'",
+                    remediation: $"Verify the CLR property name or add a property with CLR name 'MissingId' to 'TestObject'"
+                ),
+            ]
+        },
+
+        // ApiKeyPath throws if a navigation segment resolves to a non-object type
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiKeyPath)} Throws If Navigation Segment Resolves To Non Object Type",
+            SourceJson = @"
+            {
+                ""ApiName"": ""ApiKeyPath Throws If Navigation Segment Resolves To Non Object Type"",
+                ""ApiScalarTypes"": [
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""Int32"",
+                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                    }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""TestObject"",
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""Id"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""Int32""
+                                },
+                                ""ClrName"": ""Id""
+                            },
+                            {
+                                ""ApiName"": ""Code"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""Int32""
+                                },
+                                ""ClrName"": ""Code""
+                            }
+                        ],
+                        ""ApiKeyTypes"": [
+                            {
+                                ""ApiName"": ""PrimaryKey"",
+                                ""ApiKeyPaths"": [
+                                    {
+                                        ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyTypeApiNameType, Evoogle.ApiFramework.Core.Tests"",
+                                        ""ApiSegments"": [
+                                            { ""ClrPropertyName"": ""Id"" },
+                                            { ""ClrPropertyName"": ""Code"" }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyTypeApiNameType, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"].{nameof(ApiKeyType)}[\"PrimaryKey\"].{nameof(ApiKeyPath)}[\"{nameof(DuplicateKeyTypeApiNameType)}.Id.Code\"].{nameof(ApiKeyPathSegment)}[\"Id\"]",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.ApiKeyPathNavigationSegmentInvalidType,
+                    description: $"Navigation segment property 'Id' must resolve to an object type; found '{nameof(ApiScalarType)}'",
+                    remediation: $"Change the navigation property to an object-typed property or restructure the path segments"
+                ),
+            ]
+        },
+
+        // ApiKeyPath throws if the scalar segment resolves to a non-scalar type
+        new InitializeThrowsTest
+        {
+            Name = $"{nameof(ApiKeyPath)} Throws If Scalar Segment Resolves To Non Scalar Type",
+            SourceJson = @"
+            {
+                ""ApiName"": ""ApiKeyPath Throws If Scalar Segment Resolves To Non Scalar Type"",
+                ""ApiScalarTypes"": [
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""Int32"",
+                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                    }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""Owned"",
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""Id"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""Int32""
+                                },
+                                ""ClrName"": ""Id""
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+OwnedType, Evoogle.ApiFramework.Core.Tests""
+                    },
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""Owner"",
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""Id"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Scalar"",
+                                    ""ApiName"": ""Int32""
+                                },
+                                ""ClrName"": ""Id""
+                            },
+                            {
+                                ""ApiName"": ""Item"",
+                                ""ApiType"": {
+                                    ""ApiKind"": ""Object"",
+                                    ""ApiName"": ""Owned""
+                                },
+                                ""ClrName"": ""Item""
+                            }
+                        ],
+                        ""ApiKeyTypes"": [
+                            {
+                                ""ApiName"": ""PrimaryKey"",
+                                ""ApiKeyPaths"": [
+                                    {
+                                        ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+OwnerType, Evoogle.ApiFramework.Core.Tests"",
+                                        ""ApiSegments"": [
+                                            { ""ClrPropertyName"": ""Item"" }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+OwnerType, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ]
+            }",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedIssues =
+            [
+                new ApiInitializationIssue
+                (
+                    apiPath: $"{nameof(ApiObjectType)}[\"Owner\"].{nameof(ApiKeyType)}[\"PrimaryKey\"].{nameof(ApiKeyPath)}[\"{nameof(OwnerType)}.Item\"].{nameof(ApiKeyPathSegment)}[\"Item\"]",
+                    severity: ApiInitializationSeverity.Error,
+                    code: ApiInitializationCode.ApiKeyPathScalarSegmentInvalidType,
+                    description: $"Terminal segment property 'Item' must resolve to a scalar type; found '{nameof(ApiObjectType)}'",
+                    remediation: $"Change the terminal property to a scalar-typed property or remove extra navigation segments"
+                ),
+            ]
+        },
+
         //
         // ApiRelationship Initialization Tests
         //
