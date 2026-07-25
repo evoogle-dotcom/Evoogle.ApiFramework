@@ -73,6 +73,22 @@ public class ApiKeyTypeBuilder(string? apiName = null) : ExtensionBuilder<ApiKey
     #endregion
 
     #region With Methods
+    /// <summary>Gets the API name currently configured on this key type builder.</summary>
+    internal string? ApiName => _apiName;
+
+    /// <summary>
+    ///     Returns <c>true</c> when this key type already contains a single-segment path
+    ///     with the specified CLR root type and CLR property name.
+    /// 
+    ///     Used by <see cref="ApiObjectTypeBuilder.AddKeyOrAppendPath"/> to prevent
+    ///     convention and annotation passes from adding the same path twice.
+    /// </summary>
+    internal bool HasSimplePath(Type clrRootType, string clrPropertyName)
+        => _keyPathBuilders.Any(p =>
+            p.ClrRootType == clrRootType &&
+            p.SegmentBuilders.Count == 1 &&
+            p.SegmentBuilders[0].ClrPropertyName == clrPropertyName);
+
     /// <summary>
     ///    Sets the API name for the key type being built.
     /// </summary>

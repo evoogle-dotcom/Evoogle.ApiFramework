@@ -5,6 +5,10 @@
 // See the LICENSE file in the project root for more information.
 using Microsoft.Extensions.Logging;
 
+using Evoogle.ApiFramework.Schema.Configuration.Internal;
+using Evoogle.ApiFramework.Schema.Configuration.Conventions;
+using Evoogle.ApiFramework.Schema.Configuration.Conventions.Internal;
+
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
 /// <summary>
@@ -16,6 +20,8 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     private string? _apiName;
     private string? _apiVersion;
     private Action<ApiSchemaOptionsBuilder>? _apiOptionsConfiguration = null;
+    private ApiConventionSet? _conventionSet;
+    private ApiAnnotationReaderSet? _annotationReaderSet;
 
     private readonly ApiSchemaBuilderContext _context = new(logger);
     #endregion
@@ -150,13 +156,12 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     /// <returns>The current builder instance.</returns>
     public ApiSchemaBuilder AddOneToOneRelationship(string apiName, Action<ApiRelationshipOneToOneBuilder> configure)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
-        ArgumentNullException.ThrowIfNull(configure);
-
-        var builder = _context.GetOrAddOneToOneRelationshipBuilder(apiName);
-
-        configure(builder);
-        return this;
+        return this.AddOneToOneRelationshipCore
+        (
+            apiName,
+            configure,
+            _context.CurrentConfigurationSource
+        );
     }
 
     /// <summary>
@@ -167,13 +172,13 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     /// <returns>The current builder instance.</returns>
     public ApiSchemaBuilder AddOneToOneRelationship(string apiName, IApiRelationshipOneToOneConfiguration configuration)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
         ArgumentNullException.ThrowIfNull(configuration);
 
-        var builder = _context.GetOrAddOneToOneRelationshipBuilder(apiName);
-
-        configuration.Configure(builder);
-        return this;
+        return this.AddOneToOneRelationship
+        (
+            apiName,
+            builder => configuration.Configure(builder)
+        );
     }
 
     /// <summary>
@@ -184,13 +189,12 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     /// <returns>The current builder instance.</returns>
     public ApiSchemaBuilder AddOneToManyRelationship(string apiName, Action<ApiRelationshipOneToManyBuilder> configure)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
-        ArgumentNullException.ThrowIfNull(configure);
-
-        var builder = _context.GetOrAddOneToManyRelationshipBuilder(apiName);
-
-        configure(builder);
-        return this;
+        return this.AddOneToManyRelationshipCore
+        (
+            apiName,
+            configure,
+            _context.CurrentConfigurationSource
+        );
     }
 
     /// <summary>
@@ -201,13 +205,13 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     /// <returns>The current builder instance.</returns>
     public ApiSchemaBuilder AddOneToManyRelationship(string apiName, IApiRelationshipOneToManyConfiguration configuration)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
         ArgumentNullException.ThrowIfNull(configuration);
 
-        var builder = _context.GetOrAddOneToManyRelationshipBuilder(apiName);
-
-        configuration.Configure(builder);
-        return this;
+        return this.AddOneToManyRelationship
+        (
+            apiName,
+            builder => configuration.Configure(builder)
+        );
     }
 
     /// <summary>
@@ -218,13 +222,12 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     /// <returns>The current builder instance.</returns>
     public ApiSchemaBuilder AddManyToManyRelationship(string apiName, Action<ApiRelationshipManyToManyBuilder> configure)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
-        ArgumentNullException.ThrowIfNull(configure);
-
-        var builder = _context.GetOrAddManyToManyRelationshipBuilder(apiName);
-
-        configure(builder);
-        return this;
+        return this.AddManyToManyRelationshipCore
+        (
+            apiName,
+            configure,
+            _context.CurrentConfigurationSource
+        );
     }
 
     /// <summary>
@@ -235,13 +238,99 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     /// <returns>The current builder instance.</returns>
     public ApiSchemaBuilder AddManyToManyRelationship(string apiName, IApiRelationshipManyToManyConfiguration configuration)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
         ArgumentNullException.ThrowIfNull(configuration);
 
-        var builder = _context.GetOrAddManyToManyRelationshipBuilder(apiName);
+        return this.AddManyToManyRelationship
+        (
+            apiName,
+            builder => configuration.Configure(builder)
+        );
+    }
+    #endregion
 
-        configuration.Configure(builder);
+    #region Internal Relationship Configuration Methods
+    /// <summary>Adds or configures a one-to-one relationship at the supplied precedence.</summary>
+    internal ApiSchemaBuilder AddOneToOneRelationshipCore
+    (
+        string apiName,
+        Action<ApiRelationshipOneToOneBuilder> configure,
+        ApiConfigurationSource source
+    )
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
+        ArgumentNullException.ThrowIfNull(configure);
+
+        var builder = _context.GetOrAddOneToOneRelationshipBuilder(apiName, source);
+        if (builder != null)
+        {
+            _context.ApplyConfiguration
+            (
+                source,
+                () => builder.ApplyConfiguration(source, () => configure(builder))
+            );
+        }
+
         return this;
+    }
+
+    /// <summary>Adds or configures a one-to-many relationship at the supplied precedence.</summary>
+    internal ApiSchemaBuilder AddOneToManyRelationshipCore
+    (
+        string apiName,
+        Action<ApiRelationshipOneToManyBuilder> configure,
+        ApiConfigurationSource source
+    )
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
+        ArgumentNullException.ThrowIfNull(configure);
+
+        var builder = _context.GetOrAddOneToManyRelationshipBuilder(apiName, source);
+        if (builder != null)
+        {
+            _context.ApplyConfiguration
+            (
+                source,
+                () => builder.ApplyConfiguration(source, () => configure(builder))
+            );
+        }
+
+        return this;
+    }
+
+    /// <summary>Adds or configures a many-to-many relationship at the supplied precedence.</summary>
+    internal ApiSchemaBuilder AddManyToManyRelationshipCore
+    (
+        string apiName,
+        Action<ApiRelationshipManyToManyBuilder> configure,
+        ApiConfigurationSource source
+    )
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
+        ArgumentNullException.ThrowIfNull(configure);
+
+        var builder = _context.GetOrAddManyToManyRelationshipBuilder(apiName, source);
+        if (builder != null)
+        {
+            _context.ApplyConfiguration
+            (
+                source,
+                () => builder.ApplyConfiguration(source, () => configure(builder))
+            );
+        }
+
+        return this;
+    }
+
+    /// <summary>Runs a relationship convention at convention precedence.</summary>
+    internal void ApplyRelationshipConvention(IApiRelationshipConvention convention)
+    {
+        ArgumentNullException.ThrowIfNull(convention);
+
+        _context.ApplyConfiguration
+        (
+            ApiConfigurationSource.Convention,
+            () => convention.Apply(this)
+        );
     }
     #endregion
 
@@ -296,6 +385,125 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     }
     #endregion
 
+    #region UseConventions Methods
+    /// <summary>
+    ///     Configures the convention pipeline using a fluent <see cref="ApiConventionSetBuilder"/>.
+    ///     Calling this method multiple times is additive — each call starts from the previously
+    ///     configured set so conventions accumulate rather than being replaced.
+    /// </summary>
+    /// <param name="configure">Callback to configure the convention set builder.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiSchemaBuilder UseConventions(Action<ApiConventionSetBuilder> configure)
+    {
+        ArgumentNullException.ThrowIfNull(configure);
+
+        var setBuilder = _conventionSet != null
+            ? new ApiConventionSetBuilder(_conventionSet)
+            : new ApiConventionSetBuilder();
+
+        configure(setBuilder);
+        _conventionSet = setBuilder.Build();
+        return this;
+    }
+
+    /// <summary>
+    ///     Applies <see cref="ApiConventionSet.CreateDefault"/> as the starting convention set.
+    ///     May be combined with <see cref="UseConventions"/> to augment or remove individual
+    ///     conventions.
+    /// </summary>
+    /// <returns>The current builder instance.</returns>
+    public ApiSchemaBuilder UseDefaultConventions()
+    {
+        _conventionSet = ApiConventionSet.CreateDefault();
+        return this;
+    }
+    #endregion
+
+    #region UseAnnotations Methods
+    /// <summary>
+    ///     Configures the annotation reader pipeline using a fluent <see cref="ApiAnnotationReaderSetBuilder"/>.
+    /// </summary>
+    /// <param name="configure">Callback to configure the annotation reader set builder.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiSchemaBuilder UseAnnotations(Action<ApiAnnotationReaderSetBuilder> configure)
+    {
+        ArgumentNullException.ThrowIfNull(configure);
+
+        var setBuilder = new ApiAnnotationReaderSetBuilder();
+        configure(setBuilder);
+        _annotationReaderSet = setBuilder.Build();
+        return this;
+    }
+
+    /// <summary>
+    ///     Registers <see cref="ApiAttributeAnnotationReader"/> as the annotation reader,
+    ///     enabling the framework's built-in attribute set (<see cref="Annotations.ApiObjectTypeAttribute"/>,
+    ///     <see cref="Annotations.ApiPropertyAttribute"/>, <see cref="Annotations.ApiKeyAttribute"/>, etc.).
+    /// </summary>
+    /// <returns>The current builder instance.</returns>
+    public ApiSchemaBuilder UseDefaultAnnotations()
+    {
+        return this.UseAnnotations(a => a.AddReader(new ApiAttributeAnnotationReader()));
+    }
+    #endregion
+
+    #region AddTypes Methods
+    /// <summary>
+    ///     Registers one or more CLR types so that conventions and annotations can configure them
+    ///     without any explicit fluent configuration.
+    ///     Object types, scalar types, and enum types may all be mixed in the same call; the
+    ///     method inspects each type and routes it to the correct <c>AddObject</c>, <c>AddScalar</c>,
+    ///     or <c>AddEnum</c> overload.
+    /// </summary>
+    /// <param name="clrTypes">The CLR types to register.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiSchemaBuilder AddTypes(params Type[] clrTypes)
+    {
+        ArgumentNullException.ThrowIfNull(clrTypes);
+
+        foreach (var clrType in clrTypes)
+        {
+            if (clrType == null)
+            {
+                continue;
+            }
+
+            if (clrType.IsEnum)
+            {
+                this.AddEnum(clrType);
+            }
+            else
+            {
+                this.AddObject(clrType);
+            }
+        }
+
+        return this;
+    }
+
+    /// <summary>
+    ///     Scans the specified assembly using the built-in assembly scanning convention and registers
+    ///     all public non-abstract types annotated with
+    ///     <see cref="Annotations.ApiObjectTypeAttribute"/>,
+    ///     <see cref="Annotations.ApiScalarTypeAttribute"/>, or
+    ///     <see cref="Annotations.ApiEnumTypeAttribute"/>.
+    ///     Equivalent to the <see cref="ApiSchemaBuilderExtensions.UseAssemblyScanning"/> extension
+    ///     method.
+    /// </summary>
+    /// <param name="assembly">The assembly to scan.</param>
+    /// <param name="filter">Optional predicate to limit which types are considered.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiSchemaBuilder ScanAssembly
+    (
+        System.Reflection.Assembly assembly,
+        Func<Type, bool>? filter = null
+    )
+    {
+        return this.UseConventions(c =>
+            c.AddConvention(new ApiSchemaAssemblyScanConvention(assembly, filter)));
+    }
+    #endregion
+
     #region Build Methods
     /// <summary>
     ///     Constructs the <see cref="ApiSchema"/> using the configured components.
@@ -303,6 +511,17 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     /// <returns>The built <see cref="ApiSchema"/>.</returns>
     public ApiSchema Build()
     {
+        if (_conventionSet is not null || _annotationReaderSet is not null)
+        {
+            var configurationPipeline = new ApiSchemaConfigurationPipeline(
+                _conventionSet,
+                _annotationReaderSet,
+                _context,
+                this);
+
+            configurationPipeline.Run();
+        }
+
         // Build ApiSchema instance from all the configured components.
         var apiName = _apiName!;
         var apiVersion = _apiVersion;

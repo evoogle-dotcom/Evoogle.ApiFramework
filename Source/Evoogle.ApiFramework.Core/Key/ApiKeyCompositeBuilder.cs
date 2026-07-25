@@ -103,10 +103,7 @@ public sealed class ApiKeyCompositeBuilder
     /// </remarks>
     public ApiKeyCompositeBuilder Add(string apiName, ApiKey apiValue)
     {
-        if (string.IsNullOrWhiteSpace(apiName))
-        {
-            throw new ArgumentException("Name must be non-empty for a named part.", nameof(apiName));
-        }
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
 
         _parts ??= [];
         _parts.Add(new ApiKeyPart(apiName.Trim(), apiValue));
@@ -138,4 +135,3 @@ public sealed class ApiKeyCompositeBuilder
     }
     #endregion
 }
-

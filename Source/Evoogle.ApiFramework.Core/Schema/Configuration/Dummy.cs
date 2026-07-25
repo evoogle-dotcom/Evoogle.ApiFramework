@@ -3,6 +3,8 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Schema.Annotations;
+using Evoogle.ApiFramework.Schema.Configuration.Conventions;
 
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
@@ -627,5 +629,133 @@ internal static class Dummy
                     .WithForeignKeyA(p => p.ProductId)                      // shorthand: single expression
                     .WithForeignKeyB(p => p.TagId)))                        // shorthand: single expression
             .Build();
+    }
+
+    // ──────────────────────────────────────────────────────────────────────────────────
+    // Annotation-decorated types used by DummyMethodAnnotations.
+    // ──────────────────────────────────────────────────────────────────────────────────
+
+    /// <summary>
+    ///     An annotation-decorated version of <see cref="Customer"/> that demonstrates how
+    ///     <c>[ApiObjectType]</c>, <c>[ApiProperty]</c>, <c>[ApiKey]</c>, and <c>[ApiIgnore]</c>
+    ///     can describe the schema shape directly on the POCO.
+    /// </summary>
+    [ApiObjectType(Name = "Customer")]
+    public class CustomerAnnotated
+    {
+        /// <summary>Gets or sets the unique customer identifier.</summary>
+        [ApiKey]
+        public Guid Id { get; set; }
+
+        /// <summary>Gets or sets the customer's display name.</summary>
+        [ApiProperty(Name = "displayName", IsRequired = true)]
+        public string Name { get; set; } = string.Empty;
+
+        /// <summary>Gets or sets the optional customer email address (string variant for schema simplicity).</summary>
+        [ApiProperty(IsOptional = true)]
+        public string? Email { get; set; }
+
+        /// <summary>Internal tracking tag excluded from the API schema.</summary>
+        [ApiIgnore]
+        public string InternalTag { get; set; } = string.Empty;
+
+        /// <summary>Gets or sets the collection of orders that belong to the customer.</summary>
+        [ApiRelationship("CustomerHasOrdersAnnotated",
+            Kind = ApiRelationshipKind.OneToMany,
+            ForeignKey = "CustomerId",
+            DeleteBehavior = ApiRelationshipDeleteBehavior.Delete)]
+        public List<OrderAnnotated> Orders { get; set; } = [];
+    }
+
+    /// <summary>
+    ///     An annotation-decorated version of <see cref="Order"/> paired with
+    ///     <see cref="CustomerAnnotated"/> for the annotation demo schema.
+    /// </summary>
+    [ApiObjectType(Name = "Order")]
+    public class OrderAnnotated
+    {
+        /// <summary>Gets or sets the unique order identifier.</summary>
+        [ApiKey]
+        public Guid Id { get; set; }
+
+        /// <summary>Gets or sets the order total.</summary>
+        public decimal Total { get; set; }
+
+        /// <summary>Gets or sets the optional FK to the owning customer.</summary>
+        public Guid? CustomerId { get; set; }
+    }
+
+    /// <summary>
+    ///     Demonstrates how to build a schema using conventions rather than explicit
+    ///     property and key declarations.
+    ///     <see cref="ApiSchemaBuilder.UseDefaultConventions"/> applies property discovery, camelCase naming,
+    ///     nullability-based Required/Optional inference, and primary-key inference
+    ///     automatically.
+    ///     This demo uses <see cref="Product"/>, <see cref="Tag"/>, and <see cref="ProductTag"/>
+    ///     because they only reference primitive scalar types, keeping the example self-contained.
+    /// </summary>
+    public static void DummyMethodConventions()
+    {
+        var schema = new ApiSchemaBuilder()
+            .WithName("ProductTagsAPI")
+            .WithVersion("v1")
+            // Conventions discover properties and infer keys automatically, but the scalar
+            // types that those properties resolve to must still be registered explicitly.
+            .AddScalar<Guid>(x => x.WithName("Guid"))
+            .AddScalar<string>(x => x.WithName("String"))
+            // Apply the full default convention set: property discovery, camelCase
+            // naming, nullability-based modifiers, and PrimaryKey inference.
+            .UseDefaultConventions()
+            // Augment the default set with a custom application-specific convention.
+            .UseConventions(c => c
+                .AddConvention(new ApiObjectTypeConventionExample()))
+            // Register the CLR types; conventions configure them automatically.
+            .AddTypes(typeof(Product), typeof(Tag), typeof(ProductTag))
+            // Relationships are not yet inferred by convention (IApiRelationshipConvention
+            // has no built-in implementations). Register the M:N link explicitly.
+            .AddManyToManyRelationship(
+                "ProductHasTags",
+                r => r
+                    .Between<Product>()
+                    .And<Tag>()
+                    .WithAssociation<ProductTag>(a => a
+                        .WithForeignKeyA(b => b.AddPath(typeof(ProductTag), "ProductId"))
+                        .WithForeignKeyB(b => b.AddPath(typeof(ProductTag), "TagId"))))
+            .Build();
+    }
+
+    /// <summary>
+    ///     Demonstrates how to build a schema using CLR attribute annotations on POCO types.
+    ///     Conventions provide the discovery baseline; annotations override specific values.
+    /// </summary>
+    public static void DummyMethodAnnotations()
+    {
+        var schema = new ApiSchemaBuilder()
+            .WithName("CustomerOrdersAPI")
+            .WithVersion("v1")
+            .AddScalar<Guid>(x => x.WithName("Guid"))
+            .AddScalar<string>(x => x.WithName("String"))
+            .AddScalar<decimal>(x => x.WithName("Decimal"))
+            // Use default conventions for property discovery and nullability inference.
+            .UseDefaultConventions()
+            // Activate the framework's built-in annotation reader so that attributes
+            // on CustomerAnnotated and OrderAnnotated are picked up automatically.
+            .UseDefaultAnnotations()
+            // Register the annotated POCO types; conventions + annotations configure them.
+            .AddTypes<CustomerAnnotated, OrderAnnotated>()
+            .Build();
+    }
+
+    /// <summary>
+    ///     A custom <see cref="IApiObjectTypeConvention"/> that demonstrates how to supply
+    ///     third-party or application-specific conventions alongside the built-in ones.
+    /// </summary>
+    public class ApiObjectTypeConventionExample : IApiObjectTypeConvention
+    {
+        /// <inheritdoc />
+        public void Apply(ApiObjectTypeBuilder builder)
+        {
+            // Example: log or audit every registered object type during schema construction.
+        }
     }
 }

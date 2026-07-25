@@ -88,7 +88,7 @@ public sealed partial class ApiKeyType
         {
             if (context.NullHandling == ApiKeyNullHandling.ThrowOnNull)
             {
-                throw new ApiKeyException($"Cannot walk key path '{pathName}': no root object registered for type '{path.ClrRootType.Name}'.");
+                throw new ApiSchemaMaterializationException($"Cannot walk key path '{pathName}': no root object registered for type '{path.ClrRootType.Name}'.");
             }
 
             return ApiKey.Empty;
@@ -102,7 +102,7 @@ public sealed partial class ApiKeyType
             {
                 if (context.NullHandling == ApiKeyNullHandling.ThrowOnNull)
                 {
-                    throw new ApiKeyException($"Cannot walk key path '{pathName}': navigation property '{segment.ClrPropertyName}' resolved to null.");
+                    throw new ApiSchemaMaterializationException($"Cannot walk key path '{pathName}': navigation property '{segment.ClrPropertyName}' resolved to null.");
                 }
 
                 return ApiKey.Empty;
@@ -115,7 +115,7 @@ public sealed partial class ApiKeyType
         {
             if (context.NullHandling == ApiKeyNullHandling.ThrowOnNull)
             {
-                throw new ApiKeyException($"Key path '{pathName}' resolved to a null scalar value.");
+                throw new ApiSchemaMaterializationException($"Key path '{pathName}' resolved to a null scalar value.");
             }
 
             return ApiKey.Empty;
@@ -138,7 +138,7 @@ public sealed partial class ApiKeyType
         {
             ApiKeyMaterializationValueKind.Key => MaterializeKeyValue(materializationValue.ApiKey, expectedClrType, context, path, pathName),
             ApiKeyMaterializationValueKind.Text => MaterializeTextValue(materializationValue.Text, expectedClrType, context, path, pathName),
-            _ => throw new ApiKeyException($"Key path '{pathName}' has an unsupported materialization value kind '{materializationValue.Kind}'."),
+            _ => throw new ApiSchemaMaterializationException($"Key path '{pathName}' has an unsupported materialization value kind '{materializationValue.Kind}'."),
         };
 
     }
@@ -153,7 +153,7 @@ public sealed partial class ApiKeyType
         var expectedKind = GetExpectedScalarKind(expectedClrType, pathName);
         if (apiKey.ApiKind != expectedKind)
         {
-            throw new ApiKeyException($"Key path '{pathName}' expected {expectedKind} but received {apiKey.ApiKind}.");
+            throw new ApiSchemaMaterializationException($"Key path '{pathName}' expected {expectedKind} but received {apiKey.ApiKind}.");
         }
 
         return apiKey;
@@ -172,14 +172,14 @@ public sealed partial class ApiKeyType
         }
 
         var expectedKind = GetExpectedScalarKind(expectedClrType, pathName);
-        throw new ApiKeyException($"Text '{text}' is not a valid {expectedKind} value for key path '{pathName}'.");
+        throw new ApiSchemaMaterializationException($"Text '{text}' is not a valid {expectedKind} value for key path '{pathName}'.");
     }
 
     private static ApiKey HandleMissingValue(ApiKeyMaterializationContext context, ApiKeyPath path, string pathName)
     {
         if (context.NullHandling == ApiKeyNullHandling.ThrowOnNull)
         {
-            throw new ApiKeyException($"Cannot materialize key path '{pathName}': no value registered for type '{path.ClrRootType.Name}'.");
+            throw new ApiSchemaMaterializationException($"Cannot materialize key path '{pathName}': no value registered for type '{path.ClrRootType.Name}'.");
         }
 
         return ApiKey.Empty;
@@ -194,7 +194,7 @@ public sealed partial class ApiKeyType
             return kind;
         }
 
-        throw new ApiKeyException($"Key path '{pathName}' has unsupported terminal scalar CLR type '{clrType.Name}'.");
+        throw new ApiSchemaMaterializationException($"Key path '{pathName}' has unsupported terminal scalar CLR type '{clrType.Name}'.");
     }
     #endregion
 }

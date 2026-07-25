@@ -57,4 +57,3 @@ internal static class ApiKeyPartNameFormatters
     }
     #endregion
 }
-

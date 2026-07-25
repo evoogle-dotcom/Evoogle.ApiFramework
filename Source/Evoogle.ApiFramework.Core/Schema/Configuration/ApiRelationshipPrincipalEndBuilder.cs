@@ -3,6 +3,8 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Schema.Configuration.Internal;
+
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
 /// <summary>
@@ -18,8 +20,15 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 public sealed class ApiRelationshipPrincipalEndBuilder(Type clrObjectType) : ExtensionBuilder<ApiRelationshipPrincipalEndBuilder>
 {
     #region Fields
+    private readonly ApiConfigurationSourceScope _configurationSourceScope = new();
     private readonly Type _clrObjectType = clrObjectType ?? throw new ArgumentNullException(nameof(clrObjectType));
     private string? _apiPrincipalKeyTypeName;
+    private ApiConfigurationSource? _apiPrincipalKeyTypeNameSource;
+    #endregion
+
+    #region Properties
+    /// <summary>Gets the CLR object type represented by this principal end.</summary>
+    internal Type ClrObjectType => _clrObjectType;
     #endregion
 
     #region AddExtension Methods
@@ -46,8 +55,22 @@ public sealed class ApiRelationshipPrincipalEndBuilder(Type clrObjectType) : Ext
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiPrincipalKeyTypeName, nameof(apiPrincipalKeyTypeName));
 
-        _apiPrincipalKeyTypeName = apiPrincipalKeyTypeName;
+        var source = _configurationSourceScope.CurrentSource;
+        if (_apiPrincipalKeyTypeNameSource == null || source >= _apiPrincipalKeyTypeNameSource.Value)
+        {
+            _apiPrincipalKeyTypeName = apiPrincipalKeyTypeName;
+            _apiPrincipalKeyTypeNameSource = source;
+        }
+
         return this;
+    }
+    #endregion
+
+    #region Configuration Source Methods
+    /// <summary>Runs a fluent callback at the supplied configuration-source precedence.</summary>
+    internal void ApplyConfiguration(ApiConfigurationSource source, Action configure)
+    {
+        _configurationSourceScope.Apply(source, configure);
     }
     #endregion
 

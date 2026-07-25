@@ -84,4 +84,3 @@ public class ApiTypeModifiersBuilderTests(ITestOutputHelper output) : XUnitTests
     public void Build(IXUnitTest test) => test.Execute(this);
     #endregion
 }
-

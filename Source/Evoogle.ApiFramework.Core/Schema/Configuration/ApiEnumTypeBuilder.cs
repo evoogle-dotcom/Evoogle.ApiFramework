@@ -3,6 +3,8 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Schema.Configuration.Internal;
+
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
 /// <summary>
@@ -14,7 +16,7 @@ public class ApiEnumTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     : ApiNamedTypeBuilder<ApiEnumTypeBuilder>(clrType, context)
 {
     #region Fields
-    private readonly List<ApiEnumValue> _values = [];
+    private readonly List<ApiEnumValueBuilder> _apiEnumValueBuilders = [];
     #endregion
 
     #region AddExtension Methods
@@ -32,18 +34,22 @@ public class ApiEnumTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
 
     #region AddValue Methods
     /// <summary>
-    ///     Adds an <see cref="ApiEnumValue"/> definition to the enumeration.
+    ///     Adds an <see cref="ApiEnumValue"/> definition to the enumeration using an explicitly
+    ///     supplied API name.
     /// </summary>
-    /// <param name="apiName">The API name of the enumeration value.</param>
+    /// <param name="apiName">The explicit API name of the enumeration value.</param>
     /// <param name="clrName">The CLR name of the enumeration value.</param>
     /// <param name="clrOrdinal">The CLR ordinal of the enumeration value.</param>
     /// <returns>The current builder instance.</returns>
     public ApiEnumTypeBuilder AddValue(string apiName, string clrName, int clrOrdinal)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
-        ArgumentException.ThrowIfNullOrWhiteSpace(clrName, nameof(clrName));
-
-        _values.Add(new ApiEnumValue(apiName, clrName, clrOrdinal));
+        this.AddValueCore
+        (
+            apiName,
+            clrName,
+            clrOrdinal,
+            ApiConfigurationSource.Explicit
+        );
         return this;
     }
     #endregion
@@ -56,7 +62,7 @@ public class ApiEnumTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     internal ApiEnumType Build()
     {
         var apiName = this.ApiName;
-        var apiEnumValues = _values;
+        var apiEnumValues = _apiEnumValueBuilders.Select(b => b.Build());
         var clrEnumType = this.ClrType;
 
         var apiEnumType = new ApiEnumType
@@ -73,6 +79,51 @@ public class ApiEnumTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
         }
 
         return apiEnumType;
+    }
+    #endregion
+
+    #region Internal Convention Methods
+    /// <summary>
+    ///     Gets all <see cref="ApiEnumValueBuilder"/> instances currently on this enum type builder.
+    /// </summary>
+    internal IEnumerable<ApiEnumValueBuilder> ApiEnumValueBuilders => _apiEnumValueBuilders;
+
+    /// <summary>
+    ///     Adds an enumeration value whose API name is inferred from its CLR name at
+    ///     <see cref="ApiConfigurationSource.Convention"/> precedence.
+    /// </summary>
+    internal ApiEnumTypeBuilder AddValueWithInferredName(string clrName, int clrOrdinal)
+    {
+        this.AddValueCore
+        (
+            clrName,
+            clrName,
+            clrOrdinal,
+            ApiConfigurationSource.Convention
+        );
+        return this;
+    }
+    #endregion
+
+    #region Implementation Methods
+    private ApiEnumValueBuilder AddValueCore
+    (
+        string apiName,
+        string clrName,
+        int clrOrdinal,
+        ApiConfigurationSource apiNameSource
+    )
+    {
+        var builder = new ApiEnumValueBuilder
+        (
+            apiName,
+            clrName,
+            clrOrdinal,
+            apiNameSource
+        );
+
+        _apiEnumValueBuilders.Add(builder);
+        return builder;
     }
     #endregion
 }

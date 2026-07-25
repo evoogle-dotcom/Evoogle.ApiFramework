@@ -20,6 +20,14 @@ public class ApiKeyPathBuilder : ExtensionBuilder<ApiKeyPathBuilder>
     private readonly List<ApiKeyPathSegmentBuilder> _segmentBuilders;
     #endregion
 
+    #region Properties
+    /// <summary>Gets the CLR root type from which this key path's navigation chain begins.</summary>
+    internal Type ClrRootType => _clrRootType;
+
+    /// <summary>Gets the ordered segment builders that make up this key path.</summary>
+    internal IReadOnlyList<ApiKeyPathSegmentBuilder> SegmentBuilders => _segmentBuilders;
+    #endregion
+
     #region Constructors
     /// <summary>
     ///     Initializes an <see cref="ApiKeyPathBuilder"/> with the specified root CLR type and CLR property names.

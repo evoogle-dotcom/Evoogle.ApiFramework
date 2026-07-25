@@ -43,7 +43,8 @@ public static class ApiEnumTypeBuilderExtensions
     }
 
     /// <summary>
-    ///     Adds an <see cref="ApiEnumValue"/> definition using <paramref name="apiAndClrName"/> as both the API name and CLR name.
+    ///     Adds an <see cref="ApiEnumValue"/> definition using
+    ///     <paramref name="apiAndClrName"/> as both the explicit API name and CLR name.
     /// </summary>
     /// <param name="builder">The enum type builder to configure.</param>
     /// <param name="apiAndClrName">The API and CLR name of the enumeration value.</param>

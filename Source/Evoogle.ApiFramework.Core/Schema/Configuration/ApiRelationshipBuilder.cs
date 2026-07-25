@@ -3,6 +3,8 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Schema.Configuration.Internal;
+
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
 /// <summary>
@@ -25,7 +27,10 @@ public abstract class ApiRelationshipBuilder(string apiName, ApiRelationshipDele
     /// </summary>
     protected ApiRelationshipDeleteBehavior _apiDeleteBehavior = apiDefaultDeleteBehavior;
 
+    private readonly ApiConfigurationSourceScope _configurationSourceScope = new();
     private readonly string _apiName = ValidateApiName(apiName);
+    private ApiConfigurationSource? _apiDeleteBehaviorSource;
+    private ApiConfigurationSource? _registrationSource;
     #endregion
 
     #region AddExtension Methods
@@ -64,7 +69,13 @@ public abstract class ApiRelationshipBuilder(string apiName, ApiRelationshipDele
     protected TBuilder WithDeleteBehavior<TBuilder>(ApiRelationshipDeleteBehavior apiDeleteBehavior)
         where TBuilder : ApiRelationshipBuilder
     {
-        _apiDeleteBehavior = apiDeleteBehavior;
+        var source = this.CurrentConfigurationSource;
+        if (_apiDeleteBehaviorSource == null || source >= _apiDeleteBehaviorSource.Value)
+        {
+            _apiDeleteBehavior = apiDeleteBehavior;
+            _apiDeleteBehaviorSource = source;
+        }
+
         return (TBuilder)this;
     }
     #endregion
@@ -76,6 +87,29 @@ public abstract class ApiRelationshipBuilder(string apiName, ApiRelationshipDele
     #region Protected Helpers
     /// <summary>Gets the configured API name.</summary>
     protected string ApiName => _apiName;
+
+    /// <summary>Gets the source associated with the active fluent configuration callback.</summary>
+    internal ApiConfigurationSource CurrentConfigurationSource =>
+        _configurationSourceScope.CurrentSource;
+
+    /// <summary>Gets the highest-precedence source that registered this relationship.</summary>
+    internal ApiConfigurationSource RegistrationSource =>
+        _registrationSource ?? ApiConfigurationSource.Explicit;
+
+    /// <summary>Runs a fluent callback at the supplied configuration-source precedence.</summary>
+    internal void ApplyConfiguration(ApiConfigurationSource source, Action configure)
+    {
+        _configurationSourceScope.Apply(source, configure);
+    }
+
+    /// <summary>Records the source that registered this relationship.</summary>
+    internal void SetRegistrationSource(ApiConfigurationSource source)
+    {
+        if (_registrationSource == null || source > _registrationSource.Value)
+        {
+            _registrationSource = source;
+        }
+    }
     #endregion
 
     #region Implementation Methods

@@ -567,7 +567,7 @@ public partial class ApiKeyTypeTests
             ApiObjectTypeName = nameof(KeyTwoScalarPartComposite),
             SelfObject = KeyTwoScalarPartCompositeWithNullId2PropertyInstance,
             NullHandling = ApiKeyNullHandling.ThrowOnNull,
-            ExpectedExceptionType = typeof(ApiKeyException)
+            ExpectedExceptionType = typeof(ApiSchemaMaterializationException)
         },
 
         new MaterializeKeyFromInstanceTest
@@ -576,7 +576,7 @@ public partial class ApiKeyTypeTests
             ApiObjectTypeName = nameof(KeyNestedComposite),
             SelfObject = KeyNestedCompositeWithNullNestedPartPropertyInstance,
             NullHandling = ApiKeyNullHandling.ThrowOnNull,
-            ExpectedExceptionType = typeof(ApiKeyException)
+            ExpectedExceptionType = typeof(ApiSchemaMaterializationException)
         },
 
         new MaterializeKeyFromInstanceTest
@@ -586,7 +586,7 @@ public partial class ApiKeyTypeTests
             SelfObject = KeyOwnedCompositeInstance,
             OwnerObject = null,
             NullHandling = ApiKeyNullHandling.ThrowOnNull,
-            ExpectedExceptionType = typeof(ApiKeyException)
+            ExpectedExceptionType = typeof(ApiSchemaMaterializationException)
         },
     ];
     #endregion
@@ -742,7 +742,7 @@ public partial class ApiKeyTypeTests
             ApiObjectTypeName = nameof(KeyTwoScalarPartComposite),
             ConfigureValuesExpression = static a => ApiKeyTypeMaterializeKeyFromValuesTestFactory.ConfigureMissingCompositeValue(a),
             NullHandling = ApiKeyNullHandling.ThrowOnNull,
-            ExpectedExceptionType = typeof(ApiKeyException)
+            ExpectedExceptionType = typeof(ApiSchemaMaterializationException)
         },
 
         new MaterializeKeyFromValuesTest
@@ -752,7 +752,7 @@ public partial class ApiKeyTypeTests
             ApiKeyTypeName = "PK_KeyOneScalarPart",
             ConfigureValuesExpression = static a => ApiKeyTypeMaterializeKeyFromValuesTestFactory.ConfigureInvalidTextParse(a),
             NullHandling = ApiKeyNullHandling.UseDefaultOnNull,
-            ExpectedExceptionType = typeof(ApiKeyException)
+            ExpectedExceptionType = typeof(ApiSchemaMaterializationException)
         },
 
         new MaterializeKeyFromValuesTest
@@ -761,7 +761,7 @@ public partial class ApiKeyTypeTests
             ApiObjectTypeName = nameof(KeyOneScalarPart),
             ApiKeyTypeName = "PK_KeyOneScalarPart",
             ConfigureValuesExpression = static a => ApiKeyTypeMaterializeKeyFromValuesTestFactory.ConfigureMismatchedApiKeyKind(a),
-            ExpectedExceptionType = typeof(ApiKeyException)
+            ExpectedExceptionType = typeof(ApiSchemaMaterializationException)
         },
     ];
     #endregion

@@ -64,8 +64,13 @@ public static class ApiRelationshipOneToOneBuilderExtensions
     {
         ArgumentNullException.ThrowIfNull(builder);
 
+        var source = builder.CurrentConfigurationSource;
         var dependentEndBuilder = new ApiRelationshipDependentEndBuilder<TDependent>();
-        configure?.Invoke(dependentEndBuilder);
+        if (configure != null)
+        {
+            dependentEndBuilder.ApplyConfiguration(source, () => configure(dependentEndBuilder));
+        }
+
         return builder.SetDependentEndBuilderCore(dependentEndBuilder);
     }
     #endregion

@@ -28,24 +28,36 @@ public sealed class ApiEnumTypeBuilder<TEnum>(ApiSchemaBuilderContext context)
     #region AddValue Methods
     /// <summary>
     ///     Adds an <see cref="ApiEnumValue"/> definition derived from the CLR enum member <paramref name="member"/>.
-    ///     The CLR name and ordinal are inferred automatically; the API name defaults to the CLR name.
+    ///     The CLR name and ordinal are inferred automatically. When no API name is supplied, its
+    ///     initial value is inferred from the CLR name and remains configurable by conventions.
     /// </summary>
     /// <param name="member">The CLR enum member to add.</param>
     /// <param name="apiName">
-    ///     Optional API name override. When <see langword="null"/> the CLR member name is used as the API name.
+    ///     Optional explicit API name. When <see langword="null"/>, the API name is inferred from
+    ///     the CLR member name.
     /// </param>
     /// <returns>The current builder instance.</returns>
     public ApiEnumTypeBuilder<TEnum> AddValue(TEnum member, string? apiName = null)
     {
         var clrName = member.ToString();
         var ordinal = Convert.ToInt32(member);
-        base.AddValue(apiName ?? clrName, clrName, ordinal);
+
+        if (apiName == null)
+        {
+            base.AddValueWithInferredName(clrName, ordinal);
+        }
+        else
+        {
+            base.AddValue(apiName, clrName, ordinal);
+        }
+
         return this;
     }
 
     /// <summary>
     ///     Adds an <see cref="ApiEnumValue"/> definition for every member declared on <typeparamref name="TEnum"/>.
-    ///     Each member uses its CLR name as the API name.
+    ///     Each API name is inferred from its CLR member name and remains configurable by
+    ///     conventions.
     /// </summary>
     /// <returns>The current builder instance.</returns>
     public ApiEnumTypeBuilder<TEnum> AddAllValues()

@@ -3,6 +3,8 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Schema.Configuration.Internal;
+
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
 /// <summary>
@@ -16,9 +18,21 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 public class ApiRelationshipAssociationBuilder(Type clrObjectType) : ExtensionBuilder<ApiRelationshipAssociationBuilder>
 {
     #region Fields
+    private readonly ApiConfigurationSourceScope _configurationSourceScope = new();
     private readonly Type _clrObjectType = clrObjectType ?? throw new ArgumentNullException(nameof(clrObjectType));
     private ApiKeyTypeBuilder? _foreignKeyTypeBuilderA;
     private ApiKeyTypeBuilder? _foreignKeyTypeBuilderB;
+    private ApiConfigurationSource? _foreignKeyTypeBuilderASource;
+    private ApiConfigurationSource? _foreignKeyTypeBuilderBSource;
+    #endregion
+
+    #region Properties
+    /// <summary>Gets the CLR object type represented by this association.</summary>
+    internal Type ClrObjectType => _clrObjectType;
+
+    /// <summary>Gets the source associated with the active fluent configuration callback.</summary>
+    internal ApiConfigurationSource CurrentConfigurationSource =>
+        _configurationSourceScope.CurrentSource;
     #endregion
 
     #region AddExtension Methods
@@ -42,8 +56,14 @@ public class ApiRelationshipAssociationBuilder(Type clrObjectType) : ExtensionBu
     /// <returns>The current builder instance.</returns>
     public ApiRelationshipAssociationBuilder WithForeignKeyA(Action<ApiKeyTypeBuilder>? configure = null)
     {
-        _foreignKeyTypeBuilderA = new ApiKeyTypeBuilder();
-        configure?.Invoke(_foreignKeyTypeBuilderA);
+        var source = this.CurrentConfigurationSource;
+        if (_foreignKeyTypeBuilderASource == null || source >= _foreignKeyTypeBuilderASource.Value)
+        {
+            _foreignKeyTypeBuilderA = new ApiKeyTypeBuilder();
+            configure?.Invoke(_foreignKeyTypeBuilderA);
+            _foreignKeyTypeBuilderASource = source;
+        }
+
         return this;
     }
 
@@ -54,8 +74,14 @@ public class ApiRelationshipAssociationBuilder(Type clrObjectType) : ExtensionBu
     /// <returns>The current builder instance.</returns>
     public ApiRelationshipAssociationBuilder WithForeignKeyB(Action<ApiKeyTypeBuilder>? configure = null)
     {
-        _foreignKeyTypeBuilderB = new ApiKeyTypeBuilder();
-        configure?.Invoke(_foreignKeyTypeBuilderB);
+        var source = this.CurrentConfigurationSource;
+        if (_foreignKeyTypeBuilderBSource == null || source >= _foreignKeyTypeBuilderBSource.Value)
+        {
+            _foreignKeyTypeBuilderB = new ApiKeyTypeBuilder();
+            configure?.Invoke(_foreignKeyTypeBuilderB);
+            _foreignKeyTypeBuilderBSource = source;
+        }
+
         return this;
     }
 
@@ -65,7 +91,13 @@ public class ApiRelationshipAssociationBuilder(Type clrObjectType) : ExtensionBu
     protected void SetForeignKeyTypeBuilderACore(ApiKeyTypeBuilder builder)
     {
         ArgumentNullException.ThrowIfNull(builder);
-        _foreignKeyTypeBuilderA = builder;
+
+        var source = this.CurrentConfigurationSource;
+        if (_foreignKeyTypeBuilderASource == null || source >= _foreignKeyTypeBuilderASource.Value)
+        {
+            _foreignKeyTypeBuilderA = builder;
+            _foreignKeyTypeBuilderASource = source;
+        }
     }
 
     /// <summary>
@@ -74,7 +106,60 @@ public class ApiRelationshipAssociationBuilder(Type clrObjectType) : ExtensionBu
     protected void SetForeignKeyTypeBuilderBCore(ApiKeyTypeBuilder builder)
     {
         ArgumentNullException.ThrowIfNull(builder);
-        _foreignKeyTypeBuilderB = builder;
+
+        var source = this.CurrentConfigurationSource;
+        if (_foreignKeyTypeBuilderBSource == null || source >= _foreignKeyTypeBuilderBSource.Value)
+        {
+            _foreignKeyTypeBuilderB = builder;
+            _foreignKeyTypeBuilderBSource = source;
+        }
+    }
+
+    /// <summary>
+    ///     Merges configured key-role facets from another builder without replacing facets that
+    ///     were supplied by a higher-precedence source.
+    /// </summary>
+    internal void MergeConfigurationFrom(ApiRelationshipAssociationBuilder builder)
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+
+        if
+        (
+            builder._foreignKeyTypeBuilderA != null &&
+            builder._foreignKeyTypeBuilderASource != null &&
+            (
+                _foreignKeyTypeBuilderASource == null ||
+                builder._foreignKeyTypeBuilderASource.Value >=
+                    _foreignKeyTypeBuilderASource.Value
+            )
+        )
+        {
+            _foreignKeyTypeBuilderA = builder._foreignKeyTypeBuilderA;
+            _foreignKeyTypeBuilderASource = builder._foreignKeyTypeBuilderASource;
+        }
+
+        if
+        (
+            builder._foreignKeyTypeBuilderB != null &&
+            builder._foreignKeyTypeBuilderBSource != null &&
+            (
+                _foreignKeyTypeBuilderBSource == null ||
+                builder._foreignKeyTypeBuilderBSource.Value >=
+                    _foreignKeyTypeBuilderBSource.Value
+            )
+        )
+        {
+            _foreignKeyTypeBuilderB = builder._foreignKeyTypeBuilderB;
+            _foreignKeyTypeBuilderBSource = builder._foreignKeyTypeBuilderBSource;
+        }
+    }
+    #endregion
+
+    #region Configuration Source Methods
+    /// <summary>Runs a fluent callback at the supplied configuration-source precedence.</summary>
+    internal void ApplyConfiguration(ApiConfigurationSource source, Action configure)
+    {
+        _configurationSourceScope.Apply(source, configure);
     }
     #endregion
 

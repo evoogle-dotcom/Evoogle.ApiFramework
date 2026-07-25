@@ -51,4 +51,3 @@ public abstract class ExtensionBuilder<TBuilder>
         _extensions.Count > 0 ? new OrderedDictionary<Type, object>(_extensions) : null;
     #endregion
 }
-

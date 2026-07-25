@@ -13,7 +13,7 @@ public class ApiException : Exception
     #region Constructors
     /// <summary>
     ///     Initializes a new instance of the <see cref="ApiException"/> class with a default error message.
-    /// </summary>    
+    /// </summary>
     public ApiException()
         : base("An error occurred during an API operation.")
     { }

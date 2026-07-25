@@ -24,7 +24,7 @@ public static class ApiObjectTypeBuilderRelationshipExtensions
         ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
         ArgumentNullException.ThrowIfNull(configure);
 
-        configure(builder.GetOrAddOneToOneRelationshipBuilderCore(apiName));
+        builder.AddOneToOneRelationshipCore(apiName, configure);
         return builder;
     }
 
@@ -60,7 +60,7 @@ public static class ApiObjectTypeBuilderRelationshipExtensions
         ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
         ArgumentNullException.ThrowIfNull(configuration);
 
-        configuration.Configure(builder.GetOrAddOneToOneRelationshipBuilderCore(apiName));
+        builder.AddOneToOneRelationshipCore(apiName, configuration.Configure);
         return builder;
     }
 
@@ -98,7 +98,7 @@ public static class ApiObjectTypeBuilderRelationshipExtensions
         ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
         ArgumentNullException.ThrowIfNull(configure);
 
-        configure(builder.GetOrAddOneToManyRelationshipBuilderCore(apiName));
+        builder.AddOneToManyRelationshipCore(apiName, configure);
         return builder;
     }
 
@@ -134,7 +134,7 @@ public static class ApiObjectTypeBuilderRelationshipExtensions
         ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
         ArgumentNullException.ThrowIfNull(configuration);
 
-        configuration.Configure(builder.GetOrAddOneToManyRelationshipBuilderCore(apiName));
+        builder.AddOneToManyRelationshipCore(apiName, configuration.Configure);
         return builder;
     }
 
@@ -172,7 +172,7 @@ public static class ApiObjectTypeBuilderRelationshipExtensions
         ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
         ArgumentNullException.ThrowIfNull(configure);
 
-        configure(builder.GetOrAddManyToManyRelationshipBuilderCore(apiName));
+        builder.AddManyToManyRelationshipCore(apiName, configure);
         return builder;
     }
 
@@ -208,7 +208,7 @@ public static class ApiObjectTypeBuilderRelationshipExtensions
         ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
         ArgumentNullException.ThrowIfNull(configuration);
 
-        configuration.Configure(builder.GetOrAddManyToManyRelationshipBuilderCore(apiName));
+        builder.AddManyToManyRelationshipCore(apiName, configuration.Configure);
         return builder;
     }
 

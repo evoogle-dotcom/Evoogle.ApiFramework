@@ -7,7 +7,6 @@ using System.Linq.Expressions;
 using System.Text.Json.Serialization;
 
 using Evoogle.ApiFramework.Schema.TestData;
-using Evoogle.ApiFramework.TestData;
 using Evoogle.Extensions;
 using Evoogle.XUnit;
 using Evoogle.XUnit.Json;
@@ -136,4 +135,3 @@ public class ApiRelationshipBuilderGenericTests(ITestOutputHelper output) : XUni
     public void BuildRelationship(IXUnitTest test) => test.Execute(this);
     #endregion
 }
-

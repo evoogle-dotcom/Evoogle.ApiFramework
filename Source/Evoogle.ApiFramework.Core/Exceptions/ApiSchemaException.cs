@@ -15,7 +15,7 @@ public class ApiSchemaException : ApiException
     #region Constructors
     /// <summary>
     ///     Initializes a new instance of the <see cref="ApiSchemaException"/> class with a default schema error message.
-    /// </summary>    
+    /// </summary>
     public ApiSchemaException()
         : base($"An {nameof(ApiSchema)} error occurred.")
     { }

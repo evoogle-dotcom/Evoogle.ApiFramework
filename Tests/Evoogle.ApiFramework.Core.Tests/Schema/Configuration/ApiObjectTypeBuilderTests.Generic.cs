@@ -13,8 +13,6 @@ using Evoogle.Extensions;
 using Evoogle.XUnit;
 using Evoogle.XUnit.Json;
 
-using FluentAssertions;
-
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
 public partial class ApiObjectTypeBuilderTests

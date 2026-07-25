@@ -199,4 +199,3 @@ public class ApiScalarTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
     public void BuildWithDefaultName(IXUnitTest test) => test.Execute(this);
     #endregion
 }
-

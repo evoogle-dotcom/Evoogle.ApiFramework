@@ -14,6 +14,11 @@ public class ApiKeyPathSegmentBuilder : ExtensionBuilder<ApiKeyPathSegmentBuilde
     private readonly string _clrPropertyName;
     #endregion
 
+    #region Properties
+    /// <summary>Gets the CLR property name for this segment.</summary>
+    internal string ClrPropertyName => _clrPropertyName;
+    #endregion
+
     #region Constructors
     /// <summary>
     ///     Initializes an <see cref="ApiKeyPathSegmentBuilder"/> with the specified CLR property name.

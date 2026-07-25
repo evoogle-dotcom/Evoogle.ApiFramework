@@ -22,6 +22,8 @@ public sealed class ApiRelationshipOneToManyBuilder(string apiName)
     #region Fields
     private ApiRelationshipPrincipalEndBuilder? _principalEndBuilder;
     private ApiRelationshipDependentEndBuilder? _dependentEndBuilder;
+    private Internal.ApiConfigurationSource? _principalEndBuilderSource;
+    private Internal.ApiConfigurationSource? _dependentEndBuilderSource;
     #endregion
 
     #region AddExtension Methods
@@ -46,9 +48,40 @@ public sealed class ApiRelationshipOneToManyBuilder(string apiName)
     {
         ArgumentNullException.ThrowIfNull(clrPrincipalType);
 
+        var source = this.CurrentConfigurationSource;
+        if
+        (
+            _principalEndBuilder != null &&
+            _principalEndBuilder.ClrObjectType == clrPrincipalType &&
+            _principalEndBuilderSource != null &&
+            source < _principalEndBuilderSource.Value
+        )
+        {
+            if (configure != null)
+            {
+                _principalEndBuilder.ApplyConfiguration
+                (
+                    source,
+                    () => configure(_principalEndBuilder)
+                );
+            }
+
+            return this;
+        }
+
+        if (_principalEndBuilderSource != null && source < _principalEndBuilderSource.Value)
+        {
+            return this;
+        }
+
         var builder = new ApiRelationshipPrincipalEndBuilder(clrPrincipalType);
-        configure?.Invoke(builder);
+        if (configure != null)
+        {
+            builder.ApplyConfiguration(source, () => configure(builder));
+        }
+
         _principalEndBuilder = builder;
+        _principalEndBuilderSource = source;
         return this;
     }
 
@@ -64,10 +97,11 @@ public sealed class ApiRelationshipOneToManyBuilder(string apiName)
         ArgumentNullException.ThrowIfNull(clrPrincipalType);
         ArgumentException.ThrowIfNullOrWhiteSpace(apiPrincipalKeyTypeName, nameof(apiPrincipalKeyTypeName));
 
-        var builder = new ApiRelationshipPrincipalEndBuilder(clrPrincipalType);
-        builder.WithPrincipalKey(apiPrincipalKeyTypeName);
-        _principalEndBuilder = builder;
-        return this;
+        return this.From
+        (
+            clrPrincipalType,
+            builder => builder.WithPrincipalKey(apiPrincipalKeyTypeName)
+        );
     }
 
     /// <summary>
@@ -80,9 +114,40 @@ public sealed class ApiRelationshipOneToManyBuilder(string apiName)
     {
         ArgumentNullException.ThrowIfNull(clrDependentType);
 
+        var source = this.CurrentConfigurationSource;
+        if
+        (
+            _dependentEndBuilder != null &&
+            _dependentEndBuilder.ClrObjectType == clrDependentType &&
+            _dependentEndBuilderSource != null &&
+            source < _dependentEndBuilderSource.Value
+        )
+        {
+            if (configure != null)
+            {
+                _dependentEndBuilder.ApplyConfiguration
+                (
+                    source,
+                    () => configure(_dependentEndBuilder)
+                );
+            }
+
+            return this;
+        }
+
+        if (_dependentEndBuilderSource != null && source < _dependentEndBuilderSource.Value)
+        {
+            return this;
+        }
+
         var builder = new ApiRelationshipDependentEndBuilder(clrDependentType);
-        configure?.Invoke(builder);
+        if (configure != null)
+        {
+            builder.ApplyConfiguration(source, () => configure(builder));
+        }
+
         _dependentEndBuilder = builder;
+        _dependentEndBuilderSource = source;
         return this;
     }
     #endregion
@@ -131,8 +196,37 @@ public sealed class ApiRelationshipOneToManyBuilder(string apiName)
     internal ApiRelationshipOneToManyBuilder SetDependentEndBuilderCore(ApiRelationshipDependentEndBuilder builder)
     {
         ArgumentNullException.ThrowIfNull(builder);
-        _dependentEndBuilder = builder;
+
+        var source = this.CurrentConfigurationSource;
+        if
+        (
+            _dependentEndBuilder != null &&
+            _dependentEndBuilder.ClrObjectType == builder.ClrObjectType &&
+            _dependentEndBuilderSource != null &&
+            source < _dependentEndBuilderSource.Value
+        )
+        {
+            _dependentEndBuilder.MergeConfigurationFrom(builder);
+            return this;
+        }
+
+        if (_dependentEndBuilderSource == null || source >= _dependentEndBuilderSource.Value)
+        {
+            _dependentEndBuilder = builder;
+            _dependentEndBuilderSource = source;
+        }
+
         return this;
+    }
+
+    /// <summary>Runs a fluent callback at the supplied configuration-source precedence.</summary>
+    internal void ApplyConfiguration
+    (
+        Internal.ApiConfigurationSource source,
+        Action<ApiRelationshipOneToManyBuilder> configure
+    )
+    {
+        base.ApplyConfiguration(source, () => configure(this));
     }
     #endregion
 }

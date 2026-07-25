@@ -414,4 +414,3 @@ public partial class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnit
     public void Build(IXUnitTest test) => test.Execute(this);
     #endregion
 }
-

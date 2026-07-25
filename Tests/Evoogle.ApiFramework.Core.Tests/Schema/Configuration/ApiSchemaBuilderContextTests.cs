@@ -3,6 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.TestData;
 using Evoogle.Extensions;
 using Evoogle.XUnit;
@@ -79,5 +80,37 @@ public class ApiSchemaBuilderContextTests(ITestOutputHelper output) : XUnitTests
     [Theory]
     [MemberData(nameof(GetOrAddTheoryData))]
     public void GetOrAdd(IXUnitTest test) => test.Execute(this);
-}
 
+    [Fact]
+    public void GetOrAddObjectTypeBuilderGenericThrowsConfigurationExceptionWhenNonGenericBuilderExists()
+    {
+        var context = new ApiSchemaBuilderContext();
+        context.GetOrAddObjectTypeBuilder(typeof(Order));
+
+        Action act = () => context.GetOrAddObjectTypeBuilder<Order>();
+
+        act.Should().Throw<ApiSchemaConfigurationException>();
+    }
+
+    [Fact]
+    public void GetOrAddScalarTypeBuilderGenericThrowsConfigurationExceptionWhenNonGenericBuilderExists()
+    {
+        var context = new ApiSchemaBuilderContext();
+        context.GetOrAddScalarTypeBuilder(typeof(int));
+
+        Action act = () => context.GetOrAddScalarTypeBuilder<int>();
+
+        act.Should().Throw<ApiSchemaConfigurationException>();
+    }
+
+    [Fact]
+    public void GetOrAddTypedRelationshipBuilderThrowsConfigurationExceptionWhenDifferentKindExists()
+    {
+        var context = new ApiSchemaBuilderContext();
+        context.GetOrAddOneToOneRelationshipBuilder("REL_Test");
+
+        var act = () => context.GetOrAddOneToManyRelationshipBuilder("REL_Test");
+
+        act.Should().Throw<ApiSchemaConfigurationException>();
+    }
+}

@@ -3,6 +3,8 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Schema.Configuration.Internal;
+
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
 /// <summary>
@@ -61,23 +63,16 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
 
     #region AddProperty Methods
     /// <summary>
-    ///     Adds an <see cref="ApiProperty"/> definition to the object type.
+    ///     Adds an <see cref="ApiProperty"/> definition to the object type using an explicitly
+    ///     supplied API name.
     /// </summary>
-    /// <param name="apiName">The API property name.</param>
+    /// <param name="apiName">The explicit API property name.</param>
     /// <param name="clrName">The CLR property name.</param>
     /// <param name="configure">Optional callback to configure the added property.</param>
     /// <returns>The current builder instance.</returns>
     public ApiObjectTypeBuilder AddProperty(string apiName, string clrName, Action<ApiPropertyBuilder>? configure = null)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
-        ArgumentException.ThrowIfNullOrWhiteSpace(clrName, nameof(clrName));
-
-        var apiPropertyBuilder = new ApiPropertyBuilder(apiName, clrName);
-
-        configure?.Invoke(apiPropertyBuilder);
-
-        _apiPropertyBuilders.Add(apiPropertyBuilder);
-
+        this.AddPropertyCore(apiName, clrName, ApiConfigurationSource.Explicit, configure);
         return this;
     }
     #endregion
@@ -169,16 +164,176 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
         _apiKeyTypeBuilders.Add(builder);
     }
 
-    /// <summary>Gets or creates a schema-level one-to-one relationship builder.</summary>
-    internal ApiRelationshipOneToOneBuilder GetOrAddOneToOneRelationshipBuilderCore(string apiName)
-        => this.Context.GetOrAddOneToOneRelationshipBuilder(apiName);
+    /// <summary>
+    ///     Finds an existing key type builder with the given API name and appends the specified path
+    ///     to it, or creates a new key type builder with that path when no matching key exists.
+    ///     Used by annotation readers to accumulate composite key paths from multiple
+    ///     <see cref="Annotations.ApiKeyAttribute"/> declarations.
+    /// </summary>
+    internal void AddKeyOrAppendPath(string apiKeyName, Type clrRootType, string clrPropertyName)
+    {
+        var existing = _apiKeyTypeBuilders.FirstOrDefault(b => b.ApiName == apiKeyName);
+        if (existing != null)
+        {
+            // Guard against convention + annotation both adding the same single-segment path.
+            if (!existing.HasSimplePath(clrRootType, clrPropertyName))
+            {
+                existing.AddPath(clrRootType, clrPropertyName);
+            }
+        }
+        else
+        {
+            var builder = new ApiKeyTypeBuilder(apiKeyName);
+            builder.AddPath(clrRootType, clrPropertyName);
+            _apiKeyTypeBuilders.Add(builder);
+        }
+    }
 
-    /// <summary>Gets or creates a schema-level one-to-many relationship builder.</summary>
-    internal ApiRelationshipOneToManyBuilder GetOrAddOneToManyRelationshipBuilderCore(string apiName)
-        => this.Context.GetOrAddOneToManyRelationshipBuilder(apiName);
+    /// <summary>Gets all <see cref="ApiPropertyBuilder"/> instances currently on this object type builder.</summary>
+    internal IEnumerable<ApiPropertyBuilder> ApiPropertyBuilders => _apiPropertyBuilders;
 
-    /// <summary>Gets or creates a schema-level many-to-many relationship builder.</summary>
-    internal ApiRelationshipManyToManyBuilder GetOrAddManyToManyRelationshipBuilderCore(string apiName)
-        => this.Context.GetOrAddManyToManyRelationshipBuilder(apiName);
+    /// <summary>
+    ///     Explicitly adds the CLR member while initializing its API name from the CLR name at
+    ///     <see cref="ApiConfigurationSource.Convention"/> precedence.
+    /// </summary>
+    /// <param name="clrName">
+    ///     The CLR property or field name to add and use as the candidate API name.
+    /// </param>
+    /// <param name="configure">Optional callback to configure the added property.</param>
+    /// <returns>The current builder instance.</returns>
+    internal ApiObjectTypeBuilder AddPropertyWithInferredName
+    (
+        string clrName,
+        Action<ApiPropertyBuilder>? configure = null
+    )
+    {
+        this.AddPropertyCore
+        (
+            clrName,
+            clrName,
+            ApiConfigurationSource.Convention,
+            configure
+        );
+
+        return this;
+    }
+
+    /// <summary>
+    ///     Adds a property builder for the given CLR member name only when no existing builder
+    ///     already targets that CLR name. The new builder is initialized at
+    ///     <see cref="ApiConfigurationSource.Convention"/> precedence; its API name defaults
+    ///     to the CLR name and can be overridden by a later naming convention.
+    /// </summary>
+    /// <param name="clrName">The CLR property or field name to add.</param>
+    /// <returns>
+    ///     The newly created <see cref="ApiPropertyBuilder"/>, or <c>null</c> if a builder
+    ///     for that CLR name was already present.
+    /// </returns>
+    internal ApiPropertyBuilder? AddPropertyIfAbsent(string clrName)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(clrName, nameof(clrName));
+
+        if (_apiPropertyBuilders.Any(b => b.ClrName == clrName))
+        {
+            return null;
+        }
+
+        return this.AddPropertyCore
+        (
+            clrName,
+            clrName,
+            ApiConfigurationSource.Convention,
+            configure: null
+        );
+    }
+
+    private ApiPropertyBuilder AddPropertyCore
+    (
+        string apiName,
+        string clrName,
+        ApiConfigurationSource apiNameSource,
+        Action<ApiPropertyBuilder>? configure
+    )
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
+        ArgumentException.ThrowIfNullOrWhiteSpace(clrName, nameof(clrName));
+
+        var builder = new ApiPropertyBuilder(apiName, clrName, apiNameSource);
+        configure?.Invoke(builder);
+        _apiPropertyBuilders.Add(builder);
+        return builder;
+    }
+
+    /// <summary>
+    ///     Adds a key type builder with the given API name only when no existing builder
+    ///     with that API name is already present.
+    /// </summary>
+    /// <param name="apiKeyName">The API name of the key type to add.</param>
+    /// <param name="configure">Optional callback to configure the new key type builder.</param>
+    /// <returns>
+    ///     <c>true</c> if the key type was added; <c>false</c> if a key type with that name already existed.
+    /// </returns>
+    internal bool AddKeyIfAbsent(string apiKeyName, Action<ApiKeyTypeBuilder>? configure = null)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKeyName, nameof(apiKeyName));
+
+        if (_apiKeyTypeBuilders.Any(b => b.ApiName == apiKeyName))
+        {
+            return false;
+        }
+
+        var builder = new ApiKeyTypeBuilder(apiKeyName);
+        configure?.Invoke(builder);
+        _apiKeyTypeBuilders.Add(builder);
+        return true;
+    }
+
+    /// <summary>Configures a schema-level one-to-one relationship at the active source.</summary>
+    internal void AddOneToOneRelationshipCore
+    (
+        string apiName,
+        Action<ApiRelationshipOneToOneBuilder> configure
+    )
+    {
+        var source = this.Context.CurrentConfigurationSource;
+        var builder = this.Context.GetOrAddOneToOneRelationshipBuilder(apiName, source);
+
+        if (builder != null)
+        {
+            builder.ApplyConfiguration(source, () => configure(builder));
+        }
+    }
+
+    /// <summary>Configures a schema-level one-to-many relationship at the active source.</summary>
+    internal void AddOneToManyRelationshipCore
+    (
+        string apiName,
+        Action<ApiRelationshipOneToManyBuilder> configure
+    )
+    {
+        var source = this.Context.CurrentConfigurationSource;
+        var builder = this.Context.GetOrAddOneToManyRelationshipBuilder(apiName, source);
+
+        if (builder != null)
+        {
+            builder.ApplyConfiguration(source, () => configure(builder));
+        }
+    }
+
+    /// <summary>Configures a schema-level many-to-many relationship at the active source.</summary>
+    internal void AddManyToManyRelationshipCore
+    (
+        string apiName,
+        Action<ApiRelationshipManyToManyBuilder> configure
+    )
+    {
+        var source = this.Context.CurrentConfigurationSource;
+        var builder = this.Context.GetOrAddManyToManyRelationshipBuilder(apiName, source);
+
+        if (builder != null)
+        {
+            builder.ApplyConfiguration(source, () => configure(builder));
+        }
+    }
     #endregion
 }

@@ -32,8 +32,13 @@ public sealed class ApiRelationshipDependentEndBuilder<TDependent>() : ApiRelati
     /// <returns>The current builder instance.</returns>
     public ApiRelationshipDependentEndBuilder<TDependent> WithForeignKey(Action<ApiKeyTypeBuilder<TDependent>>? configure = null)
     {
+        var source = this.CurrentConfigurationSource;
         var builder = new ApiKeyTypeBuilder<TDependent>();
-        configure?.Invoke(builder);
+        if (configure != null)
+        {
+            this.ApplyConfiguration(source, () => configure(builder));
+        }
+
         base.SetForeignKeyTypeBuilderCore(builder);
         return this;
     }

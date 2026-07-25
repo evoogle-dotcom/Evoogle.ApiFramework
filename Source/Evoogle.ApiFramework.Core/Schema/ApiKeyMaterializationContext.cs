@@ -170,7 +170,7 @@ public sealed class ApiKeyMaterializationContext
         }
 
         var typeName = clrRootType.SafeToName();
-        throw new ApiKeyException($"No root object registered for type '{typeName}'. Call With<{typeName}>() before materializing.");
+        throw new ApiSchemaMaterializationException($"No root object registered for type '{typeName}'. Call With<{typeName}>() before materializing.");
     }
 
     internal bool TryResolveRoot(Type clrRootType, out object? result)

@@ -127,7 +127,8 @@ public static class ApiObjectTypeBuilderGenericExtensions
 
     #region AddProperty Methods
     /// <summary>
-    ///     Adds an <see cref="ApiProperty"/> definition, deriving the CLR name from <paramref name="clrProperty"/>.
+    ///     Explicitly includes an <see cref="ApiProperty"/> and infers its candidate API name
+    ///     from the CLR member selected by <paramref name="clrProperty"/>.
     /// </summary>
     public static ApiObjectTypeBuilder<TObject> AddProperty<TObject, TResult>
     (
@@ -140,7 +141,7 @@ public static class ApiObjectTypeBuilderGenericExtensions
         ArgumentNullException.ThrowIfNull(clrProperty);
 
         var clrName = StaticReflection.GetMemberName(clrProperty);
-        builder.AddProperty(clrName, clrName, configure);
+        builder.AddPropertyWithInferredName(clrName, configure);
         return builder;
     }
 
@@ -167,7 +168,8 @@ public static class ApiObjectTypeBuilderGenericExtensions
 
     #region AddRequiredProperty Methods
     /// <summary>
-    ///     Adds an <see cref="ApiProperty"/> definition marked as required using a type-safe CLR property selector.
+    ///     Explicitly includes an <see cref="ApiProperty"/> marked as required and infers its
+    ///     candidate API name from the CLR member selected by <paramref name="clrProperty"/>.
     /// </summary>
     public static ApiObjectTypeBuilder<TObject> AddRequiredProperty<TObject, TResult>
     (
@@ -180,14 +182,19 @@ public static class ApiObjectTypeBuilderGenericExtensions
         ArgumentNullException.ThrowIfNull(clrProperty);
 
         var clrName = StaticReflection.GetMemberName(clrProperty);
-        builder.AddProperty(clrName, clrName, b => { b.AsRequired(); configure?.Invoke(b); });
+        builder.AddPropertyWithInferredName
+        (
+            clrName,
+            b => { b.AsRequired(); configure?.Invoke(b); }
+        );
         return builder;
     }
     #endregion
 
     #region AddOptionalProperty Methods
     /// <summary>
-    ///     Adds an <see cref="ApiProperty"/> definition marked as optional using a type-safe CLR property selector.
+    ///     Explicitly includes an <see cref="ApiProperty"/> marked as optional and infers its
+    ///     candidate API name from the CLR member selected by <paramref name="clrProperty"/>.
     /// </summary>
     public static ApiObjectTypeBuilder<TObject> AddOptionalProperty<TObject, TResult>
     (
@@ -200,7 +207,11 @@ public static class ApiObjectTypeBuilderGenericExtensions
         ArgumentNullException.ThrowIfNull(clrProperty);
 
         var clrName = StaticReflection.GetMemberName(clrProperty);
-        builder.AddProperty(clrName, clrName, b => { b.AsOptional(); configure?.Invoke(b); });
+        builder.AddPropertyWithInferredName
+        (
+            clrName,
+            b => { b.AsOptional(); configure?.Invoke(b); }
+        );
         return builder;
     }
     #endregion

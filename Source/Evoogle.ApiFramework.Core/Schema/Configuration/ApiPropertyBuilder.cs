@@ -13,20 +13,46 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 /// <summary>
 ///     Builds <see cref="ApiProperty"/> definitions from CLR property/field metadata and optional modifiers.
 /// </summary>
-/// <param name="apiName">The API name of the property.</param>
-/// <param name="clrName">The CLR property name.</param>
-public class ApiPropertyBuilder(string apiName, string clrName) : ExtensionBuilder<ApiPropertyBuilder>
+public class ApiPropertyBuilder : ExtensionBuilder<ApiPropertyBuilder>
 {
     #region Fields
-    private string _apiName = ValidateName(apiName, nameof(apiName));
-    private readonly string _clrName = ValidateName(clrName, nameof(clrName));
+    private string _apiName;
+    private ApiConfigurationSource _apiNameSource;
+    private readonly string _clrName;
+    private Action<ApiTypeModifiersBuilder>? _modifiers;
+    private ApiConfigurationSource? _modifiersSource;
+    #endregion
+
+    #region Constructors
+    /// <summary>
+    ///     Initializes a new instance of <see cref="ApiPropertyBuilder"/> with an explicit API name
+    ///     and the CLR property or field name.
+    /// </summary>
+    /// <param name="apiName">The API name of the property.</param>
+    /// <param name="clrName">The CLR property or field name.</param>
+    public ApiPropertyBuilder(string apiName, string clrName)
+        : this(apiName, clrName, ApiConfigurationSource.Explicit)
+    {
+    }
+
+    internal ApiPropertyBuilder(string apiName, string clrName, ApiConfigurationSource apiNameSource)
+    {
+        _apiName = ValidateName(apiName, nameof(apiName));
+        _clrName = ValidateName(clrName, nameof(clrName));
+        _apiNameSource = apiNameSource;
+    }
     #endregion
 
     #region Properties
     /// <summary>
-    ///     Gets or sets a delegate that configures additional type modifiers for the property.
+    ///     Gets the API name currently configured for the property.
     /// </summary>
-    internal Action<ApiTypeModifiersBuilder>? Modifiers { get; set; }
+    internal string ApiName => _apiName;
+
+    /// <summary>
+    ///     Gets the CLR property or field name this builder represents.
+    /// </summary>
+    internal string ClrName => _clrName;
     #endregion
 
     #region AddExtension Methods
@@ -44,7 +70,7 @@ public class ApiPropertyBuilder(string apiName, string clrName) : ExtensionBuild
 
     #region With Methods
     /// <summary>
-    ///     Configures type modifiers for the property.
+    ///     Configures type modifiers for the property at <see cref="ApiConfigurationSource.Explicit"/> precedence.
     /// </summary>
     /// <param name="configure">Callback to configure type modifiers.</param>
     /// <returns>The current builder instance.</returns>
@@ -52,12 +78,11 @@ public class ApiPropertyBuilder(string apiName, string clrName) : ExtensionBuild
     {
         ArgumentNullException.ThrowIfNull(configure);
 
-        this.Modifiers = configure;
-        return this;
+        return this.SetModifiers(configure, ApiConfigurationSource.Explicit);
     }
 
     /// <summary>
-    ///    Sets the API name for the property being built.
+    ///     Sets the API name for the property at <see cref="ApiConfigurationSource.Explicit"/> precedence.
     /// </summary>
     /// <param name="apiName">The API name to use.</param>
     /// <returns>The current builder instance.</returns>
@@ -65,9 +90,38 @@ public class ApiPropertyBuilder(string apiName, string clrName) : ExtensionBuild
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
 
-        _apiName = apiName;
-        return this;
+        return this.SetApiName(apiName, ApiConfigurationSource.Explicit);
     }
+    #endregion
+
+    #region Internal Convention/Annotation Methods
+    /// <summary>
+    ///     Sets the API name at <see cref="ApiConfigurationSource.Convention"/> precedence.
+    ///     Has no effect if a higher-precedence value has already been applied.
+    /// </summary>
+    internal ApiPropertyBuilder SetApiNameConvention(string apiName)
+        => this.SetApiName(apiName, ApiConfigurationSource.Convention);
+
+    /// <summary>
+    ///     Sets the API name at <see cref="ApiConfigurationSource.DataAnnotation"/> precedence.
+    ///     Has no effect if an explicit value has already been applied.
+    /// </summary>
+    internal ApiPropertyBuilder SetApiNameDataAnnotation(string apiName)
+        => this.SetApiName(apiName, ApiConfigurationSource.DataAnnotation);
+
+    /// <summary>
+    ///     Sets the type modifier delegate at <see cref="ApiConfigurationSource.Convention"/> precedence.
+    ///     Has no effect if a higher-precedence value has already been applied.
+    /// </summary>
+    internal ApiPropertyBuilder SetModifiersConvention(Action<ApiTypeModifiersBuilder> configure)
+        => this.SetModifiers(configure, ApiConfigurationSource.Convention);
+
+    /// <summary>
+    ///     Sets the type modifier delegate at <see cref="ApiConfigurationSource.DataAnnotation"/> precedence.
+    ///     Has no effect if an explicit value has already been applied.
+    /// </summary>
+    internal ApiPropertyBuilder SetModifiersDataAnnotation(Action<ApiTypeModifiersBuilder> configure)
+        => this.SetModifiers(configure, ApiConfigurationSource.DataAnnotation);
     #endregion
 
     #region Build Methods
@@ -105,16 +159,40 @@ public class ApiPropertyBuilder(string apiName, string clrName) : ExtensionBuild
         return this.BuildFromNullabilityInfo(clrFieldNullabilityInfo, ClrMemberKind.Field);
     }
 
-    private ApiTypeModifiers BuildModifiers(ApiTypeModifiers apiInitialTypeModifiers)
+    private ApiTypeModifiers BuildModifiers(ApiTypeModifiers apiNullabilityModifiers)
     {
-        if (this.Modifiers == null)
+        // No tier has set modifiers: fall back to the nullability-derived default.
+        if (_modifiers == null)
         {
-            return apiInitialTypeModifiers;
+            return apiNullabilityModifiers;
         }
 
-        var modifierBuilder = new ApiTypeModifiersBuilder(apiInitialTypeModifiers);
-        this.Modifiers.Invoke(modifierBuilder);
+        // A tier set modifiers; start from None so the stored delegate has full control.
+        var modifierBuilder = new ApiTypeModifiersBuilder(ApiTypeModifiers.None);
+        _modifiers.Invoke(modifierBuilder);
         return modifierBuilder.Build();
+    }
+
+    private ApiPropertyBuilder SetApiName(string apiName, ApiConfigurationSource source)
+    {
+        if (source >= _apiNameSource)
+        {
+            _apiName = apiName;
+            _apiNameSource = source;
+        }
+
+        return this;
+    }
+
+    private ApiPropertyBuilder SetModifiers(Action<ApiTypeModifiersBuilder> configure, ApiConfigurationSource source)
+    {
+        if (_modifiersSource == null || source >= _modifiersSource.Value)
+        {
+            _modifiers = configure;
+            _modifiersSource = source;
+        }
+
+        return this;
     }
 
     private ApiProperty BuildFromNullabilityInfo(MemberNullableInfo clrNullabilityInfo, ClrMemberKind clrMemberKind)

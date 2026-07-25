@@ -17,7 +17,7 @@ public static class ApiCollectionTypeExtensions
     /// <param name="apiCollectionType">The <see cref="ApiCollectionType"/> instance.</param>
     /// <returns>
     ///     <c>true</c> if the <see cref="ApiCollectionType.ApiItemTypeModifiers"/> has the <see cref="ApiTypeModifiers.Required"/> flag set; otherwise, <c>false</c>.
-    /// </returns>    
+    /// </returns>
     public static bool IsItemRequired(this ApiCollectionType apiCollectionType) => apiCollectionType.ApiItemTypeModifiers.HasFlag(ApiTypeModifiers.Required);
 
     /// <summary>

@@ -33,8 +33,13 @@ public sealed class ApiRelationshipAssociationBuilder<TAssociation>()
     /// <returns>The current builder instance.</returns>
     public ApiRelationshipAssociationBuilder<TAssociation> WithForeignKeyA(Action<ApiKeyTypeBuilder<TAssociation>>? configure = null)
     {
+        var source = this.CurrentConfigurationSource;
         var builder = new ApiKeyTypeBuilder<TAssociation>();
-        configure?.Invoke(builder);
+        if (configure != null)
+        {
+            this.ApplyConfiguration(source, () => configure(builder));
+        }
+
         base.SetForeignKeyTypeBuilderACore(builder);
         return this;
     }
@@ -47,8 +52,13 @@ public sealed class ApiRelationshipAssociationBuilder<TAssociation>()
     /// <returns>The current builder instance.</returns>
     public ApiRelationshipAssociationBuilder<TAssociation> WithForeignKeyB(Action<ApiKeyTypeBuilder<TAssociation>>? configure = null)
     {
+        var source = this.CurrentConfigurationSource;
         var builder = new ApiKeyTypeBuilder<TAssociation>();
-        configure?.Invoke(builder);
+        if (configure != null)
+        {
+            this.ApplyConfiguration(source, () => configure(builder));
+        }
+
         base.SetForeignKeyTypeBuilderBCore(builder);
         return this;
     }
