@@ -4,6 +4,7 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using System.Reflection;
+
 using Evoogle.ApiFramework.Schema.Annotations;
 using Evoogle.Reflection;
 
@@ -50,28 +51,30 @@ public sealed class ApiAttributeAnnotationReader : IApiAnnotationReader
 
     #region IApiAnnotationReader — property-level
     /// <inheritdoc />
-    public void ApplyPropertyAnnotations(
+    public void ApplyPropertyAnnotations
+    (
         MemberInfo clrMember,
         ClrMemberKind clrMemberKind,
-        MemberNullableInfo nullabilityInfo,
-        ApiPropertyBuilder builder,
-        ApiObjectTypeBuilder objectTypeBuilder)
+        MemberNullableInfo clrNullabilityInfo,
+        ApiObjectTypeBuilder objectTypeBuilder,
+        ApiPropertyBuilder propertyBuilder
+    )
     {
         var propAttr = clrMember.GetCustomAttribute<ApiPropertyAttribute>(inherit: true);
         if (propAttr != null)
         {
             if (propAttr.Name != null)
             {
-                builder.SetApiNameDataAnnotation(propAttr.Name);
+                propertyBuilder.SetApiNameDataAnnotation(propAttr.Name);
             }
 
             if (propAttr.IsRequired)
             {
-                builder.SetModifiersDataAnnotation(static m => m.Required());
+                propertyBuilder.SetModifiersDataAnnotation(static m => m.Required());
             }
             else if (propAttr.IsOptional)
             {
-                builder.SetModifiersDataAnnotation(static m => m.Optional());
+                propertyBuilder.SetModifiersDataAnnotation(static m => m.Optional());
             }
         }
 

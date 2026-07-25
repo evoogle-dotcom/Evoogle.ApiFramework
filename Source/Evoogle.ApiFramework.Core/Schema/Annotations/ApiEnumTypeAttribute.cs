@@ -13,6 +13,8 @@ namespace Evoogle.ApiFramework.Schema.Annotations;
 [AttributeUsage(AttributeTargets.Enum, AllowMultiple = false)]
 public sealed class ApiEnumTypeAttribute : Attribute
 {
+    #region Properties
     /// <summary>Gets or sets the API name for the enum type. When <c>null</c> the CLR type name is used.</summary>
     public string? Name { get; set; }
+    #endregion
 }

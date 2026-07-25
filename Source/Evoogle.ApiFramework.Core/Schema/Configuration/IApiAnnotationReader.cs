@@ -43,19 +43,19 @@ public interface IApiAnnotationReader
     /// </summary>
     /// <param name="clrMember">The CLR property or field being configured.</param>
     /// <param name="clrMemberKind">Whether <paramref name="clrMember"/> is a property or field.</param>
-    /// <param name="nullabilityInfo">
+    /// <param name="clrNullabilityInfo">
     ///     Pre-computed nullability info from <see cref="PropertyReflection.GetNullabilityInfo"/>
     ///     or <see cref="FieldReflection.GetNullabilityInfo"/>.
     /// </param>
-    /// <param name="builder">The property builder to configure.</param>
     /// <param name="objectTypeBuilder">The object type builder that owns the property.</param>
+    /// <param name="propertyBuilder">The property builder to configure.</param>
     void ApplyPropertyAnnotations
     (
         MemberInfo clrMember,
         ClrMemberKind clrMemberKind,
-        MemberNullableInfo nullabilityInfo,
-        ApiPropertyBuilder builder,
-        ApiObjectTypeBuilder objectTypeBuilder
+        MemberNullableInfo clrNullabilityInfo,
+        ApiObjectTypeBuilder objectTypeBuilder,
+        ApiPropertyBuilder propertyBuilder
     );
 
     /// <summary>

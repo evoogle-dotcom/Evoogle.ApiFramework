@@ -83,8 +83,8 @@ public sealed class ApiAnnotationReaderSet
                     propertyInfo,
                     ClrMemberKind.Property,
                     nullabilityInfo,
-                    propertyBuilder,
-                    objectBuilder
+                    objectBuilder,
+                    propertyBuilder
                 );
             }
 
@@ -106,8 +106,8 @@ public sealed class ApiAnnotationReaderSet
                 fieldInfo,
                 ClrMemberKind.Field,
                 fieldNullabilityInfo,
-                propertyBuilder,
-                objectBuilder
+                objectBuilder,
+                propertyBuilder
             );
         }
     }

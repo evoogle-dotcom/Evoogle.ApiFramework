@@ -13,6 +13,7 @@ namespace Evoogle.ApiFramework.Schema.Annotations;
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
 public sealed class ApiPropertyAttribute : Attribute
 {
+    #region Properties
     /// <summary>
     ///     Gets or sets the API name for the property.
     ///     When <c>null</c> the name is derived by the active naming convention.
@@ -34,4 +35,5 @@ public sealed class ApiPropertyAttribute : Attribute
     ///     the modifier is left to convention inference.
     /// </summary>
     public bool IsOptional { get; set; }
+    #endregion
 }

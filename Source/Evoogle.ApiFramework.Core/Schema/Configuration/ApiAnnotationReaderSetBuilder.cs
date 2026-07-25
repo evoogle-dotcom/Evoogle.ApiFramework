@@ -33,7 +33,6 @@ public sealed class ApiAnnotationReaderSetBuilder
     ///     Builds the configured <see cref="ApiAnnotationReaderSet"/>.
     /// </summary>
     /// <returns>The built reader set.</returns>
-    public ApiAnnotationReaderSet Build()
-        => new ApiAnnotationReaderSet(_readers.ToList());
+    public ApiAnnotationReaderSet Build() => new([.. _readers]);
     #endregion
 }
