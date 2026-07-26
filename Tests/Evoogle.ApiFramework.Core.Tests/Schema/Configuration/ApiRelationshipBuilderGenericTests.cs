@@ -108,9 +108,9 @@ public class ApiRelationshipBuilderGenericTests(ITestOutputHelper output) : XUni
 
         new BuildRelationshipTest
         {
-            Name = "ApiRelationshipOneToOneBuilder typed WithDependentEnd<CustomerProfile> AddNestedPath drill-down",
-            BuildExpected = static () => ApiRelationshipBuilderGenericTestFactory.BuildExpected_OneToOne_NestedPath(),
-            BuildActual = static () => ApiRelationshipBuilderGenericTestFactory.BuildActual_OneToOne_NestedPath()
+            Name = "ApiRelationshipOneToOneBuilder typed From<Customer> and To<CustomerProfile> without foreign key",
+            BuildExpected = static () => ApiRelationshipBuilderGenericTestFactory.BuildExpected_OneToOne_NavigationalEndTypes(),
+            BuildActual = static () => ApiRelationshipBuilderGenericTestFactory.BuildActual_OneToOne_NavigationalEndTypes()
         },
 
         new BuildRelationshipTest

@@ -199,6 +199,9 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
                 .AddKey("PK_Customer", p => p.Id)
                 .AddKey("AK_Customer_Email", p => p.Email.Value))
 
+            .AddObject<CustomerProfile>(o => o
+                .AddProperty(p => p.Biography))
+
             // Product Objects
             .AddObject<Category>(o => o
                 .AddProperty(p => p.Id)
@@ -284,6 +287,10 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
             .AddOneToManyRelationship("REL_Customer_Order_1toN", r => r
                 .From<Customer>()
                 .To<Order>(de => de.WithForeignKey(p => p.Id)))
+
+            .AddOneToOneRelationship("REL_Customer_Profile_1to1", r => r
+                .From<Customer>()
+                .To<CustomerProfile>())
 
             .AddOneToManyRelationship("REL_Order_OrderLine_1toN", r => r
                 .From<Order>()

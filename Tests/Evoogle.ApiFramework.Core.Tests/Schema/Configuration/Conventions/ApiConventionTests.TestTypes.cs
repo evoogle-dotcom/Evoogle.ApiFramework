@@ -31,6 +31,14 @@ public partial class ApiConventionTests
         Active,
     }
 
+    internal enum PipelineStatus
+    {
+        Active,
+        InProgress,
+        OnHold,
+        Queued,
+    }
+
     [ApiObjectType]
     public class AssemblyScannedObject
     {
@@ -69,5 +77,50 @@ public partial class ApiConventionTests
     {
         public T? Next { get; set; }
     }
+
+    internal class PropertyConventionTarget
+    {
+        public int Initial { get; set; }
+        public int Added { get; set; }
+    }
+
+    internal class PropertyConventionTrigger
+    {
+        public int Trigger { get; set; }
+    }
+
+    internal class PropertyConventionRegistered
+    {
+        public int Id { get; set; }
+    }
+    #endregion
+
+    #region Test Result Types
+    public sealed record ApiConventionBuildTrace
+    (
+        ApiSchema ApiSchema,
+        IReadOnlyList<string> Events
+    );
+
+    public sealed record EnumValueNamingContextSnapshot
+    (
+        bool IsEnumTypeRegistered,
+        ApiNamingConventionTarget Target,
+        Type ClrType,
+        string ClrName,
+        bool HasPropertyContext,
+        Type ClrEnumType,
+        string ClrMemberName,
+        Type ApiEnumTypeBuilderClrType,
+        bool HasApiSchemaBuilder
+    );
+
+    public sealed record ApiConventionSetSnapshot
+    (
+        bool AddedConventionIsRegistered,
+        bool CopiedConventionIsRegistered,
+        bool RemovedConventionIsAbsent,
+        bool DefaultConventionIsRegistered
+    );
     #endregion
 }

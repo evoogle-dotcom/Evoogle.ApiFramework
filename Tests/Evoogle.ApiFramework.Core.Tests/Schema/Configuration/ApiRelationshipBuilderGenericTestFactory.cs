@@ -51,11 +51,10 @@ public static class ApiRelationshipBuilderGenericTestFactory
                 .AddPath(o => o.PlacedAt)))
             .Build();
 
-    public static ApiRelationship BuildExpected_OneToOne_NestedPath()
-        => new ApiRelationshipOneToOneBuilder("REL_Customer_Profile_NestedPath")
-            .From<Dummy.Customer>()
-            .To<Dummy.CustomerProfile>(d => d
-                .WithForeignKey(fk => fk.AddPath(cp => cp.CustomerRef.CustomerId)))
+    public static ApiRelationship BuildExpected_OneToOne_NavigationalEndTypes()
+        => new ApiRelationshipOneToOneBuilder("REL_Customer_Profile_1to1")
+            .From<Customer>()
+            .To<CustomerProfile>()
             .Build();
 
     public static ApiRelationship BuildExpected_OneToOne_PrincipalConfigure_DeleteBehavior()
@@ -103,11 +102,10 @@ public static class ApiRelationshipBuilderGenericTestFactory
             .To<Order>(b => b.WithForeignKey(o => o.Id, o => o.PlacedAt))
             .Build();
 
-    public static ApiRelationship BuildActual_OneToOne_NestedPath()
-        => new ApiRelationshipOneToOneBuilder("REL_Customer_Profile_NestedPath")
-            .From<Dummy.Customer>()
-            .To<Dummy.CustomerProfile>(d => d
-                .WithForeignKey(fk => fk.AddPath(cp => cp.CustomerRef.CustomerId)))
+    public static ApiRelationship BuildActual_OneToOne_NavigationalEndTypes()
+        => new ApiRelationshipOneToOneBuilder("REL_Customer_Profile_1to1")
+            .From<Customer>()
+            .To<CustomerProfile>()
             .Build();
 
     public static ApiRelationship BuildActual_OneToOne_PrincipalConfigure_DeleteBehavior()

@@ -246,6 +246,12 @@ public static partial class ApiSchemaFactory
             KT("AK_Customer_Email", [KP(typeof(Customer), [KPS(nameof(Customer.Email)), KPS(nameof(EmailAddress.Value))])])
         ]);
 
+        var customerProfile = O(name: nameof(CustomerProfile), clr: typeof(CustomerProfile),
+        properties:
+        [
+            P(name: nameof(CustomerProfile.Biography), expression: TE.ClrRef<string>(), required: true)
+        ]);
+
         // Product Object Types
 
         // Category (self-referential)
@@ -414,7 +420,7 @@ public static partial class ApiSchemaFactory
         var objects = new List<ApiObjectType>
         {
             money, quantity, emailAddress, address,
-            customer,
+            customer, customerProfile,
             category, physicalProduct, digitalProduct, tag,
             order, orderLine, payment,
             digitalProductTag, physicalProductTag
@@ -426,6 +432,11 @@ public static partial class ApiSchemaFactory
         var customerToOrder = R1M("REL_Customer_Order_1toN",
             RPE(typeof(Customer)),
             RDE(typeof(Order), KT([KP(typeof(Order), [KPS(nameof(Order.Customer)), KPS(nameof(Customer.Id))])])));
+
+        // Customer → CustomerProfile (1:1, navigational)
+        var customerToProfile = R11("REL_Customer_Profile_1to1",
+            RPE(typeof(Customer)),
+            RDE(typeof(CustomerProfile)));
 
         // Order → OrderLine (1:M, owner key path)
         var orderToOrderLine = R1M("REL_Order_OrderLine_1toN",
@@ -471,7 +482,7 @@ public static partial class ApiSchemaFactory
 
         var relationships = new List<ApiRelationship>
         {
-            customerToOrder, orderToOrderLine, paymentToOrder,
+            customerToOrder, customerToProfile, orderToOrderLine, paymentToOrder,
             categoryToCategory, categoryToDigitalProduct, categoryToPhysicalProduct, digitalProductToTag, physicalProductToTag
         };
 

@@ -66,6 +66,11 @@ public sealed class Customer
         return $"{nameof(Customer)} {{{nameof(this.Id)}={id}, {nameof(this.Name)}={name}, {nameof(this.Email)}={email}, {nameof(this.PrimaryAddress)}={primaryAddress}, {nameof(this.Addresses)}={addresses}, {nameof(this.Orders)}={orders}}}";
     }
 }
+
+public sealed class CustomerProfile
+{
+    public string Biography { get; init; } = string.Empty;
+}
 #endregion
 
 #region Product Object Types
