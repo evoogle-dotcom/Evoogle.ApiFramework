@@ -13,6 +13,11 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Conventions.Internal;
 /// </summary>
 internal sealed class ApiObjectTypePrimaryKeyInferenceConvention : IApiObjectTypeConvention
 {
+    #region Properties
+    /// <inheritdoc />
+    public ApiConventionPhase Phase => ApiConventionPhase.Configuration;
+    #endregion
+
     #region Fields
     private static readonly HashSet<Type> _keyCompatibleTypes =
     [

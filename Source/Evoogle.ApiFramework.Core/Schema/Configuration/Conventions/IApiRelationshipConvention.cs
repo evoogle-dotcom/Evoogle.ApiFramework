@@ -19,9 +19,6 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Conventions;
 /// </remarks>
 public interface IApiRelationshipConvention : IApiConvention
 {
-    /// <inheritdoc />
-    ApiConventionPhase IApiConvention.Phase => ApiConventionPhase.Relationship;
-
     #region Methods
     /// <summary>
     ///     Applies the relationship convention to the schema being built.

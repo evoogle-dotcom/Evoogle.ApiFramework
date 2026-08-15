@@ -13,6 +13,11 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Conventions.Internal;
 /// </summary>
 internal sealed class ApiPropertyNullabilityModifierConvention : IApiPropertyConvention
 {
+    #region Properties
+    /// <inheritdoc />
+    public ApiConventionPhase Phase => ApiConventionPhase.Configuration;
+    #endregion
+
     #region IApiPropertyConvention
     /// <inheritdoc />
     public void Apply(ApiPropertyBuilder builder, ApiPropertyConventionContext context)

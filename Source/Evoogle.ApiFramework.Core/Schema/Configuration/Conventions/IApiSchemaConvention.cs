@@ -15,9 +15,6 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Conventions;
 /// </remarks>
 public interface IApiSchemaConvention : IApiConvention
 {
-    /// <inheritdoc />
-    ApiConventionPhase IApiConvention.Phase => ApiConventionPhase.Discovery;
-
     #region Methods
     /// <summary>
     ///     Applies the discovery convention to the schema being built.

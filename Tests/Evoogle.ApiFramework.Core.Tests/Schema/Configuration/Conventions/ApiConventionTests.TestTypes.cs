@@ -10,6 +10,28 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Conventions;
 public partial class ApiConventionTests
 {
     #region Test Domain Types
+    public class AssemblyScannedObject
+    {
+        public Guid Id { get; set; }
+    }
+
+    public readonly record struct AssemblyScannedScalar(string Value);
+
+    public enum AssemblyScannedEnum
+    {
+        Active,
+    }
+
+    [ApiObjectType]
+    public class AssemblyAnnotatedObject
+    {
+        public Guid Id { get; set; }
+    }
+
+    [ApiScalarType]
+    public readonly record struct AssemblyAnnotatedScalar(string Value);
+
+
     internal class PersonWithId
     {
         public Guid Id { get; set; }
@@ -37,21 +59,6 @@ public partial class ApiConventionTests
         InProgress,
         OnHold,
         Queued,
-    }
-
-    [ApiObjectType]
-    public class AssemblyScannedObject
-    {
-        public Guid Id { get; set; }
-    }
-
-    [ApiScalarType]
-    public readonly record struct AssemblyScannedScalar(string Value);
-
-    [ApiEnumType]
-    public enum AssemblyScannedEnum
-    {
-        Active,
     }
 
     // Named "OrderItem" so that "OrderItemId" triggers the {ClassName}Id convention.
@@ -96,13 +103,7 @@ public partial class ApiConventionTests
     #endregion
 
     #region Test Result Types
-    public sealed record ApiConventionBuildTrace
-    (
-        ApiSchema ApiSchema,
-        IReadOnlyList<string> Events
-    );
-
-    public sealed record EnumValueNamingContextSnapshot
+    internal sealed record EnumValueNamingContextSnapshot
     (
         bool IsEnumTypeRegistered,
         ApiNamingConventionTarget Target,
@@ -115,7 +116,7 @@ public partial class ApiConventionTests
         bool HasApiSchemaBuilder
     );
 
-    public sealed record ApiConventionSetSnapshot
+    internal sealed record ApiConventionSetSnapshot
     (
         bool AddedConventionIsRegistered,
         bool CopiedConventionIsRegistered,

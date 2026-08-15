@@ -13,8 +13,13 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Conventions.Internal;
 ///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used directly from your code.
 ///     This API may change or be removed in future releases.
 /// </summary>
-internal sealed class ApiSchemaAssemblyScanConvention : IApiSchemaConvention
+internal sealed class ApiSchemaAssemblyAnnotationScanConvention : IApiSchemaConvention
 {
+    #region Properties
+    /// <inheritdoc />
+    public ApiConventionPhase Phase => ApiConventionPhase.Discovery;
+    #endregion
+
     #region Fields
     private readonly Assembly _assembly;
     private readonly Func<Type, bool>? _filter;
@@ -22,7 +27,7 @@ internal sealed class ApiSchemaAssemblyScanConvention : IApiSchemaConvention
 
     #region Constructors
     /// <summary>
-    ///     Initializes a new <see cref="ApiSchemaAssemblyScanConvention"/> that scans the specified
+    ///     Initializes a new <see cref="ApiSchemaAssemblyAnnotationScanConvention"/> that scans the specified
     ///     assembly.
     /// </summary>
     /// <param name="assembly">The assembly to scan for annotated types.</param>
@@ -30,7 +35,7 @@ internal sealed class ApiSchemaAssemblyScanConvention : IApiSchemaConvention
     ///     Optional predicate to limit which types are considered.
     ///     When <c>null</c> all annotated public non-abstract types are included.
     /// </param>
-    internal ApiSchemaAssemblyScanConvention(Assembly assembly, Func<Type, bool>? filter = null)
+    internal ApiSchemaAssemblyAnnotationScanConvention(Assembly assembly, Func<Type, bool>? filter = null)
     {
         ArgumentNullException.ThrowIfNull(assembly);
         _assembly = assembly;
@@ -42,29 +47,35 @@ internal sealed class ApiSchemaAssemblyScanConvention : IApiSchemaConvention
     /// <inheritdoc />
     public void Apply(ApiSchemaBuilder builder)
     {
-        foreach (var type in _assembly.GetExportedTypes())
+        var clrTypes = _assembly.GetExportedTypes();
+        foreach (var clrType in clrTypes)
         {
-            if (type.IsAbstract || !type.IsClass && !type.IsValueType)
+            if (clrType == null)
             {
                 continue;
             }
 
-            if (_filter != null && !_filter(type))
+            if (clrType.IsAbstract || !clrType.IsClass && !clrType.IsValueType)
             {
                 continue;
             }
 
-            if (type.IsDefined(typeof(ApiObjectTypeAttribute), inherit: false))
+            if (_filter != null && !_filter(clrType))
             {
-                builder.AddObject(type);
+                continue;
             }
-            else if (type.IsDefined(typeof(ApiScalarTypeAttribute), inherit: false))
+
+            if (clrType.IsDefined(typeof(ApiObjectTypeAttribute), inherit: false))
             {
-                builder.AddScalar(type);
+                builder.AddObject(clrType);
             }
-            else if (type.IsEnum && type.IsDefined(typeof(ApiEnumTypeAttribute), inherit: false))
+            else if (clrType.IsDefined(typeof(ApiScalarTypeAttribute), inherit: false))
             {
-                builder.AddEnum(type);
+                builder.AddScalar(clrType);
+            }
+            else if (clrType.IsEnum && clrType.IsDefined(typeof(ApiEnumTypeAttribute), inherit: false))
+            {
+                builder.AddEnum(clrType);
             }
         }
     }

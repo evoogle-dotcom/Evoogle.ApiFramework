@@ -4,6 +4,7 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
+using Evoogle.ApiFramework.Schema.Configuration.Trace;
 
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
@@ -16,6 +17,8 @@ public sealed class ApiEnumValueBuilder
     #region Fields
     private string _apiName;
     private ApiConfigurationSource _apiNameSource;
+    private readonly ApiSchemaBuilderContext? _context;
+    private readonly Type? _clrEnumType;
     #endregion
 
     #region Constructors
@@ -36,12 +39,26 @@ public sealed class ApiEnumValueBuilder
         string clrName,
         int clrOrdinal,
         ApiConfigurationSource apiNameSource
+    ) : this(apiName, clrName, clrOrdinal, apiNameSource, null, null)
+    {
+    }
+
+    internal ApiEnumValueBuilder
+    (
+        string apiName,
+        string clrName,
+        int clrOrdinal,
+        ApiConfigurationSource apiNameSource,
+        ApiSchemaBuilderContext? context,
+        Type? clrEnumType
     )
     {
         _apiName = ValidateName(apiName, nameof(apiName));
         this.ClrName = ValidateName(clrName, nameof(clrName));
         this.ClrOrdinal = clrOrdinal;
         _apiNameSource = apiNameSource;
+        _context = context;
+        _clrEnumType = clrEnumType;
     }
     #endregion
 
@@ -69,6 +86,9 @@ public sealed class ApiEnumValueBuilder
     #endregion
 
     #region Internal Convention Methods
+    /// <summary>Gets the configuration source that established the current API name.</summary>
+    internal ApiConfigurationSource ApiNameSource => _apiNameSource;
+
     /// <summary>
     ///     Sets the API name at <see cref="ApiConfigurationSource.Convention"/> precedence.
     ///     Has no effect if a higher-precedence value has already been applied.
@@ -88,13 +108,39 @@ public sealed class ApiEnumValueBuilder
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
 
+        var previousValue = _apiName;
+        var wasApplied = source >= _apiNameSource;
+
         if (source >= _apiNameSource)
         {
             _apiName = apiName;
             _apiNameSource = source;
         }
 
+        _context?.TraceConfigurationChange
+        (
+            this.GetTraceTarget(),
+            ApiSchemaBuildConfigurationFacet.ApiName,
+            source,
+            previousValue,
+            apiName,
+            _apiName,
+            wasApplied,
+            wasApplied ? null : "A higher-precedence API name is already configured."
+        );
+
         return this;
+    }
+
+    private ApiSchemaBuildTraceTarget GetTraceTarget()
+    {
+        return new
+        (
+            ApiSchemaBuildTargetKind.EnumValue,
+            _clrEnumType,
+            this.ClrName,
+            _apiName
+        );
     }
 
     private static string ValidateName(string name, string paramName)

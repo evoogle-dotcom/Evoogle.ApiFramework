@@ -180,9 +180,12 @@ public static class ApiSchemaBuilderExtensions
     /// </summary>
     /// <param name="builder">The schema builder to configure.</param>
     /// <param name="assembly">The assembly to scan for annotated types.</param>
-    /// <param name="filter">Optional predicate to limit which types are considered.</param>
+    /// <param name="filter">
+    ///     Optional inclusion predicate. When <see langword="null"/>, all eligible types are
+    ///     considered; returning <see langword="false"/> skips a type.
+    /// </param>
     /// <returns>The current builder instance.</returns>
-    public static ApiSchemaBuilder UseAssemblyScanning
+    public static ApiSchemaBuilder UseAssemblyAnnotationScanning
     (
         this ApiSchemaBuilder builder,
         Assembly assembly,
@@ -192,7 +195,69 @@ public static class ApiSchemaBuilderExtensions
         ArgumentNullException.ThrowIfNull(builder);
         ArgumentNullException.ThrowIfNull(assembly);
 
-        return builder.UseConventions(c => c.AddConvention(new ApiSchemaAssemblyScanConvention(assembly, filter)));
+        return builder.UseConventions(c => c.AddConvention(new ApiSchemaAssemblyAnnotationScanConvention(assembly, filter)));
+    }
+
+    /// <summary>
+    ///     Adds the built-in convention that scans an assembly and infers API type kinds from CLR
+    ///     type reflection.
+    /// </summary>
+    /// <param name="builder">The schema builder to configure.</param>
+    /// <param name="assembly">The assembly to scan for types.</param>
+    /// <param name="filter">
+    ///     Optional inclusion predicate. When <see langword="null"/>, all eligible types are
+    ///     considered; returning <see langword="false"/> skips a type.
+    /// </param>
+    /// <returns>The current builder instance.</returns>
+    public static ApiSchemaBuilder UseAssemblyTypeInference
+    (
+        this ApiSchemaBuilder builder,
+        Assembly assembly,
+        Func<Type, bool>? filter = null
+    )
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+        ArgumentNullException.ThrowIfNull(assembly);
+
+        return builder.UseConventions(c => c.AddConvention(new ApiSchemaAssemblyTypeInferenceConvention(assembly, filter)));
+    }
+
+    /// <summary>
+    ///     Adds the built-in conventions that compose assembly type inference, property discovery,
+    ///     enum-value discovery, and property nullability inference to create a complete API schema
+    ///     from CLR types.
+    /// </summary>
+    /// <remarks>
+    ///     This is equivalent to composing <see cref="UseAssemblyTypeInference"/>,
+    ///     <see cref="UsePropertyDiscovery"/>, <see cref="UseEnumValueDiscovery"/>, and
+    ///     <see cref="UsePropertyNullabilityModifiers"/>. The optional filter is applied while
+    ///     scanning the assembly for eligible CLR types.
+    /// </remarks>
+    /// <param name="builder">The schema builder to configure.</param>
+    /// <param name="assembly">The assembly to scan for types.</param>
+    /// <param name="filter">
+    ///     Optional inclusion predicate. When <see langword="null"/>, all eligible types are
+    ///     considered; returning <see langword="false"/> skips a type.
+    /// </param>
+    /// <returns>The current builder instance.</returns>
+    public static ApiSchemaBuilder UseAssemblySchemaDiscovery
+    (
+        this ApiSchemaBuilder builder,
+        Assembly assembly,
+        Func<Type, bool>? filter = null
+    )
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+        ArgumentNullException.ThrowIfNull(assembly);
+
+        return builder.UseConventions
+        (
+            c => c
+                .AddConvention(new ApiSchemaAssemblyTypeInferenceConvention(assembly, filter))
+                .AddConvention(new ApiEnumTypeEnumValueDiscoveryConvention())
+                .AddConvention(new ApiObjectTypePropertyDiscoveryConvention())
+                .AddConvention(new ApiPropertyNullabilityModifierConvention())
+        );
     }
 
     /// <summary>
@@ -206,6 +271,19 @@ public static class ApiSchemaBuilderExtensions
         ArgumentNullException.ThrowIfNull(builder);
 
         return builder.UseConventions(c => c.AddConvention(new ApiNamingCamelCaseConvention()));
+    }
+
+    /// <summary>
+    ///     Adds the built-in convention that discovers missing values from registered CLR enum
+    ///     types.
+    /// </summary>
+    /// <param name="builder">The schema builder to configure.</param>
+    /// <returns>The current builder instance.</returns>
+    public static ApiSchemaBuilder UseEnumValueDiscovery(this ApiSchemaBuilder builder)
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+
+        return builder.UseConventions(c => c.AddConvention(new ApiEnumTypeEnumValueDiscoveryConvention()));
     }
 
     /// <summary>

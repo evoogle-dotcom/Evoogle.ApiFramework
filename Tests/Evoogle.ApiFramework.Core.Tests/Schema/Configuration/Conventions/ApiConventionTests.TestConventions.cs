@@ -11,6 +11,10 @@ public partial class ApiConventionTests
     #region Test Conventions
     internal sealed class NonConvergingPropertyConvention : IApiPropertyConvention
     {
+        #region IApiConvention
+        public ApiConventionPhase Phase => ApiConventionPhase.Configuration;
+        #endregion
+
         #region Fields
         private Type _nextType = typeof(ConventionLoopRoot);
         #endregion
@@ -26,6 +30,10 @@ public partial class ApiConventionTests
 
     internal sealed class AddSiblingPropertyConvention : IApiPropertyConvention
     {
+        #region IApiConvention
+        public ApiConventionPhase Phase => ApiConventionPhase.Configuration;
+        #endregion
+
         #region Fields
         private bool _hasAddedProperty;
         #endregion
@@ -53,6 +61,10 @@ public partial class ApiConventionTests
 
     internal sealed class AddPropertyToVisitedObjectConvention : IApiPropertyConvention
     {
+        #region IApiConvention
+        public ApiConventionPhase Phase => ApiConventionPhase.Configuration;
+        #endregion
+
         #region Fields
         private bool _hasAddedProperty;
         #endregion
@@ -83,33 +95,31 @@ public partial class ApiConventionTests
 
     internal sealed class RecordingPropertyConvention : IApiPropertyConvention
     {
-        #region Properties
-        public List<(Type ClrDeclaringType, string ClrName)> ProcessedProperties { get; } = [];
+        #region IApiConvention
+        public ApiConventionPhase Phase => ApiConventionPhase.Configuration;
         #endregion
 
         #region IApiPropertyConvention
         public void Apply(ApiPropertyBuilder builder, ApiPropertyConventionContext context)
         {
-            this.ProcessedProperties.Add((context.ClrDeclaringType, builder.ClrName));
         }
         #endregion
     }
 
-    internal sealed class PropertyRegisteredObjectOrderingConvention(List<string> events)
+    internal sealed class PropertyRegisteredObjectOrderingConvention
         : IApiObjectTypeConvention, IApiPropertyConvention
     {
+        #region IApiConvention
+        public ApiConventionPhase Phase => ApiConventionPhase.Configuration;
+        #endregion
+
         #region Fields
-        private readonly List<string> _events = events;
         private bool _hasRegisteredObject;
         #endregion
 
         #region IApiObjectTypeConvention
         public void Apply(ApiObjectTypeBuilder builder)
         {
-            if (builder.ClrType == typeof(PropertyConventionRegistered))
-            {
-                _events.Add("ObjectType");
-            }
         }
         #endregion
 
@@ -140,7 +150,6 @@ public partial class ApiConventionTests
                 builder.ClrName == nameof(PropertyConventionRegistered.Id)
             )
             {
-                _events.Add("Property");
             }
         }
         #endregion
@@ -148,6 +157,10 @@ public partial class ApiConventionTests
 
     internal sealed class NonConvergingPropertyAdditionConvention : IApiPropertyConvention
     {
+        #region IApiConvention
+        public ApiConventionPhase Phase => ApiConventionPhase.Configuration;
+        #endregion
+
         #region Fields
         private int _nextPropertyNumber = 100;
         #endregion
@@ -164,6 +177,10 @@ public partial class ApiConventionTests
 
     internal sealed class PropertyAddsEnumValueConvention : IApiPropertyConvention
     {
+        #region IApiConvention
+        public ApiConventionPhase Phase => ApiConventionPhase.Configuration;
+        #endregion
+
         #region Fields
         private bool _hasAddedValue;
         #endregion
@@ -190,6 +207,10 @@ public partial class ApiConventionTests
 
     internal sealed class AppendApiNameConvention(string suffix) : ApiNamingConvention
     {
+        #region IApiConvention
+        public override ApiConventionPhase Phase => ApiConventionPhase.Configuration;
+        #endregion
+
         #region ApiNamingConvention Methods
         public override string ConvertName(string apiName, ApiNamingConventionContext context)
         {
@@ -200,6 +221,10 @@ public partial class ApiConventionTests
 
     internal sealed class AssemblyScannedEnumValueConvention : IApiEnumTypeConvention
     {
+        #region IApiConvention
+        public ApiConventionPhase Phase => ApiConventionPhase.Configuration;
+        #endregion
+
         #region IApiEnumTypeConvention
         public void Apply(ApiEnumTypeBuilder builder)
         {
@@ -218,6 +243,10 @@ public partial class ApiConventionTests
 
     internal sealed class CaptureEnumValueNamingConvention : ApiNamingConvention
     {
+        #region IApiConvention
+        public override ApiConventionPhase Phase => ApiConventionPhase.Configuration;
+        #endregion
+
         #region Properties
         public ApiNamingConventionContext? EnumValueContext { get; private set; }
         #endregion
@@ -237,6 +266,10 @@ public partial class ApiConventionTests
 
     internal sealed class EnumTypeAddsValueConvention : IApiEnumTypeConvention
     {
+        #region IApiConvention
+        public ApiConventionPhase Phase => ApiConventionPhase.Configuration;
+        #endregion
+
         #region IApiEnumTypeConvention
         public void Apply(ApiEnumTypeBuilder builder)
         {
@@ -255,6 +288,10 @@ public partial class ApiConventionTests
 
     internal sealed class EnumValueAddsValueConvention : IApiEnumValueConvention
     {
+        #region IApiConvention
+        public ApiConventionPhase Phase => ApiConventionPhase.Configuration;
+        #endregion
+
         #region Fields
         private bool _hasAddedValue;
         #endregion
@@ -278,6 +315,10 @@ public partial class ApiConventionTests
 
     internal sealed class ExplicitEnumValueNameConvention : IApiEnumValueConvention
     {
+        #region IApiConvention
+        public ApiConventionPhase Phase => ApiConventionPhase.Configuration;
+        #endregion
+
         #region IApiEnumValueConvention
         public void Apply(ApiEnumValueBuilder builder, ApiEnumValueConventionContext context)
         {
@@ -288,20 +329,23 @@ public partial class ApiConventionTests
 
     internal sealed class RecordingEnumValueConvention : IApiEnumValueConvention
     {
-        #region Properties
-        public List<string> ProcessedClrNames { get; } = [];
+        #region IApiConvention
+        public ApiConventionPhase Phase => ApiConventionPhase.Configuration;
         #endregion
 
         #region IApiEnumValueConvention
         public void Apply(ApiEnumValueBuilder builder, ApiEnumValueConventionContext context)
         {
-            this.ProcessedClrNames.Add(builder.ClrName);
         }
         #endregion
     }
 
     internal sealed class NonConvergingEnumValueConvention : IApiEnumValueConvention
     {
+        #region IApiConvention
+        public ApiConventionPhase Phase => ApiConventionPhase.Configuration;
+        #endregion
+
         #region Fields
         private int _nextOrdinal = 100;
         #endregion
@@ -316,12 +360,8 @@ public partial class ApiConventionTests
         #endregion
     }
 
-    internal sealed class RecordingObjectPhaseConvention
-    (
-        string eventName,
-        ApiConventionPhase phase,
-        List<string> events
-    ) : IApiObjectTypeConvention
+    internal sealed class RecordingObjectPhaseConvention(ApiConventionPhase phase)
+        : IApiObjectTypeConvention
     {
         #region IApiConvention
         public ApiConventionPhase Phase { get; } = phase;
@@ -330,10 +370,6 @@ public partial class ApiConventionTests
         #region IApiObjectTypeConvention
         public void Apply(ApiObjectTypeBuilder builder)
         {
-            if (builder.ClrType == typeof(PersonWithId))
-            {
-                events.Add(eventName);
-            }
         }
         #endregion
     }
@@ -353,6 +389,10 @@ public partial class ApiConventionTests
 
     internal sealed class RelationshipAddsObjectConvention : IApiRelationshipConvention
     {
+        #region IApiConvention
+        public ApiConventionPhase Phase => ApiConventionPhase.Relationship;
+        #endregion
+
         #region IApiRelationshipConvention
         public void Apply(ApiSchemaBuilder builder)
         {

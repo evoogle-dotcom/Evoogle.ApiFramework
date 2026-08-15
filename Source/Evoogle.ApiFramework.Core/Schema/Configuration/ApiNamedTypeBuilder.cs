@@ -4,6 +4,7 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
+using Evoogle.ApiFramework.Schema.Configuration.Trace;
 using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema.Configuration;
@@ -72,13 +73,41 @@ public abstract class ApiNamedTypeBuilder<TBuilder>(Type clrType, ApiSchemaBuild
     #region Implementation Methods
     private TBuilder SetApiName(string apiName, ApiConfigurationSource source)
     {
+        var previousValue = _apiName;
+        var wasApplied = source >= _apiNameSource;
+
         if (source >= _apiNameSource)
         {
             _apiName = apiName;
             _apiNameSource = source;
         }
 
+        this.Context.TraceConfigurationChange
+        (
+            this.GetTraceTarget(),
+            ApiSchemaBuildConfigurationFacet.ApiName,
+            source,
+            previousValue,
+            apiName,
+            _apiName,
+            wasApplied,
+            wasApplied ? null : "A higher-precedence API name is already configured."
+        );
+
         return (TBuilder)this;
+    }
+
+    private ApiSchemaBuildTraceTarget GetTraceTarget()
+    {
+        var targetKind = this switch
+        {
+            ApiObjectTypeBuilder => ApiSchemaBuildTargetKind.ObjectType,
+            ApiEnumTypeBuilder => ApiSchemaBuildTargetKind.EnumType,
+            ApiScalarTypeBuilder => ApiSchemaBuildTargetKind.ScalarType,
+            _ => ApiSchemaBuildTargetKind.Schema,
+        };
+
+        return new(targetKind, this.ClrType, ApiName: _apiName);
     }
 
     private static Type ValidateClrType(Type clrType)

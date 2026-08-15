@@ -17,7 +17,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 /// </summary>
 public sealed class ApiAttributeAnnotationReader : IApiAnnotationReader
 {
-    #region IApiAnnotationReader — type-level
+    #region IApiAnnotationReader — Type Level
     /// <inheritdoc />
     public void ApplyObjectTypeAnnotations(Type clrType, ApiObjectTypeBuilder builder)
     {
@@ -49,7 +49,7 @@ public sealed class ApiAttributeAnnotationReader : IApiAnnotationReader
     }
     #endregion
 
-    #region IApiAnnotationReader — property-level
+    #region IApiAnnotationReader — Property Level
     /// <inheritdoc />
     public void ApplyPropertyAnnotations
     (
@@ -97,7 +97,7 @@ public sealed class ApiAttributeAnnotationReader : IApiAnnotationReader
     }
     #endregion
 
-    #region IApiAnnotationReader — relationship
+    #region IApiAnnotationReader — Relationship
     /// <inheritdoc />
     public IReadOnlyList<(string Name, Action<ApiRelationshipOneToManyBuilder> Configure)>
         ReadOneToManyRelationships(Type clrType)

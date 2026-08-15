@@ -688,9 +688,9 @@ internal static class Dummy
     /// <summary>
     ///     Demonstrates how to build a schema using conventions rather than explicit
     ///     property and key declarations.
-    ///     <see cref="ApiSchemaBuilder.UseDefaultConventions"/> applies property discovery, camelCase naming,
-    ///     nullability-based Required/Optional inference, and primary-key inference
-    ///     automatically.
+    ///     <see cref="ApiSchemaBuilder.UseDefaultConventions"/> applies enum-value discovery,
+    ///     property discovery, camelCase naming, nullability-based Required/Optional inference,
+    ///     and primary-key inference automatically.
     ///     This demo uses <see cref="Product"/>, <see cref="Tag"/>, and <see cref="ProductTag"/>
     ///     because they only reference primitive scalar types, keeping the example self-contained.
     /// </summary>
@@ -703,8 +703,8 @@ internal static class Dummy
             // types that those properties resolve to must still be registered explicitly.
             .AddScalar<Guid>(x => x.WithName("Guid"))
             .AddScalar<string>(x => x.WithName("String"))
-            // Apply the full default convention set: property discovery, camelCase
-            // naming, nullability-based modifiers, and PrimaryKey inference.
+            // Apply the full default convention set: enum-value discovery, property discovery,
+            // camelCase naming, nullability-based modifiers, and PrimaryKey inference.
             .UseDefaultConventions()
             // Augment the default set with a custom application-specific convention.
             .UseConventions(c => c
@@ -736,7 +736,8 @@ internal static class Dummy
             .AddScalar<Guid>(x => x.WithName("Guid"))
             .AddScalar<string>(x => x.WithName("String"))
             .AddScalar<decimal>(x => x.WithName("Decimal"))
-            // Use default conventions for property discovery and nullability inference.
+            // Use default conventions for enum-value discovery, property discovery, and
+            // nullability inference.
             .UseDefaultConventions()
             // Activate the framework's built-in annotation reader so that attributes
             // on CustomerAnnotated and OrderAnnotated are picked up automatically.
@@ -752,6 +753,9 @@ internal static class Dummy
     /// </summary>
     public class ApiObjectTypeConventionExample : IApiObjectTypeConvention
     {
+        /// <inheritdoc />
+        public ApiConventionPhase Phase => ApiConventionPhase.Configuration;
+
         /// <inheritdoc />
         public void Apply(ApiObjectTypeBuilder builder)
         {

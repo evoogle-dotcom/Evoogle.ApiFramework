@@ -4,6 +4,7 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
+using Evoogle.ApiFramework.Schema.Configuration.Trace;
 
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
@@ -89,6 +90,58 @@ public class ApiEnumTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     internal IEnumerable<ApiEnumValueBuilder> ApiEnumValueBuilders => _apiEnumValueBuilders;
 
     /// <summary>
+    ///     Adds an enumeration value if its CLR name is not already present and its ordinal has
+    ///     not been claimed by an explicitly configured entry.
+    /// </summary>
+    /// <param name="clrName">The CLR name of the enumeration value.</param>
+    /// <param name="clrOrdinal">The CLR ordinal of the enumeration value.</param>
+    /// <returns>
+    ///     The newly created <see cref="ApiEnumValueBuilder"/>, or <see langword="null"/> when
+    ///     the value was skipped.
+    /// </returns>
+    internal ApiEnumValueBuilder? AddValueIfAbsent(string clrName, int clrOrdinal)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(clrName, nameof(clrName));
+
+        if (_apiEnumValueBuilders.Any(builder => builder.ClrName == clrName))
+        {
+            this.Context.TraceStructuralRegistration
+            (
+                new(ApiSchemaBuildTargetKind.EnumValue, this.ClrType, clrName),
+                ApiSchemaBuildRegistrationKind.EnumValue,
+                this.Context.CurrentConfigurationSource,
+                wasRegistered: false,
+                clrOrdinal: clrOrdinal,
+                rejectionReason: "An enum value with the CLR name was already registered."
+            );
+            return null;
+        }
+
+        // Explicit entries take precedence; convention-vs-convention ordinal collisions propagate to initialization.
+        if (_apiEnumValueBuilders.Any(builder => builder.ClrOrdinal == clrOrdinal && builder.ApiNameSource == ApiConfigurationSource.Explicit))
+        {
+            this.Context.TraceStructuralRegistration
+            (
+                new(ApiSchemaBuildTargetKind.EnumValue, this.ClrType, clrName),
+                ApiSchemaBuildRegistrationKind.EnumValue,
+                this.Context.CurrentConfigurationSource,
+                wasRegistered: false,
+                clrOrdinal: clrOrdinal,
+                rejectionReason: "An explicitly configured enum value already owns the ordinal."
+            );
+            return null;
+        }
+
+        return this.AddValueCore
+        (
+            clrName,
+            clrName,
+            clrOrdinal,
+            ApiConfigurationSource.Convention
+        );
+    }
+
+    /// <summary>
     ///     Adds an enumeration value whose API name is inferred from its CLR name at
     ///     <see cref="ApiConfigurationSource.Convention"/> precedence.
     /// </summary>
@@ -119,10 +172,20 @@ public class ApiEnumTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
             apiName,
             clrName,
             clrOrdinal,
-            apiNameSource
+            apiNameSource,
+            this.Context,
+            this.ClrType
         );
 
         _apiEnumValueBuilders.Add(builder);
+        this.Context.TraceStructuralRegistration
+        (
+            new(ApiSchemaBuildTargetKind.EnumValue, this.ClrType, clrName, apiName),
+            ApiSchemaBuildRegistrationKind.EnumValue,
+            apiNameSource,
+            wasRegistered: true,
+            clrOrdinal: clrOrdinal
+        );
         return builder;
     }
     #endregion

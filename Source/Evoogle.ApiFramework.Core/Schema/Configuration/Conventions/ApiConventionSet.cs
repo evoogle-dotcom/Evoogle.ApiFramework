@@ -72,28 +72,53 @@ public sealed class ApiConventionSet
 
     #region Factory Methods
     /// <summary>
-    ///     Creates an <see cref="ApiConventionSet"/> populated with the framework's curated default
-    ///     conventions: property discovery, camelCase naming, property nullability modifiers, and
-    ///     primary-key inference.
+    ///     Creates an <see cref="ApiConventionSet"/> pre-populated with the default conventions.
     /// </summary>
-    /// <returns>
-    ///     A new <see cref="ApiConventionSet"/> with default conventions applied.
-    /// </returns>
-    public static ApiConventionSet CreateDefault()
+    /// <param name="namingConvention">
+    ///     An optional naming convention to apply to all supported schema targets.
+    ///     When <see langword="null"/>, no naming convention is added.
+    /// </param>
+    /// <returns>A new <see cref="ApiConventionSet"/> with default conventions registered.</returns>
+    public static ApiConventionSet CreateDefault(ApiNamingConvention? namingConvention = null)
     {
         var set = new ApiConventionSet();
 
-        var camelCase = new ApiNamingCamelCaseConvention();
+        if (namingConvention is not null)
+        {
+            set.AddNamingConvention(namingConvention);
+        }
+
+        set.EnumTypeConventions.Add(new ApiEnumTypeEnumValueDiscoveryConvention());
         set.ObjectTypeConventions.Add(new ApiObjectTypePropertyDiscoveryConvention());
-        set.ObjectTypeConventions.Add(camelCase);
-        set.ScalarTypeConventions.Add(camelCase);
-        set.EnumTypeConventions.Add(camelCase);
-        set.EnumValueConventions.Add(camelCase);
         set.ObjectTypeConventions.Add(new ApiObjectTypePrimaryKeyInferenceConvention());
-        set.PropertyConventions.Add(camelCase);
         set.PropertyConventions.Add(new ApiPropertyNullabilityModifierConvention());
 
         return set;
+    }
+
+    /// <summary>
+    ///     Adds a naming convention to all supported schema targets.
+    /// </summary>
+    /// <param name="convention">
+    ///     The naming convention to add.
+    /// </param>
+    /// <exception cref="ArgumentNullException">
+    ///     <paramref name="convention"/> is <see langword="null"/>.
+    /// </exception>
+    /// <remarks>
+    ///     This method is a convenience for adding a single naming convention to all supported schema targets.
+    /// </remarks>
+    public void AddNamingConvention(ApiNamingConvention convention)
+    {
+        ArgumentNullException.ThrowIfNull(convention);
+
+        this.ScalarTypeConventions.Add(convention);
+
+        this.EnumTypeConventions.Add(convention);
+        this.EnumValueConventions.Add(convention);
+
+        this.ObjectTypeConventions.Add(convention);
+        this.PropertyConventions.Add(convention);
     }
     #endregion
 }

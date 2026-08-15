@@ -18,6 +18,11 @@ public abstract class ApiNamingConvention :
     IApiEnumValueConvention,
     IApiPropertyConvention
 {
+    #region IApiConvention Properties
+    /// <inheritdoc />
+    public abstract ApiConventionPhase Phase { get; }
+    #endregion
+
     #region IApiObjectTypeConvention Methods
     /// <inheritdoc />
     public void Apply(ApiObjectTypeBuilder builder)

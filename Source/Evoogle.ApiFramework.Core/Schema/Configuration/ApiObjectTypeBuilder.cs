@@ -4,6 +4,7 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
+using Evoogle.ApiFramework.Schema.Configuration.Trace;
 
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
@@ -56,6 +57,13 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
         configure?.Invoke(apiKeyTypeBuilder);
 
         _apiKeyTypeBuilders.Add(apiKeyTypeBuilder);
+        this.Context.TraceStructuralRegistration
+        (
+            new(ApiSchemaBuildTargetKind.KeyType, this.ClrType, ApiName: apiName),
+            ApiSchemaBuildRegistrationKind.KeyType,
+            this.Context.CurrentConfigurationSource,
+            wasRegistered: true
+        );
 
         return this;
     }
@@ -235,6 +243,14 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
 
         if (_apiPropertyBuilders.Any(b => b.ClrName == clrName))
         {
+            this.Context.TraceStructuralRegistration
+            (
+                new(ApiSchemaBuildTargetKind.Property, this.ClrType, clrName),
+                ApiSchemaBuildRegistrationKind.Property,
+                this.Context.CurrentConfigurationSource,
+                wasRegistered: false,
+                rejectionReason: "A property with the CLR name was already registered."
+            );
             return null;
         }
 
@@ -258,9 +274,23 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
         ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
         ArgumentException.ThrowIfNullOrWhiteSpace(clrName, nameof(clrName));
 
-        var builder = new ApiPropertyBuilder(apiName, clrName, apiNameSource);
+        var builder = new ApiPropertyBuilder
+        (
+            apiName,
+            clrName,
+            apiNameSource,
+            this.Context,
+            this.ClrType
+        );
         configure?.Invoke(builder);
         _apiPropertyBuilders.Add(builder);
+        this.Context.TraceStructuralRegistration
+        (
+            new(ApiSchemaBuildTargetKind.Property, this.ClrType, clrName, apiName),
+            ApiSchemaBuildRegistrationKind.Property,
+            apiNameSource,
+            wasRegistered: true
+        );
         return builder;
     }
 

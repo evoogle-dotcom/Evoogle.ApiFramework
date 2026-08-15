@@ -13,6 +13,11 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Conventions.Internal;
 /// </summary>
 internal sealed class ApiNamingCamelCaseConvention : ApiNamingConvention
 {
+    #region Properties
+    /// <inheritdoc />
+    public override ApiConventionPhase Phase => ApiConventionPhase.Configuration;
+    #endregion
+
     #region IApiNamingConvention
     /// <inheritdoc />
     public override string ConvertName(string apiName, ApiNamingConventionContext context)

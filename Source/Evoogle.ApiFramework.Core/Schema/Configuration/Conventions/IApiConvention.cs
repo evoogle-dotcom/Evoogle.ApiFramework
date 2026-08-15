@@ -17,8 +17,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Conventions;
 public interface IApiConvention
 {
     /// <summary>
-    ///     Gets the phase in which this convention participates. The default is
-    ///     <see cref="ApiConventionPhase.Configuration"/>.
+    ///     Gets the phase in which this convention participates.
     /// </summary>
-    ApiConventionPhase Phase => ApiConventionPhase.Configuration;
+    ApiConventionPhase Phase { get; }
 }

@@ -7,14 +7,16 @@ using Microsoft.Extensions.Logging;
 
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
 using Evoogle.ApiFramework.Schema.Configuration.Conventions;
-using Evoogle.ApiFramework.Schema.Configuration.Conventions.Internal;
+using Evoogle.ApiFramework.Schema.Configuration.Trace;
+using Evoogle.ApiFramework.Schema.Configuration.Trace.Internal;
+using Evoogle.Logging;
 
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
 /// <summary>
 ///     Provides a fluent API for programmatically constructing an <see cref="ApiSchema"/>.
 /// </summary>
-public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) : ExtensionBuilder<ApiSchemaBuilder>
+public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) : ExtensionBuilder<ApiSchemaBuilder>, IHasLogger
 {
     #region Fields
     private string? _apiName;
@@ -24,6 +26,11 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     private ApiAnnotationReaderSet? _annotationReaderSet;
 
     private readonly ApiSchemaBuilderContext _context = new(logger);
+    #endregion
+
+    #region IHasLogger Properties
+    /// <inheritdoc/>
+    public ILogger Logger => _context.Logger;
     #endregion
 
     #region AddEnum Methods
@@ -411,10 +418,14 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     ///     May be combined with <see cref="UseConventions"/> to augment or remove individual
     ///     conventions.
     /// </summary>
+    /// <param name="namingConvention">
+    ///     An optional naming convention to apply to all supported schema targets.
+    ///     When <see langword="null"/>, no naming convention is added.
+    /// </param>
     /// <returns>The current builder instance.</returns>
-    public ApiSchemaBuilder UseDefaultConventions()
+    public ApiSchemaBuilder UseDefaultConventions(ApiNamingConvention? namingConvention = null)
     {
-        _conventionSet = ApiConventionSet.CreateDefault();
+        _conventionSet = ApiConventionSet.CreateDefault(namingConvention);
         return this;
     }
     #endregion
@@ -468,13 +479,24 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
                 continue;
             }
 
-            if (clrType.IsEnum)
+            if (clrType.TryGetApiTypeKind(out var apiTypeKind))
             {
-                this.AddEnum(clrType);
+                switch (apiTypeKind.Value)
+                {
+                    case ApiTypeKind.Scalar:
+                        this.AddScalar(clrType);
+                        break;
+                    case ApiTypeKind.Enum:
+                        this.AddEnum(clrType);
+                        break;
+                    case ApiTypeKind.Object:
+                        this.AddObject(clrType);
+                        break;
+                }
             }
             else
             {
-                this.AddObject(clrType);
+                this.LogWarning("Type '{ClrType}' is not a valid API type and will be ignored.", clrType.FullName);
             }
         }
 
@@ -482,25 +504,50 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     }
 
     /// <summary>
-    ///     Scans the specified assembly using the built-in assembly scanning convention and registers
-    ///     all public non-abstract types annotated with
-    ///     <see cref="Annotations.ApiObjectTypeAttribute"/>,
-    ///     <see cref="Annotations.ApiScalarTypeAttribute"/>, or
-    ///     <see cref="Annotations.ApiEnumTypeAttribute"/>.
-    ///     Equivalent to the <see cref="ApiSchemaBuilderExtensions.UseAssemblyScanning"/> extension
-    ///     method.
+    ///     Registers one or more CLR types so that conventions and annotations can configure them
+    ///     without any explicit fluent configuration.
     /// </summary>
-    /// <param name="assembly">The assembly to scan.</param>
-    /// <param name="filter">Optional predicate to limit which types are considered.</param>
+    /// <param name="clrTypes">The CLR types to register.</param>
+    /// <param name="filter">An optional filter to apply to each type.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiSchemaBuilder ScanAssembly
-    (
-        System.Reflection.Assembly assembly,
-        Func<Type, bool>? filter = null
-    )
+    public ApiSchemaBuilder AddTypes(IEnumerable<Type> clrTypes, Func<Type, bool>? filter = null)
     {
-        return this.UseConventions(c =>
-            c.AddConvention(new ApiSchemaAssemblyScanConvention(assembly, filter)));
+        ArgumentNullException.ThrowIfNull(clrTypes);
+
+        foreach (var clrType in clrTypes)
+        {
+            if (clrType == null)
+            {
+                continue;
+            }
+
+            if (filter != null && !filter(clrType))
+            {
+                continue;
+            }
+
+            if (clrType.TryGetApiTypeKind(out var apiTypeKind))
+            {
+                switch (apiTypeKind.Value)
+                {
+                    case ApiTypeKind.Scalar:
+                        this.AddScalar(clrType);
+                        break;
+                    case ApiTypeKind.Enum:
+                        this.AddEnum(clrType);
+                        break;
+                    case ApiTypeKind.Object:
+                        this.AddObject(clrType);
+                        break;
+                }
+            }
+            else
+            {
+                this.LogWarning("Type '{ClrType}' is not a valid API type and will be ignored.", clrType.FullName);
+            }
+        }
+
+        return this;
     }
     #endregion
 
@@ -511,50 +558,134 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     /// <returns>The built <see cref="ApiSchema"/>.</returns>
     public ApiSchema Build()
     {
-        if (_conventionSet is not null || _annotationReaderSet is not null)
+        return this.BuildCore(null);
+    }
+
+    /// <summary>
+    ///     Constructs the <see cref="ApiSchema"/> while reporting structured build trace events to a sink.
+    /// </summary>
+    /// <param name="traceSink">The sink that receives trace events.</param>
+    /// <returns>The built <see cref="ApiSchema"/>.</returns>
+    public ApiSchema Build(IApiSchemaBuildTraceSink traceSink)
+    {
+        ArgumentNullException.ThrowIfNull(traceSink);
+
+        var traceDispatcher = new ApiSchemaBuildTraceDispatcher(traceSink, this.Logger);
+        return this.BuildCore(traceDispatcher);
+    }
+
+    private ApiSchema BuildCore(ApiSchemaBuildTraceDispatcher? traceDispatcher)
+    {
+        _context.SetTraceDispatcher(traceDispatcher);
+        traceDispatcher?.Record(new ApiSchemaBuildStartedEvent());
+
+        try
         {
-            var configurationPipeline = new ApiSchemaConfigurationPipeline(
-                _conventionSet,
-                _annotationReaderSet,
-                _context,
-                this);
+            if (_conventionSet is not null || _annotationReaderSet is not null)
+            {
+                var configurationPipeline = new ApiSchemaConfigurationPipeline
+                (
+                    _conventionSet,
+                    _annotationReaderSet,
+                    _context,
+                    this
+                );
 
-            configurationPipeline.Run();
+                configurationPipeline.Run();
+            }
+
+            traceDispatcher?.Record
+            (
+                new ApiSchemaBuildPhaseStartedEvent
+                {
+                    Phase = ApiSchemaBuildPhase.Materialization,
+                    Iteration = 0,
+                    Target = new(ApiSchemaBuildTargetKind.Schema),
+                }
+            );
+
+            // Build ApiSchema instance from all the configured components.
+            var apiName = _apiName!;
+            var apiVersion = _apiVersion;
+            var apiOptions = this.BuildOptions();
+
+            var apiScalarTypes = _context.ApiScalarTypeBuilders.Select(b => b.Build());
+            var apiEnumTypes = _context.ApiEnumTypeBuilders.Select(b => b.Build());
+            var apiObjectTypes = _context.ApiObjectTypeBuilders.Select(b => b.Build());
+            var apiRelationships = _context.ApiRelationshipBuilders.Select(b => b.Build());
+
+            var apiSchema = new ApiSchema
+            (
+                apiName,
+                apiVersion,
+                apiOptions,
+                apiScalarTypes,
+                apiEnumTypes,
+                apiObjectTypes,
+                apiRelationships
+            );
+
+            traceDispatcher?.Record
+            (
+                new ApiSchemaBuildPhaseCompletedEvent
+                {
+                    Phase = ApiSchemaBuildPhase.Materialization,
+                    Iteration = 0,
+                    Target = new(ApiSchemaBuildTargetKind.Schema),
+                }
+            );
+
+            // Add any extensions that were configured.
+            var extensions = this.BuildExtensions();
+            if (extensions != null)
+            {
+                apiSchema.Extensions = extensions;
+            }
+
+            traceDispatcher?.Record
+            (
+                new ApiSchemaBuildPhaseStartedEvent
+                {
+                    Phase = ApiSchemaBuildPhase.Initialization,
+                    Iteration = 0,
+                    Target = new(ApiSchemaBuildTargetKind.Schema),
+                }
+            );
+
+            // Initialize the ApiSchema instance.
+            var result = apiSchema.Initialize();
+            result.ThrowIfInvalid();
+
+            traceDispatcher?.Record
+            (
+                new ApiSchemaBuildPhaseCompletedEvent
+                {
+                    Phase = ApiSchemaBuildPhase.Initialization,
+                    Iteration = 0,
+                    Target = new(ApiSchemaBuildTargetKind.Schema),
+                }
+            );
+            traceDispatcher?.Record(new ApiSchemaBuildCompletedEvent());
+
+            return apiSchema;
         }
-
-        // Build ApiSchema instance from all the configured components.
-        var apiName = _apiName!;
-        var apiVersion = _apiVersion;
-        var apiOptions = this.BuildOptions();
-
-        var apiScalarTypes = _context.ApiScalarTypeBuilders.Select(b => b.Build());
-        var apiEnumTypes = _context.ApiEnumTypeBuilders.Select(b => b.Build());
-        var apiObjectTypes = _context.ApiObjectTypeBuilders.Select(b => b.Build());
-        var apiRelationships = _context.ApiRelationshipBuilders.Select(b => b.Build());
-
-        var apiSchema = new ApiSchema
-        (
-            apiName,
-            apiVersion,
-            apiOptions,
-            apiScalarTypes,
-            apiEnumTypes,
-            apiObjectTypes,
-            apiRelationships
-        );
-
-        // Add any extensions that were configured.
-        var extensions = this.BuildExtensions();
-        if (extensions != null)
+        catch (Exception exception)
         {
-            apiSchema.Extensions = extensions;
+            traceDispatcher?.Record
+            (
+                new ApiSchemaBuildFailedEvent
+                {
+                    ExceptionType = exception.GetType().FullName ?? exception.GetType().Name,
+                    ExceptionMessage = exception.Message,
+                    Target = new(ApiSchemaBuildTargetKind.Schema),
+                }
+            );
+            throw;
         }
-
-        // Initialize the ApiSchema instance.
-        var result = apiSchema.Initialize();
-        result.ThrowIfInvalid();
-
-        return apiSchema;
+        finally
+        {
+            _context.SetTraceDispatcher(null);
+        }
     }
 
     private ApiSchemaOptions? BuildOptions()

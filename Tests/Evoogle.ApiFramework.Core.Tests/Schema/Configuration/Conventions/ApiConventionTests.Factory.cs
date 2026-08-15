@@ -14,8 +14,79 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Conventions;
 [DynamicLinqType]
 public static class ApiConventionTestsFactory
 {
-    #region Camel Case Naming Factory Methods
-    public static ApiSchema BuildWithCamelCaseNamingExpressionInferredPropertyNames()
+    #region EnumType - EnumValue Discovery Convention Factory Methods
+    internal static ApiSchema BuildWithEnumTypeEnumValueDiscoveryThatDiscoversAllEnumValues()
+    {
+        var apiSchema = new ApiSchemaBuilder()
+            .WithName("Test")
+            .AddEnum<PipelineStatus>()
+            .UseEnumValueDiscovery()
+            .Build();
+
+        return apiSchema;
+    }
+
+    internal static ApiSchema BuildWithEnumTypeEnumValueDiscoveryWithExplicitEnumValueOverride()
+    {
+        var apiSchema = new ApiSchemaBuilder()
+            .WithName("Test")
+            .AddEnum<PipelineStatus>(x => x.AddValue(PipelineStatus.Active, "Enabled"))
+            .UseEnumValueDiscovery()
+            .Build();
+
+        return apiSchema;
+    }
+    #endregion
+
+    #region Naming Convention Factory Methods
+    internal static ApiSchema BuildWithNamingConventionForScalarType()
+    {
+        var apiSchema = new ApiSchemaBuilder()
+            .WithName("Test")
+            .AddScalar<CustomScalar>()
+            .UseCamelCaseNaming()
+            .Build();
+
+        return apiSchema;
+    }
+
+    internal static ApiSchema BuildWithNamingConventionForEnumTypeAndAllEnumValues()
+    {
+        var apiSchema = new ApiSchemaBuilder()
+            .WithName("Test")
+            .AddEnum<PipelineStatus>(x => x.AddAllValues())
+            .UseCamelCaseNaming()
+            .Build();
+
+        return apiSchema;
+    }
+
+    internal static ApiSchema BuildWithNamingConventionForEnumTypeAndPreservesTypedExplicitEnumValueApiName()
+    {
+        var apiSchema = new ApiSchemaBuilder()
+            .WithName("Test")
+            .AddEnum<PipelineStatus>(x => x
+                .AddValue(PipelineStatus.Active, "Enabled"))
+            .UseCamelCaseNaming()
+            .Build();
+
+        return apiSchema;
+    }
+
+    internal static ApiSchema BuildWithNamingConventionForEnumTypeAndPreservesStringExplicitEnumValueApiNames()
+    {
+        var apiSchema = new ApiSchemaBuilder()
+            .WithName("Test")
+            .AddEnum<PipelineStatus>(x => x
+                .AddValue("Enabled", nameof(PipelineStatus.Active), (int)PipelineStatus.Active)
+                .AddValue(nameof(PipelineStatus.InProgress), (int)PipelineStatus.InProgress))
+            .UseCamelCaseNaming()
+            .Build();
+
+        return apiSchema;
+    }
+
+    internal static ApiSchema BuildWithNamingConventionForObjectTypeAndExpressionInferredPropertyNames()
     {
         var apiSchema = new ApiSchemaBuilder()
             .WithName("Test")
@@ -31,23 +102,7 @@ public static class ApiConventionTestsFactory
         return apiSchema;
     }
 
-    public static ApiSchema BuildWithCamelCaseNamingRequiredAndOptionalExpressionPropertyNames()
-    {
-        var apiSchema = new ApiSchemaBuilder()
-            .WithName("Test")
-            .AddScalar<Guid>()
-            .AddScalar<string>()
-            .AddObject<PersonWithId>(x => x
-                .AddRequiredProperty(p => p.Id)
-                .AddRequiredProperty(p => p.Name)
-                .AddOptionalProperty(p => p.Email))
-            .UseCamelCaseNaming()
-            .Build();
-
-        return apiSchema;
-    }
-
-    public static ApiSchema BuildWithCamelCaseNamingPreservesSelectorExplicitApiName()
+    internal static ApiSchema BuildWithNamingConventionForObjectTypeAndPreservesSelectorExplicitApiName()
     {
         var apiSchema = new ApiSchemaBuilder()
             .WithName("Test")
@@ -63,7 +118,7 @@ public static class ApiConventionTestsFactory
         return apiSchema;
     }
 
-    public static ApiSchema BuildWithCamelCaseNamingPreservesCallbackExplicitApiName()
+    internal static ApiSchema BuildWithNamingConventionForObjectTypeAndPreservesCallbackExplicitApiName()
     {
         var apiSchema = new ApiSchemaBuilder()
             .WithName("Test")
@@ -79,7 +134,7 @@ public static class ApiConventionTestsFactory
         return apiSchema;
     }
 
-    public static ApiSchema BuildWithCamelCaseNamingPreservesStringBasedExplicitApiNames()
+    internal static ApiSchema BuildWithNamingConventionForObjectTypeAndPreservesStringBasedExplicitApiNames()
     {
         var apiSchema = new ApiSchemaBuilder()
             .WithName("Test")
@@ -96,21 +151,120 @@ public static class ApiConventionTestsFactory
         return apiSchema;
     }
 
-    public static ApiSchema BuildWithCamelCaseNamingForEnumTypeAndValues()
+    internal static ApiSchema BuildWithCustomNamingConventionsThatAppendsApiAndModelToApiName()
     {
         var apiSchema = new ApiSchemaBuilder()
             .WithName("Test")
-            .AddEnum<CustomEnum>(x => x
-                .AddValue(CustomEnum.Active))
-            .UseCamelCaseNaming()
+            .AddEnum<PipelineStatus>(x => x.AddValue(PipelineStatus.Active))
+            .AddObject<PersonWithId>()
+            .UseConventions(c => c
+                .AddConvention(new AppendApiNameConvention("Api"))
+                .AddConvention(new AppendApiNameConvention("Model")))
+            .Build();
+
+        return apiSchema;
+    }
+
+    internal static ApiSchema BuildWithCustomNamingConventionsThatHardCodesApiEnumValueAndAppendsChangedToApiName()
+    {
+        var apiSchema = new ApiSchemaBuilder()
+            .WithName("Test")
+            .AddEnum<PipelineStatus>(x => x.AddValue(PipelineStatus.Active))
+            .UseConventions(c => c
+                .AddConvention(new ExplicitEnumValueNameConvention())
+                .AddConvention(new AppendApiNameConvention("Changed")))
             .Build();
 
         return apiSchema;
     }
     #endregion
 
-    #region Property Discovery Factory Methods
-    public static ApiSchema BuildWithPropertyDiscoveryDiscoversPublicInstanceProperties()
+    #region ObjectType - PrimaryKey Inference Convention Factory Methods
+    internal static ApiSchema BuildWithObjectTypePrimaryKeyInferenceThatDiscoversId()
+    {
+        var apiSchema = new ApiSchemaBuilder()
+            .WithName("Test")
+            .AddScalar<Guid>()
+            .AddScalar<string>()
+            .AddObject<PersonWithId>(x => x
+                .AddProperty(p => p.Id)
+                .AddProperty(p => p.Name)
+                .AddProperty(p => p.Email))
+            .UsePrimaryKeyInference()
+            .Build();
+
+        return apiSchema;
+    }
+
+    internal static ApiSchema BuildWithObjectTypePrimaryKeyInferenceThatDiscoversIdButDoesNotOverwriteAnExplicitPrimaryKey()
+    {
+        var apiSchema = new ApiSchemaBuilder()
+            .WithName("Test")
+            .AddScalar<Guid>()
+            .AddScalar<string>()
+            .AddObject<PersonWithId>(x => x
+                .AddProperty(p => p.Id)
+                .AddProperty(p => p.Name)
+                .AddProperty(p => p.Email)
+                .AddKey("PrimaryKey", b => b.AddPath(x => x.Name)))
+            .UsePrimaryKeyInference()
+            .Build();
+
+        return apiSchema;
+    }
+
+    internal static ApiSchema BuildWithObjectTypePrimaryKeyInferenceThatDiscoversClassNameId()
+    {
+        var apiSchema = new ApiSchemaBuilder()
+            .WithName("Test")
+            .AddScalar<Guid>()
+            .AddScalar<string>()
+            .AddObject<OrderItem>(x => x
+                .AddProperty(p => p.OrderItemId)
+                .AddProperty(p => p.Description))
+            .UsePrimaryKeyInference()
+            .Build();
+
+        return apiSchema;
+    }
+    #endregion
+
+    #region ObjectType - Property Configuration Convention Factory Methods
+    internal static ApiSchema BuildWithObjectTypePropertyNullabilityModifiers()
+    {
+        var apiSchema = new ApiSchemaBuilder()
+            .WithName("Test")
+            .AddScalar<Guid>()
+            .AddScalar<string>()
+            .AddObject<PersonWithId>(x => x
+                .AddProperty(p => p.Id)
+                .AddProperty(p => p.Name)
+                .AddProperty(p => p.Email))
+            .UsePropertyNullabilityModifiers()
+            .Build();
+
+        return apiSchema;
+    }
+
+    internal static ApiSchema BuildWithObjectTypePropertyNullabilityModifiersAndExplicitPropertyModifier()
+    {
+        var apiSchema = new ApiSchemaBuilder()
+            .WithName("Test")
+            .AddScalar<Guid>()
+            .AddScalar<string>()
+            .AddObject<PersonWithId>(x => x
+                .AddProperty(p => p.Id)
+                .AddProperty(p => p.Name)
+                .AddProperty("email", "Email", p => p.WithModifiers(m => m.Required())))
+            .UsePropertyNullabilityModifiers()
+            .Build();
+
+        return apiSchema;
+    }
+    #endregion
+
+    #region ObjectType - Property Discovery Convention Factory Methods
+    internal static ApiSchema BuildWithObjectTypePropertyDiscoveryThatDiscoversPublicInstanceProperties()
     {
         var apiSchema = new ApiSchemaBuilder()
             .WithName("Test")
@@ -123,7 +277,7 @@ public static class ApiConventionTestsFactory
         return apiSchema;
     }
 
-    public static ApiSchema BuildWithPropertyDiscoveryDiscoversPublicFields()
+    internal static ApiSchema BuildWithObjectTypePropertyDiscoveryThatDiscoversPublicInstanceFields()
     {
         var apiSchema = new ApiSchemaBuilder()
             .WithName("Test")
@@ -137,7 +291,7 @@ public static class ApiConventionTestsFactory
         return apiSchema;
     }
 
-    public static ApiSchema BuildWithPropertyDiscoveryDoesNotDuplicateExplicitlyAddedProperties()
+    internal static ApiSchema BuildWithObjectTypePropertyDiscoveryThatDoesNotDuplicateExplicitlyAddedProperties()
     {
         var apiSchema = new ApiSchemaBuilder()
             .WithName("Test")
@@ -153,60 +307,10 @@ public static class ApiConventionTestsFactory
     }
     #endregion
 
-    #region Built-In Convention Factory Methods
-    public static ApiSchema BuildWithPropertyDiscoveryAndCamelCaseNaming()
+    #region Schema - Type Discovery Convention Factory Methods
+    internal static ApiSchema BuildWithSchemaAssemblyTypeInference()
     {
-        var apiSchema = new ApiSchemaBuilder()
-            .WithName("Test")
-            .AddScalar<Guid>()
-            .AddScalar<string>()
-            .AddObject<PersonWithId>()
-            .UsePropertyDiscovery()
-            .UseCamelCaseNaming()
-            .Build();
-
-        return apiSchema;
-    }
-
-    public static ApiSchema BuildWithPropertyNullabilityModifiers()
-    {
-        var apiSchema = new ApiSchemaBuilder()
-            .WithName("Test")
-            .AddScalar<Guid>()
-            .AddScalar<string>()
-            .AddObject<PersonWithId>()
-            .UsePropertyDiscovery()
-            .UsePropertyNullabilityModifiers()
-            .Build();
-
-        return apiSchema;
-    }
-
-    public static ApiSchema BuildWithPrimaryKeyInference()
-    {
-        var apiSchema = new ApiSchemaBuilder()
-            .WithName("Test")
-            .AddScalar<Guid>()
-            .AddScalar<string>()
-            .AddObject<PersonWithId>()
-            .UsePropertyDiscovery()
-            .UsePrimaryKeyInference()
-            .Build();
-
-        return apiSchema;
-    }
-
-    public static ApiSchema BuildWithAssemblyScanning()
-    {
-        var apiSchema = new ApiSchemaBuilder()
-            .WithName("Test")
-            .AddScalar<Guid>()
-            .UsePropertyDiscovery()
-            .UseAssemblyScanning(typeof(AssemblyScannedObject).Assembly, IsAssemblyScannedType)
-            .UseConventions(c => c.AddConvention(new AssemblyScannedEnumValueConvention()))
-            .Build();
-
-        return apiSchema;
+        var assemblyScannedAssembly = typeof(AssemblyScannedObject).Assembly;
 
         static bool IsAssemblyScannedType(Type clrType)
         {
@@ -214,163 +318,13 @@ public static class ApiConventionTestsFactory
                 || clrType == typeof(AssemblyScannedScalar)
                 || clrType == typeof(AssemblyScannedEnum);
         }
-    }
 
-    public static ApiSchema BuildWithCamelCaseNamingForScalarType()
-    {
-        var apiSchema = new ApiSchemaBuilder()
-            .WithName("Test")
-            .AddScalar<CustomScalar>()
-            .UseCamelCaseNaming()
-            .Build();
-
-        return apiSchema;
-    }
-
-    public static ApiSchema BuildWithCamelCaseNamingForAllEnumValues()
-    {
-        var apiSchema = new ApiSchemaBuilder()
-            .WithName("Test")
-            .AddEnum<PipelineStatus>(x => x.AddAllValues())
-            .UseCamelCaseNaming()
-            .Build();
-
-        return apiSchema;
-    }
-
-    public static ApiSchema BuildWithCamelCaseNamingPreservesTypedExplicitEnumValueApiName()
-    {
-        var apiSchema = new ApiSchemaBuilder()
-            .WithName("Test")
-            .AddEnum<PipelineStatus>(x => x
-                .AddValue(PipelineStatus.Active, "Enabled"))
-            .UseCamelCaseNaming()
-            .Build();
-
-        return apiSchema;
-    }
-
-    public static ApiSchema BuildWithCamelCaseNamingPreservesStringExplicitEnumValueApiNames()
-    {
-        var apiSchema = new ApiSchemaBuilder()
-            .WithName("Test")
-            .AddEnum<PipelineStatus>(x => x
-                .AddValue("Enabled", nameof(PipelineStatus.Active), (int)PipelineStatus.Active)
-                .AddValue(nameof(PipelineStatus.InProgress), (int)PipelineStatus.InProgress))
-            .UseCamelCaseNaming()
-            .Build();
-
-        return apiSchema;
-    }
-
-    public static ApiSchema BuildWithComposedNamingConventions()
-    {
-        var apiSchema = new ApiSchemaBuilder()
-            .WithName("Test")
-            .AddEnum<PipelineStatus>(x => x.AddValue(PipelineStatus.Active))
-            .AddObject<PersonWithId>()
-            .UseConventions(c => c
-                .AddConvention(new AppendApiNameConvention("Api"))
-                .AddConvention(new AppendApiNameConvention("Model")))
-            .Build();
-
-        return apiSchema;
-    }
-
-    public static ApiSchema BuildWithExplicitEnumValueConventionName()
-    {
-        var apiSchema = new ApiSchemaBuilder()
-            .WithName("Test")
-            .AddEnum<PipelineStatus>(x => x.AddValue(PipelineStatus.Active))
-            .UseConventions(c => c
-                .AddConvention(new ExplicitEnumValueNameConvention())
-                .AddConvention(new AppendApiNameConvention("Changed")))
-            .Build();
-
-        return apiSchema;
-    }
-
-    public static ApiSchema BuildWithExplicitPropertyModifier()
-    {
         var apiSchema = new ApiSchemaBuilder()
             .WithName("Test")
             .AddScalar<Guid>()
-            .AddScalar<string>()
-            .AddObject<PersonWithId>(x => x
-                .AddProperty("email", "Email", p => p.WithModifiers(m => m.Required())))
+            .UseAssemblyTypeInference(assemblyScannedAssembly, IsAssemblyScannedType)
             .UsePropertyDiscovery()
-            .UsePropertyNullabilityModifiers()
-            .Build();
-
-        return apiSchema;
-    }
-
-    public static ApiSchema BuildWithClassNamePrimaryKeyInference()
-    {
-        var apiSchema = new ApiSchemaBuilder()
-            .WithName("Test")
-            .AddScalar<Guid>()
-            .AddScalar<string>()
-            .AddObject<OrderItem>()
-            .UsePropertyDiscovery()
-            .UsePrimaryKeyInference()
-            .Build();
-
-        return apiSchema;
-    }
-
-    public static ApiSchema BuildWithExistingPrimaryKey()
-    {
-        var apiSchema = new ApiSchemaBuilder()
-            .WithName("Test")
-            .AddScalar<Guid>()
-            .AddScalar<string>()
-            .AddObject<PersonWithId>(x => x
-                .AddKey("PrimaryKey", b => b.AddPath(typeof(PersonWithId), "Id")))
-            .UsePropertyDiscovery()
-            .UsePrimaryKeyInference()
-            .Build();
-
-        return apiSchema;
-    }
-
-    public static ApiSchema BuildWithDefaultConventions()
-    {
-        var apiSchema = new ApiSchemaBuilder()
-            .WithName("Test")
-            .AddScalar<Guid>()
-            .AddScalar<string>()
-            .AddObject<PersonWithId>()
-            .UseDefaultConventions()
-            .Build();
-
-        return apiSchema;
-    }
-
-    public static ApiSchema BuildWithExplicitConfiguration()
-    {
-        var apiSchema = new ApiSchemaBuilder()
-            .WithName("Test")
-            .AddScalar<Guid>()
-            .AddScalar<string>()
-            .AddObject<PersonWithId>(x => x
-                .WithName("MyPerson")
-                .AddProperty("emailAddress", "Email", p => p.WithModifiers(m => m.Required())))
-            .UseDefaultConventions()
-            .Build();
-
-        return apiSchema;
-    }
-
-    public static ApiSchema BuildWithAddTypes()
-    {
-        var apiSchema = new ApiSchemaBuilder()
-            .WithName("Test")
-            .AddScalar<decimal>()
-            .AddScalar<Guid>()
-            .AddScalar<string>()
-            .AddTypes(typeof(PersonWithId), typeof(OrderWithPersonId))
-            .UseDefaultConventions()
+            .UseEnumValueDiscovery()
             .Build();
 
         return apiSchema;
@@ -378,38 +332,29 @@ public static class ApiConventionTestsFactory
     #endregion
 
     #region Convention Trace Factory Methods
-    public static ApiConventionBuildTrace BuildWithEnumTypeAddedValueTrace()
+    internal static ApiSchemaBuilder BuildWithEnumTypeAddedValueTrace()
     {
-        var recordingConvention = new RecordingEnumValueConvention();
-        var apiSchema = new ApiSchemaBuilder()
+        return new ApiSchemaBuilder()
             .WithName("Test")
             .AddEnum<PipelineStatus>(x => x.AddValue(PipelineStatus.Active))
             .UseConventions(c => c
                 .AddConvention(new EnumTypeAddsValueConvention())
-                .AddConvention(recordingConvention))
-            .Build();
-
-        return new(apiSchema, recordingConvention.ProcessedClrNames);
+                .AddConvention(new RecordingEnumValueConvention()));
     }
 
-    public static ApiConventionBuildTrace BuildWithEnumValueAddedValueTrace()
+    internal static ApiSchemaBuilder BuildWithEnumValueAddedValueTrace()
     {
-        var recordingConvention = new RecordingEnumValueConvention();
-        var apiSchema = new ApiSchemaBuilder()
+        return new ApiSchemaBuilder()
             .WithName("Test")
             .AddEnum<PipelineStatus>(x => x.AddValue(PipelineStatus.Active))
             .UseConventions(c => c
                 .AddConvention(new EnumValueAddsValueConvention())
-                .AddConvention(recordingConvention))
-            .Build();
-
-        return new(apiSchema, recordingConvention.ProcessedClrNames);
+                .AddConvention(new RecordingEnumValueConvention()));
     }
 
-    public static ApiConventionBuildTrace BuildWithSiblingPropertyTrace()
+    internal static ApiSchemaBuilder BuildWithSiblingPropertyTrace()
     {
-        var recordingConvention = new RecordingPropertyConvention();
-        var apiSchema = new ApiSchemaBuilder()
+        return new ApiSchemaBuilder()
             .WithName("Test")
             .AddScalar<int>()
             .AddObject<PropertyConventionTarget>(x => x.AddProperty
@@ -419,19 +364,12 @@ public static class ApiConventionTestsFactory
             ))
             .UseConventions(c => c
                 .AddConvention(new AddSiblingPropertyConvention())
-                .AddConvention(recordingConvention))
-            .Build();
-        var events = recordingConvention.ProcessedProperties
-            .Select(p => $"{p.ClrDeclaringType.Name}.{p.ClrName}")
-            .ToArray();
-
-        return new(apiSchema, events);
+                .AddConvention(new RecordingPropertyConvention()));
     }
 
-    public static ApiConventionBuildTrace BuildWithVisitedObjectPropertyTrace()
+    internal static ApiSchemaBuilder BuildWithVisitedObjectPropertyTrace()
     {
-        var recordingConvention = new RecordingPropertyConvention();
-        var apiSchema = new ApiSchemaBuilder()
+        return new ApiSchemaBuilder()
             .WithName("Test")
             .AddScalar<int>()
             .AddObject<PropertyConventionTarget>(x => x.AddProperty
@@ -446,20 +384,12 @@ public static class ApiConventionTestsFactory
             ))
             .UseConventions(c => c
                 .AddConvention(new AddPropertyToVisitedObjectConvention())
-                .AddConvention(recordingConvention))
-            .Build();
-        var events = recordingConvention.ProcessedProperties
-            .Select(p => $"{p.ClrDeclaringType.Name}.{p.ClrName}")
-            .ToArray();
-
-        return new(apiSchema, events);
+                .AddConvention(new RecordingPropertyConvention()));
     }
 
-    public static ApiConventionBuildTrace BuildWithPropertyRegisteredObjectTrace()
+    internal static ApiSchemaBuilder BuildWithPropertyRegisteredObjectTrace()
     {
-        var events = new List<string>();
-        var orderingConvention = new PropertyRegisteredObjectOrderingConvention(events);
-        var apiSchema = new ApiSchemaBuilder()
+        return new ApiSchemaBuilder()
             .WithName("Test")
             .AddScalar<int>()
             .AddObject<PropertyConventionTrigger>(x => x.AddProperty
@@ -467,16 +397,12 @@ public static class ApiConventionTestsFactory
                 nameof(PropertyConventionTrigger.Trigger),
                 nameof(PropertyConventionTrigger.Trigger)
             ))
-            .UseConventions(c => c.AddConvention(orderingConvention))
-            .Build();
-
-        return new(apiSchema, events);
+            .UseConventions(c => c.AddConvention(new PropertyRegisteredObjectOrderingConvention()));
     }
 
-    public static ApiConventionBuildTrace BuildWithPropertyAddedEnumValueTrace()
+    internal static ApiSchemaBuilder BuildWithPropertyAddedEnumValueTrace()
     {
-        var recordingConvention = new RecordingEnumValueConvention();
-        var apiSchema = new ApiSchemaBuilder()
+        return new ApiSchemaBuilder()
             .WithName("Test")
             .AddScalar<int>()
             .AddEnum<PipelineStatus>(x => x.AddValue(PipelineStatus.Active))
@@ -487,51 +413,36 @@ public static class ApiConventionTestsFactory
             ))
             .UseConventions(c => c
                 .AddConvention(new PropertyAddsEnumValueConvention())
-                .AddConvention(recordingConvention))
-            .Build();
-
-        return new(apiSchema, recordingConvention.ProcessedClrNames);
+                .AddConvention(new RecordingEnumValueConvention()));
     }
 
-    public static ApiConventionBuildTrace BuildWithObjectPhaseTrace()
+    internal static ApiSchemaBuilder BuildWithObjectPhaseTrace()
     {
-        var events = new List<string>();
-        var apiSchema = new ApiSchemaBuilder()
+        return new ApiSchemaBuilder()
             .WithName("Test")
             .AddObject<PersonWithId>()
             .UseConventions(c => c
                 .AddConvention(new RecordingObjectPhaseConvention
                 (
-                    "Configuration1",
-                    ApiConventionPhase.Configuration,
-                    events
+                    ApiConventionPhase.Configuration
                 ))
                 .AddConvention(new RecordingObjectPhaseConvention
                 (
-                    "Discovery1",
-                    ApiConventionPhase.Discovery,
-                    events
+                    ApiConventionPhase.Discovery
                 ))
                 .AddConvention(new RecordingObjectPhaseConvention
                 (
-                    "Configuration2",
-                    ApiConventionPhase.Configuration,
-                    events
+                    ApiConventionPhase.Configuration
                 ))
                 .AddConvention(new RecordingObjectPhaseConvention
                 (
-                    "Discovery2",
-                    ApiConventionPhase.Discovery,
-                    events
-                )))
-            .Build();
-
-        return new(apiSchema, events);
+                    ApiConventionPhase.Discovery
+                )));
     }
     #endregion
 
     #region Convention Contract Factory Methods
-    public static EnumValueNamingContextSnapshot BuildEnumValueNamingContextSnapshot()
+    internal static EnumValueNamingContextSnapshot BuildEnumValueNamingContextSnapshot()
     {
         var namingConvention = new CaptureEnumValueNamingConvention();
         var apiSchema = new ApiSchemaBuilder()
@@ -569,7 +480,7 @@ public static class ApiConventionTestsFactory
         );
     }
 
-    public static ApiConventionSetSnapshot BuildConventionSetSnapshot()
+    internal static ApiConventionSetSnapshot BuildConventionSetSnapshot()
     {
         var namingConvention = new AppendApiNameConvention("Api");
         var conventionSet = new ApiConventionSetBuilder()
@@ -593,7 +504,7 @@ public static class ApiConventionTestsFactory
     #endregion
 
     #region Failure Factory Methods
-    public static ApiSchema BuildWithInvalidPropertyConventionPhase()
+    internal static ApiSchema BuildWithInvalidPropertyConventionPhase()
     {
         return new ApiSchemaBuilder()
             .WithName("Test")
@@ -601,7 +512,7 @@ public static class ApiConventionTestsFactory
             .Build();
     }
 
-    public static ApiSchema BuildWithRelationshipStructuralRegistration()
+    internal static ApiSchema BuildWithRelationshipStructuralRegistration()
     {
         return new ApiSchemaBuilder()
             .WithName("Test")
@@ -609,7 +520,7 @@ public static class ApiConventionTestsFactory
             .Build();
     }
 
-    public static ApiSchema BuildWithNonConvergingConventionPipeline()
+    internal static ApiSchema BuildWithNonConvergingConventionPipeline()
     {
         return new ApiSchemaBuilder()
             .WithName("Test")
@@ -620,7 +531,7 @@ public static class ApiConventionTestsFactory
             .Build();
     }
 
-    public static ApiSchema BuildWithNonConvergingPropertyPipeline()
+    internal static ApiSchema BuildWithNonConvergingPropertyPipeline()
     {
         return new ApiSchemaBuilder()
             .WithName("Test")
@@ -634,7 +545,7 @@ public static class ApiConventionTestsFactory
             .Build();
     }
 
-    public static ApiSchema BuildWithNonConvergingEnumValuePipeline()
+    internal static ApiSchema BuildWithNonConvergingEnumValuePipeline()
     {
         return new ApiSchemaBuilder()
             .WithName("Test")
