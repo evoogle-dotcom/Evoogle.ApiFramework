@@ -36,6 +36,9 @@ public partial class ApiAnnotationTests
 
         [ApiProperty(IsOptional = true)]
         public string NonNullableButOptional { get; set; } = string.Empty;
+
+        [ApiProperty(IsRequired = true, IsOptional = true)]
+        public string? RequiredWins { get; set; }
     }
     #endregion
 
@@ -47,15 +50,54 @@ public partial class ApiAnnotationTests
         public string Name { get; set; } = string.Empty;
     }
 
+    public class ScalarKeyTypeAnnotation
+    {
+        [ApiKey]
+        public int Id { get; set; }
+
+        [ApiKey("AlternateKey")]
+        public string Name { get; set; } = string.Empty;
+    }
+
     public class CompositeKeyType
     {
-        [ApiKey(order: 0)]
+        [ApiKey("OrderLineKey", order: 0)]
         public Guid OrderId { get; set; }
 
-        [ApiKey(order: 1)]
+        [ApiKey("OrderLineKey", order: 1)]
         public long LineItemNumber { get; set; }
 
         public string Description { get; set; } = string.Empty;
+    }
+
+    public class ThreePartCompositeKeyType
+    {
+        [ApiKey("ThreePartKey", order: 0)]
+        public int Id1 { get; set; }
+
+        [ApiKey("ThreePartKey", order: 1)]
+        public string? Id2 { get; set; }
+
+        [ApiKey("ThreePartKey", order: 2)]
+        public Guid Id3 { get; set; }
+
+        public string? Description { get; set; }
+    }
+
+    public class NestedKeyPartAnnotation
+    {
+        [ApiKey("NestedPartKey")]
+        public int Id { get; set; }
+
+        public string? Description { get; set; }
+    }
+
+    public class OwnerKeyAnnotation
+    {
+        [ApiKey("OwnerKey")]
+        public int Id { get; set; }
+
+        public string? Description { get; set; }
     }
 
     public class AnnotationPrimaryKeyType
@@ -70,15 +112,23 @@ public partial class ApiAnnotationTests
     #region Test Domain Types — Relationship Attributes
     public class Customer
     {
+        [ApiKey]
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
 
-        [ApiRelationship("CustomerHasOrders", Kind = ApiRelationshipKind.OneToMany, ForeignKey = "CustomerId")]
+        [ApiRelationship
+        (
+            "CustomerHasOrders",
+            Kind = ApiRelationshipKind.OneToMany,
+            ForeignKey = "CustomerId",
+            DeleteBehavior = ApiRelationshipDeleteBehavior.Delete
+        )]
         public List<Order> Orders { get; set; } = [];
     }
 
     public class Order
     {
+        [ApiKey]
         public Guid Id { get; set; }
         public Guid? CustomerId { get; set; }
         public decimal Total { get; set; }
@@ -98,6 +148,73 @@ public partial class ApiAnnotationTests
         public Guid Id { get; set; }
         public Guid? OrderId { get; set; }
         public decimal Amount { get; set; }
+    }
+    #endregion
+
+    #region Test Domain Types — Field and Many-to-Many Attributes
+    public class FieldAnnotationsType
+    {
+        [ApiProperty(Name = "field_code", IsRequired = true)]
+        [ApiKey("FieldKey")]
+        public Guid Code;
+
+        [ApiIgnore]
+        public string InternalValue = string.Empty;
+    }
+
+    public class Product
+    {
+        [ApiKey]
+        public Guid Id { get; set; }
+
+        [ApiManyToManyRelationship
+        (
+            "ProductHasTags",
+            associationType: typeof(ProductTag),
+            otherPrincipalType: typeof(Tag),
+            ForeignKeyA = "ProductId",
+            ForeignKeyB = "TagId"
+        )]
+        public List<Tag> Tags { get; set; } = [];
+    }
+
+    public class Tag
+    {
+        [ApiKey]
+        public Guid Id { get; set; }
+    }
+
+    public class ProductTag
+    {
+        public Guid ProductId { get; set; }
+        public Guid TagId { get; set; }
+    }
+
+    [ApiManyToManyRelationshipType
+    (
+        "ProductHasTagsFromType",
+        principalTypeA: typeof(Category),
+        principalTypeB: typeof(Label),
+        associationType: typeof(ProductTagFromType),
+        ForeignKeyA = "ProductId",
+        ForeignKeyB = "TagId"
+    )]
+    public class ProductTagFromType
+    {
+        public Guid ProductId { get; set; }
+        public Guid TagId { get; set; }
+    }
+
+    public class Category
+    {
+        [ApiKey]
+        public Guid Id { get; set; }
+    }
+
+    public class Label
+    {
+        [ApiKey]
+        public Guid Id { get; set; }
     }
     #endregion
 }
