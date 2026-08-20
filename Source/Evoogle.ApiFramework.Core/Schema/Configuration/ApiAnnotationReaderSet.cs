@@ -58,6 +58,25 @@ public sealed class ApiAnnotationReaderSet
             reader.ApplyEnumTypeAnnotations(clrType, builder);
         }
     }
+
+    /// <summary>Applies enum-value annotations to one builder.</summary>
+    internal void ApplyEnumValueAnnotations
+    (
+        ApiEnumTypeBuilder enumTypeBuilder,
+        ApiEnumValueBuilder enumValueBuilder
+    )
+    {
+        var clrField = TypeReflection.GetField(enumTypeBuilder.ClrType, enumValueBuilder.ClrName);
+        if (clrField == null)
+        {
+            return;
+        }
+
+        foreach (var reader in _readers)
+        {
+            reader.ApplyEnumValueAnnotations(clrField, enumTypeBuilder, enumValueBuilder);
+        }
+    }
     #endregion
 
     #region Property Annotation Methods

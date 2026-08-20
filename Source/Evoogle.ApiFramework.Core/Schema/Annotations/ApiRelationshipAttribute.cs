@@ -7,31 +7,25 @@ namespace Evoogle.ApiFramework.Schema.Annotations;
 
 /// <summary>
 ///     Declares a one-to-one or one-to-many relationship on a navigation property.
-///     The relationship is named, keyed by <see cref="Name"/>, and registered by
+///     The relationship is named, keyed by
+///     <see cref="ApiNamedElementAttribute.ApiName"/>, and registered by
 ///     <see cref="Configuration.ApiAttributeAnnotationReader"/>.
 /// </summary>
 /// <remarks>
 ///     Place this attribute on the navigation property of the principal end.
 ///     To declare a relationship without a navigation property use <see cref="ApiRelationshipTypeAttribute"/>.
 /// </remarks>
+/// <remarks>
+///     Initializes a new <see cref="ApiRelationshipAttribute"/> with the given relationship name.
+/// </remarks>
+/// <param name="apiName">The schema-unique API name of the relationship.</param>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
-public sealed class ApiRelationshipAttribute : Attribute
+public sealed class ApiRelationshipAttribute(string apiName)
+    : ApiNamedElementAttribute(RequireApiName(apiName))
 {
-    #region Constructors
-    /// <summary>
-    ///     Initializes a new <see cref="ApiRelationshipAttribute"/> with the given relationship name.
-    /// </summary>
-    /// <param name="name">The schema-unique API name of the relationship.</param>
-    public ApiRelationshipAttribute(string name)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
-        this.Name = name;
-    }
-    #endregion
-
     #region Properties
     /// <summary>Gets the schema-unique API name of the relationship.</summary>
-    public string Name { get; }
+    public new string ApiName => base.ApiName!;
 
     /// <summary>Gets or sets the relationship kind. Defaults to <see cref="ApiRelationshipKind.OneToMany"/>.</summary>
     public ApiRelationshipKind Kind { get; set; } = ApiRelationshipKind.OneToMany;

@@ -13,7 +13,8 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 /// <summary>
 ///     Default <see cref="IApiAnnotationReader"/> implementation that reads the framework's
 ///     built-in attribute set (<see cref="ApiObjectTypeAttribute"/>, <see cref="ApiPropertyAttribute"/>,
-///     <see cref="ApiKeyAttribute"/>, <see cref="ApiIgnoreAttribute"/>, and the relationship attributes).
+///     <see cref="ApiEnumValueAttribute"/>, <see cref="ApiKeyAttribute"/>,
+///     <see cref="ApiIgnoreAttribute"/>, and the relationship attributes).
 /// </summary>
 public sealed class ApiAttributeAnnotationReader : IApiAnnotationReader
 {
@@ -22,9 +23,9 @@ public sealed class ApiAttributeAnnotationReader : IApiAnnotationReader
     public void ApplyObjectTypeAnnotations(Type clrType, ApiObjectTypeBuilder builder)
     {
         var attr = clrType.GetCustomAttribute<ApiObjectTypeAttribute>(inherit: false);
-        if (attr?.Name != null)
+        if (attr?.ApiName != null)
         {
-            builder.SetApiNameDataAnnotation(attr.Name);
+            builder.SetApiNameDataAnnotation(attr.ApiName);
         }
     }
 
@@ -32,9 +33,9 @@ public sealed class ApiAttributeAnnotationReader : IApiAnnotationReader
     public void ApplyScalarTypeAnnotations(Type clrType, ApiScalarTypeBuilder builder)
     {
         var attr = clrType.GetCustomAttribute<ApiScalarTypeAttribute>(inherit: false);
-        if (attr?.Name != null)
+        if (attr?.ApiName != null)
         {
-            builder.SetApiNameDataAnnotation(attr.Name);
+            builder.SetApiNameDataAnnotation(attr.ApiName);
         }
     }
 
@@ -42,9 +43,24 @@ public sealed class ApiAttributeAnnotationReader : IApiAnnotationReader
     public void ApplyEnumTypeAnnotations(Type clrType, ApiEnumTypeBuilder builder)
     {
         var attr = clrType.GetCustomAttribute<ApiEnumTypeAttribute>(inherit: false);
-        if (attr?.Name != null)
+        if (attr?.ApiName != null)
         {
-            builder.SetApiNameDataAnnotation(attr.Name);
+            builder.SetApiNameDataAnnotation(attr.ApiName);
+        }
+    }
+
+    /// <inheritdoc />
+    public void ApplyEnumValueAnnotations
+    (
+        FieldInfo clrField,
+        ApiEnumTypeBuilder enumTypeBuilder,
+        ApiEnumValueBuilder enumValueBuilder
+    )
+    {
+        var attr = clrField.GetCustomAttribute<ApiEnumValueAttribute>(inherit: false);
+        if (attr?.ApiName != null)
+        {
+            enumValueBuilder.SetApiNameDataAnnotation(attr.ApiName);
         }
     }
     #endregion
@@ -63,9 +79,9 @@ public sealed class ApiAttributeAnnotationReader : IApiAnnotationReader
         var propAttr = clrMember.GetCustomAttribute<ApiPropertyAttribute>(inherit: true);
         if (propAttr != null)
         {
-            if (propAttr.Name != null)
+            if (propAttr.ApiName != null)
             {
-                propertyBuilder.SetApiNameDataAnnotation(propAttr.Name);
+                propertyBuilder.SetApiNameDataAnnotation(propAttr.ApiName);
             }
 
             if (propAttr.IsRequired)
@@ -91,7 +107,7 @@ public sealed class ApiAttributeAnnotationReader : IApiAnnotationReader
             foreach (var keyAttr in keyAttrs)
             {
                 // Add the path to an existing or newly created key type builder.
-                objectTypeBuilder.AddKeyOrAppendPath(keyAttr.KeyName, declaringClrType, clrName);
+                objectTypeBuilder.AddKeyOrAppendPath(keyAttr.ApiName, declaringClrType, clrName);
             }
         }
     }
@@ -99,7 +115,7 @@ public sealed class ApiAttributeAnnotationReader : IApiAnnotationReader
 
     #region IApiAnnotationReader — Relationship
     /// <inheritdoc />
-    public IReadOnlyList<(string Name, Action<ApiRelationshipOneToManyBuilder> Configure)>
+    public IReadOnlyList<(string ApiName, Action<ApiRelationshipOneToManyBuilder> Configure)>
         ReadOneToManyRelationships(Type clrType)
     {
         var results = new List<(string, Action<ApiRelationshipOneToManyBuilder>)>();
@@ -117,9 +133,9 @@ public sealed class ApiAttributeAnnotationReader : IApiAnnotationReader
             var dependentType = GetCollectionElementType(memberType) ?? memberType;
             var foreignKey = attr.ForeignKey;
             var deleteBehavior = attr.DeleteBehavior;
-            var name = attr.Name;
+            var apiName = attr.ApiName;
 
-            results.Add((name, builder =>
+            results.Add((apiName, builder =>
             {
                 builder
                     .WithDeleteBehavior(deleteBehavior)
@@ -143,9 +159,9 @@ public sealed class ApiAttributeAnnotationReader : IApiAnnotationReader
             var dependentType = attr.DependentType;
             var foreignKey = attr.ForeignKey;
             var deleteBehavior = attr.DeleteBehavior;
-            var name = attr.Name;
+            var apiName = attr.ApiName;
 
-            results.Add((name, builder =>
+            results.Add((apiName, builder =>
             {
                 builder
                     .WithDeleteBehavior(deleteBehavior)
@@ -161,7 +177,7 @@ public sealed class ApiAttributeAnnotationReader : IApiAnnotationReader
     }
 
     /// <inheritdoc />
-    public IReadOnlyList<(string Name, Action<ApiRelationshipOneToOneBuilder> Configure)>
+    public IReadOnlyList<(string ApiName, Action<ApiRelationshipOneToOneBuilder> Configure)>
         ReadOneToOneRelationships(Type clrType)
     {
         var results = new List<(string, Action<ApiRelationshipOneToOneBuilder>)>();
@@ -178,9 +194,9 @@ public sealed class ApiAttributeAnnotationReader : IApiAnnotationReader
             var dependentType = GetMemberType(member);
             var foreignKey = attr.ForeignKey;
             var deleteBehavior = attr.DeleteBehavior;
-            var name = attr.Name;
+            var apiName = attr.ApiName;
 
-            results.Add((name, builder =>
+            results.Add((apiName, builder =>
             {
                 builder
                     .WithDeleteBehavior(deleteBehavior)
@@ -204,9 +220,9 @@ public sealed class ApiAttributeAnnotationReader : IApiAnnotationReader
             var dependentType = attr.DependentType;
             var foreignKey = attr.ForeignKey;
             var deleteBehavior = attr.DeleteBehavior;
-            var name = attr.Name;
+            var apiName = attr.ApiName;
 
-            results.Add((name, builder =>
+            results.Add((apiName, builder =>
             {
                 builder
                     .WithDeleteBehavior(deleteBehavior)
@@ -222,7 +238,7 @@ public sealed class ApiAttributeAnnotationReader : IApiAnnotationReader
     }
 
     /// <inheritdoc />
-    public IReadOnlyList<(string Name, Action<ApiRelationshipManyToManyBuilder> Configure)>
+    public IReadOnlyList<(string ApiName, Action<ApiRelationshipManyToManyBuilder> Configure)>
         ReadManyToManyRelationships(Type clrType)
     {
         var results = new List<(string, Action<ApiRelationshipManyToManyBuilder>)>();
@@ -241,9 +257,9 @@ public sealed class ApiAttributeAnnotationReader : IApiAnnotationReader
             var associationType = attr.AssociationType;
             var fkA = attr.ForeignKeyA;
             var fkB = attr.ForeignKeyB;
-            var name = attr.Name;
+            var apiName = attr.ApiName;
 
-            results.Add((name, builder =>
+            results.Add((apiName, builder =>
             {
                 builder
                     .Between(principalTypeA)
@@ -272,9 +288,9 @@ public sealed class ApiAttributeAnnotationReader : IApiAnnotationReader
             var associationType = attr.AssociationType;
             var fkA = attr.ForeignKeyA;
             var fkB = attr.ForeignKeyB;
-            var name = attr.Name;
+            var apiName = attr.ApiName;
 
-            results.Add((name, builder =>
+            results.Add((apiName, builder =>
             {
                 builder
                     .Between(principalTypeA)

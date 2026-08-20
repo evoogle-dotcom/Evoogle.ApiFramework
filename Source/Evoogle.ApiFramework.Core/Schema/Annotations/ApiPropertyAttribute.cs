@@ -11,14 +11,18 @@ namespace Evoogle.ApiFramework.Schema.Annotations;
 ///     <see cref="Configuration.Internal.ApiConfigurationSource.DataAnnotation"/> precedence.
 /// </summary>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
-public sealed class ApiPropertyAttribute : Attribute
+public sealed class ApiPropertyAttribute : ApiNamedElementAttribute
 {
     #region Properties
     /// <summary>
-    ///     Gets or sets the API name for the property.
-    ///     When <c>null</c> the name is derived by the active naming convention.
+    ///     Gets or sets the API name for the property. When <c>null</c>, the name is derived by
+    ///     the active naming convention.
     /// </summary>
-    public string? Name { get; set; }
+    public new string? ApiName
+    {
+        get => base.ApiName;
+        set => base.ApiName = value;
+    }
 
     /// <summary>
     ///     When <c>true</c>, forces the property to be required regardless of CLR nullability.

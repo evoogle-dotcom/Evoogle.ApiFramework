@@ -8,7 +8,7 @@ namespace Evoogle.ApiFramework.Schema.Annotations;
 public partial class ApiAnnotationTests
 {
     #region Test Domain Types — Type-Level Attributes
-    [ApiObjectType(Name = "RenamedPerson")]
+    [ApiObjectType(ApiName = "RenamedPerson")]
     public class PersonAnnotated
     {
         public Guid Id { get; set; }
@@ -16,11 +16,20 @@ public partial class ApiAnnotationTests
         public string? Email { get; set; }
     }
 
-    [ApiScalarType(Name = "EmailValue")]
+    [ApiScalarType(ApiName = "EmailValue")]
     public record struct EmailValueAnnotated(string Value);
 
-    [ApiEnumType(Name = "OrderState")]
+    [ApiEnumType(ApiName = "OrderState")]
     public enum OrderStatusAnnotated { Pending, Shipped }
+
+    public enum OrderStatusValueAnnotated
+    {
+        [ApiEnumValue(ApiName = "awaiting_payment")]
+        Pending,
+
+        [ApiEnumValue]
+        Shipped,
+    }
     #endregion
 
     #region Test Domain Types — Property-Level Attributes
@@ -28,7 +37,7 @@ public partial class ApiAnnotationTests
     {
         public Guid Id { get; set; }
 
-        [ApiProperty(Name = "display_name", IsRequired = true)]
+        [ApiProperty(ApiName = "display_name", IsRequired = true)]
         public string? Name { get; set; }
 
         [ApiIgnore]
@@ -154,7 +163,7 @@ public partial class ApiAnnotationTests
     #region Test Domain Types — Field and Many-to-Many Attributes
     public class FieldAnnotationsType
     {
-        [ApiProperty(Name = "field_code", IsRequired = true)]
+        [ApiProperty(ApiName = "field_code", IsRequired = true)]
         [ApiKey("FieldKey")]
         public Guid Code;
 

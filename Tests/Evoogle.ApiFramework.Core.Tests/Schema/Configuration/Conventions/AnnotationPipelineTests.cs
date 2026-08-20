@@ -18,7 +18,7 @@
 // public class AnnotationPipelineTests(ITestOutputHelper output) : XUnitTests(output)
 // {
 //     #region Test Domain Types — Type-Level Attributes
-//     [ApiObjectType(Name = "RenamedPerson")]
+//     [ApiObjectType(ApiName = "RenamedPerson")]
 //     private class PersonAnnotated
 //     {
 //         public Guid Id { get; set; }
@@ -26,10 +26,10 @@
 //         public string? Email { get; set; }
 //     }
 
-//     [ApiScalarType(Name = "EmailValue")]
+//     [ApiScalarType(ApiName = "EmailValue")]
 //     private record struct EmailValueAnnotated(string Value);
 
-//     [ApiEnumType(Name = "OrderState")]
+//     [ApiEnumType(ApiName = "OrderState")]
 //     private enum OrderStatusAnnotated { Pending, Shipped }
 //     #endregion
 
@@ -38,7 +38,7 @@
 //     {
 //         public Guid Id { get; set; }
 
-//         [ApiProperty(Name = "display_name", IsRequired = true)]
+//         [ApiProperty(ApiName = "display_name", IsRequired = true)]
 //         public string? Name { get; set; }
 
 //         [ApiIgnore]
@@ -576,7 +576,7 @@
 //     [Fact]
 //     public void ExplicitConfigurationOverridesDataAnnotation()
 //     {
-//         // [ApiObjectType(Name="RenamedPerson")] annotation is beaten by explicit WithName.
+//         // [ApiObjectType(ApiName="RenamedPerson")] annotation is beaten by explicit WithName.
 //         var schema = new ApiSchemaBuilder()
 //             .WithName("Test")
 //             .WithTestScalars()

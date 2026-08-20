@@ -50,6 +50,27 @@ public static class ApiAnnotationTestsFactory
             .UseDefaultAnnotations()
             .Build();
     }
+
+    public static ApiSchema BuildWithApiEnumValueAttributeOverridesApiName()
+    {
+        return new ApiSchemaBuilder()
+            .WithName("Test")
+            .UseDefaultConventions()
+            .UseDefaultAnnotations()
+            .AddEnum<OrderStatusValueAnnotated>()
+            .Build();
+    }
+
+    public static ApiSchema BuildWithExplicitEnumValueNameOverridesApiEnumValueAttribute()
+    {
+        return new ApiSchemaBuilder()
+            .WithName("Test")
+            .UseDefaultAnnotations()
+            .AddEnum<OrderStatusValueAnnotated>(x => x
+                .AddValue("explicit_pending", "Pending", 0)
+                .AddValue("Shipped", "Shipped", 1))
+            .Build();
+    }
     #endregion
 
     #region Property and Field Attribute Factory Methods

@@ -39,6 +39,19 @@ public interface IApiAnnotationReader
     void ApplyEnumTypeAnnotations(Type clrType, ApiEnumTypeBuilder builder);
 
     /// <summary>
+    ///     Applies annotations from an enum member field to the supplied enum value builder.
+    /// </summary>
+    /// <param name="clrField">The CLR field defining the enum member.</param>
+    /// <param name="enumTypeBuilder">The enum type builder that owns the value.</param>
+    /// <param name="enumValueBuilder">The enum value builder to configure.</param>
+    void ApplyEnumValueAnnotations
+    (
+        FieldInfo clrField,
+        ApiEnumTypeBuilder enumTypeBuilder,
+        ApiEnumValueBuilder enumValueBuilder
+    );
+
+    /// <summary>
     ///     Applies annotations from the CLR member to the supplied property builder.
     /// </summary>
     /// <param name="clrMember">The CLR property or field being configured.</param>
@@ -64,11 +77,11 @@ public interface IApiAnnotationReader
     /// </summary>
     /// <param name="clrType">The CLR type to inspect.</param>
     /// <returns>
-    ///     A list of (name, configure) pairs; each pair will be passed to
+    ///     A list of (apiName, configure) pairs; each pair will be passed to
     ///     <see cref="ApiSchemaBuilder.AddOneToManyRelationship(string, Action{ApiRelationshipOneToManyBuilder})"/>.
     ///     Return an empty list when no relationships are declared on this type.
     /// </returns>
-    IReadOnlyList<(string Name, Action<ApiRelationshipOneToManyBuilder> Configure)>
+    IReadOnlyList<(string ApiName, Action<ApiRelationshipOneToManyBuilder> Configure)>
         ReadOneToManyRelationships(Type clrType);
 
     /// <summary>
@@ -76,9 +89,9 @@ public interface IApiAnnotationReader
     /// </summary>
     /// <param name="clrType">The CLR type to inspect.</param>
     /// <returns>
-    ///     A list of (name, configure) pairs; return an empty list when none are declared.
+    ///     A list of (apiName, configure) pairs; return an empty list when none are declared.
     /// </returns>
-    IReadOnlyList<(string Name, Action<ApiRelationshipOneToOneBuilder> Configure)>
+    IReadOnlyList<(string ApiName, Action<ApiRelationshipOneToOneBuilder> Configure)>
         ReadOneToOneRelationships(Type clrType);
 
     /// <summary>
@@ -86,9 +99,9 @@ public interface IApiAnnotationReader
     /// </summary>
     /// <param name="clrType">The CLR type to inspect.</param>
     /// <returns>
-    ///     A list of (name, configure) pairs; return an empty list when none are declared.
+    ///     A list of (apiName, configure) pairs; return an empty list when none are declared.
     /// </returns>
-    IReadOnlyList<(string Name, Action<ApiRelationshipManyToManyBuilder> Configure)>
+    IReadOnlyList<(string ApiName, Action<ApiRelationshipManyToManyBuilder> Configure)>
         ReadManyToManyRelationships(Type clrType);
     #endregion
 }

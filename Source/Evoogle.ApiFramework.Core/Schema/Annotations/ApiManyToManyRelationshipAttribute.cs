@@ -14,22 +14,21 @@ namespace Evoogle.ApiFramework.Schema.Annotations;
 ///     To declare without a navigation property use <see cref="ApiManyToManyRelationshipTypeAttribute"/>.
 /// </remarks>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
-public sealed class ApiManyToManyRelationshipAttribute : Attribute
+public sealed class ApiManyToManyRelationshipAttribute : ApiNamedElementAttribute
 {
     #region Constructors
     /// <summary>
     ///     Initializes a new <see cref="ApiManyToManyRelationshipAttribute"/>.
     /// </summary>
-    /// <param name="name">The schema-unique API name of the relationship.</param>
+    /// <param name="apiName">The schema-unique API name of the relationship.</param>
     /// <param name="associationType">The CLR type of the association/join entity.</param>
     /// <param name="otherPrincipalType">The CLR type of the other principal end.</param>
-    public ApiManyToManyRelationshipAttribute(string name, Type associationType, Type otherPrincipalType)
+    public ApiManyToManyRelationshipAttribute(string apiName, Type associationType, Type otherPrincipalType)
+        : base(RequireApiName(apiName))
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
         ArgumentNullException.ThrowIfNull(associationType);
         ArgumentNullException.ThrowIfNull(otherPrincipalType);
 
-        this.Name = name;
         this.AssociationType = associationType;
         this.OtherPrincipalType = otherPrincipalType;
     }
@@ -37,7 +36,7 @@ public sealed class ApiManyToManyRelationshipAttribute : Attribute
 
     #region Properties
     /// <summary>Gets the schema-unique API name of the relationship.</summary>
-    public string Name { get; }
+    public new string ApiName => base.ApiName!;
 
     /// <summary>Gets the CLR type of the association (join) entity.</summary>
     public Type AssociationType { get; }

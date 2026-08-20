@@ -16,22 +16,21 @@ namespace Evoogle.ApiFramework.Schema.Annotations;
 ///     <see cref="ApiRelationshipAttribute"/> on the navigation property.
 /// </remarks>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = true)]
-public sealed class ApiRelationshipTypeAttribute : Attribute
+public sealed class ApiRelationshipTypeAttribute : ApiNamedElementAttribute
 {
     #region Constructors
     /// <summary>
     ///     Initializes a new <see cref="ApiRelationshipTypeAttribute"/>.
     /// </summary>
-    /// <param name="name">The schema-unique API name of the relationship.</param>
+    /// <param name="apiName">The schema-unique API name of the relationship.</param>
     /// <param name="principalType">The CLR type of the principal end.</param>
     /// <param name="dependentType">The CLR type of the dependent end.</param>
-    public ApiRelationshipTypeAttribute(string name, Type principalType, Type dependentType)
+    public ApiRelationshipTypeAttribute(string apiName, Type principalType, Type dependentType)
+        : base(RequireApiName(apiName))
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
         ArgumentNullException.ThrowIfNull(principalType);
         ArgumentNullException.ThrowIfNull(dependentType);
 
-        this.Name = name;
         this.PrincipalType = principalType;
         this.DependentType = dependentType;
     }
@@ -39,7 +38,7 @@ public sealed class ApiRelationshipTypeAttribute : Attribute
 
     #region Properties
     /// <summary>Gets the schema-unique API name of the relationship.</summary>
-    public string Name { get; }
+    public new string ApiName => base.ApiName!;
 
     /// <summary>Gets the CLR type of the principal end.</summary>
     public Type PrincipalType { get; }

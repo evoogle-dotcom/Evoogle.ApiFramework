@@ -11,10 +11,17 @@ namespace Evoogle.ApiFramework.Schema.Annotations;
 ///     <see cref="Configuration.Internal.ApiConfigurationSource.DataAnnotation"/> precedence.
 /// </summary>
 [AttributeUsage(AttributeTargets.Struct | AttributeTargets.Class, AllowMultiple = false)]
-public sealed class ApiScalarTypeAttribute : Attribute
+public sealed class ApiScalarTypeAttribute : ApiNamedElementAttribute
 {
     #region Properties
-    /// <summary>Gets or sets the API name for the type. When <c>null</c> the CLR type name is used.</summary>
-    public string? Name { get; set; }
+    /// <summary>
+    ///     Gets or sets the API name for the scalar type. When <c>null</c>, the CLR type name
+    ///     is used.
+    /// </summary>
+    public new string? ApiName
+    {
+        get => base.ApiName;
+        set => base.ApiName = value;
+    }
     #endregion
 }

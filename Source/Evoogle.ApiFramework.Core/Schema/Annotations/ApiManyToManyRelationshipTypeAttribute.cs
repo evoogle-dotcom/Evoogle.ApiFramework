@@ -11,30 +11,29 @@ namespace Evoogle.ApiFramework.Schema.Annotations;
 ///     Registered by <see cref="Configuration.ApiAttributeAnnotationReader"/>.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = true)]
-public sealed class ApiManyToManyRelationshipTypeAttribute : Attribute
+public sealed class ApiManyToManyRelationshipTypeAttribute : ApiNamedElementAttribute
 {
     #region Constructors
     /// <summary>
     ///     Initializes a new <see cref="ApiManyToManyRelationshipTypeAttribute"/>.
     /// </summary>
-    /// <param name="name">The schema-unique API name of the relationship.</param>
+    /// <param name="apiName">The schema-unique API name of the relationship.</param>
     /// <param name="principalTypeA">The CLR type of the first principal end.</param>
     /// <param name="principalTypeB">The CLR type of the second principal end.</param>
     /// <param name="associationType">The CLR type of the association (join) entity.</param>
     public ApiManyToManyRelationshipTypeAttribute
     (
-        string name,
+        string apiName,
         Type principalTypeA,
         Type principalTypeB,
         Type associationType
     )
+        : base(RequireApiName(apiName))
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
         ArgumentNullException.ThrowIfNull(principalTypeA);
         ArgumentNullException.ThrowIfNull(principalTypeB);
         ArgumentNullException.ThrowIfNull(associationType);
 
-        this.Name = name;
         this.PrincipalTypeA = principalTypeA;
         this.PrincipalTypeB = principalTypeB;
         this.AssociationType = associationType;
@@ -43,7 +42,7 @@ public sealed class ApiManyToManyRelationshipTypeAttribute : Attribute
 
     #region Properties
     /// <summary>Gets the schema-unique API name of the relationship.</summary>
-    public string Name { get; }
+    public new string ApiName => base.ApiName!;
 
     /// <summary>Gets the CLR type of the first principal end.</summary>
     public Type PrincipalTypeA { get; }

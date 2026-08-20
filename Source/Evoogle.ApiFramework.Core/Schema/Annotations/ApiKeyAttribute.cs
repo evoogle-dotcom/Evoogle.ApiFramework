@@ -15,14 +15,15 @@ namespace Evoogle.ApiFramework.Schema.Annotations;
 /// <remarks>
 ///     Initializes a new <see cref="ApiKeyAttribute"/> contributing to the specified key name.
 /// </remarks>
-/// <param name="keyName">The API name of the key type. Defaults to <c>PrimaryKey</c>.</param>
+/// <param name="apiName">The API name of the key type. Defaults to <c>PrimaryKey</c>.</param>
 /// <param name="order">The zero-based position of this path within a composite key.</param>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = true)]
-public sealed class ApiKeyAttribute(string keyName = "PrimaryKey", int order = 0) : Attribute
+public sealed class ApiKeyAttribute(string apiName = "PrimaryKey", int order = 0)
+    : ApiNamedElementAttribute(RequireApiName(apiName))
 {
     #region Properties
     /// <summary>Gets the API name of the key type this path contributes to.</summary>
-    public string KeyName { get; } = keyName;
+    public new string ApiName => base.ApiName!;
 
     /// <summary>Gets the zero-based order of this path within a composite key.</summary>
     public int Order { get; } = order;

@@ -449,7 +449,8 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     /// <summary>
     ///     Registers <see cref="ApiAttributeAnnotationReader"/> as the annotation reader,
     ///     enabling the framework's built-in attribute set (<see cref="Annotations.ApiObjectTypeAttribute"/>,
-    ///     <see cref="Annotations.ApiPropertyAttribute"/>, <see cref="Annotations.ApiKeyAttribute"/>, etc.).
+    ///     <see cref="Annotations.ApiPropertyAttribute"/>, <see cref="Annotations.ApiEnumValueAttribute"/>,
+    ///     <see cref="Annotations.ApiKeyAttribute"/>, etc.).
     /// </summary>
     /// <returns>The current builder instance.</returns>
     public ApiSchemaBuilder UseDefaultAnnotations()

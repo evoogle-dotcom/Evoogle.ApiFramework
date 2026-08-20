@@ -1,6 +1,6 @@
 ﻿[agents]
-max_threads = 4
+max_concurrent_threads_per_session = 4
 max_depth = 1
 
 [windows]
-sandbox = "unelevated"
+sandbox = "elevated"

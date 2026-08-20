@@ -640,7 +640,7 @@ internal static class Dummy
     ///     <c>[ApiObjectType]</c>, <c>[ApiProperty]</c>, <c>[ApiKey]</c>, and <c>[ApiIgnore]</c>
     ///     can describe the schema shape directly on the POCO.
     /// </summary>
-    [ApiObjectType(Name = "Customer")]
+    [ApiObjectType(ApiName = "Customer")]
     public class CustomerAnnotated
     {
         /// <summary>Gets or sets the unique customer identifier.</summary>
@@ -648,7 +648,7 @@ internal static class Dummy
         public Guid Id { get; set; }
 
         /// <summary>Gets or sets the customer's display name.</summary>
-        [ApiProperty(Name = "displayName", IsRequired = true)]
+        [ApiProperty(ApiName = "displayName", IsRequired = true)]
         public string Name { get; set; } = string.Empty;
 
         /// <summary>Gets or sets the optional customer email address (string variant for schema simplicity).</summary>
@@ -671,7 +671,7 @@ internal static class Dummy
     ///     An annotation-decorated version of <see cref="Order"/> paired with
     ///     <see cref="CustomerAnnotated"/> for the annotation demo schema.
     /// </summary>
-    [ApiObjectType(Name = "Order")]
+    [ApiObjectType(ApiName = "Order")]
     public class OrderAnnotated
     {
         /// <summary>Gets or sets the unique order identifier.</summary>

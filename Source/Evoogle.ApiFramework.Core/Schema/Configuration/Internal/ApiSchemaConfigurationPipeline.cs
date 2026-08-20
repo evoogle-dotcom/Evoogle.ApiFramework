@@ -454,6 +454,8 @@ internal sealed class ApiSchemaConfigurationPipeline
                     hasUnprocessedEnumValues = true;
                     var context = this.BuildEnumValueContext(enumValueBuilder, enumBuilder);
 
+                    _annotationReaderSet?.ApplyEnumValueAnnotations(enumBuilder, enumValueBuilder);
+
                     foreach (var convention in _schedule.EnumValueConfigurationConventions)
                     {
                         this.ApplyConvention
