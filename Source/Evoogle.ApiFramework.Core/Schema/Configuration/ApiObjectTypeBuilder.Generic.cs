@@ -35,8 +35,9 @@ public sealed class ApiObjectTypeBuilder<TObject>(ApiSchemaBuilderContext contex
     ///     when no key name is supplied; call
     ///     <see cref="ApiRelationshipPrincipalEndBuilder.WithPrincipalKey"/> on the principal end builder to
     ///     select a named key explicitly.
-    ///     To configure with string-based property names instead, use the non-generic
-    ///     <see cref="ApiObjectTypeBuilder.AddKey"/> overload on the base class.
+    ///     To configure with string-based property names instead, use the base
+    ///     <see cref="ApiObjectTypeBuilder.AddKey"/> overload. Both overloads configure
+    ///     the same internally managed key builder.
     /// </remarks>
     /// <param name="apiName">The API name of the key type.</param>
     /// <param name="configure">Optional callback to configure the key type using a typed builder.</param>
@@ -45,9 +46,8 @@ public sealed class ApiObjectTypeBuilder<TObject>(ApiSchemaBuilderContext contex
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
 
-        var apiKeyTypeBuilder = new ApiKeyTypeBuilder<TObject>(apiName);
+        var apiKeyTypeBuilder = (ApiKeyTypeBuilder<TObject>)this.GetOrAddKeyTypeBuilder(apiName);
         configure?.Invoke(apiKeyTypeBuilder);
-        base.AddKeyTypeBuilderCore(apiKeyTypeBuilder);
         return this;
     }
 

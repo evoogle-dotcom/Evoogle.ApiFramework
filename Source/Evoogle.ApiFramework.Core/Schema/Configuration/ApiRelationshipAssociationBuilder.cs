@@ -20,10 +20,7 @@ public class ApiRelationshipAssociationBuilder(Type clrObjectType) : ExtensionBu
     #region Fields
     private readonly ApiConfigurationSourceScope _configurationSourceScope = new();
     private readonly Type _clrObjectType = clrObjectType ?? throw new ArgumentNullException(nameof(clrObjectType));
-    private ApiKeyTypeBuilder? _foreignKeyTypeBuilderA;
-    private ApiKeyTypeBuilder? _foreignKeyTypeBuilderB;
-    private ApiConfigurationSource? _foreignKeyTypeBuilderASource;
-    private ApiConfigurationSource? _foreignKeyTypeBuilderBSource;
+    private readonly ApiRelationshipAssociationState _state = new();
     #endregion
 
     #region Properties
@@ -57,11 +54,11 @@ public class ApiRelationshipAssociationBuilder(Type clrObjectType) : ExtensionBu
     public ApiRelationshipAssociationBuilder WithForeignKeyA(Action<ApiKeyTypeBuilder>? configure = null)
     {
         var source = this.CurrentConfigurationSource;
-        if (_foreignKeyTypeBuilderASource == null || source >= _foreignKeyTypeBuilderASource.Value)
+        if (_state.ForeignKeyTypeBuilderASource == null || source >= _state.ForeignKeyTypeBuilderASource.Value)
         {
-            _foreignKeyTypeBuilderA = new ApiKeyTypeBuilder();
-            configure?.Invoke(_foreignKeyTypeBuilderA);
-            _foreignKeyTypeBuilderASource = source;
+            _state.ForeignKeyTypeBuilderA ??= this.CreateForeignKeyTypeBuilder();
+            configure?.Invoke(_state.ForeignKeyTypeBuilderA);
+            _state.ForeignKeyTypeBuilderASource = source;
         }
 
         return this;
@@ -75,14 +72,24 @@ public class ApiRelationshipAssociationBuilder(Type clrObjectType) : ExtensionBu
     public ApiRelationshipAssociationBuilder WithForeignKeyB(Action<ApiKeyTypeBuilder>? configure = null)
     {
         var source = this.CurrentConfigurationSource;
-        if (_foreignKeyTypeBuilderBSource == null || source >= _foreignKeyTypeBuilderBSource.Value)
+        if (_state.ForeignKeyTypeBuilderBSource == null || source >= _state.ForeignKeyTypeBuilderBSource.Value)
         {
-            _foreignKeyTypeBuilderB = new ApiKeyTypeBuilder();
-            configure?.Invoke(_foreignKeyTypeBuilderB);
-            _foreignKeyTypeBuilderBSource = source;
+            _state.ForeignKeyTypeBuilderB ??= this.CreateForeignKeyTypeBuilder();
+            configure?.Invoke(_state.ForeignKeyTypeBuilderB);
+            _state.ForeignKeyTypeBuilderBSource = source;
         }
 
         return this;
+    }
+
+    private ApiKeyTypeBuilder CreateForeignKeyTypeBuilder()
+    {
+        return ApiBuilderFactory.CreateClosedGeneric<ApiKeyTypeBuilder>
+        (
+            typeof(ApiKeyTypeBuilder<>),
+            this.ClrObjectType,
+            (object?)null
+        );
     }
 
     /// <summary>
@@ -93,10 +100,10 @@ public class ApiRelationshipAssociationBuilder(Type clrObjectType) : ExtensionBu
         ArgumentNullException.ThrowIfNull(builder);
 
         var source = this.CurrentConfigurationSource;
-        if (_foreignKeyTypeBuilderASource == null || source >= _foreignKeyTypeBuilderASource.Value)
+        if (_state.ForeignKeyTypeBuilderASource == null || source >= _state.ForeignKeyTypeBuilderASource.Value)
         {
-            _foreignKeyTypeBuilderA = builder;
-            _foreignKeyTypeBuilderASource = source;
+            _state.ForeignKeyTypeBuilderA = builder;
+            _state.ForeignKeyTypeBuilderASource = source;
         }
     }
 
@@ -108,10 +115,10 @@ public class ApiRelationshipAssociationBuilder(Type clrObjectType) : ExtensionBu
         ArgumentNullException.ThrowIfNull(builder);
 
         var source = this.CurrentConfigurationSource;
-        if (_foreignKeyTypeBuilderBSource == null || source >= _foreignKeyTypeBuilderBSource.Value)
+        if (_state.ForeignKeyTypeBuilderBSource == null || source >= _state.ForeignKeyTypeBuilderBSource.Value)
         {
-            _foreignKeyTypeBuilderB = builder;
-            _foreignKeyTypeBuilderBSource = source;
+            _state.ForeignKeyTypeBuilderB = builder;
+            _state.ForeignKeyTypeBuilderBSource = source;
         }
     }
 
@@ -125,32 +132,32 @@ public class ApiRelationshipAssociationBuilder(Type clrObjectType) : ExtensionBu
 
         if
         (
-            builder._foreignKeyTypeBuilderA != null &&
-            builder._foreignKeyTypeBuilderASource != null &&
+            builder._state.ForeignKeyTypeBuilderA != null &&
+            builder._state.ForeignKeyTypeBuilderASource != null &&
             (
-                _foreignKeyTypeBuilderASource == null ||
-                builder._foreignKeyTypeBuilderASource.Value >=
-                    _foreignKeyTypeBuilderASource.Value
+                _state.ForeignKeyTypeBuilderASource == null ||
+                builder._state.ForeignKeyTypeBuilderASource.Value >=
+                    _state.ForeignKeyTypeBuilderASource.Value
             )
         )
         {
-            _foreignKeyTypeBuilderA = builder._foreignKeyTypeBuilderA;
-            _foreignKeyTypeBuilderASource = builder._foreignKeyTypeBuilderASource;
+            _state.ForeignKeyTypeBuilderA = builder._state.ForeignKeyTypeBuilderA;
+            _state.ForeignKeyTypeBuilderASource = builder._state.ForeignKeyTypeBuilderASource;
         }
 
         if
         (
-            builder._foreignKeyTypeBuilderB != null &&
-            builder._foreignKeyTypeBuilderBSource != null &&
+            builder._state.ForeignKeyTypeBuilderB != null &&
+            builder._state.ForeignKeyTypeBuilderBSource != null &&
             (
-                _foreignKeyTypeBuilderBSource == null ||
-                builder._foreignKeyTypeBuilderBSource.Value >=
-                    _foreignKeyTypeBuilderBSource.Value
+                _state.ForeignKeyTypeBuilderBSource == null ||
+                builder._state.ForeignKeyTypeBuilderBSource.Value >=
+                    _state.ForeignKeyTypeBuilderBSource.Value
             )
         )
         {
-            _foreignKeyTypeBuilderB = builder._foreignKeyTypeBuilderB;
-            _foreignKeyTypeBuilderBSource = builder._foreignKeyTypeBuilderBSource;
+            _state.ForeignKeyTypeBuilderB = builder._state.ForeignKeyTypeBuilderB;
+            _state.ForeignKeyTypeBuilderBSource = builder._state.ForeignKeyTypeBuilderBSource;
         }
     }
     #endregion
@@ -169,8 +176,8 @@ public class ApiRelationshipAssociationBuilder(Type clrObjectType) : ExtensionBu
     /// </summary>
     internal ApiRelationshipAssociation Build()
     {
-        var fkA = _foreignKeyTypeBuilderA?.Build();
-        var fkB = _foreignKeyTypeBuilderB?.Build();
+        var fkA = _state.ForeignKeyTypeBuilderA?.Build();
+        var fkB = _state.ForeignKeyTypeBuilderB?.Build();
 
         var apiRelationshipAssociation = fkA != null && fkB != null
             ? new ApiRelationshipAssociation(_clrObjectType, fkA, fkB)

@@ -20,8 +20,7 @@ public class ApiRelationshipDependentEndBuilder(Type clrObjectType) : ExtensionB
     #region Fields
     private readonly ApiConfigurationSourceScope _configurationSourceScope = new();
     private readonly Type _clrObjectType = clrObjectType ?? throw new ArgumentNullException(nameof(clrObjectType));
-    private ApiKeyTypeBuilder? _foreignKeyTypeBuilder;
-    private ApiConfigurationSource? _foreignKeyTypeBuilderSource;
+    private readonly ApiRelationshipDependentEndState _state = new();
     #endregion
 
     #region Properties
@@ -55,14 +54,24 @@ public class ApiRelationshipDependentEndBuilder(Type clrObjectType) : ExtensionB
     public ApiRelationshipDependentEndBuilder WithForeignKey(Action<ApiKeyTypeBuilder>? configure = null)
     {
         var source = this.CurrentConfigurationSource;
-        if (_foreignKeyTypeBuilderSource == null || source >= _foreignKeyTypeBuilderSource.Value)
+        if (_state.ForeignKeyTypeBuilderSource == null || source >= _state.ForeignKeyTypeBuilderSource.Value)
         {
-            _foreignKeyTypeBuilder = new ApiKeyTypeBuilder();
-            configure?.Invoke(_foreignKeyTypeBuilder);
-            _foreignKeyTypeBuilderSource = source;
+            _state.ForeignKeyTypeBuilder ??= this.CreateForeignKeyTypeBuilder();
+            configure?.Invoke(_state.ForeignKeyTypeBuilder);
+            _state.ForeignKeyTypeBuilderSource = source;
         }
 
         return this;
+    }
+
+    private ApiKeyTypeBuilder CreateForeignKeyTypeBuilder()
+    {
+        return ApiBuilderFactory.CreateClosedGeneric<ApiKeyTypeBuilder>
+        (
+            typeof(ApiKeyTypeBuilder<>),
+            this.ClrObjectType,
+            (object?)null
+        );
     }
 
     /// <summary>
@@ -73,10 +82,10 @@ public class ApiRelationshipDependentEndBuilder(Type clrObjectType) : ExtensionB
         ArgumentNullException.ThrowIfNull(builder);
 
         var source = this.CurrentConfigurationSource;
-        if (_foreignKeyTypeBuilderSource == null || source >= _foreignKeyTypeBuilderSource.Value)
+        if (_state.ForeignKeyTypeBuilderSource == null || source >= _state.ForeignKeyTypeBuilderSource.Value)
         {
-            _foreignKeyTypeBuilder = builder;
-            _foreignKeyTypeBuilderSource = source;
+            _state.ForeignKeyTypeBuilder = builder;
+            _state.ForeignKeyTypeBuilderSource = source;
         }
     }
 
@@ -90,16 +99,16 @@ public class ApiRelationshipDependentEndBuilder(Type clrObjectType) : ExtensionB
 
         if
         (
-            builder._foreignKeyTypeBuilder != null &&
-            builder._foreignKeyTypeBuilderSource != null &&
+            builder._state.ForeignKeyTypeBuilder != null &&
+            builder._state.ForeignKeyTypeBuilderSource != null &&
             (
-                _foreignKeyTypeBuilderSource == null ||
-                builder._foreignKeyTypeBuilderSource.Value >= _foreignKeyTypeBuilderSource.Value
+                _state.ForeignKeyTypeBuilderSource == null ||
+                builder._state.ForeignKeyTypeBuilderSource.Value >= _state.ForeignKeyTypeBuilderSource.Value
             )
         )
         {
-            _foreignKeyTypeBuilder = builder._foreignKeyTypeBuilder;
-            _foreignKeyTypeBuilderSource = builder._foreignKeyTypeBuilderSource;
+            _state.ForeignKeyTypeBuilder = builder._state.ForeignKeyTypeBuilder;
+            _state.ForeignKeyTypeBuilderSource = builder._state.ForeignKeyTypeBuilderSource;
         }
     }
     #endregion
@@ -118,7 +127,7 @@ public class ApiRelationshipDependentEndBuilder(Type clrObjectType) : ExtensionB
     /// </summary>
     internal ApiRelationshipDependentEnd Build()
     {
-        var apiForeignKeyType = _foreignKeyTypeBuilder?.Build();
+        var apiForeignKeyType = _state.ForeignKeyTypeBuilder?.Build();
 
         var end = apiForeignKeyType != null
             ? new ApiRelationshipDependentEnd(_clrObjectType, apiForeignKeyType)

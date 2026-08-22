@@ -3,6 +3,8 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Schema.Configuration.Internal;
+
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
 /// <summary>
@@ -14,7 +16,7 @@ public abstract class ExtensionBuilder<TBuilder>
     where TBuilder : ExtensionBuilder<TBuilder>
 {
     #region Fields
-    private readonly OrderedDictionary<Type, object> _extensions = [];
+    private readonly ApiExtensionState _extensionState = new();
     #endregion
 
     #region Methods
@@ -40,7 +42,7 @@ public abstract class ExtensionBuilder<TBuilder>
             throw new ArgumentException("Extension metadata values must be reference types.", nameof(extension));
         }
 
-        _extensions[extensionType] = extension;
+        _extensionState.Extensions[extensionType] = extension;
         return (TBuilder)this;
     }
 
@@ -48,6 +50,6 @@ public abstract class ExtensionBuilder<TBuilder>
     ///     Builds a new ordered dictionary containing the collected extensions, or <c>null</c> if none exist.
     /// </summary>
     internal OrderedDictionary<Type, object>? BuildExtensions() =>
-        _extensions.Count > 0 ? new OrderedDictionary<Type, object>(_extensions) : null;
+        _extensionState.Extensions.Count > 0 ? new OrderedDictionary<Type, object>(_extensionState.Extensions) : null;
     #endregion
 }

@@ -17,9 +17,7 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     : ApiNamedTypeBuilder<ApiObjectTypeBuilder>(clrType, context)
 {
     #region Fields
-    private readonly List<ApiKeyTypeBuilder> _apiKeyTypeBuilders = [];
-    private readonly List<ApiPropertyBuilder> _apiPropertyBuilders = [];
-    private Action<ApiObjectTypeOptionsBuilder>? _apiOptionsConfiguration = null;
+    private readonly ApiObjectTypeState _state = new();
     #endregion
 
     #region AddExtension Methods
@@ -52,11 +50,9 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
 
-        var apiKeyTypeBuilder = new ApiKeyTypeBuilder(apiName);
+        var apiKeyTypeBuilder = this.GetOrAddKeyTypeBuilder(apiName);
 
         configure?.Invoke(apiKeyTypeBuilder);
-
-        _apiKeyTypeBuilders.Add(apiKeyTypeBuilder);
         this.Context.TraceStructuralRegistration
         (
             new(ApiSchemaBuildTargetKind.KeyType, this.ClrType, ApiName: apiName),
@@ -92,7 +88,7 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     /// <returns>The current builder instance.</returns>
     public ApiObjectTypeBuilder WithDefaultOptions()
     {
-        _apiOptionsConfiguration = null;
+        _state.OptionsConfiguration = null;
         return this;
     }
 
@@ -105,7 +101,7 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     {
         ArgumentNullException.ThrowIfNull(configure);
 
-        _apiOptionsConfiguration = configure;
+        _state.OptionsConfiguration = configure;
         return this;
     }
     #endregion
@@ -123,11 +119,11 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
 
         var apiOptions = this.BuildOptions();
 
-        var apiProperties = _apiPropertyBuilders
+        var apiProperties = _state.PropertyBuilders
             .Select(b => b.Build(clrObjectType));
 
-        var apiKeyTypes = _apiKeyTypeBuilders.Count > 0
-            ? _apiKeyTypeBuilders.Select(b => b.Build())
+        var apiKeyTypes = _state.KeyTypeBuilders.Count > 0
+            ? _state.KeyTypeBuilders.Select(b => b.Build())
             : null;
 
         var apiObjectType = new ApiObjectType
@@ -151,13 +147,13 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
 
     private ApiObjectTypeOptions? BuildOptions()
     {
-        if (_apiOptionsConfiguration == null)
+        if (_state.OptionsConfiguration == null)
         {
             return null;
         }
 
         var apiOptionsBuilder = new ApiObjectTypeOptionsBuilder();
-        _apiOptionsConfiguration.Invoke(apiOptionsBuilder);
+        _state.OptionsConfiguration.Invoke(apiOptionsBuilder);
         return apiOptionsBuilder.Build();
     }
     #endregion
@@ -169,7 +165,26 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     protected void AddKeyTypeBuilderCore(ApiKeyTypeBuilder builder)
     {
         ArgumentNullException.ThrowIfNull(builder);
-        _apiKeyTypeBuilders.Add(builder);
+        _state.KeyTypeBuilders.Add(builder);
+    }
+
+    /// <summary>Gets an existing named key builder or creates its canonical closed-generic instance.</summary>
+    protected ApiKeyTypeBuilder GetOrAddKeyTypeBuilder(string apiName)
+    {
+        var existing = _state.KeyTypeBuilders.FirstOrDefault(builder => builder.ApiName == apiName);
+        if (existing != null)
+        {
+            return existing;
+        }
+
+        var builder = ApiBuilderFactory.CreateClosedGeneric<ApiKeyTypeBuilder>
+        (
+            typeof(ApiKeyTypeBuilder<>),
+            this.ClrType,
+            apiName
+        );
+        _state.KeyTypeBuilders.Add(builder);
+        return builder;
     }
 
     /// <summary>
@@ -190,7 +205,7 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
         ArgumentNullException.ThrowIfNull(clrPropertyNames);
 
         var names = clrPropertyNames as IReadOnlyList<string> ?? [.. clrPropertyNames];
-        var existing = _apiKeyTypeBuilders.FirstOrDefault(b => b.ApiName == apiKeyName);
+        var existing = _state.KeyTypeBuilders.FirstOrDefault(b => b.ApiName == apiKeyName);
         if (existing != null)
         {
             // Guard against convention + annotation both adding the same path.
@@ -201,14 +216,13 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
         }
         else
         {
-            var builder = new ApiKeyTypeBuilder(apiKeyName);
+            var builder = this.GetOrAddKeyTypeBuilder(apiKeyName);
             builder.AddPath(clrRootType, names);
-            _apiKeyTypeBuilders.Add(builder);
         }
     }
 
     /// <summary>Gets all <see cref="ApiPropertyBuilder"/> instances currently on this object type builder.</summary>
-    internal IEnumerable<ApiPropertyBuilder> ApiPropertyBuilders => _apiPropertyBuilders;
+    internal IEnumerable<ApiPropertyBuilder> ApiPropertyBuilders => _state.PropertyBuilders;
 
     /// <summary>
     ///     Explicitly adds the CLR member while initializing its API name from the CLR name at
@@ -251,7 +265,7 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(clrName, nameof(clrName));
 
-        if (_apiPropertyBuilders.Any(b => b.ClrName == clrName))
+        if (_state.PropertyBuilders.Any(b => b.ClrName == clrName))
         {
             this.Context.TraceStructuralRegistration
             (
@@ -293,7 +307,7 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
             this.ClrType
         );
         configure?.Invoke(builder);
-        _apiPropertyBuilders.Add(builder);
+        _state.PropertyBuilders.Add(builder);
         this.Context.TraceStructuralRegistration
         (
             new(ApiSchemaBuildTargetKind.Property, this.ClrType, clrName, apiName),
@@ -317,14 +331,13 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKeyName, nameof(apiKeyName));
 
-        if (_apiKeyTypeBuilders.Any(b => b.ApiName == apiKeyName))
+        if (_state.KeyTypeBuilders.Any(b => b.ApiName == apiKeyName))
         {
             return false;
         }
 
-        var builder = new ApiKeyTypeBuilder(apiKeyName);
+        var builder = this.GetOrAddKeyTypeBuilder(apiKeyName);
         configure?.Invoke(builder);
-        _apiKeyTypeBuilders.Add(builder);
         return true;
     }
 

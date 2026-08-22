@@ -5,6 +5,7 @@
 // See the LICENSE file in the project root for more information.
 using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.TestData;
+using Evoogle.ApiFramework.Schema.Configuration.Internal;
 using Evoogle.Extensions;
 using Evoogle.XUnit;
 
@@ -82,25 +83,84 @@ public class ApiSchemaBuilderContextTests(ITestOutputHelper output) : XUnitTests
     public void GetOrAdd(IXUnitTest test) => test.Execute(this);
 
     [Fact]
-    public void GetOrAddObjectTypeBuilderGenericThrowsConfigurationExceptionWhenNonGenericBuilderExists()
+    public void GetOrAddObjectTypeBuilderGenericAndNonGenericReturnSameBuilder()
     {
         var context = new ApiSchemaBuilderContext();
-        context.GetOrAddObjectTypeBuilder(typeof(Order));
+        var nonGenericBuilder = context.GetOrAddObjectTypeBuilder(typeof(Order));
 
-        Action act = () => context.GetOrAddObjectTypeBuilder<Order>();
+        var genericBuilder = context.GetOrAddObjectTypeBuilder<Order>();
 
-        act.Should().Throw<ApiSchemaConfigurationException>();
+        ReferenceEquals(nonGenericBuilder, genericBuilder).Should().BeTrue();
     }
 
     [Fact]
-    public void GetOrAddScalarTypeBuilderGenericThrowsConfigurationExceptionWhenNonGenericBuilderExists()
+    public void GetOrAddScalarTypeBuilderGenericAndNonGenericReturnSameBuilder()
     {
         var context = new ApiSchemaBuilderContext();
-        context.GetOrAddScalarTypeBuilder(typeof(int));
+        var nonGenericBuilder = context.GetOrAddScalarTypeBuilder(typeof(int));
 
-        Action act = () => context.GetOrAddScalarTypeBuilder<int>();
+        var genericBuilder = context.GetOrAddScalarTypeBuilder<int>();
 
-        act.Should().Throw<ApiSchemaConfigurationException>();
+        ReferenceEquals(nonGenericBuilder, genericBuilder).Should().BeTrue();
+    }
+
+    [Fact]
+    public void GetOrAddEnumTypeBuilderGenericAndNonGenericReturnSameBuilder()
+    {
+        var context = new ApiSchemaBuilderContext();
+        var nonGenericBuilder = context.GetOrAddEnumTypeBuilder(typeof(OrderStatus));
+
+        var genericBuilder = context.GetOrAddEnumTypeBuilder<OrderStatus>();
+
+        ReferenceEquals(nonGenericBuilder, genericBuilder).Should().BeTrue();
+    }
+
+    [Fact]
+    public void GetOrAddObjectTypeBuilderNonGenericReturnsExistingGenericBuilder()
+    {
+        var context = new ApiSchemaBuilderContext();
+        var genericBuilder = context.GetOrAddObjectTypeBuilder<Order>();
+
+        var nonGenericBuilder = context.GetOrAddObjectTypeBuilder(typeof(Order));
+
+        ReferenceEquals(genericBuilder, nonGenericBuilder).Should().BeTrue();
+    }
+
+    [Fact]
+    public void GetOrAddScalarTypeBuilderNonGenericReturnsExistingGenericBuilder()
+    {
+        var context = new ApiSchemaBuilderContext();
+        var genericBuilder = context.GetOrAddScalarTypeBuilder<int>();
+
+        var nonGenericBuilder = context.GetOrAddScalarTypeBuilder(typeof(int));
+
+        ReferenceEquals(genericBuilder, nonGenericBuilder).Should().BeTrue();
+    }
+
+    [Fact]
+    public void GetOrAddEnumTypeBuilderNonGenericReturnsExistingGenericBuilder()
+    {
+        var context = new ApiSchemaBuilderContext();
+        var genericBuilder = context.GetOrAddEnumTypeBuilder<OrderStatus>();
+
+        var nonGenericBuilder = context.GetOrAddEnumTypeBuilder(typeof(OrderStatus));
+
+        ReferenceEquals(genericBuilder, nonGenericBuilder).Should().BeTrue();
+    }
+
+    [Fact]
+    public void CreateClosedGenericBuilderThrowsSchemaConfigurationExceptionForInvalidType()
+    {
+        var act = () => ApiBuilderFactory.CreateClosedGeneric<ApiEnumTypeBuilder>
+        (
+            typeof(ApiEnumTypeBuilder<>),
+            typeof(int),
+            new ApiSchemaBuilderContext()
+        );
+
+        act.Should()
+            .Throw<ApiSchemaConfigurationException>()
+            .WithMessage("Unable to create ApiEnumTypeBuilder`1 for CLR type 'Int32'.");
     }
 
     [Fact]

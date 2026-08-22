@@ -17,7 +17,7 @@ public class ApiEnumTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     : ApiNamedTypeBuilder<ApiEnumTypeBuilder>(clrType, context)
 {
     #region Fields
-    private readonly List<ApiEnumValueBuilder> _apiEnumValueBuilders = [];
+    private readonly ApiEnumTypeState _state = new();
     #endregion
 
     #region AddExtension Methods
@@ -63,7 +63,7 @@ public class ApiEnumTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     internal ApiEnumType Build()
     {
         var apiName = this.ApiName;
-        var apiEnumValues = _apiEnumValueBuilders.Select(b => b.Build());
+        var apiEnumValues = _state.Values.Select(b => b.Build());
         var clrEnumType = this.ClrType;
 
         var apiEnumType = new ApiEnumType
@@ -87,7 +87,7 @@ public class ApiEnumTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     /// <summary>
     ///     Gets all <see cref="ApiEnumValueBuilder"/> instances currently on this enum type builder.
     /// </summary>
-    internal IEnumerable<ApiEnumValueBuilder> ApiEnumValueBuilders => _apiEnumValueBuilders;
+    internal IEnumerable<ApiEnumValueBuilder> ApiEnumValueBuilders => _state.Values;
 
     /// <summary>
     ///     Adds an enumeration value if its CLR name is not already present and its ordinal has
@@ -103,7 +103,7 @@ public class ApiEnumTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(clrName, nameof(clrName));
 
-        if (_apiEnumValueBuilders.Any(builder => builder.ClrName == clrName))
+        if (_state.Values.Any(builder => builder.ClrName == clrName))
         {
             this.Context.TraceStructuralRegistration
             (
@@ -118,7 +118,7 @@ public class ApiEnumTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
         }
 
         // Explicit entries take precedence; convention-vs-convention ordinal collisions propagate to initialization.
-        if (_apiEnumValueBuilders.Any(builder => builder.ClrOrdinal == clrOrdinal && builder.ApiNameSource == ApiConfigurationSource.Explicit))
+        if (_state.Values.Any(builder => builder.ClrOrdinal == clrOrdinal && builder.ApiNameSource == ApiConfigurationSource.Explicit))
         {
             this.Context.TraceStructuralRegistration
             (
@@ -177,7 +177,7 @@ public class ApiEnumTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
             this.ClrType
         );
 
-        _apiEnumValueBuilders.Add(builder);
+        _state.Values.Add(builder);
         this.Context.TraceStructuralRegistration
         (
             new(ApiSchemaBuildTargetKind.EnumValue, this.ClrType, clrName, apiName),

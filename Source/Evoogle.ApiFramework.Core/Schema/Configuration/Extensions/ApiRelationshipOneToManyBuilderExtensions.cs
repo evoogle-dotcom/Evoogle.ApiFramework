@@ -64,14 +64,13 @@ public static class ApiRelationshipOneToManyBuilderExtensions
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        var source = builder.CurrentConfigurationSource;
-        var dependentEndBuilder = new ApiRelationshipDependentEndBuilder<TDependent>();
-        if (configure != null)
-        {
-            dependentEndBuilder.ApplyConfiguration(source, () => configure(dependentEndBuilder));
-        }
-
-        return builder.SetDependentEndBuilderCore(dependentEndBuilder);
+        return builder.To
+        (
+            typeof(TDependent),
+            configure == null
+                ? null
+                : dependentEnd => configure((ApiRelationshipDependentEndBuilder<TDependent>)dependentEnd)
+        );
     }
     #endregion
 }

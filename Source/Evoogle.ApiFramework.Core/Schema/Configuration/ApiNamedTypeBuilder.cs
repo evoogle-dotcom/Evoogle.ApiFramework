@@ -19,20 +19,19 @@ public abstract class ApiNamedTypeBuilder<TBuilder>(Type clrType, ApiSchemaBuild
     where TBuilder : ApiNamedTypeBuilder<TBuilder>
 {
     #region Fields
-    private string _apiName = ValidateClrType(clrType).SafeToName();
-    private ApiConfigurationSource _apiNameSource = ApiConfigurationSource.Convention;
+    private readonly ApiNamedTypeState _state = new(clrType);
     #endregion
 
     #region Properties
     /// <summary>
     ///     Gets the API name configured for the type.
     /// </summary>
-    public string ApiName => _apiName;
+    public string ApiName => _state.ApiName;
 
     /// <summary>
     ///     Gets the CLR type represented by this builder.
     /// </summary>
-    public Type ClrType { get; } = ValidateClrType(clrType);
+    public Type ClrType => _state.ClrType;
 
     /// <summary>
     ///     Gets the shared builder context.
@@ -73,13 +72,13 @@ public abstract class ApiNamedTypeBuilder<TBuilder>(Type clrType, ApiSchemaBuild
     #region Implementation Methods
     private TBuilder SetApiName(string apiName, ApiConfigurationSource source)
     {
-        var previousValue = _apiName;
-        var wasApplied = source >= _apiNameSource;
+        var previousValue = _state.ApiName;
+        var wasApplied = source >= _state.ApiNameSource;
 
-        if (source >= _apiNameSource)
+        if (source >= _state.ApiNameSource)
         {
-            _apiName = apiName;
-            _apiNameSource = source;
+            _state.ApiName = apiName;
+            _state.ApiNameSource = source;
         }
 
         this.Context.TraceConfigurationChange
@@ -89,7 +88,7 @@ public abstract class ApiNamedTypeBuilder<TBuilder>(Type clrType, ApiSchemaBuild
             source,
             previousValue,
             apiName,
-            _apiName,
+            _state.ApiName,
             wasApplied,
             wasApplied ? null : "A higher-precedence API name is already configured."
         );
@@ -107,13 +106,7 @@ public abstract class ApiNamedTypeBuilder<TBuilder>(Type clrType, ApiSchemaBuild
             _ => ApiSchemaBuildTargetKind.Schema,
         };
 
-        return new(targetKind, this.ClrType, ApiName: _apiName);
-    }
-
-    private static Type ValidateClrType(Type clrType)
-    {
-        ArgumentNullException.ThrowIfNull(clrType);
-        return clrType;
+        return new(targetKind, this.ClrType, ApiName: _state.ApiName);
     }
     #endregion
 }

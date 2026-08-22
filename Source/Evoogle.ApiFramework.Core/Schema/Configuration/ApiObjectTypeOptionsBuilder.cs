@@ -4,6 +4,7 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using Evoogle.ApiFramework.Exceptions;
+using Evoogle.ApiFramework.Schema.Configuration.Internal;
 
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
@@ -13,7 +14,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 public sealed class ApiObjectTypeOptionsBuilder()
 {
     #region Fields
-    private ApiKeyNullHandling? _apiKeyNullHandling = null;
+    private readonly ApiObjectTypeOptionsState _state = new();
     #endregion
 
     #region With Methods
@@ -23,7 +24,7 @@ public sealed class ApiObjectTypeOptionsBuilder()
     /// <returns>The current builder instance.</returns>
     public ApiObjectTypeOptionsBuilder ThrowOnNullKeyPart()
     {
-        _apiKeyNullHandling = ApiKeyNullHandling.ThrowOnNull;
+        _state.ApiKeyNullHandling = ApiKeyNullHandling.ThrowOnNull;
         return this;
     }
 
@@ -33,7 +34,7 @@ public sealed class ApiObjectTypeOptionsBuilder()
     /// <returns>The current builder instance.</returns>
     public ApiObjectTypeOptionsBuilder UseDefaultOnNullKeyPart()
     {
-        _apiKeyNullHandling = ApiKeyNullHandling.UseDefaultOnNull;
+        _state.ApiKeyNullHandling = ApiKeyNullHandling.UseDefaultOnNull;
         return this;
     }
     #endregion
@@ -47,7 +48,7 @@ public sealed class ApiObjectTypeOptionsBuilder()
     {
         return new ApiObjectTypeOptions
         {
-            ApiKeyNullHandling = _apiKeyNullHandling
+            ApiKeyNullHandling = _state.ApiKeyNullHandling
         };
     }
     #endregion

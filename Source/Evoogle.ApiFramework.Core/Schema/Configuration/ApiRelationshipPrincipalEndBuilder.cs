@@ -22,8 +22,7 @@ public sealed class ApiRelationshipPrincipalEndBuilder(Type clrObjectType) : Ext
     #region Fields
     private readonly ApiConfigurationSourceScope _configurationSourceScope = new();
     private readonly Type _clrObjectType = clrObjectType ?? throw new ArgumentNullException(nameof(clrObjectType));
-    private string? _apiPrincipalKeyTypeName;
-    private ApiConfigurationSource? _apiPrincipalKeyTypeNameSource;
+    private readonly ApiRelationshipPrincipalEndState _state = new();
     #endregion
 
     #region Properties
@@ -56,10 +55,10 @@ public sealed class ApiRelationshipPrincipalEndBuilder(Type clrObjectType) : Ext
         ArgumentException.ThrowIfNullOrWhiteSpace(apiPrincipalKeyTypeName, nameof(apiPrincipalKeyTypeName));
 
         var source = _configurationSourceScope.CurrentSource;
-        if (_apiPrincipalKeyTypeNameSource == null || source >= _apiPrincipalKeyTypeNameSource.Value)
+        if (_state.PrincipalKeyTypeNameSource == null || source >= _state.PrincipalKeyTypeNameSource.Value)
         {
-            _apiPrincipalKeyTypeName = apiPrincipalKeyTypeName;
-            _apiPrincipalKeyTypeNameSource = source;
+            _state.PrincipalKeyTypeName = apiPrincipalKeyTypeName;
+            _state.PrincipalKeyTypeNameSource = source;
         }
 
         return this;
@@ -83,7 +82,7 @@ public sealed class ApiRelationshipPrincipalEndBuilder(Type clrObjectType) : Ext
         var end = new ApiRelationshipPrincipalEnd
         (
             _clrObjectType,
-            _apiPrincipalKeyTypeName
+            _state.PrincipalKeyTypeName
         );
 
         var extensions = this.BuildExtensions();

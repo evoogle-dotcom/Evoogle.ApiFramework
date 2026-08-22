@@ -91,14 +91,13 @@ public static class ApiRelationshipManyToManyBuilderExtensions
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        var source = builder.CurrentConfigurationSource;
-        var associationBuilder = new ApiRelationshipAssociationBuilder<TAssociation>();
-        if (configure != null)
-        {
-            associationBuilder.ApplyConfiguration(source, () => configure(associationBuilder));
-        }
-
-        return builder.SetAssociationBuilderCore(associationBuilder);
+        return builder.WithAssociation
+        (
+            typeof(TAssociation),
+            configure == null
+                ? null
+                : association => configure((ApiRelationshipAssociationBuilder<TAssociation>)association)
+        );
     }
     #endregion
 }

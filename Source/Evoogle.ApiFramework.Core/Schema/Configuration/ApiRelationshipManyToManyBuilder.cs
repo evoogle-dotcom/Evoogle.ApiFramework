@@ -22,12 +22,7 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
     : ApiRelationshipBuilder(apiName, ApiRelationshipManyToMany.DefaultDeleteBehavior)
 {
     #region Fields
-    private ApiRelationshipPrincipalEndBuilder? _principalEndABuilder;
-    private ApiRelationshipPrincipalEndBuilder? _principalEndBBuilder;
-    private ApiRelationshipAssociationBuilder? _associationBuilder;
-    private Internal.ApiConfigurationSource? _principalEndABuilderSource;
-    private Internal.ApiConfigurationSource? _principalEndBBuilderSource;
-    private Internal.ApiConfigurationSource? _associationBuilderSource;
+    private readonly Internal.ApiRelationshipEndsState _endsState = new();
     #endregion
 
     #region AddExtension Methods
@@ -55,25 +50,25 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
         var source = this.CurrentConfigurationSource;
         if
         (
-            _principalEndABuilder != null &&
-            _principalEndABuilder.ClrObjectType == clrPrincipalType &&
-            _principalEndABuilderSource != null &&
-            source < _principalEndABuilderSource.Value
+            _endsState.PrincipalEndA != null &&
+            _endsState.PrincipalEndA.ClrObjectType == clrPrincipalType &&
+            _endsState.PrincipalEndASource != null &&
+            source < _endsState.PrincipalEndASource.Value
         )
         {
             if (configure != null)
             {
-                _principalEndABuilder.ApplyConfiguration
+                _endsState.PrincipalEndA.ApplyConfiguration
                 (
                     source,
-                    () => configure(_principalEndABuilder)
+                    () => configure(_endsState.PrincipalEndA)
                 );
             }
 
             return this;
         }
 
-        if (_principalEndABuilderSource != null && source < _principalEndABuilderSource.Value)
+        if (_endsState.PrincipalEndASource != null && source < _endsState.PrincipalEndASource.Value)
         {
             return this;
         }
@@ -84,8 +79,8 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
             builder.ApplyConfiguration(source, () => configure(builder));
         }
 
-        _principalEndABuilder = builder;
-        _principalEndABuilderSource = source;
+        _endsState.PrincipalEndA = builder;
+        _endsState.PrincipalEndASource = source;
         return this;
     }
 
@@ -121,25 +116,25 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
         var source = this.CurrentConfigurationSource;
         if
         (
-            _principalEndBBuilder != null &&
-            _principalEndBBuilder.ClrObjectType == clrPrincipalType &&
-            _principalEndBBuilderSource != null &&
-            source < _principalEndBBuilderSource.Value
+            _endsState.PrincipalEndB != null &&
+            _endsState.PrincipalEndB.ClrObjectType == clrPrincipalType &&
+            _endsState.PrincipalEndBSource != null &&
+            source < _endsState.PrincipalEndBSource.Value
         )
         {
             if (configure != null)
             {
-                _principalEndBBuilder.ApplyConfiguration
+                _endsState.PrincipalEndB.ApplyConfiguration
                 (
                     source,
-                    () => configure(_principalEndBBuilder)
+                    () => configure(_endsState.PrincipalEndB)
                 );
             }
 
             return this;
         }
 
-        if (_principalEndBBuilderSource != null && source < _principalEndBBuilderSource.Value)
+        if (_endsState.PrincipalEndBSource != null && source < _endsState.PrincipalEndBSource.Value)
         {
             return this;
         }
@@ -150,8 +145,8 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
             builder.ApplyConfiguration(source, () => configure(builder));
         }
 
-        _principalEndBBuilder = builder;
-        _principalEndBBuilderSource = source;
+        _endsState.PrincipalEndB = builder;
+        _endsState.PrincipalEndBSource = source;
         return this;
     }
 
@@ -187,39 +182,58 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
         ArgumentNullException.ThrowIfNull(clrAssociationType);
 
         var source = this.CurrentConfigurationSource;
+        if (_endsState.Association != null && _endsState.Association.ClrObjectType == clrAssociationType)
+        {
+            if (configure != null)
+            {
+                _endsState.Association.ApplyConfiguration(source, () => configure(_endsState.Association));
+            }
+
+            if (_endsState.AssociationSource == null || source >= _endsState.AssociationSource.Value)
+            {
+                _endsState.AssociationSource = source;
+            }
+
+            return this;
+        }
+
         if
         (
-            _associationBuilder != null &&
-            _associationBuilder.ClrObjectType == clrAssociationType &&
-            _associationBuilderSource != null &&
-            source < _associationBuilderSource.Value
+            _endsState.Association != null &&
+            _endsState.Association.ClrObjectType == clrAssociationType &&
+            _endsState.AssociationSource != null &&
+            source < _endsState.AssociationSource.Value
         )
         {
             if (configure != null)
             {
-                _associationBuilder.ApplyConfiguration
+                _endsState.Association.ApplyConfiguration
                 (
                     source,
-                    () => configure(_associationBuilder)
+                    () => configure(_endsState.Association)
                 );
             }
 
             return this;
         }
 
-        if (_associationBuilderSource != null && source < _associationBuilderSource.Value)
+        if (_endsState.AssociationSource != null && source < _endsState.AssociationSource.Value)
         {
             return this;
         }
 
-        var builder = new ApiRelationshipAssociationBuilder(clrAssociationType);
+        var builder = Internal.ApiBuilderFactory.CreateClosedGeneric<ApiRelationshipAssociationBuilder>
+        (
+            typeof(ApiRelationshipAssociationBuilder<>),
+            clrAssociationType
+        );
         if (configure != null)
         {
             builder.ApplyConfiguration(source, () => configure(builder));
         }
 
-        _associationBuilder = builder;
-        _associationBuilderSource = source;
+        _endsState.Association = builder;
+        _endsState.AssociationSource = source;
         return this;
     }
 
@@ -237,10 +251,10 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
     internal override ApiRelationship Build()
     {
         var apiName = this.ApiName;
-        var apiPrincipalEndA = _principalEndABuilder?.Build()!;
-        var apiPrincipalEndB = _principalEndBBuilder?.Build()!;
-        var apiAssociation = _associationBuilder?.Build()!;
-        var apiDeleteBehavior = _apiDeleteBehavior;
+        var apiPrincipalEndA = _endsState.PrincipalEndA?.Build()!;
+        var apiPrincipalEndB = _endsState.PrincipalEndB?.Build()!;
+        var apiAssociation = _endsState.Association?.Build()!;
+        var apiDeleteBehavior = this.DeleteBehavior;
 
         var relationship = new ApiRelationshipManyToMany
         (
@@ -272,20 +286,20 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
         var source = this.CurrentConfigurationSource;
         if
         (
-            _associationBuilder != null &&
-            _associationBuilder.ClrObjectType == builder.ClrObjectType &&
-            _associationBuilderSource != null &&
-            source < _associationBuilderSource.Value
+            _endsState.Association != null &&
+            _endsState.Association.ClrObjectType == builder.ClrObjectType &&
+            _endsState.AssociationSource != null &&
+            source < _endsState.AssociationSource.Value
         )
         {
-            _associationBuilder.MergeConfigurationFrom(builder);
+            _endsState.Association.MergeConfigurationFrom(builder);
             return this;
         }
 
-        if (_associationBuilderSource == null || source >= _associationBuilderSource.Value)
+        if (_endsState.AssociationSource == null || source >= _endsState.AssociationSource.Value)
         {
-            _associationBuilder = builder;
-            _associationBuilderSource = source;
+            _endsState.Association = builder;
+            _endsState.AssociationSource = source;
         }
 
         return this;

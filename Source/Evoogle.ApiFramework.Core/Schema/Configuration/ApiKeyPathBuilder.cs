@@ -3,6 +3,8 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Schema.Configuration.Internal;
+
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
 /// <summary>
@@ -16,16 +18,15 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 public class ApiKeyPathBuilder : ExtensionBuilder<ApiKeyPathBuilder>
 {
     #region Fields
-    private readonly Type _clrRootType;
-    private readonly List<ApiKeyPathSegmentBuilder> _segmentBuilders;
+    private readonly ApiKeyPathState _state;
     #endregion
 
     #region Properties
     /// <summary>Gets the CLR root type from which this key path's navigation chain begins.</summary>
-    internal Type ClrRootType => _clrRootType;
+    internal Type ClrRootType => _state.ClrRootType;
 
     /// <summary>Gets the ordered segment builders that make up this key path.</summary>
-    internal IReadOnlyList<ApiKeyPathSegmentBuilder> SegmentBuilders => _segmentBuilders;
+    internal IReadOnlyList<ApiKeyPathSegmentBuilder> SegmentBuilders => _state.SegmentBuilders;
     #endregion
 
     #region Constructors
@@ -45,7 +46,6 @@ public class ApiKeyPathBuilder : ExtensionBuilder<ApiKeyPathBuilder>
         ArgumentNullException.ThrowIfNull(clrRootType);
         ArgumentNullException.ThrowIfNull(clrPropertyNames);
 
-        _clrRootType = clrRootType;
         var names = clrPropertyNames as string[] ?? [.. clrPropertyNames];
 
         if (names.Length == 0)
@@ -58,7 +58,11 @@ public class ApiKeyPathBuilder : ExtensionBuilder<ApiKeyPathBuilder>
             throw new ArgumentException("CLR property names must not contain null, empty, or whitespace values.", nameof(clrPropertyNames));
         }
 
-        _segmentBuilders = [.. names.Select(static n => new ApiKeyPathSegmentBuilder(n))];
+        _state = new ApiKeyPathState
+        (
+            clrRootType,
+            names.Select(static n => new ApiKeyPathSegmentBuilder(n))
+        );
     }
 
     /// <summary>
@@ -77,15 +81,14 @@ public class ApiKeyPathBuilder : ExtensionBuilder<ApiKeyPathBuilder>
         ArgumentNullException.ThrowIfNull(clrRootType);
         ArgumentNullException.ThrowIfNull(segmentBuilders);
 
-        _clrRootType = clrRootType;
-        _segmentBuilders = [.. segmentBuilders];
+        _state = new ApiKeyPathState(clrRootType, segmentBuilders);
 
-        if (_segmentBuilders.Count == 0)
+        if (_state.SegmentBuilders.Count == 0)
         {
             throw new ArgumentException("At least one segment builder must be provided.", nameof(segmentBuilders));
         }
 
-        if (_segmentBuilders.Any(static builder => builder is null))
+        if (_state.SegmentBuilders.Any(static builder => builder is null))
         {
             throw new ArgumentException("Segment builders must not contain null values.", nameof(segmentBuilders));
         }
@@ -161,7 +164,7 @@ public class ApiKeyPathBuilder : ExtensionBuilder<ApiKeyPathBuilder>
 
         var segmentBuilder = new ApiKeyPathSegmentBuilder(clrPropertyName);
         configure?.Invoke(segmentBuilder);
-        _segmentBuilders.Add(segmentBuilder);
+        _state.SegmentBuilders.Add(segmentBuilder);
         return this;
     }
     #endregion
@@ -172,8 +175,8 @@ public class ApiKeyPathBuilder : ExtensionBuilder<ApiKeyPathBuilder>
     /// </summary>
     internal ApiKeyPath Build()
     {
-        var segments = _segmentBuilders.Select(b => b.Build());
-        var path = new ApiKeyPath(_clrRootType, segments);
+        var segments = _state.SegmentBuilders.Select(b => b.Build());
+        var path = new ApiKeyPath(_state.ClrRootType, segments);
 
         var extensions = this.BuildExtensions();
         if (extensions != null)

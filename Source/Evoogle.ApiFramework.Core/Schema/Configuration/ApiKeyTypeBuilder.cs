@@ -3,6 +3,8 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Schema.Configuration.Internal;
+
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
 /// <summary>
@@ -16,8 +18,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 public class ApiKeyTypeBuilder(string? apiName = null) : ExtensionBuilder<ApiKeyTypeBuilder>
 {
     #region Fields
-    private string? _apiName = apiName;
-    private readonly List<ApiKeyPathBuilder> _keyPathBuilders = [];
+    private readonly ApiKeyTypeState _state = new() { ApiName = apiName };
     #endregion
 
     #region AddExtension Methods
@@ -47,7 +48,7 @@ public class ApiKeyTypeBuilder(string? apiName = null) : ExtensionBuilder<ApiKey
         ArgumentNullException.ThrowIfNull(clrRootType);
         ArgumentNullException.ThrowIfNull(clrPropertyNames);
 
-        _keyPathBuilders.Add(ApiKeyPathBuilder.For(clrRootType, clrPropertyNames));
+        _state.KeyPathBuilders.Add(ApiKeyPathBuilder.For(clrRootType, clrPropertyNames));
         return this;
     }
 
@@ -67,14 +68,14 @@ public class ApiKeyTypeBuilder(string? apiName = null) : ExtensionBuilder<ApiKey
 
         var builder = new ApiKeyPathBuilder(clrRootType, clrPropertyNames);
         configure?.Invoke(builder);
-        _keyPathBuilders.Add(builder);
+        _state.KeyPathBuilders.Add(builder);
         return this;
     }
     #endregion
 
     #region With Methods
     /// <summary>Gets the API name currently configured on this key type builder.</summary>
-    internal string? ApiName => _apiName;
+    internal string? ApiName => _state.ApiName;
 
     /// <summary>
     ///     Returns <c>true</c> when this key type already contains the specified CLR root type
@@ -90,7 +91,7 @@ public class ApiKeyTypeBuilder(string? apiName = null) : ExtensionBuilder<ApiKey
 
         var names = clrPropertyNames as IReadOnlyList<string> ?? [.. clrPropertyNames];
 
-        return _keyPathBuilders.Any(p =>
+        return _state.KeyPathBuilders.Any(p =>
             p.ClrRootType == clrRootType &&
             p.SegmentBuilders.Select(s => s.ClrPropertyName).SequenceEqual(names));
     }
@@ -104,7 +105,7 @@ public class ApiKeyTypeBuilder(string? apiName = null) : ExtensionBuilder<ApiKey
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
 
-        _apiName = apiName;
+        _state.ApiName = apiName;
         return this;
     }
     #endregion
@@ -115,8 +116,8 @@ public class ApiKeyTypeBuilder(string? apiName = null) : ExtensionBuilder<ApiKey
     /// </summary>
     internal ApiKeyType Build()
     {
-        var apiName = _apiName;
-        var keyPaths = _keyPathBuilders.Select(b => b.Build());
+        var apiName = _state.ApiName;
+        var keyPaths = _state.KeyPathBuilders.Select(b => b.Build());
         var keyType = new ApiKeyType(apiName, keyPaths);
 
         var extensions = this.BuildExtensions();
@@ -136,7 +137,7 @@ public class ApiKeyTypeBuilder(string? apiName = null) : ExtensionBuilder<ApiKey
     protected void AddKeyPathBuilderCore(ApiKeyPathBuilder builder)
     {
         ArgumentNullException.ThrowIfNull(builder);
-        _keyPathBuilders.Add(builder);
+        _state.KeyPathBuilders.Add(builder);
     }
     #endregion
 }

@@ -17,13 +17,10 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 public class ApiPropertyBuilder : ExtensionBuilder<ApiPropertyBuilder>
 {
     #region Fields
-    private string _apiName;
-    private ApiConfigurationSource _apiNameSource;
+    private readonly ApiPropertyState _state;
     private readonly string _clrName;
     private readonly ApiSchemaBuilderContext? _context;
     private readonly Type? _clrDeclaringType;
-    private Action<ApiTypeModifiersBuilder>? _modifiers;
-    private ApiConfigurationSource? _modifiersSource;
     #endregion
 
     #region Constructors
@@ -52,9 +49,8 @@ public class ApiPropertyBuilder : ExtensionBuilder<ApiPropertyBuilder>
         Type? clrDeclaringType
     )
     {
-        _apiName = ValidateName(apiName, nameof(apiName));
+        _state = new ApiPropertyState(ValidateName(apiName, nameof(apiName)), apiNameSource);
         _clrName = ValidateName(clrName, nameof(clrName));
-        _apiNameSource = apiNameSource;
         _context = context;
         _clrDeclaringType = clrDeclaringType;
     }
@@ -64,7 +60,7 @@ public class ApiPropertyBuilder : ExtensionBuilder<ApiPropertyBuilder>
     /// <summary>
     ///     Gets the API name currently configured for the property.
     /// </summary>
-    internal string ApiName => _apiName;
+    internal string ApiName => _state.ApiName;
 
     /// <summary>
     ///     Gets the CLR property or field name this builder represents.
@@ -179,26 +175,26 @@ public class ApiPropertyBuilder : ExtensionBuilder<ApiPropertyBuilder>
     private ApiTypeModifiers BuildModifiers(ApiTypeModifiers apiNullabilityModifiers)
     {
         // No tier has set modifiers: fall back to the nullability-derived default.
-        if (_modifiers == null)
+        if (_state.Modifiers == null)
         {
             return apiNullabilityModifiers;
         }
 
         // A tier set modifiers; start from None so the stored delegate has full control.
         var modifierBuilder = new ApiTypeModifiersBuilder(ApiTypeModifiers.None);
-        _modifiers.Invoke(modifierBuilder);
+        _state.Modifiers.Invoke(modifierBuilder);
         return modifierBuilder.Build();
     }
 
     private ApiPropertyBuilder SetApiName(string apiName, ApiConfigurationSource source)
     {
-        var previousValue = _apiName;
-        var wasApplied = source >= _apiNameSource;
+        var previousValue = _state.ApiName;
+        var wasApplied = source >= _state.ApiNameSource;
 
-        if (source >= _apiNameSource)
+        if (source >= _state.ApiNameSource)
         {
-            _apiName = apiName;
-            _apiNameSource = source;
+            _state.ApiName = apiName;
+            _state.ApiNameSource = source;
         }
 
         _context?.TraceConfigurationChange
@@ -208,7 +204,7 @@ public class ApiPropertyBuilder : ExtensionBuilder<ApiPropertyBuilder>
             source,
             previousValue,
             apiName,
-            _apiName,
+            _state.ApiName,
             wasApplied,
             wasApplied ? null : "A higher-precedence API name is already configured."
         );
@@ -218,13 +214,13 @@ public class ApiPropertyBuilder : ExtensionBuilder<ApiPropertyBuilder>
 
     private ApiPropertyBuilder SetModifiers(Action<ApiTypeModifiersBuilder> configure, ApiConfigurationSource source)
     {
-        var previousSource = _modifiersSource;
+        var previousSource = _state.ModifiersSource;
         var wasApplied = false;
 
-        if (_modifiersSource == null || source >= _modifiersSource.Value)
+        if (_state.ModifiersSource == null || source >= _state.ModifiersSource.Value)
         {
-            _modifiers = configure;
-            _modifiersSource = source;
+            _state.Modifiers = configure;
+            _state.ModifiersSource = source;
             wasApplied = true;
         }
 
@@ -235,7 +231,7 @@ public class ApiPropertyBuilder : ExtensionBuilder<ApiPropertyBuilder>
             source,
             previousSource?.ToString(),
             "configured",
-            _modifiersSource?.ToString(),
+            _state.ModifiersSource?.ToString(),
             wasApplied,
             wasApplied ? null : "A higher-precedence property modifier is already configured."
         );
@@ -250,7 +246,7 @@ public class ApiPropertyBuilder : ExtensionBuilder<ApiPropertyBuilder>
             ApiSchemaBuildTargetKind.Property,
             _clrDeclaringType,
             _clrName,
-            _apiName
+            _state.ApiName
         );
     }
 
@@ -260,14 +256,14 @@ public class ApiPropertyBuilder : ExtensionBuilder<ApiPropertyBuilder>
         var apiInitialTypeModifiers = clrNullabilityInfo.Nullability == MemberNullability.NonNullable ? ApiTypeModifiers.Required : ApiTypeModifiers.None;
         var apiTypeModifiers = this.BuildModifiers(apiInitialTypeModifiers);
 
-        return this.CreateAndBuildExtensions(_apiName, apiTypeExpression, apiTypeModifiers, _clrName, clrMemberKind);
+        return this.CreateAndBuildExtensions(_state.ApiName, apiTypeExpression, apiTypeModifiers, _clrName, clrMemberKind);
     }
 
     private ApiProperty BuildUnknownProperty()
     {
         var apiTypeModifiers = this.BuildModifiers(ApiTypeModifiers.None);
 
-        return this.CreateAndBuildExtensions(_apiName, default!, apiTypeModifiers, _clrName, ClrMemberKind.Unknown);
+        return this.CreateAndBuildExtensions(_state.ApiName, default!, apiTypeModifiers, _clrName, ClrMemberKind.Unknown);
     }
 
     private ApiProperty CreateAndBuildExtensions(string apiName, ApiTypeExpression apiTypeExpression, ApiTypeModifiers apiTypeModifiers, string clrName, ClrMemberKind clrMemberKind)

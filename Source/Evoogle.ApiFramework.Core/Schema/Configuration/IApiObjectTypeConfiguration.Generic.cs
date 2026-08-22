@@ -24,7 +24,7 @@ public interface IApiObjectTypeConfiguration<TObject> : IApiObjectTypeConfigurat
     ///     Bridges the non-generic <see cref="IApiObjectTypeConfiguration.Configure"/> contract by
     ///     down-casting the builder and delegating to the typed overload.
     /// </summary>
-    /// <param name="builder">The non-generic builder. Must be an <see cref="ApiObjectTypeBuilder{TObject}"/> instance.</param>
+    /// <param name="builder">The builder, which must be an <see cref="ApiObjectTypeBuilder{TObject}"/> instance.</param>
     /// <exception cref="InvalidCastException">
     ///     Thrown when <paramref name="builder"/> is not an <see cref="ApiObjectTypeBuilder{TObject}"/>.
     ///     This happens when the configuration is applied to the wrong object type.

@@ -20,10 +20,7 @@ public sealed class ApiRelationshipOneToManyBuilder(string apiName)
     : ApiRelationshipBuilder(apiName, ApiRelationshipOneToMany.DefaultDeleteBehavior)
 {
     #region Fields
-    private ApiRelationshipPrincipalEndBuilder? _principalEndBuilder;
-    private ApiRelationshipDependentEndBuilder? _dependentEndBuilder;
-    private Internal.ApiConfigurationSource? _principalEndBuilderSource;
-    private Internal.ApiConfigurationSource? _dependentEndBuilderSource;
+    private readonly Internal.ApiRelationshipEndsState _endsState = new();
     #endregion
 
     #region AddExtension Methods
@@ -51,25 +48,25 @@ public sealed class ApiRelationshipOneToManyBuilder(string apiName)
         var source = this.CurrentConfigurationSource;
         if
         (
-            _principalEndBuilder != null &&
-            _principalEndBuilder.ClrObjectType == clrPrincipalType &&
-            _principalEndBuilderSource != null &&
-            source < _principalEndBuilderSource.Value
+            _endsState.PrincipalEndA != null &&
+            _endsState.PrincipalEndA.ClrObjectType == clrPrincipalType &&
+            _endsState.PrincipalEndASource != null &&
+            source < _endsState.PrincipalEndASource.Value
         )
         {
             if (configure != null)
             {
-                _principalEndBuilder.ApplyConfiguration
+                _endsState.PrincipalEndA.ApplyConfiguration
                 (
                     source,
-                    () => configure(_principalEndBuilder)
+                    () => configure(_endsState.PrincipalEndA)
                 );
             }
 
             return this;
         }
 
-        if (_principalEndBuilderSource != null && source < _principalEndBuilderSource.Value)
+        if (_endsState.PrincipalEndASource != null && source < _endsState.PrincipalEndASource.Value)
         {
             return this;
         }
@@ -80,8 +77,8 @@ public sealed class ApiRelationshipOneToManyBuilder(string apiName)
             builder.ApplyConfiguration(source, () => configure(builder));
         }
 
-        _principalEndBuilder = builder;
-        _principalEndBuilderSource = source;
+        _endsState.PrincipalEndA = builder;
+        _endsState.PrincipalEndASource = source;
         return this;
     }
 
@@ -115,39 +112,58 @@ public sealed class ApiRelationshipOneToManyBuilder(string apiName)
         ArgumentNullException.ThrowIfNull(clrDependentType);
 
         var source = this.CurrentConfigurationSource;
+        if (_endsState.DependentEnd != null && _endsState.DependentEnd.ClrObjectType == clrDependentType)
+        {
+            if (configure != null)
+            {
+                _endsState.DependentEnd.ApplyConfiguration(source, () => configure(_endsState.DependentEnd));
+            }
+
+            if (_endsState.DependentEndSource == null || source >= _endsState.DependentEndSource.Value)
+            {
+                _endsState.DependentEndSource = source;
+            }
+
+            return this;
+        }
+
         if
         (
-            _dependentEndBuilder != null &&
-            _dependentEndBuilder.ClrObjectType == clrDependentType &&
-            _dependentEndBuilderSource != null &&
-            source < _dependentEndBuilderSource.Value
+            _endsState.DependentEnd != null &&
+            _endsState.DependentEnd.ClrObjectType == clrDependentType &&
+            _endsState.DependentEndSource != null &&
+            source < _endsState.DependentEndSource.Value
         )
         {
             if (configure != null)
             {
-                _dependentEndBuilder.ApplyConfiguration
+                _endsState.DependentEnd.ApplyConfiguration
                 (
                     source,
-                    () => configure(_dependentEndBuilder)
+                    () => configure(_endsState.DependentEnd)
                 );
             }
 
             return this;
         }
 
-        if (_dependentEndBuilderSource != null && source < _dependentEndBuilderSource.Value)
+        if (_endsState.DependentEndSource != null && source < _endsState.DependentEndSource.Value)
         {
             return this;
         }
 
-        var builder = new ApiRelationshipDependentEndBuilder(clrDependentType);
+        var builder = Internal.ApiBuilderFactory.CreateClosedGeneric<ApiRelationshipDependentEndBuilder>
+        (
+            typeof(ApiRelationshipDependentEndBuilder<>),
+            clrDependentType
+        );
         if (configure != null)
         {
             builder.ApplyConfiguration(source, () => configure(builder));
         }
 
-        _dependentEndBuilder = builder;
-        _dependentEndBuilderSource = source;
+        _endsState.DependentEnd = builder;
+        _endsState.DependentEndSource = source;
         return this;
     }
     #endregion
@@ -167,9 +183,9 @@ public sealed class ApiRelationshipOneToManyBuilder(string apiName)
     internal override ApiRelationship Build()
     {
         var apiName = this.ApiName;
-        var apiPrincipalEnd = _principalEndBuilder?.Build()!;
-        var apiDependentEnd = _dependentEndBuilder?.Build()!;
-        var apiDeleteBehavior = _apiDeleteBehavior;
+        var apiPrincipalEnd = _endsState.PrincipalEndA?.Build()!;
+        var apiDependentEnd = _endsState.DependentEnd?.Build()!;
+        var apiDeleteBehavior = this.DeleteBehavior;
 
         var relationship = new ApiRelationshipOneToMany
         (
@@ -200,20 +216,20 @@ public sealed class ApiRelationshipOneToManyBuilder(string apiName)
         var source = this.CurrentConfigurationSource;
         if
         (
-            _dependentEndBuilder != null &&
-            _dependentEndBuilder.ClrObjectType == builder.ClrObjectType &&
-            _dependentEndBuilderSource != null &&
-            source < _dependentEndBuilderSource.Value
+            _endsState.DependentEnd != null &&
+            _endsState.DependentEnd.ClrObjectType == builder.ClrObjectType &&
+            _endsState.DependentEndSource != null &&
+            source < _endsState.DependentEndSource.Value
         )
         {
-            _dependentEndBuilder.MergeConfigurationFrom(builder);
+            _endsState.DependentEnd.MergeConfigurationFrom(builder);
             return this;
         }
 
-        if (_dependentEndBuilderSource == null || source >= _dependentEndBuilderSource.Value)
+        if (_endsState.DependentEndSource == null || source >= _endsState.DependentEndSource.Value)
         {
-            _dependentEndBuilder = builder;
-            _dependentEndBuilderSource = source;
+            _endsState.DependentEnd = builder;
+            _endsState.DependentEndSource = source;
         }
 
         return this;

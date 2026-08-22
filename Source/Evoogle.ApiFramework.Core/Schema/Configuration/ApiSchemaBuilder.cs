@@ -18,11 +18,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) : ExtensionBuilder<ApiSchemaBuilder>, IHasLogger
 {
     #region Fields
-    private string? _apiName;
-    private string? _apiVersion;
-    private Action<ApiSchemaOptionsBuilder>? _apiOptionsConfiguration = null;
-    private ApiConventionSet? _conventionSet;
-    private ApiAnnotationReaderSet? _annotationReaderSet;
+    private readonly ApiSchemaBuilderState _state = new();
 
     private readonly ApiSchemaBuilderContext _context = new(logger);
     #endregion
@@ -350,7 +346,7 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
 
-        _apiName = apiName;
+        _state.ApiName = apiName;
         return this;
     }
 
@@ -363,7 +359,7 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiVersion, nameof(apiVersion));
 
-        _apiVersion = apiVersion;
+        _state.ApiVersion = apiVersion;
         return this;
     }
 
@@ -376,7 +372,7 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     {
         ArgumentNullException.ThrowIfNull(configure);
 
-        _apiOptionsConfiguration = configure;
+        _state.OptionsConfiguration = configure;
         return this;
     }
 
@@ -386,7 +382,7 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     /// <returns>The current builder instance.</returns>
     public ApiSchemaBuilder WithDefaultOptions()
     {
-        _apiOptionsConfiguration = null;
+        _state.OptionsConfiguration = null;
         return this;
     }
     #endregion
@@ -403,12 +399,12 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     {
         ArgumentNullException.ThrowIfNull(configure);
 
-        var setBuilder = _conventionSet != null
-            ? new ApiConventionSetBuilder(_conventionSet)
+        var setBuilder = _state.ConventionSet != null
+            ? new ApiConventionSetBuilder(_state.ConventionSet)
             : new ApiConventionSetBuilder();
 
         configure(setBuilder);
-        _conventionSet = setBuilder.Build();
+        _state.ConventionSet = setBuilder.Build();
         return this;
     }
 
@@ -424,7 +420,7 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     /// <returns>The current builder instance.</returns>
     public ApiSchemaBuilder UseDefaultConventions(ApiNamingConvention? namingConvention = null)
     {
-        _conventionSet = ApiConventionSet.CreateDefault(namingConvention);
+        _state.ConventionSet = ApiConventionSet.CreateDefault(namingConvention);
         return this;
     }
     #endregion
@@ -441,7 +437,7 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
 
         var setBuilder = new ApiAnnotationReaderSetBuilder();
         configure(setBuilder);
-        _annotationReaderSet = setBuilder.Build();
+        _state.AnnotationReaderSet = setBuilder.Build();
         return this;
     }
 
@@ -581,12 +577,12 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
 
         try
         {
-            if (_conventionSet is not null || _annotationReaderSet is not null)
+            if (_state.ConventionSet is not null || _state.AnnotationReaderSet is not null)
             {
                 var configurationPipeline = new ApiSchemaConfigurationPipeline
                 (
-                    _conventionSet,
-                    _annotationReaderSet,
+                    _state.ConventionSet,
+                    _state.AnnotationReaderSet,
                     _context,
                     this
                 );
@@ -605,8 +601,8 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
             );
 
             // Build ApiSchema instance from all the configured components.
-            var apiName = _apiName!;
-            var apiVersion = _apiVersion;
+            var apiName = _state.ApiName!;
+            var apiVersion = _state.ApiVersion;
             var apiOptions = this.BuildOptions();
 
             var apiScalarTypes = _context.ApiScalarTypeBuilders.Select(b => b.Build());
@@ -690,13 +686,13 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
 
     private ApiSchemaOptions? BuildOptions()
     {
-        if (_apiOptionsConfiguration == null)
+        if (_state.OptionsConfiguration == null)
         {
             return null;
         }
 
         var apiOptionsBuilder = new ApiSchemaOptionsBuilder();
-        _apiOptionsConfiguration.Invoke(apiOptionsBuilder);
+        _state.OptionsConfiguration.Invoke(apiOptionsBuilder);
         return apiOptionsBuilder.Build();
     }
     #endregion

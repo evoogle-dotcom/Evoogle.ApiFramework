@@ -1,12 +1,9 @@
 ﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
-//
-// This file is licensed under the MIT License.
-// See the LICENSE file in the project root for more information.
 using Evoogle.ApiFramework.Exceptions;
+using Evoogle.ApiFramework.Schema.Configuration.Trace.Internal;
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
 using Evoogle.ApiFramework.Schema.Configuration.Trace;
-using Evoogle.ApiFramework.Schema.Configuration.Trace.Internal;
 using Evoogle.Logging;
 
 using Microsoft.Extensions.Logging;
@@ -157,39 +154,7 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null) : IHasLogger
     /// <typeparam name="TScalar">The CLR scalar type.</typeparam>
     /// <returns>The corresponding <see cref="ApiScalarTypeBuilder{TScalar}"/>.</returns>
     internal ApiScalarTypeBuilder<TScalar> GetOrAddScalarTypeBuilder<TScalar>()
-    {
-        var clrType = typeof(TScalar);
-        if (_apiScalarTypeBuilders.TryGetValue(clrType, out var existing))
-        {
-            this.TraceStructuralRegistration
-            (
-                new(ApiSchemaBuildTargetKind.ScalarType, clrType, ApiName: existing.ApiName),
-                ApiSchemaBuildRegistrationKind.Type,
-                this.CurrentConfigurationSource,
-                wasRegistered: false,
-                rejectionReason: "The scalar type was already registered."
-            );
-
-            if (existing is not ApiScalarTypeBuilder<TScalar> typed)
-            {
-                throw new ApiSchemaConfigurationException($"Scalar type '{clrType.Name}' was already registered as {existing.GetType().Name} and cannot be reconfigured as {typeof(ApiScalarTypeBuilder<TScalar>).Name}.");
-            }
-
-            return typed;
-        }
-
-        var builder = new ApiScalarTypeBuilder<TScalar>(this);
-        _apiScalarTypeBuilders[clrType] = builder;
-        _pendingScalarBuilders.Enqueue(builder);
-        this.TraceStructuralRegistration
-        (
-            new(ApiSchemaBuildTargetKind.ScalarType, clrType, ApiName: builder.ApiName),
-            ApiSchemaBuildRegistrationKind.Type,
-            this.CurrentConfigurationSource,
-            wasRegistered: true
-        );
-        return builder;
-    }
+        => (ApiScalarTypeBuilder<TScalar>)this.GetOrAddScalarTypeBuilder(typeof(TScalar));
 
     /// <summary>
     ///     Gets existing or adds new <see cref="ApiEnumTypeBuilder{TEnum}"/> for the CLR type <typeparamref name="TEnum"/>.
@@ -197,39 +162,7 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null) : IHasLogger
     /// <typeparam name="TEnum">The CLR enum type.</typeparam>
     /// <returns>The corresponding <see cref="ApiEnumTypeBuilder{TEnum}"/>.</returns>
     internal ApiEnumTypeBuilder<TEnum> GetOrAddEnumTypeBuilder<TEnum>() where TEnum : Enum
-    {
-        var clrType = typeof(TEnum);
-        if (_apiEnumTypeBuilders.TryGetValue(clrType, out var existing))
-        {
-            this.TraceStructuralRegistration
-            (
-                new(ApiSchemaBuildTargetKind.EnumType, clrType, ApiName: existing.ApiName),
-                ApiSchemaBuildRegistrationKind.Type,
-                this.CurrentConfigurationSource,
-                wasRegistered: false,
-                rejectionReason: "The enum type was already registered."
-            );
-
-            if (existing is not ApiEnumTypeBuilder<TEnum> typed)
-            {
-                throw new ApiSchemaConfigurationException($"Enum type '{clrType.Name}' was already registered as {existing.GetType().Name} and cannot be reconfigured as {typeof(ApiEnumTypeBuilder<TEnum>).Name}.");
-            }
-
-            return typed;
-        }
-
-        var builder = new ApiEnumTypeBuilder<TEnum>(this);
-        _apiEnumTypeBuilders[clrType] = builder;
-        _pendingEnumBuilders.Enqueue(builder);
-        this.TraceStructuralRegistration
-        (
-            new(ApiSchemaBuildTargetKind.EnumType, clrType, ApiName: builder.ApiName),
-            ApiSchemaBuildRegistrationKind.Type,
-            this.CurrentConfigurationSource,
-            wasRegistered: true
-        );
-        return builder;
-    }
+        => (ApiEnumTypeBuilder<TEnum>)this.GetOrAddEnumTypeBuilder(typeof(TEnum));
 
     /// <summary>
     ///     Gets existing or adds new <see cref="ApiEnumTypeBuilder"/> for the specified CLR type.
@@ -241,7 +174,7 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null) : IHasLogger
         (
             clrType,
             _apiEnumTypeBuilders,
-            static (t, ctx) => new ApiEnumTypeBuilder(t, ctx),
+            static (t, ctx) => ApiBuilderFactory.CreateClosedGeneric<ApiEnumTypeBuilder>(typeof(ApiEnumTypeBuilder<>), t, ctx),
             this,
             _pendingEnumBuilders,
             ApiSchemaBuildTargetKind.EnumType
@@ -257,7 +190,7 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null) : IHasLogger
         (
             clrType,
             _apiObjectTypeBuilders,
-            static (t, ctx) => new ApiObjectTypeBuilder(t, ctx),
+            static (t, ctx) => ApiBuilderFactory.CreateClosedGeneric<ApiObjectTypeBuilder>(typeof(ApiObjectTypeBuilder<>), t, ctx),
             this,
             _pendingObjectBuilders,
             ApiSchemaBuildTargetKind.ObjectType
@@ -269,39 +202,7 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null) : IHasLogger
     /// <typeparam name="TObject">The CLR object type.</typeparam>
     /// <returns>The corresponding <see cref="ApiObjectTypeBuilder{TObject}"/>.</returns>
     internal ApiObjectTypeBuilder<TObject> GetOrAddObjectTypeBuilder<TObject>()
-    {
-        var clrType = typeof(TObject);
-        if (_apiObjectTypeBuilders.TryGetValue(clrType, out var existing))
-        {
-            this.TraceStructuralRegistration
-            (
-                new(ApiSchemaBuildTargetKind.ObjectType, clrType, ApiName: existing.ApiName),
-                ApiSchemaBuildRegistrationKind.Type,
-                this.CurrentConfigurationSource,
-                wasRegistered: false,
-                rejectionReason: "The object type was already registered."
-            );
-
-            if (existing is not ApiObjectTypeBuilder<TObject> typed)
-            {
-                throw new ApiSchemaConfigurationException($"Object type '{clrType.Name}' was already registered as {existing.GetType().Name} and cannot be reconfigured as {typeof(ApiObjectTypeBuilder<TObject>).Name}.");
-            }
-
-            return typed;
-        }
-
-        var builder = new ApiObjectTypeBuilder<TObject>(this);
-        _apiObjectTypeBuilders[clrType] = builder;
-        _pendingObjectBuilders.Enqueue(builder);
-        this.TraceStructuralRegistration
-        (
-            new(ApiSchemaBuildTargetKind.ObjectType, clrType, ApiName: builder.ApiName),
-            ApiSchemaBuildRegistrationKind.Type,
-            this.CurrentConfigurationSource,
-            wasRegistered: true
-        );
-        return builder;
-    }
+        => (ApiObjectTypeBuilder<TObject>)this.GetOrAddObjectTypeBuilder(typeof(TObject));
 
     /// <summary>
     ///     Gets existing or adds new <see cref="ApiScalarTypeBuilder"/> for the specified CLR type.
@@ -313,7 +214,7 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null) : IHasLogger
         (
             clrType,
             _apiScalarTypeBuilders,
-            static (t, ctx) => new ApiScalarTypeBuilder(t, ctx),
+            static (t, ctx) => ApiBuilderFactory.CreateClosedGeneric<ApiScalarTypeBuilder>(typeof(ApiScalarTypeBuilder<>), t, ctx),
             this,
             _pendingScalarBuilders,
             ApiSchemaBuildTargetKind.ScalarType

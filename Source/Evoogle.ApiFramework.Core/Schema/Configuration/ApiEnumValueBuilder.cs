@@ -15,8 +15,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 public sealed class ApiEnumValueBuilder
 {
     #region Fields
-    private string _apiName;
-    private ApiConfigurationSource _apiNameSource;
+    private readonly ApiEnumValueState _state;
     private readonly ApiSchemaBuilderContext? _context;
     private readonly Type? _clrEnumType;
     #endregion
@@ -53,10 +52,9 @@ public sealed class ApiEnumValueBuilder
         Type? clrEnumType
     )
     {
-        _apiName = ValidateName(apiName, nameof(apiName));
+        _state = new ApiEnumValueState(ValidateName(apiName, nameof(apiName)), apiNameSource);
         this.ClrName = ValidateName(clrName, nameof(clrName));
         this.ClrOrdinal = clrOrdinal;
-        _apiNameSource = apiNameSource;
         _context = context;
         _clrEnumType = clrEnumType;
     }
@@ -64,7 +62,7 @@ public sealed class ApiEnumValueBuilder
 
     #region Properties
     /// <summary>Gets the current API name of the enumeration value.</summary>
-    public string ApiName => _apiName;
+    public string ApiName => _state.ApiName;
 
     /// <summary>Gets the CLR name of the enumeration value.</summary>
     public string ClrName { get; }
@@ -87,7 +85,7 @@ public sealed class ApiEnumValueBuilder
 
     #region Internal Convention Methods
     /// <summary>Gets the configuration source that established the current API name.</summary>
-    internal ApiConfigurationSource ApiNameSource => _apiNameSource;
+    internal ApiConfigurationSource ApiNameSource => _state.ApiNameSource;
 
     /// <summary>
     ///     Sets the API name at <see cref="ApiConfigurationSource.DataAnnotation"/> precedence.
@@ -107,7 +105,7 @@ public sealed class ApiEnumValueBuilder
     #region Build Methods
     /// <summary>Builds the configured <see cref="ApiEnumValue"/>.</summary>
     internal ApiEnumValue Build()
-        => new(_apiName, this.ClrName, this.ClrOrdinal);
+        => new(_state.ApiName, this.ClrName, this.ClrOrdinal);
     #endregion
 
     #region Implementation Methods
@@ -115,13 +113,13 @@ public sealed class ApiEnumValueBuilder
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
 
-        var previousValue = _apiName;
-        var wasApplied = source >= _apiNameSource;
+        var previousValue = _state.ApiName;
+        var wasApplied = source >= _state.ApiNameSource;
 
-        if (source >= _apiNameSource)
+        if (source >= _state.ApiNameSource)
         {
-            _apiName = apiName;
-            _apiNameSource = source;
+            _state.ApiName = apiName;
+            _state.ApiNameSource = source;
         }
 
         _context?.TraceConfigurationChange
@@ -131,7 +129,7 @@ public sealed class ApiEnumValueBuilder
             source,
             previousValue,
             apiName,
-            _apiName,
+            _state.ApiName,
             wasApplied,
             wasApplied ? null : "A higher-precedence API name is already configured."
         );
@@ -146,7 +144,7 @@ public sealed class ApiEnumValueBuilder
             ApiSchemaBuildTargetKind.EnumValue,
             _clrEnumType,
             this.ClrName,
-            _apiName
+            _state.ApiName
         );
     }
 

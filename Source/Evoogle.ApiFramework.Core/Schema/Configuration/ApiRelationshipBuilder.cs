@@ -25,12 +25,10 @@ public abstract class ApiRelationshipBuilder(string apiName, ApiRelationshipDele
     ///     Updated if the user calls <see cref="WithDeleteBehavior"/> on the concrete builder.
     ///     Used when building the final <see cref="ApiRelationship"/> instance.
     /// </summary>
-    protected ApiRelationshipDeleteBehavior _apiDeleteBehavior = apiDefaultDeleteBehavior;
+    private readonly ApiRelationshipState _state = new(apiDefaultDeleteBehavior);
 
     private readonly ApiConfigurationSourceScope _configurationSourceScope = new();
     private readonly string _apiName = ValidateApiName(apiName);
-    private ApiConfigurationSource? _apiDeleteBehaviorSource;
-    private ApiConfigurationSource? _registrationSource;
     #endregion
 
     #region AddExtension Methods
@@ -70,10 +68,10 @@ public abstract class ApiRelationshipBuilder(string apiName, ApiRelationshipDele
         where TBuilder : ApiRelationshipBuilder
     {
         var source = this.CurrentConfigurationSource;
-        if (_apiDeleteBehaviorSource == null || source >= _apiDeleteBehaviorSource.Value)
+        if (_state.DeleteBehaviorSource == null || source >= _state.DeleteBehaviorSource.Value)
         {
-            _apiDeleteBehavior = apiDeleteBehavior;
-            _apiDeleteBehaviorSource = source;
+            _state.DeleteBehavior = apiDeleteBehavior;
+            _state.DeleteBehaviorSource = source;
         }
 
         return (TBuilder)this;
@@ -88,13 +86,16 @@ public abstract class ApiRelationshipBuilder(string apiName, ApiRelationshipDele
     /// <summary>Gets the configured API name.</summary>
     protected string ApiName => _apiName;
 
+    /// <summary>Gets the configured delete behavior.</summary>
+    protected ApiRelationshipDeleteBehavior DeleteBehavior => _state.DeleteBehavior;
+
     /// <summary>Gets the source associated with the active fluent configuration callback.</summary>
     internal ApiConfigurationSource CurrentConfigurationSource =>
         _configurationSourceScope.CurrentSource;
 
     /// <summary>Gets the highest-precedence source that registered this relationship.</summary>
     internal ApiConfigurationSource RegistrationSource =>
-        _registrationSource ?? ApiConfigurationSource.Explicit;
+        _state.RegistrationSource ?? ApiConfigurationSource.Explicit;
 
     /// <summary>Runs a fluent callback at the supplied configuration-source precedence.</summary>
     internal void ApplyConfiguration(ApiConfigurationSource source, Action configure)
@@ -105,9 +106,9 @@ public abstract class ApiRelationshipBuilder(string apiName, ApiRelationshipDele
     /// <summary>Records the source that registered this relationship.</summary>
     internal void SetRegistrationSource(ApiConfigurationSource source)
     {
-        if (_registrationSource == null || source > _registrationSource.Value)
+        if (_state.RegistrationSource == null || source > _state.RegistrationSource.Value)
         {
-            _registrationSource = source;
+            _state.RegistrationSource = source;
         }
     }
     #endregion

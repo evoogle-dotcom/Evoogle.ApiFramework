@@ -19,6 +19,21 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 
 public partial class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnitTests(output)
 {
+    [Fact]
+    public void AddKeyGenericAndNonGenericReuseTheSameKeyBuilder()
+    {
+        ApiKeyTypeBuilder? nonGenericBuilder = null;
+        ApiKeyTypeBuilder<Order>? genericBuilder = null;
+        var builder = new ApiObjectTypeBuilder<Order>(new ApiSchemaBuilderContext());
+
+        builder.AddKey("PK_Order", keyBuilder => nonGenericBuilder = keyBuilder);
+        builder.AddKey("PK_Order", keyBuilder => genericBuilder = keyBuilder);
+
+        nonGenericBuilder.Should().NotBeNull();
+        genericBuilder.Should().NotBeNull();
+        ReferenceEquals(nonGenericBuilder, genericBuilder).Should().BeTrue();
+    }
+
     #region Test Classes
     private class BuildTestCore : XUnitTest
     {

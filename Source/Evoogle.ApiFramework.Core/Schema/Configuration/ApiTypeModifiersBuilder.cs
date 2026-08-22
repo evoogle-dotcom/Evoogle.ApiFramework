@@ -3,6 +3,8 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Schema.Configuration.Internal;
+
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
 /// <summary>
@@ -11,7 +13,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 public sealed class ApiTypeModifiersBuilder(ApiTypeModifiers modifiers = ApiTypeModifiers.None)
 {
     #region Fields
-    private ApiTypeModifiers _modifiers = modifiers;
+    private readonly ApiTypeModifiersState _state = new(modifiers);
     #endregion
 
     #region Builder Methods
@@ -21,7 +23,7 @@ public sealed class ApiTypeModifiersBuilder(ApiTypeModifiers modifiers = ApiType
     /// <returns>The current builder instance.</returns>
     public ApiTypeModifiersBuilder Required()
     {
-        _modifiers |= ApiTypeModifiers.Required;
+        _state.Modifiers |= ApiTypeModifiers.Required;
         return this;
     }
 
@@ -31,7 +33,7 @@ public sealed class ApiTypeModifiersBuilder(ApiTypeModifiers modifiers = ApiType
     /// <returns>The current builder instance.</returns>
     public ApiTypeModifiersBuilder Optional()
     {
-        _modifiers &= ~ApiTypeModifiers.Required;
+        _state.Modifiers &= ~ApiTypeModifiers.Required;
         return this;
     }
     #endregion
@@ -41,6 +43,6 @@ public sealed class ApiTypeModifiersBuilder(ApiTypeModifiers modifiers = ApiType
     ///     Builds the combined <see cref="ApiTypeModifiers"/> flags.
     /// </summary>
     /// <returns>The computed modifiers.</returns>
-    internal ApiTypeModifiers Build() => _modifiers;
+    internal ApiTypeModifiers Build() => _state.Modifiers;
     #endregion
 }
