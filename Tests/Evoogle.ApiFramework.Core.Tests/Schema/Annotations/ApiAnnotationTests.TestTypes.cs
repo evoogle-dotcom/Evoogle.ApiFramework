@@ -116,6 +116,53 @@ public partial class ApiAnnotationTests
         [ApiKey]
         public string Code { get; set; } = string.Empty;
     }
+
+    [ApiKey(ApiName = "NestedCompositeKey", Order = 0, ClrPath = nameof(NestedPart) + "." + nameof(NestedKeyPartAnnotation.Id))]
+    [ApiKey(ApiName = "NestedCompositeKey", Order = 1, ClrPath = nameof(Name))]
+    public class NestedCompositeKeyAnnotation
+    {
+        public NestedKeyPartAnnotation NestedPart { get; set; } = null!;
+        public string Name { get; set; } = string.Empty;
+    }
+
+    [ApiKey(ApiName = "OwnedCompositeKey", Order = 0, ClrRootType = typeof(OwnerKeyAnnotation), ClrPath = nameof(OwnerKeyAnnotation.Id))]
+    [ApiKey(ApiName = "OwnedCompositeKey", Order = 1, ClrPath = nameof(LineNumber))]
+    public class OwnedCompositeKeyAnnotation
+    {
+        public int LineNumber { get; set; }
+        public string Description { get; set; } = string.Empty;
+    }
+
+    [ApiKey(ApiName = "OwnedDependentKey", Order = 0, ClrRootType = typeof(OwnerKeyAnnotation), ClrPath = nameof(OwnerKeyAnnotation.Id))]
+    public class OwnedDependentKeyAnnotation
+    {
+        public string Description { get; set; } = string.Empty;
+    }
+
+    [ApiKey(ApiName = "MissingPathKey")]
+    public class MissingTypeLevelKeyPathAnnotation
+    {
+        public int Id { get; set; }
+    }
+
+    [ApiKey(ApiName = "MalformedPathKey", ClrPath = "Nested..Id")]
+    public class MalformedTypeLevelKeyPathAnnotation
+    {
+        public int Id { get; set; }
+    }
+
+    [ApiKey(ApiName = "UnresolvedPathKey", ClrPath = "Missing")]
+    public class UnresolvedTypeLevelKeyPathAnnotation
+    {
+        public int Id { get; set; }
+    }
+
+    [ApiKey(ApiName = "DuplicatePathKey", Order = 0, ClrPath = nameof(Id))]
+    public class DuplicatePathKeyAnnotation
+    {
+        [ApiKey(ApiName = "DuplicatePathKey", Order = 1, ClrPath = nameof(Id))]
+        public int Id { get; set; }
+    }
     #endregion
 
     #region Test Domain Types — Relationship Attributes
@@ -147,7 +194,7 @@ public partial class ApiAnnotationTests
     {
         public Guid Id { get; set; }
 
-        [ApiRelationship("ConventionFilledCustomerOrders",Kind = ApiRelationshipKind.OneToMany)]
+        [ApiRelationship("ConventionFilledCustomerOrders", Kind = ApiRelationshipKind.OneToMany)]
         public List<Order> Orders { get; set; } = [];
     }
 

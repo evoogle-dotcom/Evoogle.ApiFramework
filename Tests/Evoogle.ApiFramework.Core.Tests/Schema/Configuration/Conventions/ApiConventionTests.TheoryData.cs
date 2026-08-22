@@ -5,7 +5,6 @@
 // See the LICENSE file in the project root for more information.
 using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Schema.Configuration.Conventions.Internal;
-using Evoogle.ApiFramework.Schema.Configuration.Trace;
 using Evoogle.XUnit;
 
 using BuildTest = Evoogle.ApiFramework.Schema.TestData.ApiSchemaJsonExpressionBuildTest;

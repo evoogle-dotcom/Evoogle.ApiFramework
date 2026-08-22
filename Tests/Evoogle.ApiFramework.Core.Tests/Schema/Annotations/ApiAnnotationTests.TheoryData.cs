@@ -3,9 +3,13 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Linq.Expressions;
+
+using Evoogle.ApiFramework.Exceptions;
 using Evoogle.XUnit;
 
 using BuildTest = Evoogle.ApiFramework.Schema.TestData.ApiSchemaJsonExpressionBuildTest;
+using BuildThrowsTest = Evoogle.ApiFramework.Schema.TestData.ApiSchemaExpressionBuildThrowsTest;
 
 namespace Evoogle.ApiFramework.Schema.Annotations;
 
@@ -140,6 +144,118 @@ public partial class ApiAnnotationTests
             }",
             ApiSchemaActualBuildExpression = static () =>
                 ApiAnnotationTestsFactory.BuildWithApiEnumTypeAttributeOverridesApiName()
+        },
+
+        new BuildTest
+        {
+            Name = $"Build with {nameof(ApiEnumValueAttribute)} overrides enum value API name",
+            ApiSchemaExpectedJson = @"
+            {
+                ""ApiName"": ""Test"",
+                ""ApiVersion"": ""0.1.0"",
+                ""ApiOptions"": {
+                    ""ApiKeyNullHandling"": ""UseDefaultOnNull""
+                },
+                ""ApiScalarTypes"": [],
+                ""ApiEnumTypes"": [
+                    {
+                        ""ApiKind"": ""Enum"",
+                        ""ApiName"": ""OrderStatusValueAnnotated"",
+                        ""ApiEnumValues"": [
+                            {
+                                ""ApiName"": ""awaiting_payment"",
+                                ""ClrName"": ""Pending"",
+                                ""ClrOrdinal"": 0
+                            },
+                            {
+                                ""ApiName"": ""Shipped"",
+                                ""ClrName"": ""Shipped"",
+                                ""ClrOrdinal"": 1
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.Annotations.ApiAnnotationTests+OrderStatusValueAnnotated, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ],
+                ""ApiObjectTypes"": [],
+                ""ApiRelationships"": []
+            }",
+            ApiSchemaActualBuildExpression = static () =>
+                ApiAnnotationTestsFactory.BuildWithApiEnumValueAttributeOverridesApiName()
+        },
+
+        new BuildTest
+        {
+            Name = $"Build with explicit enum value API name overriding {nameof(ApiEnumValueAttribute)}",
+            ApiSchemaExpectedJson = @"
+            {
+                ""ApiName"": ""Test"",
+                ""ApiVersion"": ""0.1.0"",
+                ""ApiOptions"": {
+                    ""ApiKeyNullHandling"": ""UseDefaultOnNull""
+                },
+                ""ApiScalarTypes"": [],
+                ""ApiEnumTypes"": [
+                    {
+                        ""ApiKind"": ""Enum"",
+                        ""ApiName"": ""OrderStatusValueAnnotated"",
+                        ""ApiEnumValues"": [
+                            {
+                                ""ApiName"": ""explicit_pending"",
+                                ""ClrName"": ""Pending"",
+                                ""ClrOrdinal"": 0
+                            },
+                            {
+                                ""ApiName"": ""Shipped"",
+                                ""ClrName"": ""Shipped"",
+                                ""ClrOrdinal"": 1
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.Annotations.ApiAnnotationTests+OrderStatusValueAnnotated, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ],
+                ""ApiObjectTypes"": [],
+                ""ApiRelationships"": []
+            }",
+            ApiSchemaActualBuildExpression = static () =>
+                ApiAnnotationTestsFactory
+                    .BuildWithExplicitEnumValueNameOverridesApiEnumValueAttribute()
+        },
+
+        new BuildTest
+        {
+            Name = "Build with a custom annotation reader receiving enum value annotations",
+            ApiSchemaExpectedJson = @"
+            {
+                ""ApiName"": ""Test"",
+                ""ApiVersion"": ""0.1.0"",
+                ""ApiOptions"": {
+                    ""ApiKeyNullHandling"": ""UseDefaultOnNull""
+                },
+                ""ApiScalarTypes"": [],
+                ""ApiEnumTypes"": [
+                    {
+                        ""ApiKind"": ""Enum"",
+                        ""ApiName"": ""OrderStatusValueAnnotated"",
+                        ""ApiEnumValues"": [
+                            {
+                                ""ApiName"": ""reader_Pending"",
+                                ""ClrName"": ""Pending"",
+                                ""ClrOrdinal"": 0
+                            },
+                            {
+                                ""ApiName"": ""reader_Shipped"",
+                                ""ClrName"": ""Shipped"",
+                                ""ClrOrdinal"": 1
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.Annotations.ApiAnnotationTests+OrderStatusValueAnnotated, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ],
+                ""ApiObjectTypes"": [],
+                ""ApiRelationships"": []
+            }",
+            ApiSchemaActualBuildExpression = static () =>
+                ApiAnnotationTestsFactory.BuildWithCustomEnumValueAnnotationReader()
         },
 
         new BuildTest
@@ -828,6 +944,386 @@ public partial class ApiAnnotationTests
 
         new BuildTest
         {
+            Name = $"Build with {nameof(ApiKeyAttribute)} creates a nested composite key",
+            ApiSchemaExpectedJson = @"
+            {
+                ""ApiName"": ""Test"",
+                ""ApiVersion"": ""0.1.0"",
+                ""ApiOptions"": {
+                    ""ApiKeyNullHandling"": ""UseDefaultOnNull""
+                },
+                ""ApiScalarTypes"": [
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""Int32"",
+                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                    },
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""String"",
+                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                    }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""NestedCompositeKeyAnnotation"",
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""NestedPart"",
+                                ""ApiType"": {
+                                    ""ClrType"": ""Evoogle.ApiFramework.Schema.Annotations.ApiAnnotationTests+NestedKeyPartAnnotation, Evoogle.ApiFramework.Core.Tests""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""NestedPart"",
+                                ""ClrMemberKind"": ""Property""
+                            },
+                            {
+                                ""ApiName"": ""Name"",
+                                ""ApiType"": {
+                                    ""ClrType"": ""System.String, System.Private.CoreLib""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Name"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ApiKeyTypes"": [
+                            {
+                                ""ApiName"": ""NestedCompositeKey"",
+                                ""ApiKeyPaths"": [
+                                    {
+                                        ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Annotations.ApiAnnotationTests+NestedCompositeKeyAnnotation, Evoogle.ApiFramework.Core.Tests"",
+                                        ""ApiSegments"": [
+                                            { ""ClrPropertyName"": ""NestedPart"" },
+                                            { ""ClrPropertyName"": ""Id"" }
+                                        ]
+                                    },
+                                    {
+                                        ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Annotations.ApiAnnotationTests+NestedCompositeKeyAnnotation, Evoogle.ApiFramework.Core.Tests"",
+                                        ""ApiSegments"": [
+                                            { ""ClrPropertyName"": ""Name"" }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.Annotations.ApiAnnotationTests+NestedCompositeKeyAnnotation, Evoogle.ApiFramework.Core.Tests""
+                    },
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""NestedKeyPartAnnotation"",
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""Id"",
+                                ""ApiType"": {
+                                    ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Id"",
+                                ""ClrMemberKind"": ""Property""
+                            },
+                            {
+                                ""ApiName"": ""Description"",
+                                ""ApiType"": {
+                                    ""ClrType"": ""System.String, System.Private.CoreLib""
+                                },
+                                ""ApiTypeModifiers"": ""None"",
+                                ""ClrName"": ""Description"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ApiKeyTypes"": [
+                            {
+                                ""ApiName"": ""NestedPartKey"",
+                                ""ApiKeyPaths"": [
+                                    {
+                                        ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Annotations.ApiAnnotationTests+NestedKeyPartAnnotation, Evoogle.ApiFramework.Core.Tests"",
+                                        ""ApiSegments"": [
+                                            { ""ClrPropertyName"": ""Id"" }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.Annotations.ApiAnnotationTests+NestedKeyPartAnnotation, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ],
+                ""ApiRelationships"": []
+            }",
+            ApiSchemaActualBuildExpression = static () =>
+                ApiAnnotationTestsFactory.BuildWithApiKeyAttributesCreateNestedCompositeKey()
+        },
+
+        new BuildTest
+        {
+            Name = $"Build with {nameof(ApiKeyAttribute)} creates an owned composite key",
+            ApiSchemaExpectedJson = @"
+            {
+                ""ApiName"": ""Test"",
+                ""ApiVersion"": ""0.1.0"",
+                ""ApiOptions"": {
+                    ""ApiKeyNullHandling"": ""UseDefaultOnNull""
+                },
+                ""ApiScalarTypes"": [
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""Int32"",
+                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                    },
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""String"",
+                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                    }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""OwnedCompositeKeyAnnotation"",
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""LineNumber"",
+                                ""ApiType"": {
+                                    ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""LineNumber"",
+                                ""ClrMemberKind"": ""Property""
+                            },
+                            {
+                                ""ApiName"": ""Description"",
+                                ""ApiType"": {
+                                    ""ClrType"": ""System.String, System.Private.CoreLib""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Description"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ApiKeyTypes"": [
+                            {
+                                ""ApiName"": ""OwnedCompositeKey"",
+                                ""ApiKeyPaths"": [
+                                    {
+                                        ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Annotations.ApiAnnotationTests+OwnerKeyAnnotation, Evoogle.ApiFramework.Core.Tests"",
+                                        ""ApiSegments"": [
+                                            { ""ClrPropertyName"": ""Id"" }
+                                        ]
+                                    },
+                                    {
+                                        ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Annotations.ApiAnnotationTests+OwnedCompositeKeyAnnotation, Evoogle.ApiFramework.Core.Tests"",
+                                        ""ApiSegments"": [
+                                            { ""ClrPropertyName"": ""LineNumber"" }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.Annotations.ApiAnnotationTests+OwnedCompositeKeyAnnotation, Evoogle.ApiFramework.Core.Tests""
+                    },
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""OwnerKeyAnnotation"",
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""Id"",
+                                ""ApiType"": {
+                                    ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Id"",
+                                ""ClrMemberKind"": ""Property""
+                            },
+                            {
+                                ""ApiName"": ""Description"",
+                                ""ApiType"": {
+                                    ""ClrType"": ""System.String, System.Private.CoreLib""
+                                },
+                                ""ApiTypeModifiers"": ""None"",
+                                ""ClrName"": ""Description"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ApiKeyTypes"": [
+                            {
+                                ""ApiName"": ""OwnerKey"",
+                                ""ApiKeyPaths"": [
+                                    {
+                                        ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Annotations.ApiAnnotationTests+OwnerKeyAnnotation, Evoogle.ApiFramework.Core.Tests"",
+                                        ""ApiSegments"": [
+                                            { ""ClrPropertyName"": ""Id"" }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.Annotations.ApiAnnotationTests+OwnerKeyAnnotation, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ],
+                ""ApiRelationships"": []
+            }",
+            ApiSchemaActualBuildExpression = static () =>
+                ApiAnnotationTestsFactory.BuildWithApiKeyAttributesCreateOwnedCompositeKey()
+        },
+
+        new BuildTest
+        {
+            Name = $"Build with {nameof(ApiKeyAttribute)} creates an owned dependent key",
+            ApiSchemaExpectedJson = @"
+            {
+                ""ApiName"": ""Test"",
+                ""ApiVersion"": ""0.1.0"",
+                ""ApiOptions"": {
+                    ""ApiKeyNullHandling"": ""UseDefaultOnNull""
+                },
+                ""ApiScalarTypes"": [
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""Int32"",
+                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                    },
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""String"",
+                        ""ClrType"": ""System.String, System.Private.CoreLib""
+                    }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""OwnedDependentKeyAnnotation"",
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""Description"",
+                                ""ApiType"": {
+                                    ""ClrType"": ""System.String, System.Private.CoreLib""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Description"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ApiKeyTypes"": [
+                            {
+                                ""ApiName"": ""OwnedDependentKey"",
+                                ""ApiKeyPaths"": [
+                                    {
+                                        ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Annotations.ApiAnnotationTests+OwnerKeyAnnotation, Evoogle.ApiFramework.Core.Tests"",
+                                        ""ApiSegments"": [
+                                            { ""ClrPropertyName"": ""Id"" }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.Annotations.ApiAnnotationTests+OwnedDependentKeyAnnotation, Evoogle.ApiFramework.Core.Tests""
+                    },
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""OwnerKeyAnnotation"",
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""Id"",
+                                ""ApiType"": {
+                                    ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Id"",
+                                ""ClrMemberKind"": ""Property""
+                            },
+                            {
+                                ""ApiName"": ""Description"",
+                                ""ApiType"": {
+                                    ""ClrType"": ""System.String, System.Private.CoreLib""
+                                },
+                                ""ApiTypeModifiers"": ""None"",
+                                ""ClrName"": ""Description"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ApiKeyTypes"": [
+                            {
+                                ""ApiName"": ""OwnerKey"",
+                                ""ApiKeyPaths"": [
+                                    {
+                                        ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Annotations.ApiAnnotationTests+OwnerKeyAnnotation, Evoogle.ApiFramework.Core.Tests"",
+                                        ""ApiSegments"": [
+                                            { ""ClrPropertyName"": ""Id"" }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.Annotations.ApiAnnotationTests+OwnerKeyAnnotation, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ],
+                ""ApiRelationships"": []
+            }",
+            ApiSchemaActualBuildExpression = static () =>
+                ApiAnnotationTestsFactory.BuildWithApiKeyAttributeCreatesOwnedDependentKey()
+        },
+
+        new BuildTest
+        {
+            Name = $"Build with {nameof(ApiKeyAttribute)} suppresses duplicate paths",
+            ApiSchemaExpectedJson = @"
+            {
+                ""ApiName"": ""Test"",
+                ""ApiVersion"": ""0.1.0"",
+                ""ApiOptions"": {
+                    ""ApiKeyNullHandling"": ""UseDefaultOnNull""
+                },
+                ""ApiScalarTypes"": [
+                    {
+                        ""ApiKind"": ""Scalar"",
+                        ""ApiName"": ""Int32"",
+                        ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                    }
+                ],
+                ""ApiEnumTypes"": [],
+                ""ApiObjectTypes"": [
+                    {
+                        ""ApiKind"": ""Object"",
+                        ""ApiName"": ""DuplicatePathKeyAnnotation"",
+                        ""ApiProperties"": [
+                            {
+                                ""ApiName"": ""Id"",
+                                ""ApiType"": {
+                                    ""ClrType"": ""System.Int32, System.Private.CoreLib""
+                                },
+                                ""ApiTypeModifiers"": ""Required"",
+                                ""ClrName"": ""Id"",
+                                ""ClrMemberKind"": ""Property""
+                            }
+                        ],
+                        ""ApiKeyTypes"": [
+                            {
+                                ""ApiName"": ""DuplicatePathKey"",
+                                ""ApiKeyPaths"": [
+                                    {
+                                        ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Annotations.ApiAnnotationTests+DuplicatePathKeyAnnotation, Evoogle.ApiFramework.Core.Tests"",
+                                        ""ApiSegments"": [
+                                            { ""ClrPropertyName"": ""Id"" }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ],
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.Annotations.ApiAnnotationTests+DuplicatePathKeyAnnotation, Evoogle.ApiFramework.Core.Tests""
+                    }
+                ],
+                ""ApiRelationships"": []
+            }",
+            ApiSchemaActualBuildExpression = static () =>
+                ApiAnnotationTestsFactory.BuildWithApiKeyAttributesCreateDuplicatePath()
+        },
+
+        new BuildTest
+        {
             Name = $"Build with {nameof(ApiRelationshipAttribute)} on a navigation property",
             ApiSchemaExpectedJson = @"
             {
@@ -1376,5 +1872,176 @@ public partial class ApiAnnotationTests
                 ApiAnnotationTestsFactory.BuildWithApiManyToManyRelationshipTypeAttributeAtTypeLevel()
         },
     ];
+
+    public static TheoryDataRow<IXUnitTest>[] BuildThrowsTheoryData =>
+    [
+        new BuildThrowsTest
+        {
+            Name = $"Build rejects a type-level {nameof(ApiKeyAttribute)} without {nameof(ApiKeyAttribute.ClrPath)}",
+            ExceptionTypeExpected = typeof(ApiSchemaConfigurationException),
+            ExceptionMessagePatternExpected = "*ClrPath*type level*",
+            ApiSchemaActualBuildExpression = static () =>
+                ApiAnnotationTestsFactory.BuildWithMissingTypeLevelKeyPathAnnotation()
+        },
+
+        new BuildThrowsTest
+        {
+            Name = $"Build rejects a malformed type-level {nameof(ApiKeyAttribute)} path",
+            ExceptionTypeExpected = typeof(ApiSchemaConfigurationException),
+            ExceptionMessagePatternExpected = "*Nested..Id*",
+            ApiSchemaActualBuildExpression = static () =>
+                ApiAnnotationTestsFactory.BuildWithMalformedTypeLevelKeyPathAnnotation()
+        },
+
+        new BuildThrowsTest
+        {
+            Name = $"Build rejects an unresolved type-level {nameof(ApiKeyAttribute)} path",
+            ExceptionTypeExpected = typeof(ApiSchemaInitializationException),
+            ExceptionMessagePatternExpected = "*ApiKeyPathSegmentUnresolvedApiProperty*",
+            ApiSchemaActualBuildExpression = static () =>
+                ApiAnnotationTestsFactory.BuildWithUnresolvedTypeLevelKeyPathAnnotation()
+        },
+
+        ..BuildInvalidRequiredAnnotationApiNameTheoryData()
+    ];
+
+    private static TheoryDataRow<IXUnitTest>[] BuildInvalidRequiredAnnotationApiNameTheoryData()
+    {
+        var invalidApiNameTests = new
+        (
+            string AnnotationType,
+            string? ApiName,
+            Expression<Func<ApiSchema>> BuildExpression
+        )[]
+        {
+            (nameof(ApiKeyAttribute), null,
+                static () => ApiAnnotationTestsFactory
+                    .BuildWithInvalidRequiredAnnotationApiName
+                    (
+                        nameof(ApiKeyAttribute),
+                        null
+                    )),
+            (nameof(ApiKeyAttribute), string.Empty,
+                static () => ApiAnnotationTestsFactory
+                    .BuildWithInvalidRequiredAnnotationApiName
+                    (
+                        nameof(ApiKeyAttribute),
+                        string.Empty
+                    )),
+            (nameof(ApiKeyAttribute), " ",
+                static () => ApiAnnotationTestsFactory
+                    .BuildWithInvalidRequiredAnnotationApiName
+                    (
+                        nameof(ApiKeyAttribute),
+                        " "
+                    )),
+            (nameof(ApiRelationshipAttribute), null,
+                static () => ApiAnnotationTestsFactory
+                    .BuildWithInvalidRequiredAnnotationApiName
+                    (
+                        nameof(ApiRelationshipAttribute),
+                        null
+                    )),
+            (nameof(ApiRelationshipAttribute), string.Empty,
+                static () => ApiAnnotationTestsFactory
+                    .BuildWithInvalidRequiredAnnotationApiName
+                    (
+                        nameof(ApiRelationshipAttribute),
+                        string.Empty
+                    )),
+            (nameof(ApiRelationshipAttribute), " ",
+                static () => ApiAnnotationTestsFactory
+                    .BuildWithInvalidRequiredAnnotationApiName
+                    (
+                        nameof(ApiRelationshipAttribute),
+                        " "
+                    )),
+            (nameof(ApiRelationshipTypeAttribute), null,
+                static () => ApiAnnotationTestsFactory
+                    .BuildWithInvalidRequiredAnnotationApiName
+                    (
+                        nameof(ApiRelationshipTypeAttribute),
+                        null
+                    )),
+            (nameof(ApiRelationshipTypeAttribute), string.Empty,
+                static () => ApiAnnotationTestsFactory
+                    .BuildWithInvalidRequiredAnnotationApiName
+                    (
+                        nameof(ApiRelationshipTypeAttribute),
+                        string.Empty
+                    )),
+            (nameof(ApiRelationshipTypeAttribute), " ",
+                static () => ApiAnnotationTestsFactory
+                    .BuildWithInvalidRequiredAnnotationApiName
+                    (
+                        nameof(ApiRelationshipTypeAttribute),
+                        " "
+                    )),
+            (nameof(ApiManyToManyRelationshipAttribute), null,
+                static () => ApiAnnotationTestsFactory
+                    .BuildWithInvalidRequiredAnnotationApiName
+                    (
+                        nameof(ApiManyToManyRelationshipAttribute),
+                        null
+                    )),
+            (nameof(ApiManyToManyRelationshipAttribute), string.Empty,
+                static () => ApiAnnotationTestsFactory
+                    .BuildWithInvalidRequiredAnnotationApiName
+                    (
+                        nameof(ApiManyToManyRelationshipAttribute),
+                        string.Empty
+                    )),
+            (nameof(ApiManyToManyRelationshipAttribute), " ",
+                static () => ApiAnnotationTestsFactory
+                    .BuildWithInvalidRequiredAnnotationApiName
+                    (
+                        nameof(ApiManyToManyRelationshipAttribute),
+                        " "
+                    )),
+            (nameof(ApiManyToManyRelationshipTypeAttribute), null,
+                static () => ApiAnnotationTestsFactory
+                    .BuildWithInvalidRequiredAnnotationApiName
+                    (
+                        nameof(ApiManyToManyRelationshipTypeAttribute),
+                        null
+                    )),
+            (nameof(ApiManyToManyRelationshipTypeAttribute), string.Empty,
+                static () => ApiAnnotationTestsFactory
+                    .BuildWithInvalidRequiredAnnotationApiName
+                    (
+                        nameof(ApiManyToManyRelationshipTypeAttribute),
+                        string.Empty
+                    )),
+            (nameof(ApiManyToManyRelationshipTypeAttribute), " ",
+                static () => ApiAnnotationTestsFactory
+                    .BuildWithInvalidRequiredAnnotationApiName
+                    (
+                        nameof(ApiManyToManyRelationshipTypeAttribute),
+                        " "
+                    )),
+        };
+        var tests = new List<TheoryDataRow<IXUnitTest>>();
+
+        foreach (var (annotationType, apiName, buildExpression) in invalidApiNameTests)
+        {
+            tests.Add
+            (
+                new BuildThrowsTest
+                {
+                    Name = $"Build rejects invalid {annotationType} API name " +
+                        $"'{apiName ?? "null"}'",
+                    ExceptionTypeExpected = apiName switch
+                    {
+                        null => typeof(ArgumentNullException),
+                        _ => typeof(ArgumentException)
+                    },
+                    ExceptionMessagePatternExpected = "*apiName*",
+                    ApiSchemaActualBuildExpression = buildExpression
+                }
+            );
+        }
+
+        return [.. tests];
+    }
     #endregion
 }

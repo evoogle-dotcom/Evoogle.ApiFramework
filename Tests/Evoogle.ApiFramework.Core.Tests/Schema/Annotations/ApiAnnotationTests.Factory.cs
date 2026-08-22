@@ -197,6 +197,139 @@ public static class ApiAnnotationTestsFactory
             .AddObject<AnnotationPrimaryKeyType>()
             .Build();
     }
+
+    public static ApiSchema BuildWithApiKeyAttributesCreateNestedCompositeKey()
+    {
+        return new ApiSchemaBuilder()
+            .WithName("Test")
+            .AddScalar<int>()
+            .AddScalar<string>()
+            .AddObject<NestedKeyPartAnnotation>(x => x
+                .AddProperty(p => p.Id)
+                .AddProperty(p => p.Description))
+            .AddObject<NestedCompositeKeyAnnotation>(x => x
+                .AddProperty(p => p.NestedPart)
+                .AddProperty(p => p.Name))
+            .UseDefaultAnnotations()
+            .Build();
+    }
+
+    public static ApiSchema BuildWithApiKeyAttributesCreateOwnedCompositeKey()
+    {
+        return new ApiSchemaBuilder()
+            .WithName("Test")
+            .AddScalar<int>()
+            .AddScalar<string>()
+            .AddObject<OwnerKeyAnnotation>(x => x
+                .AddProperty(p => p.Id)
+                .AddProperty(p => p.Description))
+            .AddObject<OwnedCompositeKeyAnnotation>(x => x
+                .AddProperty(p => p.LineNumber)
+                .AddProperty(p => p.Description))
+            .UseDefaultAnnotations()
+            .Build();
+    }
+
+    public static ApiSchema BuildWithApiKeyAttributeCreatesOwnedDependentKey()
+    {
+        return new ApiSchemaBuilder()
+            .WithName("Test")
+            .AddScalar<int>()
+            .AddScalar<string>()
+            .AddObject<OwnerKeyAnnotation>(x => x
+                .AddProperty(p => p.Id)
+                .AddProperty(p => p.Description))
+            .AddObject<OwnedDependentKeyAnnotation>(x => x
+                .AddProperty(p => p.Description))
+            .UseDefaultAnnotations()
+            .Build();
+    }
+
+    public static ApiSchema BuildWithApiKeyAttributesCreateDuplicatePath()
+    {
+        return new ApiSchemaBuilder()
+            .WithName("Test")
+            .AddScalar<int>()
+            .AddObject<DuplicatePathKeyAnnotation>(x => x.AddProperty(p => p.Id))
+            .UseDefaultAnnotations()
+            .Build();
+    }
+
+    public static ApiSchema BuildWithMissingTypeLevelKeyPathAnnotation()
+    {
+        return new ApiSchemaBuilder()
+            .WithName("Test")
+            .AddScalar<int>()
+            .AddObject<MissingTypeLevelKeyPathAnnotation>(x => x.AddProperty(p => p.Id))
+            .UseDefaultAnnotations()
+            .Build();
+    }
+
+    public static ApiSchema BuildWithMalformedTypeLevelKeyPathAnnotation()
+    {
+        return new ApiSchemaBuilder()
+            .WithName("Test")
+            .AddScalar<int>()
+            .AddObject<MalformedTypeLevelKeyPathAnnotation>(x => x.AddProperty(p => p.Id))
+            .UseDefaultAnnotations()
+            .Build();
+    }
+
+    public static ApiSchema BuildWithUnresolvedTypeLevelKeyPathAnnotation()
+    {
+        return new ApiSchemaBuilder()
+            .WithName("Test")
+            .AddScalar<int>()
+            .AddObject<UnresolvedTypeLevelKeyPathAnnotation>(x => x.AddProperty(p => p.Id))
+            .UseDefaultAnnotations()
+            .Build();
+    }
+
+    public static ApiSchema BuildWithInvalidRequiredAnnotationApiName
+    (
+        string annotationType,
+        string? apiName
+    )
+    {
+        Attribute attribute = annotationType switch
+        {
+            nameof(ApiKeyAttribute) => new ApiKeyAttribute(apiName!),
+            nameof(ApiRelationshipAttribute) => new ApiRelationshipAttribute(apiName!),
+            nameof(ApiRelationshipTypeAttribute) => new ApiRelationshipTypeAttribute
+            (
+                apiName!,
+                typeof(PersonAnnotated),
+                typeof(OrderStatusAnnotated)
+            ),
+            nameof(ApiManyToManyRelationshipAttribute) => new ApiManyToManyRelationshipAttribute
+            (
+                apiName!,
+                typeof(EmailValueAnnotated),
+                typeof(PersonAnnotated)
+            ),
+            nameof(ApiManyToManyRelationshipTypeAttribute) => new ApiManyToManyRelationshipTypeAttribute
+            (
+                apiName!,
+                typeof(PersonAnnotated),
+                typeof(OrderStatusAnnotated),
+                typeof(EmailValueAnnotated)
+            ),
+            _ => throw new ArgumentException("Unknown annotation type.", nameof(annotationType))
+        };
+        _ = attribute;
+
+        return null!;
+    }
+
+    public static ApiSchema BuildWithCustomEnumValueAnnotationReader()
+    {
+        return new ApiSchemaBuilder()
+            .WithName("Test")
+            .UseDefaultConventions()
+            .UseAnnotations(x => x.AddReader(new BuildObservableEnumValueAnnotationReader()))
+            .AddEnum<OrderStatusValueAnnotated>()
+            .Build();
+    }
     #endregion
 
     #region Relationship Attribute Factory Methods

@@ -13,5 +13,9 @@ public partial class ApiAnnotationTests(ITestOutputHelper output) : XUnitTests(o
     [Theory]
     [MemberData(nameof(BuildTheoryData))]
     public void Build(IXUnitTest test) => test.Execute(this);
+
+    [Theory]
+    [MemberData(nameof(BuildThrowsTheoryData))]
+    public void BuildThrows(IXUnitTest test) => test.Execute(this);
     #endregion
 }

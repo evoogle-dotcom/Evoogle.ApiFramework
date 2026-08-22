@@ -5,6 +5,7 @@
 // See the LICENSE file in the project root for more information.
 using System.Reflection;
 
+using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Schema.Annotations;
 using Evoogle.Reflection;
 
@@ -26,6 +27,18 @@ public sealed class ApiAttributeAnnotationReader : IApiAnnotationReader
         if (attr?.ApiName != null)
         {
             builder.SetApiNameDataAnnotation(attr.ApiName);
+        }
+
+        var keyAttrs = clrType.GetCustomAttributes<ApiKeyAttribute>(inherit: true)
+            .OrderBy(a => a.Order)
+            .ToList();
+
+        foreach (var keyAttr in keyAttrs)
+        {
+            var clrRootType = keyAttr.ClrRootType ?? builder.ClrType;
+            var clrPropertyNames = GetClrPath(keyAttr, clrType, memberName: null);
+
+            builder.AddKeyOrAppendPath(keyAttr.ApiName, clrRootType, clrPropertyNames);
         }
     }
 
@@ -101,13 +114,22 @@ public sealed class ApiAttributeAnnotationReader : IApiAnnotationReader
 
         if (keyAttrs.Count > 0)
         {
-            var clrName = clrMember.Name;
-            var declaringClrType = objectTypeBuilder.ClrType;
-
             foreach (var keyAttr in keyAttrs)
             {
-                // Add the path to an existing or newly created key type builder.
-                objectTypeBuilder.AddKeyOrAppendPath(keyAttr.ApiName, declaringClrType, clrName);
+                var clrRootType = keyAttr.ClrRootType ?? objectTypeBuilder.ClrType;
+                var clrPropertyNames = GetClrPath
+                (
+                    keyAttr,
+                    objectTypeBuilder.ClrType,
+                    clrMember.Name
+                );
+
+                objectTypeBuilder.AddKeyOrAppendPath
+                (
+                    keyAttr.ApiName,
+                    clrRootType,
+                    clrPropertyNames
+                );
             }
         }
     }
@@ -316,6 +338,41 @@ public sealed class ApiAttributeAnnotationReader : IApiAnnotationReader
     #endregion
 
     #region Implementation Methods
+    private static IReadOnlyList<string> GetClrPath
+    (
+        ApiKeyAttribute keyAttribute,
+        Type clrType,
+        string? memberName
+    )
+    {
+        if (keyAttribute.ClrPath == null)
+        {
+            if (memberName != null)
+            {
+                return [memberName];
+            }
+
+            throw new ApiSchemaConfigurationException
+            (
+                $"The {nameof(ApiKeyAttribute)} on CLR type '{clrType.FullName}' must specify " +
+                $"{nameof(ApiKeyAttribute.ClrPath)} when applied at type level."
+            );
+        }
+
+        var clrPropertyNames = keyAttribute.ClrPath.Split('.');
+        if (clrPropertyNames.Length == 0 || clrPropertyNames.Any(string.IsNullOrWhiteSpace))
+        {
+            throw new ApiSchemaConfigurationException
+            (
+                $"The {nameof(ApiKeyAttribute)} on CLR type '{clrType.FullName}' has an invalid " +
+                $"{nameof(ApiKeyAttribute.ClrPath)} value '{keyAttribute.ClrPath}'. CLR paths must " +
+                "contain one or more non-empty dot-delimited member names."
+            );
+        }
+
+        return clrPropertyNames;
+    }
+
     private static IEnumerable<MemberInfo> GetPublicInstanceMembers(Type clrType)
     {
         return clrType

@@ -178,21 +178,31 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     ///     Used by annotation readers to accumulate composite key paths from multiple
     ///     <see cref="Annotations.ApiKeyAttribute"/> declarations.
     /// </summary>
-    internal void AddKeyOrAppendPath(string apiKeyName, Type clrRootType, string clrPropertyName)
+    internal void AddKeyOrAppendPath
+    (
+        string apiKeyName,
+        Type clrRootType,
+        IEnumerable<string> clrPropertyNames
+    )
     {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKeyName, nameof(apiKeyName));
+        ArgumentNullException.ThrowIfNull(clrRootType);
+        ArgumentNullException.ThrowIfNull(clrPropertyNames);
+
+        var names = clrPropertyNames as IReadOnlyList<string> ?? [.. clrPropertyNames];
         var existing = _apiKeyTypeBuilders.FirstOrDefault(b => b.ApiName == apiKeyName);
         if (existing != null)
         {
-            // Guard against convention + annotation both adding the same single-segment path.
-            if (!existing.HasSimplePath(clrRootType, clrPropertyName))
+            // Guard against convention + annotation both adding the same path.
+            if (!existing.HasPath(clrRootType, names))
             {
-                existing.AddPath(clrRootType, clrPropertyName);
+                existing.AddPath(clrRootType, names);
             }
         }
         else
         {
             var builder = new ApiKeyTypeBuilder(apiKeyName);
-            builder.AddPath(clrRootType, clrPropertyName);
+            builder.AddPath(clrRootType, names);
             _apiKeyTypeBuilders.Add(builder);
         }
     }
