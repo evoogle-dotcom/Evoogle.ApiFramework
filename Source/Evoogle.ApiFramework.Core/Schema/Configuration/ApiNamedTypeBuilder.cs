@@ -5,7 +5,6 @@
 // See the LICENSE file in the project root for more information.
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
 using Evoogle.ApiFramework.Schema.Configuration.Trace;
-using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema.Configuration;
 

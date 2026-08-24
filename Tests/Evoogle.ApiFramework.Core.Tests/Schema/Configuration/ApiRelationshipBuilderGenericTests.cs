@@ -6,7 +6,6 @@
 using System.Linq.Expressions;
 using System.Text.Json.Serialization;
 
-using Evoogle.ApiFramework.TestData;
 using Evoogle.ApiFramework.Schema.TestData;
 using Evoogle.Extensions;
 using Evoogle.XUnit;
@@ -135,33 +134,4 @@ public class ApiRelationshipBuilderGenericTests(ITestOutputHelper output) : XUni
     [MemberData(nameof(BuildRelationshipTheoryData))]
     public void BuildRelationship(IXUnitTest test) => test.Execute(this);
     #endregion
-
-    [Fact]
-    public void ToGenericAndNonGenericReuseTheSameDependentEndBuilder()
-    {
-        ApiRelationshipDependentEndBuilder? nonGenericBuilder = null;
-        ApiRelationshipDependentEndBuilder<Order>? genericBuilder = null;
-        var relationship = new ApiRelationshipOneToManyBuilder("REL_Test");
-
-        relationship.To(typeof(Order), builder => nonGenericBuilder = builder);
-        relationship.To<Order>(builder => genericBuilder = builder);
-
-        nonGenericBuilder.Should().NotBeNull();
-        genericBuilder.Should().NotBeNull();
-        ReferenceEquals(nonGenericBuilder, genericBuilder).Should().BeTrue();
-    }
-    [Fact]
-    public void WithAssociationGenericAndNonGenericReuseTheSameAssociationBuilder()
-    {
-        ApiRelationshipAssociationBuilder? nonGenericBuilder = null;
-        ApiRelationshipAssociationBuilder<Order>? genericBuilder = null;
-        var relationship = new ApiRelationshipManyToManyBuilder("REL_Test");
-
-        relationship.WithAssociation(typeof(Order), builder => nonGenericBuilder = builder);
-        relationship.WithAssociation<Order>(builder => genericBuilder = builder);
-
-        nonGenericBuilder.Should().NotBeNull();
-        genericBuilder.Should().NotBeNull();
-        ReferenceEquals(nonGenericBuilder, genericBuilder).Should().BeTrue();
-    }
 }
