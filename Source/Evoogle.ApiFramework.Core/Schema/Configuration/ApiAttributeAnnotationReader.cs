@@ -13,7 +13,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 
 /// <summary>
 ///     Default <see cref="IApiAnnotationReader"/> implementation that reads the framework's
-///     built-in attribute set (<see cref="ApiObjectTypeAttribute"/>, <see cref="ApiPropertyAttribute"/>,
+///     built-in attribute set (<see cref="ApiObjectAttribute"/>, <see cref="ApiPropertyAttribute"/>,
 ///     <see cref="ApiEnumValueAttribute"/>, <see cref="ApiKeyAttribute"/>,
 ///     <see cref="ApiIgnoreAttribute"/>, and the relationship attributes).
 /// </summary>
@@ -23,7 +23,7 @@ public sealed class ApiAttributeAnnotationReader : IApiAnnotationReader
     /// <inheritdoc />
     public void ApplyObjectTypeAnnotations(Type clrType, ApiObjectTypeBuilder builder)
     {
-        var attr = clrType.GetCustomAttribute<ApiObjectTypeAttribute>(inherit: false);
+        var attr = clrType.GetCustomAttribute<ApiObjectAttribute>(inherit: false);
         if (attr?.ApiName != null)
         {
             builder.SetApiNameDataAnnotation(attr.ApiName);
@@ -45,7 +45,7 @@ public sealed class ApiAttributeAnnotationReader : IApiAnnotationReader
     /// <inheritdoc />
     public void ApplyScalarTypeAnnotations(Type clrType, ApiScalarTypeBuilder builder)
     {
-        var attr = clrType.GetCustomAttribute<ApiScalarTypeAttribute>(inherit: false);
+        var attr = clrType.GetCustomAttribute<ApiScalarAttribute>(inherit: false);
         if (attr?.ApiName != null)
         {
             builder.SetApiNameDataAnnotation(attr.ApiName);
@@ -55,7 +55,7 @@ public sealed class ApiAttributeAnnotationReader : IApiAnnotationReader
     /// <inheritdoc />
     public void ApplyEnumTypeAnnotations(Type clrType, ApiEnumTypeBuilder builder)
     {
-        var attr = clrType.GetCustomAttribute<ApiEnumTypeAttribute>(inherit: false);
+        var attr = clrType.GetCustomAttribute<ApiEnumAttribute>(inherit: false);
         if (attr?.ApiName != null)
         {
             builder.SetApiNameDataAnnotation(attr.ApiName);

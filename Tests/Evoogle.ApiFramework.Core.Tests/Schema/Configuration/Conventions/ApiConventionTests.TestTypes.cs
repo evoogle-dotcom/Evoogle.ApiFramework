@@ -22,13 +22,13 @@ public partial class ApiConventionTests
         Active,
     }
 
-    [ApiObjectType]
+    [ApiObject]
     public class AssemblyAnnotatedObject
     {
         public Guid Id { get; set; }
     }
 
-    [ApiScalarType]
+    [ApiScalar]
     public readonly record struct AssemblyAnnotatedScalar(string Value);
 
 

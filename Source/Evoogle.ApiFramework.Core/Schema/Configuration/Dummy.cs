@@ -637,10 +637,10 @@ internal static class Dummy
 
     /// <summary>
     ///     An annotation-decorated version of <see cref="Customer"/> that demonstrates how
-    ///     <c>[ApiObjectType]</c>, <c>[ApiProperty]</c>, <c>[ApiKey]</c>, and <c>[ApiIgnore]</c>
+    ///     <c>[ApiObject]</c>, <c>[ApiProperty]</c>, <c>[ApiKey]</c>, and <c>[ApiIgnore]</c>
     ///     can describe the schema shape directly on the POCO.
     /// </summary>
-    [ApiObjectType(ApiName = "Customer")]
+    [ApiObject(ApiName = "Customer")]
     public class CustomerAnnotated
     {
         /// <summary>Gets or sets the unique customer identifier.</summary>
@@ -671,7 +671,7 @@ internal static class Dummy
     ///     An annotation-decorated version of <see cref="Order"/> paired with
     ///     <see cref="CustomerAnnotated"/> for the annotation demo schema.
     /// </summary>
-    [ApiObjectType(ApiName = "Order")]
+    [ApiObject(ApiName = "Order")]
     public class OrderAnnotated
     {
         /// <summary>Gets or sets the unique order identifier.</summary>

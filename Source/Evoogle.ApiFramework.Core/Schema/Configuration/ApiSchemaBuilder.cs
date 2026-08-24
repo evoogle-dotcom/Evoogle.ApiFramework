@@ -443,7 +443,7 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
 
     /// <summary>
     ///     Registers <see cref="ApiAttributeAnnotationReader"/> as the annotation reader,
-    ///     enabling the framework's built-in attribute set (<see cref="Annotations.ApiObjectTypeAttribute"/>,
+    ///     enabling the framework's built-in attribute set (<see cref="Annotations.ApiObjectAttribute"/>,
     ///     <see cref="Annotations.ApiPropertyAttribute"/>, <see cref="Annotations.ApiEnumValueAttribute"/>,
     ///     <see cref="Annotations.ApiKeyAttribute"/>, etc.).
     /// </summary>

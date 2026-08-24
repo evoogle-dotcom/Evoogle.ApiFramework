@@ -6,16 +6,16 @@
 namespace Evoogle.ApiFramework.Schema.Annotations;
 
 /// <summary>
-///     Marks a class or struct as an API object type and optionally overrides its API name.
+///     Marks an enum as an API enum type and optionally overrides its API name.
 ///     Processed by <see cref="Configuration.ApiAttributeAnnotationReader"/> at
 ///     <see cref="Configuration.Internal.ApiConfigurationSource.DataAnnotation"/> precedence.
 /// </summary>
-[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = false)]
-public sealed class ApiObjectTypeAttribute : ApiNamedElementAttribute
+[AttributeUsage(AttributeTargets.Enum, AllowMultiple = false)]
+public sealed class ApiEnumAttribute : ApiNamedElementAttribute
 {
     #region Properties
     /// <summary>
-    ///     Gets or sets the API name for the object type. When <c>null</c>, the CLR type name
+    ///     Gets or sets the API name for the enum type. When <c>null</c>, the CLR type name
     ///     is used.
     /// </summary>
     public new string? ApiName

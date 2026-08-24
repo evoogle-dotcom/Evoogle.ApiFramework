@@ -18,10 +18,10 @@ public partial class ApiAnnotationTests
     #region Theory Data
     public static TheoryDataRow<IXUnitTest>[] BuildTheoryData =>
     [
-        // ApiObjectTypeAttribute Tests
+        // ApiObjectAttribute Tests
         new BuildTest
         {
-            Name = $"Build with {nameof(ApiObjectTypeAttribute)} overrides API name",
+            Name = $"Build with {nameof(ApiObjectAttribute)} overrides API name",
             ApiSchemaExpectedJson = @"
             {
                 ""ApiName"": ""Test"",
@@ -81,12 +81,12 @@ public partial class ApiAnnotationTests
                 ],
                 ""ApiRelationships"": []
             }",
-            ApiSchemaActualBuildExpression = static () => ApiAnnotationTestsFactory.BuildWithApiObjectTypeAttributeOverridesApiName()
+            ApiSchemaActualBuildExpression = static () => ApiAnnotationTestsFactory.BuildWithApiObjectAttributeOverridesApiName()
         },
 
         new BuildTest
         {
-            Name = $"Build with {nameof(ApiScalarTypeAttribute)} overrides API name",
+            Name = $"Build with {nameof(ApiScalarAttribute)} overrides API name",
             ApiSchemaExpectedJson = @"
             {
                 ""ApiName"": ""Test"",
@@ -106,12 +106,12 @@ public partial class ApiAnnotationTests
                 ""ApiRelationships"": []
             }",
             ApiSchemaActualBuildExpression = static () =>
-                ApiAnnotationTestsFactory.BuildWithApiScalarTypeAttributeOverridesApiName()
+                ApiAnnotationTestsFactory.BuildWithApiScalarAttributeOverridesApiName()
         },
 
         new BuildTest
         {
-            Name = $"Build with {nameof(ApiEnumTypeAttribute)} overrides API name",
+            Name = $"Build with {nameof(ApiEnumAttribute)} overrides API name",
             ApiSchemaExpectedJson = @"
             {
                 ""ApiName"": ""Test"",
@@ -143,7 +143,7 @@ public partial class ApiAnnotationTests
                 ""ApiRelationships"": []
             }",
             ApiSchemaActualBuildExpression = static () =>
-                ApiAnnotationTestsFactory.BuildWithApiEnumTypeAttributeOverridesApiName()
+                ApiAnnotationTestsFactory.BuildWithApiEnumAttributeOverridesApiName()
         },
 
         new BuildTest

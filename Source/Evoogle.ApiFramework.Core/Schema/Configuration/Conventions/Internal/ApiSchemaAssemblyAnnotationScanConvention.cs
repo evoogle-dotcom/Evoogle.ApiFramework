@@ -65,15 +65,15 @@ internal sealed class ApiSchemaAssemblyAnnotationScanConvention : IApiSchemaConv
                 continue;
             }
 
-            if (clrType.IsDefined(typeof(ApiObjectTypeAttribute), inherit: false))
+            if (clrType.IsDefined(typeof(ApiObjectAttribute), inherit: false))
             {
                 builder.AddObject(clrType);
             }
-            else if (clrType.IsDefined(typeof(ApiScalarTypeAttribute), inherit: false))
+            else if (clrType.IsDefined(typeof(ApiScalarAttribute), inherit: false))
             {
                 builder.AddScalar(clrType);
             }
-            else if (clrType.IsEnum && clrType.IsDefined(typeof(ApiEnumTypeAttribute), inherit: false))
+            else if (clrType.IsEnum && clrType.IsDefined(typeof(ApiEnumAttribute), inherit: false))
             {
                 builder.AddEnum(clrType);
             }

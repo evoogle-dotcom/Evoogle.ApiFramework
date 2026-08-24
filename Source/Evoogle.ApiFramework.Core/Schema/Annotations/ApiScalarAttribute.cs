@@ -11,7 +11,7 @@ namespace Evoogle.ApiFramework.Schema.Annotations;
 ///     <see cref="Configuration.Internal.ApiConfigurationSource.DataAnnotation"/> precedence.
 /// </summary>
 [AttributeUsage(AttributeTargets.Struct | AttributeTargets.Class, AllowMultiple = false)]
-public sealed class ApiScalarTypeAttribute : ApiNamedElementAttribute
+public sealed class ApiScalarAttribute : ApiNamedElementAttribute
 {
     #region Properties
     /// <summary>

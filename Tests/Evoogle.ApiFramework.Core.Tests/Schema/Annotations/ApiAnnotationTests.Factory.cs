@@ -15,7 +15,7 @@ namespace Evoogle.ApiFramework.Schema.Annotations;
 public static class ApiAnnotationTestsFactory
 {
     #region Type-Level Attribute Factory Methods
-    public static ApiSchema BuildWithApiObjectTypeAttributeOverridesApiName()
+    public static ApiSchema BuildWithApiObjectAttributeOverridesApiName()
     {
         var apiSchema = new ApiSchemaBuilder()
             .WithName("Test")
@@ -31,7 +31,7 @@ public static class ApiAnnotationTestsFactory
         return apiSchema;
     }
 
-    public static ApiSchema BuildWithApiScalarTypeAttributeOverridesApiName()
+    public static ApiSchema BuildWithApiScalarAttributeOverridesApiName()
     {
         return new ApiSchemaBuilder()
             .WithName("Test")
@@ -40,7 +40,7 @@ public static class ApiAnnotationTestsFactory
             .Build();
     }
 
-    public static ApiSchema BuildWithApiEnumTypeAttributeOverridesApiName()
+    public static ApiSchema BuildWithApiEnumAttributeOverridesApiName()
     {
         return new ApiSchemaBuilder()
             .WithName("Test")

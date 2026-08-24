@@ -8,7 +8,7 @@ namespace Evoogle.ApiFramework.Schema.Annotations;
 public partial class ApiAnnotationTests
 {
     #region Test Domain Types — Type-Level Attributes
-    [ApiObjectType(ApiName = "RenamedPerson")]
+    [ApiObject(ApiName = "RenamedPerson")]
     public class PersonAnnotated
     {
         public Guid Id { get; set; }
@@ -16,10 +16,10 @@ public partial class ApiAnnotationTests
         public string? Email { get; set; }
     }
 
-    [ApiScalarType(ApiName = "EmailValue")]
+    [ApiScalar(ApiName = "EmailValue")]
     public record struct EmailValueAnnotated(string Value);
 
-    [ApiEnumType(ApiName = "OrderState")]
+    [ApiEnum(ApiName = "OrderState")]
     public enum OrderStatusAnnotated { Pending, Shipped }
 
     public enum OrderStatusValueAnnotated
