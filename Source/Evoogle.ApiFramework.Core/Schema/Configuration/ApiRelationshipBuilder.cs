@@ -41,7 +41,7 @@ public abstract class ApiRelationshipBuilder(string apiName, ApiRelationshipDele
     protected TBuilder AddRelationshipExtension<TBuilder>(Type extensionType, object extension)
         where TBuilder : ApiRelationshipBuilder
     {
-        base.AddExtension(extensionType, extension);
+        this.AddExtension(extensionType, extension);
         return (TBuilder)this;
     }
 

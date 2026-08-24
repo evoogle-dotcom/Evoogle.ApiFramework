@@ -107,7 +107,7 @@ internal sealed class ApiSchemaConfigurationPipeline
                     this.ApplyConvention
                     (
                         convention,
-                        ApiSchemaConfigurationPipeline.GetTarget(objectBuilder),
+                        GetTarget(objectBuilder),
                         () => convention.Apply(objectBuilder)
                     );
                 }
@@ -133,7 +133,7 @@ internal sealed class ApiSchemaConfigurationPipeline
                     this.ApplyConvention
                     (
                         convention,
-                        ApiSchemaConfigurationPipeline.GetTarget(scalarBuilder),
+                        GetTarget(scalarBuilder),
                         () => convention.Apply(scalarBuilder)
                     );
                 }
@@ -148,7 +148,7 @@ internal sealed class ApiSchemaConfigurationPipeline
                     this.ApplyConvention
                     (
                         convention,
-                        ApiSchemaConfigurationPipeline.GetTarget(enumBuilder),
+                        GetTarget(enumBuilder),
                         () => convention.Apply(enumBuilder)
                     );
                 }
@@ -229,7 +229,7 @@ internal sealed class ApiSchemaConfigurationPipeline
             this.ApplyConvention
             (
                 convention,
-                ApiSchemaConfigurationPipeline.GetTarget(builder),
+                GetTarget(builder),
                 () => convention.Apply(builder)
             );
         }
@@ -405,7 +405,7 @@ internal sealed class ApiSchemaConfigurationPipeline
                         this.ApplyConvention
                         (
                             convention,
-                            ApiSchemaConfigurationPipeline.GetTarget(propertyBuilder, objectBuilder.ClrType),
+                            GetTarget(propertyBuilder, objectBuilder.ClrType),
                             () => convention.Apply(propertyBuilder, context)
                         );
                     }
@@ -461,7 +461,7 @@ internal sealed class ApiSchemaConfigurationPipeline
                         this.ApplyConvention
                         (
                             convention,
-                            ApiSchemaConfigurationPipeline.GetTarget(enumValueBuilder, enumBuilder.ClrType),
+                            GetTarget(enumValueBuilder, enumBuilder.ClrType),
                             () => convention.Apply(enumValueBuilder, context)
                         );
                     }

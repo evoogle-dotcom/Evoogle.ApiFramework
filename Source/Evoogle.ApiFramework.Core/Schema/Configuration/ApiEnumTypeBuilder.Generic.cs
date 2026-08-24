@@ -44,11 +44,11 @@ public sealed class ApiEnumTypeBuilder<TEnum>(ApiSchemaBuilderContext context)
 
         if (apiName == null)
         {
-            base.AddValueWithInferredName(clrName, ordinal);
+            this.AddValueWithInferredName(clrName, ordinal);
         }
         else
         {
-            base.AddValue(apiName, clrName, ordinal);
+            this.AddValue(apiName, clrName, ordinal);
         }
 
         return this;

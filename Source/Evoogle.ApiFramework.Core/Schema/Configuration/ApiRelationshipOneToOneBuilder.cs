@@ -31,7 +31,7 @@ public sealed class ApiRelationshipOneToOneBuilder(string apiName)
     /// <param name="extension">The extension value to store.</param>
     /// <returns>The current builder instance.</returns>
     public ApiRelationshipOneToOneBuilder AddRelationshipExtension(Type extensionType, object extension)
-        => base.AddRelationshipExtension<ApiRelationshipOneToOneBuilder>(extensionType, extension);
+        => this.AddRelationshipExtension<ApiRelationshipOneToOneBuilder>(extensionType, extension);
     #endregion
 
     #region Non-Generic From/To Methods
@@ -175,7 +175,7 @@ public sealed class ApiRelationshipOneToOneBuilder(string apiName)
     /// <param name="apiDeleteBehavior">The desired delete behavior.</param>
     /// <returns>The current builder instance.</returns>
     public ApiRelationshipOneToOneBuilder WithDeleteBehavior(ApiRelationshipDeleteBehavior apiDeleteBehavior)
-        => base.WithDeleteBehavior<ApiRelationshipOneToOneBuilder>(apiDeleteBehavior);
+        => this.WithDeleteBehavior<ApiRelationshipOneToOneBuilder>(apiDeleteBehavior);
     #endregion
 
     #region Build Methods

@@ -80,7 +80,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
 
         protected override void Assert()
         {
-            base.AssertException();
+            this.AssertException();
 
             this.ActualIssues.Should().NotBeNull();
             this.ActualIssues.Should().BeEquivalentTo(this.ExpectedIssues);

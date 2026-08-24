@@ -33,7 +33,7 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
     /// <param name="extension">The extension value to store.</param>
     /// <returns>The current builder instance.</returns>
     public ApiRelationshipManyToManyBuilder AddRelationshipExtension(Type extensionType, object extension)
-        => base.AddRelationshipExtension<ApiRelationshipManyToManyBuilder>(extensionType, extension);
+        => this.AddRelationshipExtension<ApiRelationshipManyToManyBuilder>(extensionType, extension);
     #endregion
 
     #region Non-Generic Between/And Methods
@@ -243,7 +243,7 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
     /// <param name="apiDeleteBehavior">The desired delete behavior.</param>
     /// <returns>The current builder instance.</returns>
     public ApiRelationshipManyToManyBuilder WithDeleteBehavior(ApiRelationshipDeleteBehavior apiDeleteBehavior)
-        => base.WithDeleteBehavior<ApiRelationshipManyToManyBuilder>(apiDeleteBehavior);
+        => this.WithDeleteBehavior<ApiRelationshipManyToManyBuilder>(apiDeleteBehavior);
     #endregion
 
     #region Build Methods

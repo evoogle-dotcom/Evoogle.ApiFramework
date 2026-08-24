@@ -170,7 +170,7 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null) : IHasLogger
     /// <param name="clrType">The CLR enum type.</param>
     /// <returns>The corresponding <see cref="ApiEnumTypeBuilder"/>.</returns>
     internal ApiEnumTypeBuilder GetOrAddEnumTypeBuilder(Type clrType) =>
-        ApiSchemaBuilderContext.GetOrAddBuilder
+        GetOrAddBuilder
         (
             clrType,
             _apiEnumTypeBuilders,
@@ -186,7 +186,7 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null) : IHasLogger
     /// <param name="clrType">The CLR object type.</param>
     /// <returns>The corresponding <see cref="ApiObjectTypeBuilder"/>.</returns>
     internal ApiObjectTypeBuilder GetOrAddObjectTypeBuilder(Type clrType) =>
-        ApiSchemaBuilderContext.GetOrAddBuilder
+        GetOrAddBuilder
         (
             clrType,
             _apiObjectTypeBuilders,
@@ -210,7 +210,7 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null) : IHasLogger
     /// <param name="clrType">The CLR scalar type.</param>
     /// <returns>The corresponding <see cref="ApiScalarTypeBuilder"/>.</returns>
     internal ApiScalarTypeBuilder GetOrAddScalarTypeBuilder(Type clrType) =>
-        ApiSchemaBuilderContext.GetOrAddBuilder
+        GetOrAddBuilder
         (
             clrType,
             _apiScalarTypeBuilders,

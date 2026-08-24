@@ -41,7 +41,7 @@ public sealed class ApiKeyTypeBuilder<TRoot>(string? apiName = null) : ApiKeyTyp
 
         var builder = ApiKeyPathBuilder<TRoot>.For(expression);
         configure?.Invoke(builder);
-        base.AddKeyPathBuilderCore(builder);
+        this.AddKeyPathBuilderCore(builder);
         return this;
     }
 
@@ -66,7 +66,7 @@ public sealed class ApiKeyTypeBuilder<TRoot>(string? apiName = null) : ApiKeyTyp
 
         var builder = ApiKeyPathBuilder<TRoot>.For(expression);
         configure?.Invoke(builder);
-        base.AddKeyPathBuilderCore(builder);
+        this.AddKeyPathBuilderCore(builder);
         return this;
     }
     #endregion
