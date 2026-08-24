@@ -18,6 +18,34 @@ public partial class ApiRelationshipTests
     [
         new KeyBindingTest
         {
+            Name = "Resolves explicit principal key binding",
+            ApiSchemaKind = ApiSchemaKind.Commerce,
+            ExpectedApiRelationshipDef = new ApiRelationshipOneToManyDef
+            (
+                ApiName: "REL_Category_PhysicalProduct_1toN",
+                PrincipalEnd: PrincipalEnd(typeof(Category), "PK_Category"),
+                DependentEnd: DependentEnd
+                (
+                    typeof(PhysicalProduct),
+                    ForeignKey(KeyPath(typeof(PhysicalProduct), nameof(PhysicalProduct.CategoryId)))
+                )
+            )
+        },
+
+        new KeyBindingTest
+        {
+            Name = "Leaves navigational one-to-one relationship without key binding",
+            ApiSchemaKind = ApiSchemaKind.Commerce,
+            ExpectedApiRelationshipDef = new ApiRelationshipOneToOneDef
+            (
+                ApiName: "REL_Customer_Profile_1to1",
+                PrincipalEnd: PrincipalEnd(typeof(Customer)),
+                DependentEnd: DependentEnd(typeof(CustomerProfile))
+            )
+        },
+
+        new KeyBindingTest
+        {
             Name = "Resolves one-to-one scalar foreign key binding",
             ApiSchemaKind = ApiSchemaKind.Relationship,
             ExpectedApiRelationshipDef = new ApiRelationshipOneToOneDef
