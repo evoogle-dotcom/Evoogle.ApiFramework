@@ -5,7 +5,6 @@
 // See the LICENSE file in the project root for more information.
 using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.TestData;
-using Evoogle.ApiFramework.Schema.Configuration.Internal;
 using Evoogle.Extensions;
 using Evoogle.XUnit;
 
@@ -20,37 +19,120 @@ public class ApiSchemaBuilderContextTests(ITestOutputHelper output) : XUnitTests
     {
         #region User Supplied Properties
         public string MethodName { get; init; } = null!;
-        public Type ClrType { get; init; } = null!;
+        public string? GenericMethodName { get; init; }
+        public string? SecondMethodName { get; init; }
+        public Type? ClrType { get; init; }
+        public string? ApiName { get; init; }
+        public bool IsGenericFirst { get; init; }
+        public Type? ExceptionTypeExpected { get; init; }
+        public string? ExceptionMessageExpected { get; init; }
         #endregion
 
         #region Calculated Properties
         private object? Builder1 { get; set; }
         private object? Builder2 { get; set; }
+        private Exception? ExceptionActual { get; set; }
         #endregion
 
         #region XUnitTest Methods
         protected override void Arrange()
         {
             this.WriteLine($"MethodName: {this.MethodName.SafeToString()}");
+            this.WriteLine($"GenericMethodName: {this.GenericMethodName.SafeToString()}");
+            this.WriteLine($"SecondMethodName: {this.SecondMethodName.SafeToString()}");
             this.WriteLine($"ClrType: {this.ClrType.SafeToName()}");
+            this.WriteLine($"ApiName: {this.ApiName.SafeToString()}");
             this.WriteLine();
         }
 
         protected override void Act()
         {
             var context = new ApiSchemaBuilderContext();
-            var method = typeof(ApiSchemaBuilderContext).GetMethod(this.MethodName, System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic, [typeof(Type)]);
-
-            this.Builder1 = method!.Invoke(context, [this.ClrType]);
-            this.Builder2 = method!.Invoke(context, [this.ClrType]);
+            try
+            {
+                if (this.SecondMethodName is not null)
+                {
+                    this.InvokeRelationshipMethod(context, this.MethodName);
+                    this.InvokeRelationshipMethod(context, this.SecondMethodName);
+                }
+                else if (this.GenericMethodName is null)
+                {
+                    this.Builder1 = this.InvokeBuilderMethod(context, this.MethodName, isGeneric: false);
+                    this.Builder2 = this.InvokeBuilderMethod(context, this.MethodName, isGeneric: false);
+                }
+                else if (this.IsGenericFirst)
+                {
+                    this.Builder1 = this.InvokeBuilderMethod(context, this.GenericMethodName, isGeneric: true);
+                    this.Builder2 = this.InvokeBuilderMethod(context, this.MethodName, isGeneric: false);
+                }
+                else
+                {
+                    this.Builder1 = this.InvokeBuilderMethod(context, this.MethodName, isGeneric: false);
+                    this.Builder2 = this.InvokeBuilderMethod(context, this.GenericMethodName, isGeneric: true);
+                }
+            }
+            catch (System.Reflection.TargetInvocationException exception) when (exception.InnerException is not null)
+            {
+                this.ExceptionActual = exception.InnerException;
+            }
+            catch (Exception exception)
+            {
+                this.ExceptionActual = exception;
+            }
         }
 
         protected override void Assert()
         {
+            if (this.ExceptionTypeExpected is not null)
+            {
+                this.ExceptionActual.Should().NotBeNull();
+                this.ExceptionActual.Should().BeOfType(this.ExceptionTypeExpected);
+
+                if (this.ExceptionMessageExpected is not null)
+                {
+                    this.ExceptionActual!.Message.Should().Be(this.ExceptionMessageExpected);
+                }
+
+                return;
+            }
+
             this.Builder1.Should().NotBeNull();
             this.Builder2.Should().NotBeNull();
 
             ReferenceEquals(this.Builder1, this.Builder2).Should().BeTrue();
+        }
+
+        private object? InvokeBuilderMethod(ApiSchemaBuilderContext context, string methodName, bool isGeneric)
+        {
+            var method = typeof(ApiSchemaBuilderContext).GetMethod
+            (
+                methodName,
+                System.Reflection.BindingFlags.Instance |
+                    System.Reflection.BindingFlags.Public |
+                    System.Reflection.BindingFlags.NonPublic,
+                isGeneric ? Type.EmptyTypes : [typeof(Type)]
+            );
+
+            if (isGeneric)
+            {
+                return method!.MakeGenericMethod(this.ClrType!).Invoke(context, []);
+            }
+
+            return method!.Invoke(context, [this.ClrType]);
+        }
+
+        private object? InvokeRelationshipMethod(ApiSchemaBuilderContext context, string methodName)
+        {
+            var method = typeof(ApiSchemaBuilderContext).GetMethod
+            (
+                methodName,
+                System.Reflection.BindingFlags.Instance |
+                    System.Reflection.BindingFlags.Public |
+                    System.Reflection.BindingFlags.NonPublic,
+                [typeof(string)]
+            );
+
+            return method!.Invoke(context, [this.ApiName]);
         }
         #endregion
     }
@@ -75,102 +157,71 @@ public class ApiSchemaBuilderContextTests(ITestOutputHelper output) : XUnitTests
             Name = "GetOrAddObjectTypeBuilder returns same instance for same CLR type",
             MethodName = nameof(ApiSchemaBuilderContext.GetOrAddObjectTypeBuilder),
             ClrType = typeof(Order)
+        },
+        new GetOrAddTest
+        {
+            Name = "GetOrAddObjectTypeBuilder generic and non-generic return same builder",
+            MethodName = nameof(ApiSchemaBuilderContext.GetOrAddObjectTypeBuilder),
+            GenericMethodName = nameof(ApiSchemaBuilderContext.GetOrAddObjectTypeBuilder),
+            ClrType = typeof(Order)
+        },
+        new GetOrAddTest
+        {
+            Name = "GetOrAddScalarTypeBuilder generic and non-generic return same builder",
+            MethodName = nameof(ApiSchemaBuilderContext.GetOrAddScalarTypeBuilder),
+            GenericMethodName = nameof(ApiSchemaBuilderContext.GetOrAddScalarTypeBuilder),
+            ClrType = typeof(int)
+        },
+        new GetOrAddTest
+        {
+            Name = "GetOrAddEnumTypeBuilder generic and non-generic return same builder",
+            MethodName = nameof(ApiSchemaBuilderContext.GetOrAddEnumTypeBuilder),
+            GenericMethodName = nameof(ApiSchemaBuilderContext.GetOrAddEnumTypeBuilder),
+            ClrType = typeof(OrderStatus)
+        },
+        new GetOrAddTest
+        {
+            Name = "GetOrAddObjectTypeBuilder non-generic returns existing generic builder",
+            MethodName = nameof(ApiSchemaBuilderContext.GetOrAddObjectTypeBuilder),
+            GenericMethodName = nameof(ApiSchemaBuilderContext.GetOrAddObjectTypeBuilder),
+            ClrType = typeof(Order),
+            IsGenericFirst = true
+        },
+        new GetOrAddTest
+        {
+            Name = "GetOrAddScalarTypeBuilder non-generic returns existing generic builder",
+            MethodName = nameof(ApiSchemaBuilderContext.GetOrAddScalarTypeBuilder),
+            GenericMethodName = nameof(ApiSchemaBuilderContext.GetOrAddScalarTypeBuilder),
+            ClrType = typeof(int),
+            IsGenericFirst = true
+        },
+        new GetOrAddTest
+        {
+            Name = "GetOrAddEnumTypeBuilder non-generic returns existing generic builder",
+            MethodName = nameof(ApiSchemaBuilderContext.GetOrAddEnumTypeBuilder),
+            GenericMethodName = nameof(ApiSchemaBuilderContext.GetOrAddEnumTypeBuilder),
+            ClrType = typeof(OrderStatus),
+            IsGenericFirst = true
+        },
+        new GetOrAddTest
+        {
+            Name = "GetOrAddEnumTypeBuilder throws configuration exception for invalid CLR type",
+            MethodName = nameof(ApiSchemaBuilderContext.GetOrAddEnumTypeBuilder),
+            ClrType = typeof(int),
+            ExceptionTypeExpected = typeof(ApiSchemaConfigurationException),
+            ExceptionMessageExpected = "Unable to create ApiEnumTypeBuilder`1 for CLR type 'Int32'."
+        },
+        new GetOrAddTest
+        {
+            Name = "GetOrAddTypedRelationshipBuilder throws configuration exception when different kind exists",
+            MethodName = nameof(ApiSchemaBuilderContext.GetOrAddOneToOneRelationshipBuilder),
+            SecondMethodName = nameof(ApiSchemaBuilderContext.GetOrAddOneToManyRelationshipBuilder),
+            ApiName = "REL_Test",
+            ExceptionTypeExpected = typeof(ApiSchemaConfigurationException)
         }
     ];
 
     [Theory]
     [MemberData(nameof(GetOrAddTheoryData))]
     public void GetOrAdd(IXUnitTest test) => test.Execute(this);
-
-    [Fact]
-    public void GetOrAddObjectTypeBuilderGenericAndNonGenericReturnSameBuilder()
-    {
-        var context = new ApiSchemaBuilderContext();
-        var nonGenericBuilder = context.GetOrAddObjectTypeBuilder(typeof(Order));
-
-        var genericBuilder = context.GetOrAddObjectTypeBuilder<Order>();
-
-        ReferenceEquals(nonGenericBuilder, genericBuilder).Should().BeTrue();
-    }
-
-    [Fact]
-    public void GetOrAddScalarTypeBuilderGenericAndNonGenericReturnSameBuilder()
-    {
-        var context = new ApiSchemaBuilderContext();
-        var nonGenericBuilder = context.GetOrAddScalarTypeBuilder(typeof(int));
-
-        var genericBuilder = context.GetOrAddScalarTypeBuilder<int>();
-
-        ReferenceEquals(nonGenericBuilder, genericBuilder).Should().BeTrue();
-    }
-
-    [Fact]
-    public void GetOrAddEnumTypeBuilderGenericAndNonGenericReturnSameBuilder()
-    {
-        var context = new ApiSchemaBuilderContext();
-        var nonGenericBuilder = context.GetOrAddEnumTypeBuilder(typeof(OrderStatus));
-
-        var genericBuilder = context.GetOrAddEnumTypeBuilder<OrderStatus>();
-
-        ReferenceEquals(nonGenericBuilder, genericBuilder).Should().BeTrue();
-    }
-
-    [Fact]
-    public void GetOrAddObjectTypeBuilderNonGenericReturnsExistingGenericBuilder()
-    {
-        var context = new ApiSchemaBuilderContext();
-        var genericBuilder = context.GetOrAddObjectTypeBuilder<Order>();
-
-        var nonGenericBuilder = context.GetOrAddObjectTypeBuilder(typeof(Order));
-
-        ReferenceEquals(genericBuilder, nonGenericBuilder).Should().BeTrue();
-    }
-
-    [Fact]
-    public void GetOrAddScalarTypeBuilderNonGenericReturnsExistingGenericBuilder()
-    {
-        var context = new ApiSchemaBuilderContext();
-        var genericBuilder = context.GetOrAddScalarTypeBuilder<int>();
-
-        var nonGenericBuilder = context.GetOrAddScalarTypeBuilder(typeof(int));
-
-        ReferenceEquals(genericBuilder, nonGenericBuilder).Should().BeTrue();
-    }
-
-    [Fact]
-    public void GetOrAddEnumTypeBuilderNonGenericReturnsExistingGenericBuilder()
-    {
-        var context = new ApiSchemaBuilderContext();
-        var genericBuilder = context.GetOrAddEnumTypeBuilder<OrderStatus>();
-
-        var nonGenericBuilder = context.GetOrAddEnumTypeBuilder(typeof(OrderStatus));
-
-        ReferenceEquals(genericBuilder, nonGenericBuilder).Should().BeTrue();
-    }
-
-    [Fact]
-    public void CreateClosedGenericBuilderThrowsSchemaConfigurationExceptionForInvalidType()
-    {
-        var act = () => ApiBuilderFactory.CreateClosedGeneric<ApiEnumTypeBuilder>
-        (
-            typeof(ApiEnumTypeBuilder<>),
-            typeof(int),
-            new ApiSchemaBuilderContext()
-        );
-
-        act.Should()
-            .Throw<ApiSchemaConfigurationException>()
-            .WithMessage("Unable to create ApiEnumTypeBuilder`1 for CLR type 'Int32'.");
-    }
-
-    [Fact]
-    public void GetOrAddTypedRelationshipBuilderThrowsConfigurationExceptionWhenDifferentKindExists()
-    {
-        var context = new ApiSchemaBuilderContext();
-        context.GetOrAddOneToOneRelationshipBuilder("REL_Test");
-
-        var act = () => context.GetOrAddOneToManyRelationshipBuilder("REL_Test");
-
-        act.Should().Throw<ApiSchemaConfigurationException>();
-    }
 }
