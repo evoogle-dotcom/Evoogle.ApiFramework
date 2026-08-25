@@ -15,13 +15,14 @@ public sealed class ApiEnumValueAttribute : ApiNamedElementAttribute
 {
     #region Properties
     /// <summary>
-    ///     Gets or sets the API name for the enum value. When <c>null</c>, the enum member name
+    ///     Gets or initializes the API name for the enum value.
+    ///     When <c>null</c>, the enum member name is used.
     ///     is used.
     /// </summary>
     public new string? ApiName
     {
         get => base.ApiName;
-        set => base.ApiName = value;
+        init => base.ApiName = value;
     }
     #endregion
 }

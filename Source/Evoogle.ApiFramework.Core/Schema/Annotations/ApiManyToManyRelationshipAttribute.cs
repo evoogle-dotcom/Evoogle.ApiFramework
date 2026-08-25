@@ -16,44 +16,56 @@ namespace Evoogle.ApiFramework.Schema.Annotations;
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
 public sealed class ApiManyToManyRelationshipAttribute : ApiNamedElementAttribute
 {
-    #region Constructors
-    /// <summary>
-    ///     Initializes a new <see cref="ApiManyToManyRelationshipAttribute"/>.
-    /// </summary>
-    /// <param name="apiName">The schema-unique API name of the relationship.</param>
-    /// <param name="associationType">The CLR type of the association/join entity.</param>
-    /// <param name="otherPrincipalType">The CLR type of the other principal end.</param>
-    public ApiManyToManyRelationshipAttribute(string apiName, Type associationType, Type otherPrincipalType)
-        : base(RequireApiName(apiName))
-    {
-        ArgumentNullException.ThrowIfNull(associationType);
-        ArgumentNullException.ThrowIfNull(otherPrincipalType);
-
-        this.AssociationType = associationType;
-        this.OtherPrincipalType = otherPrincipalType;
-    }
-    #endregion
-
     #region Properties
-    /// <summary>Gets the schema-unique API name of the relationship.</summary>
-    public new string ApiName => base.ApiName!;
+    /// <summary>Gets or initializes the schema-unique API name of the relationship.</summary>
+    public new required string ApiName
+    {
+        get => base.ApiName!;
+        init => base.ApiName = RequireApiName(value);
+    }
 
-    /// <summary>Gets the CLR type of the association (join) entity.</summary>
-    public Type AssociationType { get; }
-
-    /// <summary>Gets the CLR type of the other principal end (not the type carrying this attribute).</summary>
-    public Type OtherPrincipalType { get; }
+    /// <summary>Gets or initializes the CLR type of the association (join) entity.</summary>
+    public required Type AssociationType
+    {
+        get => this._associationType;
+        init
+        {
+            ArgumentNullException.ThrowIfNull(value);
+            this._associationType = value;
+        }
+    }
 
     /// <summary>
-    ///     Gets or sets the CLR property name on <see cref="AssociationType"/> that holds the
+    ///     Gets or initializes the CLR type of the other principal end (not the type carrying this
+    ///     attribute).
+    /// </summary>
+    public required Type OtherPrincipalType
+    {
+        get => this._otherPrincipalType;
+        init
+        {
+            ArgumentNullException.ThrowIfNull(value);
+            this._otherPrincipalType = value;
+        }
+    }
+
+    /// <summary>
+    ///     Gets or initializes the CLR property name on
+    ///     <see cref="AssociationType"/> that holds the
     ///     foreign key back to the type carrying this attribute.
     /// </summary>
-    public string? ForeignKeyA { get; set; }
+    public string? ForeignKeyA { get; init; }
 
     /// <summary>
-    ///     Gets or sets the CLR property name on <see cref="AssociationType"/> that holds the
+    ///     Gets or initializes the CLR property name on
+    ///     <see cref="AssociationType"/> that holds the
     ///     foreign key back to <see cref="OtherPrincipalType"/>.
     /// </summary>
-    public string? ForeignKeyB { get; set; }
+    public string? ForeignKeyB { get; init; }
+    #endregion
+
+    #region Fields
+    private Type _associationType = null!;
+    private Type _otherPrincipalType = null!;
     #endregion
 }

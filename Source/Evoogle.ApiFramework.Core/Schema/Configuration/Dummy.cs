@@ -660,7 +660,7 @@ internal static class Dummy
         public string InternalTag { get; set; } = string.Empty;
 
         /// <summary>Gets or sets the collection of orders that belong to the customer.</summary>
-        [ApiRelationship("CustomerHasOrdersAnnotated",
+        [ApiRelationship(ApiName = "CustomerHasOrdersAnnotated",
             Kind = ApiRelationshipKind.OneToMany,
             ForeignKey = "CustomerId",
             DeleteBehavior = ApiRelationshipDeleteBehavior.Delete)]

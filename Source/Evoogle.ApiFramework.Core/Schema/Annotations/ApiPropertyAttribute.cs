@@ -15,13 +15,14 @@ public sealed class ApiPropertyAttribute : ApiNamedElementAttribute
 {
     #region Properties
     /// <summary>
-    ///     Gets or sets the API name for the property. When <c>null</c>, the name is derived by
+    ///     Gets or initializes the API name for the property.
+    ///     When <c>null</c>, the name is derived by
     ///     the active naming convention.
     /// </summary>
     public new string? ApiName
     {
         get => base.ApiName;
-        set => base.ApiName = value;
+        init => base.ApiName = value;
     }
 
     /// <summary>
@@ -30,7 +31,7 @@ public sealed class ApiPropertyAttribute : ApiNamedElementAttribute
     ///     When both <see cref="IsRequired"/> and <see cref="IsOptional"/> are <c>false</c>
     ///     the modifier is left to convention inference.
     /// </summary>
-    public bool IsRequired { get; set; }
+    public bool IsRequired { get; init; }
 
     /// <summary>
     ///     When <c>true</c>, forces the property to be optional regardless of CLR nullability.
@@ -38,6 +39,6 @@ public sealed class ApiPropertyAttribute : ApiNamedElementAttribute
     ///     When both <see cref="IsRequired"/> and <see cref="IsOptional"/> are <c>false</c>
     ///     the modifier is left to convention inference.
     /// </summary>
-    public bool IsOptional { get; set; }
+    public bool IsOptional { get; init; }
     #endregion
 }

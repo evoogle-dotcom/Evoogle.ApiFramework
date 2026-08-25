@@ -64,16 +64,16 @@ public partial class ApiAnnotationTests
         [ApiKey]
         public int Id { get; set; }
 
-        [ApiKey("AlternateKey")]
+        [ApiKey(ApiName = "AlternateKey")]
         public string Name { get; set; } = string.Empty;
     }
 
     public class CompositeKeyType
     {
-        [ApiKey("OrderLineKey", order: 0)]
+        [ApiKey(ApiName = "OrderLineKey", Order = 0)]
         public Guid OrderId { get; set; }
 
-        [ApiKey("OrderLineKey", order: 1)]
+        [ApiKey(ApiName = "OrderLineKey", Order = 1)]
         public long LineItemNumber { get; set; }
 
         public string Description { get; set; } = string.Empty;
@@ -81,13 +81,13 @@ public partial class ApiAnnotationTests
 
     public class ThreePartCompositeKeyType
     {
-        [ApiKey("ThreePartKey", order: 0)]
+        [ApiKey(ApiName = "ThreePartKey", Order = 0)]
         public int Id1 { get; set; }
 
-        [ApiKey("ThreePartKey", order: 1)]
+        [ApiKey(ApiName = "ThreePartKey", Order = 1)]
         public string? Id2 { get; set; }
 
-        [ApiKey("ThreePartKey", order: 2)]
+        [ApiKey(ApiName = "ThreePartKey", Order = 2)]
         public Guid Id3 { get; set; }
 
         public string? Description { get; set; }
@@ -95,7 +95,7 @@ public partial class ApiAnnotationTests
 
     public class NestedKeyPartAnnotation
     {
-        [ApiKey("NestedPartKey")]
+        [ApiKey(ApiName = "NestedPartKey")]
         public int Id { get; set; }
 
         public string? Description { get; set; }
@@ -103,7 +103,7 @@ public partial class ApiAnnotationTests
 
     public class OwnerKeyAnnotation
     {
-        [ApiKey("OwnerKey")]
+        [ApiKey(ApiName = "OwnerKey")]
         public int Id { get; set; }
 
         public string? Description { get; set; }
@@ -174,7 +174,7 @@ public partial class ApiAnnotationTests
 
         [ApiRelationship
         (
-            "CustomerHasOrders",
+            ApiName = "CustomerHasOrders",
             Kind = ApiRelationshipKind.OneToMany,
             ForeignKey = "CustomerId",
             DeleteBehavior = ApiRelationshipDeleteBehavior.Delete
@@ -194,11 +194,22 @@ public partial class ApiAnnotationTests
     {
         public Guid Id { get; set; }
 
-        [ApiRelationship("ConventionFilledCustomerOrders", Kind = ApiRelationshipKind.OneToMany)]
+        [ApiRelationship
+        (
+            ApiName = "ConventionFilledCustomerOrders",
+            Kind = ApiRelationshipKind.OneToMany
+        )]
         public List<Order> Orders { get; set; } = [];
     }
 
-    [ApiRelationshipType("InvoiceForOrder", principalType: typeof(Order), dependentType: typeof(Invoice), Kind = ApiRelationshipKind.OneToOne, ForeignKey = "OrderId")]
+    [ApiRelationshipType
+    (
+        ApiName = "InvoiceForOrder",
+        PrincipalType = typeof(Order),
+        DependentType = typeof(Invoice),
+        Kind = ApiRelationshipKind.OneToOne,
+        ForeignKey = "OrderId"
+    )]
     public class Invoice
     {
         public Guid Id { get; set; }
@@ -211,7 +222,7 @@ public partial class ApiAnnotationTests
     public class FieldAnnotationsType
     {
         [ApiProperty(ApiName = "field_code", IsRequired = true)]
-        [ApiKey("FieldKey")]
+        [ApiKey(ApiName = "FieldKey")]
         public Guid Code;
 
         [ApiIgnore]
@@ -225,9 +236,9 @@ public partial class ApiAnnotationTests
 
         [ApiManyToManyRelationship
         (
-            "ProductHasTags",
-            associationType: typeof(ProductTag),
-            otherPrincipalType: typeof(Tag),
+            ApiName = "ProductHasTags",
+            AssociationType = typeof(ProductTag),
+            OtherPrincipalType = typeof(Tag),
             ForeignKeyA = "ProductId",
             ForeignKeyB = "TagId"
         )]
@@ -248,10 +259,10 @@ public partial class ApiAnnotationTests
 
     [ApiManyToManyRelationshipType
     (
-        "ProductHasTagsFromType",
-        principalTypeA: typeof(Category),
-        principalTypeB: typeof(Label),
-        associationType: typeof(ProductTagFromType),
+        ApiName = "ProductHasTagsFromType",
+        PrincipalTypeA = typeof(Category),
+        PrincipalTypeB = typeof(Label),
+        AssociationType = typeof(ProductTagFromType),
         ForeignKeyA = "ProductId",
         ForeignKeyB = "TagId"
     )]

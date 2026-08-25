@@ -15,16 +15,6 @@ namespace Evoogle.ApiFramework.Schema.Annotations;
 ///     Processed by <see cref="Configuration.ApiAttributeAnnotationReader"/> at
 ///     <see cref="Configuration.Internal.ApiConfigurationSource.DataAnnotation"/> precedence.
 /// </summary>
-/// <remarks>
-///     Initializes a new <see cref="ApiKeyAttribute"/> contributing to the specified key name.
-///     <para>
-///         <see cref="ClrPath"/> contains dot-delimited CLR member names relative to
-///         <see cref="ClrRootType"/>. When <see cref="ClrRootType"/> is not supplied, the enclosing
-///         object type is used.
-///     </para>
-/// </remarks>
-/// <param name="apiName">The API name of the key type. Defaults to <c>PrimaryKey</c>.</param>
-/// <param name="order">The zero-based position of this path within a composite key.</param>
 [AttributeUsage
 (
     AttributeTargets.Class |
@@ -34,9 +24,19 @@ namespace Evoogle.ApiFramework.Schema.Annotations;
     AllowMultiple = true,
     Inherited = true
 )]
-public sealed class ApiKeyAttribute(string apiName = "PrimaryKey", int order = 0)
-    : ApiNamedElementAttribute(RequireApiName(apiName))
+public sealed class ApiKeyAttribute : ApiNamedElementAttribute
 {
+    #region Constructors
+    /// <summary>
+    ///     Initializes a new <see cref="ApiKeyAttribute"/> with the default <c>PrimaryKey</c>
+    ///     API name.
+    /// </summary>
+    public ApiKeyAttribute()
+    {
+        this.ApiName = "PrimaryKey";
+    }
+    #endregion
+
     #region Properties
     /// <summary>
     ///     Gets or initializes the API name of the key type this path contributes to.
@@ -50,7 +50,7 @@ public sealed class ApiKeyAttribute(string apiName = "PrimaryKey", int order = 0
     /// <summary>
     ///     Gets or initializes the zero-based order of this path within a composite key.
     /// </summary>
-    public int Order { get; init; } = order;
+    public int Order { get; init; }
 
     /// <summary>
     ///     Gets or initializes the CLR type from which <see cref="ClrPath"/> begins.

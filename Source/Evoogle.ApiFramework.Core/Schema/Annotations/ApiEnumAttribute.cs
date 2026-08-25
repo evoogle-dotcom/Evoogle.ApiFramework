@@ -15,13 +15,13 @@ public sealed class ApiEnumAttribute : ApiNamedElementAttribute
 {
     #region Properties
     /// <summary>
-    ///     Gets or sets the API name for the enum type. When <c>null</c>, the CLR type name
+    ///     Gets or initializes the API name for the enum type. When <c>null</c>, the CLR type name
     ///     is used.
     /// </summary>
     public new string? ApiName
     {
         get => base.ApiName;
-        set => base.ApiName = value;
+        init => base.ApiName = value;
     }
     #endregion
 }

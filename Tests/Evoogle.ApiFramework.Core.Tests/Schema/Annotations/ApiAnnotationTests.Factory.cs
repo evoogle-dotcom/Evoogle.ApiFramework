@@ -293,27 +293,31 @@ public static class ApiAnnotationTestsFactory
     {
         Attribute attribute = annotationType switch
         {
-            nameof(ApiKeyAttribute) => new ApiKeyAttribute(apiName!),
-            nameof(ApiRelationshipAttribute) => new ApiRelationshipAttribute(apiName!),
+            nameof(ApiKeyAttribute) => new ApiKeyAttribute { ApiName = apiName! },
+            nameof(ApiRelationshipAttribute) => new ApiRelationshipAttribute
+            {
+                ApiName = apiName!
+            },
             nameof(ApiRelationshipTypeAttribute) => new ApiRelationshipTypeAttribute
-            (
-                apiName!,
-                typeof(PersonAnnotated),
-                typeof(OrderStatusAnnotated)
-            ),
+            {
+                ApiName = apiName!,
+                PrincipalType = typeof(PersonAnnotated),
+                DependentType = typeof(OrderStatusAnnotated)
+            },
             nameof(ApiManyToManyRelationshipAttribute) => new ApiManyToManyRelationshipAttribute
-            (
-                apiName!,
-                typeof(EmailValueAnnotated),
-                typeof(PersonAnnotated)
-            ),
-            nameof(ApiManyToManyRelationshipTypeAttribute) => new ApiManyToManyRelationshipTypeAttribute
-            (
-                apiName!,
-                typeof(PersonAnnotated),
-                typeof(OrderStatusAnnotated),
-                typeof(EmailValueAnnotated)
-            ),
+            {
+                ApiName = apiName!,
+                AssociationType = typeof(EmailValueAnnotated),
+                OtherPrincipalType = typeof(PersonAnnotated)
+            },
+            nameof(ApiManyToManyRelationshipTypeAttribute) =>
+                new ApiManyToManyRelationshipTypeAttribute
+            {
+                ApiName = apiName!,
+                PrincipalTypeA = typeof(PersonAnnotated),
+                PrincipalTypeB = typeof(OrderStatusAnnotated),
+                AssociationType = typeof(EmailValueAnnotated)
+            },
             _ => throw new ArgumentException("Unknown annotation type.", nameof(annotationType))
         };
         _ = attribute;

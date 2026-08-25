@@ -15,28 +15,31 @@ namespace Evoogle.ApiFramework.Schema.Annotations;
 ///     Place this attribute on the navigation property of the principal end.
 ///     To declare a relationship without a navigation property use <see cref="ApiRelationshipTypeAttribute"/>.
 /// </remarks>
-/// <remarks>
-///     Initializes a new <see cref="ApiRelationshipAttribute"/> with the given relationship name.
-/// </remarks>
-/// <param name="apiName">The schema-unique API name of the relationship.</param>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
-public sealed class ApiRelationshipAttribute(string apiName)
-    : ApiNamedElementAttribute(RequireApiName(apiName))
+public sealed class ApiRelationshipAttribute : ApiNamedElementAttribute
 {
     #region Properties
-    /// <summary>Gets the schema-unique API name of the relationship.</summary>
-    public new string ApiName => base.ApiName!;
-
-    /// <summary>Gets or sets the relationship kind. Defaults to <see cref="ApiRelationshipKind.OneToMany"/>.</summary>
-    public ApiRelationshipKind Kind { get; set; } = ApiRelationshipKind.OneToMany;
+    /// <summary>Gets or initializes the schema-unique API name of the relationship.</summary>
+    public new required string ApiName
+    {
+        get => base.ApiName!;
+        init => base.ApiName = RequireApiName(value);
+    }
 
     /// <summary>
-    ///     Gets or sets the name of the foreign-key CLR property on the dependent end.
+    ///     Gets or initializes the relationship kind. Defaults to
+    ///     <see cref="ApiRelationshipKind.OneToMany"/>.
+    /// </summary>
+    public ApiRelationshipKind Kind { get; init; } = ApiRelationshipKind.OneToMany;
+
+    /// <summary>
+    ///     Gets or initializes the name of the foreign-key CLR property on the dependent end.
     ///     When <c>null</c> the framework infers the foreign key via convention.
     /// </summary>
-    public string? ForeignKey { get; set; }
+    public string? ForeignKey { get; init; }
 
-    /// <summary>Gets or sets the delete behavior for the relationship.</summary>
-    public ApiRelationshipDeleteBehavior DeleteBehavior { get; set; } = ApiRelationshipDeleteBehavior.None;
+    /// <summary>Gets or initializes the delete behavior for the relationship.</summary>
+    public ApiRelationshipDeleteBehavior DeleteBehavior { get; init; } =
+        ApiRelationshipDeleteBehavior.None;
     #endregion
 }

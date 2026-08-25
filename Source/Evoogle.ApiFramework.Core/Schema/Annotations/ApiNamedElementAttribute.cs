@@ -8,14 +8,14 @@ namespace Evoogle.ApiFramework.Schema.Annotations;
 /// <summary>
 ///     Provides the common API name for annotations that identify named API schema elements.
 /// </summary>
-public abstract class ApiNamedElementAttribute(string? apiName = null) : Attribute
+public abstract class ApiNamedElementAttribute : Attribute
 {
     #region Properties
     /// <summary>
-    ///     Gets the API name for the annotated schema element. When <c>null</c>, the applicable
-    ///     naming convention supplies the name.
+    ///     Gets or initializes the API name for the annotated schema element.
+    ///     When <c>null</c>, the applicable naming convention supplies the name.
     /// </summary>
-    public string? ApiName { get; protected set; } = apiName;
+    public string? ApiName { get; protected init; }
     #endregion
 
     #region Validation Methods

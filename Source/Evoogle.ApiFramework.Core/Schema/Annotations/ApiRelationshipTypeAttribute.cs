@@ -18,44 +18,55 @@ namespace Evoogle.ApiFramework.Schema.Annotations;
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = true)]
 public sealed class ApiRelationshipTypeAttribute : ApiNamedElementAttribute
 {
-    #region Constructors
-    /// <summary>
-    ///     Initializes a new <see cref="ApiRelationshipTypeAttribute"/>.
-    /// </summary>
-    /// <param name="apiName">The schema-unique API name of the relationship.</param>
-    /// <param name="principalType">The CLR type of the principal end.</param>
-    /// <param name="dependentType">The CLR type of the dependent end.</param>
-    public ApiRelationshipTypeAttribute(string apiName, Type principalType, Type dependentType)
-        : base(RequireApiName(apiName))
-    {
-        ArgumentNullException.ThrowIfNull(principalType);
-        ArgumentNullException.ThrowIfNull(dependentType);
-
-        this.PrincipalType = principalType;
-        this.DependentType = dependentType;
-    }
-    #endregion
-
     #region Properties
-    /// <summary>Gets the schema-unique API name of the relationship.</summary>
-    public new string ApiName => base.ApiName!;
+    /// <summary>Gets or initializes the schema-unique API name of the relationship.</summary>
+    public new required string ApiName
+    {
+        get => base.ApiName!;
+        init => base.ApiName = RequireApiName(value);
+    }
 
-    /// <summary>Gets the CLR type of the principal end.</summary>
-    public Type PrincipalType { get; }
+    /// <summary>Gets or initializes the CLR type of the principal end.</summary>
+    public required Type PrincipalType
+    {
+        get => this._principalType;
+        init
+        {
+            ArgumentNullException.ThrowIfNull(value);
+            this._principalType = value;
+        }
+    }
 
-    /// <summary>Gets the CLR type of the dependent end.</summary>
-    public Type DependentType { get; }
-
-    /// <summary>Gets or sets the relationship kind. Defaults to <see cref="ApiRelationshipKind.OneToMany"/>.</summary>
-    public ApiRelationshipKind Kind { get; set; } = ApiRelationshipKind.OneToMany;
+    /// <summary>Gets or initializes the CLR type of the dependent end.</summary>
+    public required Type DependentType
+    {
+        get => this._dependentType;
+        init
+        {
+            ArgumentNullException.ThrowIfNull(value);
+            this._dependentType = value;
+        }
+    }
 
     /// <summary>
-    ///     Gets or sets the name of the foreign-key CLR property on the dependent type.
+    ///     Gets or initializes the relationship kind. Defaults to
+    ///     <see cref="ApiRelationshipKind.OneToMany"/>.
+    /// </summary>
+    public ApiRelationshipKind Kind { get; init; } = ApiRelationshipKind.OneToMany;
+
+    /// <summary>
+    ///     Gets or initializes the name of the foreign-key CLR property on the dependent type.
     ///     When <c>null</c> the framework infers the foreign key via convention.
     /// </summary>
-    public string? ForeignKey { get; set; }
+    public string? ForeignKey { get; init; }
 
-    /// <summary>Gets or sets the delete behavior for the relationship.</summary>
-    public ApiRelationshipDeleteBehavior DeleteBehavior { get; set; } = ApiRelationshipDeleteBehavior.None;
+    /// <summary>Gets or initializes the delete behavior for the relationship.</summary>
+    public ApiRelationshipDeleteBehavior DeleteBehavior { get; init; } =
+        ApiRelationshipDeleteBehavior.None;
+    #endregion
+
+    #region Fields
+    private Type _principalType = null!;
+    private Type _dependentType = null!;
     #endregion
 }
