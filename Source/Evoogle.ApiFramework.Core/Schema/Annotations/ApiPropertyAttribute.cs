@@ -7,8 +7,6 @@ namespace Evoogle.ApiFramework.Schema.Annotations;
 
 /// <summary>
 ///     Overrides the API name or required/optional modifier for a CLR property or field.
-///     Processed by <see cref="Configuration.ApiAttributeAnnotationReader"/> at
-///     <see cref="Configuration.Internal.ApiConfigurationSource.DataAnnotation"/> precedence.
 /// </summary>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
 public sealed class ApiPropertyAttribute : ApiNamedElementAttribute
@@ -16,8 +14,7 @@ public sealed class ApiPropertyAttribute : ApiNamedElementAttribute
     #region Properties
     /// <summary>
     ///     Gets or initializes the API name for the property.
-    ///     When <c>null</c>, the name is derived by
-    ///     the active naming convention.
+    ///     When <c>null</c>, the name is derived by the active naming convention.
     /// </summary>
     public new string? ApiName
     {
@@ -28,16 +25,14 @@ public sealed class ApiPropertyAttribute : ApiNamedElementAttribute
     /// <summary>
     ///     When <c>true</c>, forces the property to be required regardless of CLR nullability.
     ///     Takes precedence over <see cref="IsOptional"/>.
-    ///     When both <see cref="IsRequired"/> and <see cref="IsOptional"/> are <c>false</c>
-    ///     the modifier is left to convention inference.
+    ///     When both <see cref="IsRequired"/> and <see cref="IsOptional"/> are <c>false</c> the modifier is left to convention inference.
     /// </summary>
     public bool IsRequired { get; init; }
 
     /// <summary>
     ///     When <c>true</c>, forces the property to be optional regardless of CLR nullability.
     ///     Ignored when <see cref="IsRequired"/> is also <c>true</c>.
-    ///     When both <see cref="IsRequired"/> and <see cref="IsOptional"/> are <c>false</c>
-    ///     the modifier is left to convention inference.
+    ///     When both <see cref="IsRequired"/> and <see cref="IsOptional"/> are <c>false</c> the modifier is left to convention inference.
     /// </summary>
     public bool IsOptional { get; init; }
     #endregion

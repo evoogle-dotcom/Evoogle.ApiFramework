@@ -202,7 +202,7 @@ public partial class ApiAnnotationTests
         public List<Order> Orders { get; set; } = [];
     }
 
-    [ApiRelationshipType
+    [ApiRelationshipDefinition
     (
         ApiName = "InvoiceForOrder",
         PrincipalType = typeof(Order),
@@ -257,7 +257,7 @@ public partial class ApiAnnotationTests
         public Guid TagId { get; set; }
     }
 
-    [ApiManyToManyRelationshipType
+    [ApiManyToManyRelationshipDefinition
     (
         ApiName = "ProductHasTagsFromType",
         PrincipalTypeA = typeof(Category),

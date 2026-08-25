@@ -170,7 +170,13 @@ public sealed class ApiAttributeAnnotationReader : IApiAnnotationReader
         }
 
         // Type-level attributes.
-        foreach (var attr in clrType.GetCustomAttributes<ApiRelationshipTypeAttribute>(inherit: false))
+        foreach
+        (
+            var attr in clrType.GetCustomAttributes<ApiRelationshipDefinitionAttribute>
+            (
+                inherit: false
+            )
+        )
         {
             if (attr.Kind != ApiRelationshipKind.OneToMany)
             {
@@ -231,7 +237,13 @@ public sealed class ApiAttributeAnnotationReader : IApiAnnotationReader
         }
 
         // Type-level attributes.
-        foreach (var attr in clrType.GetCustomAttributes<ApiRelationshipTypeAttribute>(inherit: false))
+        foreach
+        (
+            var attr in clrType.GetCustomAttributes<ApiRelationshipDefinitionAttribute>
+            (
+                inherit: false
+            )
+        )
         {
             if (attr.Kind != ApiRelationshipKind.OneToOne)
             {
@@ -303,7 +315,13 @@ public sealed class ApiAttributeAnnotationReader : IApiAnnotationReader
         }
 
         // Type-level attributes.
-        foreach (var attr in clrType.GetCustomAttributes<ApiManyToManyRelationshipTypeAttribute>(inherit: false))
+        foreach
+        (
+            var attr in clrType.GetCustomAttributes<ApiManyToManyRelationshipDefinitionAttribute>
+            (
+                inherit: false
+            )
+        )
         {
             var principalTypeA = attr.PrincipalTypeA;
             var principalTypeB = attr.PrincipalTypeB;

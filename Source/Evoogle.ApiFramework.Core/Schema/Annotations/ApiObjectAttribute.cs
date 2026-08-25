@@ -7,8 +7,6 @@ namespace Evoogle.ApiFramework.Schema.Annotations;
 
 /// <summary>
 ///     Marks a class or struct as an API object type and optionally overrides its API name.
-///     Processed by <see cref="Configuration.ApiAttributeAnnotationReader"/> at
-///     <see cref="Configuration.Internal.ApiConfigurationSource.DataAnnotation"/> precedence.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = false)]
 public sealed class ApiObjectAttribute : ApiNamedElementAttribute
@@ -16,8 +14,7 @@ public sealed class ApiObjectAttribute : ApiNamedElementAttribute
     #region Properties
     /// <summary>
     ///     Gets or initializes the API name for the object type.
-    ///     When <c>null</c>, the CLR type name
-    ///     is used.
+    ///     When <c>null</c>, the CLR type name is used.
     /// </summary>
     public new string? ApiName
     {

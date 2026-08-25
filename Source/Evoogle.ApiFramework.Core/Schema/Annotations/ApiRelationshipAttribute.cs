@@ -7,13 +7,10 @@ namespace Evoogle.ApiFramework.Schema.Annotations;
 
 /// <summary>
 ///     Declares a one-to-one or one-to-many relationship on a navigation property.
-///     The relationship is named, keyed by
-///     <see cref="ApiNamedElementAttribute.ApiName"/>, and registered by
-///     <see cref="Configuration.ApiAttributeAnnotationReader"/>.
 /// </summary>
 /// <remarks>
 ///     Place this attribute on the navigation property of the principal end.
-///     To declare a relationship without a navigation property use <see cref="ApiRelationshipTypeAttribute"/>.
+///     To declare a relationship without a navigation property use <see cref="ApiRelationshipDefinitionAttribute"/>.
 /// </remarks>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
 public sealed class ApiRelationshipAttribute : ApiNamedElementAttribute
@@ -27,10 +24,9 @@ public sealed class ApiRelationshipAttribute : ApiNamedElementAttribute
     }
 
     /// <summary>
-    ///     Gets or initializes the relationship kind. Defaults to
-    ///     <see cref="ApiRelationshipKind.OneToMany"/>.
+    ///     Gets or initializes the relationship kind.
     /// </summary>
-    public ApiRelationshipKind Kind { get; init; } = ApiRelationshipKind.OneToMany;
+    public required ApiRelationshipKind Kind { get; init; }
 
     /// <summary>
     ///     Gets or initializes the name of the foreign-key CLR property on the dependent end.
@@ -39,7 +35,6 @@ public sealed class ApiRelationshipAttribute : ApiNamedElementAttribute
     public string? ForeignKey { get; init; }
 
     /// <summary>Gets or initializes the delete behavior for the relationship.</summary>
-    public ApiRelationshipDeleteBehavior DeleteBehavior { get; init; } =
-        ApiRelationshipDeleteBehavior.None;
+    public ApiRelationshipDeleteBehavior DeleteBehavior { get; init; } = ApiRelationshipDeleteBehavior.None;
     #endregion
 }

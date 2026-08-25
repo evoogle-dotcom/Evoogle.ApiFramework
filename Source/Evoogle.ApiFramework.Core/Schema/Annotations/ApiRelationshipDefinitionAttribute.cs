@@ -6,18 +6,21 @@
 namespace Evoogle.ApiFramework.Schema.Annotations;
 
 /// <summary>
-///     Declares a one-to-one or one-to-many relationship at the type level, without requiring
-///     a navigation property on the POCO. Apply multiple instances for multiple relationships.
-///     Registered by <see cref="Configuration.ApiAttributeAnnotationReader"/>.
+///     Declares a one-to-one or one-to-many relationship at the type level, without requiring a navigation property on the POCO.
+///     Apply multiple instances for multiple relationships.
 /// </summary>
 /// <remarks>
-///     Use this attribute when the POCO does not expose navigation properties and you want to
-///     keep the domain model clean. For POCOs with navigation properties prefer
-///     <see cref="ApiRelationshipAttribute"/> on the navigation property.
+///     Use this attribute when the POCO does not expose navigation properties and you want to keep the domain model clean.
+///     For POCOs with navigation properties prefer <see cref="ApiRelationshipAttribute"/> on the navigation property.
 /// </remarks>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = true)]
-public sealed class ApiRelationshipTypeAttribute : ApiNamedElementAttribute
+public sealed class ApiRelationshipDefinitionAttribute : ApiNamedElementAttribute
 {
+    #region Fields
+    private Type _principalType = null!;
+    private Type _dependentType = null!;
+    #endregion
+
     #region Properties
     /// <summary>Gets or initializes the schema-unique API name of the relationship.</summary>
     public new required string ApiName
@@ -49,10 +52,9 @@ public sealed class ApiRelationshipTypeAttribute : ApiNamedElementAttribute
     }
 
     /// <summary>
-    ///     Gets or initializes the relationship kind. Defaults to
-    ///     <see cref="ApiRelationshipKind.OneToMany"/>.
+    ///     Gets or initializes the relationship kind.
     /// </summary>
-    public ApiRelationshipKind Kind { get; init; } = ApiRelationshipKind.OneToMany;
+    public required ApiRelationshipKind Kind { get; init; }
 
     /// <summary>
     ///     Gets or initializes the name of the foreign-key CLR property on the dependent type.
@@ -61,12 +63,6 @@ public sealed class ApiRelationshipTypeAttribute : ApiNamedElementAttribute
     public string? ForeignKey { get; init; }
 
     /// <summary>Gets or initializes the delete behavior for the relationship.</summary>
-    public ApiRelationshipDeleteBehavior DeleteBehavior { get; init; } =
-        ApiRelationshipDeleteBehavior.None;
-    #endregion
-
-    #region Fields
-    private Type _principalType = null!;
-    private Type _dependentType = null!;
+    public ApiRelationshipDeleteBehavior DeleteBehavior { get; init; } = ApiRelationshipDeleteBehavior.None;
     #endregion
 }

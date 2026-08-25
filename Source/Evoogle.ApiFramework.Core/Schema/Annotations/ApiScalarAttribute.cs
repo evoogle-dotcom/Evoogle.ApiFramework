@@ -7,8 +7,6 @@ namespace Evoogle.ApiFramework.Schema.Annotations;
 
 /// <summary>
 ///     Marks a struct or class as an API scalar type and optionally overrides its API name.
-///     Processed by <see cref="Configuration.ApiAttributeAnnotationReader"/> at
-///     <see cref="Configuration.Internal.ApiConfigurationSource.DataAnnotation"/> precedence.
 /// </summary>
 [AttributeUsage(AttributeTargets.Struct | AttributeTargets.Class, AllowMultiple = false)]
 public sealed class ApiScalarAttribute : ApiNamedElementAttribute
@@ -16,8 +14,7 @@ public sealed class ApiScalarAttribute : ApiNamedElementAttribute
     #region Properties
     /// <summary>
     ///     Gets or initializes the API name for the scalar type.
-    ///     When <c>null</c>, the CLR type name
-    ///     is used.
+    ///     When <c>null</c>, the CLR type name is used.
     /// </summary>
     public new string? ApiName
     {

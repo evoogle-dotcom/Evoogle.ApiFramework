@@ -1467,7 +1467,8 @@ public partial class ApiAnnotationTests
 
         new BuildTest
         {
-            Name = $"Build with {nameof(ApiRelationshipTypeAttribute)} at type level",
+            Name =
+                $"Build with {nameof(ApiRelationshipDefinitionAttribute)} at type level",
             ApiSchemaExpectedJson = @"
             {
                 ""ApiName"": ""Test"",
@@ -1579,7 +1580,7 @@ public partial class ApiAnnotationTests
                 ]
             }",
             ApiSchemaActualBuildExpression = static () =>
-                ApiAnnotationTestsFactory.BuildWithApiRelationshipTypeAttributeAtTypeLevel()
+                ApiAnnotationTestsFactory.BuildWithApiRelationshipDefinitionAttributeAtTypeLevel()
         },
 
         new BuildTest
@@ -1729,7 +1730,8 @@ public partial class ApiAnnotationTests
 
         new BuildTest
         {
-            Name = $"Build with {nameof(ApiManyToManyRelationshipTypeAttribute)} at type level",
+            Name =
+                $"Build with {nameof(ApiManyToManyRelationshipDefinitionAttribute)} at type level",
             ApiSchemaExpectedJson = @"
             {
                 ""ApiName"": ""Test"",
@@ -1869,7 +1871,8 @@ public partial class ApiAnnotationTests
                 ]
             }",
             ApiSchemaActualBuildExpression = static () =>
-                ApiAnnotationTestsFactory.BuildWithApiManyToManyRelationshipTypeAttributeAtTypeLevel()
+                ApiAnnotationTestsFactory
+                    .BuildWithApiManyToManyRelationshipDefinitionAttributeAtTypeLevel()
         },
     ];
 
@@ -1956,25 +1959,25 @@ public partial class ApiAnnotationTests
                         nameof(ApiRelationshipAttribute),
                         " "
                     )),
-            (nameof(ApiRelationshipTypeAttribute), null,
+            (nameof(ApiRelationshipDefinitionAttribute), null,
                 static () => ApiAnnotationTestsFactory
                     .BuildWithInvalidRequiredAnnotationApiName
                     (
-                        nameof(ApiRelationshipTypeAttribute),
+                        nameof(ApiRelationshipDefinitionAttribute),
                         null
                     )),
-            (nameof(ApiRelationshipTypeAttribute), string.Empty,
+            (nameof(ApiRelationshipDefinitionAttribute), string.Empty,
                 static () => ApiAnnotationTestsFactory
                     .BuildWithInvalidRequiredAnnotationApiName
                     (
-                        nameof(ApiRelationshipTypeAttribute),
+                        nameof(ApiRelationshipDefinitionAttribute),
                         string.Empty
                     )),
-            (nameof(ApiRelationshipTypeAttribute), " ",
+            (nameof(ApiRelationshipDefinitionAttribute), " ",
                 static () => ApiAnnotationTestsFactory
                     .BuildWithInvalidRequiredAnnotationApiName
                     (
-                        nameof(ApiRelationshipTypeAttribute),
+                        nameof(ApiRelationshipDefinitionAttribute),
                         " "
                     )),
             (nameof(ApiManyToManyRelationshipAttribute), null,
@@ -1998,25 +2001,25 @@ public partial class ApiAnnotationTests
                         nameof(ApiManyToManyRelationshipAttribute),
                         " "
                     )),
-            (nameof(ApiManyToManyRelationshipTypeAttribute), null,
+            (nameof(ApiManyToManyRelationshipDefinitionAttribute), null,
                 static () => ApiAnnotationTestsFactory
                     .BuildWithInvalidRequiredAnnotationApiName
                     (
-                        nameof(ApiManyToManyRelationshipTypeAttribute),
+                        nameof(ApiManyToManyRelationshipDefinitionAttribute),
                         null
                     )),
-            (nameof(ApiManyToManyRelationshipTypeAttribute), string.Empty,
+            (nameof(ApiManyToManyRelationshipDefinitionAttribute), string.Empty,
                 static () => ApiAnnotationTestsFactory
                     .BuildWithInvalidRequiredAnnotationApiName
                     (
-                        nameof(ApiManyToManyRelationshipTypeAttribute),
+                        nameof(ApiManyToManyRelationshipDefinitionAttribute),
                         string.Empty
                     )),
-            (nameof(ApiManyToManyRelationshipTypeAttribute), " ",
+            (nameof(ApiManyToManyRelationshipDefinitionAttribute), " ",
                 static () => ApiAnnotationTestsFactory
                     .BuildWithInvalidRequiredAnnotationApiName
                     (
-                        nameof(ApiManyToManyRelationshipTypeAttribute),
+                        nameof(ApiManyToManyRelationshipDefinitionAttribute),
                         " "
                     )),
         };

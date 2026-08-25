@@ -7,8 +7,6 @@ namespace Evoogle.ApiFramework.Schema.Annotations;
 
 /// <summary>
 ///     Optionally overrides the API name of an enum value.
-///     Processed by <see cref="Configuration.ApiAttributeAnnotationReader"/> at
-///     <see cref="Configuration.Internal.ApiConfigurationSource.DataAnnotation"/> precedence.
 /// </summary>
 [AttributeUsage(AttributeTargets.Field, AllowMultiple = false)]
 public sealed class ApiEnumValueAttribute : ApiNamedElementAttribute
@@ -17,7 +15,6 @@ public sealed class ApiEnumValueAttribute : ApiNamedElementAttribute
     /// <summary>
     ///     Gets or initializes the API name for the enum value.
     ///     When <c>null</c>, the enum member name is used.
-    ///     is used.
     /// </summary>
     public new string? ApiName
     {

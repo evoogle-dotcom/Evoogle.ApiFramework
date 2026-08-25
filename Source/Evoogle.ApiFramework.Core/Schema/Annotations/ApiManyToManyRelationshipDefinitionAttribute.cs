@@ -6,13 +6,18 @@
 namespace Evoogle.ApiFramework.Schema.Annotations;
 
 /// <summary>
-///     Declares a many-to-many relationship at the type level without requiring navigation
-///     properties on the POCO. Apply multiple instances for multiple M:N relationships.
-///     Registered by <see cref="Configuration.ApiAttributeAnnotationReader"/>.
+///     Declares a many-to-many relationship at the type level without requiring navigation properties on the POCO.
+///     Apply multiple instances for multiple M:N relationships.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = true)]
-public sealed class ApiManyToManyRelationshipTypeAttribute : ApiNamedElementAttribute
+public sealed class ApiManyToManyRelationshipDefinitionAttribute : ApiNamedElementAttribute
 {
+    #region Fields
+    private Type _principalTypeA = null!;
+    private Type _principalTypeB = null!;
+    private Type _associationType = null!;
+    #endregion
+
     #region Properties
     /// <summary>Gets or initializes the schema-unique API name of the relationship.</summary>
     public new required string ApiName
@@ -55,21 +60,13 @@ public sealed class ApiManyToManyRelationshipTypeAttribute : ApiNamedElementAttr
     }
 
     /// <summary>
-    ///     Gets or initializes the CLR property name on <see cref="AssociationType"/> that holds
-    ///     the foreign key back to <see cref="PrincipalTypeA"/>.
+    ///     Gets or initializes the CLR property name on <see cref="AssociationType"/> that holds the foreign key back to <see cref="PrincipalTypeA"/>.
     /// </summary>
     public string? ForeignKeyA { get; init; }
 
     /// <summary>
-    ///     Gets or initializes the CLR property name on <see cref="AssociationType"/> that holds
-    ///     the foreign key back to <see cref="PrincipalTypeB"/>.
+    ///     Gets or initializes the CLR property name on <see cref="AssociationType"/> that holds the foreign key back to <see cref="PrincipalTypeB"/>.
     /// </summary>
     public string? ForeignKeyB { get; init; }
-    #endregion
-
-    #region Fields
-    private Type _principalTypeA = null!;
-    private Type _principalTypeB = null!;
-    private Type _associationType = null!;
     #endregion
 }

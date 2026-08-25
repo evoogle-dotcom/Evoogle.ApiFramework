@@ -296,12 +296,14 @@ public static class ApiAnnotationTestsFactory
             nameof(ApiKeyAttribute) => new ApiKeyAttribute { ApiName = apiName! },
             nameof(ApiRelationshipAttribute) => new ApiRelationshipAttribute
             {
-                ApiName = apiName!
+                ApiName = apiName!,
+                Kind = ApiRelationshipKind.OneToMany
             },
-            nameof(ApiRelationshipTypeAttribute) => new ApiRelationshipTypeAttribute
+            nameof(ApiRelationshipDefinitionAttribute) => new ApiRelationshipDefinitionAttribute
             {
                 ApiName = apiName!,
                 PrincipalType = typeof(PersonAnnotated),
+                Kind = ApiRelationshipKind.OneToMany,
                 DependentType = typeof(OrderStatusAnnotated)
             },
             nameof(ApiManyToManyRelationshipAttribute) => new ApiManyToManyRelationshipAttribute
@@ -310,8 +312,8 @@ public static class ApiAnnotationTestsFactory
                 AssociationType = typeof(EmailValueAnnotated),
                 OtherPrincipalType = typeof(PersonAnnotated)
             },
-            nameof(ApiManyToManyRelationshipTypeAttribute) =>
-                new ApiManyToManyRelationshipTypeAttribute
+            nameof(ApiManyToManyRelationshipDefinitionAttribute) =>
+                new ApiManyToManyRelationshipDefinitionAttribute
             {
                 ApiName = apiName!,
                 PrincipalTypeA = typeof(PersonAnnotated),
@@ -355,7 +357,7 @@ public static class ApiAnnotationTestsFactory
             .Build();
     }
 
-    public static ApiSchema BuildWithApiRelationshipTypeAttributeAtTypeLevel()
+    public static ApiSchema BuildWithApiRelationshipDefinitionAttributeAtTypeLevel()
     {
         return new ApiSchemaBuilder()
             .WithName("Test")
@@ -389,7 +391,7 @@ public static class ApiAnnotationTestsFactory
             .Build();
     }
 
-    public static ApiSchema BuildWithApiManyToManyRelationshipTypeAttributeAtTypeLevel()
+    public static ApiSchema BuildWithApiManyToManyRelationshipDefinitionAttributeAtTypeLevel()
     {
         return new ApiSchemaBuilder()
             .WithName("Test")

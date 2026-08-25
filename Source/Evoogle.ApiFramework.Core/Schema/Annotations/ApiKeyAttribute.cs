@@ -6,14 +6,9 @@
 namespace Evoogle.ApiFramework.Schema.Annotations;
 
 /// <summary>
-///     Declares a CLR property, field, or CLR-rooted path as part of a named key type
-///     on an object type.
-///     Apply this attribute once per key path; use <see cref="Order"/> to sequence the paths
-///     within a composite key.
-///     When applied to a property or field without <see cref="ClrPath"/>, the decorated member
-///     supplies the single path segment.
-///     Processed by <see cref="Configuration.ApiAttributeAnnotationReader"/> at
-///     <see cref="Configuration.Internal.ApiConfigurationSource.DataAnnotation"/> precedence.
+///     Declares a CLR property, field, or CLR-rooted path as part of a named key type on an object type.
+///     Apply this attribute once per key path; use <see cref="Order"/> to sequence the paths within a composite key.
+///     When applied to a property or field without <see cref="ClrPath"/>, the decorated member supplies the single path segment.
 /// </summary>
 [AttributeUsage
 (
@@ -28,8 +23,7 @@ public sealed class ApiKeyAttribute : ApiNamedElementAttribute
 {
     #region Constructors
     /// <summary>
-    ///     Initializes a new <see cref="ApiKeyAttribute"/> with the default <c>PrimaryKey</c>
-    ///     API name.
+    ///     Initializes a new <see cref="ApiKeyAttribute"/> with the default <c>PrimaryKey</c> API name.
     /// </summary>
     public ApiKeyAttribute()
     {
@@ -59,8 +53,8 @@ public sealed class ApiKeyAttribute : ApiNamedElementAttribute
     public Type? ClrRootType { get; init; }
 
     /// <summary>
-    ///     Gets or initializes the dot-delimited CLR member path relative to
-    ///     <see cref="ClrRootType"/>. A type-level annotation must provide this value.
+    ///     Gets or initializes the dot-delimited CLR member path relative to <see cref="ClrRootType"/>.
+    ///     A type-level annotation must provide this value.
     /// </summary>
     public string? ClrPath { get; init; }
     #endregion
