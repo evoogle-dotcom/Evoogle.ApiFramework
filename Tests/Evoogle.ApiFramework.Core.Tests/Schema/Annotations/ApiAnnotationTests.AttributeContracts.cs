@@ -6,295 +6,911 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
+using Evoogle.XUnit;
+
 using FluentAssertions;
 
 namespace Evoogle.ApiFramework.Schema.Annotations;
 
 public partial class ApiAnnotationTests
 {
-    #region Test Methods
-    [Fact]
-    public void AnnotationConstructorsAreParameterless()
+    #region Test Classes
+    private class AnnotationConstructorTest : XUnitTest
     {
-        var annotationTypes = new[]
-        {
-            typeof(ApiObjectAttribute),
-            typeof(ApiScalarAttribute),
-            typeof(ApiEnumAttribute),
-            typeof(ApiEnumValueAttribute),
-            typeof(ApiPropertyAttribute),
-            typeof(ApiKeyAttribute),
-            typeof(ApiRelationshipAttribute),
-            typeof(ApiRelationshipTypeAttribute),
-            typeof(ApiManyToManyRelationshipAttribute),
-            typeof(ApiManyToManyRelationshipTypeAttribute)
-        };
+        #region User Supplied Properties
+        public required Type AnnotationType { get; init; }
+        #endregion
 
-        foreach (var annotationType in annotationTypes)
+        #region Calculated Properties
+        private ConstructorInfo[]? ActualConstructors { get; set; }
+        #endregion
+
+        #region XUnitTest Methods
+        protected override void Arrange()
         {
-            var constructors = annotationType.GetConstructors
+            this.WriteLine($"AnnotationType: {this.AnnotationType}");
+        }
+
+        protected override void Act()
+        {
+            this.ActualConstructors = this.AnnotationType.GetConstructors
             (
                 BindingFlags.Instance | BindingFlags.Public
             );
 
-            constructors.Should().ContainSingle();
-            constructors[0].GetParameters().Should().BeEmpty();
+            this.WriteLine($"Constructor count: {this.ActualConstructors.Length}");
         }
+
+        protected override void Assert()
+        {
+            this.ActualConstructors.Should().ContainSingle();
+            this.ActualConstructors![0].GetParameters().Should().BeEmpty();
+        }
+        #endregion
     }
 
-    [Fact]
-    public void AnnotationPropertiesUseInitAccessors()
+    private class AnnotationPropertyInitTest : XUnitTest
     {
-        var annotationTypes = new[]
-        {
-            typeof(ApiObjectAttribute),
-            typeof(ApiScalarAttribute),
-            typeof(ApiEnumAttribute),
-            typeof(ApiEnumValueAttribute),
-            typeof(ApiPropertyAttribute),
-            typeof(ApiKeyAttribute),
-            typeof(ApiRelationshipAttribute),
-            typeof(ApiRelationshipTypeAttribute),
-            typeof(ApiManyToManyRelationshipAttribute),
-            typeof(ApiManyToManyRelationshipTypeAttribute)
-        };
+        #region User Supplied Properties
+        public required Type AnnotationType { get; init; }
+        public required string PropertyName { get; init; }
+        #endregion
 
-        foreach (var annotationType in annotationTypes)
-        {
-            var properties = annotationType.GetProperties
-            (
-                BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly
-            );
+        #region Calculated Properties
+        private PropertyInfo? ActualProperty { get; set; }
+        #endregion
 
-            foreach (var property in properties)
+        #region XUnitTest Methods
+        protected override void Arrange()
+        {
+            this.WriteLine($"AnnotationType: {this.AnnotationType}");
+            this.WriteLine($"PropertyName: {this.PropertyName}");
+        }
+
+        protected override void Act()
+        {
+            this.ActualProperty = this.AnnotationType.GetProperty(this.PropertyName);
+        }
+
+        protected override void Assert()
+        {
+            this.ActualProperty.Should().NotBeNull();
+            this.ActualProperty!.GetMethod.Should().NotBeNull();
+
+            var setter = this.ActualProperty.GetSetMethod(nonPublic: true);
+            setter.Should().NotBeNull();
+            setter!.ReturnParameter
+                .GetRequiredCustomModifiers()
+                .Should()
+                .Contain(typeof(IsExternalInit));
+        }
+        #endregion
+    }
+
+    private class RequiredAnnotationPropertyTest : XUnitTest
+    {
+        #region User Supplied Properties
+        public required Type AnnotationType { get; init; }
+        public required string PropertyName { get; init; }
+        #endregion
+
+        #region Calculated Properties
+        private PropertyInfo? ActualProperty { get; set; }
+        #endregion
+
+        #region XUnitTest Methods
+        protected override void Arrange()
+        {
+            this.WriteLine($"AnnotationType: {this.AnnotationType}");
+            this.WriteLine($"PropertyName: {this.PropertyName}");
+        }
+
+        protected override void Act()
+        {
+            this.ActualProperty = this.AnnotationType.GetProperty(this.PropertyName);
+        }
+
+        protected override void Assert()
+        {
+            this.ActualProperty.Should().NotBeNull();
+            this.ActualProperty!
+                .GetCustomAttribute<RequiredMemberAttribute>()
+                .Should()
+                .NotBeNull();
+        }
+        #endregion
+    }
+
+    private class OptionalAnnotationPropertyTest : XUnitTest
+    {
+        #region User Supplied Properties
+        public required Type AnnotationType { get; init; }
+        public required string PropertyName { get; init; }
+        #endregion
+
+        #region Calculated Properties
+        private PropertyInfo? ActualProperty { get; set; }
+        #endregion
+
+        #region XUnitTest Methods
+        protected override void Arrange()
+        {
+            this.WriteLine($"AnnotationType: {this.AnnotationType}");
+            this.WriteLine($"PropertyName: {this.PropertyName}");
+        }
+
+        protected override void Act()
+        {
+            this.ActualProperty = this.AnnotationType.GetProperty(this.PropertyName);
+        }
+
+        protected override void Assert()
+        {
+            this.ActualProperty.Should().NotBeNull();
+
+            var nullabilityContext = new NullabilityInfoContext();
+            nullabilityContext.Create(this.ActualProperty!).ReadState
+                .Should()
+                .Be(NullabilityState.Nullable);
+        }
+        #endregion
+    }
+
+    private class RequiredAnnotationApiNameTest : XUnitTest
+    {
+        #region User Supplied Properties
+        public required Type AnnotationType { get; init; }
+        public string? ApiName { get; init; }
+        #endregion
+
+        #region Calculated Properties
+        private Exception? ActualException { get; set; }
+        #endregion
+
+        #region XUnitTest Methods
+        protected override void Arrange()
+        {
+            this.WriteLine($"AnnotationType: {this.AnnotationType}");
+            this.WriteLine($"ApiName: {this.ApiName ?? "null"}");
+        }
+
+        protected override void Act()
+        {
+            try
             {
-                property.GetMethod.Should().NotBeNull();
-
-                var setter = property.GetSetMethod(nonPublic: true);
-                setter.Should().NotBeNull();
-                setter!.ReturnParameter
-                    .GetRequiredCustomModifiers()
-                    .Should()
-                    .Contain(typeof(IsExternalInit));
+                _ = CreateAnnotationWithApiName(this.AnnotationType, this.ApiName);
+            }
+            catch (Exception exception)
+            {
+                this.ActualException = exception;
             }
         }
 
-        var baseApiName = typeof(ApiNamedElementAttribute).GetProperty
-        (
-            nameof(ApiNamedElementAttribute.ApiName)
-        );
-
-        baseApiName.Should().NotBeNull();
-        baseApiName!.GetSetMethod(nonPublic: true).Should().NotBeNull();
-        baseApiName.GetSetMethod(nonPublic: true)!.ReturnParameter
-            .GetRequiredCustomModifiers()
-            .Should()
-            .Contain(typeof(IsExternalInit));
-    }
-
-    [Fact]
-    public void RequiredAnnotationPropertiesExposeRequiredMetadata()
-    {
-        var requiredProperties = new[]
+        protected override void Assert()
         {
-            (typeof(ApiRelationshipAttribute), nameof(ApiRelationshipAttribute.ApiName)),
-            (typeof(ApiRelationshipTypeAttribute), nameof(ApiRelationshipTypeAttribute.ApiName)),
-            (
-                typeof(ApiRelationshipTypeAttribute),
-                nameof(ApiRelationshipTypeAttribute.PrincipalType)
-            ),
-            (
-                typeof(ApiRelationshipTypeAttribute),
-                nameof(ApiRelationshipTypeAttribute.DependentType)
-            ),
-            (
-                typeof(ApiManyToManyRelationshipAttribute),
-                nameof(ApiManyToManyRelationshipAttribute.ApiName)
-            ),
-            (
-                typeof(ApiManyToManyRelationshipAttribute),
-                nameof(ApiManyToManyRelationshipAttribute.AssociationType)
-            ),
-            (
-                typeof(ApiManyToManyRelationshipAttribute),
-                nameof(ApiManyToManyRelationshipAttribute.OtherPrincipalType)
-            ),
-            (
-                typeof(ApiManyToManyRelationshipTypeAttribute),
-                nameof(ApiManyToManyRelationshipTypeAttribute.ApiName)
-            ),
-            (
-                typeof(ApiManyToManyRelationshipTypeAttribute),
-                nameof(ApiManyToManyRelationshipTypeAttribute.PrincipalTypeA)
-            ),
-            (
-                typeof(ApiManyToManyRelationshipTypeAttribute),
-                nameof(ApiManyToManyRelationshipTypeAttribute.PrincipalTypeB)
-            ),
-            (
-                typeof(ApiManyToManyRelationshipTypeAttribute),
-                nameof(ApiManyToManyRelationshipTypeAttribute.AssociationType)
-            )
-        };
+            this.ActualException.Should().NotBeNull();
+            this.ActualException.Should().BeAssignableTo<ArgumentException>();
 
-        foreach (var (annotationType, propertyName) in requiredProperties)
-        {
-            var property = annotationType.GetProperty(propertyName);
-
-            property.Should().NotBeNull();
-            property!.GetCustomAttribute<RequiredMemberAttribute>().Should().NotBeNull();
+            var argumentException = (ArgumentException)this.ActualException!;
+            argumentException.ParamName.Should().Be("apiName");
         }
+        #endregion
     }
 
-    [Fact]
-    public void OptionalAnnotationPropertiesExposeNullableMetadata()
+    private class RequiredAnnotationClrTypeTest : XUnitTest
     {
-        var optionalProperties = new[]
+        #region User Supplied Properties
+        public required Type AnnotationType { get; init; }
+        public required string PropertyName { get; init; }
+        #endregion
+
+        #region Calculated Properties
+        private Exception? ActualException { get; set; }
+        #endregion
+
+        #region XUnitTest Methods
+        protected override void Arrange()
         {
-            (typeof(ApiNamedElementAttribute), nameof(ApiNamedElementAttribute.ApiName)),
-            (typeof(ApiObjectAttribute), nameof(ApiObjectAttribute.ApiName)),
-            (typeof(ApiScalarAttribute), nameof(ApiScalarAttribute.ApiName)),
-            (typeof(ApiEnumAttribute), nameof(ApiEnumAttribute.ApiName)),
-            (typeof(ApiEnumValueAttribute), nameof(ApiEnumValueAttribute.ApiName)),
-            (typeof(ApiPropertyAttribute), nameof(ApiPropertyAttribute.ApiName)),
-            (typeof(ApiKeyAttribute), nameof(ApiKeyAttribute.ClrRootType)),
-            (typeof(ApiKeyAttribute), nameof(ApiKeyAttribute.ClrPath)),
-            (typeof(ApiRelationshipAttribute), nameof(ApiRelationshipAttribute.ForeignKey)),
-            (
-                typeof(ApiRelationshipTypeAttribute),
-                nameof(ApiRelationshipTypeAttribute.ForeignKey)
-            ),
-            (
-                typeof(ApiManyToManyRelationshipAttribute),
-                nameof(ApiManyToManyRelationshipAttribute.ForeignKeyA)
-            ),
-            (
-                typeof(ApiManyToManyRelationshipAttribute),
-                nameof(ApiManyToManyRelationshipAttribute.ForeignKeyB)
-            ),
-            (
-                typeof(ApiManyToManyRelationshipTypeAttribute),
-                nameof(ApiManyToManyRelationshipTypeAttribute.ForeignKeyA)
-            ),
-            (
-                typeof(ApiManyToManyRelationshipTypeAttribute),
-                nameof(ApiManyToManyRelationshipTypeAttribute.ForeignKeyB)
-            )
-        };
-
-        var nullabilityContext = new NullabilityInfoContext();
-
-        foreach (var (annotationType, propertyName) in optionalProperties)
-        {
-            var property = annotationType.GetProperty(propertyName);
-
-            property.Should().NotBeNull();
-            nullabilityContext.Create(property!).ReadState.Should().Be(NullabilityState.Nullable);
+            this.WriteLine($"AnnotationType: {this.AnnotationType}");
+            this.WriteLine($"PropertyName: {this.PropertyName}");
         }
-    }
 
-    [Fact]
-    public void ParameterlessApiKeyPreservesDefaults()
-    {
-        var attribute = new ApiKeyAttribute();
+        protected override void Act()
+        {
+            try
+            {
+                _ = CreateAnnotationWithNullClrType(this.AnnotationType, this.PropertyName);
+            }
+            catch (Exception exception)
+            {
+                this.ActualException = exception;
+            }
+        }
 
-        attribute.ApiName.Should().Be("PrimaryKey");
-        attribute.Order.Should().Be(0);
+        protected override void Assert()
+        {
+            this.ActualException.Should().BeOfType<ArgumentNullException>();
+        }
+        #endregion
     }
+    #endregion
+
+    #region Theory Data
+    public static TheoryDataRow<IXUnitTest>[] AnnotationConstructorTheoryData =>
+    [
+        new AnnotationConstructorTest
+        {
+            Name = $"{nameof(ApiObjectAttribute)} has a parameterless constructor",
+            AnnotationType = typeof(ApiObjectAttribute)
+        },
+        new AnnotationConstructorTest
+        {
+            Name = $"{nameof(ApiScalarAttribute)} has a parameterless constructor",
+            AnnotationType = typeof(ApiScalarAttribute)
+        },
+        new AnnotationConstructorTest
+        {
+            Name = $"{nameof(ApiEnumAttribute)} has a parameterless constructor",
+            AnnotationType = typeof(ApiEnumAttribute)
+        },
+        new AnnotationConstructorTest
+        {
+            Name = $"{nameof(ApiEnumValueAttribute)} has a parameterless constructor",
+            AnnotationType = typeof(ApiEnumValueAttribute)
+        },
+        new AnnotationConstructorTest
+        {
+            Name = $"{nameof(ApiPropertyAttribute)} has a parameterless constructor",
+            AnnotationType = typeof(ApiPropertyAttribute)
+        },
+        new AnnotationConstructorTest
+        {
+            Name = $"{nameof(ApiKeyAttribute)} has a parameterless constructor",
+            AnnotationType = typeof(ApiKeyAttribute)
+        },
+        new AnnotationConstructorTest
+        {
+            Name = $"{nameof(ApiRelationshipAttribute)} has a parameterless constructor",
+            AnnotationType = typeof(ApiRelationshipAttribute)
+        },
+        new AnnotationConstructorTest
+        {
+            Name = $"{nameof(ApiRelationshipTypeAttribute)} has a parameterless constructor",
+            AnnotationType = typeof(ApiRelationshipTypeAttribute)
+        },
+        new AnnotationConstructorTest
+        {
+            Name = $"{nameof(ApiManyToManyRelationshipAttribute)} has a parameterless constructor",
+            AnnotationType = typeof(ApiManyToManyRelationshipAttribute)
+        },
+        new AnnotationConstructorTest
+        {
+            Name = $"{nameof(ApiManyToManyRelationshipTypeAttribute)} has a parameterless constructor",
+            AnnotationType = typeof(ApiManyToManyRelationshipTypeAttribute)
+        }
+    ];
+
+    public static TheoryDataRow<IXUnitTest>[] AnnotationPropertyInitTheoryData =>
+    [
+        new AnnotationPropertyInitTest
+        {
+            Name = $"{nameof(ApiNamedElementAttribute)}.{nameof(ApiNamedElementAttribute.ApiName)} uses init",
+            AnnotationType = typeof(ApiNamedElementAttribute),
+            PropertyName = nameof(ApiNamedElementAttribute.ApiName)
+        },
+        new AnnotationPropertyInitTest
+        {
+            Name = $"{nameof(ApiObjectAttribute)}.{nameof(ApiObjectAttribute.ApiName)} uses init",
+            AnnotationType = typeof(ApiObjectAttribute),
+            PropertyName = nameof(ApiObjectAttribute.ApiName)
+        },
+        new AnnotationPropertyInitTest
+        {
+            Name = $"{nameof(ApiScalarAttribute)}.{nameof(ApiScalarAttribute.ApiName)} uses init",
+            AnnotationType = typeof(ApiScalarAttribute),
+            PropertyName = nameof(ApiScalarAttribute.ApiName)
+        },
+        new AnnotationPropertyInitTest
+        {
+            Name = $"{nameof(ApiEnumAttribute)}.{nameof(ApiEnumAttribute.ApiName)} uses init",
+            AnnotationType = typeof(ApiEnumAttribute),
+            PropertyName = nameof(ApiEnumAttribute.ApiName)
+        },
+        new AnnotationPropertyInitTest
+        {
+            Name = $"{nameof(ApiEnumValueAttribute)}.{nameof(ApiEnumValueAttribute.ApiName)} uses init",
+            AnnotationType = typeof(ApiEnumValueAttribute),
+            PropertyName = nameof(ApiEnumValueAttribute.ApiName)
+        },
+        new AnnotationPropertyInitTest
+        {
+            Name = $"{nameof(ApiPropertyAttribute)}.{nameof(ApiPropertyAttribute.ApiName)} uses init",
+            AnnotationType = typeof(ApiPropertyAttribute),
+            PropertyName = nameof(ApiPropertyAttribute.ApiName)
+        },
+        new AnnotationPropertyInitTest
+        {
+            Name = $"{nameof(ApiPropertyAttribute)}.{nameof(ApiPropertyAttribute.IsRequired)} uses init",
+            AnnotationType = typeof(ApiPropertyAttribute),
+            PropertyName = nameof(ApiPropertyAttribute.IsRequired)
+        },
+        new AnnotationPropertyInitTest
+        {
+            Name = $"{nameof(ApiPropertyAttribute)}.{nameof(ApiPropertyAttribute.IsOptional)} uses init",
+            AnnotationType = typeof(ApiPropertyAttribute),
+            PropertyName = nameof(ApiPropertyAttribute.IsOptional)
+        },
+        new AnnotationPropertyInitTest
+        {
+            Name = $"{nameof(ApiKeyAttribute)}.{nameof(ApiKeyAttribute.ApiName)} uses init",
+            AnnotationType = typeof(ApiKeyAttribute),
+            PropertyName = nameof(ApiKeyAttribute.ApiName)
+        },
+        new AnnotationPropertyInitTest
+        {
+            Name = $"{nameof(ApiKeyAttribute)}.{nameof(ApiKeyAttribute.Order)} uses init",
+            AnnotationType = typeof(ApiKeyAttribute),
+            PropertyName = nameof(ApiKeyAttribute.Order)
+        },
+        new AnnotationPropertyInitTest
+        {
+            Name = $"{nameof(ApiKeyAttribute)}.{nameof(ApiKeyAttribute.ClrRootType)} uses init",
+            AnnotationType = typeof(ApiKeyAttribute),
+            PropertyName = nameof(ApiKeyAttribute.ClrRootType)
+        },
+        new AnnotationPropertyInitTest
+        {
+            Name = $"{nameof(ApiKeyAttribute)}.{nameof(ApiKeyAttribute.ClrPath)} uses init",
+            AnnotationType = typeof(ApiKeyAttribute),
+            PropertyName = nameof(ApiKeyAttribute.ClrPath)
+        },
+        new AnnotationPropertyInitTest
+        {
+            Name = $"{nameof(ApiRelationshipAttribute)}.{nameof(ApiRelationshipAttribute.ApiName)} uses init",
+            AnnotationType = typeof(ApiRelationshipAttribute),
+            PropertyName = nameof(ApiRelationshipAttribute.ApiName)
+        },
+        new AnnotationPropertyInitTest
+        {
+            Name = $"{nameof(ApiRelationshipAttribute)}.{nameof(ApiRelationshipAttribute.Kind)} uses init",
+            AnnotationType = typeof(ApiRelationshipAttribute),
+            PropertyName = nameof(ApiRelationshipAttribute.Kind)
+        },
+        new AnnotationPropertyInitTest
+        {
+            Name = $"{nameof(ApiRelationshipAttribute)}.{nameof(ApiRelationshipAttribute.ForeignKey)} uses init",
+            AnnotationType = typeof(ApiRelationshipAttribute),
+            PropertyName = nameof(ApiRelationshipAttribute.ForeignKey)
+        },
+        new AnnotationPropertyInitTest
+        {
+            Name = $"{nameof(ApiRelationshipAttribute)}.{nameof(ApiRelationshipAttribute.DeleteBehavior)} uses init",
+            AnnotationType = typeof(ApiRelationshipAttribute),
+            PropertyName = nameof(ApiRelationshipAttribute.DeleteBehavior)
+        },
+        new AnnotationPropertyInitTest
+        {
+            Name = $"{nameof(ApiRelationshipTypeAttribute)}.{nameof(ApiRelationshipTypeAttribute.ApiName)} uses init",
+            AnnotationType = typeof(ApiRelationshipTypeAttribute),
+            PropertyName = nameof(ApiRelationshipTypeAttribute.ApiName)
+        },
+        new AnnotationPropertyInitTest
+        {
+            Name = $"{nameof(ApiRelationshipTypeAttribute)}.{nameof(ApiRelationshipTypeAttribute.PrincipalType)} uses init",
+            AnnotationType = typeof(ApiRelationshipTypeAttribute),
+            PropertyName = nameof(ApiRelationshipTypeAttribute.PrincipalType)
+        },
+        new AnnotationPropertyInitTest
+        {
+            Name = $"{nameof(ApiRelationshipTypeAttribute)}.{nameof(ApiRelationshipTypeAttribute.DependentType)} uses init",
+            AnnotationType = typeof(ApiRelationshipTypeAttribute),
+            PropertyName = nameof(ApiRelationshipTypeAttribute.DependentType)
+        },
+        new AnnotationPropertyInitTest
+        {
+            Name = $"{nameof(ApiRelationshipTypeAttribute)}.{nameof(ApiRelationshipTypeAttribute.Kind)} uses init",
+            AnnotationType = typeof(ApiRelationshipTypeAttribute),
+            PropertyName = nameof(ApiRelationshipTypeAttribute.Kind)
+        },
+        new AnnotationPropertyInitTest
+        {
+            Name = $"{nameof(ApiRelationshipTypeAttribute)}.{nameof(ApiRelationshipTypeAttribute.ForeignKey)} uses init",
+            AnnotationType = typeof(ApiRelationshipTypeAttribute),
+            PropertyName = nameof(ApiRelationshipTypeAttribute.ForeignKey)
+        },
+        new AnnotationPropertyInitTest
+        {
+            Name = $"{nameof(ApiRelationshipTypeAttribute)}.{nameof(ApiRelationshipTypeAttribute.DeleteBehavior)} uses init",
+            AnnotationType = typeof(ApiRelationshipTypeAttribute),
+            PropertyName = nameof(ApiRelationshipTypeAttribute.DeleteBehavior)
+        },
+        new AnnotationPropertyInitTest
+        {
+            Name = $"{nameof(ApiManyToManyRelationshipAttribute)}.{nameof(ApiManyToManyRelationshipAttribute.ApiName)} uses init",
+            AnnotationType = typeof(ApiManyToManyRelationshipAttribute),
+            PropertyName = nameof(ApiManyToManyRelationshipAttribute.ApiName)
+        },
+        new AnnotationPropertyInitTest
+        {
+            Name = $"{nameof(ApiManyToManyRelationshipAttribute)}.{nameof(ApiManyToManyRelationshipAttribute.AssociationType)} uses init",
+            AnnotationType = typeof(ApiManyToManyRelationshipAttribute),
+            PropertyName = nameof(ApiManyToManyRelationshipAttribute.AssociationType)
+        },
+        new AnnotationPropertyInitTest
+        {
+            Name = $"{nameof(ApiManyToManyRelationshipAttribute)}.{nameof(ApiManyToManyRelationshipAttribute.OtherPrincipalType)} uses init",
+            AnnotationType = typeof(ApiManyToManyRelationshipAttribute),
+            PropertyName = nameof(ApiManyToManyRelationshipAttribute.OtherPrincipalType)
+        },
+        new AnnotationPropertyInitTest
+        {
+            Name = $"{nameof(ApiManyToManyRelationshipAttribute)}.{nameof(ApiManyToManyRelationshipAttribute.ForeignKeyA)} uses init",
+            AnnotationType = typeof(ApiManyToManyRelationshipAttribute),
+            PropertyName = nameof(ApiManyToManyRelationshipAttribute.ForeignKeyA)
+        },
+        new AnnotationPropertyInitTest
+        {
+            Name = $"{nameof(ApiManyToManyRelationshipAttribute)}.{nameof(ApiManyToManyRelationshipAttribute.ForeignKeyB)} uses init",
+            AnnotationType = typeof(ApiManyToManyRelationshipAttribute),
+            PropertyName = nameof(ApiManyToManyRelationshipAttribute.ForeignKeyB)
+        },
+        new AnnotationPropertyInitTest
+        {
+            Name = $"{nameof(ApiManyToManyRelationshipTypeAttribute)}.{nameof(ApiManyToManyRelationshipTypeAttribute.ApiName)} uses init",
+            AnnotationType = typeof(ApiManyToManyRelationshipTypeAttribute),
+            PropertyName = nameof(ApiManyToManyRelationshipTypeAttribute.ApiName)
+        },
+        new AnnotationPropertyInitTest
+        {
+            Name = $"{nameof(ApiManyToManyRelationshipTypeAttribute)}.{nameof(ApiManyToManyRelationshipTypeAttribute.PrincipalTypeA)} uses init",
+            AnnotationType = typeof(ApiManyToManyRelationshipTypeAttribute),
+            PropertyName = nameof(ApiManyToManyRelationshipTypeAttribute.PrincipalTypeA)
+        },
+        new AnnotationPropertyInitTest
+        {
+            Name = $"{nameof(ApiManyToManyRelationshipTypeAttribute)}.{nameof(ApiManyToManyRelationshipTypeAttribute.PrincipalTypeB)} uses init",
+            AnnotationType = typeof(ApiManyToManyRelationshipTypeAttribute),
+            PropertyName = nameof(ApiManyToManyRelationshipTypeAttribute.PrincipalTypeB)
+        },
+        new AnnotationPropertyInitTest
+        {
+            Name = $"{nameof(ApiManyToManyRelationshipTypeAttribute)}.{nameof(ApiManyToManyRelationshipTypeAttribute.AssociationType)} uses init",
+            AnnotationType = typeof(ApiManyToManyRelationshipTypeAttribute),
+            PropertyName = nameof(ApiManyToManyRelationshipTypeAttribute.AssociationType)
+        },
+        new AnnotationPropertyInitTest
+        {
+            Name = $"{nameof(ApiManyToManyRelationshipTypeAttribute)}.{nameof(ApiManyToManyRelationshipTypeAttribute.ForeignKeyA)} uses init",
+            AnnotationType = typeof(ApiManyToManyRelationshipTypeAttribute),
+            PropertyName = nameof(ApiManyToManyRelationshipTypeAttribute.ForeignKeyA)
+        },
+        new AnnotationPropertyInitTest
+        {
+            Name = $"{nameof(ApiManyToManyRelationshipTypeAttribute)}.{nameof(ApiManyToManyRelationshipTypeAttribute.ForeignKeyB)} uses init",
+            AnnotationType = typeof(ApiManyToManyRelationshipTypeAttribute),
+            PropertyName = nameof(ApiManyToManyRelationshipTypeAttribute.ForeignKeyB)
+        }
+    ];
+
+    public static TheoryDataRow<IXUnitTest>[] RequiredAnnotationPropertyTheoryData =>
+    [
+        new RequiredAnnotationPropertyTest
+        {
+            Name = $"{nameof(ApiRelationshipAttribute)}.{nameof(ApiRelationshipAttribute.ApiName)} is required",
+            AnnotationType = typeof(ApiRelationshipAttribute),
+            PropertyName = nameof(ApiRelationshipAttribute.ApiName)
+        },
+        new RequiredAnnotationPropertyTest
+        {
+            Name = $"{nameof(ApiRelationshipTypeAttribute)}.{nameof(ApiRelationshipTypeAttribute.ApiName)} is required",
+            AnnotationType = typeof(ApiRelationshipTypeAttribute),
+            PropertyName = nameof(ApiRelationshipTypeAttribute.ApiName)
+        },
+        new RequiredAnnotationPropertyTest
+        {
+            Name = $"{nameof(ApiRelationshipTypeAttribute)}.{nameof(ApiRelationshipTypeAttribute.PrincipalType)} is required",
+            AnnotationType = typeof(ApiRelationshipTypeAttribute),
+            PropertyName = nameof(ApiRelationshipTypeAttribute.PrincipalType)
+        },
+        new RequiredAnnotationPropertyTest
+        {
+            Name = $"{nameof(ApiRelationshipTypeAttribute)}.{nameof(ApiRelationshipTypeAttribute.DependentType)} is required",
+            AnnotationType = typeof(ApiRelationshipTypeAttribute),
+            PropertyName = nameof(ApiRelationshipTypeAttribute.DependentType)
+        },
+        new RequiredAnnotationPropertyTest
+        {
+            Name = $"{nameof(ApiManyToManyRelationshipAttribute)}.{nameof(ApiManyToManyRelationshipAttribute.ApiName)} is required",
+            AnnotationType = typeof(ApiManyToManyRelationshipAttribute),
+            PropertyName = nameof(ApiManyToManyRelationshipAttribute.ApiName)
+        },
+        new RequiredAnnotationPropertyTest
+        {
+            Name = $"{nameof(ApiManyToManyRelationshipAttribute)}.{nameof(ApiManyToManyRelationshipAttribute.AssociationType)} is required",
+            AnnotationType = typeof(ApiManyToManyRelationshipAttribute),
+            PropertyName = nameof(ApiManyToManyRelationshipAttribute.AssociationType)
+        },
+        new RequiredAnnotationPropertyTest
+        {
+            Name = $"{nameof(ApiManyToManyRelationshipAttribute)}.{nameof(ApiManyToManyRelationshipAttribute.OtherPrincipalType)} is required",
+            AnnotationType = typeof(ApiManyToManyRelationshipAttribute),
+            PropertyName = nameof(ApiManyToManyRelationshipAttribute.OtherPrincipalType)
+        },
+        new RequiredAnnotationPropertyTest
+        {
+            Name = $"{nameof(ApiManyToManyRelationshipTypeAttribute)}.{nameof(ApiManyToManyRelationshipTypeAttribute.ApiName)} is required",
+            AnnotationType = typeof(ApiManyToManyRelationshipTypeAttribute),
+            PropertyName = nameof(ApiManyToManyRelationshipTypeAttribute.ApiName)
+        },
+        new RequiredAnnotationPropertyTest
+        {
+            Name = $"{nameof(ApiManyToManyRelationshipTypeAttribute)}.{nameof(ApiManyToManyRelationshipTypeAttribute.PrincipalTypeA)} is required",
+            AnnotationType = typeof(ApiManyToManyRelationshipTypeAttribute),
+            PropertyName = nameof(ApiManyToManyRelationshipTypeAttribute.PrincipalTypeA)
+        },
+        new RequiredAnnotationPropertyTest
+        {
+            Name = $"{nameof(ApiManyToManyRelationshipTypeAttribute)}.{nameof(ApiManyToManyRelationshipTypeAttribute.PrincipalTypeB)} is required",
+            AnnotationType = typeof(ApiManyToManyRelationshipTypeAttribute),
+            PropertyName = nameof(ApiManyToManyRelationshipTypeAttribute.PrincipalTypeB)
+        },
+        new RequiredAnnotationPropertyTest
+        {
+            Name = $"{nameof(ApiManyToManyRelationshipTypeAttribute)}.{nameof(ApiManyToManyRelationshipTypeAttribute.AssociationType)} is required",
+            AnnotationType = typeof(ApiManyToManyRelationshipTypeAttribute),
+            PropertyName = nameof(ApiManyToManyRelationshipTypeAttribute.AssociationType)
+        }
+    ];
+
+    public static TheoryDataRow<IXUnitTest>[] OptionalAnnotationPropertyTheoryData =>
+    [
+        new OptionalAnnotationPropertyTest
+        {
+            Name = $"{nameof(ApiNamedElementAttribute)}.{nameof(ApiNamedElementAttribute.ApiName)} is nullable",
+            AnnotationType = typeof(ApiNamedElementAttribute),
+            PropertyName = nameof(ApiNamedElementAttribute.ApiName)
+        },
+        new OptionalAnnotationPropertyTest
+        {
+            Name = $"{nameof(ApiObjectAttribute)}.{nameof(ApiObjectAttribute.ApiName)} is nullable",
+            AnnotationType = typeof(ApiObjectAttribute),
+            PropertyName = nameof(ApiObjectAttribute.ApiName)
+        },
+        new OptionalAnnotationPropertyTest
+        {
+            Name = $"{nameof(ApiScalarAttribute)}.{nameof(ApiScalarAttribute.ApiName)} is nullable",
+            AnnotationType = typeof(ApiScalarAttribute),
+            PropertyName = nameof(ApiScalarAttribute.ApiName)
+        },
+        new OptionalAnnotationPropertyTest
+        {
+            Name = $"{nameof(ApiEnumAttribute)}.{nameof(ApiEnumAttribute.ApiName)} is nullable",
+            AnnotationType = typeof(ApiEnumAttribute),
+            PropertyName = nameof(ApiEnumAttribute.ApiName)
+        },
+        new OptionalAnnotationPropertyTest
+        {
+            Name = $"{nameof(ApiEnumValueAttribute)}.{nameof(ApiEnumValueAttribute.ApiName)} is nullable",
+            AnnotationType = typeof(ApiEnumValueAttribute),
+            PropertyName = nameof(ApiEnumValueAttribute.ApiName)
+        },
+        new OptionalAnnotationPropertyTest
+        {
+            Name = $"{nameof(ApiPropertyAttribute)}.{nameof(ApiPropertyAttribute.ApiName)} is nullable",
+            AnnotationType = typeof(ApiPropertyAttribute),
+            PropertyName = nameof(ApiPropertyAttribute.ApiName)
+        },
+        new OptionalAnnotationPropertyTest
+        {
+            Name = $"{nameof(ApiKeyAttribute)}.{nameof(ApiKeyAttribute.ClrRootType)} is nullable",
+            AnnotationType = typeof(ApiKeyAttribute),
+            PropertyName = nameof(ApiKeyAttribute.ClrRootType)
+        },
+        new OptionalAnnotationPropertyTest
+        {
+            Name = $"{nameof(ApiKeyAttribute)}.{nameof(ApiKeyAttribute.ClrPath)} is nullable",
+            AnnotationType = typeof(ApiKeyAttribute),
+            PropertyName = nameof(ApiKeyAttribute.ClrPath)
+        },
+        new OptionalAnnotationPropertyTest
+        {
+            Name = $"{nameof(ApiRelationshipAttribute)}.{nameof(ApiRelationshipAttribute.ForeignKey)} is nullable",
+            AnnotationType = typeof(ApiRelationshipAttribute),
+            PropertyName = nameof(ApiRelationshipAttribute.ForeignKey)
+        },
+        new OptionalAnnotationPropertyTest
+        {
+            Name = $"{nameof(ApiRelationshipTypeAttribute)}.{nameof(ApiRelationshipTypeAttribute.ForeignKey)} is nullable",
+            AnnotationType = typeof(ApiRelationshipTypeAttribute),
+            PropertyName = nameof(ApiRelationshipTypeAttribute.ForeignKey)
+        },
+        new OptionalAnnotationPropertyTest
+        {
+            Name = $"{nameof(ApiManyToManyRelationshipAttribute)}.{nameof(ApiManyToManyRelationshipAttribute.ForeignKeyA)} is nullable",
+            AnnotationType = typeof(ApiManyToManyRelationshipAttribute),
+            PropertyName = nameof(ApiManyToManyRelationshipAttribute.ForeignKeyA)
+        },
+        new OptionalAnnotationPropertyTest
+        {
+            Name = $"{nameof(ApiManyToManyRelationshipAttribute)}.{nameof(ApiManyToManyRelationshipAttribute.ForeignKeyB)} is nullable",
+            AnnotationType = typeof(ApiManyToManyRelationshipAttribute),
+            PropertyName = nameof(ApiManyToManyRelationshipAttribute.ForeignKeyB)
+        },
+        new OptionalAnnotationPropertyTest
+        {
+            Name = $"{nameof(ApiManyToManyRelationshipTypeAttribute)}.{nameof(ApiManyToManyRelationshipTypeAttribute.ForeignKeyA)} is nullable",
+            AnnotationType = typeof(ApiManyToManyRelationshipTypeAttribute),
+            PropertyName = nameof(ApiManyToManyRelationshipTypeAttribute.ForeignKeyA)
+        },
+        new OptionalAnnotationPropertyTest
+        {
+            Name = $"{nameof(ApiManyToManyRelationshipTypeAttribute)}.{nameof(ApiManyToManyRelationshipTypeAttribute.ForeignKeyB)} is nullable",
+            AnnotationType = typeof(ApiManyToManyRelationshipTypeAttribute),
+            PropertyName = nameof(ApiManyToManyRelationshipTypeAttribute.ForeignKeyB)
+        }
+    ];
+
+    public static TheoryDataRow<IXUnitTest>[] RequiredAnnotationApiNameTheoryData =>
+    [
+        new RequiredAnnotationApiNameTest
+        {
+            Name = $"{nameof(ApiKeyAttribute)} rejects a null API name",
+            AnnotationType = typeof(ApiKeyAttribute),
+            ApiName = null
+        },
+        new RequiredAnnotationApiNameTest
+        {
+            Name = $"{nameof(ApiKeyAttribute)} rejects an empty API name",
+            AnnotationType = typeof(ApiKeyAttribute),
+            ApiName = string.Empty
+        },
+        new RequiredAnnotationApiNameTest
+        {
+            Name = $"{nameof(ApiKeyAttribute)} rejects a whitespace API name",
+            AnnotationType = typeof(ApiKeyAttribute),
+            ApiName = " "
+        },
+        new RequiredAnnotationApiNameTest
+        {
+            Name = $"{nameof(ApiRelationshipAttribute)} rejects a null API name",
+            AnnotationType = typeof(ApiRelationshipAttribute),
+            ApiName = null
+        },
+        new RequiredAnnotationApiNameTest
+        {
+            Name = $"{nameof(ApiRelationshipAttribute)} rejects an empty API name",
+            AnnotationType = typeof(ApiRelationshipAttribute),
+            ApiName = string.Empty
+        },
+        new RequiredAnnotationApiNameTest
+        {
+            Name = $"{nameof(ApiRelationshipAttribute)} rejects a whitespace API name",
+            AnnotationType = typeof(ApiRelationshipAttribute),
+            ApiName = " "
+        },
+        new RequiredAnnotationApiNameTest
+        {
+            Name = $"{nameof(ApiRelationshipTypeAttribute)} rejects a null API name",
+            AnnotationType = typeof(ApiRelationshipTypeAttribute),
+            ApiName = null
+        },
+        new RequiredAnnotationApiNameTest
+        {
+            Name = $"{nameof(ApiRelationshipTypeAttribute)} rejects an empty API name",
+            AnnotationType = typeof(ApiRelationshipTypeAttribute),
+            ApiName = string.Empty
+        },
+        new RequiredAnnotationApiNameTest
+        {
+            Name = $"{nameof(ApiRelationshipTypeAttribute)} rejects a whitespace API name",
+            AnnotationType = typeof(ApiRelationshipTypeAttribute),
+            ApiName = " "
+        },
+        new RequiredAnnotationApiNameTest
+        {
+            Name = $"{nameof(ApiManyToManyRelationshipAttribute)} rejects a null API name",
+            AnnotationType = typeof(ApiManyToManyRelationshipAttribute),
+            ApiName = null
+        },
+        new RequiredAnnotationApiNameTest
+        {
+            Name = $"{nameof(ApiManyToManyRelationshipAttribute)} rejects an empty API name",
+            AnnotationType = typeof(ApiManyToManyRelationshipAttribute),
+            ApiName = string.Empty
+        },
+        new RequiredAnnotationApiNameTest
+        {
+            Name = $"{nameof(ApiManyToManyRelationshipAttribute)} rejects a whitespace API name",
+            AnnotationType = typeof(ApiManyToManyRelationshipAttribute),
+            ApiName = " "
+        },
+        new RequiredAnnotationApiNameTest
+        {
+            Name = $"{nameof(ApiManyToManyRelationshipTypeAttribute)} rejects a null API name",
+            AnnotationType = typeof(ApiManyToManyRelationshipTypeAttribute),
+            ApiName = null
+        },
+        new RequiredAnnotationApiNameTest
+        {
+            Name = $"{nameof(ApiManyToManyRelationshipTypeAttribute)} rejects an empty API name",
+            AnnotationType = typeof(ApiManyToManyRelationshipTypeAttribute),
+            ApiName = string.Empty
+        },
+        new RequiredAnnotationApiNameTest
+        {
+            Name = $"{nameof(ApiManyToManyRelationshipTypeAttribute)} rejects a whitespace API name",
+            AnnotationType = typeof(ApiManyToManyRelationshipTypeAttribute),
+            ApiName = " "
+        }
+    ];
+
+    public static TheoryDataRow<IXUnitTest>[] RequiredAnnotationClrTypeTheoryData =>
+    [
+        new RequiredAnnotationClrTypeTest
+        {
+            Name = $"{nameof(ApiRelationshipTypeAttribute)} rejects a null principal type",
+            AnnotationType = typeof(ApiRelationshipTypeAttribute),
+            PropertyName = nameof(ApiRelationshipTypeAttribute.PrincipalType)
+        },
+        new RequiredAnnotationClrTypeTest
+        {
+            Name = $"{nameof(ApiRelationshipTypeAttribute)} rejects a null dependent type",
+            AnnotationType = typeof(ApiRelationshipTypeAttribute),
+            PropertyName = nameof(ApiRelationshipTypeAttribute.DependentType)
+        },
+        new RequiredAnnotationClrTypeTest
+        {
+            Name = $"{nameof(ApiManyToManyRelationshipAttribute)} rejects a null association type",
+            AnnotationType = typeof(ApiManyToManyRelationshipAttribute),
+            PropertyName = nameof(ApiManyToManyRelationshipAttribute.AssociationType)
+        },
+        new RequiredAnnotationClrTypeTest
+        {
+            Name = $"{nameof(ApiManyToManyRelationshipAttribute)} rejects a null other principal type",
+            AnnotationType = typeof(ApiManyToManyRelationshipAttribute),
+            PropertyName = nameof(ApiManyToManyRelationshipAttribute.OtherPrincipalType)
+        },
+        new RequiredAnnotationClrTypeTest
+        {
+            Name = $"{nameof(ApiManyToManyRelationshipTypeAttribute)} rejects a null principal type A",
+            AnnotationType = typeof(ApiManyToManyRelationshipTypeAttribute),
+            PropertyName = nameof(ApiManyToManyRelationshipTypeAttribute.PrincipalTypeA)
+        },
+        new RequiredAnnotationClrTypeTest
+        {
+            Name = $"{nameof(ApiManyToManyRelationshipTypeAttribute)} rejects a null principal type B",
+            AnnotationType = typeof(ApiManyToManyRelationshipTypeAttribute),
+            PropertyName = nameof(ApiManyToManyRelationshipTypeAttribute.PrincipalTypeB)
+        },
+        new RequiredAnnotationClrTypeTest
+        {
+            Name = $"{nameof(ApiManyToManyRelationshipTypeAttribute)} rejects a null association type",
+            AnnotationType = typeof(ApiManyToManyRelationshipTypeAttribute),
+            PropertyName = nameof(ApiManyToManyRelationshipTypeAttribute.AssociationType)
+        }
+    ];
+    #endregion
+
+    #region Test Methods
+    [Theory]
+    [MemberData(nameof(AnnotationConstructorTheoryData))]
+    public void AnnotationConstructor(IXUnitTest test) => test.Execute(this);
 
     [Theory]
-    [InlineData(null)]
-    [InlineData("")]
-    [InlineData(" ")]
-    public void RequiredAnnotationApiNamesRejectInvalidValues(string? apiName)
+    [MemberData(nameof(AnnotationPropertyInitTheoryData))]
+    public void AnnotationPropertyInit(IXUnitTest test) => test.Execute(this);
+
+    [Theory]
+    [MemberData(nameof(RequiredAnnotationPropertyTheoryData))]
+    public void RequiredAnnotationProperty(IXUnitTest test) => test.Execute(this);
+
+    [Theory]
+    [MemberData(nameof(OptionalAnnotationPropertyTheoryData))]
+    public void OptionalAnnotationProperty(IXUnitTest test) => test.Execute(this);
+
+    [Theory]
+    [MemberData(nameof(RequiredAnnotationApiNameTheoryData))]
+    public void RequiredAnnotationApiName(IXUnitTest test) => test.Execute(this);
+
+    [Theory]
+    [MemberData(nameof(RequiredAnnotationClrTypeTheoryData))]
+    public void RequiredAnnotationClrType(IXUnitTest test) => test.Execute(this);
+    #endregion
+
+    #region Private Methods
+    private static Attribute CreateAnnotationWithApiName(Type annotationType, string? apiName)
     {
-        var actions = new Action[]
+        Attribute attribute = annotationType switch
         {
-            () => new ApiKeyAttribute { ApiName = apiName! },
-            () => new ApiRelationshipAttribute { ApiName = apiName! },
-            () => new ApiRelationshipTypeAttribute
+            var type when type == typeof(ApiKeyAttribute) => new ApiKeyAttribute
+            {
+                ApiName = apiName!
+            },
+            var type when type == typeof(ApiRelationshipAttribute) => new ApiRelationshipAttribute
+            {
+                ApiName = apiName!
+            },
+            var type when type == typeof(ApiRelationshipTypeAttribute) =>
+                new ApiRelationshipTypeAttribute
             {
                 ApiName = apiName!,
                 PrincipalType = typeof(PersonAnnotated),
                 DependentType = typeof(OrderStatusAnnotated)
             },
-            () => new ApiManyToManyRelationshipAttribute
+            var type when type == typeof(ApiManyToManyRelationshipAttribute) =>
+                new ApiManyToManyRelationshipAttribute
             {
                 ApiName = apiName!,
                 AssociationType = typeof(EmailValueAnnotated),
                 OtherPrincipalType = typeof(PersonAnnotated)
             },
-            () => new ApiManyToManyRelationshipTypeAttribute
+            var type when type == typeof(ApiManyToManyRelationshipTypeAttribute) =>
+                new ApiManyToManyRelationshipTypeAttribute
             {
                 ApiName = apiName!,
                 PrincipalTypeA = typeof(PersonAnnotated),
                 PrincipalTypeB = typeof(OrderStatusAnnotated),
                 AssociationType = typeof(EmailValueAnnotated)
-            }
+            },
+            _ => throw new ArgumentException("Unknown annotation type.", nameof(annotationType))
         };
 
-        foreach (var action in actions)
-        {
-            action.Should().Throw<ArgumentException>().WithParameterName("apiName");
-        }
+        return attribute;
     }
 
-    [Fact]
-    public void RequiredAnnotationClrTypesRejectNullValues()
+    private static Attribute CreateAnnotationWithNullClrType
+    (
+        Type annotationType,
+        string propertyName
+    )
     {
-        var actions = new Action[]
+        Attribute attribute = annotationType switch
         {
-            () => new ApiRelationshipTypeAttribute
+            var type when type == typeof(ApiRelationshipTypeAttribute) =>
+                new ApiRelationshipTypeAttribute
             {
                 ApiName = "Relationship",
-                PrincipalType = null!,
-                DependentType = typeof(OrderStatusAnnotated)
+                PrincipalType = propertyName == nameof(ApiRelationshipTypeAttribute.PrincipalType)
+                    ? null!
+                    : typeof(PersonAnnotated),
+                DependentType = propertyName == nameof(ApiRelationshipTypeAttribute.DependentType)
+                    ? null!
+                    : typeof(OrderStatusAnnotated)
             },
-            () => new ApiRelationshipTypeAttribute
+            var type when type == typeof(ApiManyToManyRelationshipAttribute) =>
+                new ApiManyToManyRelationshipAttribute
             {
                 ApiName = "Relationship",
-                PrincipalType = typeof(PersonAnnotated),
-                DependentType = null!
+                AssociationType =
+                    propertyName == nameof(ApiManyToManyRelationshipAttribute.AssociationType)
+                        ? null!
+                        : typeof(EmailValueAnnotated),
+                OtherPrincipalType =
+                    propertyName == nameof(ApiManyToManyRelationshipAttribute.OtherPrincipalType)
+                        ? null!
+                        : typeof(PersonAnnotated)
             },
-            () => new ApiManyToManyRelationshipAttribute
+            var type when type == typeof(ApiManyToManyRelationshipTypeAttribute) =>
+                new ApiManyToManyRelationshipTypeAttribute
             {
                 ApiName = "Relationship",
-                AssociationType = null!,
-                OtherPrincipalType = typeof(PersonAnnotated)
+                PrincipalTypeA =
+                    propertyName == nameof(ApiManyToManyRelationshipTypeAttribute.PrincipalTypeA)
+                        ? null!
+                        : typeof(PersonAnnotated),
+                PrincipalTypeB =
+                    propertyName == nameof(ApiManyToManyRelationshipTypeAttribute.PrincipalTypeB)
+                        ? null!
+                        : typeof(OrderStatusAnnotated),
+                AssociationType =
+                    propertyName == nameof(ApiManyToManyRelationshipTypeAttribute.AssociationType)
+                        ? null!
+                        : typeof(EmailValueAnnotated)
             },
-            () => new ApiManyToManyRelationshipAttribute
-            {
-                ApiName = "Relationship",
-                AssociationType = typeof(EmailValueAnnotated),
-                OtherPrincipalType = null!
-            },
-            () => new ApiManyToManyRelationshipTypeAttribute
-            {
-                ApiName = "Relationship",
-                PrincipalTypeA = null!,
-                PrincipalTypeB = typeof(OrderStatusAnnotated),
-                AssociationType = typeof(EmailValueAnnotated)
-            },
-            () => new ApiManyToManyRelationshipTypeAttribute
-            {
-                ApiName = "Relationship",
-                PrincipalTypeA = typeof(PersonAnnotated),
-                PrincipalTypeB = null!,
-                AssociationType = typeof(EmailValueAnnotated)
-            },
-            () => new ApiManyToManyRelationshipTypeAttribute
-            {
-                ApiName = "Relationship",
-                PrincipalTypeA = typeof(PersonAnnotated),
-                PrincipalTypeB = typeof(OrderStatusAnnotated),
-                AssociationType = null!
-            }
+            _ => throw new ArgumentException("Unknown annotation type.", nameof(annotationType))
         };
 
-        foreach (var action in actions)
-        {
-            action.Should().Throw<ArgumentNullException>();
-        }
+        return attribute;
     }
     #endregion
 }
