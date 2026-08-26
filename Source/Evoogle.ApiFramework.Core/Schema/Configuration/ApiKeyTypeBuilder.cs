@@ -77,6 +77,18 @@ public class ApiKeyTypeBuilder(string? apiName = null) : ExtensionBuilder<ApiKey
     /// <summary>Gets the API name currently configured on this key type builder.</summary>
     internal string? ApiName => _state.ApiName;
 
+    internal ApiConfigurationSource RegistrationSource => _state.RegistrationSource;
+
+    internal void SetRegistrationSource(ApiConfigurationSource source)
+    {
+        if (source > _state.RegistrationSource)
+        {
+            _state.RegistrationSource = source;
+        }
+    }
+
+    internal void ClearPaths() => _state.KeyPathBuilders.Clear();
+
     /// <summary>
     ///     Returns <c>true</c> when this key type already contains the specified CLR root type
     ///     and ordered CLR property path.

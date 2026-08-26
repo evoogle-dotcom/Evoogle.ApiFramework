@@ -36,6 +36,8 @@ public abstract class ApiNamedTypeBuilder<TBuilder>(Type clrType, ApiSchemaBuild
     ///     Gets the shared builder context.
     /// </summary>
     protected ApiSchemaBuilderContext Context { get; } = context ?? throw new ArgumentNullException(nameof(context));
+
+    internal ApiSchemaBuilderContext ConfigurationContext => this.Context;
     #endregion
 
     #region With Methods
@@ -54,14 +56,14 @@ public abstract class ApiNamedTypeBuilder<TBuilder>(Type clrType, ApiSchemaBuild
 
     #region Internal Convention/Annotation Methods
     /// <summary>
-    ///     Sets the API name at <see cref="ApiConfigurationSource.Convention"/> precedence.
+    ///     Sets the API name at convention precedence.
     ///     Has no effect if a higher-precedence value has already been applied.
     /// </summary>
     internal TBuilder SetApiNameConvention(string apiName)
         => this.SetApiName(apiName, ApiConfigurationSource.Convention);
 
     /// <summary>
-    ///     Sets the API name at <see cref="ApiConfigurationSource.DataAnnotation"/> precedence.
+    ///     Sets the API name at data-annotation precedence.
     ///     Has no effect if an explicit value has already been applied.
     /// </summary>
     internal TBuilder SetApiNameDataAnnotation(string apiName)

@@ -143,7 +143,7 @@ public class ApiEnumTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
 
     /// <summary>
     ///     Adds an enumeration value whose API name is inferred from its CLR name at
-    ///     <see cref="ApiConfigurationSource.Convention"/> precedence.
+    ///     convention precedence.
     /// </summary>
     internal ApiEnumTypeBuilder AddValueWithInferredName(string clrName, int clrOrdinal)
     {

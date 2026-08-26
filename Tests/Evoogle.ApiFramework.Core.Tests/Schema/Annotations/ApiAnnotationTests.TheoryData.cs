@@ -1881,7 +1881,7 @@ public partial class ApiAnnotationTests
         new BuildThrowsTest
         {
             Name = $"Build rejects a type-level {nameof(ApiKeyAttribute)} without {nameof(ApiKeyAttribute.ClrPath)}",
-            ExceptionTypeExpected = typeof(ApiSchemaConfigurationException),
+            ExceptionTypeExpected = typeof(ApiSchemaInitializationException),
             ExceptionMessagePatternExpected = "*ClrPath*type level*",
             ApiSchemaActualBuildExpression = static () =>
                 ApiAnnotationTestsFactory.BuildWithMissingTypeLevelKeyPathAnnotation()
@@ -1890,7 +1890,7 @@ public partial class ApiAnnotationTests
         new BuildThrowsTest
         {
             Name = $"Build rejects a malformed type-level {nameof(ApiKeyAttribute)} path",
-            ExceptionTypeExpected = typeof(ApiSchemaConfigurationException),
+            ExceptionTypeExpected = typeof(ApiSchemaInitializationException),
             ExceptionMessagePatternExpected = "*Nested..Id*",
             ApiSchemaActualBuildExpression = static () =>
                 ApiAnnotationTestsFactory.BuildWithMalformedTypeLevelKeyPathAnnotation()

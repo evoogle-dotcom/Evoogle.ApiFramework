@@ -6,6 +6,7 @@
 using System.Reflection;
 
 using Evoogle.ApiFramework.Exceptions;
+using Evoogle.ApiFramework.Schema.Configuration.Annotations;
 using Evoogle.ApiFramework.Schema.Configuration.Conventions;
 using Evoogle.ApiFramework.Schema.Configuration.Trace;
 using Evoogle.Reflection;
@@ -314,7 +315,7 @@ internal sealed class ApiSchemaConfigurationPipeline
                 (
                     $"The property annotation pipeline exceeded {_maxIterations} iterations. " +
                     "This usually indicates that an annotation reader is adding properties in " +
-                    "a cycle. Check IApiAnnotationReader implementations for unconditional " +
+                    "a cycle. Check annotation-reader capability implementations for unconditional " +
                     "property registrations."
                 );
             }

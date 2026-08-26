@@ -83,7 +83,7 @@ public class ApiPropertyBuilder : ExtensionBuilder<ApiPropertyBuilder>
 
     #region With Methods
     /// <summary>
-    ///     Configures type modifiers for the property at <see cref="ApiConfigurationSource.Explicit"/> precedence.
+    ///     Configures type modifiers for the property at explicit precedence.
     /// </summary>
     /// <param name="configure">Callback to configure type modifiers.</param>
     /// <returns>The current builder instance.</returns>
@@ -95,7 +95,7 @@ public class ApiPropertyBuilder : ExtensionBuilder<ApiPropertyBuilder>
     }
 
     /// <summary>
-    ///     Sets the API name for the property at <see cref="ApiConfigurationSource.Explicit"/> precedence.
+    ///     Sets the API name for the property at explicit precedence.
     /// </summary>
     /// <param name="apiName">The API name to use.</param>
     /// <returns>The current builder instance.</returns>
@@ -109,28 +109,28 @@ public class ApiPropertyBuilder : ExtensionBuilder<ApiPropertyBuilder>
 
     #region Internal Convention/Annotation Methods
     /// <summary>
-    ///     Sets the API name at <see cref="ApiConfigurationSource.Convention"/> precedence.
+    ///     Sets the API name at convention precedence.
     ///     Has no effect if a higher-precedence value has already been applied.
     /// </summary>
     internal ApiPropertyBuilder SetApiNameConvention(string apiName)
         => this.SetApiName(apiName, ApiConfigurationSource.Convention);
 
     /// <summary>
-    ///     Sets the API name at <see cref="ApiConfigurationSource.DataAnnotation"/> precedence.
+    ///     Sets the API name at data-annotation precedence.
     ///     Has no effect if an explicit value has already been applied.
     /// </summary>
     internal ApiPropertyBuilder SetApiNameDataAnnotation(string apiName)
         => this.SetApiName(apiName, ApiConfigurationSource.DataAnnotation);
 
     /// <summary>
-    ///     Sets the type modifier delegate at <see cref="ApiConfigurationSource.Convention"/> precedence.
+    ///     Sets the type modifier delegate at convention precedence.
     ///     Has no effect if a higher-precedence value has already been applied.
     /// </summary>
     internal ApiPropertyBuilder SetModifiersConvention(Action<ApiTypeModifiersBuilder> configure)
         => this.SetModifiers(configure, ApiConfigurationSource.Convention);
 
     /// <summary>
-    ///     Sets the type modifier delegate at <see cref="ApiConfigurationSource.DataAnnotation"/> precedence.
+    ///     Sets the type modifier delegate at data-annotation precedence.
     ///     Has no effect if an explicit value has already been applied.
     /// </summary>
     internal ApiPropertyBuilder SetModifiersDataAnnotation(Action<ApiTypeModifiersBuilder> configure)

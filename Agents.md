@@ -140,6 +140,20 @@ A C# symbol rename must use symbol-aware refactoring where available. Do not use
 
 Tests use xUnit v3 with `Evoogle.XUnit` helpers and FluentAssertions.
 
+### Mandatory Unit-Test Pattern
+
+Whenever creating or modifying unit tests:
+
+- Use `[Theory]`, never `[Fact]`.
+- Test classes must inherit from the repository's `XUnitTest` base class.
+- Implement the test through `XUnitTest`'s concrete Arrange, Act, and Assert overrides.
+- Use FluentAssertions for assertions.
+- Supply test inputs through the repository's established theory-data pattern.
+- Before writing a test, inspect at least two nearby tests and follow their structure.
+- Do not place Arrange, Act, or Assert logic directly in the `[Theory]` method unless an existing repository pattern explicitly requires it.
+
+`[Fact]` is prohibited for unit tests. If a test has only one case, express it as a `[Theory]` with one data row.
+
 Place tests under:
 
 ```text
@@ -218,6 +232,14 @@ Before completing the task:
 5. Run the relevant tests.
 6. Check the diff for unrelated formatting or renaming changes.
 7. Report any standard that could not be followed and explain why.
+
+For every new or changed test, also verify:
+
+1. The test class derives from `XUnitTest`.
+2. Every test method uses `[Theory]`.
+3. No `[Fact]` attributes were introduced.
+4. Arrange, Act, and Assert are implemented through the base-class overrides.
+5. Assertions use FluentAssertions.
 
 ## Public API Changes
 

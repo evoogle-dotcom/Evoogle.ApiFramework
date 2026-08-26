@@ -3,7 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-namespace Evoogle.ApiFramework.Schema.Configuration;
+namespace Evoogle.ApiFramework.Schema.Configuration.Annotations;
 
 /// <summary>
 ///     Fluent builder used to compose an <see cref="ApiAnnotationReaderSet"/>.
@@ -18,13 +18,31 @@ public sealed class ApiAnnotationReaderSetBuilder
     /// <summary>
     ///     Appends a reader to the end of the ordered reader list.
     ///     Readers run in registration order; later readers may override earlier ones
-    ///     at the same <see cref="Internal.ApiConfigurationSource.DataAnnotation"/> precedence level.
+    ///     at the same data-annotation precedence level.
     /// </summary>
     /// <param name="reader">The annotation reader to add.</param>
     /// <returns>The current builder instance.</returns>
     public ApiAnnotationReaderSetBuilder AddReader(IApiAnnotationReader reader)
     {
         ArgumentNullException.ThrowIfNull(reader);
+
+        if (reader is not
+            (
+                IApiTypeAnnotationReader or
+                IApiPropertyAnnotationReader or
+                IApiEnumValueAnnotationReader or
+                IApiKeyAnnotationReader or
+                IApiRelationshipAnnotationReader or
+                IApiTypeDiscoveryAnnotationReader
+            ))
+        {
+            throw new ArgumentException
+            (
+                "An annotation reader must implement at least one annotation-reader capability.",
+                nameof(reader)
+            );
+        }
+
         _readers.Add(reader);
         return this;
     }

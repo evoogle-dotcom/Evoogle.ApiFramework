@@ -88,14 +88,14 @@ public sealed class ApiEnumValueBuilder
     internal ApiConfigurationSource ApiNameSource => _state.ApiNameSource;
 
     /// <summary>
-    ///     Sets the API name at <see cref="ApiConfigurationSource.DataAnnotation"/> precedence.
+    ///     Sets the API name at data-annotation precedence.
     ///     Has no effect if an explicit value has already been applied.
     /// </summary>
     internal ApiEnumValueBuilder SetApiNameDataAnnotation(string apiName)
         => this.SetApiName(apiName, ApiConfigurationSource.DataAnnotation);
 
     /// <summary>
-    ///     Sets the API name at <see cref="ApiConfigurationSource.Convention"/> precedence.
+    ///     Sets the API name at convention precedence.
     ///     Has no effect if a higher-precedence value has already been applied.
     /// </summary>
     internal ApiEnumValueBuilder SetApiNameConvention(string apiName)

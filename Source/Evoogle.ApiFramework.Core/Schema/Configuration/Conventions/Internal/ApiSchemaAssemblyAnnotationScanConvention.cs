@@ -47,6 +47,8 @@ internal sealed class ApiSchemaAssemblyAnnotationScanConvention : IApiSchemaConv
     /// <inheritdoc />
     public void Apply(ApiSchemaBuilder builder)
     {
+        builder.ApplyAnnotationTypeDiscovery(_assembly, _filter);
+
         var clrTypes = _assembly.GetExportedTypes();
         foreach (var clrType in clrTypes)
         {

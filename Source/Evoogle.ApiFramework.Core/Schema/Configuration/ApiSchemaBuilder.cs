@@ -3,11 +3,13 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Schema.Configuration.Annotations;
 using Evoogle.ApiFramework.Schema.Configuration.Conventions;
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
 using Evoogle.ApiFramework.Schema.Configuration.Trace;
 using Evoogle.ApiFramework.Schema.Configuration.Trace.Internal;
 using Evoogle.Logging;
+
 using Microsoft.Extensions.Logging;
 
 namespace Evoogle.ApiFramework.Schema.Configuration;
@@ -26,6 +28,8 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     #region IHasLogger Properties
     /// <inheritdoc/>
     public ILogger Logger => _context.Logger;
+
+    internal ApiSchemaBuilderContext Context => _context;
     #endregion
 
     #region AddEnum Methods
@@ -443,14 +447,54 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
 
     /// <summary>
     ///     Registers <see cref="ApiAttributeAnnotationReader"/> as the annotation reader,
-    ///     enabling the framework's built-in attribute set (<see cref="Annotations.ApiObjectAttribute"/>,
-    ///     <see cref="Annotations.ApiPropertyAttribute"/>, <see cref="Annotations.ApiEnumValueAttribute"/>,
-    ///     <see cref="Annotations.ApiKeyAttribute"/>, etc.).
+    ///     enabling the framework's built-in attribute set
+    ///     (<see cref="Evoogle.ApiFramework.Schema.Annotations.ApiObjectAttribute"/>,
+    ///     <see cref="Evoogle.ApiFramework.Schema.Annotations.ApiPropertyAttribute"/>,
+    ///     <see cref="Evoogle.ApiFramework.Schema.Annotations.ApiEnumValueAttribute"/>,
+    ///     <see cref="Evoogle.ApiFramework.Schema.Annotations.ApiKeyAttribute"/>, etc.).
     /// </summary>
     /// <returns>The current builder instance.</returns>
     public ApiSchemaBuilder UseDefaultAnnotations()
     {
         return this.UseAnnotations(a => a.AddReader(new ApiAttributeAnnotationReader()));
+    }
+    #endregion
+
+    #region Internal Annotation Discovery Methods
+    internal void ApplyAnnotationTypeDiscovery
+    (
+        System.Reflection.Assembly assembly,
+        Func<Type, bool>? filter
+    )
+    {
+        var readerSet = _state.AnnotationReaderSet;
+        if (readerSet == null)
+        {
+            return;
+        }
+
+        _context.ApplyConfiguration
+        (
+            ApiConfigurationSource.DataAnnotation,
+            () =>
+            {
+                foreach (var result in readerSet.ReadTypeDiscoveryAnnotations(assembly, filter))
+                {
+                    switch (result.ApiKind)
+                    {
+                        case ApiTypeKind.Object:
+                            this.AddObject(result.ClrType);
+                            break;
+                        case ApiTypeKind.Scalar:
+                            this.AddScalar(result.ClrType);
+                            break;
+                        case ApiTypeKind.Enum:
+                            this.AddEnum(result.ClrType);
+                            break;
+                    }
+                }
+            }
+        );
     }
     #endregion
 
@@ -650,6 +694,15 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
 
             // Initialize the ApiSchema instance.
             var result = apiSchema.Initialize();
+            var annotationIssues = _state.AnnotationReaderSet?.Issues;
+            if (annotationIssues is { Count: > 0 })
+            {
+                result = new ApiInitializationResult
+                (
+                    (result.Issues ?? []).Concat(annotationIssues)
+                );
+            }
+
             result.ThrowIfInvalid();
 
             traceDispatcher?.Record

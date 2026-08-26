@@ -14,5 +14,7 @@ internal sealed class ApiKeyTypeState
     internal string? ApiName { get; set; }
 
     internal List<ApiKeyPathBuilder> KeyPathBuilders { get; } = [];
+
+    internal ApiConfigurationSource RegistrationSource { get; set; } = ApiConfigurationSource.Convention;
     #endregion
 }

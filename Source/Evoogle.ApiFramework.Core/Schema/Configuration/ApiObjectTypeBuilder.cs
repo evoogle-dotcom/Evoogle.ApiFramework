@@ -170,6 +170,20 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
 
     /// <summary>Gets an existing named key builder or creates its canonical closed-generic instance.</summary>
     protected ApiKeyTypeBuilder GetOrAddKeyTypeBuilder(string apiName)
+        => this.GetOrAddKeyTypeBuilderCore(apiName, this.Context.CurrentConfigurationSource);
+
+    internal ApiKeyTypeBuilder GetOrAddKeyTypeBuilderAtSource
+    (
+        string apiName,
+        ApiConfigurationSource source
+    )
+        => this.GetOrAddKeyTypeBuilderCore(apiName, source);
+
+    private ApiKeyTypeBuilder GetOrAddKeyTypeBuilderCore
+    (
+        string apiName,
+        ApiConfigurationSource registrationSource
+    )
     {
         var existing = _state.KeyTypeBuilders.FirstOrDefault(builder => builder.ApiName == apiName);
         if (existing != null)
@@ -183,15 +197,53 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
             this.ClrType,
             apiName
         );
+        builder.SetRegistrationSource(registrationSource);
         _state.KeyTypeBuilders.Add(builder);
         return builder;
+    }
+
+    internal bool HasExplicitKey(string apiKeyName)
+    {
+        return _state.KeyTypeBuilders.Any
+        (
+            builder => builder.ApiName == apiKeyName &&
+                builder.RegistrationSource == ApiConfigurationSource.Explicit
+        );
+    }
+
+    internal void ReplaceKeyFromDataAnnotation
+    (
+        string apiKeyName,
+        IEnumerable<(Type ClrRootType, IReadOnlyList<string> ClrPropertyNames)> paths
+    )
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiKeyName, nameof(apiKeyName));
+        ArgumentNullException.ThrowIfNull(paths);
+
+        var builder = this.GetOrAddKeyTypeBuilderAtSource
+        (
+            apiKeyName,
+            ApiConfigurationSource.DataAnnotation
+        );
+        if (builder.RegistrationSource > ApiConfigurationSource.DataAnnotation)
+        {
+            return;
+        }
+
+        builder.SetRegistrationSource(ApiConfigurationSource.DataAnnotation);
+        builder.ClearPaths();
+
+        foreach (var (clrRootType, clrPropertyNames) in paths)
+        {
+            builder.AddPath(clrRootType, clrPropertyNames);
+        }
     }
 
     /// <summary>
     ///     Finds an existing key type builder with the given API name and appends the specified path
     ///     to it, or creates a new key type builder with that path when no matching key exists.
     ///     Used by annotation readers to accumulate composite key paths from multiple
-    ///     <see cref="Annotations.ApiKeyAttribute"/> declarations.
+    ///     <see cref="Schema.Annotations.ApiKeyAttribute"/> declarations.
     /// </summary>
     internal void AddKeyOrAppendPath
     (
@@ -226,7 +278,7 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
 
     /// <summary>
     ///     Explicitly adds the CLR member while initializing its API name from the CLR name at
-    ///     <see cref="ApiConfigurationSource.Convention"/> precedence.
+    ///     convention precedence.
     /// </summary>
     /// <param name="clrName">
     ///     The CLR property or field name to add and use as the candidate API name.
@@ -253,7 +305,7 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     /// <summary>
     ///     Adds a property builder for the given CLR member name only when no existing builder
     ///     already targets that CLR name. The new builder is initialized at
-    ///     <see cref="ApiConfigurationSource.Convention"/> precedence; its API name defaults
+    ///     convention precedence; its API name defaults
     ///     to the CLR name and can be overridden by a later naming convention.
     /// </summary>
     /// <param name="clrName">The CLR property or field name to add.</param>
