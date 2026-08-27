@@ -225,10 +225,19 @@ public sealed class ApiAnnotationReaderArchitectureTests(ITestOutputHelper outpu
         #endregion
     }
 
+    private enum DiscoveryTestCase
+    {
+        CustomReader,
+        DefaultAttributeReader,
+        NoDiscoveryReader
+    }
+
     private sealed class DiscoveryTest : XUnitTest
     {
         #region User Supplied Properties
+        public required DiscoveryTestCase TestCase { get; init; }
         public required Type ClrTypeExpected { get; init; }
+        public required bool IsExpected { get; init; }
         #endregion
 
         #region Calculated Properties
@@ -239,18 +248,37 @@ public sealed class ApiAnnotationReaderArchitectureTests(ITestOutputHelper outpu
         #region XUnitTest Methods
         protected override void Arrange()
         {
-            this.ApiSchemaBuilder = new ApiSchemaBuilder()
+            var apiSchemaBuilder = new ApiSchemaBuilder()
                 .WithName("Test")
                 .AddScalar<int>()
-                .UsePropertyDiscovery()
-                .UseAnnotations(annotations => annotations.AddReader(new TypeDiscoveryReader()))
-                .UseAssemblyAnnotationScanning
+                .UsePropertyDiscovery();
+
+            switch (this.TestCase)
+            {
+                case DiscoveryTestCase.CustomReader:
+                    apiSchemaBuilder.UseAnnotations
+                    (
+                        annotations => annotations.AddReader(new TypeDiscoveryReader())
+                    );
+                    break;
+                case DiscoveryTestCase.DefaultAttributeReader:
+                    apiSchemaBuilder.UseDefaultAnnotations();
+                    break;
+                case DiscoveryTestCase.NoDiscoveryReader:
+                    break;
+                default:
+                    throw new InvalidOperationException($"Unknown test case: {this.TestCase}");
+            }
+
+            this.ApiSchemaBuilder = apiSchemaBuilder.UseAssemblyAnnotationScanning
                 (
                     typeof(ApiAnnotationReaderArchitectureTests).Assembly,
                     type => type == this.ClrTypeExpected
                 );
 
+            this.WriteLine($"TestCase: {this.TestCase}");
             this.WriteLine($"ClrTypeExpected: {this.ClrTypeExpected.Name}");
+            this.WriteLine($"IsExpected: {this.IsExpected}");
             this.WriteLine();
         }
 
@@ -264,8 +292,16 @@ public sealed class ApiAnnotationReaderArchitectureTests(ITestOutputHelper outpu
         protected override void Assert()
         {
             this.ApiSchemaActual.Should().NotBeNull();
-            this.ApiSchemaActual!.ApiObjectTypes.Select(type => type.ClrType)
-                .Should().Contain(this.ClrTypeExpected);
+
+            var apiObjectTypes = this.ApiSchemaActual!.ApiObjectTypes.Select(type => type.ClrType);
+            if (this.IsExpected)
+            {
+                apiObjectTypes.Should().Contain(this.ClrTypeExpected);
+            }
+            else
+            {
+                apiObjectTypes.Should().NotContain(this.ClrTypeExpected);
+            }
         }
         #endregion
     }
@@ -357,7 +393,23 @@ public sealed class ApiAnnotationReaderArchitectureTests(ITestOutputHelper outpu
         new DiscoveryTest
         {
             Name = "Custom discovery reader participates in assembly scanning",
-            ClrTypeExpected = typeof(DiscoveredAnnotationType)
+            TestCase = DiscoveryTestCase.CustomReader,
+            ClrTypeExpected = typeof(DiscoveredAnnotationType),
+            IsExpected = true
+        },
+        new DiscoveryTest
+        {
+            Name = "Default attribute reader participates in assembly scanning",
+            TestCase = DiscoveryTestCase.DefaultAttributeReader,
+            ClrTypeExpected = typeof(BuiltInDiscoveredAnnotationType),
+            IsExpected = true
+        },
+        new DiscoveryTest
+        {
+            Name = "Assembly scanning without a discovery reader ignores built-in attributes",
+            TestCase = DiscoveryTestCase.NoDiscoveryReader,
+            ClrTypeExpected = typeof(BuiltInDiscoveredAnnotationType),
+            IsExpected = false
         }
     ];
     #endregion
@@ -414,6 +466,12 @@ public sealed class ExplicitKeyOverrideType
 }
 
 public sealed class DiscoveredAnnotationType
+{
+    public int Id { get; set; }
+}
+
+[ApiObject]
+public sealed class BuiltInDiscoveredAnnotationType
 {
     public int Id { get; set; }
 }

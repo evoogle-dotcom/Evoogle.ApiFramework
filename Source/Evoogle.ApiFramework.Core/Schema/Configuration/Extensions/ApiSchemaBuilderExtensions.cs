@@ -178,6 +178,11 @@ public static class ApiSchemaBuilderExtensions
     /// <summary>
     ///     Adds the built-in convention that scans an assembly for annotated schema types.
     /// </summary>
+    /// <remarks>
+    ///     Built-in attributes are discovered when <see cref="ApiSchemaBuilder.UseDefaultAnnotations"/>
+    ///     is configured. Custom type-discovery readers can be registered through
+    ///     <see cref="ApiSchemaBuilder.UseAnnotations"/>.
+    /// </remarks>
     /// <param name="builder">The schema builder to configure.</param>
     /// <param name="assembly">The assembly to scan for annotated types.</param>
     /// <param name="filter">

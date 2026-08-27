@@ -15,6 +15,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Annotations;
 /// </summary>
 public sealed class ApiAttributeAnnotationReader :
     IApiTypeAnnotationReader,
+    IApiTypeDiscoveryAnnotationReader,
     IApiPropertyAnnotationReader,
     IApiEnumValueAnnotationReader,
     IApiKeyAnnotationReader,
@@ -40,6 +41,52 @@ public sealed class ApiAttributeAnnotationReader :
     {
         var attr = clrType.GetCustomAttribute<ApiEnumAttribute>(inherit: false);
         return attr?.ApiName == null ? [] : [new(attr.ApiName)];
+    }
+    #endregion
+
+    #region IApiTypeDiscoveryAnnotationReader Methods
+    /// <inheritdoc/>
+    public IReadOnlyList<ApiTypeDiscoveryAnnotationResult> ReadTypeDiscoveryAnnotations
+    (
+        Assembly assembly,
+        Func<Type, bool>? filter
+    )
+    {
+        ArgumentNullException.ThrowIfNull(assembly);
+
+        var results = new List<ApiTypeDiscoveryAnnotationResult>();
+        foreach (var clrType in assembly.GetExportedTypes())
+        {
+            if
+            (
+                clrType == null ||
+                clrType.IsAbstract ||
+                !clrType.IsClass && !clrType.IsValueType
+            )
+            {
+                continue;
+            }
+
+            if (filter != null && !filter(clrType))
+            {
+                continue;
+            }
+
+            if (clrType.IsDefined(typeof(ApiObjectAttribute), inherit: false))
+            {
+                results.Add(new(clrType, ApiTypeKind.Object));
+            }
+            else if (clrType.IsDefined(typeof(ApiScalarAttribute), inherit: false))
+            {
+                results.Add(new(clrType, ApiTypeKind.Scalar));
+            }
+            else if (clrType.IsEnum && clrType.IsDefined(typeof(ApiEnumAttribute), inherit: false))
+            {
+                results.Add(new(clrType, ApiTypeKind.Enum));
+            }
+        }
+
+        return results;
     }
     #endregion
 
@@ -69,9 +116,7 @@ public sealed class ApiAttributeAnnotationReader :
 
         var modifiers = attr.IsRequired
             ? ApiTypeModifiers.Required
-            : attr.IsOptional
-                ? ApiTypeModifiers.None
-                : (ApiTypeModifiers?)null;
+            : attr.IsOptional ? ApiTypeModifiers.None : (ApiTypeModifiers?)null;
 
         return [new(attr.ApiName, modifiers)];
     }

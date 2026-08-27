@@ -5,8 +5,6 @@
 // See the LICENSE file in the project root for more information.
 using System.Reflection;
 
-using Evoogle.ApiFramework.Schema.Annotations;
-
 namespace Evoogle.ApiFramework.Schema.Configuration.Conventions.Internal;
 
 /// <summary>
@@ -48,38 +46,6 @@ internal sealed class ApiSchemaAssemblyAnnotationScanConvention : IApiSchemaConv
     public void Apply(ApiSchemaBuilder builder)
     {
         builder.ApplyAnnotationTypeDiscovery(_assembly, _filter);
-
-        var clrTypes = _assembly.GetExportedTypes();
-        foreach (var clrType in clrTypes)
-        {
-            if (clrType == null)
-            {
-                continue;
-            }
-
-            if (clrType.IsAbstract || !clrType.IsClass && !clrType.IsValueType)
-            {
-                continue;
-            }
-
-            if (_filter != null && !_filter(clrType))
-            {
-                continue;
-            }
-
-            if (clrType.IsDefined(typeof(ApiObjectAttribute), inherit: false))
-            {
-                builder.AddObject(clrType);
-            }
-            else if (clrType.IsDefined(typeof(ApiScalarAttribute), inherit: false))
-            {
-                builder.AddScalar(clrType);
-            }
-            else if (clrType.IsEnum && clrType.IsDefined(typeof(ApiEnumAttribute), inherit: false))
-            {
-                builder.AddEnum(clrType);
-            }
-        }
     }
     #endregion
 }
