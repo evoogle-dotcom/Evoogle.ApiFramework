@@ -46,7 +46,7 @@ public sealed class ApiAttributeAnnotationReader :
 
     #region IApiTypeDiscoveryAnnotationReader Methods
     /// <inheritdoc/>
-    public IReadOnlyList<ApiTypeDiscoveryAnnotationResult> ReadTypeDiscoveryAnnotations
+    public ApiAnnotationReaderResult<ApiTypeDiscoveryAnnotationResult> ReadTypeDiscoveryAnnotations
     (
         Assembly assembly,
         Func<Type, bool>? filter
@@ -54,7 +54,8 @@ public sealed class ApiAttributeAnnotationReader :
     {
         ArgumentNullException.ThrowIfNull(assembly);
 
-        var results = new List<ApiTypeDiscoveryAnnotationResult>();
+        var contributions = new List<ApiTypeDiscoveryAnnotationResult>();
+        var diagnostics = new List<ApiAnnotationReaderDiagnostic>();
         foreach (var clrType in assembly.GetExportedTypes())
         {
             if
@@ -72,21 +73,38 @@ public sealed class ApiAttributeAnnotationReader :
                 continue;
             }
 
-            if (clrType.IsDefined(typeof(ApiObjectAttribute), inherit: false))
+            var hasObjectAttribute = clrType.IsDefined(typeof(ApiObjectAttribute), inherit: false);
+            var hasScalarAttribute = clrType.IsDefined(typeof(ApiScalarAttribute), inherit: false);
+            if (hasObjectAttribute && hasScalarAttribute)
             {
-                results.Add(new(clrType, ApiTypeKind.Object));
+                diagnostics.Add
+                (
+                    new
+                    (
+                        ApiInitializationCode.ApiAnnotationTypeMarkerConflict,
+                        clrType.FullName ?? clrType.Name,
+                        "A CLR type cannot be marked as both an API object and an API scalar.",
+                        "Remove either the API object marker or the API scalar marker."
+                    )
+                );
+                continue;
             }
-            else if (clrType.IsDefined(typeof(ApiScalarAttribute), inherit: false))
+
+            if (hasObjectAttribute)
             {
-                results.Add(new(clrType, ApiTypeKind.Scalar));
+                contributions.Add(new(clrType, ApiTypeKind.Object));
+            }
+            else if (hasScalarAttribute)
+            {
+                contributions.Add(new(clrType, ApiTypeKind.Scalar));
             }
             else if (clrType.IsEnum && clrType.IsDefined(typeof(ApiEnumAttribute), inherit: false))
             {
-                results.Add(new(clrType, ApiTypeKind.Enum));
+                contributions.Add(new(clrType, ApiTypeKind.Enum));
             }
         }
 
-        return results;
+        return new(contributions, diagnostics);
     }
     #endregion
 

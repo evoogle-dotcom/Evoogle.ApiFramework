@@ -3,6 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Schema.Annotations;
 using Evoogle.ApiFramework.Schema.Configuration.Annotations;
 using Evoogle.ApiFramework.Schema.Configuration.Conventions;
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
@@ -431,7 +432,9 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
 
     #region UseAnnotations Methods
     /// <summary>
-    ///     Configures the annotation reader pipeline using a fluent <see cref="ApiAnnotationReaderSetBuilder"/>.
+    ///     Adds readers to the annotation reader pipeline using a fluent
+    ///     <see cref="ApiAnnotationReaderSetBuilder"/>. Repeated calls preserve existing readers,
+    ///     append new readers in registration order, and preserve duplicate registrations.
     /// </summary>
     /// <param name="configure">Callback to configure the annotation reader set builder.</param>
     /// <returns>The current builder instance.</returns>
@@ -439,19 +442,21 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     {
         ArgumentNullException.ThrowIfNull(configure);
 
-        var setBuilder = new ApiAnnotationReaderSetBuilder();
+        var setBuilder = _state.AnnotationReaderSet is { } readerSet
+            ? new ApiAnnotationReaderSetBuilder(readerSet.Readers)
+            : new ApiAnnotationReaderSetBuilder();
         configure(setBuilder);
         _state.AnnotationReaderSet = setBuilder.Build();
         return this;
     }
 
     /// <summary>
-    ///     Registers <see cref="ApiAttributeAnnotationReader"/> as the annotation reader,
+    ///     Adds <see cref="ApiAttributeAnnotationReader"/> to the annotation reader pipeline,
     ///     enabling the framework's built-in attribute set
-    ///     (<see cref="Evoogle.ApiFramework.Schema.Annotations.ApiObjectAttribute"/>,
-    ///     <see cref="Evoogle.ApiFramework.Schema.Annotations.ApiPropertyAttribute"/>,
-    ///     <see cref="Evoogle.ApiFramework.Schema.Annotations.ApiEnumValueAttribute"/>,
-    ///     <see cref="Evoogle.ApiFramework.Schema.Annotations.ApiKeyAttribute"/>, etc.).
+    ///     (<see cref="ApiObjectAttribute"/>,
+    ///     <see cref="ApiPropertyAttribute"/>,
+    ///     <see cref="ApiEnumValueAttribute"/>,
+    ///     <see cref="ApiKeyAttribute"/>, etc.).
     /// </summary>
     /// <returns>The current builder instance.</returns>
     public ApiSchemaBuilder UseDefaultAnnotations()

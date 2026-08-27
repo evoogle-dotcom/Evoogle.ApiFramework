@@ -314,12 +314,12 @@ public static class ApiAnnotationTestsFactory
             },
             nameof(ApiManyToManyRelationshipDefinitionAttribute) =>
                 new ApiManyToManyRelationshipDefinitionAttribute
-            {
-                ApiName = apiName!,
-                PrincipalTypeA = typeof(PersonAnnotated),
-                PrincipalTypeB = typeof(OrderStatusAnnotated),
-                AssociationType = typeof(EmailValueAnnotated)
-            },
+                {
+                    ApiName = apiName!,
+                    PrincipalTypeA = typeof(PersonAnnotated),
+                    PrincipalTypeB = typeof(OrderStatusAnnotated),
+                    AssociationType = typeof(EmailValueAnnotated)
+                },
             _ => throw new ArgumentException("Unknown annotation type.", nameof(annotationType))
         };
         _ = attribute;

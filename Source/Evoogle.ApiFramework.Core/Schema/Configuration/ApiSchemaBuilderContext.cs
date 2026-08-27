@@ -1,11 +1,10 @@
 ﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 using Evoogle.ApiFramework.Exceptions;
-using Evoogle.ApiFramework.Schema.Configuration.Trace.Internal;
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
 using Evoogle.ApiFramework.Schema.Configuration.Trace;
+using Evoogle.ApiFramework.Schema.Configuration.Trace.Internal;
 using Evoogle.Logging;
-
 using Microsoft.Extensions.Logging;
 
 namespace Evoogle.ApiFramework.Schema.Configuration;

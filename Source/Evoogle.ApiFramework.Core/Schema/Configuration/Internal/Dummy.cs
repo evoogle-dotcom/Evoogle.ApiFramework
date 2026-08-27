@@ -6,7 +6,7 @@
 using Evoogle.ApiFramework.Schema.Annotations;
 using Evoogle.ApiFramework.Schema.Configuration.Conventions;
 
-namespace Evoogle.ApiFramework.Schema.Configuration;
+namespace Evoogle.ApiFramework.Schema.Configuration.Internal;
 
 /// <summary>
 ///     Provides sample domain types and schema configurations used by internal examples and tests.

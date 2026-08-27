@@ -14,8 +14,8 @@ public interface IApiTypeDiscoveryAnnotationReader : IApiAnnotationReader
     /// <summary>Reads type-discovery contributions from an assembly.</summary>
     /// <param name="assembly">The assembly currently being scanned.</param>
     /// <param name="filter">The optional caller-supplied type filter.</param>
-    /// <returns>The declarative type-discovery results.</returns>
-    IReadOnlyList<ApiTypeDiscoveryAnnotationResult> ReadTypeDiscoveryAnnotations
+    /// <returns>The type-discovery contributions and any reader-emitted diagnostics.</returns>
+    ApiAnnotationReaderResult<ApiTypeDiscoveryAnnotationResult> ReadTypeDiscoveryAnnotations
     (
         Assembly assembly,
         Func<Type, bool>? filter

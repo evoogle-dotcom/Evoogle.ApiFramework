@@ -15,13 +15,21 @@ namespace Evoogle.ApiFramework.Schema;
 /// <param name="code">The specific error or warning code identifying the issue.</param>
 /// <param name="description">A human-readable description of the issue.</param>
 /// <param name="remediation">Optional guidance on how to resolve the issue.</param>
+/// <param name="readerType">
+///     The annotation reader type that produced the issue, if applicable.
+/// </param>
+/// <param name="exception">
+///     The exception associated with the issue, if applicable.
+/// </param>
 public sealed class ApiInitializationIssue
 (
     string apiPath,
     ApiInitializationSeverity severity,
     ApiInitializationCode code,
     string description,
-    string? remediation
+    string? remediation,
+    Type? readerType = null,
+    Exception? exception = null
 )
 {
     #region ApiInitializationIssue Properties
@@ -49,6 +57,16 @@ public sealed class ApiInitializationIssue
     ///     Gets optional guidance on how to resolve the issue.
     /// </summary>
     public string? Remediation { get; } = remediation;
+
+    /// <summary>
+    ///     Gets the annotation reader type that produced the issue, if applicable.
+    /// </summary>
+    public Type? ReaderType { get; } = readerType;
+
+    /// <summary>
+    ///     Gets the exception associated with the issue, if applicable.
+    /// </summary>
+    public Exception? Exception { get; } = exception;
     #endregion
 
     #region Object Methods

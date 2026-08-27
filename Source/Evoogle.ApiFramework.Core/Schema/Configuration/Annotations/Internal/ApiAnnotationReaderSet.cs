@@ -8,10 +8,10 @@ using System.Reflection;
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
 using Evoogle.Reflection;
 
-namespace Evoogle.ApiFramework.Schema.Configuration.Annotations;
+namespace Evoogle.ApiFramework.Schema.Configuration.Annotations.Internal;
 
 /// <summary>Holds the ordered annotation readers and centrally applies their results.</summary>
-public sealed class ApiAnnotationReaderSet
+internal sealed class ApiAnnotationReaderSet
 {
     #region Fields
     private readonly IReadOnlyList<IApiAnnotationReader> _readers;
@@ -26,6 +26,8 @@ public sealed class ApiAnnotationReaderSet
     #endregion
 
     #region Properties
+    internal IReadOnlyList<IApiAnnotationReader> Readers => _readers;
+
     internal IReadOnlyList<ApiInitializationIssue> Issues => _issues;
     #endregion
 
@@ -42,6 +44,7 @@ public sealed class ApiAnnotationReaderSet
                 (
                     builder,
                     clrType,
+                    typeReader,
                     typeReader.ReadObjectTypeAnnotations,
                     "object type"
                 );
@@ -63,6 +66,7 @@ public sealed class ApiAnnotationReaderSet
                 (
                     builder,
                     clrType,
+                    typeReader,
                     typeReader.ReadScalarTypeAnnotations,
                     "scalar type"
                 );
@@ -82,6 +86,7 @@ public sealed class ApiAnnotationReaderSet
                 (
                     builder,
                     clrType,
+                    typeReader,
                     typeReader.ReadEnumTypeAnnotations,
                     "enum type"
                 );
@@ -115,7 +120,13 @@ public sealed class ApiAnnotationReaderSet
             }
             catch (Exception exception)
             {
-                this.AddReaderIssue(enumTypeBuilder.ClrType, enumValueBuilder.ClrName, exception);
+                this.AddReaderIssue
+                (
+                    enumValueReader,
+                    enumTypeBuilder.ClrType,
+                    enumValueBuilder.ClrName,
+                    exception
+                );
                 continue;
             }
 
@@ -123,6 +134,7 @@ public sealed class ApiAnnotationReaderSet
             {
                 this.AddInvalidContributionIssue
                 (
+                    enumValueReader,
                     enumTypeBuilder.ClrType,
                     enumValueBuilder.ClrName,
                     "An enum-value annotation reader returned null instead of a result list."
@@ -136,6 +148,7 @@ public sealed class ApiAnnotationReaderSet
                 {
                     this.AddInvalidContributionIssue
                     (
+                        enumValueReader,
                         enumTypeBuilder.ClrType,
                         enumValueBuilder.ClrName,
                         "An enum-value annotation reader returned a null result."
@@ -160,6 +173,7 @@ public sealed class ApiAnnotationReaderSet
                 {
                     this.AddInvalidContributionIssue
                     (
+                        enumValueReader,
                         enumTypeBuilder.ClrType,
                         enumValueBuilder.ClrName,
                         exception.Message
@@ -222,7 +236,7 @@ public sealed class ApiAnnotationReaderSet
             }
             catch (Exception exception)
             {
-                this.AddReaderIssue(clrType, clrName, exception);
+                this.AddReaderIssue(propertyReader, clrType, clrName, exception);
                 continue;
             }
 
@@ -230,6 +244,7 @@ public sealed class ApiAnnotationReaderSet
             {
                 this.AddInvalidContributionIssue
                 (
+                    propertyReader,
                     clrType,
                     clrName,
                     "A property annotation reader returned null instead of a result list."
@@ -243,6 +258,7 @@ public sealed class ApiAnnotationReaderSet
                 {
                     this.AddInvalidContributionIssue
                     (
+                        propertyReader,
                         clrType,
                         clrName,
                         "A property annotation reader returned a null result."
@@ -285,7 +301,13 @@ public sealed class ApiAnnotationReaderSet
                 }
                 catch (Exception exception)
                 {
-                    this.AddInvalidContributionIssue(clrType, clrName, exception.Message);
+                    this.AddInvalidContributionIssue
+                    (
+                        propertyReader,
+                        clrType,
+                        clrName,
+                        exception.Message
+                    );
                 }
             }
         }
@@ -328,23 +350,46 @@ public sealed class ApiAnnotationReaderSet
                 continue;
             }
 
-            IReadOnlyList<ApiTypeDiscoveryAnnotationResult>? readerResults;
+            ApiAnnotationReaderResult<ApiTypeDiscoveryAnnotationResult>? readerResult;
             try
             {
-                readerResults = discoveryReader.ReadTypeDiscoveryAnnotations(assembly, filter);
+                readerResult = discoveryReader.ReadTypeDiscoveryAnnotations(assembly, filter);
             }
             catch (Exception exception)
             {
-                this.AddReaderIssue(assembly.GetName().Name ?? assembly.FullName ?? assembly.ToString(), exception);
+                this.AddReaderIssue
+                (
+                    discoveryReader,
+                    assembly.GetName().Name ?? assembly.FullName ?? assembly.ToString(),
+                    exception
+                );
                 continue;
             }
 
+            var assemblyApiPath = assembly.GetName().Name ??
+                assembly.FullName ??
+                assembly.ToString();
+            if (readerResult == null)
+            {
+                this.AddInvalidContributionIssue
+                (
+                    discoveryReader,
+                    assemblyApiPath,
+                    "A type-discovery annotation reader returned null instead of a result list."
+                );
+                continue;
+            }
+
+            this.ApplyReaderDiagnostics(discoveryReader, assemblyApiPath, readerResult.Diagnostics);
+
+            var readerResults = readerResult.Contributions;
             if (readerResults == null)
             {
                 this.AddInvalidContributionIssue
                 (
-                    assembly.GetName().Name ?? assembly.FullName ?? assembly.ToString(),
-                    "A type-discovery annotation reader returned null instead of a result list."
+                    discoveryReader,
+                    assemblyApiPath,
+                    "A type-discovery annotation reader returned null contributions."
                 );
                 continue;
             }
@@ -355,17 +400,30 @@ public sealed class ApiAnnotationReaderSet
                 {
                     this.AddInvalidContributionIssue
                     (
-                        assembly.GetName().Name ?? assembly.FullName ?? assembly.ToString(),
+                        discoveryReader,
+                        assemblyApiPath,
                         "A type-discovery annotation reader returned a null result."
                     );
                     continue;
                 }
 
                 var resultType = result.ClrType;
+                if (resultType == null)
+                {
+                    this.AddInvalidContributionIssue
+                    (
+                        discoveryReader,
+                        assemblyApiPath,
+                        "A type-discovery contribution returned a null CLR type."
+                    );
+                    continue;
+                }
+
                 if (!eligibleTypes.Contains(resultType))
                 {
                     this.AddInvalidContributionIssue
                     (
+                        discoveryReader,
                         resultType.FullName ?? assembly.FullName ?? assembly.ToString(),
                         "A type-discovery contribution did not satisfy the assembly scan eligibility rules."
                     );
@@ -376,6 +434,7 @@ public sealed class ApiAnnotationReaderSet
                 {
                     this.AddInvalidContributionIssue
                     (
+                        discoveryReader,
                         resultType.FullName ?? resultType.Name,
                         $"The API type kind '{result.ApiKind}' cannot be discovered from a CLR type."
                     );
@@ -394,7 +453,11 @@ public sealed class ApiAnnotationReaderSet
     #region Key Methods
     private void ApplyKeyAnnotations(ApiObjectTypeBuilder builder)
     {
-        var contributions = new Dictionary<string, (int ReaderIndex, List<ApiKeyAnnotationResult> Results)>();
+        var contributions = new Dictionary
+        <
+            string,
+            (int ReaderIndex, IApiAnnotationReader Reader, List<ApiKeyAnnotationResult> Results)
+        >();
         var readerIndex = 0;
 
         foreach (var reader in _readers)
@@ -412,7 +475,7 @@ public sealed class ApiAnnotationReaderSet
             }
             catch (Exception exception)
             {
-                this.AddReaderIssue(builder.ClrType, exception);
+                this.AddReaderIssue(keyReader, builder.ClrType, exception);
                 readerIndex++;
                 continue;
             }
@@ -421,6 +484,7 @@ public sealed class ApiAnnotationReaderSet
             {
                 this.AddInvalidContributionIssue
                 (
+                    keyReader,
                     builder.ClrType,
                     "A key annotation reader returned null instead of a result list."
                 );
@@ -430,12 +494,13 @@ public sealed class ApiAnnotationReaderSet
 
             foreach (var result in results)
             {
-                if (result == null || !this.IsValidKeyResult(builder.ClrType, result))
+                if (result == null || !this.IsValidKeyResult(keyReader, builder.ClrType, result))
                 {
                     if (result == null)
                     {
                         this.AddInvalidContributionIssue
                         (
+                            keyReader,
                             builder.ClrType,
                             "A key annotation reader returned a null result."
                         );
@@ -447,7 +512,7 @@ public sealed class ApiAnnotationReaderSet
                 if (!contributions.TryGetValue(result.ApiName, out var existing) ||
                     existing.ReaderIndex != readerIndex)
                 {
-                    existing = (readerIndex, []);
+                    existing = (readerIndex, keyReader, []);
                     contributions[result.ApiName] = existing;
                 }
 
@@ -482,6 +547,7 @@ public sealed class ApiAnnotationReaderSet
             {
                 this.AddInvalidContributionIssue
                 (
+                    contribution.Reader,
                     builder.ClrType,
                     $"Key:{apiName}",
                     $"Multiple annotation key paths use order {duplicateOrder.Key}. Key path orders must be unique.",
@@ -506,6 +572,7 @@ public sealed class ApiAnnotationReaderSet
     (
         TBuilder builder,
         Type clrType,
+        IApiAnnotationReader reader,
         Func<Type, IReadOnlyList<ApiTypeAnnotationResult>> read,
         string targetKind
     )
@@ -518,7 +585,7 @@ public sealed class ApiAnnotationReaderSet
         }
         catch (Exception exception)
         {
-            this.AddReaderIssue(clrType, exception);
+            this.AddReaderIssue(reader, clrType, exception);
             return;
         }
 
@@ -526,6 +593,7 @@ public sealed class ApiAnnotationReaderSet
         {
             this.AddInvalidContributionIssue
             (
+                reader,
                 clrType,
                 $"A {targetKind} annotation reader returned null instead of a result list."
             );
@@ -538,6 +606,7 @@ public sealed class ApiAnnotationReaderSet
             {
                 this.AddInvalidContributionIssue
                 (
+                    reader,
                     clrType,
                     $"A {targetKind} annotation reader returned a null result."
                 );
@@ -559,12 +628,17 @@ public sealed class ApiAnnotationReaderSet
             }
             catch (Exception exception)
             {
-                this.AddInvalidContributionIssue(clrType, exception.Message);
+                this.AddInvalidContributionIssue(reader, clrType, exception.Message);
             }
         }
     }
 
-    private bool IsValidKeyResult(Type clrType, ApiKeyAnnotationResult result)
+    private bool IsValidKeyResult
+    (
+        IApiAnnotationReader reader,
+        Type clrType,
+        ApiKeyAnnotationResult result
+    )
     {
         if (string.IsNullOrWhiteSpace(result.ApiName) ||
             result.ClrRootType == null ||
@@ -574,6 +648,7 @@ public sealed class ApiAnnotationReaderSet
         {
             this.AddInvalidContributionIssue
             (
+                reader,
                 clrType,
                 $"Key:{result.ApiName}",
                 "A key annotation contribution must provide a name, CLR root type, and non-empty member path."
@@ -601,13 +676,18 @@ public sealed class ApiAnnotationReaderSet
         }
         catch (Exception exception)
         {
-            this.AddReaderIssue(clrType, exception);
+            this.AddReaderIssue(reader, clrType, exception);
             return;
         }
 
         if (results == null)
         {
-            this.AddInvalidContributionIssue(clrType, "A one-to-many reader returned null instead of a result list.");
+            this.AddInvalidContributionIssue
+            (
+                reader,
+                clrType,
+                "A one-to-many reader returned null instead of a result list."
+            );
             return;
         }
 
@@ -643,7 +723,7 @@ public sealed class ApiAnnotationReaderSet
             }
             catch (Exception exception)
             {
-                this.AddInvalidContributionIssue(clrType, exception.Message);
+                this.AddInvalidContributionIssue(reader, clrType, exception.Message);
             }
         }
     }
@@ -662,13 +742,18 @@ public sealed class ApiAnnotationReaderSet
         }
         catch (Exception exception)
         {
-            this.AddReaderIssue(clrType, exception);
+            this.AddReaderIssue(reader, clrType, exception);
             return;
         }
 
         if (results == null)
         {
-            this.AddInvalidContributionIssue(clrType, "A one-to-one reader returned null instead of a result list.");
+            this.AddInvalidContributionIssue
+            (
+                reader,
+                clrType,
+                "A one-to-one reader returned null instead of a result list."
+            );
             return;
         }
 
@@ -704,7 +789,7 @@ public sealed class ApiAnnotationReaderSet
             }
             catch (Exception exception)
             {
-                this.AddInvalidContributionIssue(clrType, exception.Message);
+                this.AddInvalidContributionIssue(reader, clrType, exception.Message);
             }
         }
     }
@@ -723,13 +808,18 @@ public sealed class ApiAnnotationReaderSet
         }
         catch (Exception exception)
         {
-            this.AddReaderIssue(clrType, exception);
+            this.AddReaderIssue(reader, clrType, exception);
             return;
         }
 
         if (results == null)
         {
-            this.AddInvalidContributionIssue(clrType, "A many-to-many reader returned null instead of a result list.");
+            this.AddInvalidContributionIssue
+            (
+                reader,
+                clrType,
+                "A many-to-many reader returned null instead of a result list."
+            );
             return;
         }
 
@@ -781,7 +871,7 @@ public sealed class ApiAnnotationReaderSet
             }
             catch (Exception exception)
             {
-                this.AddInvalidContributionIssue(clrType, exception.Message);
+                this.AddInvalidContributionIssue(reader, clrType, exception.Message);
             }
         }
     }
@@ -789,17 +879,83 @@ public sealed class ApiAnnotationReaderSet
     #endregion
 
     #region Issue Methods
-    private void AddReaderIssue(Type clrType, Exception exception)
-        => this.AddReaderIssue(clrType.FullName ?? clrType.Name, exception);
+    private void ApplyReaderDiagnostics
+    (
+        IApiAnnotationReader reader,
+        string defaultApiPath,
+        IReadOnlyList<ApiAnnotationReaderDiagnostic>? diagnostics
+    )
+    {
+        if (diagnostics == null)
+        {
+            this.AddInvalidContributionIssue
+            (
+                reader,
+                defaultApiPath,
+                "An annotation reader returned null diagnostics."
+            );
+            return;
+        }
 
-    private void AddReaderIssue(Type clrType, string memberName, Exception exception)
+        foreach (var diagnostic in diagnostics)
+        {
+            if (diagnostic == null)
+            {
+                this.AddInvalidContributionIssue
+                (
+                    reader,
+                    defaultApiPath,
+                    "An annotation reader returned a null diagnostic."
+                );
+                continue;
+            }
+
+            if (string.IsNullOrWhiteSpace(diagnostic.ApiPath) ||
+                string.IsNullOrWhiteSpace(diagnostic.Description))
+            {
+                this.AddInvalidContributionIssue
+                (
+                    reader,
+                    defaultApiPath,
+                    "An annotation reader returned a diagnostic without a path or description."
+                );
+                continue;
+            }
+
+            _issues.Add
+            (
+                new ApiInitializationIssue
+                (
+                    diagnostic.ApiPath,
+                    ApiInitializationSeverity.Error,
+                    diagnostic.Code,
+                    diagnostic.Description,
+                    diagnostic.Remediation,
+                    reader.GetType(),
+                    diagnostic.Exception
+                )
+            );
+        }
+    }
+
+    private void AddReaderIssue(IApiAnnotationReader reader, Type clrType, Exception exception)
+        => this.AddReaderIssue(reader, clrType.FullName ?? clrType.Name, exception);
+
+    private void AddReaderIssue
+    (
+        IApiAnnotationReader reader,
+        Type clrType,
+        string memberName,
+        Exception exception
+    )
         => this.AddReaderIssue
         (
+            reader,
             $"{clrType.FullName ?? clrType.Name}.{memberName}",
             exception
         );
 
-    private void AddReaderIssue(string apiPath, Exception exception)
+    private void AddReaderIssue(IApiAnnotationReader reader, string apiPath, Exception exception)
     {
         _issues.Add
         (
@@ -809,22 +965,37 @@ public sealed class ApiAnnotationReaderSet
                 ApiInitializationSeverity.Error,
                 ApiInitializationCode.ApiAnnotationReaderExecutionFailed,
                 exception.Message,
-                "Correct the annotation reader implementation or its input metadata."
+                "Correct the annotation reader implementation or its input metadata.",
+                reader.GetType(),
+                exception
             )
         );
     }
 
-    private void AddInvalidContributionIssue(Type clrType, string description)
+    private void AddInvalidContributionIssue
+    (
+        IApiAnnotationReader reader,
+        Type clrType,
+        string description
+    )
         => this.AddInvalidContributionIssue
         (
+            reader,
             clrType.FullName ?? clrType.Name,
             description,
             ApiInitializationCode.ApiAnnotationInvalidContribution
         );
 
-    private void AddInvalidContributionIssue(Type clrType, string memberName, string description)
+    private void AddInvalidContributionIssue
+    (
+        IApiAnnotationReader reader,
+        Type clrType,
+        string memberName,
+        string description
+    )
         => this.AddInvalidContributionIssue
         (
+            reader,
             $"{clrType.FullName ?? clrType.Name}.{memberName}",
             description,
             ApiInitializationCode.ApiAnnotationInvalidContribution
@@ -832,6 +1003,7 @@ public sealed class ApiAnnotationReaderSet
 
     private void AddInvalidContributionIssue
     (
+        IApiAnnotationReader reader,
         Type clrType,
         string memberName,
         string description,
@@ -839,6 +1011,7 @@ public sealed class ApiAnnotationReaderSet
     )
         => this.AddInvalidContributionIssue
         (
+            reader,
             $"{clrType.FullName ?? clrType.Name}.{memberName}",
             description,
             code
@@ -846,6 +1019,7 @@ public sealed class ApiAnnotationReaderSet
 
     private void AddInvalidContributionIssue
     (
+        IApiAnnotationReader reader,
         string apiPath,
         string description,
         ApiInitializationCode code = ApiInitializationCode.ApiAnnotationInvalidContribution
@@ -859,7 +1033,8 @@ public sealed class ApiAnnotationReaderSet
                 ApiInitializationSeverity.Error,
                 code,
                 description,
-                "Return a valid declarative annotation result for the supplied target."
+                "Return a valid declarative annotation result for the supplied target.",
+                reader.GetType()
             )
         );
     }

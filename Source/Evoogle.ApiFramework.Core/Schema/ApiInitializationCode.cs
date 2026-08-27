@@ -451,6 +451,12 @@ public enum ApiInitializationCode
     ApiAnnotationInvalidContribution,
 
     /// <summary>
+    ///     A CLR type has conflicting built-in API type marker annotations.
+    /// </summary>
+    [EnumMember(Value = "API_ANNOTATION_TYPE_MARKER_CONFLICT")]
+    ApiAnnotationTypeMarkerConflict,
+
+    /// <summary>
     ///     Multiple annotation key paths use the same order within one named key type.
     /// </summary>
     [EnumMember(Value = "API_ANNOTATION_KEY_ORDER_CONFLICT")]

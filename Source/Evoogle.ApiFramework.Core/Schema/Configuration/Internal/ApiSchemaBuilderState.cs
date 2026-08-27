@@ -3,8 +3,8 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Schema.Configuration.Annotations.Internal;
 using Evoogle.ApiFramework.Schema.Configuration.Conventions;
-using Evoogle.ApiFramework.Schema.Configuration.Annotations;
 
 namespace Evoogle.ApiFramework.Schema.Configuration.Internal;
 

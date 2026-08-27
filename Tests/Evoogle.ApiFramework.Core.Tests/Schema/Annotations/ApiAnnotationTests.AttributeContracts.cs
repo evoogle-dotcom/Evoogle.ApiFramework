@@ -914,27 +914,27 @@ public partial class ApiAnnotationTests
             },
             var type when type == typeof(ApiRelationshipDefinitionAttribute) =>
                 new ApiRelationshipDefinitionAttribute
-            {
-                ApiName = apiName!,
-                PrincipalType = typeof(PersonAnnotated),
-                Kind = ApiRelationshipKind.OneToMany,
-                DependentType = typeof(OrderStatusAnnotated)
-            },
+                {
+                    ApiName = apiName!,
+                    PrincipalType = typeof(PersonAnnotated),
+                    Kind = ApiRelationshipKind.OneToMany,
+                    DependentType = typeof(OrderStatusAnnotated)
+                },
             var type when type == typeof(ApiManyToManyRelationshipAttribute) =>
                 new ApiManyToManyRelationshipAttribute
-            {
-                ApiName = apiName!,
-                AssociationType = typeof(EmailValueAnnotated),
-                OtherPrincipalType = typeof(PersonAnnotated)
-            },
+                {
+                    ApiName = apiName!,
+                    AssociationType = typeof(EmailValueAnnotated),
+                    OtherPrincipalType = typeof(PersonAnnotated)
+                },
             var type when type == typeof(ApiManyToManyRelationshipDefinitionAttribute) =>
                 new ApiManyToManyRelationshipDefinitionAttribute
-            {
-                ApiName = apiName!,
-                PrincipalTypeA = typeof(PersonAnnotated),
-                PrincipalTypeB = typeof(OrderStatusAnnotated),
-                AssociationType = typeof(EmailValueAnnotated)
-            },
+                {
+                    ApiName = apiName!,
+                    PrincipalTypeA = typeof(PersonAnnotated),
+                    PrincipalTypeB = typeof(OrderStatusAnnotated),
+                    AssociationType = typeof(EmailValueAnnotated)
+                },
             _ => throw new ArgumentException("Unknown annotation type.", nameof(annotationType))
         };
 
@@ -951,51 +951,51 @@ public partial class ApiAnnotationTests
         {
             var type when type == typeof(ApiRelationshipDefinitionAttribute) =>
                 new ApiRelationshipDefinitionAttribute
-            {
-                ApiName = "Relationship",
-                Kind = ApiRelationshipKind.OneToMany,
-                PrincipalType =
+                {
+                    ApiName = "Relationship",
+                    Kind = ApiRelationshipKind.OneToMany,
+                    PrincipalType =
                     propertyName == nameof(ApiRelationshipDefinitionAttribute.PrincipalType)
                     ? null!
                     : typeof(PersonAnnotated),
-                DependentType =
+                    DependentType =
                     propertyName == nameof(ApiRelationshipDefinitionAttribute.DependentType)
                     ? null!
                     : typeof(OrderStatusAnnotated)
-            },
+                },
             var type when type == typeof(ApiManyToManyRelationshipAttribute) =>
                 new ApiManyToManyRelationshipAttribute
-            {
-                ApiName = "Relationship",
-                AssociationType =
+                {
+                    ApiName = "Relationship",
+                    AssociationType =
                     propertyName == nameof(ApiManyToManyRelationshipAttribute.AssociationType)
                         ? null!
                         : typeof(EmailValueAnnotated),
-                OtherPrincipalType =
+                    OtherPrincipalType =
                     propertyName == nameof(ApiManyToManyRelationshipAttribute.OtherPrincipalType)
                         ? null!
                         : typeof(PersonAnnotated)
-            },
+                },
             var type when type == typeof(ApiManyToManyRelationshipDefinitionAttribute) =>
                 new ApiManyToManyRelationshipDefinitionAttribute
-            {
-                ApiName = "Relationship",
-                PrincipalTypeA =
+                {
+                    ApiName = "Relationship",
+                    PrincipalTypeA =
                     propertyName ==
                         nameof(ApiManyToManyRelationshipDefinitionAttribute.PrincipalTypeA)
                         ? null!
                         : typeof(PersonAnnotated),
-                PrincipalTypeB =
+                    PrincipalTypeB =
                     propertyName ==
                         nameof(ApiManyToManyRelationshipDefinitionAttribute.PrincipalTypeB)
                         ? null!
                         : typeof(OrderStatusAnnotated),
-                AssociationType =
+                    AssociationType =
                     propertyName ==
                         nameof(ApiManyToManyRelationshipDefinitionAttribute.AssociationType)
                         ? null!
                         : typeof(EmailValueAnnotated)
-            },
+                },
             _ => throw new ArgumentException("Unknown annotation type.", nameof(annotationType))
         };
 

@@ -3,6 +3,8 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Schema.Configuration.Annotations.Internal;
+
 namespace Evoogle.ApiFramework.Schema.Configuration.Annotations;
 
 /// <summary>
@@ -12,6 +14,19 @@ public sealed class ApiAnnotationReaderSetBuilder
 {
     #region Fields
     private readonly List<IApiAnnotationReader> _readers = [];
+    #endregion
+
+    #region Constructors
+    /// <summary>Initializes an empty annotation reader set builder.</summary>
+    public ApiAnnotationReaderSetBuilder()
+    {
+    }
+
+    internal ApiAnnotationReaderSetBuilder(IEnumerable<IApiAnnotationReader> readers)
+    {
+        ArgumentNullException.ThrowIfNull(readers);
+        _readers.AddRange(readers);
+    }
     #endregion
 
     #region Methods
@@ -51,6 +66,6 @@ public sealed class ApiAnnotationReaderSetBuilder
     ///     Builds the configured <see cref="ApiAnnotationReaderSet"/>.
     /// </summary>
     /// <returns>The built reader set.</returns>
-    public ApiAnnotationReaderSet Build() => new([.. _readers]);
+    internal ApiAnnotationReaderSet Build() => new([.. _readers]);
     #endregion
 }

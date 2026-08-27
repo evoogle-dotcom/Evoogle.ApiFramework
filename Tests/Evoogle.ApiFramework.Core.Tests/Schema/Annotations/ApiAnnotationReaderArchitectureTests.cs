@@ -320,12 +320,13 @@ public sealed class ApiAnnotationReaderArchitectureTests(ITestOutputHelper outpu
 
     private sealed class TypeDiscoveryReader : IApiTypeDiscoveryAnnotationReader
     {
-        public IReadOnlyList<ApiTypeDiscoveryAnnotationResult> ReadTypeDiscoveryAnnotations
+        public ApiAnnotationReaderResult<ApiTypeDiscoveryAnnotationResult>
+            ReadTypeDiscoveryAnnotations
         (
             Assembly assembly,
             Func<Type, bool>? filter
         )
-            => [new(typeof(DiscoveredAnnotationType), ApiTypeKind.Object)];
+            => new([new(typeof(DiscoveredAnnotationType), ApiTypeKind.Object)], []);
     }
 
     private sealed class MarkerOnlyReader : IApiAnnotationReader
