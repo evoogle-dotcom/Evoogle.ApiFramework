@@ -62,6 +62,21 @@ Fluent builder methods are stricter because they are explicit authoring APIs. A 
 
 ## Naming Conventions
 
+Built-in API naming conventions are opt-in through `ApiSchemaBuilder` extension methods. They
+apply to convention-configurable schema type, enum-value, and property API names. Explicit API
+names remain unchanged.
+
+| Method | Format | Example for `PersonWithId` |
+| --- | --- | --- |
+| `UseCamelCaseNaming()` | camelCase | `personWithId` |
+| `UseKebabCaseNaming()` | kebab-case | `person-with-id` |
+| `UseLowerCaseNaming()` | lower case without separators | `personwithid` |
+| `UsePascalCaseNaming()` | PascalCase | `PersonWithId` |
+| `UseUpperCaseNaming()` | upper case without separators | `PERSONWITHID` |
+
+The built-in conventions use Humanizer for their transformations. Multiple naming conventions may
+be registered and are applied in registration order.
+
 ### Prefix Standard: `Api`, `Clr`, and No Prefix
 
 Use `Api` and `Clr` to mark the boundary between the framework/API-schema model and the

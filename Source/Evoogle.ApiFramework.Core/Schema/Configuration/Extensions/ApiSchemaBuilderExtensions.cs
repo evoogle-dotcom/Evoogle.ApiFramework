@@ -331,6 +331,58 @@ public static class ApiSchemaBuilderExtensions
     }
 
     /// <summary>
+    ///     Adds the built-in convention that converts current schema type, enum-value, and
+    ///     property API names to kebab-case when their names remain convention-configurable.
+    /// </summary>
+    /// <param name="builder">The schema builder to configure.</param>
+    /// <returns>The current builder instance.</returns>
+    public static ApiSchemaBuilder UseKebabCaseNaming(this ApiSchemaBuilder builder)
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+
+        return builder.UseConventions(c => c.AddConvention(new ApiNamingKebabCaseConvention()));
+    }
+
+    /// <summary>
+    ///     Adds the built-in convention that converts current schema type, enum-value, and
+    ///     property API names to lower case when their names remain convention-configurable.
+    /// </summary>
+    /// <param name="builder">The schema builder to configure.</param>
+    /// <returns>The current builder instance.</returns>
+    public static ApiSchemaBuilder UseLowerCaseNaming(this ApiSchemaBuilder builder)
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+
+        return builder.UseConventions(c => c.AddConvention(new ApiNamingLowerCaseConvention()));
+    }
+
+    /// <summary>
+    ///     Adds the built-in convention that converts current schema type, enum-value, and
+    ///     property API names to PascalCase when their names remain convention-configurable.
+    /// </summary>
+    /// <param name="builder">The schema builder to configure.</param>
+    /// <returns>The current builder instance.</returns>
+    public static ApiSchemaBuilder UsePascalCaseNaming(this ApiSchemaBuilder builder)
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+
+        return builder.UseConventions(c => c.AddConvention(new ApiNamingPascalCaseConvention()));
+    }
+
+    /// <summary>
+    ///     Adds the built-in convention that converts current schema type, enum-value, and
+    ///     property API names to upper case when their names remain convention-configurable.
+    /// </summary>
+    /// <param name="builder">The schema builder to configure.</param>
+    /// <returns>The current builder instance.</returns>
+    public static ApiSchemaBuilder UseUpperCaseNaming(this ApiSchemaBuilder builder)
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+
+        return builder.UseConventions(c => c.AddConvention(new ApiNamingUpperCaseConvention()));
+    }
+
+    /// <summary>
     ///     Adds the built-in convention that discovers missing values from registered CLR enum
     ///     types.
     /// </summary>
