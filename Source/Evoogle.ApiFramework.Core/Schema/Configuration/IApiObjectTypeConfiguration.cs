@@ -6,9 +6,9 @@
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
 /// <summary>
-///     Provides configuration for an <see cref="ApiObjectTypeBuilder"/>.
+///     Provides configuration for an <see cref="ApiObjectTypeBuilder"/> and identifies its CLR type.
 /// </summary>
-public interface IApiObjectTypeConfiguration
+public interface IApiObjectTypeConfiguration : IApiTypeConfiguration
 {
     #region Methods
     /// <summary>

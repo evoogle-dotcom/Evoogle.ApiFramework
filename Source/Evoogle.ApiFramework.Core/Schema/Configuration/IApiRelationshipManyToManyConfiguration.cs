@@ -6,9 +6,9 @@
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
 /// <summary>
-///     Provides configuration for an <see cref="ApiRelationshipManyToManyBuilder"/>.
+///     Provides configuration for an <see cref="ApiRelationshipManyToManyBuilder"/> and identifies its API name.
 /// </summary>
-public interface IApiRelationshipManyToManyConfiguration
+public interface IApiRelationshipManyToManyConfiguration : IApiRelationshipConfiguration
 {
     #region Methods
     /// <summary>

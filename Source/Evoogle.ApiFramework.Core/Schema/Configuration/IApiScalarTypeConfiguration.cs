@@ -6,9 +6,9 @@
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
 /// <summary>
-///     Provides configuration for an <see cref="ApiScalarTypeBuilder"/>.
+///     Provides configuration for an <see cref="ApiScalarTypeBuilder"/> and identifies its CLR type.
 /// </summary>
-public interface IApiScalarTypeConfiguration
+public interface IApiScalarTypeConfiguration : IApiTypeConfiguration
 {
     #region Methods
     /// <summary>

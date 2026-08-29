@@ -51,16 +51,14 @@ public static class ApiObjectTypeBuilderRelationshipExtensions
     ///     Registers a one-to-one relationship at the schema level while authoring this object type.
     /// </summary>
     /// <param name="builder">The object type builder to configure.</param>
-    /// <param name="apiName">The schema-unique API name of the relationship.</param>
     /// <param name="configuration">The configuration implementation.</param>
     /// <returns>The current builder instance.</returns>
-    public static ApiObjectTypeBuilder AddOneToOneRelationship(this ApiObjectTypeBuilder builder, string apiName, IApiRelationshipOneToOneConfiguration configuration)
+    public static ApiObjectTypeBuilder AddOneToOneRelationship(this ApiObjectTypeBuilder builder, IApiRelationshipOneToOneConfiguration configuration)
     {
         ArgumentNullException.ThrowIfNull(builder);
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
         ArgumentNullException.ThrowIfNull(configuration);
 
-        builder.AddOneToOneRelationshipCore(apiName, configuration.Configure);
+        builder.AddOneToOneRelationshipCore(configuration.ApiName, configuration.Configure);
         return builder;
     }
 
@@ -69,17 +67,15 @@ public static class ApiObjectTypeBuilderRelationshipExtensions
     /// </summary>
     /// <typeparam name="TObject">The CLR object type represented by the builder.</typeparam>
     /// <param name="builder">The object type builder to configure.</param>
-    /// <param name="apiName">The schema-unique API name of the relationship.</param>
     /// <param name="configuration">The configuration implementation.</param>
     /// <returns>The current builder instance.</returns>
     public static ApiObjectTypeBuilder<TObject> AddOneToOneRelationship<TObject>
     (
         this ApiObjectTypeBuilder<TObject> builder,
-        string apiName,
         IApiRelationshipOneToOneConfiguration configuration
     )
     {
-        AddOneToOneRelationship((ApiObjectTypeBuilder)builder, apiName, configuration);
+        AddOneToOneRelationship((ApiObjectTypeBuilder)builder, configuration);
         return builder;
     }
     #endregion
@@ -125,16 +121,14 @@ public static class ApiObjectTypeBuilderRelationshipExtensions
     ///     Registers a one-to-many relationship at the schema level while authoring this object type.
     /// </summary>
     /// <param name="builder">The object type builder to configure.</param>
-    /// <param name="apiName">The schema-unique API name of the relationship.</param>
     /// <param name="configuration">The configuration implementation.</param>
     /// <returns>The current builder instance.</returns>
-    public static ApiObjectTypeBuilder AddOneToManyRelationship(this ApiObjectTypeBuilder builder, string apiName, IApiRelationshipOneToManyConfiguration configuration)
+    public static ApiObjectTypeBuilder AddOneToManyRelationship(this ApiObjectTypeBuilder builder, IApiRelationshipOneToManyConfiguration configuration)
     {
         ArgumentNullException.ThrowIfNull(builder);
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
         ArgumentNullException.ThrowIfNull(configuration);
 
-        builder.AddOneToManyRelationshipCore(apiName, configuration.Configure);
+        builder.AddOneToManyRelationshipCore(configuration.ApiName, configuration.Configure);
         return builder;
     }
 
@@ -143,17 +137,15 @@ public static class ApiObjectTypeBuilderRelationshipExtensions
     /// </summary>
     /// <typeparam name="TObject">The CLR object type represented by the builder.</typeparam>
     /// <param name="builder">The object type builder to configure.</param>
-    /// <param name="apiName">The schema-unique API name of the relationship.</param>
     /// <param name="configuration">The configuration implementation.</param>
     /// <returns>The current builder instance.</returns>
     public static ApiObjectTypeBuilder<TObject> AddOneToManyRelationship<TObject>
     (
         this ApiObjectTypeBuilder<TObject> builder,
-        string apiName,
         IApiRelationshipOneToManyConfiguration configuration
     )
     {
-        AddOneToManyRelationship((ApiObjectTypeBuilder)builder, apiName, configuration);
+        AddOneToManyRelationship((ApiObjectTypeBuilder)builder, configuration);
         return builder;
     }
     #endregion
@@ -199,16 +191,14 @@ public static class ApiObjectTypeBuilderRelationshipExtensions
     ///     Registers a many-to-many relationship at the schema level while authoring this object type.
     /// </summary>
     /// <param name="builder">The object type builder to configure.</param>
-    /// <param name="apiName">The schema-unique API name of the relationship.</param>
     /// <param name="configuration">The configuration implementation.</param>
     /// <returns>The current builder instance.</returns>
-    public static ApiObjectTypeBuilder AddManyToManyRelationship(this ApiObjectTypeBuilder builder, string apiName, IApiRelationshipManyToManyConfiguration configuration)
+    public static ApiObjectTypeBuilder AddManyToManyRelationship(this ApiObjectTypeBuilder builder, IApiRelationshipManyToManyConfiguration configuration)
     {
         ArgumentNullException.ThrowIfNull(builder);
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
         ArgumentNullException.ThrowIfNull(configuration);
 
-        builder.AddManyToManyRelationshipCore(apiName, configuration.Configure);
+        builder.AddManyToManyRelationshipCore(configuration.ApiName, configuration.Configure);
         return builder;
     }
 
@@ -217,17 +207,15 @@ public static class ApiObjectTypeBuilderRelationshipExtensions
     /// </summary>
     /// <typeparam name="TObject">The CLR object type represented by the builder.</typeparam>
     /// <param name="builder">The object type builder to configure.</param>
-    /// <param name="apiName">The schema-unique API name of the relationship.</param>
     /// <param name="configuration">The configuration implementation.</param>
     /// <returns>The current builder instance.</returns>
     public static ApiObjectTypeBuilder<TObject> AddManyToManyRelationship<TObject>
     (
         this ApiObjectTypeBuilder<TObject> builder,
-        string apiName,
         IApiRelationshipManyToManyConfiguration configuration
     )
     {
-        AddManyToManyRelationship((ApiObjectTypeBuilder)builder, apiName, configuration);
+        AddManyToManyRelationship((ApiObjectTypeBuilder)builder, configuration);
         return builder;
     }
     #endregion

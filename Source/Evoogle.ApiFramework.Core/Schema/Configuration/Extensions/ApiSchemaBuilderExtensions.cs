@@ -31,19 +31,20 @@ public static class ApiSchemaBuilderExtensions
     }
 
     /// <summary>
-    ///     Adds an enumeration type to the schema using an implementation of <see cref="IApiEnumTypeConfiguration"/>.
+    ///     Adds an enumeration type to the schema using a strongly-typed implementation of
+    ///     <see cref="IApiEnumTypeConfiguration{TEnum}"/>.
     /// </summary>
     /// <typeparam name="TEnum">The CLR enum type.</typeparam>
     /// <param name="builder">The schema builder to configure.</param>
-    /// <param name="configuration">The configuration implementation.</param>
+    /// <param name="configuration">The strongly-typed configuration implementation.</param>
     /// <returns>The current builder instance.</returns>
-    public static ApiSchemaBuilder AddEnum<TEnum>(this ApiSchemaBuilder builder, IApiEnumTypeConfiguration configuration)
+    public static ApiSchemaBuilder AddEnum<TEnum>(this ApiSchemaBuilder builder, IApiEnumTypeConfiguration<TEnum> configuration)
         where TEnum : Enum
     {
         ArgumentNullException.ThrowIfNull(builder);
         ArgumentNullException.ThrowIfNull(configuration);
 
-        return builder.AddEnumCore<TEnum>(configuration.Configure);
+        return builder.AddEnum(configuration);
     }
 
     /// <summary>
@@ -72,7 +73,7 @@ public static class ApiSchemaBuilderExtensions
         ArgumentNullException.ThrowIfNull(builder);
         ArgumentNullException.ThrowIfNull(configuration);
 
-        return builder.AddObjectCore<TObject>(configuration.Configure);
+        return builder.AddObject(configuration);
     }
 
     /// <summary>
@@ -90,18 +91,19 @@ public static class ApiSchemaBuilderExtensions
     }
 
     /// <summary>
-    ///     Adds a scalar type to the schema using an implementation of <see cref="IApiScalarTypeConfiguration"/>.
+    ///     Adds a scalar type to the schema using a strongly-typed implementation of
+    ///     <see cref="IApiScalarTypeConfiguration{TScalar}"/>.
     /// </summary>
     /// <typeparam name="TScalar">The CLR scalar type.</typeparam>
     /// <param name="builder">The schema builder to configure.</param>
-    /// <param name="configuration">The configuration implementation.</param>
+    /// <param name="configuration">The strongly-typed configuration implementation.</param>
     /// <returns>The current builder instance.</returns>
-    public static ApiSchemaBuilder AddScalar<TScalar>(this ApiSchemaBuilder builder, IApiScalarTypeConfiguration configuration)
+    public static ApiSchemaBuilder AddScalar<TScalar>(this ApiSchemaBuilder builder, IApiScalarTypeConfiguration<TScalar> configuration)
     {
         ArgumentNullException.ThrowIfNull(builder);
         ArgumentNullException.ThrowIfNull(configuration);
 
-        return builder.AddScalarCore<TScalar>(configuration.Configure);
+        return builder.AddScalar(configuration);
     }
 
     /// <summary>

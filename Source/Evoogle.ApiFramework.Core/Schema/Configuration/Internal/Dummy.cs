@@ -181,6 +181,9 @@ internal static class Dummy
     public class EmailAddressConfiguration : IApiScalarTypeConfiguration
     {
         /// <inheritdoc />
+        public Type ClrType => typeof(EmailAddress);
+
+        /// <inheritdoc />
         public void Configure(ApiScalarTypeBuilder builder)
         {
             builder
@@ -190,10 +193,24 @@ internal static class Dummy
     }
 
     /// <summary>
+    ///     Demonstrates strongly-typed scalar configuration using the fluent schema builder APIs.
+    /// </summary>
+    public class EmailAddressConfigurationGeneric : IApiScalarTypeConfiguration<EmailAddress>
+    {
+        public void Configure(ApiScalarTypeBuilder<EmailAddress> builder)
+        {
+            builder.WithName("EmailAddress");
+        }
+    }
+
+    /// <summary>
     ///     Demonstrates how to configure an enum type using the fluent schema builder APIs.
     /// </summary>
     public class OrderStatusConfiguration : IApiEnumTypeConfiguration
     {
+        /// <inheritdoc />
+        public Type ClrType => typeof(OrderStatus);
+
         /// <inheritdoc />
         public void Configure(ApiEnumTypeBuilder builder)
         {
@@ -208,10 +225,29 @@ internal static class Dummy
     }
 
     /// <summary>
+    ///     Demonstrates strongly-typed enum configuration using the fluent schema builder APIs.
+    /// </summary>
+    public class OrderStatusConfigurationGeneric : IApiEnumTypeConfiguration<OrderStatus>
+    {
+        public void Configure(ApiEnumTypeBuilder<OrderStatus> builder)
+        {
+            builder
+                .WithName("OrderStatus")
+                .AddValue("Pending", "Pending", 0)
+                .AddValue("Shipped", "Shipped", 1)
+                .AddValue("Delivered", "Delivered", 2)
+                .AddValue("Cancelled", "Cancelled", 3);
+        }
+    }
+
+    /// <summary>
     ///     Demonstrates how to configure an object type using the fluent schema builder APIs.
     /// </summary>
     public class OrderConfiguration : IApiObjectTypeConfiguration
     {
+        /// <inheritdoc />
+        public Type ClrType => typeof(Order);
+
         /// <inheritdoc />
         public void Configure(ApiObjectTypeBuilder builder)
         {
@@ -231,6 +267,9 @@ internal static class Dummy
     public class CustomerHasOrdersRelationshipConfiguration : IApiRelationshipOneToManyConfiguration
     {
         /// <inheritdoc />
+        public string ApiName => "CustomerHasOrders";
+
+        /// <inheritdoc />
         public void Configure(ApiRelationshipOneToManyBuilder builder)
         {
             builder
@@ -249,6 +288,9 @@ internal static class Dummy
     /// </summary>
     public class OrderHasOrderItemsRelationshipConfiguration : IApiRelationshipOneToManyConfiguration
     {
+        /// <inheritdoc />
+        public string ApiName => "OrderHasOrderItems";
+
         /// <inheritdoc />
         public void Configure(ApiRelationshipOneToManyBuilder builder)
         {
@@ -276,6 +318,9 @@ internal static class Dummy
     public class CustomerHasProfileRelationshipConfiguration : IApiRelationshipOneToOneConfiguration
     {
         /// <inheritdoc />
+        public string ApiName => "CustomerHasProfile";
+
+        /// <inheritdoc />
         public void Configure(ApiRelationshipOneToOneBuilder builder)
         {
             builder
@@ -301,6 +346,9 @@ internal static class Dummy
     /// </summary>
     public class ProductTagRelationshipConfiguration : IApiRelationshipManyToManyConfiguration
     {
+        /// <inheritdoc />
+        public string ApiName => "ProductHasTags";
+
         /// <inheritdoc />
         public void Configure(ApiRelationshipManyToManyBuilder builder)
         {
@@ -340,6 +388,8 @@ internal static class Dummy
 
     public class CustomerHasOrdersConfigurationGeneric : IApiRelationshipOneToManyConfiguration
     {
+        public string ApiName => "CustomerHasOrders";
+
         public void Configure(ApiRelationshipOneToManyBuilder builder)
         {
             builder
@@ -351,6 +401,8 @@ internal static class Dummy
 
     public class CustomerHasProfileConfigurationGeneric : IApiRelationshipOneToOneConfiguration
     {
+        public string ApiName => "CustomerHasProfile";
+
         public void Configure(ApiRelationshipOneToOneBuilder builder)
         {
             builder
@@ -363,6 +415,8 @@ internal static class Dummy
 
     public class ProductTagConfigurationGeneric : IApiRelationshipManyToManyConfiguration
     {
+        public string ApiName => "ProductHasTags";
+
         public void Configure(ApiRelationshipManyToManyBuilder builder)
         {
             builder
@@ -437,9 +491,9 @@ internal static class Dummy
                 .AddValue("Shipped", "Shipped", 1)
                 .AddValue("Delivered", "Delivered", 2)
                 .AddValue("Cancelled", "Cancelled", 3))
-            .AddScalar<EmailAddress>(new EmailAddressConfiguration())
-            .AddEnum<OrderStatus>(new OrderStatusConfiguration())
-            .AddObject(typeof(Order), new OrderConfiguration())
+            .AddScalar(new EmailAddressConfiguration())
+            .AddEnum(new OrderStatusConfiguration())
+            .AddObject(new OrderConfiguration())
             .AddObject<CustomerProfile>(x => x
                 .WithName("CustomerProfile")
                 .AddProperty("Biography", "Biography", p => p.WithModifiers(m => m.Required()))
@@ -464,8 +518,8 @@ internal static class Dummy
                 .AddKey("PrimaryKey", b => b
                     .AddPath(typeof(ProductTag), "ProductId")
                     .AddPath(typeof(ProductTag), "TagId")))
-            .AddOneToManyRelationship("CustomerHasOrders", new CustomerHasOrdersRelationshipConfiguration())
-            .AddOneToManyRelationship("OrderHasOrderItems", new OrderHasOrderItemsRelationshipConfiguration())
+            .AddOneToManyRelationship(new CustomerHasOrdersRelationshipConfiguration())
+            .AddOneToManyRelationship(new OrderHasOrderItemsRelationshipConfiguration())
             .AddOneToManyRelationship
             (
                 "CustomerOrders",
@@ -492,7 +546,7 @@ internal static class Dummy
                     )
             )
             // 1:1 — configuration class style; demonstrates AddNestedPath on the dependent end.
-            .AddOneToOneRelationship("CustomerHasProfile", new CustomerHasProfileRelationshipConfiguration())
+            .AddOneToOneRelationship(new CustomerHasProfileRelationshipConfiguration())
             // 1:1 — inline lambda style.
             .AddOneToOneRelationship
             (
@@ -510,7 +564,7 @@ internal static class Dummy
                     )
             )
             // M:N — configuration class style; demonstrates WithKeyTypeName and extensions on principal ends.
-            .AddManyToManyRelationship("ProductHasTags", new ProductTagRelationshipConfiguration())
+            .AddManyToManyRelationship(new ProductTagRelationshipConfiguration())
             // M:N — inline lambda style; demonstrates all four end methods and relationship-level extensions.
             .AddManyToManyRelationship
             (
@@ -548,19 +602,14 @@ internal static class Dummy
         var schema = new ApiSchemaBuilder()
             .WithName("CustomerOrdersAPI")
             .WithVersion("v1")
-            .AddScalar<EmailAddress>(x => x.WithName("EmailAddress"))
+            .AddScalar<EmailAddress>(new EmailAddressConfigurationGeneric())
             .AddScalar<EmailAddress>()
-            .AddEnum<OrderStatus>(x => x
-                .WithName("OrderStatus")
-                .AddValue("Pending", "Pending", 0)
-                .AddValue("Shipped", "Shipped", 1)
-                .AddValue("Delivered", "Delivered", 2)
-                .AddValue("Cancelled", "Cancelled", 3))
+            .AddEnum<OrderStatus>(new OrderStatusConfigurationGeneric())
             .AddObject<Country>(x => x
                 .WithName("Country")
                 .AddProperty(c => c.Code)
                 .AddKey("PrimaryKey", c => c.Code))                        // shorthand: single expression
-            .AddObject(new CustomerConfigurationGeneric())
+            .AddObject<Customer>(new CustomerConfigurationGeneric())
             .AddObject<Order>(x => x
                 .WithName("Order")
                 .AddProperty(o => o.Id, p => p.WithModifiers(m => m.Required()))
@@ -604,7 +653,7 @@ internal static class Dummy
                 .AddKey("PrimaryKey", b => b                               // composite: builder required
                     .AddPath(pt => pt.ProductId)
                     .AddPath(pt => pt.TagId)))
-            .AddOneToManyRelationship("CustomerHasOrders", new CustomerHasOrdersConfigurationGeneric())
+            .AddOneToManyRelationship(new CustomerHasOrdersConfigurationGeneric())
             .AddOneToManyRelationship("OrderHasOrderItems", r => r
                 .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete)
                 .From<Order>()
@@ -612,14 +661,14 @@ internal static class Dummy
                     .WithForeignKey(b => b                                  // composite: builder required
                         .AddPath(oi => oi.OrderId)
                         .AddPath(oi => oi.LineItemNumber))))
-            .AddOneToOneRelationship("CustomerHasProfile", new CustomerHasProfileConfigurationGeneric())
+            .AddOneToOneRelationship(new CustomerHasProfileConfigurationGeneric())
             .AddOneToOneRelationship("CustomerHasProfileInline", r => r
                 .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete)
                 .From<Customer>(p => p
                     .WithPrincipalKey("PrimaryKey"))
                 .To<CustomerProfile>(d => d
                     .WithForeignKey(cp => cp.CustomerRef.CustomerId)))      // shorthand: navigated expression
-            .AddManyToManyRelationship("ProductHasTags", new ProductTagConfigurationGeneric())
+            .AddManyToManyRelationship(new ProductTagConfigurationGeneric())
             .AddManyToManyRelationship("ProductHasTagsInline", r => r
                 .Between<Product>(p => p
                     .WithPrincipalKey("PrimaryKey"))

@@ -6,9 +6,9 @@
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
 /// <summary>
-///     Provides configuration for an <see cref="ApiRelationshipOneToOneBuilder"/>.
+///     Provides configuration for an <see cref="ApiRelationshipOneToOneBuilder"/> and identifies its API name.
 /// </summary>
-public interface IApiRelationshipOneToOneConfiguration
+public interface IApiRelationshipOneToOneConfiguration : IApiRelationshipConfiguration
 {
     #region Methods
     /// <summary>

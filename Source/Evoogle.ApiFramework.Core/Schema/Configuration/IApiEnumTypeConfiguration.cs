@@ -6,9 +6,9 @@
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
 /// <summary>
-///     Provides configuration for an <see cref="ApiEnumTypeBuilder"/>.
+///     Provides configuration for an <see cref="ApiEnumTypeBuilder"/> and identifies its CLR type.
 /// </summary>
-public interface IApiEnumTypeConfiguration
+public interface IApiEnumTypeConfiguration : IApiTypeConfiguration
 {
     #region Methods
     /// <summary>

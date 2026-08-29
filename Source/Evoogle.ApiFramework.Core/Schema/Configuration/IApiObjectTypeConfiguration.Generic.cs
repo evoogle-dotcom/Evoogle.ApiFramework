@@ -6,13 +6,21 @@
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
 /// <summary>
-///     Provides strongly-typed configuration for an <see cref="ApiObjectType"/> whose CLR type is <typeparamref name="TObject"/>.
+///     Provides strongly-typed configuration for an <see cref="ApiObjectType"/> whose CLR type is
+///     <typeparamref name="TObject"/>.
 ///     Inherits from <see cref="IApiObjectTypeConfiguration"/> and bridges the non-generic
-///     <see cref="ApiObjectTypeBuilder"/> interface via a default implementation that up-casts the builder.
+///     <see cref="ApiObjectTypeBuilder"/> interface via a default implementation that down-casts the builder.
 /// </summary>
 /// <typeparam name="TObject">The CLR type represented by the API object type.</typeparam>
 public interface IApiObjectTypeConfiguration<TObject> : IApiObjectTypeConfiguration
 {
+    #region Properties
+    /// <summary>
+    ///     Gets the CLR type represented by the configuration.
+    /// </summary>
+    Type IApiTypeConfiguration.ClrType => typeof(TObject);
+    #endregion
+
     #region Methods
     /// <summary>
     ///     Applies configuration to the supplied strongly-typed <see cref="ApiObjectTypeBuilder{TObject}"/>.
