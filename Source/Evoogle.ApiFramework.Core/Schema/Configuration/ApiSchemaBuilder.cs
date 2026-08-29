@@ -609,6 +609,7 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
 
     private ApiSchema BuildCore(ApiSchemaBuildTraceDispatcher? traceDispatcher)
     {
+        _context.ResetConfigurationIssues();
         _context.SetTraceDispatcher(traceDispatcher);
         traceDispatcher?.Record(new ApiSchemaBuildStartedEvent());
 
@@ -688,11 +689,14 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
             // Initialize the ApiSchema instance.
             var result = apiSchema.Initialize();
             var annotationIssues = _state.AnnotationReaderSet?.Issues;
-            if (annotationIssues is { Count: > 0 })
+            var configurationIssues = _context.ConfigurationIssues;
+            if (annotationIssues is { Count: > 0 } || configurationIssues.Count > 0)
             {
                 result = new ApiInitializationResult
                 (
-                    (result.Issues ?? []).Concat(annotationIssues)
+                    (result.Issues ?? [])
+                        .Concat(annotationIssues ?? [])
+                        .Concat(configurationIssues)
                 );
             }
 

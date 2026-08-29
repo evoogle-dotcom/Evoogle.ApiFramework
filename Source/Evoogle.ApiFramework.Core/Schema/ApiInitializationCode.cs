@@ -437,6 +437,20 @@ public enum ApiInitializationCode
     ApiTypeNullClrType,
     #endregion
 
+    #region ApiConfiguration Initialization Codes
+    /// <summary>
+    ///     A discovered configuration could not be activated.
+    /// </summary>
+    [EnumMember(Value = "API_CONFIGURATION_ACTIVATION_FAILED")]
+    ApiConfigurationActivationFailed,
+
+    /// <summary>
+    ///     A discovered configuration threw while exposing its identity or applying its configuration.
+    /// </summary>
+    [EnumMember(Value = "API_CONFIGURATION_EXECUTION_FAILED")]
+    ApiConfigurationExecutionFailed,
+    #endregion
+
     #region ApiAnnotation Initialization Codes
     /// <summary>
     ///     An annotation reader threw while reading metadata for a schema target.

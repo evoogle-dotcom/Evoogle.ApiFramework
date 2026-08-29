@@ -206,6 +206,54 @@ public static class ApiSchemaBuilderExtensions
     }
 
     /// <summary>
+    ///     Adds the built-in convention that scans an assembly for API configuration implementations.
+    /// </summary>
+    /// <param name="builder">The schema builder to configure.</param>
+    /// <param name="assembly">The assembly to scan for API configurations.</param>
+    /// <param name="filter">
+    ///     Optional inclusion predicate. When <see langword="null"/>, all eligible configuration types are
+    ///     considered; returning <see langword="false"/> skips a type.
+    /// </param>
+    /// <returns>The current builder instance.</returns>
+    public static ApiSchemaBuilder UseConfigurationsFromAssembly
+    (
+        this ApiSchemaBuilder builder,
+        Assembly assembly,
+        Func<Type, bool>? filter = null
+    )
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+        ArgumentNullException.ThrowIfNull(assembly);
+
+        return builder.UseConventions
+        (
+            c => c.AddConvention(new ApiSchemaAssemblyConfigurationDiscoveryConvention(assembly, filter))
+        );
+    }
+
+    /// <summary>
+    ///     Adds the built-in convention that scans the assembly containing <typeparamref name="TMarker"/>
+    ///     for API configuration implementations.
+    /// </summary>
+    /// <typeparam name="TMarker">The type whose assembly contains the configurations to scan.</typeparam>
+    /// <param name="builder">The schema builder to configure.</param>
+    /// <param name="filter">
+    ///     Optional inclusion predicate. When <see langword="null"/>, all eligible configuration types are
+    ///     considered; returning <see langword="false"/> skips a type.
+    /// </param>
+    /// <returns>The current builder instance.</returns>
+    public static ApiSchemaBuilder UseConfigurationsFromAssemblyOf<TMarker>
+    (
+        this ApiSchemaBuilder builder,
+        Func<Type, bool>? filter = null
+    )
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+
+        return builder.UseConfigurationsFromAssembly(typeof(TMarker).Assembly, filter);
+    }
+
+    /// <summary>
     ///     Adds the built-in convention that scans an assembly and infers API type kinds from CLR
     ///     type reflection.
     /// </summary>
@@ -236,9 +284,10 @@ public static class ApiSchemaBuilderExtensions
     /// </summary>
     /// <remarks>
     ///     This is equivalent to composing <see cref="UseAssemblyTypeInference"/>,
+    ///     <see cref="UseConfigurationsFromAssembly"/>,
     ///     <see cref="UsePropertyDiscovery"/>, <see cref="UseEnumValueDiscovery"/>, and
     ///     <see cref="UsePropertyNullabilityModifiers"/>. The optional filter is applied while
-    ///     scanning the assembly for eligible CLR types.
+    ///     scanning the assembly for eligible CLR types and configurations.
     /// </remarks>
     /// <param name="builder">The schema builder to configure.</param>
     /// <param name="assembly">The assembly to scan for types.</param>
@@ -261,6 +310,7 @@ public static class ApiSchemaBuilderExtensions
         (
             c => c
                 .AddConvention(new ApiSchemaAssemblyTypeInferenceConvention(assembly, filter))
+                .AddConvention(new ApiSchemaAssemblyConfigurationDiscoveryConvention(assembly, filter))
                 .AddConvention(new ApiEnumTypeEnumValueDiscoveryConvention())
                 .AddConvention(new ApiObjectTypePropertyDiscoveryConvention())
                 .AddConvention(new ApiPropertyNullabilityModifierConvention())

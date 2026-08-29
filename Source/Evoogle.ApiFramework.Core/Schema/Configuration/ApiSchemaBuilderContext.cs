@@ -25,6 +25,7 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null) : IHasLogger
     private readonly Queue<ApiObjectTypeBuilder> _pendingObjectBuilders = new();
     private readonly Queue<ApiScalarTypeBuilder> _pendingScalarBuilders = new();
     private readonly Queue<ApiEnumTypeBuilder> _pendingEnumBuilders = new();
+    private readonly List<ApiInitializationIssue> _configurationIssues = [];
     private readonly ApiConfigurationSourceScope _configurationSourceScope = new();
     private ApiSchemaBuildTraceDispatcher? _traceDispatcher;
     #endregion
@@ -39,6 +40,7 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null) : IHasLogger
     internal IEnumerable<ApiEnumTypeBuilder> ApiEnumTypeBuilders => _apiEnumTypeBuilders.Values;
     internal IEnumerable<ApiObjectTypeBuilder> ApiObjectTypeBuilders => _apiObjectTypeBuilders.Values;
     internal IEnumerable<ApiRelationshipBuilder> ApiRelationshipBuilders => _apiRelationshipBuilders.Values;
+    internal IReadOnlyList<ApiInitializationIssue> ConfigurationIssues => _configurationIssues;
 
     /// <summary>Gets the source associated with the active configuration callback.</summary>
     internal ApiConfigurationSource CurrentConfigurationSource =>
@@ -81,6 +83,20 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null) : IHasLogger
     #endregion
 
     #region Methods
+    /// <summary>Clears configuration-discovery issues for a new schema build.</summary>
+    internal void ResetConfigurationIssues()
+    {
+        _configurationIssues.Clear();
+    }
+
+    /// <summary>Records a configuration-discovery issue for the current schema build.</summary>
+    internal void AddConfigurationIssue(ApiInitializationIssue issue)
+    {
+        ArgumentNullException.ThrowIfNull(issue);
+
+        _configurationIssues.Add(issue);
+    }
+
     /// <summary>Sets the optional trace dispatcher for the current build.</summary>
     internal void SetTraceDispatcher(ApiSchemaBuildTraceDispatcher? traceDispatcher)
     {
