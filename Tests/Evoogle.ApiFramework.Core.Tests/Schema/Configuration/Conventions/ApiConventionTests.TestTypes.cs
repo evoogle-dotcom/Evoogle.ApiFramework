@@ -39,6 +39,12 @@ public partial class ApiConventionTests
         public string? Email { get; set; }
     }
 
+    internal class People
+    {
+        public Guid Id { get; set; }
+        public string Names { get; set; } = string.Empty;
+    }
+
     internal class OrderWithPersonId
     {
         public Guid OrderId { get; set; }

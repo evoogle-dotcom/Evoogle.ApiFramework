@@ -72,12 +72,15 @@ names remain unchanged.
 | `UseKebabCaseNaming()` | kebab-case | `person-with-id` |
 | `UseLowerCaseNaming()` | lower case without separators | `personwithid` |
 | `UsePascalCaseNaming()` | PascalCase | `PersonWithId` |
+| `UsePluralizeNaming()` | pluralized | `PersonWithIds` |
+| `UseSingularizeNaming()` | singularized | `PersonWithId` |
 | `UseUpperCaseNaming()` | upper case without separators | `PERSONWITHID` |
 
 The built-in conventions use Humanizer for their transformations. Multiple naming conventions may
 be registered and are applied in registration order. Each method accepts an optional
-`ApiNamingConventionTargets` value that defaults to `All`, so a convention can be limited to
-specific schema elements. `None` makes that naming convention a no-op. For example:
+`ApiNamingConventionTargets` value. Existing casing methods default to `All`; pluralize and
+singularize default to `ObjectType`. Any convention can be limited to specific schema elements,
+and `None` makes that naming convention a no-op. For example:
 
 ```csharp
 builder.UseKebabCaseNaming

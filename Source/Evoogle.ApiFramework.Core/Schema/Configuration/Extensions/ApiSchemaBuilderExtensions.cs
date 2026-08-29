@@ -335,10 +335,7 @@ public static class ApiSchemaBuilderExtensions
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        return builder.UseConventions
-        (
-            c => c.AddConvention(new ApiNamingCamelCaseConvention(targets))
-        );
+        return builder.UseConventions(c => c.AddConvention(new ApiNamingCamelCaseConvention(targets)));
     }
 
     /// <summary>
@@ -358,10 +355,7 @@ public static class ApiSchemaBuilderExtensions
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        return builder.UseConventions
-        (
-            c => c.AddConvention(new ApiNamingKebabCaseConvention(targets))
-        );
+        return builder.UseConventions(c => c.AddConvention(new ApiNamingKebabCaseConvention(targets)));
     }
 
     /// <summary>
@@ -381,10 +375,7 @@ public static class ApiSchemaBuilderExtensions
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        return builder.UseConventions
-        (
-            c => c.AddConvention(new ApiNamingLowerCaseConvention(targets))
-        );
+        return builder.UseConventions(c => c.AddConvention(new ApiNamingLowerCaseConvention(targets)));
     }
 
     /// <summary>
@@ -404,10 +395,49 @@ public static class ApiSchemaBuilderExtensions
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        return builder.UseConventions
-        (
-            c => c.AddConvention(new ApiNamingPascalCaseConvention(targets))
-        );
+        return builder.UseConventions(c => c.AddConvention(new ApiNamingPascalCaseConvention(targets)));
+    }
+
+    /// <summary>
+    ///     Adds the built-in convention that pluralizes current schema type, enum-value, and
+    ///     property API names when their names remain convention-configurable.
+    /// </summary>
+    /// <param name="builder">The schema builder to configure.</param>
+    /// <param name="targets">
+    ///     The schema element kinds to which the naming convention applies. Defaults to object
+    ///     types.
+    /// </param>
+    /// <returns>The current builder instance.</returns>
+    public static ApiSchemaBuilder UsePluralizeNaming
+    (
+        this ApiSchemaBuilder builder,
+        ApiNamingConventionTargets targets = ApiNamingConventionTargets.ObjectType
+    )
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+
+        return builder.UseConventions(c => c.AddConvention(new ApiNamingPluralizeConvention(targets)));
+    }
+
+    /// <summary>
+    ///     Adds the built-in convention that singularizes current schema type, enum-value, and
+    ///     property API names when their names remain convention-configurable.
+    /// </summary>
+    /// <param name="builder">The schema builder to configure.</param>
+    /// <param name="targets">
+    ///     The schema element kinds to which the naming convention applies. Defaults to object
+    ///     types.
+    /// </param>
+    /// <returns>The current builder instance.</returns>
+    public static ApiSchemaBuilder UseSingularizeNaming
+    (
+        this ApiSchemaBuilder builder,
+        ApiNamingConventionTargets targets = ApiNamingConventionTargets.ObjectType
+    )
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+
+        return builder.UseConventions(c => c.AddConvention(new ApiNamingSingularizeConvention(targets)));
     }
 
     /// <summary>
@@ -427,10 +457,7 @@ public static class ApiSchemaBuilderExtensions
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        return builder.UseConventions
-        (
-            c => c.AddConvention(new ApiNamingUpperCaseConvention(targets))
-        );
+        return builder.UseConventions(c => c.AddConvention(new ApiNamingUpperCaseConvention(targets)));
     }
 
     /// <summary>
