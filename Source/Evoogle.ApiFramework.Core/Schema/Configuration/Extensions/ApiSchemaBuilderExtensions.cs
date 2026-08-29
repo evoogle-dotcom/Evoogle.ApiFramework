@@ -5,6 +5,7 @@
 // See the LICENSE file in the project root for more information.
 using System.Reflection;
 
+using Evoogle.ApiFramework.Schema.Configuration.Conventions;
 using Evoogle.ApiFramework.Schema.Configuration.Conventions.Internal;
 
 namespace Evoogle.ApiFramework.Schema.Configuration;
@@ -322,12 +323,22 @@ public static class ApiSchemaBuilderExtensions
     ///     property API names to camelCase when their names remain convention-configurable.
     /// </summary>
     /// <param name="builder">The schema builder to configure.</param>
+    /// <param name="targets">
+    ///     The schema element kinds to which the naming convention applies.
+    /// </param>
     /// <returns>The current builder instance.</returns>
-    public static ApiSchemaBuilder UseCamelCaseNaming(this ApiSchemaBuilder builder)
+    public static ApiSchemaBuilder UseCamelCaseNaming
+    (
+        this ApiSchemaBuilder builder,
+        ApiNamingConventionTargets targets = ApiNamingConventionTargets.All
+    )
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        return builder.UseConventions(c => c.AddConvention(new ApiNamingCamelCaseConvention()));
+        return builder.UseConventions
+        (
+            c => c.AddConvention(new ApiNamingCamelCaseConvention(targets))
+        );
     }
 
     /// <summary>
@@ -335,12 +346,22 @@ public static class ApiSchemaBuilderExtensions
     ///     property API names to kebab-case when their names remain convention-configurable.
     /// </summary>
     /// <param name="builder">The schema builder to configure.</param>
+    /// <param name="targets">
+    ///     The schema element kinds to which the naming convention applies.
+    /// </param>
     /// <returns>The current builder instance.</returns>
-    public static ApiSchemaBuilder UseKebabCaseNaming(this ApiSchemaBuilder builder)
+    public static ApiSchemaBuilder UseKebabCaseNaming
+    (
+        this ApiSchemaBuilder builder,
+        ApiNamingConventionTargets targets = ApiNamingConventionTargets.All
+    )
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        return builder.UseConventions(c => c.AddConvention(new ApiNamingKebabCaseConvention()));
+        return builder.UseConventions
+        (
+            c => c.AddConvention(new ApiNamingKebabCaseConvention(targets))
+        );
     }
 
     /// <summary>
@@ -348,12 +369,22 @@ public static class ApiSchemaBuilderExtensions
     ///     property API names to lower case when their names remain convention-configurable.
     /// </summary>
     /// <param name="builder">The schema builder to configure.</param>
+    /// <param name="targets">
+    ///     The schema element kinds to which the naming convention applies.
+    /// </param>
     /// <returns>The current builder instance.</returns>
-    public static ApiSchemaBuilder UseLowerCaseNaming(this ApiSchemaBuilder builder)
+    public static ApiSchemaBuilder UseLowerCaseNaming
+    (
+        this ApiSchemaBuilder builder,
+        ApiNamingConventionTargets targets = ApiNamingConventionTargets.All
+    )
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        return builder.UseConventions(c => c.AddConvention(new ApiNamingLowerCaseConvention()));
+        return builder.UseConventions
+        (
+            c => c.AddConvention(new ApiNamingLowerCaseConvention(targets))
+        );
     }
 
     /// <summary>
@@ -361,12 +392,22 @@ public static class ApiSchemaBuilderExtensions
     ///     property API names to PascalCase when their names remain convention-configurable.
     /// </summary>
     /// <param name="builder">The schema builder to configure.</param>
+    /// <param name="targets">
+    ///     The schema element kinds to which the naming convention applies.
+    /// </param>
     /// <returns>The current builder instance.</returns>
-    public static ApiSchemaBuilder UsePascalCaseNaming(this ApiSchemaBuilder builder)
+    public static ApiSchemaBuilder UsePascalCaseNaming
+    (
+        this ApiSchemaBuilder builder,
+        ApiNamingConventionTargets targets = ApiNamingConventionTargets.All
+    )
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        return builder.UseConventions(c => c.AddConvention(new ApiNamingPascalCaseConvention()));
+        return builder.UseConventions
+        (
+            c => c.AddConvention(new ApiNamingPascalCaseConvention(targets))
+        );
     }
 
     /// <summary>
@@ -374,12 +415,22 @@ public static class ApiSchemaBuilderExtensions
     ///     property API names to upper case when their names remain convention-configurable.
     /// </summary>
     /// <param name="builder">The schema builder to configure.</param>
+    /// <param name="targets">
+    ///     The schema element kinds to which the naming convention applies.
+    /// </param>
     /// <returns>The current builder instance.</returns>
-    public static ApiSchemaBuilder UseUpperCaseNaming(this ApiSchemaBuilder builder)
+    public static ApiSchemaBuilder UseUpperCaseNaming
+    (
+        this ApiSchemaBuilder builder,
+        ApiNamingConventionTargets targets = ApiNamingConventionTargets.All
+    )
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        return builder.UseConventions(c => c.AddConvention(new ApiNamingUpperCaseConvention()));
+        return builder.UseConventions
+        (
+            c => c.AddConvention(new ApiNamingUpperCaseConvention(targets))
+        );
     }
 
     /// <summary>

@@ -75,7 +75,20 @@ names remain unchanged.
 | `UseUpperCaseNaming()` | upper case without separators | `PERSONWITHID` |
 
 The built-in conventions use Humanizer for their transformations. Multiple naming conventions may
-be registered and are applied in registration order.
+be registered and are applied in registration order. Each method accepts an optional
+`ApiNamingConventionTargets` value that defaults to `All`, so a convention can be limited to
+specific schema elements. `None` makes that naming convention a no-op. For example:
+
+```csharp
+builder.UseKebabCaseNaming
+(
+    ApiNamingConventionTargets.ObjectType |
+    ApiNamingConventionTargets.Property
+);
+```
+
+The available targets are object types, scalar types, enum types, enum values, and properties.
+Lower-case and upper-case naming change the casing of the whole name without inserting separators.
 
 ### Prefix Standard: `Api`, `Clr`, and No Prefix
 

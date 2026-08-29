@@ -8,11 +8,11 @@ using Humanizer;
 namespace Evoogle.ApiFramework.Schema.Configuration.Conventions.Internal;
 
 /// <summary>
-///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used
-///     directly from your code.
+///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used directly from your code.
 ///     This API may change or be removed in future releases.
 /// </summary>
-internal sealed class ApiNamingUpperCaseConvention : ApiNamingConvention
+internal sealed class ApiNamingUpperCaseConvention(ApiNamingConventionTargets targets = ApiNamingConventionTargets.All)
+    : ApiNamingConvention(targets)
 {
     #region Properties
     /// <inheritdoc />

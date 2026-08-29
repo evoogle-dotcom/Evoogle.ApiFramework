@@ -10,7 +10,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Conventions;
 ///     builders, and property builders by transforming the current candidate API name or deriving
 ///     a replacement from CLR metadata.
 /// </summary>
-public abstract class ApiNamingConvention :
+public abstract class ApiNamingConvention(ApiNamingConventionTargets targets = ApiNamingConventionTargets.All) :
     IApiNamingConvention,
     IApiObjectTypeConvention,
     IApiScalarTypeConvention,
@@ -18,6 +18,12 @@ public abstract class ApiNamingConvention :
     IApiEnumValueConvention,
     IApiPropertyConvention
 {
+
+    #region Properties
+    /// <summary>Gets the schema element kinds to which the convention applies.</summary>
+    protected ApiNamingConventionTargets Targets { get; } = ValidateTargets(targets);
+    #endregion
+
     #region IApiConvention Properties
     /// <inheritdoc />
     public abstract ApiConventionPhase Phase { get; }
@@ -28,6 +34,11 @@ public abstract class ApiNamingConvention :
     public void Apply(ApiObjectTypeBuilder builder)
     {
         ArgumentNullException.ThrowIfNull(builder);
+
+        if (!this.IsTargeted(ApiNamingConventionTargets.ObjectType))
+        {
+            return;
+        }
 
         var context = new ApiNamingConventionContext
         (
@@ -45,6 +56,11 @@ public abstract class ApiNamingConvention :
     {
         ArgumentNullException.ThrowIfNull(builder);
 
+        if (!this.IsTargeted(ApiNamingConventionTargets.ScalarType))
+        {
+            return;
+        }
+
         var context = new ApiNamingConventionContext
         (
             ApiNamingConventionTarget.ScalarType,
@@ -60,6 +76,11 @@ public abstract class ApiNamingConvention :
     public void Apply(ApiEnumTypeBuilder builder)
     {
         ArgumentNullException.ThrowIfNull(builder);
+
+        if (!this.IsTargeted(ApiNamingConventionTargets.EnumType))
+        {
+            return;
+        }
 
         var context = new ApiNamingConventionContext
         (
@@ -77,6 +98,11 @@ public abstract class ApiNamingConvention :
     {
         ArgumentNullException.ThrowIfNull(builder);
         ArgumentNullException.ThrowIfNull(context);
+
+        if (!this.IsTargeted(ApiNamingConventionTargets.EnumValue))
+        {
+            return;
+        }
 
         var namingContext = new ApiNamingConventionContext
         (
@@ -98,6 +124,11 @@ public abstract class ApiNamingConvention :
         ArgumentNullException.ThrowIfNull(builder);
         ArgumentNullException.ThrowIfNull(context);
 
+        if (!this.IsTargeted(ApiNamingConventionTargets.Property))
+        {
+            return;
+        }
+
         var namingContext = new ApiNamingConventionContext
         (
             ApiNamingConventionTarget.Property,
@@ -113,5 +144,33 @@ public abstract class ApiNamingConvention :
     #region IApiNamingConvention Methods
     /// <inheritdoc />
     public abstract string ConvertName(string apiName, ApiNamingConventionContext context);
+    #endregion
+
+    #region Private Helper Methods
+    /// <summary>
+    ///     Determines whether the convention applies to the specified target.
+    /// </summary>
+    /// <param name="target">The target to check.</param>
+    /// <returns>True if the target is included in the convention's targets; otherwise, false.</returns>
+    private bool IsTargeted(ApiNamingConventionTargets target)
+    {
+        return (this.Targets & target) != ApiNamingConventionTargets.None;
+    }
+
+    /// <summary>
+    ///     Validates that the specified targets contain only known convention target values.
+    /// </summary>
+    /// <param name="targets">The targets to validate.</param>
+    /// <returns>The validated targets.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when targets contains unknown values.</exception>
+    private static ApiNamingConventionTargets ValidateTargets(ApiNamingConventionTargets targets)
+    {
+        if ((targets & ~ApiNamingConventionTargets.All) != ApiNamingConventionTargets.None)
+        {
+            throw new ArgumentOutOfRangeException(nameof(targets), targets, "Unknown naming convention target.");
+        }
+
+        return targets;
+    }
     #endregion
 }

@@ -36,6 +36,7 @@ public partial class ApiConventionTests
     {
         #region User Supplied Properties
         public required BuiltInNamingStyle Style { get; init; }
+        public ApiNamingConventionTargets Targets { get; init; } = ApiNamingConventionTargets.All;
         #endregion
 
         #region Calculated Properties
@@ -66,23 +67,31 @@ public partial class ApiConventionTests
                     .WithName("ExplicitObject")
                     .AddProperty(p => p.OrderId));
 
-            this.WriteLine($"Style: {this.Style}");
+            this.WriteLine($"Style: {this.Style}; Targets: {this.Targets}");
         }
 
         protected override void Act()
         {
             this.ApiSchemaActual = this.Style switch
             {
-                BuiltInNamingStyle.CamelCase => this.ApiSchemaBuilder!.UseCamelCaseNaming().Build(),
-                BuiltInNamingStyle.KebabCase => this.ApiSchemaBuilder!.UseKebabCaseNaming().Build(),
-                BuiltInNamingStyle.LowerCase => this.ApiSchemaBuilder!.UseLowerCaseNaming().Build(),
-                BuiltInNamingStyle.PascalCase => this.ApiSchemaBuilder!
-                    .UsePascalCaseNaming()
+                BuiltInNamingStyle.CamelCase => this.ApiSchemaBuilder!
+                    .UseCamelCaseNaming(this.Targets)
                     .Build(),
-                BuiltInNamingStyle.UpperCase => this.ApiSchemaBuilder!.UseUpperCaseNaming().Build(),
+                BuiltInNamingStyle.KebabCase => this.ApiSchemaBuilder!
+                    .UseKebabCaseNaming(this.Targets)
+                    .Build(),
+                BuiltInNamingStyle.LowerCase => this.ApiSchemaBuilder!
+                    .UseLowerCaseNaming(this.Targets)
+                    .Build(),
+                BuiltInNamingStyle.PascalCase => this.ApiSchemaBuilder!
+                    .UsePascalCaseNaming(this.Targets)
+                    .Build(),
+                BuiltInNamingStyle.UpperCase => this.ApiSchemaBuilder!
+                    .UseUpperCaseNaming(this.Targets)
+                    .Build(),
                 BuiltInNamingStyle.CamelThenKebabCase => this.ApiSchemaBuilder!
-                    .UseCamelCaseNaming()
-                    .UseKebabCaseNaming()
+                    .UseCamelCaseNaming(this.Targets)
+                    .UseKebabCaseNaming(this.Targets)
                     .Build(),
                 _ => throw new InvalidOperationException($"Unknown naming style: {this.Style}"),
             };
@@ -141,14 +150,38 @@ public partial class ApiConventionTests
 
             var scalarType = apiSchema.ApiScalarTypes
                 .Single(x => x.ClrType == typeof(CustomScalar));
-            scalarType.ApiName.Should().Be(expected.ScalarApiName);
+            scalarType.ApiName.Should().Be
+            (
+                this.GetExpectedApiName
+                (
+                    expected.ScalarApiName,
+                    nameof(CustomScalar),
+                    ApiNamingConventionTargets.ScalarType
+                )
+            );
 
             var enumType = apiSchema.ApiEnumTypes.Single(x => x.ClrType == typeof(PipelineStatus));
-            enumType.ApiName.Should().Be(expected.EnumApiName);
+            enumType.ApiName.Should().Be
+            (
+                this.GetExpectedApiName
+                (
+                    expected.EnumApiName,
+                    nameof(PipelineStatus),
+                    ApiNamingConventionTargets.EnumType
+                )
+            );
 
             var inferredEnumValue = enumType.ApiEnumValues
                 .Single(x => x.ClrName == nameof(PipelineStatus.InProgress));
-            inferredEnumValue.ApiName.Should().Be(expected.InferredEnumValueApiName);
+            inferredEnumValue.ApiName.Should().Be
+            (
+                this.GetExpectedApiName
+                (
+                    expected.InferredEnumValueApiName,
+                    nameof(PipelineStatus.InProgress),
+                    ApiNamingConventionTargets.EnumValue
+                )
+            );
 
             var explicitEnumValue = enumType.ApiEnumValues
                 .Single(x => x.ClrName == nameof(PipelineStatus.Active));
@@ -156,11 +189,51 @@ public partial class ApiConventionTests
 
             var objectType = apiSchema.ApiObjectTypes
                 .Single(x => x.ClrType == typeof(PersonWithId));
-            objectType.ApiName.Should().Be(expected.ObjectApiName);
+            objectType.ApiName.Should().Be
+            (
+                this.GetExpectedApiName
+                (
+                    expected.ObjectApiName,
+                    nameof(PersonWithId),
+                    ApiNamingConventionTargets.ObjectType
+                )
+            );
 
             var inferredProperty = objectType.ApiProperties
                 .Single(x => x.ClrName == nameof(PersonWithId.Id));
-            inferredProperty.ApiName.Should().Be(expected.InferredPropertyApiName);
+            inferredProperty.ApiName.Should().Be
+            (
+                this.GetExpectedApiName
+                (
+                    expected.InferredPropertyApiName,
+                    nameof(PersonWithId.Id),
+                    ApiNamingConventionTargets.Property
+                )
+            );
+
+            var inferredNameProperty = objectType.ApiProperties
+                .Single(x => x.ClrName == nameof(PersonWithId.Name));
+            inferredNameProperty.ApiName.Should().Be
+            (
+                this.GetExpectedApiName
+                (
+                    this.Style switch
+                    {
+                        BuiltInNamingStyle.CamelCase or
+                        BuiltInNamingStyle.KebabCase or
+                        BuiltInNamingStyle.LowerCase or
+                        BuiltInNamingStyle.CamelThenKebabCase => "name",
+                        BuiltInNamingStyle.PascalCase => "Name",
+                        BuiltInNamingStyle.UpperCase => "NAME",
+                        _ => throw new InvalidOperationException
+                        (
+                            $"Unknown naming style: {this.Style}"
+                        ),
+                    },
+                    nameof(PersonWithId.Name),
+                    ApiNamingConventionTargets.Property
+                )
+            );
 
             var explicitProperty = objectType.ApiProperties
                 .Single(x => x.ClrName == nameof(PersonWithId.Email));
@@ -169,6 +242,18 @@ public partial class ApiConventionTests
             var explicitObject = apiSchema.ApiObjectTypes
                 .Single(x => x.ClrType == typeof(OrderWithPersonId));
             explicitObject.ApiName.Should().Be("ExplicitObject");
+        }
+
+        private string GetExpectedApiName
+        (
+            string transformedApiName,
+            string originalApiName,
+            ApiNamingConventionTargets target
+        )
+        {
+            return (this.Targets & target) != ApiNamingConventionTargets.None
+                ? transformedApiName
+                : originalApiName;
         }
         #endregion
     }
@@ -229,6 +314,69 @@ public partial class ApiConventionTests
         {
             this.ExceptionActual.Should().NotBeNull();
             this.ExceptionActual.Should().BeOfType(this.ExpectedExceptionType);
+        }
+        #endregion
+    }
+
+    private sealed class NamingConventionTargetValidationTest : XUnitTest
+    {
+        #region User Supplied Properties
+        public required BuiltInNamingStyle Style { get; init; }
+        #endregion
+
+        #region Calculated Properties
+        private ApiNamingConvention? NamingConventionActual { get; set; }
+        private Exception? ExceptionActual { get; set; }
+        #endregion
+
+        #region Constructors
+        public NamingConventionTargetValidationTest()
+            => this.Name = nameof(NamingConventionTargetValidationTest);
+        #endregion
+
+        #region XUnitTest Methods
+        protected override void Arrange()
+        {
+        }
+
+        protected override void Act()
+        {
+            try
+            {
+                this.NamingConventionActual = this.Style switch
+                {
+                    BuiltInNamingStyle.CamelCase => new ApiNamingCamelCaseConvention
+                    (
+                        (ApiNamingConventionTargets)int.MaxValue
+                    ),
+                    BuiltInNamingStyle.KebabCase => new ApiNamingKebabCaseConvention
+                    (
+                        (ApiNamingConventionTargets)int.MaxValue
+                    ),
+                    BuiltInNamingStyle.LowerCase => new ApiNamingLowerCaseConvention
+                    (
+                        (ApiNamingConventionTargets)int.MaxValue
+                    ),
+                    BuiltInNamingStyle.PascalCase => new ApiNamingPascalCaseConvention
+                    (
+                        (ApiNamingConventionTargets)int.MaxValue
+                    ),
+                    BuiltInNamingStyle.UpperCase => new ApiNamingUpperCaseConvention
+                    (
+                        (ApiNamingConventionTargets)int.MaxValue
+                    ),
+                    _ => throw new InvalidOperationException($"Unknown naming style: {this.Style}"),
+                };
+            }
+            catch (Exception exception)
+            {
+                this.ExceptionActual = exception;
+            }
+        }
+
+        protected override void Assert()
+        {
+            this.ExceptionActual.Should().BeOfType<ArgumentOutOfRangeException>();
         }
         #endregion
     }
@@ -342,6 +490,88 @@ public partial class ApiConventionTests
             ExpectedExceptionType = typeof(ArgumentException),
         },
     ];
+
+    public static TheoryDataRow<IXUnitTest>[] BuiltInNamingTargetTheoryData =>
+    [
+        new BuiltInNamingTest
+        {
+            Name = "Camel-case naming selects object types",
+            Style = BuiltInNamingStyle.CamelCase,
+            Targets = ApiNamingConventionTargets.ObjectType,
+        },
+        new BuiltInNamingTest
+        {
+            Name = "Kebab-case naming selects scalar types",
+            Style = BuiltInNamingStyle.KebabCase,
+            Targets = ApiNamingConventionTargets.ScalarType,
+        },
+        new BuiltInNamingTest
+        {
+            Name = "Lower-case naming selects enum types",
+            Style = BuiltInNamingStyle.LowerCase,
+            Targets = ApiNamingConventionTargets.EnumType,
+        },
+        new BuiltInNamingTest
+        {
+            Name = "Pascal-case naming selects properties",
+            Style = BuiltInNamingStyle.PascalCase,
+            Targets = ApiNamingConventionTargets.Property,
+        },
+        new BuiltInNamingTest
+        {
+            Name = "Upper-case naming selects enum values",
+            Style = BuiltInNamingStyle.UpperCase,
+            Targets = ApiNamingConventionTargets.EnumValue,
+        },
+        new BuiltInNamingTest
+        {
+            Name = "None disables naming convention target selection",
+            Style = BuiltInNamingStyle.PascalCase,
+            Targets = ApiNamingConventionTargets.None,
+        },
+        new BuiltInNamingTest
+        {
+            Name = "Naming convention target selection composes",
+            Style = BuiltInNamingStyle.CamelThenKebabCase,
+            Targets = ApiNamingConventionTargets.ObjectType |
+                ApiNamingConventionTargets.Property,
+        },
+        new BuiltInNamingTest
+        {
+            Name = "All naming convention targets can be selected explicitly",
+            Style = BuiltInNamingStyle.CamelCase,
+            Targets = ApiNamingConventionTargets.All,
+        },
+    ];
+
+    public static TheoryDataRow<IXUnitTest>[] NamingConventionTargetValidationTheoryData =>
+    [
+        new NamingConventionTargetValidationTest
+        {
+            Name = "Camel-case naming rejects unknown targets",
+            Style = BuiltInNamingStyle.CamelCase,
+        },
+        new NamingConventionTargetValidationTest
+        {
+            Name = "Kebab-case naming rejects unknown targets",
+            Style = BuiltInNamingStyle.KebabCase,
+        },
+        new NamingConventionTargetValidationTest
+        {
+            Name = "Lower-case naming rejects unknown targets",
+            Style = BuiltInNamingStyle.LowerCase,
+        },
+        new NamingConventionTargetValidationTest
+        {
+            Name = "Pascal-case naming rejects unknown targets",
+            Style = BuiltInNamingStyle.PascalCase,
+        },
+        new NamingConventionTargetValidationTest
+        {
+            Name = "Upper-case naming rejects unknown targets",
+            Style = BuiltInNamingStyle.UpperCase,
+        },
+    ];
     #endregion
 
     #region Test Methods
@@ -352,5 +582,13 @@ public partial class ApiConventionTests
     [Theory]
     [MemberData(nameof(NamingConventionValidationTheoryData))]
     public void NamingConventionValidation(IXUnitTest test) => test.Execute(this);
+
+    [Theory]
+    [MemberData(nameof(BuiltInNamingTargetTheoryData))]
+    public void BuiltInNamingTargetSelection(IXUnitTest test) => test.Execute(this);
+
+    [Theory]
+    [MemberData(nameof(NamingConventionTargetValidationTheoryData))]
+    public void NamingConventionTargetValidation(IXUnitTest test) => test.Execute(this);
     #endregion
 }
