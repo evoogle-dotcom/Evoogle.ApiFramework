@@ -342,6 +342,8 @@ internal sealed class ApiAnnotationReaderSet
             .Where(type => filter == null || filter(type))
             .ToHashSet();
         var results = new List<ApiTypeDiscoveryAnnotationResult>();
+        var discoveredTypes = new Dictionary
+        <Type, (ApiTypeKind ApiKind, IApiAnnotationReader Reader)>();
 
         foreach (var reader in _readers)
         {
@@ -441,6 +443,33 @@ internal sealed class ApiAnnotationReaderSet
                     continue;
                 }
 
+                if
+                (
+                    discoveredTypes.TryGetValue(resultType, out var existingDiscovery) &&
+                    existingDiscovery.ApiKind != result.ApiKind
+                )
+                {
+                    this.ApplyReaderDiagnostics
+                    (
+                        discoveryReader,
+                        resultType.FullName ?? resultType.Name,
+                        [new
+                        (
+                            ApiInitializationCode.ApiAnnotationTypeDiscoveryConflict,
+                            resultType.FullName ?? resultType.Name,
+                            "The CLR type was already discovered as an " +
+                            $"API {existingDiscovery.ApiKind} " +
+                            "by reader '" +
+                            $"{existingDiscovery.Reader.GetType().FullName ?? existingDiscovery.Reader.GetType().Name}' " +
+                            $"and cannot also be discovered as an API {result.ApiKind}.",
+                            "Ensure all annotation readers agree on the API type kind for each " +
+                            "CLR type."
+                        )]
+                    );
+                    continue;
+                }
+
+                discoveredTypes.TryAdd(resultType, (result.ApiKind, discoveryReader));
                 results.Add(result);
             }
         }
@@ -578,6 +607,8 @@ internal sealed class ApiAnnotationReaderSet
     )
         where TBuilder : ApiNamedTypeBuilder<TBuilder>
     {
+        this.ApplyTypeDiagnostics(reader, clrType);
+
         IReadOnlyList<ApiTypeAnnotationResult>? results;
         try
         {
@@ -631,6 +662,32 @@ internal sealed class ApiAnnotationReaderSet
                 this.AddInvalidContributionIssue(reader, clrType, exception.Message);
             }
         }
+    }
+
+    private void ApplyTypeDiagnostics(IApiAnnotationReader reader, Type clrType)
+    {
+        if (reader is not IApiTypeAnnotationDiagnosticReader diagnosticReader)
+        {
+            return;
+        }
+
+        IReadOnlyList<ApiAnnotationReaderDiagnostic>? diagnostics;
+        try
+        {
+            diagnostics = diagnosticReader.ReadTypeAnnotationDiagnostics(clrType);
+        }
+        catch (Exception exception)
+        {
+            this.AddReaderIssue(diagnosticReader, clrType, exception);
+            return;
+        }
+
+        this.ApplyReaderDiagnostics
+        (
+            diagnosticReader,
+            clrType.FullName ?? clrType.Name,
+            diagnostics
+        );
     }
 
     private bool IsValidKeyResult
@@ -910,6 +967,18 @@ internal sealed class ApiAnnotationReaderSet
                 continue;
             }
 
+            if (!Enum.IsDefined(typeof(ApiInitializationCode), diagnostic.Code))
+            {
+                this.AddInvalidContributionIssue
+                (
+                    reader,
+                    defaultApiPath,
+                    "An annotation reader returned a diagnostic with an undefined " +
+                    "initialization code."
+                );
+                continue;
+            }
+
             if (string.IsNullOrWhiteSpace(diagnostic.ApiPath) ||
                 string.IsNullOrWhiteSpace(diagnostic.Description))
             {
@@ -927,7 +996,7 @@ internal sealed class ApiAnnotationReaderSet
                 new ApiInitializationIssue
                 (
                     diagnostic.ApiPath,
-                    ApiInitializationSeverity.Error,
+                    diagnostic.Severity,
                     diagnostic.Code,
                     diagnostic.Description,
                     diagnostic.Remediation,

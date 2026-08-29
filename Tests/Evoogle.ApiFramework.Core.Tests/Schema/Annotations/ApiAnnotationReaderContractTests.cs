@@ -261,8 +261,114 @@ public sealed class ApiAnnotationReaderContractTests(ITestOutputHelper output)
         #endregion
     }
 
+    private enum MarkerConflictCase
+    {
+        Discovery,
+        ExplicitObject,
+        ExplicitScalar
+    }
+
     private sealed class MarkerConflictTest : XUnitTest
     {
+        #region User Supplied Properties
+        public required MarkerConflictCase TestCase { get; init; }
+        #endregion
+
+        #region Calculated Properties
+        private IReadOnlyList<ApiTypeDiscoveryAnnotationResult>? ResultsActual { get; set; }
+        private IReadOnlyList<ApiInitializationIssue>? IssuesActual { get; set; }
+        private ApiSchemaInitializationException? ExceptionActual { get; set; }
+        #endregion
+
+        #region XUnitTest Methods
+        protected override void Arrange()
+        {
+            this.WriteLine($"TestCase: {this.TestCase}");
+            this.WriteLine();
+        }
+
+        protected override void Act()
+        {
+            if (this.TestCase == MarkerConflictCase.Discovery)
+            {
+                var readerSet = new ApiAnnotationReaderSetBuilder()
+                    .AddReader(new ApiAttributeAnnotationReader())
+                    .Build();
+
+                this.ResultsActual = readerSet.ReadTypeDiscoveryAnnotations
+                (
+                    typeof(ApiAnnotationReaderContractTests).Assembly,
+                    static type => type == typeof(ConflictingMarkerType) ||
+                        type == typeof(ValidMarkerType)
+                );
+                this.IssuesActual = readerSet.Issues;
+                return;
+            }
+
+            var builder = new ApiSchemaBuilder()
+                .WithName("Test")
+                .UseDefaultAnnotations();
+            if (this.TestCase == MarkerConflictCase.ExplicitObject)
+            {
+                builder.AddObject<ConflictingMarkerType>();
+            }
+            else
+            {
+                builder.AddScalar<ConflictingMarkerType>();
+            }
+
+            try
+            {
+                _ = builder.Build();
+            }
+            catch (ApiSchemaInitializationException exception)
+            {
+                this.ExceptionActual = exception;
+            }
+        }
+
+        protected override void Assert()
+        {
+            if (this.TestCase == MarkerConflictCase.Discovery)
+            {
+                this.ResultsActual!.Select(result => result.ClrType)
+                    .Should().Contain(typeof(ValidMarkerType));
+                this.ResultsActual!.Select(result => result.ClrType)
+                    .Should().NotContain(typeof(ConflictingMarkerType));
+
+                var issue = this.IssuesActual!.Single
+                (
+                    issue => issue.Code == ApiInitializationCode.ApiAnnotationTypeMarkerConflict
+                );
+                issue.ReaderType.Should().Be(typeof(ApiAttributeAnnotationReader));
+                issue.Description.Should().Contain("both");
+                return;
+            }
+
+            this.ExceptionActual.Should().NotBeNull();
+            var explicitIssue = this.ExceptionActual!.Errors.Single
+            (
+                issue => issue.Code == ApiInitializationCode.ApiAnnotationTypeMarkerConflict
+            );
+            explicitIssue.ReaderType.Should().Be(typeof(ApiAttributeAnnotationReader));
+            explicitIssue.Description.Should().Contain("both");
+        }
+        #endregion
+    }
+
+    private enum DiscoveryConflictCase
+    {
+        ObjectThenScalar,
+        ScalarThenObject
+    }
+
+    private sealed class DiscoveryConflictTest : XUnitTest
+    {
+        #region User Supplied Properties
+        public required DiscoveryConflictCase TestCase { get; init; }
+        public required ApiTypeKind ApiKindExpected { get; init; }
+        #endregion
+
         #region Calculated Properties
         private IReadOnlyList<ApiTypeDiscoveryAnnotationResult>? ResultsActual { get; set; }
         private IReadOnlyList<ApiInitializationIssue>? IssuesActual { get; set; }
@@ -271,43 +377,111 @@ public sealed class ApiAnnotationReaderContractTests(ITestOutputHelper output)
         #region XUnitTest Methods
         protected override void Arrange()
         {
+            this.WriteLine($"TestCase: {this.TestCase}");
+            this.WriteLine($"ApiKindExpected: {this.ApiKindExpected}");
+            this.WriteLine();
         }
 
         protected override void Act()
         {
-            var readerSet = new ApiAnnotationReaderSetBuilder()
-                .AddReader(new ApiAttributeAnnotationReader())
-                .Build();
+            var objectReader = new DiscoveryTypeReader(ApiTypeKind.Object);
+            var scalarReader = new DiscoveryTypeReader(ApiTypeKind.Scalar);
+            var readerSet = this.TestCase == DiscoveryConflictCase.ObjectThenScalar
+                ? new ApiAnnotationReaderSetBuilder()
+                    .AddReader(objectReader)
+                    .AddReader(scalarReader)
+                    .Build()
+                : new ApiAnnotationReaderSetBuilder()
+                    .AddReader(scalarReader)
+                    .AddReader(objectReader)
+                    .Build();
 
             this.ResultsActual = readerSet.ReadTypeDiscoveryAnnotations
             (
                 typeof(ApiAnnotationReaderContractTests).Assembly,
-                static type => type == typeof(ConflictingMarkerType) ||
-                    type == typeof(ValidMarkerType)
+                static type => type == typeof(CrossReaderDiscoveryType)
             );
             this.IssuesActual = readerSet.Issues;
         }
 
         protected override void Assert()
         {
-            this.ResultsActual!.Select(result => result.ClrType)
-                .Should().Contain(typeof(ValidMarkerType));
-            this.ResultsActual!.Select(result => result.ClrType)
-                .Should().NotContain(typeof(ConflictingMarkerType));
+            this.ResultsActual.Should().ContainSingle();
+            var result = this.ResultsActual!.Single();
+            result.ClrType.Should().Be(typeof(CrossReaderDiscoveryType));
+            result.ApiKind.Should().Be(this.ApiKindExpected);
 
             var issue = this.IssuesActual!.Single
             (
-                issue => issue.Code == ApiInitializationCode.ApiAnnotationTypeMarkerConflict
+                issue => issue.Code == ApiInitializationCode.ApiAnnotationTypeDiscoveryConflict
             );
-            issue.ReaderType.Should().Be(typeof(ApiAttributeAnnotationReader));
-            issue.Description.Should().Contain("both");
+            issue.ReaderType.Should().Be(typeof(DiscoveryTypeReader));
+            issue.Description.Should().Contain
+            (
+                this.ApiKindExpected == ApiTypeKind.Object ? "Object" : "Scalar"
+            );
         }
         #endregion
+    }
+
+    private sealed class DiscoveryRegistrationTest : XUnitTest
+    {
+        #region Calculated Properties
+        private ApiSchemaBuilder? ApiSchemaBuilder { get; set; }
+        private IReadOnlyList<string>? ReaderOrderActual { get; set; }
+        private ApiSchema? ApiSchemaActual { get; set; }
+        private Exception? ExceptionActual { get; set; }
+        #endregion
+
+        #region XUnitTest Methods
+        protected override void Arrange()
+        {
+            var readerOrder = new List<string>();
+            var firstReader = new OrderedDiscoveryReader("First", readerOrder);
+            var secondReader = new OrderedDiscoveryReader("Second", readerOrder);
+            this.ReaderOrderActual = readerOrder;
+            this.ApiSchemaBuilder = new ApiSchemaBuilder()
+                .WithName("Test")
+                .UseAnnotations(annotations => annotations
+                    .AddReader(firstReader)
+                    .AddReader(secondReader)
+                    .AddReader(firstReader))
+                .UseAssemblyAnnotationScanning
+                (
+                    typeof(ApiAnnotationReaderContractTests).Assembly,
+                    static type => type == typeof(DiscoveryRegistrationType)
+                );
+        }
+
+        protected override void Act()
+        {
+            try
+            {
+                this.ApiSchemaActual = this.ApiSchemaBuilder!.Build();
+            }
+            catch (Exception exception)
+            {
+                this.ExceptionActual = exception;
+            }
+        }
+
+        protected override void Assert()
+        {
+            this.ExceptionActual.Should().BeNull();
+            this.ReaderOrderActual.Should().Equal("First", "Second", "First");
+            this.ApiSchemaActual!.ApiObjectTypes
+                .Count(type => type.ClrType == typeof(DiscoveryRegistrationType))
+                .Should().Be(1);
+        }
+        #endregion
+
     }
 
     private enum IssueMetadataTestCase
     {
         DiagnosticMetadata,
+        InvalidDiagnosticCode,
+        DiagnosticSeverity,
         ExecutionMetadata,
         PersistentIssueHistory
     }
@@ -316,6 +490,8 @@ public sealed class ApiAnnotationReaderContractTests(ITestOutputHelper output)
     {
         #region User Supplied Properties
         public required IssueMetadataTestCase TestCase { get; init; }
+        public ApiInitializationSeverity SeverityExpected { get; init; } =
+            ApiInitializationSeverity.Error;
         #endregion
 
         #region Calculated Properties
@@ -337,9 +513,21 @@ public sealed class ApiAnnotationReaderContractTests(ITestOutputHelper output)
             switch (this.TestCase)
             {
                 case IssueMetadataTestCase.DiagnosticMetadata:
+                case IssueMetadataTestCase.DiagnosticSeverity:
+                case IssueMetadataTestCase.InvalidDiagnosticCode:
                     {
                         var readerSet = new ApiAnnotationReaderSetBuilder()
-                            .AddReader(new DiagnosticReader(this.ReaderExceptionExpected!))
+                            .AddReader
+                            (
+                                new DiagnosticReader
+                                (
+                                    this.ReaderExceptionExpected!,
+                                    this.SeverityExpected,
+                                    this.TestCase == IssueMetadataTestCase.InvalidDiagnosticCode
+                                        ? (ApiInitializationCode)999
+                                        : ApiInitializationCode.ApiAnnotationInvalidContribution
+                                )
+                            )
                             .Build();
                         _ = readerSet.ReadTypeDiscoveryAnnotations
                         (
@@ -399,11 +587,23 @@ public sealed class ApiAnnotationReaderContractTests(ITestOutputHelper output)
 
         protected override void Assert()
         {
-            if (this.TestCase == IssueMetadataTestCase.DiagnosticMetadata)
+            if (this.TestCase == IssueMetadataTestCase.InvalidDiagnosticCode)
+            {
+                this.IssuesActual!.Should().ContainSingle
+                (
+                    issue => issue.Code == ApiInitializationCode.ApiAnnotationInvalidContribution &&
+                        issue.ReaderType == typeof(DiagnosticReader)
+                );
+                return;
+            }
+
+            if (this.TestCase is IssueMetadataTestCase.DiagnosticMetadata or
+                IssueMetadataTestCase.DiagnosticSeverity)
             {
                 var issue = this.IssuesActual!.Single();
                 issue.ReaderType.Should().Be(typeof(DiagnosticReader));
                 issue.Exception.Should().BeSameAs(this.ReaderExceptionExpected);
+                issue.Severity.Should().Be(this.SeverityExpected);
                 return;
             }
 
@@ -560,8 +760,12 @@ public sealed class ApiAnnotationReaderContractTests(ITestOutputHelper output)
         KeyNullRow,
         PropertyNullList,
         PropertyNullRow,
+        RelationshipManyToManyNullList,
+        RelationshipManyToManyNullRow,
         RelationshipNullList,
         RelationshipNullRow,
+        RelationshipOneToOneNullList,
+        RelationshipOneToOneNullRow,
         TypeNullList,
         TypeNullRow
     }
@@ -597,8 +801,12 @@ public sealed class ApiAnnotationReaderContractTests(ITestOutputHelper output)
                     builder
                         .UseEnumValueDiscovery()
                         .AddEnum<CapabilityEnum>(enumBuilder => enumBuilder.AddAllValues()),
+                InvalidCapabilityCase.RelationshipManyToManyNullList or
+                InvalidCapabilityCase.RelationshipManyToManyNullRow or
                 InvalidCapabilityCase.RelationshipNullList or
-                    InvalidCapabilityCase.RelationshipNullRow => builder
+                InvalidCapabilityCase.RelationshipNullRow or
+                InvalidCapabilityCase.RelationshipOneToOneNullList or
+                InvalidCapabilityCase.RelationshipOneToOneNullRow => builder
                         .AddObject<CapabilityPrincipal>(objectBuilder => objectBuilder
                             .AddProperty("Id", nameof(CapabilityPrincipal.Id)))
                         .AddObject<CapabilityDependent>(objectBuilder => objectBuilder
@@ -631,6 +839,84 @@ public sealed class ApiAnnotationReaderContractTests(ITestOutputHelper output)
                 .Should().Contain(issue =>
                     issue.Code == ApiInitializationCode.ApiAnnotationInvalidContribution &&
                     issue.ReaderType == typeof(InvalidContributionReader));
+        }
+        #endregion
+    }
+
+    private enum ReaderExecutionCase
+    {
+        EnumValue,
+        Key,
+        ManyToMany,
+        ObjectProperty,
+        OneToMany,
+        OneToOne,
+        Type
+    }
+
+    private sealed class ReaderExecutionTest : XUnitTest
+    {
+        #region User Supplied Properties
+        public required ReaderExecutionCase TestCase { get; init; }
+        #endregion
+
+        #region Calculated Properties
+        private ApiSchemaBuilder? ApiSchemaBuilder { get; set; }
+        private ApiSchemaInitializationException? ExceptionActual { get; set; }
+        private Exception? ReaderExceptionExpected { get; set; }
+        #endregion
+
+        #region XUnitTest Methods
+        protected override void Arrange()
+        {
+            this.ReaderExceptionExpected = new InvalidOperationException("reader failure");
+            var builder = new ApiSchemaBuilder()
+                .WithName("Test")
+                .UsePropertyDiscovery()
+                .UseEnumValueDiscovery()
+                .AddScalar<int>()
+                .UseAnnotations(annotations => annotations.AddReader
+                (
+                    new ThrowingCapabilityReader(this.TestCase, this.ReaderExceptionExpected)
+                ));
+
+            this.ApiSchemaBuilder = this.TestCase switch
+            {
+                ReaderExecutionCase.EnumValue => builder
+                    .AddEnum<CapabilityEnum>(enumBuilder => enumBuilder.AddAllValues()),
+                ReaderExecutionCase.ManyToMany or
+                ReaderExecutionCase.OneToMany or
+                ReaderExecutionCase.OneToOne => builder
+                    .AddObject<CapabilityPrincipal>()
+                    .AddObject<CapabilityDependent>(),
+                _ => builder.AddObject<CapabilityObject>()
+            };
+
+            this.WriteLine($"TestCase: {this.TestCase}");
+            this.WriteLine();
+        }
+
+        protected override void Act()
+        {
+            try
+            {
+                _ = this.ApiSchemaBuilder!.Build();
+            }
+            catch (ApiSchemaInitializationException exception)
+            {
+                this.ExceptionActual = exception;
+            }
+        }
+
+        protected override void Assert()
+        {
+            this.ExceptionActual.Should().NotBeNull();
+            this.ExceptionActual!.Errors.Should().Contain
+            (
+                issue => issue.Code == ApiInitializationCode.ApiAnnotationReaderExecutionFailed &&
+                    issue.ReaderType == typeof(ThrowingCapabilityReader) &&
+                    issue.Exception == this.ReaderExceptionExpected
+            );
         }
         #endregion
     }
@@ -709,7 +995,47 @@ public sealed class ApiAnnotationReaderContractTests(ITestOutputHelper output)
         }
     }
 
-    private sealed class DiagnosticReader(Exception exception) : IApiTypeDiscoveryAnnotationReader
+    private sealed class DiscoveryTypeReader(ApiTypeKind apiKind) :
+        IApiTypeDiscoveryAnnotationReader
+    {
+        public ApiAnnotationReaderResult<ApiTypeDiscoveryAnnotationResult>
+            ReadTypeDiscoveryAnnotations
+        (
+            Assembly assembly,
+            Func<Type, bool>? filter
+        )
+            => new
+            (
+                [new(typeof(CrossReaderDiscoveryType), apiKind)],
+                []
+            );
+    }
+
+    private sealed class OrderedDiscoveryReader(string name, ICollection<string> readerOrder) :
+        IApiTypeDiscoveryAnnotationReader
+    {
+        public ApiAnnotationReaderResult<ApiTypeDiscoveryAnnotationResult>
+            ReadTypeDiscoveryAnnotations
+        (
+            Assembly assembly,
+            Func<Type, bool>? filter
+        )
+        {
+            readerOrder.Add(name);
+            return new
+            (
+                [new(typeof(DiscoveryRegistrationType), ApiTypeKind.Object)],
+                []
+            );
+        }
+    }
+
+    private sealed class DiagnosticReader
+    (
+        Exception exception,
+        ApiInitializationSeverity severity,
+        ApiInitializationCode code
+    ) : IApiTypeDiscoveryAnnotationReader
     {
         public ApiAnnotationReaderResult<ApiTypeDiscoveryAnnotationResult>
             ReadTypeDiscoveryAnnotations
@@ -722,11 +1048,12 @@ public sealed class ApiAnnotationReaderContractTests(ITestOutputHelper output)
                 [],
                 [new
                 (
-                    ApiInitializationCode.ApiAnnotationInvalidContribution,
+                    code,
                     "DiagnosticPath",
                     "A diagnostic reader reported an invalid contribution.",
                     "Correct the contribution.",
-                    exception
+                    exception,
+                    severity
                 )]
             );
     }
@@ -874,12 +1201,112 @@ public sealed class ApiAnnotationReaderContractTests(ITestOutputHelper output)
         public IReadOnlyList<ApiOneToOneRelationshipAnnotationResult> ReadOneToOneRelationships
         (
             Type clrType
-        ) => [];
+        )
+            => testCase switch
+            {
+                InvalidCapabilityCase.RelationshipOneToOneNullList => null!,
+                InvalidCapabilityCase.RelationshipOneToOneNullRow => [null!],
+                _ => []
+            };
 
         public IReadOnlyList<ApiManyToManyRelationshipAnnotationResult> ReadManyToManyRelationships
         (
             Type clrType
-        ) => [];
+        )
+            => testCase switch
+            {
+                InvalidCapabilityCase.RelationshipManyToManyNullList => null!,
+                InvalidCapabilityCase.RelationshipManyToManyNullRow => [null!],
+                _ => []
+            };
+    }
+
+    private sealed class ThrowingCapabilityReader
+    (
+        ReaderExecutionCase testCase,
+        Exception exception
+    ) :
+        IApiTypeAnnotationReader,
+        IApiPropertyAnnotationReader,
+        IApiEnumValueAnnotationReader,
+        IApiKeyAnnotationReader,
+        IApiRelationshipAnnotationReader
+    {
+        public IReadOnlyList<ApiTypeAnnotationResult> ReadObjectTypeAnnotations(Type clrType)
+        {
+            this.ThrowIfSelected(ReaderExecutionCase.Type);
+            return [];
+        }
+
+        public IReadOnlyList<ApiTypeAnnotationResult> ReadScalarTypeAnnotations(Type clrType)
+        {
+            this.ThrowIfSelected(ReaderExecutionCase.Type);
+            return [];
+        }
+
+        public IReadOnlyList<ApiTypeAnnotationResult> ReadEnumTypeAnnotations(Type clrType)
+        {
+            this.ThrowIfSelected(ReaderExecutionCase.Type);
+            return [];
+        }
+
+        public IReadOnlyList<ApiPropertyAnnotationResult> ReadPropertyAnnotations
+        (
+            MemberInfo clrMember,
+            ClrMemberKind clrMemberKind,
+            MemberNullableInfo clrNullabilityInfo
+        )
+        {
+            this.ThrowIfSelected(ReaderExecutionCase.ObjectProperty);
+            return [];
+        }
+
+        public IReadOnlyList<ApiEnumValueAnnotationResult> ReadEnumValueAnnotations(FieldInfo clrField)
+        {
+            this.ThrowIfSelected(ReaderExecutionCase.EnumValue);
+            return [];
+        }
+
+        public IReadOnlyList<ApiKeyAnnotationResult> ReadKeyAnnotations(Type clrType)
+        {
+            this.ThrowIfSelected(ReaderExecutionCase.Key);
+            return [];
+        }
+
+        public IReadOnlyList<ApiOneToManyRelationshipAnnotationResult> ReadOneToManyRelationships
+        (
+            Type clrType
+        )
+        {
+            this.ThrowIfSelected(ReaderExecutionCase.OneToMany);
+            return [];
+        }
+
+        public IReadOnlyList<ApiOneToOneRelationshipAnnotationResult> ReadOneToOneRelationships
+        (
+            Type clrType
+        )
+        {
+            this.ThrowIfSelected(ReaderExecutionCase.OneToOne);
+            return [];
+        }
+
+        public IReadOnlyList<ApiManyToManyRelationshipAnnotationResult> ReadManyToManyRelationships
+        (
+            Type clrType
+        )
+        {
+            this.ThrowIfSelected(ReaderExecutionCase.ManyToMany);
+            return [];
+        }
+
+        private void ThrowIfSelected(ReaderExecutionCase capability)
+        {
+            if (testCase == capability)
+            {
+                throw exception;
+            }
+        }
     }
     #endregion
 
@@ -1071,6 +1498,31 @@ public sealed class ApiAnnotationReaderContractTests(ITestOutputHelper output)
             Name =
                 "A null relationship annotation result row becomes an invalid contribution issue",
             TestCase = InvalidCapabilityCase.RelationshipNullRow
+        },
+        new InvalidContributionTest
+        {
+            Name =
+                "A null one-to-one relationship result list becomes an invalid contribution issue",
+            TestCase = InvalidCapabilityCase.RelationshipOneToOneNullList
+        },
+        new InvalidContributionTest
+        {
+            Name =
+                "A null one-to-one relationship result row becomes an invalid contribution issue",
+            TestCase = InvalidCapabilityCase.RelationshipOneToOneNullRow
+        },
+        new InvalidContributionTest
+        {
+            Name =
+                "A null many-to-many relationship result list becomes an invalid " +
+                "contribution issue",
+            TestCase = InvalidCapabilityCase.RelationshipManyToManyNullList
+        },
+        new InvalidContributionTest
+        {
+            Name =
+                "A null many-to-many relationship result row becomes an invalid contribution issue",
+            TestCase = InvalidCapabilityCase.RelationshipManyToManyNullRow
         }
     ];
 
@@ -1088,6 +1540,17 @@ public sealed class ApiAnnotationReaderContractTests(ITestOutputHelper output)
         },
         new IssueMetadataTest
         {
+            Name = "Undefined reader diagnostic codes become invalid contribution issues",
+            TestCase = IssueMetadataTestCase.InvalidDiagnosticCode
+        },
+        new IssueMetadataTest
+        {
+            Name = "Reader diagnostics preserve their configured severity",
+            TestCase = IssueMetadataTestCase.DiagnosticSeverity,
+            SeverityExpected = ApiInitializationSeverity.Warning
+        },
+        new IssueMetadataTest
+        {
             Name = "Reader issues accumulate across repeated builds",
             TestCase = IssueMetadataTestCase.PersistentIssueHistory
         }
@@ -1097,7 +1560,81 @@ public sealed class ApiAnnotationReaderContractTests(ITestOutputHelper output)
     [
         new MarkerConflictTest
         {
-            Name = "Conflicting built-in type markers are diagnosed while valid types continue"
+            Name = "Conflicting built-in type markers are diagnosed during assembly discovery",
+            TestCase = MarkerConflictCase.Discovery
+        },
+        new MarkerConflictTest
+        {
+            Name = "Conflicting built-in type markers are diagnosed for explicit object types",
+            TestCase = MarkerConflictCase.ExplicitObject
+        },
+        new MarkerConflictTest
+        {
+            Name = "Conflicting built-in type markers are diagnosed for explicit scalar types",
+            TestCase = MarkerConflictCase.ExplicitScalar
+        }
+    ];
+
+    public static TheoryDataRow<IXUnitTest>[] DiscoveryConflictTheoryData =>
+    [
+        new DiscoveryConflictTest
+        {
+            Name = "The first object discovery kind wins over a later scalar conflict",
+            TestCase = DiscoveryConflictCase.ObjectThenScalar,
+            ApiKindExpected = ApiTypeKind.Object
+        },
+        new DiscoveryConflictTest
+        {
+            Name = "The first scalar discovery kind wins over a later object conflict",
+            TestCase = DiscoveryConflictCase.ScalarThenObject,
+            ApiKindExpected = ApiTypeKind.Scalar
+        }
+    ];
+
+    public static TheoryDataRow<IXUnitTest>[] DiscoveryRegistrationTheoryData =>
+    [
+        new DiscoveryRegistrationTest
+        {
+            Name = "Discovery readers execute in registration order, including duplicates"
+        }
+    ];
+
+    public static TheoryDataRow<IXUnitTest>[] ReaderExecutionTheoryData =>
+    [
+        new ReaderExecutionTest
+        {
+            Name = "Type reader exceptions become reader-attributed initialization issues",
+            TestCase = ReaderExecutionCase.Type
+        },
+        new ReaderExecutionTest
+        {
+            Name = "Property reader exceptions become reader-attributed initialization issues",
+            TestCase = ReaderExecutionCase.ObjectProperty
+        },
+        new ReaderExecutionTest
+        {
+            Name = "Enum-value reader exceptions become reader-attributed initialization issues",
+            TestCase = ReaderExecutionCase.EnumValue
+        },
+        new ReaderExecutionTest
+        {
+            Name = "Key reader exceptions become reader-attributed initialization issues",
+            TestCase = ReaderExecutionCase.Key
+        },
+        new ReaderExecutionTest
+        {
+            Name = "One-to-many reader exceptions become reader-attributed initialization issues",
+            TestCase = ReaderExecutionCase.OneToMany
+        },
+        new ReaderExecutionTest
+        {
+            Name = "One-to-one reader exceptions become reader-attributed initialization issues",
+            TestCase = ReaderExecutionCase.OneToOne
+        },
+        new ReaderExecutionTest
+        {
+            Name = "Many-to-many reader exceptions become reader-attributed initialization issues",
+            TestCase = ReaderExecutionCase.ManyToMany
         }
     ];
     #endregion
@@ -1130,6 +1667,18 @@ public sealed class ApiAnnotationReaderContractTests(ITestOutputHelper output)
     [Theory]
     [MemberData(nameof(MarkerConflictTheoryData))]
     public void MarkerConflict(IXUnitTest test) => test.Execute(this);
+
+    [Theory]
+    [MemberData(nameof(DiscoveryConflictTheoryData))]
+    public void DiscoveryConflict(IXUnitTest test) => test.Execute(this);
+
+    [Theory]
+    [MemberData(nameof(DiscoveryRegistrationTheoryData))]
+    public void DiscoveryRegistration(IXUnitTest test) => test.Execute(this);
+
+    [Theory]
+    [MemberData(nameof(ReaderExecutionTheoryData))]
+    public void ReaderExecution(IXUnitTest test) => test.Execute(this);
     #endregion
 }
 
@@ -1155,10 +1704,21 @@ public sealed class DiscoverySecondValidType
 {
 }
 
+public sealed class CrossReaderDiscoveryType
+{
+    public int Id { get; set; }
+}
+
+public sealed class DiscoveryRegistrationType
+{
+    public int Id { get; set; }
+}
+
 [ApiObject]
 [ApiScalar]
 public sealed class ConflictingMarkerType
 {
+    public int Id { get; set; }
 }
 
 [ApiObject]

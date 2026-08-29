@@ -457,6 +457,12 @@ public enum ApiInitializationCode
     ApiAnnotationTypeMarkerConflict,
 
     /// <summary>
+    ///     Multiple annotation readers discovered different API type kinds for the same CLR type.
+    /// </summary>
+    [EnumMember(Value = "API_ANNOTATION_TYPE_DISCOVERY_CONFLICT")]
+    ApiAnnotationTypeDiscoveryConflict,
+
+    /// <summary>
     ///     Multiple annotation key paths use the same order within one named key type.
     /// </summary>
     [EnumMember(Value = "API_ANNOTATION_KEY_ORDER_CONFLICT")]

@@ -8,6 +8,10 @@ using System.Reflection;
 namespace Evoogle.ApiFramework.Schema.Configuration.Annotations;
 
 /// <summary>Reads CLR types to discover during assembly annotation scanning.</summary>
+/// <remarks>
+///     When multiple readers discover the same CLR type with different API kinds, the first valid
+///     contribution is retained and later conflicting contributions are reported as initialization issues.
+/// </remarks>
 public interface IApiTypeDiscoveryAnnotationReader : IApiAnnotationReader
 {
     #region Methods

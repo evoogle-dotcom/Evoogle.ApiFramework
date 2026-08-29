@@ -12,13 +12,15 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Annotations;
 /// <param name="Description">The human-readable diagnostic description.</param>
 /// <param name="Remediation">Optional guidance for resolving the diagnostic.</param>
 /// <param name="Exception">The exception associated with the diagnostic, if any.</param>
+/// <param name="Severity">The severity assigned to the diagnostic.</param>
 public sealed record ApiAnnotationReaderDiagnostic
 (
     ApiInitializationCode Code,
     string ApiPath,
     string Description,
     string? Remediation = null,
-    Exception? Exception = null
+    Exception? Exception = null,
+    ApiInitializationSeverity Severity = ApiInitializationSeverity.Error
 );
 
 /// <summary>Contains annotation-reader contributions and reader-emitted diagnostics.</summary>

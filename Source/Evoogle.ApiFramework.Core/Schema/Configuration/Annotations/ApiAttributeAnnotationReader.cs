@@ -14,7 +14,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Annotations;
 ///     Default annotation reader for the framework's built-in attribute set.
 /// </summary>
 public sealed class ApiAttributeAnnotationReader :
-    IApiTypeAnnotationReader,
+    IApiTypeAnnotationDiagnosticReader,
     IApiTypeDiscoveryAnnotationReader,
     IApiPropertyAnnotationReader,
     IApiEnumValueAnnotationReader,
@@ -25,6 +25,11 @@ public sealed class ApiAttributeAnnotationReader :
     /// <inheritdoc/>
     public IReadOnlyList<ApiTypeAnnotationResult> ReadObjectTypeAnnotations(Type clrType)
     {
+        if (HasConflictingTypeMarkers(clrType))
+        {
+            return [];
+        }
+
         var attr = clrType.GetCustomAttribute<ApiObjectAttribute>(inherit: false);
         return attr?.ApiName == null ? [] : [new(attr.ApiName)];
     }
@@ -32,6 +37,11 @@ public sealed class ApiAttributeAnnotationReader :
     /// <inheritdoc/>
     public IReadOnlyList<ApiTypeAnnotationResult> ReadScalarTypeAnnotations(Type clrType)
     {
+        if (HasConflictingTypeMarkers(clrType))
+        {
+            return [];
+        }
+
         var attr = clrType.GetCustomAttribute<ApiScalarAttribute>(inherit: false);
         return attr?.ApiName == null ? [] : [new(attr.ApiName)];
     }
@@ -41,6 +51,18 @@ public sealed class ApiAttributeAnnotationReader :
     {
         var attr = clrType.GetCustomAttribute<ApiEnumAttribute>(inherit: false);
         return attr?.ApiName == null ? [] : [new(attr.ApiName)];
+    }
+    #endregion
+
+    #region IApiTypeAnnotationDiagnosticReader Methods
+    /// <inheritdoc/>
+    public IReadOnlyList<ApiAnnotationReaderDiagnostic> ReadTypeAnnotationDiagnostics(Type clrType)
+    {
+        ArgumentNullException.ThrowIfNull(clrType);
+
+        return HasConflictingTypeMarkers(clrType)
+            ? [CreateTypeMarkerConflictDiagnostic(clrType)]
+            : [];
     }
     #endregion
 
@@ -73,28 +95,18 @@ public sealed class ApiAttributeAnnotationReader :
                 continue;
             }
 
-            var hasObjectAttribute = clrType.IsDefined(typeof(ApiObjectAttribute), inherit: false);
-            var hasScalarAttribute = clrType.IsDefined(typeof(ApiScalarAttribute), inherit: false);
-            if (hasObjectAttribute && hasScalarAttribute)
+            var markerConflictDiagnostic = CreateTypeMarkerConflictDiagnosticOrNull(clrType);
+            if (markerConflictDiagnostic != null)
             {
-                diagnostics.Add
-                (
-                    new
-                    (
-                        ApiInitializationCode.ApiAnnotationTypeMarkerConflict,
-                        clrType.FullName ?? clrType.Name,
-                        "A CLR type cannot be marked as both an API object and an API scalar.",
-                        "Remove either the API object marker or the API scalar marker."
-                    )
-                );
+                diagnostics.Add(markerConflictDiagnostic);
                 continue;
             }
 
-            if (hasObjectAttribute)
+            if (clrType.IsDefined(typeof(ApiObjectAttribute), inherit: false))
             {
                 contributions.Add(new(clrType, ApiTypeKind.Object));
             }
-            else if (hasScalarAttribute)
+            else if (clrType.IsDefined(typeof(ApiScalarAttribute), inherit: false))
             {
                 contributions.Add(new(clrType, ApiTypeKind.Scalar));
             }
@@ -328,6 +340,33 @@ public sealed class ApiAttributeAnnotationReader :
     #endregion
 
     #region Private Methods
+    private static bool HasConflictingTypeMarkers(Type clrType)
+    {
+        return clrType.IsDefined(typeof(ApiObjectAttribute), inherit: false) &&
+            clrType.IsDefined(typeof(ApiScalarAttribute), inherit: false);
+    }
+
+    private static ApiAnnotationReaderDiagnostic CreateTypeMarkerConflictDiagnostic(Type clrType)
+    {
+        return new
+        (
+            ApiInitializationCode.ApiAnnotationTypeMarkerConflict,
+            clrType.FullName ?? clrType.Name,
+            "A CLR type cannot be marked as both an API object and an API scalar.",
+            "Remove either the API object marker or the API scalar marker."
+        );
+    }
+
+    private static ApiAnnotationReaderDiagnostic? CreateTypeMarkerConflictDiagnosticOrNull
+    (
+        Type clrType
+    )
+    {
+        return HasConflictingTypeMarkers(clrType)
+            ? CreateTypeMarkerConflictDiagnostic(clrType)
+            : null;
+    }
+
     private static IReadOnlyList<string> GetClrPath
     (
         ApiKeyAttribute keyAttribute,
