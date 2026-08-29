@@ -5,6 +5,8 @@
 // See the LICENSE file in the project root for more information.
 using System.Reflection;
 
+using Evoogle.ApiFramework.Schema.Configuration.Internal;
+
 namespace Evoogle.ApiFramework.Schema.Configuration.Conventions.Internal;
 
 /// <summary>
@@ -45,8 +47,13 @@ internal sealed class ApiSchemaAssemblyTypeInferenceConvention : IApiSchemaConve
     /// <inheritdoc />
     public void Apply(ApiSchemaBuilder builder)
     {
-        var clrTypes = _assembly.GetExportedTypes();
-        builder.AddTypes(clrTypes, _filter);
+        var scan = ApiAssemblyTypeScanner.Scan(_assembly, _filter);
+        foreach (var issue in scan.Issues)
+        {
+            builder.Context.AddConfigurationIssue(issue);
+        }
+
+        builder.AddTypes(scan.Types);
     }
     #endregion
 }

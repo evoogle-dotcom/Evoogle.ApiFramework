@@ -76,7 +76,7 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     /// <returns>The current builder instance.</returns>
     public ApiObjectTypeBuilder AddProperty(string apiName, string clrName, Action<ApiPropertyBuilder>? configure = null)
     {
-        this.AddPropertyCore(apiName, clrName, ApiConfigurationSource.Explicit, configure);
+        this.AddPropertyCore(apiName, clrName, this.Context.CurrentConfigurationSource, configure);
         return this;
     }
     #endregion

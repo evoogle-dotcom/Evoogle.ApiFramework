@@ -610,6 +610,7 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     private ApiSchema BuildCore(ApiSchemaBuildTraceDispatcher? traceDispatcher)
     {
         _context.ResetConfigurationIssues();
+        _state.AnnotationReaderSet?.ResetIssues();
         _context.SetTraceDispatcher(traceDispatcher);
         traceDispatcher?.Record(new ApiSchemaBuildStartedEvent());
 

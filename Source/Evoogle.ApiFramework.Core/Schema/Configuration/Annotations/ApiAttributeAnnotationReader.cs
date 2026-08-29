@@ -6,6 +6,7 @@
 using System.Reflection;
 
 using Evoogle.ApiFramework.Schema.Annotations;
+using Evoogle.ApiFramework.Schema.Configuration.Internal;
 using Evoogle.Reflection;
 
 namespace Evoogle.ApiFramework.Schema.Configuration.Annotations;
@@ -78,19 +79,17 @@ public sealed class ApiAttributeAnnotationReader :
 
         var contributions = new List<ApiTypeDiscoveryAnnotationResult>();
         var diagnostics = new List<ApiAnnotationReaderDiagnostic>();
-        foreach (var clrType in assembly.GetExportedTypes())
+        var scan = ApiAssemblyTypeScanner.Scan
+        (
+            assembly,
+            filter == null
+                ? null
+                : type => type.IsClass || type.IsValueType ?
+                    !type.IsAbstract && filter(type) : false
+        );
+        foreach (var clrType in scan.Types)
         {
-            if
-            (
-                clrType == null ||
-                clrType.IsAbstract ||
-                !clrType.IsClass && !clrType.IsValueType
-            )
-            {
-                continue;
-            }
-
-            if (filter != null && !filter(clrType))
+            if (clrType.IsAbstract || !clrType.IsClass && !clrType.IsValueType)
             {
                 continue;
             }

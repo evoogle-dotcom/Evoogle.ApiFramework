@@ -496,6 +496,8 @@ public sealed class ApiAnnotationReaderContractTests(ITestOutputHelper output)
 
         #region Calculated Properties
         private ApiSchemaInitializationException? ExceptionActual { get; set; }
+        private ApiSchemaInitializationException? FirstExceptionActual { get; set; }
+        private ApiSchemaInitializationException? SecondExceptionActual { get; set; }
         private IReadOnlyList<ApiInitializationIssue>? IssuesActual { get; set; }
         private Exception? ReaderExceptionExpected { get; set; }
         #endregion
@@ -566,7 +568,7 @@ public sealed class ApiAnnotationReaderContractTests(ITestOutputHelper output)
                         }
                         catch (ApiSchemaInitializationException exception)
                         {
-                            this.ExceptionActual = exception;
+                            this.FirstExceptionActual = exception;
                         }
 
                         try
@@ -575,6 +577,7 @@ public sealed class ApiAnnotationReaderContractTests(ITestOutputHelper output)
                         }
                         catch (ApiSchemaInitializationException exception)
                         {
+                            this.SecondExceptionActual = exception;
                             this.ExceptionActual = exception;
                         }
 
@@ -617,8 +620,33 @@ public sealed class ApiAnnotationReaderContractTests(ITestOutputHelper output)
 
             if (this.TestCase == IssueMetadataTestCase.PersistentIssueHistory)
             {
+                this.FirstExceptionActual.Should().NotBeNull();
+                this.SecondExceptionActual.Should().NotBeNull();
+
+                var firstErrors = this.FirstExceptionActual!.Errors;
+                firstErrors.Count(issue => issue.ReaderType == typeof(ThrowingTypeReader))
+                    .Should().Be(1);
                 errors.Count(issue => issue.ReaderType == typeof(ThrowingTypeReader))
-                    .Should().Be(2);
+                    .Should().Be(1);
+                errors.Select(issue =>
+                    (
+                        issue.ApiPath,
+                        issue.Severity,
+                        issue.Code,
+                        issue.Description,
+                        issue.Remediation,
+                        issue.ReaderType,
+                        issue.Exception
+                    )).Should().Equal(firstErrors.Select(issue =>
+                    (
+                        issue.ApiPath,
+                        issue.Severity,
+                        issue.Code,
+                        issue.Description,
+                        issue.Remediation,
+                        issue.ReaderType,
+                        issue.Exception
+                    )));
             }
 
             var issueWithException = errors.First(issue => issue.Exception is not null);
@@ -1551,7 +1579,7 @@ public sealed class ApiAnnotationReaderContractTests(ITestOutputHelper output)
         },
         new IssueMetadataTest
         {
-            Name = "Reader issues accumulate across repeated builds",
+            Name = "Reader issues reset across repeated builds",
             TestCase = IssueMetadataTestCase.PersistentIssueHistory
         }
     ];

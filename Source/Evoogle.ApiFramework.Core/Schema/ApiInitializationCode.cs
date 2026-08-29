@@ -451,6 +451,15 @@ public enum ApiInitializationCode
     ApiConfigurationExecutionFailed,
     #endregion
 
+    #region ApiAssembly Initialization Codes
+    /// <summary>
+    ///     Assembly type discovery failed while scanning an assembly or evaluating a candidate
+    ///     filter.
+    /// </summary>
+    [EnumMember(Value = "API_ASSEMBLY_DISCOVERY_FAILED")]
+    ApiAssemblyDiscoveryFailed,
+    #endregion
+
     #region ApiAnnotation Initialization Codes
     /// <summary>
     ///     An annotation reader threw while reading metadata for a schema target.

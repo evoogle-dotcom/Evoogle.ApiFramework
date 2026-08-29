@@ -53,10 +53,17 @@ internal sealed class ApiSchemaAssemblyConfigurationDiscoveryConvention : IApiSc
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        var configurationTypes = _assembly.GetExportedTypes()
-            .Where(IsEligibleConfigurationType)
-            .Where(type => _filter == null || _filter(type))
-            .OrderBy(GetTypeName, StringComparer.Ordinal);
+        var scan = ApiAssemblyTypeScanner.Scan
+        (
+            _assembly,
+            type => IsEligibleConfigurationType(type) && (_filter == null || _filter(type))
+        );
+        foreach (var issue in scan.Issues)
+        {
+            builder.Context.AddConfigurationIssue(issue);
+        }
+
+        var configurationTypes = scan.Types.OrderBy(GetTypeName, StringComparer.Ordinal);
 
         foreach (var configurationType in configurationTypes)
         {

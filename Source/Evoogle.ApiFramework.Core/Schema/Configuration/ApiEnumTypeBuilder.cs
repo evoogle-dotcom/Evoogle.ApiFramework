@@ -49,7 +49,7 @@ public class ApiEnumTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
             apiName,
             clrName,
             clrOrdinal,
-            ApiConfigurationSource.Explicit
+            this.Context.CurrentConfigurationSource
         );
         return this;
     }

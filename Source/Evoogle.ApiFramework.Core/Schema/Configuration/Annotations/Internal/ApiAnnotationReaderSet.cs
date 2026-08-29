@@ -29,6 +29,11 @@ internal sealed class ApiAnnotationReaderSet
     internal IReadOnlyList<IApiAnnotationReader> Readers => _readers;
 
     internal IReadOnlyList<ApiInitializationIssue> Issues => _issues;
+
+    internal void ResetIssues()
+    {
+        _issues.Clear();
+    }
     #endregion
 
     #region Annotation Methods
@@ -337,9 +342,19 @@ internal sealed class ApiAnnotationReaderSet
         Func<Type, bool>? filter
     )
     {
-        var eligibleTypes = assembly.GetExportedTypes()
+        var scan = ApiAssemblyTypeScanner.Scan
+        (
+            assembly,
+            type => IsEligibleType(type) && (filter == null || filter(type))
+        );
+        _issues.AddRange(scan.Issues);
+
+        var scannedTypes = scan.Types.ToHashSet();
+        Func<Type, bool>? readerFilter = filter is null && scan.Issues.Count == 0
+            ? null
+            : scannedTypes.Contains;
+        var eligibleTypes = scannedTypes
             .Where(IsEligibleType)
-            .Where(type => filter == null || filter(type))
             .ToHashSet();
         var results = new List<ApiTypeDiscoveryAnnotationResult>();
         var discoveredTypes = new Dictionary
@@ -355,7 +370,7 @@ internal sealed class ApiAnnotationReaderSet
             ApiAnnotationReaderResult<ApiTypeDiscoveryAnnotationResult>? readerResult;
             try
             {
-                readerResult = discoveryReader.ReadTypeDiscoveryAnnotations(assembly, filter);
+                readerResult = discoveryReader.ReadTypeDiscoveryAnnotations(assembly, readerFilter);
             }
             catch (Exception exception)
             {
