@@ -54,7 +54,7 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
         #region Properties
         public ApiObjectTypeOptions? ApiOptions { get; set; }
         public List<ApiProperty>? ApiProperties { get; set; }
-        public List<ApiKeyType>? ApiKeyTypes { get; set; }
+        public List<ApiNamedKeyType>? ApiKeyTypes { get; set; }
         #endregion
     }
 
@@ -177,23 +177,17 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
 
         private static void HandleApiObjectTypeApiKeyTypesArrayItem(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
-            var apiKeyType = JsonSerializer.Deserialize<ApiKeyType>(ref reader, context.Options);
+            var apiKeyType = JsonSerializer.Deserialize<ApiNamedKeyType>
+            (
+                ref reader,
+                context.Options
+            );
             if (apiKeyType == null)
             {
                 return;
             }
 
             context.ReadData.ApiObjectType!.ApiKeyTypes!.Add(apiKeyType);
-        }
-
-        private static ApiKeyType WithApiName(ApiKeyType apiKeyType, string apiName)
-        {
-            var named = new ApiKeyType(apiKeyType.ApiName ?? apiName, apiKeyType.ApiKeyPaths)
-            {
-                Extensions = apiKeyType.Extensions
-            };
-
-            return named;
         }
 
         private static void HandleApiObjectTypeApiOptions(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)

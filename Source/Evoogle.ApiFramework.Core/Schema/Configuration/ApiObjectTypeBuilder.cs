@@ -35,7 +35,7 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
 
     #region AddKey Methods
     /// <summary>
-    ///     Adds an <see cref="ApiKeyType"/> definition to the object type.
+    ///     Adds an <see cref="ApiNamedKeyType"/> definition to the object type.
     /// </summary>
     /// <remarks>
     ///     Key-bound relationship principal ends infer the best compatible key from the corresponding foreign key
@@ -108,7 +108,8 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
 
     #region Build Methods
     /// <summary>
-    ///     Builds the <see cref="ApiObjectType"/> using the configured properties and key types.
+    ///     Builds the <see cref="ApiObjectType"/> using the configured properties and named key
+    ///     types.
     /// </summary>
     /// <returns>The constructed <see cref="ApiObjectType"/>.</returns>
     internal ApiObjectType Build()
@@ -123,7 +124,7 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
             .Select(b => b.Build(clrObjectType));
 
         var apiKeyTypes = _state.KeyTypeBuilders.Count > 0
-            ? _state.KeyTypeBuilders.Select(b => b.Build())
+            ? _state.KeyTypeBuilders.Select(b => b.BuildNamed())
             : null;
 
         var apiObjectType = new ApiObjectType

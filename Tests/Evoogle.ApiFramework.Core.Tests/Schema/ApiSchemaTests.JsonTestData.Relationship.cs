@@ -396,7 +396,6 @@ public partial class ApiSchemaTests
                         ""ApiDependentEnd"": {
                             ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipUserProfile,Evoogle.ApiFramework.Core.Tests"",
                             ""ApiForeignKeyType"": {
-                                ""ApiName"": ""FK_User_UserProfile_UserRef_UserId"",
                                 ""ApiKeyPaths"": [
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.TestData.RelationshipUserProfile,Evoogle.ApiFramework.Core.Tests"",
@@ -419,7 +418,6 @@ public partial class ApiSchemaTests
                         ""ApiDependentEnd"": {
                             ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipUserProfile,Evoogle.ApiFramework.Core.Tests"",
                             ""ApiForeignKeyType"": {
-                                ""ApiName"": ""FK_User_UserProfile_UserId"",
                                 ""ApiKeyPaths"": [
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.TestData.RelationshipUserProfile,Evoogle.ApiFramework.Core.Tests"",
@@ -1094,7 +1092,6 @@ public partial class ApiSchemaTests
                         ""ApiDependentEnd"": {
                             ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipComment,Evoogle.ApiFramework.Core.Tests"",
                             ""ApiForeignKeyType"": {
-                                ""ApiName"": ""FK_Post_Comment_PostRef_PostId"",
                                 ""ApiKeyPaths"": [
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.TestData.RelationshipComment,Evoogle.ApiFramework.Core.Tests"",
@@ -1117,7 +1114,6 @@ public partial class ApiSchemaTests
                         ""ApiDependentEnd"": {
                             ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipComment,Evoogle.ApiFramework.Core.Tests"",
                             ""ApiForeignKeyType"": {
-                                ""ApiName"": ""FK_Post_Comment_PostId"",
                                 ""ApiKeyPaths"": [
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.TestData.RelationshipComment,Evoogle.ApiFramework.Core.Tests"",
@@ -1139,7 +1135,6 @@ public partial class ApiSchemaTests
                         ""ApiDependentEnd"": {
                             ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipPost,Evoogle.ApiFramework.Core.Tests"",
                             ""ApiForeignKeyType"": {
-                                ""ApiName"": ""FK_User_Post_AuthorUserRef_UserId"",
                                 ""ApiKeyPaths"": [
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.TestData.RelationshipPost,Evoogle.ApiFramework.Core.Tests"",
@@ -1162,7 +1157,6 @@ public partial class ApiSchemaTests
                         ""ApiDependentEnd"": {
                             ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipPost,Evoogle.ApiFramework.Core.Tests"",
                             ""ApiForeignKeyType"": {
-                                ""ApiName"": ""FK_User_Post_AuthorUserId"",
                                 ""ApiKeyPaths"": [
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.TestData.RelationshipPost,Evoogle.ApiFramework.Core.Tests"",
@@ -1569,7 +1563,6 @@ public partial class ApiSchemaTests
                         ""ApiAssociation"": {
                             ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipPostTag,Evoogle.ApiFramework.Core.Tests"",
                             ""ApiForeignKeyTypeA"": {
-                                ""ApiName"": ""FK_Post_PostTag_PostId"",
                                 ""ApiKeyPaths"": [
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.TestData.RelationshipPostTag,Evoogle.ApiFramework.Core.Tests"",
@@ -1580,7 +1573,6 @@ public partial class ApiSchemaTests
                                 ]
                             },
                             ""ApiForeignKeyTypeB"": {
-                                ""ApiName"": ""FK_Tag_PostTag_TagId"",
                                 ""ApiKeyPaths"": [
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.TestData.RelationshipPostTag,Evoogle.ApiFramework.Core.Tests"",

@@ -24,7 +24,12 @@ public delegate string? ApiKeyPartNameFormatterDelegate(ApiKeyPartNameContext co
 /// <param name="ApiKeyType">The key type being materialized.</param>
 /// <param name="ApiKeyPath">The key path for the current part.</param>
 /// <param name="PartIndex">The zero-based index of the current part.</param>
-/// <param name="ApiKeyTypeName">The contextual name of the key type being materialized, or <see langword="null"/> for anonymous key types.</param>
+/// <param name="ApiKeyTypeName">
+///     The effective contextual name of the key type being materialized, or
+///     <see langword="null"/> for an anonymous key type. An explicit
+///     <see cref="ApiKeyMaterializationContext.ContextualKeyTypeName"/> takes precedence over
+///     <see cref="ApiNamedKeyType.ApiName"/>.
+/// </param>
 public readonly record struct ApiKeyPartNameContext(ApiKeyType ApiKeyType, ApiKeyPath ApiKeyPath, int PartIndex, string? ApiKeyTypeName);
 
 internal enum ApiKeyMaterializationValueKind
@@ -95,10 +100,17 @@ public sealed class ApiKeyMaterializationContext
     public ApiKeyNullHandling NullHandling { get; init; } = ApiKeyNullHandling.UseDefaultOnNull;
 
     /// <summary>
-    ///     Gets the optional name of the key type being materialized.
-    ///     Propagated into <see cref="ApiKeyPartNameContext.ApiKeyTypeName"/> for each part during materialization.
+    ///     Gets the optional contextual name override for the key type being materialized.
     /// </summary>
-    public string? KeyTypeName { get; init; }
+    /// <remarks>
+    ///     When non-null, this value is propagated into
+    ///     <see cref="ApiKeyPartNameContext.ApiKeyTypeName"/> for each part. It takes precedence over
+    ///     <see cref="ApiNamedKeyType.ApiName"/>. When null, the
+    ///     <see cref="ApiNamedKeyType.ApiName"/> of a named key type is propagated; anonymous key types
+    ///     propagate null. This value is metadata for <see cref="PartNameFormatter"/> and is not used by
+    ///     the predefined <see cref="PartNameFormat"/> values.
+    /// </remarks>
+    public string? ContextualKeyTypeName { get; init; }
     #endregion
 
     #region Methods

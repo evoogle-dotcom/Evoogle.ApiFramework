@@ -136,18 +136,18 @@ public enum ApiInitializationCode
     ApiKeyPathSegmentUnresolvedApiProperty,
     #endregion
 
-    #region ApiKeyType Initialization Codes
-    /// <summary>
-    ///     An <see cref="ApiKeyType"/>'s API name is null, empty, or whitespace.
-    /// </summary>
-    [EnumMember(Value = "API_KEY_TYPE_INVALID_API_NAME")]
-    ApiKeyTypeInvalidApiName,
-
+    #region ApiKeyType and ApiNamedKeyType Initialization Codes
     /// <summary>
     ///     An <see cref="ApiKeyType"/> has no key paths defined. At least one <see cref="ApiKeyPath"/> is required.
     /// </summary>
     [EnumMember(Value = "API_KEY_TYPE_NULL_OR_EMPTY_PATHS")]
     ApiKeyTypeNullOrEmptyPaths,
+
+    /// <summary>
+    ///     An <see cref="ApiNamedKeyType"/>'s API name is null, empty, or whitespace.
+    /// </summary>
+    [EnumMember(Value = "API_NAMED_KEY_TYPE_INVALID_API_NAME")]
+    ApiNamedKeyTypeInvalidApiName,
     #endregion
 
     #region ApiNamedType Initialization Codes

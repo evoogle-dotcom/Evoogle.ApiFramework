@@ -8,9 +8,12 @@ using Evoogle.ApiFramework.Schema.Configuration.Internal;
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
 /// <summary>
-///     Fluent builder used to configure a single <see cref="ApiKeyType"/>.
+///     Fluent builder used to configure the structural paths shared by <see cref="ApiKeyType"/> and
+///     <see cref="ApiNamedKeyType"/>.
 /// </summary>
-/// <param name="apiName">The optional API name of the key type.</param>
+/// <param name="apiName">
+///     The optional API name used when the builder produces an <see cref="ApiNamedKeyType"/>.
+/// </param>
 /// <remarks>
 ///    <para>Key types are reusable components that define how to extract key values from CLR objects via one or more key paths. They are primarily used to configure API keys, but can also be used for other purposes such as defining unique identifiers for object types.</para>
 ///    <para>Each key path represents a navigation chain from a specified CLR root type to a terminal scalar property, and can be configured with extensions at both the path and segment levels. When multiple key paths are defined within a key type, the resulting key value is a composite of the individual path values.</para>
@@ -109,7 +112,7 @@ public class ApiKeyTypeBuilder(string? apiName = null) : ExtensionBuilder<ApiKey
     }
 
     /// <summary>
-    ///    Sets the API name for the key type being built.
+    ///    Sets the API name used when this builder produces an <see cref="ApiNamedKeyType"/>.
     /// </summary>
     /// <param name="apiName">The API name to use.</param>
     /// <returns>The current builder instance.</returns>
@@ -128,21 +131,41 @@ public class ApiKeyTypeBuilder(string? apiName = null) : ExtensionBuilder<ApiKey
     /// </summary>
     internal ApiKeyType Build()
     {
-        var apiName = _state.ApiName;
         var keyPaths = _state.KeyPathBuilders.Select(b => b.Build());
-        var keyType = new ApiKeyType(apiName, keyPaths);
+        var keyType = new ApiKeyType(keyPaths);
 
-        var extensions = this.BuildExtensions();
-        if (extensions != null)
-        {
-            keyType.Extensions = extensions;
-        }
+        this.AttachExtensions(keyType);
+
+        return keyType;
+    }
+
+    /// <summary>
+    ///     Builds the <see cref="ApiNamedKeyType"/> configured by this builder.
+    /// </summary>
+    internal ApiNamedKeyType BuildNamed()
+    {
+        var apiName = _state.ApiName!;
+        var keyPaths = _state.KeyPathBuilders.Select(b => b.Build());
+        var keyType = new ApiNamedKeyType(apiName, keyPaths);
+
+        this.AttachExtensions(keyType);
 
         return keyType;
     }
     #endregion
 
     #region Implementation Methods
+    private void AttachExtensions(ApiKeyType keyType)
+    {
+        ArgumentNullException.ThrowIfNull(keyType);
+
+        var extensions = this.BuildExtensions();
+        if (extensions != null)
+        {
+            keyType.Extensions = extensions;
+        }
+    }
+
     /// <summary>
     ///     Allows subclasses to add a pre-constructed key path builder without bypassing internal list management.
     /// </summary>

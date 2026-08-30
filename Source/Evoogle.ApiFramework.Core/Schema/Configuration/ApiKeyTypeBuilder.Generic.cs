@@ -8,12 +8,15 @@ using System.Linq.Expressions;
 namespace Evoogle.ApiFramework.Schema.Configuration;
 
 /// <summary>
-///     Strongly-typed fluent builder for configuring an <see cref="ApiKeyType"/> whose paths are rooted at
-///     <typeparamref name="TRoot"/>. Extends <see cref="ApiKeyTypeBuilder"/> with expression-based overloads so
-///     CLR property names are extracted at compile time rather than supplied as raw strings.
+///     Strongly-typed fluent builder for configuring key-type paths rooted at
+///     <typeparamref name="TRoot"/>. Extends <see cref="ApiKeyTypeBuilder"/> with expression-based
+///     overloads so CLR property names are extracted at compile time rather than supplied as raw
+///     strings.
 /// </summary>
 /// <typeparam name="TRoot">The default root CLR type for key paths added via expression overloads.</typeparam>
-/// <param name="apiName">The optional API name of the key type.</param>
+/// <param name="apiName">
+///     The optional API name used when the builder produces an <see cref="ApiNamedKeyType"/>.
+/// </param>
 /// <remarks>
 ///    <para>Key types are reusable components that define how to extract key values from CLR objects via one or more key paths. They are primarily used to configure API keys, but can also be used for other purposes such as defining unique identifiers for object types.</para>
 ///    <para>Each key path represents a navigation chain from a specified CLR root type to a terminal scalar property, and can be configured with extensions at both the path and segment levels. When multiple key paths are defined within a key type, the resulting key value is a composite of the individual path values.</para>

@@ -17,19 +17,21 @@ namespace Evoogle.ApiFramework.Schema;
 /// <param name="apiName">The API name of the object type.</param>
 /// <param name="apiOptions">The configuration options for the object type.</param>
 /// <param name="apiProperties">The collection of API properties defined on this object type.</param>
-/// <param name="apiKeyTypes">The collection of API key types defined for this object type.</param>
+/// <param name="apiKeyTypes">
+///     The collection of named API key types defined for this object type.
+/// </param>
 /// <param name="clrObjectType">The CLR type representing this API object.</param>
 public sealed partial class ApiObjectType
 (
     string apiName,
     ApiObjectTypeOptions? apiOptions,
     IEnumerable<ApiProperty>? apiProperties,
-    IEnumerable<ApiKeyType>? apiKeyTypes,
+    IEnumerable<ApiNamedKeyType>? apiKeyTypes,
     Type clrObjectType
 ) : ApiNamedType(apiName, clrObjectType)
 {
     #region ApiObjectType Fields
-    private Dictionary<string, ApiKeyType>? _apiKeyTypeApiNameLookup = null;
+    private Dictionary<string, ApiNamedKeyType>? _apiKeyTypeApiNameLookup = null;
     private string[]? _apiKeyTypeApiNames = null;
 
     private Dictionary<string, ApiProperty>? _apiPropertyApiNameLookup = null;
@@ -52,8 +54,9 @@ public sealed partial class ApiObjectType
     #endregion
 
     #region ApiObjectType Properties
-    /// <summary>Gets all key types defined for the object type.</summary>
-    public ApiKeyType[] ApiKeyTypes { get; } = [.. apiKeyTypes.EmptyIfNull().Where(x => x is not null)];
+    /// <summary>Gets all named key types defined for the object type.</summary>
+    public ApiNamedKeyType[] ApiKeyTypes { get; } =
+        [.. apiKeyTypes.EmptyIfNull().Where(x => x is not null)];
 
     /// <summary>Gets the configuration options for the object type.</summary>
     public ApiObjectTypeOptions? ApiOptions { get; } = apiOptions;
@@ -85,7 +88,7 @@ public sealed partial class ApiObjectType
     /// </summary>
     public ApiRelationshipAssociation[] ApiRelationshipAssociations => _apiRelationshipAssociations is not null ? _apiRelationshipAssociations : [];
 
-    private Dictionary<string, ApiKeyType> ApiKeyTypeApiNameLookup => this.ThrowIfNotInitialized(_apiKeyTypeApiNameLookup);
+    private Dictionary<string, ApiNamedKeyType> ApiKeyTypeApiNameLookup => this.ThrowIfNotInitialized(_apiKeyTypeApiNameLookup);
     private Dictionary<string, ApiProperty> ApiPropertyApiNameLookup => this.ThrowIfNotInitialized(_apiPropertyApiNameLookup);
     private Dictionary<string, ApiProperty> ApiPropertyClrNameLookup => this.ThrowIfNotInitialized(_apiPropertyClrNameLookup);
     #endregion
@@ -143,9 +146,16 @@ public sealed partial class ApiObjectType
     ///     Attempts to retrieve an API key type by its API name.
     /// </summary>
     /// <param name="apiName">The name of the key type to retrieve.</param>
-    /// <param name="apiKeyType">When this method returns, contains the <see cref="ApiKeyType"/> if found; otherwise, null.</param>
+    /// <param name="apiKeyType">
+    ///     When this method returns, contains the <see cref="ApiNamedKeyType"/> if found;
+    ///     otherwise, null.
+    /// </param>
     /// <returns>True if the key type was found; otherwise, false.</returns>
-    public bool TryGetKeyTypeByApiName(string apiName, [NotNullWhen(true)] out ApiKeyType? apiKeyType) => this.ApiKeyTypeApiNameLookup.TryGetValue(apiName, out apiKeyType);
+    public bool TryGetKeyTypeByApiName
+    (
+        string apiName,
+        [NotNullWhen(true)] out ApiNamedKeyType? apiKeyType
+    ) => this.ApiKeyTypeApiNameLookup.TryGetValue(apiName, out apiKeyType);
 
     /// <summary>
     ///     Attempts to retrieve an API property by its API name.
@@ -279,7 +289,7 @@ public sealed partial class ApiObjectType
             parts: this.ApiKeyTypes,
             partKeySelector: x => x.ApiName,
             partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
-            partKeyPropertyName: nameof(ApiKeyType.ApiName),
+            partKeyPropertyName: nameof(ApiNamedKeyType.ApiName),
             apiPath: this.ApiPath,
             duplicatePartCode: ApiInitializationCode.ApiObjectTypeDuplicateKeyTypeApiName,
             context: context,
@@ -310,6 +320,5 @@ public sealed partial class ApiObjectType
             lookupDictionary: out _apiPropertyClrNameLookup
         );
     }
-
     #endregion
 }

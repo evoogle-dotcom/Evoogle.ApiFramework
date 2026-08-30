@@ -35,7 +35,7 @@ internal static class ApiRelationshipKeyAlignment
 
         var keyPathCount = foreignKeyType.ApiKeyPaths.Length;
         var runCountCheck = true;
-        ApiKeyType? principalKeyType = null;
+        ApiNamedKeyType? principalKeyType = null;
         var principalKeyResolutionSource = ApiRelationshipPrincipalKeyResolutionSource.Inferred;
 
         var principalObjectType = principalEnd.ApiResolvedObjectType;
@@ -58,7 +58,11 @@ internal static class ApiRelationshipKeyAlignment
         {
             var matchingShapeKeys = principalObjectType.ApiKeyTypes
                 .Where(keyType => ApiRelationshipKeyCompatibility.CountKeyLeaves(keyType) == keyPathCount)
-                .Select(static keyType => new KeyValuePair<string, ApiKeyType>(keyType.ApiName!, keyType))
+                .Select
+                (
+                    static keyType =>
+                        new KeyValuePair<string, ApiNamedKeyType>(keyType.ApiName, keyType)
+                )
                 .ToList();
             var matchingKeys = matchingShapeKeys
                 .Where(kvp => ApiRelationshipKeyCompatibility.AreKeyTypesCompatible(kvp.Value, foreignKeyType))
@@ -188,7 +192,7 @@ internal static class ApiRelationshipKeyAlignment
         ApiInitializationContext context,
         string relationshipPath,
         ApiObjectType principalObjectType,
-        List<KeyValuePair<string, ApiKeyType>> matchingKeys,
+        List<KeyValuePair<string, ApiNamedKeyType>> matchingKeys,
         string? principalEndQualifier,
         string explicitKeyTarget
     )
@@ -251,7 +255,7 @@ internal static class ApiRelationshipKeyAlignment
         string relationshipPath,
         string foreignKeyPath,
         ApiKeyType foreignKeyType,
-        ApiKeyType principalKeyType,
+        ApiNamedKeyType principalKeyType,
         string principalCompatibilityLabel,
         string compatibilityRemediation
     )
@@ -271,7 +275,7 @@ internal static class ApiRelationshipKeyAlignment
         string relationshipPath,
         ApiObjectType principalObjectType,
         ApiKeyType foreignKeyType,
-        List<KeyValuePair<string, ApiKeyType>> matchingShapeKeys,
+        List<KeyValuePair<string, ApiNamedKeyType>> matchingShapeKeys,
         int keyPathCount,
         string? principalEndQualifier,
         string explicitKeyTarget,

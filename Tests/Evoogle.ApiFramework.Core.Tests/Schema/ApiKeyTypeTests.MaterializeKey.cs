@@ -22,7 +22,7 @@ public partial class ApiKeyTypeTests
     #region Test Fields
     private static readonly IReadOnlyDictionary<string, ApiKeyPartNameFormatterDelegate> _customPartNameFormats = new Dictionary<string, ApiKeyPartNameFormatterDelegate>
     {
-        ["Custom"] = static c => $"{c.ApiKeyType.ApiName ?? "(anonymous)"}[{c.PartIndex}]"
+        ["Custom"] = static c => $"{c.ApiKeyTypeName ?? "(anonymous)"}[{c.PartIndex}]"
     };
     #endregion
 

@@ -15,11 +15,11 @@ public static class ApiObjectTypeExtensions
 {
     #region Extension Methods
     /// <summary>
-    ///     Gets an <see cref="ApiKeyType"/> by its API name.
+    ///     Gets an <see cref="ApiNamedKeyType"/> by its API name.
     /// </summary>
     /// <param name="apiObjectType">The API object type to search.</param>
     /// <param name="apiName">The API name of the key type to retrieve.</param>
-    /// <returns>The <see cref="ApiKeyType"/> with the specified API name.</returns>
+    /// <returns>The <see cref="ApiNamedKeyType"/> with the specified API name.</returns>
     /// <exception cref="ApiSchemaException">
     ///     Thrown if no key type with the specified API name exists in the object type.
     ///     The exception message includes a list of all available key type API names.
@@ -28,7 +28,11 @@ public static class ApiObjectTypeExtensions
     ///     This method performs a case-sensitive search for the key type by its API name.
     ///     Use <see cref="ApiObjectType.TryGetKeyTypeByApiName"/> if you prefer non-throwing behavior.
     /// </remarks>
-    public static ApiKeyType GetKeyTypeByApiName(this ApiObjectType apiObjectType, string apiName)
+    public static ApiNamedKeyType GetKeyTypeByApiName
+    (
+        this ApiObjectType apiObjectType,
+        string apiName
+    )
     {
         if (apiObjectType.TryGetKeyTypeByApiName(apiName, out var apiKeyType))
         {
@@ -37,8 +41,9 @@ public static class ApiObjectTypeExtensions
 
         var availableKeyTypesByApiName = string.Join(',', apiObjectType.GetKeyTypeApiNames().OrderBy(k => k));
         var errorMessage =
-            $"{nameof(ApiKeyType)} with name '{apiName.SafeToString()}' not found in {apiObjectType.SafeToString()}. " +
-            $"Available {nameof(ApiKeyType)} names are: {availableKeyTypesByApiName}.";
+            $"{nameof(ApiNamedKeyType)} with name '{apiName.SafeToString()}' not found in " +
+            $"{apiObjectType.SafeToString()}. Available {nameof(ApiNamedKeyType)} names are: " +
+            $"{availableKeyTypesByApiName}.";
         throw new ApiSchemaException(errorMessage);
     }
 

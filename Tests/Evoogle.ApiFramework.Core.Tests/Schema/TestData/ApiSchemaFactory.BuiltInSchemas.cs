@@ -74,10 +74,22 @@ public static partial class ApiSchemaFactory
             Extensions = extensions
         };
 
-    private static ApiKeyType KT(string name, IEnumerable<ApiKeyPath> paths, OrderedDictionary<Type, object>? extensions = null)
-        => new(name, paths) { Extensions = extensions };
+    private static ApiNamedKeyType KT
+    (
+        string name,
+        IEnumerable<ApiKeyPath> paths,
+        OrderedDictionary<Type, object>? extensions = null
+    ) => new(name, paths) { Extensions = extensions };
 
-    private static ApiObjectType O(string name, Type clr, IEnumerable<ApiProperty> properties, IEnumerable<ApiKeyType>? keyTypes = null, ApiObjectTypeOptions? options = null, OrderedDictionary<Type, object>? extensions = null)
+    private static ApiObjectType O
+    (
+        string name,
+        Type clr,
+        IEnumerable<ApiProperty> properties,
+        IEnumerable<ApiNamedKeyType>? keyTypes = null,
+        ApiObjectTypeOptions? options = null,
+        OrderedDictionary<Type, object>? extensions = null
+    )
         => new(name, options, properties, keyTypes, clr)
         {
             Extensions = extensions

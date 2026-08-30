@@ -1367,8 +1367,10 @@ public partial class ApiSchemaTests
                     apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiObjectTypeDuplicateKeyTypeApiName,
-                    description: $"Duplicate {nameof(ApiKeyType)}.{nameof(ApiKeyType.ApiName)} values: 'Primary'",
-                    remediation: $"Verify that each {nameof(ApiKeyType)} has a unique {nameof(ApiKeyType.ApiName)} value"
+                    description: $"Duplicate {nameof(ApiNamedKeyType)}." +
+                        $"{nameof(ApiNamedKeyType.ApiName)} values: 'Primary'",
+                    remediation: $"Verify that each {nameof(ApiNamedKeyType)} has a unique " +
+                        $"{nameof(ApiNamedKeyType.ApiName)} value"
                 ),
             ]
         },
@@ -1899,13 +1901,14 @@ public partial class ApiSchemaTests
         },
 
         //
-        // ApiKeyType Initialization Tests
+        // ApiKeyType and ApiNamedKeyType Initialization Tests
         //
 
-        // ApiKeyType throws if ApiName is invalid and owned by ApiObjectType (null)
+        // ApiNamedKeyType throws if ApiName is invalid (null)
         new InitializeThrowsTest
         {
-            Name = $"{nameof(ApiKeyType)} Throws If {nameof(ApiKeyType.ApiName)} Is Invalid And Owned By {nameof(ApiObjectType)}",
+            Name = $"{nameof(ApiNamedKeyType)} Throws If " +
+                $"{nameof(ApiNamedKeyType.ApiName)} Is Invalid",
             SourceJson = @"
             {
                 ""ApiName"": ""ApiKeyType Throws If ApiName Is Invalid And Owned By ApiObjectType"",
@@ -1952,11 +1955,13 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"].{nameof(ApiKeyType)}",
+                    apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"]." +
+                        $"{nameof(ApiNamedKeyType)}",
                     severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiKeyTypeInvalidApiName,
-                    description: $"{nameof(ApiKeyType.ApiName)} must not be null, empty, or whitespace",
-                    remediation: $"Specify a valid {nameof(ApiKeyType.ApiName)} value"
+                    code: ApiInitializationCode.ApiNamedKeyTypeInvalidApiName,
+                    description: $"{nameof(ApiNamedKeyType.ApiName)} must not be null, empty, " +
+                        "or whitespace",
+                    remediation: $"Specify a valid {nameof(ApiNamedKeyType.ApiName)} value"
                 ),
             ]
         },
@@ -2005,7 +2010,8 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"].{nameof(ApiKeyType)}[\"PrimaryKey\"]",
+                    apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"]." +
+                        $"{nameof(ApiNamedKeyType)}[\"PrimaryKey\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiKeyTypeNullOrEmptyPaths,
                     description: $"{nameof(ApiKeyType.ApiKeyPaths)} must not be null or empty",
@@ -2063,7 +2069,9 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"].{nameof(ApiKeyType)}[\"PrimaryKey\"].{nameof(ApiKeyPath)}[\"{nameof(DuplicateKeyTypeApiNameType)}.\"]",
+                    apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"]." +
+                        $"{nameof(ApiNamedKeyType)}[\"PrimaryKey\"].{nameof(ApiKeyPath)}" +
+                        $"[\"{nameof(DuplicateKeyTypeApiNameType)}.\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiKeyPathEmptySegments,
                     description: $"{nameof(ApiKeyPath.ApiSegments)} must contain at least one property name",
@@ -2123,7 +2131,9 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"].{nameof(ApiKeyType)}[\"PrimaryKey\"].{nameof(ApiKeyPath)}[\"{nameof(TypeWithListProperty)}.Id\"]",
+                    apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"]." +
+                        $"{nameof(ApiNamedKeyType)}[\"PrimaryKey\"].{nameof(ApiKeyPath)}" +
+                        $"[\"{nameof(TypeWithListProperty)}.Id\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiKeyPathUnresolvedRootType,
                     description: $"Root CLR type '{nameof(TypeWithListProperty)}' is not registered as an {nameof(ApiObjectType)} in the schema",
@@ -2183,7 +2193,10 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"].{nameof(ApiKeyType)}[\"PrimaryKey\"].{nameof(ApiKeyPath)}[\"{nameof(DuplicateKeyTypeApiNameType)}.\"].{nameof(ApiKeyPathSegment)}",
+                    apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"]." +
+                        $"{nameof(ApiNamedKeyType)}[\"PrimaryKey\"].{nameof(ApiKeyPath)}" +
+                        $"[\"{nameof(DuplicateKeyTypeApiNameType)}.\"]." +
+                        $"{nameof(ApiKeyPathSegment)}",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiKeyPathSegmentInvalidClrPropertyName,
                     description: $"{nameof(ApiKeyPathSegment.ClrPropertyName)} must not be null, empty, or whitespace",
@@ -2243,7 +2256,10 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"].{nameof(ApiKeyType)}[\"PrimaryKey\"].{nameof(ApiKeyPath)}[\"{nameof(DuplicateKeyTypeApiNameType)}.MissingId\"].{nameof(ApiKeyPathSegment)}[\"MissingId\"]",
+                    apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"]." +
+                        $"{nameof(ApiNamedKeyType)}[\"PrimaryKey\"].{nameof(ApiKeyPath)}" +
+                        $"[\"{nameof(DuplicateKeyTypeApiNameType)}.MissingId\"]." +
+                        $"{nameof(ApiKeyPathSegment)}[\"MissingId\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiKeyPathSegmentUnresolvedApiProperty,
                     description: $"Property with CLR name 'MissingId' could not be found on object type 'TestObject'",
@@ -2312,7 +2328,10 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"].{nameof(ApiKeyType)}[\"PrimaryKey\"].{nameof(ApiKeyPath)}[\"{nameof(DuplicateKeyTypeApiNameType)}.Id.Code\"].{nameof(ApiKeyPathSegment)}[\"Id\"]",
+                    apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"]." +
+                        $"{nameof(ApiNamedKeyType)}[\"PrimaryKey\"].{nameof(ApiKeyPath)}" +
+                        $"[\"{nameof(DuplicateKeyTypeApiNameType)}.Id.Code\"]." +
+                        $"{nameof(ApiKeyPathSegment)}[\"Id\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiKeyPathNavigationSegmentInvalidType,
                     description: $"Navigation segment property 'Id' must resolve to an object type; found '{nameof(ApiScalarType)}'",
@@ -2395,7 +2414,9 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    apiPath: $"{nameof(ApiObjectType)}[\"Owner\"].{nameof(ApiKeyType)}[\"PrimaryKey\"].{nameof(ApiKeyPath)}[\"{nameof(OwnerType)}.Item\"].{nameof(ApiKeyPathSegment)}[\"Item\"]",
+                    apiPath: $"{nameof(ApiObjectType)}[\"Owner\"]." +
+                        $"{nameof(ApiNamedKeyType)}[\"PrimaryKey\"].{nameof(ApiKeyPath)}" +
+                        $"[\"{nameof(OwnerType)}.Item\"].{nameof(ApiKeyPathSegment)}[\"Item\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiKeyPathScalarSegmentInvalidType,
                     description: $"Terminal segment property 'Item' must resolve to a scalar type; found '{nameof(ApiObjectType)}'",

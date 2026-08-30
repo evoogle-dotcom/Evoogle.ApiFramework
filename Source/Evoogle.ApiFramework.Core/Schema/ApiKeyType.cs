@@ -13,14 +13,16 @@ using Evoogle.Extensions;
 namespace Evoogle.ApiFramework.Schema;
 
 /// <summary>
-///     Defines the key structure for an <see cref="ApiObjectType"/>, composed of one or more <see cref="ApiKeyPath"/>
-///     instances that together navigate from CLR object properties to a scalar or composite runtime <see cref="ApiKey"/>.
+///     Defines a key structure composed of one or more <see cref="ApiKeyPath"/> instances that
+///     together navigate from CLR object properties to a scalar or composite runtime
+///     <see cref="ApiKey"/>.
 /// </summary>
 /// <remarks>
 ///     <para>
-///         <see cref="ApiKeyType"/> unifies the concepts of primary-key and foreign-key definitions. Both are expressed
-///         as an ordered collection of <see cref="ApiKeyPath"/> instances, each of which navigates from a root object
-///         type to a single terminal <see cref="ApiScalarType"/> property.
+///         <see cref="ApiKeyType"/> represents an anonymous structural key shape, such as a
+///         relationship foreign key.
+///         Named key definitions declared by an <see cref="ApiObjectType"/> are represented by
+///         <see cref="ApiNamedKeyType"/>.
 ///     </para>
 ///     <para>
 ///         Use <see cref="MaterializeKey"/> to materialize an <see cref="ApiKey"/> at runtime by walking each path against
@@ -30,36 +32,16 @@ namespace Evoogle.ApiFramework.Schema;
 ///         <see cref="ApiKeyMaterializationContext.PartNameFormat"/>.
 ///     </para>
 /// </remarks>
-/// <param name="apiName">
-///     The optional API name of this key type.
-///     Required when the key type is declared on an <see cref="ApiObjectType"/>, optional for inline foreign-key shapes used by relationships.
-/// </param>
 /// <param name="apiKeyPaths">The ordered collection of key paths that compose this key type.</param>
 [JsonConverter(typeof(ApiKeyTypeJsonConverter))]
-public sealed partial class ApiKeyType(string? apiName, IEnumerable<ApiKeyPath> apiKeyPaths) : ApiSchemaElement
+public partial class ApiKeyType(IEnumerable<ApiKeyPath> apiKeyPaths) : ApiSchemaElement
 {
-    #region Constructors
-    /// <summary>
-    ///     Initializes an anonymous key type.
-    /// </summary>
-    /// <param name="apiKeyPaths">The ordered collection of key paths that compose this key type.</param>
-    public ApiKeyType(IEnumerable<ApiKeyPath> apiKeyPaths)
-        : this(null, apiKeyPaths)
-    {
-    }
-    #endregion
-
     #region ApiSchemaElement Properties
     /// <inheritdoc/>
     protected override string ApiElementName => nameof(ApiKeyType);
     #endregion
 
     #region ApiKeyType Properties
-    /// <summary>
-    ///     Gets the optional API name for this key type.
-    /// </summary>
-    public string? ApiName { get; } = apiName;
-
     /// <summary>Gets the ordered array of <see cref="ApiKeyPath"/> instances that compose this key type.</summary>
     public ApiKeyPath[] ApiKeyPaths { get; } = [.. apiKeyPaths.EmptyIfNull().Where(x => x is not null)];
     #endregion
@@ -76,18 +58,22 @@ public sealed partial class ApiKeyType(string? apiName, IEnumerable<ApiKeyPath> 
     /// <inheritdoc/>
     public override string ToString()
     {
-        var apiName = this.ApiName.SafeToString();
         var apiKeyPathsCount = this.ApiKeyPaths.Length.SafeToString();
         var extensionCount = this.ExtensionCount.SafeToString();
 
-        return $"{nameof(ApiKeyType)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ApiKeyPaths)}Count={apiKeyPathsCount}, {nameof(this.ExtensionCount)}={extensionCount}}}";
+        return $"{nameof(ApiKeyType)} {{{nameof(this.ApiKeyPaths)}Count={apiKeyPathsCount}, {nameof(this.ExtensionCount)}={extensionCount}}}";
     }
     #endregion
 
     #region ApiSchemaElement Methods
     /// <inheritdoc/>
     protected override string BuildPath(string? apiPreviousPath)
-        => ApiSchemaPathFormatting.BuildPath(apiBasePath: apiPreviousPath, apiPathSegment: this.ApiElementName, apiPathSegmentName: this.ApiName);
+        => ApiSchemaPathFormatting.BuildPath
+        (
+            apiBasePath: apiPreviousPath,
+            apiPathSegment: this.ApiElementName,
+            apiPathSegmentName: null
+        );
 
     /// <inheritdoc/>
     internal override void Initialize(ApiInitializationContext context)
@@ -96,35 +82,11 @@ public sealed partial class ApiKeyType(string? apiName, IEnumerable<ApiKeyPath> 
 
         base.Initialize(context);
 
-        this.InitializeApiName(context);
         this.InitializeApiKeyPaths(context);
     }
     #endregion
 
     #region Implementation Methods
-    private void InitializeApiName(ApiInitializationContext context)
-    {
-        var hasDeclaringObjectType = context.HasDeclaringObjectType;
-        if (!hasDeclaringObjectType)
-        {
-            // API name is only required for key types declared on an object type (identity).
-            // For inline foreign key shapes used by relationships, the API name is optional and often omitted for simplicity.
-            return;
-        }
-
-        var isApiNameInvalid = ApiSchemaNameValidation.IsNameInvalid(this.ApiName);
-        if (isApiNameInvalid)
-        {
-            var path = this.ApiPath;
-            var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.ApiKeyTypeInvalidApiName;
-            var description = $"{nameof(this.ApiName)} must not be null, empty, or whitespace";
-            var remediation = $"Specify a valid {nameof(this.ApiName)} value";
-
-            context.AddIssue(path, severity, code, description, remediation);
-        }
-    }
-
     private void InitializeApiKeyPaths(ApiInitializationContext context)
     {
         if (this.ApiKeyPaths.Length == 0)

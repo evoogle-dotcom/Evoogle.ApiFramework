@@ -17,7 +17,8 @@ public partial class ApiObjectTypeTests
         // TryGetKeyTypeByApiName
         new TryGetTest
         {
-            Name = $"{nameof(ApiObjectType.TryGetKeyTypeByApiName)} returns true when {nameof(ApiKeyType)} exists with exact case match",
+            Name = $"{nameof(ApiObjectType.TryGetKeyTypeByApiName)} returns true when " +
+                $"{nameof(ApiNamedKeyType)} exists with exact case match",
             ApiSchemaKind = ApiSchemaKind.Key,
             ApiObjectTypeName = nameof(KeyOneScalarPart),
             TryGetMethod = TryGetMethod.TryGetKeyTypeByApiName,
@@ -27,7 +28,8 @@ public partial class ApiObjectTypeTests
 
         new TryGetTest
         {
-            Name = $"{nameof(ApiObjectType.TryGetKeyTypeByApiName)} returns false when {nameof(ApiKeyType)} exists but case mismatch",
+            Name = $"{nameof(ApiObjectType.TryGetKeyTypeByApiName)} returns false when " +
+                $"{nameof(ApiNamedKeyType)} exists but case mismatch",
             ApiSchemaKind = ApiSchemaKind.Key,
             ApiObjectTypeName = nameof(KeyOneScalarPart),
             TryGetMethod = TryGetMethod.TryGetKeyTypeByApiName,
@@ -37,7 +39,8 @@ public partial class ApiObjectTypeTests
 
         new TryGetTest
         {
-            Name = $"{nameof(ApiObjectType.TryGetKeyTypeByApiName)} returns false when {nameof(ApiKeyType)} does not exist",
+            Name = $"{nameof(ApiObjectType.TryGetKeyTypeByApiName)} returns false when " +
+                $"{nameof(ApiNamedKeyType)} does not exist",
             ApiSchemaKind = ApiSchemaKind.Key,
             ApiObjectTypeName = nameof(KeyOneScalarPart),
             TryGetMethod = TryGetMethod.TryGetKeyTypeByApiName,

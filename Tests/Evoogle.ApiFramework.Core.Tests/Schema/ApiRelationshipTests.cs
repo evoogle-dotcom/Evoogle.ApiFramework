@@ -252,7 +252,7 @@ public partial class ApiRelationshipTests(ITestOutputHelper output) : XUnitTests
             actualKeyBinding.ApiPrincipalKeyResolutionSource.Should().Be(expectedResolutionSource);
         }
 
-        private static ApiKeyType ResolveExpectedPrincipalKeyType
+        private static ApiNamedKeyType ResolveExpectedPrincipalKeyType
         (
             ApiRelationshipPrincipalEndDef expectedPrincipalEnd,
             ApiRelationshipPrincipalEnd actualPrincipalEnd,
@@ -336,7 +336,15 @@ public partial class ApiRelationshipTests(ITestOutputHelper output) : XUnitTests
 
         private static void AssertKeyType(ApiKeyTypeDef expectedKeyType, ApiKeyType actualKeyType)
         {
-            actualKeyType.ApiName.Should().Be(expectedKeyType.ApiName);
+            if (actualKeyType is ApiNamedKeyType actualNamedKeyType)
+            {
+                actualNamedKeyType.ApiName.Should().Be(expectedKeyType.ApiName);
+            }
+            else
+            {
+                actualKeyType.Should().BeOfType<ApiKeyType>();
+            }
+
             actualKeyType.ApiKeyPaths.Should().HaveCount(expectedKeyType.ApiKeyPaths.Count);
 
             for (var i = 0; i < expectedKeyType.ApiKeyPaths.Count; i++)
