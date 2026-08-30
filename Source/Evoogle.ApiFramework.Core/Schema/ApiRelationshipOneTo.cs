@@ -58,11 +58,11 @@ public abstract class ApiRelationshipOneTo
 
     #region ApiSchemaElement Methods
     /// <inheritdoc/>
-    internal override void Initialize(ApiInitializationContext context)
+    internal override void InitializeCore(ApiInitializationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        base.Initialize(context);
+        base.InitializeCore(context);
 
         _apiResolvedKeyBinding = null;
 
@@ -77,36 +77,34 @@ public abstract class ApiRelationshipOneTo
     {
         if (this.ApiPrincipalEnd is null)
         {
-            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.ApiRelationshipNullPrincipalEnd;
             var description = $"{nameof(this.ApiPrincipalEnd)} must not be null";
             var remediation = $"Provide a valid {nameof(ApiRelationshipPrincipalEnd)}";
 
-            context.AddIssue(path, severity, code, description, remediation);
+            context.AddIssue(severity, code, description, remediation);
             return;
         }
 
-        var endContext = context.WithDeclaringSchemaElement(this);
-        this.ApiPrincipalEnd.Initialize(endContext);
+        var location = ApiInitializationLocation.ForRole(nameof(this.ApiPrincipalEnd));
+        this.ApiPrincipalEnd.Initialize(context, location);
     }
 
     private void InitializeApiDependentEnd(ApiInitializationContext context)
     {
         if (this.ApiDependentEnd is null)
         {
-            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.ApiRelationshipNullDependentEnd;
             var description = $"{nameof(this.ApiDependentEnd)} must not be null";
             var remediation = $"Provide a valid {nameof(ApiRelationshipDependentEnd)}";
 
-            context.AddIssue(path, severity, code, description, remediation);
+            context.AddIssue(severity, code, description, remediation);
             return;
         }
 
-        var endContext = context.WithDeclaringSchemaElement(this);
-        this.ApiDependentEnd.Initialize(endContext);
+        var location = ApiInitializationLocation.ForRole(nameof(this.ApiDependentEnd));
+        this.ApiDependentEnd.Initialize(context, location);
     }
 
     private void InitializeDependentKeyPathAlignment(ApiInitializationContext context)
@@ -156,13 +154,12 @@ public abstract class ApiRelationshipOneTo
             return;
         }
 
-        var path = this.ApiPath;
         var severity = ApiInitializationSeverity.Error;
         var code = ApiInitializationCode.ApiRelationshipEndPrincipalKeyWithoutForeignKey;
         var description = $"Cannot resolve {explicitKeyTarget} '{principal.ApiPrincipalKeyTypeName}' because this relationship has no foreign key binding";
         var remediation = $"Declare {nameof(this.ApiDependentEnd)}.{nameof(ApiRelationshipDependentEnd.ApiForeignKeyType)} or remove {explicitKeyTarget}";
 
-        context.AddIssue(path, severity, code, description, remediation);
+        context.AddIssue(severity, code, description, remediation);
     }
     #endregion
 }

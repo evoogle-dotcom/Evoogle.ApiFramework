@@ -56,6 +56,11 @@ public sealed class ApiKeyPath(Type clrRootType, IEnumerable<ApiKeyPathSegment> 
 
     /// <summary>Gets the CLR type from which the navigation chain of this key path begins.</summary>
     public Type ClrRootType { get; } = clrRootType;
+
+    internal string? ApiPathLabel => this.ClrRootType is null
+        ? null
+        : $"{this.ClrRootType.Name}."
+            + string.Join(".", this.ApiSegments.Select(s => s.ClrPropertyName));
     #endregion
 
     #region Object Methods
@@ -74,17 +79,20 @@ public sealed class ApiKeyPath(Type clrRootType, IEnumerable<ApiKeyPathSegment> 
     /// <inheritdoc/>
     protected override string BuildPath(string? apiPreviousPath)
     {
-        var clrRootType = this.ClrRootType;
-        var segmentName = clrRootType is not null ? $"{clrRootType.Name}.{string.Join(".", this.ApiSegments.Select(s => s.ClrPropertyName))}" : null;
-        return ApiSchemaPathFormatting.BuildPath(apiBasePath: apiPreviousPath, apiPathSegment: this.ApiElementName, apiPathSegmentName: segmentName);
+        return ApiSchemaPathFormatting.BuildPath
+        (
+            apiBasePath: apiPreviousPath,
+            apiPathSegment: this.ApiElementName,
+            apiPathSegmentName: this.ApiPathLabel
+        );
     }
 
     /// <inheritdoc/>
-    internal override void Initialize(ApiInitializationContext context)
+    internal override void InitializeCore(ApiInitializationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        base.Initialize(context);
+        base.InitializeCore(context);
 
         this.ValidateSegmentsNonEmpty(context);
         this.ResolveRootObjectType(context);
@@ -101,13 +109,12 @@ public sealed class ApiKeyPath(Type clrRootType, IEnumerable<ApiKeyPathSegment> 
 
         if (!context.ApiSchema.TryGetObjectTypeByClrType(this.ClrRootType, out var rootObjectType))
         {
-            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.ApiKeyPathUnresolvedRootType;
             var description = $"Root CLR type '{this.ClrRootType.Name}' is not registered as an {nameof(ApiObjectType)} in the schema";
             var remediation = $"Add an {nameof(ApiObjectType)} for '{this.ClrRootType.Name}' to the schema, or correct the root CLR type";
 
-            context.AddIssue(path, severity, code, description, remediation);
+            context.AddIssue(severity, code, description, remediation);
             return;
         }
 
@@ -121,29 +128,32 @@ public sealed class ApiKeyPath(Type clrRootType, IEnumerable<ApiKeyPathSegment> 
             return;
         }
 
-        var path = this.ApiPath;
         var severity = ApiInitializationSeverity.Error;
         var code = ApiInitializationCode.ApiKeyPathEmptySegments;
         var description = $"{nameof(this.ApiSegments)} must contain at least one property name";
         var remediation = $"Specify at least one CLR property name when creating an {nameof(ApiKeyPath)}";
 
-        context.AddIssue(path, severity, code, description, remediation);
+        context.AddIssue(severity, code, description, remediation);
     }
 
     private void InitializeSegmentChain(ApiObjectType rootObjectType, ApiInitializationContext context)
     {
         _apiRootObjectType = rootObjectType;
 
-        var currentContext = context
-            .WithDeclaringSchemaElement(this)
-            .WithDeclaringObjectTypeOnly(rootObjectType);
+        var currentContext = context;
 
         for (var i = 0; i < this.ApiSegments.Length; i++)
         {
             var segment = this.ApiSegments[i];
             var isLast = i == this.ApiSegments.Length - 1;
 
-            segment.Initialize(currentContext);
+            var location = ApiInitializationLocation.ForIndexedLabel
+            (
+                i,
+                segment.ClrPropertyName,
+                apiPathBase: context.ApiPath
+            );
+            var segmentContext = segment.Initialize(currentContext, location);
 
             if (!segment.IsPropertyResolved)
             {
@@ -180,9 +190,7 @@ public sealed class ApiKeyPath(Type clrRootType, IEnumerable<ApiKeyPathSegment> 
                     return;
                 }
 
-                currentContext = currentContext
-                    .WithDeclaringSchemaElement(segment)
-                    .WithDeclaringObjectTypeOnly(nestedObjectType);
+                currentContext = segmentContext;
             }
         }
     }

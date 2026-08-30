@@ -83,7 +83,10 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
             this.AssertException();
 
             this.ActualIssues.Should().NotBeNull();
-            this.ActualIssues.Should().BeEquivalentTo(this.ExpectedIssues);
+            this.ActualIssues.Should().BeEquivalentTo
+            (
+                FullyQualifyInitializationIssues(this.SourceJson, this.ExpectedIssues)
+            );
         }
     }
 
@@ -134,7 +137,10 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
         protected override void Assert()
         {
             this.ActualWarnings.Should().NotBeNull();
-            this.ActualWarnings.Should().BeEquivalentTo(this.ExpectedWarnings);
+            this.ActualWarnings.Should().BeEquivalentTo
+            (
+                FullyQualifyInitializationIssues(this.SourceJson, this.ExpectedWarnings)
+            );
         }
         #endregion
     }
@@ -263,6 +269,41 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
             this.ActualResult.Should().Be(this.ExpectedResult);
         }
         #endregion
+    }
+    #endregion
+
+    #region Implementation Methods
+    private static ApiInitializationIssue[] FullyQualifyInitializationIssues
+    (
+        string sourceJson,
+        IEnumerable<ApiInitializationIssue> issues
+    )
+    {
+        using var document = JsonDocument.Parse(sourceJson);
+        var apiName = document.RootElement.GetProperty(nameof(ApiSchema.ApiName)).GetString();
+        var apiSchemaPath = string.IsNullOrWhiteSpace(apiName)
+            ? nameof(ApiSchema)
+            : $"{nameof(ApiSchema)}[\"{apiName}\"]";
+
+        return
+        [
+            .. issues.Select(issue => issue.ApiPath.StartsWith
+            (
+                nameof(ApiSchema),
+                StringComparison.Ordinal
+            )
+                ? issue
+                : new ApiInitializationIssue
+                (
+                    $"{apiSchemaPath}.{issue.ApiPath}",
+                    issue.Severity,
+                    issue.Code,
+                    issue.Description,
+                    issue.Remediation,
+                    issue.ReaderType,
+                    issue.Exception
+                )),
+        ];
     }
     #endregion
 }

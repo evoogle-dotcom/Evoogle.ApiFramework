@@ -22,7 +22,7 @@ internal static class ApiSchemaInitializationLookup
         string partKeyPropertyName,
         string apiPath,
         ApiInitializationCode duplicatePartCode,
-        ApiInitializationContext context,
+        ApiInitializationSession session,
         out Dictionary<TPartKey, TPart>? lookupDictionary
     )
         where TPart : class
@@ -47,7 +47,7 @@ internal static class ApiSchemaInitializationLookup
             partKeyPropertyName: partKeyPropertyName,
             apiPath: apiPath,
             duplicatePartCode: duplicatePartCode,
-            context: context);
+            session: session);
     }
 
     public static void ValidateUnique<TPart, TPartKey>
@@ -58,7 +58,7 @@ internal static class ApiSchemaInitializationLookup
         string partKeyPropertyName,
         string apiPath,
         ApiInitializationCode duplicatePartCode,
-        ApiInitializationContext context
+        ApiInitializationSession session
     )
         where TPart : class
         where TPartKey : notnull
@@ -86,7 +86,7 @@ internal static class ApiSchemaInitializationLookup
         var description = $"Duplicate {partTypeName}.{partKeyPropertyName} values: '{duplicatesString}'";
         var remediation = $"Verify that each {partTypeName} has a unique {partKeyPropertyName} value";
 
-        context.AddIssue(apiPath, severity, duplicatePartCode, description, remediation);
+        session.AddIssue(apiPath, severity, duplicatePartCode, description, remediation);
     }
     #endregion
 }

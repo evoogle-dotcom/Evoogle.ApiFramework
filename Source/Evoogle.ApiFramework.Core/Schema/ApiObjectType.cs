@@ -119,11 +119,11 @@ public sealed partial class ApiObjectType
 
     #region ApiSchemaElement Methods
     /// <inheritdoc />
-    internal override void Initialize(ApiInitializationContext context)
+    internal override void InitializeCore(ApiInitializationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        base.Initialize(context);
+        base.InitializeCore(context);
 
         this.InitializeLookupDictionaries(context);
         this.InitializeApiProperties(context);
@@ -246,8 +246,7 @@ public sealed partial class ApiObjectType
         {
             var apiKeyType = this.ApiKeyTypes[i];
 
-            var childContext = context.WithDeclaringObjectType(this);
-            apiKeyType.Initialize(childContext);
+            apiKeyType.Initialize(context);
         }
     }
 
@@ -255,14 +254,13 @@ public sealed partial class ApiObjectType
     {
         if (this.ApiProperties is null || this.ApiProperties.Length == 0)
         {
-            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Warning;
             var code = ApiInitializationCode.ApiObjectTypeNullOrEmptyProperties;
             var description = $"{nameof(this.ApiProperties)} is null or empty";
 
             var remediation = $"Add at least one {nameof(ApiProperty)} to {nameof(ApiObjectType)}[\"{this.ApiName}\"]";
 
-            context.AddIssue(path, severity, code, description, remediation);
+            context.AddIssue(severity, code, description, remediation);
             return;
         }
 
@@ -271,8 +269,7 @@ public sealed partial class ApiObjectType
         {
             var apiProperty = this.ApiProperties[i];
 
-            var childContext = context.WithDeclaringObjectType(this);
-            apiProperty.Initialize(childContext);
+            apiProperty.Initialize(context);
         }
     }
 
@@ -292,7 +289,7 @@ public sealed partial class ApiObjectType
             partKeyPropertyName: nameof(ApiNamedKeyType.ApiName),
             apiPath: this.ApiPath,
             duplicatePartCode: ApiInitializationCode.ApiObjectTypeDuplicateKeyTypeApiName,
-            context: context,
+            session: context.Session,
             lookupDictionary: out _apiKeyTypeApiNameLookup
         );
 
@@ -304,7 +301,7 @@ public sealed partial class ApiObjectType
             partKeyPropertyName: nameof(ApiProperty.ApiName),
             apiPath: this.ApiPath,
             duplicatePartCode: ApiInitializationCode.ApiObjectTypeDuplicatePropertyApiName,
-            context: context,
+            session: context.Session,
             lookupDictionary: out _apiPropertyApiNameLookup
         );
 
@@ -316,7 +313,7 @@ public sealed partial class ApiObjectType
             partKeyPropertyName: nameof(ApiProperty.ClrName),
             apiPath: this.ApiPath,
             duplicatePartCode: ApiInitializationCode.ApiObjectTypeDuplicatePropertyClrName,
-            context: context,
+            session: context.Session,
             lookupDictionary: out _apiPropertyClrNameLookup
         );
     }

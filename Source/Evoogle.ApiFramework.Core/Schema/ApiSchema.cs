@@ -196,25 +196,25 @@ public sealed class ApiSchema : ExtensibleBase
         _apiPath = this.BuildPath();
 
         // Phase 1: Validate schema name and build all lookup dictionaries
-        var context = ApiInitializationContext.CreateRootContext(this);
-        this.InitializeApiName(context);
-        this.InitializeLookupDictionaries(context);
+        var session = new ApiInitializationSession(this);
+        this.InitializeApiName(session);
+        this.InitializeLookupDictionaries(session);
 
         // Phase 2: Initialize all type definitions
-        this.InitializeApiScalarTypes(context);
-        this.InitializeApiEnumTypes(context);
-        this.InitializeApiObjectTypes(context);
+        this.InitializeApiScalarTypes(session);
+        this.InitializeApiEnumTypes(session);
+        var apiObjectTypeContexts = this.InitializeApiObjectTypes(session);
 
         // The remaining initialization phases require fully initialized types,
         // so they come after all types have been initialized.
 
         // Phase 3. Initialize key types
-        this.InitializeApiKeyTypes(context);
+        this.InitializeApiKeyTypes(apiObjectTypeContexts);
 
         // Phase 4: Initialize relationships
-        this.InitializeApiRelationships(context);
+        this.InitializeApiRelationships(session);
 
-        var issues = context.Issues;
+        var issues = session.Issues;
         return new ApiInitializationResult(issues);
     }
 
@@ -357,7 +357,7 @@ public sealed class ApiSchema : ExtensibleBase
     #endregion
 
     #region Implementation Methods
-    private void InitializeApiName(ApiInitializationContext context)
+    private void InitializeApiName(ApiInitializationSession session)
     {
         var isApiNameInvalid = ApiSchemaNameValidation.IsNameInvalid(this.ApiName);
         if (isApiNameInvalid)
@@ -368,53 +368,59 @@ public sealed class ApiSchema : ExtensibleBase
             var description = $"{nameof(this.ApiName)} must not be null, empty, or whitespace";
             var remediation = $"Specify a valid {nameof(this.ApiName)} value";
 
-            context.AddIssue(path, severity, code, description, remediation);
+            session.AddIssue(path, severity, code, description, remediation);
         }
     }
 
-    private void InitializeApiEnumTypes(ApiInitializationContext context)
+    private void InitializeApiEnumTypes(ApiInitializationSession session)
     {
         foreach (var apiEnumType in this.ApiEnumTypes)
         {
-            apiEnumType.Initialize(context);
+            apiEnumType.Initialize(session);
         }
     }
 
-    private void InitializeApiObjectTypes(ApiInitializationContext context)
+    private ApiInitializationContext[] InitializeApiObjectTypes
+    (
+        ApiInitializationSession session
+    )
     {
+        var contexts = new List<ApiInitializationContext>(this.ApiObjectTypes.Length);
         foreach (var apiObjectType in this.ApiObjectTypes)
         {
-            apiObjectType.Initialize(context);
+            contexts.Add(apiObjectType.Initialize(session));
         }
+
+        return [.. contexts];
     }
 
-    private void InitializeApiKeyTypes(ApiInitializationContext context)
+    private void InitializeApiKeyTypes(ApiInitializationContext[] apiObjectTypeContexts)
     {
-        foreach (var apiObjectType in this.ApiObjectTypes)
+        for (var i = 0; i < this.ApiObjectTypes.Length; ++i)
         {
-            apiObjectType.InitializeKeyTypes(context);
+            this.ApiObjectTypes[i].InitializeKeyTypes(apiObjectTypeContexts[i]);
         }
     }
 
-    private void InitializeApiRelationships(ApiInitializationContext context)
+    private void InitializeApiRelationships(ApiInitializationSession session)
     {
         foreach (var apiRelationship in this.ApiRelationships)
         {
-            apiRelationship.Initialize(context);
+            apiRelationship.Initialize(session);
         }
 
-        this.PopulateRelationshipCrossReferences(context);
+        this.PopulateRelationshipCrossReferences();
     }
 
-    private void InitializeApiScalarTypes(ApiInitializationContext context)
+    private void InitializeApiScalarTypes(ApiInitializationSession session)
     {
         foreach (var apiScalarType in this.ApiScalarTypes)
         {
-            apiScalarType.Initialize(context);
+            apiScalarType.Initialize(session);
         }
     }
 
-    private void InitializeLookupDictionaries(ApiInitializationContext context)
+    private void InitializeLookupDictionaries(ApiInitializationSession session)
     {
         // Initialize lookup dictionaries for lookup by API name and CLR type.
         _apiNamedTypeApiNameLookup = null;
@@ -439,7 +445,7 @@ public sealed class ApiSchema : ExtensibleBase
             partKeyPropertyName: nameof(ApiNamedType.ApiName),
             apiPath: this.ApiPath,
             duplicatePartCode: ApiInitializationCode.ApiSchemaDuplicateNamedTypeApiName,
-            context: context,
+            session: session,
             lookupDictionary: out _apiNamedTypeApiNameLookup
         );
 
@@ -451,7 +457,7 @@ public sealed class ApiSchema : ExtensibleBase
             partKeyPropertyName: nameof(ApiNamedType.ClrType),
             apiPath: this.ApiPath,
             duplicatePartCode: ApiInitializationCode.ApiSchemaDuplicateNamedTypeClrType,
-            context: context,
+            session: session,
             lookupDictionary: out _apiNamedTypeClrTypeLookup
         );
 
@@ -463,7 +469,7 @@ public sealed class ApiSchema : ExtensibleBase
             partKeyPropertyName: nameof(ApiEnumType.ApiName),
             apiPath: this.ApiPath,
             duplicatePartCode: ApiInitializationCode.ApiSchemaDuplicateEnumTypeApiName,
-            context: context,
+            session: session,
             lookupDictionary: out _apiEnumTypeApiNameLookup
         );
 
@@ -475,7 +481,7 @@ public sealed class ApiSchema : ExtensibleBase
             partKeyPropertyName: nameof(ApiEnumType.ClrType),
             apiPath: this.ApiPath,
             duplicatePartCode: ApiInitializationCode.ApiSchemaDuplicateEnumTypeClrType,
-            context: context,
+            session: session,
             lookupDictionary: out _apiEnumTypeClrTypeLookup
         );
 
@@ -487,7 +493,7 @@ public sealed class ApiSchema : ExtensibleBase
             partKeyPropertyName: nameof(ApiObjectType.ApiName),
             apiPath: this.ApiPath,
             duplicatePartCode: ApiInitializationCode.ApiSchemaDuplicateObjectTypeApiName,
-            context: context,
+            session: session,
             lookupDictionary: out _apiObjectTypeApiNameLookup
         );
 
@@ -499,7 +505,7 @@ public sealed class ApiSchema : ExtensibleBase
             partKeyPropertyName: nameof(ApiObjectType.ClrType),
             apiPath: this.ApiPath,
             duplicatePartCode: ApiInitializationCode.ApiSchemaDuplicateObjectTypeClrType,
-            context: context,
+            session: session,
             lookupDictionary: out _apiObjectTypeClrTypeLookup
         );
 
@@ -511,7 +517,7 @@ public sealed class ApiSchema : ExtensibleBase
             partKeyPropertyName: nameof(ApiScalarType.ApiName),
             apiPath: this.ApiPath,
             duplicatePartCode: ApiInitializationCode.ApiSchemaDuplicateScalarTypeApiName,
-            context: context,
+            session: session,
             lookupDictionary: out _apiScalarTypeApiNameLookup
         );
 
@@ -523,7 +529,7 @@ public sealed class ApiSchema : ExtensibleBase
             partKeyPropertyName: nameof(ApiScalarType.ClrType),
             apiPath: this.ApiPath,
             duplicatePartCode: ApiInitializationCode.ApiSchemaDuplicateScalarTypeClrType,
-            context: context,
+            session: session,
             lookupDictionary: out _apiScalarTypeClrTypeLookup
         );
 
@@ -535,12 +541,12 @@ public sealed class ApiSchema : ExtensibleBase
             partKeyPropertyName: nameof(ApiRelationship.ApiName),
             apiPath: this.ApiPath,
             duplicatePartCode: ApiInitializationCode.ApiSchemaDuplicateRelationshipApiName,
-            context: context,
+            session: session,
             lookupDictionary: out _apiRelationshipApiNameLookup
         );
     }
 
-    private void PopulateRelationshipCrossReferences(ApiInitializationContext context)
+    private void PopulateRelationshipCrossReferences()
     {
         // Collect phase: bucket ends and associations by target object type using lists (no reallocation per insertion).
         var endMap = new Dictionary<ApiObjectType, (List<ApiRelationshipEnd> All, List<ApiRelationshipPrincipalEnd> Principal, List<ApiRelationshipDependentEnd> Dependent)>();

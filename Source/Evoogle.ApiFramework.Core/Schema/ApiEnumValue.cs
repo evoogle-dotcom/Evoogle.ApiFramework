@@ -60,11 +60,11 @@ public sealed class ApiEnumValue
         => ApiSchemaPathFormatting.BuildPath(apiBasePath: apiPreviousPath, apiPathSegment: this.ApiElementName, apiPathSegmentName: this.ApiName);
 
     /// <inheritdoc />
-    internal override void Initialize(ApiInitializationContext context)
+    internal override void InitializeCore(ApiInitializationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        base.Initialize(context);
+        base.InitializeCore(context);
 
         this.InitializeApiName(context);
         this.InitializeClrName(context);
@@ -77,13 +77,12 @@ public sealed class ApiEnumValue
         var isApiNameInvalid = ApiSchemaNameValidation.IsNameInvalid(this.ApiName);
         if (isApiNameInvalid)
         {
-            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.ApiEnumValueInvalidApiName;
             var description = $"{nameof(this.ApiName)} must not be null, empty, or whitespace";
             var remediation = $"Specify a valid {nameof(this.ApiName)} value";
 
-            context.AddIssue(path, severity, code, description, remediation);
+            context.AddIssue(severity, code, description, remediation);
         }
     }
 
@@ -92,13 +91,12 @@ public sealed class ApiEnumValue
         var isClrNameInvalid = ApiSchemaNameValidation.IsNameInvalid(this.ClrName);
         if (isClrNameInvalid)
         {
-            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.ApiEnumValueInvalidClrName;
             var description = $"{nameof(this.ClrName)} must not be null, empty, or whitespace";
             var remediation = $"Specify a valid {nameof(this.ClrName)} value";
 
-            context.AddIssue(path, severity, code, description, remediation);
+            context.AddIssue(severity, code, description, remediation);
         }
     }
     #endregion

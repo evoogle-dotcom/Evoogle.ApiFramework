@@ -54,5 +54,17 @@ internal static class ApiSchemaPathFormatting
 
         return stringBuilder.ToString();
     }
+
+    public static string BuildIndexedPath
+    (
+        string? apiBasePath,
+        string apiPathSegment,
+        int index,
+        string? apiPathSegmentName
+    )
+    {
+        var indexedSegment = $"{apiPathSegment}[{index}]";
+        return BuildPath(apiBasePath, indexedSegment, apiPathSegmentName);
+    }
     #endregion
 }

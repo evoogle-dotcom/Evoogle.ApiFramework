@@ -76,11 +76,11 @@ public partial class ApiKeyType(IEnumerable<ApiKeyPath> apiKeyPaths) : ApiSchema
         );
 
     /// <inheritdoc/>
-    internal override void Initialize(ApiInitializationContext context)
+    internal override void InitializeCore(ApiInitializationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        base.Initialize(context);
+        base.InitializeCore(context);
 
         this.InitializeApiKeyPaths(context);
     }
@@ -91,13 +91,12 @@ public partial class ApiKeyType(IEnumerable<ApiKeyPath> apiKeyPaths) : ApiSchema
     {
         if (this.ApiKeyPaths.Length == 0)
         {
-            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.ApiKeyTypeNullOrEmptyPaths;
             var description = $"{nameof(this.ApiKeyPaths)} must not be null or empty";
             var remediation = $"Specify at least one {nameof(ApiKeyPath)}";
 
-            context.AddIssue(path, severity, code, description, remediation);
+            context.AddIssue(severity, code, description, remediation);
             return;
         }
 
@@ -106,8 +105,12 @@ public partial class ApiKeyType(IEnumerable<ApiKeyPath> apiKeyPaths) : ApiSchema
         {
             var apiKeyPath = this.ApiKeyPaths[i];
 
-            var childContext = context.WithDeclaringSchemaElement(this);
-            apiKeyPath.Initialize(childContext);
+            var location = ApiInitializationLocation.ForIndexedLabel
+            (
+                i,
+                apiKeyPath.ApiPathLabel
+            );
+            apiKeyPath.Initialize(context, location);
         }
     }
     #endregion

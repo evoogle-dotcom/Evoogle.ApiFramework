@@ -165,13 +165,12 @@ public sealed class ApiTypeExpression
         }
         else
         {
-            var path = context.ApiDeclaringPath!;
             var severity = ApiInitializationSeverity.Error;
             var code = parentUnresolvedCode;
             var description = $"{parentUnresolvedName} could not be resolved because none of the following are set: {nameof(this.ApiInlineType)}, a valid combination of {nameof(this.ApiKind)} and {nameof(this.ApiName)}, or {nameof(this.ClrType)}";
             var remediation = $"Specify either {nameof(this.ApiInlineType)}, a valid combination of {nameof(this.ApiKind)} and {nameof(this.ApiName)}, or {nameof(this.ClrType)}";
 
-            context.AddIssue(path, severity, code, description, remediation);
+            context.AddIssue(severity, code, description, remediation);
         }
     }
     #endregion
@@ -241,13 +240,12 @@ public sealed class ApiTypeExpression
 
             case ApiTypeKind.Collection:
                 {
-                    var path = context.ApiDeclaringPath!;
                     var severity = ApiInitializationSeverity.Error;
                     var code = parentUnresolvedCode;
                     var description = $"{parentUnresolvedName} could not be resolved for {nameof(this.ApiKind)}={this.ApiKind.SafeToString()} and {nameof(this.ApiName)}={this.ApiName.SafeToString()} because {nameof(ApiTypeKind.Collection)} types must be defined inline";
                     var remediation = $"Define the {nameof(ApiTypeKind.Collection)} type inline using {nameof(this.ApiInlineType)} instead of specifying {nameof(this.ApiKind)} and {nameof(this.ApiName)}";
 
-                    context.AddIssue(path, severity, code, description, remediation);
+                    context.AddIssue(severity, code, description, remediation);
                     return;
                 }
 
@@ -257,13 +255,12 @@ public sealed class ApiTypeExpression
 
         if (_apiResolvedType is null)
         {
-            var path = context.ApiDeclaringPath!;
             var severity = ApiInitializationSeverity.Error;
             var code = parentUnresolvedCode;
             var description = $"{parentUnresolvedName} could not be resolved for {nameof(this.ApiKind)}='{this.ApiKind.SafeToString()}' and {nameof(this.ApiName)}='{this.ApiName.SafeToString()}'";
             var remediation = $"Verify that a type is declared in the schema for {nameof(this.ApiKind)}='{this.ApiKind.SafeToString()}' and {nameof(this.ApiName)}='{this.ApiName.SafeToString()}'";
 
-            context.AddIssue(path, severity, code, description, remediation);
+            context.AddIssue(severity, code, description, remediation);
         }
     }
 
@@ -280,12 +277,11 @@ public sealed class ApiTypeExpression
 
         if (_apiResolvedType is null)
         {
-            var path = context.ApiDeclaringPath!;
             var severity = ApiInitializationSeverity.Error;
             var code = parentUnresolvedCode;
             var description = $"{parentUnresolvedName} could not be resolved for {nameof(this.ClrType)}='{this.ClrType.SafeToName()}'";
             var remediation = $"Verify that a type is declared in the schema for {nameof(this.ClrType)}='{this.ClrType.SafeToName()}'";
-            context.AddIssue(path, severity, code, description, remediation);
+            context.AddIssue(severity, code, description, remediation);
         }
     }
 

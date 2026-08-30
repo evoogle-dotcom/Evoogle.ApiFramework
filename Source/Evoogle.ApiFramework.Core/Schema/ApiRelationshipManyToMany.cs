@@ -118,11 +118,11 @@ public sealed class ApiRelationshipManyToMany
 
     #region ApiSchemaElement Methods
     /// <inheritdoc/>
-    internal override void Initialize(ApiInitializationContext context)
+    internal override void InitializeCore(ApiInitializationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        base.Initialize(context);
+        base.InitializeCore(context);
 
         _apiResolvedKeyBindingA = null;
         _apiResolvedKeyBindingB = null;
@@ -208,67 +208,63 @@ public sealed class ApiRelationshipManyToMany
             return;
         }
 
-        var path = this.ApiPath;
         var severity = ApiInitializationSeverity.Error;
         var code = ApiInitializationCode.ApiRelationshipEndPrincipalKeyWithoutForeignKey;
         var description = $"Cannot resolve {explicitKeyTarget} '{principalEnd.ApiPrincipalKeyTypeName}' because this relationship has no association foreign key bindings";
         var remediation = $"Declare {nameof(this.ApiAssociation)}.{nameof(ApiRelationshipAssociation.ApiForeignKeyTypeA)} and {nameof(this.ApiAssociation)}.{nameof(ApiRelationshipAssociation.ApiForeignKeyTypeB)} or remove {explicitKeyTarget}";
 
-        context.AddIssue(path, severity, code, description, remediation);
+        context.AddIssue(severity, code, description, remediation);
     }
 
     private void InitializeApiAssociation(ApiInitializationContext context)
     {
         if (this.ApiAssociation is null)
         {
-            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.ApiRelationshipManyToManyNullAssociation;
             var description = $"{nameof(this.ApiAssociation)} must not be null";
             var remediation = $"Provide a valid {nameof(ApiRelationshipAssociation)} for the association between the two principal ends";
 
-            context.AddIssue(path, severity, code, description, remediation);
+            context.AddIssue(severity, code, description, remediation);
             return;
         }
 
-        var assocationContext = context.WithDeclaringSchemaElement(this);
-        this.ApiAssociation.Initialize(assocationContext);
+        var location = ApiInitializationLocation.ForRole(nameof(this.ApiAssociation));
+        this.ApiAssociation.Initialize(context, location);
     }
 
     private void InitializeApiPrincipalEndA(ApiInitializationContext context)
     {
         if (this.ApiPrincipalEndA is null)
         {
-            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.ApiRelationshipManyToManyNullPrincipalEndA;
             var description = $"{nameof(this.ApiPrincipalEndA)} must not be null";
             var remediation = $"Provide a valid {nameof(ApiRelationshipPrincipalEnd)} for end A";
 
-            context.AddIssue(path, severity, code, description, remediation);
+            context.AddIssue(severity, code, description, remediation);
             return;
         }
 
-        var endContext = context.WithDeclaringSchemaElement(this);
-        this.ApiPrincipalEndA.Initialize(endContext);
+        var location = ApiInitializationLocation.ForRole(nameof(this.ApiPrincipalEndA));
+        this.ApiPrincipalEndA.Initialize(context, location);
     }
 
     private void InitializeApiPrincipalEndB(ApiInitializationContext context)
     {
         if (this.ApiPrincipalEndB is null)
         {
-            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.ApiRelationshipManyToManyNullPrincipalEndB;
             var description = $"{nameof(this.ApiPrincipalEndB)} must not be null";
             var remediation = $"Provide a valid {nameof(ApiRelationshipPrincipalEnd)} for end B";
 
-            context.AddIssue(path, severity, code, description, remediation);
+            context.AddIssue(severity, code, description, remediation);
             return;
         }
 
-        var endContext = context.WithDeclaringSchemaElement(this);
-        this.ApiPrincipalEndB.Initialize(endContext);
+        var location = ApiInitializationLocation.ForRole(nameof(this.ApiPrincipalEndB));
+        this.ApiPrincipalEndB.Initialize(context, location);
     }
 
     #endregion

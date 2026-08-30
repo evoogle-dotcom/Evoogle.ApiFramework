@@ -46,11 +46,11 @@ public abstract class ApiRelationshipElement(Type clrObjectType) : ApiSchemaElem
         => ApiSchemaPathFormatting.BuildPath(apiBasePath: apiPreviousPath, apiPathSegment: this.ApiElementName, apiPathSegmentName: null);
 
     /// <inheritdoc/>
-    internal override void Initialize(ApiInitializationContext context)
+    internal override void InitializeCore(ApiInitializationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        base.Initialize(context);
+        base.InitializeCore(context);
 
         this.InitializeClrObjectType(context);
         this.InitializeApiObjectType(context);
@@ -65,13 +65,12 @@ public abstract class ApiRelationshipElement(Type clrObjectType) : ApiSchemaElem
             return;
         }
 
-        var path = this.ApiPath;
         var severity = ApiInitializationSeverity.Error;
         var code = ApiInitializationCode.ApiRelationshipElementNullClrObjectType;
         var description = $"{nameof(this.ClrObjectType)} must not be null";
         var remediation = $"Specify a valid {nameof(this.ClrObjectType)} value";
 
-        context.AddIssue(path, severity, code, description, remediation);
+        context.AddIssue(severity, code, description, remediation);
     }
 
     private void InitializeApiObjectType(ApiInitializationContext context)
@@ -89,7 +88,6 @@ public abstract class ApiRelationshipElement(Type clrObjectType) : ApiSchemaElem
             return;
         }
 
-        var path = this.ApiPath;
         var severity = ApiInitializationSeverity.Error;
         var code = ApiInitializationCode.ApiRelationshipElementUnresolvedObjectType;
         var description = $"No {nameof(Schema.ApiObjectType)} is registered for CLR type '{this.ClrObjectType.FullName}'";
@@ -98,7 +96,7 @@ public abstract class ApiRelationshipElement(Type clrObjectType) : ApiSchemaElem
             ? $"Use one of the available object types: {availableTypes}"
             : $"Define an {nameof(Schema.ApiObjectType)} for CLR type '{this.ClrObjectType.FullName}' in the schema";
 
-        context.AddIssue(path, severity, code, description, remediation);
+        context.AddIssue(severity, code, description, remediation);
     }
     #endregion
 }

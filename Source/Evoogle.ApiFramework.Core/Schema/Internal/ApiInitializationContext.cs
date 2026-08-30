@@ -3,6 +3,8 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Diagnostics.CodeAnalysis;
+
 using Evoogle.ApiFramework.Exceptions;
 
 namespace Evoogle.ApiFramework.Schema.Internal;
@@ -11,49 +13,71 @@ namespace Evoogle.ApiFramework.Schema.Internal;
 ///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used directly from your code.
 ///     This API may change or be removed in future releases.
 /// </summary>
-internal class ApiInitializationContext
+internal sealed class ApiInitializationContext
 {
-    #region Fields
-    private readonly string? _apiDeclaringPath;
-    private readonly ApiObjectType? _apiDeclaringObjectType;
-    private readonly List<ApiInitializationIssue> _issues; // shared, non-null
-    #endregion
-
     #region Properties
-    public ApiSchema ApiSchema { get; }
+    public IEnumerable<ApiSchemaElement> Ancestors
+    {
+        get
+        {
+            var ancestor = this.Parent;
+            while (ancestor is not null)
+            {
+                yield return ancestor.CurrentElement;
+                ancestor = ancestor.Parent;
+            }
+        }
+    }
 
-    public string? ApiDeclaringPath => _apiDeclaringPath;
+    public ApiSchema ApiSchema => this.Session.ApiSchema;
 
-    public ApiObjectType ApiDeclaringObjectType => _apiDeclaringObjectType ?? throw new ApiSchemaException($"No parent {nameof(ApiObjectType)} in this context.");
+    public string ApiPath { get; }
 
-    public IEnumerable<ApiInitializationIssue> Issues => _issues;
+    public ApiSchemaElement CurrentElement { get; }
+
+    public IEnumerable<ApiInitializationIssue> Issues => this.Session.Issues;
+
+    public ApiInitializationLocation Location { get; }
+
+    public ApiInitializationContext? Parent { get; }
+
+    public ApiSchemaElement? ParentElement => this.Parent?.CurrentElement;
+
+    public ApiInitializationSession Session { get; }
     #endregion
 
-    #region Computed Properties
-    public bool HasDeclaringObjectType => _apiDeclaringObjectType is not null;
-    #endregion
-
-    #region Constructor
-    private ApiInitializationContext
+    #region Constructors
+    internal ApiInitializationContext
     (
-        ApiSchema apiSchema,
-        string? apiDeclaringPath,
-        ApiObjectType? apiDeclaringObjectType,
-        List<ApiInitializationIssue> issues
+        ApiInitializationSession session,
+        ApiSchemaElement currentElement,
+        ApiInitializationContext? parent,
+        ApiInitializationLocation location,
+        string apiPath
     )
     {
-        ArgumentNullException.ThrowIfNull(apiSchema);
-        ArgumentNullException.ThrowIfNull(issues);
+        ArgumentNullException.ThrowIfNull(session);
+        ArgumentNullException.ThrowIfNull(currentElement);
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiPath);
 
-        _apiDeclaringPath = apiDeclaringPath;
-        _apiDeclaringObjectType = apiDeclaringObjectType;
-
-        this.ApiSchema = apiSchema;
-        _issues = issues; // keep shared reference
+        this.Session = session;
+        this.CurrentElement = currentElement;
+        this.Parent = parent;
+        this.Location = location;
+        this.ApiPath = apiPath;
     }
     #endregion
 
     #region Methods
+    public void AddIssue
+    (
+        ApiInitializationSeverity severity,
+        ApiInitializationCode code,
+        string description,
+        string? remediation
+    )
+    => this.Session.AddIssue(this.ApiPath, severity, code, description, remediation);
+
     public void AddIssue
     (
         string apiPath,
@@ -62,57 +86,39 @@ internal class ApiInitializationContext
         string description,
         string? remediation
     )
-    {
-        var issue = new ApiInitializationIssue(apiPath, severity, code, description, remediation);
-        _issues.Add(issue);
-    }
+    => this.Session.AddIssue(apiPath, severity, code, description, remediation);
 
-    public static ApiInitializationContext CreateRootContext(ApiSchema apiSchema)
+    public TElement GetNearestAncestor<TElement>()
+        where TElement : ApiSchemaElement
     {
-        return new ApiInitializationContext
+        if (this.TryGetNearestAncestor<TElement>(out var ancestor))
+        {
+            return ancestor;
+        }
+
+        throw new ApiSchemaException
         (
-            apiSchema: apiSchema,
-            apiDeclaringPath: null,
-            apiDeclaringObjectType: null,
-            issues: [] // always non-null shared list
+            $"No ancestor {typeof(TElement).Name} exists in the initialization context."
         );
     }
 
-    public ApiInitializationContext WithDeclaringObjectType(ApiObjectType apiDeclaringObjectType)
+    public bool TryGetNearestAncestor<TElement>([NotNullWhen(true)] out TElement? ancestor)
+        where TElement : ApiSchemaElement
     {
-        var apiDeclaringPath = apiDeclaringObjectType.ApiPath;
+        var current = this.Parent;
+        while (current is not null)
+        {
+            if (current.CurrentElement is TElement typedAncestor)
+            {
+                ancestor = typedAncestor;
+                return true;
+            }
 
-        return new ApiInitializationContext
-        (
-            this.ApiSchema,
-            apiDeclaringPath,
-            apiDeclaringObjectType,
-            _issues // share the same list
-        );
-    }
+            current = current.Parent;
+        }
 
-    public ApiInitializationContext WithDeclaringSchemaElement(ApiSchemaElement apiDeclaringSchemaElement)
-    {
-        var apiDeclaringPath = apiDeclaringSchemaElement.ApiPath;
-
-        return new ApiInitializationContext
-        (
-            this.ApiSchema,
-            apiDeclaringPath,
-            _apiDeclaringObjectType,
-            _issues // share the same list
-        );
-    }
-
-    public ApiInitializationContext WithDeclaringObjectTypeOnly(ApiObjectType apiDeclaringObjectType)
-    {
-        return new ApiInitializationContext
-        (
-            this.ApiSchema,
-            _apiDeclaringPath, // preserve current path unchanged
-            apiDeclaringObjectType,
-            _issues // share the same list
-        );
+        ancestor = null;
+        return false;
     }
     #endregion
 }

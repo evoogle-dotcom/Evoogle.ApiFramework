@@ -30,12 +30,16 @@ public abstract class ApiSchemaElement : ExtensibleBase
     ///     Gets the API path that uniquely identifies this element within the schema hierarchy.
     /// </summary>
     /// <remarks>
-    ///     This property is available after the element has been initialized.
+    ///     This property is available after the element has been initialized. Its value begins
+    ///     with the containing <see cref="ApiSchema"/> and includes the element's structural
+    ///     ancestry.
     /// </remarks>
     public string ApiPath => this.ThrowIfNotInitialized(_apiPath);
 
     /// <summary>Gets runtime API element name of the API schema element.</summary>
     protected abstract string ApiElementName { get; }
+
+    internal string ApiElementTypeName => this.ApiElementName;
 
     /// <summary>
     ///     Gets the runtime context for the API schema containing this element.
@@ -63,16 +67,51 @@ public abstract class ApiSchemaElement : ExtensibleBase
     protected abstract string BuildPath(string? apiPreviousPath);
 
     /// <summary>
-    ///     Initializes this schema element with the specified context.
+    ///     Initializes this schema element as a top-level element in the specified session.
     /// </summary>
-    /// <param name="context">The runtime initialization context needed for initializing this schema element.</param>
-    /// <exception cref="ArgumentNullException"><paramref name="context"/> is <c>null</c>.</exception>
-    internal virtual void Initialize(ApiInitializationContext context)
+    internal ApiInitializationContext Initialize
+    (
+        ApiInitializationSession session,
+        ApiInitializationLocation location = default
+    )
+    {
+        ArgumentNullException.ThrowIfNull(session);
+
+        return this.Initialize(session, parentContext: null, location);
+    }
+
+    internal ApiInitializationContext Initialize
+    (
+        ApiInitializationContext parentContext,
+        ApiInitializationLocation location = default
+    )
+    {
+        ArgumentNullException.ThrowIfNull(parentContext);
+
+        return this.Initialize(parentContext.Session, parentContext, location);
+    }
+
+    internal string BuildDefaultPath(string apiPreviousPath) => this.BuildPath(apiPreviousPath);
+
+    internal virtual void InitializeCore(ApiInitializationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
+    }
 
-        _apiPath = this.BuildPath(context.ApiDeclaringPath);
+    private ApiInitializationContext Initialize
+    (
+        ApiInitializationSession session,
+        ApiInitializationContext? parentContext,
+        ApiInitializationLocation location
+    )
+    {
+        var context = session.CreateContext(this, parentContext, location);
+
+        _apiPath = context.ApiPath;
         _apiSchemaContext = context.ApiSchema.ApiSchemaContext;
+
+        this.InitializeCore(context);
+        return context;
     }
     #endregion
 }

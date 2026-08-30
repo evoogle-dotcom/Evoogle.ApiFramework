@@ -33,11 +33,11 @@ public abstract class ApiType(Type clrType) : ApiSchemaElement
 
     #region ApiSchemaElement Methods
     /// <inheritdoc />
-    internal override void Initialize(ApiInitializationContext context)
+    internal override void InitializeCore(ApiInitializationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        base.Initialize(context);
+        base.InitializeCore(context);
 
         this.InitializeClrType(context);
     }
@@ -48,13 +48,12 @@ public abstract class ApiType(Type clrType) : ApiSchemaElement
     {
         if (this.ClrType is null)
         {
-            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.ApiTypeNullClrType;
             var description = $"{nameof(this.ClrType)} must not be null";
             var remediation = $"Specify a valid {nameof(this.ClrType)}";
 
-            context.AddIssue(path, severity, code, description, remediation);
+            context.AddIssue(severity, code, description, remediation);
         }
     }
     #endregion

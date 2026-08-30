@@ -59,11 +59,11 @@ public sealed class ApiRelationshipPrincipalEnd(Type clrObjectType, string? apiP
 
     #region ApiSchemaElement Methods
     /// <inheritdoc/>
-    internal override void Initialize(ApiInitializationContext context)
+    internal override void InitializeCore(ApiInitializationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        base.Initialize(context);
+        base.InitializeCore(context);
     }
     #endregion
 }

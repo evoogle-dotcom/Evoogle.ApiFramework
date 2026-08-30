@@ -2071,7 +2071,7 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"]." +
                         $"{nameof(ApiNamedKeyType)}[\"PrimaryKey\"].{nameof(ApiKeyPath)}" +
-                        $"[\"{nameof(DuplicateKeyTypeApiNameType)}.\"]",
+                        $"[0][\"{nameof(DuplicateKeyTypeApiNameType)}.\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiKeyPathEmptySegments,
                     description: $"{nameof(ApiKeyPath.ApiSegments)} must contain at least one property name",
@@ -2133,7 +2133,7 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"]." +
                         $"{nameof(ApiNamedKeyType)}[\"PrimaryKey\"].{nameof(ApiKeyPath)}" +
-                        $"[\"{nameof(TypeWithListProperty)}.Id\"]",
+                        $"[0][\"{nameof(TypeWithListProperty)}.Id\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiKeyPathUnresolvedRootType,
                     description: $"Root CLR type '{nameof(TypeWithListProperty)}' is not registered as an {nameof(ApiObjectType)} in the schema",
@@ -2195,8 +2195,8 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"]." +
                         $"{nameof(ApiNamedKeyType)}[\"PrimaryKey\"].{nameof(ApiKeyPath)}" +
-                        $"[\"{nameof(DuplicateKeyTypeApiNameType)}.\"]." +
-                        $"{nameof(ApiKeyPathSegment)}",
+                        $"[0][\"{nameof(DuplicateKeyTypeApiNameType)}.\"]." +
+                        $"{nameof(ApiKeyPathSegment)}[0]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiKeyPathSegmentInvalidClrPropertyName,
                     description: $"{nameof(ApiKeyPathSegment.ClrPropertyName)} must not be null, empty, or whitespace",
@@ -2258,8 +2258,8 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"]." +
                         $"{nameof(ApiNamedKeyType)}[\"PrimaryKey\"].{nameof(ApiKeyPath)}" +
-                        $"[\"{nameof(DuplicateKeyTypeApiNameType)}.MissingId\"]." +
-                        $"{nameof(ApiKeyPathSegment)}[\"MissingId\"]",
+                        $"[0][\"{nameof(DuplicateKeyTypeApiNameType)}.MissingId\"]." +
+                        $"{nameof(ApiKeyPathSegment)}[0][\"MissingId\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiKeyPathSegmentUnresolvedApiProperty,
                     description: $"Property with CLR name 'MissingId' could not be found on object type 'TestObject'",
@@ -2330,8 +2330,8 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"]." +
                         $"{nameof(ApiNamedKeyType)}[\"PrimaryKey\"].{nameof(ApiKeyPath)}" +
-                        $"[\"{nameof(DuplicateKeyTypeApiNameType)}.Id.Code\"]." +
-                        $"{nameof(ApiKeyPathSegment)}[\"Id\"]",
+                        $"[0][\"{nameof(DuplicateKeyTypeApiNameType)}.Id.Code\"]." +
+                        $"{nameof(ApiKeyPathSegment)}[0][\"Id\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiKeyPathNavigationSegmentInvalidType,
                     description: $"Navigation segment property 'Id' must resolve to an object type; found '{nameof(ApiScalarType)}'",
@@ -2416,7 +2416,8 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"Owner\"]." +
                         $"{nameof(ApiNamedKeyType)}[\"PrimaryKey\"].{nameof(ApiKeyPath)}" +
-                        $"[\"{nameof(OwnerType)}.Item\"].{nameof(ApiKeyPathSegment)}[\"Item\"]",
+                        $"[0][\"{nameof(OwnerType)}.Item\"]." +
+                        $"{nameof(ApiKeyPathSegment)}[0][\"Item\"]",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiKeyPathScalarSegmentInvalidType,
                     description: $"Terminal segment property 'Item' must resolve to a scalar type; found '{nameof(ApiObjectType)}'",
@@ -2614,7 +2615,8 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    apiPath: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"].{nameof(ApiRelationshipPrincipalEnd)}",
+                    apiPath: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"]." +
+                        $"{nameof(ApiRelationshipOneTo.ApiPrincipalEnd)}",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiRelationshipElementNullClrObjectType,
                     description: $"{nameof(ApiRelationshipElement.ClrObjectType)} must not be null",
@@ -2658,7 +2660,8 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    apiPath: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"].{nameof(ApiRelationshipPrincipalEnd)}",
+                    apiPath: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"]." +
+                        $"{nameof(ApiRelationshipOneTo.ApiPrincipalEnd)}",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiRelationshipElementUnresolvedObjectType,
                     description: $"No {nameof(ApiObjectType)} is registered for CLR type '{typeof(object).FullName}'",
@@ -2726,7 +2729,8 @@ public partial class ApiSchemaTests
             [
                 new ApiInitializationIssue
                 (
-                    apiPath: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"].{nameof(ApiRelationshipPrincipalEnd)}",
+                    apiPath: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"]." +
+                        $"{nameof(ApiRelationshipOneTo.ApiPrincipalEnd)}",
                     severity: ApiInitializationSeverity.Error,
                     code: ApiInitializationCode.ApiRelationshipEndUnresolvedKeyType,
                     description: "Referenced principal key type 'NonExistentKeyType' could not be found on object type 'RelPrincipal'",

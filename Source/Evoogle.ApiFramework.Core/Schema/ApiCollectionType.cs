@@ -75,11 +75,11 @@ public sealed class ApiCollectionType
         => ApiSchemaPathFormatting.BuildPath(apiBasePath: apiPreviousPath, apiPathSegment: this.ApiElementName, apiPathSegmentName: null);
 
     /// <inheritdoc />
-    internal override void Initialize(ApiInitializationContext context)
+    internal override void InitializeCore(ApiInitializationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        base.Initialize(context);
+        base.InitializeCore(context);
 
         this.InitializeApiItemTypeExpression(context);
     }
@@ -90,18 +90,16 @@ public sealed class ApiCollectionType
     {
         if (this.ApiItemTypeExpression is null)
         {
-            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.ApiCollectionTypeNullItemType;
             var description = $"{nameof(this.ApiItemType)} must not be null";
             var remediation = $"Specify a valid {nameof(this.ApiItemType)}";
 
-            context.AddIssue(path, severity, code, description, remediation);
+            context.AddIssue(severity, code, description, remediation);
             return;
         }
 
-        var childContext = context.WithDeclaringSchemaElement(this);
-        this.ApiItemTypeExpression.InitializeForCollection(childContext);
+        this.ApiItemTypeExpression.InitializeForCollection(context);
     }
     #endregion
 }

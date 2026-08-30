@@ -142,11 +142,11 @@ public sealed class ApiRelationshipAssociation : ApiRelationshipElement
 
     #region ApiSchemaElement Methods
     /// <inheritdoc/>
-    internal override void Initialize(ApiInitializationContext context)
+    internal override void InitializeCore(ApiInitializationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        base.Initialize(context);
+        base.InitializeCore(context);
 
         this.InitializeApiForeignKeyTypes(context);
     }
@@ -169,9 +169,11 @@ public sealed class ApiRelationshipAssociation : ApiRelationshipElement
             return;
         }
 
-        var fkContext = context.WithDeclaringSchemaElement(this);
-        _apiForeignKeyTypeA!.Initialize(fkContext);
-        _apiForeignKeyTypeB!.Initialize(fkContext);
+        var locationA = ApiInitializationLocation.ForRole(nameof(this.ApiForeignKeyTypeA));
+        _apiForeignKeyTypeA!.Initialize(context, locationA);
+
+        var locationB = ApiInitializationLocation.ForRole(nameof(this.ApiForeignKeyTypeB));
+        _apiForeignKeyTypeB!.Initialize(context, locationB);
     }
     #endregion
 }

@@ -5,6 +5,7 @@
 // See the LICENSE file in the project root for more information.
 using System.Text.Json.Serialization;
 
+using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.ApiFramework.Schema.Json;
 using Evoogle.Extensions;
@@ -59,11 +60,11 @@ public sealed class ApiKeyPathSegment(string clrPropertyName) : ApiSchemaElement
         => ApiSchemaPathFormatting.BuildPath(apiBasePath: apiPreviousPath, apiPathSegment: this.ApiElementName, apiPathSegmentName: this.ClrPropertyName);
 
     /// <inheritdoc/>
-    internal override void Initialize(ApiInitializationContext context)
+    internal override void InitializeCore(ApiInitializationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        base.Initialize(context);
+        base.InitializeCore(context);
 
         this.InitializeClrPropertyName(context);
         this.InitializeApiProperty(context);
@@ -78,13 +79,12 @@ public sealed class ApiKeyPathSegment(string clrPropertyName) : ApiSchemaElement
             return;
         }
 
-        var path = this.ApiPath;
         var severity = ApiInitializationSeverity.Error;
         var code = ApiInitializationCode.ApiKeyPathSegmentInvalidClrPropertyName;
         var description = $"{nameof(this.ClrPropertyName)} must not be null, empty, or whitespace";
         var remediation = $"Specify a valid {nameof(this.ClrPropertyName)} value";
 
-        context.AddIssue(path, severity, code, description, remediation);
+        context.AddIssue(severity, code, description, remediation);
     }
 
     private void InitializeApiProperty(ApiInitializationContext context)
@@ -96,20 +96,40 @@ public sealed class ApiKeyPathSegment(string clrPropertyName) : ApiSchemaElement
             return;
         }
 
-        var apiDeclaringObjectType = context.ApiDeclaringObjectType;
-        if (apiDeclaringObjectType.TryGetPropertyByClrName(this.ClrPropertyName, out var apiResolvedProperty))
+        var apiObjectType = this.GetApiObjectType(context);
+        if (apiObjectType.TryGetPropertyByClrName
+        (
+            this.ClrPropertyName,
+            out var apiResolvedProperty
+        ))
         {
             _apiResolvedProperty = apiResolvedProperty;
             return;
         }
 
-        var path = this.ApiPath;
         var severity = ApiInitializationSeverity.Error;
         var code = ApiInitializationCode.ApiKeyPathSegmentUnresolvedApiProperty;
-        var description = $"Property with CLR name '{this.ClrPropertyName}' could not be found on object type '{apiDeclaringObjectType.ApiName}'";
-        var remediation = $"Verify the CLR property name or add a property with CLR name '{this.ClrPropertyName}' to '{apiDeclaringObjectType.ApiName}'";
+        var description = $"Property with CLR name '{this.ClrPropertyName}' could not be "
+            + $"found on object type '{apiObjectType.ApiName}'";
+        var remediation = $"Verify the CLR property name or add a property with CLR name "
+            + $"'{this.ClrPropertyName}' to '{apiObjectType.ApiName}'";
 
-        context.AddIssue(path, severity, code, description, remediation);
+        context.AddIssue(severity, code, description, remediation);
+    }
+
+    private ApiObjectType GetApiObjectType(ApiInitializationContext context)
+    {
+        if (context.TryGetNearestAncestor<ApiKeyPathSegment>(out var precedingSegment))
+        {
+            return precedingSegment.ApiProperty.ApiType as ApiObjectType
+                ?? throw new ApiSchemaException
+                (
+                    "A key path navigation segment must resolve to an API object type before "
+                        + "initializing its next segment."
+                );
+        }
+
+        return context.GetNearestAncestor<ApiKeyPath>().ApiRootObjectType;
     }
     #endregion
 }

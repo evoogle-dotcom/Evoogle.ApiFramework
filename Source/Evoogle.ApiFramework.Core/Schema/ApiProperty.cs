@@ -167,11 +167,11 @@ public sealed partial class ApiProperty
         => ApiSchemaPathFormatting.BuildPath(apiBasePath: apiPreviousPath, apiPathSegment: this.ApiElementName, apiPathSegmentName: this.ApiName);
 
     /// <inheritdoc />
-    internal override void Initialize(ApiInitializationContext context)
+    internal override void InitializeCore(ApiInitializationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        base.Initialize(context);
+        base.InitializeCore(context);
 
         this.InitializeApiName(context);
         this.InitializeApiTypeExpression(context);
@@ -184,13 +184,12 @@ public sealed partial class ApiProperty
         var isApiNameInvalid = ApiSchemaNameValidation.IsNameInvalid(this.ApiName);
         if (isApiNameInvalid)
         {
-            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.ApiPropertyInvalidApiName;
             var description = $"{nameof(this.ApiName)} must not be null, empty, or whitespace";
             var remediation = $"Specify a valid {nameof(this.ApiName)} value";
 
-            context.AddIssue(path, severity, code, description, remediation);
+            context.AddIssue(severity, code, description, remediation);
         }
     }
 
@@ -198,23 +197,21 @@ public sealed partial class ApiProperty
     {
         if (this.ApiTypeExpression is null)
         {
-            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.ApiPropertyNullType;
             var description = $"{nameof(this.ApiType)} must not be null";
             var remediation = $"Specify a valid {nameof(this.ApiType)}";
 
-            context.AddIssue(path, severity, code, description, remediation);
+            context.AddIssue(severity, code, description, remediation);
             return;
         }
 
-        var childContext = context.WithDeclaringSchemaElement(this);
-        this.ApiTypeExpression.InitializeForProperty(childContext);
+        this.ApiTypeExpression.InitializeForProperty(context);
     }
 
     private void InitializeClrFieldGetterAndSetter(ApiInitializationContext context, FieldInfo clrFieldInfo)
     {
-        var apiObjectType = context.ApiDeclaringObjectType;
+        var apiObjectType = context.GetNearestAncestor<ApiObjectType>();
         var clrObjectType = apiObjectType.ClrType;
         var clrMemberName = this.ClrName;
 
@@ -225,13 +222,12 @@ public sealed partial class ApiProperty
         }
         catch (Exception ex)
         {
-            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.ApiPropertyInvalidFieldGetter;
             var description = $"Failed to compile field getter for '{clrMemberName}': {ex.Message.TrimEnd('.')}";
             var remediation = $"Verify that field '{clrMemberName}' is readable and can be used in expression trees";
 
-            context.AddIssue(path, severity, code, description, remediation);
+            context.AddIssue(severity, code, description, remediation);
         }
 
         try
@@ -240,12 +236,11 @@ public sealed partial class ApiProperty
         }
         catch (Exception ex)
         {
-            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.ApiPropertyInvalidFieldSetter;
             var description = $"Failed to compile field setter for '{clrMemberName}': {ex.Message.TrimEnd('.')}";
             var remediation = $"Verify that field '{clrMemberName}' is writable and can be used in expression trees";
-            context.AddIssue(path, severity, code, description, remediation);
+            context.AddIssue(severity, code, description, remediation);
         }
 
         // Validate nullability alignment between API declaration and CLR member
@@ -255,19 +250,18 @@ public sealed partial class ApiProperty
 
     private void InitializeClrPropertyGetterAndSetter(ApiInitializationContext context, PropertyInfo clrPropertyInfo)
     {
-        var apiObjectType = context.ApiDeclaringObjectType;
+        var apiObjectType = context.GetNearestAncestor<ApiObjectType>();
         var clrObjectType = apiObjectType.ClrType;
         var clrMemberName = this.ClrName;
 
         // Exclude indexers
         if (clrPropertyInfo.GetIndexParameters().Length > 0)
         {
-            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.ApiPropertyInvalidPropertyGetter;
             var description = $"Property '{clrMemberName}' is an indexer, which is not supported";
 
-            context.AddIssue(path, severity, code, description, remediation: null);
+            context.AddIssue(severity, code, description, remediation: null);
             return;
         }
 
@@ -278,13 +272,12 @@ public sealed partial class ApiProperty
         }
         catch (Exception ex)
         {
-            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.ApiPropertyInvalidPropertyGetter;
             var description = $"Failed to compile property getter for '{clrMemberName}': {ex.Message.TrimEnd('.')}";
             var remediation = $"Verify that property '{clrMemberName}' is readable and can be used in expression trees";
 
-            context.AddIssue(path, severity, code, description, remediation);
+            context.AddIssue(severity, code, description, remediation);
         }
 
         try
@@ -293,13 +286,12 @@ public sealed partial class ApiProperty
         }
         catch (Exception ex)
         {
-            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.ApiPropertyInvalidPropertySetter;
             var description = $"Failed to compile property setter for '{clrMemberName}': {ex.Message.TrimEnd('.')}";
             var remediation = $"Verify that property '{clrMemberName}' is writable and can be used in expression trees";
 
-            context.AddIssue(path, severity, code, description, remediation);
+            context.AddIssue(severity, code, description, remediation);
         }
 
         // Validate nullability alignment between API declaration and CLR member
@@ -309,7 +301,7 @@ public sealed partial class ApiProperty
 
     private void InitializeClrGetterAndSetter(ApiInitializationContext context)
     {
-        var apiObjectType = context.ApiDeclaringObjectType;
+        var apiObjectType = context.GetNearestAncestor<ApiObjectType>();
         var clrObjectType = apiObjectType.ClrType;
         var clrMemberName = this.ClrName;
 
@@ -357,23 +349,21 @@ public sealed partial class ApiProperty
             }
 
             // Member not found
-            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.ApiPropertyMissingClrMember;
             var description = $"CLR member '{clrMemberName}' was not found on CLR type '{clrObjectType.SafeToName()}'";
             var remediation = $"Add a public CLR property or field named '{clrMemberName}' to CLR type '{clrObjectType.SafeToName()}'";
 
-            context.AddIssue(path, severity, code, description, remediation);
+            context.AddIssue(severity, code, description, remediation);
         }
         catch (Exception ex)
         {
-            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.ApiPropertyInvalidClrMember;
             var description = $"Failed to compile getter or setter accessor for '{clrMemberName}': {ex.Message.TrimEnd('.')}";
             var remediation = $"Verify that '{clrMemberName}' exists as a public property or field on {nameof(ApiObjectType)}.{nameof(ApiObjectType.ClrType)} '{clrObjectType.SafeToName()}'";
 
-            context.AddIssue(path, severity, code, description, remediation);
+            context.AddIssue(severity, code, description, remediation);
         }
     }
 
@@ -382,13 +372,12 @@ public sealed partial class ApiProperty
         var isClrNameInvalid = ApiSchemaNameValidation.IsNameInvalid(this.ClrName);
         if (isClrNameInvalid)
         {
-            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.ApiPropertyInvalidClrName;
             var description = $"{nameof(this.ClrName)} must not be null, empty, or whitespace";
             var remediation = $"Specify a valid {nameof(this.ClrName)} value";
 
-            context.AddIssue(path, severity, code, description, remediation);
+            context.AddIssue(severity, code, description, remediation);
         }
     }
     #endregion
@@ -405,13 +394,12 @@ public sealed partial class ApiProperty
         // Required + CLR Nullable: API contract demands a value but CLR type permits null
         if (this.IsRequired && clrNullableInfo.Nullability == MemberNullability.Nullable)
         {
-            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Warning;
             var code = ApiInitializationCode.ApiPropertyRequiredNullableMismatch;
             var description = $"CLR member '{clrMemberName}' is nullable but property '{this.ApiName}' is declared Required";
             var remediation = $"Change CLR member '{clrMemberName}' to a non-nullable type, or change property '{this.ApiName}' to Optional";
 
-            context.AddIssue(path, severity, code, description, remediation);
+            context.AddIssue(severity, code, description, remediation);
             return;
         }
 
@@ -419,13 +407,12 @@ public sealed partial class ApiProperty
         // to a CLR member that cannot hold it. Value types are excluded: absent value → default, never null.
         if (this.IsOptional && clrNullableInfo.Nullability == MemberNullability.NonNullable && !clrNullableInfo.MemberType.IsValueType)
         {
-            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Warning;
             var code = ApiInitializationCode.ApiPropertyOptionalNonNullableMismatch;
             var description = $"CLR member '{clrMemberName}' is non-nullable but property '{this.ApiName}' is declared Optional";
             var remediation = $"Change CLR member '{clrMemberName}' to a nullable reference type, or change property '{this.ApiName}' to Required";
 
-            context.AddIssue(path, severity, code, description, remediation);
+            context.AddIssue(severity, code, description, remediation);
         }
 
         // Check collection item nullability against ApiCollectionType.ApiItemTypeModifiers
@@ -443,13 +430,12 @@ public sealed partial class ApiProperty
             // Item Required + CLR element Nullable: API contract demands a value but CLR element permits null
             if (apiCollectionType.IsItemRequired && itemNullability == MemberNullability.Nullable)
             {
-                var path = this.ApiPath;
                 var severity = ApiInitializationSeverity.Warning;
                 var code = ApiInitializationCode.ApiCollectionItemRequiredNullableMismatch;
                 var description = $"CLR collection element in '{clrMemberName}' is nullable but item is declared Required";
                 var remediation = $"Change the CLR element type in '{clrMemberName}' to non-nullable, or change the item modifier to Optional";
 
-                context.AddIssue(path, severity, code, description, remediation);
+                context.AddIssue(severity, code, description, remediation);
                 return;
             }
 
@@ -457,13 +443,12 @@ public sealed partial class ApiProperty
             // to a CLR element that cannot hold it. Value types are excluded: absent item → default, never null.
             if (apiCollectionType.IsItemOptional && itemNullability == MemberNullability.NonNullable && !itemElementType.IsValueType)
             {
-                var path = this.ApiPath;
                 var severity = ApiInitializationSeverity.Warning;
                 var code = ApiInitializationCode.ApiCollectionItemOptionalNonNullableMismatch;
                 var description = $"CLR collection element in '{clrMemberName}' is non-nullable but item is declared Optional";
                 var remediation = $"Change the CLR element type in '{clrMemberName}' to a nullable reference type, or change the item modifier to Required";
 
-                context.AddIssue(path, severity, code, description, remediation);
+                context.AddIssue(severity, code, description, remediation);
             }
         }
     }
@@ -473,13 +458,12 @@ public sealed partial class ApiProperty
         // Check if the type is a ref struct (cannot be boxed/unboxed)
         if (memberType.IsByRefLike)
         {
-            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.ApiPropertyInvalidClrMember;
             var description = $"CLR member '{memberName}' has type '{memberType.SafeToName()}' which is a ref struct. Ref structs cannot be boxed to object and are not supported for API properties.";
             var remediation = $"Change the type of CLR member '{memberName}' to a non-ref struct type.";
 
-            context.AddIssue(path, severity, code, description, remediation);
+            context.AddIssue(severity, code, description, remediation);
             return false;
         }
 

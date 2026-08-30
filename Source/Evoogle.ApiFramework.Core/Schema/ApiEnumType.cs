@@ -66,11 +66,11 @@ public sealed class ApiEnumType
 
     #region ApiSchemaElement Methods
     /// <inheritdoc />
-    internal override void Initialize(ApiInitializationContext context)
+    internal override void InitializeCore(ApiInitializationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        base.Initialize(context);
+        base.InitializeCore(context);
 
         this.InitializeLookupDictionaries(context);
 
@@ -110,13 +110,12 @@ public sealed class ApiEnumType
     {
         if (this.ApiEnumValues is null || this.ApiEnumValues.Length == 0)
         {
-            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.ApiEnumTypeNullOrEmptyValues;
             var description = $"{nameof(this.ApiEnumValues)} must not be null or empty";
             var remediation = $"Define at least one {nameof(ApiEnumValue)}";
 
-            context.AddIssue(path, severity, code, description, remediation);
+            context.AddIssue(severity, code, description, remediation);
             return;
         }
 
@@ -125,8 +124,7 @@ public sealed class ApiEnumType
         {
             var apiEnumValue = this.ApiEnumValues[i];
 
-            var childContext = context.WithDeclaringSchemaElement(this);
-            apiEnumValue.Initialize(childContext);
+            apiEnumValue.Initialize(context);
         }
     }
 
@@ -140,13 +138,12 @@ public sealed class ApiEnumType
 
         if (!TypeReflection.IsEnum(this.ClrType))
         {
-            var path = this.ApiPath;
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.ApiEnumTypeInvalidClrType;
             var description = $"{nameof(this.ClrType)} '{this.ClrType.SafeToName()}' must be a CLR Enum";
             var remediation = $"Set {nameof(this.ClrType)} to a CLR Enum type";
 
-            context.AddIssue(path, severity, code, description, remediation);
+            context.AddIssue(severity, code, description, remediation);
         }
     }
 
@@ -165,7 +162,7 @@ public sealed class ApiEnumType
             partKeyPropertyName: nameof(ApiEnumValue.ApiName),
             apiPath: this.ApiPath,
             duplicatePartCode: ApiInitializationCode.ApiEnumTypeDuplicateValueApiName,
-            context: context,
+            session: context.Session,
             lookupDictionary: out _apiNameLookup
         );
 
@@ -177,7 +174,7 @@ public sealed class ApiEnumType
             partKeyPropertyName: nameof(ApiEnumValue.ClrName),
             apiPath: this.ApiPath,
             duplicatePartCode: ApiInitializationCode.ApiEnumTypeDuplicateValueClrName,
-            context: context,
+            session: context.Session,
             lookupDictionary: out _clrNameLookup
         );
 
@@ -189,7 +186,7 @@ public sealed class ApiEnumType
             partKeyPropertyName: nameof(ApiEnumValue.ClrOrdinal),
             apiPath: this.ApiPath,
             duplicatePartCode: ApiInitializationCode.ApiEnumTypeDuplicateValueClrOrdinal,
-            context: context,
+            session: context.Session,
             lookupDictionary: out _clrOrdinalLookup
         );
     }

@@ -58,6 +58,20 @@ Schema validation is centralized in `ApiSchema.Initialize()`. `Build()` and JSON
 
 This aggregation applies to schema validity problems such as duplicate API names, unresolved CLR types, invalid key paths, missing properties, invalid relationship definitions, and other whole-schema consistency issues. Malformed JSON or incompatible JSON token shapes may still be rejected by the JSON serializer before schema initialization runs.
 
+Schema-element traversal diagnostics use fully qualified paths. Every schema-element path begins
+with the schema, such as `ApiSchema["Store"].ApiObjectType["Order"]`, and continues through the
+complete structural location. Relationship children use semantic roles such as
+`ApiPrincipalEndA` and `ApiForeignKeyTypeB`; ordered key paths and segments include their
+zero-based position and an available label. Issues produced while traversing schema elements are
+also logged once through the schema context logger with their severity, initialization code,
+path, description, and optional remediation.
+
+Internally, initialization passes an immutable context frame to each schema element. A frame
+identifies the current element and links to its parent frames, so an element can inspect its
+nearest typed ancestors without relying on manually propagated declaring fields. The frames and
+their shared initialization session are transient and are rebuilt for every call to
+`ApiSchema.Initialize()`.
+
 Fluent builder methods are stricter because they are explicit authoring APIs. A builder method may fail fast with standard argument exceptions when the method call itself violates its parameter contract, such as passing a `null` callback, `null` configuration object, `null` `Type`, blank name, invalid expression, or invalid extension metadata. Those precondition failures are treated as programmer errors and are separate from schema initialization diagnostics.
 
 ## Naming Conventions
