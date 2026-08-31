@@ -41,6 +41,10 @@ public sealed class ApiRelationshipAssociation : ApiRelationshipElement
 
     #region ApiSchemaElement Properties
     /// <inheritdoc/>
+    public override ApiSchemaElementKind Kind =>
+        ApiSchemaElementKind.RelationshipAssociation;
+
+    /// <inheritdoc/>
     protected override string ApiElementName => nameof(ApiRelationshipAssociation);
     #endregion
 
@@ -141,6 +145,20 @@ public sealed class ApiRelationshipAssociation : ApiRelationshipElement
     #endregion
 
     #region ApiSchemaElement Methods
+    /// <inheritdoc/>
+    internal override IEnumerable<ApiSchemaElement> GetOwnedElements()
+    {
+        if (_apiForeignKeyTypeA is not null)
+        {
+            yield return _apiForeignKeyTypeA;
+        }
+
+        if (_apiForeignKeyTypeB is not null)
+        {
+            yield return _apiForeignKeyTypeB;
+        }
+    }
+
     /// <inheritdoc/>
     internal override void InitializeCore(ApiInitializationContext context)
     {

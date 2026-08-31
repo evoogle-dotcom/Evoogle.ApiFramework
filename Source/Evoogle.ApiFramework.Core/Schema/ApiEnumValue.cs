@@ -27,6 +27,9 @@ public sealed class ApiEnumValue
 {
     #region ApiSchemaElement Properties
     /// <inheritdoc/>
+    public override ApiSchemaElementKind Kind => ApiSchemaElementKind.EnumValue;
+
+    /// <inheritdoc/>
     protected override string ApiElementName => nameof(ApiEnumValue);
     #endregion
 

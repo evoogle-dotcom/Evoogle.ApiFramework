@@ -9,8 +9,21 @@ namespace Evoogle.ApiFramework.Schema.TestData;
 
 public static class ApiSchemaExcludeMembers
 {
+    private static readonly ExcludeMember[] _schemaElementRuntimeMembers =
+    [
+        new ExcludeMember(typeof(ApiSchemaElement), nameof(ApiSchemaElement.ApiSchemaContext)),
+        new ExcludeMember(typeof(ApiSchemaElement), nameof(ApiSchemaElement.Root)),
+        new ExcludeMember(typeof(ApiSchemaElement), nameof(ApiSchemaElement.Parent)),
+        new ExcludeMember(typeof(ApiSchemaElement), nameof(ApiSchemaElement.FirstChild)),
+        new ExcludeMember(typeof(ApiSchemaElement), nameof(ApiSchemaElement.LastChild)),
+        new ExcludeMember(typeof(ApiSchemaElement), nameof(ApiSchemaElement.NextSibling)),
+        new ExcludeMember(typeof(ApiSchemaElement), nameof(ApiSchemaElement.PreviousSibling)),
+    ];
+
     public static readonly List<ExcludeMember> SchemaInitialized =
     [
+        .. _schemaElementRuntimeMembers,
+
         // ApiCollectionType — cycle: ApiItemType → ApiObjectType → ApiProperties[].ApiType → ...
         new ExcludeMember(typeof(ApiCollectionType), nameof(ApiCollectionType.ApiItemType)),
 
@@ -47,12 +60,12 @@ public static class ApiSchemaExcludeMembers
         // ApiRelationshipDependentEnd — ApiForeignKeyType throws when HasForeignKey=false
         new ExcludeMember(typeof(ApiRelationshipDependentEnd), nameof(ApiRelationshipDependentEnd.ApiForeignKeyType)),
 
-        // ApiSchema - cycle: ApiSchema → ApiSchemaContext → ApiSchema → ...
-        new ExcludeMember(typeof(ApiSchema), nameof(ApiSchema.ApiSchemaContext)),
     ];
 
     public static readonly List<ExcludeMember> Standard =
     [
+        .. _schemaElementRuntimeMembers,
+
         // ApiCollectionType
         new ExcludeMember(typeof(ApiCollectionType), nameof(ApiCollectionType.ApiItemType)),
 
@@ -67,8 +80,6 @@ public static class ApiSchemaExcludeMembers
 
         // ApiSchema
         new ExcludeMember(typeof(ApiSchema), nameof(ApiSchema.ApiPath)),
-        new ExcludeMember(typeof(ApiSchema), nameof(ApiSchema.ApiSchemaContext)),
-
         // ApiSchemaElement
         new ExcludeMember(typeof(ApiSchemaElement), nameof(ApiSchemaElement.ApiPath)),
 
@@ -82,6 +93,8 @@ public static class ApiSchemaExcludeMembers
     /// </summary>
     public static readonly List<ExcludeMember> Relationship =
     [
+        .. _schemaElementRuntimeMembers,
+
         // ApiRelationshipElement — object type resolved during initialization
         new ExcludeMember(typeof(ApiRelationshipElement), nameof(ApiRelationshipElement.ApiObjectType)),
 

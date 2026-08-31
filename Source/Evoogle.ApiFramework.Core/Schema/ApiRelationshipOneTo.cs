@@ -58,6 +58,20 @@ public abstract class ApiRelationshipOneTo
 
     #region ApiSchemaElement Methods
     /// <inheritdoc/>
+    internal override IEnumerable<ApiSchemaElement> GetOwnedElements()
+    {
+        if (this.ApiPrincipalEnd is not null)
+        {
+            yield return this.ApiPrincipalEnd;
+        }
+
+        if (this.ApiDependentEnd is not null)
+        {
+            yield return this.ApiDependentEnd;
+        }
+    }
+
+    /// <inheritdoc/>
     internal override void InitializeCore(ApiInitializationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);

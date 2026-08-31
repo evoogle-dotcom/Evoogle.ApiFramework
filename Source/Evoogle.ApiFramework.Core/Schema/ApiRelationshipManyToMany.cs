@@ -118,6 +118,25 @@ public sealed class ApiRelationshipManyToMany
 
     #region ApiSchemaElement Methods
     /// <inheritdoc/>
+    internal override IEnumerable<ApiSchemaElement> GetOwnedElements()
+    {
+        if (this.ApiPrincipalEndA is not null)
+        {
+            yield return this.ApiPrincipalEndA;
+        }
+
+        if (this.ApiPrincipalEndB is not null)
+        {
+            yield return this.ApiPrincipalEndB;
+        }
+
+        if (this.ApiAssociation is not null)
+        {
+            yield return this.ApiAssociation;
+        }
+    }
+
+    /// <inheritdoc/>
     internal override void InitializeCore(ApiInitializationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);

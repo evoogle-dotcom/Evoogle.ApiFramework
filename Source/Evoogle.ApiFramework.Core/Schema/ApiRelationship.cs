@@ -24,6 +24,17 @@ namespace Evoogle.ApiFramework.Schema;
 [JsonConverter(typeof(ApiRelationshipJsonConverter))]
 public abstract class ApiRelationship(string apiName, ApiRelationshipDeleteBehavior apiDeleteBehavior) : ApiSchemaElement
 {
+    #region ApiSchemaElement Properties
+    /// <inheritdoc/>
+    public override sealed ApiSchemaElementKind Kind => this.ApiKind switch
+    {
+        ApiRelationshipKind.OneToOne => ApiSchemaElementKind.RelationshipOneToOne,
+        ApiRelationshipKind.OneToMany => ApiSchemaElementKind.RelationshipOneToMany,
+        ApiRelationshipKind.ManyToMany => ApiSchemaElementKind.RelationshipManyToMany,
+        _ => throw new ArgumentOutOfRangeException(nameof(this.ApiKind))
+    };
+    #endregion
+
     #region ApiRelationship Properties
     /// <summary>
     ///     Gets the structural kind of this relationship. Used as the JSON polymorphic discriminator.

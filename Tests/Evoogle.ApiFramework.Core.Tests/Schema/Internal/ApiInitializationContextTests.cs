@@ -16,81 +16,6 @@ namespace Evoogle.ApiFramework.Schema.Internal;
 public class ApiInitializationContextTests(ITestOutputHelper output) : XUnitTests(output)
 {
     #region Test Types
-    private sealed class ContextChainTest : XUnitTest
-    {
-        #region Calculated Properties
-        private ApiInitializationContext? ChildContext { get; set; }
-        private ApiInitializationContext? FreshRootContext { get; set; }
-        private ApiInitializationContext? LeafContext { get; set; }
-        private ObservingElement? LeafElement { get; set; }
-        private ApiInitializationContext? RootContext { get; set; }
-        private ContainerElement? RootElement { get; set; }
-        private ApiInitializationContext? SiblingContext { get; set; }
-        #endregion
-
-        #region XUnitTest Methods
-        protected override void Arrange()
-        { }
-
-        protected override void Act()
-        {
-            var schema = CreateSchema("ContextChain");
-            var session = new ApiInitializationSession(schema, new RecordingLogger());
-
-            this.RootElement = new ContainerElement("Root");
-            var childElement = new ContainerElement("Child");
-            this.LeafElement = new ObservingElement("Leaf");
-            var siblingElement = new ObservingElement("Sibling");
-
-            this.RootContext = this.RootElement.Initialize(session);
-            this.ChildContext = childElement.Initialize(this.RootContext);
-            this.LeafContext = this.LeafElement.Initialize(this.ChildContext);
-            this.SiblingContext = siblingElement.Initialize(this.RootContext);
-
-            this.LeafContext.AddIssue
-            (
-                ApiInitializationSeverity.Warning,
-                ApiInitializationCode.ApiObjectTypeNullOrEmptyProperties,
-                "Leaf issue",
-                remediation: null
-            );
-
-            var freshSession = new ApiInitializationSession(schema, new RecordingLogger());
-            this.FreshRootContext = this.RootElement.Initialize(freshSession);
-        }
-
-        protected override void Assert()
-        {
-            this.LeafContext.Should().NotBeNull();
-            this.LeafContext!.CurrentElement.Should().BeSameAs(this.LeafElement);
-            this.LeafContext.Parent.Should().BeSameAs(this.ChildContext);
-            this.LeafContext.ParentElement.Should().BeSameAs(this.ChildContext!.CurrentElement);
-            this.LeafContext.Ancestors.Should().Equal
-            (
-                this.ChildContext.CurrentElement,
-                this.RootElement!
-            );
-
-            this.LeafElement!.NearestContainer.Should().BeSameAs(this.ChildContext.CurrentElement);
-            this.LeafElement.ObservedAncestors.Should().Equal
-            (
-                this.ChildContext.CurrentElement,
-                this.RootElement!
-            );
-
-            this.SiblingContext!.Parent.Should().BeSameAs(this.RootContext);
-            this.SiblingContext.Ancestors.Should().Equal(this.RootElement!);
-            this.SiblingContext.Ancestors.Should().NotContain(this.LeafElement);
-
-            this.RootContext!.Issues.Should().ContainSingle();
-            this.ChildContext.Issues.Should().ContainSingle();
-            this.LeafContext.Issues.Should().ContainSingle();
-            this.FreshRootContext!.Issues.Should().BeEmpty();
-            this.FreshRootContext.Session.Should().NotBeSameAs(this.RootContext.Session);
-        }
-        #endregion
-    }
-
     private enum DiagnosticPathTestCase
     {
         KeyPath,
@@ -161,8 +86,11 @@ public class ApiInitializationContextTests(ITestOutputHelper output) : XUnitTest
 
         protected override void Act()
         {
-            var element = new ObservingElement("Current");
-            var context = element.Initialize(this.Session!);
+            var context = this.Session!.CreateContext
+            (
+                this.Session.ApiSchema,
+                location: default
+            );
 
             context.AddIssue
             (
@@ -185,7 +113,7 @@ public class ApiInitializationContextTests(ITestOutputHelper output) : XUnitTest
             entry.Properties["InitializationCode"].Should().Be(this.Code);
             entry.Properties["ApiPath"].Should().Be
             (
-                $"{nameof(ApiSchema)}[\"IssueLogging\"].TestElement[\"Current\"]"
+                $"{nameof(ApiSchema)}[\"IssueLogging\"]"
             );
             entry.Properties["Description"].Should().Be("Description");
 
@@ -204,6 +132,8 @@ public class ApiInitializationContextTests(ITestOutputHelper output) : XUnitTest
     private class TestElement(string apiLabel) : ApiSchemaElement
     {
         #region ApiSchemaElement Properties
+        public override ApiSchemaElementKind Kind => ApiSchemaElementKind.Property;
+
         protected override string ApiElementName => "TestElement";
         #endregion
 
@@ -218,24 +148,39 @@ public class ApiInitializationContextTests(ITestOutputHelper output) : XUnitTest
         #endregion
     }
 
-    private sealed class ContainerElement(string apiLabel) : TestElement(apiLabel);
-
-    private sealed class ObservingElement(string apiLabel) : TestElement(apiLabel)
+    private sealed class SessionIsolationTest : XUnitTest
     {
-        #region Properties
-        public ContainerElement? NearestContainer { get; private set; }
+        #region Calculated Properties
+        private ApiInitializationSession? FirstSession { get; set; }
 
-        public ApiSchemaElement[]? ObservedAncestors { get; private set; }
+        private ApiInitializationSession? SecondSession { get; set; }
         #endregion
 
-        #region ApiSchemaElement Methods
-        internal override void InitializeCore(ApiInitializationContext context)
+        #region XUnitTest Methods
+        protected override void Arrange()
         {
-            base.InitializeCore(context);
+            var schema = CreateSchema("SessionIsolation");
+            this.FirstSession = new ApiInitializationSession(schema, new RecordingLogger());
+            this.SecondSession = new ApiInitializationSession(schema, new RecordingLogger());
+        }
 
-            context.TryGetNearestAncestor(out ContainerElement? nearestContainer);
-            this.NearestContainer = nearestContainer;
-            this.ObservedAncestors = [.. context.Ancestors];
+        protected override void Act()
+        {
+            this.FirstSession!.AddIssue
+            (
+                this.FirstSession.ApiSchema.ApiPath,
+                ApiInitializationSeverity.Warning,
+                ApiInitializationCode.ApiObjectTypeNullOrEmptyProperties,
+                "First-session issue",
+                remediation: null
+            );
+        }
+
+        protected override void Assert()
+        {
+            this.FirstSession!.Issues.Should().ContainSingle();
+            this.SecondSession!.Issues.Should().BeEmpty();
+            this.SecondSession.Should().NotBeSameAs(this.FirstSession);
         }
         #endregion
     }
@@ -283,11 +228,11 @@ public class ApiInitializationContextTests(ITestOutputHelper output) : XUnitTest
     #endregion
 
     #region Test Data
-    public static TheoryDataRow<IXUnitTest>[] ContextChainTheoryData =>
+    public static TheoryDataRow<IXUnitTest>[] SessionIsolationTheoryData =>
     [
-        new ContextChainTest
+        new SessionIsolationTest
         {
-            Name = "Context Frames Preserve Ancestry And Isolate Branches"
+            Name = "Initialization Sessions Isolate Issues"
         },
     ];
 
@@ -397,8 +342,8 @@ public class ApiInitializationContextTests(ITestOutputHelper output) : XUnitTest
 
     #region Test Methods
     [Theory]
-    [MemberData(nameof(ContextChainTheoryData))]
-    public void ContextChain(IXUnitTest test) => test.Execute(this);
+    [MemberData(nameof(SessionIsolationTheoryData))]
+    public void SessionIsolation(IXUnitTest test) => test.Execute(this);
 
     [Theory]
     [MemberData(nameof(DiagnosticPathTheoryData))]
@@ -428,15 +373,15 @@ public class ApiInitializationContextTests(ITestOutputHelper output) : XUnitTest
     private static string[] GetBlankIndexedLabelPath()
     {
         var schema = CreateSchema("Location");
-        var session = new ApiInitializationSession(schema, new RecordingLogger());
-        var root = new ContainerElement("Root");
-        var child = new ObservingElement("Child");
-
-        var rootContext = root.Initialize(session);
         var location = ApiInitializationLocation.ForIndexedLabel(2, "   ");
-        var childContext = child.Initialize(rootContext, location);
+        var child = new TestElement("Child");
+        var apiPath = location.BuildPath
+        (
+            child,
+            $"{schema.ApiPath}.TestElement[\"Root\"]"
+        );
 
-        return [childContext.ApiPath];
+        return [apiPath];
     }
 
     private static string[] GetKeyPaths()

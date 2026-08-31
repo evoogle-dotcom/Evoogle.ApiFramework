@@ -14,6 +14,16 @@ namespace Evoogle.ApiFramework.Schema;
 /// <param name="clrObjectType">The CLR type of the participating <see cref="ApiObjectType"/> on this end of the relationship.</param>
 public abstract class ApiRelationshipEnd(Type clrObjectType) : ApiRelationshipElement(clrObjectType)
 {
+    #region ApiSchemaElement Properties
+    /// <inheritdoc/>
+    public override sealed ApiSchemaElementKind Kind => this.ApiKind switch
+    {
+        ApiRelationshipEndKind.Principal => ApiSchemaElementKind.RelationshipPrincipalEnd,
+        ApiRelationshipEndKind.Dependent => ApiSchemaElementKind.RelationshipDependentEnd,
+        _ => throw new ArgumentOutOfRangeException(nameof(this.ApiKind))
+    };
+    #endregion
+
     #region ApiRelationshipEnd Fields
     private ApiRelationship? _apiResolvedRelationship = null;
     #endregion

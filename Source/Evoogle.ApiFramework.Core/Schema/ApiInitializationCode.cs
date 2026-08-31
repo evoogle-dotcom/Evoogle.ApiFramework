@@ -367,6 +367,20 @@ public enum ApiInitializationCode
     ApiRelationshipIncompatiblePrincipalForeignKey,
     #endregion
 
+    #region ApiSchemaElement Initialization Codes
+    /// <summary>
+    ///     The same schema element instance appears in more than one structural ownership position.
+    /// </summary>
+    [EnumMember(Value = "API_SCHEMA_ELEMENT_DUPLICATE_OWNERSHIP")]
+    ApiSchemaElementDuplicateOwnership,
+
+    /// <summary>
+    ///     The schema element ownership graph contains a cycle.
+    /// </summary>
+    [EnumMember(Value = "API_SCHEMA_ELEMENT_OWNERSHIP_CYCLE")]
+    ApiSchemaElementOwnershipCycle,
+    #endregion
+
     #region ApiSchema Initialization Codes
     /// <summary>
     ///     Multiple enum types have the same API name.

@@ -20,6 +20,18 @@ namespace Evoogle.ApiFramework.Schema;
 [JsonConverter(typeof(ApiTypeJsonConverter))]
 public abstract class ApiType(Type clrType) : ApiSchemaElement
 {
+    #region ApiSchemaElement Properties
+    /// <inheritdoc/>
+    public override sealed ApiSchemaElementKind Kind => this.ApiKind switch
+    {
+        ApiTypeKind.Collection => ApiSchemaElementKind.CollectionType,
+        ApiTypeKind.Enum => ApiSchemaElementKind.EnumType,
+        ApiTypeKind.Object => ApiSchemaElementKind.ObjectType,
+        ApiTypeKind.Scalar => ApiSchemaElementKind.ScalarType,
+        _ => throw new ArgumentOutOfRangeException(nameof(this.ApiKind))
+    };
+    #endregion
+
     #region ApiType Properties
     /// <summary>Gets the kind of API type represented by this instance.</summary>
     public abstract ApiTypeKind ApiKind { get; }

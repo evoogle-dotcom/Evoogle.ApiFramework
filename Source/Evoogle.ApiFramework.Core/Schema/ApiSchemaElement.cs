@@ -5,6 +5,7 @@
 // See the LICENSE file in the project root for more information.
 using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.Extension;
+using Evoogle.NTree;
 
 using Microsoft.Extensions.Logging;
 
@@ -16,13 +17,34 @@ namespace Evoogle.ApiFramework.Schema;
 /// <remarks>
 ///     This class provides common initialization and path building functionality for all schema elements.
 ///     Each schema element maintains an API path that uniquely identifies its location within the schema hierarchy.
+///     After topology construction, it also participates in a read-only ownership tree whose root is the containing <see cref="ApiSchema"/>.
+///     Reference relationships are not ownership links.
 /// </remarks>
-public abstract class ApiSchemaElement : ExtensibleBase
+public abstract class ApiSchemaElement : ExtensibleBase, INode<ApiSchemaElement>
 {
+    #region Types
+    private sealed class ApiSchemaElementTopology
+    {
+        public required ApiSchemaElement? FirstChild { get; init; }
+
+        public required ApiSchemaElement? LastChild { get; init; }
+
+        public required ApiSchemaElement? NextSibling { get; init; }
+
+        public required ApiSchemaElement? Parent { get; init; }
+
+        public required ApiSchemaElement? PreviousSibling { get; init; }
+
+        public required ApiSchemaElement Root { get; init; }
+    }
+    #endregion
+
     #region Fields
     private string? _apiPath = null;
 
     private ApiSchemaContext? _apiSchemaContext = null;
+
+    private ApiSchemaElementTopology? _topology = null;
     #endregion
 
     #region Properties
@@ -36,10 +58,47 @@ public abstract class ApiSchemaElement : ExtensibleBase
     /// </remarks>
     public string ApiPath => this.ThrowIfNotInitialized(_apiPath);
 
+    /// <summary>Gets the concrete built-in kind of this schema element.</summary>
+    public abstract ApiSchemaElementKind Kind { get; }
+
+    /// <summary>Gets the root element of the schema ownership tree.</summary>
+    /// <remarks>
+    ///     This property is available after the schema topology has been initialized.
+    /// </remarks>
+    public ApiSchemaElement Root => this.Topology.Root;
+
+    /// <summary>Gets the structural parent of this schema element.</summary>
+    /// <remarks>
+    ///     This property is available after the schema topology has been initialized.
+    /// </remarks>
+    public ApiSchemaElement? Parent => this.Topology.Parent;
+
+    /// <summary>Gets the first structurally owned child of this schema element.</summary>
+    /// <remarks>
+    ///     This property is available after the schema topology has been initialized.
+    /// </remarks>
+    public ApiSchemaElement? FirstChild => this.Topology.FirstChild;
+
+    /// <summary>Gets the last structurally owned child of this schema element.</summary>
+    /// <remarks>
+    ///     This property is available after the schema topology has been initialized.
+    /// </remarks>
+    public ApiSchemaElement? LastChild => this.Topology.LastChild;
+
+    /// <summary>Gets the next structurally owned sibling of this schema element.</summary>
+    /// <remarks>
+    ///     This property is available after the schema topology has been initialized.
+    /// </remarks>
+    public ApiSchemaElement? NextSibling => this.Topology.NextSibling;
+
+    /// <summary>Gets the previous structurally owned sibling of this schema element.</summary>
+    /// <remarks>
+    ///     This property is available after the schema topology has been initialized.
+    /// </remarks>
+    public ApiSchemaElement? PreviousSibling => this.Topology.PreviousSibling;
+
     /// <summary>Gets runtime API element name of the API schema element.</summary>
     protected abstract string ApiElementName { get; }
-
-    internal string ApiElementTypeName => this.ApiElementName;
 
     /// <summary>
     ///     Gets the runtime context for the API schema containing this element.
@@ -47,7 +106,7 @@ public abstract class ApiSchemaElement : ExtensibleBase
     /// <remarks>
     ///     This property is available after the element has been initialized.
     /// </remarks>
-    protected internal ApiSchemaContext ApiSchemaContext => this.ThrowIfNotInitialized(_apiSchemaContext);
+    public ApiSchemaContext ApiSchemaContext => this.ThrowIfNotInitialized(_apiSchemaContext);
 
     /// <summary>
     ///     Gets the logger for this schema element.
@@ -56,18 +115,24 @@ public abstract class ApiSchemaElement : ExtensibleBase
     ///     Returns the shared logger from the schema context, categorized under <see cref="ApiSchema"/>.
     /// </remarks>
     protected ILogger Logger => this.ApiSchemaContext.Logger;
+
+    internal string ApiElementTypeName => this.ApiElementName;
+
+    private ApiSchemaElementTopology Topology => this.ThrowIfNotInitialized(_topology);
     #endregion
 
     #region Methods
     /// <summary>
     ///     Builds the API path for this schema element.
     /// </summary>
-    /// <param name="apiPreviousPath">The optional API path of the previous element, or <c>null</c> if this is a root element.</param>
+    /// <param name="apiPreviousPath">
+    ///     The optional API path of the previous element, or <c>null</c> if this is a root element.
+    /// </param>
     /// <returns>The complete API path for this element.</returns>
     protected abstract string BuildPath(string? apiPreviousPath);
 
     /// <summary>
-    ///     Initializes this schema element as a top-level element in the specified session.
+    ///     Initializes this schema element in the specified session.
     /// </summary>
     internal ApiInitializationContext Initialize
     (
@@ -77,41 +142,69 @@ public abstract class ApiSchemaElement : ExtensibleBase
     {
         ArgumentNullException.ThrowIfNull(session);
 
-        return this.Initialize(session, parentContext: null, location);
+        var context = session.CreateContext(this, location);
+
+        _apiPath = context.ApiPath;
+        _apiSchemaContext = session.ApiSchemaContext;
+
+        this.InitializeCore(context);
+        return context;
     }
 
     internal ApiInitializationContext Initialize
     (
-        ApiInitializationContext parentContext,
+        ApiInitializationContext context,
         ApiInitializationLocation location = default
     )
     {
-        ArgumentNullException.ThrowIfNull(parentContext);
+        ArgumentNullException.ThrowIfNull(context);
 
-        return this.Initialize(parentContext.Session, parentContext, location);
+        // The supplied context contributes only shared session state. Structural parentage and
+        // path construction come from this element's published ownership topology.
+        return this.Initialize(context.Session, location);
     }
 
-    internal string BuildDefaultPath(string apiPreviousPath) => this.BuildPath(apiPreviousPath);
+    internal string BuildDefaultPath(string? apiPreviousPath) => this.BuildPath(apiPreviousPath);
+
+    internal virtual IEnumerable<ApiSchemaElement> GetOwnedElements() => [];
 
     internal virtual void InitializeCore(ApiInitializationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
     }
 
-    private ApiInitializationContext Initialize
+    internal void ClearTopology()
+    {
+        _topology = null;
+    }
+
+    internal void SetTopology
     (
-        ApiInitializationSession session,
-        ApiInitializationContext? parentContext,
-        ApiInitializationLocation location
+        ApiSchemaElement root,
+        ApiSchemaElement? parent,
+        ApiSchemaElement? firstChild,
+        ApiSchemaElement? lastChild,
+        ApiSchemaElement? previousSibling,
+        ApiSchemaElement? nextSibling
     )
     {
-        var context = session.CreateContext(this, parentContext, location);
+        ArgumentNullException.ThrowIfNull(root);
 
-        _apiPath = context.ApiPath;
-        _apiSchemaContext = context.ApiSchema.ApiSchemaContext;
+        _topology = new ApiSchemaElementTopology
+        {
+            Root = root,
+            Parent = parent,
+            FirstChild = firstChild,
+            LastChild = lastChild,
+            PreviousSibling = previousSibling,
+            NextSibling = nextSibling
+        };
+    }
 
-        this.InitializeCore(context);
-        return context;
+    internal bool TryGetTopology(out ApiSchemaElement? firstChild)
+    {
+        firstChild = _topology?.FirstChild;
+        return _topology is not null;
     }
     #endregion
 }

@@ -66,10 +66,12 @@ zero-based position and an available label. Issues produced while traversing sch
 also logged once through the schema context logger with their severity, initialization code,
 path, description, and optional remediation.
 
-Internally, initialization passes an immutable context frame to each schema element. A frame
-identifies the current element and links to its parent frames, so an element can inspect its
-nearest typed ancestors without relying on manually propagated declaring fields. The frames and
-their shared initialization session are transient and are rebuilt for every call to
+Before element initialization begins, the framework builds an ownership tree rooted at
+`ApiSchema`. Every `ApiSchemaElement` exposes its parent, children, siblings, and root through the
+read-only NTree node interface, so callers can navigate or traverse the initialized schema without
+reconstructing containment from its specialized collections. Cross-references, such as resolved
+named types and relationship targets, remain outside this ownership tree. Initialization contexts
+retain only transient session and diagnostic state and are rebuilt for every call to
 `ApiSchema.Initialize()`.
 
 Fluent builder methods are stricter because they are explicit authoring APIs. A builder method may fail fast with standard argument exceptions when the method call itself violates its parameter contract, such as passing a `null` callback, `null` configuration object, `null` `Type`, blank name, invalid expression, or invalid extension metadata. Those precondition failures are treated as programmer errors and are separate from schema initialization diagnostics.

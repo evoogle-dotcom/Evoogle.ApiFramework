@@ -118,6 +118,20 @@ public sealed partial class ApiObjectType
     #endregion
 
     #region ApiSchemaElement Methods
+    /// <inheritdoc/>
+    internal override IEnumerable<ApiSchemaElement> GetOwnedElements()
+    {
+        foreach (var apiProperty in this.ApiProperties)
+        {
+            yield return apiProperty;
+        }
+
+        foreach (var apiKeyType in this.ApiKeyTypes)
+        {
+            yield return apiKeyType;
+        }
+    }
+
     /// <inheritdoc />
     internal override void InitializeCore(ApiInitializationContext context)
     {

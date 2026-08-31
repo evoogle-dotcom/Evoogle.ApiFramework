@@ -79,6 +79,15 @@ public sealed class ApiRelationshipDependentEnd(Type clrObjectType, ApiKeyType? 
 
     #region ApiSchemaElement Methods
     /// <inheritdoc/>
+    internal override IEnumerable<ApiSchemaElement> GetOwnedElements()
+    {
+        if (_apiForeignKeyType is not null)
+        {
+            yield return _apiForeignKeyType;
+        }
+    }
+
+    /// <inheritdoc/>
     internal override void InitializeCore(ApiInitializationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);

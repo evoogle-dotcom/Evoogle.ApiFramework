@@ -108,6 +108,9 @@ public sealed partial class ApiProperty
 
     #region ApiSchemaElement Properties
     /// <inheritdoc/>
+    public override ApiSchemaElementKind Kind => ApiSchemaElementKind.Property;
+
+    /// <inheritdoc/>
     protected override string ApiElementName => nameof(ApiProperty);
     #endregion
 
@@ -162,6 +165,15 @@ public sealed partial class ApiProperty
     #endregion
 
     #region ApiSchemaElement Methods
+    /// <inheritdoc/>
+    internal override IEnumerable<ApiSchemaElement> GetOwnedElements()
+    {
+        if (this.ApiTypeExpression?.ApiInlineType is ApiType apiInlineType)
+        {
+            yield return apiInlineType;
+        }
+    }
+
     /// <inheritdoc />
     protected override string BuildPath(string? apiPreviousPath)
         => ApiSchemaPathFormatting.BuildPath(apiBasePath: apiPreviousPath, apiPathSegment: this.ApiElementName, apiPathSegmentName: this.ApiName);
@@ -211,7 +223,7 @@ public sealed partial class ApiProperty
 
     private void InitializeClrFieldGetterAndSetter(ApiInitializationContext context, FieldInfo clrFieldInfo)
     {
-        var apiObjectType = context.GetNearestAncestor<ApiObjectType>();
+        var apiObjectType = this.GetApiObjectType();
         var clrObjectType = apiObjectType.ClrType;
         var clrMemberName = this.ClrName;
 
@@ -250,7 +262,7 @@ public sealed partial class ApiProperty
 
     private void InitializeClrPropertyGetterAndSetter(ApiInitializationContext context, PropertyInfo clrPropertyInfo)
     {
-        var apiObjectType = context.GetNearestAncestor<ApiObjectType>();
+        var apiObjectType = this.GetApiObjectType();
         var clrObjectType = apiObjectType.ClrType;
         var clrMemberName = this.ClrName;
 
@@ -301,7 +313,7 @@ public sealed partial class ApiProperty
 
     private void InitializeClrGetterAndSetter(ApiInitializationContext context)
     {
-        var apiObjectType = context.GetNearestAncestor<ApiObjectType>();
+        var apiObjectType = this.GetApiObjectType();
         var clrObjectType = apiObjectType.ClrType;
         var clrMemberName = this.ClrName;
 
@@ -325,7 +337,7 @@ public sealed partial class ApiProperty
             var clrPropertyInfo = TypeReflection.GetProperty(clrObjectType!, clrMemberName, BindingFlags.Public | BindingFlags.Instance);
             if (clrPropertyInfo is not null)
             {
-                if (!this.ValidateClrMemberType(context, clrPropertyInfo.PropertyType, clrMemberName))
+                if (!ValidateClrMemberType(context, clrPropertyInfo.PropertyType, clrMemberName))
                 {
                     // Fail fast on invalid member type
                     return;
@@ -338,7 +350,7 @@ public sealed partial class ApiProperty
             var clrFieldInfo = TypeReflection.GetField(clrObjectType!, clrMemberName, BindingFlags.Public | BindingFlags.Instance);
             if (clrFieldInfo is not null)
             {
-                if (!this.ValidateClrMemberType(context, clrFieldInfo.FieldType, clrMemberName))
+                if (!ValidateClrMemberType(context, clrFieldInfo.FieldType, clrMemberName))
                 {
                     // Fail fast on invalid member type
                     return;
@@ -379,6 +391,12 @@ public sealed partial class ApiProperty
 
             context.AddIssue(severity, code, description, remediation);
         }
+    }
+
+    private ApiObjectType GetApiObjectType()
+    {
+        return this.Parent as ApiObjectType
+            ?? throw new ApiSchemaException($"An {nameof(ApiProperty)} must be owned by an {nameof(ApiObjectType)}.");
     }
     #endregion
 
@@ -453,7 +471,7 @@ public sealed partial class ApiProperty
         }
     }
 
-    private bool ValidateClrMemberType(ApiInitializationContext context, Type memberType, string memberName)
+    private static bool ValidateClrMemberType(ApiInitializationContext context, Type memberType, string memberName)
     {
         // Check if the type is a ref struct (cannot be boxed/unboxed)
         if (memberType.IsByRefLike)

@@ -65,6 +65,15 @@ public sealed class ApiEnumType
     #endregion
 
     #region ApiSchemaElement Methods
+    /// <inheritdoc/>
+    internal override IEnumerable<ApiSchemaElement> GetOwnedElements()
+    {
+        foreach (var apiEnumValue in this.ApiEnumValues)
+        {
+            yield return apiEnumValue;
+        }
+    }
+
     /// <inheritdoc />
     internal override void InitializeCore(ApiInitializationContext context)
     {

@@ -70,6 +70,15 @@ public sealed class ApiCollectionType
     #endregion
 
     #region ApiSchemaElement Methods
+    /// <inheritdoc/>
+    internal override IEnumerable<ApiSchemaElement> GetOwnedElements()
+    {
+        if (this.ApiItemTypeExpression?.ApiInlineType is ApiType apiInlineType)
+        {
+            yield return apiInlineType;
+        }
+    }
+
     /// <inheritdoc />
     protected override string BuildPath(string? apiPreviousPath)
         => ApiSchemaPathFormatting.BuildPath(apiBasePath: apiPreviousPath, apiPathSegment: this.ApiElementName, apiPathSegmentName: null);

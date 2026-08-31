@@ -37,6 +37,9 @@ public sealed class ApiKeyPath(Type clrRootType, IEnumerable<ApiKeyPathSegment> 
 
     #region ApiSchemaElement Properties
     /// <inheritdoc/>
+    public override ApiSchemaElementKind Kind => ApiSchemaElementKind.KeyPath;
+
+    /// <inheritdoc/>
     protected override string ApiElementName => nameof(ApiKeyPath);
     #endregion
 
@@ -76,6 +79,15 @@ public sealed class ApiKeyPath(Type clrRootType, IEnumerable<ApiKeyPathSegment> 
     #endregion
 
     #region ApiSchemaElement Methods
+    /// <inheritdoc/>
+    internal override IEnumerable<ApiSchemaElement> GetOwnedElements()
+    {
+        foreach (var apiSegment in this.ApiSegments)
+        {
+            yield return apiSegment;
+        }
+    }
+
     /// <inheritdoc/>
     protected override string BuildPath(string? apiPreviousPath)
     {
@@ -140,8 +152,6 @@ public sealed class ApiKeyPath(Type clrRootType, IEnumerable<ApiKeyPathSegment> 
     {
         _apiRootObjectType = rootObjectType;
 
-        var currentContext = context;
-
         for (var i = 0; i < this.ApiSegments.Length; i++)
         {
             var segment = this.ApiSegments[i];
@@ -150,10 +160,9 @@ public sealed class ApiKeyPath(Type clrRootType, IEnumerable<ApiKeyPathSegment> 
             var location = ApiInitializationLocation.ForIndexedLabel
             (
                 i,
-                segment.ClrPropertyName,
-                apiPathBase: context.ApiPath
+                segment.ClrPropertyName
             );
-            var segmentContext = segment.Initialize(currentContext, location);
+            segment.Initialize(context, location);
 
             if (!segment.IsPropertyResolved)
             {
@@ -189,8 +198,6 @@ public sealed class ApiKeyPath(Type clrRootType, IEnumerable<ApiKeyPathSegment> 
                     context.AddIssue(path, severity, code, description, remediation);
                     return;
                 }
-
-                currentContext = segmentContext;
             }
         }
     }

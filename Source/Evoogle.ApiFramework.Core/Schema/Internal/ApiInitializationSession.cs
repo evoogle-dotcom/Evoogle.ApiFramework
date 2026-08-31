@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 namespace Evoogle.ApiFramework.Schema.Internal;
 
 /// <summary>
-///     Holds state shared by every context frame created during one schema initialization.
+///     Holds state shared by every context created during one schema initialization.
 /// </summary>
 internal sealed class ApiInitializationSession
 {
@@ -19,15 +19,27 @@ internal sealed class ApiInitializationSession
     #region Properties
     public ApiSchema ApiSchema { get; }
 
+    public ApiSchemaContext ApiSchemaContext { get; }
+
     public IEnumerable<ApiInitializationIssue> Issues => _issues;
 
     public ILogger Logger { get; }
     #endregion
 
     #region Constructors
-    public ApiInitializationSession(ApiSchema apiSchema)
-        : this(apiSchema, apiSchema.ApiSchemaContext.Logger)
-    { }
+    public ApiInitializationSession
+    (
+        ApiSchema apiSchema,
+        ApiSchemaContext apiSchemaContext
+    )
+    {
+        ArgumentNullException.ThrowIfNull(apiSchema);
+        ArgumentNullException.ThrowIfNull(apiSchemaContext);
+
+        this.ApiSchema = apiSchema;
+        this.ApiSchemaContext = apiSchemaContext;
+        this.Logger = apiSchemaContext.Logger;
+    }
 
     internal ApiInitializationSession(ApiSchema apiSchema, ILogger logger)
     {
@@ -35,6 +47,7 @@ internal sealed class ApiInitializationSession
         ArgumentNullException.ThrowIfNull(logger);
 
         this.ApiSchema = apiSchema;
+        this.ApiSchemaContext = apiSchema.ApiSchemaContext;
         this.Logger = logger;
     }
     #endregion
@@ -58,28 +71,25 @@ internal sealed class ApiInitializationSession
     public ApiInitializationContext CreateContext
     (
         ApiSchemaElement apiSchemaElement,
-        ApiInitializationContext? parentContext,
         ApiInitializationLocation location
     )
     {
         ArgumentNullException.ThrowIfNull(apiSchemaElement);
 
-        if (parentContext is not null && !ReferenceEquals(parentContext.Session, this))
+        if (!ReferenceEquals(apiSchemaElement.Root, this.ApiSchema))
         {
-            throw new InvalidOperationException
-            (
-                "An initialization context cannot be reused across initialization sessions."
-            );
+            throw new InvalidOperationException("A schema element can only be initialized by the session for its ownership tree.");
         }
 
-        var defaultApiBasePath = parentContext?.ApiPath ?? this.ApiSchema.ApiPath;
+        var defaultApiBasePath = ReferenceEquals(apiSchemaElement, this.ApiSchema)
+            ? null
+            : apiSchemaElement.Parent?.ApiPath ?? throw new InvalidOperationException("A non-root schema element must have an initialized structural parent.");
         var apiPath = location.BuildPath(apiSchemaElement, defaultApiBasePath);
 
         return new ApiInitializationContext
         (
             this,
             apiSchemaElement,
-            parentContext,
             location,
             apiPath
         );
@@ -96,6 +106,11 @@ internal sealed class ApiInitializationSession
             ApiInitializationSeverity.Error => LogLevel.Error,
             _ => LogLevel.Error,
         };
+
+        if (!this.Logger.IsEnabled(logLevel))
+        {
+            return;
+        }
 
         var eventId = new EventId((int)issue.Code, issue.Code.ToString());
 
@@ -117,8 +132,7 @@ internal sealed class ApiInitializationSession
             (
                 logLevel,
                 eventId,
-                "API schema initialization issue {InitializationCode} at {ApiPath}: "
-                    + "{Description} Remediation: {Remediation}",
+                "API schema initialization issue {InitializationCode} at {ApiPath}: {Description} Remediation: {Remediation}",
                 issue.Code,
                 issue.ApiPath,
                 issue.Description,

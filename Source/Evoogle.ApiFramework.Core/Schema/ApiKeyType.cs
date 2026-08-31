@@ -38,6 +38,9 @@ public partial class ApiKeyType(IEnumerable<ApiKeyPath> apiKeyPaths) : ApiSchema
 {
     #region ApiSchemaElement Properties
     /// <inheritdoc/>
+    public override ApiSchemaElementKind Kind => ApiSchemaElementKind.KeyType;
+
+    /// <inheritdoc/>
     protected override string ApiElementName => nameof(ApiKeyType);
     #endregion
 
@@ -66,6 +69,15 @@ public partial class ApiKeyType(IEnumerable<ApiKeyPath> apiKeyPaths) : ApiSchema
     #endregion
 
     #region ApiSchemaElement Methods
+    /// <inheritdoc/>
+    internal override IEnumerable<ApiSchemaElement> GetOwnedElements()
+    {
+        foreach (var apiKeyPath in this.ApiKeyPaths)
+        {
+            yield return apiKeyPath;
+        }
+    }
+
     /// <inheritdoc/>
     protected override string BuildPath(string? apiPreviousPath)
         => ApiSchemaPathFormatting.BuildPath

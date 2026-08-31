@@ -29,6 +29,9 @@ public sealed class ApiKeyPathSegment(string clrPropertyName) : ApiSchemaElement
 
     #region ApiSchemaElement Properties
     /// <inheritdoc/>
+    public override ApiSchemaElementKind Kind => ApiSchemaElementKind.KeyPathSegment;
+
+    /// <inheritdoc/>
     protected override string ApiElementName => nameof(ApiKeyPathSegment);
     #endregion
 
@@ -96,7 +99,7 @@ public sealed class ApiKeyPathSegment(string clrPropertyName) : ApiSchemaElement
             return;
         }
 
-        var apiObjectType = this.GetApiObjectType(context);
+        var apiObjectType = this.GetApiObjectType();
         if (apiObjectType.TryGetPropertyByClrName
         (
             this.ClrPropertyName,
@@ -117,19 +120,21 @@ public sealed class ApiKeyPathSegment(string clrPropertyName) : ApiSchemaElement
         context.AddIssue(severity, code, description, remediation);
     }
 
-    private ApiObjectType GetApiObjectType(ApiInitializationContext context)
+    private ApiObjectType GetApiObjectType()
     {
-        if (context.TryGetNearestAncestor<ApiKeyPathSegment>(out var precedingSegment))
+        if (this.PreviousSibling is ApiKeyPathSegment precedingSegment)
         {
             return precedingSegment.ApiProperty.ApiType as ApiObjectType
-                ?? throw new ApiSchemaException
-                (
-                    "A key path navigation segment must resolve to an API object type before "
-                        + "initializing its next segment."
-                );
+                ?? throw new ApiSchemaException("A key path navigation segment must resolve to an API object type before initializing its next segment.");
         }
 
-        return context.GetNearestAncestor<ApiKeyPath>().ApiRootObjectType;
+        if (this.PreviousSibling is not null)
+        {
+            throw new ApiSchemaException($"A {nameof(ApiKeyPathSegment)} can only have another {nameof(ApiKeyPathSegment)} as its previous sibling.");
+        }
+
+        return (this.Parent as ApiKeyPath)?.ApiRootObjectType
+            ?? throw new ApiSchemaException($"A {nameof(ApiKeyPathSegment)} must be owned by an {nameof(ApiKeyPath)}.");
     }
     #endregion
 }

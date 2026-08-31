@@ -6,13 +6,22 @@
 namespace Evoogle.ApiFramework.Schema.Internal;
 
 /// <summary>
-///     Describes how a schema element is located within initialization ancestry and diagnostics.
+///     Describes transient role or index metadata used to format a schema element's diagnostic
+///     path.
 /// </summary>
 internal readonly struct ApiInitializationLocation
 {
+    #region Types
+    private enum ApiInitializationLocationKind
+    {
+        Default,
+        Role,
+        IndexedLabel
+    }
+    #endregion
+
     #region Fields
     private readonly string? _apiLabel;
-    private readonly string? _apiPathBase;
     private readonly string? _apiRole;
     private readonly int _index;
     private readonly ApiInitializationLocationKind _kind;
@@ -24,15 +33,13 @@ internal readonly struct ApiInitializationLocation
         ApiInitializationLocationKind kind,
         string? apiRole,
         int index,
-        string? apiLabel,
-        string? apiPathBase
+        string? apiLabel
     )
     {
         _kind = kind;
         _apiRole = apiRole;
         _index = index;
         _apiLabel = apiLabel;
-        _apiPathBase = apiPathBase;
     }
     #endregion
 
@@ -46,17 +53,11 @@ internal readonly struct ApiInitializationLocation
             ApiInitializationLocationKind.Role,
             apiRole,
             index: 0,
-            apiLabel: null,
-            apiPathBase: null
+            apiLabel: null
         );
     }
 
-    public static ApiInitializationLocation ForIndexedLabel
-    (
-        int index,
-        string? apiLabel,
-        string? apiPathBase = null
-    )
+    public static ApiInitializationLocation ForIndexedLabel(int index, string? apiLabel)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(index);
 
@@ -65,42 +66,37 @@ internal readonly struct ApiInitializationLocation
             ApiInitializationLocationKind.IndexedLabel,
             apiRole: null,
             index,
-            apiLabel,
-            apiPathBase
+            apiLabel
         );
     }
     #endregion
 
     #region Methods
-    public string BuildPath(ApiSchemaElement apiSchemaElement, string defaultApiBasePath)
+    public string BuildPath(ApiSchemaElement apiSchemaElement, string? defaultApiBasePath)
     {
         ArgumentNullException.ThrowIfNull(apiSchemaElement);
 
         return _kind switch
         {
             ApiInitializationLocationKind.Default => apiSchemaElement.BuildDefaultPath(defaultApiBasePath),
-            ApiInitializationLocationKind.Role => ApiSchemaPathFormatting.BuildPath(defaultApiBasePath, _apiRole!, null),
+
+            ApiInitializationLocationKind.Role => ApiSchemaPathFormatting.BuildPath
+                (
+                    defaultApiBasePath,
+                    _apiRole!,
+                    apiPathSegmentName: null
+                ),
+
             ApiInitializationLocationKind.IndexedLabel => ApiSchemaPathFormatting.BuildIndexedPath
                 (
-                    _apiPathBase ?? defaultApiBasePath,
+                    defaultApiBasePath,
                     apiSchemaElement.ApiElementTypeName,
                     _index,
                     _apiLabel
                 ),
-            _ => throw new InvalidOperationException
-            (
-                $"Unsupported {nameof(ApiInitializationLocationKind)} value '{_kind}'."
-            ),
-        };
-    }
-    #endregion
 
-    #region Types
-    private enum ApiInitializationLocationKind
-    {
-        Default,
-        Role,
-        IndexedLabel
+            _ => throw new InvalidOperationException($"Unsupported {nameof(ApiInitializationLocationKind)} value '{_kind}'."),
+        };
     }
     #endregion
 }
