@@ -19,10 +19,8 @@ namespace Evoogle.ApiFramework.Schema;
 ///     and <see cref="ApiRelationshipManyToMany"/>.
 ///     The <see cref="ApiKind"/> property serves as the JSON polymorphic discriminator.
 /// </remarks>
-/// <param name="apiName">The API name that uniquely identifies this relationship within the schema.</param>
-/// <param name="apiDeleteBehavior">The delete behavior that governs what happens to related objects when either end is affected.</param>
 [JsonConverter(typeof(ApiRelationshipJsonConverter))]
-public abstract class ApiRelationship(string apiName, ApiRelationshipDeleteBehavior apiDeleteBehavior) : ApiSchemaElement
+public abstract class ApiRelationship : ApiSchemaElement
 {
     #region ApiSchemaElement Properties
     /// <inheritdoc/>
@@ -42,7 +40,7 @@ public abstract class ApiRelationship(string apiName, ApiRelationshipDeleteBehav
     public abstract ApiRelationshipKind ApiKind { get; }
 
     /// <summary>Gets the API name that uniquely identifies this relationship within the schema.</summary>
-    public string ApiName { get; } = apiName;
+    public string ApiName { get; }
 
     /// <summary>
     ///     Gets the delete behavior that governs what happens to related objects when either end is affected.
@@ -51,7 +49,19 @@ public abstract class ApiRelationship(string apiName, ApiRelationshipDeleteBehav
     ///         <item><description><strong>Dependent orphaned:</strong> what happens to a dependent when it is removed from the relationship.</description></item>
     ///     </list>
     /// </summary>
-    public ApiRelationshipDeleteBehavior ApiDeleteBehavior { get; } = apiDeleteBehavior;
+    public ApiRelationshipDeleteBehavior ApiDeleteBehavior { get; }
+    #endregion
+
+    #region Constructors
+    internal ApiRelationship
+    (
+        string apiName,
+        ApiRelationshipDeleteBehavior apiDeleteBehavior
+    )
+    {
+        this.ApiName = apiName;
+        this.ApiDeleteBehavior = apiDeleteBehavior;
+    }
     #endregion
 
     #region ApiSchemaElement Methods

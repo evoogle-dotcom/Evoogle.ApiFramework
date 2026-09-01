@@ -3,6 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Collections.Immutable;
 using System.Reflection;
 
 using Evoogle.XUnit;
@@ -130,7 +131,8 @@ public partial class ApiKeyTypeTests
             this.ApiNameConstructorParameter.ParameterType.Should().Be<string>();
             this.ApiNameConstructorParameterNullability.Should().Be(NullabilityState.NotNull);
 
-            this.ApiObjectKeyTypesPropertyType.Should().Be<ApiNamedKeyType[]>();
+            this.ApiObjectKeyTypesPropertyType.Should()
+                .Be<ImmutableArray<ApiNamedKeyType>>();
             this.ApiRelationshipKeyBindingPublicConstructors.Should().BeEmpty();
             this.ApiRelationshipKeyBindingInternalConstructor.Should().NotBeNull();
             this.ApiRelationshipKeyBindingInternalConstructor!.IsAssembly.Should().BeTrue();

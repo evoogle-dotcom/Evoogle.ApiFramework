@@ -24,9 +24,6 @@ public sealed class ApiNamedKeyType(string apiName, IEnumerable<ApiKeyPath> apiK
 {
     #region ApiSchemaElement Properties
     /// <inheritdoc/>
-    public override ApiSchemaElementKind Kind => ApiSchemaElementKind.NamedKeyType;
-
-    /// <inheritdoc/>
     protected override string ApiElementName => nameof(ApiNamedKeyType);
     #endregion
 

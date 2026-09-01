@@ -69,10 +69,24 @@ path, description, and optional remediation.
 Before element initialization begins, the framework builds an ownership tree rooted at
 `ApiSchema`. Every `ApiSchemaElement` exposes its parent, children, siblings, and root through the
 read-only NTree node interface, so callers can navigate or traverse the initialized schema without
-reconstructing containment from its specialized collections. Cross-references, such as resolved
-named types and relationship targets, remain outside this ownership tree. Initialization contexts
-retain only transient session and diagnostic state and are rebuilt for every call to
-`ApiSchema.Initialize()`.
+reconstructing containment from its specialized collections. Concrete schema-element variables can
+use the same children, descendant, path, and visitor operations directly through
+`ApiSchemaElementExtensions`; those operations delegate to NTree. Cross-references, such as resolved
+named types and relationship targets, remain outside this ownership tree.
+
+Ownership is exclusive: one schema-element instance cannot belong to two schema trees. Structural
+constructor inputs are defensively copied into non-default immutable arrays, so changing a source
+collection after construction cannot change the model. Construct a new model to change its
+structural shape. Inline scalar, enum, object, and collection types are owned and initialized in
+place, including nested inline collections and keys owned by inline object types; inline named types
+are not added to schema-level lookup registries. Relationship ends and many-to-many associations
+derive their owner from the ownership tree. Initialization contexts retain only transient session
+and diagnostic state and are rebuilt for every call to `ApiSchema.Initialize()`.
+
+`ApiSchemaElement.Kind` is a runtime, cast-safe discriminator for built-in schema families. The
+specialized type, relationship, and relationship-end kind properties remain their authoritative
+domain discriminators. Custom `ApiKeyType` subclasses report `KeyType`, while the built-in
+`ApiNamedKeyType` reports `NamedKeyType`.
 
 Fluent builder methods are stricter because they are explicit authoring APIs. A builder method may fail fast with standard argument exceptions when the method call itself violates its parameter contract, such as passing a `null` callback, `null` configuration object, `null` `Type`, blank name, invalid expression, or invalid extension metadata. Those precondition failures are treated as programmer errors and are separate from schema initialization diagnostics.
 

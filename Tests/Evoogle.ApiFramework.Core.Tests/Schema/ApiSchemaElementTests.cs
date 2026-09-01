@@ -181,7 +181,7 @@ public class ApiSchemaElementTests(ITestOutputHelper output) : XUnitTests(output
         {
             var segments = this.KeyPath!.ApiSegments;
             segments.Should().HaveCount(2);
-            ((ApiSchemaElement)this.KeyPath).Children().Should().Equal(segments);
+            this.KeyPath.Children().Should().Equal(segments);
 
             segments[0].Parent.Should().BeSameAs(this.KeyPath);
             segments[1].Parent.Should().BeSameAs(this.KeyPath);
@@ -190,8 +190,8 @@ public class ApiSchemaElementTests(ITestOutputHelper output) : XUnitTests(output
             segments[1].PreviousSibling.Should().BeSameAs(segments[0]);
             segments[1].NextSibling.Should().BeNull();
 
-            ((ApiSchemaElement)segments[0]).IsDescendantOf(segments[1]).Should().BeFalse();
-            ((ApiSchemaElement)segments[1]).IsDescendantOf(segments[0]).Should().BeFalse();
+            segments[0].IsDescendantOf(segments[1]).Should().BeFalse();
+            segments[1].IsDescendantOf(segments[0]).Should().BeFalse();
         }
         #endregion
     }

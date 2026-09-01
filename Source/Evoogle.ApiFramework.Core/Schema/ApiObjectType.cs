@@ -3,6 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 
 using Evoogle.ApiFramework.Schema.Internal;
@@ -37,10 +38,10 @@ public sealed partial class ApiObjectType
     private Dictionary<string, ApiProperty>? _apiPropertyApiNameLookup = null;
     private Dictionary<string, ApiProperty>? _apiPropertyClrNameLookup = null;
 
-    private ApiRelationshipEnd[]? _apiRelationshipEnds = null;
-    private ApiRelationshipPrincipalEnd[]? _apiPrincipalRelationshipEnds = null;
-    private ApiRelationshipDependentEnd[]? _apiDependentRelationshipEnds = null;
-    private ApiRelationshipAssociation[]? _apiRelationshipAssociations = null;
+    private ImmutableArray<ApiRelationshipEnd> _apiRelationshipEnds = [];
+    private ImmutableArray<ApiRelationshipPrincipalEnd> _apiPrincipalRelationshipEnds = [];
+    private ImmutableArray<ApiRelationshipDependentEnd> _apiDependentRelationshipEnds = [];
+    private ImmutableArray<ApiRelationshipAssociation> _apiRelationshipAssociations = [];
     #endregion
 
     #region ApiSchemaElement Properties
@@ -54,39 +55,47 @@ public sealed partial class ApiObjectType
     #endregion
 
     #region ApiObjectType Properties
-    /// <summary>Gets all named key types defined for the object type.</summary>
-    public ApiNamedKeyType[] ApiKeyTypes { get; } =
+    /// <summary>Gets the immutable snapshot of named key types defined for the object type.</summary>
+    public ImmutableArray<ApiNamedKeyType> ApiKeyTypes { get; } =
         [.. apiKeyTypes.EmptyIfNull().Where(x => x is not null)];
 
     /// <summary>Gets the configuration options for the object type.</summary>
     public ApiObjectTypeOptions? ApiOptions { get; } = apiOptions;
 
-    /// <summary>Gets the collection of API properties defined on this object type.</summary>
-    public ApiProperty[] ApiProperties { get; } = [.. apiProperties.EmptyIfNull().Where(x => x is not null)];
+    /// <summary>Gets the immutable snapshot of properties defined on this object type.</summary>
+    public ImmutableArray<ApiProperty> ApiProperties { get; } =
+        [.. apiProperties.EmptyIfNull().Where(x => x is not null)];
 
     /// <summary>
-    ///     Gets all relationship ends where this object type participates, whether as principal or dependent.
-    ///     Populated during <see cref="ApiSchema"/> initialization. Returns an empty array before initialization completes.
+    ///     Gets the immutable snapshot of relationship ends where this object type participates.
+    ///     Populated during <see cref="ApiSchema"/> initialization. Returns an empty array before
+    ///     initialization completes.
     /// </summary>
-    public ApiRelationshipEnd[] ApiRelationshipEnds => _apiRelationshipEnds is not null ? _apiRelationshipEnds : [];
+    public ImmutableArray<ApiRelationshipEnd> ApiRelationshipEnds => _apiRelationshipEnds;
 
     /// <summary>
-    ///     Gets all relationship ends where this object type acts as the principal and provides the principal key type.
-    ///     Populated during <see cref="ApiSchema"/> initialization. Returns an empty array before initialization completes.
+    ///     Gets the immutable snapshot of relationship ends where this object type acts as the
+    ///     principal and provides the principal key type. Populated during <see cref="ApiSchema"/>
+    ///     initialization. Returns an empty array before initialization completes.
     /// </summary>
-    public ApiRelationshipPrincipalEnd[] ApiRelationshipPrincipalEnds => _apiPrincipalRelationshipEnds is not null ? _apiPrincipalRelationshipEnds : [];
+    public ImmutableArray<ApiRelationshipPrincipalEnd> ApiRelationshipPrincipalEnds =>
+        _apiPrincipalRelationshipEnds;
 
     /// <summary>
-    ///     Gets all relationship ends where this object type acts as the dependent and may provide a foreign key role binding.
-    ///     Populated during <see cref="ApiSchema"/> initialization. Returns an empty array before initialization completes.
+    ///     Gets the immutable snapshot of relationship ends where this object type acts as the
+    ///     dependent and may provide a foreign key role binding. Populated during
+    ///     <see cref="ApiSchema"/> initialization. Returns an empty array before initialization.
     /// </summary>
-    public ApiRelationshipDependentEnd[] ApiRelationshipDependentEnds => _apiDependentRelationshipEnds is not null ? _apiDependentRelationshipEnds : [];
+    public ImmutableArray<ApiRelationshipDependentEnd> ApiRelationshipDependentEnds =>
+        _apiDependentRelationshipEnds;
 
     /// <summary>
-    ///     Gets all M:N relationship associations where this object type acts as the join table.
-    ///     Populated during <see cref="ApiSchema"/> initialization. Returns an empty array before initialization completes.
+    ///     Gets the immutable snapshot of M:N associations where this object type acts as the join
+    ///     table. Populated during <see cref="ApiSchema"/> initialization. Returns an empty array
+    ///     before initialization completes.
     /// </summary>
-    public ApiRelationshipAssociation[] ApiRelationshipAssociations => _apiRelationshipAssociations is not null ? _apiRelationshipAssociations : [];
+    public ImmutableArray<ApiRelationshipAssociation> ApiRelationshipAssociations =>
+        _apiRelationshipAssociations;
 
     private Dictionary<string, ApiNamedKeyType> ApiKeyTypeApiNameLookup => this.ThrowIfNotInitialized(_apiKeyTypeApiNameLookup);
     private Dictionary<string, ApiProperty> ApiPropertyApiNameLookup => this.ThrowIfNotInitialized(_apiPropertyApiNameLookup);
@@ -98,10 +107,10 @@ public sealed partial class ApiObjectType
     public bool HasKeyTypes => this.ApiKeyTypes.Length > 0;
 
     /// <summary>Indicates whether this object type participates in any relationships.</summary>
-    public bool HasRelationshipEnds => _apiRelationshipEnds?.Length > 0;
+    public bool HasRelationshipEnds => !_apiRelationshipEnds.IsDefaultOrEmpty;
 
     /// <summary>Indicates whether this object type acts as a join table in any M:N relationships.</summary>
-    public bool HasAssociationRole => _apiRelationshipAssociations?.Length > 0;
+    public bool HasAssociationRole => !_apiRelationshipAssociations.IsDefaultOrEmpty;
     #endregion
 
     #region Object Methods
@@ -223,27 +232,30 @@ public sealed partial class ApiObjectType
     #region Implementation Methods
     internal void SetRelationshipEnds
     (
-        ApiRelationshipEnd[] ends,
-        ApiRelationshipPrincipalEnd[] principalEnds,
-        ApiRelationshipDependentEnd[] dependentEnds
+        ImmutableArray<ApiRelationshipEnd> ends,
+        ImmutableArray<ApiRelationshipPrincipalEnd> principalEnds,
+        ImmutableArray<ApiRelationshipDependentEnd> dependentEnds
     )
     {
-        _apiRelationshipEnds = ends;
-        _apiPrincipalRelationshipEnds = principalEnds;
-        _apiDependentRelationshipEnds = dependentEnds;
+        _apiRelationshipEnds = ends.IsDefault ? [] : ends;
+        _apiPrincipalRelationshipEnds = principalEnds.IsDefault ? [] : principalEnds;
+        _apiDependentRelationshipEnds = dependentEnds.IsDefault ? [] : dependentEnds;
     }
 
-    internal void SetRelationshipAssociations(ApiRelationshipAssociation[] associations)
+    internal void SetRelationshipAssociations
+    (
+        ImmutableArray<ApiRelationshipAssociation> associations
+    )
     {
-        _apiRelationshipAssociations = associations;
+        _apiRelationshipAssociations = associations.IsDefault ? [] : associations;
     }
 
     internal void ClearRelationshipEnds()
     {
-        _apiRelationshipEnds = null;
-        _apiPrincipalRelationshipEnds = null;
-        _apiDependentRelationshipEnds = null;
-        _apiRelationshipAssociations = null;
+        _apiRelationshipEnds = [];
+        _apiPrincipalRelationshipEnds = [];
+        _apiDependentRelationshipEnds = [];
+        _apiRelationshipAssociations = [];
     }
 
     private void InitializeApiKeyTypes(ApiInitializationContext context)
@@ -266,7 +278,7 @@ public sealed partial class ApiObjectType
 
     private void InitializeApiProperties(ApiInitializationContext context)
     {
-        if (this.ApiProperties is null || this.ApiProperties.Length == 0)
+        if (this.ApiProperties.Length == 0)
         {
             var severity = ApiInitializationSeverity.Warning;
             var code = ApiInitializationCode.ApiObjectTypeNullOrEmptyProperties;

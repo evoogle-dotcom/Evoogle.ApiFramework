@@ -10,20 +10,19 @@ namespace Evoogle.ApiFramework.Schema;
 /// <summary>
 ///     Represents the base class for API types that are identified by a unique API name.
 /// </summary>
-/// <remarks>
-///     Initializes a new instance of the <see cref="ApiNamedType"/> class.
-/// </remarks>
-/// <param name="apiName">The unique API name of the type.</param>
-/// <param name="clrType">The underlying CLR type this API type maps to.</param>
-public abstract class ApiNamedType
-(
-    string apiName,
-    Type clrType
-) : ApiType(clrType)
+public abstract class ApiNamedType : ApiType
 {
     #region ApiNamedType Properties
     /// <summary>Gets the API name of the API type.</summary>
-    public string ApiName { get; } = apiName;
+    public string ApiName { get; }
+    #endregion
+
+    #region Constructors
+    internal ApiNamedType(string apiName, Type clrType)
+        : base(clrType)
+    {
+        this.ApiName = apiName;
+    }
     #endregion
 
     #region ApiSchemaElement Methods

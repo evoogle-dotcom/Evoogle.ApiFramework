@@ -3,6 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
@@ -10,6 +11,7 @@ using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.ApiFramework.Schema.Json;
 using Evoogle.Extensions;
+using Evoogle.NTree;
 
 namespace Evoogle.ApiFramework.Schema;
 
@@ -17,6 +19,10 @@ namespace Evoogle.ApiFramework.Schema;
 ///     Represents the root schema element and the collection of <see cref="ApiType"/> instances
 ///     making up the schema.
 /// </summary>
+/// <remarks>
+///     Constructor collections are filtered, ordered, and defensively snapshotted into immutable
+///     arrays. Construct a new schema to change its structural shape.
+/// </remarks>
 [JsonConverter(typeof(ApiSchemaJsonConverter))]
 public sealed class ApiSchema : ApiSchemaElement
 {
@@ -46,20 +52,20 @@ public sealed class ApiSchema : ApiSchemaElement
     /// <summary>Gets the options used to configure this API schema.</summary>
     public ApiSchemaOptions ApiOptions { get; }
 
-    /// <summary>Gets all API named types contained within this API schema.</summary>
-    public ApiNamedType[] ApiNamedTypes { get; }
+    /// <summary>Gets the immutable snapshot of named types contained within this schema.</summary>
+    public ImmutableArray<ApiNamedType> ApiNamedTypes { get; }
 
-    /// <summary>Gets all API enum types contained within this API schema.</summary>
-    public ApiEnumType[] ApiEnumTypes { get; }
+    /// <summary>Gets the immutable snapshot of enum types contained within this schema.</summary>
+    public ImmutableArray<ApiEnumType> ApiEnumTypes { get; }
 
-    /// <summary>Gets all API object types contained within this API schema.</summary>
-    public ApiObjectType[] ApiObjectTypes { get; }
+    /// <summary>Gets the immutable snapshot of object types contained within this schema.</summary>
+    public ImmutableArray<ApiObjectType> ApiObjectTypes { get; }
 
-    /// <summary>Gets all API scalar types contained within this API schema.</summary>
-    public ApiScalarType[] ApiScalarTypes { get; }
+    /// <summary>Gets the immutable snapshot of scalar types contained within this schema.</summary>
+    public ImmutableArray<ApiScalarType> ApiScalarTypes { get; }
 
-    /// <summary>Gets all API relationships declared within this API schema.</summary>
-    public ApiRelationship[] ApiRelationships { get; }
+    /// <summary>Gets the immutable snapshot of relationships declared within this schema.</summary>
+    public ImmutableArray<ApiRelationship> ApiRelationships { get; }
 
     private Dictionary<string, ApiNamedType> ApiNamedTypeApiNameLookup => this.ThrowIfNotInitialized(_apiNamedTypeApiNameLookup);
     private Dictionary<Type, ApiNamedType> ApiNamedTypeClrTypeLookup => this.ThrowIfNotInitialized(_apiNamedTypeClrTypeLookup);
@@ -425,7 +431,9 @@ public sealed class ApiSchema : ApiSchemaElement
 
     private void InitializeApiKeyTypes(ApiInitializationContext context)
     {
-        foreach (var apiObjectType in this.ApiObjectTypes)
+        foreach (var apiObjectType in this
+            .SelfAndDescendants(TraversalStrategy.DepthFirst)
+            .OfType<ApiObjectType>())
         {
             apiObjectType.InitializeKeyTypes(context);
         }
@@ -586,20 +594,20 @@ public sealed class ApiSchema : ApiSchemaElement
             switch (relationship)
             {
                 case ApiRelationshipOneTo oneTo:
-                    Collect(oneTo.ApiPrincipalEnd, oneTo);
-                    Collect(oneTo.ApiDependentEnd, oneTo);
+                    Collect(oneTo.ApiPrincipalEnd);
+                    Collect(oneTo.ApiDependentEnd);
                     break;
 
                 case ApiRelationshipManyToMany manyToMany:
-                    Collect(manyToMany.ApiPrincipalEndA, manyToMany);
-                    Collect(manyToMany.ApiPrincipalEndB, manyToMany);
-                    CollectAssociation(manyToMany.ApiAssociation, manyToMany);
+                    Collect(manyToMany.ApiPrincipalEndA);
+                    Collect(manyToMany.ApiPrincipalEndB);
+                    CollectAssociation(manyToMany.ApiAssociation);
                     break;
             }
         }
 
-        // Apply phase: deliver final arrays to each object type in a single call.
-        // Types not present in a map receive null via ClearRelationshipEnds (supports idempotent re-initialization).
+        // Apply phase: deliver complete immutable values to each object type.
+        // Types not present in a map receive empty values for idempotent re-initialization.
         foreach (var apiObjectType in this.ApiObjectTypes)
         {
             if (endMap.TryGetValue(apiObjectType, out var lists))
@@ -621,15 +629,13 @@ public sealed class ApiSchema : ApiSchemaElement
             }
         }
 
-        void Collect(ApiRelationshipEnd? end, ApiRelationship relationship)
+        void Collect(ApiRelationshipEnd? end)
         {
             if (end is null)
             {
                 // Already reported as ApiRelationshipNullPrincipalEnd or ApiRelationshipNullDependentEnd (Error).
                 return;
             }
-
-            end.SetRelationship(relationship);
 
             if (end.ClrObjectType is null || !this.TryGetObjectTypeByClrType(end.ClrObjectType, out var apiObjectType))
             {
@@ -654,14 +660,12 @@ public sealed class ApiSchema : ApiSchemaElement
             }
         }
 
-        void CollectAssociation(ApiRelationshipAssociation? association, ApiRelationshipManyToMany relationship)
+        void CollectAssociation(ApiRelationshipAssociation? association)
         {
             if (association is null)
             {
                 return;
             }
-
-            association.SetRelationship(relationship);
 
             var clrObjectType = association.ClrObjectType;
             if (clrObjectType is null)

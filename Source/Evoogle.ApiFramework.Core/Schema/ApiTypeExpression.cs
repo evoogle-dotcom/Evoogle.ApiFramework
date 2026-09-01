@@ -44,7 +44,7 @@ public sealed class ApiTypeExpression
 
     /// <summary>
     ///     Gets the inline type definition, if any.
-    ///     This is typically used for inline collection types.
+    ///     Inline scalar, enum, object, and collection types are owned and initialized in place.
     /// </summary>
     public ApiType? ApiInlineType { get; }
 
@@ -288,11 +288,7 @@ public sealed class ApiTypeExpression
     private void InitializeApiTypeByInline(ApiInitializationContext context)
     {
         _apiResolvedType = this.ApiInlineType;
-
-        if (this.ApiInlineType is ApiCollectionType collection)
-        {
-            collection.Initialize(context);
-        }
+        this.ApiInlineType!.Initialize(context);
     }
     #endregion
 }

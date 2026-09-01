@@ -36,7 +36,8 @@ public sealed class ApiRelationshipAssociation : ApiRelationshipElement
     private readonly ApiKeyType? _apiForeignKeyTypeA;
     private readonly ApiKeyType? _apiForeignKeyTypeB;
 
-    private ApiRelationshipManyToMany? _apiResolvedRelationshipManyToMany;
+    private const string _noForeignKeysDeclaredMessage = "No foreign keys declared for this association of the many-to-many relationship.";
+    private const string _ownershipErrorMessage = $"An {nameof(ApiRelationshipAssociation)} must be owned by an {nameof(ApiRelationshipManyToMany)}.";
     #endregion
 
     #region ApiSchemaElement Properties
@@ -51,9 +52,10 @@ public sealed class ApiRelationshipAssociation : ApiRelationshipElement
     #region ApiRelationshipAssociation Properties
     /// <summary>
     ///     Gets the <see cref="ApiRelationshipManyToMany"/> that owns this association.
-    ///     Available after schema initialization.
+    ///     Derived from <see cref="ApiSchemaElement.Parent"/> and available after topology construction.
     /// </summary>
-    public ApiRelationshipManyToMany ApiRelationshipManyToMany => this.ThrowIfNotInitialized(_apiResolvedRelationshipManyToMany);
+    public ApiRelationshipManyToMany ApiRelationshipManyToMany =>
+        this.Parent as ApiRelationshipManyToMany ?? throw new ApiSchemaException(_ownershipErrorMessage);
 
     /// <summary>
     ///     Gets the A-side foreign key role's <see cref="ApiKeyType"/> that maps scalar leaves of principal end A's key type
@@ -63,8 +65,7 @@ public sealed class ApiRelationshipAssociation : ApiRelationshipElement
     ///     Thrown when <see cref="HasForeignKeys"/> is <see langword="false"/>.
     /// </exception>
     public ApiKeyType ApiForeignKeyTypeA => this.HasForeignKeys
-        ? _apiForeignKeyTypeA!
-        : throw new ApiSchemaException("No foreign keys declared for this association of the many-to-many relationship.");
+        ? _apiForeignKeyTypeA! : throw new ApiSchemaException(_noForeignKeysDeclaredMessage);
 
     /// <summary>
     ///     Gets the B-side foreign key role's <see cref="ApiKeyType"/> that maps scalar leaves of principal end B's key type
@@ -74,8 +75,7 @@ public sealed class ApiRelationshipAssociation : ApiRelationshipElement
     ///     Thrown when <see cref="HasForeignKeys"/> is <see langword="false"/>.
     /// </exception>
     public ApiKeyType ApiForeignKeyTypeB => this.HasForeignKeys
-        ? _apiForeignKeyTypeB!
-        : throw new ApiSchemaException("No foreign keys declared for this association of the many-to-many relationship.");
+        ? _apiForeignKeyTypeB! : throw new ApiSchemaException(_noForeignKeysDeclaredMessage);
     #endregion
 
     #region ApiRelationshipAssociation Computed Properties
@@ -167,14 +167,6 @@ public sealed class ApiRelationshipAssociation : ApiRelationshipElement
         base.InitializeCore(context);
 
         this.InitializeApiForeignKeyTypes(context);
-    }
-    #endregion
-
-    #region ApiRelationshipAssociation Methods
-    internal void SetRelationship(ApiRelationshipManyToMany relationship)
-    {
-        ArgumentNullException.ThrowIfNull(relationship);
-        _apiResolvedRelationshipManyToMany = relationship;
     }
     #endregion
 

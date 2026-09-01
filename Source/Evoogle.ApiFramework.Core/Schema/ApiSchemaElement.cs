@@ -17,8 +17,10 @@ namespace Evoogle.ApiFramework.Schema;
 /// <remarks>
 ///     This class provides common initialization and path building functionality for all schema elements.
 ///     Each schema element maintains an API path that uniquely identifies its location within the schema hierarchy.
-///     After topology construction, it also participates in a read-only ownership tree whose root is the containing <see cref="ApiSchema"/>.
-///     Reference relationships are not ownership links.
+///     After topology construction, it also participates in an exclusive, read-only ownership tree
+///     whose root is the containing <see cref="ApiSchema"/>. An element instance cannot be owned by
+///     multiple schemas. Reference relationships are not ownership links. Use
+///     <see cref="ApiSchemaElementExtensions"/> to traverse concrete schema-element instances.
 /// </remarks>
 public abstract class ApiSchemaElement : ExtensibleBase, INode<ApiSchemaElement>
 {
@@ -58,7 +60,12 @@ public abstract class ApiSchemaElement : ExtensibleBase, INode<ApiSchemaElement>
     /// </remarks>
     public string ApiPath => this.ThrowIfNotInitialized(_apiPath);
 
-    /// <summary>Gets the concrete built-in kind of this schema element.</summary>
+    /// <summary>Gets the cast-safe runtime kind of this schema element.</summary>
+    /// <remarks>
+    ///     Specialized type, relationship, and relationship-end kind properties remain the
+    ///     authoritative domain discriminators. Custom <see cref="ApiKeyType"/> subclasses report
+    ///     <see cref="ApiSchemaElementKind.KeyType"/>.
+    /// </remarks>
     public abstract ApiSchemaElementKind Kind { get; }
 
     /// <summary>Gets the root element of the schema ownership tree.</summary>
@@ -119,6 +126,11 @@ public abstract class ApiSchemaElement : ExtensibleBase, INode<ApiSchemaElement>
     internal string ApiElementTypeName => this.ApiElementName;
 
     private ApiSchemaElementTopology Topology => this.ThrowIfNotInitialized(_topology);
+    #endregion
+
+    #region Constructors
+    internal ApiSchemaElement()
+    { }
     #endregion
 
     #region Methods
@@ -201,8 +213,13 @@ public abstract class ApiSchemaElement : ExtensibleBase, INode<ApiSchemaElement>
         };
     }
 
-    internal bool TryGetTopology(out ApiSchemaElement? firstChild)
+    internal bool TryGetTopology
+    (
+        out ApiSchemaElement? root,
+        out ApiSchemaElement? firstChild
+    )
     {
+        root = _topology?.Root;
         firstChild = _topology?.FirstChild;
         return _topology is not null;
     }

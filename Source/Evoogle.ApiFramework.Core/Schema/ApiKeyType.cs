@@ -3,6 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Collections.Immutable;
 using System.Text.Json.Serialization;
 
 using Evoogle.ApiFramework.Key;
@@ -31,6 +32,11 @@ namespace Evoogle.ApiFramework.Schema;
 ///         The result is a composite <see cref="ApiKey"/> whose part names are formatted according to
 ///         <see cref="ApiKeyMaterializationContext.PartNameFormat"/>.
 ///     </para>
+///     <para>
+///         <see cref="ApiSchemaElement.Kind"/> is sealed for this extensible hierarchy. The built-in
+///         <see cref="ApiNamedKeyType"/> reports <see cref="ApiSchemaElementKind.NamedKeyType"/>;
+///         every other subclass reports <see cref="ApiSchemaElementKind.KeyType"/>.
+///     </para>
 /// </remarks>
 /// <param name="apiKeyPaths">The ordered collection of key paths that compose this key type.</param>
 [JsonConverter(typeof(ApiKeyTypeJsonConverter))]
@@ -38,15 +44,18 @@ public partial class ApiKeyType(IEnumerable<ApiKeyPath> apiKeyPaths) : ApiSchema
 {
     #region ApiSchemaElement Properties
     /// <inheritdoc/>
-    public override ApiSchemaElementKind Kind => ApiSchemaElementKind.KeyType;
+    public override sealed ApiSchemaElementKind Kind => this is ApiNamedKeyType
+        ? ApiSchemaElementKind.NamedKeyType
+        : ApiSchemaElementKind.KeyType;
 
     /// <inheritdoc/>
     protected override string ApiElementName => nameof(ApiKeyType);
     #endregion
 
     #region ApiKeyType Properties
-    /// <summary>Gets the ordered array of <see cref="ApiKeyPath"/> instances that compose this key type.</summary>
-    public ApiKeyPath[] ApiKeyPaths { get; } = [.. apiKeyPaths.EmptyIfNull().Where(x => x is not null)];
+    /// <summary>Gets the immutable ordered paths that compose this key type.</summary>
+    public ImmutableArray<ApiKeyPath> ApiKeyPaths { get; } =
+        [.. apiKeyPaths.EmptyIfNull().Where(x => x is not null)];
     #endregion
 
     #region ApiKeyType Computed Properties

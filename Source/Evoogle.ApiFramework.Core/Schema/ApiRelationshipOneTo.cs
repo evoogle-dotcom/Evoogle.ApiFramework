@@ -17,17 +17,7 @@ namespace Evoogle.ApiFramework.Schema;
 ///     The foreign key role always resides on the dependent side; the principal side provides the referenced principal key type.
 ///     Self-referential relationships are supported by setting both ends to the same <see cref="ApiRelationshipElement.ClrObjectType"/>.
 /// </remarks>
-/// <param name="apiName">The API name that uniquely identifies this relationship within the schema.</param>
-/// <param name="apiPrincipalEnd">The principal end of the relationship, which provides the referenced principal key type.</param>
-/// <param name="apiDependentEnd">The dependent end of the relationship, which may provide the foreign key role's key paths.</param>
-/// <param name="apiDeleteBehavior">The delete behavior that governs what happens to related objects when either end is affected.</param>
-public abstract class ApiRelationshipOneTo
-(
-    string apiName,
-    ApiRelationshipPrincipalEnd apiPrincipalEnd,
-    ApiRelationshipDependentEnd apiDependentEnd,
-    ApiRelationshipDeleteBehavior apiDeleteBehavior
-) : ApiRelationship(apiName, apiDeleteBehavior)
+public abstract class ApiRelationshipOneTo : ApiRelationship
 {
     #region ApiRelationshipOneTo Fields
     private ApiRelationshipKeyBinding? _apiResolvedKeyBinding = null;
@@ -35,10 +25,10 @@ public abstract class ApiRelationshipOneTo
 
     #region ApiRelationshipOneTo Properties
     /// <summary>Gets the principal end of the relationship, which provides the referenced principal key type.</summary>
-    public ApiRelationshipPrincipalEnd ApiPrincipalEnd { get; } = apiPrincipalEnd;
+    public ApiRelationshipPrincipalEnd ApiPrincipalEnd { get; }
 
     /// <summary>Gets the dependent end of the relationship, which may provide the foreign key role's key paths.</summary>
-    public ApiRelationshipDependentEnd ApiDependentEnd { get; } = apiDependentEnd;
+    public ApiRelationshipDependentEnd ApiDependentEnd { get; }
 
     /// <summary>Gets the resolved key binding between the principal key and dependent foreign key.</summary>
     /// <exception cref="ApiSchemaException">
@@ -54,6 +44,21 @@ public abstract class ApiRelationshipOneTo
 
     /// <summary>Gets a value indicating whether this relationship has no dependent foreign key binding declared at the schema level.</summary>
     public bool IsNavigational => this.ApiDependentEnd is null || !this.ApiDependentEnd.HasForeignKey;
+    #endregion
+
+    #region Constructors
+    internal ApiRelationshipOneTo
+    (
+        string apiName,
+        ApiRelationshipPrincipalEnd apiPrincipalEnd,
+        ApiRelationshipDependentEnd apiDependentEnd,
+        ApiRelationshipDeleteBehavior apiDeleteBehavior
+    )
+        : base(apiName, apiDeleteBehavior)
+    {
+        this.ApiPrincipalEnd = apiPrincipalEnd;
+        this.ApiDependentEnd = apiDependentEnd;
+    }
     #endregion
 
     #region ApiSchemaElement Methods

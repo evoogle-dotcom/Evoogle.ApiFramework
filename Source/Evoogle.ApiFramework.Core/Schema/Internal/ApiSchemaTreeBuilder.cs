@@ -104,6 +104,21 @@ internal static class ApiSchemaTreeBuilder
                 return;
             }
 
+            if (apiSchemaElement.TryGetTopology(out var existingRoot, out _) &&
+                !ReferenceEquals(existingRoot, rootElement))
+            {
+                isValid = false;
+                var apiPath = apiSchemaPath;
+                var severity = ApiInitializationSeverity.Error;
+                var code = ApiInitializationCode.ApiSchemaElementDuplicateOwnership;
+                var apiSchemaElementTypeName = apiSchemaElement.GetType().Name;
+                var description = $"Schema element instance '{apiSchemaElementTypeName}' is already owned by another schema tree.";
+                var remediation = "Create a distinct schema element instance for each schema tree.";
+
+                session.AddIssue(apiPath, severity, code, description, remediation);
+                return;
+            }
+
             if (apiParentByElement.TryGetValue(apiSchemaElement, out var existingParent))
             {
                 isValid = false;
@@ -138,7 +153,7 @@ internal static class ApiSchemaTreeBuilder
     #region Implementation Methods
     private static void ClearExistingLinks(ApiSchemaElement rootElement)
     {
-        if (!rootElement.TryGetTopology(out _))
+        if (!rootElement.TryGetTopology(out var existingRoot, out _) || !ReferenceEquals(existingRoot, rootElement))
         {
             return;
         }
@@ -150,7 +165,7 @@ internal static class ApiSchemaTreeBuilder
         while (pending.TryPop(out var apiSchemaElement))
         {
             if (!visited.Add(apiSchemaElement) ||
-                !apiSchemaElement.TryGetTopology(out var firstChild))
+                !apiSchemaElement.TryGetTopology(out _, out var firstChild))
             {
                 continue;
             }

@@ -113,7 +113,7 @@ public partial class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnit
                 .WithName(apiName);
 
             var apiProperties = apiObjectType.ApiProperties;
-            foreach (var apiProperty in apiProperties ?? [])
+            foreach (var apiProperty in apiProperties)
             {
                 var apiPropertyName = apiProperty.ApiName;
                 var clrPropertyName = apiProperty.ClrName;
@@ -168,7 +168,7 @@ public partial class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnit
                 .WithName(apiName);
 
             var apiProperties = apiObjectType.ApiProperties;
-            foreach (var apiProperty in apiProperties ?? [])
+            foreach (var apiProperty in apiProperties)
             {
                 var apiPropertyName = apiProperty.ApiName;
                 var clrPropertyName = apiProperty.ClrName;
@@ -232,7 +232,7 @@ public partial class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnit
                 .WithName(apiName);
 
             var apiProperties = apiObjectType.ApiProperties;
-            foreach (var apiProperty in apiProperties ?? [])
+            foreach (var apiProperty in apiProperties)
             {
                 var apiPropertyName = apiProperty.ApiName;
                 var clrPropertyName = apiProperty.ClrName;

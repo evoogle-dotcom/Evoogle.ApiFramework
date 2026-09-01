@@ -3,6 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Collections.Immutable;
 using System.Text.Json.Serialization;
 
 using Evoogle.ApiFramework.Schema.Internal;
@@ -44,8 +45,9 @@ public sealed class ApiKeyPath(Type clrRootType, IEnumerable<ApiKeyPathSegment> 
     #endregion
 
     #region ApiKeyPath Properties
-    /// <summary>Gets the ordered segment chain, from root navigation step to the terminal scalar step.</summary>
-    public ApiKeyPathSegment[] ApiSegments { get; } = [.. apiSegments.EmptyIfNull().Where(x => x is not null)];
+    /// <summary>Gets the immutable ordered segment chain from root to terminal scalar step.</summary>
+    public ImmutableArray<ApiKeyPathSegment> ApiSegments { get; } =
+        [.. apiSegments.EmptyIfNull().Where(x => x is not null)];
 
     /// <summary>Gets the terminal (scalar) segment — the last element in <see cref="ApiSegments"/>.</summary>
     /// <remarks>This is equivalent to <c>ApiSegments[^1]</c>.</remarks>
@@ -119,7 +121,9 @@ public sealed class ApiKeyPath(Type clrRootType, IEnumerable<ApiKeyPathSegment> 
             return; // Error already reported by ValidateSegmentsNonEmpty.
         }
 
-        if (!context.ApiSchema.TryGetObjectTypeByClrType(this.ClrRootType, out var rootObjectType))
+        var rootObjectType = this.GetOwningObjectType();
+        if (rootObjectType is null &&
+            !context.ApiSchema.TryGetObjectTypeByClrType(this.ClrRootType, out rootObjectType))
         {
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.ApiKeyPathUnresolvedRootType;
@@ -131,6 +135,12 @@ public sealed class ApiKeyPath(Type clrRootType, IEnumerable<ApiKeyPathSegment> 
         }
 
         this.InitializeSegmentChain(rootObjectType, context);
+    }
+
+    private ApiObjectType? GetOwningObjectType()
+    {
+        var apiObjectType = (this.Parent as ApiNamedKeyType)?.Parent as ApiObjectType;
+        return apiObjectType?.ClrType == this.ClrRootType ? apiObjectType : null;
     }
 
     private void ValidateSegmentsNonEmpty(ApiInitializationContext context)

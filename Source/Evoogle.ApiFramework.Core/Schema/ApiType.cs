@@ -13,12 +13,8 @@ namespace Evoogle.ApiFramework.Schema;
 /// <summary>
 ///     Represents the abstract base class for all API types in the schema (e.g., Scalar, Enum, Object, Collection).
 /// </summary>
-/// <remarks>
-///     Initializes a new instance of the <see cref="ApiType"/> class.
-/// </remarks>
-/// <param name="clrType">The underlying CLR type this API type maps to.</param>
 [JsonConverter(typeof(ApiTypeJsonConverter))]
-public abstract class ApiType(Type clrType) : ApiSchemaElement
+public abstract class ApiType : ApiSchemaElement
 {
     #region ApiSchemaElement Properties
     /// <inheritdoc/>
@@ -37,10 +33,17 @@ public abstract class ApiType(Type clrType) : ApiSchemaElement
     public abstract ApiTypeKind ApiKind { get; }
 
     /// <summary>Gets the CLR type associated with the API type.</summary>
-    public Type ClrType { get; } = clrType;
+    public Type ClrType { get; }
 
     /// <summary>Gets the name of the CLR type associated with the API type.</summary>
     public string ClrTypeName => this.ClrType.Name;
+    #endregion
+
+    #region Constructors
+    internal ApiType(Type clrType)
+    {
+        this.ClrType = clrType;
+    }
     #endregion
 
     #region ApiSchemaElement Methods

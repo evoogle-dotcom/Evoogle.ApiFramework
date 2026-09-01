@@ -369,7 +369,8 @@ public enum ApiInitializationCode
 
     #region ApiSchemaElement Initialization Codes
     /// <summary>
-    ///     The same schema element instance appears in more than one structural ownership position.
+    ///     The same schema element instance appears in more than one structural ownership position
+    ///     or schema tree.
     /// </summary>
     [EnumMember(Value = "API_SCHEMA_ELEMENT_DUPLICATE_OWNERSHIP")]
     ApiSchemaElementDuplicateOwnership,

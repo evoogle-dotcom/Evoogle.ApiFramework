@@ -3,6 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 
 using Evoogle.ApiFramework.Schema.Internal;
@@ -44,8 +45,9 @@ public sealed class ApiEnumType
     #endregion
 
     #region ApiEnumType Properties
-    /// <summary>Gets the collection of enumeration values defined for this API enum type.</summary>
-    public ApiEnumValue[] ApiEnumValues { get; } = [.. apiEnumValues.EmptyIfNull().Where(x => x is not null).OrderBy(x => x.ClrOrdinal)];
+    /// <summary>Gets the immutable snapshot of values defined for this API enum type.</summary>
+    public ImmutableArray<ApiEnumValue> ApiEnumValues { get; } =
+        [.. apiEnumValues.EmptyIfNull().Where(x => x is not null).OrderBy(x => x.ClrOrdinal)];
 
     private Dictionary<string, ApiEnumValue> ApiNameLookup => this.ThrowIfNotInitialized(_apiNameLookup);
     private Dictionary<string, ApiEnumValue> ClrNameLookup => this.ThrowIfNotInitialized(_clrNameLookup);
@@ -117,7 +119,7 @@ public sealed class ApiEnumType
     #region Implementation Methods
     private void InitializeApiEnumValues(ApiInitializationContext context)
     {
-        if (this.ApiEnumValues is null || this.ApiEnumValues.Length == 0)
+        if (this.ApiEnumValues.Length == 0)
         {
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.ApiEnumTypeNullOrEmptyValues;

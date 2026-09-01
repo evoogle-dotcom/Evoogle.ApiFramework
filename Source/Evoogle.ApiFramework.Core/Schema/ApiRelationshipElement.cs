@@ -14,10 +14,7 @@ namespace Evoogle.ApiFramework.Schema;
 ///     Holds the <see cref="ClrObjectType"/> that identifies the participating CLR type
 ///     and resolves the corresponding <see cref="ApiObjectType"/> during initialization.
 /// </summary>
-/// <param name="clrObjectType">
-///     The CLR type of the <see cref="ApiObjectType"/> this element participates as.
-/// </param>
-public abstract class ApiRelationshipElement(Type clrObjectType) : ApiSchemaElement
+public abstract class ApiRelationshipElement : ApiSchemaElement
 {
     #region ApiRelationshipElement Fields
     private ApiObjectType? _apiResolvedObjectType = null;
@@ -25,7 +22,7 @@ public abstract class ApiRelationshipElement(Type clrObjectType) : ApiSchemaElem
 
     #region ApiRelationshipElement Properties
     /// <summary>Gets the CLR type that identifies the participating <see cref="ApiObjectType"/>.</summary>
-    public Type ClrObjectType { get; } = clrObjectType;
+    public Type ClrObjectType { get; }
 
     /// <summary>
     ///     Gets the resolved <see cref="ApiObjectType"/> that corresponds to <see cref="ClrObjectType"/>.
@@ -38,6 +35,13 @@ public abstract class ApiRelationshipElement(Type clrObjectType) : ApiSchemaElem
     ///     has not yet run or failed to resolve the object type.
     /// </summary>
     internal ApiObjectType? ApiResolvedObjectType => _apiResolvedObjectType;
+    #endregion
+
+    #region Constructors
+    internal ApiRelationshipElement(Type clrObjectType)
+    {
+        this.ClrObjectType = clrObjectType;
+    }
     #endregion
 
     #region ApiSchemaElement Methods

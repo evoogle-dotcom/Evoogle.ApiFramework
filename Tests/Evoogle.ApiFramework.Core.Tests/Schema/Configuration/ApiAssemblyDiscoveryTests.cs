@@ -6,7 +6,6 @@
 using System.Reflection;
 
 using Evoogle.ApiFramework.Exceptions;
-using Evoogle.ApiFramework.Schema.Configuration.Conventions;
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
 using Evoogle.XUnit;
 

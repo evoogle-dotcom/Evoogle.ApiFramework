@@ -3,7 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using Evoogle.ApiFramework.Schema.Internal;
+using Evoogle.ApiFramework.Exceptions;
 
 namespace Evoogle.ApiFramework.Schema;
 
@@ -11,9 +11,12 @@ namespace Evoogle.ApiFramework.Schema;
 ///     Abstract base class for the ends of an <see cref="ApiRelationship"/>.
 ///     Each end describes one participating <see cref="ApiObjectType"/>.
 /// </summary>
-/// <param name="clrObjectType">The CLR type of the participating <see cref="ApiObjectType"/> on this end of the relationship.</param>
-public abstract class ApiRelationshipEnd(Type clrObjectType) : ApiRelationshipElement(clrObjectType)
+public abstract class ApiRelationshipEnd : ApiRelationshipElement
 {
+    #region ApiRelationshipEnd Fields
+    private const string _ownershipErrorMessage = $"An {nameof(ApiRelationshipEnd)} must be owned by an {nameof(ApiRelationship)}.";
+    #endregion
+
     #region ApiSchemaElement Properties
     /// <inheritdoc/>
     public override sealed ApiSchemaElementKind Kind => this.ApiKind switch
@@ -24,26 +27,22 @@ public abstract class ApiRelationshipEnd(Type clrObjectType) : ApiRelationshipEl
     };
     #endregion
 
-    #region ApiRelationshipEnd Fields
-    private ApiRelationship? _apiResolvedRelationship = null;
-    #endregion
-
     #region ApiRelationshipEnd Properties
     /// <summary>Gets the kind of this relationship end, either <see cref="ApiRelationshipEndKind.Principal"/> or <see cref="ApiRelationshipEndKind.Dependent"/>.</summary>
     public abstract ApiRelationshipEndKind ApiKind { get; }
 
     /// <summary>
     ///     Gets the <see cref="ApiRelationship"/> that owns this end.
-    ///     Available after schema initialization.
+    ///     Derived from <see cref="ApiSchemaElement.Parent"/> and available after topology construction.
     /// </summary>
-    public ApiRelationship ApiRelationship => this.ThrowIfNotInitialized(_apiResolvedRelationship);
+    public ApiRelationship ApiRelationship => this.Parent as ApiRelationship
+        ?? throw new ApiSchemaException(_ownershipErrorMessage);
     #endregion
 
-    #region ApiRelationshipEnd Methods
-    internal void SetRelationship(ApiRelationship relationship)
+    #region Constructors
+    internal ApiRelationshipEnd(Type clrObjectType)
+        : base(clrObjectType)
     {
-        ArgumentNullException.ThrowIfNull(relationship);
-        _apiResolvedRelationship = relationship;
     }
     #endregion
 }
