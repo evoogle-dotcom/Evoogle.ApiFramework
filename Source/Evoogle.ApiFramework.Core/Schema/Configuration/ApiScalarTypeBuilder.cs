@@ -45,7 +45,7 @@ public class ApiScalarTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
         var extensions = this.BuildExtensions();
         if (extensions != null)
         {
-            apiScalarType.Extensions = extensions;
+            apiScalarType.AttachExtensions(extensions);
         }
 
         return apiScalarType;

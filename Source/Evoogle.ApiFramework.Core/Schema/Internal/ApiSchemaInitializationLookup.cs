@@ -3,6 +3,8 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Collections.Frozen;
+
 using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema.Internal;
@@ -23,7 +25,7 @@ internal static class ApiSchemaInitializationLookup
         string apiPath,
         ApiInitializationCode duplicatePartCode,
         ApiInitializationSession session,
-        out Dictionary<TPartKey, TPart>? lookupDictionary
+        out FrozenDictionary<TPartKey, TPart>? lookupDictionary
     )
         where TPart : class
         where TPartKey : notnull
@@ -38,7 +40,7 @@ internal static class ApiSchemaInitializationLookup
         lookupDictionary = keyedParts
             .GroupBy(x => x.Key!)
             .Where(g => g.Count() == 1)
-            .ToDictionary(g => g.Key, g => g.Single().Part);
+            .ToFrozenDictionary(g => g.Key, g => g.Single().Part);
 
         ValidateUnique(
             parts: parts,

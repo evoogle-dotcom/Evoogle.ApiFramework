@@ -18,7 +18,7 @@ public static class ApiEnumTypeBuilderExtensions
     /// <param name="extension">The extension value.</param>
     /// <returns>The current builder instance.</returns>
     public static ApiEnumTypeBuilder AddEnumTypeExtension<TExtension>(this ApiEnumTypeBuilder builder, TExtension extension)
-        where TExtension : class
+        where TExtension : class, IApiSchemaExtension
     {
         ArgumentNullException.ThrowIfNull(builder);
 
@@ -35,7 +35,7 @@ public static class ApiEnumTypeBuilderExtensions
     /// <returns>The current builder instance.</returns>
     public static ApiEnumTypeBuilder<TEnum> AddEnumTypeExtension<TEnum, TExtension>(this ApiEnumTypeBuilder<TEnum> builder, TExtension extension)
         where TEnum : Enum
-        where TExtension : class
+        where TExtension : class, IApiSchemaExtension
     {
         ArgumentNullException.ThrowIfNull(builder);
 

@@ -176,7 +176,7 @@ public static partial class ApiSchemaFactory
 
         var extensionTypeAndInstances = BuildExtensionInstances(apiSchemaDef.ExtensionTypes);
 
-        return ApiSchema.Create
+        return CreateFrozenSchema
         (
             apiName,
             apiNamedTypes,
@@ -185,6 +185,56 @@ public static partial class ApiSchemaFactory
             apiRelationships,
             extensionTypeAndInstances
         );
+    }
+
+    private static ApiSchema CreateFrozenSchema
+    (
+        string apiName,
+        IEnumerable<ApiNamedType>? apiNamedTypes,
+        string? apiVersion = null,
+        ApiSchemaOptions? apiOptions = null,
+        IEnumerable<ApiRelationship>? apiRelationships = null,
+        IEnumerable<(Type ExtensionType, object ExtensionInstance)>? extensionTypeAndInstances = null
+    )
+    {
+        var apiSchema = new ApiSchema(apiName, apiVersion, apiOptions, apiNamedTypes, apiRelationships);
+        if (extensionTypeAndInstances is not null)
+        {
+            foreach (var (extensionType, extensionInstance) in extensionTypeAndInstances)
+            {
+                apiSchema.AttachExtension(extensionType, extensionInstance);
+            }
+        }
+
+        var result = Evoogle.ApiFramework.Schema.Internal.ApiSchemaCompiler.Compile(apiSchema);
+        result.ThrowIfInvalid();
+        return result.Schema!;
+    }
+
+    private static ApiSchema CreateFrozenSchema
+    (
+        string apiName,
+        IEnumerable<ApiScalarType>? apiScalarTypes,
+        IEnumerable<ApiEnumType>? apiEnumTypes,
+        IEnumerable<ApiObjectType>? apiObjectTypes,
+        string? apiVersion = null,
+        ApiSchemaOptions? apiOptions = null,
+        IEnumerable<ApiRelationship>? apiRelationships = null
+    )
+    {
+        var apiSchema = new ApiSchema
+        (
+            apiName,
+            apiVersion,
+            apiOptions,
+            apiScalarTypes,
+            apiEnumTypes,
+            apiObjectTypes,
+            apiRelationships
+        );
+        var result = Evoogle.ApiFramework.Schema.Internal.ApiSchemaCompiler.Compile(apiSchema);
+        result.ThrowIfInvalid();
+        return result.Schema!;
     }
 
     public static ApiType? BuildTestApiType(ApiTypeDef? apiTypeDef)

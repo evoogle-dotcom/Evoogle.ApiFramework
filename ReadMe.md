@@ -50,13 +50,26 @@ Schema-wide options can be overridden on individual object types:
     .AddKey("PK_Customer", c => c.Id))
 ```
 
-`Build()` initializes and validates the schema.
+`Build()` compiles, validates, freezes, and returns the schema. A returned schema is immutable and
+safe for concurrent runtime reads.
 
 ### Validation and Error Reporting
 
-Schema validation is centralized in `ApiSchema.Initialize()`. `Build()` and JSON deserialization construct as much schema state as they can, run initialization, and collect all initialization issues before deciding whether the schema is usable. They do not stop at the first schema issue. If initialization records one or more errors, the framework throws one `ApiSchemaInitializationException` that packages the full `ApiInitializationResult`, including errors and warnings. Consumers can catch the exception and inspect `Issues`, `Errors`, or `Warnings` to produce a complete report.
+Schema construction is a one-way compilation lifecycle: mutable builder or JSON state becomes one
+unpublished graph, that graph is resolved and validated once, and a frozen `ApiSchema` is published
+only when it is valid. `ApiSchemaBuilder.Build()` throws one `ApiSchemaInitializationException` for
+expected schema errors. `BuildResult()` returns an immutable `ApiSchemaBuildResult` instead, with a
+non-null `Schema` for success or warnings and a null `Schema` for errors. Both expose non-default
+immutable `Issues`, `Errors`, and `Warnings` arrays. Malformed JSON and unexpected programming or
+infrastructure exceptions still propagate normally.
 
-This aggregation applies to schema validity problems such as duplicate API names, unresolved CLR types, invalid key paths, missing properties, invalid relationship definitions, and other whole-schema consistency issues. Malformed JSON or incompatible JSON token shapes may still be rejected by the JSON serializer before schema initialization runs.
+`ApiSchema` has no public constructor, `Initialize`, or instance-based factory. Each builder call
+materializes a fresh graph; failed graphs are discarded and cannot be retried. Updating application
+metadata means building a separate schema and atomically exchanging the application-held reference.
+Root JSON deserialization follows the same compiler path. Warning-only JSON remains deserializable,
+although `JsonSerializer` does not return the warnings.
+
+This aggregation applies to schema validity problems such as duplicate API names, unresolved CLR types, invalid key paths, missing properties, invalid relationship definitions, and other whole-schema consistency issues. Malformed JSON or incompatible JSON token shapes may still be rejected by the JSON serializer before schema compilation runs.
 
 Schema-element traversal diagnostics use fully qualified paths. Every schema-element path begins
 with the schema, such as `ApiSchema["Store"].ApiObjectType["Order"]`, and continues through the
@@ -68,7 +81,7 @@ path, description, and optional remediation.
 
 Before element initialization begins, the framework builds an ownership tree rooted at
 `ApiSchema`. Every `ApiSchemaElement` exposes its parent, children, siblings, and root through the
-read-only NTree node interface, so callers can navigate or traverse the initialized schema without
+read-only NTree node interface, so callers can navigate or traverse the compiled schema without
 reconstructing containment from its specialized collections. Concrete schema-element variables can
 use the same children, descendant, path, and visitor operations directly through
 `ApiSchemaElementExtensions`; those operations delegate to NTree. Cross-references, such as resolved
@@ -77,18 +90,29 @@ named types and relationship targets, remain outside this ownership tree.
 Ownership is exclusive: one schema-element instance cannot belong to two schema trees. Structural
 constructor inputs are defensively copied into non-default immutable arrays, so changing a source
 collection after construction cannot change the model. Construct a new model to change its
-structural shape. Inline scalar, enum, object, and collection types are owned and initialized in
+structural shape. Inline scalar, enum, object, and collection types are owned and compiled in
 place, including nested inline collections and keys owned by inline object types; inline named types
 are not added to schema-level lookup registries. Relationship ends and many-to-many associations
-derive their owner from the ownership tree. Initialization contexts retain only transient session
-and diagnostic state and are rebuilt for every call to `ApiSchema.Initialize()`.
+derive their owner from the ownership tree. Lookup maps are frozen before publication, key names are
+precomputed, and structural and reverse-reference collections use immutable arrays.
 
 `ApiSchemaElement.Kind` is a runtime, cast-safe discriminator for built-in schema families. The
 specialized type, relationship, and relationship-end kind properties remain their authoritative
-domain discriminators. Custom `ApiKeyType` subclasses report `KeyType`, while the built-in
-`ApiNamedKeyType` reports `NamedKeyType`.
+domain discriminators. `ApiKeyType` is the built-in anonymous key representation and
+`ApiNamedKeyType` reports `NamedKeyType`; callers cannot construct or derive new key metadata
+outside the framework assembly.
 
-Fluent builder methods are stricter because they are explicit authoring APIs. A builder method may fail fast with standard argument exceptions when the method call itself violates its parameter contract, such as passing a `null` callback, `null` configuration object, `null` `Type`, blank name, invalid expression, or invalid extension metadata. Those precondition failures are treated as programmer errors and are separate from schema initialization diagnostics.
+Schema extensions implement `IApiSchemaExtension.CreateFrozenSnapshot()`. Compilation requires a
+distinct, non-null immutable snapshot assignable to the registered extension key type. The snapshot
+may use thread-safe caches, but it must not expose semantic mutation. Builder and JSON state remain
+exclusive and are not thread-safe; the successfully returned schema, its descendants, traversal,
+lookups, serialization, relationship/key resolution, compiled property accessors, and extension
+lookups are safe for concurrent use. `ApiKeyMaterializationContext` remains request-scoped and must
+not be shared by concurrent operations. Caller-provided CLR objects, loggers, format providers, and
+the application reference used to replace a schema remain the caller's synchronization
+responsibility.
+
+Fluent builder methods are stricter because they are explicit authoring APIs. A builder method may fail fast with standard argument exceptions when the method call itself violates its parameter contract, such as passing a `null` callback, `null` configuration object, `null` `Type`, blank name, invalid expression, or invalid extension metadata. Those precondition failures are treated as programmer errors and are separate from schema compilation diagnostics.
 
 ## Naming Conventions
 

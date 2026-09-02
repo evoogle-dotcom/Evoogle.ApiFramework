@@ -97,24 +97,25 @@ public class ApiEnumTypeBuilderTests(ITestOutputHelper output) : XUnitTests(outp
         typeof(OrderStatus)
     );
 
-    private static ApiEnumType EnumTypeWithExtension { get; } = new ApiEnumType
-    (
-        "enum",
-        [
-            new ApiEnumValue($"{nameof(OrderStatus.Pending)}", $"{nameof(OrderStatus.Pending)}", (int)OrderStatus.Pending),
-            new ApiEnumValue($"{nameof(OrderStatus.Paid)}", $"{nameof(OrderStatus.Paid)}", (int)OrderStatus.Paid),
-            new ApiEnumValue($"{nameof(OrderStatus.Shipped)}", $"{nameof(OrderStatus.Shipped)}", (int)OrderStatus.Shipped),
-            new ApiEnumValue($"{nameof(OrderStatus.Cancelled)}", $"{nameof(OrderStatus.Cancelled)}", (int)OrderStatus.Cancelled),
-            new ApiEnumValue($"{nameof(OrderStatus.Returned)}", $"{nameof(OrderStatus.Returned)}", (int)OrderStatus.Returned)
-        ],
-        typeof(OrderStatus)
-    )
+    private static ApiEnumType EnumTypeWithExtension { get; } = CreateEnumTypeWithExtension();
+
+    private static ApiEnumType CreateEnumTypeWithExtension()
     {
-        Extensions = new OrderedDictionary<Type, object>
-        {
-            [typeof(TestExtension)] = new TestExtension()
-        }
-    };
+        var enumType = new ApiEnumType
+        (
+            "enum",
+            [
+                new ApiEnumValue($"{nameof(OrderStatus.Pending)}", $"{nameof(OrderStatus.Pending)}", (int)OrderStatus.Pending),
+                new ApiEnumValue($"{nameof(OrderStatus.Paid)}", $"{nameof(OrderStatus.Paid)}", (int)OrderStatus.Paid),
+                new ApiEnumValue($"{nameof(OrderStatus.Shipped)}", $"{nameof(OrderStatus.Shipped)}", (int)OrderStatus.Shipped),
+                new ApiEnumValue($"{nameof(OrderStatus.Cancelled)}", $"{nameof(OrderStatus.Cancelled)}", (int)OrderStatus.Cancelled),
+                new ApiEnumValue($"{nameof(OrderStatus.Returned)}", $"{nameof(OrderStatus.Returned)}", (int)OrderStatus.Returned)
+            ],
+            typeof(OrderStatus)
+        );
+        enumType.AttachExtension(typeof(TestExtension), new TestExtension());
+        return enumType;
+    }
 
     private static ApiEnumType EnumTypeWithDefaultName { get; } = new ApiEnumType
     (

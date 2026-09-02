@@ -143,9 +143,6 @@ public sealed class ApiRelationshipManyToMany
 
         base.InitializeCore(context);
 
-        _apiResolvedKeyBindingA = null;
-        _apiResolvedKeyBindingB = null;
-
         this.InitializeApiPrincipalEndA(context);
         this.InitializeApiPrincipalEndB(context);
         this.InitializeApiAssociation(context);

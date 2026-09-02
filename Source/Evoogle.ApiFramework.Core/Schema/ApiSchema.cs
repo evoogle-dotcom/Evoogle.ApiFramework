@@ -3,6 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Collections.Frozen;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
@@ -20,26 +21,30 @@ namespace Evoogle.ApiFramework.Schema;
 ///     making up the schema.
 /// </summary>
 /// <remarks>
-///     Constructor collections are filtered, ordered, and defensively snapshotted into immutable
-///     arrays. Construct a new schema to change its structural shape.
+///     Instances are produced only by a successful builder compilation or root JSON
+///     deserialization. A returned instance and all framework-owned descendants are frozen and
+///     safe for concurrent lookup, traversal, relationship and key resolution, property access,
+///     extension lookup, and serialization. Build a separate schema to replace runtime metadata.
 /// </remarks>
 [JsonConverter(typeof(ApiSchemaJsonConverter))]
 public sealed class ApiSchema : ApiSchemaElement
 {
     #region ApiSchema Fields
-    private Dictionary<string, ApiNamedType>? _apiNamedTypeApiNameLookup = null;
-    private Dictionary<Type, ApiNamedType>? _apiNamedTypeClrTypeLookup = null;
+    private FrozenDictionary<string, ApiNamedType>? _apiNamedTypeApiNameLookup = null;
+    private FrozenDictionary<Type, ApiNamedType>? _apiNamedTypeClrTypeLookup = null;
 
-    private Dictionary<string, ApiEnumType>? _apiEnumTypeApiNameLookup = null;
-    private Dictionary<Type, ApiEnumType>? _apiEnumTypeClrTypeLookup = null;
+    private FrozenDictionary<string, ApiEnumType>? _apiEnumTypeApiNameLookup = null;
+    private FrozenDictionary<Type, ApiEnumType>? _apiEnumTypeClrTypeLookup = null;
 
-    private Dictionary<string, ApiObjectType>? _apiObjectTypeApiNameLookup = null;
-    private Dictionary<Type, ApiObjectType>? _apiObjectTypeClrTypeLookup = null;
+    private FrozenDictionary<string, ApiObjectType>? _apiObjectTypeApiNameLookup = null;
+    private FrozenDictionary<Type, ApiObjectType>? _apiObjectTypeClrTypeLookup = null;
 
-    private Dictionary<string, ApiScalarType>? _apiScalarTypeApiNameLookup = null;
-    private Dictionary<Type, ApiScalarType>? _apiScalarTypeClrTypeLookup = null;
+    private FrozenDictionary<string, ApiScalarType>? _apiScalarTypeApiNameLookup = null;
+    private FrozenDictionary<Type, ApiScalarType>? _apiScalarTypeClrTypeLookup = null;
 
-    private Dictionary<string, ApiRelationship>? _apiRelationshipApiNameLookup = null;
+    private FrozenDictionary<string, ApiRelationship>? _apiRelationshipApiNameLookup = null;
+
+    private int _compilationState;
     #endregion
 
     #region ApiSchema Properties
@@ -67,19 +72,19 @@ public sealed class ApiSchema : ApiSchemaElement
     /// <summary>Gets the immutable snapshot of relationships declared within this schema.</summary>
     public ImmutableArray<ApiRelationship> ApiRelationships { get; }
 
-    private Dictionary<string, ApiNamedType> ApiNamedTypeApiNameLookup => this.ThrowIfNotInitialized(_apiNamedTypeApiNameLookup);
-    private Dictionary<Type, ApiNamedType> ApiNamedTypeClrTypeLookup => this.ThrowIfNotInitialized(_apiNamedTypeClrTypeLookup);
+    private FrozenDictionary<string, ApiNamedType> ApiNamedTypeApiNameLookup => this.ThrowIfNotInitialized(_apiNamedTypeApiNameLookup);
+    private FrozenDictionary<Type, ApiNamedType> ApiNamedTypeClrTypeLookup => this.ThrowIfNotInitialized(_apiNamedTypeClrTypeLookup);
 
-    private Dictionary<string, ApiEnumType> ApiEnumTypeApiNameLookup => this.ThrowIfNotInitialized(_apiEnumTypeApiNameLookup);
-    private Dictionary<Type, ApiEnumType> ApiEnumTypeClrTypeLookup => this.ThrowIfNotInitialized(_apiEnumTypeClrTypeLookup);
+    private FrozenDictionary<string, ApiEnumType> ApiEnumTypeApiNameLookup => this.ThrowIfNotInitialized(_apiEnumTypeApiNameLookup);
+    private FrozenDictionary<Type, ApiEnumType> ApiEnumTypeClrTypeLookup => this.ThrowIfNotInitialized(_apiEnumTypeClrTypeLookup);
 
-    private Dictionary<string, ApiObjectType> ApiObjectTypeApiNameLookup => this.ThrowIfNotInitialized(_apiObjectTypeApiNameLookup);
-    private Dictionary<Type, ApiObjectType> ApiObjectTypeClrTypeLookup => this.ThrowIfNotInitialized(_apiObjectTypeClrTypeLookup);
+    private FrozenDictionary<string, ApiObjectType> ApiObjectTypeApiNameLookup => this.ThrowIfNotInitialized(_apiObjectTypeApiNameLookup);
+    private FrozenDictionary<Type, ApiObjectType> ApiObjectTypeClrTypeLookup => this.ThrowIfNotInitialized(_apiObjectTypeClrTypeLookup);
 
-    private Dictionary<string, ApiScalarType> ApiScalarTypeApiNameLookup => this.ThrowIfNotInitialized(_apiScalarTypeApiNameLookup);
-    private Dictionary<Type, ApiScalarType> ApiScalarTypeClrTypeLookup => this.ThrowIfNotInitialized(_apiScalarTypeClrTypeLookup);
+    private FrozenDictionary<string, ApiScalarType> ApiScalarTypeApiNameLookup => this.ThrowIfNotInitialized(_apiScalarTypeApiNameLookup);
+    private FrozenDictionary<Type, ApiScalarType> ApiScalarTypeClrTypeLookup => this.ThrowIfNotInitialized(_apiScalarTypeClrTypeLookup);
 
-    private Dictionary<string, ApiRelationship> ApiRelationshipApiNameLookup => this.ThrowIfNotInitialized(_apiRelationshipApiNameLookup);
+    private FrozenDictionary<string, ApiRelationship> ApiRelationshipApiNameLookup => this.ThrowIfNotInitialized(_apiRelationshipApiNameLookup);
 
     #endregion
 
@@ -94,7 +99,7 @@ public sealed class ApiSchema : ApiSchemaElement
     /// <param name="apiEnumTypes">The collection of enum types to include in the API schema.</param>
     /// <param name="apiObjectTypes">The collection of object types to include in the API schema.</param>
     /// <param name="apiRelationships">The collection of relationships to include in the API schema.</param>
-    public ApiSchema
+    internal ApiSchema
     (
         string apiName,
         string? apiVersion,
@@ -137,7 +142,7 @@ public sealed class ApiSchema : ApiSchemaElement
     /// <param name="apiOptions">The options used to configure this API schema. If null, the default options are used.</param>
     /// <param name="apiNamedTypes">The collection of API named types to include in the API schema.</param>
     /// <param name="apiRelationships">The optional collection of relationships to include in the API schema.</param>
-    public ApiSchema
+    internal ApiSchema
     (
         string apiName,
         string? apiVersion,
@@ -175,32 +180,6 @@ public sealed class ApiSchema : ApiSchemaElement
     #endregion
 
     #region ApiSchema Methods
-    /// <summary>
-    ///     Builds the ownership tree, initializes all types and elements within this schema,
-    ///     resolves cross-references, and validates the entire object graph.
-    /// </summary>
-    /// <returns>
-    ///     An <see cref="ApiInitializationResult"/> that contains any warnings or errors discovered during initialization.
-    ///     Call <see cref="ApiInitializationResult.ThrowIfInvalid"/> to convert errors into an exception.
-    /// </returns>
-    public ApiInitializationResult Initialize()
-    {
-        var apiSchemaContext = new ApiSchemaContext
-        {
-            ApiSchema = this
-        };
-
-        apiSchemaContext.InitializeLogger();
-
-        var session = new ApiInitializationSession(this, apiSchemaContext);
-        if (ApiSchemaTreeBuilder.TryBuild(this, session))
-        {
-            this.Initialize(session);
-        }
-
-        return new ApiInitializationResult(session.Issues);
-    }
-
     /// <summary>Attempts to retrieve an API named type by its API name.</summary>
     /// <param name="apiName">The API name to look up.</param>
     /// <param name="apiNamedType">The matching named type, or <see langword="null"/> if not found.</param>
@@ -317,87 +296,20 @@ public sealed class ApiSchema : ApiSchemaElement
     }
     #endregion
 
-    #region Factory Methods
-    /// <summary>
-    ///     Creates a new <see cref="ApiSchema"/> from a flat collection of named types, initializes it, and throws on validation errors.
-    /// </summary>
-    /// <param name="apiName">The name of the API schema.</param>
-    /// <param name="apiNamedTypes">The collection of named types (scalar, enum, and object) to include in the schema.</param>
-    /// <param name="apiVersion">The optional version string. Defaults to <c>"0.1.0"</c> if not provided.</param>
-    /// <param name="apiOptions">The optional schema options. Defaults to <see cref="ApiSchemaOptions.Default"/> if not provided.</param>
-    /// <param name="apiRelationships">The optional collection of relationships to include in the schema.</param>
-    /// <param name="extensionTypeAndInstances">Optional extension instances to attach to the schema after construction.</param>
-    /// <returns>A fully initialized <see cref="ApiSchema"/> instance.</returns>
-    /// <exception cref="ApiSchemaInitializationException">Thrown if initialization produces one or more errors.</exception>
-    public static ApiSchema Create
-    (
-        string apiName,
-        IEnumerable<ApiNamedType>? apiNamedTypes,
-        string? apiVersion = null,
-        ApiSchemaOptions? apiOptions = null,
-        IEnumerable<ApiRelationship>? apiRelationships = null,
-        IEnumerable<(Type ExtensionType, object ExtensionInstance)>? extensionTypeAndInstances = null
-    )
-    {
-        var apiSchema = new ApiSchema(apiName, apiVersion, apiOptions, apiNamedTypes, apiRelationships);
-
-        if (extensionTypeAndInstances is not null)
-        {
-            foreach (var (extensionType, extensionInstance) in extensionTypeAndInstances)
-            {
-                apiSchema.AttachExtension(extensionType, extensionInstance);
-            }
-        }
-
-        var result = apiSchema.Initialize();
-        result.ThrowIfInvalid();
-
-        return apiSchema;
-    }
-
-    /// <summary>
-    ///     Creates a new <see cref="ApiSchema"/> from separate scalar, enum, and object type collections, initializes it, and throws on validation errors.
-    /// </summary>
-    /// <param name="apiName">The name of the API schema.</param>
-    /// <param name="apiScalarTypes">The collection of scalar types to include in the schema.</param>
-    /// <param name="apiEnumTypes">The collection of enum types to include in the schema.</param>
-    /// <param name="apiObjectTypes">The collection of object types to include in the schema.</param>
-    /// <param name="apiVersion">The optional version string. Defaults to <c>"0.1.0"</c> if not provided.</param>
-    /// <param name="apiOptions">The optional schema options. Defaults to <see cref="ApiSchemaOptions.Default"/> if not provided.</param>
-    /// <param name="apiRelationships">The collection of relationships to include in the schema.</param>
-    /// <param name="extensionTypeAndInstances">Optional extension instances to attach to the schema after construction.</param>
-    /// <returns>A fully initialized <see cref="ApiSchema"/> instance.</returns>
-    /// <exception cref="ApiSchemaInitializationException">Thrown if initialization produces one or more errors.</exception>
-    public static ApiSchema Create
-    (
-        string apiName,
-        IEnumerable<ApiScalarType>? apiScalarTypes,
-        IEnumerable<ApiEnumType>? apiEnumTypes,
-        IEnumerable<ApiObjectType>? apiObjectTypes,
-        string? apiVersion = null,
-        ApiSchemaOptions? apiOptions = null,
-        IEnumerable<ApiRelationship>? apiRelationships = null,
-        IEnumerable<(Type ExtensionType, object ExtensionInstance)>? extensionTypeAndInstances = null
-    )
-    {
-        var apiSchema = new ApiSchema(apiName, apiVersion, apiOptions, apiScalarTypes, apiEnumTypes, apiObjectTypes, apiRelationships);
-
-        if (extensionTypeAndInstances is not null)
-        {
-            foreach (var (extensionType, extensionInstance) in extensionTypeAndInstances)
-            {
-                apiSchema.AttachExtension(extensionType, extensionInstance);
-            }
-        }
-
-        var result = apiSchema.Initialize();
-        result.ThrowIfInvalid();
-
-        return apiSchema;
-    }
-    #endregion
-
     #region Implementation Methods
+    internal void BeginCompilation()
+    {
+        if (Interlocked.CompareExchange(ref _compilationState, 1, 0) != 0)
+        {
+            throw new InvalidOperationException("An API schema graph can only be compiled once.");
+        }
+    }
+
+    internal void CompleteCompilation(bool isSuccessful)
+    {
+        Interlocked.Exchange(ref _compilationState, isSuccessful ? 2 : 3);
+    }
+
     private void InitializeApiName(ApiInitializationContext context)
     {
         var isApiNameInvalid = ApiSchemaNameValidation.IsNameInvalid(this.ApiName);
@@ -459,21 +371,6 @@ public sealed class ApiSchema : ApiSchemaElement
 
     private void InitializeLookupDictionaries(ApiInitializationContext context)
     {
-        // Initialize lookup dictionaries for lookup by API name and CLR type.
-        _apiNamedTypeApiNameLookup = null;
-        _apiNamedTypeClrTypeLookup = null;
-
-        _apiEnumTypeApiNameLookup = null;
-        _apiEnumTypeClrTypeLookup = null;
-
-        _apiObjectTypeApiNameLookup = null;
-        _apiObjectTypeClrTypeLookup = null;
-
-        _apiScalarTypeApiNameLookup = null;
-        _apiScalarTypeClrTypeLookup = null;
-
-        _apiRelationshipApiNameLookup = null;
-
         ApiSchemaInitializationLookup.InitializeLookupDictionary
         (
             parts: this.ApiNamedTypes,
@@ -607,7 +504,7 @@ public sealed class ApiSchema : ApiSchemaElement
         }
 
         // Apply phase: deliver complete immutable values to each object type.
-        // Types not present in a map receive empty values for idempotent re-initialization.
+        // Types not present in a map receive empty immutable values.
         foreach (var apiObjectType in this.ApiObjectTypes)
         {
             if (endMap.TryGetValue(apiObjectType, out var lists))

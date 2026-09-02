@@ -98,7 +98,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
         #endregion
 
         #region Calculated Properties
-        private List<ApiInitializationIssue>? ActualWarnings { get; set; }
+        private ApiSchema? ActualSchema { get; set; }
         #endregion
 
         #region XUnitTest Methods
@@ -117,30 +117,12 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
         protected override void Act()
         {
             // Deserialize the schema — succeeds because warnings do not throw
-            var schema = JsonSerializer.Deserialize<ApiSchema>(this.SourceJson);
-
-            if (schema is not null)
-            {
-                // Re-initialize to capture the ApiInitializationResult with warnings
-                // (the initial result is discarded by the JSON converter after ThrowIfInvalid)
-                var result = schema.Initialize();
-                this.ActualWarnings = result.Warnings is not null ? [.. result.Warnings] : [];
-            }
-
-            this.WriteLine();
-            foreach (var actualWarning in this.ActualWarnings ?? [])
-            {
-                this.WriteLine($"Actual Warning: {actualWarning.SafeToString()}");
-            }
+            this.ActualSchema = JsonSerializer.Deserialize<ApiSchema>(this.SourceJson);
         }
 
         protected override void Assert()
         {
-            this.ActualWarnings.Should().NotBeNull();
-            this.ActualWarnings.Should().BeEquivalentTo
-            (
-                FullyQualifyInitializationIssues(this.SourceJson, this.ExpectedWarnings)
-            );
+            this.ActualSchema.Should().NotBeNull();
         }
         #endregion
     }

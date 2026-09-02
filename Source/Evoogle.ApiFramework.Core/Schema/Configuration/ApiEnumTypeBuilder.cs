@@ -76,7 +76,7 @@ public class ApiEnumTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
         var extensions = this.BuildExtensions();
         if (extensions != null)
         {
-            apiEnumType.Extensions = extensions;
+            apiEnumType.AttachExtensions(extensions);
         }
 
         return apiEnumType;

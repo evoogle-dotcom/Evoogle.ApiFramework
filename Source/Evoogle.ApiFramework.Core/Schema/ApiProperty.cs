@@ -26,7 +26,7 @@ namespace Evoogle.ApiFramework.Schema;
 ///         objects, collections, and complex types.
 ///     </para>
 ///     <para>
-///         For optimal performance, getter and setter accessors are compiled once during initialization
+///         For optimal performance, getter and setter accessors are compiled once during schema compilation
 ///         as lambda expressions using the owning <see cref="ApiObjectType"/>'s CLR type. The compiled
 ///         delegates are stored directly on each <see cref="ApiProperty"/> instance and provide near-native
 ///         performance (~10-20x faster than reflection) for property/field access operations.

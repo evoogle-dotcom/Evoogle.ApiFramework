@@ -19,7 +19,7 @@ public static class ApiObjectTypeBuilderExtensions
     /// <param name="extension">The extension value.</param>
     /// <returns>The current builder instance.</returns>
     public static ApiObjectTypeBuilder AddObjectTypeExtension<TExtension>(this ApiObjectTypeBuilder builder, TExtension extension)
-        where TExtension : class
+        where TExtension : class, IApiSchemaExtension
     {
         ArgumentNullException.ThrowIfNull(builder);
 
@@ -35,7 +35,7 @@ public static class ApiObjectTypeBuilderExtensions
     /// <param name="extension">The extension value.</param>
     /// <returns>The current builder instance.</returns>
     public static ApiObjectTypeBuilder<TObject> AddObjectTypeExtension<TObject, TExtension>(this ApiObjectTypeBuilder<TObject> builder, TExtension extension)
-        where TExtension : class
+        where TExtension : class, IApiSchemaExtension
     {
         ArgumentNullException.ThrowIfNull(builder);
 

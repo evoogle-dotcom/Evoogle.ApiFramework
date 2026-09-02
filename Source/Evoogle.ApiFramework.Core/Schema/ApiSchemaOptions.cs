@@ -14,7 +14,7 @@ namespace Evoogle.ApiFramework.Schema;
 ///     Holds schema-wide configuration options for all types within an <see cref="ApiSchema"/>.
 /// </summary>
 [JsonConverter(typeof(ApiSchemaOptionsJsonConverter))]
-public record class ApiSchemaOptions
+public sealed record class ApiSchemaOptions
 {
     #region Fields
     private static readonly ApiSchemaOptions _default = new();

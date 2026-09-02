@@ -54,7 +54,7 @@ public abstract class ApiRelationshipBuilder(string apiName, ApiRelationshipDele
     /// <returns>The current builder instance.</returns>
     protected TBuilder AddRelationshipExtension<TBuilder, TExtension>(TExtension extension)
         where TBuilder : ApiRelationshipBuilder
-        where TExtension : class
+        where TExtension : class, IApiSchemaExtension
         => this.AddRelationshipExtension<TBuilder>(typeof(TExtension), extension);
     #endregion
 

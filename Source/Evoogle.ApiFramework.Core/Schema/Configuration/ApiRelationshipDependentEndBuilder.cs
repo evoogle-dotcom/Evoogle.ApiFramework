@@ -136,7 +136,7 @@ public class ApiRelationshipDependentEndBuilder(Type clrObjectType) : ExtensionB
         var extensions = this.BuildExtensions();
         if (extensions != null)
         {
-            end.Extensions = extensions;
+            end.AttachExtensions(extensions);
         }
 
         return end;

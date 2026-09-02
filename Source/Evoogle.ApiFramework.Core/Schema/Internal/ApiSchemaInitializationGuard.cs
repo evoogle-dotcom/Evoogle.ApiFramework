@@ -27,7 +27,7 @@ internal static class ApiSchemaInitializationGuard
         }
 
         var objectType = obj.GetType();
-        throw new ApiSchemaException($"{objectType.SafeToName()} has not been initialized. Initialize the {nameof(ApiSchema)} before accessing.");
+        throw new ApiSchemaException($"{objectType.SafeToName()} has not been compiled. Obtain it from a successful schema build before accessing.");
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -40,7 +40,7 @@ internal static class ApiSchemaInitializationGuard
         }
 
         var objectType = obj.GetType();
-        throw new ApiSchemaException($"{objectType.SafeToName()} has not been initialized. Initialize the {nameof(ApiSchema)} before accessing.");
+        throw new ApiSchemaException($"{objectType.SafeToName()} has not been compiled. Obtain it from a successful schema build before accessing.");
     }
     #endregion
 }

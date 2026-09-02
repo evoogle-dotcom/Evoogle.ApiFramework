@@ -273,7 +273,7 @@ public class ApiPropertyBuilder : ExtensionBuilder<ApiPropertyBuilder>
         var extensions = this.BuildExtensions();
         if (extensions != null)
         {
-            apiProperty.Extensions = extensions;
+            apiProperty.AttachExtensions(extensions);
         }
 
         return apiProperty;

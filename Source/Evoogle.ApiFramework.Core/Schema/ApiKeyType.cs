@@ -38,10 +38,16 @@ namespace Evoogle.ApiFramework.Schema;
 ///         every other subclass reports <see cref="ApiSchemaElementKind.KeyType"/>.
 ///     </para>
 /// </remarks>
-/// <param name="apiKeyPaths">The ordered collection of key paths that compose this key type.</param>
 [JsonConverter(typeof(ApiKeyTypeJsonConverter))]
-public partial class ApiKeyType(IEnumerable<ApiKeyPath> apiKeyPaths) : ApiSchemaElement
+public partial class ApiKeyType : ApiSchemaElement
 {
+    #region Constructors
+    internal ApiKeyType(IEnumerable<ApiKeyPath> apiKeyPaths)
+    {
+        this.ApiKeyPaths = [.. apiKeyPaths.EmptyIfNull().Where(x => x is not null)];
+    }
+    #endregion
+
     #region ApiSchemaElement Properties
     /// <inheritdoc/>
     public override sealed ApiSchemaElementKind Kind => this is ApiNamedKeyType
@@ -54,8 +60,7 @@ public partial class ApiKeyType(IEnumerable<ApiKeyPath> apiKeyPaths) : ApiSchema
 
     #region ApiKeyType Properties
     /// <summary>Gets the immutable ordered paths that compose this key type.</summary>
-    public ImmutableArray<ApiKeyPath> ApiKeyPaths { get; } =
-        [.. apiKeyPaths.EmptyIfNull().Where(x => x is not null)];
+    public ImmutableArray<ApiKeyPath> ApiKeyPaths { get; }
     #endregion
 
     #region ApiKeyType Computed Properties

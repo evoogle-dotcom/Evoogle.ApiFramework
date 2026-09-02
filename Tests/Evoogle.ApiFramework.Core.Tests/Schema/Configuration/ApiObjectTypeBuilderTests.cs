@@ -53,12 +53,10 @@ public partial class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnit
             var apiExtensionTypesCount = apiExtensionTypes.Count;
             if (apiExtensionTypesCount > 0)
             {
-                apiTypeExpected.Extensions ??= [];
-
                 foreach (var apiExtensionType in apiExtensionTypes)
                 {
                     var extensionInstance = Activator.CreateInstance(apiExtensionType);
-                    apiTypeExpected.Extensions[apiExtensionType] = extensionInstance!;
+                    apiTypeExpected.AttachExtension(apiExtensionType, extensionInstance!);
                 }
             }
 

@@ -83,8 +83,6 @@ public abstract class ApiRelationshipOneTo : ApiRelationship
 
         base.InitializeCore(context);
 
-        _apiResolvedKeyBinding = null;
-
         this.InitializeApiPrincipalEnd(context);
         this.InitializeApiDependentEnd(context);
         this.InitializeDependentKeyPathAlignment(context);

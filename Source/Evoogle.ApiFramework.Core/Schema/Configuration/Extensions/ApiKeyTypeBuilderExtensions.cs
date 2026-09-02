@@ -18,7 +18,7 @@ public static class ApiKeyTypeBuilderExtensions
     /// <param name="extension">The extension value.</param>
     /// <returns>The current builder instance.</returns>
     public static ApiKeyTypeBuilder AddKeyTypeExtension<TExtension>(this ApiKeyTypeBuilder builder, TExtension extension)
-        where TExtension : class
+        where TExtension : class, IApiSchemaExtension
     {
         ArgumentNullException.ThrowIfNull(builder);
 

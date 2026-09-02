@@ -162,7 +162,7 @@ public class ApiKeyTypeBuilder(string? apiName = null) : ExtensionBuilder<ApiKey
         var extensions = this.BuildExtensions();
         if (extensions != null)
         {
-            keyType.Extensions = extensions;
+            keyType.AttachExtensions(extensions);
         }
     }
 

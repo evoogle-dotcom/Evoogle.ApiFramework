@@ -18,7 +18,7 @@ public static class ApiPropertyBuilderExtensions
     /// <param name="extension">The extension value.</param>
     /// <returns>The current builder instance.</returns>
     public static ApiPropertyBuilder AddPropertyExtension<TExtension>(this ApiPropertyBuilder builder, TExtension extension)
-        where TExtension : class
+        where TExtension : class, IApiSchemaExtension
     {
         ArgumentNullException.ThrowIfNull(builder);
 

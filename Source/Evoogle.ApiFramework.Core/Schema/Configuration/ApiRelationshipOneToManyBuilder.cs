@@ -198,7 +198,7 @@ public sealed class ApiRelationshipOneToManyBuilder(string apiName)
         var extensions = this.BuildExtensions();
         if (extensions != null)
         {
-            relationship.Extensions = extensions;
+            relationship.AttachExtensions(extensions);
         }
 
         return relationship;

@@ -3,6 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Collections.Frozen;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 
@@ -29,9 +30,9 @@ public sealed class ApiEnumType
 ) : ApiNamedType(apiName, clrEnumType)
 {
     #region ApiEnumType Fields
-    private Dictionary<string, ApiEnumValue>? _apiNameLookup = null;
-    private Dictionary<string, ApiEnumValue>? _clrNameLookup = null;
-    private Dictionary<int, ApiEnumValue>? _clrOrdinalLookup = null;
+    private FrozenDictionary<string, ApiEnumValue>? _apiNameLookup = null;
+    private FrozenDictionary<string, ApiEnumValue>? _clrNameLookup = null;
+    private FrozenDictionary<int, ApiEnumValue>? _clrOrdinalLookup = null;
     #endregion
 
     #region ApiSchemaElement Properties
@@ -49,9 +50,9 @@ public sealed class ApiEnumType
     public ImmutableArray<ApiEnumValue> ApiEnumValues { get; } =
         [.. apiEnumValues.EmptyIfNull().Where(x => x is not null).OrderBy(x => x.ClrOrdinal)];
 
-    private Dictionary<string, ApiEnumValue> ApiNameLookup => this.ThrowIfNotInitialized(_apiNameLookup);
-    private Dictionary<string, ApiEnumValue> ClrNameLookup => this.ThrowIfNotInitialized(_clrNameLookup);
-    private Dictionary<int, ApiEnumValue> ClrOrdinalLookup => this.ThrowIfNotInitialized(_clrOrdinalLookup);
+    private FrozenDictionary<string, ApiEnumValue> ApiNameLookup => this.ThrowIfNotInitialized(_apiNameLookup);
+    private FrozenDictionary<string, ApiEnumValue> ClrNameLookup => this.ThrowIfNotInitialized(_clrNameLookup);
+    private FrozenDictionary<int, ApiEnumValue> ClrOrdinalLookup => this.ThrowIfNotInitialized(_clrOrdinalLookup);
     #endregion
 
     #region Object Methods
@@ -161,10 +162,6 @@ public sealed class ApiEnumType
     private void InitializeLookupDictionaries(ApiInitializationContext context)
     {
         // Initialize lookup dictionaries for lookup by API name, CLR name, and CLR ordinal.
-        _apiNameLookup = null;
-        _clrNameLookup = null;
-        _clrOrdinalLookup = null;
-
         ApiSchemaInitializationLookup.InitializeLookupDictionary
         (
             parts: this.ApiEnumValues,

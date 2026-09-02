@@ -19,7 +19,7 @@ public static class ApiRelationshipOneToOneBuilderExtensions
     /// <param name="extension">The extension value.</param>
     /// <returns>The current builder instance.</returns>
     public static ApiRelationshipOneToOneBuilder AddRelationshipExtension<TExtension>(this ApiRelationshipOneToOneBuilder builder, TExtension extension)
-        where TExtension : class
+        where TExtension : class, IApiSchemaExtension
     {
         ArgumentNullException.ThrowIfNull(builder);
 

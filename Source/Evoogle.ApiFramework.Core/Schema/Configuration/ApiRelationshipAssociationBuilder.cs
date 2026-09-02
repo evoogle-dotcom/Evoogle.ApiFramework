@@ -186,7 +186,7 @@ public class ApiRelationshipAssociationBuilder(Type clrObjectType) : ExtensionBu
         var extensions = this.BuildExtensions();
         if (extensions != null)
         {
-            apiRelationshipAssociation.Extensions = extensions;
+            apiRelationshipAssociation.AttachExtensions(extensions);
         }
 
         return apiRelationshipAssociation;

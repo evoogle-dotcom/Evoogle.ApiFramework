@@ -21,7 +21,7 @@ public static class ApiRelationshipAssociationBuilderGenericExtensions
     /// <param name="extension">The extension value.</param>
     /// <returns>The current builder instance.</returns>
     public static ApiRelationshipAssociationBuilder AddRelationshipAssociationExtension<TExtension>(this ApiRelationshipAssociationBuilder builder, TExtension extension)
-        where TExtension : class
+        where TExtension : class, IApiSchemaExtension
     {
         ArgumentNullException.ThrowIfNull(builder);
 
@@ -41,7 +41,7 @@ public static class ApiRelationshipAssociationBuilderGenericExtensions
         this ApiRelationshipAssociationBuilder<TAssociation> builder,
         TExtension extension
     )
-        where TExtension : class
+        where TExtension : class, IApiSchemaExtension
     {
         ArgumentNullException.ThrowIfNull(builder);
 

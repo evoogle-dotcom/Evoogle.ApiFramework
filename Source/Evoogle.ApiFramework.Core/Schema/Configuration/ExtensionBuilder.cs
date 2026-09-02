@@ -11,6 +11,10 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 ///     Provides a base class for builders that collect extension values keyed by type.
 ///     Extensions allow attaching arbitrary metadata to schema elements during configuration.
 /// </summary>
+/// <remarks>
+///     Runtime schema extensions must implement <see cref="IApiSchemaExtension"/> and create a
+///     distinct immutable snapshot during schema compilation.
+/// </remarks>
 /// <typeparam name="TBuilder">The concrete builder type.</typeparam>
 public abstract class ExtensionBuilder<TBuilder>
     where TBuilder : ExtensionBuilder<TBuilder>

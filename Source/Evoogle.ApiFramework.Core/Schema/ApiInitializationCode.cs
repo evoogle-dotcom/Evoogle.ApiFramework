@@ -442,6 +442,24 @@ public enum ApiInitializationCode
     /// </summary>
     [EnumMember(Value = "API_SCHEMA_INVALID_NAME")]
     ApiSchemaInvalidName,
+
+    /// <summary>
+    ///     An attached schema extension does not implement the frozen snapshot contract.
+    /// </summary>
+    [EnumMember(Value = "API_SCHEMA_EXTENSION_UNSUPPORTED")]
+    ApiSchemaExtensionUnsupported,
+
+    /// <summary>
+    ///     A schema extension failed while creating its frozen snapshot.
+    /// </summary>
+    [EnumMember(Value = "API_SCHEMA_EXTENSION_SNAPSHOT_FAILED")]
+    ApiSchemaExtensionSnapshotFailed,
+
+    /// <summary>
+    ///     A schema extension returned an invalid frozen snapshot.
+    /// </summary>
+    [EnumMember(Value = "API_SCHEMA_EXTENSION_INVALID_SNAPSHOT")]
+    ApiSchemaExtensionInvalidSnapshot,
     #endregion
 
     #region ApiType Initialization Codes

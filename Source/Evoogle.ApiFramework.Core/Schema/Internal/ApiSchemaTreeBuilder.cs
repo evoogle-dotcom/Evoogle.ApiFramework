@@ -34,8 +34,6 @@ internal static class ApiSchemaTreeBuilder
         ArgumentNullException.ThrowIfNull(rootElement);
         ArgumentNullException.ThrowIfNull(session);
 
-        ClearExistingLinks(rootElement);
-
         var apiChildrenByElement = new Dictionary<ApiSchemaElement, ApiSchemaElement[]>
         (
             ReferenceEqualityComparer.Instance
@@ -104,15 +102,14 @@ internal static class ApiSchemaTreeBuilder
                 return;
             }
 
-            if (apiSchemaElement.TryGetTopology(out var existingRoot, out _) &&
-                !ReferenceEquals(existingRoot, rootElement))
+            if (apiSchemaElement.TryGetTopology(out _, out _))
             {
                 isValid = false;
                 var apiPath = apiSchemaPath;
                 var severity = ApiInitializationSeverity.Error;
                 var code = ApiInitializationCode.ApiSchemaElementDuplicateOwnership;
                 var apiSchemaElementTypeName = apiSchemaElement.GetType().Name;
-                var description = $"Schema element instance '{apiSchemaElementTypeName}' is already owned by another schema tree.";
+                var description = $"Schema element instance '{apiSchemaElementTypeName}' already belongs to a compiled schema tree.";
                 var remediation = "Create a distinct schema element instance for each schema tree.";
 
                 session.AddIssue(apiPath, severity, code, description, remediation);
@@ -150,36 +147,4 @@ internal static class ApiSchemaTreeBuilder
     }
     #endregion
 
-    #region Implementation Methods
-    private static void ClearExistingLinks(ApiSchemaElement rootElement)
-    {
-        if (!rootElement.TryGetTopology(out var existingRoot, out _) || !ReferenceEquals(existingRoot, rootElement))
-        {
-            return;
-        }
-
-        var visited = new HashSet<ApiSchemaElement>(ReferenceEqualityComparer.Instance);
-        var pending = new Stack<ApiSchemaElement>();
-        pending.Push(rootElement);
-
-        while (pending.TryPop(out var apiSchemaElement))
-        {
-            if (!visited.Add(apiSchemaElement) ||
-                !apiSchemaElement.TryGetTopology(out _, out var firstChild))
-            {
-                continue;
-            }
-
-            var apiChild = firstChild;
-            while (apiChild is not null)
-            {
-                var apiNextSibling = apiChild.NextSibling;
-                pending.Push(apiChild);
-                apiChild = apiNextSibling;
-            }
-
-            apiSchemaElement.ClearTopology();
-        }
-    }
-    #endregion
 }

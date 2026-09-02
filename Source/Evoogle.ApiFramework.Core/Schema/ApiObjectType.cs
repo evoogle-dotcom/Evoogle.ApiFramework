@@ -3,6 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Collections.Frozen;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 
@@ -32,11 +33,11 @@ public sealed partial class ApiObjectType
 ) : ApiNamedType(apiName, clrObjectType)
 {
     #region ApiObjectType Fields
-    private Dictionary<string, ApiNamedKeyType>? _apiKeyTypeApiNameLookup = null;
-    private string[]? _apiKeyTypeApiNames = null;
+    private FrozenDictionary<string, ApiNamedKeyType>? _apiKeyTypeApiNameLookup = null;
+    private ImmutableArray<string> _apiKeyTypeApiNames = [];
 
-    private Dictionary<string, ApiProperty>? _apiPropertyApiNameLookup = null;
-    private Dictionary<string, ApiProperty>? _apiPropertyClrNameLookup = null;
+    private FrozenDictionary<string, ApiProperty>? _apiPropertyApiNameLookup = null;
+    private FrozenDictionary<string, ApiProperty>? _apiPropertyClrNameLookup = null;
 
     private ImmutableArray<ApiRelationshipEnd> _apiRelationshipEnds = [];
     private ImmutableArray<ApiRelationshipPrincipalEnd> _apiPrincipalRelationshipEnds = [];
@@ -68,15 +69,15 @@ public sealed partial class ApiObjectType
 
     /// <summary>
     ///     Gets the immutable snapshot of relationship ends where this object type participates.
-    ///     Populated during <see cref="ApiSchema"/> initialization. Returns an empty array before
-    ///     initialization completes.
+    ///     Populated during <see cref="ApiSchema"/> compilation. Returns an empty array before
+    ///     compilation completes.
     /// </summary>
     public ImmutableArray<ApiRelationshipEnd> ApiRelationshipEnds => _apiRelationshipEnds;
 
     /// <summary>
     ///     Gets the immutable snapshot of relationship ends where this object type acts as the
     ///     principal and provides the principal key type. Populated during <see cref="ApiSchema"/>
-    ///     initialization. Returns an empty array before initialization completes.
+    ///     compilation. Returns an empty array before compilation completes.
     /// </summary>
     public ImmutableArray<ApiRelationshipPrincipalEnd> ApiRelationshipPrincipalEnds =>
         _apiPrincipalRelationshipEnds;
@@ -84,22 +85,22 @@ public sealed partial class ApiObjectType
     /// <summary>
     ///     Gets the immutable snapshot of relationship ends where this object type acts as the
     ///     dependent and may provide a foreign key role binding. Populated during
-    ///     <see cref="ApiSchema"/> initialization. Returns an empty array before initialization.
+    ///     <see cref="ApiSchema"/> compilation. Returns an empty array before compilation.
     /// </summary>
     public ImmutableArray<ApiRelationshipDependentEnd> ApiRelationshipDependentEnds =>
         _apiDependentRelationshipEnds;
 
     /// <summary>
     ///     Gets the immutable snapshot of M:N associations where this object type acts as the join
-    ///     table. Populated during <see cref="ApiSchema"/> initialization. Returns an empty array
-    ///     before initialization completes.
+    ///     table. Populated during <see cref="ApiSchema"/> compilation. Returns an empty array
+    ///     before compilation completes.
     /// </summary>
     public ImmutableArray<ApiRelationshipAssociation> ApiRelationshipAssociations =>
         _apiRelationshipAssociations;
 
-    private Dictionary<string, ApiNamedKeyType> ApiKeyTypeApiNameLookup => this.ThrowIfNotInitialized(_apiKeyTypeApiNameLookup);
-    private Dictionary<string, ApiProperty> ApiPropertyApiNameLookup => this.ThrowIfNotInitialized(_apiPropertyApiNameLookup);
-    private Dictionary<string, ApiProperty> ApiPropertyClrNameLookup => this.ThrowIfNotInitialized(_apiPropertyClrNameLookup);
+    private FrozenDictionary<string, ApiNamedKeyType> ApiKeyTypeApiNameLookup => this.ThrowIfNotInitialized(_apiKeyTypeApiNameLookup);
+    private FrozenDictionary<string, ApiProperty> ApiPropertyApiNameLookup => this.ThrowIfNotInitialized(_apiPropertyApiNameLookup);
+    private FrozenDictionary<string, ApiProperty> ApiPropertyClrNameLookup => this.ThrowIfNotInitialized(_apiPropertyClrNameLookup);
     #endregion
 
     #region ApiObjectType Computed Properties
@@ -159,6 +160,7 @@ public sealed partial class ApiObjectType
     internal void InitializeKeyTypes(ApiInitializationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
+        this.ThrowIfFrozen();
 
         this.InitializeApiKeyTypes(context);
     }
@@ -199,19 +201,8 @@ public sealed partial class ApiObjectType
     #endregion
 
     #region ApiObjectType KeyType Methods
-    /// <summary>
-    ///     Gets the API names of all key types defined on this object type.
-    /// </summary>
-    /// <returns>An array of key type API names, or an empty array if no key types are defined.</returns>
-    public string[] GetKeyTypeApiNames()
-    {
-        if (!this.HasKeyTypes)
-        {
-            return [];
-        }
-
-        return _apiKeyTypeApiNames ??= [.. this.ApiKeyTypeApiNameLookup.Keys];
-    }
+    /// <summary>Gets the precomputed immutable API names of all key types in declaration order.</summary>
+    public ImmutableArray<string> ApiKeyTypeApiNames => _apiKeyTypeApiNames;
 
     /// <summary>
     ///     Checks if this object type has a specific key type by API name.
@@ -237,6 +228,7 @@ public sealed partial class ApiObjectType
         ImmutableArray<ApiRelationshipDependentEnd> dependentEnds
     )
     {
+        this.ThrowIfFrozen();
         _apiRelationshipEnds = ends.IsDefault ? [] : ends;
         _apiPrincipalRelationshipEnds = principalEnds.IsDefault ? [] : principalEnds;
         _apiDependentRelationshipEnds = dependentEnds.IsDefault ? [] : dependentEnds;
@@ -247,11 +239,13 @@ public sealed partial class ApiObjectType
         ImmutableArray<ApiRelationshipAssociation> associations
     )
     {
+        this.ThrowIfFrozen();
         _apiRelationshipAssociations = associations.IsDefault ? [] : associations;
     }
 
     internal void ClearRelationshipEnds()
     {
+        this.ThrowIfFrozen();
         _apiRelationshipEnds = [];
         _apiPrincipalRelationshipEnds = [];
         _apiDependentRelationshipEnds = [];
@@ -303,9 +297,7 @@ public sealed partial class ApiObjectType
     {
         // Initialize lookup dictionaries for lookup of:
         // - Property by API name and CLR name
-        _apiKeyTypeApiNameLookup = null;
-        _apiPropertyApiNameLookup = null;
-        _apiPropertyClrNameLookup = null;
+        _apiKeyTypeApiNames = [.. this.ApiKeyTypes.Select(keyType => keyType.ApiName)];
 
         ApiSchemaInitializationLookup.InitializeLookupDictionary
         (

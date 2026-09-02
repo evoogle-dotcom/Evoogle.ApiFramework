@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Text.Json;
 
 using Evoogle.ApiFramework.Exceptions;
+using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.ApiFramework.Schema.TestData;
 using Evoogle.NTree;
 using Evoogle.XUnit;
@@ -130,7 +131,7 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
 
         private ApiSchemaElement? SharedParent { get; set; }
 
-        private ApiInitializationResult? SecondResult { get; set; }
+        private ApiSchemaBuildResult? SecondResult { get; set; }
 
         private ApiSchema? SecondSchema { get; set; }
         #endregion
@@ -171,7 +172,7 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
                 this.SecondSchema = CreateSchema("Second", [sharedObjectType]);
             }
 
-            this.FirstSchema.Initialize().ThrowIfInvalid();
+            ApiSchemaCompiler.Compile(this.FirstSchema).ThrowIfInvalid();
             this.FirstElementsBefore =
                 [.. this.FirstSchema.SelfAndDescendants(TraversalStrategy.DepthFirst)];
             this.SharedParent = this.SharedElement!.Parent;
@@ -181,7 +182,7 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
 
         protected override void Act()
         {
-            this.SecondResult = this.SecondSchema!.Initialize();
+            this.SecondResult = ApiSchemaCompiler.Compile(this.SecondSchema!);
             this.FirstElementsAfter =
                 [.. this.FirstSchema!.SelfAndDescendants(TraversalStrategy.DepthFirst)];
         }
@@ -217,7 +218,7 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
         #region Calculated Properties
         private InlineSchemaFixture? Fixture { get; set; }
 
-        private ApiInitializationResult? Result { get; set; }
+        private ApiSchemaBuildResult? Result { get; set; }
         #endregion
 
         #region XUnitTest Methods
@@ -228,7 +229,7 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
 
         protected override void Act()
         {
-            this.Result = this.Fixture!.Schema.Initialize();
+            this.Result = ApiSchemaCompiler.Compile(this.Fixture!.Schema);
         }
 
         protected override void Assert()
@@ -466,10 +467,10 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
             var namedTypeSource = new List<ApiNamedType> { this.EnumType, this.ObjectType };
             this.Schema = CreateSchema("Immutable", namedTypeSource);
             namedTypeSource.Clear();
-            this.Schema.Initialize().ThrowIfInvalid();
+            ApiSchemaCompiler.Compile(this.Schema).ThrowIfInvalid();
 
             this.RelationshipSchema = CreateRelationshipSchema();
-            this.RelationshipSchema.Initialize().ThrowIfInvalid();
+            ApiSchemaCompiler.Compile(this.RelationshipSchema).ThrowIfInvalid();
             this.RelationshipObjectType = this.RelationshipSchema.ApiObjectTypes
                 .First(apiObjectType => apiObjectType.ApiRelationshipAssociations.Length > 0);
             this.RelationshipEndsBefore = this.RelationshipSchema.ApiObjectTypes
@@ -477,7 +478,6 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
                 .ApiRelationshipEnds;
             this.RelationshipAssociationsBefore =
                 this.RelationshipObjectType.ApiRelationshipAssociations;
-            this.RelationshipSchema.Initialize().ThrowIfInvalid();
         }
 
         protected override void Act()
@@ -515,11 +515,11 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
             relationshipObjectType.ApiRelationshipEnds.Should()
                 .Equal(this.RelationshipEndsBefore);
             relationshipObjectType.ApiRelationshipEnds.Equals(this.RelationshipEndsBefore)
-                .Should().BeFalse();
+                .Should().BeTrue();
             this.RelationshipObjectType!.ApiRelationshipAssociations.Should()
                 .Equal(this.RelationshipAssociationsBefore);
             this.RelationshipObjectType.ApiRelationshipAssociations
-                .Equals(this.RelationshipAssociationsBefore).Should().BeFalse();
+                .Equals(this.RelationshipAssociationsBefore).Should().BeTrue();
 
             var changedSegments = this.KeyPath.ApiSegments.SetItem
             (

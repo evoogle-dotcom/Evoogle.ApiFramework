@@ -23,7 +23,7 @@ namespace Evoogle.ApiFramework.Schema;
 ///     </para>
 ///     <para>
 ///         The <see cref="ClrRootType"/> property specifies the CLR type from which the navigation chain begins.
-///         During schema initialization this is resolved to an <see cref="ApiObjectType"/> via the containing
+///         During schema compilation this is resolved to an <see cref="ApiObjectType"/> via the containing
 ///         <see cref="ApiSchema"/>'s type registry, and the segment chain is validated against that root object type.
 ///     </para>
 /// </remarks>
@@ -55,7 +55,7 @@ public sealed class ApiKeyPath(Type clrRootType, IEnumerable<ApiKeyPathSegment> 
 
     /// <summary>
     ///     Gets the root <see cref="ApiObjectType"/> from which the segment chain begins.
-    ///     Available after initialization.
+    ///     Available after compilation.
     /// </summary>
     public ApiObjectType ApiRootObjectType => this.ThrowIfNotInitialized(_apiRootObjectType);
 

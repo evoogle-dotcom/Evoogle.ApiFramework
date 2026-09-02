@@ -39,7 +39,7 @@ public static class ApiObjectTypeExtensions
             return apiKeyType;
         }
 
-        var availableKeyTypesByApiName = string.Join(',', apiObjectType.GetKeyTypeApiNames().OrderBy(k => k));
+        var availableKeyTypesByApiName = string.Join(',', apiObjectType.ApiKeyTypeApiNames.OrderBy(k => k));
         var errorMessage =
             $"{nameof(ApiNamedKeyType)} with name '{apiName.SafeToString()}' not found in " +
             $"{apiObjectType.SafeToString()}. Available {nameof(ApiNamedKeyType)} names are: " +

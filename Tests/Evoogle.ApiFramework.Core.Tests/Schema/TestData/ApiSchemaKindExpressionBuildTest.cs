@@ -43,12 +43,10 @@ public class ApiSchemaKindExpressionBuildTest : ApiSchemaExpressionBuildTest
         var apiExtensionTypesList = apiExtensionTypes.SafeToList();
         if (apiExtensionTypesList.Count > 0)
         {
-            apiSchemaExpected.Extensions ??= [];
-
             foreach (var apiExtensionType in apiExtensionTypesList)
             {
                 var extensionInstance = Activator.CreateInstance(apiExtensionType);
-                apiSchemaExpected.Extensions[apiExtensionType] = extensionInstance!;
+                apiSchemaExpected.AttachExtension(apiExtensionType, extensionInstance!);
             }
         }
 

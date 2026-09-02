@@ -14,7 +14,7 @@ namespace Evoogle.ApiFramework.Schema;
 ///     Holds optional per-type configuration for an <see cref="ApiObjectType"/>, allowing options to be overridden on a type-by-type basis.
 /// </summary>
 [JsonConverter(typeof(ApiObjectTypeOptionsJsonConverter))]
-public record class ApiObjectTypeOptions
+public sealed record class ApiObjectTypeOptions
 {
     #region Properties
     /// <summary>

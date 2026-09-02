@@ -16,7 +16,7 @@ namespace Evoogle.ApiFramework.Schema;
 ///     Represents a single property navigation step within an <see cref="ApiKeyPath"/>.
 /// </summary>
 /// <remarks>
-///     Each segment holds a CLR property name and, after initialization, a reference to the resolved <see cref="ApiProperty"/>.
+///     Each segment holds a CLR property name and, after compilation, a reference to the resolved <see cref="ApiProperty"/>.
 ///     Segments do not validate whether the resolved property is scalar or object-typed — that responsibility belongs to the parent <see cref="ApiKeyPath"/>, which has positional context (navigation vs. terminal).
 /// </remarks>
 /// <param name="clrPropertyName">The CLR property name for this navigation step.</param>
@@ -39,10 +39,10 @@ public sealed class ApiKeyPathSegment(string clrPropertyName) : ApiSchemaElement
     /// <summary>Gets the CLR property name for this navigation step.</summary>
     public string ClrPropertyName { get; } = clrPropertyName;
 
-    /// <summary>Gets the resolved <see cref="ApiProperty"/> for this segment. Available after initialization.</summary>
+    /// <summary>Gets the resolved <see cref="ApiProperty"/> for this segment. Available after compilation.</summary>
     public ApiProperty ApiProperty => this.ThrowIfNotInitialized(_apiResolvedProperty);
 
-    /// <summary>Gets a value indicating whether the CLR property was successfully resolved during initialization.</summary>
+    /// <summary>Gets a value indicating whether the CLR property was successfully resolved during compilation.</summary>
     internal bool IsPropertyResolved => _apiResolvedProperty is not null;
     #endregion
 
@@ -92,8 +92,6 @@ public sealed class ApiKeyPathSegment(string clrPropertyName) : ApiSchemaElement
 
     private void InitializeApiProperty(ApiInitializationContext context)
     {
-        _apiResolvedProperty = null;
-
         if (ApiSchemaNameValidation.IsNameInvalid(this.ClrPropertyName))
         {
             return;

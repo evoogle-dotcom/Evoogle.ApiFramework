@@ -96,8 +96,6 @@ public sealed class ApiRelationshipAssociation : ApiRelationshipElement
     public ApiRelationshipAssociation(Type clrObjectType)
         : base(clrObjectType)
     {
-        _apiForeignKeyTypeA = null;
-        _apiForeignKeyTypeB = null;
     }
 
     /// <summary>

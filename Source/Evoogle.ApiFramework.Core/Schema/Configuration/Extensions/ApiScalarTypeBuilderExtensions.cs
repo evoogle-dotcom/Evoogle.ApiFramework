@@ -18,7 +18,7 @@ public static class ApiScalarTypeBuilderExtensions
     /// <param name="extension">The extension value.</param>
     /// <returns>The current builder instance.</returns>
     public static ApiScalarTypeBuilder AddScalarTypeExtension<TExtension>(this ApiScalarTypeBuilder builder, TExtension extension)
-        where TExtension : class
+        where TExtension : class, IApiSchemaExtension
     {
         ArgumentNullException.ThrowIfNull(builder);
 
@@ -34,7 +34,7 @@ public static class ApiScalarTypeBuilderExtensions
     /// <param name="extension">The extension value.</param>
     /// <returns>The current builder instance.</returns>
     public static ApiScalarTypeBuilder<TScalar> AddScalarTypeExtension<TScalar, TExtension>(this ApiScalarTypeBuilder<TScalar> builder, TExtension extension)
-        where TExtension : class
+        where TExtension : class, IApiSchemaExtension
     {
         ArgumentNullException.ThrowIfNull(builder);
 

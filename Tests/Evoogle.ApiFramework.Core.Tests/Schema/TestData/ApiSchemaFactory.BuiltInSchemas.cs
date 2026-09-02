@@ -39,47 +39,29 @@ public static partial class ApiSchemaFactory
 
     #region Built-In Schema Presets
     private static ApiScalarType S(string name, Type clr, OrderedDictionary<Type, object>? extensions = null)
-        => new(name, clr)
-        {
-            Extensions = extensions
-        };
+        => WithExtensions(new ApiScalarType(name, clr), extensions);
 
     private static ApiEnumType E(string name, Type clr, IEnumerable<ApiEnumValue> values, OrderedDictionary<Type, object>? extensions = null)
-        => new(name, values, clr)
-        {
-            Extensions = extensions
-        };
+        => WithExtensions(new ApiEnumType(name, values, clr), extensions);
 
     private static ApiEnumValue EV(string name, int ordinal, OrderedDictionary<Type, object>? extensions = null)
-        => new(name, name, ordinal)
-        {
-            Extensions = extensions
-        };
+        => WithExtensions(new ApiEnumValue(name, name, ordinal), extensions);
 
     private static ApiKeyPath KP(Type rootType, IEnumerable<ApiKeyPathSegment> segments, OrderedDictionary<Type, object>? extensions = null)
-         => new(rootType, segments)
-         {
-             Extensions = extensions
-         };
+         => WithExtensions(new ApiKeyPath(rootType, segments), extensions);
 
     private static ApiKeyPathSegment KPS(string propertyName, OrderedDictionary<Type, object>? extensions = null)
-         => new(propertyName)
-         {
-             Extensions = extensions
-         };
+         => WithExtensions(new ApiKeyPathSegment(propertyName), extensions);
 
     private static ApiKeyType KT(IEnumerable<ApiKeyPath> paths, OrderedDictionary<Type, object>? extensions = null)
-        => new(paths)
-        {
-            Extensions = extensions
-        };
+        => WithExtensions(new ApiKeyType(paths), extensions);
 
     private static ApiNamedKeyType KT
     (
         string name,
         IEnumerable<ApiKeyPath> paths,
         OrderedDictionary<Type, object>? extensions = null
-    ) => new(name, paths) { Extensions = extensions };
+    ) => WithExtensions(new ApiNamedKeyType(name, paths), extensions);
 
     private static ApiObjectType O
     (
@@ -90,10 +72,7 @@ public static partial class ApiSchemaFactory
         ApiObjectTypeOptions? options = null,
         OrderedDictionary<Type, object>? extensions = null
     )
-        => new(name, options, properties, keyTypes, clr)
-        {
-            Extensions = extensions
-        };
+        => WithExtensions(new ApiObjectType(name, options, properties, keyTypes, clr), extensions);
 
     private static ApiObjectTypeOptions OO(ApiKeyNullHandling keyNullHandling)
         => new()
@@ -102,10 +81,29 @@ public static partial class ApiSchemaFactory
         };
 
     private static ApiProperty P(string name, ApiTypeExpression expression, bool required, ClrMemberKind clrMemberKind = ClrMemberKind.Property, OrderedDictionary<Type, object>? extensions = null)
-        => new(name, expression, required ? ApiTypeModifiers.Required : ApiTypeModifiers.None, name, clrMemberKind)
+        => WithExtensions(
+            new ApiProperty(
+                name,
+                expression,
+                required ? ApiTypeModifiers.Required : ApiTypeModifiers.None,
+                name,
+                clrMemberKind),
+            extensions);
+
+    private static TElement WithExtensions<TElement>
+    (
+        TElement element,
+        OrderedDictionary<Type, object>? extensions
+    )
+        where TElement : ApiSchemaElement
+    {
+        if (extensions is not null)
         {
-            Extensions = extensions
-        };
+            element.AttachExtensions(extensions);
+        }
+
+        return element;
+    }
 
     // private static IDictionary<string, object?> Ext(IDictionary<string, object?> dict) => dict;
 
@@ -499,7 +497,7 @@ public static partial class ApiSchemaFactory
         };
 
         // 7) Assemble schema
-        var schema = ApiSchema.Create
+        var schema = CreateFrozenSchema
         (
             apiName: name,
             apiVersion: null,
@@ -657,7 +655,7 @@ public static partial class ApiSchemaFactory
             keyOwnedDependent
         };
 
-        var schema = ApiSchema.Create
+        var schema = CreateFrozenSchema
         (
             apiName: name,
             apiVersion: null,
@@ -948,7 +946,7 @@ public static partial class ApiSchemaFactory
             orderToOrderLineViaOwnerKeyPath, orgUnitToOrgUnit
         };
 
-        var schema = ApiSchema.Create
+        var schema = CreateFrozenSchema
         (
             apiName: name,
             apiVersion: null,
@@ -1062,7 +1060,7 @@ public static partial class ApiSchemaFactory
         };
 
         // 5) Assemble schema
-        var schema = ApiSchema.Create
+        var schema = CreateFrozenSchema
         (
             apiName: name,
             apiVersion: null,

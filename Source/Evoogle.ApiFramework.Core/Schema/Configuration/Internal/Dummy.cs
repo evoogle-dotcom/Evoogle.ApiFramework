@@ -304,10 +304,16 @@ internal static class Dummy
     /// <summary>
     ///     Represents a simple extension payload that controls visibility in the sample schema configuration.
     /// </summary>
-    public class VisibleMetadata
+    public sealed class VisibleMetadata : IApiSchemaExtension
     {
         /// <summary>Gets or sets a value indicating whether the target artifact should be visible.</summary>
         public bool IsVisible { get; set; }
+
+        /// <inheritdoc />
+        public IApiSchemaExtension CreateFrozenSnapshot() => new VisibleMetadata
+        {
+            IsVisible = this.IsVisible
+        };
     }
 
     /// <summary>

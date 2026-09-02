@@ -65,6 +65,11 @@ internal readonly record struct ApiKeyMaterializationValue
 ///     Provides context for materializing an <see cref="ApiKey"/> from CLR object instances
 ///     using <see cref="ApiKeyType.MaterializeKey(ApiKeyMaterializationContext)"/>.
 /// </summary>
+/// <remarks>
+///     This mutable context is request-scoped and is not safe for concurrent sharing. Each
+///     concurrent materialization operation must use its own context. Synchronizing the CLR object
+///     instances supplied to the context remains the caller's responsibility.
+/// </remarks>
 public sealed class ApiKeyMaterializationContext
 {
     #region Fields

@@ -174,7 +174,7 @@ internal static class ApiRelationshipKeyAlignment
         ApiObjectType principalObjectType
     )
     {
-        var availableKeyTypes = string.Join(", ", principalObjectType.GetKeyTypeApiNames().Select(static k => $"'{k}'"));
+        var availableKeyTypes = string.Join(", ", principalObjectType.ApiKeyTypeApiNames.Select(static k => $"'{k}'"));
         var remediation = !string.IsNullOrEmpty(availableKeyTypes)
             ? $"Use one of the available key types: {availableKeyTypes}"
             : $"Define a key type on '{principalObjectType.ApiName}' or remove {nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyTypeName)}";

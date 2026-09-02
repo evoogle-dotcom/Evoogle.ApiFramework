@@ -88,7 +88,7 @@ public sealed class ApiRelationshipPrincipalEndBuilder(Type clrObjectType) : Ext
         var extensions = this.BuildExtensions();
         if (extensions != null)
         {
-            end.Extensions = extensions;
+            end.AttachExtensions(extensions);
         }
 
         return end;

@@ -4,13 +4,16 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using Evoogle.Extensions;
+using Evoogle.ApiFramework.Schema;
 
 namespace Evoogle.ApiFramework.TestData;
 
 #region Extension Types
-public class GraphQlExtension
+public class GraphQlExtension : IApiSchemaExtension
 {
     public int Count { get; set; } = 42;
+
+    public IApiSchemaExtension CreateFrozenSnapshot() => new GraphQlExtension { Count = this.Count };
 
     public override string ToString()
     {
@@ -20,9 +23,11 @@ public class GraphQlExtension
     }
 }
 
-public class JsonApiExtension
+public class JsonApiExtension : IApiSchemaExtension
 {
     public string Website { get; set; } = "http://jsonapi.org";
+
+    public IApiSchemaExtension CreateFrozenSnapshot() => new JsonApiExtension { Website = this.Website };
 
     public override string ToString()
     {
@@ -32,9 +37,11 @@ public class JsonApiExtension
     }
 }
 
-public class ProtobufExtension
+public class ProtobufExtension : IApiSchemaExtension
 {
     public int Edition { get; set; } = 2024;
+
+    public IApiSchemaExtension CreateFrozenSnapshot() => new ProtobufExtension { Edition = this.Edition };
 
     public override string ToString()
     {
@@ -44,9 +51,11 @@ public class ProtobufExtension
     }
 }
 
-public class TestExtension
+public class TestExtension : IApiSchemaExtension
 {
     public bool Flag { get; set; } = true;
+
+    public IApiSchemaExtension CreateFrozenSnapshot() => new TestExtension { Flag = this.Flag };
 
     public override string ToString()
     {
@@ -56,9 +65,11 @@ public class TestExtension
     }
 }
 
-public class TestExtension1
+public class TestExtension1 : IApiSchemaExtension
 {
     public string Description { get; set; } = nameof(TestExtension1);
+
+    public IApiSchemaExtension CreateFrozenSnapshot() => new TestExtension1 { Description = this.Description };
 
     public override string ToString()
     {
@@ -68,10 +79,16 @@ public class TestExtension1
     }
 }
 
-public class TestExtension2
+public class TestExtension2 : IApiSchemaExtension
 {
     public string Id { get; set; } = "2";
     public string Name { get; set; } = nameof(TestExtension2);
+
+    public IApiSchemaExtension CreateFrozenSnapshot() => new TestExtension2
+    {
+        Id = this.Id,
+        Name = this.Name
+    };
 
     public override string ToString()
     {

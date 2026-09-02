@@ -71,7 +71,7 @@ public class ApiKeyPathSegmentBuilder : ExtensionBuilder<ApiKeyPathSegmentBuilde
         var extensions = this.BuildExtensions();
         if (extensions != null)
         {
-            segment.Extensions = extensions;
+            segment.AttachExtensions(extensions);
         }
 
         return segment;

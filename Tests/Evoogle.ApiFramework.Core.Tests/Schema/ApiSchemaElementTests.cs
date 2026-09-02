@@ -203,7 +203,7 @@ public class ApiSchemaElementTests(ITestOutputHelper output) : XUnitTests(output
 
         private ApiSchemaElement[]? Before { get; set; }
 
-        private ApiInitializationResult? Result { get; set; }
+        private Exception? Exception { get; set; }
 
         private ApiSchema? Schema { get; set; }
         #endregion
@@ -217,13 +217,21 @@ public class ApiSchemaElementTests(ITestOutputHelper output) : XUnitTests(output
 
         protected override void Act()
         {
-            this.Result = this.Schema!.Initialize();
-            this.After = [.. this.Schema.Root.SelfAndDescendants()];
+            try
+            {
+                ApiSchemaCompiler.Compile(this.Schema!);
+            }
+            catch (Exception exception)
+            {
+                this.Exception = exception;
+            }
+
+            this.After = [.. this.Schema!.Root.SelfAndDescendants()];
         }
 
         protected override void Assert()
         {
-            this.Result!.IsValid.Should().BeTrue();
+            this.Exception.Should().BeOfType<InvalidOperationException>();
             this.After.Should().Equal(this.Before!);
             AssertTopology(this.Schema!);
         }
@@ -297,7 +305,7 @@ public class ApiSchemaElementTests(ITestOutputHelper output) : XUnitTests(output
 
         private ApiSchemaElement? RootElement { get; set; }
 
-        private ApiInitializationResult? Result { get; set; }
+        private ApiSchemaBuildResult? Result { get; set; }
 
         private bool? WasTopologyBuilt { get; set; }
         #endregion
@@ -326,7 +334,7 @@ public class ApiSchemaElementTests(ITestOutputHelper output) : XUnitTests(output
 
                 this.ExpectedApiPath = schema.BuildDefaultPath(apiPreviousPath: null);
                 this.RootElement = schema;
-                this.Result = schema.Initialize();
+                this.Result = ApiSchemaCompiler.Compile(schema);
                 return;
             }
 
@@ -334,7 +342,7 @@ public class ApiSchemaElementTests(ITestOutputHelper output) : XUnitTests(output
             var session = new ApiInitializationSession
             (
                 sessionSchema,
-                sessionSchema.ApiSchemaContext
+                new ApiSchemaContext(sessionSchema)
             );
             var cyclicElement = new TopologyElement("Cycle");
             cyclicElement.SetChildren(cyclicElement);
@@ -342,7 +350,7 @@ public class ApiSchemaElementTests(ITestOutputHelper output) : XUnitTests(output
             this.ExpectedApiPath = sessionSchema.ApiPath;
             this.RootElement = cyclicElement;
             this.WasTopologyBuilt = ApiSchemaTreeBuilder.TryBuild(cyclicElement, session);
-            this.Result = new ApiInitializationResult(session.Issues);
+            this.Result = new ApiSchemaBuildResult(null, session.Issues);
         }
 
         protected override void Assert()
@@ -469,7 +477,7 @@ public class ApiSchemaElementTests(ITestOutputHelper output) : XUnitTests(output
         },
         new ReinitializeTest
         {
-            Name = "Repeated Initialization Rebuilds The Same Topology"
+            Name = "Second Compilation Is Rejected Without Changing Topology"
         },
         new JsonConverterOutputTest
         {
@@ -562,7 +570,7 @@ public class ApiSchemaElementTests(ITestOutputHelper output) : XUnitTests(output
             apiRelationships: []
         );
 
-        schema.Initialize().ThrowIfInvalid();
+        ApiSchemaCompiler.Compile(schema).ThrowIfInvalid();
         return schema;
     }
 

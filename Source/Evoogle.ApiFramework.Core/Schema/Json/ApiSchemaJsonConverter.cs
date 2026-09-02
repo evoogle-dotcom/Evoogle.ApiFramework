@@ -4,6 +4,8 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using System.Text.Json;
+
+using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.Json;
 
 using Microsoft.Extensions.Logging;
@@ -242,11 +244,11 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
         var extensions = readContext.ReadData.Extensions;
         AttachExtensions(apiSchema, extensions);
 
-        // Initialize the ApiSchema instance.
-        var result = apiSchema.Initialize();
+        // Compile and freeze the API schema instance before publishing it.
+        var result = ApiSchemaCompiler.Compile(apiSchema);
         result.ThrowIfInvalid();
 
-        return apiSchema;
+        return result.Schema;
     }
 
     /// <inheritdoc/>

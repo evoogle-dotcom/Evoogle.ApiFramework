@@ -23,7 +23,7 @@ public static class ApiRelationshipDependentEndBuilderGenericExtensions
     /// <param name="extension">The extension value.</param>
     /// <returns>The current builder instance.</returns>
     public static ApiRelationshipDependentEndBuilder AddRelationshipDependentEndExtension<TExtension>(this ApiRelationshipDependentEndBuilder builder, TExtension extension)
-        where TExtension : class
+        where TExtension : class, IApiSchemaExtension
     {
         ArgumentNullException.ThrowIfNull(builder);
 
@@ -43,7 +43,7 @@ public static class ApiRelationshipDependentEndBuilderGenericExtensions
         this ApiRelationshipDependentEndBuilder<TDependent> builder,
         TExtension extension
     )
-        where TExtension : class
+        where TExtension : class, IApiSchemaExtension
     {
         ArgumentNullException.ThrowIfNull(builder);
 

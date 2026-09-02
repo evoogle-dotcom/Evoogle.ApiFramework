@@ -142,8 +142,6 @@ public sealed class ApiTypeExpression
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        _apiResolvedType = null;
-
         // Try and resolve API type:
         // - Inline API type
         // - API named reference

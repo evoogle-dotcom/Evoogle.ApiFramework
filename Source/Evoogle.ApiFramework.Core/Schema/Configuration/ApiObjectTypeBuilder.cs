@@ -140,7 +140,7 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
         var extensions = this.BuildExtensions();
         if (extensions != null)
         {
-            apiObjectType.Extensions = extensions;
+            apiObjectType.AttachExtensions(extensions);
         }
 
         return apiObjectType;

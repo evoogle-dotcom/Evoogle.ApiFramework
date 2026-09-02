@@ -366,7 +366,7 @@ public class ApiInitializationContextTests(ITestOutputHelper output) : XUnitTest
             apiRelationships: []
         );
 
-        schema.Initialize().ThrowIfInvalid();
+        ApiSchemaCompiler.Compile(schema).ThrowIfInvalid();
         return schema;
     }
 

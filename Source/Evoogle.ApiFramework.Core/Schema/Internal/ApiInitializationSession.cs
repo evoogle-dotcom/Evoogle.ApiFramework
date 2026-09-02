@@ -42,14 +42,10 @@ internal sealed class ApiInitializationSession
     }
 
     internal ApiInitializationSession(ApiSchema apiSchema, ILogger logger)
+        : this(apiSchema, new ApiSchemaContext(apiSchema, logger))
     {
-        ArgumentNullException.ThrowIfNull(apiSchema);
-        ArgumentNullException.ThrowIfNull(logger);
-
-        this.ApiSchema = apiSchema;
-        this.ApiSchemaContext = apiSchema.ApiSchemaContext;
-        this.Logger = logger;
     }
+
     #endregion
 
     #region Methods
@@ -65,6 +61,13 @@ internal sealed class ApiInitializationSession
         var issue = new ApiInitializationIssue(apiPath, severity, code, description, remediation);
         _issues.Add(issue);
 
+        this.LogIssue(issue);
+    }
+
+    public void AddIssue(ApiInitializationIssue issue)
+    {
+        ArgumentNullException.ThrowIfNull(issue);
+        _issues.Add(issue);
         this.LogIssue(issue);
     }
 

@@ -19,7 +19,7 @@ public static class ApiRelationshipManyToManyBuilderExtensions
     /// <param name="extension">The extension value.</param>
     /// <returns>The current builder instance.</returns>
     public static ApiRelationshipManyToManyBuilder AddRelationshipExtension<TExtension>(this ApiRelationshipManyToManyBuilder builder, TExtension extension)
-        where TExtension : class
+        where TExtension : class, IApiSchemaExtension
     {
         ArgumentNullException.ThrowIfNull(builder);
 

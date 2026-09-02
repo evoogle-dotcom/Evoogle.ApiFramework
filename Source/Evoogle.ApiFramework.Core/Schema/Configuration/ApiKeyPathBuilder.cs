@@ -181,7 +181,7 @@ public class ApiKeyPathBuilder : ExtensionBuilder<ApiKeyPathBuilder>
         var extensions = this.BuildExtensions();
         if (extensions != null)
         {
-            path.Extensions = extensions;
+            path.AttachExtensions(extensions);
         }
 
         return path;

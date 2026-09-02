@@ -121,22 +121,19 @@ public class ApiScalarTypeBuilderTests(ITestOutputHelper output) : XUnitTests(ou
 
     #region Theory Data
     private static ApiScalarType Int64Type { get; } = new ApiScalarType("number", typeof(long));
-    private static ApiScalarType Int64TypeWithExtension { get; } = new ApiScalarType("number", typeof(long))
-    {
-        Extensions = new OrderedDictionary<Type, object>
-        {
-            [typeof(TestExtension)] = new TestExtension()
-        }
-    };
+    private static ApiScalarType Int64TypeWithExtension { get; } =
+        CreateScalarTypeWithExtension("number", typeof(long));
 
     private static ApiScalarType StringType { get; } = new ApiScalarType("text", typeof(string));
-    private static ApiScalarType StringTypeWithExtension { get; } = new ApiScalarType("text", typeof(string))
+    private static ApiScalarType StringTypeWithExtension { get; } =
+        CreateScalarTypeWithExtension("text", typeof(string));
+
+    private static ApiScalarType CreateScalarTypeWithExtension(string apiName, Type clrType)
     {
-        Extensions = new OrderedDictionary<Type, object>
-        {
-            [typeof(TestExtension)] = new TestExtension()
-        }
-    };
+        var scalarType = new ApiScalarType(apiName, clrType);
+        scalarType.AttachExtension(typeof(TestExtension), new TestExtension());
+        return scalarType;
+    }
 
     public static TheoryDataRow<IXUnitTest>[] BuildTheoryData =>
     [

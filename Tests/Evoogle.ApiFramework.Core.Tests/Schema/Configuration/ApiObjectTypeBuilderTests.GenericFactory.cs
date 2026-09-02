@@ -37,7 +37,7 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
     }
 
     public static ApiObjectType BuildFromSimpleApiSchemaTheEmptyType<TExtension>()
-        where TExtension : class, new()
+        where TExtension : class, IApiSchemaExtension, new()
     {
         var ctx = new ApiSchemaBuilderContext();
         var builder = CreateFromSimpleApiSchemaTheEmptyTypeBuilder(ctx)
@@ -47,8 +47,8 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
     }
 
     public static ApiObjectType BuildFromSimpleApiSchemaTheEmptyType<TExtension1, TExtension2>()
-        where TExtension1 : class, new()
-        where TExtension2 : class, new()
+        where TExtension1 : class, IApiSchemaExtension, new()
+        where TExtension2 : class, IApiSchemaExtension, new()
     {
         var ctx = new ApiSchemaBuilderContext();
         var builder = CreateFromSimpleApiSchemaTheEmptyTypeBuilder(ctx)
@@ -67,7 +67,7 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
     }
 
     public static ApiObjectType BuildFromSimpleApiSchemaTheScalarsOnlyType<TExtension>()
-        where TExtension : class, new()
+        where TExtension : class, IApiSchemaExtension, new()
     {
         var ctx = new ApiSchemaBuilderContext();
         var builder = CreateFromSimpleApiSchemaTheScalarsOnlyTypeBuilder(ctx)
@@ -77,8 +77,8 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
     }
 
     public static ApiObjectType BuildFromSimpleApiSchemaTheScalarsOnlyType<TExtension1, TExtension2>()
-        where TExtension1 : class, new()
-        where TExtension2 : class, new()
+        where TExtension1 : class, IApiSchemaExtension, new()
+        where TExtension2 : class, IApiSchemaExtension, new()
     {
         var ctx = new ApiSchemaBuilderContext();
         var builder = CreateFromSimpleApiSchemaTheScalarsOnlyTypeBuilder(ctx)
@@ -113,7 +113,7 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
     }
 
     public static ApiObjectType BuildFromSimpleApiSchemaTheCompanyType<TExtension>()
-        where TExtension : class, new()
+        where TExtension : class, IApiSchemaExtension, new()
     {
         var ctx = new ApiSchemaBuilderContext();
         var builder = CreateFromSimpleApiSchemaTheCompanyTypeBuilder(ctx)
@@ -123,8 +123,8 @@ public static class ApiObjectTypeBuilderTestsGenericTestFactory
     }
 
     public static ApiObjectType BuildFromSimpleApiSchemaTheCompanyType<TExtension1, TExtension2>()
-        where TExtension1 : class, new()
-        where TExtension2 : class, new()
+        where TExtension1 : class, IApiSchemaExtension, new()
+        where TExtension2 : class, IApiSchemaExtension, new()
     {
         var ctx = new ApiSchemaBuilderContext();
         var builder = CreateFromSimpleApiSchemaTheCompanyTypeBuilder(ctx)
