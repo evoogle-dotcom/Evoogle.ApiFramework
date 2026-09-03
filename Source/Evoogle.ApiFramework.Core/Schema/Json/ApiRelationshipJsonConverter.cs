@@ -5,6 +5,7 @@
 // See the LICENSE file in the project root for more information.
 using System.Text.Json;
 
+using Evoogle.ApiFramework.Schema.Json.Internal;
 using Evoogle.Json;
 
 using Microsoft.Extensions.Logging;
@@ -79,7 +80,7 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
     {
         public ApiRelationshipKind? ApiKind { get; set; }
         public string? ApiName { get; set; }
-        public ApiRelationshipDeleteBehavior? ApiDeleteBehavior { get; set; }
+        public JsonEnumReadState<ApiRelationshipDeleteBehavior>? ApiDeleteBehavior { get; set; }
     }
 
     private class ApiRelationshipOneToReadData
@@ -120,7 +121,12 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
         private static void HandleApiKind(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
             context.ReadData.ApiRelationship ??= new ApiRelationshipReadData();
-            context.ReadData.ApiRelationship.ApiKind = _kindConverter.Read(ref reader, typeof(ApiRelationshipKind), context.Options);
+            context.ReadData.ApiRelationship.ApiKind = _nullableKindJsonConverter.Read
+            (
+                ref reader,
+                typeof(ApiRelationshipKind?),
+                context.Options
+            );
         }
 
         private static void HandleApiName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
@@ -132,7 +138,9 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
         private static void HandleApiDeleteBehavior(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
             context.ReadData.ApiRelationship ??= new ApiRelationshipReadData();
-            context.ReadData.ApiRelationship.ApiDeleteBehavior = _deleteBehaviorConverter.Read(ref reader, typeof(ApiRelationshipDeleteBehavior), context.Options);
+            var readData = context.ReadData.ApiRelationship;
+            readData.ApiDeleteBehavior ??= new JsonEnumReadState<ApiRelationshipDeleteBehavior>();
+            readData.ApiDeleteBehavior.Read(ref reader, context.Options, _nullableDeleteBehaviorJsonConverter);
         }
 
         private static void HandleApiPrincipalEnd(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
@@ -175,6 +183,10 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
     #region Fields
     private static readonly EnumJsonConverter<ApiRelationshipKind> _kindConverter = new();
     private static readonly EnumJsonConverter<ApiRelationshipDeleteBehavior> _deleteBehaviorConverter = new();
+    private static readonly NullableEnumJsonConverter<ApiRelationshipKind> _nullableKindJsonConverter =
+        new(EnumJsonInvalidValuePolicy.Throw);
+    private static readonly NullableEnumJsonConverter<ApiRelationshipDeleteBehavior> _nullableDeleteBehaviorJsonConverter =
+        new(EnumJsonInvalidValuePolicy.ReturnNull);
     #endregion
 
     #region Constructors
@@ -206,46 +218,43 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
         var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
         var readState = readContext.ReadData;
 
-        if (readState.ApiRelationship?.ApiKind is null)
-        {
-            return null;
-        }
-
-        var apiKindValue = readState.ApiRelationship.ApiKind.Value;
-        ApiRelationship? relationship = apiKindValue switch
+        var apiRelationshipReadData = readState.ApiRelationship;
+        var apiKind = apiRelationshipReadData?.ApiKind
+            ?? throw new JsonException($"Missing {nameof(ApiRelationship.ApiKind)} enumeration value.");
+        var apiDeleteBehaviorReadState = apiRelationshipReadData.ApiDeleteBehavior;
+        ApiRelationship relationship = apiKind switch
         {
             ApiRelationshipKind.OneToOne => new ApiRelationshipOneToOne
             (
-                readState.ApiRelationship.ApiName!,
+                apiRelationshipReadData.ApiName!,
                 readState.ApiRelationshipOneTo?.ApiPrincipalEnd!,
                 readState.ApiRelationshipOneTo?.ApiDependentEnd!,
-                readState.ApiRelationship?.ApiDeleteBehavior ?? ApiRelationshipOneToOne.DefaultDeleteBehavior
+                apiDeleteBehaviorReadState?.Value ?? ApiRelationshipOneToOne.DefaultDeleteBehavior
             ),
 
             ApiRelationshipKind.OneToMany => new ApiRelationshipOneToMany
             (
-                readState.ApiRelationship.ApiName!,
+                apiRelationshipReadData.ApiName!,
                 readState.ApiRelationshipOneTo?.ApiPrincipalEnd!,
                 readState.ApiRelationshipOneTo?.ApiDependentEnd!,
-                readState.ApiRelationship?.ApiDeleteBehavior ?? ApiRelationshipOneToMany.DefaultDeleteBehavior
+                apiDeleteBehaviorReadState?.Value ?? ApiRelationshipOneToMany.DefaultDeleteBehavior
             ),
 
             ApiRelationshipKind.ManyToMany => new ApiRelationshipManyToMany
             (
-                readState.ApiRelationship?.ApiName!,
+                apiRelationshipReadData.ApiName!,
                 readState.ApiRelationshipManyToMany?.ApiPrincipalEndA!,
                 readState.ApiRelationshipManyToMany?.ApiPrincipalEndB!,
                 readState.ApiRelationshipManyToMany?.ApiAssociation!,
-                readState.ApiRelationship?.ApiDeleteBehavior ?? ApiRelationshipManyToMany.DefaultDeleteBehavior
+                apiDeleteBehaviorReadState?.Value ?? ApiRelationshipManyToMany.DefaultDeleteBehavior
             ),
 
-            _ => null
+            _ => throw new JsonException($"Unsupported {nameof(ApiRelationshipKind)} enumeration value: '{apiKind}'.")
         };
 
-        if (relationship is null)
+        if (apiDeleteBehaviorReadState?.IsInvalid == true || apiDeleteBehaviorReadState?.IsNull == true)
         {
-            readContext.Logger.LogError("Unsupported {ApiKind} enumeration value: '{ApiKindValue}'", nameof(ApiRelationshipKind), apiKindValue);
-            return null;
+            relationship.MarkInvalidApiDeleteBehavior();
         }
 
         AttachExtensions(relationship, readContext.ReadData.Extensions);
@@ -256,7 +265,14 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
     protected override void ReadCore(ref Utf8JsonReader reader, IReadContext context)
     {
         var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
-        ReadJsonObject(ref reader, readContext, readContext.ReadHandlers.PropertyHandlers);
+        ReadJsonObject
+        (
+            ref reader,
+            readContext,
+            readContext.ReadHandlers.PropertyHandlers,
+            readContext.PropertyNames.ApiRelationship.ApiKind,
+            readContext.PropertyNames.ApiRelationship.ApiDeleteBehavior
+        );
     }
 
     /// <inheritdoc/>

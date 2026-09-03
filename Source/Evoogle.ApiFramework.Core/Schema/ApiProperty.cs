@@ -78,6 +78,8 @@ public sealed partial class ApiProperty : ApiSchemaElement
     #region ApiProperty Fields
     private readonly ClrMemberKind? _clrMemberKind;
 
+    private bool _hasInvalidApiTypeModifiers;
+
     private Func<object, ApiSchemaContext, object?>? _clrGetter;
 
     private Action<object, ApiSchemaContext, object?>? _clrSetter;
@@ -169,6 +171,8 @@ public sealed partial class ApiProperty : ApiSchemaElement
 
     internal ApiTypeExpression ApiTypeExpression { get; }
 
+    internal void MarkInvalidApiTypeModifiers() => _hasInvalidApiTypeModifiers = true;
+
     private static MethodInfo GenericCoerceMethodDefinition => _genericCoerceMethodDefinition
         ?? throw new ApiSchemaException($"Failed to locate generic method definition for {nameof(TypeCoercion)}.{nameof(TypeCoercion.Coerce)}.");
 
@@ -223,10 +227,11 @@ public sealed partial class ApiProperty : ApiSchemaElement
         base.InitializeCore(context);
 
         this.InitializeApiName(context);
+        this.InitializeApiTypeModifiers(context);
         this.InitializeApiTypeExpression(context);
         this.InitializeClrName(context);
 
-        if (this.InitializeClrMemberKind(context))
+        if (this.InitializeClrMemberKind(context) && this.ApiTypeExpression?.IsResolved == true)
         {
             this.InitializeClrGetterAndSetter(context);
         }
@@ -244,6 +249,21 @@ public sealed partial class ApiProperty : ApiSchemaElement
 
             context.AddIssue(severity, code, description, remediation);
         }
+    }
+
+    private void InitializeApiTypeModifiers(ApiInitializationContext context)
+    {
+        if (!_hasInvalidApiTypeModifiers)
+        {
+            return;
+        }
+
+        var severity = ApiInitializationSeverity.Error;
+        var code = ApiInitializationCode.ApiPropertyInvalidApiTypeModifiers;
+        var description = $"{nameof(this.ApiTypeModifiers)} must be a valid {nameof(this.ApiTypeModifiers)} value";
+        var remediation = $"Specify a valid {nameof(this.ApiTypeModifiers)} value";
+
+        context.AddIssue(severity, code, description, remediation);
     }
 
     private void InitializeApiTypeExpression(ApiInitializationContext context)

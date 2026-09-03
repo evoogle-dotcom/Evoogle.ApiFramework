@@ -4,6 +4,8 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using System.Text.Json;
+
+using Evoogle.ApiFramework.Schema.Json.Internal;
 using Evoogle.Json;
 
 using Microsoft.Extensions.Logging;
@@ -63,7 +65,7 @@ public class ApiTypeExpressionJsonConverter(ILogger<ApiTypeExpressionJsonConvert
     {
         #region Properties
         public ApiType? ApiInlineType { get; set; }
-        public ApiTypeKind? ApiKind { get; set; }
+        public JsonEnumReadState<ApiTypeKind>? ApiKind { get; set; }
         public string? ApiName { get; set; }
         public Type? ClrType { get; set; }
         #endregion
@@ -106,8 +108,9 @@ public class ApiTypeExpressionJsonConverter(ILogger<ApiTypeExpressionJsonConvert
         {
             context.ReadData.ApiTypeExpression ??= new ApiTypeExpressionReadData();
 
-            var options = context.Options;
-            context.ReadData.ApiTypeExpression.ApiKind = _apiTypeKindJsonConverter.Read(ref reader, typeof(ApiTypeKind), options);
+            var readData = context.ReadData.ApiTypeExpression;
+            readData.ApiKind ??= new JsonEnumReadState<ApiTypeKind>();
+            readData.ApiKind.Read(ref reader, context.Options, _nullableApiTypeKindJsonConverter);
         }
 
         private static void HandleApiTypeExpressionApiName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
@@ -129,6 +132,8 @@ public class ApiTypeExpressionJsonConverter(ILogger<ApiTypeExpressionJsonConvert
 
     #region Fields
     private static readonly EnumJsonConverter<ApiTypeKind> _apiTypeKindJsonConverter = new();
+    private static readonly NullableEnumJsonConverter<ApiTypeKind> _nullableApiTypeKindJsonConverter =
+        new(EnumJsonInvalidValuePolicy.ReturnNull);
 
     private static readonly TypeJsonConverter _typeJsonConverter = new();
     #endregion
@@ -166,18 +171,31 @@ public class ApiTypeExpressionJsonConverter(ILogger<ApiTypeExpressionJsonConvert
     {
         var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
         var readState = readContext.ReadData.ApiTypeExpression;
+        var apiKindReadState = readState?.ApiKind;
 
         var apiInlineType = readState?.ApiInlineType;
         if (apiInlineType is not null)
         {
-            return new ApiTypeExpression(apiInlineType);
+            var apiTypeExpression = new ApiTypeExpression(apiInlineType);
+            if (apiKindReadState?.IsInvalid == true)
+            {
+                apiTypeExpression.MarkInvalidApiKind();
+            }
+
+            return apiTypeExpression;
         }
 
-        var apiKind = readState?.ApiKind;
+        var apiKind = apiKindReadState?.Value;
         var apiName = readState?.ApiName;
         var clrType = readState?.ClrType;
 
-        return new ApiTypeExpression(apiKind, apiName, clrType);
+        var apiTypeExpressionForReference = new ApiTypeExpression(apiKind, apiName, clrType);
+        if (apiKindReadState?.IsInvalid == true)
+        {
+            apiTypeExpressionForReference.MarkInvalidApiKind();
+        }
+
+        return apiTypeExpressionForReference;
     }
 
     /// <inheritdoc/>
@@ -186,7 +204,13 @@ public class ApiTypeExpressionJsonConverter(ILogger<ApiTypeExpressionJsonConvert
         var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
         var handlers = readContext.ReadHandlers.PropertyHandlers;
 
-        ReadJsonObject(ref reader, readContext, handlers);
+        ReadJsonObject
+        (
+            ref reader,
+            readContext,
+            handlers,
+            readContext.PropertyNames.ApiTypeExpression.ApiKind
+        );
     }
 
     /// <inheritdoc/>

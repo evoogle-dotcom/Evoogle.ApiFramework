@@ -22,6 +22,10 @@ namespace Evoogle.ApiFramework.Schema;
 [JsonConverter(typeof(ApiRelationshipJsonConverter))]
 public abstract class ApiRelationship : ApiSchemaElement
 {
+    #region Fields
+    private bool _hasInvalidApiDeleteBehavior;
+    #endregion
+
     #region ApiSchemaElement Properties
     /// <inheritdoc/>
     public override sealed ApiSchemaElementKind Kind => this.ApiKind switch
@@ -50,6 +54,8 @@ public abstract class ApiRelationship : ApiSchemaElement
     ///     </list>
     /// </summary>
     public ApiRelationshipDeleteBehavior ApiDeleteBehavior { get; }
+
+    internal void MarkInvalidApiDeleteBehavior() => _hasInvalidApiDeleteBehavior = true;
     #endregion
 
     #region Constructors
@@ -77,6 +83,7 @@ public abstract class ApiRelationship : ApiSchemaElement
         base.InitializeCore(context);
 
         this.InitializeApiName(context);
+        this.InitializeApiDeleteBehavior(context);
     }
     #endregion
 
@@ -93,6 +100,21 @@ public abstract class ApiRelationship : ApiSchemaElement
 
             context.AddIssue(severity, code, description, remediation);
         }
+    }
+
+    private void InitializeApiDeleteBehavior(ApiInitializationContext context)
+    {
+        if (!_hasInvalidApiDeleteBehavior)
+        {
+            return;
+        }
+
+        var severity = ApiInitializationSeverity.Error;
+        var code = ApiInitializationCode.ApiRelationshipInvalidApiDeleteBehavior;
+        var description = $"{nameof(this.ApiDeleteBehavior)} must be a valid {nameof(ApiRelationshipDeleteBehavior)} value";
+        var remediation = $"Specify a valid {nameof(this.ApiDeleteBehavior)} value";
+
+        context.AddIssue(severity, code, description, remediation);
     }
     #endregion
 }

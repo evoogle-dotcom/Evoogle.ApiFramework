@@ -69,7 +69,12 @@ metadata means building a separate schema and atomically exchanging the applicat
 Root JSON deserialization follows the same compiler path. Warning-only JSON remains deserializable,
 although `JsonSerializer` does not return the warnings.
 
-This aggregation applies to schema validity problems such as duplicate API names, unresolved CLR types, invalid key paths, missing properties, invalid relationship definitions, and other whole-schema consistency issues. Malformed JSON or incompatible JSON token shapes may still be rejected by the JSON serializer before schema compilation runs.
+This aggregation applies to schema validity problems such as duplicate API names, unresolved CLR
+types, invalid key paths, missing properties, invalid relationship definitions, and other
+whole-schema consistency issues. Malformed JSON or incompatible JSON token shapes may still be
+rejected by the JSON serializer before schema compilation runs. The [enum handling policy for JSON
+deserialization](docs/EnumJsonDeserializationPolicy.md) defines which well-formed enum errors are
+reported during compilation and which remain JSON parsing errors.
 
 Schema-element traversal diagnostics use fully qualified paths. Every schema-element path begins
 with the schema, such as `ApiSchema["Store"].ApiObjectType["Order"]`, and continues through the

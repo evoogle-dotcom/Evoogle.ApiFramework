@@ -34,6 +34,12 @@ public enum ApiInitializationCode
     ApiCollectionTypeUnresolvedItemType,
 
     /// <summary>
+    ///     The collection type's item type modifiers could not be read from schema JSON.
+    /// </summary>
+    [EnumMember(Value = "API_COLLECTION_TYPE_INVALID_API_ITEM_TYPE_MODIFIERS")]
+    ApiCollectionTypeInvalidApiItemTypeModifiers,
+
+    /// <summary>
     ///     The collection item is declared Required but the CLR element type is nullable.
     ///     The API contract demands a value, but the CLR element type permits null.
     /// </summary>
@@ -182,6 +188,12 @@ public enum ApiInitializationCode
     /// </summary>
     [EnumMember(Value = "API_OBJECT_TYPE_NULL_OR_EMPTY_PROPERTIES")]
     ApiObjectTypeNullOrEmptyProperties,
+
+    /// <summary>
+    ///     The object type's key null-handling option could not be read from schema JSON.
+    /// </summary>
+    [EnumMember(Value = "API_OBJECT_TYPE_INVALID_API_KEY_NULL_HANDLING")]
+    ApiObjectTypeInvalidApiKeyNullHandling,
     #endregion
 
     #region ApiProperty Initialization Codes
@@ -202,6 +214,12 @@ public enum ApiInitializationCode
     /// </summary>
     [EnumMember(Value = "API_PROPERTY_INVALID_CLR_MEMBER")]
     ApiPropertyInvalidClrMember,
+
+    /// <summary>
+    ///     The property's type modifiers could not be read from schema JSON.
+    /// </summary>
+    [EnumMember(Value = "API_PROPERTY_INVALID_API_TYPE_MODIFIERS")]
+    ApiPropertyInvalidApiTypeModifiers,
 
     /// <summary>
     ///     The property's field getter could not be created or is invalid.
@@ -266,6 +284,12 @@ public enum ApiInitializationCode
     /// </summary>
     [EnumMember(Value = "API_RELATIONSHIP_INVALID_API_NAME")]
     ApiRelationshipInvalidApiName,
+
+    /// <summary>
+    ///     The relationship's delete behavior could not be read from schema JSON.
+    /// </summary>
+    [EnumMember(Value = "API_RELATIONSHIP_INVALID_API_DELETE_BEHAVIOR")]
+    ApiRelationshipInvalidApiDeleteBehavior,
 
     /// <summary>
     ///     The relationship's principal end is null.
@@ -444,6 +468,12 @@ public enum ApiInitializationCode
     ApiSchemaInvalidName,
 
     /// <summary>
+    ///     The schema's key null-handling option could not be read from schema JSON.
+    /// </summary>
+    [EnumMember(Value = "API_SCHEMA_INVALID_API_KEY_NULL_HANDLING")]
+    ApiSchemaInvalidApiKeyNullHandling,
+
+    /// <summary>
     ///     An attached schema extension does not implement the frozen snapshot contract.
     /// </summary>
     [EnumMember(Value = "API_SCHEMA_EXTENSION_UNSUPPORTED")]
@@ -460,6 +490,14 @@ public enum ApiInitializationCode
     /// </summary>
     [EnumMember(Value = "API_SCHEMA_EXTENSION_INVALID_SNAPSHOT")]
     ApiSchemaExtensionInvalidSnapshot,
+    #endregion
+
+    #region ApiTypeExpression Initialization Codes
+    /// <summary>
+    ///     A type expression's API kind could not be read from schema JSON.
+    /// </summary>
+    [EnumMember(Value = "API_TYPE_EXPRESSION_INVALID_API_KIND")]
+    ApiTypeExpressionInvalidApiKind,
     #endregion
 
     #region ApiType Initialization Codes

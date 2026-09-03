@@ -29,6 +29,8 @@ public sealed record class ApiSchemaOptions
     ///     Defaults to <see cref="ApiKeyNullHandling.UseDefaultOnNull"/>.
     /// </summary>
     public ApiKeyNullHandling ApiKeyNullHandling { get; init; } = ApiKeyNullHandling.UseDefaultOnNull;
+
+    internal bool HasInvalidApiKeyNullHandling { get; init; }
     #endregion
 
     #region Object Methods

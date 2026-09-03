@@ -24,6 +24,10 @@ public sealed class ApiCollectionType
     Type clrCollectionType
 ) : ApiType(clrCollectionType)
 {
+    #region Fields
+    private bool _hasInvalidApiItemTypeModifiers;
+    #endregion
+
     #region ApiSchemaElement Properties
     /// <inheritdoc/>
     protected override string ApiElementName => nameof(ApiCollectionType);
@@ -44,6 +48,8 @@ public sealed class ApiCollectionType
     public ApiTypeModifiers ApiItemTypeModifiers { get; } = apiItemTypeModifiers;
 
     internal ApiTypeExpression ApiItemTypeExpression { get; } = apiItemTypeExpression;
+
+    internal void MarkInvalidApiItemTypeModifiers() => _hasInvalidApiItemTypeModifiers = true;
     #endregion
 
     #region ApiCollectionType Computed Properties
@@ -90,6 +96,7 @@ public sealed class ApiCollectionType
 
         base.InitializeCore(context);
 
+        this.InitializeApiItemTypeModifiers(context);
         this.InitializeApiItemTypeExpression(context);
     }
     #endregion
@@ -109,6 +116,21 @@ public sealed class ApiCollectionType
         }
 
         this.ApiItemTypeExpression.InitializeForCollection(context);
+    }
+
+    private void InitializeApiItemTypeModifiers(ApiInitializationContext context)
+    {
+        if (!_hasInvalidApiItemTypeModifiers)
+        {
+            return;
+        }
+
+        var severity = ApiInitializationSeverity.Error;
+        var code = ApiInitializationCode.ApiCollectionTypeInvalidApiItemTypeModifiers;
+        var description = $"{nameof(this.ApiItemTypeModifiers)} must be a valid {nameof(ApiTypeModifiers)} value";
+        var remediation = $"Specify a valid {nameof(this.ApiItemTypeModifiers)} value";
+
+        context.AddIssue(severity, code, description, remediation);
     }
     #endregion
 }

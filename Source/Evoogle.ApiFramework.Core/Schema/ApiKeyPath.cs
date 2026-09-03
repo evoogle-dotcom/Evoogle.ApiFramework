@@ -182,6 +182,12 @@ public sealed class ApiKeyPath(Type clrRootType, IEnumerable<ApiKeyPathSegment> 
 
             var apiProperty = segment.ApiProperty;
 
+            if (!apiProperty.IsResolved)
+            {
+                // The property's type expression already reported an initialization issue.
+                return;
+            }
+
             if (isLast)
             {
                 if (apiProperty.ApiType is not ApiScalarType)

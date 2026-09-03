@@ -149,6 +149,7 @@ public sealed partial class ApiObjectType
 
         base.InitializeCore(context);
 
+        this.InitializeApiOptions(context);
         this.InitializeLookupDictionaries(context);
         this.InitializeApiProperties(context);
     }
@@ -221,6 +222,21 @@ public sealed partial class ApiObjectType
     #endregion
 
     #region Implementation Methods
+    private void InitializeApiOptions(ApiInitializationContext context)
+    {
+        if (this.ApiOptions?.HasInvalidApiKeyNullHandling != true)
+        {
+            return;
+        }
+
+        var severity = ApiInitializationSeverity.Error;
+        var code = ApiInitializationCode.ApiObjectTypeInvalidApiKeyNullHandling;
+        var description = $"{nameof(this.ApiOptions)}.{nameof(ApiObjectTypeOptions.ApiKeyNullHandling)} must be a valid {nameof(ApiKeyNullHandling)} value";
+        var remediation = $"Specify a valid {nameof(ApiObjectTypeOptions.ApiKeyNullHandling)} value";
+
+        context.AddIssue(severity, code, description, remediation);
+    }
+
     internal void SetRelationshipEnds
     (
         ImmutableArray<ApiRelationshipEnd> ends,

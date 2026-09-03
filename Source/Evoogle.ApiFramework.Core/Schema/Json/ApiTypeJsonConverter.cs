@@ -4,6 +4,8 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using System.Text.Json;
+
+using Evoogle.ApiFramework.Schema.Json.Internal;
 using Evoogle.Json;
 
 using Microsoft.Extensions.Logging;
@@ -126,6 +128,10 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
     #region Fields
     private static readonly EnumJsonConverter<ApiTypeKind> _apiTypeKindJsonConverter = new();
     private static readonly EnumJsonConverter<ApiTypeModifiers> _apiTypeModifiersJsonConverter = new();
+    private static readonly NullableEnumJsonConverter<ApiTypeKind> _nullableApiTypeKindJsonConverter =
+        new(EnumJsonInvalidValuePolicy.Throw);
+    private static readonly NullableEnumJsonConverter<ApiTypeModifiers> _nullableApiTypeModifiersJsonConverter =
+        new(EnumJsonInvalidValuePolicy.ReturnNull);
 
     private static readonly TypeJsonConverter _typeJsonConverter = new();
     #endregion
@@ -163,43 +169,16 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
     {
         var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
 
-        var apiType = default(ApiType);
-
-        var apiKind = readContext.ReadData.ApiType?.ApiKind;
-        if (apiKind is not null)
+        var apiKind = readContext.ReadData.ApiType?.ApiKind
+            ?? throw new JsonException($"Missing {nameof(ApiType.ApiKind)} enumeration value.");
+        ApiType apiType = apiKind switch
         {
-            switch (apiKind)
-            {
-                case ApiTypeKind.Collection:
-                    apiType = CreateApiCollectionType(readContext);
-                    break;
-
-                case ApiTypeKind.Enum:
-                    apiType = CreateApiEnumType(readContext);
-                    break;
-
-                case ApiTypeKind.Object:
-                    apiType = CreateApiObjectType(readContext);
-                    break;
-
-                case ApiTypeKind.Scalar:
-                    apiType = CreateApiScalarType(readContext);
-                    break;
-
-                default:
-                    readContext.Logger.LogError("Unsupported {Kind} enumeration value: '{KindValue}'", nameof(ApiTypeKind), apiKind);
-                    break;
-            }
-        }
-        else
-        {
-            readContext.Logger.LogError("Missing {Kind} enumeration value", nameof(ApiType.ApiKind));
-        }
-
-        if (apiType is null)
-        {
-            return null;
-        }
+            ApiTypeKind.Collection => CreateApiCollectionType(readContext),
+            ApiTypeKind.Enum => CreateApiEnumType(readContext),
+            ApiTypeKind.Object => CreateApiObjectType(readContext),
+            ApiTypeKind.Scalar => CreateApiScalarType(readContext),
+            _ => throw new JsonException($"Unsupported {nameof(ApiTypeKind)} enumeration value: '{apiKind}'.")
+        };
 
         var extensions = readContext.ReadData.Extensions;
         AttachExtensions(apiType, extensions);
@@ -213,7 +192,14 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
         var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
         var handlers = readContext.ReadHandlers.PropertyHandlers;
 
-        ReadJsonObject(ref reader, readContext, handlers);
+        ReadJsonObject
+        (
+            ref reader,
+            readContext,
+            handlers,
+            readContext.PropertyNames.ApiType.ApiKind,
+            readContext.PropertyNames.ApiCollectionType.ApiItemTypeModifiers
+        );
     }
 
     /// <inheritdoc/>

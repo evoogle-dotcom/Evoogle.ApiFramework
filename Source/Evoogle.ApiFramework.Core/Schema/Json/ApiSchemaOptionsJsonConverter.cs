@@ -5,6 +5,7 @@
 // See the LICENSE file in the project root for more information.
 using System.Text.Json;
 
+using Evoogle.ApiFramework.Schema.Json.Internal;
 using Evoogle.Json;
 
 using Microsoft.Extensions.Logging;
@@ -37,16 +38,12 @@ public class ApiSchemaOptionsJsonConverter(ILogger<ApiSchemaOptionsJsonConverter
     private class ReadState
     {
         #region Properties
-        public ApiKeyNullHandling? ApiKeyNullHandling { get; set; }
+        public JsonEnumReadState<ApiKeyNullHandling>? ApiKeyNullHandling { get; set; }
         #endregion
     }
 
     private class ReadHandlers(PropertyNames propertyNames)
     {
-        #region Constants
-        private static readonly Type _apiKeyNullHandlingType = typeof(ApiKeyNullHandling);
-        #endregion
-
         #region Fields
         public readonly Dictionary<string, JsonReaderHandler<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>>> PropertyHandlers = new()
         {
@@ -57,8 +54,8 @@ public class ApiSchemaOptionsJsonConverter(ILogger<ApiSchemaOptionsJsonConverter
         #region Methods
         private static void HandleApiKeyNullHandling(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
-            var options = context.Options;
-            context.ReadData.ApiKeyNullHandling = _apiKeyNullHandlingJsonConverter.Read(ref reader, _apiKeyNullHandlingType, options);
+            context.ReadData.ApiKeyNullHandling ??= new JsonEnumReadState<ApiKeyNullHandling>();
+            context.ReadData.ApiKeyNullHandling.Read(ref reader, context.Options, _nullableApiKeyNullHandlingJsonConverter);
         }
         #endregion
     }
@@ -66,6 +63,8 @@ public class ApiSchemaOptionsJsonConverter(ILogger<ApiSchemaOptionsJsonConverter
 
     #region Fields
     private static readonly EnumJsonConverter<ApiKeyNullHandling> _apiKeyNullHandlingJsonConverter = new();
+    private static readonly NullableEnumJsonConverter<ApiKeyNullHandling> _nullableApiKeyNullHandlingJsonConverter =
+        new(EnumJsonInvalidValuePolicy.ReturnNull);
     #endregion
 
     #region Constructors
@@ -102,11 +101,14 @@ public class ApiSchemaOptionsJsonConverter(ILogger<ApiSchemaOptionsJsonConverter
         var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
         var readState = readContext.ReadData;
 
-        var apiKeyNullHandling = readState.ApiKeyNullHandling ?? ApiSchemaOptions.Default.ApiKeyNullHandling;
+        var apiKeyNullHandlingReadState = readState.ApiKeyNullHandling;
+        var apiKeyNullHandling = apiKeyNullHandlingReadState?.Value ?? ApiSchemaOptions.Default.ApiKeyNullHandling;
 
         var apiSchemaOptions = new ApiSchemaOptions()
         {
             ApiKeyNullHandling = apiKeyNullHandling,
+            HasInvalidApiKeyNullHandling = apiKeyNullHandlingReadState?.IsInvalid == true ||
+                apiKeyNullHandlingReadState?.IsNull == true,
         };
 
         return apiSchemaOptions;
@@ -118,7 +120,13 @@ public class ApiSchemaOptionsJsonConverter(ILogger<ApiSchemaOptionsJsonConverter
         var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
         var handlers = readContext.ReadHandlers.PropertyHandlers;
 
-        ReadJsonObject(ref reader, readContext, handlers);
+        ReadJsonObject
+        (
+            ref reader,
+            readContext,
+            handlers,
+            readContext.PropertyNames.ApiKeyNullHandling
+        );
     }
 
     /// <inheritdoc/>

@@ -24,6 +24,8 @@ public sealed class ApiTypeExpression
 {
     #region Fields
     private ApiType? _apiResolvedType = null;
+
+    private bool _hasInvalidApiKind;
     #endregion
 
     #region Properties
@@ -55,6 +57,8 @@ public sealed class ApiTypeExpression
     ///     Thrown if the expression has not been resolved yet.
     /// </exception>
     public ApiType ApiType => this.ThrowIfNotInitialized(_apiResolvedType);
+
+    internal void MarkInvalidApiKind() => _hasInvalidApiKind = true;
     #endregion
 
     #region Computed Properties
@@ -141,6 +145,17 @@ public sealed class ApiTypeExpression
     )
     {
         ArgumentNullException.ThrowIfNull(context);
+
+        if (_hasInvalidApiKind)
+        {
+            var severity = ApiInitializationSeverity.Error;
+            var code = ApiInitializationCode.ApiTypeExpressionInvalidApiKind;
+            var description = $"{nameof(this.ApiKind)} must be a valid {nameof(ApiTypeKind)} value";
+            var remediation = $"Specify a valid {nameof(this.ApiKind)} value";
+
+            context.AddIssue(severity, code, description, remediation);
+            return;
+        }
 
         // Try and resolve API type:
         // - Inline API type

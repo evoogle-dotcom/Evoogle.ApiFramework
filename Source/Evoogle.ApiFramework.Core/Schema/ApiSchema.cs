@@ -281,6 +281,7 @@ public sealed class ApiSchema : ApiSchemaElement
 
         // Phase 1: Validate schema name and build all lookup dictionaries.
         this.InitializeApiName(context);
+        this.InitializeApiOptions(context);
         this.InitializeLookupDictionaries(context);
 
         // Phase 2: Initialize all type definitions.
@@ -323,6 +324,21 @@ public sealed class ApiSchema : ApiSchemaElement
 
             context.AddIssue(path, severity, code, description, remediation);
         }
+    }
+
+    private void InitializeApiOptions(ApiInitializationContext context)
+    {
+        if (!this.ApiOptions.HasInvalidApiKeyNullHandling)
+        {
+            return;
+        }
+
+        var severity = ApiInitializationSeverity.Error;
+        var code = ApiInitializationCode.ApiSchemaInvalidApiKeyNullHandling;
+        var description = $"{nameof(this.ApiOptions)}.{nameof(ApiSchemaOptions.ApiKeyNullHandling)} must be a valid {nameof(ApiKeyNullHandling)} value";
+        var remediation = $"Specify a valid {nameof(ApiSchemaOptions.ApiKeyNullHandling)} value";
+
+        context.AddIssue(severity, code, description, remediation);
     }
 
     private void InitializeApiEnumTypes(ApiInitializationContext context)

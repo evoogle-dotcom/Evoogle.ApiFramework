@@ -5,6 +5,7 @@
 // See the LICENSE file in the project root for more information.
 using System.Text.Json;
 
+using Evoogle.ApiFramework.Schema.Json.Internal;
 using Evoogle.Json;
 
 using Microsoft.Extensions.Logging;
@@ -69,7 +70,7 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
         #region Properties
         public string? ApiName { get; set; }
         public ApiTypeExpression? ApiTypeExpression { get; set; }
-        public ApiTypeModifiers? ApiTypeModifiers { get; set; }
+        public JsonEnumReadState<ApiTypeModifiers>? ApiTypeModifiers { get; set; }
         public string? ClrName { get; set; }
         public ClrMemberKind? ClrMemberKind { get; set; }
         #endregion
@@ -91,7 +92,6 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
     private class ReadHandlers(PropertyNames propertyNames)
     {
         #region Constants
-        private static readonly Type _apiTypeModifiersType = typeof(ApiTypeModifiers);
         private static readonly Type _clrMemberKindType = typeof(ClrMemberKind?);
         #endregion
 
@@ -122,8 +122,9 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
         {
             context.ReadData.ApiProperty ??= new ApiPropertyReadData();
 
-            var options = context.Options;
-            context.ReadData.ApiProperty.ApiTypeModifiers = _apiTypeModifiersJsonConverter.Read(ref reader, _apiTypeModifiersType, options);
+            var readState = context.ReadData.ApiProperty;
+            readState.ApiTypeModifiers ??= new JsonEnumReadState<ApiTypeModifiers>();
+            readState.ApiTypeModifiers.Read(ref reader, context.Options, _nullableApiTypeModifiersJsonConverter);
         }
 
         private static void HandleApiPropertyApiTypeExpression(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
@@ -159,6 +160,8 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
 
     #region Fields
     private static readonly EnumJsonConverter<ApiTypeModifiers> _apiTypeModifiersJsonConverter = new();
+    private static readonly NullableEnumJsonConverter<ApiTypeModifiers> _nullableApiTypeModifiersJsonConverter =
+        new(EnumJsonInvalidValuePolicy.ReturnNull);
     private static readonly EnumJsonConverter<ClrMemberKind> _clrMemberKindJsonConverter = new();
     private static readonly NullableEnumJsonConverter<ClrMemberKind> _nullableClrMemberKindJsonConverter =
         new(EnumJsonInvalidValuePolicy.ReturnNull);
@@ -200,11 +203,17 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
 
         var apiName = readState?.ApiName;
         var apiTypeExpression = readState?.ApiTypeExpression;
-        var apiTypeModifiers = readState?.ApiTypeModifiers ?? ApiTypeModifiers.None;
+        var apiTypeModifiersReadState = readState?.ApiTypeModifiers;
+        var apiTypeModifiers = apiTypeModifiersReadState?.Value ?? ApiTypeModifiers.None;
         var clrName = readState?.ClrName;
         var clrMemberKind = readState?.ClrMemberKind;
 
         var apiProperty = new ApiProperty(apiName!, apiTypeExpression!, apiTypeModifiers, clrName!, clrMemberKind);
+
+        if (apiTypeModifiersReadState?.IsInvalid == true || apiTypeModifiersReadState?.IsNull == true)
+        {
+            apiProperty.MarkInvalidApiTypeModifiers();
+        }
 
         var extensions = readContext.ReadData.Extensions;
         AttachExtensions(apiProperty, extensions);
@@ -218,7 +227,14 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
         var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
         var handlers = readContext.ReadHandlers.PropertyHandlers;
 
-        ReadJsonObject(ref reader, readContext, handlers);
+        ReadJsonObject
+        (
+            ref reader,
+            readContext,
+            handlers,
+            readContext.PropertyNames.ApiProperty.ApiTypeModifiers,
+            readContext.PropertyNames.ApiProperty.ClrMemberKind
+        );
     }
 
     /// <inheritdoc/>

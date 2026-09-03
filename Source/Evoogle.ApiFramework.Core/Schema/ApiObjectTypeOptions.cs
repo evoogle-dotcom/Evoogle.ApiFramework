@@ -22,6 +22,8 @@ public sealed record class ApiObjectTypeOptions
     ///     When <see langword="null"/>, the strategy is inherited from the containing <see cref="ApiSchema"/>'s options.
     /// </summary>
     public ApiKeyNullHandling? ApiKeyNullHandling { get; init; }
+
+    internal bool HasInvalidApiKeyNullHandling { get; init; }
     #endregion
 
     #region Object Methods

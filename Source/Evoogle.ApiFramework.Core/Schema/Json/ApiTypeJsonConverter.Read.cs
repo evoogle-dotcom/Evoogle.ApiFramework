@@ -5,6 +5,7 @@
 // See the LICENSE file in the project root for more information.
 using System.Text.Json;
 
+using Evoogle.ApiFramework.Schema.Json.Internal;
 using Evoogle.Json;
 
 namespace Evoogle.ApiFramework.Schema.Json;
@@ -22,7 +23,7 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
     {
         #region Properties
         public ApiTypeExpression? ApiItemTypeExpression { get; set; }
-        public ApiTypeModifiers? ApiItemTypeModifiers { get; set; }
+        public JsonEnumReadState<ApiTypeModifiers>? ApiItemTypeModifiers { get; set; }
         #endregion
     }
 
@@ -88,10 +89,6 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
     /// </summary>
     private class ReadHandlers(PropertyNames propertyNames)
     {
-        #region Constants
-        private static readonly Type _apiTypeModifiersType = typeof(ApiTypeModifiers);
-        #endregion
-
         #region ApiType Fields
         public readonly Dictionary<string, JsonReaderHandler<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>>> PropertyHandlers = new()
         {
@@ -131,8 +128,9 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
         {
             context.ReadData.ApiCollectionType ??= new ApiCollectionTypeReadData();
 
-            var options = context.Options;
-            context.ReadData.ApiCollectionType.ApiItemTypeModifiers = _apiTypeModifiersJsonConverter.Read(ref reader, _apiTypeModifiersType, options);
+            var readData = context.ReadData.ApiCollectionType;
+            readData.ApiItemTypeModifiers ??= new JsonEnumReadState<ApiTypeModifiers>();
+            readData.ApiItemTypeModifiers.Read(ref reader, context.Options, _nullableApiTypeModifiersJsonConverter);
         }
         #endregion
 
@@ -222,8 +220,12 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
         {
             context.ReadData.ApiType ??= new ApiTypeReadData();
 
-            var options = context.Options;
-            context.ReadData.ApiType.ApiKind = _apiTypeKindJsonConverter.Read(ref reader, typeof(ApiTypeKind), options);
+            context.ReadData.ApiType.ApiKind = _nullableApiTypeKindJsonConverter.Read
+            (
+                ref reader,
+                typeof(ApiTypeKind?),
+                context.Options
+            );
         }
 
         private static void HandleApiTypeClrType(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
