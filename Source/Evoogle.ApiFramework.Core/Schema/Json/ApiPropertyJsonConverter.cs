@@ -92,7 +92,7 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
     {
         #region Constants
         private static readonly Type _apiTypeModifiersType = typeof(ApiTypeModifiers);
-        private static readonly Type _clrMemberKindType = typeof(ClrMemberKind);
+        private static readonly Type _clrMemberKindType = typeof(ClrMemberKind?);
         #endregion
 
         #region ApiProperty Fields
@@ -146,7 +146,12 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
             context.ReadData.ApiProperty ??= new ApiPropertyReadData();
 
             var options = context.Options;
-            context.ReadData.ApiProperty.ClrMemberKind = _clrMemberKindJsonConverter.Read(ref reader, _clrMemberKindType, options);
+            context.ReadData.ApiProperty.ClrMemberKind = _nullableClrMemberKindJsonConverter.Read
+            (
+                ref reader,
+                _clrMemberKindType,
+                options
+            );
         }
         #endregion
     }
@@ -155,6 +160,8 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
     #region Fields
     private static readonly EnumJsonConverter<ApiTypeModifiers> _apiTypeModifiersJsonConverter = new();
     private static readonly EnumJsonConverter<ClrMemberKind> _clrMemberKindJsonConverter = new();
+    private static readonly NullableEnumJsonConverter<ClrMemberKind> _nullableClrMemberKindJsonConverter =
+        new(EnumJsonInvalidValuePolicy.ReturnNull);
     #endregion
 
     #region Constructors
@@ -195,7 +202,7 @@ public class ApiPropertyJsonConverter(ILogger<ApiPropertyJsonConverter>? logger)
         var apiTypeExpression = readState?.ApiTypeExpression;
         var apiTypeModifiers = readState?.ApiTypeModifiers ?? ApiTypeModifiers.None;
         var clrName = readState?.ClrName;
-        var clrMemberKind = readState?.ClrMemberKind ?? ClrMemberKind.Unknown;
+        var clrMemberKind = readState?.ClrMemberKind;
 
         var apiProperty = new ApiProperty(apiName!, apiTypeExpression!, apiTypeModifiers, clrName!, clrMemberKind);
 

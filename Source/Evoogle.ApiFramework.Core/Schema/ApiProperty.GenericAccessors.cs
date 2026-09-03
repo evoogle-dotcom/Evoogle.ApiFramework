@@ -25,11 +25,25 @@ public sealed partial class ApiProperty
     /// <typeparam name="TObject">The type of the object containing the member.</typeparam>
     /// <typeparam name="TValue">The expected return type of the member value.</typeparam>
     /// <param name="clrObjectType">The actual CLR type (may differ from TObject for inheritance scenarios).</param>
-    /// <param name="clrMemberName">The name of the property or field to access.</param>
+    /// <param name="clrMemberName">The name of the CLR member to access.</param>
+    /// <param name="clrMemberKind">The kind of CLR member to access.</param>
     /// <returns>A cache value containing the compiled getter delegate, or null if the member cannot be accessed.</returns>
-    private static ClrGetterCacheValue<TObject, TValue> BuildGenericClrGetter<TObject, TValue>(Type clrObjectType, string clrMemberName)
+    private static ClrGetterCacheValue<TObject, TValue> BuildGenericClrGetter<TObject, TValue>
+    (
+        Type clrObjectType,
+        string clrMemberName,
+        ClrMemberKind clrMemberKind
+    )
     {
-        if (!TryResolveMember(clrObjectType, clrMemberName, requiresWriteAccess: false, out var clrMemberInfo, out var clrMemberType))
+        if (!TryResolveMember
+        (
+            clrObjectType,
+            clrMemberName,
+            clrMemberKind,
+            requiresWriteAccess: false,
+            out var clrMemberInfo,
+            out var clrMemberType
+        ))
         {
             return new ClrGetterCacheValue<TObject, TValue>(null);
         }
@@ -93,11 +107,25 @@ public sealed partial class ApiProperty
     /// <typeparam name="TObject">The type of the object containing the member.</typeparam>
     /// <typeparam name="TValue">The type of the value to assign.</typeparam>
     /// <param name="clrObjectType">The actual CLR type (may differ from TObject for inheritance scenarios).</param>
-    /// <param name="clrMemberName">The name of the property or field to modify.</param>
+    /// <param name="clrMemberName">The name of the CLR member to modify.</param>
+    /// <param name="clrMemberKind">The kind of CLR member to modify.</param>
     /// <returns>A cache value containing the compiled setter delegate, or null if the member cannot be modified.</returns>
-    private static ClrSetterCacheValue<TObject, TValue> BuildGenericClrSetter<TObject, TValue>(Type clrObjectType, string clrMemberName)
+    private static ClrSetterCacheValue<TObject, TValue> BuildGenericClrSetter<TObject, TValue>
+    (
+        Type clrObjectType,
+        string clrMemberName,
+        ClrMemberKind clrMemberKind
+    )
     {
-        if (!TryResolveMember(clrObjectType, clrMemberName, requiresWriteAccess: true, out var clrMemberInfo, out var clrMemberType))
+        if (!TryResolveMember
+        (
+            clrObjectType,
+            clrMemberName,
+            clrMemberKind,
+            requiresWriteAccess: true,
+            out var clrMemberInfo,
+            out var clrMemberType
+        ))
         {
             return new ClrSetterCacheValue<TObject, TValue>(null);
         }
@@ -165,9 +193,15 @@ public sealed partial class ApiProperty
     /// <typeparam name="TObject">The struct type containing the member.</typeparam>
     /// <typeparam name="TValue">The type of the value to assign.</typeparam>
     /// <param name="clrObjectType">The CLR type (must exactly match typeof(TObject) for structs).</param>
-    /// <param name="clrMemberName">The name of the property or field to modify.</param>
+    /// <param name="clrMemberName">The name of the CLR member to modify.</param>
+    /// <param name="clrMemberKind">The kind of CLR member to modify.</param>
     /// <returns>A cache value containing the compiled by-ref setter delegate, or null if the member cannot be modified.</returns>
-    private static ClrSetterByRefCacheValue<TObject, TValue> BuildGenericClrSetterByRef<TObject, TValue>(Type clrObjectType, string clrMemberName)
+    private static ClrSetterByRefCacheValue<TObject, TValue> BuildGenericClrSetterByRef<TObject, TValue>
+    (
+        Type clrObjectType,
+        string clrMemberName,
+        ClrMemberKind clrMemberKind
+    )
         where TObject : struct
     {
         // clrObjectType must be exactly typeof(TObject) for structs
@@ -176,7 +210,15 @@ public sealed partial class ApiProperty
             return new ClrSetterByRefCacheValue<TObject, TValue>(null);
         }
 
-        if (!TryResolveMember(clrObjectType, clrMemberName, requiresWriteAccess: true, out var clrMemberInfo, out var clrMemberType))
+        if (!TryResolveMember
+        (
+            clrObjectType,
+            clrMemberName,
+            clrMemberKind,
+            requiresWriteAccess: true,
+            out var clrMemberInfo,
+            out var clrMemberType
+        ))
         {
             return new ClrSetterByRefCacheValue<TObject, TValue>(null);
         }
@@ -262,56 +304,64 @@ public sealed partial class ApiProperty
     }
 
     /// <summary>
-    ///     Attempts to resolve a property or field by name on the specified type.
-    ///     Prefers properties over fields and validates accessibility based on the operation type.
+    ///     Attempts to resolve a CLR member by name and kind on the specified type.
+    ///     Validates accessibility based on the operation type.
     /// </summary>
     /// <param name="clrObjectType">The CLR type to search for the member.</param>
-    /// <param name="clrMemberName">The name of the property or field.</param>
+    /// <param name="clrMemberName">The name of the CLR member.</param>
+    /// <param name="clrMemberKind">The kind of CLR member to resolve.</param>
     /// <param name="requiresWriteAccess">True if the member will be written to; false for read-only access.</param>
     /// <param name="clrMemberInfo">The resolved member info, or default if not found.</param>
     /// <param name="clrMemberType">The type of the resolved member, or default if not found.</param>
     /// <returns>True if the member was successfully resolved; otherwise false.</returns>
-    private static bool TryResolveMember(Type clrObjectType, string clrMemberName, bool requiresWriteAccess, [NotNullWhen(true)] out MemberInfo clrMemberInfo, [NotNullWhen(true)] out Type clrMemberType)
+    private static bool TryResolveMember
+    (
+        Type clrObjectType,
+        string clrMemberName,
+        ClrMemberKind clrMemberKind,
+        bool requiresWriteAccess,
+        [NotNullWhen(true)] out MemberInfo clrMemberInfo,
+        [NotNullWhen(true)] out Type clrMemberType
+    )
     {
-        // Prefer property, then field
-        var clrPropertyInfo = TypeReflection.GetProperty(clrObjectType, clrMemberName, BindingFlags.Public | BindingFlags.Instance);
-        if (clrPropertyInfo is not null)
+        switch (clrMemberKind)
         {
-            // Exclude indexers
-            if (clrPropertyInfo.GetIndexParameters().Length > 0)
-            {
-                clrMemberInfo = default!;
-                clrMemberType = default!;
-                return false;
-            }
+            case ClrMemberKind.Property:
+                var clrPropertyInfo = TypeReflection.GetProperty
+                (
+                    clrObjectType,
+                    clrMemberName,
+                    BindingFlags.Public | BindingFlags.Instance
+                );
+                if (clrPropertyInfo is null || clrPropertyInfo.GetIndexParameters().Length > 0)
+                {
+                    break;
+                }
 
-            // For write operations, require CanWrite
-            if (requiresWriteAccess && !clrPropertyInfo.CanWrite)
-            {
-                clrMemberInfo = default!;
-                clrMemberType = default!;
-                return false;
-            }
+                if (requiresWriteAccess && !clrPropertyInfo.CanWrite)
+                {
+                    break;
+                }
 
-            clrMemberInfo = clrPropertyInfo;
-            clrMemberType = clrPropertyInfo.PropertyType;
-            return true;
-        }
+                clrMemberInfo = clrPropertyInfo;
+                clrMemberType = clrPropertyInfo.PropertyType;
+                return true;
 
-        var clrFieldInfo = TypeReflection.GetField(clrObjectType, clrMemberName, BindingFlags.Public | BindingFlags.Instance);
-        if (clrFieldInfo is not null)
-        {
-            // For write operations, exclude init-only fields
-            if (requiresWriteAccess && clrFieldInfo.IsInitOnly)
-            {
-                clrMemberInfo = default!;
-                clrMemberType = default!;
-                return false;
-            }
+            case ClrMemberKind.Field:
+                var clrFieldInfo = TypeReflection.GetField
+                (
+                    clrObjectType,
+                    clrMemberName,
+                    BindingFlags.Public | BindingFlags.Instance
+                );
+                if (clrFieldInfo is null || (requiresWriteAccess && clrFieldInfo.IsInitOnly))
+                {
+                    break;
+                }
 
-            clrMemberInfo = clrFieldInfo;
-            clrMemberType = clrFieldInfo.FieldType;
-            return true;
+                clrMemberInfo = clrFieldInfo;
+                clrMemberType = clrFieldInfo.FieldType;
+                return true;
         }
 
         clrMemberInfo = default!;

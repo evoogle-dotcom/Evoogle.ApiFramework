@@ -5,8 +5,10 @@
 // See the LICENSE file in the project root for more information.
 using System.Reflection;
 
+using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
 using Evoogle.ApiFramework.Schema.Configuration.Trace;
+using Evoogle.Extensions;
 using Evoogle.Reflection;
 
 namespace Evoogle.ApiFramework.Schema.Configuration;
@@ -157,7 +159,11 @@ public class ApiPropertyBuilder : ExtensionBuilder<ApiPropertyBuilder>
             return this.BuildFromFieldInfo(clrFieldInfo);
         }
 
-        return this.BuildUnknownProperty();
+        throw new ApiSchemaConfigurationException
+        (
+            $"Cannot build {nameof(ApiProperty)} '{_state.ApiName}' because CLR type " +
+            $"'{clrObjectType.SafeToName()}' has no public property or field named '{_clrName}'."
+        );
     }
 
     private ApiProperty BuildFromPropertyInfo(PropertyInfo clrPropertyInfo)
@@ -257,13 +263,6 @@ public class ApiPropertyBuilder : ExtensionBuilder<ApiPropertyBuilder>
         var apiTypeModifiers = this.BuildModifiers(apiInitialTypeModifiers);
 
         return this.CreateAndBuildExtensions(_state.ApiName, apiTypeExpression, apiTypeModifiers, _clrName, clrMemberKind);
-    }
-
-    private ApiProperty BuildUnknownProperty()
-    {
-        var apiTypeModifiers = this.BuildModifiers(ApiTypeModifiers.None);
-
-        return this.CreateAndBuildExtensions(_state.ApiName, default!, apiTypeModifiers, _clrName, ClrMemberKind.Unknown);
     }
 
     private ApiProperty CreateAndBuildExtensions(string apiName, ApiTypeExpression apiTypeExpression, ApiTypeModifiers apiTypeModifiers, string clrName, ClrMemberKind clrMemberKind)

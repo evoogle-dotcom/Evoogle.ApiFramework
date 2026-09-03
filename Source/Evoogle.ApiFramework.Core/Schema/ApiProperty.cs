@@ -36,25 +36,18 @@ namespace Evoogle.ApiFramework.Schema;
 ///         the fully generic overloads to avoid boxing both the target instance and the returned value.
 ///     </para>
 /// </remarks>
-/// <param name="apiName">The API name of the property.</param>
-/// <param name="apiTypeExpression">The API type expression of the property.</param>
-/// <param name="apiTypeModifiers">Modifiers applied to the property (e.g., Required).</param>
-/// <param name="clrName">The CLR property name corresponding to this API property.</param>
-/// <param name="clrMemberKind">The kind of CLR member (property or field) this API property represents.</param>
 [JsonConverter(typeof(ApiPropertyJsonConverter))]
-public sealed partial class ApiProperty
-(
-    string apiName,
-    ApiTypeExpression apiTypeExpression,
-    ApiTypeModifiers apiTypeModifiers,
-    string clrName,
-    ClrMemberKind clrMemberKind
-) : ApiSchemaElement
+public sealed partial class ApiProperty : ApiSchemaElement
 {
     #region ApiProperty Types
     private delegate void ClrByRefAction<TObject, in TValue>(ref TObject clrObject, ApiSchemaContext apiSchemaContext, TValue? clrValue);
 
-    private readonly record struct ClrCacheKey(Type ClrObjectType, string ClrMemberName);
+    private readonly record struct ClrCacheKey
+    (
+        Type ClrObjectType,
+        string ClrMemberName,
+        ClrMemberKind ClrMemberKind
+    );
 
     private readonly record struct ClrGetterCacheValue<TObject, TValue>(Func<TObject, ApiSchemaContext, TValue?>? ClrGetter);
 
@@ -83,6 +76,8 @@ public sealed partial class ApiProperty
     #endregion
 
     #region ApiProperty Fields
+    private readonly ClrMemberKind? _clrMemberKind;
+
     private Func<object, ApiSchemaContext, object?>? _clrGetter;
 
     private Action<object, ApiSchemaContext, object?>? _clrSetter;
@@ -106,6 +101,44 @@ public sealed partial class ApiProperty
     );
     #endregion
 
+    #region Constructors
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ApiProperty"/> class.
+    /// </summary>
+    /// <param name="apiName">The API name of the property.</param>
+    /// <param name="apiTypeExpression">The API type expression of the property.</param>
+    /// <param name="apiTypeModifiers">Modifiers applied to the property (e.g., Required).</param>
+    /// <param name="clrName">The CLR name of the property or field corresponding to this API property.</param>
+    /// <param name="clrMemberKind">The concrete kind of CLR member this API property represents.</param>
+    public ApiProperty
+    (
+        string apiName,
+        ApiTypeExpression apiTypeExpression,
+        ApiTypeModifiers apiTypeModifiers,
+        string clrName,
+        ClrMemberKind clrMemberKind
+    )
+        : this(apiName, apiTypeExpression, apiTypeModifiers, clrName, (ClrMemberKind?)clrMemberKind)
+    {
+    }
+
+    internal ApiProperty
+    (
+        string apiName,
+        ApiTypeExpression apiTypeExpression,
+        ApiTypeModifiers apiTypeModifiers,
+        string clrName,
+        ClrMemberKind? clrMemberKind
+    )
+    {
+        this.ApiName = apiName;
+        this.ApiTypeExpression = apiTypeExpression;
+        this.ApiTypeModifiers = apiTypeModifiers;
+        this.ClrName = clrName;
+        _clrMemberKind = clrMemberKind;
+    }
+    #endregion
+
     #region ApiSchemaElement Properties
     /// <inheritdoc/>
     public override ApiSchemaElementKind Kind => ApiSchemaElementKind.Property;
@@ -116,21 +149,25 @@ public sealed partial class ApiProperty
 
     #region ApiProperty Properties
     /// <summary>Gets the API name of the property (used in API requests/responses).</summary>
-    public string ApiName { get; } = apiName;
+    public string ApiName { get; }
 
     /// <summary>Gets the API type of the property.</summary>
     public ApiType ApiType => this.ApiTypeExpression.ApiType;
 
     /// <summary>Gets the modifiers applied to this property (e.g., Required).</summary>
-    public ApiTypeModifiers ApiTypeModifiers { get; } = apiTypeModifiers;
+    public ApiTypeModifiers ApiTypeModifiers { get; }
 
-    /// <summary>Gets the CLR name of the property (matching the C# property name).</summary>
-    public string ClrName { get; } = clrName;
+    /// <summary>Gets the CLR name of the member backing this API property.</summary>
+    public string ClrName { get; }
 
-    /// <summary>Gets the kind of CLR member (property or field) this API property represents.</summary>
-    public ClrMemberKind ClrMemberKind { get; } = clrMemberKind;
+    /// <summary>
+    ///     Gets the authoritative CLR member kind used with <see cref="ClrName"/> to bind this property.
+    ///     <see cref="ClrMemberKind.Property"/> resolves only properties and
+    ///     <see cref="ClrMemberKind.Field"/> resolves only fields.
+    /// </summary>
+    public ClrMemberKind ClrMemberKind => this.ThrowIfNotInitialized(_clrMemberKind);
 
-    internal ApiTypeExpression ApiTypeExpression { get; } = apiTypeExpression;
+    internal ApiTypeExpression ApiTypeExpression { get; }
 
     private static MethodInfo GenericCoerceMethodDefinition => _genericCoerceMethodDefinition
         ?? throw new ApiSchemaException($"Failed to locate generic method definition for {nameof(TypeCoercion)}.{nameof(TypeCoercion.Coerce)}.");
@@ -157,7 +194,7 @@ public sealed partial class ApiProperty
         var apiTypeExpression = this.ApiTypeExpression.SafeToString();
         var apiTypeModifiers = this.ApiTypeModifiers.SafeToString();
         var clrName = this.ClrName.SafeToString();
-        var clrMemberKind = this.ClrMemberKind.SafeToString();
+        var clrMemberKind = _clrMemberKind.SafeToString();
         var extensionCount = this.ExtensionCount.SafeToString();
 
         return $"{nameof(ApiProperty)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ApiTypeExpression)}={apiTypeExpression}, {nameof(this.ApiTypeModifiers)}={apiTypeModifiers}, {nameof(this.ClrName)}={clrName}, {nameof(this.ClrMemberKind)}={clrMemberKind}, {nameof(this.ExtensionCount)}={extensionCount}}}";
@@ -188,7 +225,11 @@ public sealed partial class ApiProperty
         this.InitializeApiName(context);
         this.InitializeApiTypeExpression(context);
         this.InitializeClrName(context);
-        this.InitializeClrGetterAndSetter(context);
+
+        if (this.InitializeClrMemberKind(context))
+        {
+            this.InitializeClrGetterAndSetter(context);
+        }
     }
 
     private void InitializeApiName(ApiInitializationContext context)
@@ -317,8 +358,7 @@ public sealed partial class ApiProperty
         var clrObjectType = apiObjectType.ClrType;
         var clrMemberName = this.ClrName;
 
-        var isClrObjectTypeNull = clrObjectType is null;
-        if (isClrObjectTypeNull)
+        if (clrObjectType is null)
         {
             // If the parent CLR object type is null, skip further processing
             return;
@@ -333,50 +373,100 @@ public sealed partial class ApiProperty
 
         try
         {
-            // Prefer property, then field
-            var clrPropertyInfo = TypeReflection.GetProperty(clrObjectType!, clrMemberName, BindingFlags.Public | BindingFlags.Instance);
-            if (clrPropertyInfo is not null)
+            switch (this.ClrMemberKind)
             {
-                if (!ValidateClrMemberType(context, clrPropertyInfo.PropertyType, clrMemberName))
-                {
-                    // Fail fast on invalid member type
+                case ClrMemberKind.Property:
+                    var clrPropertyInfo = TypeReflection.GetProperty
+                    (
+                        clrObjectType,
+                        clrMemberName,
+                        BindingFlags.Public | BindingFlags.Instance
+                    );
+
+                    if (clrPropertyInfo is null)
+                    {
+                        this.AddMissingClrMemberIssue
+                        (
+                            context,
+                            clrObjectType,
+                            clrMemberName
+                        );
+                        return;
+                    }
+
+                    if (!ValidateClrMemberType(context, clrPropertyInfo.PropertyType, clrMemberName))
+                    {
+                        return;
+                    }
+
+                    this.InitializeClrPropertyGetterAndSetter(context, clrPropertyInfo);
                     return;
-                }
 
-                this.InitializeClrPropertyGetterAndSetter(context, clrPropertyInfo);
-                return; // Found valid property
-            }
+                case ClrMemberKind.Field:
+                    var clrFieldInfo = TypeReflection.GetField
+                    (
+                        clrObjectType,
+                        clrMemberName,
+                        BindingFlags.Public | BindingFlags.Instance
+                    );
 
-            var clrFieldInfo = TypeReflection.GetField(clrObjectType!, clrMemberName, BindingFlags.Public | BindingFlags.Instance);
-            if (clrFieldInfo is not null)
-            {
-                if (!ValidateClrMemberType(context, clrFieldInfo.FieldType, clrMemberName))
-                {
-                    // Fail fast on invalid member type
+                    if (clrFieldInfo is null)
+                    {
+                        this.AddMissingClrMemberIssue
+                        (
+                            context,
+                            clrObjectType,
+                            clrMemberName
+                        );
+                        return;
+                    }
+
+                    if (!ValidateClrMemberType(context, clrFieldInfo.FieldType, clrMemberName))
+                    {
+                        return;
+                    }
+
+                    this.InitializeClrFieldGetterAndSetter(context, clrFieldInfo);
                     return;
-                }
-
-                this.InitializeClrFieldGetterAndSetter(context, clrFieldInfo);
-                return; // Found valid field
             }
-
-            // Member not found
-            var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.ApiPropertyMissingClrMember;
-            var description = $"CLR member '{clrMemberName}' was not found on CLR type '{clrObjectType.SafeToName()}'";
-            var remediation = $"Add a public CLR property or field named '{clrMemberName}' to CLR type '{clrObjectType.SafeToName()}'";
-
-            context.AddIssue(severity, code, description, remediation);
         }
         catch (Exception ex)
         {
             var severity = ApiInitializationSeverity.Error;
             var code = ApiInitializationCode.ApiPropertyInvalidClrMember;
             var description = $"Failed to compile getter or setter accessor for '{clrMemberName}': {ex.Message.TrimEnd('.')}";
-            var remediation = $"Verify that '{clrMemberName}' exists as a public property or field on {nameof(ApiObjectType)}.{nameof(ApiObjectType.ClrType)} '{clrObjectType.SafeToName()}'";
+            var remediation = $"Verify that '{clrMemberName}' exists as a public {this.ClrMemberKind.ToString().ToLowerInvariant()} on {nameof(ApiObjectType)}.{nameof(ApiObjectType.ClrType)} '{clrObjectType.SafeToName()}'";
 
             context.AddIssue(severity, code, description, remediation);
         }
+    }
+
+    private bool InitializeClrMemberKind(ApiInitializationContext context)
+    {
+        var isClrMemberKindValid = _clrMemberKind is ClrMemberKind.Property or ClrMemberKind.Field;
+        if (isClrMemberKindValid)
+        {
+            return true;
+        }
+
+        var severity = ApiInitializationSeverity.Error;
+        var code = ApiInitializationCode.ApiPropertyInvalidClrMember;
+        var description = $"{nameof(this.ClrMemberKind)} must be {ClrMemberKind.Property} or {ClrMemberKind.Field}";
+        var remediation = $"Specify {nameof(this.ClrMemberKind)} as {ClrMemberKind.Property} or {ClrMemberKind.Field}";
+
+        context.AddIssue(severity, code, description, remediation);
+        return false;
+    }
+
+    private void AddMissingClrMemberIssue(ApiInitializationContext context, Type clrObjectType, string clrMemberName)
+    {
+        var clrMemberKindName = this.ClrMemberKind.ToString().ToLowerInvariant();
+        var severity = ApiInitializationSeverity.Error;
+        var code = ApiInitializationCode.ApiPropertyMissingClrMember;
+        var description = $"CLR {clrMemberKindName} '{clrMemberName}' was not found on CLR type '{clrObjectType.SafeToName()}'";
+        var remediation = $"Add a public CLR {clrMemberKindName} named '{clrMemberName}' to CLR type '{clrObjectType.SafeToName()}'";
+
+        context.AddIssue(severity, code, description, remediation);
     }
 
     private void InitializeClrName(ApiInitializationContext context)

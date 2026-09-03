@@ -6,23 +6,19 @@
 namespace Evoogle.ApiFramework.Schema;
 
 /// <summary>
-///     Specifies the kind of CLR member that an <see cref="ApiProperty"/> represents.
+///     Specifies the authoritative concrete kind of CLR member that an <see cref="ApiProperty"/>
+///     binds by <see cref="ApiProperty.ClrName"/>.
 /// </summary>
 public enum ClrMemberKind
 {
     #region Values
     /// <summary>
-    ///     The CLR member kind is unknown or has not been determined.
-    /// </summary>
-    Unknown,
-
-    /// <summary>
-    ///     The CLR member is a property (PropertyInfo).
+    ///     Binds only a CLR property (<see cref="System.Reflection.PropertyInfo"/>).
     /// </summary>
     Property,
 
     /// <summary>
-    ///     The CLR member is a field (FieldInfo).
+    ///     Binds only a CLR field (<see cref="System.Reflection.FieldInfo"/>).
     /// </summary>
     Field
     #endregion

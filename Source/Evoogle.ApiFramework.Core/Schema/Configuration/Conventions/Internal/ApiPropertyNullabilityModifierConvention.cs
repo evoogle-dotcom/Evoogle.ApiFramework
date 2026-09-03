@@ -22,7 +22,7 @@ internal sealed class ApiPropertyNullabilityModifierConvention : IApiPropertyCon
     /// <inheritdoc />
     public void Apply(ApiPropertyBuilder builder, ApiPropertyConventionContext context)
     {
-        if (context.ClrMemberKind == ClrMemberKind.Unknown || context.ClrMemberNullableInfo == null)
+        if (context.ClrMemberKind is null || context.ClrMemberNullableInfo == null)
         {
             return;
         }

@@ -96,8 +96,17 @@ public sealed partial class ApiProperty
         ArgumentNullException.ThrowIfNull(clrObject, nameof(clrObject));
 
         var clrObjectType = typeof(TObject);
-        var clrCacheKey = new ClrCacheKey(clrObjectType, this.ClrName);
-        var clrCacheValue = ClrGetterCache<TObject, TValue>.Cache.GetOrAdd(clrCacheKey, static k => BuildGenericClrGetter<TObject, TValue>(k.ClrObjectType, k.ClrMemberName));
+        var clrCacheKey = new ClrCacheKey(clrObjectType, this.ClrName, this.ClrMemberKind);
+        var clrCacheValue = ClrGetterCache<TObject, TValue>.Cache.GetOrAdd
+        (
+            clrCacheKey,
+            static k => BuildGenericClrGetter<TObject, TValue>
+            (
+                k.ClrObjectType,
+                k.ClrMemberName,
+                k.ClrMemberKind
+            )
+        );
         var clrGetter = clrCacheValue.ClrGetter;
 
         if (clrGetter is null)
@@ -186,8 +195,17 @@ public sealed partial class ApiProperty
         ArgumentNullException.ThrowIfNull(clrObject, nameof(clrObject));
 
         var clrObjectType = typeof(TObject);
-        var clrCacheKey = new ClrCacheKey(clrObjectType, this.ClrName);
-        var clrCacheValue = ClrSetterCache<TObject, TValue>.Cache.GetOrAdd(clrCacheKey, static k => BuildGenericClrSetter<TObject, TValue>(k.ClrObjectType, k.ClrMemberName));
+        var clrCacheKey = new ClrCacheKey(clrObjectType, this.ClrName, this.ClrMemberKind);
+        var clrCacheValue = ClrSetterCache<TObject, TValue>.Cache.GetOrAdd
+        (
+            clrCacheKey,
+            static k => BuildGenericClrSetter<TObject, TValue>
+            (
+                k.ClrObjectType,
+                k.ClrMemberName,
+                k.ClrMemberKind
+            )
+        );
         var clrSetter = clrCacheValue.ClrSetter;
 
         if (clrSetter is null)
@@ -236,8 +254,17 @@ public sealed partial class ApiProperty
         where TObject : struct
     {
         var clrObjectType = typeof(TObject);
-        var clrCacheKey = new ClrCacheKey(clrObjectType, this.ClrName);
-        var clrCacheValue = ClrSetterByRefCache<TObject, TValue>.Cache.GetOrAdd(clrCacheKey, static k => BuildGenericClrSetterByRef<TObject, TValue>(k.ClrObjectType, k.ClrMemberName));
+        var clrCacheKey = new ClrCacheKey(clrObjectType, this.ClrName, this.ClrMemberKind);
+        var clrCacheValue = ClrSetterByRefCache<TObject, TValue>.Cache.GetOrAdd
+        (
+            clrCacheKey,
+            static k => BuildGenericClrSetterByRef<TObject, TValue>
+            (
+                k.ClrObjectType,
+                k.ClrMemberName,
+                k.ClrMemberKind
+            )
+        );
         var clrSetterByRef = clrCacheValue.ClrSetterByRef;
 
         if (clrSetterByRef is null)
@@ -266,7 +293,8 @@ public sealed partial class ApiProperty
 
     #region TryGet Methods
     /// <summary>
-    ///     Attempts to read the CLR member value identified by <see cref="ClrName"/> from the specified <paramref name="clrObject"/>.
+    ///     Attempts to read the CLR member identified by <see cref="ClrName"/> and
+    ///     <see cref="ClrMemberKind"/> from the specified <paramref name="clrObject"/>.
     ///     This non-generic overload returns the value as <see cref="object"/>, which will box value types.
     /// </summary>
     /// <param name="clrObject">The object instance containing the member.</param>
@@ -328,8 +356,9 @@ public sealed partial class ApiProperty
     }
 
     /// <summary>
-    ///     Attempts to read the CLR member value identified by <see cref="ClrName"/> from the specified <paramref name="clrObject"/>
-    ///     with type safety and minimal boxing overhead.
+    ///     Attempts to read the CLR member identified by <see cref="ClrName"/> and
+    ///     <see cref="ClrMemberKind"/> from the specified <paramref name="clrObject"/> with type safety and
+    ///     minimal boxing overhead.
     /// </summary>
     /// <typeparam name="TObject">The static type of the target instance.</typeparam>
     /// <typeparam name="TValue">The desired return type for the member value.</typeparam>
@@ -366,8 +395,17 @@ public sealed partial class ApiProperty
         var clrObjectType = typeof(TObject);
         var clrMemberName = this.ClrName;
 
-        var clrCacheKey = new ClrCacheKey(clrObjectType, clrMemberName);
-        var clrCacheValue = ClrGetterCache<TObject, TValue>.Cache.GetOrAdd(clrCacheKey, static k => BuildGenericClrGetter<TObject, TValue>(k.ClrObjectType, k.ClrMemberName));
+        var clrCacheKey = new ClrCacheKey(clrObjectType, clrMemberName, this.ClrMemberKind);
+        var clrCacheValue = ClrGetterCache<TObject, TValue>.Cache.GetOrAdd
+        (
+            clrCacheKey,
+            static k => BuildGenericClrGetter<TObject, TValue>
+            (
+                k.ClrObjectType,
+                k.ClrMemberName,
+                k.ClrMemberKind
+            )
+        );
         var clrGetter = clrCacheValue.ClrGetter;
 
         if (clrGetter is null)
@@ -391,7 +429,9 @@ public sealed partial class ApiProperty
 
     #region TrySet Methods
     /// <summary>
-    ///     Attempts to set the CLR member identified by <see cref="ClrName"/> on the specified <paramref name="clrObject"/> to <paramref name="clrValue"/>.
+    ///     Attempts to set the CLR member identified by <see cref="ClrName"/> and
+    ///     <see cref="ClrMemberKind"/> on the specified <paramref name="clrObject"/> to
+    ///     <paramref name="clrValue"/>.
     ///     This non-generic overload accepts <see cref="object"/> parameters and will box value types by design.
     /// </summary>
     /// <param name="clrObject">The object instance containing the member to set.</param>
@@ -434,8 +474,9 @@ public sealed partial class ApiProperty
     }
 
     /// <summary>
-    ///     Attempts to set the CLR member identified by <see cref="ClrName"/> on the specified <paramref name="clrObject"/>
-    ///     to <paramref name="clrValue"/> with type safety and minimal boxing overhead.
+    ///     Attempts to set the CLR member identified by <see cref="ClrName"/> and
+    ///     <see cref="ClrMemberKind"/> on the specified <paramref name="clrObject"/> to
+    ///     <paramref name="clrValue"/> with type safety and minimal boxing overhead.
     /// </summary>
     /// <typeparam name="TObject">The static type of the target instance.</typeparam>
     /// <typeparam name="TValue">The type of the value to assign.</typeparam>
@@ -475,8 +516,17 @@ public sealed partial class ApiProperty
         var clrObjectType = typeof(TObject);
         var clrMemberName = this.ClrName;
 
-        var clrCacheKey = new ClrCacheKey(clrObjectType, clrMemberName);
-        var clrCacheValue = ClrSetterCache<TObject, TValue>.Cache.GetOrAdd(clrCacheKey, static k => BuildGenericClrSetter<TObject, TValue>(k.ClrObjectType, k.ClrMemberName));
+        var clrCacheKey = new ClrCacheKey(clrObjectType, clrMemberName, this.ClrMemberKind);
+        var clrCacheValue = ClrSetterCache<TObject, TValue>.Cache.GetOrAdd
+        (
+            clrCacheKey,
+            static k => BuildGenericClrSetter<TObject, TValue>
+            (
+                k.ClrObjectType,
+                k.ClrMemberName,
+                k.ClrMemberKind
+            )
+        );
         var clrSetter = clrCacheValue.ClrSetter;
 
         if (clrSetter is null)
@@ -496,8 +546,9 @@ public sealed partial class ApiProperty
     }
 
     /// <summary>
-    ///     Attempts to set the CLR member identified by <see cref="ClrName"/> on the specified struct <paramref name="clrObject"/>
-    ///     by reference, ensuring mutations affect the original instance.
+    ///     Attempts to set the CLR member identified by <see cref="ClrName"/> and
+    ///     <see cref="ClrMemberKind"/> on the specified struct <paramref name="clrObject"/> by reference,
+    ///     ensuring mutations affect the original instance.
     /// </summary>
     /// <typeparam name="TObject">The struct type of the target instance.</typeparam>
     /// <typeparam name="TValue">The type of the value to assign.</typeparam>
@@ -528,8 +579,17 @@ public sealed partial class ApiProperty
         var clrObjectType = typeof(TObject);
         var clrMemberName = this.ClrName;
 
-        var clrCacheKey = new ClrCacheKey(clrObjectType, clrMemberName);
-        var clrCacheValue = ClrSetterByRefCache<TObject, TValue>.Cache.GetOrAdd(clrCacheKey, static k => BuildGenericClrSetterByRef<TObject, TValue>(k.ClrObjectType, k.ClrMemberName));
+        var clrCacheKey = new ClrCacheKey(clrObjectType, clrMemberName, this.ClrMemberKind);
+        var clrCacheValue = ClrSetterByRefCache<TObject, TValue>.Cache.GetOrAdd
+        (
+            clrCacheKey,
+            static k => BuildGenericClrSetterByRef<TObject, TValue>
+            (
+                k.ClrObjectType,
+                k.ClrMemberName,
+                k.ClrMemberKind
+            )
+        );
         var clrSetterByRef = clrCacheValue.ClrSetterByRef;
 
         if (clrSetterByRef is null)

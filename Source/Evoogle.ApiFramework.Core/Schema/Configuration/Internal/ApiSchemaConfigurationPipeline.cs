@@ -727,7 +727,7 @@ internal sealed class ApiSchemaConfigurationPipeline
 
         return new ApiPropertyConventionContext
         (
-            ClrMemberKind.Unknown,
+            null,
             null,
             null,
             clrType,

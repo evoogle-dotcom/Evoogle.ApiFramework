@@ -12,7 +12,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Conventions;
 /// <summary>
 ///     Provides CLR metadata and builder context for an <see cref="IApiPropertyConvention"/>.
 /// </summary>
-/// <param name="clrMemberKind">The kind of CLR member backing the property, or <see cref="ClrMemberKind.Unknown"/> when no CLR member could be resolved.</param>
+/// <param name="clrMemberKind">The kind of CLR member backing the property, or <see langword="null"/> when no CLR member could be resolved.</param>
 /// <param name="clrMemberInfo">The CLR property or field backing the property, or <see langword="null"/> when no CLR member could be resolved.</param>
 /// <param name="clrMemberNullableInfo">The reflected nullability information for <paramref name="clrMemberInfo"/>, or <see langword="null"/> when it cannot be determined.</param>
 /// <param name="clrDeclaringType">The CLR type whose property convention is running.</param>
@@ -20,7 +20,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Conventions;
 /// <param name="apiSchemaBuilder">The schema builder running the convention pipeline.</param>
 public class ApiPropertyConventionContext
 (
-    ClrMemberKind clrMemberKind,
+    ClrMemberKind? clrMemberKind,
     MemberInfo? clrMemberInfo,
     MemberNullableInfo? clrMemberNullableInfo,
     Type clrDeclaringType,
@@ -29,8 +29,8 @@ public class ApiPropertyConventionContext
 )
 {
     #region Properties
-    /// <summary>Gets the kind of CLR member backing the property.</summary>
-    public ClrMemberKind ClrMemberKind { get; } = clrMemberKind;
+    /// <summary>Gets the kind of CLR member backing the property, or <see langword="null"/> when no CLR member could be resolved.</summary>
+    public ClrMemberKind? ClrMemberKind { get; } = clrMemberKind;
 
     /// <summary>Gets the CLR property or field backing the property, or <see langword="null"/> when no CLR member could be resolved.</summary>
     public MemberInfo? ClrMemberInfo { get; } = clrMemberInfo;
