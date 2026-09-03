@@ -3,12 +3,15 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Linq.Expressions;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 
 using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Schema.TestData;
 using Evoogle.XUnit;
+using Evoogle.XUnit.Json;
 
 using FluentAssertions;
 
@@ -26,7 +29,8 @@ public partial class ApiSchemaTests
 
         public required ApiSchemaKind SchemaKind { get; init; }
 
-        public required Action<JsonObject> UpdateJson { get; init; }
+        [JsonConverter(typeof(ExpressionActionJsonConverter<JsonObject>))]
+        public required Expression<Action<JsonObject>> UpdateJson { get; init; }
         #endregion
 
         #region Calculated Properties
@@ -39,7 +43,8 @@ public partial class ApiSchemaTests
         protected override void Arrange()
         {
             var json = CreateSchemaJson(this.SchemaKind);
-            this.UpdateJson(json);
+            var updateJson = this.UpdateJson.Compile() ?? throw new InvalidOperationException($"Unable to compile {nameof(this.UpdateJson)} into an action.");
+            updateJson(json);
             this.SourceJson = json.ToJsonString();
         }
 
@@ -70,7 +75,8 @@ public partial class ApiSchemaTests
 
         public bool ExpectsInheritedObjectNullHandling { get; init; }
 
-        public required Action<JsonObject> UpdateJson { get; init; }
+        [JsonConverter(typeof(ExpressionActionJsonConverter<JsonObject>))]
+        public required Expression<Action<JsonObject>> UpdateJson { get; init; }
         #endregion
 
         #region Calculated Properties
@@ -83,7 +89,8 @@ public partial class ApiSchemaTests
         protected override void Arrange()
         {
             var json = CreateSchemaJson(ApiSchemaKind.Simple);
-            this.UpdateJson(json);
+            var updateJson = this.UpdateJson.Compile() ?? throw new InvalidOperationException($"Unable to compile {nameof(this.UpdateJson)} into an action.");
+            updateJson(json);
             this.SourceJson = json.ToJsonString();
         }
 
@@ -110,7 +117,8 @@ public partial class ApiSchemaTests
         #region User Supplied Properties
         public required bool IsRelationship { get; init; }
 
-        public required Action<JsonObject> UpdateJson { get; init; }
+        [JsonConverter(typeof(ExpressionActionJsonConverter<JsonObject>))]
+        public required Expression<Action<JsonObject>> UpdateJson { get; init; }
         #endregion
 
         #region Calculated Properties
@@ -127,7 +135,8 @@ public partial class ApiSchemaTests
                 ? schema[nameof(ApiSchema.ApiRelationships)]!.AsArray()[0]!.AsObject()
                 : schema[nameof(ApiSchema.ApiScalarTypes)]!.AsArray()[0]!.AsObject();
 
-            this.UpdateJson(value);
+            var updateJson = this.UpdateJson.Compile() ?? throw new InvalidOperationException($"Unable to compile {nameof(this.UpdateJson)} into an action.");
+            updateJson(value);
             this.SourceJson = value.ToJsonString();
         }
 
@@ -166,52 +175,49 @@ public partial class ApiSchemaTests
             Name = "Property type modifiers reject an unknown JSON enum value",
             SchemaKind = ApiSchemaKind.Simple,
             ExpectedCode = ApiInitializationCode.ApiPropertyInvalidApiTypeModifiers,
-            UpdateJson = static json => GetFirstProperty(json)[nameof(ApiProperty.ApiTypeModifiers)] = "Unknown",
+            UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.SetFirstPropertyApiTypeModifiersToUnknownString(a),
         },
         new InitializationIssueTest
         {
             Name = "Property type modifiers reject a JSON null enum value",
             SchemaKind = ApiSchemaKind.Simple,
             ExpectedCode = ApiInitializationCode.ApiPropertyInvalidApiTypeModifiers,
-            UpdateJson = static json => GetFirstProperty(json)[nameof(ApiProperty.ApiTypeModifiers)] = null,
+            UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.SetFirstPropertyApiTypeModifiersToNull(a),
         },
         new InitializationIssueTest
         {
             Name = "Collection item type modifiers reject an incompatible JSON enum token",
             SchemaKind = ApiSchemaKind.Commerce,
             ExpectedCode = ApiInitializationCode.ApiCollectionTypeInvalidApiItemTypeModifiers,
-            UpdateJson = static json => GetFirstCollectionType(json)[nameof(ApiCollectionType.ApiItemTypeModifiers)] = 1,
+            UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.SetFirstCollectionTypeApiItemTypeModifiersToIncompatibleToken(a),
         },
         new InitializationIssueTest
         {
             Name = "Schema key null handling rejects a JSON null enum value",
             SchemaKind = ApiSchemaKind.Simple,
             ExpectedCode = ApiInitializationCode.ApiSchemaInvalidApiKeyNullHandling,
-            UpdateJson = static json => json[nameof(ApiSchema.ApiOptions)]!.AsObject()[nameof(ApiSchemaOptions.ApiKeyNullHandling)] = null,
+            UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.SetSchemaApiKeyNullHandlingToNull(a),
         },
         new InitializationIssueTest
         {
             Name = "Object key null handling rejects an unknown JSON enum value",
             SchemaKind = ApiSchemaKind.Simple,
             ExpectedCode = ApiInitializationCode.ApiObjectTypeInvalidApiKeyNullHandling,
-            UpdateJson = static json => GetFirstObjectType(json)[nameof(ApiObjectType.ApiOptions)] = new JsonObject
-            {
-                [nameof(ApiObjectTypeOptions.ApiKeyNullHandling)] = "Unknown",
-            },
+            UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.SetFirstObjectTypeApiKeyNullHandlingToUnknownString(a),
         },
         new InitializationIssueTest
         {
             Name = "Relationship delete behavior rejects an incompatible JSON enum token",
             SchemaKind = ApiSchemaKind.Relationship,
             ExpectedCode = ApiInitializationCode.ApiRelationshipInvalidApiDeleteBehavior,
-            UpdateJson = static json => json[nameof(ApiSchema.ApiRelationships)]!.AsArray()[0]!.AsObject()[nameof(ApiRelationship.ApiDeleteBehavior)] = new JsonObject(),
+            UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.SetFirstRelationshipApiDeleteBehaviorToIncompatibleToken(a),
         },
         new InitializationIssueTest
         {
             Name = "Type expression API kind rejects an unknown JSON enum value",
             SchemaKind = ApiSchemaKind.Simple,
             ExpectedCode = ApiInitializationCode.ApiTypeExpressionInvalidApiKind,
-            UpdateJson = static json => GetFirstProperty(json)[nameof(ApiProperty.ApiType)]!.AsObject()[nameof(ApiTypeExpression.ApiKind)] = "Unknown",
+            UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.SetFirstPropertyApiTypeApiKindToUnknownString(a),
         },
     ];
 
@@ -221,17 +227,14 @@ public partial class ApiSchemaTests
         {
             Name = "Omitted schema key null handling uses the default",
             ExpectedSchemaNullHandling = ApiKeyNullHandling.UseDefaultOnNull,
-            UpdateJson = static json => json[nameof(ApiSchema.ApiOptions)]!.AsObject().Remove(nameof(ApiSchemaOptions.ApiKeyNullHandling)),
+            UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.RemoveSchemaApiKeyNullHandling(a),
         },
         new DefaultAndInheritanceTest
         {
             Name = "Null object key null handling preserves inheritance",
             ExpectedSchemaNullHandling = ApiKeyNullHandling.UseDefaultOnNull,
             ExpectsInheritedObjectNullHandling = true,
-            UpdateJson = static json => GetFirstObjectType(json)[nameof(ApiObjectType.ApiOptions)] = new JsonObject
-            {
-                [nameof(ApiObjectTypeOptions.ApiKeyNullHandling)] = null,
-            },
+            UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.SetFirstObjectTypeApiKeyNullHandlingToNull(a),
         },
     ];
 
@@ -241,61 +244,61 @@ public partial class ApiSchemaTests
         {
             Name = "Type discriminator rejects an omitted JSON enum value",
             IsRelationship = false,
-            UpdateJson = static json => json.Remove(nameof(ApiType.ApiKind)),
+            UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.RemoveApiKind(a),
         },
         new StructuralDiscriminatorTest
         {
             Name = "Type discriminator rejects a JSON null enum value",
             IsRelationship = false,
-            UpdateJson = static json => json[nameof(ApiType.ApiKind)] = null,
+            UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.SetApiKindToNull(a),
         },
         new StructuralDiscriminatorTest
         {
             Name = "Type discriminator rejects a whitespace JSON enum value",
             IsRelationship = false,
-            UpdateJson = static json => json[nameof(ApiType.ApiKind)] = " ",
+            UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.SetApiKindToWhitespace(a),
         },
         new StructuralDiscriminatorTest
         {
             Name = "Type discriminator rejects an unknown JSON enum value",
             IsRelationship = false,
-            UpdateJson = static json => json[nameof(ApiType.ApiKind)] = "Unknown",
+            UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.SetApiKindToUnknownString(a),
         },
         new StructuralDiscriminatorTest
         {
             Name = "Type discriminator rejects an incompatible JSON enum token",
             IsRelationship = false,
-            UpdateJson = static json => json[nameof(ApiType.ApiKind)] = new JsonArray(),
+            UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.SetApiKindToIncompatibleToken(a),
         },
         new StructuralDiscriminatorTest
         {
             Name = "Relationship discriminator rejects an omitted JSON enum value",
             IsRelationship = true,
-            UpdateJson = static json => json.Remove(nameof(ApiRelationship.ApiKind)),
+            UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.RemoveApiKind(a),
         },
         new StructuralDiscriminatorTest
         {
             Name = "Relationship discriminator rejects a JSON null enum value",
             IsRelationship = true,
-            UpdateJson = static json => json[nameof(ApiRelationship.ApiKind)] = null,
+            UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.SetApiKindToNull(a),
         },
         new StructuralDiscriminatorTest
         {
             Name = "Relationship discriminator rejects a whitespace JSON enum value",
             IsRelationship = true,
-            UpdateJson = static json => json[nameof(ApiRelationship.ApiKind)] = " ",
+            UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.SetApiKindToWhitespace(a),
         },
         new StructuralDiscriminatorTest
         {
             Name = "Relationship discriminator rejects an unknown JSON enum value",
             IsRelationship = true,
-            UpdateJson = static json => json[nameof(ApiRelationship.ApiKind)] = "Unknown",
+            UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.SetApiKindToUnknownString(a),
         },
         new StructuralDiscriminatorTest
         {
             Name = "Relationship discriminator rejects an incompatible JSON enum token",
             IsRelationship = true,
-            UpdateJson = static json => json[nameof(ApiRelationship.ApiKind)] = new JsonArray(),
+            UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.SetApiKindToIncompatibleToken(a),
         },
     ];
     #endregion
@@ -323,31 +326,5 @@ public partial class ApiSchemaTests
         return json?.AsObject()
             ?? throw new InvalidOperationException($"{nameof(ApiSchema)} JSON was not an object.");
     }
-
-    private static JsonObject GetFirstCollectionType(JsonObject json)
-    {
-        foreach (var apiObjectTypeNode in json[nameof(ApiSchema.ApiObjectTypes)]!.AsArray())
-        {
-            var apiObjectType = apiObjectTypeNode!.AsObject();
-            foreach (var apiPropertyNode in apiObjectType[nameof(ApiObjectType.ApiProperties)]!.AsArray())
-            {
-                var apiTypeExpression = apiPropertyNode!.AsObject()[nameof(ApiProperty.ApiType)]!.AsObject();
-                var apiInlineType = apiTypeExpression[nameof(ApiTypeExpression.ApiInlineType)]?.AsObject();
-                if (apiInlineType?[nameof(ApiType.ApiKind)]?.GetValue<string>() == nameof(ApiTypeKind.Collection))
-                {
-                    return apiInlineType;
-                }
-            }
-        }
-
-        throw new InvalidOperationException("The schema contains no inline collection type.");
-    }
-
-    private static JsonObject GetFirstObjectType(JsonObject json)
-        => json[nameof(ApiSchema.ApiObjectTypes)]!.AsArray()[0]!.AsObject();
-
-    private static JsonObject GetFirstProperty(JsonObject json)
-        => GetFirstObjectType(json)[nameof(ApiObjectType.ApiProperties)]!.AsArray()[0]!.AsObject();
-
     #endregion
 }
