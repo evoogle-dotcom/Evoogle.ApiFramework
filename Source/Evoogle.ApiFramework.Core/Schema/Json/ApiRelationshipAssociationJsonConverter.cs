@@ -141,6 +141,19 @@ public class ApiRelationshipAssociationJsonConverter(ILogger<ApiRelationshipAsso
             ? new ApiRelationshipAssociation(clrObjectType!, apiForeignKeyTypeA, apiForeignKeyTypeB)
             : new ApiRelationshipAssociation(clrObjectType!);
 
+        if (clrObjectType is not null)
+        {
+            foreach (var apiKeyPath in apiForeignKeyTypeA?.ApiKeyPaths ?? [])
+            {
+                apiKeyPath.EnsureClrRootType(clrObjectType);
+            }
+
+            foreach (var apiKeyPath in apiForeignKeyTypeB?.ApiKeyPaths ?? [])
+            {
+                apiKeyPath.EnsureClrRootType(clrObjectType);
+            }
+        }
+
         AttachExtensions(apiRelationshipAssociation, readContext.ReadData.Extensions);
         return apiRelationshipAssociation;
     }

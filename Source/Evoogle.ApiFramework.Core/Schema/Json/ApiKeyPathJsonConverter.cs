@@ -151,7 +151,7 @@ public class ApiKeyPathJsonConverter(ILogger<ApiKeyPathJsonConverter>? logger) :
         var clrRootType = readState?.ClrRootType;
         var apiSegments = readState?.ApiSegments;
 
-        var apiKeyPath = new ApiKeyPath(clrRootType!, apiSegments!);
+        var apiKeyPath = new ApiKeyPath(clrRootType, apiSegments!);
 
         var extensions = readContext.ReadData.Extensions;
         AttachExtensions(apiKeyPath, extensions);
@@ -186,8 +186,14 @@ public class ApiKeyPathJsonConverter(ILogger<ApiKeyPathJsonConverter>? logger) :
     #region Write Implementation Methods
     private static void WriteApiKeyPathClrRootType(Utf8JsonWriter writer, ApiKeyPath apiKeyPath, DefaultWriteContext<PropertyNames> context)
     {
-        var propertyName = context.PropertyNames.ApiKeyPath.ClrRootType;
         var type = apiKeyPath.ClrRootType;
+
+        if (apiKeyPath.GetOwningDefaultClrRootType() == type)
+        {
+            return; // Inferred from the owning ApiObjectType or ApiRelationshipDependentEnd during compilation.
+        }
+
+        var propertyName = context.PropertyNames.ApiKeyPath.ClrRootType;
         var options = context.Options;
 
         writer.TryWritePropertyWithConverter(propertyName, type, options, _typeJsonConverter);

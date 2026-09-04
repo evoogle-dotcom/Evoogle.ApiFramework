@@ -132,6 +132,9 @@ public abstract class ApiSchemaElement : ExtensibleBase, INode<ApiSchemaElement>
 
     internal bool IsFrozen => _isFrozen;
 
+    /// <summary>Gets a value indicating whether this element's ownership topology has been established.</summary>
+    internal bool HasTopology => _topology is not null;
+
     private ApiSchemaElementTopology Topology => this.ThrowIfNotInitialized(_topology);
     #endregion
 

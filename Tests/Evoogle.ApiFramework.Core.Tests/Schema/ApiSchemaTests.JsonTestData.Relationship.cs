@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024-2025 Evoogle.com
+// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -273,7 +273,6 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""PK_RelationshipUser_Id"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ClrRootType"": ""Evoogle.ApiFramework.TestData.RelationshipUser,Evoogle.ApiFramework.Core.Tests"",
                                         ""ApiSegments"": [
                                             { ""ClrPropertyName"": ""Id"" }
                                         ]
@@ -333,7 +332,6 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""PK_RelationshipUserProfile_UserId"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ClrRootType"": ""Evoogle.ApiFramework.TestData.RelationshipUserProfile,Evoogle.ApiFramework.Core.Tests"",
                                         ""ApiSegments"": [
                                             { ""ClrPropertyName"": ""UserId"" }
                                         ]
@@ -344,7 +342,6 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""AK_RelationshipUserProfile_UserRef"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ClrRootType"": ""Evoogle.ApiFramework.TestData.RelationshipUserProfile,Evoogle.ApiFramework.Core.Tests"",
                                         ""ApiSegments"": [
                                             { ""ClrPropertyName"": ""UserRef"" },
                                             { ""ClrPropertyName"": ""UserId"" }
@@ -375,7 +372,6 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""PK_RelationshipUserRef_UserId"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ClrRootType"": ""Evoogle.ApiFramework.TestData.RelationshipUserRef,Evoogle.ApiFramework.Core.Tests"",
                                         ""ApiSegments"": [
                                             { ""ClrPropertyName"": ""UserId"" }
                                         ]
@@ -398,7 +394,6 @@ public partial class ApiSchemaTests
                             ""ApiForeignKeyType"": {
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ClrRootType"": ""Evoogle.ApiFramework.TestData.RelationshipUserProfile,Evoogle.ApiFramework.Core.Tests"",
                                         ""ApiSegments"": [
                                             { ""ClrPropertyName"": ""UserRef"" },
                                             { ""ClrPropertyName"": ""UserId"" }
@@ -420,7 +415,6 @@ public partial class ApiSchemaTests
                             ""ApiForeignKeyType"": {
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ClrRootType"": ""Evoogle.ApiFramework.TestData.RelationshipUserProfile,Evoogle.ApiFramework.Core.Tests"",
                                         ""ApiSegments"": [
                                             { ""ClrPropertyName"": ""UserId"" }
                                         ]
@@ -867,7 +861,6 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""PK_RelationshipComment_Id"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ClrRootType"": ""Evoogle.ApiFramework.TestData.RelationshipComment,Evoogle.ApiFramework.Core.Tests"",
                                         ""ApiSegments"": [
                                             { ""ClrPropertyName"": ""Id"" }
                                         ]
@@ -954,7 +947,6 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""PK_RelationshipPost_Id"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ClrRootType"": ""Evoogle.ApiFramework.TestData.RelationshipPost,Evoogle.ApiFramework.Core.Tests"",
                                         ""ApiSegments"": [
                                             { ""ClrPropertyName"": ""Id"" }
                                         ]
@@ -984,7 +976,6 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""PK_RelationshipPostRef_PostId"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ClrRootType"": ""Evoogle.ApiFramework.TestData.RelationshipPostRef,Evoogle.ApiFramework.Core.Tests"",
                                         ""ApiSegments"": [
                                             { ""ClrPropertyName"": ""PostId"" }
                                         ]
@@ -1041,7 +1032,6 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""PK_RelationshipUser_Id"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ClrRootType"": ""Evoogle.ApiFramework.TestData.RelationshipUser,Evoogle.ApiFramework.Core.Tests"",
                                         ""ApiSegments"": [
                                             { ""ClrPropertyName"": ""Id"" }
                                         ]
@@ -1071,7 +1061,6 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""PK_RelationshipUserRef_UserId"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ClrRootType"": ""Evoogle.ApiFramework.TestData.RelationshipUserRef,Evoogle.ApiFramework.Core.Tests"",
                                         ""ApiSegments"": [
                                             { ""ClrPropertyName"": ""UserId"" }
                                         ]
@@ -1094,7 +1083,6 @@ public partial class ApiSchemaTests
                             ""ApiForeignKeyType"": {
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ClrRootType"": ""Evoogle.ApiFramework.TestData.RelationshipComment,Evoogle.ApiFramework.Core.Tests"",
                                         ""ApiSegments"": [
                                             { ""ClrPropertyName"": ""PostRef"" },
                                             { ""ClrPropertyName"": ""PostId"" }
@@ -1116,7 +1104,6 @@ public partial class ApiSchemaTests
                             ""ApiForeignKeyType"": {
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ClrRootType"": ""Evoogle.ApiFramework.TestData.RelationshipComment,Evoogle.ApiFramework.Core.Tests"",
                                         ""ApiSegments"": [
                                             { ""ClrPropertyName"": ""PostId"" }
                                         ]
@@ -1137,7 +1124,6 @@ public partial class ApiSchemaTests
                             ""ApiForeignKeyType"": {
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ClrRootType"": ""Evoogle.ApiFramework.TestData.RelationshipPost,Evoogle.ApiFramework.Core.Tests"",
                                         ""ApiSegments"": [
                                             { ""ClrPropertyName"": ""AuthorUserRef"" },
                                             { ""ClrPropertyName"": ""UserId"" }
@@ -1159,7 +1145,6 @@ public partial class ApiSchemaTests
                             ""ApiForeignKeyType"": {
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ClrRootType"": ""Evoogle.ApiFramework.TestData.RelationshipPost,Evoogle.ApiFramework.Core.Tests"",
                                         ""ApiSegments"": [
                                             { ""ClrPropertyName"": ""AuthorUserId"" }
                                         ]
@@ -1436,7 +1421,6 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""PK_RelationshipPost_Id"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ClrRootType"": ""Evoogle.ApiFramework.TestData.RelationshipPost,Evoogle.ApiFramework.Core.Tests"",
                                         ""ApiSegments"": [
                                             { ""ClrPropertyName"": ""Id"" }
                                         ]
@@ -1476,13 +1460,11 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""PK_RelationshipPostTag_PostId_TagId"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ClrRootType"": ""Evoogle.ApiFramework.TestData.RelationshipPostTag,Evoogle.ApiFramework.Core.Tests"",
                                         ""ApiSegments"": [
                                             { ""ClrPropertyName"": ""PostId"" }
                                         ]
                                     },
                                     {
-                                        ""ClrRootType"": ""Evoogle.ApiFramework.TestData.RelationshipPostTag,Evoogle.ApiFramework.Core.Tests"",
                                         ""ApiSegments"": [
                                             { ""ClrPropertyName"": ""TagId"" }
                                         ]
@@ -1539,7 +1521,6 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""PK_RelationshipTag_Id"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ClrRootType"": ""Evoogle.ApiFramework.TestData.RelationshipTag,Evoogle.ApiFramework.Core.Tests"",
                                         ""ApiSegments"": [
                                             { ""ClrPropertyName"": ""Id"" }
                                         ]
@@ -1565,7 +1546,6 @@ public partial class ApiSchemaTests
                             ""ApiForeignKeyTypeA"": {
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ClrRootType"": ""Evoogle.ApiFramework.TestData.RelationshipPostTag,Evoogle.ApiFramework.Core.Tests"",
                                         ""ApiSegments"": [
                                             { ""ClrPropertyName"": ""PostId"" }
                                         ]
@@ -1575,7 +1555,6 @@ public partial class ApiSchemaTests
                             ""ApiForeignKeyTypeB"": {
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ClrRootType"": ""Evoogle.ApiFramework.TestData.RelationshipPostTag,Evoogle.ApiFramework.Core.Tests"",
                                         ""ApiSegments"": [
                                             { ""ClrPropertyName"": ""TagId"" }
                                         ]

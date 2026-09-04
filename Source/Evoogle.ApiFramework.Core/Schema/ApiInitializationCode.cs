@@ -126,6 +126,13 @@ public enum ApiInitializationCode
     /// </summary>
     [EnumMember(Value = "API_KEY_PATH_UNRESOLVED_ROOT_TYPE")]
     ApiKeyPathUnresolvedRootType,
+
+    /// <summary>
+    ///     An <see cref="ApiKeyPath"/> declares no explicit root CLR type and no owning
+    ///     <see cref="ApiObjectType"/> or <see cref="ApiRelationshipElement"/> could supply one.
+    /// </summary>
+    [EnumMember(Value = "API_KEY_PATH_UNINFERABLE_ROOT_TYPE")]
+    ApiKeyPathUninferableRootType,
     #endregion
 
     #region ApiKeyPathSegment Initialization Codes

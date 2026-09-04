@@ -72,6 +72,17 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
             clrType!
         );
 
+        if (apiKeyTypes is not null && clrType is not null)
+        {
+            foreach (var apiKeyType in apiKeyTypes)
+            {
+                foreach (var apiKeyPath in apiKeyType.ApiKeyPaths)
+                {
+                    apiKeyPath.EnsureClrRootType(clrType);
+                }
+            }
+        }
+
         return apiObjectType;
     }
     #endregion

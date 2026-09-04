@@ -130,6 +130,14 @@ public class ApiRelationshipDependentEndJsonConverter(ILogger<ApiRelationshipDep
             ? new ApiRelationshipDependentEnd(clrObjectType!, apiForeignKeyType)
             : new ApiRelationshipDependentEnd(clrObjectType!);
 
+        if (apiForeignKeyType is not null && clrObjectType is not null)
+        {
+            foreach (var apiKeyPath in apiForeignKeyType.ApiKeyPaths)
+            {
+                apiKeyPath.EnsureClrRootType(clrObjectType);
+            }
+        }
+
         AttachExtensions(end, readContext.ReadData.Extensions);
         return end;
     }
