@@ -22,14 +22,14 @@ public sealed class ApiConventionSetBuilder
 
     #region Constructors
     /// <summary>
-    ///     Initializes a new empty <see cref="ApiConventionSetBuilder"/>.
+    ///     Creates a new empty <see cref="ApiConventionSetBuilder"/>.
     /// </summary>
     public ApiConventionSetBuilder()
     {
     }
 
     /// <summary>
-    ///     Initializes a new <see cref="ApiConventionSetBuilder"/> pre-populated from an existing
+    ///     Creates a new <see cref="ApiConventionSetBuilder"/> pre-populated from an existing
     ///     <see cref="ApiConventionSet"/>, allowing additive customization.
     /// </summary>
     /// <param name="existing">The existing convention set to copy conventions from.</param>

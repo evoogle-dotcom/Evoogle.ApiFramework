@@ -136,9 +136,9 @@ public partial class ApiSchemaTests
         public RelNestedType? Nested { get; set; }
     }
 
-    // CLR types for the key initialization order regression test.
+    // CLR types for the key compilation order regression test.
     // AlphaKeyType sorts before ZetaKeyType alphabetically; its composite key navigates through ZetaKeyType.
-    // Under the original single-pass initialization, AlphaKeyType's key would be initialized before
+    // Under the original single-pass compilation, AlphaKeyType's key would be compiled before
     // ZetaKeyType's property lookups were populated, causing an ApiSchemaException.
     public class ZetaKeyType
     {
@@ -152,14 +152,14 @@ public partial class ApiSchemaTests
     #endregion
 
     #region Theory Data
-    public static TheoryDataRow<IXUnitTest>[] InitializeThrowsTheoryData =>
+    public static TheoryDataRow<IXUnitTest>[] CompileThrowsTheoryData =>
     [
         //
-        // ApiCollectionType Initialization Tests
+        // ApiCollectionType Compilation Tests
         //
 
         // ApiCollectionType throws if item type expression is null
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiCollectionType)} Throws If {nameof(ApiCollectionType.ApiItemType)} Is Null",
             SourceJson = @"
@@ -189,14 +189,14 @@ public partial class ApiSchemaTests
                     }
                 ]
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"].{nameof(ApiProperty)}[\"Items\"].{nameof(ApiCollectionType)}",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiCollectionTypeNullItemType,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiCollectionTypeNullItemType,
                     description: $"{nameof(ApiCollectionType.ApiItemType)} must not be null",
                     remediation: $"Specify a valid {nameof(ApiCollectionType.ApiItemType)}"
                 ),
@@ -204,7 +204,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiCollectionType throws if item type expression cannot be resolved
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiCollectionType)} Throws If {nameof(ApiCollectionType.ApiItemType)} Is Unresolved",
             SourceJson = @"
@@ -238,14 +238,14 @@ public partial class ApiSchemaTests
                     }
                 ]
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"].{nameof(ApiProperty)}[\"Items\"].{nameof(ApiCollectionType)}",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiCollectionTypeUnresolvedItemType,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiCollectionTypeUnresolvedItemType,
                     description: $"{nameof(ApiCollectionType.ApiItemType)} could not be resolved for {nameof(ApiTypeExpression.ApiKind)}='{ApiTypeKind.Scalar}' and {nameof(ApiTypeExpression.ApiName)}='String'",
                     remediation: $"Verify that a type is declared in the schema for {nameof(ApiTypeExpression.ApiKind)}='{ApiTypeKind.Scalar}' and {nameof(ApiTypeExpression.ApiName)}='String'"
                 ),
@@ -253,11 +253,11 @@ public partial class ApiSchemaTests
         },
 
         //
-        // ApiEnumType Initialization Tests
+        // ApiEnumType Compilation Tests
         //
 
         // ApiEnumType throws if ApiName is invalid
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiEnumType)} Throws If {nameof(ApiEnumType.ApiName)} Is Invalid",
             SourceJson = @"
@@ -290,14 +290,14 @@ public partial class ApiSchemaTests
                 ],
                 ""ApiObjectTypes"": []
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiEnumType)}",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiNamedTypeInvalidApiName,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiNamedTypeInvalidApiName,
                     description: $"{nameof(ApiEnumType.ApiName)} must not be null, empty, or whitespace",
                     remediation: $"Specify a valid {nameof(ApiEnumType.ApiName)} value"
                 ),
@@ -305,7 +305,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiEnumType throws if ClrType is null
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiEnumType)} Throws If {nameof(ApiEnumType.ClrType)} Is Null",
             SourceJson = @"
@@ -337,14 +337,14 @@ public partial class ApiSchemaTests
                 ],
                 ""ApiObjectTypes"": []
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiTypeNullClrType,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiTypeNullClrType,
                     description: $"{nameof(ApiEnumType.ClrType)} must not be null",
                     remediation: $"Specify a valid {nameof(ApiEnumType.ClrType)}"
                 ),
@@ -352,7 +352,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiEnumType throws if ClrType is not a CLR Enum
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiEnumType)} Throws If {nameof(ApiEnumType.ClrType)} Is Not a CLR Enum",
             SourceJson = @"
@@ -385,14 +385,14 @@ public partial class ApiSchemaTests
                 ],
                 ""ApiObjectTypes"": []
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiEnumTypeInvalidClrType,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiEnumTypeInvalidClrType,
                     description: $"{nameof(ApiEnumType.ClrType)} 'String' must be a CLR Enum",
                     remediation: $"Set {nameof(ApiEnumType.ClrType)} to a CLR Enum type"
                 ),
@@ -400,7 +400,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiEnumType throws if ApiEnumValues is null
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiEnumType)} Throws If {nameof(ApiEnumType.ApiEnumValues)} Is Null",
             SourceJson = @"
@@ -416,14 +416,14 @@ public partial class ApiSchemaTests
                 ],
                 ""ApiObjectTypes"": []
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiEnumTypeNullOrEmptyValues,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiEnumTypeNullOrEmptyValues,
                     description: $"{nameof(ApiEnumType.ApiEnumValues)} must not be null or empty",
                     remediation: $"Define at least one {nameof(ApiEnumValue)}"
                 ),
@@ -431,7 +431,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiEnumType throws if ApiEnumValues is emtpy
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiEnumType)} Throws If {nameof(ApiEnumType.ApiEnumValues)} Is Empty",
             SourceJson = @"
@@ -448,14 +448,14 @@ public partial class ApiSchemaTests
                 ],
                 ""ApiObjectTypes"": []
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiEnumTypeNullOrEmptyValues,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiEnumTypeNullOrEmptyValues,
                     description: $"{nameof(ApiEnumType.ApiEnumValues)} must not be null or empty",
                     remediation: $"Define at least one {nameof(ApiEnumValue)}"
                 ),
@@ -463,7 +463,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiEnumType throws if ApiEnumValues has duplicate ApiName values
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiEnumType)} Throws If {nameof(ApiEnumType.ApiEnumValues)} Has Duplicate {nameof(ApiEnumValue.ApiName)} Values",
             SourceJson = @"
@@ -496,14 +496,14 @@ public partial class ApiSchemaTests
                 ],
                 ""ApiObjectTypes"": []
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiEnumTypeDuplicateValueApiName,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiEnumTypeDuplicateValueApiName,
                     description: $"Duplicate {nameof(ApiEnumValue)}.{nameof(ApiEnumValue.ApiName)} values: 'Female'",
                     remediation: $"Verify that each {nameof(ApiEnumValue)} has a unique {nameof(ApiEnumValue.ApiName)} value"
                 ),
@@ -511,7 +511,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiEnumType throws if ApiEnumValues has duplicate ClrName values
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiEnumType)} Throws If {nameof(ApiEnumType.ApiEnumValues)} Has Duplicate {nameof(ApiEnumValue.ClrName)} Values",
             SourceJson = @"
@@ -544,14 +544,14 @@ public partial class ApiSchemaTests
                 ],
                 ""ApiObjectTypes"": []
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiEnumTypeDuplicateValueClrName,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiEnumTypeDuplicateValueClrName,
                     description: $"Duplicate {nameof(ApiEnumValue)}.{nameof(ApiEnumValue.ClrName)} values: 'Female'",
                     remediation: $"Verify that each {nameof(ApiEnumValue)} has a unique {nameof(ApiEnumValue.ClrName)} value"
                 ),
@@ -559,7 +559,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiEnumType throws if ApiEnumValues has duplicate ClrOrdinal values
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiEnumType)} Throws If {nameof(ApiEnumType.ApiEnumValues)} Has Duplicate {nameof(ApiEnumValue.ClrOrdinal)} Values",
             SourceJson = @"
@@ -597,14 +597,14 @@ public partial class ApiSchemaTests
                 ],
                 ""ApiObjectTypes"": []
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiEnumTypeDuplicateValueClrOrdinal,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiEnumTypeDuplicateValueClrOrdinal,
                     description: $"Duplicate {nameof(ApiEnumValue)}.{nameof(ApiEnumValue.ClrOrdinal)} values: '2'",
                     remediation: $"Verify that each {nameof(ApiEnumValue)} has a unique {nameof(ApiEnumValue.ClrOrdinal)} value"
                 ),
@@ -612,11 +612,11 @@ public partial class ApiSchemaTests
         },
 
         //
-        // ApiEnumValue Initialization Tests
+        // ApiEnumValue Compilation Tests
         //
 
         // ApiEnumValue throws if ApiName is invalid
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiEnumValue)} Throws If {nameof(ApiEnumValue.ApiName)} Is Invalid",
             SourceJson = @"
@@ -649,14 +649,14 @@ public partial class ApiSchemaTests
                 ],
                 ""ApiObjectTypes"": []
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"].{nameof(ApiEnumValue)}",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiEnumValueInvalidApiName,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiEnumValueInvalidApiName,
                     description: $"{nameof(ApiEnumValue.ApiName)} must not be null, empty, or whitespace",
                     remediation: $"Specify a valid {nameof(ApiEnumValue.ApiName)} value"
                 ),
@@ -664,7 +664,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiEnumValue throws if ClrName is invalid
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiEnumValue)} Throws If {nameof(ApiEnumValue.ClrName)} Is Invalid",
             SourceJson = @"
@@ -697,14 +697,14 @@ public partial class ApiSchemaTests
                 ],
                 ""ApiObjectTypes"": []
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiEnumType)}[\"{nameof(Gender)}\"].{nameof(ApiEnumValue)}[\"{nameof(Gender.Male)}\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiEnumValueInvalidClrName,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiEnumValueInvalidClrName,
                     description: $"{nameof(ApiEnumValue.ClrName)} must not be null, empty, or whitespace",
                     remediation: $"Specify a valid {nameof(ApiEnumValue.ClrName)} value"
                 ),
@@ -712,11 +712,11 @@ public partial class ApiSchemaTests
         },
 
         //
-        // ApiProperty Initialization Tests
+        // ApiProperty Compilation Tests
         //
 
         // ApiProperty throws if ApiName is invalid
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiProperty)} Throws If {nameof(ApiProperty.ApiName)} Is Invalid",
             SourceJson = @"
@@ -750,14 +750,14 @@ public partial class ApiSchemaTests
                     }
                 ]
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiPropertyInvalidApiName,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiPropertyInvalidApiName,
                     description: $"{nameof(ApiProperty.ApiName)} must not be null, empty, or whitespace",
                     remediation: $"Specify a valid {nameof(ApiProperty.ApiName)} value"
                 ),
@@ -765,7 +765,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiProperty throws if ClrName is invalid
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiProperty)} Throws If {nameof(ApiProperty.ClrName)} Is Invalid",
             SourceJson = @"
@@ -799,14 +799,14 @@ public partial class ApiSchemaTests
                     }
                 ]
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"RequiredName\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiPropertyInvalidClrName,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiPropertyInvalidClrName,
                     description: $"{nameof(ApiProperty.ClrName)} must not be null, empty, or whitespace",
                     remediation: $"Specify a valid {nameof(ApiProperty.ClrName)} value"
                 ),
@@ -814,7 +814,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiProperty throws if the specified CLR field is missing
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiProperty)} Throws If Specified CLR Field Is Missing",
             SourceJson = @"
@@ -848,14 +848,14 @@ public partial class ApiSchemaTests
                     }
                 ]
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(ClrMemberKindPropertyOnlyType)}\"].{nameof(ApiProperty)}[\"Value\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiPropertyMissingClrMember,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiPropertyMissingClrMember,
                     description: $"CLR field 'Value' was not found on CLR type '{nameof(ClrMemberKindPropertyOnlyType)}'",
                     remediation: $"Add a public CLR field named 'Value' to CLR type '{nameof(ClrMemberKindPropertyOnlyType)}'"
                 ),
@@ -863,7 +863,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiProperty throws if the specified CLR property is missing
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiProperty)} Throws If Specified CLR Property Is Missing",
             SourceJson = @"
@@ -897,14 +897,14 @@ public partial class ApiSchemaTests
                     }
                 ]
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(ClrMemberKindFieldOnlyType)}\"].{nameof(ApiProperty)}[\"Value\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiPropertyMissingClrMember,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiPropertyMissingClrMember,
                     description: $"CLR property 'Value' was not found on CLR type '{nameof(ClrMemberKindFieldOnlyType)}'",
                     remediation: $"Add a public CLR property named 'Value' to CLR type '{nameof(ClrMemberKindFieldOnlyType)}'"
                 ),
@@ -912,7 +912,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiProperty throws if CLR member is missing
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiProperty)} Throws If CLR Member Is Missing",
             SourceJson = @"
@@ -946,14 +946,14 @@ public partial class ApiSchemaTests
                     }
                 ]
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"NonExistent\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiPropertyMissingClrMember,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiPropertyMissingClrMember,
                     description: $"CLR property 'NonExistentProperty' was not found on CLR type '{nameof(ScalarsOnly)}'",
                     remediation: $"Add a public CLR property named 'NonExistentProperty' to CLR type '{nameof(ScalarsOnly)}'"
                 ),
@@ -961,7 +961,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiProperty throws if Type is null
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiProperty)} Throws If {nameof(ApiProperty.ApiType)} Type Is Null",
             SourceJson = @"
@@ -985,14 +985,14 @@ public partial class ApiSchemaTests
                     }
                 ]
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"RequiredName\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiPropertyNullType,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiPropertyNullType,
                     description: $"{nameof(ApiProperty.ApiType)} must not be null",
                     remediation: $"Specify a valid {nameof(ApiProperty.ApiType)}"
                 ),
@@ -1000,7 +1000,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiProperty throws if Type is an invalid CLR member
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiProperty)} Throws If Type Is An Invalid CLR Member",
             SourceJson = @"
@@ -1058,22 +1058,22 @@ public partial class ApiSchemaTests
                     }
                 ]
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=2, Errors=2, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=2, Errors=2, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(TypesWithRefStructMembers)}\"].{nameof(ApiProperty)}[\"SpanField\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiPropertyInvalidClrMember,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiPropertyInvalidClrMember,
                     description: $"CLR member '{nameof(TypesWithRefStructMembers.SpanField)}' has type '{typeof(Span<byte>).SafeToName()}' which is a ref struct. Ref structs cannot be boxed to object and are not supported for API properties.",
                     remediation: $"Change the type of CLR member '{nameof(TypesWithRefStructMembers.SpanField)}' to a non-ref struct type."
                 ),
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(TypesWithRefStructMembers)}\"].{nameof(ApiProperty)}[\"SpanProperty\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiPropertyInvalidClrMember,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiPropertyInvalidClrMember,
                     description: $"CLR member '{nameof(TypesWithRefStructMembers.SpanProperty)}' has type '{typeof(Span<byte>).SafeToName()}' which is a ref struct. Ref structs cannot be boxed to object and are not supported for API properties.",
                     remediation: $"Change the type of CLR member '{nameof(TypesWithRefStructMembers.SpanProperty)}' to a non-ref struct type."
                 ),
@@ -1081,7 +1081,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiProperty throws if Type is unresolved
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiProperty)} Throws If {nameof(ApiProperty.ApiType)} Is Unresolved Because Api Named Reference Type Does Not Exist",
             SourceJson = @"
@@ -1109,21 +1109,21 @@ public partial class ApiSchemaTests
                     }
                 ]
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"RequiredName\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiPropertyUnresolvedType,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiPropertyUnresolvedType,
                     description: $"{nameof(ApiProperty.ApiType)} could not be resolved for {nameof(ApiTypeExpression.ApiKind)}='Scalar' and {nameof(ApiTypeExpression.ApiName)}='String'",
                     remediation: $"Verify that a type is declared in the schema for {nameof(ApiTypeExpression.ApiKind)}='Scalar' and {nameof(ApiTypeExpression.ApiName)}='String'"
                 ),
             ]
         },
 
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiProperty)} Throws If {nameof(ApiProperty.ApiType)} Is Unresolved Because CLR Reference Type Does Not Exist",
             SourceJson = @"
@@ -1150,21 +1150,21 @@ public partial class ApiSchemaTests
                     }
                 ]
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"RequiredName\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiPropertyUnresolvedType,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiPropertyUnresolvedType,
                     description: $"{nameof(ApiProperty.ApiType)} could not be resolved for {nameof(ApiTypeExpression.ClrType)}='{nameof(String)}'",
                     remediation: $"Verify that a type is declared in the schema for {nameof(ApiTypeExpression.ClrType)}='{nameof(String)}'"
                 ),
             ]
         },
 
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiProperty)} Throws If {nameof(ApiProperty.ApiType)} Is Unresolved Because Type Reference Is Invalid",
             SourceJson = @"
@@ -1189,14 +1189,14 @@ public partial class ApiSchemaTests
                     }
                 ]
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(ScalarsOnly)}\"].{nameof(ApiProperty)}[\"RequiredName\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiPropertyUnresolvedType,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiPropertyUnresolvedType,
                     description: $"{nameof(ApiProperty.ApiType)} could not be resolved because none of the following are set: {nameof(ApiTypeExpression.ApiInlineType)}, a valid combination of {nameof(ApiTypeExpression.ApiKind)} and {nameof(ApiTypeExpression.ApiName)}, or {nameof(ApiTypeExpression.ClrType)}",
                     remediation: $"Specify either {nameof(ApiTypeExpression.ApiInlineType)}, a valid combination of {nameof(ApiTypeExpression.ApiKind)} and {nameof(ApiTypeExpression.ApiName)}, or {nameof(ApiTypeExpression.ClrType)}"
                 ),
@@ -1204,7 +1204,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiProperty throws if unable to get or set field/property value
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiProperty)} Throws If Unable To Get Or Set Field/Property Value",
             SourceJson = @"
@@ -1248,38 +1248,38 @@ public partial class ApiSchemaTests
                     }
                 ]
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=4, Errors=4, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=4, Errors=4, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(TypesWithPointerMembers)}\"].{nameof(ApiProperty)}[\"PointerField\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiPropertyInvalidFieldGetter,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiPropertyInvalidFieldGetter,
                     description: $"Failed to compile field getter for '{nameof(TypesWithPointerMembers.PointerField)}': No coercion operator is defined between types 'System.Byte*' and 'System.Object'",
                     remediation: $"Verify that field '{nameof(TypesWithPointerMembers.PointerField)}' is readable and can be used in expression trees"
                 ),
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(TypesWithPointerMembers)}\"].{nameof(ApiProperty)}[\"PointerField\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiPropertyInvalidFieldSetter,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiPropertyInvalidFieldSetter,
                     description: $"Failed to compile field setter for '{nameof(TypesWithPointerMembers.PointerField)}': Type must not be a pointer type (Parameter 'type')",
                     remediation: $"Verify that field '{nameof(TypesWithPointerMembers.PointerField)}' is writable and can be used in expression trees"
                 ),
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(TypesWithPointerMembers)}\"].{nameof(ApiProperty)}[\"PointerProperty\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiPropertyInvalidPropertyGetter,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiPropertyInvalidPropertyGetter,
                     description: $"Failed to compile property getter for '{nameof(TypesWithPointerMembers.PointerProperty)}': No coercion operator is defined between types 'System.Byte*' and 'System.Object'",
                     remediation: $"Verify that property '{nameof(TypesWithPointerMembers.PointerProperty)}' is readable and can be used in expression trees"
                 ),
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(TypesWithPointerMembers)}\"].{nameof(ApiProperty)}[\"PointerProperty\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiPropertyInvalidPropertySetter,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiPropertyInvalidPropertySetter,
                     description: $"Failed to compile property setter for '{nameof(TypesWithPointerMembers.PointerProperty)}': Type must not be a pointer type (Parameter 'type')",
                     remediation: $"Verify that property '{nameof(TypesWithPointerMembers.PointerProperty)}' is writable and can be used in expression trees"
                 ),
@@ -1287,11 +1287,11 @@ public partial class ApiSchemaTests
         },
 
         //
-        // ApiObjectType Initialization Tests
+        // ApiObjectType Compilation Tests
         //
 
         // ApiObjectType throws if ApiProperties has duplicate ApiName
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiObjectType)} Throws If ApiProperties Has Duplicate ApiName",
             SourceJson = @"
@@ -1335,14 +1335,14 @@ public partial class ApiSchemaTests
                     }
                 ]
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiObjectTypeDuplicatePropertyApiName,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiObjectTypeDuplicatePropertyApiName,
                     description: $"Duplicate {nameof(ApiProperty)}.{nameof(ApiProperty.ApiName)} values: 'Name'",
                     remediation: $"Verify that each {nameof(ApiProperty)} has a unique {nameof(ApiProperty.ApiName)} value"
                 ),
@@ -1350,7 +1350,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiObjectType throws if ApiProperties has duplicate ClrName
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiObjectType)} Throws If ApiProperties Has Duplicate ClrName",
             SourceJson = @"
@@ -1394,14 +1394,14 @@ public partial class ApiSchemaTests
                     }
                 ]
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiObjectTypeDuplicatePropertyClrName,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiObjectTypeDuplicatePropertyClrName,
                     description: $"Duplicate {nameof(ApiProperty)}.{nameof(ApiProperty.ClrName)} values: 'Name'",
                     remediation: $"Verify that each {nameof(ApiProperty)} has a unique {nameof(ApiProperty.ClrName)} value"
                 ),
@@ -1409,7 +1409,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiObjectType throws if ApiKeyTypes has duplicate ApiName
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiObjectType)} Throws If ApiKeyTypes Has Duplicate ApiName",
             SourceJson = @"
@@ -1475,14 +1475,14 @@ public partial class ApiSchemaTests
                     }
                 ]
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiObjectTypeDuplicateKeyTypeApiName,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiObjectTypeDuplicateKeyTypeApiName,
                     description: $"Duplicate {nameof(ApiNamedKeyType)}." +
                         $"{nameof(ApiNamedKeyType.ApiName)} values: 'Primary'",
                     remediation: $"Verify that each {nameof(ApiNamedKeyType)} has a unique " +
@@ -1492,11 +1492,11 @@ public partial class ApiSchemaTests
         },
 
         //
-        // ApiScalarType Initialization Tests
+        // ApiScalarType Compilation Tests
         //
 
         // ApiScalarType throws if ApiName is invalid
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiScalarType)} Throws If {nameof(ApiScalarType.ApiName)} Is Invalid",
             SourceJson = @"
@@ -1512,14 +1512,14 @@ public partial class ApiSchemaTests
                 ""ApiEnumTypes"": [],
                 ""ApiObjectTypes"": []
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiScalarType)}",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiNamedTypeInvalidApiName,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiNamedTypeInvalidApiName,
                     description: $"{nameof(ApiScalarType.ApiName)} must not be null, empty, or whitespace",
                     remediation: $"Specify a valid {nameof(ApiScalarType.ApiName)} value"
                 ),
@@ -1527,7 +1527,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiScalarType throws if ClrType is null
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiScalarType)} Throws If {nameof(ApiScalarType.ClrType)} Is Null",
             SourceJson = @"
@@ -1542,14 +1542,14 @@ public partial class ApiSchemaTests
                 ""ApiEnumTypes"": [],
                 ""ApiObjectTypes"": []
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiScalarType)}[\"String\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiTypeNullClrType,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiTypeNullClrType,
                     description: $"{nameof(ApiScalarType.ClrType)} must not be null",
                     remediation: $"Specify a valid {nameof(ApiScalarType.ClrType)}"
                 ),
@@ -1557,11 +1557,11 @@ public partial class ApiSchemaTests
         },
 
         //
-        // ApiSchema Initialization Tests
+        // ApiSchema Compilation Tests
         //
 
         // ApiSchema throws if ApiName is invalid
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiSchema)} Throws If {nameof(ApiSchema.ApiName)} Is Invalid",
             SourceJson = @"
@@ -1571,14 +1571,14 @@ public partial class ApiSchemaTests
                 ""ApiEnumTypes"": [],
                 ""ApiObjectTypes"": []
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiSchema)}",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiSchemaInvalidName,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiSchemaInvalidName,
                     description: $"{nameof(ApiSchema.ApiName)} must not be null, empty, or whitespace",
                     remediation: $"Specify a valid {nameof(ApiSchema.ApiName)} value"
                 )
@@ -1586,7 +1586,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiSchema throws if scalar types have duplicate ApiName
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiSchema)} Throws If {nameof(ApiSchema.ApiScalarTypes)} Has Duplicate {nameof(ApiScalarType.ApiName)}",
             SourceJson = @"
@@ -1607,22 +1607,22 @@ public partial class ApiSchemaTests
                 ""ApiEnumTypes"": [],
                 ""ApiObjectTypes"": []
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=2, Errors=2, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=2, Errors=2, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiScalarTypes Has Duplicate ApiName\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiSchemaDuplicateNamedTypeApiName,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiSchemaDuplicateNamedTypeApiName,
                     description: $"Duplicate {nameof(ApiNamedType)}.{nameof(ApiNamedType.ApiName)} values: 'String'",
                     remediation: $"Verify that each {nameof(ApiNamedType)} has a unique {nameof(ApiNamedType.ApiName)} value"
                 ),
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiScalarTypes Has Duplicate ApiName\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiSchemaDuplicateScalarTypeApiName,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiSchemaDuplicateScalarTypeApiName,
                     description: $"Duplicate {nameof(ApiScalarType)}.{nameof(ApiScalarType.ApiName)} values: 'String'",
                     remediation: $"Verify that each {nameof(ApiScalarType)} has a unique {nameof(ApiScalarType.ApiName)} value"
                 ),
@@ -1630,7 +1630,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiSchema throws if scalar types have duplicate ClrType
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiSchema)} Throws If {nameof(ApiSchema.ApiScalarTypes)} Has Duplicate {nameof(ApiScalarType.ClrType)}",
             SourceJson = @"
@@ -1651,22 +1651,22 @@ public partial class ApiSchemaTests
                 ""ApiEnumTypes"": [],
                 ""ApiObjectTypes"": []
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=2, Errors=2, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=2, Errors=2, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiScalarTypes Has Duplicate ClrType\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiSchemaDuplicateNamedTypeClrType,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiSchemaDuplicateNamedTypeClrType,
                     description: $"Duplicate {nameof(ApiNamedType)}.{nameof(ApiNamedType.ClrType)} values: '{typeof(string)}'",
                     remediation: $"Verify that each {nameof(ApiNamedType)} has a unique {nameof(ApiNamedType.ClrType)} value"
                 ),
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiScalarTypes Has Duplicate ClrType\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiSchemaDuplicateScalarTypeClrType,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiSchemaDuplicateScalarTypeClrType,
                     description: $"Duplicate {nameof(ApiScalarType)}.{nameof(ApiScalarType.ClrType)} values: '{typeof(string)}'",
                     remediation: $"Verify that each {nameof(ApiScalarType)} has a unique {nameof(ApiScalarType.ClrType)} value"
                 ),
@@ -1674,7 +1674,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiSchema throws if enum types have duplicate ApiName
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiSchema)} Throws If {nameof(ApiSchema.ApiEnumTypes)} Has Duplicate {nameof(ApiEnumType.ApiName)}",
             SourceJson = @"
@@ -1706,22 +1706,22 @@ public partial class ApiSchemaTests
                 ],
                 ""ApiObjectTypes"": []
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=2, Errors=2, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=2, Errors=2, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiEnumTypes Has Duplicate ApiName\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiSchemaDuplicateNamedTypeApiName,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiSchemaDuplicateNamedTypeApiName,
                     description: $"Duplicate {nameof(ApiNamedType)}.{nameof(ApiNamedType.ApiName)} values: 'Gender'",
                     remediation: $"Verify that each {nameof(ApiNamedType)} has a unique {nameof(ApiNamedType.ApiName)} value"
                 ),
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiEnumTypes Has Duplicate ApiName\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiSchemaDuplicateEnumTypeApiName,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiSchemaDuplicateEnumTypeApiName,
                     description: $"Duplicate {nameof(ApiEnumType)}.{nameof(ApiEnumType.ApiName)} values: 'Gender'",
                     remediation: $"Verify that each {nameof(ApiEnumType)} has a unique {nameof(ApiEnumType.ApiName)} value"
                 ),
@@ -1729,7 +1729,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiSchema throws if enum types have duplicate ClrType
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiSchema)} Throws If {nameof(ApiSchema.ApiEnumTypes)} Has Duplicate {nameof(ApiEnumType.ClrType)}",
             SourceJson = @"
@@ -1760,22 +1760,22 @@ public partial class ApiSchemaTests
                 ],
                 ""ApiObjectTypes"": []
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=2, Errors=2, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=2, Errors=2, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiEnumTypes Has Duplicate ClrType\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiSchemaDuplicateNamedTypeClrType,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiSchemaDuplicateNamedTypeClrType,
                     description: $"Duplicate {nameof(ApiNamedType)}.{nameof(ApiNamedType.ClrType)} values: '{typeof(Gender)}'",
                     remediation: $"Verify that each {nameof(ApiNamedType)} has a unique {nameof(ApiNamedType.ClrType)} value"
                 ),
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiEnumTypes Has Duplicate ClrType\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiSchemaDuplicateEnumTypeClrType,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiSchemaDuplicateEnumTypeClrType,
                     description: $"Duplicate {nameof(ApiEnumType)}.{nameof(ApiEnumType.ClrType)} values: '{typeof(Gender)}'",
                     remediation: $"Verify that each {nameof(ApiEnumType)} has a unique {nameof(ApiEnumType.ClrType)} value"
                 ),
@@ -1783,7 +1783,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiSchema throws if object types have duplicate ApiName
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiSchema)} Throws If {nameof(ApiSchema.ApiObjectTypes)} Has Duplicate {nameof(ApiObjectType.ApiName)}",
             SourceJson = @"
@@ -1835,22 +1835,22 @@ public partial class ApiSchemaTests
                     }
                 ]
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=2, Errors=2, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=2, Errors=2, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiObjectTypes Has Duplicate ApiName\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiSchemaDuplicateNamedTypeApiName,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiSchemaDuplicateNamedTypeApiName,
                     description: $"Duplicate {nameof(ApiNamedType)}.{nameof(ApiNamedType.ApiName)} values: 'TestObject'",
                     remediation: $"Verify that each {nameof(ApiNamedType)} has a unique {nameof(ApiNamedType.ApiName)} value"
                 ),
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiObjectTypes Has Duplicate ApiName\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiSchemaDuplicateObjectTypeApiName,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiSchemaDuplicateObjectTypeApiName,
                     description: $"Duplicate {nameof(ApiObjectType)}.{nameof(ApiObjectType.ApiName)} values: 'TestObject'",
                     remediation: $"Verify that each {nameof(ApiObjectType)} has a unique {nameof(ApiObjectType.ApiName)} value"
                 ),
@@ -1858,7 +1858,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiSchema throws if object types have duplicate ClrType
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiSchema)} Throws If {nameof(ApiSchema.ApiObjectTypes)} Has Duplicate {nameof(ApiObjectType.ClrType)}",
             SourceJson = @"
@@ -1917,22 +1917,22 @@ public partial class ApiSchemaTests
                     }
                 ]
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=2, Errors=2, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=2, Errors=2, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiObjectTypes Has Duplicate ClrType\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiSchemaDuplicateNamedTypeClrType,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiSchemaDuplicateNamedTypeClrType,
                     description: $"Duplicate {nameof(ApiNamedType)}.{nameof(ApiNamedType.ClrType)} values: '{typeof(DuplicatePropertyApiNameType)}'",
                     remediation: $"Verify that each {nameof(ApiNamedType)} has a unique {nameof(ApiNamedType.ClrType)} value"
                 ),
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiObjectTypes Has Duplicate ClrType\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiSchemaDuplicateObjectTypeClrType,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiSchemaDuplicateObjectTypeClrType,
                     description: $"Duplicate {nameof(ApiObjectType)}.{nameof(ApiObjectType.ClrType)} values: '{typeof(DuplicatePropertyApiNameType)}'",
                     remediation: $"Verify that each {nameof(ApiObjectType)} has a unique {nameof(ApiObjectType.ClrType)} value"
                 ),
@@ -1940,7 +1940,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiSchema throws if named types have duplicate ApiName (cross-type: scalar + enum with same API name)
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiSchema)} Throws If {nameof(ApiSchema.ApiNamedTypes)} Has Duplicate {nameof(ApiNamedType.ApiName)}",
             SourceJson = @"
@@ -1967,14 +1967,14 @@ public partial class ApiSchemaTests
                 ],
                 ""ApiObjectTypes"": []
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiNamedTypes Has Duplicate ApiName\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiSchemaDuplicateNamedTypeApiName,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiSchemaDuplicateNamedTypeApiName,
                     description: $"Duplicate {nameof(ApiNamedType)}.{nameof(ApiNamedType.ApiName)} values: 'MyType'",
                     remediation: $"Verify that each {nameof(ApiNamedType)} has a unique {nameof(ApiNamedType.ApiName)} value"
                 ),
@@ -1982,7 +1982,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiSchema throws if named types have duplicate ClrType (cross-type: scalar + enum with same CLR type)
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiSchema)} Throws If {nameof(ApiSchema.ApiNamedTypes)} Has Duplicate {nameof(ApiNamedType.ClrType)}",
             SourceJson = @"
@@ -2009,14 +2009,14 @@ public partial class ApiSchemaTests
                 ],
                 ""ApiObjectTypes"": []
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiNamedTypes Has Duplicate ClrType\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiSchemaDuplicateNamedTypeClrType,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiSchemaDuplicateNamedTypeClrType,
                     description: $"Duplicate {nameof(ApiNamedType)}.{nameof(ApiNamedType.ClrType)} values: '{typeof(Gender)}'",
                     remediation: $"Verify that each {nameof(ApiNamedType)} has a unique {nameof(ApiNamedType.ClrType)} value"
                 ),
@@ -2024,11 +2024,11 @@ public partial class ApiSchemaTests
         },
 
         //
-        // ApiKeyType and ApiNamedKeyType Initialization Tests
+        // ApiKeyType and ApiNamedKeyType Compilation Tests
         //
 
         // ApiNamedKeyType throws if ApiName is invalid (null)
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiNamedKeyType)} Throws If " +
                 $"{nameof(ApiNamedKeyType.ApiName)} Is Invalid",
@@ -2074,15 +2074,15 @@ public partial class ApiSchemaTests
                     }
                 ]
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"]." +
                         $"{nameof(ApiNamedKeyType)}",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiNamedKeyTypeInvalidApiName,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiNamedKeyTypeInvalidApiName,
                     description: $"{nameof(ApiNamedKeyType.ApiName)} must not be null, empty, " +
                         "or whitespace",
                     remediation: $"Specify a valid {nameof(ApiNamedKeyType.ApiName)} value"
@@ -2091,7 +2091,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiKeyType throws if ApiKeyPaths is null or empty
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiKeyType)} Throws If {nameof(ApiKeyType.ApiKeyPaths)} Is Null Or Empty",
             SourceJson = @"
@@ -2130,15 +2130,15 @@ public partial class ApiSchemaTests
                     }
                 ]
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"]." +
                         $"{nameof(ApiNamedKeyType)}[\"PrimaryKey\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiKeyTypeNullOrEmptyPaths,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiKeyTypeNullOrEmptyPaths,
                     description: $"{nameof(ApiKeyType.ApiKeyPaths)} must not be null or empty",
                     remediation: $"Specify at least one {nameof(ApiKeyPath)}"
                 ),
@@ -2146,7 +2146,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiKeyPath throws if ApiSegments is empty
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiKeyPath)} Throws If {nameof(ApiKeyPath.ApiSegments)} Is Empty",
             SourceJson = @"
@@ -2190,16 +2190,16 @@ public partial class ApiSchemaTests
                     }
                 ]
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"]." +
                         $"{nameof(ApiNamedKeyType)}[\"PrimaryKey\"].{nameof(ApiKeyPath)}" +
                         $"[0][\"{nameof(DuplicateKeyTypeApiNameType)}.\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiKeyPathEmptySegments,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiKeyPathEmptySegments,
                     description: $"{nameof(ApiKeyPath.ApiSegments)} must contain at least one property name",
                     remediation: $"Specify at least one CLR property name when creating an {nameof(ApiKeyPath)}"
                 ),
@@ -2207,7 +2207,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiKeyPath throws if ClrRootType is not registered as an ApiObjectType
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiKeyPath)} Throws If {nameof(ApiKeyPath.ClrRootType)} Is Unresolved",
             SourceJson = @"
@@ -2253,16 +2253,16 @@ public partial class ApiSchemaTests
                     }
                 ]
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"]." +
                         $"{nameof(ApiNamedKeyType)}[\"PrimaryKey\"].{nameof(ApiKeyPath)}" +
                         $"[0][\"{nameof(TypeWithListProperty)}.Id\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiKeyPathUnresolvedRootType,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiKeyPathUnresolvedRootType,
                     description: $"Root CLR type '{nameof(TypeWithListProperty)}' is not registered as an {nameof(ApiObjectType)} in the schema",
                     remediation: $"Add an {nameof(ApiObjectType)} for '{nameof(TypeWithListProperty)}' to the schema, or correct the root CLR type"
                 ),
@@ -2270,7 +2270,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiKeyPathSegment throws if ClrPropertyName is invalid
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiKeyPathSegment)} Throws If {nameof(ApiKeyPathSegment.ClrPropertyName)} Is Invalid",
             SourceJson = @"
@@ -2316,17 +2316,17 @@ public partial class ApiSchemaTests
                     }
                 ]
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"]." +
                         $"{nameof(ApiNamedKeyType)}[\"PrimaryKey\"].{nameof(ApiKeyPath)}" +
                         $"[0][\"{nameof(DuplicateKeyTypeApiNameType)}.\"]." +
                         $"{nameof(ApiKeyPathSegment)}[0]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiKeyPathSegmentInvalidClrPropertyName,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiKeyPathSegmentInvalidClrPropertyName,
                     description: $"{nameof(ApiKeyPathSegment.ClrPropertyName)} must not be null, empty, or whitespace",
                     remediation: $"Specify a valid {nameof(ApiKeyPathSegment.ClrPropertyName)} value"
                 ),
@@ -2334,7 +2334,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiKeyPathSegment throws if ClrPropertyName cannot resolve to a property
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiKeyPathSegment)} Throws If {nameof(ApiKeyPathSegment.ClrPropertyName)} Is Unresolved",
             SourceJson = @"
@@ -2380,17 +2380,17 @@ public partial class ApiSchemaTests
                     }
                 ]
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"]." +
                         $"{nameof(ApiNamedKeyType)}[\"PrimaryKey\"].{nameof(ApiKeyPath)}" +
                         $"[0][\"{nameof(DuplicateKeyTypeApiNameType)}.MissingId\"]." +
                         $"{nameof(ApiKeyPathSegment)}[0][\"MissingId\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiKeyPathSegmentUnresolvedApiProperty,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiKeyPathSegmentUnresolvedApiProperty,
                     description: $"Property with CLR name 'MissingId' could not be found on object type 'TestObject'",
                     remediation: $"Verify the CLR property name or add a property with CLR name 'MissingId' to 'TestObject'"
                 ),
@@ -2398,7 +2398,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiKeyPath throws if a navigation segment resolves to a non-object type
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiKeyPath)} Throws If Navigation Segment Resolves To Non Object Type",
             SourceJson = @"
@@ -2454,17 +2454,17 @@ public partial class ApiSchemaTests
                     }
                 ]
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"]." +
                         $"{nameof(ApiNamedKeyType)}[\"PrimaryKey\"].{nameof(ApiKeyPath)}" +
                         $"[0][\"{nameof(DuplicateKeyTypeApiNameType)}.Id.Code\"]." +
                         $"{nameof(ApiKeyPathSegment)}[0][\"Id\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiKeyPathNavigationSegmentInvalidType,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiKeyPathNavigationSegmentInvalidType,
                     description: $"Navigation segment property 'Id' must resolve to an object type; found '{nameof(ApiScalarType)}'",
                     remediation: $"Change the navigation property to an object-typed property or restructure the path segments"
                 ),
@@ -2472,7 +2472,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiKeyPath throws if the scalar segment resolves to a non-scalar type
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiKeyPath)} Throws If Scalar Segment Resolves To Non Scalar Type",
             SourceJson = @"
@@ -2543,17 +2543,17 @@ public partial class ApiSchemaTests
                     }
                 ]
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"Owner\"]." +
                         $"{nameof(ApiNamedKeyType)}[\"PrimaryKey\"].{nameof(ApiKeyPath)}" +
                         $"[0][\"{nameof(OwnerType)}.Item\"]." +
                         $"{nameof(ApiKeyPathSegment)}[0][\"Item\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiKeyPathScalarSegmentInvalidType,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiKeyPathScalarSegmentInvalidType,
                     description: $"Terminal segment property 'Item' must resolve to a scalar type; found '{nameof(ApiObjectType)}'",
                     remediation: $"Change the terminal property to a scalar-typed property or remove extra navigation segments"
                 ),
@@ -2561,11 +2561,11 @@ public partial class ApiSchemaTests
         },
 
         //
-        // ApiRelationship Initialization Tests
+        // ApiRelationship Compilation Tests
         //
 
         // ApiRelationship throws if ApiName is invalid (empty)
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiRelationship)} Throws If {nameof(ApiRelationship.ApiName)} Is Invalid",
             SourceJson = @"
@@ -2608,14 +2608,14 @@ public partial class ApiSchemaTests
                     }
                 ]
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiRelationshipOneToMany)}",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiRelationshipInvalidApiName,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiRelationshipInvalidApiName,
                     description: $"{nameof(ApiRelationship.ApiName)} must not be null, empty, or whitespace",
                     remediation: $"Specify a valid {nameof(ApiRelationship.ApiName)} value"
                 ),
@@ -2623,7 +2623,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiRelationshipOneTo throws if ApiPrincipalEnd is null
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiRelationshipOneTo)} Throws If {nameof(ApiRelationshipOneTo.ApiPrincipalEnd)} Is Null",
             SourceJson = @"
@@ -2651,14 +2651,14 @@ public partial class ApiSchemaTests
                     }
                 ]
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiRelationshipNullPrincipalEnd,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiRelationshipNullPrincipalEnd,
                     description: $"{nameof(ApiRelationshipOneTo.ApiPrincipalEnd)} must not be null",
                     remediation: $"Provide a valid {nameof(ApiRelationshipPrincipalEnd)}"
                 ),
@@ -2666,7 +2666,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiRelationshipOneTo throws if ApiDependentEnd is null
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiRelationshipOneTo)} Throws If {nameof(ApiRelationshipOneTo.ApiDependentEnd)} Is Null",
             SourceJson = @"
@@ -2700,14 +2700,14 @@ public partial class ApiSchemaTests
                     }
                 ]
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiRelationshipNullDependentEnd,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiRelationshipNullDependentEnd,
                     description: $"{nameof(ApiRelationshipOneTo.ApiDependentEnd)} must not be null",
                     remediation: $"Provide a valid {nameof(ApiRelationshipDependentEnd)}"
                 ),
@@ -2715,7 +2715,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiRelationshipElement throws if ClrObjectType is null
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiRelationshipElement)} Throws If {nameof(ApiRelationshipElement.ClrObjectType)} Is Null",
             SourceJson = @"
@@ -2744,15 +2744,15 @@ public partial class ApiSchemaTests
                     }
                 ]
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"]." +
                         $"{nameof(ApiRelationshipOneTo.ApiPrincipalEnd)}",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiRelationshipElementNullClrObjectType,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiRelationshipElementNullClrObjectType,
                     description: $"{nameof(ApiRelationshipElement.ClrObjectType)} must not be null",
                     remediation: $"Specify a valid {nameof(ApiRelationshipElement.ClrObjectType)} value"
                 ),
@@ -2760,7 +2760,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiRelationshipElement throws if ClrObjectType is not registered as an ApiObjectType
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiRelationshipElement)} Throws If {nameof(ApiRelationshipElement.ClrObjectType)} Is Unresolved",
             SourceJson = @"
@@ -2789,15 +2789,15 @@ public partial class ApiSchemaTests
                     }
                 ]
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"]." +
                         $"{nameof(ApiRelationshipOneTo.ApiPrincipalEnd)}",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiRelationshipElementUnresolvedObjectType,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiRelationshipElementUnresolvedObjectType,
                     description: $"No {nameof(ApiObjectType)} is registered for CLR type '{typeof(object).FullName}'",
                     remediation: $"Use one of the available object types: 'RelDependent' ({nameof(RelDependentType)})"
                 ),
@@ -2805,7 +2805,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiRelationshipPrincipalEnd throws if referenced ApiPrincipalKeyTypeName cannot be resolved
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiRelationshipPrincipalEnd)} Throws If {nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyTypeName)} Is Unresolved",
             SourceJson = @"
@@ -2858,15 +2858,15 @@ public partial class ApiSchemaTests
                     }
                 ]
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"]." +
                         $"{nameof(ApiRelationshipOneTo.ApiPrincipalEnd)}",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiRelationshipEndUnresolvedKeyType,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiRelationshipEndUnresolvedKeyType,
                     description: "Referenced principal key type 'NonExistentKeyType' could not be found on object type 'RelPrincipal'",
                     remediation: "Use one of the available key types: 'Id'"
                 ),
@@ -2874,7 +2874,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiRelationshipOneTo throws if principal key type is named on a navigational relationship
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiRelationshipOneTo)} Throws If {nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyTypeName)} Is Supplied Without Foreign Key",
             SourceJson = @"
@@ -2920,14 +2920,14 @@ public partial class ApiSchemaTests
                     }
                 ]
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiRelationshipEndPrincipalKeyWithoutForeignKey,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiRelationshipEndPrincipalKeyWithoutForeignKey,
                     description: $"Cannot resolve {nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyTypeName)} 'Id' because this relationship has no foreign key binding",
                     remediation: $"Declare {nameof(ApiRelationshipOneTo.ApiDependentEnd)}.{nameof(ApiRelationshipDependentEnd.ApiForeignKeyType)} or remove {nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyTypeName)}"
                 ),
@@ -2935,7 +2935,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiRelationshipManyToMany throws if ApiPrincipalEndA is null
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiRelationshipManyToMany)} Throws If {nameof(ApiRelationshipManyToMany.ApiPrincipalEndA)} Is Null",
             SourceJson = @"
@@ -2979,14 +2979,14 @@ public partial class ApiSchemaTests
                     }
                 ]
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiRelationshipManyToMany)}[\"TestRel\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiRelationshipManyToManyNullPrincipalEndA,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiRelationshipManyToManyNullPrincipalEndA,
                     description: $"{nameof(ApiRelationshipManyToMany.ApiPrincipalEndA)} must not be null",
                     remediation: $"Provide a valid {nameof(ApiRelationshipPrincipalEnd)} for end A"
                 ),
@@ -2994,7 +2994,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiRelationshipManyToMany throws if ApiPrincipalEndB is null
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiRelationshipManyToMany)} Throws If {nameof(ApiRelationshipManyToMany.ApiPrincipalEndB)} Is Null",
             SourceJson = @"
@@ -3038,14 +3038,14 @@ public partial class ApiSchemaTests
                     }
                 ]
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiRelationshipManyToMany)}[\"TestRel\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiRelationshipManyToManyNullPrincipalEndB,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiRelationshipManyToManyNullPrincipalEndB,
                     description: $"{nameof(ApiRelationshipManyToMany.ApiPrincipalEndB)} must not be null",
                     remediation: $"Provide a valid {nameof(ApiRelationshipPrincipalEnd)} for end B"
                 ),
@@ -3053,7 +3053,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiRelationshipManyToMany throws if ApiAssociation is null
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiRelationshipManyToMany)} Throws If {nameof(ApiRelationshipManyToMany.ApiAssociation)} Is Null",
             SourceJson = @"
@@ -3088,14 +3088,14 @@ public partial class ApiSchemaTests
                     }
                 ]
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiRelationshipManyToMany)}[\"TestRel\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiRelationshipManyToManyNullAssociation,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiRelationshipManyToManyNullAssociation,
                     description: $"{nameof(ApiRelationshipManyToMany.ApiAssociation)} must not be null",
                     remediation: $"Provide a valid {nameof(ApiRelationshipAssociation)} for the association between the two principal ends"
                 ),
@@ -3103,7 +3103,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiRelationshipManyToMany throws if ApiAssociation.ApiForeignKeyTypeA.ApiKeyPaths count does not match principal end A key type path count
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiRelationshipManyToMany)} Throws If {nameof(ApiRelationshipAssociation.ApiForeignKeyTypeA)}.{nameof(ApiKeyType.ApiKeyPaths)} Count Does Not Match Principal End A Key Type",
             SourceJson = @"
@@ -3175,14 +3175,14 @@ public partial class ApiSchemaTests
                     }
                 ]
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiRelationshipManyToMany)}[\"TestRel\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiRelationshipManyToManyInvalidAssociationKeyPathsACount,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiRelationshipManyToManyInvalidAssociationKeyPathsACount,
                     description: $"Cannot automatically determine the referenced principal key type for principal end A: {nameof(ApiRelationshipManyToMany.ApiAssociation)}.{nameof(ApiRelationshipAssociation.ApiForeignKeyTypeA)}.{nameof(ApiKeyType.ApiKeyPaths)} has 2 key path(s), but no key type on 'RelPrincipal' has 2 key path(s)",
                     remediation: $"Set {nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyTypeName)} on principal end A explicitly or align the foreign key shape with one of these key types: 'Id'"
                 ),
@@ -3190,7 +3190,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiRelationshipManyToMany throws if ApiAssociation.ApiForeignKeyTypeB.ApiKeyPaths count does not match principal end B key type path count
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiRelationshipManyToMany)} Throws If {nameof(ApiRelationshipAssociation.ApiForeignKeyTypeB)}.{nameof(ApiKeyType.ApiKeyPaths)} Count Does Not Match Principal End B Key Type",
             SourceJson = @"
@@ -3262,14 +3262,14 @@ public partial class ApiSchemaTests
                     }
                 ]
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiRelationshipManyToMany)}[\"TestRel\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiRelationshipManyToManyInvalidAssociationKeyPathsBCount,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiRelationshipManyToManyInvalidAssociationKeyPathsBCount,
                     description: $"Cannot automatically determine the referenced principal key type for principal end B: {nameof(ApiRelationshipManyToMany.ApiAssociation)}.{nameof(ApiRelationshipAssociation.ApiForeignKeyTypeB)}.{nameof(ApiKeyType.ApiKeyPaths)} has 2 key path(s), but no key type on 'RelPrincipalB' has 2 key path(s)",
                     remediation: $"Set {nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyTypeName)} on principal end B explicitly or align the foreign key shape with one of these key types: 'Id'"
                 ),
@@ -3277,7 +3277,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiRelationshipOneTo throws if ApiDependentEnd.ApiForeignKeyType.ApiKeyPaths count does not match principal key type path count
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiRelationshipOneTo)} Throws If {nameof(ApiRelationshipDependentEnd.ApiForeignKeyType)}.{nameof(ApiKeyType.ApiKeyPaths)} Count Does Not Match Principal Key Type",
             SourceJson = @"
@@ -3329,14 +3329,14 @@ public partial class ApiSchemaTests
                     }
                 ]
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiRelationshipOneToInvalidDependentKeyPathsCount,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiRelationshipOneToInvalidDependentKeyPathsCount,
                     description: $"Cannot automatically determine the referenced principal key type: {nameof(ApiRelationshipOneTo.ApiDependentEnd)}.{nameof(ApiRelationshipDependentEnd.ApiForeignKeyType)}.{nameof(ApiKeyType.ApiKeyPaths)} has 2 key path(s), but no key type on 'RelPrincipal' has 2 key path(s)",
                     remediation: $"Set {nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyTypeName)} explicitly or align the foreign key shape with one of these key types: 'Id'"
                 ),
@@ -3344,7 +3344,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiRelationshipOneTo throws if an explicitly selected principal key type is incompatible with the dependent foreign key type
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiRelationshipOneTo)} Throws If Explicit Principal Key Type Is Incompatible With Foreign Key Type",
             SourceJson = @"
@@ -3395,14 +3395,14 @@ public partial class ApiSchemaTests
                     }
                 ]
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiRelationshipIncompatiblePrincipalForeignKey,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiRelationshipIncompatiblePrincipalForeignKey,
                     description: $"{nameof(ApiRelationshipOneTo.ApiDependentEnd)}.{nameof(ApiRelationshipDependentEnd.ApiForeignKeyType)} leaf type(s) [String] are not compatible with principal end principal key type 'PK_Id' leaf type(s) [Int32]",
                     remediation: $"Ensure {nameof(ApiRelationshipOneTo.ApiDependentEnd)}.{nameof(ApiRelationshipDependentEnd.ApiForeignKeyType)} paths are ordered to match the principal end's principal key type and use compatible scalar types"
                 ),
@@ -3410,7 +3410,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiSchema throws if ApiRelationships contains entries with duplicate ApiName values
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiSchema)} Throws If {nameof(ApiSchema.ApiRelationships)} Has Duplicate {nameof(ApiRelationship.ApiName)}",
             SourceJson = @"
@@ -3459,14 +3459,14 @@ public partial class ApiSchemaTests
                     }
                 ]
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiSchema)}[\"ApiSchema Throws If ApiRelationships Has Duplicate ApiName\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiSchemaDuplicateRelationshipApiName,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiSchemaDuplicateRelationshipApiName,
                     description: $"Duplicate {nameof(ApiRelationship)}.{nameof(ApiRelationship.ApiName)} values: 'DupRel'",
                     remediation: $"Verify that each {nameof(ApiRelationship)} has a unique {nameof(ApiRelationship.ApiName)} value"
                 ),
@@ -3474,7 +3474,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiRelationshipOneTo throws if the principal has multiple key types compatible with the foreign key (ambiguous)
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiRelationshipOneTo)} Throws If Principal Key Type Is Ambiguous",
             SourceJson = @"
@@ -3529,20 +3529,20 @@ public partial class ApiSchemaTests
                     }
                 ]
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiRelationshipAmbiguousPrincipalKey,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiRelationshipAmbiguousPrincipalKey,
                     description: "Cannot automatically determine the referenced principal key type: 2 key types on 'RelPrincipal' are compatible with the foreign key type: 'PK_Id', 'PK_Code'",
                     remediation: $"Set {nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyTypeName)} to specify the principal key type explicitly; available key types: 'PK_Id', 'PK_Code'"
                 ),
             ]
         },
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiProperty)} reports an invalid {nameof(ApiProperty.ClrMemberKind)} JSON value",
             SourceJson = @"
@@ -3576,20 +3576,20 @@ public partial class ApiSchemaTests
                     }
                 ]
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(ClrMemberKindPropertyOnlyType)}\"].{nameof(ApiProperty)}[\"Value\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiPropertyInvalidClrMember,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiPropertyInvalidClrMember,
                     description: $"{nameof(ApiProperty.ClrMemberKind)} must be {ClrMemberKind.Property} or {ClrMemberKind.Field}",
                     remediation: $"Specify {nameof(ApiProperty.ClrMemberKind)} as {ClrMemberKind.Property} or {ClrMemberKind.Field}"
                 ),
             ]
         },
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiProperty)} reports a null {nameof(ApiProperty.ClrMemberKind)} JSON value",
             SourceJson = @"
@@ -3623,20 +3623,20 @@ public partial class ApiSchemaTests
                     }
                 ]
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(ClrMemberKindPropertyOnlyType)}\"].{nameof(ApiProperty)}[\"Value\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiPropertyInvalidClrMember,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiPropertyInvalidClrMember,
                     description: $"{nameof(ApiProperty.ClrMemberKind)} must be {ClrMemberKind.Property} or {ClrMemberKind.Field}",
                     remediation: $"Specify {nameof(ApiProperty.ClrMemberKind)} as {ClrMemberKind.Property} or {ClrMemberKind.Field}"
                 ),
             ]
         },
-        new InitializeThrowsTest
+        new CompileThrowsTest
         {
             Name = $"{nameof(ApiProperty)} reports an omitted {nameof(ApiProperty.ClrMemberKind)} JSON value",
             SourceJson = @"
@@ -3669,14 +3669,14 @@ public partial class ApiSchemaTests
                     }
                 ]
             }",
-            ExpectedExceptionMessage = $"{nameof(ApiSchema)} initialization failed. Issues=1, Errors=1, Warnings=0.",
+            ExpectedExceptionMessage = $"{nameof(ApiSchema)} compilation failed. Issues=1, Errors=1, Warnings=0.",
             ExpectedIssues =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"{nameof(ClrMemberKindPropertyOnlyType)}\"].{nameof(ApiProperty)}[\"Value\"]",
-                    severity: ApiInitializationSeverity.Error,
-                    code: ApiInitializationCode.ApiPropertyInvalidClrMember,
+                    severity: ApiSchemaCompilationSeverity.Error,
+                    code: ApiSchemaCompilationCode.ApiPropertyInvalidClrMember,
                     description: $"{nameof(ApiProperty.ClrMemberKind)} must be {ClrMemberKind.Property} or {ClrMemberKind.Field}",
                     remediation: $"Specify {nameof(ApiProperty.ClrMemberKind)} as {ClrMemberKind.Property} or {ClrMemberKind.Field}"
                 ),
@@ -3684,10 +3684,10 @@ public partial class ApiSchemaTests
         },
     ];
 
-    public static TheoryDataRow<IXUnitTest>[] InitializeWarnsTheoryData =>
+    public static TheoryDataRow<IXUnitTest>[] CompileWarnsTheoryData =>
     [
         // ApiObjectType warns if ApiProperties is null or empty
-        new InitializeWarnsTest
+        new CompileWarnsTest
         {
             Name = $"{nameof(ApiObjectType)} Warns If ApiProperties Is Null Or Empty",
             SourceJson = @"
@@ -3706,11 +3706,11 @@ public partial class ApiSchemaTests
             }",
             ExpectedWarnings =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"Empty\"]",
-                    severity: ApiInitializationSeverity.Warning,
-                    code: ApiInitializationCode.ApiObjectTypeNullOrEmptyProperties,
+                    severity: ApiSchemaCompilationSeverity.Warning,
+                    code: ApiSchemaCompilationCode.ApiObjectTypeNullOrEmptyProperties,
                     description: $"{nameof(ApiObjectType.ApiProperties)} is null or empty",
                     remediation: $"Add at least one {nameof(ApiProperty)} to {nameof(ApiObjectType)}[\"Empty\"]"
                 ),
@@ -3718,7 +3718,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiProperty warns if Required property maps to a nullable CLR member
-        new InitializeWarnsTest
+        new CompileWarnsTest
         {
             Name = $"{nameof(ApiProperty)} Warns If Required Property Maps To Nullable CLR Member",
             SourceJson = @"
@@ -3751,11 +3751,11 @@ public partial class ApiSchemaTests
             }",
             ExpectedWarnings =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"NullabilityMismatch\"].{nameof(ApiProperty)}[\"NullableProp\"]",
-                    severity: ApiInitializationSeverity.Warning,
-                    code: ApiInitializationCode.ApiPropertyRequiredNullableMismatch,
+                    severity: ApiSchemaCompilationSeverity.Warning,
+                    code: ApiSchemaCompilationCode.ApiPropertyRequiredNullableMismatch,
                     description: "CLR member 'NullableProp' is nullable but property 'NullableProp' is declared Required",
                     remediation: "Change CLR member 'NullableProp' to a non-nullable type, or change property 'NullableProp' to Optional"
                 ),
@@ -3763,7 +3763,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiProperty warns if Optional property maps to a non-nullable CLR reference type member
-        new InitializeWarnsTest
+        new CompileWarnsTest
         {
             Name = $"{nameof(ApiProperty)} Warns If Optional Property Maps To Non-Nullable CLR Reference Type Member",
             SourceJson = @"
@@ -3795,11 +3795,11 @@ public partial class ApiSchemaTests
             }",
             ExpectedWarnings =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"NullabilityMismatch\"].{nameof(ApiProperty)}[\"NonNullableProp\"]",
-                    severity: ApiInitializationSeverity.Warning,
-                    code: ApiInitializationCode.ApiPropertyOptionalNonNullableMismatch,
+                    severity: ApiSchemaCompilationSeverity.Warning,
+                    code: ApiSchemaCompilationCode.ApiPropertyOptionalNonNullableMismatch,
                     description: "CLR member 'NonNullableProp' is non-nullable but property 'NonNullableProp' is declared Optional",
                     remediation: "Change CLR member 'NonNullableProp' to a nullable reference type, or change property 'NonNullableProp' to Required"
                 ),
@@ -3807,7 +3807,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiProperty warns if Required item modifier maps to a nullable CLR collection element type
-        new InitializeWarnsTest
+        new CompileWarnsTest
         {
             Name = $"{nameof(ApiProperty)} Warns If Required Collection Item Maps To Nullable CLR Element Type",
             SourceJson = @"
@@ -3846,11 +3846,11 @@ public partial class ApiSchemaTests
             }",
             ExpectedWarnings =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"CollectionNullabilityMismatch\"].{nameof(ApiProperty)}[\"NullableItemsProp\"]",
-                    severity: ApiInitializationSeverity.Warning,
-                    code: ApiInitializationCode.ApiCollectionItemRequiredNullableMismatch,
+                    severity: ApiSchemaCompilationSeverity.Warning,
+                    code: ApiSchemaCompilationCode.ApiCollectionItemRequiredNullableMismatch,
                     description: "CLR collection element in 'NullableItemsProp' is nullable but item is declared Required",
                     remediation: "Change the CLR element type in 'NullableItemsProp' to non-nullable, or change the item modifier to Optional"
                 ),
@@ -3858,7 +3858,7 @@ public partial class ApiSchemaTests
         },
 
         // ApiProperty warns if Optional item modifier maps to a non-nullable CLR collection element reference type
-        new InitializeWarnsTest
+        new CompileWarnsTest
         {
             Name = $"{nameof(ApiProperty)} Warns If Optional Collection Item Maps To Non-Nullable CLR Element Reference Type",
             SourceJson = @"
@@ -3897,11 +3897,11 @@ public partial class ApiSchemaTests
             }",
             ExpectedWarnings =
             [
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"CollectionNullabilityMismatch\"].{nameof(ApiProperty)}[\"NonNullableItemsProp\"]",
-                    severity: ApiInitializationSeverity.Warning,
-                    code: ApiInitializationCode.ApiCollectionItemOptionalNonNullableMismatch,
+                    severity: ApiSchemaCompilationSeverity.Warning,
+                    code: ApiSchemaCompilationCode.ApiCollectionItemOptionalNonNullableMismatch,
                     description: "CLR collection element in 'NonNullableItemsProp' is non-nullable but item is declared Optional",
                     remediation: "Change the CLR element type in 'NonNullableItemsProp' to a nullable reference type, or change the item modifier to Required"
                 ),
@@ -3912,12 +3912,12 @@ public partial class ApiSchemaTests
 
     #region Test Methods
     [Theory]
-    [MemberData(nameof(InitializeThrowsTheoryData))]
-    public void InitializeThrows(IXUnitTest test) => test.Execute(this);
+    [MemberData(nameof(CompileThrowsTheoryData))]
+    public void CompileThrows(IXUnitTest test) => test.Execute(this);
 
     [Theory]
-    [MemberData(nameof(InitializeWarnsTheoryData))]
-    public void InitializeWarns(IXUnitTest test) => test.Execute(this);
+    [MemberData(nameof(CompileWarnsTheoryData))]
+    public void CompileWarns(IXUnitTest test) => test.Execute(this);
 
     #endregion
 }

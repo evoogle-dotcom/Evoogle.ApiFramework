@@ -55,24 +55,24 @@ public sealed class ApiNamedKeyType(string apiName, IEnumerable<ApiKeyPath> apiK
         );
 
     /// <inheritdoc/>
-    internal override void InitializeCore(ApiInitializationContext context)
+    internal override void CompileCore(ApiSchemaCompilationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        base.InitializeCore(context);
+        base.CompileCore(context);
 
-        this.InitializeApiName(context);
+        this.ValidateApiName(context);
     }
     #endregion
 
     #region Implementation Methods
-    private void InitializeApiName(ApiInitializationContext context)
+    private void ValidateApiName(ApiSchemaCompilationContext context)
     {
         var isApiNameInvalid = ApiSchemaNameValidation.IsNameInvalid(this.ApiName);
         if (isApiNameInvalid)
         {
-            var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.ApiNamedKeyTypeInvalidApiName;
+            var severity = ApiSchemaCompilationSeverity.Error;
+            var code = ApiSchemaCompilationCode.ApiNamedKeyTypeInvalidApiName;
             var description = $"{nameof(this.ApiName)} must not be null, empty, or whitespace";
             var remediation = $"Specify a valid {nameof(this.ApiName)} value";
 

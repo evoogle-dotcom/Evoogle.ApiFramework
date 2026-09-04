@@ -13,7 +13,7 @@ public sealed class ApiObjectAttribute : ApiNamedElementAttribute
 {
     #region Properties
     /// <summary>
-    ///     Gets or initializes the API name for the object type.
+    ///     Gets the the API name for the object type.
     ///     When <c>null</c>, the CLR type name is used.
     /// </summary>
     public new string? ApiName

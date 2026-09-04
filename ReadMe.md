@@ -57,13 +57,13 @@ safe for concurrent runtime reads.
 
 Schema construction is a one-way compilation lifecycle: mutable builder or JSON state becomes one
 unpublished graph, that graph is resolved and validated once, and a frozen `ApiSchema` is published
-only when it is valid. `ApiSchemaBuilder.Build()` throws one `ApiSchemaInitializationException` for
-expected schema errors. `BuildResult()` returns an immutable `ApiSchemaBuildResult` instead, with a
+only when it is valid. `ApiSchemaBuilder.Build()` throws one `ApiSchemaCompilationException` for
+expected schema errors. `BuildResult()` returns an immutable `ApiSchemaCompilationResult` instead, with a
 non-null `Schema` for success or warnings and a null `Schema` for errors. Both expose non-default
 immutable `Issues`, `Errors`, and `Warnings` arrays. Malformed JSON and unexpected programming or
 infrastructure exceptions still propagate normally.
 
-`ApiSchema` has no public constructor, `Initialize`, or instance-based factory. Each builder call
+`ApiSchema` has no public constructor, `Compile`, or instance-based factory. Each builder call
 materializes a fresh graph; failed graphs are discarded and cannot be retried. Updating application
 metadata means building a separate schema and atomically exchanging the application-held reference.
 Root JSON deserialization follows the same compiler path. Warning-only JSON remains deserializable,
@@ -81,10 +81,10 @@ with the schema, such as `ApiSchema["Store"].ApiObjectType["Order"]`, and contin
 complete structural location. Relationship children use semantic roles such as
 `ApiPrincipalEndA` and `ApiForeignKeyTypeB`; ordered key paths and segments include their
 zero-based position and an available label. Issues produced while traversing schema elements are
-also logged once through the schema context logger with their severity, initialization code,
+also logged once through the schema context logger with their severity, compilation code,
 path, description, and optional remediation.
 
-Before element initialization begins, the framework builds an ownership tree rooted at
+Before element compilation begins, the framework builds an ownership tree rooted at
 `ApiSchema`. Every `ApiSchemaElement` exposes its parent, children, siblings, and root through the
 read-only NTree node interface, so callers can navigate or traverse the compiled schema without
 reconstructing containment from its specialized collections. Concrete schema-element variables can
@@ -181,9 +181,9 @@ Use no prefix when the containing type or local scope already makes the domain c
 there is no API-vs-CLR distinction to communicate.
 
 ```csharp
-// On ApiInitializationIssue
+// On ApiSchemaCompilationIssue
 public string ApiPath { get; }
-public ApiInitializationSeverity Severity { get; }
+public ApiSchemaCompilationSeverity Severity { get; }
 public string Description { get; }
 public string? Remediation { get; }
 

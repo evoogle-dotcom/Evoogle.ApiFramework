@@ -760,7 +760,7 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
         public required ConfigurationFailureKind FailureKind { get; init; }
 
         private ApiSchema? ApiSchemaActual { get; set; }
-        private IReadOnlyList<ApiInitializationIssue> IssuesActual { get; set; } = [];
+        private IReadOnlyList<ApiSchemaCompilationIssue> IssuesActual { get; set; } = [];
 
         protected override void Arrange()
         {
@@ -797,8 +797,8 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
             this.ApiSchemaActual.Should().NotBeNull();
             this.IssuesActual.Should().ContainSingle
             (
-                issue => issue.Code == ApiInitializationCode.ApiConfigurationExecutionFailed &&
-                    issue.Severity == ApiInitializationSeverity.Warning &&
+                issue => issue.Code == ApiSchemaCompilationCode.ApiConfigurationExecutionFailed &&
+                    issue.Severity == ApiSchemaCompilationSeverity.Warning &&
                     issue.ApiPath ==
                     (
                         this.FailureKind == ConfigurationFailureKind.Configure
@@ -816,7 +816,7 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
 
     private sealed class ActivationFailureTest : XUnitTest
     {
-        private IReadOnlyList<ApiInitializationIssue> IssuesActual { get; set; } = [];
+        private IReadOnlyList<ApiSchemaCompilationIssue> IssuesActual { get; set; } = [];
 
         protected override void Act()
         {
@@ -836,8 +836,8 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
         {
             this.IssuesActual.Should().ContainSingle();
             var issue = this.IssuesActual.Single();
-            issue.Code.Should().Be(ApiInitializationCode.ApiConfigurationActivationFailed);
-            issue.Severity.Should().Be(ApiInitializationSeverity.Warning);
+            issue.Code.Should().Be(ApiSchemaCompilationCode.ApiConfigurationActivationFailed);
+            issue.Severity.Should().Be(ApiSchemaCompilationSeverity.Warning);
             issue.ApiPath.Should().Be(typeof(ActivationFailureConfiguration).FullName);
             issue.Exception.Should().NotBeNull();
         }
@@ -988,7 +988,7 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
         },
         new ConfigurationFailureTest
         {
-            Name = "Configuration identity failure becomes an initialization issue",
+            Name = "Configuration identity failure becomes an compilation issue",
             FailureKind = ConfigurationFailureKind.Identity,
         },
     ];
@@ -1029,7 +1029,7 @@ public class ApiConfigurationDiscoveryTests(ITestOutputHelper output) : XUnitTes
     [
         new ActivationFailureTest
         {
-            Name = "Configuration activation failure becomes an initialization issue",
+            Name = "Configuration activation failure becomes an compilation issue",
         },
     ];
 

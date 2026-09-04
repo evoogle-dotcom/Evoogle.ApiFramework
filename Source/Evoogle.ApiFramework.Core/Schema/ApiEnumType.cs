@@ -50,9 +50,9 @@ public sealed class ApiEnumType
     public ImmutableArray<ApiEnumValue> ApiEnumValues { get; } =
         [.. apiEnumValues.EmptyIfNull().Where(x => x is not null).OrderBy(x => x.ClrOrdinal)];
 
-    private FrozenDictionary<string, ApiEnumValue> ApiNameLookup => this.ThrowIfNotInitialized(_apiNameLookup);
-    private FrozenDictionary<string, ApiEnumValue> ClrNameLookup => this.ThrowIfNotInitialized(_clrNameLookup);
-    private FrozenDictionary<int, ApiEnumValue> ClrOrdinalLookup => this.ThrowIfNotInitialized(_clrOrdinalLookup);
+    private FrozenDictionary<string, ApiEnumValue> ApiNameLookup => this.RequireValue(_apiNameLookup);
+    private FrozenDictionary<string, ApiEnumValue> ClrNameLookup => this.RequireValue(_clrNameLookup);
+    private FrozenDictionary<int, ApiEnumValue> ClrOrdinalLookup => this.RequireValue(_clrOrdinalLookup);
     #endregion
 
     #region Object Methods
@@ -78,16 +78,16 @@ public sealed class ApiEnumType
     }
 
     /// <inheritdoc />
-    internal override void InitializeCore(ApiInitializationContext context)
+    internal override void CompileCore(ApiSchemaCompilationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        base.InitializeCore(context);
+        base.CompileCore(context);
 
-        this.InitializeLookupDictionaries(context);
+        this.BuildLookupDictionaries(context);
 
-        this.InitializeClrType(context);
-        this.InitializeApiEnumValues(context);
+        this.ValidateClrType(context);
+        this.CompileApiEnumValues(context);
     }
     #endregion
 
@@ -118,12 +118,12 @@ public sealed class ApiEnumType
     #endregion
 
     #region Implementation Methods
-    private void InitializeApiEnumValues(ApiInitializationContext context)
+    private void CompileApiEnumValues(ApiSchemaCompilationContext context)
     {
         if (this.ApiEnumValues.Length == 0)
         {
-            var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.ApiEnumTypeNullOrEmptyValues;
+            var severity = ApiSchemaCompilationSeverity.Error;
+            var code = ApiSchemaCompilationCode.ApiEnumTypeNullOrEmptyValues;
             var description = $"{nameof(this.ApiEnumValues)} must not be null or empty";
             var remediation = $"Define at least one {nameof(ApiEnumValue)}";
 
@@ -136,13 +136,13 @@ public sealed class ApiEnumType
         {
             var apiEnumValue = this.ApiEnumValues[i];
 
-            apiEnumValue.Initialize(context);
+            apiEnumValue.Compile(context);
         }
     }
 
-    private void InitializeClrType(ApiInitializationContext context)
+    private void ValidateClrType(ApiSchemaCompilationContext context)
     {
-        // If ClrType is null, the base ApiNamedType.Initialize will have already reported the issue.
+        // If ClrType is null, the base ApiNamedType.Compile will have already reported the issue.
         if (this.ClrType is null)
         {
             return;
@@ -150,8 +150,8 @@ public sealed class ApiEnumType
 
         if (!TypeReflection.IsEnum(this.ClrType))
         {
-            var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.ApiEnumTypeInvalidClrType;
+            var severity = ApiSchemaCompilationSeverity.Error;
+            var code = ApiSchemaCompilationCode.ApiEnumTypeInvalidClrType;
             var description = $"{nameof(this.ClrType)} '{this.ClrType.SafeToName()}' must be a CLR Enum";
             var remediation = $"Set {nameof(this.ClrType)} to a CLR Enum type";
 
@@ -159,41 +159,41 @@ public sealed class ApiEnumType
         }
     }
 
-    private void InitializeLookupDictionaries(ApiInitializationContext context)
+    private void BuildLookupDictionaries(ApiSchemaCompilationContext context)
     {
-        // Initialize lookup dictionaries for lookup by API name, CLR name, and CLR ordinal.
-        ApiSchemaInitializationLookup.InitializeLookupDictionary
+        // Compile lookup dictionaries for lookup by API name, CLR name, and CLR ordinal.
+        ApiSchemaCompilationLookup.BuildLookupDictionary
         (
             parts: this.ApiEnumValues,
             partKeySelector: x => x.ApiName,
             partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
             partKeyPropertyName: nameof(ApiEnumValue.ApiName),
             apiPath: this.ApiPath,
-            duplicatePartCode: ApiInitializationCode.ApiEnumTypeDuplicateValueApiName,
+            duplicatePartCode: ApiSchemaCompilationCode.ApiEnumTypeDuplicateValueApiName,
             session: context.Session,
             lookupDictionary: out _apiNameLookup
         );
 
-        ApiSchemaInitializationLookup.InitializeLookupDictionary
+        ApiSchemaCompilationLookup.BuildLookupDictionary
         (
             parts: this.ApiEnumValues,
             partKeySelector: x => x.ClrName,
             partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
             partKeyPropertyName: nameof(ApiEnumValue.ClrName),
             apiPath: this.ApiPath,
-            duplicatePartCode: ApiInitializationCode.ApiEnumTypeDuplicateValueClrName,
+            duplicatePartCode: ApiSchemaCompilationCode.ApiEnumTypeDuplicateValueClrName,
             session: context.Session,
             lookupDictionary: out _clrNameLookup
         );
 
-        ApiSchemaInitializationLookup.InitializeLookupDictionary
+        ApiSchemaCompilationLookup.BuildLookupDictionary
         (
             parts: this.ApiEnumValues,
             partKeySelector: x => x.ClrOrdinal,
             partKeyFilter: null,
             partKeyPropertyName: nameof(ApiEnumValue.ClrOrdinal),
             apiPath: this.ApiPath,
-            duplicatePartCode: ApiInitializationCode.ApiEnumTypeDuplicateValueClrOrdinal,
+            duplicatePartCode: ApiSchemaCompilationCode.ApiEnumTypeDuplicateValueClrOrdinal,
             session: context.Session,
             lookupDictionary: out _clrOrdinalLookup
         );

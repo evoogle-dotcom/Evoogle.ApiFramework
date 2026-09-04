@@ -72,19 +72,19 @@ public sealed class ApiSchema : ApiSchemaElement
     /// <summary>Gets the immutable snapshot of relationships declared within this schema.</summary>
     public ImmutableArray<ApiRelationship> ApiRelationships { get; }
 
-    private FrozenDictionary<string, ApiNamedType> ApiNamedTypeApiNameLookup => this.ThrowIfNotInitialized(_apiNamedTypeApiNameLookup);
-    private FrozenDictionary<Type, ApiNamedType> ApiNamedTypeClrTypeLookup => this.ThrowIfNotInitialized(_apiNamedTypeClrTypeLookup);
+    private FrozenDictionary<string, ApiNamedType> ApiNamedTypeApiNameLookup => this.RequireValue(_apiNamedTypeApiNameLookup);
+    private FrozenDictionary<Type, ApiNamedType> ApiNamedTypeClrTypeLookup => this.RequireValue(_apiNamedTypeClrTypeLookup);
 
-    private FrozenDictionary<string, ApiEnumType> ApiEnumTypeApiNameLookup => this.ThrowIfNotInitialized(_apiEnumTypeApiNameLookup);
-    private FrozenDictionary<Type, ApiEnumType> ApiEnumTypeClrTypeLookup => this.ThrowIfNotInitialized(_apiEnumTypeClrTypeLookup);
+    private FrozenDictionary<string, ApiEnumType> ApiEnumTypeApiNameLookup => this.RequireValue(_apiEnumTypeApiNameLookup);
+    private FrozenDictionary<Type, ApiEnumType> ApiEnumTypeClrTypeLookup => this.RequireValue(_apiEnumTypeClrTypeLookup);
 
-    private FrozenDictionary<string, ApiObjectType> ApiObjectTypeApiNameLookup => this.ThrowIfNotInitialized(_apiObjectTypeApiNameLookup);
-    private FrozenDictionary<Type, ApiObjectType> ApiObjectTypeClrTypeLookup => this.ThrowIfNotInitialized(_apiObjectTypeClrTypeLookup);
+    private FrozenDictionary<string, ApiObjectType> ApiObjectTypeApiNameLookup => this.RequireValue(_apiObjectTypeApiNameLookup);
+    private FrozenDictionary<Type, ApiObjectType> ApiObjectTypeClrTypeLookup => this.RequireValue(_apiObjectTypeClrTypeLookup);
 
-    private FrozenDictionary<string, ApiScalarType> ApiScalarTypeApiNameLookup => this.ThrowIfNotInitialized(_apiScalarTypeApiNameLookup);
-    private FrozenDictionary<Type, ApiScalarType> ApiScalarTypeClrTypeLookup => this.ThrowIfNotInitialized(_apiScalarTypeClrTypeLookup);
+    private FrozenDictionary<string, ApiScalarType> ApiScalarTypeApiNameLookup => this.RequireValue(_apiScalarTypeApiNameLookup);
+    private FrozenDictionary<Type, ApiScalarType> ApiScalarTypeClrTypeLookup => this.RequireValue(_apiScalarTypeClrTypeLookup);
 
-    private FrozenDictionary<string, ApiRelationship> ApiRelationshipApiNameLookup => this.ThrowIfNotInitialized(_apiRelationshipApiNameLookup);
+    private FrozenDictionary<string, ApiRelationship> ApiRelationshipApiNameLookup => this.RequireValue(_apiRelationshipApiNameLookup);
 
     #endregion
 
@@ -110,27 +110,27 @@ public sealed class ApiSchema : ApiSchemaElement
         IEnumerable<ApiRelationship>? apiRelationships
     )
     {
-        // Initialize the API name.
+        // Compile the API name.
         this.ApiName = apiName;
 
-        // Initialize the API version.
+        // Compile the API version.
         // Default to standard semantic versioning for initial development version.
         this.ApiVersion = apiVersion ?? "0.1.0";
 
-        // Initialize the API schema options.
+        // Compile the API schema options.
         this.ApiOptions = apiOptions ?? ApiSchemaOptions.Default;
 
-        // Initialize the collections for API named types, scalar types, enum types, and object types.
+        // Compile the collections for API named types, scalar types, enum types, and object types.
         this.ApiScalarTypes = [.. apiScalarTypes.EmptyIfNull().Where(x => x is not null).OrderBy(x => x.ApiName, StringComparer.OrdinalIgnoreCase)];
 
         this.ApiEnumTypes = [.. apiEnumTypes.EmptyIfNull().Where(x => x is not null).OrderBy(x => x.ApiName, StringComparer.OrdinalIgnoreCase)];
 
         this.ApiObjectTypes = [.. apiObjectTypes.EmptyIfNull().Where(x => x is not null).OrderBy(x => x.ApiName, StringComparer.OrdinalIgnoreCase)];
 
-        // Initialize the collection of all API named types.
+        // Compile the collection of all API named types.
         this.ApiNamedTypes = [.. this.ApiScalarTypes.SafeCast<ApiNamedType>().Concat(this.ApiEnumTypes.SafeCast<ApiNamedType>()).Concat(this.ApiObjectTypes.SafeCast<ApiNamedType>()).OrderBy(x => x.ApiName, StringComparer.OrdinalIgnoreCase)];
 
-        // Initialize the collection of API relationships.
+        // Compile the collection of API relationships.
         this.ApiRelationships = [.. apiRelationships.EmptyIfNull().Where(x => x is not null).OrderBy(x => x.ApiName, StringComparer.OrdinalIgnoreCase)];
     }
 
@@ -273,27 +273,27 @@ public sealed class ApiSchema : ApiSchemaElement
     }
 
     /// <inheritdoc/>
-    internal override void InitializeCore(ApiInitializationContext context)
+    internal override void CompileCore(ApiSchemaCompilationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        base.InitializeCore(context);
+        base.CompileCore(context);
 
         // Phase 1: Validate schema name and build all lookup dictionaries.
-        this.InitializeApiName(context);
-        this.InitializeApiOptions(context);
-        this.InitializeLookupDictionaries(context);
+        this.ValidateApiName(context);
+        this.ValidateApiOptions(context);
+        this.BuildLookupDictionaries(context);
 
-        // Phase 2: Initialize all type definitions.
-        this.InitializeApiScalarTypes(context);
-        this.InitializeApiEnumTypes(context);
-        this.InitializeApiObjectTypes(context);
+        // Phase 2: Compile all type definitions.
+        this.CompileApiScalarTypes(context);
+        this.CompileApiEnumTypes(context);
+        this.CompileApiObjectTypes(context);
 
-        // Phase 3: Initialize key types after all type definitions are available.
-        this.InitializeApiKeyTypes(context);
+        // Phase 3: Compile key types after all type definitions are available.
+        this.CompileApiKeyTypes(context);
 
-        // Phase 4: Initialize relationships.
-        this.InitializeApiRelationships(context);
+        // Phase 4: Compile relationships.
+        this.CompileApiRelationships(context);
     }
     #endregion
 
@@ -311,14 +311,14 @@ public sealed class ApiSchema : ApiSchemaElement
         Interlocked.Exchange(ref _compilationState, isSuccessful ? 2 : 3);
     }
 
-    private void InitializeApiName(ApiInitializationContext context)
+    private void ValidateApiName(ApiSchemaCompilationContext context)
     {
         var isApiNameInvalid = ApiSchemaNameValidation.IsNameInvalid(this.ApiName);
         if (isApiNameInvalid)
         {
             var path = this.ApiPath;
-            var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.ApiSchemaInvalidName;
+            var severity = ApiSchemaCompilationSeverity.Error;
+            var code = ApiSchemaCompilationCode.ApiSchemaInvalidName;
             var description = $"{nameof(this.ApiName)} must not be null, empty, or whitespace";
             var remediation = $"Specify a valid {nameof(this.ApiName)} value";
 
@@ -326,171 +326,171 @@ public sealed class ApiSchema : ApiSchemaElement
         }
     }
 
-    private void InitializeApiOptions(ApiInitializationContext context)
+    private void ValidateApiOptions(ApiSchemaCompilationContext context)
     {
         if (!this.ApiOptions.HasInvalidApiKeyNullHandling)
         {
             return;
         }
 
-        var severity = ApiInitializationSeverity.Error;
-        var code = ApiInitializationCode.ApiSchemaInvalidApiKeyNullHandling;
+        var severity = ApiSchemaCompilationSeverity.Error;
+        var code = ApiSchemaCompilationCode.ApiSchemaInvalidApiKeyNullHandling;
         var description = $"{nameof(this.ApiOptions)}.{nameof(ApiSchemaOptions.ApiKeyNullHandling)} must be a valid {nameof(ApiKeyNullHandling)} value";
         var remediation = $"Specify a valid {nameof(ApiSchemaOptions.ApiKeyNullHandling)} value";
 
         context.AddIssue(severity, code, description, remediation);
     }
 
-    private void InitializeApiEnumTypes(ApiInitializationContext context)
+    private void CompileApiEnumTypes(ApiSchemaCompilationContext context)
     {
         foreach (var apiEnumType in this.ApiEnumTypes)
         {
-            apiEnumType.Initialize(context);
+            apiEnumType.Compile(context);
         }
     }
 
-    private void InitializeApiObjectTypes(ApiInitializationContext context)
+    private void CompileApiObjectTypes(ApiSchemaCompilationContext context)
     {
         foreach (var apiObjectType in this.ApiObjectTypes)
         {
-            apiObjectType.Initialize(context);
+            apiObjectType.Compile(context);
         }
     }
 
-    private void InitializeApiKeyTypes(ApiInitializationContext context)
+    private void CompileApiKeyTypes(ApiSchemaCompilationContext context)
     {
         foreach (var apiObjectType in this
             .SelfAndDescendants(TraversalStrategy.DepthFirst)
             .OfType<ApiObjectType>())
         {
-            apiObjectType.InitializeKeyTypes(context);
+            apiObjectType.CompileKeyTypes(context);
         }
     }
 
-    private void InitializeApiRelationships(ApiInitializationContext context)
+    private void CompileApiRelationships(ApiSchemaCompilationContext context)
     {
         foreach (var apiRelationship in this.ApiRelationships)
         {
-            apiRelationship.Initialize(context);
+            apiRelationship.Compile(context);
         }
 
         this.PopulateRelationshipCrossReferences();
     }
 
-    private void InitializeApiScalarTypes(ApiInitializationContext context)
+    private void CompileApiScalarTypes(ApiSchemaCompilationContext context)
     {
         foreach (var apiScalarType in this.ApiScalarTypes)
         {
-            apiScalarType.Initialize(context);
+            apiScalarType.Compile(context);
         }
     }
 
-    private void InitializeLookupDictionaries(ApiInitializationContext context)
+    private void BuildLookupDictionaries(ApiSchemaCompilationContext context)
     {
-        ApiSchemaInitializationLookup.InitializeLookupDictionary
+        ApiSchemaCompilationLookup.BuildLookupDictionary
         (
             parts: this.ApiNamedTypes,
             partKeySelector: x => x.ApiName,
             partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
             partKeyPropertyName: nameof(ApiNamedType.ApiName),
             apiPath: this.ApiPath,
-            duplicatePartCode: ApiInitializationCode.ApiSchemaDuplicateNamedTypeApiName,
+            duplicatePartCode: ApiSchemaCompilationCode.ApiSchemaDuplicateNamedTypeApiName,
             session: context.Session,
             lookupDictionary: out _apiNamedTypeApiNameLookup
         );
 
-        ApiSchemaInitializationLookup.InitializeLookupDictionary
+        ApiSchemaCompilationLookup.BuildLookupDictionary
         (
             parts: this.ApiNamedTypes,
             partKeySelector: x => x.ClrType,
             partKeyFilter: x => x is not null,
             partKeyPropertyName: nameof(ApiNamedType.ClrType),
             apiPath: this.ApiPath,
-            duplicatePartCode: ApiInitializationCode.ApiSchemaDuplicateNamedTypeClrType,
+            duplicatePartCode: ApiSchemaCompilationCode.ApiSchemaDuplicateNamedTypeClrType,
             session: context.Session,
             lookupDictionary: out _apiNamedTypeClrTypeLookup
         );
 
-        ApiSchemaInitializationLookup.InitializeLookupDictionary
+        ApiSchemaCompilationLookup.BuildLookupDictionary
         (
             parts: this.ApiEnumTypes,
             partKeySelector: x => x.ApiName,
             partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
             partKeyPropertyName: nameof(ApiEnumType.ApiName),
             apiPath: this.ApiPath,
-            duplicatePartCode: ApiInitializationCode.ApiSchemaDuplicateEnumTypeApiName,
+            duplicatePartCode: ApiSchemaCompilationCode.ApiSchemaDuplicateEnumTypeApiName,
             session: context.Session,
             lookupDictionary: out _apiEnumTypeApiNameLookup
         );
 
-        ApiSchemaInitializationLookup.InitializeLookupDictionary
+        ApiSchemaCompilationLookup.BuildLookupDictionary
         (
             parts: this.ApiEnumTypes,
             partKeySelector: x => x.ClrType,
             partKeyFilter: x => x is not null,
             partKeyPropertyName: nameof(ApiEnumType.ClrType),
             apiPath: this.ApiPath,
-            duplicatePartCode: ApiInitializationCode.ApiSchemaDuplicateEnumTypeClrType,
+            duplicatePartCode: ApiSchemaCompilationCode.ApiSchemaDuplicateEnumTypeClrType,
             session: context.Session,
             lookupDictionary: out _apiEnumTypeClrTypeLookup
         );
 
-        ApiSchemaInitializationLookup.InitializeLookupDictionary
+        ApiSchemaCompilationLookup.BuildLookupDictionary
         (
             parts: this.ApiObjectTypes,
             partKeySelector: x => x.ApiName,
             partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
             partKeyPropertyName: nameof(ApiObjectType.ApiName),
             apiPath: this.ApiPath,
-            duplicatePartCode: ApiInitializationCode.ApiSchemaDuplicateObjectTypeApiName,
+            duplicatePartCode: ApiSchemaCompilationCode.ApiSchemaDuplicateObjectTypeApiName,
             session: context.Session,
             lookupDictionary: out _apiObjectTypeApiNameLookup
         );
 
-        ApiSchemaInitializationLookup.InitializeLookupDictionary
+        ApiSchemaCompilationLookup.BuildLookupDictionary
         (
             parts: this.ApiObjectTypes,
             partKeySelector: x => x.ClrType,
             partKeyFilter: x => x is not null,
             partKeyPropertyName: nameof(ApiObjectType.ClrType),
             apiPath: this.ApiPath,
-            duplicatePartCode: ApiInitializationCode.ApiSchemaDuplicateObjectTypeClrType,
+            duplicatePartCode: ApiSchemaCompilationCode.ApiSchemaDuplicateObjectTypeClrType,
             session: context.Session,
             lookupDictionary: out _apiObjectTypeClrTypeLookup
         );
 
-        ApiSchemaInitializationLookup.InitializeLookupDictionary
+        ApiSchemaCompilationLookup.BuildLookupDictionary
         (
             parts: this.ApiScalarTypes,
             partKeySelector: x => x.ApiName,
             partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
             partKeyPropertyName: nameof(ApiScalarType.ApiName),
             apiPath: this.ApiPath,
-            duplicatePartCode: ApiInitializationCode.ApiSchemaDuplicateScalarTypeApiName,
+            duplicatePartCode: ApiSchemaCompilationCode.ApiSchemaDuplicateScalarTypeApiName,
             session: context.Session,
             lookupDictionary: out _apiScalarTypeApiNameLookup
         );
 
-        ApiSchemaInitializationLookup.InitializeLookupDictionary
+        ApiSchemaCompilationLookup.BuildLookupDictionary
         (
             parts: this.ApiScalarTypes,
             partKeySelector: x => x.ClrType,
             partKeyFilter: x => x is not null,
             partKeyPropertyName: nameof(ApiScalarType.ClrType),
             apiPath: this.ApiPath,
-            duplicatePartCode: ApiInitializationCode.ApiSchemaDuplicateScalarTypeClrType,
+            duplicatePartCode: ApiSchemaCompilationCode.ApiSchemaDuplicateScalarTypeClrType,
             session: context.Session,
             lookupDictionary: out _apiScalarTypeClrTypeLookup
         );
 
-        ApiSchemaInitializationLookup.InitializeLookupDictionary
+        ApiSchemaCompilationLookup.BuildLookupDictionary
         (
             parts: this.ApiRelationships,
             partKeySelector: x => x.ApiName,
             partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
             partKeyPropertyName: nameof(ApiRelationship.ApiName),
             apiPath: this.ApiPath,
-            duplicatePartCode: ApiInitializationCode.ApiSchemaDuplicateRelationshipApiName,
+            duplicatePartCode: ApiSchemaCompilationCode.ApiSchemaDuplicateRelationshipApiName,
             session: context.Session,
             lookupDictionary: out _apiRelationshipApiNameLookup
         );

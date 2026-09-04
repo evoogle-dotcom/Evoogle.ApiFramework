@@ -33,8 +33,8 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
 
     private enum RelationshipOwnerCase
     {
-        InitializedEnd,
-        InitializedAssociation,
+        CompiledEnd,
+        CompiledAssociation,
         UninitializedEnd,
         UninitializedAssociation,
         InvalidEndParent,
@@ -131,7 +131,7 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
 
         private ApiSchemaElement? SharedParent { get; set; }
 
-        private ApiSchemaBuildResult? SecondResult { get; set; }
+        private ApiSchemaCompilationResult? SecondResult { get; set; }
 
         private ApiSchema? SecondSchema { get; set; }
         #endregion
@@ -191,7 +191,7 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
         {
             this.SecondResult!.Errors.Should().ContainSingle
             (
-                issue => issue.Code == ApiInitializationCode.ApiSchemaElementDuplicateOwnership
+                issue => issue.Code == ApiSchemaCompilationCode.ApiSchemaElementDuplicateOwnership
             );
 
             Action getSecondRoot = () => _ = this.SecondSchema!.Root;
@@ -218,7 +218,7 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
         #region Calculated Properties
         private InlineSchemaFixture? Fixture { get; set; }
 
-        private ApiSchemaBuildResult? Result { get; set; }
+        private ApiSchemaCompilationResult? Result { get; set; }
         #endregion
 
         #region XUnitTest Methods
@@ -310,14 +310,14 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
         {
             switch (this.OwnerCase)
             {
-                case RelationshipOwnerCase.InitializedEnd:
+                case RelationshipOwnerCase.CompiledEnd:
                     this.ExpectedRelationship = ApiSchemaFactory.RelationshipApiSchema
                         .ApiRelationships.OfType<ApiRelationshipOneTo>().First();
                     this.Element =
                         ((ApiRelationshipOneTo)this.ExpectedRelationship).ApiPrincipalEnd;
                     break;
 
-                case RelationshipOwnerCase.InitializedAssociation:
+                case RelationshipOwnerCase.CompiledAssociation:
                     this.ExpectedRelationship = ApiSchemaFactory.RelationshipApiSchema
                         .ApiRelationships.OfType<ApiRelationshipManyToMany>().First();
                     this.Element =
@@ -743,7 +743,7 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
                     case TraversalExceptionCase.NullEnumerator:
                         _ = schema.Descendants
                         (
-                            (IEnumerator<ApiSchemaElement>)null!
+                            null!
                         ).ToArray();
                         break;
 
@@ -811,7 +811,7 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
     [
         new InlineTypesInitializeTest
         {
-            Name = "Every Inline Type Is Initialized As An Owned Element"
+            Name = "Every Inline Type Is Compiled As An Owned Element"
         }
     ];
 

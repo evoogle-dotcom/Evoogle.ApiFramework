@@ -164,7 +164,7 @@ public sealed class ApiAnnotationReaderArchitectureTests(ITestOutputHelper outpu
         #region User Supplied Properties
         public required ExceptionTestCase TestCase { get; init; }
         public required Type ExceptionTypeExpected { get; init; }
-        public ApiInitializationCode? InitializationCodeExpected { get; init; }
+        public ApiSchemaCompilationCode? CompilationCodeExpected { get; init; }
         #endregion
 
         #region Calculated Properties
@@ -176,7 +176,7 @@ public sealed class ApiAnnotationReaderArchitectureTests(ITestOutputHelper outpu
         {
             this.WriteLine($"TestCase: {this.TestCase}");
             this.WriteLine($"ExceptionTypeExpected: {this.ExceptionTypeExpected.Name}");
-            this.WriteLine($"InitializationCodeExpected: {this.InitializationCodeExpected}");
+            this.WriteLine($"CompilationCodeExpected: {this.CompilationCodeExpected}");
             this.WriteLine();
         }
 
@@ -186,7 +186,7 @@ public sealed class ApiAnnotationReaderArchitectureTests(ITestOutputHelper outpu
             {
                 _ = this.TestCase switch
                 {
-                    ExceptionTestCase.DuplicateAnnotationKeyOrders => (object)new ApiSchemaBuilder()
+                    ExceptionTestCase.DuplicateAnnotationKeyOrders => new ApiSchemaBuilder()
                         .WithName("Test")
                         .AddScalar<int>()
                         .AddObject<DuplicateOrderKeyType>(builder => builder
@@ -213,14 +213,14 @@ public sealed class ApiAnnotationReaderArchitectureTests(ITestOutputHelper outpu
             this.ExceptionActual.Should().NotBeNull();
             this.ExceptionActual.Should().BeOfType(this.ExceptionTypeExpected);
 
-            if (this.InitializationCodeExpected is not { } initializationCodeExpected)
+            if (this.CompilationCodeExpected is not { } compilationCodeExpected)
             {
                 return;
             }
 
-            var exception = (ApiSchemaInitializationException)this.ExceptionActual!;
+            var exception = (ApiSchemaCompilationException)this.ExceptionActual!;
             exception.Errors.Select(issue => issue.Code)
-                .Should().Contain(initializationCodeExpected);
+                .Should().Contain(compilationCodeExpected);
         }
         #endregion
     }
@@ -376,10 +376,10 @@ public sealed class ApiAnnotationReaderArchitectureTests(ITestOutputHelper outpu
     [
         new ExceptionTest
         {
-            Name = "Duplicate annotation key orders become initialization issues",
+            Name = "Duplicate annotation key orders become compilation issues",
             TestCase = ExceptionTestCase.DuplicateAnnotationKeyOrders,
-            ExceptionTypeExpected = typeof(ApiSchemaInitializationException),
-            InitializationCodeExpected = ApiInitializationCode.ApiAnnotationKeyOrderConflict
+            ExceptionTypeExpected = typeof(ApiSchemaCompilationException),
+            CompilationCodeExpected = ApiSchemaCompilationCode.ApiAnnotationKeyOrderConflict
         },
         new ExceptionTest
         {

@@ -13,18 +13,18 @@ namespace Evoogle.ApiFramework.Schema.Internal;
 ///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used directly from your code.
 ///     This API may change or be removed in future releases.
 /// </summary>
-internal static class ApiSchemaInitializationLookup
+internal static class ApiSchemaCompilationLookup
 {
     #region Utility Methods
-    public static void InitializeLookupDictionary<TPart, TPartKey>
+    public static void BuildLookupDictionary<TPart, TPartKey>
     (
         IEnumerable<TPart?> parts,
         Func<TPart, TPartKey?> partKeySelector,
         Func<TPartKey, bool>? partKeyFilter,
         string partKeyPropertyName,
         string apiPath,
-        ApiInitializationCode duplicatePartCode,
-        ApiInitializationSession session,
+        ApiSchemaCompilationCode duplicatePartCode,
+        ApiSchemaCompilationSession session,
         out FrozenDictionary<TPartKey, TPart>? lookupDictionary
     )
         where TPart : class
@@ -59,8 +59,8 @@ internal static class ApiSchemaInitializationLookup
         Func<TPartKey, bool>? partKeyFilter,
         string partKeyPropertyName,
         string apiPath,
-        ApiInitializationCode duplicatePartCode,
-        ApiInitializationSession session
+        ApiSchemaCompilationCode duplicatePartCode,
+        ApiSchemaCompilationSession session
     )
         where TPart : class
         where TPartKey : notnull
@@ -84,7 +84,7 @@ internal static class ApiSchemaInitializationLookup
         var duplicatesString = duplicates.SafeToDelimitedString(',');
         var partTypeName = typeof(TPart).SafeToName();
 
-        var severity = ApiInitializationSeverity.Error;
+        var severity = ApiSchemaCompilationSeverity.Error;
         var description = $"Duplicate {partTypeName}.{partKeyPropertyName} values: '{duplicatesString}'";
         var remediation = $"Verify that each {partTypeName} has a unique {partKeyPropertyName} value";
 

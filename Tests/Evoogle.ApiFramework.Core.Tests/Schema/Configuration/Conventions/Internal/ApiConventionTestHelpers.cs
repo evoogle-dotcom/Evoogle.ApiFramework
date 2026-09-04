@@ -13,7 +13,7 @@ internal static class ApiConventionTestHelpers
     #region Test Helpers
     /// <summary>
     ///     Registers the common .NET primitive scalar types used by convention and annotation
-    ///     test domain models so that schema initialization succeeds.
+    ///     test domain models so that schema compilation succeeds.
     /// </summary>
     public static ApiSchemaBuilder WithTestScalars(this ApiSchemaBuilder builder)
     {

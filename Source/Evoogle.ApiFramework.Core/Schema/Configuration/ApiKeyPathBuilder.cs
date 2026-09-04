@@ -31,7 +31,7 @@ public class ApiKeyPathBuilder : ExtensionBuilder<ApiKeyPathBuilder>
 
     #region Constructors
     /// <summary>
-    ///     Initializes an <see cref="ApiKeyPathBuilder"/> with the specified root CLR type and CLR property names.
+    ///     Creates an <see cref="ApiKeyPathBuilder"/> with the specified root CLR type and CLR property names.
     ///     Each name is wrapped in a plain <see cref="ApiKeyPathSegmentBuilder"/> with no extensions.
     /// </summary>
     /// <param name="clrRootType">The CLR type from which the navigation chain begins.</param>
@@ -66,7 +66,7 @@ public class ApiKeyPathBuilder : ExtensionBuilder<ApiKeyPathBuilder>
     }
 
     /// <summary>
-    ///     Initializes an <see cref="ApiKeyPathBuilder"/> with the specified root CLR type and pre-configured
+    ///     Creates an <see cref="ApiKeyPathBuilder"/> with the specified root CLR type and pre-configured
     ///     segment builders. Use this overload when individual segments require extensions.
     /// </summary>
     /// <param name="clrRootType">The CLR type from which the navigation chain begins.</param>

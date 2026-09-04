@@ -90,24 +90,24 @@ public sealed class ApiCollectionType
         => ApiSchemaPathFormatting.BuildPath(apiBasePath: apiPreviousPath, apiPathSegment: this.ApiElementName, apiPathSegmentName: null);
 
     /// <inheritdoc />
-    internal override void InitializeCore(ApiInitializationContext context)
+    internal override void CompileCore(ApiSchemaCompilationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        base.InitializeCore(context);
+        base.CompileCore(context);
 
-        this.InitializeApiItemTypeModifiers(context);
-        this.InitializeApiItemTypeExpression(context);
+        this.ValidateApiItemTypeModifiers(context);
+        this.ValidateApiItemTypeExpression(context);
     }
     #endregion
 
     #region Implementation Methods
-    private void InitializeApiItemTypeExpression(ApiInitializationContext context)
+    private void ValidateApiItemTypeExpression(ApiSchemaCompilationContext context)
     {
         if (this.ApiItemTypeExpression is null)
         {
-            var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.ApiCollectionTypeNullItemType;
+            var severity = ApiSchemaCompilationSeverity.Error;
+            var code = ApiSchemaCompilationCode.ApiCollectionTypeNullItemType;
             var description = $"{nameof(this.ApiItemType)} must not be null";
             var remediation = $"Specify a valid {nameof(this.ApiItemType)}";
 
@@ -115,18 +115,18 @@ public sealed class ApiCollectionType
             return;
         }
 
-        this.ApiItemTypeExpression.InitializeForCollection(context);
+        this.ApiItemTypeExpression.ResolveForCollection(context);
     }
 
-    private void InitializeApiItemTypeModifiers(ApiInitializationContext context)
+    private void ValidateApiItemTypeModifiers(ApiSchemaCompilationContext context)
     {
         if (!_hasInvalidApiItemTypeModifiers)
         {
             return;
         }
 
-        var severity = ApiInitializationSeverity.Error;
-        var code = ApiInitializationCode.ApiCollectionTypeInvalidApiItemTypeModifiers;
+        var severity = ApiSchemaCompilationSeverity.Error;
+        var code = ApiSchemaCompilationCode.ApiCollectionTypeInvalidApiItemTypeModifiers;
         var description = $"{nameof(this.ApiItemTypeModifiers)} must be a valid {nameof(ApiTypeModifiers)} value";
         var remediation = $"Specify a valid {nameof(this.ApiItemTypeModifiers)} value";
 

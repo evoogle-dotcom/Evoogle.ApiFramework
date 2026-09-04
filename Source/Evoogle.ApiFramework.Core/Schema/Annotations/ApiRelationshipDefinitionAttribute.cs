@@ -22,14 +22,14 @@ public sealed class ApiRelationshipDefinitionAttribute : ApiNamedElementAttribut
     #endregion
 
     #region Properties
-    /// <summary>Gets or initializes the schema-unique API name of the relationship.</summary>
+    /// <summary>Gets the the schema-unique API name of the relationship.</summary>
     public new required string ApiName
     {
         get => base.ApiName!;
         init => base.ApiName = RequireApiName(value);
     }
 
-    /// <summary>Gets or initializes the CLR type of the principal end.</summary>
+    /// <summary>Gets the the CLR type of the principal end.</summary>
     public required Type PrincipalType
     {
         get => this._principalType;
@@ -40,7 +40,7 @@ public sealed class ApiRelationshipDefinitionAttribute : ApiNamedElementAttribut
         }
     }
 
-    /// <summary>Gets or initializes the CLR type of the dependent end.</summary>
+    /// <summary>Gets the the CLR type of the dependent end.</summary>
     public required Type DependentType
     {
         get => this._dependentType;
@@ -52,17 +52,17 @@ public sealed class ApiRelationshipDefinitionAttribute : ApiNamedElementAttribut
     }
 
     /// <summary>
-    ///     Gets or initializes the relationship kind.
+    ///     Gets the the relationship kind.
     /// </summary>
     public required ApiRelationshipKind Kind { get; init; }
 
     /// <summary>
-    ///     Gets or initializes the name of the foreign-key CLR property on the dependent type.
+    ///     Gets the the name of the foreign-key CLR property on the dependent type.
     ///     When <c>null</c> the framework infers the foreign key via convention.
     /// </summary>
     public string? ForeignKey { get; init; }
 
-    /// <summary>Gets or initializes the delete behavior for the relationship.</summary>
+    /// <summary>Gets the the delete behavior for the relationship.</summary>
     public ApiRelationshipDeleteBehavior DeleteBehavior { get; init; } = ApiRelationshipDeleteBehavior.None;
     #endregion
 }

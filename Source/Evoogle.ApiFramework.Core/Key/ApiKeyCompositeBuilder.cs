@@ -48,7 +48,7 @@ public sealed class ApiKeyCompositeBuilder
     ///     Internal mutable collection of parts accumulated during the build process.
     /// </summary>
     /// <remarks>
-    ///     Initialized lazily on first <see cref="Add(ApiKey)"/> or <see cref="Add(string, ApiKey)"/> call.
+    ///     Created lazily on first <see cref="Add(ApiKey)"/> or <see cref="Add(string, ApiKey)"/> call.
     /// </remarks>
     private List<ApiKeyPart>? _parts;
     #endregion

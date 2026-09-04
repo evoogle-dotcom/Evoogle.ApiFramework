@@ -15,7 +15,7 @@ namespace Evoogle.ApiFramework.Schema;
 ///     Represents the abstract base class for all elements in an API schema (e.g., types, properties, relationships).
 /// </summary>
 /// <remarks>
-///     This class provides common initialization and path building functionality for all schema elements.
+///     This class provides common compilation and path building functionality for all schema elements.
 ///     Each schema element maintains an API path that uniquely identifies its location within the schema hierarchy.
 ///     After topology construction, it also participates in an exclusive, read-only ownership tree
 ///     whose root is the containing <see cref="ApiSchema"/>. An element instance cannot be owned by
@@ -59,11 +59,11 @@ public abstract class ApiSchemaElement : ExtensibleBase, INode<ApiSchemaElement>
     ///     Gets the API path that uniquely identifies this element within the schema hierarchy.
     /// </summary>
     /// <remarks>
-    ///     This property is available after the element has been initialized. Its value begins
+    ///     This property is available after the element has compiled. Its value begins
     ///     with the containing <see cref="ApiSchema"/> and includes the element's structural
     ///     ancestry.
     /// </remarks>
-    public string ApiPath => this.ThrowIfNotInitialized(_apiPath);
+    public string ApiPath => this.RequireValue(_apiPath);
 
     /// <summary>Gets the cast-safe runtime kind of this schema element.</summary>
     /// <remarks>
@@ -75,37 +75,37 @@ public abstract class ApiSchemaElement : ExtensibleBase, INode<ApiSchemaElement>
 
     /// <summary>Gets the root element of the schema ownership tree.</summary>
     /// <remarks>
-    ///     This property is available after the schema topology has been initialized.
+    ///     This property is available after schema compilation establishes the topology.
     /// </remarks>
     public ApiSchemaElement Root => this.Topology.Root;
 
     /// <summary>Gets the structural parent of this schema element.</summary>
     /// <remarks>
-    ///     This property is available after the schema topology has been initialized.
+    ///     This property is available after schema compilation establishes the topology.
     /// </remarks>
     public ApiSchemaElement? Parent => this.Topology.Parent;
 
     /// <summary>Gets the first structurally owned child of this schema element.</summary>
     /// <remarks>
-    ///     This property is available after the schema topology has been initialized.
+    ///     This property is available after schema compilation establishes the topology.
     /// </remarks>
     public ApiSchemaElement? FirstChild => this.Topology.FirstChild;
 
     /// <summary>Gets the last structurally owned child of this schema element.</summary>
     /// <remarks>
-    ///     This property is available after the schema topology has been initialized.
+    ///     This property is available after schema compilation establishes the topology.
     /// </remarks>
     public ApiSchemaElement? LastChild => this.Topology.LastChild;
 
     /// <summary>Gets the next structurally owned sibling of this schema element.</summary>
     /// <remarks>
-    ///     This property is available after the schema topology has been initialized.
+    ///     This property is available after schema compilation establishes the topology.
     /// </remarks>
     public ApiSchemaElement? NextSibling => this.Topology.NextSibling;
 
     /// <summary>Gets the previous structurally owned sibling of this schema element.</summary>
     /// <remarks>
-    ///     This property is available after the schema topology has been initialized.
+    ///     This property is available after the schema topology has been compiled.
     /// </remarks>
     public ApiSchemaElement? PreviousSibling => this.Topology.PreviousSibling;
 
@@ -116,9 +116,9 @@ public abstract class ApiSchemaElement : ExtensibleBase, INode<ApiSchemaElement>
     ///     Gets the runtime context for the API schema containing this element.
     /// </summary>
     /// <remarks>
-    ///     This property is available after the element has been initialized.
+    ///     This property is available after the element has compiled.
     /// </remarks>
-    public ApiSchemaContext ApiSchemaContext => this.ThrowIfNotInitialized(_apiSchemaContext);
+    public ApiSchemaContext ApiSchemaContext => this.RequireValue(_apiSchemaContext);
 
     /// <summary>
     ///     Gets the logger for this schema element.
@@ -135,7 +135,7 @@ public abstract class ApiSchemaElement : ExtensibleBase, INode<ApiSchemaElement>
     /// <summary>Gets a value indicating whether this element's ownership topology has been established.</summary>
     internal bool HasTopology => _topology is not null;
 
-    private ApiSchemaElementTopology Topology => this.ThrowIfNotInitialized(_topology);
+    private ApiSchemaElementTopology Topology => this.RequireValue(_topology);
     #endregion
 
     #region Constructors
@@ -154,12 +154,12 @@ public abstract class ApiSchemaElement : ExtensibleBase, INode<ApiSchemaElement>
     protected abstract string BuildPath(string? apiPreviousPath);
 
     /// <summary>
-    ///     Initializes this schema element in the specified session.
+    ///     Compiles this schema element in the specified session.
     /// </summary>
-    internal ApiInitializationContext Initialize
+    internal ApiSchemaCompilationContext Compile
     (
-        ApiInitializationSession session,
-        ApiInitializationLocation location = default
+        ApiSchemaCompilationSession session,
+        ApiSchemaCompilationLocation location = default
     )
     {
         ArgumentNullException.ThrowIfNull(session);
@@ -170,28 +170,28 @@ public abstract class ApiSchemaElement : ExtensibleBase, INode<ApiSchemaElement>
         _apiPath = context.ApiPath;
         _apiSchemaContext = session.ApiSchemaContext;
 
-        this.InitializeCore(context);
+        this.CompileCore(context);
         return context;
     }
 
-    internal ApiInitializationContext Initialize
+    internal ApiSchemaCompilationContext Compile
     (
-        ApiInitializationContext context,
-        ApiInitializationLocation location = default
+        ApiSchemaCompilationContext context,
+        ApiSchemaCompilationLocation location = default
     )
     {
         ArgumentNullException.ThrowIfNull(context);
 
         // The supplied context contributes only shared session state. Structural parentage and
         // path construction come from this element's published ownership topology.
-        return this.Initialize(context.Session, location);
+        return this.Compile(context.Session, location);
     }
 
     internal string BuildDefaultPath(string? apiPreviousPath) => this.BuildPath(apiPreviousPath);
 
     internal virtual IEnumerable<ApiSchemaElement> GetOwnedElements() => [];
 
-    internal virtual void InitializeCore(ApiInitializationContext context)
+    internal virtual void CompileCore(ApiSchemaCompilationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
     }
@@ -249,7 +249,7 @@ public abstract class ApiSchemaElement : ExtensibleBase, INode<ApiSchemaElement>
 
     internal bool TryCreateFrozenExtensionSnapshot
     (
-        ApiInitializationSession session,
+        ApiSchemaCompilationSession session,
         out IReadOnlyList<KeyValuePair<Type, object>> frozenExtensions
     )
     {
@@ -268,8 +268,8 @@ public abstract class ApiSchemaElement : ExtensibleBase, INode<ApiSchemaElement>
                 session.AddIssue
                 (
                     issuePath,
-                    ApiInitializationSeverity.Error,
-                    ApiInitializationCode.ApiSchemaExtensionInvalidSnapshot,
+                    ApiSchemaCompilationSeverity.Error,
+                    ApiSchemaCompilationCode.ApiSchemaExtensionInvalidSnapshot,
                     $"Extension value '{extension.GetType().FullName}' is not assignable to its registered key type '{extensionType.FullName}'.",
                     "Register the extension under a type assignable from the extension value and its frozen snapshot."
                 );
@@ -282,8 +282,8 @@ public abstract class ApiSchemaElement : ExtensibleBase, INode<ApiSchemaElement>
                 session.AddIssue
                 (
                     issuePath,
-                    ApiInitializationSeverity.Error,
-                    ApiInitializationCode.ApiSchemaExtensionUnsupported,
+                    ApiSchemaCompilationSeverity.Error,
+                    ApiSchemaCompilationCode.ApiSchemaExtensionUnsupported,
                     $"Extension '{extensionType.FullName}' does not implement {nameof(IApiSchemaExtension)}.",
                     $"Implement {nameof(IApiSchemaExtension)} and return an immutable runtime snapshot."
                 );
@@ -301,8 +301,8 @@ public abstract class ApiSchemaElement : ExtensibleBase, INode<ApiSchemaElement>
                 session.AddIssue
                 (
                     issuePath,
-                    ApiInitializationSeverity.Error,
-                    ApiInitializationCode.ApiSchemaExtensionSnapshotFailed,
+                    ApiSchemaCompilationSeverity.Error,
+                    ApiSchemaCompilationCode.ApiSchemaExtensionSnapshotFailed,
                     $"Extension '{extensionType.FullName}' failed to create a frozen snapshot: {exception.Message}",
                     "Correct the extension snapshot implementation so it completes successfully."
                 );
@@ -317,8 +317,8 @@ public abstract class ApiSchemaElement : ExtensibleBase, INode<ApiSchemaElement>
                 session.AddIssue
                 (
                     issuePath,
-                    ApiInitializationSeverity.Error,
-                    ApiInitializationCode.ApiSchemaExtensionInvalidSnapshot,
+                    ApiSchemaCompilationSeverity.Error,
+                    ApiSchemaCompilationCode.ApiSchemaExtensionInvalidSnapshot,
                     $"Extension '{extensionType.FullName}' returned a null, reused, or incompatible frozen snapshot.",
                     "Return a distinct immutable snapshot assignable to the registered extension key type."
                 );

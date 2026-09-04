@@ -13,7 +13,7 @@ public sealed class ApiPropertyAttribute : ApiNamedElementAttribute
 {
     #region Properties
     /// <summary>
-    ///     Gets or initializes the API name for the property.
+    ///     Gets the the API name for the property.
     ///     When <c>null</c>, the name is derived by the active naming convention.
     /// </summary>
     public new string? ApiName

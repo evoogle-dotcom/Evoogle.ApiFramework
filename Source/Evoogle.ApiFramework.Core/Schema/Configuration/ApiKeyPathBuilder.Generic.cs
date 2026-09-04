@@ -15,7 +15,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 /// </summary>
 /// <typeparam name="TRoot">The root CLR type from which the key path navigation begins.</typeparam>
 /// <remarks>
-///     Initializes an <see cref="ApiKeyPathBuilder{TRoot}"/> with the specified root CLR type and pre-configured
+///     Creates an <see cref="ApiKeyPathBuilder{TRoot}"/> with the specified root CLR type and pre-configured
 ///     segment builders.
 /// </remarks>
 /// <param name="clrRootType">The CLR type from which the navigation chain begins.</param>

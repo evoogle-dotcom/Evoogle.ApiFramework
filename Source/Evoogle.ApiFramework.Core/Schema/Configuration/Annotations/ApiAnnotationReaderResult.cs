@@ -7,7 +7,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Annotations;
 
 #region Result Types
 /// <summary>Describes a diagnostic emitted by an annotation reader.</summary>
-/// <param name="Code">The initialization code identifying the diagnostic.</param>
+/// <param name="Code">The compilation code identifying the diagnostic.</param>
 /// <param name="ApiPath">The API path associated with the diagnostic.</param>
 /// <param name="Description">The human-readable diagnostic description.</param>
 /// <param name="Remediation">Optional guidance for resolving the diagnostic.</param>
@@ -15,12 +15,12 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Annotations;
 /// <param name="Severity">The severity assigned to the diagnostic.</param>
 public sealed record ApiAnnotationReaderDiagnostic
 (
-    ApiInitializationCode Code,
+    ApiSchemaCompilationCode Code,
     string ApiPath,
     string Description,
     string? Remediation = null,
     Exception? Exception = null,
-    ApiInitializationSeverity Severity = ApiInitializationSeverity.Error
+    ApiSchemaCompilationSeverity Severity = ApiSchemaCompilationSeverity.Error
 );
 
 /// <summary>Contains annotation-reader contributions and reader-emitted diagnostics.</summary>

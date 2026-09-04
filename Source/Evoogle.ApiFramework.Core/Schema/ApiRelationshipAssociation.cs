@@ -88,7 +88,7 @@ public sealed class ApiRelationshipAssociation : ApiRelationshipElement
 
     #region Constructors
     /// <summary>
-    ///     Initializes an association with no foreign key binding declared at the schema level for either principal end.
+    ///     Creates an association with no foreign key binding declared at the schema level for either principal end.
     ///     Use when the join-table object type needs to be identified but key property mapping
     ///     is intentionally left to the downstream layer.
     /// </summary>
@@ -99,7 +99,7 @@ public sealed class ApiRelationshipAssociation : ApiRelationshipElement
     }
 
     /// <summary>
-    ///     Initializes a key-bound association with explicit <see cref="ApiKeyType"/> instances for both foreign key roles.
+    ///     Creates a key-bound association with explicit <see cref="ApiKeyType"/> instances for both foreign key roles.
     /// </summary>
     /// <param name="clrObjectType">The CLR type of the association <see cref="ApiObjectType"/>.</param>
     /// <param name="apiForeignKeyTypeA">
@@ -158,18 +158,18 @@ public sealed class ApiRelationshipAssociation : ApiRelationshipElement
     }
 
     /// <inheritdoc/>
-    internal override void InitializeCore(ApiInitializationContext context)
+    internal override void CompileCore(ApiSchemaCompilationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        base.InitializeCore(context);
+        base.CompileCore(context);
 
-        this.InitializeApiForeignKeyTypes(context);
+        this.CompileApiForeignKeyTypes(context);
     }
     #endregion
 
     #region Implementation Methods
-    private void InitializeApiForeignKeyTypes(ApiInitializationContext context)
+    private void CompileApiForeignKeyTypes(ApiSchemaCompilationContext context)
     {
         if (!this.HasForeignKeys)
         {
@@ -177,11 +177,11 @@ public sealed class ApiRelationshipAssociation : ApiRelationshipElement
             return;
         }
 
-        var locationA = ApiInitializationLocation.ForRole(nameof(this.ApiForeignKeyTypeA));
-        _apiForeignKeyTypeA!.Initialize(context, locationA);
+        var locationA = ApiSchemaCompilationLocation.ForRole(nameof(this.ApiForeignKeyTypeA));
+        _apiForeignKeyTypeA!.Compile(context, locationA);
 
-        var locationB = ApiInitializationLocation.ForRole(nameof(this.ApiForeignKeyTypeB));
-        _apiForeignKeyTypeB!.Initialize(context, locationB);
+        var locationB = ApiSchemaCompilationLocation.ForRole(nameof(this.ApiForeignKeyTypeB));
+        _apiForeignKeyTypeB!.Compile(context, locationB);
     }
     #endregion
 }

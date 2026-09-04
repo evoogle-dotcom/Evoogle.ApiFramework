@@ -6,23 +6,23 @@
 namespace Evoogle.ApiFramework.Schema;
 
 /// <summary>
-///     Defines the severity levels for issues encountered during API schema initialization.
+///     Defines the severity levels for issues encountered during API schema compilation.
 /// </summary>
-public enum ApiInitializationSeverity
+public enum ApiSchemaCompilationSeverity
 {
     #region Values
     /// <summary>
-    ///     Informational message that does not prevent initialization.
+    ///     Informational message that does not prevent compilation.
     /// </summary>
     Info,
 
     /// <summary>
-    ///     Warning about a potential issue that does not prevent initialization.
+    ///     Warning about a potential issue that does not prevent compilation.
     /// </summary>
     Warning,
 
     /// <summary>
-    ///     Error that prevents successful initialization.
+    ///     Error that prevents successful compilation.
     /// </summary>
     Error
     #endregion

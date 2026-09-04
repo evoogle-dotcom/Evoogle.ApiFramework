@@ -21,14 +21,14 @@ public sealed class ApiManyToManyRelationshipAttribute : ApiNamedElementAttribut
     #endregion
 
     #region Properties
-    /// <summary>Gets or initializes the schema-unique API name of the relationship.</summary>
+    /// <summary>Gets the the schema-unique API name of the relationship.</summary>
     public new required string ApiName
     {
         get => base.ApiName!;
         init => base.ApiName = RequireApiName(value);
     }
 
-    /// <summary>Gets or initializes the CLR type of the association (join) entity.</summary>
+    /// <summary>Gets the the CLR type of the association (join) entity.</summary>
     public required Type AssociationType
     {
         get => this._associationType;
@@ -40,7 +40,7 @@ public sealed class ApiManyToManyRelationshipAttribute : ApiNamedElementAttribut
     }
 
     /// <summary>
-    ///     Gets or initializes the CLR type of the other principal end (not the type carrying this attribute).
+    ///     Gets the the CLR type of the other principal end (not the type carrying this attribute).
     /// </summary>
     public required Type OtherPrincipalType
     {
@@ -53,12 +53,12 @@ public sealed class ApiManyToManyRelationshipAttribute : ApiNamedElementAttribut
     }
 
     /// <summary>
-    ///     Gets or initializes the CLR property name on <see cref="AssociationType"/> that holds the foreign key back to the type carrying this attribute.
+    ///     Gets the the CLR property name on <see cref="AssociationType"/> that holds the foreign key back to the type carrying this attribute.
     /// </summary>
     public string? ForeignKeyA { get; init; }
 
     /// <summary>
-    ///     Gets or initializes the CLR property name on <see cref="AssociationType"/> that holds the foreign key back to <see cref="OtherPrincipalType"/>.
+    ///     Gets the the CLR property name on <see cref="AssociationType"/> that holds the foreign key back to <see cref="OtherPrincipalType"/>.
     /// </summary>
     public string? ForeignKeyB { get; init; }
     #endregion

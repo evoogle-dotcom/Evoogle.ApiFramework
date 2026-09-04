@@ -63,25 +63,25 @@ public sealed class ApiEnumValue
         => ApiSchemaPathFormatting.BuildPath(apiBasePath: apiPreviousPath, apiPathSegment: this.ApiElementName, apiPathSegmentName: this.ApiName);
 
     /// <inheritdoc />
-    internal override void InitializeCore(ApiInitializationContext context)
+    internal override void CompileCore(ApiSchemaCompilationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        base.InitializeCore(context);
+        base.CompileCore(context);
 
-        this.InitializeApiName(context);
-        this.InitializeClrName(context);
+        this.ValidateApiName(context);
+        this.ValidateClrName(context);
     }
     #endregion
 
     #region Implementation Methods
-    private void InitializeApiName(ApiInitializationContext context)
+    private void ValidateApiName(ApiSchemaCompilationContext context)
     {
         var isApiNameInvalid = ApiSchemaNameValidation.IsNameInvalid(this.ApiName);
         if (isApiNameInvalid)
         {
-            var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.ApiEnumValueInvalidApiName;
+            var severity = ApiSchemaCompilationSeverity.Error;
+            var code = ApiSchemaCompilationCode.ApiEnumValueInvalidApiName;
             var description = $"{nameof(this.ApiName)} must not be null, empty, or whitespace";
             var remediation = $"Specify a valid {nameof(this.ApiName)} value";
 
@@ -89,13 +89,13 @@ public sealed class ApiEnumValue
         }
     }
 
-    private void InitializeClrName(ApiInitializationContext context)
+    private void ValidateClrName(ApiSchemaCompilationContext context)
     {
         var isClrNameInvalid = ApiSchemaNameValidation.IsNameInvalid(this.ClrName);
         if (isClrNameInvalid)
         {
-            var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.ApiEnumValueInvalidClrName;
+            var severity = ApiSchemaCompilationSeverity.Error;
+            var code = ApiSchemaCompilationCode.ApiEnumValueInvalidClrName;
             var description = $"{nameof(this.ClrName)} must not be null, empty, or whitespace";
             var remediation = $"Specify a valid {nameof(this.ClrName)} value";
 

@@ -11,7 +11,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration;
 ///     Fluent builder used to configure the principal end of an <see cref="ApiRelationship"/>.
 /// </summary>
 /// <remarks>
-///     The principal end provides the principal key for the relationship. For key-bound relationships, initialization
+///     The principal end provides the principal key for the relationship. For key-bound relationships, compilation
 ///     infers the best compatible principal key type from the corresponding foreign key when no name is supplied. Call
 ///     <see cref="WithPrincipalKey"/> to specify the named principal key type explicitly. Delete behavior is configured on the
 ///     relationship builder, not on individual ends.

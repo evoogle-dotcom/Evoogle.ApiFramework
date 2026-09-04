@@ -41,7 +41,7 @@ public static class ApiSchemaExcludeMembers
         new ExcludeMember(typeof(ApiObjectType), nameof(ApiObjectType.ApiRelationshipPrincipalEnds)),
         new ExcludeMember(typeof(ApiObjectType), nameof(ApiObjectType.ApiRelationshipDependentEnds)),
 
-        // ApiRelationshipElement — object type resolved during initialization
+        // ApiRelationshipElement — object type resolved during compilation
         new ExcludeMember(typeof(ApiRelationshipElement), nameof(ApiRelationshipElement.ApiObjectType)),
 
         // ApiRelationshipEnd — cycle: end → relationship → end → ...
@@ -88,14 +88,14 @@ public static class ApiSchemaExcludeMembers
     ];
 
     /// <summary>
-    ///     Exclusions for comparing pre-initialization <see cref="ApiRelationship"/> objects built directly via builders
-    ///     without running the full schema initialization pass.
+    ///     Exclusions for comparing pre-compilation <see cref="ApiRelationship"/> objects built directly via builders
+    ///     without running the full schema compilation pass.
     /// </summary>
     public static readonly List<ExcludeMember> Relationship =
     [
         .. _schemaElementRuntimeMembers,
 
-        // ApiRelationshipElement — object type resolved during initialization
+        // ApiRelationshipElement — object type resolved during compilation
         new ExcludeMember(typeof(ApiRelationshipElement), nameof(ApiRelationshipElement.ApiObjectType)),
 
         // ApiRelationshipDependentEnd — ApiForeignKeyType throws when HasForeignKey=false
@@ -116,7 +116,7 @@ public static class ApiSchemaExcludeMembers
         new ExcludeMember(typeof(ApiRelationshipManyToMany), nameof(ApiRelationshipManyToMany.ApiKeyBindingA)),
         new ExcludeMember(typeof(ApiRelationshipManyToMany), nameof(ApiRelationshipManyToMany.ApiKeyBindingB)),
 
-        // Key path nodes — property and object type references resolved during initialization
+        // Key path nodes — property and object type references resolved during compilation
         new ExcludeMember(typeof(ApiKeyPath), nameof(ApiKeyPath.ApiRootObjectType)),
         new ExcludeMember(typeof(ApiKeyPathSegment), nameof(ApiKeyPathSegment.ApiProperty)),
 

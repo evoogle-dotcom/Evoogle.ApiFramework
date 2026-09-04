@@ -20,7 +20,7 @@ namespace Evoogle.ApiFramework.Schema;
 /// <param name="clrObjectType">The CLR type of the principal <see cref="ApiObjectType"/>.</param>
 /// <param name="apiPrincipalKeyTypeName">
 ///     The optional name of the <see cref="ApiKeyType"/> on the principal type that should be used by the owning
-///     relationship's key binding. When <see langword="null"/>, key-bound relationship initialization uses the foreign
+///     relationship's key binding. When <see langword="null"/>, key-bound relationship compilation uses the foreign
 ///     key binding to infer the best compatible key type on the principal object type.
 /// </param>
 [JsonConverter(typeof(ApiRelationshipPrincipalEndJsonConverter))]
@@ -59,11 +59,11 @@ public sealed class ApiRelationshipPrincipalEnd(Type clrObjectType, string? apiP
 
     #region ApiSchemaElement Methods
     /// <inheritdoc/>
-    internal override void InitializeCore(ApiInitializationContext context)
+    internal override void CompileCore(ApiSchemaCompilationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        base.InitializeCore(context);
+        base.CompileCore(context);
     }
     #endregion
 }

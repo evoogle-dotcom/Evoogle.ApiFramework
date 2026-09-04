@@ -9,7 +9,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Internal;
 
 internal sealed record ApiAssemblyTypeScanResult(
     IReadOnlyList<Type> Types,
-    IReadOnlyList<ApiInitializationIssue> Issues);
+    IReadOnlyList<ApiSchemaCompilationIssue> Issues);
 
 internal static class ApiAssemblyTypeScanner
 {
@@ -28,7 +28,7 @@ internal static class ApiAssemblyTypeScanner
         ArgumentNullException.ThrowIfNull(assembly);
         ArgumentNullException.ThrowIfNull(getExportedTypes);
 
-        var issues = new List<ApiInitializationIssue>();
+        var issues = new List<ApiSchemaCompilationIssue>();
         Type[] exportedTypes;
 
         try
@@ -90,7 +90,7 @@ internal static class ApiAssemblyTypeScanner
         return new ApiAssemblyTypeScanResult(types, issues);
     }
 
-    private static ApiInitializationIssue CreateAssemblyIssue(
+    private static ApiSchemaCompilationIssue CreateAssemblyIssue(
         Assembly assembly,
         Exception exception,
         string description,
@@ -99,16 +99,16 @@ internal static class ApiAssemblyTypeScanner
         return CreateAssemblyIssue(GetAssemblyName(assembly), exception, description, remediation);
     }
 
-    private static ApiInitializationIssue CreateAssemblyIssue(
+    private static ApiSchemaCompilationIssue CreateAssemblyIssue(
         string apiPath,
         Exception exception,
         string description,
         string remediation)
     {
-        return new ApiInitializationIssue(
+        return new ApiSchemaCompilationIssue(
             apiPath,
-            ApiInitializationSeverity.Error,
-            ApiInitializationCode.ApiAssemblyDiscoveryFailed,
+            ApiSchemaCompilationSeverity.Error,
+            ApiSchemaCompilationCode.ApiAssemblyDiscoveryFailed,
             description,
             remediation,
             exception: exception);

@@ -28,10 +28,10 @@ public abstract class ApiRelationshipElement : ApiSchemaElement
     ///     Gets the resolved <see cref="ApiObjectType"/> that corresponds to <see cref="ClrObjectType"/>.
     ///     Available after schema compilation. Throws if accessed before compilation completes.
     /// </summary>
-    public ApiObjectType ApiObjectType => this.ThrowIfNotInitialized(_apiResolvedObjectType);
+    public ApiObjectType ApiObjectType => this.RequireValue(_apiResolvedObjectType);
 
     /// <summary>
-    ///     Gets the resolved <see cref="ApiObjectType"/>, or <see langword="null"/> if initialization
+    ///     Gets the resolved <see cref="ApiObjectType"/>, or <see langword="null"/> if compilation
     ///     has not yet run or failed to resolve the object type.
     /// </summary>
     internal ApiObjectType? ApiResolvedObjectType => _apiResolvedObjectType;
@@ -50,34 +50,34 @@ public abstract class ApiRelationshipElement : ApiSchemaElement
         => ApiSchemaPathFormatting.BuildPath(apiBasePath: apiPreviousPath, apiPathSegment: this.ApiElementName, apiPathSegmentName: null);
 
     /// <inheritdoc/>
-    internal override void InitializeCore(ApiInitializationContext context)
+    internal override void CompileCore(ApiSchemaCompilationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        base.InitializeCore(context);
+        base.CompileCore(context);
 
-        this.InitializeClrObjectType(context);
-        this.InitializeApiObjectType(context);
+        this.ValidateClrObjectType(context);
+        this.ResolveApiObjectType(context);
     }
     #endregion
 
     #region Implementation Methods
-    private void InitializeClrObjectType(ApiInitializationContext context)
+    private void ValidateClrObjectType(ApiSchemaCompilationContext context)
     {
         if (this.ClrObjectType is not null)
         {
             return;
         }
 
-        var severity = ApiInitializationSeverity.Error;
-        var code = ApiInitializationCode.ApiRelationshipElementNullClrObjectType;
+        var severity = ApiSchemaCompilationSeverity.Error;
+        var code = ApiSchemaCompilationCode.ApiRelationshipElementNullClrObjectType;
         var description = $"{nameof(this.ClrObjectType)} must not be null";
         var remediation = $"Specify a valid {nameof(this.ClrObjectType)} value";
 
         context.AddIssue(severity, code, description, remediation);
     }
 
-    private void InitializeApiObjectType(ApiInitializationContext context)
+    private void ResolveApiObjectType(ApiSchemaCompilationContext context)
     {
         if (this.ClrObjectType is null)
         {
@@ -90,8 +90,8 @@ public abstract class ApiRelationshipElement : ApiSchemaElement
             return;
         }
 
-        var severity = ApiInitializationSeverity.Error;
-        var code = ApiInitializationCode.ApiRelationshipElementUnresolvedObjectType;
+        var severity = ApiSchemaCompilationSeverity.Error;
+        var code = ApiSchemaCompilationCode.ApiRelationshipElementUnresolvedObjectType;
         var description = $"No {nameof(Schema.ApiObjectType)} is registered for CLR type '{this.ClrObjectType.FullName}'";
         var availableTypes = string.Join(", ", context.ApiSchema.ApiObjectTypes.Select(t => $"'{t.ApiName}' ({t.ClrType.Name})"));
         var remediation = !string.IsNullOrEmpty(availableTypes)

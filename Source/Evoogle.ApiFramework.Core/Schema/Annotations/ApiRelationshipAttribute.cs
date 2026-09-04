@@ -16,7 +16,7 @@ namespace Evoogle.ApiFramework.Schema.Annotations;
 public sealed class ApiRelationshipAttribute : ApiNamedElementAttribute
 {
     #region Properties
-    /// <summary>Gets or initializes the schema-unique API name of the relationship.</summary>
+    /// <summary>Gets the the schema-unique API name of the relationship.</summary>
     public new required string ApiName
     {
         get => base.ApiName!;
@@ -24,17 +24,17 @@ public sealed class ApiRelationshipAttribute : ApiNamedElementAttribute
     }
 
     /// <summary>
-    ///     Gets or initializes the relationship kind.
+    ///     Gets the the relationship kind.
     /// </summary>
     public required ApiRelationshipKind Kind { get; init; }
 
     /// <summary>
-    ///     Gets or initializes the name of the foreign-key CLR property on the dependent end.
+    ///     Gets the the name of the foreign-key CLR property on the dependent end.
     ///     When <c>null</c> the framework infers the foreign key via convention.
     /// </summary>
     public string? ForeignKey { get; init; }
 
-    /// <summary>Gets or initializes the delete behavior for the relationship.</summary>
+    /// <summary>Gets the the delete behavior for the relationship.</summary>
     public ApiRelationshipDeleteBehavior DeleteBehavior { get; init; } = ApiRelationshipDeleteBehavior.None;
     #endregion
 }

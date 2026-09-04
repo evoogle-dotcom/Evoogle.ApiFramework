@@ -13,10 +13,12 @@ namespace Evoogle.ApiFramework.Schema.Internal;
 internal static class ApiSchemaCompiler
 {
     #region Methods
-    public static ApiSchemaBuildResult Compile
+    public static ApiSchemaCompilationResult Compile
     (
         ApiSchema apiSchema,
-        IEnumerable<ApiInitializationIssue>? preliminaryIssues = null
+        IEnumerable<ApiSchemaCompilationIssue>? preliminaryIssues = null,
+        Action? onFreezingStarted = null,
+        Action? onFreezingCompleted = null
     )
     {
         ArgumentNullException.ThrowIfNull(apiSchema);
@@ -26,12 +28,12 @@ internal static class ApiSchemaCompiler
         try
         {
             var apiSchemaContext = new ApiSchemaContext(apiSchema);
-            var session = new ApiInitializationSession(apiSchema, apiSchemaContext);
+            var session = new ApiSchemaCompilationSession(apiSchema, apiSchemaContext);
 
             var isTopologyValid = ApiSchemaTreeBuilder.TryBuild(apiSchema, session);
             if (isTopologyValid)
             {
-                apiSchema.Initialize(session);
+                apiSchema.Compile(session);
             }
 
             if (preliminaryIssues is not null)
@@ -44,10 +46,10 @@ internal static class ApiSchemaCompiler
 
             if (!isTopologyValid)
             {
-                return new ApiSchemaBuildResult(null, session.Issues);
+                return new ApiSchemaCompilationResult(null, session.Issues);
             }
 
-            var elements = ((ApiSchemaElement)apiSchema)
+            var elements = apiSchema
                 .SelfAndDescendants(TraversalStrategy.DepthFirst)
                 .ToArray();
 
@@ -64,10 +66,12 @@ internal static class ApiSchemaCompiler
                 }
             }
 
-            if (session.Issues.Any(issue => issue.Severity == ApiInitializationSeverity.Error))
+            if (session.Issues.Any(issue => issue.Severity == ApiSchemaCompilationSeverity.Error))
             {
-                return new ApiSchemaBuildResult(null, session.Issues);
+                return new ApiSchemaCompilationResult(null, session.Issues);
             }
+
+            onFreezingStarted?.Invoke();
 
             foreach (var element in elements.Where(element => !ReferenceEquals(element, apiSchema)))
             {
@@ -75,8 +79,9 @@ internal static class ApiSchemaCompiler
             }
 
             apiSchema.Freeze(frozenExtensions[apiSchema]);
+            onFreezingCompleted?.Invoke();
             isSuccessful = true;
-            return new ApiSchemaBuildResult(apiSchema, session.Issues);
+            return new ApiSchemaCompilationResult(apiSchema, session.Issues);
         }
         finally
         {

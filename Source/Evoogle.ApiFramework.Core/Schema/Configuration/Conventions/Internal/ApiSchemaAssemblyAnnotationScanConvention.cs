@@ -25,7 +25,7 @@ internal sealed class ApiSchemaAssemblyAnnotationScanConvention : IApiSchemaConv
 
     #region Constructors
     /// <summary>
-    ///     Initializes a new <see cref="ApiSchemaAssemblyAnnotationScanConvention"/> that scans the specified
+    ///     Creates a new <see cref="ApiSchemaAssemblyAnnotationScanConvention"/> that scans the specified
     ///     assembly.
     /// </summary>
     /// <param name="assembly">The assembly to scan for annotated types.</param>

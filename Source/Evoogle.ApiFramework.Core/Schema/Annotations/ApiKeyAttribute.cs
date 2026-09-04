@@ -23,7 +23,7 @@ public sealed class ApiKeyAttribute : ApiNamedElementAttribute
 {
     #region Constructors
     /// <summary>
-    ///     Initializes a new <see cref="ApiKeyAttribute"/> with the default <c>PrimaryKey</c> API name.
+    ///     Creates a new <see cref="ApiKeyAttribute"/> with the default <c>PrimaryKey</c> API name.
     /// </summary>
     public ApiKeyAttribute()
     {
@@ -33,7 +33,7 @@ public sealed class ApiKeyAttribute : ApiNamedElementAttribute
 
     #region Properties
     /// <summary>
-    ///     Gets or initializes the API name of the key type this path contributes to.
+    ///     Gets the the API name of the key type this path contributes to.
     /// </summary>
     public new string ApiName
     {
@@ -42,18 +42,18 @@ public sealed class ApiKeyAttribute : ApiNamedElementAttribute
     }
 
     /// <summary>
-    ///     Gets or initializes the zero-based order of this path within a composite key.
+    ///     Gets the the zero-based order of this path within a composite key.
     /// </summary>
     public int Order { get; init; }
 
     /// <summary>
-    ///     Gets or initializes the CLR type from which <see cref="ClrPath"/> begins.
+    ///     Gets the the CLR type from which <see cref="ClrPath"/> begins.
     ///     When <see langword="null"/>, the enclosing object CLR type is used.
     /// </summary>
     public Type? ClrRootType { get; init; }
 
     /// <summary>
-    ///     Gets or initializes the dot-delimited CLR member path relative to <see cref="ClrRootType"/>.
+    ///     Gets the the dot-delimited CLR member path relative to <see cref="ClrRootType"/>.
     ///     A type-level annotation must provide this value.
     /// </summary>
     public string? ClrPath { get; init; }

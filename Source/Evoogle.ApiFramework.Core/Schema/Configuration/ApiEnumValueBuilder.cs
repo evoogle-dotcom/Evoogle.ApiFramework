@@ -22,7 +22,7 @@ public sealed class ApiEnumValueBuilder
 
     #region Constructors
     /// <summary>
-    ///     Initializes a new enum-value builder with an explicitly supplied API name.
+    ///     Creates a new enum-value builder with an explicitly supplied API name.
     /// </summary>
     /// <param name="apiName">The explicit API name of the enumeration value.</param>
     /// <param name="clrName">The CLR name of the enumeration value.</param>

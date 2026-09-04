@@ -30,7 +30,7 @@ public sealed class ApiAssemblyDiscoveryTests(ITestOutputHelper output) : XUnitT
         #endregion
 
         #region Calculated Properties
-        private ApiSchemaInitializationException? ExceptionActual { get; set; }
+        private ApiSchemaCompilationException? ExceptionActual { get; set; }
         #endregion
 
         #region XUnitTest Methods
@@ -69,7 +69,7 @@ public sealed class ApiAssemblyDiscoveryTests(ITestOutputHelper output) : XUnitT
 
                 _ = builder.Build();
             }
-            catch (ApiSchemaInitializationException exception)
+            catch (ApiSchemaCompilationException exception)
             {
                 this.ExceptionActual = exception;
             }
@@ -80,8 +80,8 @@ public sealed class ApiAssemblyDiscoveryTests(ITestOutputHelper output) : XUnitT
             this.ExceptionActual.Should().NotBeNull();
             this.ExceptionActual!.Errors.Should().Contain
             (
-                issue => issue.Code == ApiInitializationCode.ApiAssemblyDiscoveryFailed &&
-                    issue.Severity == ApiInitializationSeverity.Error &&
+                issue => issue.Code == ApiSchemaCompilationCode.ApiAssemblyDiscoveryFailed &&
+                    issue.Severity == ApiSchemaCompilationSeverity.Error &&
                     issue.ApiPath == typeof(AssemblyFilterFailureCandidate).FullName &&
                     issue.Exception is InvalidOperationException
             );
@@ -132,8 +132,8 @@ public sealed class ApiAssemblyDiscoveryTests(ITestOutputHelper output) : XUnitT
 
             this.ScanActual.Issues.Should().ContainSingle();
             var issue = this.ScanActual.Issues.Single();
-            issue.Code.Should().Be(ApiInitializationCode.ApiAssemblyDiscoveryFailed);
-            issue.Severity.Should().Be(ApiInitializationSeverity.Error);
+            issue.Code.Should().Be(ApiSchemaCompilationCode.ApiAssemblyDiscoveryFailed);
+            issue.Severity.Should().Be(ApiSchemaCompilationSeverity.Error);
             issue.Exception.Should().BeSameAs(this.ExceptionExpected);
         }
         #endregion
@@ -145,17 +145,17 @@ public sealed class ApiAssemblyDiscoveryTests(ITestOutputHelper output) : XUnitT
     [
         new PipelineFilterFailureTest
         {
-            Name = "Type inference filter failures become initialization issues",
+            Name = "Type inference filter failures become compilation issues",
             DiscoveryKind = PipelineDiscoveryKind.TypeInference
         },
         new PipelineFilterFailureTest
         {
-            Name = "Annotation discovery filter failures become initialization issues",
+            Name = "Annotation discovery filter failures become compilation issues",
             DiscoveryKind = PipelineDiscoveryKind.Annotation
         },
         new PipelineFilterFailureTest
         {
-            Name = "Configuration discovery filter failures become initialization issues",
+            Name = "Configuration discovery filter failures become compilation issues",
             DiscoveryKind = PipelineDiscoveryKind.Configuration
         }
     ];

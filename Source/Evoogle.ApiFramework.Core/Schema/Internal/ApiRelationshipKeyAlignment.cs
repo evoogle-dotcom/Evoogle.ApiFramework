@@ -14,11 +14,11 @@ internal static class ApiRelationshipKeyAlignment
     #region ApiRelationshipKeyAlignment Methods
     public static ApiRelationshipKeyBinding? ResolvePrincipalForeignKeyBinding
     (
-        ApiInitializationContext context,
+        ApiSchemaCompilationContext context,
         string relationshipPath,
         ApiRelationshipPrincipalEnd principalEnd,
         ApiKeyType foreignKeyType,
-        ApiInitializationCode countMismatchCode,
+        ApiSchemaCompilationCode countMismatchCode,
         string foreignKeyPath,
         string principalCountLabel,
         string principalCompatibilityLabel,
@@ -169,7 +169,7 @@ internal static class ApiRelationshipKeyAlignment
     #region Implementation Methods
     private static void AddUnresolvedExplicitPrincipalKeyIssue
     (
-        ApiInitializationContext context,
+        ApiSchemaCompilationContext context,
         ApiRelationshipPrincipalEnd principalEnd,
         ApiObjectType principalObjectType
     )
@@ -180,8 +180,8 @@ internal static class ApiRelationshipKeyAlignment
             : $"Define a key type on '{principalObjectType.ApiName}' or remove {nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyTypeName)}";
 
         var path = principalEnd.ApiPath;
-        var severity = ApiInitializationSeverity.Error;
-        var code = ApiInitializationCode.ApiRelationshipEndUnresolvedKeyType;
+        var severity = ApiSchemaCompilationSeverity.Error;
+        var code = ApiSchemaCompilationCode.ApiRelationshipEndUnresolvedKeyType;
         var description = $"Referenced principal key type '{principalEnd.ApiPrincipalKeyTypeName}' could not be found on object type '{principalObjectType.ApiName}'";
 
         context.AddIssue(path, severity, code, description, remediation);
@@ -189,7 +189,7 @@ internal static class ApiRelationshipKeyAlignment
 
     private static void AddAmbiguousPrincipalKeyIssue
     (
-        ApiInitializationContext context,
+        ApiSchemaCompilationContext context,
         string relationshipPath,
         ApiObjectType principalObjectType,
         List<KeyValuePair<string, ApiNamedKeyType>> matchingKeys,
@@ -199,8 +199,8 @@ internal static class ApiRelationshipKeyAlignment
     {
         var keyTypeNames = string.Join(", ", matchingKeys.Select(static kvp => $"'{kvp.Key}'"));
         var qualifier = string.IsNullOrWhiteSpace(principalEndQualifier) ? null : $" {principalEndQualifier}";
-        var severity = ApiInitializationSeverity.Error;
-        var code = ApiInitializationCode.ApiRelationshipAmbiguousPrincipalKey;
+        var severity = ApiSchemaCompilationSeverity.Error;
+        var code = ApiSchemaCompilationCode.ApiRelationshipAmbiguousPrincipalKey;
         var description = $"Cannot automatically determine the referenced principal key type{qualifier}: {matchingKeys.Count} key types on '{principalObjectType.ApiName}' are compatible with the foreign key type: {keyTypeNames}";
         var remediation = $"Set {explicitKeyTarget} to specify the principal key type explicitly; available key types: {keyTypeNames}";
 
@@ -209,17 +209,17 @@ internal static class ApiRelationshipKeyAlignment
 
     private static void AddCountMismatchIssue
     (
-        ApiInitializationContext context,
+        ApiSchemaCompilationContext context,
         string relationshipPath,
         string foreignKeyPath,
         int keyPathCount,
         int keyTypePathCount,
-        ApiInitializationCode countMismatchCode,
+        ApiSchemaCompilationCode countMismatchCode,
         string principalCountLabel,
         string countMismatchRemediationTarget
     )
     {
-        var severity = ApiInitializationSeverity.Error;
+        var severity = ApiSchemaCompilationSeverity.Error;
         var description = $"{foreignKeyPath}.{nameof(ApiKeyType.ApiKeyPaths)} has {keyPathCount} key path(s) but {principalCountLabel} has {keyTypePathCount} key path(s)";
         var remediation = $"Ensure {foreignKeyPath}.{nameof(ApiKeyType.ApiKeyPaths)} contains exactly {keyTypePathCount} key path(s) to match {countMismatchRemediationTarget}";
 
@@ -228,19 +228,19 @@ internal static class ApiRelationshipKeyAlignment
 
     private static void AddInferredCountMismatchIssue
     (
-        ApiInitializationContext context,
+        ApiSchemaCompilationContext context,
         string relationshipPath,
         string foreignKeyPath,
         ApiObjectType principalObjectType,
         int keyPathCount,
-        ApiInitializationCode countMismatchCode,
+        ApiSchemaCompilationCode countMismatchCode,
         string? principalEndQualifier,
         string explicitKeyTarget
     )
     {
         var keyTypeNames = string.Join(", ", principalObjectType.ApiKeyTypes.Select(static keyType => $"'{keyType.ApiName}'"));
         var qualifier = string.IsNullOrWhiteSpace(principalEndQualifier) ? null : $" {principalEndQualifier}";
-        var severity = ApiInitializationSeverity.Error;
+        var severity = ApiSchemaCompilationSeverity.Error;
         var description = $"Cannot automatically determine the referenced principal key type{qualifier}: {foreignKeyPath}.{nameof(ApiKeyType.ApiKeyPaths)} has {keyPathCount} key path(s), but no key type on '{principalObjectType.ApiName}' has {keyPathCount} key path(s)";
         var remediation = principalObjectType.ApiKeyTypes.Length > 0
             ? $"Set {explicitKeyTarget} explicitly or align the foreign key shape with one of these key types: {keyTypeNames}"
@@ -251,7 +251,7 @@ internal static class ApiRelationshipKeyAlignment
 
     private static void AddExplicitIncompatiblePrincipalKeyIssue
     (
-        ApiInitializationContext context,
+        ApiSchemaCompilationContext context,
         string relationshipPath,
         string foreignKeyPath,
         ApiKeyType foreignKeyType,
@@ -262,8 +262,8 @@ internal static class ApiRelationshipKeyAlignment
     {
         var principalKeyTypes = ApiRelationshipKeyCompatibility.DescribeKeyLeafTypes(principalKeyType);
         var foreignKeyTypes = ApiRelationshipKeyCompatibility.DescribeKeyLeafTypes(foreignKeyType);
-        var severity = ApiInitializationSeverity.Error;
-        var code = ApiInitializationCode.ApiRelationshipIncompatiblePrincipalForeignKey;
+        var severity = ApiSchemaCompilationSeverity.Error;
+        var code = ApiSchemaCompilationCode.ApiRelationshipIncompatiblePrincipalForeignKey;
         var description = $"{foreignKeyPath} leaf type(s) [{foreignKeyTypes}] are not compatible with {principalCompatibilityLabel} leaf type(s) [{principalKeyTypes}]";
 
         context.AddIssue(relationshipPath, severity, code, description, compatibilityRemediation);
@@ -271,7 +271,7 @@ internal static class ApiRelationshipKeyAlignment
 
     private static void AddInferredIncompatiblePrincipalKeyIssue
     (
-        ApiInitializationContext context,
+        ApiSchemaCompilationContext context,
         string relationshipPath,
         ApiObjectType principalObjectType,
         ApiKeyType foreignKeyType,
@@ -291,8 +291,8 @@ internal static class ApiRelationshipKeyAlignment
         var keyTypeNames = string.Join(", ", matchingShapeKeys.Select(static kvp => $"'{kvp.Key}'"));
         var foreignKeyTypes = ApiRelationshipKeyCompatibility.DescribeKeyLeafTypes(foreignKeyType);
         var qualifier = string.IsNullOrWhiteSpace(principalEndQualifier) ? null : $" {principalEndQualifier}";
-        var severity = ApiInitializationSeverity.Error;
-        var code = ApiInitializationCode.ApiRelationshipIncompatiblePrincipalForeignKey;
+        var severity = ApiSchemaCompilationSeverity.Error;
+        var code = ApiSchemaCompilationCode.ApiRelationshipIncompatiblePrincipalForeignKey;
         var description = $"Cannot automatically determine the referenced principal key type{qualifier}: no key type on '{principalObjectType.ApiName}' with {keyPathCount} key path(s) is compatible with foreign key leaf type(s) [{foreignKeyTypes}]";
         var remediation = $"Set {explicitKeyTarget} explicitly or align the {inferredForeignKeyLabel} leaf type(s) with one of these key types: {keyTypeNames}";
 

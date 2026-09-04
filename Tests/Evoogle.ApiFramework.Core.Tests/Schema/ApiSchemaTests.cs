@@ -20,21 +20,21 @@ namespace Evoogle.ApiFramework.Schema;
 public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(output)
 {
     #region Test Types
-    private class InitializeThrowsTest : JsonConverterTestBase<ApiSchema>
+    private class CompileThrowsTest : JsonConverterTestBase<ApiSchema>
     {
         #region User Supplied Properties
         public required string SourceJson { get; init; }
-        public required List<ApiInitializationIssue> ExpectedIssues { get; init; }
+        public required List<ApiSchemaCompilationIssue> ExpectedIssues { get; init; }
         #endregion
 
         #region Calculated Properties
-        private List<ApiInitializationIssue>? ActualIssues { get; set; }
+        private List<ApiSchemaCompilationIssue>? ActualIssues { get; set; }
         #endregion
 
         #region Constructors
-        public InitializeThrowsTest()
+        public CompileThrowsTest()
         {
-            this.ExpectedExceptionType = typeof(ApiSchemaInitializationException);
+            this.ExpectedExceptionType = typeof(ApiSchemaCompilationException);
         }
         #endregion
 
@@ -61,7 +61,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
             {
                 JsonSerializer.Deserialize<ApiSchema>(this.SourceJson, this.JsonSerializerOptions);
             }
-            catch (ApiSchemaInitializationException ex)
+            catch (ApiSchemaCompilationException ex)
             {
                 this.CaptureException(ex);
 
@@ -90,11 +90,11 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
         }
     }
 
-    private class InitializeWarnsTest : XUnitTest
+    private class CompileWarnsTest : XUnitTest
     {
         #region User Supplied Properties
         public required string SourceJson { get; init; }
-        public required List<ApiInitializationIssue> ExpectedWarnings { get; init; }
+        public required List<ApiSchemaCompilationIssue> ExpectedWarnings { get; init; }
         #endregion
 
         #region Calculated Properties
@@ -255,10 +255,10 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
     #endregion
 
     #region Implementation Methods
-    private static ApiInitializationIssue[] FullyQualifyInitializationIssues
+    private static ApiSchemaCompilationIssue[] FullyQualifyInitializationIssues
     (
         string sourceJson,
-        IEnumerable<ApiInitializationIssue> issues
+        IEnumerable<ApiSchemaCompilationIssue> issues
     )
     {
         using var document = JsonDocument.Parse(sourceJson);
@@ -275,7 +275,7 @@ public partial class ApiSchemaTests(ITestOutputHelper output) : XUnitTests(outpu
                 StringComparison.Ordinal
             )
                 ? issue
-                : new ApiInitializationIssue
+                : new ApiSchemaCompilationIssue
                 (
                     $"{apiSchemaPath}.{issue.ApiPath}",
                     issue.Severity,

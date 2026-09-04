@@ -17,7 +17,7 @@ public sealed class ApiAnnotationReaderSetBuilder
     #endregion
 
     #region Constructors
-    /// <summary>Initializes an empty annotation reader set builder.</summary>
+    /// <summary>Creates an empty annotation reader set builder.</summary>
     public ApiAnnotationReaderSetBuilder()
     {
     }

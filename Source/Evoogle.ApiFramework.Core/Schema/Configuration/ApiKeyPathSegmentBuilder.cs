@@ -21,7 +21,7 @@ public class ApiKeyPathSegmentBuilder : ExtensionBuilder<ApiKeyPathSegmentBuilde
 
     #region Constructors
     /// <summary>
-    ///     Initializes an <see cref="ApiKeyPathSegmentBuilder"/> with the specified CLR property name.
+    ///     Creates an <see cref="ApiKeyPathSegmentBuilder"/> with the specified CLR property name.
     /// </summary>
     /// <param name="clrPropertyName">The CLR property name for this navigation step.</param>
     /// <exception cref="ArgumentException">Thrown when <paramref name="clrPropertyName"/> is <c>null</c>, empty, or whitespace.</exception>

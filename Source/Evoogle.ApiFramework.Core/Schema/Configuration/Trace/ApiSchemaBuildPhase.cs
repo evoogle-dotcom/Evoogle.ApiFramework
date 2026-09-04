@@ -25,6 +25,9 @@ public enum ApiSchemaBuildPhase
     /// <summary>Reports conversion of builders into schema model objects.</summary>
     Materialization = 4,
 
-    /// <summary>Reports final schema initialization and validation.</summary>
-    Initialization = 5,
+    /// <summary>Reports final schema compilation and validation.</summary>
+    Compilation = 5,
+
+    /// <summary>Reports conversion of a validated schema graph into its frozen runtime form.</summary>
+    Freezing = 6,
 }

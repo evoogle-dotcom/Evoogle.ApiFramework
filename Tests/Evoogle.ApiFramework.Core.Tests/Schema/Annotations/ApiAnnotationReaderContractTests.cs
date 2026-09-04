@@ -196,7 +196,7 @@ public sealed class ApiAnnotationReaderContractTests(ITestOutputHelper output)
         #region Calculated Properties
         private ApiAnnotationReaderSet? ReaderSet { get; set; }
         private IReadOnlyList<ApiTypeDiscoveryAnnotationResult>? ResultsActual { get; set; }
-        private IReadOnlyList<ApiInitializationIssue>? IssuesActual { get; set; }
+        private IReadOnlyList<ApiSchemaCompilationIssue>? IssuesActual { get; set; }
         #endregion
 
         #region XUnitTest Methods
@@ -234,7 +234,7 @@ public sealed class ApiAnnotationReaderContractTests(ITestOutputHelper output)
             var expectedIssue = this.TestCase != DiscoveryValidationCase.Valid;
             this.IssuesActual!.Any
             (
-                issue => issue.Code == ApiInitializationCode.ApiAnnotationInvalidContribution
+                issue => issue.Code == ApiSchemaCompilationCode.ApiAnnotationInvalidContribution
             )
                 .Should().Be(expectedIssue);
 
@@ -276,8 +276,8 @@ public sealed class ApiAnnotationReaderContractTests(ITestOutputHelper output)
 
         #region Calculated Properties
         private IReadOnlyList<ApiTypeDiscoveryAnnotationResult>? ResultsActual { get; set; }
-        private IReadOnlyList<ApiInitializationIssue>? IssuesActual { get; set; }
-        private ApiSchemaInitializationException? ExceptionActual { get; set; }
+        private IReadOnlyList<ApiSchemaCompilationIssue>? IssuesActual { get; set; }
+        private ApiSchemaCompilationException? ExceptionActual { get; set; }
         #endregion
 
         #region XUnitTest Methods
@@ -321,7 +321,7 @@ public sealed class ApiAnnotationReaderContractTests(ITestOutputHelper output)
             {
                 _ = builder.Build();
             }
-            catch (ApiSchemaInitializationException exception)
+            catch (ApiSchemaCompilationException exception)
             {
                 this.ExceptionActual = exception;
             }
@@ -338,7 +338,7 @@ public sealed class ApiAnnotationReaderContractTests(ITestOutputHelper output)
 
                 var issue = this.IssuesActual!.Single
                 (
-                    issue => issue.Code == ApiInitializationCode.ApiAnnotationTypeMarkerConflict
+                    issue => issue.Code == ApiSchemaCompilationCode.ApiAnnotationTypeMarkerConflict
                 );
                 issue.ReaderType.Should().Be(typeof(ApiAttributeAnnotationReader));
                 issue.Description.Should().Contain("both");
@@ -348,7 +348,7 @@ public sealed class ApiAnnotationReaderContractTests(ITestOutputHelper output)
             this.ExceptionActual.Should().NotBeNull();
             var explicitIssue = this.ExceptionActual!.Errors.Single
             (
-                issue => issue.Code == ApiInitializationCode.ApiAnnotationTypeMarkerConflict
+                issue => issue.Code == ApiSchemaCompilationCode.ApiAnnotationTypeMarkerConflict
             );
             explicitIssue.ReaderType.Should().Be(typeof(ApiAttributeAnnotationReader));
             explicitIssue.Description.Should().Contain("both");
@@ -371,7 +371,7 @@ public sealed class ApiAnnotationReaderContractTests(ITestOutputHelper output)
 
         #region Calculated Properties
         private IReadOnlyList<ApiTypeDiscoveryAnnotationResult>? ResultsActual { get; set; }
-        private IReadOnlyList<ApiInitializationIssue>? IssuesActual { get; set; }
+        private IReadOnlyList<ApiSchemaCompilationIssue>? IssuesActual { get; set; }
         #endregion
 
         #region XUnitTest Methods
@@ -413,7 +413,7 @@ public sealed class ApiAnnotationReaderContractTests(ITestOutputHelper output)
 
             var issue = this.IssuesActual!.Single
             (
-                issue => issue.Code == ApiInitializationCode.ApiAnnotationTypeDiscoveryConflict
+                issue => issue.Code == ApiSchemaCompilationCode.ApiAnnotationTypeDiscoveryConflict
             );
             issue.ReaderType.Should().Be(typeof(DiscoveryTypeReader));
             issue.Description.Should().Contain
@@ -490,15 +490,15 @@ public sealed class ApiAnnotationReaderContractTests(ITestOutputHelper output)
     {
         #region User Supplied Properties
         public required IssueMetadataTestCase TestCase { get; init; }
-        public ApiInitializationSeverity SeverityExpected { get; init; } =
-            ApiInitializationSeverity.Error;
+        public ApiSchemaCompilationSeverity SeverityExpected { get; init; } =
+            ApiSchemaCompilationSeverity.Error;
         #endregion
 
         #region Calculated Properties
-        private ApiSchemaInitializationException? ExceptionActual { get; set; }
-        private ApiSchemaInitializationException? FirstExceptionActual { get; set; }
-        private ApiSchemaInitializationException? SecondExceptionActual { get; set; }
-        private IReadOnlyList<ApiInitializationIssue>? IssuesActual { get; set; }
+        private ApiSchemaCompilationException? ExceptionActual { get; set; }
+        private ApiSchemaCompilationException? FirstExceptionActual { get; set; }
+        private ApiSchemaCompilationException? SecondExceptionActual { get; set; }
+        private IReadOnlyList<ApiSchemaCompilationIssue>? IssuesActual { get; set; }
         private Exception? ReaderExceptionExpected { get; set; }
         #endregion
 
@@ -526,8 +526,8 @@ public sealed class ApiAnnotationReaderContractTests(ITestOutputHelper output)
                                     this.ReaderExceptionExpected!,
                                     this.SeverityExpected,
                                     this.TestCase == IssueMetadataTestCase.InvalidDiagnosticCode
-                                        ? (ApiInitializationCode)999
-                                        : ApiInitializationCode.ApiAnnotationInvalidContribution
+                                        ? (ApiSchemaCompilationCode)999
+                                        : ApiSchemaCompilationCode.ApiAnnotationInvalidContribution
                                 )
                             )
                             .Build();
@@ -549,7 +549,7 @@ public sealed class ApiAnnotationReaderContractTests(ITestOutputHelper output)
                         {
                             _ = builder.Build();
                         }
-                        catch (ApiSchemaInitializationException exception)
+                        catch (ApiSchemaCompilationException exception)
                         {
                             this.ExceptionActual = exception;
                         }
@@ -566,7 +566,7 @@ public sealed class ApiAnnotationReaderContractTests(ITestOutputHelper output)
                         {
                             _ = builder.Build();
                         }
-                        catch (ApiSchemaInitializationException exception)
+                        catch (ApiSchemaCompilationException exception)
                         {
                             this.FirstExceptionActual = exception;
                         }
@@ -575,7 +575,7 @@ public sealed class ApiAnnotationReaderContractTests(ITestOutputHelper output)
                         {
                             _ = builder.Build();
                         }
-                        catch (ApiSchemaInitializationException exception)
+                        catch (ApiSchemaCompilationException exception)
                         {
                             this.SecondExceptionActual = exception;
                             this.ExceptionActual = exception;
@@ -594,7 +594,7 @@ public sealed class ApiAnnotationReaderContractTests(ITestOutputHelper output)
             {
                 this.IssuesActual!.Should().ContainSingle
                 (
-                    issue => issue.Code == ApiInitializationCode.ApiAnnotationInvalidContribution &&
+                    issue => issue.Code == ApiSchemaCompilationCode.ApiAnnotationInvalidContribution &&
                         issue.ReaderType == typeof(DiagnosticReader)
                 );
                 return;
@@ -806,7 +806,7 @@ public sealed class ApiAnnotationReaderContractTests(ITestOutputHelper output)
 
         #region Calculated Properties
         private ApiSchemaBuilder? ApiSchemaBuilder { get; set; }
-        private ApiSchemaInitializationException? ExceptionActual { get; set; }
+        private ApiSchemaCompilationException? ExceptionActual { get; set; }
         #endregion
 
         #region XUnitTest Methods
@@ -854,7 +854,7 @@ public sealed class ApiAnnotationReaderContractTests(ITestOutputHelper output)
             {
                 _ = this.ApiSchemaBuilder!.Build();
             }
-            catch (ApiSchemaInitializationException exception)
+            catch (ApiSchemaCompilationException exception)
             {
                 this.ExceptionActual = exception;
             }
@@ -865,7 +865,7 @@ public sealed class ApiAnnotationReaderContractTests(ITestOutputHelper output)
             this.ExceptionActual.Should().NotBeNull();
             this.ExceptionActual!.Errors
                 .Should().Contain(issue =>
-                    issue.Code == ApiInitializationCode.ApiAnnotationInvalidContribution &&
+                    issue.Code == ApiSchemaCompilationCode.ApiAnnotationInvalidContribution &&
                     issue.ReaderType == typeof(InvalidContributionReader));
         }
         #endregion
@@ -890,7 +890,7 @@ public sealed class ApiAnnotationReaderContractTests(ITestOutputHelper output)
 
         #region Calculated Properties
         private ApiSchemaBuilder? ApiSchemaBuilder { get; set; }
-        private ApiSchemaInitializationException? ExceptionActual { get; set; }
+        private ApiSchemaCompilationException? ExceptionActual { get; set; }
         private Exception? ReaderExceptionExpected { get; set; }
         #endregion
 
@@ -930,7 +930,7 @@ public sealed class ApiAnnotationReaderContractTests(ITestOutputHelper output)
             {
                 _ = this.ApiSchemaBuilder!.Build();
             }
-            catch (ApiSchemaInitializationException exception)
+            catch (ApiSchemaCompilationException exception)
             {
                 this.ExceptionActual = exception;
             }
@@ -941,7 +941,7 @@ public sealed class ApiAnnotationReaderContractTests(ITestOutputHelper output)
             this.ExceptionActual.Should().NotBeNull();
             this.ExceptionActual!.Errors.Should().Contain
             (
-                issue => issue.Code == ApiInitializationCode.ApiAnnotationReaderExecutionFailed &&
+                issue => issue.Code == ApiSchemaCompilationCode.ApiAnnotationReaderExecutionFailed &&
                     issue.ReaderType == typeof(ThrowingCapabilityReader) &&
                     issue.Exception == this.ReaderExceptionExpected
             );
@@ -1061,8 +1061,8 @@ public sealed class ApiAnnotationReaderContractTests(ITestOutputHelper output)
     private sealed class DiagnosticReader
     (
         Exception exception,
-        ApiInitializationSeverity severity,
-        ApiInitializationCode code
+        ApiSchemaCompilationSeverity severity,
+        ApiSchemaCompilationCode code
     ) : IApiTypeDiscoveryAnnotationReader
     {
         public ApiAnnotationReaderResult<ApiTypeDiscoveryAnnotationResult>
@@ -1575,7 +1575,7 @@ public sealed class ApiAnnotationReaderContractTests(ITestOutputHelper output)
         {
             Name = "Reader diagnostics preserve their configured severity",
             TestCase = IssueMetadataTestCase.DiagnosticSeverity,
-            SeverityExpected = ApiInitializationSeverity.Warning
+            SeverityExpected = ApiSchemaCompilationSeverity.Warning
         },
         new IssueMetadataTest
         {
@@ -1631,37 +1631,37 @@ public sealed class ApiAnnotationReaderContractTests(ITestOutputHelper output)
     [
         new ReaderExecutionTest
         {
-            Name = "Type reader exceptions become reader-attributed initialization issues",
+            Name = "Type reader exceptions become reader-attributed compilation issues",
             TestCase = ReaderExecutionCase.Type
         },
         new ReaderExecutionTest
         {
-            Name = "Property reader exceptions become reader-attributed initialization issues",
+            Name = "Property reader exceptions become reader-attributed compilation issues",
             TestCase = ReaderExecutionCase.ObjectProperty
         },
         new ReaderExecutionTest
         {
-            Name = "Enum-value reader exceptions become reader-attributed initialization issues",
+            Name = "Enum-value reader exceptions become reader-attributed compilation issues",
             TestCase = ReaderExecutionCase.EnumValue
         },
         new ReaderExecutionTest
         {
-            Name = "Key reader exceptions become reader-attributed initialization issues",
+            Name = "Key reader exceptions become reader-attributed compilation issues",
             TestCase = ReaderExecutionCase.Key
         },
         new ReaderExecutionTest
         {
-            Name = "One-to-many reader exceptions become reader-attributed initialization issues",
+            Name = "One-to-many reader exceptions become reader-attributed compilation issues",
             TestCase = ReaderExecutionCase.OneToMany
         },
         new ReaderExecutionTest
         {
-            Name = "One-to-one reader exceptions become reader-attributed initialization issues",
+            Name = "One-to-one reader exceptions become reader-attributed compilation issues",
             TestCase = ReaderExecutionCase.OneToOne
         },
         new ReaderExecutionTest
         {
-            Name = "Many-to-many reader exceptions become reader-attributed initialization issues",
+            Name = "Many-to-many reader exceptions become reader-attributed compilation issues",
             TestCase = ReaderExecutionCase.ManyToMany
         }
     ];

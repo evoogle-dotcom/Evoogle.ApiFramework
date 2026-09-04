@@ -349,7 +349,7 @@ public sealed class ApiAttributeAnnotationReader :
     {
         return new
         (
-            ApiInitializationCode.ApiAnnotationTypeMarkerConflict,
+            ApiSchemaCompilationCode.ApiAnnotationTypeMarkerConflict,
             clrType.FullName ?? clrType.Name,
             "A CLR type cannot be marked as both an API object and an API scalar.",
             "Remove either the API object marker or the API scalar marker."

@@ -12,7 +12,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Trace;
 /// </summary>
 public sealed class ApiSchemaBuildTrace
 {
-    /// <summary>Initializes a trace from the supplied events.</summary>
+    /// <summary>Creates a trace from the supplied events.</summary>
     /// <param name="events">The events to retain.</param>
     public ApiSchemaBuildTrace(IEnumerable<ApiSchemaBuildTraceEvent> events)
     {

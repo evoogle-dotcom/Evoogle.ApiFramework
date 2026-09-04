@@ -27,7 +27,7 @@ internal sealed class ApiSchemaAssemblyTypeInferenceConvention : IApiSchemaConve
 
     #region Constructors
     /// <summary>
-    ///     Initializes a new <see cref="ApiSchemaAssemblyTypeInferenceConvention"/> that scans the specified
+    ///     Creates a new <see cref="ApiSchemaAssemblyTypeInferenceConvention"/> that scans the specified
     ///     assembly and infers API type kinds from CLR type reflection.
     /// </summary>
     /// <param name="assembly">The assembly to scan for public types.</param>

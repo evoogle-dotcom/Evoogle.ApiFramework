@@ -14,11 +14,11 @@ namespace Evoogle.ApiFramework.Schema.Internal;
 ///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used directly from your code.
 ///     This API may change or be removed in future releases.
 /// </summary>
-internal static class ApiSchemaInitializationGuard
+internal static class ApiSchemaCompilationGuard
 {
     #region Extension Methods
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static TValue ThrowIfNotInitialized<TValue>(this object obj, TValue? value)
+    public static TValue RequireValue<TValue>(this object obj, TValue? value)
         where TValue : class
     {
         if (value is not null)
@@ -31,7 +31,7 @@ internal static class ApiSchemaInitializationGuard
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static TValue ThrowIfNotInitialized<TValue>(this object obj, TValue? value)
+    public static TValue RequireValue<TValue>(this object obj, TValue? value)
         where TValue : struct
     {
         if (value.HasValue)

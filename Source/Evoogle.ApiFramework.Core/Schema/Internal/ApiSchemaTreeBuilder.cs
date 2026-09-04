@@ -12,14 +12,14 @@ namespace Evoogle.ApiFramework.Schema.Internal;
 internal static class ApiSchemaTreeBuilder
 {
     #region Methods
-    public static bool TryBuild(ApiSchema apiSchema, ApiInitializationSession session)
+    public static bool TryBuild(ApiSchema apiSchema, ApiSchemaCompilationSession session)
     {
         ArgumentNullException.ThrowIfNull(apiSchema);
         ArgumentNullException.ThrowIfNull(session);
 
         if (!ReferenceEquals(apiSchema, session.ApiSchema))
         {
-            throw new InvalidOperationException("A schema topology must be built by that schema's initialization session.");
+            throw new InvalidOperationException("A schema topology must be built by that schema's compilation session.");
         }
 
         return TryBuild((ApiSchemaElement)apiSchema, session);
@@ -28,7 +28,7 @@ internal static class ApiSchemaTreeBuilder
     internal static bool TryBuild
     (
         ApiSchemaElement rootElement,
-        ApiInitializationSession session
+        ApiSchemaCompilationSession session
     )
     {
         ArgumentNullException.ThrowIfNull(rootElement);
@@ -93,8 +93,8 @@ internal static class ApiSchemaTreeBuilder
             {
                 isValid = false;
                 var apiPath = apiSchemaPath;
-                var severity = ApiInitializationSeverity.Error;
-                var code = ApiInitializationCode.ApiSchemaElementOwnershipCycle;
+                var severity = ApiSchemaCompilationSeverity.Error;
+                var code = ApiSchemaCompilationCode.ApiSchemaElementOwnershipCycle;
                 var description = $"Schema element ownership contains a cycle involving '{apiSchemaElement.GetType().Name}'.";
                 var remediation = "Remove the ownership cycle so every schema element belongs to an acyclic tree.";
 
@@ -106,8 +106,8 @@ internal static class ApiSchemaTreeBuilder
             {
                 isValid = false;
                 var apiPath = apiSchemaPath;
-                var severity = ApiInitializationSeverity.Error;
-                var code = ApiInitializationCode.ApiSchemaElementDuplicateOwnership;
+                var severity = ApiSchemaCompilationSeverity.Error;
+                var code = ApiSchemaCompilationCode.ApiSchemaElementDuplicateOwnership;
                 var apiSchemaElementTypeName = apiSchemaElement.GetType().Name;
                 var description = $"Schema element instance '{apiSchemaElementTypeName}' already belongs to a compiled schema tree.";
                 var remediation = "Create a distinct schema element instance for each schema tree.";
@@ -122,8 +122,8 @@ internal static class ApiSchemaTreeBuilder
                 var existingOwner = existingParent?.GetType().Name ?? nameof(ApiSchema);
                 var duplicateOwner = parent?.GetType().Name ?? nameof(ApiSchema);
                 var apiPath = apiSchemaPath;
-                var severity = ApiInitializationSeverity.Error;
-                var code = ApiInitializationCode.ApiSchemaElementDuplicateOwnership;
+                var severity = ApiSchemaCompilationSeverity.Error;
+                var code = ApiSchemaCompilationCode.ApiSchemaElementDuplicateOwnership;
                 var description = $"Schema element instance '{apiSchemaElement.GetType().Name}' is owned more than once by '{existingOwner}' and '{duplicateOwner}'.";
                 var remediation = "Create a distinct schema element instance for each structural ownership position.";
 

@@ -278,7 +278,7 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     internal IEnumerable<ApiPropertyBuilder> ApiPropertyBuilders => _state.PropertyBuilders;
 
     /// <summary>
-    ///     Explicitly adds the CLR member while initializing its API name from the CLR name at
+    ///     Explicitly adds the CLR member while compiling its API name from the CLR name at
     ///     convention precedence.
     /// </summary>
     /// <param name="clrName">
@@ -305,7 +305,7 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
 
     /// <summary>
     ///     Adds a property builder for the given CLR member name only when no existing builder
-    ///     already targets that CLR name. The new builder is initialized at
+    ///     already targets that CLR name. The new builder is compiled at
     ///     convention precedence; its API name defaults
     ///     to the CLR name and can be overridden by a later naming convention.
     /// </summary>

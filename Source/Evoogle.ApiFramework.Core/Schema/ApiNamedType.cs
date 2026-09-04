@@ -31,24 +31,24 @@ public abstract class ApiNamedType : ApiType
         => ApiSchemaPathFormatting.BuildPath(apiBasePath: apiPreviousPath, apiPathSegment: this.ApiElementName, apiPathSegmentName: this.ApiName);
 
     /// <inheritdoc />
-    internal override void InitializeCore(ApiInitializationContext context)
+    internal override void CompileCore(ApiSchemaCompilationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        base.InitializeCore(context);
+        base.CompileCore(context);
 
-        this.InitializeApiName(context);
+        this.ValidateApiName(context);
     }
     #endregion
 
     #region Implementation Methods
-    private void InitializeApiName(ApiInitializationContext context)
+    private void ValidateApiName(ApiSchemaCompilationContext context)
     {
         var isApiNameInvalid = ApiSchemaNameValidation.IsNameInvalid(this.ApiName);
         if (isApiNameInvalid)
         {
-            var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.ApiNamedTypeInvalidApiName;
+            var severity = ApiSchemaCompilationSeverity.Error;
+            var code = ApiSchemaCompilationCode.ApiNamedTypeInvalidApiName;
             var description = $"{nameof(this.ApiName)} must not be null, empty, or whitespace";
             var remediation = $"Specify a valid {nameof(this.ApiName)} value";
 

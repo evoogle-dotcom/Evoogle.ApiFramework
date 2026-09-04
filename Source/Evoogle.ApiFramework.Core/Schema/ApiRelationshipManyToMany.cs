@@ -79,7 +79,7 @@ public sealed class ApiRelationshipManyToMany
 
     /// <summary>Gets the resolved key binding for principal end A.</summary>
     /// <exception cref="ApiSchemaException">
-    ///     Thrown when <see cref="IsNavigational"/> is <see langword="true"/> or initialization failed.
+    ///     Thrown when <see cref="IsNavigational"/> is <see langword="true"/> or compilation failed.
     ///     Check <see cref="HasKeyBindings"/> before accessing this property.
     /// </exception>
     public ApiRelationshipKeyBinding ApiKeyBindingA => this.HasKeyBindings
@@ -88,7 +88,7 @@ public sealed class ApiRelationshipManyToMany
 
     /// <summary>Gets the resolved key binding for principal end B.</summary>
     /// <exception cref="ApiSchemaException">
-    ///     Thrown when <see cref="IsNavigational"/> is <see langword="true"/> or initialization failed.
+    ///     Thrown when <see cref="IsNavigational"/> is <see langword="true"/> or compilation failed.
     ///     Check <see cref="HasKeyBindings"/> before accessing this property.
     /// </exception>
     public ApiRelationshipKeyBinding ApiKeyBindingB => this.HasKeyBindings
@@ -137,30 +137,30 @@ public sealed class ApiRelationshipManyToMany
     }
 
     /// <inheritdoc/>
-    internal override void InitializeCore(ApiInitializationContext context)
+    internal override void CompileCore(ApiSchemaCompilationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        base.InitializeCore(context);
+        base.CompileCore(context);
 
-        this.InitializeApiPrincipalEndA(context);
-        this.InitializeApiPrincipalEndB(context);
-        this.InitializeApiAssociation(context);
-        this.InitializeApiAssociationKeyPathAlignment(context);
+        this.ResolveApiPrincipalEndA(context);
+        this.ResolveApiPrincipalEndB(context);
+        this.ResolveApiAssociation(context);
+        this.ValidateApiAssociationKeyPathAlignment(context);
     }
     #endregion
 
     #region Implementation Methods
-    private void InitializeApiAssociationKeyPathAlignment(ApiInitializationContext context)
+    private void ValidateApiAssociationKeyPathAlignment(ApiSchemaCompilationContext context)
     {
         if (this.ApiPrincipalEndA is not null && this.ApiAssociation is not null && this.ApiAssociation.HasForeignKeys)
         {
-            _apiResolvedKeyBindingA = this.InitializeApiAssociationKeyPathAlignment
+            _apiResolvedKeyBindingA = this.ValidateApiAssociationKeyPathAlignment
             (
                 context,
                 this.ApiPrincipalEndA,
                 this.ApiAssociation.ApiForeignKeyTypeA,
-                ApiInitializationCode.ApiRelationshipManyToManyInvalidAssociationKeyPathsACount,
+                ApiSchemaCompilationCode.ApiRelationshipManyToManyInvalidAssociationKeyPathsACount,
                 nameof(ApiRelationshipAssociation.ApiForeignKeyTypeA),
                 "A"
             );
@@ -168,12 +168,12 @@ public sealed class ApiRelationshipManyToMany
 
         if (this.ApiPrincipalEndB is not null && this.ApiAssociation is not null && this.ApiAssociation.HasForeignKeys)
         {
-            _apiResolvedKeyBindingB = this.InitializeApiAssociationKeyPathAlignment
+            _apiResolvedKeyBindingB = this.ValidateApiAssociationKeyPathAlignment
             (
                 context,
                 this.ApiPrincipalEndB,
                 this.ApiAssociation.ApiForeignKeyTypeB,
-                ApiInitializationCode.ApiRelationshipManyToManyInvalidAssociationKeyPathsBCount,
+                ApiSchemaCompilationCode.ApiRelationshipManyToManyInvalidAssociationKeyPathsBCount,
                 nameof(ApiRelationshipAssociation.ApiForeignKeyTypeB),
                 "B"
             );
@@ -186,12 +186,12 @@ public sealed class ApiRelationshipManyToMany
         }
     }
 
-    private ApiRelationshipKeyBinding? InitializeApiAssociationKeyPathAlignment
+    private ApiRelationshipKeyBinding? ValidateApiAssociationKeyPathAlignment
     (
-        ApiInitializationContext context,
+        ApiSchemaCompilationContext context,
         ApiRelationshipPrincipalEnd principalEnd,
         ApiKeyType foreignKeyType,
-        ApiInitializationCode countMismatchCode,
+        ApiSchemaCompilationCode countMismatchCode,
         string foreignKeyPropertyName,
         string principalEndName
     )
@@ -217,27 +217,27 @@ public sealed class ApiRelationshipManyToMany
         );
     }
 
-    private void ValidateNavigationalPrincipalKey(ApiInitializationContext context, ApiRelationshipPrincipalEnd? principalEnd, string explicitKeyTarget)
+    private void ValidateNavigationalPrincipalKey(ApiSchemaCompilationContext context, ApiRelationshipPrincipalEnd? principalEnd, string explicitKeyTarget)
     {
         if (principalEnd?.ApiPrincipalKeyTypeName is null)
         {
             return;
         }
 
-        var severity = ApiInitializationSeverity.Error;
-        var code = ApiInitializationCode.ApiRelationshipEndPrincipalKeyWithoutForeignKey;
+        var severity = ApiSchemaCompilationSeverity.Error;
+        var code = ApiSchemaCompilationCode.ApiRelationshipEndPrincipalKeyWithoutForeignKey;
         var description = $"Cannot resolve {explicitKeyTarget} '{principalEnd.ApiPrincipalKeyTypeName}' because this relationship has no association foreign key bindings";
         var remediation = $"Declare {nameof(this.ApiAssociation)}.{nameof(ApiRelationshipAssociation.ApiForeignKeyTypeA)} and {nameof(this.ApiAssociation)}.{nameof(ApiRelationshipAssociation.ApiForeignKeyTypeB)} or remove {explicitKeyTarget}";
 
         context.AddIssue(severity, code, description, remediation);
     }
 
-    private void InitializeApiAssociation(ApiInitializationContext context)
+    private void ResolveApiAssociation(ApiSchemaCompilationContext context)
     {
         if (this.ApiAssociation is null)
         {
-            var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.ApiRelationshipManyToManyNullAssociation;
+            var severity = ApiSchemaCompilationSeverity.Error;
+            var code = ApiSchemaCompilationCode.ApiRelationshipManyToManyNullAssociation;
             var description = $"{nameof(this.ApiAssociation)} must not be null";
             var remediation = $"Provide a valid {nameof(ApiRelationshipAssociation)} for the association between the two principal ends";
 
@@ -245,16 +245,16 @@ public sealed class ApiRelationshipManyToMany
             return;
         }
 
-        var location = ApiInitializationLocation.ForRole(nameof(this.ApiAssociation));
-        this.ApiAssociation.Initialize(context, location);
+        var location = ApiSchemaCompilationLocation.ForRole(nameof(this.ApiAssociation));
+        this.ApiAssociation.Compile(context, location);
     }
 
-    private void InitializeApiPrincipalEndA(ApiInitializationContext context)
+    private void ResolveApiPrincipalEndA(ApiSchemaCompilationContext context)
     {
         if (this.ApiPrincipalEndA is null)
         {
-            var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.ApiRelationshipManyToManyNullPrincipalEndA;
+            var severity = ApiSchemaCompilationSeverity.Error;
+            var code = ApiSchemaCompilationCode.ApiRelationshipManyToManyNullPrincipalEndA;
             var description = $"{nameof(this.ApiPrincipalEndA)} must not be null";
             var remediation = $"Provide a valid {nameof(ApiRelationshipPrincipalEnd)} for end A";
 
@@ -262,16 +262,16 @@ public sealed class ApiRelationshipManyToMany
             return;
         }
 
-        var location = ApiInitializationLocation.ForRole(nameof(this.ApiPrincipalEndA));
-        this.ApiPrincipalEndA.Initialize(context, location);
+        var location = ApiSchemaCompilationLocation.ForRole(nameof(this.ApiPrincipalEndA));
+        this.ApiPrincipalEndA.Compile(context, location);
     }
 
-    private void InitializeApiPrincipalEndB(ApiInitializationContext context)
+    private void ResolveApiPrincipalEndB(ApiSchemaCompilationContext context)
     {
         if (this.ApiPrincipalEndB is null)
         {
-            var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.ApiRelationshipManyToManyNullPrincipalEndB;
+            var severity = ApiSchemaCompilationSeverity.Error;
+            var code = ApiSchemaCompilationCode.ApiRelationshipManyToManyNullPrincipalEndB;
             var description = $"{nameof(this.ApiPrincipalEndB)} must not be null";
             var remediation = $"Provide a valid {nameof(ApiRelationshipPrincipalEnd)} for end B";
 
@@ -279,8 +279,8 @@ public sealed class ApiRelationshipManyToMany
             return;
         }
 
-        var location = ApiInitializationLocation.ForRole(nameof(this.ApiPrincipalEndB));
-        this.ApiPrincipalEndB.Initialize(context, location);
+        var location = ApiSchemaCompilationLocation.ForRole(nameof(this.ApiPrincipalEndB));
+        this.ApiPrincipalEndB.Compile(context, location);
     }
 
     #endregion

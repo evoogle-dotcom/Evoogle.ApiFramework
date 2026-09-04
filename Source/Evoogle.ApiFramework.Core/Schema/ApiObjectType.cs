@@ -98,9 +98,9 @@ public sealed partial class ApiObjectType
     public ImmutableArray<ApiRelationshipAssociation> ApiRelationshipAssociations =>
         _apiRelationshipAssociations;
 
-    private FrozenDictionary<string, ApiNamedKeyType> ApiKeyTypeApiNameLookup => this.ThrowIfNotInitialized(_apiKeyTypeApiNameLookup);
-    private FrozenDictionary<string, ApiProperty> ApiPropertyApiNameLookup => this.ThrowIfNotInitialized(_apiPropertyApiNameLookup);
-    private FrozenDictionary<string, ApiProperty> ApiPropertyClrNameLookup => this.ThrowIfNotInitialized(_apiPropertyClrNameLookup);
+    private FrozenDictionary<string, ApiNamedKeyType> ApiKeyTypeApiNameLookup => this.RequireValue(_apiKeyTypeApiNameLookup);
+    private FrozenDictionary<string, ApiProperty> ApiPropertyApiNameLookup => this.RequireValue(_apiPropertyApiNameLookup);
+    private FrozenDictionary<string, ApiProperty> ApiPropertyClrNameLookup => this.RequireValue(_apiPropertyClrNameLookup);
     #endregion
 
     #region ApiObjectType Computed Properties
@@ -143,27 +143,27 @@ public sealed partial class ApiObjectType
     }
 
     /// <inheritdoc />
-    internal override void InitializeCore(ApiInitializationContext context)
+    internal override void CompileCore(ApiSchemaCompilationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        base.InitializeCore(context);
+        base.CompileCore(context);
 
-        this.InitializeApiOptions(context);
-        this.InitializeLookupDictionaries(context);
-        this.InitializeApiProperties(context);
+        this.ValidateApiOptions(context);
+        this.BuildLookupDictionaries(context);
+        this.CompileApiProperties(context);
     }
 
     /// <summary>
-    ///    Initializes the API key types defined for this object type.
+    ///    Compiles the API key types defined for this object type.
     /// </summary>
-    /// <param name="context">The initialization context.</param>
-    internal void InitializeKeyTypes(ApiInitializationContext context)
+    /// <param name="context">The compilation context.</param>
+    internal void CompileKeyTypes(ApiSchemaCompilationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
         this.ThrowIfFrozen();
 
-        this.InitializeApiKeyTypes(context);
+        this.CompileApiKeyTypes(context);
     }
     #endregion
 
@@ -222,15 +222,15 @@ public sealed partial class ApiObjectType
     #endregion
 
     #region Implementation Methods
-    private void InitializeApiOptions(ApiInitializationContext context)
+    private void ValidateApiOptions(ApiSchemaCompilationContext context)
     {
         if (this.ApiOptions?.HasInvalidApiKeyNullHandling != true)
         {
             return;
         }
 
-        var severity = ApiInitializationSeverity.Error;
-        var code = ApiInitializationCode.ApiObjectTypeInvalidApiKeyNullHandling;
+        var severity = ApiSchemaCompilationSeverity.Error;
+        var code = ApiSchemaCompilationCode.ApiObjectTypeInvalidApiKeyNullHandling;
         var description = $"{nameof(this.ApiOptions)}.{nameof(ApiObjectTypeOptions.ApiKeyNullHandling)} must be a valid {nameof(ApiKeyNullHandling)} value";
         var remediation = $"Specify a valid {nameof(ApiObjectTypeOptions.ApiKeyNullHandling)} value";
 
@@ -268,7 +268,7 @@ public sealed partial class ApiObjectType
         _apiRelationshipAssociations = [];
     }
 
-    private void InitializeApiKeyTypes(ApiInitializationContext context)
+    private void CompileApiKeyTypes(ApiSchemaCompilationContext context)
     {
         if (this.ApiKeyTypes.Length == 0)
         {
@@ -276,22 +276,22 @@ public sealed partial class ApiObjectType
             return;
         }
 
-        // Initialize each key type
+        // Compile each key type
         var apiKeyTypesCount = this.ApiKeyTypes.Length;
         for (var i = 0; i < apiKeyTypesCount; ++i)
         {
             var apiKeyType = this.ApiKeyTypes[i];
 
-            apiKeyType.Initialize(context);
+            apiKeyType.Compile(context);
         }
     }
 
-    private void InitializeApiProperties(ApiInitializationContext context)
+    private void CompileApiProperties(ApiSchemaCompilationContext context)
     {
         if (this.ApiProperties.Length == 0)
         {
-            var severity = ApiInitializationSeverity.Warning;
-            var code = ApiInitializationCode.ApiObjectTypeNullOrEmptyProperties;
+            var severity = ApiSchemaCompilationSeverity.Warning;
+            var code = ApiSchemaCompilationCode.ApiObjectTypeNullOrEmptyProperties;
             var description = $"{nameof(this.ApiProperties)} is null or empty";
 
             var remediation = $"Add at least one {nameof(ApiProperty)} to {nameof(ApiObjectType)}[\"{this.ApiName}\"]";
@@ -305,48 +305,48 @@ public sealed partial class ApiObjectType
         {
             var apiProperty = this.ApiProperties[i];
 
-            apiProperty.Initialize(context);
+            apiProperty.Compile(context);
         }
     }
 
-    private void InitializeLookupDictionaries(ApiInitializationContext context)
+    private void BuildLookupDictionaries(ApiSchemaCompilationContext context)
     {
-        // Initialize lookup dictionaries for lookup of:
+        // Compile lookup dictionaries for lookup of:
         // - Property by API name and CLR name
         _apiKeyTypeApiNames = [.. this.ApiKeyTypes.Select(keyType => keyType.ApiName)];
 
-        ApiSchemaInitializationLookup.InitializeLookupDictionary
+        ApiSchemaCompilationLookup.BuildLookupDictionary
         (
             parts: this.ApiKeyTypes,
             partKeySelector: x => x.ApiName,
             partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
             partKeyPropertyName: nameof(ApiNamedKeyType.ApiName),
             apiPath: this.ApiPath,
-            duplicatePartCode: ApiInitializationCode.ApiObjectTypeDuplicateKeyTypeApiName,
+            duplicatePartCode: ApiSchemaCompilationCode.ApiObjectTypeDuplicateKeyTypeApiName,
             session: context.Session,
             lookupDictionary: out _apiKeyTypeApiNameLookup
         );
 
-        ApiSchemaInitializationLookup.InitializeLookupDictionary
+        ApiSchemaCompilationLookup.BuildLookupDictionary
         (
             parts: this.ApiProperties,
             partKeySelector: x => x.ApiName,
             partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
             partKeyPropertyName: nameof(ApiProperty.ApiName),
             apiPath: this.ApiPath,
-            duplicatePartCode: ApiInitializationCode.ApiObjectTypeDuplicatePropertyApiName,
+            duplicatePartCode: ApiSchemaCompilationCode.ApiObjectTypeDuplicatePropertyApiName,
             session: context.Session,
             lookupDictionary: out _apiPropertyApiNameLookup
         );
 
-        ApiSchemaInitializationLookup.InitializeLookupDictionary
+        ApiSchemaCompilationLookup.BuildLookupDictionary
         (
             parts: this.ApiProperties,
             partKeySelector: x => x.ClrName,
             partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
             partKeyPropertyName: nameof(ApiProperty.ClrName),
             apiPath: this.ApiPath,
-            duplicatePartCode: ApiInitializationCode.ApiObjectTypeDuplicatePropertyClrName,
+            duplicatePartCode: ApiSchemaCompilationCode.ApiObjectTypeDuplicatePropertyClrName,
             session: context.Session,
             lookupDictionary: out _apiPropertyClrNameLookup
         );

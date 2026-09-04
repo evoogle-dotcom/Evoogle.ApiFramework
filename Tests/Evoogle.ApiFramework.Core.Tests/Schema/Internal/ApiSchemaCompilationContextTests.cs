@@ -65,15 +65,15 @@ public class ApiInitializationContextTests(ITestOutputHelper output) : XUnitTest
     private sealed class IssueLoggingTest : XUnitTest
     {
         #region User Supplied Properties
-        public required ApiInitializationCode Code { get; init; }
+        public required ApiSchemaCompilationCode Code { get; init; }
         public required LogLevel ExpectedLogLevel { get; init; }
         public required string? Remediation { get; init; }
-        public required ApiInitializationSeverity Severity { get; init; }
+        public required ApiSchemaCompilationSeverity Severity { get; init; }
         #endregion
 
         #region Calculated Properties
         private RecordingLogger? Logger { get; set; }
-        private ApiInitializationSession? Session { get; set; }
+        private ApiSchemaCompilationSession? Session { get; set; }
         #endregion
 
         #region XUnitTest Methods
@@ -81,7 +81,7 @@ public class ApiInitializationContextTests(ITestOutputHelper output) : XUnitTest
         {
             this.Logger = new RecordingLogger();
             var schema = CreateSchema("IssueLogging");
-            this.Session = new ApiInitializationSession(schema, this.Logger);
+            this.Session = new ApiSchemaCompilationSession(schema, this.Logger);
         }
 
         protected override void Act()
@@ -110,7 +110,7 @@ public class ApiInitializationContextTests(ITestOutputHelper output) : XUnitTest
             entry.LogLevel.Should().Be(this.ExpectedLogLevel);
             entry.EventId.Id.Should().Be((int)this.Code);
             entry.EventId.Name.Should().Be(this.Code.ToString());
-            entry.Properties["InitializationCode"].Should().Be(this.Code);
+            entry.Properties["CompilationCode"].Should().Be(this.Code);
             entry.Properties["ApiPath"].Should().Be
             (
                 $"{nameof(ApiSchema)}[\"IssueLogging\"]"
@@ -151,17 +151,17 @@ public class ApiInitializationContextTests(ITestOutputHelper output) : XUnitTest
     private sealed class SessionIsolationTest : XUnitTest
     {
         #region Calculated Properties
-        private ApiInitializationSession? FirstSession { get; set; }
+        private ApiSchemaCompilationSession? FirstSession { get; set; }
 
-        private ApiInitializationSession? SecondSession { get; set; }
+        private ApiSchemaCompilationSession? SecondSession { get; set; }
         #endregion
 
         #region XUnitTest Methods
         protected override void Arrange()
         {
             var schema = CreateSchema("SessionIsolation");
-            this.FirstSession = new ApiInitializationSession(schema, new RecordingLogger());
-            this.SecondSession = new ApiInitializationSession(schema, new RecordingLogger());
+            this.FirstSession = new ApiSchemaCompilationSession(schema, new RecordingLogger());
+            this.SecondSession = new ApiSchemaCompilationSession(schema, new RecordingLogger());
         }
 
         protected override void Act()
@@ -169,8 +169,8 @@ public class ApiInitializationContextTests(ITestOutputHelper output) : XUnitTest
             this.FirstSession!.AddIssue
             (
                 this.FirstSession.ApiSchema.ApiPath,
-                ApiInitializationSeverity.Warning,
-                ApiInitializationCode.ApiObjectTypeNullOrEmptyProperties,
+                ApiSchemaCompilationSeverity.Warning,
+                ApiSchemaCompilationCode.ApiObjectTypeNullOrEmptyProperties,
                 "First-session issue",
                 remediation: null
             );
@@ -232,7 +232,7 @@ public class ApiInitializationContextTests(ITestOutputHelper output) : XUnitTest
     [
         new SessionIsolationTest
         {
-            Name = "Initialization Sessions Isolate Issues"
+            Name = "Compilation Sessions Isolate Issues"
         },
     ];
 
@@ -316,24 +316,24 @@ public class ApiInitializationContextTests(ITestOutputHelper output) : XUnitTest
         new IssueLoggingTest
         {
             Name = "Information Issues Are Logged Without Remediation",
-            Severity = ApiInitializationSeverity.Info,
-            Code = ApiInitializationCode.ApiSchemaInvalidName,
+            Severity = ApiSchemaCompilationSeverity.Info,
+            Code = ApiSchemaCompilationCode.ApiSchemaInvalidName,
             ExpectedLogLevel = LogLevel.Information,
             Remediation = null
         },
         new IssueLoggingTest
         {
             Name = "Warning Issues Are Logged With Remediation",
-            Severity = ApiInitializationSeverity.Warning,
-            Code = ApiInitializationCode.ApiObjectTypeNullOrEmptyProperties,
+            Severity = ApiSchemaCompilationSeverity.Warning,
+            Code = ApiSchemaCompilationCode.ApiObjectTypeNullOrEmptyProperties,
             ExpectedLogLevel = LogLevel.Warning,
             Remediation = "Remediation"
         },
         new IssueLoggingTest
         {
             Name = "Error Issues Are Logged With Remediation",
-            Severity = ApiInitializationSeverity.Error,
-            Code = ApiInitializationCode.ApiKeyTypeNullOrEmptyPaths,
+            Severity = ApiSchemaCompilationSeverity.Error,
+            Code = ApiSchemaCompilationCode.ApiKeyTypeNullOrEmptyPaths,
             ExpectedLogLevel = LogLevel.Error,
             Remediation = "Remediation"
         },
@@ -373,7 +373,7 @@ public class ApiInitializationContextTests(ITestOutputHelper output) : XUnitTest
     private static string[] GetBlankIndexedLabelPath()
     {
         var schema = CreateSchema("Location");
-        var location = ApiInitializationLocation.ForIndexedLabel(2, "   ");
+        var location = ApiSchemaCompilationLocation.ForIndexedLabel(2, "   ");
         var child = new TestElement("Child");
         var apiPath = location.BuildPath
         (

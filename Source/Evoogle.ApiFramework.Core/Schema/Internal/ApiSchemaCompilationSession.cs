@@ -8,12 +8,12 @@ using Microsoft.Extensions.Logging;
 namespace Evoogle.ApiFramework.Schema.Internal;
 
 /// <summary>
-///     Holds state shared by every context created during one schema initialization.
+///     Holds state shared by every context created during one schema compilation.
 /// </summary>
-internal sealed class ApiInitializationSession
+internal sealed class ApiSchemaCompilationSession
 {
     #region Fields
-    private readonly List<ApiInitializationIssue> _issues = [];
+    private readonly List<ApiSchemaCompilationIssue> _issues = [];
     #endregion
 
     #region Properties
@@ -21,13 +21,13 @@ internal sealed class ApiInitializationSession
 
     public ApiSchemaContext ApiSchemaContext { get; }
 
-    public IEnumerable<ApiInitializationIssue> Issues => _issues;
+    public IEnumerable<ApiSchemaCompilationIssue> Issues => _issues;
 
     public ILogger Logger { get; }
     #endregion
 
     #region Constructors
-    public ApiInitializationSession
+    public ApiSchemaCompilationSession
     (
         ApiSchema apiSchema,
         ApiSchemaContext apiSchemaContext
@@ -41,7 +41,7 @@ internal sealed class ApiInitializationSession
         this.Logger = apiSchemaContext.Logger;
     }
 
-    internal ApiInitializationSession(ApiSchema apiSchema, ILogger logger)
+    internal ApiSchemaCompilationSession(ApiSchema apiSchema, ILogger logger)
         : this(apiSchema, new ApiSchemaContext(apiSchema, logger))
     {
     }
@@ -52,44 +52,44 @@ internal sealed class ApiInitializationSession
     public void AddIssue
     (
         string apiPath,
-        ApiInitializationSeverity severity,
-        ApiInitializationCode code,
+        ApiSchemaCompilationSeverity severity,
+        ApiSchemaCompilationCode code,
         string description,
         string? remediation
     )
     {
-        var issue = new ApiInitializationIssue(apiPath, severity, code, description, remediation);
+        var issue = new ApiSchemaCompilationIssue(apiPath, severity, code, description, remediation);
         _issues.Add(issue);
 
         this.LogIssue(issue);
     }
 
-    public void AddIssue(ApiInitializationIssue issue)
+    public void AddIssue(ApiSchemaCompilationIssue issue)
     {
         ArgumentNullException.ThrowIfNull(issue);
         _issues.Add(issue);
         this.LogIssue(issue);
     }
 
-    public ApiInitializationContext CreateContext
+    public ApiSchemaCompilationContext CreateContext
     (
         ApiSchemaElement apiSchemaElement,
-        ApiInitializationLocation location
+        ApiSchemaCompilationLocation location
     )
     {
         ArgumentNullException.ThrowIfNull(apiSchemaElement);
 
         if (!ReferenceEquals(apiSchemaElement.Root, this.ApiSchema))
         {
-            throw new InvalidOperationException("A schema element can only be initialized by the session for its ownership tree.");
+            throw new InvalidOperationException("A schema element can only be compiled by the session for its ownership tree.");
         }
 
         var defaultApiBasePath = ReferenceEquals(apiSchemaElement, this.ApiSchema)
             ? null
-            : apiSchemaElement.Parent?.ApiPath ?? throw new InvalidOperationException("A non-root schema element must have an initialized structural parent.");
+            : apiSchemaElement.Parent?.ApiPath ?? throw new InvalidOperationException("A non-root schema element must have a compiled structural parent.");
         var apiPath = location.BuildPath(apiSchemaElement, defaultApiBasePath);
 
-        return new ApiInitializationContext
+        return new ApiSchemaCompilationContext
         (
             this,
             apiSchemaElement,
@@ -100,13 +100,13 @@ internal sealed class ApiInitializationSession
     #endregion
 
     #region Implementation Methods
-    private void LogIssue(ApiInitializationIssue issue)
+    private void LogIssue(ApiSchemaCompilationIssue issue)
     {
         var logLevel = issue.Severity switch
         {
-            ApiInitializationSeverity.Info => LogLevel.Information,
-            ApiInitializationSeverity.Warning => LogLevel.Warning,
-            ApiInitializationSeverity.Error => LogLevel.Error,
+            ApiSchemaCompilationSeverity.Info => LogLevel.Information,
+            ApiSchemaCompilationSeverity.Warning => LogLevel.Warning,
+            ApiSchemaCompilationSeverity.Error => LogLevel.Error,
             _ => LogLevel.Error,
         };
 
@@ -123,7 +123,7 @@ internal sealed class ApiInitializationSession
             (
                 logLevel,
                 eventId,
-                "API schema initialization issue {InitializationCode} at {ApiPath}: {Description}",
+                "API schema compilation issue {CompilationCode} at {ApiPath}: {Description}",
                 issue.Code,
                 issue.ApiPath,
                 issue.Description
@@ -135,7 +135,7 @@ internal sealed class ApiInitializationSession
             (
                 logLevel,
                 eventId,
-                "API schema initialization issue {InitializationCode} at {ApiPath}: {Description} Remediation: {Remediation}",
+                "API schema compilation issue {CompilationCode} at {ApiPath}: {Description} Remediation: {Remediation}",
                 issue.Code,
                 issue.ApiPath,
                 issue.Description,

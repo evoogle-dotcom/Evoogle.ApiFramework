@@ -9,7 +9,7 @@ namespace Evoogle.ApiFramework.Schema.Internal;
 ///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used
 ///     directly from your code. This API may change or be removed in future releases.
 /// </summary>
-internal sealed class ApiInitializationContext
+internal sealed class ApiSchemaCompilationContext
 {
     #region Properties
     public ApiSchema ApiSchema => this.Session.ApiSchema;
@@ -18,19 +18,19 @@ internal sealed class ApiInitializationContext
 
     public ApiSchemaElement CurrentElement { get; }
 
-    public IEnumerable<ApiInitializationIssue> Issues => this.Session.Issues;
+    public IEnumerable<ApiSchemaCompilationIssue> Issues => this.Session.Issues;
 
-    public ApiInitializationLocation Location { get; }
+    public ApiSchemaCompilationLocation Location { get; }
 
-    public ApiInitializationSession Session { get; }
+    public ApiSchemaCompilationSession Session { get; }
     #endregion
 
     #region Constructors
-    internal ApiInitializationContext
+    internal ApiSchemaCompilationContext
     (
-        ApiInitializationSession session,
+        ApiSchemaCompilationSession session,
         ApiSchemaElement currentElement,
-        ApiInitializationLocation location,
+        ApiSchemaCompilationLocation location,
         string apiPath
     )
     {
@@ -48,8 +48,8 @@ internal sealed class ApiInitializationContext
     #region Methods
     public void AddIssue
     (
-        ApiInitializationSeverity severity,
-        ApiInitializationCode code,
+        ApiSchemaCompilationSeverity severity,
+        ApiSchemaCompilationCode code,
         string description,
         string? remediation
     )
@@ -58,8 +58,8 @@ internal sealed class ApiInitializationContext
     public void AddIssue
     (
         string apiPath,
-        ApiInitializationSeverity severity,
-        ApiInitializationCode code,
+        ApiSchemaCompilationSeverity severity,
+        ApiSchemaCompilationCode code,
         string description,
         string? remediation
     )

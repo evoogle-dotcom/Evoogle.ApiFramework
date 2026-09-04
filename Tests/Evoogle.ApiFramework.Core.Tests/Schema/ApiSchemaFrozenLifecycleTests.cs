@@ -66,7 +66,7 @@ public class ApiSchemaFrozenLifecycleTests(ITestOutputHelper output) : XUnitTest
             typeof(ApiSchema).GetConstructors(BindingFlags.Instance | BindingFlags.Public)
                 .Should().BeEmpty();
             typeof(ApiSchema).GetMethods(BindingFlags.Instance | BindingFlags.Public)
-                .Should().NotContain(method => method.Name == "Initialize");
+                .Should().NotContain(method => method.Name == "Compile");
             typeof(ApiSchema).GetMethods(BindingFlags.Static | BindingFlags.Public)
                 .Should().NotContain(method => method.Name == "Create");
 
@@ -81,13 +81,13 @@ public class ApiSchemaFrozenLifecycleTests(ITestOutputHelper output) : XUnitTest
 
     private sealed class BuildResultTest : XUnitTest
     {
-        private ApiSchemaBuildResult? ErrorResult { get; set; }
+        private ApiSchemaCompilationResult? ErrorResult { get; set; }
 
-        private ApiSchemaBuildResult? SuccessResult { get; set; }
+        private ApiSchemaCompilationResult? SuccessResult { get; set; }
 
-        private ApiSchemaBuildResult? WarningResult { get; set; }
+        private ApiSchemaCompilationResult? WarningResult { get; set; }
 
-        private ApiSchemaInitializationException? Exception { get; set; }
+        private ApiSchemaCompilationException? Exception { get; set; }
 
         protected override void Arrange()
         { }
@@ -106,7 +106,7 @@ public class ApiSchemaFrozenLifecycleTests(ITestOutputHelper output) : XUnitTest
             {
                 invalidBuilder.Build();
             }
-            catch (ApiSchemaInitializationException exception)
+            catch (ApiSchemaCompilationException exception)
             {
                 this.Exception = exception;
             }
@@ -129,13 +129,13 @@ public class ApiSchemaFrozenLifecycleTests(ITestOutputHelper output) : XUnitTest
             this.ErrorResult.HasErrors.Should().BeTrue();
             this.ErrorResult.Errors.Should().Contain
             (
-                issue => issue.Code == ApiInitializationCode.ApiSchemaInvalidName
+                issue => issue.Code == ApiSchemaCompilationCode.ApiSchemaInvalidName
             );
             this.Exception.Should().NotBeNull();
             this.Exception!.Result.Schema.Should().BeNull();
             this.Exception.Result.Errors.Should().Contain
             (
-                issue => issue.Code == ApiInitializationCode.ApiSchemaInvalidName
+                issue => issue.Code == ApiSchemaCompilationCode.ApiSchemaInvalidName
             );
         }
     }
@@ -213,7 +213,7 @@ public class ApiSchemaFrozenLifecycleTests(ITestOutputHelper output) : XUnitTest
 
     private sealed class InvalidExtensionTest : XUnitTest
     {
-        private ApiSchemaBuildResult[]? Results { get; set; }
+        private ApiSchemaCompilationResult[]? Results { get; set; }
 
         protected override void Arrange()
         { }
@@ -239,15 +239,15 @@ public class ApiSchemaFrozenLifecycleTests(ITestOutputHelper output) : XUnitTest
             this.Results.Should().OnlyContain(result => result.Schema == null);
             this.Results![0].Errors.Should().ContainSingle
             (
-                issue => issue.Code == ApiInitializationCode.ApiSchemaExtensionUnsupported
+                issue => issue.Code == ApiSchemaCompilationCode.ApiSchemaExtensionUnsupported
             );
             this.Results[1].Errors.Should().ContainSingle
             (
-                issue => issue.Code == ApiInitializationCode.ApiSchemaExtensionSnapshotFailed
+                issue => issue.Code == ApiSchemaCompilationCode.ApiSchemaExtensionSnapshotFailed
             );
             this.Results[2].Errors.Should().ContainSingle
             (
-                issue => issue.Code == ApiInitializationCode.ApiSchemaExtensionInvalidSnapshot
+                issue => issue.Code == ApiSchemaCompilationCode.ApiSchemaExtensionInvalidSnapshot
             );
         }
     }

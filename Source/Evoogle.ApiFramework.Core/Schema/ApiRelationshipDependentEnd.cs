@@ -88,18 +88,18 @@ public sealed class ApiRelationshipDependentEnd(Type clrObjectType, ApiKeyType? 
     }
 
     /// <inheritdoc/>
-    internal override void InitializeCore(ApiInitializationContext context)
+    internal override void CompileCore(ApiSchemaCompilationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        base.InitializeCore(context);
+        base.CompileCore(context);
 
-        this.InitializeApiForeignKeyType(context);
+        this.ResolveApiForeignKeyType(context);
     }
     #endregion
 
     #region Implementation Methods
-    private void InitializeApiForeignKeyType(ApiInitializationContext context)
+    private void ResolveApiForeignKeyType(ApiSchemaCompilationContext context)
     {
         if (!this.HasForeignKey)
         {
@@ -107,8 +107,8 @@ public sealed class ApiRelationshipDependentEnd(Type clrObjectType, ApiKeyType? 
             return;
         }
 
-        var location = ApiInitializationLocation.ForRole(nameof(this.ApiForeignKeyType));
-        _apiForeignKeyType!.Initialize(context, location);
+        var location = ApiSchemaCompilationLocation.ForRole(nameof(this.ApiForeignKeyType));
+        _apiForeignKeyType!.Compile(context, location);
     }
     #endregion
 }

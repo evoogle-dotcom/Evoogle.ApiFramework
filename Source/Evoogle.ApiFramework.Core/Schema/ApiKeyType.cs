@@ -102,23 +102,23 @@ public partial class ApiKeyType : ApiSchemaElement
         );
 
     /// <inheritdoc/>
-    internal override void InitializeCore(ApiInitializationContext context)
+    internal override void CompileCore(ApiSchemaCompilationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        base.InitializeCore(context);
+        base.CompileCore(context);
 
-        this.InitializeApiKeyPaths(context);
+        this.CompileApiKeyPaths(context);
     }
     #endregion
 
     #region Implementation Methods
-    private void InitializeApiKeyPaths(ApiInitializationContext context)
+    private void CompileApiKeyPaths(ApiSchemaCompilationContext context)
     {
         if (this.ApiKeyPaths.Length == 0)
         {
-            var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.ApiKeyTypeNullOrEmptyPaths;
+            var severity = ApiSchemaCompilationSeverity.Error;
+            var code = ApiSchemaCompilationCode.ApiKeyTypeNullOrEmptyPaths;
             var description = $"{nameof(this.ApiKeyPaths)} must not be null or empty";
             var remediation = $"Specify at least one {nameof(ApiKeyPath)}";
 
@@ -131,12 +131,12 @@ public partial class ApiKeyType : ApiSchemaElement
         {
             var apiKeyPath = this.ApiKeyPaths[i];
 
-            var location = ApiInitializationLocation.ForIndexedLabel
+            var location = ApiSchemaCompilationLocation.ForIndexedLabel
             (
                 i,
                 apiKeyPath.ApiPathLabel
             );
-            apiKeyPath.Initialize(context, location);
+            apiKeyPath.Compile(context, location);
         }
     }
     #endregion

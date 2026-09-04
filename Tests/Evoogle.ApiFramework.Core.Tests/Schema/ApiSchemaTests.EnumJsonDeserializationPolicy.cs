@@ -22,10 +22,10 @@ namespace Evoogle.ApiFramework.Schema;
 public partial class ApiSchemaTests
 {
     #region Test Classes
-    private sealed class InitializationIssueTest : XUnitTest
+    private sealed class CompilationIssueTest : XUnitTest
     {
         #region User Supplied Properties
-        public required ApiInitializationCode ExpectedCode { get; init; }
+        public required ApiSchemaCompilationCode ExpectedCode { get; init; }
 
         public required ApiSchemaKind SchemaKind { get; init; }
 
@@ -62,7 +62,7 @@ public partial class ApiSchemaTests
 
         protected override void Assert()
         {
-            var exception = this.ActualException.Should().BeOfType<ApiSchemaInitializationException>().Which;
+            var exception = this.ActualException.Should().BeOfType<ApiSchemaCompilationException>().Which;
             exception.Issues.Should().Contain(issue => issue.Code == this.ExpectedCode);
         }
         #endregion
@@ -170,53 +170,53 @@ public partial class ApiSchemaTests
     #region Theory Data
     public static TheoryDataRow<IXUnitTest>[] EnumJsonInitializationIssueTheoryData =>
     [
-        new InitializationIssueTest
+        new CompilationIssueTest
         {
             Name = "Property type modifiers reject an unknown JSON enum value",
             SchemaKind = ApiSchemaKind.Simple,
-            ExpectedCode = ApiInitializationCode.ApiPropertyInvalidApiTypeModifiers,
+            ExpectedCode = ApiSchemaCompilationCode.ApiPropertyInvalidApiTypeModifiers,
             UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.SetFirstPropertyApiTypeModifiersToUnknownString(a),
         },
-        new InitializationIssueTest
+        new CompilationIssueTest
         {
             Name = "Property type modifiers reject a JSON null enum value",
             SchemaKind = ApiSchemaKind.Simple,
-            ExpectedCode = ApiInitializationCode.ApiPropertyInvalidApiTypeModifiers,
+            ExpectedCode = ApiSchemaCompilationCode.ApiPropertyInvalidApiTypeModifiers,
             UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.SetFirstPropertyApiTypeModifiersToNull(a),
         },
-        new InitializationIssueTest
+        new CompilationIssueTest
         {
             Name = "Collection item type modifiers reject an incompatible JSON enum token",
             SchemaKind = ApiSchemaKind.Commerce,
-            ExpectedCode = ApiInitializationCode.ApiCollectionTypeInvalidApiItemTypeModifiers,
+            ExpectedCode = ApiSchemaCompilationCode.ApiCollectionTypeInvalidApiItemTypeModifiers,
             UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.SetFirstCollectionTypeApiItemTypeModifiersToIncompatibleToken(a),
         },
-        new InitializationIssueTest
+        new CompilationIssueTest
         {
             Name = "Schema key null handling rejects a JSON null enum value",
             SchemaKind = ApiSchemaKind.Simple,
-            ExpectedCode = ApiInitializationCode.ApiSchemaInvalidApiKeyNullHandling,
+            ExpectedCode = ApiSchemaCompilationCode.ApiSchemaInvalidApiKeyNullHandling,
             UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.SetSchemaApiKeyNullHandlingToNull(a),
         },
-        new InitializationIssueTest
+        new CompilationIssueTest
         {
             Name = "Object key null handling rejects an unknown JSON enum value",
             SchemaKind = ApiSchemaKind.Simple,
-            ExpectedCode = ApiInitializationCode.ApiObjectTypeInvalidApiKeyNullHandling,
+            ExpectedCode = ApiSchemaCompilationCode.ApiObjectTypeInvalidApiKeyNullHandling,
             UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.SetFirstObjectTypeApiKeyNullHandlingToUnknownString(a),
         },
-        new InitializationIssueTest
+        new CompilationIssueTest
         {
             Name = "Relationship delete behavior rejects an incompatible JSON enum token",
             SchemaKind = ApiSchemaKind.Relationship,
-            ExpectedCode = ApiInitializationCode.ApiRelationshipInvalidApiDeleteBehavior,
+            ExpectedCode = ApiSchemaCompilationCode.ApiRelationshipInvalidApiDeleteBehavior,
             UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.SetFirstRelationshipApiDeleteBehaviorToIncompatibleToken(a),
         },
-        new InitializationIssueTest
+        new CompilationIssueTest
         {
             Name = "Type expression API kind rejects an unknown JSON enum value",
             SchemaKind = ApiSchemaKind.Simple,
-            ExpectedCode = ApiInitializationCode.ApiTypeExpressionInvalidApiKind,
+            ExpectedCode = ApiSchemaCompilationCode.ApiTypeExpressionInvalidApiKind,
             UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.SetFirstPropertyApiTypeApiKindToUnknownString(a),
         },
     ];

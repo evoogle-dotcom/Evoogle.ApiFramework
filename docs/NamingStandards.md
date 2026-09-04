@@ -58,7 +58,7 @@ Name the member by its semantic role. If the role is already clear in context, u
 shorter name.
 
 ```csharp
-public IEnumerable<ApiInitializationIssue> Issues { get; }
+public IEnumerable<ApiSchemaCompilationIssue> Issues { get; }
 public ApiKeyPartNameFormat PartNameFormat { get; init; }
 public ApiKeyNullHandling NullHandling { get; init; }
 ```
@@ -92,7 +92,7 @@ Do not add `Api` or `Clr` when no cross-level ambiguity exists. The enclosing ty
 member name should already make the meaning clear.
 
 ```csharp
-public ApiInitializationSeverity Severity { get; }
+public ApiSchemaCompilationSeverity Severity { get; }
 public string Description { get; }
 public bool IsValid { get; }
 public bool HasErrors { get; }

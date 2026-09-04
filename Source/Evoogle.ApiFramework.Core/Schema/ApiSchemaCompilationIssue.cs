@@ -8,7 +8,7 @@ using Evoogle.Extensions;
 namespace Evoogle.ApiFramework.Schema;
 
 /// <summary>
-///     Represents an issue encountered during API schema initialization.
+///     Represents an issue encountered during API schema compilation.
 /// </summary>
 /// <param name="apiPath">The API path to the schema element where the issue occurred.</param>
 /// <param name="severity">The severity level of the issue.</param>
@@ -21,18 +21,18 @@ namespace Evoogle.ApiFramework.Schema;
 /// <param name="exception">
 ///     The exception associated with the issue, if applicable.
 /// </param>
-public sealed class ApiInitializationIssue
+public sealed class ApiSchemaCompilationIssue
 (
     string apiPath,
-    ApiInitializationSeverity severity,
-    ApiInitializationCode code,
+    ApiSchemaCompilationSeverity severity,
+    ApiSchemaCompilationCode code,
     string description,
     string? remediation,
     Type? readerType = null,
     Exception? exception = null
 )
 {
-    #region ApiInitializationIssue Properties
+    #region ApiSchemaCompilationIssue Properties
     /// <summary>
     ///     Gets the API path to the schema element where the issue occurred.
     /// </summary>
@@ -41,12 +41,12 @@ public sealed class ApiInitializationIssue
     /// <summary>
     ///     Gets the severity level of the issue.
     /// </summary>
-    public ApiInitializationSeverity Severity { get; } = severity;
+    public ApiSchemaCompilationSeverity Severity { get; } = severity;
 
     /// <summary>
     ///     Gets the specific error or warning code identifying the issue.
     /// </summary>
-    public ApiInitializationCode Code { get; } = code;
+    public ApiSchemaCompilationCode Code { get; } = code;
 
     /// <summary>
     ///     Gets a human-readable description of the issue.
@@ -79,11 +79,11 @@ public sealed class ApiInitializationIssue
         var description = this.Description.SafeToString();
         var remediation = this.Remediation.SafeToString();
 
-        return $"{nameof(ApiInitializationIssue)} {{{nameof(this.ApiPath)}={apiPath}, {nameof(this.Severity)}={severity}, {nameof(this.Code)}={code}, {nameof(this.Description)}={description}, {nameof(this.Remediation)}={remediation}}}";
+        return $"{nameof(ApiSchemaCompilationIssue)} {{{nameof(this.ApiPath)}={apiPath}, {nameof(this.Severity)}={severity}, {nameof(this.Code)}={code}, {nameof(this.Description)}={description}, {nameof(this.Remediation)}={remediation}}}";
     }
     #endregion
 
-    #region ApiInitializationIssue Methods
+    #region ApiSchemaCompilationIssue Methods
     /// <summary>
     ///     Converts the issue to a formatted message string.
     /// </summary>

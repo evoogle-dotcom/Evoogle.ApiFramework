@@ -13,7 +13,7 @@ namespace Evoogle.ApiFramework.Schema;
 [DynamicLinqType]
 internal static class EnumJsonDeserializationPolicyTestsFactory
 {
-    #region Initialization Issue Factory Methods
+    #region Compilation Issue Factory Methods
     public static void SetFirstPropertyApiTypeModifiersToUnknownString(JsonObject schema)
         => GetFirstProperty(schema)[nameof(ApiProperty.ApiTypeModifiers)] = "Unknown";
 

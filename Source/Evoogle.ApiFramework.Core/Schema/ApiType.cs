@@ -48,23 +48,23 @@ public abstract class ApiType : ApiSchemaElement
 
     #region ApiSchemaElement Methods
     /// <inheritdoc />
-    internal override void InitializeCore(ApiInitializationContext context)
+    internal override void CompileCore(ApiSchemaCompilationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        base.InitializeCore(context);
+        base.CompileCore(context);
 
-        this.InitializeClrType(context);
+        this.ValidateClrType(context);
     }
     #endregion
 
     #region Implementation Methods
-    private void InitializeClrType(ApiInitializationContext context)
+    private void ValidateClrType(ApiSchemaCompilationContext context)
     {
         if (this.ClrType is null)
         {
-            var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.ApiTypeNullClrType;
+            var severity = ApiSchemaCompilationSeverity.Error;
+            var code = ApiSchemaCompilationCode.ApiTypeNullClrType;
             var description = $"{nameof(this.ClrType)} must not be null";
             var remediation = $"Specify a valid {nameof(this.ClrType)}";
 

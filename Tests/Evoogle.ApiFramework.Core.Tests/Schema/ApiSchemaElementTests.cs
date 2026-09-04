@@ -196,7 +196,7 @@ public class ApiSchemaElementTests(ITestOutputHelper output) : XUnitTests(output
         #endregion
     }
 
-    private sealed class ReinitializeTest : XUnitTest
+    private sealed class RecompileTest : XUnitTest
     {
         #region Calculated Properties
         private ApiSchemaElement[]? After { get; set; }
@@ -295,7 +295,7 @@ public class ApiSchemaElementTests(ITestOutputHelper output) : XUnitTests(output
     private sealed class InvalidTopologyTest : XUnitTest
     {
         #region User Supplied Properties
-        public required ApiInitializationCode ExpectedCode { get; init; }
+        public required ApiSchemaCompilationCode ExpectedCode { get; init; }
 
         public required InvalidTopologyTestCase TestCase { get; init; }
         #endregion
@@ -305,7 +305,7 @@ public class ApiSchemaElementTests(ITestOutputHelper output) : XUnitTests(output
 
         private ApiSchemaElement? RootElement { get; set; }
 
-        private ApiSchemaBuildResult? Result { get; set; }
+        private ApiSchemaCompilationResult? Result { get; set; }
 
         private bool? WasTopologyBuilt { get; set; }
         #endregion
@@ -339,7 +339,7 @@ public class ApiSchemaElementTests(ITestOutputHelper output) : XUnitTests(output
             }
 
             var sessionSchema = CreateTraversalSchema();
-            var session = new ApiInitializationSession
+            var session = new ApiSchemaCompilationSession
             (
                 sessionSchema,
                 new ApiSchemaContext(sessionSchema)
@@ -350,7 +350,7 @@ public class ApiSchemaElementTests(ITestOutputHelper output) : XUnitTests(output
             this.ExpectedApiPath = sessionSchema.ApiPath;
             this.RootElement = cyclicElement;
             this.WasTopologyBuilt = ApiSchemaTreeBuilder.TryBuild(cyclicElement, session);
-            this.Result = new ApiSchemaBuildResult(null, session.Issues);
+            this.Result = new ApiSchemaCompilationResult(null, session.Issues);
         }
 
         protected override void Assert()
@@ -465,7 +465,7 @@ public class ApiSchemaElementTests(ITestOutputHelper output) : XUnitTests(output
     [
         new TopologyTest
         {
-            Name = "Initialized Schemas Expose Canonical Ownership Trees"
+            Name = "Compiled Schemas Expose Canonical Ownership Trees"
         },
         new TraversalOrderTest
         {
@@ -475,7 +475,7 @@ public class ApiSchemaElementTests(ITestOutputHelper output) : XUnitTests(output
         {
             Name = "Key Path Segments Are Ordered Siblings"
         },
-        new ReinitializeTest
+        new RecompileTest
         {
             Name = "Second Compilation Is Rejected Without Changing Topology"
         },
@@ -493,7 +493,7 @@ public class ApiSchemaElementTests(ITestOutputHelper output) : XUnitTests(output
             (
                 new PreInitializationTest
                 {
-                    Name = $"{link} Requires Initialized Topology",
+                    Name = $"{link} Requires Compiled Topology",
                     Link = link
                 }
             )
@@ -506,13 +506,13 @@ public class ApiSchemaElementTests(ITestOutputHelper output) : XUnitTests(output
         {
             Name = "Duplicate Ownership Prevents Topology Publication",
             TestCase = InvalidTopologyTestCase.DuplicateOwnership,
-            ExpectedCode = ApiInitializationCode.ApiSchemaElementDuplicateOwnership
+            ExpectedCode = ApiSchemaCompilationCode.ApiSchemaElementDuplicateOwnership
         },
         new InvalidTopologyTest
         {
             Name = "Ownership Cycles Prevent Topology Publication",
             TestCase = InvalidTopologyTestCase.OwnershipCycle,
-            ExpectedCode = ApiInitializationCode.ApiSchemaElementOwnershipCycle
+            ExpectedCode = ApiSchemaCompilationCode.ApiSchemaElementOwnershipCycle
         }
     ];
     #endregion

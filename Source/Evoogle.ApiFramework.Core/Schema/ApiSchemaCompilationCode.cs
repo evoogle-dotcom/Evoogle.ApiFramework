@@ -11,16 +11,16 @@ using Evoogle.Json;
 namespace Evoogle.ApiFramework.Schema;
 
 /// <summary>
-///     Defines error and warning codes used during API schema initialization.
+///     Defines error and warning codes used during API schema compilation.
 /// </summary>
 /// <remarks>
-///     These codes identify specific validation issues encountered when initializing API schema elements,
+///     These codes identify specific validation issues encountered when compiling API schema elements,
 ///     such as missing required values, duplicate names, unresolved references, or invalid configurations.
 /// </remarks>
-[JsonConverter(typeof(EnumJsonConverter<ApiInitializationCode>))]
-public enum ApiInitializationCode
+[JsonConverter(typeof(EnumJsonConverter<ApiSchemaCompilationCode>))]
+public enum ApiSchemaCompilationCode
 {
-    #region ApiCollectionType Initialization Codes
+    #region ApiCollectionType Compilation Codes
     /// <summary>
     ///     The collection type's item type expression is null.
     /// </summary>
@@ -54,7 +54,7 @@ public enum ApiInitializationCode
     ApiCollectionItemOptionalNonNullableMismatch,
     #endregion
 
-    #region ApiEnumType Initialization Codes
+    #region ApiEnumType Compilation Codes
     /// <summary>
     ///     Multiple enum values have the same API name.
     /// </summary>
@@ -86,7 +86,7 @@ public enum ApiInitializationCode
     ApiEnumTypeNullOrEmptyValues,
     #endregion
 
-    #region ApiEnumValue Initialization Codes
+    #region ApiEnumValue Compilation Codes
     /// <summary>
     ///     The enum value's API name is null, empty, or whitespace.
     /// </summary>
@@ -100,7 +100,7 @@ public enum ApiInitializationCode
     ApiEnumValueInvalidClrName,
     #endregion
 
-    #region ApiKeyPath Initialization Codes
+    #region ApiKeyPath Compilation Codes
     /// <summary>
     ///     An <see cref="ApiKeyPath"/> has no segments. At least one segment is required to identify a scalar property.
     /// </summary>
@@ -135,7 +135,7 @@ public enum ApiInitializationCode
     ApiKeyPathUninferableRootType,
     #endregion
 
-    #region ApiKeyPathSegment Initialization Codes
+    #region ApiKeyPathSegment Compilation Codes
     /// <summary>
     ///     An <see cref="ApiKeyPath"/> segment's CLR property name is null, empty, or whitespace.
     /// </summary>
@@ -149,7 +149,7 @@ public enum ApiInitializationCode
     ApiKeyPathSegmentUnresolvedApiProperty,
     #endregion
 
-    #region ApiKeyType and ApiNamedKeyType Initialization Codes
+    #region ApiKeyType and ApiNamedKeyType Compilation Codes
     /// <summary>
     ///     An <see cref="ApiKeyType"/> has no key paths defined. At least one <see cref="ApiKeyPath"/> is required.
     /// </summary>
@@ -163,7 +163,7 @@ public enum ApiInitializationCode
     ApiNamedKeyTypeInvalidApiName,
     #endregion
 
-    #region ApiNamedType Initialization Codes
+    #region ApiNamedType Compilation Codes
     /// <summary>
     ///     The named type's API name is null, empty, or whitespace.
     /// </summary>
@@ -171,7 +171,7 @@ public enum ApiInitializationCode
     ApiNamedTypeInvalidApiName,
     #endregion
 
-    #region ApiObjectType Initialization Codes
+    #region ApiObjectType Compilation Codes
     /// <summary>
     ///     Multiple key types have the same API name.
     /// </summary>
@@ -203,7 +203,7 @@ public enum ApiInitializationCode
     ApiObjectTypeInvalidApiKeyNullHandling,
     #endregion
 
-    #region ApiProperty Initialization Codes
+    #region ApiProperty Compilation Codes
     /// <summary>
     ///     The property's API name is null, empty, or whitespace.
     /// </summary>
@@ -285,7 +285,7 @@ public enum ApiInitializationCode
     ApiPropertyOptionalNonNullableMismatch,
     #endregion
 
-    #region ApiRelationship Initialization Codes
+    #region ApiRelationship Compilation Codes
     /// <summary>
     ///     The relationship's API name is null, empty, or whitespace.
     /// </summary>
@@ -311,7 +311,7 @@ public enum ApiInitializationCode
     ApiRelationshipNullDependentEnd,
     #endregion
 
-    #region ApiRelationshipElement Initialization Codes
+    #region ApiRelationshipElement Compilation Codes
     /// <summary>
     ///     The relationship element's CLR object type is null.
     /// </summary>
@@ -325,7 +325,7 @@ public enum ApiInitializationCode
     ApiRelationshipElementUnresolvedObjectType,
     #endregion
 
-    #region ApiRelationshipEnd Initialization Codes
+    #region ApiRelationshipEnd Compilation Codes
     /// <summary>
     ///     The principal end's explicitly referenced principal key type could not be resolved.
     /// </summary>
@@ -339,7 +339,7 @@ public enum ApiInitializationCode
     ApiRelationshipEndPrincipalKeyWithoutForeignKey,
     #endregion
 
-    #region ApiRelationshipManyToMany Initialization Codes
+    #region ApiRelationshipManyToMany Compilation Codes
     /// <summary>
     ///     The many-to-many relationship's principal end A is null.
     /// </summary>
@@ -373,7 +373,7 @@ public enum ApiInitializationCode
     ApiRelationshipManyToManyInvalidAssociationKeyPathsBCount,
     #endregion
 
-    #region ApiRelationshipOneTo Initialization Codes
+    #region ApiRelationshipOneTo Compilation Codes
     /// <summary>
     ///     The number of scalar leaves in the dependent end's key paths does not match
     ///     the number of scalar leaves in the principal end's key type in either
@@ -398,7 +398,7 @@ public enum ApiInitializationCode
     ApiRelationshipIncompatiblePrincipalForeignKey,
     #endregion
 
-    #region ApiSchemaElement Initialization Codes
+    #region ApiSchemaElement Compilation Codes
     /// <summary>
     ///     The same schema element instance appears in more than one structural ownership position
     ///     or schema tree.
@@ -413,7 +413,7 @@ public enum ApiInitializationCode
     ApiSchemaElementOwnershipCycle,
     #endregion
 
-    #region ApiSchema Initialization Codes
+    #region ApiSchema Compilation Codes
     /// <summary>
     ///     Multiple enum types have the same API name.
     /// </summary>
@@ -499,7 +499,7 @@ public enum ApiInitializationCode
     ApiSchemaExtensionInvalidSnapshot,
     #endregion
 
-    #region ApiTypeExpression Initialization Codes
+    #region ApiTypeExpression Compilation Codes
     /// <summary>
     ///     A type expression's API kind could not be read from schema JSON.
     /// </summary>
@@ -507,7 +507,7 @@ public enum ApiInitializationCode
     ApiTypeExpressionInvalidApiKind,
     #endregion
 
-    #region ApiType Initialization Codes
+    #region ApiType Compilation Codes
     /// <summary>
     ///     The type's CLR type is null.
     /// </summary>
@@ -515,7 +515,7 @@ public enum ApiInitializationCode
     ApiTypeNullClrType,
     #endregion
 
-    #region ApiConfiguration Initialization Codes
+    #region ApiConfiguration Compilation Codes
     /// <summary>
     ///     A discovered configuration could not be activated.
     /// </summary>
@@ -529,7 +529,7 @@ public enum ApiInitializationCode
     ApiConfigurationExecutionFailed,
     #endregion
 
-    #region ApiAssembly Initialization Codes
+    #region ApiAssembly Compilation Codes
     /// <summary>
     ///     Assembly type discovery failed while scanning an assembly or evaluating a candidate
     ///     filter.
@@ -538,7 +538,7 @@ public enum ApiInitializationCode
     ApiAssemblyDiscoveryFailed,
     #endregion
 
-    #region ApiAnnotation Initialization Codes
+    #region ApiAnnotation Compilation Codes
     /// <summary>
     ///     An annotation reader threw while reading metadata for a schema target.
     /// </summary>

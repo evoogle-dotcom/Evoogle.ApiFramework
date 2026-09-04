@@ -21,7 +21,7 @@ public abstract class ApiRelationshipBuilder(string apiName, ApiRelationshipDele
 {
     #region Fields
     /// <summary>
-    ///     The delete behavior for the relationship, initialized to the default value for the relationship kind.
+    ///     The delete behavior for the relationship, defaulted according to the relationship kind.
     ///     Updated if the user calls <see cref="WithDeleteBehavior"/> on the concrete builder.
     ///     Used when building the final <see cref="ApiRelationship"/> instance.
     /// </summary>

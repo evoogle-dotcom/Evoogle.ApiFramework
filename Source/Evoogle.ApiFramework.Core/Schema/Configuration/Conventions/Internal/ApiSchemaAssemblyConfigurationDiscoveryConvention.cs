@@ -29,7 +29,7 @@ internal sealed class ApiSchemaAssemblyConfigurationDiscoveryConvention : IApiSc
 
     #region Constructors
     /// <summary>
-    ///     Initializes a new <see cref="ApiSchemaAssemblyConfigurationDiscoveryConvention"/> that scans the
+    ///     Creates a new <see cref="ApiSchemaAssemblyConfigurationDiscoveryConvention"/> that scans the
     ///     specified assembly.
     /// </summary>
     /// <param name="assembly">The assembly to scan for API configurations.</param>
@@ -119,7 +119,7 @@ internal sealed class ApiSchemaAssemblyConfigurationDiscoveryConvention : IApiSc
                 this.CreateIssue
                 (
                     configurationType,
-                    ApiInitializationCode.ApiConfigurationActivationFailed,
+                    ApiSchemaCompilationCode.ApiConfigurationActivationFailed,
                     $"The API configuration type '{configurationTypeName}' could not be activated.",
                     "Provide a public parameterless constructor.",
                     exception
@@ -229,7 +229,7 @@ internal sealed class ApiSchemaAssemblyConfigurationDiscoveryConvention : IApiSc
                 this.CreateIssue
                 (
                     configurationType,
-                    ApiInitializationCode.ApiConfigurationExecutionFailed,
+                    ApiSchemaCompilationCode.ApiConfigurationExecutionFailed,
                     $"The API configuration type '{configurationTypeName}' threw while configuring its " +
                     $"{configurationRole} role.",
                     "Correct the configuration identity or Configure implementation.",
@@ -239,19 +239,19 @@ internal sealed class ApiSchemaAssemblyConfigurationDiscoveryConvention : IApiSc
         }
     }
 
-    private ApiInitializationIssue CreateIssue
+    private ApiSchemaCompilationIssue CreateIssue
     (
         Type configurationType,
-        ApiInitializationCode code,
+        ApiSchemaCompilationCode code,
         string description,
         string remediation,
         Exception exception
     )
     {
-        return new ApiInitializationIssue
+        return new ApiSchemaCompilationIssue
         (
             GetTypeName(configurationType),
-            ApiInitializationSeverity.Warning,
+            ApiSchemaCompilationSeverity.Warning,
             code,
             description,
             remediation,

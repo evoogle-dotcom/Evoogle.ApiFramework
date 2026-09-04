@@ -45,7 +45,7 @@ public sealed partial class ApiProperty
         {
             var errorMessage =
                 $"Cannot get value for property '{this.ClrName}': no compiled getter available. " +
-                $"This may indicate the property does not exist on the target type, is write-only, or the schema was not initialized properly.";
+                $"This may indicate the property does not exist on the target type, is write-only, or the schema was not compiled properly.";
             throw new ApiSchemaException(errorMessage);
         }
 
@@ -151,7 +151,7 @@ public sealed partial class ApiProperty
         {
             var errorMessage =
                 $"Cannot set value for property '{this.ClrName}': no compiled setter available. " +
-                $"This property may be read-only, write-only (getter missing), not exist on the target type, or the schema was not initialized properly.";
+                $"This property may be read-only, write-only (getter missing), not exist on the target type, or the schema was not compiled properly.";
             throw new ApiSchemaException(errorMessage);
         }
 

@@ -619,14 +619,14 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     ///     Compiles the configured graph and returns validation issues without throwing for expected errors.
     /// </summary>
     /// <returns>The immutable schema build result.</returns>
-    public ApiSchemaBuildResult BuildResult() => this.BuildCore(null);
+    public ApiSchemaCompilationResult BuildResult() => this.BuildCore(null);
 
     /// <summary>
     ///     Compiles the configured graph while reporting structured build trace events.
     /// </summary>
     /// <param name="traceSink">The sink that receives trace events.</param>
     /// <returns>The immutable schema build result.</returns>
-    public ApiSchemaBuildResult BuildResult(IApiSchemaBuildTraceSink traceSink)
+    public ApiSchemaCompilationResult BuildResult(IApiSchemaBuildTraceSink traceSink)
     {
         ArgumentNullException.ThrowIfNull(traceSink);
 
@@ -634,7 +634,7 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
         return this.BuildCore(traceDispatcher);
     }
 
-    private ApiSchemaBuildResult BuildCore(ApiSchemaBuildTraceDispatcher? traceDispatcher)
+    private ApiSchemaCompilationResult BuildCore(ApiSchemaBuildTraceDispatcher? traceDispatcher)
     {
         _context.ResetConfigurationIssues();
         _state.AnnotationReaderSet?.ResetIssues();
@@ -708,7 +708,7 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
             (
                 new ApiSchemaBuildPhaseStartedEvent
                 {
-                    Phase = ApiSchemaBuildPhase.Initialization,
+                    Phase = ApiSchemaBuildPhase.Compilation,
                     Iteration = 0,
                     Target = new(ApiSchemaBuildTargetKind.Schema),
                 }
@@ -717,24 +717,52 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
             var annotationIssues = _state.AnnotationReaderSet?.Issues;
             var configurationIssues = _context.ConfigurationIssues;
             var preliminaryIssues = (annotationIssues ?? []).Concat(configurationIssues);
-            var result = ApiSchemaCompiler.Compile(apiSchema, preliminaryIssues);
+            var result = ApiSchemaCompiler.Compile
+            (
+                apiSchema,
+                preliminaryIssues,
+                onFreezingStarted: () =>
+                {
+                    traceDispatcher?.Record
+                    (
+                        new ApiSchemaBuildPhaseCompletedEvent
+                        {
+                            Phase = ApiSchemaBuildPhase.Compilation,
+                            Iteration = 0,
+                            Target = new(ApiSchemaBuildTargetKind.Schema),
+                        }
+                    );
+                    traceDispatcher?.Record
+                    (
+                        new ApiSchemaBuildPhaseStartedEvent
+                        {
+                            Phase = ApiSchemaBuildPhase.Freezing,
+                            Iteration = 0,
+                            Target = new(ApiSchemaBuildTargetKind.Schema),
+                        }
+                    );
+                },
+                onFreezingCompleted: () =>
+                {
+                    traceDispatcher?.Record
+                    (
+                        new ApiSchemaBuildPhaseCompletedEvent
+                        {
+                            Phase = ApiSchemaBuildPhase.Freezing,
+                            Iteration = 0,
+                            Target = new(ApiSchemaBuildTargetKind.Schema),
+                        }
+                    );
+                }
+            );
 
             if (result.IsValid)
             {
-                traceDispatcher?.Record
-                (
-                    new ApiSchemaBuildPhaseCompletedEvent
-                    {
-                        Phase = ApiSchemaBuildPhase.Initialization,
-                        Iteration = 0,
-                        Target = new(ApiSchemaBuildTargetKind.Schema),
-                    }
-                );
                 traceDispatcher?.Record(new ApiSchemaBuildCompletedEvent());
             }
             else
             {
-                var exception = new Evoogle.ApiFramework.Exceptions.ApiSchemaInitializationException(result);
+                var exception = new Evoogle.ApiFramework.Exceptions.ApiSchemaCompilationException(result);
                 traceDispatcher?.Record
                 (
                     new ApiSchemaBuildFailedEvent

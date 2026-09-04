@@ -128,7 +128,7 @@ public sealed class Company
 
 /// <summary>
 ///     CLR type used to test ApiPropertyRequiredNullableMismatch and ApiPropertyOptionalNonNullableMismatch
-///     initialization warnings by deliberately pairing nullable/non-nullable CLR members with mismatched API modifiers.
+///     compilation warnings by deliberately pairing nullable/non-nullable CLR members with mismatched API modifiers.
 /// </summary>
 public sealed class NullabilityMismatch
 {
@@ -141,7 +141,7 @@ public sealed class NullabilityMismatch
 
 /// <summary>
 ///     CLR type used to test ApiCollectionItemRequiredNullableMismatch and
-///     ApiCollectionItemOptionalNonNullableMismatch initialization warnings by deliberately
+///     ApiCollectionItemOptionalNonNullableMismatch compilation warnings by deliberately
 ///     pairing nullable/non-nullable CLR collection element types with mismatched API item modifiers.
 /// </summary>
 public sealed class CollectionNullabilityMismatch

@@ -46,7 +46,7 @@ public sealed class ApiTypeExpression
 
     /// <summary>
     ///     Gets the inline type definition, if any.
-    ///     Inline scalar, enum, object, and collection types are owned and initialized in place.
+    ///     Inline scalar, enum, object, and collection types are owned and compiled in place.
     /// </summary>
     public ApiType? ApiInlineType { get; }
 
@@ -56,7 +56,7 @@ public sealed class ApiTypeExpression
     /// <exception cref="ApiSchemaException">
     ///     Thrown if the expression has not been resolved yet.
     /// </exception>
-    public ApiType ApiType => this.ThrowIfNotInitialized(_apiResolvedType);
+    public ApiType ApiType => this.RequireValue(_apiResolvedType);
 
     internal void MarkInvalidApiKind() => _hasInvalidApiKind = true;
     #endregion
@@ -90,13 +90,13 @@ public sealed class ApiTypeExpression
 
     #region Constructors
     /// <summary>
-    ///     Initializes an inline type expression (e.g., a collection declared in-place).
+    ///     Creates an inline type expression (e.g., a collection declared in-place).
     /// </summary>
     /// <param name="apiInlineType">The API type instance used directly by this expression.</param>
     public ApiTypeExpression(ApiType apiInlineType) => this.ApiInlineType = apiInlineType;
 
     /// <summary>
-    ///     Initializes an API named reference to a declared API type within a schema.
+    ///     Creates an API named reference to a declared API type within a schema.
     /// </summary>
     /// <param name="apiKind">The expected kind of the referenced API type.</param>
     /// <param name="apiName">The name of the API type to be resolved in the schema.</param>
@@ -107,13 +107,13 @@ public sealed class ApiTypeExpression
     }
 
     /// <summary>
-    ///     Initializes a CLR typed reference to a declared API type within a schema.
+    ///     Creates a CLR typed reference to a declared API type within a schema.
     /// </summary>
     /// <param name="clrType">The CLR type to be resolved in the schema.</param>
     public ApiTypeExpression(Type clrType) => this.ClrType = TypeReflection.IsNullableType(clrType) ? Nullable.GetUnderlyingType(clrType) : clrType;
 
     /// <summary>
-    ///     Initializes either an API named reference or a CLR typed reference to a declared API type within a schema.
+    ///     Creates either an API named reference or a CLR typed reference to a declared API type within a schema.
     /// </summary>
     /// <param name="apiKind">The expected kind of the referenced API type.</param>
     /// <param name="apiName">The name of the API type to be resolved in the schema.</param>
@@ -127,20 +127,30 @@ public sealed class ApiTypeExpression
     #endregion
 
     #region ApiTypeExpression Methods
-    internal void InitializeForCollection(ApiInitializationContext context)
+    internal void ResolveForCollection(ApiSchemaCompilationContext context)
     {
-        this.Initialize(context, ApiInitializationCode.ApiCollectionTypeUnresolvedItemType, nameof(ApiCollectionType.ApiItemType));
+        this.Resolve
+        (
+            context,
+            ApiSchemaCompilationCode.ApiCollectionTypeUnresolvedItemType,
+            nameof(ApiCollectionType.ApiItemType)
+        );
     }
 
-    internal void InitializeForProperty(ApiInitializationContext context)
+    internal void ResolveForProperty(ApiSchemaCompilationContext context)
     {
-        this.Initialize(context, ApiInitializationCode.ApiPropertyUnresolvedType, nameof(ApiProperty.ApiType));
+        this.Resolve
+        (
+            context,
+            ApiSchemaCompilationCode.ApiPropertyUnresolvedType,
+            nameof(ApiProperty.ApiType)
+        );
     }
 
-    private void Initialize
+    private void Resolve
     (
-        ApiInitializationContext context,
-        ApiInitializationCode parentUnresolvedCode,
+        ApiSchemaCompilationContext context,
+        ApiSchemaCompilationCode parentUnresolvedCode,
         string parentUnresolvedName
     )
     {
@@ -148,8 +158,8 @@ public sealed class ApiTypeExpression
 
         if (_hasInvalidApiKind)
         {
-            var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.ApiTypeExpressionInvalidApiKind;
+            var severity = ApiSchemaCompilationSeverity.Error;
+            var code = ApiSchemaCompilationCode.ApiTypeExpressionInvalidApiKind;
             var description = $"{nameof(this.ApiKind)} must be a valid {nameof(ApiTypeKind)} value";
             var remediation = $"Specify a valid {nameof(this.ApiKind)} value";
 
@@ -163,22 +173,22 @@ public sealed class ApiTypeExpression
         // - CLR type reference
         if (this.IsInline)
         {
-            this.InitializeApiTypeByInline(context);
+            this.ResolveApiTypeByInline(context);
             return;
         }
         else if (this.IsApiNamedReference)
         {
-            this.InitializeApiTypeByApiNamedReference(context, parentUnresolvedCode, parentUnresolvedName);
+            this.ResolveApiTypeByApiNamedReference(context, parentUnresolvedCode, parentUnresolvedName);
             return;
         }
         else if (this.IsClrTypeReference)
         {
-            this.InitializeApiTypeByClrTypeReference(context, parentUnresolvedCode, parentUnresolvedName);
+            this.ResolveApiTypeByClrTypeReference(context, parentUnresolvedCode, parentUnresolvedName);
             return;
         }
         else
         {
-            var severity = ApiInitializationSeverity.Error;
+            var severity = ApiSchemaCompilationSeverity.Error;
             var code = parentUnresolvedCode;
             var description = $"{parentUnresolvedName} could not be resolved because none of the following are set: {nameof(this.ApiInlineType)}, a valid combination of {nameof(this.ApiKind)} and {nameof(this.ApiName)}, or {nameof(this.ClrType)}";
             var remediation = $"Specify either {nameof(this.ApiInlineType)}, a valid combination of {nameof(this.ApiKind)} and {nameof(this.ApiName)}, or {nameof(this.ClrType)}";
@@ -227,10 +237,10 @@ public sealed class ApiTypeExpression
     #endregion
 
     #region Implementation Methods
-    private void InitializeApiTypeByApiNamedReference
+    private void ResolveApiTypeByApiNamedReference
     (
-        ApiInitializationContext context,
-        ApiInitializationCode parentUnresolvedCode,
+        ApiSchemaCompilationContext context,
+        ApiSchemaCompilationCode parentUnresolvedCode,
         string parentUnresolvedName
     )
     {
@@ -253,7 +263,7 @@ public sealed class ApiTypeExpression
 
             case ApiTypeKind.Collection:
                 {
-                    var severity = ApiInitializationSeverity.Error;
+                    var severity = ApiSchemaCompilationSeverity.Error;
                     var code = parentUnresolvedCode;
                     var description = $"{parentUnresolvedName} could not be resolved for {nameof(this.ApiKind)}={this.ApiKind.SafeToString()} and {nameof(this.ApiName)}={this.ApiName.SafeToString()} because {nameof(ApiTypeKind.Collection)} types must be defined inline";
                     var remediation = $"Define the {nameof(ApiTypeKind.Collection)} type inline using {nameof(this.ApiInlineType)} instead of specifying {nameof(this.ApiKind)} and {nameof(this.ApiName)}";
@@ -268,7 +278,7 @@ public sealed class ApiTypeExpression
 
         if (_apiResolvedType is null)
         {
-            var severity = ApiInitializationSeverity.Error;
+            var severity = ApiSchemaCompilationSeverity.Error;
             var code = parentUnresolvedCode;
             var description = $"{parentUnresolvedName} could not be resolved for {nameof(this.ApiKind)}='{this.ApiKind.SafeToString()}' and {nameof(this.ApiName)}='{this.ApiName.SafeToString()}'";
             var remediation = $"Verify that a type is declared in the schema for {nameof(this.ApiKind)}='{this.ApiKind.SafeToString()}' and {nameof(this.ApiName)}='{this.ApiName.SafeToString()}'";
@@ -277,10 +287,10 @@ public sealed class ApiTypeExpression
         }
     }
 
-    private void InitializeApiTypeByClrTypeReference
+    private void ResolveApiTypeByClrTypeReference
     (
-        ApiInitializationContext context,
-        ApiInitializationCode parentUnresolvedCode,
+        ApiSchemaCompilationContext context,
+        ApiSchemaCompilationCode parentUnresolvedCode,
         string parentUnresolvedName
     )
     {
@@ -290,7 +300,7 @@ public sealed class ApiTypeExpression
 
         if (_apiResolvedType is null)
         {
-            var severity = ApiInitializationSeverity.Error;
+            var severity = ApiSchemaCompilationSeverity.Error;
             var code = parentUnresolvedCode;
             var description = $"{parentUnresolvedName} could not be resolved for {nameof(this.ClrType)}='{this.ClrType.SafeToName()}'";
             var remediation = $"Verify that a type is declared in the schema for {nameof(this.ClrType)}='{this.ClrType.SafeToName()}'";
@@ -298,10 +308,10 @@ public sealed class ApiTypeExpression
         }
     }
 
-    private void InitializeApiTypeByInline(ApiInitializationContext context)
+    private void ResolveApiTypeByInline(ApiSchemaCompilationContext context)
     {
         _apiResolvedType = this.ApiInlineType;
-        this.ApiInlineType!.Initialize(context);
+        this.ApiInlineType!.Compile(context);
     }
     #endregion
 }

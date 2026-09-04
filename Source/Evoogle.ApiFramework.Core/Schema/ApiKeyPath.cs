@@ -67,19 +67,19 @@ public sealed class ApiKeyPath(Type? clrRootType, IEnumerable<ApiKeyPathSegment>
     ///     Gets the root <see cref="ApiObjectType"/> from which the segment chain begins.
     ///     Available after compilation.
     /// </summary>
-    public ApiObjectType ApiRootObjectType => this.ThrowIfNotInitialized(_apiRootObjectType);
+    public ApiObjectType ApiRootObjectType => this.RequireValue(_apiRootObjectType);
 
     /// <summary>
     ///     Gets the CLR type from which the navigation chain of this key path begins.
     ///     Available immediately when supplied explicitly; otherwise available after compilation.
     /// </summary>
-    public Type ClrRootType => this.ThrowIfNotInitialized(_clrRootType);
+    public Type ClrRootType => this.RequireValue(_clrRootType);
 
     internal string? ApiPathLabel
     {
         get
         {
-            // this.Parent is available before InitializeCore backfills _clrRootType, so the path
+            // this.Parent is available before CompileCore backfills _clrRootType, so the path
             // label must resolve the same effective type here to stay stable once compiled.
             var effectiveClrRootType = _clrRootType ?? this.GetOwningDefaultClrRootType();
             return effectiveClrRootType is null
@@ -123,11 +123,11 @@ public sealed class ApiKeyPath(Type? clrRootType, IEnumerable<ApiKeyPathSegment>
     }
 
     /// <inheritdoc/>
-    internal override void InitializeCore(ApiInitializationContext context)
+    internal override void CompileCore(ApiSchemaCompilationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        base.InitializeCore(context);
+        base.CompileCore(context);
 
         this.ValidateSegmentsNonEmpty(context);
         this.ResolveRootObjectType(context);
@@ -143,7 +143,7 @@ public sealed class ApiKeyPath(Type? clrRootType, IEnumerable<ApiKeyPathSegment>
     #endregion
 
     #region Implementation Methods
-    private void ResolveRootObjectType(ApiInitializationContext context)
+    private void ResolveRootObjectType(ApiSchemaCompilationContext context)
     {
         if (this.ApiSegments.Length == 0)
         {
@@ -153,8 +153,8 @@ public sealed class ApiKeyPath(Type? clrRootType, IEnumerable<ApiKeyPathSegment>
         var effectiveClrRootType = _clrRootType ?? this.GetOwningDefaultClrRootType();
         if (effectiveClrRootType is null)
         {
-            var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.ApiKeyPathUninferableRootType;
+            var severity = ApiSchemaCompilationSeverity.Error;
+            var code = ApiSchemaCompilationCode.ApiKeyPathUninferableRootType;
             var description = $"{nameof(this.ClrRootType)} was not specified and no owning {nameof(ApiObjectType)} or {nameof(ApiRelationshipElement)} could supply a default";
             var remediation = $"Specify an explicit {nameof(this.ClrRootType)} when creating this {nameof(ApiKeyPath)}";
 
@@ -168,8 +168,8 @@ public sealed class ApiKeyPath(Type? clrRootType, IEnumerable<ApiKeyPathSegment>
         if (rootObjectType is null &&
             !context.ApiSchema.TryGetObjectTypeByClrType(effectiveClrRootType, out rootObjectType))
         {
-            var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.ApiKeyPathUnresolvedRootType;
+            var severity = ApiSchemaCompilationSeverity.Error;
+            var code = ApiSchemaCompilationCode.ApiKeyPathUnresolvedRootType;
             var description = $"Root CLR type '{effectiveClrRootType.Name}' is not registered as an {nameof(ApiObjectType)} in the schema";
             var remediation = $"Add an {nameof(ApiObjectType)} for '{effectiveClrRootType.Name}' to the schema, or correct the root CLR type";
 
@@ -177,7 +177,7 @@ public sealed class ApiKeyPath(Type? clrRootType, IEnumerable<ApiKeyPathSegment>
             return;
         }
 
-        this.InitializeSegmentChain(rootObjectType, context);
+        this.CompileSegmentChain(rootObjectType, context);
     }
 
     private ApiObjectType? GetOwningObjectType(Type effectiveClrRootType)
@@ -202,22 +202,22 @@ public sealed class ApiKeyPath(Type? clrRootType, IEnumerable<ApiKeyPathSegment>
         };
     }
 
-    private void ValidateSegmentsNonEmpty(ApiInitializationContext context)
+    private void ValidateSegmentsNonEmpty(ApiSchemaCompilationContext context)
     {
         if (this.ApiSegments.Length > 0)
         {
             return;
         }
 
-        var severity = ApiInitializationSeverity.Error;
-        var code = ApiInitializationCode.ApiKeyPathEmptySegments;
+        var severity = ApiSchemaCompilationSeverity.Error;
+        var code = ApiSchemaCompilationCode.ApiKeyPathEmptySegments;
         var description = $"{nameof(this.ApiSegments)} must contain at least one property name";
         var remediation = $"Specify at least one CLR property name when creating an {nameof(ApiKeyPath)}";
 
         context.AddIssue(severity, code, description, remediation);
     }
 
-    private void InitializeSegmentChain(ApiObjectType rootObjectType, ApiInitializationContext context)
+    private void CompileSegmentChain(ApiObjectType rootObjectType, ApiSchemaCompilationContext context)
     {
         _apiRootObjectType = rootObjectType;
 
@@ -226,16 +226,16 @@ public sealed class ApiKeyPath(Type? clrRootType, IEnumerable<ApiKeyPathSegment>
             var segment = this.ApiSegments[i];
             var isLast = i == this.ApiSegments.Length - 1;
 
-            var location = ApiInitializationLocation.ForIndexedLabel
+            var location = ApiSchemaCompilationLocation.ForIndexedLabel
             (
                 i,
                 segment.ClrPropertyName
             );
-            segment.Initialize(context, location);
+            segment.Compile(context, location);
 
             if (!segment.IsPropertyResolved)
             {
-                // Error already reported in segment.Initialize; bail the chain.
+                // Error already reported in segment.Compile; bail the chain.
                 return;
             }
 
@@ -243,7 +243,7 @@ public sealed class ApiKeyPath(Type? clrRootType, IEnumerable<ApiKeyPathSegment>
 
             if (!apiProperty.IsResolved)
             {
-                // The property's type expression already reported an initialization issue.
+                // The property's type expression already reported an compilation issue.
                 return;
             }
 
@@ -252,8 +252,8 @@ public sealed class ApiKeyPath(Type? clrRootType, IEnumerable<ApiKeyPathSegment>
                 if (apiProperty.ApiType is not ApiScalarType)
                 {
                     var path = segment.ApiPath;
-                    var severity = ApiInitializationSeverity.Error;
-                    var code = ApiInitializationCode.ApiKeyPathScalarSegmentInvalidType;
+                    var severity = ApiSchemaCompilationSeverity.Error;
+                    var code = ApiSchemaCompilationCode.ApiKeyPathScalarSegmentInvalidType;
                     var description = $"Terminal segment property '{segment.ClrPropertyName}' must resolve to a scalar type; found '{apiProperty.ApiType.GetType().Name}'";
                     var remediation = $"Change the terminal property to a scalar-typed property or remove extra navigation segments";
 
@@ -265,8 +265,8 @@ public sealed class ApiKeyPath(Type? clrRootType, IEnumerable<ApiKeyPathSegment>
                 if (apiProperty.ApiType is not ApiObjectType nestedObjectType)
                 {
                     var path = segment.ApiPath;
-                    var severity = ApiInitializationSeverity.Error;
-                    var code = ApiInitializationCode.ApiKeyPathNavigationSegmentInvalidType;
+                    var severity = ApiSchemaCompilationSeverity.Error;
+                    var code = ApiSchemaCompilationCode.ApiKeyPathNavigationSegmentInvalidType;
                     var description = $"Navigation segment property '{segment.ClrPropertyName}' must resolve to an object type; found '{apiProperty.ApiType.GetType().Name}'";
                     var remediation = $"Change the navigation property to an object-typed property or restructure the path segments";
 

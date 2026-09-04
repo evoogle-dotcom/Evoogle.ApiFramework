@@ -76,25 +76,25 @@ public abstract class ApiRelationship : ApiSchemaElement
         => ApiSchemaPathFormatting.BuildPath(apiBasePath: apiPreviousPath, apiPathSegment: this.ApiElementName, apiPathSegmentName: this.ApiName);
 
     /// <inheritdoc/>
-    internal override void InitializeCore(ApiInitializationContext context)
+    internal override void CompileCore(ApiSchemaCompilationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        base.InitializeCore(context);
+        base.CompileCore(context);
 
-        this.InitializeApiName(context);
-        this.InitializeApiDeleteBehavior(context);
+        this.ValidateApiName(context);
+        this.ValidateApiDeleteBehavior(context);
     }
     #endregion
 
     #region Implementation Methods
-    private void InitializeApiName(ApiInitializationContext context)
+    private void ValidateApiName(ApiSchemaCompilationContext context)
     {
         var isApiNameInvalid = ApiSchemaNameValidation.IsNameInvalid(this.ApiName);
         if (isApiNameInvalid)
         {
-            var severity = ApiInitializationSeverity.Error;
-            var code = ApiInitializationCode.ApiRelationshipInvalidApiName;
+            var severity = ApiSchemaCompilationSeverity.Error;
+            var code = ApiSchemaCompilationCode.ApiRelationshipInvalidApiName;
             var description = $"{nameof(this.ApiName)} must not be null, empty, or whitespace";
             var remediation = $"Specify a valid {nameof(this.ApiName)} value";
 
@@ -102,15 +102,15 @@ public abstract class ApiRelationship : ApiSchemaElement
         }
     }
 
-    private void InitializeApiDeleteBehavior(ApiInitializationContext context)
+    private void ValidateApiDeleteBehavior(ApiSchemaCompilationContext context)
     {
         if (!_hasInvalidApiDeleteBehavior)
         {
             return;
         }
 
-        var severity = ApiInitializationSeverity.Error;
-        var code = ApiInitializationCode.ApiRelationshipInvalidApiDeleteBehavior;
+        var severity = ApiSchemaCompilationSeverity.Error;
+        var code = ApiSchemaCompilationCode.ApiRelationshipInvalidApiDeleteBehavior;
         var description = $"{nameof(this.ApiDeleteBehavior)} must be a valid {nameof(ApiRelationshipDeleteBehavior)} value";
         var remediation = $"Specify a valid {nameof(this.ApiDeleteBehavior)} value";
 

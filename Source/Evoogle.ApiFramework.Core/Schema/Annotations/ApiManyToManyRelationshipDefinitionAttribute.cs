@@ -19,14 +19,14 @@ public sealed class ApiManyToManyRelationshipDefinitionAttribute : ApiNamedEleme
     #endregion
 
     #region Properties
-    /// <summary>Gets or initializes the schema-unique API name of the relationship.</summary>
+    /// <summary>Gets the the schema-unique API name of the relationship.</summary>
     public new required string ApiName
     {
         get => base.ApiName!;
         init => base.ApiName = RequireApiName(value);
     }
 
-    /// <summary>Gets or initializes the CLR type of the first principal end.</summary>
+    /// <summary>Gets the the CLR type of the first principal end.</summary>
     public required Type PrincipalTypeA
     {
         get => this._principalTypeA;
@@ -37,7 +37,7 @@ public sealed class ApiManyToManyRelationshipDefinitionAttribute : ApiNamedEleme
         }
     }
 
-    /// <summary>Gets or initializes the CLR type of the second principal end.</summary>
+    /// <summary>Gets the the CLR type of the second principal end.</summary>
     public required Type PrincipalTypeB
     {
         get => this._principalTypeB;
@@ -48,7 +48,7 @@ public sealed class ApiManyToManyRelationshipDefinitionAttribute : ApiNamedEleme
         }
     }
 
-    /// <summary>Gets or initializes the CLR type of the association (join) entity.</summary>
+    /// <summary>Gets the the CLR type of the association (join) entity.</summary>
     public required Type AssociationType
     {
         get => this._associationType;
@@ -60,12 +60,12 @@ public sealed class ApiManyToManyRelationshipDefinitionAttribute : ApiNamedEleme
     }
 
     /// <summary>
-    ///     Gets or initializes the CLR property name on <see cref="AssociationType"/> that holds the foreign key back to <see cref="PrincipalTypeA"/>.
+    ///     Gets the the CLR property name on <see cref="AssociationType"/> that holds the foreign key back to <see cref="PrincipalTypeA"/>.
     /// </summary>
     public string? ForeignKeyA { get; init; }
 
     /// <summary>
-    ///     Gets or initializes the CLR property name on <see cref="AssociationType"/> that holds the foreign key back to <see cref="PrincipalTypeB"/>.
+    ///     Gets the the CLR property name on <see cref="AssociationType"/> that holds the foreign key back to <see cref="PrincipalTypeB"/>.
     /// </summary>
     public string? ForeignKeyB { get; init; }
     #endregion

@@ -117,7 +117,7 @@ public class ApiEnumTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
             return null;
         }
 
-        // Explicit entries take precedence; convention-vs-convention ordinal collisions propagate to initialization.
+        // Explicit entries take precedence; convention-vs-convention ordinal collisions propagate to compilation.
         if (_state.Values.Any(builder => builder.ClrOrdinal == clrOrdinal && builder.ApiNameSource == ApiConfigurationSource.Explicit))
         {
             this.Context.TraceStructuralRegistration

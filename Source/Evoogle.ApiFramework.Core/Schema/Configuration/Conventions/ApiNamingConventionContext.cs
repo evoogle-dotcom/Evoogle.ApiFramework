@@ -13,7 +13,7 @@ public sealed class ApiNamingConventionContext
 {
     #region Constructors
     /// <summary>
-    ///     Initializes a naming convention context for a schema type or property.
+    ///     Creates a naming convention context for a schema type or property.
     /// </summary>
     /// <param name="target">The schema element kind whose API name is being produced.</param>
     /// <param name="clrType">The CLR type associated with the naming target.</param>
@@ -37,7 +37,7 @@ public sealed class ApiNamingConventionContext
     }
 
     /// <summary>
-    ///     Initializes a naming convention context that can carry property or enum-value
+    ///     Creates a naming convention context that can carry property or enum-value
     ///     convention metadata.
     /// </summary>
     /// <param name="target">The schema element kind whose API name is being produced.</param>

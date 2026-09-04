@@ -15,7 +15,7 @@ internal sealed class ApiAnnotationReaderSet
 {
     #region Fields
     private readonly IReadOnlyList<IApiAnnotationReader> _readers;
-    private readonly List<ApiInitializationIssue> _issues = [];
+    private readonly List<ApiSchemaCompilationIssue> _issues = [];
     #endregion
 
     #region Constructors
@@ -28,7 +28,7 @@ internal sealed class ApiAnnotationReaderSet
     #region Properties
     internal IReadOnlyList<IApiAnnotationReader> Readers => _readers;
 
-    internal IReadOnlyList<ApiInitializationIssue> Issues => _issues;
+    internal IReadOnlyList<ApiSchemaCompilationIssue> Issues => _issues;
 
     internal void ResetIssues()
     {
@@ -470,7 +470,7 @@ internal sealed class ApiAnnotationReaderSet
                         resultType.FullName ?? resultType.Name,
                         [new
                         (
-                            ApiInitializationCode.ApiAnnotationTypeDiscoveryConflict,
+                            ApiSchemaCompilationCode.ApiAnnotationTypeDiscoveryConflict,
                             resultType.FullName ?? resultType.Name,
                             "The CLR type was already discovered as an " +
                             $"API {existingDiscovery.ApiKind} " +
@@ -595,7 +595,7 @@ internal sealed class ApiAnnotationReaderSet
                     builder.ClrType,
                     $"Key:{apiName}",
                     $"Multiple annotation key paths use order {duplicateOrder.Key}. Key path orders must be unique.",
-                    ApiInitializationCode.ApiAnnotationKeyOrderConflict
+                    ApiSchemaCompilationCode.ApiAnnotationKeyOrderConflict
                 );
             }
 
@@ -982,14 +982,14 @@ internal sealed class ApiAnnotationReaderSet
                 continue;
             }
 
-            if (!Enum.IsDefined(typeof(ApiInitializationCode), diagnostic.Code))
+            if (!Enum.IsDefined(typeof(ApiSchemaCompilationCode), diagnostic.Code))
             {
                 this.AddInvalidContributionIssue
                 (
                     reader,
                     defaultApiPath,
                     "An annotation reader returned a diagnostic with an undefined " +
-                    "initialization code."
+                    "compilation code."
                 );
                 continue;
             }
@@ -1008,7 +1008,7 @@ internal sealed class ApiAnnotationReaderSet
 
             _issues.Add
             (
-                new ApiInitializationIssue
+                new ApiSchemaCompilationIssue
                 (
                     diagnostic.ApiPath,
                     diagnostic.Severity,
@@ -1043,11 +1043,11 @@ internal sealed class ApiAnnotationReaderSet
     {
         _issues.Add
         (
-            new ApiInitializationIssue
+            new ApiSchemaCompilationIssue
             (
                 apiPath,
-                ApiInitializationSeverity.Error,
-                ApiInitializationCode.ApiAnnotationReaderExecutionFailed,
+                ApiSchemaCompilationSeverity.Error,
+                ApiSchemaCompilationCode.ApiAnnotationReaderExecutionFailed,
                 exception.Message,
                 "Correct the annotation reader implementation or its input metadata.",
                 reader.GetType(),
@@ -1067,7 +1067,7 @@ internal sealed class ApiAnnotationReaderSet
             reader,
             clrType.FullName ?? clrType.Name,
             description,
-            ApiInitializationCode.ApiAnnotationInvalidContribution
+            ApiSchemaCompilationCode.ApiAnnotationInvalidContribution
         );
 
     private void AddInvalidContributionIssue
@@ -1082,7 +1082,7 @@ internal sealed class ApiAnnotationReaderSet
             reader,
             $"{clrType.FullName ?? clrType.Name}.{memberName}",
             description,
-            ApiInitializationCode.ApiAnnotationInvalidContribution
+            ApiSchemaCompilationCode.ApiAnnotationInvalidContribution
         );
 
     private void AddInvalidContributionIssue
@@ -1091,7 +1091,7 @@ internal sealed class ApiAnnotationReaderSet
         Type clrType,
         string memberName,
         string description,
-        ApiInitializationCode code
+        ApiSchemaCompilationCode code
     )
         => this.AddInvalidContributionIssue
         (
@@ -1106,15 +1106,15 @@ internal sealed class ApiAnnotationReaderSet
         IApiAnnotationReader reader,
         string apiPath,
         string description,
-        ApiInitializationCode code = ApiInitializationCode.ApiAnnotationInvalidContribution
+        ApiSchemaCompilationCode code = ApiSchemaCompilationCode.ApiAnnotationInvalidContribution
     )
     {
         _issues.Add
         (
-            new ApiInitializationIssue
+            new ApiSchemaCompilationIssue
             (
                 apiPath,
-                ApiInitializationSeverity.Error,
+                ApiSchemaCompilationSeverity.Error,
                 code,
                 description,
                 "Return a valid declarative annotation result for the supplied target.",

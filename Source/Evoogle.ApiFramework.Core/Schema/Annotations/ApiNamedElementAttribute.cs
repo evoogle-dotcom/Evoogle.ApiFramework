@@ -12,7 +12,7 @@ public abstract class ApiNamedElementAttribute : Attribute
 {
     #region Properties
     /// <summary>
-    ///     Gets or initializes the API name for the annotated schema element.
+    ///     Gets the the API name for the annotated schema element.
     ///     When <c>null</c>, the applicable naming convention supplies the name.
     /// </summary>
     public string? ApiName { get; protected init; }

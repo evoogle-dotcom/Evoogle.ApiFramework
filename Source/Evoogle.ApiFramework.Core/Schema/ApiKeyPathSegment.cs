@@ -40,7 +40,7 @@ public sealed class ApiKeyPathSegment(string clrPropertyName) : ApiSchemaElement
     public string ClrPropertyName { get; } = clrPropertyName;
 
     /// <summary>Gets the resolved <see cref="ApiProperty"/> for this segment. Available after compilation.</summary>
-    public ApiProperty ApiProperty => this.ThrowIfNotInitialized(_apiResolvedProperty);
+    public ApiProperty ApiProperty => this.RequireValue(_apiResolvedProperty);
 
     /// <summary>Gets a value indicating whether the CLR property was successfully resolved during compilation.</summary>
     internal bool IsPropertyResolved => _apiResolvedProperty is not null;
@@ -63,34 +63,34 @@ public sealed class ApiKeyPathSegment(string clrPropertyName) : ApiSchemaElement
         => ApiSchemaPathFormatting.BuildPath(apiBasePath: apiPreviousPath, apiPathSegment: this.ApiElementName, apiPathSegmentName: this.ClrPropertyName);
 
     /// <inheritdoc/>
-    internal override void InitializeCore(ApiInitializationContext context)
+    internal override void CompileCore(ApiSchemaCompilationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
 
-        base.InitializeCore(context);
+        base.CompileCore(context);
 
-        this.InitializeClrPropertyName(context);
-        this.InitializeApiProperty(context);
+        this.ValidateClrPropertyName(context);
+        this.ResolveApiProperty(context);
     }
     #endregion
 
     #region Implementation Methods
-    private void InitializeClrPropertyName(ApiInitializationContext context)
+    private void ValidateClrPropertyName(ApiSchemaCompilationContext context)
     {
         if (!ApiSchemaNameValidation.IsNameInvalid(this.ClrPropertyName))
         {
             return;
         }
 
-        var severity = ApiInitializationSeverity.Error;
-        var code = ApiInitializationCode.ApiKeyPathSegmentInvalidClrPropertyName;
+        var severity = ApiSchemaCompilationSeverity.Error;
+        var code = ApiSchemaCompilationCode.ApiKeyPathSegmentInvalidClrPropertyName;
         var description = $"{nameof(this.ClrPropertyName)} must not be null, empty, or whitespace";
         var remediation = $"Specify a valid {nameof(this.ClrPropertyName)} value";
 
         context.AddIssue(severity, code, description, remediation);
     }
 
-    private void InitializeApiProperty(ApiInitializationContext context)
+    private void ResolveApiProperty(ApiSchemaCompilationContext context)
     {
         if (ApiSchemaNameValidation.IsNameInvalid(this.ClrPropertyName))
         {
@@ -108,8 +108,8 @@ public sealed class ApiKeyPathSegment(string clrPropertyName) : ApiSchemaElement
             return;
         }
 
-        var severity = ApiInitializationSeverity.Error;
-        var code = ApiInitializationCode.ApiKeyPathSegmentUnresolvedApiProperty;
+        var severity = ApiSchemaCompilationSeverity.Error;
+        var code = ApiSchemaCompilationCode.ApiKeyPathSegmentUnresolvedApiProperty;
         var description = $"Property with CLR name '{this.ClrPropertyName}' could not be "
             + $"found on object type '{apiObjectType.ApiName}'";
         var remediation = $"Verify the CLR property name or add a property with CLR name "
@@ -123,7 +123,7 @@ public sealed class ApiKeyPathSegment(string clrPropertyName) : ApiSchemaElement
         if (this.PreviousSibling is ApiKeyPathSegment precedingSegment)
         {
             return precedingSegment.ApiProperty.ApiType as ApiObjectType
-                ?? throw new ApiSchemaException("A key path navigation segment must resolve to an API object type before initializing its next segment.");
+                ?? throw new ApiSchemaException("A key path navigation segment must resolve to an API object type before compiling its next segment.");
         }
 
         if (this.PreviousSibling is not null)
