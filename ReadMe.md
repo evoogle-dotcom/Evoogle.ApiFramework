@@ -10,6 +10,34 @@ TBD: Need a high-level description.
 
 - **Schema**. Library that represents an API schema where a schema defines a type system that describes what data can be queried or mutated from an API.
 
+### Declarative POCO Models
+
+Reference `Evoogle.ApiFramework.Annotations` from a POCO-only domain-model project when that
+project should declare API-schema metadata without depending on the schema runtime. Its public
+types share the root `Evoogle.ApiFramework` namespace:
+
+```csharp
+using Evoogle.ApiFramework;
+
+[ApiObject]
+public sealed class Customer
+{
+    [ApiKey]
+    public Guid Id { get; set; }
+
+    [ApiRelationship
+    (
+        ApiName = "CustomerOrders",
+        Kind = ApiRelationshipKind.OneToMany,
+        DeleteBehavior = ApiRelationshipDeleteBehavior.Delete
+    )]
+    public ICollection<Order> Orders { get; } = [];
+}
+```
+
+`Evoogle.ApiFramework` references the annotations package transitively and provides schema
+construction, discovery, validation, JSON, and runtime materialization.
+
 ### Configuring a Schema
 
 Use `ApiSchemaBuilder` when defining schemas in code. The fluent API is designed around familiar .NET patterns:

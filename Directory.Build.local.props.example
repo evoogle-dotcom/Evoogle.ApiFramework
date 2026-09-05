@@ -1,0 +1,5 @@
+﻿<Project>
+  <PropertyGroup>
+    <UseLocalEvoogleProjectReferences>true</UseLocalEvoogleProjectReferences>
+  </PropertyGroup>
+</Project>

@@ -1,4 +1,17 @@
 ﻿<Project>
+  <Import
+      Project="$(MSBuildThisFileDirectory)Directory.Build.evoogle-core.local.props"
+      Condition="Exists('$(MSBuildThisFileDirectory)Directory.Build.evoogle-core.local.props')" />
+  <Import
+      Project="$(MSBuildThisFileDirectory)Directory.Build.local.props"
+      Condition="Exists('$(MSBuildThisFileDirectory)Directory.Build.local.props')" />
+
+  <PropertyGroup>
+    <UseLocalEvoogleProjectReferences Condition="'$(UseLocalEvoogleProjectReferences)' == ''">
+      false
+    </UseLocalEvoogleProjectReferences>
+  </PropertyGroup>
+
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>

@@ -1,0 +1,819 @@
+﻿// Copyright (c) 2024-2025 Evoogle.com
+// SPDX-License-Identifier: MIT
+//
+// This file is licensed under the MIT License.
+// See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Schema.Configuration.Conventions;
+
+namespace Evoogle.ApiFramework.Schema.Configuration.Internal;
+
+/// <summary>
+///     Provides sample domain types and schema configurations used by internal examples and tests.
+/// </summary>
+internal static class Dummy
+{
+    /// <summary>
+    ///     Represents a lightweight value object that wraps a raw email address string.
+    /// </summary>
+    /// <param name="Email">The canonical email address value.</param>
+    public record struct EmailAddress(string Email)
+    {
+        /// <summary>Implicitly converts a <see cref="string"/> to an <see cref="EmailAddress"/> value object.</summary>
+        public static implicit operator EmailAddress(string address) => new(address);
+
+        /// <summary>Implicitly converts an <see cref="EmailAddress"/> value object to its underlying string.</summary>
+        public static implicit operator string(EmailAddress emailAddress) => emailAddress.Email;
+    }
+
+    /// <summary>
+    ///     Represents a country domain model that is used by the sample schema builder extensions.
+    /// </summary>
+    public class Country
+    {
+        /// <summary>Gets or sets the ISO country code.</summary>
+        public string Code { get; set; } = "us";
+    }
+
+    /// <summary>
+    ///     Represents a customer domain model that is used by the sample schema builder extensions.
+    /// </summary>
+    public class Customer
+    {
+        /// <summary>Gets or sets the unique customer identifier.</summary>
+        public Guid Id { get; set; }
+
+        /// <summary>Gets or sets the customer's country.</summary>
+        public Country Country { get; set; } = new Country();
+
+        /// <summary>Gets or sets the customer's display name.</summary>
+        public string Name { get; set; } = string.Empty;
+
+        /// <summary>Gets or sets the optional customer email address.</summary>
+        public EmailAddress? Email { get; set; }
+
+        /// <summary>Gets or sets the collection of orders that belong to the customer.</summary>
+        public List<Order> Orders { get; set; } = [];
+    }
+
+    /// <summary>
+    ///     Represents an order domain model that is used by the sample schema builder extensions.
+    /// </summary>
+    public class Order
+    {
+        /// <summary>Gets or sets the unique order identifier.</summary>
+        public Guid Id { get; set; }
+
+        /// <summary>Gets or sets the current order status.</summary>
+        public OrderStatus Status { get; set; }
+
+        /// <summary>Gets or sets the order total.</summary>
+        public decimal Total { get; set; }
+
+        /// <summary>Gets or sets the optional identifier of the customer that owns the order.</summary>
+        public Guid? CustomerId { get; set; }
+
+        /// <summary>Gets or sets the optional navigation property to the owning customer.</summary>
+        public Customer? Customer { get; set; }
+    }
+
+    /// <summary>
+    ///     Represents an order line-item domain model used by the sample schema builder extensions.
+    /// </summary>
+    public class OrderItem
+    {
+        /// <summary>Gets or sets the identifier of the order that owns this line item.</summary>
+        public Guid OrderId { get; set; }
+
+        /// <summary>Gets or sets the sequential line-item number within its parent order.</summary>
+        public long LineItemNumber { get; set; }
+
+        /// <summary>Gets or sets the display name of the product on this line item.</summary>
+        public string ProductName { get; set; } = string.Empty;
+
+        /// <summary>Gets or sets the quantity of units ordered for this line item.</summary>
+        public int Quantity { get; set; }
+
+        /// <summary>Gets or sets the per-unit price for this line item.</summary>
+        public decimal UnitPrice { get; set; }
+    }
+
+    /// <summary>
+    ///     Represents a nested customer reference used to demonstrate key paths stored inside a complex property.
+    /// </summary>
+    public class CustomerRef
+    {
+        /// <summary>Gets or sets the identifier of the referenced customer.</summary>
+        public Guid CustomerId { get; set; }
+    }
+
+    /// <summary>
+    ///     Represents a customer profile domain model — a 1:1 extension of <see cref="Customer"/>.
+    ///     The key value back to <see cref="Customer"/> is stored inside the nested <see cref="CustomerRef"/> property.
+    /// </summary>
+    public class CustomerProfile
+    {
+        /// <summary>Gets or sets the nested customer reference that carries the key value.</summary>
+        public CustomerRef CustomerRef { get; set; } = new CustomerRef();
+
+        /// <summary>Gets or sets the customer biography text.</summary>
+        public string Biography { get; set; } = string.Empty;
+    }
+
+    /// <summary>
+    ///     Represents a product domain model used by the many-to-many sample schema.
+    /// </summary>
+    public class Product
+    {
+        /// <summary>Gets or sets the unique product identifier.</summary>
+        public Guid Id { get; set; }
+
+        /// <summary>Gets or sets the product display name.</summary>
+        public string Name { get; set; } = string.Empty;
+    }
+
+    /// <summary>
+    ///     Represents a tag domain model used by the many-to-many sample schema.
+    /// </summary>
+    public class Tag
+    {
+        /// <summary>Gets or sets the unique tag identifier.</summary>
+        public Guid Id { get; set; }
+
+        /// <summary>Gets or sets the tag label.</summary>
+        public string Name { get; set; } = string.Empty;
+    }
+
+    /// <summary>
+    ///     Represents the association type that mediates the many-to-many relationship between
+    ///     <see cref="Product"/> and <see cref="Tag"/>.
+    /// </summary>
+    public class ProductTag
+    {
+        /// <summary>Gets or sets the ID of the associated product.</summary>
+        public Guid ProductId { get; set; }
+
+        /// <summary>Gets or sets the ID of the associated tag.</summary>
+        public Guid TagId { get; set; }
+    }
+
+    /// <summary>
+    ///     Defines the states that an order can be in for the sample schema configuration.
+    /// </summary>
+    public enum OrderStatus
+    {
+        /// <summary>The order has been placed but not yet processed or shipped.</summary>
+        Pending,
+
+        /// <summary>The order has been dispatched and is in transit.</summary>
+        Shipped,
+
+        /// <summary>The order has been received by the customer.</summary>
+        Delivered,
+
+        /// <summary>The order was cancelled before or after shipment.</summary>
+        Cancelled
+    }
+
+    /// <summary>
+    ///     Demonstrates how to configure a scalar type using the fluent schema builder APIs.
+    /// </summary>
+    public class EmailAddressConfiguration : IApiScalarTypeConfiguration
+    {
+        /// <inheritdoc />
+        public Type ClrType => typeof(EmailAddress);
+
+        /// <inheritdoc />
+        public void Configure(ApiScalarTypeBuilder builder)
+        {
+            builder
+                .WithName("Email")
+                .AddScalarTypeExtension(new VisibleMetadata { IsVisible = true });
+        }
+    }
+
+    /// <summary>
+    ///     Demonstrates strongly-typed scalar configuration using the fluent schema builder APIs.
+    /// </summary>
+    public class EmailAddressConfigurationGeneric : IApiScalarTypeConfiguration<EmailAddress>
+    {
+        public void Configure(ApiScalarTypeBuilder<EmailAddress> builder)
+        {
+            builder.WithName("EmailAddress");
+        }
+    }
+
+    /// <summary>
+    ///     Demonstrates how to configure an enum type using the fluent schema builder APIs.
+    /// </summary>
+    public class OrderStatusConfiguration : IApiEnumTypeConfiguration
+    {
+        /// <inheritdoc />
+        public Type ClrType => typeof(OrderStatus);
+
+        /// <inheritdoc />
+        public void Configure(ApiEnumTypeBuilder builder)
+        {
+            builder
+                .WithName("OrderStatus")
+                .AddValue("Pending", "Pending", 0)
+                .AddValue("Shipped", "Shipped", 1)
+                .AddValue("Delivered", "Delivered", 2)
+                .AddValue("Cancelled", "Cancelled", 3)
+                .AddEnumTypeExtension(new VisibleMetadata { IsVisible = true });
+        }
+    }
+
+    /// <summary>
+    ///     Demonstrates strongly-typed enum configuration using the fluent schema builder APIs.
+    /// </summary>
+    public class OrderStatusConfigurationGeneric : IApiEnumTypeConfiguration<OrderStatus>
+    {
+        public void Configure(ApiEnumTypeBuilder<OrderStatus> builder)
+        {
+            builder
+                .WithName("OrderStatus")
+                .AddValue("Pending", "Pending", 0)
+                .AddValue("Shipped", "Shipped", 1)
+                .AddValue("Delivered", "Delivered", 2)
+                .AddValue("Cancelled", "Cancelled", 3);
+        }
+    }
+
+    /// <summary>
+    ///     Demonstrates how to configure an object type using the fluent schema builder APIs.
+    /// </summary>
+    public class OrderConfiguration : IApiObjectTypeConfiguration
+    {
+        /// <inheritdoc />
+        public Type ClrType => typeof(Order);
+
+        /// <inheritdoc />
+        public void Configure(ApiObjectTypeBuilder builder)
+        {
+            builder
+                .WithName("Order")
+                .AddProperty("id", "Id")
+                .AddProperty("status", "Status")
+                .AddProperty("total", "Total")
+                .AddObjectTypeExtension(new VisibleMetadata { IsVisible = true });
+        }
+    }
+
+    /// <summary>
+    ///     Demonstrates how to configure a 1:M relationship using the fluent schema builder APIs.
+    ///     Models the "a Customer has zero-or-more Orders" relationship.
+    /// </summary>
+    public class CustomerHasOrdersRelationshipConfiguration : IApiRelationshipOneToManyConfiguration
+    {
+        /// <inheritdoc />
+        public string ApiName => "CustomerHasOrders";
+
+        /// <inheritdoc />
+        public void Configure(ApiRelationshipOneToManyBuilder builder)
+        {
+            builder
+                .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete)
+                .From<Customer>()
+                .To<Order>
+                (
+                    d => d.WithForeignKey(b => b.AddPath(typeof(Order), "CustomerId"))
+                );
+        }
+    }
+
+    /// <summary>
+    ///     Demonstrates how to configure a 1:M relationship using the fluent schema builder APIs.
+    ///     Models the "an Order has one-or-more OrderItems" relationship.
+    /// </summary>
+    public class OrderHasOrderItemsRelationshipConfiguration : IApiRelationshipOneToManyConfiguration
+    {
+        /// <inheritdoc />
+        public string ApiName => "OrderHasOrderItems";
+
+        /// <inheritdoc />
+        public void Configure(ApiRelationshipOneToManyBuilder builder)
+        {
+            builder
+                .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete)
+                .From<Order>()
+                .To<OrderItem>();
+        }
+    }
+
+    /// <summary>
+    ///     Represents a simple extension payload that controls visibility in the sample schema configuration.
+    /// </summary>
+    public sealed class VisibleMetadata : IApiSchemaExtension
+    {
+        /// <summary>Gets or sets a value indicating whether the target artifact should be visible.</summary>
+        public bool IsVisible { get; set; }
+
+        /// <inheritdoc />
+        public IApiSchemaExtension CreateFrozenSnapshot() => new VisibleMetadata
+        {
+            IsVisible = this.IsVisible
+        };
+    }
+
+    /// <summary>
+    ///     Demonstrates how to configure a 1:1 relationship using the fluent schema builder APIs.
+    ///     Models the "a Customer has at most one CustomerProfile" relationship.
+    ///     Demonstrates nested <see cref="ApiKeyPath"/> values stored inside a complex property on the dependent type.
+    /// </summary>
+    public class CustomerHasProfileRelationshipConfiguration : IApiRelationshipOneToOneConfiguration
+    {
+        /// <inheritdoc />
+        public string ApiName => "CustomerHasProfile";
+
+        /// <inheritdoc />
+        public void Configure(ApiRelationshipOneToOneBuilder builder)
+        {
+            builder
+                .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete)
+                .From<Customer>
+                (
+                    p => p
+                        .AddRelationshipPrincipalEndExtension(new VisibleMetadata { IsVisible = true })
+                )
+                .To<CustomerProfile>
+                (
+                    // The key value is not a direct scalar; it lives inside the nested CustomerRef property.
+                    d => d.WithForeignKey(b => b.AddPath(typeof(CustomerProfile), "CustomerRef", "CustomerId"))
+                );
+        }
+    }
+
+    /// <summary>
+    ///     Demonstrates how to configure a M:N relationship using the fluent schema builder APIs.
+    ///     Models the "Products are tagged with Tags" relationship via the <see cref="ProductTag"/> association type.
+    ///     Demonstrates <see cref="ApiRelationshipPrincipalEndBuilder.WithPrincipalKey"/> to select a
+    ///     non-principal key type on the principal side, and extensions on principal ends.
+    /// </summary>
+    public class ProductTagRelationshipConfiguration : IApiRelationshipManyToManyConfiguration
+    {
+        /// <inheritdoc />
+        public string ApiName => "ProductHasTags";
+
+        /// <inheritdoc />
+        public void Configure(ApiRelationshipManyToManyBuilder builder)
+        {
+            builder
+                .Between<Product>
+                (
+                    p => p.AddRelationshipPrincipalEndExtension(new VisibleMetadata { IsVisible = true })
+                )
+                .And<Tag>
+                (
+                    p => p.WithPrincipalKey("PrimaryKey")
+                )
+                .WithAssociation<ProductTag>
+                (
+                    a => a
+                        .WithForeignKeyA(b => b.AddPath(typeof(ProductTag), "ProductId"))
+                        .WithForeignKeyB(b => b.AddPath(typeof(ProductTag), "TagId"))
+                );
+        }
+    }
+
+    public class CustomerConfigurationGeneric : IApiObjectTypeConfiguration<Customer>
+    {
+        public void Configure(ApiObjectTypeBuilder<Customer> builder)
+        {
+            builder
+                .WithName("Customer")
+                .WithOptions(o => o.ThrowOnNullKeyPart())
+                .AddRequiredProperty(c => c.Id)
+                .AddRequiredProperty(c => c.Name)
+                .AddOptionalProperty(c => c.Email)
+                .AddRequiredProperty(c => c.Orders)
+                .AddKey("PrimaryKey", c => c.Id)                       // shorthand: single expression
+                .AddKey("AlternateKey", c => c.Country.Code);          // shorthand: navigated expression
+        }
+    }
+
+    public class CustomerHasOrdersConfigurationGeneric : IApiRelationshipOneToManyConfiguration
+    {
+        public string ApiName => "CustomerHasOrders";
+
+        public void Configure(ApiRelationshipOneToManyBuilder builder)
+        {
+            builder
+                .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete)
+                .From<Customer>()
+                .To<Order>(d => d.WithForeignKey(o => o.CustomerId));   // shorthand: single expression
+        }
+    }
+
+    public class CustomerHasProfileConfigurationGeneric : IApiRelationshipOneToOneConfiguration
+    {
+        public string ApiName => "CustomerHasProfile";
+
+        public void Configure(ApiRelationshipOneToOneBuilder builder)
+        {
+            builder
+                .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete)
+                .From<Customer>()
+                .To<CustomerProfile>(d => d
+                    .WithForeignKey(cp => cp.CustomerRef.CustomerId));   // shorthand: navigated expression
+        }
+    }
+
+    public class ProductTagConfigurationGeneric : IApiRelationshipManyToManyConfiguration
+    {
+        public string ApiName => "ProductHasTags";
+
+        public void Configure(ApiRelationshipManyToManyBuilder builder)
+        {
+            builder
+                .Between<Product>(p => p.WithPrincipalKey("PrimaryKey"))
+                .And<Tag>(p => p.WithPrincipalKey("PrimaryKey"))
+                .WithAssociation<ProductTag>
+                (
+                    a => a
+                        .WithForeignKeyA(p => p.ProductId)              // shorthand: single expression
+                        .WithForeignKeyB(p => p.TagId)                  // shorthand: single expression
+                );
+        }
+    }
+
+    /// <summary>
+    ///     Builds a fully configured sample <see cref="ApiSchema"/> demonstrating the fluent builder API surface area.
+    /// </summary>
+    public static void DummyMethod()
+    {
+        var schema = new ApiSchemaBuilder()
+            .WithName("CustomerOrdersAPI")
+            .WithVersion("v1")
+            .WithDefaultOptions()
+            .WithOptions(o => o
+                .UseDefaultOnNullKeyPart()
+                .ThrowOnNullKeyPart())
+            .AddScalar<EmailAddress>(x => x
+                .WithName("EmailAddress"))
+                .AddSchemaExtension(new VisibleMetadata { IsVisible = true })
+            .AddObject<Country>(x => x
+                .WithName("Country")
+                .AddKey("PrimaryKey", b => b
+                    .AddPath(typeof(Country), "Code")))
+            .AddObject<Customer>(x => x
+                .WithName("Customer")
+                .WithOptions(o => o
+                    .ThrowOnNullKeyPart())
+                .AddProperty("Id", "Id", p => p.WithModifiers(m => m.Required()))
+                .AddProperty("Name", "Name", p => p.WithModifiers(m => m.Required()).AddPropertyExtension(new VisibleMetadata { IsVisible = true }))
+                .AddProperty("Email", "Email", p => p.WithModifiers(m => m.Optional()))
+                .AddProperty("Orders", "Orders", p => p.WithModifiers(m => m.Required()))
+                .AddKey("PrimaryKey", b => b
+                    .AddPath(typeof(Customer), "Id"))
+                .AddKey("AlternateKey", b => b
+                    .AddPath(typeof(Customer), "Country", "Code")))
+            .AddObject<Order>(x => x
+                .WithName("Order")
+                .WithDefaultOptions()
+                .AddProperty("Id", "Id", p => p.WithModifiers(m => m.Required()))
+                .AddProperty("Status", "Status", p => p.WithModifiers(m => m.Required()))
+                .AddProperty("Total", "Total", p => p.WithModifiers(m => m.Required()))
+                .AddProperty("CustomerId", "CustomerId", p => p.WithModifiers(m => m.Optional()))
+                .AddProperty("Customer", "Customer", p => p.WithModifiers(m => m.Optional())))
+            .AddObject<OrderItem>(x => x
+                .WithName("OrderItem")
+                .WithDefaultOptions()
+                .AddProperty("OrderId", "OrderId", p => p.WithModifiers(m => m.Required()))
+                .AddProperty("LineItemNumber", "LineItemNumber", p => p.WithModifiers(m => m.Required()))
+                .AddProperty("ProductName", "ProductName", p => p.WithModifiers(m => m.Required()))
+                .AddProperty("Quantity", "Quantity", p => p.WithModifiers(m => m.Required()))
+                .AddProperty("UnitPrice", "UnitPrice", p => p.WithModifiers(m => m.Required()))
+                .AddKey("PrimaryKey", b => b
+                    .AddPath(typeof(OrderItem), ["OrderId"], p => p.AddKeyPathExtension(new VisibleMetadata { IsVisible = true }))
+                    .AddPath(typeof(OrderItem), "LineItemNumber"))
+                .AddKey("AlternateKey", b => b
+                    .AddPath(typeof(Order), ["Id"], p => p.AddKeyPathExtension(new VisibleMetadata { IsVisible = true }))
+                    .AddPath(typeof(OrderItem), "LineItemNumber")))
+            .AddEnum<OrderStatus>(x => x
+                .AddEnumTypeExtension(new VisibleMetadata { IsVisible = true })
+                .WithName("OrderStatus")
+                .AddValue("Pending", "Pending", 0)
+                .AddValue("Shipped", "Shipped", 1)
+                .AddValue("Delivered", "Delivered", 2)
+                .AddValue("Cancelled", "Cancelled", 3))
+            .AddScalar(new EmailAddressConfiguration())
+            .AddEnum(new OrderStatusConfiguration())
+            .AddObject(new OrderConfiguration())
+            .AddObject<CustomerProfile>(x => x
+                .WithName("CustomerProfile")
+                .AddProperty("Biography", "Biography", p => p.WithModifiers(m => m.Required()))
+                .AddKey("PrimaryKey", b => b
+                    .AddPath(typeof(CustomerProfile), "CustomerRef", "CustomerId")))
+            .AddObject<Product>(x => x
+                .WithName("Product")
+                .AddProperty("Id", "Id", p => p.WithModifiers(m => m.Required()))
+                .AddProperty("Name", "Name", p => p.WithModifiers(m => m.Required()))
+                .AddKey("PrimaryKey", b => b
+                    .AddPath(typeof(Product), "Id")))
+            .AddObject<Tag>(x => x
+                .WithName("Tag")
+                .AddProperty("Id", "Id", p => p.WithModifiers(m => m.Required()))
+                .AddProperty("Name", "Name", p => p.WithModifiers(m => m.Required()))
+                .AddKey("PrimaryKey", b => b
+                    .AddPath(typeof(Tag), "Id")))
+            .AddObject<ProductTag>(x => x
+                .WithName("ProductTag")
+                .AddProperty("ProductId", "ProductId", p => p.WithModifiers(m => m.Required()))
+                .AddProperty("TagId", "TagId", p => p.WithModifiers(m => m.Required()))
+                .AddKey("PrimaryKey", b => b
+                    .AddPath(typeof(ProductTag), "ProductId")
+                    .AddPath(typeof(ProductTag), "TagId")))
+            .AddOneToManyRelationship(new CustomerHasOrdersRelationshipConfiguration())
+            .AddOneToManyRelationship(new OrderHasOrderItemsRelationshipConfiguration())
+            .AddOneToManyRelationship
+            (
+                "CustomerOrders",
+                r => r
+                    .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete)
+                    .From<Customer>()
+                    .To<Order>
+                    (
+                        d => d.WithForeignKey(b => b.AddPath(typeof(Order), "CustomerId"))
+                    )
+            )
+            // 1:M — inline lambda; demonstrates WithForeignKey for a composite key role.
+            .AddOneToManyRelationship
+            (
+                "OrderOrderItemsViaOwner",
+                r => r
+                    .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete)
+                    .From<Order>()
+                    .To<OrderItem>
+                    (
+                        d => d.WithForeignKey(b => b
+                            .AddPath(typeof(OrderItem), "OrderId")
+                            .AddPath(typeof(OrderItem), "LineItemNumber"))
+                    )
+            )
+            // 1:1 — configuration class style; demonstrates AddNestedPath on the dependent end.
+            .AddOneToOneRelationship(new CustomerHasProfileRelationshipConfiguration())
+            // 1:1 — inline lambda style.
+            .AddOneToOneRelationship
+            (
+                "CustomerHasProfileInline",
+                r => r
+                    .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete)
+                    .From<Customer>
+                    (
+                        p => p
+                            .WithPrincipalKey("PrimaryKey")
+                    )
+                    .To<CustomerProfile>
+                    (
+                        d => d.WithForeignKey(b => b.AddPath(typeof(CustomerProfile), "CustomerRef", "CustomerId"))
+                    )
+            )
+            // M:N — configuration class style; demonstrates WithKeyTypeName and extensions on principal ends.
+            .AddManyToManyRelationship(new ProductTagRelationshipConfiguration())
+            // M:N — inline lambda style; demonstrates all four end methods and relationship-level extensions.
+            .AddManyToManyRelationship
+            (
+                "ProductHasTagsInline",
+                r => r
+                    .Between<Product>
+                    (
+                        p => p
+                            .WithPrincipalKey("PrimaryKey")
+                            .AddRelationshipPrincipalEndExtension(new VisibleMetadata { IsVisible = true })
+                    )
+                    .And<Tag>
+                    (
+                        p => p
+                            .WithPrincipalKey("PrimaryKey")
+                    )
+                    .WithAssociation<ProductTag>
+                    (
+                        a => a
+                            .WithForeignKeyA(b => b.AddPath(typeof(ProductTag), "ProductId"))
+                            .WithForeignKeyB(b => b.AddPath(typeof(ProductTag), "TagId"))
+                            .AddRelationshipAssociationExtension(new VisibleMetadata { IsVisible = true })
+                    )
+                    .AddRelationshipExtension(new VisibleMetadata { IsVisible = true })
+            )
+            .AddSchemaExtension(new VisibleMetadata { IsVisible = true })
+            .Build();
+    }
+
+    /// <summary>
+    ///     Builds the same schema as <see cref="DummyMethod"/> using the generic, expression-based fluent builder APIs.
+    /// </summary>
+    public static void DummyMethodGeneric()
+    {
+        var schema = new ApiSchemaBuilder()
+            .WithName("CustomerOrdersAPI")
+            .WithVersion("v1")
+            .AddScalar<EmailAddress>(new EmailAddressConfigurationGeneric())
+            .AddScalar<EmailAddress>()
+            .AddEnum<OrderStatus>(new OrderStatusConfigurationGeneric())
+            .AddObject<Country>(x => x
+                .WithName("Country")
+                .AddProperty(c => c.Code)
+                .AddKey("PrimaryKey", c => c.Code))                        // shorthand: single expression
+            .AddObject<Customer>(new CustomerConfigurationGeneric())
+            .AddObject<Order>(x => x
+                .WithName("Order")
+                .AddProperty(o => o.Id, p => p.WithModifiers(m => m.Required()))
+                .AddProperty(o => o.Status, p => p.WithModifiers(m => m.Required()))
+                .AddProperty(o => o.Total, p => p.WithModifiers(m => m.Required()))
+                .AddProperty(o => o.CustomerId, p => p.WithModifiers(m => m.Optional()))
+                .AddProperty(o => o.Customer, p => p.WithModifiers(m => m.Optional()))
+                .AddKey("PrimaryKey", o => o.Id))                          // shorthand: single expression
+            .AddObject<OrderItem>(x => x
+                .WithName("OrderItem")
+                .AddProperty(oi => oi.OrderId, p => p.WithModifiers(m => m.Required()))
+                .AddProperty(oi => oi.LineItemNumber, p => p.WithModifiers(m => m.Required()))
+                .AddProperty(oi => oi.ProductName, p => p.WithModifiers(m => m.Required()))
+                .AddProperty(oi => oi.Quantity, p => p.WithModifiers(m => m.Required()))
+                .AddProperty(oi => oi.UnitPrice, p => p.WithModifiers(m => m.Required()))
+                .AddKey("PrimaryKey", b => b                               // composite: builder required
+                    .AddPath(oi => oi.OrderId)
+                    .AddPath(oi => oi.LineItemNumber))
+                .AddKey("AlternateKey", b => b                             // cross-entity: builder required
+                    .AddPathFrom<Order>(o => o.Id)
+                    .AddPath(oi => oi.LineItemNumber)))
+            .AddObject<CustomerProfile>(x => x
+                .WithName("CustomerProfile")
+                .AddProperty(cp => cp.CustomerRef, p => p.WithModifiers(m => m.Required()))
+                .AddProperty(cp => cp.Biography, p => p.WithModifiers(m => m.Required()))
+                .AddKey("PrimaryKey", cp => cp.CustomerRef.CustomerId))    // shorthand: navigated expression
+            .AddObject<Product>(x => x
+                .WithName("Product")
+                .AddProperty(p => p.Id, cfg => cfg.WithModifiers(m => m.Required()))
+                .AddProperty(p => p.Name, cfg => cfg.WithModifiers(m => m.Required()))
+                .AddKey("PrimaryKey", p => p.Id))                          // shorthand: single expression
+            .AddObject<Tag>(x => x
+                .WithName("Tag")
+                .AddProperty(t => t.Id, p => p.WithModifiers(m => m.Required()))
+                .AddProperty(t => t.Name, p => p.WithModifiers(m => m.Required()))
+                .AddKey("PrimaryKey", t => t.Id))                          // shorthand: single expression
+            .AddObject<ProductTag>(x => x
+                .WithName("ProductTag")
+                .AddProperty(pt => pt.ProductId, p => p.WithModifiers(m => m.Required()))
+                .AddProperty(pt => pt.TagId, p => p.WithModifiers(m => m.Required()))
+                .AddKey("PrimaryKey", b => b                               // composite: builder required
+                    .AddPath(pt => pt.ProductId)
+                    .AddPath(pt => pt.TagId)))
+            .AddOneToManyRelationship(new CustomerHasOrdersConfigurationGeneric())
+            .AddOneToManyRelationship("OrderHasOrderItems", r => r
+                .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete)
+                .From<Order>()
+                .To<OrderItem>(d => d
+                    .WithForeignKey(b => b                                  // composite: builder required
+                        .AddPath(oi => oi.OrderId)
+                        .AddPath(oi => oi.LineItemNumber))))
+            .AddOneToOneRelationship(new CustomerHasProfileConfigurationGeneric())
+            .AddOneToOneRelationship("CustomerHasProfileInline", r => r
+                .WithDeleteBehavior(ApiRelationshipDeleteBehavior.Delete)
+                .From<Customer>(p => p
+                    .WithPrincipalKey("PrimaryKey"))
+                .To<CustomerProfile>(d => d
+                    .WithForeignKey(cp => cp.CustomerRef.CustomerId)))      // shorthand: navigated expression
+            .AddManyToManyRelationship(new ProductTagConfigurationGeneric())
+            .AddManyToManyRelationship("ProductHasTagsInline", r => r
+                .Between<Product>(p => p
+                    .WithPrincipalKey("PrimaryKey"))
+                .And<Tag>(p => p
+                    .WithPrincipalKey("PrimaryKey"))
+                .WithAssociation<ProductTag>(a => a
+                    .WithForeignKeyA(p => p.ProductId)                      // shorthand: single expression
+                    .WithForeignKeyB(p => p.TagId)))                        // shorthand: single expression
+            .Build();
+    }
+
+    // ──────────────────────────────────────────────────────────────────────────────────
+    // Annotation-decorated types used by DummyMethodAnnotations.
+    // ──────────────────────────────────────────────────────────────────────────────────
+
+    /// <summary>
+    ///     An annotation-decorated version of <see cref="Customer"/> that demonstrates how
+    ///     <c>[ApiObject]</c>, <c>[ApiProperty]</c>, <c>[ApiKey]</c>, and <c>[ApiIgnore]</c>
+    ///     can describe the schema shape directly on the POCO.
+    /// </summary>
+    [ApiObject(ApiName = "Customer")]
+    public class CustomerAnnotated
+    {
+        /// <summary>Gets or sets the unique customer identifier.</summary>
+        [ApiKey]
+        public Guid Id { get; set; }
+
+        /// <summary>Gets or sets the customer's display name.</summary>
+        [ApiProperty(ApiName = "displayName", IsRequired = true)]
+        public string Name { get; set; } = string.Empty;
+
+        /// <summary>Gets or sets the optional customer email address (string variant for schema simplicity).</summary>
+        [ApiProperty(IsOptional = true)]
+        public string? Email { get; set; }
+
+        /// <summary>Internal tracking tag excluded from the API schema.</summary>
+        [ApiIgnore]
+        public string InternalTag { get; set; } = string.Empty;
+
+        /// <summary>Gets or sets the collection of orders that belong to the customer.</summary>
+        [ApiRelationship(ApiName = "CustomerHasOrdersAnnotated",
+            Kind = ApiRelationshipKind.OneToMany,
+            ForeignKey = "CustomerId",
+            DeleteBehavior = ApiRelationshipDeleteBehavior.Delete)]
+        public List<OrderAnnotated> Orders { get; set; } = [];
+    }
+
+    /// <summary>
+    ///     An annotation-decorated version of <see cref="Order"/> paired with
+    ///     <see cref="CustomerAnnotated"/> for the annotation demo schema.
+    /// </summary>
+    [ApiObject(ApiName = "Order")]
+    public class OrderAnnotated
+    {
+        /// <summary>Gets or sets the unique order identifier.</summary>
+        [ApiKey]
+        public Guid Id { get; set; }
+
+        /// <summary>Gets or sets the order total.</summary>
+        public decimal Total { get; set; }
+
+        /// <summary>Gets or sets the optional FK to the owning customer.</summary>
+        public Guid? CustomerId { get; set; }
+    }
+
+    /// <summary>
+    ///     Demonstrates how to build a schema using conventions rather than explicit
+    ///     property and key declarations.
+    ///     <see cref="ApiSchemaBuilder.UseDefaultConventions"/> applies enum-value discovery,
+    ///     property discovery, camelCase naming, nullability-based Required/Optional inference,
+    ///     and primary-key inference automatically.
+    ///     This demo uses <see cref="Product"/>, <see cref="Tag"/>, and <see cref="ProductTag"/>
+    ///     because they only reference primitive scalar types, keeping the example self-contained.
+    /// </summary>
+    public static void DummyMethodConventions()
+    {
+        var schema = new ApiSchemaBuilder()
+            .WithName("ProductTagsAPI")
+            .WithVersion("v1")
+            // Conventions discover properties and infer keys automatically, but the scalar
+            // types that those properties resolve to must still be registered explicitly.
+            .AddScalar<Guid>(x => x.WithName("Guid"))
+            .AddScalar<string>(x => x.WithName("String"))
+            // Apply the full default convention set: enum-value discovery, property discovery,
+            // camelCase naming, nullability-based modifiers, and PrimaryKey inference.
+            .UseDefaultConventions()
+            // Augment the default set with a custom application-specific convention.
+            .UseConventions(c => c
+                .AddConvention(new ApiObjectTypeConventionExample()))
+            // Register the CLR types; conventions configure them automatically.
+            .AddTypes(typeof(Product), typeof(Tag), typeof(ProductTag))
+            // Relationships are not yet inferred by convention (IApiRelationshipConvention
+            // has no built-in implementations). Register the M:N link explicitly.
+            .AddManyToManyRelationship(
+                "ProductHasTags",
+                r => r
+                    .Between<Product>()
+                    .And<Tag>()
+                    .WithAssociation<ProductTag>(a => a
+                        .WithForeignKeyA(b => b.AddPath(typeof(ProductTag), "ProductId"))
+                        .WithForeignKeyB(b => b.AddPath(typeof(ProductTag), "TagId"))))
+            .Build();
+    }
+
+    /// <summary>
+    ///     Demonstrates how to build a schema using CLR attribute annotations on POCO types.
+    ///     Conventions provide the discovery baseline; annotations override specific values.
+    /// </summary>
+    public static void DummyMethodAnnotations()
+    {
+        var schema = new ApiSchemaBuilder()
+            .WithName("CustomerOrdersAPI")
+            .WithVersion("v1")
+            .AddScalar<Guid>(x => x.WithName("Guid"))
+            .AddScalar<string>(x => x.WithName("String"))
+            .AddScalar<decimal>(x => x.WithName("Decimal"))
+            // Use default conventions for enum-value discovery, property discovery, and
+            // nullability inference.
+            .UseDefaultConventions()
+            // Activate the framework's built-in annotation reader so that attributes
+            // on CustomerAnnotated and OrderAnnotated are picked up automatically.
+            .UseDefaultAnnotations()
+            // Register the annotated POCO types; conventions + annotations configure them.
+            .AddTypes<CustomerAnnotated, OrderAnnotated>()
+            .Build();
+    }
+
+    /// <summary>
+    ///     A custom <see cref="IApiObjectTypeConvention"/> that demonstrates how to supply
+    ///     third-party or application-specific conventions alongside the built-in ones.
+    /// </summary>
+    public class ApiObjectTypeConventionExample : IApiObjectTypeConvention
+    {
+        /// <inheritdoc />
+        public ApiConventionPhase Phase => ApiConventionPhase.Configuration;
+
+        /// <inheritdoc />
+        public void Apply(ApiObjectTypeBuilder builder)
+        {
+            // Example: log or audit every registered object type during schema construction.
+        }
+    }
+}

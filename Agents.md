@@ -4,8 +4,10 @@
 
 This repository is a .NET 10 solution for `Evoogle.ApiFramework`.
 
-- `Source/Evoogle.ApiFramework.Core/` contains the production library.
-- `Tests/Evoogle.ApiFramework.Core.Tests/` contains xUnit v3 tests.
+- `Source/Evoogle.ApiFramework.Annotations/` contains POCO-safe declarative annotations.
+- `Source/Evoogle.ApiFramework/` contains the runtime schema framework.
+- `Tests/Evoogle.ApiFramework.Annotations.Tests/` contains annotations-package xUnit v3 tests.
+- `Tests/Evoogle.ApiFramework.Tests/` contains runtime-framework xUnit v3 tests.
 - `Evoogle.ApiFramework.sln` is the solution entry point.
 - `Directory.Build.props` centralizes the target framework, nullable-reference-type settings, analyzers, and XML-documentation rules.
 - The core project references sibling repository code under `../evoogle-core`; keep that repository checked out and available when building locally.
@@ -17,10 +19,13 @@ Keep production code and tests organized by the feature or API area they impleme
 Run commands from the repository root.
 
 ```powershell
-dotnet build Source\Evoogle.ApiFramework.Core\Evoogle.ApiFramework.Core.csproj
-dotnet build Tests\Evoogle.ApiFramework.Core.Tests\Evoogle.ApiFramework.Core.Tests.csproj
-dotnet test Tests\Evoogle.ApiFramework.Core.Tests\Evoogle.ApiFramework.Core.Tests.csproj --no-build
-dotnet test Tests\Evoogle.ApiFramework.Core.Tests\Evoogle.ApiFramework.Core.Tests.csproj --filter "FullyQualifiedName~ApiSchemaTests"
+dotnet build Source\Evoogle.ApiFramework.Annotations\Evoogle.ApiFramework.Annotations.csproj
+dotnet build Tests\Evoogle.ApiFramework.Annotations.Tests\Evoogle.ApiFramework.Annotations.Tests.csproj
+dotnet test Tests\Evoogle.ApiFramework.Annotations.Tests\Evoogle.ApiFramework.Annotations.Tests.csproj --no-build
+dotnet build Source\Evoogle.ApiFramework\Evoogle.ApiFramework.csproj
+dotnet build Tests\Evoogle.ApiFramework.Tests\Evoogle.ApiFramework.Tests.csproj
+dotnet test Tests\Evoogle.ApiFramework.Tests\Evoogle.ApiFramework.Tests.csproj --no-build
+dotnet test Tests\Evoogle.ApiFramework.Tests\Evoogle.ApiFramework.Tests.csproj --filter "FullyQualifiedName~ApiSchemaTests"
 ```
 
 Use project-level build and test commands for focused work.
@@ -154,10 +159,16 @@ Whenever creating or modifying unit tests:
 
 `[Fact]` is prohibited for unit tests. If a test has only one case, express it as a `[Theory]` with one data row.
 
-Place tests under:
+Place annotations-package tests under:
 
 ```text
-Tests/Evoogle.ApiFramework.Core.Tests/
+Tests/Evoogle.ApiFramework.Annotations.Tests/
+```
+
+Place runtime-framework tests under:
+
+```text
+Tests/Evoogle.ApiFramework.Tests/
 ```
 
 Organize tests to match the production feature or API area being exercised.
