@@ -39,10 +39,12 @@ public class ApiKeyTypeBuilder(string? apiName = null) : ExtensionBuilder<ApiKey
 
     #region AddPath Methods
     /// <summary>
-    ///     Adds a key path to this key type using plain CLR property names.
+    ///     Adds a key path to this key type using CLR property names or dot-delimited CLR property paths.
     /// </summary>
     /// <param name="clrRootType">The CLR type from which the navigation chain begins.</param>
-    /// <param name="clrPropertyNames">Ordered CLR property names from the root type to the terminal scalar property.</param>
+    /// <param name="clrPropertyNames">
+    ///     Ordered CLR property names or dot-delimited CLR property paths from the root type to the terminal scalar property.
+    /// </param>
     /// <returns>The current builder instance.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="clrRootType"/> is <c>null</c>.</exception>
     /// <exception cref="ArgumentException">Thrown when <paramref name="clrPropertyNames"/> is empty.</exception>
@@ -56,10 +58,13 @@ public class ApiKeyTypeBuilder(string? apiName = null) : ExtensionBuilder<ApiKey
     }
 
     /// <summary>
-    ///     Adds a key path to this key type using plain CLR property names, with an optional configuration callback.
+    ///     Adds a key path to this key type using CLR property names or dot-delimited CLR property paths,
+    ///     with an optional configuration callback.
     /// </summary>
     /// <param name="clrRootType">The CLR type from which the navigation chain begins.</param>
-    /// <param name="clrPropertyNames">Ordered CLR property names from the root type to the terminal scalar property.</param>
+    /// <param name="clrPropertyNames">
+    ///     Ordered CLR property names or dot-delimited CLR property paths from the root type to the terminal scalar property.
+    /// </param>
     /// <param name="configure">Optional callback to attach extensions or additional segments to the path builder.</param>
     /// <returns>The current builder instance.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="clrRootType"/> is <c>null</c>.</exception>

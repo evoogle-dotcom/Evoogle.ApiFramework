@@ -24,10 +24,20 @@ public class ApiKeyPathSegmentBuilder : ExtensionBuilder<ApiKeyPathSegmentBuilde
     ///     Creates an <see cref="ApiKeyPathSegmentBuilder"/> with the specified CLR property name.
     /// </summary>
     /// <param name="clrPropertyName">The CLR property name for this navigation step.</param>
-    /// <exception cref="ArgumentException">Thrown when <paramref name="clrPropertyName"/> is <c>null</c>, empty, or whitespace.</exception>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="clrPropertyName"/> is not one CLR property name.</exception>
     public ApiKeyPathSegmentBuilder(string clrPropertyName)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(clrPropertyName);
+
+        if (clrPropertyName.Contains('.'))
+        {
+            throw new ArgumentException
+            (
+                "A key path segment must contain exactly one CLR property name and cannot contain a dot.",
+                nameof(clrPropertyName)
+            );
+        }
+
         _clrPropertyName = clrPropertyName;
     }
     #endregion
@@ -38,7 +48,7 @@ public class ApiKeyPathSegmentBuilder : ExtensionBuilder<ApiKeyPathSegmentBuilde
     /// </summary>
     /// <param name="clrPropertyName">The CLR property name for this navigation step.</param>
     /// <returns>A new <see cref="ApiKeyPathSegmentBuilder"/> for the specified property name.</returns>
-    /// <exception cref="ArgumentException">Thrown when <paramref name="clrPropertyName"/> is <c>null</c>, empty, or whitespace.</exception>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="clrPropertyName"/> is not one CLR property name.</exception>
     public static ApiKeyPathSegmentBuilder For(string clrPropertyName)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(clrPropertyName);

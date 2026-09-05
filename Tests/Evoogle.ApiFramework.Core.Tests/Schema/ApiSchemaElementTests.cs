@@ -181,6 +181,10 @@ public class ApiSchemaElementTests(ITestOutputHelper output) : XUnitTests(output
         {
             var segments = this.KeyPath!.ApiSegments;
             segments.Should().HaveCount(2);
+            this.KeyPath.ClrPath.Should().Be
+            (
+                string.Join('.', segments.Select(static segment => segment.ClrPropertyName))
+            );
             this.KeyPath.Children().Should().Equal(segments);
 
             segments[0].Parent.Should().BeSameAs(this.KeyPath);

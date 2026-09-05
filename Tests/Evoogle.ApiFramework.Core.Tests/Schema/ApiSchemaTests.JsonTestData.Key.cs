@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -129,9 +129,7 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""PK_KeyOneScalarPart"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id"" }
-                                        ]
+                                        ""ClrPath"": ""Id""
                                     }
                                 ]
                             },
@@ -139,9 +137,7 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""AK_KeyOneScalarPart"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Name"" }
-                                        ]
+                                        ""ClrPath"": ""Name""
                                     }
                                 ]
                             }
@@ -279,14 +275,10 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""PK_KeyTwoScalarPartComposite"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id1"" }
-                                        ]
+                                        ""ClrPath"": ""Id1""
                                     },
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id2"" }
-                                        ]
+                                        ""ClrPath"": ""Id2""
                                     }
                                 ]
                             }
@@ -453,19 +445,13 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""PK_KeyThreeScalarPartComposite"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id1"" }
-                                        ]
+                                        ""ClrPath"": ""Id1""
                                     },
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id2"" }
-                                        ]
+                                        ""ClrPath"": ""Id2""
                                     },
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id3"" }
-                                        ]
+                                        ""ClrPath"": ""Id3""
                                     }
                                 ]
                             }
@@ -620,9 +606,7 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""PK_KeyNestedPart"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id"" }
-                                        ]
+                                        ""ClrPath"": ""Id""
                                     }
                                 ]
                             }
@@ -659,15 +643,10 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""PK_KeyNestedComposite"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""NestedPart"" },
-                                            { ""ClrPropertyName"": ""Id"" }
-                                        ]
+                                        ""ClrPath"": ""NestedPart.Id""
                                     },
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Name"" }
-                                        ]
+                                        ""ClrPath"": ""Name""
                                     }
                                 ]
                             }
@@ -874,14 +853,10 @@ public partial class ApiSchemaTests
                                 ""ApiKeyPaths"": [
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.TestData.KeyOwner, Evoogle.ApiFramework.Core.Tests"",
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id"" }
-                                        ]
+                                        ""ClrPath"": ""Id""
                                     },
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""LineNumber"" }
-                                        ]
+                                        ""ClrPath"": ""LineNumber""
                                     }
                                 ]
                             }
@@ -909,9 +884,7 @@ public partial class ApiSchemaTests
                                 ""ApiKeyPaths"": [
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.TestData.KeyOwner, Evoogle.ApiFramework.Core.Tests"",
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id"" }
-                                        ]
+                                        ""ClrPath"": ""Id""
                                     }
                                 ]
                             }
@@ -975,9 +948,7 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""PK_KeyOwner"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id"" }
-                                        ]
+                                        ""ClrPath"": ""Id""
                                     }
                                 ]
                             }
@@ -1404,9 +1375,7 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""PK_KeyNestedPart"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id"" }
-                                        ]
+                                        ""ClrPath"": ""Id""
                                     }
                                 ]
                             }
@@ -1443,15 +1412,10 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""PK_KeyNestedComposite"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""NestedPart"" },
-                                            { ""ClrPropertyName"": ""Id"" }
-                                        ]
+                                        ""ClrPath"": ""NestedPart.Id""
                                     },
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Name"" }
-                                        ]
+                                        ""ClrPath"": ""Name""
                                     }
                                 ]
                             }
@@ -1488,9 +1452,7 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""PK_KeyOneScalarPart"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id"" }
-                                        ]
+                                        ""ClrPath"": ""Id""
                                     }
                                 ]
                             },
@@ -1498,9 +1460,7 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""AK_KeyOneScalarPart"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Name"" }
-                                        ]
+                                        ""ClrPath"": ""Name""
                                     }
                                 ]
                             }
@@ -1538,14 +1498,10 @@ public partial class ApiSchemaTests
                                 ""ApiKeyPaths"": [
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.TestData.KeyOwner, Evoogle.ApiFramework.Core.Tests"",
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id"" }
-                                        ]
+                                        ""ClrPath"": ""Id""
                                     },
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""LineNumber"" }
-                                        ]
+                                        ""ClrPath"": ""LineNumber""
                                     }
                                 ]
                             }
@@ -1573,9 +1529,7 @@ public partial class ApiSchemaTests
                                 ""ApiKeyPaths"": [
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.TestData.KeyOwner, Evoogle.ApiFramework.Core.Tests"",
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id"" }
-                                        ]
+                                        ""ClrPath"": ""Id""
                                     }
                                 ]
                             }
@@ -1639,9 +1593,7 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""PK_KeyOwner"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id"" }
-                                        ]
+                                        ""ClrPath"": ""Id""
                                     }
                                 ]
                             }
@@ -1698,19 +1650,13 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""PK_KeyThreeScalarPartComposite"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id1"" }
-                                        ]
+                                        ""ClrPath"": ""Id1""
                                     },
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id2"" }
-                                        ]
+                                        ""ClrPath"": ""Id2""
                                     },
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id3"" }
-                                        ]
+                                        ""ClrPath"": ""Id3""
                                     }
                                 ]
                             }
@@ -1757,14 +1703,10 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""PK_KeyTwoScalarPartComposite"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id1"" }
-                                        ]
+                                        ""ClrPath"": ""Id1""
                                     },
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id2"" }
-                                        ]
+                                        ""ClrPath"": ""Id2""
                                     }
                                 ]
                             }

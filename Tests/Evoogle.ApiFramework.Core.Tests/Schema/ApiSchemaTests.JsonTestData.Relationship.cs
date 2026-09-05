@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -273,9 +273,7 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""PK_RelationshipUser_Id"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id"" }
-                                        ]
+                                        ""ClrPath"": ""Id""
                                     }
                                 ]
                             }
@@ -332,9 +330,7 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""PK_RelationshipUserProfile_UserId"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""UserId"" }
-                                        ]
+                                        ""ClrPath"": ""UserId""
                                     }
                                 ]
                             },
@@ -342,10 +338,7 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""AK_RelationshipUserProfile_UserRef"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""UserRef"" },
-                                            { ""ClrPropertyName"": ""UserId"" }
-                                        ]
+                                        ""ClrPath"": ""UserRef.UserId""
                                     }
                                 ]
                             }
@@ -372,9 +365,7 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""PK_RelationshipUserRef_UserId"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""UserId"" }
-                                        ]
+                                        ""ClrPath"": ""UserId""
                                     }
                                 ]
                             }
@@ -394,10 +385,7 @@ public partial class ApiSchemaTests
                             ""ApiForeignKeyType"": {
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""UserRef"" },
-                                            { ""ClrPropertyName"": ""UserId"" }
-                                        ]
+                                        ""ClrPath"": ""UserRef.UserId""
                                     }
                                 ]
                             }
@@ -415,9 +403,7 @@ public partial class ApiSchemaTests
                             ""ApiForeignKeyType"": {
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""UserId"" }
-                                        ]
+                                        ""ClrPath"": ""UserId""
                                     }
                                 ]
                             }
@@ -861,9 +847,7 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""PK_RelationshipComment_Id"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id"" }
-                                        ]
+                                        ""ClrPath"": ""Id""
                                     }
                                 ]
                             }
@@ -947,9 +931,7 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""PK_RelationshipPost_Id"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id"" }
-                                        ]
+                                        ""ClrPath"": ""Id""
                                     }
                                 ]
                             }
@@ -976,9 +958,7 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""PK_RelationshipPostRef_PostId"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""PostId"" }
-                                        ]
+                                        ""ClrPath"": ""PostId""
                                     }
                                 ]
                             }
@@ -1032,9 +1012,7 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""PK_RelationshipUser_Id"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id"" }
-                                        ]
+                                        ""ClrPath"": ""Id""
                                     }
                                 ]
                             }
@@ -1061,9 +1039,7 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""PK_RelationshipUserRef_UserId"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""UserId"" }
-                                        ]
+                                        ""ClrPath"": ""UserId""
                                     }
                                 ]
                             }
@@ -1083,10 +1059,7 @@ public partial class ApiSchemaTests
                             ""ApiForeignKeyType"": {
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""PostRef"" },
-                                            { ""ClrPropertyName"": ""PostId"" }
-                                        ]
+                                        ""ClrPath"": ""PostRef.PostId""
                                     }
                                 ]
                             }
@@ -1104,9 +1077,7 @@ public partial class ApiSchemaTests
                             ""ApiForeignKeyType"": {
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""PostId"" }
-                                        ]
+                                        ""ClrPath"": ""PostId""
                                     }
                                 ]
                             }
@@ -1124,10 +1095,7 @@ public partial class ApiSchemaTests
                             ""ApiForeignKeyType"": {
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""AuthorUserRef"" },
-                                            { ""ClrPropertyName"": ""UserId"" }
-                                        ]
+                                        ""ClrPath"": ""AuthorUserRef.UserId""
                                     }
                                 ]
                             }
@@ -1145,9 +1113,7 @@ public partial class ApiSchemaTests
                             ""ApiForeignKeyType"": {
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""AuthorUserId"" }
-                                        ]
+                                        ""ClrPath"": ""AuthorUserId""
                                     }
                                 ]
                             }
@@ -1421,9 +1387,7 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""PK_RelationshipPost_Id"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id"" }
-                                        ]
+                                        ""ClrPath"": ""Id""
                                     }
                                 ]
                             }
@@ -1460,14 +1424,10 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""PK_RelationshipPostTag_PostId_TagId"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""PostId"" }
-                                        ]
+                                        ""ClrPath"": ""PostId""
                                     },
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""TagId"" }
-                                        ]
+                                        ""ClrPath"": ""TagId""
                                     }
                                 ]
                             }
@@ -1521,9 +1481,7 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""PK_RelationshipTag_Id"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id"" }
-                                        ]
+                                        ""ClrPath"": ""Id""
                                     }
                                 ]
                             }
@@ -1546,18 +1504,14 @@ public partial class ApiSchemaTests
                             ""ApiForeignKeyTypeA"": {
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""PostId"" }
-                                        ]
+                                        ""ClrPath"": ""PostId""
                                     }
                                 ]
                             },
                             ""ApiForeignKeyTypeB"": {
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""TagId"" }
-                                        ]
+                                        ""ClrPath"": ""TagId""
                                     }
                                 ]
                             }

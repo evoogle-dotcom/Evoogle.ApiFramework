@@ -2269,13 +2269,13 @@ public partial class ApiSchemaTests
             ]
         },
 
-        // ApiKeyPathSegment throws if ClrPropertyName is invalid
+        // ApiKeyPath compact JSON preserves invalid segments for compilation diagnostics
         new CompileThrowsTest
         {
-            Name = $"{nameof(ApiKeyPathSegment)} Throws If {nameof(ApiKeyPathSegment.ClrPropertyName)} Is Invalid",
+            Name = $"{nameof(ApiKeyPath)} Compact JSON Preserves Invalid {nameof(ApiKeyPathSegment.ClrPropertyName)}",
             SourceJson = @"
             {
-                ""ApiName"": ""ApiKeyPathSegment Throws If ClrPropertyName Is Invalid"",
+                ""ApiName"": ""ApiKeyPath Compact JSON Preserves Invalid ClrPropertyName"",
                 ""ApiScalarTypes"": [
                     {
                         ""ApiKind"": ""Scalar"",
@@ -2305,9 +2305,7 @@ public partial class ApiSchemaTests
                                 ""ApiKeyPaths"": [
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyTypeApiNameType, Evoogle.ApiFramework.Core.Tests"",
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": """" }
-                                        ]
+                                        ""ClrPath"": """"
                                     }
                                 ]
                             }

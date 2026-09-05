@@ -107,9 +107,7 @@ public partial class ApiKeyTypeTests
                     {
                         ""ClrRootType"": ""Evoogle.ApiFramework.TestData.KeyOneScalarPart, " +
                             @"Evoogle.ApiFramework.Core.Tests"",
-                        ""ApiSegments"": [
-                            { ""ClrPropertyName"": ""Id"" }
-                        ]
+                        ""ClrPath"": ""Id""
                     }
                 ],
                 ""Extensions"": {
@@ -131,9 +129,7 @@ public partial class ApiKeyTypeTests
                     {
                         ""ClrRootType"": ""Evoogle.ApiFramework.TestData.KeyOneScalarPart, " +
                             @"Evoogle.ApiFramework.Core.Tests"",
-                        ""ApiSegments"": [
-                            { ""ClrPropertyName"": ""Id"" }
-                        ]
+                        ""ClrPath"": ""Id""
                     }
                 ],
                 ""Extensions"": {

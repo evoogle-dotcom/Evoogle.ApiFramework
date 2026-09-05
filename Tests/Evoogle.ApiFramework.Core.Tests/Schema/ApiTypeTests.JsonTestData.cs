@@ -811,11 +811,7 @@ public partial class ApiTypeTests
                         ""ApiKeyPaths"": [
                             {
                                 ""ClrRootType"": ""Evoogle.ApiFramework.TestData.Company, Evoogle.ApiFramework.Core.Tests"",
-                                ""ApiSegments"": [
-                                    {
-                                        ""ClrPropertyName"": ""Id""
-                                    }
-                                ]
+                                ""ClrPath"": ""Id""
                             }
                         ]
                     },
@@ -824,11 +820,7 @@ public partial class ApiTypeTests
                         ""ApiKeyPaths"": [
                             {
                                 ""ClrRootType"": ""Evoogle.ApiFramework.TestData.Company, Evoogle.ApiFramework.Core.Tests"",
-                                ""ApiSegments"": [
-                                    {
-                                        ""ClrPropertyName"": ""Name""
-                                    }
-                                ]
+                                ""ClrPath"": ""Name""
                             }
                         ]
                     }
@@ -1342,11 +1334,7 @@ public partial class ApiTypeTests
                         ""ApiKeyPaths"": [
                             {
                                 ""ClrRootType"": ""Evoogle.ApiFramework.TestData.Company, Evoogle.ApiFramework.Core.Tests"",
-                                ""ApiSegments"": [
-                                    {
-                                        ""ClrPropertyName"": ""Id""
-                                    }
-                                ]
+                                ""ClrPath"": ""Id""
                             }
                         ]
                     },
@@ -1355,11 +1343,7 @@ public partial class ApiTypeTests
                         ""ApiKeyPaths"": [
                             {
                                 ""ClrRootType"": ""Evoogle.ApiFramework.TestData.Company, Evoogle.ApiFramework.Core.Tests"",
-                                ""ApiSegments"": [
-                                    {
-                                        ""ClrPropertyName"": ""Name""
-                                    }
-                                ]
+                                ""ClrPath"": ""Name""
                             }
                         ]
                     }

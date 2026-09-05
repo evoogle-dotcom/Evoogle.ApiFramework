@@ -75,6 +75,9 @@ public sealed class ApiKeyPath(Type? clrRootType, IEnumerable<ApiKeyPathSegment>
     /// </summary>
     public Type ClrRootType => this.RequireValue(_clrRootType);
 
+    /// <summary>Gets the dot-delimited CLR property path represented by <see cref="ApiSegments"/>.</summary>
+    public string ClrPath => string.Join('.', this.ApiSegments.Select(static segment => segment.ClrPropertyName));
+
     internal string? ApiPathLabel
     {
         get

@@ -6,6 +6,7 @@
 using System.Reflection;
 
 using Evoogle.ApiFramework.Schema.Annotations;
+using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
 using Evoogle.Reflection;
 
@@ -387,8 +388,8 @@ public sealed class ApiAttributeAnnotationReader :
             );
         }
 
-        var clrPropertyNames = keyAttribute.ClrPath.Split('.');
-        if (clrPropertyNames.Length == 0 || clrPropertyNames.Any(string.IsNullOrWhiteSpace))
+        var parseResult = ApiKeyPathClrPathParser.Parse(keyAttribute.ClrPath);
+        if (!parseResult.IsValid)
         {
             throw new InvalidOperationException
             (
@@ -398,7 +399,7 @@ public sealed class ApiAttributeAnnotationReader :
             );
         }
 
-        return clrPropertyNames;
+        return parseResult.ClrPropertyNames;
     }
 
     private static IEnumerable<MemberInfo> GetPublicInstanceMembers(Type clrType)

@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Evoogle.com
+﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
 //
 // This file is licensed under the MIT License.
@@ -699,9 +699,7 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""PK_Person_Id"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id"" }
-                                        ]
+                                        ""ClrPath"": ""Id""
                                     }
                                 ]
                             },
@@ -709,9 +707,7 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""AK_Person_Name"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Name"" }
-                                        ]
+                                        ""ClrPath"": ""Name""
                                     }
                                 ]
                             }
@@ -964,9 +960,7 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""PK_Person_Id"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id"" }
-                                        ]
+                                        ""ClrPath"": ""Id""
                                     }
                                 ]
                             },
@@ -974,9 +968,7 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""AK_Person_Name"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Name"" }
-                                        ]
+                                        ""ClrPath"": ""Name""
                                     }
                                 ]
                             }
@@ -1283,9 +1275,7 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""PK_Company_Id"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id"" }
-                                        ]
+                                        ""ClrPath"": ""Id""
                                     }
                                 ]
                             },
@@ -1293,9 +1283,7 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""AK_Company_Name"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Name"" }
-                                        ]
+                                        ""ClrPath"": ""Name""
                                     }
                                 ]
                             }
@@ -1379,9 +1367,7 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""PK_Person_Id"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id"" }
-                                        ]
+                                        ""ClrPath"": ""Id""
                                     }
                                 ]
                             },
@@ -1389,9 +1375,7 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""AK_Person_Name"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Name"" }
-                                        ]
+                                        ""ClrPath"": ""Name""
                                     }
                                 ]
                             }
