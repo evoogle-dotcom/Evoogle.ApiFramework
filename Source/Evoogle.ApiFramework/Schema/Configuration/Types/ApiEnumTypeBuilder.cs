@@ -4,7 +4,6 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
-using Evoogle.ApiFramework.Schema.Configuration.Trace;
 using Evoogle.ApiFramework.Schema.Configuration.Types.Internal;
 using Evoogle.ApiFramework.Schema.Types;
 
@@ -107,30 +106,12 @@ public class ApiEnumTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
 
         if (_state.Values.Any(builder => builder.ClrName == clrName))
         {
-            this.Context.TraceStructuralRegistration
-            (
-                new(ApiSchemaBuildTargetKind.EnumValue, this.ClrType, clrName),
-                ApiSchemaBuildRegistrationKind.EnumValue,
-                this.Context.CurrentConfigurationSource,
-                wasRegistered: false,
-                clrOrdinal: clrOrdinal,
-                rejectionReason: "An enum value with the CLR name was already registered."
-            );
             return null;
         }
 
         // Explicit entries take precedence; convention-vs-convention ordinal collisions propagate to compilation.
         if (_state.Values.Any(builder => builder.ClrOrdinal == clrOrdinal && builder.ApiNameSource == ApiConfigurationSource.Explicit))
         {
-            this.Context.TraceStructuralRegistration
-            (
-                new(ApiSchemaBuildTargetKind.EnumValue, this.ClrType, clrName),
-                ApiSchemaBuildRegistrationKind.EnumValue,
-                this.Context.CurrentConfigurationSource,
-                wasRegistered: false,
-                clrOrdinal: clrOrdinal,
-                rejectionReason: "An explicitly configured enum value already owns the ordinal."
-            );
             return null;
         }
 
@@ -174,20 +155,10 @@ public class ApiEnumTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
             apiName,
             clrName,
             clrOrdinal,
-            apiNameSource,
-            this.Context,
-            this.ClrType
+            apiNameSource
         );
 
         _state.Values.Add(builder);
-        this.Context.TraceStructuralRegistration
-        (
-            new(ApiSchemaBuildTargetKind.EnumValue, this.ClrType, clrName, apiName),
-            ApiSchemaBuildRegistrationKind.EnumValue,
-            apiNameSource,
-            wasRegistered: true,
-            clrOrdinal: clrOrdinal
-        );
         return builder;
     }
     #endregion

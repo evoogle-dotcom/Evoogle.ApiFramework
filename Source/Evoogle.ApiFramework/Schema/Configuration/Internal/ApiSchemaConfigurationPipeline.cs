@@ -8,7 +8,6 @@ using System.Reflection;
 using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Schema.Configuration.Annotations.Internal;
 using Evoogle.ApiFramework.Schema.Configuration.Conventions;
-using Evoogle.ApiFramework.Schema.Configuration.Trace;
 using Evoogle.ApiFramework.Schema.Configuration.Types;
 using Evoogle.ApiFramework.Schema.Types;
 using Evoogle.Reflection;
@@ -71,9 +70,7 @@ internal sealed class ApiSchemaConfigurationPipeline
         var processedPropertyBuilders = new HashSet<ApiPropertyBuilder>(ReferenceEqualityComparer.Instance);
         var processedEnumValueBuilders = new HashSet<ApiEnumValueBuilder>(ReferenceEqualityComparer.Instance);
 
-        this.RecordPhaseStarted(ApiSchemaBuildPhase.Discovery, 0);
         this.ApplySchemaDiscoveryConventions();
-        this.RecordPhaseCompleted(ApiSchemaBuildPhase.Discovery, 0);
 
         var iterations = 0;
 
@@ -87,8 +84,6 @@ internal sealed class ApiSchemaConfigurationPipeline
                     "This usually indicates that a convention is registering types in a cycle."
                 );
             }
-
-            this.RecordPhaseStarted(ApiSchemaBuildPhase.Discovery, iterations - 1);
 
             foreach (var objectBuilder in _context.DrainPendingObjectBuilders())
             {
@@ -109,8 +104,6 @@ internal sealed class ApiSchemaConfigurationPipeline
                     );
                     this.ApplyConvention
                     (
-                        convention,
-                        GetTarget(objectBuilder),
                         () => convention.Apply(objectBuilder)
                     );
                 }
@@ -135,8 +128,6 @@ internal sealed class ApiSchemaConfigurationPipeline
                 {
                     this.ApplyConvention
                     (
-                        convention,
-                        GetTarget(scalarBuilder),
                         () => convention.Apply(scalarBuilder)
                     );
                 }
@@ -150,8 +141,6 @@ internal sealed class ApiSchemaConfigurationPipeline
                 {
                     this.ApplyConvention
                     (
-                        convention,
-                        GetTarget(enumBuilder),
                         () => convention.Apply(enumBuilder)
                     );
                 }
@@ -172,9 +161,6 @@ internal sealed class ApiSchemaConfigurationPipeline
                 );
             }
 
-            this.RecordPhaseCompleted(ApiSchemaBuildPhase.Discovery, iterations - 1);
-            this.RecordPhaseStarted(ApiSchemaBuildPhase.Configuration, iterations - 1);
-
             this.ApplyEnumValueConventions(enumBuilders, processedEnumValueBuilders);
             this.ApplyPropertyPipeline
             (
@@ -193,19 +179,14 @@ internal sealed class ApiSchemaConfigurationPipeline
 
             if (!_context.HasPendingBuilders && !hasUnprocessedEnumValues)
             {
-                this.RecordPhaseCompleted(ApiSchemaBuildPhase.Configuration, iterations - 1);
                 break;
             }
-
-            this.RecordPhaseCompleted(ApiSchemaBuildPhase.Configuration, iterations - 1);
         }
 
         var structuralBuilderCounts = this.GetStructuralBuilderCounts();
 
-        this.RecordPhaseStarted(ApiSchemaBuildPhase.Relationship, 0);
         this.ApplyRelationshipAnnotations(objectBuilders);
         this.ApplyRelationshipConventions();
-        this.RecordPhaseCompleted(ApiSchemaBuildPhase.Relationship, 0);
 
         this.ThrowIfRelationshipStageAddedStructuralBuilders(structuralBuilderCounts);
     }
@@ -218,8 +199,6 @@ internal sealed class ApiSchemaConfigurationPipeline
         {
             this.ApplyConvention
             (
-                convention,
-                new(ApiSchemaBuildTargetKind.Schema),
                 () => convention.Apply(_schemaBuilder)
             );
         }
@@ -231,8 +210,6 @@ internal sealed class ApiSchemaConfigurationPipeline
         {
             this.ApplyConvention
             (
-                convention,
-                GetTarget(builder),
                 () => convention.Apply(builder)
             );
         }
@@ -407,8 +384,6 @@ internal sealed class ApiSchemaConfigurationPipeline
                     {
                         this.ApplyConvention
                         (
-                            convention,
-                            GetTarget(propertyBuilder, objectBuilder.ClrType),
                             () => convention.Apply(propertyBuilder, context)
                         );
                     }
@@ -463,8 +438,6 @@ internal sealed class ApiSchemaConfigurationPipeline
                     {
                         this.ApplyConvention
                         (
-                            convention,
-                            GetTarget(enumValueBuilder, enumBuilder.ClrType),
                             () => convention.Apply(enumValueBuilder, context)
                         );
                     }
@@ -495,128 +468,14 @@ internal sealed class ApiSchemaConfigurationPipeline
         {
             this.ApplyConvention
             (
-                convention,
-                new(ApiSchemaBuildTargetKind.Schema),
                 () => _schemaBuilder.ApplyRelationshipConvention(convention)
             );
         }
     }
 
-    private void ApplyConvention
-    (
-        IApiConvention convention,
-        ApiSchemaBuildTraceTarget target,
-        Action apply
-    )
+    private void ApplyConvention(Action apply)
     {
-        var traceDispatcher = _context.TraceDispatcher;
-        traceDispatcher?.Record
-        (
-            new ApiSchemaBuildConventionStartedEvent
-            {
-                ConventionType = convention.GetType(),
-                ConventionPhase = convention.Phase,
-                Target = target,
-            }
-        );
-
-        try
-        {
-            _context.ApplyConfiguration(ApiConfigurationSource.Convention, apply);
-            traceDispatcher?.Record
-            (
-                new ApiSchemaBuildConventionCompletedEvent
-                {
-                    ConventionType = convention.GetType(),
-                    ConventionPhase = convention.Phase,
-                    Target = target,
-                }
-            );
-        }
-        catch (Exception exception)
-        {
-            traceDispatcher?.Record
-            (
-                new ApiSchemaBuildConventionFailedEvent
-                {
-                    ConventionType = convention.GetType(),
-                    ConventionPhase = convention.Phase,
-                    Target = target,
-                    ExceptionType = exception.GetType().FullName ?? exception.GetType().Name,
-                    ExceptionMessage = exception.Message,
-                }
-            );
-            throw;
-        }
-    }
-
-    private void RecordPhaseStarted(ApiSchemaBuildPhase phase, int iteration)
-    {
-        _context.TraceDispatcher?.Record
-        (
-            new ApiSchemaBuildPhaseStartedEvent
-            {
-                Phase = phase,
-                Iteration = iteration,
-            }
-        );
-    }
-
-    private void RecordPhaseCompleted(ApiSchemaBuildPhase phase, int iteration)
-    {
-        _context.TraceDispatcher?.Record
-        (
-            new ApiSchemaBuildPhaseCompletedEvent
-            {
-                Phase = phase,
-                Iteration = iteration,
-            }
-        );
-    }
-
-    private static ApiSchemaBuildTraceTarget GetTarget(ApiObjectTypeBuilder builder)
-    {
-        return new(ApiSchemaBuildTargetKind.ObjectType, builder.ClrType, ApiName: builder.ApiName);
-    }
-
-    private static ApiSchemaBuildTraceTarget GetTarget(ApiScalarTypeBuilder builder)
-    {
-        return new(ApiSchemaBuildTargetKind.ScalarType, builder.ClrType, ApiName: builder.ApiName);
-    }
-
-    private static ApiSchemaBuildTraceTarget GetTarget(ApiEnumTypeBuilder builder)
-    {
-        return new(ApiSchemaBuildTargetKind.EnumType, builder.ClrType, ApiName: builder.ApiName);
-    }
-
-    private static ApiSchemaBuildTraceTarget GetTarget
-    (
-        ApiPropertyBuilder builder,
-        Type clrObjectType
-    )
-    {
-        return new
-        (
-            ApiSchemaBuildTargetKind.Property,
-            clrObjectType,
-            builder.ClrName,
-            builder.ApiName
-        );
-    }
-
-    private static ApiSchemaBuildTraceTarget GetTarget
-    (
-        ApiEnumValueBuilder builder,
-        Type clrEnumType
-    )
-    {
-        return new
-        (
-            ApiSchemaBuildTargetKind.EnumValue,
-            clrEnumType,
-            builder.ClrName,
-            builder.ApiName
-        );
+        _context.ApplyConfiguration(ApiConfigurationSource.Convention, apply);
     }
     #endregion
 

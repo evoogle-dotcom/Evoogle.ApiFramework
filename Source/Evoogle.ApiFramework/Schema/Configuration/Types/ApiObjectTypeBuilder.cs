@@ -6,7 +6,6 @@
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
 using Evoogle.ApiFramework.Schema.Configuration.Keys;
 using Evoogle.ApiFramework.Schema.Configuration.Relationships;
-using Evoogle.ApiFramework.Schema.Configuration.Trace;
 using Evoogle.ApiFramework.Schema.Configuration.Types.Internal;
 using Evoogle.ApiFramework.Schema.Keys;
 using Evoogle.ApiFramework.Schema.Types;
@@ -58,13 +57,6 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
         var apiKeyTypeBuilder = this.GetOrAddKeyTypeBuilder(apiName);
 
         configure?.Invoke(apiKeyTypeBuilder);
-        this.Context.TraceStructuralRegistration
-        (
-            new(ApiSchemaBuildTargetKind.KeyType, this.ClrType, ApiName: apiName),
-            ApiSchemaBuildRegistrationKind.KeyType,
-            this.Context.CurrentConfigurationSource,
-            wasRegistered: true
-        );
 
         return this;
     }
@@ -325,14 +317,6 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
 
         if (_state.PropertyBuilders.Any(b => b.ClrName == clrName))
         {
-            this.Context.TraceStructuralRegistration
-            (
-                new(ApiSchemaBuildTargetKind.Property, this.ClrType, clrName),
-                ApiSchemaBuildRegistrationKind.Property,
-                this.Context.CurrentConfigurationSource,
-                wasRegistered: false,
-                rejectionReason: "A property with the CLR name was already registered."
-            );
             return null;
         }
 
@@ -360,19 +344,10 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
         (
             apiName,
             clrName,
-            apiNameSource,
-            this.Context,
-            this.ClrType
+            apiNameSource
         );
         configure?.Invoke(builder);
         _state.PropertyBuilders.Add(builder);
-        this.Context.TraceStructuralRegistration
-        (
-            new(ApiSchemaBuildTargetKind.Property, this.ClrType, clrName, apiName),
-            ApiSchemaBuildRegistrationKind.Property,
-            apiNameSource,
-            wasRegistered: true
-        );
         return builder;
     }
 

@@ -17,9 +17,7 @@ internal static class ApiSchemaCompiler
     public static ApiSchemaCompilationResult Compile
     (
         ApiSchema apiSchema,
-        IEnumerable<ApiSchemaCompilationIssue>? preliminaryIssues = null,
-        Action? onFreezingStarted = null,
-        Action? onFreezingCompleted = null
+        IEnumerable<ApiSchemaCompilationIssue>? preliminaryIssues = null
     )
     {
         ArgumentNullException.ThrowIfNull(apiSchema);
@@ -72,15 +70,12 @@ internal static class ApiSchemaCompiler
                 return new ApiSchemaCompilationResult(null, session.Issues);
             }
 
-            onFreezingStarted?.Invoke();
-
             foreach (var element in elements.Where(element => !ReferenceEquals(element, apiSchema)))
             {
                 element.Freeze(frozenExtensions[element]);
             }
 
             apiSchema.Freeze(frozenExtensions[apiSchema]);
-            onFreezingCompleted?.Invoke();
             isSuccessful = true;
             return new ApiSchemaCompilationResult(apiSchema, session.Issues);
         }

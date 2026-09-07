@@ -4,7 +4,6 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
-using Evoogle.ApiFramework.Schema.Configuration.Trace;
 using Evoogle.ApiFramework.Schema.Configuration.Types.Internal;
 using Evoogle.ApiFramework.Schema.Types;
 
@@ -18,8 +17,6 @@ public sealed class ApiEnumValueBuilder
 {
     #region Fields
     private readonly ApiEnumValueState _state;
-    private readonly ApiSchemaBuilderContext? _context;
-    private readonly Type? _clrEnumType;
     #endregion
 
     #region Constructors
@@ -40,25 +37,11 @@ public sealed class ApiEnumValueBuilder
         string clrName,
         int clrOrdinal,
         ApiConfigurationSource apiNameSource
-    ) : this(apiName, clrName, clrOrdinal, apiNameSource, null, null)
-    {
-    }
-
-    internal ApiEnumValueBuilder
-    (
-        string apiName,
-        string clrName,
-        int clrOrdinal,
-        ApiConfigurationSource apiNameSource,
-        ApiSchemaBuilderContext? context,
-        Type? clrEnumType
     )
     {
         _state = new ApiEnumValueState(ValidateName(apiName, nameof(apiName)), apiNameSource);
         this.ClrName = ValidateName(clrName, nameof(clrName));
         this.ClrOrdinal = clrOrdinal;
-        _context = context;
-        _clrEnumType = clrEnumType;
     }
     #endregion
 
@@ -115,39 +98,13 @@ public sealed class ApiEnumValueBuilder
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
 
-        var previousValue = _state.ApiName;
-        var wasApplied = source >= _state.ApiNameSource;
-
         if (source >= _state.ApiNameSource)
         {
             _state.ApiName = apiName;
             _state.ApiNameSource = source;
         }
 
-        _context?.TraceConfigurationChange
-        (
-            this.GetTraceTarget(),
-            ApiSchemaBuildConfigurationFacet.ApiName,
-            source,
-            previousValue,
-            apiName,
-            _state.ApiName,
-            wasApplied,
-            wasApplied ? null : "A higher-precedence API name is already configured."
-        );
-
         return this;
-    }
-
-    private ApiSchemaBuildTraceTarget GetTraceTarget()
-    {
-        return new
-        (
-            ApiSchemaBuildTargetKind.EnumValue,
-            _clrEnumType,
-            this.ClrName,
-            _state.ApiName
-        );
     }
 
     private static string ValidateName(string name, string paramName)

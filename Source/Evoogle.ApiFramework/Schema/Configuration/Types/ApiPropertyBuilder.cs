@@ -7,7 +7,6 @@ using System.Reflection;
 
 using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
-using Evoogle.ApiFramework.Schema.Configuration.Trace;
 using Evoogle.ApiFramework.Schema.Configuration.Types.Internal;
 using Evoogle.ApiFramework.Schema.Types;
 using Evoogle.Extensions;
@@ -23,8 +22,6 @@ public class ApiPropertyBuilder : ExtensionBuilder<ApiPropertyBuilder>
     #region Fields
     private readonly ApiPropertyState _state;
     private readonly string _clrName;
-    private readonly ApiSchemaBuilderContext? _context;
-    private readonly Type? _clrDeclaringType;
     #endregion
 
     #region Constructors
@@ -39,24 +36,15 @@ public class ApiPropertyBuilder : ExtensionBuilder<ApiPropertyBuilder>
     {
     }
 
-    internal ApiPropertyBuilder(string apiName, string clrName, ApiConfigurationSource apiNameSource)
-        : this(apiName, clrName, apiNameSource, null, null)
-    {
-    }
-
     internal ApiPropertyBuilder
     (
         string apiName,
         string clrName,
-        ApiConfigurationSource apiNameSource,
-        ApiSchemaBuilderContext? context,
-        Type? clrDeclaringType
+        ApiConfigurationSource apiNameSource
     )
     {
         _state = new ApiPropertyState(ValidateName(apiName, nameof(apiName)), apiNameSource);
         _clrName = ValidateName(clrName, nameof(clrName));
-        _context = context;
-        _clrDeclaringType = clrDeclaringType;
     }
     #endregion
 
@@ -196,66 +184,24 @@ public class ApiPropertyBuilder : ExtensionBuilder<ApiPropertyBuilder>
 
     private ApiPropertyBuilder SetApiName(string apiName, ApiConfigurationSource source)
     {
-        var previousValue = _state.ApiName;
-        var wasApplied = source >= _state.ApiNameSource;
-
         if (source >= _state.ApiNameSource)
         {
             _state.ApiName = apiName;
             _state.ApiNameSource = source;
         }
 
-        _context?.TraceConfigurationChange
-        (
-            this.GetTraceTarget(),
-            ApiSchemaBuildConfigurationFacet.ApiName,
-            source,
-            previousValue,
-            apiName,
-            _state.ApiName,
-            wasApplied,
-            wasApplied ? null : "A higher-precedence API name is already configured."
-        );
-
         return this;
     }
 
     private ApiPropertyBuilder SetModifiers(Action<ApiTypeModifiersBuilder> configure, ApiConfigurationSource source)
     {
-        var previousSource = _state.ModifiersSource;
-        var wasApplied = false;
-
         if (_state.ModifiersSource == null || source >= _state.ModifiersSource.Value)
         {
             _state.Modifiers = configure;
             _state.ModifiersSource = source;
-            wasApplied = true;
         }
 
-        _context?.TraceConfigurationChange
-        (
-            this.GetTraceTarget(),
-            ApiSchemaBuildConfigurationFacet.Modifiers,
-            source,
-            previousSource?.ToString(),
-            "configured",
-            _state.ModifiersSource?.ToString(),
-            wasApplied,
-            wasApplied ? null : "A higher-precedence property modifier is already configured."
-        );
-
         return this;
-    }
-
-    private ApiSchemaBuildTraceTarget GetTraceTarget()
-    {
-        return new
-        (
-            ApiSchemaBuildTargetKind.Property,
-            _clrDeclaringType,
-            _clrName,
-            _state.ApiName
-        );
     }
 
     private ApiProperty BuildFromNullabilityInfo(MemberNullableInfo clrNullabilityInfo, ClrMemberKind clrMemberKind)

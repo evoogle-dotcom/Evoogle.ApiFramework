@@ -4,8 +4,6 @@ using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Schema.Compilation;
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
 using Evoogle.ApiFramework.Schema.Configuration.Relationships;
-using Evoogle.ApiFramework.Schema.Configuration.Trace;
-using Evoogle.ApiFramework.Schema.Configuration.Trace.Internal;
 using Evoogle.ApiFramework.Schema.Configuration.Types;
 using Evoogle.Logging;
 
@@ -31,7 +29,6 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null) : IHasLogger
     private readonly Queue<ApiEnumTypeBuilder> _pendingEnumBuilders = new();
     private readonly List<ApiSchemaCompilationIssue> _configurationIssues = [];
     private readonly ApiConfigurationSourceScope _configurationSourceScope = new();
-    private ApiSchemaBuildTraceDispatcher? _traceDispatcher;
     #endregion
 
     #region IHasLogger Properties
@@ -49,9 +46,6 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null) : IHasLogger
     /// <summary>Gets the source associated with the active configuration callback.</summary>
     internal ApiConfigurationSource CurrentConfigurationSource =>
         _configurationSourceScope.CurrentSource;
-
-    /// <summary>Gets the active optional schema-build trace dispatcher.</summary>
-    internal ApiSchemaBuildTraceDispatcher? TraceDispatcher => _traceDispatcher;
 
     /// <summary>Returns <c>true</c> when at least one newly registered type builder is awaiting convention processing.</summary>
     internal bool HasPendingBuilders =>
@@ -101,70 +95,10 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null) : IHasLogger
         _configurationIssues.Add(issue);
     }
 
-    /// <summary>Sets the optional trace dispatcher for the current build.</summary>
-    internal void SetTraceDispatcher(ApiSchemaBuildTraceDispatcher? traceDispatcher)
-    {
-        _traceDispatcher = traceDispatcher;
-    }
-
     /// <summary>Runs a configuration callback at the supplied source precedence.</summary>
     internal void ApplyConfiguration(ApiConfigurationSource source, Action configure)
     {
         _configurationSourceScope.Apply(source, configure);
-    }
-
-    /// <summary>Records a configuration attempt when tracing is enabled.</summary>
-    internal void TraceConfigurationChange
-    (
-        ApiSchemaBuildTraceTarget target,
-        ApiSchemaBuildConfigurationFacet facet,
-        ApiConfigurationSource source,
-        string? previousValue,
-        string? requestedValue,
-        string? effectiveValue,
-        bool wasApplied,
-        string? rejectionReason = null
-    )
-    {
-        _traceDispatcher?.Record
-        (
-            new ApiSchemaBuildConfigurationChangeEvent
-            {
-                Target = target,
-                Facet = facet,
-                ConfigurationSource = source.ToTraceSource(),
-                PreviousValue = previousValue,
-                RequestedValue = requestedValue,
-                EffectiveValue = effectiveValue,
-                WasApplied = wasApplied,
-                RejectionReason = rejectionReason,
-            }
-        );
-    }
-
-    /// <summary>Records a structural registration attempt when tracing is enabled.</summary>
-    internal void TraceStructuralRegistration
-    (
-        ApiSchemaBuildTraceTarget target,
-        ApiSchemaBuildRegistrationKind registrationKind,
-        ApiConfigurationSource source,
-        bool wasRegistered,
-        int? clrOrdinal = null,
-        string? rejectionReason = null
-    )
-    {
-        _traceDispatcher?.Record
-        (
-            new ApiSchemaBuildStructuralRegistrationEvent
-            {
-                Target = target,
-                RegistrationKind = registrationKind,
-                ConfigurationSource = source.ToTraceSource(),
-                WasRegistered = wasRegistered,
-                ClrOrdinal = clrOrdinal,
-                RejectionReason = rejectionReason,
-            }
-        );
     }
 
     /// <summary>
@@ -195,8 +129,7 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null) : IHasLogger
             _apiEnumTypeBuilders,
             static (t, ctx) => ApiBuilderFactory.CreateClosedGeneric<ApiEnumTypeBuilder>(typeof(ApiEnumTypeBuilder<>), t, ctx),
             this,
-            _pendingEnumBuilders,
-            ApiSchemaBuildTargetKind.EnumType
+            _pendingEnumBuilders
         );
 
     /// <summary>
@@ -211,8 +144,7 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null) : IHasLogger
             _apiObjectTypeBuilders,
             static (t, ctx) => ApiBuilderFactory.CreateClosedGeneric<ApiObjectTypeBuilder>(typeof(ApiObjectTypeBuilder<>), t, ctx),
             this,
-            _pendingObjectBuilders,
-            ApiSchemaBuildTargetKind.ObjectType
+            _pendingObjectBuilders
         );
 
     /// <summary>
@@ -235,8 +167,7 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null) : IHasLogger
             _apiScalarTypeBuilders,
             static (t, ctx) => ApiBuilderFactory.CreateClosedGeneric<ApiScalarTypeBuilder>(typeof(ApiScalarTypeBuilder<>), t, ctx),
             this,
-            _pendingScalarBuilders,
-            ApiSchemaBuildTargetKind.ScalarType
+            _pendingScalarBuilders
         );
 
     /// <summary>
@@ -314,8 +245,7 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null) : IHasLogger
         Dictionary<Type, TBuilder> builders,
         Func<Type, ApiSchemaBuilderContext, TBuilder> factory,
         ApiSchemaBuilderContext context,
-        Queue<TBuilder>? pendingQueue,
-        ApiSchemaBuildTargetKind targetKind
+        Queue<TBuilder>? pendingQueue
     )
     {
         ArgumentNullException.ThrowIfNull(clrType);
@@ -325,24 +255,6 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null) : IHasLogger
             builder = factory(clrType, context);
             builders[clrType] = builder;
             pendingQueue?.Enqueue(builder);
-            context.TraceStructuralRegistration
-            (
-                new(targetKind, clrType),
-                ApiSchemaBuildRegistrationKind.Type,
-                context.CurrentConfigurationSource,
-                wasRegistered: true
-            );
-        }
-        else
-        {
-            context.TraceStructuralRegistration
-            (
-                new(targetKind, clrType),
-                ApiSchemaBuildRegistrationKind.Type,
-                context.CurrentConfigurationSource,
-                wasRegistered: false,
-                rejectionReason: "The type was already registered."
-            );
         }
 
         return builder;
@@ -358,15 +270,6 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null) : IHasLogger
     {
         if (_apiRelationshipBuilders.TryGetValue(apiName, out var existing))
         {
-            this.TraceStructuralRegistration
-            (
-                new(ApiSchemaBuildTargetKind.Relationship, ApiName: apiName),
-                ApiSchemaBuildRegistrationKind.Relationship,
-                source,
-                wasRegistered: false,
-                rejectionReason: "The relationship name was already registered."
-            );
-
             if (existing is not TBuilder typed)
             {
                 if (source < existing.RegistrationSource)
@@ -389,13 +292,6 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null) : IHasLogger
         var builder = factory(apiName);
         builder.SetRegistrationSource(source);
         _apiRelationshipBuilders[apiName] = builder;
-        this.TraceStructuralRegistration
-        (
-            new(ApiSchemaBuildTargetKind.Relationship, ApiName: apiName),
-            ApiSchemaBuildRegistrationKind.Relationship,
-            source,
-            wasRegistered: true
-        );
         return builder;
     }
     #endregion
