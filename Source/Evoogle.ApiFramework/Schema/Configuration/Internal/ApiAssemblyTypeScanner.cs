@@ -5,12 +5,18 @@
 // See the LICENSE file in the project root for more information.
 using System.Reflection;
 
+using Evoogle.ApiFramework.Schema.Compilation;
+
 namespace Evoogle.ApiFramework.Schema.Configuration.Internal;
 
 internal sealed record ApiAssemblyTypeScanResult(
     IReadOnlyList<Type> Types,
     IReadOnlyList<ApiSchemaCompilationIssue> Issues);
 
+/// <summary>
+///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used
+///     directly from your code. This API may change or be removed in future releases.
+/// </summary>
 internal static class ApiAssemblyTypeScanner
 {
     internal static ApiAssemblyTypeScanResult Scan(

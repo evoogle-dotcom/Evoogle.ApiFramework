@@ -1,0 +1,92 @@
+﻿// Copyright (c) 2024-2025 Evoogle.com
+// SPDX-License-Identifier: MIT
+//
+// This file is licensed under the MIT License.
+// See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Schema.Keys;
+
+namespace Evoogle.ApiFramework.Schema.Configuration.Keys;
+
+/// <summary>
+///     Fluent builder used to configure a single <see cref="ApiKeyPathSegment"/>.
+/// </summary>
+public class ApiKeyPathSegmentBuilder : ExtensionBuilder<ApiKeyPathSegmentBuilder>
+{
+    #region Fields
+    private readonly string _clrPropertyName;
+    #endregion
+
+    #region Properties
+    /// <summary>Gets the CLR property name for this segment.</summary>
+    internal string ClrPropertyName => _clrPropertyName;
+    #endregion
+
+    #region Constructors
+    /// <summary>
+    ///     Creates an <see cref="ApiKeyPathSegmentBuilder"/> with the specified CLR property name.
+    /// </summary>
+    /// <param name="clrPropertyName">The CLR property name for this navigation step.</param>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="clrPropertyName"/> is not one CLR property name.</exception>
+    public ApiKeyPathSegmentBuilder(string clrPropertyName)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(clrPropertyName);
+
+        if (clrPropertyName.Contains('.'))
+        {
+            throw new ArgumentException
+            (
+                "A key path segment must contain exactly one CLR property name and cannot contain a dot.",
+                nameof(clrPropertyName)
+            );
+        }
+
+        _clrPropertyName = clrPropertyName;
+    }
+    #endregion
+
+    #region Factory Methods
+    /// <summary>
+    ///     Creates a builder for a segment with the specified CLR property name.
+    /// </summary>
+    /// <param name="clrPropertyName">The CLR property name for this navigation step.</param>
+    /// <returns>A new <see cref="ApiKeyPathSegmentBuilder"/> for the specified property name.</returns>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="clrPropertyName"/> is not one CLR property name.</exception>
+    public static ApiKeyPathSegmentBuilder For(string clrPropertyName)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(clrPropertyName);
+
+        return new(clrPropertyName);
+    }
+    #endregion
+
+    #region AddExtension Methods
+    /// <summary>
+    ///     Adds an extension value associated with the specified <paramref name="extensionType"/>.
+    /// </summary>
+    /// <param name="extensionType">The type used as the extension key.</param>
+    /// <param name="extension">The extension value to store.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiKeyPathSegmentBuilder AddKeyPathSegmentExtension(Type extensionType, object extension)
+    {
+        return this.AddExtension(extensionType, extension);
+    }
+    #endregion
+
+    #region Build Methods
+    /// <summary>
+    ///     Builds the <see cref="ApiKeyPathSegment"/> configured by this builder.
+    /// </summary>
+    internal ApiKeyPathSegment Build()
+    {
+        var segment = new ApiKeyPathSegment(_clrPropertyName);
+
+        var extensions = this.BuildExtensions();
+        if (extensions != null)
+        {
+            segment.AttachExtensions(extensions);
+        }
+
+        return segment;
+    }
+    #endregion
+}

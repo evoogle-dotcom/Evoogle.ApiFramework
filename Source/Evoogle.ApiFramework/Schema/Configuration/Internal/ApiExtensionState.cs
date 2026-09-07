@@ -6,7 +6,8 @@
 namespace Evoogle.ApiFramework.Schema.Configuration.Internal;
 
 /// <summary>
-///     Stores extension metadata collected while a schema builder is being configured.
+///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used
+///     directly from your code. This API may change or be removed in future releases.
 /// </summary>
 internal sealed class ApiExtensionState
 {

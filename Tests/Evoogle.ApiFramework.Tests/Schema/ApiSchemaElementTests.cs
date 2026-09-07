@@ -6,7 +6,6 @@
 using System.Text.Json;
 
 using Evoogle.ApiFramework.Exceptions;
-using Evoogle.ApiFramework.Schema.Internal;
 using Evoogle.ApiFramework.Schema.TestData;
 using Evoogle.NTree;
 using Evoogle.XUnit;

@@ -5,9 +5,6 @@
 // See the LICENSE file in the project root for more information.
 using System.Linq.Dynamic.Core.CustomTypeProviders;
 
-using Evoogle.ApiFramework.Schema;
-using Evoogle.ApiFramework.Schema.Configuration;
-
 using static Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests;
 
 namespace Evoogle.ApiFramework.Schema.Configuration.Annotations;

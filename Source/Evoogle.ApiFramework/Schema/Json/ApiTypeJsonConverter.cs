@@ -4,8 +4,7 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using System.Text.Json;
-
-using Evoogle.ApiFramework.Schema.Json.Internal;
+using Evoogle.ApiFramework.Schema.Types;
 using Evoogle.Json;
 
 using Microsoft.Extensions.Logging;
@@ -97,27 +96,27 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
             {
                 ApiCollectionType = new ApiCollectionTypePropertyNames
                 {
-                    ApiItemTypeExpression = policy.ConvertName(nameof(Schema.ApiCollectionType.ApiItemType)), // Mapping property name from ApiItemTypeExpression to ApiItemType by design
-                    ApiItemTypeModifiers = policy.ConvertName(nameof(Schema.ApiCollectionType.ApiItemTypeModifiers))
+                    ApiItemTypeExpression = policy.ConvertName(nameof(Types.ApiCollectionType.ApiItemType)), // Mapping property name from ApiItemTypeExpression to ApiItemType by design
+                    ApiItemTypeModifiers = policy.ConvertName(nameof(Types.ApiCollectionType.ApiItemTypeModifiers))
                 },
                 ApiEnumType = new ApiEnumTypePropertyNames
                 {
-                    ApiEnumValues = policy.ConvertName(nameof(Schema.ApiEnumType.ApiEnumValues))
+                    ApiEnumValues = policy.ConvertName(nameof(Types.ApiEnumType.ApiEnumValues))
                 },
                 ApiNamedType = new ApiNamedTypePropertyNames
                 {
-                    ApiName = policy.ConvertName(nameof(Schema.ApiNamedType.ApiName))
+                    ApiName = policy.ConvertName(nameof(Types.ApiNamedType.ApiName))
                 },
                 ApiObjectType = new ApiObjectTypePropertyNames
                 {
-                    ApiOptions = policy.ConvertName(nameof(Schema.ApiObjectType.ApiOptions)),
-                    ApiProperties = policy.ConvertName(nameof(Schema.ApiObjectType.ApiProperties)),
-                    ApiKeyTypes = policy.ConvertName(nameof(Schema.ApiObjectType.ApiKeyTypes))
+                    ApiOptions = policy.ConvertName(nameof(Types.ApiObjectType.ApiOptions)),
+                    ApiProperties = policy.ConvertName(nameof(Types.ApiObjectType.ApiProperties)),
+                    ApiKeyTypes = policy.ConvertName(nameof(Types.ApiObjectType.ApiKeyTypes))
                 },
                 ApiType = new ApiTypePropertyNames
                 {
-                    ClrType = policy.ConvertName(nameof(Schema.ApiType.ClrType)),
-                    ApiKind = policy.ConvertName(nameof(Schema.ApiType.ApiKind))
+                    ClrType = policy.ConvertName(nameof(Types.ApiType.ClrType)),
+                    ApiKind = policy.ConvertName(nameof(Types.ApiType.ApiKind))
                 },
                 ExtensibleBase = GetExtensiblePropertyNames(policy),
             };

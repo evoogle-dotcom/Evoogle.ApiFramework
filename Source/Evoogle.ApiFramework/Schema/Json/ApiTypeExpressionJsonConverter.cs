@@ -6,6 +6,7 @@
 using System.Text.Json;
 
 using Evoogle.ApiFramework.Schema.Json.Internal;
+using Evoogle.ApiFramework.Schema.Types;
 using Evoogle.Json;
 
 using Microsoft.Extensions.Logging;
@@ -47,10 +48,10 @@ public class ApiTypeExpressionJsonConverter(ILogger<ApiTypeExpressionJsonConvert
             {
                 ApiTypeExpression = new ApiTypeExpressionPropertyNames
                 {
-                    ApiInlineType = policy.ConvertName(nameof(Schema.ApiTypeExpression.ApiInlineType)),
-                    ApiKind = policy.ConvertName(nameof(Schema.ApiTypeExpression.ApiKind)),
-                    ApiName = policy.ConvertName(nameof(Schema.ApiTypeExpression.ApiName)),
-                    ClrType = policy.ConvertName(nameof(Schema.ApiTypeExpression.ClrType)),
+                    ApiInlineType = policy.ConvertName(nameof(Types.ApiTypeExpression.ApiInlineType)),
+                    ApiKind = policy.ConvertName(nameof(Types.ApiTypeExpression.ApiKind)),
+                    ApiName = policy.ConvertName(nameof(Types.ApiTypeExpression.ApiName)),
+                    ClrType = policy.ConvertName(nameof(Types.ApiTypeExpression.ClrType)),
                 }
             };
         #endregion

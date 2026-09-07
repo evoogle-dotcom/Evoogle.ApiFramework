@@ -3,7 +3,9 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using Evoogle.ApiFramework.Schema.Internal;
+using Evoogle.ApiFramework.Schema.Compilation;
+using Evoogle.ApiFramework.Schema.Compilation.Internal;
+using Evoogle.ApiFramework.Schema.Keys;
 using Evoogle.Extension;
 using Evoogle.NTree;
 

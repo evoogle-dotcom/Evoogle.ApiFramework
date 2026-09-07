@@ -6,6 +6,7 @@
 using System.Collections.Immutable;
 
 using Evoogle.ApiFramework.Schema;
+using Evoogle.ApiFramework.Schema.Compilation;
 
 namespace Evoogle.ApiFramework.Exceptions;
 

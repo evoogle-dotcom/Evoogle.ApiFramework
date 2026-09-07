@@ -8,9 +8,12 @@ using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
-using Evoogle.ApiFramework.Exceptions;
-using Evoogle.ApiFramework.Schema.Internal;
+using Evoogle.ApiFramework.Schema.Compilation;
+using Evoogle.ApiFramework.Schema.Compilation.Internal;
 using Evoogle.ApiFramework.Schema.Json;
+using Evoogle.ApiFramework.Schema.Keys;
+using Evoogle.ApiFramework.Schema.Relationships;
+using Evoogle.ApiFramework.Schema.Types;
 using Evoogle.Extensions;
 using Evoogle.NTree;
 

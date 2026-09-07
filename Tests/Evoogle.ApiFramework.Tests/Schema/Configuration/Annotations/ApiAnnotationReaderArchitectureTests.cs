@@ -6,8 +6,6 @@
 using System.Reflection;
 
 using Evoogle.ApiFramework.Exceptions;
-using Evoogle.ApiFramework.Schema;
-using Evoogle.ApiFramework.Schema.Configuration;
 using Evoogle.XUnit;
 
 using FluentAssertions;

@@ -8,6 +8,10 @@ using Microsoft.Extensions.Logging;
 
 namespace Evoogle.ApiFramework.Schema.Configuration.Trace.Internal;
 
+/// <summary>
+///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used
+///     directly from your code. This API may change or be removed in future releases.
+/// </summary>
 internal static class ApiSchemaBuildTraceExtensions
 {
     internal static ApiSchemaBuildConfigurationSource ToTraceSource
@@ -27,7 +31,8 @@ internal static class ApiSchemaBuildTraceExtensions
 }
 
 /// <summary>
-///     Assigns build-order sequence numbers and forwards schema-build trace events to an optional sink.
+///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used
+///     directly from your code. This API may change or be removed in future releases.
 /// </summary>
 internal sealed class ApiSchemaBuildTraceDispatcher
 {

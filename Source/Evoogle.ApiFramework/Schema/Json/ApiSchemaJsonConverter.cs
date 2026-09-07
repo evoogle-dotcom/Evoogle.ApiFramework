@@ -5,7 +5,9 @@
 // See the LICENSE file in the project root for more information.
 using System.Text.Json;
 
-using Evoogle.ApiFramework.Schema.Internal;
+using Evoogle.ApiFramework.Schema.Compilation.Internal;
+using Evoogle.ApiFramework.Schema.Relationships;
+using Evoogle.ApiFramework.Schema.Types;
 using Evoogle.Json;
 
 using Microsoft.Extensions.Logging;

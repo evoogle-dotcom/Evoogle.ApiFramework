@@ -1,0 +1,185 @@
+﻿// Copyright (c) 2024-2025 Evoogle.com
+// SPDX-License-Identifier: MIT
+//
+// This file is licensed under the MIT License.
+// See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Exceptions;
+using Evoogle.ApiFramework.Schema.Compilation;
+using Evoogle.ApiFramework.Schema.Compilation.Internal;
+using Evoogle.ApiFramework.Schema.Relationships.Internal;
+using Evoogle.ApiFramework.Schema.Types;
+
+namespace Evoogle.ApiFramework.Schema.Relationships;
+
+/// <summary>
+///     Abstract intermediate base class for relationships that connect exactly two participating
+///     <see cref="ApiObjectType"/> instances with a single principal end and a single dependent end.
+/// </summary>
+/// <remarks>
+///     Concrete subclasses are <see cref="ApiRelationshipOneToOne"/> and <see cref="ApiRelationshipOneToMany"/>.
+///     The foreign key role always resides on the dependent side; the principal side provides the referenced principal key type.
+///     Self-referential relationships are supported by setting both ends to the same <see cref="ApiRelationshipElement.ClrObjectType"/>.
+/// </remarks>
+public abstract class ApiRelationshipOneTo : ApiRelationship
+{
+    #region ApiRelationshipOneTo Fields
+    private ApiRelationshipKeyBinding? _apiResolvedKeyBinding = null;
+    #endregion
+
+    #region ApiRelationshipOneTo Properties
+    /// <summary>Gets the principal end of the relationship, which provides the referenced principal key type.</summary>
+    public ApiRelationshipPrincipalEnd ApiPrincipalEnd { get; }
+
+    /// <summary>Gets the dependent end of the relationship, which may provide the foreign key role's key paths.</summary>
+    public ApiRelationshipDependentEnd ApiDependentEnd { get; }
+
+    /// <summary>Gets the resolved key binding between the principal key and dependent foreign key.</summary>
+    /// <exception cref="ApiSchemaException">
+    ///     Thrown when <see cref="IsNavigational"/> is <see langword="true"/> or compilation failed.
+    ///     Check <see cref="HasKeyBinding"/> before accessing this property.
+    /// </exception>
+    public ApiRelationshipKeyBinding ApiKeyBinding => this.HasKeyBinding
+        ? _apiResolvedKeyBinding!
+        : throw new ApiSchemaException("No key binding declared or resolved for this relationship.");
+
+    /// <summary>Gets a value indicating whether this relationship has a resolved key binding.</summary>
+    public bool HasKeyBinding => _apiResolvedKeyBinding is not null;
+
+    /// <summary>Gets a value indicating whether this relationship has no dependent foreign key binding declared at the schema level.</summary>
+    public bool IsNavigational => this.ApiDependentEnd is null || !this.ApiDependentEnd.HasForeignKey;
+    #endregion
+
+    #region Constructors
+    internal ApiRelationshipOneTo
+    (
+        string apiName,
+        ApiRelationshipPrincipalEnd apiPrincipalEnd,
+        ApiRelationshipDependentEnd apiDependentEnd,
+        ApiRelationshipDeleteBehavior apiDeleteBehavior
+    )
+        : base(apiName, apiDeleteBehavior)
+    {
+        this.ApiPrincipalEnd = apiPrincipalEnd;
+        this.ApiDependentEnd = apiDependentEnd;
+    }
+    #endregion
+
+    #region ApiSchemaElement Methods
+    /// <inheritdoc/>
+    internal override IEnumerable<ApiSchemaElement> GetOwnedElements()
+    {
+        if (this.ApiPrincipalEnd is not null)
+        {
+            yield return this.ApiPrincipalEnd;
+        }
+
+        if (this.ApiDependentEnd is not null)
+        {
+            yield return this.ApiDependentEnd;
+        }
+    }
+
+    /// <inheritdoc/>
+    internal override void CompileCore(ApiSchemaCompilationContext context)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+
+        base.CompileCore(context);
+
+        this.ResolveApiPrincipalEnd(context);
+        this.ResolveApiDependentEnd(context);
+        this.ValidateDependentKeyPathAlignment(context);
+    }
+    #endregion
+
+    #region Implementation Methods
+    private void ResolveApiPrincipalEnd(ApiSchemaCompilationContext context)
+    {
+        if (this.ApiPrincipalEnd is null)
+        {
+            var severity = ApiSchemaCompilationSeverity.Error;
+            var code = ApiSchemaCompilationCode.ApiRelationshipNullPrincipalEnd;
+            var description = $"{nameof(this.ApiPrincipalEnd)} must not be null";
+            var remediation = $"Provide a valid {nameof(ApiRelationshipPrincipalEnd)}";
+
+            context.AddIssue(severity, code, description, remediation);
+            return;
+        }
+
+        var location = ApiSchemaCompilationLocation.ForRole(nameof(this.ApiPrincipalEnd));
+        this.ApiPrincipalEnd.Compile(context, location);
+    }
+
+    private void ResolveApiDependentEnd(ApiSchemaCompilationContext context)
+    {
+        if (this.ApiDependentEnd is null)
+        {
+            var severity = ApiSchemaCompilationSeverity.Error;
+            var code = ApiSchemaCompilationCode.ApiRelationshipNullDependentEnd;
+            var description = $"{nameof(this.ApiDependentEnd)} must not be null";
+            var remediation = $"Provide a valid {nameof(ApiRelationshipDependentEnd)}";
+
+            context.AddIssue(severity, code, description, remediation);
+            return;
+        }
+
+        var location = ApiSchemaCompilationLocation.ForRole(nameof(this.ApiDependentEnd));
+        this.ApiDependentEnd.Compile(context, location);
+    }
+
+    private void ValidateDependentKeyPathAlignment(ApiSchemaCompilationContext context)
+    {
+        var principal = this.ApiPrincipalEnd;
+        var dependent = this.ApiDependentEnd;
+
+        if (principal is null || dependent is null)
+        {
+            return;
+        }
+
+        if (!dependent.HasForeignKey)
+        {
+            this.ValidateNavigationalPrincipalKey(context, principal, nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyTypeName));
+
+            // Purely navigational; no key path alignment to validate.
+            return;
+        }
+
+        var principalKeyDesc = principal.ApiPrincipalKeyTypeName is not null ? $"principal key type '{principal.ApiPrincipalKeyTypeName}'" : "principal key type";
+        var foreignKeyPath = $"{nameof(this.ApiDependentEnd)}.{nameof(this.ApiDependentEnd.ApiForeignKeyType)}";
+        var compatibilityRemediation = $"Ensure {foreignKeyPath} paths are ordered to match the principal end's principal key type and use compatible scalar types";
+
+        _apiResolvedKeyBinding = ApiRelationshipKeyAlignment.ResolvePrincipalForeignKeyBinding
+        (
+            context: context,
+            relationshipPath: this.ApiPath,
+            principalEnd: principal,
+            foreignKeyType: dependent.ApiForeignKeyType,
+            countMismatchCode: ApiSchemaCompilationCode.ApiRelationshipOneToInvalidDependentKeyPathsCount,
+            foreignKeyPath: foreignKeyPath,
+            principalCountLabel: principalKeyDesc,
+            principalCompatibilityLabel: $"principal end {principalKeyDesc}",
+            principalEndQualifier: null,
+            explicitKeyTarget: nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyTypeName),
+            inferredForeignKeyLabel: "foreign key",
+            countMismatchRemediationTarget: "the principal end's principal key type",
+            compatibilityRemediation: compatibilityRemediation
+        );
+    }
+
+    private void ValidateNavigationalPrincipalKey(ApiSchemaCompilationContext context, ApiRelationshipPrincipalEnd principal, string explicitKeyTarget)
+    {
+        if (principal.ApiPrincipalKeyTypeName is null)
+        {
+            return;
+        }
+
+        var severity = ApiSchemaCompilationSeverity.Error;
+        var code = ApiSchemaCompilationCode.ApiRelationshipEndPrincipalKeyWithoutForeignKey;
+        var description = $"Cannot resolve {explicitKeyTarget} '{principal.ApiPrincipalKeyTypeName}' because this relationship has no foreign key binding";
+        var remediation = $"Declare {nameof(this.ApiDependentEnd)}.{nameof(ApiRelationshipDependentEnd.ApiForeignKeyType)} or remove {explicitKeyTarget}";
+
+        context.AddIssue(severity, code, description, remediation);
+    }
+    #endregion
+}

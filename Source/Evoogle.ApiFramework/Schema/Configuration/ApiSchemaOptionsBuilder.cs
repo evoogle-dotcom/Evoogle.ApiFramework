@@ -5,6 +5,7 @@
 // See the LICENSE file in the project root for more information.
 using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
+using Evoogle.ApiFramework.Schema.Keys;
 
 namespace Evoogle.ApiFramework.Schema.Configuration;
 

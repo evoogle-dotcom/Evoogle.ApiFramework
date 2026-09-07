@@ -9,7 +9,8 @@ using Evoogle.ApiFramework.Schema.Configuration.Conventions;
 namespace Evoogle.ApiFramework.Schema.Configuration.Internal;
 
 /// <summary>
-///     Provides an immutable, validated convention schedule for one configuration-pipeline run.
+///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used
+///     directly from your code. This API may change or be removed in future releases.
 /// </summary>
 internal sealed class ApiConventionSchedule
 {

@@ -1,0 +1,602 @@
+﻿// Copyright (c) 2024-2025 Evoogle.com
+// SPDX-License-Identifier: MIT
+//
+// This file is licensed under the MIT License.
+// See the LICENSE file in the project root for more information.
+using System.Collections.Concurrent;
+using System.Reflection;
+using System.Text.Json.Serialization;
+
+using Evoogle.ApiFramework.Exceptions;
+using Evoogle.ApiFramework.Schema.Compilation;
+using Evoogle.ApiFramework.Schema.Compilation.Internal;
+using Evoogle.ApiFramework.Schema.Json;
+using Evoogle.Coercion;
+using Evoogle.Extensions;
+using Evoogle.Reflection;
+
+namespace Evoogle.ApiFramework.Schema.Types;
+
+/// <summary>
+///     Represents structural metadata of an API property belonging to an <see cref="ApiObjectType"/>.
+///     Each property corresponds to a named data element in an API contract.
+/// </summary>
+/// <remarks>
+///     <para>
+///         <see cref="ApiProperty"/> captures type-level structure for fields such as primitives,
+///         objects, collections, and complex types.
+///     </para>
+///     <para>
+///         For optimal performance, getter and setter accessors are compiled once during schema compilation
+///         as lambda expressions using the owning <see cref="ApiObjectType"/>'s CLR type. The compiled
+///         delegates are stored directly on each <see cref="ApiProperty"/> instance and provide near-native
+///         performance (~10-20x faster than reflection) for property/field access operations.
+///     </para>
+///     <para>
+///         The non-generic Try* methods accept <see cref="object"/> and will box value types by design. Prefer
+///         the fully generic overloads to avoid boxing both the target instance and the returned value.
+///     </para>
+/// </remarks>
+[JsonConverter(typeof(ApiPropertyJsonConverter))]
+public sealed partial class ApiProperty : ApiSchemaElement
+{
+    #region ApiProperty Types
+    private delegate void ClrByRefAction<TObject, in TValue>(ref TObject clrObject, ApiSchemaContext apiSchemaContext, TValue? clrValue);
+
+    private readonly record struct ClrCacheKey
+    (
+        Type ClrObjectType,
+        string ClrMemberName,
+        ClrMemberKind ClrMemberKind
+    );
+
+    private readonly record struct ClrGetterCacheValue<TObject, TValue>(Func<TObject, ApiSchemaContext, TValue?>? ClrGetter);
+
+    private readonly record struct ClrSetterCacheValue<TObject, TValue>(Action<TObject, ApiSchemaContext, TValue?>? ClrSetter);
+
+    private readonly record struct ClrSetterByRefCacheValue<TObject, TValue>(ClrByRefAction<TObject, TValue?>? ClrSetterByRef)
+        where TObject : struct;
+
+    private static class ClrGetterCache<TObject, TValue>
+    {
+        public static readonly ConcurrentDictionary<ClrCacheKey, ClrGetterCacheValue<TObject, TValue>> Cache = new();
+    }
+
+    private static class ClrSetterCache<TObject, TValue>
+    {
+        public static readonly ConcurrentDictionary<ClrCacheKey, ClrSetterCacheValue<TObject, TValue>> Cache = new();
+    }
+
+    private static class ClrSetterByRefCache<TObject, TValue>
+        where TObject : struct
+    {
+        public static readonly ConcurrentDictionary<ClrCacheKey, ClrSetterByRefCacheValue<TObject, TValue>> Cache = new();
+    }
+
+    private readonly record struct CoerceMethodCacheKey(Type ClrInputType, Type ClrOutputType);
+    #endregion
+
+    #region ApiProperty Fields
+    private readonly ClrMemberKind? _clrMemberKind;
+
+    private bool _hasInvalidApiTypeModifiers;
+
+    private Func<object, ApiSchemaContext, object?>? _clrGetter;
+
+    private Action<object, ApiSchemaContext, object?>? _clrSetter;
+
+    private static readonly ConcurrentDictionary<CoerceMethodCacheKey, MethodInfo> _coerceMethodCache = new();
+
+    private static readonly MethodInfo? _genericCoerceMethodDefinition = TypeReflection.GetGenericMethodDefinition
+    (
+        type: typeof(TypeCoercion),
+        methodName: nameof(TypeCoercion.Coerce),
+        bindingFlags: BindingFlags.Public | BindingFlags.Instance,
+        parameterCount: 2
+    );
+
+    private static readonly MethodInfo? _nonGenericCoerceMethod = TypeReflection.GetMethod
+    (
+        type: typeof(TypeCoercion),
+        methodName: nameof(TypeCoercion.Coerce),
+        bindingFlags: BindingFlags.Public | BindingFlags.Instance,
+        parameterTypes: [typeof(object), typeof(Type), typeof(TypeCoercionContext)]
+    );
+    #endregion
+
+    #region Constructors
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="ApiProperty"/> class.
+    /// </summary>
+    /// <param name="apiName">The API name of the property.</param>
+    /// <param name="apiTypeExpression">The API type expression of the property.</param>
+    /// <param name="apiTypeModifiers">Modifiers applied to the property (e.g., Required).</param>
+    /// <param name="clrName">The CLR name of the property or field corresponding to this API property.</param>
+    /// <param name="clrMemberKind">The concrete kind of CLR member this API property represents.</param>
+    public ApiProperty
+    (
+        string apiName,
+        ApiTypeExpression apiTypeExpression,
+        ApiTypeModifiers apiTypeModifiers,
+        string clrName,
+        ClrMemberKind clrMemberKind
+    )
+        : this(apiName, apiTypeExpression, apiTypeModifiers, clrName, (ClrMemberKind?)clrMemberKind)
+    {
+    }
+
+    internal ApiProperty
+    (
+        string apiName,
+        ApiTypeExpression apiTypeExpression,
+        ApiTypeModifiers apiTypeModifiers,
+        string clrName,
+        ClrMemberKind? clrMemberKind
+    )
+    {
+        this.ApiName = apiName;
+        this.ApiTypeExpression = apiTypeExpression;
+        this.ApiTypeModifiers = apiTypeModifiers;
+        this.ClrName = clrName;
+        _clrMemberKind = clrMemberKind;
+    }
+    #endregion
+
+    #region ApiSchemaElement Properties
+    /// <inheritdoc/>
+    public override ApiSchemaElementKind Kind => ApiSchemaElementKind.Property;
+
+    /// <inheritdoc/>
+    protected override string ApiElementName => nameof(ApiProperty);
+    #endregion
+
+    #region ApiProperty Properties
+    /// <summary>Gets the API name of the property (used in API requests/responses).</summary>
+    public string ApiName { get; }
+
+    /// <summary>Gets the API type of the property.</summary>
+    public ApiType ApiType => this.ApiTypeExpression.ApiType;
+
+    /// <summary>Gets the modifiers applied to this property (e.g., Required).</summary>
+    public ApiTypeModifiers ApiTypeModifiers { get; }
+
+    /// <summary>Gets the CLR name of the member backing this API property.</summary>
+    public string ClrName { get; }
+
+    /// <summary>
+    ///     Gets the authoritative CLR member kind used with <see cref="ClrName"/> to bind this property.
+    ///     <see cref="ClrMemberKind.Property"/> resolves only properties and
+    ///     <see cref="ClrMemberKind.Field"/> resolves only fields.
+    /// </summary>
+    public ClrMemberKind ClrMemberKind => this.RequireValue(_clrMemberKind);
+
+    internal ApiTypeExpression ApiTypeExpression { get; }
+
+    internal void MarkInvalidApiTypeModifiers() => _hasInvalidApiTypeModifiers = true;
+
+    private static MethodInfo GenericCoerceMethodDefinition => _genericCoerceMethodDefinition
+        ?? throw new ApiSchemaException($"Failed to locate generic method definition for {nameof(TypeCoercion)}.{nameof(TypeCoercion.Coerce)}.");
+
+    private static MethodInfo NonGenericCoerceMethod => _nonGenericCoerceMethod
+        ?? throw new ApiSchemaException($"Failed to locate non-generic method for {nameof(TypeCoercion)}.{nameof(TypeCoercion.Coerce)}.");
+    #endregion
+
+    #region ApiProperty Computed Properties
+    /// <summary>Gets a value indicating whether this property is optional (not required).</summary>
+    public bool IsOptional => !this.ApiTypeModifiers.HasFlag(ApiTypeModifiers.Required);
+
+    /// <summary>Gets a value indicating whether this property is required.</summary>
+    public bool IsRequired => this.ApiTypeModifiers.HasFlag(ApiTypeModifiers.Required);
+
+    internal bool IsResolved => this.ApiTypeExpression?.IsResolved == true;
+    #endregion
+
+    #region Object Methods
+    /// <inheritdoc/>
+    public override string ToString()
+    {
+        var apiName = this.ApiName.SafeToString();
+        var apiTypeExpression = this.ApiTypeExpression.SafeToString();
+        var apiTypeModifiers = this.ApiTypeModifiers.SafeToString();
+        var clrName = this.ClrName.SafeToString();
+        var clrMemberKind = _clrMemberKind.SafeToString();
+        var extensionCount = this.ExtensionCount.SafeToString();
+
+        return $"{nameof(ApiProperty)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ApiTypeExpression)}={apiTypeExpression}, {nameof(this.ApiTypeModifiers)}={apiTypeModifiers}, {nameof(this.ClrName)}={clrName}, {nameof(this.ClrMemberKind)}={clrMemberKind}, {nameof(this.ExtensionCount)}={extensionCount}}}";
+    }
+    #endregion
+
+    #region ApiSchemaElement Methods
+    /// <inheritdoc/>
+    internal override IEnumerable<ApiSchemaElement> GetOwnedElements()
+    {
+        if (this.ApiTypeExpression?.ApiInlineType is ApiType apiInlineType)
+        {
+            yield return apiInlineType;
+        }
+    }
+
+    /// <inheritdoc />
+    protected override string BuildPath(string? apiPreviousPath)
+        => ApiSchemaPathFormatting.BuildPath(apiBasePath: apiPreviousPath, apiPathSegment: this.ApiElementName, apiPathSegmentName: this.ApiName);
+
+    /// <inheritdoc />
+    internal override void CompileCore(ApiSchemaCompilationContext context)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+
+        base.CompileCore(context);
+
+        this.ValidateApiName(context);
+        this.ValidateApiTypeModifiers(context);
+        this.ResolveApiTypeExpression(context);
+        this.ValidateClrName(context);
+
+        if (this.ValidateClrMemberKind(context) && this.ApiTypeExpression?.IsResolved == true)
+        {
+            this.CompileClrGetterAndSetter(context);
+        }
+    }
+
+    private void ValidateApiName(ApiSchemaCompilationContext context)
+    {
+        var isApiNameInvalid = ApiSchemaNameValidation.IsNameInvalid(this.ApiName);
+        if (isApiNameInvalid)
+        {
+            var severity = ApiSchemaCompilationSeverity.Error;
+            var code = ApiSchemaCompilationCode.ApiPropertyInvalidApiName;
+            var description = $"{nameof(this.ApiName)} must not be null, empty, or whitespace";
+            var remediation = $"Specify a valid {nameof(this.ApiName)} value";
+
+            context.AddIssue(severity, code, description, remediation);
+        }
+    }
+
+    private void ValidateApiTypeModifiers(ApiSchemaCompilationContext context)
+    {
+        if (!_hasInvalidApiTypeModifiers)
+        {
+            return;
+        }
+
+        var severity = ApiSchemaCompilationSeverity.Error;
+        var code = ApiSchemaCompilationCode.ApiPropertyInvalidApiTypeModifiers;
+        var description = $"{nameof(this.ApiTypeModifiers)} must be a valid {nameof(this.ApiTypeModifiers)} value";
+        var remediation = $"Specify a valid {nameof(this.ApiTypeModifiers)} value";
+
+        context.AddIssue(severity, code, description, remediation);
+    }
+
+    private void ResolveApiTypeExpression(ApiSchemaCompilationContext context)
+    {
+        if (this.ApiTypeExpression is null)
+        {
+            var severity = ApiSchemaCompilationSeverity.Error;
+            var code = ApiSchemaCompilationCode.ApiPropertyNullType;
+            var description = $"{nameof(this.ApiType)} must not be null";
+            var remediation = $"Specify a valid {nameof(this.ApiType)}";
+
+            context.AddIssue(severity, code, description, remediation);
+            return;
+        }
+
+        this.ApiTypeExpression.ResolveForProperty(context);
+    }
+
+    private void CompileClrFieldGetterAndSetter(ApiSchemaCompilationContext context, FieldInfo clrFieldInfo)
+    {
+        var apiObjectType = this.GetApiObjectType();
+        var clrObjectType = apiObjectType.ClrType;
+        var clrMemberName = this.ClrName;
+
+        // Build compiled field getter and setter
+        try
+        {
+            _clrGetter = BuildNonGenericClrFieldGetter(clrObjectType, clrFieldInfo);
+        }
+        catch (Exception ex)
+        {
+            var severity = ApiSchemaCompilationSeverity.Error;
+            var code = ApiSchemaCompilationCode.ApiPropertyInvalidFieldGetter;
+            var description = $"Failed to compile field getter for '{clrMemberName}': {ex.Message.TrimEnd('.')}";
+            var remediation = $"Verify that field '{clrMemberName}' is readable and can be used in expression trees";
+
+            context.AddIssue(severity, code, description, remediation);
+        }
+
+        try
+        {
+            _clrSetter = BuildNonGenericClrFieldSetter(clrObjectType, clrFieldInfo);
+        }
+        catch (Exception ex)
+        {
+            var severity = ApiSchemaCompilationSeverity.Error;
+            var code = ApiSchemaCompilationCode.ApiPropertyInvalidFieldSetter;
+            var description = $"Failed to compile field setter for '{clrMemberName}': {ex.Message.TrimEnd('.')}";
+            var remediation = $"Verify that field '{clrMemberName}' is writable and can be used in expression trees";
+            context.AddIssue(severity, code, description, remediation);
+        }
+
+        // Validate nullability alignment between API declaration and CLR member
+        var clrFieldNullableInfo = FieldReflection.GetNullabilityInfo(clrFieldInfo);
+        this.ValidateNullabilityMismatch(context, clrFieldNullableInfo, clrMemberName);
+    }
+
+    private void CompileClrPropertyGetterAndSetter(ApiSchemaCompilationContext context, PropertyInfo clrPropertyInfo)
+    {
+        var apiObjectType = this.GetApiObjectType();
+        var clrObjectType = apiObjectType.ClrType;
+        var clrMemberName = this.ClrName;
+
+        // Exclude indexers
+        if (clrPropertyInfo.GetIndexParameters().Length > 0)
+        {
+            var severity = ApiSchemaCompilationSeverity.Error;
+            var code = ApiSchemaCompilationCode.ApiPropertyInvalidPropertyGetter;
+            var description = $"Property '{clrMemberName}' is an indexer, which is not supported";
+
+            context.AddIssue(severity, code, description, remediation: null);
+            return;
+        }
+
+        // Build compiled property getter and setter
+        try
+        {
+            _clrGetter = BuildNonGenericClrPropertyGetter(clrObjectType, clrPropertyInfo);
+        }
+        catch (Exception ex)
+        {
+            var severity = ApiSchemaCompilationSeverity.Error;
+            var code = ApiSchemaCompilationCode.ApiPropertyInvalidPropertyGetter;
+            var description = $"Failed to compile property getter for '{clrMemberName}': {ex.Message.TrimEnd('.')}";
+            var remediation = $"Verify that property '{clrMemberName}' is readable and can be used in expression trees";
+
+            context.AddIssue(severity, code, description, remediation);
+        }
+
+        try
+        {
+            _clrSetter = BuildNonGenericClrPropertySetter(clrObjectType, clrPropertyInfo);
+        }
+        catch (Exception ex)
+        {
+            var severity = ApiSchemaCompilationSeverity.Error;
+            var code = ApiSchemaCompilationCode.ApiPropertyInvalidPropertySetter;
+            var description = $"Failed to compile property setter for '{clrMemberName}': {ex.Message.TrimEnd('.')}";
+            var remediation = $"Verify that property '{clrMemberName}' is writable and can be used in expression trees";
+
+            context.AddIssue(severity, code, description, remediation);
+        }
+
+        // Validate nullability alignment between API declaration and CLR member
+        var clrPropertyNullableInfo = PropertyReflection.GetNullabilityInfo(clrPropertyInfo);
+        this.ValidateNullabilityMismatch(context, clrPropertyNullableInfo, clrMemberName);
+    }
+
+    private void CompileClrGetterAndSetter(ApiSchemaCompilationContext context)
+    {
+        var apiObjectType = this.GetApiObjectType();
+        var clrObjectType = apiObjectType.ClrType;
+        var clrMemberName = this.ClrName;
+
+        if (clrObjectType is null)
+        {
+            // If the parent CLR object type is null, skip further processing
+            return;
+        }
+
+        var isClrMemberNameInvalid = ApiSchemaNameValidation.IsNameInvalid(clrMemberName);
+        if (isClrMemberNameInvalid)
+        {
+            // If the CLR member name is invalid, skip further processing
+            return;
+        }
+
+        try
+        {
+            switch (this.ClrMemberKind)
+            {
+                case ClrMemberKind.Property:
+                    var clrPropertyInfo = TypeReflection.GetProperty
+                    (
+                        clrObjectType,
+                        clrMemberName,
+                        BindingFlags.Public | BindingFlags.Instance
+                    );
+
+                    if (clrPropertyInfo is null)
+                    {
+                        this.AddMissingClrMemberIssue
+                        (
+                            context,
+                            clrObjectType,
+                            clrMemberName
+                        );
+                        return;
+                    }
+
+                    if (!ValidateClrMemberType(context, clrPropertyInfo.PropertyType, clrMemberName))
+                    {
+                        return;
+                    }
+
+                    this.CompileClrPropertyGetterAndSetter(context, clrPropertyInfo);
+                    return;
+
+                case ClrMemberKind.Field:
+                    var clrFieldInfo = TypeReflection.GetField
+                    (
+                        clrObjectType,
+                        clrMemberName,
+                        BindingFlags.Public | BindingFlags.Instance
+                    );
+
+                    if (clrFieldInfo is null)
+                    {
+                        this.AddMissingClrMemberIssue
+                        (
+                            context,
+                            clrObjectType,
+                            clrMemberName
+                        );
+                        return;
+                    }
+
+                    if (!ValidateClrMemberType(context, clrFieldInfo.FieldType, clrMemberName))
+                    {
+                        return;
+                    }
+
+                    this.CompileClrFieldGetterAndSetter(context, clrFieldInfo);
+                    return;
+            }
+        }
+        catch (Exception ex)
+        {
+            var severity = ApiSchemaCompilationSeverity.Error;
+            var code = ApiSchemaCompilationCode.ApiPropertyInvalidClrMember;
+            var description = $"Failed to compile getter or setter accessor for '{clrMemberName}': {ex.Message.TrimEnd('.')}";
+            var remediation = $"Verify that '{clrMemberName}' exists as a public {this.ClrMemberKind.ToString().ToLowerInvariant()} on {nameof(ApiObjectType)}.{nameof(ApiObjectType.ClrType)} '{clrObjectType.SafeToName()}'";
+
+            context.AddIssue(severity, code, description, remediation);
+        }
+    }
+
+    private bool ValidateClrMemberKind(ApiSchemaCompilationContext context)
+    {
+        var isClrMemberKindValid = _clrMemberKind is ClrMemberKind.Property or ClrMemberKind.Field;
+        if (isClrMemberKindValid)
+        {
+            return true;
+        }
+
+        var severity = ApiSchemaCompilationSeverity.Error;
+        var code = ApiSchemaCompilationCode.ApiPropertyInvalidClrMember;
+        var description = $"{nameof(this.ClrMemberKind)} must be {ClrMemberKind.Property} or {ClrMemberKind.Field}";
+        var remediation = $"Specify {nameof(this.ClrMemberKind)} as {ClrMemberKind.Property} or {ClrMemberKind.Field}";
+
+        context.AddIssue(severity, code, description, remediation);
+        return false;
+    }
+
+    private void AddMissingClrMemberIssue(ApiSchemaCompilationContext context, Type clrObjectType, string clrMemberName)
+    {
+        var clrMemberKindName = this.ClrMemberKind.ToString().ToLowerInvariant();
+        var severity = ApiSchemaCompilationSeverity.Error;
+        var code = ApiSchemaCompilationCode.ApiPropertyMissingClrMember;
+        var description = $"CLR {clrMemberKindName} '{clrMemberName}' was not found on CLR type '{clrObjectType.SafeToName()}'";
+        var remediation = $"Add a public CLR {clrMemberKindName} named '{clrMemberName}' to CLR type '{clrObjectType.SafeToName()}'";
+
+        context.AddIssue(severity, code, description, remediation);
+    }
+
+    private void ValidateClrName(ApiSchemaCompilationContext context)
+    {
+        var isClrNameInvalid = ApiSchemaNameValidation.IsNameInvalid(this.ClrName);
+        if (isClrNameInvalid)
+        {
+            var severity = ApiSchemaCompilationSeverity.Error;
+            var code = ApiSchemaCompilationCode.ApiPropertyInvalidClrName;
+            var description = $"{nameof(this.ClrName)} must not be null, empty, or whitespace";
+            var remediation = $"Specify a valid {nameof(this.ClrName)} value";
+
+            context.AddIssue(severity, code, description, remediation);
+        }
+    }
+
+    private ApiObjectType GetApiObjectType()
+    {
+        return this.Parent as ApiObjectType
+            ?? throw new ApiSchemaException($"An {nameof(ApiProperty)} must be owned by an {nameof(ApiObjectType)}.");
+    }
+    #endregion
+
+    #region Validation Methods
+    private void ValidateNullabilityMismatch(ApiSchemaCompilationContext context, MemberNullableInfo clrNullableInfo, string clrMemberName)
+    {
+        // Skip if nullability cannot be determined (defensive guard for types from assemblies without NRT)
+        if (clrNullableInfo.Nullability == MemberNullability.Unknown)
+        {
+            return;
+        }
+
+        // Required + CLR Nullable: API contract demands a value but CLR type permits null
+        if (this.IsRequired && clrNullableInfo.Nullability == MemberNullability.Nullable)
+        {
+            var severity = ApiSchemaCompilationSeverity.Warning;
+            var code = ApiSchemaCompilationCode.ApiPropertyRequiredNullableMismatch;
+            var description = $"CLR member '{clrMemberName}' is nullable but property '{this.ApiName}' is declared Required";
+            var remediation = $"Change CLR member '{clrMemberName}' to a non-nullable type, or change property '{this.ApiName}' to Optional";
+
+            context.AddIssue(severity, code, description, remediation);
+            return;
+        }
+
+        // Optional + CLR NonNullable (reference types only): absent optional value may assign null
+        // to a CLR member that cannot hold it. Value types are excluded: absent value → default, never null.
+        if (this.IsOptional && clrNullableInfo.Nullability == MemberNullability.NonNullable && !clrNullableInfo.MemberType.IsValueType)
+        {
+            var severity = ApiSchemaCompilationSeverity.Warning;
+            var code = ApiSchemaCompilationCode.ApiPropertyOptionalNonNullableMismatch;
+            var description = $"CLR member '{clrMemberName}' is non-nullable but property '{this.ApiName}' is declared Optional";
+            var remediation = $"Change CLR member '{clrMemberName}' to a nullable reference type, or change property '{this.ApiName}' to Required";
+
+            context.AddIssue(severity, code, description, remediation);
+        }
+
+        // Check collection item nullability against ApiCollectionType.ApiItemTypeModifiers
+        if (clrNullableInfo.CollectionChain.Count > 0 && this.ApiType is ApiCollectionType apiCollectionType)
+        {
+            var itemNullability = clrNullableInfo.CollectionChain[0].ElementNullability;
+            var itemElementType = clrNullableInfo.CollectionChain[0].ElementType;
+
+            // Skip if item nullability cannot be determined
+            if (itemNullability == MemberNullability.Unknown)
+            {
+                return;
+            }
+
+            // Item Required + CLR element Nullable: API contract demands a value but CLR element permits null
+            if (apiCollectionType.IsItemRequired && itemNullability == MemberNullability.Nullable)
+            {
+                var severity = ApiSchemaCompilationSeverity.Warning;
+                var code = ApiSchemaCompilationCode.ApiCollectionItemRequiredNullableMismatch;
+                var description = $"CLR collection element in '{clrMemberName}' is nullable but item is declared Required";
+                var remediation = $"Change the CLR element type in '{clrMemberName}' to non-nullable, or change the item modifier to Optional";
+
+                context.AddIssue(severity, code, description, remediation);
+                return;
+            }
+
+            // Item Optional + CLR element NonNullable (reference types only): absent item may assign null
+            // to a CLR element that cannot hold it. Value types are excluded: absent item → default, never null.
+            if (apiCollectionType.IsItemOptional && itemNullability == MemberNullability.NonNullable && !itemElementType.IsValueType)
+            {
+                var severity = ApiSchemaCompilationSeverity.Warning;
+                var code = ApiSchemaCompilationCode.ApiCollectionItemOptionalNonNullableMismatch;
+                var description = $"CLR collection element in '{clrMemberName}' is non-nullable but item is declared Optional";
+                var remediation = $"Change the CLR element type in '{clrMemberName}' to a nullable reference type, or change the item modifier to Required";
+
+                context.AddIssue(severity, code, description, remediation);
+            }
+        }
+    }
+
+    private static bool ValidateClrMemberType(ApiSchemaCompilationContext context, Type memberType, string memberName)
+    {
+        // Check if the type is a ref struct (cannot be boxed/unboxed)
+        if (memberType.IsByRefLike)
+        {
+            var severity = ApiSchemaCompilationSeverity.Error;
+            var code = ApiSchemaCompilationCode.ApiPropertyInvalidClrMember;
+            var description = $"CLR member '{memberName}' has type '{memberType.SafeToName()}' which is a ref struct. Ref structs cannot be boxed to object and are not supported for API properties.";
+            var remediation = $"Change the type of CLR member '{memberName}' to a non-ref struct type.";
+
+            context.AddIssue(severity, code, description, remediation);
+            return false;
+        }
+
+        return true;
+    }
+    #endregion
+}

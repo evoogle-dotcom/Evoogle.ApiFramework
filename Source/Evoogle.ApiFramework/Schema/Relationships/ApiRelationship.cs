@@ -1,0 +1,121 @@
+﻿// Copyright (c) 2024-2025 Evoogle.com
+// SPDX-License-Identifier: MIT
+//
+// This file is licensed under the MIT License.
+// See the LICENSE file in the project root for more information.
+using System.Text.Json.Serialization;
+
+using Evoogle.ApiFramework.Schema.Compilation;
+using Evoogle.ApiFramework.Schema.Compilation.Internal;
+using Evoogle.ApiFramework.Schema.Json;
+
+namespace Evoogle.ApiFramework.Schema.Relationships;
+
+/// <summary>
+///     Abstract base class for all first-class relationships declared at the <see cref="ApiSchema"/> level.
+/// </summary>
+/// <remarks>
+///     Concrete subclasses express specific structural kinds:
+///     <see cref="ApiRelationshipOneToOne"/>, <see cref="ApiRelationshipOneToMany"/>,
+///     and <see cref="ApiRelationshipManyToMany"/>.
+///     The <see cref="ApiKind"/> property serves as the JSON polymorphic discriminator.
+/// </remarks>
+[JsonConverter(typeof(ApiRelationshipJsonConverter))]
+public abstract class ApiRelationship : ApiSchemaElement
+{
+    #region Fields
+    private bool _hasInvalidApiDeleteBehavior;
+    #endregion
+
+    #region ApiSchemaElement Properties
+    /// <inheritdoc/>
+    public override sealed ApiSchemaElementKind Kind => this.ApiKind switch
+    {
+        ApiRelationshipKind.OneToOne => ApiSchemaElementKind.RelationshipOneToOne,
+        ApiRelationshipKind.OneToMany => ApiSchemaElementKind.RelationshipOneToMany,
+        ApiRelationshipKind.ManyToMany => ApiSchemaElementKind.RelationshipManyToMany,
+        _ => throw new ArgumentOutOfRangeException(nameof(this.ApiKind))
+    };
+    #endregion
+
+    #region ApiRelationship Properties
+    /// <summary>
+    ///     Gets the structural kind of this relationship. Used as the JSON polymorphic discriminator.
+    /// </summary>
+    public abstract ApiRelationshipKind ApiKind { get; }
+
+    /// <summary>Gets the API name that uniquely identifies this relationship within the schema.</summary>
+    public string ApiName { get; }
+
+    /// <summary>
+    ///     Gets the delete behavior that governs what happens to related objects when either end is affected.
+    ///     <list type="bullet">
+    ///         <item><description><strong>Principal deleted:</strong> what happens to dependent objects when the principal is deleted.</description></item>
+    ///         <item><description><strong>Dependent orphaned:</strong> what happens to a dependent when it is removed from the relationship.</description></item>
+    ///     </list>
+    /// </summary>
+    public ApiRelationshipDeleteBehavior ApiDeleteBehavior { get; }
+
+    internal void MarkInvalidApiDeleteBehavior() => _hasInvalidApiDeleteBehavior = true;
+    #endregion
+
+    #region Constructors
+    internal ApiRelationship
+    (
+        string apiName,
+        ApiRelationshipDeleteBehavior apiDeleteBehavior
+    )
+    {
+        this.ApiName = apiName;
+        this.ApiDeleteBehavior = apiDeleteBehavior;
+    }
+    #endregion
+
+    #region ApiSchemaElement Methods
+    /// <inheritdoc/>
+    protected override string BuildPath(string? apiPreviousPath)
+        => ApiSchemaPathFormatting.BuildPath(apiBasePath: apiPreviousPath, apiPathSegment: this.ApiElementName, apiPathSegmentName: this.ApiName);
+
+    /// <inheritdoc/>
+    internal override void CompileCore(ApiSchemaCompilationContext context)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+
+        base.CompileCore(context);
+
+        this.ValidateApiName(context);
+        this.ValidateApiDeleteBehavior(context);
+    }
+    #endregion
+
+    #region Implementation Methods
+    private void ValidateApiName(ApiSchemaCompilationContext context)
+    {
+        var isApiNameInvalid = ApiSchemaNameValidation.IsNameInvalid(this.ApiName);
+        if (isApiNameInvalid)
+        {
+            var severity = ApiSchemaCompilationSeverity.Error;
+            var code = ApiSchemaCompilationCode.ApiRelationshipInvalidApiName;
+            var description = $"{nameof(this.ApiName)} must not be null, empty, or whitespace";
+            var remediation = $"Specify a valid {nameof(this.ApiName)} value";
+
+            context.AddIssue(severity, code, description, remediation);
+        }
+    }
+
+    private void ValidateApiDeleteBehavior(ApiSchemaCompilationContext context)
+    {
+        if (!_hasInvalidApiDeleteBehavior)
+        {
+            return;
+        }
+
+        var severity = ApiSchemaCompilationSeverity.Error;
+        var code = ApiSchemaCompilationCode.ApiRelationshipInvalidApiDeleteBehavior;
+        var description = $"{nameof(this.ApiDeleteBehavior)} must be a valid {nameof(ApiRelationshipDeleteBehavior)} value";
+        var remediation = $"Specify a valid {nameof(this.ApiDeleteBehavior)} value";
+
+        context.AddIssue(severity, code, description, remediation);
+    }
+    #endregion
+}

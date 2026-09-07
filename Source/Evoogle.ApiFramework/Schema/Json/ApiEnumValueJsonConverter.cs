@@ -5,6 +5,7 @@
 // See the LICENSE file in the project root for more information.
 using System.Text.Json;
 
+using Evoogle.ApiFramework.Schema.Types;
 using Evoogle.Json;
 
 using Microsoft.Extensions.Logging;
@@ -46,9 +47,9 @@ public class ApiEnumValueJsonConverter(ILogger<ApiEnumValueJsonConverter>? logge
             {
                 ApiEnumValue = new ApiEnumValuePropertyNames
                 {
-                    ApiName = policy.ConvertName(nameof(Schema.ApiEnumValue.ApiName)),
-                    ClrName = policy.ConvertName(nameof(Schema.ApiEnumValue.ClrName)),
-                    ClrOrdinal = policy.ConvertName(nameof(Schema.ApiEnumValue.ClrOrdinal)),
+                    ApiName = policy.ConvertName(nameof(Types.ApiEnumValue.ApiName)),
+                    ClrName = policy.ConvertName(nameof(Types.ApiEnumValue.ClrName)),
+                    ClrOrdinal = policy.ConvertName(nameof(Types.ApiEnumValue.ClrOrdinal)),
                 },
                 ExtensibleBase = GetExtensiblePropertyNames(policy),
             };

@@ -6,7 +6,6 @@
 using System.Linq.Expressions;
 
 using Evoogle.ApiFramework.Exceptions;
-using Evoogle.ApiFramework.Schema;
 using Evoogle.XUnit;
 
 using BuildTest = Evoogle.ApiFramework.Schema.TestData.ApiSchemaJsonExpressionBuildTest;

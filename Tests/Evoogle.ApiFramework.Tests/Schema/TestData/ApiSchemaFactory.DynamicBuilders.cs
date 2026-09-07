@@ -206,7 +206,7 @@ public static partial class ApiSchemaFactory
             }
         }
 
-        var result = Evoogle.ApiFramework.Schema.Internal.ApiSchemaCompiler.Compile(apiSchema);
+        var result = Evoogle.ApiFramework.Schema.Compilation.Internal.ApiSchemaCompiler.Compile(apiSchema);
         result.ThrowIfInvalid();
         return result.Schema!;
     }
@@ -232,7 +232,7 @@ public static partial class ApiSchemaFactory
             apiObjectTypes,
             apiRelationships
         );
-        var result = Evoogle.ApiFramework.Schema.Internal.ApiSchemaCompiler.Compile(apiSchema);
+        var result = Evoogle.ApiFramework.Schema.Compilation.Internal.ApiSchemaCompiler.Compile(apiSchema);
         result.ThrowIfInvalid();
         return result.Schema!;
     }

@@ -3,12 +3,16 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Schema.Compilation;
+using Evoogle.ApiFramework.Schema.Compilation.Internal;
 using Evoogle.ApiFramework.Schema.Configuration.Annotations;
 using Evoogle.ApiFramework.Schema.Configuration.Conventions;
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
+using Evoogle.ApiFramework.Schema.Configuration.Relationships;
 using Evoogle.ApiFramework.Schema.Configuration.Trace;
 using Evoogle.ApiFramework.Schema.Configuration.Trace.Internal;
-using Evoogle.ApiFramework.Schema.Internal;
+using Evoogle.ApiFramework.Schema.Configuration.Types;
+using Evoogle.ApiFramework.Schema.Types;
 using Evoogle.Logging;
 
 using Microsoft.Extensions.Logging;

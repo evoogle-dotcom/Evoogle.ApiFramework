@@ -7,6 +7,7 @@ using System.Reflection;
 
 using Evoogle.ApiFramework.Schema.Configuration.Conventions;
 using Evoogle.ApiFramework.Schema.Configuration.Conventions.Internal;
+using Evoogle.ApiFramework.Schema.Configuration.Types;
 
 namespace Evoogle.ApiFramework.Schema.Configuration;
 

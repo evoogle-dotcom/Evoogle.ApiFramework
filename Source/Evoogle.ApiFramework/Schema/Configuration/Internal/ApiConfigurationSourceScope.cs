@@ -6,8 +6,8 @@
 namespace Evoogle.ApiFramework.Schema.Configuration.Internal;
 
 /// <summary>
-///     Provides a synchronous, nestable configuration-source scope for fluent configuration
-///     callbacks whose public surface does not expose configuration provenance.
+///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used
+///     directly from your code. This API may change or be removed in future releases.
 /// </summary>
 internal sealed class ApiConfigurationSourceScope
 {

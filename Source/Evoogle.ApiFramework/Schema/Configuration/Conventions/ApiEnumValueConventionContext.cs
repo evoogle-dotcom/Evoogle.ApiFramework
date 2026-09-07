@@ -5,6 +5,8 @@
 // See the LICENSE file in the project root for more information.
 using System.Reflection;
 
+using Evoogle.ApiFramework.Schema.Configuration.Types;
+
 namespace Evoogle.ApiFramework.Schema.Configuration.Conventions;
 
 /// <summary>

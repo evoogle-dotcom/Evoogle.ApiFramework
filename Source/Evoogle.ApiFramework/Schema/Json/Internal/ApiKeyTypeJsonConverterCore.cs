@@ -5,13 +5,14 @@
 // See the LICENSE file in the project root for more information.
 using System.Text.Json;
 
+using Evoogle.ApiFramework.Schema.Keys;
 using Evoogle.Json;
 
 namespace Evoogle.ApiFramework.Schema.Json.Internal;
 
 /// <summary>
-///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used directly from your code.
-///     This API may change or be removed in future releases.
+///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used
+///     directly from your code. This API may change or be removed in future releases.
 /// </summary>
 internal static class ApiKeyTypeJsonConverterCore
 {
@@ -40,6 +41,10 @@ internal static class ApiKeyTypeJsonConverterCore
         #endregion
     }
 
+    /// <summary>
+    ///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used
+    ///     directly from your code. This API may change or be removed in future releases.
+    /// </summary>
     internal sealed class ReadData
     {
         #region Properties

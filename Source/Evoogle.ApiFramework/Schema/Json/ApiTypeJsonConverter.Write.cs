@@ -5,6 +5,7 @@
 // See the LICENSE file in the project root for more information.
 using System.Text.Json;
 
+using Evoogle.ApiFramework.Schema.Types;
 using Evoogle.Json;
 
 namespace Evoogle.ApiFramework.Schema.Json;

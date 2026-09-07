@@ -5,12 +5,19 @@
 // See the LICENSE file in the project root for more information.
 using System.Reflection;
 
+using Evoogle.ApiFramework.Schema.Compilation;
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
+using Evoogle.ApiFramework.Schema.Configuration.Types;
+using Evoogle.ApiFramework.Schema.Types;
 using Evoogle.Reflection;
 
 namespace Evoogle.ApiFramework.Schema.Configuration.Annotations.Internal;
 
 /// <summary>Holds the ordered annotation readers and centrally applies their results.</summary>
+/// <summary>
+///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used
+///     directly from your code. This API may change or be removed in future releases.
+/// </summary>
 internal sealed class ApiAnnotationReaderSet
 {
     #region Fields

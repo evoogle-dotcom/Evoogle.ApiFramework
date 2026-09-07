@@ -1,0 +1,168 @@
+﻿// Copyright (c) 2024-2025 Evoogle.com
+// SPDX-License-Identifier: MIT
+//
+// This file is licensed under the MIT License.
+// See the LICENSE file in the project root for more information.
+using System.Linq.Expressions;
+
+using Evoogle.ApiFramework.Schema.Keys;
+using Evoogle.Reflection;
+
+namespace Evoogle.ApiFramework.Schema.Configuration.Relationships;
+
+/// <summary>
+///     Extension methods for <see cref="ApiRelationshipDependentEndBuilder{TDependent}"/>.
+/// </summary>
+public static class ApiRelationshipDependentEndBuilderGenericExtensions
+{
+    #region Extension Methods
+    /// <summary>
+    ///     Adds a dependent end extension value keyed by its own type.
+    /// </summary>
+    /// <typeparam name="TExtension">The extension value type.</typeparam>
+    /// <param name="builder">The dependent end builder to configure.</param>
+    /// <param name="extension">The extension value.</param>
+    /// <returns>The current builder instance.</returns>
+    public static ApiRelationshipDependentEndBuilder AddRelationshipDependentEndExtension<TExtension>(this ApiRelationshipDependentEndBuilder builder, TExtension extension)
+        where TExtension : class, IApiSchemaExtension
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+
+        return builder.AddRelationshipDependentEndExtension(typeof(TExtension), extension);
+    }
+
+    /// <summary>
+    ///     Adds a dependent end extension value keyed by its own type.
+    /// </summary>
+    /// <typeparam name="TDependent">The CLR dependent type represented by the builder.</typeparam>
+    /// <typeparam name="TExtension">The extension value type.</typeparam>
+    /// <param name="builder">The dependent end builder to configure.</param>
+    /// <param name="extension">The extension value.</param>
+    /// <returns>The current builder instance.</returns>
+    public static ApiRelationshipDependentEndBuilder<TDependent> AddRelationshipDependentEndExtension<TDependent, TExtension>
+    (
+        this ApiRelationshipDependentEndBuilder<TDependent> builder,
+        TExtension extension
+    )
+        where TExtension : class, IApiSchemaExtension
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+
+        return builder.AddRelationshipDependentEndExtension(typeof(TExtension), extension);
+    }
+    #endregion
+
+    #region WithForeignKey Methods
+    /// <summary>
+    ///     Sets the foreign key role's <see cref="ApiKeyType"/> with a single key path using a type-safe expression.
+    /// </summary>
+    public static ApiRelationshipDependentEndBuilder<TDependent> WithForeignKey<TDependent, TScalar>
+    (
+        this ApiRelationshipDependentEndBuilder<TDependent> builder,
+        Expression<Func<TDependent, TScalar>> expression
+    )
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+        ArgumentNullException.ThrowIfNull(expression);
+
+        return builder.WithForeignKey(b => b.AddPath(expression));
+    }
+
+    /// <summary>
+    ///     Sets the foreign key role's <see cref="ApiKeyType"/> with two key paths using type-safe expressions.
+    /// </summary>
+    public static ApiRelationshipDependentEndBuilder<TDependent> WithForeignKey<TDependent, TScalar1, TScalar2>
+    (
+        this ApiRelationshipDependentEndBuilder<TDependent> builder,
+        Expression<Func<TDependent, TScalar1>> expression1,
+        Expression<Func<TDependent, TScalar2>> expression2
+    )
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+        ArgumentNullException.ThrowIfNull(expression1);
+        ArgumentNullException.ThrowIfNull(expression2);
+
+        return builder.WithForeignKey(b => b
+            .AddPath(expression1)
+            .AddPath(expression2));
+    }
+
+    /// <summary>
+    ///     Sets the foreign key role's <see cref="ApiKeyType"/> with three key paths using type-safe expressions.
+    /// </summary>
+    public static ApiRelationshipDependentEndBuilder<TDependent> WithForeignKey<TDependent, TScalar1, TScalar2, TScalar3>
+    (
+        this ApiRelationshipDependentEndBuilder<TDependent> builder,
+        Expression<Func<TDependent, TScalar1>> expression1,
+        Expression<Func<TDependent, TScalar2>> expression2,
+        Expression<Func<TDependent, TScalar3>> expression3
+    )
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+        ArgumentNullException.ThrowIfNull(expression1);
+        ArgumentNullException.ThrowIfNull(expression2);
+        ArgumentNullException.ThrowIfNull(expression3);
+
+        return builder.WithForeignKey(b => b
+            .AddPath(expression1)
+            .AddPath(expression2)
+            .AddPath(expression3));
+    }
+
+    /// <summary>
+    ///     Sets the foreign key role's <see cref="ApiKeyType"/> with four key paths using type-safe expressions.
+    /// </summary>
+    public static ApiRelationshipDependentEndBuilder<TDependent> WithForeignKey<TDependent, TScalar1, TScalar2, TScalar3, TScalar4>
+    (
+        this ApiRelationshipDependentEndBuilder<TDependent> builder,
+        Expression<Func<TDependent, TScalar1>> expression1,
+        Expression<Func<TDependent, TScalar2>> expression2,
+        Expression<Func<TDependent, TScalar3>> expression3,
+        Expression<Func<TDependent, TScalar4>> expression4
+    )
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+        ArgumentNullException.ThrowIfNull(expression1);
+        ArgumentNullException.ThrowIfNull(expression2);
+        ArgumentNullException.ThrowIfNull(expression3);
+        ArgumentNullException.ThrowIfNull(expression4);
+
+        return builder.WithForeignKey(b => b
+            .AddPath(expression1)
+            .AddPath(expression2)
+            .AddPath(expression3)
+            .AddPath(expression4));
+    }
+
+    /// <summary>
+    ///     Sets the foreign key role's <see cref="ApiKeyType"/> with a single key path rooted at <typeparamref name="TRoot"/>.
+    /// </summary>
+    public static ApiRelationshipDependentEndBuilder WithForeignKeyFrom<TRoot>
+    (
+        this ApiRelationshipDependentEndBuilder builder,
+        Expression<Func<TRoot, object?>> expression
+    )
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+        ArgumentNullException.ThrowIfNull(expression);
+
+        var clrPropertyNames = StaticReflection.GetMemberPath(expression);
+        return builder.WithForeignKey(b => b.AddPath(typeof(TRoot), clrPropertyNames));
+    }
+
+    /// <summary>
+    ///     Sets the foreign key role's <see cref="ApiKeyType"/> with a single key path rooted at <typeparamref name="TPathRoot"/>.
+    /// </summary>
+    public static ApiRelationshipDependentEndBuilder<TDependent> WithForeignKeyFrom<TDependent, TPathRoot>
+    (
+        this ApiRelationshipDependentEndBuilder<TDependent> builder,
+        Expression<Func<TPathRoot, object?>> expression
+    )
+    {
+        ArgumentNullException.ThrowIfNull(builder);
+        ArgumentNullException.ThrowIfNull(expression);
+
+        return builder.WithForeignKey(b => b.AddPathFrom(expression));
+    }
+    #endregion
+}

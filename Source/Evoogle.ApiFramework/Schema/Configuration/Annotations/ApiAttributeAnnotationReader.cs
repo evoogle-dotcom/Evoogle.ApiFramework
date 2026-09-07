@@ -5,8 +5,10 @@
 // See the LICENSE file in the project root for more information.
 using System.Reflection;
 
-using Evoogle.ApiFramework.Schema.Internal;
+using Evoogle.ApiFramework.Schema.Compilation;
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
+using Evoogle.ApiFramework.Schema.Keys.Internal;
+using Evoogle.ApiFramework.Schema.Types;
 using Evoogle.Reflection;
 
 namespace Evoogle.ApiFramework.Schema.Configuration.Annotations;

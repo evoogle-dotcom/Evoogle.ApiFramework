@@ -9,13 +9,15 @@ using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Schema.Configuration.Annotations.Internal;
 using Evoogle.ApiFramework.Schema.Configuration.Conventions;
 using Evoogle.ApiFramework.Schema.Configuration.Trace;
+using Evoogle.ApiFramework.Schema.Configuration.Types;
+using Evoogle.ApiFramework.Schema.Types;
 using Evoogle.Reflection;
 
 namespace Evoogle.ApiFramework.Schema.Configuration.Internal;
 
 /// <summary>
-///     Coordinates discovery conventions, annotations, configuration conventions, and
-///     relationship configuration for one schema-builder execution.
+///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used
+///     directly from your code. This API may change or be removed in future releases.
 /// </summary>
 internal sealed class ApiSchemaConfigurationPipeline
 {

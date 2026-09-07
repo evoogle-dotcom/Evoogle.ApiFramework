@@ -8,7 +8,8 @@ using Evoogle.ApiFramework.Exceptions;
 namespace Evoogle.ApiFramework.Schema.Configuration.Internal;
 
 /// <summary>
-///     Creates canonical closed-generic builder instances for runtime CLR types.
+///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used
+///     directly from your code. This API may change or be removed in future releases.
 /// </summary>
 internal static class ApiBuilderFactory
 {
