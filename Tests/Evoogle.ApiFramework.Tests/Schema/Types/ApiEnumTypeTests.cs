@@ -47,7 +47,7 @@ public class ApiEnumTypeTests(ITestOutputHelper output) : XUnitTests(output)
             this.ApiSchema = apiSchema ?? throw new InvalidOperationException($"{nameof(Schema.ApiSchema)} creation failed.");
 
             var apiEnumType = this.ApiSchema.GetEnumTypeByApiName(this.ApiEnumTypeName);
-            this.ApiEnumType = apiEnumType ?? throw new InvalidOperationException($"{nameof(ApiEnumType)} '{this.ApiEnumTypeName}' not found in ApiSchema.");
+            this.ApiEnumType = apiEnumType ?? throw new InvalidOperationException($"{nameof(Types.ApiEnumType)} '{this.ApiEnumTypeName}' not found in ApiSchema.");
 
             this.WriteLine($"ApiSchema:      {this.ApiSchema.ApiName.SafeToString()}");
             this.WriteLine($"ApiEnumType:    {this.ApiEnumType.ApiName.SafeToString()}");

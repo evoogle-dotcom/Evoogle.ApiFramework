@@ -46,7 +46,7 @@ public partial class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(o
             this.ApiSchema = apiSchema ?? throw new InvalidOperationException($"{nameof(Schema.ApiSchema)} creation failed.");
 
             var apiObjectType = this.ApiSchema.GetObjectTypeByApiName(this.ApiObjectTypeName);
-            this.ApiObjectType = apiObjectType ?? throw new InvalidOperationException($"{nameof(ApiObjectType)} '{this.ApiObjectTypeName}' not found in ApiSchema.");
+            this.ApiObjectType = apiObjectType ?? throw new InvalidOperationException($"{nameof(Types.ApiObjectType)} '{this.ApiObjectTypeName}' not found in ApiSchema.");
 
             this.WriteLine($"ApiSchema:      {this.ApiSchema.ApiName.SafeToString()}");
             this.WriteLine($"ApiObjectType:  {this.ApiObjectTypeName.SafeToString()}");
