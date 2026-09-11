@@ -145,7 +145,7 @@ public sealed class ApiAnnotationReaderArchitectureTests(ITestOutputHelper outpu
 
             var apiKeyPaths = this.ApiSchemaActual!.ApiObjectTypes.Single().ApiKeyTypes!
                 .Single().ApiKeyPaths;
-            apiKeyPaths.Select(path => path.ApiSegments.Single().ClrPropertyName)
+            apiKeyPaths.Select(path => path.ApiSegments.Single().ClrMemberName)
                 .Should().Equal(this.ApiKeyPathPropertyNamesExpected);
         }
         #endregion

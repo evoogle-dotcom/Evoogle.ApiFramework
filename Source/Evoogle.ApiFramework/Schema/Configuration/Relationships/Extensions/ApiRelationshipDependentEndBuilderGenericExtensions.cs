@@ -146,8 +146,8 @@ public static class ApiRelationshipDependentEndBuilderGenericExtensions
         ArgumentNullException.ThrowIfNull(builder);
         ArgumentNullException.ThrowIfNull(expression);
 
-        var clrPropertyNames = StaticReflection.GetMemberPath(expression);
-        return builder.WithForeignKey(b => b.AddPath(typeof(TRoot), clrPropertyNames));
+        var clrMemberNames = StaticReflection.GetMemberPath(expression);
+        return builder.WithForeignKey(b => b.AddPath(typeof(TRoot), clrMemberNames));
     }
 
     /// <summary>

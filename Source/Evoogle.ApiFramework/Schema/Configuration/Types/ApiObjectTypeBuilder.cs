@@ -7,6 +7,7 @@ using Evoogle.ApiFramework.Schema.Configuration.Internal;
 using Evoogle.ApiFramework.Schema.Configuration.Keys;
 using Evoogle.ApiFramework.Schema.Configuration.Relationships;
 using Evoogle.ApiFramework.Schema.Configuration.Types.Internal;
+using Evoogle.ApiFramework.Schema.Configuration.Versions;
 using Evoogle.ApiFramework.Schema.Keys;
 using Evoogle.ApiFramework.Schema.Types;
 
@@ -68,7 +69,7 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     ///     supplied API name.
     /// </summary>
     /// <param name="apiName">The explicit API property name.</param>
-    /// <param name="clrName">The CLR property name.</param>
+    /// <param name="clrName">The CLR member name.</param>
     /// <param name="configure">Optional callback to configure the added property.</param>
     /// <returns>The current builder instance.</returns>
     public ApiObjectTypeBuilder AddProperty(string apiName, string clrName, Action<ApiPropertyBuilder>? configure = null)
@@ -101,6 +102,45 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
         _state.OptionsConfiguration = configure;
         return this;
     }
+
+    /// <summary>Configures a property-backed version using an exact CLR type and member name.</summary>
+    /// <param name="clrVersionType">The exact CLR type of the version value.</param>
+    /// <param name="clrMemberName">The CLR member exposed as an API property.</param>
+    /// <param name="configure">Optional version metadata configuration.</param>
+    /// <returns>The current builder.</returns>
+    public ApiObjectTypeBuilder WithVersion
+    (
+        Type clrVersionType,
+        string clrMemberName,
+        Action<ApiVersionTypeBuilder>? configure = null
+    )
+    {
+        ArgumentNullException.ThrowIfNull(clrVersionType);
+        ArgumentException.ThrowIfNullOrWhiteSpace(clrMemberName);
+
+        var builder = new ApiVersionTypeBuilder(clrVersionType, clrMemberName);
+        configure?.Invoke(builder);
+        _state.VersionTypeBuilder = builder;
+        return this;
+    }
+
+    /// <summary>Configures a repository-backed version using an exact CLR type.</summary>
+    /// <param name="clrVersionType">The exact CLR type of the version value.</param>
+    /// <param name="configure">Optional version metadata configuration.</param>
+    /// <returns>The current builder.</returns>
+    public ApiObjectTypeBuilder WithRepositoryVersion
+    (
+        Type clrVersionType,
+        Action<ApiVersionTypeBuilder>? configure = null
+    )
+    {
+        ArgumentNullException.ThrowIfNull(clrVersionType);
+
+        var builder = new ApiVersionTypeBuilder(clrVersionType, clrMemberName: null);
+        configure?.Invoke(builder);
+        _state.VersionTypeBuilder = builder;
+        return this;
+    }
     #endregion
 
     #region Build Methods
@@ -124,12 +164,15 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
             ? _state.KeyTypeBuilders.Select(b => b.BuildNamed())
             : null;
 
+        var apiVersionType = _state.VersionTypeBuilder?.Build();
+
         var apiObjectType = new ApiObjectType
         (
             apiName,
             apiOptions,
             apiProperties,
             apiKeyTypes,
+            apiVersionType,
             clrObjectType
         );
 
@@ -212,7 +255,7 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     internal void ReplaceKeyFromDataAnnotation
     (
         string apiKeyName,
-        IEnumerable<(Type ClrRootType, IReadOnlyList<string> ClrPropertyNames)> paths
+        IEnumerable<(Type ClrRootType, IReadOnlyList<string> ClrMemberNames)> paths
     )
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKeyName, nameof(apiKeyName));
@@ -231,9 +274,9 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
         builder.SetRegistrationSource(ApiConfigurationSource.DataAnnotation);
         builder.ClearPaths();
 
-        foreach (var (clrRootType, clrPropertyNames) in paths)
+        foreach (var (clrRootType, clrMemberNames) in paths)
         {
-            builder.AddPath(clrRootType, clrPropertyNames);
+            builder.AddPath(clrRootType, clrMemberNames);
         }
     }
 
@@ -247,14 +290,14 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     (
         string apiKeyName,
         Type clrRootType,
-        IEnumerable<string> clrPropertyNames
+        IEnumerable<string> clrMemberNames
     )
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKeyName, nameof(apiKeyName));
         ArgumentNullException.ThrowIfNull(clrRootType);
-        ArgumentNullException.ThrowIfNull(clrPropertyNames);
+        ArgumentNullException.ThrowIfNull(clrMemberNames);
 
-        var names = clrPropertyNames as IReadOnlyList<string> ?? [.. clrPropertyNames];
+        var names = clrMemberNames as IReadOnlyList<string> ?? [.. clrMemberNames];
         var existing = _state.KeyTypeBuilders.FirstOrDefault(b => b.ApiName == apiKeyName);
         if (existing != null)
         {

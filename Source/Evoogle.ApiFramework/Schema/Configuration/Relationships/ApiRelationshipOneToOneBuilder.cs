@@ -245,7 +245,7 @@ public sealed class ApiRelationshipOneToOneBuilder(string apiName)
         Action<ApiRelationshipOneToOneBuilder> configure
     )
     {
-        base.ApplyConfiguration(source, () => configure(this));
+        this.ApplyConfiguration(source, () => configure(this));
     }
     #endregion
 }

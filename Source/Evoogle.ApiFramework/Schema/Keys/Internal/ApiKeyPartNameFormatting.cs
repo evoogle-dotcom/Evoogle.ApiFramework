@@ -36,15 +36,15 @@ internal static class ApiKeyPartNameFormatters
     private static string? None(ApiKeyPartNameContext context) => null;
 
     /// <summary>
-    ///     Creates names from only the dotted CLR property path.
+    ///     Creates names from only the dotted CLR member path.
     /// </summary>
     /// <param name="context">The part naming context.</param>
     /// <returns>A name like <c>Id</c> or <c>Customer.Id</c>.</returns>
     private static string? ClrPathOnly(ApiKeyPartNameContext context)
-        => string.Join(".", context.ApiKeyPath.ApiSegments.Select(static s => s.ClrPropertyName));
+        => string.Join(".", context.ApiKeyPath.ApiSegments.Select(static s => s.ClrMemberName));
 
     /// <summary>
-    ///     Creates names from the CLR root type and dotted CLR property path.
+    ///     Creates names from the CLR root type and dotted CLR member path.
     /// </summary>
     /// <param name="context">The part naming context.</param>
     /// <returns>A name like <c>Customer.Id</c>.</returns>
@@ -52,7 +52,7 @@ internal static class ApiKeyPartNameFormatters
     {
         var path = context.ApiKeyPath;
         var pathTypeName = path.ClrRootType.SafeToName();
-        var pathSegmentsDelimited = string.Join(".", path.ApiSegments.Select(static s => s.ClrPropertyName));
+        var pathSegmentsDelimited = string.Join(".", path.ApiSegments.Select(static s => s.ClrMemberName));
 
         return string.IsNullOrEmpty(pathSegmentsDelimited) ? pathTypeName : $"{pathTypeName}.{pathSegmentsDelimited}";
     }

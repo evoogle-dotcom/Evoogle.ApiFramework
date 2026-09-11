@@ -20,7 +20,7 @@ internal static class ApiObjectTypeBuilderExtensions
             {
                 foreach (var keyPath in apiKeyType.ApiKeyPaths)
                 {
-                    k.AddPath(keyPath.ClrRootType, keyPath.ApiSegments.Select(s => s.ClrPropertyName));
+                    k.AddPath(keyPath.ClrRootType, keyPath.ApiSegments.Select(s => s.ClrMemberName));
                 }
             });
         }
@@ -49,6 +49,38 @@ internal static class ApiObjectTypeBuilderExtensions
                     }
                 }
             });
+        }
+    }
+
+    public static void ConfigureVersionType
+    (
+        this ApiObjectTypeBuilder builder,
+        ApiObjectType apiObjectType
+    )
+    {
+        var apiVersionType = apiObjectType.ApiVersionType;
+        if (apiVersionType is null)
+        {
+            return;
+        }
+
+        var clrMemberName = apiVersionType.ClrMemberName;
+        if (clrMemberName is null)
+        {
+            builder.WithRepositoryVersion
+            (
+                apiVersionType.ClrType,
+                x => x.ConfigureExtensions(apiVersionType)
+            );
+        }
+        else
+        {
+            builder.WithVersion
+            (
+                apiVersionType.ClrType,
+                clrMemberName,
+                x => x.ConfigureExtensions(apiVersionType)
+            );
         }
     }
     #endregion

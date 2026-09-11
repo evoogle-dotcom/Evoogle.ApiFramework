@@ -21,7 +21,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Keys;
 /// </remarks>
 /// <param name="clrRootType">The CLR type from which the navigation chain begins.</param>
 /// <param name="segmentBuilders">
-///     Ordered <see cref="ApiKeyPathSegmentBuilder"/> instances from the root type to the terminal scalar property.
+///     Ordered <see cref="ApiKeyPathSegmentBuilder"/> instances from the root type to the terminal scalar member.
 ///     Must contain at least one builder.
 /// </param>
 /// <exception cref="ArgumentNullException">Thrown when <paramref name="clrRootType"/> or <paramref name="segmentBuilders"/> is <c>null</c>.</exception>
@@ -33,8 +33,8 @@ public sealed class ApiKeyPathBuilder<TRoot>(Type clrRootType, IEnumerable<ApiKe
     ///     Creates a builder for a path rooted at <typeparamref name="TRoot"/> using a type-safe lambda expression.
     ///     The expression must consist only of chained member access (e.g. <c>x => x.Address.CityId</c>).
     /// </summary>
-    /// <typeparam name="TScalar">The return type of the terminal scalar property.</typeparam>
-    /// <param name="expression">A lambda expression selecting the scalar property, optionally through navigation properties.</param>
+    /// <typeparam name="TScalar">The return type of the terminal scalar member.</typeparam>
+    /// <param name="expression">A lambda expression selecting the scalar member, optionally through navigation members.</param>
     /// <returns>A new <see cref="ApiKeyPathBuilder{TRoot}"/> with <typeparamref name="TRoot"/> as the root CLR type.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="expression"/> is <c>null</c>.</exception>
     /// <exception cref="ArgumentException">Thrown when <paramref name="expression"/> is not a simple member access chain.</exception>
@@ -53,7 +53,7 @@ public sealed class ApiKeyPathBuilder<TRoot>(Type clrRootType, IEnumerable<ApiKe
     ///     <see cref="object"/>.
     /// </summary>
     /// <typeparam name="TPathRoot">The CLR type from which the navigation begins.</typeparam>
-    /// <param name="expression">A lambda expression selecting the scalar property on <typeparamref name="TPathRoot"/>, optionally through navigation properties.</param>
+    /// <param name="expression">A lambda expression selecting the scalar member on <typeparamref name="TPathRoot"/>, optionally through navigation members.</param>
     /// <returns>A new <see cref="ApiKeyPathBuilder{TRoot}"/> with <typeparamref name="TPathRoot"/> as the root CLR type.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="expression"/> is <c>null</c>.</exception>
     /// <exception cref="ArgumentException">Thrown when <paramref name="expression"/> is not a simple member access chain.</exception>

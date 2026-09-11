@@ -98,8 +98,8 @@ public sealed class ApiKeyMaterializationContext
     public ApiKeyPartNameFormatterDelegate? PartNameFormatter { get; init; }
 
     /// <summary>
-    ///     Gets the behavior when any property in a path — whether an intermediate navigation property
-    ///     or the terminal scalar property — is <see langword="null"/>.
+    ///     Gets the behavior when any property in a path — whether an intermediate navigation member
+    ///     or the terminal scalar member — is <see langword="null"/>.
     ///     Defaults to <see cref="ApiKeyNullHandling.UseDefaultOnNull"/>.
     /// </summary>
     public ApiKeyNullHandling NullHandling { get; init; } = ApiKeyNullHandling.UseDefaultOnNull;
@@ -144,10 +144,10 @@ public sealed class ApiKeyMaterializationContext
     }
 
     /// <summary>
-    ///     Registers an already-materialized <see cref="ApiKey"/> value for the specified root CLR type and CLR property path.
+    ///     Registers an already-materialized <see cref="ApiKey"/> value for the specified root CLR type and CLR member path.
     /// </summary>
     /// <param name="clrRootType">The root CLR type of the key path.</param>
-    /// <param name="clrPath">The full dotted CLR property path from the root type to the scalar property.</param>
+    /// <param name="clrPath">The full dotted CLR member path from the root type to the scalar member.</param>
     /// <param name="apiKey">The materialized key value.</param>
     /// <returns>The current context for fluent chaining.</returns>
     public ApiKeyMaterializationContext WithKey(Type clrRootType, string clrPath, ApiKey apiKey)
@@ -158,11 +158,11 @@ public sealed class ApiKeyMaterializationContext
     }
 
     /// <summary>
-    ///     Registers raw text for the specified root CLR type and CLR property path.
+    ///     Registers raw text for the specified root CLR type and CLR member path.
     ///     The text is parsed according to schema metadata during value-based materialization.
     /// </summary>
     /// <param name="clrRootType">The root CLR type of the key path.</param>
-    /// <param name="clrPath">The full dotted CLR property path from the root type to the scalar property.</param>
+    /// <param name="clrPath">The full dotted CLR member path from the root type to the scalar member.</param>
     /// <param name="text">The raw text value.</param>
     /// <returns>The current context for fluent chaining.</returns>
     public ApiKeyMaterializationContext WithText(Type clrRootType, string clrPath, string? text)

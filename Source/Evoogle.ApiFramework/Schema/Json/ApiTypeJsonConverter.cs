@@ -4,6 +4,7 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using System.Text.Json;
+
 using Evoogle.ApiFramework.Schema.Types;
 using Evoogle.Json;
 
@@ -62,6 +63,7 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
         public required string ApiOptions { get; init; }
         public required string ApiProperties { get; init; }
         public required string ApiKeyTypes { get; init; }
+        public required string ApiVersionType { get; init; }
         #endregion
     }
 
@@ -111,7 +113,8 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
                 {
                     ApiOptions = policy.ConvertName(nameof(Types.ApiObjectType.ApiOptions)),
                     ApiProperties = policy.ConvertName(nameof(Types.ApiObjectType.ApiProperties)),
-                    ApiKeyTypes = policy.ConvertName(nameof(Types.ApiObjectType.ApiKeyTypes))
+                    ApiKeyTypes = policy.ConvertName(nameof(Types.ApiObjectType.ApiKeyTypes)),
+                    ApiVersionType = policy.ConvertName(nameof(Types.ApiObjectType.ApiVersionType))
                 },
                 ApiType = new ApiTypePropertyNames
                 {

@@ -3,6 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Schema.Versions;
 using Evoogle.ApiFramework.TestData;
 
 namespace Evoogle.ApiFramework.Schema.TestData;
@@ -70,9 +71,10 @@ public static partial class ApiSchemaFactory
         IEnumerable<ApiProperty> properties,
         IEnumerable<ApiNamedKeyType>? keyTypes = null,
         ApiObjectTypeOptions? options = null,
+        ApiVersionType? versionType = null,
         OrderedDictionary<Type, object>? extensions = null
     )
-        => WithExtensions(new ApiObjectType(name, options, properties, keyTypes, clr), extensions);
+        => WithExtensions(new ApiObjectType(name, options, properties, keyTypes, versionType, clr), extensions);
 
     private static ApiObjectTypeOptions OO(ApiKeyNullHandling keyNullHandling)
         => new()
@@ -365,7 +367,8 @@ public static partial class ApiSchemaFactory
         keyTypes:
         [
             KT("PK_Order", [KP(typeof(Order), [KPS(nameof(Order.Id))])])
-        ]);
+        ],
+        versionType: new ApiVersionType(typeof(long)));
 
         // OrderLine
         var orderLine = O(name: nameof(OrderLine), clr: typeof(OrderLine),
@@ -584,7 +587,8 @@ public static partial class ApiSchemaFactory
         keyTypes:
         [
             KT(name: "PK_KeyNestedPart", paths: [KP(typeof(KeyNested), [KPS(nameof(KeyNested.Id))])])
-        ]);
+        ],
+        versionType: new ApiVersionType(typeof(Guid)));
 
         // KeyNestedComposite: Composite key with nested part
         var keyNestedComposite = O(name: nameof(KeyNestedComposite), clr: typeof(KeyNestedComposite),
@@ -797,7 +801,12 @@ public static partial class ApiSchemaFactory
         keyTypes:
         [
             KT("PK_RelationshipCatalogItem", [KP(typeof(RelationshipCatalogItem), [KPS(nameof(RelationshipCatalogItem.Sku))]), KP(typeof(RelationshipCatalogItem), [KPS(nameof(RelationshipCatalogItem.Revision))])]),
-        ]);
+        ],
+        versionType: new ApiVersionType
+        (
+            typeof(int),
+            nameof(RelationshipCatalogItem.Revision)
+        ));
 
         // RelationshipCatalogKey
         var relationshipCatalogKey = O(name: nameof(RelationshipCatalogKey), clr: typeof(RelationshipCatalogKey),
@@ -1006,7 +1015,8 @@ public static partial class ApiSchemaFactory
             P(name: nameof(Point.X),    expression: TE.ClrRef<long>(),   required: true, ClrMemberKind.Field),
             P(name: nameof(Point.Y),    expression: TE.ClrRef<long>(),   required: true),
             P(name: nameof(Point.Note), expression: TE.ClrRef<string>(), required: false)
-        ]);
+        ],
+        versionType: new ApiVersionType(typeof(long), nameof(Point.X)));
 
         var scalarsOnly = O(name: nameof(ScalarsOnly), clr: typeof(ScalarsOnly), options: OO(ApiKeyNullHandling.ThrowOnNull),
         properties:

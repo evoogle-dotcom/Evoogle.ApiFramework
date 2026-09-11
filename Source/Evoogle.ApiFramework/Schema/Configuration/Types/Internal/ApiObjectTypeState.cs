@@ -4,6 +4,7 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using Evoogle.ApiFramework.Schema.Configuration.Keys;
+using Evoogle.ApiFramework.Schema.Configuration.Versions;
 
 namespace Evoogle.ApiFramework.Schema.Configuration.Types.Internal;
 
@@ -19,5 +20,7 @@ internal sealed class ApiObjectTypeState
     internal List<ApiPropertyBuilder> PropertyBuilders { get; } = [];
 
     internal Action<ApiObjectTypeOptionsBuilder>? OptionsConfiguration { get; set; }
+
+    internal ApiVersionTypeBuilder? VersionTypeBuilder { get; set; }
     #endregion
 }

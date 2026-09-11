@@ -400,7 +400,7 @@ public sealed class ApiAttributeAnnotationReader :
             );
         }
 
-        return parseResult.ClrPropertyNames;
+        return parseResult.ClrMemberNames;
     }
 
     private static IEnumerable<MemberInfo> GetPublicInstanceMembers(Type clrType)

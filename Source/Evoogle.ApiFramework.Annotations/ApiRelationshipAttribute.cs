@@ -6,11 +6,12 @@
 namespace Evoogle.ApiFramework;
 
 /// <summary>
-///     Declares a one-to-one or one-to-many relationship on a navigation property.
+///     Declares a one-to-one or one-to-many relationship on a navigation member.
 /// </summary>
 /// <remarks>
-///     Place this attribute on the navigation property of the principal end.
-///     To declare a relationship without a navigation property use <see cref="ApiRelationshipDefinitionAttribute"/>.
+///     Place this attribute on the navigation member of the principal end.
+///     To declare a relationship without a navigation member use
+///     <see cref="ApiRelationshipDefinitionAttribute"/>.
 /// </remarks>
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
 public sealed class ApiRelationshipAttribute : ApiNamedElementAttribute
@@ -29,7 +30,7 @@ public sealed class ApiRelationshipAttribute : ApiNamedElementAttribute
     public required ApiRelationshipKind Kind { get; init; }
 
     /// <summary>
-    ///     Gets the the name of the foreign-key CLR property on the dependent end.
+    ///     Gets the foreign-key CLR member name on the dependent end.
     ///     When <c>null</c> the framework infers the foreign key via convention.
     /// </summary>
     public string? ForeignKey { get; init; }

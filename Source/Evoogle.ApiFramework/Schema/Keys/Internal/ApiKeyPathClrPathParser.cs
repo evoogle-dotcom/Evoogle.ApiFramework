@@ -16,12 +16,12 @@ internal static class ApiKeyPathClrPathParser
     {
         ArgumentNullException.ThrowIfNull(clrPath);
 
-        var clrPropertyNames = clrPath.Trim().Split('.').Select(static name => name.Trim()).ToArray();
-        var validationMessage = clrPropertyNames.Length == 0 || clrPropertyNames.Any(string.IsNullOrWhiteSpace)
-            ? "CLR paths must contain one or more non-empty dot-delimited property names."
+        var clrMemberNames = clrPath.Trim().Split('.').Select(static name => name.Trim()).ToArray();
+        var validationMessage = clrMemberNames.Length == 0 || clrMemberNames.Any(string.IsNullOrWhiteSpace)
+            ? "CLR paths must contain one or more non-empty dot-delimited member names."
             : null;
 
-        return new(clrPropertyNames, validationMessage);
+        return new(clrMemberNames, validationMessage);
     }
     #endregion
 
@@ -33,15 +33,15 @@ internal static class ApiKeyPathClrPathParser
     internal sealed class ParseResult
     {
         #region Constructors
-        public ParseResult(string[] clrPropertyNames, string? validationMessage)
+        public ParseResult(string[] clrMemberNames, string? validationMessage)
         {
-            this.ClrPropertyNames = clrPropertyNames;
+            this.ClrMemberNames = clrMemberNames;
             this.ValidationMessage = validationMessage;
         }
         #endregion
 
         #region Properties
-        public IReadOnlyList<string> ClrPropertyNames { get; }
+        public IReadOnlyList<string> ClrMemberNames { get; }
 
         public bool IsValid => this.ValidationMessage is null;
 

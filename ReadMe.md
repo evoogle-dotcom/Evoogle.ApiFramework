@@ -25,6 +25,8 @@ public sealed class Customer
     [ApiKey]
     public Guid Id { get; set; }
 
+    public long Version { get; set; }
+
     [ApiRelationship
     (
         ApiName = "CustomerOrders",
@@ -44,6 +46,8 @@ Use `ApiSchemaBuilder` when defining schemas in code. The fluent API is designed
 
 - Register scalar, enum, and object CLR types with `AddScalar<T>()`, `AddEnum<T>()`, and `AddObject<T>()`.
 - Prefer expression-based overloads such as `AddProperty(c => c.Name)` and `AddKey("PK_Customer", c => c.Id)` so CLR member names are refactor-safe.
+- Use `WithVersion(c => c.Version)` for a required property-backed version, or
+  `WithRepositoryVersion<TVersion>()` when repository metadata supplies it.
 - Use `AddRequiredProperty` or `AddOptionalProperty` only when the API contract should override CLR nullable reference type inference.
 - Configure larger schemas with `IApiObjectTypeConfiguration<T>` and relationship configuration classes when inline lambdas become too large.
 - Use relationship shortcuts for common cases, or the full relationship builders when you need named principal keys, composite keys, or extensions.
@@ -54,12 +58,15 @@ var schema = new ApiSchemaBuilder()
     .WithVersion("v1")
     .WithOptions(o => o.ThrowOnNullKeyPart())
     .AddScalar<Guid>()
+    .AddScalar<long>()
     .AddScalar<string>()
     .AddEnum<OrderStatus>(e => e.AddAllValues())
     .AddObject<Customer>(o => o
         .AddProperty(c => c.Id)
         .AddProperty(c => c.Name)
+        .AddProperty(c => c.Version)
         .AddProperty(c => c.Orders)
+        .WithVersion(c => c.Version)
         .AddKey("PK_Customer", c => c.Id))
     .AddObject<Order>(order => order
         .AddProperty(o => o.Id)
@@ -80,6 +87,21 @@ Schema-wide options can be overridden on individual object types:
 
 `Build()` compiles, validates, freezes, and returns the schema. A returned schema is immutable and
 safe for concurrent runtime reads.
+
+Each `ApiObjectType` may own one optional `ApiVersionType`. A property-backed definition references
+an existing required scalar `ApiProperty`; a repository-backed definition has no CLR member.
+`ApiVersion` is an opaque equality token whose exact CLR representation matters. Strings use
+ordinal equality, and recognized binary values are defensively copied.
+
+Custom reference-type scalar versions are supported for third-party integrations as an explicit
+opt-in. The framework retains the supplied reference, so it must remain immutable and provide
+stable equality and hash-code behavior for its full lifetime as an `ApiVersion`. The framework
+cannot enforce deep immutability for arbitrary custom objects.
+
+This release supplies the schema metadata, builders, JSON contract, compilation, and value
+materialization foundation. Repository retrieval records, command concurrency policies, atomic
+mutation enforcement, provider mappings, and client state reconciliation remain operation-runtime
+work.
 
 ### Validation and Error Reporting
 
@@ -202,7 +224,7 @@ public Type ClrType { get; }
 
 Some schema concepts are canonical `Api*` terms and should stay that way everywhere.
 Examples include `ApiName`, `ApiPath`, and `ApiKind`. `ApiPath` is intentionally prefixed
-because path-like values can mean schema paths, CLR property paths, JSON paths, or
+because path-like values can mean schema paths, CLR member paths, JSON paths, or
 file-system paths.
 
 Use no prefix when the containing type or local scope already makes the domain clear and

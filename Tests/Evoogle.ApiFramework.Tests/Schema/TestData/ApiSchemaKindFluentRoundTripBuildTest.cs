@@ -82,12 +82,13 @@ public class ApiSchemaKindFluentRoundTripBuildTest : ApiSchemaBuildTestBase
                 foreach (var apiProperty in apiObjectType.ApiProperties.SafeCast<ApiProperty>())
                 {
                     var apiPropertyName = apiProperty.ApiName;
-                    var clrPropertyName = apiProperty.ClrName;
-                    x.AddProperty(apiPropertyName, clrPropertyName, p => p.ConfigureExtensions(apiProperty));
+                    var clrMemberName = apiProperty.ClrName;
+                    x.AddProperty(apiPropertyName, clrMemberName, p => p.ConfigureExtensions(apiProperty));
                 }
 
                 x.ConfigureOptions(apiObjectType);
                 x.ConfigureKeyTypes(apiObjectType);
+                x.ConfigureVersionType(apiObjectType);
                 x.ConfigureExtensions(apiObjectType);
             });
         }

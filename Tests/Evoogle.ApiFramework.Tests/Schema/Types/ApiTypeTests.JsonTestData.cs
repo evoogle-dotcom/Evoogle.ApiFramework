@@ -743,12 +743,12 @@ public partial class ApiTypeTests
                     new ApiKeyTypeDef
                     (
                         ApiName: "PK_Company_Id",
-                        ApiKeyPaths: [new ApiKeyPathDef(ClrRootType: typeof(Company), [new ApiKeyPathSegmentDef(ClrPropertyName: nameof(Company.Id))])]
+                        ApiKeyPaths: [new ApiKeyPathDef(ClrRootType: typeof(Company), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(Company.Id))])]
                     ),
                     new ApiKeyTypeDef
                     (
                         ApiName: "AK_Company_Name",
-                        ApiKeyPaths: [new ApiKeyPathDef(ClrRootType: typeof(Company), [new ApiKeyPathSegmentDef(ClrPropertyName: nameof(Company.Name))])]
+                        ApiKeyPaths: [new ApiKeyPathDef(ClrRootType: typeof(Company), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(Company.Name))])]
                     )
                 ]
             ),
@@ -1270,12 +1270,12 @@ public partial class ApiTypeTests
                     new ApiKeyTypeDef
                     (
                         ApiName: "PK_Company_Id",
-                        ApiKeyPaths: [new ApiKeyPathDef(ClrRootType: typeof(Company), [new ApiKeyPathSegmentDef(ClrPropertyName: nameof(Company.Id))])]
+                        ApiKeyPaths: [new ApiKeyPathDef(ClrRootType: typeof(Company), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(Company.Id))])]
                     ),
                     new ApiKeyTypeDef
                     (
                         ApiName: "AK_Company_Name",
-                        ApiKeyPaths: [new ApiKeyPathDef(ClrRootType: typeof(Company), [new ApiKeyPathSegmentDef(ClrPropertyName: nameof(Company.Name))])]
+                        ApiKeyPaths: [new ApiKeyPathDef(ClrRootType: typeof(Company), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(Company.Name))])]
                     )
                 ]
             ),

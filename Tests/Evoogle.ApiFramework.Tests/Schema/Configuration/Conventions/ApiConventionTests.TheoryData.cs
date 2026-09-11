@@ -653,7 +653,7 @@ public partial class ApiConventionTests
                           ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+PersonWithId, Evoogle.ApiFramework.Tests"",
                           ""ApiSegments"": [
                             {
-                              ""ClrPropertyName"": ""Id""
+                              ""ClrMemberName"": ""Id""
                             }
                           ]
                         }
@@ -733,7 +733,7 @@ public partial class ApiConventionTests
                           ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+PersonWithId, Evoogle.ApiFramework.Tests"",
                           ""ApiSegments"": [
                             {
-                              ""ClrPropertyName"": ""Name""
+                              ""ClrMemberName"": ""Name""
                             }
                           ]
                         }
@@ -804,7 +804,7 @@ public partial class ApiConventionTests
                           ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+OrderItem, Evoogle.ApiFramework.Tests"",
                           ""ApiSegments"": [
                             {
-                              ""ClrPropertyName"": ""OrderItemId""
+                              ""ClrMemberName"": ""OrderItemId""
                             }
                           ]
                         }

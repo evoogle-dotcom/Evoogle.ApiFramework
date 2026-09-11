@@ -7,6 +7,7 @@ using System.Text.Json;
 
 using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Schema.TestData;
+using Evoogle.ApiFramework.Schema.Versions;
 using Evoogle.NTree;
 using Evoogle.XUnit;
 
@@ -133,7 +134,8 @@ public class ApiSchemaElementTests(ITestOutputHelper output) : XUnitTests(output
                 ApiSchemaElementKind.EnumType,
                 ApiSchemaElementKind.ObjectType,
                 ApiSchemaElementKind.EnumValue,
-                ApiSchemaElementKind.Property
+                ApiSchemaElementKind.Property,
+                ApiSchemaElementKind.VersionType
             );
 
             var depthFirstKinds = this.Schema.Root
@@ -146,7 +148,8 @@ public class ApiSchemaElementTests(ITestOutputHelper output) : XUnitTests(output
                 ApiSchemaElementKind.EnumType,
                 ApiSchemaElementKind.EnumValue,
                 ApiSchemaElementKind.ObjectType,
-                ApiSchemaElementKind.Property
+                ApiSchemaElementKind.Property,
+                ApiSchemaElementKind.VersionType
             );
         }
         #endregion
@@ -182,7 +185,7 @@ public class ApiSchemaElementTests(ITestOutputHelper output) : XUnitTests(output
             segments.Should().HaveCount(2);
             this.KeyPath.ClrPath.Should().Be
             (
-                string.Join('.', segments.Select(static segment => segment.ClrPropertyName))
+                string.Join('.', segments.Select(static segment => segment.ClrMemberName))
             );
             this.KeyPath.Children().Should().Equal(segments);
 
@@ -562,6 +565,7 @@ public class ApiSchemaElementTests(ITestOutputHelper output) : XUnitTests(output
             apiOptions: null,
             apiProperties: [apiProperty],
             apiKeyTypes: [],
+            new ApiVersionType(typeof(int), nameof(TreeObject.Id)),
             typeof(TreeObject)
         );
         var schema = new ApiSchema
@@ -646,6 +650,7 @@ public class ApiSchemaElementTests(ITestOutputHelper output) : XUnitTests(output
             ApiEnumType => ApiSchemaElementKind.EnumType,
             ApiObjectType => ApiSchemaElementKind.ObjectType,
             ApiScalarType => ApiSchemaElementKind.ScalarType,
+            ApiVersionType => ApiSchemaElementKind.VersionType,
             ApiEnumValue => ApiSchemaElementKind.EnumValue,
             ApiProperty => ApiSchemaElementKind.Property,
             ApiNamedKeyType => ApiSchemaElementKind.NamedKeyType,
@@ -680,7 +685,9 @@ public class ApiSchemaElementTests(ITestOutputHelper output) : XUnitTests(output
             ApiObjectType apiObjectType =>
             [
                 .. apiObjectType.ApiProperties,
-                .. apiObjectType.ApiKeyTypes
+                .. apiObjectType.ApiKeyTypes,
+                .. new ApiSchemaElement?[] { apiObjectType.ApiVersionType }
+                    .OfType<ApiSchemaElement>()
             ],
             ApiProperty apiProperty when apiProperty.ApiTypeExpression?.ApiInlineType is not null =>
                 [apiProperty.ApiTypeExpression.ApiInlineType],

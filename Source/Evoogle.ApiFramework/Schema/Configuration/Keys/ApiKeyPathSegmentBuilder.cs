@@ -13,49 +13,49 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Keys;
 public class ApiKeyPathSegmentBuilder : ExtensionBuilder<ApiKeyPathSegmentBuilder>
 {
     #region Fields
-    private readonly string _clrPropertyName;
+    private readonly string _clrMemberName;
     #endregion
 
     #region Properties
-    /// <summary>Gets the CLR property name for this segment.</summary>
-    internal string ClrPropertyName => _clrPropertyName;
+    /// <summary>Gets the CLR member name for this segment.</summary>
+    internal string ClrMemberName => _clrMemberName;
     #endregion
 
     #region Constructors
     /// <summary>
-    ///     Creates an <see cref="ApiKeyPathSegmentBuilder"/> with the specified CLR property name.
+    ///     Creates an <see cref="ApiKeyPathSegmentBuilder"/> with the specified CLR member name.
     /// </summary>
-    /// <param name="clrPropertyName">The CLR property name for this navigation step.</param>
-    /// <exception cref="ArgumentException">Thrown when <paramref name="clrPropertyName"/> is not one CLR property name.</exception>
-    public ApiKeyPathSegmentBuilder(string clrPropertyName)
+    /// <param name="clrMemberName">The CLR member name for this navigation step.</param>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="clrMemberName"/> is not one CLR member name.</exception>
+    public ApiKeyPathSegmentBuilder(string clrMemberName)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(clrPropertyName);
+        ArgumentException.ThrowIfNullOrWhiteSpace(clrMemberName);
 
-        if (clrPropertyName.Contains('.'))
+        if (clrMemberName.Contains('.'))
         {
             throw new ArgumentException
             (
-                "A key path segment must contain exactly one CLR property name and cannot contain a dot.",
-                nameof(clrPropertyName)
+                "A key path segment must contain exactly one CLR member name and cannot contain a dot.",
+                nameof(clrMemberName)
             );
         }
 
-        _clrPropertyName = clrPropertyName;
+        _clrMemberName = clrMemberName;
     }
     #endregion
 
     #region Factory Methods
     /// <summary>
-    ///     Creates a builder for a segment with the specified CLR property name.
+    ///     Creates a builder for a segment with the specified CLR member name.
     /// </summary>
-    /// <param name="clrPropertyName">The CLR property name for this navigation step.</param>
-    /// <returns>A new <see cref="ApiKeyPathSegmentBuilder"/> for the specified property name.</returns>
-    /// <exception cref="ArgumentException">Thrown when <paramref name="clrPropertyName"/> is not one CLR property name.</exception>
-    public static ApiKeyPathSegmentBuilder For(string clrPropertyName)
+    /// <param name="clrMemberName">The CLR member name for this navigation step.</param>
+    /// <returns>A new <see cref="ApiKeyPathSegmentBuilder"/> for the specified member name.</returns>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="clrMemberName"/> is not one CLR member name.</exception>
+    public static ApiKeyPathSegmentBuilder For(string clrMemberName)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(clrPropertyName);
+        ArgumentException.ThrowIfNullOrWhiteSpace(clrMemberName);
 
-        return new(clrPropertyName);
+        return new(clrMemberName);
     }
     #endregion
 
@@ -78,7 +78,7 @@ public class ApiKeyPathSegmentBuilder : ExtensionBuilder<ApiKeyPathSegmentBuilde
     /// </summary>
     internal ApiKeyPathSegment Build()
     {
-        var segment = new ApiKeyPathSegment(_clrPropertyName);
+        var segment = new ApiKeyPathSegment(_clrMemberName);
 
         var extensions = this.BuildExtensions();
         if (extensions != null)

@@ -15,15 +15,15 @@ using Evoogle.Extensions;
 namespace Evoogle.ApiFramework.Schema.Keys;
 
 /// <summary>
-///     Represents a single property navigation step within an <see cref="ApiKeyPath"/>.
+///     Represents a single CLR member navigation step within an <see cref="ApiKeyPath"/>.
 /// </summary>
 /// <remarks>
-///     Each segment holds a CLR property name and, after compilation, a reference to the resolved <see cref="ApiProperty"/>.
+///     Each segment holds a CLR member name and, after compilation, a reference to the resolved <see cref="ApiProperty"/>.
 ///     Segments do not validate whether the resolved property is scalar or object-typed — that responsibility belongs to the parent <see cref="ApiKeyPath"/>, which has positional context (navigation vs. terminal).
 /// </remarks>
-/// <param name="clrPropertyName">The CLR property name for this navigation step.</param>
+/// <param name="clrMemberName">The CLR member name for this navigation step.</param>
 [JsonConverter(typeof(ApiKeyPathSegmentJsonConverter))]
-public sealed class ApiKeyPathSegment(string clrPropertyName) : ApiSchemaElement
+public sealed class ApiKeyPathSegment(string clrMemberName) : ApiSchemaElement
 {
     #region Fields
     private ApiProperty? _apiResolvedProperty = null;
@@ -38,13 +38,16 @@ public sealed class ApiKeyPathSegment(string clrPropertyName) : ApiSchemaElement
     #endregion
 
     #region ApiKeyPathSegment Properties
-    /// <summary>Gets the CLR property name for this navigation step.</summary>
-    public string ClrPropertyName { get; } = clrPropertyName;
+    /// <summary>Gets the CLR member name for this navigation step.</summary>
+    public string ClrMemberName { get; } = clrMemberName;
 
     /// <summary>Gets the resolved <see cref="ApiProperty"/> for this segment. Available after compilation.</summary>
     public ApiProperty ApiProperty => this.RequireValue(_apiResolvedProperty);
 
-    /// <summary>Gets a value indicating whether the CLR property was successfully resolved during compilation.</summary>
+    /// <summary>
+    ///     Gets a value indicating whether the CLR member was successfully resolved to an
+    ///     <see cref="ApiProperty"/> during compilation.
+    /// </summary>
     internal bool IsPropertyResolved => _apiResolvedProperty is not null;
     #endregion
 
@@ -52,17 +55,17 @@ public sealed class ApiKeyPathSegment(string clrPropertyName) : ApiSchemaElement
     /// <inheritdoc/>
     public override string ToString()
     {
-        var clrPropertyName = this.ClrPropertyName.SafeToString();
+        var clrMemberName = this.ClrMemberName.SafeToString();
         var extensionCount = this.ExtensionCount.SafeToString();
 
-        return $"{nameof(ApiKeyPathSegment)} {{{nameof(this.ClrPropertyName)}={clrPropertyName}, {nameof(this.ExtensionCount)}={extensionCount}}}";
+        return $"{nameof(ApiKeyPathSegment)} {{{nameof(this.ClrMemberName)}={clrMemberName}, {nameof(this.ExtensionCount)}={extensionCount}}}";
     }
     #endregion
 
     #region ApiSchemaElement Methods
     /// <inheritdoc/>
     protected override string BuildPath(string? apiPreviousPath)
-        => ApiSchemaPathFormatting.BuildPath(apiBasePath: apiPreviousPath, apiPathSegment: this.ApiElementName, apiPathSegmentName: this.ClrPropertyName);
+        => ApiSchemaPathFormatting.BuildPath(apiBasePath: apiPreviousPath, apiPathSegment: this.ApiElementName, apiPathSegmentName: this.ClrMemberName);
 
     /// <inheritdoc/>
     internal override void CompileCore(ApiSchemaCompilationContext context)
@@ -71,30 +74,30 @@ public sealed class ApiKeyPathSegment(string clrPropertyName) : ApiSchemaElement
 
         base.CompileCore(context);
 
-        this.ValidateClrPropertyName(context);
+        this.ValidateClrMemberName(context);
         this.ResolveApiProperty(context);
     }
     #endregion
 
     #region Implementation Methods
-    private void ValidateClrPropertyName(ApiSchemaCompilationContext context)
+    private void ValidateClrMemberName(ApiSchemaCompilationContext context)
     {
-        if (!ApiSchemaNameValidation.IsNameInvalid(this.ClrPropertyName))
+        if (!ApiSchemaNameValidation.IsNameInvalid(this.ClrMemberName))
         {
             return;
         }
 
         var severity = ApiSchemaCompilationSeverity.Error;
-        var code = ApiSchemaCompilationCode.ApiKeyPathSegmentInvalidClrPropertyName;
-        var description = $"{nameof(this.ClrPropertyName)} must not be null, empty, or whitespace";
-        var remediation = $"Specify a valid {nameof(this.ClrPropertyName)} value";
+        var code = ApiSchemaCompilationCode.ApiKeyPathSegmentInvalidClrMemberName;
+        var description = $"{nameof(this.ClrMemberName)} must not be null, empty, or whitespace";
+        var remediation = $"Specify a valid {nameof(this.ClrMemberName)} value";
 
         context.AddIssue(severity, code, description, remediation);
     }
 
     private void ResolveApiProperty(ApiSchemaCompilationContext context)
     {
-        if (ApiSchemaNameValidation.IsNameInvalid(this.ClrPropertyName))
+        if (ApiSchemaNameValidation.IsNameInvalid(this.ClrMemberName))
         {
             return;
         }
@@ -102,7 +105,7 @@ public sealed class ApiKeyPathSegment(string clrPropertyName) : ApiSchemaElement
         var apiObjectType = this.GetApiObjectType();
         if (apiObjectType.TryGetPropertyByClrName
         (
-            this.ClrPropertyName,
+            this.ClrMemberName,
             out var apiResolvedProperty
         ))
         {
@@ -112,10 +115,10 @@ public sealed class ApiKeyPathSegment(string clrPropertyName) : ApiSchemaElement
 
         var severity = ApiSchemaCompilationSeverity.Error;
         var code = ApiSchemaCompilationCode.ApiKeyPathSegmentUnresolvedApiProperty;
-        var description = $"Property with CLR name '{this.ClrPropertyName}' could not be "
+        var description = $"An API property for CLR member '{this.ClrMemberName}' could not be "
             + $"found on object type '{apiObjectType.ApiName}'";
-        var remediation = $"Verify the CLR property name or add a property with CLR name "
-            + $"'{this.ClrPropertyName}' to '{apiObjectType.ApiName}'";
+        var remediation = $"Verify the CLR member name or add an API property for CLR member "
+            + $"'{this.ClrMemberName}' to '{apiObjectType.ApiName}'";
 
         context.AddIssue(severity, code, description, remediation);
     }

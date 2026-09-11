@@ -19,7 +19,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Keys;
 /// </param>
 /// <remarks>
 ///    <para>Key types are reusable components that define how to extract key values from CLR objects via one or more key paths. They are primarily used to configure API keys, but can also be used for other purposes such as defining unique identifiers for object types.</para>
-///    <para>Each key path represents a navigation chain from a specified CLR root type to a terminal scalar property, and can be configured with extensions at both the path and segment levels. When multiple key paths are defined within a key type, the resulting key value is a composite of the individual path values.</para>
+///    <para>Each key path represents a navigation chain from a specified CLR root type to a terminal scalar member, and can be configured with extensions at both the path and segment levels. When multiple key paths are defined within a key type, the resulting key value is a composite of the individual path values.</para>
 /// </remarks>
 public class ApiKeyTypeBuilder(string? apiName = null) : ExtensionBuilder<ApiKeyTypeBuilder>
 {
@@ -42,42 +42,42 @@ public class ApiKeyTypeBuilder(string? apiName = null) : ExtensionBuilder<ApiKey
 
     #region AddPath Methods
     /// <summary>
-    ///     Adds a key path to this key type using CLR property names or dot-delimited CLR property paths.
+    ///     Adds a key path to this key type using CLR member names or dot-delimited CLR member paths.
     /// </summary>
     /// <param name="clrRootType">The CLR type from which the navigation chain begins.</param>
-    /// <param name="clrPropertyNames">
-    ///     Ordered CLR property names or dot-delimited CLR property paths from the root type to the terminal scalar property.
+    /// <param name="clrMemberNames">
+    ///     Ordered CLR member names or dot-delimited CLR member paths from the root type to the terminal scalar member.
     /// </param>
     /// <returns>The current builder instance.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="clrRootType"/> is <c>null</c>.</exception>
-    /// <exception cref="ArgumentException">Thrown when <paramref name="clrPropertyNames"/> is empty.</exception>
-    public ApiKeyTypeBuilder AddPath(Type clrRootType, params string[] clrPropertyNames)
+    /// <exception cref="ArgumentException">Thrown when <paramref name="clrMemberNames"/> is empty.</exception>
+    public ApiKeyTypeBuilder AddPath(Type clrRootType, params string[] clrMemberNames)
     {
         ArgumentNullException.ThrowIfNull(clrRootType);
-        ArgumentNullException.ThrowIfNull(clrPropertyNames);
+        ArgumentNullException.ThrowIfNull(clrMemberNames);
 
-        _state.KeyPathBuilders.Add(ApiKeyPathBuilder.For(clrRootType, clrPropertyNames));
+        _state.KeyPathBuilders.Add(ApiKeyPathBuilder.For(clrRootType, clrMemberNames));
         return this;
     }
 
     /// <summary>
-    ///     Adds a key path to this key type using CLR property names or dot-delimited CLR property paths,
+    ///     Adds a key path to this key type using CLR member names or dot-delimited CLR member paths,
     ///     with an optional configuration callback.
     /// </summary>
     /// <param name="clrRootType">The CLR type from which the navigation chain begins.</param>
-    /// <param name="clrPropertyNames">
-    ///     Ordered CLR property names or dot-delimited CLR property paths from the root type to the terminal scalar property.
+    /// <param name="clrMemberNames">
+    ///     Ordered CLR member names or dot-delimited CLR member paths from the root type to the terminal scalar member.
     /// </param>
     /// <param name="configure">Optional callback to attach extensions or additional segments to the path builder.</param>
     /// <returns>The current builder instance.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="clrRootType"/> is <c>null</c>.</exception>
-    /// <exception cref="ArgumentException">Thrown when <paramref name="clrPropertyNames"/> is empty.</exception>
-    public ApiKeyTypeBuilder AddPath(Type clrRootType, IEnumerable<string> clrPropertyNames, Action<ApiKeyPathBuilder>? configure = null)
+    /// <exception cref="ArgumentException">Thrown when <paramref name="clrMemberNames"/> is empty.</exception>
+    public ApiKeyTypeBuilder AddPath(Type clrRootType, IEnumerable<string> clrMemberNames, Action<ApiKeyPathBuilder>? configure = null)
     {
         ArgumentNullException.ThrowIfNull(clrRootType);
-        ArgumentNullException.ThrowIfNull(clrPropertyNames);
+        ArgumentNullException.ThrowIfNull(clrMemberNames);
 
-        var builder = new ApiKeyPathBuilder(clrRootType, clrPropertyNames);
+        var builder = new ApiKeyPathBuilder(clrRootType, clrMemberNames);
         configure?.Invoke(builder);
         _state.KeyPathBuilders.Add(builder);
         return this;
@@ -102,21 +102,21 @@ public class ApiKeyTypeBuilder(string? apiName = null) : ExtensionBuilder<ApiKey
 
     /// <summary>
     ///     Returns <c>true</c> when this key type already contains the specified CLR root type
-    ///     and ordered CLR property path.
+    ///     and ordered CLR member path.
     ///
     ///     Used by <see cref="ApiObjectTypeBuilder.AddKeyOrAppendPath"/> to prevent
     ///     convention and annotation passes from adding the same path twice.
     /// </summary>
-    internal bool HasPath(Type clrRootType, IEnumerable<string> clrPropertyNames)
+    internal bool HasPath(Type clrRootType, IEnumerable<string> clrMemberNames)
     {
         ArgumentNullException.ThrowIfNull(clrRootType);
-        ArgumentNullException.ThrowIfNull(clrPropertyNames);
+        ArgumentNullException.ThrowIfNull(clrMemberNames);
 
-        var names = clrPropertyNames as IReadOnlyList<string> ?? [.. clrPropertyNames];
+        var names = clrMemberNames as IReadOnlyList<string> ?? [.. clrMemberNames];
 
         return _state.KeyPathBuilders.Any(p =>
             p.ClrRootType == clrRootType &&
-            p.SegmentBuilders.Select(s => s.ClrPropertyName).SequenceEqual(names));
+            p.SegmentBuilders.Select(s => s.ClrMemberName).SequenceEqual(names));
     }
 
     /// <summary>

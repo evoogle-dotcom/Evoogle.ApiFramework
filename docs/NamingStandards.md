@@ -72,7 +72,7 @@ concept.
 public Type ClrType { get; }
 public string ClrName { get; }
 public Type ClrObjectType { get; }
-public string ClrPropertyName { get; }
+public string ClrMemberName { get; }
 ```
 
 Parameter names mirror the same distinction in `camelCase`:
@@ -80,8 +80,12 @@ Parameter names mirror the same distinction in `camelCase`:
 ```csharp
 public ApiObjectTypeBuilder AddObject(Type clrType);
 public ApiPropertyBuilder(string apiName, string clrName);
-public ApiKeyPathBuilder AddPath(Type clrRootType, params string[] clrPropertyNames);
+public ApiKeyPathBuilder AddPath(Type clrRootType, params string[] clrMemberNames);
 ```
+
+Use `ClrMemberName` when a name can identify either a CLR property or field. A more specific
+property-based name is appropriate only when the value is guaranteed to identify a CLR property
+and cannot identify a field.
 
 Use `Clr` only when the value really is the CLR-side representation. Do not use `Clr` for
 general runtime values, parsed values, API names, or schema concepts.
@@ -139,8 +143,8 @@ Use framework terminology consistently.
 
 - Use `ApiName` for schema-visible names.
 - Use `ApiPath` for schema element paths because path-like values can otherwise mean
-  schema paths, CLR property paths, JSON paths, or file-system paths.
-- Use `ClrName`, `ClrType`, `ClrObjectType`, and `ClrPropertyName` for CLR-side backing
+  schema paths, CLR member paths, JSON paths, or file-system paths.
+- Use `ClrName`, `ClrType`, `ClrObjectType`, and `ClrMemberName` for CLR-side backing
   information.
 - Use `PrincipalKey` for relationship principal-end key terminology, not `PrimaryKey`.
 - Use `ForeignKey` for dependent/association-side key terminology.

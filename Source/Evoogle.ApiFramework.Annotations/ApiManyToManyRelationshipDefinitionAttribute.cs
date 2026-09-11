@@ -6,7 +6,8 @@
 namespace Evoogle.ApiFramework;
 
 /// <summary>
-///     Declares a many-to-many relationship at the type level without requiring navigation properties on the POCO.
+///     Declares a many-to-many relationship at the type level without requiring navigation members
+///     on the POCO.
 ///     Apply multiple instances for multiple M:N relationships.
 /// </summary>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = true)]
@@ -60,12 +61,14 @@ public sealed class ApiManyToManyRelationshipDefinitionAttribute : ApiNamedEleme
     }
 
     /// <summary>
-    ///     Gets the the CLR property name on <see cref="AssociationType"/> that holds the foreign key back to <see cref="PrincipalTypeA"/>.
+    ///     Gets the CLR member name on <see cref="AssociationType"/> that holds the foreign key
+    ///     back to <see cref="PrincipalTypeA"/>.
     /// </summary>
     public string? ForeignKeyA { get; init; }
 
     /// <summary>
-    ///     Gets the the CLR property name on <see cref="AssociationType"/> that holds the foreign key back to <see cref="PrincipalTypeB"/>.
+    ///     Gets the CLR member name on <see cref="AssociationType"/> that holds the foreign key
+    ///     back to <see cref="PrincipalTypeB"/>.
     /// </summary>
     public string? ForeignKeyB { get; init; }
     #endregion

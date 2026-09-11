@@ -378,7 +378,7 @@ public partial class ApiAnnotationTests
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+FieldAnnotationsType, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Code"" }
+                                            { ""ClrMemberName"": ""Code"" }
                                         ]
                                     }
                                 ]
@@ -447,7 +447,7 @@ public partial class ApiAnnotationTests
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+PersonWithKeyAnnotation, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id"" }
+                                            { ""ClrMemberName"": ""Id"" }
                                         ]
                                     }
                                 ]
@@ -516,7 +516,7 @@ public partial class ApiAnnotationTests
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+ScalarKeyTypeAnnotation, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id"" }
+                                            { ""ClrMemberName"": ""Id"" }
                                         ]
                                     }
                                 ]
@@ -527,7 +527,7 @@ public partial class ApiAnnotationTests
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+ScalarKeyTypeAnnotation, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Name"" }
+                                            { ""ClrMemberName"": ""Name"" }
                                         ]
                                     }
                                 ]
@@ -610,13 +610,13 @@ public partial class ApiAnnotationTests
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+CompositeKeyType, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""OrderId"" }
+                                            { ""ClrMemberName"": ""OrderId"" }
                                         ]
                                     },
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+CompositeKeyType, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""LineItemNumber"" }
+                                            { ""ClrMemberName"": ""LineItemNumber"" }
                                         ]
                                     }
                                 ]
@@ -708,19 +708,19 @@ public partial class ApiAnnotationTests
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+ThreePartCompositeKeyType, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id1"" }
+                                            { ""ClrMemberName"": ""Id1"" }
                                         ]
                                     },
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+ThreePartCompositeKeyType, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id2"" }
+                                            { ""ClrMemberName"": ""Id2"" }
                                         ]
                                     },
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+ThreePartCompositeKeyType, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id3"" }
+                                            { ""ClrMemberName"": ""Id3"" }
                                         ]
                                     }
                                 ]
@@ -789,7 +789,7 @@ public partial class ApiAnnotationTests
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+NestedKeyPartAnnotation, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id"" }
+                                            { ""ClrMemberName"": ""Id"" }
                                         ]
                                     }
                                 ]
@@ -858,7 +858,7 @@ public partial class ApiAnnotationTests
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+OwnerKeyAnnotation, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id"" }
+                                            { ""ClrMemberName"": ""Id"" }
                                         ]
                                     }
                                 ]
@@ -927,7 +927,7 @@ public partial class ApiAnnotationTests
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+AnnotationPrimaryKeyType, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Code"" }
+                                            { ""ClrMemberName"": ""Code"" }
                                         ]
                                     }
                                 ]
@@ -996,14 +996,14 @@ public partial class ApiAnnotationTests
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+NestedCompositeKeyAnnotation, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""NestedPart"" },
-                                            { ""ClrPropertyName"": ""Id"" }
+                                            { ""ClrMemberName"": ""NestedPart"" },
+                                            { ""ClrMemberName"": ""Id"" }
                                         ]
                                     },
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+NestedCompositeKeyAnnotation, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Name"" }
+                                            { ""ClrMemberName"": ""Name"" }
                                         ]
                                     }
                                 ]
@@ -1041,7 +1041,7 @@ public partial class ApiAnnotationTests
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+NestedKeyPartAnnotation, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id"" }
+                                            { ""ClrMemberName"": ""Id"" }
                                         ]
                                     }
                                 ]
@@ -1110,13 +1110,13 @@ public partial class ApiAnnotationTests
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+OwnerKeyAnnotation, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id"" }
+                                            { ""ClrMemberName"": ""Id"" }
                                         ]
                                     },
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+OwnedCompositeKeyAnnotation, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""LineNumber"" }
+                                            { ""ClrMemberName"": ""LineNumber"" }
                                         ]
                                     }
                                 ]
@@ -1154,7 +1154,7 @@ public partial class ApiAnnotationTests
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+OwnerKeyAnnotation, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id"" }
+                                            { ""ClrMemberName"": ""Id"" }
                                         ]
                                     }
                                 ]
@@ -1214,7 +1214,7 @@ public partial class ApiAnnotationTests
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+OwnerKeyAnnotation, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id"" }
+                                            { ""ClrMemberName"": ""Id"" }
                                         ]
                                     }
                                 ]
@@ -1252,7 +1252,7 @@ public partial class ApiAnnotationTests
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+OwnerKeyAnnotation, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id"" }
+                                            { ""ClrMemberName"": ""Id"" }
                                         ]
                                     }
                                 ]
@@ -1307,7 +1307,7 @@ public partial class ApiAnnotationTests
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+DuplicatePathKeyAnnotation, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id"" }
+                                            { ""ClrMemberName"": ""Id"" }
                                         ]
                                     }
                                 ]
@@ -1381,7 +1381,7 @@ public partial class ApiAnnotationTests
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+Customer, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id"" }
+                                            { ""ClrMemberName"": ""Id"" }
                                         ]
                                     }
                                 ]
@@ -1428,7 +1428,7 @@ public partial class ApiAnnotationTests
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+Order, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id"" }
+                                            { ""ClrMemberName"": ""Id"" }
                                         ]
                                     }
                                 ]
@@ -1451,7 +1451,7 @@ public partial class ApiAnnotationTests
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+Order, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""CustomerId"" }
+                                            { ""ClrMemberName"": ""CustomerId"" }
                                         ]
                                     }
                                 ]
@@ -1546,7 +1546,7 @@ public partial class ApiAnnotationTests
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+Order, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id"" }
+                                            { ""ClrMemberName"": ""Id"" }
                                         ]
                                     }
                                 ]
@@ -1569,7 +1569,7 @@ public partial class ApiAnnotationTests
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+Invoice, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""OrderId"" }
+                                            { ""ClrMemberName"": ""OrderId"" }
                                         ]
                                     }
                                 ]
@@ -1623,7 +1623,7 @@ public partial class ApiAnnotationTests
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+Product, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id"" }
+                                            { ""ClrMemberName"": ""Id"" }
                                         ]
                                     }
                                 ]
@@ -1678,7 +1678,7 @@ public partial class ApiAnnotationTests
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+Tag, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id"" }
+                                            { ""ClrMemberName"": ""Id"" }
                                         ]
                                     }
                                 ]
@@ -1704,7 +1704,7 @@ public partial class ApiAnnotationTests
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+ProductTag, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""ProductId"" }
+                                            { ""ClrMemberName"": ""ProductId"" }
                                         ]
                                     }
                                 ]
@@ -1714,7 +1714,7 @@ public partial class ApiAnnotationTests
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+ProductTag, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""TagId"" }
+                                            { ""ClrMemberName"": ""TagId"" }
                                         ]
                                     }
                                 ]
@@ -1769,7 +1769,7 @@ public partial class ApiAnnotationTests
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+Category, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id"" }
+                                            { ""ClrMemberName"": ""Id"" }
                                         ]
                                     }
                                 ]
@@ -1798,7 +1798,7 @@ public partial class ApiAnnotationTests
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+Label, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id"" }
+                                            { ""ClrMemberName"": ""Id"" }
                                         ]
                                     }
                                 ]
@@ -1850,7 +1850,7 @@ public partial class ApiAnnotationTests
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+ProductTagFromType, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""ProductId"" }
+                                            { ""ClrMemberName"": ""ProductId"" }
                                         ]
                                     }
                                 ]
@@ -1860,7 +1860,7 @@ public partial class ApiAnnotationTests
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+ProductTagFromType, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""TagId"" }
+                                            { ""ClrMemberName"": ""TagId"" }
                                         ]
                                     }
                                 ]

@@ -29,7 +29,7 @@ public partial class ApiKeyType
     /// <exception cref="ApiKeyException">
     ///     Thrown when <see cref="ApiKeyMaterializationContext.NullHandling"/> is
     ///     <see cref="ApiKeyNullHandling.ThrowOnNull"/> and any property in a path — whether an
-    ///     intermediate navigation property or the terminal scalar property — is <see langword="null"/>.
+    ///     intermediate navigation member or the terminal scalar member — is <see langword="null"/>.
     /// </exception>
     public ApiKey MaterializeKey(ApiKeyMaterializationContext context)
     {
@@ -106,7 +106,11 @@ public partial class ApiKeyType
             {
                 if (context.NullHandling == ApiKeyNullHandling.ThrowOnNull)
                 {
-                    throw new ApiSchemaMaterializationException($"Cannot walk key path '{pathName}': navigation property '{segment.ClrPropertyName}' resolved to null.");
+                    throw new ApiSchemaMaterializationException
+                    (
+                        $"Cannot walk key path '{pathName}': navigation member "
+                        + $"'{segment.ClrMemberName}' resolved to null."
+                    );
                 }
 
                 return ApiKey.Empty;
@@ -189,7 +193,7 @@ public partial class ApiKeyType
         return ApiKey.Empty;
     }
 
-    private static string GetPathName(ApiKeyPath path) => string.Join(".", path.ApiSegments.Select(static s => s.ClrPropertyName));
+    private static string GetPathName(ApiKeyPath path) => string.Join(".", path.ApiSegments.Select(static s => s.ClrMemberName));
 
     private static ApiKeyKind GetExpectedScalarKind(Type clrType, string pathName)
     {

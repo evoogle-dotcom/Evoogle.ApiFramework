@@ -3,6 +3,9 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Schema.Configuration.Versions;
+using Evoogle.ApiFramework.Schema.Versions;
+
 namespace Evoogle.ApiFramework.Schema.Configuration.Internal;
 
 /// <summary>
@@ -131,6 +134,19 @@ internal static class ApiExtensionBuilderExtensions
         foreach (var extension in extensions)
         {
             builder.AddScalarTypeExtension(extension.Key, extension.Value);
+        }
+    }
+
+    public static void ConfigureExtensions
+    (
+        this ApiVersionTypeBuilder builder,
+        ApiVersionType apiVersionType
+    )
+    {
+        var extensions = apiVersionType.Extensions;
+        foreach (var extension in extensions)
+        {
+            builder.AddVersionTypeExtension(extension.Key, extension.Value);
         }
     }
 

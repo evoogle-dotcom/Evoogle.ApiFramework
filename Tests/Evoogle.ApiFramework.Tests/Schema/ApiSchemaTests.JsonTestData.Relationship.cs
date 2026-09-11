@@ -73,7 +73,7 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_RelationshipUser_Id",
                                 ApiKeyPaths:
                                 [
-                                    new ApiKeyPathDef(ClrRootType: typeof(RelationshipUser), [new ApiKeyPathSegmentDef(ClrPropertyName: nameof(RelationshipUser.Id))])
+                                    new ApiKeyPathDef(ClrRootType: typeof(RelationshipUser), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(RelationshipUser.Id))])
                                 ]
                             )
                         ]
@@ -102,7 +102,7 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_RelationshipUserRef_UserId",
                                 ApiKeyPaths:
                                 [
-                                    new ApiKeyPathDef(ClrRootType: typeof(RelationshipUserRef), [new ApiKeyPathSegmentDef(ClrPropertyName: nameof(RelationshipUserRef.UserId))])
+                                    new ApiKeyPathDef(ClrRootType: typeof(RelationshipUserRef), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(RelationshipUserRef.UserId))])
                                 ]
                             )
                         ]
@@ -155,7 +155,7 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_RelationshipUserProfile_UserId",
                                 ApiKeyPaths:
                                 [
-                                    new ApiKeyPathDef(ClrRootType: typeof(RelationshipUserProfile), [new ApiKeyPathSegmentDef(ClrPropertyName: nameof(RelationshipUserProfile.UserId))])
+                                    new ApiKeyPathDef(ClrRootType: typeof(RelationshipUserProfile), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(RelationshipUserProfile.UserId))])
                                 ]
                             ),
                             new ApiKeyTypeDef
@@ -163,7 +163,7 @@ public partial class ApiSchemaTests
                                 ApiName: "AK_RelationshipUserProfile_UserRef",
                                 ApiKeyPaths:
                                 [
-                                    new ApiKeyPathDef(ClrRootType: typeof(RelationshipUserProfile), [new ApiKeyPathSegmentDef(ClrPropertyName: nameof(RelationshipUserProfile.UserRef)), new ApiKeyPathSegmentDef(ClrPropertyName: nameof(RelationshipUserRef.UserId))])
+                                    new ApiKeyPathDef(ClrRootType: typeof(RelationshipUserProfile), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(RelationshipUserProfile.UserRef)), new ApiKeyPathSegmentDef(ClrMemberName: nameof(RelationshipUserRef.UserId))])
                                 ]
                             )
                         ]
@@ -185,7 +185,7 @@ public partial class ApiSchemaTests
                             ApiForeignKeyType: new ApiKeyTypeDef
                             (
                                 ApiName: "FK_User_UserProfile_UserId",
-                                ApiKeyPaths: [new ApiKeyPathDef(ClrRootType: typeof(RelationshipUserProfile), [new ApiKeyPathSegmentDef(ClrPropertyName: nameof(RelationshipUserProfile.UserId))])]
+                                ApiKeyPaths: [new ApiKeyPathDef(ClrRootType: typeof(RelationshipUserProfile), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(RelationshipUserProfile.UserId))])]
                             )
                         ),
                         ApiDeleteBehavior: ApiRelationshipDeleteBehavior.Delete
@@ -205,7 +205,7 @@ public partial class ApiSchemaTests
                             ApiForeignKeyType: new ApiKeyTypeDef
                             (
                                 ApiName: "FK_User_UserProfile_UserRef_UserId",
-                                ApiKeyPaths: [new ApiKeyPathDef(ClrRootType: typeof(RelationshipUserProfile), [new ApiKeyPathSegmentDef(ClrPropertyName: nameof(RelationshipUserProfile.UserRef)), new ApiKeyPathSegmentDef(ClrPropertyName: nameof(RelationshipUserRef.UserId))])]
+                                ApiKeyPaths: [new ApiKeyPathDef(ClrRootType: typeof(RelationshipUserProfile), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(RelationshipUserProfile.UserRef)), new ApiKeyPathSegmentDef(ClrMemberName: nameof(RelationshipUserRef.UserId))])]
                             )
                         ),
                         ApiDeleteBehavior: ApiRelationshipDeleteBehavior.Delete
@@ -481,7 +481,7 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_RelationshipUser_Id",
                                 ApiKeyPaths:
                                 [
-                                    new ApiKeyPathDef(ClrRootType: typeof(RelationshipUser), [new ApiKeyPathSegmentDef(ClrPropertyName: nameof(RelationshipUser.Id))])
+                                    new ApiKeyPathDef(ClrRootType: typeof(RelationshipUser), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(RelationshipUser.Id))])
                                 ]
                             )
                         ]
@@ -510,7 +510,7 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_RelationshipUserRef_UserId",
                                 ApiKeyPaths:
                                 [
-                                    new ApiKeyPathDef(ClrRootType: typeof(RelationshipUserRef), [new ApiKeyPathSegmentDef(ClrPropertyName: nameof(RelationshipUserRef.UserId))])
+                                    new ApiKeyPathDef(ClrRootType: typeof(RelationshipUserRef), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(RelationshipUserRef.UserId))])
                                 ]
                             )
                         ]
@@ -587,7 +587,7 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_RelationshipPost_Id",
                                 ApiKeyPaths:
                                 [
-                                    new ApiKeyPathDef(ClrRootType: typeof(RelationshipPost), [new ApiKeyPathSegmentDef(ClrPropertyName: nameof(RelationshipPost.Id))])
+                                    new ApiKeyPathDef(ClrRootType: typeof(RelationshipPost), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(RelationshipPost.Id))])
                                 ]
                             )
                         ]
@@ -616,7 +616,7 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_RelationshipPostRef_PostId",
                                 ApiKeyPaths:
                                 [
-                                    new ApiKeyPathDef(ClrRootType: typeof(RelationshipPostRef), [new ApiKeyPathSegmentDef(ClrPropertyName: nameof(RelationshipPostRef.PostId))])
+                                    new ApiKeyPathDef(ClrRootType: typeof(RelationshipPostRef), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(RelationshipPostRef.PostId))])
                                 ]
                             )
                         ]
@@ -677,7 +677,7 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_RelationshipComment_Id",
                                 ApiKeyPaths:
                                 [
-                                    new ApiKeyPathDef(ClrRootType: typeof(RelationshipComment), [new ApiKeyPathSegmentDef(ClrPropertyName: nameof(RelationshipComment.Id))])
+                                    new ApiKeyPathDef(ClrRootType: typeof(RelationshipComment), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(RelationshipComment.Id))])
                                 ]
                             )
                         ]
@@ -699,7 +699,7 @@ public partial class ApiSchemaTests
                             ApiForeignKeyType: new ApiKeyTypeDef
                             (
                                 ApiName: "FK_User_Post_AuthorUserId",
-                                ApiKeyPaths: [new ApiKeyPathDef(ClrRootType: typeof(RelationshipPost), [new ApiKeyPathSegmentDef(ClrPropertyName: nameof(RelationshipPost.AuthorUserId))])]
+                                ApiKeyPaths: [new ApiKeyPathDef(ClrRootType: typeof(RelationshipPost), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(RelationshipPost.AuthorUserId))])]
                             )
                         ),
                         ApiDeleteBehavior: ApiRelationshipDeleteBehavior.Delete
@@ -719,7 +719,7 @@ public partial class ApiSchemaTests
                             ApiForeignKeyType: new ApiKeyTypeDef
                             (
                                 ApiName: "FK_User_Post_AuthorUserRef_UserId",
-                                ApiKeyPaths: [new ApiKeyPathDef(ClrRootType: typeof(RelationshipPost), [new ApiKeyPathSegmentDef(ClrPropertyName: nameof(RelationshipPost.AuthorUserRef)), new ApiKeyPathSegmentDef(ClrPropertyName: nameof(RelationshipUserRef.UserId))])]
+                                ApiKeyPaths: [new ApiKeyPathDef(ClrRootType: typeof(RelationshipPost), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(RelationshipPost.AuthorUserRef)), new ApiKeyPathSegmentDef(ClrMemberName: nameof(RelationshipUserRef.UserId))])]
                             )
                         ),
                         ApiDeleteBehavior: ApiRelationshipDeleteBehavior.Delete
@@ -739,7 +739,7 @@ public partial class ApiSchemaTests
                             ApiForeignKeyType: new ApiKeyTypeDef
                             (
                                 ApiName: "FK_Post_Comment_PostId",
-                                ApiKeyPaths: [new ApiKeyPathDef(ClrRootType: typeof(RelationshipComment), [new ApiKeyPathSegmentDef(ClrPropertyName: nameof(RelationshipComment.PostId))])]
+                                ApiKeyPaths: [new ApiKeyPathDef(ClrRootType: typeof(RelationshipComment), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(RelationshipComment.PostId))])]
                             )
                         ),
                         ApiDeleteBehavior: ApiRelationshipDeleteBehavior.Delete
@@ -759,7 +759,7 @@ public partial class ApiSchemaTests
                             ApiForeignKeyType: new ApiKeyTypeDef
                             (
                                 ApiName: "FK_Post_Comment_PostRef_PostId",
-                                ApiKeyPaths: [new ApiKeyPathDef(ClrRootType: typeof(RelationshipComment), [new ApiKeyPathSegmentDef(ClrPropertyName: nameof(RelationshipComment.PostRef)), new ApiKeyPathSegmentDef(ClrPropertyName: nameof(RelationshipPostRef.PostId))])]
+                                ApiKeyPaths: [new ApiKeyPathDef(ClrRootType: typeof(RelationshipComment), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(RelationshipComment.PostRef)), new ApiKeyPathSegmentDef(ClrMemberName: nameof(RelationshipPostRef.PostId))])]
                             )
                         ),
                         ApiDeleteBehavior: ApiRelationshipDeleteBehavior.Delete
@@ -1191,7 +1191,7 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_RelationshipPost_Id",
                                 ApiKeyPaths:
                                 [
-                                    new ApiKeyPathDef(ClrRootType: typeof(RelationshipPost), [new ApiKeyPathSegmentDef(ClrPropertyName: nameof(RelationshipPost.Id))])
+                                    new ApiKeyPathDef(ClrRootType: typeof(RelationshipPost), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(RelationshipPost.Id))])
                                 ]
                             )
                         ]
@@ -1244,7 +1244,7 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_RelationshipTag_Id",
                                 ApiKeyPaths:
                                 [
-                                    new ApiKeyPathDef(ClrRootType: typeof(RelationshipTag), [new ApiKeyPathSegmentDef(ClrPropertyName: nameof(RelationshipTag.Id))])
+                                    new ApiKeyPathDef(ClrRootType: typeof(RelationshipTag), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(RelationshipTag.Id))])
                                 ]
                             )
                         ]
@@ -1281,8 +1281,8 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_RelationshipPostTag_PostId_TagId",
                                 ApiKeyPaths:
                                 [
-                                    new ApiKeyPathDef(ClrRootType: typeof(RelationshipPostTag), [new ApiKeyPathSegmentDef(ClrPropertyName: nameof(RelationshipPostTag.PostId))]),
-                                    new ApiKeyPathDef(ClrRootType: typeof(RelationshipPostTag), [new ApiKeyPathSegmentDef(ClrPropertyName: nameof(RelationshipPostTag.TagId))])
+                                    new ApiKeyPathDef(ClrRootType: typeof(RelationshipPostTag), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(RelationshipPostTag.PostId))]),
+                                    new ApiKeyPathDef(ClrRootType: typeof(RelationshipPostTag), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(RelationshipPostTag.TagId))])
                                 ]
                             )
                         ]
@@ -1308,12 +1308,12 @@ public partial class ApiSchemaTests
                             ApiForeignKeyTypeA: new ApiKeyTypeDef
                             (
                                 ApiName: "FK_Post_PostTag_PostId",
-                                ApiKeyPaths: [new ApiKeyPathDef(ClrRootType: typeof(RelationshipPostTag), [new ApiKeyPathSegmentDef(ClrPropertyName: nameof(RelationshipPostTag.PostId))])]
+                                ApiKeyPaths: [new ApiKeyPathDef(ClrRootType: typeof(RelationshipPostTag), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(RelationshipPostTag.PostId))])]
                             ),
                             ApiForeignKeyTypeB: new ApiKeyTypeDef
                             (
                                 ApiName: "FK_Tag_PostTag_TagId",
-                                ApiKeyPaths: [new ApiKeyPathDef(ClrRootType: typeof(RelationshipPostTag), [new ApiKeyPathSegmentDef(ClrPropertyName: nameof(RelationshipPostTag.TagId))])]
+                                ApiKeyPaths: [new ApiKeyPathDef(ClrRootType: typeof(RelationshipPostTag), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(RelationshipPostTag.TagId))])]
                             )
                         )
                     )

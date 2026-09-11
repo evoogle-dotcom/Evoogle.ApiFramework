@@ -68,7 +68,7 @@ public partial class ApiKeyTypeTests
             var actualApiKeyPath = this.ActualKeyType.ApiKeyPaths.Single();
             actualApiKeyPath.ClrRootType.Should().Be(typeof(KeyOneScalarPart));
             actualApiKeyPath.ApiSegments.Should().ContainSingle();
-            actualApiKeyPath.ApiSegments.Single().ClrPropertyName.Should().Be
+            actualApiKeyPath.ApiSegments.Single().ClrMemberName.Should().Be
             (
                 nameof(KeyOneScalarPart.Id)
             );

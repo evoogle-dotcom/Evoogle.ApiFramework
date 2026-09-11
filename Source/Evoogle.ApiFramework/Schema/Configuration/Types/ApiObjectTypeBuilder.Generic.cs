@@ -5,6 +5,7 @@
 // See the LICENSE file in the project root for more information.
 using Evoogle.ApiFramework.Schema.Configuration.Keys;
 using Evoogle.ApiFramework.Schema.Configuration.Relationships;
+using Evoogle.ApiFramework.Schema.Configuration.Versions;
 using Evoogle.ApiFramework.Schema.Keys;
 using Evoogle.ApiFramework.Schema.Types;
 
@@ -83,6 +84,42 @@ public sealed class ApiObjectTypeBuilder<TObject>(ApiSchemaBuilderContext contex
     public new ApiObjectTypeBuilder<TObject> WithDefaultOptions()
     {
         base.WithDefaultOptions();
+        return this;
+    }
+
+    /// <inheritdoc cref="ApiObjectTypeBuilder.WithVersion"/>
+    public new ApiObjectTypeBuilder<TObject> WithVersion
+    (
+        Type clrVersionType,
+        string clrMemberName,
+        Action<ApiVersionTypeBuilder>? configure = null
+    )
+    {
+        base.WithVersion(clrVersionType, clrMemberName, configure);
+        return this;
+    }
+
+    /// <inheritdoc cref="ApiObjectTypeBuilder.WithRepositoryVersion"/>
+    public new ApiObjectTypeBuilder<TObject> WithRepositoryVersion
+    (
+        Type clrVersionType,
+        Action<ApiVersionTypeBuilder>? configure = null
+    )
+    {
+        base.WithRepositoryVersion(clrVersionType, configure);
+        return this;
+    }
+
+    /// <summary>Configures a repository-backed version using a type-safe CLR version type.</summary>
+    /// <typeparam name="TVersion">The exact CLR version type.</typeparam>
+    /// <param name="configure">Optional version metadata configuration.</param>
+    /// <returns>The current builder.</returns>
+    public ApiObjectTypeBuilder<TObject> WithRepositoryVersion<TVersion>
+    (
+        Action<ApiVersionTypeBuilder>? configure = null
+    )
+    {
+        base.WithRepositoryVersion(typeof(TVersion), configure);
         return this;
     }
     #endregion

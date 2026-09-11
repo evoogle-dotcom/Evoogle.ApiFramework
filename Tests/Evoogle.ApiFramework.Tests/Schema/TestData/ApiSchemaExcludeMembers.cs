@@ -3,6 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Schema.Versions;
 using Evoogle.XUnit;
 
 namespace Evoogle.ApiFramework.Schema.TestData;
@@ -35,6 +36,10 @@ public static class ApiSchemaExcludeMembers
 
         // ApiProperty — cycle: ApiType → ApiObjectType → ApiProperties[].ApiType → ...
         new ExcludeMember(typeof(ApiProperty), nameof(ApiProperty.ApiType)),
+
+        // ApiVersionType — scalar and property references resolved during compilation
+        new ExcludeMember(typeof(ApiVersionType), nameof(ApiVersionType.ApiScalarType)),
+        new ExcludeMember(typeof(ApiVersionType), nameof(ApiVersionType.ApiProperty)),
 
         // ApiObjectType — cycles: ApiProperties[].ApiType → ... / ApiKeyTypes[].ApiKeyPaths[].ApiProperty → ...
         new ExcludeMember(typeof(ApiObjectType), nameof(ApiObjectType.ApiRelationshipEnds)),
@@ -77,6 +82,10 @@ public static class ApiSchemaExcludeMembers
 
         // ApiProperty
         new ExcludeMember(typeof(ApiProperty), nameof(ApiProperty.ApiType)),
+
+        // ApiVersionType
+        new ExcludeMember(typeof(ApiVersionType), nameof(ApiVersionType.ApiScalarType)),
+        new ExcludeMember(typeof(ApiVersionType), nameof(ApiVersionType.ApiProperty)),
 
         // ApiSchema
         new ExcludeMember(typeof(ApiSchema), nameof(ApiSchema.ApiPath)),

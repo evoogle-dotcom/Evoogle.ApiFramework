@@ -572,7 +572,7 @@ internal sealed class ApiAnnotationReaderSet
                         existingResult =>
                             existingResult.Order != result.Order ||
                             existingResult.ClrRootType != result.ClrRootType ||
-                            !existingResult.ClrPropertyNames.SequenceEqual(result.ClrPropertyNames)
+                            !existingResult.ClrMemberNames.SequenceEqual(result.ClrMemberNames)
                     ))
                 {
                     existing.Results.Add(result);
@@ -608,8 +608,8 @@ internal sealed class ApiAnnotationReaderSet
 
             var paths = contribution.Results
                 .OrderBy(result => result.Order)
-                .Select(result => (result.ClrRootType, result.ClrPropertyNames))
-                .DistinctBy(path => (path.ClrRootType, string.Join("\0", path.ClrPropertyNames)))
+                .Select(result => (result.ClrRootType, result.ClrMemberNames))
+                .DistinctBy(path => (path.ClrRootType, string.Join("\0", path.ClrMemberNames)))
                 .ToList();
 
             builder.ReplaceKeyFromDataAnnotation(apiName, paths);
@@ -721,9 +721,9 @@ internal sealed class ApiAnnotationReaderSet
     {
         if (string.IsNullOrWhiteSpace(result.ApiName) ||
             result.ClrRootType == null ||
-            result.ClrPropertyNames == null ||
-            result.ClrPropertyNames.Count == 0 ||
-            result.ClrPropertyNames.Any(string.IsNullOrWhiteSpace))
+            result.ClrMemberNames == null ||
+            result.ClrMemberNames.Count == 0 ||
+            result.ClrMemberNames.Any(string.IsNullOrWhiteSpace))
         {
             this.AddInvalidContributionIssue
             (

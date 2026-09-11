@@ -328,14 +328,14 @@ public partial class ApiRelationshipTests
     private static ApiKeyTypeDef ForeignKey(params ApiKeyPathDef[] apiKeyPaths)
         => new(null!, [.. apiKeyPaths]);
 
-    private static ApiKeyPathDef KeyPath(Type clrRootType, params string[] clrPropertyNames)
+    private static ApiKeyPathDef KeyPath(Type clrRootType, params string[] clrMemberNames)
         => new
         (
             clrRootType,
             [
-                .. clrPropertyNames.Select
+                .. clrMemberNames.Select
                 (
-                    static clrPropertyName => new ApiKeyPathSegmentDef(clrPropertyName)
+                    static clrMemberName => new ApiKeyPathSegmentDef(clrMemberName)
                 )
             ]
         );

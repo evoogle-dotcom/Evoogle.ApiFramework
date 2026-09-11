@@ -33,40 +33,40 @@ public class ApiKeyPathBuilder : ExtensionBuilder<ApiKeyPathBuilder>
 
     #region Constructors
     /// <summary>
-    ///     Creates an <see cref="ApiKeyPathBuilder"/> with the specified root CLR type and CLR property paths.
+    ///     Creates an <see cref="ApiKeyPathBuilder"/> with the specified root CLR type and CLR member paths.
     ///     Each dot-delimited path is expanded into plain <see cref="ApiKeyPathSegmentBuilder"/> instances with no extensions.
     /// </summary>
     /// <param name="clrRootType">The CLR type from which the navigation chain begins.</param>
-    /// <param name="clrPropertyNames">
-    ///     Ordered CLR property names or dot-delimited CLR property paths from the root type to the terminal scalar property.
+    /// <param name="clrMemberNames">
+    ///     Ordered CLR member names or dot-delimited CLR member paths from the root type to the terminal scalar member.
     ///     Must contain at least one path.
     /// </param>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="clrRootType"/> or <paramref name="clrPropertyNames"/> is <c>null</c>.</exception>
-    /// <exception cref="ArgumentException">Thrown when <paramref name="clrPropertyNames"/> contains no valid paths.</exception>
-    public ApiKeyPathBuilder(Type clrRootType, IEnumerable<string> clrPropertyNames)
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="clrRootType"/> or <paramref name="clrMemberNames"/> is <c>null</c>.</exception>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="clrMemberNames"/> contains no valid paths.</exception>
+    public ApiKeyPathBuilder(Type clrRootType, IEnumerable<string> clrMemberNames)
     {
         ArgumentNullException.ThrowIfNull(clrRootType);
-        ArgumentNullException.ThrowIfNull(clrPropertyNames);
+        ArgumentNullException.ThrowIfNull(clrMemberNames);
 
-        var names = clrPropertyNames as string[] ?? [.. clrPropertyNames];
+        var names = clrMemberNames as string[] ?? [.. clrMemberNames];
 
         if (names.Length == 0)
         {
-            throw new ArgumentException("At least one CLR property name must be provided.", nameof(clrPropertyNames));
+            throw new ArgumentException("At least one CLR member name must be provided.", nameof(clrMemberNames));
         }
 
-        var parsedClrPropertyNames = new List<string>();
+        var parsedClrMemberNames = new List<string>();
         foreach (var name in names)
         {
             var parseResult = ApiKeyPathClrPathParser.Parse(name);
-            parseResult.ThrowIfInvalid(nameof(clrPropertyNames));
-            parsedClrPropertyNames.AddRange(parseResult.ClrPropertyNames);
+            parseResult.ThrowIfInvalid(nameof(clrMemberNames));
+            parsedClrMemberNames.AddRange(parseResult.ClrMemberNames);
         }
 
         _state = new ApiKeyPathState
         (
             clrRootType,
-            parsedClrPropertyNames.Select(static name => new ApiKeyPathSegmentBuilder(name))
+            parsedClrMemberNames.Select(static name => new ApiKeyPathSegmentBuilder(name))
         );
     }
 
@@ -76,7 +76,7 @@ public class ApiKeyPathBuilder : ExtensionBuilder<ApiKeyPathBuilder>
     /// </summary>
     /// <param name="clrRootType">The CLR type from which the navigation chain begins.</param>
     /// <param name="segmentBuilders">
-    ///     Ordered <see cref="ApiKeyPathSegmentBuilder"/> instances from the root type to the terminal scalar property.
+    ///     Ordered <see cref="ApiKeyPathSegmentBuilder"/> instances from the root type to the terminal scalar member.
     ///     Must contain at least one builder.
     /// </param>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="clrRootType"/> or <paramref name="segmentBuilders"/> is <c>null</c>.</exception>
@@ -102,24 +102,25 @@ public class ApiKeyPathBuilder : ExtensionBuilder<ApiKeyPathBuilder>
 
     #region Factory Methods
     /// <summary>
-    ///     Creates a builder for a path that starts from the specified root CLR type, using CLR property paths.
+    ///     Creates a builder for a path that starts from the specified root CLR type, using CLR member paths.
     ///     Use <see cref="AddSegment"/> or <see cref="For(Type, ApiKeyPathSegmentBuilder[])"/> when individual
     ///     segments require extensions.
     /// </summary>
     /// <param name="clrRootType">The CLR type from which the navigation chain begins.</param>
-    /// <param name="clrPropertyNames">
-    ///     Ordered CLR property names or dot-delimited CLR property paths from the root type to the terminal scalar property.
-    ///     Provide a single name for a direct property, a dot-delimited path for navigation, or multiple path fragments.
+    /// <param name="clrMemberNames">
+    ///     Ordered CLR member names or dot-delimited CLR member paths from the root type to the terminal scalar member.
+    ///     Provide a single name for a direct member, a dot-delimited path for navigation, or
+    ///     multiple path fragments.
     /// </param>
     /// <returns>A new <see cref="ApiKeyPathBuilder"/> for the specified root CLR type.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="clrRootType"/> is <c>null</c>.</exception>
-    /// <exception cref="ArgumentException">Thrown when <paramref name="clrPropertyNames"/> is empty or contains an invalid path.</exception>
-    public static ApiKeyPathBuilder For(Type clrRootType, params string[] clrPropertyNames)
+    /// <exception cref="ArgumentException">Thrown when <paramref name="clrMemberNames"/> is empty or contains an invalid path.</exception>
+    public static ApiKeyPathBuilder For(Type clrRootType, params string[] clrMemberNames)
     {
         ArgumentNullException.ThrowIfNull(clrRootType);
-        ArgumentNullException.ThrowIfNull(clrPropertyNames);
+        ArgumentNullException.ThrowIfNull(clrMemberNames);
 
-        return new(clrRootType, clrPropertyNames);
+        return new(clrRootType, clrMemberNames);
     }
 
     /// <summary>
@@ -128,7 +129,7 @@ public class ApiKeyPathBuilder : ExtensionBuilder<ApiKeyPathBuilder>
     /// </summary>
     /// <param name="clrRootType">The CLR type from which the navigation chain begins.</param>
     /// <param name="segmentBuilders">
-    ///     Ordered <see cref="ApiKeyPathSegmentBuilder"/> instances from the root type to the terminal scalar property.
+    ///     Ordered <see cref="ApiKeyPathSegmentBuilder"/> instances from the root type to the terminal scalar member.
     /// </param>
     /// <returns>A new <see cref="ApiKeyPathBuilder"/> for the specified root CLR type.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="clrRootType"/> is <c>null</c>.</exception>
@@ -157,17 +158,17 @@ public class ApiKeyPathBuilder : ExtensionBuilder<ApiKeyPathBuilder>
 
     #region AddSegment Methods
     /// <summary>
-    ///     Appends a new segment for the specified CLR property name, optionally configuring it with extensions.
+    ///     Appends a new segment for the specified CLR member name, optionally configuring it with extensions.
     /// </summary>
-    /// <param name="clrPropertyName">The CLR property name for this navigation step.</param>
+    /// <param name="clrMemberName">The CLR member name for this navigation step.</param>
     /// <param name="configure">Optional callback to attach extensions to the segment.</param>
     /// <returns>The current builder instance.</returns>
-    /// <exception cref="ArgumentException">Thrown when <paramref name="clrPropertyName"/> is not one CLR property name.</exception>
-    public ApiKeyPathBuilder AddSegment(string clrPropertyName, Action<ApiKeyPathSegmentBuilder>? configure = null)
+    /// <exception cref="ArgumentException">Thrown when <paramref name="clrMemberName"/> is not one CLR member name.</exception>
+    public ApiKeyPathBuilder AddSegment(string clrMemberName, Action<ApiKeyPathSegmentBuilder>? configure = null)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(clrPropertyName);
+        ArgumentException.ThrowIfNullOrWhiteSpace(clrMemberName);
 
-        var segmentBuilder = new ApiKeyPathSegmentBuilder(clrPropertyName);
+        var segmentBuilder = new ApiKeyPathSegmentBuilder(clrMemberName);
         configure?.Invoke(segmentBuilder);
         _state.SegmentBuilders.Add(segmentBuilder);
         return this;

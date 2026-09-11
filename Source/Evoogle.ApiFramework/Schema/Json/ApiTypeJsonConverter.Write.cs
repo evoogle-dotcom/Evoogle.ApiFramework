@@ -77,6 +77,7 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
         WriteApiObjectTypeApiOptions(writer, apiObjectType, context);
         WriteApiObjectTypeApiProperties(writer, apiObjectType, context);
         WriteApiObjectTypeApiKeyTypes(writer, apiObjectType, context);
+        WriteApiObjectTypeApiVersionType(writer, apiObjectType, context);
     }
 
     private static void WriteApiObjectTypeApiKeyTypes(Utf8JsonWriter writer, ApiObjectType apiObjectType, DefaultWriteContext<PropertyNames> context)
@@ -101,6 +102,21 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
         var options = context.Options;
 
         writer.TryWritePropertyWithSerializer(propertyName, apiOptions, options);
+    }
+
+    private static void WriteApiObjectTypeApiVersionType
+    (
+        Utf8JsonWriter writer,
+        ApiObjectType apiObjectType,
+        DefaultWriteContext<PropertyNames> context
+    )
+    {
+        writer.TryWritePropertyWithSerializer
+        (
+            context.PropertyNames.ApiObjectType.ApiVersionType,
+            apiObjectType.ApiVersionType,
+            context.Options
+        );
     }
 
     private static void WriteApiObjectTypeApiProperties(Utf8JsonWriter writer, ApiObjectType apiObjectType, DefaultWriteContext<PropertyNames> context)

@@ -219,7 +219,7 @@ public class ApiKeyPathJsonConverter(ILogger<ApiKeyPathJsonConverter>? logger) :
         }
 
         var parseResult = ApiKeyPathClrPathParser.Parse(clrPath);
-        return [.. parseResult.ClrPropertyNames.Select(static name => new ApiKeyPathSegment(name))];
+        return [.. parseResult.ClrMemberNames.Select(static name => new ApiKeyPathSegment(name))];
     }
 
     private static void WriteApiKeyPathClrPathOrApiSegments(Utf8JsonWriter writer, ApiKeyPath apiKeyPath, DefaultWriteContext<PropertyNames> context)
@@ -237,7 +237,7 @@ public class ApiKeyPathJsonConverter(ILogger<ApiKeyPathJsonConverter>? logger) :
     {
         return apiKeyPath.ApiSegments.IsEmpty || apiKeyPath.ApiSegments.Any
         (
-            static segment => segment.ExtensionCount > 0 || segment.ClrPropertyName.Contains('.')
+            static segment => segment.ExtensionCount > 0 || segment.ClrMemberName.Contains('.')
         );
     }
 

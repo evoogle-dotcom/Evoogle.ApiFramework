@@ -175,8 +175,7 @@ public class ApiRelationshipDependentEndJsonConverter(ILogger<ApiRelationshipDep
         var propertyName = context.PropertyNames.ApiRelationshipDependentEnd.ApiForeignKeyType;
         var value = end.HasForeignKey ? end.ApiForeignKeyType : null;
 
-        writer.WritePropertyName(propertyName);
-        writer.TryWriteWithSerializer(value, context.Options);
+        writer.TryWritePropertyWithSerializer(propertyName, value, context.Options);
     }
     #endregion
 }

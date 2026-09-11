@@ -28,7 +28,7 @@ public class ApiKeyPathTests(ITestOutputHelper output) : XUnitTests(output)
     private sealed class JsonWriteTest : XUnitTest
     {
         #region User Supplied Properties
-        public required string[] ExpectedClrPropertyNames { get; init; }
+        public required string[] ExpectedClrMemberNames { get; init; }
 
         public required JsonWriteCase JsonWriteCase { get; init; }
 
@@ -58,8 +58,8 @@ public class ApiKeyPathTests(ITestOutputHelper output) : XUnitTests(output)
         {
             this.ActualJson.Should().NotBeNull();
             this.ActualPath.Should().NotBeNull();
-            this.ActualPath!.ApiSegments.Select(static segment => segment.ClrPropertyName)
-                .Should().Equal(this.ExpectedClrPropertyNames);
+            this.ActualPath!.ApiSegments.Select(static segment => segment.ClrMemberName)
+                .Should().Equal(this.ExpectedClrMemberNames);
 
             using var document = JsonDocument.Parse(this.ActualJson!);
             var properties = document.RootElement;
@@ -71,6 +71,14 @@ public class ApiKeyPathTests(ITestOutputHelper output) : XUnitTests(output)
             if (this.ExpectsDetailedSegments)
             {
                 apiSegments.ValueKind.Should().Be(JsonValueKind.Array);
+                apiSegments.EnumerateArray()
+                    .Select
+                    (
+                        static segment => segment
+                            .GetProperty(nameof(ApiKeyPathSegment.ClrMemberName))
+                            .GetString()
+                    )
+                    .Should().Equal(this.ExpectedClrMemberNames);
             }
             else
             {
@@ -93,7 +101,7 @@ public class ApiKeyPathTests(ITestOutputHelper output) : XUnitTests(output)
     private sealed class JsonReadTest : XUnitTest
     {
         #region User Supplied Properties
-        public required string[] ExpectedClrPropertyNames { get; init; }
+        public required string[] ExpectedClrMemberNames { get; init; }
 
         public required string SourceJson { get; init; }
         #endregion
@@ -114,8 +122,8 @@ public class ApiKeyPathTests(ITestOutputHelper output) : XUnitTests(output)
         protected override void Assert()
         {
             this.ActualPath.Should().NotBeNull();
-            this.ActualPath!.ApiSegments.Select(static segment => segment.ClrPropertyName)
-                .Should().Equal(this.ExpectedClrPropertyNames);
+            this.ActualPath!.ApiSegments.Select(static segment => segment.ClrMemberName)
+                .Should().Equal(this.ExpectedClrMemberNames);
         }
         #endregion
     }
@@ -128,7 +136,7 @@ public class ApiKeyPathTests(ITestOutputHelper output) : XUnitTests(output)
         {
             Name = "Writes an extension-free key path in compact JSON",
             JsonWriteCase = JsonWriteCase.Compact,
-            ExpectedClrPropertyNames = [nameof(KeyNestedComposite.NestedPart), nameof(KeyNested.Id)],
+            ExpectedClrMemberNames = [nameof(KeyNestedComposite.NestedPart), nameof(KeyNested.Id)],
             ExpectsDetailedSegments = false,
             ExpectedClrPath = nameof(KeyNestedComposite.NestedPart) + "." + nameof(KeyNested.Id)
         },
@@ -136,7 +144,7 @@ public class ApiKeyPathTests(ITestOutputHelper output) : XUnitTests(output)
         {
             Name = "Writes a path extension with compact key path JSON",
             JsonWriteCase = JsonWriteCase.PathExtension,
-            ExpectedClrPropertyNames = [nameof(KeyOneScalarPart.Id)],
+            ExpectedClrMemberNames = [nameof(KeyOneScalarPart.Id)],
             ExpectsDetailedSegments = false,
             ExpectedClrPath = nameof(KeyOneScalarPart.Id)
         },
@@ -144,21 +152,21 @@ public class ApiKeyPathTests(ITestOutputHelper output) : XUnitTests(output)
         {
             Name = "Writes a segment extension with detailed key path JSON",
             JsonWriteCase = JsonWriteCase.SegmentExtension,
-            ExpectedClrPropertyNames = [nameof(KeyOneScalarPart.Id)],
+            ExpectedClrMemberNames = [nameof(KeyOneScalarPart.Id)],
             ExpectsDetailedSegments = true
         },
         new JsonWriteTest
         {
             Name = "Writes an empty key path with detailed JSON",
             JsonWriteCase = JsonWriteCase.Empty,
-            ExpectedClrPropertyNames = [],
+            ExpectedClrMemberNames = [],
             ExpectsDetailedSegments = true
         },
         new JsonWriteTest
         {
             Name = "Writes a literal dot segment with detailed JSON",
             JsonWriteCase = JsonWriteCase.LiteralDotSegment,
-            ExpectedClrPropertyNames = ["Nested.Part"],
+            ExpectedClrMemberNames = ["Nested.Part"],
             ExpectsDetailedSegments = true
         },
     ];
@@ -169,31 +177,31 @@ public class ApiKeyPathTests(ITestOutputHelper output) : XUnitTests(output)
         {
             Name = "Reads and normalizes a compact key path",
             SourceJson = @"{ ""ClrPath"": "" NestedPart . Id "" }",
-            ExpectedClrPropertyNames = ["NestedPart", "Id"]
+            ExpectedClrMemberNames = ["NestedPart", "Id"]
         },
         new JsonReadTest
         {
             Name = "Uses detailed key path segments before compact path",
-            SourceJson = @"{ ""ApiSegments"": [ { ""ClrPropertyName"": ""Id"" } ], ""ClrPath"": ""NestedPart.Id"" }",
-            ExpectedClrPropertyNames = ["Id"]
+            SourceJson = @"{ ""ApiSegments"": [ { ""ClrMemberName"": ""Id"" } ], ""ClrPath"": ""NestedPart.Id"" }",
+            ExpectedClrMemberNames = ["Id"]
         },
         new JsonReadTest
         {
             Name = "Treats null compact key path as absent",
             SourceJson = @"{ ""ClrPath"": null }",
-            ExpectedClrPropertyNames = []
+            ExpectedClrMemberNames = []
         },
         new JsonReadTest
         {
             Name = "Preserves malformed compact key path for compilation validation",
             SourceJson = @"{ ""ClrPath"": ""NestedPart..Id"" }",
-            ExpectedClrPropertyNames = ["NestedPart", "", "Id"]
+            ExpectedClrMemberNames = ["NestedPart", "", "Id"]
         },
         new JsonReadTest
         {
             Name = "Reads a detailed literal dot key path segment",
-            SourceJson = @"{ ""ApiSegments"": [ { ""ClrPropertyName"": ""Nested.Part"" } ] }",
-            ExpectedClrPropertyNames = ["Nested.Part"]
+            SourceJson = @"{ ""ApiSegments"": [ { ""ClrMemberName"": ""Nested.Part"" } ] }",
+            ExpectedClrMemberNames = ["Nested.Part"]
         },
     ];
     #endregion

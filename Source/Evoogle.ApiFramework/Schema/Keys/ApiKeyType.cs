@@ -17,7 +17,7 @@ namespace Evoogle.ApiFramework.Schema.Keys;
 
 /// <summary>
 ///     Defines a key structure composed of one or more <see cref="ApiKeyPath"/> instances that
-///     together navigate from CLR object properties to a scalar or composite runtime
+///     together navigate from CLR object members to a scalar or composite runtime
 ///     <see cref="ApiKey"/>.
 /// </summary>
 /// <remarks>

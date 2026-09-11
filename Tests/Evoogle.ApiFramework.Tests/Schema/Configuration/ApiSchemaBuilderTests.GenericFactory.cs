@@ -263,7 +263,8 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
                 .AddProperty(p => p.Lines)
                 .AddProperty(p => p.Payment)
                 .AddProperty(p => p.Total)
-                .AddKey("PK_Order", p => p.Id))
+                .AddKey("PK_Order", p => p.Id)
+                .WithRepositoryVersion(typeof(long)))
 
             .AddObject<OrderLine>(o => o
                 .AddProperty(p => p.OrderId)
@@ -365,7 +366,8 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
             .AddObject<KeyNested>(o => o
                 .AddProperty(p => p.Id)
                 .AddProperty(p => p.Description)
-                .AddKey("PK_KeyNestedPart", p => p.Id))
+                .AddKey("PK_KeyNestedPart", p => p.Id)
+                .WithRepositoryVersion(typeof(Guid)))
 
             .AddObject<KeyNestedComposite>(o => o
                 .AddProperty(p => p.NestedPart)
@@ -425,7 +427,8 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
                 .WithOptions(opt => opt.ThrowOnNullKeyPart())
                 .AddProperty(p => p.X)
                 .AddProperty(p => p.Y)
-                .AddProperty(p => p.Note))
+                .AddProperty(p => p.Note)
+                .WithVersion(typeof(long), nameof(Point.X)))
 
             .AddObject<ScalarsOnly>(o => o
                 .WithOptions(opt => opt.ThrowOnNullKeyPart())
@@ -536,7 +539,8 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
                 .AddProperty(p => p.Sku)
                 .AddProperty(p => p.Revision)
                 .AddProperty(p => p.Name)
-                .AddKey("PK_RelationshipCatalogItem", p => p.Sku, p => p.Revision))
+                .AddKey("PK_RelationshipCatalogItem", p => p.Sku, p => p.Revision)
+                .WithVersion(typeof(int), nameof(RelationshipCatalogItem.Revision)))
 
             // RelationshipOrder
             .AddObject<RelationshipOrder>(o => o

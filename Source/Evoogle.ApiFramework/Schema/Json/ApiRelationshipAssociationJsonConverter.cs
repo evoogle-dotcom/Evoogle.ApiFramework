@@ -189,8 +189,7 @@ public class ApiRelationshipAssociationJsonConverter(ILogger<ApiRelationshipAsso
 
     private static void WriteApiForeignKeyType(Utf8JsonWriter writer, ApiKeyType? value, string propertyName, DefaultWriteContext<PropertyNames> context)
     {
-        writer.WritePropertyName(propertyName);
-        writer.TryWriteWithSerializer(value, context.Options);
+        writer.TryWritePropertyWithSerializer(propertyName, value, context.Options);
     }
     #endregion
 }

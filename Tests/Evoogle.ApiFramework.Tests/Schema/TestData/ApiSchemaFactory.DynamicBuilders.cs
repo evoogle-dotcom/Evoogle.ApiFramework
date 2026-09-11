@@ -3,6 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Schema.Versions;
 using Evoogle.Extension;
 
 namespace Evoogle.ApiFramework.Schema.TestData;
@@ -42,6 +43,7 @@ public static partial class ApiSchemaFactory
         ApiKeyNullHandling? ApiKeyNullHandling = null,
         List<ApiPropertyDef>? ApiProperties = null,
         List<ApiKeyTypeDef>? ApiKeyTypes = null,
+        ApiVersionTypeDef? ApiVersionType = null,
         List<Type>? ExtensionTypes = null
     ) : ApiNamedTypeDef(ApiName, ClrType, ExtensionTypes);
 
@@ -58,7 +60,15 @@ public static partial class ApiSchemaFactory
 
     public record ApiKeyPathDef(Type ClrRootType, List<ApiKeyPathSegmentDef> ApiKeyPathSegments, List<Type>? ExtensionTypes = null) : ApiSchemaElementDef(ExtensionTypes);
 
-    public record ApiKeyPathSegmentDef(string ClrPropertyName, List<Type>? ExtensionTypes = null) : ApiSchemaElementDef(ExtensionTypes);
+    public record ApiKeyPathSegmentDef(string ClrMemberName, List<Type>? ExtensionTypes = null) : ApiSchemaElementDef(ExtensionTypes);
+
+    // ApiVersionType
+    public record ApiVersionTypeDef
+    (
+        Type ClrType,
+        string? ClrMemberName = null,
+        List<Type>? ExtensionTypes = null
+    ) : ApiSchemaElementDef(ExtensionTypes);
 
     // ApiProperty
     public record ApiPropertyDef
@@ -206,7 +216,7 @@ public static partial class ApiSchemaFactory
             }
         }
 
-        var result = Evoogle.ApiFramework.Schema.Compilation.Internal.ApiSchemaCompiler.Compile(apiSchema);
+        var result = ApiSchemaCompiler.Compile(apiSchema);
         result.ThrowIfInvalid();
         return result.Schema!;
     }
@@ -232,7 +242,7 @@ public static partial class ApiSchemaFactory
             apiObjectTypes,
             apiRelationships
         );
-        var result = Evoogle.ApiFramework.Schema.Compilation.Internal.ApiSchemaCompiler.Compile(apiSchema);
+        var result = ApiSchemaCompiler.Compile(apiSchema);
         result.ThrowIfInvalid();
         return result.Schema!;
     }
@@ -297,9 +307,9 @@ public static partial class ApiSchemaFactory
 
     private static ApiKeyPathSegment BuildApiKeyPathSegment(ApiKeyPathSegmentDef def)
     {
-        var clrPropertyName = def.ClrPropertyName;
+        var clrMemberName = def.ClrMemberName;
 
-        var apiKeyPathSegment = new ApiKeyPathSegment(clrPropertyName);
+        var apiKeyPathSegment = new ApiKeyPathSegment(clrMemberName);
 
         AttachExtensions(apiKeyPathSegment, def);
 
@@ -478,9 +488,20 @@ public static partial class ApiSchemaFactory
         var apiOptions = BuildApiObjectTypeOptions(def);
         var apiProperties = def.ApiProperties?.Select(BuildApiProperty);
         var apiKeyTypes = def.ApiKeyTypes?.Select(BuildApiNamedKeyType);
+        var apiVersionType = def.ApiVersionType is not null
+            ? BuildApiVersionType(def.ApiVersionType)
+            : null;
         var clrType = def.ClrType;
 
-        return new ApiObjectType(apiName, apiOptions, apiProperties, apiKeyTypes, clrType);
+        return new ApiObjectType
+        (
+            apiName,
+            apiOptions,
+            apiProperties,
+            apiKeyTypes,
+            apiVersionType,
+            clrType
+        );
     }
 
     private static ApiScalarType BuildApiScalarType(ApiScalarTypeDef def)
@@ -489,6 +510,15 @@ public static partial class ApiSchemaFactory
         var clrType = def.ClrType;
 
         return new ApiScalarType(apiName, clrType);
+    }
+
+    private static ApiVersionType BuildApiVersionType(ApiVersionTypeDef def)
+    {
+        var apiVersionType = new ApiVersionType(def.ClrType, def.ClrMemberName);
+
+        AttachExtensions(apiVersionType, def);
+
+        return apiVersionType;
     }
     #endregion
 

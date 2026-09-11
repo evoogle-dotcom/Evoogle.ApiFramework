@@ -1454,7 +1454,7 @@ public partial class ApiSchemaTests
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyTypeApiNameType, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id"" }
+                                            { ""ClrMemberName"": ""Id"" }
                                         ]
                                     }
                                 ]
@@ -1465,7 +1465,7 @@ public partial class ApiSchemaTests
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyTypeApiNameType, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Code"" }
+                                            { ""ClrMemberName"": ""Code"" }
                                         ]
                                     }
                                 ]
@@ -2064,7 +2064,7 @@ public partial class ApiSchemaTests
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyTypeApiNameType, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id"" }
+                                            { ""ClrMemberName"": ""Id"" }
                                         ]
                                     }
                                 ]
@@ -2200,8 +2200,8 @@ public partial class ApiSchemaTests
                         $"[0][\"{nameof(DuplicateKeyTypeApiNameType)}.\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
                     code: ApiSchemaCompilationCode.ApiKeyPathEmptySegments,
-                    description: $"{nameof(ApiKeyPath.ApiSegments)} must contain at least one property name",
-                    remediation: $"Specify at least one CLR property name when creating an {nameof(ApiKeyPath)}"
+                    description: $"{nameof(ApiKeyPath.ApiSegments)} must contain at least one member name",
+                    remediation: $"Specify at least one CLR member name when creating an {nameof(ApiKeyPath)}"
                 ),
             ]
         },
@@ -2243,7 +2243,7 @@ public partial class ApiSchemaTests
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+TypeWithListProperty, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id"" }
+                                            { ""ClrMemberName"": ""Id"" }
                                         ]
                                     }
                                 ]
@@ -2272,10 +2272,10 @@ public partial class ApiSchemaTests
         // ApiKeyPath compact JSON preserves invalid segments for compilation diagnostics
         new CompileThrowsTest
         {
-            Name = $"{nameof(ApiKeyPath)} Compact JSON Preserves Invalid {nameof(ApiKeyPathSegment.ClrPropertyName)}",
+            Name = $"{nameof(ApiKeyPath)} Compact JSON Preserves Invalid {nameof(ApiKeyPathSegment.ClrMemberName)}",
             SourceJson = @"
             {
-                ""ApiName"": ""ApiKeyPath Compact JSON Preserves Invalid ClrPropertyName"",
+                ""ApiName"": ""ApiKeyPath Compact JSON Preserves Invalid ClrMemberName"",
                 ""ApiScalarTypes"": [
                     {
                         ""ApiKind"": ""Scalar"",
@@ -2324,20 +2324,20 @@ public partial class ApiSchemaTests
                         $"[0][\"{nameof(DuplicateKeyTypeApiNameType)}.\"]." +
                         $"{nameof(ApiKeyPathSegment)}[0]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiKeyPathSegmentInvalidClrPropertyName,
-                    description: $"{nameof(ApiKeyPathSegment.ClrPropertyName)} must not be null, empty, or whitespace",
-                    remediation: $"Specify a valid {nameof(ApiKeyPathSegment.ClrPropertyName)} value"
+                    code: ApiSchemaCompilationCode.ApiKeyPathSegmentInvalidClrMemberName,
+                    description: $"{nameof(ApiKeyPathSegment.ClrMemberName)} must not be null, empty, or whitespace",
+                    remediation: $"Specify a valid {nameof(ApiKeyPathSegment.ClrMemberName)} value"
                 ),
             ]
         },
 
-        // ApiKeyPathSegment throws if ClrPropertyName cannot resolve to a property
+        // ApiKeyPathSegment throws if ClrMemberName cannot resolve to a property
         new CompileThrowsTest
         {
-            Name = $"{nameof(ApiKeyPathSegment)} Throws If {nameof(ApiKeyPathSegment.ClrPropertyName)} Is Unresolved",
+            Name = $"{nameof(ApiKeyPathSegment)} Throws If {nameof(ApiKeyPathSegment.ClrMemberName)} Is Unresolved",
             SourceJson = @"
             {
-                ""ApiName"": ""ApiKeyPathSegment Throws If ClrPropertyName Is Unresolved"",
+                ""ApiName"": ""ApiKeyPathSegment Throws If ClrMemberName Is Unresolved"",
                 ""ApiScalarTypes"": [
                     {
                         ""ApiKind"": ""Scalar"",
@@ -2368,7 +2368,7 @@ public partial class ApiSchemaTests
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyTypeApiNameType, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""MissingId"" }
+                                            { ""ClrMemberName"": ""MissingId"" }
                                         ]
                                     }
                                 ]
@@ -2389,8 +2389,10 @@ public partial class ApiSchemaTests
                         $"{nameof(ApiKeyPathSegment)}[0][\"MissingId\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
                     code: ApiSchemaCompilationCode.ApiKeyPathSegmentUnresolvedApiProperty,
-                    description: $"Property with CLR name 'MissingId' could not be found on object type 'TestObject'",
-                    remediation: $"Verify the CLR property name or add a property with CLR name 'MissingId' to 'TestObject'"
+                    description: "An API property for CLR member 'MissingId' could not be found "
+                        + "on object type 'TestObject'",
+                    remediation: "Verify the CLR member name or add an API property for CLR "
+                        + "member 'MissingId' to 'TestObject'"
                 ),
             ]
         },
@@ -2441,8 +2443,8 @@ public partial class ApiSchemaTests
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyTypeApiNameType, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Id"" },
-                                            { ""ClrPropertyName"": ""Code"" }
+                                            { ""ClrMemberName"": ""Id"" },
+                                            { ""ClrMemberName"": ""Code"" }
                                         ]
                                     }
                                 ]
@@ -2463,8 +2465,9 @@ public partial class ApiSchemaTests
                         $"{nameof(ApiKeyPathSegment)}[0][\"Id\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
                     code: ApiSchemaCompilationCode.ApiKeyPathNavigationSegmentInvalidType,
-                    description: $"Navigation segment property 'Id' must resolve to an object type; found '{nameof(ApiScalarType)}'",
-                    remediation: $"Change the navigation property to an object-typed property or restructure the path segments"
+                    description: $"Navigation segment member 'Id' must resolve to an object type; found '{nameof(ApiScalarType)}'",
+                    remediation: "Change the navigation member to an object-typed member or "
+                        + "restructure the path segments"
                 ),
             ]
         },
@@ -2531,7 +2534,7 @@ public partial class ApiSchemaTests
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+OwnerType, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
-                                            { ""ClrPropertyName"": ""Item"" }
+                                            { ""ClrMemberName"": ""Item"" }
                                         ]
                                     }
                                 ]
@@ -2552,8 +2555,9 @@ public partial class ApiSchemaTests
                         $"{nameof(ApiKeyPathSegment)}[0][\"Item\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
                     code: ApiSchemaCompilationCode.ApiKeyPathScalarSegmentInvalidType,
-                    description: $"Terminal segment property 'Item' must resolve to a scalar type; found '{nameof(ApiObjectType)}'",
-                    remediation: $"Change the terminal property to a scalar-typed property or remove extra navigation segments"
+                    description: $"Terminal segment member 'Item' must resolve to a scalar type; found '{nameof(ApiObjectType)}'",
+                    remediation: "Change the terminal member to a scalar-typed member or remove "
+                        + "extra navigation segments"
                 ),
             ]
         },
@@ -2583,7 +2587,7 @@ public partial class ApiSchemaTests
                         ""ApiKeyTypes"": [
                             {
                                 ""ApiName"": ""Id"",
-                                ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrPropertyName"": ""Id"" } ] } ]
+                                ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""Id"" } ] } ]
                             }
                         ],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests""
@@ -2684,7 +2688,7 @@ public partial class ApiSchemaTests
                         ""ApiKeyTypes"": [
                             {
                                 ""ApiName"": ""Id"",
-                                ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrPropertyName"": ""Id"" } ] } ]
+                                ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""Id"" } ] } ]
                             }
                         ],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests""
@@ -2823,7 +2827,7 @@ public partial class ApiSchemaTests
                         ""ApiKeyTypes"": [
                             {
                                 ""ApiName"": ""Id"",
-                                ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrPropertyName"": ""Id"" } ] } ]
+                                ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""Id"" } ] } ]
                             }
                         ],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests""
@@ -2849,7 +2853,7 @@ public partial class ApiSchemaTests
                             ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"",
                             ""ApiForeignKeyType"": {
                                 ""ApiKeyPaths"": [
-                                    { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrPropertyName"": ""PrincipalId"" } ] }
+                                    { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""PrincipalId"" } ] }
                                 ]
                             }
                         }
@@ -2892,7 +2896,7 @@ public partial class ApiSchemaTests
                         ""ApiKeyTypes"": [
                             {
                                 ""ApiName"": ""Id"",
-                                ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrPropertyName"": ""Id"" } ] } ]
+                                ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""Id"" } ] } ]
                             }
                         ],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests""
@@ -2953,7 +2957,7 @@ public partial class ApiSchemaTests
                         ""ApiKeyTypes"": [
                             {
                                 ""ApiName"": ""Id"",
-                                ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrPropertyName"": ""Id"" } ] } ]
+                                ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""Id"" } ] } ]
                             }
                         ],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests""
@@ -3012,7 +3016,7 @@ public partial class ApiSchemaTests
                         ""ApiKeyTypes"": [
                             {
                                 ""ApiName"": ""Id"",
-                                ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrPropertyName"": ""Id"" } ] } ]
+                                ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""Id"" } ] } ]
                             }
                         ],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests""
@@ -3071,7 +3075,7 @@ public partial class ApiSchemaTests
                         ""ApiKeyTypes"": [
                             {
                                 ""ApiName"": ""Id"",
-                                ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrPropertyName"": ""Id"" } ] } ]
+                                ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""Id"" } ] } ]
                             }
                         ],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests""
@@ -3121,7 +3125,7 @@ public partial class ApiSchemaTests
                         ""ApiKeyTypes"": [
                             {
                                 ""ApiName"": ""Id"",
-                                ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrPropertyName"": ""Id"" } ] } ]
+                                ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""Id"" } ] } ]
                             }
                         ],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests""
@@ -3135,7 +3139,7 @@ public partial class ApiSchemaTests
                         ""ApiKeyTypes"": [
                             {
                                 ""ApiName"": ""Id"",
-                                ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalBType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrPropertyName"": ""Id"" } ] } ]
+                                ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalBType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""Id"" } ] } ]
                             }
                         ],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalBType, Evoogle.ApiFramework.Tests""
@@ -3160,13 +3164,13 @@ public partial class ApiSchemaTests
                             ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"",
                             ""ApiForeignKeyTypeA"": {
                                 ""ApiKeyPaths"": [
-                                    { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrPropertyName"": ""PrincipalAId"" } ] },
-                                    { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrPropertyName"": ""PrincipalBId"" } ] }
+                                    { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""PrincipalAId"" } ] },
+                                    { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""PrincipalBId"" } ] }
                                 ]
                             },
                             ""ApiForeignKeyTypeB"": {
                                 ""ApiKeyPaths"": [
-                                    { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrPropertyName"": ""PrincipalBId"" } ] }
+                                    { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""PrincipalBId"" } ] }
                                 ]
                             }
                         }
@@ -3208,7 +3212,7 @@ public partial class ApiSchemaTests
                         ""ApiKeyTypes"": [
                             {
                                 ""ApiName"": ""Id"",
-                                ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrPropertyName"": ""Id"" } ] } ]
+                                ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""Id"" } ] } ]
                             }
                         ],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests""
@@ -3222,7 +3226,7 @@ public partial class ApiSchemaTests
                         ""ApiKeyTypes"": [
                             {
                                 ""ApiName"": ""Id"",
-                                ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalBType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrPropertyName"": ""Id"" } ] } ]
+                                ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalBType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""Id"" } ] } ]
                             }
                         ],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalBType, Evoogle.ApiFramework.Tests""
@@ -3247,13 +3251,13 @@ public partial class ApiSchemaTests
                             ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"",
                             ""ApiForeignKeyTypeA"": {
                                 ""ApiKeyPaths"": [
-                                    { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrPropertyName"": ""PrincipalAId"" } ] }
+                                    { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""PrincipalAId"" } ] }
                                 ]
                             },
                             ""ApiForeignKeyTypeB"": {
                                 ""ApiKeyPaths"": [
-                                    { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrPropertyName"": ""PrincipalAId"" } ] },
-                                    { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrPropertyName"": ""PrincipalBId"" } ] }
+                                    { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""PrincipalAId"" } ] },
+                                    { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""PrincipalBId"" } ] }
                                 ]
                             }
                         }
@@ -3295,7 +3299,7 @@ public partial class ApiSchemaTests
                         ""ApiKeyTypes"": [
                             {
                                 ""ApiName"": ""Id"",
-                                ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrPropertyName"": ""Id"" } ] } ]
+                                ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""Id"" } ] } ]
                             }
                         ],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests""
@@ -3319,8 +3323,8 @@ public partial class ApiSchemaTests
                             ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"",
                             ""ApiForeignKeyType"": {
                                 ""ApiKeyPaths"": [
-                                    { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrPropertyName"": ""PrincipalId"" } ] },
-                                    { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrPropertyName"": ""PrincipalId2"" } ] }
+                                    { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""PrincipalId"" } ] },
+                                    { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""PrincipalId2"" } ] }
                                 ]
                             }
                         }
@@ -3363,7 +3367,7 @@ public partial class ApiSchemaTests
                         ""ApiKeyTypes"": [
                             {
                                 ""ApiName"": ""PK_Id"",
-                                ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyTypeApiNameType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrPropertyName"": ""Id"" } ] } ]
+                                ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyTypeApiNameType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""Id"" } ] } ]
                             }
                         ],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyTypeApiNameType, Evoogle.ApiFramework.Tests""
@@ -3386,7 +3390,7 @@ public partial class ApiSchemaTests
                             ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"",
                             ""ApiForeignKeyType"": {
                                 ""ApiKeyPaths"": [
-                                    { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrPropertyName"": ""PrincipalCode"" } ] }
+                                    { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""PrincipalCode"" } ] }
                                 ]
                             }
                         }
@@ -3428,7 +3432,7 @@ public partial class ApiSchemaTests
                         ""ApiKeyTypes"": [
                             {
                                 ""ApiName"": ""Id"",
-                                ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrPropertyName"": ""Id"" } ] } ]
+                                ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""Id"" } ] } ]
                             }
                         ],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests""
@@ -3493,11 +3497,11 @@ public partial class ApiSchemaTests
                         ""ApiKeyTypes"": [
                             {
                                 ""ApiName"": ""PK_Id"",
-                                ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyTypeApiNameType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrPropertyName"": ""Id"" } ] } ]
+                                ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyTypeApiNameType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""Id"" } ] } ]
                             },
                             {
                                 ""ApiName"": ""PK_Code"",
-                                ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyTypeApiNameType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrPropertyName"": ""Code"" } ] } ]
+                                ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyTypeApiNameType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""Code"" } ] } ]
                             }
                         ],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyTypeApiNameType, Evoogle.ApiFramework.Tests""
@@ -3520,7 +3524,7 @@ public partial class ApiSchemaTests
                             ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"",
                             ""ApiForeignKeyType"": {
                                 ""ApiKeyPaths"": [
-                                    { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrPropertyName"": ""PrincipalId"" } ] }
+                                    { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""PrincipalId"" } ] }
                                 ]
                             }
                         }

@@ -16,7 +16,8 @@ using Evoogle.Extensions;
 namespace Evoogle.ApiFramework.Schema.Keys;
 
 /// <summary>
-///     Represents a flat, ordered chain of property navigation steps from a root CLR type to a scalar value.
+///     Represents a flat, ordered chain of CLR member navigation steps from a root CLR type to a
+///     scalar value.
 /// </summary>
 /// <remarks>
 ///     <para>
@@ -40,7 +41,7 @@ namespace Evoogle.ApiFramework.Schema.Keys;
 ///     The CLR type from which the navigation chain begins, or <see langword="null"/> to infer it from the
 ///     owning <see cref="ApiObjectType"/> or <see cref="ApiRelationshipElement"/> during compilation.
 /// </param>
-/// <param name="apiSegments">Ordered <see cref="ApiKeyPathSegment"/> instances from the root type to the terminal scalar property. Must contain at least one segment.</param>
+/// <param name="apiSegments">Ordered <see cref="ApiKeyPathSegment"/> instances from the root type to the terminal scalar member. Must contain at least one segment.</param>
 [JsonConverter(typeof(ApiKeyPathJsonConverter))]
 public sealed class ApiKeyPath(Type? clrRootType, IEnumerable<ApiKeyPathSegment> apiSegments) : ApiSchemaElement
 {
@@ -78,8 +79,8 @@ public sealed class ApiKeyPath(Type? clrRootType, IEnumerable<ApiKeyPathSegment>
     /// </summary>
     public Type ClrRootType => this.RequireValue(_clrRootType);
 
-    /// <summary>Gets the dot-delimited CLR property path represented by <see cref="ApiSegments"/>.</summary>
-    public string ClrPath => string.Join('.', this.ApiSegments.Select(static segment => segment.ClrPropertyName));
+    /// <summary>Gets the dot-delimited CLR member path represented by <see cref="ApiSegments"/>.</summary>
+    public string ClrPath => string.Join('.', this.ApiSegments.Select(static segment => segment.ClrMemberName));
 
     internal string? ApiPathLabel
     {
@@ -90,7 +91,7 @@ public sealed class ApiKeyPath(Type? clrRootType, IEnumerable<ApiKeyPathSegment>
             var effectiveClrRootType = _clrRootType ?? this.GetOwningDefaultClrRootType();
             return effectiveClrRootType is null
                 ? null
-                : $"{effectiveClrRootType.Name}." + string.Join(".", this.ApiSegments.Select(s => s.ClrPropertyName));
+                : $"{effectiveClrRootType.Name}." + string.Join(".", this.ApiSegments.Select(s => s.ClrMemberName));
         }
     }
     #endregion
@@ -100,7 +101,7 @@ public sealed class ApiKeyPath(Type? clrRootType, IEnumerable<ApiKeyPathSegment>
     public override string ToString()
     {
         var clrRootTypeName = _clrRootType.SafeToName();
-        var apiSegments = string.Join(".", this.ApiSegments.Select(s => s.ClrPropertyName));
+        var apiSegments = string.Join(".", this.ApiSegments.Select(s => s.ClrMemberName));
         var extensionCount = this.ExtensionCount.SafeToString();
 
         return $"{nameof(ApiKeyPath)} {{{nameof(this.ClrRootType)}={clrRootTypeName}, {nameof(this.ApiSegments)}=\"{apiSegments}\", {nameof(this.ExtensionCount)}={extensionCount}}}";
@@ -217,8 +218,8 @@ public sealed class ApiKeyPath(Type? clrRootType, IEnumerable<ApiKeyPathSegment>
 
         var severity = ApiSchemaCompilationSeverity.Error;
         var code = ApiSchemaCompilationCode.ApiKeyPathEmptySegments;
-        var description = $"{nameof(this.ApiSegments)} must contain at least one property name";
-        var remediation = $"Specify at least one CLR property name when creating an {nameof(ApiKeyPath)}";
+        var description = $"{nameof(this.ApiSegments)} must contain at least one member name";
+        var remediation = $"Specify at least one CLR member name when creating an {nameof(ApiKeyPath)}";
 
         context.AddIssue(severity, code, description, remediation);
     }
@@ -235,7 +236,7 @@ public sealed class ApiKeyPath(Type? clrRootType, IEnumerable<ApiKeyPathSegment>
             var location = ApiSchemaCompilationLocation.ForIndexedLabel
             (
                 i,
-                segment.ClrPropertyName
+                segment.ClrMemberName
             );
             segment.Compile(context, location);
 
@@ -260,8 +261,10 @@ public sealed class ApiKeyPath(Type? clrRootType, IEnumerable<ApiKeyPathSegment>
                     var path = segment.ApiPath;
                     var severity = ApiSchemaCompilationSeverity.Error;
                     var code = ApiSchemaCompilationCode.ApiKeyPathScalarSegmentInvalidType;
-                    var description = $"Terminal segment property '{segment.ClrPropertyName}' must resolve to a scalar type; found '{apiProperty.ApiType.GetType().Name}'";
-                    var remediation = $"Change the terminal property to a scalar-typed property or remove extra navigation segments";
+                    var description = $"Terminal segment member '{segment.ClrMemberName}' must "
+                        + $"resolve to a scalar type; found '{apiProperty.ApiType.GetType().Name}'";
+                    var remediation = "Change the terminal member to a scalar-typed member or "
+                        + "remove extra navigation segments";
 
                     context.AddIssue(path, severity, code, description, remediation);
                 }
@@ -273,8 +276,10 @@ public sealed class ApiKeyPath(Type? clrRootType, IEnumerable<ApiKeyPathSegment>
                     var path = segment.ApiPath;
                     var severity = ApiSchemaCompilationSeverity.Error;
                     var code = ApiSchemaCompilationCode.ApiKeyPathNavigationSegmentInvalidType;
-                    var description = $"Navigation segment property '{segment.ClrPropertyName}' must resolve to an object type; found '{apiProperty.ApiType.GetType().Name}'";
-                    var remediation = $"Change the navigation property to an object-typed property or restructure the path segments";
+                    var description = $"Navigation segment member '{segment.ClrMemberName}' must "
+                        + $"resolve to an object type; found '{apiProperty.ApiType.GetType().Name}'";
+                    var remediation = "Change the navigation member to an object-typed member or "
+                        + "restructure the path segments";
 
                     context.AddIssue(path, severity, code, description, remediation);
                     return;

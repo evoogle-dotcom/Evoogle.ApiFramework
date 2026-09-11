@@ -140,13 +140,14 @@ public enum ApiSchemaCompilationCode
 
     #region ApiKeyPathSegment Compilation Codes
     /// <summary>
-    ///     An <see cref="ApiKeyPath"/> segment's CLR property name is null, empty, or whitespace.
+    ///     An <see cref="ApiKeyPath"/> segment's CLR member name is null, empty, or whitespace.
     /// </summary>
-    [EnumMember(Value = "API_KEY_PATH_SEGMENT_INVALID_CLR_PROPERTY_NAME")]
-    ApiKeyPathSegmentInvalidClrPropertyName,
+    [EnumMember(Value = "API_KEY_PATH_SEGMENT_INVALID_CLR_MEMBER_NAME")]
+    ApiKeyPathSegmentInvalidClrMemberName,
 
     /// <summary>
-    ///     An <see cref="ApiKeyPath"/> segment's CLR property name could not be resolved to a defined property on the current object type.
+    ///     An <see cref="ApiKeyPath"/> segment's CLR member name could not be resolved to an
+    ///     <see cref="ApiProperty"/> on the current object type.
     /// </summary>
     [EnumMember(Value = "API_KEY_PATH_SEGMENT_UNRESOLVED_API_PROPERTY")]
     ApiKeyPathSegmentUnresolvedApiProperty,
@@ -286,6 +287,40 @@ public enum ApiSchemaCompilationCode
     /// </summary>
     [EnumMember(Value = "API_PROPERTY_OPTIONAL_NON_NULLABLE_MISMATCH")]
     ApiPropertyOptionalNonNullableMismatch,
+    #endregion
+
+    #region ApiVersionType Compilation Codes
+    /// <summary>The version type's CLR type is null.</summary>
+    [EnumMember(Value = "API_VERSION_TYPE_NULL_CLR_TYPE")]
+    ApiVersionTypeNullClrType,
+
+    /// <summary>The version type uses a nullable CLR value type.</summary>
+    [EnumMember(Value = "API_VERSION_TYPE_NULLABLE_CLR_TYPE")]
+    ApiVersionTypeNullableClrType,
+
+    /// <summary>The property-backed version has an invalid CLR member name.</summary>
+    [EnumMember(Value = "API_VERSION_TYPE_INVALID_CLR_MEMBER_NAME")]
+    ApiVersionTypeInvalidClrMemberName,
+
+    /// <summary>No scalar schema type matches the version CLR type.</summary>
+    [EnumMember(Value = "API_VERSION_TYPE_UNRESOLVED_SCALAR_TYPE")]
+    ApiVersionTypeUnresolvedScalarType,
+
+    /// <summary>No API property matches the property-backed version CLR member name.</summary>
+    [EnumMember(Value = "API_VERSION_TYPE_UNRESOLVED_PROPERTY")]
+    ApiVersionTypeUnresolvedProperty,
+
+    /// <summary>The property-backed version refers to a non-scalar API property.</summary>
+    [EnumMember(Value = "API_VERSION_TYPE_NON_SCALAR_PROPERTY")]
+    ApiVersionTypeNonScalarProperty,
+
+    /// <summary>The version type and property use different CLR types.</summary>
+    [EnumMember(Value = "API_VERSION_TYPE_CLR_TYPE_MISMATCH")]
+    ApiVersionTypeClrTypeMismatch,
+
+    /// <summary>The property-backed version refers to an optional API property.</summary>
+    [EnumMember(Value = "API_VERSION_TYPE_OPTIONAL_PROPERTY")]
+    ApiVersionTypeOptionalProperty,
     #endregion
 
     #region ApiRelationship Compilation Codes

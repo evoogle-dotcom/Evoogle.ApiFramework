@@ -64,6 +64,15 @@ Public production APIs require XML documentation because CS1591 is treated as an
 
 Do not reformat or reorganize unrelated code as part of a focused change.
 
+### JSON Serialization
+
+When writing an optional property in a custom JSON converter, write the property name and value
+as one conditional operation. Use the applicable `TryWriteProperty*` helper, such as
+`TryWritePropertyWithSerializer`, so serializer ignore conditions omit the entire property.
+
+Do not call `WritePropertyName` before a conditional `TryWrite*` value helper. If the value is
+skipped, that split pattern leaves a property name without a value and produces invalid JSON.
+
 ## Naming Standards
 
 All new and modified identifiers must follow:

@@ -6,12 +6,14 @@
 namespace Evoogle.ApiFramework;
 
 /// <summary>
-///     Declares a one-to-one or one-to-many relationship at the type level, without requiring a navigation property on the POCO.
+///     Declares a one-to-one or one-to-many relationship at the type level, without requiring a
+///     navigation member on the POCO.
 ///     Apply multiple instances for multiple relationships.
 /// </summary>
 /// <remarks>
-///     Use this attribute when the POCO does not expose navigation properties and you want to keep the domain model clean.
-///     For POCOs with navigation properties prefer <see cref="ApiRelationshipAttribute"/> on the navigation property.
+///     Use this attribute when the POCO does not expose navigation members and you want to keep the
+///     domain model clean. For POCOs with navigation members, prefer
+///     <see cref="ApiRelationshipAttribute"/> on the navigation member.
 /// </remarks>
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = true)]
 public sealed class ApiRelationshipDefinitionAttribute : ApiNamedElementAttribute
@@ -57,7 +59,7 @@ public sealed class ApiRelationshipDefinitionAttribute : ApiNamedElementAttribut
     public required ApiRelationshipKind Kind { get; init; }
 
     /// <summary>
-    ///     Gets the the name of the foreign-key CLR property on the dependent type.
+    ///     Gets the foreign-key CLR member name on the dependent type.
     ///     When <c>null</c> the framework infers the foreign key via convention.
     /// </summary>
     public string? ForeignKey { get; init; }

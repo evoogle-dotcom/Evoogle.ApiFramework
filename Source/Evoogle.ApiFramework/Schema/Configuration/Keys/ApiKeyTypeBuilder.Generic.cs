@@ -12,7 +12,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Keys;
 /// <summary>
 ///     Strongly-typed fluent builder for configuring key-type paths rooted at
 ///     <typeparamref name="TRoot"/>. Extends <see cref="ApiKeyTypeBuilder"/> with expression-based
-///     overloads so CLR property names are extracted at compile time rather than supplied as raw
+///     overloads so CLR member names are extracted at compile time rather than supplied as raw
 ///     strings.
 /// </summary>
 /// <typeparam name="TRoot">The default root CLR type for key paths added via expression overloads.</typeparam>
@@ -21,7 +21,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Keys;
 /// </param>
 /// <remarks>
 ///    <para>Key types are reusable components that define how to extract key values from CLR objects via one or more key paths. They are primarily used to configure API keys, but can also be used for other purposes such as defining unique identifiers for object types.</para>
-///    <para>Each key path represents a navigation chain from a specified CLR root type to a terminal scalar property, and can be configured with extensions at both the path and segment levels. When multiple key paths are defined within a key type, the resulting key value is a composite of the individual path values.</para>
+///    <para>Each key path represents a navigation chain from a specified CLR root type to a terminal scalar member, and can be configured with extensions at both the path and segment levels. When multiple key paths are defined within a key type, the resulting key value is a composite of the individual path values.</para>
 /// </remarks>
 public sealed class ApiKeyTypeBuilder<TRoot>(string? apiName = null) : ApiKeyTypeBuilder(apiName)
 {
@@ -30,8 +30,8 @@ public sealed class ApiKeyTypeBuilder<TRoot>(string? apiName = null) : ApiKeyTyp
     ///     Adds a key path rooted at <typeparamref name="TRoot"/> using a type-safe lambda expression.
     ///     The expression must consist only of chained member access (e.g. <c>x => x.Address.CityId</c>).
     /// </summary>
-    /// <typeparam name="TScalar">The return type of the terminal scalar property.</typeparam>
-    /// <param name="expression">A lambda expression selecting the scalar property, optionally through navigation properties.</param>
+    /// <typeparam name="TScalar">The return type of the terminal scalar member.</typeparam>
+    /// <param name="expression">A lambda expression selecting the scalar member, optionally through navigation members.</param>
     /// <param name="configure">Optional callback to attach extensions to the key path builder.</param>
     /// <returns>The current builder instance.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="expression"/> is <c>null</c>.</exception>
@@ -56,7 +56,7 @@ public sealed class ApiKeyTypeBuilder<TRoot>(string? apiName = null) : ApiKeyTyp
     ///     <see cref="object"/>.
     /// </summary>
     /// <typeparam name="TPathRoot">The CLR type from which the navigation begins.</typeparam>
-    /// <param name="expression">A lambda expression selecting the scalar property on <typeparamref name="TPathRoot"/>, optionally through navigation properties.</param>
+    /// <param name="expression">A lambda expression selecting the scalar member on <typeparamref name="TPathRoot"/>, optionally through navigation members.</param>
     /// <param name="configure">Optional callback to attach extensions to the key path builder.</param>
     /// <returns>The current builder instance.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="expression"/> is <c>null</c>.</exception>

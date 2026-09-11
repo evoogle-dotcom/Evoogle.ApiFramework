@@ -57,8 +57,8 @@ internal static class ApiRelationshipBuilderExtensions
         {
             foreach (var keyPath in apiForeignKeyType.ApiKeyPaths)
             {
-                var clrPropertyNames = keyPath.ApiSegments.Select(s => s.ClrPropertyName);
-                fk.AddPath(keyPath.ClrRootType, clrPropertyNames, p => p.ConfigureExtensions(keyPath));
+                var clrMemberNames = keyPath.ApiSegments.Select(s => s.ClrMemberName);
+                fk.AddPath(keyPath.ClrRootType, clrMemberNames, p => p.ConfigureExtensions(keyPath));
             }
             fk.ConfigureExtensions(apiForeignKeyType);
         });
@@ -72,8 +72,8 @@ internal static class ApiRelationshipBuilderExtensions
             {
                 foreach (var keyPath in apiForeignKeyType.ApiKeyPaths)
                 {
-                    var clrPropertyNames = keyPath.ApiSegments.Select(s => s.ClrPropertyName);
-                    fk.AddPath(keyPath.ClrRootType, clrPropertyNames, p => p.ConfigureExtensions(keyPath));
+                    var clrMemberNames = keyPath.ApiSegments.Select(s => s.ClrMemberName);
+                    fk.AddPath(keyPath.ClrRootType, clrMemberNames, p => p.ConfigureExtensions(keyPath));
                 }
                 fk.ConfigureExtensions(apiForeignKeyType);
             });
@@ -84,8 +84,8 @@ internal static class ApiRelationshipBuilderExtensions
             {
                 foreach (var keyPath in apiForeignKeyType.ApiKeyPaths)
                 {
-                    var clrPropertyNames = keyPath.ApiSegments.Select(s => s.ClrPropertyName);
-                    fk.AddPath(keyPath.ClrRootType, clrPropertyNames, p => p.ConfigureExtensions(keyPath));
+                    var clrMemberNames = keyPath.ApiSegments.Select(s => s.ClrMemberName);
+                    fk.AddPath(keyPath.ClrRootType, clrMemberNames, p => p.ConfigureExtensions(keyPath));
                 }
                 fk.ConfigureExtensions(apiForeignKeyType);
             });

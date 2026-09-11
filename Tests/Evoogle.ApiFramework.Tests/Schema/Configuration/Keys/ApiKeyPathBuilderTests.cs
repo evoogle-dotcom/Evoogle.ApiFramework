@@ -15,9 +15,9 @@ public class ApiKeyPathBuilderTests(ITestOutputHelper output) : XUnitTests(outpu
     private sealed class BuildPathTest : XUnitTest
     {
         #region User Supplied Properties
-        public required string[] ClrPropertyNames { get; init; }
+        public required string[] ClrMemberNames { get; init; }
 
-        public required string[] ExpectedClrPropertyNames { get; init; }
+        public required string[] ExpectedClrMemberNames { get; init; }
 
         public bool UsesKeyTypeBuilder { get; init; }
         #endregion
@@ -34,12 +34,12 @@ public class ApiKeyPathBuilderTests(ITestOutputHelper output) : XUnitTests(outpu
         {
             if (this.UsesKeyTypeBuilder)
             {
-                var keyType = new ApiKeyTypeBuilder().AddPath(typeof(object), this.ClrPropertyNames).Build();
+                var keyType = new ApiKeyTypeBuilder().AddPath(typeof(object), this.ClrMemberNames).Build();
                 this.ActualPath = keyType.ApiKeyPaths.Single();
             }
             else
             {
-                var builder = new ApiKeyPathBuilder(typeof(object), this.ClrPropertyNames);
+                var builder = new ApiKeyPathBuilder(typeof(object), this.ClrMemberNames);
                 this.ActualPath = builder.Build();
             }
         }
@@ -47,8 +47,8 @@ public class ApiKeyPathBuilderTests(ITestOutputHelper output) : XUnitTests(outpu
         protected override void Assert()
         {
             this.ActualPath.Should().NotBeNull();
-            this.ActualPath!.ApiSegments.Select(static segment => segment.ClrPropertyName)
-                .Should().Equal(this.ExpectedClrPropertyNames);
+            this.ActualPath!.ApiSegments.Select(static segment => segment.ClrMemberName)
+                .Should().Equal(this.ExpectedClrMemberNames);
         }
         #endregion
     }
@@ -119,7 +119,7 @@ public class ApiKeyPathBuilderTests(ITestOutputHelper output) : XUnitTests(outpu
         protected override void Assert()
         {
             this.ActualException.Should().BeOfType<ArgumentException>();
-            this.ActualException!.Message.Should().Contain("non-empty dot-delimited property names");
+            this.ActualException!.Message.Should().Contain("non-empty dot-delimited member names");
         }
         #endregion
     }
@@ -131,14 +131,14 @@ public class ApiKeyPathBuilderTests(ITestOutputHelper output) : XUnitTests(outpu
         new BuildPathTest
         {
             Name = "Builds key path from dot-delimited CLR path",
-            ClrPropertyNames = ["NestedPart.Id"],
-            ExpectedClrPropertyNames = ["NestedPart", "Id"]
+            ClrMemberNames = ["NestedPart.Id"],
+            ExpectedClrMemberNames = ["NestedPart", "Id"]
         },
         new BuildPathTest
         {
             Name = "Builds key path from mixed CLR path fragments",
-            ClrPropertyNames = [" NestedPart . Id ", "Name"],
-            ExpectedClrPropertyNames = ["NestedPart", "Id", "Name"],
+            ClrMemberNames = [" NestedPart . Id ", "Name"],
+            ExpectedClrMemberNames = ["NestedPart", "Id", "Name"],
             UsesKeyTypeBuilder = true
         },
         new RejectDottedSegmentTest

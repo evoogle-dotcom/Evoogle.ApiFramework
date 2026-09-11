@@ -112,12 +112,13 @@ public partial class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnit
             foreach (var apiProperty in apiProperties)
             {
                 var apiPropertyName = apiProperty.ApiName;
-                var clrPropertyName = apiProperty.ClrName;
-                builder.AddProperty(apiPropertyName, clrPropertyName);
+                var clrMemberName = apiProperty.ClrName;
+                builder.AddProperty(apiPropertyName, clrMemberName);
             }
 
             builder.ConfigureOptions(apiObjectType);
             builder.ConfigureKeyTypes(apiObjectType);
+            builder.ConfigureVersionType(apiObjectType);
             builder.ConfigureExtensions(apiObjectType);
 
             this.ApiTypeActual = builder.Build();
@@ -167,10 +168,10 @@ public partial class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnit
             foreach (var apiProperty in apiProperties)
             {
                 var apiPropertyName = apiProperty.ApiName;
-                var clrPropertyName = apiProperty.ClrName;
+                var clrMemberName = apiProperty.ClrName;
                 var isRequired = apiProperty.IsRequired;
 
-                if (apiPropertyName == clrPropertyName)
+                if (apiPropertyName == clrMemberName)
                 {
                     var name = apiPropertyName;
                     if (isRequired)
@@ -186,17 +187,18 @@ public partial class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnit
                 {
                     if (isRequired)
                     {
-                        builder.AddRequiredProperty(apiPropertyName, clrPropertyName);
+                        builder.AddRequiredProperty(apiPropertyName, clrMemberName);
                     }
                     else
                     {
-                        builder.AddOptionalProperty(apiPropertyName, clrPropertyName);
+                        builder.AddOptionalProperty(apiPropertyName, clrMemberName);
                     }
                 }
             }
 
             builder.ConfigureOptions(apiObjectType);
             builder.ConfigureKeyTypes(apiObjectType);
+            builder.ConfigureVersionType(apiObjectType);
             builder.ConfigureExtensions(apiObjectType);
 
             this.ApiTypeActual = builder.Build();
@@ -231,10 +233,10 @@ public partial class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnit
             foreach (var apiProperty in apiProperties)
             {
                 var apiPropertyName = apiProperty.ApiName;
-                var clrPropertyName = apiProperty.ClrName;
+                var clrMemberName = apiProperty.ClrName;
                 var isRequired = apiProperty.IsRequired;
 
-                if (apiPropertyName == clrPropertyName)
+                if (apiPropertyName == clrMemberName)
                 {
                     var name = apiPropertyName;
                     if (isRequired)
@@ -250,17 +252,18 @@ public partial class ApiObjectTypeBuilderTests(ITestOutputHelper output) : XUnit
                 {
                     if (isRequired)
                     {
-                        builder.AddProperty(apiPropertyName, clrPropertyName, x => x.AsRequired());
+                        builder.AddProperty(apiPropertyName, clrMemberName, x => x.AsRequired());
                     }
                     else
                     {
-                        builder.AddProperty(apiPropertyName, clrPropertyName, x => x.AsOptional());
+                        builder.AddProperty(apiPropertyName, clrMemberName, x => x.AsOptional());
                     }
                 }
             }
 
             builder.ConfigureOptions(apiObjectType);
             builder.ConfigureKeyTypes(apiObjectType);
+            builder.ConfigureVersionType(apiObjectType);
             builder.ConfigureExtensions(apiObjectType);
 
             this.ApiTypeActual = builder.Build();

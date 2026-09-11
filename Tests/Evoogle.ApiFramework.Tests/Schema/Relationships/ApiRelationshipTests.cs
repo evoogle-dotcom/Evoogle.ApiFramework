@@ -360,9 +360,9 @@ public partial class ApiRelationshipTests(ITestOutputHelper output) : XUnitTests
 
             for (var i = 0; i < expectedKeyPath.ApiKeyPathSegments.Count; i++)
             {
-                actualKeyPath.ApiSegments[i].ClrPropertyName.Should().Be
+                actualKeyPath.ApiSegments[i].ClrMemberName.Should().Be
                 (
-                    expectedKeyPath.ApiKeyPathSegments[i].ClrPropertyName
+                    expectedKeyPath.ApiKeyPathSegments[i].ClrMemberName
                 );
             }
         }

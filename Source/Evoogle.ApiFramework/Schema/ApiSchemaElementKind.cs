@@ -6,6 +6,7 @@
 using Evoogle.ApiFramework.Schema.Keys;
 using Evoogle.ApiFramework.Schema.Relationships;
 using Evoogle.ApiFramework.Schema.Types;
+using Evoogle.ApiFramework.Schema.Versions;
 
 namespace Evoogle.ApiFramework.Schema;
 
@@ -64,6 +65,9 @@ public enum ApiSchemaElementKind
     ScalarType,
 
     /// <summary>Represents an <see cref="ApiSchema"/>.</summary>
-    Schema
+    Schema,
+
+    /// <summary>Represents an <see cref="ApiVersionType"/>.</summary>
+    VersionType
     #endregion
 }

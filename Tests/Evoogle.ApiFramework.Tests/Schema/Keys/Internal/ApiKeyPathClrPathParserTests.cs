@@ -17,7 +17,7 @@ public class ApiKeyPathClrPathParserTests(ITestOutputHelper output) : XUnitTests
         #region User Supplied Properties
         public required string ClrPath { get; init; }
 
-        public required string[] ExpectedClrPropertyNames { get; init; }
+        public required string[] ExpectedClrMemberNames { get; init; }
 
         public required bool ExpectedIsValid { get; init; }
         #endregion
@@ -38,10 +38,10 @@ public class ApiKeyPathClrPathParserTests(ITestOutputHelper output) : XUnitTests
         protected override void Assert()
         {
             this.ActualResult.Should().NotBeNull();
-            this.ActualResult!.ClrPropertyNames.Should().Equal(this.ExpectedClrPropertyNames);
+            this.ActualResult!.ClrMemberNames.Should().Equal(this.ExpectedClrMemberNames);
             this.ActualResult.IsValid.Should().Be(this.ExpectedIsValid);
             this.ActualResult.ValidationMessage.Should().Be(this.ExpectedIsValid ? null :
-                "CLR paths must contain one or more non-empty dot-delimited property names.");
+                "CLR paths must contain one or more non-empty dot-delimited member names.");
         }
         #endregion
     }
@@ -54,28 +54,28 @@ public class ApiKeyPathClrPathParserTests(ITestOutputHelper output) : XUnitTests
         {
             Name = "Parses nested CLR path",
             ClrPath = "NestedPart.Id",
-            ExpectedClrPropertyNames = ["NestedPart", "Id"],
+            ExpectedClrMemberNames = ["NestedPart", "Id"],
             ExpectedIsValid = true
         },
         new ParseTest
         {
             Name = "Normalizes CLR path whitespace",
             ClrPath = "  NestedPart . Id  ",
-            ExpectedClrPropertyNames = ["NestedPart", "Id"],
+            ExpectedClrMemberNames = ["NestedPart", "Id"],
             ExpectedIsValid = true
         },
         new ParseTest
         {
             Name = "Preserves empty CLR path segment for compilation validation",
             ClrPath = "NestedPart..Id",
-            ExpectedClrPropertyNames = ["NestedPart", "", "Id"],
+            ExpectedClrMemberNames = ["NestedPart", "", "Id"],
             ExpectedIsValid = false
         },
         new ParseTest
         {
             Name = "Marks whitespace-only CLR path invalid",
             ClrPath = "   ",
-            ExpectedClrPropertyNames = [""],
+            ExpectedClrMemberNames = [""],
             ExpectedIsValid = false
         },
     ];

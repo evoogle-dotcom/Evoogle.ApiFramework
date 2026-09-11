@@ -47,10 +47,10 @@ public static class ApiObjectTypeBuilderExtensions
 
     #region AddProperty Methods
     /// <summary>
-    ///     Adds an <see cref="ApiProperty"/> definition using <paramref name="apiAndClrName"/> as both the API name and CLR property name.
+    ///     Adds an <see cref="ApiProperty"/> definition using <paramref name="apiAndClrName"/> as both the API name and CLR member name.
     /// </summary>
     /// <param name="builder">The object type builder to configure.</param>
-    /// <param name="apiAndClrName">The API and CLR property name.</param>
+    /// <param name="apiAndClrName">The API and CLR member name.</param>
     /// <param name="configure">Optional callback to configure the added property.</param>
     /// <returns>The current builder instance.</returns>
     public static ApiObjectTypeBuilder AddProperty(this ApiObjectTypeBuilder builder, string apiAndClrName, Action<ApiPropertyBuilder>? configure = null)
@@ -62,11 +62,11 @@ public static class ApiObjectTypeBuilderExtensions
     }
 
     /// <summary>
-    ///     Adds an <see cref="ApiProperty"/> definition using <paramref name="apiAndClrName"/> as both the API name and CLR property name.
+    ///     Adds an <see cref="ApiProperty"/> definition using <paramref name="apiAndClrName"/> as both the API name and CLR member name.
     /// </summary>
     /// <typeparam name="TObject">The CLR object type represented by the builder.</typeparam>
     /// <param name="builder">The object type builder to configure.</param>
-    /// <param name="apiAndClrName">The API and CLR property name.</param>
+    /// <param name="apiAndClrName">The API and CLR member name.</param>
     /// <param name="configure">Optional callback to configure the added property.</param>
     /// <returns>The current builder instance.</returns>
     public static ApiObjectTypeBuilder<TObject> AddProperty<TObject>(this ApiObjectTypeBuilder<TObject> builder, string apiAndClrName, Action<ApiPropertyBuilder>? configure = null)
@@ -84,7 +84,7 @@ public static class ApiObjectTypeBuilderExtensions
     ///     Adds an <see cref="ApiProperty"/> definition marked as required.
     /// </summary>
     /// <param name="builder">The object type builder to configure.</param>
-    /// <param name="apiAndClrName">The API and CLR property name.</param>
+    /// <param name="apiAndClrName">The API and CLR member name.</param>
     /// <param name="configure">Optional callback to further configure the added property.</param>
     /// <returns>The current builder instance.</returns>
     public static ApiObjectTypeBuilder AddRequiredProperty(this ApiObjectTypeBuilder builder, string apiAndClrName, Action<ApiPropertyBuilder>? configure = null)
@@ -100,7 +100,7 @@ public static class ApiObjectTypeBuilderExtensions
     /// </summary>
     /// <param name="builder">The object type builder to configure.</param>
     /// <param name="apiName">The API property name.</param>
-    /// <param name="clrName">The CLR property name.</param>
+    /// <param name="clrName">The CLR member name.</param>
     /// <param name="configure">Optional callback to further configure the added property.</param>
     /// <returns>The current builder instance.</returns>
     public static ApiObjectTypeBuilder AddRequiredProperty(this ApiObjectTypeBuilder builder, string apiName, string clrName, Action<ApiPropertyBuilder>? configure = null)
@@ -117,7 +117,7 @@ public static class ApiObjectTypeBuilderExtensions
     /// </summary>
     /// <typeparam name="TObject">The CLR object type represented by the builder.</typeparam>
     /// <param name="builder">The object type builder to configure.</param>
-    /// <param name="apiAndClrName">The API and CLR property name.</param>
+    /// <param name="apiAndClrName">The API and CLR member name.</param>
     /// <param name="configure">Optional callback to further configure the added property.</param>
     /// <returns>The current builder instance.</returns>
     public static ApiObjectTypeBuilder<TObject> AddRequiredProperty<TObject>(this ApiObjectTypeBuilder<TObject> builder, string apiAndClrName, Action<ApiPropertyBuilder>? configure = null)
@@ -134,7 +134,7 @@ public static class ApiObjectTypeBuilderExtensions
     /// <typeparam name="TObject">The CLR object type represented by the builder.</typeparam>
     /// <param name="builder">The object type builder to configure.</param>
     /// <param name="apiName">The API property name.</param>
-    /// <param name="clrName">The CLR property name.</param>
+    /// <param name="clrName">The CLR member name.</param>
     /// <param name="configure">Optional callback to further configure the added property.</param>
     /// <returns>The current builder instance.</returns>
     public static ApiObjectTypeBuilder<TObject> AddRequiredProperty<TObject>
@@ -159,7 +159,7 @@ public static class ApiObjectTypeBuilderExtensions
     ///     Adds an <see cref="ApiProperty"/> definition marked as optional.
     /// </summary>
     /// <param name="builder">The object type builder to configure.</param>
-    /// <param name="apiAndClrName">The API and CLR property name.</param>
+    /// <param name="apiAndClrName">The API and CLR member name.</param>
     /// <param name="configure">Optional callback to further configure the added property.</param>
     /// <returns>The current builder instance.</returns>
     public static ApiObjectTypeBuilder AddOptionalProperty(this ApiObjectTypeBuilder builder, string apiAndClrName, Action<ApiPropertyBuilder>? configure = null)
@@ -175,7 +175,7 @@ public static class ApiObjectTypeBuilderExtensions
     /// </summary>
     /// <param name="builder">The object type builder to configure.</param>
     /// <param name="apiName">The API property name.</param>
-    /// <param name="clrName">The CLR property name.</param>
+    /// <param name="clrName">The CLR member name.</param>
     /// <param name="configure">Optional callback to further configure the added property.</param>
     /// <returns>The current builder instance.</returns>
     public static ApiObjectTypeBuilder AddOptionalProperty(this ApiObjectTypeBuilder builder, string apiName, string clrName, Action<ApiPropertyBuilder>? configure = null)
@@ -192,7 +192,7 @@ public static class ApiObjectTypeBuilderExtensions
     /// </summary>
     /// <typeparam name="TObject">The CLR object type represented by the builder.</typeparam>
     /// <param name="builder">The object type builder to configure.</param>
-    /// <param name="apiAndClrName">The API and CLR property name.</param>
+    /// <param name="apiAndClrName">The API and CLR member name.</param>
     /// <param name="configure">Optional callback to further configure the added property.</param>
     /// <returns>The current builder instance.</returns>
     public static ApiObjectTypeBuilder<TObject> AddOptionalProperty<TObject>(this ApiObjectTypeBuilder<TObject> builder, string apiAndClrName, Action<ApiPropertyBuilder>? configure = null)
@@ -209,7 +209,7 @@ public static class ApiObjectTypeBuilderExtensions
     /// <typeparam name="TObject">The CLR object type represented by the builder.</typeparam>
     /// <param name="builder">The object type builder to configure.</param>
     /// <param name="apiName">The API property name.</param>
-    /// <param name="clrName">The CLR property name.</param>
+    /// <param name="clrName">The CLR member name.</param>
     /// <param name="configure">Optional callback to further configure the added property.</param>
     /// <returns>The current builder instance.</returns>
     public static ApiObjectTypeBuilder<TObject> AddOptionalProperty<TObject>

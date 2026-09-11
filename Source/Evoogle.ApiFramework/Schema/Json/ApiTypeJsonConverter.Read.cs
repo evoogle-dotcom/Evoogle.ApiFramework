@@ -8,6 +8,7 @@ using System.Text.Json;
 using Evoogle.ApiFramework.Schema.Json.Internal;
 using Evoogle.ApiFramework.Schema.Keys;
 using Evoogle.ApiFramework.Schema.Types;
+using Evoogle.ApiFramework.Schema.Versions;
 using Evoogle.Json;
 
 namespace Evoogle.ApiFramework.Schema.Json;
@@ -58,6 +59,8 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
         public ApiObjectTypeOptions? ApiOptions { get; set; }
         public List<ApiProperty>? ApiProperties { get; set; }
         public List<ApiNamedKeyType>? ApiKeyTypes { get; set; }
+        public ApiVersionType? ApiVersionType { get; set; }
+        public bool HasApiVersionType { get; set; }
         #endregion
     }
 
@@ -108,6 +111,7 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
             { propertyNames.ApiObjectType.ApiOptions, HandleApiObjectTypeApiOptions },
             { propertyNames.ApiObjectType.ApiProperties, HandleApiObjectTypeApiProperties },
             { propertyNames.ApiObjectType.ApiKeyTypes, HandleApiObjectTypeApiKeyTypes },
+            { propertyNames.ApiObjectType.ApiVersionType, HandleApiObjectTypeApiVersionType },
 
             // ApiType Property Handlers
             { propertyNames.ApiType.ApiKind, HandleApiTypeApiKind },
@@ -195,6 +199,22 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
             context.ReadData.ApiObjectType ??= new ApiObjectTypeReadData();
 
             context.ReadData.ApiObjectType.ApiOptions = JsonSerializer.Deserialize<ApiObjectTypeOptions>(ref reader, context.Options);
+        }
+
+        private static void HandleApiObjectTypeApiVersionType
+        (
+            ref Utf8JsonReader reader,
+            DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context
+        )
+        {
+            context.ReadData.ApiObjectType ??= new ApiObjectTypeReadData();
+            if (context.ReadData.ApiObjectType.HasApiVersionType)
+            {
+                throw new JsonException($"Duplicate {nameof(ApiObjectType.ApiVersionType)} JSON member.");
+            }
+
+            context.ReadData.ApiObjectType.HasApiVersionType = true;
+            context.ReadData.ApiObjectType.ApiVersionType = JsonSerializer.Deserialize<ApiVersionType>(ref reader, context.Options);
         }
 
         private static void HandleApiObjectTypeApiProperties(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)

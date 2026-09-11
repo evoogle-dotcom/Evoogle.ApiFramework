@@ -11,6 +11,7 @@ using Evoogle.ApiFramework.Schema.Compilation;
 using Evoogle.ApiFramework.Schema.Compilation.Internal;
 using Evoogle.ApiFramework.Schema.Keys;
 using Evoogle.ApiFramework.Schema.Relationships;
+using Evoogle.ApiFramework.Schema.Versions;
 using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema.Types;
@@ -25,6 +26,7 @@ namespace Evoogle.ApiFramework.Schema.Types;
 /// <param name="apiKeyTypes">
 ///     The collection of named API key types defined for this object type.
 /// </param>
+/// <param name="apiVersionType">The optional version metadata for this object type.</param>
 /// <param name="clrObjectType">The CLR type representing this API object.</param>
 public sealed partial class ApiObjectType
 (
@@ -32,6 +34,7 @@ public sealed partial class ApiObjectType
     ApiObjectTypeOptions? apiOptions,
     IEnumerable<ApiProperty>? apiProperties,
     IEnumerable<ApiNamedKeyType>? apiKeyTypes,
+    ApiVersionType? apiVersionType,
     Type clrObjectType
 ) : ApiNamedType(apiName, clrObjectType)
 {
@@ -69,6 +72,9 @@ public sealed partial class ApiObjectType
     /// <summary>Gets the immutable snapshot of properties defined on this object type.</summary>
     public ImmutableArray<ApiProperty> ApiProperties { get; } =
         [.. apiProperties.EmptyIfNull().Where(x => x is not null)];
+
+    /// <summary>Gets the optional version metadata defined for this object type.</summary>
+    public ApiVersionType? ApiVersionType { get; } = apiVersionType;
 
     /// <summary>
     ///     Gets the immutable snapshot of relationship ends where this object type participates.
@@ -110,6 +116,9 @@ public sealed partial class ApiObjectType
     /// <summary>Indicates whether this object type has any API key types.</summary>
     public bool HasKeyTypes => this.ApiKeyTypes.Length > 0;
 
+    /// <summary>Indicates whether this object type defines version metadata.</summary>
+    public bool HasVersionType => this.ApiVersionType is not null;
+
     /// <summary>Indicates whether this object type participates in any relationships.</summary>
     public bool HasRelationshipEnds => !_apiRelationshipEnds.IsDefaultOrEmpty;
 
@@ -143,6 +152,11 @@ public sealed partial class ApiObjectType
         {
             yield return apiKeyType;
         }
+
+        if (this.ApiVersionType is not null)
+        {
+            yield return this.ApiVersionType;
+        }
     }
 
     /// <inheritdoc />
@@ -167,6 +181,15 @@ public sealed partial class ApiObjectType
         this.ThrowIfFrozen();
 
         this.CompileApiKeyTypes(context);
+    }
+
+    /// <summary>Compiles the optional API version type defined for this object type.</summary>
+    /// <param name="context">The compilation context.</param>
+    internal void CompileVersionType(ApiSchemaCompilationContext context)
+    {
+        ArgumentNullException.ThrowIfNull(context);
+        this.ThrowIfFrozen();
+        this.ApiVersionType?.Compile(context);
     }
     #endregion
 

@@ -18,12 +18,12 @@ public enum ApiKeyPartNameFormat
     None = 0,
 
     /// <summary>
-    ///     Creates names from only the dotted CLR property path.
+    ///     Creates names from only the dotted CLR member path.
     /// </summary>
     ClrPathOnly = 1,
 
     /// <summary>
-    ///     Creates names from the CLR root type and dotted CLR property path.
+    ///     Creates names from the CLR root type and dotted CLR member path.
     /// </summary>
     ClrRootAndPath = 2
 }

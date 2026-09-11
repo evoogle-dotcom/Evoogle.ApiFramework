@@ -162,6 +162,7 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
                     apiOptions: null,
                     apiProperties: [sharedProperty],
                     apiKeyTypes: [],
+                    apiVersionType: null,
                     typeof(SharedTreeObject)
                 );
 
@@ -451,6 +452,7 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
                 apiOptions: null,
                 propertySource,
                 keyTypeSource,
+                apiVersionType: null,
                 typeof(InlineKeyedChild)
             );
             propertySource.Clear();
@@ -526,7 +528,7 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
                 new ApiKeyPathSegment("Other")
             );
             changedSegments.Should().NotEqual(this.KeyPath.ApiSegments);
-            this.KeyPath.ApiSegments.Single().ClrPropertyName.Should()
+            this.KeyPath.ApiSegments.Single().ClrMemberName.Should()
                 .Be(nameof(InlineKeyedChild.Id));
         }
         #endregion
@@ -927,6 +929,7 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
                 )
             ],
             apiKeyTypes: [],
+            apiVersionType: null,
             typeof(InlineChild)
         );
 
@@ -965,6 +968,7 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
             apiOptions: null,
             apiProperties: [keyedProperty],
             apiKeyTypes: [new ApiNamedKeyType("PK_InlineObjectWithKey", [keyedPath])],
+            apiVersionType: null,
             typeof(InlineKeyedChild)
         );
 
@@ -986,6 +990,7 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
                 CreateInlineProperty(nameof(InlineHost.ObjectWithKey), objectTypeWithKey)
             ],
             apiKeyTypes: [],
+            apiVersionType: null,
             typeof(InlineHost)
         );
         var schema = CreateSchema("InlineTypes", [hostType]);
@@ -1011,6 +1016,7 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
             apiOptions: null,
             apiProperties: [],
             apiKeyTypes: [],
+            apiVersionType: null,
             typeof(SharedTreeObject)
         );
         var principalObjectTypeB = new ApiObjectType
@@ -1019,6 +1025,7 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
             apiOptions: null,
             apiProperties: [],
             apiKeyTypes: [],
+            apiVersionType: null,
             typeof(InlineHost)
         );
         var associationObjectType = new ApiObjectType
@@ -1027,6 +1034,7 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
             apiOptions: null,
             apiProperties: [],
             apiKeyTypes: [],
+            apiVersionType: null,
             typeof(InlineKeyedChild)
         );
         var oneToMany = new ApiRelationshipOneToMany

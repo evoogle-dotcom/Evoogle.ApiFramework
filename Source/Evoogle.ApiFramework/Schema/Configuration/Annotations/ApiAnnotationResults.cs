@@ -25,13 +25,13 @@ public sealed record ApiEnumValueAnnotationResult(string? ApiName);
 /// <param name="ApiName">The API name of the key type.</param>
 /// <param name="Order">The zero-based order of the path within the key.</param>
 /// <param name="ClrRootType">The CLR type from which the path begins.</param>
-/// <param name="ClrPropertyNames">The ordered CLR property names in the path.</param>
+/// <param name="ClrMemberNames">The ordered CLR member names in the path.</param>
 public sealed record ApiKeyAnnotationResult
 (
     string ApiName,
     int Order,
     Type ClrRootType,
-    IReadOnlyList<string> ClrPropertyNames
+    IReadOnlyList<string> ClrMemberNames
 );
 
 /// <summary>Describes a one-to-many relationship annotation result.</summary>
