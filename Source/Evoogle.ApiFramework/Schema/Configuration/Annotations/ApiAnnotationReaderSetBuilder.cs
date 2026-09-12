@@ -47,6 +47,7 @@ public sealed class ApiAnnotationReaderSetBuilder
                 IApiPropertyAnnotationReader or
                 IApiEnumValueAnnotationReader or
                 IApiKeyAnnotationReader or
+                IApiVersionAnnotationReader or
                 IApiRelationshipAnnotationReader or
                 IApiTypeDiscoveryAnnotationReader
             ))

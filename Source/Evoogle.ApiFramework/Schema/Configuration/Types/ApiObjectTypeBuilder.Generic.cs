@@ -3,10 +3,10 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using Evoogle.ApiFramework.Schema.Configuration.Keys;
+using Evoogle.ApiFramework.Schema.Configuration.Key;
 using Evoogle.ApiFramework.Schema.Configuration.Relationships;
-using Evoogle.ApiFramework.Schema.Configuration.Versions;
-using Evoogle.ApiFramework.Schema.Keys;
+using Evoogle.ApiFramework.Schema.Configuration.Version;
+using Evoogle.ApiFramework.Schema.Key;
 using Evoogle.ApiFramework.Schema.Types;
 
 namespace Evoogle.ApiFramework.Schema.Configuration.Types;
@@ -90,12 +90,11 @@ public sealed class ApiObjectTypeBuilder<TObject>(ApiSchemaBuilderContext contex
     /// <inheritdoc cref="ApiObjectTypeBuilder.WithVersion"/>
     public new ApiObjectTypeBuilder<TObject> WithVersion
     (
-        Type clrVersionType,
         string clrMemberName,
         Action<ApiVersionTypeBuilder>? configure = null
     )
     {
-        base.WithVersion(clrVersionType, clrMemberName, configure);
+        base.WithVersion(clrMemberName, configure);
         return this;
     }
 

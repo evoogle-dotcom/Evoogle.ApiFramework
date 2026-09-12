@@ -5,7 +5,7 @@
 // See the LICENSE file in the project root for more information.
 using System.Linq.Expressions;
 
-using Evoogle.ApiFramework.Schema.Keys;
+using Evoogle.ApiFramework.Schema.Key;
 
 namespace Evoogle.ApiFramework.Schema.Configuration.Relationships;
 

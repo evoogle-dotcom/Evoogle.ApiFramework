@@ -9,9 +9,9 @@ using System.Diagnostics.CodeAnalysis;
 
 using Evoogle.ApiFramework.Schema.Compilation;
 using Evoogle.ApiFramework.Schema.Compilation.Internal;
-using Evoogle.ApiFramework.Schema.Keys;
+using Evoogle.ApiFramework.Schema.Key;
 using Evoogle.ApiFramework.Schema.Relationships;
-using Evoogle.ApiFramework.Schema.Versions;
+using Evoogle.ApiFramework.Schema.Version;
 using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema.Types;

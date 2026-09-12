@@ -7,12 +7,12 @@
 global using Evoogle.ApiFramework.Schema.Compilation;
 global using Evoogle.ApiFramework.Schema.Compilation.Internal;
 global using Evoogle.ApiFramework.Schema.Configuration.Internal;
-global using Evoogle.ApiFramework.Schema.Configuration.Keys;
+global using Evoogle.ApiFramework.Schema.Configuration.Key;
 global using Evoogle.ApiFramework.Schema.Configuration.Relationships;
 global using Evoogle.ApiFramework.Schema.Configuration.Relationships.Internal;
 global using Evoogle.ApiFramework.Schema.Configuration.Types;
 global using Evoogle.ApiFramework.Schema.Configuration.Types.Internal;
-global using Evoogle.ApiFramework.Schema.Keys;
+global using Evoogle.ApiFramework.Schema.Key;
 global using Evoogle.ApiFramework.Schema.Relationships;
 global using Evoogle.ApiFramework.Schema.Types;
 

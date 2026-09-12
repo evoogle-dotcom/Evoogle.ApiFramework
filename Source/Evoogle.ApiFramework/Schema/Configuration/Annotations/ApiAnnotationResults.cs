@@ -34,6 +34,38 @@ public sealed record ApiKeyAnnotationResult
     IReadOnlyList<string> ClrMemberNames
 );
 
+/// <summary>
+///     Describes a property-backed or repository-backed object-version annotation result.
+/// </summary>
+public sealed record ApiVersionAnnotationResult
+{
+    #region Constructors
+    /// <summary>Initializes a repository-backed version contribution.</summary>
+    /// <param name="clrType">The exact CLR type of the repository-supplied version value.</param>
+    public ApiVersionAnnotationResult(Type clrType)
+    {
+        this.ClrType = clrType;
+    }
+
+    /// <summary>Initializes a property-backed version contribution.</summary>
+    /// <param name="clrMemberName">The CLR member that supplies the version value.</param>
+    public ApiVersionAnnotationResult(string clrMemberName)
+    {
+        this.ClrMemberName = clrMemberName;
+    }
+    #endregion
+
+    #region Properties
+    /// <summary>Gets the repository-backed CLR type, or <c>null</c> when property-backed.</summary>
+    public Type? ClrType { get; }
+
+    /// <summary>
+    ///     Gets the property-backed CLR member name, or <c>null</c> when repository-backed.
+    /// </summary>
+    public string? ClrMemberName { get; }
+    #endregion
+}
+
 /// <summary>Describes a one-to-many relationship annotation result.</summary>
 /// <param name="ApiName">The schema-unique relationship API name.</param>
 /// <param name="PrincipalType">The principal CLR object type.</param>

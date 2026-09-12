@@ -450,7 +450,8 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
     ///     (<see cref="ApiObjectAttribute"/>,
     ///     <see cref="ApiPropertyAttribute"/>,
     ///     <see cref="ApiEnumValueAttribute"/>,
-    ///     <see cref="ApiKeyAttribute"/>, etc.).
+    ///     <see cref="ApiKeyAttribute"/>,
+    ///     <see cref="ApiVersionAttribute"/>, etc.).
     /// </summary>
     /// <returns>The current builder instance.</returns>
     public ApiSchemaBuilder UseDefaultAnnotations()

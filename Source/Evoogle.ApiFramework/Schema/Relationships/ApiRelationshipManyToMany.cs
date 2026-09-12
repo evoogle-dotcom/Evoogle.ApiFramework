@@ -6,7 +6,7 @@
 using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Schema.Compilation;
 using Evoogle.ApiFramework.Schema.Compilation.Internal;
-using Evoogle.ApiFramework.Schema.Keys;
+using Evoogle.ApiFramework.Schema.Key;
 using Evoogle.ApiFramework.Schema.Relationships.Internal;
 using Evoogle.ApiFramework.Schema.Types;
 using Evoogle.Extensions;

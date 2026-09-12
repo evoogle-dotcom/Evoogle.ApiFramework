@@ -428,7 +428,7 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
                 .AddProperty(p => p.X)
                 .AddProperty(p => p.Y)
                 .AddProperty(p => p.Note)
-                .WithVersion(typeof(long), nameof(Point.X)))
+                .WithVersion(nameof(Point.X)))
 
             .AddObject<ScalarsOnly>(o => o
                 .WithOptions(opt => opt.ThrowOnNullKeyPart())
@@ -540,7 +540,7 @@ public static class ApiSchemaBuilderTestsGenericTestFactory
                 .AddProperty(p => p.Revision)
                 .AddProperty(p => p.Name)
                 .AddKey("PK_RelationshipCatalogItem", p => p.Sku, p => p.Revision)
-                .WithVersion(typeof(int), nameof(RelationshipCatalogItem.Revision)))
+                .WithVersion(nameof(RelationshipCatalogItem.Revision)))
 
             // RelationshipOrder
             .AddObject<RelationshipOrder>(o => o

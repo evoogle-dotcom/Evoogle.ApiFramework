@@ -6,7 +6,7 @@
 using System.Text.Json.Serialization;
 
 using Evoogle.ApiFramework.Schema.Json;
-using Evoogle.ApiFramework.Schema.Keys;
+using Evoogle.ApiFramework.Schema.Key;
 using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema;

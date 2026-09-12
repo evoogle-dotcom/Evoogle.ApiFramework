@@ -7,7 +7,7 @@ using System.Text.Json;
 
 using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Schema.TestData;
-using Evoogle.ApiFramework.Schema.Versions;
+using Evoogle.ApiFramework.Schema.Version;
 using Evoogle.NTree;
 using Evoogle.XUnit;
 
@@ -565,7 +565,7 @@ public class ApiSchemaElementTests(ITestOutputHelper output) : XUnitTests(output
             apiOptions: null,
             apiProperties: [apiProperty],
             apiKeyTypes: [],
-            new ApiVersionType(typeof(int), nameof(TreeObject.Id)),
+            new ApiVersionType(nameof(TreeObject.Id)),
             typeof(TreeObject)
         );
         var schema = new ApiSchema

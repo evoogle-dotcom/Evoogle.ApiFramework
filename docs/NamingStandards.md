@@ -21,6 +21,13 @@ use the Google C# naming baseline:
 In prose, use normal English acronyms such as "API" and "CLR" when referring to the
 concept generally. In code identifiers, use `Api` and `Clr`.
 
+## Namespace and Directory Names
+
+Use plural names for namespaces and corresponding directories whose contents are a
+homogeneous collection of peer concepts. Use singular names for namespaces and
+corresponding directories whose contents are heterogeneous and organized around one
+feature or concept.
+
 ## `Api` and `Clr` Prefixes
 
 ApiFramework models two related naming spaces:
@@ -173,6 +180,7 @@ Do not document `ApiName` as just "name" when the distinction from `ClrName` mat
 | Local variable or parameter | `camelCase` |
 | Non-public instance field | `_camelCase` |
 | Acronym inside identifier | Treat as a word: `Api`, `Clr`, `Rpc` |
+| Namespace or directory | Plural for homogeneous contents; singular for heterogeneous contents |
 | API/schema side of an API-vs-CLR boundary | Prefix with `Api` |
 | Canonical schema term such as `ApiName` or `ApiPath` | Prefix with `Api` |
 | CLR/BCL backing concept | Prefix with `Clr` |

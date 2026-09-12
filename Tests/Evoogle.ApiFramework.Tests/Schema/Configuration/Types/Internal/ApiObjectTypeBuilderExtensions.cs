@@ -77,7 +77,6 @@ internal static class ApiObjectTypeBuilderExtensions
         {
             builder.WithVersion
             (
-                apiVersionType.ClrType,
                 clrMemberName,
                 x => x.ConfigureExtensions(apiVersionType)
             );

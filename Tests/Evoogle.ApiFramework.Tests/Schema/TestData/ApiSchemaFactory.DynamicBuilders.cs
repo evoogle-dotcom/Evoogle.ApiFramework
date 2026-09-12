@@ -3,7 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using Evoogle.ApiFramework.Schema.Versions;
+using Evoogle.ApiFramework.Schema.Version;
 using Evoogle.Extension;
 
 namespace Evoogle.ApiFramework.Schema.TestData;
@@ -63,12 +63,23 @@ public static partial class ApiSchemaFactory
     public record ApiKeyPathSegmentDef(string ClrMemberName, List<Type>? ExtensionTypes = null) : ApiSchemaElementDef(ExtensionTypes);
 
     // ApiVersionType
-    public record ApiVersionTypeDef
-    (
-        Type ClrType,
-        string? ClrMemberName = null,
-        List<Type>? ExtensionTypes = null
-    ) : ApiSchemaElementDef(ExtensionTypes);
+    public record ApiVersionTypeDef : ApiSchemaElementDef
+    {
+        public ApiVersionTypeDef(Type clrType, List<Type>? extensionTypes = null)
+            : base(extensionTypes)
+        {
+            this.ClrType = clrType;
+        }
+
+        public ApiVersionTypeDef(string clrMemberName, List<Type>? extensionTypes = null)
+            : base(extensionTypes)
+        {
+            this.ClrMemberName = clrMemberName;
+        }
+
+        public Type? ClrType { get; }
+        public string? ClrMemberName { get; }
+    }
 
     // ApiProperty
     public record ApiPropertyDef
@@ -514,7 +525,9 @@ public static partial class ApiSchemaFactory
 
     private static ApiVersionType BuildApiVersionType(ApiVersionTypeDef def)
     {
-        var apiVersionType = new ApiVersionType(def.ClrType, def.ClrMemberName);
+        var apiVersionType = def.ClrMemberName is not null
+            ? new ApiVersionType(def.ClrMemberName)
+            : new ApiVersionType(def.ClrType!);
 
         AttachExtensions(apiVersionType, def);
 

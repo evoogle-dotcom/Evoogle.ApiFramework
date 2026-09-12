@@ -23,6 +23,9 @@ internal sealed class AnnotationsOnlyPoco
     [ApiProperty(ApiName = "id", IsRequired = true)]
     public int Id { get; set; }
 
+    [ApiVersion]
+    public long Version { get; set; }
+
     [ApiIgnore]
     public string Ignored { get; set; } = string.Empty;
 
@@ -56,3 +59,6 @@ internal enum AnnotationsOnlyEnum
 internal sealed class AnnotationsOnlyDependent;
 
 internal sealed class AnnotationsOnlyAssociation;
+
+[ApiVersion(ClrType = typeof(string))]
+internal sealed class AnnotationsOnlyRepositoryVersionedPoco;

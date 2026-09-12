@@ -4,7 +4,7 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
-using Evoogle.ApiFramework.Schema.Configuration.Keys;
+using Evoogle.ApiFramework.Schema.Configuration.Key;
 
 namespace Evoogle.ApiFramework.Schema.Configuration.Relationships.Internal;
 

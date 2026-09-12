@@ -189,6 +189,8 @@ public sealed partial class ApiProperty : ApiSchemaElement
     public bool IsRequired => this.ApiTypeModifiers.HasFlag(ApiTypeModifiers.Required);
 
     internal bool IsResolved => this.ApiTypeExpression?.IsResolved == true;
+
+    internal Type? ClrMemberType { get; private set; }
     #endregion
 
     #region Object Methods
@@ -420,6 +422,7 @@ public sealed partial class ApiProperty : ApiSchemaElement
                         return;
                     }
 
+                    this.ClrMemberType = clrPropertyInfo.PropertyType;
                     this.CompileClrPropertyGetterAndSetter(context, clrPropertyInfo);
                     return;
 
@@ -447,6 +450,7 @@ public sealed partial class ApiProperty : ApiSchemaElement
                         return;
                     }
 
+                    this.ClrMemberType = clrFieldInfo.FieldType;
                     this.CompileClrFieldGetterAndSetter(context, clrFieldInfo);
                     return;
             }

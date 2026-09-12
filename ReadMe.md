@@ -25,6 +25,7 @@ public sealed class Customer
     [ApiKey]
     public Guid Id { get; set; }
 
+    [ApiVersion]
     public long Version { get; set; }
 
     [ApiRelationship
@@ -48,6 +49,10 @@ Use `ApiSchemaBuilder` when defining schemas in code. The fluent API is designed
 - Prefer expression-based overloads such as `AddProperty(c => c.Name)` and `AddKey("PK_Customer", c => c.Id)` so CLR member names are refactor-safe.
 - Use `WithVersion(c => c.Version)` for a required property-backed version, or
   `WithRepositoryVersion<TVersion>()` when repository metadata supplies it.
+- With default annotations enabled, apply `[ApiVersion]` to a property or field for a
+  property-backed version, or apply `[ApiVersion(ClrType = typeof(TVersion))]` to an object type
+  for a repository-backed version. Member annotations must omit `ClrType`, and the annotation does
+  not register the scalar or property.
 - Use `AddRequiredProperty` or `AddOptionalProperty` only when the API contract should override CLR nullable reference type inference.
 - Configure larger schemas with `IApiObjectTypeConfiguration<T>` and relationship configuration classes when inline lambdas become too large.
 - Use relationship shortcuts for common cases, or the full relationship builders when you need named principal keys, composite keys, or extensions.

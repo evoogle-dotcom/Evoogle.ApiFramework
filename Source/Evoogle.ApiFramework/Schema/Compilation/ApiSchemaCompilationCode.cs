@@ -6,7 +6,7 @@
 using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
 
-using Evoogle.ApiFramework.Schema.Keys;
+using Evoogle.ApiFramework.Schema.Key;
 using Evoogle.ApiFramework.Schema.Relationships;
 using Evoogle.ApiFramework.Schema.Types;
 using Evoogle.Json;
@@ -314,7 +314,7 @@ public enum ApiSchemaCompilationCode
     [EnumMember(Value = "API_VERSION_TYPE_NON_SCALAR_PROPERTY")]
     ApiVersionTypeNonScalarProperty,
 
-    /// <summary>The version type and property use different CLR types.</summary>
+    /// <summary>The version member and scalar API type use different CLR types.</summary>
     [EnumMember(Value = "API_VERSION_TYPE_CLR_TYPE_MISMATCH")]
     ApiVersionTypeClrTypeMismatch,
 
@@ -606,5 +606,11 @@ public enum ApiSchemaCompilationCode
     /// </summary>
     [EnumMember(Value = "API_ANNOTATION_KEY_ORDER_CONFLICT")]
     ApiAnnotationKeyOrderConflict,
+
+    /// <summary>
+    ///     An annotation reader returned multiple valid version declarations for one object type.
+    /// </summary>
+    [EnumMember(Value = "API_ANNOTATION_VERSION_CONFLICT")]
+    ApiAnnotationVersionConflict,
     #endregion
 }

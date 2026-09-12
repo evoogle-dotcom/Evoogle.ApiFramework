@@ -7,7 +7,7 @@ using System.Reflection;
 
 using Evoogle.ApiFramework.Schema.Compilation;
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
-using Evoogle.ApiFramework.Schema.Keys.Internal;
+using Evoogle.ApiFramework.Schema.Key.Internal;
 using Evoogle.ApiFramework.Schema.Types;
 using Evoogle.Reflection;
 
@@ -22,6 +22,7 @@ public sealed class ApiAttributeAnnotationReader :
     IApiPropertyAnnotationReader,
     IApiEnumValueAnnotationReader,
     IApiKeyAnnotationReader,
+    IApiVersionAnnotationReader,
     IApiRelationshipAnnotationReader
 {
     #region IApiTypeAnnotationReader Methods
@@ -63,9 +64,54 @@ public sealed class ApiAttributeAnnotationReader :
     {
         ArgumentNullException.ThrowIfNull(clrType);
 
-        return HasConflictingTypeMarkers(clrType)
-            ? [CreateTypeMarkerConflictDiagnostic(clrType)]
-            : [];
+        var diagnostics = new List<ApiAnnotationReaderDiagnostic>();
+
+        if (HasConflictingTypeMarkers(clrType))
+        {
+            diagnostics.Add(CreateTypeMarkerConflictDiagnostic(clrType));
+        }
+
+        var versionAttribute = clrType.GetCustomAttribute<ApiVersionAttribute>(inherit: true);
+        if (versionAttribute != null && versionAttribute.ClrType == null)
+        {
+            diagnostics.Add
+            (
+                new
+                (
+                    ApiSchemaCompilationCode.ApiAnnotationInvalidContribution,
+                    clrType.FullName ?? clrType.Name,
+                    $"A type-level {nameof(ApiVersionAttribute)} must specify " +
+                    $"{nameof(ApiVersionAttribute.ClrType)}.",
+                    $"Set {nameof(ApiVersionAttribute.ClrType)} to the exact CLR version type."
+                )
+            );
+        }
+
+        foreach (var member in GetPublicInstanceMembers(clrType))
+        {
+            var memberVersionAttribute = member.GetCustomAttribute<ApiVersionAttribute>
+            (
+                inherit: true
+            );
+            if (memberVersionAttribute?.ClrType == null)
+            {
+                continue;
+            }
+
+            diagnostics.Add
+            (
+                new
+                (
+                    ApiSchemaCompilationCode.ApiAnnotationInvalidContribution,
+                    $"{clrType.FullName ?? clrType.Name}.{member.Name}",
+                    $"A member-level {nameof(ApiVersionAttribute)} cannot specify " +
+                    $"{nameof(ApiVersionAttribute.ClrType)}.",
+                    $"Remove {nameof(ApiVersionAttribute.ClrType)} from the member annotation."
+                )
+            );
+        }
+
+        return diagnostics;
     }
     #endregion
 
@@ -189,6 +235,36 @@ public sealed class ApiAttributeAnnotationReader :
                         GetClrPath(keyAttribute, clrType, member.Name)
                     )
                 );
+            }
+        }
+
+        return results;
+    }
+    #endregion
+
+    #region IApiVersionAnnotationReader Methods
+    /// <inheritdoc/>
+    public IReadOnlyList<ApiVersionAnnotationResult> ReadVersionAnnotations(Type clrType)
+    {
+        var results = new List<ApiVersionAnnotationResult>();
+
+        var typeAttribute = clrType.GetCustomAttribute<ApiVersionAttribute>(inherit: true);
+        if (typeAttribute?.ClrType != null)
+        {
+            results.Add(new(typeAttribute.ClrType));
+        }
+
+        foreach (var member in GetPublicInstanceMembers(clrType))
+        {
+            var memberAttribute = member.GetCustomAttribute<ApiVersionAttribute>(inherit: true);
+            if (memberAttribute == null)
+            {
+                continue;
+            }
+
+            if (memberAttribute.ClrType == null)
+            {
+                results.Add(new(member.Name));
             }
         }
 

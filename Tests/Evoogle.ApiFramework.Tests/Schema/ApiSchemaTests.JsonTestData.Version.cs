@@ -3,7 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using Evoogle.ApiFramework.Schema.Versions;
+using Evoogle.ApiFramework.Schema.Version;
 using Evoogle.ApiFramework.TestData;
 
 using static Evoogle.ApiFramework.Schema.TestData.ApiSchemaFactory;
@@ -47,11 +47,7 @@ public partial class ApiSchemaTests
                                 ClrMemberKind: ClrMemberKind.Property
                             )
                         ],
-                        ApiVersionType: new ApiVersionTypeDef
-                        (
-                            ClrType: typeof(int),
-                            ClrMemberName: nameof(Person.Id)
-                        )
+                        ApiVersionType: new ApiVersionTypeDef(nameof(Person.Id))
                     )
                 ]
             ),
@@ -88,7 +84,6 @@ public partial class ApiSchemaTests
                         ],
                         ""ApiKeyTypes"": [],
                         ""ApiVersionType"": {
-                            ""ClrType"": ""System.Int32, System.Private.CoreLib"",
                             ""ClrMemberName"": ""Id""
                         },
                         ""ClrType"": ""Evoogle.ApiFramework.TestData.Person, Evoogle.ApiFramework.Tests""
@@ -115,7 +110,7 @@ public partial class ApiSchemaTests
                     (
                         ApiName: nameof(Empty),
                         ClrType: typeof(Empty),
-                        ApiVersionType: new ApiVersionTypeDef(ClrType: typeof(int))
+                        ApiVersionType: new ApiVersionTypeDef(typeof(int))
                     )
                 ]
             ),

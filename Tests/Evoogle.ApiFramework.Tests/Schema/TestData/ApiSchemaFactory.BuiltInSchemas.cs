@@ -3,7 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using Evoogle.ApiFramework.Schema.Versions;
+using Evoogle.ApiFramework.Schema.Version;
 using Evoogle.ApiFramework.TestData;
 
 namespace Evoogle.ApiFramework.Schema.TestData;
@@ -804,7 +804,6 @@ public static partial class ApiSchemaFactory
         ],
         versionType: new ApiVersionType
         (
-            typeof(int),
             nameof(RelationshipCatalogItem.Revision)
         ));
 
@@ -1016,7 +1015,7 @@ public static partial class ApiSchemaFactory
             P(name: nameof(Point.Y),    expression: TE.ClrRef<long>(),   required: true),
             P(name: nameof(Point.Note), expression: TE.ClrRef<string>(), required: false)
         ],
-        versionType: new ApiVersionType(typeof(long), nameof(Point.X)));
+        versionType: new ApiVersionType(nameof(Point.X)));
 
         var scalarsOnly = O(name: nameof(ScalarsOnly), clr: typeof(ScalarsOnly), options: OO(ApiKeyNullHandling.ThrowOnNull),
         properties:

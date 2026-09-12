@@ -3,12 +3,13 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Schema.Configuration.Annotations;
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
-using Evoogle.ApiFramework.Schema.Configuration.Keys;
+using Evoogle.ApiFramework.Schema.Configuration.Key;
 using Evoogle.ApiFramework.Schema.Configuration.Relationships;
 using Evoogle.ApiFramework.Schema.Configuration.Types.Internal;
-using Evoogle.ApiFramework.Schema.Configuration.Versions;
-using Evoogle.ApiFramework.Schema.Keys;
+using Evoogle.ApiFramework.Schema.Configuration.Version;
+using Evoogle.ApiFramework.Schema.Key;
 using Evoogle.ApiFramework.Schema.Types;
 
 namespace Evoogle.ApiFramework.Schema.Configuration.Types;
@@ -103,24 +104,24 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
         return this;
     }
 
-    /// <summary>Configures a property-backed version using an exact CLR type and member name.</summary>
-    /// <param name="clrVersionType">The exact CLR type of the version value.</param>
+    /// <summary>Configures a property-backed version using a CLR member name.</summary>
     /// <param name="clrMemberName">The CLR member exposed as an API property.</param>
     /// <param name="configure">Optional version metadata configuration.</param>
     /// <returns>The current builder.</returns>
     public ApiObjectTypeBuilder WithVersion
     (
-        Type clrVersionType,
         string clrMemberName,
         Action<ApiVersionTypeBuilder>? configure = null
     )
     {
-        ArgumentNullException.ThrowIfNull(clrVersionType);
         ArgumentException.ThrowIfNullOrWhiteSpace(clrMemberName);
 
-        var builder = new ApiVersionTypeBuilder(clrVersionType, clrMemberName);
-        configure?.Invoke(builder);
-        _state.VersionTypeBuilder = builder;
+        this.ConfigureVersion
+        (
+            new ApiVersionTypeBuilder(clrMemberName),
+            this.Context.CurrentConfigurationSource,
+            configure
+        );
         return this;
     }
 
@@ -136,9 +137,12 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     {
         ArgumentNullException.ThrowIfNull(clrVersionType);
 
-        var builder = new ApiVersionTypeBuilder(clrVersionType, clrMemberName: null);
-        configure?.Invoke(builder);
-        _state.VersionTypeBuilder = builder;
+        this.ConfigureVersion
+        (
+            new ApiVersionTypeBuilder(clrVersionType),
+            this.Context.CurrentConfigurationSource,
+            configure
+        );
         return this;
     }
     #endregion
@@ -278,6 +282,38 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
         {
             builder.AddPath(clrRootType, clrMemberNames);
         }
+    }
+
+    internal void ReplaceVersionFromDataAnnotation(ApiVersionAnnotationResult version)
+    {
+        ArgumentNullException.ThrowIfNull(version);
+
+        this.ConfigureVersion
+        (
+            version.ClrMemberName is not null
+                ? new ApiVersionTypeBuilder(version.ClrMemberName)
+                : new ApiVersionTypeBuilder(version.ClrType!),
+            ApiConfigurationSource.DataAnnotation,
+            configure: null
+        );
+    }
+
+    private void ConfigureVersion
+    (
+        ApiVersionTypeBuilder builder,
+        ApiConfigurationSource configurationSource,
+        Action<ApiVersionTypeBuilder>? configure
+    )
+    {
+        if (_state.VersionConfigurationSource > configurationSource)
+        {
+            return;
+        }
+
+        configure?.Invoke(builder);
+
+        _state.VersionTypeBuilder = builder;
+        _state.VersionConfigurationSource = configurationSource;
     }
 
     /// <summary>

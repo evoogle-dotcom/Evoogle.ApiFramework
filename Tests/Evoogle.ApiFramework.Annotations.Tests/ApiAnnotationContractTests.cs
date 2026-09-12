@@ -270,6 +270,11 @@ public sealed class ApiAnnotationContractTests(ITestOutputHelper output) : XUnit
         },
         new AnnotationConstructorTest
         {
+            Name = $"{nameof(ApiVersionAttribute)} has a parameterless constructor",
+            AnnotationType = typeof(ApiVersionAttribute)
+        },
+        new AnnotationConstructorTest
+        {
             Name = $"{nameof(ApiRelationshipAttribute)} has a parameterless constructor",
             AnnotationType = typeof(ApiRelationshipAttribute)
         },
@@ -366,6 +371,13 @@ public sealed class ApiAnnotationContractTests(ITestOutputHelper output) : XUnit
             Name = $"{nameof(ApiKeyAttribute)}.{nameof(ApiKeyAttribute.ClrPath)} uses init",
             AnnotationType = typeof(ApiKeyAttribute),
             PropertyName = nameof(ApiKeyAttribute.ClrPath)
+        },
+        new AnnotationPropertyInitTest
+        {
+            Name =
+                $"{nameof(ApiVersionAttribute)}.{nameof(ApiVersionAttribute.ClrType)} uses init",
+            AnnotationType = typeof(ApiVersionAttribute),
+            PropertyName = nameof(ApiVersionAttribute.ClrType)
         },
         new AnnotationPropertyInitTest
         {
@@ -671,6 +683,13 @@ public sealed class ApiAnnotationContractTests(ITestOutputHelper output) : XUnit
             Name = $"{nameof(ApiKeyAttribute)}.{nameof(ApiKeyAttribute.ClrPath)} is nullable",
             AnnotationType = typeof(ApiKeyAttribute),
             PropertyName = nameof(ApiKeyAttribute.ClrPath)
+        },
+        new OptionalAnnotationPropertyTest
+        {
+            Name =
+                $"{nameof(ApiVersionAttribute)}.{nameof(ApiVersionAttribute.ClrType)} is nullable",
+            AnnotationType = typeof(ApiVersionAttribute),
+            PropertyName = nameof(ApiVersionAttribute.ClrType)
         },
         new OptionalAnnotationPropertyTest
         {

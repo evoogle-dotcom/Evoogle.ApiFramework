@@ -64,6 +64,7 @@ internal sealed class ApiAnnotationReaderSet
         }
 
         this.ApplyKeyAnnotations(builder);
+        this.ApplyVersionAnnotations(builder);
     }
 
     internal void ApplyScalarTypeAnnotations(ApiScalarTypeBuilder builder)
@@ -499,6 +500,102 @@ internal sealed class ApiAnnotationReaderSet
         return results;
     }
 
+    #endregion
+
+    #region Version Methods
+    private void ApplyVersionAnnotations(ApiObjectTypeBuilder builder)
+    {
+        foreach (var reader in _readers)
+        {
+            if (reader is not IApiVersionAnnotationReader versionReader)
+            {
+                continue;
+            }
+
+            IReadOnlyList<ApiVersionAnnotationResult>? results;
+            try
+            {
+                results = versionReader.ReadVersionAnnotations(builder.ClrType);
+            }
+            catch (Exception exception)
+            {
+                this.AddReaderIssue(versionReader, builder.ClrType, exception);
+                continue;
+            }
+
+            if (results == null)
+            {
+                this.AddInvalidContributionIssue
+                (
+                    versionReader,
+                    builder.ClrType,
+                    "A version annotation reader returned null instead of a result list."
+                );
+                continue;
+            }
+
+            var validResults = new List<ApiVersionAnnotationResult>();
+            foreach (var result in results)
+            {
+                if (result == null)
+                {
+                    this.AddInvalidContributionIssue
+                    (
+                        versionReader,
+                        builder.ClrType,
+                        "A version annotation reader returned a null result."
+                    );
+                    continue;
+                }
+
+                var hasClrType = result.ClrType is not null;
+                var hasClrMemberName = result.ClrMemberName is not null;
+                if (hasClrType == hasClrMemberName ||
+                    hasClrMemberName && string.IsNullOrWhiteSpace(result.ClrMemberName))
+                {
+                    this.AddInvalidContributionIssue
+                    (
+                        versionReader,
+                        builder.ClrType,
+                        "A version annotation contribution must provide exactly one of a CLR " +
+                        "type or a non-empty CLR member name."
+                    );
+                    continue;
+                }
+
+                validResults.Add(result);
+            }
+
+            if (validResults.Count > 1)
+            {
+                this.AddInvalidContributionIssue
+                (
+                    versionReader,
+                    builder.ClrType,
+                    "Version",
+                    "An annotation reader returned multiple valid version declarations for one " +
+                    "object type.",
+                    ApiSchemaCompilationCode.ApiAnnotationVersionConflict
+                );
+                continue;
+            }
+
+            if (validResults.Count == 0)
+            {
+                continue;
+            }
+
+            var version = validResults[0];
+            try
+            {
+                builder.ReplaceVersionFromDataAnnotation(version);
+            }
+            catch (Exception exception)
+            {
+                this.AddInvalidContributionIssue(versionReader, builder.ClrType, exception.Message);
+            }
+        }
+    }
     #endregion
 
     #region Key Methods

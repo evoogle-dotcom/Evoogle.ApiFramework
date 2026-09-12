@@ -5,7 +5,7 @@
 // See the LICENSE file in the project root for more information.
 using System.Text.Json;
 
-using Evoogle.ApiFramework.Schema.Versions;
+using Evoogle.ApiFramework.Schema.Version;
 using Evoogle.Json;
 
 using Microsoft.Extensions.Logging;
@@ -37,6 +37,8 @@ public class ApiVersionTypeJsonConverter(ILogger<ApiVersionTypeJsonConverter>? l
     #region Read Types
     private sealed class ReadState : ExtensibleReadData
     {
+        public bool HasClrMemberName { get; set; }
+        public bool HasClrType { get; set; }
         public string? ClrMemberName { get; set; }
         public Type? ClrType { get; set; }
     }
@@ -61,18 +63,26 @@ public class ApiVersionTypeJsonConverter(ILogger<ApiVersionTypeJsonConverter>? l
         (
             ref Utf8JsonReader reader,
             DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context
-        ) => context.ReadData.ClrMemberName = reader.GetString();
+        )
+        {
+            context.ReadData.HasClrMemberName = true;
+            context.ReadData.ClrMemberName = reader.GetString();
+        }
 
         private static void HandleClrType
         (
             ref Utf8JsonReader reader,
             DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context
-        ) => context.ReadData.ClrType = _typeJsonConverter.Read
-        (
-            ref reader,
-            typeof(Type),
-            context.Options
-        );
+        )
+        {
+            context.ReadData.HasClrType = true;
+            context.ReadData.ClrType = _typeJsonConverter.Read
+            (
+                ref reader,
+                typeof(Type),
+                context.Options
+            );
+        }
     }
     #endregion
 
@@ -113,11 +123,15 @@ public class ApiVersionTypeJsonConverter(ILogger<ApiVersionTypeJsonConverter>? l
     protected override ApiVersionType? CreateValue(IReadContext context)
     {
         var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
-        var value = new ApiVersionType
-        (
-            readContext.ReadData.ClrType!,
-            readContext.ReadData.ClrMemberName
-        );
+        var readData = readContext.ReadData;
+        if (readData.HasClrType == readData.HasClrMemberName)
+        {
+            throw new JsonException($"An {nameof(ApiVersionType)} must contain exactly one of {nameof(ApiVersionType.ClrType)} or {nameof(ApiVersionType.ClrMemberName)}.");
+        }
+
+        var value = readData.HasClrMemberName
+            ? new ApiVersionType(readData.ClrMemberName!)
+            : new ApiVersionType(readData.ClrType!);
 
         AttachExtensions(value, readContext.ReadData.Extensions);
         return value;
@@ -141,19 +155,26 @@ public class ApiVersionTypeJsonConverter(ILogger<ApiVersionTypeJsonConverter>? l
         var writeContext = (DefaultWriteContext<PropertyNames>)context;
         WriteJsonObject(writer, () =>
         {
-            writer.TryWritePropertyWithConverter
-            (
-                writeContext.PropertyNames.ClrType,
-                value.ClrType,
-                writeContext.Options,
-                _typeJsonConverter
-            );
-            writer.TryWritePropertyAsString
-            (
-                writeContext.PropertyNames.ClrMemberName,
-                value.ClrMemberName,
-                writeContext.Options
-            );
+            if (value.IsPropertyBacked)
+            {
+                writer.TryWritePropertyAsString
+                (
+                    writeContext.PropertyNames.ClrMemberName,
+                    value.ClrMemberName,
+                    writeContext.Options
+                );
+            }
+            else
+            {
+                writer.TryWritePropertyWithConverter
+                (
+                    writeContext.PropertyNames.ClrType,
+                    value.ClrRepositoryType,
+                    writeContext.Options,
+                    _typeJsonConverter
+                );
+            }
+
             WriteExtensibleBaseExtensions
             (
                 writer,
