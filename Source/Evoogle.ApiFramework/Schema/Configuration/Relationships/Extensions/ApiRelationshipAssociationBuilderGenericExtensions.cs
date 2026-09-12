@@ -53,7 +53,7 @@ public static class ApiRelationshipAssociationBuilderGenericExtensions
 
     #region WithForeignKey Methods
     /// <summary>
-    ///     Sets the A-side foreign key role's <see cref="ApiKeyType"/> with a single key path using a type-safe expression.
+    ///     Sets the A-side foreign key role's <see cref="ApiKeyDefinition"/> with a single key path using a type-safe expression.
     /// </summary>
     public static ApiRelationshipAssociationBuilder<TAssociation> WithForeignKeyA<TAssociation, TScalar>
     (
@@ -68,7 +68,7 @@ public static class ApiRelationshipAssociationBuilderGenericExtensions
     }
 
     /// <summary>
-    ///     Sets the B-side foreign key role's <see cref="ApiKeyType"/> with a single key path using a type-safe expression.
+    ///     Sets the B-side foreign key role's <see cref="ApiKeyDefinition"/> with a single key path using a type-safe expression.
     /// </summary>
     public static ApiRelationshipAssociationBuilder<TAssociation> WithForeignKeyB<TAssociation, TScalar>
     (

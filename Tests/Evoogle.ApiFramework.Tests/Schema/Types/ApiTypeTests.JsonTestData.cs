@@ -410,7 +410,7 @@ public partial class ApiTypeTests
                         ""ClrMemberKind"": ""Field""
                     }
                 ],
-                ""ApiKeyTypes"": [],
+                ""ApiKeys"": [],
                 ""ClrType"": ""Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Tests""
             }"
         },
@@ -544,7 +544,7 @@ public partial class ApiTypeTests
                         ""ClrMemberKind"": ""Field""
                     }
                 ],
-                ""ApiKeyTypes"": [],
+                ""ApiKeys"": [],
                 ""ClrType"": ""Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Tests""
             }"
         },
@@ -675,7 +675,7 @@ public partial class ApiTypeTests
                         ""ClrMemberKind"": ""Field""
                     }
                 ],
-                ""ApiKeyTypes"": [],
+                ""ApiKeys"": [],
                 ""ClrType"": ""Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Tests"",
                 ""Extensions"": {
                     ""Evoogle.ApiFramework.TestData.GraphQlExtension, Evoogle.ApiFramework.Tests"": {
@@ -738,14 +738,14 @@ public partial class ApiTypeTests
                         ClrMemberKind: ClrMemberKind.Property
                     ),
                 ],
-                ApiKeyTypes:
+                ApiKeys:
                 [
-                    new ApiKeyTypeDef
+                    new ApiKeyDef
                     (
                         ApiName: "PK_Company_Id",
                         ApiKeyPaths: [new ApiKeyPathDef(ClrRootType: typeof(Company), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(Company.Id))])]
                     ),
-                    new ApiKeyTypeDef
+                    new ApiKeyDef
                     (
                         ApiName: "AK_Company_Name",
                         ApiKeyPaths: [new ApiKeyPathDef(ClrRootType: typeof(Company), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(Company.Name))])]
@@ -805,7 +805,7 @@ public partial class ApiTypeTests
                         ""ClrMemberKind"": ""Property""
                     }
                 ],
-                ""ApiKeyTypes"": [
+                ""ApiKeys"": [
                     {
                         ""ApiName"": ""PK_Company_Id"",
                         ""ApiKeyPaths"": [
@@ -949,7 +949,7 @@ public partial class ApiTypeTests
                         ""ClrMemberKind"": ""Field""
                     }
                 ],
-                ""ApiKeyTypes"": [],
+                ""ApiKeys"": [],
                 ""ClrType"": ""Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Tests""
             }"
         },
@@ -1077,7 +1077,7 @@ public partial class ApiTypeTests
                         ""ClrMemberKind"": ""Field""
                     }
                 ],
-                ""ApiKeyTypes"": [],
+                ""ApiKeys"": [],
                 ""ClrType"": ""Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Tests""
             }"
         },
@@ -1202,7 +1202,7 @@ public partial class ApiTypeTests
                         ""ClrMemberKind"": ""Field""
                     }
                 ],
-                ""ApiKeyTypes"": [],
+                ""ApiKeys"": [],
                 ""ClrType"": ""Evoogle.ApiFramework.TestData.ScalarsOnly, Evoogle.ApiFramework.Tests"",
                 ""Extensions"": {
                     ""Evoogle.ApiFramework.TestData.GraphQlExtension, Evoogle.ApiFramework.Tests"": {
@@ -1265,14 +1265,14 @@ public partial class ApiTypeTests
                         ClrMemberKind: ClrMemberKind.Property
                     ),
                 ],
-                ApiKeyTypes:
+                ApiKeys:
                 [
-                    new ApiKeyTypeDef
+                    new ApiKeyDef
                     (
                         ApiName: "PK_Company_Id",
                         ApiKeyPaths: [new ApiKeyPathDef(ClrRootType: typeof(Company), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(Company.Id))])]
                     ),
-                    new ApiKeyTypeDef
+                    new ApiKeyDef
                     (
                         ApiName: "AK_Company_Name",
                         ApiKeyPaths: [new ApiKeyPathDef(ClrRootType: typeof(Company), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(Company.Name))])]
@@ -1328,7 +1328,7 @@ public partial class ApiTypeTests
                         ""ClrMemberKind"": ""Property""
                     }
                 ],
-                ""ApiKeyTypes"": [
+                ""ApiKeys"": [
                     {
                         ""ApiName"": ""PK_Company_Id"",
                         ""ApiKeyPaths"": [

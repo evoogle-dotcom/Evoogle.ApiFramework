@@ -41,7 +41,7 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
 
     #region AddKey Methods
     /// <summary>
-    ///     Adds an <see cref="ApiNamedKeyType"/> definition to the object type.
+    ///     Adds an <see cref="ApiNamedKeyDefinition"/> to the object type.
     /// </summary>
     /// <remarks>
     ///     Key-bound relationship principal ends infer the best compatible key from the corresponding foreign key
@@ -49,16 +49,16 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     ///     <see cref="ApiRelationshipPrincipalEndBuilder.WithPrincipalKey"/> on the principal end builder to
     ///     select a named key explicitly.
     /// </remarks>
-    /// <param name="apiName">The API name of the key type.</param>
-    /// <param name="configure">Optional callback to configure the added key type.</param>
+    /// <param name="apiName">The API name of the key.</param>
+    /// <param name="configure">Optional callback to configure the added key.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiObjectTypeBuilder AddKey(string apiName, Action<ApiKeyTypeBuilder>? configure = null)
+    public ApiObjectTypeBuilder AddKey(string apiName, Action<ApiKeyDefinitionBuilder>? configure = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
 
-        var apiKeyTypeBuilder = this.GetOrAddKeyTypeBuilder(apiName);
+        var apiKeyDefinitionBuilder = this.GetOrAddKeyBuilder(apiName);
 
-        configure?.Invoke(apiKeyTypeBuilder);
+        configure?.Invoke(apiKeyDefinitionBuilder);
 
         return this;
     }
@@ -111,14 +111,14 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     public ApiObjectTypeBuilder WithVersion
     (
         string clrMemberName,
-        Action<ApiVersionTypeBuilder>? configure = null
+        Action<ApiVersionDefinitionBuilder>? configure = null
     )
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(clrMemberName);
 
         this.ConfigureVersion
         (
-            new ApiVersionTypeBuilder(clrMemberName),
+            new ApiVersionDefinitionBuilder(clrMemberName),
             this.Context.CurrentConfigurationSource,
             configure
         );
@@ -132,14 +132,14 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     public ApiObjectTypeBuilder WithRepositoryVersion
     (
         Type clrVersionType,
-        Action<ApiVersionTypeBuilder>? configure = null
+        Action<ApiVersionDefinitionBuilder>? configure = null
     )
     {
         ArgumentNullException.ThrowIfNull(clrVersionType);
 
         this.ConfigureVersion
         (
-            new ApiVersionTypeBuilder(clrVersionType),
+            new ApiVersionDefinitionBuilder(clrVersionType),
             this.Context.CurrentConfigurationSource,
             configure
         );
@@ -164,19 +164,19 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
         var apiProperties = _state.PropertyBuilders
             .Select(b => b.Build(clrObjectType));
 
-        var apiKeyTypes = _state.KeyTypeBuilders.Count > 0
-            ? _state.KeyTypeBuilders.Select(b => b.BuildNamed())
+        var apiKeys = _state.KeyBuilders.Count > 0
+            ? _state.KeyBuilders.Select(b => b.BuildNamed())
             : null;
 
-        var apiVersionType = _state.VersionTypeBuilder?.Build();
+        var apiVersionDefinition = _state.VersionBuilder?.Build();
 
         var apiObjectType = new ApiObjectType
         (
             apiName,
             apiOptions,
             apiProperties,
-            apiKeyTypes,
-            apiVersionType,
+            apiKeys,
+            apiVersionDefinition,
             clrObjectType
         );
 
@@ -205,51 +205,51 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
 
     #region Implementation Methods
     /// <summary>
-    ///     Allows subclasses to add a pre-constructed key type builder without bypassing internal list management.
+    ///     Allows subclasses to add a pre-constructed key definition builder without bypassing internal list management.
     /// </summary>
-    protected void AddKeyTypeBuilderCore(ApiKeyTypeBuilder builder)
+    protected void AddKeyBuilderCore(ApiKeyDefinitionBuilder builder)
     {
         ArgumentNullException.ThrowIfNull(builder);
-        _state.KeyTypeBuilders.Add(builder);
+        _state.KeyBuilders.Add(builder);
     }
 
     /// <summary>Gets an existing named key builder or creates its canonical closed-generic instance.</summary>
-    protected ApiKeyTypeBuilder GetOrAddKeyTypeBuilder(string apiName)
-        => this.GetOrAddKeyTypeBuilderCore(apiName, this.Context.CurrentConfigurationSource);
+    protected ApiKeyDefinitionBuilder GetOrAddKeyBuilder(string apiName)
+        => this.GetOrAddKeyBuilderCore(apiName, this.Context.CurrentConfigurationSource);
 
-    internal ApiKeyTypeBuilder GetOrAddKeyTypeBuilderAtSource
+    internal ApiKeyDefinitionBuilder GetOrAddKeyBuilderAtSource
     (
         string apiName,
         ApiConfigurationSource source
     )
-        => this.GetOrAddKeyTypeBuilderCore(apiName, source);
+        => this.GetOrAddKeyBuilderCore(apiName, source);
 
-    private ApiKeyTypeBuilder GetOrAddKeyTypeBuilderCore
+    private ApiKeyDefinitionBuilder GetOrAddKeyBuilderCore
     (
         string apiName,
         ApiConfigurationSource registrationSource
     )
     {
-        var existing = _state.KeyTypeBuilders.FirstOrDefault(builder => builder.ApiName == apiName);
+        var existing = _state.KeyBuilders.FirstOrDefault(builder => builder.ApiName == apiName);
         if (existing != null)
         {
             return existing;
         }
 
-        var builder = ApiBuilderFactory.CreateClosedGeneric<ApiKeyTypeBuilder>
+        var builder = ApiBuilderFactory.CreateClosedGeneric<ApiKeyDefinitionBuilder>
         (
-            typeof(ApiKeyTypeBuilder<>),
+            typeof(ApiKeyDefinitionBuilder<>),
             this.ClrType,
             apiName
         );
         builder.SetRegistrationSource(registrationSource);
-        _state.KeyTypeBuilders.Add(builder);
+        _state.KeyBuilders.Add(builder);
         return builder;
     }
 
     internal bool HasExplicitKey(string apiKeyName)
     {
-        return _state.KeyTypeBuilders.Any
+        return _state.KeyBuilders.Any
         (
             builder => builder.ApiName == apiKeyName &&
                 builder.RegistrationSource == ApiConfigurationSource.Explicit
@@ -265,7 +265,7 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKeyName, nameof(apiKeyName));
         ArgumentNullException.ThrowIfNull(paths);
 
-        var builder = this.GetOrAddKeyTypeBuilderAtSource
+        var builder = this.GetOrAddKeyBuilderAtSource
         (
             apiKeyName,
             ApiConfigurationSource.DataAnnotation
@@ -291,8 +291,8 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
         this.ConfigureVersion
         (
             version.ClrMemberName is not null
-                ? new ApiVersionTypeBuilder(version.ClrMemberName)
-                : new ApiVersionTypeBuilder(version.ClrType!),
+                ? new ApiVersionDefinitionBuilder(version.ClrMemberName)
+                : new ApiVersionDefinitionBuilder(version.ClrType!),
             ApiConfigurationSource.DataAnnotation,
             configure: null
         );
@@ -300,9 +300,9 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
 
     private void ConfigureVersion
     (
-        ApiVersionTypeBuilder builder,
+        ApiVersionDefinitionBuilder builder,
         ApiConfigurationSource configurationSource,
-        Action<ApiVersionTypeBuilder>? configure
+        Action<ApiVersionDefinitionBuilder>? configure
     )
     {
         if (_state.VersionConfigurationSource > configurationSource)
@@ -312,13 +312,13 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
 
         configure?.Invoke(builder);
 
-        _state.VersionTypeBuilder = builder;
+        _state.VersionBuilder = builder;
         _state.VersionConfigurationSource = configurationSource;
     }
 
     /// <summary>
-    ///     Finds an existing key type builder with the given API name and appends the specified path
-    ///     to it, or creates a new key type builder with that path when no matching key exists.
+    ///     Finds an existing key definition builder with the given API name and appends the specified path
+    ///     to it, or creates a new key definition builder with that path when no matching key exists.
     ///     Used by annotation readers to accumulate composite key paths from multiple
     ///     <see cref="ApiKeyAttribute"/> declarations.
     /// </summary>
@@ -334,7 +334,7 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
         ArgumentNullException.ThrowIfNull(clrMemberNames);
 
         var names = clrMemberNames as IReadOnlyList<string> ?? [.. clrMemberNames];
-        var existing = _state.KeyTypeBuilders.FirstOrDefault(b => b.ApiName == apiKeyName);
+        var existing = _state.KeyBuilders.FirstOrDefault(b => b.ApiName == apiKeyName);
         if (existing != null)
         {
             // Guard against convention + annotation both adding the same path.
@@ -345,7 +345,7 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
         }
         else
         {
-            var builder = this.GetOrAddKeyTypeBuilder(apiKeyName);
+            var builder = this.GetOrAddKeyBuilder(apiKeyName);
             builder.AddPath(clrRootType, names);
         }
     }
@@ -431,24 +431,24 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     }
 
     /// <summary>
-    ///     Adds a key type builder with the given API name only when no existing builder
+    ///     Adds a key definition builder with the given API name only when no existing builder
     ///     with that API name is already present.
     /// </summary>
-    /// <param name="apiKeyName">The API name of the key type to add.</param>
-    /// <param name="configure">Optional callback to configure the new key type builder.</param>
+    /// <param name="apiKeyName">The API name of the key to add.</param>
+    /// <param name="configure">Optional callback to configure the new key definition builder.</param>
     /// <returns>
-    ///     <c>true</c> if the key type was added; <c>false</c> if a key type with that name already existed.
+    ///     <c>true</c> if the key was added; <c>false</c> if a key with that name already existed.
     /// </returns>
-    internal bool AddKeyIfAbsent(string apiKeyName, Action<ApiKeyTypeBuilder>? configure = null)
+    internal bool AddKeyIfAbsent(string apiKeyName, Action<ApiKeyDefinitionBuilder>? configure = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKeyName, nameof(apiKeyName));
 
-        if (_state.KeyTypeBuilders.Any(b => b.ApiName == apiKeyName))
+        if (_state.KeyBuilders.Any(b => b.ApiName == apiKeyName))
         {
             return false;
         }
 
-        var builder = this.GetOrAddKeyTypeBuilder(apiKeyName);
+        var builder = this.GetOrAddKeyBuilder(apiKeyName);
         configure?.Invoke(builder);
         return true;
     }

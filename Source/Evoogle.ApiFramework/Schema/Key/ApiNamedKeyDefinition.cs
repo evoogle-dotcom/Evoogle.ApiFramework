@@ -14,23 +14,23 @@ using Evoogle.Extensions;
 namespace Evoogle.ApiFramework.Schema.Key;
 
 /// <summary>
-///     Defines a named key type declared by an <see cref="ApiObjectType"/>.
+///     Defines a named key definition declared by an <see cref="ApiObjectType"/>.
 /// </summary>
-/// <param name="apiName">The required API name of this key type.</param>
+/// <param name="apiName">The required API name of this key definition.</param>
 /// <param name="apiKeyPaths">
-///     The ordered collection of key paths that compose this key type.
+///     The ordered collection of key paths that compose this key definition.
 /// </param>
-[JsonConverter(typeof(ApiNamedKeyTypeJsonConverter))]
-public sealed class ApiNamedKeyType(string apiName, IEnumerable<ApiKeyPath> apiKeyPaths)
-    : ApiKeyType(apiKeyPaths)
+[JsonConverter(typeof(ApiNamedKeyDefinitionJsonConverter))]
+public sealed class ApiNamedKeyDefinition(string apiName, IEnumerable<ApiKeyPath> apiKeyPaths)
+    : ApiKeyDefinition(apiKeyPaths)
 {
     #region ApiSchemaElement Properties
     /// <inheritdoc/>
-    protected override string ApiElementName => nameof(ApiNamedKeyType);
+    protected override string ApiElementName => nameof(ApiNamedKeyDefinition);
     #endregion
 
-    #region ApiNamedKeyType Properties
-    /// <summary>Gets the required API name for this key type.</summary>
+    #region ApiNamedKeyDefinition Properties
+    /// <summary>Gets the required API name for this key definition.</summary>
     public string ApiName { get; } = apiName;
     #endregion
 
@@ -42,7 +42,7 @@ public sealed class ApiNamedKeyType(string apiName, IEnumerable<ApiKeyPath> apiK
         var apiKeyPathsCount = this.ApiKeyPaths.Length.SafeToString();
         var extensionCount = this.ExtensionCount.SafeToString();
 
-        return $"{nameof(ApiNamedKeyType)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ApiKeyPaths)}Count={apiKeyPathsCount}, {nameof(this.ExtensionCount)}={extensionCount}}}";
+        return $"{nameof(ApiNamedKeyDefinition)} {{{nameof(this.ApiName)}={apiName}, {nameof(this.ApiKeyPaths)}Count={apiKeyPathsCount}, {nameof(this.ExtensionCount)}={extensionCount}}}";
     }
     #endregion
 
@@ -74,7 +74,7 @@ public sealed class ApiNamedKeyType(string apiName, IEnumerable<ApiKeyPath> apiK
         if (isApiNameInvalid)
         {
             var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiNamedKeyTypeInvalidApiName;
+            var code = ApiSchemaCompilationCode.ApiNamedKeyDefinitionInvalidApiName;
             var description = $"{nameof(this.ApiName)} must not be null, empty, or whitespace";
             var remediation = $"Specify a valid {nameof(this.ApiName)} value";
 

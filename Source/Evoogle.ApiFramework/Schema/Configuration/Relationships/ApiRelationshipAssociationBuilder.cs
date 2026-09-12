@@ -16,7 +16,7 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Relationships;
 ///     Fluent builder used to configure the association of an <see cref="ApiRelationshipManyToMany"/>.
 /// </summary>
 /// <remarks>
-///     Set the foreign key role key types with <see cref="WithForeignKeyA"/> and <see cref="WithForeignKeyB"/>.
+///     Set the foreign key role keys with <see cref="WithForeignKeyA"/> and <see cref="WithForeignKeyB"/>.
 ///     When neither side is configured the relationship is treated as purely navigational.
 /// </remarks>
 /// <param name="clrObjectType">The CLR type of the association <see cref="ApiObjectType"/>.</param>
@@ -52,78 +52,78 @@ public class ApiRelationshipAssociationBuilder(Type clrObjectType) : ExtensionBu
 
     #region WithForeignKey Methods
     /// <summary>
-    ///     Sets the A-side foreign key role's <see cref="ApiKeyType"/>, optionally configuring it further.
+    ///     Sets the A-side foreign key role's <see cref="ApiKeyDefinition"/>, optionally configuring it further.
     /// </summary>
-    /// <param name="configure">Optional callback to configure key paths on the key type.</param>
+    /// <param name="configure">Optional callback to configure key paths on the key.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipAssociationBuilder WithForeignKeyA(Action<ApiKeyTypeBuilder>? configure = null)
+    public ApiRelationshipAssociationBuilder WithForeignKeyA(Action<ApiKeyDefinitionBuilder>? configure = null)
     {
         var source = this.CurrentConfigurationSource;
-        if (_state.ForeignKeyTypeBuilderASource == null || source >= _state.ForeignKeyTypeBuilderASource.Value)
+        if (_state.ForeignKeyBuilderASource == null || source >= _state.ForeignKeyBuilderASource.Value)
         {
-            _state.ForeignKeyTypeBuilderA ??= this.CreateForeignKeyTypeBuilder();
-            configure?.Invoke(_state.ForeignKeyTypeBuilderA);
-            _state.ForeignKeyTypeBuilderASource = source;
+            _state.ForeignKeyBuilderA ??= this.CreateForeignKeyBuilder();
+            configure?.Invoke(_state.ForeignKeyBuilderA);
+            _state.ForeignKeyBuilderASource = source;
         }
 
         return this;
     }
 
     /// <summary>
-    ///     Sets the B-side foreign key role's <see cref="ApiKeyType"/>, optionally configuring it further.
+    ///     Sets the B-side foreign key role's <see cref="ApiKeyDefinition"/>, optionally configuring it further.
     /// </summary>
-    /// <param name="configure">Optional callback to configure key paths on the key type.</param>
+    /// <param name="configure">Optional callback to configure key paths on the key.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipAssociationBuilder WithForeignKeyB(Action<ApiKeyTypeBuilder>? configure = null)
+    public ApiRelationshipAssociationBuilder WithForeignKeyB(Action<ApiKeyDefinitionBuilder>? configure = null)
     {
         var source = this.CurrentConfigurationSource;
-        if (_state.ForeignKeyTypeBuilderBSource == null || source >= _state.ForeignKeyTypeBuilderBSource.Value)
+        if (_state.ForeignKeyBuilderBSource == null || source >= _state.ForeignKeyBuilderBSource.Value)
         {
-            _state.ForeignKeyTypeBuilderB ??= this.CreateForeignKeyTypeBuilder();
-            configure?.Invoke(_state.ForeignKeyTypeBuilderB);
-            _state.ForeignKeyTypeBuilderBSource = source;
+            _state.ForeignKeyBuilderB ??= this.CreateForeignKeyBuilder();
+            configure?.Invoke(_state.ForeignKeyBuilderB);
+            _state.ForeignKeyBuilderBSource = source;
         }
 
         return this;
     }
 
-    private ApiKeyTypeBuilder CreateForeignKeyTypeBuilder()
+    private ApiKeyDefinitionBuilder CreateForeignKeyBuilder()
     {
-        return ApiBuilderFactory.CreateClosedGeneric<ApiKeyTypeBuilder>
+        return ApiBuilderFactory.CreateClosedGeneric<ApiKeyDefinitionBuilder>
         (
-            typeof(ApiKeyTypeBuilder<>),
+            typeof(ApiKeyDefinitionBuilder<>),
             this.ClrObjectType,
             (object?)null
         );
     }
 
     /// <summary>
-    ///     Allows subclasses to set a pre-constructed A-side key type builder for the foreign key role.
+    ///     Allows subclasses to set a pre-constructed A-side key builder for the foreign key role.
     /// </summary>
-    protected void SetForeignKeyTypeBuilderACore(ApiKeyTypeBuilder builder)
+    protected void SetForeignKeyBuilderACore(ApiKeyDefinitionBuilder builder)
     {
         ArgumentNullException.ThrowIfNull(builder);
 
         var source = this.CurrentConfigurationSource;
-        if (_state.ForeignKeyTypeBuilderASource == null || source >= _state.ForeignKeyTypeBuilderASource.Value)
+        if (_state.ForeignKeyBuilderASource == null || source >= _state.ForeignKeyBuilderASource.Value)
         {
-            _state.ForeignKeyTypeBuilderA = builder;
-            _state.ForeignKeyTypeBuilderASource = source;
+            _state.ForeignKeyBuilderA = builder;
+            _state.ForeignKeyBuilderASource = source;
         }
     }
 
     /// <summary>
-    ///     Allows subclasses to set a pre-constructed B-side key type builder for the foreign key role.
+    ///     Allows subclasses to set a pre-constructed B-side key builder for the foreign key role.
     /// </summary>
-    protected void SetForeignKeyTypeBuilderBCore(ApiKeyTypeBuilder builder)
+    protected void SetForeignKeyBuilderBCore(ApiKeyDefinitionBuilder builder)
     {
         ArgumentNullException.ThrowIfNull(builder);
 
         var source = this.CurrentConfigurationSource;
-        if (_state.ForeignKeyTypeBuilderBSource == null || source >= _state.ForeignKeyTypeBuilderBSource.Value)
+        if (_state.ForeignKeyBuilderBSource == null || source >= _state.ForeignKeyBuilderBSource.Value)
         {
-            _state.ForeignKeyTypeBuilderB = builder;
-            _state.ForeignKeyTypeBuilderBSource = source;
+            _state.ForeignKeyBuilderB = builder;
+            _state.ForeignKeyBuilderBSource = source;
         }
     }
 
@@ -137,32 +137,32 @@ public class ApiRelationshipAssociationBuilder(Type clrObjectType) : ExtensionBu
 
         if
         (
-            builder._state.ForeignKeyTypeBuilderA != null &&
-            builder._state.ForeignKeyTypeBuilderASource != null &&
+            builder._state.ForeignKeyBuilderA != null &&
+            builder._state.ForeignKeyBuilderASource != null &&
             (
-                _state.ForeignKeyTypeBuilderASource == null ||
-                builder._state.ForeignKeyTypeBuilderASource.Value >=
-                    _state.ForeignKeyTypeBuilderASource.Value
+                _state.ForeignKeyBuilderASource == null ||
+                builder._state.ForeignKeyBuilderASource.Value >=
+                    _state.ForeignKeyBuilderASource.Value
             )
         )
         {
-            _state.ForeignKeyTypeBuilderA = builder._state.ForeignKeyTypeBuilderA;
-            _state.ForeignKeyTypeBuilderASource = builder._state.ForeignKeyTypeBuilderASource;
+            _state.ForeignKeyBuilderA = builder._state.ForeignKeyBuilderA;
+            _state.ForeignKeyBuilderASource = builder._state.ForeignKeyBuilderASource;
         }
 
         if
         (
-            builder._state.ForeignKeyTypeBuilderB != null &&
-            builder._state.ForeignKeyTypeBuilderBSource != null &&
+            builder._state.ForeignKeyBuilderB != null &&
+            builder._state.ForeignKeyBuilderBSource != null &&
             (
-                _state.ForeignKeyTypeBuilderBSource == null ||
-                builder._state.ForeignKeyTypeBuilderBSource.Value >=
-                    _state.ForeignKeyTypeBuilderBSource.Value
+                _state.ForeignKeyBuilderBSource == null ||
+                builder._state.ForeignKeyBuilderBSource.Value >=
+                    _state.ForeignKeyBuilderBSource.Value
             )
         )
         {
-            _state.ForeignKeyTypeBuilderB = builder._state.ForeignKeyTypeBuilderB;
-            _state.ForeignKeyTypeBuilderBSource = builder._state.ForeignKeyTypeBuilderBSource;
+            _state.ForeignKeyBuilderB = builder._state.ForeignKeyBuilderB;
+            _state.ForeignKeyBuilderBSource = builder._state.ForeignKeyBuilderBSource;
         }
     }
     #endregion
@@ -181,8 +181,8 @@ public class ApiRelationshipAssociationBuilder(Type clrObjectType) : ExtensionBu
     /// </summary>
     internal ApiRelationshipAssociation Build()
     {
-        var fkA = _state.ForeignKeyTypeBuilderA?.Build();
-        var fkB = _state.ForeignKeyTypeBuilderB?.Build();
+        var fkA = _state.ForeignKeyBuilderA?.Build();
+        var fkB = _state.ForeignKeyBuilderB?.Build();
 
         var apiRelationshipAssociation = fkA != null && fkB != null
             ? new ApiRelationshipAssociation(_clrObjectType, fkA, fkB)

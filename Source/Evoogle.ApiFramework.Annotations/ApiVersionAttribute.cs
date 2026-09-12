@@ -29,7 +29,7 @@ public sealed class ApiVersionAttribute : Attribute
     /// <summary>
     ///     Gets the exact CLR type of a repository-supplied version value. A type-level annotation
     ///     must provide this value. A member-level annotation must omit it because the member and
-    ///     its scalar API property determine the version type.
+    ///     its scalar API property determine the version definition.
     /// </summary>
     public Type? ClrType { get; init; }
     #endregion

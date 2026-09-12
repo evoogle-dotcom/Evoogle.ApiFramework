@@ -54,7 +54,7 @@ public static class ApiRelationshipDependentEndBuilderGenericExtensions
 
     #region WithForeignKey Methods
     /// <summary>
-    ///     Sets the foreign key role's <see cref="ApiKeyType"/> with a single key path using a type-safe expression.
+    ///     Sets the foreign key role's <see cref="ApiKeyDefinition"/> with a single key path using a type-safe expression.
     /// </summary>
     public static ApiRelationshipDependentEndBuilder<TDependent> WithForeignKey<TDependent, TScalar>
     (
@@ -69,7 +69,7 @@ public static class ApiRelationshipDependentEndBuilderGenericExtensions
     }
 
     /// <summary>
-    ///     Sets the foreign key role's <see cref="ApiKeyType"/> with two key paths using type-safe expressions.
+    ///     Sets the foreign key role's <see cref="ApiKeyDefinition"/> with two key paths using type-safe expressions.
     /// </summary>
     public static ApiRelationshipDependentEndBuilder<TDependent> WithForeignKey<TDependent, TScalar1, TScalar2>
     (
@@ -88,7 +88,7 @@ public static class ApiRelationshipDependentEndBuilderGenericExtensions
     }
 
     /// <summary>
-    ///     Sets the foreign key role's <see cref="ApiKeyType"/> with three key paths using type-safe expressions.
+    ///     Sets the foreign key role's <see cref="ApiKeyDefinition"/> with three key paths using type-safe expressions.
     /// </summary>
     public static ApiRelationshipDependentEndBuilder<TDependent> WithForeignKey<TDependent, TScalar1, TScalar2, TScalar3>
     (
@@ -110,7 +110,7 @@ public static class ApiRelationshipDependentEndBuilderGenericExtensions
     }
 
     /// <summary>
-    ///     Sets the foreign key role's <see cref="ApiKeyType"/> with four key paths using type-safe expressions.
+    ///     Sets the foreign key role's <see cref="ApiKeyDefinition"/> with four key paths using type-safe expressions.
     /// </summary>
     public static ApiRelationshipDependentEndBuilder<TDependent> WithForeignKey<TDependent, TScalar1, TScalar2, TScalar3, TScalar4>
     (
@@ -135,7 +135,7 @@ public static class ApiRelationshipDependentEndBuilderGenericExtensions
     }
 
     /// <summary>
-    ///     Sets the foreign key role's <see cref="ApiKeyType"/> with a single key path rooted at <typeparamref name="TRoot"/>.
+    ///     Sets the foreign key role's <see cref="ApiKeyDefinition"/> with a single key path rooted at <typeparamref name="TRoot"/>.
     /// </summary>
     public static ApiRelationshipDependentEndBuilder WithForeignKeyFrom<TRoot>
     (
@@ -151,7 +151,7 @@ public static class ApiRelationshipDependentEndBuilderGenericExtensions
     }
 
     /// <summary>
-    ///     Sets the foreign key role's <see cref="ApiKeyType"/> with a single key path rooted at <typeparamref name="TPathRoot"/>.
+    ///     Sets the foreign key role's <see cref="ApiKeyDefinition"/> with a single key path rooted at <typeparamref name="TPathRoot"/>.
     /// </summary>
     public static ApiRelationshipDependentEndBuilder<TDependent> WithForeignKeyFrom<TDependent, TPathRoot>
     (

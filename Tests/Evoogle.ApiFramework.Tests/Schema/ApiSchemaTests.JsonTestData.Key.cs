@@ -56,9 +56,9 @@ public partial class ApiSchemaTests
                                 ClrMemberKind: ClrMemberKind.Property
                             )
                         ],
-                        ApiKeyTypes:
+                        ApiKeys:
                         [
-                            new ApiKeyTypeDef
+                            new ApiKeyDef
                             (
                                 ApiName: "PK_KeyOneScalarPart",
                                 ApiKeyPaths:
@@ -66,7 +66,7 @@ public partial class ApiSchemaTests
                                     new ApiKeyPathDef(ClrRootType: typeof(KeyOneScalarPart), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyOneScalarPart.Id))])
                                 ]
                             ),
-                            new ApiKeyTypeDef
+                            new ApiKeyDef
                             (
                                 ApiName: "AK_KeyOneScalarPart",
                                 ApiKeyPaths:
@@ -124,7 +124,7 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PK_KeyOneScalarPart"",
                                 ""ApiKeyPaths"": [
@@ -199,9 +199,9 @@ public partial class ApiSchemaTests
                                 ClrMemberKind: ClrMemberKind.Property
                             )
                         ],
-                        ApiKeyTypes:
+                        ApiKeys:
                         [
-                            new ApiKeyTypeDef
+                            new ApiKeyDef
                             (
                                 ApiName: "PK_KeyTwoScalarPartComposite",
                                 ApiKeyPaths:
@@ -270,7 +270,7 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PK_KeyTwoScalarPartComposite"",
                                 ""ApiKeyPaths"": [
@@ -353,9 +353,9 @@ public partial class ApiSchemaTests
                                 ClrMemberKind: ClrMemberKind.Property
                             )
                         ],
-                        ApiKeyTypes:
+                        ApiKeys:
                         [
-                            new ApiKeyTypeDef
+                            new ApiKeyDef
                             (
                                 ApiName: "PK_KeyThreeScalarPartComposite",
                                 ApiKeyPaths:
@@ -440,7 +440,7 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PK_KeyThreeScalarPartComposite"",
                                 ""ApiKeyPaths"": [
@@ -505,9 +505,9 @@ public partial class ApiSchemaTests
                                 ClrMemberKind: ClrMemberKind.Property
                             )
                         ],
-                        ApiKeyTypes:
+                        ApiKeys:
                         [
-                            new ApiKeyTypeDef
+                            new ApiKeyDef
                             (
                                 ApiName: "PK_KeyNestedPart",
                                 ApiKeyPaths:
@@ -540,9 +540,9 @@ public partial class ApiSchemaTests
                                 ClrMemberKind: ClrMemberKind.Property
                             )
                         ],
-                        ApiKeyTypes:
+                        ApiKeys:
                         [
-                            new ApiKeyTypeDef
+                            new ApiKeyDef
                             (
                                 ApiName: "PK_KeyNestedComposite",
                                 ApiKeyPaths:
@@ -601,7 +601,7 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PK_KeyNestedPart"",
                                 ""ApiKeyPaths"": [
@@ -638,7 +638,7 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PK_KeyNestedComposite"",
                                 ""ApiKeyPaths"": [
@@ -724,9 +724,9 @@ public partial class ApiSchemaTests
                                 ClrMemberKind: ClrMemberKind.Property
                             )
                         ],
-                        ApiKeyTypes:
+                        ApiKeys:
                         [
-                            new ApiKeyTypeDef
+                            new ApiKeyDef
                             (
                                 ApiName: "PK_KeyOwner",
                                 ApiKeyPaths:
@@ -759,9 +759,9 @@ public partial class ApiSchemaTests
                                 ClrMemberKind: ClrMemberKind.Property
                             )
                         ],
-                        ApiKeyTypes:
+                        ApiKeys:
                         [
-                            new ApiKeyTypeDef
+                            new ApiKeyDef
                             (
                                 ApiName: "PK_KeyOwnedComposite",
                                 ApiKeyPaths:
@@ -787,9 +787,9 @@ public partial class ApiSchemaTests
                                 ClrMemberKind: ClrMemberKind.Property
                             )
                         ],
-                        ApiKeyTypes:
+                        ApiKeys:
                         [
-                            new ApiKeyTypeDef
+                            new ApiKeyDef
                             (
                                 ApiName: "PK_KeyOwnedDependent",
                                 ApiKeyPaths:
@@ -847,7 +847,7 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PK_KeyOwnedComposite"",
                                 ""ApiKeyPaths"": [
@@ -878,7 +878,7 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PK_KeyOwnedDependent"",
                                 ""ApiKeyPaths"": [
@@ -943,7 +943,7 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PK_KeyOwner"",
                                 ""ApiKeyPaths"": [
@@ -1007,9 +1007,9 @@ public partial class ApiSchemaTests
                                 ClrMemberKind: ClrMemberKind.Property
                             )
                         ],
-                        ApiKeyTypes:
+                        ApiKeys:
                         [
-                            new ApiKeyTypeDef
+                            new ApiKeyDef
                             (
                                 ApiName: "PK_KeyOneScalarPart",
                                 ApiKeyPaths:
@@ -1017,7 +1017,7 @@ public partial class ApiSchemaTests
                                     new ApiKeyPathDef(ClrRootType: typeof(KeyOneScalarPart), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyOneScalarPart.Id))])
                                 ]
                             ),
-                            new ApiKeyTypeDef
+                            new ApiKeyDef
                             (
                                 ApiName: "AK_KeyOneScalarPart",
                                 ApiKeyPaths:
@@ -1058,9 +1058,9 @@ public partial class ApiSchemaTests
                                 ClrMemberKind: ClrMemberKind.Property
                             )
                         ],
-                        ApiKeyTypes:
+                        ApiKeys:
                         [
-                            new ApiKeyTypeDef
+                            new ApiKeyDef
                             (
                                 ApiName: "PK_KeyTwoScalarPartComposite",
                                 ApiKeyPaths:
@@ -1110,9 +1110,9 @@ public partial class ApiSchemaTests
                                 ClrMemberKind: ClrMemberKind.Property
                             )
                         ],
-                        ApiKeyTypes:
+                        ApiKeys:
                         [
-                            new ApiKeyTypeDef
+                            new ApiKeyDef
                             (
                                 ApiName: "PK_KeyThreeScalarPartComposite",
                                 ApiKeyPaths:
@@ -1147,9 +1147,9 @@ public partial class ApiSchemaTests
                                 ClrMemberKind: ClrMemberKind.Property
                             )
                         ],
-                        ApiKeyTypes:
+                        ApiKeys:
                         [
-                            new ApiKeyTypeDef
+                            new ApiKeyDef
                             (
                                 ApiName: "PK_KeyNestedPart",
                                 ApiKeyPaths:
@@ -1182,9 +1182,9 @@ public partial class ApiSchemaTests
                                 ClrMemberKind: ClrMemberKind.Property
                             )
                         ],
-                        ApiKeyTypes:
+                        ApiKeys:
                         [
-                            new ApiKeyTypeDef
+                            new ApiKeyDef
                             (
                                 ApiName: "PK_KeyNestedComposite",
                                 ApiKeyPaths:
@@ -1242,9 +1242,9 @@ public partial class ApiSchemaTests
                                 ClrMemberKind: ClrMemberKind.Property
                             )
                         ],
-                        ApiKeyTypes:
+                        ApiKeys:
                         [
-                            new ApiKeyTypeDef
+                            new ApiKeyDef
                             (
                                 ApiName: "PK_KeyOwner",
                                 ApiKeyPaths:
@@ -1277,9 +1277,9 @@ public partial class ApiSchemaTests
                                 ClrMemberKind: ClrMemberKind.Property
                             )
                         ],
-                        ApiKeyTypes:
+                        ApiKeys:
                         [
-                            new ApiKeyTypeDef
+                            new ApiKeyDef
                             (
                                 ApiName: "PK_KeyOwnedComposite",
                                 ApiKeyPaths:
@@ -1305,9 +1305,9 @@ public partial class ApiSchemaTests
                                 ClrMemberKind: ClrMemberKind.Property
                             )
                         ],
-                        ApiKeyTypes:
+                        ApiKeys:
                         [
-                            new ApiKeyTypeDef
+                            new ApiKeyDef
                             (
                                 ApiName: "PK_KeyOwnedDependent",
                                 ApiKeyPaths:
@@ -1370,7 +1370,7 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PK_KeyNestedPart"",
                                 ""ApiKeyPaths"": [
@@ -1407,7 +1407,7 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PK_KeyNestedComposite"",
                                 ""ApiKeyPaths"": [
@@ -1447,7 +1447,7 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PK_KeyOneScalarPart"",
                                 ""ApiKeyPaths"": [
@@ -1492,7 +1492,7 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PK_KeyOwnedComposite"",
                                 ""ApiKeyPaths"": [
@@ -1523,7 +1523,7 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PK_KeyOwnedDependent"",
                                 ""ApiKeyPaths"": [
@@ -1588,7 +1588,7 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PK_KeyOwner"",
                                 ""ApiKeyPaths"": [
@@ -1645,7 +1645,7 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PK_KeyThreeScalarPartComposite"",
                                 ""ApiKeyPaths"": [
@@ -1698,7 +1698,7 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PK_KeyTwoScalarPartComposite"",
                                 ""ApiKeyPaths"": [

@@ -42,7 +42,7 @@ public sealed class ApiRelationshipOneToManyBuilder(string apiName)
     ///     Configures the principal end of the 1:M relationship using the specified CLR type.
     /// </summary>
     /// <param name="clrPrincipalType">The CLR type of the principal object.</param>
-    /// <param name="configure">Optional callback to configure principal key type selection and extensions.</param>
+    /// <param name="configure">Optional callback to configure principal key selection and extensions.</param>
     /// <returns>The current builder instance.</returns>
     public ApiRelationshipOneToManyBuilder From(Type clrPrincipalType, Action<ApiRelationshipPrincipalEndBuilder>? configure = null)
     {
@@ -87,20 +87,20 @@ public sealed class ApiRelationshipOneToManyBuilder(string apiName)
 
     /// <summary>
     ///     Configures the principal end of the 1:M relationship using the specified CLR type,
-    ///     and selects the named principal key type for the relationship.
+    ///     and selects the named principal key for the relationship.
     /// </summary>
     /// <param name="clrPrincipalType">The CLR type of the principal object.</param>
-    /// <param name="apiPrincipalKeyTypeName">The name of the principal key type to use for the relationship.</param>
+    /// <param name="apiPrincipalKeyName">The name of the principal key to use for the relationship.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipOneToManyBuilder From(Type clrPrincipalType, string apiPrincipalKeyTypeName)
+    public ApiRelationshipOneToManyBuilder From(Type clrPrincipalType, string apiPrincipalKeyName)
     {
         ArgumentNullException.ThrowIfNull(clrPrincipalType);
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiPrincipalKeyTypeName, nameof(apiPrincipalKeyTypeName));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiPrincipalKeyName, nameof(apiPrincipalKeyName));
 
         return this.From
         (
             clrPrincipalType,
-            builder => builder.WithPrincipalKey(apiPrincipalKeyTypeName)
+            builder => builder.WithPrincipalKey(apiPrincipalKeyName)
         );
     }
 

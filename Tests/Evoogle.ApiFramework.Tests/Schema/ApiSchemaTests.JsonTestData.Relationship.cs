@@ -66,9 +66,9 @@ public partial class ApiSchemaTests
                                 ClrMemberKind: ClrMemberKind.Property
                             )
                         ],
-                        ApiKeyTypes:
+                        ApiKeys:
                         [
-                            new ApiKeyTypeDef
+                            new ApiKeyDef
                             (
                                 ApiName: "PK_RelationshipUser_Id",
                                 ApiKeyPaths:
@@ -95,9 +95,9 @@ public partial class ApiSchemaTests
                                 ClrMemberKind: ClrMemberKind.Property
                             ),
                         ],
-                        ApiKeyTypes:
+                        ApiKeys:
                         [
-                            new ApiKeyTypeDef
+                            new ApiKeyDef
                             (
                                 ApiName: "PK_RelationshipUserRef_UserId",
                                 ApiKeyPaths:
@@ -148,9 +148,9 @@ public partial class ApiSchemaTests
                                 ClrMemberKind: ClrMemberKind.Property
                             )
                         ],
-                        ApiKeyTypes:
+                        ApiKeys:
                         [
-                            new ApiKeyTypeDef
+                            new ApiKeyDef
                             (
                                 ApiName: "PK_RelationshipUserProfile_UserId",
                                 ApiKeyPaths:
@@ -158,7 +158,7 @@ public partial class ApiSchemaTests
                                     new ApiKeyPathDef(ClrRootType: typeof(RelationshipUserProfile), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(RelationshipUserProfile.UserId))])
                                 ]
                             ),
-                            new ApiKeyTypeDef
+                            new ApiKeyDef
                             (
                                 ApiName: "AK_RelationshipUserProfile_UserRef",
                                 ApiKeyPaths:
@@ -182,7 +182,7 @@ public partial class ApiSchemaTests
                         DependentEnd: new ApiRelationshipDependentEndDef
                         (
                             ClrObjectType: typeof(RelationshipUserProfile),
-                            ApiForeignKeyType: new ApiKeyTypeDef
+                            ApiForeignKey: new ApiKeyDef
                             (
                                 ApiName: "FK_User_UserProfile_UserId",
                                 ApiKeyPaths: [new ApiKeyPathDef(ClrRootType: typeof(RelationshipUserProfile), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(RelationshipUserProfile.UserId))])]
@@ -202,7 +202,7 @@ public partial class ApiSchemaTests
                         DependentEnd: new ApiRelationshipDependentEndDef
                         (
                             ClrObjectType: typeof(RelationshipUserProfile),
-                            ApiForeignKeyType: new ApiKeyTypeDef
+                            ApiForeignKey: new ApiKeyDef
                             (
                                 ApiName: "FK_User_UserProfile_UserRef_UserId",
                                 ApiKeyPaths: [new ApiKeyPathDef(ClrRootType: typeof(RelationshipUserProfile), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(RelationshipUserProfile.UserRef)), new ApiKeyPathSegmentDef(ClrMemberName: nameof(RelationshipUserRef.UserId))])]
@@ -268,7 +268,7 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PK_RelationshipUser_Id"",
                                 ""ApiKeyPaths"": [
@@ -325,7 +325,7 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PK_RelationshipUserProfile_UserId"",
                                 ""ApiKeyPaths"": [
@@ -360,7 +360,7 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PK_RelationshipUserRef_UserId"",
                                 ""ApiKeyPaths"": [
@@ -382,7 +382,7 @@ public partial class ApiSchemaTests
                         },
                         ""ApiDependentEnd"": {
                             ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipUserProfile,Evoogle.ApiFramework.Tests"",
-                            ""ApiForeignKeyType"": {
+                            ""ApiForeignKey"": {
                                 ""ApiKeyPaths"": [
                                     {
                                         ""ClrPath"": ""UserRef.UserId""
@@ -400,7 +400,7 @@ public partial class ApiSchemaTests
                         },
                         ""ApiDependentEnd"": {
                             ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipUserProfile,Evoogle.ApiFramework.Tests"",
-                            ""ApiForeignKeyType"": {
+                            ""ApiForeignKey"": {
                                 ""ApiKeyPaths"": [
                                     {
                                         ""ClrPath"": ""UserId""
@@ -474,9 +474,9 @@ public partial class ApiSchemaTests
                                 ClrMemberKind: ClrMemberKind.Property
                             ),
                         ],
-                        ApiKeyTypes:
+                        ApiKeys:
                         [
-                            new ApiKeyTypeDef
+                            new ApiKeyDef
                             (
                                 ApiName: "PK_RelationshipUser_Id",
                                 ApiKeyPaths:
@@ -503,9 +503,9 @@ public partial class ApiSchemaTests
                                 ClrMemberKind: ClrMemberKind.Property
                             ),
                         ],
-                        ApiKeyTypes:
+                        ApiKeys:
                         [
-                            new ApiKeyTypeDef
+                            new ApiKeyDef
                             (
                                 ApiName: "PK_RelationshipUserRef_UserId",
                                 ApiKeyPaths:
@@ -580,9 +580,9 @@ public partial class ApiSchemaTests
                                 ClrMemberKind: ClrMemberKind.Property
                             )
                         ],
-                        ApiKeyTypes:
+                        ApiKeys:
                         [
-                            new ApiKeyTypeDef
+                            new ApiKeyDef
                             (
                                 ApiName: "PK_RelationshipPost_Id",
                                 ApiKeyPaths:
@@ -609,9 +609,9 @@ public partial class ApiSchemaTests
                                 ClrMemberKind: ClrMemberKind.Property
                             ),
                         ],
-                        ApiKeyTypes:
+                        ApiKeys:
                         [
-                            new ApiKeyTypeDef
+                            new ApiKeyDef
                             (
                                 ApiName: "PK_RelationshipPostRef_PostId",
                                 ApiKeyPaths:
@@ -670,9 +670,9 @@ public partial class ApiSchemaTests
                                 ClrMemberKind: ClrMemberKind.Property
                             ),
                         ],
-                        ApiKeyTypes:
+                        ApiKeys:
                         [
-                            new ApiKeyTypeDef
+                            new ApiKeyDef
                             (
                                 ApiName: "PK_RelationshipComment_Id",
                                 ApiKeyPaths:
@@ -696,7 +696,7 @@ public partial class ApiSchemaTests
                         DependentEnd: new ApiRelationshipDependentEndDef
                         (
                             ClrObjectType: typeof(RelationshipPost),
-                            ApiForeignKeyType: new ApiKeyTypeDef
+                            ApiForeignKey: new ApiKeyDef
                             (
                                 ApiName: "FK_User_Post_AuthorUserId",
                                 ApiKeyPaths: [new ApiKeyPathDef(ClrRootType: typeof(RelationshipPost), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(RelationshipPost.AuthorUserId))])]
@@ -716,7 +716,7 @@ public partial class ApiSchemaTests
                         DependentEnd: new ApiRelationshipDependentEndDef
                         (
                             ClrObjectType: typeof(RelationshipPost),
-                            ApiForeignKeyType: new ApiKeyTypeDef
+                            ApiForeignKey: new ApiKeyDef
                             (
                                 ApiName: "FK_User_Post_AuthorUserRef_UserId",
                                 ApiKeyPaths: [new ApiKeyPathDef(ClrRootType: typeof(RelationshipPost), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(RelationshipPost.AuthorUserRef)), new ApiKeyPathSegmentDef(ClrMemberName: nameof(RelationshipUserRef.UserId))])]
@@ -736,7 +736,7 @@ public partial class ApiSchemaTests
                         DependentEnd: new ApiRelationshipDependentEndDef
                         (
                             ClrObjectType: typeof(RelationshipComment),
-                            ApiForeignKeyType: new ApiKeyTypeDef
+                            ApiForeignKey: new ApiKeyDef
                             (
                                 ApiName: "FK_Post_Comment_PostId",
                                 ApiKeyPaths: [new ApiKeyPathDef(ClrRootType: typeof(RelationshipComment), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(RelationshipComment.PostId))])]
@@ -756,7 +756,7 @@ public partial class ApiSchemaTests
                         DependentEnd: new ApiRelationshipDependentEndDef
                         (
                             ClrObjectType: typeof(RelationshipComment),
-                            ApiForeignKeyType: new ApiKeyTypeDef
+                            ApiForeignKey: new ApiKeyDef
                             (
                                 ApiName: "FK_Post_Comment_PostRef_PostId",
                                 ApiKeyPaths: [new ApiKeyPathDef(ClrRootType: typeof(RelationshipComment), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(RelationshipComment.PostRef)), new ApiKeyPathSegmentDef(ClrMemberName: nameof(RelationshipPostRef.PostId))])]
@@ -842,7 +842,7 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PK_RelationshipComment_Id"",
                                 ""ApiKeyPaths"": [
@@ -926,7 +926,7 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PK_RelationshipPost_Id"",
                                 ""ApiKeyPaths"": [
@@ -953,7 +953,7 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PK_RelationshipPostRef_PostId"",
                                 ""ApiKeyPaths"": [
@@ -1007,7 +1007,7 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PK_RelationshipUser_Id"",
                                 ""ApiKeyPaths"": [
@@ -1034,7 +1034,7 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PK_RelationshipUserRef_UserId"",
                                 ""ApiKeyPaths"": [
@@ -1056,7 +1056,7 @@ public partial class ApiSchemaTests
                         },
                         ""ApiDependentEnd"": {
                             ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipComment,Evoogle.ApiFramework.Tests"",
-                            ""ApiForeignKeyType"": {
+                            ""ApiForeignKey"": {
                                 ""ApiKeyPaths"": [
                                     {
                                         ""ClrPath"": ""PostRef.PostId""
@@ -1074,7 +1074,7 @@ public partial class ApiSchemaTests
                         },
                         ""ApiDependentEnd"": {
                             ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipComment,Evoogle.ApiFramework.Tests"",
-                            ""ApiForeignKeyType"": {
+                            ""ApiForeignKey"": {
                                 ""ApiKeyPaths"": [
                                     {
                                         ""ClrPath"": ""PostId""
@@ -1092,7 +1092,7 @@ public partial class ApiSchemaTests
                         },
                         ""ApiDependentEnd"": {
                             ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipPost,Evoogle.ApiFramework.Tests"",
-                            ""ApiForeignKeyType"": {
+                            ""ApiForeignKey"": {
                                 ""ApiKeyPaths"": [
                                     {
                                         ""ClrPath"": ""AuthorUserRef.UserId""
@@ -1110,7 +1110,7 @@ public partial class ApiSchemaTests
                         },
                         ""ApiDependentEnd"": {
                             ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipPost,Evoogle.ApiFramework.Tests"",
-                            ""ApiForeignKeyType"": {
+                            ""ApiForeignKey"": {
                                 ""ApiKeyPaths"": [
                                     {
                                         ""ClrPath"": ""AuthorUserId""
@@ -1184,9 +1184,9 @@ public partial class ApiSchemaTests
                                 ClrMemberKind: ClrMemberKind.Property
                             )
                         ],
-                        ApiKeyTypes:
+                        ApiKeys:
                         [
-                            new ApiKeyTypeDef
+                            new ApiKeyDef
                             (
                                 ApiName: "PK_RelationshipPost_Id",
                                 ApiKeyPaths:
@@ -1237,9 +1237,9 @@ public partial class ApiSchemaTests
                                 ClrMemberKind: ClrMemberKind.Property
                             )
                         ],
-                        ApiKeyTypes:
+                        ApiKeys:
                         [
-                            new ApiKeyTypeDef
+                            new ApiKeyDef
                             (
                                 ApiName: "PK_RelationshipTag_Id",
                                 ApiKeyPaths:
@@ -1274,9 +1274,9 @@ public partial class ApiSchemaTests
                                 ClrMemberKind: ClrMemberKind.Property
                             )
                         ],
-                        ApiKeyTypes:
+                        ApiKeys:
                         [
-                            new ApiKeyTypeDef
+                            new ApiKeyDef
                             (
                                 ApiName: "PK_RelationshipPostTag_PostId_TagId",
                                 ApiKeyPaths:
@@ -1305,12 +1305,12 @@ public partial class ApiSchemaTests
                         Association: new ApiRelationshipAssociationDef
                         (
                             ClrObjectType: typeof(RelationshipPostTag),
-                            ApiForeignKeyTypeA: new ApiKeyTypeDef
+                            ApiForeignKeyA: new ApiKeyDef
                             (
                                 ApiName: "FK_Post_PostTag_PostId",
                                 ApiKeyPaths: [new ApiKeyPathDef(ClrRootType: typeof(RelationshipPostTag), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(RelationshipPostTag.PostId))])]
                             ),
-                            ApiForeignKeyTypeB: new ApiKeyTypeDef
+                            ApiForeignKeyB: new ApiKeyDef
                             (
                                 ApiName: "FK_Tag_PostTag_TagId",
                                 ApiKeyPaths: [new ApiKeyPathDef(ClrRootType: typeof(RelationshipPostTag), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(RelationshipPostTag.TagId))])]
@@ -1382,7 +1382,7 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PK_RelationshipPost_Id"",
                                 ""ApiKeyPaths"": [
@@ -1419,7 +1419,7 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PK_RelationshipPostTag_PostId_TagId"",
                                 ""ApiKeyPaths"": [
@@ -1476,7 +1476,7 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PK_RelationshipTag_Id"",
                                 ""ApiKeyPaths"": [
@@ -1501,14 +1501,14 @@ public partial class ApiSchemaTests
                         },
                         ""ApiAssociation"": {
                             ""ClrObjectType"": ""Evoogle.ApiFramework.TestData.RelationshipPostTag,Evoogle.ApiFramework.Tests"",
-                            ""ApiForeignKeyTypeA"": {
+                            ""ApiForeignKeyA"": {
                                 ""ApiKeyPaths"": [
                                     {
                                         ""ClrPath"": ""PostId""
                                     }
                                 ]
                             },
-                            ""ApiForeignKeyTypeB"": {
+                            ""ApiForeignKeyB"": {
                                 ""ApiKeyPaths"": [
                                     {
                                         ""ClrPath"": ""TagId""

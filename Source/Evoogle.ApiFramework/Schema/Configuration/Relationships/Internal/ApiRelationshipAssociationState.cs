@@ -15,12 +15,12 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Relationships.Internal;
 internal sealed class ApiRelationshipAssociationState
 {
     #region Properties
-    internal ApiKeyTypeBuilder? ForeignKeyTypeBuilderA { get; set; }
+    internal ApiKeyDefinitionBuilder? ForeignKeyBuilderA { get; set; }
 
-    internal ApiKeyTypeBuilder? ForeignKeyTypeBuilderB { get; set; }
+    internal ApiKeyDefinitionBuilder? ForeignKeyBuilderB { get; set; }
 
-    internal ApiConfigurationSource? ForeignKeyTypeBuilderASource { get; set; }
+    internal ApiConfigurationSource? ForeignKeyBuilderASource { get; set; }
 
-    internal ApiConfigurationSource? ForeignKeyTypeBuilderBSource { get; set; }
+    internal ApiConfigurationSource? ForeignKeyBuilderBSource { get; set; }
     #endregion
 }

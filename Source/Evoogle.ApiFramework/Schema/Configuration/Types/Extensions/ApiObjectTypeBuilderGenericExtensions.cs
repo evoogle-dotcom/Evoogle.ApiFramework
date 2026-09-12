@@ -18,7 +18,7 @@ public static class ApiObjectTypeBuilderGenericExtensions
 {
     #region AddKey Methods
     /// <summary>
-    ///     Adds an <see cref="ApiKeyType"/> definition with a single key path using a type-safe expression.
+    ///     Adds an <see cref="ApiKeyDefinition"/> with a single key path using a type-safe expression.
     /// </summary>
     public static ApiObjectTypeBuilder<TObject> AddKey<TObject, TScalar>(this ApiObjectTypeBuilder<TObject> builder, string apiName, Expression<Func<TObject, TScalar>> expression)
     {
@@ -30,7 +30,7 @@ public static class ApiObjectTypeBuilderGenericExtensions
     }
 
     /// <summary>
-    ///     Adds an <see cref="ApiKeyType"/> definition with two key paths using type-safe expressions.
+    ///     Adds an <see cref="ApiKeyDefinition"/> with two key paths using type-safe expressions.
     /// </summary>
     public static ApiObjectTypeBuilder<TObject> AddKey<TObject, TScalar1, TScalar2>
     (
@@ -51,7 +51,7 @@ public static class ApiObjectTypeBuilderGenericExtensions
     }
 
     /// <summary>
-    ///     Adds an <see cref="ApiKeyType"/> definition with three key paths using type-safe expressions.
+    ///     Adds an <see cref="ApiKeyDefinition"/> with three key paths using type-safe expressions.
     /// </summary>
     public static ApiObjectTypeBuilder<TObject> AddKey<TObject, TScalar1, TScalar2, TScalar3>
     (
@@ -75,7 +75,7 @@ public static class ApiObjectTypeBuilderGenericExtensions
     }
 
     /// <summary>
-    ///     Adds an <see cref="ApiKeyType"/> definition with four key paths using type-safe expressions.
+    ///     Adds an <see cref="ApiKeyDefinition"/> with four key paths using type-safe expressions.
     /// </summary>
     public static ApiObjectTypeBuilder<TObject> AddKey<TObject, TScalar1, TScalar2, TScalar3, TScalar4>
     (
@@ -102,7 +102,8 @@ public static class ApiObjectTypeBuilderGenericExtensions
     }
 
     /// <summary>
-    ///     Adds an <see cref="ApiKeyType"/> definition with a single key path rooted at <typeparamref name="TRoot"/>.
+    ///     Adds an <see cref="ApiKeyDefinition"/> with a single key path rooted at
+    ///     <typeparamref name="TRoot"/>.
     /// </summary>
     public static ApiObjectTypeBuilder AddKeyFrom<TRoot>(this ApiObjectTypeBuilder builder, string apiName, Expression<Func<TRoot, object?>> expression)
     {
@@ -115,7 +116,8 @@ public static class ApiObjectTypeBuilderGenericExtensions
     }
 
     /// <summary>
-    ///     Adds an <see cref="ApiKeyType"/> definition with a single key path rooted at <typeparamref name="TPathRoot"/>.
+    ///     Adds an <see cref="ApiKeyDefinition"/> with a single key path rooted at
+    ///     <typeparamref name="TPathRoot"/>.
     /// </summary>
     public static ApiObjectTypeBuilder<TObject> AddKeyFrom<TObject, TPathRoot>(this ApiObjectTypeBuilder<TObject> builder, string apiName, Expression<Func<TPathRoot, object?>> expression)
     {

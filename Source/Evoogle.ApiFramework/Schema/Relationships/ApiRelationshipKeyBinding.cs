@@ -8,7 +8,7 @@ using Evoogle.ApiFramework.Schema.Key;
 namespace Evoogle.ApiFramework.Schema.Relationships;
 
 /// <summary>
-///     Represents the resolved key binding between a principal end's named key type and a
+///     Represents the resolved key binding between a principal end's named key and a
 ///     declared foreign key shape.
 /// </summary>
 public sealed class ApiRelationshipKeyBinding
@@ -17,14 +17,14 @@ public sealed class ApiRelationshipKeyBinding
     internal ApiRelationshipKeyBinding
     (
         ApiRelationshipPrincipalEnd apiPrincipalEnd,
-        ApiNamedKeyType apiPrincipalKeyType,
-        ApiKeyType apiForeignKeyType,
+        ApiNamedKeyDefinition apiPrincipalKey,
+        ApiKeyDefinition apiForeignKey,
         ApiRelationshipPrincipalKeyResolutionSource apiPrincipalKeyResolutionSource
     )
     {
         this.ApiPrincipalEnd = apiPrincipalEnd ?? throw new ArgumentNullException(nameof(apiPrincipalEnd));
-        this.ApiPrincipalKeyType = apiPrincipalKeyType ?? throw new ArgumentNullException(nameof(apiPrincipalKeyType));
-        this.ApiForeignKeyType = apiForeignKeyType ?? throw new ArgumentNullException(nameof(apiForeignKeyType));
+        this.ApiPrincipalKey = apiPrincipalKey ?? throw new ArgumentNullException(nameof(apiPrincipalKey));
+        this.ApiForeignKey = apiForeignKey ?? throw new ArgumentNullException(nameof(apiForeignKey));
         this.ApiPrincipalKeyResolutionSource = apiPrincipalKeyResolutionSource;
     }
     #endregion
@@ -33,16 +33,16 @@ public sealed class ApiRelationshipKeyBinding
     /// <summary>Gets the relationship principal end referenced by this binding.</summary>
     public ApiRelationshipPrincipalEnd ApiPrincipalEnd { get; }
 
-    /// <summary>Gets the resolved named key type declared by the principal object type.</summary>
-    public ApiNamedKeyType ApiPrincipalKeyType { get; }
+    /// <summary>Gets the resolved named key declared by the principal object type.</summary>
+    public ApiNamedKeyDefinition ApiPrincipalKey { get; }
 
-    /// <summary>Gets the API name of the resolved principal key type.</summary>
-    public string ApiPrincipalKeyTypeName => this.ApiPrincipalKeyType.ApiName;
+    /// <summary>Gets the API name of the resolved principal key.</summary>
+    public string ApiPrincipalKeyName => this.ApiPrincipalKey.ApiName;
 
-    /// <summary>Gets the declared foreign key type that maps to the principal key type.</summary>
-    public ApiKeyType ApiForeignKeyType { get; }
+    /// <summary>Gets the declared foreign key that maps to the principal key.</summary>
+    public ApiKeyDefinition ApiForeignKey { get; }
 
-    /// <summary>Gets how the principal key type was selected.</summary>
+    /// <summary>Gets how the principal key was selected.</summary>
     public ApiRelationshipPrincipalKeyResolutionSource ApiPrincipalKeyResolutionSource { get; }
     #endregion
 }

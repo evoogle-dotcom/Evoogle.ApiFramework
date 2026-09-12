@@ -11,7 +11,7 @@ using Evoogle.ApiFramework.TestData;
 namespace Evoogle.ApiFramework.Schema.Key;
 
 [DynamicLinqType]
-public static class ApiKeyTypeMaterializeKeyFromValuesTestFactory
+public static class ApiKeyDefinitionMaterializeKeyFromValuesTestFactory
 {
     #region Configure Values Methods
     public static void ConfigureTextIntTerminalScalar(ApiKeyMaterializationContext context)

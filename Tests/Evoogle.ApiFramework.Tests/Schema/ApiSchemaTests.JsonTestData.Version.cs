@@ -17,10 +17,10 @@ public partial class ApiSchemaTests
     [
         new ApiSchemaJsonTestCase
         {
-            Name = $"{nameof(ApiSchema)} With Property Backed {nameof(ApiVersionType)}",
+            Name = $"{nameof(ApiSchema)} With Property Backed {nameof(ApiVersionDefinition)}",
             FactoryArgument = new ApiSchemaDef
             (
-                ApiName: $"{nameof(ApiSchema)} With Property Backed {nameof(ApiVersionType)}",
+                ApiName: $"{nameof(ApiSchema)} With Property Backed {nameof(ApiVersionDefinition)}",
                 ApiNamedTypes:
                 [
                     new ApiScalarTypeDef
@@ -47,13 +47,13 @@ public partial class ApiSchemaTests
                                 ClrMemberKind: ClrMemberKind.Property
                             )
                         ],
-                        ApiVersionType: new ApiVersionTypeDef(nameof(Person.Id))
+                        ApiVersion: new ApiVersionDef(nameof(Person.Id))
                     )
                 ]
             ),
             Json = @"
             {
-                ""ApiName"": ""ApiSchema With Property Backed ApiVersionType"",
+                ""ApiName"": ""ApiSchema With Property Backed ApiVersionDefinition"",
                 ""ApiVersion"": ""0.1.0"",
                 ""ApiOptions"": {
                     ""ApiKeyNullHandling"": ""UseDefaultOnNull""
@@ -82,8 +82,8 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [],
-                        ""ApiVersionType"": {
+                        ""ApiKeys"": [],
+                        ""ApiVersion"": {
                             ""ClrMemberName"": ""Id""
                         },
                         ""ClrType"": ""Evoogle.ApiFramework.TestData.Person, Evoogle.ApiFramework.Tests""
@@ -95,10 +95,10 @@ public partial class ApiSchemaTests
 
         new ApiSchemaJsonTestCase
         {
-            Name = $"{nameof(ApiSchema)} With Repository Backed {nameof(ApiVersionType)}",
+            Name = $"{nameof(ApiSchema)} With Repository Backed {nameof(ApiVersionDefinition)}",
             FactoryArgument = new ApiSchemaDef
             (
-                ApiName: $"{nameof(ApiSchema)} With Repository Backed {nameof(ApiVersionType)}",
+                ApiName: $"{nameof(ApiSchema)} With Repository Backed {nameof(ApiVersionDefinition)}",
                 ApiNamedTypes:
                 [
                     new ApiScalarTypeDef
@@ -110,13 +110,13 @@ public partial class ApiSchemaTests
                     (
                         ApiName: nameof(Empty),
                         ClrType: typeof(Empty),
-                        ApiVersionType: new ApiVersionTypeDef(typeof(int))
+                        ApiVersion: new ApiVersionDef(typeof(int))
                     )
                 ]
             ),
             Json = @"
             {
-                ""ApiName"": ""ApiSchema With Repository Backed ApiVersionType"",
+                ""ApiName"": ""ApiSchema With Repository Backed ApiVersionDefinition"",
                 ""ApiVersion"": ""0.1.0"",
                 ""ApiOptions"": {
                     ""ApiKeyNullHandling"": ""UseDefaultOnNull""
@@ -134,8 +134,8 @@ public partial class ApiSchemaTests
                         ""ApiKind"": ""Object"",
                         ""ApiName"": ""Empty"",
                         ""ApiProperties"": [],
-                        ""ApiKeyTypes"": [],
-                        ""ApiVersionType"": {
+                        ""ApiKeys"": [],
+                        ""ApiVersion"": {
                             ""ClrType"": ""System.Int32, System.Private.CoreLib""
                         },
                         ""ClrType"": ""Evoogle.ApiFramework.TestData.Empty, Evoogle.ApiFramework.Tests""

@@ -70,9 +70,9 @@ public class ApiSchemaFrozenLifecycleTests(ITestOutputHelper output) : XUnitTest
             typeof(ApiSchema).GetMethods(BindingFlags.Static | BindingFlags.Public)
                 .Should().NotContain(method => method.Name == "Create");
 
-            typeof(ApiKeyType).GetConstructors(BindingFlags.Instance | BindingFlags.Public)
+            typeof(ApiKeyDefinition).GetConstructors(BindingFlags.Instance | BindingFlags.Public)
                 .Should().BeEmpty();
-            typeof(ApiKeyType).GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic)
+            typeof(ApiKeyDefinition).GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic)
                 .Should().ContainSingle(constructor => constructor.IsAssembly);
             typeof(ApiSchemaOptions).IsSealed.Should().BeTrue();
             typeof(ApiObjectTypeOptions).IsSealed.Should().BeTrue();
@@ -284,7 +284,7 @@ public class ApiSchemaFrozenLifecycleTests(ITestOutputHelper output) : XUnitTest
                 .SelfAndDescendants(TraversalStrategy.DepthFirst)
                 .ToArray();
             var objectType = schema.ApiObjectTypes.Single();
-            var keyType = objectType.ApiKeyTypes.Single();
+            var keyDefinition = objectType.ApiKeys.Single();
             var replacementTask = Task.Run(() => CreateBuilder("Replacement").Build());
 
             this.ConcurrentReadsSucceeded = Task.WhenAll
@@ -301,7 +301,7 @@ public class ApiSchemaFrozenLifecycleTests(ITestOutputHelper output) : XUnitTest
                                     .SelfAndDescendants(TraversalStrategy.DepthFirst)
                                     .ToArray();
                                 var serialized = JsonSerializer.Serialize(schema);
-                                var materializedKey = keyType.MaterializeKey
+                                var materializedKey = keyDefinition.MaterializeKey
                                 (
                                     new ApiKeyMaterializationContext().With
                                     (
@@ -355,7 +355,7 @@ public class ApiSchemaFrozenLifecycleTests(ITestOutputHelper output) : XUnitTest
                 field.GetValue(this.Schema).Should().NotBeNull();
             }
 
-            var objectType = this.Schema!.ApiObjectTypes.First(type => type.ApiKeyTypes.Length > 0);
+            var objectType = this.Schema!.ApiObjectTypes.First(type => type.ApiKeys.Length > 0);
             foreach (var field in GetLookupFields(typeof(ApiObjectType)))
             {
                 field.GetValue(objectType).Should().NotBeNull();
@@ -367,8 +367,8 @@ public class ApiSchemaFrozenLifecycleTests(ITestOutputHelper output) : XUnitTest
                 field.GetValue(enumType).Should().NotBeNull();
             }
 
-            objectType.ApiKeyTypeApiNames.IsDefault.Should().BeFalse();
-            objectType.ApiKeyTypeApiNames.Should().Equal(objectType.ApiKeyTypes.Select(type => type.ApiName));
+            objectType.ApiKeyApiNames.IsDefault.Should().BeFalse();
+            objectType.ApiKeyApiNames.Should().Equal(objectType.ApiKeys.Select(type => type.ApiName));
             this.ConcurrentReadsSucceeded.Should().BeTrue();
             this.ReplacementSchema.Should().NotBeSameAs(this.Schema);
             this.Schema.SelfAndDescendants(TraversalStrategy.DepthFirst).Should().Equal(this.OriginalElements!);

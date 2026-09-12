@@ -17,24 +17,24 @@ namespace Evoogle.ApiFramework.Schema.Relationships;
 /// <summary>
 ///     Represents the dependent end of an <see cref="ApiRelationship"/>.
 ///
-///     A dependent end may declare a foreign key binding where <see cref="ApiForeignKeyType"/>
-///     maps scalar leaves of the principal <see cref="ApiKeyType"/> to properties on the dependent object graph.
+///     A dependent end may declare a foreign key binding where <see cref="ApiForeignKey"/>
+///     maps scalar leaves of the principal <see cref="ApiKeyDefinition"/> to properties on the dependent object graph.
 /// </summary>
 /// <remarks>
-///     Use <see cref="HasForeignKey"/> before accessing <see cref="ApiForeignKeyType"/>.
+///     Use <see cref="HasForeignKey"/> before accessing <see cref="ApiForeignKey"/>.
 ///
 ///     When no foreign key is declared, the owning relationship is navigational at the schema level.
 /// </remarks>
 /// <param name="clrObjectType">The CLR type of the dependent <see cref="ApiObjectType"/>.</param>
-/// <param name="apiForeignKeyType">
-///     The optional <see cref="ApiKeyType"/> that maps the principal key type's scalar leaves to properties
+/// <param name="apiForeignKey">
+///     The optional <see cref="ApiKeyDefinition"/> that maps the principal key's scalar leaves to properties
 ///     on the dependent object graph.
 /// </param>
 [JsonConverter(typeof(ApiRelationshipDependentEndJsonConverter))]
-public sealed class ApiRelationshipDependentEnd(Type clrObjectType, ApiKeyType? apiForeignKeyType = null) : ApiRelationshipEnd(clrObjectType)
+public sealed class ApiRelationshipDependentEnd(Type clrObjectType, ApiKeyDefinition? apiForeignKey = null) : ApiRelationshipEnd(clrObjectType)
 {
     #region ApiRelationshipDependentEnd Fields
-    private readonly ApiKeyType? _apiForeignKeyType = apiForeignKeyType;
+    private readonly ApiKeyDefinition? _apiForeignKey = apiForeignKey;
     #endregion
 
     #region ApiSchemaElement Properties
@@ -49,14 +49,14 @@ public sealed class ApiRelationshipDependentEnd(Type clrObjectType, ApiKeyType? 
 
     #region ApiRelationshipDependentEnd Properties
     /// <summary>
-    ///     Gets the foreign key role's <see cref="ApiKeyType"/> that maps scalar leaves of the principal key type
+    ///     Gets the foreign key role's <see cref="ApiKeyDefinition"/> that maps scalar leaves of the principal key
     ///     to properties on this dependent object graph.
     /// </summary>
     /// <exception cref="ApiSchemaException">
     ///     Thrown when <see cref="HasForeignKey"/> is <see langword="false"/>.
     /// </exception>
-    public ApiKeyType ApiForeignKeyType => this.HasForeignKey
-        ? _apiForeignKeyType!
+    public ApiKeyDefinition ApiForeignKey => this.HasForeignKey
+        ? _apiForeignKey!
         : throw new ApiSchemaException("No foreign key declared for this dependent end of the relationship.");
     #endregion
 
@@ -64,7 +64,7 @@ public sealed class ApiRelationshipDependentEnd(Type clrObjectType, ApiKeyType? 
     /// <summary>
     ///    Gets a value indicating whether this dependent end has an explicit foreign key declared at the schema level.
     /// </summary>
-    public bool HasForeignKey => _apiForeignKeyType is not null;
+    public bool HasForeignKey => _apiForeignKey is not null;
     #endregion
 
     #region Object Methods
@@ -72,10 +72,10 @@ public sealed class ApiRelationshipDependentEnd(Type clrObjectType, ApiKeyType? 
     public override string ToString()
     {
         var clrObjectType = this.ClrObjectType.SafeToName();
-        var apiForeignKeyType = _apiForeignKeyType?.SafeToString();
+        var apiForeignKey = _apiForeignKey?.SafeToString();
         var extensionCount = this.ExtensionCount.SafeToString();
 
-        return $"{nameof(ApiRelationshipDependentEnd)} {{{nameof(this.ClrObjectType)}={clrObjectType}, {nameof(this.ApiForeignKeyType)}={apiForeignKeyType}, {nameof(this.ExtensionCount)}={extensionCount}}}";
+        return $"{nameof(ApiRelationshipDependentEnd)} {{{nameof(this.ClrObjectType)}={clrObjectType}, {nameof(this.ApiForeignKey)}={apiForeignKey}, {nameof(this.ExtensionCount)}={extensionCount}}}";
     }
     #endregion
 
@@ -83,9 +83,9 @@ public sealed class ApiRelationshipDependentEnd(Type clrObjectType, ApiKeyType? 
     /// <inheritdoc/>
     internal override IEnumerable<ApiSchemaElement> GetOwnedElements()
     {
-        if (_apiForeignKeyType is not null)
+        if (_apiForeignKey is not null)
         {
-            yield return _apiForeignKeyType;
+            yield return _apiForeignKey;
         }
     }
 
@@ -96,12 +96,12 @@ public sealed class ApiRelationshipDependentEnd(Type clrObjectType, ApiKeyType? 
 
         base.CompileCore(context);
 
-        this.ResolveApiForeignKeyType(context);
+        this.ResolveApiForeignKey(context);
     }
     #endregion
 
     #region Implementation Methods
-    private void ResolveApiForeignKeyType(ApiSchemaCompilationContext context)
+    private void ResolveApiForeignKey(ApiSchemaCompilationContext context)
     {
         if (!this.HasForeignKey)
         {
@@ -109,8 +109,8 @@ public sealed class ApiRelationshipDependentEnd(Type clrObjectType, ApiKeyType? 
             return;
         }
 
-        var location = ApiSchemaCompilationLocation.ForRole(nameof(this.ApiForeignKeyType));
-        _apiForeignKeyType!.Compile(context, location);
+        var location = ApiSchemaCompilationLocation.ForRole(nameof(this.ApiForeignKey));
+        _apiForeignKey!.Compile(context, location);
     }
     #endregion
 }

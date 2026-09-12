@@ -7,8 +7,8 @@ Accepted on 2026-09-09. Schema and value foundation implemented on 2026-09-10.
 ## Context and Problem Statement
 
 `ApiObjectType` describes API-visible object structure, keys, and relationships. The runtime can
-materialize an `ApiKey` from an object according to an `ApiKeyType`, but it does not yet have an
-equivalent schema concept for the version of an object's state.
+materialize an `ApiKey` from an object according to an `ApiKeyDefinition`, but it does not yet have
+an equivalent schema concept for the version of an object's state.
 
 The operation architecture requires versions to support optimistic concurrency consistently across
 clients, services, providers, and heterogeneous repositories. A version may be stored in a CLR
@@ -16,7 +16,7 @@ member, supplied as repository metadata, represented as an HTTP entity tag, or g
 service. It must not be confused with an object's stable identity or with `ApiSchema.ApiVersion`.
 
 This record defines the required semantics and feature boundary. The implemented public metadata
-type is `ApiVersionType`; its materialized runtime value is `ApiVersion`.
+type is `ApiVersionDefinition`; its materialized runtime value is `ApiVersion`.
 
 ## Decision Drivers
 
@@ -45,10 +45,10 @@ Conceptually:
 
 ```text
 ApiObjectType
-├── ApiKeyTypes
+├── ApiKeys
 ├── ApiProperties
 ├── ApiRelationships
-└── optional ApiVersionType
+└── optional ApiVersion
 
 Object occurrence
 ├── ApiObjectIdentity
@@ -56,7 +56,7 @@ Object occurrence
 └── object state
 ```
 
-`ApiObjectIdentity` continues to contain the applicable `ApiNamedKeyType` and materialized
+`ApiObjectIdentity` continues to contain the applicable `ApiNamedKeyDefinition` and materialized
 `ApiKey`. Version is not part of identity.
 
 ## Required Semantics
@@ -70,10 +70,16 @@ explicitly introduced.
 The version definition is owned by the object type, participates in schema compilation and
 freezing, and is navigable as structural schema metadata.
 
-The singular `ApiObjectType.ApiVersionType` property makes multiple in-memory definitions
+The singular `ApiObjectType.ApiVersion` property makes multiple in-memory definitions
 structurally impossible. Repeated fluent configuration replaces the prior definition. Duplicate
-`ApiVersionType` members in one object-type JSON object are rejected as malformed JSON rather than
+`ApiVersion` members in one object-type JSON object are rejected as malformed JSON rather than
 represented as a plural schema model.
+
+The `Definition` suffix identifies metadata CLR types. Contextual object members, builders,
+annotations, and JSON use the concise domain role: `ApiObjectType.ApiVersion`, `WithVersion`,
+`WithRepositoryVersion`, `ApiVersionAttribute`, and the `ApiVersion` JSON member. The root
+`ApiSchema.ApiVersion` string retains its name; its location and string shape distinguish it from
+the nested object-version definition.
 
 ### Version and identity remain separate
 
@@ -120,10 +126,10 @@ Repositories return repository-backed versions explicitly.
 The implemented shape is:
 
 ```csharp
-public sealed class ApiVersionType : ApiSchemaElement
+public sealed class ApiVersionDefinition : ApiSchemaElement
 {
-    public ApiVersionType(string clrMemberName);
-    public ApiVersionType(Type clrType);
+    public ApiVersionDefinition(string clrMemberName);
+    public ApiVersionDefinition(Type clrType);
 
     public Type ClrType { get; }
     public string? ClrMemberName { get; }
@@ -249,9 +255,9 @@ conflict.
 
 Schema compilation must diagnose at least:
 
-- Duplicate version metadata in object-type JSON (the singular CLR model cannot contain more than
-  one definition).
-- Version-type JSON that contains both or neither source property.
+- Duplicate `ApiVersion` metadata in object-type JSON (the singular CLR model cannot contain more
+  than one definition).
+- Version-definition JSON that contains both or neither source property.
 - An unresolved or incompatible CLR member binding.
 - A non-scalar or nullable first-version representation.
 - A version definition whose scalar type is unresolved.

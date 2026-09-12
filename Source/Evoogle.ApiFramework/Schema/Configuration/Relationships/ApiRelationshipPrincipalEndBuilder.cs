@@ -15,8 +15,8 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Relationships;
 /// </summary>
 /// <remarks>
 ///     The principal end provides the principal key for the relationship. For key-bound relationships, compilation
-///     infers the best compatible principal key type from the corresponding foreign key when no name is supplied. Call
-///     <see cref="WithPrincipalKey"/> to specify the named principal key type explicitly. Delete behavior is configured on the
+///     infers the best compatible principal key from the corresponding foreign key when no name is supplied. Call
+///     <see cref="WithPrincipalKey"/> to specify the named principal key explicitly. Delete behavior is configured on the
 ///     relationship builder, not on individual ends.
 /// </remarks>
 /// <param name="clrObjectType">The CLR type of the principal <see cref="ApiObjectType"/>.</param>
@@ -48,20 +48,20 @@ public sealed class ApiRelationshipPrincipalEndBuilder(Type clrObjectType) : Ext
 
     #region With Methods
     /// <summary>
-    ///     Selects a named key type on the principal object type to use as the relationship's principal key,
+    ///     Selects a named key on the principal object type to use as the relationship's principal key,
     ///     overriding automatic compatibility-based key inference.
     /// </summary>
-    /// <param name="apiPrincipalKeyTypeName">The name of the principal key type to use for the relationship.</param>
+    /// <param name="apiPrincipalKeyName">The name of the principal key to use for the relationship.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipPrincipalEndBuilder WithPrincipalKey(string apiPrincipalKeyTypeName)
+    public ApiRelationshipPrincipalEndBuilder WithPrincipalKey(string apiPrincipalKeyName)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiPrincipalKeyTypeName, nameof(apiPrincipalKeyTypeName));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiPrincipalKeyName, nameof(apiPrincipalKeyName));
 
         var source = _configurationSourceScope.CurrentSource;
-        if (_state.PrincipalKeyTypeNameSource == null || source >= _state.PrincipalKeyTypeNameSource.Value)
+        if (_state.PrincipalKeyNameSource == null || source >= _state.PrincipalKeyNameSource.Value)
         {
-            _state.PrincipalKeyTypeName = apiPrincipalKeyTypeName;
-            _state.PrincipalKeyTypeNameSource = source;
+            _state.PrincipalKeyName = apiPrincipalKeyName;
+            _state.PrincipalKeyNameSource = source;
         }
 
         return this;
@@ -85,7 +85,7 @@ public sealed class ApiRelationshipPrincipalEndBuilder(Type clrObjectType) : Ext
         var end = new ApiRelationshipPrincipalEnd
         (
             _clrObjectType,
-            _state.PrincipalKeyTypeName
+            _state.PrincipalKeyName
         );
 
         var extensions = this.BuildExtensions();

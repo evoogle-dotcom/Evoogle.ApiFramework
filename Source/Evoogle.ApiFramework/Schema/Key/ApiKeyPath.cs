@@ -32,8 +32,8 @@ namespace Evoogle.ApiFramework.Schema.Key;
 ///     </para>
 ///     <para>
 ///         When <paramref name="clrRootType"/> is <see langword="null"/>, it is inferred during compilation
-///         from the owning <see cref="ApiObjectType"/> (for a named key type) or the owning
-///         <see cref="ApiRelationshipElement"/> (for a foreign key type, e.g. an
+///         from the owning <see cref="ApiObjectType"/> (for a named key definition) or the owning
+///         <see cref="ApiRelationshipElement"/> (for a foreign key definition, e.g. an
 ///         <see cref="ApiRelationshipDependentEnd"/> or <see cref="ApiRelationshipAssociation"/>).
 ///     </para>
 /// </remarks>
@@ -189,7 +189,7 @@ public sealed class ApiKeyPath(Type? clrRootType, IEnumerable<ApiKeyPathSegment>
 
     private ApiObjectType? GetOwningObjectType(Type effectiveClrRootType)
     {
-        var apiObjectType = (this.Parent as ApiNamedKeyType)?.Parent as ApiObjectType;
+        var apiObjectType = (this.Parent as ApiNamedKeyDefinition)?.Parent as ApiObjectType;
         return apiObjectType?.ClrType == effectiveClrRootType ? apiObjectType : null;
     }
 
@@ -203,8 +203,8 @@ public sealed class ApiKeyPath(Type? clrRootType, IEnumerable<ApiKeyPathSegment>
 
         return this.Parent switch
         {
-            ApiNamedKeyType { Parent: ApiObjectType apiObjectType } => apiObjectType.ClrType,
-            ApiKeyType { Parent: ApiRelationshipElement apiRelationshipElement } => apiRelationshipElement.ClrObjectType,
+            ApiNamedKeyDefinition { Parent: ApiObjectType apiObjectType } => apiObjectType.ClrType,
+            ApiKeyDefinition { Parent: ApiRelationshipElement apiRelationshipElement } => apiRelationshipElement.ClrObjectType,
             _ => null,
         };
     }

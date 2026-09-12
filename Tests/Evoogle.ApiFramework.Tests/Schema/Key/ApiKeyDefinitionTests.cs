@@ -9,23 +9,27 @@ using Evoogle.XUnit;
 
 namespace Evoogle.ApiFramework.Schema.Key;
 
-public partial class ApiKeyTypeTests(ITestOutputHelper output) : XUnitTests(output)
+public partial class ApiKeyDefinitionTests(ITestOutputHelper output) : XUnitTests(output)
 {
     #region Test Data
     private static ApiSchema KeyApiSchema { get; } = ApiSchemaFactory.KeyApiSchema;
 
-    private static ApiKeyType GetPrimaryKeyType(string apiObjectTypeName)
+    private static ApiKeyDefinition GetPrimaryKeyDefinition(string apiObjectTypeName)
     {
         var apiObjectType = KeyApiSchema.GetObjectTypeByApiName(apiObjectTypeName);
-        return apiObjectType.ApiKeyTypes.FirstOrDefault() ?? throw new InvalidOperationException($"No key type on '{apiObjectTypeName}'.");
+        return apiObjectType.ApiKeys.FirstOrDefault() ??
+            throw new InvalidOperationException($"No key definition on '{apiObjectTypeName}'.");
     }
 
-    private static ApiKeyType GetKeyTypeByName(string apiObjectTypeName, string apiKeyTypeName)
+    private static ApiKeyDefinition GetKeyDefinitionByName(string apiObjectTypeName, string apiKeyName)
     {
         var apiObjectType = KeyApiSchema.GetObjectTypeByApiName(apiObjectTypeName);
-        return apiObjectType.TryGetKeyTypeByApiName(apiKeyTypeName, out var keyType)
-            ? keyType
-            : throw new InvalidOperationException($"Key type '{apiKeyTypeName}' not found on '{apiObjectTypeName}'.");
+        return apiObjectType.TryGetKeyByApiName(apiKeyName, out var keyDefinition)
+            ? keyDefinition
+            : throw new InvalidOperationException
+            (
+                $"Key definition '{apiKeyName}' not found on '{apiObjectTypeName}'."
+            );
     }
 
     // CLR instances with fully populated values

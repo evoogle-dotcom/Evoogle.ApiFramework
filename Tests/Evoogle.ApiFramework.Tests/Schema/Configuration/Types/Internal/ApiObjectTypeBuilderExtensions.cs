@@ -12,13 +12,13 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Types.Internal;
 internal static class ApiObjectTypeBuilderExtensions
 {
     #region Methods
-    public static void ConfigureKeyTypes(this ApiObjectTypeBuilder builder, ApiObjectType apiObjectType)
+    public static void ConfigureKeys(this ApiObjectTypeBuilder builder, ApiObjectType apiObjectType)
     {
-        foreach (var apiKeyType in apiObjectType.ApiKeyTypes)
+        foreach (var apiKeyDefinition in apiObjectType.ApiKeys)
         {
-            builder.AddKey(apiKeyType.ApiName!, k =>
+            builder.AddKey(apiKeyDefinition.ApiName!, k =>
             {
-                foreach (var keyPath in apiKeyType.ApiKeyPaths)
+                foreach (var keyPath in apiKeyDefinition.ApiKeyPaths)
                 {
                     k.AddPath(keyPath.ClrRootType, keyPath.ApiSegments.Select(s => s.ClrMemberName));
                 }
@@ -52,25 +52,25 @@ internal static class ApiObjectTypeBuilderExtensions
         }
     }
 
-    public static void ConfigureVersionType
+    public static void ConfigureVersion
     (
         this ApiObjectTypeBuilder builder,
         ApiObjectType apiObjectType
     )
     {
-        var apiVersionType = apiObjectType.ApiVersionType;
-        if (apiVersionType is null)
+        var apiVersionDefinition = apiObjectType.ApiVersion;
+        if (apiVersionDefinition is null)
         {
             return;
         }
 
-        var clrMemberName = apiVersionType.ClrMemberName;
+        var clrMemberName = apiVersionDefinition.ClrMemberName;
         if (clrMemberName is null)
         {
             builder.WithRepositoryVersion
             (
-                apiVersionType.ClrType,
-                x => x.ConfigureExtensions(apiVersionType)
+                apiVersionDefinition.ClrType,
+                x => x.ConfigureExtensions(apiVersionDefinition)
             );
         }
         else
@@ -78,7 +78,7 @@ internal static class ApiObjectTypeBuilderExtensions
             builder.WithVersion
             (
                 clrMemberName,
-                x => x.ConfigureExtensions(apiVersionType)
+                x => x.ConfigureExtensions(apiVersionDefinition)
             );
         }
     }

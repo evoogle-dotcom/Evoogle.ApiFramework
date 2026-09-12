@@ -59,7 +59,7 @@ public partial class ApiAnnotationTests
         public string Name { get; set; } = string.Empty;
     }
 
-    public class ScalarKeyTypeAnnotation
+    public class ScalarKeyAnnotationObject
     {
         [ApiKey]
         public int Id { get; set; }
@@ -68,7 +68,7 @@ public partial class ApiAnnotationTests
         public string Name { get; set; } = string.Empty;
     }
 
-    public class CompositeKeyType
+    public class CompositeKeyObject
     {
         [ApiKey(ApiName = "OrderLineKey", Order = 0)]
         public Guid OrderId { get; set; }
@@ -79,7 +79,7 @@ public partial class ApiAnnotationTests
         public string Description { get; set; } = string.Empty;
     }
 
-    public class ThreePartCompositeKeyType
+    public class ThreePartCompositeKeyObject
     {
         [ApiKey(ApiName = "ThreePartKey", Order = 0)]
         public int Id1 { get; set; }
@@ -109,7 +109,7 @@ public partial class ApiAnnotationTests
         public string? Description { get; set; }
     }
 
-    public class AnnotationPrimaryKeyType
+    public class AnnotationPrimaryKeyObject
     {
         public Guid Id { get; set; }
 

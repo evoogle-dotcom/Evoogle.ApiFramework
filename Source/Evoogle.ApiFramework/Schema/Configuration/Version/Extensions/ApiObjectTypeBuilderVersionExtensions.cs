@@ -27,7 +27,7 @@ public static class ApiObjectTypeBuilderVersionExtensions
     (
         this ApiObjectTypeBuilder<TObject> builder,
         Expression<Func<TObject, TVersion>> expression,
-        Action<ApiVersionTypeBuilder>? configure = null
+        Action<ApiVersionDefinitionBuilder>? configure = null
     )
     {
         ArgumentNullException.ThrowIfNull(builder);
@@ -47,7 +47,7 @@ public static class ApiObjectTypeBuilderVersionExtensions
     public static ApiObjectTypeBuilder<TObject> WithRepositoryVersion<TObject, TVersion>
     (
         this ApiObjectTypeBuilder<TObject> builder,
-        Action<ApiVersionTypeBuilder>? configure = null
+        Action<ApiVersionDefinitionBuilder>? configure = null
     )
     {
         ArgumentNullException.ThrowIfNull(builder);

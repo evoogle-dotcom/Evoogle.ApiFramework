@@ -42,12 +42,12 @@ internal static class ApiExtensionBuilderExtensions
         }
     }
 
-    public static void ConfigureExtensions(this ApiKeyTypeBuilder builder, ApiKeyType apiKeyType)
+    public static void ConfigureExtensions(this ApiKeyDefinitionBuilder builder, ApiKeyDefinition apiKeyDefinition)
     {
-        var extensions = apiKeyType.Extensions;
+        var extensions = apiKeyDefinition.Extensions;
         foreach (var extension in extensions)
         {
-            builder.AddKeyTypeExtension(extension.Key, extension.Value);
+            builder.AddKeyExtension(extension.Key, extension.Value);
         }
     }
 
@@ -116,9 +116,9 @@ internal static class ApiExtensionBuilderExtensions
 
     public static void ConfigureExtensions(this ApiRelationshipPrincipalEndBuilder builder, ApiRelationshipPrincipalEnd apiRelationshipPrincipalEnd)
     {
-        if (apiRelationshipPrincipalEnd.ApiPrincipalKeyTypeName is not null)
+        if (apiRelationshipPrincipalEnd.ApiPrincipalKeyName is not null)
         {
-            builder.WithPrincipalKey(apiRelationshipPrincipalEnd.ApiPrincipalKeyTypeName);
+            builder.WithPrincipalKey(apiRelationshipPrincipalEnd.ApiPrincipalKeyName);
         }
 
         var extensions = apiRelationshipPrincipalEnd.Extensions;
@@ -139,14 +139,14 @@ internal static class ApiExtensionBuilderExtensions
 
     public static void ConfigureExtensions
     (
-        this ApiVersionTypeBuilder builder,
-        ApiVersionType apiVersionType
+        this ApiVersionDefinitionBuilder builder,
+        ApiVersionDefinition apiVersionDefinition
     )
     {
-        var extensions = apiVersionType.Extensions;
+        var extensions = apiVersionDefinition.Extensions;
         foreach (var extension in extensions)
         {
-            builder.AddVersionTypeExtension(extension.Key, extension.Value);
+            builder.AddVersionExtension(extension.Key, extension.Value);
         }
     }
 

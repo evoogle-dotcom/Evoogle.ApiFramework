@@ -45,12 +45,12 @@ public static class ApiRelationshipManyToManyBuilderExtensions
     /// <summary>
     ///     Configures principal end A using the CLR type <typeparamref name="TPrincipal"/>.
     /// </summary>
-    public static ApiRelationshipManyToManyBuilder Between<TPrincipal>(this ApiRelationshipManyToManyBuilder builder, string apiPrincipalKeyTypeName)
+    public static ApiRelationshipManyToManyBuilder Between<TPrincipal>(this ApiRelationshipManyToManyBuilder builder, string apiPrincipalKeyName)
     {
         ArgumentNullException.ThrowIfNull(builder);
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiPrincipalKeyTypeName, nameof(apiPrincipalKeyTypeName));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiPrincipalKeyName, nameof(apiPrincipalKeyName));
 
-        return builder.Between(typeof(TPrincipal), apiPrincipalKeyTypeName);
+        return builder.Between(typeof(TPrincipal), apiPrincipalKeyName);
     }
 
     /// <summary>
@@ -70,12 +70,12 @@ public static class ApiRelationshipManyToManyBuilderExtensions
     /// <summary>
     ///     Configures principal end B using the CLR type <typeparamref name="TPrincipal"/>.
     /// </summary>
-    public static ApiRelationshipManyToManyBuilder And<TPrincipal>(this ApiRelationshipManyToManyBuilder builder, string apiPrincipalKeyTypeName)
+    public static ApiRelationshipManyToManyBuilder And<TPrincipal>(this ApiRelationshipManyToManyBuilder builder, string apiPrincipalKeyName)
     {
         ArgumentNullException.ThrowIfNull(builder);
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiPrincipalKeyTypeName, nameof(apiPrincipalKeyTypeName));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiPrincipalKeyName, nameof(apiPrincipalKeyName));
 
-        return builder.And(typeof(TPrincipal), apiPrincipalKeyTypeName);
+        return builder.And(typeof(TPrincipal), apiPrincipalKeyName);
     }
     #endregion
 

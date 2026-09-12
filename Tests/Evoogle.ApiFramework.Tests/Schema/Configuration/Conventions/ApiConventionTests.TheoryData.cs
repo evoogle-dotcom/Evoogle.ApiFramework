@@ -312,7 +312,7 @@ public partial class ApiConventionTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [],
+                        ""ApiKeys"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+PersonWithId, Evoogle.ApiFramework.Tests""
                     }
                 ],
@@ -377,7 +377,7 @@ public partial class ApiConventionTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [],
+                        ""ApiKeys"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+PersonWithId, Evoogle.ApiFramework.Tests""
                     }
                 ],
@@ -442,7 +442,7 @@ public partial class ApiConventionTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [],
+                        ""ApiKeys"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+PersonWithId, Evoogle.ApiFramework.Tests""
                     }
                 ],
@@ -507,7 +507,7 @@ public partial class ApiConventionTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [],
+                        ""ApiKeys"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+PersonWithId, Evoogle.ApiFramework.Tests""
                     }
                 ],
@@ -546,7 +546,7 @@ public partial class ApiConventionTests
                   ""ApiKind"": ""Object"",
                   ""ApiName"": ""PersonWithIdApiModel"",
                   ""ApiProperties"": [],
-                  ""ApiKeyTypes"": [],
+                  ""ApiKeys"": [],
                   ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+PersonWithId, Evoogle.ApiFramework.Tests""
                 }
               ],
@@ -645,7 +645,7 @@ public partial class ApiConventionTests
                       ""ClrMemberKind"": ""Property""
                     }
                   ],
-                  ""ApiKeyTypes"": [
+                  ""ApiKeys"": [
                     {
                       ""ApiName"": ""PrimaryKey"",
                       ""ApiKeyPaths"": [
@@ -725,7 +725,7 @@ public partial class ApiConventionTests
                       ""ClrMemberKind"": ""Property""
                     }
                   ],
-                  ""ApiKeyTypes"": [
+                  ""ApiKeys"": [
                     {
                       ""ApiName"": ""PrimaryKey"",
                       ""ApiKeyPaths"": [
@@ -796,7 +796,7 @@ public partial class ApiConventionTests
                       ""ClrMemberKind"": ""Property""
                     }
                   ],
-                  ""ApiKeyTypes"": [
+                  ""ApiKeys"": [
                     {
                       ""ApiName"": ""PrimaryKey"",
                       ""ApiKeyPaths"": [
@@ -877,7 +877,7 @@ public partial class ApiConventionTests
                       ""ClrMemberKind"": ""Property""
                     }
                   ],
-                  ""ApiKeyTypes"": [],
+                  ""ApiKeys"": [],
                   ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+PersonWithId, Evoogle.ApiFramework.Tests""
                 }
               ],
@@ -943,7 +943,7 @@ public partial class ApiConventionTests
                       ""ClrMemberKind"": ""Property""
                     }
                   ],
-                  ""ApiKeyTypes"": [],
+                  ""ApiKeys"": [],
                   ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+PersonWithId, Evoogle.ApiFramework.Tests""
                 }
               ],
@@ -1010,7 +1010,7 @@ public partial class ApiConventionTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [],
+                        ""ApiKeys"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+PersonWithId, Evoogle.ApiFramework.Tests""
                     }
                 ],
@@ -1080,7 +1080,7 @@ public partial class ApiConventionTests
                                 ""ClrMemberKind"": ""Field""
                             }
                         ],
-                        ""ApiKeyTypes"": [],
+                        ""ApiKeys"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+TypeWithField, Evoogle.ApiFramework.Tests""
                     }
                 ],
@@ -1145,7 +1145,7 @@ public partial class ApiConventionTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [],
+                        ""ApiKeys"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+PersonWithId, Evoogle.ApiFramework.Tests""
                     }
                 ],
@@ -1206,7 +1206,7 @@ public partial class ApiConventionTests
                       ""ClrMemberKind"": ""Property""
                     }
                   ],
-                  ""ApiKeyTypes"": [],
+                  ""ApiKeys"": [],
                   ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Conventions.ApiConventionTests+AssemblyScannedObject, Evoogle.ApiFramework.Tests""
                 }
               ],

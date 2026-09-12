@@ -143,7 +143,7 @@ public partial class ApiRelationshipTests(ITestOutputHelper output) : XUnitTests
             AssertPrincipalEnd(expectedPrincipalEnd, actualRelationship.ApiPrincipalEnd);
             AssertDependentEnd(expectedDependentEnd, actualRelationship.ApiDependentEnd);
 
-            var expectedHasKeyBinding = expectedDependentEnd.ApiForeignKeyType is not null;
+            var expectedHasKeyBinding = expectedDependentEnd.ApiForeignKey is not null;
 
             actualRelationship.IsNavigational.Should().Be(!expectedHasKeyBinding);
             actualRelationship.HasKeyBinding.Should().Be(expectedHasKeyBinding);
@@ -155,17 +155,17 @@ public partial class ApiRelationshipTests(ITestOutputHelper output) : XUnitTests
                 return;
             }
 
-            AssertKeyType
+            AssertKeyDefinition
             (
-                expectedDependentEnd.ApiForeignKeyType!,
-                actualRelationship.ApiDependentEnd.ApiForeignKeyType
+                expectedDependentEnd.ApiForeignKey!,
+                actualRelationship.ApiDependentEnd.ApiForeignKey
             );
 
             AssertRelationshipKeyBinding
             (
                 expectedPrincipalEnd,
                 actualRelationship.ApiPrincipalEnd,
-                actualRelationship.ApiDependentEnd.ApiForeignKeyType,
+                actualRelationship.ApiDependentEnd.ApiForeignKey,
                 actualRelationship.ApiKeyBinding
             );
         }
@@ -182,8 +182,8 @@ public partial class ApiRelationshipTests(ITestOutputHelper output) : XUnitTests
             AssertPrincipalEnd(expectedPrincipalEndB, actualRelationship.ApiPrincipalEndB);
             AssertAssociation(expectedAssociation, actualRelationship.ApiAssociation);
 
-            var expectedHasKeyBindings = expectedAssociation.ApiForeignKeyTypeA is not null &&
-                expectedAssociation.ApiForeignKeyTypeB is not null;
+            var expectedHasKeyBindings = expectedAssociation.ApiForeignKeyA is not null &&
+                expectedAssociation.ApiForeignKeyB is not null;
 
             actualRelationship.IsNavigational.Should().Be(!expectedHasKeyBindings);
             actualRelationship.HasKeyBindings.Should().Be(expectedHasKeyBindings);
@@ -198,22 +198,22 @@ public partial class ApiRelationshipTests(ITestOutputHelper output) : XUnitTests
                 return;
             }
 
-            AssertKeyType
+            AssertKeyDefinition
             (
-                expectedAssociation.ApiForeignKeyTypeA!,
-                actualRelationship.ApiAssociation.ApiForeignKeyTypeA
+                expectedAssociation.ApiForeignKeyA!,
+                actualRelationship.ApiAssociation.ApiForeignKeyA
             );
-            AssertKeyType
+            AssertKeyDefinition
             (
-                expectedAssociation.ApiForeignKeyTypeB!,
-                actualRelationship.ApiAssociation.ApiForeignKeyTypeB
+                expectedAssociation.ApiForeignKeyB!,
+                actualRelationship.ApiAssociation.ApiForeignKeyB
             );
 
             AssertRelationshipKeyBinding
             (
                 expectedPrincipalEndA,
                 actualRelationship.ApiPrincipalEndA,
-                actualRelationship.ApiAssociation.ApiForeignKeyTypeA,
+                actualRelationship.ApiAssociation.ApiForeignKeyA,
                 actualRelationship.ApiKeyBindingA
             );
 
@@ -221,7 +221,7 @@ public partial class ApiRelationshipTests(ITestOutputHelper output) : XUnitTests
             (
                 expectedPrincipalEndB,
                 actualRelationship.ApiPrincipalEndB,
-                actualRelationship.ApiAssociation.ApiForeignKeyTypeB,
+                actualRelationship.ApiAssociation.ApiForeignKeyB,
                 actualRelationship.ApiKeyBindingB
             );
         }
@@ -230,67 +230,67 @@ public partial class ApiRelationshipTests(ITestOutputHelper output) : XUnitTests
         (
             ApiRelationshipPrincipalEndDef expectedPrincipalEnd,
             ApiRelationshipPrincipalEnd actualPrincipalEnd,
-            ApiKeyType actualForeignKeyType,
+            ApiKeyDefinition actualForeignKey,
             ApiRelationshipKeyBinding actualKeyBinding
         )
         {
-            var expectedPrincipalKeyType = ResolveExpectedPrincipalKeyType
+            var expectedPrincipalKey = ResolveExpectedPrincipalKey
             (
                 expectedPrincipalEnd,
                 actualPrincipalEnd,
-                actualForeignKeyType
+                actualForeignKey
             );
 
-            var expectedResolutionSource = expectedPrincipalEnd.ApiPrincipalKeyTypeName is null
+            var expectedResolutionSource = expectedPrincipalEnd.ApiPrincipalKeyName is null
                 ? ApiRelationshipPrincipalKeyResolutionSource.Inferred
                 : ApiRelationshipPrincipalKeyResolutionSource.Explicit;
 
             actualKeyBinding.ApiPrincipalEnd.Should().BeSameAs(actualPrincipalEnd);
-            actualKeyBinding.ApiPrincipalKeyType.Should().BeSameAs(expectedPrincipalKeyType);
-            actualKeyBinding.ApiForeignKeyType.Should().BeSameAs(actualForeignKeyType);
-            actualKeyBinding.ApiPrincipalKeyTypeName.Should().Be(expectedPrincipalKeyType.ApiName);
+            actualKeyBinding.ApiPrincipalKey.Should().BeSameAs(expectedPrincipalKey);
+            actualKeyBinding.ApiForeignKey.Should().BeSameAs(actualForeignKey);
+            actualKeyBinding.ApiPrincipalKeyName.Should().Be(expectedPrincipalKey.ApiName);
             actualKeyBinding.ApiPrincipalKeyResolutionSource.Should().Be(expectedResolutionSource);
         }
 
-        private static ApiNamedKeyType ResolveExpectedPrincipalKeyType
+        private static ApiNamedKeyDefinition ResolveExpectedPrincipalKey
         (
             ApiRelationshipPrincipalEndDef expectedPrincipalEnd,
             ApiRelationshipPrincipalEnd actualPrincipalEnd,
-            ApiKeyType actualForeignKeyType
+            ApiKeyDefinition actualForeignKey
         )
         {
-            if (expectedPrincipalEnd.ApiPrincipalKeyTypeName is { } apiPrincipalKeyTypeName)
+            if (expectedPrincipalEnd.ApiPrincipalKeyName is { } apiPrincipalKeyName)
             {
                 return actualPrincipalEnd.ApiObjectType
-                    .GetKeyTypeByApiName(apiPrincipalKeyTypeName);
+                    .GetKeyByApiName(apiPrincipalKeyName);
             }
 
-            var compatiblePrincipalKeyTypes = actualPrincipalEnd.ApiObjectType.ApiKeyTypes
-                .Where(apiKeyType => HaveCompatibleLeafTypes(apiKeyType, actualForeignKeyType))
+            var compatiblePrincipalKeys = actualPrincipalEnd.ApiObjectType.ApiKeys
+                .Where(apiKeyDefinition => HaveCompatibleLeafTypes(apiKeyDefinition, actualForeignKey))
                 .ToArray();
 
-            var compatiblePrincipalKeyType = compatiblePrincipalKeyTypes
+            var compatiblePrincipalKey = compatiblePrincipalKeys
                 .Should().ContainSingle().Which;
-            return compatiblePrincipalKeyType;
+            return compatiblePrincipalKey;
         }
 
         private static bool HaveCompatibleLeafTypes
         (
-            ApiKeyType principalKeyType,
-            ApiKeyType foreignKeyType
+            ApiKeyDefinition principalKey,
+            ApiKeyDefinition foreignKey
         )
         {
-            var principalLeafTypes = GetKeyLeafTypes(principalKeyType);
-            var foreignLeafTypes = GetKeyLeafTypes(foreignKeyType);
+            var principalLeafTypes = GetKeyLeafTypes(principalKey);
+            var foreignLeafTypes = GetKeyLeafTypes(foreignKey);
 
             return principalLeafTypes.SequenceEqual(foreignLeafTypes);
         }
 
-        private static Type[] GetKeyLeafTypes(ApiKeyType keyType)
+        private static Type[] GetKeyLeafTypes(ApiKeyDefinition keyDefinition)
         {
             return
             [
-                .. keyType.ApiKeyPaths.Select
+                .. keyDefinition.ApiKeyPaths.Select
                 (
                     static apiKeyPath => apiKeyPath.ApiScalarSegment.ApiProperty.ApiType.ClrType
                 )
@@ -304,7 +304,7 @@ public partial class ApiRelationshipTests(ITestOutputHelper output) : XUnitTests
         )
         {
             actualEnd.ClrObjectType.Should().Be(expectedEnd.ClrObjectType);
-            actualEnd.ApiPrincipalKeyTypeName.Should().Be(expectedEnd.ApiPrincipalKeyTypeName);
+            actualEnd.ApiPrincipalKeyName.Should().Be(expectedEnd.ApiPrincipalKeyName);
             actualEnd.ApiObjectType.ClrType.Should().Be(expectedEnd.ClrObjectType);
         }
 
@@ -315,7 +315,7 @@ public partial class ApiRelationshipTests(ITestOutputHelper output) : XUnitTests
         )
         {
             actualEnd.ClrObjectType.Should().Be(expectedEnd.ClrObjectType);
-            actualEnd.HasForeignKey.Should().Be(expectedEnd.ApiForeignKeyType is not null);
+            actualEnd.HasForeignKey.Should().Be(expectedEnd.ApiForeignKey is not null);
             actualEnd.ApiObjectType.ClrType.Should().Be(expectedEnd.ClrObjectType);
         }
 
@@ -328,28 +328,28 @@ public partial class ApiRelationshipTests(ITestOutputHelper output) : XUnitTests
             actualAssociation.ClrObjectType.Should().Be(expectedAssociation.ClrObjectType);
             actualAssociation.HasForeignKeys.Should().Be
             (
-                expectedAssociation.ApiForeignKeyTypeA is not null &&
-                expectedAssociation.ApiForeignKeyTypeB is not null
+                expectedAssociation.ApiForeignKeyA is not null &&
+                expectedAssociation.ApiForeignKeyB is not null
             );
             actualAssociation.ApiObjectType.ClrType.Should().Be(expectedAssociation.ClrObjectType);
         }
 
-        private static void AssertKeyType(ApiKeyTypeDef expectedKeyType, ApiKeyType actualKeyType)
+        private static void AssertKeyDefinition(ApiKeyDef expectedKey, ApiKeyDefinition actualKey)
         {
-            if (actualKeyType is ApiNamedKeyType actualNamedKeyType)
+            if (actualKey is ApiNamedKeyDefinition actualNamedKey)
             {
-                actualNamedKeyType.ApiName.Should().Be(expectedKeyType.ApiName);
+                actualNamedKey.ApiName.Should().Be(expectedKey.ApiName);
             }
             else
             {
-                actualKeyType.Should().BeOfType<ApiKeyType>();
+                actualKey.Should().BeOfType<ApiKeyDefinition>();
             }
 
-            actualKeyType.ApiKeyPaths.Should().HaveCount(expectedKeyType.ApiKeyPaths.Count);
+            actualKey.ApiKeyPaths.Should().HaveCount(expectedKey.ApiKeyPaths.Count);
 
-            for (var i = 0; i < expectedKeyType.ApiKeyPaths.Count; i++)
+            for (var i = 0; i < expectedKey.ApiKeyPaths.Count; i++)
             {
-                AssertKeyPath(expectedKeyType.ApiKeyPaths[i], actualKeyType.ApiKeyPaths[i]);
+                AssertKeyPath(expectedKey.ApiKeyPaths[i], actualKey.ApiKeyPaths[i]);
             }
         }
 

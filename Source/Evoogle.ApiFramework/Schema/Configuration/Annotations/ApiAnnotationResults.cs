@@ -21,8 +21,8 @@ public sealed record ApiPropertyAnnotationResult(string? ApiName, ApiTypeModifie
 /// <param name="ApiName">The optional API enum-value name.</param>
 public sealed record ApiEnumValueAnnotationResult(string? ApiName);
 
-/// <summary>Describes a key path contribution to a named key type.</summary>
-/// <param name="ApiName">The API name of the key type.</param>
+/// <summary>Describes a key path contribution to a named key.</summary>
+/// <param name="ApiName">The API name of the key.</param>
 /// <param name="Order">The zero-based order of the path within the key.</param>
 /// <param name="ClrRootType">The CLR type from which the path begins.</param>
 /// <param name="ClrMemberNames">The ordered CLR member names in the path.</param>

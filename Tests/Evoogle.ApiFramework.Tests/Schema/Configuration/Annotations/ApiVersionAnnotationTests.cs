@@ -33,7 +33,7 @@ public sealed class ApiVersionAnnotationTests(ITestOutputHelper output) : XUnitT
 
         #region Calculated Properties
         private ApiVersion MaterializedVersion { get; set; }
-        private ApiVersionType? VersionType { get; set; }
+        private ApiVersionDefinition? VersionDefinition { get; set; }
         #endregion
 
         #region XUnitTest Methods
@@ -63,30 +63,30 @@ public sealed class ApiVersionAnnotationTests(ITestOutputHelper output) : XUnitT
                 _ => throw new InvalidOperationException($"Unknown test case: {this.TestCase}")
             };
 
-            this.VersionType = builder.Build().ApiObjectTypes.Single().ApiVersionType;
+            this.VersionDefinition = builder.Build().ApiObjectTypes.Single().ApiVersion;
             this.MaterializedVersion = this.TestCase switch
             {
-                BuiltInVersionCase.Property => this.VersionType!.MaterializeVersion
+                BuiltInVersionCase.Property => this.VersionDefinition!.MaterializeVersion
                 (
                     new PropertyVersionedType { Version = 42 }
                 ),
-                BuiltInVersionCase.Field => this.VersionType!.MaterializeVersion
+                BuiltInVersionCase.Field => this.VersionDefinition!.MaterializeVersion
                 (
                     new FieldVersionedType { Version = 42 }
                 ),
                 BuiltInVersionCase.Repository =>
-                    this.VersionType!.MaterializeVersionFromValue(42L),
+                    this.VersionDefinition!.MaterializeVersionFromValue(42L),
                 BuiltInVersionCase.InheritedRepository =>
-                    this.VersionType!.MaterializeVersionFromValue(42L),
+                    this.VersionDefinition!.MaterializeVersionFromValue(42L),
                 _ => throw new InvalidOperationException($"Unknown test case: {this.TestCase}")
             };
         }
 
         protected override void Assert()
         {
-            this.VersionType.Should().NotBeNull();
-            this.VersionType!.ClrType.Should().Be(this.ClrTypeExpected);
-            this.VersionType.ClrMemberName.Should().Be(this.ClrMemberNameExpected);
+            this.VersionDefinition.Should().NotBeNull();
+            this.VersionDefinition!.ClrType.Should().Be(this.ClrTypeExpected);
+            this.VersionDefinition.ClrMemberName.Should().Be(this.ClrMemberNameExpected);
             this.MaterializedVersion.HasValue.Should().BeTrue();
             this.MaterializedVersion.ClrType.Should().Be(this.ClrTypeExpected);
         }
@@ -109,7 +109,7 @@ public sealed class ApiVersionAnnotationTests(ITestOutputHelper output) : XUnitT
         #endregion
 
         #region Calculated Properties
-        private ApiVersionType? VersionType { get; set; }
+        private ApiVersionDefinition? VersionDefinition { get; set; }
         #endregion
 
         #region XUnitTest Methods
@@ -169,14 +169,14 @@ public sealed class ApiVersionAnnotationTests(ITestOutputHelper output) : XUnitT
                 _ => throw new InvalidOperationException($"Unknown test case: {this.TestCase}")
             };
 
-            this.VersionType = builder.Build().ApiObjectTypes.Single().ApiVersionType;
+            this.VersionDefinition = builder.Build().ApiObjectTypes.Single().ApiVersion;
         }
 
         protected override void Assert()
         {
-            this.VersionType.Should().NotBeNull();
-            this.VersionType!.ClrType.Should().Be(this.ClrTypeExpected);
-            this.VersionType.ClrMemberName.Should().Be(this.ClrMemberNameExpected);
+            this.VersionDefinition.Should().NotBeNull();
+            this.VersionDefinition!.ClrType.Should().Be(this.ClrTypeExpected);
+            this.VersionDefinition.ClrMemberName.Should().Be(this.ClrMemberNameExpected);
         }
         #endregion
     }
@@ -493,13 +493,13 @@ public sealed class ApiVersionAnnotationTests(ITestOutputHelper output) : XUnitT
         {
             Name = "Member annotation does not add an API property",
             TestCase = InvalidCase.MissingProperty,
-            CompilationCodeExpected = ApiSchemaCompilationCode.ApiVersionTypeUnresolvedProperty
+            CompilationCodeExpected = ApiSchemaCompilationCode.ApiVersionDefinitionUnresolvedProperty
         },
         new InvalidTest
         {
             Name = "Member annotation does not make its API property required",
             TestCase = InvalidCase.OptionalProperty,
-            CompilationCodeExpected = ApiSchemaCompilationCode.ApiVersionTypeOptionalProperty
+            CompilationCodeExpected = ApiSchemaCompilationCode.ApiVersionDefinitionOptionalProperty
         },
         new InvalidTest
         {
@@ -511,7 +511,7 @@ public sealed class ApiVersionAnnotationTests(ITestOutputHelper output) : XUnitT
         {
             Name = "Repository annotation rejects a nullable CLR value type",
             TestCase = InvalidCase.NullableRepositoryType,
-            CompilationCodeExpected = ApiSchemaCompilationCode.ApiVersionTypeNullableClrType
+            CompilationCodeExpected = ApiSchemaCompilationCode.ApiVersionDefinitionNullableClrType
         },
         new InvalidTest
         {

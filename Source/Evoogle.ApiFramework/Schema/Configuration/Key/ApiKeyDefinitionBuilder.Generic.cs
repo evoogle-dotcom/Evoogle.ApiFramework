@@ -11,19 +11,19 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Key;
 
 /// <summary>
 ///     Strongly-typed fluent builder for configuring key-type paths rooted at
-///     <typeparamref name="TRoot"/>. Extends <see cref="ApiKeyTypeBuilder"/> with expression-based
+///     <typeparamref name="TRoot"/>. Extends <see cref="ApiKeyDefinitionBuilder"/> with expression-based
 ///     overloads so CLR member names are extracted at compile time rather than supplied as raw
 ///     strings.
 /// </summary>
 /// <typeparam name="TRoot">The default root CLR type for key paths added via expression overloads.</typeparam>
 /// <param name="apiName">
-///     The optional API name used when the builder produces an <see cref="ApiNamedKeyType"/>.
+///     The optional API name used when the builder produces an <see cref="ApiNamedKeyDefinition"/>.
 /// </param>
 /// <remarks>
-///    <para>Key types are reusable components that define how to extract key values from CLR objects via one or more key paths. They are primarily used to configure API keys, but can also be used for other purposes such as defining unique identifiers for object types.</para>
-///    <para>Each key path represents a navigation chain from a specified CLR root type to a terminal scalar member, and can be configured with extensions at both the path and segment levels. When multiple key paths are defined within a key type, the resulting key value is a composite of the individual path values.</para>
+///    <para>Key definitions are reusable components that define how to extract key values from CLR objects via one or more key paths. They are primarily used to configure API keys, but can also be used for other purposes such as defining unique identifiers for object types.</para>
+///    <para>Each key path represents a navigation chain from a specified CLR root type to a terminal scalar member, and can be configured with extensions at both the path and segment levels. When multiple key paths are defined within a key definition, the resulting key value is a composite of the individual path values.</para>
 /// </remarks>
-public sealed class ApiKeyTypeBuilder<TRoot>(string? apiName = null) : ApiKeyTypeBuilder(apiName)
+public sealed class ApiKeyDefinitionBuilder<TRoot>(string? apiName = null) : ApiKeyDefinitionBuilder(apiName)
 {
     #region AddPath Methods
     /// <summary>
@@ -36,7 +36,7 @@ public sealed class ApiKeyTypeBuilder<TRoot>(string? apiName = null) : ApiKeyTyp
     /// <returns>The current builder instance.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="expression"/> is <c>null</c>.</exception>
     /// <exception cref="ArgumentException">Thrown when <paramref name="expression"/> is not a simple member access chain.</exception>
-    public ApiKeyTypeBuilder<TRoot> AddPath<TScalar>
+    public ApiKeyDefinitionBuilder<TRoot> AddPath<TScalar>
     (
         Expression<Func<TRoot, TScalar>> expression,
         Action<ApiKeyPathBuilder<TRoot>>? configure = null
@@ -61,7 +61,7 @@ public sealed class ApiKeyTypeBuilder<TRoot>(string? apiName = null) : ApiKeyTyp
     /// <returns>The current builder instance.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="expression"/> is <c>null</c>.</exception>
     /// <exception cref="ArgumentException">Thrown when <paramref name="expression"/> is not a simple member access chain.</exception>
-    public ApiKeyTypeBuilder<TRoot> AddPathFrom<TPathRoot>
+    public ApiKeyDefinitionBuilder<TRoot> AddPathFrom<TPathRoot>
     (
         Expression<Func<TPathRoot, object?>> expression,
         Action<ApiKeyPathBuilder<TRoot>>? configure = null
@@ -77,8 +77,8 @@ public sealed class ApiKeyTypeBuilder<TRoot>(string? apiName = null) : ApiKeyTyp
     #endregion
 
     #region With Methods
-    /// <inheritdoc cref="ApiKeyTypeBuilder.WithName(string)"/>
-    public new ApiKeyTypeBuilder<TRoot> WithName(string apiName)
+    /// <inheritdoc cref="ApiKeyDefinitionBuilder.WithName(string)"/>
+    public new ApiKeyDefinitionBuilder<TRoot> WithName(string apiName)
     {
         base.WithName(apiName);
         return this;

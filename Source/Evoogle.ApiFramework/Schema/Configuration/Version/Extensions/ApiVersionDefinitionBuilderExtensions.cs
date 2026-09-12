@@ -5,22 +5,22 @@
 // See the LICENSE file in the project root for more information.
 namespace Evoogle.ApiFramework.Schema.Configuration.Version;
 
-/// <summary>Convenience extension methods for <see cref="ApiVersionTypeBuilder"/>.</summary>
-public static class ApiVersionTypeBuilderExtensions
+/// <summary>Convenience extension methods for <see cref="ApiVersionDefinitionBuilder"/>.</summary>
+public static class ApiVersionDefinitionBuilderExtensions
 {
     /// <summary>Adds version extension metadata keyed by its concrete type.</summary>
     /// <typeparam name="TExtension">The extension metadata type.</typeparam>
-    /// <param name="builder">The version type builder.</param>
+    /// <param name="builder">The version definition builder.</param>
     /// <param name="extension">The extension metadata value.</param>
     /// <returns>The current builder.</returns>
-    public static ApiVersionTypeBuilder AddVersionTypeExtension<TExtension>
+    public static ApiVersionDefinitionBuilder AddVersionExtension<TExtension>
     (
-        this ApiVersionTypeBuilder builder,
+        this ApiVersionDefinitionBuilder builder,
         TExtension extension
     )
         where TExtension : class, IApiSchemaExtension
     {
         ArgumentNullException.ThrowIfNull(builder);
-        return builder.AddVersionTypeExtension(typeof(TExtension), extension);
+        return builder.AddVersionExtension(typeof(TExtension), extension);
     }
 }

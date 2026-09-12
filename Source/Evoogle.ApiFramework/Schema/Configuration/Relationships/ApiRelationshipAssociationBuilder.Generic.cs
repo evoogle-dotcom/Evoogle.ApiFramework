@@ -30,35 +30,35 @@ public sealed class ApiRelationshipAssociationBuilder<TAssociation>()
 
     #region WithForeignKey Methods
     /// <summary>
-    ///     Sets the A-side foreign key role's <see cref="ApiKeyType"/> using a strongly-typed builder for
+    ///     Sets the A-side foreign key role's <see cref="ApiKeyDefinition"/> using a strongly-typed builder for
     ///     <typeparamref name="TAssociation"/>.
     /// </summary>
-    /// <param name="configure">Optional callback to configure key paths on the key type.</param>
+    /// <param name="configure">Optional callback to configure key paths on the key.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipAssociationBuilder<TAssociation> WithForeignKeyA(Action<ApiKeyTypeBuilder<TAssociation>>? configure = null)
+    public ApiRelationshipAssociationBuilder<TAssociation> WithForeignKeyA(Action<ApiKeyDefinitionBuilder<TAssociation>>? configure = null)
     {
         base.WithForeignKeyA
         (
             configure == null
                 ? null
-                : builder => configure((ApiKeyTypeBuilder<TAssociation>)builder)
+                : builder => configure((ApiKeyDefinitionBuilder<TAssociation>)builder)
         );
         return this;
     }
 
     /// <summary>
-    ///     Sets the B-side foreign key role's <see cref="ApiKeyType"/> using a strongly-typed builder for
+    ///     Sets the B-side foreign key role's <see cref="ApiKeyDefinition"/> using a strongly-typed builder for
     ///     <typeparamref name="TAssociation"/>.
     /// </summary>
-    /// <param name="configure">Optional callback to configure key paths on the key type.</param>
+    /// <param name="configure">Optional callback to configure key paths on the key.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipAssociationBuilder<TAssociation> WithForeignKeyB(Action<ApiKeyTypeBuilder<TAssociation>>? configure = null)
+    public ApiRelationshipAssociationBuilder<TAssociation> WithForeignKeyB(Action<ApiKeyDefinitionBuilder<TAssociation>>? configure = null)
     {
         base.WithForeignKeyB
         (
             configure == null
                 ? null
-                : builder => configure((ApiKeyTypeBuilder<TAssociation>)builder)
+                : builder => configure((ApiKeyDefinitionBuilder<TAssociation>)builder)
         );
         return this;
     }

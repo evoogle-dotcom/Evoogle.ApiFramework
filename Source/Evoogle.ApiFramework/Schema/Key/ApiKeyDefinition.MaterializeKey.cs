@@ -9,7 +9,7 @@ using Evoogle.ApiFramework.Schema.Key.Internal;
 
 namespace Evoogle.ApiFramework.Schema.Key;
 
-public partial class ApiKeyType
+public partial class ApiKeyDefinition
 {
     #region MaterializeKey Methods
     /// <summary>
@@ -64,14 +64,14 @@ public partial class ApiKeyType
         // All keys produce a named-composite ApiKey regardless of path count,
         // so callers can always inspect part names uniformly.
         var partNameFormatter = context.PartNameFormatter ?? ApiKeyPartNameFormatters.Resolve(context.PartNameFormat);
-        var contextualKeyTypeName = context.ContextualKeyTypeName ?? (this as ApiNamedKeyType)?.ApiName;
+        var contextualKeyName = context.ContextualKeyName ?? (this as ApiNamedKeyDefinition)?.ApiName;
         var parts = new ApiKeyPart[this.ApiKeyPaths.Length];
         for (var i = 0; i < this.ApiKeyPaths.Length; i++)
         {
             var path = this.ApiKeyPaths[i];
             var partName = partNameFormatter
             (
-                new ApiKeyPartNameContext(this, path, i, contextualKeyTypeName)
+                new ApiKeyPartNameContext(this, path, i, contextualKeyName)
             );
             var partValue = valueFactory(path, context);
             parts[i] = new ApiKeyPart(partName, partValue);

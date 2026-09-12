@@ -16,13 +16,13 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Types.Internal;
 internal sealed class ApiObjectTypeState
 {
     #region Properties
-    internal List<ApiKeyTypeBuilder> KeyTypeBuilders { get; } = [];
+    internal List<ApiKeyDefinitionBuilder> KeyBuilders { get; } = [];
 
     internal List<ApiPropertyBuilder> PropertyBuilders { get; } = [];
 
     internal Action<ApiObjectTypeOptionsBuilder>? OptionsConfiguration { get; set; }
 
-    internal ApiVersionTypeBuilder? VersionTypeBuilder { get; set; }
+    internal ApiVersionDefinitionBuilder? VersionBuilder { get; set; }
 
     internal ApiConfigurationSource? VersionConfigurationSource { get; set; }
     #endregion

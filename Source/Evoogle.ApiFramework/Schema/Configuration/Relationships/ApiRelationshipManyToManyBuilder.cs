@@ -45,7 +45,7 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
     ///     Configures principal end A of the relationship using the specified CLR type.
     /// </summary>
     /// <param name="clrPrincipalType">The CLR type of the principal end A object type.</param>
-    /// <param name="configure">Optional callback to configure principal key type selection and extensions.</param>
+    /// <param name="configure">Optional callback to configure principal key selection and extensions.</param>
     /// <returns>The current builder instance.</returns>
     public ApiRelationshipManyToManyBuilder Between(Type clrPrincipalType, Action<ApiRelationshipPrincipalEndBuilder>? configure = null)
     {
@@ -90,20 +90,20 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
 
     /// <summary>
     ///     Configures principal end A of the relationship using the specified CLR type,
-    ///     and selects the named principal key type for the relationship.
+    ///     and selects the named principal key for the relationship.
     /// </summary>
     /// <param name="clrPrincipalType">The CLR type of the principal end A object type.</param>
-    /// <param name="apiPrincipalKeyTypeName">The name of the principal key type to use for the relationship.</param>
+    /// <param name="apiPrincipalKeyName">The name of the principal key to use for the relationship.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipManyToManyBuilder Between(Type clrPrincipalType, string apiPrincipalKeyTypeName)
+    public ApiRelationshipManyToManyBuilder Between(Type clrPrincipalType, string apiPrincipalKeyName)
     {
         ArgumentNullException.ThrowIfNull(clrPrincipalType);
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiPrincipalKeyTypeName, nameof(apiPrincipalKeyTypeName));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiPrincipalKeyName, nameof(apiPrincipalKeyName));
 
         return this.Between
         (
             clrPrincipalType,
-            builder => builder.WithPrincipalKey(apiPrincipalKeyTypeName)
+            builder => builder.WithPrincipalKey(apiPrincipalKeyName)
         );
     }
 
@@ -111,7 +111,7 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
     ///     Configures principal end B of the relationship using the specified CLR type.
     /// </summary>
     /// <param name="clrPrincipalType">The CLR type of the principal end B object type.</param>
-    /// <param name="configure">Optional callback to configure principal key type selection and extensions.</param>
+    /// <param name="configure">Optional callback to configure principal key selection and extensions.</param>
     /// <returns>The current builder instance.</returns>
     public ApiRelationshipManyToManyBuilder And(Type clrPrincipalType, Action<ApiRelationshipPrincipalEndBuilder>? configure = null)
     {
@@ -156,20 +156,20 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
 
     /// <summary>
     ///     Configures principal end B of the relationship using the specified CLR type,
-    ///     and selects the named principal key type for the relationship.
+    ///     and selects the named principal key for the relationship.
     /// </summary>
     /// <param name="clrPrincipalType">The CLR type of the principal end B object type.</param>
-    /// <param name="apiPrincipalKeyTypeName">The name of the principal key type to use for the relationship.</param>
+    /// <param name="apiPrincipalKeyName">The name of the principal key to use for the relationship.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipManyToManyBuilder And(Type clrPrincipalType, string apiPrincipalKeyTypeName)
+    public ApiRelationshipManyToManyBuilder And(Type clrPrincipalType, string apiPrincipalKeyName)
     {
         ArgumentNullException.ThrowIfNull(clrPrincipalType);
-        ArgumentException.ThrowIfNullOrWhiteSpace(apiPrincipalKeyTypeName, nameof(apiPrincipalKeyTypeName));
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiPrincipalKeyName, nameof(apiPrincipalKeyName));
 
         return this.And
         (
             clrPrincipalType,
-            builder => builder.WithPrincipalKey(apiPrincipalKeyTypeName)
+            builder => builder.WithPrincipalKey(apiPrincipalKeyName)
         );
     }
     #endregion

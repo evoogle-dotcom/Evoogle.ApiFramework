@@ -6,22 +6,22 @@
 namespace Evoogle.ApiFramework.Schema.Configuration.Key;
 
 /// <summary>
-///     Convenience extension methods for <see cref="ApiKeyTypeBuilder"/>.
+///     Convenience extension methods for <see cref="ApiKeyDefinitionBuilder"/>.
 /// </summary>
-public static class ApiKeyTypeBuilderExtensions
+public static class ApiKeyDefinitionBuilderExtensions
 {
     /// <summary>
-    ///     Adds a key type extension value keyed by its own type.
+    ///     Adds a key definition extension value keyed by its own type.
     /// </summary>
     /// <typeparam name="TExtension">The extension value type.</typeparam>
-    /// <param name="builder">The key type builder to configure.</param>
+    /// <param name="builder">The key definition builder to configure.</param>
     /// <param name="extension">The extension value.</param>
     /// <returns>The current builder instance.</returns>
-    public static ApiKeyTypeBuilder AddKeyTypeExtension<TExtension>(this ApiKeyTypeBuilder builder, TExtension extension)
+    public static ApiKeyDefinitionBuilder AddKeyExtension<TExtension>(this ApiKeyDefinitionBuilder builder, TExtension extension)
         where TExtension : class, IApiSchemaExtension
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        return builder.AddKeyTypeExtension(typeof(TExtension), extension);
+        return builder.AddKeyExtension(typeof(TExtension), extension);
     }
 }

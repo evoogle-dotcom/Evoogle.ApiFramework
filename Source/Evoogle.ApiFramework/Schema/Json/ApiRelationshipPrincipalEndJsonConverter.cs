@@ -27,7 +27,7 @@ public class ApiRelationshipPrincipalEndJsonConverter(ILogger<ApiRelationshipPri
 
     private readonly record struct ApiRelationshipPrincipalEndPropertyNames
     {
-        public required string ApiPrincipalKeyTypeName { get; init; }
+        public required string ApiPrincipalKeyName { get; init; }
     }
 
     private readonly record struct PropertyNames
@@ -45,7 +45,7 @@ public class ApiRelationshipPrincipalEndJsonConverter(ILogger<ApiRelationshipPri
                 },
                 ApiRelationshipPrincipalEnd = new ApiRelationshipPrincipalEndPropertyNames
                 {
-                    ApiPrincipalKeyTypeName = policy.ConvertName(nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyTypeName)),
+                    ApiPrincipalKeyName = policy.ConvertName(nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyName)),
                 },
                 ExtensibleBase = GetExtensiblePropertyNames(policy),
             };
@@ -60,7 +60,7 @@ public class ApiRelationshipPrincipalEndJsonConverter(ILogger<ApiRelationshipPri
 
     private class ApiRelationshipPrincipalEndReadData
     {
-        public string? ApiPrincipalKeyTypeName { get; set; }
+        public string? ApiPrincipalKeyName { get; set; }
     }
 
     private class ReadState : ExtensibleReadData
@@ -74,7 +74,7 @@ public class ApiRelationshipPrincipalEndJsonConverter(ILogger<ApiRelationshipPri
         public readonly Dictionary<string, JsonReaderHandler<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>>> PropertyHandlers = new()
         {
             { propertyNames.ApiRelationshipElement.ClrObjectType, HandleClrObjectType },
-            { propertyNames.ApiRelationshipPrincipalEnd.ApiPrincipalKeyTypeName, HandleApiPrincipalKeyTypeName },
+            { propertyNames.ApiRelationshipPrincipalEnd.ApiPrincipalKeyName, HandleApiPrincipalKeyName },
             { propertyNames.ExtensibleBase.Extensions, CreateExtensionsHandler<PropertyNames, ReadState, ReadHandlers>() },
         };
 
@@ -84,10 +84,10 @@ public class ApiRelationshipPrincipalEndJsonConverter(ILogger<ApiRelationshipPri
             context.ReadData.ApiRelationshipElement.ClrObjectType = _typeJsonConverter.Read(ref reader, typeof(Type), context.Options);
         }
 
-        private static void HandleApiPrincipalKeyTypeName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
+        private static void HandleApiPrincipalKeyName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
             context.ReadData.ApiRelationshipPrincipalEnd ??= new ApiRelationshipPrincipalEndReadData();
-            context.ReadData.ApiRelationshipPrincipalEnd.ApiPrincipalKeyTypeName = reader.GetString();
+            context.ReadData.ApiRelationshipPrincipalEnd.ApiPrincipalKeyName = reader.GetString();
         }
     }
     #endregion
@@ -125,12 +125,12 @@ public class ApiRelationshipPrincipalEndJsonConverter(ILogger<ApiRelationshipPri
         var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
 
         var clrObjectType = readContext.ReadData.ApiRelationshipElement?.ClrObjectType;
-        var apiPrincipalKeyTypeName = readContext.ReadData.ApiRelationshipPrincipalEnd?.ApiPrincipalKeyTypeName;
+        var apiPrincipalKeyName = readContext.ReadData.ApiRelationshipPrincipalEnd?.ApiPrincipalKeyName;
 
         var end = new ApiRelationshipPrincipalEnd
             (
                 clrObjectType!,
-                apiPrincipalKeyTypeName
+                apiPrincipalKeyName
             );
 
         AttachExtensions(end, readContext.ReadData.Extensions);
@@ -152,7 +152,7 @@ public class ApiRelationshipPrincipalEndJsonConverter(ILogger<ApiRelationshipPri
         WriteJsonObject(writer, () =>
         {
             WriteClrObjectType(writer, value, writeContext);
-            WriteApiPrincipalKeyTypeName(writer, value, writeContext);
+            WriteApiPrincipalKeyName(writer, value, writeContext);
 
             WriteExtensibleBaseExtensions(writer, writeContext.PropertyNames.ExtensibleBase.Extensions, value, writeContext);
         });
@@ -163,10 +163,10 @@ public class ApiRelationshipPrincipalEndJsonConverter(ILogger<ApiRelationshipPri
     private static void WriteClrObjectType(Utf8JsonWriter writer, ApiRelationshipPrincipalEnd end, DefaultWriteContext<PropertyNames> context)
         => writer.TryWritePropertyWithConverter(context.PropertyNames.ApiRelationshipElement.ClrObjectType, end.ClrObjectType, context.Options, _typeJsonConverter);
 
-    private static void WriteApiPrincipalKeyTypeName(Utf8JsonWriter writer, ApiRelationshipPrincipalEnd end, DefaultWriteContext<PropertyNames> context)
+    private static void WriteApiPrincipalKeyName(Utf8JsonWriter writer, ApiRelationshipPrincipalEnd end, DefaultWriteContext<PropertyNames> context)
     {
-        var propertyName = context.PropertyNames.ApiRelationshipPrincipalEnd.ApiPrincipalKeyTypeName;
-        var value = end.ApiPrincipalKeyTypeName;
+        var propertyName = context.PropertyNames.ApiRelationshipPrincipalEnd.ApiPrincipalKeyName;
+        var value = end.ApiPrincipalKeyName;
 
         writer.TryWritePropertyAsString(propertyName, value, context.Options);
     }

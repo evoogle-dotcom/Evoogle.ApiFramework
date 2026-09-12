@@ -79,8 +79,8 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
         public int Id { get; set; }
     }
 
-    private sealed class CustomKeyType(IEnumerable<ApiKeyPath> apiKeyPaths)
-        : ApiKeyType(apiKeyPaths);
+    private sealed class CustomKeyDefinition(IEnumerable<ApiKeyPath> apiKeyPaths)
+        : ApiKeyDefinition(apiKeyPaths);
 
     private sealed class StoppingVisitor(int maximumCount) : INodeVisitor<ApiSchemaElement>
     {
@@ -161,8 +161,8 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
                     "SharedTreeObject",
                     apiOptions: null,
                     apiProperties: [sharedProperty],
-                    apiKeyTypes: [],
-                    apiVersionType: null,
+                    apiKeys: [],
+                    apiVersion: null,
                     typeof(SharedTreeObject)
                 );
 
@@ -265,11 +265,11 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
                 .BeSameAs(fixture.NestedItemCollectionType);
             fixture.NestedItemCollectionType.ApiItemType.Root.Should().BeSameAs(fixture.Schema);
 
-            var keyType = fixture.ObjectTypeWithKey.ApiKeyTypes.Single();
-            keyType.Root.Should().BeSameAs(fixture.Schema);
-            keyType.ApiKeyPaths.Single().ApiRootObjectType.Should()
+            var keyDefinition = fixture.ObjectTypeWithKey.ApiKeys.Single();
+            keyDefinition.Root.Should().BeSameAs(fixture.Schema);
+            keyDefinition.ApiKeyPaths.Single().ApiRootObjectType.Should()
                 .BeSameAs(fixture.ObjectTypeWithKey);
-            keyType.ApiKeyPaths.Single().ApiScalarSegment.ApiProperty.Parent.Should()
+            keyDefinition.ApiKeyPaths.Single().ApiScalarSegment.ApiProperty.Parent.Should()
                 .BeSameAs(fixture.ObjectTypeWithKey);
 
             fixture.Schema.TryGetScalarTypeByApiName(fixture.ScalarType.ApiName, out _)
@@ -408,7 +408,7 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
 
         private ApiKeyPath? KeyPath { get; set; }
 
-        private ApiNamedKeyType? KeyType { get; set; }
+        private ApiNamedKeyDefinition? KeyDefinition { get; set; }
 
         private ImmutableArray<ApiRelationshipAssociation> RelationshipAssociationsBefore
         {
@@ -434,7 +434,7 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
             segmentSource.Clear();
 
             var keyPathSource = new List<ApiKeyPath> { this.KeyPath };
-            this.KeyType = new ApiNamedKeyType("PK_InlineKeyedChild", keyPathSource);
+            this.KeyDefinition = new ApiNamedKeyDefinition("PK_InlineKeyedChild", keyPathSource);
             keyPathSource.Clear();
 
             var propertySource = new List<ApiProperty>
@@ -445,18 +445,18 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
                     new ApiScalarType("InlineInt32", typeof(int))
                 )
             };
-            var keyTypeSource = new List<ApiNamedKeyType> { this.KeyType };
+            var keySource = new List<ApiNamedKeyDefinition> { this.KeyDefinition };
             this.ObjectType = new ApiObjectType
             (
                 "InlineKeyedChild",
                 apiOptions: null,
                 propertySource,
-                keyTypeSource,
-                apiVersionType: null,
+                keySource,
+                apiVersion: null,
                 typeof(InlineKeyedChild)
             );
             propertySource.Clear();
-            keyTypeSource.Clear();
+            keySource.Clear();
 
             var enumValueSource = new List<ApiEnumValue>
             {
@@ -496,10 +496,10 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
             this.EnumType.ApiEnumValues.Should().ContainSingle();
             this.ObjectType!.ApiProperties.IsDefault.Should().BeFalse();
             this.ObjectType.ApiProperties.Should().ContainSingle();
-            this.ObjectType.ApiKeyTypes.IsDefault.Should().BeFalse();
-            this.ObjectType.ApiKeyTypes.Should().ContainSingle();
-            this.KeyType!.ApiKeyPaths.IsDefault.Should().BeFalse();
-            this.KeyType.ApiKeyPaths.Should().ContainSingle();
+            this.ObjectType.ApiKeys.IsDefault.Should().BeFalse();
+            this.ObjectType.ApiKeys.Should().ContainSingle();
+            this.KeyDefinition!.ApiKeyPaths.IsDefault.Should().BeFalse();
+            this.KeyDefinition.ApiKeyPaths.Should().ContainSingle();
             this.KeyPath!.ApiSegments.IsDefault.Should().BeFalse();
             this.KeyPath.ApiSegments.Should().ContainSingle();
 
@@ -539,7 +539,7 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
         #region Calculated Properties
         private Type[]? AbstractBranchTypes { get; set; }
 
-        private CustomKeyType? CustomKeyType { get; set; }
+        private CustomKeyDefinition? CustomKeyDefinition { get; set; }
         #endregion
 
         #region XUnitTest Methods
@@ -555,7 +555,7 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
                 typeof(ApiRelationshipElement),
                 typeof(ApiRelationshipEnd)
             ];
-            this.CustomKeyType = new CustomKeyType([]);
+            this.CustomKeyDefinition = new CustomKeyDefinition([]);
         }
 
         protected override void Act()
@@ -571,8 +571,8 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
                     .Should().Contain(constructor => constructor.IsAssembly);
             }
 
-            this.CustomKeyType!.Kind.Should().Be(ApiSchemaElementKind.KeyType);
-            this.CustomKeyType.Should().BeAssignableTo<ApiKeyType>();
+            this.CustomKeyDefinition!.Kind.Should().Be(ApiSchemaElementKind.KeyDefinition);
+            this.CustomKeyDefinition.Should().BeAssignableTo<ApiKeyDefinition>();
         }
         #endregion
     }
@@ -615,7 +615,7 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
         {
             var schema = ApiSchemaFactory.KeyApiSchema;
             var objectType = schema.GetObjectTypeByApiName("KeyNestedComposite");
-            var keyPath = objectType.GetKeyTypeByApiName("PK_KeyNestedComposite")
+            var keyPath = objectType.GetKeyByApiName("PK_KeyNestedComposite")
                 .ApiKeyPaths.Single(path => path.ApiSegments.Length > 1);
             var terminalSegment = keyPath.ApiSegments[^1];
 
@@ -671,7 +671,7 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
         {
             var schema = ApiSchemaFactory.KeyApiSchema;
             var objectType = schema.GetObjectTypeByApiName("KeyNestedComposite");
-            var keyPath = objectType.GetKeyTypeByApiName("PK_KeyNestedComposite")
+            var keyPath = objectType.GetKeyByApiName("PK_KeyNestedComposite")
                 .ApiKeyPaths.Single(path => path.ApiSegments.Length > 1);
             var terminalSegment = keyPath.ApiSegments[^1];
 
@@ -928,8 +928,8 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
                     new ApiScalarType("InlineObjectInt32", typeof(int))
                 )
             ],
-            apiKeyTypes: [],
-            apiVersionType: null,
+            apiKeys: [],
+            apiVersion: null,
             typeof(InlineChild)
         );
 
@@ -967,8 +967,8 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
             "InlineObjectWithKey",
             apiOptions: null,
             apiProperties: [keyedProperty],
-            apiKeyTypes: [new ApiNamedKeyType("PK_InlineObjectWithKey", [keyedPath])],
-            apiVersionType: null,
+            apiKeys: [new ApiNamedKeyDefinition("PK_InlineObjectWithKey", [keyedPath])],
+            apiVersion: null,
             typeof(InlineKeyedChild)
         );
 
@@ -989,8 +989,8 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
                 ),
                 CreateInlineProperty(nameof(InlineHost.ObjectWithKey), objectTypeWithKey)
             ],
-            apiKeyTypes: [],
-            apiVersionType: null,
+            apiKeys: [],
+            apiVersion: null,
             typeof(InlineHost)
         );
         var schema = CreateSchema("InlineTypes", [hostType]);
@@ -1015,8 +1015,8 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
             "PrincipalA",
             apiOptions: null,
             apiProperties: [],
-            apiKeyTypes: [],
-            apiVersionType: null,
+            apiKeys: [],
+            apiVersion: null,
             typeof(SharedTreeObject)
         );
         var principalObjectTypeB = new ApiObjectType
@@ -1024,8 +1024,8 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
             "PrincipalB",
             apiOptions: null,
             apiProperties: [],
-            apiKeyTypes: [],
-            apiVersionType: null,
+            apiKeys: [],
+            apiVersion: null,
             typeof(InlineHost)
         );
         var associationObjectType = new ApiObjectType
@@ -1033,8 +1033,8 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
             "Association",
             apiOptions: null,
             apiProperties: [],
-            apiKeyTypes: [],
-            apiVersionType: null,
+            apiKeys: [],
+            apiVersion: null,
             typeof(InlineKeyedChild)
         );
         var oneToMany = new ApiRelationshipOneToMany

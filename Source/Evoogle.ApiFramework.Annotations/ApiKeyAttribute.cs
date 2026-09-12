@@ -6,7 +6,7 @@
 namespace Evoogle.ApiFramework;
 
 /// <summary>
-///     Declares a CLR property, field, or CLR-rooted path as part of a named key type on an object type.
+///     Declares a CLR property, field, or CLR-rooted path as part of a named key on an object type.
 ///     Apply this attribute once per key path; use <see cref="Order"/> to sequence the paths within a composite key.
 ///     When applied to a property or field without <see cref="ClrPath"/>, the decorated member supplies the single path segment.
 /// </summary>
@@ -33,7 +33,7 @@ public sealed class ApiKeyAttribute : ApiNamedElementAttribute
 
     #region Properties
     /// <summary>
-    ///     Gets the the API name of the key type this path contributes to.
+    ///     Gets the API name of the key this path contributes to.
     /// </summary>
     public new string ApiName
     {

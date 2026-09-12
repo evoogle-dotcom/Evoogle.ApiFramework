@@ -21,16 +21,22 @@ public delegate string? ApiKeyPartNameFormatterDelegate(ApiKeyPartNameContext co
 /// <summary>
 ///     Provides metadata to an <see cref="ApiKeyPartNameFormatterDelegate"/> while materializing an <see cref="ApiKey"/>.
 /// </summary>
-/// <param name="ApiKeyType">The key type being materialized.</param>
+/// <param name="ApiKeyDefinition">The key definition being materialized.</param>
 /// <param name="ApiKeyPath">The key path for the current part.</param>
-/// <param name="PartIndex">The zero-based index of the current part.</param>
-/// <param name="ApiKeyTypeName">
-///     The effective contextual name of the key type being materialized, or
-///     <see langword="null"/> for an anonymous key type. An explicit
-///     <see cref="ApiKeyMaterializationContext.ContextualKeyTypeName"/> takes precedence over
-///     <see cref="ApiNamedKeyType.ApiName"/>.
+/// <param name="ApiKeyPartIndex">The zero-based index of the current API key part.</param>
+/// <param name="ApiKeyName">
+///     The effective contextual name of the key definition being materialized, or
+///     <see langword="null"/> for an anonymous key definition. An explicit
+///     <see cref="ApiKeyMaterializationContext.ContextualKeyName"/> takes precedence over
+///     <see cref="ApiNamedKeyDefinition.ApiName"/>.
 /// </param>
-public readonly record struct ApiKeyPartNameContext(ApiKeyType ApiKeyType, ApiKeyPath ApiKeyPath, int PartIndex, string? ApiKeyTypeName);
+public readonly record struct ApiKeyPartNameContext
+(
+    ApiKeyDefinition ApiKeyDefinition,
+    ApiKeyPath ApiKeyPath,
+    int ApiKeyPartIndex,
+    string? ApiKeyName
+);
 
 internal enum ApiKeyMaterializationValueKind
 {
@@ -63,7 +69,7 @@ internal readonly record struct ApiKeyMaterializationValue
 
 /// <summary>
 ///     Provides context for materializing an <see cref="ApiKey"/> from CLR object instances
-///     using <see cref="ApiKeyType.MaterializeKey(ApiKeyMaterializationContext)"/>.
+///     using <see cref="ApiKeyDefinition.MaterializeKey(ApiKeyMaterializationContext)"/>.
 /// </summary>
 /// <remarks>
 ///     This mutable context is request-scoped and is not safe for concurrent sharing. Each
@@ -105,17 +111,18 @@ public sealed class ApiKeyMaterializationContext
     public ApiKeyNullHandling NullHandling { get; init; } = ApiKeyNullHandling.UseDefaultOnNull;
 
     /// <summary>
-    ///     Gets the optional contextual name override for the key type being materialized.
+    ///     Gets the optional contextual name override for the key definition being materialized.
     /// </summary>
     /// <remarks>
     ///     When non-null, this value is propagated into
-    ///     <see cref="ApiKeyPartNameContext.ApiKeyTypeName"/> for each part. It takes precedence over
-    ///     <see cref="ApiNamedKeyType.ApiName"/>. When null, the
-    ///     <see cref="ApiNamedKeyType.ApiName"/> of a named key type is propagated; anonymous key types
-    ///     propagate null. This value is metadata for <see cref="PartNameFormatter"/> and is not used by
-    ///     the predefined <see cref="PartNameFormat"/> values.
+    ///     <see cref="ApiKeyPartNameContext.ApiKeyName"/> for each part. It takes precedence over
+    ///     <see cref="ApiNamedKeyDefinition.ApiName"/>. When null, the
+    ///     <see cref="ApiNamedKeyDefinition.ApiName"/> of a named key definition is propagated;
+    ///     anonymous key definitions propagate null. This value is metadata for
+    ///     <see cref="PartNameFormatter"/> and is not used by the predefined
+    ///     <see cref="PartNameFormat"/> values.
     /// </remarks>
-    public string? ContextualKeyTypeName { get; init; }
+    public string? ContextualKeyName { get; init; }
     #endregion
 
     #region Methods

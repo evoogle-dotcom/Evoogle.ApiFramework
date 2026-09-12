@@ -20,12 +20,12 @@ namespace Evoogle.ApiFramework.Schema.Relationships;
 ///     The association identifies the join-table <see cref="ApiObjectType"/> whose properties hold key values
 ///     that link the two outer principal object types.
 ///
-///     An association may declare <see cref="ApiForeignKeyTypeA"/> and <see cref="ApiForeignKeyTypeB"/>
-///     to map the scalar leaves of each principal key type to properties on the association object type.
+///     An association may declare <see cref="ApiForeignKeyA"/> and <see cref="ApiForeignKeyB"/>
+///     to map the scalar leaves of each principal key to properties on the association object type.
 /// </summary>
 /// <remarks>
-///     Use <see cref="HasForeignKeys"/> before accessing <see cref="ApiForeignKeyTypeA"/> or
-///     <see cref="ApiForeignKeyTypeB"/>.
+///     Use <see cref="HasForeignKeys"/> before accessing <see cref="ApiForeignKeyA"/> or
+///     <see cref="ApiForeignKeyB"/>.
 ///
 ///     The state is symmetric: both sides are either declared together or omitted together.
 ///
@@ -35,8 +35,8 @@ namespace Evoogle.ApiFramework.Schema.Relationships;
 public sealed class ApiRelationshipAssociation : ApiRelationshipElement
 {
     #region ApiRelationshipAssociation Fields
-    private readonly ApiKeyType? _apiForeignKeyTypeA;
-    private readonly ApiKeyType? _apiForeignKeyTypeB;
+    private readonly ApiKeyDefinition? _apiForeignKeyA;
+    private readonly ApiKeyDefinition? _apiForeignKeyB;
 
     private const string _noForeignKeysDeclaredMessage = "No foreign keys declared for this association of the many-to-many relationship.";
     private const string _ownershipErrorMessage = $"An {nameof(ApiRelationshipAssociation)} must be owned by an {nameof(ApiRelationshipManyToMany)}.";
@@ -60,32 +60,32 @@ public sealed class ApiRelationshipAssociation : ApiRelationshipElement
         this.Parent as ApiRelationshipManyToMany ?? throw new ApiSchemaException(_ownershipErrorMessage);
 
     /// <summary>
-    ///     Gets the A-side foreign key role's <see cref="ApiKeyType"/> that maps scalar leaves of principal end A's key type
+    ///     Gets the A-side foreign key role's <see cref="ApiKeyDefinition"/> that maps scalar leaves of principal end A's key
     ///     to properties on the association object type.
     /// </summary>
     /// <exception cref="ApiSchemaException">
     ///     Thrown when <see cref="HasForeignKeys"/> is <see langword="false"/>.
     /// </exception>
-    public ApiKeyType ApiForeignKeyTypeA => this.HasForeignKeys
-        ? _apiForeignKeyTypeA! : throw new ApiSchemaException(_noForeignKeysDeclaredMessage);
+    public ApiKeyDefinition ApiForeignKeyA => this.HasForeignKeys
+        ? _apiForeignKeyA! : throw new ApiSchemaException(_noForeignKeysDeclaredMessage);
 
     /// <summary>
-    ///     Gets the B-side foreign key role's <see cref="ApiKeyType"/> that maps scalar leaves of principal end B's key type
+    ///     Gets the B-side foreign key role's <see cref="ApiKeyDefinition"/> that maps scalar leaves of principal end B's key
     ///     to properties on the association object type.
     /// </summary>
     /// <exception cref="ApiSchemaException">
     ///     Thrown when <see cref="HasForeignKeys"/> is <see langword="false"/>.
     /// </exception>
-    public ApiKeyType ApiForeignKeyTypeB => this.HasForeignKeys
-        ? _apiForeignKeyTypeB! : throw new ApiSchemaException(_noForeignKeysDeclaredMessage);
+    public ApiKeyDefinition ApiForeignKeyB => this.HasForeignKeys
+        ? _apiForeignKeyB! : throw new ApiSchemaException(_noForeignKeysDeclaredMessage);
     #endregion
 
     #region ApiRelationshipAssociation Computed Properties
     /// <summary>
     ///     Gets a value indicating whether this association has explicit foreign keys declared for both principal ends.
-    ///     When <see langword="true"/>, both <see cref="ApiForeignKeyTypeA"/> and <see cref="ApiForeignKeyTypeB"/> are available.
+    ///     When <see langword="true"/>, both <see cref="ApiForeignKeyA"/> and <see cref="ApiForeignKeyB"/> are available.
     /// </summary>
-    public bool HasForeignKeys => _apiForeignKeyTypeA is not null && _apiForeignKeyTypeB is not null;
+    public bool HasForeignKeys => _apiForeignKeyA is not null && _apiForeignKeyB is not null;
     #endregion
 
     #region Constructors
@@ -101,33 +101,33 @@ public sealed class ApiRelationshipAssociation : ApiRelationshipElement
     }
 
     /// <summary>
-    ///     Creates a key-bound association with explicit <see cref="ApiKeyType"/> instances for both foreign key roles.
+    ///     Creates a key-bound association with explicit <see cref="ApiKeyDefinition"/> instances for both foreign key roles.
     /// </summary>
     /// <param name="clrObjectType">The CLR type of the association <see cref="ApiObjectType"/>.</param>
-    /// <param name="apiForeignKeyTypeA">
-    ///     The <see cref="ApiKeyType"/> that maps the scalar leaves of principal end A's key type
+    /// <param name="apiForeignKeyA">
+    ///     The <see cref="ApiKeyDefinition"/> that maps the scalar leaves of principal end A's key
     ///     to properties on the association object type.
     /// </param>
-    /// <param name="apiForeignKeyTypeB">
-    ///     The <see cref="ApiKeyType"/> that maps the scalar leaves of principal end B's key type
+    /// <param name="apiForeignKeyB">
+    ///     The <see cref="ApiKeyDefinition"/> that maps the scalar leaves of principal end B's key
     ///     to properties on the association object type.
     /// </param>
     /// <exception cref="ArgumentNullException">
-    ///     Thrown when <paramref name="apiForeignKeyTypeA"/> or <paramref name="apiForeignKeyTypeB"/> is <see langword="null"/>.
+    ///     Thrown when <paramref name="apiForeignKeyA"/> or <paramref name="apiForeignKeyB"/> is <see langword="null"/>.
     /// </exception>
     public ApiRelationshipAssociation
     (
         Type clrObjectType,
-        ApiKeyType apiForeignKeyTypeA,
-        ApiKeyType apiForeignKeyTypeB
+        ApiKeyDefinition apiForeignKeyA,
+        ApiKeyDefinition apiForeignKeyB
     )
         : base(clrObjectType)
     {
-        ArgumentNullException.ThrowIfNull(apiForeignKeyTypeA);
-        ArgumentNullException.ThrowIfNull(apiForeignKeyTypeB);
+        ArgumentNullException.ThrowIfNull(apiForeignKeyA);
+        ArgumentNullException.ThrowIfNull(apiForeignKeyB);
 
-        _apiForeignKeyTypeA = apiForeignKeyTypeA;
-        _apiForeignKeyTypeB = apiForeignKeyTypeB;
+        _apiForeignKeyA = apiForeignKeyA;
+        _apiForeignKeyB = apiForeignKeyB;
     }
     #endregion
 
@@ -136,11 +136,11 @@ public sealed class ApiRelationshipAssociation : ApiRelationshipElement
     public override string ToString()
     {
         var clrObjectType = this.ClrObjectType.SafeToName();
-        var apiForeignKeyTypeA = _apiForeignKeyTypeA.SafeToString();
-        var apiForeignKeyTypeB = _apiForeignKeyTypeB.SafeToString();
+        var apiForeignKeyA = _apiForeignKeyA.SafeToString();
+        var apiForeignKeyB = _apiForeignKeyB.SafeToString();
         var extensionCount = this.ExtensionCount.SafeToString();
 
-        return $"{nameof(ApiRelationshipAssociation)} {{{nameof(this.ClrObjectType)}={clrObjectType}, {nameof(this.ApiForeignKeyTypeA)}={apiForeignKeyTypeA}, {nameof(this.ApiForeignKeyTypeB)}={apiForeignKeyTypeB}, {nameof(this.ExtensionCount)}={extensionCount}}}";
+        return $"{nameof(ApiRelationshipAssociation)} {{{nameof(this.ClrObjectType)}={clrObjectType}, {nameof(this.ApiForeignKeyA)}={apiForeignKeyA}, {nameof(this.ApiForeignKeyB)}={apiForeignKeyB}, {nameof(this.ExtensionCount)}={extensionCount}}}";
     }
     #endregion
 
@@ -148,14 +148,14 @@ public sealed class ApiRelationshipAssociation : ApiRelationshipElement
     /// <inheritdoc/>
     internal override IEnumerable<ApiSchemaElement> GetOwnedElements()
     {
-        if (_apiForeignKeyTypeA is not null)
+        if (_apiForeignKeyA is not null)
         {
-            yield return _apiForeignKeyTypeA;
+            yield return _apiForeignKeyA;
         }
 
-        if (_apiForeignKeyTypeB is not null)
+        if (_apiForeignKeyB is not null)
         {
-            yield return _apiForeignKeyTypeB;
+            yield return _apiForeignKeyB;
         }
     }
 
@@ -166,12 +166,12 @@ public sealed class ApiRelationshipAssociation : ApiRelationshipElement
 
         base.CompileCore(context);
 
-        this.CompileApiForeignKeyTypes(context);
+        this.CompileApiForeignKeys(context);
     }
     #endregion
 
     #region Implementation Methods
-    private void CompileApiForeignKeyTypes(ApiSchemaCompilationContext context)
+    private void CompileApiForeignKeys(ApiSchemaCompilationContext context)
     {
         if (!this.HasForeignKeys)
         {
@@ -179,11 +179,11 @@ public sealed class ApiRelationshipAssociation : ApiRelationshipElement
             return;
         }
 
-        var locationA = ApiSchemaCompilationLocation.ForRole(nameof(this.ApiForeignKeyTypeA));
-        _apiForeignKeyTypeA!.Compile(context, locationA);
+        var locationA = ApiSchemaCompilationLocation.ForRole(nameof(this.ApiForeignKeyA));
+        _apiForeignKeyA!.Compile(context, locationA);
 
-        var locationB = ApiSchemaCompilationLocation.ForRole(nameof(this.ApiForeignKeyTypeB));
-        _apiForeignKeyTypeB!.Compile(context, locationB);
+        var locationB = ApiSchemaCompilationLocation.ForRole(nameof(this.ApiForeignKeyB));
+        _apiForeignKeyB!.Compile(context, locationB);
     }
     #endregion
 }

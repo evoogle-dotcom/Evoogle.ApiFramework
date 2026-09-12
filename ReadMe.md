@@ -93,8 +93,9 @@ Schema-wide options can be overridden on individual object types:
 `Build()` compiles, validates, freezes, and returns the schema. A returned schema is immutable and
 safe for concurrent runtime reads.
 
-Each `ApiObjectType` may own one optional `ApiVersionType`. A property-backed definition references
-an existing required scalar `ApiProperty`; a repository-backed definition has no CLR member.
+Each `ApiObjectType` may expose one optional `ApiVersion` member whose value is an
+`ApiVersionDefinition`. A property-backed definition references an existing required scalar
+`ApiProperty`; a repository-backed definition has no CLR member.
 `ApiVersion` is an opaque equality token whose exact CLR representation matters. Strings use
 ordinal equality, and recognized binary values are defensively copied.
 
@@ -134,7 +135,7 @@ reported during compilation and which remain JSON parsing errors.
 Schema-element traversal diagnostics use fully qualified paths. Every schema-element path begins
 with the schema, such as `ApiSchema["Store"].ApiObjectType["Order"]`, and continues through the
 complete structural location. Relationship children use semantic roles such as
-`ApiPrincipalEndA` and `ApiForeignKeyTypeB`; ordered key paths and segments include their
+`ApiPrincipalEndA` and `ApiForeignKeyB`; ordered key paths and segments include their
 zero-based position and an available label. Issues produced while traversing schema elements are
 also logged once through the schema context logger with their severity, compilation code,
 path, description, and optional remediation.
@@ -158,9 +159,14 @@ precomputed, and structural and reverse-reference collections use immutable arra
 
 `ApiSchemaElement.Kind` is a runtime, cast-safe discriminator for built-in schema families. The
 specialized type, relationship, and relationship-end kind properties remain their authoritative
-domain discriminators. `ApiKeyType` is the built-in anonymous key representation and
-`ApiNamedKeyType` reports `NamedKeyType`; callers cannot construct or derive new key metadata
-outside the framework assembly.
+domain discriminators. `ApiKeyDefinition` is the built-in anonymous key representation and
+`ApiNamedKeyDefinition` reports `NamedKeyDefinition`; callers cannot construct or derive new key
+metadata outside the framework assembly.
+
+Schema metadata CLR types use the `Definition` suffix, including `ApiKeyDefinition`,
+`ApiNamedKeyDefinition`, and `ApiVersionDefinition`. Contextual members, JSON, fluent methods, and
+annotations use concise domain roles: `ApiKeys`, `ApiVersion`, `ApiForeignKey`,
+`ApiPrincipalKey`, `AddKey`, `WithVersion`, `ApiKeyAttribute`, and `ApiVersionAttribute`.
 
 Schema extensions implement `IApiSchemaExtension.CreateFrozenSnapshot()`. Compilation requires a
 distinct, non-null immutable snapshot assignable to the registered extension key type. The snapshot

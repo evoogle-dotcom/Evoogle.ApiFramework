@@ -16,35 +16,35 @@ public static class ApiObjectTypeExtensions
 {
     #region Extension Methods
     /// <summary>
-    ///     Gets an <see cref="ApiNamedKeyType"/> by its API name.
+    ///     Gets an <see cref="ApiNamedKeyDefinition"/> by its API name.
     /// </summary>
     /// <param name="apiObjectType">The API object type to search.</param>
-    /// <param name="apiName">The API name of the key type to retrieve.</param>
-    /// <returns>The <see cref="ApiNamedKeyType"/> with the specified API name.</returns>
+    /// <param name="apiName">The API name of the key to retrieve.</param>
+    /// <returns>The <see cref="ApiNamedKeyDefinition"/> with the specified API name.</returns>
     /// <exception cref="ApiSchemaException">
-    ///     Thrown if no key type with the specified API name exists in the object type.
-    ///     The exception message includes a list of all available key type API names.
+    ///     Thrown if no key with the specified API name exists in the object type.
+    ///     The exception message includes a list of all available key API names.
     /// </exception>
     /// <remarks>
-    ///     This method performs a case-sensitive search for the key type by its API name.
-    ///     Use <see cref="ApiObjectType.TryGetKeyTypeByApiName"/> if you prefer non-throwing behavior.
+    ///     This method performs a case-sensitive search for the key by its API name.
+    ///     Use <see cref="ApiObjectType.TryGetKeyByApiName"/> if you prefer non-throwing behavior.
     /// </remarks>
-    public static ApiNamedKeyType GetKeyTypeByApiName
+    public static ApiNamedKeyDefinition GetKeyByApiName
     (
         this ApiObjectType apiObjectType,
         string apiName
     )
     {
-        if (apiObjectType.TryGetKeyTypeByApiName(apiName, out var apiKeyType))
+        if (apiObjectType.TryGetKeyByApiName(apiName, out var apiKey))
         {
-            return apiKeyType;
+            return apiKey;
         }
 
-        var availableKeyTypesByApiName = string.Join(',', apiObjectType.ApiKeyTypeApiNames.OrderBy(k => k));
+        var availableKeysByApiName = string.Join(',', apiObjectType.ApiKeyApiNames.OrderBy(k => k));
         var errorMessage =
-            $"{nameof(ApiNamedKeyType)} with name '{apiName.SafeToString()}' not found in " +
-            $"{apiObjectType.SafeToString()}. Available {nameof(ApiNamedKeyType)} names are: " +
-            $"{availableKeyTypesByApiName}.";
+            $"{nameof(ApiNamedKeyDefinition)} with name '{apiName.SafeToString()}' not found in " +
+            $"{apiObjectType.SafeToString()}. Available {nameof(ApiNamedKeyDefinition)} names are: " +
+            $"{availableKeysByApiName}.";
         throw new ApiSchemaException(errorMessage);
     }
 

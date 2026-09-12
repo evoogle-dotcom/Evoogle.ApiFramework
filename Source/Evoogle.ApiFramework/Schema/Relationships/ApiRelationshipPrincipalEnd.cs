@@ -20,13 +20,13 @@ namespace Evoogle.ApiFramework.Schema.Relationships;
 ///     Key-bound relationships resolve the concrete principal key binding on the owning relationship.
 /// </summary>
 /// <param name="clrObjectType">The CLR type of the principal <see cref="ApiObjectType"/>.</param>
-/// <param name="apiPrincipalKeyTypeName">
-///     The optional name of the <see cref="ApiKeyType"/> on the principal type that should be used by the owning
+/// <param name="apiPrincipalKeyName">
+///     The optional name of the <see cref="ApiKeyDefinition"/> on the principal type that should be used by the owning
 ///     relationship's key binding. When <see langword="null"/>, key-bound relationship compilation uses the foreign
-///     key binding to infer the best compatible key type on the principal object type.
+///     key binding to infer the best compatible key on the principal object type.
 /// </param>
 [JsonConverter(typeof(ApiRelationshipPrincipalEndJsonConverter))]
-public sealed class ApiRelationshipPrincipalEnd(Type clrObjectType, string? apiPrincipalKeyTypeName = null) : ApiRelationshipEnd(clrObjectType)
+public sealed class ApiRelationshipPrincipalEnd(Type clrObjectType, string? apiPrincipalKeyName = null) : ApiRelationshipEnd(clrObjectType)
 {
     #region ApiSchemaElement Properties
     /// <inheritdoc/>
@@ -40,11 +40,11 @@ public sealed class ApiRelationshipPrincipalEnd(Type clrObjectType, string? apiP
 
     #region ApiRelationshipPrincipalEnd Properties
     /// <summary>
-    ///     Gets the optional explicit principal key type name used by the owning relationship's key binding.
-    ///     When <see langword="null"/>, key-bound relationships infer the best compatible principal key type from the
+    ///     Gets the optional explicit principal key name used by the owning relationship's key binding.
+    ///     When <see langword="null"/>, key-bound relationships infer the best compatible principal key from the
     ///     corresponding foreign key.
     /// </summary>
-    public string? ApiPrincipalKeyTypeName { get; } = apiPrincipalKeyTypeName;
+    public string? ApiPrincipalKeyName { get; } = apiPrincipalKeyName;
     #endregion
 
     #region Object Methods
@@ -52,10 +52,10 @@ public sealed class ApiRelationshipPrincipalEnd(Type clrObjectType, string? apiP
     public override string ToString()
     {
         var clrObjectType = this.ClrObjectType.SafeToName();
-        var apiPrincipalKeyTypeName = this.ApiPrincipalKeyTypeName.SafeToString();
+        var apiPrincipalKeyName = this.ApiPrincipalKeyName.SafeToString();
         var extensionCount = this.ExtensionCount.SafeToString();
 
-        return $"{nameof(ApiRelationshipPrincipalEnd)} {{{nameof(this.ClrObjectType)}={clrObjectType}, {nameof(this.ApiPrincipalKeyTypeName)}={apiPrincipalKeyTypeName}, {nameof(this.ExtensionCount)}={extensionCount}}}";
+        return $"{nameof(ApiRelationshipPrincipalEnd)} {{{nameof(this.ClrObjectType)}={clrObjectType}, {nameof(this.ApiPrincipalKeyName)}={apiPrincipalKeyName}, {nameof(this.ExtensionCount)}={extensionCount}}}";
     }
     #endregion
 

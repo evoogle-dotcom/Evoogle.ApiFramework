@@ -54,27 +54,27 @@ public static partial class ApiSchemaFactory
     private static ApiKeyPathSegment KPS(string propertyName, OrderedDictionary<Type, object>? extensions = null)
          => WithExtensions(new ApiKeyPathSegment(propertyName), extensions);
 
-    private static ApiKeyType KT(IEnumerable<ApiKeyPath> paths, OrderedDictionary<Type, object>? extensions = null)
-        => WithExtensions(new ApiKeyType(paths), extensions);
+    private static ApiKeyDefinition KD(IEnumerable<ApiKeyPath> paths, OrderedDictionary<Type, object>? extensions = null)
+        => WithExtensions(new ApiKeyDefinition(paths), extensions);
 
-    private static ApiNamedKeyType KT
+    private static ApiNamedKeyDefinition KD
     (
         string name,
         IEnumerable<ApiKeyPath> paths,
         OrderedDictionary<Type, object>? extensions = null
-    ) => WithExtensions(new ApiNamedKeyType(name, paths), extensions);
+    ) => WithExtensions(new ApiNamedKeyDefinition(name, paths), extensions);
 
     private static ApiObjectType O
     (
         string name,
         Type clr,
         IEnumerable<ApiProperty> properties,
-        IEnumerable<ApiNamedKeyType>? keyTypes = null,
+        IEnumerable<ApiNamedKeyDefinition>? apiKeys = null,
         ApiObjectTypeOptions? options = null,
-        ApiVersionType? versionType = null,
+        ApiVersionDefinition? apiVersion = null,
         OrderedDictionary<Type, object>? extensions = null
     )
-        => WithExtensions(new ApiObjectType(name, options, properties, keyTypes, versionType, clr), extensions);
+        => WithExtensions(new ApiObjectType(name, options, properties, apiKeys, apiVersion, clr), extensions);
 
     private static ApiObjectTypeOptions OO(ApiKeyNullHandling keyNullHandling)
         => new()
@@ -135,10 +135,10 @@ public static partial class ApiSchemaFactory
     private static ApiRelationshipDependentEnd RDE(Type clr)
         => new(clr);
 
-    private static ApiRelationshipDependentEnd RDE(Type clr, ApiKeyType fk)
+    private static ApiRelationshipDependentEnd RDE(Type clr, ApiKeyDefinition fk)
         => new(clr, fk);
 
-    private static ApiRelationshipAssociation RAS(Type clr, ApiKeyType fkA, ApiKeyType fkB)
+    private static ApiRelationshipAssociation RAS(Type clr, ApiKeyDefinition fkA, ApiKeyDefinition fkB)
         => new(clr, fkA, fkB);
 
     /// <summary>
@@ -252,10 +252,10 @@ public static partial class ApiSchemaFactory
             P(name: nameof(Customer.Addresses),      expression: TE.ListOf<Address>(required: true), required: true),
             P(name: nameof(Customer.Orders),         expression: TE.ListOf<Order>(required: true),   required: true)
         ],
-        keyTypes:
+        apiKeys:
         [
-            KT("PK_Customer", [KP(typeof(Customer), [KPS(nameof(Customer.Id))])]),
-            KT("AK_Customer_Email", [KP(typeof(Customer), [KPS(nameof(Customer.Email)), KPS(nameof(EmailAddress.Value))])])
+            KD("PK_Customer", [KP(typeof(Customer), [KPS(nameof(Customer.Id))])]),
+            KD("AK_Customer_Email", [KP(typeof(Customer), [KPS(nameof(Customer.Email)), KPS(nameof(EmailAddress.Value))])])
         ]);
 
         var customerProfile = O(name: nameof(CustomerProfile), clr: typeof(CustomerProfile),
@@ -276,10 +276,10 @@ public static partial class ApiSchemaFactory
             P(name: nameof(Category.Parent),   expression: TE.ClrRef<Category>(),               required: false),
             P(name: nameof(Category.Children), expression: TE.ListOf<Category>(required: true), required: true)
         ],
-        keyTypes:
+        apiKeys:
         [
-            KT("PK_Category", [KP(typeof(Category), [KPS(nameof(Category.Id))])]),
-            KT("AK_Category_Name", [KP(typeof(Category), [KPS(nameof(Category.Name))])])
+            KD("PK_Category", [KP(typeof(Category), [KPS(nameof(Category.Id))])]),
+            KD("AK_Category_Name", [KP(typeof(Category), [KPS(nameof(Category.Name))])])
         ]);
 
         // Tag (M2M with ProductBase)
@@ -290,10 +290,10 @@ public static partial class ApiSchemaFactory
             P(name: nameof(Tag.Name),      expression: TE.ClrRef<string>(),                    required: true),
             // P(name: nameof(Tag.Products),  expression: TE.ListOf<ProductBase>(required: true), required: true)
         ],
-        keyTypes:
+        apiKeys:
         [
-            KT("PK_Tag", [KP(typeof(Tag), [KPS(nameof(Tag.Id))])]),
-            KT("AK_Tag_Name", [KP(typeof(Tag), [KPS(nameof(Tag.Name))])])
+            KD("PK_Tag", [KP(typeof(Tag), [KPS(nameof(Tag.Id))])]),
+            KD("AK_Tag_Name", [KP(typeof(Tag), [KPS(nameof(Tag.Name))])])
         ]);
 
         // // Abstract ProductBase + two derived types (polymorphism)
@@ -322,10 +322,10 @@ public static partial class ApiSchemaFactory
             P(name: nameof(DigitalProduct.DownloadUrl), expression: TE.ClrRef<Uri>(),               required: false),
             P(name: nameof(DigitalProduct.Bytes),       expression: TE.ClrRef<long>(),              required: false),
         ],
-        keyTypes:
+        apiKeys:
         [
-            KT("PK_DigitalProduct", [KP(typeof(DigitalProduct), [KPS(nameof(DigitalProduct.Id))])]),
-            KT("AK_DigitalProduct_Sku", [KP(typeof(DigitalProduct), [KPS(nameof(DigitalProduct.Sku))])])
+            KD("PK_DigitalProduct", [KP(typeof(DigitalProduct), [KPS(nameof(DigitalProduct.Id))])]),
+            KD("AK_DigitalProduct_Sku", [KP(typeof(DigitalProduct), [KPS(nameof(DigitalProduct.Sku))])])
         ]);
 
         var physicalProduct = O(name: nameof(PhysicalProduct), clr: typeof(PhysicalProduct),
@@ -344,10 +344,10 @@ public static partial class ApiSchemaFactory
             P(name: nameof(PhysicalProduct.Weight),     expression: TE.ClrRef<decimal>(),           required: true),
             P(name: nameof(PhysicalProduct.Size),       expression: TE.ClrRef<Quantity>(),          required: false),
         ],
-        keyTypes:
+        apiKeys:
         [
-            KT("PK_PhysicalProduct", [KP(typeof(PhysicalProduct), [KPS(nameof(PhysicalProduct.Id))])]),
-            KT("AK_PhysicalProduct_Sku", [KP(typeof(PhysicalProduct), [KPS(nameof(PhysicalProduct.Sku))])])
+            KD("PK_PhysicalProduct", [KP(typeof(PhysicalProduct), [KPS(nameof(PhysicalProduct.Id))])]),
+            KD("AK_PhysicalProduct_Sku", [KP(typeof(PhysicalProduct), [KPS(nameof(PhysicalProduct.Sku))])])
         ]);
 
         // Order/Payment Object Types
@@ -364,11 +364,11 @@ public static partial class ApiSchemaFactory
             P(name: nameof(Order.Payment),   expression: TE.ClrRef<Payment>(),                 required: false),
             P(name: nameof(Order.Total),     expression: TE.ClrRef<Money>(),                   required: true)
         ],
-        keyTypes:
+        apiKeys:
         [
-            KT("PK_Order", [KP(typeof(Order), [KPS(nameof(Order.Id))])])
+            KD("PK_Order", [KP(typeof(Order), [KPS(nameof(Order.Id))])])
         ],
-        versionType: new ApiVersionType(typeof(long)));
+        apiVersion: new ApiVersionDefinition(typeof(long)));
 
         // OrderLine
         var orderLine = O(name: nameof(OrderLine), clr: typeof(OrderLine),
@@ -381,9 +381,9 @@ public static partial class ApiSchemaFactory
             P(name: nameof(OrderLine.UnitPrice),    expression: TE.ClrRef<Money>(),       required: true),
             P(name: nameof(OrderLine.LineTotal),    expression: TE.ClrRef<Money>(),       required: true)
         ],
-        keyTypes:
+        apiKeys:
         [
-            KT("PK_OrderLine",
+            KD("PK_OrderLine",
             [
                 KP(typeof(Order), [KPS(nameof(Order.Id))]),
                 KP(typeof(OrderLine), [KPS(nameof(OrderLine.LineNumber))])
@@ -401,9 +401,9 @@ public static partial class ApiSchemaFactory
             // Dictionary<string,string>
             //P(name: "Metadata",  expression: TE.DictOf(TE.ClrRef<string>(), TE.ClrRef<string>(), valueNullable: true), required: true)
         ],
-        keyTypes:
+        apiKeys:
         [
-            KT("PK_Payment", [KP(typeof(Payment), [KPS(nameof(Payment.Id))])])
+            KD("PK_Payment", [KP(typeof(Payment), [KPS(nameof(Payment.Id))])])
         ]);
 
         // Product Join Types (M:M association tables)
@@ -413,9 +413,9 @@ public static partial class ApiSchemaFactory
             P(name: nameof(DigitalProductTag.DigitalProductId), expression: TE.ClrRef<Ulid>(), required: true),
             P(name: nameof(DigitalProductTag.TagId),            expression: TE.ClrRef<Ulid>(), required: true)
         ],
-        keyTypes:
+        apiKeys:
         [
-            KT("PK_DigitalProductTag", [KP(typeof(DigitalProductTag), [KPS(nameof(DigitalProductTag.DigitalProductId))]), KP(typeof(DigitalProductTag), [KPS(nameof(DigitalProductTag.TagId))])])
+            KD("PK_DigitalProductTag", [KP(typeof(DigitalProductTag), [KPS(nameof(DigitalProductTag.DigitalProductId))]), KP(typeof(DigitalProductTag), [KPS(nameof(DigitalProductTag.TagId))])])
         ]);
 
         var physicalProductTag = O(name: nameof(PhysicalProductTag), clr: typeof(PhysicalProductTag),
@@ -424,9 +424,9 @@ public static partial class ApiSchemaFactory
             P(name: nameof(PhysicalProductTag.PhysicalProductId), expression: TE.ClrRef<Ulid>(), required: true),
             P(name: nameof(PhysicalProductTag.TagId),             expression: TE.ClrRef<Ulid>(), required: true)
         ],
-        keyTypes:
+        apiKeys:
         [
-            KT("PK_PhysicalProductTag", [KP(typeof(PhysicalProductTag), [KPS(nameof(PhysicalProductTag.PhysicalProductId))]), KP(typeof(PhysicalProductTag), [KPS(nameof(PhysicalProductTag.TagId))])])
+            KD("PK_PhysicalProductTag", [KP(typeof(PhysicalProductTag), [KPS(nameof(PhysicalProductTag.PhysicalProductId))]), KP(typeof(PhysicalProductTag), [KPS(nameof(PhysicalProductTag.TagId))])])
         ]);
 
         // 5) Objects list (include value objects + entities + abstract base + derived)
@@ -444,7 +444,7 @@ public static partial class ApiSchemaFactory
         // Customer → Order (1:M, nested FK via Order.Customer.Id)
         var customerToOrder = R1M("REL_Customer_Order_1toN",
             RPE(typeof(Customer)),
-            RDE(typeof(Order), KT([KP(typeof(Order), [KPS(nameof(Order.Customer)), KPS(nameof(Customer.Id))])])));
+            RDE(typeof(Order), KD([KP(typeof(Order), [KPS(nameof(Order.Customer)), KPS(nameof(Customer.Id))])])));
 
         // Customer → CustomerProfile (1:1, navigational)
         var customerToProfile = R11("REL_Customer_Profile_1to1",
@@ -454,44 +454,44 @@ public static partial class ApiSchemaFactory
         // Order → OrderLine (1:M, owner key path)
         var orderToOrderLine = R1M("REL_Order_OrderLine_1toN",
             RPE(typeof(Order)),
-            RDE(typeof(OrderLine), KT([KP(typeof(Order), [KPS(nameof(Order.Id))])])),
+            RDE(typeof(OrderLine), KD([KP(typeof(Order), [KPS(nameof(Order.Id))])])),
             ApiRelationshipDeleteBehavior.Delete);
 
         // Payment → Order (1:1, nested FK via Order.Payment.Id)
         var paymentToOrder = R11("REL_Payment_Order_1to1",
             RPE(typeof(Payment)),
-            RDE(typeof(Order), KT([KP(typeof(Order), [KPS(nameof(Order.Payment)), KPS(nameof(Payment.Id))])])));
+            RDE(typeof(Order), KD([KP(typeof(Order), [KPS(nameof(Order.Payment)), KPS(nameof(Payment.Id))])])));
 
         // Category → Category (1:M self-referential, scalar FK via Category.ParentId)
         var categoryToCategory = R1M("REL_Category_Category_1toN",
             RPE(typeof(Category)),
-            RDE(typeof(Category), KT([KP(typeof(Category), [KPS(nameof(Category.ParentId))])])));
+            RDE(typeof(Category), KD([KP(typeof(Category), [KPS(nameof(Category.ParentId))])])));
 
         // Category → DigitalProduct (1:M, scalar FK via DigitalProduct.CategoryId)
         var categoryToDigitalProduct = R1M("REL_Category_DigitalProduct_1toN",
             RPE(typeof(Category)),
-            RDE(typeof(DigitalProduct), KT([KP(typeof(DigitalProduct), [KPS(nameof(DigitalProduct.CategoryId))])])));
+            RDE(typeof(DigitalProduct), KD([KP(typeof(DigitalProduct), [KPS(nameof(DigitalProduct.CategoryId))])])));
 
         // Category → PhysicalProduct (1:M, scalar FK via PhysicalProduct.CategoryId)
         var categoryToPhysicalProduct = R1M("REL_Category_PhysicalProduct_1toN",
             RPE(typeof(Category), "PK_Category"),
-            RDE(typeof(PhysicalProduct), KT([KP(typeof(PhysicalProduct), [KPS(nameof(PhysicalProduct.CategoryId))])])));
+            RDE(typeof(PhysicalProduct), KD([KP(typeof(PhysicalProduct), [KPS(nameof(PhysicalProduct.CategoryId))])])));
 
         // DigitalProduct ↔ Tag (M:M via DigitalProductTag)
         var digitalProductToTag = RMN("REL_DigitalProduct_Tag_NtoN",
             RPE(typeof(DigitalProduct)),
             RPE(typeof(Tag)),
             RAS(typeof(DigitalProductTag),
-                KT([KP(typeof(DigitalProductTag), [KPS(nameof(DigitalProductTag.DigitalProductId))])]),
-                KT([KP(typeof(DigitalProductTag), [KPS(nameof(DigitalProductTag.TagId))])])));
+                KD([KP(typeof(DigitalProductTag), [KPS(nameof(DigitalProductTag.DigitalProductId))])]),
+                KD([KP(typeof(DigitalProductTag), [KPS(nameof(DigitalProductTag.TagId))])])));
 
         // PhysicalProduct ↔ Tag (M:M via PhysicalProductTag)
         var physicalProductToTag = RMN("REL_PhysicalProduct_Tag_NtoN",
             RPE(typeof(PhysicalProduct), "PK_PhysicalProduct"),
             RPE(typeof(Tag), "PK_Tag"),
             RAS(typeof(PhysicalProductTag),
-                KT([KP(typeof(PhysicalProductTag), [KPS(nameof(PhysicalProductTag.PhysicalProductId))])]),
-                KT([KP(typeof(PhysicalProductTag), [KPS(nameof(PhysicalProductTag.TagId))])])));
+                KD([KP(typeof(PhysicalProductTag), [KPS(nameof(PhysicalProductTag.PhysicalProductId))])]),
+                KD([KP(typeof(PhysicalProductTag), [KPS(nameof(PhysicalProductTag.TagId))])])));
 
         var relationships = new List<ApiRelationship>
         {
@@ -535,10 +535,10 @@ public static partial class ApiSchemaFactory
             P(name: nameof(KeyOneScalarPart.Id), expression: TE.ClrRef<int>(), required: true),
             P(name: nameof(KeyOneScalarPart.Name), expression: TE.ClrRef<string>(), required: true)
         ],
-        keyTypes:
+        apiKeys:
         [
-            KT(name: "PK_KeyOneScalarPart", paths: [KP(typeof(KeyOneScalarPart), [KPS(nameof(KeyOneScalarPart.Id))])]),
-            KT(name: "AK_KeyOneScalarPart", paths: [KP(typeof(KeyOneScalarPart), [KPS(nameof(KeyOneScalarPart.Name))])])
+            KD(name: "PK_KeyOneScalarPart", paths: [KP(typeof(KeyOneScalarPart), [KPS(nameof(KeyOneScalarPart.Id))])]),
+            KD(name: "AK_KeyOneScalarPart", paths: [KP(typeof(KeyOneScalarPart), [KPS(nameof(KeyOneScalarPart.Name))])])
         ]);
 
         // KeyTwoScalarPartComposite: Composite key (int + string)
@@ -549,9 +549,9 @@ public static partial class ApiSchemaFactory
             P(name: nameof(KeyTwoScalarPartComposite.Id2), expression: TE.ClrRef<string>(), required: false),
             P(name: nameof(KeyTwoScalarPartComposite.Description), expression: TE.ClrRef<string>(), required: false)
         ],
-        keyTypes:
+        apiKeys:
         [
-            KT(name: "PK_KeyTwoScalarPartComposite", paths:
+            KD(name: "PK_KeyTwoScalarPartComposite", paths:
             [
                 KP(typeof(KeyTwoScalarPartComposite), [KPS(nameof(KeyTwoScalarPartComposite.Id1))]),
                 KP(typeof(KeyTwoScalarPartComposite), [KPS(nameof(KeyTwoScalarPartComposite.Id2))])
@@ -567,9 +567,9 @@ public static partial class ApiSchemaFactory
             P(name: nameof(KeyThreeScalarPartComposite.Id3), expression: TE.ClrRef<Guid>(), required: true),
             P(name: nameof(KeyThreeScalarPartComposite.Description), expression: TE.ClrRef<string>(), required: false)
         ],
-        keyTypes:
+        apiKeys:
         [
-            KT(name: "PK_KeyThreeScalarPartComposite", paths:
+            KD(name: "PK_KeyThreeScalarPartComposite", paths:
             [
                 KP(typeof(KeyThreeScalarPartComposite), [KPS(nameof(KeyThreeScalarPartComposite.Id1))]),
                 KP(typeof(KeyThreeScalarPartComposite), [KPS(nameof(KeyThreeScalarPartComposite.Id2))]),
@@ -584,11 +584,11 @@ public static partial class ApiSchemaFactory
             P(name: nameof(KeyNested.Id), expression: TE.ClrRef<int>(), required: true),
             P(name: nameof(KeyNested.Description), expression: TE.ClrRef<string>(), required: false)
         ],
-        keyTypes:
+        apiKeys:
         [
-            KT(name: "PK_KeyNestedPart", paths: [KP(typeof(KeyNested), [KPS(nameof(KeyNested.Id))])])
+            KD(name: "PK_KeyNestedPart", paths: [KP(typeof(KeyNested), [KPS(nameof(KeyNested.Id))])])
         ],
-        versionType: new ApiVersionType(typeof(Guid)));
+        apiVersion: new ApiVersionDefinition(typeof(Guid)));
 
         // KeyNestedComposite: Composite key with nested part
         var keyNestedComposite = O(name: nameof(KeyNestedComposite), clr: typeof(KeyNestedComposite),
@@ -597,9 +597,9 @@ public static partial class ApiSchemaFactory
             P(name: nameof(KeyNestedComposite.NestedPart), expression: TE.ClrRef<KeyNested>(), required: true),
             P(name: nameof(KeyNestedComposite.Name), expression: TE.ClrRef<string>(), required: true)
         ],
-        keyTypes:
+        apiKeys:
         [
-            KT(name: "PK_KeyNestedComposite", paths:
+            KD(name: "PK_KeyNestedComposite", paths:
             [
                 KP(typeof(KeyNestedComposite), [KPS(nameof(KeyNestedComposite.NestedPart)), KPS(nameof(KeyNested.Id))]),
                 KP(typeof(KeyNestedComposite), [KPS(nameof(KeyNestedComposite.Name))])
@@ -615,9 +615,9 @@ public static partial class ApiSchemaFactory
             P(name: nameof(KeyOwner.Dependents), expression: TE.ListOf<KeyOwnedComposite>(required: true), required: true),
             P(name: nameof(KeyOwner.Dependent), expression: TE.ClrRef<KeyOwnedDependent>(), required: true)
         ],
-        keyTypes:
+        apiKeys:
         [
-            KT(name: "PK_KeyOwner", paths: [KP(typeof(KeyOwner), [KPS(nameof(KeyOwner.Id))])])
+            KD(name: "PK_KeyOwner", paths: [KP(typeof(KeyOwner), [KPS(nameof(KeyOwner.Id))])])
         ]);
 
         // KeyOwnedComposite: Composite key with owner key and secondary child key
@@ -627,9 +627,9 @@ public static partial class ApiSchemaFactory
             P(name: nameof(KeyOwnedComposite.LineNumber), expression: TE.ClrRef<int>(), required: true),
             P(name: nameof(KeyOwnedComposite.Description), expression: TE.ClrRef<string>(), required: true),
         ],
-        keyTypes:
+        apiKeys:
         [
-            KT(name: "PK_KeyOwnedComposite", paths:
+            KD(name: "PK_KeyOwnedComposite", paths:
             [
                 KP(typeof(KeyOwner), [KPS(nameof(KeyOwner.Id))]),
                 KP(typeof(KeyOwnedComposite), [KPS(nameof(KeyOwnedComposite.LineNumber))])
@@ -642,9 +642,9 @@ public static partial class ApiSchemaFactory
         [
             P(name: nameof(KeyOwnedDependent.Description), expression: TE.ClrRef<string>(), required: true)
         ],
-        keyTypes:
+        apiKeys:
         [
-            KT(name: "PK_KeyOwnedDependent", paths: [KP(typeof(KeyOwner), [KPS(nameof(KeyOwner.Id))])])
+            KD(name: "PK_KeyOwnedDependent", paths: [KP(typeof(KeyOwner), [KPS(nameof(KeyOwner.Id))])])
         ]);
 
         var objects = new List<ApiObjectType>
@@ -700,9 +700,9 @@ public static partial class ApiSchemaFactory
             P(name: nameof(RelationshipUser.Profile),  expression: TE.ClrRef<RelationshipUserProfile>(),       required: false),
             P(name: nameof(RelationshipUser.Posts), expression:    TE.ListOf<RelationshipPost>(required:true), required: true),
         ],
-        keyTypes:
+        apiKeys:
         [
-            KT("PK_RelationshipUser", [KP(typeof(RelationshipUser), [KPS(nameof(RelationshipUser.Id))])]),
+            KD("PK_RelationshipUser", [KP(typeof(RelationshipUser), [KPS(nameof(RelationshipUser.Id))])]),
         ]);
 
         // RelationshipUserProfile
@@ -714,9 +714,9 @@ public static partial class ApiSchemaFactory
             P(name: nameof(RelationshipUserProfile.DisplayName), expression: TE.ClrRef<string>(),              required: true),
             P(name: nameof(RelationshipUserProfile.User),        expression: TE.ClrRef<RelationshipUser>(),    required: true),
         ],
-        keyTypes:
+        apiKeys:
         [
-            KT("PK_RelationshipUserProfile", [KP(typeof(RelationshipUserProfile), [KPS(nameof(RelationshipUserProfile.UserId))])]),
+            KD("PK_RelationshipUserProfile", [KP(typeof(RelationshipUserProfile), [KPS(nameof(RelationshipUserProfile.UserId))])]),
         ]);
 
         // RelationshipUserRef
@@ -738,9 +738,9 @@ public static partial class ApiSchemaFactory
             P(name: nameof(RelationshipPost.Tags),          expression: TE.ListOf<RelationshipTag>(required: true),     required: true),
             P(name: nameof(RelationshipPost.User),          expression: TE.ClrRef<RelationshipUser>(),                  required: true),
         ],
-        keyTypes:
+        apiKeys:
         [
-            KT("PK_RelationshipPost", [KP(typeof(RelationshipPost), [KPS(nameof(RelationshipPost.Id))])]),
+            KD("PK_RelationshipPost", [KP(typeof(RelationshipPost), [KPS(nameof(RelationshipPost.Id))])]),
         ]);
 
         // RelationshipPostRef
@@ -760,9 +760,9 @@ public static partial class ApiSchemaFactory
             P(name: nameof(RelationshipComment.Body),    expression: TE.ClrRef<string>(),              required: true),
             P(name: nameof(RelationshipComment.Post),    expression: TE.ClrRef<RelationshipPost>(),    required: true),
         ],
-        keyTypes:
+        apiKeys:
         [
-            KT("PK_RelationshipComment", [KP(typeof(RelationshipComment), [KPS(nameof(RelationshipComment.Id))])]),
+            KD("PK_RelationshipComment", [KP(typeof(RelationshipComment), [KPS(nameof(RelationshipComment.Id))])]),
         ]);
 
         // RelationshipTag
@@ -773,9 +773,9 @@ public static partial class ApiSchemaFactory
             P(name: nameof(RelationshipTag.Name),  expression: TE.ClrRef<string>(),                        required: true),
             P(name: nameof(RelationshipTag.Posts), expression: TE.ListOf<RelationshipPost>(required:true), required: true),
         ],
-        keyTypes:
+        apiKeys:
         [
-            KT("PK_RelationshipTag", [KP(typeof(RelationshipTag), [KPS(nameof(RelationshipTag.Id))])]),
+            KD("PK_RelationshipTag", [KP(typeof(RelationshipTag), [KPS(nameof(RelationshipTag.Id))])]),
         ]);
 
         // RelationshipPostTag
@@ -785,9 +785,9 @@ public static partial class ApiSchemaFactory
             P(name: nameof(RelationshipPostTag.PostId), expression: TE.ClrRef<Ulid>(), required: true),
             P(name: nameof(RelationshipPostTag.TagId),  expression: TE.ClrRef<Ulid>(), required: true),
         ],
-        keyTypes:
+        apiKeys:
         [
-            KT("PK_RelationshipPostTag", [KP(typeof(RelationshipPostTag), [KPS(nameof(RelationshipPostTag.PostId))]), KP(typeof(RelationshipPostTag), [KPS(nameof(RelationshipPostTag.TagId))])]),
+            KD("PK_RelationshipPostTag", [KP(typeof(RelationshipPostTag), [KPS(nameof(RelationshipPostTag.PostId))]), KP(typeof(RelationshipPostTag), [KPS(nameof(RelationshipPostTag.TagId))])]),
         ]);
 
         // RelationshipCatalogItem
@@ -798,11 +798,11 @@ public static partial class ApiSchemaFactory
             P(name: nameof(RelationshipCatalogItem.Revision), expression: TE.ClrRef<int>(), required: true),
             P(name: nameof(RelationshipCatalogItem.Name),     expression: TE.ClrRef<string>(), required: true),
         ],
-        keyTypes:
+        apiKeys:
         [
-            KT("PK_RelationshipCatalogItem", [KP(typeof(RelationshipCatalogItem), [KPS(nameof(RelationshipCatalogItem.Sku))]), KP(typeof(RelationshipCatalogItem), [KPS(nameof(RelationshipCatalogItem.Revision))])]),
+            KD("PK_RelationshipCatalogItem", [KP(typeof(RelationshipCatalogItem), [KPS(nameof(RelationshipCatalogItem.Sku))]), KP(typeof(RelationshipCatalogItem), [KPS(nameof(RelationshipCatalogItem.Revision))])]),
         ],
-        versionType: new ApiVersionType
+        apiVersion: new ApiVersionDefinition
         (
             nameof(RelationshipCatalogItem.Revision)
         ));
@@ -822,9 +822,9 @@ public static partial class ApiSchemaFactory
             P(name: nameof(RelationshipOrder.Id),    expression: TE.ClrRef<Ulid>(),                               required: true),
             P(name: nameof(RelationshipOrder.Lines), expression: TE.ListOf<RelationshipOwnedLine>(required:true), required: true),
         ],
-        keyTypes:
+        apiKeys:
         [
-            KT("PK_RelationshipOrder", [KP(typeof(RelationshipOrder), [KPS(nameof(RelationshipOrder.Id))])]),
+            KD("PK_RelationshipOrder", [KP(typeof(RelationshipOrder), [KPS(nameof(RelationshipOrder.Id))])]),
         ]);
 
         // RelationshipOrderLine
@@ -837,9 +837,9 @@ public static partial class ApiSchemaFactory
             P(name: nameof(RelationshipOrderLine.ProductRevision), expression: TE.ClrRef<int>(),                    required: true),
             P(name: nameof(RelationshipOrderLine.ProductKey),      expression: TE.ClrRef<RelationshipCatalogKey>(), required: true),
         ],
-        keyTypes:
+        apiKeys:
         [
-            KT("PK_RelationshipOrderLine", [KP(typeof(RelationshipOrderLine), [KPS(nameof(RelationshipOrderLine.OrderId))]), KP(typeof(RelationshipOrderLine), [KPS(nameof(RelationshipOrderLine.LineNumber))])]),
+            KD("PK_RelationshipOrderLine", [KP(typeof(RelationshipOrderLine), [KPS(nameof(RelationshipOrderLine.OrderId))]), KP(typeof(RelationshipOrderLine), [KPS(nameof(RelationshipOrderLine.LineNumber))])]),
         ]);
 
         // RelationshipOwnedLine
@@ -849,9 +849,9 @@ public static partial class ApiSchemaFactory
             P(name: nameof(RelationshipOwnedLine.LineNumber), expression: TE.ClrRef<int>(),     required: true),
             P(name: nameof(RelationshipOwnedLine.Notes),      expression: TE.ClrRef<string?>(), required: false),
         ],
-        keyTypes:
+        apiKeys:
         [
-            KT("PK_RelationshipOwnedLine", [KP(typeof(RelationshipOrder), [KPS(nameof(RelationshipOrder.Id))]), KP(typeof(RelationshipOwnedLine), [KPS(nameof(RelationshipOwnedLine.LineNumber))])]),
+            KD("PK_RelationshipOwnedLine", [KP(typeof(RelationshipOrder), [KPS(nameof(RelationshipOrder.Id))]), KP(typeof(RelationshipOwnedLine), [KPS(nameof(RelationshipOwnedLine.LineNumber))])]),
         ]);
 
         // RelationshipOrgUnit
@@ -863,9 +863,9 @@ public static partial class ApiSchemaFactory
             P(name: nameof(RelationshipOrgUnit.Name),     expression: TE.ClrRef<string>(),                           required: true),
             P(name: nameof(RelationshipOrgUnit.Children), expression: TE.ListOf<RelationshipOrgUnit>(required:true), required: true),
         ],
-        keyTypes:
+        apiKeys:
         [
-            KT("PK_RelationshipOrgUnit", [KP(typeof(RelationshipOrgUnit), [KPS(nameof(RelationshipOrgUnit.Id))])]),
+            KD("PK_RelationshipOrgUnit", [KP(typeof(RelationshipOrgUnit), [KPS(nameof(RelationshipOrgUnit.Id))])]),
         ]);
 
         var objects = new List<ApiObjectType>
@@ -891,60 +891,60 @@ public static partial class ApiSchemaFactory
         // User → UserProfile (1:1, scalar FK via UserProfile.UserId)
         var userToUserProfileViaScalar = R11("REL_User_UserProfile_1to1ViaScalar",
             RPE(typeof(RelationshipUser)),
-            RDE(typeof(RelationshipUserProfile), KT([KP(typeof(RelationshipUserProfile), [KPS(nameof(RelationshipUserProfile.UserId))])])));
+            RDE(typeof(RelationshipUserProfile), KD([KP(typeof(RelationshipUserProfile), [KPS(nameof(RelationshipUserProfile.UserId))])])));
 
         // User → UserProfile (1:1, nested FK via UserProfile.UserRef.UserId)
         var userToUserProfileViaNested = R11("REL_User_UserProfile_1to1ViaNested",
             RPE(typeof(RelationshipUser)),
-            RDE(typeof(RelationshipUserProfile), KT([KP(typeof(RelationshipUserProfile), [KPS(nameof(RelationshipUserProfile.UserRef)), KPS(nameof(RelationshipUserRef.UserId))])])));
+            RDE(typeof(RelationshipUserProfile), KD([KP(typeof(RelationshipUserProfile), [KPS(nameof(RelationshipUserProfile.UserRef)), KPS(nameof(RelationshipUserRef.UserId))])])));
 
         // User -> Post (1:M, scalar FK via Post.AuthorUserId)
         var userToPostViaScalar = R1M("REL_User_Post_1toN_ViaScalar",
             RPE(typeof(RelationshipUser)),
-            RDE(typeof(RelationshipPost), KT([KP(typeof(RelationshipPost), [KPS(nameof(RelationshipPost.AuthorUserId))])])));
+            RDE(typeof(RelationshipPost), KD([KP(typeof(RelationshipPost), [KPS(nameof(RelationshipPost.AuthorUserId))])])));
 
         // User -> Post (1:M, nested FK via Post.AuthorUserRef.UserId)
         var userToPostViaNested = R1M("REL_User_Post_1toN_ViaNested",
             RPE(typeof(RelationshipUser)),
-            RDE(typeof(RelationshipPost), KT([KP(typeof(RelationshipPost), [KPS(nameof(RelationshipPost.AuthorUserRef)), KPS(nameof(RelationshipUserRef.UserId))])])));
+            RDE(typeof(RelationshipPost), KD([KP(typeof(RelationshipPost), [KPS(nameof(RelationshipPost.AuthorUserRef)), KPS(nameof(RelationshipUserRef.UserId))])])));
 
         // Post → Comment (1:M, scalar FK via Comment.PostId)
         var postToCommentViaScalar = R1M("REL_Post_Comment_1toN_ViaScalar",
             RPE(typeof(RelationshipPost)),
-            RDE(typeof(RelationshipComment), KT([KP(typeof(RelationshipComment), [KPS(nameof(RelationshipComment.PostId))])])));
+            RDE(typeof(RelationshipComment), KD([KP(typeof(RelationshipComment), [KPS(nameof(RelationshipComment.PostId))])])));
 
         // Post → Comment (1:M, nested FK via Comment.PostRef.PostId)
         var postToCommentViaNested = R1M("REL_Post_Comment_1toN_ViaNested",
             RPE(typeof(RelationshipPost)),
-            RDE(typeof(RelationshipComment), KT([KP(typeof(RelationshipComment), [KPS(nameof(RelationshipComment.PostRef)), KPS(nameof(RelationshipPostRef.PostId))])])));
+            RDE(typeof(RelationshipComment), KD([KP(typeof(RelationshipComment), [KPS(nameof(RelationshipComment.PostRef)), KPS(nameof(RelationshipPostRef.PostId))])])));
 
         // Post ↔ Tag (M:M via PostTag)
         var postToTagViaPostTag = RMN("REL_Post_Tag_NtoN_ViaPostTag",
             RPE(typeof(RelationshipPost)),
             RPE(typeof(RelationshipTag)),
             RAS(typeof(RelationshipPostTag),
-                KT([KP(typeof(RelationshipPostTag), [KPS(nameof(RelationshipPostTag.PostId))])]),
-                KT([KP(typeof(RelationshipPostTag), [KPS(nameof(RelationshipPostTag.TagId))])])));
+                KD([KP(typeof(RelationshipPostTag), [KPS(nameof(RelationshipPostTag.PostId))])]),
+                KD([KP(typeof(RelationshipPostTag), [KPS(nameof(RelationshipPostTag.TagId))])])));
 
         // CatalogItem → OrderLine (1:M, composite FK via OrderLine.ProductSku + OrderLine.ProductRevision → CatalogItem.Sku + CatalogItem.Revision)
         var catalogItemToOrderLineViaScalarComposite = R1M("REL_CatalogItem_OrderLine_1toN_ViaScalarComposite",
             RPE(typeof(RelationshipCatalogItem)),
-            RDE(typeof(RelationshipOrderLine), KT([KP(typeof(RelationshipOrderLine), [KPS(nameof(RelationshipOrderLine.ProductSku))]), KP(typeof(RelationshipOrderLine), [KPS(nameof(RelationshipOrderLine.ProductRevision))])])));
+            RDE(typeof(RelationshipOrderLine), KD([KP(typeof(RelationshipOrderLine), [KPS(nameof(RelationshipOrderLine.ProductSku))]), KP(typeof(RelationshipOrderLine), [KPS(nameof(RelationshipOrderLine.ProductRevision))])])));
 
         // CatalogItem → OrderLine (1:M, composite FK via nested ProductKey → CatalogKey)
         var catalogItemToOrderLineViaNestedComposite = R1M("REL_CatalogItem_OrderLine_1toN_ViaNestedComposite",
             RPE(typeof(RelationshipCatalogItem)),
-            RDE(typeof(RelationshipOrderLine), KT([KP(typeof(RelationshipOrderLine), [KPS(nameof(RelationshipOrderLine.ProductKey)), KPS(nameof(RelationshipCatalogKey.Sku))]), KP(typeof(RelationshipOrderLine), [KPS(nameof(RelationshipOrderLine.ProductKey)), KPS(nameof(RelationshipCatalogKey.Revision))])])));
+            RDE(typeof(RelationshipOrderLine), KD([KP(typeof(RelationshipOrderLine), [KPS(nameof(RelationshipOrderLine.ProductKey)), KPS(nameof(RelationshipCatalogKey.Sku))]), KP(typeof(RelationshipOrderLine), [KPS(nameof(RelationshipOrderLine.ProductKey)), KPS(nameof(RelationshipCatalogKey.Revision))])])));
 
         // Order → OrderLine (1:M, owner key path via nested Order.Lines[LineNumber] → OrderLine.LineNumber)
         var orderToOrderLineViaOwnerKeyPath = R1M("REL_Order_OwnedLine_1toN_ViaOwnerKeyPath",
             RPE(typeof(RelationshipOrder)),
-            RDE(typeof(RelationshipOwnedLine), KT([KP(typeof(RelationshipOrder), [KPS(nameof(RelationshipOrder.Id))])])));
+            RDE(typeof(RelationshipOwnedLine), KD([KP(typeof(RelationshipOrder), [KPS(nameof(RelationshipOrder.Id))])])));
 
         // OrgUnit self-referential relationship (1:M, scalar FK via ParentId)
         var orgUnitToOrgUnit = R1M("REL_OrgUnit_OrgUnit_1toN",
             RPE(typeof(RelationshipOrgUnit)),
-            RDE(typeof(RelationshipOrgUnit), KT([KP(typeof(RelationshipOrgUnit), [KPS(nameof(RelationshipOrgUnit.ParentId))])])));
+            RDE(typeof(RelationshipOrgUnit), KD([KP(typeof(RelationshipOrgUnit), [KPS(nameof(RelationshipOrgUnit.ParentId))])])));
 
         var relationships = new List<ApiRelationship>
         {
@@ -1015,7 +1015,7 @@ public static partial class ApiSchemaFactory
             P(name: nameof(Point.Y),    expression: TE.ClrRef<long>(),   required: true),
             P(name: nameof(Point.Note), expression: TE.ClrRef<string>(), required: false)
         ],
-        versionType: new ApiVersionType(nameof(Point.X)));
+        apiVersion: new ApiVersionDefinition(nameof(Point.X)));
 
         var scalarsOnly = O(name: nameof(ScalarsOnly), clr: typeof(ScalarsOnly), options: OO(ApiKeyNullHandling.ThrowOnNull),
         properties:
@@ -1038,10 +1038,10 @@ public static partial class ApiSchemaFactory
             P(name: nameof(Person.Hobbies),   expression: TE.ListOf<string>(required: true), required: false),
             P(name: nameof(Person.CompanyId), expression: TE.ClrRef<Ulid>(),                 required: false),
         ],
-        keyTypes:
+        apiKeys:
         [
-            KT("PK_Person_Id", [KP(typeof(Person), [KPS(nameof(Person.Id))])]),
-            KT("AK_Person_Name", [KP(typeof(Person), [KPS(nameof(Person.Name))])])
+            KD("PK_Person_Id", [KP(typeof(Person), [KPS(nameof(Person.Id))])]),
+            KD("AK_Person_Name", [KP(typeof(Person), [KPS(nameof(Person.Name))])])
         ]);
 
         var company = O(name: nameof(Company), clr: typeof(Company), options: OO(ApiKeyNullHandling.ThrowOnNull),
@@ -1052,10 +1052,10 @@ public static partial class ApiSchemaFactory
             P(name: nameof(Company.Owner),     expression: TE.ClrRef<Person>(),               required: false),
             P(name: nameof(Company.Employees), expression: TE.ListOf<Person>(required: true), required: false)
         ],
-        keyTypes:
+        apiKeys:
         [
-            KT("PK_Company_Id", [KP(typeof(Company), [KPS(nameof(Company.Id))])]),
-            KT("AK_Company_Name", [KP(typeof(Company), [KPS(nameof(Company.Name))])])
+            KD("PK_Company_Id", [KP(typeof(Company), [KPS(nameof(Company.Id))])]),
+            KD("AK_Company_Name", [KP(typeof(Company), [KPS(nameof(Company.Name))])])
         ]);
 
         // 4) Objects list

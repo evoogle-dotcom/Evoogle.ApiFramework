@@ -62,8 +62,8 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
         #region Immutable Properties
         public required string ApiOptions { get; init; }
         public required string ApiProperties { get; init; }
-        public required string ApiKeyTypes { get; init; }
-        public required string ApiVersionType { get; init; }
+        public required string ApiKeys { get; init; }
+        public required string ApiVersion { get; init; }
         #endregion
     }
 
@@ -113,8 +113,8 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
                 {
                     ApiOptions = policy.ConvertName(nameof(Types.ApiObjectType.ApiOptions)),
                     ApiProperties = policy.ConvertName(nameof(Types.ApiObjectType.ApiProperties)),
-                    ApiKeyTypes = policy.ConvertName(nameof(Types.ApiObjectType.ApiKeyTypes)),
-                    ApiVersionType = policy.ConvertName(nameof(Types.ApiObjectType.ApiVersionType))
+                    ApiKeys = policy.ConvertName(nameof(Types.ApiObjectType.ApiKeys)),
+                    ApiVersion = policy.ConvertName(nameof(Types.ApiObjectType.ApiVersion))
                 },
                 ApiType = new ApiTypePropertyNames
                 {

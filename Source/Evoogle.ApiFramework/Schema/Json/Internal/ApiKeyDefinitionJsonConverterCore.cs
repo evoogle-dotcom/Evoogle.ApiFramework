@@ -14,7 +14,7 @@ namespace Evoogle.ApiFramework.Schema.Json.Internal;
 ///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used
 ///     directly from your code. This API may change or be removed in future releases.
 /// </summary>
-internal static class ApiKeyTypeJsonConverterCore
+internal static class ApiKeyDefinitionJsonConverterCore
 {
     #region Types
     internal delegate void ApiKeyPathArrayWriter
@@ -35,7 +35,7 @@ internal static class ApiKeyTypeJsonConverterCore
         {
             return new PropertyNames
             {
-                ApiKeyPaths = policy.ConvertName(nameof(ApiKeyType.ApiKeyPaths))
+                ApiKeyPaths = policy.ConvertName(nameof(ApiKeyDefinition.ApiKeyPaths))
             };
         }
         #endregion
@@ -73,13 +73,13 @@ internal static class ApiKeyTypeJsonConverterCore
     internal static void WriteApiKeyPaths
     (
         Utf8JsonWriter writer,
-        ApiKeyType apiKeyType,
+        ApiKeyDefinition apiKeyDefinition,
         string propertyName,
         JsonSerializerOptions options,
         ApiKeyPathArrayWriter writeApiKeyPathArray
     )
     {
-        var apiKeyPaths = apiKeyType.ApiKeyPaths;
+        var apiKeyPaths = apiKeyDefinition.ApiKeyPaths;
 
         writer.TryWritePropertyWithAction
         (

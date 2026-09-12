@@ -14,7 +14,7 @@ using FluentAssertions;
 
 namespace Evoogle.ApiFramework.Schema.Key;
 
-public partial class ApiKeyTypeTests
+public partial class ApiKeyDefinitionTests
 {
     #region Test Types
     private class JsonContractTest : XUnitTest
@@ -26,9 +26,9 @@ public partial class ApiKeyTypeTests
 
         #region Calculated Properties
         private string? ActualJson { get; set; }
-        private ApiKeyType? ActualKeyType { get; set; }
+        private ApiKeyDefinition? ActualKeyDefinition { get; set; }
         private Type? DeclaredType { get; set; }
-        private ApiKeyType? SourceKeyType { get; set; }
+        private ApiKeyDefinition? SourceKeyDefinition { get; set; }
         #endregion
 
         #region XUnitTest Methods
@@ -40,17 +40,17 @@ public partial class ApiKeyTypeTests
                 [new ApiKeyPathSegment(nameof(KeyOneScalarPart.Id))]
             );
 
-            this.SourceKeyType = this.ApiName is null
-                ? new ApiKeyType([apiKeyPath])
-                : new ApiNamedKeyType(this.ApiName, [apiKeyPath]);
-            this.SourceKeyType.AttachExtension(new GraphQlExtension());
-            this.DeclaredType = this.SourceKeyType.GetType();
+            this.SourceKeyDefinition = this.ApiName is null
+                ? new ApiKeyDefinition([apiKeyPath])
+                : new ApiNamedKeyDefinition(this.ApiName, [apiKeyPath]);
+            this.SourceKeyDefinition.AttachExtension(new GraphQlExtension());
+            this.DeclaredType = this.SourceKeyDefinition.GetType();
         }
 
         protected override void Act()
         {
-            this.ActualJson = JsonSerializer.Serialize(this.SourceKeyType, this.DeclaredType!);
-            this.ActualKeyType = (ApiKeyType?)JsonSerializer.Deserialize
+            this.ActualJson = JsonSerializer.Serialize(this.SourceKeyDefinition, this.DeclaredType!);
+            this.ActualKeyDefinition = (ApiKeyDefinition?)JsonSerializer.Deserialize
             (
                 this.ExpectedJson,
                 this.DeclaredType!
@@ -61,11 +61,11 @@ public partial class ApiKeyTypeTests
         {
             this.ActualJson.RemoveWhitespace().Should().Be(this.ExpectedJson.RemoveWhitespace());
 
-            this.ActualKeyType.Should().NotBeNull();
-            this.ActualKeyType!.GetType().Should().Be(this.DeclaredType);
-            this.ActualKeyType.ApiKeyPaths.Should().ContainSingle();
+            this.ActualKeyDefinition.Should().NotBeNull();
+            this.ActualKeyDefinition!.GetType().Should().Be(this.DeclaredType);
+            this.ActualKeyDefinition.ApiKeyPaths.Should().ContainSingle();
 
-            var actualApiKeyPath = this.ActualKeyType.ApiKeyPaths.Single();
+            var actualApiKeyPath = this.ActualKeyDefinition.ApiKeyPaths.Single();
             actualApiKeyPath.ClrRootType.Should().Be(typeof(KeyOneScalarPart));
             actualApiKeyPath.ApiSegments.Should().ContainSingle();
             actualApiKeyPath.ApiSegments.Single().ClrMemberName.Should().Be
@@ -73,20 +73,20 @@ public partial class ApiKeyTypeTests
                 nameof(KeyOneScalarPart.Id)
             );
 
-            this.ActualKeyType.Extensions.Should().NotBeNull();
-            this.ActualKeyType.Extensions!.Should().ContainKey(typeof(GraphQlExtension));
-            this.ActualKeyType.Extensions[typeof(GraphQlExtension)].Should().BeEquivalentTo
+            this.ActualKeyDefinition.Extensions.Should().NotBeNull();
+            this.ActualKeyDefinition.Extensions!.Should().ContainKey(typeof(GraphQlExtension));
+            this.ActualKeyDefinition.Extensions[typeof(GraphQlExtension)].Should().BeEquivalentTo
             (
                 new GraphQlExtension()
             );
 
             if (this.ApiName is null)
             {
-                this.ActualKeyType.Should().BeOfType<ApiKeyType>();
+                this.ActualKeyDefinition.Should().BeOfType<ApiKeyDefinition>();
             }
             else
             {
-                this.ActualKeyType.Should().BeOfType<ApiNamedKeyType>()
+                this.ActualKeyDefinition.Should().BeOfType<ApiNamedKeyDefinition>()
                     .Which.ApiName.Should().Be(this.ApiName);
             }
         }
@@ -99,7 +99,7 @@ public partial class ApiKeyTypeTests
     [
         new JsonContractTest
         {
-            Name = $"{nameof(ApiKeyType)} JSON contract",
+            Name = $"{nameof(ApiKeyDefinition)} JSON contract",
             ApiName = null,
             ExpectedJson = @"
             {
@@ -120,7 +120,7 @@ public partial class ApiKeyTypeTests
         },
         new JsonContractTest
         {
-            Name = $"{nameof(ApiNamedKeyType)} JSON contract",
+            Name = $"{nameof(ApiNamedKeyDefinition)} JSON contract",
             ApiName = "PrimaryKey",
             ExpectedJson = @"
             {

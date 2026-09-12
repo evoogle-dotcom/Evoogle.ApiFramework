@@ -135,7 +135,7 @@ public class ApiSchemaElementTests(ITestOutputHelper output) : XUnitTests(output
                 ApiSchemaElementKind.ObjectType,
                 ApiSchemaElementKind.EnumValue,
                 ApiSchemaElementKind.Property,
-                ApiSchemaElementKind.VersionType
+                ApiSchemaElementKind.VersionDefinition
             );
 
             var depthFirstKinds = this.Schema.Root
@@ -149,7 +149,7 @@ public class ApiSchemaElementTests(ITestOutputHelper output) : XUnitTests(output
                 ApiSchemaElementKind.EnumValue,
                 ApiSchemaElementKind.ObjectType,
                 ApiSchemaElementKind.Property,
-                ApiSchemaElementKind.VersionType
+                ApiSchemaElementKind.VersionDefinition
             );
         }
         #endregion
@@ -168,12 +168,12 @@ public class ApiSchemaElementTests(ITestOutputHelper output) : XUnitTests(output
             (
                 "KeyNestedComposite"
             );
-            var apiKeyType = apiObjectType.GetKeyTypeByApiName
+            var apiKeyDefinition = apiObjectType.GetKeyByApiName
             (
                 "PK_KeyNestedComposite"
             );
 
-            this.KeyPath = apiKeyType.ApiKeyPaths.Single(path => path.ApiSegments.Length > 1);
+            this.KeyPath = apiKeyDefinition.ApiKeyPaths.Single(path => path.ApiSegments.Length > 1);
         }
 
         protected override void Act()
@@ -564,8 +564,8 @@ public class ApiSchemaElementTests(ITestOutputHelper output) : XUnitTests(output
             "TreeObject",
             apiOptions: null,
             apiProperties: [apiProperty],
-            apiKeyTypes: [],
-            new ApiVersionType(nameof(TreeObject.Id)),
+            apiKeys: [],
+            new ApiVersionDefinition(nameof(TreeObject.Id)),
             typeof(TreeObject)
         );
         var schema = new ApiSchema
@@ -650,11 +650,11 @@ public class ApiSchemaElementTests(ITestOutputHelper output) : XUnitTests(output
             ApiEnumType => ApiSchemaElementKind.EnumType,
             ApiObjectType => ApiSchemaElementKind.ObjectType,
             ApiScalarType => ApiSchemaElementKind.ScalarType,
-            ApiVersionType => ApiSchemaElementKind.VersionType,
+            ApiVersionDefinition => ApiSchemaElementKind.VersionDefinition,
             ApiEnumValue => ApiSchemaElementKind.EnumValue,
             ApiProperty => ApiSchemaElementKind.Property,
-            ApiNamedKeyType => ApiSchemaElementKind.NamedKeyType,
-            ApiKeyType => ApiSchemaElementKind.KeyType,
+            ApiNamedKeyDefinition => ApiSchemaElementKind.NamedKeyDefinition,
+            ApiKeyDefinition => ApiSchemaElementKind.KeyDefinition,
             ApiKeyPath => ApiSchemaElementKind.KeyPath,
             ApiKeyPathSegment => ApiSchemaElementKind.KeyPathSegment,
             ApiRelationshipOneToOne => ApiSchemaElementKind.RelationshipOneToOne,
@@ -685,8 +685,8 @@ public class ApiSchemaElementTests(ITestOutputHelper output) : XUnitTests(output
             ApiObjectType apiObjectType =>
             [
                 .. apiObjectType.ApiProperties,
-                .. apiObjectType.ApiKeyTypes,
-                .. new ApiSchemaElement?[] { apiObjectType.ApiVersionType }
+                .. apiObjectType.ApiKeys,
+                .. new ApiSchemaElement?[] { apiObjectType.ApiVersion }
                     .OfType<ApiSchemaElement>()
             ],
             ApiProperty apiProperty when apiProperty.ApiTypeExpression?.ApiInlineType is not null =>
@@ -694,7 +694,7 @@ public class ApiSchemaElementTests(ITestOutputHelper output) : XUnitTests(output
             ApiCollectionType apiCollectionType
                 when apiCollectionType.ApiItemTypeExpression?.ApiInlineType is not null =>
                 [apiCollectionType.ApiItemTypeExpression.ApiInlineType],
-            ApiKeyType apiKeyType => [.. apiKeyType.ApiKeyPaths],
+            ApiKeyDefinition apiKeyDefinition => [.. apiKeyDefinition.ApiKeyPaths],
             ApiKeyPath apiKeyPath => [.. apiKeyPath.ApiSegments],
             ApiRelationshipOneTo apiRelationship =>
             [
@@ -714,9 +714,9 @@ public class ApiSchemaElementTests(ITestOutputHelper output) : XUnitTests(output
                 }.OfType<ApiSchemaElement>()
             ],
             ApiRelationshipDependentEnd apiDependentEnd when apiDependentEnd.HasForeignKey =>
-                [apiDependentEnd.ApiForeignKeyType],
+                [apiDependentEnd.ApiForeignKey],
             ApiRelationshipAssociation apiAssociation when apiAssociation.HasForeignKeys =>
-                [apiAssociation.ApiForeignKeyTypeA, apiAssociation.ApiForeignKeyTypeB],
+                [apiAssociation.ApiForeignKeyA, apiAssociation.ApiForeignKeyB],
             _ => []
         };
     }

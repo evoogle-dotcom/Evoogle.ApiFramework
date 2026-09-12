@@ -418,7 +418,7 @@ Retrieval primitives are batch-first:
 
 ```text
 Query root objects using one repository-local query
-Retrieve objects by one ApiNamedKeyType and ApiKey batch
+Retrieve objects by one ApiNamedKeyDefinition and ApiKey batch
 Retrieve relationship mappings from one identity batch to target identities
 ```
 

@@ -106,9 +106,9 @@ public sealed class ApiAnnotationReaderArchitectureTests(ITestOutputHelper outpu
             this.ApiSchemaBuilder = this.TestCase switch
             {
                 KeyPathTestCase.AnnotationKeyPathsAreSorted => apiSchemaBuilder
-                    .AddObject<ReverseOrderKeyType>(builder => builder
-                        .AddProperty("Second", nameof(ReverseOrderKeyType.Second))
-                        .AddProperty("First", nameof(ReverseOrderKeyType.First))),
+                    .AddObject<ReverseOrderKeyObject>(builder => builder
+                        .AddProperty("Second", nameof(ReverseOrderKeyObject.Second))
+                        .AddProperty("First", nameof(ReverseOrderKeyObject.First))),
                 KeyPathTestCase.ExplicitKeyIsPreserved => apiSchemaBuilder
                     .AddObject<ExplicitKeyOverrideType>(builder => builder
                         .AddProperty("Explicit", nameof(ExplicitKeyOverrideType.Explicit))
@@ -143,7 +143,7 @@ public sealed class ApiAnnotationReaderArchitectureTests(ITestOutputHelper outpu
         {
             this.ApiSchemaActual.Should().NotBeNull();
 
-            var apiKeyPaths = this.ApiSchemaActual!.ApiObjectTypes.Single().ApiKeyTypes!
+            var apiKeyPaths = this.ApiSchemaActual!.ApiObjectTypes.Single().ApiKeys!
                 .Single().ApiKeyPaths;
             apiKeyPaths.Select(path => path.ApiSegments.Single().ClrMemberName)
                 .Should().Equal(this.ApiKeyPathPropertyNamesExpected);
@@ -187,9 +187,9 @@ public sealed class ApiAnnotationReaderArchitectureTests(ITestOutputHelper outpu
                     ExceptionTestCase.DuplicateAnnotationKeyOrders => new ApiSchemaBuilder()
                         .WithName("Test")
                         .AddScalar<int>()
-                        .AddObject<DuplicateOrderKeyType>(builder => builder
-                            .AddProperty("First", nameof(DuplicateOrderKeyType.First))
-                            .AddProperty("Second", nameof(DuplicateOrderKeyType.Second)))
+                        .AddObject<DuplicateOrderKeyObject>(builder => builder
+                            .AddProperty("First", nameof(DuplicateOrderKeyObject.First))
+                            .AddProperty("Second", nameof(DuplicateOrderKeyObject.Second)))
                         .UseDefaultAnnotations()
                         .Build(),
                     ExceptionTestCase.MarkerOnlyAnnotationReader => (object)new ApiAnnotationReaderSetBuilder().AddReader(new MarkerOnlyReader()),
@@ -358,8 +358,8 @@ public sealed class ApiAnnotationReaderArchitectureTests(ITestOutputHelper outpu
             TestCase = KeyPathTestCase.AnnotationKeyPathsAreSorted,
             ApiKeyPathPropertyNamesExpected =
             [
-                nameof(ReverseOrderKeyType.First),
-                nameof(ReverseOrderKeyType.Second)
+                nameof(ReverseOrderKeyObject.First),
+                nameof(ReverseOrderKeyObject.Second)
             ]
         },
         new KeyPathTest
@@ -438,7 +438,7 @@ public sealed class ExplicitNameAnnotationType
     public int Id { get; set; }
 }
 
-public sealed class ReverseOrderKeyType
+public sealed class ReverseOrderKeyObject
 {
     [ApiKey(ApiName = "Composite", Order = 1)]
     public int Second { get; set; }
@@ -447,7 +447,7 @@ public sealed class ReverseOrderKeyType
     public int First { get; set; }
 }
 
-public sealed class DuplicateOrderKeyType
+public sealed class DuplicateOrderKeyObject
 {
     [ApiKey(ApiName = "Duplicate", Order = 0)]
     public int First { get; set; }

@@ -14,37 +14,37 @@ public partial class ApiObjectTypeTests
     #region Theory Data
     public static TheoryDataRow<IXUnitTest>[] TryGetTheoryData =>
     [
-        // TryGetKeyTypeByApiName
+        // TryGetKeyByApiName
         new TryGetTest
         {
-            Name = $"{nameof(ApiObjectType.TryGetKeyTypeByApiName)} returns true when " +
-                $"{nameof(ApiNamedKeyType)} exists with exact case match",
+            Name = $"{nameof(ApiObjectType.TryGetKeyByApiName)} returns true when " +
+                $"{nameof(ApiNamedKeyDefinition)} exists with exact case match",
             ApiSchemaKind = ApiSchemaKind.Key,
             ApiObjectTypeName = nameof(KeyOneScalarPart),
-            TryGetMethod = TryGetMethod.TryGetKeyTypeByApiName,
+            TryGetMethod = TryGetMethod.TryGetKeyByApiName,
             SearchKey = "PK_KeyOneScalarPart",
             ExpectedResult = true
         },
 
         new TryGetTest
         {
-            Name = $"{nameof(ApiObjectType.TryGetKeyTypeByApiName)} returns false when " +
-                $"{nameof(ApiNamedKeyType)} exists but case mismatch",
+            Name = $"{nameof(ApiObjectType.TryGetKeyByApiName)} returns false when " +
+                $"{nameof(ApiNamedKeyDefinition)} exists but case mismatch",
             ApiSchemaKind = ApiSchemaKind.Key,
             ApiObjectTypeName = nameof(KeyOneScalarPart),
-            TryGetMethod = TryGetMethod.TryGetKeyTypeByApiName,
+            TryGetMethod = TryGetMethod.TryGetKeyByApiName,
             SearchKey = "pk_keyonescalarpart",
             ExpectedResult = false
         },
 
         new TryGetTest
         {
-            Name = $"{nameof(ApiObjectType.TryGetKeyTypeByApiName)} returns false when " +
-                $"{nameof(ApiNamedKeyType)} does not exist",
+            Name = $"{nameof(ApiObjectType.TryGetKeyByApiName)} returns false when " +
+                $"{nameof(ApiNamedKeyDefinition)} does not exist",
             ApiSchemaKind = ApiSchemaKind.Key,
             ApiObjectTypeName = nameof(KeyOneScalarPart),
-            TryGetMethod = TryGetMethod.TryGetKeyTypeByApiName,
-            SearchKey = "Unknown_KeyType",
+            TryGetMethod = TryGetMethod.TryGetKeyByApiName,
+            SearchKey = "Unknown_Key",
             ExpectedResult = false
         },
 

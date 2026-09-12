@@ -120,7 +120,7 @@ public static class ApiAnnotationTestsFactory
             .WithName("Test")
             .AddScalar<int>()
             .AddScalar<string>()
-            .AddObject<ScalarKeyTypeAnnotation>(x => x
+            .AddObject<ScalarKeyAnnotationObject>(x => x
                 .AddProperty(p => p.Id)
                 .AddProperty(p => p.Name))
             .UseDefaultAnnotations()
@@ -134,7 +134,7 @@ public static class ApiAnnotationTestsFactory
             .AddScalar<Guid>()
             .AddScalar<long>()
             .AddScalar<string>()
-            .AddObject<CompositeKeyType>(x => x
+            .AddObject<CompositeKeyObject>(x => x
                 .AddProperty(p => p.OrderId)
                 .AddProperty(p => p.LineItemNumber)
                 .AddProperty(p => p.Description))
@@ -149,7 +149,7 @@ public static class ApiAnnotationTestsFactory
             .AddScalar<Guid>()
             .AddScalar<int>()
             .AddScalar<string>()
-            .AddObject<ThreePartCompositeKeyType>(x => x
+            .AddObject<ThreePartCompositeKeyObject>(x => x
                 .AddProperty(p => p.Id1)
                 .AddProperty(p => p.Id2)
                 .AddProperty(p => p.Id3)
@@ -192,7 +192,7 @@ public static class ApiAnnotationTestsFactory
             .AddScalar<string>()
             .UseDefaultConventions()
             .UseDefaultAnnotations()
-            .AddObject<AnnotationPrimaryKeyType>()
+            .AddObject<AnnotationPrimaryKeyObject>()
             .Build();
     }
 

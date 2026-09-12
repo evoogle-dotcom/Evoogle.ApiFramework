@@ -15,7 +15,7 @@ using FluentAssertions;
 
 namespace Evoogle.ApiFramework.Schema.Version;
 
-public class ApiVersionTypeTests(ITestOutputHelper output) : XUnitTests(output)
+public class ApiVersionDefinitionTests(ITestOutputHelper output) : XUnitTests(output)
 {
     #region Test Types
     private sealed class VersionedObject
@@ -56,37 +56,37 @@ public class ApiVersionTypeTests(ITestOutputHelper output) : XUnitTests(output)
 
         #region Calculated Properties
         private ApiVersion Actual { get; set; }
-        private ApiVersionType? VersionType { get; set; }
+        private ApiVersionDefinition? VersionDefinition { get; set; }
         #endregion
 
         #region XUnitTest Methods
         protected override void Arrange()
         {
-            this.VersionType = CompileVersionType
+            this.VersionDefinition = CompileVersion
             (
                 this.IsPropertyBacked
-                    ? new ApiVersionType(nameof(VersionedObject.Version))
-                    : new ApiVersionType(typeof(int))
+                    ? new ApiVersionDefinition(nameof(VersionedObject.Version))
+                    : new ApiVersionDefinition(typeof(int))
             );
         }
 
         protected override void Act()
         {
             this.Actual = this.IsPropertyBacked
-                ? this.VersionType!.MaterializeVersion(new VersionedObject { Version = 42 })
-                : this.VersionType!.MaterializeVersionFromValue(42);
+                ? this.VersionDefinition!.MaterializeVersion(new VersionedObject { Version = 42 })
+                : this.VersionDefinition!.MaterializeVersionFromValue(42);
         }
 
         protected override void Assert()
         {
             this.Actual.GetValue<int>().Should().Be(42);
-            this.VersionType!.ApiScalarType.ClrType.Should().Be(typeof(int));
-            this.VersionType.IsPropertyBacked.Should().Be(this.IsPropertyBacked);
-            this.VersionType.IsRepositoryBacked.Should().Be(!this.IsPropertyBacked);
-            this.VersionType.ApiProperty.Should().Be
+            this.VersionDefinition!.ApiScalarType.ClrType.Should().Be(typeof(int));
+            this.VersionDefinition.IsPropertyBacked.Should().Be(this.IsPropertyBacked);
+            this.VersionDefinition.IsRepositoryBacked.Should().Be(!this.IsPropertyBacked);
+            this.VersionDefinition.ApiProperty.Should().Be
             (
                 this.IsPropertyBacked
-                    ? this.VersionType.Parent.As<ApiObjectType>().ApiProperties.Single()
+                    ? this.VersionDefinition.Parent.As<ApiObjectType>().ApiProperties.Single()
                     : null
             );
         }
@@ -116,12 +116,12 @@ public class ApiVersionTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 InvalidDefinition.MissingProperty => "Missing",
                 _ => nameof(VersionedObject.Version)
             };
-            var versionType = this.Definition switch
+            var versionDefinition = this.Definition switch
             {
-                InvalidDefinition.NullType => new ApiVersionType((Type)null!),
-                InvalidDefinition.NullableType => new ApiVersionType(typeof(int?)),
-                InvalidDefinition.UnregisteredScalar => new ApiVersionType(typeof(decimal)),
-                _ => new ApiVersionType(memberName)
+                InvalidDefinition.NullType => new ApiVersionDefinition((Type)null!),
+                InvalidDefinition.NullableType => new ApiVersionDefinition(typeof(int?)),
+                InvalidDefinition.UnregisteredScalar => new ApiVersionDefinition(typeof(decimal)),
+                _ => new ApiVersionDefinition(memberName)
             };
             var modifiers = this.Definition == InvalidDefinition.OptionalProperty
                 ? ApiTypeModifiers.None
@@ -140,8 +140,8 @@ public class ApiVersionTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 nameof(VersionedObject),
                 apiOptions: null,
                 apiProperties: [property],
-                apiKeyTypes: null,
-                versionType,
+                apiKeys: null,
+                versionDefinition,
                 this.Definition == InvalidDefinition.TypeMismatch
                     ? typeof(MismatchedVersionedObject)
                     : typeof(VersionedObject)
@@ -169,17 +169,17 @@ public class ApiVersionTypeTests(ITestOutputHelper output) : XUnitTests(output)
 
         #region Calculated Properties
         private Exception? Exception { get; set; }
-        private ApiVersionType? VersionType { get; set; }
+        private ApiVersionDefinition? VersionDefinition { get; set; }
         #endregion
 
         #region XUnitTest Methods
         protected override void Arrange()
         {
-            this.VersionType = CompileVersionType
+            this.VersionDefinition = CompileVersion
             (
                 this.Materialization == InvalidMaterializationCase.RepositoryBackedFromObject
-                    ? new ApiVersionType(typeof(int))
-                    : new ApiVersionType(nameof(VersionedObject.Version))
+                    ? new ApiVersionDefinition(typeof(int))
+                    : new ApiVersionDefinition(nameof(VersionedObject.Version))
             );
         }
 
@@ -190,11 +190,11 @@ public class ApiVersionTypeTests(ITestOutputHelper output) : XUnitTests(output)
                 _ = this.Materialization switch
                 {
                     InvalidMaterializationCase.NullValue =>
-                        this.VersionType!.MaterializeVersionFromValue(null),
+                        this.VersionDefinition!.MaterializeVersionFromValue(null),
                     InvalidMaterializationCase.WrongValueType =>
-                        this.VersionType!.MaterializeVersionFromValue(42L),
+                        this.VersionDefinition!.MaterializeVersionFromValue(42L),
                     InvalidMaterializationCase.RepositoryBackedFromObject =>
-                        this.VersionType!.MaterializeVersion(new VersionedObject { Version = 42 }),
+                        this.VersionDefinition!.MaterializeVersion(new VersionedObject { Version = 42 }),
                     _ => throw new InvalidOperationException()
                 };
             }
@@ -226,9 +226,9 @@ public class ApiVersionTypeTests(ITestOutputHelper output) : XUnitTests(output)
         {
             var expected = CreateObjectType
             (
-                new ApiVersionType(nameof(VersionedObject.Version))
+                new ApiVersionDefinition(nameof(VersionedObject.Version))
             );
-            expected.ApiVersionType!.AttachExtension(new GraphQlExtension());
+            expected.ApiVersion!.AttachExtension(new GraphQlExtension());
             var schema = CreateSchema(expected);
             ApiSchemaCompiler.Compile(schema).ThrowIfInvalid();
 
@@ -239,23 +239,23 @@ public class ApiVersionTypeTests(ITestOutputHelper output) : XUnitTests(output)
 
         protected override void Assert()
         {
-            this.Json.Should().Contain("\"ApiVersionType\":");
+            this.Json.Should().Contain("\"ApiVersion\":");
 
             using var document = JsonDocument.Parse(this.Json!);
             var versionJson = document.RootElement
                 .GetProperty(nameof(ApiSchema.ApiObjectTypes))[0]
-                .GetProperty(nameof(ApiObjectType.ApiVersionType));
-            versionJson.TryGetProperty(nameof(ApiVersionType.ClrMemberName), out var memberName)
+                .GetProperty(nameof(ApiObjectType.ApiVersion));
+            versionJson.TryGetProperty(nameof(ApiVersionDefinition.ClrMemberName), out var memberName)
                 .Should().BeTrue();
             memberName.GetString().Should().Be(nameof(VersionedObject.Version));
-            versionJson.TryGetProperty(nameof(ApiVersionType.ClrType), out _).Should().BeFalse();
+            versionJson.TryGetProperty(nameof(ApiVersionDefinition.ClrType), out _).Should().BeFalse();
 
-            this.Actual!.ApiVersionType!.ClrType.Should().Be(typeof(int));
-            this.Actual.ApiVersionType.ClrMemberName.Should().Be
+            this.Actual!.ApiVersion!.ClrType.Should().Be(typeof(int));
+            this.Actual.ApiVersion.ClrMemberName.Should().Be
             (
                 nameof(VersionedObject.Version)
             );
-            this.Actual.ApiVersionType.Extensions.Should().ContainKey(typeof(GraphQlExtension));
+            this.Actual.ApiVersion.Extensions.Should().ContainKey(typeof(GraphQlExtension));
         }
         #endregion
     }
@@ -277,7 +277,7 @@ public class ApiVersionTypeTests(ITestOutputHelper output) : XUnitTests(output)
         {
             var objectType = CreateObjectType
             (
-                new ApiVersionType(typeof(CustomVersion))
+                new ApiVersionDefinition(typeof(CustomVersion))
             );
             var schema = new ApiSchema
             (
@@ -294,7 +294,7 @@ public class ApiVersionTypeTests(ITestOutputHelper output) : XUnitTests(output)
             );
             ApiSchemaCompiler.Compile(schema).ThrowIfInvalid();
 
-            this.Actual = objectType.ApiVersionType!.MaterializeVersionFromValue(this.Source);
+            this.Actual = objectType.ApiVersion!.MaterializeVersionFromValue(this.Source);
         }
 
         protected override void Assert()
@@ -316,14 +316,14 @@ public class ApiVersionTypeTests(ITestOutputHelper output) : XUnitTests(output)
         {
             var objectType = CreateObjectType
             (
-                new ApiVersionType(nameof(VersionedObject.Version))
+                new ApiVersionDefinition(nameof(VersionedObject.Version))
             );
             var json = JsonSerializer.Serialize<ApiType>(objectType);
             using var document = JsonDocument.Parse(json);
             var versionJson = document.RootElement
-                .GetProperty(nameof(ApiObjectType.ApiVersionType))
+                .GetProperty(nameof(ApiObjectType.ApiVersion))
                 .GetRawText();
-            var marker = $"\"{nameof(ApiObjectType.ApiVersionType)}\":";
+            var marker = $"\"{nameof(ApiObjectType.ApiVersion)}\":";
             this.Json = json.Replace(marker, $"{marker}{versionJson},{marker}");
         }
 
@@ -364,7 +364,7 @@ public class ApiVersionTypeTests(ITestOutputHelper output) : XUnitTests(output)
         {
             try
             {
-                _ = JsonSerializer.Deserialize<ApiVersionType>(this.Json);
+                _ = JsonSerializer.Deserialize<ApiVersionDefinition>(this.Json);
             }
             catch (Exception exception)
             {
@@ -375,6 +375,64 @@ public class ApiVersionTypeTests(ITestOutputHelper output) : XUnitTests(output)
         protected override void Assert()
         {
             this.Exception.Should().BeOfType<JsonException>();
+        }
+        #endregion
+    }
+
+    private sealed class LegacyObjectMemberJsonTest : XUnitTest
+    {
+        #region Calculated Properties
+        private ApiObjectType? Actual { get; set; }
+        private string? Json { get; set; }
+        #endregion
+
+        #region XUnitTest Methods
+        protected override void Arrange()
+        {
+            var property = new ApiProperty
+            (
+                nameof(VersionedObject.Version),
+                new ApiTypeExpression(typeof(int)),
+                ApiTypeModifiers.Required,
+                nameof(VersionedObject.Version),
+                ClrMemberKind.Property
+            );
+            var key = new ApiNamedKeyDefinition
+            (
+                "PK_VersionedObject",
+                [
+                    new ApiKeyPath
+                    (
+                        typeof(VersionedObject),
+                        [new ApiKeyPathSegment(nameof(VersionedObject.Version))]
+                    )
+                ]
+            );
+            var objectType = new ApiObjectType
+            (
+                nameof(VersionedObject),
+                apiOptions: null,
+                apiProperties: [property],
+                apiKeys: [key],
+                new ApiVersionDefinition(nameof(VersionedObject.Version)),
+                typeof(VersionedObject)
+            );
+
+            this.Json = JsonSerializer.Serialize<ApiType>(objectType)
+                .Replace("\"ApiKeys\":", "\"ApiKeyTypes\":")
+                .Replace("\"ApiVersion\":", "\"ApiVersionType\":");
+        }
+
+        protected override void Act()
+        {
+            this.Actual = JsonSerializer.Deserialize<ApiType>(this.Json!) as ApiObjectType;
+        }
+
+        protected override void Assert()
+        {
+            this.Actual.Should().NotBeNull();
+            this.Actual!.ApiKeys.Should().BeEmpty();
+            this.Actual.ApiVersion.Should().BeNull();
         }
         #endregion
     }
@@ -405,43 +463,43 @@ public class ApiVersionTypeTests(ITestOutputHelper output) : XUnitTests(output)
         {
             Name = "Reject Invalid Version Member Name",
             Definition = InvalidDefinition.InvalidMemberName,
-            ExpectedCode = ApiSchemaCompilationCode.ApiVersionTypeInvalidClrMemberName
+            ExpectedCode = ApiSchemaCompilationCode.ApiVersionDefinitionInvalidClrMemberName
         },
         new InvalidDefinitionTest
         {
             Name = "Reject Missing Version Property",
             Definition = InvalidDefinition.MissingProperty,
-            ExpectedCode = ApiSchemaCompilationCode.ApiVersionTypeUnresolvedProperty
+            ExpectedCode = ApiSchemaCompilationCode.ApiVersionDefinitionUnresolvedProperty
         },
         new InvalidDefinitionTest
         {
             Name = "Reject Optional Version Property",
             Definition = InvalidDefinition.OptionalProperty,
-            ExpectedCode = ApiSchemaCompilationCode.ApiVersionTypeOptionalProperty
+            ExpectedCode = ApiSchemaCompilationCode.ApiVersionDefinitionOptionalProperty
         },
         new InvalidDefinitionTest
         {
             Name = "Reject Version Property Type Mismatch",
             Definition = InvalidDefinition.TypeMismatch,
-            ExpectedCode = ApiSchemaCompilationCode.ApiVersionTypeClrTypeMismatch
+            ExpectedCode = ApiSchemaCompilationCode.ApiVersionDefinitionClrTypeMismatch
         },
         new InvalidDefinitionTest
         {
             Name = "Reject Null Repository Version CLR Type",
             Definition = InvalidDefinition.NullType,
-            ExpectedCode = ApiSchemaCompilationCode.ApiVersionTypeNullClrType
+            ExpectedCode = ApiSchemaCompilationCode.ApiVersionDefinitionNullClrType
         },
         new InvalidDefinitionTest
         {
             Name = "Reject Nullable Version CLR Type",
             Definition = InvalidDefinition.NullableType,
-            ExpectedCode = ApiSchemaCompilationCode.ApiVersionTypeNullableClrType
+            ExpectedCode = ApiSchemaCompilationCode.ApiVersionDefinitionNullableClrType
         },
         new InvalidDefinitionTest
         {
             Name = "Reject Unregistered Version Scalar",
             Definition = InvalidDefinition.UnregisteredScalar,
-            ExpectedCode = ApiSchemaCompilationCode.ApiVersionTypeUnresolvedScalarType
+            ExpectedCode = ApiSchemaCompilationCode.ApiVersionDefinitionUnresolvedScalarType
         }
     ];
 
@@ -469,6 +527,10 @@ public class ApiVersionTypeTests(ITestOutputHelper output) : XUnitTests(output)
         new DuplicateJsonMemberTest
         {
             Name = "Reject Duplicate Version Metadata JSON Member"
+        },
+        new LegacyObjectMemberJsonTest
+        {
+            Name = "Ignore Legacy Object Key And Version JSON Members"
         },
         new InvalidVersionShapeJsonTest
         {
@@ -505,16 +567,16 @@ public class ApiVersionTypeTests(ITestOutputHelper output) : XUnitTests(output)
     #endregion
 
     #region Factory Methods
-    private static ApiVersionType CompileVersionType(ApiVersionType versionType)
+    private static ApiVersionDefinition CompileVersion(ApiVersionDefinition versionDefinition)
     {
-        var objectType = CreateObjectType(versionType);
+        var objectType = CreateObjectType(versionDefinition);
         var schema = CreateSchema(objectType);
 
         ApiSchemaCompiler.Compile(schema).ThrowIfInvalid();
-        return objectType.ApiVersionType!;
+        return objectType.ApiVersion!;
     }
 
-    private static ApiObjectType CreateObjectType(ApiVersionType versionType)
+    private static ApiObjectType CreateObjectType(ApiVersionDefinition versionDefinition)
     {
         var property = new ApiProperty
         (
@@ -530,8 +592,8 @@ public class ApiVersionTypeTests(ITestOutputHelper output) : XUnitTests(output)
             nameof(VersionedObject),
             apiOptions: null,
             apiProperties: [property],
-            apiKeyTypes: null,
-            versionType,
+            apiKeys: null,
+            versionDefinition,
             typeof(VersionedObject)
         );
     }

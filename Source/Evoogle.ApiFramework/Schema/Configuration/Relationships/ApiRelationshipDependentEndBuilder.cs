@@ -16,8 +16,8 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Relationships;
 ///     Fluent builder used to configure the dependent end of an <see cref="ApiRelationship"/>.
 /// </summary>
 /// <remarks>
-///     Set the foreign key role's <see cref="ApiKeyType"/> with <see cref="WithForeignKey"/>.
-///     When no key type is configured the relationship is treated as purely navigational.
+///     Set the foreign key role's <see cref="ApiKeyDefinition"/> with <see cref="WithForeignKey"/>.
+///     When no key is configured the relationship is treated as purely navigational.
 /// </remarks>
 /// <param name="clrObjectType">The CLR type of the dependent <see cref="ApiObjectType"/>.</param>
 public class ApiRelationshipDependentEndBuilder(Type clrObjectType) : ExtensionBuilder<ApiRelationshipDependentEndBuilder>
@@ -52,45 +52,45 @@ public class ApiRelationshipDependentEndBuilder(Type clrObjectType) : ExtensionB
 
     #region WithForeignKey Methods
     /// <summary>
-    ///     Sets the foreign key role's <see cref="ApiKeyType"/>, optionally configuring its key paths.
+    ///     Sets the foreign key role's <see cref="ApiKeyDefinition"/>, optionally configuring its key paths.
     /// </summary>
-    /// <param name="configure">Optional callback to configure key paths on the key type.</param>
+    /// <param name="configure">Optional callback to configure key paths on the key.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipDependentEndBuilder WithForeignKey(Action<ApiKeyTypeBuilder>? configure = null)
+    public ApiRelationshipDependentEndBuilder WithForeignKey(Action<ApiKeyDefinitionBuilder>? configure = null)
     {
         var source = this.CurrentConfigurationSource;
-        if (_state.ForeignKeyTypeBuilderSource == null || source >= _state.ForeignKeyTypeBuilderSource.Value)
+        if (_state.ForeignKeyBuilderSource == null || source >= _state.ForeignKeyBuilderSource.Value)
         {
-            _state.ForeignKeyTypeBuilder ??= this.CreateForeignKeyTypeBuilder();
-            configure?.Invoke(_state.ForeignKeyTypeBuilder);
-            _state.ForeignKeyTypeBuilderSource = source;
+            _state.ForeignKeyBuilder ??= this.CreateForeignKeyBuilder();
+            configure?.Invoke(_state.ForeignKeyBuilder);
+            _state.ForeignKeyBuilderSource = source;
         }
 
         return this;
     }
 
-    private ApiKeyTypeBuilder CreateForeignKeyTypeBuilder()
+    private ApiKeyDefinitionBuilder CreateForeignKeyBuilder()
     {
-        return ApiBuilderFactory.CreateClosedGeneric<ApiKeyTypeBuilder>
+        return ApiBuilderFactory.CreateClosedGeneric<ApiKeyDefinitionBuilder>
         (
-            typeof(ApiKeyTypeBuilder<>),
+            typeof(ApiKeyDefinitionBuilder<>),
             this.ClrObjectType,
             (object?)null
         );
     }
 
     /// <summary>
-    ///     Allows subclasses to set a pre-constructed key type builder for the foreign key role.
+    ///     Allows subclasses to set a pre-constructed key builder for the foreign key role.
     /// </summary>
-    protected void SetForeignKeyTypeBuilderCore(ApiKeyTypeBuilder builder)
+    protected void SetForeignKeyBuilderCore(ApiKeyDefinitionBuilder builder)
     {
         ArgumentNullException.ThrowIfNull(builder);
 
         var source = this.CurrentConfigurationSource;
-        if (_state.ForeignKeyTypeBuilderSource == null || source >= _state.ForeignKeyTypeBuilderSource.Value)
+        if (_state.ForeignKeyBuilderSource == null || source >= _state.ForeignKeyBuilderSource.Value)
         {
-            _state.ForeignKeyTypeBuilder = builder;
-            _state.ForeignKeyTypeBuilderSource = source;
+            _state.ForeignKeyBuilder = builder;
+            _state.ForeignKeyBuilderSource = source;
         }
     }
 
@@ -104,16 +104,16 @@ public class ApiRelationshipDependentEndBuilder(Type clrObjectType) : ExtensionB
 
         if
         (
-            builder._state.ForeignKeyTypeBuilder != null &&
-            builder._state.ForeignKeyTypeBuilderSource != null &&
+            builder._state.ForeignKeyBuilder != null &&
+            builder._state.ForeignKeyBuilderSource != null &&
             (
-                _state.ForeignKeyTypeBuilderSource == null ||
-                builder._state.ForeignKeyTypeBuilderSource.Value >= _state.ForeignKeyTypeBuilderSource.Value
+                _state.ForeignKeyBuilderSource == null ||
+                builder._state.ForeignKeyBuilderSource.Value >= _state.ForeignKeyBuilderSource.Value
             )
         )
         {
-            _state.ForeignKeyTypeBuilder = builder._state.ForeignKeyTypeBuilder;
-            _state.ForeignKeyTypeBuilderSource = builder._state.ForeignKeyTypeBuilderSource;
+            _state.ForeignKeyBuilder = builder._state.ForeignKeyBuilder;
+            _state.ForeignKeyBuilderSource = builder._state.ForeignKeyBuilderSource;
         }
     }
     #endregion
@@ -132,10 +132,10 @@ public class ApiRelationshipDependentEndBuilder(Type clrObjectType) : ExtensionB
     /// </summary>
     internal ApiRelationshipDependentEnd Build()
     {
-        var apiForeignKeyType = _state.ForeignKeyTypeBuilder?.Build();
+        var apiForeignKey = _state.ForeignKeyBuilder?.Build();
 
-        var end = apiForeignKeyType != null
-            ? new ApiRelationshipDependentEnd(_clrObjectType, apiForeignKeyType)
+        var end = apiForeignKey != null
+            ? new ApiRelationshipDependentEnd(_clrObjectType, apiForeignKey)
             : new ApiRelationshipDependentEnd(_clrObjectType);
 
         var extensions = this.BuildExtensions();

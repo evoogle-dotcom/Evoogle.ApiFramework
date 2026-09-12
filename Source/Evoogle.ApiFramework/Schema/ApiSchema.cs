@@ -292,11 +292,11 @@ public sealed class ApiSchema : ApiSchemaElement
         this.CompileApiEnumTypes(context);
         this.CompileApiObjectTypes(context);
 
-        // Phase 3: Compile version types after object properties and scalar types are available.
-        this.CompileApiVersionTypes(context);
+        // Phase 3: Compile version definitions after object properties and scalar types are available.
+        this.CompileApiVersions(context);
 
-        // Phase 4: Compile key types after all type definitions are available.
-        this.CompileApiKeyTypes(context);
+        // Phase 4: Compile keys after all type definitions are available.
+        this.CompileApiKeys(context);
 
         // Phase 5: Compile relationships.
         this.CompileApiRelationships(context);
@@ -363,23 +363,23 @@ public sealed class ApiSchema : ApiSchemaElement
         }
     }
 
-    private void CompileApiKeyTypes(ApiSchemaCompilationContext context)
+    private void CompileApiKeys(ApiSchemaCompilationContext context)
     {
         foreach (var apiObjectType in this
             .SelfAndDescendants(TraversalStrategy.DepthFirst)
             .OfType<ApiObjectType>())
         {
-            apiObjectType.CompileKeyTypes(context);
+            apiObjectType.CompileKeys(context);
         }
     }
 
-    private void CompileApiVersionTypes(ApiSchemaCompilationContext context)
+    private void CompileApiVersions(ApiSchemaCompilationContext context)
     {
         foreach (var apiObjectType in this
             .SelfAndDescendants(TraversalStrategy.DepthFirst)
             .OfType<ApiObjectType>())
         {
-            apiObjectType.CompileVersionType(context);
+            apiObjectType.CompileVersion(context);
         }
     }
 

@@ -23,8 +23,8 @@ namespace Evoogle.ApiFramework.Schema.Version;
 ///     from an object instance. A repository-backed version is configured with a CLR type and
 ///     must be materialized from a value supplied by the repository.
 /// </remarks>
-[JsonConverter(typeof(ApiVersionTypeJsonConverter))]
-public sealed class ApiVersionType : ApiSchemaElement
+[JsonConverter(typeof(ApiVersionDefinitionJsonConverter))]
+public sealed class ApiVersionDefinition : ApiSchemaElement
 {
     #region Types
     private enum VersionSourceKind
@@ -44,7 +44,7 @@ public sealed class ApiVersionType : ApiSchemaElement
     #region Constructors
     /// <summary>Initializes a property-backed version definition.</summary>
     /// <param name="clrMemberName">The CLR member exposed as an API property.</param>
-    public ApiVersionType(string clrMemberName)
+    public ApiVersionDefinition(string clrMemberName)
     {
         _sourceKind = VersionSourceKind.Property;
         this.ClrMemberName = clrMemberName;
@@ -52,7 +52,7 @@ public sealed class ApiVersionType : ApiSchemaElement
 
     /// <summary>Initializes a repository-backed version definition.</summary>
     /// <param name="clrType">The exact CLR type of the repository-supplied version value.</param>
-    public ApiVersionType(Type clrType)
+    public ApiVersionDefinition(Type clrType)
     {
         _sourceKind = VersionSourceKind.Repository;
         _clrRepositoryType = clrType;
@@ -61,10 +61,10 @@ public sealed class ApiVersionType : ApiSchemaElement
 
     #region ApiSchemaElement Properties
     /// <inheritdoc/>
-    public override ApiSchemaElementKind Kind => ApiSchemaElementKind.VersionType;
+    public override ApiSchemaElementKind Kind => ApiSchemaElementKind.VersionDefinition;
 
     /// <inheritdoc/>
-    protected override string ApiElementName => nameof(ApiVersionType);
+    protected override string ApiElementName => nameof(ApiVersionDefinition);
     #endregion
 
     #region Properties
@@ -120,7 +120,7 @@ public sealed class ApiVersionType : ApiSchemaElement
 
         var apiProperty = this.ApiProperty ?? throw new ApiSchemaMaterializationException
             (
-                $"{nameof(ApiVersionType)} is repository-backed and cannot materialize a version from an object instance."
+                $"{nameof(ApiVersionDefinition)} is repository-backed and cannot materialize a version from an object instance."
             );
         var apiObjectType = this.GetApiObjectType();
         if (!apiObjectType.ClrType.IsInstanceOfType(clrObject))
@@ -213,7 +213,7 @@ public sealed class ApiVersionType : ApiSchemaElement
         var clrMemberName = this.ClrMemberName.SafeToString();
         var extensionCount = this.ExtensionCount.SafeToString();
 
-        return $"{nameof(ApiVersionType)} {{{nameof(this.ClrMemberName)}={clrMemberName}, {nameof(this.ExtensionCount)}={extensionCount}}} [{clrType}]";
+        return $"{nameof(ApiVersionDefinition)} {{{nameof(this.ClrMemberName)}={clrMemberName}, {nameof(this.ExtensionCount)}={extensionCount}}} [{clrType}]";
     }
     #endregion
 
@@ -251,7 +251,7 @@ public sealed class ApiVersionType : ApiSchemaElement
     #region Implementation Methods
     private ApiObjectType GetApiObjectType()
     {
-        return this.Parent as ApiObjectType ?? throw new ApiSchemaException($"An {nameof(ApiVersionType)} must be owned by an {nameof(ApiObjectType)}.");
+        return this.Parent as ApiObjectType ?? throw new ApiSchemaException($"An {nameof(ApiVersionDefinition)} must be owned by an {nameof(ApiObjectType)}.");
     }
 
     private void ResolveApiProperty(ApiSchemaCompilationContext context)
@@ -259,7 +259,7 @@ public sealed class ApiVersionType : ApiSchemaElement
         if (ApiSchemaNameValidation.IsNameInvalid(this.ClrMemberName))
         {
             var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiVersionTypeInvalidClrMemberName;
+            var code = ApiSchemaCompilationCode.ApiVersionDefinitionInvalidClrMemberName;
             var description = $"{nameof(this.ClrMemberName)} must not be empty or whitespace";
             var remediation = $"Specify a valid {nameof(this.ApiProperty.ClrName)} or omit {nameof(this.ClrMemberName)} for a repository-backed version";
 
@@ -271,7 +271,7 @@ public sealed class ApiVersionType : ApiSchemaElement
         if (!apiObjectType.TryGetPropertyByClrName(this.ClrMemberName!, out var apiProperty))
         {
             var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiVersionTypeUnresolvedProperty;
+            var code = ApiSchemaCompilationCode.ApiVersionDefinitionUnresolvedProperty;
             var description = $"No {nameof(this.ApiProperty)} has CLR name '{this.ClrMemberName}'";
             var remediation = $"Add the version member as an {nameof(this.ApiProperty)} on {nameof(ApiObjectType)}['{apiObjectType.ApiName}']";
 
@@ -287,7 +287,7 @@ public sealed class ApiVersionType : ApiSchemaElement
         if (apiProperty.ApiType is not ApiScalarType apiScalarType)
         {
             var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiVersionTypeNonScalarProperty;
+            var code = ApiSchemaCompilationCode.ApiVersionDefinitionNonScalarProperty;
             var description = $"Version property '{apiProperty.ApiName}' is not scalar";
             var remediation = "Configure the version property with a scalar API type";
 
@@ -308,7 +308,7 @@ public sealed class ApiVersionType : ApiSchemaElement
         if (apiProperty.ClrMemberType != apiScalarType.ClrType)
         {
             var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiVersionTypeClrTypeMismatch;
+            var code = ApiSchemaCompilationCode.ApiVersionDefinitionClrTypeMismatch;
             var description =
                 $"Version member CLR type '{apiProperty.ClrMemberType.SafeToName()}' does not " +
                 $"match scalar type '{apiScalarType.ClrType.SafeToName()}'";
@@ -322,7 +322,7 @@ public sealed class ApiVersionType : ApiSchemaElement
         if (apiProperty.IsOptional)
         {
             var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiVersionTypeOptionalProperty;
+            var code = ApiSchemaCompilationCode.ApiVersionDefinitionOptionalProperty;
             var description = $"Version property '{apiProperty.ApiName}' is optional";
             var remediation = "Configure the version property as required";
 
@@ -340,7 +340,7 @@ public sealed class ApiVersionType : ApiSchemaElement
         if (!schema.TryGetScalarTypeByClrType(_clrRepositoryType!, out var apiScalarType))
         {
             var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiVersionTypeUnresolvedScalarType;
+            var code = ApiSchemaCompilationCode.ApiVersionDefinitionUnresolvedScalarType;
             var description = $"No {nameof(this.ApiScalarType)} is registered for CLR type " +
                 $"'{_clrRepositoryType.SafeToName()}'";
             var remediation = $"Add an {nameof(this.ApiScalarType)} for the configured version CLR type";
@@ -357,7 +357,7 @@ public sealed class ApiVersionType : ApiSchemaElement
         if (clrType is null)
         {
             var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiVersionTypeNullClrType;
+            var code = ApiSchemaCompilationCode.ApiVersionDefinitionNullClrType;
             var description = $"{nameof(this.ClrType)} must not be null";
             var remediation = $"Specify a valid scalar {nameof(this.ClrType)}";
 
@@ -368,7 +368,7 @@ public sealed class ApiVersionType : ApiSchemaElement
         if (Nullable.GetUnderlyingType(clrType) is not null)
         {
             var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiVersionTypeNullableClrType;
+            var code = ApiSchemaCompilationCode.ApiVersionDefinitionNullableClrType;
             var description = $"{nameof(this.ClrType)} must not be nullable";
             var remediation = "Use the non-nullable underlying CLR type for the version";
 

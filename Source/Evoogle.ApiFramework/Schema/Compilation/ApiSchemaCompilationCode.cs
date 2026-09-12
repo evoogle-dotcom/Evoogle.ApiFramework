@@ -153,18 +153,18 @@ public enum ApiSchemaCompilationCode
     ApiKeyPathSegmentUnresolvedApiProperty,
     #endregion
 
-    #region ApiKeyType and ApiNamedKeyType Compilation Codes
+    #region ApiKeyDefinition and ApiNamedKeyDefinition Compilation Codes
     /// <summary>
-    ///     An <see cref="ApiKeyType"/> has no key paths defined. At least one <see cref="ApiKeyPath"/> is required.
+    ///     An <see cref="ApiKeyDefinition"/> has no key paths defined. At least one <see cref="ApiKeyPath"/> is required.
     /// </summary>
-    [EnumMember(Value = "API_KEY_TYPE_NULL_OR_EMPTY_PATHS")]
-    ApiKeyTypeNullOrEmptyPaths,
+    [EnumMember(Value = "API_KEY_DEFINITION_NULL_OR_EMPTY_PATHS")]
+    ApiKeyDefinitionNullOrEmptyPaths,
 
     /// <summary>
-    ///     An <see cref="ApiNamedKeyType"/>'s API name is null, empty, or whitespace.
+    ///     An <see cref="ApiNamedKeyDefinition"/>'s API name is null, empty, or whitespace.
     /// </summary>
-    [EnumMember(Value = "API_NAMED_KEY_TYPE_INVALID_API_NAME")]
-    ApiNamedKeyTypeInvalidApiName,
+    [EnumMember(Value = "API_NAMED_KEY_DEFINITION_INVALID_API_NAME")]
+    ApiNamedKeyDefinitionInvalidApiName,
     #endregion
 
     #region ApiNamedType Compilation Codes
@@ -177,10 +177,10 @@ public enum ApiSchemaCompilationCode
 
     #region ApiObjectType Compilation Codes
     /// <summary>
-    ///     Multiple key types have the same API name.
+    ///     Multiple keys have the same API name.
     /// </summary>
-    [EnumMember(Value = "API_OBJECT_TYPE_DUPLICATE_KEY_TYPE_API_NAME")]
-    ApiObjectTypeDuplicateKeyTypeApiName,
+    [EnumMember(Value = "API_OBJECT_TYPE_DUPLICATE_KEY_API_NAME")]
+    ApiObjectTypeDuplicateKeyApiName,
 
     /// <summary>
     ///     Multiple properties have the same API name.
@@ -289,38 +289,38 @@ public enum ApiSchemaCompilationCode
     ApiPropertyOptionalNonNullableMismatch,
     #endregion
 
-    #region ApiVersionType Compilation Codes
-    /// <summary>The version type's CLR type is null.</summary>
-    [EnumMember(Value = "API_VERSION_TYPE_NULL_CLR_TYPE")]
-    ApiVersionTypeNullClrType,
+    #region ApiVersionDefinition Compilation Codes
+    /// <summary>The version definition's CLR type is null.</summary>
+    [EnumMember(Value = "API_VERSION_DEFINITION_NULL_CLR_TYPE")]
+    ApiVersionDefinitionNullClrType,
 
-    /// <summary>The version type uses a nullable CLR value type.</summary>
-    [EnumMember(Value = "API_VERSION_TYPE_NULLABLE_CLR_TYPE")]
-    ApiVersionTypeNullableClrType,
+    /// <summary>The version definition uses a nullable CLR value type.</summary>
+    [EnumMember(Value = "API_VERSION_DEFINITION_NULLABLE_CLR_TYPE")]
+    ApiVersionDefinitionNullableClrType,
 
     /// <summary>The property-backed version has an invalid CLR member name.</summary>
-    [EnumMember(Value = "API_VERSION_TYPE_INVALID_CLR_MEMBER_NAME")]
-    ApiVersionTypeInvalidClrMemberName,
+    [EnumMember(Value = "API_VERSION_DEFINITION_INVALID_CLR_MEMBER_NAME")]
+    ApiVersionDefinitionInvalidClrMemberName,
 
     /// <summary>No scalar schema type matches the version CLR type.</summary>
-    [EnumMember(Value = "API_VERSION_TYPE_UNRESOLVED_SCALAR_TYPE")]
-    ApiVersionTypeUnresolvedScalarType,
+    [EnumMember(Value = "API_VERSION_DEFINITION_UNRESOLVED_SCALAR_TYPE")]
+    ApiVersionDefinitionUnresolvedScalarType,
 
     /// <summary>No API property matches the property-backed version CLR member name.</summary>
-    [EnumMember(Value = "API_VERSION_TYPE_UNRESOLVED_PROPERTY")]
-    ApiVersionTypeUnresolvedProperty,
+    [EnumMember(Value = "API_VERSION_DEFINITION_UNRESOLVED_PROPERTY")]
+    ApiVersionDefinitionUnresolvedProperty,
 
     /// <summary>The property-backed version refers to a non-scalar API property.</summary>
-    [EnumMember(Value = "API_VERSION_TYPE_NON_SCALAR_PROPERTY")]
-    ApiVersionTypeNonScalarProperty,
+    [EnumMember(Value = "API_VERSION_DEFINITION_NON_SCALAR_PROPERTY")]
+    ApiVersionDefinitionNonScalarProperty,
 
     /// <summary>The version member and scalar API type use different CLR types.</summary>
-    [EnumMember(Value = "API_VERSION_TYPE_CLR_TYPE_MISMATCH")]
-    ApiVersionTypeClrTypeMismatch,
+    [EnumMember(Value = "API_VERSION_DEFINITION_CLR_TYPE_MISMATCH")]
+    ApiVersionDefinitionClrTypeMismatch,
 
     /// <summary>The property-backed version refers to an optional API property.</summary>
-    [EnumMember(Value = "API_VERSION_TYPE_OPTIONAL_PROPERTY")]
-    ApiVersionTypeOptionalProperty,
+    [EnumMember(Value = "API_VERSION_DEFINITION_OPTIONAL_PROPERTY")]
+    ApiVersionDefinitionOptionalProperty,
     #endregion
 
     #region ApiRelationship Compilation Codes
@@ -365,13 +365,13 @@ public enum ApiSchemaCompilationCode
 
     #region ApiRelationshipEnd Compilation Codes
     /// <summary>
-    ///     The principal end's explicitly referenced principal key type could not be resolved.
+    ///     The principal end's explicitly referenced principal key could not be resolved.
     /// </summary>
-    [EnumMember(Value = "API_RELATIONSHIP_END_UNRESOLVED_KEY_TYPE")]
-    ApiRelationshipEndUnresolvedKeyType,
+    [EnumMember(Value = "API_RELATIONSHIP_END_UNRESOLVED_KEY")]
+    ApiRelationshipEndUnresolvedKey,
 
     /// <summary>
-    ///     A principal key type name was supplied for a navigational relationship that has no foreign key binding.
+    ///     A principal key name was supplied for a navigational relationship that has no foreign key binding.
     /// </summary>
     [EnumMember(Value = "API_RELATIONSHIP_END_PRINCIPAL_KEY_WITHOUT_FOREIGN_KEY")]
     ApiRelationshipEndPrincipalKeyWithoutForeignKey,
@@ -398,14 +398,14 @@ public enum ApiSchemaCompilationCode
 
     /// <summary>
     ///     The number of scalar leaves in the association's key paths for end A
-    ///     does not match the number of scalar leaves in principal end A's key type.
+    ///     does not match the number of scalar leaves in principal end A's key.
     /// </summary>
     [EnumMember(Value = "API_RELATIONSHIP_MANY_TO_MANY_INVALID_ASSOCIATION_KEY_PATHS_A_COUNT")]
     ApiRelationshipManyToManyInvalidAssociationKeyPathsACount,
 
     /// <summary>
     ///     The number of scalar leaves in the association's key paths for end B
-    ///     does not match the number of scalar leaves in principal end B's key type.
+    ///     does not match the number of scalar leaves in principal end B's key.
     /// </summary>
     [EnumMember(Value = "API_RELATIONSHIP_MANY_TO_MANY_INVALID_ASSOCIATION_KEY_PATHS_B_COUNT")]
     ApiRelationshipManyToManyInvalidAssociationKeyPathsBCount,
@@ -414,22 +414,22 @@ public enum ApiSchemaCompilationCode
     #region ApiRelationshipOneTo Compilation Codes
     /// <summary>
     ///     The number of scalar leaves in the dependent end's key paths does not match
-    ///     the number of scalar leaves in the principal end's key type in either
+    ///     the number of scalar leaves in the principal end's key in either
     ///     one-to-one or one-to-many relationships.
     /// </summary>
     [EnumMember(Value = "API_RELATIONSHIP_ONE_TO_INVALID_DEPENDENT_KEY_PATHS_COUNT")]
     ApiRelationshipOneToInvalidDependentKeyPathsCount,
 
     /// <summary>
-    ///     The principal end's key type cannot be automatically determined because multiple key types
-    ///     on the principal object type are compatible with the foreign key type.
-    ///     Specify the principal key type explicitly using <see cref="ApiRelationshipPrincipalEnd.ApiPrincipalKeyTypeName"/>.
+    ///     The principal end's key cannot be automatically determined because multiple keys
+    ///     on the principal object type are compatible with the foreign key.
+    ///     Specify the principal key explicitly using <see cref="ApiRelationshipPrincipalEnd.ApiPrincipalKeyName"/>.
     /// </summary>
     [EnumMember(Value = "API_RELATIONSHIP_AMBIGUOUS_PRINCIPAL_KEY")]
     ApiRelationshipAmbiguousPrincipalKey,
 
     /// <summary>
-    ///     The principal end's key type could not be matched to the foreign key type because their ordered scalar
+    ///     The principal end's key could not be matched to the foreign key because their ordered scalar
     ///     leaf types are incompatible.
     /// </summary>
     [EnumMember(Value = "API_RELATIONSHIP_INCOMPATIBLE_PRINCIPAL_FOREIGN_KEY")]
@@ -602,7 +602,7 @@ public enum ApiSchemaCompilationCode
     ApiAnnotationTypeDiscoveryConflict,
 
     /// <summary>
-    ///     Multiple annotation key paths use the same order within one named key type.
+    ///     Multiple annotation key paths use the same order within one named key.
     /// </summary>
     [EnumMember(Value = "API_ANNOTATION_KEY_ORDER_CONFLICT")]
     ApiAnnotationKeyOrderConflict,

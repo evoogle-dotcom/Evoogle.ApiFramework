@@ -75,7 +75,7 @@ public partial class ApiAnnotationTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [],
+                        ""ApiKeys"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+PersonAnnotated, Evoogle.ApiFramework.Tests""
                     }
                 ],
@@ -323,7 +323,7 @@ public partial class ApiAnnotationTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [],
+                        ""ApiKeys"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+PersonWithPropertyAnnotations, Evoogle.ApiFramework.Tests""
                     }
                 ],
@@ -371,7 +371,7 @@ public partial class ApiAnnotationTests
                                 ""ClrMemberKind"": ""Field""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""FieldKey"",
                                 ""ApiKeyPaths"": [
@@ -440,7 +440,7 @@ public partial class ApiAnnotationTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PrimaryKey"",
                                 ""ApiKeyPaths"": [
@@ -488,7 +488,7 @@ public partial class ApiAnnotationTests
                 ""ApiObjectTypes"": [
                     {
                         ""ApiKind"": ""Object"",
-                        ""ApiName"": ""ScalarKeyTypeAnnotation"",
+                        ""ApiName"": ""ScalarKeyAnnotationObject"",
                         ""ApiProperties"": [
                             {
                                 ""ApiName"": ""Id"",
@@ -509,12 +509,12 @@ public partial class ApiAnnotationTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PrimaryKey"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+ScalarKeyTypeAnnotation, Evoogle.ApiFramework.Tests"",
+                                        ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+ScalarKeyAnnotationObject, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
                                             { ""ClrMemberName"": ""Id"" }
                                         ]
@@ -525,7 +525,7 @@ public partial class ApiAnnotationTests
                                 ""ApiName"": ""AlternateKey"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+ScalarKeyTypeAnnotation, Evoogle.ApiFramework.Tests"",
+                                        ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+ScalarKeyAnnotationObject, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
                                             { ""ClrMemberName"": ""Name"" }
                                         ]
@@ -533,7 +533,7 @@ public partial class ApiAnnotationTests
                                 ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+ScalarKeyTypeAnnotation, Evoogle.ApiFramework.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+ScalarKeyAnnotationObject, Evoogle.ApiFramework.Tests""
                     }
                 ],
                 ""ApiRelationships"": []
@@ -573,7 +573,7 @@ public partial class ApiAnnotationTests
                 ""ApiObjectTypes"": [
                     {
                         ""ApiKind"": ""Object"",
-                        ""ApiName"": ""CompositeKeyType"",
+                        ""ApiName"": ""CompositeKeyObject"",
                         ""ApiProperties"": [
                             {
                                 ""ApiName"": ""OrderId"",
@@ -603,18 +603,18 @@ public partial class ApiAnnotationTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""OrderLineKey"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+CompositeKeyType, Evoogle.ApiFramework.Tests"",
+                                        ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+CompositeKeyObject, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
                                             { ""ClrMemberName"": ""OrderId"" }
                                         ]
                                     },
                                     {
-                                        ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+CompositeKeyType, Evoogle.ApiFramework.Tests"",
+                                        ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+CompositeKeyObject, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
                                             { ""ClrMemberName"": ""LineItemNumber"" }
                                         ]
@@ -622,7 +622,7 @@ public partial class ApiAnnotationTests
                                 ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+CompositeKeyType, Evoogle.ApiFramework.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+CompositeKeyObject, Evoogle.ApiFramework.Tests""
                     }
                 ],
                 ""ApiRelationships"": []
@@ -662,7 +662,7 @@ public partial class ApiAnnotationTests
                 ""ApiObjectTypes"": [
                     {
                         ""ApiKind"": ""Object"",
-                        ""ApiName"": ""ThreePartCompositeKeyType"",
+                        ""ApiName"": ""ThreePartCompositeKeyObject"",
                         ""ApiProperties"": [
                             {
                                 ""ApiName"": ""Id1"",
@@ -701,24 +701,24 @@ public partial class ApiAnnotationTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""ThreePartKey"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+ThreePartCompositeKeyType, Evoogle.ApiFramework.Tests"",
+                                        ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+ThreePartCompositeKeyObject, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
                                             { ""ClrMemberName"": ""Id1"" }
                                         ]
                                     },
                                     {
-                                        ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+ThreePartCompositeKeyType, Evoogle.ApiFramework.Tests"",
+                                        ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+ThreePartCompositeKeyObject, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
                                             { ""ClrMemberName"": ""Id2"" }
                                         ]
                                     },
                                     {
-                                        ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+ThreePartCompositeKeyType, Evoogle.ApiFramework.Tests"",
+                                        ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+ThreePartCompositeKeyObject, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
                                             { ""ClrMemberName"": ""Id3"" }
                                         ]
@@ -726,7 +726,7 @@ public partial class ApiAnnotationTests
                                 ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+ThreePartCompositeKeyType, Evoogle.ApiFramework.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+ThreePartCompositeKeyObject, Evoogle.ApiFramework.Tests""
                     }
                 ],
                 ""ApiRelationships"": []
@@ -782,7 +782,7 @@ public partial class ApiAnnotationTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""NestedPartKey"",
                                 ""ApiKeyPaths"": [
@@ -851,7 +851,7 @@ public partial class ApiAnnotationTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""OwnerKey"",
                                 ""ApiKeyPaths"": [
@@ -899,7 +899,7 @@ public partial class ApiAnnotationTests
                 ""ApiObjectTypes"": [
                     {
                         ""ApiKind"": ""Object"",
-                        ""ApiName"": ""AnnotationPrimaryKeyType"",
+                        ""ApiName"": ""AnnotationPrimaryKeyObject"",
                         ""ApiProperties"": [
                             {
                                 ""ApiName"": ""Id"",
@@ -920,12 +920,12 @@ public partial class ApiAnnotationTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PrimaryKey"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+AnnotationPrimaryKeyType, Evoogle.ApiFramework.Tests"",
+                                        ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+AnnotationPrimaryKeyObject, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
                                             { ""ClrMemberName"": ""Code"" }
                                         ]
@@ -933,7 +933,7 @@ public partial class ApiAnnotationTests
                                 ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+AnnotationPrimaryKeyType, Evoogle.ApiFramework.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+AnnotationPrimaryKeyObject, Evoogle.ApiFramework.Tests""
                     }
                 ],
                 ""ApiRelationships"": []
@@ -989,7 +989,7 @@ public partial class ApiAnnotationTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""NestedCompositeKey"",
                                 ""ApiKeyPaths"": [
@@ -1034,7 +1034,7 @@ public partial class ApiAnnotationTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""NestedPartKey"",
                                 ""ApiKeyPaths"": [
@@ -1103,7 +1103,7 @@ public partial class ApiAnnotationTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""OwnedCompositeKey"",
                                 ""ApiKeyPaths"": [
@@ -1147,7 +1147,7 @@ public partial class ApiAnnotationTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""OwnerKey"",
                                 ""ApiKeyPaths"": [
@@ -1207,7 +1207,7 @@ public partial class ApiAnnotationTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""OwnedDependentKey"",
                                 ""ApiKeyPaths"": [
@@ -1245,7 +1245,7 @@ public partial class ApiAnnotationTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""OwnerKey"",
                                 ""ApiKeyPaths"": [
@@ -1300,7 +1300,7 @@ public partial class ApiAnnotationTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""DuplicatePathKey"",
                                 ""ApiKeyPaths"": [
@@ -1374,7 +1374,7 @@ public partial class ApiAnnotationTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PrimaryKey"",
                                 ""ApiKeyPaths"": [
@@ -1421,7 +1421,7 @@ public partial class ApiAnnotationTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PrimaryKey"",
                                 ""ApiKeyPaths"": [
@@ -1446,7 +1446,7 @@ public partial class ApiAnnotationTests
                         },
                         ""ApiDependentEnd"": {
                             ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+Order, Evoogle.ApiFramework.Tests"",
-                            ""ApiForeignKeyType"": {
+                            ""ApiForeignKey"": {
                                 ""ApiKeyPaths"": [
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+Order, Evoogle.ApiFramework.Tests"",
@@ -1522,7 +1522,7 @@ public partial class ApiAnnotationTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [],
+                        ""ApiKeys"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+Invoice, Evoogle.ApiFramework.Tests""
                     },
                     {
@@ -1539,7 +1539,7 @@ public partial class ApiAnnotationTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PrimaryKey"",
                                 ""ApiKeyPaths"": [
@@ -1564,7 +1564,7 @@ public partial class ApiAnnotationTests
                         },
                         ""ApiDependentEnd"": {
                             ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+Invoice, Evoogle.ApiFramework.Tests"",
-                            ""ApiForeignKeyType"": {
+                            ""ApiForeignKey"": {
                                 ""ApiKeyPaths"": [
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+Invoice, Evoogle.ApiFramework.Tests"",
@@ -1616,7 +1616,7 @@ public partial class ApiAnnotationTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PrimaryKey"",
                                 ""ApiKeyPaths"": [
@@ -1654,7 +1654,7 @@ public partial class ApiAnnotationTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [],
+                        ""ApiKeys"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+ProductTag, Evoogle.ApiFramework.Tests""
                     },
                     {
@@ -1671,7 +1671,7 @@ public partial class ApiAnnotationTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PrimaryKey"",
                                 ""ApiKeyPaths"": [
@@ -1699,7 +1699,7 @@ public partial class ApiAnnotationTests
                         },
                         ""ApiAssociation"": {
                             ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+ProductTag, Evoogle.ApiFramework.Tests"",
-                            ""ApiForeignKeyTypeA"": {
+                            ""ApiForeignKeyA"": {
                                 ""ApiKeyPaths"": [
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+ProductTag, Evoogle.ApiFramework.Tests"",
@@ -1709,7 +1709,7 @@ public partial class ApiAnnotationTests
                                     }
                                 ]
                             },
-                            ""ApiForeignKeyTypeB"": {
+                            ""ApiForeignKeyB"": {
                                 ""ApiKeyPaths"": [
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+ProductTag, Evoogle.ApiFramework.Tests"",
@@ -1762,7 +1762,7 @@ public partial class ApiAnnotationTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PrimaryKey"",
                                 ""ApiKeyPaths"": [
@@ -1791,7 +1791,7 @@ public partial class ApiAnnotationTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PrimaryKey"",
                                 ""ApiKeyPaths"": [
@@ -1829,7 +1829,7 @@ public partial class ApiAnnotationTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [],
+                        ""ApiKeys"": [],
                         ""ClrType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+ProductTagFromType, Evoogle.ApiFramework.Tests""
                     }
                 ],
@@ -1845,7 +1845,7 @@ public partial class ApiAnnotationTests
                         },
                         ""ApiAssociation"": {
                             ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+ProductTagFromType, Evoogle.ApiFramework.Tests"",
-                            ""ApiForeignKeyTypeA"": {
+                            ""ApiForeignKeyA"": {
                                 ""ApiKeyPaths"": [
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+ProductTagFromType, Evoogle.ApiFramework.Tests"",
@@ -1855,7 +1855,7 @@ public partial class ApiAnnotationTests
                                     }
                                 ]
                             },
-                            ""ApiForeignKeyTypeB"": {
+                            ""ApiForeignKeyB"": {
                                 ""ApiKeyPaths"": [
                                     {
                                         ""ClrRootType"": ""Evoogle.ApiFramework.Schema.Configuration.Annotations.ApiAnnotationTests+ProductTagFromType, Evoogle.ApiFramework.Tests"",

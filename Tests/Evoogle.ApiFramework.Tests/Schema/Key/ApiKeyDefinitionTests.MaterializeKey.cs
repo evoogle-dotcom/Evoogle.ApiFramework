@@ -17,12 +17,12 @@ using FluentAssertions;
 
 namespace Evoogle.ApiFramework.Schema.Key;
 
-public partial class ApiKeyTypeTests
+public partial class ApiKeyDefinitionTests
 {
     #region Test Fields
     private static readonly IReadOnlyDictionary<string, ApiKeyPartNameFormatterDelegate> _customPartNameFormats = new Dictionary<string, ApiKeyPartNameFormatterDelegate>
     {
-        ["Custom"] = static c => $"{c.ApiKeyTypeName ?? "(anonymous)"}[{c.PartIndex}]"
+        ["Custom"] = static c => $"{c.ApiKeyName ?? "(anonymous)"}[{c.ApiKeyPartIndex}]"
     };
     #endregion
 
@@ -31,7 +31,7 @@ public partial class ApiKeyTypeTests
     {
         #region User Supplied Properties
         public required string ApiObjectTypeName { get; init; }
-        public string? ApiKeyTypeName { get; init; }
+        public string? ApiKeyName { get; init; }
         public object? SelfObject { get; init; }
         public object? OwnerObject { get; init; }
         public ApiKeyNullHandling NullHandling { get; init; }
@@ -42,7 +42,7 @@ public partial class ApiKeyTypeTests
         #endregion
 
         #region Calculated Properties
-        private ApiKeyType? ApiKeyType { get; set; }
+        private ApiKeyDefinition? ApiKeyDefinition { get; set; }
         private ApiKeyPartNameFormatterDelegate? PartNameFormatter { get; set; }
         private ApiKey? ActualValue { get; set; }
         private Type? ActualExceptionType { get; set; }
@@ -51,9 +51,9 @@ public partial class ApiKeyTypeTests
         #region XUnitTest Methods
         protected override void Arrange()
         {
-            this.ApiKeyType = this.ApiKeyTypeName is not null
-                ? GetKeyTypeByName(this.ApiObjectTypeName, this.ApiKeyTypeName)
-                : GetPrimaryKeyType(this.ApiObjectTypeName);
+            this.ApiKeyDefinition = this.ApiKeyName is not null
+                ? GetKeyDefinitionByName(this.ApiObjectTypeName, this.ApiKeyName)
+                : GetPrimaryKeyDefinition(this.ApiObjectTypeName);
 
             if (this.CustomPartNameFormatterName is not null)
             {
@@ -66,7 +66,7 @@ public partial class ApiKeyTypeTests
             }
 
             this.WriteLine($"ApiObjectType:     {this.ApiObjectTypeName.SafeToString()}");
-            this.WriteLine($"ApiKeyType:        {this.ApiKeyType?.ToString().SafeToString()}");
+            this.WriteLine($"ApiKeyDefinition:        {this.ApiKeyDefinition?.ToString().SafeToString()}");
             this.WriteLine($"SelfObject:        {this.SelfObject.SafeToString()}");
             this.WriteLine($"OwnerObject:       {this.OwnerObject.SafeToString()}");
             this.WriteLine($"NullHandling:      {this.NullHandling.SafeToString()}");
@@ -105,7 +105,7 @@ public partial class ApiKeyTypeTests
                     context.WithObject(this.OwnerObject);
                 }
 
-                this.ActualValue = this.ApiKeyType!.MaterializeKey(context);
+                this.ActualValue = this.ApiKeyDefinition!.MaterializeKey(context);
                 this.WriteLine($"Actual Value:   {this.ActualValue.SafeToString()}");
             }
             catch (Exception ex)
@@ -137,7 +137,7 @@ public partial class ApiKeyTypeTests
     {
         #region User Supplied Properties
         public required string ApiObjectTypeName { get; init; }
-        public string? ApiKeyTypeName { get; init; }
+        public string? ApiKeyName { get; init; }
 
         [JsonConverter(typeof(ExpressionActionJsonConverter<ApiKeyMaterializationContext>))]
         public required Expression<Action<ApiKeyMaterializationContext>> ConfigureValuesExpression { get; init; }
@@ -150,7 +150,7 @@ public partial class ApiKeyTypeTests
         #endregion
 
         #region Calculated Properties
-        private ApiKeyType? ApiKeyType { get; set; }
+        private ApiKeyDefinition? ApiKeyDefinition { get; set; }
         private ApiKeyPartNameFormatterDelegate? PartNameFormatter { get; set; }
         private ApiKey? ActualValue { get; set; }
         private Type? ActualExceptionType { get; set; }
@@ -159,9 +159,9 @@ public partial class ApiKeyTypeTests
         #region XUnitTest Methods
         protected override void Arrange()
         {
-            this.ApiKeyType = this.ApiKeyTypeName is not null
-                ? GetKeyTypeByName(this.ApiObjectTypeName, this.ApiKeyTypeName)
-                : GetPrimaryKeyType(this.ApiObjectTypeName);
+            this.ApiKeyDefinition = this.ApiKeyName is not null
+                ? GetKeyDefinitionByName(this.ApiObjectTypeName, this.ApiKeyName)
+                : GetPrimaryKeyDefinition(this.ApiObjectTypeName);
 
             if (this.CustomPartNameFormatterName is not null)
             {
@@ -174,7 +174,7 @@ public partial class ApiKeyTypeTests
             }
 
             this.WriteLine($"ApiObjectType:   {this.ApiObjectTypeName.SafeToString()}");
-            this.WriteLine($"ApiKeyType:      {this.ApiKeyType?.ToString().SafeToString()}");
+            this.WriteLine($"ApiKeyDefinition:      {this.ApiKeyDefinition?.ToString().SafeToString()}");
             this.WriteLine($"NullHandling:    {this.NullHandling.SafeToString()}");
             this.WriteLine($"PartNameFormat: {this.PartNameFormat.SafeToString()}");
             this.WriteLine($"CustomFormatter:   {this.CustomPartNameFormatterName.SafeToString()}");
@@ -203,7 +203,7 @@ public partial class ApiKeyTypeTests
 
                 this.ConfigureValuesExpression.Compile()(context);
 
-                this.ActualValue = this.ApiKeyType!.MaterializeKeyFromValues(context);
+                this.ActualValue = this.ApiKeyDefinition!.MaterializeKeyFromValues(context);
                 this.WriteLine($"Actual Value:   {this.ActualValue.SafeToString()}");
             }
             catch (Exception ex)
@@ -240,7 +240,7 @@ public partial class ApiKeyTypeTests
         {
             Name = $"{KeyOneScalarPartInstance} with primary scalar key (int) and none name format",
             ApiObjectTypeName = nameof(KeyOneScalarPart),
-            ApiKeyTypeName = "PK_KeyOneScalarPart",
+            ApiKeyName = "PK_KeyOneScalarPart",
             SelfObject = KeyOneScalarPartInstance,
             PartNameFormat = ApiKeyPartNameFormat.None,
             ExpectedValue = ApiKey.Composite(ApiKeyPart.Create(null, ApiKey.FromInt32(KeyOneScalarPartInstance.Id)))
@@ -250,7 +250,7 @@ public partial class ApiKeyTypeTests
         {
             Name = $"{KeyOneScalarPartInstance} with primary scalar key (int) and CLR path only name format",
             ApiObjectTypeName = nameof(KeyOneScalarPart),
-            ApiKeyTypeName = "PK_KeyOneScalarPart",
+            ApiKeyName = "PK_KeyOneScalarPart",
             SelfObject = KeyOneScalarPartInstance,
             PartNameFormat = ApiKeyPartNameFormat.ClrPathOnly,
             ExpectedValue = ApiKey.Composite(ApiKeyPart.Create(nameof(KeyOneScalarPart.Id), ApiKey.FromInt32(KeyOneScalarPartInstance.Id)))
@@ -260,7 +260,7 @@ public partial class ApiKeyTypeTests
         {
             Name = $"{KeyOneScalarPartInstance} with primary scalar key (int) and CLR root and path name format",
             ApiObjectTypeName = nameof(KeyOneScalarPart),
-            ApiKeyTypeName = "PK_KeyOneScalarPart",
+            ApiKeyName = "PK_KeyOneScalarPart",
             SelfObject = KeyOneScalarPartInstance,
             PartNameFormat = ApiKeyPartNameFormat.ClrRootAndPath,
             ExpectedValue = ApiKey.Composite(ApiKeyPart.Create(nameof(KeyOneScalarPart) + "." + nameof(KeyOneScalarPart.Id), ApiKey.FromInt32(KeyOneScalarPartInstance.Id)))
@@ -270,7 +270,7 @@ public partial class ApiKeyTypeTests
         {
             Name = $"{KeyOneScalarPartInstance} with alternate scalar key (string) and none name format",
             ApiObjectTypeName = nameof(KeyOneScalarPart),
-            ApiKeyTypeName = "AK_KeyOneScalarPart",
+            ApiKeyName = "AK_KeyOneScalarPart",
             SelfObject = KeyOneScalarPartInstance,
             PartNameFormat = ApiKeyPartNameFormat.None,
             ExpectedValue = ApiKey.Composite(ApiKeyPart.Create(null, ApiKey.FromString(KeyOneScalarPartInstance.Name)))
@@ -280,7 +280,7 @@ public partial class ApiKeyTypeTests
         {
             Name = $"{KeyOneScalarPartInstance} with alternate scalar key (string) and CLR path only name format",
             ApiObjectTypeName = nameof(KeyOneScalarPart),
-            ApiKeyTypeName = "AK_KeyOneScalarPart",
+            ApiKeyName = "AK_KeyOneScalarPart",
             SelfObject = KeyOneScalarPartInstance,
             PartNameFormat = ApiKeyPartNameFormat.ClrPathOnly,
             ExpectedValue = ApiKey.Composite(ApiKeyPart.Create(nameof(KeyOneScalarPart.Name), ApiKey.FromString(KeyOneScalarPartInstance.Name)))
@@ -291,7 +291,7 @@ public partial class ApiKeyTypeTests
         {
             Name = $"{KeyOneScalarPartInstance} with alternate scalar key (string) and CLR root and path name format",
             ApiObjectTypeName = nameof(KeyOneScalarPart),
-            ApiKeyTypeName = "AK_KeyOneScalarPart",
+            ApiKeyName = "AK_KeyOneScalarPart",
             SelfObject = KeyOneScalarPartInstance,
             PartNameFormat = ApiKeyPartNameFormat.ClrRootAndPath,
             ExpectedValue = ApiKey.Composite(ApiKeyPart.Create(nameof(KeyOneScalarPart) + "." + nameof(KeyOneScalarPart.Name), ApiKey.FromString(KeyOneScalarPartInstance.Name)))
@@ -598,8 +598,8 @@ public partial class ApiKeyTypeTests
         {
             Name = $"{nameof(KeyOneScalarPart)} values with primary scalar key (int) and CLR path only name format",
             ApiObjectTypeName = nameof(KeyOneScalarPart),
-            ApiKeyTypeName = "PK_KeyOneScalarPart",
-            ConfigureValuesExpression = static a => ApiKeyTypeMaterializeKeyFromValuesTestFactory.ConfigureTextIntTerminalScalar(a),
+            ApiKeyName = "PK_KeyOneScalarPart",
+            ConfigureValuesExpression = static a => ApiKeyDefinitionMaterializeKeyFromValuesTestFactory.ConfigureTextIntTerminalScalar(a),
             PartNameFormat = ApiKeyPartNameFormat.ClrPathOnly,
             ExpectedValue = ApiKey.Composite(ApiKeyPart.Create(nameof(KeyOneScalarPart.Id), ApiKey.FromInt32(1234)))
         },
@@ -608,8 +608,8 @@ public partial class ApiKeyTypeTests
         {
             Name = $"{nameof(KeyOneScalarPart)} values with alternate scalar key (string) and CLR path only name format",
             ApiObjectTypeName = nameof(KeyOneScalarPart),
-            ApiKeyTypeName = "AK_KeyOneScalarPart",
-            ConfigureValuesExpression = static a => ApiKeyTypeMaterializeKeyFromValuesTestFactory.ConfigureTextStringTerminalScalar(a),
+            ApiKeyName = "AK_KeyOneScalarPart",
+            ConfigureValuesExpression = static a => ApiKeyDefinitionMaterializeKeyFromValuesTestFactory.ConfigureTextStringTerminalScalar(a),
             PartNameFormat = ApiKeyPartNameFormat.ClrPathOnly,
             ExpectedValue = ApiKey.Composite(ApiKeyPart.Create(nameof(KeyOneScalarPart.Name), ApiKey.FromString("1234")))
         },
@@ -618,7 +618,7 @@ public partial class ApiKeyTypeTests
         {
             Name = $"{nameof(KeyTwoScalarPartComposite)} values with primary composite key (int + string) and CLR path only name format",
             ApiObjectTypeName = nameof(KeyTwoScalarPartComposite),
-            ConfigureValuesExpression = static a => ApiKeyTypeMaterializeKeyFromValuesTestFactory.ConfigureCompositeApiKeyValues(a),
+            ConfigureValuesExpression = static a => ApiKeyDefinitionMaterializeKeyFromValuesTestFactory.ConfigureCompositeApiKeyValues(a),
             PartNameFormat = ApiKeyPartNameFormat.ClrPathOnly,
             ExpectedValue = ApiKey.Composite
             (
@@ -631,7 +631,7 @@ public partial class ApiKeyTypeTests
         {
             Name = $"{nameof(KeyThreeScalarPartComposite)} values with primary composite key (int + string + Guid) and CLR path only name format",
             ApiObjectTypeName = nameof(KeyThreeScalarPartComposite),
-            ConfigureValuesExpression = static a => ApiKeyTypeMaterializeKeyFromValuesTestFactory.ConfigureTypedConvenienceValues(a),
+            ConfigureValuesExpression = static a => ApiKeyDefinitionMaterializeKeyFromValuesTestFactory.ConfigureTypedConvenienceValues(a),
             PartNameFormat = ApiKeyPartNameFormat.ClrPathOnly,
             ExpectedValue = ApiKey.Composite
             (
@@ -645,7 +645,7 @@ public partial class ApiKeyTypeTests
         {
             Name = $"{nameof(KeyNestedComposite)} values with primary composite key (int + string) and CLR path only name format",
             ApiObjectTypeName = nameof(KeyNestedComposite),
-            ConfigureValuesExpression = static a => ApiKeyTypeMaterializeKeyFromValuesTestFactory.ConfigureNestedClrPathValues(a),
+            ConfigureValuesExpression = static a => ApiKeyDefinitionMaterializeKeyFromValuesTestFactory.ConfigureNestedClrPathValues(a),
             PartNameFormat = ApiKeyPartNameFormat.ClrPathOnly,
             ExpectedValue = ApiKey.Composite
             (
@@ -658,7 +658,7 @@ public partial class ApiKeyTypeTests
         {
             Name = $"{nameof(KeyOwnedComposite)} values with primary composite key (int + int) and CLR root and path name format",
             ApiObjectTypeName = nameof(KeyOwnedComposite),
-            ConfigureValuesExpression = static a => ApiKeyTypeMaterializeKeyFromValuesTestFactory.ConfigureOwnerAndDependentRootValues(a),
+            ConfigureValuesExpression = static a => ApiKeyDefinitionMaterializeKeyFromValuesTestFactory.ConfigureOwnerAndDependentRootValues(a),
             PartNameFormat = ApiKeyPartNameFormat.ClrRootAndPath,
             ExpectedValue = ApiKey.Composite
             (
@@ -671,7 +671,7 @@ public partial class ApiKeyTypeTests
         {
             Name = $"{nameof(KeyOwnedDependent)} values with primary scalar key (int) and CLR path only name format",
             ApiObjectTypeName = nameof(KeyOwnedDependent),
-            ConfigureValuesExpression = static a => ApiKeyTypeMaterializeKeyFromValuesTestFactory.ConfigureOwnerOnlyDependentKey(a),
+            ConfigureValuesExpression = static a => ApiKeyDefinitionMaterializeKeyFromValuesTestFactory.ConfigureOwnerOnlyDependentKey(a),
             PartNameFormat = ApiKeyPartNameFormat.ClrPathOnly,
             ExpectedValue = ApiKey.Composite(ApiKeyPart.Create(nameof(KeyOwner.Id), ApiKey.FromInt32(KeyOwnerInstance.Id)))
         },
@@ -680,7 +680,7 @@ public partial class ApiKeyTypeTests
         {
             Name = $"{nameof(KeyTwoScalarPartComposite)} values with primary composite key (int + string) and custom name formatter",
             ApiObjectTypeName = nameof(KeyTwoScalarPartComposite),
-            ConfigureValuesExpression = static a => ApiKeyTypeMaterializeKeyFromValuesTestFactory.ConfigureCustomPartNameFormatterValues(a),
+            ConfigureValuesExpression = static a => ApiKeyDefinitionMaterializeKeyFromValuesTestFactory.ConfigureCustomPartNameFormatterValues(a),
             CustomPartNameFormatterName = "Custom",
             ExpectedValue = ApiKey.Composite
             (
@@ -693,7 +693,7 @@ public partial class ApiKeyTypeTests
         {
             Name = $"{nameof(KeyTwoScalarPartComposite)} values return empty key part when {nameof(ApiKeyNullHandling)}={ApiKeyNullHandling.UseDefaultOnNull}",
             ApiObjectTypeName = nameof(KeyTwoScalarPartComposite),
-            ConfigureValuesExpression = static a => ApiKeyTypeMaterializeKeyFromValuesTestFactory.ConfigureMissingCompositeValue(a),
+            ConfigureValuesExpression = static a => ApiKeyDefinitionMaterializeKeyFromValuesTestFactory.ConfigureMissingCompositeValue(a),
             NullHandling = ApiKeyNullHandling.UseDefaultOnNull,
             PartNameFormat = ApiKeyPartNameFormat.ClrPathOnly,
             ExpectedValue = ApiKey.Composite
@@ -707,8 +707,8 @@ public partial class ApiKeyTypeTests
         {
             Name = $"{nameof(KeyOneScalarPart)} values return empty key part when text is null and {nameof(ApiKeyNullHandling)}={ApiKeyNullHandling.UseDefaultOnNull}",
             ApiObjectTypeName = nameof(KeyOneScalarPart),
-            ApiKeyTypeName = "PK_KeyOneScalarPart",
-            ConfigureValuesExpression = static a => ApiKeyTypeMaterializeKeyFromValuesTestFactory.ConfigureNullText(a),
+            ApiKeyName = "PK_KeyOneScalarPart",
+            ConfigureValuesExpression = static a => ApiKeyDefinitionMaterializeKeyFromValuesTestFactory.ConfigureNullText(a),
             NullHandling = ApiKeyNullHandling.UseDefaultOnNull,
             PartNameFormat = ApiKeyPartNameFormat.ClrPathOnly,
             ExpectedValue = ApiKey.Composite(ApiKeyPart.Create(nameof(KeyOneScalarPart.Id), ApiKey.Empty))
@@ -718,8 +718,8 @@ public partial class ApiKeyTypeTests
         {
             Name = $"{nameof(KeyOneScalarPart)} values return empty key part when text is whitespace and {nameof(ApiKeyNullHandling)}={ApiKeyNullHandling.UseDefaultOnNull}",
             ApiObjectTypeName = nameof(KeyOneScalarPart),
-            ApiKeyTypeName = "PK_KeyOneScalarPart",
-            ConfigureValuesExpression = static a => ApiKeyTypeMaterializeKeyFromValuesTestFactory.ConfigureWhitespaceText(a),
+            ApiKeyName = "PK_KeyOneScalarPart",
+            ConfigureValuesExpression = static a => ApiKeyDefinitionMaterializeKeyFromValuesTestFactory.ConfigureWhitespaceText(a),
             NullHandling = ApiKeyNullHandling.UseDefaultOnNull,
             PartNameFormat = ApiKeyPartNameFormat.ClrPathOnly,
             ExpectedValue = ApiKey.Composite(ApiKeyPart.Create(nameof(KeyOneScalarPart.Id), ApiKey.Empty))
@@ -729,8 +729,8 @@ public partial class ApiKeyTypeTests
         {
             Name = $"{nameof(KeyOneScalarPart)} values return empty key part when ApiKey is empty and {nameof(ApiKeyNullHandling)}={ApiKeyNullHandling.UseDefaultOnNull}",
             ApiObjectTypeName = nameof(KeyOneScalarPart),
-            ApiKeyTypeName = "PK_KeyOneScalarPart",
-            ConfigureValuesExpression = static a => ApiKeyTypeMaterializeKeyFromValuesTestFactory.ConfigureEmptyApiKey(a),
+            ApiKeyName = "PK_KeyOneScalarPart",
+            ConfigureValuesExpression = static a => ApiKeyDefinitionMaterializeKeyFromValuesTestFactory.ConfigureEmptyApiKey(a),
             NullHandling = ApiKeyNullHandling.UseDefaultOnNull,
             PartNameFormat = ApiKeyPartNameFormat.ClrPathOnly,
             ExpectedValue = ApiKey.Composite(ApiKeyPart.Create(nameof(KeyOneScalarPart.Id), ApiKey.Empty))
@@ -740,7 +740,7 @@ public partial class ApiKeyTypeTests
         {
             Name = $"{nameof(KeyTwoScalarPartComposite)} values throw when {nameof(ApiKeyNullHandling)}={ApiKeyNullHandling.ThrowOnNull}",
             ApiObjectTypeName = nameof(KeyTwoScalarPartComposite),
-            ConfigureValuesExpression = static a => ApiKeyTypeMaterializeKeyFromValuesTestFactory.ConfigureMissingCompositeValue(a),
+            ConfigureValuesExpression = static a => ApiKeyDefinitionMaterializeKeyFromValuesTestFactory.ConfigureMissingCompositeValue(a),
             NullHandling = ApiKeyNullHandling.ThrowOnNull,
             ExpectedExceptionType = typeof(ApiSchemaMaterializationException)
         },
@@ -749,8 +749,8 @@ public partial class ApiKeyTypeTests
         {
             Name = $"{nameof(KeyOneScalarPart)} values throw when primary scalar key (int) text cannot parse",
             ApiObjectTypeName = nameof(KeyOneScalarPart),
-            ApiKeyTypeName = "PK_KeyOneScalarPart",
-            ConfigureValuesExpression = static a => ApiKeyTypeMaterializeKeyFromValuesTestFactory.ConfigureInvalidTextParse(a),
+            ApiKeyName = "PK_KeyOneScalarPart",
+            ConfigureValuesExpression = static a => ApiKeyDefinitionMaterializeKeyFromValuesTestFactory.ConfigureInvalidTextParse(a),
             NullHandling = ApiKeyNullHandling.UseDefaultOnNull,
             ExpectedExceptionType = typeof(ApiSchemaMaterializationException)
         },
@@ -759,8 +759,8 @@ public partial class ApiKeyTypeTests
         {
             Name = $"{nameof(KeyOneScalarPart)} values throw when primary scalar key (int) value has mismatched ApiKey kind",
             ApiObjectTypeName = nameof(KeyOneScalarPart),
-            ApiKeyTypeName = "PK_KeyOneScalarPart",
-            ConfigureValuesExpression = static a => ApiKeyTypeMaterializeKeyFromValuesTestFactory.ConfigureMismatchedApiKeyKind(a),
+            ApiKeyName = "PK_KeyOneScalarPart",
+            ConfigureValuesExpression = static a => ApiKeyDefinitionMaterializeKeyFromValuesTestFactory.ConfigureMismatchedApiKeyKind(a),
             ExpectedExceptionType = typeof(ApiSchemaMaterializationException)
         },
     ];

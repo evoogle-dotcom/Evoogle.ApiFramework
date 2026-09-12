@@ -14,17 +14,17 @@ using Microsoft.Extensions.Logging;
 namespace Evoogle.ApiFramework.Schema.Json;
 
 /// <summary>
-///     Handles JSON serialization for anonymous <see cref="ApiKeyType"/> instances, including
+///     Handles JSON serialization for anonymous <see cref="ApiKeyDefinition"/> instances, including
 ///     support for extensions.
 /// </summary>
 /// <param name="logger">The optional logger used to emit diagnostics during JSON operations.</param>
-public class ApiKeyTypeJsonConverter(ILogger<ApiKeyTypeJsonConverter>? logger) : JsonConverterBase<ApiKeyType>(logger)
+public class ApiKeyDefinitionJsonConverter(ILogger<ApiKeyDefinitionJsonConverter>? logger) : JsonConverterBase<ApiKeyDefinition>(logger)
 {
     #region Property Types
     private readonly record struct PropertyNames
     {
         #region Immutable Properties
-        public required ApiKeyTypeJsonConverterCore.PropertyNames ApiKeyType { get; init; }
+        public required ApiKeyDefinitionJsonConverterCore.PropertyNames ApiKeyDefinition { get; init; }
         public required ExtensibleBasePropertyNames ExtensibleBase { get; init; }
         #endregion
 
@@ -32,7 +32,7 @@ public class ApiKeyTypeJsonConverter(ILogger<ApiKeyTypeJsonConverter>? logger) :
         public static PropertyNames Create(JsonNamingPolicy policy)
             => new()
             {
-                ApiKeyType = ApiKeyTypeJsonConverterCore.PropertyNames.Create(policy),
+                ApiKeyDefinition = ApiKeyDefinitionJsonConverterCore.PropertyNames.Create(policy),
                 ExtensibleBase = GetExtensiblePropertyNames(policy),
             };
         #endregion
@@ -43,39 +43,39 @@ public class ApiKeyTypeJsonConverter(ILogger<ApiKeyTypeJsonConverter>? logger) :
     private class ReadState : ExtensibleReadData
     {
         #region Properties
-        public ApiKeyTypeJsonConverterCore.ReadData? ApiKeyType { get; set; }
+        public ApiKeyDefinitionJsonConverterCore.ReadData? ApiKeyDefinition { get; set; }
         #endregion
     }
 
     private class ReadHandlers(PropertyNames propertyNames)
     {
-        #region ApiKeyType Fields
+        #region ApiKeyDefinition Fields
         public readonly Dictionary<string, JsonReaderHandler<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>>> PropertyHandlers = new()
         {
-            // ApiKeyType Property Handlers
-            { propertyNames.ApiKeyType.ApiKeyPaths, HandleApiKeyTypeApiKeyPaths },
+            // ApiKeyDefinition Property Handlers
+            { propertyNames.ApiKeyDefinition.ApiKeyPaths, HandleApiKeyDefinitionApiKeyPaths },
 
             // ExtensibleBase Property Handlers
             { propertyNames.ExtensibleBase.Extensions, CreateExtensionsHandler<PropertyNames, ReadState, ReadHandlers>() },
         };
         #endregion
 
-        #region ApiKeyType Methods
-        private static void HandleApiKeyTypeApiKeyPaths(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
+        #region ApiKeyDefinition Methods
+        private static void HandleApiKeyDefinitionApiKeyPaths(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
-            context.ReadData.ApiKeyType ??= new ApiKeyTypeJsonConverterCore.ReadData();
-            context.ReadData.ApiKeyType.ApiKeyPaths ??= [];
+            context.ReadData.ApiKeyDefinition ??= new ApiKeyDefinitionJsonConverterCore.ReadData();
+            context.ReadData.ApiKeyDefinition.ApiKeyPaths ??= [];
 
-            ReadJsonArray(ref reader, context, (x) => HandleApiKeyTypeApiKeyPathsArrayItem);
+            ReadJsonArray(ref reader, context, (x) => HandleApiKeyDefinitionApiKeyPathsArrayItem);
         }
 
-        private static void HandleApiKeyTypeApiKeyPathsArrayItem(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
+        private static void HandleApiKeyDefinitionApiKeyPathsArrayItem(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
-            ApiKeyTypeJsonConverterCore.ReadApiKeyPath
+            ApiKeyDefinitionJsonConverterCore.ReadApiKeyPath
             (
                 ref reader,
                 context.Options,
-                context.ReadData.ApiKeyType!.ApiKeyPaths!
+                context.ReadData.ApiKeyDefinition!.ApiKeyPaths!
             );
         }
         #endregion
@@ -84,7 +84,7 @@ public class ApiKeyTypeJsonConverter(ILogger<ApiKeyTypeJsonConverter>? logger) :
 
     #region Constructors
     /// <summary>Parameterless constructor for use via [JsonConverter(typeof(...))] attribute.</summary>
-    public ApiKeyTypeJsonConverter()
+    public ApiKeyDefinitionJsonConverter()
         : this(null)
     {
     }
@@ -111,19 +111,19 @@ public class ApiKeyTypeJsonConverter(ILogger<ApiKeyTypeJsonConverter>? logger) :
             );
 
     /// <inheritdoc/>
-    protected override ApiKeyType? CreateValue(IReadContext context)
+    protected override ApiKeyDefinition? CreateValue(IReadContext context)
     {
         var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
-        var readState = readContext.ReadData.ApiKeyType;
+        var readState = readContext.ReadData.ApiKeyDefinition;
 
         var apiKeyPaths = readState?.ApiKeyPaths;
 
-        var apiKeyType = new ApiKeyType(apiKeyPaths!);
+        var apiKeyDefinition = new ApiKeyDefinition(apiKeyPaths!);
 
         var extensions = readContext.ReadData.Extensions;
-        AttachExtensions(apiKeyType, extensions);
+        AttachExtensions(apiKeyDefinition, extensions);
 
-        return apiKeyType;
+        return apiKeyDefinition;
     }
 
     /// <inheritdoc/>
@@ -136,13 +136,13 @@ public class ApiKeyTypeJsonConverter(ILogger<ApiKeyTypeJsonConverter>? logger) :
     }
 
     /// <inheritdoc/>
-    protected override void WriteCore(Utf8JsonWriter writer, ApiKeyType value, IWriteContext context)
+    protected override void WriteCore(Utf8JsonWriter writer, ApiKeyDefinition value, IWriteContext context)
     {
         var writeContext = (DefaultWriteContext<PropertyNames>)context;
 
         WriteJsonObject(writer, () =>
         {
-            WriteApiKeyTypeApiKeyPaths(writer, value, writeContext);
+            WriteApiKeyDefinitionApiKeyPaths(writer, value, writeContext);
 
             WriteExtensibleBaseExtensions(writer, writeContext.PropertyNames.ExtensibleBase.Extensions, value, writeContext);
         });
@@ -150,15 +150,15 @@ public class ApiKeyTypeJsonConverter(ILogger<ApiKeyTypeJsonConverter>? logger) :
     #endregion
 
     #region Write Implementation Methods
-    private static void WriteApiKeyTypeApiKeyPaths(Utf8JsonWriter writer, ApiKeyType apiKeyType, DefaultWriteContext<PropertyNames> context)
+    private static void WriteApiKeyDefinitionApiKeyPaths(Utf8JsonWriter writer, ApiKeyDefinition apiKeyDefinition, DefaultWriteContext<PropertyNames> context)
     {
-        var propertyName = context.PropertyNames.ApiKeyType.ApiKeyPaths;
+        var propertyName = context.PropertyNames.ApiKeyDefinition.ApiKeyPaths;
         var options = context.Options;
 
-        ApiKeyTypeJsonConverterCore.WriteApiKeyPaths
+        ApiKeyDefinitionJsonConverterCore.WriteApiKeyPaths
         (
             writer,
-            apiKeyType,
+            apiKeyDefinition,
             propertyName,
             options,
             WriteJsonArray

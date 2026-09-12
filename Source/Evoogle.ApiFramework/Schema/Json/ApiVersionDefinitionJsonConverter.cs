@@ -12,10 +12,10 @@ using Microsoft.Extensions.Logging;
 
 namespace Evoogle.ApiFramework.Schema.Json;
 
-/// <summary>Handles JSON serialization for <see cref="ApiVersionType"/> instances.</summary>
+/// <summary>Handles JSON serialization for <see cref="ApiVersionDefinition"/> instances.</summary>
 /// <param name="logger">The optional logger used to emit JSON diagnostics.</param>
-public class ApiVersionTypeJsonConverter(ILogger<ApiVersionTypeJsonConverter>? logger)
-    : JsonConverterBase<ApiVersionType>(logger)
+public class ApiVersionDefinitionJsonConverter(ILogger<ApiVersionDefinitionJsonConverter>? logger)
+    : JsonConverterBase<ApiVersionDefinition>(logger)
 {
     #region Property Types
     private readonly record struct PropertyNames
@@ -27,8 +27,8 @@ public class ApiVersionTypeJsonConverter(ILogger<ApiVersionTypeJsonConverter>? l
         public static PropertyNames Create(JsonNamingPolicy policy)
             => new()
             {
-                ClrMemberName = policy.ConvertName(nameof(ApiVersionType.ClrMemberName)),
-                ClrType = policy.ConvertName(nameof(ApiVersionType.ClrType)),
+                ClrMemberName = policy.ConvertName(nameof(ApiVersionDefinition.ClrMemberName)),
+                ClrType = policy.ConvertName(nameof(ApiVersionDefinition.ClrType)),
                 ExtensibleBase = GetExtensiblePropertyNames(policy)
             };
     }
@@ -92,7 +92,7 @@ public class ApiVersionTypeJsonConverter(ILogger<ApiVersionTypeJsonConverter>? l
 
     #region Constructors
     /// <summary>Parameterless constructor for use by the JSON converter attribute.</summary>
-    public ApiVersionTypeJsonConverter()
+    public ApiVersionDefinitionJsonConverter()
         : this(null)
     { }
     #endregion
@@ -120,18 +120,18 @@ public class ApiVersionTypeJsonConverter(ILogger<ApiVersionTypeJsonConverter>? l
     ) => CreateDefaultWriteContext(logger, options, buildPropertyNames: PropertyNames.Create);
 
     /// <inheritdoc/>
-    protected override ApiVersionType? CreateValue(IReadContext context)
+    protected override ApiVersionDefinition? CreateValue(IReadContext context)
     {
         var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
         var readData = readContext.ReadData;
         if (readData.HasClrType == readData.HasClrMemberName)
         {
-            throw new JsonException($"An {nameof(ApiVersionType)} must contain exactly one of {nameof(ApiVersionType.ClrType)} or {nameof(ApiVersionType.ClrMemberName)}.");
+            throw new JsonException($"An {nameof(ApiVersionDefinition)} must contain exactly one of {nameof(ApiVersionDefinition.ClrType)} or {nameof(ApiVersionDefinition.ClrMemberName)}.");
         }
 
         var value = readData.HasClrMemberName
-            ? new ApiVersionType(readData.ClrMemberName!)
-            : new ApiVersionType(readData.ClrType!);
+            ? new ApiVersionDefinition(readData.ClrMemberName!)
+            : new ApiVersionDefinition(readData.ClrType!);
 
         AttachExtensions(value, readContext.ReadData.Extensions);
         return value;
@@ -148,7 +148,7 @@ public class ApiVersionTypeJsonConverter(ILogger<ApiVersionTypeJsonConverter>? l
     protected override void WriteCore
     (
         Utf8JsonWriter writer,
-        ApiVersionType value,
+        ApiVersionDefinition value,
         IWriteContext context
     )
     {

@@ -22,10 +22,10 @@ namespace Evoogle.ApiFramework.Schema.Key;
 /// </summary>
 /// <remarks>
 ///     <para>
-///         <see cref="ApiKeyType"/> represents an anonymous structural key shape, such as a
+///         <see cref="ApiKeyDefinition"/> represents an anonymous structural key shape, such as a
 ///         relationship foreign key.
 ///         Named key definitions declared by an <see cref="ApiObjectType"/> are represented by
-///         <see cref="ApiNamedKeyType"/>.
+///         <see cref="ApiNamedKeyDefinition"/>.
 ///     </para>
 ///     <para>
 ///         Use <see cref="MaterializeKey"/> to materialize an <see cref="ApiKey"/> at runtime by walking each path against
@@ -36,15 +36,15 @@ namespace Evoogle.ApiFramework.Schema.Key;
 ///     </para>
 ///     <para>
 ///         <see cref="ApiSchemaElement.Kind"/> is sealed for this extensible hierarchy. The built-in
-///         <see cref="ApiNamedKeyType"/> reports <see cref="ApiSchemaElementKind.NamedKeyType"/>;
-///         every other subclass reports <see cref="ApiSchemaElementKind.KeyType"/>.
+///         <see cref="ApiNamedKeyDefinition"/> reports <see cref="ApiSchemaElementKind.NamedKeyDefinition"/>;
+///         every other subclass reports <see cref="ApiSchemaElementKind.KeyDefinition"/>.
 ///     </para>
 /// </remarks>
-[JsonConverter(typeof(ApiKeyTypeJsonConverter))]
-public partial class ApiKeyType : ApiSchemaElement
+[JsonConverter(typeof(ApiKeyDefinitionJsonConverter))]
+public partial class ApiKeyDefinition : ApiSchemaElement
 {
     #region Constructors
-    internal ApiKeyType(IEnumerable<ApiKeyPath> apiKeyPaths)
+    internal ApiKeyDefinition(IEnumerable<ApiKeyPath> apiKeyPaths)
     {
         this.ApiKeyPaths = [.. apiKeyPaths.EmptyIfNull().Where(x => x is not null)];
     }
@@ -52,24 +52,24 @@ public partial class ApiKeyType : ApiSchemaElement
 
     #region ApiSchemaElement Properties
     /// <inheritdoc/>
-    public override sealed ApiSchemaElementKind Kind => this is ApiNamedKeyType
-        ? ApiSchemaElementKind.NamedKeyType
-        : ApiSchemaElementKind.KeyType;
+    public override sealed ApiSchemaElementKind Kind => this is ApiNamedKeyDefinition
+        ? ApiSchemaElementKind.NamedKeyDefinition
+        : ApiSchemaElementKind.KeyDefinition;
 
     /// <inheritdoc/>
-    protected override string ApiElementName => nameof(ApiKeyType);
+    protected override string ApiElementName => nameof(ApiKeyDefinition);
     #endregion
 
-    #region ApiKeyType Properties
-    /// <summary>Gets the immutable ordered paths that compose this key type.</summary>
+    #region ApiKeyDefinition Properties
+    /// <summary>Gets the immutable ordered paths that compose this key definition.</summary>
     public ImmutableArray<ApiKeyPath> ApiKeyPaths { get; }
     #endregion
 
-    #region ApiKeyType Computed Properties
-    /// <summary>Gets a value indicating whether this key type is defined by a single path (produces a scalar <see cref="ApiKey"/>).</summary>
+    #region ApiKeyDefinition Computed Properties
+    /// <summary>Gets a value indicating whether this key definition is defined by a single path (produces a scalar <see cref="ApiKey"/>).</summary>
     public bool IsScalar => this.ApiKeyPaths.Length == 1;
 
-    /// <summary>Gets a value indicating whether this key type is defined by two or more paths (produces a named-composite <see cref="ApiKey"/>).</summary>
+    /// <summary>Gets a value indicating whether this key definition is defined by two or more paths (produces a named-composite <see cref="ApiKey"/>).</summary>
     public bool IsComposite => this.ApiKeyPaths.Length >= 2;
     #endregion
 
@@ -80,7 +80,7 @@ public partial class ApiKeyType : ApiSchemaElement
         var apiKeyPathsCount = this.ApiKeyPaths.Length.SafeToString();
         var extensionCount = this.ExtensionCount.SafeToString();
 
-        return $"{nameof(ApiKeyType)} {{{nameof(this.ApiKeyPaths)}Count={apiKeyPathsCount}, {nameof(this.ExtensionCount)}={extensionCount}}}";
+        return $"{nameof(ApiKeyDefinition)} {{{nameof(this.ApiKeyPaths)}Count={apiKeyPathsCount}, {nameof(this.ExtensionCount)}={extensionCount}}}";
     }
     #endregion
 
@@ -120,7 +120,7 @@ public partial class ApiKeyType : ApiSchemaElement
         if (this.ApiKeyPaths.Length == 0)
         {
             var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiKeyTypeNullOrEmptyPaths;
+            var code = ApiSchemaCompilationCode.ApiKeyDefinitionNullOrEmptyPaths;
             var description = $"{nameof(this.ApiKeyPaths)} must not be null or empty";
             var remediation = $"Specify at least one {nameof(ApiKeyPath)}";
 

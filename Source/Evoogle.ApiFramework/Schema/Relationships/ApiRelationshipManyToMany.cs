@@ -22,7 +22,7 @@ namespace Evoogle.ApiFramework.Schema.Relationships;
 ///         Unlike one-to-one and one-to-many relationships, a many-to-many has two symmetric
 ///         <see cref="ApiRelationshipPrincipalEnd"/> instances — <see cref="ApiPrincipalEndA"/> and
 ///         <see cref="ApiPrincipalEndB"/> — and no dependent end.
-///         Each principal end provides a referenced principal key type that is mapped to the association object type
+///         Each principal end provides a referenced principal key that is mapped to the association object type
 ///         through the corresponding key path collection on <see cref="ApiAssociation"/>.
 ///     </para>
 ///     <para>
@@ -31,8 +31,8 @@ namespace Evoogle.ApiFramework.Schema.Relationships;
 ///     </para>
 /// </remarks>
 /// <param name="apiName">The API name that uniquely identifies this relationship within the schema.</param>
-/// <param name="apiPrincipalEndA">The first principal end of the relationship, which provides the A-side referenced principal key type.</param>
-/// <param name="apiPrincipalEndB">The second principal end of the relationship, which provides the B-side referenced principal key type.</param>
+/// <param name="apiPrincipalEndA">The first principal end of the relationship, which provides the A-side referenced principal key.</param>
+/// <param name="apiPrincipalEndB">The second principal end of the relationship, which provides the B-side referenced principal key.</param>
 /// <param name="apiAssociation">
 ///     The association element that mediates the relationship and may provide the foreign key role's key path trees
 ///     for both principal ends.
@@ -72,10 +72,10 @@ public sealed class ApiRelationshipManyToMany
     #endregion
 
     #region ApiRelationshipManyToMany Properties
-    /// <summary>Gets principal end A of the relationship, which provides the referenced principal key type for the first outer type.</summary>
+    /// <summary>Gets principal end A of the relationship, which provides the referenced principal key for the first outer type.</summary>
     public ApiRelationshipPrincipalEnd ApiPrincipalEndA { get; } = apiPrincipalEndA;
 
-    /// <summary>Gets principal end B of the relationship, which provides the referenced principal key type for the second outer type.</summary>
+    /// <summary>Gets principal end B of the relationship, which provides the referenced principal key for the second outer type.</summary>
     public ApiRelationshipPrincipalEnd ApiPrincipalEndB { get; } = apiPrincipalEndB;
 
     /// <summary>Gets the association element that mediates the relationship.</summary>
@@ -163,9 +163,9 @@ public sealed class ApiRelationshipManyToMany
             (
                 context,
                 this.ApiPrincipalEndA,
-                this.ApiAssociation.ApiForeignKeyTypeA,
+                this.ApiAssociation.ApiForeignKeyA,
                 ApiSchemaCompilationCode.ApiRelationshipManyToManyInvalidAssociationKeyPathsACount,
-                nameof(ApiRelationshipAssociation.ApiForeignKeyTypeA),
+                nameof(ApiRelationshipAssociation.ApiForeignKeyA),
                 "A"
             );
         }
@@ -176,17 +176,17 @@ public sealed class ApiRelationshipManyToMany
             (
                 context,
                 this.ApiPrincipalEndB,
-                this.ApiAssociation.ApiForeignKeyTypeB,
+                this.ApiAssociation.ApiForeignKeyB,
                 ApiSchemaCompilationCode.ApiRelationshipManyToManyInvalidAssociationKeyPathsBCount,
-                nameof(ApiRelationshipAssociation.ApiForeignKeyTypeB),
+                nameof(ApiRelationshipAssociation.ApiForeignKeyB),
                 "B"
             );
         }
 
         if (this.ApiAssociation is not null && !this.ApiAssociation.HasForeignKeys)
         {
-            this.ValidateNavigationalPrincipalKey(context, this.ApiPrincipalEndA, $"{nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyTypeName)} on principal end A");
-            this.ValidateNavigationalPrincipalKey(context, this.ApiPrincipalEndB, $"{nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyTypeName)} on principal end B");
+            this.ValidateNavigationalPrincipalKey(context, this.ApiPrincipalEndA, $"{nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyName)} on principal end A");
+            this.ValidateNavigationalPrincipalKey(context, this.ApiPrincipalEndB, $"{nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyName)} on principal end B");
         }
     }
 
@@ -194,13 +194,13 @@ public sealed class ApiRelationshipManyToMany
     (
         ApiSchemaCompilationContext context,
         ApiRelationshipPrincipalEnd principalEnd,
-        ApiKeyType foreignKeyType,
+        ApiKeyDefinition foreignKey,
         ApiSchemaCompilationCode countMismatchCode,
         string foreignKeyPropertyName,
         string principalEndName
     )
     {
-        var principalKeyDesc = principalEnd.ApiPrincipalKeyTypeName is not null ? $"principal key type '{principalEnd.ApiPrincipalKeyTypeName}'" : "principal key type";
+        var principalKeyDesc = principalEnd.ApiPrincipalKeyName is not null ? $"principal key '{principalEnd.ApiPrincipalKeyName}'" : "principal key";
         var foreignKeyPath = $"{nameof(this.ApiAssociation)}.{foreignKeyPropertyName}";
 
         return ApiRelationshipKeyAlignment.ResolvePrincipalForeignKeyBinding
@@ -208,30 +208,30 @@ public sealed class ApiRelationshipManyToMany
             context: context,
             relationshipPath: this.ApiPath,
             principalEnd: principalEnd,
-            foreignKeyType: foreignKeyType,
+            foreignKey: foreignKey,
             countMismatchCode: countMismatchCode,
             foreignKeyPath: foreignKeyPath,
             principalCountLabel: $"principal end {principalEndName} {principalKeyDesc}",
             principalCompatibilityLabel: $"principal end {principalEndName} {principalKeyDesc}",
             principalEndQualifier: $"for principal end {principalEndName}",
-            explicitKeyTarget: $"{nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyTypeName)} on principal end {principalEndName}",
+            explicitKeyTarget: $"{nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyName)} on principal end {principalEndName}",
             inferredForeignKeyLabel: $"{principalEndName}-side foreign key",
-            countMismatchRemediationTarget: $"principal end {principalEndName}'s principal key type",
-            compatibilityRemediation: $"Ensure {foreignKeyPath} paths are ordered to match principal end {principalEndName}'s principal key type and use compatible scalar types"
+            countMismatchRemediationTarget: $"principal end {principalEndName}'s principal key",
+            compatibilityRemediation: $"Ensure {foreignKeyPath} paths are ordered to match principal end {principalEndName}'s principal key and use compatible scalar types"
         );
     }
 
     private void ValidateNavigationalPrincipalKey(ApiSchemaCompilationContext context, ApiRelationshipPrincipalEnd? principalEnd, string explicitKeyTarget)
     {
-        if (principalEnd?.ApiPrincipalKeyTypeName is null)
+        if (principalEnd?.ApiPrincipalKeyName is null)
         {
             return;
         }
 
         var severity = ApiSchemaCompilationSeverity.Error;
         var code = ApiSchemaCompilationCode.ApiRelationshipEndPrincipalKeyWithoutForeignKey;
-        var description = $"Cannot resolve {explicitKeyTarget} '{principalEnd.ApiPrincipalKeyTypeName}' because this relationship has no association foreign key bindings";
-        var remediation = $"Declare {nameof(this.ApiAssociation)}.{nameof(ApiRelationshipAssociation.ApiForeignKeyTypeA)} and {nameof(this.ApiAssociation)}.{nameof(ApiRelationshipAssociation.ApiForeignKeyTypeB)} or remove {explicitKeyTarget}";
+        var description = $"Cannot resolve {explicitKeyTarget} '{principalEnd.ApiPrincipalKeyName}' because this relationship has no association foreign key bindings";
+        var remediation = $"Declare {nameof(this.ApiAssociation)}.{nameof(ApiRelationshipAssociation.ApiForeignKeyA)} and {nameof(this.ApiAssociation)}.{nameof(ApiRelationshipAssociation.ApiForeignKeyB)} or remove {explicitKeyTarget}";
 
         context.AddIssue(severity, code, description, remediation);
     }

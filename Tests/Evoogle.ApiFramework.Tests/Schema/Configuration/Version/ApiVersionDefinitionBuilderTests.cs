@@ -11,7 +11,7 @@ using FluentAssertions;
 
 namespace Evoogle.ApiFramework.Schema.Configuration.Version;
 
-public class ApiVersionTypeBuilderTests(ITestOutputHelper output) : XUnitTests(output)
+public class ApiVersionDefinitionBuilderTests(ITestOutputHelper output) : XUnitTests(output)
 {
     #region Test Types
     private sealed class VersionedObject
@@ -44,7 +44,7 @@ public class ApiVersionTypeBuilderTests(ITestOutputHelper output) : XUnitTests(o
                 .WithVersion
                 (
                     x => x.Version,
-                    version => version.AddVersionTypeExtension(new GraphQlExtension())
+                    version => version.AddVersionExtension(new GraphQlExtension())
                 );
 
             if (this.ReplaceWithRepositoryVersion)
@@ -72,16 +72,16 @@ public class ApiVersionTypeBuilderTests(ITestOutputHelper output) : XUnitTests(o
 
         protected override void Assert()
         {
-            this.Actual!.HasVersionType.Should().BeTrue();
-            this.Actual.ApiVersionType!.ClrType.Should().Be
+            this.Actual!.HasVersion.Should().BeTrue();
+            this.Actual.ApiVersion!.ClrType.Should().Be
             (
                 this.ReplaceWithRepositoryVersion ? typeof(long) : typeof(int)
             );
-            this.Actual.ApiVersionType.ClrMemberName.Should().Be
+            this.Actual.ApiVersion.ClrMemberName.Should().Be
             (
                 this.ReplaceWithRepositoryVersion ? null : nameof(VersionedObject.Version)
             );
-            this.Actual.ApiVersionType.Extensions.Should().HaveCount
+            this.Actual.ApiVersion.Extensions.Should().HaveCount
             (
                 this.ReplaceWithRepositoryVersion ? 0 : 1
             );

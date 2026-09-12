@@ -29,18 +29,18 @@ public sealed class ApiRelationshipDependentEndBuilder<TDependent>() : ApiRelati
 
     #region WithForeignKey Methods
     /// <summary>
-    ///     Sets the foreign key role's <see cref="ApiKeyType"/> using a strongly-typed builder for
+    ///     Sets the foreign key role's <see cref="ApiKeyDefinition"/> using a strongly-typed builder for
     ///     <typeparamref name="TDependent"/>.
     /// </summary>
-    /// <param name="configure">Optional callback to configure key paths on the key type.</param>
+    /// <param name="configure">Optional callback to configure key paths on the key.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiRelationshipDependentEndBuilder<TDependent> WithForeignKey(Action<ApiKeyTypeBuilder<TDependent>>? configure = null)
+    public ApiRelationshipDependentEndBuilder<TDependent> WithForeignKey(Action<ApiKeyDefinitionBuilder<TDependent>>? configure = null)
     {
         base.WithForeignKey
         (
             configure == null
                 ? null
-                : builder => configure((ApiKeyTypeBuilder<TDependent>)builder)
+                : builder => configure((ApiKeyDefinitionBuilder<TDependent>)builder)
         );
         return this;
     }

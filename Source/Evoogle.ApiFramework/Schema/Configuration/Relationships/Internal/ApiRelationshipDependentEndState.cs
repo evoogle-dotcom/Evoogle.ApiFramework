@@ -15,8 +15,8 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Relationships.Internal;
 internal sealed class ApiRelationshipDependentEndState
 {
     #region Properties
-    internal ApiKeyTypeBuilder? ForeignKeyTypeBuilder { get; set; }
+    internal ApiKeyDefinitionBuilder? ForeignKeyBuilder { get; set; }
 
-    internal ApiConfigurationSource? ForeignKeyTypeBuilderSource { get; set; }
+    internal ApiConfigurationSource? ForeignKeyBuilderSource { get; set; }
     #endregion
 }

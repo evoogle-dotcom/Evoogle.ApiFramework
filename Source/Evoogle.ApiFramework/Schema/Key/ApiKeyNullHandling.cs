@@ -10,7 +10,7 @@ namespace Evoogle.ApiFramework.Schema.Key;
 
 /// <summary>
 ///     Specifies how <see langword="null"/> property values are handled when walking an <see cref="ApiKeyPath"/>
-///     during <see cref="ApiKeyType.MaterializeKey"/> materialization.
+///     during <see cref="ApiKeyDefinition.MaterializeKey"/> materialization.
 /// </summary>
 /// <remarks>
 ///     This policy applies at every step of the path walk: both intermediate navigation members

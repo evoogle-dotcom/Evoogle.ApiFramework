@@ -28,6 +28,22 @@ homogeneous collection of peer concepts. Use singular names for namespaces and
 corresponding directories whose contents are heterogeneous and organized around one
 feature or concept.
 
+## Definition Types and Contextual Roles
+
+Use the `Definition` suffix for CLR metadata type identities and related type families. Examples
+include `ApiKeyDefinition`, `ApiNamedKeyDefinition`, `ApiVersionDefinition`, their builders, and
+their JSON converters.
+
+When the containing type already establishes the metadata context, name members and serialized
+properties by their concise domain role. Use `ApiObjectType.ApiKeys`,
+`ApiObjectType.ApiVersion`, `ApiRelationshipDependentEnd.ApiForeignKey`, and
+`ApiRelationshipKeyBinding.ApiPrincipalKey`. Apply the same rule to contextual predicates and
+lookups such as `HasKeys`, `HasVersion`, and `GetKeyByApiName`.
+
+Fluent methods and annotations describe the developer action or domain designation, so retain
+concise names such as `AddKey`, `WithVersion`, `WithRepositoryVersion`, `ApiKeyAttribute`, and
+`ApiVersionAttribute`.
+
 ## `Api` and `Clr` Prefixes
 
 ApiFramework models two related naming spaces:
@@ -48,7 +64,7 @@ has, or can easily be confused with, a CLR/BCL-side representation:
 public string ApiName { get; }
 public string ApiPath { get; }
 public ApiType? ApiInlineType { get; }
-public ApiKeyType? ApiPrincipalKeyType { get; }
+public ApiNamedKeyDefinition ApiPrincipalKey { get; }
 ```
 
 Use `Api` for canonical framework terms that are intentionally named that way across the

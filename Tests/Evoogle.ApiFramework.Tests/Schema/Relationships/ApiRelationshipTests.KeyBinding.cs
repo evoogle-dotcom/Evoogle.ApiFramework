@@ -306,26 +306,26 @@ public partial class ApiRelationshipTests
     private static ApiRelationshipPrincipalEndDef PrincipalEnd
     (
         Type clrObjectType,
-        string? apiPrincipalKeyTypeName = null
+        string? apiPrincipalKeyName = null
     )
-        => new(clrObjectType, apiPrincipalKeyTypeName);
+        => new(clrObjectType, apiPrincipalKeyName);
 
     private static ApiRelationshipDependentEndDef DependentEnd
     (
         Type clrObjectType,
-        ApiKeyTypeDef? apiForeignKeyType = null
+        ApiKeyDef? apiForeignKey = null
     )
-        => new(clrObjectType, apiForeignKeyType);
+        => new(clrObjectType, apiForeignKey);
 
     private static ApiRelationshipAssociationDef Association
     (
         Type clrObjectType,
-        ApiKeyTypeDef? apiForeignKeyTypeA = null,
-        ApiKeyTypeDef? apiForeignKeyTypeB = null
+        ApiKeyDef? apiForeignKeyA = null,
+        ApiKeyDef? apiForeignKeyB = null
     )
-        => new(clrObjectType, apiForeignKeyTypeA, apiForeignKeyTypeB);
+        => new(clrObjectType, apiForeignKeyA, apiForeignKeyB);
 
-    private static ApiKeyTypeDef ForeignKey(params ApiKeyPathDef[] apiKeyPaths)
+    private static ApiKeyDef ForeignKey(params ApiKeyPathDef[] apiKeyPaths)
         => new(null!, [.. apiKeyPaths]);
 
     private static ApiKeyPathDef KeyPath(Type clrRootType, params string[] clrMemberNames)

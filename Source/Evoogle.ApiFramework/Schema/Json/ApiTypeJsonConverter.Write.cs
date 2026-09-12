@@ -76,20 +76,20 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
     {
         WriteApiObjectTypeApiOptions(writer, apiObjectType, context);
         WriteApiObjectTypeApiProperties(writer, apiObjectType, context);
-        WriteApiObjectTypeApiKeyTypes(writer, apiObjectType, context);
-        WriteApiObjectTypeApiVersionType(writer, apiObjectType, context);
+        WriteApiObjectTypeApiKeys(writer, apiObjectType, context);
+        WriteApiObjectTypeApiVersion(writer, apiObjectType, context);
     }
 
-    private static void WriteApiObjectTypeApiKeyTypes(Utf8JsonWriter writer, ApiObjectType apiObjectType, DefaultWriteContext<PropertyNames> context)
+    private static void WriteApiObjectTypeApiKeys(Utf8JsonWriter writer, ApiObjectType apiObjectType, DefaultWriteContext<PropertyNames> context)
     {
-        var propertyName = context.PropertyNames.ApiObjectType.ApiKeyTypes;
-        var apiKeyTypes = apiObjectType.ApiKeyTypes;
+        var propertyName = context.PropertyNames.ApiObjectType.ApiKeys;
+        var apiKeys = apiObjectType.ApiKeys;
         var options = context.Options;
 
         writer.TryWritePropertyWithAction
         (
             propertyName,
-            apiKeyTypes,
+            apiKeys,
             options,
             collection => WriteJsonArray(writer, collection, item => writer.TryWriteWithSerializer(item, options))
         );
@@ -104,7 +104,7 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
         writer.TryWritePropertyWithSerializer(propertyName, apiOptions, options);
     }
 
-    private static void WriteApiObjectTypeApiVersionType
+    private static void WriteApiObjectTypeApiVersion
     (
         Utf8JsonWriter writer,
         ApiObjectType apiObjectType,
@@ -113,8 +113,8 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
     {
         writer.TryWritePropertyWithSerializer
         (
-            context.PropertyNames.ApiObjectType.ApiVersionType,
-            apiObjectType.ApiVersionType,
+            context.PropertyNames.ApiObjectType.ApiVersion,
+            apiObjectType.ApiVersion,
             context.Options
         );
     }

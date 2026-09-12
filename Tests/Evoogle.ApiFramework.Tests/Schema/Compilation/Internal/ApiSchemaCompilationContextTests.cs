@@ -245,18 +245,18 @@ public class ApiInitializationContextTests(ITestOutputHelper output) : XUnitTest
             ExpectedPaths =
             [
                 "ApiSchema[\"Key\"].ApiObjectType[\"KeyNestedComposite\"]." +
-                    "ApiNamedKeyType[\"PK_KeyNestedComposite\"]." +
+                    "ApiNamedKeyDefinition[\"PK_KeyNestedComposite\"]." +
                     "ApiKeyPath[0][\"KeyNestedComposite.NestedPart.Id\"]",
                 "ApiSchema[\"Key\"].ApiObjectType[\"KeyNestedComposite\"]." +
-                    "ApiNamedKeyType[\"PK_KeyNestedComposite\"]." +
+                    "ApiNamedKeyDefinition[\"PK_KeyNestedComposite\"]." +
                     "ApiKeyPath[0][\"KeyNestedComposite.NestedPart.Id\"]." +
                     "ApiKeyPathSegment[0][\"NestedPart\"]",
                 "ApiSchema[\"Key\"].ApiObjectType[\"KeyNestedComposite\"]." +
-                    "ApiNamedKeyType[\"PK_KeyNestedComposite\"]." +
+                    "ApiNamedKeyDefinition[\"PK_KeyNestedComposite\"]." +
                     "ApiKeyPath[0][\"KeyNestedComposite.NestedPart.Id\"]." +
                     "ApiKeyPathSegment[1][\"Id\"]",
                 "ApiSchema[\"Key\"].ApiObjectType[\"KeyNestedComposite\"]." +
-                    "ApiNamedKeyType[\"PK_KeyNestedComposite\"]." +
+                    "ApiNamedKeyDefinition[\"PK_KeyNestedComposite\"]." +
                     "ApiKeyPath[1][\"KeyNestedComposite.Name\"]",
             ]
         },
@@ -274,7 +274,7 @@ public class ApiInitializationContextTests(ITestOutputHelper output) : XUnitTest
                     "ApiDependentEnd",
                 "ApiSchema[\"Relationship\"]." +
                     "ApiRelationshipOneToMany[\"REL_User_Post_1toN_ViaScalar\"]." +
-                    "ApiDependentEnd.ApiForeignKeyType",
+                    "ApiDependentEnd.ApiForeignKey",
             ]
         },
         new DiagnosticPathTest
@@ -294,10 +294,10 @@ public class ApiInitializationContextTests(ITestOutputHelper output) : XUnitTest
                     "ApiAssociation",
                 "ApiSchema[\"Relationship\"]." +
                     "ApiRelationshipManyToMany[\"REL_Post_Tag_NtoN_ViaPostTag\"]." +
-                    "ApiAssociation.ApiForeignKeyTypeA",
+                    "ApiAssociation.ApiForeignKeyA",
                 "ApiSchema[\"Relationship\"]." +
                     "ApiRelationshipManyToMany[\"REL_Post_Tag_NtoN_ViaPostTag\"]." +
-                    "ApiAssociation.ApiForeignKeyTypeB",
+                    "ApiAssociation.ApiForeignKeyB",
             ]
         },
         new DiagnosticPathTest
@@ -333,7 +333,7 @@ public class ApiInitializationContextTests(ITestOutputHelper output) : XUnitTest
         {
             Name = "Error Issues Are Logged With Remediation",
             Severity = ApiSchemaCompilationSeverity.Error,
-            Code = ApiSchemaCompilationCode.ApiKeyTypeNullOrEmptyPaths,
+            Code = ApiSchemaCompilationCode.ApiKeyDefinitionNullOrEmptyPaths,
             ExpectedLogLevel = LogLevel.Error,
             Remediation = "Remediation"
         },
@@ -390,14 +390,14 @@ public class ApiInitializationContextTests(ITestOutputHelper output) : XUnitTest
         (
             nameof(KeyNestedComposite)
         );
-        apiObjectType.TryGetKeyTypeByApiName
+        apiObjectType.TryGetKeyByApiName
         (
             "PK_KeyNestedComposite",
-            out var apiKeyType
+            out var apiKeyDefinition
         ).Should().BeTrue();
 
-        var firstPath = apiKeyType!.ApiKeyPaths[0];
-        var secondPath = apiKeyType.ApiKeyPaths[1];
+        var firstPath = apiKeyDefinition!.ApiKeyPaths[0];
+        var secondPath = apiKeyDefinition.ApiKeyPaths[1];
         return
         [
             firstPath.ApiPath,
@@ -421,8 +421,8 @@ public class ApiInitializationContextTests(ITestOutputHelper output) : XUnitTest
             manyToMany.ApiPrincipalEndA.ApiPath,
             manyToMany.ApiPrincipalEndB.ApiPath,
             manyToMany.ApiAssociation.ApiPath,
-            manyToMany.ApiAssociation.ApiForeignKeyTypeA.ApiPath,
-            manyToMany.ApiAssociation.ApiForeignKeyTypeB.ApiPath,
+            manyToMany.ApiAssociation.ApiForeignKeyA.ApiPath,
+            manyToMany.ApiAssociation.ApiForeignKeyB.ApiPath,
         ];
     }
 
@@ -439,7 +439,7 @@ public class ApiInitializationContextTests(ITestOutputHelper output) : XUnitTest
         [
             oneTo.ApiPrincipalEnd.ApiPath,
             oneTo.ApiDependentEnd.ApiPath,
-            oneTo.ApiDependentEnd.ApiForeignKeyType.ApiPath,
+            oneTo.ApiDependentEnd.ApiForeignKey.ApiPath,
         ];
     }
     #endregion

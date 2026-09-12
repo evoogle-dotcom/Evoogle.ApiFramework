@@ -18,7 +18,7 @@ public partial class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(o
     #region Test Types
     private enum TryGetMethod
     {
-        TryGetKeyTypeByApiName,
+        TryGetKeyByApiName,
         TryGetPropertyByApiName,
         TryGetPropertyByClrName
     }
@@ -60,7 +60,7 @@ public partial class ApiObjectTypeTests(ITestOutputHelper output) : XUnitTests(o
         {
             this.ActualResult = this.TryGetMethod switch
             {
-                TryGetMethod.TryGetKeyTypeByApiName => this.ApiObjectType!.TryGetKeyTypeByApiName(this.SearchKey!, out _),
+                TryGetMethod.TryGetKeyByApiName => this.ApiObjectType!.TryGetKeyByApiName(this.SearchKey!, out _),
                 TryGetMethod.TryGetPropertyByApiName => this.ApiObjectType!.TryGetPropertyByApiName(this.SearchKey!, out _),
                 TryGetMethod.TryGetPropertyByClrName => this.ApiObjectType!.TryGetPropertyByClrName(this.SearchKey!, out _),
                 _ => throw new InvalidOperationException($"Unknown {nameof(this.TryGetMethod)}: {this.TryGetMethod}"),

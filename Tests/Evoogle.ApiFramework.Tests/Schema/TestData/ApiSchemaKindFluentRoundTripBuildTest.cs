@@ -87,8 +87,8 @@ public class ApiSchemaKindFluentRoundTripBuildTest : ApiSchemaBuildTestBase
                 }
 
                 x.ConfigureOptions(apiObjectType);
-                x.ConfigureKeyTypes(apiObjectType);
-                x.ConfigureVersionType(apiObjectType);
+                x.ConfigureKeys(apiObjectType);
+                x.ConfigureVersion(apiObjectType);
                 x.ConfigureExtensions(apiObjectType);
             });
         }

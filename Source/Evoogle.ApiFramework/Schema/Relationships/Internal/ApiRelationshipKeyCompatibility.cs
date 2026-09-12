@@ -15,21 +15,21 @@ namespace Evoogle.ApiFramework.Schema.Relationships.Internal;
 internal static class ApiRelationshipKeyCompatibility
 {
     #region Utility Methods
-    public static int? CountKeyLeaves(ApiKeyType keyType)
+    public static int? CountKeyLeaves(ApiKeyDefinition keyDefinition)
     {
-        // Each ApiKeyPath in a key type corresponds to exactly one scalar leaf.
-        return keyType.ApiKeyPaths.Length;
+        // Each ApiKeyPath in a key corresponds to exactly one scalar leaf.
+        return keyDefinition.ApiKeyPaths.Length;
     }
 
-    public static bool AreKeyTypesCompatible(ApiKeyType principalKeyType, ApiKeyType foreignKeyType)
-        => TryAreKeyTypesCompatible(principalKeyType, foreignKeyType, out var isCompatible) && isCompatible;
+    public static bool AreKeysCompatible(ApiKeyDefinition principalKey, ApiKeyDefinition foreignKey)
+        => TryAreKeysCompatible(principalKey, foreignKey, out var isCompatible) && isCompatible;
 
-    public static bool TryAreKeyTypesCompatible(ApiKeyType principalKeyType, ApiKeyType foreignKeyType, out bool isCompatible)
+    public static bool TryAreKeysCompatible(ApiKeyDefinition principalKey, ApiKeyDefinition foreignKey, out bool isCompatible)
     {
         isCompatible = false;
 
-        if (!TryGetKeyLeafTypes(principalKeyType, out var principalLeafTypes) ||
-            !TryGetKeyLeafTypes(foreignKeyType, out var foreignLeafTypes))
+        if (!TryGetKeyLeafTypes(principalKey, out var principalLeafTypes) ||
+            !TryGetKeyLeafTypes(foreignKey, out var foreignLeafTypes))
         {
             return false;
         }
@@ -51,9 +51,9 @@ internal static class ApiRelationshipKeyCompatibility
         return true;
     }
 
-    public static string DescribeKeyLeafTypes(ApiKeyType keyType)
+    public static string DescribeKeyLeafTypes(ApiKeyDefinition keyDefinition)
     {
-        if (!TryGetKeyLeafTypes(keyType, out var leafTypes))
+        if (!TryGetKeyLeafTypes(keyDefinition, out var leafTypes))
         {
             return "(unresolved)";
         }
@@ -61,9 +61,9 @@ internal static class ApiRelationshipKeyCompatibility
         return string.Join(", ", leafTypes.Select(static clrType => clrType.SafeToName()));
     }
 
-    private static bool TryGetKeyLeafTypes(ApiKeyType keyType, out Type[] leafTypes)
+    private static bool TryGetKeyLeafTypes(ApiKeyDefinition keyDefinition, out Type[] leafTypes)
     {
-        var paths = keyType.ApiKeyPaths;
+        var paths = keyDefinition.ApiKeyPaths;
         leafTypes = new Type[paths.Length];
 
         for (var i = 0; i < paths.Length; i++)

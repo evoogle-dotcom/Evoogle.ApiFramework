@@ -66,7 +66,7 @@ public partial class ApiSchemaTests
         public int Value;
     }
 
-    public class DuplicateKeyTypeApiNameType
+    public class DuplicateKeyApiNameObject
     {
         public int Id { get; set; }
         public int Code { get; set; }
@@ -137,17 +137,17 @@ public partial class ApiSchemaTests
     }
 
     // CLR types for the key compilation order regression test.
-    // AlphaKeyType sorts before ZetaKeyType alphabetically; its composite key navigates through ZetaKeyType.
-    // Under the original single-pass compilation, AlphaKeyType's key would be compiled before
-    // ZetaKeyType's property lookups were populated, causing an ApiSchemaException.
-    public class ZetaKeyType
+    // AlphaKeyObject sorts before ZetaKeyObject alphabetically; its composite key navigates through ZetaKeyObject.
+    // Under the original single-pass compilation, AlphaKeyObject's key would be compiled before
+    // ZetaKeyObject's property lookups were populated, causing an ApiSchemaException.
+    public class ZetaKeyObject
     {
         public int Id { get; set; }
     }
 
-    public class AlphaKeyType
+    public class AlphaKeyObject
     {
-        public ZetaKeyType? ZetaRef { get; set; }
+        public ZetaKeyObject? ZetaRef { get; set; }
     }
     #endregion
 
@@ -1408,13 +1408,13 @@ public partial class ApiSchemaTests
             ]
         },
 
-        // ApiObjectType throws if ApiKeyTypes has duplicate ApiName
+        // ApiObjectType throws if ApiKeys has duplicate ApiName
         new CompileThrowsTest
         {
-            Name = $"{nameof(ApiObjectType)} Throws If ApiKeyTypes Has Duplicate ApiName",
+            Name = $"{nameof(ApiObjectType)} Throws If ApiKeys Has Duplicate ApiName",
             SourceJson = @"
             {
-                ""ApiName"": ""ApiObjectType Throws If ApiKeyTypes Has Duplicate ApiName"",
+                ""ApiName"": ""ApiObjectType Throws If ApiKeys Has Duplicate ApiName"",
                 ""ApiScalarTypes"": [
                     {
                         ""ApiKind"": ""Scalar"",
@@ -1447,12 +1447,12 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""Primary"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyTypeApiNameType, Evoogle.ApiFramework.Tests"",
+                                        ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
                                             { ""ClrMemberName"": ""Id"" }
                                         ]
@@ -1463,7 +1463,7 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""Primary"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyTypeApiNameType, Evoogle.ApiFramework.Tests"",
+                                        ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
                                             { ""ClrMemberName"": ""Code"" }
                                         ]
@@ -1471,7 +1471,7 @@ public partial class ApiSchemaTests
                                 ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyTypeApiNameType, Evoogle.ApiFramework.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests""
                     }
                 ]
             }",
@@ -1482,11 +1482,11 @@ public partial class ApiSchemaTests
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiObjectTypeDuplicateKeyTypeApiName,
-                    description: $"Duplicate {nameof(ApiNamedKeyType)}." +
-                        $"{nameof(ApiNamedKeyType.ApiName)} values: 'Primary'",
-                    remediation: $"Verify that each {nameof(ApiNamedKeyType)} has a unique " +
-                        $"{nameof(ApiNamedKeyType.ApiName)} value"
+                    code: ApiSchemaCompilationCode.ApiObjectTypeDuplicateKeyApiName,
+                    description: $"Duplicate {nameof(ApiNamedKeyDefinition)}." +
+                        $"{nameof(ApiNamedKeyDefinition.ApiName)} values: 'Primary'",
+                    remediation: $"Verify that each {nameof(ApiNamedKeyDefinition)} has a unique " +
+                        $"{nameof(ApiNamedKeyDefinition.ApiName)} value"
                 ),
             ]
         },
@@ -2024,17 +2024,17 @@ public partial class ApiSchemaTests
         },
 
         //
-        // ApiKeyType and ApiNamedKeyType Compilation Tests
+        // ApiKeyDefinition and ApiNamedKeyDefinition Compilation Tests
         //
 
-        // ApiNamedKeyType throws if ApiName is invalid (null)
+        // ApiNamedKeyDefinition throws if ApiName is invalid (null)
         new CompileThrowsTest
         {
-            Name = $"{nameof(ApiNamedKeyType)} Throws If " +
-                $"{nameof(ApiNamedKeyType.ApiName)} Is Invalid",
+            Name = $"{nameof(ApiNamedKeyDefinition)} Throws If " +
+                $"{nameof(ApiNamedKeyDefinition.ApiName)} Is Invalid",
             SourceJson = @"
             {
-                ""ApiName"": ""ApiKeyType Throws If ApiName Is Invalid And Owned By ApiObjectType"",
+                ""ApiName"": ""ApiKeyDefinition Throws If ApiName Is Invalid And Owned By ApiObjectType"",
                 ""ApiScalarTypes"": [
                     {
                         ""ApiKind"": ""Scalar"",
@@ -2058,11 +2058,11 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyTypeApiNameType, Evoogle.ApiFramework.Tests"",
+                                        ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
                                             { ""ClrMemberName"": ""Id"" }
                                         ]
@@ -2070,7 +2070,7 @@ public partial class ApiSchemaTests
                                 ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyTypeApiNameType, Evoogle.ApiFramework.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests""
                     }
                 ]
             }",
@@ -2080,23 +2080,23 @@ public partial class ApiSchemaTests
                 new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"]." +
-                        $"{nameof(ApiNamedKeyType)}",
+                        $"{nameof(ApiNamedKeyDefinition)}",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiNamedKeyTypeInvalidApiName,
-                    description: $"{nameof(ApiNamedKeyType.ApiName)} must not be null, empty, " +
+                    code: ApiSchemaCompilationCode.ApiNamedKeyDefinitionInvalidApiName,
+                    description: $"{nameof(ApiNamedKeyDefinition.ApiName)} must not be null, empty, " +
                         "or whitespace",
-                    remediation: $"Specify a valid {nameof(ApiNamedKeyType.ApiName)} value"
+                    remediation: $"Specify a valid {nameof(ApiNamedKeyDefinition.ApiName)} value"
                 ),
             ]
         },
 
-        // ApiKeyType throws if ApiKeyPaths is null or empty
+        // ApiKeyDefinition throws if ApiKeyPaths is null or empty
         new CompileThrowsTest
         {
-            Name = $"{nameof(ApiKeyType)} Throws If {nameof(ApiKeyType.ApiKeyPaths)} Is Null Or Empty",
+            Name = $"{nameof(ApiKeyDefinition)} Throws If {nameof(ApiKeyDefinition.ApiKeyPaths)} Is Null Or Empty",
             SourceJson = @"
             {
-                ""ApiName"": ""ApiKeyType Throws If ApiKeyPaths Is Null Or Empty"",
+                ""ApiName"": ""ApiKeyDefinition Throws If ApiKeyPaths Is Null Or Empty"",
                 ""ApiScalarTypes"": [
                     {
                         ""ApiKind"": ""Scalar"",
@@ -2120,13 +2120,13 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PrimaryKey"",
                                 ""ApiKeyPaths"": []
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyTypeApiNameType, Evoogle.ApiFramework.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests""
                     }
                 ]
             }",
@@ -2136,10 +2136,10 @@ public partial class ApiSchemaTests
                 new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"]." +
-                        $"{nameof(ApiNamedKeyType)}[\"PrimaryKey\"]",
+                        $"{nameof(ApiNamedKeyDefinition)}[\"PrimaryKey\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiKeyTypeNullOrEmptyPaths,
-                    description: $"{nameof(ApiKeyType.ApiKeyPaths)} must not be null or empty",
+                    code: ApiSchemaCompilationCode.ApiKeyDefinitionNullOrEmptyPaths,
+                    description: $"{nameof(ApiKeyDefinition.ApiKeyPaths)} must not be null or empty",
                     remediation: $"Specify at least one {nameof(ApiKeyPath)}"
                 ),
             ]
@@ -2175,18 +2175,18 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PrimaryKey"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyTypeApiNameType, Evoogle.ApiFramework.Tests"",
+                                        ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": []
                                     }
                                 ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyTypeApiNameType, Evoogle.ApiFramework.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests""
                     }
                 ]
             }",
@@ -2196,8 +2196,8 @@ public partial class ApiSchemaTests
                 new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"]." +
-                        $"{nameof(ApiNamedKeyType)}[\"PrimaryKey\"].{nameof(ApiKeyPath)}" +
-                        $"[0][\"{nameof(DuplicateKeyTypeApiNameType)}.\"]",
+                        $"{nameof(ApiNamedKeyDefinition)}[\"PrimaryKey\"].{nameof(ApiKeyPath)}" +
+                        $"[0][\"{nameof(DuplicateKeyApiNameObject)}.\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
                     code: ApiSchemaCompilationCode.ApiKeyPathEmptySegments,
                     description: $"{nameof(ApiKeyPath.ApiSegments)} must contain at least one member name",
@@ -2236,7 +2236,7 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PrimaryKey"",
                                 ""ApiKeyPaths"": [
@@ -2249,7 +2249,7 @@ public partial class ApiSchemaTests
                                 ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyTypeApiNameType, Evoogle.ApiFramework.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests""
                     }
                 ]
             }",
@@ -2259,7 +2259,7 @@ public partial class ApiSchemaTests
                 new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"]." +
-                        $"{nameof(ApiNamedKeyType)}[\"PrimaryKey\"].{nameof(ApiKeyPath)}" +
+                        $"{nameof(ApiNamedKeyDefinition)}[\"PrimaryKey\"].{nameof(ApiKeyPath)}" +
                         $"[0][\"{nameof(TypeWithListProperty)}.Id\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
                     code: ApiSchemaCompilationCode.ApiKeyPathUnresolvedRootType,
@@ -2299,18 +2299,18 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PrimaryKey"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyTypeApiNameType, Evoogle.ApiFramework.Tests"",
+                                        ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests"",
                                         ""ClrPath"": """"
                                     }
                                 ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyTypeApiNameType, Evoogle.ApiFramework.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests""
                     }
                 ]
             }",
@@ -2320,8 +2320,8 @@ public partial class ApiSchemaTests
                 new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"]." +
-                        $"{nameof(ApiNamedKeyType)}[\"PrimaryKey\"].{nameof(ApiKeyPath)}" +
-                        $"[0][\"{nameof(DuplicateKeyTypeApiNameType)}.\"]." +
+                        $"{nameof(ApiNamedKeyDefinition)}[\"PrimaryKey\"].{nameof(ApiKeyPath)}" +
+                        $"[0][\"{nameof(DuplicateKeyApiNameObject)}.\"]." +
                         $"{nameof(ApiKeyPathSegment)}[0]",
                     severity: ApiSchemaCompilationSeverity.Error,
                     code: ApiSchemaCompilationCode.ApiKeyPathSegmentInvalidClrMemberName,
@@ -2361,12 +2361,12 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PrimaryKey"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyTypeApiNameType, Evoogle.ApiFramework.Tests"",
+                                        ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
                                             { ""ClrMemberName"": ""MissingId"" }
                                         ]
@@ -2374,7 +2374,7 @@ public partial class ApiSchemaTests
                                 ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyTypeApiNameType, Evoogle.ApiFramework.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests""
                     }
                 ]
             }",
@@ -2384,8 +2384,8 @@ public partial class ApiSchemaTests
                 new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"]." +
-                        $"{nameof(ApiNamedKeyType)}[\"PrimaryKey\"].{nameof(ApiKeyPath)}" +
-                        $"[0][\"{nameof(DuplicateKeyTypeApiNameType)}.MissingId\"]." +
+                        $"{nameof(ApiNamedKeyDefinition)}[\"PrimaryKey\"].{nameof(ApiKeyPath)}" +
+                        $"[0][\"{nameof(DuplicateKeyApiNameObject)}.MissingId\"]." +
                         $"{nameof(ApiKeyPathSegment)}[0][\"MissingId\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
                     code: ApiSchemaCompilationCode.ApiKeyPathSegmentUnresolvedApiProperty,
@@ -2436,12 +2436,12 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PrimaryKey"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyTypeApiNameType, Evoogle.ApiFramework.Tests"",
+                                        ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests"",
                                         ""ApiSegments"": [
                                             { ""ClrMemberName"": ""Id"" },
                                             { ""ClrMemberName"": ""Code"" }
@@ -2450,7 +2450,7 @@ public partial class ApiSchemaTests
                                 ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyTypeApiNameType, Evoogle.ApiFramework.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests""
                     }
                 ]
             }",
@@ -2460,8 +2460,8 @@ public partial class ApiSchemaTests
                 new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"TestObject\"]." +
-                        $"{nameof(ApiNamedKeyType)}[\"PrimaryKey\"].{nameof(ApiKeyPath)}" +
-                        $"[0][\"{nameof(DuplicateKeyTypeApiNameType)}.Id.Code\"]." +
+                        $"{nameof(ApiNamedKeyDefinition)}[\"PrimaryKey\"].{nameof(ApiKeyPath)}" +
+                        $"[0][\"{nameof(DuplicateKeyApiNameObject)}.Id.Code\"]." +
                         $"{nameof(ApiKeyPathSegment)}[0][\"Id\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
                     code: ApiSchemaCompilationCode.ApiKeyPathNavigationSegmentInvalidType,
@@ -2527,7 +2527,7 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PrimaryKey"",
                                 ""ApiKeyPaths"": [
@@ -2550,7 +2550,7 @@ public partial class ApiSchemaTests
                 new ApiSchemaCompilationIssue
                 (
                     apiPath: $"{nameof(ApiObjectType)}[\"Owner\"]." +
-                        $"{nameof(ApiNamedKeyType)}[\"PrimaryKey\"].{nameof(ApiKeyPath)}" +
+                        $"{nameof(ApiNamedKeyDefinition)}[\"PrimaryKey\"].{nameof(ApiKeyPath)}" +
                         $"[0][\"{nameof(OwnerType)}.Item\"]." +
                         $"{nameof(ApiKeyPathSegment)}[0][\"Item\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
@@ -2584,7 +2584,7 @@ public partial class ApiSchemaTests
                         ""ApiProperties"": [
                             { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""Id"",
                                 ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""Id"" } ] } ]
@@ -2685,7 +2685,7 @@ public partial class ApiSchemaTests
                         ""ApiProperties"": [
                             { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""Id"",
                                 ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""Id"" } ] } ]
@@ -2806,13 +2806,13 @@ public partial class ApiSchemaTests
             ]
         },
 
-        // ApiRelationshipPrincipalEnd throws if referenced ApiPrincipalKeyTypeName cannot be resolved
+        // ApiRelationshipPrincipalEnd throws if referenced ApiPrincipalKeyName cannot be resolved
         new CompileThrowsTest
         {
-            Name = $"{nameof(ApiRelationshipPrincipalEnd)} Throws If {nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyTypeName)} Is Unresolved",
+            Name = $"{nameof(ApiRelationshipPrincipalEnd)} Throws If {nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyName)} Is Unresolved",
             SourceJson = @"
             {
-                ""ApiName"": ""ApiRelationshipPrincipalEnd Throws If ApiPrincipalKeyTypeName Is Unresolved"",
+                ""ApiName"": ""ApiRelationshipPrincipalEnd Throws If ApiPrincipalKeyName Is Unresolved"",
                 ""ApiScalarTypes"": [
                     { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"", ""ClrType"": ""System.Int32, System.Private.CoreLib"" }
                 ],
@@ -2824,7 +2824,7 @@ public partial class ApiSchemaTests
                         ""ApiProperties"": [
                             { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""Id"",
                                 ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""Id"" } ] } ]
@@ -2847,11 +2847,11 @@ public partial class ApiSchemaTests
                         ""ApiName"": ""TestRel"",
                         ""ApiPrincipalEnd"": {
                             ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"",
-                            ""ApiPrincipalKeyTypeName"": ""NonExistentKeyType""
+                            ""ApiPrincipalKeyName"": ""NonExistentKey""
                         },
                         ""ApiDependentEnd"": {
                             ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"",
-                            ""ApiForeignKeyType"": {
+                            ""ApiForeignKey"": {
                                 ""ApiKeyPaths"": [
                                     { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""PrincipalId"" } ] }
                                 ]
@@ -2868,17 +2868,17 @@ public partial class ApiSchemaTests
                     apiPath: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"]." +
                         $"{nameof(ApiRelationshipOneTo.ApiPrincipalEnd)}",
                     severity: ApiSchemaCompilationSeverity.Error,
-                    code: ApiSchemaCompilationCode.ApiRelationshipEndUnresolvedKeyType,
-                    description: "Referenced principal key type 'NonExistentKeyType' could not be found on object type 'RelPrincipal'",
-                    remediation: "Use one of the available key types: 'Id'"
+                    code: ApiSchemaCompilationCode.ApiRelationshipEndUnresolvedKey,
+                    description: "Referenced principal key 'NonExistentKey' could not be found on object type 'RelPrincipal'",
+                    remediation: "Use one of the available keys: 'Id'"
                 ),
             ]
         },
 
-        // ApiRelationshipOneTo throws if principal key type is named on a navigational relationship
+        // ApiRelationshipOneTo throws if principal key is named on a navigational relationship
         new CompileThrowsTest
         {
-            Name = $"{nameof(ApiRelationshipOneTo)} Throws If {nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyTypeName)} Is Supplied Without Foreign Key",
+            Name = $"{nameof(ApiRelationshipOneTo)} Throws If {nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyName)} Is Supplied Without Foreign Key",
             SourceJson = @"
             {
                 ""ApiName"": ""ApiRelationshipOneTo Throws If Principal Key Name Is Supplied Without Foreign Key"",
@@ -2893,7 +2893,7 @@ public partial class ApiSchemaTests
                         ""ApiProperties"": [
                             { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""Id"",
                                 ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""Id"" } ] } ]
@@ -2916,7 +2916,7 @@ public partial class ApiSchemaTests
                         ""ApiName"": ""TestRel"",
                         ""ApiPrincipalEnd"": {
                             ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"",
-                            ""ApiPrincipalKeyTypeName"": ""Id""
+                            ""ApiPrincipalKeyName"": ""Id""
                         },
                         ""ApiDependentEnd"": { ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"" }
                     }
@@ -2930,8 +2930,8 @@ public partial class ApiSchemaTests
                     apiPath: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
                     code: ApiSchemaCompilationCode.ApiRelationshipEndPrincipalKeyWithoutForeignKey,
-                    description: $"Cannot resolve {nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyTypeName)} 'Id' because this relationship has no foreign key binding",
-                    remediation: $"Declare {nameof(ApiRelationshipOneTo.ApiDependentEnd)}.{nameof(ApiRelationshipDependentEnd.ApiForeignKeyType)} or remove {nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyTypeName)}"
+                    description: $"Cannot resolve {nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyName)} 'Id' because this relationship has no foreign key binding",
+                    remediation: $"Declare {nameof(ApiRelationshipOneTo.ApiDependentEnd)}.{nameof(ApiRelationshipDependentEnd.ApiForeignKey)} or remove {nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyName)}"
                 ),
             ]
         },
@@ -2954,7 +2954,7 @@ public partial class ApiSchemaTests
                         ""ApiProperties"": [
                             { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""Id"",
                                 ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""Id"" } ] } ]
@@ -3013,7 +3013,7 @@ public partial class ApiSchemaTests
                         ""ApiProperties"": [
                             { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""Id"",
                                 ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""Id"" } ] } ]
@@ -3072,7 +3072,7 @@ public partial class ApiSchemaTests
                         ""ApiProperties"": [
                             { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""Id"",
                                 ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""Id"" } ] } ]
@@ -3104,13 +3104,13 @@ public partial class ApiSchemaTests
             ]
         },
 
-        // ApiRelationshipManyToMany throws if ApiAssociation.ApiForeignKeyTypeA.ApiKeyPaths count does not match principal end A key type path count
+        // ApiRelationshipManyToMany throws if ApiAssociation.ApiForeignKeyA.ApiKeyPaths count does not match principal end A key path count
         new CompileThrowsTest
         {
-            Name = $"{nameof(ApiRelationshipManyToMany)} Throws If {nameof(ApiRelationshipAssociation.ApiForeignKeyTypeA)}.{nameof(ApiKeyType.ApiKeyPaths)} Count Does Not Match Principal End A Key Type",
+            Name = $"{nameof(ApiRelationshipManyToMany)} Throws If {nameof(ApiRelationshipAssociation.ApiForeignKeyA)}.{nameof(ApiKeyDefinition.ApiKeyPaths)} Count Does Not Match Principal End A Key Type",
             SourceJson = @"
             {
-                ""ApiName"": ""ApiRelationshipManyToMany Throws If ApiForeignKeyTypeA ApiKeyPaths Count Mismatch"",
+                ""ApiName"": ""ApiRelationshipManyToMany Throws If ApiForeignKeyA ApiKeyPaths Count Mismatch"",
                 ""ApiScalarTypes"": [
                     { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"", ""ClrType"": ""System.Int32, System.Private.CoreLib"" }
                 ],
@@ -3122,7 +3122,7 @@ public partial class ApiSchemaTests
                         ""ApiProperties"": [
                             { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""Id"",
                                 ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""Id"" } ] } ]
@@ -3136,7 +3136,7 @@ public partial class ApiSchemaTests
                         ""ApiProperties"": [
                             { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""Id"",
                                 ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalBType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""Id"" } ] } ]
@@ -3162,13 +3162,13 @@ public partial class ApiSchemaTests
                         ""ApiPrincipalEndB"": { ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalBType, Evoogle.ApiFramework.Tests"" },
                         ""ApiAssociation"": {
                             ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"",
-                            ""ApiForeignKeyTypeA"": {
+                            ""ApiForeignKeyA"": {
                                 ""ApiKeyPaths"": [
                                     { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""PrincipalAId"" } ] },
                                     { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""PrincipalBId"" } ] }
                                 ]
                             },
-                            ""ApiForeignKeyTypeB"": {
+                            ""ApiForeignKeyB"": {
                                 ""ApiKeyPaths"": [
                                     { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""PrincipalBId"" } ] }
                                 ]
@@ -3185,19 +3185,19 @@ public partial class ApiSchemaTests
                     apiPath: $"{nameof(ApiRelationshipManyToMany)}[\"TestRel\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
                     code: ApiSchemaCompilationCode.ApiRelationshipManyToManyInvalidAssociationKeyPathsACount,
-                    description: $"Cannot automatically determine the referenced principal key type for principal end A: {nameof(ApiRelationshipManyToMany.ApiAssociation)}.{nameof(ApiRelationshipAssociation.ApiForeignKeyTypeA)}.{nameof(ApiKeyType.ApiKeyPaths)} has 2 key path(s), but no key type on 'RelPrincipal' has 2 key path(s)",
-                    remediation: $"Set {nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyTypeName)} on principal end A explicitly or align the foreign key shape with one of these key types: 'Id'"
+                    description: $"Cannot automatically determine the referenced principal key for principal end A: {nameof(ApiRelationshipManyToMany.ApiAssociation)}.{nameof(ApiRelationshipAssociation.ApiForeignKeyA)}.{nameof(ApiKeyDefinition.ApiKeyPaths)} has 2 key path(s), but no key on 'RelPrincipal' has 2 key path(s)",
+                    remediation: $"Set {nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyName)} on principal end A explicitly or align the foreign key shape with one of these keys: 'Id'"
                 ),
             ]
         },
 
-        // ApiRelationshipManyToMany throws if ApiAssociation.ApiForeignKeyTypeB.ApiKeyPaths count does not match principal end B key type path count
+        // ApiRelationshipManyToMany throws if ApiAssociation.ApiForeignKeyB.ApiKeyPaths count does not match principal end B key path count
         new CompileThrowsTest
         {
-            Name = $"{nameof(ApiRelationshipManyToMany)} Throws If {nameof(ApiRelationshipAssociation.ApiForeignKeyTypeB)}.{nameof(ApiKeyType.ApiKeyPaths)} Count Does Not Match Principal End B Key Type",
+            Name = $"{nameof(ApiRelationshipManyToMany)} Throws If {nameof(ApiRelationshipAssociation.ApiForeignKeyB)}.{nameof(ApiKeyDefinition.ApiKeyPaths)} Count Does Not Match Principal End B Key Type",
             SourceJson = @"
             {
-                ""ApiName"": ""ApiRelationshipManyToMany Throws If ApiForeignKeyTypeB ApiKeyPaths Count Mismatch"",
+                ""ApiName"": ""ApiRelationshipManyToMany Throws If ApiForeignKeyB ApiKeyPaths Count Mismatch"",
                 ""ApiScalarTypes"": [
                     { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"", ""ClrType"": ""System.Int32, System.Private.CoreLib"" }
                 ],
@@ -3209,7 +3209,7 @@ public partial class ApiSchemaTests
                         ""ApiProperties"": [
                             { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""Id"",
                                 ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""Id"" } ] } ]
@@ -3223,7 +3223,7 @@ public partial class ApiSchemaTests
                         ""ApiProperties"": [
                             { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""Id"",
                                 ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalBType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""Id"" } ] } ]
@@ -3249,12 +3249,12 @@ public partial class ApiSchemaTests
                         ""ApiPrincipalEndB"": { ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalBType, Evoogle.ApiFramework.Tests"" },
                         ""ApiAssociation"": {
                             ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"",
-                            ""ApiForeignKeyTypeA"": {
+                            ""ApiForeignKeyA"": {
                                 ""ApiKeyPaths"": [
                                     { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""PrincipalAId"" } ] }
                                 ]
                             },
-                            ""ApiForeignKeyTypeB"": {
+                            ""ApiForeignKeyB"": {
                                 ""ApiKeyPaths"": [
                                     { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""PrincipalAId"" } ] },
                                     { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelAssociationType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""PrincipalBId"" } ] }
@@ -3272,19 +3272,19 @@ public partial class ApiSchemaTests
                     apiPath: $"{nameof(ApiRelationshipManyToMany)}[\"TestRel\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
                     code: ApiSchemaCompilationCode.ApiRelationshipManyToManyInvalidAssociationKeyPathsBCount,
-                    description: $"Cannot automatically determine the referenced principal key type for principal end B: {nameof(ApiRelationshipManyToMany.ApiAssociation)}.{nameof(ApiRelationshipAssociation.ApiForeignKeyTypeB)}.{nameof(ApiKeyType.ApiKeyPaths)} has 2 key path(s), but no key type on 'RelPrincipalB' has 2 key path(s)",
-                    remediation: $"Set {nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyTypeName)} on principal end B explicitly or align the foreign key shape with one of these key types: 'Id'"
+                    description: $"Cannot automatically determine the referenced principal key for principal end B: {nameof(ApiRelationshipManyToMany.ApiAssociation)}.{nameof(ApiRelationshipAssociation.ApiForeignKeyB)}.{nameof(ApiKeyDefinition.ApiKeyPaths)} has 2 key path(s), but no key on 'RelPrincipalB' has 2 key path(s)",
+                    remediation: $"Set {nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyName)} on principal end B explicitly or align the foreign key shape with one of these keys: 'Id'"
                 ),
             ]
         },
 
-        // ApiRelationshipOneTo throws if ApiDependentEnd.ApiForeignKeyType.ApiKeyPaths count does not match principal key type path count
+        // ApiRelationshipOneTo throws if ApiDependentEnd.ApiForeignKey.ApiKeyPaths count does not match principal key path count
         new CompileThrowsTest
         {
-            Name = $"{nameof(ApiRelationshipOneTo)} Throws If {nameof(ApiRelationshipDependentEnd.ApiForeignKeyType)}.{nameof(ApiKeyType.ApiKeyPaths)} Count Does Not Match Principal Key Type",
+            Name = $"{nameof(ApiRelationshipOneTo)} Throws If {nameof(ApiRelationshipDependentEnd.ApiForeignKey)}.{nameof(ApiKeyDefinition.ApiKeyPaths)} Count Does Not Match Principal Key Type",
             SourceJson = @"
             {
-                ""ApiName"": ""ApiRelationshipOneTo Throws If Dependent ForeignKeyType ApiKeyPaths Count Mismatch"",
+                ""ApiName"": ""ApiRelationshipOneTo Throws If Dependent ForeignKey ApiKeyPaths Count Mismatch"",
                 ""ApiScalarTypes"": [
                     { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"", ""ClrType"": ""System.Int32, System.Private.CoreLib"" }
                 ],
@@ -3296,7 +3296,7 @@ public partial class ApiSchemaTests
                         ""ApiProperties"": [
                             { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""Id"",
                                 ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""Id"" } ] } ]
@@ -3321,7 +3321,7 @@ public partial class ApiSchemaTests
                         ""ApiPrincipalEnd"": { ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"" },
                         ""ApiDependentEnd"": {
                             ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"",
-                            ""ApiForeignKeyType"": {
+                            ""ApiForeignKey"": {
                                 ""ApiKeyPaths"": [
                                     { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""PrincipalId"" } ] },
                                     { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""PrincipalId2"" } ] }
@@ -3339,13 +3339,13 @@ public partial class ApiSchemaTests
                     apiPath: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
                     code: ApiSchemaCompilationCode.ApiRelationshipOneToInvalidDependentKeyPathsCount,
-                    description: $"Cannot automatically determine the referenced principal key type: {nameof(ApiRelationshipOneTo.ApiDependentEnd)}.{nameof(ApiRelationshipDependentEnd.ApiForeignKeyType)}.{nameof(ApiKeyType.ApiKeyPaths)} has 2 key path(s), but no key type on 'RelPrincipal' has 2 key path(s)",
-                    remediation: $"Set {nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyTypeName)} explicitly or align the foreign key shape with one of these key types: 'Id'"
+                    description: $"Cannot automatically determine the referenced principal key: {nameof(ApiRelationshipOneTo.ApiDependentEnd)}.{nameof(ApiRelationshipDependentEnd.ApiForeignKey)}.{nameof(ApiKeyDefinition.ApiKeyPaths)} has 2 key path(s), but no key on 'RelPrincipal' has 2 key path(s)",
+                    remediation: $"Set {nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyName)} explicitly or align the foreign key shape with one of these keys: 'Id'"
                 ),
             ]
         },
 
-        // ApiRelationshipOneTo throws if an explicitly selected principal key type is incompatible with the dependent foreign key type
+        // ApiRelationshipOneTo throws if an explicitly selected principal key is incompatible with the dependent foreign key
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiRelationshipOneTo)} Throws If Explicit Principal Key Type Is Incompatible With Foreign Key Type",
@@ -3364,13 +3364,13 @@ public partial class ApiSchemaTests
                         ""ApiProperties"": [
                             { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PK_Id"",
-                                ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyTypeApiNameType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""Id"" } ] } ]
+                                ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""Id"" } ] } ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyTypeApiNameType, Evoogle.ApiFramework.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests""
                     },
                     {
                         ""ApiKind"": ""Object"",
@@ -3385,10 +3385,10 @@ public partial class ApiSchemaTests
                     {
                         ""ApiKind"": ""OneToMany"",
                         ""ApiName"": ""TestRel"",
-                        ""ApiPrincipalEnd"": { ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyTypeApiNameType, Evoogle.ApiFramework.Tests"", ""ApiPrincipalKeyTypeName"": ""PK_Id"" },
+                        ""ApiPrincipalEnd"": { ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests"", ""ApiPrincipalKeyName"": ""PK_Id"" },
                         ""ApiDependentEnd"": {
                             ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"",
-                            ""ApiForeignKeyType"": {
+                            ""ApiForeignKey"": {
                                 ""ApiKeyPaths"": [
                                     { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""PrincipalCode"" } ] }
                                 ]
@@ -3405,8 +3405,8 @@ public partial class ApiSchemaTests
                     apiPath: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
                     code: ApiSchemaCompilationCode.ApiRelationshipIncompatiblePrincipalForeignKey,
-                    description: $"{nameof(ApiRelationshipOneTo.ApiDependentEnd)}.{nameof(ApiRelationshipDependentEnd.ApiForeignKeyType)} leaf type(s) [String] are not compatible with principal end principal key type 'PK_Id' leaf type(s) [Int32]",
-                    remediation: $"Ensure {nameof(ApiRelationshipOneTo.ApiDependentEnd)}.{nameof(ApiRelationshipDependentEnd.ApiForeignKeyType)} paths are ordered to match the principal end's principal key type and use compatible scalar types"
+                    description: $"{nameof(ApiRelationshipOneTo.ApiDependentEnd)}.{nameof(ApiRelationshipDependentEnd.ApiForeignKey)} leaf type(s) [String] are not compatible with principal end principal key 'PK_Id' leaf type(s) [Int32]",
+                    remediation: $"Ensure {nameof(ApiRelationshipOneTo.ApiDependentEnd)}.{nameof(ApiRelationshipDependentEnd.ApiForeignKey)} paths are ordered to match the principal end's principal key and use compatible scalar types"
                 ),
             ]
         },
@@ -3429,7 +3429,7 @@ public partial class ApiSchemaTests
                         ""ApiProperties"": [
                             { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""Id"",
                                 ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelPrincipalType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""Id"" } ] } ]
@@ -3475,7 +3475,7 @@ public partial class ApiSchemaTests
             ]
         },
 
-        // ApiRelationshipOneTo throws if the principal has multiple key types compatible with the foreign key (ambiguous)
+        // ApiRelationshipOneTo throws if the principal has multiple keys compatible with the foreign key (ambiguous)
         new CompileThrowsTest
         {
             Name = $"{nameof(ApiRelationshipOneTo)} Throws If Principal Key Type Is Ambiguous",
@@ -3494,17 +3494,17 @@ public partial class ApiSchemaTests
                             { ""ApiName"": ""Id"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Id"", ""ClrMemberKind"": ""Property"" },
                             { ""ApiName"": ""Code"", ""ApiType"": { ""ApiKind"": ""Scalar"", ""ApiName"": ""Int32"" }, ""ApiTypeModifiers"": ""Required"", ""ClrName"": ""Code"", ""ClrMemberKind"": ""Property"" }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PK_Id"",
-                                ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyTypeApiNameType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""Id"" } ] } ]
+                                ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""Id"" } ] } ]
                             },
                             {
                                 ""ApiName"": ""PK_Code"",
-                                ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyTypeApiNameType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""Code"" } ] } ]
+                                ""ApiKeyPaths"": [ { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""Code"" } ] } ]
                             }
                         ],
-                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyTypeApiNameType, Evoogle.ApiFramework.Tests""
+                        ""ClrType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests""
                     },
                     {
                         ""ApiKind"": ""Object"",
@@ -3519,10 +3519,10 @@ public partial class ApiSchemaTests
                     {
                         ""ApiKind"": ""OneToMany"",
                         ""ApiName"": ""TestRel"",
-                        ""ApiPrincipalEnd"": { ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyTypeApiNameType, Evoogle.ApiFramework.Tests"" },
+                        ""ApiPrincipalEnd"": { ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+DuplicateKeyApiNameObject, Evoogle.ApiFramework.Tests"" },
                         ""ApiDependentEnd"": {
                             ""ClrObjectType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"",
-                            ""ApiForeignKeyType"": {
+                            ""ApiForeignKey"": {
                                 ""ApiKeyPaths"": [
                                     { ""ClrRootType"": ""Evoogle.ApiFramework.Schema.ApiSchemaTests+RelDependentType, Evoogle.ApiFramework.Tests"", ""ApiSegments"": [ { ""ClrMemberName"": ""PrincipalId"" } ] }
                                 ]
@@ -3539,8 +3539,8 @@ public partial class ApiSchemaTests
                     apiPath: $"{nameof(ApiRelationshipOneToMany)}[\"TestRel\"]",
                     severity: ApiSchemaCompilationSeverity.Error,
                     code: ApiSchemaCompilationCode.ApiRelationshipAmbiguousPrincipalKey,
-                    description: "Cannot automatically determine the referenced principal key type: 2 key types on 'RelPrincipal' are compatible with the foreign key type: 'PK_Id', 'PK_Code'",
-                    remediation: $"Set {nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyTypeName)} to specify the principal key type explicitly; available key types: 'PK_Id', 'PK_Code'"
+                    description: "Cannot automatically determine the referenced principal key: 2 keys on 'RelPrincipal' are compatible with the foreign key: 'PK_Id', 'PK_Code'",
+                    remediation: $"Set {nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyName)} to specify the principal key explicitly; available keys: 'PK_Id', 'PK_Code'"
                 ),
             ]
         },

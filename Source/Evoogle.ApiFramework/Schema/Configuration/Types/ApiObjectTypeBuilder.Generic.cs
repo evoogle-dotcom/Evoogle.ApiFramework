@@ -33,7 +33,8 @@ public sealed class ApiObjectTypeBuilder<TObject>(ApiSchemaBuilderContext contex
 
     #region AddKey Methods
     /// <summary>
-    ///     Adds an <see cref="ApiKeyType"/> definition using a strongly-typed <see cref="ApiKeyTypeBuilder{TObject}"/>
+    ///     Adds an <see cref="ApiKeyDefinition"/> using a strongly-typed
+    ///     <see cref="ApiKeyDefinitionBuilder{TObject}"/>
     ///     callback that supports expression-based property selection.
     /// </summary>
     /// <remarks>
@@ -45,20 +46,20 @@ public sealed class ApiObjectTypeBuilder<TObject>(ApiSchemaBuilderContext contex
     ///     <see cref="ApiObjectTypeBuilder.AddKey"/> overload. Both overloads configure
     ///     the same internally managed key builder.
     /// </remarks>
-    /// <param name="apiName">The API name of the key type.</param>
-    /// <param name="configure">Optional callback to configure the key type using a typed builder.</param>
+    /// <param name="apiName">The API name of the key.</param>
+    /// <param name="configure">Optional callback to configure the key using a typed builder.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiObjectTypeBuilder<TObject> AddKey(string apiName, Action<ApiKeyTypeBuilder<TObject>>? configure = null)
+    public ApiObjectTypeBuilder<TObject> AddKey(string apiName, Action<ApiKeyDefinitionBuilder<TObject>>? configure = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
 
-        var apiKeyTypeBuilder = (ApiKeyTypeBuilder<TObject>)this.GetOrAddKeyTypeBuilder(apiName);
-        configure?.Invoke(apiKeyTypeBuilder);
+        var apiKeyDefinitionBuilder = (ApiKeyDefinitionBuilder<TObject>)this.GetOrAddKeyBuilder(apiName);
+        configure?.Invoke(apiKeyDefinitionBuilder);
         return this;
     }
 
-    /// <inheritdoc cref="ApiObjectTypeBuilder.AddKey(string, Action{ApiKeyTypeBuilder}?)"/>
-    public new ApiObjectTypeBuilder<TObject> AddKey(string apiName, Action<ApiKeyTypeBuilder>? configure = null)
+    /// <inheritdoc cref="ApiObjectTypeBuilder.AddKey(string, Action{ApiKeyDefinitionBuilder}?)"/>
+    public new ApiObjectTypeBuilder<TObject> AddKey(string apiName, Action<ApiKeyDefinitionBuilder>? configure = null)
     {
         base.AddKey(apiName, configure);
         return this;
@@ -91,7 +92,7 @@ public sealed class ApiObjectTypeBuilder<TObject>(ApiSchemaBuilderContext contex
     public new ApiObjectTypeBuilder<TObject> WithVersion
     (
         string clrMemberName,
-        Action<ApiVersionTypeBuilder>? configure = null
+        Action<ApiVersionDefinitionBuilder>? configure = null
     )
     {
         base.WithVersion(clrMemberName, configure);
@@ -102,7 +103,7 @@ public sealed class ApiObjectTypeBuilder<TObject>(ApiSchemaBuilderContext contex
     public new ApiObjectTypeBuilder<TObject> WithRepositoryVersion
     (
         Type clrVersionType,
-        Action<ApiVersionTypeBuilder>? configure = null
+        Action<ApiVersionDefinitionBuilder>? configure = null
     )
     {
         base.WithRepositoryVersion(clrVersionType, configure);
@@ -115,7 +116,7 @@ public sealed class ApiObjectTypeBuilder<TObject>(ApiSchemaBuilderContext contex
     /// <returns>The current builder.</returns>
     public ApiObjectTypeBuilder<TObject> WithRepositoryVersion<TVersion>
     (
-        Action<ApiVersionTypeBuilder>? configure = null
+        Action<ApiVersionDefinitionBuilder>? configure = null
     )
     {
         base.WithRepositoryVersion(typeof(TVersion), configure);

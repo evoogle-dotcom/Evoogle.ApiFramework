@@ -6,13 +6,13 @@
 namespace Evoogle.ApiFramework.Schema.Relationships;
 
 /// <summary>
-///     Describes how a relationship's principal key type was selected for a resolved key binding.
+///     Describes how a relationship's principal key was selected for a resolved key binding.
 /// </summary>
 public enum ApiRelationshipPrincipalKeyResolutionSource
 {
-    /// <summary>The principal key type was selected by an explicit principal key type name.</summary>
+    /// <summary>The principal key was selected by an explicit principal key name.</summary>
     Explicit,
 
-    /// <summary>The principal key type was inferred from the foreign key shape.</summary>
+    /// <summary>The principal key was inferred from the foreign key shape.</summary>
     Inferred,
 }

@@ -58,9 +58,9 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
         #region Properties
         public ApiObjectTypeOptions? ApiOptions { get; set; }
         public List<ApiProperty>? ApiProperties { get; set; }
-        public List<ApiNamedKeyType>? ApiKeyTypes { get; set; }
-        public ApiVersionType? ApiVersionType { get; set; }
-        public bool HasApiVersionType { get; set; }
+        public List<ApiNamedKeyDefinition>? ApiKeys { get; set; }
+        public ApiVersionDefinition? ApiVersion { get; set; }
+        public bool HasApiVersion { get; set; }
         #endregion
     }
 
@@ -110,8 +110,8 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
             // ApiObjectType Property Handlers
             { propertyNames.ApiObjectType.ApiOptions, HandleApiObjectTypeApiOptions },
             { propertyNames.ApiObjectType.ApiProperties, HandleApiObjectTypeApiProperties },
-            { propertyNames.ApiObjectType.ApiKeyTypes, HandleApiObjectTypeApiKeyTypes },
-            { propertyNames.ApiObjectType.ApiVersionType, HandleApiObjectTypeApiVersionType },
+            { propertyNames.ApiObjectType.ApiKeys, HandleApiObjectTypeApiKeys },
+            { propertyNames.ApiObjectType.ApiVersion, HandleApiObjectTypeApiVersion },
 
             // ApiType Property Handlers
             { propertyNames.ApiType.ApiKind, HandleApiTypeApiKind },
@@ -171,27 +171,27 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
         #endregion
 
         #region ApiObjectType Methods
-        private static void HandleApiObjectTypeApiKeyTypes(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
+        private static void HandleApiObjectTypeApiKeys(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
             context.ReadData.ApiObjectType ??= new ApiObjectTypeReadData();
-            context.ReadData.ApiObjectType.ApiKeyTypes ??= [];
+            context.ReadData.ApiObjectType.ApiKeys ??= [];
 
-            ReadJsonArray(ref reader, context, (x) => HandleApiObjectTypeApiKeyTypesArrayItem);
+            ReadJsonArray(ref reader, context, (x) => HandleApiObjectTypeApiKeysArrayItem);
         }
 
-        private static void HandleApiObjectTypeApiKeyTypesArrayItem(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
+        private static void HandleApiObjectTypeApiKeysArrayItem(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
-            var apiKeyType = JsonSerializer.Deserialize<ApiNamedKeyType>
+            var apiKeyDefinition = JsonSerializer.Deserialize<ApiNamedKeyDefinition>
             (
                 ref reader,
                 context.Options
             );
-            if (apiKeyType == null)
+            if (apiKeyDefinition == null)
             {
                 return;
             }
 
-            context.ReadData.ApiObjectType!.ApiKeyTypes!.Add(apiKeyType);
+            context.ReadData.ApiObjectType!.ApiKeys!.Add(apiKeyDefinition);
         }
 
         private static void HandleApiObjectTypeApiOptions(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
@@ -201,20 +201,21 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
             context.ReadData.ApiObjectType.ApiOptions = JsonSerializer.Deserialize<ApiObjectTypeOptions>(ref reader, context.Options);
         }
 
-        private static void HandleApiObjectTypeApiVersionType
+        private static void HandleApiObjectTypeApiVersion
         (
             ref Utf8JsonReader reader,
             DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context
         )
         {
             context.ReadData.ApiObjectType ??= new ApiObjectTypeReadData();
-            if (context.ReadData.ApiObjectType.HasApiVersionType)
+            if (context.ReadData.ApiObjectType.HasApiVersion)
             {
-                throw new JsonException($"Duplicate {nameof(ApiObjectType.ApiVersionType)} JSON member.");
+                throw new JsonException($"Duplicate {nameof(ApiObjectType.ApiVersion)} JSON member.");
             }
 
-            context.ReadData.ApiObjectType.HasApiVersionType = true;
-            context.ReadData.ApiObjectType.ApiVersionType = JsonSerializer.Deserialize<ApiVersionType>(ref reader, context.Options);
+            context.ReadData.ApiObjectType.HasApiVersion = true;
+            context.ReadData.ApiObjectType.ApiVersion =
+                JsonSerializer.Deserialize<ApiVersionDefinition>(ref reader, context.Options);
         }
 
         private static void HandleApiObjectTypeApiProperties(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)

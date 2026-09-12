@@ -31,11 +31,11 @@ public enum ApiSchemaElementKind
     /// <summary>Represents an <see cref="ApiKeyPathSegment"/>.</summary>
     KeyPathSegment,
 
-    /// <summary>Represents an <see cref="ApiKeyType"/>.</summary>
-    KeyType,
+    /// <summary>Represents an <see cref="ApiKeyDefinition"/>.</summary>
+    KeyDefinition,
 
-    /// <summary>Represents an <see cref="ApiNamedKeyType"/>.</summary>
-    NamedKeyType,
+    /// <summary>Represents an <see cref="ApiNamedKeyDefinition"/>.</summary>
+    NamedKeyDefinition,
 
     /// <summary>Represents an <see cref="ApiObjectType"/>.</summary>
     ObjectType,
@@ -67,7 +67,7 @@ public enum ApiSchemaElementKind
     /// <summary>Represents an <see cref="ApiSchema"/>.</summary>
     Schema,
 
-    /// <summary>Represents an <see cref="ApiVersionType"/>.</summary>
-    VersionType
+    /// <summary>Represents an <see cref="ApiVersionDefinition"/>.</summary>
+    VersionDefinition
     #endregion
 }

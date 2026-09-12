@@ -12,7 +12,7 @@ using FluentAssertions;
 
 namespace Evoogle.ApiFramework.Schema.Key;
 
-public partial class ApiKeyTypeTests
+public partial class ApiKeyDefinitionTests
 {
     #region Test Types
     private class TypeHierarchyTest : XUnitTest
@@ -22,48 +22,48 @@ public partial class ApiKeyTypeTests
         #endregion
 
         #region Calculated Properties
-        private ApiKeyType? ApiKeyType { get; set; }
-        private ApiNamedKeyType? ApiNamedKeyType { get; set; }
-        private PropertyInfo? ApiKeyTypeApiNameProperty { get; set; }
-        private PropertyInfo? ApiNamedKeyTypeApiNameProperty { get; set; }
-        private NullabilityState? ApiNamedKeyTypeApiNameNullability { get; set; }
+        private ApiKeyDefinition? ApiKeyDefinition { get; set; }
+        private ApiNamedKeyDefinition? ApiNamedKeyDefinition { get; set; }
+        private PropertyInfo? ApiKeyDefinitionApiNameProperty { get; set; }
+        private PropertyInfo? ApiNamedKeyDefinitionApiNameProperty { get; set; }
+        private NullabilityState? ApiNamedKeyDefinitionApiNameNullability { get; set; }
         private ParameterInfo? ApiNameConstructorParameter { get; set; }
         private NullabilityState? ApiNameConstructorParameterNullability { get; set; }
-        private Type? ApiObjectKeyTypesPropertyType { get; set; }
+        private Type? ApiObjectKeysPropertyType { get; set; }
         private ConstructorInfo[]? ApiRelationshipKeyBindingPublicConstructors { get; set; }
         private ConstructorInfo? ApiRelationshipKeyBindingInternalConstructor { get; set; }
         private Type[]? ApiRelationshipKeyBindingConstructorParameterTypes { get; set; }
-        private Type? ApiRelationshipPrincipalKeyTypePropertyType { get; set; }
-        private NullabilityState? ApiRelationshipPrincipalKeyTypeNameNullability { get; set; }
-        private Type[]? ApiRelationshipForeignKeyTypePropertyTypes { get; set; }
+        private Type? ApiRelationshipPrincipalKeyPropertyType { get; set; }
+        private NullabilityState? ApiRelationshipPrincipalKeyNameNullability { get; set; }
+        private Type[]? ApiRelationshipForeignKeyPropertyTypes { get; set; }
         #endregion
 
         #region XUnitTest Methods
         protected override void Arrange()
         {
-            this.ApiKeyType = new ApiKeyType([]);
-            this.ApiNamedKeyType = new ApiNamedKeyType(this.ApiName, []);
+            this.ApiKeyDefinition = new ApiKeyDefinition([]);
+            this.ApiNamedKeyDefinition = new ApiNamedKeyDefinition(this.ApiName, []);
         }
 
         protected override void Act()
         {
-            this.ApiKeyTypeApiNameProperty = typeof(ApiKeyType).GetProperty
+            this.ApiKeyDefinitionApiNameProperty = typeof(ApiKeyDefinition).GetProperty
             (
-                nameof(this.ApiNamedKeyType.ApiName),
+                nameof(this.ApiNamedKeyDefinition.ApiName),
                 BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly
             );
-            this.ApiNamedKeyTypeApiNameProperty = typeof(ApiNamedKeyType).GetProperty
+            this.ApiNamedKeyDefinitionApiNameProperty = typeof(ApiNamedKeyDefinition).GetProperty
             (
-                nameof(this.ApiNamedKeyType.ApiName),
+                nameof(this.ApiNamedKeyDefinition.ApiName),
                 BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly
             );
 
-            this.ApiNamedKeyTypeApiNameNullability = this.ApiNamedKeyTypeApiNameProperty is not null
+            this.ApiNamedKeyDefinitionApiNameNullability = this.ApiNamedKeyDefinitionApiNameProperty is not null
                 ? new NullabilityInfoContext()
-                    .Create(this.ApiNamedKeyTypeApiNameProperty)
+                    .Create(this.ApiNamedKeyDefinitionApiNameProperty)
                     .ReadState
                 : null;
-            this.ApiNameConstructorParameter = typeof(ApiNamedKeyType)
+            this.ApiNameConstructorParameter = typeof(ApiNamedKeyDefinition)
                 .GetConstructors()
                 .Single()
                 .GetParameters()
@@ -72,8 +72,8 @@ public partial class ApiKeyTypeTests
                 .Create(this.ApiNameConstructorParameter)
                 .ReadState;
 
-            this.ApiObjectKeyTypesPropertyType = typeof(ApiObjectType)
-                .GetProperty(nameof(ApiObjectType.ApiKeyTypes))
+            this.ApiObjectKeysPropertyType = typeof(ApiObjectType)
+                .GetProperty(nameof(ApiObjectType.ApiKeys))
                 ?.PropertyType;
             this.ApiRelationshipKeyBindingPublicConstructors = typeof(ApiRelationshipKeyBinding)
                 .GetConstructors(BindingFlags.Instance | BindingFlags.Public);
@@ -85,71 +85,71 @@ public partial class ApiKeyTypeTests
                     ?.GetParameters()
                     .Select(static parameter => parameter.ParameterType)
                     .ToArray();
-            this.ApiRelationshipPrincipalKeyTypePropertyType = typeof(ApiRelationshipKeyBinding)
-                .GetProperty(nameof(ApiRelationshipKeyBinding.ApiPrincipalKeyType))
+            this.ApiRelationshipPrincipalKeyPropertyType = typeof(ApiRelationshipKeyBinding)
+                .GetProperty(nameof(ApiRelationshipKeyBinding.ApiPrincipalKey))
                 ?.PropertyType;
 
-            var apiPrincipalKeyTypeNameProperty = typeof(ApiRelationshipKeyBinding)
-                .GetProperty(nameof(ApiRelationshipKeyBinding.ApiPrincipalKeyTypeName));
-            this.ApiRelationshipPrincipalKeyTypeNameNullability =
-                apiPrincipalKeyTypeNameProperty is not null
+            var apiPrincipalKeyNameProperty = typeof(ApiRelationshipKeyBinding)
+                .GetProperty(nameof(ApiRelationshipKeyBinding.ApiPrincipalKeyName));
+            this.ApiRelationshipPrincipalKeyNameNullability =
+                apiPrincipalKeyNameProperty is not null
                     ? new NullabilityInfoContext()
-                        .Create(apiPrincipalKeyTypeNameProperty)
+                        .Create(apiPrincipalKeyNameProperty)
                         .ReadState
                     : null;
 
-            this.ApiRelationshipForeignKeyTypePropertyTypes =
+            this.ApiRelationshipForeignKeyPropertyTypes =
             [
                 typeof(ApiRelationshipDependentEnd)
-                    .GetProperty(nameof(ApiRelationshipDependentEnd.ApiForeignKeyType))!
+                    .GetProperty(nameof(ApiRelationshipDependentEnd.ApiForeignKey))!
                     .PropertyType,
                 typeof(ApiRelationshipAssociation)
-                    .GetProperty(nameof(ApiRelationshipAssociation.ApiForeignKeyTypeA))!
+                    .GetProperty(nameof(ApiRelationshipAssociation.ApiForeignKeyA))!
                     .PropertyType,
                 typeof(ApiRelationshipAssociation)
-                    .GetProperty(nameof(ApiRelationshipAssociation.ApiForeignKeyTypeB))!
+                    .GetProperty(nameof(ApiRelationshipAssociation.ApiForeignKeyB))!
                     .PropertyType,
                 typeof(ApiRelationshipKeyBinding)
-                    .GetProperty(nameof(ApiRelationshipKeyBinding.ApiForeignKeyType))!
+                    .GetProperty(nameof(ApiRelationshipKeyBinding.ApiForeignKey))!
                     .PropertyType,
             ];
         }
 
         protected override void Assert()
         {
-            this.ApiKeyType.Should().BeOfType<ApiKeyType>();
-            this.ApiNamedKeyType.Should().BeOfType<ApiNamedKeyType>();
-            this.ApiNamedKeyType.Should().BeAssignableTo<ApiKeyType>();
-            this.ApiNamedKeyType!.ApiName.Should().Be(this.ApiName);
+            this.ApiKeyDefinition.Should().BeOfType<ApiKeyDefinition>();
+            this.ApiNamedKeyDefinition.Should().BeOfType<ApiNamedKeyDefinition>();
+            this.ApiNamedKeyDefinition.Should().BeAssignableTo<ApiKeyDefinition>();
+            this.ApiNamedKeyDefinition!.ApiName.Should().Be(this.ApiName);
 
-            this.ApiKeyTypeApiNameProperty.Should().BeNull();
-            this.ApiNamedKeyTypeApiNameProperty.Should().NotBeNull();
-            this.ApiNamedKeyTypeApiNameProperty!.PropertyType.Should().Be<string>();
-            this.ApiNamedKeyTypeApiNameNullability.Should().Be(NullabilityState.NotNull);
+            this.ApiKeyDefinitionApiNameProperty.Should().BeNull();
+            this.ApiNamedKeyDefinitionApiNameProperty.Should().NotBeNull();
+            this.ApiNamedKeyDefinitionApiNameProperty!.PropertyType.Should().Be<string>();
+            this.ApiNamedKeyDefinitionApiNameNullability.Should().Be(NullabilityState.NotNull);
             this.ApiNameConstructorParameter.Should().NotBeNull();
             this.ApiNameConstructorParameter!.IsOptional.Should().BeFalse();
             this.ApiNameConstructorParameter.ParameterType.Should().Be<string>();
             this.ApiNameConstructorParameterNullability.Should().Be(NullabilityState.NotNull);
 
-            this.ApiObjectKeyTypesPropertyType.Should()
-                .Be<ImmutableArray<ApiNamedKeyType>>();
+            this.ApiObjectKeysPropertyType.Should()
+                .Be<ImmutableArray<ApiNamedKeyDefinition>>();
             this.ApiRelationshipKeyBindingPublicConstructors.Should().BeEmpty();
             this.ApiRelationshipKeyBindingInternalConstructor.Should().NotBeNull();
             this.ApiRelationshipKeyBindingInternalConstructor!.IsAssembly.Should().BeTrue();
             this.ApiRelationshipKeyBindingConstructorParameterTypes.Should().Equal
             (
                 typeof(ApiRelationshipPrincipalEnd),
-                typeof(ApiNamedKeyType),
-                typeof(ApiKeyType),
+                typeof(ApiNamedKeyDefinition),
+                typeof(ApiKeyDefinition),
                 typeof(ApiRelationshipPrincipalKeyResolutionSource)
             );
-            this.ApiRelationshipPrincipalKeyTypePropertyType.Should().Be<ApiNamedKeyType>();
-            this.ApiRelationshipPrincipalKeyTypeNameNullability
+            this.ApiRelationshipPrincipalKeyPropertyType.Should().Be<ApiNamedKeyDefinition>();
+            this.ApiRelationshipPrincipalKeyNameNullability
                 .Should()
                 .Be(NullabilityState.NotNull);
-            this.ApiRelationshipForeignKeyTypePropertyTypes.Should().OnlyContain
+            this.ApiRelationshipForeignKeyPropertyTypes.Should().OnlyContain
             (
-                propertyType => propertyType == typeof(ApiKeyType)
+                propertyType => propertyType == typeof(ApiKeyDefinition)
             );
         }
         #endregion
@@ -161,10 +161,10 @@ public partial class ApiKeyTypeTests
     [
         new TypeHierarchyTest
         {
-            Name = $"{nameof(ApiNamedKeyType)} owns a required non-nullable " +
-                $"{nameof(ApiNamedKeyType.ApiName)}, object and resolved principal keys " +
+            Name = $"{nameof(ApiNamedKeyDefinition)} owns a required non-nullable " +
+                $"{nameof(ApiNamedKeyDefinition.ApiName)}, object and resolved principal keys " +
                 "are named, " +
-                $"and relationship foreign keys retain {nameof(ApiKeyType)}",
+                $"and relationship foreign keys retain {nameof(ApiKeyDefinition)}",
             ApiName = "PrimaryKey"
         },
     ];

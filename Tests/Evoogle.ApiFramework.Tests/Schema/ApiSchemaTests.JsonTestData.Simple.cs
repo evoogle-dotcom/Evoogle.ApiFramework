@@ -551,9 +551,9 @@ public partial class ApiSchemaTests
                                 ClrMemberKind: ClrMemberKind.Property
                             ),
                         ],
-                        ApiKeyTypes:
+                        ApiKeys:
                         [
-                            new ApiKeyTypeDef
+                            new ApiKeyDef
                             (
                                 ApiName: "PK_Person_Id",
                                 ApiKeyPaths:
@@ -561,7 +561,7 @@ public partial class ApiSchemaTests
                                     new ApiKeyPathDef(ClrRootType: typeof(Person), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(Person.Id))])
                                 ]
                             ),
-                            new ApiKeyTypeDef
+                            new ApiKeyDef
                             (
                                 ApiName: "AK_Person_Name",
                                 ApiKeyPaths:
@@ -694,7 +694,7 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PK_Person_Id"",
                                 ""ApiKeyPaths"": [
@@ -811,9 +811,9 @@ public partial class ApiSchemaTests
                                 ClrMemberKind: ClrMemberKind.Property
                             ),
                         ],
-                        ApiKeyTypes:
+                        ApiKeys:
                         [
-                            new ApiKeyTypeDef
+                            new ApiKeyDef
                             (
                                 ApiName: "PK_Person_Id",
                                 ApiKeyPaths:
@@ -821,7 +821,7 @@ public partial class ApiSchemaTests
                                     new ApiKeyPathDef(ClrRootType: typeof(Person), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(Person.Id))])
                                 ]
                             ),
-                            new ApiKeyTypeDef
+                            new ApiKeyDef
                             (
                                 ApiName: "AK_Person_Name",
                                 ApiKeyPaths:
@@ -955,7 +955,7 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PK_Person_Id"",
                                 ""ApiKeyPaths"": [
@@ -1064,9 +1064,9 @@ public partial class ApiSchemaTests
                                 ClrMemberKind: ClrMemberKind.Property
                             ),
                         ],
-                        ApiKeyTypes:
+                        ApiKeys:
                         [
-                            new ApiKeyTypeDef
+                            new ApiKeyDef
                             (
                                 ApiName: "PK_Company_Id",
                                 ApiKeyPaths:
@@ -1074,7 +1074,7 @@ public partial class ApiSchemaTests
                                     new ApiKeyPathDef(ClrRootType: typeof(Company), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(Company.Id))])
                                 ]
                             ),
-                            new ApiKeyTypeDef
+                            new ApiKeyDef
                             (
                                 ApiName: "AK_Company_Name",
                                 ApiKeyPaths:
@@ -1147,9 +1147,9 @@ public partial class ApiSchemaTests
                                 ClrMemberKind: ClrMemberKind.Property
                             ),
                         ],
-                        ApiKeyTypes:
+                        ApiKeys:
                         [
-                            new ApiKeyTypeDef
+                            new ApiKeyDef
                             (
                                 ApiName: "PK_Person_Id",
                                 ApiKeyPaths:
@@ -1157,7 +1157,7 @@ public partial class ApiSchemaTests
                                     new ApiKeyPathDef(ClrRootType: typeof(Person), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(Person.Id))])
                                 ]
                             ),
-                            new ApiKeyTypeDef
+                            new ApiKeyDef
                             (
                                 ApiName: "AK_Person_Name",
                                 ApiKeyPaths:
@@ -1270,7 +1270,7 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PK_Company_Id"",
                                 ""ApiKeyPaths"": [
@@ -1362,7 +1362,7 @@ public partial class ApiSchemaTests
                                 ""ClrMemberKind"": ""Property""
                             }
                         ],
-                        ""ApiKeyTypes"": [
+                        ""ApiKeys"": [
                             {
                                 ""ApiName"": ""PK_Person_Id"",
                                 ""ApiKeyPaths"": [

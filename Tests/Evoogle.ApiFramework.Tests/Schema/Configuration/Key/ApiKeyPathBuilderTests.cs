@@ -19,7 +19,7 @@ public class ApiKeyPathBuilderTests(ITestOutputHelper output) : XUnitTests(outpu
 
         public required string[] ExpectedClrMemberNames { get; init; }
 
-        public bool UsesKeyTypeBuilder { get; init; }
+        public bool UsesKeyDefinitionBuilder { get; init; }
         #endregion
 
         #region Calculated Properties
@@ -32,10 +32,12 @@ public class ApiKeyPathBuilderTests(ITestOutputHelper output) : XUnitTests(outpu
 
         protected override void Act()
         {
-            if (this.UsesKeyTypeBuilder)
+            if (this.UsesKeyDefinitionBuilder)
             {
-                var keyType = new ApiKeyTypeBuilder().AddPath(typeof(object), this.ClrMemberNames).Build();
-                this.ActualPath = keyType.ApiKeyPaths.Single();
+                var keyDefinition = new ApiKeyDefinitionBuilder()
+                    .AddPath(typeof(object), this.ClrMemberNames)
+                    .Build();
+                this.ActualPath = keyDefinition.ApiKeyPaths.Single();
             }
             else
             {
@@ -139,7 +141,7 @@ public class ApiKeyPathBuilderTests(ITestOutputHelper output) : XUnitTests(outpu
             Name = "Builds key path from mixed CLR path fragments",
             ClrMemberNames = [" NestedPart . Id ", "Name"],
             ExpectedClrMemberNames = ["NestedPart", "Id", "Name"],
-            UsesKeyTypeBuilder = true
+            UsesKeyDefinitionBuilder = true
         },
         new RejectDottedSegmentTest
         {

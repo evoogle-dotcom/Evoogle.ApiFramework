@@ -28,20 +28,20 @@ public static class ApiSchemaExcludeMembers
         // ApiCollectionType — cycle: ApiItemType → ApiObjectType → ApiProperties[].ApiType → ...
         new ExcludeMember(typeof(ApiCollectionType), nameof(ApiCollectionType.ApiItemType)),
 
-        // ApiKeyPath — cycle: ApiRootObjectType → ApiObjectType → ApiKeyTypes[].ApiKeyPaths[].ApiRootObjectType → ...
+        // ApiKeyPath — cycle: ApiRootObjectType → ApiObjectType → ApiKeys[].ApiKeyPaths[].ApiRootObjectType → ...
         new ExcludeMember(typeof(ApiKeyPath), nameof(ApiKeyPath.ApiRootObjectType)),
 
-        // ApiKeyPathSegment — cycle: ApiProperty → ApiType → ApiObjectType → ApiKeyTypes[].ApiKeyPaths[].ApiRootObjectType → ...
+        // ApiKeyPathSegment — cycle: ApiProperty → ApiType → ApiObjectType → ApiKeys[].ApiKeyPaths[].ApiRootObjectType → ...
         new ExcludeMember(typeof(ApiKeyPathSegment), nameof(ApiKeyPathSegment.ApiProperty)),
 
         // ApiProperty — cycle: ApiType → ApiObjectType → ApiProperties[].ApiType → ...
         new ExcludeMember(typeof(ApiProperty), nameof(ApiProperty.ApiType)),
 
-        // ApiVersionType — scalar and property references resolved during compilation
-        new ExcludeMember(typeof(ApiVersionType), nameof(ApiVersionType.ApiScalarType)),
-        new ExcludeMember(typeof(ApiVersionType), nameof(ApiVersionType.ApiProperty)),
+        // ApiVersionDefinition — scalar and property references resolved during compilation
+        new ExcludeMember(typeof(ApiVersionDefinition), nameof(ApiVersionDefinition.ApiScalarType)),
+        new ExcludeMember(typeof(ApiVersionDefinition), nameof(ApiVersionDefinition.ApiProperty)),
 
-        // ApiObjectType — cycles: ApiProperties[].ApiType → ... / ApiKeyTypes[].ApiKeyPaths[].ApiProperty → ...
+        // ApiObjectType — cycles: ApiProperties[].ApiType → ... / ApiKeys[].ApiKeyPaths[].ApiProperty → ...
         new ExcludeMember(typeof(ApiObjectType), nameof(ApiObjectType.ApiRelationshipEnds)),
         new ExcludeMember(typeof(ApiObjectType), nameof(ApiObjectType.ApiRelationshipPrincipalEnds)),
         new ExcludeMember(typeof(ApiObjectType), nameof(ApiObjectType.ApiRelationshipDependentEnds)),
@@ -62,8 +62,8 @@ public static class ApiSchemaExcludeMembers
         new ExcludeMember(typeof(ApiRelationshipManyToMany), nameof(ApiRelationshipManyToMany.ApiKeyBindingA)),
         new ExcludeMember(typeof(ApiRelationshipManyToMany), nameof(ApiRelationshipManyToMany.ApiKeyBindingB)),
 
-        // ApiRelationshipDependentEnd — ApiForeignKeyType throws when HasForeignKey=false
-        new ExcludeMember(typeof(ApiRelationshipDependentEnd), nameof(ApiRelationshipDependentEnd.ApiForeignKeyType)),
+        // ApiRelationshipDependentEnd — ApiForeignKey throws when HasForeignKey=false
+        new ExcludeMember(typeof(ApiRelationshipDependentEnd), nameof(ApiRelationshipDependentEnd.ApiForeignKey)),
 
     ];
 
@@ -83,9 +83,9 @@ public static class ApiSchemaExcludeMembers
         // ApiProperty
         new ExcludeMember(typeof(ApiProperty), nameof(ApiProperty.ApiType)),
 
-        // ApiVersionType
-        new ExcludeMember(typeof(ApiVersionType), nameof(ApiVersionType.ApiScalarType)),
-        new ExcludeMember(typeof(ApiVersionType), nameof(ApiVersionType.ApiProperty)),
+        // ApiVersionDefinition
+        new ExcludeMember(typeof(ApiVersionDefinition), nameof(ApiVersionDefinition.ApiScalarType)),
+        new ExcludeMember(typeof(ApiVersionDefinition), nameof(ApiVersionDefinition.ApiProperty)),
 
         // ApiSchema
         new ExcludeMember(typeof(ApiSchema), nameof(ApiSchema.ApiPath)),
@@ -107,8 +107,8 @@ public static class ApiSchemaExcludeMembers
         // ApiRelationshipElement — object type resolved during compilation
         new ExcludeMember(typeof(ApiRelationshipElement), nameof(ApiRelationshipElement.ApiObjectType)),
 
-        // ApiRelationshipDependentEnd — ApiForeignKeyType throws when HasForeignKey=false
-        new ExcludeMember(typeof(ApiRelationshipDependentEnd), nameof(ApiRelationshipDependentEnd.ApiForeignKeyType)),
+        // ApiRelationshipDependentEnd — ApiForeignKey throws when HasForeignKey=false
+        new ExcludeMember(typeof(ApiRelationshipDependentEnd), nameof(ApiRelationshipDependentEnd.ApiForeignKey)),
 
         new ExcludeMember(typeof(ApiRelationshipElement), nameof(ApiRelationshipElement.ApiObjectType)),
 

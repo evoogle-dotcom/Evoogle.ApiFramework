@@ -752,7 +752,7 @@ public sealed class ApiAnnotationReaderContractTests(ITestOutputHelper output)
                     enumValue!.ApiName.Should().Be("FirstApi");
                     break;
                 case CapabilityTestCase.Key:
-                    this.ApiSchemaActual!.ApiObjectTypes.Single().ApiKeyTypes.Single().ApiName
+                    this.ApiSchemaActual!.ApiObjectTypes.Single().ApiKeys.Single().ApiName
                         .Should().Be("CapabilityKey");
                     break;
                 case CapabilityTestCase.ObjectProperty:

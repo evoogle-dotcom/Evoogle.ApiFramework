@@ -14,8 +14,8 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Relationships.Internal;
 internal sealed class ApiRelationshipPrincipalEndState
 {
     #region Properties
-    internal string? PrincipalKeyTypeName { get; set; }
+    internal string? PrincipalKeyName { get; set; }
 
-    internal ApiConfigurationSource? PrincipalKeyTypeNameSource { get; set; }
+    internal ApiConfigurationSource? PrincipalKeyNameSource { get; set; }
     #endregion
 }

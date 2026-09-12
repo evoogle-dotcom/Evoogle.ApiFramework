@@ -11,20 +11,20 @@ using Evoogle.ApiFramework.Schema.Key;
 namespace Evoogle.ApiFramework.Schema.Configuration.Key;
 
 /// <summary>
-///     Fluent builder used to configure the structural paths shared by <see cref="ApiKeyType"/> and
-///     <see cref="ApiNamedKeyType"/>.
+///     Fluent builder used to configure the structural paths shared by <see cref="ApiKeyDefinition"/> and
+///     <see cref="ApiNamedKeyDefinition"/>.
 /// </summary>
 /// <param name="apiName">
-///     The optional API name used when the builder produces an <see cref="ApiNamedKeyType"/>.
+///     The optional API name used when the builder produces an <see cref="ApiNamedKeyDefinition"/>.
 /// </param>
 /// <remarks>
-///    <para>Key types are reusable components that define how to extract key values from CLR objects via one or more key paths. They are primarily used to configure API keys, but can also be used for other purposes such as defining unique identifiers for object types.</para>
-///    <para>Each key path represents a navigation chain from a specified CLR root type to a terminal scalar member, and can be configured with extensions at both the path and segment levels. When multiple key paths are defined within a key type, the resulting key value is a composite of the individual path values.</para>
+///    <para>Key definitions are reusable components that define how to extract key values from CLR objects via one or more key paths. They are primarily used to configure API keys, but can also be used for other purposes such as defining unique identifiers for object types.</para>
+///    <para>Each key path represents a navigation chain from a specified CLR root type to a terminal scalar member, and can be configured with extensions at both the path and segment levels. When multiple key paths are defined within a key definition, the resulting key value is a composite of the individual path values.</para>
 /// </remarks>
-public class ApiKeyTypeBuilder(string? apiName = null) : ExtensionBuilder<ApiKeyTypeBuilder>
+public class ApiKeyDefinitionBuilder(string? apiName = null) : ExtensionBuilder<ApiKeyDefinitionBuilder>
 {
     #region Fields
-    private readonly ApiKeyTypeState _state = new() { ApiName = apiName };
+    private readonly ApiKeyDefinitionState _state = new() { ApiName = apiName };
     #endregion
 
     #region AddExtension Methods
@@ -34,7 +34,7 @@ public class ApiKeyTypeBuilder(string? apiName = null) : ExtensionBuilder<ApiKey
     /// <param name="extensionType">The type used as the extension key.</param>
     /// <param name="extension">The extension value to store.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiKeyTypeBuilder AddKeyTypeExtension(Type extensionType, object extension)
+    public ApiKeyDefinitionBuilder AddKeyExtension(Type extensionType, object extension)
     {
         return this.AddExtension(extensionType, extension);
     }
@@ -42,7 +42,7 @@ public class ApiKeyTypeBuilder(string? apiName = null) : ExtensionBuilder<ApiKey
 
     #region AddPath Methods
     /// <summary>
-    ///     Adds a key path to this key type using CLR member names or dot-delimited CLR member paths.
+    ///     Adds a key path to this key definition using CLR member names or dot-delimited CLR member paths.
     /// </summary>
     /// <param name="clrRootType">The CLR type from which the navigation chain begins.</param>
     /// <param name="clrMemberNames">
@@ -51,7 +51,7 @@ public class ApiKeyTypeBuilder(string? apiName = null) : ExtensionBuilder<ApiKey
     /// <returns>The current builder instance.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="clrRootType"/> is <c>null</c>.</exception>
     /// <exception cref="ArgumentException">Thrown when <paramref name="clrMemberNames"/> is empty.</exception>
-    public ApiKeyTypeBuilder AddPath(Type clrRootType, params string[] clrMemberNames)
+    public ApiKeyDefinitionBuilder AddPath(Type clrRootType, params string[] clrMemberNames)
     {
         ArgumentNullException.ThrowIfNull(clrRootType);
         ArgumentNullException.ThrowIfNull(clrMemberNames);
@@ -61,7 +61,7 @@ public class ApiKeyTypeBuilder(string? apiName = null) : ExtensionBuilder<ApiKey
     }
 
     /// <summary>
-    ///     Adds a key path to this key type using CLR member names or dot-delimited CLR member paths,
+    ///     Adds a key path to this key definition using CLR member names or dot-delimited CLR member paths,
     ///     with an optional configuration callback.
     /// </summary>
     /// <param name="clrRootType">The CLR type from which the navigation chain begins.</param>
@@ -72,7 +72,7 @@ public class ApiKeyTypeBuilder(string? apiName = null) : ExtensionBuilder<ApiKey
     /// <returns>The current builder instance.</returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="clrRootType"/> is <c>null</c>.</exception>
     /// <exception cref="ArgumentException">Thrown when <paramref name="clrMemberNames"/> is empty.</exception>
-    public ApiKeyTypeBuilder AddPath(Type clrRootType, IEnumerable<string> clrMemberNames, Action<ApiKeyPathBuilder>? configure = null)
+    public ApiKeyDefinitionBuilder AddPath(Type clrRootType, IEnumerable<string> clrMemberNames, Action<ApiKeyPathBuilder>? configure = null)
     {
         ArgumentNullException.ThrowIfNull(clrRootType);
         ArgumentNullException.ThrowIfNull(clrMemberNames);
@@ -85,7 +85,7 @@ public class ApiKeyTypeBuilder(string? apiName = null) : ExtensionBuilder<ApiKey
     #endregion
 
     #region With Methods
-    /// <summary>Gets the API name currently configured on this key type builder.</summary>
+    /// <summary>Gets the API name currently configured on this key definition builder.</summary>
     internal string? ApiName => _state.ApiName;
 
     internal ApiConfigurationSource RegistrationSource => _state.RegistrationSource;
@@ -101,7 +101,7 @@ public class ApiKeyTypeBuilder(string? apiName = null) : ExtensionBuilder<ApiKey
     internal void ClearPaths() => _state.KeyPathBuilders.Clear();
 
     /// <summary>
-    ///     Returns <c>true</c> when this key type already contains the specified CLR root type
+    ///     Returns <c>true</c> when this key definition already contains the specified CLR root type
     ///     and ordered CLR member path.
     ///
     ///     Used by <see cref="ApiObjectTypeBuilder.AddKeyOrAppendPath"/> to prevent
@@ -120,11 +120,11 @@ public class ApiKeyTypeBuilder(string? apiName = null) : ExtensionBuilder<ApiKey
     }
 
     /// <summary>
-    ///    Sets the API name used when this builder produces an <see cref="ApiNamedKeyType"/>.
+    ///    Sets the API name used when this builder produces an <see cref="ApiNamedKeyDefinition"/>.
     /// </summary>
     /// <param name="apiName">The API name to use.</param>
     /// <returns>The current builder instance.</returns>
-    public ApiKeyTypeBuilder WithName(string apiName)
+    public ApiKeyDefinitionBuilder WithName(string apiName)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
 
@@ -135,42 +135,42 @@ public class ApiKeyTypeBuilder(string? apiName = null) : ExtensionBuilder<ApiKey
 
     #region Build Methods
     /// <summary>
-    ///     Builds the <see cref="ApiKeyType"/> configured by this builder.
+    ///     Builds the <see cref="ApiKeyDefinition"/> configured by this builder.
     /// </summary>
-    internal ApiKeyType Build()
+    internal ApiKeyDefinition Build()
     {
         var keyPaths = _state.KeyPathBuilders.Select(b => b.Build());
-        var keyType = new ApiKeyType(keyPaths);
+        var keyDefinition = new ApiKeyDefinition(keyPaths);
 
-        this.AttachExtensions(keyType);
+        this.AttachExtensions(keyDefinition);
 
-        return keyType;
+        return keyDefinition;
     }
 
     /// <summary>
-    ///     Builds the <see cref="ApiNamedKeyType"/> configured by this builder.
+    ///     Builds the <see cref="ApiNamedKeyDefinition"/> configured by this builder.
     /// </summary>
-    internal ApiNamedKeyType BuildNamed()
+    internal ApiNamedKeyDefinition BuildNamed()
     {
         var apiName = _state.ApiName!;
         var keyPaths = _state.KeyPathBuilders.Select(b => b.Build());
-        var keyType = new ApiNamedKeyType(apiName, keyPaths);
+        var keyDefinition = new ApiNamedKeyDefinition(apiName, keyPaths);
 
-        this.AttachExtensions(keyType);
+        this.AttachExtensions(keyDefinition);
 
-        return keyType;
+        return keyDefinition;
     }
     #endregion
 
     #region Implementation Methods
-    private void AttachExtensions(ApiKeyType keyType)
+    private void AttachExtensions(ApiKeyDefinition keyDefinition)
     {
-        ArgumentNullException.ThrowIfNull(keyType);
+        ArgumentNullException.ThrowIfNull(keyDefinition);
 
         var extensions = this.BuildExtensions();
         if (extensions != null)
         {
-            keyType.AttachExtensions(extensions);
+            keyDefinition.AttachExtensions(extensions);
         }
     }
 

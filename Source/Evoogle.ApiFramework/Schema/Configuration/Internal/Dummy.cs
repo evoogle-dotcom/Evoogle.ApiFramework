@@ -352,7 +352,7 @@ internal static class Dummy
     ///     Demonstrates how to configure a M:N relationship using the fluent schema builder APIs.
     ///     Models the "Products are tagged with Tags" relationship via the <see cref="ProductTag"/> association type.
     ///     Demonstrates <see cref="ApiRelationshipPrincipalEndBuilder.WithPrincipalKey"/> to select a
-    ///     non-principal key type on the principal side, and extensions on principal ends.
+    ///     non-principal key on the principal side, and extensions on principal ends.
     /// </summary>
     public class ProductTagRelationshipConfiguration : IApiRelationshipManyToManyConfiguration
     {
@@ -573,7 +573,7 @@ internal static class Dummy
                         d => d.WithForeignKey(b => b.AddPath(typeof(CustomerProfile), "CustomerRef", "CustomerId"))
                     )
             )
-            // M:N — configuration class style; demonstrates WithKeyTypeName and extensions on principal ends.
+            // M:N — configuration class style; demonstrates named principal keys and end extensions.
             .AddManyToManyRelationship(new ProductTagRelationshipConfiguration())
             // M:N — inline lambda style; demonstrates all four end methods and relationship-level extensions.
             .AddManyToManyRelationship

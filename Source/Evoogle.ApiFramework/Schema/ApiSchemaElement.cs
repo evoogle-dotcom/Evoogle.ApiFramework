@@ -70,8 +70,8 @@ public abstract class ApiSchemaElement : ExtensibleBase, INode<ApiSchemaElement>
     /// <summary>Gets the cast-safe runtime kind of this schema element.</summary>
     /// <remarks>
     ///     Specialized type, relationship, and relationship-end kind properties remain the
-    ///     authoritative domain discriminators. Custom <see cref="ApiKeyType"/> subclasses report
-    ///     <see cref="ApiSchemaElementKind.KeyType"/>.
+    ///     authoritative domain discriminators. Custom <see cref="ApiKeyDefinition"/> subclasses report
+    ///     <see cref="ApiSchemaElementKind.KeyDefinition"/>.
     /// </remarks>
     public abstract ApiSchemaElementKind Kind { get; }
 

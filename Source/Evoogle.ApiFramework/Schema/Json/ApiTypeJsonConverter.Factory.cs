@@ -61,8 +61,8 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
         var apiName = context.ReadData.ApiNamedType?.ApiName;
         var apiOptions = context.ReadData.ApiObjectType?.ApiOptions;
         var apiProperties = context.ReadData.ApiObjectType?.ApiProperties;
-        var apiKeyTypes = context.ReadData.ApiObjectType?.ApiKeyTypes;
-        var apiVersionType = context.ReadData.ApiObjectType?.ApiVersionType;
+        var apiKeys = context.ReadData.ApiObjectType?.ApiKeys;
+        var apiVersion = context.ReadData.ApiObjectType?.ApiVersion;
         var clrType = context.ReadData.ApiType?.ClrType;
 
         var apiObjectType = new ApiObjectType
@@ -70,16 +70,16 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
             apiName!,
             apiOptions,
             apiProperties,
-            apiKeyTypes,
-            apiVersionType,
+            apiKeys,
+            apiVersion,
             clrType!
         );
 
-        if (apiKeyTypes is not null && clrType is not null)
+        if (apiKeys is not null && clrType is not null)
         {
-            foreach (var apiKeyType in apiKeyTypes)
+            foreach (var apiKeyDefinition in apiKeys)
             {
-                foreach (var apiKeyPath in apiKeyType.ApiKeyPaths)
+                foreach (var apiKeyPath in apiKeyDefinition.ApiKeyPaths)
                 {
                     apiKeyPath.EnsureClrRootType(clrType);
                 }

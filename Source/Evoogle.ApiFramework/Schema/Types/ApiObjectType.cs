@@ -23,24 +23,24 @@ namespace Evoogle.ApiFramework.Schema.Types;
 /// <param name="apiName">The API name of the object type.</param>
 /// <param name="apiOptions">The configuration options for the object type.</param>
 /// <param name="apiProperties">The collection of API properties defined on this object type.</param>
-/// <param name="apiKeyTypes">
-///     The collection of named API key types defined for this object type.
+/// <param name="apiKeys">
+///     The collection of named API key definitions defined for this object type.
 /// </param>
-/// <param name="apiVersionType">The optional version metadata for this object type.</param>
+/// <param name="apiVersion">The optional version metadata for this object type.</param>
 /// <param name="clrObjectType">The CLR type representing this API object.</param>
 public sealed partial class ApiObjectType
 (
     string apiName,
     ApiObjectTypeOptions? apiOptions,
     IEnumerable<ApiProperty>? apiProperties,
-    IEnumerable<ApiNamedKeyType>? apiKeyTypes,
-    ApiVersionType? apiVersionType,
+    IEnumerable<ApiNamedKeyDefinition>? apiKeys,
+    ApiVersionDefinition? apiVersion,
     Type clrObjectType
 ) : ApiNamedType(apiName, clrObjectType)
 {
     #region ApiObjectType Fields
-    private FrozenDictionary<string, ApiNamedKeyType>? _apiKeyTypeApiNameLookup = null;
-    private ImmutableArray<string> _apiKeyTypeApiNames = [];
+    private FrozenDictionary<string, ApiNamedKeyDefinition>? _apiKeyApiNameLookup = null;
+    private ImmutableArray<string> _apiKeyApiNames = [];
 
     private FrozenDictionary<string, ApiProperty>? _apiPropertyApiNameLookup = null;
     private FrozenDictionary<string, ApiProperty>? _apiPropertyClrNameLookup = null;
@@ -62,9 +62,9 @@ public sealed partial class ApiObjectType
     #endregion
 
     #region ApiObjectType Properties
-    /// <summary>Gets the immutable snapshot of named key types defined for the object type.</summary>
-    public ImmutableArray<ApiNamedKeyType> ApiKeyTypes { get; } =
-        [.. apiKeyTypes.EmptyIfNull().Where(x => x is not null)];
+    /// <summary>Gets the immutable snapshot of named key definitions for the object type.</summary>
+    public ImmutableArray<ApiNamedKeyDefinition> ApiKeys { get; } =
+        [.. apiKeys.EmptyIfNull().Where(x => x is not null)];
 
     /// <summary>Gets the configuration options for the object type.</summary>
     public ApiObjectTypeOptions? ApiOptions { get; } = apiOptions;
@@ -74,7 +74,7 @@ public sealed partial class ApiObjectType
         [.. apiProperties.EmptyIfNull().Where(x => x is not null)];
 
     /// <summary>Gets the optional version metadata defined for this object type.</summary>
-    public ApiVersionType? ApiVersionType { get; } = apiVersionType;
+    public ApiVersionDefinition? ApiVersion { get; } = apiVersion;
 
     /// <summary>
     ///     Gets the immutable snapshot of relationship ends where this object type participates.
@@ -85,7 +85,7 @@ public sealed partial class ApiObjectType
 
     /// <summary>
     ///     Gets the immutable snapshot of relationship ends where this object type acts as the
-    ///     principal and provides the principal key type. Populated during <see cref="ApiSchema"/>
+    ///     principal and provides the principal key. Populated during <see cref="ApiSchema"/>
     ///     compilation. Returns an empty array before compilation completes.
     /// </summary>
     public ImmutableArray<ApiRelationshipPrincipalEnd> ApiRelationshipPrincipalEnds =>
@@ -107,17 +107,18 @@ public sealed partial class ApiObjectType
     public ImmutableArray<ApiRelationshipAssociation> ApiRelationshipAssociations =>
         _apiRelationshipAssociations;
 
-    private FrozenDictionary<string, ApiNamedKeyType> ApiKeyTypeApiNameLookup => this.RequireValue(_apiKeyTypeApiNameLookup);
+    private FrozenDictionary<string, ApiNamedKeyDefinition> ApiKeyApiNameLookup =>
+        this.RequireValue(_apiKeyApiNameLookup);
     private FrozenDictionary<string, ApiProperty> ApiPropertyApiNameLookup => this.RequireValue(_apiPropertyApiNameLookup);
     private FrozenDictionary<string, ApiProperty> ApiPropertyClrNameLookup => this.RequireValue(_apiPropertyClrNameLookup);
     #endregion
 
     #region ApiObjectType Computed Properties
-    /// <summary>Indicates whether this object type has any API key types.</summary>
-    public bool HasKeyTypes => this.ApiKeyTypes.Length > 0;
+    /// <summary>Indicates whether this object type has any API keys.</summary>
+    public bool HasKeys => this.ApiKeys.Length > 0;
 
     /// <summary>Indicates whether this object type defines version metadata.</summary>
-    public bool HasVersionType => this.ApiVersionType is not null;
+    public bool HasVersion => this.ApiVersion is not null;
 
     /// <summary>Indicates whether this object type participates in any relationships.</summary>
     public bool HasRelationshipEnds => !_apiRelationshipEnds.IsDefaultOrEmpty;
@@ -148,14 +149,14 @@ public sealed partial class ApiObjectType
             yield return apiProperty;
         }
 
-        foreach (var apiKeyType in this.ApiKeyTypes)
+        foreach (var apiKeyDefinition in this.ApiKeys)
         {
-            yield return apiKeyType;
+            yield return apiKeyDefinition;
         }
 
-        if (this.ApiVersionType is not null)
+        if (this.ApiVersion is not null)
         {
-            yield return this.ApiVersionType;
+            yield return this.ApiVersion;
         }
     }
 
@@ -172,42 +173,42 @@ public sealed partial class ApiObjectType
     }
 
     /// <summary>
-    ///    Compiles the API key types defined for this object type.
+    ///    Compiles the API keys defined for this object type.
     /// </summary>
     /// <param name="context">The compilation context.</param>
-    internal void CompileKeyTypes(ApiSchemaCompilationContext context)
+    internal void CompileKeys(ApiSchemaCompilationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
         this.ThrowIfFrozen();
 
-        this.CompileApiKeyTypes(context);
+        this.CompileApiKeys(context);
     }
 
-    /// <summary>Compiles the optional API version type defined for this object type.</summary>
+    /// <summary>Compiles the optional API version definition for this object type.</summary>
     /// <param name="context">The compilation context.</param>
-    internal void CompileVersionType(ApiSchemaCompilationContext context)
+    internal void CompileVersion(ApiSchemaCompilationContext context)
     {
         ArgumentNullException.ThrowIfNull(context);
         this.ThrowIfFrozen();
-        this.ApiVersionType?.Compile(context);
+        this.ApiVersion?.Compile(context);
     }
     #endregion
 
     #region ApiObjectType Methods
     /// <summary>
-    ///     Attempts to retrieve an API key type by its API name.
+    ///     Attempts to retrieve an API key by its API name.
     /// </summary>
-    /// <param name="apiName">The name of the key type to retrieve.</param>
-    /// <param name="apiKeyType">
-    ///     When this method returns, contains the <see cref="ApiNamedKeyType"/> if found;
+    /// <param name="apiName">The name of the key to retrieve.</param>
+    /// <param name="apiKey">
+    ///     When this method returns, contains the <see cref="ApiNamedKeyDefinition"/> if found;
     ///     otherwise, null.
     /// </param>
-    /// <returns>True if the key type was found; otherwise, false.</returns>
-    public bool TryGetKeyTypeByApiName
+    /// <returns>True if the key was found; otherwise, false.</returns>
+    public bool TryGetKeyByApiName
     (
         string apiName,
-        [NotNullWhen(true)] out ApiNamedKeyType? apiKeyType
-    ) => this.ApiKeyTypeApiNameLookup.TryGetValue(apiName, out apiKeyType);
+        [NotNullWhen(true)] out ApiNamedKeyDefinition? apiKey
+    ) => this.ApiKeyApiNameLookup.TryGetValue(apiName, out apiKey);
 
     /// <summary>
     ///     Attempts to retrieve an API property by its API name.
@@ -227,23 +228,23 @@ public sealed partial class ApiObjectType
 
     #endregion
 
-    #region ApiObjectType KeyType Methods
-    /// <summary>Gets the precomputed immutable API names of all key types in declaration order.</summary>
-    public ImmutableArray<string> ApiKeyTypeApiNames => _apiKeyTypeApiNames;
+    #region ApiObjectType Key Methods
+    /// <summary>Gets the precomputed immutable API names of all keys in declaration order.</summary>
+    public ImmutableArray<string> ApiKeyApiNames => _apiKeyApiNames;
 
     /// <summary>
-    ///     Checks if this object type has a specific key type by API name.
+    ///     Checks if this object type has a specific key by API name.
     /// </summary>
-    /// <param name="apiKeyTypeName">The API name of the key type to check for.</param>
-    /// <returns><c>true</c> if the key type exists; otherwise, <c>false</c>.</returns>
-    public bool HasKeyTypeByApiName(string apiKeyTypeName)
+    /// <param name="apiKeyName">The API name of the key to check for.</param>
+    /// <returns><c>true</c> if the key exists; otherwise, <c>false</c>.</returns>
+    public bool HasKeyByApiName(string apiKeyName)
     {
-        if (!this.HasKeyTypes || string.IsNullOrWhiteSpace(apiKeyTypeName))
+        if (!this.HasKeys || string.IsNullOrWhiteSpace(apiKeyName))
         {
             return false;
         }
 
-        return this.ApiKeyTypeApiNameLookup.ContainsKey(apiKeyTypeName);
+        return this.ApiKeyApiNameLookup.ContainsKey(apiKeyName);
     }
     #endregion
 
@@ -294,21 +295,21 @@ public sealed partial class ApiObjectType
         _apiRelationshipAssociations = [];
     }
 
-    private void CompileApiKeyTypes(ApiSchemaCompilationContext context)
+    private void CompileApiKeys(ApiSchemaCompilationContext context)
     {
-        if (this.ApiKeyTypes.Length == 0)
+        if (this.ApiKeys.Length == 0)
         {
-            // No key types defined; this is acceptable as key types are optional.
+            // No keys defined; this is acceptable because keys are optional.
             return;
         }
 
-        // Compile each key type
-        var apiKeyTypesCount = this.ApiKeyTypes.Length;
-        for (var i = 0; i < apiKeyTypesCount; ++i)
+        // Compile each key definition.
+        var apiKeysCount = this.ApiKeys.Length;
+        for (var i = 0; i < apiKeysCount; ++i)
         {
-            var apiKeyType = this.ApiKeyTypes[i];
+            var apiKeyDefinition = this.ApiKeys[i];
 
-            apiKeyType.Compile(context);
+            apiKeyDefinition.Compile(context);
         }
     }
 
@@ -339,18 +340,18 @@ public sealed partial class ApiObjectType
     {
         // Compile lookup dictionaries for lookup of:
         // - Property by API name and CLR name
-        _apiKeyTypeApiNames = [.. this.ApiKeyTypes.Select(keyType => keyType.ApiName)];
+        _apiKeyApiNames = [.. this.ApiKeys.Select(key => key.ApiName)];
 
         ApiSchemaCompilationLookup.BuildLookupDictionary
         (
-            parts: this.ApiKeyTypes,
+            parts: this.ApiKeys,
             partKeySelector: x => x.ApiName,
             partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
-            partKeyPropertyName: nameof(ApiNamedKeyType.ApiName),
+            partKeyPropertyName: nameof(ApiNamedKeyDefinition.ApiName),
             apiPath: this.ApiPath,
-            duplicatePartCode: ApiSchemaCompilationCode.ApiObjectTypeDuplicateKeyTypeApiName,
+            duplicatePartCode: ApiSchemaCompilationCode.ApiObjectTypeDuplicateKeyApiName,
             session: context.Session,
-            lookupDictionary: out _apiKeyTypeApiNameLookup
+            lookupDictionary: out _apiKeyApiNameLookup
         );
 
         ApiSchemaCompilationLookup.BuildLookupDictionary
