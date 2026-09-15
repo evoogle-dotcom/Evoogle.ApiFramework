@@ -19,22 +19,37 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Relationships;
 ///     Set the foreign key role keys with <see cref="WithForeignKeyA"/> and <see cref="WithForeignKeyB"/>.
 ///     When neither side is configured the relationship is treated as purely navigational.
 /// </remarks>
-/// <param name="clrObjectType">The CLR type of the association <see cref="ApiObjectType"/>.</param>
-public class ApiRelationshipAssociationBuilder(Type clrObjectType) : ExtensionBuilder<ApiRelationshipAssociationBuilder>
+/// <param name="apiObjectTypeReference">The association object-type reference.</param>
+public class ApiRelationshipAssociationBuilder(ApiTypeReference apiObjectTypeReference)
+    : ExtensionBuilder<ApiRelationshipAssociationBuilder>
 {
     #region Fields
     private readonly ApiConfigurationSourceScope _configurationSourceScope = new();
-    private readonly Type _clrObjectType = clrObjectType ?? throw new ArgumentNullException(nameof(clrObjectType));
+    private readonly ApiTypeReference _apiObjectTypeReference = apiObjectTypeReference ??
+        throw new ArgumentNullException(nameof(apiObjectTypeReference));
     private readonly ApiRelationshipAssociationState _state = new();
     #endregion
 
     #region Properties
-    /// <summary>Gets the CLR object type represented by this association.</summary>
-    internal Type ClrObjectType => _clrObjectType;
+    /// <summary>Gets the object-type reference represented by this association.</summary>
+    internal ApiTypeReference ApiObjectTypeReference => _apiObjectTypeReference;
 
     /// <summary>Gets the source associated with the active fluent configuration callback.</summary>
     internal ApiConfigurationSource CurrentConfigurationSource =>
         _configurationSourceScope.CurrentSource;
+    #endregion
+
+    #region Constructors
+    /// <summary>Creates an association builder from a CLR type.</summary>
+    /// <param name="clrObjectType">The association CLR object type.</param>
+    public ApiRelationshipAssociationBuilder(Type clrObjectType)
+        : this
+        (
+            new ApiTypeReference
+                (clrObjectType ?? throw new ArgumentNullException(nameof(clrObjectType)))
+        )
+    {
+    }
     #endregion
 
     #region AddExtension Methods
@@ -89,10 +104,15 @@ public class ApiRelationshipAssociationBuilder(Type clrObjectType) : ExtensionBu
 
     private ApiKeyDefinitionBuilder CreateForeignKeyBuilder()
     {
+        if (this.ApiObjectTypeReference.ClrType is null)
+        {
+            return new ApiKeyDefinitionBuilder();
+        }
+
         return ApiBuilderFactory.CreateClosedGeneric<ApiKeyDefinitionBuilder>
         (
             typeof(ApiKeyDefinitionBuilder<>),
-            this.ClrObjectType,
+            this.ApiObjectTypeReference.ClrType,
             (object?)null
         );
     }
@@ -185,8 +205,8 @@ public class ApiRelationshipAssociationBuilder(Type clrObjectType) : ExtensionBu
         var fkB = _state.ForeignKeyBuilderB?.Build();
 
         var apiRelationshipAssociation = fkA != null && fkB != null
-            ? new ApiRelationshipAssociation(_clrObjectType, fkA, fkB)
-            : new ApiRelationshipAssociation(_clrObjectType);
+            ? new ApiRelationshipAssociation(_apiObjectTypeReference, fkA, fkB)
+            : new ApiRelationshipAssociation(_apiObjectTypeReference);
 
         var extensions = this.BuildExtensions();
         if (extensions != null)

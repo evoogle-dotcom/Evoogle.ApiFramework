@@ -216,7 +216,7 @@ public partial class ApiSchemaTests
         {
             Name = "Type expression API kind rejects an unknown JSON enum value",
             SchemaKind = ApiSchemaKind.Simple,
-            ExpectedCode = ApiSchemaCompilationCode.ApiTypeExpressionInvalidApiKind,
+            ExpectedCode = ApiSchemaCompilationCode.ApiTypeReferenceInvalidApiKind,
             UpdateJson = a => EnumJsonDeserializationPolicyTestsFactory.SetFirstPropertyApiTypeApiKindToUnknownString(a),
         },
     ];

@@ -554,7 +554,7 @@ public class ApiSchemaElementTests(ITestOutputHelper output) : XUnitTests(output
         var apiProperty = new ApiProperty
         (
             nameof(TreeObject.Id),
-            new ApiTypeExpression(typeof(int)),
+            new ApiTypeExpression(new ApiTypeReference(typeof(int))),
             ApiTypeModifiers.Required,
             nameof(TreeObject.Id),
             ClrMemberKind.Property

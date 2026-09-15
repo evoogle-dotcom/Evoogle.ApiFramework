@@ -19,22 +19,37 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Relationships;
 ///     Set the foreign key role's <see cref="ApiKeyDefinition"/> with <see cref="WithForeignKey"/>.
 ///     When no key is configured the relationship is treated as purely navigational.
 /// </remarks>
-/// <param name="clrObjectType">The CLR type of the dependent <see cref="ApiObjectType"/>.</param>
-public class ApiRelationshipDependentEndBuilder(Type clrObjectType) : ExtensionBuilder<ApiRelationshipDependentEndBuilder>
+/// <param name="apiObjectTypeReference">The dependent object-type reference.</param>
+public class ApiRelationshipDependentEndBuilder(ApiTypeReference apiObjectTypeReference)
+    : ExtensionBuilder<ApiRelationshipDependentEndBuilder>
 {
     #region Fields
     private readonly ApiConfigurationSourceScope _configurationSourceScope = new();
-    private readonly Type _clrObjectType = clrObjectType ?? throw new ArgumentNullException(nameof(clrObjectType));
+    private readonly ApiTypeReference _apiObjectTypeReference = apiObjectTypeReference ??
+        throw new ArgumentNullException(nameof(apiObjectTypeReference));
     private readonly ApiRelationshipDependentEndState _state = new();
     #endregion
 
     #region Properties
-    /// <summary>Gets the CLR object type represented by this dependent end.</summary>
-    internal Type ClrObjectType => _clrObjectType;
+    /// <summary>Gets the object-type reference represented by this dependent end.</summary>
+    internal ApiTypeReference ApiObjectTypeReference => _apiObjectTypeReference;
 
     /// <summary>Gets the source associated with the active fluent configuration callback.</summary>
     internal ApiConfigurationSource CurrentConfigurationSource =>
         _configurationSourceScope.CurrentSource;
+    #endregion
+
+    #region Constructors
+    /// <summary>Creates a dependent-end builder from a CLR type.</summary>
+    /// <param name="clrObjectType">The dependent CLR object type.</param>
+    public ApiRelationshipDependentEndBuilder(Type clrObjectType)
+        : this
+        (
+            new ApiTypeReference
+                (clrObjectType ?? throw new ArgumentNullException(nameof(clrObjectType)))
+        )
+    {
+    }
     #endregion
 
     #region AddExtension Methods
@@ -71,10 +86,15 @@ public class ApiRelationshipDependentEndBuilder(Type clrObjectType) : ExtensionB
 
     private ApiKeyDefinitionBuilder CreateForeignKeyBuilder()
     {
+        if (this.ApiObjectTypeReference.ClrType is null)
+        {
+            return new ApiKeyDefinitionBuilder();
+        }
+
         return ApiBuilderFactory.CreateClosedGeneric<ApiKeyDefinitionBuilder>
         (
             typeof(ApiKeyDefinitionBuilder<>),
-            this.ClrObjectType,
+            this.ApiObjectTypeReference.ClrType,
             (object?)null
         );
     }
@@ -135,8 +155,8 @@ public class ApiRelationshipDependentEndBuilder(Type clrObjectType) : ExtensionB
         var apiForeignKey = _state.ForeignKeyBuilder?.Build();
 
         var end = apiForeignKey != null
-            ? new ApiRelationshipDependentEnd(_clrObjectType, apiForeignKey)
-            : new ApiRelationshipDependentEnd(_clrObjectType);
+            ? new ApiRelationshipDependentEnd(_apiObjectTypeReference, apiForeignKey)
+            : new ApiRelationshipDependentEnd(_apiObjectTypeReference);
 
         var extensions = this.BuildExtensions();
         if (extensions != null)

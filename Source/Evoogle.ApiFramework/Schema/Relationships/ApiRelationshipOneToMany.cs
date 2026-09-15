@@ -17,7 +17,8 @@ namespace Evoogle.ApiFramework.Schema.Relationships;
 ///         A corresponding dependent value may appear zero or more times among all dependent objects.
 ///     </para>
 ///     <para>
-///         Self-referential one-to-many relationships are supported by setting both ends to the same <see cref="ApiRelationshipElement.ClrObjectType"/>.
+///         Self-referential one-to-many relationships use equal
+///         <see cref="ApiRelationshipElement.ApiObjectTypeReference"/> values for both ends.
 ///     </para>
 /// </remarks>
 /// <param name="apiName">The schema-unique API name of the relationship.</param>

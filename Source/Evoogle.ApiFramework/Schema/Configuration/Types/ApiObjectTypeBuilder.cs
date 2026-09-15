@@ -280,7 +280,14 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
 
         foreach (var (clrRootType, clrMemberNames) in paths)
         {
-            builder.AddPath(clrRootType, clrMemberNames);
+            if (clrRootType == this.ClrType)
+            {
+                builder.AddPath(clrMemberNames);
+            }
+            else
+            {
+                builder.AddPath(clrRootType, clrMemberNames);
+            }
         }
     }
 
@@ -338,15 +345,32 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
         if (existing != null)
         {
             // Guard against convention + annotation both adding the same path.
-            if (!existing.HasPath(clrRootType, names))
+            var apiRootTypeReference = clrRootType == this.ClrType
+                ? null
+                : new ApiTypeReference(clrRootType);
+            if (!existing.HasPath(apiRootTypeReference, names))
             {
-                existing.AddPath(clrRootType, names);
+                if (apiRootTypeReference is null)
+                {
+                    existing.AddPath(names);
+                }
+                else
+                {
+                    existing.AddPath(apiRootTypeReference, names);
+                }
             }
         }
         else
         {
             var builder = this.GetOrAddKeyBuilder(apiKeyName);
-            builder.AddPath(clrRootType, names);
+            if (clrRootType == this.ClrType)
+            {
+                builder.AddPath(names);
+            }
+            else
+            {
+                builder.AddPath(clrRootType, names);
+            }
         }
     }
 

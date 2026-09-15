@@ -26,7 +26,7 @@ following table.
 | Required schema metadata | `ApiProperty.ClrMemberKind` | Compilation issue | Compilation issue | Compilation issue |
 | Defaulted schema setting | `ApiTypeModifiers`, `ApiRelationshipDeleteBehavior`, `ApiSchemaOptions.ApiKeyNullHandling` | Use the documented default | Compilation issue | Compilation issue |
 | Nullable override | `ApiObjectTypeOptions.ApiKeyNullHandling` | Inherit | Inherit | Compilation issue |
-| Conditional reference metadata | `ApiTypeExpression.ApiKind` | Allowed for inline and CLR references; otherwise compilation issue | Allowed for inline and CLR references; otherwise compilation issue | Compilation issue |
+| Conditional reference metadata | `ApiTypeReference.ApiKind` | Allowed for CLR references; otherwise compilation issue | Allowed for CLR references; otherwise compilation issue | Compilation issue |
 | Structural discriminator | `ApiType.ApiKind`, `ApiRelationship.ApiKind` | `JsonException` | `JsonException` | `JsonException` |
 
 An incompatible token is well-formed JSON whose value cannot represent the enum, such as a number,
@@ -49,10 +49,10 @@ type that the reader must construct. Without a valid discriminator, there is no 
 element to compile or to own an issue. Those errors remain `JsonException` values at the JSON
 boundary.
 
-`ApiTypeExpression.ApiKind` does not select a concrete materialized type. It is optional metadata
-for an API named reference, so an invalid non-null value is retained as materialization state and
-reported during compilation. An omitted or null value remains valid when the expression instead
-contains an inline type or CLR type reference.
+`ApiTypeReference.ApiKind` does not select a concrete materialized type. It is one half of an API
+named reference, so an invalid non-null value is retained as materialization state and reported
+during compilation. An omitted or null value remains valid only when the reference instead contains
+a CLR type. An inline `ApiTypeExpression` does not contain an `ApiTypeReference`.
 
 ## Converter and Materializer Responsibilities
 
@@ -63,7 +63,7 @@ compatibility and must not be used to enforce structural-discriminator validatio
 
 `NullableEnumJsonConverter<TEnum>` with
 `EnumJsonInvalidValuePolicy.ReturnNull` is a parsing tool for materializers that can turn an
-invalid enum into an compilation issue. Its `null` result alone does not distinguish a JSON
+invalid enum into a compilation issue. Its `null` result alone does not distinguish a JSON
 `null`, an unknown value, an incompatible token, and an omitted property. A materializer that
 supports any of those distinctions must retain the property's presence and parsing state in
 addition to the nullable enum value. `JsonConverterBase.ReadJsonObject` supports this narrowly:

@@ -45,7 +45,7 @@ internal sealed class ApiObjectTypePrimaryKeyInferenceConvention : IApiObjectTyp
             return;
         }
 
-        builder.AddKeyIfAbsent("PrimaryKey", b => b.AddPath(clrType, clrName));
+        builder.AddKeyIfAbsent("PrimaryKey", b => b.AddPath(clrName));
     }
     #endregion
 

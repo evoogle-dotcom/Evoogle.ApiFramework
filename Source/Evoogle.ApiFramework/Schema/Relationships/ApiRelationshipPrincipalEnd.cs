@@ -19,14 +19,18 @@ namespace Evoogle.ApiFramework.Schema.Relationships;
 ///     The principal end identifies the object type that participates as a principal in a relationship.
 ///     Key-bound relationships resolve the concrete principal key binding on the owning relationship.
 /// </summary>
-/// <param name="clrObjectType">The CLR type of the principal <see cref="ApiObjectType"/>.</param>
+/// <param name="apiObjectTypeReference">The reference to the principal <see cref="ApiObjectType"/>.</param>
 /// <param name="apiPrincipalKeyName">
 ///     The optional name of the <see cref="ApiKeyDefinition"/> on the principal type that should be used by the owning
 ///     relationship's key binding. When <see langword="null"/>, key-bound relationship compilation uses the foreign
 ///     key binding to infer the best compatible key on the principal object type.
 /// </param>
 [JsonConverter(typeof(ApiRelationshipPrincipalEndJsonConverter))]
-public sealed class ApiRelationshipPrincipalEnd(Type clrObjectType, string? apiPrincipalKeyName = null) : ApiRelationshipEnd(clrObjectType)
+public sealed class ApiRelationshipPrincipalEnd
+(
+    ApiTypeReference apiObjectTypeReference,
+    string? apiPrincipalKeyName = null
+) : ApiRelationshipEnd(apiObjectTypeReference)
 {
     #region ApiSchemaElement Properties
     /// <inheritdoc/>
@@ -51,11 +55,14 @@ public sealed class ApiRelationshipPrincipalEnd(Type clrObjectType, string? apiP
     /// <inheritdoc/>
     public override string ToString()
     {
-        var clrObjectType = this.ClrObjectType.SafeToName();
+        var apiObjectTypeReference = this.ApiObjectTypeReference.SafeToString();
         var apiPrincipalKeyName = this.ApiPrincipalKeyName.SafeToString();
         var extensionCount = this.ExtensionCount.SafeToString();
 
-        return $"{nameof(ApiRelationshipPrincipalEnd)} {{{nameof(this.ClrObjectType)}={clrObjectType}, {nameof(this.ApiPrincipalKeyName)}={apiPrincipalKeyName}, {nameof(this.ExtensionCount)}={extensionCount}}}";
+        return $"{nameof(ApiRelationshipPrincipalEnd)} "
+            + $"{{{nameof(this.ApiObjectTypeReference)}={apiObjectTypeReference}, "
+            + $"{nameof(this.ApiPrincipalKeyName)}={apiPrincipalKeyName}, "
+            + $"{nameof(this.ExtensionCount)}={extensionCount}}}";
     }
     #endregion
 

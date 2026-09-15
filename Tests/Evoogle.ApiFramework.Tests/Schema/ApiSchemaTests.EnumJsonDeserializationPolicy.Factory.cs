@@ -36,7 +36,7 @@ internal static class EnumJsonDeserializationPolicyTestsFactory
         => schema[nameof(ApiSchema.ApiRelationships)]!.AsArray()[0]!.AsObject()[nameof(ApiRelationship.ApiDeleteBehavior)] = new JsonObject();
 
     public static void SetFirstPropertyApiTypeApiKindToUnknownString(JsonObject schema)
-        => GetFirstProperty(schema)[nameof(ApiProperty.ApiType)]!.AsObject()[nameof(ApiTypeExpression.ApiKind)] = "Unknown";
+        => GetFirstProperty(schema)[nameof(ApiProperty.ApiType)]!.AsObject()[nameof(ApiTypeReference.ApiKind)] = "Unknown";
     #endregion
 
     #region Default And Inheritance Factory Methods
@@ -76,9 +76,8 @@ internal static class EnumJsonDeserializationPolicyTestsFactory
             var apiObjectType = apiObjectTypeNode!.AsObject();
             foreach (var apiPropertyNode in apiObjectType[nameof(ApiObjectType.ApiProperties)]!.AsArray())
             {
-                var apiTypeExpression = apiPropertyNode!.AsObject()[nameof(ApiProperty.ApiType)]!.AsObject();
-                var apiInlineType = apiTypeExpression[nameof(ApiTypeExpression.ApiInlineType)]?.AsObject();
-                if (apiInlineType?[nameof(ApiType.ApiKind)]?.GetValue<string>() == nameof(ApiTypeKind.Collection))
+                var apiInlineType = apiPropertyNode!.AsObject()[nameof(ApiProperty.ApiType)]!.AsObject();
+                if (apiInlineType[nameof(ApiType.ApiKind)]?.GetValue<string>() == nameof(ApiTypeKind.Collection))
                 {
                     return apiInlineType;
                 }

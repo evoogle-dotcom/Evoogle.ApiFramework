@@ -3,9 +3,9 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using System.Collections.Immutable;
 using System.Text.Json;
 
-using Evoogle.ApiFramework.Schema.Json.Internal;
 using Evoogle.ApiFramework.Schema.Types;
 using Evoogle.Json;
 
@@ -14,28 +14,22 @@ using Microsoft.Extensions.Logging;
 namespace Evoogle.ApiFramework.Schema.Json;
 
 /// <summary>
-///     Converts <see cref="ApiTypeExpression"/> instances to and from JSON, including inline types and references.
+///     Converts <see cref="ApiTypeExpression"/> instances to and from JSON.
 /// </summary>
-/// <param name="logger">The optional logger that receives diagnostics for serialization operations.</param>
-public class ApiTypeExpressionJsonConverter(ILogger<ApiTypeExpressionJsonConverter>? logger) : JsonConverterBase<ApiTypeExpression>(logger)
+/// <param name="logger">The optional logger instance.</param>
+public sealed class ApiTypeExpressionJsonConverter(ILogger<ApiTypeExpressionJsonConverter>? logger)
+    : JsonConverterBase<ApiTypeExpression>(logger)
 {
     #region Property Types
-    /// <summary>
-    ///     Caches the JSON property names used to represent a type expression for the active naming policy.
-    /// </summary>
     private readonly record struct ApiTypeExpressionPropertyNames
     {
         #region Immutable Properties
-        public required string ApiInlineType { get; init; }
         public required string ApiKind { get; init; }
         public required string ApiName { get; init; }
         public required string ClrType { get; init; }
         #endregion
     }
 
-    /// <summary>
-    ///     Aggregates all property names used by the converter for a given naming policy.
-    /// </summary>
     private readonly record struct PropertyNames
     {
         #region Immutable Properties
@@ -48,10 +42,9 @@ public class ApiTypeExpressionJsonConverter(ILogger<ApiTypeExpressionJsonConvert
             {
                 ApiTypeExpression = new ApiTypeExpressionPropertyNames
                 {
-                    ApiInlineType = policy.ConvertName(nameof(Types.ApiTypeExpression.ApiInlineType)),
-                    ApiKind = policy.ConvertName(nameof(Types.ApiTypeExpression.ApiKind)),
-                    ApiName = policy.ConvertName(nameof(Types.ApiTypeExpression.ApiName)),
-                    ClrType = policy.ConvertName(nameof(Types.ApiTypeExpression.ClrType)),
+                    ApiKind = policy.ConvertName(nameof(ApiTypeReference.ApiKind)),
+                    ApiName = policy.ConvertName(nameof(ApiTypeReference.ApiName)),
+                    ClrType = policy.ConvertName(nameof(ApiTypeReference.ClrType)),
                 }
             };
         #endregion
@@ -59,84 +52,24 @@ public class ApiTypeExpressionJsonConverter(ILogger<ApiTypeExpressionJsonConvert
     #endregion
 
     #region Read Types
-    /// <summary>
-    ///     Temporary storage that holds parsed values prior to creating an <see cref="ApiTypeExpression"/>.
-    /// </summary>
-    private class ApiTypeExpressionReadData
+    private sealed class ReadState
     {
-        #region Properties
         public ApiType? ApiInlineType { get; set; }
-        public JsonEnumReadState<ApiTypeKind>? ApiKind { get; set; }
-        public string? ApiName { get; set; }
-        public Type? ClrType { get; set; }
-        #endregion
+        public ApiTypeReference? ApiTypeReference { get; set; }
     }
 
-    /// <summary>
-    ///     Captures the overall data read from JSON for a single type expression instance.
-    /// </summary>
-    private class ReadState
+    private sealed class ReadContext
+    (
+        ILogger logger,
+        JsonSerializerOptions options,
+        JsonNamingPolicy propertyNamingPolicy,
+        PropertyNames propertyNames
+    ) : DefaultContext<PropertyNames>(logger, options, propertyNamingPolicy, propertyNames), IReadContext
     {
         #region Properties
-        public ApiTypeExpressionReadData? ApiTypeExpression { get; set; }
+        public ReadState ReadData { get; } = new();
         #endregion
     }
-
-    /// <summary>
-    ///     Provides JSON property handlers that populate <see cref="ReadState"/> during deserialization.
-    /// </summary>
-    private class ReadHandlers(PropertyNames propertyNames)
-    {
-        #region ApiTypeExpression Fields
-        public readonly Dictionary<string, JsonReaderHandler<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>>> PropertyHandlers = new()
-        {
-            { propertyNames.ApiTypeExpression.ApiInlineType, HandleApiTypeExpressionApiInlineType },
-            { propertyNames.ApiTypeExpression.ApiKind, HandleApiTypeExpressionApiKind },
-            { propertyNames.ApiTypeExpression.ApiName, HandleApiTypeExpressionApiName },
-            { propertyNames.ApiTypeExpression.ClrType, HandleApiTypeExpressionClrType },
-        };
-        #endregion
-
-        #region ApiTypeExpression Methods
-        private static void HandleApiTypeExpressionApiInlineType(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
-        {
-            context.ReadData.ApiTypeExpression ??= new ApiTypeExpressionReadData();
-
-            context.ReadData.ApiTypeExpression.ApiInlineType = JsonSerializer.Deserialize<ApiType>(ref reader, context.Options);
-        }
-
-        private static void HandleApiTypeExpressionApiKind(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
-        {
-            context.ReadData.ApiTypeExpression ??= new ApiTypeExpressionReadData();
-
-            var readData = context.ReadData.ApiTypeExpression;
-            readData.ApiKind ??= new JsonEnumReadState<ApiTypeKind>();
-            readData.ApiKind.Read(ref reader, context.Options, _nullableApiTypeKindJsonConverter);
-        }
-
-        private static void HandleApiTypeExpressionApiName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
-        {
-            context.ReadData.ApiTypeExpression ??= new ApiTypeExpressionReadData();
-
-            context.ReadData.ApiTypeExpression.ApiName = reader.GetString();
-        }
-
-        private static void HandleApiTypeExpressionClrType(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
-        {
-            context.ReadData.ApiTypeExpression ??= new ApiTypeExpressionReadData();
-
-            context.ReadData.ApiTypeExpression.ClrType = _typeJsonConverter.Read(ref reader, typeof(Type), context.Options);
-        }
-        #endregion
-    }
-    #endregion
-
-    #region Fields
-    private static readonly EnumJsonConverter<ApiTypeKind> _apiTypeKindJsonConverter = new();
-    private static readonly NullableEnumJsonConverter<ApiTypeKind> _nullableApiTypeKindJsonConverter =
-        new(EnumJsonInvalidValuePolicy.ReturnNull);
-
-    private static readonly TypeJsonConverter _typeJsonConverter = new();
     #endregion
 
     #region Constructors
@@ -147,123 +80,148 @@ public class ApiTypeExpressionJsonConverter(ILogger<ApiTypeExpressionJsonConvert
     }
     #endregion
 
-    #region JsonConverterBase<T> Methods
+    #region JsonConverterBase Methods
     /// <inheritdoc/>
     protected override IReadContext CreateReadContext(ILogger logger, JsonSerializerOptions options)
-        => CreateDefaultReadContext<PropertyNames, ReadState, ReadHandlers>
-            (
-                logger,
-                options,
-                buildPropertyNames: PropertyNames.Create,
-                buildReadHandlers: names => new ReadHandlers(names)
-            );
+    {
+        var policy = options.GetPropertyNamingPolicy();
+        var names = GetPropertyNames(options, PropertyNames.Create);
+        return new ReadContext(logger, options, policy, names);
+    }
+
+    /// <inheritdoc/>
+    protected override ApiTypeExpression CreateValue(IReadContext context)
+    {
+        var readContext = (ReadContext)context;
+        var apiInlineType = readContext.ReadData.ApiInlineType;
+        var apiTypeReference = readContext.ReadData.ApiTypeReference;
+
+        var apiTypeExpression = new ApiTypeExpression(apiInlineType, apiTypeReference);
+        return apiTypeExpression;
+    }
 
     /// <inheritdoc/>
     protected override IWriteContext CreateWriteContext(ILogger logger, JsonSerializerOptions options)
-        => CreateDefaultWriteContext
-            (
-                logger,
-                options,
-                buildPropertyNames: PropertyNames.Create
-            );
-
-    /// <inheritdoc/>
-    protected override ApiTypeExpression? CreateValue(IReadContext context)
-    {
-        var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
-        var readState = readContext.ReadData.ApiTypeExpression;
-        var apiKindReadState = readState?.ApiKind;
-
-        var apiInlineType = readState?.ApiInlineType;
-        if (apiInlineType is not null)
-        {
-            var apiTypeExpression = new ApiTypeExpression(apiInlineType);
-            if (apiKindReadState?.IsInvalid == true)
-            {
-                apiTypeExpression.MarkInvalidApiKind();
-            }
-
-            return apiTypeExpression;
-        }
-
-        var apiKind = apiKindReadState?.Value;
-        var apiName = readState?.ApiName;
-        var clrType = readState?.ClrType;
-
-        var apiTypeExpressionForReference = new ApiTypeExpression(apiKind, apiName, clrType);
-        if (apiKindReadState?.IsInvalid == true)
-        {
-            apiTypeExpressionForReference.MarkInvalidApiKind();
-        }
-
-        return apiTypeExpressionForReference;
-    }
+        => CreateDefaultWriteContext(logger, options, buildPropertyNames: PropertyNames.Create);
 
     /// <inheritdoc/>
     protected override void ReadCore(ref Utf8JsonReader reader, IReadContext context)
     {
-        var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
-        var handlers = readContext.ReadHandlers.PropertyHandlers;
+        var propertyNames = reader.ReadObjectPropertyNames(JsonReaderNullPropertyHandling.Ignore);
 
-        ReadJsonObject
-        (
-            ref reader,
-            readContext,
-            handlers,
-            readContext.PropertyNames.ApiTypeExpression.ApiKind
-        );
+        if (IsEmptyExpressionObject(propertyNames))
+        {
+            // If there are no properties, it is considered an invalid expression object.
+            reader.Skip();
+            return;
+        }
+
+        var readContext = (ReadContext)context;
+        var options = readContext.Options;
+
+        var clrTypePropertyName = readContext.PropertyNames.ApiTypeExpression.ClrType;
+        var apiKindPropertyName = readContext.PropertyNames.ApiTypeExpression.ApiKind;
+        var apiNamePropertyName = readContext.PropertyNames.ApiTypeExpression.ApiName;
+
+        if (IsReferenceObject(propertyNames, clrTypePropertyName, apiKindPropertyName, apiNamePropertyName))
+        {
+            // Handle the reference case here
+            var apiTypeReference = JsonSerializer.Deserialize<ApiTypeReference>(ref reader, options);
+            readContext.ReadData.ApiTypeReference = apiTypeReference;
+        }
+        else if (IsInlineObject(propertyNames))
+        {
+            // Handle the inline case here
+            var apiInlineType = JsonSerializer.Deserialize<ApiType>(ref reader, options);
+            readContext.ReadData.ApiInlineType = apiInlineType;
+        }
+
+        // If the object is neither a reference nor an inline object, it is considered an invalid expression object.
+        reader.Skip();
     }
 
     /// <inheritdoc/>
-    protected override void WriteCore(Utf8JsonWriter writer, ApiTypeExpression value, IWriteContext context)
+    protected override void WriteCore
+    (
+        Utf8JsonWriter writer,
+        ApiTypeExpression value,
+        IWriteContext context
+    )
     {
-        var writeContext = (DefaultWriteContext<PropertyNames>)context;
-
-        WriteJsonObject(writer, () =>
+        var options = context.Options;
+        if (value.IsReference)
         {
-            WriteApiTypeExpressionApiKind(writer, value, writeContext);
-            WriteApiTypeExpressionApiName(writer, value, writeContext);
-            WriteApiTypeExpressionApiInlineType(writer, value, writeContext);
-            WriteApiTypeExpressionClrType(writer, value, writeContext);
-        });
+            // Handle the reference case here
+            var apiTypeReference = value.ApiTypeReference;
+            writer.TryWriteWithSerializer(apiTypeReference, options);
+            return;
+        }
+        else if (value.IsInline)
+        {
+            // Handle the inline case here
+            var apiInlineType = value.ApiInlineType;
+            writer.TryWriteWithSerializer(apiInlineType, options);
+            return;
+        }
+        else
+        {
+            // Handle the invalid state here
+            throw new JsonException("Invalid ApiTypeExpression state: neither inline nor reference.");
+        }
     }
     #endregion
 
-    #region Write Implementation Methods
-    private static void WriteApiTypeExpressionApiKind(Utf8JsonWriter writer, ApiTypeExpression apiTypeExpression, DefaultWriteContext<PropertyNames> context)
-    {
-        var propertyName = context.PropertyNames.ApiTypeExpression.ApiKind;
-        var kind = apiTypeExpression.ApiKind;
-        var options = context.Options;
+    #region Helper Methods
+    private static bool IsEmptyExpressionObject(ImmutableArray<string> propertyNames)
+        => propertyNames.Length == 0;
 
-        writer.TryWritePropertyWithConverter(propertyName, kind, options, _apiTypeKindJsonConverter);
+    private static bool IsInlineObject(ImmutableArray<string> propertyNames)
+        => propertyNames.Length > 2;
+
+    private static bool IsReferenceObject
+    (
+        ImmutableArray<string> propertyNames,
+        string clrTypePropertyName,
+        string apiKindPropertyName,
+        string apiNamePropertyName
+    )
+    {
+        // Handle the two most common cases: reference by CLR type, or by API kind and name.
+        if (IsClrTypeReference(propertyNames, clrTypePropertyName))
+        {
+            return true;
+        }
+
+        if (IsApiKindAndApiNameReference(propertyNames, apiKindPropertyName, apiNamePropertyName))
+        {
+            return true;
+        }
+
+        // Handle the malformed reference case here
+        if (IsMalformedReference(propertyNames, clrTypePropertyName, apiKindPropertyName, apiNamePropertyName))
+        {
+            return true;
+        }
+
+        return false;
     }
 
-    private static void WriteApiTypeExpressionApiName(Utf8JsonWriter writer, ApiTypeExpression apiTypeExpression, DefaultWriteContext<PropertyNames> context)
+    private static bool IsApiKindAndApiNameReference(ImmutableArray<string> propertyNames, string apiKindPropertyName, string apiNamePropertyName)
+        => propertyNames.Length == 2 && ((propertyNames[0] == apiKindPropertyName && propertyNames[1] == apiNamePropertyName) || (propertyNames[0] == apiNamePropertyName && propertyNames[1] == apiKindPropertyName));
+
+    private static bool IsClrTypeReference(ImmutableArray<string> propertyNames, string clrTypePropertyName)
+        => propertyNames.Length == 1 && propertyNames[0] == clrTypePropertyName;
+
+    private static bool IsMalformedReference(ImmutableArray<string> propertyNames, string clrTypePropertyName, string apiKindPropertyName, string apiNamePropertyName)
     {
-        var propertyName = context.PropertyNames.ApiTypeExpression.ApiName;
-        var value = apiTypeExpression.ApiName;
-        var options = context.Options;
+        if (propertyNames.Length is not (1 or 2))
+        {
+            return false;
+        }
 
-        writer.TryWritePropertyAsString(propertyName, value, options);
-    }
-
-    private static void WriteApiTypeExpressionApiInlineType(Utf8JsonWriter writer, ApiTypeExpression apiTypeExpression, DefaultWriteContext<PropertyNames> context)
-    {
-        var propertyName = context.PropertyNames.ApiTypeExpression.ApiInlineType;
-        var apiInlineType = apiTypeExpression.ApiInlineType;
-        var options = context.Options;
-
-        writer.TryWritePropertyWithSerializer(propertyName, apiInlineType, options);
-    }
-
-    private static void WriteApiTypeExpressionClrType(Utf8JsonWriter writer, ApiTypeExpression apiTypeExpression, DefaultWriteContext<PropertyNames> context)
-    {
-        var propertyName = context.PropertyNames.ApiTypeExpression.ClrType;
-        var clrType = apiTypeExpression.ClrType;
-        var options = context.Options;
-
-        writer.TryWritePropertyWithConverter(propertyName, clrType, options, _typeJsonConverter);
+        return propertyNames.Contains(apiKindPropertyName)
+            || propertyNames.Contains(apiNamePropertyName)
+            || propertyNames.Contains(clrTypePropertyName);
     }
     #endregion
 }

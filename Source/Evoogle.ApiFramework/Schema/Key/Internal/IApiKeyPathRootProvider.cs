@@ -5,21 +5,20 @@
 // See the LICENSE file in the project root for more information.
 using Evoogle.ApiFramework.Schema.Types;
 
-namespace Evoogle.ApiFramework.Schema.Configuration.Key.Internal;
+namespace Evoogle.ApiFramework.Schema.Key.Internal;
 
 /// <summary>
 ///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used
 ///     directly from your code. This API may change or be removed in future releases.
 /// </summary>
-internal sealed class ApiKeyPathState
-(
-    ApiTypeReference? apiRootTypeReference,
-    IEnumerable<ApiKeyPathSegmentBuilder> segmentBuilders
-)
+/// <remarks>
+///     Supplies the root object type and diagnostic label for key paths structurally owned by an element.
+/// </remarks>
+internal interface IApiKeyPathRootProvider
 {
     #region Properties
-    internal ApiTypeReference? ApiRootTypeReference { get; } = apiRootTypeReference;
+    ApiObjectType? ApiOwnerSuppliedKeyPathRoot { get; }
 
-    internal List<ApiKeyPathSegmentBuilder> SegmentBuilders { get; } = [.. segmentBuilders ?? throw new ArgumentNullException(nameof(segmentBuilders))];
+    string? OwnerSuppliedKeyPathRootLabel { get; }
     #endregion
 }

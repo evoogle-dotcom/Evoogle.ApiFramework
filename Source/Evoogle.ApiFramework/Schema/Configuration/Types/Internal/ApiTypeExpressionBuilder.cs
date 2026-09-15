@@ -27,7 +27,8 @@ internal static class ApiTypeExpressionBuilder
     #endregion
 
     #region Implementation Methods
-    private static ApiTypeExpression BuildClrTypeReference(Type clrType) => new(clrType);
+    private static ApiTypeExpression BuildClrTypeReference(Type clrType) =>
+        new(new ApiTypeReference(clrType));
 
     private static ApiTypeExpression BuildInlineCollection(IReadOnlyList<MemberNullableInfo.CollectionInfo> clrCollectionChain)
     {

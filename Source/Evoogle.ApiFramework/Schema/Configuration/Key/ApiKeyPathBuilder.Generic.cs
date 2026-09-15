@@ -16,18 +16,26 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Key;
 /// </summary>
 /// <typeparam name="TRoot">The root CLR type from which the key path navigation begins.</typeparam>
 /// <remarks>
-///     Creates an <see cref="ApiKeyPathBuilder{TRoot}"/> with the specified root CLR type and pre-configured
-///     segment builders.
+///     Supports owner-inferred paths rooted at <typeparamref name="TRoot"/> and explicitly rooted paths
+///     for another CLR type.
 /// </remarks>
-/// <param name="clrRootType">The CLR type from which the navigation chain begins.</param>
-/// <param name="segmentBuilders">
-///     Ordered <see cref="ApiKeyPathSegmentBuilder"/> instances from the root type to the terminal scalar member.
-///     Must contain at least one builder.
-/// </param>
-/// <exception cref="ArgumentNullException">Thrown when <paramref name="clrRootType"/> or <paramref name="segmentBuilders"/> is <c>null</c>.</exception>
-/// <exception cref="ArgumentException">Thrown when <paramref name="segmentBuilders"/> contains no elements.</exception>
-public sealed class ApiKeyPathBuilder<TRoot>(Type clrRootType, IEnumerable<ApiKeyPathSegmentBuilder> segmentBuilders) : ApiKeyPathBuilder(clrRootType, segmentBuilders)
+public sealed class ApiKeyPathBuilder<TRoot> : ApiKeyPathBuilder
 {
+    #region Constructors
+    /// <summary>Creates a key-path builder with an explicit CLR root type.</summary>
+    /// <param name="clrRootType">The explicit CLR root type.</param>
+    /// <param name="segmentBuilders">The ordered key-path segment builders.</param>
+    public ApiKeyPathBuilder(Type clrRootType, IEnumerable<ApiKeyPathSegmentBuilder> segmentBuilders)
+        : base(clrRootType, segmentBuilders)
+    {
+    }
+
+    private ApiKeyPathBuilder(IEnumerable<ApiKeyPathSegmentBuilder> segmentBuilders)
+        : base(segmentBuilders)
+    {
+    }
+    #endregion
+
     #region Factory Methods
     /// <summary>
     ///     Creates a builder for a path rooted at <typeparamref name="TRoot"/> using a type-safe lambda expression.
@@ -44,7 +52,7 @@ public sealed class ApiKeyPathBuilder<TRoot>(Type clrRootType, IEnumerable<ApiKe
 
         var names = StaticReflection.GetMemberPath(expression);
         var segmentBuilders = names.Select(n => new ApiKeyPathSegmentBuilder(n));
-        return new ApiKeyPathBuilder<TRoot>(typeof(TRoot), segmentBuilders);
+        return new ApiKeyPathBuilder<TRoot>(segmentBuilders);
     }
 
     /// <summary>

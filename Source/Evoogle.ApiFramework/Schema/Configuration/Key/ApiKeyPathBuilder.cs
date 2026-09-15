@@ -6,6 +6,7 @@
 using Evoogle.ApiFramework.Schema.Configuration.Key.Internal;
 using Evoogle.ApiFramework.Schema.Key;
 using Evoogle.ApiFramework.Schema.Key.Internal;
+using Evoogle.ApiFramework.Schema.Types;
 
 namespace Evoogle.ApiFramework.Schema.Configuration.Key;
 
@@ -13,9 +14,9 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Key;
 ///     Fluent builder used to configure a single <see cref="ApiKeyPath"/>.
 /// </summary>
 /// <remarks>
-///     Use one of the static <see cref="For(Type, string[])"/> or <see cref="For(Type, ApiKeyPathSegmentBuilder[])"/>
-///     factory methods to create instances, optionally attach extensions or add segments, then call
-///     <see cref="Build"/> internally.
+///     Factory and constructor overloads accept an explicit CLR type, an explicit
+///     <see cref="ApiTypeReference"/>, or an inferred root. Extensions and additional segments can
+///     be attached before the path is built.
 /// </remarks>
 public class ApiKeyPathBuilder : ExtensionBuilder<ApiKeyPathBuilder>
 {
@@ -24,8 +25,8 @@ public class ApiKeyPathBuilder : ExtensionBuilder<ApiKeyPathBuilder>
     #endregion
 
     #region Properties
-    /// <summary>Gets the CLR root type from which this key path's navigation chain begins.</summary>
-    internal Type ClrRootType => _state.ClrRootType;
+    /// <summary>Gets the explicit root reference, or null when the root is inferred.</summary>
+    internal ApiTypeReference? ApiRootTypeReference => _state.ApiRootTypeReference;
 
     /// <summary>Gets the ordered segment builders that make up this key path.</summary>
     internal IReadOnlyList<ApiKeyPathSegmentBuilder> SegmentBuilders => _state.SegmentBuilders;
@@ -44,30 +45,39 @@ public class ApiKeyPathBuilder : ExtensionBuilder<ApiKeyPathBuilder>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="clrRootType"/> or <paramref name="clrMemberNames"/> is <c>null</c>.</exception>
     /// <exception cref="ArgumentException">Thrown when <paramref name="clrMemberNames"/> contains no valid paths.</exception>
     public ApiKeyPathBuilder(Type clrRootType, IEnumerable<string> clrMemberNames)
-    {
-        ArgumentNullException.ThrowIfNull(clrRootType);
-        ArgumentNullException.ThrowIfNull(clrMemberNames);
-
-        var names = clrMemberNames as string[] ?? [.. clrMemberNames];
-
-        if (names.Length == 0)
-        {
-            throw new ArgumentException("At least one CLR member name must be provided.", nameof(clrMemberNames));
-        }
-
-        var parsedClrMemberNames = new List<string>();
-        foreach (var name in names)
-        {
-            var parseResult = ApiKeyPathClrPathParser.Parse(name);
-            parseResult.ThrowIfInvalid(nameof(clrMemberNames));
-            parsedClrMemberNames.AddRange(parseResult.ClrMemberNames);
-        }
-
-        _state = new ApiKeyPathState
+        : this
         (
-            clrRootType,
-            parsedClrMemberNames.Select(static name => new ApiKeyPathSegmentBuilder(name))
-        );
+            new ApiTypeReference
+                (clrRootType ?? throw new ArgumentNullException(nameof(clrRootType))),
+            clrMemberNames
+        )
+    {
+    }
+
+    /// <summary>Creates a key-path builder with an explicit API type reference.</summary>
+    /// <param name="apiRootTypeReference">The explicit root object-type reference.</param>
+    /// <param name="clrMemberNames">The CLR member paths.</param>
+    public ApiKeyPathBuilder
+    (
+        ApiTypeReference apiRootTypeReference,
+        IEnumerable<string> clrMemberNames
+    ) : this
+    (
+        CreateState
+        (
+            apiRootTypeReference ??
+                throw new ArgumentNullException(nameof(apiRootTypeReference)),
+            clrMemberNames
+        )
+    )
+    {
+    }
+
+    /// <summary>Creates a key-path builder whose root is inferred from its owner.</summary>
+    /// <param name="clrMemberNames">The CLR member paths.</param>
+    public ApiKeyPathBuilder(IEnumerable<string> clrMemberNames)
+        : this(CreateState(null, clrMemberNames))
+    {
     }
 
     /// <summary>
@@ -82,21 +92,44 @@ public class ApiKeyPathBuilder : ExtensionBuilder<ApiKeyPathBuilder>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="clrRootType"/> or <paramref name="segmentBuilders"/> is <c>null</c>.</exception>
     /// <exception cref="ArgumentException">Thrown when <paramref name="segmentBuilders"/> contains no elements.</exception>
     public ApiKeyPathBuilder(Type clrRootType, IEnumerable<ApiKeyPathSegmentBuilder> segmentBuilders)
+        : this
+        (
+            new ApiTypeReference
+                (clrRootType ?? throw new ArgumentNullException(nameof(clrRootType))),
+            segmentBuilders
+        )
     {
-        ArgumentNullException.ThrowIfNull(clrRootType);
-        ArgumentNullException.ThrowIfNull(segmentBuilders);
+    }
 
-        _state = new ApiKeyPathState(clrRootType, segmentBuilders);
+    /// <summary>Creates a key-path builder with an explicit root reference and segment builders.</summary>
+    /// <param name="apiRootTypeReference">The explicit root object-type reference.</param>
+    /// <param name="segmentBuilders">The ordered segment builders.</param>
+    public ApiKeyPathBuilder
+    (
+        ApiTypeReference apiRootTypeReference,
+        IEnumerable<ApiKeyPathSegmentBuilder> segmentBuilders
+    ) : this
+    (
+        CreateState
+        (
+            apiRootTypeReference ??
+                throw new ArgumentNullException(nameof(apiRootTypeReference)),
+            segmentBuilders
+        )
+    )
+    {
+    }
 
-        if (_state.SegmentBuilders.Count == 0)
-        {
-            throw new ArgumentException("At least one segment builder must be provided.", nameof(segmentBuilders));
-        }
+    /// <summary>Creates a key-path builder with an inferred root and segment builders.</summary>
+    /// <param name="segmentBuilders">The ordered segment builders.</param>
+    public ApiKeyPathBuilder(IEnumerable<ApiKeyPathSegmentBuilder> segmentBuilders)
+        : this(CreateState(null, segmentBuilders))
+    {
+    }
 
-        if (_state.SegmentBuilders.Any(static builder => builder is null))
-        {
-            throw new ArgumentException("Segment builders must not contain null values.", nameof(segmentBuilders));
-        }
+    private ApiKeyPathBuilder(ApiKeyPathState state)
+    {
+        _state = state;
     }
     #endregion
 
@@ -123,6 +156,16 @@ public class ApiKeyPathBuilder : ExtensionBuilder<ApiKeyPathBuilder>
         return new(clrRootType, clrMemberNames);
     }
 
+    /// <summary>Creates a builder with an explicit API root reference.</summary>
+    public static ApiKeyPathBuilder For
+    (
+        ApiTypeReference apiRootTypeReference,
+        params string[] clrMemberNames
+    ) => new(apiRootTypeReference, clrMemberNames);
+
+    /// <summary>Creates a builder whose root is inferred from its owner.</summary>
+    public static ApiKeyPathBuilder For(params string[] clrMemberNames) => new(clrMemberNames);
+
     /// <summary>
     ///     Creates a builder for a path that starts from the specified root CLR type, using pre-configured
     ///     segment builders. Use this overload when individual segments require extensions.
@@ -141,6 +184,17 @@ public class ApiKeyPathBuilder : ExtensionBuilder<ApiKeyPathBuilder>
 
         return new(clrRootType, segmentBuilders);
     }
+
+    /// <summary>Creates a builder with an explicit API root reference and segment builders.</summary>
+    public static ApiKeyPathBuilder For
+    (
+        ApiTypeReference apiRootTypeReference,
+        params ApiKeyPathSegmentBuilder[] segmentBuilders
+    ) => new(apiRootTypeReference, segmentBuilders);
+
+    /// <summary>Creates a builder with an inferred root and segment builders.</summary>
+    public static ApiKeyPathBuilder For(params ApiKeyPathSegmentBuilder[] segmentBuilders) =>
+        new(segmentBuilders);
     #endregion
 
     #region AddExtension Methods
@@ -182,7 +236,7 @@ public class ApiKeyPathBuilder : ExtensionBuilder<ApiKeyPathBuilder>
     internal ApiKeyPath Build()
     {
         var segments = _state.SegmentBuilders.Select(b => b.Build());
-        var path = new ApiKeyPath(_state.ClrRootType, segments);
+        var path = new ApiKeyPath(_state.ApiRootTypeReference, segments);
 
         var extensions = this.BuildExtensions();
         if (extensions != null)
@@ -191,6 +245,62 @@ public class ApiKeyPathBuilder : ExtensionBuilder<ApiKeyPathBuilder>
         }
 
         return path;
+    }
+    #endregion
+
+    #region Implementation Methods
+    private static ApiKeyPathState CreateState
+    (
+        ApiTypeReference? apiRootTypeReference,
+        IEnumerable<string> clrMemberNames
+    )
+    {
+        ArgumentNullException.ThrowIfNull(clrMemberNames);
+
+        var names = clrMemberNames as string[] ?? [.. clrMemberNames];
+        if (names.Length == 0)
+        {
+            throw new ArgumentException
+                ("At least one CLR member name must be provided.", nameof(clrMemberNames));
+        }
+
+        var parsedClrMemberNames = new List<string>();
+        foreach (var name in names)
+        {
+            var parseResult = ApiKeyPathClrPathParser.Parse(name);
+            parseResult.ThrowIfInvalid(nameof(clrMemberNames));
+            parsedClrMemberNames.AddRange(parseResult.ClrMemberNames);
+        }
+
+        return new ApiKeyPathState
+        (
+            apiRootTypeReference,
+            parsedClrMemberNames.Select(static name => new ApiKeyPathSegmentBuilder(name))
+        );
+    }
+
+    private static ApiKeyPathState CreateState
+    (
+        ApiTypeReference? apiRootTypeReference,
+        IEnumerable<ApiKeyPathSegmentBuilder> segmentBuilders
+    )
+    {
+        ArgumentNullException.ThrowIfNull(segmentBuilders);
+
+        var state = new ApiKeyPathState(apiRootTypeReference, segmentBuilders);
+        if (state.SegmentBuilders.Count == 0)
+        {
+            throw new ArgumentException
+                ("At least one segment builder must be provided.", nameof(segmentBuilders));
+        }
+
+        if (state.SegmentBuilders.Any(static builder => builder is null))
+        {
+            throw new ArgumentException
+                ("Segment builders must not contain null values.", nameof(segmentBuilders));
+        }
+
+        return state;
     }
     #endregion
 }

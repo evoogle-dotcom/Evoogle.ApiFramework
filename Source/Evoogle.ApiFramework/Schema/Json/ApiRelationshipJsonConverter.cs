@@ -56,20 +56,20 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
             {
                 ApiRelationship = new ApiRelationshipPropertyNames
                 {
-                    ApiKind = policy.ConvertName(nameof(ApiRelationship.ApiKind)),
-                    ApiName = policy.ConvertName(nameof(ApiRelationship.ApiName)),
-                    ApiDeleteBehavior = policy.ConvertName(nameof(ApiRelationship.ApiDeleteBehavior)),
+                    ApiKind = policy.ConvertName(nameof(Relationships.ApiRelationship.ApiKind)),
+                    ApiName = policy.ConvertName(nameof(Relationships.ApiRelationship.ApiName)),
+                    ApiDeleteBehavior = policy.ConvertName(nameof(Relationships.ApiRelationship.ApiDeleteBehavior)),
                 },
                 ApiRelationshipOneTo = new ApiRelationshipOneToPropertyNames
                 {
-                    ApiPrincipalEnd = policy.ConvertName(nameof(ApiRelationshipOneTo.ApiPrincipalEnd)),
-                    ApiDependentEnd = policy.ConvertName(nameof(ApiRelationshipOneTo.ApiDependentEnd)),
+                    ApiPrincipalEnd = policy.ConvertName(nameof(Relationships.ApiRelationshipOneTo.ApiPrincipalEnd)),
+                    ApiDependentEnd = policy.ConvertName(nameof(Relationships.ApiRelationshipOneTo.ApiDependentEnd)),
                 },
                 ApiRelationshipManyToMany = new ApiRelationshipManyToManyPropertyNames
                 {
-                    ApiPrincipalEndA = policy.ConvertName(nameof(ApiRelationshipManyToMany.ApiPrincipalEndA)),
-                    ApiPrincipalEndB = policy.ConvertName(nameof(ApiRelationshipManyToMany.ApiPrincipalEndB)),
-                    ApiAssociation = policy.ConvertName(nameof(ApiRelationshipManyToMany.ApiAssociation)),
+                    ApiPrincipalEndA = policy.ConvertName(nameof(Relationships.ApiRelationshipManyToMany.ApiPrincipalEndA)),
+                    ApiPrincipalEndB = policy.ConvertName(nameof(Relationships.ApiRelationshipManyToMany.ApiPrincipalEndB)),
+                    ApiAssociation = policy.ConvertName(nameof(Relationships.ApiRelationshipManyToMany.ApiAssociation)),
                 },
                 ExtensibleBase = GetExtensiblePropertyNames(policy),
             };

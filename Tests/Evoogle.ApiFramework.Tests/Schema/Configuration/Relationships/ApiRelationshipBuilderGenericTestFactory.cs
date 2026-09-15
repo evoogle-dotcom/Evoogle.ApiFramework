@@ -5,6 +5,8 @@
 // See the LICENSE file in the project root for more information.
 using System.Linq.Dynamic.Core.CustomTypeProviders;
 
+using Evoogle.ApiFramework.Schema.Key;
+using Evoogle.ApiFramework.Schema.Types;
 using Evoogle.ApiFramework.TestData;
 
 namespace Evoogle.ApiFramework.Schema.Configuration.Relationships;
@@ -72,6 +74,22 @@ public static class ApiRelationshipBuilderGenericTestFactory
                 .WithForeignKeyA(fk => fk.AddPath(ol => ol.OrderId))
                 .WithForeignKeyB(fk => fk.AddPath(ol => ol.OrderId)))
             .Build();
+
+    public static ApiRelationship BuildExpected_OneToMany_ApiNamedReferences()
+        => new ApiRelationshipOneToMany
+        (
+            "REL_Customer_Order_ApiNamed",
+            new ApiRelationshipPrincipalEnd
+                (new ApiTypeReference(ApiTypeKind.Object, nameof(Customer))),
+            new ApiRelationshipDependentEnd
+            (
+                new ApiTypeReference(ApiTypeKind.Object, nameof(Order)),
+                new ApiKeyDefinition
+                (
+                    [new ApiKeyPath(null, [new ApiKeyPathSegment(nameof(Order.Id))])]
+                )
+            )
+        );
     #endregion
 
     #region BuildRelationship — BuildActual methods
@@ -122,6 +140,17 @@ public static class ApiRelationshipBuilderGenericTestFactory
             .WithAssociation<OrderLine>(a => a
                 .WithForeignKeyA(fk => fk.AddPath(ol => ol.OrderId))
                 .WithForeignKeyB(fk => fk.AddPath(ol => ol.OrderId)))
+            .Build();
+
+    public static ApiRelationship BuildActual_OneToMany_ApiNamedReferences()
+        => new ApiRelationshipOneToManyBuilder("REL_Customer_Order_ApiNamed")
+            .From(new ApiTypeReference(ApiTypeKind.Object, nameof(Customer)))
+            .To
+            (
+                new ApiTypeReference(ApiTypeKind.Object, nameof(Order)),
+                dependent => dependent.WithForeignKey
+                    (foreignKey => foreignKey.AddPath(nameof(Order.Id)))
+            )
             .Build();
     #endregion
 }

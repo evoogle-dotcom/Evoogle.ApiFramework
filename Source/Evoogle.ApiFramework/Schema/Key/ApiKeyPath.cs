@@ -9,45 +9,64 @@ using System.Text.Json.Serialization;
 using Evoogle.ApiFramework.Schema.Compilation;
 using Evoogle.ApiFramework.Schema.Compilation.Internal;
 using Evoogle.ApiFramework.Schema.Json;
+using Evoogle.ApiFramework.Schema.Key.Internal;
 using Evoogle.ApiFramework.Schema.Relationships;
 using Evoogle.ApiFramework.Schema.Types;
+using Evoogle.ApiFramework.Schema.Types.Internal;
 using Evoogle.Extensions;
 
 namespace Evoogle.ApiFramework.Schema.Key;
 
 /// <summary>
-///     Represents a flat, ordered chain of CLR member navigation steps from a root CLR type to a
-///     scalar value.
+///     Represents an ordered CLR member path from an explicit or owner-supplied API object root.
 /// </summary>
 /// <remarks>
 ///     <para>
-///         An <see cref="ApiKeyPath"/> unifies the concepts of primary-key field declarations and foreign-key
-///         field bindings. Both are expressed as an ordered sequence of <see cref="ApiKeyPathSegment"/> instances
-///         that navigate from a root object type to a terminal <see cref="ApiScalarType"/> property.
+///         A key path always compiles to one <see cref="ApiRootObjectType"/>, which is the
+///         <see cref="ApiObjectType"/> from which its <see cref="ApiSegments"/> are navigated.
+///         The root can originate from one of two mutually exclusive sources.
 ///     </para>
 ///     <para>
-///         The <see cref="ClrRootType"/> property specifies the CLR type from which the navigation chain begins.
-///         During schema compilation this is resolved to an <see cref="ApiObjectType"/> via the containing
-///         <see cref="ApiSchema"/>'s type registry, and the segment chain is validated against that root object type.
+///         When <see cref="ApiRootTypeReference"/> is specified, the path has an explicit root.
+///         During schema compilation, the reference is resolved against the containing schema and
+///         must resolve to an <see cref="ApiObjectType"/>. An explicit reference is authoritative:
+///         it is resolved even when it identifies the same object type that structurally owns the
+///         path, and it may identify a different declared object type.
 ///     </para>
 ///     <para>
-///         When <paramref name="clrRootType"/> is <see langword="null"/>, it is inferred during compilation
-///         from the owning <see cref="ApiObjectType"/> (for a named key definition) or the owning
-///         <see cref="ApiRelationshipElement"/> (for a foreign key definition, e.g. an
-///         <see cref="ApiRelationshipDependentEnd"/> or <see cref="ApiRelationshipAssociation"/>).
+///         When <see cref="ApiRootTypeReference"/> is <see langword="null"/>, the path has an
+///         owner-supplied root. During compilation, the path walks its ownership topology to the
+///         nearest element that supplies a key-path root. An <see cref="ApiObjectType"/> supplies
+///         itself for paths in its named keys. An <see cref="ApiRelationshipElement"/> supplies
+///         the object type resolved from its participating type reference for paths in its foreign
+///         key definitions. The supplied object type is bound directly; no additional schema
+///         lookup occurs.
+///     </para>
+///     <para>
+///         An owner-supplied relationship root is available only after its owning relationship
+///         element resolves its object-type reference. If that reference cannot resolve, the
+///         relationship element reports the authoritative diagnostic and the path does not add a
+///         duplicate root-resolution diagnostic. If neither an explicit reference nor a
+///         root-supplying owner is available, schema compilation reports that no root is
+///         available.
+///     </para>
+///     <para>
+///         After successful schema compilation, <see cref="ApiRootObjectType"/> and
+///         <see cref="ClrRootType"/> expose the resolved root regardless of its source. The
+///         segment chain is then validated from that root: every non-terminal segment must be an
+///         object-typed property, and the terminal segment must be scalar-typed.
 ///     </para>
 /// </remarks>
-/// <param name="clrRootType">
-///     The CLR type from which the navigation chain begins, or <see langword="null"/> to infer it from the
-///     owning <see cref="ApiObjectType"/> or <see cref="ApiRelationshipElement"/> during compilation.
+/// <param name="apiRootTypeReference">
+///     An explicit root type reference, or <see langword="null"/> to obtain the root from the owner.
 /// </param>
-/// <param name="apiSegments">Ordered <see cref="ApiKeyPathSegment"/> instances from the root type to the terminal scalar member. Must contain at least one segment.</param>
+/// <param name="apiSegments">The ordered member-navigation segments.</param>
 [JsonConverter(typeof(ApiKeyPathJsonConverter))]
-public sealed class ApiKeyPath(Type? clrRootType, IEnumerable<ApiKeyPathSegment> apiSegments) : ApiSchemaElement
+public sealed class ApiKeyPath(ApiTypeReference? apiRootTypeReference, IEnumerable<ApiKeyPathSegment> apiSegments)
+    : ApiSchemaElement
 {
     #region Fields
-    private ApiObjectType? _apiRootObjectType = null;
-    private Type? _clrRootType = clrRootType;
+    private readonly ApiTypeReferenceBinding<ApiObjectType> _apiRootTypeBinding = new(apiRootTypeReference);
     #endregion
 
     #region ApiSchemaElement Properties
@@ -58,40 +77,43 @@ public sealed class ApiKeyPath(Type? clrRootType, IEnumerable<ApiKeyPathSegment>
     protected override string ApiElementName => nameof(ApiKeyPath);
     #endregion
 
-    #region ApiKeyPath Properties
-    /// <summary>Gets the immutable ordered segment chain from root to terminal scalar step.</summary>
+    #region Root Properties
+    /// <summary>Gets the resolved root API object type after compilation.</summary>
+    public ApiObjectType ApiRootObjectType => _apiRootTypeBinding.ApiType;
+
+    /// <summary>Gets the resolved root CLR type after compilation.</summary>
+    public Type ClrRootType => this.ApiRootObjectType.ClrType;
+
+    /// <summary>Gets the explicit root reference, or null when the root is owner-supplied.</summary>
+    internal ApiTypeReference? ApiRootTypeReference => _apiRootTypeBinding.ApiTypeReference;
+
+    /// <summary>Gets a value indicating whether the root is supplied by the owner rather than explicitly.</summary>
+    internal bool IsOwnerSuppliedRoot => !_apiRootTypeBinding.HasReference;
+
+    /// <summary>Gets a value indicating whether the root has been resolved after compilation.</summary>
+    internal bool IsResolvedRoot => _apiRootTypeBinding.IsResolved;
+    #endregion
+
+    #region Segment Properties
+    /// <summary>Gets the immutable ordered segment chain.</summary>
     public ImmutableArray<ApiKeyPathSegment> ApiSegments { get; } =
-        [.. apiSegments.EmptyIfNull().Where(x => x is not null)];
+        [.. apiSegments.EmptyIfNull().Where(static segment => segment is not null)];
 
-    /// <summary>Gets the terminal (scalar) segment — the last element in <see cref="ApiSegments"/>.</summary>
-    /// <remarks>This is equivalent to <c>ApiSegments[^1]</c>.</remarks>
+    /// <summary>Gets the terminal scalar segment.</summary>
     public ApiKeyPathSegment ApiScalarSegment => this.ApiSegments[^1];
+    #endregion
 
-    /// <summary>
-    ///     Gets the root <see cref="ApiObjectType"/> from which the segment chain begins.
-    ///     Available after compilation.
-    /// </summary>
-    public ApiObjectType ApiRootObjectType => this.RequireValue(_apiRootObjectType);
-
-    /// <summary>
-    ///     Gets the CLR type from which the navigation chain of this key path begins.
-    ///     Available immediately when supplied explicitly; otherwise available after compilation.
-    /// </summary>
-    public Type ClrRootType => this.RequireValue(_clrRootType);
-
-    /// <summary>Gets the dot-delimited CLR member path represented by <see cref="ApiSegments"/>.</summary>
-    public string ClrPath => string.Join('.', this.ApiSegments.Select(static segment => segment.ClrMemberName));
+    #region Path Properties
+    /// <summary>Gets the dot-delimited CLR member path.</summary>
+    public string ClrPath => string.Join
+        ('.', this.ApiSegments.Select(static segment => segment.ClrMemberName));
 
     internal string? ApiPathLabel
     {
         get
         {
-            // this.Parent is available before CompileCore backfills _clrRootType, so the path
-            // label must resolve the same effective type here to stay stable once compiled.
-            var effectiveClrRootType = _clrRootType ?? this.GetOwningDefaultClrRootType();
-            return effectiveClrRootType is null
-                ? null
-                : $"{effectiveClrRootType.Name}." + string.Join(".", this.ApiSegments.Select(s => s.ClrMemberName));
+            var rootLabel = this.ApiRootTypeReference?.ApiReferenceLabel ?? this.GetOwnerSuppliedRootLabel();
+            return rootLabel is null ? null : $"{rootLabel}.{this.ClrPath}";
         }
     }
     #endregion
@@ -100,11 +122,13 @@ public sealed class ApiKeyPath(Type? clrRootType, IEnumerable<ApiKeyPathSegment>
     /// <inheritdoc/>
     public override string ToString()
     {
-        var clrRootTypeName = _clrRootType.SafeToName();
-        var apiSegments = string.Join(".", this.ApiSegments.Select(s => s.ClrMemberName));
+        var apiRootTypeReference = this.ApiRootTypeReference.SafeToString();
+        var apiSegments = string.Join(".", this.ApiSegments.Select(static segment => segment.ClrMemberName));
         var extensionCount = this.ExtensionCount.SafeToString();
-
-        return $"{nameof(ApiKeyPath)} {{{nameof(this.ClrRootType)}={clrRootTypeName}, {nameof(this.ApiSegments)}=\"{apiSegments}\", {nameof(this.ExtensionCount)}={extensionCount}}}";
+        return $"{nameof(ApiKeyPath)} "
+            + $"{{{nameof(this.ApiRootTypeReference)}={apiRootTypeReference}, "
+            + $"{nameof(this.ApiSegments)}=\"{apiSegments}\", "
+            + $"{nameof(this.ExtensionCount)}={extensionCount}}}";
     }
     #endregion
 
@@ -119,15 +143,8 @@ public sealed class ApiKeyPath(Type? clrRootType, IEnumerable<ApiKeyPathSegment>
     }
 
     /// <inheritdoc/>
-    protected override string BuildPath(string? apiPreviousPath)
-    {
-        return ApiSchemaPathFormatting.BuildPath
-        (
-            apiBasePath: apiPreviousPath,
-            apiPathSegment: this.ApiElementName,
-            apiPathSegmentName: this.ApiPathLabel
-        );
-    }
+    protected override string BuildPath(string? apiPreviousPath) =>
+        ApiSchemaPathFormatting.BuildPath(apiPreviousPath, this.ApiElementName, this.ApiPathLabel);
 
     /// <inheritdoc/>
     internal override void CompileCore(ApiSchemaCompilationContext context)
@@ -135,79 +152,94 @@ public sealed class ApiKeyPath(Type? clrRootType, IEnumerable<ApiKeyPathSegment>
         ArgumentNullException.ThrowIfNull(context);
 
         base.CompileCore(context);
-
         this.ValidateSegmentsNonEmpty(context);
         this.ResolveRootObjectType(context);
-    }
-
-    /// <summary>Backfills an omitted <see cref="ClrRootType"/> immediately after JSON deserialization, without requiring compilation.</summary>
-    internal void EnsureClrRootType(Type defaultClrRootType)
-    {
-        ArgumentNullException.ThrowIfNull(defaultClrRootType);
-
-        _clrRootType ??= defaultClrRootType;
     }
     #endregion
 
     #region Implementation Methods
+    internal Type? GetOwnerSuppliedClrRootType()
+    {
+        var apiObjectType = this.GetOwnerSuppliedRootProvider()?.ApiOwnerSuppliedKeyPathRoot;
+        if (apiObjectType is null)
+        {
+            return null;
+        }
+
+        return apiObjectType.ClrType;
+    }
+
     private void ResolveRootObjectType(ApiSchemaCompilationContext context)
     {
         if (this.ApiSegments.Length == 0)
         {
-            return; // Error already reported by ValidateSegmentsNonEmpty.
-        }
-
-        var effectiveClrRootType = _clrRootType ?? this.GetOwningDefaultClrRootType();
-        if (effectiveClrRootType is null)
-        {
-            var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiKeyPathUninferableRootType;
-            var description = $"{nameof(this.ClrRootType)} was not specified and no owning {nameof(ApiObjectType)} or {nameof(ApiRelationshipElement)} could supply a default";
-            var remediation = $"Specify an explicit {nameof(this.ClrRootType)} when creating this {nameof(ApiKeyPath)}";
-
-            context.AddIssue(severity, code, description, remediation);
             return;
         }
 
-        _clrRootType = effectiveClrRootType;
-
-        var rootObjectType = this.GetOwningObjectType(effectiveClrRootType);
-        if (rootObjectType is null &&
-            !context.ApiSchema.TryGetObjectTypeByClrType(effectiveClrRootType, out rootObjectType))
+        if (this.ApiRootTypeReference is not null)
         {
-            var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiKeyPathUnresolvedRootType;
-            var description = $"Root CLR type '{effectiveClrRootType.Name}' is not registered as an {nameof(ApiObjectType)} in the schema";
-            var remediation = $"Add an {nameof(ApiObjectType)} for '{effectiveClrRootType.Name}' to the schema, or correct the root CLR type";
+            var resolveResult = _apiRootTypeBinding.Resolve
+                (
+                    context,
+                    ApiSchemaCompilationCode.ApiKeyPathUnresolvedRootType,
+                    nameof(this.ApiRootTypeReference),
+                    nameof(this.ApiRootObjectType)
+                );
 
-            context.AddIssue(severity, code, description, remediation);
+            if (!resolveResult)
+            {
+                return;
+            }
+
+            this.CompileSegmentChain(_apiRootTypeBinding.ApiType, context);
             return;
         }
 
-        this.CompileSegmentChain(rootObjectType, context);
+        var ownerSuppliedRootProvider = this.GetOwnerSuppliedRootProvider();
+        var ownerSuppliedRootApiObjectType = ownerSuppliedRootProvider?.ApiOwnerSuppliedKeyPathRoot;
+        if (ownerSuppliedRootApiObjectType is not null)
+        {
+            _apiRootTypeBinding.Bind(ownerSuppliedRootApiObjectType);
+            this.CompileSegmentChain(ownerSuppliedRootApiObjectType, context);
+            return;
+        }
+
+        if (ownerSuppliedRootProvider is not null)
+        {
+            // The owning element already reported its unresolved reference.
+            return;
+        }
+
+        var severity = ApiSchemaCompilationSeverity.Error;
+        var code = ApiSchemaCompilationCode.ApiKeyPathUninferableRootType;
+        var description = $"{nameof(this.ApiRootTypeReference)} was not specified and no owning "
+            + $"{nameof(ApiObjectType)} or {nameof(ApiRelationshipElement)} supplied a root";
+        var remediation = $"Specify an explicit {nameof(this.ApiRootTypeReference)} when creating this "
+            + $"{nameof(ApiKeyPath)}";
+
+        context.AddIssue(severity, code, description, remediation);
     }
 
-    private ApiObjectType? GetOwningObjectType(Type effectiveClrRootType)
-    {
-        var apiObjectType = (this.Parent as ApiNamedKeyDefinition)?.Parent as ApiObjectType;
-        return apiObjectType?.ClrType == effectiveClrRootType ? apiObjectType : null;
-    }
-
-    /// <summary>Infers the default root CLR type from the owning ApiObjectType or ApiRelationshipElement.</summary>
-    internal Type? GetOwningDefaultClrRootType()
+    private IApiKeyPathRootProvider? GetOwnerSuppliedRootProvider()
     {
         if (!this.HasTopology)
         {
             return null;
         }
 
-        return this.Parent switch
+        for (var owner = this.Parent; owner is not null; owner = owner.Parent)
         {
-            ApiNamedKeyDefinition { Parent: ApiObjectType apiObjectType } => apiObjectType.ClrType,
-            ApiKeyDefinition { Parent: ApiRelationshipElement apiRelationshipElement } => apiRelationshipElement.ClrObjectType,
-            _ => null,
-        };
+            if (owner is IApiKeyPathRootProvider ownerSuppliedRootProvider)
+            {
+                return ownerSuppliedRootProvider;
+            }
+        }
+
+        return null;
     }
+
+    private string? GetOwnerSuppliedRootLabel() =>
+        this.GetOwnerSuppliedRootProvider()?.OwnerSuppliedKeyPathRootLabel;
 
     private void ValidateSegmentsNonEmpty(ApiSchemaCompilationContext context)
     {
@@ -224,33 +256,27 @@ public sealed class ApiKeyPath(Type? clrRootType, IEnumerable<ApiKeyPathSegment>
         context.AddIssue(severity, code, description, remediation);
     }
 
-    private void CompileSegmentChain(ApiObjectType rootObjectType, ApiSchemaCompilationContext context)
+    private void CompileSegmentChain
+    (
+        ApiObjectType rootObjectType,
+        ApiSchemaCompilationContext context
+    )
     {
-        _apiRootObjectType = rootObjectType;
-
         for (var i = 0; i < this.ApiSegments.Length; i++)
         {
             var segment = this.ApiSegments[i];
             var isLast = i == this.ApiSegments.Length - 1;
-
-            var location = ApiSchemaCompilationLocation.ForIndexedLabel
-            (
-                i,
-                segment.ClrMemberName
-            );
+            var location = ApiSchemaCompilationLocation.ForIndexedLabel(i, segment.ClrMemberName);
             segment.Compile(context, location);
 
             if (!segment.IsPropertyResolved)
             {
-                // Error already reported in segment.Compile; bail the chain.
                 return;
             }
 
             var apiProperty = segment.ApiProperty;
-
             if (!apiProperty.IsResolved)
             {
-                // The property's type expression already reported an compilation issue.
                 return;
             }
 
@@ -258,32 +284,29 @@ public sealed class ApiKeyPath(Type? clrRootType, IEnumerable<ApiKeyPathSegment>
             {
                 if (apiProperty.ApiType is not ApiScalarType)
                 {
-                    var path = segment.ApiPath;
+                    var apiPath = segment.ApiPath;
                     var severity = ApiSchemaCompilationSeverity.Error;
                     var code = ApiSchemaCompilationCode.ApiKeyPathScalarSegmentInvalidType;
-                    var description = $"Terminal segment member '{segment.ClrMemberName}' must "
-                        + $"resolve to a scalar type; found '{apiProperty.ApiType.GetType().Name}'";
-                    var remediation = "Change the terminal member to a scalar-typed member or "
-                        + "remove extra navigation segments";
+                    var description = $"Terminal segment member '{segment.ClrMemberName}' must resolve to a "
+                        + $"scalar type; found '{apiProperty.ApiType.GetType().Name}'";
+                    var remediation = "Change the terminal member to a scalar-typed member or remove extra "
+                        + "navigation segments";
 
-                    context.AddIssue(path, severity, code, description, remediation);
+                    context.AddIssue(apiPath, severity, code, description, remediation);
                 }
             }
-            else
+            else if (apiProperty.ApiType is not ApiObjectType)
             {
-                if (apiProperty.ApiType is not ApiObjectType nestedObjectType)
-                {
-                    var path = segment.ApiPath;
-                    var severity = ApiSchemaCompilationSeverity.Error;
-                    var code = ApiSchemaCompilationCode.ApiKeyPathNavigationSegmentInvalidType;
-                    var description = $"Navigation segment member '{segment.ClrMemberName}' must "
-                        + $"resolve to an object type; found '{apiProperty.ApiType.GetType().Name}'";
-                    var remediation = "Change the navigation member to an object-typed member or "
-                        + "restructure the path segments";
+                var apiPath = segment.ApiPath;
+                var severity = ApiSchemaCompilationSeverity.Error;
+                var code = ApiSchemaCompilationCode.ApiKeyPathNavigationSegmentInvalidType;
+                var description = $"Navigation segment member '{segment.ClrMemberName}' must resolve to an "
+                    + $"object type; found '{apiProperty.ApiType.GetType().Name}'";
+                var remediation = "Change the navigation member to an object-typed member or restructure the "
+                    + "path segments";
 
-                    context.AddIssue(path, severity, code, description, remediation);
-                    return;
-                }
+                context.AddIssue(apiPath, severity, code, description, remediation);
+                return;
             }
         }
     }

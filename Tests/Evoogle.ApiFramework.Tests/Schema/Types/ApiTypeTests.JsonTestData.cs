@@ -206,7 +206,11 @@ public partial class ApiTypeTests
             FactoryArgument = new ApiCollectionTypeDef
             (
                 ClrType: typeof(List<string>),
-                ApiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: "String"),
+                ApiItemTypeExpression: new ApiTypeExpressionDef
+                (
+                    ApiTypeDef: null,
+                    ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: "String", ClrType: null)
+                ),
                 ApiItemTypeModifiers: ApiTypeModifiers.Required
             ),
             Json = @"
@@ -227,7 +231,11 @@ public partial class ApiTypeTests
             FactoryArgument = new ApiCollectionTypeDef
             (
                 ClrType: typeof(List<string?>),
-                ApiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: "String"),
+                ApiItemTypeExpression: new ApiTypeExpressionDef
+                (
+                    ApiTypeDef: null,
+                    ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: "String", ClrType: null)
+                ),
                 ApiItemTypeModifiers: ApiTypeModifiers.None
             ),
             Json = @"
@@ -248,7 +256,11 @@ public partial class ApiTypeTests
             FactoryArgument = new ApiCollectionTypeDef
             (
                 ClrType: typeof(List<StopLight>),
-                ApiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Enum, apiName: nameof(StopLight)),
+                ApiItemTypeExpression: new ApiTypeExpressionDef
+                (
+                    ApiTypeDef: null,
+                    ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Enum, ApiName: "StopLight", ClrType: null)
+                ),
                 ApiItemTypeModifiers: ApiTypeModifiers.Required
             ),
             Json = @"
@@ -269,7 +281,11 @@ public partial class ApiTypeTests
             FactoryArgument = new ApiCollectionTypeDef
             (
                 ClrType: typeof(List<StopLight?>),
-                ApiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Enum, apiName: nameof(StopLight)),
+                ApiItemTypeExpression: new ApiTypeExpressionDef
+                (
+                    ApiTypeDef: null,
+                    ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Enum, ApiName: "StopLight", ClrType: null)
+                ),
                 ApiItemTypeModifiers: ApiTypeModifiers.None
             ),
             Json = @"
@@ -297,7 +313,7 @@ public partial class ApiTypeTests
                     new ApiPropertyDef
                     (
                         ApiName: nameof(ScalarsOnly.RequiredName),
-                        ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                        ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
                         ApiTypeModifiers: ApiTypeModifiers.Required,
                         ClrName: nameof(ScalarsOnly.RequiredName),
                         ClrMemberKind: ClrMemberKind.Property
@@ -305,7 +321,7 @@ public partial class ApiTypeTests
                     new ApiPropertyDef
                     (
                         ApiName: nameof(ScalarsOnly.RequiredNumber),
-                        ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int64)),
+                        ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Int64), ClrType: null)),
                         ApiTypeModifiers: ApiTypeModifiers.Required,
                         ClrName: nameof(ScalarsOnly.RequiredNumber),
                         ClrMemberKind: ClrMemberKind.Property
@@ -313,7 +329,7 @@ public partial class ApiTypeTests
                     new ApiPropertyDef
                     (
                         ApiName: nameof(ScalarsOnly.RequiredPredicate),
-                        ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Boolean)),
+                        ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Boolean), ClrType: null)),
                         ApiTypeModifiers: ApiTypeModifiers.Required,
                         ClrName: nameof(ScalarsOnly.RequiredPredicate),
                         ClrMemberKind: ClrMemberKind.Property
@@ -321,7 +337,7 @@ public partial class ApiTypeTests
                     new ApiPropertyDef
                     (
                         ApiName: nameof(ScalarsOnly.OptionalName),
-                        ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                        ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
                         ApiTypeModifiers: ApiTypeModifiers.None,
                         ClrName: nameof(ScalarsOnly.OptionalName),
                         ClrMemberKind: ClrMemberKind.Field
@@ -329,7 +345,7 @@ public partial class ApiTypeTests
                     new ApiPropertyDef
                     (
                         ApiName: nameof(ScalarsOnly.OptionalNumber),
-                        ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int64)),
+                        ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Int64), ClrType: null)),
                         ApiTypeModifiers: ApiTypeModifiers.None,
                         ClrName: nameof(ScalarsOnly.OptionalNumber),
                         ClrMemberKind: ClrMemberKind.Field
@@ -337,7 +353,7 @@ public partial class ApiTypeTests
                     new ApiPropertyDef
                     (
                         ApiName: nameof(ScalarsOnly.OptionalPredicate),
-                        ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Boolean)),
+                        ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Boolean), ClrType: null)),
                         ApiTypeModifiers: ApiTypeModifiers.None,
                         ClrName: nameof(ScalarsOnly.OptionalPredicate),
                         ClrMemberKind: ClrMemberKind.Field
@@ -428,7 +444,7 @@ public partial class ApiTypeTests
                     new ApiPropertyDef
                     (
                         ApiName: nameof(ScalarsOnly.RequiredName),
-                        ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                        ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
                         ApiTypeModifiers: ApiTypeModifiers.Required,
                         ClrName: nameof(ScalarsOnly.RequiredName),
                         ClrMemberKind: ClrMemberKind.Property
@@ -436,7 +452,7 @@ public partial class ApiTypeTests
                     new ApiPropertyDef
                     (
                         ApiName: nameof(ScalarsOnly.RequiredNumber),
-                        ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int64)),
+                        ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Int64), ClrType: null)),
                         ApiTypeModifiers: ApiTypeModifiers.Required,
                         ClrName: nameof(ScalarsOnly.RequiredNumber),
                         ClrMemberKind: ClrMemberKind.Property
@@ -444,7 +460,7 @@ public partial class ApiTypeTests
                     new ApiPropertyDef
                     (
                         ApiName: nameof(ScalarsOnly.RequiredPredicate),
-                        ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Boolean)),
+                        ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Boolean), ClrType: null)),
                         ApiTypeModifiers: ApiTypeModifiers.Required,
                         ClrName: nameof(ScalarsOnly.RequiredPredicate),
                         ClrMemberKind: ClrMemberKind.Property
@@ -452,7 +468,7 @@ public partial class ApiTypeTests
                     new ApiPropertyDef
                     (
                         ApiName: nameof(ScalarsOnly.OptionalName),
-                        ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                        ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
                         ApiTypeModifiers: ApiTypeModifiers.None,
                         ClrName: nameof(ScalarsOnly.OptionalName),
                         ClrMemberKind: ClrMemberKind.Field
@@ -460,7 +476,7 @@ public partial class ApiTypeTests
                     new ApiPropertyDef
                     (
                         ApiName: nameof(ScalarsOnly.OptionalNumber),
-                        ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int64)),
+                        ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Int64), ClrType: null)),
                         ApiTypeModifiers: ApiTypeModifiers.None,
                         ClrName: nameof(ScalarsOnly.OptionalNumber),
                         ClrMemberKind: ClrMemberKind.Field
@@ -468,7 +484,7 @@ public partial class ApiTypeTests
                     new ApiPropertyDef
                     (
                         ApiName: nameof(ScalarsOnly.OptionalPredicate),
-                        ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Boolean)),
+                        ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Boolean), ClrType: null)),
                         ApiTypeModifiers: ApiTypeModifiers.None,
                         ClrName: nameof(ScalarsOnly.OptionalPredicate),
                         ClrMemberKind: ClrMemberKind.Field
@@ -562,7 +578,7 @@ public partial class ApiTypeTests
                     new ApiPropertyDef
                     (
                         ApiName: nameof(ScalarsOnly.RequiredName),
-                        ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                        ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
                         ApiTypeModifiers: ApiTypeModifiers.Required,
                         ClrName: nameof(ScalarsOnly.RequiredName),
                         ClrMemberKind: ClrMemberKind.Property
@@ -570,7 +586,7 @@ public partial class ApiTypeTests
                     new ApiPropertyDef
                     (
                         ApiName: nameof(ScalarsOnly.RequiredNumber),
-                        ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int64)),
+                        ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Int64), ClrType: null)),
                         ApiTypeModifiers: ApiTypeModifiers.Required,
                         ClrName: nameof(ScalarsOnly.RequiredNumber),
                         ClrMemberKind: ClrMemberKind.Property
@@ -578,7 +594,7 @@ public partial class ApiTypeTests
                     new ApiPropertyDef
                     (
                         ApiName: nameof(ScalarsOnly.RequiredPredicate),
-                        ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Boolean)),
+                        ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Boolean), ClrType: null)),
                         ApiTypeModifiers: ApiTypeModifiers.Required,
                         ClrName: nameof(ScalarsOnly.RequiredPredicate),
                         ClrMemberKind: ClrMemberKind.Property
@@ -586,7 +602,7 @@ public partial class ApiTypeTests
                     new ApiPropertyDef
                     (
                         ApiName: nameof(ScalarsOnly.OptionalName),
-                        ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                        ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
                         ApiTypeModifiers: ApiTypeModifiers.None,
                         ClrName: nameof(ScalarsOnly.OptionalName),
                         ClrMemberKind: ClrMemberKind.Field
@@ -594,7 +610,7 @@ public partial class ApiTypeTests
                     new ApiPropertyDef
                     (
                         ApiName: nameof(ScalarsOnly.OptionalNumber),
-                        ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int64)),
+                        ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Int64), ClrType: null)),
                         ApiTypeModifiers: ApiTypeModifiers.None,
                         ClrName: nameof(ScalarsOnly.OptionalNumber),
                         ClrMemberKind: ClrMemberKind.Field
@@ -602,7 +618,7 @@ public partial class ApiTypeTests
                     new ApiPropertyDef
                     (
                         ApiName: nameof(ScalarsOnly.OptionalPredicate),
-                        ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Boolean)),
+                        ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Boolean), ClrType: null)),
                         ApiTypeModifiers: ApiTypeModifiers.None,
                         ClrName: nameof(ScalarsOnly.OptionalPredicate),
                         ClrMemberKind: ClrMemberKind.Field
@@ -700,7 +716,7 @@ public partial class ApiTypeTests
                     new ApiPropertyDef
                     (
                         ApiName: nameof(Company.Id),
-                        ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Ulid)),
+                        ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Ulid), ClrType: null)),
                         ApiTypeModifiers: ApiTypeModifiers.Required,
                         ClrName: nameof(Company.Id),
                         ClrMemberKind: ClrMemberKind.Property
@@ -708,7 +724,7 @@ public partial class ApiTypeTests
                     new ApiPropertyDef
                     (
                         ApiName: nameof(Company.Name),
-                        ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                        ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
                         ApiTypeModifiers: ApiTypeModifiers.Required,
                         ClrName: nameof(Company.Name),
                         ClrMemberKind: ClrMemberKind.Property
@@ -716,7 +732,7 @@ public partial class ApiTypeTests
                     new ApiPropertyDef
                     (
                         ApiName: nameof(Company.Owner),
-                        ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(Person)),
+                        ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Object, ApiName: nameof(Person), ClrType: null)),
                         ApiTypeModifiers: ApiTypeModifiers.None,
                         ClrName: nameof(Company.Owner),
                         ClrMemberKind: ClrMemberKind.Property
@@ -724,14 +740,19 @@ public partial class ApiTypeTests
                     new ApiPropertyDef
                     (
                         ApiName: nameof(Company.Employees),
-                        ApiTypeExpression: new ApiTypeExpression
+                        ApiTypeExpression: new ApiTypeExpressionDef
                         (
-                            apiInlineType: new ApiCollectionType
+                            ApiTypeDef: new ApiCollectionTypeDef
                             (
-                                apiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(Person)),
-                                apiItemTypeModifiers: ApiTypeModifiers.Required,
-                                clrCollectionType: typeof(List<Person>)
-                            )
+                                ClrType: typeof(List<Person>),
+                                ApiItemTypeExpression: new ApiTypeExpressionDef
+                                (
+                                    ApiTypeDef: null,
+                                    ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Object, ApiName: nameof(Person), ClrType: null)
+                                ),
+                                ApiItemTypeModifiers: ApiTypeModifiers.Required
+                            ),
+                            ApiTypeReferenceDef: null
                         ),
                         ApiTypeModifiers: ApiTypeModifiers.None,
                         ClrName: nameof(Company.Employees),
@@ -743,12 +764,12 @@ public partial class ApiTypeTests
                     new ApiKeyDef
                     (
                         ApiName: "PK_Company_Id",
-                        ApiKeyPaths: [new ApiKeyPathDef(ClrRootType: typeof(Company), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(Company.Id))])]
+                        ApiKeyPaths: [new ApiKeyPathDef(ApiRootTypeReference: null, ApiKeyPathSegments: [new ApiKeyPathSegmentDef(ClrMemberName: nameof(Company.Id))])]
                     ),
                     new ApiKeyDef
                     (
                         ApiName: "AK_Company_Name",
-                        ApiKeyPaths: [new ApiKeyPathDef(ClrRootType: typeof(Company), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(Company.Name))])]
+                        ApiKeyPaths: [new ApiKeyPathDef(ApiRootTypeReference: null, ApiKeyPathSegments: [new ApiKeyPathSegmentDef(ClrMemberName: nameof(Company.Name))])]
                     )
                 ]
             ),
@@ -790,15 +811,13 @@ public partial class ApiTypeTests
                     {
                         ""ApiName"": ""Employees"",
                         ""ApiType"": {
-                            ""ApiInlineType"": {
-                                ""ApiKind"": ""Collection"",
-                                ""ApiItemType"": {
-                                    ""ApiKind"": ""Object"",
-                                    ""ApiName"": ""Person""
-                                },
-                                ""ApiItemTypeModifiers"": ""Required"",
-                                ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.TestData.Person, Evoogle.ApiFramework.Tests]], System.Private.CoreLib""
-                            }
+                            ""ApiKind"": ""Collection"",
+                            ""ApiItemType"": {
+                                ""ApiKind"": ""Object"",
+                                ""ApiName"": ""Person""
+                            },
+                            ""ApiItemTypeModifiers"": ""Required"",
+                            ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.TestData.Person, Evoogle.ApiFramework.Tests]], System.Private.CoreLib""
                         },
                         ""ApiTypeModifiers"": ""None"",
                         ""ClrName"": ""Employees"",
@@ -810,7 +829,6 @@ public partial class ApiTypeTests
                         ""ApiName"": ""PK_Company_Id"",
                         ""ApiKeyPaths"": [
                             {
-                                ""ClrRootType"": ""Evoogle.ApiFramework.TestData.Company, Evoogle.ApiFramework.Tests"",
                                 ""ClrPath"": ""Id""
                             }
                         ]
@@ -819,7 +837,6 @@ public partial class ApiTypeTests
                         ""ApiName"": ""AK_Company_Name"",
                         ""ApiKeyPaths"": [
                             {
-                                ""ClrRootType"": ""Evoogle.ApiFramework.TestData.Company, Evoogle.ApiFramework.Tests"",
                                 ""ClrPath"": ""Name""
                             }
                         ]
@@ -842,7 +859,7 @@ public partial class ApiTypeTests
                     new ApiPropertyDef
                     (
                         ApiName: nameof(ScalarsOnly.RequiredName),
-                        ApiTypeExpression: new ApiTypeExpression(clrType: typeof(string)),
+                        ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: null, ApiName: null, ClrType: typeof(string))),
                         ApiTypeModifiers: ApiTypeModifiers.Required,
                         ClrName: nameof(ScalarsOnly.RequiredName),
                         ClrMemberKind: ClrMemberKind.Property
@@ -850,7 +867,7 @@ public partial class ApiTypeTests
                     new ApiPropertyDef
                     (
                         ApiName: nameof(ScalarsOnly.RequiredNumber),
-                        ApiTypeExpression: new ApiTypeExpression(clrType: typeof(long)),
+                        ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: null, ApiName: null, ClrType: typeof(long))),
                         ApiTypeModifiers: ApiTypeModifiers.Required,
                         ClrName: nameof(ScalarsOnly.RequiredNumber),
                         ClrMemberKind: ClrMemberKind.Property
@@ -858,7 +875,7 @@ public partial class ApiTypeTests
                     new ApiPropertyDef
                     (
                         ApiName: nameof(ScalarsOnly.RequiredPredicate),
-                        ApiTypeExpression: new ApiTypeExpression(clrType: typeof(bool)),
+                        ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: null, ApiName: null, ClrType: typeof(bool))),
                         ApiTypeModifiers: ApiTypeModifiers.Required,
                         ClrName: nameof(ScalarsOnly.RequiredPredicate),
                         ClrMemberKind: ClrMemberKind.Property
@@ -866,7 +883,7 @@ public partial class ApiTypeTests
                     new ApiPropertyDef
                     (
                         ApiName: nameof(ScalarsOnly.OptionalName),
-                        ApiTypeExpression: new ApiTypeExpression(clrType: typeof(string)),
+                        ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: null, ApiName: null, ClrType: typeof(string))),
                         ApiTypeModifiers: ApiTypeModifiers.None,
                         ClrName: nameof(ScalarsOnly.OptionalName),
                         ClrMemberKind: ClrMemberKind.Field
@@ -874,7 +891,7 @@ public partial class ApiTypeTests
                     new ApiPropertyDef
                     (
                         ApiName: nameof(ScalarsOnly.OptionalNumber),
-                        ApiTypeExpression: new ApiTypeExpression(clrType: typeof(long)),
+                        ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: null, ApiName: null, ClrType: typeof(long))),
                         ApiTypeModifiers: ApiTypeModifiers.None,
                         ClrName: nameof(ScalarsOnly.OptionalNumber),
                         ClrMemberKind: ClrMemberKind.Field
@@ -882,7 +899,7 @@ public partial class ApiTypeTests
                     new ApiPropertyDef
                     (
                         ApiName: nameof(ScalarsOnly.OptionalPredicate),
-                        ApiTypeExpression: new ApiTypeExpression(clrType: typeof(bool)),
+                        ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: null, ApiName: null, ClrType: typeof(bool))),
                         ApiTypeModifiers: ApiTypeModifiers.None,
                         ClrName: nameof(ScalarsOnly.OptionalPredicate),
                         ClrMemberKind: ClrMemberKind.Field
@@ -967,7 +984,7 @@ public partial class ApiTypeTests
                     new ApiPropertyDef
                     (
                         ApiName: nameof(ScalarsOnly.RequiredName),
-                        ApiTypeExpression: new ApiTypeExpression(clrType: typeof(string)),
+                        ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: null, ApiName: null, ClrType: typeof(string))),
                         ApiTypeModifiers: ApiTypeModifiers.Required,
                         ClrName: nameof(ScalarsOnly.RequiredName),
                         ClrMemberKind: ClrMemberKind.Property
@@ -975,7 +992,7 @@ public partial class ApiTypeTests
                     new ApiPropertyDef
                     (
                         ApiName: nameof(ScalarsOnly.RequiredNumber),
-                        ApiTypeExpression: new ApiTypeExpression(clrType: typeof(long)),
+                        ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: null, ApiName: null, ClrType: typeof(long))),
                         ApiTypeModifiers: ApiTypeModifiers.Required,
                         ClrName: nameof(ScalarsOnly.RequiredNumber),
                         ClrMemberKind: ClrMemberKind.Property
@@ -983,7 +1000,7 @@ public partial class ApiTypeTests
                     new ApiPropertyDef
                     (
                         ApiName: nameof(ScalarsOnly.RequiredPredicate),
-                        ApiTypeExpression: new ApiTypeExpression(clrType: typeof(bool)),
+                        ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: null, ApiName: null, ClrType: typeof(bool))),
                         ApiTypeModifiers: ApiTypeModifiers.Required,
                         ClrName: nameof(ScalarsOnly.RequiredPredicate),
                         ClrMemberKind: ClrMemberKind.Property
@@ -991,7 +1008,7 @@ public partial class ApiTypeTests
                     new ApiPropertyDef
                     (
                         ApiName: nameof(ScalarsOnly.OptionalName),
-                        ApiTypeExpression: new ApiTypeExpression(clrType: typeof(string)),
+                        ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: null, ApiName: null, ClrType: typeof(string))),
                         ApiTypeModifiers: ApiTypeModifiers.None,
                         ClrName: nameof(ScalarsOnly.OptionalName),
                         ClrMemberKind: ClrMemberKind.Field
@@ -999,7 +1016,7 @@ public partial class ApiTypeTests
                     new ApiPropertyDef
                     (
                         ApiName: nameof(ScalarsOnly.OptionalNumber),
-                        ApiTypeExpression: new ApiTypeExpression(clrType: typeof(long)),
+                        ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: null, ApiName: null, ClrType: typeof(long))),
                         ApiTypeModifiers: ApiTypeModifiers.None,
                         ClrName: nameof(ScalarsOnly.OptionalNumber),
                         ClrMemberKind: ClrMemberKind.Field
@@ -1007,7 +1024,7 @@ public partial class ApiTypeTests
                     new ApiPropertyDef
                     (
                         ApiName: nameof(ScalarsOnly.OptionalPredicate),
-                        ApiTypeExpression: new ApiTypeExpression(clrType: typeof(bool)),
+                        ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: null, ApiName: null, ClrType: typeof(bool))),
                         ApiTypeModifiers: ApiTypeModifiers.None,
                         ClrName: nameof(ScalarsOnly.OptionalPredicate),
                         ClrMemberKind: ClrMemberKind.Field
@@ -1095,7 +1112,7 @@ public partial class ApiTypeTests
                     new ApiPropertyDef
                     (
                         ApiName: nameof(ScalarsOnly.RequiredName),
-                        ApiTypeExpression: new ApiTypeExpression(clrType: typeof(string)),
+                        ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: null, ApiName: null, ClrType: typeof(string))),
                         ApiTypeModifiers: ApiTypeModifiers.Required,
                         ClrName: nameof(ScalarsOnly.RequiredName),
                         ClrMemberKind: ClrMemberKind.Property
@@ -1103,7 +1120,7 @@ public partial class ApiTypeTests
                     new ApiPropertyDef
                     (
                         ApiName: nameof(ScalarsOnly.RequiredNumber),
-                        ApiTypeExpression: new ApiTypeExpression(clrType: typeof(long)),
+                        ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: null, ApiName: null, ClrType: typeof(long))),
                         ApiTypeModifiers: ApiTypeModifiers.Required,
                         ClrName: nameof(ScalarsOnly.RequiredNumber),
                         ClrMemberKind: ClrMemberKind.Property
@@ -1111,7 +1128,7 @@ public partial class ApiTypeTests
                     new ApiPropertyDef
                     (
                         ApiName: nameof(ScalarsOnly.RequiredPredicate),
-                        ApiTypeExpression: new ApiTypeExpression(clrType: typeof(bool)),
+                        ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: null, ApiName: null, ClrType: typeof(bool))),
                         ApiTypeModifiers: ApiTypeModifiers.Required,
                         ClrName: nameof(ScalarsOnly.RequiredPredicate),
                         ClrMemberKind: ClrMemberKind.Property
@@ -1119,7 +1136,7 @@ public partial class ApiTypeTests
                     new ApiPropertyDef
                     (
                         ApiName: nameof(ScalarsOnly.OptionalName),
-                        ApiTypeExpression: new ApiTypeExpression(clrType: typeof(string)),
+                        ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: null, ApiName: null, ClrType: typeof(string))),
                         ApiTypeModifiers: ApiTypeModifiers.None,
                         ClrName: nameof(ScalarsOnly.OptionalName),
                         ClrMemberKind: ClrMemberKind.Field
@@ -1127,7 +1144,7 @@ public partial class ApiTypeTests
                     new ApiPropertyDef
                     (
                         ApiName: nameof(ScalarsOnly.OptionalNumber),
-                        ApiTypeExpression: new ApiTypeExpression(clrType: typeof(long)),
+                        ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: null, ApiName: null, ClrType: typeof(long))),
                         ApiTypeModifiers: ApiTypeModifiers.None,
                         ClrName: nameof(ScalarsOnly.OptionalNumber),
                         ClrMemberKind: ClrMemberKind.Field
@@ -1135,7 +1152,7 @@ public partial class ApiTypeTests
                     new ApiPropertyDef
                     (
                         ApiName: nameof(ScalarsOnly.OptionalPredicate),
-                        ApiTypeExpression: new ApiTypeExpression(clrType: typeof(bool)),
+                        ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: null, ApiName: null, ClrType: typeof(bool))),
                         ApiTypeModifiers: ApiTypeModifiers.None,
                         ClrName: nameof(ScalarsOnly.OptionalPredicate),
                         ClrMemberKind: ClrMemberKind.Field
@@ -1227,7 +1244,7 @@ public partial class ApiTypeTests
                     new ApiPropertyDef
                     (
                         ApiName: nameof(Company.Id),
-                        ApiTypeExpression: new ApiTypeExpression(clrType: typeof(Ulid)),
+                        ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: null, ApiName: null, ClrType: typeof(Ulid))),
                         ApiTypeModifiers: ApiTypeModifiers.Required,
                         ClrName: nameof(Company.Id),
                         ClrMemberKind: ClrMemberKind.Property
@@ -1235,7 +1252,7 @@ public partial class ApiTypeTests
                     new ApiPropertyDef
                     (
                         ApiName: nameof(Company.Name),
-                        ApiTypeExpression: new ApiTypeExpression(clrType: typeof(string)),
+                        ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: null, ApiName: null, ClrType: typeof(string))),
                         ApiTypeModifiers: ApiTypeModifiers.Required,
                         ClrName: nameof(Company.Name),
                         ClrMemberKind: ClrMemberKind.Property
@@ -1243,7 +1260,7 @@ public partial class ApiTypeTests
                     new ApiPropertyDef
                     (
                         ApiName: nameof(Company.Owner),
-                        ApiTypeExpression: new ApiTypeExpression(clrType: typeof(Person)),
+                        ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: null, ApiName: null, ClrType: typeof(Person))),
                         ApiTypeModifiers: ApiTypeModifiers.None,
                         ClrName: nameof(Company.Owner),
                         ClrMemberKind: ClrMemberKind.Property
@@ -1251,14 +1268,19 @@ public partial class ApiTypeTests
                     new ApiPropertyDef
                     (
                         ApiName: nameof(Company.Employees),
-                        ApiTypeExpression: new ApiTypeExpression
+                        ApiTypeExpression: new ApiTypeExpressionDef
                         (
-                            apiInlineType: new ApiCollectionType
+                            ApiTypeDef: new ApiCollectionTypeDef
                             (
-                                apiItemTypeExpression: new ApiTypeExpression(clrType: typeof(Person)),
-                                apiItemTypeModifiers: ApiTypeModifiers.Required,
-                                clrCollectionType: typeof(List<Person>)
-                            )
+                                ClrType: typeof(List<Person>),
+                                ApiItemTypeExpression: new ApiTypeExpressionDef
+                                (
+                                    ApiTypeDef: null,
+                                    ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: null, ApiName: null, ClrType: typeof(Person))
+                                ),
+                                ApiItemTypeModifiers: ApiTypeModifiers.Required
+                            ),
+                            ApiTypeReferenceDef: null
                         ),
                         ApiTypeModifiers: ApiTypeModifiers.None,
                         ClrName: nameof(Company.Employees),
@@ -1270,12 +1292,12 @@ public partial class ApiTypeTests
                     new ApiKeyDef
                     (
                         ApiName: "PK_Company_Id",
-                        ApiKeyPaths: [new ApiKeyPathDef(ClrRootType: typeof(Company), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(Company.Id))])]
+                        ApiKeyPaths: [new ApiKeyPathDef(ApiRootTypeReference: null, ApiKeyPathSegments: [new ApiKeyPathSegmentDef(ClrMemberName: nameof(Company.Id))])]
                     ),
                     new ApiKeyDef
                     (
                         ApiName: "AK_Company_Name",
-                        ApiKeyPaths: [new ApiKeyPathDef(ClrRootType: typeof(Company), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(Company.Name))])]
+                        ApiKeyPaths: [new ApiKeyPathDef(ApiRootTypeReference: null, ApiKeyPathSegments: [new ApiKeyPathSegmentDef(ClrMemberName: nameof(Company.Name))])]
                     )
                 ]
             ),
@@ -1314,14 +1336,12 @@ public partial class ApiTypeTests
                     {
                         ""ApiName"": ""Employees"",
                         ""ApiType"": {
-                            ""ApiInlineType"": {
-                                ""ApiKind"": ""Collection"",
-                                ""ApiItemType"": {
-                                    ""ClrType"": ""Evoogle.ApiFramework.TestData.Person,Evoogle.ApiFramework.Tests""
-                                },
-                                ""ApiItemTypeModifiers"": ""Required"",
-                                ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.TestData.Person, Evoogle.ApiFramework.Tests]], System.Private.CoreLib""
-                            }
+                            ""ApiKind"": ""Collection"",
+                            ""ApiItemType"": {
+                                ""ClrType"": ""Evoogle.ApiFramework.TestData.Person,Evoogle.ApiFramework.Tests""
+                            },
+                            ""ApiItemTypeModifiers"": ""Required"",
+                            ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.TestData.Person, Evoogle.ApiFramework.Tests]], System.Private.CoreLib""
                         },
                         ""ApiTypeModifiers"": ""None"",
                         ""ClrName"": ""Employees"",
@@ -1333,7 +1353,6 @@ public partial class ApiTypeTests
                         ""ApiName"": ""PK_Company_Id"",
                         ""ApiKeyPaths"": [
                             {
-                                ""ClrRootType"": ""Evoogle.ApiFramework.TestData.Company, Evoogle.ApiFramework.Tests"",
                                 ""ClrPath"": ""Id""
                             }
                         ]
@@ -1342,7 +1361,6 @@ public partial class ApiTypeTests
                         ""ApiName"": ""AK_Company_Name"",
                         ""ApiKeyPaths"": [
                             {
-                                ""ClrRootType"": ""Evoogle.ApiFramework.TestData.Company, Evoogle.ApiFramework.Tests"",
                                 ""ClrPath"": ""Name""
                             }
                         ]

@@ -6,51 +6,53 @@
 
 using Evoogle.ApiFramework.Schema.Compilation;
 using Evoogle.ApiFramework.Schema.Compilation.Internal;
+using Evoogle.ApiFramework.Schema.Key.Internal;
 using Evoogle.ApiFramework.Schema.Types;
+using Evoogle.ApiFramework.Schema.Types.Internal;
 
 namespace Evoogle.ApiFramework.Schema.Relationships;
 
 /// <summary>
-///     Abstract base class for all typed participants in an <see cref="ApiRelationship"/>:
-///     <see cref="ApiRelationshipEnd"/> subclasses (principal and dependent ends)
-///     and <see cref="ApiRelationshipAssociation"/>.
-///     Holds the <see cref="ClrObjectType"/> that identifies the participating CLR type
-///     and resolves the corresponding <see cref="ApiObjectType"/> during schema compilation.
+///     Base class for relationship participants that reference an <see cref="ApiObjectType"/>.
 /// </summary>
-public abstract class ApiRelationshipElement : ApiSchemaElement
+public abstract class ApiRelationshipElement : ApiSchemaElement, IApiKeyPathRootProvider
 {
-    #region ApiRelationshipElement Fields
-    private ApiObjectType? _apiResolvedObjectType = null;
+    #region Fields
+    private readonly ApiTypeReferenceBinding<ApiObjectType> _apiObjectTypeBinding;
     #endregion
 
-    #region ApiRelationshipElement Properties
-    /// <summary>Gets the CLR type that identifies the participating <see cref="ApiObjectType"/>.</summary>
-    public Type ClrObjectType { get; }
+    #region Properties
+    /// <summary>Gets the reference identifying the participating API object type.</summary>
+    public ApiTypeReference ApiObjectTypeReference => _apiObjectTypeBinding.ApiTypeReference!;
 
-    /// <summary>
-    ///     Gets the resolved <see cref="ApiObjectType"/> that corresponds to <see cref="ClrObjectType"/>.
-    ///     Available after schema compilation. Throws if accessed before compilation completes.
-    /// </summary>
-    public ApiObjectType ApiObjectType => this.RequireValue(_apiResolvedObjectType);
+    /// <summary>Gets the resolved participating API object type after compilation.</summary>
+    public ApiObjectType ApiObjectType => _apiObjectTypeBinding.ApiType;
 
-    /// <summary>
-    ///     Gets the resolved <see cref="ApiObjectType"/>, or <see langword="null"/> if compilation
-    ///     has not yet run or failed to resolve the object type.
-    /// </summary>
-    internal ApiObjectType? ApiResolvedObjectType => _apiResolvedObjectType;
+    /// <summary>Gets the participating CLR object type after compilation.</summary>
+    public Type ClrObjectType => this.ApiObjectType.ClrType;
+
+    internal ApiObjectType? ApiResolvedObjectType => _apiObjectTypeBinding.ApiResolvedType;
+    #endregion
+
+    #region IApiKeyPathRootProvider Properties
+    ApiObjectType? IApiKeyPathRootProvider.ApiOwnerSuppliedKeyPathRoot =>
+        this.ApiResolvedObjectType;
+
+    string? IApiKeyPathRootProvider.OwnerSuppliedKeyPathRootLabel =>
+        _apiObjectTypeBinding.ApiTypeReference?.ApiReferenceLabel;
     #endregion
 
     #region Constructors
-    internal ApiRelationshipElement(Type clrObjectType)
+    internal ApiRelationshipElement(ApiTypeReference apiObjectTypeReference)
     {
-        this.ClrObjectType = clrObjectType;
+        _apiObjectTypeBinding = new(apiObjectTypeReference);
     }
     #endregion
 
     #region ApiSchemaElement Methods
     /// <inheritdoc/>
-    protected override string BuildPath(string? apiPreviousPath)
-        => ApiSchemaPathFormatting.BuildPath(apiBasePath: apiPreviousPath, apiPathSegment: this.ApiElementName, apiPathSegmentName: null);
+    protected override string BuildPath(string? apiPreviousPath) =>
+        ApiSchemaPathFormatting.BuildPath(apiPreviousPath, this.ApiElementName, null);
 
     /// <inheritdoc/>
     internal override void CompileCore(ApiSchemaCompilationContext context)
@@ -59,49 +61,24 @@ public abstract class ApiRelationshipElement : ApiSchemaElement
 
         base.CompileCore(context);
 
-        this.ValidateClrObjectType(context);
-        this.ResolveApiObjectType(context);
-    }
-    #endregion
-
-    #region Implementation Methods
-    private void ValidateClrObjectType(ApiSchemaCompilationContext context)
-    {
-        if (this.ClrObjectType is not null)
+        if (!_apiObjectTypeBinding.HasReference)
         {
+            var severity = ApiSchemaCompilationSeverity.Error;
+            var code = ApiSchemaCompilationCode.ApiRelationshipElementNullObjectTypeReference;
+            var description = $"{nameof(this.ApiObjectTypeReference)} must not be null";
+            var remediation = $"Specify a valid {nameof(this.ApiObjectTypeReference)} value";
+
+            context.AddIssue(severity, code, description, remediation);
             return;
         }
 
-        var severity = ApiSchemaCompilationSeverity.Error;
-        var code = ApiSchemaCompilationCode.ApiRelationshipElementNullClrObjectType;
-        var description = $"{nameof(this.ClrObjectType)} must not be null";
-        var remediation = $"Specify a valid {nameof(this.ClrObjectType)} value";
-
-        context.AddIssue(severity, code, description, remediation);
-    }
-
-    private void ResolveApiObjectType(ApiSchemaCompilationContext context)
-    {
-        if (this.ClrObjectType is null)
-        {
-            return;
-        }
-
-        if (context.ApiSchema.TryGetObjectTypeByClrType(this.ClrObjectType, out var apiObjectType))
-        {
-            _apiResolvedObjectType = apiObjectType;
-            return;
-        }
-
-        var severity = ApiSchemaCompilationSeverity.Error;
-        var code = ApiSchemaCompilationCode.ApiRelationshipElementUnresolvedObjectType;
-        var description = $"No {nameof(Types.ApiObjectType)} is registered for CLR type '{this.ClrObjectType.FullName}'";
-        var availableTypes = string.Join(", ", context.ApiSchema.ApiObjectTypes.Select(t => $"'{t.ApiName}' ({t.ClrType.Name})"));
-        var remediation = !string.IsNullOrEmpty(availableTypes)
-            ? $"Use one of the available object types: {availableTypes}"
-            : $"Define an {nameof(Types.ApiObjectType)} for CLR type '{this.ClrObjectType.FullName}' in the schema";
-
-        context.AddIssue(severity, code, description, remediation);
+        _apiObjectTypeBinding.Resolve
+        (
+            context,
+            ApiSchemaCompilationCode.ApiRelationshipElementUnresolvedObjectType,
+            nameof(this.ApiObjectTypeReference),
+            nameof(this.ApiObjectType)
+        );
     }
     #endregion
 }

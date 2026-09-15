@@ -303,9 +303,11 @@ public partial class ApiRelationshipTests(ITestOutputHelper output) : XUnitTests
             ApiRelationshipPrincipalEnd actualEnd
         )
         {
-            actualEnd.ClrObjectType.Should().Be(expectedEnd.ClrObjectType);
+            actualEnd.ApiObjectTypeReference.ApiKind.Should().Be(expectedEnd.ApiObjectTypeReference.ApiKind);
+            actualEnd.ApiObjectTypeReference.ApiName.Should().Be(expectedEnd.ApiObjectTypeReference.ApiName);
+            actualEnd.ApiObjectTypeReference.ClrType.Should().Be(expectedEnd.ApiObjectTypeReference.ClrType);
             actualEnd.ApiPrincipalKeyName.Should().Be(expectedEnd.ApiPrincipalKeyName);
-            actualEnd.ApiObjectType.ClrType.Should().Be(expectedEnd.ClrObjectType);
+            actualEnd.ApiObjectType.ClrType.Should().Be(expectedEnd.ApiObjectTypeReference.ClrType);
         }
 
         private static void AssertDependentEnd
@@ -314,9 +316,11 @@ public partial class ApiRelationshipTests(ITestOutputHelper output) : XUnitTests
             ApiRelationshipDependentEnd actualEnd
         )
         {
-            actualEnd.ClrObjectType.Should().Be(expectedEnd.ClrObjectType);
+            actualEnd.ApiObjectTypeReference.ApiKind.Should().Be(expectedEnd.ApiObjectTypeReference.ApiKind);
+            actualEnd.ApiObjectTypeReference.ApiName.Should().Be(expectedEnd.ApiObjectTypeReference.ApiName);
+            actualEnd.ApiObjectTypeReference.ClrType.Should().Be(expectedEnd.ApiObjectTypeReference.ClrType);
             actualEnd.HasForeignKey.Should().Be(expectedEnd.ApiForeignKey is not null);
-            actualEnd.ApiObjectType.ClrType.Should().Be(expectedEnd.ClrObjectType);
+            actualEnd.ApiObjectType.ClrType.Should().Be(expectedEnd.ApiObjectTypeReference.ClrType);
         }
 
         private static void AssertAssociation
@@ -325,13 +329,16 @@ public partial class ApiRelationshipTests(ITestOutputHelper output) : XUnitTests
             ApiRelationshipAssociation actualAssociation
         )
         {
-            actualAssociation.ClrObjectType.Should().Be(expectedAssociation.ClrObjectType);
+            actualAssociation.ApiObjectTypeReference.ApiKind.Should().Be(expectedAssociation.ApiObjectTypeReference.ApiKind);
+            actualAssociation.ApiObjectTypeReference.ApiName.Should().Be(expectedAssociation.ApiObjectTypeReference.ApiName);
+            actualAssociation.ApiObjectTypeReference.ClrType.Should().Be(expectedAssociation.ApiObjectTypeReference.ClrType);
             actualAssociation.HasForeignKeys.Should().Be
             (
                 expectedAssociation.ApiForeignKeyA is not null &&
                 expectedAssociation.ApiForeignKeyB is not null
             );
-            actualAssociation.ApiObjectType.ClrType.Should().Be(expectedAssociation.ClrObjectType);
+            actualAssociation.ApiObjectType.ClrType.Should().Be
+                (expectedAssociation.ApiObjectTypeReference.ClrType);
         }
 
         private static void AssertKeyDefinition(ApiKeyDef expectedKey, ApiKeyDefinition actualKey)
@@ -355,7 +362,18 @@ public partial class ApiRelationshipTests(ITestOutputHelper output) : XUnitTests
 
         private static void AssertKeyPath(ApiKeyPathDef expectedKeyPath, ApiKeyPath actualKeyPath)
         {
-            actualKeyPath.ClrRootType.Should().Be(expectedKeyPath.ClrRootType);
+            actualKeyPath.ApiRootTypeReference?.ApiKind.Should().Be(expectedKeyPath.ApiRootTypeReference?.ApiKind);
+            actualKeyPath.ApiRootTypeReference?.ApiName.Should().Be(expectedKeyPath.ApiRootTypeReference?.ApiName);
+            actualKeyPath.ApiRootTypeReference?.ClrType.Should().Be(expectedKeyPath.ApiRootTypeReference?.ClrType);
+            if (expectedKeyPath.ApiRootTypeReference is null)
+            {
+                actualKeyPath.ClrRootType.Should().NotBeNull();
+            }
+            else
+            {
+                actualKeyPath.ClrRootType.Should().Be(expectedKeyPath.ApiRootTypeReference.ClrType);
+            }
+
             actualKeyPath.ApiSegments.Should().HaveCount(expectedKeyPath.ApiKeyPathSegments.Count);
 
             for (var i = 0; i < expectedKeyPath.ApiKeyPathSegments.Count; i++)

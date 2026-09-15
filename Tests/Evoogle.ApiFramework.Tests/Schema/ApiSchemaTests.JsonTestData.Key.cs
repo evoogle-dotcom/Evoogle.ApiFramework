@@ -42,7 +42,7 @@ public partial class ApiSchemaTests
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(KeyOneScalarPart.Id),
-                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Int32), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.Required,
                                 ClrName: nameof(KeyOneScalarPart.Id),
                                 ClrMemberKind: ClrMemberKind.Property
@@ -50,7 +50,7 @@ public partial class ApiSchemaTests
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(KeyOneScalarPart.Name),
-                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.Required,
                                 ClrName: nameof(KeyOneScalarPart.Name),
                                 ClrMemberKind: ClrMemberKind.Property
@@ -63,7 +63,7 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_KeyOneScalarPart",
                                 ApiKeyPaths:
                                 [
-                                    new ApiKeyPathDef(ClrRootType: typeof(KeyOneScalarPart), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyOneScalarPart.Id))])
+                                    new ApiKeyPathDef(ApiRootTypeReference: null, [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyOneScalarPart.Id))])
                                 ]
                             ),
                             new ApiKeyDef
@@ -71,7 +71,7 @@ public partial class ApiSchemaTests
                                 ApiName: "AK_KeyOneScalarPart",
                                 ApiKeyPaths:
                                 [
-                                    new ApiKeyPathDef(ClrRootType: typeof(KeyOneScalarPart), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyOneScalarPart.Name))])
+                                    new ApiKeyPathDef(ApiRootTypeReference: null, [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyOneScalarPart.Name))])
                                 ]
                             )
                         ]
@@ -177,7 +177,7 @@ public partial class ApiSchemaTests
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(KeyTwoScalarPartComposite.Id1),
-                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Int32), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.Required,
                                 ClrName: nameof(KeyTwoScalarPartComposite.Id1),
                                 ClrMemberKind: ClrMemberKind.Property
@@ -185,7 +185,7 @@ public partial class ApiSchemaTests
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(KeyTwoScalarPartComposite.Id2),
-                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.None,
                                 ClrName: nameof(KeyTwoScalarPartComposite.Id2),
                                 ClrMemberKind: ClrMemberKind.Property
@@ -193,7 +193,7 @@ public partial class ApiSchemaTests
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(KeyTwoScalarPartComposite.Description),
-                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.None,
                                 ClrName: nameof(KeyTwoScalarPartComposite.Description),
                                 ClrMemberKind: ClrMemberKind.Property
@@ -206,8 +206,8 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_KeyTwoScalarPartComposite",
                                 ApiKeyPaths:
                                 [
-                                    new ApiKeyPathDef(ClrRootType: typeof(KeyTwoScalarPartComposite), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyTwoScalarPartComposite.Id1))]),
-                                    new ApiKeyPathDef(ClrRootType: typeof(KeyTwoScalarPartComposite), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyTwoScalarPartComposite.Id2))])
+                                    new ApiKeyPathDef(ApiRootTypeReference: null, [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyTwoScalarPartComposite.Id1))]),
+                                    new ApiKeyPathDef(ApiRootTypeReference: null, [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyTwoScalarPartComposite.Id2))])
                                 ]
                             )
                         ]
@@ -323,7 +323,7 @@ public partial class ApiSchemaTests
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(KeyThreeScalarPartComposite.Id1),
-                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Int32), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.Required,
                                 ClrName: nameof(KeyThreeScalarPartComposite.Id1),
                                 ClrMemberKind: ClrMemberKind.Property
@@ -331,7 +331,7 @@ public partial class ApiSchemaTests
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(KeyThreeScalarPartComposite.Id2),
-                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.None,
                                 ClrName: nameof(KeyThreeScalarPartComposite.Id2),
                                 ClrMemberKind: ClrMemberKind.Property
@@ -339,7 +339,7 @@ public partial class ApiSchemaTests
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(KeyThreeScalarPartComposite.Id3),
-                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Guid)),
+                                ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Guid), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.Required,
                                 ClrName: nameof(KeyThreeScalarPartComposite.Id3),
                                 ClrMemberKind: ClrMemberKind.Property
@@ -347,7 +347,7 @@ public partial class ApiSchemaTests
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(KeyThreeScalarPartComposite.Description),
-                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.None,
                                 ClrName: nameof(KeyThreeScalarPartComposite.Description),
                                 ClrMemberKind: ClrMemberKind.Property
@@ -360,9 +360,9 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_KeyThreeScalarPartComposite",
                                 ApiKeyPaths:
                                 [
-                                    new ApiKeyPathDef(ClrRootType: typeof(KeyThreeScalarPartComposite), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyThreeScalarPartComposite.Id1))]),
-                                    new ApiKeyPathDef(ClrRootType: typeof(KeyThreeScalarPartComposite), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyThreeScalarPartComposite.Id2))]),
-                                    new ApiKeyPathDef(ClrRootType: typeof(KeyThreeScalarPartComposite), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyThreeScalarPartComposite.Id3))])
+                                    new ApiKeyPathDef(ApiRootTypeReference: null, [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyThreeScalarPartComposite.Id1))]),
+                                    new ApiKeyPathDef(ApiRootTypeReference: null, [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyThreeScalarPartComposite.Id2))]),
+                                    new ApiKeyPathDef(ApiRootTypeReference: null, [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyThreeScalarPartComposite.Id3))])
                                 ]
                             )
                         ]
@@ -491,7 +491,7 @@ public partial class ApiSchemaTests
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(KeyNested.Id),
-                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Int32), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.Required,
                                 ClrName: nameof(KeyNested.Id),
                                 ClrMemberKind: ClrMemberKind.Property
@@ -499,7 +499,7 @@ public partial class ApiSchemaTests
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(KeyNested.Description),
-                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.None,
                                 ClrName: nameof(KeyNested.Description),
                                 ClrMemberKind: ClrMemberKind.Property
@@ -512,7 +512,7 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_KeyNestedPart",
                                 ApiKeyPaths:
                                 [
-                                    new ApiKeyPathDef(ClrRootType: typeof(KeyNested), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyNested.Id))])
+                                    new ApiKeyPathDef(ApiRootTypeReference: null, [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyNested.Id))])
                                 ]
                             )
                         ]
@@ -526,7 +526,7 @@ public partial class ApiSchemaTests
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(KeyNestedComposite.NestedPart),
-                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(KeyNested)),
+                                ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Object, ApiName: nameof(KeyNested), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.Required,
                                 ClrName: nameof(KeyNestedComposite.NestedPart),
                                 ClrMemberKind: ClrMemberKind.Property
@@ -534,7 +534,7 @@ public partial class ApiSchemaTests
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(KeyNestedComposite.Name),
-                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.Required,
                                 ClrName: nameof(KeyNestedComposite.Name),
                                 ClrMemberKind: ClrMemberKind.Property
@@ -547,8 +547,8 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_KeyNestedComposite",
                                 ApiKeyPaths:
                                 [
-                                    new ApiKeyPathDef(ClrRootType: typeof(KeyNestedComposite), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyNestedComposite.NestedPart)), new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyNested.Id))]),
-                                    new ApiKeyPathDef(ClrRootType: typeof(KeyNestedComposite), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyNestedComposite.Name))])
+                                    new ApiKeyPathDef(ApiRootTypeReference: null, [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyNestedComposite.NestedPart)), new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyNested.Id))]),
+                                    new ApiKeyPathDef(ApiRootTypeReference: null, [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyNestedComposite.Name))])
                                 ]
                             )
                         ]
@@ -686,7 +686,7 @@ public partial class ApiSchemaTests
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(KeyOwner.Id),
-                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Int32), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.Required,
                                 ClrName: nameof(KeyOwner.Id),
                                 ClrMemberKind: ClrMemberKind.Property
@@ -694,7 +694,7 @@ public partial class ApiSchemaTests
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(KeyOwner.Description),
-                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.None,
                                 ClrName: nameof(KeyOwner.Description),
                                 ClrMemberKind: ClrMemberKind.Property
@@ -702,15 +702,7 @@ public partial class ApiSchemaTests
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(KeyOwner.Dependents),
-                                ApiTypeExpression: new ApiTypeExpression
-                                (
-                                    apiInlineType: new ApiCollectionType
-                                    (
-                                        apiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(KeyOwnedComposite)),
-                                        apiItemTypeModifiers: ApiTypeModifiers.Required,
-                                        clrCollectionType: typeof(List<KeyOwnedComposite>)
-                                    )
-                                ),
+                                ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: new ApiCollectionTypeDef(ClrType: typeof(List<KeyOwnedComposite>), ApiItemTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Object, ApiName: nameof(KeyOwnedComposite), ClrType: null)), ApiItemTypeModifiers: ApiTypeModifiers.Required), ApiTypeReferenceDef: null),
                                 ApiTypeModifiers: ApiTypeModifiers.Required,
                                 ClrName: nameof(KeyOwner.Dependents),
                                 ClrMemberKind: ClrMemberKind.Property
@@ -718,7 +710,7 @@ public partial class ApiSchemaTests
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(KeyOwner.Dependent),
-                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(KeyOwnedDependent)),
+                                ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Object, ApiName: nameof(KeyOwnedDependent), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.Required,
                                 ClrName: nameof(KeyOwner.Dependent),
                                 ClrMemberKind: ClrMemberKind.Property
@@ -731,7 +723,7 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_KeyOwner",
                                 ApiKeyPaths:
                                 [
-                                    new ApiKeyPathDef(ClrRootType: typeof(KeyOwner), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyOwner.Id))])
+                                    new ApiKeyPathDef(ApiRootTypeReference: null, [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyOwner.Id))])
                                 ]
                             )
                         ]
@@ -745,7 +737,7 @@ public partial class ApiSchemaTests
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(KeyOwnedComposite.LineNumber),
-                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Int32), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.Required,
                                 ClrName: nameof(KeyOwnedComposite.LineNumber),
                                 ClrMemberKind: ClrMemberKind.Property
@@ -753,7 +745,7 @@ public partial class ApiSchemaTests
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(KeyOwnedComposite.Description),
-                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.Required,
                                 ClrName: nameof(KeyOwnedComposite.Description),
                                 ClrMemberKind: ClrMemberKind.Property
@@ -766,8 +758,8 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_KeyOwnedComposite",
                                 ApiKeyPaths:
                                 [
-                                    new ApiKeyPathDef(ClrRootType: typeof(KeyOwner), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyOwner.Id))]),
-                                    new ApiKeyPathDef(ClrRootType: typeof(KeyOwnedComposite), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyOwnedComposite.LineNumber))])
+                                    new ApiKeyPathDef(ApiRootTypeReference: new ApiTypeReferenceDef(ApiKind: null, ApiName: null, ClrType: typeof(KeyOwner)), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyOwner.Id))]),
+                                    new ApiKeyPathDef(ApiRootTypeReference: null, [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyOwnedComposite.LineNumber))])
                                 ]
                             )
                         ]
@@ -781,7 +773,7 @@ public partial class ApiSchemaTests
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(KeyOwnedDependent.Description),
-                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.Required,
                                 ClrName: nameof(KeyOwnedDependent.Description),
                                 ClrMemberKind: ClrMemberKind.Property
@@ -794,7 +786,7 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_KeyOwnedDependent",
                                 ApiKeyPaths:
                                 [
-                                    new ApiKeyPathDef(ClrRootType: typeof(KeyOwner), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyOwner.Id))])
+                                    new ApiKeyPathDef(ApiRootTypeReference: new ApiTypeReferenceDef(ApiKind: null, ApiName: null, ClrType: typeof(KeyOwner)), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyOwner.Id))])
                                 ]
                             )
                         ]
@@ -852,7 +844,9 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""PK_KeyOwnedComposite"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ClrRootType"": ""Evoogle.ApiFramework.TestData.KeyOwner, Evoogle.ApiFramework.Tests"",
+                                        ""ApiRootObjectType"": {
+                                            ""ClrType"": ""Evoogle.ApiFramework.TestData.KeyOwner, Evoogle.ApiFramework.Tests""
+                                        },
                                         ""ClrPath"": ""Id""
                                     },
                                     {
@@ -883,7 +877,9 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""PK_KeyOwnedDependent"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ClrRootType"": ""Evoogle.ApiFramework.TestData.KeyOwner, Evoogle.ApiFramework.Tests"",
+                                        ""ApiRootObjectType"": {
+                                            ""ClrType"": ""Evoogle.ApiFramework.TestData.KeyOwner, Evoogle.ApiFramework.Tests""
+                                        },
                                         ""ClrPath"": ""Id""
                                     }
                                 ]
@@ -918,15 +914,13 @@ public partial class ApiSchemaTests
                             {
                                 ""ApiName"": ""Dependents"",
                                 ""ApiType"": {
-                                    ""ApiInlineType"": {
-                                        ""ApiKind"": ""Collection"",
-                                        ""ApiItemType"": {
-                                            ""ApiKind"": ""Object"",
-                                            ""ApiName"": ""KeyOwnedComposite""
-                                        },
-                                        ""ApiItemTypeModifiers"": ""Required"",
-                                        ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.TestData.KeyOwnedComposite,Evoogle.ApiFramework.Tests]], System.Private.CoreLib""
-                                    }
+                                    ""ApiKind"": ""Collection"",
+                                    ""ApiItemType"": {
+                                        ""ApiKind"": ""Object"",
+                                        ""ApiName"": ""KeyOwnedComposite""
+                                    },
+                                    ""ApiItemTypeModifiers"": ""Required"",
+                                    ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.TestData.KeyOwnedComposite,Evoogle.ApiFramework.Tests]], System.Private.CoreLib""
                                 },
                                 ""ApiTypeModifiers"": ""Required"",
                                 ""ClrName"": ""Dependents"",
@@ -993,7 +987,7 @@ public partial class ApiSchemaTests
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(KeyOneScalarPart.Id),
-                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Int32), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.Required,
                                 ClrName: nameof(KeyOneScalarPart.Id),
                                 ClrMemberKind: ClrMemberKind.Property
@@ -1001,7 +995,7 @@ public partial class ApiSchemaTests
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(KeyOneScalarPart.Name),
-                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.Required,
                                 ClrName: nameof(KeyOneScalarPart.Name),
                                 ClrMemberKind: ClrMemberKind.Property
@@ -1014,7 +1008,7 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_KeyOneScalarPart",
                                 ApiKeyPaths:
                                 [
-                                    new ApiKeyPathDef(ClrRootType: typeof(KeyOneScalarPart), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyOneScalarPart.Id))])
+                                    new ApiKeyPathDef(ApiRootTypeReference: null, ApiKeyPathSegments: [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyOneScalarPart.Id))])
                                 ]
                             ),
                             new ApiKeyDef
@@ -1022,7 +1016,7 @@ public partial class ApiSchemaTests
                                 ApiName: "AK_KeyOneScalarPart",
                                 ApiKeyPaths:
                                 [
-                                    new ApiKeyPathDef(ClrRootType: typeof(KeyOneScalarPart), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyOneScalarPart.Name))])
+                                    new ApiKeyPathDef(ApiRootTypeReference: null, ApiKeyPathSegments: [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyOneScalarPart.Name))])
                                 ]
                             )
                         ]
@@ -1036,7 +1030,7 @@ public partial class ApiSchemaTests
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(KeyTwoScalarPartComposite.Id1),
-                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Int32), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.Required,
                                 ClrName: nameof(KeyTwoScalarPartComposite.Id1),
                                 ClrMemberKind: ClrMemberKind.Property
@@ -1044,7 +1038,7 @@ public partial class ApiSchemaTests
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(KeyTwoScalarPartComposite.Id2),
-                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.None,
                                 ClrName: nameof(KeyTwoScalarPartComposite.Id2),
                                 ClrMemberKind: ClrMemberKind.Property
@@ -1052,7 +1046,7 @@ public partial class ApiSchemaTests
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(KeyTwoScalarPartComposite.Description),
-                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.None,
                                 ClrName: nameof(KeyTwoScalarPartComposite.Description),
                                 ClrMemberKind: ClrMemberKind.Property
@@ -1065,8 +1059,8 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_KeyTwoScalarPartComposite",
                                 ApiKeyPaths:
                                 [
-                                    new ApiKeyPathDef(ClrRootType: typeof(KeyTwoScalarPartComposite), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyTwoScalarPartComposite.Id1))]),
-                                    new ApiKeyPathDef(ClrRootType: typeof(KeyTwoScalarPartComposite), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyTwoScalarPartComposite.Id2))])
+                                    new ApiKeyPathDef(ApiRootTypeReference: null, ApiKeyPathSegments: [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyTwoScalarPartComposite.Id1))]),
+                                    new ApiKeyPathDef(ApiRootTypeReference: null, ApiKeyPathSegments: [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyTwoScalarPartComposite.Id2))])
                                 ]
                             )
                         ]
@@ -1080,7 +1074,7 @@ public partial class ApiSchemaTests
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(KeyThreeScalarPartComposite.Id1),
-                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Int32), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.Required,
                                 ClrName: nameof(KeyThreeScalarPartComposite.Id1),
                                 ClrMemberKind: ClrMemberKind.Property
@@ -1088,7 +1082,7 @@ public partial class ApiSchemaTests
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(KeyThreeScalarPartComposite.Id2),
-                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.None,
                                 ClrName: nameof(KeyThreeScalarPartComposite.Id2),
                                 ClrMemberKind: ClrMemberKind.Property
@@ -1096,7 +1090,7 @@ public partial class ApiSchemaTests
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(KeyThreeScalarPartComposite.Id3),
-                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Guid)),
+                                ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Guid), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.Required,
                                 ClrName: nameof(KeyThreeScalarPartComposite.Id3),
                                 ClrMemberKind: ClrMemberKind.Property
@@ -1104,7 +1098,7 @@ public partial class ApiSchemaTests
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(KeyThreeScalarPartComposite.Description),
-                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.None,
                                 ClrName: nameof(KeyThreeScalarPartComposite.Description),
                                 ClrMemberKind: ClrMemberKind.Property
@@ -1117,9 +1111,9 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_KeyThreeScalarPartComposite",
                                 ApiKeyPaths:
                                 [
-                                    new ApiKeyPathDef(ClrRootType: typeof(KeyThreeScalarPartComposite), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyThreeScalarPartComposite.Id1))]),
-                                    new ApiKeyPathDef(ClrRootType: typeof(KeyThreeScalarPartComposite), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyThreeScalarPartComposite.Id2))]),
-                                    new ApiKeyPathDef(ClrRootType: typeof(KeyThreeScalarPartComposite), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyThreeScalarPartComposite.Id3))])
+                                    new ApiKeyPathDef(ApiRootTypeReference: null, ApiKeyPathSegments: [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyThreeScalarPartComposite.Id1))]),
+                                    new ApiKeyPathDef(ApiRootTypeReference: null, ApiKeyPathSegments: [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyThreeScalarPartComposite.Id2))]),
+                                    new ApiKeyPathDef(ApiRootTypeReference: null, ApiKeyPathSegments: [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyThreeScalarPartComposite.Id3))])
                                 ]
                             )
                         ]
@@ -1133,7 +1127,7 @@ public partial class ApiSchemaTests
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(KeyNested.Id),
-                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Int32), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.Required,
                                 ClrName: nameof(KeyNested.Id),
                                 ClrMemberKind: ClrMemberKind.Property
@@ -1141,7 +1135,7 @@ public partial class ApiSchemaTests
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(KeyNested.Description),
-                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.None,
                                 ClrName: nameof(KeyNested.Description),
                                 ClrMemberKind: ClrMemberKind.Property
@@ -1154,7 +1148,7 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_KeyNestedPart",
                                 ApiKeyPaths:
                                 [
-                                    new ApiKeyPathDef(ClrRootType: typeof(KeyNested), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyNested.Id))])
+                                    new ApiKeyPathDef(ApiRootTypeReference: null, ApiKeyPathSegments: [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyNested.Id))])
                                 ]
                             )
                         ]
@@ -1168,7 +1162,7 @@ public partial class ApiSchemaTests
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(KeyNestedComposite.NestedPart),
-                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(KeyNested)),
+                                ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Object, ApiName: nameof(KeyNested), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.Required,
                                 ClrName: nameof(KeyNestedComposite.NestedPart),
                                 ClrMemberKind: ClrMemberKind.Property
@@ -1176,7 +1170,7 @@ public partial class ApiSchemaTests
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(KeyNestedComposite.Name),
-                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.Required,
                                 ClrName: nameof(KeyNestedComposite.Name),
                                 ClrMemberKind: ClrMemberKind.Property
@@ -1189,8 +1183,8 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_KeyNestedComposite",
                                 ApiKeyPaths:
                                 [
-                                    new ApiKeyPathDef(ClrRootType: typeof(KeyNestedComposite), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyNestedComposite.NestedPart)), new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyNested.Id))]),
-                                    new ApiKeyPathDef(ClrRootType: typeof(KeyNestedComposite), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyNestedComposite.Name))])
+                                    new ApiKeyPathDef(ApiRootTypeReference: null, ApiKeyPathSegments: [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyNestedComposite.NestedPart)), new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyNested.Id))]),
+                                    new ApiKeyPathDef(ApiRootTypeReference: null, ApiKeyPathSegments: [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyNestedComposite.Name))])
                                 ]
                             )
                         ]
@@ -1204,7 +1198,7 @@ public partial class ApiSchemaTests
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(KeyOwner.Id),
-                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Int32), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.Required,
                                 ClrName: nameof(KeyOwner.Id),
                                 ClrMemberKind: ClrMemberKind.Property
@@ -1212,7 +1206,7 @@ public partial class ApiSchemaTests
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(KeyOwner.Description),
-                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.None,
                                 ClrName: nameof(KeyOwner.Description),
                                 ClrMemberKind: ClrMemberKind.Property
@@ -1220,15 +1214,7 @@ public partial class ApiSchemaTests
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(KeyOwner.Dependents),
-                                ApiTypeExpression: new ApiTypeExpression
-                                (
-                                    apiInlineType: new ApiCollectionType
-                                    (
-                                        apiItemTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(KeyOwnedComposite)),
-                                        apiItemTypeModifiers: ApiTypeModifiers.Required,
-                                        clrCollectionType: typeof(List<KeyOwnedComposite>)
-                                    )
-                                ),
+                                ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: new ApiCollectionTypeDef(ClrType: typeof(List<KeyOwnedComposite>), ApiItemTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Object, ApiName: nameof(KeyOwnedComposite), ClrType: null)), ApiItemTypeModifiers: ApiTypeModifiers.Required), ApiTypeReferenceDef: null),
                                 ApiTypeModifiers: ApiTypeModifiers.Required,
                                 ClrName: nameof(KeyOwner.Dependents),
                                 ClrMemberKind: ClrMemberKind.Property
@@ -1236,7 +1222,7 @@ public partial class ApiSchemaTests
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(KeyOwner.Dependent),
-                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Object, apiName: nameof(KeyOwnedDependent)),
+                                ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Object, ApiName: nameof(KeyOwnedDependent), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.Required,
                                 ClrName: nameof(KeyOwner.Dependent),
                                 ClrMemberKind: ClrMemberKind.Property
@@ -1249,7 +1235,7 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_KeyOwner",
                                 ApiKeyPaths:
                                 [
-                                    new ApiKeyPathDef(ClrRootType: typeof(KeyOwner), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyOwner.Id))])
+                                    new ApiKeyPathDef(ApiRootTypeReference: null, ApiKeyPathSegments: [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyOwner.Id))])
                                 ]
                             )
                         ]
@@ -1263,7 +1249,7 @@ public partial class ApiSchemaTests
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(KeyOwnedComposite.LineNumber),
-                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(Int32)),
+                                ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Int32), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.Required,
                                 ClrName: nameof(KeyOwnedComposite.LineNumber),
                                 ClrMemberKind: ClrMemberKind.Property
@@ -1271,7 +1257,7 @@ public partial class ApiSchemaTests
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(KeyOwnedComposite.Description),
-                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.Required,
                                 ClrName: nameof(KeyOwnedComposite.Description),
                                 ClrMemberKind: ClrMemberKind.Property
@@ -1284,8 +1270,8 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_KeyOwnedComposite",
                                 ApiKeyPaths:
                                 [
-                                    new ApiKeyPathDef(ClrRootType: typeof(KeyOwner), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyOwner.Id))]),
-                                    new ApiKeyPathDef(ClrRootType: typeof(KeyOwnedComposite), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyOwnedComposite.LineNumber))])
+                                    new ApiKeyPathDef(ApiRootTypeReference: new ApiTypeReferenceDef(ApiKind: null, ApiName: null, ClrType: typeof(KeyOwner)), ApiKeyPathSegments: [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyOwner.Id))]),
+                                    new ApiKeyPathDef(ApiRootTypeReference: null, ApiKeyPathSegments: [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyOwnedComposite.LineNumber))])
                                 ]
                             )
                         ]
@@ -1299,7 +1285,7 @@ public partial class ApiSchemaTests
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(KeyOwnedDependent.Description),
-                                ApiTypeExpression: new ApiTypeExpression(apiKind: ApiTypeKind.Scalar, apiName: nameof(String)),
+                                ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(String), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.Required,
                                 ClrName: nameof(KeyOwnedDependent.Description),
                                 ClrMemberKind: ClrMemberKind.Property
@@ -1312,7 +1298,7 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_KeyOwnedDependent",
                                 ApiKeyPaths:
                                 [
-                                    new ApiKeyPathDef(ClrRootType: typeof(KeyOwner), [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyOwner.Id))])
+                                    new ApiKeyPathDef(ApiRootTypeReference: new ApiTypeReferenceDef(ApiKind: null, ApiName: null, ClrType: typeof(KeyOwner)), ApiKeyPathSegments: [new ApiKeyPathSegmentDef(ClrMemberName: nameof(KeyOwner.Id))])
                                 ]
                             )
                         ]
@@ -1497,7 +1483,9 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""PK_KeyOwnedComposite"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ClrRootType"": ""Evoogle.ApiFramework.TestData.KeyOwner, Evoogle.ApiFramework.Tests"",
+                                        ""ApiRootObjectType"": {
+                                            ""ClrType"": ""Evoogle.ApiFramework.TestData.KeyOwner, Evoogle.ApiFramework.Tests""
+                                        },
                                         ""ClrPath"": ""Id""
                                     },
                                     {
@@ -1528,7 +1516,9 @@ public partial class ApiSchemaTests
                                 ""ApiName"": ""PK_KeyOwnedDependent"",
                                 ""ApiKeyPaths"": [
                                     {
-                                        ""ClrRootType"": ""Evoogle.ApiFramework.TestData.KeyOwner, Evoogle.ApiFramework.Tests"",
+                                        ""ApiRootObjectType"": {
+                                            ""ClrType"": ""Evoogle.ApiFramework.TestData.KeyOwner, Evoogle.ApiFramework.Tests""
+                                        },
                                         ""ClrPath"": ""Id""
                                     }
                                 ]
@@ -1563,15 +1553,13 @@ public partial class ApiSchemaTests
                             {
                                 ""ApiName"": ""Dependents"",
                                 ""ApiType"": {
-                                    ""ApiInlineType"": {
-                                        ""ApiKind"": ""Collection"",
-                                        ""ApiItemType"": {
-                                            ""ApiKind"": ""Object"",
-                                            ""ApiName"": ""KeyOwnedComposite""
-                                        },
-                                        ""ApiItemTypeModifiers"": ""Required"",
-                                        ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.TestData.KeyOwnedComposite,Evoogle.ApiFramework.Tests]], System.Private.CoreLib""
-                                    }
+                                    ""ApiKind"": ""Collection"",
+                                    ""ApiItemType"": {
+                                        ""ApiKind"": ""Object"",
+                                        ""ApiName"": ""KeyOwnedComposite""
+                                    },
+                                    ""ApiItemTypeModifiers"": ""Required"",
+                                    ""ClrType"": ""System.Collections.Generic.List\u00601[[Evoogle.ApiFramework.TestData.KeyOwnedComposite,Evoogle.ApiFramework.Tests]], System.Private.CoreLib""
                                 },
                                 ""ApiTypeModifiers"": ""Required"",
                                 ""ClrName"": ""Dependents"",

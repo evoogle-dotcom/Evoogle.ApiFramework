@@ -184,12 +184,12 @@ internal static class ApiRelationshipKeyAlignment
             ? $"Use one of the available keys: {availableKeys}"
             : $"Define a key on '{principalObjectType.ApiName}' or remove {nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyName)}";
 
-        var path = principalEnd.ApiPath;
+        var apiPath = principalEnd.ApiPath;
         var severity = ApiSchemaCompilationSeverity.Error;
         var code = ApiSchemaCompilationCode.ApiRelationshipEndUnresolvedKey;
         var description = $"Referenced principal key '{principalEnd.ApiPrincipalKeyName}' could not be found on object type '{principalObjectType.ApiName}'";
 
-        context.AddIssue(path, severity, code, description, remediation);
+        context.AddIssue(apiPath, severity, code, description, remediation);
     }
 
     private static void AddAmbiguousPrincipalKeyIssue

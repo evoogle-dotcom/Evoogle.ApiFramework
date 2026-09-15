@@ -94,16 +94,16 @@ public sealed class ApiRelationshipAssociation : ApiRelationshipElement
     ///     Use when the join-table object type needs to be identified but key property mapping
     ///     is intentionally left to the downstream layer.
     /// </summary>
-    /// <param name="clrObjectType">The CLR type of the association <see cref="ApiObjectType"/>.</param>
-    public ApiRelationshipAssociation(Type clrObjectType)
-        : base(clrObjectType)
+    /// <param name="apiObjectTypeReference">The reference to the association <see cref="ApiObjectType"/>.</param>
+    public ApiRelationshipAssociation(ApiTypeReference apiObjectTypeReference)
+        : base(apiObjectTypeReference)
     {
     }
 
     /// <summary>
     ///     Creates a key-bound association with explicit <see cref="ApiKeyDefinition"/> instances for both foreign key roles.
     /// </summary>
-    /// <param name="clrObjectType">The CLR type of the association <see cref="ApiObjectType"/>.</param>
+    /// <param name="apiObjectTypeReference">The reference to the association <see cref="ApiObjectType"/>.</param>
     /// <param name="apiForeignKeyA">
     ///     The <see cref="ApiKeyDefinition"/> that maps the scalar leaves of principal end A's key
     ///     to properties on the association object type.
@@ -117,11 +117,11 @@ public sealed class ApiRelationshipAssociation : ApiRelationshipElement
     /// </exception>
     public ApiRelationshipAssociation
     (
-        Type clrObjectType,
+        ApiTypeReference apiObjectTypeReference,
         ApiKeyDefinition apiForeignKeyA,
         ApiKeyDefinition apiForeignKeyB
     )
-        : base(clrObjectType)
+        : base(apiObjectTypeReference)
     {
         ArgumentNullException.ThrowIfNull(apiForeignKeyA);
         ArgumentNullException.ThrowIfNull(apiForeignKeyB);
@@ -135,12 +135,16 @@ public sealed class ApiRelationshipAssociation : ApiRelationshipElement
     /// <inheritdoc/>
     public override string ToString()
     {
-        var clrObjectType = this.ClrObjectType.SafeToName();
+        var apiObjectTypeReference = this.ApiObjectTypeReference.SafeToString();
         var apiForeignKeyA = _apiForeignKeyA.SafeToString();
         var apiForeignKeyB = _apiForeignKeyB.SafeToString();
         var extensionCount = this.ExtensionCount.SafeToString();
 
-        return $"{nameof(ApiRelationshipAssociation)} {{{nameof(this.ClrObjectType)}={clrObjectType}, {nameof(this.ApiForeignKeyA)}={apiForeignKeyA}, {nameof(this.ApiForeignKeyB)}={apiForeignKeyB}, {nameof(this.ExtensionCount)}={extensionCount}}}";
+        return $"{nameof(ApiRelationshipAssociation)} "
+            + $"{{{nameof(this.ApiObjectTypeReference)}={apiObjectTypeReference}, "
+            + $"{nameof(this.ApiForeignKeyA)}={apiForeignKeyA}, "
+            + $"{nameof(this.ApiForeignKeyB)}={apiForeignKeyB}, "
+            + $"{nameof(this.ExtensionCount)}={extensionCount}}}";
     }
     #endregion
 

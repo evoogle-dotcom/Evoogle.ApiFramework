@@ -632,7 +632,7 @@ public sealed partial class ApiProperty
     {
         ArgumentNullException.ThrowIfNull(this.ApiSchemaContext);
 
-        var targetType = clrValueType ?? this.ApiTypeExpression.ClrType ?? throw new ApiSchemaException($"Cannot coerce value for property '{this.ClrName}' because neither a target type was provided nor does the property have a resolved CLR type.");
+        var targetType = clrValueType ?? this.ApiType.ClrType;
 
         try
         {
@@ -671,7 +671,9 @@ public sealed partial class ApiProperty
             return false;
         }
 
-        var targetType = clrValueType ?? this.ApiTypeExpression.ClrType;
+        var targetType = clrValueType ?? (this.ApiTypeExpression.IsResolved
+            ? this.ApiType.ClrType
+            : null);
 
         if (targetType is null)
         {

@@ -10,6 +10,7 @@ using System.Diagnostics.CodeAnalysis;
 using Evoogle.ApiFramework.Schema.Compilation;
 using Evoogle.ApiFramework.Schema.Compilation.Internal;
 using Evoogle.ApiFramework.Schema.Key;
+using Evoogle.ApiFramework.Schema.Key.Internal;
 using Evoogle.ApiFramework.Schema.Relationships;
 using Evoogle.ApiFramework.Schema.Version;
 using Evoogle.Extensions;
@@ -36,7 +37,7 @@ public sealed partial class ApiObjectType
     IEnumerable<ApiNamedKeyDefinition>? apiKeys,
     ApiVersionDefinition? apiVersion,
     Type clrObjectType
-) : ApiNamedType(apiName, clrObjectType)
+) : ApiNamedType(apiName, clrObjectType), IApiKeyPathRootProvider
 {
     #region ApiObjectType Fields
     private FrozenDictionary<string, ApiNamedKeyDefinition>? _apiKeyApiNameLookup = null;
@@ -125,6 +126,12 @@ public sealed partial class ApiObjectType
 
     /// <summary>Indicates whether this object type acts as a join table in any M:N relationships.</summary>
     public bool HasAssociationRole => !_apiRelationshipAssociations.IsDefaultOrEmpty;
+    #endregion
+
+    #region IApiKeyPathRootProvider Properties
+    ApiObjectType? IApiKeyPathRootProvider.ApiOwnerSuppliedKeyPathRoot => this;
+
+    string? IApiKeyPathRootProvider.OwnerSuppliedKeyPathRootLabel => this.ApiName;
     #endregion
 
     #region Object Methods

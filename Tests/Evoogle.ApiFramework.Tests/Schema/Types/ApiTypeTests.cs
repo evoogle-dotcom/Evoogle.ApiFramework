@@ -38,7 +38,6 @@ public partial class ApiTypeTests(ITestOutputHelper output) : XUnitTests(output)
         {
             this.ExcludeMembers = ApiSchemaExcludeMembers.Standard;
         }
-
         #endregion
 
         #region JsonRoundtripTest<T, TFactoryArg> Methods

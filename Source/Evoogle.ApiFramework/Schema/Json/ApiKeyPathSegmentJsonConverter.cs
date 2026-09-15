@@ -39,7 +39,7 @@ public class ApiKeyPathSegmentJsonConverter(ILogger<ApiKeyPathSegmentJsonConvert
             {
                 ApiKeyPathSegment = new ApiKeyPathSegmentPropertyNames
                 {
-                    ClrMemberName = policy.ConvertName(nameof(ApiKeyPathSegment.ClrMemberName))
+                    ClrMemberName = policy.ConvertName(nameof(Key.ApiKeyPathSegment.ClrMemberName))
                 },
                 ExtensibleBase = GetExtensiblePropertyNames(policy),
             };

@@ -18,7 +18,8 @@ namespace Evoogle.ApiFramework.Schema.Relationships;
 /// <remarks>
 ///     Concrete subclasses are <see cref="ApiRelationshipOneToOne"/> and <see cref="ApiRelationshipOneToMany"/>.
 ///     The foreign key role always resides on the dependent side; the principal side provides the referenced principal key.
-///     Self-referential relationships are supported by setting both ends to the same <see cref="ApiRelationshipElement.ClrObjectType"/>.
+///     Self-referential relationships use equal
+///     <see cref="ApiRelationshipElement.ApiObjectTypeReference"/> values for both ends.
 /// </remarks>
 public abstract class ApiRelationshipOneTo : ApiRelationship
 {

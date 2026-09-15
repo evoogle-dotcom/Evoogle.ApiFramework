@@ -25,13 +25,17 @@ namespace Evoogle.ApiFramework.Schema.Relationships;
 ///
 ///     When no foreign key is declared, the owning relationship is navigational at the schema level.
 /// </remarks>
-/// <param name="clrObjectType">The CLR type of the dependent <see cref="ApiObjectType"/>.</param>
+/// <param name="apiObjectTypeReference">The reference to the dependent <see cref="ApiObjectType"/>.</param>
 /// <param name="apiForeignKey">
 ///     The optional <see cref="ApiKeyDefinition"/> that maps the principal key's scalar leaves to properties
 ///     on the dependent object graph.
 /// </param>
 [JsonConverter(typeof(ApiRelationshipDependentEndJsonConverter))]
-public sealed class ApiRelationshipDependentEnd(Type clrObjectType, ApiKeyDefinition? apiForeignKey = null) : ApiRelationshipEnd(clrObjectType)
+public sealed class ApiRelationshipDependentEnd
+(
+    ApiTypeReference apiObjectTypeReference,
+    ApiKeyDefinition? apiForeignKey = null
+) : ApiRelationshipEnd(apiObjectTypeReference)
 {
     #region ApiRelationshipDependentEnd Fields
     private readonly ApiKeyDefinition? _apiForeignKey = apiForeignKey;
@@ -71,11 +75,14 @@ public sealed class ApiRelationshipDependentEnd(Type clrObjectType, ApiKeyDefini
     /// <inheritdoc/>
     public override string ToString()
     {
-        var clrObjectType = this.ClrObjectType.SafeToName();
+        var apiObjectTypeReference = this.ApiObjectTypeReference.SafeToString();
         var apiForeignKey = _apiForeignKey?.SafeToString();
         var extensionCount = this.ExtensionCount.SafeToString();
 
-        return $"{nameof(ApiRelationshipDependentEnd)} {{{nameof(this.ClrObjectType)}={clrObjectType}, {nameof(this.ApiForeignKey)}={apiForeignKey}, {nameof(this.ExtensionCount)}={extensionCount}}}";
+        return $"{nameof(ApiRelationshipDependentEnd)} "
+            + $"{{{nameof(this.ApiObjectTypeReference)}={apiObjectTypeReference}, "
+            + $"{nameof(this.ApiForeignKey)}={apiForeignKey}, "
+            + $"{nameof(this.ExtensionCount)}={extensionCount}}}";
     }
     #endregion
 

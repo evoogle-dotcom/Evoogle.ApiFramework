@@ -126,6 +126,13 @@ public class ApiRelationshipBuilderGenericTests(ITestOutputHelper output) : XUni
             BuildExpected = static () => ApiRelationshipBuilderGenericTestFactory.BuildExpected_ManyToMany_IndependentEndTypes(),
             BuildActual = static () => ApiRelationshipBuilderGenericTestFactory.BuildActual_ManyToMany_IndependentEndTypes()
         },
+
+        new BuildRelationshipTest
+        {
+            Name = "ApiRelationshipOneToManyBuilder accepts API-named ends with an inferred foreign-key root",
+            BuildExpected = static () => ApiRelationshipBuilderGenericTestFactory.BuildExpected_OneToMany_ApiNamedReferences(),
+            BuildActual = static () => ApiRelationshipBuilderGenericTestFactory.BuildActual_OneToMany_ApiNamedReferences()
+        },
     ];
     #endregion
 

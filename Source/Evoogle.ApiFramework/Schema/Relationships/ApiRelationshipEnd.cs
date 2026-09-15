@@ -41,8 +41,8 @@ public abstract class ApiRelationshipEnd : ApiRelationshipElement
     #endregion
 
     #region Constructors
-    internal ApiRelationshipEnd(Type clrObjectType)
-        : base(clrObjectType)
+    internal ApiRelationshipEnd(ApiTypeReference apiObjectTypeReference)
+        : base(apiObjectTypeReference)
     {
     }
     #endregion

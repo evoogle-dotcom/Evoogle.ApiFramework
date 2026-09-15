@@ -5,6 +5,7 @@
 // See the LICENSE file in the project root for more information.
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
 using Evoogle.ApiFramework.Schema.Relationships;
+using Evoogle.ApiFramework.Schema.Types;
 
 namespace Evoogle.ApiFramework.Schema.Configuration.Relationships;
 
@@ -47,12 +48,23 @@ public sealed class ApiRelationshipOneToManyBuilder(string apiName)
     public ApiRelationshipOneToManyBuilder From(Type clrPrincipalType, Action<ApiRelationshipPrincipalEndBuilder>? configure = null)
     {
         ArgumentNullException.ThrowIfNull(clrPrincipalType);
+        return this.From(new ApiTypeReference(clrPrincipalType), configure);
+    }
+
+    /// <summary>Configures the principal end using an API object-type reference.</summary>
+    public ApiRelationshipOneToManyBuilder From
+    (
+        ApiTypeReference apiPrincipalTypeReference,
+        Action<ApiRelationshipPrincipalEndBuilder>? configure = null
+    )
+    {
+        ArgumentNullException.ThrowIfNull(apiPrincipalTypeReference);
 
         var source = this.CurrentConfigurationSource;
         if
         (
             _endsState.PrincipalEndA != null &&
-            _endsState.PrincipalEndA.ClrObjectType == clrPrincipalType &&
+            _endsState.PrincipalEndA.ApiObjectTypeReference == apiPrincipalTypeReference &&
             _endsState.PrincipalEndASource != null &&
             source < _endsState.PrincipalEndASource.Value
         )
@@ -74,7 +86,7 @@ public sealed class ApiRelationshipOneToManyBuilder(string apiName)
             return this;
         }
 
-        var builder = new ApiRelationshipPrincipalEndBuilder(clrPrincipalType);
+        var builder = new ApiRelationshipPrincipalEndBuilder(apiPrincipalTypeReference);
         if (configure != null)
         {
             builder.ApplyConfiguration(source, () => configure(builder));
@@ -99,7 +111,23 @@ public sealed class ApiRelationshipOneToManyBuilder(string apiName)
 
         return this.From
         (
-            clrPrincipalType,
+            new ApiTypeReference(clrPrincipalType),
+            builder => builder.WithPrincipalKey(apiPrincipalKeyName)
+        );
+    }
+
+    /// <summary>Configures the referenced principal end and selects its named key.</summary>
+    public ApiRelationshipOneToManyBuilder From
+    (
+        ApiTypeReference apiPrincipalTypeReference,
+        string apiPrincipalKeyName
+    )
+    {
+        ArgumentNullException.ThrowIfNull(apiPrincipalTypeReference);
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiPrincipalKeyName);
+        return this.From
+        (
+            apiPrincipalTypeReference,
             builder => builder.WithPrincipalKey(apiPrincipalKeyName)
         );
     }
@@ -113,9 +141,24 @@ public sealed class ApiRelationshipOneToManyBuilder(string apiName)
     public ApiRelationshipOneToManyBuilder To(Type clrDependentType, Action<ApiRelationshipDependentEndBuilder>? configure = null)
     {
         ArgumentNullException.ThrowIfNull(clrDependentType);
+        return this.To(new ApiTypeReference(clrDependentType), configure);
+    }
+
+    /// <summary>Configures the dependent end using an API object-type reference.</summary>
+    public ApiRelationshipOneToManyBuilder To
+    (
+        ApiTypeReference apiDependentTypeReference,
+        Action<ApiRelationshipDependentEndBuilder>? configure = null
+    )
+    {
+        ArgumentNullException.ThrowIfNull(apiDependentTypeReference);
 
         var source = this.CurrentConfigurationSource;
-        if (_endsState.DependentEnd != null && _endsState.DependentEnd.ClrObjectType == clrDependentType)
+        if
+        (
+            _endsState.DependentEnd != null &&
+            _endsState.DependentEnd.ApiObjectTypeReference == apiDependentTypeReference
+        )
         {
             if (configure != null)
             {
@@ -133,7 +176,7 @@ public sealed class ApiRelationshipOneToManyBuilder(string apiName)
         if
         (
             _endsState.DependentEnd != null &&
-            _endsState.DependentEnd.ClrObjectType == clrDependentType &&
+            _endsState.DependentEnd.ApiObjectTypeReference == apiDependentTypeReference &&
             _endsState.DependentEndSource != null &&
             source < _endsState.DependentEndSource.Value
         )
@@ -155,11 +198,13 @@ public sealed class ApiRelationshipOneToManyBuilder(string apiName)
             return this;
         }
 
-        var builder = ApiBuilderFactory.CreateClosedGeneric<ApiRelationshipDependentEndBuilder>
-        (
-            typeof(ApiRelationshipDependentEndBuilder<>),
-            clrDependentType
-        );
+        var builder = apiDependentTypeReference.ClrType is not null
+            ? ApiBuilderFactory.CreateClosedGeneric<ApiRelationshipDependentEndBuilder>
+                (
+                    typeof(ApiRelationshipDependentEndBuilder<>),
+                    apiDependentTypeReference.ClrType
+                )
+            : new ApiRelationshipDependentEndBuilder(apiDependentTypeReference);
         if (configure != null)
         {
             builder.ApplyConfiguration(source, () => configure(builder));
@@ -220,7 +265,7 @@ public sealed class ApiRelationshipOneToManyBuilder(string apiName)
         if
         (
             _endsState.DependentEnd != null &&
-            _endsState.DependentEnd.ClrObjectType == builder.ClrObjectType &&
+            _endsState.DependentEnd.ApiObjectTypeReference == builder.ApiObjectTypeReference &&
             _endsState.DependentEndSource != null &&
             source < _endsState.DependentEndSource.Value
         )

@@ -125,14 +125,15 @@ public enum ApiSchemaCompilationCode
     ApiKeyPathScalarSegmentInvalidType,
 
     /// <summary>
-    ///     An <see cref="ApiKeyPath"/>'s root CLR type is not registered as an <see cref="ApiObjectType"/> in the schema.
+    ///     An <see cref="ApiKeyPath"/>'s explicit root reference could not be resolved to an
+    ///     <see cref="ApiObjectType"/> in the schema.
     /// </summary>
     [EnumMember(Value = "API_KEY_PATH_UNRESOLVED_ROOT_TYPE")]
     ApiKeyPathUnresolvedRootType,
 
     /// <summary>
-    ///     An <see cref="ApiKeyPath"/> declares no explicit root CLR type and no owning
-    ///     <see cref="ApiObjectType"/> or <see cref="ApiRelationshipElement"/> could supply one.
+    ///     An <see cref="ApiKeyPath"/> declares no explicit root reference and no owning
+    ///     <see cref="ApiObjectType"/> or <see cref="ApiRelationshipElement"/> could supply a root.
     /// </summary>
     [EnumMember(Value = "API_KEY_PATH_UNINFERABLE_ROOT_TYPE")]
     ApiKeyPathUninferableRootType,
@@ -351,13 +352,14 @@ public enum ApiSchemaCompilationCode
 
     #region ApiRelationshipElement Compilation Codes
     /// <summary>
-    ///     The relationship element's CLR object type is null.
+    ///     The relationship element's object type reference is null.
     /// </summary>
-    [EnumMember(Value = "API_RELATIONSHIP_ELEMENT_NULL_CLR_OBJECT_TYPE")]
-    ApiRelationshipElementNullClrObjectType,
+    [EnumMember(Value = "API_RELATIONSHIP_ELEMENT_NULL_OBJECT_TYPE_REFERENCE")]
+    ApiRelationshipElementNullObjectTypeReference,
 
     /// <summary>
-    ///     The relationship element's object type name could not be resolved to a defined object type in the schema.
+    ///     The relationship element's object type reference could not be resolved to an object type
+    ///     in the schema.
     /// </summary>
     [EnumMember(Value = "API_RELATIONSHIP_ELEMENT_UNRESOLVED_OBJECT_TYPE")]
     ApiRelationshipElementUnresolvedObjectType,
@@ -537,12 +539,26 @@ public enum ApiSchemaCompilationCode
     ApiSchemaExtensionInvalidSnapshot,
     #endregion
 
+    #region ApiTypeReference Compilation Codes
+    /// <summary>
+    ///     A type reference's API kind could not be read from schema JSON.
+    /// </summary>
+    [EnumMember(Value = "API_TYPE_REFERENCE_INVALID_API_KIND")]
+    ApiTypeReferenceInvalidApiKind,
+
+    /// <summary>
+    ///     A type reference does not contain exactly one complete API-named or CLR reference.
+    /// </summary>
+    [EnumMember(Value = "API_TYPE_REFERENCE_INVALID_FORM")]
+    ApiTypeReferenceInvalidForm,
+    #endregion
+
     #region ApiTypeExpression Compilation Codes
     /// <summary>
-    ///     A type expression's API kind could not be read from schema JSON.
+    ///     A type expression does not contain exactly one inline type or type reference.
     /// </summary>
-    [EnumMember(Value = "API_TYPE_EXPRESSION_INVALID_API_KIND")]
-    ApiTypeExpressionInvalidApiKind,
+    [EnumMember(Value = "API_TYPE_EXPRESSION_INVALID_FORM")]
+    ApiTypeExpressionInvalidForm,
     #endregion
 
     #region ApiType Compilation Codes

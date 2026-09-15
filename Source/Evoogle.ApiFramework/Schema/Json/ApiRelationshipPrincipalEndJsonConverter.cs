@@ -6,6 +6,7 @@
 using System.Text.Json;
 
 using Evoogle.ApiFramework.Schema.Relationships;
+using Evoogle.ApiFramework.Schema.Types;
 using Evoogle.Json;
 
 using Microsoft.Extensions.Logging;
@@ -22,7 +23,7 @@ public class ApiRelationshipPrincipalEndJsonConverter(ILogger<ApiRelationshipPri
     #region Property Types
     private readonly record struct ApiRelationshipElementPropertyNames
     {
-        public required string ClrObjectType { get; init; }
+        public required string ApiObjectTypeReference { get; init; }
     }
 
     private readonly record struct ApiRelationshipPrincipalEndPropertyNames
@@ -41,11 +42,11 @@ public class ApiRelationshipPrincipalEndJsonConverter(ILogger<ApiRelationshipPri
             {
                 ApiRelationshipElement = new ApiRelationshipElementPropertyNames
                 {
-                    ClrObjectType = policy.ConvertName(nameof(ApiRelationshipElement.ClrObjectType)),
+                    ApiObjectTypeReference = policy.ConvertName(nameof(Relationships.ApiRelationshipElement.ApiObjectType)), // Mapping property name from ApiObjectTypeReference to ApiObjectType by design
                 },
                 ApiRelationshipPrincipalEnd = new ApiRelationshipPrincipalEndPropertyNames
                 {
-                    ApiPrincipalKeyName = policy.ConvertName(nameof(ApiRelationshipPrincipalEnd.ApiPrincipalKeyName)),
+                    ApiPrincipalKeyName = policy.ConvertName(nameof(Relationships.ApiRelationshipPrincipalEnd.ApiPrincipalKeyName)),
                 },
                 ExtensibleBase = GetExtensiblePropertyNames(policy),
             };
@@ -55,7 +56,7 @@ public class ApiRelationshipPrincipalEndJsonConverter(ILogger<ApiRelationshipPri
     #region Read Types
     private class ApiRelationshipElementReadData
     {
-        public Type? ClrObjectType { get; set; }
+        public ApiTypeReference? ApiObjectTypeReference { get; set; }
     }
 
     private class ApiRelationshipPrincipalEndReadData
@@ -73,15 +74,16 @@ public class ApiRelationshipPrincipalEndJsonConverter(ILogger<ApiRelationshipPri
     {
         public readonly Dictionary<string, JsonReaderHandler<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>>> PropertyHandlers = new()
         {
-            { propertyNames.ApiRelationshipElement.ClrObjectType, HandleClrObjectType },
+            { propertyNames.ApiRelationshipElement.ApiObjectTypeReference, HandleApiObjectTypeReference },
             { propertyNames.ApiRelationshipPrincipalEnd.ApiPrincipalKeyName, HandleApiPrincipalKeyName },
             { propertyNames.ExtensibleBase.Extensions, CreateExtensionsHandler<PropertyNames, ReadState, ReadHandlers>() },
         };
 
-        private static void HandleClrObjectType(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
+        private static void HandleApiObjectTypeReference(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
             context.ReadData.ApiRelationshipElement ??= new ApiRelationshipElementReadData();
-            context.ReadData.ApiRelationshipElement.ClrObjectType = _typeJsonConverter.Read(ref reader, typeof(Type), context.Options);
+            context.ReadData.ApiRelationshipElement.ApiObjectTypeReference =
+                JsonSerializer.Deserialize<ApiTypeReference>(ref reader, context.Options);
         }
 
         private static void HandleApiPrincipalKeyName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
@@ -90,10 +92,6 @@ public class ApiRelationshipPrincipalEndJsonConverter(ILogger<ApiRelationshipPri
             context.ReadData.ApiRelationshipPrincipalEnd.ApiPrincipalKeyName = reader.GetString();
         }
     }
-    #endregion
-
-    #region Fields
-    private static readonly TypeJsonConverter _typeJsonConverter = new();
     #endregion
 
     #region Constructors
@@ -124,12 +122,12 @@ public class ApiRelationshipPrincipalEndJsonConverter(ILogger<ApiRelationshipPri
     {
         var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
 
-        var clrObjectType = readContext.ReadData.ApiRelationshipElement?.ClrObjectType;
+        var apiObjectTypeReference = readContext.ReadData.ApiRelationshipElement?.ApiObjectTypeReference;
         var apiPrincipalKeyName = readContext.ReadData.ApiRelationshipPrincipalEnd?.ApiPrincipalKeyName;
 
         var end = new ApiRelationshipPrincipalEnd
             (
-                clrObjectType!,
+                apiObjectTypeReference!,
                 apiPrincipalKeyName
             );
 
@@ -151,7 +149,7 @@ public class ApiRelationshipPrincipalEndJsonConverter(ILogger<ApiRelationshipPri
 
         WriteJsonObject(writer, () =>
         {
-            WriteClrObjectType(writer, value, writeContext);
+            WriteApiObjectTypeReference(writer, value, writeContext);
             WriteApiPrincipalKeyName(writer, value, writeContext);
 
             WriteExtensibleBaseExtensions(writer, writeContext.PropertyNames.ExtensibleBase.Extensions, value, writeContext);
@@ -160,8 +158,13 @@ public class ApiRelationshipPrincipalEndJsonConverter(ILogger<ApiRelationshipPri
     #endregion
 
     #region Write Implementation Methods
-    private static void WriteClrObjectType(Utf8JsonWriter writer, ApiRelationshipPrincipalEnd end, DefaultWriteContext<PropertyNames> context)
-        => writer.TryWritePropertyWithConverter(context.PropertyNames.ApiRelationshipElement.ClrObjectType, end.ClrObjectType, context.Options, _typeJsonConverter);
+    private static void WriteApiObjectTypeReference(Utf8JsonWriter writer, ApiRelationshipPrincipalEnd end, DefaultWriteContext<PropertyNames> context)
+        => writer.TryWritePropertyWithSerializer
+        (
+            context.PropertyNames.ApiRelationshipElement.ApiObjectTypeReference,
+            end.ApiObjectTypeReference,
+            context.Options
+        );
 
     private static void WriteApiPrincipalKeyName(Utf8JsonWriter writer, ApiRelationshipPrincipalEnd end, DefaultWriteContext<PropertyNames> context)
     {

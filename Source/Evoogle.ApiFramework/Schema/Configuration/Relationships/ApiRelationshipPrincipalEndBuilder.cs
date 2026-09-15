@@ -19,18 +19,33 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Relationships;
 ///     <see cref="WithPrincipalKey"/> to specify the named principal key explicitly. Delete behavior is configured on the
 ///     relationship builder, not on individual ends.
 /// </remarks>
-/// <param name="clrObjectType">The CLR type of the principal <see cref="ApiObjectType"/>.</param>
-public sealed class ApiRelationshipPrincipalEndBuilder(Type clrObjectType) : ExtensionBuilder<ApiRelationshipPrincipalEndBuilder>
+/// <param name="apiObjectTypeReference">The principal object-type reference.</param>
+public sealed class ApiRelationshipPrincipalEndBuilder(ApiTypeReference apiObjectTypeReference)
+    : ExtensionBuilder<ApiRelationshipPrincipalEndBuilder>
 {
     #region Fields
     private readonly ApiConfigurationSourceScope _configurationSourceScope = new();
-    private readonly Type _clrObjectType = clrObjectType ?? throw new ArgumentNullException(nameof(clrObjectType));
+    private readonly ApiTypeReference _apiObjectTypeReference = apiObjectTypeReference ??
+        throw new ArgumentNullException(nameof(apiObjectTypeReference));
     private readonly ApiRelationshipPrincipalEndState _state = new();
     #endregion
 
     #region Properties
-    /// <summary>Gets the CLR object type represented by this principal end.</summary>
-    internal Type ClrObjectType => _clrObjectType;
+    /// <summary>Gets the object-type reference represented by this principal end.</summary>
+    internal ApiTypeReference ApiObjectTypeReference => _apiObjectTypeReference;
+    #endregion
+
+    #region Constructors
+    /// <summary>Creates a principal-end builder from a CLR type.</summary>
+    /// <param name="clrObjectType">The principal CLR object type.</param>
+    public ApiRelationshipPrincipalEndBuilder(Type clrObjectType)
+        : this
+        (
+            new ApiTypeReference
+                (clrObjectType ?? throw new ArgumentNullException(nameof(clrObjectType)))
+        )
+    {
+    }
     #endregion
 
     #region AddExtension Methods
@@ -84,7 +99,7 @@ public sealed class ApiRelationshipPrincipalEndBuilder(Type clrObjectType) : Ext
     {
         var end = new ApiRelationshipPrincipalEnd
         (
-            _clrObjectType,
+            _apiObjectTypeReference,
             _state.PrincipalKeyName
         );
 

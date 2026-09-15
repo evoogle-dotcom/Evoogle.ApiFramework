@@ -30,6 +30,7 @@ public static class ApiSchemaExcludeMembers
 
         // ApiKeyPath — cycle: ApiRootObjectType → ApiObjectType → ApiKeys[].ApiKeyPaths[].ApiRootObjectType → ...
         new ExcludeMember(typeof(ApiKeyPath), nameof(ApiKeyPath.ApiRootObjectType)),
+        new ExcludeMember(typeof(ApiKeyPath), nameof(ApiKeyPath.ClrRootType)),
 
         // ApiKeyPathSegment — cycle: ApiProperty → ApiType → ApiObjectType → ApiKeys[].ApiKeyPaths[].ApiRootObjectType → ...
         new ExcludeMember(typeof(ApiKeyPathSegment), nameof(ApiKeyPathSegment.ApiProperty)),
@@ -48,6 +49,7 @@ public static class ApiSchemaExcludeMembers
 
         // ApiRelationshipElement — object type resolved during compilation
         new ExcludeMember(typeof(ApiRelationshipElement), nameof(ApiRelationshipElement.ApiObjectType)),
+        new ExcludeMember(typeof(ApiRelationshipElement), nameof(ApiRelationshipElement.ClrObjectType)),
 
         // ApiRelationshipEnd — cycle: end → relationship → end → ...
         new ExcludeMember(typeof(ApiRelationshipEnd), nameof(ApiRelationshipEnd.ApiRelationship)),
@@ -76,6 +78,7 @@ public static class ApiSchemaExcludeMembers
 
         // ApiKeyPath
         new ExcludeMember(typeof(ApiKeyPath), nameof(ApiKeyPath.ApiRootObjectType)),
+        new ExcludeMember(typeof(ApiKeyPath), nameof(ApiKeyPath.ClrRootType)),
 
         // ApiKeyPathSegment
         new ExcludeMember(typeof(ApiKeyPathSegment), nameof(ApiKeyPathSegment.ApiProperty)),
@@ -106,6 +109,7 @@ public static class ApiSchemaExcludeMembers
 
         // ApiRelationshipElement — object type resolved during compilation
         new ExcludeMember(typeof(ApiRelationshipElement), nameof(ApiRelationshipElement.ApiObjectType)),
+        new ExcludeMember(typeof(ApiRelationshipElement), nameof(ApiRelationshipElement.ClrObjectType)),
 
         // ApiRelationshipDependentEnd — ApiForeignKey throws when HasForeignKey=false
         new ExcludeMember(typeof(ApiRelationshipDependentEnd), nameof(ApiRelationshipDependentEnd.ApiForeignKey)),
@@ -127,6 +131,7 @@ public static class ApiSchemaExcludeMembers
 
         // Key path nodes — property and object type references resolved during compilation
         new ExcludeMember(typeof(ApiKeyPath), nameof(ApiKeyPath.ApiRootObjectType)),
+        new ExcludeMember(typeof(ApiKeyPath), nameof(ApiKeyPath.ClrRootType)),
         new ExcludeMember(typeof(ApiKeyPathSegment), nameof(ApiKeyPathSegment.ApiProperty)),
 
         // ApiSchemaElement

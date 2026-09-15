@@ -46,7 +46,7 @@ public class ApiNamedKeyDefinitionJsonConverter(ILogger<ApiNamedKeyDefinitionJso
                 ApiKeyDefinition = ApiKeyDefinitionJsonConverterCore.PropertyNames.Create(policy),
                 ApiNamedKeyDefinition = new ApiNamedKeyDefinitionPropertyNames
                 {
-                    ApiName = policy.ConvertName(nameof(ApiNamedKeyDefinition.ApiName))
+                    ApiName = policy.ConvertName(nameof(Key.ApiNamedKeyDefinition.ApiName))
                 },
                 ExtensibleBase = GetExtensiblePropertyNames(policy),
             };

@@ -14,22 +14,19 @@ public partial class ApiKeyDefinitionTests(ITestOutputHelper output) : XUnitTest
     #region Test Data
     private static ApiSchema KeyApiSchema { get; } = ApiSchemaFactory.KeyApiSchema;
 
-    private static ApiKeyDefinition GetPrimaryKeyDefinition(string apiObjectTypeName)
+    private static ApiNamedKeyDefinition GetPrimaryKeyDefinition(string apiObjectTypeName)
     {
         var apiObjectType = KeyApiSchema.GetObjectTypeByApiName(apiObjectTypeName);
         return apiObjectType.ApiKeys.FirstOrDefault() ??
             throw new InvalidOperationException($"No key definition on '{apiObjectTypeName}'.");
     }
 
-    private static ApiKeyDefinition GetKeyDefinitionByName(string apiObjectTypeName, string apiKeyName)
+    private static ApiNamedKeyDefinition GetKeyDefinitionByName(string apiObjectTypeName, string apiKeyName)
     {
         var apiObjectType = KeyApiSchema.GetObjectTypeByApiName(apiObjectTypeName);
         return apiObjectType.TryGetKeyByApiName(apiKeyName, out var keyDefinition)
             ? keyDefinition
-            : throw new InvalidOperationException
-            (
-                $"Key definition '{apiKeyName}' not found on '{apiObjectTypeName}'."
-            );
+            : throw new InvalidOperationException($"Key definition '{apiKeyName}' not found on '{apiObjectTypeName}'.");
     }
 
     // CLR instances with fully populated values

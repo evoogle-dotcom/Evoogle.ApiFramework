@@ -27,7 +27,7 @@ namespace Evoogle.ApiFramework.Schema.Relationships;
 ///     </para>
 ///     <para>
 ///         Self-referential many-to-many relationships are supported by setting both principal ends
-///         to the same <see cref="ApiRelationshipElement.ClrObjectType"/>.
+///         to equal <see cref="ApiRelationshipElement.ApiObjectTypeReference"/> values.
 ///     </para>
 /// </remarks>
 /// <param name="apiName">The API name that uniquely identifies this relationship within the schema.</param>

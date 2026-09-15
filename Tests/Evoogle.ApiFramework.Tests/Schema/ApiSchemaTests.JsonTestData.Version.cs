@@ -37,11 +37,7 @@ public partial class ApiSchemaTests
                             new ApiPropertyDef
                             (
                                 ApiName: nameof(Person.Id),
-                                ApiTypeExpression: new ApiTypeExpression
-                                (
-                                    apiKind: ApiTypeKind.Scalar,
-                                    apiName: nameof(Int32)
-                                ),
+                                ApiTypeExpression: new ApiTypeExpressionDef(ApiTypeDef: null, ApiTypeReferenceDef: new ApiTypeReferenceDef(ApiKind: ApiTypeKind.Scalar, ApiName: nameof(Int32), ClrType: null)),
                                 ApiTypeModifiers: ApiTypeModifiers.Required,
                                 ClrName: nameof(Person.Id),
                                 ClrMemberKind: ClrMemberKind.Property

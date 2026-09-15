@@ -191,11 +191,11 @@ public partial class ApiRelationshipTests
                     typeof(RelationshipPostTag),
                     ForeignKey
                     (
-                        KeyPath(typeof(RelationshipPostTag), nameof(RelationshipPostTag.PostId))
+                        InferredKeyPath(nameof(RelationshipPostTag.PostId))
                     ),
                     ForeignKey
                     (
-                        KeyPath(typeof(RelationshipPostTag), nameof(RelationshipPostTag.TagId))
+                        InferredKeyPath(nameof(RelationshipPostTag.TagId))
                     )
                 )
             )
@@ -308,14 +308,22 @@ public partial class ApiRelationshipTests
         Type clrObjectType,
         string? apiPrincipalKeyName = null
     )
-        => new(clrObjectType, apiPrincipalKeyName);
+        => new
+        (
+            ApiObjectTypeReference: new ApiTypeReferenceDef(ApiKind: null, ApiName: null, ClrType: clrObjectType),
+            ApiPrincipalKeyName: apiPrincipalKeyName
+        );
 
     private static ApiRelationshipDependentEndDef DependentEnd
     (
         Type clrObjectType,
         ApiKeyDef? apiForeignKey = null
     )
-        => new(clrObjectType, apiForeignKey);
+        => new
+        (
+            ApiObjectTypeReference: new ApiTypeReferenceDef(ApiKind: null, ApiName: null, ClrType: clrObjectType),
+            ApiForeignKey: apiForeignKey
+        );
 
     private static ApiRelationshipAssociationDef Association
     (
@@ -323,15 +331,33 @@ public partial class ApiRelationshipTests
         ApiKeyDef? apiForeignKeyA = null,
         ApiKeyDef? apiForeignKeyB = null
     )
-        => new(clrObjectType, apiForeignKeyA, apiForeignKeyB);
+        => new
+        (
+            ApiObjectTypeReference: new ApiTypeReferenceDef(ApiKind: null, ApiName: null, ClrType: clrObjectType),
+            ApiForeignKeyA: apiForeignKeyA,
+            ApiForeignKeyB: apiForeignKeyB
+        );
 
     private static ApiKeyDef ForeignKey(params ApiKeyPathDef[] apiKeyPaths)
-        => new(null!, [.. apiKeyPaths]);
+        => new(ApiName: null!, ApiKeyPaths: [.. apiKeyPaths]);
 
     private static ApiKeyPathDef KeyPath(Type clrRootType, params string[] clrMemberNames)
         => new
         (
-            clrRootType,
+            ApiRootTypeReference: new ApiTypeReferenceDef(ApiKind: null, ApiName: null, ClrType: clrRootType),
+            ApiKeyPathSegments:
+            [
+                .. clrMemberNames.Select
+                (
+                    static clrMemberName => new ApiKeyPathSegmentDef(ClrMemberName: clrMemberName)
+                )
+            ]
+        );
+
+    private static ApiKeyPathDef InferredKeyPath(params string[] clrMemberNames)
+        => new
+        (
+            null,
             [
                 .. clrMemberNames.Select
                 (

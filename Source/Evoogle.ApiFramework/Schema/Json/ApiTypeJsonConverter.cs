@@ -14,7 +14,8 @@ namespace Evoogle.ApiFramework.Schema.Json;
 
 /// <summary>
 ///     A JSON converter for <see cref="ApiType"/> that handles serialization and deserialization logic.
-///     This converter supports reading and writing various derived types of <see cref="ApiType"/> including scalar, enum, object, and collection types, as well as handling custom property naming policies and extensions.
+///     This converter supports reading and writing various derived types of <see cref="ApiType"/> including
+///     scalar, enum, object, and collection types, as well as handling custom property naming policies and extensions.
 /// </summary>
 /// <remarks>
 ///     Optional constructor with logger for use in DI contexts.

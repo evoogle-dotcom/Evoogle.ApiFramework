@@ -7,6 +7,7 @@ using System.Text.Json;
 
 using Evoogle.ApiFramework.Schema.Key;
 using Evoogle.ApiFramework.Schema.Key.Internal;
+using Evoogle.ApiFramework.Schema.Types;
 using Evoogle.Json;
 
 using Microsoft.Extensions.Logging;
@@ -23,7 +24,7 @@ public class ApiKeyPathJsonConverter(ILogger<ApiKeyPathJsonConverter>? logger) :
     private readonly record struct ApiKeyPathPropertyNames
     {
         #region Immutable Properties
-        public required string ClrRootType { get; init; }
+        public required string ApiRootTypeReference { get; init; }
         public required string ClrPath { get; init; }
         public required string ApiSegments { get; init; }
         #endregion
@@ -42,9 +43,9 @@ public class ApiKeyPathJsonConverter(ILogger<ApiKeyPathJsonConverter>? logger) :
             {
                 ApiKeyPath = new ApiKeyPathPropertyNames
                 {
-                    ClrRootType = policy.ConvertName(nameof(ApiKeyPath.ClrRootType)),
-                    ClrPath = policy.ConvertName(nameof(ApiKeyPath.ClrPath)),
-                    ApiSegments = policy.ConvertName(nameof(ApiKeyPath.ApiSegments)),
+                    ApiRootTypeReference = policy.ConvertName(nameof(Key.ApiKeyPath.ApiRootObjectType)), // Mapping property name from ApiRootTypeReference to ApiRootObjectType by design
+                    ClrPath = policy.ConvertName(nameof(Key.ApiKeyPath.ClrPath)),
+                    ApiSegments = policy.ConvertName(nameof(Key.ApiKeyPath.ApiSegments)),
                 },
                 ExtensibleBase = GetExtensiblePropertyNames(policy),
             };
@@ -56,7 +57,7 @@ public class ApiKeyPathJsonConverter(ILogger<ApiKeyPathJsonConverter>? logger) :
     private class ApiKeyPathReadData
     {
         #region Properties
-        public Type? ClrRootType { get; set; }
+        public ApiTypeReference? ApiRootTypeReference { get; set; }
         public string? ClrPath { get; set; }
         public List<ApiKeyPathSegment>? ApiSegments { get; set; }
         #endregion
@@ -75,7 +76,7 @@ public class ApiKeyPathJsonConverter(ILogger<ApiKeyPathJsonConverter>? logger) :
         public readonly Dictionary<string, JsonReaderHandler<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>>> PropertyHandlers = new()
         {
             // ApiKeyPath Property Handlers
-            { propertyNames.ApiKeyPath.ClrRootType, HandleApiKeyPathClrRootType },
+            { propertyNames.ApiKeyPath.ApiRootTypeReference, HandleApiKeyPathApiRootTypeReference },
             { propertyNames.ApiKeyPath.ClrPath, HandleApiKeyPathClrPath },
             { propertyNames.ApiKeyPath.ApiSegments, HandleApiKeyPathApiSegments },
 
@@ -85,12 +86,10 @@ public class ApiKeyPathJsonConverter(ILogger<ApiKeyPathJsonConverter>? logger) :
         #endregion
 
         #region ApiKeyPath Methods
-        private static void HandleApiKeyPathClrRootType(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
+        private static void HandleApiKeyPathApiRootTypeReference(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
             context.ReadData.ApiKeyPath ??= new ApiKeyPathReadData();
-
-            var options = context.Options;
-            context.ReadData.ApiKeyPath.ClrRootType = _typeJsonConverter.Read(ref reader, typeof(Type), options);
+            context.ReadData.ApiKeyPath.ApiRootTypeReference = JsonSerializer.Deserialize<ApiTypeReference>(ref reader, context.Options);
         }
 
         private static void HandleApiKeyPathApiSegments(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
@@ -120,10 +119,6 @@ public class ApiKeyPathJsonConverter(ILogger<ApiKeyPathJsonConverter>? logger) :
         }
         #endregion
     }
-    #endregion
-
-    #region Fields
-    private static readonly TypeJsonConverter _typeJsonConverter = new();
     #endregion
 
     #region Constructors
@@ -160,10 +155,10 @@ public class ApiKeyPathJsonConverter(ILogger<ApiKeyPathJsonConverter>? logger) :
         var readContext = (DefaultReadContext<PropertyNames, ReadState, ReadHandlers>)context;
         var readState = readContext.ReadData.ApiKeyPath;
 
-        var clrRootType = readState?.ClrRootType;
+        var apiRootTypeReference = readState?.ApiRootTypeReference;
         var apiSegments = readState?.ApiSegments ?? CreateApiSegments(readState?.ClrPath);
 
-        var apiKeyPath = new ApiKeyPath(clrRootType, apiSegments);
+        var apiKeyPath = new ApiKeyPath(apiRootTypeReference, apiSegments);
 
         var extensions = readContext.ReadData.Extensions;
         AttachExtensions(apiKeyPath, extensions);
@@ -187,7 +182,7 @@ public class ApiKeyPathJsonConverter(ILogger<ApiKeyPathJsonConverter>? logger) :
 
         WriteJsonObject(writer, () =>
         {
-            WriteApiKeyPathClrRootType(writer, value, writeContext);
+            WriteApiKeyPathApiRootTypeReference(writer, value, writeContext);
             WriteApiKeyPathClrPathOrApiSegments(writer, value, writeContext);
 
             WriteExtensibleBaseExtensions(writer, writeContext.PropertyNames.ExtensibleBase.Extensions, value, writeContext);
@@ -195,22 +190,7 @@ public class ApiKeyPathJsonConverter(ILogger<ApiKeyPathJsonConverter>? logger) :
     }
     #endregion
 
-    #region Write Implementation Methods
-    private static void WriteApiKeyPathClrRootType(Utf8JsonWriter writer, ApiKeyPath apiKeyPath, DefaultWriteContext<PropertyNames> context)
-    {
-        var type = apiKeyPath.ClrRootType;
-
-        if (apiKeyPath.GetOwningDefaultClrRootType() == type)
-        {
-            return; // Inferred from the owning ApiObjectType or ApiRelationshipDependentEnd during compilation.
-        }
-
-        var propertyName = context.PropertyNames.ApiKeyPath.ClrRootType;
-        var options = context.Options;
-
-        writer.TryWritePropertyWithConverter(propertyName, type, options, _typeJsonConverter);
-    }
-
+    #region Create Implementation Methods
     private static IEnumerable<ApiKeyPathSegment> CreateApiSegments(string? clrPath)
     {
         if (clrPath is null)
@@ -220,6 +200,39 @@ public class ApiKeyPathJsonConverter(ILogger<ApiKeyPathJsonConverter>? logger) :
 
         var parseResult = ApiKeyPathClrPathParser.Parse(clrPath);
         return [.. parseResult.ClrMemberNames.Select(static name => new ApiKeyPathSegment(name))];
+    }
+    #endregion
+
+    #region Write Implementation Methods
+    private static void WriteApiKeyPathApiRootTypeReference(Utf8JsonWriter writer, ApiKeyPath apiKeyPath, DefaultWriteContext<PropertyNames> context)
+    {
+        // If the root is supplied by the owner, we do not write an explicit root type reference.
+        var hasOwnerSuppliedRoot = apiKeyPath.IsOwnerSuppliedRoot;
+        if (hasOwnerSuppliedRoot)
+        {
+            return;
+        }
+
+        // If the root has not been resolved throw an exception.
+        if (!apiKeyPath.IsResolvedRoot)
+        {
+            throw new JsonException("The root type has not been resolved and cannot be written.");
+        }
+
+        // If the resolved root type matches the owner-supplied root type, we do not write an explicit root type reference.
+        var resolvedClrRootType = apiKeyPath.ClrRootType;
+        var ownerSuppliedClrRootType = apiKeyPath.GetOwnerSuppliedClrRootType();
+        if (ownerSuppliedClrRootType == resolvedClrRootType)
+        {
+            return;
+        }
+
+        // At this point, we have a resolved root type that does not match the owner-supplied root type, so we write an explicit root type reference.
+        var propertyName = context.PropertyNames.ApiKeyPath.ApiRootTypeReference;
+        var obj = apiKeyPath.ApiRootTypeReference;
+        var options = context.Options;
+
+        writer.TryWritePropertyWithSerializer(propertyName, obj, options);
     }
 
     private static void WriteApiKeyPathClrPathOrApiSegments(Utf8JsonWriter writer, ApiKeyPath apiKeyPath, DefaultWriteContext<PropertyNames> context)
@@ -241,14 +254,6 @@ public class ApiKeyPathJsonConverter(ILogger<ApiKeyPathJsonConverter>? logger) :
         );
     }
 
-    private static void WriteApiKeyPathClrPath(Utf8JsonWriter writer, ApiKeyPath apiKeyPath, DefaultWriteContext<PropertyNames> context)
-    {
-        var propertyName = context.PropertyNames.ApiKeyPath.ClrPath;
-        var options = context.Options;
-
-        writer.TryWritePropertyAsString(propertyName, apiKeyPath.ClrPath, options);
-    }
-
     private static void WriteApiKeyPathApiSegments(Utf8JsonWriter writer, ApiKeyPath apiKeyPath, DefaultWriteContext<PropertyNames> context)
     {
         var propertyName = context.PropertyNames.ApiKeyPath.ApiSegments;
@@ -262,6 +267,14 @@ public class ApiKeyPathJsonConverter(ILogger<ApiKeyPathJsonConverter>? logger) :
             options,
             collection => WriteJsonArray(writer, collection, item => writer.TryWriteWithSerializer(item, options))
         );
+    }
+
+    private static void WriteApiKeyPathClrPath(Utf8JsonWriter writer, ApiKeyPath apiKeyPath, DefaultWriteContext<PropertyNames> context)
+    {
+        var propertyName = context.PropertyNames.ApiKeyPath.ClrPath;
+        var options = context.Options;
+
+        writer.TryWritePropertyAsString(propertyName, apiKeyPath.ClrPath, options);
     }
     #endregion
 }

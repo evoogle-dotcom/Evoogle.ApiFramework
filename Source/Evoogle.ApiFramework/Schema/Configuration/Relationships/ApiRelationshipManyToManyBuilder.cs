@@ -50,12 +50,23 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
     public ApiRelationshipManyToManyBuilder Between(Type clrPrincipalType, Action<ApiRelationshipPrincipalEndBuilder>? configure = null)
     {
         ArgumentNullException.ThrowIfNull(clrPrincipalType);
+        return this.Between(new ApiTypeReference(clrPrincipalType), configure);
+    }
+
+    /// <summary>Configures principal end A using an API object-type reference.</summary>
+    public ApiRelationshipManyToManyBuilder Between
+    (
+        ApiTypeReference apiPrincipalTypeReference,
+        Action<ApiRelationshipPrincipalEndBuilder>? configure = null
+    )
+    {
+        ArgumentNullException.ThrowIfNull(apiPrincipalTypeReference);
 
         var source = this.CurrentConfigurationSource;
         if
         (
             _endsState.PrincipalEndA != null &&
-            _endsState.PrincipalEndA.ClrObjectType == clrPrincipalType &&
+            _endsState.PrincipalEndA.ApiObjectTypeReference == apiPrincipalTypeReference &&
             _endsState.PrincipalEndASource != null &&
             source < _endsState.PrincipalEndASource.Value
         )
@@ -77,7 +88,7 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
             return this;
         }
 
-        var builder = new ApiRelationshipPrincipalEndBuilder(clrPrincipalType);
+        var builder = new ApiRelationshipPrincipalEndBuilder(apiPrincipalTypeReference);
         if (configure != null)
         {
             builder.ApplyConfiguration(source, () => configure(builder));
@@ -102,7 +113,23 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
 
         return this.Between
         (
-            clrPrincipalType,
+            new ApiTypeReference(clrPrincipalType),
+            builder => builder.WithPrincipalKey(apiPrincipalKeyName)
+        );
+    }
+
+    /// <summary>Configures referenced principal end A and selects its named key.</summary>
+    public ApiRelationshipManyToManyBuilder Between
+    (
+        ApiTypeReference apiPrincipalTypeReference,
+        string apiPrincipalKeyName
+    )
+    {
+        ArgumentNullException.ThrowIfNull(apiPrincipalTypeReference);
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiPrincipalKeyName);
+        return this.Between
+        (
+            apiPrincipalTypeReference,
             builder => builder.WithPrincipalKey(apiPrincipalKeyName)
         );
     }
@@ -116,12 +143,23 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
     public ApiRelationshipManyToManyBuilder And(Type clrPrincipalType, Action<ApiRelationshipPrincipalEndBuilder>? configure = null)
     {
         ArgumentNullException.ThrowIfNull(clrPrincipalType);
+        return this.And(new ApiTypeReference(clrPrincipalType), configure);
+    }
+
+    /// <summary>Configures principal end B using an API object-type reference.</summary>
+    public ApiRelationshipManyToManyBuilder And
+    (
+        ApiTypeReference apiPrincipalTypeReference,
+        Action<ApiRelationshipPrincipalEndBuilder>? configure = null
+    )
+    {
+        ArgumentNullException.ThrowIfNull(apiPrincipalTypeReference);
 
         var source = this.CurrentConfigurationSource;
         if
         (
             _endsState.PrincipalEndB != null &&
-            _endsState.PrincipalEndB.ClrObjectType == clrPrincipalType &&
+            _endsState.PrincipalEndB.ApiObjectTypeReference == apiPrincipalTypeReference &&
             _endsState.PrincipalEndBSource != null &&
             source < _endsState.PrincipalEndBSource.Value
         )
@@ -143,7 +181,7 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
             return this;
         }
 
-        var builder = new ApiRelationshipPrincipalEndBuilder(clrPrincipalType);
+        var builder = new ApiRelationshipPrincipalEndBuilder(apiPrincipalTypeReference);
         if (configure != null)
         {
             builder.ApplyConfiguration(source, () => configure(builder));
@@ -168,7 +206,23 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
 
         return this.And
         (
-            clrPrincipalType,
+            new ApiTypeReference(clrPrincipalType),
+            builder => builder.WithPrincipalKey(apiPrincipalKeyName)
+        );
+    }
+
+    /// <summary>Configures referenced principal end B and selects its named key.</summary>
+    public ApiRelationshipManyToManyBuilder And
+    (
+        ApiTypeReference apiPrincipalTypeReference,
+        string apiPrincipalKeyName
+    )
+    {
+        ArgumentNullException.ThrowIfNull(apiPrincipalTypeReference);
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiPrincipalKeyName);
+        return this.And
+        (
+            apiPrincipalTypeReference,
             builder => builder.WithPrincipalKey(apiPrincipalKeyName)
         );
     }
@@ -184,9 +238,24 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
     public ApiRelationshipManyToManyBuilder WithAssociation(Type clrAssociationType, Action<ApiRelationshipAssociationBuilder>? configure = null)
     {
         ArgumentNullException.ThrowIfNull(clrAssociationType);
+        return this.WithAssociation(new ApiTypeReference(clrAssociationType), configure);
+    }
+
+    /// <summary>Configures the association using an API object-type reference.</summary>
+    public ApiRelationshipManyToManyBuilder WithAssociation
+    (
+        ApiTypeReference apiAssociationTypeReference,
+        Action<ApiRelationshipAssociationBuilder>? configure = null
+    )
+    {
+        ArgumentNullException.ThrowIfNull(apiAssociationTypeReference);
 
         var source = this.CurrentConfigurationSource;
-        if (_endsState.Association != null && _endsState.Association.ClrObjectType == clrAssociationType)
+        if
+        (
+            _endsState.Association != null &&
+            _endsState.Association.ApiObjectTypeReference == apiAssociationTypeReference
+        )
         {
             if (configure != null)
             {
@@ -204,7 +273,7 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
         if
         (
             _endsState.Association != null &&
-            _endsState.Association.ClrObjectType == clrAssociationType &&
+            _endsState.Association.ApiObjectTypeReference == apiAssociationTypeReference &&
             _endsState.AssociationSource != null &&
             source < _endsState.AssociationSource.Value
         )
@@ -226,11 +295,13 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
             return this;
         }
 
-        var builder = ApiBuilderFactory.CreateClosedGeneric<ApiRelationshipAssociationBuilder>
-        (
-            typeof(ApiRelationshipAssociationBuilder<>),
-            clrAssociationType
-        );
+        var builder = apiAssociationTypeReference.ClrType is not null
+            ? ApiBuilderFactory.CreateClosedGeneric<ApiRelationshipAssociationBuilder>
+                (
+                    typeof(ApiRelationshipAssociationBuilder<>),
+                    apiAssociationTypeReference.ClrType
+                )
+            : new ApiRelationshipAssociationBuilder(apiAssociationTypeReference);
         if (configure != null)
         {
             builder.ApplyConfiguration(source, () => configure(builder));
@@ -291,7 +362,7 @@ public class ApiRelationshipManyToManyBuilder(string apiName)
         if
         (
             _endsState.Association != null &&
-            _endsState.Association.ClrObjectType == builder.ClrObjectType &&
+            _endsState.Association.ApiObjectTypeReference == builder.ApiObjectTypeReference &&
             _endsState.AssociationSource != null &&
             source < _endsState.AssociationSource.Value
         )

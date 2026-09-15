@@ -325,20 +325,20 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
                     break;
 
                 case RelationshipOwnerCase.UninitializedEnd:
-                    this.Element = new ApiRelationshipPrincipalEnd(typeof(InlineHost));
+                    this.Element = new ApiRelationshipPrincipalEnd(new ApiTypeReference(typeof(InlineHost)));
                     break;
 
                 case RelationshipOwnerCase.UninitializedAssociation:
-                    this.Element = new ApiRelationshipAssociation(typeof(InlineHost));
+                    this.Element = new ApiRelationshipAssociation(new ApiTypeReference(typeof(InlineHost)));
                     break;
 
                 case RelationshipOwnerCase.InvalidEndParent:
-                    this.Element = new ApiRelationshipPrincipalEnd(typeof(InlineHost));
+                    this.Element = new ApiRelationshipPrincipalEnd(new ApiTypeReference(typeof(InlineHost)));
                     SetInvalidRelationshipParent(this.Element);
                     break;
 
                 case RelationshipOwnerCase.InvalidAssociationParent:
-                    this.Element = new ApiRelationshipAssociation(typeof(InlineHost));
+                    this.Element = new ApiRelationshipAssociation(new ApiTypeReference(typeof(InlineHost)));
                     SetInvalidRelationshipParent(this.Element);
                     break;
 
@@ -430,7 +430,7 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
             {
                 new(nameof(InlineKeyedChild.Id))
             };
-            this.KeyPath = new ApiKeyPath(typeof(InlineKeyedChild), segmentSource);
+            this.KeyPath = new ApiKeyPath(new ApiTypeReference(typeof(InlineKeyedChild)), segmentSource);
             segmentSource.Clear();
 
             var keyPathSource = new List<ApiKeyPath> { this.KeyPath };
@@ -959,7 +959,7 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
         );
         var keyedPath = new ApiKeyPath
         (
-            typeof(InlineKeyedChild),
+            apiRootTypeReference: null,
             [new ApiKeyPathSegment(nameof(InlineKeyedChild.Id))]
         );
         var objectTypeWithKey = new ApiObjectType
@@ -1040,15 +1040,15 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
         var oneToMany = new ApiRelationshipOneToMany
         (
             "OneToMany",
-            new ApiRelationshipPrincipalEnd(typeof(SharedTreeObject)),
-            new ApiRelationshipDependentEnd(typeof(InlineHost))
+            new ApiRelationshipPrincipalEnd(new ApiTypeReference(typeof(SharedTreeObject))),
+            new ApiRelationshipDependentEnd(new ApiTypeReference(typeof(InlineHost)))
         );
         var manyToMany = new ApiRelationshipManyToMany
         (
             "ManyToMany",
-            new ApiRelationshipPrincipalEnd(typeof(SharedTreeObject)),
-            new ApiRelationshipPrincipalEnd(typeof(InlineHost)),
-            new ApiRelationshipAssociation(typeof(InlineKeyedChild))
+            new ApiRelationshipPrincipalEnd(new ApiTypeReference(typeof(SharedTreeObject))),
+            new ApiRelationshipPrincipalEnd(new ApiTypeReference(typeof(InlineHost))),
+            new ApiRelationshipAssociation(new ApiTypeReference(typeof(InlineKeyedChild)))
         );
 
         return new ApiSchema

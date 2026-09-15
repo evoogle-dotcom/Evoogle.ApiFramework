@@ -322,13 +322,13 @@ public sealed class ApiSchema : ApiSchemaElement
         var isApiNameInvalid = ApiSchemaNameValidation.IsNameInvalid(this.ApiName);
         if (isApiNameInvalid)
         {
-            var path = this.ApiPath;
+            var apiPath = this.ApiPath;
             var severity = ApiSchemaCompilationSeverity.Error;
             var code = ApiSchemaCompilationCode.ApiSchemaInvalidName;
             var description = $"{nameof(this.ApiName)} must not be null, empty, or whitespace";
             var remediation = $"Specify a valid {nameof(this.ApiName)} value";
 
-            context.AddIssue(path, severity, code, description, remediation);
+            context.AddIssue(apiPath, severity, code, description, remediation);
         }
     }
 
@@ -566,9 +566,10 @@ public sealed class ApiSchema : ApiSchemaElement
                 return;
             }
 
-            if (end.ClrObjectType is null || !this.TryGetObjectTypeByClrType(end.ClrObjectType, out var apiObjectType))
+            var apiObjectType = end.ApiResolvedObjectType;
+            if (apiObjectType is null)
             {
-                // Already reported as ApiRelationshipElementNullClrObjectType or ApiRelationshipElementUnresolvedObjectType (Error).
+                // Already reported while resolving the relationship element's type reference.
                 return;
             }
 
@@ -596,16 +597,10 @@ public sealed class ApiSchema : ApiSchemaElement
                 return;
             }
 
-            var clrObjectType = association.ClrObjectType;
-            if (clrObjectType is null)
+            var apiObjectType = association.ApiResolvedObjectType;
+            if (apiObjectType is null)
             {
-                // Already reported as ApiRelationshipElementNullClrObjectType (Error).
-                return;
-            }
-
-            if (!this.TryGetObjectTypeByClrType(clrObjectType, out var apiObjectType))
-            {
-                // Already reported as ApiRelationshipElementUnresolvedObjectType (Error).
+                // Already reported while resolving the relationship element's type reference.
                 return;
             }
 
