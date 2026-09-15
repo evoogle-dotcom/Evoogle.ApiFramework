@@ -959,7 +959,7 @@ public class ApiSchemaElementHardeningTests(ITestOutputHelper output) : XUnitTes
         );
         var keyedPath = new ApiKeyPath
         (
-            apiRootTypeReference: null,
+            apiRootObjectTypeReference: null,
             [new ApiKeyPathSegment(nameof(InlineKeyedChild.Id))]
         );
         var objectTypeWithKey = new ApiObjectType

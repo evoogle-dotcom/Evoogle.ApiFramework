@@ -132,8 +132,9 @@ public enum ApiSchemaCompilationCode
     ApiKeyPathUnresolvedRootType,
 
     /// <summary>
-    ///     An <see cref="ApiKeyPath"/> declares no explicit root reference and no owning
-    ///     <see cref="ApiObjectType"/> or <see cref="ApiRelationshipElement"/> could supply a root.
+    ///     An <see cref="ApiKeyPath"/> declares no explicit root reference and no enclosing
+    ///     <see cref="ApiObjectType"/> or <see cref="ApiRelationshipElement"/> can provide an
+    ///     inferred root.
     /// </summary>
     [EnumMember(Value = "API_KEY_PATH_UNINFERABLE_ROOT_TYPE")]
     ApiKeyPathUninferableRootType,

@@ -2237,13 +2237,14 @@ public partial class ApiSchemaTests
             ]
         },
 
-        // ApiKeyPath throws if ApiRootTypeReference does not resolve to an ApiObjectType
+        // ApiKeyPath throws if ApiRootObjectTypeReference does not resolve to an ApiObjectType
         new CompileThrowsTest
         {
-            Name = $"{nameof(ApiKeyPath)} Throws If {nameof(ApiKeyPath.ApiRootTypeReference)} Is Unresolved",
+            Name = $"{nameof(ApiKeyPath)} Throws If "
+                + $"{nameof(ApiKeyPath.ApiRootObjectTypeReference)} Is Unresolved",
             SourceJson = @"
             {
-                ""ApiName"": ""ApiKeyPath Throws If ApiRootTypeReference Is Unresolved"",
+                ""ApiName"": ""ApiKeyPath Throws If ApiRootObjectTypeReference Is Unresolved"",
                 ""ApiScalarTypes"": [
                     {
                         ""ApiKind"": ""Scalar"",

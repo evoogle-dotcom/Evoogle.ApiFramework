@@ -550,7 +550,7 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_Person_Id",
                                 ApiKeyPaths:
                                 [
-                                    new ApiKeyPathDef(ApiRootTypeReference: null, ApiKeyPathSegments: [new ApiKeyPathSegmentDef(ClrMemberName: nameof(Person.Id))])
+                                    new ApiKeyPathDef(ApiRootObjectTypeReference: null, ApiKeyPathSegments: [new ApiKeyPathSegmentDef(ClrMemberName: nameof(Person.Id))])
                                 ]
                             ),
                             new ApiKeyDef
@@ -558,7 +558,7 @@ public partial class ApiSchemaTests
                                 ApiName: "AK_Person_Name",
                                 ApiKeyPaths:
                                 [
-                                    new ApiKeyPathDef(ApiRootTypeReference: null, ApiKeyPathSegments: [new ApiKeyPathSegmentDef(ClrMemberName: nameof(Person.Name))])
+                                    new ApiKeyPathDef(ApiRootObjectTypeReference: null, ApiKeyPathSegments: [new ApiKeyPathSegmentDef(ClrMemberName: nameof(Person.Name))])
                                 ]
                             )
                         ]
@@ -800,7 +800,7 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_Person_Id",
                                 ApiKeyPaths:
                                 [
-                                    new ApiKeyPathDef(ApiRootTypeReference: null, ApiKeyPathSegments: [new ApiKeyPathSegmentDef(ClrMemberName: nameof(Person.Id))])
+                                    new ApiKeyPathDef(ApiRootObjectTypeReference: null, ApiKeyPathSegments: [new ApiKeyPathSegmentDef(ClrMemberName: nameof(Person.Id))])
                                 ]
                             ),
                             new ApiKeyDef
@@ -808,7 +808,7 @@ public partial class ApiSchemaTests
                                 ApiName: "AK_Person_Name",
                                 ApiKeyPaths:
                                 [
-                                    new ApiKeyPathDef(ApiRootTypeReference: null, ApiKeyPathSegments: [new ApiKeyPathSegmentDef(ClrMemberName: nameof(Person.Name))])
+                                    new ApiKeyPathDef(ApiRootObjectTypeReference: null, ApiKeyPathSegments: [new ApiKeyPathSegmentDef(ClrMemberName: nameof(Person.Name))])
                                 ]
                             )
                         ]
@@ -1043,7 +1043,7 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_Company_Id",
                                 ApiKeyPaths:
                                 [
-                                    new ApiKeyPathDef(ApiRootTypeReference: null, ApiKeyPathSegments: [new ApiKeyPathSegmentDef(ClrMemberName: nameof(Company.Id))])
+                                    new ApiKeyPathDef(ApiRootObjectTypeReference: null, ApiKeyPathSegments: [new ApiKeyPathSegmentDef(ClrMemberName: nameof(Company.Id))])
                                 ]
                             ),
                             new ApiKeyDef
@@ -1051,7 +1051,7 @@ public partial class ApiSchemaTests
                                 ApiName: "AK_Company_Name",
                                 ApiKeyPaths:
                                 [
-                                    new ApiKeyPathDef(ApiRootTypeReference: null, ApiKeyPathSegments: [new ApiKeyPathSegmentDef(ClrMemberName: nameof(Company.Name))])
+                                    new ApiKeyPathDef(ApiRootObjectTypeReference: null, ApiKeyPathSegments: [new ApiKeyPathSegmentDef(ClrMemberName: nameof(Company.Name))])
                                 ]
                             )
                         ]
@@ -1118,7 +1118,7 @@ public partial class ApiSchemaTests
                                 ApiName: "PK_Person_Id",
                                 ApiKeyPaths:
                                 [
-                                    new ApiKeyPathDef(ApiRootTypeReference: null, ApiKeyPathSegments: [new ApiKeyPathSegmentDef(ClrMemberName: nameof(Person.Id))])
+                                    new ApiKeyPathDef(ApiRootObjectTypeReference: null, ApiKeyPathSegments: [new ApiKeyPathSegmentDef(ClrMemberName: nameof(Person.Id))])
                                 ]
                             ),
                             new ApiKeyDef
@@ -1126,7 +1126,7 @@ public partial class ApiSchemaTests
                                 ApiName: "AK_Person_Name",
                                 ApiKeyPaths:
                                 [
-                                    new ApiKeyPathDef(ApiRootTypeReference: null, ApiKeyPathSegments: [new ApiKeyPathSegmentDef(ClrMemberName: nameof(Person.Name))])
+                                    new ApiKeyPathDef(ApiRootObjectTypeReference: null, ApiKeyPathSegments: [new ApiKeyPathSegmentDef(ClrMemberName: nameof(Person.Name))])
                                 ]
                             )
                         ]

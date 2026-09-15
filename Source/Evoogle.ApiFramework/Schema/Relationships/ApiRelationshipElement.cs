@@ -3,7 +3,6 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-
 using Evoogle.ApiFramework.Schema.Compilation;
 using Evoogle.ApiFramework.Schema.Compilation.Internal;
 using Evoogle.ApiFramework.Schema.Key.Internal;
@@ -18,7 +17,7 @@ namespace Evoogle.ApiFramework.Schema.Relationships;
 public abstract class ApiRelationshipElement : ApiSchemaElement, IApiKeyPathRootProvider
 {
     #region Fields
-    private readonly ApiTypeReferenceBinding<ApiObjectType> _apiObjectTypeBinding;
+    private readonly ApiTypeBinding<ApiObjectType> _apiObjectTypeBinding;
     #endregion
 
     #region Properties
@@ -31,14 +30,15 @@ public abstract class ApiRelationshipElement : ApiSchemaElement, IApiKeyPathRoot
     /// <summary>Gets the participating CLR object type after compilation.</summary>
     public Type ClrObjectType => this.ApiObjectType.ClrType;
 
-    internal ApiObjectType? ApiResolvedObjectType => _apiObjectTypeBinding.ApiResolvedType;
+    /// <summary>Gets the resolved participating API object type, or null if unresolved.</summary>
+    internal ApiObjectType? ApiResolvedObjectType => _apiObjectTypeBinding.BoundApiType;
     #endregion
 
     #region IApiKeyPathRootProvider Properties
-    ApiObjectType? IApiKeyPathRootProvider.ApiOwnerSuppliedKeyPathRoot =>
+    ApiObjectType? IApiKeyPathRootProvider.RootObjectType =>
         this.ApiResolvedObjectType;
 
-    string? IApiKeyPathRootProvider.OwnerSuppliedKeyPathRootLabel =>
+    string? IApiKeyPathRootProvider.RootLabel =>
         _apiObjectTypeBinding.ApiTypeReference?.ApiReferenceLabel;
     #endregion
 
@@ -72,7 +72,7 @@ public abstract class ApiRelationshipElement : ApiSchemaElement, IApiKeyPathRoot
             return;
         }
 
-        _apiObjectTypeBinding.Resolve
+        _apiObjectTypeBinding.TryResolveReference
         (
             context,
             ApiSchemaCompilationCode.ApiRelationshipElementUnresolvedObjectType,

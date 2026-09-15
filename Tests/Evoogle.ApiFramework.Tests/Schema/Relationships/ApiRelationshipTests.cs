@@ -33,33 +33,19 @@ public partial class ApiRelationshipTests(ITestOutputHelper output) : XUnitTests
         protected override void Arrange()
         {
             var apiSchema = BuildTestApiSchema(this.ApiSchemaKind);
-            this.ApiSchema = apiSchema
-                ?? throw new InvalidOperationException($"{this.ApiSchemaKind} creation failed.");
+            this.ApiSchema = apiSchema ?? throw new InvalidOperationException($"{this.ApiSchemaKind} creation failed.");
 
             this.WriteLine($"ApiSchema:               {this.ApiSchema.SafeToString()}");
-            this.WriteLine
-            (
-                $"ExpectedApiRelationship: {this.ExpectedApiRelationshipDef.SafeToString()}"
-            );
+            this.WriteLine($"ExpectedApiRelationship: {this.ExpectedApiRelationshipDef.SafeToString()}");
             this.WriteLine();
         }
         #endregion
 
         protected override void Act()
         {
-            var actualApiRelationship = this.ApiSchema?.GetRelationshipByApiName
-            (
-                this.ExpectedApiRelationshipDef.ApiName
-            );
-            this.ActualApiRelationship = actualApiRelationship
-                ?? throw new InvalidOperationException
-                (
-                    $"{nameof(ApiRelationship)} creation failed."
-                );
-            this.WriteLine
-            (
-                $"ActualApiRelationship:   {this.ActualApiRelationship.SafeToString()}"
-            );
+            var actualApiRelationship = this.ApiSchema?.GetRelationshipByApiName(this.ExpectedApiRelationshipDef.ApiName);
+            this.ActualApiRelationship = actualApiRelationship ?? throw new InvalidOperationException($"{nameof(ApiRelationship)} creation failed.");
+            this.WriteLine($"ActualApiRelationship:   {this.ActualApiRelationship.SafeToString()}");
         }
 
         protected override void Assert()
@@ -72,14 +58,9 @@ public partial class ApiRelationshipTests(ITestOutputHelper output) : XUnitTests
 
             switch (this.ExpectedApiRelationshipDef, actualApiRelationship)
             {
-                case
-                (
-                    ApiRelationshipOneToOneDef expectedRelationshipDef,
-                    ApiRelationshipOneToOne actualRelationship
-                ):
+                case (ApiRelationshipOneToOneDef expectedRelationshipDef, ApiRelationshipOneToOne actualRelationship) :
                     actualRelationship.ApiKind.Should().Be(ApiRelationshipKind.OneToOne);
-                    actualRelationship.ApiDeleteBehavior
-                        .Should().Be(expectedRelationshipDef.ApiDeleteBehavior);
+                    actualRelationship.ApiDeleteBehavior.Should().Be(expectedRelationshipDef.ApiDeleteBehavior);
 
                     AssertOneToRelationshipBinding
                     (
@@ -89,14 +70,9 @@ public partial class ApiRelationshipTests(ITestOutputHelper output) : XUnitTests
                     );
                     break;
 
-                case
-                (
-                    ApiRelationshipOneToManyDef expectedRelationshipDef,
-                    ApiRelationshipOneToMany actualRelationship
-                ):
+                case (ApiRelationshipOneToManyDef expectedRelationshipDef, ApiRelationshipOneToMany actualRelationship) :
                     actualRelationship.ApiKind.Should().Be(ApiRelationshipKind.OneToMany);
-                    actualRelationship.ApiDeleteBehavior
-                        .Should().Be(expectedRelationshipDef.ApiDeleteBehavior);
+                    actualRelationship.ApiDeleteBehavior.Should().Be(expectedRelationshipDef.ApiDeleteBehavior);
 
                     AssertOneToRelationshipBinding
                     (
@@ -106,14 +82,9 @@ public partial class ApiRelationshipTests(ITestOutputHelper output) : XUnitTests
                     );
                     break;
 
-                case
-                (
-                    ApiRelationshipManyToManyDef expectedRelationshipDef,
-                    ApiRelationshipManyToMany actualRelationship
-                ):
+                case (ApiRelationshipManyToManyDef expectedRelationshipDef, ApiRelationshipManyToMany actualRelationship) :
                     actualRelationship.ApiKind.Should().Be(ApiRelationshipKind.ManyToMany);
-                    actualRelationship.ApiDeleteBehavior
-                        .Should().Be(expectedRelationshipDef.ApiDeleteBehavior);
+                    actualRelationship.ApiDeleteBehavior.Should().Be(expectedRelationshipDef.ApiDeleteBehavior);
 
                     AssertManyToManyRelationshipBinding
                     (
@@ -126,10 +97,7 @@ public partial class ApiRelationshipTests(ITestOutputHelper output) : XUnitTests
 
                 default:
                     var actualRelationshipTypeName = actualApiRelationship.GetType().Name;
-                    throw new InvalidOperationException
-                    (
-                        $"Unsupported {nameof(ApiRelationship)} type: {actualRelationshipTypeName}"
-                    );
+                    throw new InvalidOperationException($"Unsupported {nameof(ApiRelationship)} type: {actualRelationshipTypeName}");
             }
         }
 
@@ -182,8 +150,7 @@ public partial class ApiRelationshipTests(ITestOutputHelper output) : XUnitTests
             AssertPrincipalEnd(expectedPrincipalEndB, actualRelationship.ApiPrincipalEndB);
             AssertAssociation(expectedAssociation, actualRelationship.ApiAssociation);
 
-            var expectedHasKeyBindings = expectedAssociation.ApiForeignKeyA is not null &&
-                expectedAssociation.ApiForeignKeyB is not null;
+            var expectedHasKeyBindings = expectedAssociation.ApiForeignKeyA is not null && expectedAssociation.ApiForeignKeyB is not null;
 
             actualRelationship.IsNavigational.Should().Be(!expectedHasKeyBindings);
             actualRelationship.HasKeyBindings.Should().Be(expectedHasKeyBindings);
@@ -261,16 +228,14 @@ public partial class ApiRelationshipTests(ITestOutputHelper output) : XUnitTests
         {
             if (expectedPrincipalEnd.ApiPrincipalKeyName is { } apiPrincipalKeyName)
             {
-                return actualPrincipalEnd.ApiObjectType
-                    .GetKeyByApiName(apiPrincipalKeyName);
+                return actualPrincipalEnd.ApiObjectType.GetKeyByApiName(apiPrincipalKeyName);
             }
 
             var compatiblePrincipalKeys = actualPrincipalEnd.ApiObjectType.ApiKeys
                 .Where(apiKeyDefinition => HaveCompatibleLeafTypes(apiKeyDefinition, actualForeignKey))
                 .ToArray();
 
-            var compatiblePrincipalKey = compatiblePrincipalKeys
-                .Should().ContainSingle().Which;
+            var compatiblePrincipalKey = compatiblePrincipalKeys.Should().ContainSingle().Which;
             return compatiblePrincipalKey;
         }
 
@@ -362,26 +327,23 @@ public partial class ApiRelationshipTests(ITestOutputHelper output) : XUnitTests
 
         private static void AssertKeyPath(ApiKeyPathDef expectedKeyPath, ApiKeyPath actualKeyPath)
         {
-            actualKeyPath.ApiRootTypeReference?.ApiKind.Should().Be(expectedKeyPath.ApiRootTypeReference?.ApiKind);
-            actualKeyPath.ApiRootTypeReference?.ApiName.Should().Be(expectedKeyPath.ApiRootTypeReference?.ApiName);
-            actualKeyPath.ApiRootTypeReference?.ClrType.Should().Be(expectedKeyPath.ApiRootTypeReference?.ClrType);
-            if (expectedKeyPath.ApiRootTypeReference is null)
+            actualKeyPath.ApiRootObjectTypeReference?.ApiKind.Should().Be(expectedKeyPath.ApiRootObjectTypeReference?.ApiKind);
+            actualKeyPath.ApiRootObjectTypeReference?.ApiName.Should().Be(expectedKeyPath.ApiRootObjectTypeReference?.ApiName);
+            actualKeyPath.ApiRootObjectTypeReference?.ClrType.Should().Be(expectedKeyPath.ApiRootObjectTypeReference?.ClrType);
+            if (expectedKeyPath.ApiRootObjectTypeReference is null)
             {
                 actualKeyPath.ClrRootType.Should().NotBeNull();
             }
             else
             {
-                actualKeyPath.ClrRootType.Should().Be(expectedKeyPath.ApiRootTypeReference.ClrType);
+                actualKeyPath.ClrRootType.Should().Be(expectedKeyPath.ApiRootObjectTypeReference.ClrType);
             }
 
             actualKeyPath.ApiSegments.Should().HaveCount(expectedKeyPath.ApiKeyPathSegments.Count);
 
             for (var i = 0; i < expectedKeyPath.ApiKeyPathSegments.Count; i++)
             {
-                actualKeyPath.ApiSegments[i].ClrMemberName.Should().Be
-                (
-                    expectedKeyPath.ApiKeyPathSegments[i].ClrMemberName
-                );
+                actualKeyPath.ApiSegments[i].ClrMemberName.Should().Be(expectedKeyPath.ApiKeyPathSegments[i].ClrMemberName);
             }
         }
     }

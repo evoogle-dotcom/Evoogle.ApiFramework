@@ -129,9 +129,9 @@ public sealed partial class ApiObjectType
     #endregion
 
     #region IApiKeyPathRootProvider Properties
-    ApiObjectType? IApiKeyPathRootProvider.ApiOwnerSuppliedKeyPathRoot => this;
+    ApiObjectType? IApiKeyPathRootProvider.RootObjectType => this;
 
-    string? IApiKeyPathRootProvider.OwnerSuppliedKeyPathRootLabel => this.ApiName;
+    string? IApiKeyPathRootProvider.RootLabel => this.ApiName;
     #endregion
 
     #region Object Methods

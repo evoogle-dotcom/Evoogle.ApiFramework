@@ -99,7 +99,7 @@ internal static class ApiRelationshipBuilderExtensions
         IEnumerable<string> clrMemberNames
     )
     {
-        if (keyPath.ApiRootTypeReference is null)
+        if (keyPath.ApiRootObjectTypeReference is null)
         {
             builder.AddPath(clrMemberNames, path => path.ConfigureExtensions(keyPath));
         }
@@ -107,7 +107,7 @@ internal static class ApiRelationshipBuilderExtensions
         {
             builder.AddPath
             (
-                keyPath.ApiRootTypeReference,
+                keyPath.ApiRootObjectTypeReference,
                 clrMemberNames,
                 path => path.ConfigureExtensions(keyPath)
             );

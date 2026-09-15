@@ -64,24 +64,25 @@ public class ApiKeyDefinitionBuilder(string? apiName = null) : ExtensionBuilder<
         return this.AddPath(new ApiTypeReference(clrRootType), clrMemberNames);
     }
 
-    /// <summary>Adds a key path with an explicit API root type reference.</summary>
-    /// <param name="apiRootTypeReference">The explicit root object-type reference.</param>
+    /// <summary>Adds a key path with an explicit API root object-type reference.</summary>
+    /// <param name="apiRootObjectTypeReference">The explicit root object-type reference.</param>
     /// <param name="clrMemberNames">The CLR member paths.</param>
     /// <returns>The current builder.</returns>
     public ApiKeyDefinitionBuilder AddPath
     (
-        ApiTypeReference apiRootTypeReference,
+        ApiTypeReference apiRootObjectTypeReference,
         params string[] clrMemberNames
     )
     {
-        ArgumentNullException.ThrowIfNull(apiRootTypeReference);
+        ArgumentNullException.ThrowIfNull(apiRootObjectTypeReference);
         ArgumentNullException.ThrowIfNull(clrMemberNames);
 
-        _state.KeyPathBuilders.Add(ApiKeyPathBuilder.For(apiRootTypeReference, clrMemberNames));
+        _state.KeyPathBuilders.Add
+            (ApiKeyPathBuilder.For(apiRootObjectTypeReference, clrMemberNames));
         return this;
     }
 
-    /// <summary>Adds a key path whose root is inferred from its owner.</summary>
+    /// <summary>Adds a key path whose root is inferred from its enclosing schema context.</summary>
     /// <param name="clrMemberNames">The CLR member paths.</param>
     /// <returns>The current builder.</returns>
     public ApiKeyDefinitionBuilder AddPath(params string[] clrMemberNames)
@@ -111,28 +112,32 @@ public class ApiKeyDefinitionBuilder(string? apiName = null) : ExtensionBuilder<
         return this.AddPath(new ApiTypeReference(clrRootType), clrMemberNames, configure);
     }
 
-    /// <summary>Adds a configurable key path with an explicit API root type reference.</summary>
-    /// <param name="apiRootTypeReference">The explicit root object-type reference.</param>
+    /// <summary>
+    ///     Adds a configurable key path with an explicit API root object-type reference.
+    /// </summary>
+    /// <param name="apiRootObjectTypeReference">The explicit root object-type reference.</param>
     /// <param name="clrMemberNames">The CLR member paths.</param>
     /// <param name="configure">An optional path-builder callback.</param>
     /// <returns>The current builder.</returns>
     public ApiKeyDefinitionBuilder AddPath
     (
-        ApiTypeReference apiRootTypeReference,
+        ApiTypeReference apiRootObjectTypeReference,
         IEnumerable<string> clrMemberNames,
         Action<ApiKeyPathBuilder>? configure = null
     )
     {
-        ArgumentNullException.ThrowIfNull(apiRootTypeReference);
+        ArgumentNullException.ThrowIfNull(apiRootObjectTypeReference);
         ArgumentNullException.ThrowIfNull(clrMemberNames);
 
-        var builder = new ApiKeyPathBuilder(apiRootTypeReference, clrMemberNames);
+        var builder = new ApiKeyPathBuilder(apiRootObjectTypeReference, clrMemberNames);
         configure?.Invoke(builder);
         _state.KeyPathBuilders.Add(builder);
         return this;
     }
 
-    /// <summary>Adds a configurable key path whose root is inferred from its owner.</summary>
+    /// <summary>
+    ///     Adds a configurable key path whose root is inferred from its enclosing schema context.
+    /// </summary>
     /// <param name="clrMemberNames">The CLR member paths.</param>
     /// <param name="configure">An optional path-builder callback.</param>
     /// <returns>The current builder.</returns>
@@ -184,7 +189,7 @@ public class ApiKeyDefinitionBuilder(string? apiName = null) : ExtensionBuilder<
 
     internal bool HasPath
     (
-        ApiTypeReference? apiRootTypeReference,
+        ApiTypeReference? apiRootObjectTypeReference,
         IEnumerable<string> clrMemberNames
     )
     {
@@ -193,7 +198,7 @@ public class ApiKeyDefinitionBuilder(string? apiName = null) : ExtensionBuilder<
         var names = clrMemberNames as IReadOnlyList<string> ?? [.. clrMemberNames];
 
         return _state.KeyPathBuilders.Any(p =>
-            p.ApiRootTypeReference == apiRootTypeReference &&
+            p.ApiRootObjectTypeReference == apiRootObjectTypeReference &&
             p.SegmentBuilders.Select(s => s.ClrMemberName).SequenceEqual(names));
     }
 

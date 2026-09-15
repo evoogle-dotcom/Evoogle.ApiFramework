@@ -261,7 +261,7 @@ public partial class ApiRelationshipTests
 
         new KeyBindingTest
         {
-            Name = "Resolves one-to-many owner-rooted foreign key binding",
+            Name = "Resolves one-to-many explicitly rooted foreign key binding",
             ApiSchemaKind = ApiSchemaKind.Relationship,
             ExpectedApiRelationshipDef = new ApiRelationshipOneToManyDef
             (
@@ -344,7 +344,7 @@ public partial class ApiRelationshipTests
     private static ApiKeyPathDef KeyPath(Type clrRootType, params string[] clrMemberNames)
         => new
         (
-            ApiRootTypeReference: new ApiTypeReferenceDef(ApiKind: null, ApiName: null, ClrType: clrRootType),
+            ApiRootObjectTypeReference: new ApiTypeReferenceDef(ApiKind: null, ApiName: null, ClrType: clrRootType),
             ApiKeyPathSegments:
             [
                 .. clrMemberNames.Select

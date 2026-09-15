@@ -345,18 +345,18 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
         if (existing != null)
         {
             // Guard against convention + annotation both adding the same path.
-            var apiRootTypeReference = clrRootType == this.ClrType
+            var apiRootObjectTypeReference = clrRootType == this.ClrType
                 ? null
                 : new ApiTypeReference(clrRootType);
-            if (!existing.HasPath(apiRootTypeReference, names))
+            if (!existing.HasPath(apiRootObjectTypeReference, names))
             {
-                if (apiRootTypeReference is null)
+                if (apiRootObjectTypeReference is null)
                 {
                     existing.AddPath(names);
                 }
                 else
                 {
-                    existing.AddPath(apiRootTypeReference, names);
+                    existing.AddPath(apiRootObjectTypeReference, names);
                 }
             }
         }

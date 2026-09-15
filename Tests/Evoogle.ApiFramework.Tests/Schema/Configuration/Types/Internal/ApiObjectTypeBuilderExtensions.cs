@@ -21,13 +21,13 @@ internal static class ApiObjectTypeBuilderExtensions
                 foreach (var keyPath in apiKeyDefinition.ApiKeyPaths)
                 {
                     var clrMemberNames = keyPath.ApiSegments.Select(s => s.ClrMemberName);
-                    if (keyPath.ApiRootTypeReference is null)
+                    if (keyPath.ApiRootObjectTypeReference is null)
                     {
                         k.AddPath(clrMemberNames);
                     }
                     else
                     {
-                        k.AddPath(keyPath.ApiRootTypeReference, clrMemberNames);
+                        k.AddPath(keyPath.ApiRootObjectTypeReference, clrMemberNames);
                     }
                 }
             });

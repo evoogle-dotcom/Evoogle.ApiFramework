@@ -104,7 +104,7 @@ public static partial class ApiSchemaFactory
 
     public record ApiKeyPathDef
     (
-        ApiTypeReferenceDef? ApiRootTypeReference,
+        ApiTypeReferenceDef? ApiRootObjectTypeReference,
         List<ApiKeyPathSegmentDef> ApiKeyPathSegments,
         List<Type>? ExtensionTypes = null
     ) : ApiSchemaElementDef(ExtensionTypes);
@@ -500,10 +500,10 @@ public static partial class ApiSchemaFactory
 
     private static ApiKeyPath BuildApiKeyPath(ApiKeyPathDef def)
     {
-        var apiRootTypeReference = BuildApiTypeReference(def.ApiRootTypeReference);
+        var apiRootObjectTypeReference = BuildApiTypeReference(def.ApiRootObjectTypeReference);
         var apiKeyPathSegments = def.ApiKeyPathSegments.Select(BuildApiKeyPathSegment);
 
-        var apiKeyPath = new ApiKeyPath(apiRootTypeReference, apiKeyPathSegments);
+        var apiKeyPath = new ApiKeyPath(apiRootObjectTypeReference, apiKeyPathSegments);
 
         AttachExtensions(apiKeyPath, def);
 

@@ -13,12 +13,13 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Key.Internal;
 /// </summary>
 internal sealed class ApiKeyPathState
 (
-    ApiTypeReference? apiRootTypeReference,
+    ApiTypeReference? apiRootObjectTypeReference,
     IEnumerable<ApiKeyPathSegmentBuilder> segmentBuilders
 )
 {
     #region Properties
-    internal ApiTypeReference? ApiRootTypeReference { get; } = apiRootTypeReference;
+    internal ApiTypeReference? ApiRootObjectTypeReference { get; } =
+        apiRootObjectTypeReference;
 
     internal List<ApiKeyPathSegmentBuilder> SegmentBuilders { get; } = [.. segmentBuilders ?? throw new ArgumentNullException(nameof(segmentBuilders))];
     #endregion

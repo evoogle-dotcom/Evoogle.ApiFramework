@@ -12,13 +12,16 @@ namespace Evoogle.ApiFramework.Schema.Key.Internal;
 ///     directly from your code. This API may change or be removed in future releases.
 /// </summary>
 /// <remarks>
-///     Supplies the root object type and diagnostic label for key paths structurally owned by an element.
+///     Supplies the inferred root object type and diagnostic label for key paths in an enclosing
+///     schema context.
 /// </remarks>
 internal interface IApiKeyPathRootProvider
 {
     #region Properties
-    ApiObjectType? ApiOwnerSuppliedKeyPathRoot { get; }
+    /// <summary>Gets the inferred root object type, or null when it is unavailable.</summary>
+    ApiObjectType? RootObjectType { get; }
 
-    string? OwnerSuppliedKeyPathRootLabel { get; }
+    /// <summary>Gets the label that identifies the inferred root in a key path.</summary>
+    string? RootLabel { get; }
     #endregion
 }

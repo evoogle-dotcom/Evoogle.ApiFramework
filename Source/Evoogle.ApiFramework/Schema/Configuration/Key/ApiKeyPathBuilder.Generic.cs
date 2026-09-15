@@ -16,8 +16,8 @@ namespace Evoogle.ApiFramework.Schema.Configuration.Key;
 /// </summary>
 /// <typeparam name="TRoot">The root CLR type from which the key path navigation begins.</typeparam>
 /// <remarks>
-///     Supports owner-inferred paths rooted at <typeparamref name="TRoot"/> and explicitly rooted paths
-///     for another CLR type.
+///     Supports paths inferred from the enclosing schema context and rooted at
+///     <typeparamref name="TRoot"/>, along with explicitly rooted paths for another CLR type.
 /// </remarks>
 public sealed class ApiKeyPathBuilder<TRoot> : ApiKeyPathBuilder
 {

@@ -26,7 +26,8 @@ public class ApiKeyPathBuilder : ExtensionBuilder<ApiKeyPathBuilder>
 
     #region Properties
     /// <summary>Gets the explicit root reference, or null when the root is inferred.</summary>
-    internal ApiTypeReference? ApiRootTypeReference => _state.ApiRootTypeReference;
+    internal ApiTypeReference? ApiRootObjectTypeReference =>
+        _state.ApiRootObjectTypeReference;
 
     /// <summary>Gets the ordered segment builders that make up this key path.</summary>
     internal IReadOnlyList<ApiKeyPathSegmentBuilder> SegmentBuilders => _state.SegmentBuilders;
@@ -54,26 +55,30 @@ public class ApiKeyPathBuilder : ExtensionBuilder<ApiKeyPathBuilder>
     {
     }
 
-    /// <summary>Creates a key-path builder with an explicit API type reference.</summary>
-    /// <param name="apiRootTypeReference">The explicit root object-type reference.</param>
+    /// <summary>
+    ///     Creates a key-path builder with an explicit API root object-type reference.
+    /// </summary>
+    /// <param name="apiRootObjectTypeReference">The explicit root object-type reference.</param>
     /// <param name="clrMemberNames">The CLR member paths.</param>
     public ApiKeyPathBuilder
     (
-        ApiTypeReference apiRootTypeReference,
+        ApiTypeReference apiRootObjectTypeReference,
         IEnumerable<string> clrMemberNames
     ) : this
     (
         CreateState
         (
-            apiRootTypeReference ??
-                throw new ArgumentNullException(nameof(apiRootTypeReference)),
+            apiRootObjectTypeReference ??
+                throw new ArgumentNullException(nameof(apiRootObjectTypeReference)),
             clrMemberNames
         )
     )
     {
     }
 
-    /// <summary>Creates a key-path builder whose root is inferred from its owner.</summary>
+    /// <summary>
+    ///     Creates a key-path builder whose root is inferred from its enclosing schema context.
+    /// </summary>
     /// <param name="clrMemberNames">The CLR member paths.</param>
     public ApiKeyPathBuilder(IEnumerable<string> clrMemberNames)
         : this(CreateState(null, clrMemberNames))
@@ -102,18 +107,18 @@ public class ApiKeyPathBuilder : ExtensionBuilder<ApiKeyPathBuilder>
     }
 
     /// <summary>Creates a key-path builder with an explicit root reference and segment builders.</summary>
-    /// <param name="apiRootTypeReference">The explicit root object-type reference.</param>
+    /// <param name="apiRootObjectTypeReference">The explicit root object-type reference.</param>
     /// <param name="segmentBuilders">The ordered segment builders.</param>
     public ApiKeyPathBuilder
     (
-        ApiTypeReference apiRootTypeReference,
+        ApiTypeReference apiRootObjectTypeReference,
         IEnumerable<ApiKeyPathSegmentBuilder> segmentBuilders
     ) : this
     (
         CreateState
         (
-            apiRootTypeReference ??
-                throw new ArgumentNullException(nameof(apiRootTypeReference)),
+            apiRootObjectTypeReference ??
+                throw new ArgumentNullException(nameof(apiRootObjectTypeReference)),
             segmentBuilders
         )
     )
@@ -159,11 +164,13 @@ public class ApiKeyPathBuilder : ExtensionBuilder<ApiKeyPathBuilder>
     /// <summary>Creates a builder with an explicit API root reference.</summary>
     public static ApiKeyPathBuilder For
     (
-        ApiTypeReference apiRootTypeReference,
+        ApiTypeReference apiRootObjectTypeReference,
         params string[] clrMemberNames
-    ) => new(apiRootTypeReference, clrMemberNames);
+    ) => new(apiRootObjectTypeReference, clrMemberNames);
 
-    /// <summary>Creates a builder whose root is inferred from its owner.</summary>
+    /// <summary>
+    ///     Creates a builder whose root is inferred from its enclosing schema context.
+    /// </summary>
     public static ApiKeyPathBuilder For(params string[] clrMemberNames) => new(clrMemberNames);
 
     /// <summary>
@@ -188,9 +195,9 @@ public class ApiKeyPathBuilder : ExtensionBuilder<ApiKeyPathBuilder>
     /// <summary>Creates a builder with an explicit API root reference and segment builders.</summary>
     public static ApiKeyPathBuilder For
     (
-        ApiTypeReference apiRootTypeReference,
+        ApiTypeReference apiRootObjectTypeReference,
         params ApiKeyPathSegmentBuilder[] segmentBuilders
-    ) => new(apiRootTypeReference, segmentBuilders);
+    ) => new(apiRootObjectTypeReference, segmentBuilders);
 
     /// <summary>Creates a builder with an inferred root and segment builders.</summary>
     public static ApiKeyPathBuilder For(params ApiKeyPathSegmentBuilder[] segmentBuilders) =>
@@ -236,7 +243,7 @@ public class ApiKeyPathBuilder : ExtensionBuilder<ApiKeyPathBuilder>
     internal ApiKeyPath Build()
     {
         var segments = _state.SegmentBuilders.Select(b => b.Build());
-        var path = new ApiKeyPath(_state.ApiRootTypeReference, segments);
+        var path = new ApiKeyPath(_state.ApiRootObjectTypeReference, segments);
 
         var extensions = this.BuildExtensions();
         if (extensions != null)
@@ -251,7 +258,7 @@ public class ApiKeyPathBuilder : ExtensionBuilder<ApiKeyPathBuilder>
     #region Implementation Methods
     private static ApiKeyPathState CreateState
     (
-        ApiTypeReference? apiRootTypeReference,
+        ApiTypeReference? apiRootObjectTypeReference,
         IEnumerable<string> clrMemberNames
     )
     {
@@ -274,20 +281,20 @@ public class ApiKeyPathBuilder : ExtensionBuilder<ApiKeyPathBuilder>
 
         return new ApiKeyPathState
         (
-            apiRootTypeReference,
+            apiRootObjectTypeReference,
             parsedClrMemberNames.Select(static name => new ApiKeyPathSegmentBuilder(name))
         );
     }
 
     private static ApiKeyPathState CreateState
     (
-        ApiTypeReference? apiRootTypeReference,
+        ApiTypeReference? apiRootObjectTypeReference,
         IEnumerable<ApiKeyPathSegmentBuilder> segmentBuilders
     )
     {
         ArgumentNullException.ThrowIfNull(segmentBuilders);
 
-        var state = new ApiKeyPathState(apiRootTypeReference, segmentBuilders);
+        var state = new ApiKeyPathState(apiRootObjectTypeReference, segmentBuilders);
         if (state.SegmentBuilders.Count == 0)
         {
             throw new ArgumentException

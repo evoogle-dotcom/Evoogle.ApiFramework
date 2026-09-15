@@ -764,12 +764,12 @@ public partial class ApiTypeTests
                     new ApiKeyDef
                     (
                         ApiName: "PK_Company_Id",
-                        ApiKeyPaths: [new ApiKeyPathDef(ApiRootTypeReference: null, ApiKeyPathSegments: [new ApiKeyPathSegmentDef(ClrMemberName: nameof(Company.Id))])]
+                        ApiKeyPaths: [new ApiKeyPathDef(ApiRootObjectTypeReference: null, ApiKeyPathSegments: [new ApiKeyPathSegmentDef(ClrMemberName: nameof(Company.Id))])]
                     ),
                     new ApiKeyDef
                     (
                         ApiName: "AK_Company_Name",
-                        ApiKeyPaths: [new ApiKeyPathDef(ApiRootTypeReference: null, ApiKeyPathSegments: [new ApiKeyPathSegmentDef(ClrMemberName: nameof(Company.Name))])]
+                        ApiKeyPaths: [new ApiKeyPathDef(ApiRootObjectTypeReference: null, ApiKeyPathSegments: [new ApiKeyPathSegmentDef(ClrMemberName: nameof(Company.Name))])]
                     )
                 ]
             ),
@@ -1292,12 +1292,12 @@ public partial class ApiTypeTests
                     new ApiKeyDef
                     (
                         ApiName: "PK_Company_Id",
-                        ApiKeyPaths: [new ApiKeyPathDef(ApiRootTypeReference: null, ApiKeyPathSegments: [new ApiKeyPathSegmentDef(ClrMemberName: nameof(Company.Id))])]
+                        ApiKeyPaths: [new ApiKeyPathDef(ApiRootObjectTypeReference: null, ApiKeyPathSegments: [new ApiKeyPathSegmentDef(ClrMemberName: nameof(Company.Id))])]
                     ),
                     new ApiKeyDef
                     (
                         ApiName: "AK_Company_Name",
-                        ApiKeyPaths: [new ApiKeyPathDef(ApiRootTypeReference: null, ApiKeyPathSegments: [new ApiKeyPathSegmentDef(ClrMemberName: nameof(Company.Name))])]
+                        ApiKeyPaths: [new ApiKeyPathDef(ApiRootObjectTypeReference: null, ApiKeyPathSegments: [new ApiKeyPathSegmentDef(ClrMemberName: nameof(Company.Name))])]
                     )
                 ]
             ),

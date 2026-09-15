@@ -18,37 +18,42 @@ using Evoogle.Extensions;
 namespace Evoogle.ApiFramework.Schema.Key;
 
 /// <summary>
-///     Represents an ordered CLR member path from an explicit or owner-supplied API object root.
+///     Represents an ordered CLR member path from an explicit or inferred API object root.
 /// </summary>
 /// <remarks>
 ///     <para>
 ///         A key path always compiles to one <see cref="ApiRootObjectType"/>, which is the
 ///         <see cref="ApiObjectType"/> from which its <see cref="ApiSegments"/> are navigated.
-///         The root can originate from one of two mutually exclusive sources.
+///         The root can be specified explicitly or inferred from the enclosing schema context.
 ///     </para>
 ///     <para>
-///         When <see cref="ApiRootTypeReference"/> is specified, the path has an explicit root.
-///         During schema compilation, the reference is resolved against the containing schema and
-///         must resolve to an <see cref="ApiObjectType"/>. An explicit reference is authoritative:
-///         it is resolved even when it identifies the same object type that structurally owns the
-///         path, and it may identify a different declared object type.
+///         When <see cref="ApiRootObjectTypeReference"/> is specified, the path has an explicit
+///         root. During schema compilation, the reference is resolved against the containing
+///         schema and must resolve to an <see cref="ApiObjectType"/>. An explicit reference is
+///         authoritative: it is resolved even when it identifies the same object type that the
+///         enclosing context would infer, and it may identify a different declared object type.
 ///     </para>
 ///     <para>
-///         When <see cref="ApiRootTypeReference"/> is <see langword="null"/>, the path has an
-///         owner-supplied root. During compilation, the path walks its ownership topology to the
-///         nearest element that supplies a key-path root. An <see cref="ApiObjectType"/> supplies
-///         itself for paths in its named keys. An <see cref="ApiRelationshipElement"/> supplies
-///         the object type resolved from its participating type reference for paths in its foreign
-///         key definitions. The supplied object type is bound directly; no additional schema
-///         lookup occurs.
+///         When <see cref="ApiRootObjectTypeReference"/> is <see langword="null"/>, compilation
+///         infers the root from the nearest enclosing element that provides a key-path root. An
+///         <see cref="ApiObjectType"/> provides itself for paths in its named keys. An
+///         <see cref="ApiRelationshipElement"/> provides the object type resolved from its
+///         participating type reference for paths in its foreign key definitions. The inferred
+///         object type is bound directly; no additional schema lookup occurs.
 ///     </para>
 ///     <para>
-///         An owner-supplied relationship root is available only after its owning relationship
+///         An inferred relationship root is available only after the enclosing relationship
 ///         element resolves its object-type reference. If that reference cannot resolve, the
 ///         relationship element reports the authoritative diagnostic and the path does not add a
-///         duplicate root-resolution diagnostic. If neither an explicit reference nor a
-///         root-supplying owner is available, schema compilation reports that no root is
-///         available.
+///         duplicate root-resolution diagnostic. If neither an explicit reference nor an
+///         enclosing root provider is available, schema compilation reports that no root can be
+///         inferred.
+///     </para>
+///     <para>
+///         During JSON serialization, an explicit reference is written under the
+///         <see cref="ApiRootObjectType"/> property only when its resolved root differs from the
+///         root inferred from the enclosing context. Inferable roots and equivalent explicit roots
+///         are omitted. Deserialization therefore treats an omitted root as inferred.
 ///     </para>
 ///     <para>
 ///         After successful schema compilation, <see cref="ApiRootObjectType"/> and
@@ -57,16 +62,22 @@ namespace Evoogle.ApiFramework.Schema.Key;
 ///         object-typed property, and the terminal segment must be scalar-typed.
 ///     </para>
 /// </remarks>
-/// <param name="apiRootTypeReference">
-///     An explicit root type reference, or <see langword="null"/> to obtain the root from the owner.
+/// <param name="apiRootObjectTypeReference">
+///     An explicit root object-type reference, or <see langword="null"/> to infer the root from
+///     the enclosing schema context.
 /// </param>
 /// <param name="apiSegments">The ordered member-navigation segments.</param>
 [JsonConverter(typeof(ApiKeyPathJsonConverter))]
-public sealed class ApiKeyPath(ApiTypeReference? apiRootTypeReference, IEnumerable<ApiKeyPathSegment> apiSegments)
+public sealed class ApiKeyPath
+(
+    ApiTypeReference? apiRootObjectTypeReference,
+    IEnumerable<ApiKeyPathSegment> apiSegments
+)
     : ApiSchemaElement
 {
     #region Fields
-    private readonly ApiTypeReferenceBinding<ApiObjectType> _apiRootTypeBinding = new(apiRootTypeReference);
+    private readonly ApiTypeBinding<ApiObjectType> _apiRootObjectTypeBinding =
+        new(apiRootObjectTypeReference);
     #endregion
 
     #region ApiSchemaElement Properties
@@ -79,19 +90,25 @@ public sealed class ApiKeyPath(ApiTypeReference? apiRootTypeReference, IEnumerab
 
     #region Root Properties
     /// <summary>Gets the resolved root API object type after compilation.</summary>
-    public ApiObjectType ApiRootObjectType => _apiRootTypeBinding.ApiType;
+    public ApiObjectType ApiRootObjectType => _apiRootObjectTypeBinding.ApiType;
 
     /// <summary>Gets the resolved root CLR type after compilation.</summary>
     public Type ClrRootType => this.ApiRootObjectType.ClrType;
 
-    /// <summary>Gets the explicit root reference, or null when the root is owner-supplied.</summary>
-    internal ApiTypeReference? ApiRootTypeReference => _apiRootTypeBinding.ApiTypeReference;
+    /// <summary>
+    ///     Gets the explicit root object-type reference, or null when the root is inferred.
+    /// </summary>
+    internal ApiTypeReference? ApiRootObjectTypeReference =>
+        _apiRootObjectTypeBinding.ApiTypeReference;
 
-    /// <summary>Gets a value indicating whether the root is supplied by the owner rather than explicitly.</summary>
-    internal bool IsOwnerSuppliedRoot => !_apiRootTypeBinding.HasReference;
+    /// <summary>Gets a value indicating whether an explicit root reference is configured.</summary>
+    internal bool HasExplicitRootReference => _apiRootObjectTypeBinding.HasReference;
+
+    /// <summary>Gets a value indicating whether the root is inferred rather than explicitly referenced.</summary>
+    internal bool IsInferredRoot => !this.HasExplicitRootReference;
 
     /// <summary>Gets a value indicating whether the root has been resolved after compilation.</summary>
-    internal bool IsResolvedRoot => _apiRootTypeBinding.IsResolved;
+    internal bool IsRootResolved => _apiRootObjectTypeBinding.IsBound;
     #endregion
 
     #region Segment Properties
@@ -112,7 +129,8 @@ public sealed class ApiKeyPath(ApiTypeReference? apiRootTypeReference, IEnumerab
     {
         get
         {
-            var rootLabel = this.ApiRootTypeReference?.ApiReferenceLabel ?? this.GetOwnerSuppliedRootLabel();
+            var rootLabel = this.ApiRootObjectTypeReference?.ApiReferenceLabel
+                ?? this.GetInferredRootLabel();
             return rootLabel is null ? null : $"{rootLabel}.{this.ClrPath}";
         }
     }
@@ -122,11 +140,11 @@ public sealed class ApiKeyPath(ApiTypeReference? apiRootTypeReference, IEnumerab
     /// <inheritdoc/>
     public override string ToString()
     {
-        var apiRootTypeReference = this.ApiRootTypeReference.SafeToString();
+        var apiRootObjectTypeReference = this.ApiRootObjectTypeReference.SafeToString();
         var apiSegments = string.Join(".", this.ApiSegments.Select(static segment => segment.ClrMemberName));
         var extensionCount = this.ExtensionCount.SafeToString();
         return $"{nameof(ApiKeyPath)} "
-            + $"{{{nameof(this.ApiRootTypeReference)}={apiRootTypeReference}, "
+            + $"{{{nameof(this.ApiRootObjectTypeReference)}={apiRootObjectTypeReference}, "
             + $"{nameof(this.ApiSegments)}=\"{apiSegments}\", "
             + $"{nameof(this.ExtensionCount)}={extensionCount}}}";
     }
@@ -158,9 +176,9 @@ public sealed class ApiKeyPath(ApiTypeReference? apiRootTypeReference, IEnumerab
     #endregion
 
     #region Implementation Methods
-    internal Type? GetOwnerSuppliedClrRootType()
+    internal Type? GetInferredClrRootType()
     {
-        var apiObjectType = this.GetOwnerSuppliedRootProvider()?.ApiOwnerSuppliedKeyPathRoot;
+        var apiObjectType = this.FindRootProvider()?.RootObjectType;
         if (apiObjectType is null)
         {
             return null;
@@ -176,13 +194,13 @@ public sealed class ApiKeyPath(ApiTypeReference? apiRootTypeReference, IEnumerab
             return;
         }
 
-        if (this.ApiRootTypeReference is not null)
+        if (this.ApiRootObjectTypeReference is not null)
         {
-            var resolveResult = _apiRootTypeBinding.Resolve
+            var resolveResult = _apiRootObjectTypeBinding.TryResolveReference
                 (
                     context,
                     ApiSchemaCompilationCode.ApiKeyPathUnresolvedRootType,
-                    nameof(this.ApiRootTypeReference),
+                    nameof(this.ApiRootObjectTypeReference),
                     nameof(this.ApiRootObjectType)
                 );
 
@@ -191,20 +209,20 @@ public sealed class ApiKeyPath(ApiTypeReference? apiRootTypeReference, IEnumerab
                 return;
             }
 
-            this.CompileSegmentChain(_apiRootTypeBinding.ApiType, context);
+            this.CompileSegmentChain(_apiRootObjectTypeBinding.ApiType, context);
             return;
         }
 
-        var ownerSuppliedRootProvider = this.GetOwnerSuppliedRootProvider();
-        var ownerSuppliedRootApiObjectType = ownerSuppliedRootProvider?.ApiOwnerSuppliedKeyPathRoot;
-        if (ownerSuppliedRootApiObjectType is not null)
+        var rootProvider = this.FindRootProvider();
+        var inferredRootObjectType = rootProvider?.RootObjectType;
+        if (inferredRootObjectType is not null)
         {
-            _apiRootTypeBinding.Bind(ownerSuppliedRootApiObjectType);
-            this.CompileSegmentChain(ownerSuppliedRootApiObjectType, context);
+            _apiRootObjectTypeBinding.Bind(inferredRootObjectType);
+            this.CompileSegmentChain(inferredRootObjectType, context);
             return;
         }
 
-        if (ownerSuppliedRootProvider is not null)
+        if (rootProvider is not null)
         {
             // The owning element already reported its unresolved reference.
             return;
@@ -212,34 +230,36 @@ public sealed class ApiKeyPath(ApiTypeReference? apiRootTypeReference, IEnumerab
 
         var severity = ApiSchemaCompilationSeverity.Error;
         var code = ApiSchemaCompilationCode.ApiKeyPathUninferableRootType;
-        var description = $"{nameof(this.ApiRootTypeReference)} was not specified and no owning "
-            + $"{nameof(ApiObjectType)} or {nameof(ApiRelationshipElement)} supplied a root";
-        var remediation = $"Specify an explicit {nameof(this.ApiRootTypeReference)} when creating this "
-            + $"{nameof(ApiKeyPath)}";
+        var description = $"{nameof(this.ApiRootObjectTypeReference)} was not specified and no "
+            + $"enclosing {nameof(ApiObjectType)} or {nameof(ApiRelationshipElement)} provided an "
+            + "inferred root";
+        var remediation = $"Specify an explicit {nameof(this.ApiRootObjectTypeReference)} when "
+            + $"creating this {nameof(ApiKeyPath)}";
 
         context.AddIssue(severity, code, description, remediation);
     }
 
-    private IApiKeyPathRootProvider? GetOwnerSuppliedRootProvider()
+    private IApiKeyPathRootProvider? FindRootProvider()
     {
         if (!this.HasTopology)
         {
             return null;
         }
 
-        for (var owner = this.Parent; owner is not null; owner = owner.Parent)
+        for (var enclosingElement = this.Parent;
+            enclosingElement is not null;
+            enclosingElement = enclosingElement.Parent)
         {
-            if (owner is IApiKeyPathRootProvider ownerSuppliedRootProvider)
+            if (enclosingElement is IApiKeyPathRootProvider rootProvider)
             {
-                return ownerSuppliedRootProvider;
+                return rootProvider;
             }
         }
 
         return null;
     }
 
-    private string? GetOwnerSuppliedRootLabel() =>
-        this.GetOwnerSuppliedRootProvider()?.OwnerSuppliedKeyPathRootLabel;
+    private string? GetInferredRootLabel() => this.FindRootProvider()?.RootLabel;
 
     private void ValidateSegmentsNonEmpty(ApiSchemaCompilationContext context)
     {
@@ -287,10 +307,8 @@ public sealed class ApiKeyPath(ApiTypeReference? apiRootTypeReference, IEnumerab
                     var apiPath = segment.ApiPath;
                     var severity = ApiSchemaCompilationSeverity.Error;
                     var code = ApiSchemaCompilationCode.ApiKeyPathScalarSegmentInvalidType;
-                    var description = $"Terminal segment member '{segment.ClrMemberName}' must resolve to a "
-                        + $"scalar type; found '{apiProperty.ApiType.GetType().Name}'";
-                    var remediation = "Change the terminal member to a scalar-typed member or remove extra "
-                        + "navigation segments";
+                    var description = $"Terminal segment member '{segment.ClrMemberName}' must resolve to a scalar type; found '{apiProperty.ApiType.GetType().Name}'";
+                    var remediation = "Change the terminal member to a scalar-typed member or remove extra navigation segments";
 
                     context.AddIssue(apiPath, severity, code, description, remediation);
                 }
@@ -300,10 +318,8 @@ public sealed class ApiKeyPath(ApiTypeReference? apiRootTypeReference, IEnumerab
                 var apiPath = segment.ApiPath;
                 var severity = ApiSchemaCompilationSeverity.Error;
                 var code = ApiSchemaCompilationCode.ApiKeyPathNavigationSegmentInvalidType;
-                var description = $"Navigation segment member '{segment.ClrMemberName}' must resolve to an "
-                    + $"object type; found '{apiProperty.ApiType.GetType().Name}'";
-                var remediation = "Change the navigation member to an object-typed member or restructure the "
-                    + "path segments";
+                var description = $"Navigation segment member '{segment.ClrMemberName}' must resolve to an object type; found '{apiProperty.ApiType.GetType().Name}'";
+                var remediation = "Change the navigation member to an object-typed member or restructure the path segments";
 
                 context.AddIssue(apiPath, severity, code, description, remediation);
                 return;
