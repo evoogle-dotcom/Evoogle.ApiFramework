@@ -31,18 +31,26 @@ internal static class Dummy
     }
 
     /// <summary>
-    ///     Represents a country domain model that is used by the sample schema builder extensions.
+    ///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used
+    ///     directly from your code. This API may change or be removed in future releases.
     /// </summary>
-    public class Country
+    /// <remarks>
+    ///     Represents a country domain model that is used by the sample schema builder extensions.
+    /// </remarks>
+    internal class Country
     {
         /// <summary>Gets or sets the ISO country code.</summary>
         public string Code { get; set; } = "us";
     }
 
     /// <summary>
-    ///     Represents a customer domain model that is used by the sample schema builder extensions.
+    ///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used
+    ///     directly from your code. This API may change or be removed in future releases.
     /// </summary>
-    public class Customer
+    /// <remarks>
+    ///     Represents a customer domain model that is used by the sample schema builder extensions.
+    /// </remarks>
+    internal class Customer
     {
         /// <summary>Gets or sets the unique customer identifier.</summary>
         public Guid Id { get; set; }
@@ -61,9 +69,13 @@ internal static class Dummy
     }
 
     /// <summary>
-    ///     Represents an order domain model that is used by the sample schema builder extensions.
+    ///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used
+    ///     directly from your code. This API may change or be removed in future releases.
     /// </summary>
-    public class Order
+    /// <remarks>
+    ///     Represents an order domain model that is used by the sample schema builder extensions.
+    /// </remarks>
+    internal class Order
     {
         /// <summary>Gets or sets the unique order identifier.</summary>
         public Guid Id { get; set; }
@@ -82,9 +94,13 @@ internal static class Dummy
     }
 
     /// <summary>
-    ///     Represents an order line-item domain model used by the sample schema builder extensions.
+    ///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used
+    ///     directly from your code. This API may change or be removed in future releases.
     /// </summary>
-    public class OrderItem
+    /// <remarks>
+    ///     Represents an order line-item domain model used by the sample schema builder extensions.
+    /// </remarks>
+    internal class OrderItem
     {
         /// <summary>Gets or sets the identifier of the order that owns this line item.</summary>
         public Guid OrderId { get; set; }
@@ -103,19 +119,27 @@ internal static class Dummy
     }
 
     /// <summary>
-    ///     Represents a nested customer reference used to demonstrate key paths stored inside a complex property.
+    ///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used
+    ///     directly from your code. This API may change or be removed in future releases.
     /// </summary>
-    public class CustomerRef
+    /// <remarks>
+    ///     Represents a nested customer reference used to demonstrate key paths stored inside a complex property.
+    /// </remarks>
+    internal class CustomerRef
     {
         /// <summary>Gets or sets the identifier of the referenced customer.</summary>
         public Guid CustomerId { get; set; }
     }
 
     /// <summary>
+    ///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used
+    ///     directly from your code. This API may change or be removed in future releases.
+    /// </summary>
+    /// <remarks>
     ///     Represents a customer profile domain model — a 1:1 extension of <see cref="Customer"/>.
     ///     The key value back to <see cref="Customer"/> is stored inside the nested <see cref="CustomerRef"/> property.
-    /// </summary>
-    public class CustomerProfile
+    /// </remarks>
+    internal class CustomerProfile
     {
         /// <summary>Gets or sets the nested customer reference that carries the key value.</summary>
         public CustomerRef CustomerRef { get; set; } = new CustomerRef();
@@ -125,9 +149,13 @@ internal static class Dummy
     }
 
     /// <summary>
-    ///     Represents a product domain model used by the many-to-many sample schema.
+    ///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used
+    ///     directly from your code. This API may change or be removed in future releases.
     /// </summary>
-    public class Product
+    /// <remarks>
+    ///     Represents a product domain model used by the many-to-many sample schema.
+    /// </remarks>
+    internal class Product
     {
         /// <summary>Gets or sets the unique product identifier.</summary>
         public Guid Id { get; set; }
@@ -137,9 +165,13 @@ internal static class Dummy
     }
 
     /// <summary>
-    ///     Represents a tag domain model used by the many-to-many sample schema.
+    ///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used
+    ///     directly from your code. This API may change or be removed in future releases.
     /// </summary>
-    public class Tag
+    /// <remarks>
+    ///     Represents a tag domain model used by the many-to-many sample schema.
+    /// </remarks>
+    internal class Tag
     {
         /// <summary>Gets or sets the unique tag identifier.</summary>
         public Guid Id { get; set; }
@@ -149,10 +181,14 @@ internal static class Dummy
     }
 
     /// <summary>
+    ///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used
+    ///     directly from your code. This API may change or be removed in future releases.
+    /// </summary>
+    /// <remarks>
     ///     Represents the association type that mediates the many-to-many relationship between
     ///     <see cref="Product"/> and <see cref="Tag"/>.
-    /// </summary>
-    public class ProductTag
+    /// </remarks>
+    internal class ProductTag
     {
         /// <summary>Gets or sets the ID of the associated product.</summary>
         public Guid ProductId { get; set; }
@@ -180,9 +216,13 @@ internal static class Dummy
     }
 
     /// <summary>
-    ///     Demonstrates how to configure a scalar type using the fluent schema builder APIs.
+    ///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used
+    ///     directly from your code. This API may change or be removed in future releases.
     /// </summary>
-    public class EmailAddressConfiguration : IApiScalarTypeConfiguration
+    /// <remarks>
+    ///     Demonstrates how to configure a scalar type using the fluent schema builder APIs.
+    /// </remarks>
+    internal class EmailAddressConfiguration : IApiScalarTypeConfiguration
     {
         /// <inheritdoc />
         public Type ClrType => typeof(EmailAddress);
@@ -197,9 +237,13 @@ internal static class Dummy
     }
 
     /// <summary>
-    ///     Demonstrates strongly-typed scalar configuration using the fluent schema builder APIs.
+    ///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used
+    ///     directly from your code. This API may change or be removed in future releases.
     /// </summary>
-    public class EmailAddressConfigurationGeneric : IApiScalarTypeConfiguration<EmailAddress>
+    /// <remarks>
+    ///     Demonstrates strongly-typed scalar configuration using the fluent schema builder APIs.
+    /// </remarks>
+    internal class EmailAddressConfigurationGeneric : IApiScalarTypeConfiguration<EmailAddress>
     {
         public void Configure(ApiScalarTypeBuilder<EmailAddress> builder)
         {
@@ -208,9 +252,13 @@ internal static class Dummy
     }
 
     /// <summary>
-    ///     Demonstrates how to configure an enum type using the fluent schema builder APIs.
+    ///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used
+    ///     directly from your code. This API may change or be removed in future releases.
     /// </summary>
-    public class OrderStatusConfiguration : IApiEnumTypeConfiguration
+    /// <remarks>
+    ///     Demonstrates how to configure an enum type using the fluent schema builder APIs.
+    /// </remarks>
+    internal class OrderStatusConfiguration : IApiEnumTypeConfiguration
     {
         /// <inheritdoc />
         public Type ClrType => typeof(OrderStatus);
@@ -229,9 +277,13 @@ internal static class Dummy
     }
 
     /// <summary>
-    ///     Demonstrates strongly-typed enum configuration using the fluent schema builder APIs.
+    ///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used
+    ///     directly from your code. This API may change or be removed in future releases.
     /// </summary>
-    public class OrderStatusConfigurationGeneric : IApiEnumTypeConfiguration<OrderStatus>
+    /// <remarks>
+    ///     Demonstrates strongly-typed enum configuration using the fluent schema builder APIs.
+    /// </remarks>
+    internal class OrderStatusConfigurationGeneric : IApiEnumTypeConfiguration<OrderStatus>
     {
         public void Configure(ApiEnumTypeBuilder<OrderStatus> builder)
         {
@@ -245,9 +297,13 @@ internal static class Dummy
     }
 
     /// <summary>
-    ///     Demonstrates how to configure an object type using the fluent schema builder APIs.
+    ///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used
+    ///     directly from your code. This API may change or be removed in future releases.
     /// </summary>
-    public class OrderConfiguration : IApiObjectTypeConfiguration
+    /// <remarks>
+    ///     Demonstrates how to configure an object type using the fluent schema builder APIs.
+    /// </remarks>
+    internal class OrderConfiguration : IApiObjectTypeConfiguration
     {
         /// <inheritdoc />
         public Type ClrType => typeof(Order);
@@ -265,10 +321,14 @@ internal static class Dummy
     }
 
     /// <summary>
+    ///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used
+    ///     directly from your code. This API may change or be removed in future releases.
+    /// </summary>
+    /// <remarks>
     ///     Demonstrates how to configure a 1:M relationship using the fluent schema builder APIs.
     ///     Models the "a Customer has zero-or-more Orders" relationship.
-    /// </summary>
-    public class CustomerHasOrdersRelationshipConfiguration : IApiRelationshipOneToManyConfiguration
+    /// </remarks>
+    internal class CustomerHasOrdersRelationshipConfiguration : IApiRelationshipOneToManyConfiguration
     {
         /// <inheritdoc />
         public string ApiName => "CustomerHasOrders";
@@ -287,10 +347,14 @@ internal static class Dummy
     }
 
     /// <summary>
+    ///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used
+    ///     directly from your code. This API may change or be removed in future releases.
+    /// </summary>
+    /// <remarks>
     ///     Demonstrates how to configure a 1:M relationship using the fluent schema builder APIs.
     ///     Models the "an Order has one-or-more OrderItems" relationship.
-    /// </summary>
-    public class OrderHasOrderItemsRelationshipConfiguration : IApiRelationshipOneToManyConfiguration
+    /// </remarks>
+    internal class OrderHasOrderItemsRelationshipConfiguration : IApiRelationshipOneToManyConfiguration
     {
         /// <inheritdoc />
         public string ApiName => "OrderHasOrderItems";
@@ -306,9 +370,13 @@ internal static class Dummy
     }
 
     /// <summary>
-    ///     Represents a simple extension payload that controls visibility in the sample schema configuration.
+    ///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used
+    ///     directly from your code. This API may change or be removed in future releases.
     /// </summary>
-    public sealed class VisibleMetadata : IApiSchemaExtension
+    /// <remarks>
+    ///     Represents a simple extension payload that controls visibility in the sample schema configuration.
+    /// </remarks>
+    internal sealed class VisibleMetadata : IApiSchemaExtension
     {
         /// <summary>Gets or sets a value indicating whether the target artifact should be visible.</summary>
         public bool IsVisible { get; set; }
@@ -321,11 +389,15 @@ internal static class Dummy
     }
 
     /// <summary>
+    ///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used
+    ///     directly from your code. This API may change or be removed in future releases.
+    /// </summary>
+    /// <remarks>
     ///     Demonstrates how to configure a 1:1 relationship using the fluent schema builder APIs.
     ///     Models the "a Customer has at most one CustomerProfile" relationship.
     ///     Demonstrates nested <see cref="ApiKeyPath"/> values stored inside a complex property on the dependent type.
-    /// </summary>
-    public class CustomerHasProfileRelationshipConfiguration : IApiRelationshipOneToOneConfiguration
+    /// </remarks>
+    internal class CustomerHasProfileRelationshipConfiguration : IApiRelationshipOneToOneConfiguration
     {
         /// <inheritdoc />
         public string ApiName => "CustomerHasProfile";
@@ -349,12 +421,16 @@ internal static class Dummy
     }
 
     /// <summary>
+    ///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used
+    ///     directly from your code. This API may change or be removed in future releases.
+    /// </summary>
+    /// <remarks>
     ///     Demonstrates how to configure a M:N relationship using the fluent schema builder APIs.
     ///     Models the "Products are tagged with Tags" relationship via the <see cref="ProductTag"/> association type.
     ///     Demonstrates <see cref="ApiRelationshipPrincipalEndBuilder.WithPrincipalKey"/> to select a
     ///     non-principal key on the principal side, and extensions on principal ends.
-    /// </summary>
-    public class ProductTagRelationshipConfiguration : IApiRelationshipManyToManyConfiguration
+    /// </remarks>
+    internal class ProductTagRelationshipConfiguration : IApiRelationshipManyToManyConfiguration
     {
         /// <inheritdoc />
         public string ApiName => "ProductHasTags";
@@ -380,7 +456,11 @@ internal static class Dummy
         }
     }
 
-    public class CustomerConfigurationGeneric : IApiObjectTypeConfiguration<Customer>
+    /// <summary>
+    ///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used
+    ///     directly from your code. This API may change or be removed in future releases.
+    /// </summary>
+    internal class CustomerConfigurationGeneric : IApiObjectTypeConfiguration<Customer>
     {
         public void Configure(ApiObjectTypeBuilder<Customer> builder)
         {
@@ -396,7 +476,11 @@ internal static class Dummy
         }
     }
 
-    public class CustomerHasOrdersConfigurationGeneric : IApiRelationshipOneToManyConfiguration
+    /// <summary>
+    ///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used
+    ///     directly from your code. This API may change or be removed in future releases.
+    /// </summary>
+    internal class CustomerHasOrdersConfigurationGeneric : IApiRelationshipOneToManyConfiguration
     {
         public string ApiName => "CustomerHasOrders";
 
@@ -409,7 +493,11 @@ internal static class Dummy
         }
     }
 
-    public class CustomerHasProfileConfigurationGeneric : IApiRelationshipOneToOneConfiguration
+    /// <summary>
+    ///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used
+    ///     directly from your code. This API may change or be removed in future releases.
+    /// </summary>
+    internal class CustomerHasProfileConfigurationGeneric : IApiRelationshipOneToOneConfiguration
     {
         public string ApiName => "CustomerHasProfile";
 
@@ -423,7 +511,11 @@ internal static class Dummy
         }
     }
 
-    public class ProductTagConfigurationGeneric : IApiRelationshipManyToManyConfiguration
+    /// <summary>
+    ///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used
+    ///     directly from your code. This API may change or be removed in future releases.
+    /// </summary>
+    internal class ProductTagConfigurationGeneric : IApiRelationshipManyToManyConfiguration
     {
         public string ApiName => "ProductHasTags";
 
@@ -695,12 +787,16 @@ internal static class Dummy
     // ──────────────────────────────────────────────────────────────────────────────────
 
     /// <summary>
+    ///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used
+    ///     directly from your code. This API may change or be removed in future releases.
+    /// </summary>
+    /// <remarks>
     ///     An annotation-decorated version of <see cref="Customer"/> that demonstrates how
     ///     <c>[ApiObject]</c>, <c>[ApiProperty]</c>, <c>[ApiKey]</c>, and <c>[ApiIgnore]</c>
     ///     can describe the schema shape directly on the POCO.
-    /// </summary>
+    /// </remarks>
     [ApiObject(ApiName = "Customer")]
-    public class CustomerAnnotated
+    internal class CustomerAnnotated
     {
         /// <summary>Gets or sets the unique customer identifier.</summary>
         [ApiKey]
@@ -727,11 +823,15 @@ internal static class Dummy
     }
 
     /// <summary>
+    ///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used
+    ///     directly from your code. This API may change or be removed in future releases.
+    /// </summary>
+    /// <remarks>
     ///     An annotation-decorated version of <see cref="Order"/> paired with
     ///     <see cref="CustomerAnnotated"/> for the annotation demo schema.
-    /// </summary>
+    /// </remarks>
     [ApiObject(ApiName = "Order")]
-    public class OrderAnnotated
+    internal class OrderAnnotated
     {
         /// <summary>Gets or sets the unique order identifier.</summary>
         [ApiKey]
@@ -807,10 +907,14 @@ internal static class Dummy
     }
 
     /// <summary>
+    ///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used
+    ///     directly from your code. This API may change or be removed in future releases.
+    /// </summary>
+    /// <remarks>
     ///     A custom <see cref="IApiObjectTypeConvention"/> that demonstrates how to supply
     ///     third-party or application-specific conventions alongside the built-in ones.
-    /// </summary>
-    public class ApiObjectTypeConventionExample : IApiObjectTypeConvention
+    /// </remarks>
+    internal class ApiObjectTypeConventionExample : IApiObjectTypeConvention
     {
         /// <inheritdoc />
         public ApiConventionPhase Phase => ApiConventionPhase.Configuration;

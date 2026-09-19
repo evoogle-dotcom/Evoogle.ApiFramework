@@ -4,6 +4,7 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using Evoogle.ApiFramework.Exceptions;
+using Evoogle.ApiFramework.Schema.Compilation.Internal;
 using Evoogle.ApiFramework.Schema.Types;
 
 namespace Evoogle.ApiFramework.Schema.Relationships;
@@ -38,12 +39,38 @@ public abstract class ApiRelationshipEnd : ApiRelationshipElement
     /// </summary>
     public ApiRelationship ApiRelationship => this.Parent as ApiRelationship
         ?? throw new ApiSchemaException(_ownershipErrorMessage);
+
+    /// <summary>Gets the optional traversal exposed from this relationship end.</summary>
+    public ApiRelationshipTraversal? ApiTraversal { get; }
     #endregion
 
     #region Constructors
-    internal ApiRelationshipEnd(ApiTypeReference apiObjectTypeReference)
+    internal ApiRelationshipEnd
+    (
+        ApiTypeReference apiObjectTypeReference,
+        ApiRelationshipTraversal? apiTraversal = null
+    )
         : base(apiObjectTypeReference)
     {
+        this.ApiTraversal = apiTraversal;
+    }
+    #endregion
+
+    #region ApiSchemaElement Methods
+    /// <inheritdoc/>
+    internal override IEnumerable<ApiSchemaElement> GetOwnedElements()
+    {
+        if (this.ApiTraversal is not null)
+        {
+            yield return this.ApiTraversal;
+        }
+    }
+
+    /// <inheritdoc/>
+    internal override void CompileCore(ApiSchemaCompilationContext context)
+    {
+        base.CompileCore(context);
+        this.ApiTraversal?.Compile(context);
     }
     #endregion
 }

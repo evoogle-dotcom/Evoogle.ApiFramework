@@ -28,6 +28,8 @@ public sealed class ApiRelationshipPrincipalEndBuilder(ApiTypeReference apiObjec
     private readonly ApiTypeReference _apiObjectTypeReference = apiObjectTypeReference ??
         throw new ArgumentNullException(nameof(apiObjectTypeReference));
     private readonly ApiRelationshipPrincipalEndState _state = new();
+    private ApiRelationshipTraversal? _traversal;
+    private ApiConfigurationSource? _traversalSource;
     #endregion
 
     #region Properties
@@ -58,6 +60,30 @@ public sealed class ApiRelationshipPrincipalEndBuilder(ApiTypeReference apiObjec
     public ApiRelationshipPrincipalEndBuilder AddRelationshipPrincipalEndExtension(Type extensionType, object extension)
     {
         return this.AddExtension(extensionType, extension);
+    }
+    #endregion
+
+    #region WithTraversal Methods
+    /// <summary>Sets the optional traversal from this end to the opposite relationship end.</summary>
+    /// <param name="apiName">The API name exposed on the source object type.</param>
+    /// <param name="clrMemberName">An optional CLR navigation member name.</param>
+    /// <param name="clrMemberKind">The kind of CLR navigation member.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiRelationshipPrincipalEndBuilder WithTraversal
+    (
+        string apiName,
+        string? clrMemberName = null,
+        ClrMemberKind clrMemberKind = ClrMemberKind.Property
+    )
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName);
+        var source = _configurationSourceScope.CurrentSource;
+        if (_traversalSource is null || source >= _traversalSource.Value)
+        {
+            _traversal = new ApiRelationshipTraversal(apiName, clrMemberName, clrMemberKind);
+            _traversalSource = source;
+        }
+        return this;
     }
     #endregion
 
@@ -100,6 +126,7 @@ public sealed class ApiRelationshipPrincipalEndBuilder(ApiTypeReference apiObjec
         var end = new ApiRelationshipPrincipalEnd
         (
             _apiObjectTypeReference,
+            _traversal,
             _state.PrincipalKeyName
         );
 

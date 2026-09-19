@@ -73,11 +73,7 @@ public class ApiNamedKeyDefinitionJsonConverter(ILogger<ApiNamedKeyDefinitionJso
     private class ReadHandlers(PropertyNames propertyNames)
     {
         #region ApiNamedKeyDefinition Fields
-        public readonly Dictionary
-        <
-            string,
-            JsonReaderHandler<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>>
-        > PropertyHandlers = new()
+        public readonly JsonReaderHandlerTable<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>> PropertyHandlers = new()
         {
             // ApiNamedKeyDefinition Property Handlers
             { propertyNames.ApiNamedKeyDefinition.ApiName, HandleApiNamedKeyDefinitionApiName },
@@ -113,7 +109,7 @@ public class ApiNamedKeyDefinitionJsonConverter(ILogger<ApiNamedKeyDefinitionJso
             context.ReadData.ApiKeyDefinition ??= new ApiKeyDefinitionJsonConverterCore.ReadData();
             context.ReadData.ApiKeyDefinition.ApiKeyPaths ??= [];
 
-            ReadJsonArray(ref reader, context, (x) => HandleApiKeyDefinitionApiKeyPathsArrayItem);
+            ReadJsonArray(ref reader, context, HandleApiKeyDefinitionApiKeyPathsArrayItem);
         }
 
         private static void HandleApiKeyDefinitionApiKeyPathsArrayItem
@@ -194,63 +190,45 @@ public class ApiNamedKeyDefinitionJsonConverter(ILogger<ApiNamedKeyDefinitionJso
     }
 
     /// <inheritdoc/>
-    protected override void WriteCore
-    (
-        Utf8JsonWriter writer,
-        ApiNamedKeyDefinition value,
-        IWriteContext context
-    )
+    protected override void WriteCore(Utf8JsonWriter writer, ApiNamedKeyDefinition apiKeyDefinition, IWriteContext context)
     {
         var writeContext = (DefaultWriteContext<PropertyNames>)context;
 
-        WriteJsonObject(writer, () =>
+        writer.WriteJsonObject(state: (apiKeyDefinition, writeContext), writeObject: static (writer, state) =>
         {
-            WriteApiName(writer, value, writeContext);
-            WriteApiKeyPaths(writer, value, writeContext);
+            var (apiKeyDefinition, writeContext) = state;
+            WriteApiName(writer, apiKeyDefinition, writeContext);
+            WriteApiKeyPaths(writer, apiKeyDefinition, writeContext);
 
             WriteExtensibleBaseExtensions
             (
                 writer,
-                writeContext.PropertyNames.ExtensibleBase.Extensions,
-                value,
-                writeContext
+                propertyName: writeContext.PropertyNames.ExtensibleBase.Extensions,
+                extensibleBase: apiKeyDefinition,
+                context: writeContext
             );
         });
     }
     #endregion
 
     #region Write Implementation Methods
-    private static void WriteApiName
-    (
-        Utf8JsonWriter writer,
-        ApiNamedKeyDefinition apiNamedKeyDefinition,
-        DefaultWriteContext<PropertyNames> context
-    )
+    private static void WriteApiName(Utf8JsonWriter writer, ApiNamedKeyDefinition apiNamedKeyDefinition, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyAsString(propertyName: writeContext.PropertyNames.ApiNamedKeyDefinition.ApiName, value: apiNamedKeyDefinition.ApiName, options: writeContext.Options);
+
+    private static void WriteApiKeyPaths(Utf8JsonWriter writer, ApiNamedKeyDefinition apiNamedKeyDefinition, DefaultWriteContext<PropertyNames> writeContext)
     {
-        var propertyName = context.PropertyNames.ApiNamedKeyDefinition.ApiName;
-        var value = apiNamedKeyDefinition.ApiName;
-        var options = context.Options;
-
-        writer.TryWritePropertyAsString(propertyName, value, options);
-    }
-
-    private static void WriteApiKeyPaths
-    (
-        Utf8JsonWriter writer,
-        ApiNamedKeyDefinition apiNamedKeyDefinition,
-        DefaultWriteContext<PropertyNames> context
-    )
-    {
-        var propertyName = context.PropertyNames.ApiKeyDefinition.ApiKeyPaths;
-        var options = context.Options;
-
-        ApiKeyDefinitionJsonConverterCore.WriteApiKeyPaths
+        writer.TryWritePropertyAsArray
         (
-            writer,
-            apiNamedKeyDefinition,
-            propertyName,
-            options,
-            WriteJsonArray
+            propertyName: writeContext.PropertyNames.ApiKeyDefinition.ApiKeyPaths,
+            collection: apiNamedKeyDefinition.ApiKeyPaths,
+            state: writeContext,
+            options: writeContext.Options,
+            writeItem: static (writer, item, state) =>
+            {
+                var writeContext = state;
+
+                writer.TryWriteWithSerializer(obj: item, options: writeContext.Options);
+            }
         );
     }
     #endregion

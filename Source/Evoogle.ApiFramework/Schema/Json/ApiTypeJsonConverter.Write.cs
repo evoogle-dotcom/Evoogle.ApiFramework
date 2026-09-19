@@ -17,146 +17,118 @@ public partial class ApiTypeJsonConverter : JsonConverterBase<ApiType>
 {
     #region Write Implementation Methods
     // ApiCollectionType
-    private static void WriteApiCollectionType(Utf8JsonWriter writer, ApiCollectionType apiCollectionType, DefaultWriteContext<PropertyNames> context)
+    private static void WriteApiCollectionType(Utf8JsonWriter writer, ApiCollectionType apiCollectionType, DefaultWriteContext<PropertyNames> writeContext)
     {
-        WriteApiCollectionTypeApiItemTypeExpression(writer, apiCollectionType, context);
-        WriteApiCollectionTypeApiItemTypeModifiers(writer, apiCollectionType, context);
+        WriteApiCollectionTypeApiItemTypeExpression(writer, apiCollectionType, writeContext);
+        WriteApiCollectionTypeApiItemTypeModifiers(writer, apiCollectionType, writeContext);
     }
 
-    private static void WriteApiCollectionTypeApiItemTypeExpression(Utf8JsonWriter writer, ApiCollectionType apiCollectionType, DefaultWriteContext<PropertyNames> context)
-    {
-        var propertyName = context.PropertyNames.ApiCollectionType.ApiItemTypeExpression;
-        var apiItemTypeExpression = apiCollectionType.ApiItemTypeExpression;
-        var options = context.Options;
+    private static void WriteApiCollectionTypeApiItemTypeExpression(Utf8JsonWriter writer, ApiCollectionType apiCollectionType, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyWithSerializer(propertyName: writeContext.PropertyNames.ApiCollectionType.ApiItemTypeExpression, obj: apiCollectionType.ApiItemTypeExpression, options: writeContext.Options);
 
-        writer.TryWritePropertyWithSerializer(propertyName, apiItemTypeExpression, options);
-    }
-
-    private static void WriteApiCollectionTypeApiItemTypeModifiers(Utf8JsonWriter writer, ApiCollectionType apiCollectionType, DefaultWriteContext<PropertyNames> context)
-    {
-        var propertyName = context.PropertyNames.ApiCollectionType.ApiItemTypeModifiers;
-        var apiItemTypeModifiers = apiCollectionType.ApiItemTypeModifiers;
-        var options = context.Options;
-
-        writer.TryWritePropertyWithConverter(propertyName, apiItemTypeModifiers, options, _apiTypeModifiersJsonConverter);
-    }
+    private static void WriteApiCollectionTypeApiItemTypeModifiers(Utf8JsonWriter writer, ApiCollectionType apiCollectionType, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyWithConverter(propertyName: writeContext.PropertyNames.ApiCollectionType.ApiItemTypeModifiers, value: apiCollectionType.ApiItemTypeModifiers, options: writeContext.Options, converter: _apiTypeModifiersJsonConverter);
 
     // ApiEnumType
-    private static void WriteApiEnumType(Utf8JsonWriter writer, ApiEnumType apiEnumType, DefaultWriteContext<PropertyNames> context) => WriteApiEnumTypeApiEnumValues(writer, apiEnumType, context);
+    private static void WriteApiEnumType(Utf8JsonWriter writer, ApiEnumType apiEnumType, DefaultWriteContext<PropertyNames> writeContext)
+        => WriteApiEnumTypeApiEnumValues(writer, apiEnumType, writeContext);
 
-    private static void WriteApiEnumTypeApiEnumValues(Utf8JsonWriter writer, ApiEnumType apiEnumType, DefaultWriteContext<PropertyNames> context)
+    private static void WriteApiEnumTypeApiEnumValues(Utf8JsonWriter writer, ApiEnumType apiEnumType, DefaultWriteContext<PropertyNames> writeContext)
     {
-        var propertyName = context.PropertyNames.ApiEnumType.ApiEnumValues;
+        var propertyName = writeContext.PropertyNames.ApiEnumType.ApiEnumValues;
         var apiEnumValues = apiEnumType.ApiEnumValues;
-        var options = context.Options;
+        var options = writeContext.Options;
 
-        writer.TryWritePropertyWithAction
+        writer.TryWritePropertyAsArray
         (
-            propertyName,
-            apiEnumValues,
-            options,
-            collection => WriteJsonArray(writer, collection, item => writer.TryWriteWithSerializer(item, options))
+            propertyName: propertyName,
+            collection: apiEnumValues,
+            state: writeContext,
+            options: writeContext.Options,
+            writeItem: static (writer, item, state) =>
+                writer.TryWriteWithSerializer(obj: item, options: state.Options)
         );
     }
 
     // ApiNamedType
-    private static void WriteApiNamedType(Utf8JsonWriter writer, ApiNamedType apiNamedType, DefaultWriteContext<PropertyNames> context) => WriteApiNamedTypeApiName(writer, apiNamedType, context);
+    private static void WriteApiNamedType(Utf8JsonWriter writer, ApiNamedType apiNamedType, DefaultWriteContext<PropertyNames> writeContext)
+        => WriteApiNamedTypeApiName(writer, apiNamedType, writeContext);
 
-    private static void WriteApiNamedTypeApiName(Utf8JsonWriter writer, ApiNamedType apiNamedType, DefaultWriteContext<PropertyNames> context)
-    {
-        var propertyName = context.PropertyNames.ApiNamedType.ApiName;
-        var value = apiNamedType.ApiName;
-        var options = context.Options;
-
-        writer.TryWritePropertyAsString(propertyName, value, options);
-    }
+    private static void WriteApiNamedTypeApiName(Utf8JsonWriter writer, ApiNamedType apiNamedType, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyAsString(propertyName: writeContext.PropertyNames.ApiNamedType.ApiName, value: apiNamedType.ApiName, options: writeContext.Options);
 
     // ApiObjectType
-    private static void WriteApiObjectType(Utf8JsonWriter writer, ApiObjectType apiObjectType, DefaultWriteContext<PropertyNames> context)
+    private static void WriteApiObjectType(Utf8JsonWriter writer, ApiObjectType apiObjectType, DefaultWriteContext<PropertyNames> writeContext)
     {
-        WriteApiObjectTypeApiOptions(writer, apiObjectType, context);
-        WriteApiObjectTypeApiProperties(writer, apiObjectType, context);
-        WriteApiObjectTypeApiKeys(writer, apiObjectType, context);
-        WriteApiObjectTypeApiVersion(writer, apiObjectType, context);
+        WriteApiObjectTypeApiOptions(writer, apiObjectType, writeContext);
+        WriteApiObjectTypeApiProperties(writer, apiObjectType, writeContext);
+        WriteApiObjectTypeApiKeys(writer, apiObjectType, writeContext);
+        WriteApiObjectTypeApiVersion(writer, apiObjectType, writeContext);
     }
 
-    private static void WriteApiObjectTypeApiKeys(Utf8JsonWriter writer, ApiObjectType apiObjectType, DefaultWriteContext<PropertyNames> context)
+    private static void WriteApiObjectTypeApiKeys(Utf8JsonWriter writer, ApiObjectType apiObjectType, DefaultWriteContext<PropertyNames> writeContext)
     {
-        var propertyName = context.PropertyNames.ApiObjectType.ApiKeys;
+        var propertyName = writeContext.PropertyNames.ApiObjectType.ApiKeys;
         var apiKeys = apiObjectType.ApiKeys;
-        var options = context.Options;
+        var options = writeContext.Options;
 
-        writer.TryWritePropertyWithAction
+        writer.TryWritePropertyAsArray
         (
-            propertyName,
-            apiKeys,
-            options,
-            collection => WriteJsonArray(writer, collection, item => writer.TryWriteWithSerializer(item, options))
+            propertyName: propertyName,
+            collection: apiKeys,
+            state: writeContext,
+            options: writeContext.Options,
+            writeItem: static (writer, item, state) =>
+                writer.TryWriteWithSerializer(obj: item, options: state.Options)
         );
     }
 
-    private static void WriteApiObjectTypeApiOptions(Utf8JsonWriter writer, ApiObjectType apiObjectType, DefaultWriteContext<PropertyNames> context)
-    {
-        var propertyName = context.PropertyNames.ApiObjectType.ApiOptions;
-        var apiOptions = apiObjectType.ApiOptions;
-        var options = context.Options;
-
-        writer.TryWritePropertyWithSerializer(propertyName, apiOptions, options);
-    }
+    private static void WriteApiObjectTypeApiOptions(Utf8JsonWriter writer, ApiObjectType apiObjectType, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyWithSerializer(propertyName: writeContext.PropertyNames.ApiObjectType.ApiOptions, obj: apiObjectType.ApiOptions, options: writeContext.Options);
 
     private static void WriteApiObjectTypeApiVersion
     (
         Utf8JsonWriter writer,
         ApiObjectType apiObjectType,
-        DefaultWriteContext<PropertyNames> context
+        DefaultWriteContext<PropertyNames> writeContext
     )
     {
         writer.TryWritePropertyWithSerializer
         (
-            context.PropertyNames.ApiObjectType.ApiVersion,
+            writeContext.PropertyNames.ApiObjectType.ApiVersion,
             apiObjectType.ApiVersion,
-            context.Options
+            writeContext.Options
         );
     }
 
-    private static void WriteApiObjectTypeApiProperties(Utf8JsonWriter writer, ApiObjectType apiObjectType, DefaultWriteContext<PropertyNames> context)
+    private static void WriteApiObjectTypeApiProperties(Utf8JsonWriter writer, ApiObjectType apiObjectType, DefaultWriteContext<PropertyNames> writeContext)
     {
-        var propertyName = context.PropertyNames.ApiObjectType.ApiProperties;
+        var propertyName = writeContext.PropertyNames.ApiObjectType.ApiProperties;
         var apiProperties = apiObjectType.ApiProperties;
-        var options = context.Options;
+        var options = writeContext.Options;
 
-        writer.TryWritePropertyWithAction
+        writer.TryWritePropertyAsArray
         (
-            propertyName,
-            apiProperties,
-            options,
-            collection => WriteJsonArray(writer, collection, item => writer.TryWriteWithSerializer(item, options))
+            propertyName: propertyName,
+            collection: apiProperties,
+            state: writeContext,
+            options: writeContext.Options,
+            writeItem: static (writer, item, state) =>
+                writer.TryWriteWithSerializer(obj: item, options: state.Options)
         );
     }
 
     // ApiScalarType
-    private static void WriteApiScalarType(Utf8JsonWriter writer, ApiScalarType apiScalarType, DefaultWriteContext<PropertyNames> context)
+    private static void WriteApiScalarType(Utf8JsonWriter writer, ApiScalarType apiScalarType, DefaultWriteContext<PropertyNames> writeContext)
     {
         // Note: ApiScalarType has no serializable body fields — intentionally left empty.
     }
 
     // ApiType
-    private static void WriteApiTypeApiKind(Utf8JsonWriter writer, ApiType apiType, DefaultWriteContext<PropertyNames> context)
-    {
-        var propertyName = context.PropertyNames.ApiType.ApiKind;
-        var kind = apiType.ApiKind;
-        var options = context.Options;
+    private static void WriteApiTypeApiKind(Utf8JsonWriter writer, ApiType apiType, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyWithConverter(propertyName: writeContext.PropertyNames.ApiType.ApiKind, value: apiType.ApiKind, options: writeContext.Options, converter: _apiTypeKindJsonConverter);
 
-        writer.TryWritePropertyWithConverter(propertyName, kind, options, _apiTypeKindJsonConverter);
-    }
-
-    private static void WriteApiTypeClrType(Utf8JsonWriter writer, ApiType apiType, DefaultWriteContext<PropertyNames> context)
-    {
-        var propertyName = context.PropertyNames.ApiType.ClrType;
-        var clrType = apiType.ClrType;
-        var options = context.Options;
-
-        writer.TryWritePropertyWithConverter(propertyName, clrType, options, _typeJsonConverter);
-    }
+    private static void WriteApiTypeClrType(Utf8JsonWriter writer, ApiType apiType, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyWithConverter(propertyName: writeContext.PropertyNames.ApiType.ClrType, type: apiType.ClrType, options: writeContext.Options, converter: _typeJsonConverter);
     #endregion
 }

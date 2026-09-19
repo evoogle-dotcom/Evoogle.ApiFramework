@@ -44,6 +44,15 @@ Fluent methods and annotations describe the developer action or domain designati
 concise names such as `AddKey`, `WithVersion`, `WithRepositoryVersion`, `ApiKeyAttribute`, and
 `ApiVersionAttribute`.
 
+## Name Comparison
+
+Compare API names with `ApiNameComparer.Instance` and CLR member names with
+`ClrNameComparer.Instance`. Both use `StringComparer.Ordinal`: names are
+case-sensitive and culture-independent. Use the same comparer for equality,
+ordering, dictionary keys, duplicate detection, and hashing. A different
+comparison requires a documented reason at its use site. This policy does not
+apply to JSON property names or to ordinary string values.
+
 ## `Api` and `Clr` Prefixes
 
 ApiFramework models two related naming spaces:

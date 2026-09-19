@@ -64,6 +64,13 @@ Public production APIs require XML documentation because CS1591 is treated as an
 
 Do not reformat or reorganize unrelated code as part of a focused change.
 
+### Schema Compilation Issues
+
+When adding a schema compilation issue, assign its five parts to local variables named
+`apiPath`, `severity`, `code`, `description`, and `remediation` before calling `AddIssue`.
+Pass those variables to `AddIssue` in that order. Do not pass literals or expressions directly
+as issue arguments. Follow this pattern in new and modified validation code.
+
 ### JSON Serialization
 
 When writing an optional property in a custom JSON converter, write the property name and value

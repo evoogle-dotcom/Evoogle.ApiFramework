@@ -6,7 +6,6 @@
 using System.Text.Json;
 
 using Evoogle.ApiFramework.Schema.Key;
-using Evoogle.Json;
 
 namespace Evoogle.ApiFramework.Schema.Json.Internal;
 
@@ -17,14 +16,7 @@ namespace Evoogle.ApiFramework.Schema.Json.Internal;
 internal static class ApiKeyDefinitionJsonConverterCore
 {
     #region Types
-    internal delegate void ApiKeyPathArrayWriter
-    (
-        Utf8JsonWriter writer,
-        IEnumerable<ApiKeyPath> apiKeyPaths,
-        Action<ApiKeyPath> writeApiKeyPath
-    );
-
-    internal readonly record struct PropertyNames
+    public readonly record struct PropertyNames
     {
         #region Immutable Properties
         public required string ApiKeyPaths { get; init; }
@@ -41,11 +33,7 @@ internal static class ApiKeyDefinitionJsonConverterCore
         #endregion
     }
 
-    /// <summary>
-    ///     This API supports the Evoogle.ApiFramework infrastructure and is not intended to be used
-    ///     directly from your code. This API may change or be removed in future releases.
-    /// </summary>
-    internal sealed class ReadData
+    public sealed class ReadData
     {
         #region Properties
         public List<ApiKeyPath>? ApiKeyPaths { get; set; }
@@ -54,7 +42,7 @@ internal static class ApiKeyDefinitionJsonConverterCore
     #endregion
 
     #region Read Methods
-    internal static void ReadApiKeyPath
+    public static void ReadApiKeyPath
     (
         ref Utf8JsonReader reader,
         JsonSerializerOptions options,
@@ -66,33 +54,6 @@ internal static class ApiKeyDefinitionJsonConverterCore
         {
             apiKeyPaths.Add(apiKeyPath);
         }
-    }
-    #endregion
-
-    #region Write Methods
-    internal static void WriteApiKeyPaths
-    (
-        Utf8JsonWriter writer,
-        ApiKeyDefinition apiKeyDefinition,
-        string propertyName,
-        JsonSerializerOptions options,
-        ApiKeyPathArrayWriter writeApiKeyPathArray
-    )
-    {
-        var apiKeyPaths = apiKeyDefinition.ApiKeyPaths;
-
-        writer.TryWritePropertyWithAction
-        (
-            propertyName,
-            apiKeyPaths,
-            options,
-            collection => writeApiKeyPathArray
-            (
-                writer,
-                collection,
-                item => writer.TryWriteWithSerializer(item, options)
-            )
-        );
     }
     #endregion
 }

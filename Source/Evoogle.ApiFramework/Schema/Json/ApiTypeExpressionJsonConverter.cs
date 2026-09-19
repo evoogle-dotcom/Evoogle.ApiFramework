@@ -3,7 +3,6 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
-using System.Collections.Immutable;
 using System.Text.Json;
 
 using Evoogle.ApiFramework.Schema.Types;
@@ -20,6 +19,22 @@ namespace Evoogle.ApiFramework.Schema.Json;
 public sealed class ApiTypeExpressionJsonConverter(ILogger<ApiTypeExpressionJsonConverter>? logger)
     : JsonConverterBase<ApiTypeExpression>(logger)
 {
+    private enum ExpressionShape
+    {
+        Empty,
+        Reference,
+        Inline,
+        Invalid
+    }
+
+    private enum PropertyKind
+    {
+        Other,
+        ApiKind,
+        ApiName,
+        ClrType
+    }
+
     #region Property Types
     private readonly record struct ApiTypeExpressionPropertyNames
     {
@@ -107,29 +122,31 @@ public sealed class ApiTypeExpressionJsonConverter(ILogger<ApiTypeExpressionJson
     /// <inheritdoc/>
     protected override void ReadCore(ref Utf8JsonReader reader, IReadContext context)
     {
-        var propertyNames = reader.ReadObjectPropertyNames(JsonReaderNullPropertyHandling.Ignore);
+        var readContext = (ReadContext)context;
+        var propertyNames = readContext.PropertyNames.ApiTypeExpression;
+        var shape = GetExpressionShape
+        (
+            ref reader,
+            propertyNames.ApiKind,
+            propertyNames.ApiName,
+            propertyNames.ClrType
+        );
 
-        if (IsEmptyExpressionObject(propertyNames))
+        if (shape == ExpressionShape.Empty)
         {
             // If there are no properties, it is considered an invalid expression object.
             reader.Skip();
             return;
         }
 
-        var readContext = (ReadContext)context;
         var options = readContext.Options;
-
-        var clrTypePropertyName = readContext.PropertyNames.ApiTypeExpression.ClrType;
-        var apiKindPropertyName = readContext.PropertyNames.ApiTypeExpression.ApiKind;
-        var apiNamePropertyName = readContext.PropertyNames.ApiTypeExpression.ApiName;
-
-        if (IsReferenceObject(propertyNames, clrTypePropertyName, apiKindPropertyName, apiNamePropertyName))
+        if (shape == ExpressionShape.Reference)
         {
             // Handle the reference case here
             var apiTypeReference = JsonSerializer.Deserialize<ApiTypeReference>(ref reader, options);
             readContext.ReadData.ApiTypeReference = apiTypeReference;
         }
-        else if (IsInlineObject(propertyNames))
+        else if (shape == ExpressionShape.Inline)
         {
             // Handle the inline case here
             var apiInlineType = JsonSerializer.Deserialize<ApiType>(ref reader, options);
@@ -172,56 +189,128 @@ public sealed class ApiTypeExpressionJsonConverter(ILogger<ApiTypeExpressionJson
     #endregion
 
     #region Helper Methods
-    private static bool IsEmptyExpressionObject(ImmutableArray<string> propertyNames)
-        => propertyNames.Length == 0;
-
-    private static bool IsInlineObject(ImmutableArray<string> propertyNames)
-        => propertyNames.Length > 2;
-
-    private static bool IsReferenceObject
+    private static ExpressionShape GetExpressionShape
     (
-        ImmutableArray<string> propertyNames,
-        string clrTypePropertyName,
+        ref Utf8JsonReader reader,
         string apiKindPropertyName,
-        string apiNamePropertyName
+        string apiNamePropertyName,
+        string clrTypePropertyName
     )
     {
-        // Handle the two most common cases: reference by CLR type, or by API kind and name.
-        if (IsClrTypeReference(propertyNames, clrTypePropertyName))
+        if (reader.TokenType != JsonTokenType.StartObject)
         {
-            return true;
+            throw new JsonException("Expected start of JSON object.");
         }
 
-        if (IsApiKindAndApiNameReference(propertyNames, apiKindPropertyName, apiNamePropertyName))
+        var lookahead = reader;
+        var objectDepth = lookahead.CurrentDepth;
+        var propertyCount = 0;
+        var firstPropertyKind = PropertyKind.Other;
+        var secondPropertyKind = PropertyKind.Other;
+
+        while (true)
         {
-            return true;
+            if (!lookahead.Read())
+            {
+                throw new JsonException("Unexpected end of JSON.");
+            }
+
+            if (lookahead.TokenType == JsonTokenType.EndObject && lookahead.CurrentDepth == objectDepth)
+            {
+                break;
+            }
+
+            if (lookahead.TokenType != JsonTokenType.PropertyName
+                || lookahead.CurrentDepth != objectDepth + 1)
+            {
+                throw new JsonException("Expected a JSON property name.");
+            }
+
+            var propertyKind = GetPropertyKind
+            (
+                ref lookahead,
+                apiKindPropertyName,
+                apiNamePropertyName,
+                clrTypePropertyName
+            );
+
+            if (!lookahead.Read())
+            {
+                throw new JsonException("Unexpected end of JSON.");
+            }
+
+            if (lookahead.TokenType == JsonTokenType.Null)
+            {
+                continue;
+            }
+
+            propertyCount++;
+            if (propertyCount == 1)
+            {
+                firstPropertyKind = propertyKind;
+            }
+            else if (propertyCount == 2)
+            {
+                secondPropertyKind = propertyKind;
+            }
+
+            lookahead.Skip();
         }
 
-        // Handle the malformed reference case here
-        if (IsMalformedReference(propertyNames, clrTypePropertyName, apiKindPropertyName, apiNamePropertyName))
+        if (propertyCount == 0)
         {
-            return true;
+            return ExpressionShape.Empty;
         }
 
-        return false;
+        if (propertyCount > 2)
+        {
+            return ExpressionShape.Inline;
+        }
+
+        if (propertyCount == 1 && firstPropertyKind == PropertyKind.ClrType)
+        {
+            return ExpressionShape.Reference;
+        }
+
+        if (propertyCount == 2
+            && ((firstPropertyKind == PropertyKind.ApiKind && secondPropertyKind == PropertyKind.ApiName)
+                || (firstPropertyKind == PropertyKind.ApiName && secondPropertyKind == PropertyKind.ApiKind)))
+        {
+            return ExpressionShape.Reference;
+        }
+
+        if (firstPropertyKind != PropertyKind.Other || secondPropertyKind != PropertyKind.Other)
+        {
+            return ExpressionShape.Reference;
+        }
+
+        return ExpressionShape.Invalid;
     }
 
-    private static bool IsApiKindAndApiNameReference(ImmutableArray<string> propertyNames, string apiKindPropertyName, string apiNamePropertyName)
-        => propertyNames.Length == 2 && ((propertyNames[0] == apiKindPropertyName && propertyNames[1] == apiNamePropertyName) || (propertyNames[0] == apiNamePropertyName && propertyNames[1] == apiKindPropertyName));
-
-    private static bool IsClrTypeReference(ImmutableArray<string> propertyNames, string clrTypePropertyName)
-        => propertyNames.Length == 1 && propertyNames[0] == clrTypePropertyName;
-
-    private static bool IsMalformedReference(ImmutableArray<string> propertyNames, string clrTypePropertyName, string apiKindPropertyName, string apiNamePropertyName)
+    private static PropertyKind GetPropertyKind
+    (
+        ref Utf8JsonReader reader,
+        string apiKindPropertyName,
+        string apiNamePropertyName,
+        string clrTypePropertyName
+    )
     {
-        if (propertyNames.Length is not (1 or 2))
+        if (reader.ValueTextEquals(apiKindPropertyName))
         {
-            return false;
+            return PropertyKind.ApiKind;
         }
 
-        return propertyNames.Contains(apiKindPropertyName)
-            || propertyNames.Contains(apiNamePropertyName)
-            || propertyNames.Contains(clrTypePropertyName);
+        if (reader.ValueTextEquals(apiNamePropertyName))
+        {
+            return PropertyKind.ApiName;
+        }
+
+        if (reader.ValueTextEquals(clrTypePropertyName))
+        {
+            return PropertyKind.ClrType;
+        }
+
+        return PropertyKind.Other;
     }
     #endregion
 }

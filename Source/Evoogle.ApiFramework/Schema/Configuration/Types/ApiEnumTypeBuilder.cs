@@ -3,6 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Internal;
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
 using Evoogle.ApiFramework.Schema.Configuration.Types.Internal;
 using Evoogle.ApiFramework.Schema.Types;
@@ -104,7 +105,7 @@ public class ApiEnumTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(clrName, nameof(clrName));
 
-        if (_state.Values.Any(builder => builder.ClrName == clrName))
+        if (_state.Values.Any(builder => ClrNameComparer.Instance.Equals(builder.ClrName, clrName)))
         {
             return null;
         }

@@ -3,6 +3,8 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Exceptions;
+
 using Microsoft.Extensions.Logging;
 
 namespace Evoogle.ApiFramework.Schema.Compilation.Internal;
@@ -82,12 +84,12 @@ internal sealed class ApiSchemaCompilationSession
 
         if (!ReferenceEquals(apiSchemaElement.Root, this.ApiSchema))
         {
-            throw new InvalidOperationException("A schema element can only be compiled by the session for its ownership tree.");
+            throw new ApiSchemaException("A schema element can only be compiled by the session for its ownership tree.");
         }
 
         var defaultApiBasePath = ReferenceEquals(apiSchemaElement, this.ApiSchema)
             ? null
-            : apiSchemaElement.Parent?.ApiPath ?? throw new InvalidOperationException("A non-root schema element must have a compiled structural parent.");
+            : apiSchemaElement.Parent?.ApiPath ?? throw new ApiSchemaException("A non-root schema element must have a compiled structural parent.");
         var apiPath = location.BuildPath(apiSchemaElement, defaultApiBasePath);
 
         return new ApiSchemaCompilationContext

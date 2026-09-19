@@ -4,9 +4,6 @@
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
 using System.Linq.Dynamic.Core.CustomTypeProviders;
-
-using Evoogle.ApiFramework.Schema.Key;
-using Evoogle.ApiFramework.Schema.Types;
 using Evoogle.ApiFramework.TestData;
 
 namespace Evoogle.ApiFramework.Schema.Configuration.Relationships;
@@ -84,7 +81,7 @@ public static class ApiRelationshipBuilderGenericTestFactory
             new ApiRelationshipDependentEnd
             (
                 new ApiTypeReference(ApiTypeKind.Object, nameof(Order)),
-                new ApiKeyDefinition
+                apiForeignKey: new ApiKeyDefinition
                 (
                     [new ApiKeyPath(null, [new ApiKeyPathSegment(nameof(Order.Id))])]
                 )

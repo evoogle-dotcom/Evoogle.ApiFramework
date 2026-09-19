@@ -28,6 +28,8 @@ public class ApiRelationshipDependentEndBuilder(ApiTypeReference apiObjectTypeRe
     private readonly ApiTypeReference _apiObjectTypeReference = apiObjectTypeReference ??
         throw new ArgumentNullException(nameof(apiObjectTypeReference));
     private readonly ApiRelationshipDependentEndState _state = new();
+    private ApiRelationshipTraversal? _traversal;
+    private ApiConfigurationSource? _traversalSource;
     #endregion
 
     #region Properties
@@ -62,6 +64,30 @@ public class ApiRelationshipDependentEndBuilder(ApiTypeReference apiObjectTypeRe
     public ApiRelationshipDependentEndBuilder AddRelationshipDependentEndExtension(Type extensionType, object extension)
     {
         return this.AddExtension(extensionType, extension);
+    }
+    #endregion
+
+    #region WithTraversal Methods
+    /// <summary>Sets the optional traversal from this end to the opposite relationship end.</summary>
+    /// <param name="apiName">The API name exposed on the source object type.</param>
+    /// <param name="clrMemberName">An optional CLR navigation member name.</param>
+    /// <param name="clrMemberKind">The kind of CLR navigation member.</param>
+    /// <returns>The current builder instance.</returns>
+    public ApiRelationshipDependentEndBuilder WithTraversal
+    (
+        string apiName,
+        string? clrMemberName = null,
+        ClrMemberKind clrMemberKind = ClrMemberKind.Property
+    )
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(apiName);
+        var source = this.CurrentConfigurationSource;
+        if (_traversalSource is null || source >= _traversalSource.Value)
+        {
+            _traversal = new ApiRelationshipTraversal(apiName, clrMemberName, clrMemberKind);
+            _traversalSource = source;
+        }
+        return this;
     }
     #endregion
 
@@ -122,6 +148,13 @@ public class ApiRelationshipDependentEndBuilder(ApiTypeReference apiObjectTypeRe
     {
         ArgumentNullException.ThrowIfNull(builder);
 
+        if (builder._traversal is not null && builder._traversalSource is not null &&
+            (_traversalSource is null || builder._traversalSource.Value >= _traversalSource.Value))
+        {
+            _traversal = builder._traversal;
+            _traversalSource = builder._traversalSource;
+        }
+
         if
         (
             builder._state.ForeignKeyBuilder != null &&
@@ -154,9 +187,12 @@ public class ApiRelationshipDependentEndBuilder(ApiTypeReference apiObjectTypeRe
     {
         var apiForeignKey = _state.ForeignKeyBuilder?.Build();
 
-        var end = apiForeignKey != null
-            ? new ApiRelationshipDependentEnd(_apiObjectTypeReference, apiForeignKey)
-            : new ApiRelationshipDependentEnd(_apiObjectTypeReference);
+        var end = new ApiRelationshipDependentEnd
+        (
+            _apiObjectTypeReference,
+            _traversal,
+            apiForeignKey
+        );
 
         var extensions = this.BuildExtensions();
         if (extensions != null)

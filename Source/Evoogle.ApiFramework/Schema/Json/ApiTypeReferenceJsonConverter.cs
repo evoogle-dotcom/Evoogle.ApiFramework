@@ -86,9 +86,9 @@ public sealed class ApiTypeReferenceJsonConverter(ILogger<ApiTypeReferenceJsonCo
     private class ReadHandlers(PropertyNames propertyNames)
     {
         #region ApiTypeReference Fields
-        public readonly Dictionary<string, JsonReaderHandler<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>>> PropertyHandlers = new()
+        public readonly JsonReaderHandlerTable<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>> PropertyHandlers = new()
         {
-            { propertyNames.ApiTypeReference.ApiKind, HandleApiTypeReferenceApiKind },
+            { propertyNames.ApiTypeReference.ApiKind, HandleApiTypeReferenceApiKind, true },
             { propertyNames.ApiTypeReference.ApiName, HandleApiTypeReferenceApiName },
             { propertyNames.ApiTypeReference.ClrType, HandleApiTypeReferenceClrType },
         };
@@ -183,51 +183,33 @@ public sealed class ApiTypeReferenceJsonConverter(ILogger<ApiTypeReferenceJsonCo
         (
             ref reader,
             readContext,
-            handlers,
-            readContext.PropertyNames.ApiTypeReference.ApiKind
+            handlers
         );
     }
 
     /// <inheritdoc/>
-    protected override void WriteCore(Utf8JsonWriter writer, ApiTypeReference value, IWriteContext context)
+    protected override void WriteCore(Utf8JsonWriter writer, ApiTypeReference apiTypeReference, IWriteContext context)
     {
         var writeContext = (DefaultWriteContext<PropertyNames>)context;
 
-        WriteJsonObject(writer, () =>
+        writer.WriteJsonObject(state: (apiTypeReference, writeContext), writeObject: static (writer, state) =>
         {
-            WriteApiTypeReferenceApiKind(writer, value, writeContext);
-            WriteApiTypeReferenceApiName(writer, value, writeContext);
-            WriteApiTypeReferenceClrType(writer, value, writeContext);
+            var (apiTypeReference, writeContext) = state;
+            WriteApiTypeReferenceApiKind(writer, apiTypeReference, writeContext);
+            WriteApiTypeReferenceApiName(writer, apiTypeReference, writeContext);
+            WriteApiTypeReferenceClrType(writer, apiTypeReference, writeContext);
         });
     }
     #endregion
 
     #region Write Implementation Methods
-    private static void WriteApiTypeReferenceApiKind(Utf8JsonWriter writer, ApiTypeReference apiTypeReference, DefaultWriteContext<PropertyNames> context)
-    {
-        var propertyName = context.PropertyNames.ApiTypeReference.ApiKind;
-        var kind = apiTypeReference.ApiKind;
-        var options = context.Options;
+    private static void WriteApiTypeReferenceApiKind(Utf8JsonWriter writer, ApiTypeReference apiTypeReference, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyWithConverter(propertyName: writeContext.PropertyNames.ApiTypeReference.ApiKind, value: apiTypeReference.ApiKind, options: writeContext.Options, converter: _apiTypeKindJsonConverter);
 
-        writer.TryWritePropertyWithConverter(propertyName, kind, options, _apiTypeKindJsonConverter);
-    }
+    private static void WriteApiTypeReferenceApiName(Utf8JsonWriter writer, ApiTypeReference apiTypeReference, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyAsString(propertyName: writeContext.PropertyNames.ApiTypeReference.ApiName, value: apiTypeReference.ApiName, options: writeContext.Options);
 
-    private static void WriteApiTypeReferenceApiName(Utf8JsonWriter writer, ApiTypeReference apiTypeReference, DefaultWriteContext<PropertyNames> context)
-    {
-        var propertyName = context.PropertyNames.ApiTypeReference.ApiName;
-        var value = apiTypeReference.ApiName;
-        var options = context.Options;
-
-        writer.TryWritePropertyAsString(propertyName, value, options);
-    }
-
-    private static void WriteApiTypeReferenceClrType(Utf8JsonWriter writer, ApiTypeReference apiTypeReference, DefaultWriteContext<PropertyNames> context)
-    {
-        var propertyName = context.PropertyNames.ApiTypeReference.ClrType;
-        var clrType = apiTypeReference.ClrType;
-        var options = context.Options;
-
-        writer.TryWritePropertyWithConverter(propertyName, clrType, options, _typeJsonConverter);
-    }
+    private static void WriteApiTypeReferenceClrType(Utf8JsonWriter writer, ApiTypeReference apiTypeReference, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyWithConverter(propertyName: writeContext.PropertyNames.ApiTypeReference.ClrType, type: apiTypeReference.ClrType, options: writeContext.Options, converter: _typeJsonConverter);
     #endregion
 }

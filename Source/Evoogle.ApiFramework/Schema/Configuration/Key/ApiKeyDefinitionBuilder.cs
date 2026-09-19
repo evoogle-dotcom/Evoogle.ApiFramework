@@ -3,6 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Internal;
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
 using Evoogle.ApiFramework.Schema.Configuration.Key.Internal;
 using Evoogle.ApiFramework.Schema.Configuration.Types;
@@ -199,7 +200,8 @@ public class ApiKeyDefinitionBuilder(string? apiName = null) : ExtensionBuilder<
 
         return _state.KeyPathBuilders.Any(p =>
             p.ApiRootObjectTypeReference == apiRootObjectTypeReference &&
-            p.SegmentBuilders.Select(s => s.ClrMemberName).SequenceEqual(names));
+            p.SegmentBuilders.Select(s => s.ClrMemberName)
+                .SequenceEqual(names, ClrNameComparer.Instance));
     }
 
     /// <summary>

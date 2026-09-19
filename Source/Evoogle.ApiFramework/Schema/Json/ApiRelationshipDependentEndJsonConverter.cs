@@ -30,6 +30,7 @@ public class ApiRelationshipDependentEndJsonConverter(ILogger<ApiRelationshipDep
     private readonly record struct ApiRelationshipDependentEndPropertyNames
     {
         public required string ApiForeignKey { get; init; }
+        public required string ApiTraversal { get; init; }
     }
 
     private readonly record struct PropertyNames
@@ -48,6 +49,10 @@ public class ApiRelationshipDependentEndJsonConverter(ILogger<ApiRelationshipDep
                 ApiRelationshipDependentEnd = new ApiRelationshipDependentEndPropertyNames
                 {
                     ApiForeignKey = policy.ConvertName(nameof(Relationships.ApiRelationshipDependentEnd.ApiForeignKey)),
+                    ApiTraversal = policy.ConvertName
+                    (
+                        nameof(Relationships.ApiRelationshipEnd.ApiTraversal)
+                    ),
                 },
                 ExtensibleBase = GetExtensiblePropertyNames(policy),
             };
@@ -63,6 +68,7 @@ public class ApiRelationshipDependentEndJsonConverter(ILogger<ApiRelationshipDep
     private class ApiRelationshipDependentEndReadData
     {
         public ApiKeyDefinition? ApiForeignKey { get; set; }
+        public ApiRelationshipTraversal? ApiTraversal { get; set; }
     }
 
     private class ReadState : ExtensibleReadData
@@ -73,10 +79,11 @@ public class ApiRelationshipDependentEndJsonConverter(ILogger<ApiRelationshipDep
 
     private class ReadHandlers(PropertyNames propertyNames)
     {
-        public readonly Dictionary<string, JsonReaderHandler<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>>> PropertyHandlers = new()
+        public readonly JsonReaderHandlerTable<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>> PropertyHandlers = new()
         {
             { propertyNames.ApiRelationshipElement.ApiObjectTypeReference, HandleApiObjectTypeReference },
             { propertyNames.ApiRelationshipDependentEnd.ApiForeignKey, HandleApiForeignKey },
+            { propertyNames.ApiRelationshipDependentEnd.ApiTraversal, HandleApiTraversal },
             { propertyNames.ExtensibleBase.Extensions, CreateExtensionsHandler<PropertyNames, ReadState, ReadHandlers>() },
         };
 
@@ -91,6 +98,18 @@ public class ApiRelationshipDependentEndJsonConverter(ILogger<ApiRelationshipDep
         {
             context.ReadData.ApiRelationshipDependentEnd ??= new ApiRelationshipDependentEndReadData();
             context.ReadData.ApiRelationshipDependentEnd.ApiForeignKey = JsonSerializer.Deserialize<ApiKeyDefinition>(ref reader, context.Options);
+        }
+
+        private static void HandleApiTraversal
+        (
+            ref Utf8JsonReader reader,
+            DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context
+        )
+        {
+            context.ReadData.ApiRelationshipDependentEnd ??=
+                new ApiRelationshipDependentEndReadData();
+            context.ReadData.ApiRelationshipDependentEnd.ApiTraversal =
+                JsonSerializer.Deserialize<ApiRelationshipTraversal>(ref reader, context.Options);
         }
     }
     #endregion
@@ -126,9 +145,11 @@ public class ApiRelationshipDependentEndJsonConverter(ILogger<ApiRelationshipDep
         var apiObjectTypeReference = readContext.ReadData.ApiRelationshipElement?.ApiObjectTypeReference;
         var apiForeignKey = readContext.ReadData.ApiRelationshipDependentEnd?.ApiForeignKey;
 
-        var end = apiForeignKey != null
-            ? new ApiRelationshipDependentEnd(apiObjectTypeReference!, apiForeignKey)
-            : new ApiRelationshipDependentEnd(apiObjectTypeReference!);
+        var apiTraversal = readContext.ReadData.ApiRelationshipDependentEnd?.ApiTraversal;
+        var end = new ApiRelationshipDependentEnd
+        (
+            apiObjectTypeReference!, apiTraversal, apiForeignKey
+        );
 
         AttachExtensions(end, readContext.ReadData.Extensions);
         return end;
@@ -142,35 +163,51 @@ public class ApiRelationshipDependentEndJsonConverter(ILogger<ApiRelationshipDep
     }
 
     /// <inheritdoc/>
-    protected override void WriteCore(Utf8JsonWriter writer, ApiRelationshipDependentEnd value, IWriteContext context)
+    protected override void WriteCore(Utf8JsonWriter writer, ApiRelationshipDependentEnd apiRelationshipDependentEnd, IWriteContext context)
     {
         var writeContext = (DefaultWriteContext<PropertyNames>)context;
 
-        WriteJsonObject(writer, () =>
+        writer.WriteJsonObject(state: (apiRelationshipDependentEnd, writeContext), writeObject: static (writer, state) =>
         {
-            WriteApiObjectTypeReference(writer, value, writeContext);
-            WriteApiForeignKey(writer, value, writeContext);
+            var (apiRelationshipDependentEnd, writeContext) = state;
+            WriteApiObjectTypeReference(writer, apiRelationshipDependentEnd, writeContext);
+            WriteApiForeignKey(writer, apiRelationshipDependentEnd, writeContext);
+            WriteApiTraversal(writer, apiRelationshipDependentEnd, writeContext);
 
-            WriteExtensibleBaseExtensions(writer, writeContext.PropertyNames.ExtensibleBase.Extensions, value, writeContext);
+            WriteExtensibleBaseExtensions
+            (
+                writer,
+                propertyName: writeContext.PropertyNames.ExtensibleBase.Extensions,
+                extensibleBase: apiRelationshipDependentEnd,
+                context: writeContext
+            );
         });
     }
     #endregion
 
     #region Write Implementation Methods
-    private static void WriteApiObjectTypeReference(Utf8JsonWriter writer, ApiRelationshipDependentEnd end, DefaultWriteContext<PropertyNames> context)
+    private static void WriteApiObjectTypeReference(Utf8JsonWriter writer, ApiRelationshipDependentEnd end, DefaultWriteContext<PropertyNames> writeContext)
         => writer.TryWritePropertyWithSerializer
         (
-            context.PropertyNames.ApiRelationshipElement.ApiObjectTypeReference,
-            end.ApiObjectTypeReference,
-            context.Options
+            propertyName: writeContext.PropertyNames.ApiRelationshipElement.ApiObjectTypeReference,
+            obj: end.ApiObjectTypeReference,
+            options: writeContext.Options
         );
 
-    private static void WriteApiForeignKey(Utf8JsonWriter writer, ApiRelationshipDependentEnd end, DefaultWriteContext<PropertyNames> context)
-    {
-        var propertyName = context.PropertyNames.ApiRelationshipDependentEnd.ApiForeignKey;
-        var value = end.HasForeignKey ? end.ApiForeignKey : null;
+    private static void WriteApiForeignKey(Utf8JsonWriter writer, ApiRelationshipDependentEnd end, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyWithSerializer
+        (
+            propertyName: writeContext.PropertyNames.ApiRelationshipDependentEnd.ApiForeignKey,
+            obj: end.HasForeignKey ? end.ApiForeignKey : null,
+            options: writeContext.Options
+        );
 
-        writer.TryWritePropertyWithSerializer(propertyName, value, context.Options);
-    }
+    private static void WriteApiTraversal(Utf8JsonWriter writer, ApiRelationshipDependentEnd end, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyWithSerializer
+        (
+            propertyName: writeContext.PropertyNames.ApiRelationshipDependentEnd.ApiTraversal,
+            obj: end.ApiTraversal,
+            options: writeContext.Options
+        );
     #endregion
 }

@@ -32,7 +32,7 @@ public class ApiPropertyBuilder : ExtensionBuilder<ApiPropertyBuilder>
     /// <param name="apiName">The API name of the property.</param>
     /// <param name="clrName">The CLR property or field name.</param>
     public ApiPropertyBuilder(string apiName, string clrName)
-        : this(apiName, clrName, ApiConfigurationSource.Explicit)
+        : this(apiName, clrName, ApiConfigurationSource.Explicit, false)
     {
     }
 
@@ -40,11 +40,13 @@ public class ApiPropertyBuilder : ExtensionBuilder<ApiPropertyBuilder>
     (
         string apiName,
         string clrName,
-        ApiConfigurationSource apiNameSource
+        ApiConfigurationSource apiNameSource,
+        bool isConventionDiscovered
     )
     {
         _state = new ApiPropertyState(ValidateName(apiName, nameof(apiName)), apiNameSource);
         _clrName = ValidateName(clrName, nameof(clrName));
+        this.IsConventionDiscovered = isConventionDiscovered;
     }
     #endregion
 
@@ -58,6 +60,14 @@ public class ApiPropertyBuilder : ExtensionBuilder<ApiPropertyBuilder>
     ///     Gets the CLR property or field name this builder represents.
     /// </summary>
     internal string ClrName => _clrName;
+
+    internal bool IsConventionDiscovered { get; }
+
+    internal bool IsConventionOnly => this.IsConventionDiscovered &&
+        _state.ApiNameSource == ApiConfigurationSource.Convention &&
+        (_state.ModifiersSource is null ||
+            _state.ModifiersSource == ApiConfigurationSource.Convention) &&
+        this.BuildExtensions() is null;
     #endregion
 
     #region AddExtension Methods

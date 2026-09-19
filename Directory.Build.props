@@ -7,9 +7,7 @@
       Condition="Exists('$(MSBuildThisFileDirectory)Directory.Build.local.props')" />
 
   <PropertyGroup>
-    <UseLocalEvoogleProjectReferences Condition="'$(UseLocalEvoogleProjectReferences)' == ''">
-      false
-    </UseLocalEvoogleProjectReferences>
+    <UseLocalEvoogleProjectReferences Condition="'$(UseLocalEvoogleProjectReferences)' == ''">false</UseLocalEvoogleProjectReferences>
   </PropertyGroup>
 
   <PropertyGroup>

@@ -3,6 +3,8 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Exceptions;
+
 namespace Evoogle.ApiFramework.Schema.Compilation.Internal;
 
 /// <summary>
@@ -19,7 +21,7 @@ internal static class ApiSchemaTreeBuilder
 
         if (!ReferenceEquals(apiSchema, session.ApiSchema))
         {
-            throw new InvalidOperationException("A schema topology must be built by that schema's compilation session.");
+            throw new ApiSchemaException("A schema topology must be built by that schema's compilation session.");
         }
 
         return TryBuild((ApiSchemaElement)apiSchema, session);

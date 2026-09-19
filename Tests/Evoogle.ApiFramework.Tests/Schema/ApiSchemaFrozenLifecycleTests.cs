@@ -343,7 +343,7 @@ public class ApiSchemaFrozenLifecycleTests(ITestOutputHelper output) : XUnitTest
 
         protected override void Assert()
         {
-            this.LookupFields.Should().HaveCount(15);
+            this.LookupFields.Should().HaveCount(16);
             this.LookupFields.Should().OnlyContain
             (
                 field => field.FieldType.IsGenericType &&

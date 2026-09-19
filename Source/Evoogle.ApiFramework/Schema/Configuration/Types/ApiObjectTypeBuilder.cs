@@ -3,6 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Internal;
 using Evoogle.ApiFramework.Schema.Configuration.Annotations;
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
 using Evoogle.ApiFramework.Schema.Configuration.Key;
@@ -230,7 +231,8 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
         ApiConfigurationSource registrationSource
     )
     {
-        var existing = _state.KeyBuilders.FirstOrDefault(builder => builder.ApiName == apiName);
+        var existing = _state.KeyBuilders.FirstOrDefault(builder =>
+            ApiNameComparer.Instance.Equals(builder.ApiName, apiName));
         if (existing != null)
         {
             return existing;
@@ -251,7 +253,7 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     {
         return _state.KeyBuilders.Any
         (
-            builder => builder.ApiName == apiKeyName &&
+            builder => ApiNameComparer.Instance.Equals(builder.ApiName, apiKeyName) &&
                 builder.RegistrationSource == ApiConfigurationSource.Explicit
         );
     }
@@ -341,7 +343,8 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
         ArgumentNullException.ThrowIfNull(clrMemberNames);
 
         var names = clrMemberNames as IReadOnlyList<string> ?? [.. clrMemberNames];
-        var existing = _state.KeyBuilders.FirstOrDefault(b => b.ApiName == apiKeyName);
+        var existing = _state.KeyBuilders.FirstOrDefault(b =>
+            ApiNameComparer.Instance.Equals(b.ApiName, apiKeyName));
         if (existing != null)
         {
             // Guard against convention + annotation both adding the same path.
@@ -376,6 +379,15 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
 
     /// <summary>Gets all <see cref="ApiPropertyBuilder"/> instances currently on this object type builder.</summary>
     internal IEnumerable<ApiPropertyBuilder> ApiPropertyBuilders => _state.PropertyBuilders;
+
+    internal string ConfiguredApiName => this.ApiName;
+
+    internal void RemoveConventionPropertyByClrName(string clrMemberName)
+    {
+        _state.PropertyBuilders.RemoveAll(builder =>
+            ClrNameComparer.Instance.Equals(builder.ClrName, clrMemberName) &&
+            builder.IsConventionOnly);
+    }
 
     /// <summary>
     ///     Explicitly adds the CLR member while compiling its API name from the CLR name at
@@ -418,7 +430,7 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(clrName, nameof(clrName));
 
-        if (_state.PropertyBuilders.Any(b => b.ClrName == clrName))
+        if (_state.PropertyBuilders.Any(b => ClrNameComparer.Instance.Equals(b.ClrName, clrName)))
         {
             return null;
         }
@@ -428,7 +440,8 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
             clrName,
             clrName,
             ApiConfigurationSource.Convention,
-            configure: null
+            configure: null,
+            isConventionDiscovered: true
         );
     }
 
@@ -437,7 +450,8 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
         string apiName,
         string clrName,
         ApiConfigurationSource apiNameSource,
-        Action<ApiPropertyBuilder>? configure
+        Action<ApiPropertyBuilder>? configure,
+        bool isConventionDiscovered = false
     )
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiName, nameof(apiName));
@@ -447,7 +461,8 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
         (
             apiName,
             clrName,
-            apiNameSource
+            apiNameSource,
+            isConventionDiscovered
         );
         configure?.Invoke(builder);
         _state.PropertyBuilders.Add(builder);
@@ -467,7 +482,7 @@ public class ApiObjectTypeBuilder(Type clrType, ApiSchemaBuilderContext context)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(apiKeyName, nameof(apiKeyName));
 
-        if (_state.KeyBuilders.Any(b => b.ApiName == apiKeyName))
+        if (_state.KeyBuilders.Any(b => ApiNameComparer.Instance.Equals(b.ApiName, apiKeyName)))
         {
             return false;
         }

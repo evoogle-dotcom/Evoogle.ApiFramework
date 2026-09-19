@@ -5,6 +5,7 @@
 // See the LICENSE file in the project root for more information.
 using System.Reflection;
 
+using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Schema.Compilation;
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
 using Evoogle.ApiFramework.Schema.Configuration.Relationships;
@@ -110,7 +111,7 @@ internal sealed class ApiSchemaAssemblyConfigurationDiscoveryConvention : IApiSc
         try
         {
             configuration = Activator.CreateInstance(configurationType)
-                ?? throw new InvalidOperationException
+                ?? throw new ApiSchemaConfigurationException
                 (
                     $"Activator.CreateInstance returned null for configuration type '{configurationTypeName}'."
                 );

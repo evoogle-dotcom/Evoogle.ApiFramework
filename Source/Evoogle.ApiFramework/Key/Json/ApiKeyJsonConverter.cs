@@ -107,7 +107,7 @@ public sealed class ApiKeyJsonConverter(ILogger<ApiKeyJsonConverter>? logger) : 
     private class ReadHandlers(PropertyNames propertyNames)
     {
         #region ApiKey Fields
-        public readonly Dictionary<string, JsonReaderHandler<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>>> ApiKeyPropertyHandlers = new()
+        public readonly JsonReaderHandlerTable<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>> ApiKeyPropertyHandlers = new()
         {
             // ApiKey Property Handlers
             { propertyNames.ApiKey.ApiKind, HandleApiKeyApiKind },
@@ -117,7 +117,7 @@ public sealed class ApiKeyJsonConverter(ILogger<ApiKeyJsonConverter>? logger) : 
         #endregion
 
         #region ApiKeyPart Fields
-        public readonly Dictionary<string, JsonReaderHandler<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>>> ApiKeyPartPropertyHandlers = new()
+        public readonly JsonReaderHandlerTable<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>> ApiKeyPartPropertyHandlers = new()
         {
             // ApiKeyPart Property Handlers
             { propertyNames.ApiKeyPart.ApiName, HandleApiKeyPartApiName },
@@ -140,9 +140,7 @@ public sealed class ApiKeyJsonConverter(ILogger<ApiKeyJsonConverter>? logger) : 
             context.ReadData.ApiKey ??= new ApiKeyReadData();
             context.ReadData.ApiKey.ApiParts ??= [];
 
-            // The context argument is intentionally discarded:
-            // The same fixed handler is used for every element regardless of context; the handler itself receives the context at invocation time.
-            ReadJsonArray(ref reader, context, static _ => HandleApiKeyApiPartsArrayItem);
+            ReadJsonArray(ref reader, context, HandleApiKeyApiPartsArrayItem);
         }
 
         private static void HandleApiKeyApiPartsArrayItem(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
@@ -296,8 +294,11 @@ public sealed class ApiKeyJsonConverter(ILogger<ApiKeyJsonConverter>? logger) : 
         }
 
         var writeContext = (DefaultWriteContext<PropertyNames>)context;
-        WriteJsonObject(writer, () =>
+
+        writer.WriteJsonObject((apiKey, writeContext), static (writer, state) =>
         {
+            var (apiKey, writeContext) = state;
+
             WriteApiKeyApiKind(writer, apiKey, writeContext);
 
             if (apiKey.IsComposite)
@@ -443,77 +444,43 @@ public sealed class ApiKeyJsonConverter(ILogger<ApiKeyJsonConverter>? logger) : 
     #endregion
 
     #region Write Implementation Methods
-    private static void WriteApiKeyApiKind(Utf8JsonWriter writer, ApiKey apiKey, DefaultWriteContext<PropertyNames> context)
+    private static void WriteApiKeyApiKind(Utf8JsonWriter writer, ApiKey apiKey, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyWithConverter(propertyName: writeContext.PropertyNames.ApiKey.ApiKind, value: apiKey.ApiKind, options: writeContext.Options, converter: _apiKeyKindJsonConverter);
+
+    private static void WriteApiKeyApiParts(Utf8JsonWriter writer, ApiKey apiKey, DefaultWriteContext<PropertyNames> writeContext)
     {
-        var propertyName = context.PropertyNames.ApiKey.ApiKind;
-        var value = apiKey.ApiKind;
-        var options = context.Options;
-
-        writer.TryWritePropertyWithConverter(propertyName, value, options, _apiKeyKindJsonConverter);
-    }
-
-    private static void WriteApiKeyApiParts(Utf8JsonWriter writer, ApiKey apiKey, DefaultWriteContext<PropertyNames> context)
-    {
-        var propertyName = context.PropertyNames.ApiKey.ApiParts;
-        var apiParts = apiKey.PartsAsSpan;
-        var options = context.Options;
-
-        writer.TryWritePropertyWithAction
+        writer.TryWritePropertyAsArray
         (
-            propertyName,
-            apiParts,
-            options,
-            collection => WriteJsonArray
-            (
-                writer,
-                collection,
-                item =>
+            propertyName: writeContext.PropertyNames.ApiKey.ApiParts,
+            span: apiKey.PartsAsSpan,
+            state: writeContext,
+            writeItem: static (writer, item, state) =>
+            {
+                var writeContext = state;
+
+                writer.WriteJsonObject((item, writeContext), static (writer, state) =>
                 {
-                    WriteJsonObject(writer, () =>
-                    {
-                        WriteApiKeyPartApiName(writer, item, context);
-                        WriteApiKeyPartApiKind(writer, item, context);
-                        WriteApiKeyPartClrValue(writer, item, context);
-                    });
-                }
-            )
+                    var (item, writeContext) = state;
+
+                    WriteApiKeyPartApiName(writer, item, writeContext);
+                    WriteApiKeyPartApiKind(writer, item, writeContext);
+                    WriteApiKeyPartClrValue(writer, item, writeContext);
+                });
+            }
         );
     }
 
-    private static void WriteApiKeyClrValue(Utf8JsonWriter writer, ApiKey apiKey, DefaultWriteContext<PropertyNames> context)
-    {
-        var propertyName = context.PropertyNames.ApiKey.ClrValue;
-        var options = context.Options;
+    private static void WriteApiKeyClrValue(Utf8JsonWriter writer, ApiKey apiKey, DefaultWriteContext<PropertyNames> writeContext)
+        => WriteClrValueCore(writer: writer, propertyName: writeContext.PropertyNames.ApiKey.ClrValue, apiKey: apiKey, options: writeContext.Options);
 
-        WriteClrValueCore(writer, propertyName, apiKey, options);
-    }
+    private static void WriteApiKeyPartApiKind(Utf8JsonWriter writer, ApiKeyPart apiKeyPart, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyWithConverter(propertyName: writeContext.PropertyNames.ApiKeyPart.ApiKind, value: apiKeyPart.ApiValue.ApiKind, options: writeContext.Options, converter: _apiKeyKindJsonConverter);
 
-    private static void WriteApiKeyPartApiKind(Utf8JsonWriter writer, ApiKeyPart apiKeyPart, DefaultWriteContext<PropertyNames> context)
-    {
-        var propertyName = context.PropertyNames.ApiKeyPart.ApiKind;
-        var value = apiKeyPart.ApiValue.ApiKind;
-        var options = context.Options;
+    private static void WriteApiKeyPartApiName(Utf8JsonWriter writer, ApiKeyPart apiKeyPart, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyAsString(propertyName: writeContext.PropertyNames.ApiKeyPart.ApiName, value: apiKeyPart.ApiName, options: writeContext.Options);
 
-        writer.TryWritePropertyWithConverter(propertyName, value, options, _apiKeyKindJsonConverter);
-    }
-
-    private static void WriteApiKeyPartApiName(Utf8JsonWriter writer, ApiKeyPart apiKeyPart, DefaultWriteContext<PropertyNames> context)
-    {
-        var propertyName = context.PropertyNames.ApiKeyPart.ApiName;
-        var value = apiKeyPart.ApiName;
-        var options = context.Options;
-
-        writer.TryWritePropertyAsString(propertyName, value, options);
-    }
-
-    private static void WriteApiKeyPartClrValue(Utf8JsonWriter writer, ApiKeyPart apiKeyPart, DefaultWriteContext<PropertyNames> context)
-    {
-        var propertyName = context.PropertyNames.ApiKeyPart.ClrValue;
-        var options = context.Options;
-        var apiKey = apiKeyPart.ApiValue;
-
-        WriteClrValueCore(writer, propertyName, apiKey, options);
-    }
+    private static void WriteApiKeyPartClrValue(Utf8JsonWriter writer, ApiKeyPart apiKeyPart, DefaultWriteContext<PropertyNames> writeContext)
+        => WriteClrValueCore(writer: writer, propertyName: writeContext.PropertyNames.ApiKeyPart.ClrValue, apiKey: apiKeyPart.ApiValue, options: writeContext.Options);
 
     private static void WriteClrValueCore(Utf8JsonWriter writer, string propertyName, ApiKey apiKey, JsonSerializerOptions options)
     {

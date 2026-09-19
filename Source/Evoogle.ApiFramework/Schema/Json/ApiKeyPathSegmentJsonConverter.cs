@@ -65,7 +65,7 @@ public class ApiKeyPathSegmentJsonConverter(ILogger<ApiKeyPathSegmentJsonConvert
     private class ReadHandlers(PropertyNames propertyNames)
     {
         #region ApiKeyPathSegment Fields
-        public readonly Dictionary<string, JsonReaderHandler<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>>> PropertyHandlers = new()
+        public readonly JsonReaderHandlerTable<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>> PropertyHandlers = new()
         {
             // ApiKeyPathSegment Property Handlers
             { propertyNames.ApiKeyPathSegment.ClrMemberName, HandleApiKeyPathSegmentClrMemberName },
@@ -140,27 +140,28 @@ public class ApiKeyPathSegmentJsonConverter(ILogger<ApiKeyPathSegmentJsonConvert
     }
 
     /// <inheritdoc/>
-    protected override void WriteCore(Utf8JsonWriter writer, ApiKeyPathSegment value, IWriteContext context)
+    protected override void WriteCore(Utf8JsonWriter writer, ApiKeyPathSegment apiKeyPathSegment, IWriteContext context)
     {
         var writeContext = (DefaultWriteContext<PropertyNames>)context;
 
-        WriteJsonObject(writer, () =>
+        writer.WriteJsonObject(state: (apiKeyPathSegment, writeContext), writeObject: static (writer, state) =>
         {
-            WriteApiKeyPathSegmentClrMemberName(writer, value, writeContext);
+            var (apiKeyPathSegment, writeContext) = state;
+            WriteApiKeyPathSegmentClrMemberName(writer, apiKeyPathSegment, writeContext);
 
-            WriteExtensibleBaseExtensions(writer, writeContext.PropertyNames.ExtensibleBase.Extensions, value, writeContext);
+            WriteExtensibleBaseExtensions
+            (
+                writer,
+                propertyName: writeContext.PropertyNames.ExtensibleBase.Extensions,
+                extensibleBase: apiKeyPathSegment,
+                context: writeContext
+            );
         });
     }
     #endregion
 
     #region Write Implementation Methods
-    private static void WriteApiKeyPathSegmentClrMemberName(Utf8JsonWriter writer, ApiKeyPathSegment apiKeyPathSegment, DefaultWriteContext<PropertyNames> context)
-    {
-        var propertyName = context.PropertyNames.ApiKeyPathSegment.ClrMemberName;
-        var value = apiKeyPathSegment.ClrMemberName;
-        var options = context.Options;
-
-        writer.TryWritePropertyAsString(propertyName, value, options);
-    }
+    private static void WriteApiKeyPathSegmentClrMemberName(Utf8JsonWriter writer, ApiKeyPathSegment apiKeyPathSegment, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyAsString(propertyName: writeContext.PropertyNames.ApiKeyPathSegment.ClrMemberName, value: apiKeyPathSegment.ClrMemberName, options: writeContext.Options);
     #endregion
 }

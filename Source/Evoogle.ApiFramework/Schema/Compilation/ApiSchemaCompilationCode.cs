@@ -630,4 +630,24 @@ public enum ApiSchemaCompilationCode
     [EnumMember(Value = "API_ANNOTATION_VERSION_CONFLICT")]
     ApiAnnotationVersionConflict,
     #endregion
+
+    #region ApiRelationshipTraversal Compilation Codes
+    /// <summary>A relationship traversal has an invalid API name.</summary>
+    [EnumMember(Value = "API_RELATIONSHIP_TRAVERSAL_INVALID_API_NAME")]
+    ApiRelationshipTraversalInvalidApiName,
+
+    /// <summary>A relationship traversal has an invalid CLR navigation member binding.</summary>
+    [EnumMember(Value = "API_RELATIONSHIP_TRAVERSAL_INVALID_CLR_MEMBER")]
+    ApiRelationshipTraversalInvalidClrMember,
+
+    /// <summary>
+    ///     A relationship traversal conflicts with another API field on its source type.
+    /// </summary>
+    [EnumMember(Value = "API_RELATIONSHIP_TRAVERSAL_DUPLICATE_API_NAME")]
+    ApiRelationshipTraversalDuplicateApiName,
+
+    /// <summary>A CLR member is bound to both a contained property and a traversal.</summary>
+    [EnumMember(Value = "API_RELATIONSHIP_TRAVERSAL_CLR_MEMBER_CONFLICT")]
+    ApiRelationshipTraversalClrMemberConflict,
+    #endregion
 }

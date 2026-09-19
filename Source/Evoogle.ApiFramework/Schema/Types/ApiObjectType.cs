@@ -7,6 +7,7 @@ using System.Collections.Frozen;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 
+using Evoogle.ApiFramework.Internal;
 using Evoogle.ApiFramework.Schema.Compilation;
 using Evoogle.ApiFramework.Schema.Compilation.Internal;
 using Evoogle.ApiFramework.Schema.Key;
@@ -50,6 +51,9 @@ public sealed partial class ApiObjectType
     private ImmutableArray<ApiRelationshipPrincipalEnd> _apiPrincipalRelationshipEnds = [];
     private ImmutableArray<ApiRelationshipDependentEnd> _apiDependentRelationshipEnds = [];
     private ImmutableArray<ApiRelationshipAssociation> _apiRelationshipAssociations = [];
+
+    private ImmutableArray<ApiRelationshipTraversal> _apiRelationshipTraversals = [];
+    private FrozenDictionary<string, ApiRelationshipTraversal>? _apiRelationshipTraversalApiNameLookup = null;
     #endregion
 
     #region ApiSchemaElement Properties
@@ -108,10 +112,15 @@ public sealed partial class ApiObjectType
     public ImmutableArray<ApiRelationshipAssociation> ApiRelationshipAssociations =>
         _apiRelationshipAssociations;
 
-    private FrozenDictionary<string, ApiNamedKeyDefinition> ApiKeyApiNameLookup =>
-        this.RequireValue(_apiKeyApiNameLookup);
+    /// <summary>Gets the relationship traversals exposed from this object type.</summary>
+    public ImmutableArray<ApiRelationshipTraversal> ApiRelationshipTraversals => _apiRelationshipTraversals;
+
+    private FrozenDictionary<string, ApiNamedKeyDefinition> ApiKeyApiNameLookup => this.RequireValue(_apiKeyApiNameLookup);
+
     private FrozenDictionary<string, ApiProperty> ApiPropertyApiNameLookup => this.RequireValue(_apiPropertyApiNameLookup);
     private FrozenDictionary<string, ApiProperty> ApiPropertyClrNameLookup => this.RequireValue(_apiPropertyClrNameLookup);
+
+    private FrozenDictionary<string, ApiRelationshipTraversal> ApiRelationshipTraversalApiNameLookup => this.RequireValue(_apiRelationshipTraversalApiNameLookup);
     #endregion
 
     #region ApiObjectType Computed Properties
@@ -211,11 +220,8 @@ public sealed partial class ApiObjectType
     ///     otherwise, null.
     /// </param>
     /// <returns>True if the key was found; otherwise, false.</returns>
-    public bool TryGetKeyByApiName
-    (
-        string apiName,
-        [NotNullWhen(true)] out ApiNamedKeyDefinition? apiKey
-    ) => this.ApiKeyApiNameLookup.TryGetValue(apiName, out apiKey);
+    public bool TryGetKeyByApiName(string apiName, [NotNullWhen(true)] out ApiNamedKeyDefinition? apiKey)
+        => this.ApiKeyApiNameLookup.TryGetValue(apiName, out apiKey);
 
     /// <summary>
     ///     Attempts to retrieve an API property by its API name.
@@ -223,7 +229,8 @@ public sealed partial class ApiObjectType
     /// <param name="apiName">The API name of the property to retrieve.</param>
     /// <param name="value">When this method returns, contains the <see cref="ApiProperty"/> if found; otherwise, null.</param>
     /// <returns>True if the property was found; otherwise, false.</returns>
-    public bool TryGetPropertyByApiName(string apiName, [NotNullWhen(true)] out ApiProperty? value) => this.ApiPropertyApiNameLookup.TryGetValue(apiName, out value);
+    public bool TryGetPropertyByApiName(string apiName, [NotNullWhen(true)] out ApiProperty? value)
+        => this.ApiPropertyApiNameLookup.TryGetValue(apiName, out value);
 
     /// <summary>
     ///     Attempts to retrieve an API property by its CLR name.
@@ -231,8 +238,15 @@ public sealed partial class ApiObjectType
     /// <param name="clrName">The CLR name of the property to retrieve.</param>
     /// <param name="value">When this method returns, contains the <see cref="ApiProperty"/> if found; otherwise, null.</param>
     /// <returns>True if the property was found; otherwise, false.</returns>
-    public bool TryGetPropertyByClrName(string clrName, [NotNullWhen(true)] out ApiProperty? value) => this.ApiPropertyClrNameLookup.TryGetValue(clrName, out value);
+    public bool TryGetPropertyByClrName(string clrName, [NotNullWhen(true)] out ApiProperty? value)
+        => this.ApiPropertyClrNameLookup.TryGetValue(clrName, out value);
 
+    /// <summary>Finds an exposed relationship traversal by API name.</summary>
+    /// <param name="apiName">The traversal name on this object type.</param>
+    /// <param name="traversal">The matching traversal, or null when absent.</param>
+    /// <returns>True when a matching traversal exists.</returns>
+    public bool TryGetTraversalByApiName(string apiName, [NotNullWhen(true)] out ApiRelationshipTraversal? traversal)
+        => this.ApiRelationshipTraversalApiNameLookup.TryGetValue(apiName, out traversal);
     #endregion
 
     #region ApiObjectType Key Methods
@@ -256,19 +270,13 @@ public sealed partial class ApiObjectType
     #endregion
 
     #region Implementation Methods
-    private void ValidateApiOptions(ApiSchemaCompilationContext context)
+    internal void SetRelationshipAssociations
+    (
+        ImmutableArray<ApiRelationshipAssociation> associations
+    )
     {
-        if (this.ApiOptions?.HasInvalidApiKeyNullHandling != true)
-        {
-            return;
-        }
-
-        var severity = ApiSchemaCompilationSeverity.Error;
-        var code = ApiSchemaCompilationCode.ApiObjectTypeInvalidApiKeyNullHandling;
-        var description = $"{nameof(this.ApiOptions)}.{nameof(ApiObjectTypeOptions.ApiKeyNullHandling)} must be a valid {nameof(ApiKeyNullHandling)} value";
-        var remediation = $"Specify a valid {nameof(ApiObjectTypeOptions.ApiKeyNullHandling)} value";
-
-        context.AddIssue(severity, code, description, remediation);
+        this.ThrowIfFrozen();
+        _apiRelationshipAssociations = associations.IsDefault ? [] : associations;
     }
 
     internal void SetRelationshipEnds
@@ -284,22 +292,98 @@ public sealed partial class ApiObjectType
         _apiDependentRelationshipEnds = dependentEnds.IsDefault ? [] : dependentEnds;
     }
 
-    internal void SetRelationshipAssociations
+    internal void SetRelationshipTraversals
     (
-        ImmutableArray<ApiRelationshipAssociation> associations
+        ApiSchemaCompilationContext context,
+        ImmutableArray<ApiRelationshipTraversal> traversals
     )
     {
         this.ThrowIfFrozen();
-        _apiRelationshipAssociations = associations.IsDefault ? [] : associations;
+        _apiRelationshipTraversals = traversals.IsDefault ? [] : traversals;
+
+        ApiSchemaCompilationLookup.BuildLookupDictionary
+        (
+            parts: _apiRelationshipTraversals,
+            partKeySelector: x => x.ApiName,
+            partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
+            partKeyPropertyName: nameof(ApiRelationshipTraversal.ApiName),
+            apiPath: this.ApiPath,
+            duplicatePartCode: ApiSchemaCompilationCode.ApiRelationshipTraversalDuplicateApiName,
+            session: context.Session,
+            keyComparer: ApiNameComparer.Instance,
+            lookupDictionary: out _apiRelationshipTraversalApiNameLookup
+        );
+
+        foreach (var traversal in _apiRelationshipTraversals)
+        {
+            if (this.ApiProperties.Any(apiProperty => ApiNameComparer.Instance.Equals(apiProperty.ApiName, traversal.ApiName)))
+            {
+                var apiPath = traversal.ApiPath;
+                var severity = ApiSchemaCompilationSeverity.Error;
+                var code = ApiSchemaCompilationCode.ApiRelationshipTraversalDuplicateApiName;
+                var description = $"Traversal name '{traversal.ApiName}' conflicts with another property on '{this.ApiName}'";
+                var remediation = "Choose a unique API property name on the source object type";
+
+                context.AddIssue(apiPath, severity, code, description, remediation);
+            }
+
+            if (traversal.ClrMemberName is { } clrMemberName && this.ApiProperties.Any(apiProperty => ClrNameComparer.Instance.Equals(apiProperty.ClrName, clrMemberName)))
+            {
+                var apiPath = traversal.ApiPath;
+                var severity = ApiSchemaCompilationSeverity.Error;
+                var code = ApiSchemaCompilationCode.ApiRelationshipTraversalClrMemberConflict;
+                var description = $"CLR member '{clrMemberName}' is bound to both a contained property and traversal on '{this.ApiName}'";
+                var remediation = "Bind the traversal to a distinct CLR member";
+
+                context.AddIssue(apiPath, severity, code, description, remediation);
+            }
+        }
     }
 
-    internal void ClearRelationshipEnds()
+    private void BuildLookupDictionaries(ApiSchemaCompilationContext context)
     {
-        this.ThrowIfFrozen();
-        _apiRelationshipEnds = [];
-        _apiPrincipalRelationshipEnds = [];
-        _apiDependentRelationshipEnds = [];
-        _apiRelationshipAssociations = [];
+        // Compile lookup dictionaries for lookup of:
+        // - Property by API name and CLR name
+        _apiKeyApiNames = [.. this.ApiKeys.Select(key => key.ApiName)];
+
+        ApiSchemaCompilationLookup.BuildLookupDictionary
+        (
+            parts: this.ApiKeys,
+            partKeySelector: x => x.ApiName,
+            partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
+            partKeyPropertyName: nameof(ApiNamedKeyDefinition.ApiName),
+            apiPath: this.ApiPath,
+            duplicatePartCode: ApiSchemaCompilationCode.ApiObjectTypeDuplicateKeyApiName,
+            session: context.Session,
+            keyComparer: ApiNameComparer.Instance,
+            lookupDictionary: out _apiKeyApiNameLookup
+        );
+
+        ApiSchemaCompilationLookup.BuildLookupDictionary
+        (
+            parts: this.ApiProperties,
+            partKeySelector: x => x.ApiName,
+            partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
+            partKeyPropertyName: nameof(ApiProperty.ApiName),
+            apiPath: this.ApiPath,
+            duplicatePartCode: ApiSchemaCompilationCode.ApiObjectTypeDuplicatePropertyApiName,
+            session: context.Session,
+            keyComparer: ApiNameComparer.Instance,
+            lookupDictionary: out _apiPropertyApiNameLookup
+        );
+
+        ApiSchemaCompilationLookup.BuildLookupDictionary
+        (
+            parts: this.ApiProperties,
+            partKeySelector: x => x.ClrName,
+            partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
+            partKeyPropertyName: nameof(ApiProperty.ClrName),
+            apiPath: this.ApiPath,
+            duplicatePartCode: ApiSchemaCompilationCode.ApiObjectTypeDuplicatePropertyClrName,
+            session: context.Session,
+            keyComparer: ClrNameComparer.Instance,
+            lookupDictionary: out _apiPropertyClrNameLookup
+        );
     }
 
     private void CompileApiKeys(ApiSchemaCompilationContext context)
@@ -343,47 +427,19 @@ public sealed partial class ApiObjectType
         }
     }
 
-    private void BuildLookupDictionaries(ApiSchemaCompilationContext context)
+    private void ValidateApiOptions(ApiSchemaCompilationContext context)
     {
-        // Compile lookup dictionaries for lookup of:
-        // - Property by API name and CLR name
-        _apiKeyApiNames = [.. this.ApiKeys.Select(key => key.ApiName)];
+        if (this.ApiOptions?.HasInvalidApiKeyNullHandling != true)
+        {
+            return;
+        }
 
-        ApiSchemaCompilationLookup.BuildLookupDictionary
-        (
-            parts: this.ApiKeys,
-            partKeySelector: x => x.ApiName,
-            partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
-            partKeyPropertyName: nameof(ApiNamedKeyDefinition.ApiName),
-            apiPath: this.ApiPath,
-            duplicatePartCode: ApiSchemaCompilationCode.ApiObjectTypeDuplicateKeyApiName,
-            session: context.Session,
-            lookupDictionary: out _apiKeyApiNameLookup
-        );
+        var severity = ApiSchemaCompilationSeverity.Error;
+        var code = ApiSchemaCompilationCode.ApiObjectTypeInvalidApiKeyNullHandling;
+        var description = $"{nameof(this.ApiOptions)}.{nameof(ApiObjectTypeOptions.ApiKeyNullHandling)} must be a valid {nameof(ApiKeyNullHandling)} value";
+        var remediation = $"Specify a valid {nameof(ApiObjectTypeOptions.ApiKeyNullHandling)} value";
 
-        ApiSchemaCompilationLookup.BuildLookupDictionary
-        (
-            parts: this.ApiProperties,
-            partKeySelector: x => x.ApiName,
-            partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
-            partKeyPropertyName: nameof(ApiProperty.ApiName),
-            apiPath: this.ApiPath,
-            duplicatePartCode: ApiSchemaCompilationCode.ApiObjectTypeDuplicatePropertyApiName,
-            session: context.Session,
-            lookupDictionary: out _apiPropertyApiNameLookup
-        );
-
-        ApiSchemaCompilationLookup.BuildLookupDictionary
-        (
-            parts: this.ApiProperties,
-            partKeySelector: x => x.ClrName,
-            partKeyFilter: x => ApiSchemaNameValidation.IsNameValid(x),
-            partKeyPropertyName: nameof(ApiProperty.ClrName),
-            apiPath: this.ApiPath,
-            duplicatePartCode: ApiSchemaCompilationCode.ApiObjectTypeDuplicatePropertyClrName,
-            session: context.Session,
-            lookupDictionary: out _apiPropertyClrNameLookup
-        );
+        context.AddIssue(severity, code, description, remediation);
     }
     #endregion
 }

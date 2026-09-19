@@ -46,9 +46,9 @@ public class ApiSchemaOptionsJsonConverter(ILogger<ApiSchemaOptionsJsonConverter
     private class ReadHandlers(PropertyNames propertyNames)
     {
         #region Fields
-        public readonly Dictionary<string, JsonReaderHandler<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>>> PropertyHandlers = new()
+        public readonly JsonReaderHandlerTable<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>> PropertyHandlers = new()
         {
-            { propertyNames.ApiKeyNullHandling, HandleApiKeyNullHandling },
+            { propertyNames.ApiKeyNullHandling, HandleApiKeyNullHandling, true },
         };
         #endregion
 
@@ -125,31 +125,25 @@ public class ApiSchemaOptionsJsonConverter(ILogger<ApiSchemaOptionsJsonConverter
         (
             ref reader,
             readContext,
-            handlers,
-            readContext.PropertyNames.ApiKeyNullHandling
+            handlers
         );
     }
 
     /// <inheritdoc/>
-    protected override void WriteCore(Utf8JsonWriter writer, ApiSchemaOptions value, IWriteContext context)
+    protected override void WriteCore(Utf8JsonWriter writer, ApiSchemaOptions apiSchemaOptions, IWriteContext context)
     {
         var writeContext = (DefaultWriteContext<PropertyNames>)context;
 
-        WriteJsonObject(writer, () =>
+        writer.WriteJsonObject(state: (apiSchemaOptions, writeContext), writeObject: static (writer, state) =>
         {
-            WriteApiKeyNullHandling(writer, value, writeContext);
+            var (apiSchemaOptions, writeContext) = state;
+            WriteApiKeyNullHandling(writer, apiSchemaOptions, writeContext);
         });
     }
     #endregion
 
     #region Write Implementation Methods
-    private static void WriteApiKeyNullHandling(Utf8JsonWriter writer, ApiSchemaOptions apiSchemaOptions, DefaultWriteContext<PropertyNames> context)
-    {
-        var propertyName = context.PropertyNames.ApiKeyNullHandling;
-        var apiKeyNullHandling = apiSchemaOptions.ApiKeyNullHandling;
-        var options = context.Options;
-
-        writer.TryWritePropertyWithConverter(propertyName, apiKeyNullHandling, options, _apiKeyNullHandlingJsonConverter);
-    }
+    private static void WriteApiKeyNullHandling(Utf8JsonWriter writer, ApiSchemaOptions apiSchemaOptions, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyWithConverter(propertyName: writeContext.PropertyNames.ApiKeyNullHandling, value: apiSchemaOptions.ApiKeyNullHandling, options: writeContext.Options, converter: _apiKeyNullHandlingJsonConverter);
     #endregion
 }

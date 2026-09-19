@@ -106,11 +106,11 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
 
     private class ReadHandlers(PropertyNames propertyNames)
     {
-        public readonly Dictionary<string, JsonReaderHandler<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>>> PropertyHandlers = new()
+        public readonly JsonReaderHandlerTable<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>> PropertyHandlers = new()
         {
-            { propertyNames.ApiRelationship.ApiKind, HandleApiKind },
+            { propertyNames.ApiRelationship.ApiKind, HandleApiKind, true },
             { propertyNames.ApiRelationship.ApiName, HandleApiName },
-            { propertyNames.ApiRelationship.ApiDeleteBehavior, HandleApiDeleteBehavior },
+            { propertyNames.ApiRelationship.ApiDeleteBehavior, HandleApiDeleteBehavior, true },
             { propertyNames.ApiRelationshipOneTo.ApiPrincipalEnd, HandleApiPrincipalEnd },
             { propertyNames.ApiRelationshipOneTo.ApiDependentEnd, HandleApiDependentEnd },
             { propertyNames.ApiRelationshipManyToMany.ApiPrincipalEndA, HandleApiPrincipalEndA },
@@ -270,23 +270,22 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
         (
             ref reader,
             readContext,
-            readContext.ReadHandlers.PropertyHandlers,
-            readContext.PropertyNames.ApiRelationship.ApiKind,
-            readContext.PropertyNames.ApiRelationship.ApiDeleteBehavior
+            readContext.ReadHandlers.PropertyHandlers
         );
     }
 
     /// <inheritdoc/>
-    protected override void WriteCore(Utf8JsonWriter writer, ApiRelationship value, IWriteContext context)
+    protected override void WriteCore(Utf8JsonWriter writer, ApiRelationship apiRelationship, IWriteContext context)
     {
         var writeContext = (DefaultWriteContext<PropertyNames>)context;
 
-        WriteJsonObject(writer, () =>
+        writer.WriteJsonObject(state: (apiRelationship, writeContext), writeObject: static (writer, state) =>
         {
-            WriteApiKind(writer, value, writeContext);
-            WriteApiName(writer, value, writeContext);
+            var (apiRelationship, writeContext) = state;
+            WriteApiKind(writer, apiRelationship, writeContext);
+            WriteApiName(writer, apiRelationship, writeContext);
 
-            switch (value)
+            switch (apiRelationship)
             {
                 case ApiRelationshipOneTo oneToRelationship:
                     WriteApiPrincipalEnd(writer, oneToRelationship, writeContext);
@@ -300,96 +299,42 @@ public class ApiRelationshipJsonConverter(ILogger<ApiRelationshipJsonConverter>?
                     break;
             }
 
-            WriteApiDeleteBehavior(writer, value, writeContext);
+            WriteApiDeleteBehavior(writer, apiRelationship, writeContext);
 
-            WriteExtensibleBaseExtensions(writer, writeContext.PropertyNames.ExtensibleBase.Extensions, value, writeContext);
+            WriteExtensibleBaseExtensions
+            (
+                writer,
+                propertyName: writeContext.PropertyNames.ExtensibleBase.Extensions,
+                extensibleBase: apiRelationship,
+                context: writeContext
+            );
         });
     }
     #endregion
 
     #region Write Implementation Methods
-    private static void WriteApiKind(Utf8JsonWriter writer, ApiRelationship relationship, DefaultWriteContext<PropertyNames> context)
-        => writer.TryWritePropertyWithConverter(context.PropertyNames.ApiRelationship.ApiKind, relationship.ApiKind, context.Options, _kindConverter);
+    private static void WriteApiKind(Utf8JsonWriter writer, ApiRelationship relationship, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyWithConverter(propertyName: writeContext.PropertyNames.ApiRelationship.ApiKind, value: relationship.ApiKind, options: writeContext.Options, converter: _kindConverter);
 
-    private static void WriteApiDeleteBehavior(Utf8JsonWriter writer, ApiRelationship relationship, DefaultWriteContext<PropertyNames> context)
-        => writer.TryWritePropertyWithConverter(context.PropertyNames.ApiRelationship.ApiDeleteBehavior, relationship.ApiDeleteBehavior, context.Options, _deleteBehaviorConverter);
+    private static void WriteApiDeleteBehavior(Utf8JsonWriter writer, ApiRelationship relationship, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyWithConverter(propertyName: writeContext.PropertyNames.ApiRelationship.ApiDeleteBehavior, value: relationship.ApiDeleteBehavior, options: writeContext.Options, converter: _deleteBehaviorConverter);
 
-    private static void WriteApiName(Utf8JsonWriter writer, ApiRelationship relationship, DefaultWriteContext<PropertyNames> context)
-        => writer.TryWritePropertyAsString(context.PropertyNames.ApiRelationship.ApiName, relationship.ApiName, context.Options);
+    private static void WriteApiName(Utf8JsonWriter writer, ApiRelationship relationship, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyAsString(propertyName: writeContext.PropertyNames.ApiRelationship.ApiName, value: relationship.ApiName, options: writeContext.Options);
 
-    private static void WriteApiPrincipalEnd(Utf8JsonWriter writer, ApiRelationshipOneTo relationship, DefaultWriteContext<PropertyNames> context)
-    {
-        var propertyName = context.PropertyNames.ApiRelationshipOneTo.ApiPrincipalEnd;
-        var end = relationship.ApiPrincipalEnd;
-        var options = context.Options;
+    private static void WriteApiPrincipalEnd(Utf8JsonWriter writer, ApiRelationshipOneTo relationship, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyWithSerializer(propertyName: writeContext.PropertyNames.ApiRelationshipOneTo.ApiPrincipalEnd, obj: relationship.ApiPrincipalEnd, options: writeContext.Options);
 
-        writer.TryWritePropertyWithAction
-        (
-            propertyName,
-            end,
-            options,
-            end => writer.TryWriteWithSerializer(end, options)
-        );
-    }
+    private static void WriteApiDependentEnd(Utf8JsonWriter writer, ApiRelationshipOneTo relationship, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyWithSerializer(propertyName: writeContext.PropertyNames.ApiRelationshipOneTo.ApiDependentEnd, obj: relationship.ApiDependentEnd, options: writeContext.Options);
 
-    private static void WriteApiDependentEnd(Utf8JsonWriter writer, ApiRelationshipOneTo relationship, DefaultWriteContext<PropertyNames> context)
-    {
-        var propertyName = context.PropertyNames.ApiRelationshipOneTo.ApiDependentEnd;
-        var end = relationship.ApiDependentEnd;
-        var options = context.Options;
+    private static void WriteApiPrincipalEndA(Utf8JsonWriter writer, ApiRelationshipManyToMany relationship, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyWithSerializer(propertyName: writeContext.PropertyNames.ApiRelationshipManyToMany.ApiPrincipalEndA, obj: relationship.ApiPrincipalEndA, options: writeContext.Options);
 
-        writer.TryWritePropertyWithAction
-        (
-            propertyName,
-            end,
-            options,
-            end => writer.TryWriteWithSerializer(end, options)
-        );
-    }
+    private static void WriteApiPrincipalEndB(Utf8JsonWriter writer, ApiRelationshipManyToMany relationship, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyWithSerializer(propertyName: writeContext.PropertyNames.ApiRelationshipManyToMany.ApiPrincipalEndB, obj: relationship.ApiPrincipalEndB, options: writeContext.Options);
 
-    private static void WriteApiPrincipalEndA(Utf8JsonWriter writer, ApiRelationshipManyToMany relationship, DefaultWriteContext<PropertyNames> context)
-    {
-        var propertyName = context.PropertyNames.ApiRelationshipManyToMany.ApiPrincipalEndA;
-        var end = relationship.ApiPrincipalEndA;
-        var options = context.Options;
-
-        writer.TryWritePropertyWithAction
-        (
-            propertyName,
-            end,
-            options,
-            end => writer.TryWriteWithSerializer(end, options)
-        );
-    }
-
-    private static void WriteApiPrincipalEndB(Utf8JsonWriter writer, ApiRelationshipManyToMany relationship, DefaultWriteContext<PropertyNames> context)
-    {
-        var propertyName = context.PropertyNames.ApiRelationshipManyToMany.ApiPrincipalEndB;
-        var end = relationship.ApiPrincipalEndB;
-        var options = context.Options;
-
-        writer.TryWritePropertyWithAction
-        (
-            propertyName,
-            end,
-            options,
-            end => writer.TryWriteWithSerializer(end, options)
-        );
-    }
-
-    private static void WriteApiAssociation(Utf8JsonWriter writer, ApiRelationshipManyToMany relationship, DefaultWriteContext<PropertyNames> context)
-    {
-        var propertyName = context.PropertyNames.ApiRelationshipManyToMany.ApiAssociation;
-        var end = relationship.ApiAssociation;
-        var options = context.Options;
-
-        writer.TryWritePropertyWithAction
-        (
-            propertyName,
-            end,
-            options,
-            end => writer.TryWriteWithSerializer(end, options)
-        );
-    }
+    private static void WriteApiAssociation(Utf8JsonWriter writer, ApiRelationshipManyToMany relationship, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyWithSerializer(propertyName: writeContext.PropertyNames.ApiRelationshipManyToMany.ApiAssociation, obj: relationship.ApiAssociation, options: writeContext.Options);
     #endregion
 }

@@ -133,13 +133,13 @@ public static partial class ApiSchemaFactory
         => new(name, principalA, principalB, association, deleteBehavior);
 
     private static ApiRelationshipPrincipalEnd RPE(Type clr, string? identityName = null)
-        => new(new ApiTypeReference(clr), identityName);
+        => new(new ApiTypeReference(clr), apiPrincipalKeyName: identityName);
 
     private static ApiRelationshipDependentEnd RDE(Type clr)
         => new(new ApiTypeReference(clr));
 
     private static ApiRelationshipDependentEnd RDE(Type clr, ApiKeyDefinition fk)
-        => new(new ApiTypeReference(clr), fk);
+        => new(new ApiTypeReference(clr), apiForeignKey: fk);
 
     private static ApiRelationshipAssociation RAS(Type clr, ApiKeyDefinition fkA, ApiKeyDefinition fkB)
         => new(new ApiTypeReference(clr), fkA, fkB);

@@ -1,5 +1,6 @@
 ﻿// Copyright (c) 2024-2025 Evoogle.com
 // SPDX-License-Identifier: MIT
+using Evoogle.ApiFramework.Internal;
 using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Schema.Compilation;
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
@@ -22,7 +23,8 @@ public sealed class ApiSchemaBuilderContext(ILogger? logger = null) : IHasLogger
     private readonly Dictionary<Type, ApiScalarTypeBuilder> _apiScalarTypeBuilders = [];
     private readonly Dictionary<Type, ApiEnumTypeBuilder> _apiEnumTypeBuilders = [];
     private readonly Dictionary<Type, ApiObjectTypeBuilder> _apiObjectTypeBuilders = [];
-    private readonly Dictionary<string, ApiRelationshipBuilder> _apiRelationshipBuilders = [];
+    private readonly Dictionary<string, ApiRelationshipBuilder> _apiRelationshipBuilders =
+        new(ApiNameComparer.Instance);
 
     private readonly Queue<ApiObjectTypeBuilder> _pendingObjectBuilders = new();
     private readonly Queue<ApiScalarTypeBuilder> _pendingScalarBuilders = new();

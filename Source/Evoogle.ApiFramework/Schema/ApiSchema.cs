@@ -8,6 +8,8 @@ using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
+using Evoogle.ApiFramework.Internal;
+using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Schema.Compilation;
 using Evoogle.ApiFramework.Schema.Compilation.Internal;
 using Evoogle.ApiFramework.Schema.Json;
@@ -124,17 +126,17 @@ public sealed class ApiSchema : ApiSchemaElement
         this.ApiOptions = apiOptions ?? ApiSchemaOptions.Default;
 
         // Compile the collections for API named types, scalar types, enum types, and object types.
-        this.ApiScalarTypes = [.. apiScalarTypes.EmptyIfNull().Where(x => x is not null).OrderBy(x => x.ApiName, StringComparer.OrdinalIgnoreCase)];
+        this.ApiScalarTypes = [.. apiScalarTypes.EmptyIfNull().Where(x => x is not null).OrderBy(x => x.ApiName, ApiNameComparer.Instance)];
 
-        this.ApiEnumTypes = [.. apiEnumTypes.EmptyIfNull().Where(x => x is not null).OrderBy(x => x.ApiName, StringComparer.OrdinalIgnoreCase)];
+        this.ApiEnumTypes = [.. apiEnumTypes.EmptyIfNull().Where(x => x is not null).OrderBy(x => x.ApiName, ApiNameComparer.Instance)];
 
-        this.ApiObjectTypes = [.. apiObjectTypes.EmptyIfNull().Where(x => x is not null).OrderBy(x => x.ApiName, StringComparer.OrdinalIgnoreCase)];
+        this.ApiObjectTypes = [.. apiObjectTypes.EmptyIfNull().Where(x => x is not null).OrderBy(x => x.ApiName, ApiNameComparer.Instance)];
 
         // Compile the collection of all API named types.
-        this.ApiNamedTypes = [.. this.ApiScalarTypes.SafeCast<ApiNamedType>().Concat(this.ApiEnumTypes.SafeCast<ApiNamedType>()).Concat(this.ApiObjectTypes.SafeCast<ApiNamedType>()).OrderBy(x => x.ApiName, StringComparer.OrdinalIgnoreCase)];
+        this.ApiNamedTypes = [.. this.ApiScalarTypes.SafeCast<ApiNamedType>().Concat(this.ApiEnumTypes.SafeCast<ApiNamedType>()).Concat(this.ApiObjectTypes.SafeCast<ApiNamedType>()).OrderBy(x => x.ApiName, ApiNameComparer.Instance)];
 
         // Compile the collection of API relationships.
-        this.ApiRelationships = [.. apiRelationships.EmptyIfNull().Where(x => x is not null).OrderBy(x => x.ApiName, StringComparer.OrdinalIgnoreCase)];
+        this.ApiRelationships = [.. apiRelationships.EmptyIfNull().Where(x => x is not null).OrderBy(x => x.ApiName, ApiNameComparer.Instance)];
     }
 
     /// <summary>
@@ -308,7 +310,7 @@ public sealed class ApiSchema : ApiSchemaElement
     {
         if (Interlocked.CompareExchange(ref _compilationState, 1, 0) != 0)
         {
-            throw new InvalidOperationException("An API schema graph can only be compiled once.");
+            throw new ApiSchemaException("An API schema graph can only be compiled once.");
         }
     }
 
@@ -390,7 +392,60 @@ public sealed class ApiSchema : ApiSchemaElement
             apiRelationship.Compile(context);
         }
 
+        this.BindRelationshipTraversals(context);
         this.PopulateRelationshipCrossReferences();
+    }
+
+    private void BindRelationshipTraversals(ApiSchemaCompilationContext context)
+    {
+        var traversalsBySource = new Dictionary<ApiObjectType, List<ApiRelationshipTraversal>>();
+
+        foreach (var apiRelationship in this.ApiRelationships)
+        {
+            switch (apiRelationship)
+            {
+                case ApiRelationshipOneTo oneTo:
+                    Bind(oneTo.ApiPrincipalEnd, oneTo.ApiDependentEnd);
+                    Bind(oneTo.ApiDependentEnd, oneTo.ApiPrincipalEnd);
+                    break;
+
+                case ApiRelationshipManyToMany manyToMany:
+                    Bind(manyToMany.ApiPrincipalEndA, manyToMany.ApiPrincipalEndB);
+                    Bind(manyToMany.ApiPrincipalEndB, manyToMany.ApiPrincipalEndA);
+                    break;
+            }
+        }
+
+        foreach (var apiObjectType in this.ApiObjectTypes)
+        {
+            apiObjectType.SetRelationshipTraversals
+            (
+                context,
+                traversalsBySource.TryGetValue(apiObjectType, out var traversals)
+                    ? [.. traversals]
+                    : []
+            );
+        }
+
+        void Bind(ApiRelationshipEnd? sourceEnd, ApiRelationshipEnd? targetEnd)
+        {
+            if (sourceEnd is null || targetEnd is null || sourceEnd.ApiResolvedObjectType is not { } sourceType)
+            {
+                return;
+            }
+
+            if (!traversalsBySource.TryGetValue(sourceType, out var sourceTraversals))
+            {
+                sourceTraversals = [];
+                traversalsBySource.Add(sourceType, sourceTraversals);
+            }
+
+            if (sourceEnd.ApiTraversal is { } traversal)
+            {
+                traversal.BindTargetEnd(targetEnd, context);
+                sourceTraversals.Add(traversal);
+            }
+        }
     }
 
     private void CompileApiScalarTypes(ApiSchemaCompilationContext context)
@@ -412,6 +467,7 @@ public sealed class ApiSchema : ApiSchemaElement
             apiPath: this.ApiPath,
             duplicatePartCode: ApiSchemaCompilationCode.ApiSchemaDuplicateNamedTypeApiName,
             session: context.Session,
+            keyComparer: ApiNameComparer.Instance,
             lookupDictionary: out _apiNamedTypeApiNameLookup
         );
 
@@ -424,6 +480,7 @@ public sealed class ApiSchema : ApiSchemaElement
             apiPath: this.ApiPath,
             duplicatePartCode: ApiSchemaCompilationCode.ApiSchemaDuplicateNamedTypeClrType,
             session: context.Session,
+            keyComparer: EqualityComparer<Type>.Default,
             lookupDictionary: out _apiNamedTypeClrTypeLookup
         );
 
@@ -436,6 +493,7 @@ public sealed class ApiSchema : ApiSchemaElement
             apiPath: this.ApiPath,
             duplicatePartCode: ApiSchemaCompilationCode.ApiSchemaDuplicateEnumTypeApiName,
             session: context.Session,
+            keyComparer: ApiNameComparer.Instance,
             lookupDictionary: out _apiEnumTypeApiNameLookup
         );
 
@@ -448,6 +506,7 @@ public sealed class ApiSchema : ApiSchemaElement
             apiPath: this.ApiPath,
             duplicatePartCode: ApiSchemaCompilationCode.ApiSchemaDuplicateEnumTypeClrType,
             session: context.Session,
+            keyComparer: EqualityComparer<Type>.Default,
             lookupDictionary: out _apiEnumTypeClrTypeLookup
         );
 
@@ -460,6 +519,7 @@ public sealed class ApiSchema : ApiSchemaElement
             apiPath: this.ApiPath,
             duplicatePartCode: ApiSchemaCompilationCode.ApiSchemaDuplicateObjectTypeApiName,
             session: context.Session,
+            keyComparer: ApiNameComparer.Instance,
             lookupDictionary: out _apiObjectTypeApiNameLookup
         );
 
@@ -472,6 +532,7 @@ public sealed class ApiSchema : ApiSchemaElement
             apiPath: this.ApiPath,
             duplicatePartCode: ApiSchemaCompilationCode.ApiSchemaDuplicateObjectTypeClrType,
             session: context.Session,
+            keyComparer: EqualityComparer<Type>.Default,
             lookupDictionary: out _apiObjectTypeClrTypeLookup
         );
 
@@ -484,6 +545,7 @@ public sealed class ApiSchema : ApiSchemaElement
             apiPath: this.ApiPath,
             duplicatePartCode: ApiSchemaCompilationCode.ApiSchemaDuplicateScalarTypeApiName,
             session: context.Session,
+            keyComparer: ApiNameComparer.Instance,
             lookupDictionary: out _apiScalarTypeApiNameLookup
         );
 
@@ -496,6 +558,7 @@ public sealed class ApiSchema : ApiSchemaElement
             apiPath: this.ApiPath,
             duplicatePartCode: ApiSchemaCompilationCode.ApiSchemaDuplicateScalarTypeClrType,
             session: context.Session,
+            keyComparer: EqualityComparer<Type>.Default,
             lookupDictionary: out _apiScalarTypeClrTypeLookup
         );
 
@@ -508,6 +571,7 @@ public sealed class ApiSchema : ApiSchemaElement
             apiPath: this.ApiPath,
             duplicatePartCode: ApiSchemaCompilationCode.ApiSchemaDuplicateRelationshipApiName,
             session: context.Session,
+            keyComparer: ApiNameComparer.Instance,
             lookupDictionary: out _apiRelationshipApiNameLookup
         );
     }
@@ -545,7 +609,7 @@ public sealed class ApiSchema : ApiSchemaElement
             }
             else
             {
-                apiObjectType.ClearRelationshipEnds();
+                apiObjectType.SetRelationshipEnds([], [], []);
             }
 
             if (associationMap.TryGetValue(apiObjectType, out var associations))

@@ -45,11 +45,7 @@ public class ApiVersionDefinitionJsonConverter(ILogger<ApiVersionDefinitionJsonC
 
     private sealed class ReadHandlers(PropertyNames propertyNames)
     {
-        public readonly Dictionary
-        <
-            string,
-            JsonReaderHandler<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>>
-        > PropertyHandlers = new()
+        public readonly JsonReaderHandlerTable<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>> PropertyHandlers = new()
         {
             { propertyNames.ClrMemberName, HandleClrMemberName },
             { propertyNames.ClrType, HandleClrType },
@@ -148,41 +144,43 @@ public class ApiVersionDefinitionJsonConverter(ILogger<ApiVersionDefinitionJsonC
     protected override void WriteCore
     (
         Utf8JsonWriter writer,
-        ApiVersionDefinition value,
+        ApiVersionDefinition apiVersionDefinition,
         IWriteContext context
     )
     {
         var writeContext = (DefaultWriteContext<PropertyNames>)context;
-        WriteJsonObject(writer, () =>
+        writer.WriteJsonObject(state: (apiVersionDefinition, writeContext), writeObject: static (writer, state) =>
         {
-            if (value.IsPropertyBacked)
-            {
-                writer.TryWritePropertyAsString
-                (
-                    writeContext.PropertyNames.ClrMemberName,
-                    value.ClrMemberName,
-                    writeContext.Options
-                );
-            }
-            else
-            {
-                writer.TryWritePropertyWithConverter
-                (
-                    writeContext.PropertyNames.ClrType,
-                    value.ClrRepositoryType,
-                    writeContext.Options,
-                    _typeJsonConverter
-                );
-            }
+            var (apiVersionDefinition, writeContext) = state;
+            WriteClrMemberName(writer, apiVersionDefinition, writeContext);
+            WriteClrType(writer, apiVersionDefinition, writeContext);
 
             WriteExtensibleBaseExtensions
             (
                 writer,
-                writeContext.PropertyNames.ExtensibleBase.Extensions,
-                value,
-                writeContext
+                propertyName: writeContext.PropertyNames.ExtensibleBase.Extensions,
+                extensibleBase: apiVersionDefinition,
+                context: writeContext
             );
         });
+    }
+    #endregion
+
+    #region Write Implementation Methods
+    private static void WriteClrMemberName(Utf8JsonWriter writer, ApiVersionDefinition apiVersionDefinition, DefaultWriteContext<PropertyNames> writeContext)
+    {
+        if (apiVersionDefinition.IsPropertyBacked)
+        {
+            writer.TryWritePropertyAsString(propertyName: writeContext.PropertyNames.ClrMemberName, value: apiVersionDefinition.ClrMemberName, options: writeContext.Options);
+        }
+    }
+
+    private static void WriteClrType(Utf8JsonWriter writer, ApiVersionDefinition apiVersionDefinition, DefaultWriteContext<PropertyNames> writeContext)
+    {
+        if (!apiVersionDefinition.IsPropertyBacked)
+        {
+            writer.TryWritePropertyWithConverter(propertyName: writeContext.PropertyNames.ClrType, type: apiVersionDefinition.ClrRepositoryType, options: writeContext.Options, converter: _typeJsonConverter);
+        }
     }
     #endregion
 }

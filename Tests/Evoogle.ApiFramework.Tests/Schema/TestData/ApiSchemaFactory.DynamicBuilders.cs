@@ -588,7 +588,8 @@ public static partial class ApiSchemaFactory
         var apiRelationshipPrincipalEnd = new ApiRelationshipPrincipalEnd
         (
             apiObjectTypeReference,
-            apiPrincipalKeyName
+            apiTraversal: null,
+            apiPrincipalKeyName: apiPrincipalKeyName
         );
 
         AttachExtensions(apiRelationshipPrincipalEnd, def);
@@ -602,7 +603,7 @@ public static partial class ApiSchemaFactory
         var apiForeignKey = def.ApiForeignKey != null ? BuildApiKeyDefinition(def.ApiForeignKey) : null;
 
         var apiRelationshipDependentEnd = apiForeignKey != null
-            ? new ApiRelationshipDependentEnd(apiObjectTypeReference, apiForeignKey)
+            ? new ApiRelationshipDependentEnd(apiObjectTypeReference, apiForeignKey: apiForeignKey)
             : new ApiRelationshipDependentEnd(apiObjectTypeReference);
 
         AttachExtensions(apiRelationshipDependentEnd, def);

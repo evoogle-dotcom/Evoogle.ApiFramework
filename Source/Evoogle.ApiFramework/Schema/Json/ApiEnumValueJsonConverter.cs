@@ -86,7 +86,7 @@ public class ApiEnumValueJsonConverter(ILogger<ApiEnumValueJsonConverter>? logge
     private class ReadHandlers(PropertyNames propertyNames)
     {
         #region ApiEnumValue Fields
-        public readonly Dictionary<string, JsonReaderHandler<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>>> PropertyHandlers = new()
+        public readonly JsonReaderHandlerTable<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>> PropertyHandlers = new()
         {
             // ApiEnumValue Property Handlers
             { propertyNames.ApiEnumValue.ApiName, HandleApiEnumValueApiName },
@@ -179,47 +179,36 @@ public class ApiEnumValueJsonConverter(ILogger<ApiEnumValueJsonConverter>? logge
     }
 
     /// <inheritdoc/>
-    protected override void WriteCore(Utf8JsonWriter writer, ApiEnumValue value, IWriteContext context)
+    protected override void WriteCore(Utf8JsonWriter writer, ApiEnumValue apiEnumValue, IWriteContext context)
     {
         var writeContext = (DefaultWriteContext<PropertyNames>)context;
 
-        WriteJsonObject(writer, () =>
+        writer.WriteJsonObject(state: (apiEnumValue, writeContext), writeObject: static (writer, state) =>
         {
-            WriteApiEnumValueApiName(writer, value, writeContext);
-            WriteApiEnumValueClrName(writer, value, writeContext);
-            WriteApiEnumValueClrOrdinal(writer, value, writeContext);
+            var (apiEnumValue, writeContext) = state;
+            WriteApiEnumValueApiName(writer, apiEnumValue, writeContext);
+            WriteApiEnumValueClrName(writer, apiEnumValue, writeContext);
+            WriteApiEnumValueClrOrdinal(writer, apiEnumValue, writeContext);
 
-            WriteExtensibleBaseExtensions(writer, writeContext.PropertyNames.ExtensibleBase.Extensions, value, writeContext);
+            WriteExtensibleBaseExtensions
+            (
+                writer,
+                propertyName: writeContext.PropertyNames.ExtensibleBase.Extensions,
+                extensibleBase: apiEnumValue,
+                context: writeContext
+            );
         });
     }
     #endregion
 
     #region Write Implementation Methods
-    private static void WriteApiEnumValueApiName(Utf8JsonWriter writer, ApiEnumValue apiEnumValue, DefaultWriteContext<PropertyNames> context)
-    {
-        var propertyName = context.PropertyNames.ApiEnumValue.ApiName;
-        var value = apiEnumValue.ApiName;
-        var options = context.Options;
+    private static void WriteApiEnumValueApiName(Utf8JsonWriter writer, ApiEnumValue apiEnumValue, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyAsString(propertyName: writeContext.PropertyNames.ApiEnumValue.ApiName, value: apiEnumValue.ApiName, options: writeContext.Options);
 
-        writer.TryWritePropertyAsString(propertyName, value, options);
-    }
+    private static void WriteApiEnumValueClrName(Utf8JsonWriter writer, ApiEnumValue apiEnumValue, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyAsString(propertyName: writeContext.PropertyNames.ApiEnumValue.ClrName, value: apiEnumValue.ClrName, options: writeContext.Options);
 
-    private static void WriteApiEnumValueClrName(Utf8JsonWriter writer, ApiEnumValue apiEnumValue, DefaultWriteContext<PropertyNames> context)
-    {
-        var propertyName = context.PropertyNames.ApiEnumValue.ClrName;
-        var value = apiEnumValue.ClrName;
-        var options = context.Options;
-
-        writer.TryWritePropertyAsString(propertyName, value, options);
-    }
-
-    private static void WriteApiEnumValueClrOrdinal(Utf8JsonWriter writer, ApiEnumValue apiEnumValue, DefaultWriteContext<PropertyNames> context)
-    {
-        var propertyName = context.PropertyNames.ApiEnumValue.ClrOrdinal;
-        var value = apiEnumValue.ClrOrdinal;
-        var options = context.Options;
-
-        writer.TryWritePropertyAsNumber(propertyName, value, options);
-    }
+    private static void WriteApiEnumValueClrOrdinal(Utf8JsonWriter writer, ApiEnumValue apiEnumValue, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyAsNumber(propertyName: writeContext.PropertyNames.ApiEnumValue.ClrOrdinal, value: apiEnumValue.ClrOrdinal, options: writeContext.Options);
     #endregion
 }

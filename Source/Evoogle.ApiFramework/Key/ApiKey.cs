@@ -10,6 +10,7 @@ using System.Globalization;
 using System.Text;
 using System.Text.Json.Serialization;
 
+using Evoogle.ApiFramework.Internal;
 using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Key.Internal;
 using Evoogle.ApiFramework.Key.Json;
@@ -807,7 +808,7 @@ public readonly struct ApiKey
         }
         foreach (var part in (ApiKeyPart[])_referenceValue!)
         {
-            if (string.Equals(part.ApiName, apiName, StringComparison.Ordinal))
+            if (ApiNameComparer.Instance.Equals(part.ApiName, apiName))
             {
                 apiValue = part.ApiValue;
                 return true;
@@ -1167,7 +1168,7 @@ public readonly struct ApiKey
 
         for (var i = 0; i < leftParts.Length; i++)
         {
-            if (!string.Equals(leftParts[i].ApiName, rightParts[i].ApiName, StringComparison.Ordinal))
+            if (!ApiNameComparer.Instance.Equals(leftParts[i].ApiName, rightParts[i].ApiName))
             {
                 return false;
             }
@@ -1213,7 +1214,7 @@ public readonly struct ApiKey
         hashCode.Add((int)ApiKeyKind.Composite);
         foreach (var part in parts)
         {
-            hashCode.Add(part.ApiName, StringComparer.Ordinal);
+            hashCode.Add(part.ApiName, ApiNameComparer.Instance);
             hashCode.Add(part.ApiValue);
         }
         return hashCode.ToHashCode();
@@ -1257,7 +1258,11 @@ public readonly struct ApiKey
 
         for (var i = 0; i < leftParts.Length; i++)
         {
-            var apiNameComparison = Math.Sign(string.Compare(leftParts[i].ApiName, rightParts[i].ApiName, StringComparison.Ordinal));
+            var apiNameComparison = Math.Sign(ApiNameComparer.Instance.Compare
+            (
+                leftParts[i].ApiName,
+                rightParts[i].ApiName
+            ));
             if (apiNameComparison != 0)
             {
                 return apiNameComparison;

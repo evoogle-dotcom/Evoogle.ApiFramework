@@ -76,7 +76,7 @@ public class ApiRelationshipAssociationJsonConverter(ILogger<ApiRelationshipAsso
 
     private class ReadHandlers(PropertyNames propertyNames)
     {
-        public readonly Dictionary<string, JsonReaderHandler<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>>> PropertyHandlers = new()
+        public readonly JsonReaderHandlerTable<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>> PropertyHandlers = new()
         {
             { propertyNames.ApiRelationshipElement.ApiObjectTypeReference, HandleApiObjectTypeReference },
             { propertyNames.ApiRelationshipAssociation.ApiForeignKeyA, HandleApiForeignKeyA },
@@ -153,33 +153,41 @@ public class ApiRelationshipAssociationJsonConverter(ILogger<ApiRelationshipAsso
     }
 
     /// <inheritdoc/>
-    protected override void WriteCore(Utf8JsonWriter writer, ApiRelationshipAssociation value, IWriteContext context)
+    protected override void WriteCore(Utf8JsonWriter writer, ApiRelationshipAssociation apiRelationshipAssociation, IWriteContext context)
     {
         var writeContext = (DefaultWriteContext<PropertyNames>)context;
 
-        WriteJsonObject(writer, () =>
+        writer.WriteJsonObject(state: (apiRelationshipAssociation, writeContext), writeObject: static (writer, state) =>
         {
-            WriteApiObjectTypeReference(writer, value, writeContext);
-            WriteApiForeignKey(writer, value.HasForeignKeys ? value.ApiForeignKeyA : null, writeContext.PropertyNames.ApiRelationshipAssociation.ApiForeignKeyA, writeContext);
-            WriteApiForeignKey(writer, value.HasForeignKeys ? value.ApiForeignKeyB : null, writeContext.PropertyNames.ApiRelationshipAssociation.ApiForeignKeyB, writeContext);
+            var (apiRelationshipAssociation, writeContext) = state;
+            WriteApiObjectTypeReference(writer, apiRelationshipAssociation, writeContext);
+            WriteApiForeignKeyA(writer, apiRelationshipAssociation, writeContext);
+            WriteApiForeignKeyB(writer, apiRelationshipAssociation, writeContext);
 
-            WriteExtensibleBaseExtensions(writer, writeContext.PropertyNames.ExtensibleBase.Extensions, value, writeContext);
+            WriteExtensibleBaseExtensions
+            (
+                writer,
+                propertyName: writeContext.PropertyNames.ExtensibleBase.Extensions,
+                extensibleBase: apiRelationshipAssociation,
+                context: writeContext
+            );
         });
     }
     #endregion
 
     #region Write Implementation Methods
-    private static void WriteApiObjectTypeReference(Utf8JsonWriter writer, ApiRelationshipAssociation end, DefaultWriteContext<PropertyNames> context)
+    private static void WriteApiObjectTypeReference(Utf8JsonWriter writer, ApiRelationshipAssociation apiRelationshipAssociation, DefaultWriteContext<PropertyNames> writeContext)
         => writer.TryWritePropertyWithSerializer
         (
-            context.PropertyNames.ApiRelationshipElement.ApiObjectTypeReference,
-            end.ApiObjectTypeReference,
-            context.Options
+            propertyName: writeContext.PropertyNames.ApiRelationshipElement.ApiObjectTypeReference,
+            obj: apiRelationshipAssociation.ApiObjectTypeReference,
+            options: writeContext.Options
         );
 
-    private static void WriteApiForeignKey(Utf8JsonWriter writer, ApiKeyDefinition? value, string propertyName, DefaultWriteContext<PropertyNames> context)
-    {
-        writer.TryWritePropertyWithSerializer(propertyName, value, context.Options);
-    }
+    private static void WriteApiForeignKeyA(Utf8JsonWriter writer, ApiRelationshipAssociation apiRelationshipAssociation, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyWithSerializer(propertyName: writeContext.PropertyNames.ApiRelationshipAssociation.ApiForeignKeyA, obj: apiRelationshipAssociation.HasForeignKeys ? apiRelationshipAssociation.ApiForeignKeyA : null, options: writeContext.Options);
+
+    private static void WriteApiForeignKeyB(Utf8JsonWriter writer, ApiRelationshipAssociation apiRelationshipAssociation, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyWithSerializer(propertyName: writeContext.PropertyNames.ApiRelationshipAssociation.ApiForeignKeyB, obj: apiRelationshipAssociation.HasForeignKeys ? apiRelationshipAssociation.ApiForeignKeyB : null, options: writeContext.Options);
     #endregion
 }

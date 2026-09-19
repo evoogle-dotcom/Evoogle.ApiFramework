@@ -3,6 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Internal;
 using Evoogle.ApiFramework.Schema.Compilation;
 using Evoogle.ApiFramework.Schema.Compilation.Internal;
 using Evoogle.ApiFramework.Schema.Configuration.Annotations;
@@ -10,6 +11,7 @@ using Evoogle.ApiFramework.Schema.Configuration.Conventions;
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
 using Evoogle.ApiFramework.Schema.Configuration.Relationships;
 using Evoogle.ApiFramework.Schema.Configuration.Types;
+using Evoogle.ApiFramework.Schema.Relationships;
 using Evoogle.ApiFramework.Schema.Types;
 using Evoogle.Logging;
 
@@ -632,8 +634,9 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
 
         var apiScalarTypes = _context.ApiScalarTypeBuilders.Select(b => b.Build());
         var apiEnumTypes = _context.ApiEnumTypeBuilders.Select(b => b.Build());
+        var apiRelationships = _context.ApiRelationshipBuilders.Select(b => b.Build()).ToArray();
+        this.RemoveDiscoveredNavigationProperties(apiRelationships);
         var apiObjectTypes = _context.ApiObjectTypeBuilders.Select(b => b.Build());
-        var apiRelationships = _context.ApiRelationshipBuilders.Select(b => b.Build());
 
         var apiSchema = new ApiSchema
         (
@@ -657,6 +660,49 @@ public sealed class ApiSchemaBuilder(ILogger<ApiSchemaBuilder>? logger = null) :
         var configurationIssues = _context.ConfigurationIssues;
         var preliminaryIssues = (annotationIssues ?? []).Concat(configurationIssues);
         return ApiSchemaCompiler.Compile(apiSchema, preliminaryIssues);
+    }
+
+    private void RemoveDiscoveredNavigationProperties(IEnumerable<ApiRelationship> relationships)
+    {
+        foreach (var relationship in relationships)
+        {
+            var ends = relationship switch
+            {
+                ApiRelationshipOneTo oneTo =>
+                    new ApiRelationshipEnd[] { oneTo.ApiPrincipalEnd, oneTo.ApiDependentEnd },
+                ApiRelationshipManyToMany manyToMany =>
+                    [manyToMany.ApiPrincipalEndA, manyToMany.ApiPrincipalEndB],
+                _ => []
+            };
+
+            foreach (var end in ends)
+            {
+                if (end is null)
+                {
+                    continue;
+                }
+
+                if (end.ApiTraversal is { ClrMemberName: not null } traversal)
+                {
+                    foreach (var objectBuilder in _context.ApiObjectTypeBuilders)
+                    {
+                        if (end.ApiObjectTypeReference.ClrType == objectBuilder.ClrType ||
+                            (end.ApiObjectTypeReference.ApiName is { } apiName &&
+                                ApiNameComparer.Instance.Equals
+                                (
+                                    apiName,
+                                    objectBuilder.ConfiguredApiName
+                                )))
+                        {
+                            objectBuilder.RemoveConventionPropertyByClrName
+                            (
+                                traversal.ClrMemberName
+                            );
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private ApiSchemaOptions? BuildOptions()

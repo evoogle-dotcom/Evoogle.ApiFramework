@@ -20,6 +20,7 @@ namespace Evoogle.ApiFramework.Schema.Relationships;
 ///     Key-bound relationships resolve the concrete principal key binding on the owning relationship.
 /// </summary>
 /// <param name="apiObjectTypeReference">The reference to the principal <see cref="ApiObjectType"/>.</param>
+/// <param name="apiTraversal">The optional traversal exposed from this end.</param>
 /// <param name="apiPrincipalKeyName">
 ///     The optional name of the <see cref="ApiKeyDefinition"/> on the principal type that should be used by the owning
 ///     relationship's key binding. When <see langword="null"/>, key-bound relationship compilation uses the foreign
@@ -29,8 +30,9 @@ namespace Evoogle.ApiFramework.Schema.Relationships;
 public sealed class ApiRelationshipPrincipalEnd
 (
     ApiTypeReference apiObjectTypeReference,
+    ApiRelationshipTraversal? apiTraversal = null,
     string? apiPrincipalKeyName = null
-) : ApiRelationshipEnd(apiObjectTypeReference)
+) : ApiRelationshipEnd(apiObjectTypeReference, apiTraversal)
 {
     #region ApiSchemaElement Properties
     /// <inheritdoc/>

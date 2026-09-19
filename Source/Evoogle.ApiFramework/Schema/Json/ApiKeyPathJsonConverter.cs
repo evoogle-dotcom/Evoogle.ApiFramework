@@ -73,7 +73,7 @@ public class ApiKeyPathJsonConverter(ILogger<ApiKeyPathJsonConverter>? logger) :
     private class ReadHandlers(PropertyNames propertyNames)
     {
         #region ApiKeyPath Fields
-        public readonly Dictionary<string, JsonReaderHandler<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>>> PropertyHandlers = new()
+        public readonly JsonReaderHandlerTable<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>> PropertyHandlers = new()
         {
             // ApiKeyPath Property Handlers
             { propertyNames.ApiKeyPath.ApiRootObjectTypeReference, HandleApiKeyPathApiRootObjectTypeReference },
@@ -101,7 +101,7 @@ public class ApiKeyPathJsonConverter(ILogger<ApiKeyPathJsonConverter>? logger) :
             context.ReadData.ApiKeyPath ??= new ApiKeyPathReadData();
             context.ReadData.ApiKeyPath.ApiSegments ??= [];
 
-            ReadJsonArray(ref reader, context, _ => HandleApiKeyPathApiSegmentsArrayItem);
+            ReadJsonArray(ref reader, context, HandleApiKeyPathApiSegmentsArrayItem);
         }
 
         private static void HandleApiKeyPathClrPath(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
@@ -180,21 +180,28 @@ public class ApiKeyPathJsonConverter(ILogger<ApiKeyPathJsonConverter>? logger) :
     }
 
     /// <inheritdoc/>
-    protected override void WriteCore(Utf8JsonWriter writer, ApiKeyPath value, IWriteContext context)
+    protected override void WriteCore(Utf8JsonWriter writer, ApiKeyPath apiKeyPath, IWriteContext context)
     {
         var writeContext = (DefaultWriteContext<PropertyNames>)context;
 
-        WriteJsonObject(writer, () =>
+        writer.WriteJsonObject((apiKeyPath, writeContext), writeObject: static (writer, state) =>
         {
-            WriteApiKeyPathApiRootObjectTypeReference(writer, value, writeContext);
-            WriteApiKeyPathClrPathOrApiSegments(writer, value, writeContext);
+            var (apiKeyPath, writeContext) = state;
+            WriteApiKeyPathApiRootObjectTypeReference(writer, apiKeyPath, writeContext);
+            WriteApiKeyPathClrPathOrApiSegments(writer, apiKeyPath, writeContext);
 
-            WriteExtensibleBaseExtensions(writer, writeContext.PropertyNames.ExtensibleBase.Extensions, value, writeContext);
+            WriteExtensibleBaseExtensions
+            (
+                writer,
+                propertyName: writeContext.PropertyNames.ExtensibleBase.Extensions,
+                extensibleBase: apiKeyPath,
+                context: writeContext
+            );
         });
     }
     #endregion
 
-    #region Create Implementation Methods
+    #region Factory Implementation Methods
     private static IEnumerable<ApiKeyPathSegment> CreateApiSegments(string? clrPath)
     {
         if (clrPath is null)
@@ -208,11 +215,19 @@ public class ApiKeyPathJsonConverter(ILogger<ApiKeyPathJsonConverter>? logger) :
     #endregion
 
     #region Write Implementation Methods
+    private static bool ShouldWriteApiSegments(ApiKeyPath apiKeyPath)
+    {
+        return apiKeyPath.ApiSegments.IsEmpty || apiKeyPath.ApiSegments.Any
+        (
+            static segment => segment.ExtensionCount > 0 || segment.ClrMemberName.Contains('.')
+        );
+    }
+
     private static void WriteApiKeyPathApiRootObjectTypeReference
     (
         Utf8JsonWriter writer,
         ApiKeyPath apiKeyPath,
-        DefaultWriteContext<PropertyNames> context
+        DefaultWriteContext<PropertyNames> writeContext
     )
     {
         // An inferred root does not require an explicit root object-type reference.
@@ -227,7 +242,7 @@ public class ApiKeyPathJsonConverter(ILogger<ApiKeyPathJsonConverter>? logger) :
             throw new JsonException("The root type has not been resolved and cannot be written.");
         }
 
-        // Omit an explicit reference when it resolves to the root the context would infer.
+        // Omit an explicit reference when it resolves to the root the writeContext would infer.
         var resolvedClrRootType = apiKeyPath.ClrRootType;
         var inferredClrRootType = apiKeyPath.GetInferredClrRootType();
         if (inferredClrRootType == resolvedClrRootType)
@@ -236,53 +251,43 @@ public class ApiKeyPathJsonConverter(ILogger<ApiKeyPathJsonConverter>? logger) :
         }
 
         // A differing explicit root is written under the logical ApiRootObjectType JSON property.
-        var propertyName = context.PropertyNames.ApiKeyPath.ApiRootObjectTypeReference;
-        var apiRootObjectTypeReference = apiKeyPath.ApiRootObjectTypeReference;
-        var options = context.Options;
-
-        writer.TryWritePropertyWithSerializer(propertyName, apiRootObjectTypeReference, options);
+        writer.TryWritePropertyWithSerializer
+        (
+            propertyName: writeContext.PropertyNames.ApiKeyPath.ApiRootObjectTypeReference,
+            obj: apiKeyPath.ApiRootObjectTypeReference,
+            options: writeContext.Options
+        );
     }
 
-    private static void WriteApiKeyPathClrPathOrApiSegments(Utf8JsonWriter writer, ApiKeyPath apiKeyPath, DefaultWriteContext<PropertyNames> context)
+    private static void WriteApiKeyPathClrPathOrApiSegments(Utf8JsonWriter writer, ApiKeyPath apiKeyPath, DefaultWriteContext<PropertyNames> writeContext)
     {
         if (ShouldWriteApiSegments(apiKeyPath))
         {
-            WriteApiKeyPathApiSegments(writer, apiKeyPath, context);
+            WriteApiKeyPathApiSegments(writer, apiKeyPath, writeContext);
             return;
         }
 
-        WriteApiKeyPathClrPath(writer, apiKeyPath, context);
+        WriteApiKeyPathClrPath(writer, apiKeyPath, writeContext);
     }
 
-    private static bool ShouldWriteApiSegments(ApiKeyPath apiKeyPath)
+    private static void WriteApiKeyPathApiSegments(Utf8JsonWriter writer, ApiKeyPath apiKeyPath, DefaultWriteContext<PropertyNames> writeContext)
     {
-        return apiKeyPath.ApiSegments.IsEmpty || apiKeyPath.ApiSegments.Any
+        writer.TryWritePropertyAsArray
         (
-            static segment => segment.ExtensionCount > 0 || segment.ClrMemberName.Contains('.')
+            propertyName: writeContext.PropertyNames.ApiKeyPath.ApiSegments,
+            collection: apiKeyPath.ApiSegments,
+            state: writeContext,
+            options: writeContext.Options,
+            writeItem: static (writer, item, state) =>
+            {
+                var writeContext = state;
+
+                writer.TryWriteWithSerializer(obj: item, options: writeContext.Options);
+            }
         );
     }
 
-    private static void WriteApiKeyPathApiSegments(Utf8JsonWriter writer, ApiKeyPath apiKeyPath, DefaultWriteContext<PropertyNames> context)
-    {
-        var propertyName = context.PropertyNames.ApiKeyPath.ApiSegments;
-        var apiSegments = apiKeyPath.ApiSegments;
-        var options = context.Options;
-
-        writer.TryWritePropertyWithAction
-        (
-            propertyName,
-            apiSegments,
-            options,
-            collection => WriteJsonArray(writer, collection, item => writer.TryWriteWithSerializer(item, options))
-        );
-    }
-
-    private static void WriteApiKeyPathClrPath(Utf8JsonWriter writer, ApiKeyPath apiKeyPath, DefaultWriteContext<PropertyNames> context)
-    {
-        var propertyName = context.PropertyNames.ApiKeyPath.ClrPath;
-        var options = context.Options;
-
-        writer.TryWritePropertyAsString(propertyName, apiKeyPath.ClrPath, options);
-    }
+    private static void WriteApiKeyPathClrPath(Utf8JsonWriter writer, ApiKeyPath apiKeyPath, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyAsString(propertyName: writeContext.PropertyNames.ApiKeyPath.ClrPath, value: apiKeyPath.ClrPath, options: writeContext.Options);
     #endregion
 }

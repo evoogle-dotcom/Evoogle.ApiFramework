@@ -602,6 +602,8 @@ management belongs to the runtime; each delivered event receives a bounded proce
 - The alpha may reveal that provisional artifact names or boundaries should change.
 - The version feature is implemented and vetted separately under ADR 0001 before version-dependent
   command scenarios are completed.
+- [ADR 0003](0003-distinguish-contained-values-from-relationship-traversals.md) defines contained
+  object values, first-class relationship traversals, and optional CLR navigation bindings.
 - Roadmap features require new ADRs or explicit amendments rather than being inferred from this
   decision.
 

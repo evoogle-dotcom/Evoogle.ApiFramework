@@ -104,7 +104,7 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
     private class ReadHandlers(PropertyNames propertyNames)
     {
         #region ApiSchema Fields
-        public readonly Dictionary<string, JsonReaderHandler<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>>> PropertyHandlers = new()
+        public readonly JsonReaderHandlerTable<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>> PropertyHandlers = new()
         {
             // ApiSchema Property Handlers
             { propertyNames.ApiSchema.ApiName, HandleApiName },
@@ -263,122 +263,114 @@ public class ApiSchemaJsonConverter(ILogger<ApiSchemaJsonConverter>? logger) : J
     }
 
     /// <inheritdoc/>
-    protected override void WriteCore(Utf8JsonWriter writer, ApiSchema value, IWriteContext context)
+    protected override void WriteCore(Utf8JsonWriter writer, ApiSchema apiSchema, IWriteContext context)
     {
         var writeContext = (DefaultWriteContext<PropertyNames>)context;
 
-        WriteJsonObject(writer, () =>
+        writer.WriteJsonObject(state: (apiSchema, writeContext), writeObject: static (writer, state) =>
         {
+            var (apiSchema, writeContext) = state;
+
             // Prolog
-            WriteApiName(writer, value, writeContext);
-            WriteApiVersion(writer, value, writeContext);
-            WriteApiOptions(writer, value, writeContext);
+            WriteApiName(writer, apiSchema, writeContext);
+            WriteApiVersion(writer, apiSchema, writeContext);
+            WriteApiOptions(writer, apiSchema, writeContext);
 
             // Body
-            WriteApiScalarTypes(writer, value, writeContext);
-            WriteApiEnumTypes(writer, value, writeContext);
-            WriteApiObjectTypes(writer, value, writeContext);
-            WriteApiRelationships(writer, value, writeContext);
+            WriteApiScalarTypes(writer, apiSchema, writeContext);
+            WriteApiEnumTypes(writer, apiSchema, writeContext);
+            WriteApiObjectTypes(writer, apiSchema, writeContext);
+            WriteApiRelationships(writer, apiSchema, writeContext);
 
             // Epilog
-            WriteExtensions(writer, value, writeContext);
+            WriteExtensions(writer, apiSchema, writeContext);
         });
     }
     #endregion
 
     #region Write Implementation Methods
-    private static void WriteApiName(Utf8JsonWriter writer, ApiSchema apiSchema, DefaultWriteContext<PropertyNames> context)
+    private static void WriteApiName(Utf8JsonWriter writer, ApiSchema apiSchema, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyAsString(propertyName: writeContext.PropertyNames.ApiSchema.ApiName, value: apiSchema.ApiName, options: writeContext.Options);
+
+    private static void WriteApiVersion(Utf8JsonWriter writer, ApiSchema apiSchema, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyAsString(propertyName: writeContext.PropertyNames.ApiSchema.ApiVersion, value: apiSchema.ApiVersion, options: writeContext.Options);
+
+    private static void WriteApiOptions(Utf8JsonWriter writer, ApiSchema apiSchema, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyWithSerializer(propertyName: writeContext.PropertyNames.ApiSchema.ApiOptions, obj: apiSchema.ApiOptions, options: writeContext.Options);
+
+    private static void WriteApiScalarTypes(Utf8JsonWriter writer, ApiSchema apiSchema, DefaultWriteContext<PropertyNames> writeContext)
     {
-        var propertyName = context.PropertyNames.ApiSchema.ApiName;
-        var value = apiSchema.ApiName;
-        var options = context.Options;
-
-        writer.TryWritePropertyAsString(propertyName, value, options);
-    }
-
-    private static void WriteApiVersion(Utf8JsonWriter writer, ApiSchema apiSchema, DefaultWriteContext<PropertyNames> context)
-    {
-        var propertyName = context.PropertyNames.ApiSchema.ApiVersion;
-        var value = apiSchema.ApiVersion;
-        var options = context.Options;
-
-        writer.TryWritePropertyAsString(propertyName, value, options);
-    }
-
-    private static void WriteApiOptions(Utf8JsonWriter writer, ApiSchema apiSchema, DefaultWriteContext<PropertyNames> context)
-    {
-        var propertyName = context.PropertyNames.ApiSchema.ApiOptions;
-        var apiSchemaOptions = apiSchema.ApiOptions;
-        var options = context.Options;
-
-        writer.TryWritePropertyWithSerializer(propertyName, apiSchemaOptions, options);
-    }
-
-    private static void WriteApiScalarTypes(Utf8JsonWriter writer, ApiSchema apiSchema, DefaultWriteContext<PropertyNames> context)
-    {
-        var propertyName = context.PropertyNames.ApiSchema.ApiScalarTypes;
+        var propertyName = writeContext.PropertyNames.ApiSchema.ApiScalarTypes;
         var apiScalarTypes = apiSchema.ApiScalarTypes.Cast<ApiType>();
-        var options = context.Options;
+        var options = writeContext.Options;
 
-        writer.TryWritePropertyWithAction
+        writer.TryWritePropertyAsArray
         (
-            propertyName,
-            apiScalarTypes,
-            options,
-            collection => WriteJsonArray(writer, collection, item => writer.TryWriteWithSerializer(item, options))
+            propertyName: propertyName,
+            collection: apiScalarTypes,
+            state: writeContext,
+            options: writeContext.Options,
+            writeItem: static (writer, item, state) =>
+                writer.TryWriteWithSerializer(obj: item, options: state.Options)
         );
     }
 
-    private static void WriteApiEnumTypes(Utf8JsonWriter writer, ApiSchema apiSchema, DefaultWriteContext<PropertyNames> context)
+    private static void WriteApiEnumTypes(Utf8JsonWriter writer, ApiSchema apiSchema, DefaultWriteContext<PropertyNames> writeContext)
     {
-        var propertyName = context.PropertyNames.ApiSchema.ApiEnumTypes;
+        var propertyName = writeContext.PropertyNames.ApiSchema.ApiEnumTypes;
         var apiEnumTypes = apiSchema.ApiEnumTypes.Cast<ApiType>();
-        var options = context.Options;
+        var options = writeContext.Options;
 
-        writer.TryWritePropertyWithAction
+        writer.TryWritePropertyAsArray
         (
-            propertyName,
-            apiEnumTypes,
-            options,
-            collection => WriteJsonArray(writer, collection, item => writer.TryWriteWithSerializer(item, options))
+            propertyName: propertyName,
+            collection: apiEnumTypes,
+            state: writeContext,
+            options: writeContext.Options,
+            writeItem: static (writer, item, state) =>
+                writer.TryWriteWithSerializer(obj: item, options: state.Options)
         );
     }
 
-    private static void WriteApiObjectTypes(Utf8JsonWriter writer, ApiSchema apiSchema, DefaultWriteContext<PropertyNames> context)
+    private static void WriteApiObjectTypes(Utf8JsonWriter writer, ApiSchema apiSchema, DefaultWriteContext<PropertyNames> writeContext)
     {
-        var propertyName = context.PropertyNames.ApiSchema.ApiObjectTypes;
+        var propertyName = writeContext.PropertyNames.ApiSchema.ApiObjectTypes;
         var apiObjectTypes = apiSchema.ApiObjectTypes.Cast<ApiType>();
-        var options = context.Options;
+        var options = writeContext.Options;
 
-        writer.TryWritePropertyWithAction
+        writer.TryWritePropertyAsArray
         (
-            propertyName,
-            apiObjectTypes,
-            options,
-            collection => WriteJsonArray(writer, collection, item => writer.TryWriteWithSerializer(item, options))
+            propertyName: propertyName,
+            collection: apiObjectTypes,
+            state: writeContext,
+            options: writeContext.Options,
+            writeItem: static (writer, item, state) =>
+                writer.TryWriteWithSerializer(obj: item, options: state.Options)
         );
     }
 
-    private static void WriteApiRelationships(Utf8JsonWriter writer, ApiSchema apiSchema, DefaultWriteContext<PropertyNames> context)
+    private static void WriteApiRelationships(Utf8JsonWriter writer, ApiSchema apiSchema, DefaultWriteContext<PropertyNames> writeContext)
     {
-        var propertyName = context.PropertyNames.ApiSchema.ApiRelationships;
+        var propertyName = writeContext.PropertyNames.ApiSchema.ApiRelationships;
         var apiRelationships = apiSchema.ApiRelationships;
-        var options = context.Options;
+        var options = writeContext.Options;
 
-        writer.TryWritePropertyWithAction
+        writer.TryWritePropertyAsArray
         (
-            propertyName,
-            apiRelationships,
-            options,
-            collection => WriteJsonArray(writer, collection, item => writer.TryWriteWithSerializer(item, options))
+            propertyName: propertyName,
+            collection: apiRelationships,
+            state: writeContext,
+            options: writeContext.Options,
+            writeItem: static (writer, item, state) =>
+                writer.TryWriteWithSerializer(obj: item, options: state.Options)
         );
     }
 
-    private static void WriteExtensions(Utf8JsonWriter writer, ApiSchema apiSchema, DefaultWriteContext<PropertyNames> context)
+    private static void WriteExtensions(Utf8JsonWriter writer, ApiSchema apiSchema, DefaultWriteContext<PropertyNames> writeContext)
     {
-        var propertyName = context.PropertyNames.ExtensibleBase.Extensions;
+        var propertyName = writeContext.PropertyNames.ExtensibleBase.Extensions;
 
-        WriteExtensibleBaseExtensions(writer, propertyName, apiSchema, context);
+        WriteExtensibleBaseExtensions(writer, propertyName, apiSchema, writeContext);
     }
     #endregion
 }

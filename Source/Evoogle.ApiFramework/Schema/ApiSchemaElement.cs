@@ -3,6 +3,7 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Schema.Compilation;
 using Evoogle.ApiFramework.Schema.Compilation.Internal;
 using Evoogle.ApiFramework.Schema.Key;
@@ -224,7 +225,7 @@ public abstract class ApiSchemaElement : ExtensibleBase, INode<ApiSchemaElement>
 
         if (_topology is not null)
         {
-            throw new InvalidOperationException("Schema element topology can only be established once.");
+            throw new ApiSchemaException("Schema element topology can only be established once.");
         }
 
         _topology = new ApiSchemaElementTopology
@@ -346,7 +347,7 @@ public abstract class ApiSchemaElement : ExtensibleBase, INode<ApiSchemaElement>
     {
         if (_isFrozen)
         {
-            throw new InvalidOperationException("A frozen API schema element cannot be modified.");
+            throw new ApiSchemaException("A frozen API schema element cannot be modified.");
         }
     }
     #endregion

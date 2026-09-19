@@ -25,6 +25,7 @@ internal static class ApiSchemaCompilationLookup
         string apiPath,
         ApiSchemaCompilationCode duplicatePartCode,
         ApiSchemaCompilationSession session,
+        IEqualityComparer<TPartKey> keyComparer,
         out FrozenDictionary<TPartKey, TPart>? lookupDictionary
     )
         where TPart : class
@@ -38,21 +39,24 @@ internal static class ApiSchemaCompilationLookup
             .Where(x => x.Key is not null && partKeyFilter(x.Key));
 
         lookupDictionary = keyedParts
-            .GroupBy(x => x.Key!)
+            .GroupBy(x => x.Key!, keyComparer)
             .Where(g => g.Count() == 1)
-            .ToFrozenDictionary(g => g.Key, g => g.Single().Part);
+            .ToFrozenDictionary(g => g.Key, g => g.Single().Part, keyComparer);
 
-        ValidateUnique(
+        ValidateUnique
+        (
             parts: parts,
             partKeySelector: partKeySelector,
             partKeyFilter: partKeyFilter,
             partKeyPropertyName: partKeyPropertyName,
             apiPath: apiPath,
             duplicatePartCode: duplicatePartCode,
-            session: session);
+            session: session,
+            keyComparer: keyComparer
+        );
     }
 
-    public static void ValidateUnique<TPart, TPartKey>
+    private static void ValidateUnique<TPart, TPartKey>
     (
         IEnumerable<TPart?> parts,
         Func<TPart, TPartKey?> partKeySelector,
@@ -60,7 +64,8 @@ internal static class ApiSchemaCompilationLookup
         string partKeyPropertyName,
         string apiPath,
         ApiSchemaCompilationCode duplicatePartCode,
-        ApiSchemaCompilationSession session
+        ApiSchemaCompilationSession session,
+        IEqualityComparer<TPartKey> keyComparer
     )
         where TPart : class
         where TPartKey : notnull
@@ -71,7 +76,7 @@ internal static class ApiSchemaCompilationLookup
             .OfType<TPart>()
             .Select(part => (Part: part, Key: partKeySelector(part)))
             .Where(x => x.Key is not null && partKeyFilter(x.Key))
-            .GroupBy(x => x.Key!)
+            .GroupBy(x => x.Key!, keyComparer)
             .Where(g => g.Count() > 1)
             .Select(g => g.Key)
             .ToList();

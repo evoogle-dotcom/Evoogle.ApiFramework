@@ -5,6 +5,7 @@
 // See the LICENSE file in the project root for more information.
 using System.Reflection;
 
+using Evoogle.ApiFramework.Internal;
 using Evoogle.ApiFramework.Schema.Compilation;
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
 using Evoogle.ApiFramework.Schema.Configuration.Types;
@@ -669,7 +670,11 @@ internal sealed class ApiAnnotationReaderSet
                         existingResult =>
                             existingResult.Order != result.Order ||
                             existingResult.ClrRootType != result.ClrRootType ||
-                            !existingResult.ClrMemberNames.SequenceEqual(result.ClrMemberNames)
+                            !existingResult.ClrMemberNames.SequenceEqual
+                            (
+                                result.ClrMemberNames,
+                                ClrNameComparer.Instance
+                            )
                     ))
                 {
                     existing.Results.Add(result);

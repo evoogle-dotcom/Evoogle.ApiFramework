@@ -7,6 +7,7 @@ using System.Collections.Frozen;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 
+using Evoogle.ApiFramework.Internal;
 using Evoogle.ApiFramework.Schema.Compilation;
 using Evoogle.ApiFramework.Schema.Compilation.Internal;
 using Evoogle.Extensions;
@@ -172,6 +173,7 @@ public sealed class ApiEnumType
             apiPath: this.ApiPath,
             duplicatePartCode: ApiSchemaCompilationCode.ApiEnumTypeDuplicateValueApiName,
             session: context.Session,
+            keyComparer: ApiNameComparer.Instance,
             lookupDictionary: out _apiNameLookup
         );
 
@@ -184,6 +186,7 @@ public sealed class ApiEnumType
             apiPath: this.ApiPath,
             duplicatePartCode: ApiSchemaCompilationCode.ApiEnumTypeDuplicateValueClrName,
             session: context.Session,
+            keyComparer: ClrNameComparer.Instance,
             lookupDictionary: out _clrNameLookup
         );
 
@@ -196,6 +199,7 @@ public sealed class ApiEnumType
             apiPath: this.ApiPath,
             duplicatePartCode: ApiSchemaCompilationCode.ApiEnumTypeDuplicateValueClrOrdinal,
             session: context.Session,
+            keyComparer: EqualityComparer<int>.Default,
             lookupDictionary: out _clrOrdinalLookup
         );
     }

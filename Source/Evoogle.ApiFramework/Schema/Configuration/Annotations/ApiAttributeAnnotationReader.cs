@@ -5,6 +5,7 @@
 // See the LICENSE file in the project root for more information.
 using System.Reflection;
 
+using Evoogle.ApiFramework.Exceptions;
 using Evoogle.ApiFramework.Schema.Compilation;
 using Evoogle.ApiFramework.Schema.Configuration.Internal;
 using Evoogle.ApiFramework.Schema.Key.Internal;
@@ -458,7 +459,7 @@ public sealed class ApiAttributeAnnotationReader :
                 return [memberName];
             }
 
-            throw new InvalidOperationException
+            throw new ApiSchemaConfigurationException
             (
                 $"The {nameof(ApiKeyAttribute)} on CLR type '{clrType.FullName}' must specify " +
                 $"{nameof(ApiKeyAttribute.ClrPath)} when applied at type level."
@@ -468,7 +469,7 @@ public sealed class ApiAttributeAnnotationReader :
         var parseResult = ApiKeyPathClrPathParser.Parse(keyAttribute.ClrPath);
         if (!parseResult.IsValid)
         {
-            throw new InvalidOperationException
+            throw new ApiSchemaConfigurationException
             (
                 $"The {nameof(ApiKeyAttribute)} on CLR type '{clrType.FullName}' has an invalid " +
                 $"{nameof(ApiKeyAttribute.ClrPath)} value '{keyAttribute.ClrPath}'. CLR paths must " +

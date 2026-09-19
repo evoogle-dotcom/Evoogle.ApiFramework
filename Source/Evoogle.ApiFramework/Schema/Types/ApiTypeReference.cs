@@ -5,6 +5,7 @@
 // See the LICENSE file in the project root for more information.
 using System.Text.Json.Serialization;
 
+using Evoogle.ApiFramework.Internal;
 using Evoogle.ApiFramework.Schema.Compilation;
 using Evoogle.ApiFramework.Schema.Compilation.Internal;
 using Evoogle.ApiFramework.Schema.Json;
@@ -183,7 +184,7 @@ public sealed class ApiTypeReference : IEquatable<ApiTypeReference>
     public bool Equals(ApiTypeReference? other) =>
         other is not null &&
         this.ApiKind == other.ApiKind &&
-        string.Equals(this.ApiName, other.ApiName, StringComparison.Ordinal) &&
+        ApiNameComparer.Instance.Equals(this.ApiName, other.ApiName) &&
         this.ClrType == other.ClrType &&
         _hasInvalidApiKind == other._hasInvalidApiKind;
 
@@ -194,7 +195,7 @@ public sealed class ApiTypeReference : IEquatable<ApiTypeReference>
     public override int GetHashCode() => HashCode.Combine
     (
         this.ApiKind,
-        this.ApiName is null ? 0 : StringComparer.Ordinal.GetHashCode(this.ApiName),
+        this.ApiName is null ? 0 : ApiNameComparer.Instance.GetHashCode(this.ApiName),
         this.ClrType,
         _hasInvalidApiKind
     );

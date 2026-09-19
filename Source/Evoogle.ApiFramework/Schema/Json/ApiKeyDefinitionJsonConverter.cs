@@ -50,7 +50,7 @@ public class ApiKeyDefinitionJsonConverter(ILogger<ApiKeyDefinitionJsonConverter
     private class ReadHandlers(PropertyNames propertyNames)
     {
         #region ApiKeyDefinition Fields
-        public readonly Dictionary<string, JsonReaderHandler<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>>> PropertyHandlers = new()
+        public readonly JsonReaderHandlerTable<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>> PropertyHandlers = new()
         {
             // ApiKeyDefinition Property Handlers
             { propertyNames.ApiKeyDefinition.ApiKeyPaths, HandleApiKeyDefinitionApiKeyPaths },
@@ -66,7 +66,7 @@ public class ApiKeyDefinitionJsonConverter(ILogger<ApiKeyDefinitionJsonConverter
             context.ReadData.ApiKeyDefinition ??= new ApiKeyDefinitionJsonConverterCore.ReadData();
             context.ReadData.ApiKeyDefinition.ApiKeyPaths ??= [];
 
-            ReadJsonArray(ref reader, context, (x) => HandleApiKeyDefinitionApiKeyPathsArrayItem);
+            ReadJsonArray(ref reader, context, HandleApiKeyDefinitionApiKeyPathsArrayItem);
         }
 
         private static void HandleApiKeyDefinitionApiKeyPathsArrayItem(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
@@ -136,32 +136,41 @@ public class ApiKeyDefinitionJsonConverter(ILogger<ApiKeyDefinitionJsonConverter
     }
 
     /// <inheritdoc/>
-    protected override void WriteCore(Utf8JsonWriter writer, ApiKeyDefinition value, IWriteContext context)
+    protected override void WriteCore(Utf8JsonWriter writer, ApiKeyDefinition apiKeyDefinition, IWriteContext context)
     {
         var writeContext = (DefaultWriteContext<PropertyNames>)context;
 
-        WriteJsonObject(writer, () =>
+        writer.WriteJsonObject(state: (apiKeyDefinition, writeContext), writeObject: static (writer, state) =>
         {
-            WriteApiKeyDefinitionApiKeyPaths(writer, value, writeContext);
+            var (apiKeyDefinition, writeContext) = state;
+            WriteApiKeyDefinitionApiKeyPaths(writer, apiKeyDefinition, writeContext);
 
-            WriteExtensibleBaseExtensions(writer, writeContext.PropertyNames.ExtensibleBase.Extensions, value, writeContext);
+            WriteExtensibleBaseExtensions
+            (
+                writer,
+                propertyName: writeContext.PropertyNames.ExtensibleBase.Extensions,
+                extensibleBase: apiKeyDefinition,
+                context: writeContext
+            );
         });
     }
     #endregion
 
     #region Write Implementation Methods
-    private static void WriteApiKeyDefinitionApiKeyPaths(Utf8JsonWriter writer, ApiKeyDefinition apiKeyDefinition, DefaultWriteContext<PropertyNames> context)
+    private static void WriteApiKeyDefinitionApiKeyPaths(Utf8JsonWriter writer, ApiKeyDefinition apiKeyDefinition, DefaultWriteContext<PropertyNames> writeContext)
     {
-        var propertyName = context.PropertyNames.ApiKeyDefinition.ApiKeyPaths;
-        var options = context.Options;
-
-        ApiKeyDefinitionJsonConverterCore.WriteApiKeyPaths
+        writer.TryWritePropertyAsArray
         (
-            writer,
-            apiKeyDefinition,
-            propertyName,
-            options,
-            WriteJsonArray
+            propertyName: writeContext.PropertyNames.ApiKeyDefinition.ApiKeyPaths,
+            collection: apiKeyDefinition.ApiKeyPaths,
+            state: writeContext,
+            options: writeContext.Options,
+            writeItem: static (writer, item, state) =>
+            {
+                var writeContext = state;
+
+                writer.TryWriteWithSerializer(obj: item, options: writeContext.Options);
+            }
         );
     }
     #endregion

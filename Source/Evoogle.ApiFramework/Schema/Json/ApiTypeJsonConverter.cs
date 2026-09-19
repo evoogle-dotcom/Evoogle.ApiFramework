@@ -199,36 +199,36 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
         (
             ref reader,
             readContext,
-            handlers,
-            readContext.PropertyNames.ApiType.ApiKind,
-            readContext.PropertyNames.ApiCollectionType.ApiItemTypeModifiers
+            handlers
         );
     }
 
     /// <inheritdoc/>
-    protected override void WriteCore(Utf8JsonWriter writer, ApiType value, IWriteContext context)
+    protected override void WriteCore(Utf8JsonWriter writer, ApiType apiType, IWriteContext context)
     {
         var writeContext = (DefaultWriteContext<PropertyNames>)context;
 
-        WriteJsonObject(writer, () =>
+        writer.WriteJsonObject(state: (apiType, writeContext), writeObject: static (writer, state) =>
         {
+            var (apiType, writeContext) = state;
+
             // Prolog
-            WriteApiTypeApiKind(writer, value, writeContext);
+            WriteApiTypeApiKind(writer, apiType, writeContext);
 
             // Body
-            var apiKind = value.ApiKind;
+            var apiKind = apiType.ApiKind;
             switch (apiKind)
             {
                 case ApiTypeKind.Collection:
                     {
-                        var apiCollectionType = (ApiCollectionType)value;
+                        var apiCollectionType = (ApiCollectionType)apiType;
                         WriteApiCollectionType(writer, apiCollectionType, writeContext);
                         break;
                     }
 
                 case ApiTypeKind.Enum:
                     {
-                        var apiEnumType = (ApiEnumType)value;
+                        var apiEnumType = (ApiEnumType)apiType;
                         WriteApiNamedType(writer, apiEnumType, writeContext);
                         WriteApiEnumType(writer, apiEnumType, writeContext);
                         break;
@@ -236,7 +236,7 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
 
                 case ApiTypeKind.Object:
                     {
-                        var apiObjectType = (ApiObjectType)value;
+                        var apiObjectType = (ApiObjectType)apiType;
                         WriteApiNamedType(writer, apiObjectType, writeContext);
                         WriteApiObjectType(writer, apiObjectType, writeContext);
                         break;
@@ -244,7 +244,7 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
 
                 case ApiTypeKind.Scalar:
                     {
-                        var apiScalarType = (ApiScalarType)value;
+                        var apiScalarType = (ApiScalarType)apiType;
                         WriteApiNamedType(writer, apiScalarType, writeContext);
                         WriteApiScalarType(writer, apiScalarType, writeContext);
                         break;
@@ -257,9 +257,15 @@ public partial class ApiTypeJsonConverter(ILogger<ApiTypeJsonConverter>? logger)
             }
 
             // Epilog
-            WriteApiTypeClrType(writer, value, writeContext);
+            WriteApiTypeClrType(writer, apiType, writeContext);
 
-            WriteExtensibleBaseExtensions(writer, writeContext.PropertyNames.ExtensibleBase.Extensions, value, writeContext);
+            WriteExtensibleBaseExtensions
+            (
+                writer,
+                propertyName: writeContext.PropertyNames.ExtensibleBase.Extensions,
+                extensibleBase: apiType,
+                context: writeContext
+            );
         });
     }
     #endregion

@@ -3,6 +3,8 @@
 //
 // This file is licensed under the MIT License.
 // See the LICENSE file in the project root for more information.
+using Evoogle.ApiFramework.Exceptions;
+
 namespace Evoogle.ApiFramework.Schema.Compilation.Internal;
 
 /// <summary>
@@ -95,7 +97,7 @@ internal readonly struct ApiSchemaCompilationLocation
                     _apiLabel
                 ),
 
-            _ => throw new InvalidOperationException($"Unsupported {nameof(ApiSchemaCompilationLocationKind)} value '{_kind}'."),
+            _ => throw new ApiSchemaException($"Unsupported {nameof(ApiSchemaCompilationLocationKind)} value '{_kind}'."),
         };
     }
     #endregion

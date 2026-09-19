@@ -237,7 +237,7 @@ public class ApiSchemaElementTests(ITestOutputHelper output) : XUnitTests(output
 
         protected override void Assert()
         {
-            this.Exception.Should().BeOfType<InvalidOperationException>();
+            this.Exception.Should().BeOfType<ApiSchemaException>();
             this.After.Should().Equal(this.Before!);
             AssertTopology(this.Schema!);
         }
@@ -586,11 +586,50 @@ public class ApiSchemaElementTests(ITestOutputHelper output) : XUnitTests(output
         return
         [
             CreateTraversalSchema(),
+            CreateRelationshipTraversalSchema(),
             ApiSchemaFactory.SimpleApiSchema,
             ApiSchemaFactory.CommerceApiSchema,
             ApiSchemaFactory.KeyApiSchema,
             ApiSchemaFactory.RelationshipApiSchema
         ];
+    }
+
+    private static ApiSchema CreateRelationshipTraversalSchema()
+    {
+        var objectType = new ApiObjectType
+        (
+            "TreeObject", null,
+            [
+                new ApiProperty
+                (
+                    "Id", new ApiTypeExpression(new ApiTypeReference(typeof(int))),
+                    ApiTypeModifiers.Required, nameof(TreeObject.Id), ClrMemberKind.Property
+                )
+            ],
+            null, null, typeof(TreeObject)
+        );
+        var relationship = new ApiRelationshipOneToOne
+        (
+            "Self",
+            new ApiRelationshipPrincipalEnd
+            (
+                new ApiTypeReference(typeof(TreeObject)),
+                new ApiRelationshipTraversal("forward")
+            ),
+            new ApiRelationshipDependentEnd
+            (
+                new ApiTypeReference(typeof(TreeObject)),
+                new ApiRelationshipTraversal("back")
+            )
+        );
+        var schema = new ApiSchema
+        (
+            "TraversalKinds", null, null,
+            apiNamedTypes: [new ApiScalarType("Int32", typeof(int)), objectType],
+            apiRelationships: [relationship]
+        );
+        ApiSchemaCompiler.Compile(schema).ThrowIfInvalid();
+        return schema;
     }
     #endregion
 
@@ -663,6 +702,7 @@ public class ApiSchemaElementTests(ITestOutputHelper output) : XUnitTests(output
             ApiRelationshipPrincipalEnd => ApiSchemaElementKind.RelationshipPrincipalEnd,
             ApiRelationshipDependentEnd => ApiSchemaElementKind.RelationshipDependentEnd,
             ApiRelationshipAssociation => ApiSchemaElementKind.RelationshipAssociation,
+            ApiRelationshipTraversal => ApiSchemaElementKind.RelationshipTraversal,
             _ => throw new InvalidOperationException
             (
                 $"Unsupported schema element type '{element.GetType().Name}'."
@@ -713,8 +753,16 @@ public class ApiSchemaElementTests(ITestOutputHelper output) : XUnitTests(output
                     apiRelationship.ApiAssociation
                 }.OfType<ApiSchemaElement>()
             ],
-            ApiRelationshipDependentEnd apiDependentEnd when apiDependentEnd.HasForeignKey =>
-                [apiDependentEnd.ApiForeignKey],
+            ApiRelationshipPrincipalEnd principalEnd => principalEnd.ApiTraversal is { } principalTraversal
+                ? [principalTraversal] : [],
+            ApiRelationshipDependentEnd dependentEnd =>
+            [
+                .. new ApiSchemaElement?[]
+                {
+                    dependentEnd.ApiTraversal,
+                    dependentEnd.HasForeignKey ? dependentEnd.ApiForeignKey : null
+                }.OfType<ApiSchemaElement>()
+            ],
             ApiRelationshipAssociation apiAssociation when apiAssociation.HasForeignKeys =>
                 [apiAssociation.ApiForeignKeyA, apiAssociation.ApiForeignKeyB],
             _ => []

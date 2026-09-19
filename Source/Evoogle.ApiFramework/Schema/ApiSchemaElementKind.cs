@@ -61,6 +61,9 @@ public enum ApiSchemaElementKind
     /// <summary>Represents an <see cref="ApiRelationshipPrincipalEnd"/>.</summary>
     RelationshipPrincipalEnd,
 
+    /// <summary>Represents an <see cref="ApiRelationshipTraversal"/>.</summary>
+    RelationshipTraversal,
+
     /// <summary>Represents an <see cref="ApiScalarType"/>.</summary>
     ScalarType,
 

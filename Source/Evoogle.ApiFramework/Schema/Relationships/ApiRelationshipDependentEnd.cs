@@ -26,6 +26,7 @@ namespace Evoogle.ApiFramework.Schema.Relationships;
 ///     When no foreign key is declared, the owning relationship is navigational at the schema level.
 /// </remarks>
 /// <param name="apiObjectTypeReference">The reference to the dependent <see cref="ApiObjectType"/>.</param>
+/// <param name="apiTraversal">The optional traversal exposed from this end.</param>
 /// <param name="apiForeignKey">
 ///     The optional <see cref="ApiKeyDefinition"/> that maps the principal key's scalar leaves to properties
 ///     on the dependent object graph.
@@ -34,8 +35,9 @@ namespace Evoogle.ApiFramework.Schema.Relationships;
 public sealed class ApiRelationshipDependentEnd
 (
     ApiTypeReference apiObjectTypeReference,
+    ApiRelationshipTraversal? apiTraversal = null,
     ApiKeyDefinition? apiForeignKey = null
-) : ApiRelationshipEnd(apiObjectTypeReference)
+) : ApiRelationshipEnd(apiObjectTypeReference, apiTraversal)
 {
     #region ApiRelationshipDependentEnd Fields
     private readonly ApiKeyDefinition? _apiForeignKey = apiForeignKey;
@@ -90,6 +92,11 @@ public sealed class ApiRelationshipDependentEnd
     /// <inheritdoc/>
     internal override IEnumerable<ApiSchemaElement> GetOwnedElements()
     {
+        foreach (var traversal in base.GetOwnedElements())
+        {
+            yield return traversal;
+        }
+
         if (_apiForeignKey is not null)
         {
             yield return _apiForeignKey;
