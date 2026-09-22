@@ -80,10 +80,10 @@ public class ApiClrMemberReferenceTests(ITestOutputHelper output) : XUnitTests(o
     #endregion
 
     #region Test Fields
-    private static readonly ApiClrMemberReference _apiAcmeFieldReference = new("Acme", ClrMemberKind.Field);
-    private static readonly ApiClrMemberReference _apiValueFieldReference = new("Value", ClrMemberKind.Field);
-    private static readonly ApiClrMemberReference _apiValuePropertyReference = new("Value", ClrMemberKind.Property);
-    private static readonly ApiClrMemberReference _apiVALUEPropertyReference = new("VALUE", ClrMemberKind.Property);
+    private static readonly ApiClrMemberReference _apiAcmeFieldReference = new(ClrMemberKind.Field, "Acme");
+    private static readonly ApiClrMemberReference _apiValueFieldReference = new(ClrMemberKind.Field, "Value");
+    private static readonly ApiClrMemberReference _apiValuePropertyReference = new(ClrMemberKind.Property, "Value");
+    private static readonly ApiClrMemberReference _apiVALUEPropertyReference = new(ClrMemberKind.Property, "VALUE");
     #endregion
 
     #region Test Properties
@@ -156,7 +156,7 @@ public class ApiClrMemberReferenceTests(ITestOutputHelper output) : XUnitTests(o
                 ""ClrName"": ""Value"",
                 ""ClrKind"": ""Field""
             }",
-            ExpectedFactoryArgument = new ApiClrMemberReferenceDef(clrName: "Value", clrKind: ClrMemberKind.Field)
+            ExpectedFactoryArgument = new ApiClrMemberReferenceDef(clrKind: ClrMemberKind.Field, clrName: "Value")
         },
         new JsonDeserializeTest
         {
@@ -167,7 +167,7 @@ public class ApiClrMemberReferenceTests(ITestOutputHelper output) : XUnitTests(o
                 ""clrName"": ""Value"",
                 ""clrKind"": ""Field""
             }",
-            ExpectedFactoryArgument = new ApiClrMemberReferenceDef(clrName: "Value", clrKind: ClrMemberKind.Field)
+            ExpectedFactoryArgument = new ApiClrMemberReferenceDef(clrKind: ClrMemberKind.Field, clrName: "Value")
         },
         new JsonDeserializeTest
         {
@@ -177,7 +177,7 @@ public class ApiClrMemberReferenceTests(ITestOutputHelper output) : XUnitTests(o
                 ""ClrName"": ""Value"",
                 ""ClrKind"": ""Property""
             }",
-            ExpectedFactoryArgument = new ApiClrMemberReferenceDef(clrName: "Value", clrKind: ClrMemberKind.Property)
+            ExpectedFactoryArgument = new ApiClrMemberReferenceDef(clrKind: ClrMemberKind.Property, clrName: "Value")
         },
         new JsonDeserializeTest
         {
@@ -188,7 +188,7 @@ public class ApiClrMemberReferenceTests(ITestOutputHelper output) : XUnitTests(o
                 ""clrName"": ""Value"",
                 ""clrKind"": ""Property""
             }",
-            ExpectedFactoryArgument = new ApiClrMemberReferenceDef(clrName: "Value", clrKind: ClrMemberKind.Property)
+            ExpectedFactoryArgument = new ApiClrMemberReferenceDef(clrKind: ClrMemberKind.Property, clrName: "Value")
         },
 
         // Invalid JSON
@@ -200,7 +200,7 @@ public class ApiClrMemberReferenceTests(ITestOutputHelper output) : XUnitTests(o
                 ""ClrName"": ""Value"",
                 ""ClrKind"": ""42""
             }",
-            ExpectedFactoryArgument = new ApiClrMemberReferenceDef(clrName: "Value", clrKind: null, hasInvalidClrKind: true)
+            ExpectedFactoryArgument = new ApiClrMemberReferenceDef(clrKind: null, clrName: "Value", hasInvalidClrKind: true)
         },
 
         new JsonDeserializeTest
@@ -210,7 +210,7 @@ public class ApiClrMemberReferenceTests(ITestOutputHelper output) : XUnitTests(o
             {
                 ""ClrKind"": ""Property""
             }",
-            ExpectedFactoryArgument = new ApiClrMemberReferenceDef(clrName: null, clrKind: ClrMemberKind.Property, hasInvalidClrKind: false)
+            ExpectedFactoryArgument = new ApiClrMemberReferenceDef(clrKind: ClrMemberKind.Property, clrName: null, hasInvalidClrKind: false)
         },
 
         new JsonDeserializeTest
@@ -220,7 +220,7 @@ public class ApiClrMemberReferenceTests(ITestOutputHelper output) : XUnitTests(o
             {
                 ""ClrName"": ""Value""
             }",
-            ExpectedFactoryArgument = new ApiClrMemberReferenceDef(clrName: "Value", clrKind: null, hasInvalidClrKind: true)
+            ExpectedFactoryArgument = new ApiClrMemberReferenceDef(clrKind: null, clrName: "Value", hasInvalidClrKind: true)
         },
     ];
 
@@ -229,12 +229,12 @@ public class ApiClrMemberReferenceTests(ITestOutputHelper output) : XUnitTests(o
         new JsonRoundtripTest
         {
             Name = $"{nameof(ApiClrMemberReference)} with {nameof(ApiClrMemberReference.ClrKind)}.{nameof(ClrMemberKind.Field)}",
-            ExpectedFactoryArgument = new ApiClrMemberReferenceDef(clrName: "Value", clrKind: ClrMemberKind.Field)
+            ExpectedFactoryArgument = new ApiClrMemberReferenceDef(clrKind: ClrMemberKind.Field, clrName: "Value")
         },
         new JsonRoundtripTest
         {
             Name = $"{nameof(ApiClrMemberReference)} with {nameof(ApiClrMemberReference.ClrKind)}.{nameof(ClrMemberKind.Property)}",
-            ExpectedFactoryArgument = new ApiClrMemberReferenceDef(clrName: "Value", clrKind: ClrMemberKind.Property)
+            ExpectedFactoryArgument = new ApiClrMemberReferenceDef(clrKind: ClrMemberKind.Property, clrName: "Value")
         },
     ];
 
@@ -243,43 +243,43 @@ public class ApiClrMemberReferenceTests(ITestOutputHelper output) : XUnitTests(o
         new JsonSerializeTest
         {
             Name = $"{nameof(ApiClrMemberReference)} with {nameof(ApiClrMemberReference.ClrKind)}.{nameof(ClrMemberKind.Field)}",
-            SourceFactoryArgument = new ApiClrMemberReferenceDef(clrName: "Value", clrKind: ClrMemberKind.Field),
+            SourceFactoryArgument = new ApiClrMemberReferenceDef(clrKind: ClrMemberKind.Field, clrName: "Value"),
             ExpectedJson = @"
             {
-                ""ClrName"": ""Value"",
-                ""ClrKind"": ""Field""
+                ""ClrKind"": ""Field"",
+                ""ClrName"": ""Value""
             }"
         },
         new JsonSerializeTest
         {
             Name = $"{nameof(ApiClrMemberReference)} with {nameof(ApiClrMemberReference.ClrKind)}.{nameof(ClrMemberKind.Field)} and camel-case JSON",
             JsonSerializerOptions = CamelCaseOptions,
-            SourceFactoryArgument = new ApiClrMemberReferenceDef(clrName: "Value", clrKind: ClrMemberKind.Field),
+            SourceFactoryArgument = new ApiClrMemberReferenceDef(clrKind: ClrMemberKind.Field, clrName: "Value"),
             ExpectedJson = @"
             {
-                ""clrName"": ""Value"",
-                ""clrKind"": ""Field""
+                ""clrKind"": ""Field"",
+                ""clrName"": ""Value""
             }"
         },
         new JsonSerializeTest
         {
             Name = $"{nameof(ApiClrMemberReference)} with {nameof(ApiClrMemberReference.ClrKind)}.{nameof(ClrMemberKind.Property)}",
-            SourceFactoryArgument = new ApiClrMemberReferenceDef(clrName: "Value", clrKind: ClrMemberKind.Property),
+            SourceFactoryArgument = new ApiClrMemberReferenceDef(clrKind: ClrMemberKind.Property, clrName: "Value"),
             ExpectedJson = @"
             {
-                ""ClrName"": ""Value"",
-                ""ClrKind"": ""Property""
+                ""ClrKind"": ""Property"",
+                ""ClrName"": ""Value""
             }"
         },
         new JsonSerializeTest
         {
             Name = $"{nameof(ApiClrMemberReference)} with {nameof(ApiClrMemberReference.ClrKind)}.{nameof(ClrMemberKind.Property)} and camel-case JSON",
             JsonSerializerOptions = CamelCaseOptions,
-            SourceFactoryArgument = new ApiClrMemberReferenceDef(clrName: "Value", clrKind: ClrMemberKind.Property),
+            SourceFactoryArgument = new ApiClrMemberReferenceDef(clrKind: ClrMemberKind.Property, clrName: "Value"),
             ExpectedJson = @"
             {
-                ""clrName"": ""Value"",
-                ""clrKind"": ""Property""
+                ""clrKind"": ""Property"",
+                ""clrName"": ""Value""
             }"
         },
     ];

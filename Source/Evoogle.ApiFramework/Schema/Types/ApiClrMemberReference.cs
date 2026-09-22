@@ -30,26 +30,26 @@ public sealed class ApiClrMemberReference : IEquatable<ApiClrMemberReference>
     #endregion
 
     #region Properties
-    /// <summary>Gets the CLR member name.</summary>
-    public string ClrName { get; }
-
     /// <summary>Gets the CLR member kind.</summary>
     public ClrMemberKind ClrKind => this.RequireValue(_clrKind);
+
+    /// <summary>Gets the CLR member name.</summary>
+    public string ClrName { get; }
     #endregion
 
     #region Constructors
     /// <summary>Creates a CLR member reference.</summary>
-    /// <param name="clrName">The CLR member name.</param>
     /// <param name="clrKind">The CLR member kind.</param>
-    public ApiClrMemberReference(string clrName, ClrMemberKind clrKind)
-        : this(clrName, clrKind, false)
+    /// <param name="clrName">The CLR member name.</param>
+    public ApiClrMemberReference(ClrMemberKind clrKind, string clrName)
+        : this(clrKind, clrName, false)
     {
     }
 
-    internal ApiClrMemberReference(string clrName, ClrMemberKind? clrKind, bool hasInvalidClrKind)
+    internal ApiClrMemberReference(ClrMemberKind? clrKind, string clrName, bool hasInvalidClrKind)
     {
-        this.ClrName = clrName;
         _clrKind = clrKind;
+        this.ClrName = clrName;
         _hasInvalidClrKind = hasInvalidClrKind;
     }
     #endregion
@@ -57,8 +57,8 @@ public sealed class ApiClrMemberReference : IEquatable<ApiClrMemberReference>
     #region Equality Methods
     /// <inheritdoc/>
     public bool Equals(ApiClrMemberReference? other) => other is not null
-        && ClrNameComparer.Instance.Equals(this.ClrName, other.ClrName)
-        && _clrKind == other._clrKind;
+        && _clrKind == other._clrKind
+        && ClrNameComparer.Instance.Equals(this.ClrName, other.ClrName);
 
     /// <inheritdoc/>
     public override bool Equals(object? obj) => this.Equals(obj as ApiClrMemberReference);
@@ -66,8 +66,8 @@ public sealed class ApiClrMemberReference : IEquatable<ApiClrMemberReference>
     /// <inheritdoc/>
     public override int GetHashCode() => HashCode.Combine
     (
-        this.ClrName is null ? 0 : ClrNameComparer.Instance.GetHashCode(this.ClrName),
-        _clrKind
+        _clrKind,
+        this.ClrName is null ? 0 : ClrNameComparer.Instance.GetHashCode(this.ClrName)
     );
 
     /// <summary>Determines whether two references identify the same CLR member.</summary>
@@ -83,9 +83,9 @@ public sealed class ApiClrMemberReference : IEquatable<ApiClrMemberReference>
     /// <inheritdoc/>
     public override string ToString()
     {
-        var clrName = this.ClrName.SafeToString();
         var clrKind = _clrKind.SafeToString();
-        return $"{nameof(ApiClrMemberReference)} {{{nameof(this.ClrName)}={clrName}, {nameof(this.ClrKind)}={clrKind}}}";
+        var clrName = this.ClrName.SafeToString();
+        return $"{nameof(ApiClrMemberReference)} {{{nameof(this.ClrKind)}={clrKind}, {nameof(this.ClrName)}={clrName}}}";
     }
     #endregion
 
@@ -101,10 +101,10 @@ public sealed class ApiClrMemberReference : IEquatable<ApiClrMemberReference>
         ArgumentNullException.ThrowIfNull(clrObjectType);
         ArgumentNullException.ThrowIfNull(context);
 
-        // Validate the CLR member name and kind before attempting to resolve the reference.
-        var isClrNameInvalid = !this.ValidateClrName(context);
+        // Validate the CLR member kind and name before attempting to resolve the reference.
         var isClrKindInvalid = !this.ValidateClrKind(context);
-        if (isClrNameInvalid || isClrKindInvalid)
+        var isClrNameInvalid = !this.ValidateClrName(context);
+        if (isClrKindInvalid || isClrNameInvalid)
         {
             return null;
         }
@@ -132,6 +132,22 @@ public sealed class ApiClrMemberReference : IEquatable<ApiClrMemberReference>
     #endregion
 
     #region Implementation Methods
+    private bool ValidateClrKind(ApiSchemaCompilationContext context)
+    {
+        if (_hasInvalidClrKind || _clrKind is ClrMemberKind clrKind && !Enum.IsDefined(clrKind))
+        {
+            var severity = ApiSchemaCompilationSeverity.Error;
+            var code = ApiSchemaCompilationCode.ApiClrMemberReferenceInvalidClrKind;
+            var description = $"{nameof(this.ClrKind)} must be a valid {nameof(Types.ClrMemberKind)} value";
+            var remediation = $"Specify a valid {nameof(this.ClrKind)} value";
+
+            context.AddIssue(severity, code, description, remediation);
+            return false;
+        }
+
+        return true;
+    }
+
     private bool ValidateClrName(ApiSchemaCompilationContext context)
     {
         var isClrNameInvalid = ApiSchemaNameValidation.IsNameInvalid(this.ClrName);
@@ -141,22 +157,6 @@ public sealed class ApiClrMemberReference : IEquatable<ApiClrMemberReference>
             var code = ApiSchemaCompilationCode.ApiClrMemberReferenceInvalidClrName;
             var description = $"{nameof(this.ClrName)} must not be null, empty, or whitespace";
             var remediation = $"Specify a valid {nameof(this.ClrName)} value";
-
-            context.AddIssue(severity, code, description, remediation);
-            return false;
-        }
-
-        return true;
-    }
-
-    private bool ValidateClrKind(ApiSchemaCompilationContext context)
-    {
-        if (_hasInvalidClrKind || _clrKind is ClrMemberKind clrKind && !Enum.IsDefined(clrKind))
-        {
-            var severity = ApiSchemaCompilationSeverity.Error;
-            var code = ApiSchemaCompilationCode.ApiClrMemberReferenceInvalidClrKind;
-            var description = $"{nameof(this.ClrKind)} must be a valid {nameof(Types.ClrMemberKind)} value";
-            var remediation = $"Specify a valid {nameof(this.ClrKind)} value";
 
             context.AddIssue(severity, code, description, remediation);
             return false;

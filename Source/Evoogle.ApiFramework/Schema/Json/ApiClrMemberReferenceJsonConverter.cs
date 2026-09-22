@@ -27,8 +27,8 @@ public sealed class ApiClrMemberReferenceJsonConverter(ILogger<ApiClrMemberRefer
     private readonly record struct ApiClrMemberReferencePropertyNames
     {
         #region Immutable Properties
-        public required string ClrName { get; init; }
         public required string ClrKind { get; init; }
+        public required string ClrName { get; init; }
         #endregion
     }
 
@@ -47,8 +47,8 @@ public sealed class ApiClrMemberReferenceJsonConverter(ILogger<ApiClrMemberRefer
             {
                 ApiClrMemberReference = new ApiClrMemberReferencePropertyNames
                 {
-                    ClrName = policy.ConvertName(nameof(Types.ApiClrMemberReference.ClrName)),
                     ClrKind = policy.ConvertName(nameof(Types.ApiClrMemberReference.ClrKind)),
+                    ClrName = policy.ConvertName(nameof(Types.ApiClrMemberReference.ClrName)),
                 }
             };
         #endregion
@@ -62,8 +62,8 @@ public sealed class ApiClrMemberReferenceJsonConverter(ILogger<ApiClrMemberRefer
     private class ApiClrMemberReferenceReadData
     {
         #region Properties
-        public string? ClrName { get; set; }
         public JsonEnumReadState<ClrMemberKind>? ClrKind { get; set; }
+        public string? ClrName { get; set; }
         #endregion
     }
 
@@ -85,19 +85,12 @@ public sealed class ApiClrMemberReferenceJsonConverter(ILogger<ApiClrMemberRefer
         #region ApiClrMemberReference Fields
         public readonly JsonReaderHandlerTable<DefaultReadContext<PropertyNames, ReadState, ReadHandlers>> PropertyHandlers = new()
         {
-            { propertyNames.ApiClrMemberReference.ClrName, HandleApiClrMemberReferenceClrName },
             { propertyNames.ApiClrMemberReference.ClrKind, HandleApiClrMemberReferenceClrKind },
+            { propertyNames.ApiClrMemberReference.ClrName, HandleApiClrMemberReferenceClrName },
         };
         #endregion
 
         #region ApiClrMemberReference Methods
-        private static void HandleApiClrMemberReferenceClrName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
-        {
-            context.ReadData.ApiClrMemberReference ??= new ApiClrMemberReferenceReadData();
-
-            context.ReadData.ApiClrMemberReference.ClrName = reader.GetString();
-        }
-
         private static void HandleApiClrMemberReferenceClrKind(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
         {
             context.ReadData.ApiClrMemberReference ??= new ApiClrMemberReferenceReadData();
@@ -105,6 +98,13 @@ public sealed class ApiClrMemberReferenceJsonConverter(ILogger<ApiClrMemberRefer
             var readData = context.ReadData.ApiClrMemberReference;
             readData.ClrKind ??= new JsonEnumReadState<ClrMemberKind>();
             readData.ClrKind.Read(ref reader, context.Options, _nullableClrMemberKindJsonConverter);
+        }
+
+        private static void HandleApiClrMemberReferenceClrName(ref Utf8JsonReader reader, DefaultReadContext<PropertyNames, ReadState, ReadHandlers> context)
+        {
+            context.ReadData.ApiClrMemberReference ??= new ApiClrMemberReferenceReadData();
+
+            context.ReadData.ApiClrMemberReference.ClrName = reader.GetString();
         }
         #endregion
     }
@@ -141,11 +141,11 @@ public sealed class ApiClrMemberReferenceJsonConverter(ILogger<ApiClrMemberRefer
         var readState = readContext.ReadData.ApiClrMemberReference;
         var clrKindReadState = readState?.ClrKind;
 
-        var clrName = readState?.ClrName;
         var clrKind = clrKindReadState?.Value;
+        var clrName = readState?.ClrName;
         var hasInvalidClrKind = clrKindReadState?.IsInvalid == true;
 
-        var apiClrMemberReference = new ApiClrMemberReference(clrName!, clrKind, hasInvalidClrKind);
+        var apiClrMemberReference = new ApiClrMemberReference(clrKind, clrName!, hasInvalidClrKind);
         return apiClrMemberReference;
     }
 
@@ -180,17 +180,17 @@ public sealed class ApiClrMemberReferenceJsonConverter(ILogger<ApiClrMemberRefer
         writer.WriteJsonObject(state: (apiClrMemberReference, writeContext), writeObject: static (writer, state) =>
         {
             var (apiClrMemberReference, writeContext) = state;
-            WriteApiClrMemberReferenceClrName(writer, apiClrMemberReference, writeContext);
             WriteApiClrMemberReferenceClrKind(writer, apiClrMemberReference, writeContext);
+            WriteApiClrMemberReferenceClrName(writer, apiClrMemberReference, writeContext);
         });
     }
     #endregion
 
     #region Write Implementation Methods
-    private static void WriteApiClrMemberReferenceClrName(Utf8JsonWriter writer, ApiClrMemberReference apiClrMemberReference, DefaultWriteContext<PropertyNames> writeContext)
-        => writer.TryWritePropertyAsString(propertyName: writeContext.PropertyNames.ApiClrMemberReference.ClrName, value: apiClrMemberReference.ClrName, options: writeContext.Options);
-
     private static void WriteApiClrMemberReferenceClrKind(Utf8JsonWriter writer, ApiClrMemberReference apiClrMemberReference, DefaultWriteContext<PropertyNames> writeContext)
         => writer.TryWritePropertyWithConverter(propertyName: writeContext.PropertyNames.ApiClrMemberReference.ClrKind, value: apiClrMemberReference.ClrKind, options: writeContext.Options, converter: _clrMemberKindJsonConverter);
+
+    private static void WriteApiClrMemberReferenceClrName(Utf8JsonWriter writer, ApiClrMemberReference apiClrMemberReference, DefaultWriteContext<PropertyNames> writeContext)
+        => writer.TryWritePropertyAsString(propertyName: writeContext.PropertyNames.ApiClrMemberReference.ClrName, value: apiClrMemberReference.ClrName, options: writeContext.Options);
     #endregion
 }

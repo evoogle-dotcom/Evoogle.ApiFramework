@@ -98,7 +98,7 @@ public class ApiRelationshipDependentEndBuilder(ApiTypeReference apiObjectTypeRe
     ) => this.WithTraversal
     (
         apiName,
-        new ApiClrMemberReference(clrMemberName, clrMemberKind)
+        new ApiClrMemberReference(clrMemberKind, clrMemberName)
     );
 
     private ApiRelationshipDependentEndBuilder WithTraversalCore

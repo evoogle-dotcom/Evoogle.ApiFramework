@@ -47,22 +47,22 @@ public static partial class ApiSchemaFactory
 
     public record ApiClrMemberReferenceDef
     {
-        public ApiClrMemberReferenceDef(string clrName, ClrMemberKind clrKind)
+        public ApiClrMemberReferenceDef(ClrMemberKind clrKind, string clrName)
         {
-            this.ClrName = clrName;
             this.ClrKind = clrKind;
+            this.ClrName = clrName;
             this.HasInvalidClrKind = false;
         }
 
-        public ApiClrMemberReferenceDef(string? clrName, ClrMemberKind? clrKind, bool hasInvalidClrKind)
+        public ApiClrMemberReferenceDef(ClrMemberKind? clrKind, string? clrName, bool hasInvalidClrKind)
         {
-            this.ClrName = clrName;
             this.ClrKind = clrKind;
+            this.ClrName = clrName;
             this.HasInvalidClrKind = hasInvalidClrKind;
         }
 
-        public string? ClrName { get; }
         public ClrMemberKind? ClrKind { get; }
+        public string? ClrName { get; }
         public bool HasInvalidClrKind { get; }
     };
 
@@ -293,8 +293,8 @@ public static partial class ApiSchemaFactory
 
         return new ApiClrMemberReference
         (
-            apiClrMemberReferenceDef.ClrName!,
             apiClrMemberReferenceDef.ClrKind,
+            apiClrMemberReferenceDef.ClrName!,
             apiClrMemberReferenceDef.HasInvalidClrKind
         );
     }

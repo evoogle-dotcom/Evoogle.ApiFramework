@@ -79,12 +79,12 @@ public class ApiRelationshipTraversalReferenceTests(ITestOutputHelper output) : 
         new ReferenceTest
         {
             Name = "Traversal with CLR property reference",
-            ClrMemberReference = new("Related", ClrMemberKind.Property)
+            ClrMemberReference = new(ClrMemberKind.Property, "Related")
         },
         new ReferenceTest
         {
             Name = "Traversal with CLR field reference",
-            ClrMemberReference = new("Related", ClrMemberKind.Field)
+            ClrMemberReference = new(ClrMemberKind.Field, "Related")
         },
     ];
     #endregion

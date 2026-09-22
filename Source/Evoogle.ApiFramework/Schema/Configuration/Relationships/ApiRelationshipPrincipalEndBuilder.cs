@@ -94,7 +94,7 @@ public sealed class ApiRelationshipPrincipalEndBuilder(ApiTypeReference apiObjec
     ) => this.WithTraversal
     (
         apiName,
-        new ApiClrMemberReference(clrMemberName, clrMemberKind)
+        new ApiClrMemberReference(clrMemberKind, clrMemberName)
     );
 
     private ApiRelationshipPrincipalEndBuilder WithTraversalCore

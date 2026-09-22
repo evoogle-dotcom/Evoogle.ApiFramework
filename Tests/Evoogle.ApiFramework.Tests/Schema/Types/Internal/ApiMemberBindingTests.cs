@@ -82,7 +82,7 @@ public class ApiMemberBindingTests(ITestOutputHelper output) : XUnitTests(output
                     case Scenario.ResolveProperty:
                         this.ClrMemberBinding = new
                         (
-                            new ApiClrMemberReference(nameof(BindingObject.Id), ClrMemberKind.Property)
+                            new ApiClrMemberReference(ClrMemberKind.Property, nameof(BindingObject.Id))
                         );
                         this.ClrMemberBinding.TryResolveReference
                         (
@@ -95,7 +95,7 @@ public class ApiMemberBindingTests(ITestOutputHelper output) : XUnitTests(output
                     case Scenario.ResolveField:
                         this.ClrMemberBinding = new
                         (
-                            new ApiClrMemberReference(nameof(BindingObject.Code), ClrMemberKind.Field)
+                            new ApiClrMemberReference(ClrMemberKind.Field, nameof(BindingObject.Code))
                         );
                         this.ClrMemberBinding.TryResolveReference
                         (
@@ -108,7 +108,7 @@ public class ApiMemberBindingTests(ITestOutputHelper output) : XUnitTests(output
                     case Scenario.EnforceMemberKind:
                         this.ClrMemberBinding = new
                         (
-                            new ApiClrMemberReference(nameof(BindingObject.Id), ClrMemberKind.Field)
+                            new ApiClrMemberReference(ClrMemberKind.Field, nameof(BindingObject.Id))
                         );
                         this.ClrMemberBinding.TryResolveReference
                         (
@@ -121,7 +121,7 @@ public class ApiMemberBindingTests(ITestOutputHelper output) : XUnitTests(output
                     case Scenario.RejectDirectMemberWithReference:
                         this.ClrMemberBinding = new
                         (
-                            new ApiClrMemberReference(nameof(BindingObject.Id), ClrMemberKind.Property)
+                            new ApiClrMemberReference(ClrMemberKind.Property, nameof(BindingObject.Id))
                         );
                         this.ClrMemberBinding.Bind(propertyInfo);
                         break;
@@ -140,7 +140,7 @@ public class ApiMemberBindingTests(ITestOutputHelper output) : XUnitTests(output
                     case Scenario.ConsumeFailedMemberResolution:
                         this.ClrMemberBinding = new
                         (
-                            new ApiClrMemberReference(nameof(BindingObject.Id), ClrMemberKind.Field)
+                            new ApiClrMemberReference(ClrMemberKind.Field, nameof(BindingObject.Id))
                         );
                         this.ClrMemberBinding.TryResolveReference
                         (
